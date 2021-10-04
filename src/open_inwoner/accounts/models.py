@@ -1,9 +1,15 @@
+from datetime import date
+
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
+from localflavor.nl.models import NLBSNField, NLZipCodeField
+
+from open_inwoner.utils.storage import PrivateFileSystemStorage
+from .choices import LoginTypeChoices
 from .managers import UserManager
 
 
@@ -44,6 +50,18 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
     date_joined = models.DateTimeField(_("date joined"), default=timezone.now)
 
+    bsn = NLBSNField(null=True, blank=True)
+    login_type = models.CharField(
+        choices=LoginTypeChoices.choices,
+        default=LoginTypeChoices.default,
+        max_length=250,
+    )
+    birthday = models.DateField(null=True, blank=True)
+    street = models.CharField(default="", blank=True, max_length=250)
+    housenumber = models.CharField(default="", blank=True, max_length=250)
+    postcode = NLZipCodeField(null=True, blank=True, max_length=250)
+    city = models.CharField(default="", blank=True, max_length=250)
+
     objects = UserManager()
 
     USERNAME_FIELD = "username"
@@ -63,3 +81,42 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_short_name(self):
         "Returns the short name for the user."
         return self.first_name
+
+    def get_age(self):
+        today = date.today()
+        age = (
+            today.year
+            - self.birthday.year
+            - ((today.month, today.day) < (self.birthday.month, self.birthday.day))
+        )
+
+        return age
+
+
+class Contact(models.Model):
+    first_name = models.CharField(max_length=250)
+    last_name = models.CharField(max_length=250)
+    email = models.EmailField()
+    phonenumber = models.CharField(blank=True, default="", max_length=250)
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
+
+
+class Document(models.Model):
+    name = models.CharField(default="", max_length=250)
+    file = models.FileField(storage=PrivateFileSystemStorage())
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
+
+
+class Appointment(models.Model):
+    name = models.CharField(default="", max_length=250)
+    datetime = models.DateTimeField()
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
+
+
+class Action(models.Model):
+    name = models.CharField(default="", max_length=250)
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)

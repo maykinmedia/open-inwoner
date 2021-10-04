@@ -16,6 +16,8 @@ django-rosetta
 django-sniplates
 maykin-django-two-factor-auth
 phonenumbers
+django-localflavor
+django-sendfile
 
 # API libraries
 # djangorestframework

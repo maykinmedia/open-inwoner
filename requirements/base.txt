@@ -20,12 +20,16 @@ django==3.2.7
     #   django-choices
     #   django-formtools
     #   django-hijack
+    #   django-localflavor
     #   django-otp
     #   django-phonenumber-field
     #   django-redis
     #   django-rosetta
     #   django-sniplates
     #   maykin-django-two-factor-auth
+    #   django-sendfile
+    #   django-sniplates
+    #   django-two-factor-auth
 django-admin-index==1.5.0
     # via -r requirements/base.in
 django-axes==5.25.0
@@ -38,6 +42,8 @@ django-hijack==3.0.4
     # via -r requirements/base.in
 django-ipware==4.0.0
     # via django-axes
+django-localflavor==3.1
+    # via -r requirements/base.in
 django-ordered-model==3.4.3
     # via django-admin-index
 django-otp==1.1.1
@@ -47,6 +53,8 @@ django-phonenumber-field==5.2.0
 django-redis==5.0.0
     # via -r requirements/base.in
 django-rosetta==0.9.7
+    # via -r requirements/base.in
+django-sendfile==0.3.11
     # via -r requirements/base.in
 django-sniplates==0.7.0
     # via -r requirements/base.in
@@ -68,6 +76,8 @@ python-decouple==3.5
     # via -r requirements/base.in
 python-dotenv==0.19.0
     # via -r requirements/base.in
+python-stdnum==1.17
+    # via django-localflavor
 pytz==2021.3
     # via
     #   -r requirements/base.in
