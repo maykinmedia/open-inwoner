@@ -121,6 +121,7 @@ INSTALLED_APPS = [
     "easy_thumbnails",  # used by filer
     "filer",
     "mptt",  # used by filer
+    "hijack.contrib.admin",
     # Project applications.
     "open_inwoner.accounts",
     "open_inwoner.pdc",
