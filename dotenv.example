@@ -1,0 +1,10 @@
+SECRET_KEY="7bk)w=_%lnm#68rc!c)h@gy&5+%^f$=okq17bv!)yv!l0udu2y"
+DB_NAME="open_inwoner"
+DB_USER="open_inwoner"
+#
+# For peer authentication via unix domain socket
+# these should be kept empty.
+#
+DB_PASSWORD=""
+DB_HOST=""
+DB_PORT=""
