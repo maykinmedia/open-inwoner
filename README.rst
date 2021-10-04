@@ -3,11 +3,9 @@ open_inwoner
 ==================
 
 :Version: 0.1.0
-:Source: https://bitbucket.org/maykinmedia/open_inwoner
+:Source: https://github.com/maykinmedia/open_inwoner
 :Keywords: ``<keywords>``
 :PythonVersion: 3.7
-
-|build-status| |requirements|
 
 ``<oneliner describing the project>``
 
@@ -31,16 +29,6 @@ References
 ==========
 
 * `Issues <https://taiga.maykinmedia.nl/project/open_inwoner>`_
-* `Code <https://bitbucket.org/maykinmedia/open_inwoner>`_
-
-
-.. |build-status| image:: http://jenkins.maykin.nl/buildStatus/icon?job=bitbucket/open_inwoner/master
-    :alt: Build status
-    :target: http://jenkins.maykin.nl/job/open_inwoner
-
-.. |requirements| image:: https://requires.io/bitbucket/maykinmedia/open_inwoner/requirements.svg?branch=master
-     :target: https://requires.io/bitbucket/maykinmedia/open_inwoner/requirements/?branch=master
-     :alt: Requirements status
-
+* `Code <https://github.com/maykinmedia/open_inwoner>`_
 
 .. _Maykin Media B.V.: https://www.maykinmedia.nl
