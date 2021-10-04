@@ -37,6 +37,7 @@ django==3.2.7
     #   django-choices
     #   django-formtools
     #   django-hijack
+    #   django-jenkins
     #   django-localflavor
     #   django-otp
     #   django-phonenumber-field
@@ -46,6 +47,9 @@ django==3.2.7
     #   django-sendfile2
     #   django-sniplates
     #   maykin-django-two-factor-auth
+    #   django-sendfile
+    #   django-sniplates
+    #   django-two-factor-auth
 django-admin-index==1.5.0
     # via
     #   -c requirements/base.txt
@@ -63,6 +67,7 @@ django-formtools==2.3
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   maykin-django-two-factor-auth
+    #   django-two-factor-auth
 django-hijack==3.0.4
     # via
     #   -c requirements/base.txt
