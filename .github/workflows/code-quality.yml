@@ -1,0 +1,47 @@
+name: code-quality
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - '*'
+    paths:
+      - '**.py'
+  pull_request:
+    paths:
+      - '**.py'
+  workflow_dispatch:
+
+
+jobs:
+  isort:
+    name: Check import sorting
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.7'
+      - uses: isort/isort-action@v0.1.0
+        with:
+          requirementsFiles: requirements/dev.txt
+          sortPaths: "src"
+          configuration: '--check-only --diff'
+
+  black:
+    name: Check code formatting with black
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.7'
+      - name: Install dependencies
+        run: |
+          pip install -r requirements/dev.txt
+      - name: Run black
+        run: |
+          black --check src
