@@ -3,7 +3,7 @@ from unittest import skipIf
 from unittest.mock import mock_open, patch
 
 from django.conf import settings
-from django.test import TestCase
+from django.test import TestCase, SimpleTestCase
 from django.utils.module_loading import import_string
 
 from open_inwoner.conf.utils import get_current_version
@@ -115,7 +115,7 @@ class FileVersionTestCase(VersionTestCase):
 
 
 class BeatConfigTests(SimpleTestCase):
-    @skipIf(not hasattr(settings, "CELERY_BEAT_SCHEDULE")
+    @skipIf(not hasattr(settings, "CELERY_BEAT_SCHEDULE"))
     def test_task_references_correct(self):
         """
         Assert that the task import paths in the Beat config are valid.
