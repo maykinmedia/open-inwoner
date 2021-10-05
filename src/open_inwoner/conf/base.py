@@ -310,6 +310,9 @@ AUTHENTICATION_BACKENDS = [
 SESSION_COOKIE_NAME = "open_inwoner_sessionid"
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 
+LOGIN_REDIRECT_URL = reverse_lazy("admin:index")
+LOGOUT_REDIRECT_URL = reverse_lazy("admin:index")
+
 #
 # SECURITY settings
 #
@@ -398,10 +401,6 @@ HIJACK_ALLOW_GET_REQUESTS = True
 #
 SENTRY_DSN = config("SENTRY_DSN", None)
 RELEASE = get_current_version()
-
-# Two factor auth
-LOGIN_URL = 'two_factor:login'
-LOGIN_REDIRECT_URL = 'admin:index'
 
 if SENTRY_DSN:
     SENTRY_CONFIG = {
