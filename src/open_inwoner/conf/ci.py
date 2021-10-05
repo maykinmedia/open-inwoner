@@ -1,6 +1,5 @@
 import os
 
-
 os.environ.setdefault("DEBUG", "no")
 os.environ.setdefault("ENVIRONMENT", "ci")
 os.environ.setdefault("SECRET_KEY", "for-testing-purposes-only")

@@ -96,13 +96,11 @@ INSTALLED_APPS = [
     # 'django.contrib.sites',
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
     # Admin auth
     "django_otp",
     "django_otp.plugins.otp_static",
     "django_otp.plugins.otp_totp",
     "two_factor",
-
     # Optional applications.
     "ordered_model",
     "django_admin_index",
@@ -320,7 +318,7 @@ SESSION_COOKIE_SECURE = IS_HTTPS
 SESSION_COOKIE_HTTPONLY = True
 
 CSRF_COOKIE_SECURE = IS_HTTPS
-CSRF_FAILURE_VIEW = 'open_inwoner.accounts.views.csrf_failure'
+CSRF_FAILURE_VIEW = "open_inwoner.accounts.views.csrf_failure"
 
 X_FRAME_OPTIONS = "DENY"
 
@@ -414,12 +412,12 @@ if SENTRY_DSN:
     )
 
 # Elastic APM
-ELASTIC_APM_SERVER_URL = os.getenv('ELASTIC_APM_SERVER_URL', None)
+ELASTIC_APM_SERVER_URL = os.getenv("ELASTIC_APM_SERVER_URL", None)
 ELASTIC_APM = {
     "SERVICE_NAME": f"open_inwoner {ENVIRONMENT}",
     "SECRET_TOKEN": config("ELASTIC_APM_SECRET_TOKEN", "default"),
     "SERVER_URL": ELASTIC_APM_SERVER_URL,
 }
 if not ELASTIC_APM_SERVER_URL:
-    ELASTIC_APM['ENABLED'] = False
-    ELASTIC_APM['SERVER_URL'] = 'http://localhost:8200'
+    ELASTIC_APM["ENABLED"] = False
+    ELASTIC_APM["SERVER_URL"] = "http://localhost:8200"
