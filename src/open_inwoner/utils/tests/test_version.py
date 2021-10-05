@@ -1,10 +1,7 @@
 from subprocess import CalledProcessError
-from unittest import skipIf
 from unittest.mock import mock_open, patch
 
-from django.conf import settings
-from django.test import TestCase, SimpleTestCase
-from django.utils.module_loading import import_string
+from django.test import TestCase
 
 from open_inwoner.conf.utils import get_current_version
 
@@ -112,20 +109,3 @@ class FileVersionTestCase(VersionTestCase):
         self.mocked_listdir.return_value = ("foo", "bar", "foobar")
 
         self.assertEqual(get_current_version(), "")
-
-
-class BeatConfigTests(SimpleTestCase):
-    @skipIf(not hasattr(settings, "CELERY_BEAT_SCHEDULE"))
-    def test_task_references_correct(self):
-        """
-        Assert that the task import paths in the Beat config are valid.
-        """
-        for entry in settings.CELERY_BEAT_SCHEDULE.values():
-            task = entry["task"]
-            with self.subTest(task=task):
-                try:
-                    import_string(task)
-                except ImportError:
-                    self.fail(
-                        f"Could not import task '{task}' in settings.CELERY_BEAT_SCHEDULE"
-                    )

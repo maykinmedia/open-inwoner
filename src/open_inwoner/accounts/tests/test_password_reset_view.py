@@ -9,6 +9,5 @@ class PasswordResetViewTests(TestCase):
         for i in range(5):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 200)
-            print(i)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 403)
