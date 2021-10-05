@@ -310,9 +310,6 @@ AUTHENTICATION_BACKENDS = [
 SESSION_COOKIE_NAME = "open_inwoner_sessionid"
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 
-LOGIN_URL = reverse_lazy("admin:login")
-LOGIN_REDIRECT_URL = reverse_lazy("admin:index")
-
 #
 # SECURITY settings
 #
