@@ -22,6 +22,8 @@ BASE_DIR = os.path.abspath(
 #
 # SITE_ID = config("SITE_ID", default=1)
 
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config("SECRET_KEY")
 
@@ -113,7 +115,6 @@ INSTALLED_APPS = [
     "sniplates",
     "compat",  # Part of hijack
     "hijack",
-    "hijack_admin",
     # Project applications.
     "open_inwoner.accounts",
     "open_inwoner.utils",
@@ -129,6 +130,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "axes.middleware.AxesMiddleware",
+    "hijack.middleware.HijackUserMiddleware",
     "django_otp.middleware.OTPMiddleware",
 ]
 
