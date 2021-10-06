@@ -122,6 +122,7 @@ INSTALLED_APPS = [
     "mptt",  # used by filer
     # Project applications.
     "open_inwoner.accounts",
+    "open_inwoner.pdc",
     "open_inwoner.utils",
 ]
 
