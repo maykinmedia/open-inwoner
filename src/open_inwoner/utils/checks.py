@@ -27,6 +27,10 @@ def check_modelform_exclude(app_configs, **kwargs):
     errors = []
 
     for form in get_subclasses(ModelForm):
+        # skip for django-filer and django-treebeard
+        if form.__module__.split(".")[0] in ("mptt", "filer", "treebeard."):
+            continue
+
         # ok, fields is defined
         if form._meta.fields or getattr(form.Meta, "fields", None):
             continue
