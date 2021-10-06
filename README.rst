@@ -1,21 +1,22 @@
 ==================
-open_inwoner
+Open Inwoner
 ==================
 
 :Version: 0.1.0
-:Source: https://github.com/maykinmedia/open_inwoner
-:Keywords: ``<keywords>``
+:Source: https://github.com/maykinmedia/open-inwoner
+:Keywords: inwoner
 :PythonVersion: 3.7
 
-``<oneliner describing the project>``
+Platform to provide digital services to the residents.
 
-Developed by `Maykin Media B.V.`_ for ``<client>``
+Developed by `Maykin Media B.V.`_ for Dimpact.
 
 
 Introduction
 ============
 
-``<describe the project in a few paragraphs and briefly mention the features>``
+Open Inwoner Platform is designed to help municipalities to support their residents and to inform them about
+available services.
 
 
 Documentation
@@ -29,6 +30,6 @@ References
 ==========
 
 * `Issues <https://taiga.maykinmedia.nl/project/open_inwoner>`_
-* `Code <https://github.com/maykinmedia/open_inwoner>`_
+* `Code <https://github.com/maykinmedia/open-inwoner>`_
 
 .. _Maykin Media B.V.: https://www.maykinmedia.nl
