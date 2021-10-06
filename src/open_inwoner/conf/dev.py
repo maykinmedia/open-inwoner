@@ -23,6 +23,7 @@ from .base import *  # noqa isort:skip
 #
 # Standard Django settings.
 #
+SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 LOGGING["loggers"].update(

@@ -4,7 +4,7 @@ from django.db import migrations, models
 
 import localflavor.nl.models
 
-import open_inwoner.utils.storage
+import open_inwoner.private_files.storage
 
 
 class Migration(migrations.Migration):
@@ -88,7 +88,7 @@ class Migration(migrations.Migration):
                 (
                     "file",
                     models.FileField(
-                        storage=open_inwoner.utils.storage.PrivateFileSystemStorage(),
+                        storage=open_inwoner.private_files.storage.PrivateFileSystemStorage(),
                         upload_to="",
                     ),
                 ),

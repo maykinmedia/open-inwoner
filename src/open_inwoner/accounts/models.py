@@ -8,7 +8,8 @@ from django.utils.translation import ugettext_lazy as _
 
 from localflavor.nl.models import NLBSNField, NLZipCodeField
 
-from open_inwoner.utils.storage import PrivateFileSystemStorage
+from open_inwoner.private_files.storage import PrivateFileSystemStorage
+from open_inwoner.utils.validators import validate_phone_number
 
 from .choices import LoginTypeChoices
 from .managers import UserManager
@@ -98,7 +99,9 @@ class Contact(models.Model):
     first_name = models.CharField(max_length=250)
     last_name = models.CharField(max_length=250)
     email = models.EmailField()
-    phonenumber = models.CharField(blank=True, default="", max_length=250)
+    phonenumber = models.CharField(
+        blank=True, default="", max_length=250, validators=[validate_phone_number]
+    )
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
 

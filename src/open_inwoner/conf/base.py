@@ -113,11 +113,12 @@ INSTALLED_APPS = [
     # External applications.
     "axes",
     "sniplates",
+    # "hijack.contrib.admin", # This should be imported but it causes an error. So now there are
     "hijack",
-    "hijack.contrib.admin",
     "localflavor",
     # Project applications.
     "open_inwoner.accounts",
+    "open_inwoner.private_files",
     "open_inwoner.utils",
 ]
 

@@ -38,8 +38,16 @@ urlpatterns = [
         auth_views.PasswordResetCompleteView.as_view(),
         name="password_reset_complete",
     ),
+    path(
+        "private_files/",
+        include("open_inwoner.private_files.urls", namespace="private_files"),
+    ),
+    path(
+        "accounts/",
+        include("open_inwoner.accounts.urls", namespace="accounts"),
+    ),
     # Simply show the master template.
-    path("", TemplateView.as_view(template_name="master.html")),
+    path("", TemplateView.as_view(template_name="master.html"), name="root"),
 ]
 
 # NOTE: The staticfiles_urlpatterns also discovers static files (ie. no need to run collectstatic). Both the static
