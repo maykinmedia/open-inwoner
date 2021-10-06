@@ -113,7 +113,6 @@ INSTALLED_APPS = [
     # External applications.
     "axes",
     "sniplates",
-    "compat",  # Part of hijack
     "hijack",
     # Project applications.
     "open_inwoner.accounts",
