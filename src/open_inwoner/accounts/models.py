@@ -9,6 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 from localflavor.nl.models import NLBSNField, NLZipCodeField
 
 from open_inwoner.utils.storage import PrivateFileSystemStorage
+
 from .choices import LoginTypeChoices
 from .managers import UserManager
 
