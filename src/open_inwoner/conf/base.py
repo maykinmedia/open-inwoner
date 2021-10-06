@@ -114,6 +114,10 @@ INSTALLED_APPS = [
     "axes",
     "sniplates",
     "hijack",
+    "treebeard",
+    "easy_thumbnails",  # used by filer
+    "filer",
+    "mptt",  # used by filer
     # Project applications.
     "open_inwoner.accounts",
     "open_inwoner.utils",
