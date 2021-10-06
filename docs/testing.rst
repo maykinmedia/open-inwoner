@@ -29,23 +29,6 @@ and::
     $ cov_runtests src && chromium htmlcov/index.html
 
 
-Jenkins
--------
-
-Run ``./bin/jenkins_django.sh`` to execute the tests for ``develop`` and ``master``.
-This script runs the tests with ``--keepdb``.
-
-To run PR tests, run ``./bin/jenkins_django_pr.sh``. This script drops the test
-database at the end, so it should be safe with different migrations between PR's.
-
-
-SASS build - Jenkins
-====================
-
-There is a simple ``./bin/jenkins_sass.sh`` script that checks if the sass
-compiles successfully.
-
-
 Javascript tests
 ================
 
@@ -70,36 +53,3 @@ To trigger a test run on file change (source file or test file), run::
     $ karma start karma.conf.js --single-run=false --browsers=PhantomJS
 
 
-Jenkins
--------
-
-On Jenkins, the tests are run against PhantomJS and Chrome. Therefore, ``xfvb``
-needs to be available.
-
-Run the tests by invoking ``./bin/jenkins_js.sh``.
-
-
-Jenkins jobs
-============
-
-It is recommended to set up the following Jenkins jobs for a project:
-
-**master** branch
------------------
-
-1. ``open_inwoner-django``: backend tests, runs ``./bin/jenkins_django.sh``.
-2. ``open_inwoner-js``: frontend tests, runs ``./bin/jenkins_js.sh``.
-
-**develop** branch
-------------------
-
-1. ``open_inwoner-django-develop``: backend tests, runs ``./bin/jenkins_django.sh``.
-2. ``open_inwoner-django-develop-js``: frontend tests, runs ``./bin/jenkins_js.sh``.
-
-pull requests
--------------
-1. ``open_inwoner-pr-django``: backend tests, runs ``./bin/jenkins_django_pr.sh``.
-2. ``open_inwoner-pr-js``: frontend tests, runs ``./bin/jenkins_js.sh``.
-3. ``open_inwoner-pr-sass``: checks that sass compiles, runs ``./bin/jenkins_sass.sh``.
-4. ``open_inwoner-pr-isort``: checks that imports are correctly
-   sorted, runs ``./bin/jenkins_isort.sh``.

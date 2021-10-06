@@ -22,6 +22,8 @@ BASE_DIR = os.path.abspath(
 #
 # SITE_ID = config("SITE_ID", default=1)
 
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config("SECRET_KEY")
 
@@ -96,13 +98,11 @@ INSTALLED_APPS = [
     # 'django.contrib.sites',
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
     # Admin auth
     "django_otp",
     "django_otp.plugins.otp_static",
     "django_otp.plugins.otp_totp",
     "two_factor",
-
     # Optional applications.
     "ordered_model",
     "django_admin_index",
@@ -113,9 +113,7 @@ INSTALLED_APPS = [
     # External applications.
     "axes",
     "sniplates",
-    "compat",  # Part of hijack
     "hijack",
-    "hijack_admin",
     # Project applications.
     "open_inwoner.accounts",
     "open_inwoner.utils",
@@ -131,6 +129,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "axes.middleware.AxesMiddleware",
+    "hijack.middleware.HijackUserMiddleware",
     "django_otp.middleware.OTPMiddleware",
 ]
 
@@ -310,8 +309,8 @@ AUTHENTICATION_BACKENDS = [
 SESSION_COOKIE_NAME = "open_inwoner_sessionid"
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 
-LOGIN_URL = reverse_lazy("admin:login")
 LOGIN_REDIRECT_URL = reverse_lazy("admin:index")
+LOGOUT_REDIRECT_URL = reverse_lazy("admin:index")
 
 #
 # SECURITY settings
@@ -320,7 +319,7 @@ SESSION_COOKIE_SECURE = IS_HTTPS
 SESSION_COOKIE_HTTPONLY = True
 
 CSRF_COOKIE_SECURE = IS_HTTPS
-CSRF_FAILURE_VIEW = 'open_inwoner.accounts.views.csrf_failure'
+CSRF_FAILURE_VIEW = "open_inwoner.accounts.views.csrf_failure"
 
 X_FRAME_OPTIONS = "DENY"
 
@@ -402,10 +401,6 @@ HIJACK_ALLOW_GET_REQUESTS = True
 SENTRY_DSN = config("SENTRY_DSN", None)
 RELEASE = get_current_version()
 
-# Two factor auth
-LOGIN_URL = 'two_factor:login'
-LOGIN_REDIRECT_URL = 'admin:index'
-
 if SENTRY_DSN:
     SENTRY_CONFIG = {
         "dsn": SENTRY_DSN,
@@ -418,12 +413,12 @@ if SENTRY_DSN:
     )
 
 # Elastic APM
-ELASTIC_APM_SERVER_URL = os.getenv('ELASTIC_APM_SERVER_URL', None)
+ELASTIC_APM_SERVER_URL = os.getenv("ELASTIC_APM_SERVER_URL", None)
 ELASTIC_APM = {
     "SERVICE_NAME": f"open_inwoner {ENVIRONMENT}",
     "SECRET_TOKEN": config("ELASTIC_APM_SECRET_TOKEN", "default"),
     "SERVER_URL": ELASTIC_APM_SERVER_URL,
 }
 if not ELASTIC_APM_SERVER_URL:
-    ELASTIC_APM['ENABLED'] = False
-    ELASTIC_APM['SERVER_URL'] = 'http://localhost:8200'
+    ELASTIC_APM["ENABLED"] = False
+    ELASTIC_APM["SERVER_URL"] = "http://localhost:8200"
