@@ -17,7 +17,7 @@ django-sniplates
 maykin-django-two-factor-auth
 phonenumbers
 django-localflavor
-django-sendfile
+django-privates
 
 # API libraries
 # djangorestframework

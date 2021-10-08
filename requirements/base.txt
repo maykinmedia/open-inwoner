@@ -23,13 +23,12 @@ django==3.2.7
     #   django-localflavor
     #   django-otp
     #   django-phonenumber-field
+    #   django-privates
     #   django-redis
     #   django-rosetta
+    #   django-sendfile2
     #   django-sniplates
     #   maykin-django-two-factor-auth
-    #   django-sendfile
-    #   django-sniplates
-    #   django-two-factor-auth
 django-admin-index==1.5.0
     # via -r requirements/base.in
 django-axes==5.25.0
@@ -50,12 +49,14 @@ django-otp==1.1.1
     # via maykin-django-two-factor-auth
 django-phonenumber-field==5.2.0
     # via maykin-django-two-factor-auth
+django-privates==1.2.2
+    # via -r requirements/base.in
 django-redis==5.0.0
     # via -r requirements/base.in
 django-rosetta==0.9.7
     # via -r requirements/base.in
-django-sendfile==0.3.11
-    # via -r requirements/base.in
+django-sendfile2==0.6.0
+    # via django-privates
 django-sniplates==0.7.0
     # via -r requirements/base.in
 elastic-apm==6.4.0

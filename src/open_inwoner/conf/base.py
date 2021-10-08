@@ -118,7 +118,6 @@ INSTALLED_APPS = [
     "localflavor",
     # Project applications.
     "open_inwoner.accounts",
-    "open_inwoner.private_files",
     "open_inwoner.utils",
 ]
 

@@ -37,17 +37,15 @@ django==3.2.7
     #   django-choices
     #   django-formtools
     #   django-hijack
-    #   django-jenkins
     #   django-localflavor
     #   django-otp
     #   django-phonenumber-field
+    #   django-privates
     #   django-redis
     #   django-rosetta
+    #   django-sendfile2
     #   django-sniplates
     #   maykin-django-two-factor-auth
-    #   django-sendfile
-    #   django-sniplates
-    #   django-two-factor-auth
 django-admin-index==1.5.0
     # via
     #   -c requirements/base.txt
@@ -65,7 +63,6 @@ django-formtools==2.3
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   maykin-django-two-factor-auth
-    #   django-two-factor-auth
 django-hijack==3.0.4
     # via
     #   -c requirements/base.txt
@@ -75,8 +72,6 @@ django-ipware==4.0.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-axes
-django-jenkins==0.110.0
-    # via -r requirements/test-tools.in
 django-localflavor==3.1
     # via
     #   -c requirements/base.txt
@@ -96,6 +91,10 @@ django-phonenumber-field==5.2.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   maykin-django-two-factor-auth
+django-privates==1.2.2
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
 django-redis==5.0.0
     # via
     #   -c requirements/base.txt
@@ -104,10 +103,11 @@ django-rosetta==0.9.7
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-django-sendfile==0.3.11
+django-sendfile2==0.6.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   django-privates
 django-sniplates==0.7.0
     # via
     #   -c requirements/base.txt

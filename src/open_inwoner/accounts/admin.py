@@ -14,19 +14,23 @@ class _UserAdmin(HijackUserAdminMixin, UserAdmin):
 
 @admin.register(Action)
 class ActionAdmin(admin.ModelAdmin):
-    pass
+    list_display = ("name", "created_on", "created_by")
+    list_filter = ("created_by",)
 
 
 @admin.register(Contact)
 class ContactAdmin(admin.ModelAdmin):
-    pass
+    list_display = ("first_name", "last_name", "email", "created_by", "created_on")
+    list_filter = ("created_by",)
 
 
 @admin.register(Document)
 class DocumentAdmin(admin.ModelAdmin):
-    pass
+    list_display = ("name", "file", "created_on", "owner")
+    list_filter = ("owner",)
 
 
 @admin.register(Appointment)
 class AppointmentAdmin(admin.ModelAdmin):
-    pass
+    list_display = ("name", "datetime", "created_on", "created_by")
+    list_filter = ("created_by",)
