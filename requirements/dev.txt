@@ -82,9 +82,6 @@ django==3.2.7
     #   django-treebeard
     #   easy-thumbnails
     #   maykin-django-two-factor-auth
-    #   django-sendfile
-    #   django-sniplates
-    #   django-two-factor-auth
 django-admin-index==1.5.0
     # via
     #   -c requirements/ci.txt

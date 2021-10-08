@@ -12,6 +12,7 @@ from django_registration.backends.one_step.views import RegistrationView
 from open_inwoner.accounts.forms import CustomRegistrationForm
 from open_inwoner.accounts.views import DocumentPrivateMediaView, PasswordResetView
 
+
 handler500 = "open_inwoner.utils.views.server_error"
 admin.site.site_header = "open_inwoner admin"
 admin.site.site_title = "open_inwoner admin"
