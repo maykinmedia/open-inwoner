@@ -7,9 +7,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import include, path
 from django.views.generic.base import TemplateView
 
-from privates.views import PrivateMediaView
-
-from open_inwoner.accounts.views.password_reset import PasswordResetView
+from open_inwoner.accounts.views import DocumentPrivateMediaView, PasswordResetView
 
 handler500 = "open_inwoner.utils.views.server_error"
 admin.site.site_header = "open_inwoner admin"
@@ -40,7 +38,11 @@ urlpatterns = [
         auth_views.PasswordResetCompleteView.as_view(),
         name="password_reset_complete",
     ),
-    path("private_files/<path>/", PrivateMediaView.as_view(), name="private_file"),
+    path(
+        "private_files/<path>",
+        DocumentPrivateMediaView.as_view(),
+        name="private_file",
+    ),
     # Simply show the master template.
     path("", TemplateView.as_view(template_name="master.html"), name="root"),
 ]
