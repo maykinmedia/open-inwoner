@@ -1,0 +1,88 @@
+/	django.views.generic.base.TemplateView	root
+/__debug__/render_panel/	debug_toolbar.views.render_panel	djdt:render_panel
+/__debug__/sql_explain/	debug_toolbar.panels.sql.views.sql_explain	djdt:sql_explain
+/__debug__/sql_profile/	debug_toolbar.panels.sql.views.sql_profile	djdt:sql_profile
+/__debug__/sql_select/	debug_toolbar.panels.sql.views.sql_select	djdt:sql_select
+/__debug__/template_source/	debug_toolbar.panels.templates.views.template_source	djdt:template_source
+/accounts/login/	django.contrib.auth.views.LoginView	login
+/accounts/logout/	django.contrib.auth.views.LogoutView	logout
+/accounts/password_change/	django.contrib.auth.views.PasswordChangeView	password_change
+/accounts/password_change/done/	django.contrib.auth.views.PasswordChangeDoneView	password_change_done
+/accounts/password_reset/	django.contrib.auth.views.PasswordResetView	password_reset
+/accounts/password_reset/done/	django.contrib.auth.views.PasswordResetDoneView	password_reset_done
+/accounts/register/	django_registration.backends.one_step.views.RegistrationView	django_registration_register
+/accounts/register/	django_registration.backends.one_step.views.RegistrationView	registration_register
+/accounts/register/closed/	django.views.generic.base.TemplateView	django_registration_disallowed
+/accounts/register/complete/	django.views.generic.base.TemplateView	django_registration_complete
+/accounts/reset/<uidb64>/<token>/	django.contrib.auth.views.PasswordResetConfirmView	password_reset_confirm
+/accounts/reset/done/	django.contrib.auth.views.PasswordResetCompleteView	password_reset_complete
+/admin/	django.contrib.admin.sites.index	admin:index
+/admin/<app_label>/	django.contrib.admin.sites.app_index	admin:app_list
+/admin/<url>	django.contrib.admin.sites.catch_all_view
+/admin/accounts/user/	django.contrib.admin.options.changelist_view	admin:accounts_user_changelist
+/admin/accounts/user/<id>/password/	django.contrib.auth.admin.user_change_password	admin:auth_user_password_change
+/admin/accounts/user/<path:object_id>/	django.views.generic.base.RedirectView
+/admin/accounts/user/<path:object_id>/change/	django.contrib.admin.options.change_view	admin:accounts_user_change
+/admin/accounts/user/<path:object_id>/delete/	django.contrib.admin.options.delete_view	admin:accounts_user_delete
+/admin/accounts/user/<path:object_id>/history/	django.contrib.admin.options.history_view	admin:accounts_user_history
+/admin/accounts/user/add/	django.contrib.auth.admin.add_view	admin:accounts_user_add
+/admin/admin_index/appgroup/	ordered_model.admin.changelist_view	admin:admin_index_appgroup_changelist
+/admin/admin_index/appgroup/<path:object_id>/	django.views.generic.base.RedirectView
+/admin/admin_index/appgroup/<path:object_id>/change/	django.contrib.admin.options.change_view	admin:admin_index_appgroup_change
+/admin/admin_index/appgroup/<path:object_id>/delete/	django.contrib.admin.options.delete_view	admin:admin_index_appgroup_delete
+/admin/admin_index/appgroup/<path:object_id>/history/	django.contrib.admin.options.history_view	admin:admin_index_appgroup_history
+/admin/admin_index/appgroup/<path:object_id>/move-<direction>/	ordered_model.admin.move_view	admin:admin_index_appgroup_change_order
+/admin/admin_index/appgroup/add/	django.contrib.admin.options.add_view	admin:admin_index_appgroup_add
+/admin/auth/group/	django.contrib.admin.options.changelist_view	admin:auth_group_changelist
+/admin/auth/group/<path:object_id>/	django.views.generic.base.RedirectView
+/admin/auth/group/<path:object_id>/change/	django.contrib.admin.options.change_view	admin:auth_group_change
+/admin/auth/group/<path:object_id>/delete/	django.contrib.admin.options.delete_view	admin:auth_group_delete
+/admin/auth/group/<path:object_id>/history/	django.contrib.admin.options.history_view	admin:auth_group_history
+/admin/auth/group/add/	django.contrib.admin.options.add_view	admin:auth_group_add
+/admin/autocomplete/	django.contrib.admin.sites.autocomplete_view	admin:autocomplete
+/admin/axes/accessattempt/	django.contrib.admin.options.changelist_view	admin:axes_accessattempt_changelist
+/admin/axes/accessattempt/<path:object_id>/	django.views.generic.base.RedirectView
+/admin/axes/accessattempt/<path:object_id>/change/	django.contrib.admin.options.change_view	admin:axes_accessattempt_change
+/admin/axes/accessattempt/<path:object_id>/delete/	django.contrib.admin.options.delete_view	admin:axes_accessattempt_delete
+/admin/axes/accessattempt/<path:object_id>/history/	django.contrib.admin.options.history_view	admin:axes_accessattempt_history
+/admin/axes/accessattempt/add/	django.contrib.admin.options.add_view	admin:axes_accessattempt_add
+/admin/axes/accesslog/	django.contrib.admin.options.changelist_view	admin:axes_accesslog_changelist
+/admin/axes/accesslog/<path:object_id>/	django.views.generic.base.RedirectView
+/admin/axes/accesslog/<path:object_id>/change/	django.contrib.admin.options.change_view	admin:axes_accesslog_change
+/admin/axes/accesslog/<path:object_id>/delete/	django.contrib.admin.options.delete_view	admin:axes_accesslog_delete
+/admin/axes/accesslog/<path:object_id>/history/	django.contrib.admin.options.history_view	admin:axes_accesslog_history
+/admin/axes/accesslog/add/	django.contrib.admin.options.add_view	admin:axes_accesslog_add
+/admin/hijack/acquire/	hijack.views.AcquireUserView	hijack:acquire
+/admin/hijack/release/	hijack.views.ReleaseUserView	hijack:release
+/admin/jsi18n/	django.contrib.admin.sites.i18n_javascript	admin:jsi18n
+/admin/login/	django.contrib.admin.sites.login	admin:login
+/admin/logout/	django.contrib.admin.sites.logout	admin:logout
+/admin/otp_static/staticdevice/	django.contrib.admin.options.changelist_view	admin:otp_static_staticdevice_changelist
+/admin/otp_static/staticdevice/<path:object_id>/	django.views.generic.base.RedirectView
+/admin/otp_static/staticdevice/<path:object_id>/change/	django.contrib.admin.options.change_view	admin:otp_static_staticdevice_change
+/admin/otp_static/staticdevice/<path:object_id>/delete/	django.contrib.admin.options.delete_view	admin:otp_static_staticdevice_delete
+/admin/otp_static/staticdevice/<path:object_id>/history/	django.contrib.admin.options.history_view	admin:otp_static_staticdevice_history
+/admin/otp_static/staticdevice/add/	django.contrib.admin.options.add_view	admin:otp_static_staticdevice_add
+/admin/otp_totp/totpdevice/	django.contrib.admin.options.changelist_view	admin:otp_totp_totpdevice_changelist
+/admin/otp_totp/totpdevice/<int:pk>/config/	django_otp.plugins.otp_totp.admin.config_view	admin:otp_totp_totpdevice_config
+/admin/otp_totp/totpdevice/<int:pk>/qrcode/	django_otp.plugins.otp_totp.admin.qrcode_view	admin:otp_totp_totpdevice_qrcode
+/admin/otp_totp/totpdevice/<path:object_id>/	django.views.generic.base.RedirectView
+/admin/otp_totp/totpdevice/<path:object_id>/change/	django.contrib.admin.options.change_view	admin:otp_totp_totpdevice_change
+/admin/otp_totp/totpdevice/<path:object_id>/delete/	django.contrib.admin.options.delete_view	admin:otp_totp_totpdevice_delete
+/admin/otp_totp/totpdevice/<path:object_id>/history/	django.contrib.admin.options.history_view	admin:otp_totp_totpdevice_history
+/admin/otp_totp/totpdevice/add/	django.contrib.admin.options.add_view	admin:otp_totp_totpdevice_add
+/admin/password_change/	django.contrib.admin.sites.password_change	admin:password_change
+/admin/password_change/done/	django.contrib.admin.sites.password_change_done	admin:password_change_done
+/admin/password_reset/	open_inwoner.accounts.views.password_reset.PasswordResetView	admin_password_reset
+/admin/password_reset/done/	django.contrib.auth.views.PasswordResetDoneView	admin_password_reset_done
+/admin/r/<int:content_type_id>/<path:object_id>/	django.contrib.contenttypes.views.shortcut	admin:view_on_site
+/admin/two_factor/phonedevice/	django.contrib.admin.options.changelist_view	admin:two_factor_phonedevice_changelist
+/admin/two_factor/phonedevice/<path:object_id>/	django.views.generic.base.RedirectView
+/admin/two_factor/phonedevice/<path:object_id>/change/	django.contrib.admin.options.change_view	admin:two_factor_phonedevice_change
+/admin/two_factor/phonedevice/<path:object_id>/delete/	django.contrib.admin.options.delete_view	admin:two_factor_phonedevice_delete
+/admin/two_factor/phonedevice/<path:object_id>/history/	django.contrib.admin.options.history_view	admin:two_factor_phonedevice_history
+/admin/two_factor/phonedevice/add/	django.contrib.admin.options.add_view	admin:two_factor_phonedevice_add
+/media/<path>	django.views.static.serve
+/reset/<uidb64>/<token>/	django.contrib.auth.views.PasswordResetConfirmView	password_reset_confirm
+/reset/done/	django.contrib.auth.views.PasswordResetCompleteView	password_reset_complete
+/static/<path>	django.contrib.staticfiles.views.serve

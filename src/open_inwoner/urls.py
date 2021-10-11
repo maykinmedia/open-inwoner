@@ -7,6 +7,9 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import include, path
 from django.views.generic.base import TemplateView
 
+from django_registration.backends.one_step.views import RegistrationView
+
+from open_inwoner.accounts.forms import CustomRegistrationForm
 from open_inwoner.accounts.views import DocumentPrivateMediaView, PasswordResetView
 
 handler500 = "open_inwoner.utils.views.server_error"
@@ -24,10 +27,8 @@ urlpatterns = [
     path(
         "admin/password_reset/done/",
         auth_views.PasswordResetDoneView.as_view(),
-        name="password_reset_done",
+        name="admin_password_reset_done",
     ),
-    path("admin/hijack/", include("hijack.urls")),
-    path("admin/", admin.site.urls),
     path(
         "reset/<uidb64>/<token>/",
         auth_views.PasswordResetConfirmView.as_view(),
@@ -43,6 +44,15 @@ urlpatterns = [
         DocumentPrivateMediaView.as_view(),
         name="private_file",
     ),
+    path("admin/hijack/", include("hijack.urls")),
+    path("admin/", admin.site.urls),
+    path(
+        "accounts/register/",
+        RegistrationView.as_view(form_class=CustomRegistrationForm),
+        name="django_registration_register",
+    ),
+    path("accounts/", include("django_registration.backends.one_step.urls")),
+    path("accounts/", include("django.contrib.auth.urls")),
     # Simply show the master template.
     path("", TemplateView.as_view(template_name="master.html"), name="root"),
 ]
