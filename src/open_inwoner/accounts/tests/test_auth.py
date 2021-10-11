@@ -24,7 +24,7 @@ class AuthTests(WebTest):
     def test_registration(self):
         """Test user registration succeeds."""
 
-        register_page = self.app.get(reverse("registration_register"))
+        register_page = self.app.get(reverse("django_registration_register"))
 
         form = register_page.forms["registration-form"]
         form["email"] = TEST_USER["email"]
