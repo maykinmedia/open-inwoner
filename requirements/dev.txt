@@ -63,10 +63,13 @@ django==3.2.7
     #   django-extensions
     #   django-formtools
     #   django-hijack
+    #   django-localflavor
     #   django-otp
     #   django-phonenumber-field
+    #   django-privates
     #   django-redis
     #   django-rosetta
+    #   django-sendfile2
     #   django-sniplates
     #   maykin-django-two-factor-auth
 django-admin-index==1.5.0
@@ -99,6 +102,10 @@ django-ipware==4.0.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-axes
+django-localflavor==3.1
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 django-ordered-model==3.4.3
     # via
     #   -c requirements/ci.txt
@@ -114,6 +121,10 @@ django-phonenumber-field==5.2.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   maykin-django-two-factor-auth
+django-privates==1.2.2
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 django-redis==5.0.0
     # via
     #   -c requirements/ci.txt
@@ -122,6 +133,11 @@ django-rosetta==0.9.7
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+django-sendfile2==0.6.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   django-privates
 django-sniplates==0.7.0
     # via
     #   -c requirements/ci.txt
@@ -257,6 +273,11 @@ python-dotenv==0.19.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+python-stdnum==1.17
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   django-localflavor
 pytz==2021.3
     # via
     #   -c requirements/ci.txt
