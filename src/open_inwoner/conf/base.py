@@ -113,7 +113,9 @@ INSTALLED_APPS = [
     # External applications.
     "axes",
     "sniplates",
+    # "hijack.contrib.admin", # This should be imported but it causes an error. So now there are
     "hijack",
+    "localflavor",
     # Project applications.
     "open_inwoner.accounts",
     "open_inwoner.utils",
@@ -385,6 +387,8 @@ IPWARE_META_PRECEDENCE_ORDER = (
     "REMOTE_ADDR",
 )
 
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
 #
 # DJANGO-HIJACK
 #
@@ -400,6 +404,11 @@ HIJACK_ALLOW_GET_REQUESTS = True
 #
 SENTRY_DSN = config("SENTRY_DSN", None)
 RELEASE = get_current_version()
+
+PRIVATE_MEDIA_ROOT = os.path.join(BASE_DIR, "private_media")
+SENDFILE_ROOT = PRIVATE_MEDIA_ROOT
+SENDFILE_BACKEND = "django_sendfile.backends.simple"
+PRIVATE_MEDIA_URL = "/private_files/"
 
 if SENTRY_DSN:
     SENTRY_CONFIG = {
