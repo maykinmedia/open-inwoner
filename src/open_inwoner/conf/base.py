@@ -117,8 +117,13 @@ INSTALLED_APPS = [
     # "hijack.contrib.admin", # This should be imported but it causes an error. So now there are
     "hijack",
     "localflavor",
+    "treebeard",
+    "easy_thumbnails",  # used by filer
+    "filer",
+    "mptt",  # used by filer
     # Project applications.
     "open_inwoner.accounts",
+    "open_inwoner.pdc",
     "open_inwoner.utils",
 ]
 
