@@ -76,7 +76,7 @@ AUTHENTICATION_BACKENDS = [
     "axes.backends.AxesBackend",
     "open_inwoner.accounts.backends.UserModelEmailBackend",
     "django.contrib.auth.backends.ModelBackend",
-    "digid_eherkenning.backends.mock.DigiDBackend",
+    "digid_eherkenning.mock.backends.DigiDBackend",
 ]
 
 ELASTIC_APM["DEBUG"] = True

@@ -6,3 +6,4 @@ from djchoices import ChoiceItem, DjangoChoices
 class LoginTypeChoices(DjangoChoices):
     default = ChoiceItem("default", _("Email en Wachtwoord"))
     digid = ChoiceItem("digid", _("DigiD"))
+    eherkenning = ChoiceItem("eherkenning", _("eHerkenning"))

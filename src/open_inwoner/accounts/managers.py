@@ -1,5 +1,39 @@
 from django.contrib.auth.models import BaseUserManager
 
+from digid_eherkenning.managers import BaseDigidManager, BaseeHerkenningManager
+
+from .choices import LoginTypeChoices
+
+
+class DigidManager(BaseDigidManager):
+    def get_queryset(self):
+        return super().get_queryset().filter(login_type=LoginTypeChoices.digid)
+
+    def get_by_bsn(self, bsn):
+        return self.get_queryset().get(bsn=bsn)
+
+    def digid_create(self, bsn, **kwargs):
+        return super().create(
+            username="user-{}".format(bsn),
+            login_type=LoginTypeChoices.digid,
+            bsn=bsn,
+        )
+
+
+class eHerkenningManager(BaseeHerkenningManager):
+    def get_queryset(self):
+        return super().get_queryset().filter(login_type=LoginTypeChoices.eherkenning)
+
+    def get_by_rsin(self, rsin):
+        return self.get_queryset().get(rsin=rsin)
+
+    def eherkenning_create(self, rsin, **kwargs):
+        return super().create(
+            username="user-{}".format(rsin),
+            login_type=LoginTypeChoices.eherkenning,
+            rsin=rsin,
+        )
+
 
 class UserManager(BaseUserManager):
     use_in_migrations = True
