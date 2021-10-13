@@ -114,6 +114,7 @@ INSTALLED_APPS = [
     # External applications.
     "axes",
     "sniplates",
+    "digid_eherkenning",
     # "hijack.contrib.admin", # This should be imported but it causes an error. So now there are
     "hijack",
     "localflavor",
@@ -313,6 +314,7 @@ AUTHENTICATION_BACKENDS = [
     "open_inwoner.accounts.backends.UserModelEmailBackend",
     "django.contrib.auth.backends.ModelBackend",
     "axes.backends.AxesBackend",
+    "digid_eherkenning.backends.DigiDBackend",
 ]
 
 SESSION_COOKIE_NAME = "open_inwoner_sessionid"

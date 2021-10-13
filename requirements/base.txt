@@ -15,9 +15,14 @@ charset-normalizer==2.0.6
     # via requests
 confusable-homoglyphs==3.2.0
     # via django-registration
+defusedxml==0.7.1
+    # via digid-eherkenning
+digid-eherkenning @ git+https://bitbucket.org/maykinmedia/django-digid-eherkenning.git@02ac61c42f6dd2f229ba9f0f687fa1a4160511be
+    # via -r requirements/base.in
 django==3.2.7
     # via
     #   -r requirements/base.in
+    #   digid-eherkenning
     #   django-axes
     #   django-choices
     #   django-filer

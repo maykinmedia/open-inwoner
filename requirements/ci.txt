@@ -34,10 +34,20 @@ coverage==4.5.4
     # via -r requirements/test-tools.in
 cssselect==1.1.0
     # via pyquery
+defusedxml==0.7.1
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   digid-eherkenning
+digid-eherkenning @ git+https://bitbucket.org/maykinmedia/django-digid-eherkenning.git@02ac61c42f6dd2f229ba9f0f687fa1a4160511be
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
 django==3.2.7
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   digid-eherkenning
     #   django-axes
     #   django-choices
     #   django-filer
@@ -72,6 +82,7 @@ django-filer==2.0.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   digid-eherkenning
 django-formtools==2.3
     # via
     #   -c requirements/base.txt

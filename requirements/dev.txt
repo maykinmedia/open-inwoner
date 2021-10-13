@@ -32,6 +32,8 @@ certifi==2021.5.30
     #   elastic-apm
     #   requests
     #   sentry-sdk
+cffi==1.14.6
+    # via cryptography
 charset-normalizer==2.0.6
     # via
     #   -c requirements/ci.txt
@@ -50,6 +52,8 @@ coverage==4.5.4
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+cryptography==35.0.0
+    # via pyopenssl
 cssselect==1.1.0
     # via
     #   -c requirements/ci.txt
@@ -57,11 +61,21 @@ cssselect==1.1.0
     #   pyquery
 ddt-api-calls==0.3.2
     # via -r requirements/dev.in
+defusedxml==0.7.1
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   digid-eherkenning
+digid-eherkenning @ git+https://bitbucket.org/maykinmedia/django-digid-eherkenning.git@02ac61c42f6dd2f229ba9f0f687fa1a4160511be
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 django==3.2.7
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   ddt-api-calls
+    #   digid-eherkenning
     #   django-axes
     #   django-choices
     #   django-debug-toolbar
@@ -94,6 +108,7 @@ django-choices==1.7.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   digid-eherkenning
 django-debug-toolbar==3.2.2
     # via -r requirements/dev.in
 django-extensions==3.1.3
@@ -223,6 +238,8 @@ importlib-metadata==4.8.1
     #   click
     #   flake8
     #   pep517
+isodate==0.6.0
+    # via python3-saml
 isort==5.9.3
     # via
     #   -c requirements/ci.txt
@@ -241,6 +258,8 @@ lxml==4.6.3
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   pyquery
+    #   python3-saml
+    #   xmlsec
 markupsafe==2.0.1
     # via jinja2
 maykin-django-two-factor-auth==2.0.4
@@ -293,6 +312,8 @@ psycopg2==2.9.1
     #   -r requirements/ci.txt
 pycodestyle==2.7.0
     # via flake8
+pycparser==2.20
+    # via cffi
 pyflakes==2.3.1
     # via flake8
 pygments==2.10.0
@@ -301,6 +322,8 @@ pylint==2.11.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+pyopenssl==21.0.0
+    # via -r requirements/dev.in
 pyparsing==2.4.7
     # via packaging
 pyquery==1.4.3
@@ -326,6 +349,8 @@ python-stdnum==1.17
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-localflavor
+python3-saml==1.12.0
+    # via -r requirements/dev.in
 pytz==2021.3
     # via
     #   -c requirements/ci.txt
@@ -366,6 +391,8 @@ six==1.16.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-choices
+    #   isodate
+    #   pyopenssl
     #   python-dateutil
     #   qrcode
     #   requests-mock
@@ -475,6 +502,8 @@ zipp==3.6.0
     # via
     #   importlib-metadata
     #   pep517
+xmlsec==1.3.12
+    # via python3-saml
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip
