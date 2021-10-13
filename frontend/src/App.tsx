@@ -1,45 +1,43 @@
 import { useState } from 'react'
-import logo from './logo.svg'
-import './App.css'
+import { Link, Route, Switch } from 'react-router-dom'
+import './App.scss'
 
-function App() {
+const pages = import.meta.globEager('./pages/*.tsx')
+
+const routes = Object.keys(pages).map((path) => {
+  const name = path.match(/\.\/pages\/(.*)\.tsx$/)[1]
+  return {
+    name,
+    path: name === 'Home' ? '/' : `/${name.toLowerCase()}`,
+    component: pages[path].default
+  }
+})
+
+export function App() {
   const [count, setCount] = useState(0)
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>Hello Vite + React!</p>
-        <p>
-          <button type="button" onClick={() => setCount((count) => count + 1)}>
-            count is: {count}
-          </button>
-        </p>
-        <p>
-          Edit <code>App.tsx</code> and save to test HMR updates.
-        </p>
-        <p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          {' | '}
-          <a
-            className="App-link"
-            href="https://vitejs.dev/guide/features.html"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Vite Docs
-          </a>
-        </p>
-      </header>
-    </div>
+    <>
+      <nav>
+        <ul>
+          {routes.map(({ name, path }) => {
+            return (
+              <li key={path}>
+                <Link to={path}>{name}</Link>
+              </li>
+            )
+          })}
+        </ul>
+      </nav>
+      <Switch>
+        {routes.map(({ path, component: RouteComp }) => {
+          return (
+            <Route key={path} path={path}>
+              <RouteComp />
+            </Route>
+          )
+        })}
+      </Switch>
+    </>
   )
 }
-
-export default App
