@@ -41,6 +41,11 @@ click==8.0.1
     # via
     #   black
     #   pip-tools
+confusable-homoglyphs==3.2.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   django-registration
 coverage==4.5.4
     # via
     #   -c requirements/ci.txt
@@ -70,6 +75,7 @@ django==3.2.7
     #   django-polymorphic
     #   django-privates
     #   django-redis
+    #   django-registration
     #   django-rosetta
     #   django-sendfile2
     #   django-sniplates
@@ -149,6 +155,10 @@ django-privates==1.2.2
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
 django-redis==5.0.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+django-registration==3.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt

@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.urls import reverse_lazy
+from django.utils.translation import ugettext_lazy as _
 
 from hijack.contrib.admin import HijackUserAdminMixin
 
@@ -10,6 +11,36 @@ from .models import Action, Appointment, Contact, Document, User
 @admin.register(User)
 class _UserAdmin(HijackUserAdminMixin, UserAdmin):
     hijack_success_url = reverse_lazy("root")
+    fieldsets = (
+        (None, {"fields": ("email", "password")}),
+        (_("Personal info"), {"fields": ("first_name", "last_name")}),
+        (
+            _("Permissions"),
+            {
+                "classes": ("collapse",),
+                "fields": (
+                    "is_active",
+                    "is_staff",
+                    "is_superuser",
+                    "groups",
+                    "user_permissions",
+                ),
+            },
+        ),
+        (_("Important dates"), {"fields": ("last_login", "date_joined")}),
+    )
+    add_fieldsets = (
+        (
+            None,
+            {
+                "classes": ("wide",),
+                "fields": ("email", "password1", "password2"),
+            },
+        ),
+    )
+    list_display = ("email", "first_name", "last_name", "is_staff")
+    search_fields = ("first_name", "last_name", "email")
+    ordering = ("email",)
 
 
 @admin.register(Action)
