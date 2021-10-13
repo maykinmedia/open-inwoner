@@ -78,9 +78,6 @@ django==3.2.7
     #   django-sendfile2
     #   django-sniplates
     #   maykin-django-two-factor-auth
-    #   django-sendfile
-    #   django-sniplates
-    #   maykin-django-two-factor-auth
 django-admin-index==1.5.0
     # via
     #   -c requirements/ci.txt
