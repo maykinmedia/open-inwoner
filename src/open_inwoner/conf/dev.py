@@ -105,6 +105,9 @@ warnings.filterwarnings(
     r"django\.db\.models\.fields",
 )
 
+# django-filer
+FILER_DEBUG = True
+
 # Override settings with local settings.
 try:
     from .local import *  # noqa
