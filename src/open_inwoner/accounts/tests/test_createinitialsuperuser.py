@@ -9,9 +9,8 @@ from ..models import User
 
 class CreateInitialSuperuserTests(TestCase):
     def test_create_initial_superuser_command(self):
-        call_command("createinitialsuperuser", "maykin", "support@maykinmedia.nl")
+        call_command("createinitialsuperuser", "support@maykinmedia.nl")
         user = User.objects.get()
-
         self.assertTrue(user.has_usable_password())
         self.assertTrue(user.is_active)
         self.assertTrue(user.is_staff)
@@ -31,7 +30,7 @@ class CreateInitialSuperuserTests(TestCase):
 
     @override_settings(ALLOWED_HOSTS=[])
     def test_create_initial_superuser_command_allowed_hosts_empty(self):
-        call_command("createinitialsuperuser", "maykin", "support@maykinmedia.nl")
+        call_command("createinitialsuperuser", "support@maykinmedia.nl")
         user = User.objects.get()
 
         self.assertTrue(user.has_usable_password())

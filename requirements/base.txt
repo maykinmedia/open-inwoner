@@ -13,6 +13,8 @@ certifi==2021.5.30
     #   sentry-sdk
 charset-normalizer==2.0.6
     # via requests
+confusable-homoglyphs==3.2.0
+    # via django-registration
 django==3.2.7
     # via
     #   -r requirements/base.in
@@ -27,6 +29,7 @@ django==3.2.7
     #   django-polymorphic
     #   django-privates
     #   django-redis
+    #   django-registration
     #   django-rosetta
     #   django-sendfile2
     #   django-sniplates
@@ -64,6 +67,8 @@ django-polymorphic==3.0.0
 django-privates==1.2.2
     # via -r requirements/base.in
 django-redis==5.0.0
+    # via -r requirements/base.in
+django-registration==3.2
     # via -r requirements/base.in
 django-rosetta==0.9.7
     # via -r requirements/base.in

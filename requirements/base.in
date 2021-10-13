@@ -20,6 +20,7 @@ maykin-django-two-factor-auth
 phonenumbers
 django-localflavor
 django-privates
+django-registration
 
 # API libraries
 # djangorestframework

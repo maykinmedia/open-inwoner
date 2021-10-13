@@ -106,6 +106,7 @@ INSTALLED_APPS = [
     # Optional applications.
     "ordered_model",
     "django_admin_index",
+    "django_registration",
     "django.contrib.admin",
     # 'django.contrib.admindocs',
     # 'django.contrib.humanize',
@@ -308,16 +309,16 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Allow logging in with both username+password and email+password
 AUTHENTICATION_BACKENDS = [
-    "axes.backends.AxesBackend",
     "open_inwoner.accounts.backends.UserModelEmailBackend",
     "django.contrib.auth.backends.ModelBackend",
+    "axes.backends.AxesBackend",
 ]
 
 SESSION_COOKIE_NAME = "open_inwoner_sessionid"
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 
-LOGIN_REDIRECT_URL = reverse_lazy("admin:index")
-LOGOUT_REDIRECT_URL = reverse_lazy("admin:index")
+LOGIN_REDIRECT_URL = reverse_lazy("root")
+LOGOUT_REDIRECT_URL = reverse_lazy("root")
 
 #
 # SECURITY settings
