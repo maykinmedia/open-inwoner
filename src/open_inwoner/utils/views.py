@@ -5,7 +5,7 @@ from django.views import View
 from django.views.decorators.csrf import requires_csrf_token
 from django.views.defaults import ERROR_500_TEMPLATE_NAME
 
-from sendfile import sendfile
+from django_sendfile import sendfile
 
 from .storage import private_storage
 
