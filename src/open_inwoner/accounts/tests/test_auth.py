@@ -4,12 +4,13 @@ from django.utils.translation import ugettext_lazy as _
 from django_webtest import WebTest
 
 from ..models import User
-from .factories import UserDbFactory, UserFactory
+from .factories import UserFactory
 
 
 class TestRegistrationFunctionality(WebTest):
     def setUp(self):
-        self.user = UserFactory()
+        # Create a User instance that's not saved
+        self.user = UserFactory.build()
 
     def test_registration_succeeds_with_right_user_input(self):
         register_page = self.app.get(reverse("django_registration_register"))
@@ -60,7 +61,7 @@ class TestLoginLogoutFunctionality(WebTest):
     def setUp(self):
         # Create a user. We need to reset their password
         # because otherwise we do not have access to the raw one associated.
-        self.user = UserDbFactory.create(password="test")
+        self.user = UserFactory.create(password="test")
 
     def test_login(self):
         """Test that a user is successfully logged in."""
