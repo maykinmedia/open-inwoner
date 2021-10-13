@@ -27,7 +27,7 @@ urlpatterns = [
     path(
         "admin/password_reset/done/",
         auth_views.PasswordResetDoneView.as_view(),
-        name="admin_password_reset_done",
+        name="password_reset_done",
     ),
     path(
         "reset/<uidb64>/<token>/",
