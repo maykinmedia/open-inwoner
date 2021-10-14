@@ -112,6 +112,8 @@ INSTALLED_APPS = [
     # 'django.contrib.humanize',
     # 'django.contrib.sitemaps',
     # External applications.
+    "rest_framework",
+    "drf_spectacular",
     "axes",
     "sniplates",
     # "hijack.contrib.admin", # This should be imported but it causes an error. So now there are
@@ -415,6 +417,24 @@ PRIVATE_MEDIA_ROOT = os.path.join(BASE_DIR, "private_media")
 SENDFILE_ROOT = PRIVATE_MEDIA_ROOT
 SENDFILE_BACKEND = "django_sendfile.backends.simple"
 PRIVATE_MEDIA_URL = "/private_files/"
+
+REST_FRAMEWORK = {
+    # YOUR SETTINGS
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Open Inwoner API",
+    "DESCRIPTION": "Description",
+    "VERSION": "1.0.0",
+    # OTHER SETTINGS
+}
 
 if SENTRY_DSN:
     SENTRY_CONFIG = {
