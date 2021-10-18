@@ -4,7 +4,7 @@ from django.contrib import admin
 from treebeard.admin import TreeAdmin
 from treebeard.forms import movenodeform_factory
 
-from .models import Category, Product
+from .models import Category, Product, Tag, TagType
 from .widgets import CKEditorWidget
 
 
@@ -21,16 +21,37 @@ class ProductAdminForm(forms.ModelForm):
         widgets = {"content": CKEditorWidget}
 
 
-@admin.register(Product)
-class ProductAdmin(admin.ModelAdmin):
-    list_display = ("name", "created_on", "display_categories")
-    list_filter = ("categories",)
-    date_hierarchy = "created_on"
-    form = ProductAdminForm
+@admin.register(TagType)
+class TagTypeAdmin(admin.ModelAdmin):
+    list_display = ("name",)
+
+
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
+    list_display = ("name", "type")
+    list_filter = ("type",)
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
-        return qs.prefetch_related("categories")
+        return qs.select_related("type").prefetch_related("products")
+
+
+class TagInline(admin.TabularInline):
+    model = Tag.products.through
+    extra = 1
+
+
+@admin.register(Product)
+class ProductAdmin(admin.ModelAdmin):
+    list_display = ("name", "created_on", "display_categories")
+    list_filter = ("categories", "tags")
+    date_hierarchy = "created_on"
+    form = ProductAdminForm
+    inlines = (TagInline,)
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.prefetch_related("categories", "tags")
 
     def display_categories(self, obj):
         return ", ".join(p.name for p in obj.categories.all())

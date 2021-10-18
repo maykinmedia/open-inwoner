@@ -91,3 +91,50 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class TagType(models.Model):
+    name = models.CharField(
+        _("name"), max_length=100, help_text=_("Name of the tag type"), unique=True
+    )
+
+    class Meta:
+        verbose_name = _("tag type")
+        verbose_name_plural = _("tag types")
+
+    def __str__(self):
+        return self.name
+
+
+class Tag(models.Model):
+    name = models.CharField(
+        _("name"), max_length=100, help_text=_("Name of the tag"), unique=True
+    )
+    icon = FilerImageField(
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="tag_icons",
+        help_text=_("Icon of the tag"),
+    )
+    type = models.ForeignKey(
+        "pdc.TagType",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="tags",
+        help_text=_("The related tag type"),
+    )
+    products = models.ManyToManyField(
+        "pdc.Product",
+        blank=True,
+        related_name="tags",
+        help_text=_("Products which the tag is applied to"),
+    )
+
+    class Meta:
+        verbose_name = _("tag")
+        verbose_name_plural = _("tag")
+
+    def __str__(self):
+        return self.name
