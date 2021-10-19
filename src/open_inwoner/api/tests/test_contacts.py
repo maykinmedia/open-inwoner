@@ -167,6 +167,68 @@ class TestUpdateContact(WebTest):
         self.assertEqual(response.json, {"detail": "Niet gevonden."})
 
 
+class TestPartialUpdateContact(WebTest):
+    csrf_checks = False
+
+    @freeze_time("2021-10-18 13:00:00")
+    def setUp(self):
+        self.user1 = UserFactory()
+        self.contact1 = ContactFactory(created_by=self.user1)
+
+    @freeze_time("2021-10-18 13:00:00")
+    def test_contacts_endpoint_updates_first_name(self):
+        url = reverse("api:contacts-detail", kwargs={"uuid": self.contact1.uuid})
+        response = self.app.patch(
+            url,
+            {"first_name": "Updated first name"},
+            user=self.user1,
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response.json,
+            {
+                "uuid": str(self.contact1.uuid),
+                "first_name": "Updated first name",
+                "last_name": self.contact1.last_name,
+                "email": None,
+                "phonenumber": "",
+                "created_on": "2021-10-18T15:00:00+02:00",
+                "updated_on": "2021-10-18T15:00:00+02:00",
+                "url": f"http://testserver/api/contacts/{str(self.contact1.uuid)}/",
+            },
+        )
+
+    def test_contacts_endpoint_fails_to_update_first_name_when_user_is_unauthorized(
+        self,
+    ):
+        url = reverse("api:contacts-detail", kwargs={"uuid": self.contact1.uuid})
+        response = self.app.patch(
+            url,
+            {"first_name": "Updated first name"},
+            status=401,
+        )
+
+        self.assertEqual(
+            response.json, {"detail": "Authenticatiegegevens zijn niet opgegeven."}
+        )
+
+    def test_contacts_endpoint_fails_to_update_first_name_of_a_contact_created_by_another_user(
+        self,
+    ):
+        user2 = UserFactory()
+        contact2 = ContactFactory(created_by=user2)
+        url = reverse("api:contacts-detail", kwargs={"uuid": contact2.uuid})
+        response = self.app.patch(
+            url,
+            {"first_name": "Updated first name"},
+            status=404,
+            user=self.user1,
+        )
+
+        self.assertEqual(response.json, {"detail": "Niet gevonden."})
+
+
 class TestDeleteContact(WebTest):
     csrf_checks = False
 
