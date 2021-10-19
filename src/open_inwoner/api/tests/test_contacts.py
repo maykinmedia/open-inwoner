@@ -25,13 +25,14 @@ class TestListContacts(WebTest):
             response.json,
             [
                 {
-                    "reference": str(self.contact1.reference),
+                    "uuid": str(self.contact1.uuid),
                     "first_name": self.contact1.first_name,
                     "last_name": self.contact1.last_name,
                     "email": None,
                     "phonenumber": "",
                     "created_on": "2021-10-18T15:00:00+02:00",
                     "updated_on": "2021-10-18T15:00:00+02:00",
+                    "url": f"http://testserver/api/contacts/{str(self.contact1.uuid)}/",
                 },
             ],
         )
@@ -43,9 +44,7 @@ class TestListContacts(WebTest):
         )
 
     def test_contacts_endpoint_fails_to_return_contacts_of_another_user(self):
-        url = reverse(
-            "api:contacts-detail", kwargs={"reference": self.contact2.reference}
-        )
+        url = reverse("api:contacts-detail", kwargs={"uuid": self.contact2.uuid})
         response = self.app.get(url, user=self.user1, status=404)
 
         self.assertEqual(response.json, {"detail": "Niet gevonden."})
@@ -120,9 +119,7 @@ class TestUpdateContact(WebTest):
 
     @freeze_time("2021-10-18 13:00:00")
     def test_contacts_endpoint_updates_contact_of_authorized_user(self):
-        url = reverse(
-            "api:contacts-detail", kwargs={"reference": self.contact1.reference}
-        )
+        url = reverse("api:contacts-detail", kwargs={"uuid": self.contact1.uuid})
         response = self.app.put(
             url,
             {"first_name": "Updated first name", "last_name": "Updated last name"},
@@ -133,20 +130,19 @@ class TestUpdateContact(WebTest):
         self.assertEqual(
             response.json,
             {
-                "reference": str(self.contact1.reference),
+                "uuid": str(self.contact1.uuid),
                 "first_name": "Updated first name",
                 "last_name": "Updated last name",
                 "email": None,
                 "phonenumber": "",
                 "created_on": "2021-10-18T15:00:00+02:00",
                 "updated_on": "2021-10-18T15:00:00+02:00",
+                "url": f"http://testserver/api/contacts/{str(self.contact1.uuid)}/",
             },
         )
 
     def test_contacts_endpoint_fails_to_update_contact_when_user_is_unauthorized(self):
-        url = reverse(
-            "api:contacts-detail", kwargs={"reference": self.contact1.reference}
-        )
+        url = reverse("api:contacts-detail", kwargs={"uuid": self.contact1.uuid})
         response = self.app.put(
             url,
             {"first_name": "Updated first name", "last_name": "Updated last name"},
@@ -160,7 +156,7 @@ class TestUpdateContact(WebTest):
     def test_contacts_endpoint_fails_to_update_contact_created_by_another_user(self):
         user2 = UserFactory()
         contact2 = ContactFactory(created_by=user2)
-        url = reverse("api:contacts-detail", kwargs={"reference": contact2.reference})
+        url = reverse("api:contacts-detail", kwargs={"uuid": contact2.uuid})
         response = self.app.put(
             url,
             {"first_name": "Updated first name", "last_name": "Updated last name"},
@@ -179,17 +175,13 @@ class TestDeleteContact(WebTest):
         self.contact1 = ContactFactory(created_by=self.user1)
 
     def test_contacts_endpoint_deletes_contact_when_user_is_authorized(self):
-        url = reverse(
-            "api:contacts-detail", kwargs={"reference": self.contact1.reference}
-        )
+        url = reverse("api:contacts-detail", kwargs={"uuid": self.contact1.uuid})
         response = self.app.delete(url, user=self.user1)
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_contacts_endpoint_fails_to_delete_contact_when_user_is_unauthorized(self):
-        url = reverse(
-            "api:contacts-detail", kwargs={"reference": self.contact1.reference}
-        )
+        url = reverse("api:contacts-detail", kwargs={"uuid": self.contact1.uuid})
         response = self.app.delete(url, status=401)
 
         self.assertEqual(
@@ -199,9 +191,7 @@ class TestDeleteContact(WebTest):
     def test_contacts_endpoint_fails_to_delete_contact_created_by_another_user(self):
         user2 = UserFactory()
         user2_contact = ContactFactory(created_by=user2)
-        url = reverse(
-            "api:contacts-detail", kwargs={"reference": user2_contact.reference}
-        )
+        url = reverse("api:contacts-detail", kwargs={"uuid": user2_contact.uuid})
         response = self.app.delete(
             url,
             status=404,

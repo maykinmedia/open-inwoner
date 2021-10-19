@@ -82,8 +82,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class Contact(models.Model):
-    reference = models.UUIDField(
-        verbose_name=_("reference"), unique=True, default=uuid4
+    uuid = models.UUIDField(
+        verbose_name=_("UUID"),
+        unique=True,
+        default=uuid4,
+        help_text=_("Used as a reference in the contacts api."),
     )
     first_name = models.CharField(
         verbose_name=_("First name"),

@@ -6,7 +6,7 @@ from .serializers import ContactSerializer
 
 class ContactViewSet(ModelViewSet):
     serializer_class = ContactSerializer
-    lookup_field = "reference"
+    lookup_field = "uuid"
 
     def get_queryset(self):
         return Contact.objects.filter(created_by=self.request.user.id)
