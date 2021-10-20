@@ -83,6 +83,7 @@ django==3.2.7
     #   digid-eherkenning
     #   django-axes
     #   django-choices
+    #   django-cors-headers
     #   django-debug-toolbar
     #   django-extensions
     #   django-extra-fields
@@ -118,6 +119,10 @@ django-choices==1.7.2
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   digid-eherkenning
+django-cors-headers==3.10.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 django-debug-toolbar==3.2.2
     # via -r requirements/dev.in
 django-extensions==3.1.3
@@ -264,13 +269,13 @@ idna==3.2
     #   requests
 imagesize==1.2.0
     # via sphinx
-isodate==0.6.0
-    # via python3-saml
 inflection==0.5.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   drf-spectacular
+isodate==0.6.0
+    # via python3-saml
 isort==5.9.3
     # via
     #   -c requirements/ci.txt

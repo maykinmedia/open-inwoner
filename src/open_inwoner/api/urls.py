@@ -20,5 +20,7 @@ urlpatterns = [
         SpectacularRedocView.as_view(authentication_classes=[], url_name="api:schema"),
         name="docs",
     ),
+    path("auth/", include("dj_rest_auth.urls")),
+    path("auth/", include("rest_framework.urls", namespace="rest_framework")),
     path("", include(router.urls)),
 ]

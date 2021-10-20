@@ -54,7 +54,6 @@ urlpatterns = [
     path("accounts/", include("django_registration.backends.one_step.urls")),
     path("accounts/", include("django.contrib.auth.urls")),
     path("api/", include("open_inwoner.api.urls", namespace="api")),
-    path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     # Simply show the master template.
     path("", TemplateView.as_view(template_name="master.html"), name="root"),
 ]

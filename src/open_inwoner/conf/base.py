@@ -112,7 +112,10 @@ INSTALLED_APPS = [
     # 'django.contrib.humanize',
     # 'django.contrib.sitemaps',
     # External applications.
+    "corsheaders",
     "rest_framework",
+    "rest_framework.authtoken",
+    "dj_rest_auth",
     "drf_spectacular",
     "axes",
     "sniplates",
@@ -135,6 +138,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     # 'django.middleware.locale.LocaleMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -421,12 +425,13 @@ SENDFILE_ROOT = PRIVATE_MEDIA_ROOT
 SENDFILE_BACKEND = "django_sendfile.backends.simple"
 PRIVATE_MEDIA_URL = "/private_files/"
 
+CORS_ALLOW_ALL_ORIGINS = True
+
 REST_FRAMEWORK = {
     # YOUR SETTINGS
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.BasicAuthentication",
-        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",

@@ -55,6 +55,7 @@ django==3.2.7
     #   digid-eherkenning
     #   django-axes
     #   django-choices
+    #   django-cors-headers
     #   django-extra-fields
     #   django-filer
     #   django-filter
@@ -88,6 +89,10 @@ django-choices==1.7.2
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   digid-eherkenning
+django-cors-headers==3.10.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
 django-extra-fields==3.0.2
     # via
     #   -c requirements/base.txt
