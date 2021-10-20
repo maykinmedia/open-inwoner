@@ -27,6 +27,7 @@ djangorestframework
 django-extra-fields
 django-filter
 drf-spectacular # api documentation
+djangorestframework-camel-case
 
 # WSGI servers & monitoring - production oriented
 uwsgi

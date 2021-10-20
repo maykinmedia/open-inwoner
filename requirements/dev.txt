@@ -206,6 +206,10 @@ djangorestframework==3.12.4
     #   -r requirements/ci.txt
     #   django-extra-fields
     #   drf-spectacular
+djangorestframework-camel-case==1.2.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 docutils==0.17.1
     # via
     #   sphinx

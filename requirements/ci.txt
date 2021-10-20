@@ -174,6 +174,10 @@ djangorestframework==3.12.4
     #   -r requirements/base.txt
     #   django-extra-fields
     #   drf-spectacular
+djangorestframework-camel-case==1.2.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
 drf-spectacular==0.20.1
     # via
     #   -c requirements/base.txt

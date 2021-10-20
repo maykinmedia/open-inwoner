@@ -93,6 +93,8 @@ djangorestframework==3.12.4
     #   -r requirements/base.in
     #   django-extra-fields
     #   drf-spectacular
+djangorestframework-camel-case==1.2.0
+    # via -r requirements/base.in
 drf-spectacular==0.20.1
     # via -r requirements/base.in
 easy-thumbnails==2.7.1
