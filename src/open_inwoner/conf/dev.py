@@ -71,10 +71,18 @@ CACHES = {
 # Library settings
 #
 
+# Allow logging in with both username+password and email+password
+AUTHENTICATION_BACKENDS = [
+    "axes.backends.AxesBackend",
+    "open_inwoner.accounts.backends.UserModelEmailBackend",
+    "django.contrib.auth.backends.ModelBackend",
+    "digid_eherkenning.mock.backends.DigiDBackend",
+]
+
 ELASTIC_APM["DEBUG"] = True
 
 # Django debug toolbar
-INSTALLED_APPS += ["debug_toolbar", "ddt_api_calls"]
+INSTALLED_APPS += ["debug_toolbar", "ddt_api_calls", "django_extensions"]
 MIDDLEWARE += [
     "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]

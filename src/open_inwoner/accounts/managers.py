@@ -1,28 +1,59 @@
 from django.contrib.auth.models import BaseUserManager
 
+from digid_eherkenning.managers import BaseDigidManager, BaseeHerkenningManager
+
+from .choices import LoginTypeChoices
+
+
+class DigidManager(BaseDigidManager):
+    def get_queryset(self):
+        return super().get_queryset().filter(login_type=LoginTypeChoices.digid)
+
+    def get_by_bsn(self, bsn):
+        return self.get_queryset().get(bsn=bsn)
+
+    def digid_create(self, bsn, **kwargs):
+        return super().create(
+            email="user-{}@bsn.com".format(bsn),
+            login_type=LoginTypeChoices.digid,
+            bsn=bsn,
+        )
+
+
+class eHerkenningManager(BaseeHerkenningManager):
+    def get_queryset(self):
+        return super().get_queryset().filter(login_type=LoginTypeChoices.eherkenning)
+
+    def get_by_rsin(self, rsin):
+        return self.get_queryset().get(rsin=rsin)
+
+    def eherkenning_create(self, rsin, **kwargs):
+        return super().create(
+            email="user-{}@rsin.com".format(rsin),
+            login_type=LoginTypeChoices.eherkenning,
+            rsin=rsin,
+        )
+
 
 class UserManager(BaseUserManager):
     use_in_migrations = True
 
-    def _create_user(self, username, email, password, **extra_fields):
+    def _create_user(self, email, password, **extra_fields):
         """
-        Creates and saves a User with the given username, email and password.
+        Creates and saves a User with the given email and password.
         """
-        if not username:
-            raise ValueError("The given username must be set")
         email = self.normalize_email(email)
-        username = self.model.normalize_username(username)
-        user = self.model(username=username, email=email, **extra_fields)
+        user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_user(self, username, email=None, password=None, **extra_fields):
+    def create_user(self, email, password=None, **extra_fields):
         extra_fields.setdefault("is_staff", False)
         extra_fields.setdefault("is_superuser", False)
-        return self._create_user(username, email, password, **extra_fields)
+        return self._create_user(email, password, **extra_fields)
 
-    def create_superuser(self, username, email, password, **extra_fields):
+    def create_superuser(self, email, password, **extra_fields):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
 
@@ -31,4 +62,4 @@ class UserManager(BaseUserManager):
         if extra_fields.get("is_superuser") is not True:
             raise ValueError("Superuser must have is_superuser=True.")
 
-        return self._create_user(username, email, password, **extra_fields)
+        return self._create_user(email, password, **extra_fields)

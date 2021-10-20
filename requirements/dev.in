@@ -1,5 +1,9 @@
 -c ci.txt
 
+# DigidLocal
+python3-saml
+pyopenssl
+
 # Helpers
 pip-tools
 

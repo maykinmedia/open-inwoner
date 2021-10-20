@@ -42,3 +42,10 @@
 
 {% block nav-global %}
 {% endblock %}
+
+
+{% block footer %}
+    {{ block.super }}
+    {# Load the custom JS #}
+    <script src="{% static 'bundles/open_inwoner-js.js' %}"></script>
+{% endblock %}
