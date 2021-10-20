@@ -23,6 +23,7 @@ django==3.2.7
     #   django-filer
     #   django-formtools
     #   django-hijack
+    #   django-leaflet
     #   django-localflavor
     #   django-otp
     #   django-phonenumber-field
@@ -52,6 +53,8 @@ django-ipware==4.0.0
     # via django-axes
 django-js-asset==1.2.2
     # via django-mptt
+django-leaflet==0.28.1
+    # via -r requirements/base.in
 django-localflavor==3.1
     # via -r requirements/base.in
 django-mptt==0.13.4
@@ -81,6 +84,10 @@ django-treebeard==4.5.1
 easy-thumbnails==2.7.1
     # via django-filer
 elastic-apm==6.4.0
+    # via -r requirements/base.in
+geographiclib==1.52
+    # via geopy
+geopy==2.2.0
     # via -r requirements/base.in
 idna==3.2
     # via requests

@@ -4,6 +4,7 @@ psycopg2  # database driver
 pytz  # handle timezones
 python-dotenv  # environment variables for secrets
 python-decouple  # processing of envvar configs
+geopy # geo decoder
 
 # Framework libraries
 django < 4.0
@@ -21,6 +22,7 @@ phonenumbers
 django-localflavor
 django-privates
 django-registration
+django-leaflet
 
 # API libraries
 # djangorestframework

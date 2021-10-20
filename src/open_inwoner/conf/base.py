@@ -121,6 +121,7 @@ INSTALLED_APPS = [
     "easy_thumbnails",  # used by filer
     "filer",
     "mptt",  # used by filer
+    "leaflet",
     # Project applications.
     "open_inwoner.accounts",
     "open_inwoner.pdc",
@@ -437,3 +438,7 @@ ELASTIC_APM = {
 if not ELASTIC_APM_SERVER_URL:
     ELASTIC_APM["ENABLED"] = False
     ELASTIC_APM["SERVER_URL"] = "http://localhost:8200"
+
+
+# geopy
+GEOPY_APP = PROJECT_NAME
