@@ -112,6 +112,8 @@ INSTALLED_APPS = [
     # 'django.contrib.humanize',
     # 'django.contrib.sitemaps',
     # External applications.
+    "rest_framework",
+    "drf_spectacular",
     "axes",
     "sniplates",
     "digid_eherkenning",
@@ -418,6 +420,38 @@ PRIVATE_MEDIA_ROOT = os.path.join(BASE_DIR, "private_media")
 SENDFILE_ROOT = PRIVATE_MEDIA_ROOT
 SENDFILE_BACKEND = "django_sendfile.backends.simple"
 PRIVATE_MEDIA_URL = "/private_files/"
+
+REST_FRAMEWORK = {
+    # YOUR SETTINGS
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.BasicAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
+    "DEFAULT_RENDERER_CLASSES": (
+        "djangorestframework_camel_case.render.CamelCaseJSONRenderer",
+        # Any other renders
+    ),
+    "DEFAULT_PARSER_CLASSES": (
+        "djangorestframework_camel_case.parser.CamelCaseJSONParser",
+        # Any other parsers
+    ),
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Open Inwoner API",
+    "DESCRIPTION": "Description",
+    "VERSION": "1.0.0",
+    # OTHER SETTINGS
+    "COMPONENT_NO_READ_ONLY_REQUIRED": True,
+    "POSTPROCESSING_HOOKS": [
+        "drf_spectacular.hooks.postprocess_schema_enums",
+        "drf_spectacular.contrib.djangorestframework_camel_case.camelize_serializer_fields",
+    ],
+}
 
 if SENTRY_DSN:
     SENTRY_CONFIG = {

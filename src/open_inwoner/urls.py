@@ -12,7 +12,6 @@ from django_registration.backends.one_step.views import RegistrationView
 from open_inwoner.accounts.forms import CustomRegistrationForm
 from open_inwoner.accounts.views import DocumentPrivateMediaView, PasswordResetView
 
-
 handler500 = "open_inwoner.utils.views.server_error"
 admin.site.site_header = "open_inwoner admin"
 admin.site.site_title = "open_inwoner admin"
@@ -54,6 +53,8 @@ urlpatterns = [
     ),
     path("accounts/", include("django_registration.backends.one_step.urls")),
     path("accounts/", include("django.contrib.auth.urls")),
+    path("api/", include("open_inwoner.api.urls", namespace="api")),
+    path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     # Simply show the master template.
     path("", TemplateView.as_view(template_name="master.html"), name="root"),
 ]

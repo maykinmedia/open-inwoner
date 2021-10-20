@@ -24,10 +24,11 @@ django-registration
 git+https://bitbucket.org/maykinmedia/django-digid-eherkenning.git@02ac61c42f6dd2f229ba9f0f687fa1a4160511be#egg=digid_eherkenning
 
 # API libraries
-# djangorestframework
-# django-extra-fields
-# django-filter
-# drf-yasg  # api documentation
+djangorestframework
+django-extra-fields
+django-filter
+drf-spectacular # api documentation
+djangorestframework-camel-case
 
 # WSGI servers & monitoring - production oriented
 uwsgi
