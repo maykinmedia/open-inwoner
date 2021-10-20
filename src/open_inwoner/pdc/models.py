@@ -1,8 +1,13 @@
+from django.contrib.gis.db.models import PointField
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from filer.fields.image import FilerImageField
+from localflavor.nl.models import NLZipCodeField
 from treebeard.mp_tree import MP_Node
+
+from .geocode import geocode_address
 
 
 class Category(MP_Node):
@@ -138,3 +143,82 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class ProductLink(models.Model):
+    product = models.ForeignKey(
+        "pdc.Product",
+        related_name="links",
+        on_delete=models.CASCADE,
+        help_text=_("Related product"),
+    )
+    name = models.CharField(_("name"), max_length=100, help_text=_("Name for the link"))
+    url = models.URLField(_("url"), help_text=_("Url of the link"))
+
+    class Meta:
+        verbose_name = _("product link")
+        verbose_name_plural = _("product links")
+
+    def __str__(self):
+        return f"{self.product}: {self.name}"
+
+
+class ProductLocation(models.Model):
+    product = models.ForeignKey(
+        "pdc.Product",
+        related_name="locations",
+        on_delete=models.CASCADE,
+        help_text=_("Related product"),
+    )
+    street = models.CharField(
+        _("street"), blank=True, max_length=250, help_text=_("Address street")
+    )
+    housenumber = models.CharField(
+        _("house number"),
+        blank=True,
+        max_length=250,
+        help_text=_("Address house number"),
+    )
+    postcode = NLZipCodeField(_("postcode"), help_text=_("Address postcode"))
+    city = models.CharField(_("city"), max_length=250, help_text=_("Address city"))
+    geometry = PointField(
+        _("geometry"),
+        help_text=_("Geo coordinates of the location"),
+    )
+
+    class Meta:
+        verbose_name = _("product location")
+        verbose_name_plural = _("product locations")
+
+    def __str__(self):
+        return f"{self.product}: {self.address_str}"
+
+    @property
+    def address_str(self):
+        # geocoding doesn't work if postcode has space inside
+        postcode = self.postcode.replace(" ", "")
+        return f"{self.street} {self.housenumber}, {postcode} {self.city}"
+
+    def clean(self):
+        super().clean()
+
+        self.clean_geometry()
+
+    def clean_geometry(self):
+        # if address is not changed - do nothing
+        if (
+            self.id
+            and self.address_str == ProductLocation.objects.get(id=self.id).address_str
+        ):
+            return
+
+        # locate geo coordinates using address string
+        geometry = geocode_address(self.address_str)
+        if not geometry:
+            raise ValidationError(
+                _(
+                    "Geo coordinates of the address can't be found. "
+                    "Make sure that the address data are correct"
+                )
+            )
+        self.geometry = geometry
