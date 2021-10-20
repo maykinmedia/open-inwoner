@@ -14,7 +14,7 @@ class DigidManager(BaseDigidManager):
 
     def digid_create(self, bsn, **kwargs):
         return super().create(
-            username="user-{}".format(bsn),
+            email="user-{}@bsn.com".format(bsn),
             login_type=LoginTypeChoices.digid,
             bsn=bsn,
         )
@@ -29,7 +29,7 @@ class eHerkenningManager(BaseeHerkenningManager):
 
     def eherkenning_create(self, rsin, **kwargs):
         return super().create(
-            username="user-{}".format(rsin),
+            email="user-{}@rsin.com".format(rsin),
             login_type=LoginTypeChoices.eherkenning,
             rsin=rsin,
         )

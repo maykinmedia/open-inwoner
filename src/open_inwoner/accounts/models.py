@@ -9,6 +9,7 @@ from localflavor.nl.models import NLBSNField, NLZipCodeField
 from privates.storages import PrivateMediaFileSystemStorage
 
 from open_inwoner.utils.validators import validate_phone_number
+
 from .choices import LoginTypeChoices
 from .managers import DigidManager, UserManager, eHerkenningManager
 
@@ -37,18 +38,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         ),
     )
     date_joined = models.DateTimeField(_("date joined"), default=timezone.now)
-    bsn = NLBSNField(null=True, blank=True)
-    login_type = models.CharField(
-        choices=LoginTypeChoices.choices,
-        default=LoginTypeChoices.default,
-        max_length=250,
-    )
-    birthday = models.DateField(null=True, blank=True)
-    street = models.CharField(default="", blank=True, max_length=250)
-    housenumber = models.CharField(default="", blank=True, max_length=250)
-    postcode = NLZipCodeField(null=True, blank=True, max_length=250)
-    city = models.CharField(default="", blank=True, max_length=250)
-
     rsin = models.CharField(max_length=9, null=True, blank=True)
     bsn = NLBSNField(null=True, blank=True)
     login_type = models.CharField(
