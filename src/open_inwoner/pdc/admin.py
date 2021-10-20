@@ -29,16 +29,7 @@ class TagTypeAdmin(admin.ModelAdmin):
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
     list_display = ("name", "type")
-    list_filter = ("type",)
-
-    def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        return qs.select_related("type").prefetch_related("products")
-
-
-class TagInline(admin.TabularInline):
-    model = Tag.products.through
-    extra = 1
+    list_filter = ("type__name",)
 
 
 @admin.register(Product)
@@ -47,7 +38,6 @@ class ProductAdmin(admin.ModelAdmin):
     list_filter = ("categories", "tags")
     date_hierarchy = "created_on"
     form = ProductAdminForm
-    inlines = (TagInline,)
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)

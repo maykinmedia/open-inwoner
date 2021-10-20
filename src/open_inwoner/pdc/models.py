@@ -63,6 +63,12 @@ class Product(models.Model):
         blank=True,
         help_text=_("Related products to this product"),
     )
+    tags = models.ManyToManyField(
+        "pdc.Tag",
+        blank=True,
+        related_name="products",
+        help_text=_("Tags which the product is linked to"),
+    )
     costs = models.DecimalField(
         _("costs"),
         decimal_places=2,
@@ -124,12 +130,6 @@ class Tag(models.Model):
         on_delete=models.SET_NULL,
         related_name="tags",
         help_text=_("The related tag type"),
-    )
-    products = models.ManyToManyField(
-        "pdc.Product",
-        blank=True,
-        related_name="tags",
-        help_text=_("Products which the tag is applied to"),
     )
 
     class Meta:
