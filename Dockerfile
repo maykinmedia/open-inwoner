@@ -52,6 +52,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         procps \
         vim \
         postgresql-client \
+        libgdal20 \
+        libgeos-c1v5 \
+        libproj13 \
         # lxml deps
         # libxslt \
     && rm -rf /var/lib/apt/lists/*

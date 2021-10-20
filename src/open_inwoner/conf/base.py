@@ -55,7 +55,7 @@ USE_THOUSAND_SEPARATOR = True
 #
 DATABASES = {
     "default": {
-        "ENGINE": config("DB_ENGINE", "django.db.backends.postgresql"),
+        "ENGINE": config("DB_ENGINE", "django.contrib.gis.db.backends.postgis"),
         "NAME": config("DB_NAME", "open_inwoner"),
         "USER": config("DB_USER", "open_inwoner"),
         "PASSWORD": config("DB_PASSWORD", "open_inwoner"),
@@ -108,6 +108,7 @@ INSTALLED_APPS = [
     "django_admin_index",
     "django_registration",
     "django.contrib.admin",
+    "django.contrib.gis",
     # 'django.contrib.admindocs',
     # 'django.contrib.humanize',
     # 'django.contrib.sitemaps',
