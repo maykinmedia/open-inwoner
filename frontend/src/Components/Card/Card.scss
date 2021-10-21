@@ -1,0 +1,16 @@
+.card {
+    display: grid;
+    grid-template-columns: 0fr 1fr;
+    align-items: center;
+    float: right;
+    margin: 5px;
+
+    &__img{
+        display: flex;
+    }
+
+    &__title{
+        padding: 1rem;
+    }
+
+}
