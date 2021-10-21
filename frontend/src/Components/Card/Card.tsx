@@ -12,13 +12,10 @@ interface CardProps {
 export class Card extends Component<CardProps, {}> {
     render() {
         return (
-            <div className="card">
-                <Link to="/themas">
-                    <img className="card__img" src={this.props.src} />
-                </Link>
+            <Link className="card" to={this.props.to}>
+                <img className="card__img" src={this.props.src} alt={this.props.alt} />
                 <h3 className="card__title">{this.props.title}</h3>
-            </div>
+            </Link>
         )
     }
 }
-

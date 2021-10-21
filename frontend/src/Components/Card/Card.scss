@@ -1,10 +1,10 @@
 .card {
     display: grid;
-    grid-template-columns: 0fr 1fr;
+    grid-template-columns: 1fr;
     align-items: center;
-    float: right;
-    margin: 5px;
-
+    box-sizing: border-box;
+    border: 1px solid #D2D2D2;
+    border-radius: 3px;
     &__img{
         display: flex;
     }
