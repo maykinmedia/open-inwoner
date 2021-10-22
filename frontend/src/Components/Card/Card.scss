@@ -1,0 +1,17 @@
+.card {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: center;
+    box-sizing: border-box;
+    border: 1px solid #D2D2D2;
+    border-radius: 3px;
+    
+    &__img{
+        display: flex;
+    }
+
+    &__title{
+        padding: 1rem;
+    }
+
+}
