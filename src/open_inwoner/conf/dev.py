@@ -26,6 +26,8 @@ from .base import *  # noqa isort:skip
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
+LOGIN_REDIRECT_URL = "http://localhost:3000"
+
 LOGGING["loggers"].update(
     {
         "open_inwoner": {

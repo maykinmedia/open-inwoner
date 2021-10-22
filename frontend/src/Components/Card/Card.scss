@@ -5,13 +5,15 @@
     box-sizing: border-box;
     border: 1px solid #D2D2D2;
     border-radius: 3px;
-    
+
     &__img{
-        display: flex;
+        width: 100%;
     }
 
     &__title{
         padding: 1rem;
+        text-align: center;
+        margin: 0;
     }
 
 }
