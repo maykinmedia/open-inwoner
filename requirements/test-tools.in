@@ -10,3 +10,7 @@ pylint
 pyquery  # integrates with webtest
 requests-mock
 tblib
+
+# DigidLocal
+python3-saml
+pyopenssl

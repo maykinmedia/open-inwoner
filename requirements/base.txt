@@ -21,10 +21,13 @@ defusedxml==0.7.1
     # via digid-eherkenning
 digid-eherkenning @ git+https://bitbucket.org/maykinmedia/django-digid-eherkenning.git@02ac61c42f6dd2f229ba9f0f687fa1a4160511be
     # via -r requirements/base.in
+dj-rest-auth==2.1.11
+    # via -r requirements/base.in
 django==3.2.7
     # via
     #   -r requirements/base.in
     #   digid-eherkenning
+    #   dj-rest-auth
     #   django-axes
     #   django-choices
     #   django-cors-headers
@@ -101,6 +104,7 @@ django-treebeard==4.5.1
 djangorestframework==3.12.4
     # via
     #   -r requirements/base.in
+    #   dj-rest-auth
     #   django-extra-fields
     #   drf-spectacular
 djangorestframework-camel-case==1.2.0
