@@ -20,6 +20,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Install libxml
+        run: |
+          apt update
+          apt install -y libxml2-dev libxmlsec1-dev libxmlsec1-openssl
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
@@ -35,6 +39,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Install libxml
+        run: |
+          apt update
+          apt install -y libxml2-dev libxmlsec1-dev libxmlsec1-openssl
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
