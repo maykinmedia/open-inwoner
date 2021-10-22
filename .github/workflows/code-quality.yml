@@ -22,8 +22,8 @@ jobs:
     steps:
       - name: Install libxml
         run: |
-          apt update
-          apt install -y libxml2-dev libxmlsec1-dev libxmlsec1-openssl
+          sudo apt-get update
+          sudo apt-get install -y libxml2-dev libxmlsec1-dev libxmlsec1-openssl
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
@@ -41,8 +41,8 @@ jobs:
     steps:
       - name: Install libxml
         run: |
-          apt update
-          apt install -y libxml2-dev libxmlsec1-dev libxmlsec1-openssl
+          sudo apt-get update
+          sudo apt-get install -y libxml2-dev libxmlsec1-dev libxmlsec1-openssl
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
