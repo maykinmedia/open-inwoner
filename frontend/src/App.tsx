@@ -3,6 +3,7 @@ import { Route, Switch, NavLink } from 'react-router-dom'
 import { Menu } from './Components/Menu/Menu'
 import { Logo } from './Components/Menu/Logo'
 import { MenuText } from './Components/Menu/MenuText'
+import { Container } from './Components/Container/Container'
 
 import './App.scss'
 
@@ -52,6 +53,15 @@ export class App extends Component<{}, AppState> {
         return "";
     }
 
+    getLoginLink = () => {
+        if (this.state.user.firstName) {
+            <NavLink className="menu__link menu__link--highlighted" activeClassName="menu__link--active" to="/logout">Logout</NavLink>
+        }
+        return (
+            <NavLink className="menu__link menu__link--highlighted" activeClassName="menu__link--active" to="/login">Login</NavLink>
+        )
+    }
+
     render() {
         return (
             <>
@@ -59,18 +69,20 @@ export class App extends Component<{}, AppState> {
                     <Logo src="https://www.zwolle.nl/sites/all/themes/custom/zwolle_redesign/logo.png" alt="Logo van gemeente" />
                     <div className="menu__info">
                         <MenuText>{this.getMenuText()}</MenuText>
-                        <NavLink className="menu__link menu__link--highlighted" activeClassName="menu__link--active" to="/login">Login</NavLink>
+                        { this.getLoginLink() }
                     </div>
                 </Menu>
-                <Switch>
-                    {routes.map(({ path, component: RouteComp }) => {
-                        return (
-                            <Route key={path} path={path}>
-                                <RouteComp token={this.state.token} user={this.state.user} setParentState={this.updateState} />
-                            </Route>
-                        )
-                    })}
-                </Switch>
+                <Container>
+                    <Switch>
+                        {routes.map(({ path, component: RouteComp }) => {
+                            return (
+                                <Route key={path} path={path}>
+                                    <RouteComp token={this.state.token} user={this.state.user} setParentState={this.updateState} />
+                                </Route>
+                            )
+                        })}
+                    </Switch>
+                </Container>
             </>
         )
     }

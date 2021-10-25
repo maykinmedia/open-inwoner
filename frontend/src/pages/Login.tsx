@@ -1,5 +1,10 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom'
+import { Input } from '../Components/Form/Input'
+import { Label } from '../Components/Form/Label'
+import { Fieldset } from '../Components/Form/Fieldset'
+import { Button } from '../Components/Button/Button'
+import { Direction } from '../Enums/direction'
 
 interface LoginProps {
     user: Object,
@@ -18,6 +23,8 @@ type LoginState = {
 export default class Login extends Component<LoginProps, LoginState> {
     state: Readonly<LoginState> = {
         loggedIn: false,
+        email: '',
+        password: '',
     };
 
     handleSubmit = async (e: any) => {
@@ -54,6 +61,14 @@ export default class Login extends Component<LoginProps, LoginState> {
         .then(data => data.json())
     }
 
+    setEmail = (event: any) => {
+        this.setState({ email: event.target.value })
+    }
+
+    setPassword = (event: any) => {
+        this.setState({ password: event.target.value })
+    }
+
     render() {
         const { loggedIn } = this.state;
 
@@ -62,19 +77,33 @@ export default class Login extends Component<LoginProps, LoginState> {
         }
         return (
             <>
-                <div className="card">
+                <div className="login">
                     <h1>Login</h1>
                     <form action="" onSubmit={this.handleSubmit}>
-                        <fieldset>
-                            <label htmlFor="">Emailadres</label>
-                            <input type="email" name="email" id="id_email" required onChange={e => this.setState({ email: e.target.value })} />
-                        </fieldset>
-                        <fieldset>
-                            <label htmlFor="">Wachtwoord</label>
-                            <input type="password" name="password" id="id_password" required onChange={e => this.setState({ password: e.target.value })} />
-                        </fieldset>
-                        <input type="submit" value="Login" />
-                        <a href="http://localhost:8000/digid/login/">Login met Digid</a>
+                        <Fieldset direction={ Direction.Vertical }>
+                            <Label for="email">Emailadres</Label>
+                            <Input
+                                type="email"
+                                name="email"
+                                required={true}
+                                value={this.state.email}
+                                changeAction={this.setEmail}
+                            />
+                        </Fieldset>
+                        <Fieldset direction={ Direction.Vertical }>
+                            <Label for="password">Wachtwoord</Label>
+                            <Input
+                                type="password"
+                                name="password"
+                                required={true}
+                                value={this.state.email}
+                                changeAction={this.setPassword}
+                            />
+                        </Fieldset>
+                        <Fieldset direction={ Direction.Horizontal }>
+                            <Button type="submit">Login</Button>
+                            <Button href="http://localhost:8000/digid/login/" open={true}>Login met Digid</Button>
+                        </Fieldset>
                     </form>
                 </div>
             </>
