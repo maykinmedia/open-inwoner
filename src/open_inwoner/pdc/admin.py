@@ -1,11 +1,23 @@
 from django import forms
 from django.contrib import admin
+from django.utils.translation import ugettext_lazy as _
 
 from leaflet.admin import LeafletGeoAdmin
 from treebeard.admin import TreeAdmin
 from treebeard.forms import movenodeform_factory
 
-from .models import Category, Product, ProductLink, ProductLocation, Tag, TagType
+from .models import (
+    Category,
+    Neighbourhood,
+    Organization,
+    OrganizationType,
+    Product,
+    ProductContact,
+    ProductLink,
+    ProductLocation,
+    Tag,
+    TagType,
+)
 from .widgets import CKEditorWidget
 
 
@@ -28,6 +40,11 @@ class ProductLocationInline(admin.TabularInline):
     extra = 1
 
 
+class ProductContactInline(admin.TabularInline):
+    model = ProductContact
+    extra = 1
+
+
 class ProductAdminForm(forms.ModelForm):
     class Meta:
         model = Product
@@ -40,15 +57,15 @@ class ProductAdmin(admin.ModelAdmin):
     list_display = ("name", "created_on", "display_categories")
     list_filter = ("categories", "tags")
     date_hierarchy = "created_on"
-    autocomplete_fields = ("categories", "related_products", "tags")
+    autocomplete_fields = ("categories", "related_products", "tags", "organizations")
     search_fields = ("name",)
     ordering = ("name",)
     form = ProductAdminForm
-    inlines = (ProductLinkInline, ProductLocationInline)
+    inlines = (ProductLinkInline, ProductLocationInline, ProductContactInline)
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
-        return qs.prefetch_related("categories", "tags")
+        return qs.prefetch_related("links", "locations", "product_contacts")
 
     def display_categories(self, obj):
         return ", ".join(p.name for p in obj.categories.all())
@@ -71,13 +88,22 @@ class TagAdmin(admin.ModelAdmin):
 
 @admin.register(ProductLocation)
 class ProductLocationAdmin(LeafletGeoAdmin):
+    # List
     list_display = ("product", "city", "postcode", "street", "housenumber")
     list_filter = ("city",)
+
+    # Detail
     modifiable = False
+    fieldsets = (
+        (None, {"fields": ("product",)}),
+        (
+            _("Address"),
+            {"fields": ("street", "housenumber", "postcode", "city", "geometry")},
+        ),
+    )
 
     def get_readonly_fields(self, request, obj=None):
         readonly_fields = super().get_readonly_fields(request, obj)
-
         # don't show map when creating new location
         if not obj:
             return readonly_fields + ("geometry",)
@@ -88,3 +114,47 @@ class ProductLocationAdmin(LeafletGeoAdmin):
 @admin.register(ProductLink)
 class ProductLinkAdmin(admin.ModelAdmin):
     list_display = ("product", "name", "url")
+
+
+@admin.register(Neighbourhood)
+class NeighbourhoodAmin(admin.ModelAdmin):
+    list_display = ("name",)
+
+
+@admin.register(OrganizationType)
+class OrganizationTypeAdmin(admin.ModelAdmin):
+    list_display = ("name",)
+
+
+@admin.register(Organization)
+class OrganizationAdmin(LeafletGeoAdmin):
+    # List
+    list_display = ("name", "type")
+    list_filter = ("type__name", "city")
+    search_fields = ("name",)
+    ordering = ("name",)
+
+    # Detail
+    modifiable = False
+    fieldsets = (
+        (None, {"fields": ("name", "type", "logo", "neighbourhood")}),
+        (_("Contact"), {"fields": ("email", "phonenumber")}),
+        (
+            _("Address"),
+            {"fields": ("street", "housenumber", "postcode", "city", "geometry")},
+        ),
+    )
+
+    def get_readonly_fields(self, request, obj=None):
+        readonly_fields = super().get_readonly_fields(request, obj)
+        # don't show map when creating new location
+        if not obj:
+            return readonly_fields + ("geometry",)
+
+        return readonly_fields
+
+
+@admin.register(ProductContact)
+class ProductContactAdmin(admin.ModelAdmin):
+    list_display = ("product", "organization", "last_name", "first_name")
+    list_filter = ("product__name",)

@@ -442,4 +442,5 @@ if not ELASTIC_APM_SERVER_URL:
 
 
 # geopy
-GEOPY_APP = PROJECT_NAME
+GEOPY_APP = "Openinwoner"
+GEOPY_TIMEOUT = 10  # in seconds

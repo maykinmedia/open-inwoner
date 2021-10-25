@@ -1,13 +1,12 @@
-from django.contrib.gis.db.models import PointField
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from filer.fields.image import FilerImageField
-from localflavor.nl.models import NLZipCodeField
 from treebeard.mp_tree import MP_Node
 
-from .geocode import geocode_address
+from open_inwoner.utils.validators import validate_phone_number
+
+from .mixins import GeoModel
 
 
 class Category(MP_Node):
@@ -95,6 +94,12 @@ class Product(models.Model):
             "This is the date when the product was last changed. This field is automatically set."
         ),
     )
+    organizations = models.ManyToManyField(
+        "pdc.Organization",
+        blank=True,
+        related_name="products",
+        help_text=_("Organizations which provides this product"),
+    )
 
     class Meta:
         verbose_name = _("product")
@@ -163,27 +168,12 @@ class ProductLink(models.Model):
         return f"{self.product}: {self.name}"
 
 
-class ProductLocation(models.Model):
+class ProductLocation(GeoModel):
     product = models.ForeignKey(
         "pdc.Product",
         related_name="locations",
         on_delete=models.CASCADE,
         help_text=_("Related product"),
-    )
-    street = models.CharField(
-        _("street"), blank=True, max_length=250, help_text=_("Address street")
-    )
-    housenumber = models.CharField(
-        _("house number"),
-        blank=True,
-        max_length=250,
-        help_text=_("Address house number"),
-    )
-    postcode = NLZipCodeField(_("postcode"), help_text=_("Address postcode"))
-    city = models.CharField(_("city"), max_length=250, help_text=_("Address city"))
-    geometry = PointField(
-        _("geometry"),
-        help_text=_("Geo coordinates of the location"),
     )
 
     class Meta:
@@ -193,32 +183,118 @@ class ProductLocation(models.Model):
     def __str__(self):
         return f"{self.product}: {self.address_str}"
 
-    @property
-    def address_str(self):
-        # geocoding doesn't work if postcode has space inside
-        postcode = self.postcode.replace(" ", "")
-        return f"{self.street} {self.housenumber}, {postcode} {self.city}"
 
-    def clean(self):
-        super().clean()
+class Neighbourhood(models.Model):
+    name = models.CharField(
+        _("name"), max_length=100, unique=True, help_text=_("Neighbourhood name")
+    )
 
-        self.clean_geometry()
+    class Meta:
+        verbose_name = _("neighbourhood")
+        verbose_name_plural = _("neighbourhoods")
 
-    def clean_geometry(self):
-        # if address is not changed - do nothing
-        if (
-            self.id
-            and self.address_str == ProductLocation.objects.get(id=self.id).address_str
-        ):
-            return
+    def __str__(self):
+        return self.name
 
-        # locate geo coordinates using address string
-        geometry = geocode_address(self.address_str)
-        if not geometry:
-            raise ValidationError(
-                _(
-                    "Geo coordinates of the address can't be found. "
-                    "Make sure that the address data are correct"
-                )
-            )
-        self.geometry = geometry
+
+class OrganizationType(models.Model):
+    name = models.CharField(
+        _("name"), max_length=100, unique=True, help_text=_("Organization type")
+    )
+
+    class Meta:
+        verbose_name = _("organization type")
+        verbose_name_plural = _("organization types")
+
+    def __str__(self):
+        return self.name
+
+
+class Organization(GeoModel):
+    name = models.CharField(
+        _("name"), max_length=250, help_text=_("Name of the organization")
+    )
+    logo = FilerImageField(
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="organization_logos",
+        help_text=_("Logo of the orgaization"),
+    )
+    type = models.ForeignKey(
+        "pdc.OrganizationType",
+        related_name="organizations",
+        on_delete=models.CASCADE,
+        help_text=_("Organization type"),
+    )
+    email = models.EmailField(
+        verbose_name=_("Email address"),
+        blank=True,
+        help_text=_("The email address of the organization"),
+    )
+    phonenumber = models.CharField(
+        verbose_name=_("Phonenumber"),
+        blank=True,
+        max_length=100,
+        validators=[validate_phone_number],
+        help_text=_("The phone number of the organization"),
+    )
+    neighbourhood = models.ForeignKey(
+        "pdc.Neighbourhood",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="organization",
+        help_text=_("The neighbourhood of the organization"),
+    )
+
+    class Meta:
+        verbose_name = _("organization")
+        verbose_name_plural = _("organizations")
+
+    def __str__(self):
+        return f"{self.name}"
+
+
+class ProductContact(models.Model):
+    product = models.ForeignKey(
+        "pdc.Product",
+        related_name="product_contacts",
+        on_delete=models.CASCADE,
+        help_text=_("Related product"),
+    )
+    organization = models.ForeignKey(
+        "pdc.Organization",
+        null=True,
+        blank=True,
+        related_name="product_contacts",
+        on_delete=models.SET_NULL,
+        help_text=_("The organization of the product contact"),
+    )
+    first_name = models.CharField(
+        _("first name"),
+        max_length=255,
+        help_text=_("First name of the product contact"),
+    )
+    last_name = models.CharField(
+        _("last name"), max_length=255, help_text=_("Last name of the product contact")
+    )
+    email = models.EmailField(
+        verbose_name=_("Email address"),
+        blank=True,
+        help_text=_("The email address of the product contact"),
+    )
+    phonenumber = models.CharField(
+        verbose_name=_("Phonenumber"),
+        blank=True,
+        max_length=100,
+        validators=[validate_phone_number],
+        help_text=_("The phone number of the product contact"),
+    )
+
+    class Meta:
+        verbose_name = _("product contact")
+        verbose_name_plural = _("product contacts")
+
+    def __str__(self):
+        return f"{self.product}: {self.first_name} {self.last_name}"
