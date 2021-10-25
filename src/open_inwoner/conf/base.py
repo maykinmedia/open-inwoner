@@ -317,9 +317,9 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Allow logging in with both username+password and email+password
 AUTHENTICATION_BACKENDS = [
+    "open_inwoner.accounts.backends.CustomAxesBackend",
     "open_inwoner.accounts.backends.UserModelEmailBackend",
     "django.contrib.auth.backends.ModelBackend",
-    "axes.backends.AxesBackend",
     "digid_eherkenning.backends.DigiDBackend",
 ]
 
