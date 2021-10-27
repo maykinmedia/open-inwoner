@@ -27,6 +27,7 @@ dj-rest-auth
 django-allauth
 django-leaflet
 django-autoslug
+django-elasticsearch-dsl
 
 # API libraries
 djangorestframework
