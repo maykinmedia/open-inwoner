@@ -1,89 +1,53 @@
-import { Component } from 'react'
-import { Route, Switch, NavLink } from 'react-router-dom'
+import { Component, useContext, Dispatch } from 'react'
+import { NavLink } from 'react-router-dom'
 import { Menu } from './Components/Menu/Menu'
 import { Logo } from './Components/Menu/Logo'
 import { MenuText } from './Components/Menu/MenuText'
 import { Container } from './Components/Container/Container'
 
 import './App.scss'
+import { globalContext } from './store';
+import { RouterView } from './routes/RouterView';
 
-const pages = import.meta.globEager('./pages/**/*.tsx')
-const routes = Object.keys(pages).map((path) => {
-    console.log(path, pages[path].default);
-    const name = path.match(/\.\/pages\/(.*)\.tsx$/)[1]
-    console.log(name);
-    return {
-        name,
-        path: name === '_Home' ? '/' : `/${name.toLowerCase()}`,
-        component: pages[path].default
-    }
-})
 
-type AppState = {
-    token: {
-        key: string,
-    },
-    user: {
-        firstName: string,
-        lastName: string,
-        email: string,
-    },
-}
+export function App() {
+    const { globalState, dispatch } = useContext(globalContext);
 
-export class App extends Component<{}, AppState> {
-    state: Readonly<AppState> = {
-        token: {
-            key: '',
-        },
-        user: {
-            firstName: "",
-            lastName: "",
-            email: "",
-        },
-    };
-
-    updateState = (toUpdate: any) => {
-        this.setState(toUpdate);
+    async function handleLogout() {
+        await dispatch({ type: 'PURGE_STATE' });
     }
 
-    getMenuText = () => {
-        if (this.state.user.firstName) {
-            return `Welkom ${this.state.user.firstName} ${this.state.user.lastName}`
+    const getMenuText = () => {
+        if (globalState.user) {
+            return <MenuText>Welkom {globalState.user.firstName} {globalState.user.lastName}</MenuText>
         }
-        return "";
+        return <></>;
     }
 
-    getLoginLink = () => {
-        if (this.state.user.firstName) {
-            <NavLink className="menu__link menu__link--highlighted" activeClassName="menu__link--active" to="/logout">Logout</NavLink>
+    const getLoginLink = () => {
+        if (globalState.user) {
+            return <NavLink className="menu__link menu__link--highlighted" activeClassName="menu__link--active" onClick={handleLogout} to="/">Logout</NavLink>
         }
-        return (
-            <NavLink className="menu__link menu__link--highlighted" activeClassName="menu__link--active" to="/login">Login</NavLink>
-        )
-    }
-
-    render() {
         return (
             <>
-                <Menu>
-                    <Logo src="https://www.zwolle.nl/sites/all/themes/custom/zwolle_redesign/logo.png" alt="Logo van gemeente" />
-                    <div className="menu__info">
-                        <MenuText>{this.getMenuText()}</MenuText>
-                        { this.getLoginLink() }
-                    </div>
-                </Menu>
-                <Container>
-                    <Switch>
-                        {routes.map(({ path, component: RouteComp }) => {
-                            return (
-                                <Route key={path} path={path}>
-                                    <RouteComp token={this.state.token} user={this.state.user} setParentState={this.updateState} />
-                                </Route>
-                            )
-                        })}
-                    </Switch>
-                </Container>
+                <NavLink className="menu__link" activeClassName="menu__link--active" to="/register">Registreer</NavLink>
+                <NavLink className="menu__link menu__link--highlighted" activeClassName="menu__link--active" to="/login">Login</NavLink>
             </>
         )
     }
+
+    return (
+        <>
+            <Menu>
+                <Logo src="https://www.zwolle.nl/sites/all/themes/custom/zwolle_redesign/logo.png" alt="Logo van gemeente" />
+                <div className="menu__info">
+                    { getMenuText() }
+                    { getLoginLink() }
+                </div>
+            </Menu>
+            <Container>
+                <RouterView />
+            </Container>
+        </>
+    )
 }

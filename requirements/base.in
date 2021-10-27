@@ -24,6 +24,7 @@ django-registration
 git+https://bitbucket.org/maykinmedia/django-digid-eherkenning.git@02ac61c42f6dd2f229ba9f0f687fa1a4160511be#egg=digid_eherkenning
 django-cors-headers
 dj-rest-auth
+django-allauth
 
 # API libraries
 djangorestframework

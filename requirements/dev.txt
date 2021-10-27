@@ -64,6 +64,7 @@ cryptography==35.0.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   pyjwt
     #   pyopenssl
 cssselect==1.1.0
     # via
@@ -77,6 +78,7 @@ defusedxml==0.7.1
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   digid-eherkenning
+    #   python3-openid
 digid-eherkenning @ git+https://bitbucket.org/maykinmedia/django-digid-eherkenning.git@02ac61c42f6dd2f229ba9f0f687fa1a4160511be
     # via
     #   -c requirements/ci.txt
@@ -92,6 +94,7 @@ django==3.2.7
     #   ddt-api-calls
     #   digid-eherkenning
     #   dj-rest-auth
+    #   django-allauth
     #   django-axes
     #   django-choices
     #   django-cors-headers
@@ -118,6 +121,10 @@ django==3.2.7
     #   easy-thumbnails
     #   maykin-django-two-factor-auth
 django-admin-index==1.5.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+django-allauth==0.45.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -330,6 +337,11 @@ mccabe==0.6.1
     #   pylint
 mypy-extensions==0.4.3
     # via black
+oauthlib==3.1.1
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   requests-oauthlib
 packaging==21.0
     # via sphinx
 pathspec==0.9.0
@@ -377,6 +389,11 @@ pyflakes==2.3.1
     # via flake8
 pygments==2.10.0
     # via sphinx
+pyjwt[crypto]==2.3.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   django-allauth
 pylint==2.11.1
     # via
     #   -c requirements/ci.txt
@@ -415,6 +432,11 @@ python-stdnum==1.17
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-localflavor
+python3-openid==3.2.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   django-allauth
 python3-saml==1.12.0
     # via
     #   -c requirements/ci.txt
@@ -447,14 +469,21 @@ requests==2.26.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   ddt-api-calls
+    #   django-allauth
     #   django-rosetta
     #   requests-mock
+    #   requests-oauthlib
     #   sphinx
 requests-mock==1.9.3
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   ddt-api-calls
+requests-oauthlib==1.3.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   django-allauth
 sentry-sdk==1.4.3
     # via
     #   -c requirements/ci.txt

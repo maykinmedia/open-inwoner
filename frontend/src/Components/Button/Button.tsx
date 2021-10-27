@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { Link } from "react-router-dom";
 import './Button.scss'
 
 interface ButtonProps {
@@ -19,7 +20,7 @@ export class Button extends Component<ButtonProps, {}> {
     render() {
         if (this.props.href) {
             return (
-                <a className={ this.getClassNames() } href={this.props.href}>{ this.props.children }</a>
+                <Link className={ this.getClassNames() } to={this.props.href}>{ this.props.children }</Link>
             )
         }
         return (

@@ -20,7 +20,7 @@ BASE_DIR = os.path.abspath(
 #
 # Core Django settings
 #
-# SITE_ID = config("SITE_ID", default=1)
+SITE_ID = config("SITE_ID", default=1)
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
@@ -95,7 +95,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     # NOTE: If enabled, at least one Site object is required and
     # uncomment SITE_ID above.
-    # 'django.contrib.sites',
+    "django.contrib.sites",
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # Admin auth
@@ -115,7 +115,11 @@ INSTALLED_APPS = [
     "corsheaders",
     "rest_framework",
     "rest_framework.authtoken",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
     "dj_rest_auth",
+    "dj_rest_auth.registration",
     "drf_spectacular",
     "axes",
     "sniplates",
@@ -426,6 +430,14 @@ SENDFILE_BACKEND = "django_sendfile.backends.simple"
 PRIVATE_MEDIA_URL = "/private_files/"
 
 CORS_ALLOW_ALL_ORIGINS = True
+
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+REST_AUTH_REGISTER_SERIALIZERS = {
+    "REGISTER_SERIALIZER": "open_inwoner.api.accounts.serializers.RegisterSerializer"
+}
 
 REST_FRAMEWORK = {
     # YOUR SETTINGS

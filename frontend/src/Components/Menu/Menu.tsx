@@ -5,11 +5,11 @@ import './Menu.scss'
 export class Menu extends Component {
     render() {
         return (
-            <header className="menu">
+            <div className="menu">
                 <nav className="menu__container">
                     {this.props.children}
                 </nav>
-            </header>
+            </div>
         )
     }
 }
