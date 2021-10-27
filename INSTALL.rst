@@ -20,7 +20,7 @@ You need the following libraries and/or programs:
 
 * `Python`_ 3.6 or above
 * Python `Virtualenv`_ and `Pip`_
-* `PostgreSQL`_ 10 or above
+* `PostgreSQL`_ 10 or above with PostGIS extension
 * `Node.js`_
 * `npm`_
 
@@ -48,7 +48,7 @@ development machine.
        $ cd open_inwoner
 
 3. Install all required (backend) libraries.
-   **Tip:** You can use the ``bootstrap.py`` script to install the requiments
+   **Tip:** You can use the ``bootstrap.py`` script to install the requirements
    and set the proper settings in ``manage.py``. Or, perform the steps
    manually:
 

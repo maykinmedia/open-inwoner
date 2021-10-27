@@ -4,6 +4,7 @@ psycopg2  # database driver
 pytz  # handle timezones
 python-dotenv  # environment variables for secrets
 python-decouple  # processing of envvar configs
+geopy # geo decoder
 
 # Framework libraries
 django < 4.0
@@ -25,6 +26,7 @@ git+https://bitbucket.org/maykinmedia/django-digid-eherkenning.git@02ac61c42f6dd
 django-cors-headers
 dj-rest-auth
 django-allauth
+django-leaflet
 
 # API libraries
 djangorestframework
