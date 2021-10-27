@@ -133,6 +133,7 @@ INSTALLED_APPS = [
     "mptt",  # used by filer
     "hijack.contrib.admin",
     "leaflet",
+    "django_elasticsearch_dsl",
     # Project applications.
     "open_inwoner.accounts",
     "open_inwoner.pdc",
@@ -504,3 +505,9 @@ if not ELASTIC_APM_SERVER_URL:
 # geopy
 GEOPY_APP = "Openinwoner"
 GEOPY_TIMEOUT = 10  # in seconds
+
+
+# ELASTICSEARCH CONFIG
+ELASTICSEARCH_DSL = {
+    "default": {"hosts": config("ES_HOST", "localhost:9200")},
+}
