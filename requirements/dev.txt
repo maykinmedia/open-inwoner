@@ -76,6 +76,7 @@ django==3.2.7
     #   django-filter
     #   django-formtools
     #   django-hijack
+    #   django-leaflet
     #   django-localflavor
     #   django-otp
     #   django-phonenumber-field
@@ -138,6 +139,10 @@ django-js-asset==1.2.2
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-mptt
+django-leaflet==0.28.1
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 django-localflavor==3.1
     # via
     #   -c requirements/ci.txt
@@ -239,6 +244,15 @@ faker==8.14.1
 flake8==3.9.2
     # via -r requirements/dev.in
 freezegun==1.1.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+geographiclib==1.52
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   geopy
+geopy==2.2.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
