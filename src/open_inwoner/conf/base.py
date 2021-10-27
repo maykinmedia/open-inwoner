@@ -55,7 +55,7 @@ USE_THOUSAND_SEPARATOR = True
 #
 DATABASES = {
     "default": {
-        "ENGINE": config("DB_ENGINE", "django.db.backends.postgresql"),
+        "ENGINE": config("DB_ENGINE", "django.contrib.gis.db.backends.postgis"),
         "NAME": config("DB_NAME", "open_inwoner"),
         "USER": config("DB_USER", "open_inwoner"),
         "PASSWORD": config("DB_PASSWORD", "open_inwoner"),
@@ -108,6 +108,7 @@ INSTALLED_APPS = [
     "django_admin_index",
     "django_registration",
     "django.contrib.admin",
+    "django.contrib.gis",
     # 'django.contrib.admindocs',
     # 'django.contrib.humanize',
     # 'django.contrib.sitemaps',
@@ -123,6 +124,7 @@ INSTALLED_APPS = [
     "easy_thumbnails",  # used by filer
     "filer",
     "mptt",  # used by filer
+    "leaflet",
     # Project applications.
     "open_inwoner.accounts",
     "open_inwoner.pdc",
@@ -471,3 +473,8 @@ ELASTIC_APM = {
 if not ELASTIC_APM_SERVER_URL:
     ELASTIC_APM["ENABLED"] = False
     ELASTIC_APM["SERVER_URL"] = "http://localhost:8200"
+
+
+# geopy
+GEOPY_APP = "Openinwoner"
+GEOPY_TIMEOUT = 10  # in seconds
