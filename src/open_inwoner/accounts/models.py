@@ -74,14 +74,16 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.first_name
 
     def get_age(self):
-        today = date.today()
-        age = (
-            today.year
-            - self.birthday.year
-            - ((today.month, today.day) < (self.birthday.month, self.birthday.day))
-        )
+        if self.birthday:
+            today = date.today()
+            age = (
+                today.year
+                - self.birthday.year
+                - ((today.month, today.day) < (self.birthday.month, self.birthday.day))
+            )
 
-        return age
+            return age
+        return None
 
 
 class Contact(models.Model):
@@ -123,14 +125,14 @@ class Contact(models.Model):
         verbose_name=_("Created on"),
         auto_now_add=True,
         help_text=_(
-            "This is the date the document was created. This field is automatically set."
+            "This is the date the contact was created. This field is automatically set."
         ),
     )
     updated_on = models.DateTimeField(
         verbose_name=_("Updated on"),
         auto_now=True,
         help_text=_(
-            "This is the date when the document was last changed. This field is automatically set."
+            "This is the date when the contact was last changed. This field is automatically set."
         ),
     )
     created_by = models.ForeignKey(
@@ -146,6 +148,12 @@ class Contact(models.Model):
 
 
 class Document(models.Model):
+    uuid = models.UUIDField(
+        verbose_name=_("UUID"),
+        unique=True,
+        default=uuid4,
+        help_text=_("Used as a reference in the documents api."),
+    )
     name = models.CharField(
         verbose_name=_("Name"),
         default="",
@@ -155,7 +163,7 @@ class Document(models.Model):
     file = models.FileField(
         verbose_name=_("File"),
         storage=PrivateMediaFileSystemStorage(),
-        help_text="This will be te actual document.",
+        help_text="This will be the actual document.",
     )
     created_on = models.DateTimeField(
         verbose_name=_("Created on"),
@@ -180,6 +188,12 @@ class Document(models.Model):
 
 
 class Appointment(models.Model):
+    uuid = models.UUIDField(
+        verbose_name=_("UUID"),
+        unique=True,
+        default=uuid4,
+        help_text=_("Used as a reference in the appointments api."),
+    )
     name = models.CharField(
         verbose_name=_("Name"),
         default="",
@@ -193,12 +207,12 @@ class Appointment(models.Model):
     created_on = models.DateTimeField(
         verbose_name=_("Created on"),
         auto_now_add=True,
-        help_text=_("This is the date the document was created"),
+        help_text=_("This is the date the appointment was created"),
     )
     updated_on = models.DateTimeField(
         verbose_name=_("Updated on"),
         auto_now=True,
-        help_text=_("This is the date when the document was last changed"),
+        help_text=_("This is the date when the appointment was last changed"),
     )
     created_by = models.ForeignKey(
         "accounts.User",
@@ -213,6 +227,12 @@ class Appointment(models.Model):
 
 
 class Action(models.Model):
+    uuid = models.UUIDField(
+        verbose_name=_("UUID"),
+        unique=True,
+        default=uuid4,
+        help_text=_("Used as a reference in the actions api."),
+    )
     name = models.CharField(
         verbose_name=_("Name"),
         default="",
@@ -222,12 +242,12 @@ class Action(models.Model):
     created_on = models.DateTimeField(
         verbose_name=_("Created on"),
         auto_now_add=True,
-        help_text=_("This is the date the document was created"),
+        help_text=_("This is the date the action was created"),
     )
     updated_on = models.DateTimeField(
         verbose_name=_("Updated on"),
         auto_now=True,
-        help_text=_("This is the date when the document was last changed"),
+        help_text=_("This is the date when the action was last changed"),
     )
     created_by = models.ForeignKey(
         "accounts.User",
