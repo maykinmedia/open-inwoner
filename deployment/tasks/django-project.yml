@@ -94,7 +94,7 @@
     become_user: "{{ user_name }}"
 
   - name: Build the frontend
-    command: chdir={{ project_root }}/frontend npm run {{ gulp_frontend_task|default('build') }}
+    command: chdir={{ project_root }}/frontend npm run {{ npm_frontend_task|default('build') }}
     become: yes
     become_user: "{{ user_name }}"
 
