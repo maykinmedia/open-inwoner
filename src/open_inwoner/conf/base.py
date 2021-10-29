@@ -137,6 +137,7 @@ INSTALLED_APPS = [
     # Project applications.
     "open_inwoner.accounts",
     "open_inwoner.pdc",
+    "open_inwoner.search",
     "open_inwoner.utils",
 ]
 
@@ -511,3 +512,4 @@ GEOPY_TIMEOUT = 10  # in seconds
 ELASTICSEARCH_DSL = {
     "default": {"hosts": config("ES_HOST", "localhost:9200")},
 }
+ES_INDEX_PRODUCTS = "products"
