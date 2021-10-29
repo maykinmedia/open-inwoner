@@ -36,7 +36,7 @@ export default function Register() {
 
     const registerUser = async (email?: string, password1?: string, password2?: string, firstName?: string, lastName?: string) => {
         try {
-            const res = await axios.post(`${process.env.API_URL}/api/auth/registration/`, {email: email, password1: password1, password2: password2, firstName: firstName, lastName: lastName}).catch(err => {
+            const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/registration/`, {email: email, password1: password1, password2: password2, firstName: firstName, lastName: lastName}).catch(err => {
                 console.log(err.response.data)
                 let localErrors = []
                 for (const [key, value] of Object.entries(err.response.data)) {

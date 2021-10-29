@@ -40,7 +40,7 @@ export default function ProductDetail() {
     useEffect(() => {
         const getProduct = async () => {
             try {
-                const res = await axios.get(`${process.env.API_URL}/api/products/${slug}/`).catch(err => {
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/products/${slug}/`).catch(err => {
                     console.log(err.response.data)
                     throw err;
                 });
@@ -55,7 +55,7 @@ export default function ProductDetail() {
     const getContent = () => {
         console.log(product)
         if (product && product.content) {
-            return <ReactMarkdown>{product.content}</ReactMarkdown>
+            // return <ReactMarkdown>{product.content}</ReactMarkdown>
         }
         return <></>
     }

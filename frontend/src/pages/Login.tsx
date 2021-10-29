@@ -31,7 +31,7 @@ export default function Login() {
 
     const loginUser = async (email?: string, password?: string) => {
         try {
-            const res = await axios.post(`${process.env.API_URL}/api/auth/login/`, {email: email, password: password}).catch(err => {
+            const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/login/`, {email: email, password: password}).catch(err => {
                 console.log(err.response.data)
                 setErrors(err.response.data);
                 throw err;
@@ -43,7 +43,7 @@ export default function Login() {
     }
 
     const getUser = async (token: Token) => {
-        return fetch(`${process.env.API_URL}/api/auth/user/`, {
+        return fetch(`${import.meta.env.VITE_API_URL}/api/auth/user/`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -92,7 +92,7 @@ export default function Login() {
                     </Fieldset>
                     <Fieldset direction={ Direction.Horizontal }>
                         <Button type="submit">Login</Button>
-                        <Button href={`${process.env.API_URL}/digid/login/`} open={true}>Login met Digid</Button>
+                        <Button href={`${import.meta.env.VITE_API_URL}/digid/login/`} open={true}>Login met Digid</Button>
                     </Fieldset>
                 </form>
             </div>

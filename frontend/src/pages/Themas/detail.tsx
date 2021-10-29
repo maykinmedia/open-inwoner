@@ -18,7 +18,7 @@ export default function ThemaDetail() {
     useEffect(() => {
         const getCategories = async (email?: string, password?: string) => {
             try {
-                const res = await axios.get(`${process.env.API_URL}/api/categories/${slug}/`).catch(err => {
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/categories/${slug}/`).catch(err => {
                     console.log(err.response.data)
                     throw err;
                 });

@@ -1,0 +1,136 @@
+# Generic deployment of our Django projects via ansible
+# For Django projects >= 1.7
+
+# Checks out and sets up one of our Django projects
+
+# Usage
+
+# Variables:
+#   user_name: name of the Linux user running the project
+#   group_name: name of the Linux group running the project
+#   project_name
+#   project_root: location of the project directory (unique for the project + target )
+#   project_repo: git repository of the project
+#   settings_target: to override the target in the bootstrap.py script (optional)
+#   gulp_task: if set, this is the gulp task used if a gulpfile.js is found in the project root. 'build' is the default task.
+
+# Files:
+#   deploy.key: Read-only deployment key
+
+# In use for: Lots of our projects
+
+  - name: django
+    group: name={{ group_name }} state=present
+
+  - name: Create user and set primary group
+    user: name={{ user_name }} shell=/bin/bash group={{ group_name }}
+
+  - name: Create the project directory
+    file: state=directory path={{ project_repo_root|default(project_root) }} owner={{ user_name }} group={{ group_name }} mode=0775
+    ignore_errors: True
+
+  - name: Send deployment key over
+    copy: src=deploy.key dest=/tmp/deploy_priv_key_{{ project_name }}_{{ user_name }} mode=0600
+    ignore_errors: True
+    become: yes
+    become_user: "{{ user_name }}"
+
+  - name: Pull sources from the repository.
+    git: repo={{ project_repo }} dest={{ project_repo_root|default(project_root) }} version={{ branch }} key_file=/tmp/deploy_priv_key_{{ project_name }}_{{ user_name }} accept_hostkey=yes recursive=no umask=0002
+    become: yes
+    become_user: "{{ user_name }}"
+    environment:
+      TMPDIR: "/home/{{ user_name }}" # Required, otherwise Ansible attempts to install a wrapper-script in /tmp which isn't always executable
+    register: git_result
+
+  - name: Testing to see if Django settings should be copied
+    local_action: stat path="django-local.py.j2"
+    become: no
+    register: django_settings
+
+  - name: Installing Django settings
+    template: src=django-local.py.j2 dest={{ project_root }}/src/{{ project_src_dir }}/conf/local.py
+    when: django_settings.stat.exists == True
+
+  - name: Bootstrap the environment
+    shell: chdir={{ project_root }} python bootstrap.py {{ settings_target|default(target) }}
+    become: yes
+    become_user: "{{ user_name }}"
+
+  - name: Testing to see if Django dotenv is to be used
+    local_action: stat path="dotenv.j2"
+    become: no
+    register: django_dotenv
+
+  - name: Installing Django dotenv to project directory
+    template: src=dotenv.j2 dest={{ project_root }}/.env owner={{ user_name }} group={{ group_name }} mode="u=rwx,g=,o="
+    when: django_dotenv.stat.exists == True
+
+# NPM
+
+  - name: Check if package.json exists and if so install npm dependancies
+    stat: path={{ project_root }}/package.json
+    register: package_json
+
+# Gulp requires devDependencies to be installed as well depending on the tasks
+  - name: Install NPM dependencies.
+    npm: path={{ project_root }} production=no ci=yes
+    become: yes
+    become_user: "{{ user_name }}"
+    when: package_json.stat.exists == True and ansible_version.full is version("2.8.0", ">=")
+
+  - name: Install NPM dependencies - pre Ansible 2.8 without ci
+    npm: path={{ project_root }} production=no
+    become: yes
+    become_user: "{{ user_name }}"
+    when: package_json.stat.exists == True and ansible_version.full is version ("2.8.0", "<")
+
+
+### React frontend specific ###
+
+  - name: Install NodeJS
+    command: chdir={{ project_root }}/frontend npm ci
+    become: yes
+    become_user: "{{ user_name }}"
+
+  - name: Build the frontend
+    command: chdir={{ project_root }}/frontend npm run {{ gulp_frontend_task|default('build') }}
+    become: yes
+    become_user: "{{ user_name }}"
+
+
+# Gulp
+
+  - name: Check if gulpfile exists and if so install and run gulp
+    stat: path={{ project_root }}/gulpfile.js
+    register: gulpfile
+
+  - name: Run gulp
+    shell: chdir={{ project_root }} ./node_modules/.bin/gulp {{ gulp_task|default('build') }} {{ gulp_arg|default('--production') }}
+    become: yes
+    become_user: "{{ user_name }}"
+    when: gulpfile.stat.exists == True
+
+# Npm run build
+# If not gulpfile and package_json then run npm run build
+# Note: for projects from our pre-gulp era this will fail
+
+  - name: Run npm run build
+    shell: chdir={{ project_root }} npm run {{ npm_build_task|default('build') }} {{ npm_build_arg|default('--production') }}
+    become: yes
+    become_user: "{{ user_name }}"
+    when: package_json.stat.exists == True and gulpfile.stat.exists == False
+    ignore_errors: True
+
+# Django
+
+  - name: Link Django static media.
+    shell: chdir={{ project_root }} . ./env/bin/activate && src/manage.py collectstatic --link --noinput
+    become: yes
+    become_user: "{{ user_name }}"
+
+  - name: Sync Django database.
+    shell: chdir={{ project_root }} . ./env/bin/activate && src/manage.py migrate --noinput
+    run_once: true
+    become: yes
+    become_user: "{{ user_name }}"

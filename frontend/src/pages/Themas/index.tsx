@@ -12,13 +12,15 @@ import { globalContext } from '../../store';
 import './theme-list.scss'
 
 export default function Themas() {
+    console.log(import.meta.env);
+    console.log(import.meta.env.VITE_API_URL);
     const { globalState, dispatch } = useContext(globalContext);
     const [categories, setCategories] = useState([]);
 
     useEffect(() => {
         const getCategories = async (email?: string, password?: string) => {
             try {
-                const res = await axios.get('${process.env.API_URL}/api/categories/').catch(err => {
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/categories/`).catch(err => {
                     console.log(err.response.data)
                     throw err;
                 });

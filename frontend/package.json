@@ -3,10 +3,13 @@
   "version": "0.0.0",
   "main": "./src/main.tsx",
   "scripts": {
-    "dev": "node server --env.API_URL=http://localhost:8000",
+    "dev": "node server",
     "build": "npm run build:client && npm run build:server",
-    "build:client": "vite build --outDir dist/client  --env.API_URL=https://open-inwoner-test.maykin.nl",
-    "build:server": "vite build --ssr src/entry-server.tsx --outDir dist/server  --env.API_URL=https://open-inwoner-test.maykin.nl",
+    "build:development": "npm run build:client && npm run build:server",
+    "build:test": "npm run build:client && npm run build:server",
+    "build:staging": "npm run build:client && npm run build:server",
+    "build:client": "vite build --mode development --outDir dist/client",
+    "build:server": "vite build --mode development --ssr src/entry-server.tsx --outDir dist/server",
     "generate": "vite build --outDir dist/static && npm run build:server && node prerender",
     "serve": "cross-env NODE_ENV=production node server",
     "debug": "node --inspect-brk server"
