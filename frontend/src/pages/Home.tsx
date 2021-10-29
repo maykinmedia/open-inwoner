@@ -18,6 +18,6 @@ export default function Home() {
     }
 
     return (
-        <Grid fixedLeft={true} left={getLeft()} right={getRight()} />
+        <Grid isLoggedIn={true} fixedLeft={true} left={getLeft()} right={getRight()} />
     )
 }

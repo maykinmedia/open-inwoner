@@ -27,6 +27,7 @@ django-cors-headers
 dj-rest-auth
 django-allauth
 django-leaflet
+django-autoslug
 
 # API libraries
 djangorestframework

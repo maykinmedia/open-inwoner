@@ -103,6 +103,10 @@ django-allauth==0.45.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+django-autoslug==1.9.8
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
 django-axes==5.25.0
     # via
     #   -c requirements/base.txt

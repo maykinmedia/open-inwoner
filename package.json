@@ -33,6 +33,8 @@
     "@ckeditor/ckeditor5-markdown-gfm": "^30.0.0",
     "@ckeditor/ckeditor5-paragraph": "^30.0.0",
     "@ckeditor/ckeditor5-theme-lark": "^30.0.0",
+    "@emotion/react": "^11.5.0",
+    "@emotion/styled": "^11.3.0",
     "microscope-sass": "latest",
     "style-loader": "^1.3.0"
   },

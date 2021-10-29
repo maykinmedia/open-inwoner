@@ -4,10 +4,13 @@ from drf_spectacular.views import SpectacularJSONAPIView, SpectacularRedocView
 from rest_framework import routers
 
 from .contacts.views import ContactViewSet
+from .pdc.views import CategoryViewSet, ProductViewSet
 
 app_name = "api"
 router = routers.SimpleRouter()
 router.register("contacts", ContactViewSet, basename="contacts")
+router.register("categories", CategoryViewSet, basename="categories")
+router.register("products", ProductViewSet, basename="products")
 
 urlpatterns = [
     path(

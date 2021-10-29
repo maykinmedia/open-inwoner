@@ -8,5 +8,13 @@ export default defineConfig({
     ],
     build: {
         minify: false
+    },
+    resolve: {
+        alias: [
+          {
+            find: /^@mui\/icons-material\/(.*)/,
+            replacement: "@mui/icons-material/esm/$1"
+          }
+        ]
     }
 })

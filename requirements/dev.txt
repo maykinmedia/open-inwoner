@@ -129,6 +129,10 @@ django-allauth==0.45.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+django-autoslug==1.9.8
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 django-axes==5.25.0
     # via
     #   -c requirements/ci.txt

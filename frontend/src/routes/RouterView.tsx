@@ -6,6 +6,7 @@ import Login from '../pages/Login';
 import Register from '../pages/Register';
 import Themas from '../pages/Themas/index';
 import ThemeDetail from '../pages/Themas/detail';
+import ProductDetail from '../pages/Product/detail';
 import { PrivateRoute } from './PrivateRoute';
 import { globalContext } from '../store';
 
@@ -25,8 +26,11 @@ export function RouterView(): ReactElement {
             <Route exact path="/themas">
                 <Themas />
             </Route>
-            <Route exact path="/themas/1">
+            <Route exact path="/themas/:slug">
                 <ThemeDetail />
+            </Route>
+            <Route exact path="/product/:slug">
+                <ProductDetail />
             </Route>
             <PrivateRoute exact path="/about" pathname={pathname} component={About} />
             {/* <Route exact path="/login">

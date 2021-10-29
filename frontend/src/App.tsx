@@ -8,6 +8,8 @@ import { Container } from './Components/Container/Container'
 import './App.scss'
 import { globalContext } from './store';
 import { RouterView } from './routes/RouterView';
+import './fonts/TheMixC5/DesktopFonts/TheMixC5-5_Plain.otf';
+import './fonts/TheSansC5/DesktopFonts/TheSansC5-5_Plain.otf';
 
 
 export function App() {
