@@ -4,8 +4,8 @@ user_name: maykin
 group_name: staff
 project_name: open-inwoner
 project_root: "/srv/sites/{{ project_name }}-{{ target }}"
-project_src_dir: "open-inwoner"
-celery_worker_path: "open-inwoner"
+project_src_dir: "open_inwoner"
+celery_worker_path: "open_inwoner"
 django_settings_module: "{{ project_src_dir }}.conf.{{ target }}"
 
 django_secret_key: "wvi=esi+d^4x*#=72*u=sr2hm0!n%y39numxcbevx)%u-#v%l7"
