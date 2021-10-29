@@ -1,0 +1,13 @@
+---
+target: test
+
+nginx_server_name: "{{ project_name }}-{{ target }}.maykin.nl"
+
+dbname: "{{ project_name }}-{{ target }}"
+dbuser: "{{ project_name }}-{{ target }}"
+dbpassword: =*h1.L^ZH#kRD`@WSEB1
+dbport: 5432
+
+redis_url: redis://localhost:6379/1
+
+uwsgi_port: 8082
