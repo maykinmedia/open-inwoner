@@ -116,7 +116,7 @@
 # Note: for projects from our pre-gulp era this will fail
 
   - name: Run npm run build
-    shell: chdir={{ project_root }} npm run {{ npm_build_task|default('build') }} {{ npm_build_arg|default('--production') }}
+    shell: chdir={{ project_root }} npm run {{ npm_build_task|default('build') }}
     become: yes
     become_user: "{{ user_name }}"
     when: package_json.stat.exists == True and gulpfile.stat.exists == False
