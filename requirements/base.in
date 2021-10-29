@@ -40,3 +40,7 @@ djangorestframework-camel-case
 uwsgi
 sentry-sdk  # error monitoring
 elastic-apm  # Elastic APM integration
+
+# DigidLocal
+python3-saml
+pyopenssl
