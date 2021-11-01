@@ -51,15 +51,15 @@ export function RouterView() {
     const hasSession = async (to, from, next) => {
         const sessionCookie = getCookie("open_inwoner_sessionid");
         console.log("sessionCookie", sessionCookie);
-        if (sessionCookie) {
+        if (sessionCookie && !globalState.token) {
             const token = await getToken();
             if (token) {
                 await dispatch({ type: 'SET_TOKEN', payload: token })
                 const user = await getUser(token);
                 await dispatch({ type: 'SET_USER', payload: user })
             }
-            next();
         }
+        next();
     }
 
     return (
