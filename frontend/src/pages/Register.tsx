@@ -14,24 +14,24 @@ import axios from 'axios';
 
 export default function Register() {
     const { globalState, dispatch } = useContext(globalContext);
-    const [email, setEmail] = useState('jorik.kraaikamp@gmail.com');
-    const [password, setPassword] = useState('Pi22nguin37!');
-    const [password2, setPassword2] = useState('Pi22nguin37!');
-    const [firstName, setFirstName] = useState('Jorik');
-    const [lastName, setLastName] = useState('Kraaikamp');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [password2, setPassword2] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
     const [loggedIn, setLoggedIn] = useState(false);
     const [errors, setErrors] = useState([]);
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
+        setErrors([]);
         const token = await registerUser(email, password, password2, firstName, lastName);
-        console.log(token)
-        // if (token) {
-        //     await dispatch({ type: 'SET_TOKEN', payload: token })
-        //     const user = await getUser(token);
-        //     await dispatch({ type: 'SET_USER', payload: user })
-        //     setLoggedIn(true); // Setting the state to redirect after login
-        // }
+        if (token) {
+            await dispatch({ type: 'SET_TOKEN', payload: token })
+            const user = await getUser(token);
+            await dispatch({ type: 'SET_USER', payload: user })
+            setLoggedIn(true); // Setting the state to redirect after login
+        }
     }
 
     const registerUser = async (email?: string, password1?: string, password2?: string, firstName?: string, lastName?: string) => {
@@ -39,8 +39,10 @@ export default function Register() {
             const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/registration/`, {email: email, password1: password1, password2: password2, firstName: firstName, lastName: lastName}).catch(err => {
                 console.log(err.response.data)
                 let localErrors = []
-                for (const [key, value] of Object.entries(err.response.data)) {
-                    localErrors.push(`${key}: ${value}`);
+                if(err.response.status < 500) {
+                    for (const [key, value] of Object.entries(err.response.data)) {
+                        localErrors.push(`${key}: ${value}`);
+                    }
                 }
                 setErrors(localErrors);
                 throw err;
@@ -49,6 +51,18 @@ export default function Register() {
           } catch(err) {
               console.log(err)
           }
+    }
+
+    const getUser = async (token: Token) => {
+        return fetch(`${import.meta.env.VITE_API_URL}/api/auth/user/`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Token ${token.key}`,
+            },
+        })
+        .then(data => data.json())
+        .catch(error => dispatch({type: "SET_ERROR", payload: error}))
     }
 
     function handleEmailChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -72,7 +86,7 @@ export default function Register() {
     }
 
     if (loggedIn) {
-        return <Redirect to='/login'/>
+        return <Redirect to='/themas'/>
     }
     return (
         <>

@@ -25,6 +25,7 @@ from .base import *  # noqa isort:skip
 #
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+SESSION_COOKIE_DOMAIN = ".localhost"
 
 LOGIN_REDIRECT_URL = "http://localhost:3000"
 
@@ -117,6 +118,13 @@ warnings.filterwarnings(
 
 # django-filer
 FILER_DEBUG = True
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8000",
+    "http://localhost:3000",
+]
+
+TWO_FACTOR_PATCH_ADMIN = False
 
 # Override settings with local settings.
 try:

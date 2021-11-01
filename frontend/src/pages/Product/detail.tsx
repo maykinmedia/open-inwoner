@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown'
+import Markdown from 'markdown-to-jsx';
 
 import { Grid } from '../../Components/Container/Grid'
 import { File } from '../../Components/File/File'
@@ -55,7 +56,7 @@ export default function ProductDetail() {
     const getContent = () => {
         console.log(product)
         if (product && product.content) {
-            // return <ReactMarkdown>{product.content}</ReactMarkdown>
+            return <Markdown>{product.content}</Markdown>
         }
         return <></>
     }

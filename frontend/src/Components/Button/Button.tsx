@@ -19,12 +19,11 @@ export class Button extends Component<ButtonProps, {}> {
 
     render() {
         if (this.props.href) {
-            return (
-                <Link className={ this.getClassNames() } to={this.props.href}>{ this.props.children }</Link>
-            )
+            if (this.props.href.startsWith("http")) {
+                return <a className={ this.getClassNames() } href={this.props.href}>{ this.props.children }</a>
+            }
+            return <Link className={ this.getClassNames() } to={this.props.href}>{ this.props.children }</Link>
         }
-        return (
-            <button className={ this.getClassNames() } type={this.props.type}>{ this.props.children }</button>
-        )
+        return <button className={ this.getClassNames() } type={this.props.type}>{ this.props.children }</button>
     }
 }

@@ -5,6 +5,8 @@ import { Logo } from './Components/Menu/Logo'
 import { MenuText } from './Components/Menu/MenuText'
 import { Container } from './Components/Container/Container'
 
+import { logout } from './api/calls'
+
 import './App.scss'
 import { globalContext } from './store';
 import { RouterView } from './routes/RouterView';
@@ -16,6 +18,7 @@ export function App() {
     const { globalState, dispatch } = useContext(globalContext);
 
     async function handleLogout() {
+        await logout();
         await dispatch({ type: 'PURGE_STATE' });
     }
 

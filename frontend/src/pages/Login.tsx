@@ -7,6 +7,7 @@ import { Button } from '../Components/Button/Button'
 import { Direction } from '../Enums/direction'
 import { globalContext } from '../store';
 import { Token } from '../store/types';
+import { login, getUser } from '../api/calls';
 
 import axios from 'axios';
 
@@ -20,38 +21,16 @@ export default function Login() {
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
-        const token = await loginUser(email, password);
+        const token = await login(email, password).catch(err => {
+            setErrors(err.response.data);
+            throw err;
+        });
         if (token) {
             await dispatch({ type: 'SET_TOKEN', payload: token })
             const user = await getUser(token);
             await dispatch({ type: 'SET_USER', payload: user })
             setLoggedIn(true); // Setting the state to redirect after login
         }
-    }
-
-    const loginUser = async (email?: string, password?: string) => {
-        try {
-            const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/login/`, {email: email, password: password}).catch(err => {
-                console.log(err.response.data)
-                setErrors(err.response.data);
-                throw err;
-              });
-            return res.data;
-          } catch(err) {
-              console.log(err)
-          }
-    }
-
-    const getUser = async (token: Token) => {
-        return fetch(`${import.meta.env.VITE_API_URL}/api/auth/user/`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Token ${token.key}`,
-            },
-        })
-        .then(data => data.json())
-        .catch(error => dispatch({type: "SET_ERROR", payload: error}))
     }
 
     function handleEmailChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -63,7 +42,7 @@ export default function Login() {
     }
 
     if (loggedIn) {
-        return <Redirect to='/'/>
+        return <Redirect to='/themas'/>
     }
     return (
         <>
