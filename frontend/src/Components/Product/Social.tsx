@@ -8,10 +8,14 @@ import LinkedInIcon from '@mui/icons-material/LinkedIn';
 
 import './SocialLinks.scss'
 
-export function Social() {
+interface iSocialProps {
+    id: string,
+}
+
+export function Social(props:iSocialProps) {
     const { globalState, dispatch } = useContext(globalContext);
     return (
-        <div className="social-links">
+        <div id={props.id} className="social-links">
             <h4 className="social-links__title">Delen</h4>
             <div className="social-links__container">
                 <Link className="social-links__link" to="#">

@@ -10,13 +10,14 @@ interface iLink {
 }
 
 interface iLinkProps {
+    id: string,
     links?: Array<iLink>;
 }
 
 export function Links(props:iLinkProps) {
     const { globalState, dispatch } = useContext(globalContext);
     return (
-        <div className="product-links">
+        <div id={props.id} className="product-links">
             <h4 className="product-links__title">Links</h4>
             {props.links?.map((link:iLink, index:Number) => {
                 return (

@@ -6,6 +6,7 @@ interface ButtonProps {
     href?: string,
     type?: string,
     open?: boolean,
+    transparent?: boolean,
 }
 
 export class Button extends Component<ButtonProps, {}> {
@@ -13,6 +14,9 @@ export class Button extends Component<ButtonProps, {}> {
         let classNames = "button"
         if (this.props.open) {
             classNames += " button--open"
+        }
+        if (this.props.transparent) {
+            classNames += " button--transparent"
         }
         return classNames
     }

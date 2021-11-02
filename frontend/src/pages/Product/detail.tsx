@@ -9,7 +9,7 @@ import { File } from '../../Components/File/File'
 import { TagList } from '../../Components/Tags/TagList'
 import { Breadcrumbs } from '../../Components/Breadcrumbs/Breadcrumbs'
 import { Divider } from '../../Components/Divider/Divider'
-import SideMenu from '../../Components/Menu/SideMenu'
+import AnchorMenu from '../../Components/Menu/AnchorMenu'
 import { Links } from '../../Components/Product/Links'
 import { Related } from '../../Components/Product/Related'
 import { Social } from '../../Components/Product/Social'
@@ -66,7 +66,7 @@ export default function ProductDetail() {
             return (
                 <>
                     <Divider />
-                    <p>Bestanden</p>
+                    <p id="files">Bestanden</p>
                     <File />
                     <File />
                 </>
@@ -80,10 +80,10 @@ export default function ProductDetail() {
             <>
                 <Divider />
                 <Grid isLoggedIn={true} fixedLeft={false}>
-                    <Links links={product?.links} />
+                    <Links id="links" links={product?.links} />
                     <div>
-                        <Related related={product?.relatedProducts}/>
-                        <Social />
+                        <Related id="see" related={product?.relatedProducts}/>
+                        <Social id="share" />
                     </div>
                 </Grid>
             </>
@@ -92,15 +92,15 @@ export default function ProductDetail() {
 
     const getLeft = () => {
         return (
-            <SideMenu></SideMenu>
+            <AnchorMenu></AnchorMenu>
         )
     }
     const getRight = () => {
         return (
             <>
-                <Breadcrumbs breadcrumbs={[{icon: false, name: 'Home', to: '/'}, {icon: false, name: 'Themas', to: '/themas'}]} />
+                <Breadcrumbs breadcrumbs={[{icon: true, name: 'Home', to: '/'}, {icon: false, name: 'Themas', to: '/themas'}, {icon: false, name: product?.name || "", to: `/product/${product?.slug}`}]} />
                 <div className="product">
-                    <h1>{product?.name}</h1>
+                    <h1 id="title">{product?.name}</h1>
                     <TagList tags={product?.tags} />
                     <p>{product?.summary}</p>
                     {getContent()}

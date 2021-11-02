@@ -17,8 +17,8 @@
       text-decoration: none;
       content: ">";
       position: absolute;
-      right: -50%;
-      transform: translateX(-10%);
+      right: -16px;
+      transform: translateX(50%);
     }
 
     &:last-child:after {

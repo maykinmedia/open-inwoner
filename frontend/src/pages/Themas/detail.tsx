@@ -38,10 +38,10 @@ export default function ThemaDetail() {
     const getRight = () => {
         return (
             <div className="theme-list">
-                <Breadcrumbs breadcrumbs={[{icon: false, name: 'Home', to: '/'}, {icon: false, name: 'Themas', to: '/themas'}]} />
+                <Breadcrumbs breadcrumbs={[{icon: true, name: 'Home', to: '/'}, {icon: false, name: 'Themas', to: '/themas'}, {icon: false, name: category.name, to: `/themas/${category.slug}`}]} />
                 <h1 className="theme-list__title">{category.name}</h1>
                 <p className="theme-list__description">{category.description}</p>
-                <CardList title={category.name} products={category.product} />
+                <CardList title={category.name} categories={category.children} products={category.product} />
             </div>
         )
     }

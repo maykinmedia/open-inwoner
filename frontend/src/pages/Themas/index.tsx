@@ -40,7 +40,7 @@ export default function Themas() {
     const getRight = () => {
         return (
             <div className="theme-list">
-                <Breadcrumbs breadcrumbs={[{icon: false, name: 'Home', to: '/'}, {icon: false, name: 'Themas', to: '/themas'}]} />
+                <Breadcrumbs breadcrumbs={[{icon: true, name: 'Home', to: '/'}, {icon: false, name: 'Themas', to: '/themas'}]} />
                 <h1 className="theme-list__title">Themas</h1>
                 <p className="theme-list__description">Nulla vitae elit libero, a pharetra augue.</p>
                 <CardContainer isLoggedIn={!!globalState.user}>

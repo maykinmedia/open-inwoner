@@ -12,12 +12,13 @@ interface iSmallProject {
 
 interface iRelatedProps {
     related?: Array<iSmallProject>
+    id: string,
 }
 
 export function Related(props:iRelatedProps) {
     const { globalState, dispatch } = useContext(globalContext);
     return (
-        <div className="product-links">
+        <div id={props.id} className="product-links">
             <h4 className="product-links__title">Zie ook</h4>
             {props.related?.map((related:iSmallProject) => {
                 return (

@@ -1,8 +1,8 @@
 .button {
   box-sizing: border-box;
   border-radius: 3px;
-  background-color: #248641;
-  border: 1px solid #248641;
+  background-color: var(--color-primary);
+  border: 1px solid var(--color-primary);
   padding: 8px 16px;
   color: var(--color-white);
   font-family: "TheSans C5";
@@ -15,20 +15,32 @@
   transition: transform 300ms, background-color 300ms;
 
   &:hover {
-    background-color: darken(#248641, 5);
+    background-color: darken(#476db7, 5);
     transform: translateY(-1px);
-    border-color: darken(#248641, 5);
+    border-color: darken(#476db7, 5);
   }
 
   &--open {
     background-color: transparent;
-    color: #248641;
+    color: var(--color-primary);
     border-color: transparent;
 
     &:hover {
       background-color: transparent;
-      color: darken(#248641, 5);
-      border-color: darken(#248641, 5);
+      color: darken(#476db7, 5);
+      border-color: darken(#476db7, 5);
+    }
+  }
+
+  &--transparent {
+    background-color: transparent;
+    color: var(--color-primary);
+    border-color: transparent;
+
+    &:hover {
+      background-color: transparent;
+      color: darken(#476db7, 5);
+      border-color: transparent;
     }
   }
 }

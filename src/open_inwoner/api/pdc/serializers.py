@@ -28,6 +28,7 @@ class SmallProductSerializer(serializers.HyperlinkedModelSerializer):
             "url",
             "name",
             "slug",
+            "summary",
         )
         extra_kwargs = {
             "url": {"view_name": "api:products-detail", "lookup_field": "slug"},
@@ -48,6 +49,27 @@ class CategorySerializer(serializers.ModelSerializer):
             "image",
             "product",
         )
+
+
+class CategoryWithChildSerializer(CategorySerializer):
+    children = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Category
+        fields = (
+            "name",
+            "slug",
+            "description",
+            "icon",
+            "image",
+            "product",
+            "children",
+        )
+
+    def get_children(self, obj):
+        return CategorySerializer(
+            obj.get_children(), many=True, context=self._context
+        ).data
 
 
 class ProductLinkSerializer(serializers.ModelSerializer):

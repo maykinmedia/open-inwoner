@@ -3,18 +3,18 @@ import { Link } from "react-router-dom"
 import './Breadcrumbs.scss'
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 
-interface Breadcrumb {
+interface iBreadcrumb {
     icon: boolean,
     name: string,
     to: string,
 }
 
 interface BreadcrumbsProps {
-    breadcrumbs: Array<Breadcrumb>
+    breadcrumbs: Array<iBreadcrumb>
 }
 
 export class Breadcrumbs extends Component<BreadcrumbsProps, {}> {
-    getIconOrText = (breadcrumb:Breadcrumb) => {
+    getIconOrText = (breadcrumb:iBreadcrumb) => {
         if (breadcrumb.icon) {
             return <HomeOutlinedIcon />
         }
