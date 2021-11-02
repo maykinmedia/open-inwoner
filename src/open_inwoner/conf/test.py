@@ -4,6 +4,8 @@ This *should* be nearly identical to production.
 """
 import os
 
+from .production import *  # noqa isort:skip
+
 os.environ.setdefault("ENVIRONMENT", "test")
 # NOTE: watch out for multiple projects using the same cache!
 os.environ.setdefault("CACHE_DEFAULT", "127.0.0.1:6379/0")
@@ -15,8 +17,6 @@ AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
     "digid_eherkenning.mock.backends.DigiDBackend",
 ]
-
-from .production import *  # noqa isort:skip
 
 for db_alias in DATABASES.keys():
     del DATABASES[db_alias]["CONN_MAX_AGE"]
