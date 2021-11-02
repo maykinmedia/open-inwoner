@@ -1,22 +1,22 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
-import ReactMarkdown from 'react-markdown'
+import ReactMarkdown from 'react-markdown';
 import Markdown from 'markdown-to-jsx';
 
-import { Grid } from '../../Components/Container/Grid'
-import { File } from '../../Components/File/File'
-import { TagList } from '../../Components/Tags/TagList'
-import { Breadcrumbs } from '../../Components/Breadcrumbs/Breadcrumbs'
-import { Divider } from '../../Components/Divider/Divider'
-import AnchorMenu from '../../Components/Menu/AnchorMenu'
-import { Links } from '../../Components/Product/Links'
-import { Related } from '../../Components/Product/Related'
-import { Social } from '../../Components/Product/Social'
+import { Grid } from '../../Components/Container/Grid';
+import { File } from '../../Components/File/File';
+import { TagList } from '../../Components/Tags/TagList';
+import { Breadcrumbs } from '../../Components/Breadcrumbs/Breadcrumbs';
+import { Divider } from '../../Components/Divider/Divider';
+import AnchorMenu from '../../Components/Menu/AnchorMenu';
+import { Links } from '../../Components/Product/Links';
+import { Related } from '../../Components/Product/Related';
+import { Social } from '../../Components/Product/Social';
 
-import { getProduct } from '../../api/calls'
+import { getProduct } from '../../api/calls';
 import { globalContext } from '../../store';
-import './product.scss'
+import './product.scss';
 
 interface iProduct {
     name: string,
@@ -35,76 +35,70 @@ interface iProduct {
 }
 
 export default function ProductDetail() {
-    const { globalState, dispatch } = useContext(globalContext);
-    const [product, setProduct] = useState<iProduct | undefined>(undefined);
-    let { slug } = useParams();
+  const { globalState, dispatch } = useContext(globalContext);
+  const [product, setProduct] = useState<iProduct | undefined>(undefined);
+  const { slug } = useParams();
 
-    useEffect(() => {
-        const load = async () => {
-            const product = await getProduct(slug);
-            setProduct(product);
-        }
-        load()
-    }, [slug]);
+  useEffect(() => {
+    const load = async () => {
+      const product = await getProduct(slug);
+      setProduct(product);
+    };
+    load();
+  }, [slug]);
 
-    const getContent = () => {
-        if (product && product.content) {
-            return <Markdown>{product.content}</Markdown>
-        }
-        return <></>
+  const getContent = () => {
+    if (product && product.content) {
+      return <Markdown>{product.content}</Markdown>;
     }
+    return <></>;
+  };
 
-    const getFiles = () => {
-        if (product && product.files) {
-            return (
-                <>
-                    <Divider />
-                    <p id="files">Bestanden</p>
-                    <File />
-                    <File />
-                </>
-            )
-        }
-        return <></>
+  const getFiles = () => {
+    if (product && product.files) {
+      return (
+        <>
+          <Divider />
+          <p id="files">Bestanden</p>
+          <File />
+          <File />
+        </>
+      );
     }
+    return <></>;
+  };
 
-    const getFooter = () => {
-        return (
-            <>
-                <Divider />
-                <Grid isLoggedIn={true} fixedLeft={false}>
-                    <Links id="links" links={product?.links} />
-                    <div>
-                        <Related id="see" related={product?.relatedProducts}/>
-                        <Social id="share" />
-                    </div>
-                </Grid>
-            </>
-        )
-    }
+  const getFooter = () => (
+    <>
+      <Divider />
+      <Grid isLoggedIn fixedLeft={false}>
+        <Links id="links" links={product?.links} />
+        <div>
+          <Related id="see" related={product?.relatedProducts} />
+          <Social id="share" />
+        </div>
+      </Grid>
+    </>
+  );
 
-    const getLeft = () => {
-        return (
-            <AnchorMenu></AnchorMenu>
-        )
-    }
-    const getRight = () => {
-        return (
-            <>
-                <Breadcrumbs breadcrumbs={[{icon: true, name: 'Home', to: '/'}, {icon: false, name: 'Themas', to: '/themas'}, {icon: false, name: product?.name || "", to: `/product/${product?.slug}`}]} />
-                <div className="product">
-                    <h1 id="title">{product?.name}</h1>
-                    <TagList tags={product?.tags} />
-                    <p>{product?.summary}</p>
-                    {getContent()}
-                    {getFiles()}
-                    {getFooter()}
-                </div>
-            </>
-        )
-    }
+  const getLeft = () => (
+    <AnchorMenu />
+  );
+  const getRight = () => (
+    <>
+      <Breadcrumbs breadcrumbs={[{ icon: true, name: 'Home', to: '/' }, { icon: false, name: 'Themas', to: '/themas' }, { icon: false, name: product?.name || '', to: `/product/${product?.slug}` }]} />
+      <div className="product">
+        <h1 id="title">{product?.name}</h1>
+        <TagList tags={product?.tags} />
+        <p>{product?.summary}</p>
+        {getContent()}
+        {getFiles()}
+        {getFooter()}
+      </div>
+    </>
+  );
 
-    return (
-        <Grid isLoggedIn={true} fixedLeft={true} left={getLeft()} right={getRight()} />
-    )
+  return (
+    <Grid isLoggedIn fixedLeft left={getLeft()} right={getRight()} />
+  );
 }

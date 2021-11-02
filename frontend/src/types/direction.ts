@@ -1,4 +1,4 @@
 export enum Direction {
-  Vertical = "vertical",
-  Horizontal = "horizontal",
+  Vertical = 'vertical',
+  Horizontal = 'horizontal',
 }

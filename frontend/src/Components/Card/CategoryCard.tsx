@@ -1,8 +1,8 @@
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { iProduct } from '../../types/pdc'
+import { iProduct } from '../../types/pdc';
 
-import './Card.scss'
+import './Card.scss';
 
 interface CategoryCardProps {
     title: string,
@@ -10,20 +10,18 @@ interface CategoryCardProps {
     products: Array<any>,
 }
 
-export function CategoryCard (props:CategoryCardProps) {
-    return (
-        <div className="card card--list">
-            <h3 className="card__title">{ props.title }</h3>
-            <div className="card__links">
-                { props.products?.map((product:iProduct) => {
-                    return (
-                        <Link className="card__link" key={product.slug} to={`/product/${product.slug}`}>
-                            {product.name}
-                            <ChevronRightIcon />
-                        </Link>
-                    )
-                }) }
-            </div>
-        </div>
-    )
+export function CategoryCard(props:CategoryCardProps) {
+  return (
+    <div className="card card--list">
+      <h3 className="card__title">{ props.title }</h3>
+      <div className="card__links">
+        { props.products?.map((product:iProduct) => (
+          <Link className="card__link" key={product.slug} to={`/product/${product.slug}`}>
+            {product.name}
+            <ChevronRightIcon />
+          </Link>
+        )) }
+      </div>
+    </div>
+  );
 }

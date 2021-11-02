@@ -1,7 +1,7 @@
-import './Divider.scss'
+import './Divider.scss';
 
-export function Divider () {
-    return (
-        <hr className="divider" />
-    )
+export function Divider() {
+  return (
+    <hr className="divider" />
+  );
 }

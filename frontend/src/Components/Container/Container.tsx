@@ -1,7 +1,7 @@
-import './Container.scss'
+import './Container.scss';
 
-export function Container (props:any) {
-    return (
-        <main className="container">{ props.children }</main>
-    )
+export function Container(props:any) {
+  return (
+    <main className="container">{ props.children }</main>
+  );
 }

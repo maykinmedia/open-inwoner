@@ -1,4 +1,4 @@
-import './Tag.scss'
+import './Tag.scss';
 
 interface TagProps {
     key?: string
@@ -6,7 +6,7 @@ interface TagProps {
 }
 
 export function Tag(props:TagProps) {
-    return (
-        <div className="tag">{props.children}</div>
-    )
+  return (
+    <div className="tag">{props.children}</div>
+  );
 }

@@ -1,7 +1,7 @@
-import { useContext } from 'react'
-import { globalContext } from '../../store';
+import { useContext } from 'react';
 import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
-import './ProductLinks.scss'
+import { globalContext } from '../../store';
+import './ProductLinks.scss';
 
 interface iLink {
     name: string,
@@ -14,18 +14,16 @@ interface LinkProps {
 }
 
 export function Links(props:LinkProps) {
-    const { globalState, dispatch } = useContext(globalContext);
-    return (
-        <div id={props.id} className="product-links">
-            <h4 className="product-links__title">Links</h4>
-            {props.links?.map((link:iLink, index:Number) => {
-                return (
-                    <a key={`${index}`} className="product-links__link" target="_blank" href={link.url}>
-                        {link.name}
-                        <OpenInNewOutlinedIcon className="product-links__icon" />
-                    </a>
-                )
-            })}
-        </div>
-    )
+  const { globalState, dispatch } = useContext(globalContext);
+  return (
+    <div id={props.id} className="product-links">
+      <h4 className="product-links__title">Links</h4>
+      {props.links?.map((link:iLink, index:Number) => (
+        <a key={`${index}`} className="product-links__link" target="_blank" href={link.url} rel="noreferrer">
+          {link.name}
+          <OpenInNewOutlinedIcon className="product-links__icon" />
+        </a>
+      ))}
+    </div>
+  );
 }
