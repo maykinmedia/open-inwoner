@@ -16,6 +16,7 @@ pub_key_users:
   - jorik
   - sven
   - sjoerd
+  - anna
 
 project_repo: git@github.com:maykinmedia/open-inwoner.git
 branch: develop
