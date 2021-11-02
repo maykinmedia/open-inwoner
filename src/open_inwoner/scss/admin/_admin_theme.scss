@@ -180,7 +180,8 @@ div.breadcrumbs {
     gap: 32px;
   }
 
-  #toolbar {
+  #toolbar,
+  .xfull {
     grid-column: 1/ 3;
   }
 }
