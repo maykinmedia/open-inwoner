@@ -1,4 +1,3 @@
-import React, { Component } from "react";
 import './Submit.scss'
 
 interface SubmitProps {
@@ -6,16 +5,14 @@ interface SubmitProps {
     name: string,
 }
 
-export class Submit extends Component<SubmitProps, {}> {
-    render() {
-        return (
-            <input
-                className="submit"
-                type="submit"
-                value={this.props.value}
-                name={this.props.name}
-                id={`id_${this.props.name}`}
-            />
-        )
-    }
+export function Submit (props:SubmitProps) {
+    return (
+        <input
+            className="submit"
+            type="submit"
+            value={ props.value }
+            name={ props.name }
+            id={ `id_${props.name}` }
+        />
+    )
 }

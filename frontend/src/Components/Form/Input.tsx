@@ -1,4 +1,3 @@
-import React, { Component } from "react";
 import './Input.scss'
 
 interface InputProps {
@@ -9,24 +8,22 @@ interface InputProps {
     changeAction: Function,
 }
 
-export class Input extends Component<InputProps, {}> {
-    handleOnChange = (event: any) => {
-        if (this.props.changeAction) {
-            this.props.changeAction(event);
+export function Input (props:InputProps) {
+    const handleOnChange = (event: any) => {
+        if (props.changeAction) {
+            props.changeAction(event);
         }
     }
 
-    render() {
-        return (
-            <input
-                className="input"
-                type={this.props.type}
-                value={this.props.value}
-                name={this.props.name}
-                id={`id_${this.props.name}`}
-                required={this.props.required}
-                onChange={this.handleOnChange}
-            />
-        )
-    }
+    return (
+        <input
+            className="input"
+            type={ props.type }
+            value={ props.value }
+            name={ props.name }
+            id={ `id_${props.name}` }
+            required={ props.required }
+            onChange={ handleOnChange }
+        />
+    )
 }

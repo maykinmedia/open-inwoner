@@ -1,4 +1,3 @@
-import React, { Component } from "react";
 import './Grid.scss'
 
 interface GridProps {
@@ -6,44 +5,43 @@ interface GridProps {
     fixedLeft: Boolean,
     left?: any,
     right?: any,
+    children?: any,
 }
 
-export class Grid extends Component<GridProps, {}> {
-    getClassNames = () => {
+export function Grid (props:GridProps) {
+    const getClassNames = () => {
         let classNames = "grid"
-        if (!this.props.isLoggedIn) {
+        if (!props.isLoggedIn) {
             classNames += " grid--single"
         }
-        if (this.props.fixedLeft) {
+        if (props.fixedLeft) {
             classNames += " grid--fixed-left"
         }
         return classNames
     }
 
-    getLeft = () => {
-        if (this.props.isLoggedIn) {
-            return <div className="grid__left">{this.props.left}</div>
+    const getLeft = () => {
+        if (props.isLoggedIn) {
+            return <div className="grid__left">{ props.left }</div>
         }
         return <></>
     }
 
-    getContent = () => {
-        if (this.props.children) {
-            return this.props.children
+    const getContent = () => {
+        if (props.children) {
+            return props.children
         }
         return (
             <>
-                {this.getLeft()}
-                <div className="grid__right">{this.props.right}</div>
+                { getLeft() }
+                <div className="grid__right">{ props.right }</div>
             </>
         )
     }
 
-    render() {
-        return (
-            <div className={this.getClassNames()}>
-                {this.getContent()}
-            </div>
-        )
-    }
+    return (
+        <div className={ getClassNames() }>
+            { getContent() }
+        </div>
+    )
 }

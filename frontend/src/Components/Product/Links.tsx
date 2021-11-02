@@ -1,5 +1,4 @@
 import { useContext } from 'react'
-import { Link } from "react-router-dom"
 import { globalContext } from '../../store';
 import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
 import './ProductLinks.scss'
@@ -9,12 +8,12 @@ interface iLink {
     url: string,
 }
 
-interface iLinkProps {
+interface LinkProps {
     id: string,
     links?: Array<iLink>;
 }
 
-export function Links(props:iLinkProps) {
+export function Links(props:LinkProps) {
     const { globalState, dispatch } = useContext(globalContext);
     return (
         <div id={props.id} className="product-links">

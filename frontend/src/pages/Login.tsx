@@ -4,7 +4,7 @@ import { Input } from '../Components/Form/Input'
 import { Label } from '../Components/Form/Label'
 import { Fieldset } from '../Components/Form/Fieldset'
 import { Button } from '../Components/Button/Button'
-import { Direction } from '../Enums/direction'
+import { Direction } from '../types/direction'
 import { globalContext } from '../store';
 import { Token } from '../store/types';
 import { login, getUser } from '../api/calls';

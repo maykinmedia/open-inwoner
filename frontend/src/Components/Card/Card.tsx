@@ -9,13 +9,11 @@ interface CardProps {
     to: string,
 }
 
-export class Card extends Component<CardProps, {}> {
-    render() {
-        return (
-            <Link className="card" to={this.props.to}>
-                <img className="card__img" src={this.props.src} alt={this.props.alt} />
-                <h3 className="card__title">{this.props.title}</h3>
-            </Link>
-        )
-    }
+export function Card(props:CardProps) {
+    return (
+        <Link className="card" to={ props.to }>
+            <img className="card__img" src={ props.src } alt={ props.alt } />
+            <h3 className="card__title">{ props.title }</h3>
+        </Link>
+    )
 }

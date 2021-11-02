@@ -1,22 +1,16 @@
-import React, { Component } from "react";
-import './TagList.scss'
 import { Tag } from './Tag'
+import { iTag } from '../../types/pdc'
 
-interface TagObject {
-    pk: Number,
-    name: String,
-}
+import './TagList.scss'
 
 interface TagListProps {
-    tags?: Array<TagObject>
+    tags?: Array<iTag>
 }
 
-export class TagList extends Component<TagListProps, {}> {
-    render() {
-        return (
-            <div className="tag-list">
-                {this.props.tags?.map((tag) => <Tag key={`${tag.pk}`}>{tag.name}</Tag>)}
-            </div>
-        )
-    }
+export function TagList(props:TagListProps) {
+    return (
+        <div className="tag-list">
+            {props.tags?.map((tag:iTag) => <Tag key={`${tag.pk}`}>{tag.name}</Tag>)}
+        </div>
+    )
 }

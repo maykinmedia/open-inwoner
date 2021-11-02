@@ -1,9 +1,5 @@
-import React, { Component } from "react";
-
-export class MenuText extends Component {
-    render() {
-        return (
-            <span className="menu__text">{this.props.children}</span>
-        )
-    }
+export function MenuText(props:any) {
+    return (
+        <span className="menu__text">{props.children}</span>
+    )
 }

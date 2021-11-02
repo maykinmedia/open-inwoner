@@ -1,4 +1,4 @@
-import { ReactElement, useContext } from 'react';
+import { useContext } from 'react';
 import { Switch, useLocation } from 'react-router-dom';
 import { GuardProvider, GuardedRoute } from 'react-router-guards';
 

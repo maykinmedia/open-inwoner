@@ -4,22 +4,21 @@ import './CardContainer.scss'
 
 interface CardContainerProps {
     isLoggedIn: Boolean,
+    children?: any,
 }
 
-export class CardContainer extends Component<CardContainerProps, {}> {
-    getClassNames = () => {
+export function CardContainer (props:CardContainerProps) {
+    const getClassNames = () => {
         let classNames = "card-container"
-        if (this.props.isLoggedIn) {
+        if (props.isLoggedIn) {
             classNames += " card-container--with-menu"
         }
         return classNames
     }
 
-    render() {
-        return (
-            <div className="card-container">
-                {this.props.children}
-            </div>
-        )
-    }
+    return (
+        <div className="card-container">
+            { props.children }
+        </div>
+    )
 }

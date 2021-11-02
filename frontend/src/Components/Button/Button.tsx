@@ -7,27 +7,26 @@ interface ButtonProps {
     type?: string,
     open?: boolean,
     transparent?: boolean,
+    children?: any,
 }
 
-export class Button extends Component<ButtonProps, {}> {
-    getClassNames = () => {
+export function Button(props:ButtonProps) {
+    const getClassNames = () => {
         let classNames = "button"
-        if (this.props.open) {
+        if (props.open) {
             classNames += " button--open"
         }
-        if (this.props.transparent) {
+        if (props.transparent) {
             classNames += " button--transparent"
         }
         return classNames
     }
 
-    render() {
-        if (this.props.href) {
-            if (this.props.href.startsWith("http")) {
-                return <a className={ this.getClassNames() } href={this.props.href}>{ this.props.children }</a>
-            }
-            return <Link className={ this.getClassNames() } to={this.props.href}>{ this.props.children }</Link>
+    if (props.href) {
+        if (props.href.startsWith("http")) {
+            return <a className={ getClassNames() } href={ props.href }>{ props.children }</a>
         }
-        return <button className={ this.getClassNames() } type={this.props.type}>{ this.props.children }</button>
+        return <Link className={ getClassNames() } to={ props.href }>{ props.children }</Link>
     }
+    return <button className={ getClassNames() } type={ props.type }>{ props.children }</button>
 }

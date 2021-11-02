@@ -14,6 +14,7 @@ import { Links } from '../../Components/Product/Links'
 import { Related } from '../../Components/Product/Related'
 import { Social } from '../../Components/Product/Social'
 
+import { getProduct } from '../../api/calls'
 import { globalContext } from '../../store';
 import './product.scss'
 
@@ -39,22 +40,14 @@ export default function ProductDetail() {
     let { slug } = useParams();
 
     useEffect(() => {
-        const getProduct = async () => {
-            try {
-                const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/products/${slug}/`).catch(err => {
-                    console.log(err.response.data)
-                    throw err;
-                });
-                setProduct(res.data);
-            } catch(err) {
-                console.log(err)
-            }
+        const load = async () => {
+            const product = await getProduct(slug);
+            setProduct(product);
         }
-        getProduct();
+        load()
     }, [slug]);
 
     const getContent = () => {
-        console.log(product)
         if (product && product.content) {
             return <Markdown>{product.content}</Markdown>
         }

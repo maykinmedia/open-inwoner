@@ -1,14 +1,12 @@
-import React, { Component } from "react";
 import './Tag.scss'
 
 interface TagProps {
     key?: string
+    children?: any,
 }
 
-export class Tag extends Component<TagProps, {}> {
-    render() {
-        return (
-            <div className="tag">{this.props.children}</div>
-        )
-    }
+export function Tag(props:TagProps) {
+    return (
+        <div className="tag">{props.children}</div>
+    )
 }

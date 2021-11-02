@@ -1,14 +1,17 @@
-import React, { Component } from "react";
 import './Label.scss'
 
 interface LabelProps {
     for: string,
+    children?: any
 }
 
-export class Label extends Component<LabelProps, {}> {
-    render() {
-        return (
-            <label className="label" htmlFor={`id_${this.props.for}`}>{ this.props.children }</label>
-        )
-    }
+export function Label (props:LabelProps) {
+    return (
+        <label
+            className="label"
+            htmlFor={ `id_${props.for}` }
+        >
+            { props.children }
+        </label>
+    )
 }

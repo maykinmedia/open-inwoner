@@ -1,16 +1,19 @@
-import React, { Component } from "react";
+import { Direction } from '../../types/direction'
+
 import './Fieldset.scss'
-import { Direction } from '../../Enums/direction'
 
 
 interface FieldsetProps {
-    direction: Direction
+    direction: Direction,
+    children?: any,
 }
 
-export class Fieldset extends Component<FieldsetProps, {}> {
-    render() {
-        return (
-            <fieldset className={`fieldset fieldset--${this.props.direction}`}>{ this.props.children }</fieldset>
-        )
-    }
+export function Fieldset (props:FieldsetProps) {
+    return (
+        <fieldset
+            className={`fieldset fieldset--${props.direction}`}
+        >
+            { props.children }
+        </fieldset>
+    )
 }
