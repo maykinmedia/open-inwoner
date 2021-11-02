@@ -10,7 +10,10 @@ import Indent from '@ckeditor/ckeditor5-indent/src/indent';
 import Link from '@ckeditor/ckeditor5-link/src/link';
 import List from '@ckeditor/ckeditor5-list/src/list';
 import Markdown from '@ckeditor/ckeditor5-markdown-gfm/src/markdown';
-
+import Image from '@ckeditor/ckeditor5-image/src/image';
+import ImageUpload from '@ckeditor/ckeditor5-image/src/imageupload';
+import ImageToolbar from '@ckeditor/ckeditor5-image/src/imagetoolbar';
+import ImageCaption from '@ckeditor/ckeditor5-image/src/imagecaption';
 
 export default class ClassicEditor extends ClassicEditorBase {}
 
@@ -27,27 +30,36 @@ ClassicEditor.builtinPlugins = [
     Indent,
     Link,
     List,
+    Image,
+    ImageUpload,
+    ImageToolbar,
+    ImageCaption,
 ];
 
 // Editor configuration.
 ClassicEditor.defaultConfig = {
-    toolbar: [
-        'heading',
-        '|',
-        'bold',
-        'italic',
-        'link',
-        'blockQuote',
-        '|',
-        'bulletedList',
-        'numberedList',
-        '|',
-        'outdent',
-        'indent',
-        '|',
-        'undo',
-        'redo'
-    ]
+    toolbar: {
+        items: [
+            'heading',
+            '|',
+            'bold',
+            'italic',
+            'link',
+            'blockQuote',
+            '|',
+            'bulletedList',
+            'numberedList',
+            '|',
+            'outdent',
+            'indent',
+            '|',
+            'uploadImage',
+            '|',
+            'undo',
+            'redo'
+        ],
+        image: {toolbar: ['toggleImageCaption', 'imageTextAlternative']}
+    }
 };
 
 
