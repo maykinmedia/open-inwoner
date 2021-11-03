@@ -58,14 +58,22 @@ development machine.
        $ source env/bin/activate
        $ pip install -r requirements/dev.txt
 
-4. Install all required (frontend) libraries and build static files.
+4. Install all required (admin) libraries and build static files.
 
    .. code-block:: bash
 
        $ npm install
        $ npm run build
 
-5. Activate your virtual environment and create the statics and database:
+5. For the frontend, Install all required libraries and run it on port 3000.
+
+   .. code-block:: bash
+
+       $ cd frontend
+       $ npm install
+       $ npm run dev
+
+6. Activate your virtual environment and create the statics and database:
 
    .. code-block:: bash
 
