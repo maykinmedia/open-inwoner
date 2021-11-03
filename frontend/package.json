@@ -16,7 +16,7 @@
     "generate": "vite build --outDir dist/static && npm run build:server && node prerender",
     "serve": "cross-env NODE_ENV=production node server",
     "debug": "node --inspect-brk server",
-    "linter": "eslint ./src/**/*.tsx ./src/**/*.ts"
+    "linter": "eslint ./src/ --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
     "@emotion/react": "^11.5.0",
