@@ -58,9 +58,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Go to frontend folder
-      run: cd frontend/
     - name: Install modules
-      run: npm install
+      run: cd frontend/ && npm install
     - name: Run ESLint
-      run: npm run linter
+      run: cd frontend/ && npm run linter
