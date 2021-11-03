@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { Grid } from '../../Components/Container/Grid';
@@ -8,11 +8,9 @@ import SideMenu from '../../Components/Menu/SideMenu';
 
 import { iCategory } from '../../types/pdc';
 import { getCategory } from '../../api/calls';
-import { globalContext } from '../../store';
 import './theme.scss';
 
 export default function ThemaDetail() {
-  const { globalState, dispatch } = useContext(globalContext);
   const [category, setCategory] = useState<iCategory | undefined>(undefined);
   const { slug } = useParams();
 

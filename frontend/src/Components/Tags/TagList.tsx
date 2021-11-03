@@ -1,3 +1,4 @@
+import React from 'react';
 import { Tag } from './Tag';
 import { iTag } from '../../types/pdc';
 

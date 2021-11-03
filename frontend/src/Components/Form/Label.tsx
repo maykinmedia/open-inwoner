@@ -1,3 +1,4 @@
+import React from 'react';
 import './Label.scss';
 
 interface LabelProps {

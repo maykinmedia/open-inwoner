@@ -1,10 +1,9 @@
-import { useContext } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import FacebookOutlinedIcon from '@mui/icons-material/FacebookOutlined';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
-import { globalContext } from '../../store';
 
 import './SocialLinks.scss';
 
@@ -13,7 +12,6 @@ interface iSocialProps {
 }
 
 export function Social(props:iSocialProps) {
-  const { globalState, dispatch } = useContext(globalContext);
   return (
     <div id={props.id} className="social-links">
       <h4 className="social-links__title">Delen</h4>

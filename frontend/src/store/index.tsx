@@ -38,8 +38,7 @@ function initializeState() {
     */
 
   if (typeof window === 'object' || typeof window !== 'undefined') {
-    if (typeof (Storage) !== 'undefined') {
-    } else {
+    if (typeof (Storage) === 'undefined') {
       throw new Error('You need to enable Storage to run this app.');
     }
 

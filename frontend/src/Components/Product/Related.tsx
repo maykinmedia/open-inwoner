@@ -1,6 +1,5 @@
-import { useContext } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { globalContext } from '../../store';
 
 import './ProductLinks.scss';
 
@@ -16,7 +15,6 @@ interface iRelatedProps {
 }
 
 export function Related(props:iRelatedProps) {
-  const { globalState, dispatch } = useContext(globalContext);
   return (
     <div id={props.id} className="product-links">
       <h4 className="product-links__title">Zie ook</h4>

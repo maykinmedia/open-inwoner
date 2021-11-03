@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 
 import './CardContainer.scss';
 
@@ -17,7 +17,7 @@ export function CardContainer(props:CardContainerProps) {
   };
 
   return (
-    <div className="card-container">
+    <div className={ getClassNames() }>
       { props.children }
     </div>
   );

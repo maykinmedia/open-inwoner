@@ -1,3 +1,4 @@
+import React from 'react';
 import './Divider.scss';
 
 export function Divider() {

@@ -1,6 +1,5 @@
-import { useContext } from 'react';
+import React from 'react';
 import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
-import { globalContext } from '../../store';
 import './ProductLinks.scss';
 
 interface iLink {
@@ -14,7 +13,6 @@ interface LinkProps {
 }
 
 export function Links(props:LinkProps) {
-  const { globalState, dispatch } = useContext(globalContext);
   return (
     <div id={props.id} className="product-links">
       <h4 className="product-links__title">Links</h4>

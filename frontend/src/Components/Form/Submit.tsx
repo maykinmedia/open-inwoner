@@ -1,3 +1,4 @@
+import React from 'react';
 import './Submit.scss';
 
 interface SubmitProps {

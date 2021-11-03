@@ -1,3 +1,4 @@
+import React from 'react';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { Button } from '../Button/Button';
 import './Card.scss';

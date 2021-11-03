@@ -1,5 +1,5 @@
 import React, {
-  Component, useContext, Dispatch, useState,
+  useContext, useState,
 } from 'react';
 import { Redirect } from 'react-router-dom';
 import { Input } from '../Components/Form/Input';
@@ -13,7 +13,7 @@ import { globalContext } from '../store';
 import { registerUser, getUser } from '../api/calls';
 
 export default function Register() {
-  const { globalState, dispatch } = useContext(globalContext);
+  const { dispatch } = useContext(globalContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [password2, setPassword2] = useState('');

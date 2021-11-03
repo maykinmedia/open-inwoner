@@ -1,19 +1,18 @@
 import React, {
-  Component, useContext, Dispatch, useState,
+  useContext, useState,
 } from 'react';
 import { Redirect } from 'react-router-dom';
-import axios from 'axios';
+
 import { Input } from '../Components/Form/Input';
 import { Label } from '../Components/Form/Label';
 import { Fieldset } from '../Components/Form/Fieldset';
 import { Button } from '../Components/Button/Button';
 import { Direction } from '../types/direction';
 import { globalContext } from '../store';
-import { Token } from '../store/types';
 import { login, getUser } from '../api/calls';
 
 export default function Login() {
-  const { globalState, dispatch } = useContext(globalContext);
+  const { dispatch } = useContext(globalContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loggedIn, setLoggedIn] = useState(false);
@@ -49,6 +48,7 @@ export default function Login() {
       <div className="login">
         <h1>Login</h1>
         <form action="" onSubmit={handleSubmit}>
+          { errors }
           <Fieldset direction={Direction.Vertical}>
             <Label for="email">Emailadres</Label>
             <Input

@@ -1,3 +1,4 @@
+import React from 'react';
 import './Error.scss';
 
 export function Error(props:any) {

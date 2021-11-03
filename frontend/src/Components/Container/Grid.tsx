@@ -1,3 +1,4 @@
+import React from 'react';
 import './Grid.scss';
 
 interface GridProps {

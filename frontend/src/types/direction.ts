@@ -1,4 +1,4 @@
 export enum Direction {
-  Vertical = 'vertical',
-  Horizontal = 'horizontal',
+  Vertical = 'vertical', // eslint-disable-line
+  Horizontal = 'horizontal', // eslint-disable-line
 }

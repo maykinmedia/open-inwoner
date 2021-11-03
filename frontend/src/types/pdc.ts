@@ -1,16 +1,18 @@
-export interface iProduct {
+export interface iTag {
+    pk: Number,
     name: string,
-    slug: string,
-    summary: string,
-    link: string,
-    content: string,
-    categories: Array<iCategory>,
-    relatedProducts: Array<iProduct>,
-    tags: Array<iTag>,
-    costs: string,
-    created_on: string,
-    organizations: string,
-    links: Array<iProductLink>,
+}
+
+export interface iProductLink {
+    name: string,
+    url: string,
+}
+
+export interface iImage {
+    name: string,
+    description: string,
+    file: string,
+    subjectLocation: any,
 }
 
 export interface iSmallProduct {
@@ -18,11 +20,6 @@ export interface iSmallProduct {
     name: string,
     slug: string,
     summary: string,
-}
-
-export interface iProductLink {
-    name: string,
-    url: string,
 }
 
 export interface iCategory {
@@ -35,14 +32,17 @@ export interface iCategory {
     children?: Array<iCategory>,
 }
 
-export interface iTag {
-    pk: Number,
+export interface iProduct {
     name: string,
-}
-
-export interface iImage {
-    name: string,
-    description: string,
-    file: string,
-    subject_location: any,
+    slug: string,
+    summary: string,
+    link: string,
+    content: string,
+    categories: Array<iCategory>,
+    relatedProducts: Array<iProduct>,
+    tags: Array<iTag>,
+    costs: string,
+    createdOn: string,
+    organizations: string,
+    links: Array<iProductLink>,
 }

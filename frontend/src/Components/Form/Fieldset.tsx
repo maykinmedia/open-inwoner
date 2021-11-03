@@ -1,3 +1,4 @@
+import React from 'react';
 import { Direction } from '../../types/direction';
 
 import './Fieldset.scss';

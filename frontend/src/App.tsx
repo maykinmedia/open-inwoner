@@ -1,4 +1,4 @@
-import { Component, useContext, Dispatch } from 'react';
+import React, { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Menu } from './Components/Menu/Menu';
 import { Logo } from './Components/Menu/Logo';

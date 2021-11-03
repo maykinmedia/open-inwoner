@@ -1,7 +1,5 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import axios from 'axios';
-import ReactMarkdown from 'react-markdown';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import Markdown from 'markdown-to-jsx';
 
 import { Grid } from '../../Components/Container/Grid';
@@ -15,27 +13,10 @@ import { Related } from '../../Components/Product/Related';
 import { Social } from '../../Components/Product/Social';
 
 import { getProduct } from '../../api/calls';
-import { globalContext } from '../../store';
 import './product.scss';
-
-interface iProduct {
-    name: string,
-    slug: string,
-    summary: string,
-    link: string,
-    content: string,
-    categories: string,
-    relatedProducts?: Array<any>,
-    tags: Array<any>,
-    costs: string,
-    created_on: string,
-    organizations: string,
-    files?: Array<any>,
-    links?: Array<any>,
-}
+import { iProduct } from '../../types/pdc';
 
 export default function ProductDetail() {
-  const { globalState, dispatch } = useContext(globalContext);
   const [product, setProduct] = useState<iProduct | undefined>(undefined);
   const { slug } = useParams();
 

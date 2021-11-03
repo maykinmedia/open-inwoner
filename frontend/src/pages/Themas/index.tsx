@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useContext } from 'react';
-import axios from 'axios';
 
 import { Card } from '../../Components/Card/Card';
 import { CardContainer } from '../../Components/CardContainer/CardContainer';
@@ -15,7 +14,7 @@ import './theme-list.scss';
 import { iCategory } from '../../types/pdc';
 
 export default function Themas() {
-  const { globalState, dispatch } = useContext(globalContext);
+  const { globalState } = useContext(globalContext);
   const [categories, setCategories] = useState<Array<iCategory> | undefined>([]);
 
   useEffect(() => {

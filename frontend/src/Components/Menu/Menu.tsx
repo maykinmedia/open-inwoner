@@ -1,3 +1,4 @@
+import React from 'react';
 import './Menu.scss';
 
 export function Menu(props:any) {

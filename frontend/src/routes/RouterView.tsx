@@ -1,5 +1,5 @@
-import { useContext } from 'react';
-import { Switch, useLocation } from 'react-router-dom';
+import React, { useContext } from 'react';
+import { Switch } from 'react-router-dom';
 import { GuardProvider, GuardedRoute } from 'react-router-guards';
 
 import { getToken, getUser } from '../api/calls';
@@ -17,8 +17,6 @@ import { getIsLoggedIn } from '../utils';
 
 export function RouterView() {
   const { globalState, dispatch } = useContext(globalContext);
-  const location = useLocation();
-  const { pathname } = location;
 
   const requireLogin = (to, from, next) => {
     if (to.meta.auth) {

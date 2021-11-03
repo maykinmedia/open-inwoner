@@ -1,10 +1,10 @@
-import { useContext } from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { globalContext } from '../../store';
 import './SideMenu.scss';
 
 export default function SideMenu() {
-  const { globalState, dispatch } = useContext(globalContext);
+  const { globalState } = useContext(globalContext);
   return (
     <div className="side-menu">
       <Link className="side-menu__link" to="/">Overzicht</Link>
@@ -15,7 +15,7 @@ export default function SideMenu() {
                   <li><Link className="side-menu__link" to="/">Mijn Profiel</Link></li>
                 </>
                 )}
-      <Link className="side-menu__link" to="/themas">Thema's</Link>
+      <Link className="side-menu__link" to="/themas">Themas</Link>
       <Link className="side-menu__link" to="/">Samenwerken</Link>
       <Link className="side-menu__link" to="/">Zelfdiagnose</Link>
     </div>

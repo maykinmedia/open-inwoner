@@ -1,3 +1,4 @@
+import React from 'react';
 import { Grid } from '../Components/Container/Grid';
 import SideMenu from '../Components/Menu/SideMenu';
 

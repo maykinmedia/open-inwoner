@@ -1,12 +1,9 @@
-import { useContext } from 'react';
-import { Link } from 'react-router-dom';
-import { globalContext } from '../../store';
-import './File.scss';
+import React from 'react';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
+import './File.scss';
 
 export function File() {
-  const { globalState, dispatch } = useContext(globalContext);
   return (
     <div className="file">
       <InsertDriveFileOutlinedIcon className="file__icon" />
