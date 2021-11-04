@@ -1,0 +1,80 @@
+{% load static %}
+<!DOCTYPE html>
+<html class='no-javascript' lang='nl'>
+<head>
+    <meta charset='utf-8'/>
+    <meta
+        content='Met uw persoonlijke DigiD kunt u zich identificeren op websites van de overheid. Zo weten overheidsinstellingen dat ze echt met u te maken hebben.'
+        name='description'/>
+    <meta content='DigiD, inloggen, aanvragen, activeren, Mijn DigiD' name='keywords'/>
+    <meta content='index, follow' name='robots'/>
+    <meta content='width=device-width, initial-scale=1' name='viewport'/>
+    <meta content='none' name='msapplication-config'/>
+
+    <title>{{ page_title }}</title>
+
+    <link href='{% static 'digid-mock/assets/ro-favicon-wit-0xffffff.png' %}' rel='shortcut icon'/>
+    <link rel="stylesheet" media="all" href="{% static 'digid-mock/assets/application.css' %}"/>
+    <link rel="stylesheet" media="all" href="{% static 'digid-mock/extra.css' %}"/>
+    <script src="{% static 'digid-mock/extra.js' %}"></script>
+</head>
+<body>
+<div class='small window'>
+    <div class='content'>
+        <header class='header'>
+            <div>
+                {% block service_menu %}{% endblock %}
+                <a class="digidmock-anchor-placeholder">
+                    <img alt="Logo Rijksoverheid" class="rijksoverheid-logo" title="Logo Rijksoverheid"
+                        src="{% static 'digid-mock/assets/RO_DigiD_Logo_Homepage.svg' %}"/>
+                </a>
+                <nav class='header-navigation'></nav>
+            </div>
+            <div style='margin-top: 15px'></div>
+        </header>
+        <div class='main'>
+            <section class='main-content' id='main_content' style='outline: none' tabindex='-1'>
+                <div class="heading_with_icon"><img alt="Vignet" class="digid-logo"
+                    src="{% static 'digid-mock/assets/digid_eo_rgb.svg' %}"/>
+                    <h1 class="h2">
+                        <strong>Inloggen bij</strong> <br/> {{ app_title }}
+                    </h1>
+                </div>
+
+                <div class="digidmock-notification">
+                    <strong>Dit is een mockup van de DigiD login flow voor test en demonstratie doeleinden.</strong>
+                    <br>
+                    Vul niet uw echte DigiD logingegevens in.
+                </div>
+
+                {% block body %}{% endblock %}
+
+            </section>
+            <div class='bld-footer-ribbon'></div>
+        </div>
+    </div>
+    <footer class='footer'>
+        <div class='footer-questions'>
+            <h4>Vraag en antwoord</h4>
+            <ul class='questions'>
+                <li class='questions-item'>
+                    <a class='questions-question digidmock-anchor-placeholder'>
+                        <i class="icon-3941-delta-links-24px" style="font-size: 75%; color: #282828" aria-hidden='true'
+                            aria-label="delta links icoon"></i>
+                        Ik ben mijn gebruikersnaam vergeten
+                    </a>
+                </li>
+            </ul>
+            <h4>Geen antwoord op uw vraag?</h4>
+            <p>
+                <a target="_blank" class="digidmock-anchor-placeholder">Bekijk de DigiD website</a> [opent in een
+                nieuw venster] of <a target="_blank" class="digidmock-anchor-placeholder">neem contact op</a> [opent
+                in een nieuw venster] met de DigiD helpdesk.
+            </p>
+        </div>
+
+    </footer>
+</div>
+
+</body>
+</html>

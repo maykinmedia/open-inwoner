@@ -20,7 +20,7 @@ BASE_DIR = os.path.abspath(
 #
 # Core Django settings
 #
-# SITE_ID = config("SITE_ID", default=1)
+SITE_ID = config("SITE_ID", default=1)
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
@@ -95,7 +95,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     # NOTE: If enabled, at least one Site object is required and
     # uncomment SITE_ID above.
-    # 'django.contrib.sites',
+    "django.contrib.sites",
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # Admin auth
@@ -106,17 +106,24 @@ INSTALLED_APPS = [
     # Optional applications.
     "ordered_model",
     "django_admin_index",
-    "django_registration",
     "django.contrib.admin",
     "django.contrib.gis",
     # 'django.contrib.admindocs',
     # 'django.contrib.humanize',
     # 'django.contrib.sitemaps',
     # External applications.
+    "corsheaders",
     "rest_framework",
+    "rest_framework.authtoken",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "dj_rest_auth",
+    "dj_rest_auth.registration",
     "drf_spectacular",
     "axes",
     "sniplates",
+    "digid_eherkenning",
     # "hijack.contrib.admin", # This should be imported but it causes an error. So now there are
     "hijack",
     "localflavor",
@@ -124,6 +131,7 @@ INSTALLED_APPS = [
     "easy_thumbnails",  # used by filer
     "filer",
     "mptt",  # used by filer
+    "hijack.contrib.admin",
     "leaflet",
     # Project applications.
     "open_inwoner.accounts",
@@ -135,6 +143,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     # 'django.middleware.locale.LocaleMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -313,9 +322,10 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Allow logging in with both username+password and email+password
 AUTHENTICATION_BACKENDS = [
+    "open_inwoner.accounts.backends.CustomAxesBackend",
     "open_inwoner.accounts.backends.UserModelEmailBackend",
     "django.contrib.auth.backends.ModelBackend",
-    "axes.backends.AxesBackend",
+    "digid_eherkenning.backends.DigiDBackend",
 ]
 
 SESSION_COOKIE_NAME = "open_inwoner_sessionid"
@@ -328,7 +338,7 @@ LOGOUT_REDIRECT_URL = reverse_lazy("root")
 # SECURITY settings
 #
 SESSION_COOKIE_SECURE = IS_HTTPS
-SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_HTTPONLY = False
 
 CSRF_COOKIE_SECURE = IS_HTTPS
 CSRF_FAILURE_VIEW = "open_inwoner.accounts.views.csrf_failure"
@@ -420,12 +430,23 @@ SENDFILE_ROOT = PRIVATE_MEDIA_ROOT
 SENDFILE_BACKEND = "django_sendfile.backends.simple"
 PRIVATE_MEDIA_URL = "/private_files/"
 
+CORS_ALLOWED_ORIGINS = []
+CORS_ALLOW_CREDENTIALS = True
+
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_EMAIL_VERIFICATION = "none"
+REST_AUTH_REGISTER_SERIALIZERS = {
+    "REGISTER_SERIALIZER": "open_inwoner.api.accounts.serializers.RegisterSerializer"
+}
+
 REST_FRAMEWORK = {
     # YOUR SETTINGS
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.BasicAuthentication",
-        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",

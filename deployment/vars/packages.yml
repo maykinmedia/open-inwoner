@@ -29,4 +29,7 @@ system_packages:
 #  - python-certbot # for letsencrypt
   - libffi-dev # for pyopenssl / Scrapy
   - libc-bin # ldconfig / npm
+  - pkg-config
+  - libxmlsec1-dev
+  - libxmlsec1-openssl
 

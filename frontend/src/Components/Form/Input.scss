@@ -1,0 +1,12 @@
+.input {
+  --color-light-gray: darkgray;
+  box-sizing: border-box;
+  border: 1px solid var(--color-light-gray);
+  border-radius: 3px;
+  color: var(--color-light-gray);
+  font-family: "TheSans C5";
+  font-size: 16px;
+  letter-spacing: 0;
+  line-height: 21px;
+  padding: 10px 16px;
+}

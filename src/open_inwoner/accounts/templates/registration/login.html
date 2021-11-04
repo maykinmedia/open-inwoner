@@ -2,4 +2,6 @@
     {% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="submit">
+    <a href="{% url 'django_registration_register' %}">Registreer</a>
+    <a href="{% url 'digid:login' %}">Digid</a>
 </form>

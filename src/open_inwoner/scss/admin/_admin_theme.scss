@@ -172,3 +172,16 @@ div.breadcrumbs {
 .version {
   font-size: $typography-font-size-text-small;
 }
+
+#content {
+  #changelist {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 32px;
+  }
+
+  #toolbar,
+  .xfull {
+    grid-column: 1/ 3;
+  }
+}

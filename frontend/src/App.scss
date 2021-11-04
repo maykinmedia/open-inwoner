@@ -1,0 +1,31 @@
+:root {
+  --color-black: #000;
+  --color-white: #fff;
+  --color-text: #333;
+  --color-primary: #476db7;
+  --color-secundary: #e5006c;
+  --color-lightgray: #D2D2D2;
+  --color-gray: #7A7A7A;
+  --spacing-tiny: 2px;
+  --spacing-small: 4px;
+  --spacing-medium: 8px;
+  --spacing-large: 16px;
+  --spacing-extra-large: 32px;
+  --menu-height: 125px;
+  --container-width: 1024px;
+}
+
+@font-face {
+  font-family: 'TheMix C5';
+  src: local('TheMix C5'),  url('./fonts/TheMixC5/DesktopFonts/TheMixC5-5_Plain.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'TheSans C5';
+  src: local('TheSans C5'), url('./fonts/TheSansC5/DesktopFonts/TheSansC5-5_Plain.otf') format('opentype');
+}
+
+body {
+  margin: 0;
+  font-family: 'TheSans C5';
+}

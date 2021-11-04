@@ -2,7 +2,7 @@
 
 - hosts: cindy
   vars_files:
-    - vars/base.yml  
+    - vars/base.yml
     - vars/test.yml
     - vars/packages.yml
   become: yes
@@ -13,7 +13,7 @@
     - include: maykin-deployment/ansible/tasks/create_maykin_user.yml
     - include: maykin-deployment/ansible/tasks/staff_pub_keys.yml
     - include: maykin-deployment/ansible/tasks/setup.yml
-    - include: maykin-deployment/ansible/tasks/hostname.yml    
+    - include: maykin-deployment/ansible/tasks/hostname.yml
     - include: maykin-deployment/ansible/tasks/exim4.yml
     - include: maykin-deployment/ansible/tasks/firewall.yml
     - include: maykin-deployment/ansible/tasks/zabbix-agent.yml
@@ -21,10 +21,10 @@
     - include: maykin-deployment/ansible/tasks/postgresql-11-postgis-2.5.yml
     - include: maykin-deployment/ansible/tasks/npm.yml
     - include: maykin-deployment/ansible/tasks/set-maintenance-mode.yml
-    - include: maykin-deployment/ansible/tasks/django-project-1.7.yml
+    - include: tasks/django-project.yml
     - include: maykin-deployment/ansible/tasks/nginx-per-target.yml
     - include: maykin-deployment/ansible/tasks/cronjobs.yml
-    - include: maykin-deployment/ansible/tasks/rsnapshot.yml      
+    - include: maykin-deployment/ansible/tasks/rsnapshot.yml
     - include: maykin-deployment/ansible/tasks/supervisor-per-group.yml
     - include: maykin-deployment/ansible/tasks/unset-maintenance-mode.yml
     - include: maykin-deployment/ansible/tasks/stopdeploy.yml

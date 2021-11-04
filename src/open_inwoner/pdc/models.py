@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from autoslug import AutoSlugField
 from filer.fields.image import FilerImageField
 from treebeard.mp_tree import MP_Node
 
@@ -47,6 +48,9 @@ class Category(MP_Node):
 class Product(models.Model):
     name = models.CharField(
         _("name"), max_length=100, help_text=_("Name of the product")
+    )
+    slug = models.SlugField(
+        _("slug"), max_length=100, unique=True, help_text=_("Slug of the product")
     )
     summary = models.TextField(
         _("summary"), blank=True, help_text=_("Short description of the product")

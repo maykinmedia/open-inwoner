@@ -9,11 +9,26 @@ from .models import Action, Appointment, Contact, Document, User
 
 
 @admin.register(User)
-class _UserAdmin(HijackUserAdminMixin, UserAdmin):
+class _UserAdmin(UserAdmin):
     hijack_success_url = reverse_lazy("root")
     fieldsets = (
-        (None, {"fields": ("email", "password")}),
-        (_("Personal info"), {"fields": ("first_name", "last_name")}),
+        (None, {"fields": ("email", "password", "login_type")}),
+        (
+            _("Personal info"),
+            {
+                "fields": (
+                    "first_name",
+                    "last_name",
+                    "bsn",
+                    "rsin",
+                    "birthday",
+                    "street",
+                    "housenumber",
+                    "postcode",
+                    "city",
+                )
+            },
+        ),
         (
             _("Permissions"),
             {

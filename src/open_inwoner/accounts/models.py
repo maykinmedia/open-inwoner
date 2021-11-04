@@ -12,7 +12,7 @@ from privates.storages import PrivateMediaFileSystemStorage
 from open_inwoner.utils.validators import validate_phone_number
 
 from .choices import LoginTypeChoices
-from .managers import UserManager
+from .managers import DigidManager, UserManager, eHerkenningManager
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -39,6 +39,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         ),
     )
     date_joined = models.DateTimeField(_("date joined"), default=timezone.now)
+    rsin = models.CharField(max_length=9, null=True, blank=True)
     bsn = NLBSNField(null=True, blank=True)
     login_type = models.CharField(
         choices=LoginTypeChoices.choices,
@@ -52,6 +53,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     city = models.CharField(default="", blank=True, max_length=250)
 
     objects = UserManager()
+    digid_objects = DigidManager()
+    eherkenning_objects = eHerkenningManager()
 
     USERNAME_FIELD = "email"
 
