@@ -7,7 +7,7 @@ dbname: "{{ project_name }}-{{ target }}"
 dbuser: "{{ project_name }}-{{ target }}"
 dbpassword: =*h1.L^ZH#kRD`@WSEB1
 dbport: 5432
-branch: feature/react
+branch: develop
 
 redis_url: redis://localhost:6379/1
 sentry_dsn: https://76df0563699e46fdba25303e3b1183c6@sentry.maykinmedia.nl/284
