@@ -21,6 +21,7 @@ __pycache__
 /reports/
 /htmlcov/
 .coverage
+coverage.xml
 
 # Environment
 #/deployment/app.*.yml

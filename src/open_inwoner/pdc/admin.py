@@ -59,6 +59,7 @@ class ProductAdmin(admin.ModelAdmin):
     date_hierarchy = "created_on"
     autocomplete_fields = ("categories", "related_products", "tags", "organizations")
     search_fields = ("name",)
+    prepopulated_fields = {"slug": ("name",)}
     ordering = ("name",)
     form = ProductAdminForm
     inlines = (ProductLinkInline, ProductLocationInline, ProductContactInline)

@@ -1,7 +1,5 @@
 from django import http
-from django.core.exceptions import PermissionDenied
 from django.template import TemplateDoesNotExist, loader
-from django.views import View
 from django.views.decorators.csrf import requires_csrf_token
 from django.views.defaults import ERROR_500_TEMPLATE_NAME
 

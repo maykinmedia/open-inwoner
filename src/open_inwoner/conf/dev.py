@@ -25,6 +25,9 @@ from .base import *  # noqa isort:skip
 #
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+SESSION_COOKIE_DOMAIN = ".localhost"
+
+LOGIN_REDIRECT_URL = "http://localhost:3000"
 
 LOGGING["loggers"].update(
     {
@@ -71,6 +74,14 @@ CACHES = {
 # Library settings
 #
 
+# Allow logging in with both username+password and email+password
+AUTHENTICATION_BACKENDS = [
+    "open_inwoner.accounts.backends.CustomAxesBackend",
+    "open_inwoner.accounts.backends.UserModelEmailBackend",
+    "django.contrib.auth.backends.ModelBackend",
+    "digid_eherkenning.mock.backends.DigiDBackend",
+]
+
 ELASTIC_APM["DEBUG"] = True
 
 # Django debug toolbar
@@ -107,6 +118,13 @@ warnings.filterwarnings(
 
 # django-filer
 FILER_DEBUG = True
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8000",
+    "http://localhost:3000",
+]
+
+TWO_FACTOR_PATCH_ADMIN = False
 
 # Override settings with local settings.
 try:

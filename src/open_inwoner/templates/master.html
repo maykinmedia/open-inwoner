@@ -12,8 +12,14 @@
     <body class="view__body">
         <main>
             {% block content %}
-                Override <code>{% verbatim %}{% block content %}{% endverbatim %}</code>
-                to get some actual content.
+                {% if request.user.is_authenticated %}
+                    Welkom {{ request.user.get_full_name }}<br>
+                    <a href="{% url 'logout' %}">Logout</a>
+                {% else %}
+                    Welkom onbekende gebruiker<br>
+                    <a href="{% url 'login' %}">Login</a>
+                {% endif %}
+
             {% endblock %}
         </main>
 

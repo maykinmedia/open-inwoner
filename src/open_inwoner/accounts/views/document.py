@@ -17,7 +17,7 @@ class DocumentPrivateMediaView(PrivateMediaView):
         if not self.request.user.is_authenticated:
             return False  # If user is not authenticated, the file is not visible
 
-        if self.request.user == object.owner or self.request.user.is_superuser():
+        if self.request.user == object.owner or self.request.user.is_superuser:
             return True
 
         return False

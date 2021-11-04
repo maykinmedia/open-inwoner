@@ -1,0 +1,33 @@
+.breadcrumbs {
+  display: flex;
+  gap: 32px;
+  position: absolute;
+  top: -52px;
+  left: 0;
+
+  .breadcrumbs__breadcrumb {
+    color: var(--color-primary);
+    font-family: "TheSans C5";
+    font-size: 16px;
+    letter-spacing: 0;
+    line-height: 24px;
+    position: relative;
+
+    &:after {
+      text-decoration: none;
+      content: ">";
+      position: absolute;
+      right: -16px;
+      transform: translateX(50%);
+    }
+
+    &:last-child:after {
+      content: none;
+    }
+
+    &:last-child {
+      color: var(--color-black);
+      text-decoration: none;
+    }
+  }
+}
