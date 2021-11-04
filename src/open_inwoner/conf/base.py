@@ -439,7 +439,7 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_EMAIL_VERIFICATION = "none"
 REST_AUTH_REGISTER_SERIALIZERS = {
-    "REGISTER_SERIALIZER": "open_inwoner.api.accounts.serializers.register.RegisterSerializer"
+    "REGISTER_SERIALIZER": "open_inwoner.api.accounts.serializers.RegisterSerializer"
 }
 
 REST_FRAMEWORK = {
@@ -455,15 +455,15 @@ REST_FRAMEWORK = {
         "djangorestframework_camel_case.render.CamelCaseJSONRenderer",
         # Any other renders
     ),
+}
+
+REST_AUTH_SERIALIZERS = {
+    "USER_DETAILS_SERIALIZER": "open_inwoner.api.accounts.serializers.users.UserCustomSerializer",
     "DEFAULT_PARSER_CLASSES": (
         "djangorestframework_camel_case.parser.CamelCaseJSONParser",
         "djangorestframework_camel_case.parser.CamelCaseMultiPartParser",
         # Any other parsers
     ),
-}
-
-REST_AUTH_SERIALIZERS = {
-    "USER_DETAILS_SERIALIZER": "open_inwoner.api.accounts.serializers.users.UserCustomSerializer"
 }
 
 SPECTACULAR_SETTINGS = {
