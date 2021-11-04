@@ -66,8 +66,8 @@ class TestCreateContact(WebTest):
         response = self.app.post_json(
             reverse("api:contacts-list"),
             {
-                "first_name": self.user1_contact.first_name,
-                "last_name": self.user1_contact.last_name,
+                "first_name": self.contact.first_name,
+                "last_name": self.contact.last_name,
             },
             headers=self.headers,
         )
@@ -75,7 +75,7 @@ class TestCreateContact(WebTest):
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(db_contacts.count(), 1)
-        self.assertEqual(db_contacts[0].created_by.id, self.user1.id)
+        self.assertEqual(db_contacts[0].created_by.id, self.user.id)
 
     def test_contacts_endpoint_fails_to_create_new_contact_when_user_is_unauthorized(
         self,
@@ -83,8 +83,8 @@ class TestCreateContact(WebTest):
         response = self.app.post_json(
             reverse("api:contacts-list"),
             {
-                "first_name": self.user1_contact.first_name,
-                "last_name": self.user1_contact.last_name,
+                "first_name": self.contact.first_name,
+                "last_name": self.contact.last_name,
             },
             status=401,
         )

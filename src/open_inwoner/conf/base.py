@@ -439,7 +439,7 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_EMAIL_VERIFICATION = "none"
 REST_AUTH_REGISTER_SERIALIZERS = {
-    "REGISTER_SERIALIZER": "open_inwoner.api.accounts.serializers.RegisterSerializer"
+    "REGISTER_SERIALIZER": "open_inwoner.api.accounts.serializers.register.RegisterSerializer"
 }
 
 REST_FRAMEWORK = {

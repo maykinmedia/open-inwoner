@@ -7,12 +7,7 @@ from rest_framework import status
 
 from open_inwoner.accounts.tests.factories import TokenFactory, UserFactory
 
-# TODO
-# The tests below fail without the dj-rest-auth library.
-# The skip decorator should be removed when the library is installed.
 
-
-@skip
 class TestTokenAuthentication(WebTest):
     def setUp(self):
         self.user = UserFactory()
@@ -34,7 +29,7 @@ class TestTokenAuthentication(WebTest):
 
         self.assertEqual(
             response.json,
-            {"nonFieldErrors": ["Kan niet inloggen met de opgegeven inloggegevens."]},
+            {"nonFieldErrors": ['Moet "e-mail" en "wachtwoord" bevatten.']},
         )
 
     def test_valid_token_returns_status_200(self):

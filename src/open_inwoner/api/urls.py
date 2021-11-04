@@ -3,14 +3,14 @@ from django.urls import include, path
 from drf_spectacular.views import SpectacularJSONAPIView, SpectacularRedocView
 from rest_framework import routers
 
-from .accounts.views import GetAuthTokenView
-from .pdc.views import CategoryViewSet, ProductViewSet
 from .accounts.views import (
     ActionViewSet,
     AppointmentViewSet,
     ContactViewSet,
     DocumentViewSet,
+    GetAuthTokenView,
 )
+from .pdc.views import CategoryViewSet, ProductViewSet
 
 app_name = "api"
 router = routers.SimpleRouter()
