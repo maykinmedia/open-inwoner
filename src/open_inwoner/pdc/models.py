@@ -50,7 +50,7 @@ class Product(models.Model):
         _("name"), max_length=100, help_text=_("Name of the product")
     )
     slug = models.SlugField(
-        _("slug"), max_length=100, unique=True, help_text=_("Slug of the category")
+        _("slug"), max_length=100, unique=True, help_text=_("Slug of the product")
     )
     summary = models.TextField(
         _("summary"), blank=True, help_text=_("Short description of the product")
