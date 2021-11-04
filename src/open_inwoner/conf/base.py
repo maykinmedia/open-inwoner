@@ -320,7 +320,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Allow logging in with both username+password and email+password
+# Allow logging in with email+password
 AUTHENTICATION_BACKENDS = [
     "open_inwoner.accounts.backends.CustomAxesBackend",
     "open_inwoner.accounts.backends.UserModelEmailBackend",
@@ -442,6 +442,10 @@ REST_AUTH_REGISTER_SERIALIZERS = {
     "REGISTER_SERIALIZER": "open_inwoner.api.accounts.serializers.RegisterSerializer"
 }
 
+REST_AUTH_SERIALIZERS = {
+    "USER_DETAILS_SERIALIZER": "open_inwoner.api.accounts.serializers.users.UserCustomSerializer",
+}
+
 REST_FRAMEWORK = {
     # YOUR SETTINGS
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
@@ -457,6 +461,7 @@ REST_FRAMEWORK = {
     ),
     "DEFAULT_PARSER_CLASSES": (
         "djangorestframework_camel_case.parser.CamelCaseJSONParser",
+        "djangorestframework_camel_case.parser.CamelCaseMultiPartParser",
         # Any other parsers
     ),
 }
