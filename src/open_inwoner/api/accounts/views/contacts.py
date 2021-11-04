@@ -1,7 +1,8 @@
 from rest_framework.viewsets import ModelViewSet
 
-from ...accounts.models import Contact
-from .serializers import ContactSerializer
+from open_inwoner.accounts.models import Contact
+
+from ..serializers import ContactSerializer
 
 
 class ContactViewSet(ModelViewSet):

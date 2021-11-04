@@ -1,18 +1,16 @@
 from rest_framework import serializers
 
-from ...accounts.models import Contact
+from open_inwoner.accounts.models import Document
 
 
-class ContactSerializer(serializers.HyperlinkedModelSerializer):
+class DocumentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = Contact
+        model = Document
         fields = [
             "uuid",
             "url",
-            "first_name",
-            "last_name",
-            "email",
-            "phonenumber",
+            "name",
+            "file",
             "created_on",
             "updated_on",
         ]
@@ -23,5 +21,5 @@ class ContactSerializer(serializers.HyperlinkedModelSerializer):
             "updated_on",
         ]
         extra_kwargs = {
-            "url": {"view_name": "api:contacts-detail", "lookup_field": "uuid"},
+            "url": {"view_name": "api:documents-detail", "lookup_field": "uuid"},
         }
