@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { Token } from '../store/types';
+import {iCategory} from "../types/pdc";
 
 export const logout = async () => {
   const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/logout/`, {}).catch((err) => {
@@ -59,10 +60,10 @@ export const getCategory = async (slug: string) => {
   return res.data;
 };
 
-export const getCategories = async () => {
+export const getCategories = async (): Promise<iCategory[]> => {
   const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/categories/`).catch((err) => {
     console.error(err.response.data);
     throw err;
   });
-  return res.data;
+  return res.data as iCategory[];
 };

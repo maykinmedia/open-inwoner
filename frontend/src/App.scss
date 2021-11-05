@@ -1,23 +1,46 @@
 :root {
+  --border-image: linear-gradient(to right, var(--color-yellow-light), var(--color-yellow-dark), var(--color-yellow));
+  --border-width: 2px;
+
+  --container-width: 1024px;
+
   --color-black: #000;
-  --color-white: #fff;
-  --color-text: #333;
-  --color-primary: #476db7;
-  --color-secundary: #e5006c;
-  --color-lightgray: #D2D2D2;
+  --color-blue: #476db7;
   --color-gray: #7A7A7A;
+  --color-gray-dark: #4b4b4b;
+  --color-gray-light: #D2D2D2;
+  --color-red: #e5006c;
+  --color-white: #fff;
+  --color-yellow: #F8D62D;
+  --color-yellow-dark: #CCA000;
+  --color-yellow-light: #FFF7D1;
+
+  --color-accent: var(--color-yellow-light);
+  --color-body: var(--color-gray-dark);
+  --color-primary: var(--color-blue);
+  --color-secundary: var(--color-red);
+
+  --row-height: 37px;
+
   --spacing-tiny: 2px;
   --spacing-small: 4px;
   --spacing-medium: 8px;
   --spacing-large: 16px;
   --spacing-extra-large: 32px;
-  --menu-height: 125px;
-  --container-width: 1024px;
+
+
+  --font-family-heading: 'TheMix C5';
+
+  --font-family-body: 'TheSans C5';
+  --font-color-body: var(--color-black);
+  --font-size-body: 16px;
+  --font-line-height-body: 21px;
+
 }
 
 @font-face {
   font-family: 'TheMix C5';
-  src: local('TheMix C5'),  url('./fonts/TheMixC5/DesktopFonts/TheMixC5-5_Plain.otf') format('opentype');
+  src: local('TheMix C5'), url('./fonts/TheMixC5/DesktopFonts/TheMixC5-5_Plain.otf') format('opentype');
 }
 
 @font-face {
