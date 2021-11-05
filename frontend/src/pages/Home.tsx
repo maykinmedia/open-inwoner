@@ -1,11 +1,8 @@
 import React from 'react';
 import { Grid } from '../Components/Container/Grid';
-import SideMenu from '../Components/Menu/SideMenu';
+import HeaderMenu from '../Components/Header/SideMenu';
 
 export default function Home() {
-  const getLeft = () => (
-    <SideMenu />
-  );
   const getRight = () => (
     <>
       Home
@@ -13,6 +10,6 @@ export default function Home() {
   );
 
   return (
-    <Grid isLoggedIn fixedLeft left={getLeft()} right={getRight()} />
+    <Grid isLoggedIn right={getRight()} />
   );
 }

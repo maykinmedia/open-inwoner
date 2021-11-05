@@ -1,17 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
-
+import { getCategories } from '../../api/calls';
 import { Card } from '../../Components/Card/Card';
 import { CardContainer } from '../../Components/CardContainer/CardContainer';
 import { Grid } from '../../Components/Container/Grid';
-import { Breadcrumbs } from '../../Components/Breadcrumbs/Breadcrumbs';
-import SideMenu from '../../Components/Menu/SideMenu';
-
-import { getCategories } from '../../api/calls';
-
 import { globalContext } from '../../store';
-
-import './theme-list.scss';
 import { iCategory } from '../../types/pdc';
+import './theme-list.scss';
+
 
 export default function Themas() {
   const { globalState } = useContext(globalContext);
@@ -25,14 +20,9 @@ export default function Themas() {
     load();
   }, []);
 
-  const getLeft = () => (
-    <SideMenu />
-  );
   const getRight = () => {
-    console.log(categories);
     return (
       <div className="theme-list">
-        <Breadcrumbs breadcrumbs={[{ icon: true, name: 'Home', to: '/' }, { icon: false, name: 'Themas', to: '/themas' }]} />
         <h1 className="theme-list__title">Themas</h1>
         <p className="theme-list__description">Nulla vitae elit libero, a pharetra augue.</p>
         <CardContainer isLoggedIn={!!globalState.user}>
@@ -43,6 +33,6 @@ export default function Themas() {
   };
 
   return (
-    <Grid isLoggedIn={!!globalState.user} fixedLeft left={getLeft()} right={getRight()} />
+    <Grid isLoggedIn={!!globalState.user} right={getRight()} />
   );
 }
