@@ -1,0 +1,62 @@
+
+///
+/// Header.
+///
+
+.header {
+  display: grid;
+  grid-template-areas: "pad-before  actions     pad-after"
+                       "pad-before  logo        pad-after"
+                       "nav         nav         nav"
+                       "breadcrumbs breadcrumbs breadcrumbs";
+  grid-template-columns: var(--spacing-large) 1fr var(--spacing-large);
+  grid-template-rows: auto auto auto auto;
+
+  @media (min-width: 768px) {
+    grid-template-areas: "pad-before  logo        actions     pad-after"
+                         "nav         nav         nav         nav"
+                         "breadcrumbs breadcrumbs breadcrumbs breadcrumbs";
+    grid-template-columns: max(calc((100vw - var(--container-width)) / 2), var(--spacing-large)) 1fr 1fr max(calc((100vw - var(--container-width)) / 2), var(--spacing-large));
+    grid-template-rows: auto auto auto;
+  }
+
+  /// Logo.
+  .logo {
+    grid-area: logo
+  }
+
+  /// Actions.
+  &__actions {
+    align-items: baseline;
+    display: flex;
+    grid-area: actions;
+    justify-content: space-between;
+
+    @media (min-width: 768px) {
+      justify-content: flex-end;
+      margin-top: var(--row-height);
+    }
+
+  }
+
+  &__actions &__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  &__actions &__list-item {
+    display: inline;
+    margin-left: var(--spacing-extra-large);
+  }
+
+  /// Primary navigation.
+  .primary-navigation {
+    grid-area: nav;
+  }
+
+  /// Breadcrumbs.
+  .breadcrumbs {
+    grid-area: breadcrumbs;
+  }
+}

@@ -1,0 +1,80 @@
+///
+/// Primary navigation.
+///
+
+.primary-navigation {
+  position: relative;
+
+  &:before {
+    content: '';
+
+    border-bottom: var(--border-width) solid;
+    border-image: var(--border-image);
+    border-image-slice: 1;
+    left: 0;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    z-index: -1;
+  }
+
+  /// Top list.
+
+  & > &__list {
+    box-sizing: content-box;
+    display: flex;
+    list-style: none;
+    margin: auto;
+    max-width: var(--container-width);
+    padding: 0 var(--spacing-large);
+    width: 100%;
+  }
+
+  & > &__list > &__list-item {
+    display: flex;
+    align-items: center;
+    height: var(--row-height);
+    padding: var(--spacing-large);
+    box-sizing: content-box;
+
+    &:first-child {
+      padding-left: 0;
+    }
+
+    &:last-child {
+      padding-right: 0;
+    }
+  }
+
+  /// Nested list.
+
+  & > &__list > &__list-item > &__list {
+    background-color: var(--color-accent);
+    box-sizing: border-box;
+    padding: var(--spacing-large) max(calc((100vw - var(--container-width)) / 2), var(--spacing-large));
+    position: absolute;
+    left: 0;
+    list-style: none;
+    margin: 0;
+    top: 100%;
+    transform: scaleY(0);
+    width: 100%;
+    z-index: 100;
+
+    @media (min-width: 768px) {
+      column-count: 4;
+    }
+  }
+
+  & > &__list > &__list-item > &__list > &__list-item {
+    line-height: var(--row-height);
+  }
+
+  /// Interaction.
+
+  & > &__list > &__list-item:focus &__list,
+  & > &__list > &__list-item:focus-within &__list,
+  & > &__list > &__list-item:hover &__list {
+    transform: scaleY(1);
+  }
+}

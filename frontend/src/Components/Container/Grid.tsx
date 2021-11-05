@@ -21,20 +21,13 @@ export function Grid(props:GridProps) {
     return classNames;
   };
 
-  const getLeft = () => {
-    if (props.isLoggedIn) {
-      return <div className="grid__left">{ props.left }</div>;
-    }
-    return <></>;
-  };
-
   const getContent = () => {
     if (props.children) {
       return props.children;
     }
     return (
       <>
-        { getLeft() }
+        {props.left}
         <div className="grid__right">{ props.right }</div>
       </>
     );
