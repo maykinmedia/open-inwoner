@@ -1,20 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Markdown from 'markdown-to-jsx';
-
+import { getProduct } from '../../api/calls';
 import { Grid } from '../../Components/Container/Grid';
-import { File } from '../../Components/File/File';
-import { TagList } from '../../Components/Tags/TagList';
-import { Breadcrumbs } from '../../Components/Breadcrumbs/Breadcrumbs';
 import { Divider } from '../../Components/Divider/Divider';
-import AnchorMenu from '../../Components/Menu/AnchorMenu';
+import AnchorMenu from '../../Components/Header/AnchorMenu';
+import { File } from '../../Components/File/File';
 import { Links } from '../../Components/Product/Links';
 import { Related } from '../../Components/Product/Related';
 import { Social } from '../../Components/Product/Social';
-
-import { getProduct } from '../../api/calls';
-import './product.scss';
+import { TagList } from '../../Components/Tags/TagList';
 import { iProduct } from '../../types/pdc';
+import './product.scss';
+
 
 export default function ProductDetail() {
   const [product, setProduct] = useState<iProduct | undefined>(undefined);
@@ -67,7 +65,6 @@ export default function ProductDetail() {
   );
   const getRight = () => (
     <>
-      <Breadcrumbs breadcrumbs={[{ icon: true, name: 'Home', to: '/' }, { icon: false, name: 'Themas', to: '/themas' }, { icon: false, name: product?.name || '', to: `/product/${product?.slug}` }]} />
       <div className="product">
         <h1 id="title">{product?.name}</h1>
         <TagList tags={product?.tags} />

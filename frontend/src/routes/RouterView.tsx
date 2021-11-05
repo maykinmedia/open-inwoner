@@ -1,22 +1,15 @@
-import React, { useContext } from 'react';
-import { Switch } from 'react-router-dom';
-import { GuardProvider, GuardedRoute } from 'react-router-guards';
-
-import { getToken, getUser } from '../api/calls';
-
-import Home from '../pages/Home';
+import React, {useContext} from 'react';
+import {Switch} from 'react-router-dom';
+import {GuardProvider, GuardedRoute} from 'react-router-guards';
+import {getToken, getUser} from '../api/calls';
 import NotFoundPage from '../pages/NotFound';
-import About from '../pages/About';
-import Login from '../pages/Login';
-import Register from '../pages/Register';
-import Themas from '../pages/Themas/index';
-import ThemeDetail from '../pages/Themas/detail';
-import ProductDetail from '../pages/Product/detail';
-import { globalContext } from '../store';
-import { getIsLoggedIn } from '../utils';
+import {globalContext} from '../store';
+import {getIsLoggedIn} from '../utils';
+import {ROUTES} from './routes';
+
 
 export function RouterView() {
-  const { globalState, dispatch } = useContext(globalContext);
+  const {globalState, dispatch} = useContext(globalContext);
 
   const requireLogin = (to, from, next) => {
     if (to.meta.auth) {
@@ -29,7 +22,12 @@ export function RouterView() {
     }
   };
 
-  function getCookie(cookieName:string) {
+  /**
+   * Returns a cookie.
+   * @param {string} cookieName
+   * @return {string}
+   */
+  function getCookie(cookieName: string) {
     const name = `${cookieName}=`;
     const decodedCookie = decodeURIComponent(document.cookie);
     const ca = decodedCookie.split(';');
@@ -50,25 +48,24 @@ export function RouterView() {
     if (sessionCookie && !getIsLoggedIn(globalState)) {
       const token = await getToken();
       if (token) {
-        await dispatch({ type: 'SET_TOKEN', payload: token });
+        await dispatch({type: 'SET_TOKEN', payload: token});
         const user = await getUser(token);
-        await dispatch({ type: 'SET_USER', payload: user });
+        await dispatch({type: 'SET_USER', payload: user});
       }
     }
     next();
   };
 
+  const renderRoutes = () => {
+    return Object.entries(ROUTES).map(([key, route]) => (
+      <GuardedRoute key={key} component={route.component} exact={route.exact} path={route.path} meta={{auth: route.loginRequired}}/>
+    ))
+  };
+
   return (
     <GuardProvider guards={[requireLogin, hasSession]} error={NotFoundPage}>
       <Switch>
-        <GuardedRoute path="/" exact component={Home} />
-        <GuardedRoute path="/login" exact component={Login} />
-        <GuardedRoute path="/register" exact component={Register} />
-        <GuardedRoute path="/themas" exact component={Themas} />
-        <GuardedRoute path="/themas/:slug" exact component={ThemeDetail} />
-        <GuardedRoute path="/product/:slug" exact component={ProductDetail} />
-        <GuardedRoute path="/about" exact component={About} meta={{ auth: true }} />
-        <GuardedRoute path="*" component={NotFoundPage} />
+        {renderRoutes()}
       </Switch>
     </GuardProvider>
   );
