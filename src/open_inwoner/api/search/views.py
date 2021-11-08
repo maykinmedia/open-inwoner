@@ -19,7 +19,7 @@ class SearchView(APIView):
         )
 
     def get(self, request, *args, **kwargs):
-        search_string = request.query_params.get("search")
+        search_string = request.query_params.get("search", "")
 
         objects = search_products(search_string)
         serializer = self.get_serializer(instance=objects)
