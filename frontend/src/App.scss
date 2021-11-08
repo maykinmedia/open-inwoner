@@ -1,14 +1,24 @@
 :root {
+
+  // Layout.
+
+  --container-width: 1024px;
+  --header-height: 150px;
+
+  // Border.
+
   --border-image: linear-gradient(to right, var(--color-yellow-light), var(--color-yellow-dark), var(--color-yellow));
   --border-width: 2px;
 
-  --container-width: 1024px;
+
+  // Color.
 
   --color-black: #000;
   --color-blue: #476db7;
   --color-gray: #7A7A7A;
   --color-gray-dark: #4b4b4b;
-  --color-gray-light: #D2D2D2;
+  --color-gray-light: #F1F1F1;
+  --color-green: #248641;
   --color-red: #e5006c;
   --color-white: #fff;
   --color-yellow: #F8D62D;
@@ -17,8 +27,25 @@
 
   --color-accent: var(--color-yellow-light);
   --color-body: var(--color-gray-dark);
-  --color-primary: var(--color-blue);
+  --color-primary: var(--color-green);
   --color-secundary: var(--color-red);
+
+
+  /// Font.
+
+  --font-family-heading: 'TheMix C5';
+  --font-color-heading: var(--color-black);
+
+  --font-size-heading-4: 16px;
+  --font-line-height-heading-4: 26px;
+
+  --font-family-body: 'TheSans C5';
+  --font-color-body: var(--color-gray-dark);
+  --font-size-body: 16px;
+  --font-line-height-body: 21px;
+
+
+  /// Spacing.
 
   --row-height: 37px;
 
@@ -27,15 +54,6 @@
   --spacing-medium: 8px;
   --spacing-large: 16px;
   --spacing-extra-large: 32px;
-
-
-  --font-family-heading: 'TheMix C5';
-
-  --font-family-body: 'TheSans C5';
-  --font-color-body: var(--color-black);
-  --font-size-body: 16px;
-  --font-line-height-body: 21px;
-
 }
 
 @font-face {
@@ -50,5 +68,5 @@
 
 body {
   margin: 0;
-  font-family: 'TheSans C5';
+  //font-family: 'TheSans C5';
 }
