@@ -11,6 +11,7 @@ from .accounts.views import (
     GetAuthTokenView,
 )
 from .pdc.views import CategoryViewSet, ProductViewSet
+from .search.views import SearchView
 
 app_name = "api"
 router = routers.SimpleRouter()
@@ -37,5 +38,6 @@ urlpatterns = [
     path("auth/", include("dj_rest_auth.urls")),
     path("auth/registration/", include("dj_rest_auth.registration.urls")),
     # path("auth/", include("rest_framework.urls", namespace="rest_framework")),
+    path("search/", SearchView.as_view(), name="search"),
     path("", include(router.urls)),
 ]
