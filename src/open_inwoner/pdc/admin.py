@@ -2,6 +2,7 @@ from django import forms
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 
+from import_export.admin import ImportExportMixin
 from leaflet.admin import LeafletGeoAdmin
 from treebeard.admin import TreeAdmin
 from treebeard.forms import movenodeform_factory
@@ -18,15 +19,20 @@ from .models import (
     Tag,
     TagType,
 )
+from .resources import CategoryResource, ProductResource
 from .widgets import CKEditorWidget
 
 
 @admin.register(Category)
-class CategoryAdmin(TreeAdmin):
+class CategoryAdmin(ImportExportMixin, TreeAdmin):
+    change_list_template = "admin/category_admintools.html"
     form = movenodeform_factory(Category, fields="__all__")
     prepopulated_fields = {"slug": ("name",)}
     search_fields = ("name",)
-    ordering = ("name",)
+    ordering = ("path",)
+
+    # import-export resource
+    resource_class = CategoryResource
 
 
 class ProductLinkInline(admin.TabularInline):
@@ -53,7 +59,7 @@ class ProductAdminForm(forms.ModelForm):
 
 
 @admin.register(Product)
-class ProductAdmin(admin.ModelAdmin):
+class ProductAdmin(ImportExportMixin, admin.ModelAdmin):
     list_display = ("name", "created_on", "display_categories")
     list_filter = ("categories", "tags")
     date_hierarchy = "created_on"
@@ -63,6 +69,9 @@ class ProductAdmin(admin.ModelAdmin):
     ordering = ("name",)
     form = ProductAdminForm
     inlines = (ProductLinkInline, ProductLocationInline, ProductContactInline)
+
+    # import-export resource
+    resource_class = ProductResource
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)

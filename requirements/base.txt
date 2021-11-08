@@ -25,7 +25,10 @@ cryptography==35.0.0
 defusedxml==0.7.1
     # via
     #   digid-eherkenning
+    #   odfpy
     #   python3-openid
+diff-match-patch==20200713
+    # via django-import-export
 digid-eherkenning @ git+https://bitbucket.org/maykinmedia/django-digid-eherkenning.git@02ac61c42f6dd2f229ba9f0f687fa1a4160511be
     # via -r requirements/base.in
 dj-rest-auth==2.1.11
@@ -44,6 +47,7 @@ django==3.2.7
     #   django-filter
     #   django-formtools
     #   django-hijack
+    #   django-import-export
     #   django-leaflet
     #   django-localflavor
     #   django-otp
@@ -84,6 +88,8 @@ django-filter==21.1
 django-formtools==2.3
     # via maykin-django-two-factor-auth
 django-hijack==3.0.4
+    # via -r requirements/base.in
+django-import-export==2.6.1
     # via -r requirements/base.in
 django-ipware==4.0.0
     # via django-axes
@@ -133,6 +139,8 @@ elasticsearch==7.15.1
     # via elasticsearch-dsl
 elasticsearch-dsl==7.4.0
     # via django-elasticsearch-dsl
+et-xmlfile==1.1.0
+    # via openpyxl
 geographiclib==1.52
     # via geopy
 geopy==2.2.0
@@ -149,10 +157,16 @@ lxml==4.6.3
     # via
     #   python3-saml
     #   xmlsec
+markuppy==1.14
+    # via tablib
 maykin-django-two-factor-auth==2.0.4
     # via -r requirements/base.in
 oauthlib==3.1.1
     # via requests-oauthlib
+odfpy==1.4.1
+    # via tablib
+openpyxl==3.0.9
+    # via tablib
 phonenumbers==8.12.33
     # via -r requirements/base.in
 pillow==8.3.2
@@ -188,7 +202,9 @@ pytz==2021.3
     #   -r requirements/base.in
     #   django
 pyyaml==6.0
-    # via drf-spectacular
+    # via
+    #   drf-spectacular
+    #   tablib
 qrcode==6.1
     # via maykin-django-two-factor-auth
 redis==3.5.3
@@ -213,6 +229,8 @@ six==1.16.0
     #   qrcode
 sqlparse==0.4.2
     # via django
+tablib[html,ods,xls,xlsx,yaml]==3.1.0
+    # via django-import-export
 unidecode==1.1.2
     # via django-filer
 uritemplate==4.1.1
@@ -225,5 +243,9 @@ urllib3==1.26.7
     #   sentry-sdk
 uwsgi==2.0.19.1
     # via -r requirements/base.in
+xlrd==2.0.1
+    # via tablib
+xlwt==1.3.0
+    # via tablib
 xmlsec==1.3.12
     # via python3-saml

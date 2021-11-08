@@ -1,7 +1,6 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from autoslug import AutoSlugField
 from filer.fields.image import FilerImageField
 from treebeard.mp_tree import MP_Node
 

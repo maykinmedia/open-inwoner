@@ -134,6 +134,7 @@ INSTALLED_APPS = [
     "hijack.contrib.admin",
     "leaflet",
     "django_elasticsearch_dsl",
+    "import_export",
     # Project applications.
     "open_inwoner.accounts",
     "open_inwoner.pdc",
