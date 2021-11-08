@@ -1,11 +1,11 @@
-import { ActionType, GlobalStateInterface } from './types';
+import { iActionType, iGlobalStateInterface } from './types';
 import { initialState } from './index';
 
 function assertNever(x: never): never {
   throw new Error(`Unexpected object: ${x}`);
 }
 
-const Reducer = (state: GlobalStateInterface, action: ActionType): any => {
+const Reducer = (state: iGlobalStateInterface, action: iActionType): any => {
   switch (action.type) {
     case 'SET_TOKEN':
       return { ...state, token: action.payload, error: null };

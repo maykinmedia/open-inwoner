@@ -1,27 +1,27 @@
 import { Dispatch } from 'react';
 
-export interface User {
+export interface iUser {
     firstName: string,
     lastName: string,
     email: string,
 }
 
-export interface Token {
+export interface iToken {
     key: string,
 }
 
-export interface GlobalStateInterface {
-    token: Token | null,
-    user: User | null,
+export interface iGlobalStateInterface {
+    token: iToken | null,
+    user: iUser | null,
     error: string | null,
 }
 
-export type ActionType = {
+export type iActionType = {
     type: string;
     payload?: any;
 };
 
-export type ContextType = {
-    globalState: GlobalStateInterface;
-    dispatch: Dispatch<ActionType>;
+export type iContextType = {
+    globalState: iGlobalStateInterface;
+    dispatch: Dispatch<iActionType>;
 };
