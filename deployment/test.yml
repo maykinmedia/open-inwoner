@@ -18,6 +18,7 @@
     - include: maykin-deployment/ansible/tasks/firewall.yml
     - include: maykin-deployment/ansible/tasks/zabbix-agent.yml
     - include: maykin-deployment/ansible/tasks/logrotate.yml
+    - include: maykin-deployment/ansible/tasks/elasticsearch-7.yml
     - include: maykin-deployment/ansible/tasks/postgresql-11-postgis-2.5.yml
     - include: maykin-deployment/ansible/tasks/npm.yml
     - include: maykin-deployment/ansible/tasks/set-maintenance-mode.yml
