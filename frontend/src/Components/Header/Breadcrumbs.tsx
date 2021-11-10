@@ -17,7 +17,7 @@ interface iBreadCrumb {
 
 /**
  * Returns the breadcrumbs based the current location and matched routes.
- * @return {JSX.Element}
+ * @return {ReactElement}
  */
 export function Breadcrumbs() {
   const location = useLocation();
@@ -75,7 +75,7 @@ export function Breadcrumbs() {
 
   /**
    * Renders the breadcrumbs.
-   * @return {JSX.Element}
+   * @return {ReactElement}
    */
   const renderBreadCrumbs = () => getBreadCrumbs().map((breadCrumb: iBreadCrumb, index: number) => {
     const Icon = breadCrumb.route.icon;
