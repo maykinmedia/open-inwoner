@@ -19,7 +19,7 @@ interface iRouteLinkProps {
 /**
  * Creates a Link based on a route.
  * @param {iRouteLinkProps} props
- * @return {JSX.Element}
+ * @return {ReactElement}
  */
 export const RouteLink = (props: iRouteLinkProps) => {
   const {route, routeParams, children, icon, ..._props} = props;

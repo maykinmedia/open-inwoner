@@ -18,7 +18,7 @@ interface iPrimaryNavigationProps {
  * contain a "children" key containing either a nested iMenuItem[] or an async function returning a Promise for an
  * iMenuItem[]
  *
- * @return {JSX.Element}
+ * @return {ReactElement}
  */
 export default function PrimaryNavigation(props: iPrimaryNavigationProps) {
   const {globalState} = useContext(globalContext);

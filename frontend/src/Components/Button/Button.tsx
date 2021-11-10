@@ -15,7 +15,7 @@ interface iButtonProps {
 /**
  * A generic button, can be a link or a button.
  * @param {iButtonProps} props
- * @return {JSX.Element}
+ * @return {ReactElement}
  */
 export function Button(props: iButtonProps) {
   const {href, icon, type, open, transparent, children, ..._props} = props;
@@ -43,7 +43,7 @@ export function Button(props: iButtonProps) {
 
   /**
    * Returns the children.
-   * @return {JSX.Element}
+   * @return {ReactElement}
    */
   const getChildren = () => {
     const Icon = icon;
