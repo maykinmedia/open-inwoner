@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Token } from '../store/types';
+import { iToken } from '../store/types';
 import {iCategory} from "../types/pdc";
 
 export const logout = async () => {
@@ -26,7 +26,7 @@ export const login = async (email:string, password:string) => {
   return res.data;
 };
 
-export const getUser = async (token: Token) => {
+export const getUser = async (token: iToken) => {
   const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/user/`, { headers: { Authorization: `Token ${token.key}` } }).catch((err) => {
     console.error(err.response.data);
     throw err;

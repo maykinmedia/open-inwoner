@@ -1,9 +1,11 @@
 import React, {useContext} from 'react';
 import {Switch} from 'react-router-dom';
-import {GuardProvider, GuardedRoute} from 'react-router-guards';
+import {GuardProvider, GuardedRoute, Next} from 'react-router-guards';
+import {GuardFunctionRouteProps, GuardToRoute} from 'react-router-guards/dist/types';
 import {getToken, getUser} from '../api/calls';
 import NotFoundPage from '../pages/NotFound';
 import {globalContext} from '../store';
+import {iToken} from '../store/types';
 import {getIsLoggedIn} from '../utils';
 import {ROUTES} from './routes';
 
@@ -11,7 +13,7 @@ import {ROUTES} from './routes';
 export function RouterView() {
   const {globalState, dispatch} = useContext(globalContext);
 
-  const requireLogin = (to, from, next) => {
+  const requireLogin = (to: GuardToRoute, from: GuardFunctionRouteProps | null, next: Next) => {
     if (to.meta.auth) {
       if (getIsLoggedIn(globalState)) {
         next();
@@ -43,13 +45,13 @@ export function RouterView() {
     return '';
   }
 
-  const hasSession = async (to, from, next) => {
+  const hasSession = async (to: GuardToRoute, from: GuardFunctionRouteProps | null, next: Next) => {
     const sessionCookie = getCookie('open_inwoner_sessionid');
     if (sessionCookie && !getIsLoggedIn(globalState)) {
       const token = await getToken();
       if (token) {
         await dispatch({type: 'SET_TOKEN', payload: token});
-        const user = await getUser(token);
+        const user = await getUser(token as iToken);
         await dispatch({type: 'SET_USER', payload: user});
       }
     }
@@ -58,7 +60,8 @@ export function RouterView() {
 
   const renderRoutes = () => {
     return Object.entries(ROUTES).map(([key, route]) => (
-      <GuardedRoute key={key} component={route.component} exact={route.exact} path={route.path} meta={{auth: route.loginRequired}}/>
+      <GuardedRoute key={key} component={route.component} exact={route.exact} path={route.path}
+                    meta={{auth: route.loginRequired}}/>
     ))
   };
 

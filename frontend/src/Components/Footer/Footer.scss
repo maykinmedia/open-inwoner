@@ -1,0 +1,77 @@
+///
+/// Footer.
+///
+
+.footer {
+  $hm: max(calc((100vw - var(--container-width)) / 2), var(--spacing-large));
+  $vm: var(--row-height);
+  background-color: var(--color-gray-light);
+  display: grid;
+
+  grid-template-areas: "mtl mt   mt   mt   mtr"
+                       "ml  logo logo logo mr"
+                       "ml  vs1  vs1  vs1  mr"
+                       "ml  vstr vstr vstr mr"
+                       "ml  vs2  vs2  vs2  mr"
+                       "ml  mail mail mail mr"
+                       "ml  vs3  vs3  vs3  mr"
+                       "ml  scl  scl  scl  mr"
+                       "ml  vs4  vs4  vs4  mr"
+                       "ml  nws  nws  nws  mr"
+                       "ml  vs5  vs5  vs5  mr"
+                       "ml  lnks lnks lnks mr"
+                       "mbl mb   mb   mb   mbr";
+  grid-template-columns: $hm 6fr 3fr 3fr $hm;
+  grid-template-rows: $vm $vm $vm auto $vm auto $vm auto $vm auto $vm auto $vm;
+
+
+  @media (min-width: 768px) {
+    grid-template-areas: "mtl mt   mt   mt   mtr"
+                         "ml  logo logo logo mr"
+                         "ml  vs1  vs1  vs1  mr"
+                         "ml  vstr scl  lnks mr"
+                         "ml  vs2  vs2  lnks mr"
+                         "ml  mail nws  lnks mr"
+                         "mbl mb   mb   mb   mbr";
+    grid-template-columns: $hm 6fr 3fr 3fr $hm;
+    grid-template-rows: $vm $vm $vm auto $vm auto $vm;
+  }
+
+  /// Layout.
+
+  .logo {
+    grid-area: logo;
+  }
+
+  &__visitor {
+    grid-area: vstr;
+  }
+
+  &__mail {
+    grid-area: mail;
+  }
+
+  &__social {
+    grid-area: scl;
+  }
+
+  &__newsletter {
+    grid-area: nws;
+  }
+
+  &__links {
+    grid-area: lnks;
+  }
+
+  /// List.
+
+  &__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  &__list-item {
+    padding: var(--spacing-small) 0;
+  }
+}
