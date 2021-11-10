@@ -514,3 +514,6 @@ ELASTICSEARCH_DSL = {
     "default": {"hosts": config("ES_HOST", "localhost:9200")},
 }
 ES_INDEX_PRODUCTS = "products"
+
+# django import-export
+IMPORT_EXPORT_USE_TRANSACTIONS = True
