@@ -3,14 +3,17 @@
 ///
 
 .primary-navigation {
+  $hm: max(calc((100vw - var(--container-width)) / 2), var(--spacing-large));
+  display: grid;
+  grid-template-areas: "ml-1 nav mr-1";
+  grid-template-columns: $hm 1fr $hm;
   position: relative;
 
   &:before {
-    content: '';
-
     border-bottom: var(--border-width) solid;
     border-image: var(--border-image);
     border-image-slice: 1;
+    content: '';
     left: 0;
     position: absolute;
     bottom: 0;
@@ -21,21 +24,21 @@
   /// Top list.
 
   & > &__list {
-    box-sizing: content-box;
+    grid-area: nav;
     display: flex;
     list-style: none;
-    margin: auto;
-    max-width: var(--container-width);
-    padding: 0 var(--spacing-large);
-    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: auto;
   }
 
   & > &__list > &__list-item {
+    box-sizing: border-box;
     display: flex;
     align-items: center;
     height: var(--row-height);
-    padding: var(--spacing-large);
-    box-sizing: content-box;
+    padding: 0 var(--spacing-large);
+    white-space: nowrap;
 
     &:first-child {
       padding-left: 0;

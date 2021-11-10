@@ -1,12 +1,13 @@
 import React, {useContext} from 'react';
-import {NavLink} from "react-router-dom";
 import {logout} from '../../api/calls';
+import {ROUTES} from '../../routes/routes';
 import {globalContext} from '../../store';
 import {Breadcrumbs} from './Breadcrumbs';
-import {Logo} from './Logo';
+import {Logo} from '../Logo/Logo';
 import PrimaryNavigation from './PrimaryNavigation';
+import {RouteLink} from '../Typography/RouteLink';
 import './Header.scss';
-import './Link.scss';
+import {P} from '../Typography/P';
 
 
 /**
@@ -30,10 +31,10 @@ export function Header() {
    */
   const getWelcomeMessage = () => {
     return (
-      <p className="link">
+      <P>
         {globalState.user && `Welkom ${globalState.user.firstName} ${globalState.user.lastName}`}
         {!globalState.user && 'Welkom'}
-      </p>
+      </P>
     )
   };
 
@@ -46,7 +47,7 @@ export function Header() {
       return (
         <ul className="header__list">
           <li className="header__list-item">
-            <NavLink className="link" onClick={handleLogout} to="#">Uitloggen</NavLink>
+            <RouteLink onClick={handleLogout} route={ROUTES.LOGOUT}/>
           </li>
         </ul>
       );
@@ -55,11 +56,11 @@ export function Header() {
     return (
       <ul className="header__list">
         <li className="header__list-item">
-          <NavLink className="link" to="/register">Registreren</NavLink>
+          <RouteLink route={ROUTES.REGISTER}/>
         </li>
 
         <li className="header__list-item">
-          <NavLink className="link link--primary" activeClassName="link--active" to="/login">Inloggen</NavLink>
+          <RouteLink primary={true} route={ROUTES.LOGIN}/>
         </li>
       </ul>
     );
@@ -67,7 +68,7 @@ export function Header() {
 
   return (
     <header className="header">
-      <Logo src="https://www.zwolle.nl/sites/all/themes/custom/zwolle_redesign/logo.png" alt="Logo van gemeente"/>
+      <Logo/>
 
       <nav className="header__actions">
         {getWelcomeMessage()}

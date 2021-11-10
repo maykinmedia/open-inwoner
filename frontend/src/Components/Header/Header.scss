@@ -1,40 +1,57 @@
-
 ///
 /// Header.
 ///
 
 .header {
+  $hm: max(calc((100vw - var(--container-width)) / 2), var(--spacing-large));
+  $vm: var(--spacing-large);
   display: grid;
-  grid-template-areas: "pad-before  actions     pad-after"
-                       "pad-before  logo        pad-after"
-                       "nav         nav         nav"
-                       "breadcrumbs breadcrumbs breadcrumbs";
-  grid-template-columns: var(--spacing-large) 1fr var(--spacing-large);
-  grid-template-rows: auto auto auto auto;
+  grid-template-areas: "mtl  actns mtr"
+                       "ml-1 logo  mr-1"
+                       "nav  nav   nav"
+                       "ml-2 bc    mr-2";
+  grid-template-columns: $vm 1fr $vm;
+  grid-template-rows: auto calc(var(--header-height) - var(--row-height)) auto auto;
 
   @media (min-width: 768px) {
-    grid-template-areas: "pad-before  logo        actions     pad-after"
-                         "nav         nav         nav         nav"
-                         "breadcrumbs breadcrumbs breadcrumbs breadcrumbs";
-    grid-template-columns: max(calc((100vw - var(--container-width)) / 2), var(--spacing-large)) 1fr 1fr max(calc((100vw - var(--container-width)) / 2), var(--spacing-large));
-    grid-template-rows: auto auto auto;
+    grid-template-areas: "ml-1 logo actns mr-1"
+                         "nav  nav  nav   nav"
+                         "ml-2 bc   bc    mr-2";
+    grid-template-columns: $hm 1fr 1fr $hm;
+    grid-template-rows: calc(var(--header-height) - var(--row-height)) auto auto;
+    height: var(--header-height);
   }
 
-  /// Logo.
+  /// Layout.
+
   .logo {
+    margin: var(--row-height) 0;
     grid-area: logo
   }
 
+  &__actions {
+    grid-area: actns;
+  }
+
+  .primary-navigation {
+    grid-area: nav;
+  }
+
+  .breadcrumbs {
+    grid-area: bc;
+  }
+
+
   /// Actions.
   &__actions {
-    align-items: baseline;
+    align-items: center;
     display: flex;
-    grid-area: actions;
+    height: var(--row-height);
     justify-content: space-between;
 
     @media (min-width: 768px) {
       justify-content: flex-end;
-      margin-top: var(--row-height);
+      margin: var(--row-height) 0;
     }
 
   }
@@ -48,15 +65,5 @@
   &__actions &__list-item {
     display: inline;
     margin-left: var(--spacing-extra-large);
-  }
-
-  /// Primary navigation.
-  .primary-navigation {
-    grid-area: nav;
-  }
-
-  /// Breadcrumbs.
-  .breadcrumbs {
-    grid-area: breadcrumbs;
   }
 }

@@ -3,8 +3,7 @@
     display: flex;
     list-style: none;
     margin: 0;
-    max-width: var(--container-width);
-    padding: var(--spacing-large) max(calc((100vw - var(--container-width)) / 2), var(--spacing-large));
+    padding: 0;
   }
 
   &__list-item {
@@ -13,8 +12,12 @@
     white-space: nowrap;
   }
 
+  .link {
+    line-height: var(--row-height);
+  }
+
   &__list-item > *[class*=icon],
   &__list-item > *[class*=Icon] {
-   margin: 0 var(--spacing-medium);
+    margin: 0 var(--spacing-medium);
   }
 }
