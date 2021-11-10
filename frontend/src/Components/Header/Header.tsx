@@ -12,7 +12,7 @@ import {P} from '../Typography/P';
 
 /**
  * Renders the header including all the navigation.
- * @return {JSX.Element}
+ * @return {ReactElement}
  */
 export function Header() {
   const {globalState, dispatch} = useContext(globalContext);
@@ -27,7 +27,7 @@ export function Header() {
 
   /**
    * Returns the welcome message.
-   * @return {JSX.Element}
+   * @return {ReactElement}
    */
   const getWelcomeMessage = () => {
     return (
@@ -40,7 +40,7 @@ export function Header() {
 
   /**
    * Returns the login/logout link(s).
-   * @return {JSX.Element}
+   * @return {ReactElement}
    */
   const getLoginLinks = () => {
     if (globalState.user) {
