@@ -27,8 +27,8 @@
     text-decoration: underline;
   }
 
-  *[class*=icon],
-  *[class*=Icon] {
+  *[class*=icon]:first-child,
+  *[class*=Icon]:first-child {
     margin-right: var(--spacing-medium)
   }
 }

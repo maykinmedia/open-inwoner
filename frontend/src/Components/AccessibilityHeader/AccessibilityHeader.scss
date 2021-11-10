@@ -1,0 +1,46 @@
+.accessibility-header {
+  $hm: max(calc((100vw - var(--container-width)) / 2), var(--spacing-large));
+  background-color: var(--color-accent);
+  display: grid;
+  grid-template-areas: "ml-1 lst mr-1";
+  grid-template-columns: $hm 1fr $hm;
+
+  /// Layout.
+
+  &__list {
+    grid-area: lst;
+  }
+
+  /// List.
+
+  &__list {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  &__list-item {
+    margin: 0 var(--spacing-large);
+
+    &:first-child {
+      margin-left: 0;
+    }
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+
+  /// Link.
+
+  .link {
+    line-height: var(--row-height);
+    @media (max-width: 767px) {
+
+      &:not(:focus):not(:hover) {
+        font-size: 0;
+      }
+    }
+  }
+}
