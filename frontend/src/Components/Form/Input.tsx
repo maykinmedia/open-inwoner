@@ -1,30 +1,22 @@
-import React from 'react';
+import React, {ReactElement} from 'react';
+import {iField} from '../../types/field';
 import './Input.scss';
 
-interface InputProps {
-    type: string,
-    value?: string,
-    name: string,
-    required: boolean,
-    changeAction: Function,
+
+interface iInputProps {
+  field: iField,
 }
 
-export function Input(props:InputProps) {
-  const handleOnChange = (event: any) => {
-    if (props.changeAction) {
-      props.changeAction(event);
-    }
-  };
+/**
+ * Returns an input based on field.
+ * @param {iInputProps} props
+ * @return {ReactElement}
+ */
+export function Input(props: iInputProps): ReactElement {
+  const {field, ..._props} = props;
 
   return (
-    <input
-      className="input"
-      type={props.type}
-      value={props.value}
-      name={props.name}
-      id={`id_${props.name}`}
-      required={props.required}
-      onChange={handleOnChange}
-    />
-  );
+    <input className="input" title={field.label} name={field.name} type={field.type}
+           value={field.value} {...field.attrs} {..._props}/>
+  )
 }

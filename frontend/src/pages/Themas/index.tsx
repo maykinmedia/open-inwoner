@@ -33,6 +33,6 @@ export default function Themas() {
   };
 
   return (
-    <Grid isLoggedIn={!!globalState.user} right={getRight()} />
+    <Grid isLoggedIn={!!globalState.user} mainContent={getRight()} />
   );
 }

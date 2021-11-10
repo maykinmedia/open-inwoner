@@ -1,10 +1,7 @@
 import 'react';
 import './H4.scss';
+import {iHeadingProps} from './iHeadingProps';
 
-
-interface iHeadingProps {
-  children?: any,
-}
 
 /**
  * h4 element.
