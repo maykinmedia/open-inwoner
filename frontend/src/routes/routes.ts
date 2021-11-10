@@ -12,6 +12,7 @@ import ThemeDetail from "../pages/Themas/detail";
 import Themas from "../pages/Themas";
 import Register from "../pages/Register";
 import Login from "../pages/Login";
+import Profile from '../pages/Profile';
 
 
 /**
@@ -48,7 +49,7 @@ export const ROUTES: { [index: string]: iRoute } = {
     loginRequired: false,
   },
   PROFILE: {
-    component: Home,  // TODO
+    component: Profile,
     label: 'Mijn profiel',
     path: '/account',
     exact: true,

@@ -5,10 +5,12 @@ import './Button.scss';
 interface iButtonProps {
   href?: string,
   icon?: ComponentType,
+  size?: 'big' | 'normal',
   type?: 'button' | 'submit' | 'reset' | undefined,
   open?: boolean,
   transparent?: boolean,
   children?: any,
+  [key: string]: any,
 }
 
 
@@ -18,7 +20,7 @@ interface iButtonProps {
  * @return {ReactElement}
  */
 export function Button(props: iButtonProps) {
-  const {href, icon, type, open, transparent, children, ..._props} = props;
+  const {href, icon, size, type, open, transparent, children, ..._props} = props;
 
   /**
    * Returns the className value.
@@ -29,6 +31,10 @@ export function Button(props: iButtonProps) {
 
     if (icon) {
       classNames += ' button--icon'
+    }
+
+    if (size) {
+      classNames += ` button--${size}`
     }
 
     if (open) {
@@ -58,9 +64,9 @@ export function Button(props: iButtonProps) {
 
   if (href) {
     if (href.startsWith('http')) {
-      return <a className={getClassNames()} href={href}>{getChildren()}</a>;
+      return <a className={getClassNames()} href={href} {..._props}>{getChildren()}</a>;
     }
-    return <Link className={getClassNames()} to={href}>{getChildren()}</Link>;
+    return <Link className={getClassNames()} to={href} {..._props}>{getChildren()}</Link>;
   }
-  return <button className={getClassNames()} type={type}>{getChildren()}</button>;
+  return <button className={getClassNames()} type={type} {..._props}>{getChildren()}</button>;
 }

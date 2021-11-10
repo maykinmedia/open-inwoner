@@ -5,3 +5,7 @@
   line-height: var(--font-line-height-body);
   margin: 0;
 }
+
+.h1 + .p {
+  margin-top: var(--spacing-small);
+}

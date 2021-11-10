@@ -5,16 +5,17 @@
   --container-width: 1024px;
   --header-height: 150px;
 
+
   // Border.
 
   --border-image: linear-gradient(to right, var(--color-yellow-light), var(--color-yellow-dark), var(--color-yellow));
   --border-width: 2px;
-
+  --border-radius: 3px;
 
   // Color.
 
   --color-black: #000;
-  --color-blue: #476db7;
+  --color-blue: #1261A3;
   --color-gray: #7A7A7A;
   --color-gray-dark: #4b4b4b;
   --color-gray-light: #F1F1F1;
@@ -27,14 +28,18 @@
 
   --color-accent: var(--color-yellow-light);
   --color-body: var(--color-gray-dark);
+  --color-border: var(--color-gray);
   --color-primary: var(--color-green);
-  --color-secundary: var(--color-red);
+  --color-secondary: var(--color-blue);
 
 
   /// Font.
 
   --font-family-heading: 'TheMix C5';
   --font-color-heading: var(--color-black);
+
+  --font-size-heading-1: 32px;
+  --font-line-height-heading-1: 41px;
 
   --font-size-heading-4: 16px;
   --font-line-height-heading-4: 26px;
@@ -44,16 +49,21 @@
   --font-size-body: 16px;
   --font-line-height-body: 21px;
 
+  --font-size-body-small: 12px;
+  --font-line-height-body-small: 20px;
+
 
   /// Spacing.
 
   --row-height: 37px;
+  --row-height-big: 48px;
+  --gutter-width: 32px;
 
   --spacing-tiny: 2px;
   --spacing-small: 4px;
   --spacing-medium: 8px;
   --spacing-large: 16px;
-  --spacing-extra-large: 32px;
+  --spacing-extra-large: 24px;
 }
 
 @font-face {
@@ -64,6 +74,12 @@
 @font-face {
   font-family: 'TheSans C5';
   src: local('TheSans C5'), url('./fonts/TheSansC5/DesktopFonts/TheSansC5-5_Plain.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'TheSans C5';
+  font-weight: bold;
+  src: local('TheSans C5'), url('./fonts/TheSansC5/DesktopFonts/TheSansC5-7_Bold.otf') format('opentype');
 }
 
 body {

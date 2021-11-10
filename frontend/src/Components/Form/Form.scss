@@ -1,0 +1,49 @@
+.form {
+  box-sizing: border-box;
+  display: grid;
+  grid-gap: var(--gutter-width);
+  padding: var(--gutter-width) 0;
+
+  /// Columns.
+
+  @media (min-width: 768px) {
+    @for $i from 1 through 12 {
+      &--columns-#{$i} {
+        grid-template-columns: repeat($i, 1fr);
+      }
+    }
+  }
+
+  /// Control.
+
+  &__control > .label {
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__control > .label * {
+    margin-top: var(--spacing-medium);
+  }
+
+  &__control > .label *:not(.button) {
+    width: 100%;
+  }
+
+
+  /// Actions.
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    padding: var(--gutter-width) 0 0;
+  }
+
+  @media (min-width: 768px) {
+    @for $i from 1 through 12 {
+      &--columns-#{$i} &__actions {
+        grid-column-start: 1;
+        grid-column-end: $i + 1;
+      }
+    }
+  }
+}

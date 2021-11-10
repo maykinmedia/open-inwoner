@@ -3,12 +3,14 @@ import {NavLink} from 'react-router-dom';
 import './Link.scss';
 
 
-interface iLinkProps {
+export interface iLinkProps {
   to: string,
+  active?: boolean,
   activeClassName?: string | null,
   children?: any
   icon?: ComponentType,
   primary?: boolean,
+  secondary?: boolean,
   shouldRenderIcon?: boolean,
   onClick?: Function
 }
@@ -19,9 +21,20 @@ interface iLinkProps {
  * @return {ReactElement}
  */
 export function Link(props: iLinkProps): ReactElement {
-  const {to, activeClassName, children, icon, shouldRenderIcon, ..._props} = props;
-  const className = (props.primary) ? 'link link--primary' : 'link';
+  const {to, active, activeClassName, children, icon, primary, secondary, shouldRenderIcon, ..._props} = props;
   const Icon = icon;
+
+  let className = 'link';
+  if (active) {
+    className += ' link--active'
+  }
+  if (primary) {
+    className += ' link--primary'
+  }
+  if (secondary) {
+    className += ' link--secondary'
+  }
+
 
   /**
    * Renders the children of the link.
@@ -43,7 +56,7 @@ export function Link(props: iLinkProps): ReactElement {
   }
 
   return (
-    <NavLink className={className} activeClassName={activeClassName} to={to} {..._props as any}>
+    <NavLink className={className} isActive={active} activeClassName={activeClassName} to={to} {..._props as any}>
       {renderChildren()}
     </NavLink>
   );

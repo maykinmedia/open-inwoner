@@ -1,41 +1,44 @@
-import React from 'react';
+import React, {ReactElement} from 'react';
 import './Grid.scss';
 
 interface GridProps {
-    isLoggedIn: Boolean,
-    fixedLeft: Boolean,
-    left?: any,
-    right?: any,
-    children?: any,
+  isLoggedIn: boolean,
+  children?: any,
+  mainContent?: ReactElement,
+  sidebarContent?: ReactElement,
 }
 
-export function Grid(props:GridProps) {
-  const getClassNames = () => {
-    let classNames = 'grid';
-    if (!props.isLoggedIn) {
-      classNames += ' grid--single';
-    }
-    if (props.fixedLeft) {
-      classNames += ' grid--fixed-left';
-    }
-    return classNames;
-  };
+export function Grid(props: GridProps) {
+  const {children, mainContent, sidebarContent, ..._props} = props;
 
-  const getContent = () => {
-    if (props.children) {
-      return props.children;
-    }
-    return (
-      <>
-        {props.left}
-        <div className="grid__right">{ props.right }</div>
-      </>
-    );
-  };
+  /**
+   * Gets the sidebar content.
+   * @return
+   */
+  const getSidebarContent = (): ReactElement => (
+    <>
+      {sidebarContent && <aside className="grid__sidebar">
+        {sidebarContent}
+      </aside>}
+    </>
+  );
+
+  /**
+   * Gets the main content.
+   */
+  const getMainContent = (): ReactElement => (
+    <>
+      {(children || mainContent) && <div className="grid__main">
+        {mainContent}
+        {children}
+      </div>}
+    </>
+  );
 
   return (
-    <div className={getClassNames()}>
-      { getContent() }
+    <div className="grid" {..._props}>
+      {getSidebarContent()}
+      {getMainContent()}
     </div>
   );
 }
