@@ -2,6 +2,7 @@ import React, {ReactElement} from 'react';
 import {iField} from '../../types/field';
 import {iChoice} from '../../types/choice';
 import './Select.scss';
+import {Error} from "./Error";
 
 interface iSelectProps {
   field: iField,
@@ -14,6 +15,7 @@ interface iSelectProps {
  */
 export function Select(props: iSelectProps): ReactElement {
   const {field, ..._props} = props;
+  const required = (typeof field.required === 'undefined') ? true : field.required;
 
   /**
    * Renders the options.
@@ -26,8 +28,11 @@ export function Select(props: iSelectProps): ReactElement {
   };
 
   return (
-    <select className="select" title={field.label} name={field.name} {...field.attrs} {..._props}>
-      {renderOptions()}
-    </select>
+    <>
+      <select className="select" title={field.label} name={field.name} required={required} {...field.attrs} {..._props}>
+        {renderOptions()}
+      </select>
+      {field.errors?.map((error) => <Error key={error}>{error}</Error>)}
+    </>
   )
 }
