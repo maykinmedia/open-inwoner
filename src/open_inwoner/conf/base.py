@@ -136,6 +136,7 @@ INSTALLED_APPS = [
     "django_elasticsearch_dsl",
     # Project applications.
     "open_inwoner.accounts",
+    "open_inwoner.ckeditor",
     "open_inwoner.pdc",
     "open_inwoner.search",
     "open_inwoner.utils",
