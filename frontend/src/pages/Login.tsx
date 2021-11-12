@@ -1,4 +1,5 @@
 import React, {ReactElement, SyntheticEvent, useContext, useState} from 'react';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import {useHistory} from 'react-router-dom';
 import {H1} from '../Components/Typography/H1';
 import {P} from '../Components/Typography/P';
@@ -9,6 +10,7 @@ import {ROUTES} from '../routes/routes';
 import {globalContext} from '../store';
 import {iToken} from '../store/types';
 import {iField} from '../types/field';
+import {iButtonProps} from "../Components/Button/Button";
 
 export default function Login() {
   const {dispatch} = useContext(globalContext);
@@ -16,15 +18,16 @@ export default function Login() {
   const history = useHistory();
 
   /**
-   * Get scalled when the form is submitted, attempts to log in.
+   * Gets called when the form is submitted, attempts to log in.
    * @param {SyntheticEvent} event
    * @param {Object} data
    */
-  const onSubmit = async (event: SyntheticEvent, data: { email: string, password: string }): void => {
+  const onSubmit = async (event: SyntheticEvent, data: { email: string, password: string }): Promise<void> => {
     const {email, password} = data;
     setErrors({});
 
-    event.preventDefault();
+    event.preventDefault()
+    ;
     const token: iToken | void = await login(email, password)
       .catch((err) => {
         const errors = err.response.data;
@@ -40,6 +43,13 @@ export default function Login() {
     await dispatch({type: 'SET_USER', payload: user});
     history.push(ROUTES.HOME.path);
   };
+
+  /**
+   * Returns the additional form actions.
+   */
+  const getActions = (): iButtonProps[] => {
+    return [{children: ROUTES.REGISTER.label, href: ROUTES.REGISTER.path, icon: ArrowForwardIcon, iconPosition: 'after', transparent: true}]
+  }
 
   /**
    * Returns the fields for the form.
@@ -58,7 +68,7 @@ export default function Login() {
     <>
       <H1>Welkom</H1>
       <P>Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</P>
-      <Form fields={getFields()} errors={errors.nonFieldErrors} submitLabel='Inloggen' onSubmit={onSubmit}></Form>
+      <Form actions={getActions()} fields={getFields()} errors={errors.nonFieldErrors} submitLabel='Inloggen' onSubmit={onSubmit}></Form>
     </>
   );
 

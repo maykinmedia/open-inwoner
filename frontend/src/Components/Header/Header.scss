@@ -5,36 +5,55 @@
 .header {
   $hm: max(calc((100vw - var(--container-width)) / 2), var(--spacing-large));
   $vm: var(--spacing-large);
+  box-sizing: border-box;
   display: grid;
-  grid-template-areas: "mtl  actns mtr"
-                       "ml-1 logo  mr-1"
-                       "nav  nav   nav"
-                       "ml-2 bc    mr-2";
-  grid-template-columns: $vm 1fr $vm;
-  grid-template-rows: auto calc(var(--header-height) - var(--row-height)) auto auto;
+  grid-column-gap: var(--gutter-width);
+  padding: 0 $hm;
+  position: relative;
+
+  grid-template-areas: "actns actns actns actns"
+                       "lg    lg    lg    lg"
+                       "nv    nv    nv    nv"
+                       "bc    bc    bc    bc";
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: var(--row-height) calc(var(--header-height) - var(--row-height) * 3) var(--row-height) var(--row-height);
+
 
   @media (min-width: 768px) {
-    grid-template-areas: "ml-1 logo actns mr-1"
-                         "nav  nav  nav   nav"
-                         "ml-2 bc   bc    mr-2";
-    grid-template-columns: $hm 1fr 1fr $hm;
-    grid-template-rows: calc(var(--header-height) - var(--row-height)) auto auto;
-    height: var(--header-height);
+    grid-template-areas: "lg lg lg lg lg lg lg lg actns actns actns"
+                         "nv nv nv nv nv nv nv nv nv    nv    nv"
+                         "bc bc bc bc bc bc bc bc bc    bc    bc";
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: calc(var(--header-height) - var(--row-height) * 2) var(--row-height) var(--row-height);
   }
 
   /// Layout.
 
   .logo {
-    margin: var(--row-height) 0;
-    grid-area: logo
+    grid-area: lg;
+    max-height: var(--row-height);
+
+    @media (min-width: 768px) {
+      margin: var(--row-height) 0;
+    }
   }
 
   &__actions {
+    align-self: center;
     grid-area: actns;
   }
 
   .primary-navigation {
-    grid-area: nav;
+    grid-area: nv;
+
+    @media (min-width: 768px) {
+      grid-area: none;
+      left: 0;
+      bottom: var(--row-height);
+      position: absolute;
+      width: 100%;
+      padding: 0 $hm;
+    }
   }
 
   .breadcrumbs {
@@ -47,13 +66,7 @@
     align-items: center;
     display: flex;
     height: var(--row-height);
-    justify-content: space-between;
-
-    @media (min-width: 768px) {
-      justify-content: flex-end;
-      margin: var(--row-height) 0;
-    }
-
+    justify-content: flex-end;
   }
 
   &__actions &__list {

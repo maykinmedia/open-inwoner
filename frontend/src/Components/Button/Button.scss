@@ -1,11 +1,9 @@
 .button {
   align-items: center;
-  background-color: var(--color-primary);
-  border: 1px solid var(--color-primary);
   border-radius: 3px;
   box-sizing: border-box;
+  color: var(--color-secondary);
   cursor: pointer;
-  color: var(--color-white);
   display: inline-flex;
   font-family: var(--font-family-body);
   font-size: var(--font-size-body);
@@ -22,18 +20,21 @@
     transform: translateY(-1px);
   }
 
-  &--icon#{&}--transparent {
-    padding-left: 0;
-
+  &--icon-before {
     *[class*=icon],
     *[class*=Icon] {
       margin-right: var(--spacing-medium)
     }
   }
 
-  *[class*=icon]:last-child,
-  *[class*=Icon]:last-child {
-    margin-left: var(--spacing-medium)
+  &--icon-after {
+    flex-direction: row-reverse;
+    //padding-right: 0;
+
+    *[class*=icon],
+    *[class*=Icon] {
+      margin-left: var(--spacing-medium)
+    }
   }
 
   &--big {
@@ -58,8 +59,21 @@
 
   &--transparent {
     background-color: transparent;
-    color: var(--color-primary);
     border-color: transparent;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  &--transparent#{&}--icon-before {
+  }
+
+  &--transparent#{&}--icon-after {
+  }
+
+  &--primary {
+    background-color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+    color: var(--color-white);
   }
 }
 

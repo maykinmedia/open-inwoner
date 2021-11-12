@@ -1,7 +1,7 @@
 import React, {ReactElement, SyntheticEvent, useRef} from 'react';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import {iField} from '../../types/field';
-import {Button} from '../Button/Button';
+import {Button, iButtonProps} from '../Button/Button';
 import {Textarea} from './Textarea';
 import {Select} from './Select';
 import {Input} from './Input';
@@ -12,6 +12,7 @@ import {Error} from "./Error";
 
 interface iFormProps {
   action?: string,
+  actions?: iButtonProps[],
   children?: any,
   columns?: number,
   encType?: string
@@ -29,7 +30,7 @@ interface iFormProps {
  * @return {ReactElement}
  */
 export function Form(props: iFormProps): ReactElement {
-  const {action, children, columns, encType, errors, fields, method, submitLabel, onSubmit, ..._props} = props
+  const {action, actions, children, columns, encType, errors, fields, method, submitLabel, onSubmit, ..._props} = props
   const formRef = useRef<HTMLFormElement>(null);
 
   /**
@@ -125,13 +126,15 @@ export function Form(props: iFormProps): ReactElement {
       {renderFormControls()}
 
       <div className="form__actions">
-        <Button size="big" type="submit">{submitLabel}<ArrowForwardIcon/></Button>
+        {actions?.map((action, index) => <Button key={index} {...action}/>)}
+        <Button icon={ArrowForwardIcon} iconPosition="after" primary={true} size="big" type="submit">{submitLabel}</Button>
       </div>
     </form>
   );
 }
 
 Form.defaultProps = {
+  actions: [],
   columns: 1,
   fields: [],
   method: 'GET',

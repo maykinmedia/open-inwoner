@@ -1,13 +1,13 @@
 .grid {
   display: flex;
   flex-direction: column;
+  grid-gap: var(--gutter-width);
   width: 100%;
 
   @media (min-width: 768px) {
     display: grid;
-    grid-gap: var(--gutter-width);
     grid-template-areas: "sb sb sb mn mn mn mn mn mn mn mn mn";
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: repeat(12, 1fr);
     grid-template-rows: 1fr;
   }
 

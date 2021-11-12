@@ -22,7 +22,7 @@ export const Footer = () => {
         <H4>Bezoekadres</H4>
         <P>Stadhuis Spui (stadsdeelkantoor Centrum)<br/>
           Spui 70, 2511 BT Den Haag</P>
-        <Button icon={ArrowForwardIcon} transparent={true}>Bekijk op Google Maps</Button>
+        <Button icon={ArrowForwardIcon} iconPosition='after' transparent={true}>Bekijk op Google Maps</Button>
       </aside>
 
       <aside className="footer__mail">
@@ -41,7 +41,7 @@ export const Footer = () => {
 
       <aside className="footer__newsletter">
         <H4>Meld je aan voor de nieuwsbrief</H4>
-        <Button>Aanmelden</Button>
+        <Button primary={true}>Aanmelden</Button>
       </aside>
 
       <nav className="footer__links">
