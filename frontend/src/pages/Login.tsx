@@ -26,8 +26,8 @@ export default function Login() {
     const {email, password} = data;
     setErrors({});
 
-    event.preventDefault()
-    ;
+    event.preventDefault();
+
     const token: iToken | void = await login(email, password)
       .catch((err) => {
         const errors = err.response.data;
@@ -56,7 +56,7 @@ export default function Login() {
    * @return {iField[]}
    */
   const getFields = (): iField[] => [
-    {errors: errors.email || [], label: 'E-mail', name: 'email', type: 'text'},
+    {errors: errors.email || [], label: 'E-mail', name: 'email', type: 'email'},
     {label: 'Wachtwoord', name: 'password', type: 'password'},
   ];
 

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { iToken } from '../store/types';
+import {iToken, iUser} from '../store/types';
 import {iCategory} from "../types/pdc";
 
 export const logout = async () => {
@@ -37,7 +37,7 @@ export const registerUser = async (email?: string, password1?: string, password2
   }).catch((err) => {
     throw err;
   });
-  return res.data;
+  return res.data as iToken;
 };
 
 export const getProduct = async (slug: string) => {
