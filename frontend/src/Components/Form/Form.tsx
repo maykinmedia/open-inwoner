@@ -1,4 +1,4 @@
-import React, {ReactElement} from 'react';
+import React, {ReactElement, SyntheticEvent, useRef} from 'react';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import {iField} from '../../types/field';
 import {Button} from '../Button/Button';
@@ -7,15 +7,19 @@ import {Select} from './Select';
 import {Input} from './Input';
 import {Label} from './Label';
 import './Form.scss';
+import {Error} from "./Error";
+
 
 interface iFormProps {
   action?: string,
   children?: any,
-  columns: number,
+  columns?: number,
   encType?: string
+  errors?: string[],
   fields?: iField[],
   method?: string,
   submitLabel?: string,
+  onSubmit?: Function,
 }
 
 
@@ -25,7 +29,43 @@ interface iFormProps {
  * @return {ReactElement}
  */
 export function Form(props: iFormProps): ReactElement {
-  const {action, children, columns, encType, fields, method, submitLabel, ..._props} = props
+  const {action, children, columns, encType, errors, fields, method, submitLabel, onSubmit, ..._props} = props
+  const formRef = useRef<HTMLFormElement>(null);
+
+  /**
+   * Handles the form submit.
+   * @param event
+   */
+  const handleSubmit = (event: SyntheticEvent): void => {
+    if (!onSubmit || !formRef.current) {
+      return;
+    }
+
+    const data = serializeForm(formRef.current);
+    onSubmit(event, data);
+  }
+
+  /**
+   * Serializes form.
+   * @param {HTMLFormElement} form
+   * @return {Object}
+   */
+  const serializeForm = (form: HTMLFormElement): {[index: string]: any} => {
+    const formData = new FormData(form);
+    return [...formData].reduce((acc: { [index: string]: any }, [key, value]) => {
+      if (!Reflect.has(acc, key)) {
+        acc[key] = value;
+        return acc;
+      }
+
+      if (!Array.isArray(acc[key])) {
+        acc[key] = [acc[key]];
+        return acc;
+      }
+      acc[key].push(value);
+      return acc;
+    }, {});
+  }
 
   /**
    * Renders form controls.
@@ -77,8 +117,11 @@ export function Form(props: iFormProps): ReactElement {
   }
 
   return (
-    <form className={`form form--columns-${columns}`} action={action} encType={encType} method={method} {..._props}>
+    <form ref={formRef} className={`form form--columns-${columns}`} action={action} encType={encType} method={method} onSubmit={handleSubmit} {..._props}>
       {children}
+
+      {errors?.map((error) => <Error key={error}>{error}</Error>)}
+
       {renderFormControls()}
 
       <div className="form__actions">
