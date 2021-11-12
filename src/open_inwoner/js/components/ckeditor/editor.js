@@ -12,8 +12,10 @@ import List from '@ckeditor/ckeditor5-list/src/list';
 import Markdown from '@ckeditor/ckeditor5-markdown-gfm/src/markdown';
 import Image from '@ckeditor/ckeditor5-image/src/image';
 import ImageUpload from '@ckeditor/ckeditor5-image/src/imageupload';
+import ImageStyle from '@ckeditor/ckeditor5-image/src/imagestyle';
 import ImageToolbar from '@ckeditor/ckeditor5-image/src/imagetoolbar';
 import ImageCaption from '@ckeditor/ckeditor5-image/src/imagecaption';
+import FilerImageAdapterPlugin from "./plugins/filer/plugin";
 
 export default class ClassicEditor extends ClassicEditorBase {}
 
@@ -34,6 +36,8 @@ ClassicEditor.builtinPlugins = [
     ImageUpload,
     ImageToolbar,
     ImageCaption,
+    ImageStyle,
+    FilerImageAdapterPlugin,
 ];
 
 // Editor configuration.
@@ -58,21 +62,28 @@ ClassicEditor.defaultConfig = {
             'undo',
             'redo'
         ],
-        image: {toolbar: ['toggleImageCaption', 'imageTextAlternative']}
-    }
+    },
+    image: {
+        toolbar: [
+            'imageStyle:inline',
+            'imageStyle:block',
+            'imageStyle:side',
+            '|',
+            'toggleImageCaption',
+            'imageTextAlternative'
+        ]
+    },
 };
 
 
-const getEditor = (node) => {
+export const getEditor = (node) => {
     ClassicEditor
         .create(node)
         .then(editor => {
             console.log('Editor was initialized', editor);
         })
         .catch(error => {
+            console.log(error);
             console.error(error.stack);
         });
 };
-
-
-export {getEditor};
