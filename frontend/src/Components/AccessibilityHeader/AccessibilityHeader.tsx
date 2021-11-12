@@ -101,7 +101,7 @@ export function AccessibilityHeader(): ReactElement {
 
         <li className="accessibility-header__list-item">
           <Link to="#" icon={(previousFontSize) ? ZoomOutOutlinedIcon : ZoomInOutlinedIcon} onClick={zoom}>
-            Vergroten
+            {(previousFontSize) ? 'Verkleinen' : 'Vergroten'}
           </Link>
         </li>
 
