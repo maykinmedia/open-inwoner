@@ -19,20 +19,28 @@ from .models import (
     Tag,
     TagType,
 )
-from .resources import CategoryResource, ProductResource
+from .resources import (
+    CategoryExportResource,
+    CategoryImportResource,
+    ProductExportResource,
+    ProductImportResource,
+)
 from .widgets import CKEditorWidget
 
 
 @admin.register(Category)
 class CategoryAdmin(ImportExportMixin, TreeAdmin):
-    change_list_template = "admin/category_admintools.html"
     form = movenodeform_factory(Category, fields="__all__")
     prepopulated_fields = {"slug": ("name",)}
     search_fields = ("name",)
     ordering = ("path",)
 
-    # import-export resource
-    resource_class = CategoryResource
+    # import-export
+    change_list_template = "admin/category_change_list.html"
+    resource_class = CategoryImportResource
+
+    def get_export_resource_class(self):
+        return CategoryExportResource
 
 
 class ProductLinkInline(admin.TabularInline):
@@ -70,8 +78,12 @@ class ProductAdmin(ImportExportMixin, admin.ModelAdmin):
     form = ProductAdminForm
     inlines = (ProductLinkInline, ProductLocationInline, ProductContactInline)
 
-    # import-export resource
-    resource_class = ProductResource
+    # import-export
+    resource_class = ProductImportResource
+    import_template_name = "admin/product_import.html"
+
+    def get_export_resource_class(self):
+        return ProductExportResource
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
