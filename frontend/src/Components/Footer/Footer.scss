@@ -6,41 +6,31 @@
   $hm: max(calc((100vw - var(--container-width)) / 2), var(--spacing-large));
   $vm: var(--row-height);
   background-color: var(--color-gray-light);
+  box-sizing: border-box;
   display: grid;
-
-  grid-template-areas: "mtl mt   mt   mt   mtr"
-                       "ml  logo logo logo mr"
-                       "ml  vs1  vs1  vs1  mr"
-                       "ml  vstr vstr vstr mr"
-                       "ml  vs2  vs2  vs2  mr"
-                       "ml  mail mail mail mr"
-                       "ml  vs3  vs3  vs3  mr"
-                       "ml  scl  scl  scl  mr"
-                       "ml  vs4  vs4  vs4  mr"
-                       "ml  nws  nws  nws  mr"
-                       "ml  vs5  vs5  vs5  mr"
-                       "ml  lnks lnks lnks mr"
-                       "mbl mb   mb   mb   mbr";
-  grid-template-columns: $hm 6fr 3fr 3fr $hm;
-  grid-template-rows: $vm $vm $vm auto $vm auto $vm auto $vm auto $vm auto $vm;
-
+  grid-gap: var(--gutter-width);
+  grid-template-areas: "lg   lg   lg   lg"
+                       "vstr vstr vstr vstr"
+                       "ml   ml   ml   ml"
+                       "scl  scl  scl  scl"
+                       "nws  nws  nws  nws"
+                       "lnks lnks lnks lnks";
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: var(--row-height);
+  padding: $vm $hm;
 
   @media (min-width: 768px) {
-    grid-template-areas: "mtl mt   mt   mt   mtr"
-                         "ml  logo logo logo mr"
-                         "ml  vs1  vs1  vs1  mr"
-                         "ml  vstr scl  lnks mr"
-                         "ml  vs2  vs2  lnks mr"
-                         "ml  mail nws  lnks mr"
-                         "mbl mb   mb   mb   mbr";
-    grid-template-columns: $hm 6fr 3fr 3fr $hm;
-    grid-template-rows: $vm $vm $vm auto $vm auto $vm;
+    grid-template-areas: "lg   lg   lg   lg   lg  lg  lg  lg  lg   lg   lg lg"
+                         "vstr vstr vstr vstr scl scl scl scl scl lnks lnks lnks"
+                         "ml   ml   ml   ml   nws nws nws nws nws lnks lnks lnks";
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: var(--row-height);
   }
 
   /// Layout.
 
   .logo {
-    grid-area: logo;
+    grid-area: lg;
   }
 
   &__visitor {
@@ -48,7 +38,7 @@
   }
 
   &__mail {
-    grid-area: mail;
+    grid-area: ml;
   }
 
   &__social {

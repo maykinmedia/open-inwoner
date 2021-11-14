@@ -11,21 +11,25 @@
   line-height: var(--font-line-height-body);
   text-decoration: none;
 
-  &--active,
-  &--primary,
-  &:active,
-  &:focus,
-  &:hover {
+  &--primary {
     color: var(--color-primary);
   }
 
-  &--active {
-    text-decoration: underline;
+  &--secondary {
+    color: var(--color-secondary);
   }
 
+  &--active {
+    font-weight: bold;
+  }
+
+  &:active,
+  &:focus,
   &:hover {
     text-decoration: underline;
   }
+
+
 
   *[class*=icon]:first-child,
   *[class*=Icon]:first-child {

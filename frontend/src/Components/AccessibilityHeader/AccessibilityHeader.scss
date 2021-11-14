@@ -1,15 +1,8 @@
 .accessibility-header {
   $hm: max(calc((100vw - var(--container-width)) / 2), var(--spacing-large));
   background-color: var(--color-accent);
-  display: grid;
-  grid-template-areas: "ml-1 lst mr-1";
-  grid-template-columns: $hm 1fr $hm;
-
-  /// Layout.
-
-  &__list {
-    grid-area: lst;
-  }
+  box-sizing: border-box;
+  padding: 0 $hm;
 
   /// List.
 

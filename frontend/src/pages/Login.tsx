@@ -1,80 +1,78 @@
-import React, {
-  useContext, useState,
-} from 'react';
-import { Redirect } from 'react-router-dom';
-
-import { Input } from '../Components/Form/Input';
-import { Label } from '../Components/Form/Label';
-import { Fieldset } from '../Components/Form/Fieldset';
-import { Button } from '../Components/Button/Button';
-import { Direction } from '../types/direction';
-import { globalContext } from '../store';
-import { login, getUser } from '../api/calls';
+import React, {ReactElement, SyntheticEvent, useContext, useState} from 'react';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import {useHistory} from 'react-router-dom';
+import {H1} from '../Components/Typography/H1';
+import {P} from '../Components/Typography/P';
+import {Form} from '../Components/Form/Form';
+import {Grid} from '../Components/Container/Grid';
+import {login, getUser} from '../api/calls';
+import {ROUTES} from '../routes/routes';
+import {globalContext} from '../store';
+import {iToken} from '../store/types';
+import {iField} from '../types/field';
+import {iButtonProps} from "../Components/Button/Button";
 
 export default function Login() {
-  const { dispatch } = useContext(globalContext);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loggedIn, setLoggedIn] = useState(false);
-  const [errors, setErrors] = useState([]);
+  const {dispatch} = useContext(globalContext);
+  const [errors, setErrors] = useState<{ email?: string[], password?: string[], nonFieldErrors?: string[] }>({});
+  const history = useHistory();
 
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
-    const token = await login(email, password).catch((err) => {
-      setErrors(err.response.data);
-      throw err;
-    });
-    if (token) {
-      await dispatch({ type: 'SET_TOKEN', payload: token });
-      const user = await getUser(token);
-      await dispatch({ type: 'SET_USER', payload: user });
-      setLoggedIn(true); // Setting the state to redirect after login
+  /**
+   * Gets called when the form is submitted, attempts to log in.
+   * @param {SyntheticEvent} event
+   * @param {Object} data
+   */
+  const onSubmit = async (event: SyntheticEvent, data: { email: string, password: string }): Promise<void> => {
+    const {email, password} = data;
+    setErrors({});
+
+    event.preventDefault();
+
+    const token: iToken | void = await login(email, password)
+      .catch((err) => {
+        const errors = err.response.data;
+        setErrors(errors)
+      })
+
+    if (!token) {
+      return;
     }
+
+    await dispatch({type: 'SET_TOKEN', payload: token});
+    const user = await getUser(token);
+    await dispatch({type: 'SET_USER', payload: user});
+    history.push(ROUTES.HOME.path);
   };
 
-  function handleEmailChange(event: React.ChangeEvent<HTMLInputElement>) {
-    setEmail(event.currentTarget.value);
+  /**
+   * Returns the additional form actions.
+   */
+  const getActions = (): iButtonProps[] => {
+    return [{children: ROUTES.REGISTER.label, href: ROUTES.REGISTER.path, icon: ArrowForwardIcon, iconPosition: 'after', transparent: true}]
   }
 
-  function handlePasswordChange(event: React.ChangeEvent<HTMLInputElement>) {
-    setPassword(event.currentTarget.value);
-  }
+  /**
+   * Returns the fields for the form.
+   * @return {iField[]}
+   */
+  const getFields = (): iField[] => [
+    {errors: errors.email || [], label: 'E-mail', name: 'email', type: 'email'},
+    {label: 'Wachtwoord', name: 'password', type: 'password'},
+  ];
 
-  if (loggedIn) {
-    return <Redirect to="/themas" />;
-  }
-  return (
+  /**
+   * Returns the main content.
+   * @return {ReactElement}
+   */
+  const getMainContent = (): ReactElement => (
     <>
-      <div className="login">
-        <h1>Login</h1>
-        <form action="" onSubmit={handleSubmit}>
-          { errors }
-          <Fieldset direction={Direction.Vertical}>
-            <Label for="email">Emailadres</Label>
-            <Input
-              type="email"
-              name="email"
-              required
-              value={email}
-              changeAction={handleEmailChange}
-            />
-          </Fieldset>
-          <Fieldset direction={Direction.Vertical}>
-            <Label for="password">Wachtwoord</Label>
-            <Input
-              type="password"
-              name="password"
-              required
-              value={password}
-              changeAction={handlePasswordChange}
-            />
-          </Fieldset>
-          <Fieldset direction={Direction.Horizontal}>
-            <Button type="submit">Login</Button>
-            <Button href={`${import.meta.env.VITE_API_URL}/digid/login/`} open>Login met Digid</Button>
-          </Fieldset>
-        </form>
-      </div>
+      <H1>Welkom</H1>
+      <P>Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</P>
+      <Form actions={getActions()} fields={getFields()} errors={errors.nonFieldErrors} submitLabel='Inloggen' onSubmit={onSubmit}></Form>
     </>
+  );
+
+  return (
+    <Grid isLoggedIn mainContent={getMainContent()}/>
   );
 }

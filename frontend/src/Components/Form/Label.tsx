@@ -1,18 +1,22 @@
-import React from 'react';
+import React, {ReactElement} from 'react';
 import './Label.scss';
 
-interface LabelProps {
-    for: string,
-    children?: any
+interface iLabelProps {
+  htmlFor?: string,
+  children?: any
 }
 
-export function Label(props:LabelProps) {
+/**
+ * Renders a label.
+ * @param {iLabelProps} props
+ * @return {ReactElement}
+ */
+export function Label(props: iLabelProps): ReactElement {
+  const {children, htmlFor, ..._props} = props
+
   return (
-    <label
-      className="label"
-      htmlFor={`id_${props.for}`}
-    >
-      { props.children }
+    <label className="label" htmlFor={htmlFor} {..._props}>
+      {children}
     </label>
   );
 }
