@@ -50,7 +50,7 @@ export default function ProductDetail() {
   const getFooter = () => (
     <>
       <Divider />
-      <Grid isLoggedIn fixedLeft={false}>
+      <Grid isLoggedIn>
         <Links id="links" links={product?.links} />
         <div>
           <Related id="see" related={product?.relatedProducts} />
@@ -60,10 +60,10 @@ export default function ProductDetail() {
     </>
   );
 
-  const getLeft = () => (
+  const getSidebarContent = () => (
     <AnchorMenu />
   );
-  const getRight = () => (
+  const getMainContent = () => (
     <>
       <div className="product">
         <h1 id="title">{product?.name}</h1>
@@ -77,6 +77,6 @@ export default function ProductDetail() {
   );
 
   return (
-    <Grid isLoggedIn fixedLeft left={getLeft()} right={getRight()} />
+    <Grid isLoggedIn sidebarContent={getSidebarContent()} mainContent={getMainContent()} />
   );
 }

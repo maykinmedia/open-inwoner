@@ -12,6 +12,7 @@ interface iRouteLinkProps {
   children?: any
   icon?: ComponentType,
   primary?: boolean,
+  secondary?: boolean,
   shouldRenderIcon?: boolean,
   onClick?: Function,
 }

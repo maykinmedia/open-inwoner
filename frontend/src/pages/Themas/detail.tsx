@@ -27,6 +27,6 @@ export default function ThemaDetail() {
   );
 
   return (
-    <Grid right={getRight()} isLoggedIn={false} />
+    <Grid mainContent={getRight()} isLoggedIn={false} />
   );
 }
