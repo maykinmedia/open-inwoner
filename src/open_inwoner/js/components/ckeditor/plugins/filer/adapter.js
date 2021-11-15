@@ -59,9 +59,10 @@ export default class FilerImageAdapter {
     }
 
     _sendRequest( file ) {
+        this.xhr.withCredentials = true;
+
         // Prepare the form data.
         const data = new FormData();
-
         data.append( 'upload', file );
 
         // add csrf token to the headers

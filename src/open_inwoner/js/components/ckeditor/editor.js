@@ -71,7 +71,10 @@ ClassicEditor.defaultConfig = {
             '|',
             'toggleImageCaption',
             'imageTextAlternative'
-        ]
+        ],
+        upload: {
+            types: ['jpeg', 'png', 'gif']
+        }
     },
 };
 
