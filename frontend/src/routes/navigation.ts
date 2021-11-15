@@ -9,7 +9,11 @@ import {ROUTES} from './routes';
  * @return {Promise}
  */
 const getThemeNavigation = async () => {
-  const categories = await getCategories();
+  const categories = await getCategories().catch((error) => {
+    // Catch the error so ti does not cause problems.
+    console.error(error);
+    return [];
+  });
   return categories.map((category: iCategory): iMenuItem => ({
     label: category.name,
     route: ROUTES.CATEGORY,
@@ -21,8 +25,9 @@ const getThemeNavigation = async () => {
  * The main navigation.
  */
 export const NAVIGATION: iMenuItem[] = [
-  {route: ROUTES.HOME},
-  {route: ROUTES.CATEGORIES, children: getThemeNavigation},
-  {route: ROUTES.PROFILE},
-  {route: ROUTES.INBOX},
+  { route: ROUTES.HOME },
+  { route: ROUTES.CATEGORIES, children: getThemeNavigation },
+  { route: ROUTES.PROFILE },
+  { route: ROUTES.INBOX },
+  { route: ROUTES.SEARCH },
 ]

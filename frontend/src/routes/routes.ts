@@ -6,7 +6,7 @@ import InboxOutlinedIcon from "@mui/icons-material/InboxOutlined";
 import Home from "../pages/Home";
 import {iRoute} from "../types/route";
 import NotFoundPage from "../pages/NotFound";
-import About from "../pages/About";
+import Search from "../pages/Search";
 import ProductDetail from "../pages/Product/detail";
 import ThemeDetail from "../pages/Themas/detail";
 import Themas from "../pages/Themas";
@@ -93,12 +93,12 @@ export const ROUTES: { [index: string]: iRoute } = {
     exact: true,
     loginRequired: false,
   },
-  ABOUT: {
-    component: About,
-    label: 'Over',
-    path: '/about',
+  SEARCH: {
+    component: Search,
+    label: 'Zoeken',
+    path: '/search',
     exact: true,
-    loginRequired: true,
+    loginRequired: false,
   },
   NOTFOUND: {
     component: NotFoundPage,

@@ -1,6 +1,6 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
-import './logo.scss';
+import './Logo.scss';
 
 interface LogoProps {
   alt?: string,
