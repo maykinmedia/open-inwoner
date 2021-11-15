@@ -4,28 +4,51 @@ from django.utils.translation import ugettext_lazy as _
 
 from import_export import fields, resources
 from import_export.instance_loaders import CachedInstanceLoader
-from import_export.widgets import ManyToManyWidget
 
 from ..models import Category, Organization, Product, Tag
+from .widgets import ValidatedManyToManyWidget
 
 
 class CategoryImportResource(resources.ModelResource):
     class Meta:
         model = Category
+        instance_loader_class = CachedInstanceLoader
+        clean_model_instances = True
         import_id_fields = ("slug",)
+        fields = ("name", "slug", "description")
 
+    def before_import(self, dataset, using_transactions, dry_run, **kwargs):
+        # Validate that file contains all the headers
+        missing_headers = set(self.get_diff_headers()) - set(dataset.headers)
+        if missing_headers:
+            missing_headers = ",\n".join(missing_headers)
+            raise ValidationError(_(f"Missing required headers: {missing_headers}"))
 
-class ValidatedManyToManyWidget(ManyToManyWidget):
-    def clean(self, value, row=None, *args, **kwargs):
-        if self.model.__name__ == "Category" and value == "":
-            raise ValidationError("The field categories is required")
+        return super().before_import(dataset, using_transactions, dry_run, **kwargs)
 
-        qs = super().clean(value, row=row, *args, **kwargs)
-        if not qs and value != "":
-            raise ValidationError(
-                _(f"The {self.model.__name__.lower()} you entered does not exist")
-            )
-        return qs
+    def get_or_init_instance(self, instance_loader, row):
+        # Add slug field when a new row has to be created
+        if not row.get("slug") and row.get("name"):
+            row["slug"] = slugify(row["name"])
+        return super().get_or_init_instance(instance_loader, row)
+
+    def validate_instance(
+        self, instance, import_validation_errors=None, validate_unique=True
+    ):
+        last_root = Category.get_last_root_node()
+        if last_root:
+            # Add the new root node as the last one
+            newpath = last_root._inc_path()
+        else:
+            # Add the first root node
+            newpath = Category._get_path(None, 1, 1)
+        instance.depth = 1
+        instance.path = newpath
+        return super().validate_instance(
+            instance,
+            import_validation_errors=import_validation_errors,
+            validate_unique=validate_unique,
+        )
 
 
 class ProductImportResource(resources.ModelResource):
@@ -73,7 +96,7 @@ class ProductImportResource(resources.ModelResource):
         missing_headers = set(self.get_diff_headers()) - set(dataset.headers)
         if missing_headers:
             missing_headers = ",\n".join(missing_headers)
-            raise ValidationError(f"Missing required headers: {missing_headers}")
+            raise ValidationError(_(f"Missing required headers: {missing_headers}"))
 
         return super().before_import(dataset, using_transactions, dry_run, **kwargs)
 

@@ -6,9 +6,14 @@ from ..models import Category, Organization, Product, Tag
 
 
 class CategoryExportResource(resources.ModelResource):
+    name = fields.Field(column_name="Name of category", attribute="name")
+    slug = fields.Field(column_name="Slug", attribute="slug")
+    description = fields.Field(column_name="Description", attribute="description")
+
     class Meta:
         model = Category
         import_id_fields = ("slug",)
+        fields = ("name", "slug", "description")
 
 
 class ProductExportResource(resources.ModelResource):
@@ -47,7 +52,6 @@ class ProductExportResource(resources.ModelResource):
 
     class Meta:
         model = Product
-        instance_loader_class = CachedInstanceLoader
         fields = (
             "name",
             "slug",

@@ -37,6 +37,7 @@ class CategoryAdmin(ImportExportMixin, TreeAdmin):
 
     # import-export
     change_list_template = "admin/category_change_list.html"
+    import_template_name = "admin/category_import.html"
     resource_class = CategoryImportResource
 
     def get_export_resource_class(self):

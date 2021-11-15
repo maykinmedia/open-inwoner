@@ -1,0 +1,8 @@
+{# Used for category import specifications  #}
+{% extends "admin/import_export/import.html" %}
+{% load static %}
+
+{% block content %}
+  Download an example of <a href="{% static 'pdc/category_file_example.csv' %}" download>csv</a> or <a href="{% static 'pdc/category_file_example.xls' %}" download>excel</a> structure
+  {{ block.super }}
+{% endblock %}
