@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {iToken, iUser} from '../store/types';
+import iToken from '../store/types';
 import {iCategory} from "../types/pdc";
 
 export const logout = async () => {
