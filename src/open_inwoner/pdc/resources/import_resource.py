@@ -68,6 +68,15 @@ class ProductImportResource(resources.ModelResource):
             "organizations",
         )
 
+    def before_import(self, dataset, using_transactions, dry_run, **kwargs):
+        # Validate that file contains all the headers
+        missing_headers = set(self.get_diff_headers()) - set(dataset.headers)
+        if missing_headers:
+            missing_headers = ",\n".join(missing_headers)
+            raise ValidationError(f"Missing required headers: {missing_headers}")
+
+        return super().before_import(dataset, using_transactions, dry_run, **kwargs)
+
     def get_or_init_instance(self, instance_loader, row):
         # Add slug field when a new row has to be created
         if not row.get("slug") and row.get("name"):
