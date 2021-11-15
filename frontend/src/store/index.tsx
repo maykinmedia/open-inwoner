@@ -2,7 +2,7 @@ import React, {
   createContext, ReactElement, ReactNode, useEffect, useReducer, useRef,
 } from 'react';
 import Reducer from './reducer';
-import { ContextType, GlobalStateInterface } from './types';
+import { iContextType, iGlobalStateInterface } from './types';
 
 /**
  * React Context-based Global Store with a reducer
@@ -23,9 +23,9 @@ export function GlobalStore({ children }: { children: ReactNode }): ReactElement
   return <globalContext.Provider value={{ globalState, dispatch }}>{children}</globalContext.Provider>;
 }
 
-export const globalContext = createContext({} as ContextType);
+export const globalContext = createContext({} as iContextType);
 
-export const initialState: GlobalStateInterface = {
+export const initialState: iGlobalStateInterface = {
   token: null,
   user: null,
   error: null,

@@ -1,0 +1,15 @@
+.p {
+  color: var(--font-color-body);
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-body);
+  line-height: var(--font-line-height-body);
+  margin: 0;
+}
+
+.h1 + .p {
+  margin-top: var(--font-l);
+}
+
+.p + .p {
+  margin-top: var(--font-line-height-body);
+}

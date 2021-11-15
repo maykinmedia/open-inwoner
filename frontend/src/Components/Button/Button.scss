@@ -1,23 +1,49 @@
 .button {
-  box-sizing: border-box;
+  align-items: center;
   border-radius: 3px;
-  background-color: var(--color-primary);
-  border: 1px solid var(--color-primary);
-  padding: 8px 16px;
-  color: var(--color-white);
-  font-family: "TheSans C5";
-  font-size: 16px;
+  box-sizing: border-box;
+  color: var(--color-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-body);
   letter-spacing: 0;
-  line-height: 24px;
+  line-height: var(--font-line-height-body);
+  padding: var(--spacing-medium) var(--spacing-large);
   text-align: center;
   text-decoration: none;
-  cursor: pointer;
   transition: transform 300ms, background-color 300ms;
 
+  &:focus,
   &:hover {
-    background-color: darken(#476db7, 5);
+    filter: brightness(80%);
     transform: translateY(-1px);
-    border-color: darken(#476db7, 5);
+  }
+
+  &--icon-before {
+    *[class*=icon],
+    *[class*=Icon] {
+      margin-right: var(--spacing-medium)
+    }
+  }
+
+  &--icon-after {
+    flex-direction: row-reverse;
+    //padding-right: 0;
+
+    *[class*=icon],
+    *[class*=Icon] {
+      margin-left: var(--spacing-medium)
+    }
+  }
+
+  &--big {
+    height: var(--row-height-big);
+
+    @media (max-width: 767px) {
+      width: 100%;
+      justify-content: space-between;
+    }
   }
 
   &--open {
@@ -25,22 +51,33 @@
     color: var(--color-primary);
     border-color: transparent;
 
+    &:focus,
     &:hover {
-      background-color: transparent;
-      color: darken(#476db7, 5);
-      border-color: darken(#476db7, 5);
+      border-color: var(--color-primary);
     }
   }
 
   &--transparent {
     background-color: transparent;
-    color: var(--color-primary);
     border-color: transparent;
-
-    &:hover {
-      background-color: transparent;
-      color: darken(#476db7, 5);
-      border-color: transparent;
-    }
+    padding-left: 0;
+    padding-right: 0;
   }
+
+  &--transparent#{&}--icon-before {
+  }
+
+  &--transparent#{&}--icon-after {
+  }
+
+  &--primary {
+    background-color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+    color: var(--color-white);
+  }
+}
+
+.h4 + .button,
+.p + .button {
+  margin-top: var(--spacing-large)
 }
