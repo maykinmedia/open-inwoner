@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from filer.fields.file import FilerFileField
 from filer.fields.image import FilerImageField
 from treebeard.mp_tree import MP_Node
 
@@ -164,6 +165,28 @@ class Tag(models.Model):
         return self.name
 
 
+class ProductFile(models.Model):
+    product = models.ForeignKey(
+        "pdc.Product",
+        related_name="files",
+        on_delete=models.CASCADE,
+        help_text=_("Related product"),
+    )
+    file = FilerFileField(
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="product_files",
+    )
+
+    class Meta:
+        verbose_name = _("product file")
+        verbose_name_plural = _("product files")
+
+    def __str__(self):
+        return self.file.name
+
+
 class ProductLink(models.Model):
     product = models.ForeignKey(
         "pdc.Product",
@@ -183,6 +206,13 @@ class ProductLink(models.Model):
 
 
 class ProductLocation(GeoModel):
+    name = models.CharField(
+        _("name"),
+        max_length=100,
+        help_text=_("Location name"),
+        blank=True,
+        null=True,
+    )
     product = models.ForeignKey(
         "pdc.Product",
         related_name="locations",

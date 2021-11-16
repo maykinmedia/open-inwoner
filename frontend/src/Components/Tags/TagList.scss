@@ -1,4 +1,13 @@
 .tag-list {
-  display: flex;
-  gap: 16px;
+  &__list {
+    display: flex;
+    gap: var(--spacing-large);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+*[class^=h] + .tag-list {
+  margin-top: var(--spacing-large);
 }

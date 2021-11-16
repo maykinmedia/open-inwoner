@@ -1,13 +1,22 @@
-import React from 'react';
+import React, {ReactElement} from 'react';
+import {iTag} from '../../types/pdc';
 import './Tag.scss';
 
-interface TagProps {
-    key?: string
-    children?: any,
+
+interface iTagProps {
+  tag: iTag
 }
 
-export function Tag(props:TagProps) {
+
+/**
+ * Renders a tag.
+ * @param {iTagProps} props
+ * @return {ReactElement}
+ */
+export function Tag(props: iTagProps): ReactElement {
+  const {tag, ..._props} = props;
+
   return (
-    <div className="tag">{props.children}</div>
+    <span className="tag" {..._props}>{tag.name}</span>
   );
 }
