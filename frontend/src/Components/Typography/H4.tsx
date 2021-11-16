@@ -1,4 +1,4 @@
-import 'react';
+import React from 'react';
 import './H4.scss';
 import {iHeadingProps} from './iHeadingProps';
 
