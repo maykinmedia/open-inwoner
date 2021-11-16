@@ -8,12 +8,6 @@ class CategoryExportResource(resources.ModelResource):
     name = fields.Field(column_name="Name of category", attribute="name")
     slug = fields.Field(column_name="Slug", attribute="slug")
     description = fields.Field(column_name="Description", attribute="description")
-    created_on = fields.Field(
-        column_name="Date of category creation", attribute="created_on"
-    )
-    updated_on = fields.Field(
-        column_name="Date of category update", attribute="updated_on"
-    )
 
     class Meta:
         model = Category
@@ -22,15 +16,11 @@ class CategoryExportResource(resources.ModelResource):
             "name",
             "slug",
             "description",
-            "created_on",
-            "updated_on",
         )
         export_order = (
             "name",
             "slug",
             "description",
-            "created_on",
-            "updated_on",
         )
 
 
