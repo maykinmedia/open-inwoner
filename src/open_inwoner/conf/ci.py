@@ -28,6 +28,3 @@ CACHES = {
 }
 
 ELASTIC_APM["DEBUG"] = True
-
-# Directory for testing media files
-TEST_PRIVATE_MEDIA_ROOT = os.path.join(BASE_DIR, "test_private_media")

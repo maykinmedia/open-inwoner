@@ -38,7 +38,18 @@ class SearchListTests(ESMixin, APITestCase):
         )
 
     def test_search_list_without_query_param(self):
+        """empty search will return all the results in order to use facets on them"""
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.json(), [])
+        self.assertEqual(
+            response.json(),
+            [
+                {
+                    "name": "Some product",
+                    "slug": self.product.slug,
+                    "summary": self.product.summary,
+                    "content": self.product.content,
+                }
+            ],
+        )
