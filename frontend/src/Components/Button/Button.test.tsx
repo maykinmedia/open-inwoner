@@ -2,7 +2,7 @@ import React from 'react';
 import renderer from 'react-test-renderer';
 import { Button } from './Button';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import { Router } from 'react-router-dom';
+// import { Router } from 'react-router-dom';
 
 test('Render button', () => {
   const component = renderer.create(
