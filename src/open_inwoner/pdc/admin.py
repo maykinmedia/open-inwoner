@@ -6,6 +6,8 @@ from leaflet.admin import LeafletGeoAdmin
 from treebeard.admin import TreeAdmin
 from treebeard.forms import movenodeform_factory
 
+from open_inwoner.ckeditor.widgets import CKEditorWidget
+
 from .models import (
     Category,
     Neighbourhood,
@@ -18,7 +20,6 @@ from .models import (
     Tag,
     TagType,
 )
-from .widgets import CKEditorWidget
 
 
 @admin.register(Category)
