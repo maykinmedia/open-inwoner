@@ -21,14 +21,11 @@ jobs:
         with:
           node-version: '14'
 
-      - name: Go to frontend
-        run: |
-          cd frontend
       - name: Install dependencies
         run: |
-          npm install
+          cd frontend/ && npm install
       - name: Run tests
         run: |
-          npm test
+          cd frontend/ && npm test
       - name: Publish coverage report
         uses: codecov/codecov-action@v1
