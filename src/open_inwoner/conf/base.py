@@ -137,6 +137,7 @@ INSTALLED_APPS = [
     "import_export",
     # Project applications.
     "open_inwoner.accounts",
+    "open_inwoner.ckeditor",
     "open_inwoner.pdc",
     "open_inwoner.search",
     "open_inwoner.utils",
@@ -475,6 +476,7 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0.0",
     # OTHER SETTINGS
     "COMPONENT_NO_READ_ONLY_REQUIRED": True,
+    "SERVE_INCLUDE_SCHEMA": False,
     "POSTPROCESSING_HOOKS": [
         "drf_spectacular.hooks.postprocess_schema_enums",
         "drf_spectacular.contrib.djangorestframework_camel_case.camelize_serializer_fields",
