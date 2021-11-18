@@ -5,7 +5,7 @@
 .footer {
   $hm: max(calc((100vw - var(--container-width)) / 2), var(--spacing-large));
   $vm: var(--row-height);
-  background-color: var(--color-gray-light);
+  background-color: var(--color-gray-lightest);
   box-sizing: border-box;
   display: grid;
   grid-gap: var(--gutter-width);

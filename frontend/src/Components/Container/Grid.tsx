@@ -2,7 +2,6 @@ import React, {ReactElement} from 'react';
 import './Grid.scss';
 
 interface GridProps {
-  isLoggedIn: boolean,
   children?: any,
   mainContent?: ReactElement,
   sidebarContent?: ReactElement,

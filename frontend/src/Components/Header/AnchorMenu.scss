@@ -15,7 +15,7 @@
     padding: 10px 18px;
     display: block;
     color: #000000;
-    font-family: "TheSans C5";
+    font-family: var(--font-family-body);
     font-size: 16px;
     letter-spacing: 0;
     line-height: 21px;
@@ -27,7 +27,7 @@
     .anchor-menu__link {
       border: 0;
       color: #248641;
-      font-family: "TheSans C5";
+      font-family: var(--font-family-body);
       font-size: 16px;
       letter-spacing: 0;
       line-height: 24px;
