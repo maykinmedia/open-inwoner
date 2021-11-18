@@ -1,8 +1,8 @@
-from django.core.exceptions import ValidationError
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 
 from import_export import fields, resources
+from import_export.exceptions import ImportExportError
 from import_export.instance_loaders import CachedInstanceLoader
 
 from ..models import Category, Organization, Product, Tag
@@ -10,6 +10,12 @@ from .widgets import ValidatedManyToManyWidget
 
 
 class CategoryImportResource(resources.ModelResource):
+    name = fields.Field(column_name="name", attribute="name")
+    slug = fields.Field(column_name="slug", attribute="slug")
+    description = fields.Field(
+        column_name="description", attribute="description", default=""
+    )
+
     class Meta:
         model = Category
         instance_loader_class = CachedInstanceLoader
@@ -22,7 +28,7 @@ class CategoryImportResource(resources.ModelResource):
         missing_headers = set(self.get_diff_headers()) - set(dataset.headers)
         if missing_headers:
             missing_headers = ",\n".join(missing_headers)
-            raise ValidationError(_(f"Missing required headers: {missing_headers}"))
+            raise ImportExportError(_(f"Missing required headers: {missing_headers}"))
 
         return super().before_import(dataset, using_transactions, dry_run, **kwargs)
 
@@ -52,6 +58,12 @@ class CategoryImportResource(resources.ModelResource):
 
 
 class ProductImportResource(resources.ModelResource):
+    name = fields.Field(column_name="name", attribute="name")
+    slug = fields.Field(column_name="slug", attribute="slug")
+    summary = fields.Field(column_name="summary", attribute="summary", default="")
+    link = fields.Field(column_name="link", attribute="link", default="")
+    content = fields.Field(column_name="content", attribute="content")
+    costs = fields.Field(column_name="costs", attribute="costs", default=0)
     categories = fields.Field(
         column_name="categories",
         attribute="categories",
@@ -96,7 +108,7 @@ class ProductImportResource(resources.ModelResource):
         missing_headers = set(self.get_diff_headers()) - set(dataset.headers)
         if missing_headers:
             missing_headers = ",\n".join(missing_headers)
-            raise ValidationError(_(f"Missing required headers: {missing_headers}"))
+            raise ImportExportError(_(f"Missing required headers: {missing_headers}"))
 
         return super().before_import(dataset, using_transactions, dry_run, **kwargs)
 

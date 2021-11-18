@@ -1,10 +1,11 @@
 from collections import OrderedDict
+from decimal import Decimal
 
-from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 import tablib
 from freezegun import freeze_time
+from import_export.exceptions import ImportExportError
 
 from ..models import Product
 from ..resources import ProductExportResource, ProductImportResource
@@ -49,7 +50,7 @@ class TestProductImportResource(TestCase):
 
         self.assertEqual(qs.count(), 1)
 
-    def test_import_raises_validation_error_when_headers_are_missing(self):
+    def test_import_raises_import_export_error_when_headers_are_missing(self):
         dataset = tablib.Dataset(
             [
                 self.product.name,
@@ -68,15 +69,15 @@ class TestProductImportResource(TestCase):
             "summary",
             "tags",
         ]
-        with self.assertRaises(ValidationError) as e:
+        with self.assertRaises(ImportExportError) as e:
             self.resource.import_data(dataset, raise_errors=True)
 
         error_message_list = sorted(
-            e.exception.message.replace("\n", "").split()[-1].split(",")
+            e.exception.args[0].replace("\n", "").split()[-1].split(",")
         )
         self.assertEqual(error_message_list, expected_error_message_list)
 
-    def test_import_raises_validation_error_when_category_value_is_null(self):
+    def test_import_raises_import_export_error_when_category_value_is_null(self):
         dataset = tablib.Dataset(
             [
                 self.product.name,
@@ -103,15 +104,15 @@ class TestProductImportResource(TestCase):
                 "organizations",
             ],
         )
-        with self.assertRaises(ValidationError) as e:
+        with self.assertRaises(ImportExportError) as e:
             self.resource.import_data(dataset, raise_errors=True)
 
         self.assertEqual(
-            e.exception.message,
+            e.exception.args[0],
             "The field categories is required",
         )
 
-    def test_import_raises_validation_error_when_category_does_not_exist(self):
+    def test_import_raises_import_export_error_when_category_does_not_exist(self):
         dataset = tablib.Dataset(
             [
                 self.product.name,
@@ -138,10 +139,10 @@ class TestProductImportResource(TestCase):
                 "organizations",
             ],
         )
-        with self.assertRaises(ValidationError) as e:
+        with self.assertRaises(ImportExportError) as e:
             self.resource.import_data(dataset, raise_errors=True)
 
-        self.assertEqual(e.exception.message, "The category you entered does not exist")
+        self.assertEqual(e.exception.args[0], "The category you entered does not exist")
 
     def test_import_creates_slug_field_when_it_is_not_given(self):
         dataset = tablib.Dataset(
@@ -222,6 +223,7 @@ class TestProductExportResource(TestCase):
         self.resource = ProductExportResource()
 
     def test_export_returns_expected_row(self):
+        self.maxDiff = None
         dataset = self.resource.export()
         category_name = self.product.categories.all()[0].name
 
@@ -239,30 +241,10 @@ class TestProductExportResource(TestCase):
                         (dataset.headers[6], ""),
                         (dataset.headers[7], ""),
                         (dataset.headers[8], ""),
-                        (dataset.headers[9], "0.00"),
-                        (dataset.headers[10], "2021-10-18 13:00:00+00:00"),
-                        (dataset.headers[11], "2021-10-18 13:00:00+00:00"),
+                        (dataset.headers[9], Decimal("0.00")),
+                        (dataset.headers[10], "2021-10-18 15:00:00"),
+                        (dataset.headers[11], "2021-10-18 15:00:00"),
                     ]
                 ),
-            ],
-        )
-
-    def test_export_returns_right_column_names(self):
-        dataset = self.resource.export()
-        self.assertEqual(
-            dataset.headers,
-            [
-                "Name of product",
-                "Slug",
-                "Summary",
-                "Action link",
-                "Content",
-                "Categories",
-                "Related products",
-                "Tags",
-                "Organizations",
-                "Costs",
-                "Date of product creation",
-                "Date of product update",
             ],
         )

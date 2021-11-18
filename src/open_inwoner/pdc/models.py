@@ -11,13 +11,16 @@ from .mixins import GeoModel
 
 class Category(MP_Node):
     name = models.CharField(
-        _("name"), max_length=100, help_text=_("Name of the category")
+        _("name"), max_length=100, default="", help_text=_("Name of the category")
     )
     slug = models.SlugField(
         _("slug"), max_length=100, unique=True, help_text=_("Slug of the category")
     )
     description = models.TextField(
-        _("description"), blank=True, help_text=_("Description of the category")
+        _("description"),
+        blank=True,
+        default="",
+        help_text=_("Description of the category"),
     )
     icon = FilerImageField(
         null=True,
@@ -46,19 +49,27 @@ class Category(MP_Node):
 
 class Product(models.Model):
     name = models.CharField(
-        _("name"), max_length=100, help_text=_("Name of the product")
+        _("name"), max_length=100, default="", help_text=_("Name of the product")
     )
     slug = models.SlugField(
         _("slug"), max_length=100, unique=True, help_text=_("Slug of the product")
     )
     summary = models.TextField(
-        _("summary"), blank=True, help_text=_("Short description of the product")
+        _("summary"),
+        blank=True,
+        default="",
+        help_text=_("Short description of the product"),
     )
     link = models.URLField(
-        _("link"), blank=True, help_text=_("Action link to request the product")
+        _("link"),
+        blank=True,
+        default="",
+        help_text=_("Action link to request the product"),
     )
     content = models.TextField(
-        _("content"), help_text=_("Product content with build-in WYSIWYG editor")
+        _("content"),
+        default="",
+        help_text=_("Product content with build-in WYSIWYG editor"),
     )
     categories = models.ManyToManyField(
         "pdc.Category",

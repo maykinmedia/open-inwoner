@@ -5,10 +5,6 @@ from ..models import Category, Organization, Product, Tag
 
 
 class CategoryExportResource(resources.ModelResource):
-    name = fields.Field(column_name="Name of category", attribute="name")
-    slug = fields.Field(column_name="Slug", attribute="slug")
-    description = fields.Field(column_name="Description", attribute="description")
-
     class Meta:
         model = Category
         import_id_fields = ("slug",)
@@ -25,18 +21,6 @@ class CategoryExportResource(resources.ModelResource):
 
 
 class ProductExportResource(resources.ModelResource):
-    name = fields.Field(column_name="Name of product", attribute="name")
-    slug = fields.Field(column_name="Slug", attribute="slug")
-    summary = fields.Field(column_name="Summary", attribute="summary")
-    link = fields.Field(column_name="Action link", attribute="link")
-    content = fields.Field(column_name="Content", attribute="content")
-    costs = fields.Field(column_name="Costs", attribute="costs")
-    created_on = fields.Field(
-        column_name="Date of product creation", attribute="created_on"
-    )
-    updated_on = fields.Field(
-        column_name="Date of product update", attribute="updated_on"
-    )
     categories = fields.Field(
         column_name="Categories",
         attribute="categories",

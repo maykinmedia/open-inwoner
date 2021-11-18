@@ -1,9 +1,9 @@
 from collections import OrderedDict
 
-from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 import tablib
+from import_export.exceptions import ImportExportError
 
 from ..models import Category
 from ..resources import CategoryExportResource, CategoryImportResource
@@ -33,7 +33,7 @@ class TestCategoryImportResource(TestCase):
 
         self.assertEqual(qs.count(), 1)
 
-    def test_import_raises_validation_error_when_headers_are_missing(self):
+    def test_import_raises_import_export_error_when_headers_are_missing(self):
         dataset = tablib.Dataset(
             [
                 self.category.name,
@@ -45,11 +45,11 @@ class TestCategoryImportResource(TestCase):
             "name",
             "slug",
         ]
-        with self.assertRaises(ValidationError) as e:
+        with self.assertRaises(ImportExportError) as e:
             self.resource.import_data(dataset, raise_errors=True)
 
         error_message_list = sorted(
-            e.exception.message.replace("\n", "").split()[-1].split(",")
+            e.exception.args[0].replace("\n", "").split()[-1].split(",")
         )
 
         self.assertEqual(error_message_list, expected_error_message_list)
@@ -152,16 +152,5 @@ class TestCategoryExportResource(TestCase):
                         (dataset.headers[2], self.category.description),
                     ]
                 ),
-            ],
-        )
-
-    def test_export_returns_right_column_names(self):
-        dataset = self.resource.export()
-        self.assertEqual(
-            dataset.headers,
-            [
-                "Name of category",
-                "Slug",
-                "Description",
             ],
         )

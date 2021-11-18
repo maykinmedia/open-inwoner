@@ -185,3 +185,8 @@ div.breadcrumbs {
     grid-column: 1/ 3;
   }
 }
+
+/* import-export override */
+.traceback {
+  display: none;
+}
