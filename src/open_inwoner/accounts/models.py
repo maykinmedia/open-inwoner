@@ -51,6 +51,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     housenumber = models.CharField(default="", blank=True, max_length=250)
     postcode = NLZipCodeField(null=True, blank=True, max_length=250)
     city = models.CharField(default="", blank=True, max_length=250)
+    deactivated_on = models.DateField(
+        verbose_name=_("Deactivated on"),
+        null=True,
+        blank=True,
+        help_text=_("This is the date the user decides to deactivate account."),
+    )
 
     objects = UserManager()
     digid_objects = DigidManager()
