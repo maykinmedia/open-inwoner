@@ -15,16 +15,18 @@
   // Color.
 
   --color-black: #000;
-  --color-blue: #1261A3;
-  --color-gray: #7A7A7A;
+  --color-blue: #1261a3;
+  --color-gray: #7a7a7a;
+  --color-gray-darkest: #2d2d2d;
   --color-gray-dark: #4b4b4b;
-  --color-gray-light: #F1F1F1;
+  --color-gray-light: #d2d2d2;
+  --color-gray-lightest: #f1f1f1;
   --color-green: #248641;
   --color-red: #e5006c;
   --color-white: #fff;
-  --color-yellow: #F8D62D;
-  --color-yellow-dark: #CCA000;
-  --color-yellow-light: #FFF7D1;
+  --color-yellow: #f8d62d;
+  --color-yellow-dark: #cca000;
+  --color-yellow-light: #fff7d1;
 
   --color-accent: var(--color-yellow-light);
   --color-body: var(--color-gray-dark);
@@ -65,6 +67,7 @@
   --spacing-medium: 8px;
   --spacing-large: 16px;
   --spacing-extra-large: 24px;
+  --spacing-giant: 32px;
 }
 
 @font-face {
