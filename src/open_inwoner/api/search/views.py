@@ -7,20 +7,13 @@ from rest_framework.views import APIView
 
 from open_inwoner.search.searches import search_products
 
-from .serializers import ProductDocumentSerializer
+from .serializers import SearchResponseSerializer
 
 
 class SearchView(APIView):
     permission_classes = []
     authentication_classes = []
-    serializer_class = ProductDocumentSerializer
-
-    def get_serializer(self, **kwargs):
-        return self.serializer_class(
-            many=True,
-            context={"request": self.request, "view": self},
-            **kwargs,
-        )
+    serializer_class = SearchResponseSerializer
 
     @extend_schema(
         parameters=[
@@ -29,7 +22,7 @@ class SearchView(APIView):
                 required=False,
                 type=OpenApiTypes.STR,
                 description=_(
-                    "The search string. If empty the empty list is returned."
+                    "The search string. If empty all the documents are returned."
                 ),
                 location=OpenApiParameter.QUERY,
             )
@@ -39,6 +32,6 @@ class SearchView(APIView):
         """Search products by query string"""
         search_string = request.query_params.get("search", "")
 
-        objects = search_products(search_string)
-        serializer = self.get_serializer(instance=objects)
+        search_response = search_products(search_string)
+        serializer = self.serializer_class(instance=search_response)
         return Response(serializer.data)
