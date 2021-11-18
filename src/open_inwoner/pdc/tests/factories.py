@@ -1,9 +1,10 @@
+from django.contrib.gis.geos import Point
 from django.utils.text import slugify
 
 import factory
 import factory.fuzzy
 
-from ..models import Category, Product
+from ..models import Category, Organization, OrganizationType, Product, Tag
 
 
 class ProductFactory(factory.django.DjangoModelFactory):
@@ -29,18 +30,36 @@ class CategoryFactory(factory.django.DjangoModelFactory):
     name = factory.Faker("word")
     slug = factory.LazyAttribute(lambda a: slugify(a.name))
     description = factory.Faker("sentence")
-    depth = 1
 
     class Meta:
         model = Category
 
-    @factory.lazy_attribute
-    def path(self):
-        last_root = Category.get_last_root_node()
-        if last_root:
-            # Add the new root node as the last one
-            newpath = last_root._inc_path()
-        else:
-            # Add the first root node
-            newpath = Category._get_path(None, 1, 1)
-        return newpath
+    @classmethod
+    def _create(cls, model_class, *args, **kwargs):
+        """For now factory creates only root categories"""
+        return Category.add_root(**kwargs)
+
+
+class TagFactory(factory.django.DjangoModelFactory):
+    name = factory.Faker("word")
+
+    class Meta:
+        model = Tag
+
+
+class OrganizationTypeFactory(factory.django.DjangoModelFactory):
+    name = factory.Faker("word")
+
+    class Meta:
+        model = OrganizationType
+
+
+class OrganizationFactory(factory.django.DjangoModelFactory):
+    name = factory.Faker("word")
+    type = factory.SubFactory(OrganizationTypeFactory)
+    street = factory.Faker("street_name", locale="nl_NL")
+    postcode = factory.Faker("postcode", locale="nl_NL")
+    geometry = Point(5, 52)
+
+    class Meta:
+        model = Organization
