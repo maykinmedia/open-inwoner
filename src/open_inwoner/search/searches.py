@@ -1,6 +1,12 @@
 from django.conf import settings
 
-from elasticsearch_dsl import FacetedResponse, FacetedSearch, NestedFacet, TermsFacet
+from elasticsearch_dsl import (
+    FacetedResponse,
+    FacetedSearch,
+    NestedFacet,
+    TermsFacet,
+    query,
+)
 
 from open_inwoner.pdc.models import Product
 
@@ -21,6 +27,18 @@ class ProductSearch(FacetedSearch):
             "organizations", TermsFacet(field="organizations.slug")
         ),
     }
+
+    def filter(self, search):
+        """
+        The default FacetedSearch uses post_filter. To avoid confusion rewrite with filter
+        """
+        if not self._filters:
+            return search
+
+        filters = query.MatchAll()
+        for f in iter(self._filters.values()):
+            filters &= f
+        return search.filter(filters)
 
 
 def search_products(query: str, filters=None) -> FacetedResponse:
