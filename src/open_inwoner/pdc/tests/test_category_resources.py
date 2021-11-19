@@ -150,6 +150,7 @@ class TestCategoryExportResource(TestCase):
                         (dataset.headers[0], self.category.name),
                         (dataset.headers[1], self.category.slug),
                         (dataset.headers[2], self.category.description),
+                        (dataset.headers[3], self.category.path),
                     ]
                 ),
             ],

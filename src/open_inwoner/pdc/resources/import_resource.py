@@ -9,20 +9,7 @@ from ..models import Category, Organization, Product, Tag
 from .widgets import ValidatedManyToManyWidget
 
 
-class CategoryImportResource(resources.ModelResource):
-    name = fields.Field(column_name="name", attribute="name")
-    slug = fields.Field(column_name="slug", attribute="slug")
-    description = fields.Field(
-        column_name="description", attribute="description", default=""
-    )
-
-    class Meta:
-        model = Category
-        instance_loader_class = CachedInstanceLoader
-        clean_model_instances = True
-        import_id_fields = ("slug",)
-        fields = ("name", "slug", "description")
-
+class ImportResource(resources.ModelResource):
     def before_import(self, dataset, using_transactions, dry_run, **kwargs):
         # Validate that file contains all the headers
         missing_headers = set(self.get_diff_headers()) - set(dataset.headers)
@@ -37,6 +24,21 @@ class CategoryImportResource(resources.ModelResource):
         if not row.get("slug") and row.get("name"):
             row["slug"] = slugify(row["name"])
         return super().get_or_init_instance(instance_loader, row)
+
+
+class CategoryImportResource(ImportResource):
+    name = fields.Field(column_name="name", attribute="name")
+    slug = fields.Field(column_name="slug", attribute="slug")
+    description = fields.Field(
+        column_name="description", attribute="description", default=""
+    )
+
+    class Meta:
+        model = Category
+        instance_loader_class = CachedInstanceLoader
+        clean_model_instances = True
+        import_id_fields = ("slug",)
+        fields = ("name", "slug", "description")
 
     def validate_instance(
         self, instance, import_validation_errors=None, validate_unique=True
@@ -57,7 +59,7 @@ class CategoryImportResource(resources.ModelResource):
         )
 
 
-class ProductImportResource(resources.ModelResource):
+class ProductImportResource(ImportResource):
     name = fields.Field(column_name="name", attribute="name")
     slug = fields.Field(column_name="slug", attribute="slug")
     summary = fields.Field(column_name="summary", attribute="summary", default="")
@@ -102,18 +104,3 @@ class ProductImportResource(resources.ModelResource):
             "costs",
             "organizations",
         )
-
-    def before_import(self, dataset, using_transactions, dry_run, **kwargs):
-        # Validate that file contains all the headers
-        missing_headers = set(self.get_diff_headers()) - set(dataset.headers)
-        if missing_headers:
-            missing_headers = ",\n".join(missing_headers)
-            raise ImportExportError(_(f"Missing required headers: {missing_headers}"))
-
-        return super().before_import(dataset, using_transactions, dry_run, **kwargs)
-
-    def get_or_init_instance(self, instance_loader, row):
-        # Add slug field when a new row has to be created
-        if not row.get("slug") and row.get("name"):
-            row["slug"] = slugify(row["name"])
-        return super().get_or_init_instance(instance_loader, row)

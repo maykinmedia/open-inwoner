@@ -11,7 +11,7 @@ from .mixins import GeoModel
 
 class Category(MP_Node):
     name = models.CharField(
-        _("name"), max_length=100, default="", help_text=_("Name of the category")
+        _("name"), max_length=100, help_text=_("Name of the category")
     )
     slug = models.SlugField(
         _("slug"), max_length=100, unique=True, help_text=_("Slug of the category")
@@ -49,7 +49,7 @@ class Category(MP_Node):
 
 class Product(models.Model):
     name = models.CharField(
-        _("name"), max_length=100, default="", help_text=_("Name of the product")
+        _("name"), max_length=100, help_text=_("Name of the product")
     )
     slug = models.SlugField(
         _("slug"), max_length=100, unique=True, help_text=_("Slug of the product")
@@ -68,7 +68,6 @@ class Product(models.Model):
     )
     content = models.TextField(
         _("content"),
-        default="",
         help_text=_("Product content with build-in WYSIWYG editor"),
     )
     categories = models.ManyToManyField(

@@ -12,11 +12,13 @@ class CategoryExportResource(resources.ModelResource):
             "name",
             "slug",
             "description",
+            "path",
         )
         export_order = (
             "name",
             "slug",
             "description",
+            "path",
         )
 
 

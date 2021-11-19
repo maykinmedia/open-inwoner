@@ -187,6 +187,7 @@ div.breadcrumbs {
 }
 
 /* import-export override */
+/* Used for not displaying the traceback(we display only the message to the user) when headers are missing from import */
 .traceback {
   display: none;
 }

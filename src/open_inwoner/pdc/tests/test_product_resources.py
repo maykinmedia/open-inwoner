@@ -1,6 +1,7 @@
 from collections import OrderedDict
 from decimal import Decimal
 
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 import tablib
@@ -77,7 +78,7 @@ class TestProductImportResource(TestCase):
         )
         self.assertEqual(error_message_list, expected_error_message_list)
 
-    def test_import_raises_import_export_error_when_category_value_is_null(self):
+    def test_import_raises_validation_error_when_category_value_is_null(self):
         dataset = tablib.Dataset(
             [
                 self.product.name,
@@ -104,15 +105,15 @@ class TestProductImportResource(TestCase):
                 "organizations",
             ],
         )
-        with self.assertRaises(ImportExportError) as e:
+        with self.assertRaises(ValidationError) as e:
             self.resource.import_data(dataset, raise_errors=True)
 
         self.assertEqual(
-            e.exception.args[0],
+            e.exception.message,
             "The field categories is required",
         )
 
-    def test_import_raises_import_export_error_when_category_does_not_exist(self):
+    def test_import_raises_validation_error_when_category_does_not_exist(self):
         dataset = tablib.Dataset(
             [
                 self.product.name,
@@ -139,10 +140,10 @@ class TestProductImportResource(TestCase):
                 "organizations",
             ],
         )
-        with self.assertRaises(ImportExportError) as e:
+        with self.assertRaises(ValidationError) as e:
             self.resource.import_data(dataset, raise_errors=True)
 
-        self.assertEqual(e.exception.args[0], "The category you entered does not exist")
+        self.assertEqual(e.exception.message, "The category you entered does not exist")
 
     def test_import_creates_slug_field_when_it_is_not_given(self):
         dataset = tablib.Dataset(
