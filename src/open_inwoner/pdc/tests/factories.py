@@ -42,6 +42,7 @@ class CategoryFactory(factory.django.DjangoModelFactory):
 
 class TagFactory(factory.django.DjangoModelFactory):
     name = factory.Faker("word")
+    slug = factory.LazyAttribute(lambda a: slugify(a.name))
 
     class Meta:
         model = Tag
@@ -56,6 +57,7 @@ class OrganizationTypeFactory(factory.django.DjangoModelFactory):
 
 class OrganizationFactory(factory.django.DjangoModelFactory):
     name = factory.Faker("word")
+    slug = factory.LazyAttribute(lambda a: slugify(a.name))
     type = factory.SubFactory(OrganizationTypeFactory)
     street = factory.Faker("street_name", locale="nl_NL")
     postcode = factory.Faker("postcode", locale="nl_NL")
