@@ -13,11 +13,9 @@ class ProductDocumentSerializer(serializers.ModelSerializer):
 
 
 class BucketSerializer(serializers.Serializer):
-    key = serializers.CharField(help_text=_("value of the facet"))
+    slug = serializers.CharField(help_text=_("Slug of the bucket"))
+    name = serializers.CharField(help_text=_("Name of the bucket"))
     count = serializers.IntegerField(help_text=_("Number of documents in the bucket"))
-
-    def to_representation(self, instance):
-        return {"key": instance[0], "count": instance[1]}
 
 
 class FacetSerializer(serializers.Serializer):

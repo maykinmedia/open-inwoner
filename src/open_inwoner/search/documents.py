@@ -12,20 +12,22 @@ class ProductDocument(Document):
 
     categories = fields.NestedField(
         properties={
-            "name": fields.TextField(fields={"raw": fields.KeywordField()}),
+            "name": fields.TextField(),
             "slug": fields.KeywordField(),
             "description": fields.TextField(),
         }
     )
     tags = fields.NestedField(
         properties={
-            "name": fields.TextField(fields={"raw": fields.KeywordField()}),
+            "name": fields.TextField(),
+            "slug": fields.KeywordField(),
             "type": fields.TextField(attr="type.name"),
         }
     )
     organizations = fields.NestedField(
         properties={
-            "name": fields.TextField(fields={"raw": fields.KeywordField()}),
+            "name": fields.TextField(),
+            "slug": fields.KeywordField(),
             "type": fields.TextField(attr="type.name"),
             "neighbourhood": fields.TextField(attr="neighbourhood.name"),
         }

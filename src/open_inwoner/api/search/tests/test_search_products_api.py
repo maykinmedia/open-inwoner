@@ -50,20 +50,22 @@ class SearchListTests(ESMixin, APITestCase):
                 "facets": [
                     {
                         "name": FacetChoices.categories,
-                        "buckets": [{"key": category.name, "count": 1}],
+                        "buckets": [
+                            {"slug": category.slug, "name": category.name, "count": 1}
+                        ],
                     },
                     {
                         "name": FacetChoices.tags,
                         "buckets": [
-                            {"key": tags[0].name, "count": 1},
-                            {"key": tags[1].name, "count": 1},
+                            {"slug": tags[0].slug, "name": tags[0].name, "count": 1},
+                            {"slug": tags[1].slug, "name": tags[1].name, "count": 1},
                         ],
                     },
                     {
                         "name": FacetChoices.organizations,
                         "buckets": [
-                            {"key": orgs[0].name, "count": 1},
-                            {"key": orgs[1].name, "count": 1},
+                            {"slug": orgs[0].slug, "name": orgs[0].name, "count": 1},
+                            {"slug": orgs[1].slug, "name": orgs[1].name, "count": 1},
                         ],
                     },
                 ],
