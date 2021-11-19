@@ -33,7 +33,12 @@ def search_products(query: str, filters=None) -> FacetedResponse:
         model = getattr(Product, facet_name).rel.model
         bucket_mapping = {m.slug: m.name for m in model.objects.all()}
         bucket_groups = [
-            {"slug": b[0], "name": bucket_mapping[b[0]], "count": b[1]}
+            {
+                "slug": b[0],
+                "name": bucket_mapping[b[0]],
+                "count": b[1],
+                "is_selected": b[2],
+            }
             for b in facet_buckets
         ]
         facet_groups.append({"name": facet_name, "buckets": bucket_groups})

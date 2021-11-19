@@ -1,13 +1,11 @@
-from django.utils.translation import ugettext_lazy as _
-
-from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import OpenApiParameter, extend_schema
+from drf_spectacular.utils import extend_schema
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from open_inwoner.search.searches import search_products
+from open_inwoner.utils.schema import input_serializer_to_parameters
 
-from .serializers import SearchResponseSerializer
+from .serializers import SearchQuerySerializer, SearchResponseSerializer
 
 
 class SearchView(APIView):
@@ -15,23 +13,16 @@ class SearchView(APIView):
     authentication_classes = []
     serializer_class = SearchResponseSerializer
 
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                name="search",
-                required=False,
-                type=OpenApiTypes.STR,
-                description=_(
-                    "The search string. If empty all the documents are returned."
-                ),
-                location=OpenApiParameter.QUERY,
-            )
-        ],
-    )
+    @extend_schema(parameters=input_serializer_to_parameters(SearchQuerySerializer))
     def get(self, request, *args, **kwargs):
         """Search products by query string"""
-        search_string = request.query_params.get("search", "")
+        # validate query params
+        query_serializer = SearchQuerySerializer(data=request.query_params)
+        query_serializer.is_valid()
+        query_data = query_serializer.data
 
-        search_response = search_products(search_string)
+        # perform search
+        search_string = query_data.pop("search", "")
+        search_response = search_products(search_string, filters=query_data)
         serializer = self.serializer_class(instance=search_response)
         return Response(serializer.data)
