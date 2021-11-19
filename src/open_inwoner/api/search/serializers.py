@@ -16,7 +16,7 @@ class BucketSerializer(serializers.Serializer):
     slug = serializers.CharField(help_text=_("Slug of the bucket"))
     name = serializers.CharField(help_text=_("Name of the bucket"))
     count = serializers.IntegerField(help_text=_("Number of documents in the bucket"))
-    is_selected = serializers.IntegerField(
+    selected = serializers.BooleanField(
         help_text=_("Boolean shows if the bucket value is used in filtering")
     )
 

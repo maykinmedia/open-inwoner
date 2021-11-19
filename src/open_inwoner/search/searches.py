@@ -55,7 +55,7 @@ def search_products(query: str, filters=None) -> FacetedResponse:
                 "slug": b[0],
                 "name": bucket_mapping[b[0]],
                 "count": b[1],
-                "is_selected": b[2],
+                "selected": b[2],
             }
             for b in facet_buckets
         ]
