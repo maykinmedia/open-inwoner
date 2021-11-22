@@ -134,6 +134,7 @@ INSTALLED_APPS = [
     "hijack.contrib.admin",
     "leaflet",
     "django_elasticsearch_dsl",
+    "import_export",
     # Project applications.
     "open_inwoner.accounts",
     "open_inwoner.ckeditor",
@@ -202,8 +203,8 @@ STATICFILES_DIRS = [os.path.join(DJANGO_PROJECT_DIR, "static")]
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = [
-    "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+    "django.contrib.staticfiles.finders.FileSystemFinder",
 ]
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
@@ -518,3 +519,6 @@ ES_INDEX_PRODUCTS = "products"
 
 # Delete user after x days of inactivity
 DELETE_USER_AFTER_X_DAYS_INACTIVE = 14
+
+# django import-export
+IMPORT_EXPORT_USE_TRANSACTIONS = True
