@@ -39,6 +39,9 @@ class SearchListTests(ESMixin, APITestCase):
         self.assertEqual(
             response.json(),
             {
+                "count": 1,
+                "next": None,
+                "previous": None,
                 "results": [
                     {
                         "name": "Some product",
@@ -107,6 +110,9 @@ class SearchListTests(ESMixin, APITestCase):
         self.assertEqual(
             response.json(),
             {
+                "count": 1,
+                "next": None,
+                "previous": None,
                 "results": [
                     {
                         "name": "Some product",
@@ -134,13 +140,39 @@ class SearchListTests(ESMixin, APITestCase):
 
     def test_search_list_without_search_param(self):
         """empty search will return all the results in order to use facets on them"""
-        ProductFactory.create(name="Some product")
+        product1, product2 = ProductFactory.create_batch(2)
         self.update_index()
 
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.json()["results"]), 1)
+        self.assertEqual(
+            response.json(),
+            {
+                "count": 2,
+                "next": None,
+                "previous": None,
+                "results": [
+                    {
+                        "name": product1.name,
+                        "slug": product1.slug,
+                        "summary": product1.summary,
+                        "content": product1.content,
+                    },
+                    {
+                        "name": product2.name,
+                        "slug": product2.slug,
+                        "summary": product2.summary,
+                        "content": product2.content,
+                    },
+                ],
+                "facets": [
+                    {"name": "categories", "buckets": []},
+                    {"name": "tags", "buckets": []},
+                    {"name": "organizations", "buckets": []},
+                ],
+            },
+        )
 
     def test_search_list_filter_on_facet(self):
         product1 = ProductFactory.create(
@@ -169,6 +201,9 @@ class SearchListTests(ESMixin, APITestCase):
         self.assertEqual(
             response.json(),
             {
+                "count": 1,
+                "next": None,
+                "previous": None,
                 "results": [
                     {
                         "name": product1.name,

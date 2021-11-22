@@ -30,11 +30,9 @@ class FacetSerializer(serializers.Serializer):
 
 class SearchResponseSerializer(serializers.Serializer):
     results = ProductDocumentSerializer(
-        many=True, source="hits", help_text=_("List of the search results (hits)")
+        many=True, help_text=_("List of the search results (hits)")
     )
-    facets = FacetSerializer(
-        many=True, source="facet_groups", help_text=_("List of available facets")
-    )
+    facets = FacetSerializer(many=True, help_text=_("List of available facets"))
 
 
 class SearchQuerySerializer(serializers.Serializer):
