@@ -74,7 +74,7 @@ export function AccessibilityHeader(): ReactElement {
   const swapFont = (): void => {
     const target = document.querySelector(':root') as HTMLElement;
     const varName = '--font-family-body';
-    const alternativeFontFamily = `Helvetica, Courier, Arial, Verdana.`;
+    const alternativeFontFamily = `Open Dyslexic`;
 
     if (!target) {
       return;
