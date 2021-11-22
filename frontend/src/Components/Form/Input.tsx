@@ -20,7 +20,7 @@ export function Input(props: iInputProps): ReactElement {
   return (
     <>
       <input className="input" title={field.label} name={field.name} required={required} type={field.type}
-             value={field.value} {...field.attrs} {..._props}/>
+        value={field.value} onChange={ field.onChange } {...field.attrs} {..._props}/>
       {field.errors?.map((error) => <Error key={error}>{error}</Error>)}
     </>
   )

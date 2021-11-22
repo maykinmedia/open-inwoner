@@ -7,9 +7,9 @@ import { Checkbox } from '../Form/Checkbox';
 import './Filter.scss';
 
 interface iFilterItem {
-  id: string,
-  label: string,
-  value: any,
+  slug: string,
+  name: string,
+  count: number,
   selected: boolean,
 }
 
@@ -23,7 +23,7 @@ export function Filter(props: FilterProps): ReactElement {
   const [opened, setOpened] = useState<boolean>(false);
 
   const renderFilterItems = () => items.map((item: iFilterItem, index: number): ReactElement => {
-    return <Checkbox key={ index } field={{ id: item.id, label: item.label, name: item.value, selected: item.selected, value: item.value, type="checkbox" }} />;
+    return <Checkbox key={ index } field={{ id: item.slug, label: `${item.name} - ${item.count}`, name: item.slug, selected: item.selected, value: item.slug, type: "checkbox" }} />;
   });
 
   const getIcon = () => {
