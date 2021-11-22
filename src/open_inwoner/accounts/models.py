@@ -55,7 +55,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name=_("Deactivated on"),
         null=True,
         blank=True,
-        help_text=_("This is the date the user decides to deactivate account."),
+        help_text=_("This is the date the user decided to deactivate their account."),
     )
 
     objects = UserManager()

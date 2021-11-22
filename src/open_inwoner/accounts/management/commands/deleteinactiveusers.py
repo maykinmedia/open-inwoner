@@ -16,7 +16,7 @@ class Command(BaseCommand):
         interval = date.today() - timedelta(
             days=settings.DELETE_USER_AFTER_X_DAYS_INACTIVE
         )
-        # Deleting users from before interval
+        logger.info(f"\nDeleting users from before {interval}")
         users_to_be_deleted = User.objects.filter(
             is_active=False,
             is_staff=False,
