@@ -16,6 +16,6 @@ export function Logo(props: LogoProps) {
 }
 
 Logo.defaultProps = {
-  alt: import.meta.env.VITE_LOGO_ALT,
-  src: import.meta.env.VITE_LOGO_URL,
+  alt: 'Logo van gemeente',
+  src: '/src/assets/logo.svg',
 }
