@@ -12,5 +12,8 @@ export interface iField {
   choices?: iChoice[]
   required?: boolean,
   value?: any,
+  defaultValue?: any,
   selected?: boolean,
+  defaultSelected?: boolean,
+  onChange: Function,
 }
