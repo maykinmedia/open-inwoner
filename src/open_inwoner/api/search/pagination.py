@@ -17,3 +17,37 @@ class SearchPagination(PageNumberPagination):
         )
 
         return Response({**pagination_data, **data})
+
+    def get_paginated_response_schema(self, schema):
+        pageinate_schema = {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer",
+                    "example": 123,
+                },
+                "next": {
+                    "type": "string",
+                    "nullable": True,
+                    "format": "uri",
+                    "example": "http://api.example.org/accounts/?{page_query_param}=4".format(
+                        page_query_param=self.page_query_param
+                    ),
+                },
+                "previous": {
+                    "type": "string",
+                    "nullable": True,
+                    "format": "uri",
+                    "example": "http://api.example.org/accounts/?{page_query_param}=2".format(
+                        page_query_param=self.page_query_param
+                    ),
+                },
+            },
+        }
+        return {
+            "type": "object",
+            "allOf": [
+                pageinate_schema,
+                schema["items"],
+            ],
+        }

@@ -13,6 +13,7 @@ class SearchView(GenericAPIView):
     authentication_classes = []
     serializer_class = SearchResponseSerializer
     pagination_class = SearchPagination
+    action = "list"  # for spectacular
 
     @extend_schema(parameters=input_serializer_to_parameters(SearchQuerySerializer))
     def get(self, request, *args, **kwargs):
