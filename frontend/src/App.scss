@@ -83,6 +83,30 @@
   src: local('TheSans C5'), url('./fonts/TheSansC5/DesktopFonts/TheSansC5-7_Bold.otf') format('opentype');
 }
 
+@font-face {
+  font-family: 'Open Dyslexic';
+  src: local('TheSans C5'), url('./fonts/opendyslexic/OpenDyslexic-Regular.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Open Dyslexic';
+  font-weight: bold;
+  src: local('TheSans C5'), url('./fonts/opendyslexic/OpenDyslexic-Bold.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Open Dyslexic';
+  font-style: italic;
+  src: local('TheSans C5'), url('./fonts/opendyslexic/OpenDyslexic-Italic.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Open Dyslexic';
+  font-weight: bold;
+  font-style: italic;
+  src: local('TheSans C5'), url('./fonts/opendyslexic/OpenDyslexic-Bold-Italic.otf') format('opentype');
+}
+
 body {
   margin: 0;
   //font-family: 'TheSans C5';
