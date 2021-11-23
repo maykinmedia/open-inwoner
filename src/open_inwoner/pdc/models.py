@@ -1,7 +1,6 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from autoslug import AutoSlugField
 from filer.fields.image import FilerImageField
 from treebeard.mp_tree import MP_Node
 
@@ -18,7 +17,10 @@ class Category(MP_Node):
         _("slug"), max_length=100, unique=True, help_text=_("Slug of the category")
     )
     description = models.TextField(
-        _("description"), blank=True, help_text=_("Description of the category")
+        _("description"),
+        blank=True,
+        default="",
+        help_text=_("Description of the category"),
     )
     icon = FilerImageField(
         null=True,
@@ -53,13 +55,20 @@ class Product(models.Model):
         _("slug"), max_length=100, unique=True, help_text=_("Slug of the product")
     )
     summary = models.TextField(
-        _("summary"), blank=True, help_text=_("Short description of the product")
+        _("summary"),
+        blank=True,
+        default="",
+        help_text=_("Short description of the product"),
     )
     link = models.URLField(
-        _("link"), blank=True, help_text=_("Action link to request the product")
+        _("link"),
+        blank=True,
+        default="",
+        help_text=_("Action link to request the product"),
     )
     content = models.TextField(
-        _("content"), help_text=_("Product content with build-in WYSIWYG editor")
+        _("content"),
+        help_text=_("Product content with build-in WYSIWYG editor"),
     )
     categories = models.ManyToManyField(
         "pdc.Category",
@@ -127,8 +136,9 @@ class TagType(models.Model):
 
 
 class Tag(models.Model):
-    name = models.CharField(
-        _("name"), max_length=100, help_text=_("Name of the tag"), unique=True
+    name = models.CharField(_("name"), max_length=100, help_text=_("Name of the tag"))
+    slug = models.SlugField(
+        _("slug"), max_length=100, unique=True, help_text=_("Slug of the tag")
     )
     icon = FilerImageField(
         null=True,
@@ -217,6 +227,9 @@ class OrganizationType(models.Model):
 class Organization(GeoModel):
     name = models.CharField(
         _("name"), max_length=250, help_text=_("Name of the organization")
+    )
+    slug = models.SlugField(
+        _("slug"), max_length=100, unique=True, help_text=_("Slug of the organization")
     )
     logo = FilerImageField(
         null=True,
