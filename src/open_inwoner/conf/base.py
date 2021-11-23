@@ -517,5 +517,8 @@ ELASTICSEARCH_DSL = {
 }
 ES_INDEX_PRODUCTS = "products"
 
+# Delete user after x days of inactivity
+DELETE_USER_AFTER_X_DAYS_INACTIVE = 14
+
 # django import-export
 IMPORT_EXPORT_USE_TRANSACTIONS = True
