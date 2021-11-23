@@ -111,6 +111,7 @@ class TagAdmin(admin.ModelAdmin):
     list_filter = ("type__name",)
     search_fields = ("name",)
     ordering = ("name",)
+    prepopulated_fields = {"slug": ("name",)}
 
 
 @admin.register(ProductLocation)
@@ -160,6 +161,7 @@ class OrganizationAdmin(LeafletGeoAdmin):
     list_filter = ("type__name", "city")
     search_fields = ("name",)
     ordering = ("name",)
+    prepopulated_fields = {"slug": ("name",)}
 
     # Detail
     modifiable = False

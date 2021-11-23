@@ -136,8 +136,9 @@ class TagType(models.Model):
 
 
 class Tag(models.Model):
-    name = models.CharField(
-        _("name"), max_length=100, help_text=_("Name of the tag"), unique=True
+    name = models.CharField(_("name"), max_length=100, help_text=_("Name of the tag"))
+    slug = models.SlugField(
+        _("slug"), max_length=100, unique=True, help_text=_("Slug of the tag")
     )
     icon = FilerImageField(
         null=True,
@@ -226,6 +227,9 @@ class OrganizationType(models.Model):
 class Organization(GeoModel):
     name = models.CharField(
         _("name"), max_length=250, help_text=_("Name of the organization")
+    )
+    slug = models.SlugField(
+        _("slug"), max_length=100, unique=True, help_text=_("Slug of the organization")
     )
     logo = FilerImageField(
         null=True,
