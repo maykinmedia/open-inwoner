@@ -1,5 +1,3 @@
-from django import conf
-from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext_lazy as _
 
 from drf_spectacular.utils import extend_schema
@@ -15,6 +13,7 @@ class SiteConfigurationView(APIView):
     authentication_classes = []
     permission_classes = []
 
+    @extend_schema(responses={200: ConfigDetailSerializer})
     def get(self, request, format=None):
         config = SiteConfiguration.get_solo()
         serializer = ConfigDetailSerializer(config)
