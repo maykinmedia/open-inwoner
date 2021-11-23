@@ -5,6 +5,8 @@ from django_elasticsearch_dsl.test.testcases import ESTestCase
 
 
 class ESMixin(ESTestCase):
+    _index_suffixe = ""  # manage index names on django settings level
+
     @staticmethod
     def rebuild_index():
         call_command("search_index", "--rebuild", "-f")
