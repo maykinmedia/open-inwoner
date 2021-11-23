@@ -7,6 +7,7 @@ from .accounts.views import (
     ActionViewSet,
     AppointmentViewSet,
     ContactViewSet,
+    DeactivateUserView,
     DocumentViewSet,
     GetAuthTokenView,
 )
@@ -35,6 +36,7 @@ urlpatterns = [
         name="docs",
     ),
     path("auth/get_token/", GetAuthTokenView.as_view(), name="get_token"),
+    path("auth/user/deactivate/", DeactivateUserView.as_view(), name="deactivate_user"),
     path("auth/", include("dj_rest_auth.urls")),
     path("auth/registration/", include("dj_rest_auth.registration.urls")),
     # path("auth/", include("rest_framework.urls", namespace="rest_framework")),
