@@ -135,12 +135,15 @@ INSTALLED_APPS = [
     "leaflet",
     "django_elasticsearch_dsl",
     "import_export",
+    "solo",
+    "colorfield",
     # Project applications.
     "open_inwoner.accounts",
     "open_inwoner.ckeditor",
     "open_inwoner.pdc",
     "open_inwoner.search",
     "open_inwoner.utils",
+    "open_inwoner.configurations",
 ]
 
 MIDDLEWARE = [
