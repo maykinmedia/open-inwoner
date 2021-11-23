@@ -23,9 +23,9 @@ class Command(BaseCommand):
         )
 
         if users_to_be_deleted:
-            logger.info(f"\nDeleting users from before {interval}")
+            logger.info(f"\nDeleting users from before {interval}.")
             results = users_to_be_deleted.delete()
             num_of_deleted_users = results[1].get("accounts.User")
             logger.info(f"\n{num_of_deleted_users} users were successfully deleted.")
         else:
-            logger.info(f"\nNo users were deleted from before {interval}")
+            logger.info(f"\nNo users were deleted from before {interval}.")

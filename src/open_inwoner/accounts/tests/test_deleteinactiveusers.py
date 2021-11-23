@@ -31,7 +31,10 @@ class TestCommand(TestCase):
         with self.assertLogs() as captured:
             call_command("deleteinactiveusers")
 
-        self.assertEqual(captured.records[1].getMessage(), "\nNo users were deleted.")
+        self.assertEqual(
+            captured.records[0].getMessage(),
+            "\nNo users were deleted from before 2021-09-17.",
+        )
         self.assertTrue(User.objects.filter(id=user.id).exists())
 
     @freeze_time("2021-10-01")
