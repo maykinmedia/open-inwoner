@@ -17,8 +17,8 @@ class DeactivateUserView(UpdateModelMixin, GenericAPIView):
     )
     def post(self, request, *args, **kwargs):
         """
-        Updates UserModel concerning deactivation.
-        Fields which are updated: is_active, deactivated_on.
+        By calling this endpoint for a user, the account will be deactivated and
+        automatically deleted if not reactivated within X amount of days.
         """
         user = self.request.user
         if user.is_staff:

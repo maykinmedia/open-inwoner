@@ -40,7 +40,7 @@ class TestPartialUpdateDeactivate(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertEqual(
-            response.json(), {"detail": _("Authenticatiegegevens zijn niet opgegeven.")}
+            response.json(), {"detail": "Authenticatiegegevens zijn niet opgegeven."}
         )
 
     @freeze_time("2021-10-01")
@@ -62,6 +62,4 @@ class TestPartialUpdateDeactivate(APITestCase):
         response = self.client.put(url)
 
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
-        self.assertEqual(
-            response.json(), {"detail": _('Methode "PUT" niet toegestaan.')}
-        )
+        self.assertEqual(response.json(), {"detail": 'Methode "PUT" niet toegestaan.'})
