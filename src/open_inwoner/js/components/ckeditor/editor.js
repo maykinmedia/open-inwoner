@@ -10,7 +10,12 @@ import Indent from '@ckeditor/ckeditor5-indent/src/indent';
 import Link from '@ckeditor/ckeditor5-link/src/link';
 import List from '@ckeditor/ckeditor5-list/src/list';
 import Markdown from '@ckeditor/ckeditor5-markdown-gfm/src/markdown';
-
+import Image from '@ckeditor/ckeditor5-image/src/image';
+import ImageUpload from '@ckeditor/ckeditor5-image/src/imageupload';
+import ImageStyle from '@ckeditor/ckeditor5-image/src/imagestyle';
+import ImageToolbar from '@ckeditor/ckeditor5-image/src/imagetoolbar';
+import ImageCaption from '@ckeditor/ckeditor5-image/src/imagecaption';
+import FilerImageAdapterPlugin from "./plugins/filer/plugin";
 
 export default class ClassicEditor extends ClassicEditorBase {}
 
@@ -27,40 +32,61 @@ ClassicEditor.builtinPlugins = [
     Indent,
     Link,
     List,
+    Image,
+    ImageUpload,
+    ImageToolbar,
+    ImageCaption,
+    ImageStyle,
+    FilerImageAdapterPlugin,
 ];
 
 // Editor configuration.
 ClassicEditor.defaultConfig = {
-    toolbar: [
-        'heading',
-        '|',
-        'bold',
-        'italic',
-        'link',
-        'blockQuote',
-        '|',
-        'bulletedList',
-        'numberedList',
-        '|',
-        'outdent',
-        'indent',
-        '|',
-        'undo',
-        'redo'
-    ]
+    toolbar: {
+        items: [
+            'heading',
+            '|',
+            'bold',
+            'italic',
+            'link',
+            'blockQuote',
+            '|',
+            'bulletedList',
+            'numberedList',
+            '|',
+            'outdent',
+            'indent',
+            '|',
+            'uploadImage',
+            '|',
+            'undo',
+            'redo'
+        ],
+    },
+    image: {
+        toolbar: [
+            'imageStyle:inline',
+            'imageStyle:block',
+            'imageStyle:side',
+            '|',
+            'toggleImageCaption',
+            'imageTextAlternative'
+        ],
+        upload: {
+            types: ['jpeg', 'png', 'gif']
+        }
+    },
 };
 
 
-const getEditor = (node) => {
+export const getEditor = (node) => {
     ClassicEditor
         .create(node)
         .then(editor => {
             console.log('Editor was initialized', editor);
         })
         .catch(error => {
+            console.log(error);
             console.error(error.stack);
         });
 };
-
-
-export {getEditor};

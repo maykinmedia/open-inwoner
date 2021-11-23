@@ -28,6 +28,7 @@ django-allauth
 django-leaflet
 django-autoslug
 django-elasticsearch-dsl
+django-import-export
 
 # API libraries
 djangorestframework

@@ -2,9 +2,13 @@ from django import forms
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 
+from import_export.admin import ImportExportMixin
+from import_export.formats import base_formats
 from leaflet.admin import LeafletGeoAdmin
 from treebeard.admin import TreeAdmin
 from treebeard.forms import movenodeform_factory
+
+from open_inwoner.ckeditor.widgets import CKEditorWidget
 
 from .models import (
     Category,
@@ -18,15 +22,29 @@ from .models import (
     Tag,
     TagType,
 )
-from .widgets import CKEditorWidget
+from .resources import (
+    CategoryExportResource,
+    CategoryImportResource,
+    ProductExportResource,
+    ProductImportResource,
+)
 
 
 @admin.register(Category)
-class CategoryAdmin(TreeAdmin):
+class CategoryAdmin(ImportExportMixin, TreeAdmin):
+    change_list_template = "admin/category_change_list.html"
     form = movenodeform_factory(Category, fields="__all__")
     prepopulated_fields = {"slug": ("name",)}
     search_fields = ("name",)
-    ordering = ("name",)
+    ordering = ("path",)
+
+    # import-export
+    import_template_name = "admin/category_import.html"
+    resource_class = CategoryImportResource
+    formats = [base_formats.XLSX, base_formats.CSV]
+
+    def get_export_resource_class(self):
+        return CategoryExportResource
 
 
 class ProductLinkInline(admin.TabularInline):
@@ -53,7 +71,7 @@ class ProductAdminForm(forms.ModelForm):
 
 
 @admin.register(Product)
-class ProductAdmin(admin.ModelAdmin):
+class ProductAdmin(ImportExportMixin, admin.ModelAdmin):
     list_display = ("name", "created_on", "display_categories")
     list_filter = ("categories", "tags")
     date_hierarchy = "created_on"
@@ -63,6 +81,14 @@ class ProductAdmin(admin.ModelAdmin):
     ordering = ("name",)
     form = ProductAdminForm
     inlines = (ProductLinkInline, ProductLocationInline, ProductContactInline)
+
+    # import-export
+    resource_class = ProductImportResource
+    import_template_name = "admin/product_import.html"
+    formats = [base_formats.XLSX, base_formats.CSV]
+
+    def get_export_resource_class(self):
+        return ProductExportResource
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
@@ -85,6 +111,7 @@ class TagAdmin(admin.ModelAdmin):
     list_filter = ("type__name",)
     search_fields = ("name",)
     ordering = ("name",)
+    prepopulated_fields = {"slug": ("name",)}
 
 
 @admin.register(ProductLocation)
@@ -134,6 +161,7 @@ class OrganizationAdmin(LeafletGeoAdmin):
     list_filter = ("type__name", "city")
     search_fields = ("name",)
     ordering = ("name",)
+    prepopulated_fields = {"slug": ("name",)}
 
     # Detail
     modifiable = False

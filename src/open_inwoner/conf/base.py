@@ -134,8 +134,10 @@ INSTALLED_APPS = [
     "hijack.contrib.admin",
     "leaflet",
     "django_elasticsearch_dsl",
+    "import_export",
     # Project applications.
     "open_inwoner.accounts",
+    "open_inwoner.ckeditor",
     "open_inwoner.pdc",
     "open_inwoner.search",
     "open_inwoner.utils",
@@ -201,8 +203,8 @@ STATICFILES_DIRS = [os.path.join(DJANGO_PROJECT_DIR, "static")]
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = [
-    "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+    "django.contrib.staticfiles.finders.FileSystemFinder",
 ]
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
@@ -474,6 +476,7 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0.0",
     # OTHER SETTINGS
     "COMPONENT_NO_READ_ONLY_REQUIRED": True,
+    "SERVE_INCLUDE_SCHEMA": False,
     "POSTPROCESSING_HOOKS": [
         "drf_spectacular.hooks.postprocess_schema_enums",
         "drf_spectacular.contrib.djangorestframework_camel_case.camelize_serializer_fields",
@@ -513,3 +516,6 @@ ELASTICSEARCH_DSL = {
     "default": {"hosts": config("ES_HOST", "localhost:9200")},
 }
 ES_INDEX_PRODUCTS = "products"
+
+# django import-export
+IMPORT_EXPORT_USE_TRANSACTIONS = True
