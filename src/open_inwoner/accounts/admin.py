@@ -37,6 +37,7 @@ class _UserAdmin(UserAdmin):
                     "is_active",
                     "is_staff",
                     "is_superuser",
+                    "deactivated_on",
                     "groups",
                     "user_permissions",
                 ),
