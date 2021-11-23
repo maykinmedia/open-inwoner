@@ -1,17 +1,10 @@
 from django.conf import settings
 
-from elasticsearch_dsl import (
-    FacetedResponse,
-    FacetedSearch,
-    NestedFacet,
-    TermsFacet,
-    query,
-)
-
-from open_inwoner.pdc.models import Product
+from elasticsearch_dsl import FacetedSearch, NestedFacet, TermsFacet, query
 
 from .constants import FacetChoices
 from .documents import ProductDocument
+from .results import ProductSearchResult
 
 
 class ProductSearch(FacetedSearch):
@@ -41,34 +34,8 @@ class ProductSearch(FacetedSearch):
         return search.filter(filters)
 
 
-def search_products(query_str: str, filters=None) -> FacetedResponse:
+def search_products(query_str: str, filters=None) -> ProductSearchResult:
     s = ProductSearch(query_str, filters=filters or {})
-    result = s.execute()
+    response = s.execute()
 
-    # add facets representation for rest api
-    facet_groups = []
-    for facet_name, facet_buckets in result.facets.to_dict().items():
-        model = getattr(Product, facet_name).rel.model
-        bucket_keys = [b[0] for b in facet_buckets]
-        bucket_mapping = {
-            m.slug: m.name for m in model.objects.filter(slug__in=bucket_keys)
-        }
-        bucket_groups = [
-            {
-                "slug": b[0],
-                "name": bucket_mapping[b[0]],
-                "count": b[1],
-                "selected": b[2],
-            }
-            for b in facet_buckets
-        ]
-        # todo replace empty bucket values with the facet endpoint which shows all buckets
-        empty_buckets = [
-            {"slug": m.slug, "name": m.name, "count": 0, "selected": False}
-            for m in model.objects.exclude(slug__in=bucket_keys).order_by("slug")
-        ]
-        facet_groups.append(
-            {"name": facet_name, "buckets": bucket_groups + empty_buckets}
-        )
-    result.facet_groups = facet_groups
-    return result
+    return ProductSearchResult.build_from_response(response)

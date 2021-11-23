@@ -1,6 +1,7 @@
 from drf_spectacular.utils import extend_schema
 from rest_framework.generics import GenericAPIView
 
+from open_inwoner.search.results import ProductSearchResult
 from open_inwoner.search.searches import search_products
 from open_inwoner.utils.schema import input_serializer_to_parameters
 
@@ -28,8 +29,8 @@ class SearchView(GenericAPIView):
         search_response = search_products(search_string, filters=query_data)
 
         # paginate
-        page = self.paginate_queryset(search_response.hits)
+        page = self.paginate_queryset(search_response.results)
         serializer = self.get_serializer(
-            {"results": page, "facets": search_response.facet_groups}
+            ProductSearchResult(results=page, facets=search_response.facets)
         )
         return self.get_paginated_response(serializer.data)
