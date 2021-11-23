@@ -74,13 +74,13 @@ class TestCategoryImportResource(TestCase):
         self.assertEqual(qs[0].slug, self.category.slug)
 
     def test_import_updates_category_when_slug_field_is_given(self):
-        self.category.save()
+        category = CategoryFactory.create()
         updated_category = CategoryFactory.build()
         dataset = tablib.Dataset(
             [
                 updated_category.name,
                 updated_category.description,
-                self.category.slug,
+                category.slug,
             ],
             headers=[
                 "name",
@@ -114,7 +114,7 @@ class TestCategoryImportResource(TestCase):
         self.assertEqual(qs[0].path, "0001")
 
     def test_import_builds_right_path_for_additional_category(self):
-        self.category.save()
+        CategoryFactory.create()
         category = CategoryFactory.build()
         dataset = tablib.Dataset(
             [
