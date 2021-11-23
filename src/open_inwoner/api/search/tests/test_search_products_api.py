@@ -232,7 +232,13 @@ class SearchListTests(ESMixin, APITestCase):
                                 "name": tag1.name,
                                 "count": 1,
                                 "selected": True,
-                            }
+                            },
+                            {
+                                "slug": tag2.slug,
+                                "name": tag2.name,
+                                "count": 0,
+                                "selected": False,
+                            },
                         ],
                     },
                     {
@@ -243,7 +249,13 @@ class SearchListTests(ESMixin, APITestCase):
                                 "name": org1.name,
                                 "count": 1,
                                 "selected": False,
-                            }
+                            },
+                            {
+                                "slug": org2.slug,
+                                "name": org2.name,
+                                "count": 0,
+                                "selected": False,
+                            },
                         ],
                     },
                 ],
