@@ -1,24 +1,19 @@
-import React from 'react';
-
+import React, {ReactElement} from 'react';
 import './CardContainer.scss';
 
-interface CardContainerProps {
-    isLoggedIn: Boolean,
-    children?: any,
+interface iCardContainerProps {
+  children?: any,
 }
 
-export function CardContainer(props:CardContainerProps) {
-  const getClassNames = () => {
-    let classNames = 'card-container';
-    if (props.isLoggedIn) {
-      classNames += ' card-container--with-menu';
-    }
-    return classNames;
-  };
-
+/**
+ * A wrapper for cards.
+ * @param {iCardContainerProps} props
+ * @return {ReactElement}
+ */
+export function CardContainer(props: iCardContainerProps): ReactElement {
   return (
-    <div className={ getClassNames() }>
-      { props.children }
+    <div className="card-container">
+      {props.children}
     </div>
   );
 }

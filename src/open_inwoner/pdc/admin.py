@@ -17,6 +17,7 @@ from .models import (
     OrganizationType,
     Product,
     ProductContact,
+    ProductFile,
     ProductLink,
     ProductLocation,
     Tag,
@@ -45,6 +46,11 @@ class CategoryAdmin(ImportExportMixin, TreeAdmin):
 
     def get_export_resource_class(self):
         return CategoryExportResource
+
+
+class ProductFileInline(admin.TabularInline):
+    model = ProductFile
+    extra = 1
 
 
 class ProductLinkInline(admin.TabularInline):
@@ -80,7 +86,12 @@ class ProductAdmin(ImportExportMixin, admin.ModelAdmin):
     prepopulated_fields = {"slug": ("name",)}
     ordering = ("name",)
     form = ProductAdminForm
-    inlines = (ProductLinkInline, ProductLocationInline, ProductContactInline)
+    inlines = (
+        ProductFileInline,
+        ProductLinkInline,
+        ProductLocationInline,
+        ProductContactInline,
+    )
 
     # import-export
     resource_class = ProductImportResource
@@ -112,6 +123,12 @@ class TagAdmin(admin.ModelAdmin):
     search_fields = ("name",)
     ordering = ("name",)
     prepopulated_fields = {"slug": ("name",)}
+
+
+@admin.register(ProductFile)
+class ProductFileAdmin(admin.ModelAdmin):
+    list_display = ("product", "file")
+    list_filter = ("product",)
 
 
 @admin.register(ProductLocation)

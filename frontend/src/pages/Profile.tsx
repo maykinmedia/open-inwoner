@@ -61,6 +61,6 @@ export default function Profile(): ReactElement {
   )
 
   return (
-    <Grid isLoggedIn mainContent={getMainContent()} sidebarContent={getSidebarContent()}/>
+    <Grid mainContent={getMainContent()} sidebarContent={getSidebarContent()}/>
   );
 }

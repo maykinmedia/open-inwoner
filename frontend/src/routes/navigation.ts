@@ -17,7 +17,7 @@ const getThemeNavigation = async () => {
   return categories.map((category: iCategory): iMenuItem => ({
     label: category.name,
     route: ROUTES.CATEGORY,
-    routeParams: {slug: category.slug}
+    routeParams: {categorySlug: category.slug}
   }));
 }
 

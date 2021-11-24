@@ -6,7 +6,6 @@
 
   @media (min-width: 768px) {
     display: grid;
-    grid-template-areas: "sb sb sb mn mn mn mn mn mn mn mn mn";
     grid-template-columns: repeat(12, 1fr);
     grid-template-rows: 1fr;
   }
@@ -14,16 +13,19 @@
 
   ///// Layout.
 
-  &__sidebar {
-    grid-area: sb;
+  > * {
+    grid-column-end: span 6;
   }
 
-  &__sidebar + &__main {
-    grid-area: mn;
+  & > #{&}__sidebar {
+    grid-column-end: span 3;
   }
 
-  &__main:first-child {
-    grid-column-start: 1;
-    grid-column-end: 13;
+  & > #{&}__sidebar + &__main {
+    grid-column-end: span 9;
+  }
+
+  & > #{&}__main:first-child {
+    grid-column-end: span 12;
   }
 }

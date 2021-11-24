@@ -1,42 +1,27 @@
 .file {
-  display: grid;
-  grid-template-columns: 55px 1fr 1fr;
-  border: 1px solid #D2D2D2;
-  border-radius: 3px;
-  margin-bottom: 16px;
+  align-items: center;
+  border: 1px solid var(--color-mute);
+  border-radius: var(--border-radius);
+  box-sizing: border-box;
+  display: flex;
 
-  .file__icon {
-    padding: 16px;
-    border-radius: 3px 0 0 3px;
-    background-color: #F8F7F5;
-    border-right: 1px solid #D2D2D2;
+  > *[class*=icon]:first-child,
+  > *[class*=Icon]:first-child {
+    background-color: var(--color-gray-light);
+    padding: var(--spacing-large);
+    box-sizing: content-box;
   }
 
-  .file__name {
-    padding: 18px 16px;
-    color: #4B4B4B;
-    font-family: "TheSans C5";
-    font-size: 16px;
-    letter-spacing: 0;
-    line-height: 21px;
+  .link,
+  .p {
+    padding: var(--spacing-large);
+    box-sizing: border-box;
   }
 
-  .file__download {
-    text-align: right;
-    padding: 18px 16px;
-    color: #1261A3;
-    font-family: "TheSans C5";
-    font-size: 16px;
-    letter-spacing: 0;
-    line-height: 21px;
-    display: flex;
-    justify-content: end;
-    align-items: center;
-  }
-
-  .file__download-icon {
-    width: 14px;
-    height: 14px;
-    margin-right: 4px;
+  .p {
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
