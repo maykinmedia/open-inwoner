@@ -519,6 +519,7 @@ ELASTICSEARCH_DSL = {
     "default": {"hosts": config("ES_HOST", "localhost:9200")},
 }
 ES_INDEX_PRODUCTS = "products"
+ES_MAX_SIZE = 10000
 
 # Delete user after x days of inactivity
 DELETE_USER_AFTER_X_DAYS_INACTIVE = 14

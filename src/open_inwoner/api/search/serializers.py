@@ -25,7 +25,11 @@ class FacetSerializer(serializers.Serializer):
     name = serializers.ChoiceField(
         choices=FacetChoices.choices, help_text=_("Name of the facet")
     )
-    buckets = BucketSerializer(many=True, help_text=_("Available buckets"))
+    buckets = BucketSerializer(
+        many=True,
+        source="total_buckets",
+        help_text=_("All buckets, including empty ones"),
+    )
 
 
 class SearchResponseSerializer(serializers.Serializer):
