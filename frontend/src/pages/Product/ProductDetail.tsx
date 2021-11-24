@@ -9,7 +9,8 @@ import {LocationCardList} from '../../Components/Card/LocationCardList';
 import {Image} from '../../Components/Image/Image';
 import {Social} from '../../Components/Social/Social';
 import {TagList} from '../../Components/Tags/TagList';
-import {H1} from '../../Components/Typography/H1';
+import { H1 } from '../../Components/Typography/H1';
+import {H2} from '../../Components/Typography/H2';
 import {H3} from '../../Components/Typography/H3';
 import {H4} from '../../Components/Typography/H4';
 import {iLinkProps, Link} from '../../Components/Typography/Link';
@@ -108,7 +109,8 @@ export default function ProductDetail() {
     const options = {
       overrides: {
         a: {component: Link, props: {className: 'link'}},
-        h1: {component: H1, props: {autoId: true, className: 'h1'}},
+        h1: { component: H1, props: { autoId: true, className: 'h1' } },
+        h2: {component: H2, props: {autoId: true, className: 'h2'}},
         h3: {component: H3, props: {autoId: true, className: 'h3'}},
         h4: {component: H4, props: {autoId: true, className: 'h4'}},
         img: {component: Image, props: {className: 'image'}},
@@ -129,6 +131,10 @@ export default function ProductDetail() {
    * @return {ReactElement}
    */
   const renderFiles = (): ReactElement => {
+    if (!product?.files.length) {
+      return <></>;
+    }
+
     return (
       <>
         <Divider/>
@@ -141,7 +147,7 @@ export default function ProductDetail() {
    * Renders the locations.
    */
   const renderLocations = (): ReactElement => {
-    if (!product?.locations) {
+    if (!product?.locations.length) {
       return <></>;
     }
 

@@ -2,6 +2,7 @@
 const fs = require('fs')
 const path = require('path')
 const express = require('express')
+const axios = require('axios').default
 
 const isTest = process.env.NODE_ENV === 'test' || !!process.env.VITE_TEST_BUILD
 
@@ -45,6 +46,14 @@ async function createServer(
       })
     )
   }
+
+  app.get("/api/config", async (req, res) => {
+    console.log(process.env);
+    const response = await axios.get(`${process.env.DJANGO_ROOT_URL}/api/config`).catch((err) => {
+      throw err;
+    });
+    res.json(response.data);
+  });
 
   app.use('*', async (req, res) => {
     try {

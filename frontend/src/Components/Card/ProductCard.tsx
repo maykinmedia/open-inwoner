@@ -1,6 +1,8 @@
 import React from 'react';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { Button } from '../Button/Button';
+import { P } from '../Typography/P';
+import { H3 } from '../Typography/H3';
 import './Card.scss';
 
 interface ProductCardProps {
@@ -12,9 +14,9 @@ interface ProductCardProps {
 export function ProductCard(props:ProductCardProps) {
   return (
     <div className="card card--product">
-      <h3 className="card__title">{ props.title }</h3>
-      <p className="card__summary">{ props.summary }</p>
-      <Button href={props.to} transparent>
+      <H3>{ props.title }</H3>
+      <P>{ props.summary }</P>
+      <Button href={`/product/${props.to}`} transparent>
         <ArrowForwardIcon />
       </Button>
     </div>

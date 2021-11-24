@@ -46,7 +46,7 @@ export default function Search() {
 
     event?.preventDefault();
     const localSearchResults = await search(page, filters, query);
-    if (localSearchResults.count) {
+    if (searchTerms.length > 0) {
       setSearchResults(localSearchResults.results);
       setResultCount(localSearchResults.count);
     } else {
@@ -123,7 +123,9 @@ export default function Search() {
   }
 
   const nextPage = async () => {
-    setPage(page + 1);
+    if (page < Math.ceil(resultCount / 12)) {
+      setPage(page + 1);
+    }
   }
 
   const getFields = (): iField[] => [
@@ -147,7 +149,7 @@ export default function Search() {
     <>
       <H1>Zoeken</H1>
       <P>Hier vind u hoe wonen, zorg, welzijn, werk en geldzaken in Den Haag geregeld zijn en wijzen we u de weg naar organisaties, activiteiten, hulp en initiatieven in uw eigen buurt.</P>
-      <Form fields={getFields()} submitLabel='Zoeken' onSubmit={onSubmit}></Form>
+      <Form columns={2} inline={true} actionSize="normal" fields={getFields()} submitLabel='Zoeken' onSubmit={onSubmit}></Form>
       {searchTerms.length > 0 && <ButtonRow startingText="U zocht op:" buttons={getButtons()} />}
     </>
   )
@@ -157,7 +159,7 @@ export default function Search() {
       return {
         name: searchResult.name,
         intro: searchResult.summary,
-        href: `/products/${searchResult.slug}`,
+        href: `/product/${searchResult.slug}`,
         type: "product"
       }
     });

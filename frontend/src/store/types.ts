@@ -14,6 +14,7 @@ export interface iLogo {
   name: string,
   description: string,
   file: string,
+  url: string,
   subjectLocation: any,
 }
 

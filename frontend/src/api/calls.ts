@@ -86,7 +86,7 @@ export const search = async (page: number, filters: any, query?: string): Promis
 }
 
 export const getConfiguration = async (): Promise<iConfig> => {
-  const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/config/`).catch((err) => {
+  const res = await axios.get(`/api/config`).catch((err) => {
     throw err;
   });
   return res.data as iConfig;

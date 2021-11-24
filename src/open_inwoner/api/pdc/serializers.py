@@ -20,14 +20,20 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class FilerImageSerializer(serializers.ModelSerializer):
+    url = serializers.SerializerMethodField()
+
     class Meta:
         model = Image
         fields = (
             "name",
             "description",
             "file",
+            "url",
             "subject_location",
         )
+
+    def get_url(self, obj):
+        return self.context["request"].build_absolute_uri(obj.file.url)
 
 
 class SmallProductSerializer(serializers.HyperlinkedModelSerializer):
