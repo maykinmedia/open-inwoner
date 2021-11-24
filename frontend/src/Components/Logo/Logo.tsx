@@ -1,21 +1,23 @@
-import React from 'react';
-import {Link} from 'react-router-dom';
+import React, {useContext} from 'react';
+import { Link } from 'react-router-dom';
+
+import {globalContext} from '../../store';
+
 import './Logo.scss';
 
-interface LogoProps {
-  alt?: string,
-  src?: string,
-}
+export function Logo() {
+  const { globalState } = useContext(globalContext);
 
-export function Logo(props: LogoProps) {
+  const getLogo = () => {
+    if (globalState.logo) {
+      return `${import.meta.env.VITE_API_URL}${globalState.logo.file}`
+    }
+    return ""
+  }
+
   return (
     <Link className="logo" to="/">
-      <img className="logo__image" src={props.src} alt={props.alt}/>
+      <img className="logo__image" src={getLogo()} alt={ globalState.logo?.description }/>
     </Link>
   );
-}
-
-Logo.defaultProps = {
-  alt: import.meta.env.VITE_LOGO_ALT,
-  src: import.meta.env.VITE_LOGO_URL,
 }
