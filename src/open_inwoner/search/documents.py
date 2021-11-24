@@ -35,6 +35,7 @@ class ProductDocument(Document):
             "neighbourhood": fields.TextField(attr="neighbourhood.name"),
         }
     )
+    keywords = fields.TextField(fields={"suggest": fields.CompletionField(multi=True)})
 
     class Index:
         name = settings.ES_INDEX_PRODUCTS
