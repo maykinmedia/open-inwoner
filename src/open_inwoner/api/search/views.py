@@ -26,7 +26,6 @@ class SearchView(GenericAPIView):
         # perform search
         search_string = query_data.pop("search", "")
         search_response = search_products(search_string, filters=query_data)
-        print(search_response)
         # paginate
         page = self.paginate_queryset(search_response.hits)
         serializer = self.get_serializer(

@@ -44,7 +44,6 @@ class ProductSearch(FacetedSearch):
 def search_products(query: str, filters=None) -> FacetedResponse:
     s = ProductSearch(query, filters=filters or {})
     result = s.execute()
-    print(result)
 
     # add facets representation for rest api
     facet_groups = []
