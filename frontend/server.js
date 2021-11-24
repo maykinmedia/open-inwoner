@@ -50,7 +50,8 @@ async function createServer(
   app.get("/api/config", async (req, res) => {
     console.log(process.env);
     const response = await axios.get(`${process.env.DJANGO_ROOT_URL}/api/config`).catch((err) => {
-      throw err;
+      console.error(err)
+      res.status(500).end()
     });
     res.json(response.data);
   });

@@ -1,3 +1,4 @@
+from django.contrib.sites.models import Site
 from django.utils.translation import gettext as _
 
 from filer.models import Image
@@ -33,7 +34,9 @@ class FilerImageSerializer(serializers.ModelSerializer):
         )
 
     def get_url(self, obj):
-        return self.context["request"].build_absolute_uri(obj.file.url)
+        self.context
+        domain = Site.objects.get_current().domain
+        return f"{domain}{obj.file.url}"
 
 
 class SmallProductSerializer(serializers.HyperlinkedModelSerializer):
