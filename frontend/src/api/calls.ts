@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {iToken, iUser} from '../store/types';
-import {iCategory, iProduct} from "../types/pdc";
+import { iCategory, iProduct } from "../types/pdc";
+import { iConfig } from '../types/configuration';
 
 export const logout = async () => {
   const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/logout/`, {}).catch((err) => {
@@ -66,4 +67,11 @@ export const search = async (query?: string): Promise<iProduct[]> => {
     throw err;
   });
   return res.data as iProduct[];
+}
+
+export const getConfiguration = async (): Promise<iConfig> => {
+  const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/config/`).catch((err) => {
+    throw err;
+  });
+  return res.data as iConfig;
 }

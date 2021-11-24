@@ -28,6 +28,7 @@ export const globalContext = createContext({} as iContextType);
 export const initialState: iGlobalStateInterface = {
   token: null,
   user: null,
+  logo: null,
   error: null,
 };
 
