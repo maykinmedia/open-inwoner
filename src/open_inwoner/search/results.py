@@ -22,9 +22,7 @@ class Facet:
     buckets: List[FacetBucket]
     model: Type[models.Model]
 
-    def __init__(
-        self, name: str, buckets: list, model: models.Model
-    ):
+    def __init__(self, name: str, buckets: list, model: models.Model):
         self.name = name
         self.model = model
         self.buckets = self.generate_buckets(buckets)
