@@ -24,22 +24,22 @@ class CategoryExportResource(resources.ModelResource):
 
 class ProductExportResource(resources.ModelResource):
     categories = fields.Field(
-        column_name="Categories",
+        column_name="categories",
         attribute="categories",
         widget=ManyToManyWidget(Category, field="slug"),
     )
     organizations = fields.Field(
-        column_name="Organizations",
+        column_name="organizations",
         attribute="organizations",
         widget=ManyToManyWidget(Organization, field="name"),
     )
     related_products = fields.Field(
-        column_name="Related products",
+        column_name="related_products",
         attribute="related_products",
         widget=ManyToManyWidget(Product, field="slug"),
     )
     tags = fields.Field(
-        column_name="Tags",
+        column_name="tags",
         attribute="tags",
         widget=ManyToManyWidget(Tag, field="name"),
     )
