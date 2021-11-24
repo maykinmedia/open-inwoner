@@ -11,12 +11,21 @@
   line-height: var(--font-line-height-body);
   text-decoration: none;
 
+  &--icon-after {
+    flex-direction: row-reverse;
+  }
+
   &--primary {
     color: var(--color-primary);
   }
 
   &--secondary {
     color: var(--color-secondary);
+    text-decoration: underline;
+
+    &#{&}:hover {
+      text-decoration: none;
+    }
   }
 
   &--active {
@@ -29,10 +38,9 @@
     text-decoration: underline;
   }
 
-
-
   *[class*=icon]:first-child,
   *[class*=Icon]:first-child {
-    margin-right: var(--spacing-medium)
+    margin-right: var(--spacing-small);
+    transform: scale(0.75);
   }
 }

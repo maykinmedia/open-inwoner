@@ -85,6 +85,6 @@ export default function Register() {
   );
 
   return (
-    <Grid isLoggedIn mainContent={getMainContent()}/>
+    <Grid mainContent={getMainContent()}/>
   );
 }

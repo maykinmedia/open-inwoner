@@ -6,10 +6,14 @@
   margin: 0;
 }
 
-.h1 + .p {
-  margin-top: var(--font-l);
+*[class^=h] + .p {
+  margin-top: var(--spacing-medium);
 }
 
 .p + .p {
   margin-top: var(--font-line-height-body);
+}
+
+.tag-list + .p {
+  margin-top: var(--spacing-extra-large);
 }

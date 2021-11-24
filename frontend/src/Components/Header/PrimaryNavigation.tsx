@@ -51,7 +51,7 @@ export default function PrimaryNavigation(props: iPrimaryNavigationProps) {
   const renderMenuItems = (menuItems: iMenuItem[], shouldRenderIcon: boolean) => {
     return (
       <ul className="primary-navigation__list">
-        {menuItems.filter && menuItems.filter((menuItem: iMenuItem) => globalState.user || !menuItem.route.loginRequired).map((menuItem: iMenuItem, index: number) => {
+        {menuItems.filter && menuItems.filter((menuItem: iMenuItem) => globalState?.user || !menuItem.route.loginRequired).map((menuItem: iMenuItem, index: number) => {
           const activeClassName = menuItem.route.path === '/' && location.pathname !== '/' ? '' : undefined;
 
           return (

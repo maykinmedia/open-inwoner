@@ -1,23 +1,36 @@
-import React from 'react';
+import React, {ReactElement} from 'react';
 import Scrollspy from 'react-scrollspy';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-
+import {iLinkProps, Link} from '../Typography/Link';
 import './AnchorMenu.scss';
 
-export default function AnchorMenu() {
+
+interface iAnchorMenuProps {
+  links: iLinkProps[]
+}
+
+export default function AnchorMenu(props: iAnchorMenuProps): ReactElement {
+  const {links, ..._props} = props;
+  const items = links.map((linkProps: iLinkProps) => linkProps.to.replace('#', ''));
+
+  const renderListItems = (): ReactElement[] => links.map((linkProps: iLinkProps): ReactElement => (
+    <li key={linkProps.to} className="anchor-menu__list-item">
+      <Link {...linkProps}/>
+    </li>
+  ))
+
   return (
-    <Scrollspy className="anchor-menu" items={['title', 'files', 'links', 'see', 'share']} currentClassName="anchor-menu__item--highlight">
-      <li className="anchor-menu__item"><a className="anchor-menu__link" href="#title">Persoonlijk Plan</a></li>
-      <li className="anchor-menu__item"><a className="anchor-menu__link" href="#files">Bestanden</a></li>
-      <li className="anchor-menu__item"><a className="anchor-menu__link" href="#links">Links</a></li>
-      <li className="anchor-menu__item"><a className="anchor-menu__link" href="#see">Zie ook</a></li>
-      <li className="anchor-menu__item"><a className="anchor-menu__link" href="#share">Delen</a></li>
-      <li className="anchor-menu__item anchor-menu__item--top">
-        <a className="anchor-menu__link" href="#title">
-          <ArrowUpwardIcon className="anchor-menu__icon" />
-          Terug naar boven
-        </a>
-      </li>
-    </Scrollspy>
+    <aside className="anchor-menu" {..._props}>
+      <Scrollspy className="anchor-menu__list" currentClassName="anchor-menu__list-item--active" items={items}>
+        {renderListItems()}
+        <li className="anchor-menu__list-item anchor-menu__list-item--top">
+          <Link primary={true} to={(links.length) ? links[0].to : ''} icon={ArrowUpwardIcon}>Terug naar boven</Link>
+        </li>
+      </Scrollspy>
+    </aside>
   );
+}
+
+AnchorMenu.defaultProps = {
+  links: [],
 }
