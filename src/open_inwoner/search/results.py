@@ -19,15 +19,13 @@ class FacetBucket:
 @dataclass(init=False)
 class Facet:
     name: str
-    display_name: str
     buckets: List[FacetBucket]
     model: Type[models.Model]
 
     def __init__(
-        self, name: str, display_name: str, buckets: list, model: models.Model
+        self, name: str, buckets: list, model: models.Model
     ):
         self.name = name
-        self.display_name = display_name
         self.model = model
         self.buckets = self.generate_buckets(buckets)
 
@@ -86,12 +84,7 @@ class ProductSearchResult:
         facets = []
         for facet_name, facet_buckets in response.facets.to_dict().items():
             model = getattr(Product, facet_name).rel.model
-            facet = Facet(
-                name=facet_name,
-                display_name=facet_buckets.get("display_name"),
-                buckets=facet_buckets.get("values"),
-                model=model,
-            )
+            facet = Facet(name=facet_name, buckets=facet_buckets, model=model)
             facets.append(facet)
 
         return cls(results=response.hits, facets=facets, _r=response)
