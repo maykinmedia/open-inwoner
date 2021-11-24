@@ -5,6 +5,7 @@ import { H4 } from '../Typography/H4';
 import { Checkbox } from '../Form/Checkbox';
 
 import './Filter.scss';
+import { FaceTwoTone } from '@mui/icons-material';
 
 interface iFilterItem {
   slug: string,
@@ -14,16 +15,17 @@ interface iFilterItem {
 }
 
 interface FilterProps {
-  title: string,
+  facet: any,
   items: Array<iFilterItem>,
+  action: Function,
 }
 
 export function Filter(props: FilterProps): ReactElement {
-  const { title, items } = props
+  const { facet, items, action } = props
   const [opened, setOpened] = useState<boolean>(false);
 
   const renderFilterItems = () => items.map((item: iFilterItem, index: number): ReactElement => {
-    return <Checkbox key={ index } field={{ id: item.slug, label: `${item.name} - ${item.count}`, name: item.slug, selected: item.selected, value: item.slug, type: "checkbox" }} />;
+    return <Checkbox key={ index } onChange={action} field={{ id: item.slug, label: `${item.name} (${item.count})`, name: facet.name, selected: item.selected, value: item.slug, type: "checkbox" }} />;
   });
 
   const getIcon = () => {
@@ -41,7 +43,7 @@ export function Filter(props: FilterProps): ReactElement {
   return (
     <aside className={ opened ? "filter filter--open" : "filter" }>
       <H4 className="filter__title" onClick={ toggleOpen }>
-        {title}
+        {facet.name}
         {getIcon()}
       </H4>
       <div className="filter__list">
