@@ -1,0 +1,19 @@
+.file-list {
+  .h4 {
+    margin-bottom: var(--spacing-large);
+  }
+
+  &__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  &__list-item {
+    margin-bottom: var(--spacing-large);
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}

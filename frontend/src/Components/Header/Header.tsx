@@ -1,20 +1,26 @@
-import React, {useContext} from 'react';
-import {NavLink} from "react-router-dom";
+import React, {useContext, useEffect, useState} from 'react';
 import {logout} from '../../api/calls';
+import {ROUTES} from '../../routes/routes';
 import {globalContext} from '../../store';
 import {Breadcrumbs} from './Breadcrumbs';
-import {Logo} from './Logo';
+import {Logo} from '../Logo/Logo';
 import PrimaryNavigation from './PrimaryNavigation';
+import {RouteLink} from '../Typography/RouteLink';
+import {P} from '../Typography/P';
 import './Header.scss';
-import './Link.scss';
 
 
 /**
  * Renders the header including all the navigation.
- * @return {JSX.Element}
+ * @return {ReactElement}
  */
 export function Header() {
   const {globalState, dispatch} = useContext(globalContext);
+  const [greeting, setGreeting] = useState('Welkom');
+
+  useEffect(() => {
+    setGreeting(`Welkom ${globalState?.user?.firstName} ${globalState.user?.lastName}`.trim());
+  }, [globalState])
 
   /**
    * Logout.
@@ -26,27 +32,24 @@ export function Header() {
 
   /**
    * Returns the welcome message.
-   * @return {JSX.Element}
+   * @return {ReactElement}
    */
   const getWelcomeMessage = () => {
     return (
-      <p className="link">
-        {globalState.user && `Welkom ${globalState.user.firstName} ${globalState.user.lastName}`}
-        {!globalState.user && 'Welkom'}
-      </p>
+      <P>{greeting}</P>
     )
   };
 
   /**
    * Returns the login/logout link(s).
-   * @return {JSX.Element}
+   * @return {ReactElement}
    */
   const getLoginLinks = () => {
-    if (globalState.user) {
+    if (globalState?.user) {
       return (
         <ul className="header__list">
           <li className="header__list-item">
-            <NavLink className="link" onClick={handleLogout} to="#">Uitloggen</NavLink>
+            <RouteLink onClick={handleLogout} route={ROUTES.LOGOUT}/>
           </li>
         </ul>
       );
@@ -55,11 +58,11 @@ export function Header() {
     return (
       <ul className="header__list">
         <li className="header__list-item">
-          <NavLink className="link" to="/register">Registreren</NavLink>
+          <RouteLink route={ROUTES.REGISTER}/>
         </li>
 
         <li className="header__list-item">
-          <NavLink className="link link--primary" activeClassName="link--active" to="/login">Inloggen</NavLink>
+          <RouteLink primary={true} route={ROUTES.LOGIN}/>
         </li>
       </ul>
     );
@@ -67,7 +70,7 @@ export function Header() {
 
   return (
     <header className="header">
-      <Logo src="https://www.zwolle.nl/sites/all/themes/custom/zwolle_redesign/logo.png" alt="Logo van gemeente"/>
+      <Logo/>
 
       <nav className="header__actions">
         {getWelcomeMessage()}

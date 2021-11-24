@@ -1,17 +1,31 @@
 .grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 55px;
+  display: flex;
+  flex-direction: column;
+  grid-gap: var(--gutter-width);
+  width: 100%;
 
-  &--single {
-    grid-template-columns: 1fr !important;
+  @media (min-width: 768px) {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: 1fr;
   }
 
-  &--fixed-left {
-    grid-template-columns: 250px 1fr;
+
+  ///// Layout.
+
+  > * {
+    grid-column-end: span 6;
   }
 
-  .grid__right {
-    position: relative;
+  & > #{&}__sidebar {
+    grid-column-end: span 3;
+  }
+
+  & > #{&}__sidebar + &__main {
+    grid-column-end: span 9;
+  }
+
+  & > #{&}__main:first-child {
+    grid-column-end: span 12;
   }
 }

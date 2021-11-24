@@ -1,15 +1,15 @@
 import React, {useContext, useState} from 'react';
-import {generatePath, Link} from 'react-router-dom';
+import {useLocation} from 'react-router-dom';
 import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
 import {NAVIGATION} from '../../routes/navigation';
 import {globalContext} from '../../store';
 import {iMenuItem} from '../../types/menu-item';
-import './Link.scss'
+import {RouteLink} from '../Typography/RouteLink';
 import './PrimaryNavigation.scss'
 
 
 interface iPrimaryNavigationProps {
-  menuItems: iMenuItem[],
+  menuItems?: iMenuItem[],
 }
 
 /**
@@ -18,15 +18,16 @@ interface iPrimaryNavigationProps {
  * contain a "children" key containing either a nested iMenuItem[] or an async function returning a Promise for an
  * iMenuItem[]
  *
- * @return {JSX.Element}
+ * @return {ReactElement}
  */
 export default function PrimaryNavigation(props: iPrimaryNavigationProps) {
   const {globalState} = useContext(globalContext);
+  const location = useLocation();
   const [resolvedNavigation, setResolvedNavigation] = useState(props.menuItems);
   const [tick, setTick] = useState(0);
 
   // Run optionally async children function.
-  props.menuItems.forEach(async (menuItem) => {
+  props.menuItems?.forEach(async (menuItem) => {
     if (!menuItem.children) {
       return;
     }
@@ -47,30 +48,30 @@ export default function PrimaryNavigation(props: iPrimaryNavigationProps) {
    * @param {boolean} shouldRenderIcons=true
    * @return JSX.Element
    */
-  const renderMenuItems = (menuItems: iMenuItem[], shouldRenderIcons: boolean) => (
+  const renderMenuItems = (menuItems: iMenuItem[], shouldRenderIcon: boolean) => {
+    return (
       <ul className="primary-navigation__list">
-        {menuItems.filter && menuItems.filter((menuItem: iMenuItem) => globalState.user || !menuItem.route.loginRequired).map((menuItem: iMenuItem, index: number) => {
-          const label = (menuItem.label) ? menuItem.label : menuItem.route.label;
-          const to = (menuItem.routeParams) ? generatePath(menuItem.route.path, menuItem.routeParams) : menuItem.route.path;
-          const Icon = menuItem.route.icon;
+        {menuItems.filter && menuItems.filter((menuItem: iMenuItem) => globalState?.user || !menuItem.route.loginRequired).map((menuItem: iMenuItem, index: number) => {
+          const activeClassName = menuItem.route.path === '/' && location.pathname !== '/' ? '' : undefined;
 
           return (
             <li key={index} className="primary-navigation__list-item">
-              <Link className="link" to={to}>
-                {shouldRenderIcons && Icon && <Icon/>}
-                {label}
+              <RouteLink activeClassName={activeClassName} route={menuItem.route} routeParams={menuItem.routeParams}
+                         shouldRenderIcon={shouldRenderIcon}>
+                {menuItem.label || menuItem.route.label}
                 {menuItem.children && <KeyboardArrowDownOutlinedIcon/>}
-              </Link>
+              </RouteLink>
               {menuItem.children && renderMenuItems(menuItem.children as iMenuItem[], false)}
             </li>
           );
         })}
       </ul>
-    )
+    );
+  }
 
   return (
     <nav className="primary-navigation">
-      {renderMenuItems(resolvedNavigation, true)}
+      {resolvedNavigation && renderMenuItems(resolvedNavigation, true)}
     </nav>
   );
 }
