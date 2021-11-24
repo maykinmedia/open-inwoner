@@ -5,7 +5,6 @@ import { H4 } from '../Typography/H4';
 import { Checkbox } from '../Form/Checkbox';
 
 import './Filter.scss';
-import { FaceTwoTone } from '@mui/icons-material';
 
 interface iFilterItem {
   slug: string,

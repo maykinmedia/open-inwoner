@@ -46,7 +46,7 @@ export default function Search() {
 
     event?.preventDefault();
     const localSearchResults = await search(page, filters, query);
-    if (true) {
+    if (localSearchResults.count) {
       setSearchResults(localSearchResults.results);
       setResultCount(localSearchResults.count);
     } else {
@@ -116,13 +116,13 @@ export default function Search() {
     setPage(event.currentTarget.dataset.page);
   }
 
-  const prevPage = async (event: SyntheticEvent) => {
+  const prevPage = async () => {
     if (page > 1) {
       setPage(page - 1);
     }
   }
 
-  const nextPage = async (event: SyntheticEvent) => {
+  const nextPage = async () => {
     setPage(page + 1);
   }
 
