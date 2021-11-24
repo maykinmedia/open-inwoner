@@ -228,7 +228,7 @@ EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
 EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=False)
 EMAIL_TIMEOUT = 10
 
-DEFAULT_FROM_EMAIL = "open_inwoner@example.com"
+DEFAULT_FROM_EMAIL = "openinwoner@maykinmedia.nl"
 
 #
 # LOGGING
