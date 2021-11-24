@@ -2,6 +2,18 @@ import axios from 'axios';
 import {iToken, iUser} from '../store/types';
 import { iCategory, iProduct } from "../types/pdc";
 import { iConfig } from '../types/configuration';
+import { iSearchResults } from '../types/search';
+
+const getQueryString = (name: string, list: Array<string>) => {
+  let queryString = ""
+  if (list.length > 0) {
+    list.forEach((item) => {
+      queryString += `&${name}=${item}`
+    });
+    // queryString = `&${name}=[${list.join(",")}]`
+  }
+  return queryString
+}
 
 export const logout = async () => {
   const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/logout/`, {}).catch((err) => {
@@ -62,11 +74,15 @@ export const getCategories = async (): Promise<iCategory[]> => {
   return res.data as iCategory[];
 };
 
-export const search = async (query?: string): Promise<iProduct[]> => {
-  const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/search/?search=${query}`).catch((err) => {
+export const search = async (page: number, filters: any, query?: string): Promise<iSearchResults> => {
+  const categoryString = getQueryString('categories', filters.categories);
+  const tagsString = getQueryString('tags', filters.tags);
+  const organizationString = getQueryString('organizations', filters.organizations);
+
+  const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/search/?search=${query}&page=${page}${categoryString}${tagsString}${organizationString}`).catch((err) => {
     throw err;
   });
-  return res.data as iProduct[];
+  return res.data as iSearchResults;
 }
 
 export const getConfiguration = async (): Promise<iConfig> => {
