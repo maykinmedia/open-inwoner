@@ -96,5 +96,5 @@ export function Button(props: iButtonProps) {
 }
 
 Button.defaultProps = {
-  iconPosition: 'after',
+  iconPosition: 'before',
 }

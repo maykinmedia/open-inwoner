@@ -1,15 +1,12 @@
 import React from 'react';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import FacebookIcon from '@mui/icons-material/Facebook';
-import LinkedInIcon from '@mui/icons-material/LinkedIn';
-import TwitterIcon from '@mui/icons-material/Twitter';
 import {Logo} from '../Logo/Logo';
 import {H4} from '../Typography/H4';
 import {P} from '../Typography/P';
 import {Button} from '../Button/Button';
 import {RouteLink} from '../Typography/RouteLink';
 import {ROUTES} from '../../routes/routes';
-import {Link} from '../Typography/Link';
+import {Social} from '../Social/Social';
 import './Footer.scss';
 
 
@@ -22,7 +19,7 @@ export const Footer = () => {
         <H4>Bezoekadres</H4>
         <P>Stadhuis Spui (stadsdeelkantoor Centrum)<br/>
           Spui 70, 2511 BT Den Haag</P>
-        <Button icon={ArrowForwardIcon} iconPosition='after' transparent={true}>Bekijk op Google Maps</Button>
+        <Button icon={ArrowForwardIcon} iconPosition='before' transparent={true}>Bekijk op Google Maps</Button>
       </aside>
 
       <aside className="footer__mail">
@@ -32,12 +29,7 @@ export const Footer = () => {
           2500 DJ Den Haag</P>
       </aside>
 
-      <aside className="footer__social">
-        <H4>Op social media</H4>
-        <Link to="#" icon={FacebookIcon}></Link>
-        <Link to="#" icon={TwitterIcon}></Link>
-        <Link to="#" icon={LinkedInIcon}></Link>
-      </aside>
+      <Social primary={true}/>
 
       <aside className="footer__newsletter">
         <H4>Meld je aan voor de nieuwsbrief</H4>

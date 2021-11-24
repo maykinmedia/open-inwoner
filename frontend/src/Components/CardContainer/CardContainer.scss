@@ -1,10 +1,15 @@
-.card-container{
-    --card-columns: 4;
-    display: grid;
-    grid-template-columns: repeat(var(--card-columns), 1fr);
-    gap: 32px;
+.card-container {
+  --card-columns: 1;
+  display: grid;
+  gap: var(--gutter-width);
+  grid-template-columns: repeat(var(--card-columns), 1fr);
 
-    &--with-menu {
-      --card-columns: 3;
-    }
+  @media (min-width: 768px) {
+    --card-columns: 4;
+  }
+
+}
+
+.p + .card-container {
+  margin-top: var(--gutter-width);
 }

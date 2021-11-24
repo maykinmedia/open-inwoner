@@ -49,14 +49,9 @@
   &--transparent {
     background-color: transparent;
     border-color: transparent;
+    color: var(--color-primary);
     padding-left: 0;
     padding-right: 0;
-  }
-
-  &--transparent#{&}--icon-before {
-  }
-
-  &--transparent#{&}--icon-after {
   }
 
   &--primary {

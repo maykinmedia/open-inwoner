@@ -1,19 +1,39 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, {ReactElement} from 'react';
+import {Link} from 'react-router-dom';
+import {H4} from '../Typography/H4';
 import './Card.scss';
 
-interface CardProps {
-    src: string,
-    alt: string,
-    title: string,
-    to: string,
+interface iCardProps {
+  header?: ReactElement,
+  title: string,
+  alt?: string,
+  children?: any,
+  src?: string,
+  to?: string,
 }
 
-export function Card(props:CardProps) {
+
+/**
+ * A card.
+ * @param {iCardProps} props
+ * @return {ReactElement}
+ */
+export function Card(props: iCardProps): ReactElement {
+  const {header, title, children, to, alt, src, ..._props} = props
+
+  const Tag = (to) ? Link : (props: any) => <aside {...props}/>;
+
   return (
-    <Link className="card" to={props.to}>
-      <img className="card__img" src={props.src} alt={props.alt} />
-      <h3 className="card__title">{ props.title }</h3>
-    </Link>
+    <Tag className="card" to={to} {..._props}>
+      {header || src && <header className="card__header">
+        {src && <img className="card__img" src={src} alt={alt}/>}
+        {header}
+      </header>}
+
+      <div className="card__body">
+        <H4>{title}</H4>
+        {children}
+      </div>
+    </Tag>
   );
 }

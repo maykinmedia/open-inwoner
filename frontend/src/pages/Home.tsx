@@ -9,6 +9,6 @@ export default function Home() {
   );
 
   return (
-    <Grid isLoggedIn mainContent={getRight()} />
+    <Grid mainContent={getRight()} />
   );
 }
