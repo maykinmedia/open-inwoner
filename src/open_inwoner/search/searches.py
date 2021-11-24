@@ -1,6 +1,7 @@
 from django.conf import settings
 
 from elasticsearch_dsl import FacetedSearch, NestedFacet, TermsFacet, query
+from elasticsearch_dsl.response import Response
 
 from .constants import FacetChoices
 from .documents import ProductDocument
@@ -39,3 +40,16 @@ def search_products(query_str: str, filters=None) -> ProductSearchResult:
     response = s.execute()
 
     return ProductSearchResult.build_from_response(response)
+
+
+def search_autocomplete(query_str: str) -> Response:
+    s = ProductDocument.search()
+    s = s.suggest(
+        "name_suggest",
+        query_str,
+        completion={"field": "name.suggest", "size": settings.ES_SUGGEST_SIZE},
+    )
+    result = s.execute()
+
+    name_suggest = result.suggest["name_suggest"][0]
+    return name_suggest.options
