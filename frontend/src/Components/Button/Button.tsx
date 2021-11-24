@@ -6,8 +6,8 @@ import './Button.scss';
 export interface iButtonProps {
   href?: string,
   icon?: ComponentType,
-  iconPosition?: 'before' | 'after',
-  size?: 'big' | 'normal',
+  iconPosition?: 'before' | 'after' | undefined,
+  size?: 'big' | 'normal' | undefined,
   type?: 'button' | 'submit' | 'reset' | undefined,
   open?: boolean,
   primary?: boolean
@@ -88,5 +88,5 @@ export function Button(props: iButtonProps) {
 }
 
 Button.defaultProps = {
-  iconPosition: 'after',
+  iconPosition: 'before',
 }

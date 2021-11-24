@@ -1,4 +1,4 @@
-import React, {ReactElement, useRef, useState} from 'react';
+import React, {ReactElement, useEffect, useRef, useState} from 'react';
 import FontDownloadOutlinedIcon from '@mui/icons-material/FontDownloadOutlined';
 import HearingOutlinedIcon from '@mui/icons-material/HearingOutlined';
 import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined';
@@ -15,10 +15,14 @@ import './AccessibilityHeader.scss';
 export function AccessibilityHeader(): ReactElement {
   const speechSynthesis = (typeof window === 'object') ? window['speechSynthesis'] : null;
   const SpeechSynthesisUtterance = (typeof window === 'object') ? window['SpeechSynthesisUtterance'] : null;
-  const isSpeechSynthesisSupported = Boolean(speechSynthesis && SpeechSynthesisUtterance);
+  const [isSpeechSynthesisSupported, setIsSpeechSynthesisSupported] = useState(false);
   const utteranceRef = useRef<{ current: SpeechSynthesisUtterance | null }>(null);
   const [previousFontSize, setPreviousFontSize] = useState<string | null>(null);
   const [previousFontFamily, setPreviousFontFamily] = useState<string | null>(null);
+
+  useEffect(() => {
+    setIsSpeechSynthesisSupported(Boolean(speechSynthesis && SpeechSynthesisUtterance));
+  })
 
   /**
    * Runs text to speech ont the textContent of <main>.
@@ -74,7 +78,7 @@ export function AccessibilityHeader(): ReactElement {
   const swapFont = (): void => {
     const target = document.querySelector(':root') as HTMLElement;
     const varName = '--font-family-body';
-    const alternativeFontFamily = `Helvetica, Courier, Arial, Verdana.`;
+    const alternativeFontFamily = `Open Dyslexic`;
 
     if (!target) {
       return;
@@ -92,6 +96,16 @@ export function AccessibilityHeader(): ReactElement {
     target?.style.setProperty(varName, alternativeFontFamily);
   }
 
+  /**
+   * (Attempts to) print the page.
+   */
+  const print = (): void => {
+    window.print();
+  }
+
+  /**
+   * Prints the page.
+   */
   return (
     <header className="accessibility-header">
       <ul className="accessibility-header__list">
@@ -112,7 +126,7 @@ export function AccessibilityHeader(): ReactElement {
         </li>
 
         <li className="accessibility-header__list-item">
-          <Link to="javascript:print()" icon={PrintOutlinedIcon}>Print pagina</Link>
+          <Link to="#" icon={PrintOutlinedIcon} onClick={print}>Print pagina</Link>
         </li>
       </ul>
     </header>

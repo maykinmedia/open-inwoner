@@ -44,6 +44,7 @@ urlpatterns = [
     path("admin/hijack/", include("hijack.urls")),
     path("admin/", admin.site.urls),
     path("api/", include("open_inwoner.api.urls", namespace="api")),
+    path("ckeditor/", include("open_inwoner.ckeditor.urls")),
     # Simply show the master template.
     path("", TemplateView.as_view(template_name="master.html"), name="root"),
 ]

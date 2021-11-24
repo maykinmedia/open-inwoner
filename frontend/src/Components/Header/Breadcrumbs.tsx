@@ -1,9 +1,10 @@
-import React from 'react';
-import {Link, useLocation} from 'react-router-dom';
+import React, {ReactElement} from 'react';
+import {matchPath, useLocation} from 'react-router-dom';
 import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
-import {ROUTES} from "../../routes/routes";
+import {labelFromSlug, ROUTES} from "../../routes/routes";
 import {iRoute} from "../../types/route";
 import './Breadcrumbs.scss';
+import {Link} from '../Typography/Link';
 
 
 interface iBreadCrumb {
@@ -19,16 +20,17 @@ interface iBreadCrumb {
  * Returns the breadcrumbs based the current location and matched routes.
  * @return {ReactElement}
  */
-export function Breadcrumbs() {
+export function Breadcrumbs(): ReactElement {
   const location = useLocation();
 
   /**
    * Returns an iBreadCrumb[] based on the current location and matched routes.
+   * This is known to be in accurate with :param* routes.
    * @return {iBreadCrumb[]}
    */
-  const getBreadCrumbs = () => {
+  const getBreadCrumbs = (path: string = location.pathname) => {
     // Root required exception.
-    if (location.pathname === '/') {
+    if (path === '/') {
       const route = Object.values(ROUTES).find((route: iRoute) => route.path === `/`)
 
       if (!route) {
@@ -38,21 +40,39 @@ export function Breadcrumbs() {
     }
 
     // Recurse routes.
-    const paths = location.pathname.split('/')
+    const paths = path.split('/')
       .reduce((acc: iBreadCrumb[], part: string) => {
         const currentPath = acc.map((breadCrumb) => breadCrumb.part).join('/')
         const path = `${currentPath}/${part}`;
-        let label = null;
+
+        let label: string|Function = labelFromSlug('?')(part);
+
+        // Try exact match.
         let route = Object.values(ROUTES).find((route: iRoute) => route.path === `/${part}`)
 
+        // Try parameterized route.
+        // FIXME: inaccurate because :param* links are not handled correctly.
         if (!route) {
-          route = Object.values(ROUTES).find((route: iRoute) => route.path.match(`${currentPath}/:[a-zA-Z-_]`))
+          let routes = Object.values(ROUTES).filter((r: iRoute) => {
+            return matchPath(path, {
+              path: r.path,
+            })
+          })
 
-          if (typeof route?.label === 'function') {
-            label = route.label(part);
+          if (routes.length > 1) {
+            routes = routes.filter((r: iRoute) => r.path.match(/\//g)?.length === path.match(/\//g)?.length)
           }
+          route = routes[0];
         }
 
+        // Resolve label.
+        label = route?.label || label;
+
+        if (typeof label === 'function') {
+          label = label(part);
+        }
+
+        // Return acc.
         return [...acc, {
           part: part,
           label: label,
@@ -70,7 +90,10 @@ export function Breadcrumbs() {
    * @return {string}
    */
   const getBreadCrumbLabel = (breadcrumb: iBreadCrumb): string => {
-    return breadcrumb.label || breadcrumb.route.label as string;
+    if(breadcrumb.part === '') {
+      return '';
+    }
+    return typeof (breadcrumb?.label) === 'string' ? breadcrumb.label : breadcrumb.route?.label as string
   }
 
   /**
@@ -78,13 +101,12 @@ export function Breadcrumbs() {
    * @return {ReactElement}
    */
   const renderBreadCrumbs = () => getBreadCrumbs().map((breadCrumb: iBreadCrumb, index: number) => {
-    const Icon = breadCrumb.route.icon;
-    const linkClassName = (index === getBreadCrumbs().length - 1) ? 'link' : 'link link--active';
+    const Icon = breadCrumb.route?.icon;
 
     return (
       <li key={index} className="breadcrumbs__list-item">
         {index > 0 && <ChevronRightOutlinedIcon/>}
-        <Link className={linkClassName} to={breadCrumb.path}>
+        <Link active={false} secondary={index < getBreadCrumbs().length - 1} to={breadCrumb.path}>
           {breadCrumb.shouldRenderIcon && Icon && <Icon/>}
           {getBreadCrumbLabel(breadCrumb)}
         </Link>

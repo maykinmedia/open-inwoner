@@ -28,6 +28,10 @@ django-allauth
 django-leaflet
 django-autoslug
 django-elasticsearch-dsl
+django-import-export
+django-solo
+django-colorfield
+
 
 # API libraries
 djangorestframework

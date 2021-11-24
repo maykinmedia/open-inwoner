@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {logout} from '../../api/calls';
 import {ROUTES} from '../../routes/routes';
 import {globalContext} from '../../store';
@@ -6,8 +6,8 @@ import {Breadcrumbs} from './Breadcrumbs';
 import {Logo} from '../Logo/Logo';
 import PrimaryNavigation from './PrimaryNavigation';
 import {RouteLink} from '../Typography/RouteLink';
-import './Header.scss';
 import {P} from '../Typography/P';
+import './Header.scss';
 
 
 /**
@@ -16,6 +16,11 @@ import {P} from '../Typography/P';
  */
 export function Header() {
   const {globalState, dispatch} = useContext(globalContext);
+  const [greeting, setGreeting] = useState('Welkom');
+
+  useEffect(() => {
+    setGreeting(`Welkom ${globalState?.user?.firstName} ${globalState.user?.lastName}`.trim());
+  }, [globalState])
 
   /**
    * Logout.
@@ -31,10 +36,7 @@ export function Header() {
    */
   const getWelcomeMessage = () => {
     return (
-      <P>
-        {globalState.user && `Welkom ${globalState.user.firstName} ${globalState.user.lastName}`}
-        {!globalState.user && 'Welkom'}
-      </P>
+      <P>{greeting}</P>
     )
   };
 
@@ -43,7 +45,7 @@ export function Header() {
    * @return {ReactElement}
    */
   const getLoginLinks = () => {
-    if (globalState.user) {
+    if (globalState?.user) {
       return (
         <ul className="header__list">
           <li className="header__list-item">
