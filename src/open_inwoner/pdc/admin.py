@@ -183,7 +183,7 @@ class OrganizationAdmin(LeafletGeoAdmin):
     # Detail
     modifiable = False
     fieldsets = (
-        (None, {"fields": ("name", "type", "logo", "neighbourhood")}),
+        (None, {"fields": ("name", "slug", "type", "logo", "neighbourhood")}),
         (_("Contact"), {"fields": ("email", "phonenumber")}),
         (
             _("Address"),
