@@ -1,0 +1,93 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Render anchor button 1`] = `
+<a
+  className="button button--icon-after"
+  href="http://www.maykin.nl"
+>
+  Maykin
+</a>
+`;
+
+exports[`Render button 1`] = `
+<button
+  className="button button--icon-after"
+>
+  Maykin
+</button>
+`;
+
+exports[`Render button with icon 1`] = `
+<button
+  className="button button--icon button--icon-after"
+>
+  <svg
+    aria-hidden={true}
+    className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-i4bv87-MuiSvgIcon-root"
+    data-testid="ArrowForwardIcon"
+    focusable="false"
+    viewBox="0 0 24 24"
+  >
+    <path
+      d="m12 4-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"
+    />
+  </svg>
+  Maykin
+</button>
+`;
+
+exports[`Render button with iconPosition 1`] = `
+<button
+  className="button button--icon-after"
+>
+  Maykin
+</button>
+`;
+
+exports[`Render button with open 1`] = `
+<button
+  className="button button--icon-after button--open"
+>
+  Maykin
+</button>
+`;
+
+exports[`Render button with primary 1`] = `
+<button
+  className="button button--icon-after button--primary"
+>
+  Maykin
+</button>
+`;
+
+exports[`Render button with secondary 1`] = `
+<button
+  className="button button--icon-after button--secondary"
+>
+  Maykin
+</button>
+`;
+
+exports[`Render button with size 1`] = `
+<button
+  className="button button--icon-after button--big"
+>
+  Maykin
+</button>
+`;
+
+exports[`Render button with transparent 1`] = `
+<button
+  className="button button--icon-after button--transparent"
+>
+  Maykin
+</button>
+`;
+
+exports[`Render button without iconPosition 1`] = `
+<button
+  className="button button--icon-after"
+>
+  Maykin
+</button>
+`;

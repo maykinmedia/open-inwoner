@@ -1,44 +1,36 @@
-from django.utils.translation import ugettext_lazy as _
+from drf_spectacular.utils import extend_schema
+from rest_framework.generics import GenericAPIView
 
-from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import OpenApiParameter, extend_schema
-from rest_framework.response import Response
-from rest_framework.views import APIView
-
+from open_inwoner.search.results import ProductSearchResult
 from open_inwoner.search.searches import search_products
+from open_inwoner.utils.schema import input_serializer_to_parameters
 
-from .serializers import ProductDocumentSerializer
+from .pagination import SearchPagination
+from .serializers import SearchQuerySerializer, SearchResponseSerializer
 
 
-class SearchView(APIView):
+class SearchView(GenericAPIView):
     permission_classes = []
     authentication_classes = []
-    serializer_class = ProductDocumentSerializer
+    serializer_class = SearchResponseSerializer
+    pagination_class = SearchPagination
+    action = "list"  # for spectacular
 
-    def get_serializer(self, **kwargs):
-        return self.serializer_class(
-            many=True,
-            context={"request": self.request, "view": self},
-            **kwargs,
-        )
-
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                name="search",
-                required=False,
-                type=OpenApiTypes.STR,
-                description=_(
-                    "The search string. If empty the empty list is returned."
-                ),
-                location=OpenApiParameter.QUERY,
-            )
-        ],
-    )
+    @extend_schema(parameters=input_serializer_to_parameters(SearchQuerySerializer))
     def get(self, request, *args, **kwargs):
         """Search products by query string"""
-        search_string = request.query_params.get("search", "")
+        # validate query params
+        query_serializer = SearchQuerySerializer(data=request.query_params)
+        query_serializer.is_valid()
+        query_data = query_serializer.data
 
-        objects = search_products(search_string)
-        serializer = self.get_serializer(instance=objects)
-        return Response(serializer.data)
+        # perform search
+        search_string = query_data.pop("search", "")
+        search_response = search_products(search_string, filters=query_data)
+
+        # paginate
+        page = self.paginate_queryset(search_response.results)
+        serializer = self.get_serializer(
+            ProductSearchResult(results=page, facets=search_response.facets)
+        )
+        return self.get_paginated_response(serializer.data)

@@ -1,0 +1,67 @@
+///
+/// Footer.
+///
+
+.footer {
+  $hm: max(calc((100vw - var(--container-width)) / 2), var(--spacing-large));
+  $vm: var(--row-height);
+  background-color: var(--color-gray-light);
+  box-sizing: border-box;
+  display: grid;
+  grid-gap: var(--gutter-width);
+  grid-template-areas: "lg   lg   lg   lg"
+                       "vstr vstr vstr vstr"
+                       "ml   ml   ml   ml"
+                       "scl  scl  scl  scl"
+                       "nws  nws  nws  nws"
+                       "lnks lnks lnks lnks";
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: var(--row-height);
+  padding: $vm $hm;
+
+  @media (min-width: 768px) {
+    grid-template-areas: "lg   lg   lg   lg   lg  lg  lg  lg  lg   lg   lg lg"
+                         "vstr vstr vstr vstr scl scl scl scl scl lnks lnks lnks"
+                         "ml   ml   ml   ml   nws nws nws nws nws lnks lnks lnks";
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: var(--row-height);
+  }
+
+  /// Layout.
+
+  .logo {
+    grid-area: lg;
+  }
+
+  &__visitor {
+    grid-area: vstr;
+  }
+
+  &__mail {
+    grid-area: ml;
+  }
+
+  .social {
+    grid-area: scl;
+  }
+
+  &__newsletter {
+    grid-area: nws;
+  }
+
+  &__links {
+    grid-area: lnks;
+  }
+
+  /// List.
+
+  &__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  &__list-item {
+    padding: var(--spacing-small) 0;
+  }
+}

@@ -7,9 +7,11 @@ from .accounts.views import (
     ActionViewSet,
     AppointmentViewSet,
     ContactViewSet,
+    DeactivateUserView,
     DocumentViewSet,
     GetAuthTokenView,
 )
+from .configurations.views import SiteConfigurationView
 from .pdc.views import CategoryViewSet, ProductViewSet
 from .search.views import SearchView
 
@@ -35,9 +37,11 @@ urlpatterns = [
         name="docs",
     ),
     path("auth/get_token/", GetAuthTokenView.as_view(), name="get_token"),
+    path("auth/user/deactivate/", DeactivateUserView.as_view(), name="deactivate_user"),
     path("auth/", include("dj_rest_auth.urls")),
     path("auth/registration/", include("dj_rest_auth.registration.urls")),
     # path("auth/", include("rest_framework.urls", namespace="rest_framework")),
     path("search/", SearchView.as_view(), name="search"),
+    path("config/", SiteConfigurationView.as_view(), name="site_configuration"),
     path("", include(router.urls)),
 ]

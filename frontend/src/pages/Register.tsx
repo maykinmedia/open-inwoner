@@ -1,133 +1,90 @@
-import React, {
-  useContext, useState,
-} from 'react';
-import { Redirect } from 'react-router-dom';
-import { Input } from '../Components/Form/Input';
-import { Label } from '../Components/Form/Label';
-import { Fieldset } from '../Components/Form/Fieldset';
-import { Error } from '../Components/Form/Error';
-import { Button } from '../Components/Button/Button';
-import { Direction } from '../types/direction';
-import { globalContext } from '../store';
-
-import { registerUser, getUser } from '../api/calls';
+import React, {ReactElement, SyntheticEvent, useContext, useState} from 'react';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import {iButtonProps} from '../Components/Button/Button';
+import {Form} from '../Components/Form/Form';
+import {Grid} from '../Components/Container/Grid';
+import {H1} from '../Components/Typography/H1';
+import {ROUTES} from '../routes/routes';
+import {globalContext} from '../store';
+import {iField} from '../types/field';
+import {iToken} from "../store/types";
+import {getUser, registerUser} from "../api/calls";
+import {P} from "../Components/Typography/P";
 
 export default function Register() {
-  const { dispatch } = useContext(globalContext);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [password2, setPassword2] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [loggedIn, setLoggedIn] = useState(false);
-  const [errors, setErrors] = useState([]);
+  const {dispatch} = useContext(globalContext);
+  const [errors, setErrors] = useState<{ [index: string]: string[] }>({});
+  const [registrationComplete, setRegistrationComplete] = useState<boolean|null>(null);
 
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
-    setErrors([]);
-    const token = await registerUser(email, password, password2, firstName, lastName).catch((err) => {
-      const localErrors = [];
-      if (err.response.status < 500) {
-        for (const [key, value] of Object.entries(err.response.data)) {
-          localErrors.push(`${key}: ${value}`);
-        }
-      }
-      setErrors(localErrors);
-      throw err;
-    });
+  const onSubmit = async (event: SyntheticEvent, data: { [index: string]: string }): Promise<void> => {
+    const {email, first_name, last_name, password, password2} = data;
+    setErrors({});
+
+    event.preventDefault();
+
+    const token: iToken | void = await registerUser(email, password, password2, first_name, last_name)
+      .catch((err) => {
+        const errors = err.response.data;
+        setErrors(errors)
+      });
+
     if (token) {
-      await dispatch({ type: 'SET_TOKEN', payload: token });
+      await dispatch({type: 'SET_TOKEN', payload: token});
       const user = await getUser(token);
-      await dispatch({ type: 'SET_USER', payload: user });
-      setLoggedIn(true); // Setting the state to redirect after login
+      await dispatch({type: 'SET_USER', payload: user});
+
+      setRegistrationComplete(true);
     }
+
   };
 
-  function handleEmailChange(event: React.ChangeEvent<HTMLInputElement>) {
-    setEmail(event.currentTarget.value);
+  /**
+   * Returns the additional form actions.
+   */
+  const getActions = (): iButtonProps[] => {
+    return [{
+      children: ROUTES.REGISTER.label,
+      href: ROUTES.REGISTER.path,
+      icon: ArrowForwardIcon,
+      iconPosition: 'after',
+      transparent: true
+    }]
   }
 
-  function handlePasswordChange(event: React.ChangeEvent<HTMLInputElement>) {
-    setPassword(event.currentTarget.value);
-  }
+  /**
+   * Returns the fields for the form.
+   * @return {iField[]}
+   */
+  const getFields = (): iField[] => [
+    ['email', 'E-mail', 'email'],
+    ['first_name', 'Voornaam', 'text'],
+    ['last_name', 'Achternaam', 'text'],
+    ['password', 'Wachtwoord', 'password'],
+    ['password2', 'Wachtwoord (opnieuw)', 'password']
+  ].map(([name, label, type]: string[]) => (
+    {errors: errors[name] || [], label: label, name: name, type: type as any}
+  ));
 
-  function handlePassword2Change(event: React.ChangeEvent<HTMLInputElement>) {
-    setPassword2(event.currentTarget.value);
-  }
-
-  function handleFirstNameChange(event: React.ChangeEvent<HTMLInputElement>) {
-    setFirstName(event.currentTarget.value);
-  }
-
-  function handleLastNameChange(event: React.ChangeEvent<HTMLInputElement>) {
-    setLastName(event.currentTarget.value);
-  }
-
-  if (loggedIn) {
-    return <Redirect to="/themas" />;
-  }
-  return (
+  /**
+   * Returns the main content.
+   * @return {ReactElement}
+   */
+  const getMainContent = (): ReactElement => (
     <>
-      <div className="register">
-        <h1>Registreer</h1>
-        <form action="" onSubmit={handleSubmit}>
-          {errors.map((object, i) => <Error key={i}>{ object }</Error>)}
-          <Fieldset direction={Direction.Vertical}>
-            <Label for="email">Emailadres</Label>
-            <Input
-              type="email"
-              name="email"
-              required
-              value={email}
-              changeAction={handleEmailChange}
-            />
-          </Fieldset>
-          <Fieldset direction={Direction.Vertical}>
-            <Label for="first_name">Voornaam</Label>
-            <Input
-              type="text"
-              name="first_name"
-              required
-              value={firstName}
-              changeAction={handleFirstNameChange}
-            />
-          </Fieldset>
-          <Fieldset direction={Direction.Vertical}>
-            <Label for="last_name">Acternaam</Label>
-            <Input
-              type="text"
-              name="last_name"
-              required
-              value={lastName}
-              changeAction={handleLastNameChange}
-            />
-          </Fieldset>
-          <Fieldset direction={Direction.Vertical}>
-            <Label for="password">Wachtwoord</Label>
-            <Input
-              type="password"
-              name="password"
-              required
-              value={password}
-              changeAction={handlePasswordChange}
-            />
-          </Fieldset>
-          <Fieldset direction={Direction.Vertical}>
-            <Label for="password2">Wachtwoord</Label>
-            <Input
-              type="password"
-              name="password2"
-              required
-              value={password2}
-              changeAction={handlePassword2Change}
-            />
-          </Fieldset>
-          <Fieldset direction={Direction.Horizontal}>
-            <Button type="submit">Registreer</Button>
-            <Button href="/login" open>Terug naar login</Button>
-          </Fieldset>
-        </form>
-      </div>
+      <H1>{ROUTES.REGISTER.label}</H1>
+
+      {registrationComplete && <>
+        <P>U bent nu geregistreerd.</P>
+        <P>Er is een e-mail naar het door u opgegeven e-mail adres
+          verstuurd met instructies hoe u uw account kunt activeren, u dient uw account te activeren voordat u kunt inloggen.</P>
+      </>}
+
+      {!registrationComplete &&
+      <Form actions={getActions()} fields={getFields()} errors={errors.nonFieldErrors} submitLabel={ROUTES.REGISTER.label as string} onSubmit={onSubmit}/>}
     </>
+  );
+
+  return (
+    <Grid mainContent={getMainContent()}/>
   );
 }
