@@ -5,7 +5,7 @@ from rest_framework.response import Response
 
 
 class SearchPagination(PageNumberPagination):
-    page_size = 100
+    page_size = 12
 
     def get_paginated_response(self, data):
         pagination_data = OrderedDict(

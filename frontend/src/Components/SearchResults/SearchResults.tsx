@@ -3,7 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom'
 import { H1 } from '../Typography/H1'
 
-import './LinkList.scss'
+import './SearchResults.scss'
 
 interface iLinkForList {
   name: string,
@@ -12,12 +12,12 @@ interface iLinkForList {
   type: string,
 }
 
-interface iLinkListProps {
+interface iSearchResultsProps {
   count: number,
   links: Array<iLinkForList>,
 }
 
-export function LinkList(props: iLinkListProps) {
+export function SearchResults(props: iSearchResultsProps) {
   const getResult = (link:iLinkForList, index:number) => {
     return (
       <Link className="search-results__item" key={index} to={link.href}>

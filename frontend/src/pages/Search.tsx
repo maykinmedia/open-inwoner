@@ -1,7 +1,7 @@
 import React, {SyntheticEvent, ChangeEvent, useState, ReactElement, useEffect} from 'react';
 
 import { Grid } from '../Components/Container/Grid';
-import { LinkList } from '../Components/LinkList/LinkList';
+import { SearchResults } from '../Components/SearchResults/SearchResults';
 import { Form } from '../Components/Form/Form';
 import { H1 } from '../Components/Typography/H1';
 import { P } from '../Components/Typography/P';
@@ -117,7 +117,9 @@ export default function Search() {
   }
 
   const prevPage = async (event: SyntheticEvent) => {
-    setPage(page - 1);
+    if (page > 1) {
+      setPage(page - 1);
+    }
   }
 
   const nextPage = async (event: SyntheticEvent) => {
@@ -159,13 +161,13 @@ export default function Search() {
         type: "product"
       }
     });
-    return <LinkList links={links} count={resultCount} />
+    return <SearchResults links={links} count={resultCount} />
   }
 
   const getMainContent = (): ReactElement => (
     <>
       {displayResults()}
-      <Pagination prevAction={prevPage} nextAction={nextPage} defaultAction={changePage} currentPage={page} itemsPerPage={10} totalItems={100} />
+      <Pagination prevAction={prevPage} nextAction={nextPage} defaultAction={changePage} currentPage={page} itemsPerPage={12} totalItems={resultCount} />
     </>
   );
 

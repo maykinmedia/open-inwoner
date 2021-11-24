@@ -56,7 +56,8 @@ exports[`Render accessibility header 1`] = `
     >
       <a
         className="link"
-        href="javascript:print()"
+        href="#"
+        onClick={[Function]}
       >
         <svg
           aria-hidden={true}
