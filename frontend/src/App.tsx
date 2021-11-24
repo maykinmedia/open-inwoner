@@ -15,6 +15,7 @@ export function App() {
   const { dispatch } = useContext(globalContext);
 
   useEffect(() => {
+    // TODO: do call in serverside render
     const load = async () => {
       const configuration = await getConfiguration();
 
