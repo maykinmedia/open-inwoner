@@ -1,18 +1,32 @@
-import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
-import AppsOutlinedIcon from "@mui/icons-material/AppsOutlined";
+import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
+import AppsOutlinedIcon from '@mui/icons-material/AppsOutlined';
 import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
-import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
-import InboxOutlinedIcon from "@mui/icons-material/InboxOutlined";
-import Home from "../pages/Home";
-import {iRoute} from "../types/route";
-import NotFoundPage from "../pages/NotFound";
-import About from "../pages/About";
-import ProductDetail from "../pages/Product/detail";
-import ThemeDetail from "../pages/Themas/detail";
-import Themas from "../pages/Themas";
-import Register from "../pages/Register";
-import Login from "../pages/Login";
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined';
+import Home from '../pages/Home';
+import Login from '../pages/Login';
+import CategoryDetail from '../pages/Category/CategoryDetail';
+import CategoryList from '../pages/Category/CategoryList';
+import NotFoundPage from '../pages/NotFound';
+import ProductDetail from '../pages/Product/ProductDetail';
 import Profile from '../pages/Profile';
+import Register from '../pages/Register';
+import Search from '../pages/Search';
+import {iRoute} from '../types/route';
+
+
+/**
+ * Returns a function that returns a label based on a given slug or defaultLabel.
+ * @param {string} defaultLabel
+ */
+export const labelFromSlug = (defaultLabel: string): Function => (
+  (slug: string | string[]): string => {
+    const _slugArray = ((Array.isArray(slug)) ? slug : [slug]) || [defaultLabel];
+    const _slug = _slugArray[_slugArray.length - 1];
+    const str = _slug.replace(/[-_]/g, ' ');
+    return (str.length) ? str[0].toUpperCase() + str.slice(1) : '';
+  }
+)
 
 
 /**
@@ -65,7 +79,7 @@ export const ROUTES: { [index: string]: iRoute } = {
     loginRequired: true
   },
   CATEGORIES: {
-    component: Themas,
+    component: CategoryList,
     label: 'Thema\'s',
     path: '/themas',
     exact: true,
@@ -73,32 +87,34 @@ export const ROUTES: { [index: string]: iRoute } = {
     loginRequired: false,
   },
   CATEGORY: {
-    component: ThemeDetail,
-    label: (slug: string): string => {
-      if(!slug) {
-        return 'Thema';
-      }
-      const str = slug.replace(/[-_]/g, ' ');
-      return str.split(' ').reduce((label: string, word: string): string => `${label} ${word[0].toUpperCase()}${word.slice(1)}`, '');
-    },
-    path: '/themas/:slug',
+    component: CategoryDetail,
+    label: labelFromSlug('Thema'),
+    path: '/themas/:categorySlug',
+    exact: true,
+    icon: ArticleOutlinedIcon,
+    loginRequired: false,
+  },
+  SUBCATEGORY: {
+    component: CategoryDetail,
+    label: labelFromSlug('Subthema'),
+    path: '/themas/:categorySlug/:subCategorySlug',
     exact: true,
     icon: ArticleOutlinedIcon,
     loginRequired: false,
   },
   PRODUCT: {
     component: ProductDetail,
-    label: 'Product',
-    path: '/product/:slug',
+    label: labelFromSlug('Product'),
+    path: '/themas/:categorySlug/:subCategorySlug/:productSlug',
     exact: true,
     loginRequired: false,
   },
-  ABOUT: {
-    component: About,
-    label: 'Over',
-    path: '/about',
+  SEARCH: {
+    component: Search,
+    label: 'Zoeken',
+    path: '/search',
     exact: true,
-    loginRequired: true,
+    loginRequired: false,
   },
   NOTFOUND: {
     component: NotFoundPage,

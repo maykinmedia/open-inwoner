@@ -1,7 +1,16 @@
+from django.utils.translation import gettext as _
+
 from filer.models import Image
 from rest_framework import serializers
 
-from open_inwoner.pdc.models import Category, Product, ProductLink, Tag
+from open_inwoner.pdc.models import (
+    Category,
+    Product,
+    ProductFile,
+    ProductLink,
+    ProductLocation,
+    Tag,
+)
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -72,6 +81,42 @@ class CategoryWithChildSerializer(CategorySerializer):
         ).data
 
 
+class ProductFileSerializer(serializers.ModelSerializer):
+    extension = serializers.SerializerMethodField(
+        help_text=_('The file extension (without "." separator). E.g.: "docx"')
+    )
+    label = serializers.SerializerMethodField(
+        help_text=_('The file name (without extension). E.g. "Untitled document".')
+    )
+    size = serializers.SerializerMethodField(
+        help_text=_("The file size in bytes. E.g. 8235")
+    )
+    url = serializers.SerializerMethodField(
+        help_text=_("The absolute url to the file (including scheme, domain and path).")
+    )
+
+    class Meta:
+        model = ProductFile
+        fields = [
+            "extension",
+            "label",
+            "size",
+            "url",
+        ]
+
+    def get_extension(self, obj):
+        return obj.file.extension
+
+    def get_label(self, obj):
+        return str(obj.file.label).replace(f".{self.get_extension(obj)}", "")
+
+    def get_size(self, obj):
+        return obj.file.file.size
+
+    def get_url(self, obj):
+        return self.context["request"].build_absolute_uri(obj.file.file.url)
+
+
 class ProductLinkSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductLink
@@ -81,24 +126,41 @@ class ProductLinkSerializer(serializers.ModelSerializer):
         )
 
 
+class ProductLocationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductLocation
+        fields = (
+            "city",
+            "geometry",
+            "housenumber",
+            "postcode",
+            "name",
+            "street",
+        )
+
+
 class ProductSerializer(serializers.ModelSerializer):
-    tags = TagSerializer(many=True)
+    files = ProductFileSerializer(many=True)
     links = ProductLinkSerializer(many=True)
+    locations = ProductLocationSerializer(many=True)
     related_products = SmallProductSerializer(many=True)
+    tags = TagSerializer(many=True)
 
     class Meta:
         model = Product
         fields = (
-            "name",
-            "slug",
-            "summary",
-            "link",
-            "content",
             "categories",
-            "related_products",
-            "tags",
+            "content",
             "costs",
             "created_on",
-            "organizations",
+            "link",
+            "files",
             "links",
+            "locations",
+            "name",
+            "organizations",
+            "related_products",
+            "slug",
+            "summary",
+            "tags",
         )

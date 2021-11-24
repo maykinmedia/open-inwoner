@@ -16,7 +16,7 @@
 
   --color-black: #000;
   --color-blue: #1261A3;
-  --color-gray: #7A7A7A;
+  --color-gray: #D2D2D2;
   --color-gray-dark: #4b4b4b;
   --color-gray-light: #F1F1F1;
   --color-green: #248641;
@@ -28,22 +28,35 @@
 
   --color-accent: var(--color-yellow-light);
   --color-body: var(--color-gray-dark);
-  --color-border: var(--color-gray);
   --color-danger: var(--color-red);
+  --color-mute: var(--color-gray);
   --color-primary: var(--color-green);
   --color-secondary: var(--color-blue);
 
 
   /// Font.
 
-  --font-family-heading: 'TheMix C5';
   --font-color-heading: var(--color-black);
+  --font-family-heading: 'TheMix C5';
+  --font-weight-heading: bold;
 
-  --font-size-heading-1: 32px;
+  --font-color-heading-1: var(--font-color-heading);
+  --font-family-heading-1: var(--font-family-heading);
   --font-line-height-heading-1: 41px;
+  --font-size-heading-1: 32px;
+  --font-weight-heading-1: var(--font-weight-heading);
 
-  --font-size-heading-4: 16px;
+  --font-color-heading-4: var(--font-color-heading);
+  --font-family-heading-4: var(--font-family-heading);
   --font-line-height-heading-4: 26px;
+  --font-size-heading-4: 16px;
+  --font-weight-heading-4: var(--font-weight-heading);
+
+  --font-color-heading-3: var(--font-color-heading);
+  --font-family-heading-3: var(--font-family-heading);
+  --font-line-height-heading-3: 30px;
+  --font-size-heading-3: 20px;
+  --font-weight-heading-3: var(--font-weight-heading);
 
   --font-family-body: 'TheSans C5';
   --font-color-body: var(--color-gray-dark);
@@ -73,6 +86,12 @@
 }
 
 @font-face {
+  font-family: 'TheMix C5';
+  font-weight: bold;
+  src: local('TheMix C5'), url('./fonts/TheMixC5/DesktopFonts/TheMixC5-7_Bold.otf') format('opentype');
+}
+
+@font-face {
   font-family: 'TheSans C5';
   src: local('TheSans C5'), url('./fonts/TheSansC5/DesktopFonts/TheSansC5-5_Plain.otf') format('opentype');
 }
@@ -83,7 +102,30 @@
   src: local('TheSans C5'), url('./fonts/TheSansC5/DesktopFonts/TheSansC5-7_Bold.otf') format('opentype');
 }
 
+@font-face {
+  font-family: 'Open Dyslexic';
+  src: local('TheSans C5'), url('./fonts/opendyslexic/OpenDyslexic-Regular.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Open Dyslexic';
+  font-weight: bold;
+  src: local('TheSans C5'), url('./fonts/opendyslexic/OpenDyslexic-Bold.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Open Dyslexic';
+  font-style: italic;
+  src: local('TheSans C5'), url('./fonts/opendyslexic/OpenDyslexic-Italic.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Open Dyslexic';
+  font-weight: bold;
+  font-style: italic;
+  src: local('TheSans C5'), url('./fonts/opendyslexic/OpenDyslexic-Bold-Italic.otf') format('opentype');
+}
+
 body {
   margin: 0;
-  //font-family: 'TheSans C5';
 }

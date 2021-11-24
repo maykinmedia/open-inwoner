@@ -5,7 +5,7 @@ import {Link} from './Link';
 import './Link.scss';
 
 
-interface iRouteLinkProps {
+export interface iRouteLinkProps {
   route: iRoute,
   routeParams: { [index: string]: string },
   activeClassName?: string | null,
@@ -27,9 +27,11 @@ export const RouteLink = (props: iRouteLinkProps) => {
   const to = generatePath(route.path, routeParams);
   const Icon = icon || route.icon;
 
+  const label = (typeof route.label === 'function') ? route.label(Object.values(routeParams)) : route.label
+
   return (
     <Link to={to} icon={Icon} {..._props as any}>
-      {children || route.label}
+      {children || label}
     </Link>
   );
 }

@@ -18,6 +18,9 @@ const Reducer = (state: iGlobalStateInterface, action: iActionType): any => {
         ...state, user: null, token: null, error: null,
       };
 
+    case 'SET_LOGO':
+      return { ...state, logo: action.payload };
+
     case 'FAIL_REQUEST':
       return { ...state, error: action.payload };
 

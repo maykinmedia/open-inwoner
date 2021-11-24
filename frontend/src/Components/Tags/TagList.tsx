@@ -1,17 +1,29 @@
-import React from 'react';
-import { Tag } from './Tag';
-import { iTag } from '../../types/pdc';
-
+import React, {ReactElement} from 'react';
+import {Tag} from './Tag';
+import {iTag} from '../../types/pdc';
 import './TagList.scss';
 
-interface TagListProps {
-    tags?: Array<iTag>
+
+interface iTagListProps {
+  tags?: Array<iTag>
 }
 
-export function TagList(props:TagListProps) {
+
+/**
+ * Returns list containing multiple tags.
+ * @param {iTagListProps} props
+ * @return {ReactElement}
+ */
+export function TagList(props: iTagListProps): ReactElement {
   return (
-    <div className="tag-list">
-      {props.tags?.map((tag:iTag) => <Tag key={`${tag.pk}`}>{tag.name}</Tag>)}
-    </div>
+    <aside className="tag-list">
+      <ul className="tag-list__list">
+        {props.tags?.map((tag: iTag) => (
+          <li key={tag.pk as any} className="tag-list__list-item">
+            <Tag tag={tag}/>
+          </li>
+        ))}
+      </ul>
+    </aside>
   );
 }

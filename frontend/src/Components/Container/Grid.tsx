@@ -2,7 +2,6 @@ import React, {ReactElement} from 'react';
 import './Grid.scss';
 
 interface GridProps {
-  isLoggedIn: boolean,
   children?: any,
   mainContent?: ReactElement,
   sidebarContent?: ReactElement,
@@ -28,9 +27,8 @@ export function Grid(props: GridProps) {
    */
   const getMainContent = (): ReactElement => (
     <>
-      {(children || mainContent) && <div className="grid__main">
+      {(mainContent) && <div className="grid__main">
         {mainContent}
-        {children}
       </div>}
     </>
   );
@@ -39,6 +37,7 @@ export function Grid(props: GridProps) {
     <div className="grid" {..._props}>
       {getSidebarContent()}
       {getMainContent()}
+      {children}
     </div>
   );
 }

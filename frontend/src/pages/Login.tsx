@@ -68,11 +68,11 @@ export default function Login() {
     <>
       <H1>Welkom</H1>
       <P>Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</P>
-      <Form actions={getActions()} fields={getFields()} errors={errors.nonFieldErrors} submitLabel='Inloggen' onSubmit={onSubmit}></Form>
+      <Form actions={getActions()} fields={getFields()} errors={errors.nonFieldErrors} submitLabel='Inloggen' onSubmit={onSubmit}/>
     </>
   );
 
   return (
-    <Grid isLoggedIn mainContent={getMainContent()}/>
+    <Grid mainContent={getMainContent()}/>
   );
 }
