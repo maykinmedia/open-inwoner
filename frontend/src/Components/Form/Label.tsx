@@ -3,7 +3,8 @@ import './Label.scss';
 
 interface iLabelProps {
   htmlFor?: string,
-  children?: any
+  children?: any,
+  className?: string,
 }
 
 /**
@@ -12,10 +13,14 @@ interface iLabelProps {
  * @return {ReactElement}
  */
 export function Label(props: iLabelProps): ReactElement {
-  const {children, htmlFor, ..._props} = props
+  const { children, htmlFor, className, ..._props } = props
+
+  const getClassNames = () => {
+    return `label ${className}`
+  }
 
   return (
-    <label className="label" htmlFor={htmlFor} {..._props}>
+    <label className={ getClassNames() } htmlFor={htmlFor} {..._props}>
       {children}
     </label>
   );

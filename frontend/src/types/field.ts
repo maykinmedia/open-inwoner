@@ -3,6 +3,7 @@ import {iChoice} from './choice';
 
 
 export interface iField {
+  id?: string,
   label: string,
   name: string,
   type: 'button' | 'checkbox' | 'color' | 'date' | 'datetime-local' | 'email' | 'file' | 'hidden' | 'image' | 'month' | 'number' | 'password' | 'radio' | 'range' | 'reset' | 'search' | 'submit' | 'tel' | 'text' | 'time' | 'url' | 'week' | 'select' | 'textarea',
@@ -10,5 +11,9 @@ export interface iField {
   errors?: string[],
   choices?: iChoice[]
   required?: boolean,
-  value?: any
+  value?: any,
+  defaultValue?: any,
+  selected?: boolean,
+  defaultSelected?: boolean,
+  onChange: Function,
 }

@@ -7,7 +7,11 @@ import './H1.scss';
  * h1 element.
  */
 export const H1 = (props: iHeadingProps) => {
-  const {autoId, id, children, ..._props} = props;
+  const {autoId, id, className, children, ..._props} = props;
+
+  const getClassnames = () => {
+    return `h1 ${className}`
+  }
 
   /**
    * Returns the id.
@@ -20,6 +24,6 @@ export const H1 = (props: iHeadingProps) => {
   }
 
   return (
-    <h1 className="h1" id={getId()} {..._props}>{children}</h1>
+    <h1 className={getClassnames()} id={getId()} {..._props}>{children}</h1>
   );
 }

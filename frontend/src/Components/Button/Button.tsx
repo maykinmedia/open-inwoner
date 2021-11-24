@@ -1,5 +1,6 @@
 import React, {ComponentType} from 'react';
-import {Link} from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import CloseIcon from '@mui/icons-material/Close';
 import './Button.scss';
 
 
@@ -10,10 +11,12 @@ export interface iButtonProps {
   size?: 'big' | 'normal' | undefined,
   type?: 'button' | 'submit' | 'reset' | undefined,
   open?: boolean,
+  bordered?: boolean,
   primary?: boolean
   secondary?: boolean
   transparent?: boolean,
   children?: any,
+  closeAction?: Function,
   [key: string]: any,
 }
 
@@ -24,7 +27,7 @@ export interface iButtonProps {
  * @return {ReactElement}
  */
 export function Button(props: iButtonProps) {
-  const {href, icon, iconPosition, size, type, open, primary, secondary, transparent, children, ..._props} = props;
+  const {href, icon, iconPosition, size, type, open, bordered, primary, secondary, transparent, children, closeAction, ..._props} = props;
 
   /**
    * Returns the className value.
@@ -47,6 +50,10 @@ export function Button(props: iButtonProps) {
 
     if (open) {
       classNames += ' button--open';
+    }
+
+    if (bordered) {
+      classNames += ' button--bordered';
     }
 
     if (primary) {
@@ -73,6 +80,7 @@ export function Button(props: iButtonProps) {
     return (
       <>
         {Icon && <Icon/>}
+        {closeAction && <CloseIcon /> }
         {children}
       </>
     );
@@ -84,7 +92,7 @@ export function Button(props: iButtonProps) {
     }
     return <Link className={getClassNames()} to={href} {..._props}>{getChildren()}</Link>;
   }
-  return <button className={getClassNames()} type={type} {..._props}>{getChildren()}</button>;
+  return <button onClick={ closeAction } className={getClassNames()} type={type} {..._props}>{getChildren()}</button>;
 }
 
 Button.defaultProps = {

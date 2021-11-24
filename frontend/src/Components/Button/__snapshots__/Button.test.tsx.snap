@@ -2,7 +2,7 @@
 
 exports[`Render anchor button 1`] = `
 <a
-  className="button button--icon-after"
+  className="button button--icon-before"
   href="http://www.maykin.nl"
 >
   Maykin
@@ -11,7 +11,7 @@ exports[`Render anchor button 1`] = `
 
 exports[`Render button 1`] = `
 <button
-  className="button button--icon-after"
+  className="button button--icon-before"
 >
   Maykin
 </button>
@@ -19,7 +19,7 @@ exports[`Render button 1`] = `
 
 exports[`Render button with icon 1`] = `
 <button
-  className="button button--icon button--icon-after"
+  className="button button--icon button--icon-before"
 >
   <svg
     aria-hidden={true}
@@ -46,7 +46,7 @@ exports[`Render button with iconPosition 1`] = `
 
 exports[`Render button with open 1`] = `
 <button
-  className="button button--icon-after button--open"
+  className="button button--icon-before button--open"
 >
   Maykin
 </button>
@@ -54,7 +54,7 @@ exports[`Render button with open 1`] = `
 
 exports[`Render button with primary 1`] = `
 <button
-  className="button button--icon-after button--primary"
+  className="button button--icon-before button--primary"
 >
   Maykin
 </button>
@@ -62,7 +62,7 @@ exports[`Render button with primary 1`] = `
 
 exports[`Render button with secondary 1`] = `
 <button
-  className="button button--icon-after button--secondary"
+  className="button button--icon-before button--secondary"
 >
   Maykin
 </button>
@@ -70,7 +70,7 @@ exports[`Render button with secondary 1`] = `
 
 exports[`Render button with size 1`] = `
 <button
-  className="button button--icon-after button--big"
+  className="button button--icon-before button--big"
 >
   Maykin
 </button>
@@ -78,7 +78,7 @@ exports[`Render button with size 1`] = `
 
 exports[`Render button with transparent 1`] = `
 <button
-  className="button button--icon-after button--transparent"
+  className="button button--icon-before button--transparent"
 >
   Maykin
 </button>
@@ -86,7 +86,7 @@ exports[`Render button with transparent 1`] = `
 
 exports[`Render button without iconPosition 1`] = `
 <button
-  className="button button--icon-after"
+  className="button button--icon-before"
 >
   Maykin
 </button>

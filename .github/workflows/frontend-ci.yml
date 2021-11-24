@@ -1,0 +1,31 @@
+name: frontend-ci
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - '**'
+  pull_request:
+  workflow_dispatch:
+
+
+jobs:
+  tests:
+    name: Run the Jest test suite
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: '14'
+
+      - name: Install dependencies
+        run: |
+          cd frontend/ && npm install
+      - name: Run tests
+        run: |
+          cd frontend/ && npm test
+      - name: Publish coverage report
+        uses: codecov/codecov-action@v1
