@@ -135,12 +135,15 @@ INSTALLED_APPS = [
     "leaflet",
     "django_elasticsearch_dsl",
     "import_export",
+    "solo",
+    "colorfield",
     # Project applications.
     "open_inwoner.accounts",
     "open_inwoner.ckeditor",
     "open_inwoner.pdc",
     "open_inwoner.search",
     "open_inwoner.utils",
+    "open_inwoner.configurations",
 ]
 
 MIDDLEWARE = [
@@ -516,6 +519,7 @@ ELASTICSEARCH_DSL = {
     "default": {"hosts": config("ES_HOST", "localhost:9200")},
 }
 ES_INDEX_PRODUCTS = "products"
+ES_MAX_SIZE = 10000
 
 # Delete user after x days of inactivity
 DELETE_USER_AFTER_X_DAYS_INACTIVE = 14
