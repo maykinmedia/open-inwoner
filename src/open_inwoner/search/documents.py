@@ -8,6 +8,9 @@ from open_inwoner.pdc.models import Category, Organization, Product, Tag
 
 @registry.register_document
 class ProductDocument(Document):
+    name = fields.TextField(
+        fields={"raw": fields.KeywordField(), "suggest": fields.CompletionField()}
+    )
     slug = fields.KeywordField()
 
     categories = fields.NestedField(
@@ -38,7 +41,7 @@ class ProductDocument(Document):
 
     class Django:
         model = Product
-        fields = ["name", "summary", "content"]
+        fields = ["summary", "content"]
         related_models = [Tag, Organization, Category]
 
     def get_instances_from_related(self, related_instance):
