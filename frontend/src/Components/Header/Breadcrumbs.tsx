@@ -100,19 +100,24 @@ export function Breadcrumbs(): ReactElement {
    * Renders the breadcrumbs.
    * @return {ReactElement}
    */
-  const renderBreadCrumbs = () => getBreadCrumbs().map((breadCrumb: iBreadCrumb, index: number) => {
-    const Icon = breadCrumb.route?.icon;
+  const renderBreadCrumbs = () => {
+    const crumbles = getBreadCrumbs()
+    if (crumbles.length > 1) {
+      return crumbles.map((breadCrumb: iBreadCrumb, index: number) => {
+        const Icon = breadCrumb.route?.icon;
 
-    return (
-      <li key={index} className="breadcrumbs__list-item">
-        {index > 0 && <ChevronRightOutlinedIcon/>}
-        <Link active={false} secondary={index < getBreadCrumbs().length - 1} to={breadCrumb.path}>
-          {breadCrumb.shouldRenderIcon && Icon && <Icon/>}
-          {getBreadCrumbLabel(breadCrumb)}
-        </Link>
-      </li>
-    );
-  });
+        return (
+          <li key={index} className="breadcrumbs__list-item">
+            {index > 0 && <ChevronRightOutlinedIcon />}
+            <Link active={false} secondary={index < getBreadCrumbs().length - 1} to={breadCrumb.path}>
+              {breadCrumb.shouldRenderIcon && Icon && <Icon />}
+              {getBreadCrumbLabel(breadCrumb)}
+            </Link>
+          </li>
+        );
+      });
+    }
+  }
 
   return (
     <nav className="breadcrumbs">

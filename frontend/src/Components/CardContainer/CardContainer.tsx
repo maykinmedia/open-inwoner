@@ -2,6 +2,7 @@ import React, {ReactElement} from 'react';
 import './CardContainer.scss';
 
 interface iCardContainerProps {
+  small?: boolean,
   children?: any,
 }
 
@@ -11,8 +12,16 @@ interface iCardContainerProps {
  * @return {ReactElement}
  */
 export function CardContainer(props: iCardContainerProps): ReactElement {
+  const getClassNames = () => {
+    let classnames = "card-container"
+    if (props.small) {
+      classnames += " card-container--small"
+    }
+    return classnames
+  }
+
   return (
-    <div className="card-container">
+    <div className={ getClassNames() }>
       {props.children}
     </div>
   );

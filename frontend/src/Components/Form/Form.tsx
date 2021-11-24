@@ -15,12 +15,14 @@ interface iFormProps {
   actions?: iButtonProps[],
   children?: any,
   columns?: number,
+  inline?: boolean,
   encType?: string
   errors?: string[],
   fields?: iField[],
   method?: string,
   submitLabel?: string,
   onSubmit?: Function,
+  actionSize?: 'big' | 'normal' | undefined,
 }
 
 
@@ -30,7 +32,7 @@ interface iFormProps {
  * @return {ReactElement}
  */
 export function Form(props: iFormProps): ReactElement {
-  const {action, actions, children, columns, encType, errors, fields, method, submitLabel, onSubmit, ..._props} = props
+  const {action, actionSize, actions, children, inline, columns, encType, errors, fields, method, submitLabel, onSubmit, ..._props} = props
   const formRef = useRef<HTMLFormElement>(null);
 
   /**
@@ -117,8 +119,16 @@ export function Form(props: iFormProps): ReactElement {
     return <Input key={key} field={field}/>
   }
 
+  const getClassNames = () => {
+    let classnames = `form form--columns-${columns}`
+    if (inline) {
+      classnames += " form--inline"
+    }
+    return classnames
+  }
+
   return (
-    <form ref={formRef} className={`form form--columns-${columns}`} action={action} encType={encType} method={method} onSubmit={handleSubmit} {..._props}>
+    <form ref={formRef} className={getClassNames()} action={action} encType={encType} method={method} onSubmit={handleSubmit} {..._props}>
       {children}
 
       {errors?.map((error) => <Error key={error}>{error}</Error>)}
@@ -127,7 +137,7 @@ export function Form(props: iFormProps): ReactElement {
 
       <div className="form__actions">
         {actions?.map((action, index) => <Button key={index} {...action}/>)}
-        <Button icon={ArrowForwardIcon} iconPosition="after" primary={true} size="big" type="submit">{submitLabel}</Button>
+        <Button icon={ArrowForwardIcon} iconPosition="after" primary={true} size={actionSize} type="submit">{submitLabel}</Button>
       </div>
     </form>
   );
@@ -139,4 +149,5 @@ Form.defaultProps = {
   fields: [],
   method: 'GET',
   submitLabel: 'Verzenden',
+  actionSize: 'big'
 }

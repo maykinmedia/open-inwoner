@@ -19,8 +19,10 @@ export function Header() {
   const [greeting, setGreeting] = useState('Welkom');
 
   useEffect(() => {
-    setGreeting(`Welkom ${globalState?.user?.firstName} ${globalState.user?.lastName}`.trim());
-  }, [globalState])
+    if (globalState?.user) {
+      setGreeting(`Welkom ${globalState?.user?.firstName} ${globalState.user?.lastName}`.trim());
+    }
+  }, [globalState?.user])
 
   /**
    * Logout.

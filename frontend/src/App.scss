@@ -47,17 +47,23 @@
   --font-size-heading-1: 32px;
   --font-weight-heading-1: var(--font-weight-heading);
 
-  --font-color-heading-4: var(--font-color-heading);
-  --font-family-heading-4: var(--font-family-heading);
-  --font-line-height-heading-4: 26px;
-  --font-size-heading-4: 16px;
-  --font-weight-heading-4: var(--font-weight-heading);
+  --font-color-heading-2: var(--font-color-heading);
+  --font-family-heading-2: var(--font-family-heading);
+  --font-line-height-heading-2: 36px;
+  --font-size-heading-2: 22px;
+  --font-weight-heading-2: var(--font-weight-heading);
 
   --font-color-heading-3: var(--font-color-heading);
   --font-family-heading-3: var(--font-family-heading);
   --font-line-height-heading-3: 30px;
   --font-size-heading-3: 20px;
   --font-weight-heading-3: var(--font-weight-heading);
+
+  --font-color-heading-4: var(--font-color-heading);
+  --font-family-heading-4: var(--font-family-heading);
+  --font-line-height-heading-4: 26px;
+  --font-size-heading-4: 16px;
+  --font-weight-heading-4: var(--font-weight-heading);
 
   --font-family-body: 'TheSans C5';
   --font-color-body: var(--color-gray-dark);
@@ -70,7 +76,7 @@
 
   /// Spacing.
 
-  --row-height: 37px;
+  --row-height: 40px;
   --row-height-big: 48px;
   --gutter-width: 32px;
 

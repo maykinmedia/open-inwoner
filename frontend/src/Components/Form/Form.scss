@@ -56,4 +56,16 @@
   &__actions > *:last-child {
     grid-area: primary;
   }
+
+  &--inline {
+    grid-template-columns: 1fr auto;
+    align-items: end;
+
+    .form__actions {
+      grid-column-start: auto;
+      grid-column-end: auto;
+      padding: 0;
+      grid-gap: 0;
+    }
+  }
 }

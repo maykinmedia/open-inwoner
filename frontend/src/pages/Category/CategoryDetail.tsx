@@ -2,13 +2,15 @@ import React, {useState, useEffect} from 'react';
 import {useParams} from 'react-router-dom';
 import {getCategory} from '../../api/calls';
 import {Grid} from '../../Components/Container/Grid';
-import {iCategory} from '../../types/pdc';
 import {H1} from '../../Components/Typography/H1';
 import {P} from '../../Components/Typography/P';
-import './CategoryDetail.scss';
 import {CardContainer} from '../../Components/CardContainer/CardContainer';
-import {CategoryCard} from '../../Components/Card/CategoryCard';
+import { CategoryCard } from '../../Components/Card/CategoryCard';
+import {ProductCard} from '../../Components/Card/ProductCard';
 
+import { iCategory, iSmallProduct } from '../../types/pdc';
+
+import './CategoryDetail.scss';
 
 /**
  * Category detail.
@@ -36,7 +38,11 @@ export default function CategoryDetail() {
       <P>{category?.description}</P>
 
       <CardContainer>
-        {category?.children?.map((c: iCategory) => <CategoryCard key={c.slug} parentCategory={category} category={c}/>)}
+        {category?.children?.map((c: iCategory) => <CategoryCard key={c.slug} parentCategory={category} category={c} />)}
+      </CardContainer>
+
+      <CardContainer small={true}>
+        {category?.product?.map((product: iSmallProduct) => <ProductCard key={product.slug} title={product.name} to={product.slug} summary={product.summary} />)}
       </CardContainer>
     </>
 

@@ -8,6 +8,12 @@
     --card-columns: 4;
   }
 
+  &--small {
+    @media (min-width: 768px) {
+      --card-columns: 2;
+    }
+  }
+
 }
 
 .p + .card-container {

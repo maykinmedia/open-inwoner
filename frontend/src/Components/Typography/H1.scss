@@ -4,5 +4,9 @@
   font-size: var(--font-size-heading-1);
   font-weight: var(--font-weight-heading-1);;
   line-height: var(--font-line-height-heading-1);
-  margin: 0;
+  margin: 40px 0 0 0;
+
+  &:first-of-type {
+    margin: 0;
+  }
 }

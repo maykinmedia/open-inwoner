@@ -62,6 +62,10 @@
 
 
   /// Actions.
+  &__search {
+    flex-basis: 100%;
+  }
+
   &__actions {
     align-items: center;
     display: flex;

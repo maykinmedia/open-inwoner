@@ -6,7 +6,7 @@ from django_elasticsearch_dsl.registries import registry
 from open_inwoner.pdc.models import Category, Organization, Product, Tag
 
 
-@registry.register_document
+# @registry.register_document
 class ProductDocument(Document):
     slug = fields.KeywordField()
 

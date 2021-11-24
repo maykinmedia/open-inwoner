@@ -10,9 +10,13 @@ export function Logo() {
 
   const getLogo = () => {
     if (globalState?.logo) {
-      return `${import.meta.env.VITE_API_URL}${globalState?.logo.file}`
+      return `${globalState?.logo.url}`
     }
-    return ""
+    return undefined
+  }
+
+  if (!globalState) {
+    return <></>
   }
 
   return (

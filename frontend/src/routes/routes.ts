@@ -105,7 +105,21 @@ export const ROUTES: { [index: string]: iRoute } = {
   PRODUCT: {
     component: ProductDetail,
     label: labelFromSlug('Product'),
-    path: '/themas/:categorySlug/:subCategorySlug/:productSlug',
+    path: '/product/:productSlug',
+    exact: true,
+    loginRequired: false,
+  },
+  TPRODUCT: {
+    component: ProductDetail,
+    label: labelFromSlug('Product'),
+    path: '/themas/:categorySlug/product/:productSlug',
+    exact: true,
+    loginRequired: false,
+  },
+  TTPRODUCT: {
+    component: ProductDetail,
+    label: labelFromSlug('Product'),
+    path: '/themas/:categorySlug/:subCategorySlug/product/:productSlug',
     exact: true,
     loginRequired: false,
   },
