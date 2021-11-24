@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {iToken, iUser} from '../store/types';
 import { iCategory, iProduct } from "../types/pdc";
+import { iConfig } from '../types/configuration';
 import { iSearchResults } from '../types/search';
 
 const getQueryString = (name: string, list: Array<string>) => {
@@ -82,4 +83,11 @@ export const search = async (page: number, filters: any, query?: string): Promis
     throw err;
   });
   return res.data as iSearchResults;
+}
+
+export const getConfiguration = async (): Promise<iConfig> => {
+  const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/config/`).catch((err) => {
+    throw err;
+  });
+  return res.data as iConfig;
 }
