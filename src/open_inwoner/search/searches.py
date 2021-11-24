@@ -35,7 +35,7 @@ class ProductSearch(FacetedSearch):
 
 
 def search_products(query_str: str, filters=None) -> ProductSearchResult:
-    s = ProductSearch(query_str, filters=filters or {})
+    s = ProductSearch(query_str, filters=filters or {})[: settings.ES_MAX_SIZE]
     response = s.execute()
 
     return ProductSearchResult.build_from_response(response)
