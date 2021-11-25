@@ -34,7 +34,7 @@ export default function Home() {
       </CardContainer>
       <H1>In de buurt</H1>
       <P>Nullam quis risus eget urna mollis ornare vel eu leo. Etiam porta sem malesuada magna mollis euismod.</P>
-      <Map fixed={false} lat={52.259221} long={6.163435} height="464" />
+      <Map fixed={false} lat={52.259221} long={6.163435} height="464px" />
     </>
   );
 
