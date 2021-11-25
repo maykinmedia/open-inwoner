@@ -78,7 +78,7 @@ export function Link(props: iLinkProps): ReactElement {
   };
 
   // Special cases.
-  if (to.match('^#') || to.match(':')) {
+  if (to && to.match('^#') || to.match(':')) {
     return (
       <a className={getClassNames()} href={to} {..._props as any}>
         {renderChildren()}
