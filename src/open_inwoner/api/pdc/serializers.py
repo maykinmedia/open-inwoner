@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.sites.models import Site
 from django.utils.translation import gettext as _
 
@@ -36,6 +37,11 @@ class FilerImageSerializer(serializers.ModelSerializer):
     def get_url(self, obj):
         self.context
         domain = Site.objects.get_current().domain
+        if not domain.startswith("http"):
+            schema = "https://"
+            if not settings.IS_HTTPS:
+                schema = "http://"
+            domain = f"{schema}{domain}"
         return f"{domain}{obj.file.url}"
 
 
