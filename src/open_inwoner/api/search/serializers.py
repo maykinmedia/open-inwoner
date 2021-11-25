@@ -25,7 +25,6 @@ class FacetSerializer(serializers.Serializer):
     name = serializers.ChoiceField(
         choices=FacetChoices.choices, help_text=_("Name of the facet")
     )
-    display_name = serializers.CharField(help_text=_("Display name of the facet"))
     buckets = BucketSerializer(
         many=True,
         source="total_buckets",

@@ -42,7 +42,7 @@ export function Filter(props: FilterProps): ReactElement {
   return (
     <aside className={ opened ? "filter filter--open" : "filter" }>
       <H4 className="filter__title" onClick={ toggleOpen }>
-        {facet.displayName}
+        {facet.name}
         {getIcon()}
       </H4>
       <div className="filter__list">
