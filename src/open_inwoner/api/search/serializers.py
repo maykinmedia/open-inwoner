@@ -58,3 +58,17 @@ class SearchQuerySerializer(serializers.Serializer):
             )
 
         return fields
+
+
+class AutocompleteQuerySerializer(serializers.Serializer):
+    search = serializers.CharField(
+        required=True, help_text=_("The string for autocomplete")
+    )
+
+
+class AutocompleteResponseSerializer(serializers.Serializer):
+    options = serializers.ListField(
+        child=serializers.CharField(),
+        allow_empty=True,
+        help_text=_("List of available options"),
+    )
