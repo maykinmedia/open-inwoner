@@ -9,7 +9,6 @@
 *.pyc
 __pycache__
 *~
-*.mo
 
 # Javascript libraries
 /node_modules/

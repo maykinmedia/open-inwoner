@@ -10,9 +10,9 @@ from django.views.generic.base import TemplateView
 from open_inwoner.accounts.views import DocumentPrivateMediaView, PasswordResetView
 
 handler500 = "open_inwoner.utils.views.server_error"
-admin.site.site_header = "open_inwoner admin"
-admin.site.site_title = "open_inwoner admin"
-admin.site.index_title = "Welcome to the open_inwoner admin"
+admin.site.site_header = "Open Inwoner beheeromgeving"
+admin.site.site_title = "Open Inwoner beheeromgeving"
+admin.site.index_title = "Welkom op de OpenInwoner beheeromgeving"
 
 
 urlpatterns = [
