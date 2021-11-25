@@ -15,7 +15,8 @@ export interface iLinkProps {
   secondary?: boolean,
   shouldRenderIcon?: boolean,
   shouldRenderExternalIcon?: boolean,
-  onClick?: Function
+  onClick?: Function,
+  href?: string,
 }
 
 /**
@@ -24,8 +25,9 @@ export interface iLinkProps {
  * @return {ReactElement}
  */
 export function Link(props: iLinkProps): ReactElement {
+  let { to } = props;
   const {
-    to,
+    href,
     active,
     activeClassName,
     children,
@@ -38,6 +40,11 @@ export function Link(props: iLinkProps): ReactElement {
     ..._props
   } = props;
   const Icon = icon;
+
+  // This is added for the matching from the markdown-to-jsx plugin
+  if (!to) {
+    to = href;
+  }
 
   /**
    * Returns the className value.
