@@ -1,0 +1,8 @@
+<div class="card-container {% if small %}card-container--small{% endif %}">
+    {% if categories %}
+        {% for category in categories %}
+            {% url 'thema-detail' slug=category.slug as category_url %}
+            {% include "components/Card/Card.html" with src=category.image.file.url alt=category.image.name title=category.name to=category_url %}
+        {% endfor %}
+    {% endif %}
+</div>

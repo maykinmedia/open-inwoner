@@ -1,0 +1,31 @@
+{% load i18n %}
+
+<header class="header">
+    {% include "components/Logo/Logo.html" %}
+
+    <nav class="header__actions">
+        <p class="p">{% trans "Welkom" %}</p>
+        {% if request.user %}{{ request.user.get_full_name }}{% endif %}
+
+        {% if request.user.is_authenticated %}
+            <ul class="header__list">
+                <li class="header__list-item">
+                    <a class="link" href="{% url 'logout' %}">{% trans "Logout" %}</a>
+                </li>
+            </ul>
+        {% else %}
+            <ul class="header__list">
+                <li class="header__list-item">
+                    <a class="link" href="{% url 'django_registration_register' %}">{% trans "Register" %}</a>
+                </li>
+
+                <li class="header__list-item">
+                    <a class="link" href="{% url 'login' %}">{% trans "Login" %}</a>
+                </li>
+            </ul>
+        {% endif %}
+    </nav>
+
+    {% include "components/Header/PrimaryNavigation.html" %}
+    {% include "components/Header/Breadcrumbs.html" %}
+</header>

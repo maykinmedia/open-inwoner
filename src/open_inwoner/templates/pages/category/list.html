@@ -1,0 +1,8 @@
+{% extends 'master.html' %}
+
+{% block content %}
+<h1 class="h1">Themas</h1>
+<p class="p">Nulla vitae elit libero, a pharetra augue.</p>
+
+{% include "components/CardContainer/CardContainer.html" with categories=object_list %}
+{% endblock content %}

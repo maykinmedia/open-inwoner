@@ -6,21 +6,33 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="{% static 'ico/favicon.png' %}" rel="shortcut icon">
         <link href="{% static 'bundles/open_inwoner-css.css' %}" media="all" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
         {% block extra_css %}{% endblock %}
     </head>
 
-    <body class="view__body">
-        <main>
-            {% block content %}
-                {% if request.user.is_authenticated %}
-                    Welkom {{ request.user.get_full_name }}<br>
-                    <a href="{% url 'admin:logout' %}">Logout</a>
-                {% else %}
-                    Welkom onbekende gebruiker<br>
-                    <a href="{% url 'admin:login' %}">Login</a>
-                {% endif %}
-
-            {% endblock %}
+    <body style="{{ theming }}">
+        {% include 'components/AccessibilityHeader/AccessibilityHeader.html' %}
+        {% include 'components/Header/Header.html' %}
+        <main class="container">
+            <div class="grid">
+                {% spaceless %}<aside class="grid__sidebar">
+                    {% block sidebarContent %}{% endblock sidebarContent %}
+                </aside>{% endspaceless %}
+                <div className="grid__main">
+                    {% block content %}
+                        <h1 class="h1">Welkom</h1>
+                        <p class="p">Nullam quis risus eget urna mollis ornare vel eu leo. Etiam porta sem malesuada magna mollis euismod.</p>
+                        <h1 class="h1">Thema&apos;s</h1>
+                        <p class="p">Nullam quis risus eget urna mollis ornare vel eu leo. Etiam porta sem malesuada magna mollis euismod.</p>
+                        {% include "components/CardContainer/CardContainer.html" with categories=categories %}
+                        <h1 class="h1">In de buurt</h1>
+                        <p class="p">Nullam quis risus eget urna mollis ornare vel eu leo. Etiam porta sem malesuada magna mollis euismod.</p>
+                        {% comment %} <Map fixed={false} lat={52.259221} long={6.163435} height="464px" /> {% endcomment %}
+                        <p class="p">TODO: Add the map</p>
+                    {% endblock content %}
+                </div>
+            </div>
         </main>
 
         <script src="{% static 'bundles/open_inwoner-js.js' %}"></script>

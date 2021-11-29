@@ -1,0 +1,39 @@
+<nav class="primary-navigation">
+    <ul class="primary-navigation__list">
+        <li class="primary-navigation__list-item">
+            <a class="link" href="{% url 'root' %}">
+                <span class="material-icons">apps</span>
+                Home
+            </a>
+        </li>
+        <li class="primary-navigation__list-item">
+            <a class="link" href="{% url 'themas' %}">
+                <span class="material-icons">description</span>
+                Thema's
+                <span class="material-icons">expand_more</span>
+            </a>
+            <ul class="primary-navigation__list">
+                {% for category in menu_categories %}
+                    <li class="primary-navigation__list-item">
+                        <a class="link" href="{% url 'thema-detail' slug=category.slug %}">{{ category.name }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </li>
+        {% if request.user.is_authenticated %}
+            <li class="primary-navigation__list-item">
+                <a class="link" href="/account">
+                    <span class="material-icons">account_circle</span>
+                    Mijn profiel
+                </a>
+            </li>
+            <li class="primary-navigation__list-item">
+                <a class="link" href="/account/inbox">
+                    <span class="material-icons">inbox</span>
+                    Mijn berichten
+                </a>
+            </li>
+        {% endif %}
+        <li class="primary-navigation__list-item"><a class="link" href="{% url 'search' %}">Zoeken</a></li>
+    </ul>
+</nav>

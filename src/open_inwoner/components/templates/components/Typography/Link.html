@@ -1,0 +1,5 @@
+<a href="{{to}}" class="link {{ extra_classes }} {% if active %}link--active{% endif %} {% if iconPosition %}button--icon-{{iconPosition}}{% endif %} {% if primary %}link--primary{% endif %} {% if secondary %}link--secondary{% endif %}">
+    {% if icon %}<span class="material-icons">{{icon}}</span>{% endif %}
+    {{ nodelist }}
+    {% comment %} {% if to.startsWith("http") %}<span class="material-icons-outlined">open_in_new</span>{% endif %} {% endcomment %}
+</a>

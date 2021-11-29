@@ -1,0 +1,12 @@
+<a href="{{ to }}" class="card">
+    {% if src %}
+    <header class="card__header">
+        <img class="card__img" src="{{ src }}" alt="{{ alt }}"/>
+    </header>
+    {% endif %}
+
+    <div class="card__body">
+        <h4 class="h4">{{ title }}</h4>
+        {{ attributes }}
+    </div>
+</a>
