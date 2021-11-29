@@ -108,6 +108,7 @@ INSTALLED_APPS = [
     "django_admin_index",
     "django.contrib.admin",
     "django.contrib.gis",
+    "component_tags",
     # 'django.contrib.admindocs',
     # 'django.contrib.humanize',
     # 'django.contrib.sitemaps',
@@ -185,6 +186,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "open_inwoner.utils.context_processors.settings",
             ],
+            "builtins": ["component_tags.template.builtins"],  # slot component
             "loaders": TEMPLATE_LOADERS,
         },
     },
