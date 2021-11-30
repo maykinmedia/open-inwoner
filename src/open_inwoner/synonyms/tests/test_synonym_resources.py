@@ -55,7 +55,7 @@ class TestSynonymExportResource(TestCase):
 
     def test_export_returns_expected_row(self):
         dataset = self.resource.export()
-        self.maxDiff = None
+
         self.assertEqual(
             dataset.dict,
             [
