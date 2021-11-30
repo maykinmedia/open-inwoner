@@ -1,0 +1,2 @@
+from .export_resource import SynonymExportResource
+from .import_resource import SynonymImportResource

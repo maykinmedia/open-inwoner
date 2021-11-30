@@ -138,6 +138,7 @@ INSTALLED_APPS = [
     "solo",
     "colorfield",
     "view_breadcrumbs",
+    "django_better_admin_arrayfield",
     # Project applications.
     "open_inwoner.accounts",
     "open_inwoner.components",
@@ -146,6 +147,7 @@ INSTALLED_APPS = [
     "open_inwoner.search",
     "open_inwoner.utils",
     "open_inwoner.configurations",
+    "open_inwoner.synonyms",
 ]
 
 MIDDLEWARE = [

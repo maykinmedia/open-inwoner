@@ -34,6 +34,7 @@ django-colorfield
 django-registration
 django-view-breadcrumbs
 markdown
+django_better_admin_arrayfield
 
 # API libraries
 djangorestframework
