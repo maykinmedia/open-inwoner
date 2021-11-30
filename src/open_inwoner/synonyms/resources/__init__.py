@@ -1,2 +1,1 @@
-from .export_resource import SynonymExportResource
-from .import_resource import SynonymImportResource
+from .resources import SynonymResource

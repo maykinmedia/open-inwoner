@@ -18,3 +18,6 @@ class Synonym(models.Model):
     class Meta:
         verbose_name = _("synonym")
         verbose_name_plural = _("synonyms")
+
+    def __str__(self):
+        return self.term

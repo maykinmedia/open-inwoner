@@ -4,7 +4,7 @@ from ..models import Synonym
 from .widgets import CustomSimpleArrayWidget
 
 
-class SynonymImportResource(resources.ModelResource):
+class SynonymResource(resources.ModelResource):
     term = fields.Field(column_name="Term", attribute="term")
     synonyms = fields.Field(
         column_name="UF",

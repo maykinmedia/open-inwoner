@@ -6,14 +6,14 @@ from django.test import TestCase
 import tablib
 
 from ..models import Synonym
-from ..resources import SynonymExportResource, SynonymImportResource
+from ..resources import SynonymResource
 from .factories import SynonymFactory
 
 
 class TestSynonymImportResource(TestCase):
     def setUp(self):
         self.synonym = SynonymFactory.create()
-        self.resource = SynonymImportResource()
+        self.resource = SynonymResource()
 
     def test_import_saves_term_and_synonyms(self):
         dataset = tablib.Dataset(
@@ -51,7 +51,7 @@ class TestSynonymImportResource(TestCase):
 class TestSynonymExportResource(TestCase):
     def setUp(self):
         self.synonym = SynonymFactory()
-        self.resource = SynonymExportResource()
+        self.resource = SynonymResource()
 
     def test_export_returns_expected_row(self):
         dataset = self.resource.export()
@@ -62,7 +62,7 @@ class TestSynonymExportResource(TestCase):
                 OrderedDict(
                     [
                         (dataset.headers[0], self.synonym.term),
-                        (dataset.headers[1], ",".join(self.synonym.synonyms)),
+                        (dataset.headers[1], ", ".join(self.synonym.synonyms)),
                     ]
                 ),
             ],

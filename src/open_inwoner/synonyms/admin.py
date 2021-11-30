@@ -5,14 +5,11 @@ from import_export.admin import ImportExportMixin
 from import_export.formats import base_formats
 
 from .models import Synonym
-from .resources import SynonymExportResource, SynonymImportResource
+from .resources import SynonymResource
 
 
 @admin.register(Synonym)
 class SynonymAdmin(ImportExportMixin, admin.ModelAdmin, DynamicArrayMixin):
     list_display = ("term", "synonyms")
-    resource_class = SynonymImportResource
+    resource_class = SynonymResource
     formats = [base_formats.CSV]
-
-    def get_export_resource_class(self):
-        return SynonymExportResource
