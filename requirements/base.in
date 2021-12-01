@@ -31,6 +31,8 @@ django-elasticsearch-dsl
 django-import-export
 django-solo
 django-colorfield
+django-registration
+django-view-breadcrumbs
 
 
 # API libraries

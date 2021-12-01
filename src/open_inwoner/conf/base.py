@@ -138,6 +138,7 @@ INSTALLED_APPS = [
     "import_export",
     "solo",
     "colorfield",
+    "view_breadcrumbs",
     # Project applications.
     "open_inwoner.accounts",
     "open_inwoner.components",

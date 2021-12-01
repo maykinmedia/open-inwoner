@@ -14,15 +14,23 @@
   ///// Layout.
 
   > * {
-    grid-column-end: span 12;
+    grid-column-end: span 6;
   }
 
-  & > #{&}__sidebar:not(:empty) {
+  & > #{&}__sidebar {
     grid-column-end: span 3;
   }
 
-  & > #{&}__sidebar:not(:empty) + &__main {
+  & > #{&}__sidebar:empty {
+    grid-column-end: span 12;
+  }
+
+  & > #{&}__sidebar ~ &__main {
     grid-column-end: span 9;
+  }
+
+  & > #{&}__sidebar:empty ~ &__main {
+    grid-column-end: span 12;
   }
 
   & > #{&}__main:first-child {

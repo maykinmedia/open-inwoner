@@ -1,8 +1,9 @@
 {% extends 'master.html' %}
+{% load card_tags %}
 
 {% block content %}
 <h1 class="h1">Themas</h1>
 <p class="p">Nulla vitae elit libero, a pharetra augue.</p>
 
-{% include "components/CardContainer/CardContainer.html" with categories=object_list %}
+{% card_container categories=object_list %}
 {% endblock content %}

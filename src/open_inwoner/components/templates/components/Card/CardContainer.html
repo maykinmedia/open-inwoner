@@ -1,0 +1,23 @@
+{% load card_tags %}
+<div class="card-container {% if small %}card-container--small{% endif %}">
+    {% if categories %}
+        {% for category in categories %}
+            {% url 'pdc:category_detail' slug=category.slug as category_url %}
+            {% card src=category.image.file.url alt=category.image.name title=category.name href=category_url %}
+        {% endfor %}
+    {% endif %}
+
+    {% if subcategories %}
+        {% for subcategory in subcategories %}
+            {% url 'pdc:category_detail' slug=subcategory.slug as subcategory_url %}
+            {% category_card title=subcategory.name products=subcategory.product.all %}
+        {% endfor %}
+    {% endif %}
+
+    {% if products %}
+        {% for product in products %}
+            {% url 'pdc:product_detail' slug=product.slug as product_url %}
+            {% product_card title=product.name description=product.summary href=product_url %}
+        {% endfor %}
+    {% endif %}
+</div>

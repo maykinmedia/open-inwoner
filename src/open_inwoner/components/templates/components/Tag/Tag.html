@@ -1,0 +1,9 @@
+<aside class="tag-list">
+    <ul class="tag-list__list">
+        {% for tag in tags %}
+            <li class="tag-list__list-item">
+                <span class="tag">{{ tag.name }}</span>
+            </li>
+        {% endfor %}
+    </ul>
+</aside>

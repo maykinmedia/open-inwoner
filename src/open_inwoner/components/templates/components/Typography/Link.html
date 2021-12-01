@@ -1,5 +1,15 @@
-<a href="{{to}}" class="link {{ extra_classes }} {% if active %}link--active{% endif %} {% if iconPosition %}button--icon-{{iconPosition}}{% endif %} {% if primary %}link--primary{% endif %} {% if secondary %}link--secondary{% endif %}">
-    {% if icon %}<span class="material-icons">{{icon}}</span>{% endif %}
-    {{ nodelist }}
-    {% comment %} {% if to.startsWith("http") %}<span class="material-icons-outlined">open_in_new</span>{% endif %} {% endcomment %}
+{% load i18n helpers %}
+
+<a href="{{href}}" class="link {{ extra_classes }} {% if active %}link--active{% endif %} {% if iconPosition %}button--icon-{{iconPosition}}{% endif %} {% if primary %}link--primary{% endif %} {% if secondary %}link--secondary{% endif %}">
+    {% if src %}
+        <img class="logo__image" src="{{src}}" alt="{% trans "Logo of the municipality" %}"/>
+    {% endif %}
+    {% if social_icon %}
+        <i class="fa-brands fa-{{social_icon}}"></i>
+    {% endif %}
+    {% if icon %}
+        <span class="material-icons">{{icon}}</span>
+    {% endif %}
+    {{ text }}
+    {% if href|startswith:"http" %}<span class="material-icons">open_in_new</span>{% endif %}
 </a>

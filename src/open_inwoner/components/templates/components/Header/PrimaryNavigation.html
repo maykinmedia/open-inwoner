@@ -1,39 +1,43 @@
+{% load i18n %}
+
 <nav class="primary-navigation">
     <ul class="primary-navigation__list">
         <li class="primary-navigation__list-item">
             <a class="link" href="{% url 'root' %}">
                 <span class="material-icons">apps</span>
-                Home
+                {% trans "Home" %}
             </a>
         </li>
         <li class="primary-navigation__list-item">
-            <a class="link" href="{% url 'themas' %}">
+            <a class="link" href="{% url 'pdc:category_list' %}">
                 <span class="material-icons">description</span>
-                Thema's
+                {% trans "Thema's" %}
                 <span class="material-icons">expand_more</span>
             </a>
-            <ul class="primary-navigation__list">
-                {% for category in menu_categories %}
-                    <li class="primary-navigation__list-item">
-                        <a class="link" href="{% url 'thema-detail' slug=category.slug %}">{{ category.name }}</a>
-                    </li>
-                {% endfor %}
-            </ul>
+            {% if categories %}
+                <ul class="primary-navigation__list">
+                    {% for category in categories %}
+                        <li class="primary-navigation__list-item">
+                            <a class="link" href="{% url 'pdc:category_detail' slug=category.slug %}">{{ category.name }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
         </li>
         {% if request.user.is_authenticated %}
             <li class="primary-navigation__list-item">
-                <a class="link" href="/account">
+                <a class="link" href="{% url 'accounts:my_profile' %}">
                     <span class="material-icons">account_circle</span>
-                    Mijn profiel
+                    {% trans "Mijn profiel" %}
                 </a>
             </li>
             <li class="primary-navigation__list-item">
-                <a class="link" href="/account/inbox">
+                <a class="link" href="{% url 'accounts:my_profile' %}">
                     <span class="material-icons">inbox</span>
-                    Mijn berichten
+                    {% trans "Mijn berichten" %}
                 </a>
             </li>
         {% endif %}
-        <li class="primary-navigation__list-item"><a class="link" href="{% url 'search' %}">Zoeken</a></li>
+        <li class="primary-navigation__list-item"><a class="link" href="{% url 'search:search' %}">{% trans "Zoeken" %}</a></li>
     </ul>
 </nav>

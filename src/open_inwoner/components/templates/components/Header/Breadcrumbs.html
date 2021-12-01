@@ -1,17 +1,19 @@
 <nav class="breadcrumbs">
     <ul class="breadcrumbs__list">
-        <li class="breadcrumbs__list-item">
-            <a class="link link--secondary" href="/">
-                <span class="material-icons">apps</span>
-            </a>
-        </li>
-        <li class="breadcrumbs__list-item">
-            <span class="material-icons">chevron_right</span>
-            <a class="link link--secondary" href="/themas">Thema's</a>
-        </li>
-        <li class="breadcrumbs__list-item">
-            <span class="material-icons">chevron_right</span>
-            <a class="link" href="/themas/opvoeding-en-gezin">Opvoeding en gezin</a>
-        </li>
+        {% for url, name in breadcrumbs %}
+            <li class="breadcrumbs__list-item">
+                {% if forloop.first %}
+                    <a class="link link--secondary" href="{{url}}">
+                        <span class="material-icons">apps</span>
+                    </a>
+                {% else %}
+                    <span class="material-icons">chevron_right</span>
+                    <a class="link {% if not forloop.last %}link--secondary{% endif %}" href="{{url}}">
+                        {{ name }}
+                    </a>
+                {% endif %}
+
+            </li>
+        {% endfor %}
     </ul>
 </nav>

@@ -1,6 +1,15 @@
 {% extends 'master.html' %}
+{% load card_tags %}
 
 {% block content %}
-<h1 class="h1">Zoeken</h1>
-<p class="p">Hier vind u hoe wonen, zorg, welzijn, werk en geldzaken in Den Haag geregeld zijn en wijzen we u de weg naar organisaties, activiteiten, hulp en initiatieven in uw eigen buurt.</p>
+<h1 class="h1">{{object.name}}</h1>
+<p class="p">{{object.description}}</p>
+
+{% if subcategories %}
+{% card_container subcategories=subcategories %}
+{% endif %}
+
+{% if products %}
+{% card_container products=products small=True %}
+{% endif %}
 {% endblock content %}

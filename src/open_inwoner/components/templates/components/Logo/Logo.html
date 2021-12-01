@@ -1,6 +1,4 @@
-{% load i18n components %}
+{% load i18n link_tags %}
 
 {% url 'root' as root_url %}
-{% link extra_classes="logo" href=root_url with site_logo=site_logo %}
-    <img class="logo__image" src="{{site_logo}}" alt="{% trans "Logo of the municipality" %}"/>
-{% endlink %}
+{% link extra_classes="logo" href=root_url src=src alt=alt %}
