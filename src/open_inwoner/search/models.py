@@ -21,3 +21,7 @@ class Synonym(models.Model):
 
     def __str__(self):
         return self.term
+
+    def synonym_line(self) -> str:
+        """synonym line in Solr syntax, used for ES"""
+        return f"{self.term}, {','.join(self.synonyms)}"
