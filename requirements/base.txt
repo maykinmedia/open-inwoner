@@ -18,6 +18,8 @@ cffi==1.15.0
     # via cryptography
 charset-normalizer==2.0.6
     # via requests
+confusable-homoglyphs==3.2.0
+    # via django-registration
 cryptography==35.0.0
     # via
     #   pyjwt
@@ -55,10 +57,12 @@ django==3.2.7
     #   django-polymorphic
     #   django-privates
     #   django-redis
+    #   django-registration
     #   django-rosetta
     #   django-sendfile2
     #   django-sniplates
     #   django-treebeard
+    #   django-view-breadcrumbs
     #   djangorestframework
     #   drf-spectacular
     #   easy-thumbnails
@@ -115,6 +119,8 @@ django-privates==1.2.2
     # via -r requirements/base.in
 django-redis==5.0.0
     # via -r requirements/base.in
+django-registration==3.2
+    # via -r requirements/base.in
 django-rosetta==0.9.7
     # via -r requirements/base.in
 django-sendfile2==0.6.0
@@ -124,6 +130,8 @@ django-sniplates==0.7.0
 django-solo==1.2.0
     # via -r requirements/base.in
 django-treebeard==4.5.1
+    # via -r requirements/base.in
+django-view-breadcrumbs==2.2.4
     # via -r requirements/base.in
 djangorestframework==3.12.4
     # via

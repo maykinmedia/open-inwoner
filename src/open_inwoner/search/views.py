@@ -11,7 +11,6 @@ class SearchView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        print(self.request.GET.get("query"))
         if self.request.GET.get("query"):
             context["results"] = search_products(
                 self.request.GET.get("query"),

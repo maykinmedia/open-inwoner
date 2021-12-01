@@ -31,7 +31,6 @@ class FormNode(template.Node):
     def __init__(
         self, nodelist, form_object, method, columns=1, inline=False, **kwargs
     ):
-        print(dir(form_object))
         self.nodelist = nodelist
         self.form = form_object
         self.method = method
