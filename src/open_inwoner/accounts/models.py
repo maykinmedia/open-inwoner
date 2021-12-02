@@ -63,10 +63,15 @@ class User(AbstractBaseUser, PermissionsMixin):
     eherkenning_objects = eHerkenningManager()
 
     USERNAME_FIELD = "email"
+    _old_bsn = None
 
     class Meta:
         verbose_name = _("user")
         verbose_name_plural = _("users")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._old_bsn = self.bsn
 
     def get_full_name(self):
         """
