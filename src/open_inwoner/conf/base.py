@@ -147,7 +147,6 @@ INSTALLED_APPS = [
     "open_inwoner.search",
     "open_inwoner.utils",
     "open_inwoner.configurations",
-    "open_inwoner.synonyms",
 ]
 
 MIDDLEWARE = [
