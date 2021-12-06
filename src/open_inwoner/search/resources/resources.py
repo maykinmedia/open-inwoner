@@ -1,7 +1,7 @@
 from import_export import fields, resources
+from import_export.widgets import SimpleArrayWidget
 
 from ..models import Synonym
-from .widgets import CustomSimpleArrayWidget
 
 
 class SynonymResource(resources.ModelResource):
@@ -9,7 +9,7 @@ class SynonymResource(resources.ModelResource):
     synonyms = fields.Field(
         column_name="UF",
         attribute="synonyms",
-        widget=CustomSimpleArrayWidget(separator="|"),
+        widget=SimpleArrayWidget(separator="|"),
     )
 
     class Meta:

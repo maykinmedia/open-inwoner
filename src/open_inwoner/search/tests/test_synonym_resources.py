@@ -62,7 +62,7 @@ class TestSynonymExportResource(TestCase):
                 OrderedDict(
                     [
                         (dataset.headers[0], self.synonym.term),
-                        (dataset.headers[1], ", ".join(self.synonym.synonyms)),
+                        (dataset.headers[1], "|".join(self.synonym.synonyms)),
                     ]
                 ),
             ],
