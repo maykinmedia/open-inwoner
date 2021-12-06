@@ -1,0 +1,21 @@
+.card-container {
+  --card-columns: 1;
+  display: grid;
+  gap: var(--gutter-width);
+  grid-template-columns: repeat(var(--card-columns), 1fr);
+
+  @media (min-width: 768px) {
+    --card-columns: 4;
+  }
+
+  &--small {
+    @media (min-width: 768px) {
+      --card-columns: 2;
+    }
+  }
+
+}
+
+.p + .card-container {
+  margin-top: var(--gutter-width);
+}
