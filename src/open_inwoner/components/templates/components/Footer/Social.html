@@ -1,0 +1,10 @@
+{% load i18n link_tags %}
+
+<nav class="social {% if primary %}social--primary{% endif %}">
+    <h4 class="h4">{% trans "Delen" %}</h4>
+
+    {% link social_icon="facebook" href="#" extra_classes="social__link" %}
+    {% link social_icon="twitter" href="#" extra_classes="social__link" %}
+    {% link social_icon="whatsapp" href="#" extra_classes="social__link" %}
+    {% link social_icon="linkedin" href="#" extra_classes="social__link" %}
+</nav>

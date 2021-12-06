@@ -49,12 +49,3 @@ jobs:
       - name: Run black
         run: |
           black --check src
-
-  eslint:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install modules
-      run: cd frontend/ && npm install
-    - name: Run ESLint
-      run: cd frontend/ && npm run linter

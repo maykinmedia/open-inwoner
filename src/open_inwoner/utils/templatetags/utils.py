@@ -68,3 +68,8 @@ def placekitten_src(width=800, height=600):
 @register.simple_tag
 def version():
     return settings.RELEASE
+
+
+@register.simple_tag
+def template_dir(value):
+    return dir(value)
