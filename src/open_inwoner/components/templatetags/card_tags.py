@@ -20,7 +20,7 @@ def product_card(title, description, href, **kwargs):
 
 @register.inclusion_tag("components/Card/CardContainer.html")
 def card_container(categories=[], subcategories=[], products=[], **kwargs):
-    if not categories and not subcategories and not products:
+    if categories is None and subcategories is None and products is None:
         assert False, "provide categories, subcategories or products"
     return {
         **kwargs,

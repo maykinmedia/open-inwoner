@@ -11,6 +11,16 @@ def addclass(field, class_attr):
     return field.as_widget(attrs={"class": class_attr})
 
 
+def safe_resolve(context_item, context):
+    """Resolve FilterExpressions and Variables in context if possible.  Return other items unchanged."""
+
+    return (
+        context_item.resolve(context)
+        if hasattr(context_item, "resolve")
+        else context_item
+    )
+
+
 def parse_component_with_args(parser, bits, tag_name):
     tag_args, tag_kwargs = parse_bits(
         parser=parser,
@@ -39,6 +49,9 @@ class FormNode(template.Node):
         self.kwargs = kwargs
 
     def render(self, context):
+        corrected_kwargs = {
+            key: safe_resolve(kwarg, context) for key, kwarg in self.kwargs.items()
+        }
         output = self.nodelist.render(context)
         method = self.method.resolve(context).replace('"', "")
         render_context = {
@@ -47,7 +60,7 @@ class FormNode(template.Node):
             "method": method,
             "columns": self.columns,
             "inline": self.inline,
-            **self.kwargs,
+            **corrected_kwargs,
         }
         rendered = render_to_string("components/Form/Form.html", render_context)
         return rendered
