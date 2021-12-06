@@ -1,0 +1,12 @@
+<aside class="card">
+    <div class="card__body">
+        <h4 class="h4">{{title}}</h4>
+        {% for product in products %}
+            {% url 'pdc:product_detail' slug=product.slug as product_url %}
+            <a class="link button--icon-after link--secondary" href="{{product_url}}">
+                <span class="material-icons">arrow_forward</span>
+                {{product.name}}
+            </a>
+        {% endfor %}
+    </div>
+</aside>
