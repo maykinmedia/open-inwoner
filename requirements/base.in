@@ -33,7 +33,7 @@ django-solo
 django-colorfield
 django-registration
 django-view-breadcrumbs
-
+markdown
 
 # API libraries
 djangorestframework
