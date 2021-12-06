@@ -75,7 +75,7 @@ class Product(models.Model):
     )
     categories = models.ManyToManyField(
         "pdc.Category",
-        related_name="product",
+        related_name="products",
         help_text=_("Categories which the product relates to"),
     )
     related_products = models.ManyToManyField(
