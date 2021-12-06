@@ -1,0 +1,9 @@
+{% load form_tags %}
+
+<form class="form form--columns-{{ columns }} {% if inline %}form--inline{% endif %}" method="{{ method }}" action="." {% if id %}id="{{id}}"{% endif %}>
+    {% if form.non_field_errors %}
+        {% errors errors=form.non_field_errors %}
+    {% endif %}
+
+    {{ contents }}
+</form>

@@ -1,0 +1,164 @@
+{% extends 'master.html' %}
+{% load i18n card_tags link_tags tag_tags %}
+
+{% block sidebar_content %}
+<aside class="anchor-menu">
+    <ul class="anchor-menu__list">
+        <li class="anchor-menu__list-item anchor-menu__list-item--active">
+            <a class="link" href="#title" to="#title">{{object.name}}</a>
+        </li>
+        {% if object.files.exists %}
+            <li class="anchor-menu__list-item">
+                <a class="link" href="#files" to="#files">{% trans "Bestanden" %}</a>
+            </li>
+        {% endif %}
+        {% if object.locations.exists %}
+            <li class="anchor-menu__list-item">
+                <a class="link" href="#locations" to="#locations">{% trans "Locaties" %}</a>
+            </li>
+        {% endif %}
+        {% if object.links.exists %}
+            <li class="anchor-menu__list-item">
+                <a class="link" href="#links" to="#links">{% trans "Links" %}</a>
+            </li>
+        {% endif %}
+        {% if object.related_products.exists %}
+            <li class="anchor-menu__list-item">
+                <a class="link" href="#see" to="#see">{% trans "Zie ook" %}</a>
+            </li>
+        {% endif %}
+        <li class="anchor-menu__list-item">
+            <a class="link" href="#share" to="#share">{% trans "Delen" %}</a>
+        </li>
+        <li class="anchor-menu__list-item anchor-menu__list-item--top">
+            <a class="link link--primary" href="#title" to="#title">
+                <span class="material-icons">arrow_upward</span>
+                Terug naar boven
+            </a>
+        </li>
+    </ul>
+</aside>
+{% endblock sidebar_content %}
+
+{% block content %}
+<h1 class="h1" id="title">{{object.name}}</h1>
+{% tag tags=object.tags.all %}
+<p class="p">{{object.summary}}</p>
+{{ object.get_rendered_content|safe }}
+{% if object.files.exists %}
+    <hr class="divider">
+    <nav class="file-list">
+        <h4 class="h4" id="files">{% trans "Bestanden" %}</h4>
+        <ul class="file-list__list">
+            {% for file in object.files.all %}
+            <li class="file-list__list-item">
+                <aside class="file">
+                    {% if file.file.file_type == 'Image' %}
+                    <span class="material-icons-outlined">image</span>
+                    {% else %}
+                    <span class="material-icons-outlined">description</span>
+                    {% endif %}
+                    <p class="p">
+                        {% firstof file.file.name file.file.label|cut:file.file.extension|cut:"." %} ({{file.file.extension}}, {{file.file.file.size}})
+                    </p>
+                    {% trans "Download" as download %}
+                    {% link href=file.file.file.url text=download secondary=True download=True icon="file_download" %}
+                </aside>
+            </li>
+            {% endfor %}
+        </ul>
+    </nav>
+{% endif %}
+{% if object.locations.exists %}
+    <hr class="divider">
+    <nav class="location-card-list">
+        <h4 class="h4" id="locations">{% trans "Locaties" %}</h4>
+        <ul class="location-card-list__list">
+            {% for location in object.locations.all %}
+            <li class="location-card-list__list-item">
+                <aside class="card">
+                    <div style="height: 100px; position: relative;" class="leaflet-container leaflet-touch leaflet-fade-anim leaflet-touch-zoom" tabindex="0">
+                        <div class="leaflet-pane leaflet-map-pane" style="transform: translate3d(0px, 0px, 0px);">
+                            <div class="leaflet-pane leaflet-tile-pane">
+                                <div class="leaflet-layer " style="z-index: 1; opacity: 1;">
+                                    <div class="leaflet-tile-container leaflet-zoom-animated" style="z-index: 18; transform: translate3d(0px, 0px, 0px) scale(1);">
+                                        <img alt="" role="presentation" src="https://c.tile.openstreetmap.org/15/16853/10791.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-69px, -236px, 0px); opacity: 1;">
+                                        <img alt="" role="presentation" src="https://a.tile.openstreetmap.org/15/16854/10791.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(187px, -236px, 0px); opacity: 1;">
+                                        <img alt="" role="presentation" src="https://a.tile.openstreetmap.org/15/16853/10792.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-69px, 20px, 0px); opacity: 1;">
+                                        <img alt="" role="presentation" src="https://b.tile.openstreetmap.org/15/16854/10792.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(187px, 20px, 0px); opacity: 1;">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="leaflet-pane leaflet-shadow-pane"></div>
+                            <div class="leaflet-pane leaflet-overlay-pane"></div>
+                            <div class="leaflet-pane leaflet-marker-pane"></div>
+                            <div class="leaflet-pane leaflet-tooltip-pane"></div>
+                            <div class="leaflet-pane leaflet-popup-pane"></div>
+                            <div class="leaflet-proxy leaflet-zoom-animated" style="transform: translate3d(4314550px, 2762780px, 0px) scale(16384);"></div>
+                        </div>
+                        <div class="leaflet-control-container">
+                            <div class="leaflet-top leaflet-left"></div>
+                            <div class="leaflet-top leaflet-right"></div>
+                            <div class="leaflet-bottom leaflet-left"></div>
+                            <div class="leaflet-bottom leaflet-right">
+                                <div class="leaflet-control-attribution leaflet-control">
+                                    <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a>
+                                    | ©
+                                    <a href="http://osm.org/copyright">OpenStreetMap</a>
+                                    contributors
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card__body">
+                        <h4 class="h4">{{location.name}}</h4>
+                        <p class="p">
+                            {{location.street}} {{location.number}}<br>
+                            {{location.postcode}} {{location.city}}
+                        </p>
+                    </div>
+                </aside>
+            </li>
+            {% endfor %}
+        </ul>
+    </nav>
+{% endif %}
+<hr class="divider">
+
+<div class="grid">
+    {% if object.links.exists %}
+        <nav class="link-list">
+            <h4 class="h4" id="links">{% trans "Links" %}</h4>
+            <ul class="link-list__list">
+                {% for link in object.links.all %}
+                    <li class="link-list__list-item">
+                        {% link href=link.url secondary=True text=link.name %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </nav>
+    {% endif %}
+    <aside>
+        {% if object.related_products.exists %}
+            <nav class="link-list">
+                <h4 class="h4" id="see">{% trans "Zie ook" %}</h4>
+                <ul class="link-list__list">
+                    {% for related in object.related_products.all %}
+                        <li class="link-list__list-item">
+                            {% url 'pdc:product_detail' slug=related.slug as product_url %}
+                            {% link href=product_url text=related.name secondary=True %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </nav>
+        {% endif %}
+        <nav class="social">
+            <h4 class="h4" id="share">{% trans "Delen" %}</h4>
+            {% link social_icon="facebook" href="#" extra_classes="social__link" %}
+            {% link social_icon="twitter" href="#" extra_classes="social__link" %}
+            {% link social_icon="whatsapp" href="#" extra_classes="social__link" %}
+            {% link social_icon="linkedin" href="#" extra_classes="social__link" %}
+        </nav>
+    </aside>
+</div>
+{% endblock content %}

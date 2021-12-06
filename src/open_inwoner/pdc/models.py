@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+import markdown
+from bs4 import BeautifulSoup
 from filer.fields.file import FilerFileField
 from filer.fields.image import FilerImageField
 from treebeard.mp_tree import MP_Node
@@ -121,6 +123,27 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_rendered_content(self):
+        md = markdown.Markdown()
+        html = md.convert(self.content)
+        soup = BeautifulSoup(html, "html.parser")
+        class_adders = [
+            ("h1", "h1"),
+            ("h2", "h2"),
+            ("h3", "h3"),
+            ("h4", "h4"),
+            ("h5", "h5"),
+            ("h6", "h6"),
+            ("p", "p"),
+        ]
+        for tag, class_name in class_adders:
+            for element in soup.find_all(tag):
+                element.attrs["class"] = class_name
+
+        for element in soup.find_all("a"):
+            element.attrs["class"] = "link"
+        return soup
 
 
 class TagType(models.Model):

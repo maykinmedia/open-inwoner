@@ -1,0 +1,24 @@
+.breadcrumbs {
+  overflow-x: auto;
+  &__list {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  &__list-item {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+  }
+
+  .link {
+    line-height: var(--row-height);
+  }
+
+  &__list-item > *[class*=icon],
+  &__list-item > *[class*=Icon] {
+    margin: 0 var(--spacing-medium);
+  }
+}

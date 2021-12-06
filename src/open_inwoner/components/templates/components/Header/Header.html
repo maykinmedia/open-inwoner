@@ -1,0 +1,35 @@
+{% load i18n logo_tags header_tags view_breadcrumbs %}
+
+{% accessibility_header %}
+<header class="header">
+    {% logo src=logo_url alt="" %}
+
+    <nav class="header__actions">
+        <p class="p">
+            {% trans "Welkom" %}
+            {% if request.user %}{{ request.user.get_full_name }}{% endif %}
+        </p>
+
+        {% if request.user.is_authenticated %}
+            <ul class="header__list">
+                <li class="header__list-item">
+                    <a class="link" href="{% url 'logout' %}">{% trans "Logout" %}</a>
+                </li>
+            </ul>
+        {% else %}
+            <ul class="header__list">
+                <li class="header__list-item">
+                    <a class="link" href="{% url 'django_registration_register' %}">{% trans "Register" %}</a>
+                </li>
+
+                <li class="header__list-item">
+                    <a class="link" href="{% url 'login' %}">{% trans "Login" %}</a>
+                </li>
+            </ul>
+        {% endif %}
+    </nav>
+
+    {% primary_navigation categories=categories request=request %}
+    {% comment %} {% breadcrumbs %} {% endcomment %}
+    {% render_breadcrumbs "components/Header/Breadcrumbs.html" %}
+</header>

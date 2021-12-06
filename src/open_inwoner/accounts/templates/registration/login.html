@@ -1,7 +1,14 @@
-<form method="post" id="login-form">
+{% extends 'master.html' %}
+{% load form_tags %}
+
+{% block content %}
+{% render_form form_object=form method="POST" id="login-form" %}
     {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="submit">
-    <a href="{% url 'django_registration_register' %}">Registreer</a>
-    <a href="{% url 'digid:login' %}">Digid</a>
-</form>
+    {% input form.username %}
+    {% input form.password %}
+    {% url 'digid:login' as digid_url %}
+    {% submit text="Inloggen" icon="arrow_forward" %}
+    <a class="link" href="{% url 'django_registration_register' %}">Registreer</a>
+    <a class="link" href="{% url 'digid:login' %}">Digid</a>
+{% endrender_form %}
+{% endblock content %}
