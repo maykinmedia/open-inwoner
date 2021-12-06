@@ -11,6 +11,14 @@ os.environ.setdefault("CACHE_DEFAULT", "127.0.0.1:6379/2")
 
 from .base import *  # noqa isort:skip
 
+# Allow logging in with both username+password and email+password
+AUTHENTICATION_BACKENDS = [
+    "open_inwoner.accounts.backends.CustomAxesBackend",
+    "open_inwoner.accounts.backends.UserModelEmailBackend",
+    "django.contrib.auth.backends.ModelBackend",
+    "digid_eherkenning.mock.backends.DigiDBackend",
+]
+
 # Database performance
 for db_config in DATABASES.values():
     db_config["CONN_MAX_AGE"] = 60  # Lifetime of a database connection for performance.
