@@ -47,6 +47,8 @@ uwsgi
 sentry-sdk  # error monitoring
 elastic-apm  # Elastic APM integration
 
+beautifulsoup4
+
 # DigidLocal
 python3-saml
 pyopenssl
