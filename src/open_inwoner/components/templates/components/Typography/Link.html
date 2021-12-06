@@ -1,6 +1,6 @@
 {% load i18n helpers %}
 
-<a href="{{href}}" class="link {{ extra_classes }} {% if active %}link--active{% endif %} {% if iconPosition %}button--icon-{{iconPosition}}{% endif %} {% if primary %}link--primary{% endif %} {% if secondary %}link--secondary{% endif %}">
+<a href="{{href}}" {% if download %}download{% endif %} {% if href|startswith:"http" %}target="_blank"{% endif %} class="link {{ extra_classes }} {% if active %}link--active{% endif %} {% if iconPosition %}button--icon-{{iconPosition}}{% endif %} {% if primary %}link--primary{% endif %} {% if secondary %}link--secondary{% endif %}">
     {% if src %}
         <img class="logo__image" src="{{src}}" alt="{% trans "Logo of the municipality" %}"/>
     {% endif %}
