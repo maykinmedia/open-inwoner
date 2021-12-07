@@ -1,0 +1,8 @@
+
+  - name: Migrate all sites
+    shell: chdir={{ project_root }} . ./env/bin/activate && src/manage.py migrate --noinput --settings=open_inwoner.conf.{{ target }}_{{item.name }}
+    run_once: true
+    become: yes
+    become_user: "{{ user_name }}"
+    loop: "{{ sites }}"
+
