@@ -17,7 +17,7 @@ dbport: 5432
 branch: develop
 
 # Fallback options for dotenv, overridden in site-specific settings
-nginx_server_name: "platform.openinwoner.nl"
+nginx_server_name: "groningen.openinwoner.nl"
 dbname: "{{ project_name }}-{{ target }}"
 redis_url: redis://localhost:6379/10
 
