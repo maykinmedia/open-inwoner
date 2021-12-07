@@ -8,10 +8,9 @@ os.environ.setdefault("ENVIRONMENT", "staging")
 # NOTE: watch out for multiple projects using the same cache!
 os.environ.setdefault("CACHE_DEFAULT", "127.0.0.1:6379/14")
 
-os.environ['DB_NAME'] = 'oip-staging-enschede'
-os.environ['ALLOWED_HOSTS'] = 'enschede.openinwoner.nl'
+os.environ["DB_NAME"] = "oip-staging-enschede"
+os.environ["ALLOWED_HOSTS"] = "enschede.openinwoner.nl"
 
 from .production import *  # noqa isort:skip
 
 ES_INDEX_PRODUCTS = "products-enschede"
-
