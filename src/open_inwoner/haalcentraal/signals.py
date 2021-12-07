@@ -9,6 +9,7 @@ from glom import PathAccessError, glom
 from requests import RequestException
 from zds_client import ClientError
 
+from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.models import User
 from open_inwoner.haalcentraal.models import HaalCentraalConfig
 
@@ -45,13 +46,18 @@ def fetch_data(instance):
 
 @receiver(pre_save, sender=User)
 def on_bsn_change(instance, **kwargs):
-    if instance.bsn and instance._old_bsn != instance.bsn:
+    if (
+        instance.bsn
+        and instance._old_bsn != instance.bsn
+        and instance.login_type == LoginTypeChoices.digid
+    ):
         data = fetch_data(instance)
         if data:
             try:
                 instance.first_name = glom(data, "naam.voornamen")
                 instance.last_name = glom(data, "naam.geslachtsnaam")
                 instance.birthday = glom(data, "geboorte.datum.datum")
+                instance.is_prepopulated = True
             except PathAccessError as e:
                 logger.exception(
                     "exception while trying to access fetched data", exc_info=e

@@ -38,6 +38,7 @@ class _UserAdmin(UserAdmin):
                     "is_staff",
                     "is_superuser",
                     "deactivated_on",
+                    "is_prepopulated",
                     "groups",
                     "user_permissions",
                 ),
@@ -54,7 +55,7 @@ class _UserAdmin(UserAdmin):
             },
         ),
     )
-    readonly_fields = ("bsn", "rsin")
+    readonly_fields = ("bsn", "rsin", "is_prepopulated")
     list_display = ("email", "first_name", "last_name", "is_staff")
     search_fields = ("first_name", "last_name", "email")
     ordering = ("email",)
