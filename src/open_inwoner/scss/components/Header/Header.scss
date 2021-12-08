@@ -67,6 +67,13 @@
   }
 
   &__actions {
+    align-items: flex-end;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+
+  &__text-actions {
     align-items: center;
     display: flex;
     height: var(--row-height);

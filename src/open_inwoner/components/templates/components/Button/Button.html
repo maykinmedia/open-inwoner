@@ -1,14 +1,13 @@
-{% load helpers %}
+{% load helpers icon_tags %}
 
 {% if href %}
     <a class="{% create_button_classes %}" href="{{href}}">
-        {% if icon %}<span class="material-icons">{{ icon }}</span>{% endif %}
+        {% if icon %}{% icon icon=icon outlined=icon_outlined %}{% endif %}
         {{text}}
     </a>
 {% else %}
     <button class="{% create_button_classes %}" type="{{type}}">
-        {% if icon %}<span class="material-icons">{{ icon }}</span>{% endif %}
-        {% if closeAction %}<span class="material-icons">close</span>{% endif %}
+        {% if icon %}{% icon icon=icon outlined=icon_outlined %}{% endif %}
         {{text}}
     </button>
 {% endif %}

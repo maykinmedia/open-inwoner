@@ -5,6 +5,12 @@
   font-weight: var(--font-weight-heading-2);
   line-height: var(--font-line-height-heading-2);
   margin: 0;
+  display: flex;
+  justify-content: space-between;
+
+  &--extra {
+    margin: var(--row-height) 0 var(--spacing-medium) 0;
+  }
 }
 
 .p + .h2 {

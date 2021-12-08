@@ -1,13 +1,54 @@
 from django import template
+from django.urls import NoReverseMatch, reverse
+
+from open_inwoner.components.templatetags.form_tags import parse_component_with_args
+from open_inwoner.utils.templatetags.abstract import ContentsNode
 
 register = template.Library()
 
 
+@register.tag
+def button_group(parser, token):
+    """
+    Nested content supported.
+    """
+    bits = token.split_contents()
+    context_kwargs = parse_component_with_args(parser, bits, "button_group")
+    nodelist = parser.parse(("endbutton_group",))
+    parser.delete_first_token()
+    return ContentsNode(
+        nodelist, "components/Button/ButtonGroup.html", **context_kwargs
+    )
+
+
 @register.inclusion_tag("components/Button/Button.html")
-def button(text, **kwargs):
+def button(**kwargs):
     """
-    text: this will be the button text
-    href: where the button links to (Optional)
-    icon: the icon that you want to display (Optional)
+    text: string | this will be the button text. (Optional)
+    href: url | where the link links to (can be url name). (Optional)
+    uuid: str | if href is an url name, pk for reverse can be passed (Optional).
+    size: "big" | If the button should be bigger. (Optional)
+    open: bool | If the open style button should be used. (Optional)
+    bordered: bool | If the border should be colored. (Optional)
+    primary: bool | If the primary colors should be used. (Optional)
+    secondary: bool | If the secondary colors should be used. (Optional)
+    transparent: bool | If the button does not have a background or border. (Optional)
+    icon: string | the icon that you want to display. (Optional)
+    icon_position: "before" or "after" | where the icon should be positioned to the text. (Optional)
+    icon_outlined: bool | if the outlined icons should be used. (Optional)
+    type: string | the type of button that should be used. (Optional)
     """
-    return {**kwargs, "text": text}
+    if "text" not in kwargs and "icon" not in kwargs:
+        assert False, "Either text or icon should be given"
+
+    if "href" in kwargs:
+        try:
+            uuid = kwargs.get("uuid")
+            reverse_kwargs = {}
+            if uuid:
+                reverse_kwargs.update(uuid=uuid)
+            kwargs["href"] = reverse(kwargs.get("href"), kwargs=reverse_kwargs)
+        except NoReverseMatch:
+            pass
+
+    return {**kwargs}

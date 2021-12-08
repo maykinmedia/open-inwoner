@@ -8,6 +8,16 @@
     --card-columns: 4;
   }
 
+  @for $i from 1 through 12 {
+    &--columns-#{$i} {
+      --card-columns: 1;
+
+      @media (min-width: 768px) {
+        --card-columns: #{$i};
+      }
+    }
+  }
+
   &--small {
     @media (min-width: 768px) {
       --card-columns: 2;

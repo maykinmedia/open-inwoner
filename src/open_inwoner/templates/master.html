@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <title>{% block title %}Open_Inwoner{% endblock %}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link href="{% static 'ico/favicon.png' %}" rel="shortcut icon">
+        <link href="{{site_logo}}" rel="shortcut icon">
         <link href="{% static 'bundles/open_inwoner-css.css' %}" media="all" rel="stylesheet" />
         <style>
             :root {
@@ -31,7 +31,7 @@
     </head>
 
     <body>
-        {% header logo_url=site_logo categories=menu_categories request=request breadcrumbs=breadcrumbs %}
+        {% header logo_url=site_logo categories=menu_categories request=request breadcrumbs=breadcrumbs search_form=search_form %}
 
         {% block header_image %}{% endblock header_image %}
 
@@ -39,23 +39,24 @@
             <main class="container">
                 {% block main_inner %}
                     <div class="grid">
-                    {% spaceless %}<aside class="grid__sidebar">
-                            {% block sidebar_content %}{% endblock sidebar_content %}
-                        </aside>{% endspaceless %}
+                        {% spaceless %}<aside class="grid__sidebar">
+                                {% block sidebar_content %}{% endblock sidebar_content %}
+                            </aside>{% endspaceless %}
 
-                    <div class="grid__main">
-                        {% block content %}
-                            Please provide the content
-                        {% endblock content %}
+                        <div class="grid__main">
+                            {% block content %}
+                                Please provide the content
+                            {% endblock content %}
+                        </div>
+
+                        {% block extra_grid %}{% endblock extra_grid %}
                     </div>
-
-                    {% block extra_grid %}{% endblock extra_grid %}
                 {% endblock main_inner %}
             </main>
         {% endblock main_outer %}
 
         {% footer logo_url=site_logo %}
 
-        <script src="{% static 'bundles/open_inwoner-js.js' %}"></script>
+        <script defer src="{% static 'bundles/open_inwoner-js.js' %}"></script>
     </body>
 </html>

@@ -1,6 +1,6 @@
-const printButtons = document.querySelectorAll(".accessibility--change-font")
+const changeFontButtons = document.querySelectorAll(".accessibility--change-font")
 
-class Print {
+class ChangeFont {
     constructor(node) {
         this.node = node;
         this.text = node.querySelector(".link__text");
@@ -22,4 +22,4 @@ class Print {
     }
 }
 
-[...printButtons].forEach((printButton) => new Print(printButton))
+[...changeFontButtons].forEach((changeFontButton) => new ChangeFont(changeFontButton))

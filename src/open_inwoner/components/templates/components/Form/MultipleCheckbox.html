@@ -1,0 +1,17 @@
+{% load form_tags utils %}
+
+<div class="form__control">
+    <div class="form__grid-box">
+        {% for choice in field.field.choices %}
+            {% choice_checkbox choice=choice name=field.name index=forloop.counter %}
+        {% endfor %}
+    </div>
+
+    {% if field.help_text %}
+        <p class="p">{{ field.help_text }}</p>
+    {% endif %}
+
+    {% if field.errors %}
+        {% errors errors=field.errors %}
+    {% endif %}
+</div>

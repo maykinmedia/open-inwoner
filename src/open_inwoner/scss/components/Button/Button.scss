@@ -5,6 +5,7 @@
   color: var(--color-secondary);
   cursor: pointer;
   display: inline-flex;
+  gap: var(--spacing-medium);
   font-family: var(--font-family-body);
   font-size: var(--font-size-body);
   letter-spacing: 0;
@@ -14,26 +15,27 @@
   text-align: center;
   text-decoration: none;
   transition: transform 300ms, background-color 300ms;
+  font-weight: normal;
 
   &:focus,
   &:hover {
     transform: translateY(-1px);
   }
 
-  &--icon-before {
-    *[class*=icon],
-    *[class*=Icon] {
-      margin-right: var(--spacing-medium)
-    }
+  *[class*=icon],
+  *[class*=Icon] {
+    font-size: 20px;
+    max-width: 20px;
   }
 
   &--icon-after {
     flex-direction: row-reverse;
-    //padding-right: 0;
+  }
 
+  &--textless {
     *[class*=icon],
     *[class*=Icon] {
-      margin-left: var(--spacing-medium)
+      margin: 0;
     }
   }
 
@@ -46,14 +48,6 @@
     }
   }
 
-  &--transparent {
-    background-color: transparent;
-    border-color: transparent;
-    color: var(--color-primary);
-    padding-left: 0;
-    padding-right: 0;
-  }
-
   &--primary {
     background-color: var(--color-primary);
     border: 1px solid var(--color-primary);
@@ -62,6 +56,29 @@
     &:focus,
     &:hover {
       background-color: var(--color-primary-darker);
+    }
+  }
+
+  &--secondary {
+    background-color: var(--color-secondary);
+    border: 1px solid var(--color-secondary);
+    color: var(--color-white);
+
+    &:focus,
+    &:hover {
+      background-color: var(--color-secondary-darker);
+    }
+  }
+
+  &--transparent {
+    background-color: transparent;
+    border-color: transparent;
+    color: var(--color-primary);
+    padding-left: 0;
+    padding-right: 0;
+
+    &.button--secondary {
+      color: var(--color-secondary);
     }
   }
 

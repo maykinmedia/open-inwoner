@@ -1,6 +1,25 @@
+import pathlib
+
 from django import template
 
+from filer.models.filemodels import File
+
 register = template.Library()
+
+IMAGE_TYPES = [
+    "jpg",
+    "jpeg",
+    "jpe",
+    "jfif",
+    "jfi",
+    "jif",
+    "png",
+    "svg",
+    "gif",
+    "webp",
+    "tiff",
+    "tif",
+]
 
 
 @register.inclusion_tag("components/File/FileList.html")
@@ -18,4 +37,31 @@ def file(file, **kwargs):
     """
     file: this is the file that needs to be rendered.
     """
-    return {**kwargs, "file": file}
+    if isinstance(file, File):
+        print(file.file_type, file.file_type == "Image")
+        kwargs.update(
+            is_image=file.file_type == "Image",
+            extension=file.extension,
+            size=file.size,
+            url=file.url,
+        )
+        if not kwargs.get("name"):
+            kwargs.update(
+                name=file.name
+                if file.name
+                else file.label.replace(f".{file.extension}", ""),
+            )
+    else:
+        pathed = pathlib.Path(file.name)
+        extension = pathed.suffix.replace(".", "")
+        kwargs.update(
+            file_type=extension.lower() in IMAGE_TYPES,
+            extension=extension,
+            size=file.size,
+            url=file.url,
+        )
+        if not kwargs.get("name"):
+            kwargs.update(
+                name=pathed.stem,
+            )
+    return {**kwargs}

@@ -1,0 +1,37 @@
+from django.http.response import HttpResponseRedirect
+from django.urls.base import reverse_lazy
+from django.views.generic import CreateView, ListView
+from django.views.generic.edit import UpdateView
+
+from ..forms import ActionForm
+from ..models import Action
+
+
+class ActionListView(ListView):
+    template_name = "pages/profile/actions/list.html"
+    model = Action
+    paginate_by = 10
+
+
+class ActionUpdateView(UpdateView):
+    template_name = "pages/profile/actions/edit.html"
+    model = Action
+    slug_field = "uuid"
+    slug_url_kwarg = "uuid"
+    form_class = ActionForm
+    success_url = reverse_lazy("accounts:action_list")
+
+    def form_valid(self, form):
+        self.object = form.save(self.request.user)
+        return HttpResponseRedirect(self.get_success_url())
+
+
+class ActionCreateView(CreateView):
+    template_name = "pages/profile/actions/edit.html"
+    model = Action
+    form_class = ActionForm
+    success_url = reverse_lazy("accounts:action_list")
+
+    def form_valid(self, form):
+        self.object = form.save(self.request.user)
+        return HttpResponseRedirect(self.get_success_url())

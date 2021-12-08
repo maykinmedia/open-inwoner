@@ -1,14 +1,22 @@
-{% load i18n link_tags utils %}
+{% load i18n link_tags utils icon_tags form_tags %}
 
 <aside class="file">
-    {% if file.file.file_type == 'Image' %}
-    <span class="material-icons-outlined">image</span>
+    {% if is_image %}
+        {% icon icon="image" outlined=True %}
     {% else %}
-    <span class="material-icons-outlined">description</span>
+        {% icon icon="description" outlined=True %}
     {% endif %}
     <p class="p">
-        {% firstof file.file.name file.file.label|cut:file.file.extension|cut:"." %} ({{file.file.extension}}, {{file.file.file.size|readable_size}})
+        {% firstof name %}
+        ({{extension}}, {{size|readable_size}})
     </p>
     {% trans "Download" as download %}
-    {% link href=file.file.file.url text=download secondary=True download=True icon="file_download" %}
+    {% link href=url text=download secondary=True download=True icon="file_download" %}
+    {% if allow_delete %}
+        {% url 'accounts:documents_delete' uuid=uuid as delete_url %}
+        {% render_form form=None form_action=delete_url method="POST" spaceless=True id="deactivate-form" %}
+            {% csrf_token %}
+            {% form_actions primary_icon="more_vert" transparent=True single=True %}
+        {% endrender_form %}
+    {% endif %}
 </aside>

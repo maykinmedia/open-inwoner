@@ -1,6 +1,12 @@
 {% load form_tags link_tags %}
 {# Shared between Form and RenderForm. #}
-<form class="form{% if columns %} form--columns-{{ columns }}{% endif %}{% if inline %} form--inline{% endif %}" method="{{ method }}" action="." {% if id %}id="{{id}}"{% endif %}>
+<form
+    class="form{% if columns %} form--columns-{{ columns }}{% endif %}{% if spaceless %} form--spaceless{% endif %}{% if inline %} form--inline{% endif %}"
+    method="{{ method }}"
+    action="{% firstof form_action "." %}"
+    {% if enctype %}enctype="{{enctype}}"{% endif %}
+    {% if id %}id="{{id}}"{% endif %}
+>
     {% if form.non_field_errors %}
         {% errors errors=form.non_field_errors %}
     {% endif %}
@@ -12,7 +18,7 @@
         {% endfor %}
 
         {% if secondary_href %}
-            {% form_actions primary_icon='arrow_forward' primary_text=submit_text secondary_href=secondary_href secondary_text=secondary_text %}
+            {% form_actions primary_icon='arrow_forward' primary_text=submit_text secondary_href=secondary_href secondary_text=secondary_text secondary_icon=secondary_icon secondary_icon_position=secondary_icon_position %}
         {% else %}
             {% form_actions primary_icon='arrow_forward' primary_text=submit_text %}
         {% endif %}

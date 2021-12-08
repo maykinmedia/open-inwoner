@@ -23,7 +23,7 @@
 
                 {% if login_allow_registration %}
                     {% render_card tinted=True %}
-                        {% form form_object=form method="POST" submit_text=_('Inloggen') secondary_href='django_registration_register' secondary_text=_('Registreer') %}
+                        {% form form_object=form method="POST" submit_text=_('Inloggen') secondary_href='django_registration_register' secondary_text=_('Registreer') secondary_icon='arrow_forward' %}
                     {% endrender_card %}
                 {% endif %}
             {% endrender_card %}

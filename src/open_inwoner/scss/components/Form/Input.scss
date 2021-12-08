@@ -13,6 +13,7 @@
   height: var(--row-height);
   margin: 0;
   padding: var(--spacing-medium) var(--spacing-large);
+  min-width: 260px;
 
   /// font.
   color: var(--font-color-body);

@@ -26,6 +26,7 @@ class _UserAdmin(UserAdmin):
                     "housenumber",
                     "postcode",
                     "city",
+                    "selected_themes",
                 )
             },
         ),

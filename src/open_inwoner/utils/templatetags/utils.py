@@ -72,7 +72,7 @@ def version():
     return settings.RELEASE
 
 
-@register.simple_tag
+@register.simple_tag(name="dir")
 def template_dir(value):
     return dir(value)
 

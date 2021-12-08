@@ -30,6 +30,12 @@
     width: 100%;
   }
 
+  &__grid-box {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 18px;
+  }
+
 
   /// Actions.
   &__actions {
@@ -37,6 +43,10 @@
     grid-template-areas: 'secondary spacing primary';
     grid-template-columns: auto 1fr auto;
     grid-gap: var(--gutter-width);
+
+    &--single {
+      grid-gap: 0;
+    }
   }
 
   @media (min-width: 768px) {
@@ -66,5 +76,10 @@
       padding: 0;
       grid-gap: 0;
     }
+  }
+
+  &--spaceless {
+    padding: 0;
+    grid-gap: var(--spacing-small);
   }
 }

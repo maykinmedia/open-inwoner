@@ -1,0 +1,6 @@
+{% load form_tags %}
+
+<label class="checkbox">
+    <input class="checkbox__input" type="checkbox" name="{{ name }}" value="{{ choice.0 }}" id="id_{{ name }}_{{ index }}" />
+    <label class="checkbox__label" for="id_{{ name }}_{{ index }}">{{ choice.1 }}</label>
+</label>

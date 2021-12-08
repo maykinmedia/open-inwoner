@@ -1,0 +1,23 @@
+.message {
+  background-color: var(--color-orange);
+  padding: 24px;
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  grid-gap: 24px;
+  color: var(--color-orange-dark);
+  margin: var(--row-height) 0;
+
+  .h2 {
+    line-height: var(--font-size-heading-2);
+    color: var(--color-orange-dark);
+  }
+
+  .p {
+    color: var(--color-orange-dark);
+  }
+
+  .button {
+    color: var(--color-white);
+    background-color: var(--color-orange-dark);
+  }
+}

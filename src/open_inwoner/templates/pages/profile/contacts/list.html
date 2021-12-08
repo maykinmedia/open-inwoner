@@ -1,0 +1,35 @@
+{% extends 'master.html' %}
+{% load i18n button_tags link_tags icon_tags pagination_tags %}
+
+
+{% block content %}
+<h1 class="h1" id="title">
+    {% trans "Mijn contacten" %}
+    {% button href="accounts:contact_create" text=_("Nieuw contact toevoegen") icon="person" primary=True %}
+</h1>
+
+<table class="table">
+    <thead class="table__heading">
+        <tr>
+            <td class="table__item">{% trans "Naam" %}</td>
+            <td class="table__item">{% trans "Soort contact" %}</td>
+            <td class="table__item">{% trans "E-mailadres" %}</td>
+            <td class="table__item">{% trans "Telefoonnummer" %}</td>
+            <td class="table__item">&nbsp;</td>
+        </tr>
+    </thead>
+    <tbody>
+        {% for contact in contact_list %}
+            <tr>
+                <th class="table__header">{{ contact.get_name }}</th>
+                <td class="table__item">{{ contact.get_type_display }}</td>
+                <td class="table__item">{{ contact.email }}</td>
+                <td class="table__item">{{ contact.phonenumber }}</td>
+                <td class="table__item">{% button icon="settings" href="accounts:contact_edit" uuid=contact.uuid icon_outlined=True transparent=True %}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% pagination page_obj=page_obj paginator=paginator request=request href="accounts:my_profile" text=_("Terug naar mijn profiel") %}
+{% endblock content %}

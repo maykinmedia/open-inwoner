@@ -15,6 +15,8 @@ def create_button_classes(context):
     classnames = "button"
 
     if context.get("icon"):
+        if not context.get("text"):
+            classnames += " button--textless"
         classnames += " button--icon"
 
     icon_position = context.get("icon_position")

@@ -7,3 +7,14 @@ class LoginTypeChoices(DjangoChoices):
     default = ChoiceItem("default", _("Email en Wachtwoord"))
     digid = ChoiceItem("digid", _("DigiD"))
     eherkenning = ChoiceItem("eherkenning", _("eHerkenning"))
+
+
+class ContactTypeChoices(DjangoChoices):
+    contact = ChoiceItem("contact", _("Contactpersoon"))
+    begeleider = ChoiceItem("begeleider", _("Begeleider"))
+    organization = ChoiceItem("organization", _("Orgnaisatie"))
+
+
+class StatusChioces(DjangoChoices):
+    open = ChoiceItem("open", _("Open"))
+    closed = ChoiceItem("closed", _("Afgerond"))

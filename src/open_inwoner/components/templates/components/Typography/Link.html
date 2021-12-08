@@ -1,10 +1,10 @@
-{% load i18n helpers %}
+{% load i18n helpers icon_tags %}
 
 <a
     href="{{href}}"
     {% if download %}download{% endif %}
     {% if href|startswith:"http" %}target="_blank"{% endif %}
-    class="link{% if extra_classes %} {{ extra_classes }}{% endif %}{% if active %} link--active{% endif %}{% if bold %} link--bold{% endif %}{% if iconPosition %} button--icon-{{iconPosition}}{% endif %}{% if primary %} link--primary{% endif %}{% if secondary %} link--secondary{% endif %}"
+    class="link{% if extra_classes %} {{ extra_classes }}{% endif %}{% if active %} link--active{% endif %} {% if align %}link--{{align}}{% endif %} {% if bold %} link--bold{% endif %}{% if icon_position %} link--icon-{{icon_position}}{% endif %}{% if primary %} link--primary{% endif %}{% if secondary %} link--secondary{% endif %}"
     {% if data_text %}data-text="{{ data_text }}"{% endif %}
     {% if data_alt_text %}data-alt-text="{{ data_alt_text }}"{% endif %}
     {% if data_icon %}data-icon="{{ data_icon }}"{% endif %}
@@ -21,8 +21,8 @@
     {% endif %}
 
     {% if icon %}
-        <span class="material-icons">{{icon}}</span>
+        {% icon icon=icon outlined=icon_outlined %}
     {% endif %}
 
-    {% if href|startswith:"http" %}<span class="material-icons">open_in_new</span>{% endif %}
+    {% if href|startswith:"http" %}{% icon icon="open_in_new" %}{% endif %}
 </a>
