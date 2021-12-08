@@ -1,7 +1,7 @@
 {% extends 'master.html' %}
 {% load i18n form_tags utils %}
 
-{% block sidebar_content %}&nbsp;{% endblock sidebar_content %}
+{% block sidebar_content %}{% if results %}&nbsp;{% endif %}{% endblock sidebar_content %}
 
 {% block content %}
 <h1 class="h1">Zoeken</h1>

@@ -23,6 +23,7 @@
 
   & > #{&}__sidebar:empty {
     grid-column-end: span 12;
+    display: none;
   }
 
   & > #{&}__sidebar ~ &__main {
@@ -35,5 +36,15 @@
 
   & > #{&}__main:first-child {
     grid-column-end: span 12;
+  }
+
+  &__welcome {
+    margin-top: calc(130px);
+    margin-bottom: var(--row-height);
+    background-color: #FFFFFF;
+    box-shadow: 0 0 40px 0 rgba(0,0,0,0.16);
+    padding: var(--spacing-large);
+    width: 50%;
+    box-sizing: border-box;
   }
 }

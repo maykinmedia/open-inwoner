@@ -136,13 +136,12 @@ class Product(models.Model):
             ("h5", "h5"),
             ("h6", "h6"),
             ("p", "p"),
+            ("a", "link"),
         ]
         for tag, class_name in class_adders:
             for element in soup.find_all(tag):
                 element.attrs["class"] = class_name
 
-        for element in soup.find_all("a"):
-            element.attrs["class"] = "link"
         return soup
 
 

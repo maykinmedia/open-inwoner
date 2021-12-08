@@ -17,7 +17,6 @@
 
   &:focus,
   &:hover {
-    filter: brightness(80%);
     transform: translateY(-1px);
   }
 
@@ -59,6 +58,11 @@
     background-color: var(--color-primary);
     border: 1px solid var(--color-primary);
     color: var(--color-white);
+
+    &:focus,
+    &:hover {
+      background-color: var(--color-primary-darker);
+    }
   }
 
   &--open {

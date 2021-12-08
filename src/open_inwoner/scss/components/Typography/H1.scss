@@ -5,6 +5,8 @@
   font-weight: var(--font-weight-heading-1);;
   line-height: var(--font-line-height-heading-1);
   margin: 40px 0 0 0;
+  display: flex;
+  justify-content: space-between;
 
   &:first-of-type {
     margin: 0;

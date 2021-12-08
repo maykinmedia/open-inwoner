@@ -1,4 +1,4 @@
-{% load static header_tags card_tags footer_tags %}<!DOCTYPE html>
+{% load static i18n header_tags card_tags footer_tags button_tags utils %}<!DOCTYPE html>
 <html lang="en" class="view {% block view_class %}view--{{ request.resolver_match.namespaces|join:'-' }}-{{ request.resolver_match.url_name }}{% endblock %}">
     <head>
         <meta charset="utf-8">
@@ -6,17 +6,32 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="{% static 'ico/favicon.png' %}" rel="shortcut icon">
         <link href="{% static 'bundles/open_inwoner-css.css' %}" media="all" rel="stylesheet" />
+        <style>
+            :root {
+                --color-primary-h: {{theming.primary.0}};
+                --color-primary-s: {{theming.primary.1}}%;
+                --color-primary-l: {{theming.primary.2}}%;
+                --color-secondary-h: {{theming.secondary.0}};
+                --color-secondary-s: {{theming.secondary.1}}%;
+                --color-secondary-l: {{theming.secondary.2}}%;
+                --color-accent-h: {{theming.accent.0}};
+                --color-accent-s: {{theming.accent.1}}%;
+                --color-accent-l: {{theming.accent.2}}%;
+            }
+        </style>
         {% comment %} TODO: Make self hosted {% endcomment %}
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
         <link href="{% static 'fontawesome6/css/fontawesome.min.css' %}" rel="stylesheet">
         <link href="{% static 'fontawesome6/css/brands.min.css' %}" rel="stylesheet">
-
         {% block extra_css %}{% endblock %}
     </head>
 
-    <body style="{{ theming }}">
+    <body>
         {% header logo_url=site_logo categories=menu_categories request=request breadcrumbs=breadcrumbs %}
+
+        {% block header_image %}{% endblock header_image %}
+
         <main class="container">
             <div class="grid">
                 {% spaceless %}<aside class="grid__sidebar">
@@ -24,15 +39,7 @@
                 </aside>{% endspaceless %}
                 <div class="grid__main">
                     {% block content %}
-                        <h1 class="h1">Welkom</h1>
-                        <p class="p">Nullam quis risus eget urna mollis ornare vel eu leo. Etiam porta sem malesuada magna mollis euismod.</p>
-                        <h1 class="h1">Thema&apos;s</h1>
-                        <p class="p">Nullam quis risus eget urna mollis ornare vel eu leo. Etiam porta sem malesuada magna mollis euismod.</p>
-                        {% card_container categories=categories %}
-                        <h1 class="h1">In de buurt</h1>
-                        <p class="p">Nullam quis risus eget urna mollis ornare vel eu leo. Etiam porta sem malesuada magna mollis euismod.</p>
-                        {% comment %} <Map fixed={false} lat={52.259221} long={6.163435} height="464px" /> {% endcomment %}
-                        <p class="p">TODO: Add the map</p>
+                        Please provide the content
                     {% endblock content %}
                 </div>
             </div>
