@@ -21,11 +21,6 @@
 
   &--secondary {
     color: var(--color-secondary);
-    text-decoration: underline;
-
-    &#{&}:hover {
-      text-decoration: none;
-    }
   }
 
   &--active {

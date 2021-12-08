@@ -1,14 +1,24 @@
 {% extends 'master.html' %}
-{% load form_tags %}
+{% load i18n static utils hero_tags logo_tags grid_tags card_tags form_tags link_tags %}
 
-{% block content %}
-{% render_form form_object=form method="POST" id="login-form" %}
-    {% csrf_token %}
-    {% input form.username %}
-    {% input form.password %}
-    {% url 'digid:login' as digid_url %}
-    {% submit text="Inloggen" icon="arrow_forward" %}
-    <a class="link" href="{% url 'django_registration_register' %}">Registreer</a>
-    <a class="link" href="{% url 'digid:login' %}">Digid</a>
-{% endrender_form %}
-{% endblock content %}
+{% block main_outer %}
+    {% placekitten_src 1024 768 as background_src %}
+    {% hero background_src %}
+    <main class="container">
+        {% render_grid background_src=background_src %}
+            {% render_column start=5 span=4 %}
+                {% render_card %}
+                    <h1 class="h1">{% trans 'Welkom' %}</h1>
+                    {% form form_object=form method="POST" submit_text=_('Inloggen') secondary_href='django_registration_register' secondary_text=_('Registreer') %}
+                {% endrender_card %}
+
+
+                {% render_card direction='horizontal' tinted=True %}
+                    {% static 'accounts/digid_logo.svg' as digid_logo_src %}
+                    {% logo src=digid_logo_src alt=_('Inloggen met DigiD') height="40" href='digid:login' %}
+                    {% link href='digid:login' text=_('Inloggen met DigiD') secondary=True icon='arrow_forward' %}
+                {% endrender_card %}
+            {% endrender_column %}
+        {% endrender_grid %}
+    </main>
+{% endblock main_outer %}

@@ -11,14 +11,18 @@
     {% if data_alt_icon %}data-alt-icon="{{ data_alt_icon }}"{% endif %}
 >
     {% if src %}
-        <img class="logo__image" src="{{src}}" alt="{% trans "Logo of the municipality" %}"/>
+        <img class="logo__image" src="{{src}}" alt="{{ text }}"{% if height %} height="{{ height }}"{% endif %}/>
     {% endif %}
+
+    {% if not src %}<span class="link__text">{{ text }}</span>{% endif %}
+
     {% if social_icon %}
         <i class="fa-brands fa-{{social_icon}}"></i>
     {% endif %}
+
     {% if icon %}
         <span class="material-icons">{{icon}}</span>
     {% endif %}
-    <span class="link__text">{{ text }}</span>
+
     {% if href|startswith:"http" %}<span class="material-icons">open_in_new</span>{% endif %}
 </a>

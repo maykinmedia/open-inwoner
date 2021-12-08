@@ -1,8 +1,17 @@
 from django import template
+from django.urls import NoReverseMatch, reverse
 
 register = template.Library()
 
 
 @register.inclusion_tag("components/Typography/Link.html")
 def link(href, **kwargs):
-    return {**kwargs, "href": href}
+    try:
+        href = reverse(href)
+    except NoReverseMatch:
+        pass
+
+    kwargs["href"] = href
+    kwargs["text"] = kwargs.get("text", href)
+
+    return kwargs
