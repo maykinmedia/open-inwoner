@@ -9,7 +9,7 @@ from .models import Category, Product
 
 
 class HomeView(TemplateView):
-    template_name = "master.html"
+    template_name = "pages/home.html"
 
     def get_context_data(self, **kwargs):
         kwargs.update(categories=Category.get_root_nodes()[:4])

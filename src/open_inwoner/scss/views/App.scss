@@ -8,7 +8,7 @@
 
   // Border.
 
-  --border-image: linear-gradient(to right, var(--color-accent-lighter), var(--color-accent-darker), var(--color-accent));
+  --border-image: linear-gradient(to right, var(--color-accent-lighter), var(--color-accent-darker), var(--color-accent-lighter));
   --border-width: 2px;
   --border-radius: 3px;
 
@@ -27,17 +27,27 @@
   --color-yellow-dark: #cca000;
   --color-yellow-light: #fff7d1;
 
-  --color-accent: var(--color-yellow-light);
-  --color-accent-lighter: #fff7d1;
-  --color-accent-darker: #cca000;
-  // --color-accent-darker: hsl(from var(--color-accent) h s calc(l - 50%));
-  // --color-accent-lighter: hsl(from var(--color-accent) h s calc(l + 50%));
+
+  --color-primary-h: 138;
+  --color-primary-s: 58%;
+  --color-primary-l: 33%;
+  --color-primary: hsl(var(--color-primary-h), var(--color-primary-s), var(--color-primary-l));
+  --color-primary-darker: hsl(var(--color-primary-h), var(--color-primary-s), calc(var(--color-primary-l) - 10%));
+  --color-primary-lighter: hsl(var(--color-primary-h), var(--color-primary-s), calc(var(--color-primary-l) + 10%));
+  --color-secondary-h: 207;
+  --color-secondary-s: 80%;
+  --color-secondary-l: 35%;
+  --color-secondary: hsl(var(--color-secondary-h), var(--color-secondary-s), var(--color-secondary-l));
+  --color-accent-h: 50;
+  --color-accent-s: 94%;
+  --color-accent-l: 57%;
+  --color-accent: hsl(var(--color-accent-h), var(--color-accent-s), var(--color-accent-l));
+  --color-accent-darker: hsl(var(--color-accent-h), var(--color-accent-s), calc(var(--color-accent-l) - 10%));
+  --color-accent-lighter: hsl(var(--color-accent-h), var(--color-accent-s), calc(var(--color-accent-l) + 10%));
+
   --color-body: var(--color-gray-dark);
   --color-danger: var(--color-red);
   --color-mute: var(--color-gray);
-  --color-primary: var(--color-green);
-  --color-secondary: var(--color-blue);
-
 
   /// Font.
 
@@ -136,6 +146,16 @@
   font-weight: bold;
   font-style: italic;
   src: local('TheSans C5'), url('./fonts/opendyslexic/OpenDyslexic-Bold-Italic.otf') format('opentype');
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 body {
