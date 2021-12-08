@@ -16,6 +16,6 @@ def file_list(**kwargs):
 @register.inclusion_tag("components/File/File.html")
 def file(file, **kwargs):
     """
-    file: this is the list of file that need to be rendered.
+    file: this is the file that needs to be rendered.
     """
     return {**kwargs, "file": file}

@@ -8,7 +8,7 @@
 
   // Border.
 
-  --border-image: linear-gradient(to right, var(--color-accent-lighter), var(--color-accent-darker), var(--color-accent));
+  --border-image: linear-gradient(to right, var(--color-accent-lighter), var(--color-accent-darker), var(--color-accent-lighter));
   --border-width: 2px;
   --border-radius: 3px;
 
@@ -33,7 +33,7 @@
   --color-primary-l: 33%;
   --color-primary: hsl(var(--color-primary-h), var(--color-primary-s), var(--color-primary-l));
   --color-primary-darker: hsl(var(--color-primary-h), var(--color-primary-s), calc(var(--color-primary-l) - 10%));
-  --color-primary-lighter: hsl(var(--color-primary-h), var(--color-primary-s), calc(var(--color-primary-l) - 10%));
+  --color-primary-lighter: hsl(var(--color-primary-h), var(--color-primary-s), calc(var(--color-primary-l) + 10%));
   --color-secondary-h: 207;
   --color-secondary-s: 80%;
   --color-secondary-l: 35%;
@@ -43,7 +43,7 @@
   --color-accent-l: 57%;
   --color-accent: hsl(var(--color-accent-h), var(--color-accent-s), var(--color-accent-l));
   --color-accent-darker: hsl(var(--color-accent-h), var(--color-accent-s), calc(var(--color-accent-l) - 10%));
-  --color-accent-lighter: hsl(var(--color-accent-h), var(--color-accent-s), calc(var(--color-accent-l) - 10%));
+  --color-accent-lighter: hsl(var(--color-accent-h), var(--color-accent-s), calc(var(--color-accent-l) + 10%));
 
   --color-body: var(--color-gray-dark);
   --color-danger: var(--color-red);
