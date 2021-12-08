@@ -23,6 +23,7 @@
 
   & > #{&}__sidebar:empty {
     grid-column-end: span 12;
+    display: none;
   }
 
   & > #{&}__sidebar ~ &__main {
