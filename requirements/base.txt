@@ -159,6 +159,8 @@ geographiclib==1.52
     # via geopy
 geopy==2.2.0
     # via -r requirements/base.in
+humanfriendly==10.0
+    # via -r requirements/base.in
 idna==3.2
     # via requests
 importlib-metadata==4.8.2

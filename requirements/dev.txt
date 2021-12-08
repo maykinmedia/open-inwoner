@@ -347,6 +347,10 @@ geopy==2.2.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+humanfriendly==10.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 idna==3.2
     # via
     #   -c requirements/ci.txt

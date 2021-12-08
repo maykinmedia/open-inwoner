@@ -16,7 +16,11 @@ def settings(request):
 
     context = {
         "site_logo": config.logo.file.url if config.logo else "",
-        "theming": f"--color-primary: {config.primary_color}; --color-secondary: {config.secondary_color}; --color-accent: {config.accent_color};",
+        "theming": {
+            "primary": config.get_primary_color,
+            "secondary": config.get_secondary_color,
+            "accent": config.get_accent_color,
+        },
         "menu_categories": Category.get_root_nodes(),
         "settings": dict(
             [(k, getattr(django_settings, k, None)) for k in public_settings]

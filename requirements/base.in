@@ -35,6 +35,7 @@ django-registration
 django-view-breadcrumbs
 markdown
 django_better_admin_arrayfield
+humanfriendly
 
 # API libraries
 djangorestframework

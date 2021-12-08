@@ -2,6 +2,8 @@ from django import template
 from django.conf import settings
 from django.utils.html import format_html
 
+from humanfriendly import format_size
+
 register = template.Library()
 
 
@@ -73,3 +75,8 @@ def version():
 @register.simple_tag
 def template_dir(value):
     return dir(value)
+
+
+@register.filter
+def readable_size(value):
+    return format_size(value)

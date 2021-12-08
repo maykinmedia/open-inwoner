@@ -302,6 +302,10 @@ geopy==2.2.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+humanfriendly==10.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
 idna==3.2
     # via
     #   -c requirements/base.txt
