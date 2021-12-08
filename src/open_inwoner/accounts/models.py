@@ -57,16 +57,26 @@ class User(AbstractBaseUser, PermissionsMixin):
         blank=True,
         help_text=_("This is the date the user decided to deactivate their account."),
     )
+    is_prepopulated = models.BooleanField(
+        _("prepopulated"),
+        default=False,
+        help_text=_("Indicates if fields have been prepopulated by Haal Central API."),
+    )
 
     objects = UserManager()
     digid_objects = DigidManager()
     eherkenning_objects = eHerkenningManager()
 
     USERNAME_FIELD = "email"
+    _old_bsn = None
 
     class Meta:
         verbose_name = _("user")
         verbose_name_plural = _("users")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._old_bsn = self.bsn
 
     def get_full_name(self):
         """
