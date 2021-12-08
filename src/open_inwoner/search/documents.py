@@ -5,15 +5,14 @@ from django_elasticsearch_dsl.registries import registry
 
 from open_inwoner.pdc.models import Category, Organization, Product, Tag
 
-from .analyzers import standard_analyzer, synonym_analyzer
+from .analyzers import synonym_analyzer
 
 
 @registry.register_document
 class ProductDocument(Document):
-    name = fields.TextField(
-        analyzer=standard_analyzer, search_analyzer=synonym_analyzer
-    )
-
+    name = fields.TextField(analyzer="standard", search_analyzer=synonym_analyzer)
+    summary = fields.TextField(analyzer="standard", search_analyzer=synonym_analyzer)
+    content = fields.TextField(analyzer="standard", search_analyzer=synonym_analyzer)
     slug = fields.KeywordField()
 
     categories = fields.NestedField(
@@ -44,7 +43,6 @@ class ProductDocument(Document):
 
     class Django:
         model = Product
-        fields = ["summary", "content"]
         related_models = [Tag, Organization, Category]
 
     def get_instances_from_related(self, related_instance):
