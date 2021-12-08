@@ -36,6 +36,7 @@ django-view-breadcrumbs
 markdown
 django_better_admin_arrayfield
 humanfriendly
+django_better_admin_arrayfield
 
 # API libraries
 djangorestframework
