@@ -1,0 +1,24 @@
+{
+    "_links": {
+        "self": {
+            "href": "https://www.haalcentraal.nl/haalcentraal/api/brp/ingeschrevenpersonen/999993847"
+        }
+    },
+    "naam": {
+        "aanhef": "Geachte mevrouw Kooyman",
+        "aanschrijfwijze": "M. Kooyman",
+        "gebruikInLopendeTekst": "mevrouw Kooyman",
+        "aanduidingNaamgebruik": "eigen",
+        "voornamen": "Merel",
+        "voorletters": "M.",
+        "geslachtsnaam": "Kooyman"
+    },
+    "geboorte": {
+        "datum": {
+            "datum": "1982-04-10",
+            "jaar": 1982,
+            "maand": 4,
+            "dag": 10
+        }
+    }
+}

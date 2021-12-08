@@ -5,6 +5,7 @@ pytz  # handle timezones
 python-dotenv  # environment variables for secrets
 python-decouple  # processing of envvar configs
 geopy # geo decoder
+glom # processing nested data
 
 # Framework libraries
 django < 4.0
@@ -55,3 +56,6 @@ beautifulsoup4
 # DigidLocal
 python3-saml
 pyopenssl
+
+# Common Ground integration
+zgw-consumers
