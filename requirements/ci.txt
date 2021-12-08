@@ -120,6 +120,10 @@ django-axes==5.25.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+django-better-admin-arrayfield==1.4.2
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
 django-choices==1.7.2
     # via
     #   -c requirements/base.txt
