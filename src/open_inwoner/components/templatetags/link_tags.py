@@ -12,6 +12,5 @@ def link(href, **kwargs):
         pass
 
     kwargs["href"] = href
-    kwargs["text"] = kwargs.get("text", href)
 
     return kwargs

@@ -3,9 +3,10 @@
 
 {% block main_outer %}
     {% placekitten_src 1024 768 as background_src %}
-    {% hero background_src %}
+    {% hero hero_image_login %}
+
     <main class="container">
-        {% render_grid background_src=background_src %}
+        {% render_grid %}
             {% render_column start=5 span=4 %}
                 {% render_card %}
                     <h1 class="h1">{% trans 'Welkom' %}</h1>

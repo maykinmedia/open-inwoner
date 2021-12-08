@@ -24,6 +24,13 @@ class SiteConfiguration(SingletonModel):
         related_name="site_logo",
         help_text=_("Logo of the municipality"),
     )
+    hero_image_login = FilerImageField(
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="hero_image_login",
+        help_text=_("Hero image on the login page"),
+    )
 
     class Meta:
         verbose_name = "Site Configuration"

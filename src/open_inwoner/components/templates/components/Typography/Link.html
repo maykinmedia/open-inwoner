@@ -14,7 +14,7 @@
         <img class="logo__image" src="{{src}}" alt="{{ text }}"{% if height %} height="{{ height }}"{% endif %}/>
     {% endif %}
 
-    {% if not src %}<span class="link__text">{{ text }}</span>{% endif %}
+    {% if text %}<span class="link__text">{{ text }}</span>{% endif %}
 
     {% if social_icon %}
         <i class="fa-brands fa-{{social_icon}}"></i>
