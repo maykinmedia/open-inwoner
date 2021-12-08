@@ -7,7 +7,7 @@ synonym_filter = token_filter(
     type="synonym",
     # expand=True
     lenient=True,
-    synonyms=load_synonyms(),  # todo should be refactored to be run after django migrations
+    synonyms=load_synonyms(),
 )
 
 synonym_analyzer = analyzer(
