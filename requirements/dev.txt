@@ -598,7 +598,7 @@ six==1.16.0
     #   requests-mock
 snowballstemmer==2.1.0
     # via sphinx
-soupsieve==2.2.1
+soupsieve==2.3.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
