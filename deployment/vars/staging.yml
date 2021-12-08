@@ -16,6 +16,8 @@ dbuser: "{{ project_name }}-{{ target }}"
 dbport: 5432
 branch: develop
 
+sentry_dsn: https://561b382a475e435983610c7f9bcc1be8@sentry.maykinmedia.nl/290
+
 # Fallback options for dotenv, overridden in site-specific settings
 nginx_server_name: "groningen.openinwoner.nl"
 dbname: "{{ project_name }}-{{ target }}"
