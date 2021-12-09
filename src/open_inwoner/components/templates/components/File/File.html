@@ -1,0 +1,14 @@
+{% load i18n link_tags utils %}
+
+<aside class="file">
+    {% if file.file.file_type == 'Image' %}
+    <span class="material-icons-outlined">image</span>
+    {% else %}
+    <span class="material-icons-outlined">description</span>
+    {% endif %}
+    <p class="p">
+        {% firstof file.file.name file.file.label|cut:file.file.extension|cut:"." %} ({{file.file.extension}}, {{file.file.file.size|readable_size}})
+    </p>
+    {% trans "Download" as download %}
+    {% link href=file.file.file.url text=download secondary=True download=True icon="file_download" %}
+</aside>

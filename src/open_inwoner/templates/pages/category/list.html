@@ -1,0 +1,9 @@
+{% extends 'master.html' %}
+{% load card_tags %}
+
+{% block content %}
+<h1 class="h1">Themas</h1>
+<p class="p">Nulla vitae elit libero, a pharetra augue.</p>
+
+{% card_container categories=object_list %}
+{% endblock content %}

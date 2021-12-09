@@ -1,0 +1,19 @@
+<nav class="breadcrumbs">
+    <ul class="breadcrumbs__list">
+        {% for url, name in breadcrumbs %}
+            <li class="breadcrumbs__list-item">
+                {% if forloop.first %}
+                    <a class="link link--secondary" href="{{url}}">
+                        <span class="material-icons">apps</span>
+                    </a>
+                {% else %}
+                    <span class="material-icons">chevron_right</span>
+                    <a class="link {% if not forloop.last %}link--secondary{% endif %}" href="{{url}}">
+                        {{ name }}
+                    </a>
+                {% endif %}
+
+            </li>
+        {% endfor %}
+    </ul>
+</nav>

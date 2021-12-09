@@ -1,0 +1,14 @@
+{% load helpers %}
+
+{% if href %}
+    <a class="{% create_button_classes %}" href="{{href}}">
+        {% if icon %}<span class="material-icons">{{ icon }}</span>{% endif %}
+        {{text}}
+    </a>
+{% else %}
+    <button class="{% create_button_classes %}" type="{{type}}">
+        {% if icon %}<span class="material-icons">{{ icon }}</span>{% endif %}
+        {% if closeAction %}<span class="material-icons">close</span>{% endif %}
+        {{text}}
+    </button>
+{% endif %}

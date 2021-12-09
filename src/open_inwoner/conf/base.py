@@ -137,13 +137,18 @@ INSTALLED_APPS = [
     "import_export",
     "solo",
     "colorfield",
+    "view_breadcrumbs",
+    "django_better_admin_arrayfield",
+    "zgw_consumers",
     # Project applications.
     "open_inwoner.accounts",
+    "open_inwoner.components",
     "open_inwoner.ckeditor",
     "open_inwoner.pdc",
     "open_inwoner.search",
     "open_inwoner.utils",
     "open_inwoner.configurations",
+    "open_inwoner.haalcentraal",
 ]
 
 MIDDLEWARE = [

@@ -1,5 +1,14 @@
-<form method="post" id="registration-form">
+{% extends 'master.html' %}
+{% load form_tags %}
+
+{% block content %}
+{% render_form form_object=form method="POST" id="registration-form" %}
     {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="submit">
-</form>
+    {% input form.email %}
+    {% input form.first_name %}
+    {% input form.last_name %}
+    {% input form.password1 %}
+    {% input form.password2 %}
+    {% submit text="Registreren" icon="arrow_forward" %}
+{% endrender_form %}
+{% endblock content %}
