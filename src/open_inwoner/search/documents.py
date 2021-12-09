@@ -47,7 +47,6 @@ class ProductDocument(Document):
 
     class Django:
         model = Product
-        fields = ["summary", "content"]
         related_models = [Tag, Organization, Category]
 
     def get_instances_from_related(self, related_instance):
