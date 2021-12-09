@@ -20,6 +20,7 @@ def settings(request):
             "primary": config.get_primary_color,
             "secondary": config.get_secondary_color,
             "accent": config.get_accent_color,
+            "font": config.font_color,
         },
         "hero_image_login": config.hero_image_login.file.url
         if config.hero_image_login
