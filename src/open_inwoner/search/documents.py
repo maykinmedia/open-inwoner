@@ -11,8 +11,9 @@ from .analyzers import synonym_analyzer
 @registry.register_document
 class ProductDocument(Document):
     name = fields.TextField(
-        analyzer="standard", search_analyzer=synonym_analyzer,
-        fields={"raw": fields.KeywordField(), "suggest": fields.CompletionField()}
+        analyzer="standard",
+        search_analyzer=synonym_analyzer,
+        fields={"raw": fields.KeywordField(), "suggest": fields.CompletionField()},
     )
     summary = fields.TextField(analyzer="standard", search_analyzer=synonym_analyzer)
     content = fields.TextField(analyzer="standard", search_analyzer=synonym_analyzer)
