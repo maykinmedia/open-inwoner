@@ -6,7 +6,7 @@ from django_better_admin_arrayfield.admin.mixins import DynamicArrayMixin
 from import_export.admin import ImportExportMixin
 from import_export.formats import base_formats
 
-from .models import Synonym
+from .models import Feedback, Synonym
 from .resources import SynonymResource
 
 
@@ -37,3 +37,10 @@ class SynonymAdmin(ImportExportMixin, admin.ModelAdmin, DynamicArrayMixin):
         self.message_restart(request)
 
         return super().process_result(result, request)
+
+
+@admin.register(Feedback)
+class FeedbackAdmin(admin.ModelAdmin):
+    list_display = ("search_query", "positive", "remark", "created_on")
+    list_filter = ("positive",)
+    ordering = ("created_on",)
