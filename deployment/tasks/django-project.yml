@@ -85,20 +85,6 @@
     become_user: "{{ user_name }}"
     when: package_json.stat.exists == True and ansible_version.full is version ("2.8.0", "<")
 
-
-### React frontend specific ###
-
-  - name: Install NodeJS
-    command: chdir={{ project_root }}/frontend npm ci
-    become: yes
-    become_user: "{{ user_name }}"
-
-  - name: Build the frontend
-    command: chdir={{ project_root }}/frontend npm run {{ npm_frontend_task|default('build') }}
-    become: yes
-    become_user: "{{ user_name }}"
-
-
 # Gulp
 
   - name: Check if gulpfile exists and if so install and run gulp

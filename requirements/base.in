@@ -5,6 +5,7 @@ pytz  # handle timezones
 python-dotenv  # environment variables for secrets
 python-decouple  # processing of envvar configs
 geopy # geo decoder
+glom # processing nested data
 
 # Framework libraries
 django < 4.0
@@ -31,7 +32,12 @@ django-elasticsearch-dsl
 django-import-export
 django-solo
 django-colorfield
-
+django-registration
+django-view-breadcrumbs
+markdown
+django_better_admin_arrayfield
+humanfriendly
+django_better_admin_arrayfield
 
 # API libraries
 djangorestframework
@@ -45,6 +51,11 @@ uwsgi
 sentry-sdk  # error monitoring
 elastic-apm  # Elastic APM integration
 
+beautifulsoup4
+
 # DigidLocal
 python3-saml
 pyopenssl
+
+# Common Ground integration
+zgw-consumers

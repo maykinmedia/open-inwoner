@@ -7,7 +7,11 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import include, path
 from django.views.generic.base import TemplateView
 
+from django_registration.backends.one_step.views import RegistrationView
+
+from open_inwoner.accounts.forms import CustomRegistrationForm
 from open_inwoner.accounts.views import DocumentPrivateMediaView, PasswordResetView
+from open_inwoner.pdc.views import HomeView
 
 handler500 = "open_inwoner.utils.views.server_error"
 admin.site.site_header = "Open Inwoner beheeromgeving"
@@ -43,10 +47,22 @@ urlpatterns = [
     ),
     path("admin/hijack/", include("hijack.urls")),
     path("admin/", admin.site.urls),
-    path("api/", include("open_inwoner.api.urls", namespace="api")),
     path("ckeditor/", include("open_inwoner.ckeditor.urls")),
     # Simply show the master template.
-    path("", TemplateView.as_view(template_name="master.html"), name="root"),
+    path(
+        "accounts/register/",
+        RegistrationView.as_view(form_class=CustomRegistrationForm),
+        name="django_registration_register",
+    ),
+    path("accounts/", include("django_registration.backends.one_step.urls")),
+    path("accounts/", include("django.contrib.auth.urls")),
+    path("api/", include("open_inwoner.api.urls", namespace="api")),
+    path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
+    # Views
+    path("accounts/", include("open_inwoner.accounts.urls", namespace="accounts")),
+    path("", include("open_inwoner.pdc.urls", namespace="pdc")),
+    path("", include("open_inwoner.search.urls", namespace="search")),
+    path("", HomeView.as_view(), name="root"),
 ]
 
 # NOTE: The staticfiles_urlpatterns also discovers static files (ie. no need to run collectstatic). Both the static

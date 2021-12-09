@@ -1,0 +1,26 @@
+{% extends 'master.html' %}
+{% load i18n button_tags card_tags utils %}
+
+
+{% block header_image %}
+    <img class="main-image" src="https://placekitten.com/1920/261" alt="Header image">
+{% endblock header_image %}
+
+{% block content %}
+<div class="grid__welcome">
+    <h1 class="h1">Welkom</h1>
+    <p class="p">Nullam quis risus eget urna mollis ornare vel eu leo. Etiam porta sem malesuada magna mollis euismod.</p>
+</div>
+<h1 class="h1">
+    Thema&apos;s
+    {% url 'pdc:category_list' as link %}
+    {% trans "Alle thema's" as button_text %}
+    {% button href=link text=button_text icon="arrow_forward" icon_position="after" %}
+</h1>
+<p class="p">Nullam quis risus eget urna mollis ornare vel eu leo. Etiam porta sem malesuada magna mollis euismod.</p>
+{% card_container categories=categories %}
+<h1 class="h1">In de buurt</h1>
+<p class="p">Nullam quis risus eget urna mollis ornare vel eu leo. Etiam porta sem malesuada magna mollis euismod.</p>
+{% comment %} <Map fixed={false} lat={52.259221} long={6.163435}  /> {% endcomment %}
+<div class="leaflet--map" style="height=300px;" data-lat="52.259221" data-lng="6.163435"></div>
+{% endblock %}

@@ -5,12 +5,17 @@ from django_elasticsearch_dsl.registries import registry
 
 from open_inwoner.pdc.models import Category, Organization, Product, Tag
 
+from .analyzers import synonym_analyzer
+
 
 @registry.register_document
 class ProductDocument(Document):
     name = fields.TextField(
+        analyzer="standard", search_analyzer=synonym_analyzer),
         fields={"raw": fields.KeywordField(), "suggest": fields.CompletionField()}
     )
+    summary = fields.TextField(analyzer="standard", search_analyzer=synonym_analyzer)
+    content = fields.TextField(analyzer="standard", search_analyzer=synonym_analyzer)
     slug = fields.KeywordField()
 
     categories = fields.NestedField(

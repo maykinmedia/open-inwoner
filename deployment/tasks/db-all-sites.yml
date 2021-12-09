@@ -1,0 +1,31 @@
+# Database/user creation    
+    
+  - name: db-all
+    postgresql_db: name={{item.dbname}} template='template_postgis'
+    become: yes
+    become_user: postgres
+    loop: "{{ sites }}"
+
+# Needed to at initialization manually recreate db's and use psql to execute `CREATE EXTENSION postgis`
+
+#  - name: Enable postgis database extensions
+#    postgresql_ext:
+#      name: "postgis"
+#      db: "{{ item.dbname }}"
+#      state: present
+#    loop: "{{ sites }}"
+#    become: yes
+#    become_user: postgres
+#    # See: https://github.com/ansible/ansible/issues/16048#issuecomment-229012509
+#    vars:
+#      ansible_ssh_pipelining: true
+#    ignore_errors: True
+
+  - name: ensure user has access to database
+    postgresql_user: db={{item.dbname}} name={{dbuser}} password={{dbpassword}} priv=ALL
+    become: yes
+    become_user: postgres
+    loop: "{{ sites }}"
+
+
+

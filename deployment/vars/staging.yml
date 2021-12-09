@@ -1,0 +1,26 @@
+---
+target: staging
+
+sites:
+  - { name: "groningen", nginx_server_name: "groningen.openinwoner.nl", dbname: "oip-staging-groningen", uwsgi_port: 8201 }
+  - { name: "leeuwarden", nginx_server_name: "leeuwarden.openinwoner.nl", dbname: "oip-staging-leeuwarden", uwsgi_port: 8202 }
+  - { name: "zwolle", nginx_server_name: "zwolle.openinwoner.nl", dbname: "oip-staging-zwolle", uwsgi_port: 8203}
+  - { name: "enschede", nginx_server_name: "enschede.openinwoner.nl", dbname: "oip-staging-enschede", uwsgi_port: 8204}
+  - { name: "deventer", nginx_server_name: "deventer.openinwoner.nl", dbname: "oip-staging-deventer", uwsgi_port: 8205}
+  - { name: "zaanstad", nginx_server_name: "zaanstad.openinwoner.nl", dbname: "oip-staging-zaanstad", uwsgi_port: 8206}
+
+
+dbuser: "{{ project_name }}-{{ target }}"
+# via secrets
+# dbpassword:
+dbport: 5432
+branch: develop
+
+sentry_dsn: https://561b382a475e435983610c7f9bcc1be8@sentry.maykinmedia.nl/290
+
+# Fallback options for dotenv, overridden in site-specific settings
+nginx_server_name: "groningen.openinwoner.nl"
+dbname: "{{ project_name }}-{{ target }}"
+redis_url: redis://localhost:6379/10
+
+npm_frontend_task: test:build
