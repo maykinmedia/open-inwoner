@@ -7,20 +7,22 @@ register = template.Library()
 @register.inclusion_tag("components/Typography/Link.html")
 def link(href, **kwargs):
     """
-    href: url | where the link links to.
+    href: url | where the link links to (can be url name).
 
-    text: string | this will be the link text. (Optional)
     download: bool | whether the link should be downloaded instead of linked to. (Optional)
     extra_classes: string | additional CSS classes.
+    icon: string | the icon that you want to display. (Optional)
     icon_position: "before" or "after" | where the icon should be positioned to the text. (Optional)
     primary: bool | if the primary colors should be used. (Optional)
+    reverse_kwargs: dict | if href is an url name, kwargs for reverse can be passed (Optional).
     secondary: bool | if the secondary colors should be used. (Optional)
-    icon: string | the icon that you want to display. (Optional)
     social_icon: string | the social icon that you want to display. (Optional)
+    text: string | this will be the link text. (Optional)
     type: string | the type of button that should be used. (Optional)
     """
     try:
-        href = reverse(href)
+        reverse_kwargs=kwargs.get('reverse_kwargs')
+        href = reverse(href, kwargs=reverse_kwargs)
     except NoReverseMatch:
         pass
 
