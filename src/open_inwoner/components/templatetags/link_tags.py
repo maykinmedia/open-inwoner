@@ -21,7 +21,7 @@ def link(href, **kwargs):
     type: string | the type of button that should be used. (Optional)
     """
     try:
-        reverse_kwargs=kwargs.get('reverse_kwargs')
+        reverse_kwargs = kwargs.get("reverse_kwargs")
         href = reverse(href, kwargs=reverse_kwargs)
     except NoReverseMatch:
         pass
