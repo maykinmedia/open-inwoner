@@ -31,6 +31,16 @@ class SiteConfiguration(SingletonModel):
         related_name="hero_image_login",
         help_text=_("Hero image on the login page"),
     )
+    login_allow_registration = models.BooleanField(
+        verbose_name=_('Sta lokale registratie toe'),
+        default=False,
+        help_text=_('Standaard is het enkel toegestraan middels DigiD in te loggen. Zet deze installing aan om ook registraties op website niveau toe te staan.')
+    )
+    login_text = models.TextField(
+        blank=True,
+        verbose_name=_('Login tekst'),
+        help_text=_('Deze tekst wordt getoond op de login pagina.')
+    )
 
     class Meta:
         verbose_name = "Site Configuration"

@@ -49,4 +49,18 @@
       width: 100%;
     }
   }
+
+  ///
+  /// Exceptions.
+  ///
+
+  /// Cards within cards should leave some space.
+  .card + .card {
+    margin-top: calc(0.5 * var(--gutter-width));
+  }
+
+  /// Form should not have padding within a card.
+  .form {
+    padding: 0;
+  }
 }

@@ -3,24 +3,30 @@
 
 
 {% block header_image %}
-    <img class="main-image" src="{{ hero_image_login}}" alt="Header image">
+    <img class="main-image" src="{{ hero_image_login }}" alt="Header image">
 {% endblock header_image %}
 
 
 {% block content %}
-        {% render_grid %}
-            {% render_column start=5 span=4 %}
-                {% render_card %}
-                    <h1 class="h1">{% trans 'Welkom' %}</h1>
-                    {% form form_object=form method="POST" submit_text=_('Inloggen') secondary_href='django_registration_register' secondary_text=_('Registreer') %}
-                {% endrender_card %}
+    {% render_grid %}
+        {% render_column start=5 span=4 %}
+            {% render_card %}
+                <h1 class="h1">{% trans 'Welkom' %}</h1>
+                {% if login_text %}<p class="p">{{ login_text }}</p>{% endif %}
+                <br>
 
+                    {% render_card direction='horizontal' tinted=True %}
+                        {% static 'accounts/digid_logo.svg' as digid_logo_src %}
+                        {% logo src=digid_logo_src alt=_('Inloggen met DigiD') height="40" href='digid:login' %}
+                        {% link href='digid:login' text=_('Inloggen met DigiD') secondary=True icon='arrow_forward' %}
+                    {% endrender_card %}
 
-                {% render_card direction='horizontal' tinted=True %}
-                    {% static 'accounts/digid_logo.svg' as digid_logo_src %}
-                    {% logo src=digid_logo_src alt=_('Inloggen met DigiD') height="40" href='digid:login' %}
-                    {% link href='digid:login' text=_('Inloggen met DigiD') secondary=True icon='arrow_forward' %}
-                {% endrender_card %}
-            {% endrender_column %}
-        {% endrender_grid %}
+                {% if login_allow_registration %}
+                    {% render_card tinted=True %}
+                        {% form form_object=form method="POST" submit_text=_('Inloggen') secondary_href='django_registration_register' secondary_text=_('Registreer') %}
+                    {% endrender_card %}
+                {% endif %}
+            {% endrender_card %}
+        {% endrender_column %}
+    {% endrender_grid %}
 {% endblock content %}
