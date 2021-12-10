@@ -1,6 +1,6 @@
 {% load form_tags link_tags %}
 
-<form class="form{% if columns %} form--columns-{{ columns }}{% endif %}{% if inline %} form--inline{% endif %}" method="{{ method }}" action="./" {% if id %}id="{{id}}"{% endif %}>
+<form class="form{% if columns %} form--columns-{{ columns }}{% endif %}{% if inline %} form--inline{% endif %}" method="{{ method }}" action="." {% if id %}id="{{id}}"{% endif %}>
     {% if form.non_field_errors %}
         {% errors errors=form.non_field_errors %}
     {% endif %}
