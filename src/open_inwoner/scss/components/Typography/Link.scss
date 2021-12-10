@@ -11,6 +11,10 @@
   line-height: var(--font-line-height-body);
   text-decoration: none;
 
+  &--bold {
+    font-weight: bold;
+  }
+
   &--icon-after {
     flex-direction: row-reverse;
   }

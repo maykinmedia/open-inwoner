@@ -18,7 +18,7 @@
                     {% render_card direction='horizontal' tinted=True %}
                         {% static 'accounts/digid_logo.svg' as digid_logo_src %}
                         {% logo src=digid_logo_src alt=_('Inloggen met DigiD') height="40" href='digid:login' %}
-                        {% link href='digid:login' text=_('Inloggen met DigiD') secondary=True icon='arrow_forward' %}
+                        {% link bold=True href='digid:login' text=_('Inloggen met DigiD') secondary=True icon='arrow_forward' %}
                     {% endrender_card %}
 
                 {% if login_allow_registration %}

@@ -9,6 +9,7 @@ def link(href, **kwargs):
     """
     href: url | where the link links to (can be url name).
 
+    bold: bool | whether the link should be bold.
     download: bool | whether the link should be downloaded instead of linked to. (Optional)
     extra_classes: string | additional CSS classes.
     icon: string | the icon that you want to display. (Optional)
