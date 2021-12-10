@@ -8,6 +8,9 @@ register = template.Library()
 
 @register.tag
 def render_grid(parser, token):
+    """
+    Nested content supported.
+    """
     bits = token.split_contents()
     context_kwargs = parse_component_with_args(parser, bits, "render_grid")
     nodelist = parser.parse(("endrender_grid",))
@@ -17,6 +20,11 @@ def render_grid(parser, token):
 
 @register.tag
 def render_column(parser, token):
+    """
+    start: int | column to start from.
+    span: int | column span.
+    Nested content supported.
+    """
     bits = token.split_contents()
     context_kwargs = parse_component_with_args(parser, bits, "render_grid")
     nodelist = parser.parse(("endrender_column",))
