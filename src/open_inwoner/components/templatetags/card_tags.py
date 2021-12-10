@@ -30,7 +30,7 @@ def render_card(parser, token):
     context_kwargs = parse_component_with_args(parser, bits, "render_card")
     nodelist = parser.parse(("endrender_card",))
     parser.delete_first_token()
-    return ContentsNode(nodelist, "components/Card/Card.html", **context_kwargs)
+    return ContentsNode(nodelist, "components/Card/RenderCard.html", **context_kwargs)
 
 
 @register.inclusion_tag("components/Card/CategoryCard.html")
