@@ -3,6 +3,7 @@ from django.forms import fields
 from django.template.library import parse_bits
 from django.template.loader import render_to_string
 from django.utils.translation import gettext as _
+
 from open_inwoner.utils.templatetags.abstract import safe_resolve
 
 register = template.Library()
