@@ -1,11 +1,13 @@
 {% extends 'master.html' %}
-{% load i18n static utils hero_tags logo_tags grid_tags card_tags form_tags link_tags %}
+{% load i18n static logo_tags grid_tags card_tags form_tags link_tags %}
 
-{% block main_outer %}
-    {% placekitten_src 1024 768 as background_src %}
-    {% hero hero_image_login %}
 
-    <main class="container">
+{% block header_image %}
+    <img class="main-image" src="{{ hero_image_login}}" alt="Header image">
+{% endblock header_image %}
+
+
+{% block content %}
         {% render_grid %}
             {% render_column start=5 span=4 %}
                 {% render_card %}
@@ -21,5 +23,4 @@
                 {% endrender_card %}
             {% endrender_column %}
         {% endrender_grid %}
-    </main>
-{% endblock main_outer %}
+{% endblock content %}
