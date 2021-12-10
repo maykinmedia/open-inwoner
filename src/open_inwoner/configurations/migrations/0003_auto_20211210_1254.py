@@ -6,18 +6,26 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('configurations', '0002_siteconfiguration_hero_image_login'),
+        ("configurations", "0002_siteconfiguration_hero_image_login"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='siteconfiguration',
-            name='login_allow_registration',
-            field=models.BooleanField(default=False, help_text='Standaard is het enkel toegestraan middels DigiD in te loggen. Zet deze installing aan om ook registraties op website niveau toe te staan.', verbose_name='Sta lokale registratie toe'),
+            model_name="siteconfiguration",
+            name="login_allow_registration",
+            field=models.BooleanField(
+                default=False,
+                help_text="Standaard is het enkel toegestraan middels DigiD in te loggen. Zet deze installing aan om ook registraties op website niveau toe te staan.",
+                verbose_name="Sta lokale registratie toe",
+            ),
         ),
         migrations.AddField(
-            model_name='siteconfiguration',
-            name='login_text',
-            field=models.TextField(blank=True, help_text='Deze tekst wordt getoond op de login pagina.', verbose_name='Login tekst'),
+            model_name="siteconfiguration",
+            name="login_text",
+            field=models.TextField(
+                blank=True,
+                help_text="Deze tekst wordt getoond op de login pagina.",
+                verbose_name="Login tekst",
+            ),
         ),
     ]
