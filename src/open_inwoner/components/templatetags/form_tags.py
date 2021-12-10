@@ -72,9 +72,9 @@ def input(field, **kwargs):
     return {**kwargs, "field": field}
 
 
-@register.inclusion_tag("components/Form/Submit.html")
-def submit(text, icon=None, **kwargs):
-    return {**kwargs, "text": text, "icon": icon}
+@register.inclusion_tag("components/Form/FormActions.html")
+def form_actions(primary_text, primary_icon=None, **kwargs):
+    return {**kwargs, "primary_text": primary_text, "primary_icon": primary_icon}
 
 
 @register.filter(name="addclass")

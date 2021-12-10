@@ -1,5 +1,5 @@
 {% load form_tags link_tags %}
-
+{# Shared between Form and RenderForm. #}
 <form class="form{% if columns %} form--columns-{{ columns }}{% endif %}{% if inline %} form--inline{% endif %}" method="{{ method }}" action="." {% if id %}id="{{id}}"{% endif %}>
     {% if form.non_field_errors %}
         {% errors errors=form.non_field_errors %}
@@ -11,12 +11,11 @@
             {% autorender_field form field %}
         {% endfor %}
 
-        <div class="form__actions">
-            {% if secondary_href %}
-                {% link secondary_href secondary=True text=secondary_text icon='arrow_forward' %}
-            {% endif %}
-            {% submit icon='arrow_forward' text=submit_text %}
-        </div>
+        {% if secondary_href %}
+            {% form_actions primary_icon='arrow_forward' primary_text=submit_text secondary_href=secondary_href secondary_text=secondary_text %}
+        {% else %}
+            {% form_actions primary_icon='arrow_forward' primary_text=submit_text %}
+        {% endif %}
     {% endif %}
 
     {{ contents }}
