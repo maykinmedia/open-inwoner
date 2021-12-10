@@ -25,7 +25,3 @@ def render_column(parser, token):
     context_kwargs["span"] = context_kwargs.get("span", 12)
 
     return ContentsNode(nodelist, "components/Grid/Column.html", **context_kwargs)
-
-
-
-

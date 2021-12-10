@@ -10,13 +10,20 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.FILER_IMAGE_MODEL),
-        ('configurations', '0001_initial'),
+        ("configurations", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='siteconfiguration',
-            name='hero_image_login',
-            field=filer.fields.image.FilerImageField(blank=True, help_text='Hero image on the login page', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='hero_image_login', to=settings.FILER_IMAGE_MODEL),
+            model_name="siteconfiguration",
+            name="hero_image_login",
+            field=filer.fields.image.FilerImageField(
+                blank=True,
+                help_text="Hero image on the login page",
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="hero_image_login",
+                to=settings.FILER_IMAGE_MODEL,
+            ),
         ),
     ]
