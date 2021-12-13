@@ -37,7 +37,6 @@
     grid-template-areas: 'secondary spacing primary';
     grid-template-columns: auto 1fr auto;
     grid-gap: var(--gutter-width);
-    padding: var(--gutter-width) 0 0;
   }
 
   @media (min-width: 768px) {

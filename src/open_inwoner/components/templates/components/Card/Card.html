@@ -1,11 +1,2 @@
-<a href="{{ href }}" class="card">
-    {% if src %}
-    <header class="card__header">
-        <img class="card__img" src="{{ src }}" alt="{{ alt }}"/>
-    </header>
-    {% endif %}
-
-    <div class="card__body">
-        <h4 class="h4">{{ title }}</h4>
-    </div>
-</a>
+{# Utilizes same template as RenderCard. #}
+{% include './RenderCard.html' %}

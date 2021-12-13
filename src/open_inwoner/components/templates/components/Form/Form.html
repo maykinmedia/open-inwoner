@@ -1,8 +1,21 @@
-{% load form_tags %}
-
-<form class="form form--columns-{{ columns }} {% if inline %}form--inline{% endif %}" method="{{ method }}" action="." {% if id %}id="{{id}}"{% endif %}>
+{% load form_tags link_tags %}
+{# Shared between Form and RenderForm. #}
+<form class="form{% if columns %} form--columns-{{ columns }}{% endif %}{% if inline %} form--inline{% endif %}" method="{{ method }}" action="." {% if id %}id="{{id}}"{% endif %}>
     {% if form.non_field_errors %}
         {% errors errors=form.non_field_errors %}
+    {% endif %}
+
+    {% if auto_render %}
+        {% csrf_token %}
+        {% for field in form.fields %}
+            {% autorender_field form field %}
+        {% endfor %}
+
+        {% if secondary_href %}
+            {% form_actions primary_icon='arrow_forward' primary_text=submit_text secondary_href=secondary_href secondary_text=secondary_text %}
+        {% else %}
+            {% form_actions primary_icon='arrow_forward' primary_text=submit_text %}
+        {% endif %}
     {% endif %}
 
     {{ contents }}

@@ -21,6 +21,11 @@ def settings(request):
             "secondary": config.get_secondary_color,
             "accent": config.get_accent_color,
         },
+        "hero_image_login": config.hero_image_login.file.url
+        if config.hero_image_login
+        else "",
+        "login_allow_registration": config.login_allow_registration,
+        "login_text": config.login_text,
         "menu_categories": Category.get_root_nodes(),
         "settings": dict(
             [(k, getattr(django_settings, k, None)) for k in public_settings]
