@@ -1,0 +1,13 @@
+{# Utilizes same template as Card. #}
+<{{ href|yesno:'a,div' }} class="card{% if tinted %} card--tinted{% endif %}" {% if href %} href="{{ href }}"{% endif %}>
+    {% if src %}
+    <header class="card__header">
+        <img class="card__img" src="{{ src }}" alt="{{ alt }}"/>
+    </header>
+    {% endif %}
+
+    <div class="card__body{% if direction %} card__body--direction-{{ direction }}{% endif %}">
+        {% if title %}<h4 class="h4">{{ title }}</h4>{% endif %}
+        {{ contents }}
+    </div>
+</{{ href|yesno:'a,div' }}>

@@ -32,19 +32,24 @@
 
         {% block header_image %}{% endblock header_image %}
 
-        <main class="container">
-            <div class="grid">
-                {% spaceless %}<aside class="grid__sidebar">
-                    {% block sidebar_content %}{% endblock sidebar_content %}
-                </aside>{% endspaceless %}
-                <div class="grid__main">
-                    {% block content %}
-                        Please provide the content
-                    {% endblock content %}
-                </div>
-            </div>
-            {% block extra_grid %}{% endblock extra_grid %}
-        </main>
+        {% block main_outer %}
+            <main class="container">
+                {% block main_inner %}
+                    <div class="grid">
+                    {% spaceless %}<aside class="grid__sidebar">
+                            {% block sidebar_content %}{% endblock sidebar_content %}
+                        </aside>{% endspaceless %}
+
+                    <div class="grid__main">
+                        {% block content %}
+                            Please provide the content
+                        {% endblock content %}
+                    </div>
+
+                    {% block extra_grid %}{% endblock extra_grid %}
+                {% endblock main_inner %}
+            </main>
+        {% endblock main_outer %}
 
         {% footer logo_url=site_logo %}
 
