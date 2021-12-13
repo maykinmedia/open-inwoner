@@ -3,8 +3,7 @@
 
 {%  block main %}
  <div class="container">
-    {% render_form form_object=form method="POST" %}
-    {% csrf_token %}
+    {% render_form form_object=form method="GET" %}
 
     {#  zoek button section #}
     <div class="grid">
