@@ -19,6 +19,11 @@ class FacetBucket:
     count: int = 0
     selected: bool = False
 
+    @property
+    def label(self) -> str:
+        """display in the label"""
+        return f"{self.name} ({self.count})"
+
 
 @dataclass(init=False)
 class Facet:
@@ -59,7 +64,6 @@ class Facet:
 
     @property
     def empty_buckets(self) -> List[FacetBucket]:
-        # todo replace empty bucket values with the facet endpoint which shows all buckets
         if not hasattr(self, "_empty_buckets"):
             bucket_slugs = [b.slug for b in self.buckets]
             empty_queryset = self.model.objects.exclude(slug__in=bucket_slugs).order_by(
@@ -73,6 +77,9 @@ class Facet:
     @property
     def total_buckets(self) -> List[FacetBucket]:
         return self.buckets + self.empty_buckets
+
+    def choices(self) -> list:
+        return [(b.slug, b.label) for b in self.buckets]
 
 
 @dataclass()
