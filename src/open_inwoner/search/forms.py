@@ -9,7 +9,9 @@ class MultipleChoiceNoValidationField(forms.MultipleChoiceField):
 
 
 class SearchForm(forms.Form):
-    query = forms.CharField(label=_("Zoek op trefwoord"), max_length=400, required=True)
+    query = forms.CharField(
+        label=_("Zoek op trefwoord"), max_length=400, required=False
+    )
     categories = MultipleChoiceNoValidationField(
         label=_("Categories"), required=False, widget=forms.CheckboxSelectMultiple
     )
