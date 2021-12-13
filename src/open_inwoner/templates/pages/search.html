@@ -6,35 +6,97 @@
 {% block content %}
 <h1 class="h1">Zoeken</h1>
 <p class="p">Hier vind u hoe wonen, zorg, welzijn, werk en geldzaken in Den Haag geregeld zijn en wijzen we u de weg naar organisaties, activiteiten, hulp en initiatieven in uw eigen buurt.</p>
-{% render_form form_object=form method="GET" columns=2 inline=True %}
+
+<form class="form form--columns-2 form--inline" method="POST" action=".">
+    {% if form.non_field_errors %}
+        {% errors errors=form.non_field_errors %}
+    {% endif %}
+
+{#{% render_form form_object=form method="POST" columns=2 inline=True %}#}
+    {% csrf_token %}
     {% input form.query %}
     {% form_actions primary_text="Zoeken" primary_icon="arrow_forward" %}
 {% endrender_form %}
 {% endblock content %}
 
-{% block extra_grid %}
+{#{% block extra_grid %}#}
+{% if results %}
 <div class="grid">
     <aside class="grid__sidebar">
-        {% for facet in results.facets %}
-            <div>
-                <aside class="filter filter--open">
-                    <h4 class="h4 filter__title">
-                        {{ facet.name }}
-                        <span class="material-icons">expand_more</span>
-                    </h4>
-                    <div class="filter__list">
-                        {% for bucket in facet.buckets %}
-                            <label class="checkbox">
-                                <input id="{{bucket.slug}}" class="checkbox__input" title="{{bucket.name}} ({{ bucket.count }})" name="{{ facet.name }}" required="" type="checkbox" value="{{bucket.slug}}" {% if bucket.selected %}selected="selected"{% endif %}>
-                                <label class="label checkbox__label" for="{{bucket.slug}}">{{bucket.name}} ({{ bucket.count }})</label>
-                            </label>
-                        {% endfor %}
-                    </div>
-                </aside>
-                <hr class="divider divider--small">
-            </div>
-        {% endfor %}
+
+        <div>
+             <aside class="filter filter--open">
+                <h4 class="h4 filter__title">
+                    Categories
+                    <span class="material-icons">expand_more</span>
+                </h4>
+                 <div class="filter__list">
+                     {{ form.categories }}
+
+                 </div>
+             </aside>
+            <hr class="divider divider--small">
+        </div>
+
+        <div>
+             <aside class="filter filter--open">
+                <h4 class="h4 filter__title">
+                    Tags
+                    <span class="material-icons">expand_more</span>
+                </h4>
+                 <div class="filter__list">
+                     {{  form.tags }}
+
+                 </div>
+             </aside>
+            <hr class="divider divider--small">
+        </div>
+
+        <div>
+             <aside class="filter filter--open">
+                <h4 class="h4 filter__title">
+                    Organizations
+                    <span class="material-icons">expand_more</span>
+                </h4>
+                 <div class="filter__list">
+                     {{  form.organizations }}
+
+                 </div>
+             </aside>
+            <hr class="divider divider--small">
+        </div>
     </aside>
+{% endif %}
+
+{#        {% for facet in results.facets %}#}
+{#            <div>#}
+{#                <aside class="filter filter--open">#}
+{#                    <h4 class="h4 filter__title">#}
+{#                        {{ facet.name }}#}
+{#                        <span class="material-icons">expand_more</span>#}
+{#                    </h4>#}
+{#                    <div class="filter__list">#}
+{#                        {% for bucket in facet.buckets %}#}
+{#                            <label class="checkbox">#}
+{#                                <input#}
+{#                                    id="{{bucket.slug}}"#}
+{#                                    class="checkbox__input"#}
+{#                                    name="{{ facet.name }}"#}
+{#                                    type="checkbox"#}
+{#                                    value="{{bucket.slug}}"#}
+{#                                    {% if bucket.selected %}selected="selected"{% endif %}#}
+{#                                >#}
+{#                                <label class="label checkbox__label" for="{{bucket.slug}}">{{bucket.label}}</label>#}
+{#                            </label>#}
+{#                        {% endfor %}#}
+{#                    </div>#}
+{#                </aside>#}
+{#                <hr class="divider divider--small">#}
+{#            </div>#}
+{#        {% endfor %}#}
+{#    </aside>#}
+
+
     <div class="grid__main">
         {% if results %}
             <div class="search-results">
@@ -58,4 +120,6 @@
         {% endif %}
     </div>
 </div>
-{% endblock extra_grid %}
+{#{% endblock extra_grid %}#}
+</form>
+{% endblock content %}
