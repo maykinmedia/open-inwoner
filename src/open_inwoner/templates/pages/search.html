@@ -26,47 +26,10 @@
     {% if results %}
     <div class="grid">
         <aside class="grid__sidebar">
-            <div>
-                 <aside class="filter filter--open">
-                    <h4 class="h4 filter__title">
-                        Categories
-                        <span class="material-icons">expand_more</span>
-                    </h4>
-                     <div class="filter__list">
-                         {% checkbox form.categories %}
-                     </div>
-                 </aside>
-                <hr class="divider divider--small">
-            </div>
-
-            <div>
-                 <aside class="filter filter--open">
-                    <h4 class="h4 filter__title">
-                        Tags
-                        <span class="material-icons">expand_more</span>
-                    </h4>
-                     <div class="filter__list">
-                         {% checkbox form.tags %}
-                     </div>
-                 </aside>
-                <hr class="divider divider--small">
-            </div>
-
-            <div>
-                 <aside class="filter filter--open">
-                    <h4 class="h4 filter__title">
-                        Organizations
-                        <span class="material-icons">expand_more</span>
-                    </h4>
-                     <div class="filter__list">
-                         {% checkbox form.organizations %}
-
-                     </div>
-                 </aside>
-                <hr class="divider divider--small">
-            </div>
+            {% include "samples/filter.html" with filter=form.categories %}
+            {% include "samples/filter.html" with filter=form.tags %}
+            {% include "samples/filter.html" with filter=form.organizations %}
         </aside>
-
 
         <div class="grid__main">
             <div class="search-results">
