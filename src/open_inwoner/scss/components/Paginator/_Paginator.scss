@@ -1,0 +1,40 @@
+.paginator {
+  display: flex;
+  justify-content: center;
+
+  &__list {
+    display: flex;
+    justify-content: flex-start;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  &__list-item {
+    display: flex;
+    align-items: flex-end;
+  }
+
+  &__list-item--page-number {
+    min-width: 0;
+    text-align: center;
+  }
+
+  .link {
+    align-items: center;
+    display: inline-flex;
+    height: var(--gutter-width);
+    justify-content: center;
+    padding: 0;
+    width: var(--gutter-width);
+  }
+
+  .link:focus,
+  .link:hover {
+    transform: none;
+  }
+}
+
+.list + .paginator {
+  margin-top: var(--spacing-large);
+}

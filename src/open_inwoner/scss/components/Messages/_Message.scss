@@ -1,0 +1,20 @@
+.message {
+  align-items: baseline;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: var(--spacing-large);
+
+  &--ours {
+    align-self: flex-end;
+  }
+
+  &--ours &__message {
+    background-color: var(--color-gray-lightest);
+  }
+
+  &__message {
+    border: 1px solid var(--color-gray-lightest);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-medium) var(--spacing-large);
+  }
+}

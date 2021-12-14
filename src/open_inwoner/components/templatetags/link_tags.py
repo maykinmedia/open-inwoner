@@ -12,6 +12,7 @@ def link(href, **kwargs):
     bold: bool | whether the link should be bold.
     download: bool | whether the link should be downloaded instead of linked to. (Optional)
     extra_classes: string | additional CSS classes.
+    hide_text: bool | whether to hide the text and use aria attribute instead. (Optional).
     icon: string | the icon that you want to display. (Optional)
     icon_position: "before" or "after" | where the icon should be positioned to the text. (Optional)
     primary: bool | if the primary colors should be used. (Optional)
@@ -27,6 +28,7 @@ def link(href, **kwargs):
     except NoReverseMatch:
         pass
 
+    kwargs["icon_position"] = kwargs.get("icon_position", kwargs.get("iconPosition"))
     kwargs["href"] = href
 
     return kwargs

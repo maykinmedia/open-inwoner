@@ -3,7 +3,13 @@
   font-family: var(--font-family-body);
   font-size: var(--font-size-body);
   line-height: var(--font-line-height-body);
+  font-weight: normal;
   margin: 0;
+
+  &--small {
+    font-size: var(--font-size-body-small);
+    line-height: var(--font-line-height-body-small);
+  }
 }
 
 *[class^=h] + .p {

@@ -1,0 +1,32 @@
+{% extends 'master.html' %}
+{% load i18n button_tags form_tags grid_tags list_tags messages_tags paginator_tags utils %}
+
+
+{% block grid_class %} grid--limit{% endblock %}
+
+
+{% block main_inner %}
+    <h1 class="h1">{% trans 'Mijn berichten' %}</h1>
+    {{ block.super }}
+{% endblock %}
+
+
+{% block sidebar_content %}
+    {% search form.search %}
+
+    {% render_list %}
+        {% for i in '01234567890' %}
+            {% capture as title %}{% lorem 3 w random %}{% endcapture %}
+            {% capture as description %}{% lorem 5 w random %}{% endcapture %}
+            {% list_item title description=description href='#' %}
+        {% endfor %}
+    {% endrender_list %}
+
+    {% paginator '0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789'|make_list 10 %}
+{% endblock %}
+
+
+{% block content %}
+    {% messages messages my_sender_id subject status %}
+    {% textarea form.message %}
+{% endblock %}

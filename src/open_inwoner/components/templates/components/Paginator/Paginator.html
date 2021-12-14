@@ -1,0 +1,80 @@
+{% load i18n link_tags %}
+
+<nav class="paginator">
+    <ul class="paginator__list">
+        {# Previous. #}
+        {% if page_obj.has_previous %}
+            {% firstof page_obj.previous_page_number|capfirst as previous_page_number %} {# Create string from int. #}
+
+            <li class="paginator__list-item paginator__list-item--previous">
+                {% link '?page='|add:previous_page_number hide_text=True text=_('Vorige pagina') extra_classes='button' icon='chevron_left' %}
+            </li>
+        {% endif %}
+
+
+        {# First page.#}
+        {% if page_obj.number == 1 %}
+            <li class="paginator__list-item paginator__list-item--page-number paginator__list-item--active">
+                {% link '?page=1' text=1 extra_classes='button button--primary' %}
+            </li>
+        {% else %}
+            <li class="paginator__list-item paginator__list-item--page-number">
+                {% link '?page=1' text=1 extra_classes='button' %}
+            </li>
+
+        {% endif %}
+
+
+        {# Ellipsis. #}
+        {% if 2 not in page_numbers %}
+            <li class="paginator__list-item paginator__list-item--ellipsis">…</li>
+        {% endif %}
+
+
+        {# Current page and lookaround in both directions. #}
+        {% for p in page_numbers %}
+            {% firstof p|capfirst as page_number %} {# Create string from int. #}
+
+            {% if page_obj.number == p %}
+                <li class="paginator__list-item paginator__list-item--page-number paginator__list-item--active">
+                    {% link '?page='|add:page_number text=page_number extra_classes='button button--primary' %}
+                </li>
+            {% else %}
+                <li class="paginator__list-item paginator__list-item--page-number">
+                    {% link '?page='|add:page_number text=page_number extra_classes='button' %}
+                </li>
+            {% endif %}
+        {% endfor %}
+
+
+        {% firstof paginator.num_pages|capfirst as last_page_number %} {# Create string from int. #}
+
+
+        {# Ellipsis. #}
+        {% if last_page_number|add:-1 not in page_numbers %}
+            <li class="paginator__list-item paginator__list-item--ellipsis">…</li>
+        {% endif %}
+
+
+        {# Last page.#}
+        {% if page_obj.number == paginator.num_pages %}
+            <li class="paginator__list-item paginator__list-item--page-number paginator__list-item--active">
+                {% link '?page='|add:last_page_number text=last_page_number extra_classes='button button--primary' %}
+            </li>
+        {% else %}
+            <li class="paginator__list-item paginator__list-item--page-number">
+                {% link '?page='|add:last_page_number text=last_page_number extra_classes='button' %}
+            </li>
+        {% endif %}
+
+
+        {# Next. #}
+        {% if page_obj.has_next %}
+            {% firstof page_obj.next_page_number|capfirst as next_page_number %}  {# Create string from int. #}
+
+            <li class="paginator__list-item paginator__list-item--next">
+                {% link '?page='|add:next_page_number hide_text=True text=_('Volgende pagina') extra_classes='button' icon='chevron_right' %}
+            </li>
+        {% endif %}
+    </ul>
+</nav>

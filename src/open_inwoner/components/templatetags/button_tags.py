@@ -7,6 +7,7 @@ register = template.Library()
 def button(text, **kwargs):
     """
     text: this will be the button text
+    hide_text: bool | whether to hide the text and use aria attribute instead. (Optional).
     href: where the button links to (Optional)
     icon: the icon that you want to display (Optional)
     """

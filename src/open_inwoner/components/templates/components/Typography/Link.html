@@ -4,17 +4,18 @@
     href="{{href}}"
     {% if download %}download{% endif %}
     {% if href|startswith:"http" %}target="_blank"{% endif %}
-    class="link{% if extra_classes %} {{ extra_classes }}{% endif %}{% if active %} link--active{% endif %}{% if bold %} link--bold{% endif %}{% if iconPosition %} button--icon-{{iconPosition}}{% endif %}{% if primary %} link--primary{% endif %}{% if secondary %} link--secondary{% endif %}"
+    class="link{% if extra_classes %} {{ extra_classes }}{% endif %}{% if active %} link--active{% endif %}{% if bold %} link--bold{% endif %}{% if icon_position %} link--icon-{{icon_position}}{% endif %}{% if primary %} link--primary{% endif %}{% if secondary %} link--secondary{% endif %}"
     {% if data_text %}data-text="{{ data_text }}"{% endif %}
     {% if data_alt_text %}data-alt-text="{{ data_alt_text }}"{% endif %}
     {% if data_icon %}data-icon="{{ data_icon }}"{% endif %}
     {% if data_alt_icon %}data-alt-icon="{{ data_alt_icon }}"{% endif %}
+    {% if hide_text %}aria-describedby="{{ text }}" title="{{ text }}"{% endif %}
 >
     {% if src %}
         <img class="logo__image" src="{{src}}" alt="{{ text }}"{% if height %} height="{{ height }}"{% endif %}/>
     {% endif %}
 
-    {% if text %}<span class="link__text">{{ text }}</span>{% endif %}
+    {% if text and not hide_text %}<span class="link__text">{{ text }}</span>{% endif %}
 
     {% if social_icon %}
         <i class="fa-brands fa-{{social_icon}}"></i>

@@ -1,4 +1,4 @@
-{% load i18n %}
+{% load i18n link_tags %}
 
 <nav class="primary-navigation">
     <ul class="primary-navigation__list">
@@ -32,10 +32,7 @@
                 </a>
             </li>
             <li class="primary-navigation__list-item">
-                <a class="link" href="{% url 'accounts:my_profile' %}">
-                    <span class="material-icons">inbox</span>
-                    {% trans "Mijn berichten" %}
-                </a>
+                {% link 'accounts:inbox' text=_('Inbox') icon='inbox' icon_position='before' %}
             </li>
         {% endif %}
         <li class="primary-navigation__list-item"><a class="link" href="{% url 'search:search' %}">{% trans "Zoeken" %}</a></li>
