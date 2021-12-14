@@ -1,8 +1,7 @@
 {% extends 'master.html' %}
 {% load i18n form_tags utils %}
 
-{%  block main %}
- <div class="container">
+{% block main_inner %}
     {% render_form form_object=form method="GET" %}
 
     {#  zoek button section #}
@@ -55,6 +54,5 @@
 
     {% endif %}
 
- {% endrender_form %}
- </div>
-{% endblock main %}
+    {% endrender_form %}
+{% endblock main_inner %}
