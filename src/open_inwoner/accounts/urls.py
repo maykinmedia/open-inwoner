@@ -1,6 +1,6 @@
 from django.urls import path
-
 from open_inwoner.pdc.views import HomeView
+from .views.inbox import InboxView
 
 
 from .views import (

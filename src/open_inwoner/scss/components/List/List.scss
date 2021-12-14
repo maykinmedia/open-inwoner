@@ -1,0 +1,35 @@
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-y: auto;
+
+  &__item {
+    border-top: 1px solid var(--color-gray-lightest);
+    border-bottom: 1px solid var(--color-gray-lightest);
+    flex-basis: 100%;
+    padding: var(--spacing-large) 0;
+
+    .p--muted {
+      margin-top: 0!important;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+  }
+
+  &__item:focus-within,
+  &__item--active {
+    background-color: var(--color-gray-lightest);
+  }
+
+  &__item + &__item {
+    border-top: none;
+  }
+}
+
+.search + .list {
+  margin-top: var(--spacing-large);
+}

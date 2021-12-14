@@ -4,6 +4,11 @@
   grid-gap: var(--gutter-width);
   width: 100%;
 
+  &--limit &__sidebar,
+  &--limit &__main {
+    max-height: 75vh;
+  }
+
   @media (min-width: 768px) {
     display: grid;
     grid-template-columns: repeat(12, 1fr);
@@ -46,4 +51,8 @@
     width: 50%;
     box-sizing: border-box;
   }
+}
+
+.h1 + .grid {
+  margin-top: var(--spacing-large);
 }

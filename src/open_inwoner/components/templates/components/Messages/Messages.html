@@ -1,0 +1,31 @@
+{% load messages_tags %}
+
+<section class="messages">
+    <header class="messages__header">
+        <h4 class="h4">{{ subject }}</h4>
+        <p class="p p--muted">{{ status }}</p>
+    </header>
+
+
+    <div class="messages__body">
+        <ol class="messages__days">
+            {% for day in days %}
+                <li class="messages__day">
+                    <header class="messages__day-header">
+                        <h4 class="p p--muted">{{ day.text }}</h4>
+                    </header>
+
+                    <ol class="messages__messages">
+                        {% for message in day.messages %}
+                            {% if message.sender.sender_id == my_sender_id %}
+                                {% message message True %}
+                            {% else %}
+                                {% message message False %}
+                            {% endif %}
+                        {% endfor %}
+                    </ol>
+                </li>
+            {% endfor %}
+        </ol>
+    </div>
+</section>

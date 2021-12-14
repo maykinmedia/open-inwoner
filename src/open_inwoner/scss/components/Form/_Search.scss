@@ -1,0 +1,8 @@
+.search {
+  display: flex;
+  gap: var(--spacing-large);
+
+  .input {
+    margin-top: 0;
+  }
+}

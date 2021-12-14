@@ -113,6 +113,16 @@ def input(field, **kwargs):
     return {**kwargs, "field": field}
 
 
+@register.inclusion_tag("components/Form/Search.html")
+def search(field, **kwargs):
+    return {**kwargs, "field": field}
+
+
+@register.inclusion_tag("components/Form/Textarea.html")
+def textarea(field, **kwargs):
+    return {**kwargs, "field": field}
+
+
 @register.inclusion_tag("components/Form/FormActions.html")
 def form_actions(primary_text="", primary_icon=None, **kwargs):
     if not primary_text and primary_icon is None:

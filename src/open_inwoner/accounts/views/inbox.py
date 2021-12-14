@@ -3,7 +3,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import InvalidPage, Paginator
 from django.http import Http404
 from django.shortcuts import get_object_or_404
-from django.utils.translation import gettext as _
 from django.views.generic import FormView
 
 from ..models import Message, User
