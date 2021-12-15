@@ -1,51 +1,49 @@
-{% load icon_tags button_tags %}
+{% load icon_tags button_tags querystring %}
 
 <div class="pagination">
     {% if href %}
         {% button href=href text=text icon="arrow_backward" %}
     {% endif %}
 
-    <div class="pagination__pages">
-        {% if page_obj.has_previous %}
-            <a class="pagination__link" href="?page={{ page_obj.previous_page_number }}">
-                {% icon icon="chevron_left" %}
-            </a>
+    {% if page_obj.has_previous %}
+        <a class="pagination__item" href="?{% querystring request key='page' value=page_obj.previous_page_number %}">
+            {% icon icon="chevron_left" %}
+        </a>
+    {% else %}
+        <span class="pagination__item">{% icon icon="chevron_left" %}</span>
+    {% endif %}
+
+    {% for i in paginator.page_range %}
+        {% if page_obj.number == i %}
+            <span class="pagination__item pagination__item--active">{{ i }} <span class="sr-only">(current)</span></span>
         {% else %}
-            <span class="pagination__item">{% icon icon="chevron_left" %}</span>
-        {% endif %}
-
-        {% for i in paginator.page_range %}
-            {% if page_obj.number == i %}
-                <span class="pagination__item pagination__item--active">{{ i }} <span class="sr-only">(current)</span></span>
+            {% if i|add:"-3" <= page_obj.number and page_obj.number <= i|add:"3" %}
+                <a class="pagination__item" href="?{% querystring request key='page' value=i %}">{{ i }}</a>
             {% else %}
-                {% if i|add:"-3" <= page_obj.number and page_obj.number <= i|add:"3" %}
-                    <a class="pagination__link" href="?page={{ i }}">{{ i }}</a>
-                {% else %}
-                    {% if i == 1 %}
-                        <a class="pagination__link" href="?page={{ i }}">{{ i }}</a>
+                {% if i == 1 %}
+                    <a class="pagination__item" href="?{% querystring request key='page' value=i %}">{{ i }}</a>
 
-                        {% if page_obj.number|add:"-3" != 2 %}
-                            <span class="pagination__item">...</span>
-                        {% endif %}
-                    {% endif %}
-
-                    {% if i == page_obj.paginator.num_pages %}
-                        {% if page_obj.number|add:"4" != page_obj.paginator.num_pages %}
-                            <span class="pagination__item">...</span>
-                        {% endif %}
-
-                        <a class="pagination__link" href="?page={{ i }}">{{ i }}</a>
+                    {% if page_obj.number|add:"-3" != 2 %}
+                        <span class="pagination__item">...</span>
                     {% endif %}
                 {% endif %}
-            {% endif %}
-        {% endfor %}
 
-        {% if page_obj.has_next %}
-            <a class="pagination__link" href="?page={{ page_obj.next_page_number }}">
-                {% icon icon="chevron_right" %}
-            </a>
-        {% else %}
-            <span class="pagination__item">{% icon icon="chevron_right" %}</span>
+                {% if i == page_obj.paginator.num_pages %}
+                    {% if page_obj.number|add:"4" != page_obj.paginator.num_pages %}
+                        <span class="pagination__item">...</span>
+                    {% endif %}
+
+                    <a class="pagination__item" href="?{% querystring request key='page' value=i %}">{{ i }}</a>
+                {% endif %}
+            {% endif %}
         {% endif %}
-    </div>
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+        <a class="pagination__item" href="?{% querystring request key='page' value=page_obj.next_page_number %}">
+            {% icon icon="chevron_right" %}
+        </a>
+    {% else %}
+        <span class="pagination__item">{% icon icon="chevron_right" %}</span>
+    {% endif %}
 </div>

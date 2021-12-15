@@ -8,7 +8,7 @@ from ..models import Category, Organization, OrganizationType, Product, Tag
 
 
 class ProductFactory(factory.django.DjangoModelFactory):
-    name = factory.Faker("word")
+    name = factory.Sequence(lambda n: f"product {n}")
     slug = factory.LazyAttribute(lambda a: slugify(a.name))
     summary = factory.Faker("sentence")
     content = factory.Faker("paragraph")

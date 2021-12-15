@@ -1,50 +1,43 @@
 {% extends 'master.html' %}
 {% load i18n form_tags utils %}
 
-{% block sidebar_content %}{% if results %}&nbsp;{% endif %}{% endblock sidebar_content %}
+{% block main_inner %}
+    {% render_form form_object=form method="GET" %}
 
-{% block content %}
-<h1 class="h1">Zoeken</h1>
-<p class="p">Hier vind u hoe wonen, zorg, welzijn, werk en geldzaken in Den Haag geregeld zijn en wijzen we u de weg naar organisaties, activiteiten, hulp en initiatieven in uw eigen buurt.</p>
-{% render_form form_object=form method="GET" columns=2 inline=True %}
-    {% input form.query %}
-    {% form_actions primary_text="Zoeken" primary_icon="arrow_forward" %}
-{% endrender_form %}
-{% endblock content %}
+    {#  zoek button section #}
+    <div class="grid">
+        {% spaceless %}<aside class="grid__sidebar">
+            &nbsp;
+        </aside>{% endspaceless %}
+        <div class="grid__main">
+            <h1 class="h1">Zoeken</h1>
+            <p class="p">Hier vind u hoe wonen, zorg, welzijn, werk en geldzaken in Den Haag geregeld zijn en wijzen we u de weg naar organisaties, activiteiten, hulp en initiatieven in uw eigen buurt.</p>
 
-{% block extra_grid %}
-<div class="grid">
-    <aside class="grid__sidebar">
-        {% for facet in results.facets %}
-            <div>
-                <aside class="filter filter--open">
-                    <h4 class="h4 filter__title">
-                        {{ facet.name }}
-                        <span class="material-icons">expand_more</span>
-                    </h4>
-                    <div class="filter__list">
-                        {% for bucket in facet.buckets %}
-                            <label class="checkbox">
-                                <input id="{{bucket.slug}}" class="checkbox__input" title="{{bucket.name}} ({{ bucket.count }})" name="{{ facet.name }}" required="" type="checkbox" value="{{bucket.slug}}" {% if bucket.selected %}selected="selected"{% endif %}>
-                                <label class="label checkbox__label" for="{{bucket.slug}}">{{bucket.name}} ({{ bucket.count }})</label>
-                            </label>
-                        {% endfor %}
-                    </div>
-                </aside>
-                <hr class="divider divider--small">
+            <div class="form form--columns-2 form--inline">
+                {% input form.query %}
+                {% form_actions primary_text="Zoeken" primary_icon="arrow_forward" %}
             </div>
-        {% endfor %}
-    </aside>
-    <div class="grid__main">
-        {% if results %}
+        </div>
+    </div>
+
+    {#  facets and results section #}
+    {% if results %}
+    <div class="grid">
+        <aside class="grid__sidebar">
+            {% include "samples/filter.html" with filter=form.categories %}
+            {% include "samples/filter.html" with filter=form.tags %}
+            {% include "samples/filter.html" with filter=form.organizations %}
+        </aside>
+
+        <div class="grid__main">
             <div class="search-results">
                 <h1 class="h1 search-results__title">
                     Zoekresultaten
-                    <span class="search-results__title-small">{{results.total}} zoekresultaten</span>
+                    <span class="search-results__title-small">{{paginator.count}} zoekresultaten</span>
 
                 </h1>
                 <div class="search-results__list">
-                    {% for hit in results.results %}
+                    {% for hit in page_obj %}
                         <a class="search-results__item" href="{% url 'pdc:product_detail' hit.slug %}">
                             <p class="search-results__item-title">{{ hit.name }}</p>
                             <div class="search-results__item-info-container">
@@ -55,7 +48,13 @@
                     {% endfor %}
                 </div>
             </div>
-        {% endif %}
+
+            {% include "components/Pagination/Pagination.html" %}
+
+        </div>
     </div>
-</div>
-{% endblock extra_grid %}
+
+    {% endif %}
+
+    {% endrender_form %}
+{% endblock main_inner %}
