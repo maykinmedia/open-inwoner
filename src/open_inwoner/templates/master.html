@@ -54,5 +54,6 @@
         {% footer logo_url=site_logo %}
 
         <script src="{% static 'bundles/open_inwoner-js.js' %}"></script>
+        {% block extra_js %}{% endblock extra_js %}
     </body>
 </html>
