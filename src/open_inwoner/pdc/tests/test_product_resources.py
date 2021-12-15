@@ -226,7 +226,7 @@ class TestProductExportResource(TestCase):
     def test_export_returns_expected_row(self):
         self.maxDiff = None
         dataset = self.resource.export()
-        category_name = self.product.categories.all()[0].name
+        category_slug = self.product.categories.all()[0].slug
 
         self.assertEqual(
             dataset.dict,
@@ -238,7 +238,7 @@ class TestProductExportResource(TestCase):
                         (dataset.headers[2], self.product.summary),
                         (dataset.headers[3], ""),
                         (dataset.headers[4], self.product.content),
-                        (dataset.headers[5], category_name),
+                        (dataset.headers[5], category_slug),
                         (dataset.headers[6], ""),
                         (dataset.headers[7], ""),
                         (dataset.headers[8], ""),

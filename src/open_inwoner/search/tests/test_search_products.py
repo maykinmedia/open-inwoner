@@ -18,10 +18,13 @@ class SearchQueryTests(ESMixin, TestCase):
         super().setUp()
 
         self.product1 = ProductFactory.create(
-            name="Name", summary="Some summary", content="Some content"
+            name="Name",
+            summary="Some summary",
+            content="Some content",
+            keywords=["keyword1", "keyword2"],
         )
         self.product2 = ProductFactory.create(
-            name="Other", summary="Other", content="Other"
+            name="Other", summary="Other", content="Other", keywords=["other"]
         )
         self.update_index()
 
@@ -39,6 +42,12 @@ class SearchQueryTests(ESMixin, TestCase):
 
     def test_search_product_on_content(self):
         results = search_products("content").results
+
+        self.assertEqual(len(results), 1)
+        self.assertEqual(int(results[0].meta.id), self.product1.id)
+
+    def test_search_product_on_keyword(self):
+        results = search_products("keyword1").results
 
         self.assertEqual(len(results), 1)
         self.assertEqual(int(results[0].meta.id), self.product1.id)
