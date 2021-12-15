@@ -28,6 +28,7 @@
   /// Link.
 
   .link {
+    color: var(--color-font-accent);
     line-height: var(--row-height);
     @media (max-width: 767px) {
 
