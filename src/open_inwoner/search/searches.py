@@ -4,13 +4,13 @@ from elasticsearch_dsl import FacetedSearch, NestedFacet, TermsFacet, query
 
 from .constants import FacetChoices
 from .documents import ProductDocument
-from .results import ProductSearchResult
+from .results import AutocompleteResult, ProductSearchResult
 
 
 class ProductSearch(FacetedSearch):
     index = settings.ES_INDEX_PRODUCTS
     doc_types = [ProductDocument]
-    fields = ["name^4", "summary", "content"]
+    fields = ["name^4", "summary", "content", "keywords"]
     facets = {
         FacetChoices.categories: NestedFacet(
             "categories", TermsFacet(field="categories.slug")
@@ -39,3 +39,28 @@ def search_products(query_str: str, filters=None) -> ProductSearchResult:
     response = s.execute()
 
     return ProductSearchResult.build_from_response(response)
+
+
+def search_autocomplete(query_str: str):
+    s = ProductDocument.search()
+    completion_params = {
+        "size": settings.ES_SUGGEST_SIZE,
+        "skip_duplicates": True,
+    }
+    s = s.suggest(
+        "name_suggest",
+        query_str,
+        completion={
+            **{"field": "name.suggest"},
+            **completion_params,
+        },
+    )
+    s = s.suggest(
+        "keyword_suggest",
+        query_str,
+        completion={**{"field": "keywords.suggest"}, **completion_params},
+    )
+    response = s.execute()
+    return AutocompleteResult.build_from_response(
+        response, order=["name_suggest", "keyword_suggest"]
+    )
