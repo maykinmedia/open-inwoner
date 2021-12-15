@@ -50,6 +50,8 @@
 
                     {% pagination page_obj=page_obj paginator=paginator request=request %}
 
+                    {% include "components/Pagination/Pagination.html" %}
+                    {% form form_object=feedback_form method="POST" %}
                 </div>
             </div>
         {% endif %}

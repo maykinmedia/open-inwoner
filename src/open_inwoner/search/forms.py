@@ -1,5 +1,8 @@
 from django import forms
+from django.forms.widgets import Textarea
 from django.utils.translation import ugettext_lazy as _
+
+from .models import Feedback
 
 
 class MultipleChoiceNoValidationField(forms.MultipleChoiceField):
@@ -21,3 +24,9 @@ class SearchForm(forms.Form):
     organizations = MultipleChoiceNoValidationField(
         label=_("Organizations"), required=False, widget=forms.CheckboxSelectMultiple
     )
+
+
+class FeedbackForm(forms.ModelForm):
+    class Meta:
+        model = Feedback
+        fields = ("positive", "remark")
