@@ -5,6 +5,8 @@ from colorfield.fields import ColorField
 from filer.fields.image import FilerImageField
 from solo.models import SingletonModel
 
+from .choices import ColorTypeChoices
+
 
 class SiteConfiguration(SingletonModel):
     name = models.CharField(max_length=255, help_text=_("The name of the municipality"))
@@ -16,6 +18,24 @@ class SiteConfiguration(SingletonModel):
     )
     accent_color = ColorField(
         help_text=_("The accent color of the municipality's site"),
+    )
+    primary_font_color = models.CharField(
+        max_length=50,
+        choices=ColorTypeChoices.choices,
+        default=ColorTypeChoices.light,
+        help_text=_("The font color for when the background is the primary color"),
+    )
+    secondary_font_color = models.CharField(
+        max_length=50,
+        choices=ColorTypeChoices.choices,
+        default=ColorTypeChoices.light,
+        help_text=_("The font color for when the background is the secondary color"),
+    )
+    accent_font_color = models.CharField(
+        max_length=50,
+        choices=ColorTypeChoices.choices,
+        default=ColorTypeChoices.dark,
+        help_text=_("The font color for when the background is the accent color"),
     )
     logo = FilerImageField(
         null=True,

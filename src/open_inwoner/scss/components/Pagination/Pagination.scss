@@ -28,10 +28,10 @@
     &--active {
       background-color: var(--color-primary);
       border-radius: 3px;
-      color: var(--color-white);
+      color: var(--color-font-primary);
 
       &:hover {
-        color: var(--color-white);
+        color: var(--color-font-primary);
       }
     }
   }
