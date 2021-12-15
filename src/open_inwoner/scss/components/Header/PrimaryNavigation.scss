@@ -69,6 +69,10 @@
     @media (min-width: 768px) {
       column-count: 4;
     }
+
+    .link {
+      color: var(--color-font-accent);
+    }
   }
 
   & > &__list > &__list-item > &__list > &__list-item {
