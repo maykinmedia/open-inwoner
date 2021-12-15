@@ -45,6 +45,10 @@
   --color-accent-darker: hsl(var(--color-accent-h), var(--color-accent-s), calc(var(--color-accent-l) - 10%));
   --color-accent-lighter: hsl(var(--color-accent-h), var(--color-accent-s), calc(var(--color-accent-l) + 10%));
 
+  --color-font-primary: var(--color-white);
+  --color-font-secondary: var(--color-white);
+  --color-font-accent: var(--color-gray-dark);
+
   --color-body: var(--color-gray-dark);
   --color-danger: var(--color-red);
   --color-mute: var(--color-gray);

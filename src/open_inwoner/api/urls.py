@@ -13,7 +13,7 @@ from .accounts.views import (
 )
 from .configurations.views import SiteConfigurationView
 from .pdc.views import CategoryViewSet, ProductViewSet
-from .search.views import SearchView
+from .search.views import AutocompleteView, SearchView
 
 app_name = "api"
 router = routers.SimpleRouter()
@@ -42,6 +42,9 @@ urlpatterns = [
     path("auth/registration/", include("dj_rest_auth.registration.urls")),
     # path("auth/", include("rest_framework.urls", namespace="rest_framework")),
     path("search/", SearchView.as_view(), name="search"),
+    path(
+        "search/autocomplete/", AutocompleteView.as_view(), name="search_autocomplete"
+    ),
     path("config/", SiteConfigurationView.as_view(), name="site_configuration"),
     path("", include(router.urls)),
 ]
