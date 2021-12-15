@@ -52,49 +52,9 @@
             {% include "components/Pagination/Pagination.html" %}
 
         </div>
-
     </div>
 
     {% endif %}
 
     {% endrender_form %}
 {% endblock main_inner %}
-
-
-{% block extra_js %}
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-$(function(){
-     $("#id_query").attr("autocomplete", "off").keyup(function(event) {
-         removeAutocomplete();
-
-         const input_el = $(this);
-         const query = input_el.val();
-         $.ajax({
-             url: '/api/search/autocomplete/',
-             data: {"search": query},
-             dataType: 'json',
-             success: function (result) {
-                 const options = result.options;
-                 const ul = $("<div/>").addClass("autocomplete").appendTo( (input_el.parent().parent()));
-                 options.forEach(function (option) {
-                     $("<div/>").addClass("autocomplete__item")
-                         .html(option)
-                         .appendTo(ul)
-                         .click(function(){
-                             input_el.val(option);
-                             removeAutocomplete();
-                         });
-                 })
-             }
-         })
-     })
-});
-
-function removeAutocomplete() {
-    $(".autocomplete").remove()
-}
-
-</script>
-
-{% endblock extra_js %}
