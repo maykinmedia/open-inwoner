@@ -30,12 +30,18 @@ class Synonym(models.Model):
 
 class Feedback(models.Model):
     search_query = models.CharField(
-        verbose_name=_("Search query"),
+        verbose_name=_("search query"),
         max_length=250,
         help_text=_("Words which are used by the user in the search box"),
     )
+    search_url = models.URLField(
+        verbose_name=_("search url"),
+        blank=True,
+        default="",
+        help_text=_("The generated url of user's search"),
+    )
     positive = models.BooleanField(
-        verbose_name=_("Positive"),
+        verbose_name=_("positive"),
         help_text=_("Designates whether the feedback was positive or not"),
     )
     remark = models.TextField(
@@ -55,10 +61,12 @@ class Feedback(models.Model):
     )
     searched_by = models.ForeignKey(
         "accounts.User",
-        verbose_name=_("Searched by"),
+        verbose_name=_("searched by"),
+        blank=True,
+        null=True,
         on_delete=CASCADE,
         related_name="queries",
-        help_text="The person who performed the search",
+        help_text="The logged in user who performed the search",
     )
 
     def __str__(self):
