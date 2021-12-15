@@ -3,3 +3,4 @@ import './ckeditor/';
 import './map';
 import './accessibility';
 import './anchor-menu';
+import './autocomplete';
