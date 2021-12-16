@@ -1,44 +1,22 @@
-from collections import OrderedDict
-from itertools import groupby
-from django.db.models import Case, When, F, Q, Value, query
-from django.db.models.functions import Concat
+from django.db.models import Q, query
+
 from open_inwoner.components.types.messagetype import MessageType
 
 
 class MessageQuerySet(query.QuerySet):
+
+    def get_conversations_for_user(self, me):
+        # UGH!
+        queryset = self.raw(
+            f'SELECT * FROM (SELECT DISTINCT ON (other_user) other_user, * FROM (SELECT CASE WHEN sender_id={me.pk} THEN receiver_id WHEN receiver_id={me.pk} THEN sender_id END AS other_user, * FROM accounts_message WHERE sender_id=1 OR receiver_id=1 GROUP BY other_user, id ORDER BY created_on DESC) as q1) as q2 ORDER BY created_on DESC'
+        )
+        return queryset
+
     def get_messages_between_users(self, me, other_user) -> 'MessageQuerySet':
         """grouped by date"""
         return self.filter(
             Q(sender=me, receiver=other_user) | Q(sender=other_user, receiver=me)
-        ).order_by("created_on")
-
-    def get_conversations_for_user(self, me):
-        conversations = self.filter(
-            Q(sender=me) | Q(receiver=me)
-        ).annotate(
-            other_user=Case(
-                When(
-                    sender=me,
-                    then=Concat(
-                        F('receiver__first_name'),
-                        Value(' '),
-                        F('receiver__last_name'),
-                    )
-                ),
-                When(
-                    receiver=me,
-                    then=Concat(
-                        F('sender__first_name'),
-                        Value(' '),
-                        F('sender__last_name'),
-                    ),
-                ),
-            )
-        ).distinct(
-            "other_user"
-        )
-
-        return conversations
+        ).select_related('sender', 'receiver', ).order_by("created_on")
 
     def as_message_type(self) -> list[MessageType]:
         """

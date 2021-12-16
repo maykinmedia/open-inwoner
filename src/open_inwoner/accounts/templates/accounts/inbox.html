@@ -11,7 +11,7 @@
 {% block sidebar_content %}
     {% render_list %}
         {% for conversation in conversations %}
-            {% list_item conversation.other_user conversation %}
+            {% list_item conversation.other_user conversation.created_on %}
         {% endfor %}
     {% endrender_list %}
 {% endblock %}

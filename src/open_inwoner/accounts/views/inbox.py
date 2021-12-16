@@ -92,7 +92,7 @@ class InboxView(LoginRequiredMixin, FormView):
         """
         try:
             return f"{_('Laatste bericht ontvangen op')} {formats.date_format(messages[-1]['sent_datetime'])}"
-        except KeyError:
+        except IndexError:
             return ''
 
     def get_initial(self):
