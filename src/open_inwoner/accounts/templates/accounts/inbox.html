@@ -8,9 +8,8 @@
     <div class="grid">
 
        <aside class="grid__sidebar">
-           {% for user in users %}
-               {{ user.email }}
-               <a href="?with={{ user.email }}">{{ user.get_full_name}}</a>
+           {% for user, message in conversations.items %}
+               <a href="?with={{ user.email }}">{{ user.get_full_name}}: {{ message.content }} </a>
            {% endfor %}
        </aside>
 

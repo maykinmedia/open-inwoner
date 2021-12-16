@@ -17,8 +17,7 @@ class InboxView(LoginRequiredMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
 
-        # fixme how to filter users ???
-        users = User.objects.exclude(id=self.request.user.id)
+        conversations = Message.objects.get_conversations_for_user(self.request.user)
 
         grouped_messages = {}
         message_user = None
@@ -30,7 +29,7 @@ class InboxView(LoginRequiredMixin, FormView):
             )
 
         message_context = {
-            "users": users,
+            "conversations": conversations,
             "message_user": message_user,
             "grouped_messages": grouped_messages,
         }
