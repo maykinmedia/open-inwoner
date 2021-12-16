@@ -28,7 +28,8 @@
 
                 {% render_form form_object=form method="POST" %}
                     {% csrf_token %}
-                    {% input form.message %}
+                    {{ form.receiver }}
+                    {% input form.content %}
                     {% form_actions primary_text="Verstuuren" primary_icon="arrow_forward" %}
 
                 {% endrender_form %}
