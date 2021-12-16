@@ -1,0 +1,25 @@
+{% extends 'master.html' %}
+{% load i18n %}
+
+{% block main_inner %}
+    <h1 class="h1">{% trans 'Mijn berichten' %}</h1>
+    {{ block.super }}
+
+    <div class="grid">
+
+       <aside class="grid__sidebar">
+           {% for user in users %}
+               {{ user.email }}
+               <a href="?with={{ user.email }}">{{ user.get_full_name}}</a>
+           {% endfor %}
+       </aside>
+
+        <div class="grid__main">
+            {% if message_user %}
+                {{ messages }}
+                {{ form }}
+            {% endif %}
+        </div>
+    </div>
+
+{% endblock %}

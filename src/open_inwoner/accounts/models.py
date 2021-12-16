@@ -14,6 +14,7 @@ from open_inwoner.utils.validators import validate_phone_number
 
 from .choices import ContactTypeChoices, LoginTypeChoices, StatusChoices
 from .managers import DigidManager, UserManager, eHerkenningManager
+from .query import MessageQuerySet
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -345,6 +346,8 @@ class Message(models.Model):
         default=False,
         help_text=_("Boolean shows if the message was seem by the receiver"),
     )
+
+    objects = MessageQuerySet.as_manager()
 
     def __str__(self):
         return f"From: {self.sender}, To: {self.receiver} ({self.created_on.date()})"
