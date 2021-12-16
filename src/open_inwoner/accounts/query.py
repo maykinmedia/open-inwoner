@@ -21,3 +21,29 @@ class MessageQuerySet(query.QuerySet):
             groups[create_date] = list(group)
 
         return groups
+
+    def get_conversations_for_user(self, me):
+        """returns dict {user: last_message}"""
+        # TODO refactor to be executed in DB
+        conversations = {}
+
+        sent_messages = self.filter(sender=me).order_by("receiver", "-created_on")
+        for user, group in groupby(sent_messages, lambda x: x.receiver):
+            conversations[user] = next(group)
+
+        received_messages = self.filter(receiver=me).order_by("sender", "-created_on")
+        for user, group in groupby(received_messages, lambda x: x.sender):
+            received_message = next(group)
+
+            if user not in conversations:
+                conversations[user] = received_message
+            else:
+                sent_message = conversations.get(user)
+                latest_message = (
+                    received_message
+                    if received_message.created_on >= sent_message.created_on
+                    else sent_message
+                )
+                conversations[user] = latest_message
+
+        return conversations
