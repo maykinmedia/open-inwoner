@@ -7,7 +7,7 @@ from typing import Any, TypedDict
 # https://github.com/MessageKit/MessageKit/blob/master/Documentation/QuickStart.md
 
 
-class Sender(TypedDict):
+class SenderType(TypedDict):
     sender_id: str
     display_name: str
 
@@ -16,8 +16,8 @@ class MessageKind(Enum):
     TEXT = 'text'
 
 
-class Message(TypedDict):
-    sender: Sender
+class MessageType(TypedDict):
+    sender: SenderType
     message_id: str
     sent_datetime: datetime
     kind: MessageKind

@@ -66,3 +66,13 @@ class DocumentFactory(factory.django.DjangoModelFactory):
     name = factory.Faker("first_name")
     file = SimpleUploadedFile("file.jpg", b"file_content", content_type="image/jpeg")
     owner = factory.SubFactory(UserFactory)
+
+
+class MessageFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = "accounts.Message"
+
+    sender = factory.SubFactory(UserFactory)
+    receiver = factory.SubFactory(UserFactory)
+    content = factory.Faker("text")
+    seen = False

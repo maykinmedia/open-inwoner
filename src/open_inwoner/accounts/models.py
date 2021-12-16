@@ -15,6 +15,7 @@ from open_inwoner.utils.validators import validate_phone_number
 from .choices import ContactTypeChoices, LoginTypeChoices, StatusChoices
 from .managers import DigidManager, UserManager, eHerkenningManager
 from .query import MessageQuerySet
+from ..components.types.messagetype import MessageType, MessageKind
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -351,3 +352,19 @@ class Message(models.Model):
 
     def __str__(self):
         return f"From: {self.sender}, To: {self.receiver} ({self.created_on.date()})"
+
+    def as_message_type(self) -> MessageType:
+        """
+        Returns message as MessageType.
+        """
+        return {
+            "sender": {
+                "sender_id": self.sender.pk,
+                "display_name": str(self.sender),
+            },
+            "message_id": self.pk,
+            "sent_datetime": self.created_on,
+            "kind": MessageKind.TEXT,
+            "data": self.content,
+        }
+

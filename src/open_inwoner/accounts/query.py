@@ -1,49 +1,52 @@
 from collections import OrderedDict
-from datetime import date
 from itertools import groupby
-from typing import Dict
-
-from django.db.models import Q, query
+from django.db.models import Case, When, F, Q, Value, query
+from django.db.models.functions import Concat
+from open_inwoner.components.types.messagetype import MessageType
 
 
 class MessageQuerySet(query.QuerySet):
-    def get_messages_between_users(self, me, other_user) -> Dict[date, list]:
+    def get_messages_between_users(self, me, other_user) -> 'MessageQuerySet':
         """grouped by date"""
-        messages = list(
-            self.filter(
-                Q(sender=me, receiver=other_user) | Q(sender=other_user, receiver=me)
-            ).order_by("created_on")
-        )
-
-        groups = OrderedDict()
-
-        for create_date, group in groupby(messages, lambda x: x.created_on.date()):
-            groups[create_date] = list(group)
-
-        return groups
+        return self.filter(
+            Q(sender=me, receiver=other_user) | Q(sender=other_user, receiver=me)
+        ).order_by("created_on")
 
     def get_conversations_for_user(self, me):
-        """returns dict {user: last_message}"""
-        # TODO refactor to be executed in DB
-        conversations = OrderedDict()
-
-        sent_messages = self.filter(sender=me).order_by("receiver", "-created_on")
-        for user, group in groupby(sent_messages, lambda x: x.receiver):
-            conversations[user] = next(group)
-
-        received_messages = self.filter(receiver=me).order_by("sender", "-created_on")
-        for user, group in groupby(received_messages, lambda x: x.sender):
-            received_message = next(group)
-
-            if user not in conversations:
-                conversations[user] = received_message
-            else:
-                sent_message = conversations.get(user)
-                latest_message = (
-                    received_message
-                    if received_message.created_on >= sent_message.created_on
-                    else sent_message
-                )
-                conversations[user] = latest_message
+        conversations = self.filter(
+            Q(sender=me) | Q(receiver=me)
+        ).annotate(
+            other_user=Case(
+                When(
+                    sender=me,
+                    then=Concat(
+                        F('receiver__first_name'),
+                        Value(' '),
+                        F('receiver__last_name'),
+                    )
+                ),
+                When(
+                    receiver=me,
+                    then=Concat(
+                        F('sender__first_name'),
+                        Value(' '),
+                        F('sender__last_name'),
+                    ),
+                ),
+            )
+        ).distinct(
+            "other_user"
+        )
 
         return conversations
+
+    def as_message_type(self) -> list[MessageType]:
+        """
+        Returns all messages as MessageType.
+        """
+        message_types = []
+        for message in self:
+            message_type = message.as_message_type()
+            message_types.append(message_type)
+
+        return message_types

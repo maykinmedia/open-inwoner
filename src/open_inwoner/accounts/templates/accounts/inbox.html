@@ -1,40 +1,34 @@
 {% extends 'master.html' %}
-{% load i18n form_tags  %}
+{% load i18n form_tags list_tags messages_tags %}
+
 
 {% block main_inner %}
     <h1 class="h1">{% trans 'Mijn berichten' %}</h1>
     {{ block.super }}
+{% endblock %}
 
-    <div class="grid">
 
-       <aside class="grid__sidebar">
-           {% for user, message in conversations.items %}
-               <a href="?with={{ user.email }}">{{ user.get_full_name}}: {{ message.content }} </a>
-           {% endfor %}
+{% block sidebar_content %}
+    {% render_list %}
+        {% for conversation in conversations %}
+            {% list_item conversation.other_user conversation %}
+        {% endfor %}
+    {% endrender_list %}
+{% endblock %}
 
-           {% include "components/Pagination/Pagination.html" %}
 
-       </aside>
+{% block content %}
+    {% if messages %}
+        {% messages messages request.user.pk message_user status %}
 
-        <div class="grid__main">
-            {% if message_user %}
-                {% for date, messages in grouped_messages.items %}
-                    <div>{{ date }}</div>
+        {% render_form form_object=form method="POST" %}
+            {% csrf_token %}
+            {% input form.message %}
+            {% form_actions primary_text=_("Versturen") primary_icon="arrow_forward" %}
 
-                    {% for message in messages %}
-                        {{ message.content }}
-                    {% endfor %}
-                {% endfor %}
+        {% endrender_form %}
 
-                {% render_form form_object=form method="POST" %}
-                    {% csrf_token %}
-                    {% input form.message %}
-                    {% form_actions primary_text="Verstuuren" primary_icon="arrow_forward" %}
-
-                {% endrender_form %}
-
-            {% endif %}
-        </div>
+    {% endif %}
     </div>
-
+    </div>
 {% endblock %}

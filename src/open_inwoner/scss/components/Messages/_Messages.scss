@@ -62,4 +62,8 @@
     display: flex;
     flex-direction: column;
   }
+
+  .message {
+    max-width: 50%;
+  }
 }

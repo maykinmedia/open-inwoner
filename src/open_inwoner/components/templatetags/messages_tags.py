@@ -5,14 +5,14 @@ from django import template
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
-from ..types.message import Message, MessageKind
+from ..types.messagetype import MessageType, MessageKind
 
 register = template.Library()
 
 
 @register.inclusion_tag('components/Messages/Messages.html')
-def messages(message_list: list[Message], my_sender_id: str, subject: str, status: str):
-    def get_dates(message_list: list[Message]) -> list[datetime.date]:
+def messages(message_list: list[MessageType], my_sender_id: str, subject: str, status: str):
+    def get_dates(message_list: list[MessageType]) -> list[datetime.date]:
         """
         Returns a list of dates to render message(s) for.
         """
@@ -68,7 +68,7 @@ def messages(message_list: list[Message], my_sender_id: str, subject: str, statu
 
 
 @register.inclusion_tag('components/Messages/Message.html')
-def message(message_dict: Message, ours: bool) -> dict:
+def message(message_dict: MessageType, ours: bool) -> dict:
     return {
         'ours': ours,
         'message': message_dict,
