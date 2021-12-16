@@ -25,7 +25,7 @@ class MessageQuerySet(query.QuerySet):
     def get_conversations_for_user(self, me):
         """returns dict {user: last_message}"""
         # TODO refactor to be executed in DB
-        conversations = {}
+        conversations = OrderedDict()
 
         sent_messages = self.filter(sender=me).order_by("receiver", "-created_on")
         for user, group in groupby(sent_messages, lambda x: x.receiver):

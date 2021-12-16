@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n form_tags %}
+{% load i18n form_tags  %}
 
 {% block main_inner %}
     <h1 class="h1">{% trans 'Mijn berichten' %}</h1>
@@ -11,6 +11,9 @@
            {% for user, message in conversations.items %}
                <a href="?with={{ user.email }}">{{ user.get_full_name}}: {{ message.content }} </a>
            {% endfor %}
+
+           {% include "components/Pagination/Pagination.html" %}
+
        </aside>
 
         <div class="grid__main">
