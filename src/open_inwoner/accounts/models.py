@@ -307,13 +307,3 @@ class Message(models.Model):
 
     def __str__(self):
         return f"From: {self.sender}, To: {self.receiver} ({self.created_on.date()})"
-
-    def get_date_text(self) -> str:
-        create_date = self.created_on.date()
-        if create_date == timezone.now().date():
-            return _("Vandaag")
-
-        if create_date == timezone.now().date() - timezone.timedelta(days=1):
-            return _("Gisteren")
-
-        return str(create_date)

@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n %}
+{% load i18n form_tags %}
 
 {% block main_inner %}
     <h1 class="h1">{% trans 'Mijn berichten' %}</h1>
@@ -16,8 +16,21 @@
 
         <div class="grid__main">
             {% if message_user %}
-                {{ messages }}
-                {{ form }}
+                {% for date, messages in grouped_messages.items %}
+                    <div>{{ date }}</div>
+
+                    {% for message in messages %}
+                        {{ message.content }}
+                    {% endfor %}
+                {% endfor %}
+
+                {% render_form form_object=form method="POST" %}
+                    {% csrf_token %}
+                    {% input form.message %}
+                    {% form_actions primary_text="Verstuuren" primary_icon="arrow_forward" %}
+
+                {% endrender_form %}
+
             {% endif %}
         </div>
     </div>

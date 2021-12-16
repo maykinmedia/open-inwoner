@@ -20,19 +20,19 @@ class InboxView(LoginRequiredMixin, FormView):
         # fixme how to filter users ???
         users = User.objects.exclude(id=self.request.user.id)
 
-        messages = []
+        grouped_messages = {}
         message_user = None
         message_user_email = self.request.GET.get("with")
         if message_user_email:
             message_user = get_object_or_404(User, email=message_user_email)
-            messages = Message.objects.get_messages_between_users(
+            grouped_messages = Message.objects.get_messages_between_users(
                 me=self.request.user, other_user=message_user
             )
 
         message_context = {
             "users": users,
             "message_user": message_user,
-            "messages": messages,
+            "grouped_messages": grouped_messages,
         }
 
         return {**context, **message_context}
