@@ -3,9 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
-from hijack.contrib.admin import HijackUserAdminMixin
-
-from .models import Action, Appointment, Contact, Document, User
+from .models import Action, Appointment, Contact, Document, Message, User
 
 
 @admin.register(User)
@@ -83,3 +81,9 @@ class DocumentAdmin(admin.ModelAdmin):
 class AppointmentAdmin(admin.ModelAdmin):
     list_display = ("name", "datetime", "created_on", "created_by")
     list_filter = ("created_by",)
+
+
+@admin.register(Message)
+class MessageAdmin(admin.ModelAdmin):
+    list_display = ("sender", "receiver", "created_on")
+    list_filter = ("sender", "receiver")
