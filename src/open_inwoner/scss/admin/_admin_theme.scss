@@ -1,23 +1,21 @@
-/* Colors */
-$color_primary: #79aec8;
-$color_primary_dark: #417690;
-$color_primary_light: #c4dce8;
+/*
+Generic admin styling overrides.
 
-$color_secondary: #f5dd5d;
-$color_secondary_dark: #f5dd5d;
-$color_secondary_light: #ffc;
-
-$color_link: #447e9b;
-$color_link_hover: #036;
-
-$color_darkest: #000;
-$color_dark: #333;
-$color_lightest: #fff;
+DO NOT PUT ANY TARGET APP-SPECIFIC RULES HERE.
+*/
+@import "./_vars";
 
 /* Overrides */
-a:link,
-a:visited {
-    color: $color_link;
+body {
+  overflow-y: scroll;
+
+  &.change-form {
+    line-height: 1.15;  // bootstrap reboot overrides this otherwise, which is pulled in by formio
+  }
+}
+
+a:link, a:visited {
+  color: $color_link;
 }
 a:focus,
 a:hover {
@@ -25,27 +23,25 @@ a:hover {
 }
 
 #header {
-    color: $color_secondary_light;
-    background: $color_primary_dark;
-    /* border-bottom: 8px solid $color_secondary; */
-    position: sticky;
-    top: 0;
-    z-index: 100000;
+  color: $color_secondary_light;
+  background: $color_primary;
+  /* border-bottom: 8px solid $color_secondary; */
+  position: sticky;
+  top: 0;
+  z-index: 100000;
 
-    a:link,
-    a:visited {
-        color: $color_lightest;
-    }
+  a:link, a:visited {
+    color: $color_lightest;
+  }
 }
 
 #user-tools a {
-    border-bottom: none;
-    text-decoration: underline;
+  border-bottom: none;
+  text-decoration: underline;
 
-    &:focus,
-    &:hover {
-        color: $color_primary;
-    }
+  &:focus, &:hover {
+    color: $color_darkest;
+  }
 }
 
 .module h2,
@@ -66,35 +62,50 @@ a:hover {
 }
 
 div.breadcrumbs {
-    background: $color_primary;
-    color: $color_primary_light;
-    position: sticky;
-    top: 60px;
-    z-index: 100000;
+  background: $color_secondary;
+  color: $color_primary;
+  position: sticky;
+  top: 60px;
+  z-index: 100000;
 
-    a {
-        color: $color_lightest;
+  a {
+    color: $color_dark;
 
-        &:focus,
-        &:hover {
-            color: $color_lightest;
-        }
+    &:focus, &:hover {
+      color: $color_darkest;
     }
 }
 
 /* Important is used because Django templates include their own style, after ours */
 #changelist-filter {
-    a:focus,
-    a:hover {
-        color: $color_link !important;
+   min-height: 100vh; /* hack to get changelist_view with search styled properly */
+  a:focus, a:hover {
+    color: $color_link !important;
+  }
+  li.selected a {
+    color: $color_link !important;
+    &:focus, &:hover {
+      color: $color_primary !important;
     }
-    li.selected a {
-        color: $color_link !important;
-        &:focus,
-        &:hover {
-            color: $color_primary !important;
-        }
-    }
+}
+
+/* hack to get changelist_view with search styled properly */
+#content {
+  #changelist {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 16px;
+  }
+
+  #toolbar,
+  .xfull {
+    grid-column: 1/ 3;
+  }
+}
+
+.form-row {
+  // Make sure the contrast is enough.
+  border-bottom-color: $color_secondary_dark;
 }
 
 .object-tools {
@@ -104,56 +115,35 @@ div.breadcrumbs {
     }
 }
 
-.button,
-input[type='submit'],
-input[type='button'],
-.submit-row input,
-a.button {
-    background: $color_primary;
-    color: $color_lightest;
-    /* border: 2px solid $color_dark; */
+.button, input[type=submit], input[type=button], .submit-row input, a.button {
+  background: $color_primary;
+  color: $color_lightest;
+  /* border: 2px solid $color_dark; */
 }
-.button:active,
-input[type='submit']:active,
-input[type='button']:active,
-.button:focus,
-input[type='submit']:focus,
-input[type='button']:focus,
-.button:hover,
-input[type='submit']:hover,
-input[type='button']:hover {
-    background: $color_primary_dark;
+.button:active, input[type=submit]:active, input[type=button]:active, .button:focus, input[type=submit]:focus, input[type=button]:focus, .utton:hover, input[type=submit]:hover, input[type=button]:hover {
+  background: $color_primary_dark;
 }
-.button.default,
-input[type='submit'].default,
-.submit-row input.default {
-    background: $color_primary_dark;
+.button.default, input[type=submit].default, .submit-row input.default {
+  background: $color_primary_dark;
 }
-.button.default:active,
-input[type='submit'].default:active,
-.button.default:focus,
-input[type='submit'].default:focus,
-.button.default:hover,
-input[type='submit'].default:hover {
-    background: $color_darkest;
+.button.default:active, input[type=submit].default:active, .button.default:focus, input[type=submit].default:focus, .button.efault:hover, input[type=submit].default:hover {
+  background: $color_darkest;
 }
 
 .delete-confirmation {
-    form {
-        input[type='submit'] {
-        }
-        .cancel-link {
-            background: $color_primary_light;
-            color: $color_lightest;
-            &:active,
-            &:focus,
-            &:hover {
-                background: $color_dark;
-            }
-        }
+  form {
+    input[type=submit] {
+    }
+    .cancel-link {
+      background: $color_primary_light;
+      color: $color_lightest;
+      &:active, &:focus, &:hover {
+        background: $color_dark;
+      }
     }
 }
 
+/* Many to many selector */
 .selector-chosen h2 {
     background: $color_primary !important;
 }
@@ -203,25 +193,113 @@ input[type='submit'].default:hover {
     font-weight: bold !important;
 }
 
+/* Icons */
+.addlink {
+  background: url('../img/admin/plus-square-regular.svg') 0 0/14px 14px no-repeat;
+}
+.changelink, .inlinechangelink {
+  background: url('../img/admin/edit-regular.svg') 0 0/14px 14px no-repeat;
+}
+.deletelink {
+  background: url('../img/admin/trash-alt-regular.svg') 0 0/14px 14px no-repeat;
+}
+.datetimeshortcuts .clock-icon {
+  background: url('../img/admin/clock-regular.svg') 0 0/14px 14px no-repeat !important;
+}
+.datetimeshortcuts .date-icon {
+  background: url('../img/admin/calendar-alt-regular.svg') 0 0/14px 14px no-repeat !important;
+}
+
+/* Footer */
+.login .version {
+  text-align: center;
+}
 .version {
-    font-size: $typography-font-size-text-small;
+  color: $color_secondary_dark;
+  font-size: smaller;
 }
 
-#content {
-    #changelist {
-        display: grid;
-        grid-template-columns: 1fr 360px;
-        gap: 32px;
-    }
-
-    #toolbar,
-    .xfull {
-        grid-column: 1/ 3;
-    }
+/**
+ * Environment banner
+ */
+.env {
+  display: block;
+  line-height: 35px;
+  text-align: center;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: $color_secondary;
+  background-color: $color_dark;
+  position: fixed;
+  top: 0;
+  height: 35px;
+  width: 300px;
+  left: 50%;
+  margin-left: -150px;
+  z-index: 1000001;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.2);
 }
 
-/* import-export override */
-/* Used for not displaying the traceback(we display only the message to the user) when headers are missing from import */
-.traceback {
-    display: none;
+/**
+ * Django form field lengths
+ */
+.change-form {
+  .vTextField {
+    width: $input-field-size;
+  }
+}
+
+/**
+ * Branding
+ */
+#branding h1 {
+  a:link, a:visited {
+    font-weight: bold;
+  }
+}
+
+
+/**
+ * Help text mouseover
+ */
+div.help:hover {
+  text-indent: inherit;
+  width: auto;
+  background-image: none;
+  background-color: $color-tooltip-background;
+  border: 1px solid $color-tooltip-border;
+  color: $color-tooltip-text;;
+  padding: 5px 5px 3px 5px !important;
+  max-width: 300px;
+  height: auto !important;
+  z-index: 10;
+}
+
+div.help {
+  cursor: help;
+  width: 16px;
+  height: 16px;
+  background-image: url(../admin/img/icon-unknown.svg);
+  display: inline-block;
+  background-repeat: no-repeat;
+  background-size: 14px;
+  margin-left: 2px !important;
+  position: absolute;
+  text-indent: -9999px;
+}
+
+/* Overrides default Django CSS */
+.aligned label + p, .aligned label + div.readonly {
+  display: inline-block;
+  margin-left: inherit !important;
+}
+.aligned label + div.help {
+  margin-left: 2px !important;
+}
+
+/* Additional components seem to need the same behaviour */
+/* TODO: TinyMCE is different... */
+.aligned label + ul {
+  display: inline-block;
+  margin-left: inherit !important;
 }
