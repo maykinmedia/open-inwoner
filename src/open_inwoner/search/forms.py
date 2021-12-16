@@ -1,4 +1,5 @@
 from django import forms
+from django.forms import widgets
 from django.forms.widgets import Textarea
 from django.utils.translation import ugettext_lazy as _
 
@@ -27,6 +28,13 @@ class SearchForm(forms.Form):
 
 
 class FeedbackForm(forms.ModelForm):
+    query_params = forms.CharField(
+        max_length=255, required=True, label="", widget=forms.HiddenInput()
+    )
+    query_url = forms.CharField(
+        max_length=255, required=True, label="", widget=forms.HiddenInput()
+    )
+
     class Meta:
         model = Feedback
         fields = ("positive", "remark")

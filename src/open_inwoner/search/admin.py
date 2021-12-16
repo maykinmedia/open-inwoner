@@ -41,6 +41,6 @@ class SynonymAdmin(ImportExportMixin, admin.ModelAdmin, DynamicArrayMixin):
 
 @admin.register(Feedback)
 class FeedbackAdmin(admin.ModelAdmin):
-    list_display = ("pk", "search_query", "positive", "remark", "created_on")
+    list_display = ("search_query", "positive", "remark", "created_on")
     list_filter = ("positive",)
     ordering = ("created_on",)

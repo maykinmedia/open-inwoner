@@ -92,7 +92,12 @@ class SearchView(PaginationMixin, FormView):
         if self.request.POST:
             form = FeedbackForm(data=self.request.POST)
         else:
-            form = FeedbackForm()
+            form = FeedbackForm(
+                initial={
+                    "query_params": self.request.GET.get("query"),
+                    "query_url": self.request.get_full_path(),
+                }
+            )
         return form
 
     def post(self, request, *args, **kwargs):
@@ -103,7 +108,11 @@ class SearchView(PaginationMixin, FormView):
             return self.form_invalid(form)
 
     def form_valid(self, form):
+        print(self.request.GET)
         if self.request.user.is_authenticated:
             form.instance.searched_by = self.request.user
+
+        form.instance.search_query = self.request.POST.get("query_params")
+        form.instance.search_url = self.request.POST.get("query_url")
         form.save()
         return HttpResponseRedirect(self.get_success_url())
