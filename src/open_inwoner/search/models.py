@@ -71,3 +71,6 @@ class Feedback(models.Model):
 
     def __str__(self):
         return self.search_query
+
+    def get_absolute_url(self):
+        return self.search_url

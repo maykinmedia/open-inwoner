@@ -1,6 +1,7 @@
 from django.core.paginator import InvalidPage, Paginator
 from django.http import Http404
 from django.utils.translation import gettext as _
+
 from django.http.response import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views.generic import FormView
@@ -107,12 +108,17 @@ class SearchView(PaginationMixin, FormView):
         else:
             return self.form_invalid(form)
 
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(feedback_form=form))
+
     def form_valid(self, form):
-        print(self.request.GET)
         if self.request.user.is_authenticated:
             form.instance.searched_by = self.request.user
+        http_referer = self.request.get_full_path()
 
-        form.instance.search_query = self.request.POST.get("query_params")
-        form.instance.search_url = self.request.POST.get("query_url")
+        form.instance.search_url = http_referer
+        form.instance.search_query = "| ".join(
+            [f"{key}: {value}" for key, value in self.request.GET.items()]
+        )
         form.save()
-        return HttpResponseRedirect(self.get_success_url())
+        return HttpResponseRedirect(http_referer)
