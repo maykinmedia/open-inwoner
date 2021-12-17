@@ -34,8 +34,9 @@ class Feedback(models.Model):
         max_length=250,
         help_text=_("Words which are used by the user in the search box"),
     )
-    search_url = models.URLField(
+    search_url = models.CharField(
         verbose_name=_("search url"),
+        max_length=250,
         blank=True,
         default="",
         help_text=_("The generated url of user's search"),

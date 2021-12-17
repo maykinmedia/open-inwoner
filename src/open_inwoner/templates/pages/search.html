@@ -57,20 +57,22 @@
 
             {% include "components/Pagination/Pagination.html" %}
 
-            <aside class="feedback">
-                <h4 class="h4">Feedback</h4>
-                <p class="p">Heeft u gevonden wat u zocht?</p>
-                {% render_form form_object=feedback_form method="POST" form_action=request.get_full_path %}
-                    {% csrf_token %}
-                    {{ feedback_form.errors }}
-                    {% input feedback_form.remark %}
-                    {% form_actions primary_text="Zoeken" %}
-                {% endrender_form %}
-            </aside>
         </div>
     </div>
 
     {% endif %}
 
     {% endrender_form %}
+    <aside class="feedback">
+        <h4 class="h4">Feedback</h4>
+        <p class="p">Heeft u gevonden wat u zocht?</p>
+        {% render_form form_object=feedback_form method="POST" form_action=request.get_full_path %}
+            {% csrf_token %}
+            {{ feedback_form.errors }}
+            <input type="checkbox" name="positive"/>
+            <input type="checkbox"/>
+            {% input feedback_form.remark %}
+            {% form_actions primary_text="Feedback versturen" %}
+        {% endrender_form %}
+    </aside>
 {% endblock main_inner %}

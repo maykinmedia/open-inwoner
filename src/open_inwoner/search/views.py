@@ -1,9 +1,8 @@
 from django.core.paginator import InvalidPage, Paginator
 from django.http import Http404
-from django.utils.translation import gettext as _
-
 from django.http.response import HttpResponseRedirect
 from django.urls import reverse_lazy
+from django.utils.translation import gettext as _
 from django.views.generic import FormView
 
 from open_inwoner.utils.mixins import PaginationMixin
@@ -25,7 +24,7 @@ class SearchView(PaginationMixin, FormView):
         if form.is_valid():
             return self.search(form)
         else:
-            context = super().get_context_data(form=form)
+            context = self.get_context_data(form=form)
             return self.render_to_response(context)
 
     def get_form_kwargs(self):
@@ -40,7 +39,7 @@ class SearchView(PaginationMixin, FormView):
     def search(self, form):
         data = form.cleaned_data.copy()
         query = data.pop("query")
-        context = super().get_context_data(form=form)
+        context = self.get_context_data(form=form)
 
         if not query:
             return self.render_to_response(context)
@@ -115,10 +114,11 @@ class SearchView(PaginationMixin, FormView):
         if self.request.user.is_authenticated:
             form.instance.searched_by = self.request.user
         http_referer = self.request.get_full_path()
+        search_data = dict(self.request.GET)
 
         form.instance.search_url = http_referer
-        form.instance.search_query = "| ".join(
-            [f"{key}: {value}" for key, value in self.request.GET.items()]
+        form.instance.search_query = " | ".join(
+            [f"{key}: {', '.join(value)}" for key, value in search_data.items()]
         )
         form.save()
         return HttpResponseRedirect(http_referer)
