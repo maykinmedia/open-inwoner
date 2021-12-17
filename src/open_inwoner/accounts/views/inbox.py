@@ -1,4 +1,5 @@
 from typing import Optional
+from urllib.parse import unquote
 
 from django import forms
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -12,6 +13,7 @@ from furl import furl
 
 from ..models import Message, User
 from ..query import MessageQuerySet
+from ...components.templatetags.paginator_tags import get_paginator_dict
 from ...components.types.messagetype import MessageType
 
 
@@ -44,7 +46,7 @@ class InboxView(LoginRequiredMixin, FormView):
         context = super().get_context_data()
 
         conversations = self.get_conversations()
-        other_user = self.get_other_user()
+        other_user = self.get_other_user(conversations)
         messages = self.get_messages(other_user)
         status = self.get_status(messages)
 
@@ -59,20 +61,25 @@ class InboxView(LoginRequiredMixin, FormView):
 
         return context
 
-    def get_conversations(self) -> MessageQuerySet:
+    def get_conversations(self) -> dict:
         """
         Returns the conversations with other users (used to navigate between conversations).
         """
-        return Message.objects.get_conversations_for_user(self.request.user)
+        conversations = Message.objects.get_conversations_for_user(self.request.user)
+        paginator = get_paginator_dict(self.request, conversations, 10)
+        return paginator
 
-    def get_other_user(self) -> Optional[User]:
+    def get_other_user(self, conversations: dict) -> Optional[User]:
         """
         Return the User instance of the "other user" in the conversation (if any).
         """
-        other_user_email = self.request.GET.get("with")
+        other_user_email = unquote(self.request.GET.get("with", ""))
 
         if not other_user_email:
-            return
+            try:
+                other_user_email = conversations["page_obj"].object_list[0].other_user_email
+            except (AttributeError, IndexError, KeyError):
+                return
 
         return get_object_or_404(User, email=other_user_email)
 
@@ -84,7 +91,7 @@ class InboxView(LoginRequiredMixin, FormView):
             return []
         return Message.objects.get_messages_between_users(
             me=self.request.user, other_user=other_user
-        ).as_message_type()[:100]  # Last 100 for now.
+        ).as_message_type()
 
     def get_status(self, messages: list[MessageType]) -> str:
         """
@@ -98,7 +105,7 @@ class InboxView(LoginRequiredMixin, FormView):
     def get_initial(self):
         initial = super().get_initial()
 
-        message_user_email = self.request.GET.get("with")
+        message_user_email = unquote(self.request.GET.get("with", ""))
         if message_user_email:
             initial["receiver"] = message_user_email
 

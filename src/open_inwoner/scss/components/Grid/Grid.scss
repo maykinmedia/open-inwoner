@@ -3,6 +3,7 @@
   flex-direction: column;
   grid-gap: var(--gutter-width);
   width: 100%;
+  position: relative;
 
   &--limit &__sidebar,
   &--limit &__main {
@@ -23,6 +24,9 @@
 
   & > #{&}__sidebar {
     grid-column-end: span 3;
+    overflow: hidden;
+    position: sticky;
+    top: 0;
   }
 
   & > #{&}__sidebar:empty {

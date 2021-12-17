@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n form_tags list_tags messages_tags %}
+{% load i18n form_tags link_tags list_tags messages_tags paginator_tags %}
 
 
 {% block main_inner %}
@@ -10,16 +10,25 @@
 
 {% block sidebar_content %}
     {% render_list %}
-        {% for conversation in conversations %}
-            {% list_item conversation.other_user conversation.created_on %}
+        {% for conversation in conversations.page_obj.object_list %}
+            {% get_query_string 'with={}&page={}' conversation.other_user_email conversations.page_obj.number as href %}
+            {% firstof conversation.other_user_first_name|add:' '|add:conversation.other_user_last_name as other_user_fullname %}
+
+            {% if other_user.email == conversation.other_user_email %}
+                {% list_item other_user_fullname conversation.content href active=True %}
+            {% else %}
+                {% list_item other_user_fullname conversation.content href %}
+            {% endif %}
         {% endfor %}
     {% endrender_list %}
+
+    {% paginator conversations %}
 {% endblock %}
 
 
 {% block content %}
     {% if messages %}
-        {% messages messages request.user.pk message_user status %}
+        {% messages messages request.user.pk other_user status %}
 
         {% render_form form_object=form method="POST" %}
             {% csrf_token %}
@@ -28,6 +37,5 @@
             {% form_actions primary_text=_("Versturen") primary_icon="arrow_forward" %}
 
         {% endrender_form %}
-
     {% endif %}
 {% endblock %}

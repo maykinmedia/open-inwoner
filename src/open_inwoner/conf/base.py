@@ -105,7 +105,7 @@ INSTALLED_APPS = [
     "two_factor",
     # Optional applications.
     "ordered_model",
-    "django_admin_index",
+    # "django_admin_index",
     "django.contrib.admin",
     "django.contrib.gis",
     # 'django.contrib.admindocs',

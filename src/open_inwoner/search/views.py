@@ -54,7 +54,7 @@ class SearchView(FormView):
 
         context.update(
             {
-                "paginator": paginator,
+                "get_paginator_dict": paginator,
                 "page_obj": page,
                 "is_paginated": is_paginated,
                 "results": results,

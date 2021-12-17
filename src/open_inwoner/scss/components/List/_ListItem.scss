@@ -1,0 +1,23 @@
+.list-item {
+  border-top: 1px solid var(--color-gray-lightest);
+  border-bottom: 1px solid var(--color-gray-lightest);
+  flex-basis: 100%;
+  padding: var(--spacing-large) 0;
+
+  .p--muted {
+    margin-top: 0!important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &:focus-within,
+  &--active {
+    background-color: var(--color-gray-lightest);
+  }
+
+  & + & {
+    border-top: none;
+  }
+}
+

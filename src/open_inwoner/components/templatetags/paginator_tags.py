@@ -4,8 +4,15 @@ from django.core.paginator import Paginator
 register = template.Library()
 
 
-@register.inclusion_tag('components/Paginator/Paginator.html', takes_context=True)
-def paginator(context, object_list, per_page, current_page=None, lookaround=1):
+@register.inclusion_tag('components/Paginator/Paginator.html')
+def paginator(paginator_context):
+    """
+    paginator_context: dict | Return value from get_paginator_dict.
+    """
+    return paginator_context
+
+
+def get_paginator_dict(request, object_list, per_page, current_page=None, lookaround=1):
     """
     object_list: list | The items to paginate.
     per_page: int | Items per page.
@@ -16,8 +23,7 @@ def paginator(context, object_list, per_page, current_page=None, lookaround=1):
     # The current page (Optional, defaults to request.GET[page]).
     if not current_page:
         try:
-            request = context['request']
-            current_page = int(request.GET.get('page', 1))
+            current_page = int(request.GET.get('page', '1'))
         except AttributeError:
             pass
 
@@ -39,11 +45,11 @@ def paginator(context, object_list, per_page, current_page=None, lookaround=1):
         if (1 < current_page - lookaround + i < p.num_pages)
     ]
 
-
     return {
+        'is_paginated': len(object_list) <= per_page,
+        'object_list': object_list,
         'page_numbers': page_numbers,
-        'is_paginated': True,
-        'object_list': len(object_list) <= per_page,
-        'paginator': p,
         'page_obj': page,
+        'paginator': p,
+        'request': request,
     }

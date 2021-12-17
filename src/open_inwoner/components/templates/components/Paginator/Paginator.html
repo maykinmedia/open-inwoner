@@ -7,19 +7,21 @@
             {% firstof page_obj.previous_page_number|capfirst as previous_page_number %} {# Create string from int. #}
 
             <li class="paginator__list-item paginator__list-item--previous">
-                {% link '?page='|add:previous_page_number hide_text=True text=_('Vorige pagina') extra_classes='button' icon='chevron_left' %}
+                {% get_query_string 'page='|add:previous_page_number as href_prev %}
+                {% link href_prev hide_text=True text=_('Vorige pagina') extra_classes='button' icon='chevron_left' %}
             </li>
         {% endif %}
 
 
         {# First page.#}
+        {% get_query_string 'page=1' as href_first %}
         {% if page_obj.number == 1 %}
             <li class="paginator__list-item paginator__list-item--page-number paginator__list-item--active">
-                {% link '?page=1' text=1 extra_classes='button button--primary' %}
+                {% link href_first text=1 extra_classes='button button--primary' %}
             </li>
         {% else %}
             <li class="paginator__list-item paginator__list-item--page-number">
-                {% link '?page=1' text=1 extra_classes='button' %}
+                {% link href_first text=1 extra_classes='button' %}
             </li>
 
         {% endif %}
@@ -35,13 +37,14 @@
         {% for p in page_numbers %}
             {% firstof p|capfirst as page_number %} {# Create string from int. #}
 
+            {% get_query_string 'page='|add:page_number as href_p %}
             {% if page_obj.number == p %}
                 <li class="paginator__list-item paginator__list-item--page-number paginator__list-item--active">
-                    {% link '?page='|add:page_number text=page_number extra_classes='button button--primary' %}
+                    {% link href_p text=page_number extra_classes='button button--primary' %}
                 </li>
             {% else %}
                 <li class="paginator__list-item paginator__list-item--page-number">
-                    {% link '?page='|add:page_number text=page_number extra_classes='button' %}
+                    {% link href_p text=page_number extra_classes='button' %}
                 </li>
             {% endif %}
         {% endfor %}
@@ -57,13 +60,14 @@
 
 
         {# Last page.#}
+        {% get_query_string 'page='|add:last_page_number as href_last %}
         {% if page_obj.number == paginator.num_pages %}
             <li class="paginator__list-item paginator__list-item--page-number paginator__list-item--active">
-                {% link '?page='|add:last_page_number text=last_page_number extra_classes='button button--primary' %}
+                {% link href_last text=last_page_number extra_classes='button button--primary' %}
             </li>
         {% else %}
             <li class="paginator__list-item paginator__list-item--page-number">
-                {% link '?page='|add:last_page_number text=last_page_number extra_classes='button' %}
+                {% link href_last text=last_page_number extra_classes='button' %}
             </li>
         {% endif %}
 
@@ -71,9 +75,9 @@
         {# Next. #}
         {% if page_obj.has_next %}
             {% firstof page_obj.next_page_number|capfirst as next_page_number %}  {# Create string from int. #}
-
+            {% get_query_string 'page='|add:next_page_number as href_next %}
             <li class="paginator__list-item paginator__list-item--next">
-                {% link '?page='|add:next_page_number hide_text=True text=_('Volgende pagina') extra_classes='button' icon='chevron_right' %}
+                {% link href_next hide_text=True text=_('Volgende pagina') extra_classes='button' icon='chevron_right' %}
             </li>
         {% endif %}
     </ul>
