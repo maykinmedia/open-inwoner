@@ -17,9 +17,9 @@
                 {% firstof conversation.other_user_first_name|add:' '|add:conversation.other_user_last_name as other_user_fullname %}
 
                 {% if other_user.email == conversation.other_user_email %}
-                    {% list_item other_user_fullname conversation.content|truncatechars:25 href active=True %}
+                    {% list_item other_user_fullname|truncatechars:25 conversation.content|truncatechars:25 href active=True %}
                 {% else %}
-                    {% list_item other_user_fullname conversation.content|truncatechars:25 href %}
+                    {% list_item other_user_fullname|truncatechars:25 conversation.content|truncatechars:25 href %}
                 {% endif %}
             {% endfor %}
         {% endrender_list %}
