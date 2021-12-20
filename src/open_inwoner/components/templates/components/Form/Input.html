@@ -2,7 +2,7 @@
 
 <div class="form__control">
     <label class="label">
-        {{ field.label }}
+        {% if not no_label %}{{ field.label }}{% endif %}
         {{ field|addclass:"input" }}
         {% if field.help_text %}
             <p class="p">{{ field.help_text }}</p>

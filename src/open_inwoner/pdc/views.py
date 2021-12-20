@@ -12,8 +12,15 @@ class HomeView(TemplateView):
     template_name = "pages/home.html"
 
     def get_context_data(self, **kwargs):
-        kwargs.update(categories=Category.get_root_nodes()[:4])
+        limit = 3 if self.request.user.is_authenticated else 4
+        kwargs.update(categories=Category.get_root_nodes()[:limit])
         return super().get_context_data(**kwargs)
+
+    def get_template_names(self):
+        if self.request.user.is_authenticated:
+            return ["pages/user-home.html"]
+        else:
+            return [self.template_name]
 
 
 class CategoryListView(ListBreadcrumbMixin, ListView):

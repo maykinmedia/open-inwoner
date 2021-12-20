@@ -1,5 +1,5 @@
 {% load link_tags button_tags %}
-<div class="form__actions">
-    {% if secondary_text %}{% link secondary_href secondary=True text=secondary_text icon='arrow_forward' %}{% endif %}
-    {% button text=primary_text icon=primary_icon primary=True type="submit" icon_position="after" %}
+<div class="form__actions {% if single %}form__actions--single{% endif %}">
+    {% if secondary_text %}{% link secondary_href secondary=True text=secondary_text icon=secondary_icon icon_position=secondary_icon_position %}{% endif %}
+    {% button text=primary_text icon=primary_icon primary=primary type="submit" icon_position="after" transparent=transparent %}
 </div>

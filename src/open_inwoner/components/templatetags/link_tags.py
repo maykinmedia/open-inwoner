@@ -9,20 +9,30 @@ def link(href, **kwargs):
     """
     href: url | where the link links to (can be url name).
 
-    bold: bool | whether the link should be bold.
-    download: bool | whether the link should be downloaded instead of linked to. (Optional)
-    extra_classes: string | additional CSS classes.
-    icon: string | the icon that you want to display. (Optional)
-    icon_position: "before" or "after" | where the icon should be positioned to the text. (Optional)
-    primary: bool | if the primary colors should be used. (Optional)
-    reverse_kwargs: dict | if href is an url name, kwargs for reverse can be passed (Optional).
-    secondary: bool | if the secondary colors should be used. (Optional)
-    social_icon: string | the social icon that you want to display. (Optional)
-    text: string | this will be the link text. (Optional)
+    bold: bool | whether the link should be bold. (Optional)
+    uuid: str | if href is an url name, kwargs for reverse can be passed (Optional).
+    download: bool | If the linked file should be downoaded. (Optional)
+    extra_classes: string | Extra classes (Optional)
+    active: bool | If the link is active (Optional)
+    align: "left" or "right" | What the text align should be (Optional)
+    icon_position: "before" or "after" | If the icon is before or after the text (Optional)
+    primary: bool | If the primary styling should be used (Optional)
+    secondary: bool | If the secondary styling should be used (Optional)
+    src: string | The source of the image (Optional)
+    social_icon: string | The icon that should be displayed from font-awesome (Optional)
+    icon: string | The icon that should be displayed (Optional)
+    text: string | The text that should be displayed in the link (Optional)
     type: string | the type of button that should be used. (Optional)
+    data_text: string | data-text (Optional)
+    data_alt_text: string | data-alt-text (Optional)
+    data_icon: string | data-icon (Optional)
+    data_alt_icon: string | data-alt-icon (Optional)
     """
     try:
-        reverse_kwargs = kwargs.get("reverse_kwargs")
+        uuid = kwargs.get("uuid")
+        reverse_kwargs = {}
+        if uuid:
+            reverse_kwargs.update(uuid=uuid)
         href = reverse(href, kwargs=reverse_kwargs)
     except NoReverseMatch:
         pass

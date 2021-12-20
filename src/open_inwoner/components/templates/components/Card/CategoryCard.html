@@ -1,9 +1,9 @@
-{% load card_tags %}
+{% load card_tags icon_tags %}
 {% render_card title=title %}
     {% for product in products %}
         {% url 'pdc:product_detail' slug=product.slug as product_url %}
         <a class="link button--icon-after link--secondary" href="{{ product_url }}">
-            <span class="material-icons">arrow_forward</span>
+            {% icon icon="arrow_forward" %}
             {{ product.name }}
         </a>
     {% endfor %}

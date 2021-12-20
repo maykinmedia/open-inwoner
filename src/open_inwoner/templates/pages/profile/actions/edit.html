@@ -1,0 +1,11 @@
+{% extends 'master.html' %}
+{% load i18n form_tags %}
+
+
+{% block content %}
+<h1 class="h1">
+    {% trans "Creeer actie" %}
+</h1>
+
+{% form form_object=form method="POST" submit_text=_("Opslaan") secondary_href='accounts:action_list' secondary_text=_('Terug') secondary_icon='arrow_backward' secondary_icon_position="before" %}
+{% endblock content %}

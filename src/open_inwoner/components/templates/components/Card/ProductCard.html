@@ -1,9 +1,9 @@
-{% load card_tags %}
+{% load card_tags icon_tags %}
 {% render_card %}
     <h3 class="h3">{{ title }}</h3>
     <p class="p">{{ description }}</p>
     {# todo: replace with link tag. #}
     <a class="button button--icon-before button--transparent" href="{{ href }}">
-        <span class="material-icons">arrow_forward</span>
+        {% icon icon="arrow_forward" %}
     </a>
 {% endrender_card %}

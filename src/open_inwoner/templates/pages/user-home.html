@@ -1,0 +1,45 @@
+{% extends 'master.html' %}
+{% load i18n button_tags card_tags utils message_tags icon_tags %}
+
+
+{% block content %}
+<h1 class="h1">Welkom {{ request.user.get_full_name }}</h1>
+<p class="p">Nullam quis risus eget urna mollis ornare vel eu leo. Etiam porta sem malesuada magna mollis euismod.</p>
+
+{% message type="warning" inline=True title="Vergeet niet om je verzoek tot kwijtschelding op te sturen" message="Je verzoek met bewijs hebben wij voor 30 september nodig om het kwijtschelden van je gemeentelijke belastingen te kunnen behandelen." action="#" action_text="Verzoek opsturen" %}
+
+<h2 class="h2 h2--extra">
+    Samenwerken
+    {% button href="#" text=_("Naar samenwerken") icon="arrow_forward" icon_position="after" %}
+</h2>
+
+<div class="card-container card-container--columns-3">
+    {% render_card %}
+        <h3 class="h3">{% trans "Verder aan mijn plan" %}</h3>
+        <p class="p">{% trans "Vestibulum id ligula porta felis euismod semper." %}</p>
+        <a class="button button--icon-before button--transparent button--secondary" href="#">
+            {% icon icon="arrow_forward" %}
+        </a>
+    {% endrender_card %}
+    {% render_card %}
+        <h3 class="h3">{% trans "Verder aan mijn plan" %}</h3>
+        <p class="p">{% trans "Vestibulum id ligula porta felis euismod semper." %}</p>
+        <a class="button button--icon-before button--transparent button--secondary" href="#">
+            {% icon icon="arrow_forward" %}
+        </a>
+        {% endrender_card %}
+        {% render_card %}
+        <h3 class="h3">{% trans "Verder aan mijn plan" %}</h3>
+        <p class="p">{% trans "Vestibulum id ligula porta felis euismod semper." %}</p>
+        <a class="button button--icon-before button--transparent button--secondary" href="#">
+            {% icon icon="arrow_forward" %}
+        </a>
+    {% endrender_card %}
+</div>
+
+<h2 class="h2 h2--extra">
+    Thema&apos;s
+    {% button href="pdc:category_list" text=_("Alle thema's") icon="arrow_forward" icon_position="after" %}
+</h2>
+{% card_container categories=categories columns=3 %}
+{% endblock %}

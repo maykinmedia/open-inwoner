@@ -2,6 +2,7 @@ from django.conf import settings as django_settings
 
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.pdc.models import Category
+from open_inwoner.search.forms import SearchForm
 
 
 def settings(request):
@@ -30,6 +31,7 @@ def settings(request):
         "login_allow_registration": config.login_allow_registration,
         "login_text": config.login_text,
         "menu_categories": Category.get_root_nodes(),
+        "search_form": SearchForm(),
         "settings": dict(
             [(k, getattr(django_settings, k, None)) for k in public_settings]
         ),

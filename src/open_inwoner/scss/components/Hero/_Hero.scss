@@ -1,15 +1,15 @@
 .hero {
-  width: 100%;
-  height: 100px;
-
-  &__image {
-    height: 300px;
     width: 100%;
-    object-fit: cover;
-    object-position: center;
-  }
+    height: 100px;
+
+    &__image {
+        height: 300px;
+        width: 100%;
+        object-fit: cover;
+        object-position: center;
+    }
 }
 
 .header + .hero {
-  margin-top: calc(-1 * var(--row-height));
+    margin-top: calc(-1 * var(--row-height));
 }

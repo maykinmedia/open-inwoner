@@ -6,12 +6,13 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
+from djchoices import choices
 from localflavor.nl.models import NLBSNField, NLZipCodeField
 from privates.storages import PrivateMediaFileSystemStorage
 
 from open_inwoner.utils.validators import validate_phone_number
 
-from .choices import LoginTypeChoices
+from .choices import ContactTypeChoices, LoginTypeChoices, StatusChioces
 from .managers import DigidManager, UserManager, eHerkenningManager
 
 
@@ -62,6 +63,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         default=False,
         help_text=_("Indicates if fields have been prepopulated by Haal Central API."),
     )
+    selected_themes = models.ManyToManyField(
+        "pdc.Category",
+        related_name="selected_by",
+    )
 
     objects = UserManager()
     digid_objects = DigidManager()
@@ -101,6 +106,11 @@ class User(AbstractBaseUser, PermissionsMixin):
             return age
         return None
 
+    def get_address(self):
+        if self.street:
+            return f"{self.street} {self.housenumber}, {self.city}"
+        return ""
+
 
 class Contact(models.Model):
     uuid = models.UUIDField(
@@ -137,6 +147,13 @@ class Contact(models.Model):
             "The phonenumber of the contact person. This field can be left empty."
         ),
     )
+    type = models.CharField(
+        verbose_name=_("Type"),
+        default=ContactTypeChoices.contact,
+        max_length=200,
+        choices=ContactTypeChoices.choices,
+        help_text=_("The type of contact"),
+    )
     created_on = models.DateTimeField(
         verbose_name=_("Created on"),
         auto_now_add=True,
@@ -159,7 +176,13 @@ class Contact(models.Model):
         help_text=_("This is the person that entered the contact person."),
     )
 
+    class Meta:
+        ordering = ("-updated_on", "-created_on")
+
     def __str__(self):
+        return self.get_name()
+
+    def get_name(self):
         return f"{self.first_name} {self.last_name}"
 
 
@@ -253,7 +276,14 @@ class Action(models.Model):
         verbose_name=_("Name"),
         default="",
         max_length=250,
-        help_text=("The name of the action"),
+        help_text=_("The name of the action"),
+    )
+    status = models.CharField(
+        verbose_name=_("Status"),
+        default=StatusChioces.open,
+        max_length=200,
+        choices=StatusChioces.choices,
+        help_text=_("The current status of the action"),
     )
     created_on = models.DateTimeField(
         verbose_name=_("Created on"),
@@ -272,6 +302,9 @@ class Action(models.Model):
         related_name="actions",
         help_text="The person that created the action.",
     )
+
+    class Meta:
+        ordering = ("-updated_on", "-created_on")
 
     def __str__(self):
         return self.name

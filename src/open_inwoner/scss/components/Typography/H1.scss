@@ -1,14 +1,18 @@
 .h1 {
-  color: var(--font-color-heading-1);
-  font-family: var(--font-family-heading-1);
-  font-size: var(--font-size-heading-1);
-  font-weight: var(--font-weight-heading-1);;
-  line-height: var(--font-line-height-heading-1);
-  margin: 40px 0 0 0;
-  display: flex;
-  justify-content: space-between;
+    color: var(--font-color-heading-1);
+    font-family: var(--font-family-heading-1);
+    font-size: var(--font-size-heading-1);
+    font-weight: var(--font-weight-heading-1);
+    line-height: var(--font-line-height-heading-1);
+    margin: var(--row-height) 0 0 0;
+    display: flex;
+    justify-content: space-between;
 
-  &:first-of-type {
-    margin: 0;
-  }
+    &:first-of-type {
+        margin: 0;
+    }
+
+    &--bottom {
+        margin-bottom: calc(var(--row-height) / 2) !important;
+    }
 }

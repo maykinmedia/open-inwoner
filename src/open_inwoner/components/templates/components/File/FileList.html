@@ -3,15 +3,17 @@
 <nav class="file-list">
     {% trans "Bestanden" as base_title %}
     {% if h1 %}
-        <h1 class="h1" id="files">{% firstof title base_title %}</h1>
+        <h1 class="h1 h1--bottom" id="files">{% firstof title base_title %}</h1>
     {% else %}
         <h4 class="h4" id="files">{% firstof title base_title %}</h4>
     {% endif %}
     <ul class="file-list__list">
         {% for file in files %}
-        <li class="file-list__list-item">
-            {% file file=file %}
-        </li>
+            <li class="file-list__list-item">
+                {% file file=file.file name=file.name uuid=file.uuid allow_delete=allow_delete %}
+            </li>
+        {% empty %}
+            <li><p class="p">{% trans "Er zijn nog geen bestanden geupload" %}</p></li>
         {% endfor %}
     </ul>
 </nav>

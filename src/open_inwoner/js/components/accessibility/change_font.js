@@ -1,25 +1,29 @@
-const printButtons = document.querySelectorAll(".accessibility--change-font")
+const changeFontButtons = document.querySelectorAll(
+    '.accessibility--change-font'
+)
 
-class Print {
+class ChangeFont {
     constructor(node) {
-        this.node = node;
-        this.text = node.querySelector(".link__text");
+        this.node = node
+        this.text = node.querySelector('.link__text')
         this.node.addEventListener('click', this.change.bind(this))
     }
 
     change(event) {
-        event.preventDefault();
-        let root = document.documentElement;
-        const varName = '--font-family-body';
+        event.preventDefault()
+        let root = document.documentElement
+        const varName = '--font-family-body'
 
-        if (root.style.getPropertyValue(varName) == "Open Dyslexic") {
-            root.style.setProperty(varName, "TheSans C5");
-            this.text.innerText = this.node.dataset.text;
+        if (root.style.getPropertyValue(varName) == 'Open Dyslexic') {
+            root.style.setProperty(varName, 'TheSans C5')
+            this.text.innerText = this.node.dataset.text
         } else {
-            root.style.setProperty(varName, "Open Dyslexic");
-            this.text.innerText = this.node.dataset.altText;
+            root.style.setProperty(varName, 'Open Dyslexic')
+            this.text.innerText = this.node.dataset.altText
         }
     }
 }
 
-[...printButtons].forEach((printButton) => new Print(printButton))
+;[...changeFontButtons].forEach(
+    (changeFontButton) => new ChangeFont(changeFontButton)
+)
