@@ -1,9 +1,9 @@
 .message {
   background-color: var(--color-orange);
-  padding: 24px;
+  padding: var(--spacing-extra-large);
   display: grid;
   grid-template-columns: 24px 1fr;
-  grid-gap: 24px;
+  grid-gap: var(--spacing-extra-large);
   color: var(--color-orange-dark);
   margin: var(--row-height) 0;
 

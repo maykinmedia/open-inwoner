@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http.response import HttpResponseRedirect
 from django.urls.base import reverse_lazy
 from django.views.generic import CreateView, ListView
@@ -7,13 +8,13 @@ from ..forms import ActionForm
 from ..models import Action
 
 
-class ActionListView(ListView):
+class ActionListView(LoginRequiredMixin, ListView):
     template_name = "pages/profile/actions/list.html"
     model = Action
     paginate_by = 10
 
 
-class ActionUpdateView(UpdateView):
+class ActionUpdateView(LoginRequiredMixin, UpdateView):
     template_name = "pages/profile/actions/edit.html"
     model = Action
     slug_field = "uuid"
@@ -26,7 +27,7 @@ class ActionUpdateView(UpdateView):
         return HttpResponseRedirect(self.get_success_url())
 
 
-class ActionCreateView(CreateView):
+class ActionCreateView(LoginRequiredMixin, CreateView):
     template_name = "pages/profile/actions/edit.html"
     model = Action
     form_class = ActionForm

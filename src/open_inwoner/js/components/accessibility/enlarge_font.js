@@ -1,5 +1,3 @@
-const enlargeButtons = document.querySelectorAll(".accessibility--enlarge-font")
-
 class EnlageFont {
     constructor(node) {
         this.node = node;
@@ -27,4 +25,5 @@ class EnlageFont {
     }
 }
 
-[...enlargeButtons].forEach((enlargeButton) => new EnlageFont(enlargeButton))
+const enlargeButtons = document.querySelectorAll(".accessibility--enlarge-font");
+[...enlargeButtons].forEach((enlargeButton) => new EnlageFont(enlargeButton));

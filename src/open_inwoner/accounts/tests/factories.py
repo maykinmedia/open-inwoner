@@ -56,6 +56,7 @@ class ActionFactory(factory.django.DjangoModelFactory):
         model = "accounts.Action"
 
     name = factory.Faker("first_name")
+    created_by = factory.SubFactory(UserFactory)
 
 
 class DocumentFactory(factory.django.DjangoModelFactory):

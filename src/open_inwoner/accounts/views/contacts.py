@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http.response import HttpResponseRedirect
 from django.urls.base import reverse_lazy
 from django.views.generic import CreateView, ListView
@@ -7,13 +8,13 @@ from ..forms import ContactForm
 from ..models import Contact
 
 
-class ContactListView(ListView):
+class ContactListView(LoginRequiredMixin, ListView):
     template_name = "pages/profile/contacts/list.html"
     model = Contact
     paginate_by = 10
 
 
-class ContactUpdateView(UpdateView):
+class ContactUpdateView(LoginRequiredMixin, UpdateView):
     template_name = "pages/profile/contacts/edit.html"
     model = Contact
     slug_field = "uuid"
@@ -26,7 +27,7 @@ class ContactUpdateView(UpdateView):
         return HttpResponseRedirect(self.get_success_url())
 
 
-class ContactCreateView(CreateView):
+class ContactCreateView(LoginRequiredMixin, CreateView):
     template_name = "pages/profile/contacts/edit.html"
     model = Contact
     form_class = ContactForm

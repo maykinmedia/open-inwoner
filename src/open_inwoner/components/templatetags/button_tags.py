@@ -8,17 +8,15 @@ register = template.Library()
 
 
 @register.tag
-def button_group(parser, token):
+def button_row(parser, token):
     """
     Nested content supported.
     """
     bits = token.split_contents()
-    context_kwargs = parse_component_with_args(parser, bits, "button_group")
-    nodelist = parser.parse(("endbutton_group",))
+    context_kwargs = parse_component_with_args(parser, bits, "button_row")
+    nodelist = parser.parse(("endbutton_row",))
     parser.delete_first_token()
-    return ContentsNode(
-        nodelist, "components/Button/ButtonGroup.html", **context_kwargs
-    )
+    return ContentsNode(nodelist, "components/Button/ButtonRow.html", **context_kwargs)
 
 
 @register.inclusion_tag("components/Button/Button.html")
