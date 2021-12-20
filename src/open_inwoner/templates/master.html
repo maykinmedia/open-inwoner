@@ -2,7 +2,7 @@
 <html lang="en" class="view {% block view_class %}view--{{ request.resolver_match.namespaces|join:'-' }}-{{ request.resolver_match.url_name }}{% endblock %}">
     <head>
         <meta charset="utf-8">
-        <title>{% block title %}Open_Inwoner{% endblock %}</title>
+        <title>{% block title %}{{ site_name }}{% endblock %}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="{{site_logo}}" rel="shortcut icon">
         <link href="{% static 'bundles/open_inwoner-css.css' %}" media="all" rel="stylesheet" />
