@@ -74,6 +74,7 @@ div.breadcrumbs {
     &:focus, &:hover {
       color: $color_darkest;
     }
+  }
 }
 
 /* Important is used because Django templates include their own style, after ours */
@@ -87,6 +88,7 @@ div.breadcrumbs {
     &:focus, &:hover {
       color: $color_primary !important;
     }
+  }
 }
 
 /* hack to get changelist_view with search styled properly */
@@ -141,6 +143,7 @@ div.breadcrumbs {
         background: $color_dark;
       }
     }
+  }
 }
 
 /* Many to many selector */
