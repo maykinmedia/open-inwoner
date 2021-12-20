@@ -26,6 +26,14 @@ def settings(request):
             "secondary_font_color": config.secondary_font_color,
             "accent_font_color": config.accent_font_color,
         },
+        "configurable_text": {
+            "home_welcome_title": config.home_welcome_title,
+            "home_welcome_intro": config.home_welcome_intro,
+            "theme_title": config.theme_title,
+            "theme_intro": config.theme_intro,
+            "home_map_title": config.home_map_title,
+            "home_map_intro": config.home_map_intro,
+        },
         "hero_image_login": config.hero_image_login.file.url
         if config.hero_image_login
         else "",

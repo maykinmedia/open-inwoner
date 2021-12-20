@@ -63,6 +63,39 @@ class SiteConfiguration(SingletonModel):
         verbose_name=_("Login tekst"),
         help_text=_("Deze tekst wordt getoond op de login pagina."),
     )
+    home_welcome_title = models.CharField(
+        max_length=255,
+        default=_("Welcom"),
+        verbose_name=_("Home welcome title"),
+        help_text=_("Welcome title on the home page."),
+    )
+    home_welcome_intro = models.TextField(
+        verbose_name=_("Home welcome intro"),
+        blank=True,
+        help_text=_("Welcome intro text on the home page."),
+    )
+    theme_title = models.CharField(
+        max_length=255,
+        default=_("Thema's"),
+        verbose_name=_("Theme's title"),
+        help_text=_("Theme's title on the home and theme's page."),
+    )
+    theme_intro = models.TextField(
+        verbose_name=_("Theme's intro"),
+        blank=True,
+        help_text=_("Theme's intro text on the home and thema's page."),
+    )
+    home_map_title = models.CharField(
+        max_length=255,
+        default=_("In de buurt"),
+        verbose_name=_("Home map title"),
+        help_text=_("Map's title on the home page."),
+    )
+    home_map_intro = models.TextField(
+        verbose_name=_("Home map intro"),
+        blank=True,
+        help_text=_("Map's intro text on the home page."),
+    )
 
     class Meta:
         verbose_name = "Site Configuration"
