@@ -5,8 +5,12 @@
         {% icon icon="change_history" %}
     </div>
     <div class="message__content">
-        <h2 class="h2">{{title}}</h2>
+        {% if title %}
+            <h2 class="h2">{{title}}</h2>
+        {% endif %}
         <p class="p">{{message}}</p>
-        {% button href=action text=action_text %}
+        {% if action %}
+            {% button href=action text=action_text %}
+        {% endif %}
     </div>
 </div>
