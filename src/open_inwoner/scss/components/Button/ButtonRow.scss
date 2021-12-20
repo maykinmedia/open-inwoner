@@ -1,12 +1,12 @@
 .button-row {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-medium);
-    margin: var(--spacing-medium) 0;
-    flex-direction: row;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-medium);
+  margin: var(--spacing-medium) 0;
+  flex-direction: row;
 
-    &--right {
-        flex-direction: row-reverse;
-        justify-content: end;
-    }
+  &--right {
+    flex-direction: row-reverse;
+    justify-content: end;
+  }
 }

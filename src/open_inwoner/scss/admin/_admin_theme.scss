@@ -3,23 +3,24 @@ Generic admin styling overrides.
 
 DO NOT PUT ANY TARGET APP-SPECIFIC RULES HERE.
 */
-@import "./_vars";
+@import './_vars';
 
 /* Overrides */
 body {
   overflow-y: scroll;
 
   &.change-form {
-    line-height: 1.15;  // bootstrap reboot overrides this otherwise, which is pulled in by formio
+    line-height: 1.15; // bootstrap reboot overrides this otherwise, which is pulled in by formio
   }
 }
 
-a:link, a:visited {
+a:link,
+a:visited {
   color: $color_link;
 }
 a:focus,
 a:hover {
-    color: $color_link_hover;
+  color: $color_link_hover;
 }
 
 #header {
@@ -30,7 +31,8 @@ a:hover {
   top: 0;
   z-index: 100000;
 
-  a:link, a:visited {
+  a:link,
+  a:visited {
     color: $color_lightest;
   }
 }
@@ -39,7 +41,8 @@ a:hover {
   border-bottom: none;
   text-decoration: underline;
 
-  &:focus, &:hover {
+  &:focus,
+  &:hover {
     color: $color_darkest;
   }
 }
@@ -47,18 +50,18 @@ a:hover {
 .module h2,
 .module caption,
 .inline-group h2 {
-    background: $color_primary;
+  background: $color_primary;
 }
 
 #branding {
-    h1 {
-        color: $color_secondary;
+  h1 {
+    color: $color_secondary;
 
-        a:link,
-        a:visited {
-            color: $color_secondary;
-        }
+    a:link,
+    a:visited {
+      color: $color_secondary;
     }
+  }
 }
 
 div.breadcrumbs {
@@ -71,7 +74,8 @@ div.breadcrumbs {
   a {
     color: $color_dark;
 
-    &:focus, &:hover {
+    &:focus,
+    &:hover {
       color: $color_darkest;
     }
   }
@@ -79,13 +83,15 @@ div.breadcrumbs {
 
 /* Important is used because Django templates include their own style, after ours */
 #changelist-filter {
-   min-height: 100vh; /* hack to get changelist_view with search styled properly */
-  a:focus, a:hover {
+  min-height: 100vh; /* hack to get changelist_view with search styled properly */
+  a:focus,
+  a:hover {
     color: $color_link !important;
   }
   li.selected a {
     color: $color_link !important;
-    &:focus, &:hover {
+    &:focus,
+    &:hover {
       color: $color_primary !important;
     }
   }
@@ -111,35 +117,56 @@ div.breadcrumbs {
 }
 
 .object-tools {
-    a:focus,
-    a:hover {
-        background-color: $color_dark;
-    }
+  a:focus,
+  a:hover {
+    background-color: $color_dark;
+  }
 }
 
-.button, input[type=submit], input[type=button], .submit-row input, a.button {
+.button,
+input[type='submit'],
+input[type='button'],
+.submit-row input,
+a.button {
   background: $color_primary;
   color: $color_lightest;
   /* border: 2px solid $color_dark; */
 }
-.button:active, input[type=submit]:active, input[type=button]:active, .button:focus, input[type=submit]:focus, input[type=button]:focus, .utton:hover, input[type=submit]:hover, input[type=button]:hover {
+.button:active,
+input[type='submit']:active,
+input[type='button']:active,
+.button:focus,
+input[type='submit']:focus,
+input[type='button']:focus,
+.utton:hover,
+input[type='submit']:hover,
+input[type='button']:hover {
   background: $color_primary_dark;
 }
-.button.default, input[type=submit].default, .submit-row input.default {
+.button.default,
+input[type='submit'].default,
+.submit-row input.default {
   background: $color_primary_dark;
 }
-.button.default:active, input[type=submit].default:active, .button.default:focus, input[type=submit].default:focus, .button.efault:hover, input[type=submit].default:hover {
+.button.default:active,
+input[type='submit'].default:active,
+.button.default:focus,
+input[type='submit'].default:focus,
+.button.efault:hover,
+input[type='submit'].default:hover {
   background: $color_darkest;
 }
 
 .delete-confirmation {
   form {
-    input[type=submit] {
+    input[type='submit'] {
     }
     .cancel-link {
       background: $color_primary_light;
       color: $color_lightest;
-      &:active, &:focus, &:hover {
+      &:active,
+      &:focus,
+      &:hover {
         background: $color_dark;
       }
     }
@@ -148,59 +175,61 @@ div.breadcrumbs {
 
 /* Many to many selector */
 .selector-chosen h2 {
-    background: $color_primary !important;
+  background: $color_primary !important;
 }
 
 /* Calendar widget */
 .calendar {
-    caption {
-        background: $color_secondary_dark !important;
-        color: $color_dark !important;
-    }
-
-    td {
-        a {
-            &:active {
-                background: $color_primary !important;
-            }
-            &:focus,
-            &:hover {
-                background: $color_primary_dark !important;
-            }
-        }
-
-        &.selected a {
-            background: $color_primary !important;
-        }
-    }
-}
-.calendarbox h2 {
+  caption {
     background: $color_secondary_dark !important;
     color: $color_dark !important;
+  }
+
+  td {
+    a {
+      &:active {
+        background: $color_primary !important;
+      }
+      &:focus,
+      &:hover {
+        background: $color_primary_dark !important;
+      }
+    }
+
+    &.selected a {
+      background: $color_primary !important;
+    }
+  }
+}
+.calendarbox h2 {
+  background: $color_secondary_dark !important;
+  color: $color_dark !important;
 }
 
 /* Time widget */
 .timelist {
-    a:active {
-        background: $color_primary !important;
-    }
-    a:focus,
-    a:hover {
-        background: $color_primary_dark !important;
-    }
+  a:active {
+    background: $color_primary !important;
+  }
+  a:focus,
+  a:hover {
+    background: $color_primary_dark !important;
+  }
 }
 .module.clockbox h2 {
-    /* Match the clock widget with the calendar widget */
-    background: $color_secondary_dark !important;
-    color: $color_dark !important;
-    font-weight: bold !important;
+  /* Match the clock widget with the calendar widget */
+  background: $color_secondary_dark !important;
+  color: $color_dark !important;
+  font-weight: bold !important;
 }
 
 /* Icons */
 .addlink {
-  background: url('../img/admin/plus-square-regular.svg') 0 0/14px 14px no-repeat;
+  background: url('../img/admin/plus-square-regular.svg') 0 0/14px 14px
+    no-repeat;
 }
-.changelink, .inlinechangelink {
+.changelink,
+.inlinechangelink {
   background: url('../img/admin/edit-regular.svg') 0 0/14px 14px no-repeat;
 }
 .deletelink {
@@ -210,7 +239,8 @@ div.breadcrumbs {
   background: url('../img/admin/clock-regular.svg') 0 0/14px 14px no-repeat !important;
 }
 .datetimeshortcuts .date-icon {
-  background: url('../img/admin/calendar-alt-regular.svg') 0 0/14px 14px no-repeat !important;
+  background: url('../img/admin/calendar-alt-regular.svg') 0 0/14px 14px
+    no-repeat !important;
 }
 
 /* Footer */
@@ -256,11 +286,11 @@ div.breadcrumbs {
  * Branding
  */
 #branding h1 {
-  a:link, a:visited {
+  a:link,
+  a:visited {
     font-weight: bold;
   }
 }
-
 
 /**
  * Help text mouseover
@@ -271,7 +301,7 @@ div.help:hover {
   background-image: none;
   background-color: $color-tooltip-background;
   border: 1px solid $color-tooltip-border;
-  color: $color-tooltip-text;;
+  color: $color-tooltip-text;
   padding: 5px 5px 3px 5px !important;
   max-width: 300px;
   height: auto !important;
@@ -292,7 +322,8 @@ div.help {
 }
 
 /* Overrides default Django CSS */
-.aligned label + p, .aligned label + div.readonly {
+.aligned label + p,
+.aligned label + div.readonly {
   display: inline-block;
   margin-left: inherit !important;
 }

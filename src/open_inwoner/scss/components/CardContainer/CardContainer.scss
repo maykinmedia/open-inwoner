@@ -1,30 +1,30 @@
 .card-container {
-    --card-columns: 1;
-    display: grid;
-    gap: var(--gutter-width);
-    grid-template-columns: repeat(var(--card-columns), 1fr);
+  --card-columns: 1;
+  display: grid;
+  gap: var(--gutter-width);
+  grid-template-columns: repeat(var(--card-columns), 1fr);
 
+  @media (min-width: 768px) {
+    --card-columns: 4;
+  }
+
+  @for $i from 1 through 12 {
+    &--columns-#{$i} {
+      --card-columns: 1;
+
+      @media (min-width: 768px) {
+        --card-columns: #{$i};
+      }
+    }
+  }
+
+  &--small {
     @media (min-width: 768px) {
-        --card-columns: 4;
+      --card-columns: 2;
     }
-
-    @for $i from 1 through 12 {
-        &--columns-#{$i} {
-            --card-columns: 1;
-
-            @media (min-width: 768px) {
-                --card-columns: #{$i};
-            }
-        }
-    }
-
-    &--small {
-        @media (min-width: 768px) {
-            --card-columns: 2;
-        }
-    }
+  }
 }
 
 .p + .card-container {
-    margin-top: var(--gutter-width);
+  margin-top: var(--gutter-width);
 }

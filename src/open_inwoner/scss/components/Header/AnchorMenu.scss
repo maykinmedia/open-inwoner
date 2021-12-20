@@ -1,31 +1,31 @@
 .anchor-menu {
-    position: sticky;
-    top: 20px;
-    width: 100%;
+  position: sticky;
+  top: 20px;
+  width: 100%;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  &__list {
     list-style: none;
     margin: 0;
     padding: 0;
+  }
 
-    &__list {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-    }
+  .link {
+    height: var(--row-height);
+    box-sizing: border-box;
+    border-left: var(--border-width) solid;
+    border-color: var(--color-gray-light);
+    padding: var(--spacing-large);
+  }
 
-    .link {
-        height: var(--row-height);
-        box-sizing: border-box;
-        border-left: var(--border-width) solid;
-        border-color: var(--color-gray-light);
-        padding: var(--spacing-large);
-    }
+  &__list-item--active .link {
+    border-color: var(--color-primary);
+    font-weight: bold;
+  }
 
-    &__list-item--active .link {
-        border-color: var(--color-primary);
-        font-weight: bold;
-    }
-
-    &__list-item--top .link {
-        border-color: transparent;
-    }
+  &__list-item--top .link {
+    border-color: transparent;
+  }
 }

@@ -3,7 +3,7 @@
 
  Generic overrides should go in _admin_theme.scss
  */
-@import "./_vars";
+@import './_vars';
 
 /**
  * DJANGO ADMIN INDEX
@@ -47,7 +47,7 @@ div#container .dropdown-menu {
 
   .dropdown-menu__drop {
     background-color: $color_primary;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.2)
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.2);
   }
 
   .dropdown-menu__link,
@@ -86,7 +86,8 @@ div#container .dropdown-menu {
 
     /* Substitute theme style above with icon. Solves translation string as well. */
     &.add-array-item {
-      background: url('../img/admin/plus-square-regular.svg') 0 0/14px 14px no-repeat !important;
+      background: url('../img/admin/plus-square-regular.svg') 0 0/14px 14px
+        no-repeat !important;
       width: 14px;
       line-height: 16px;
       text-indent: -9999px;
@@ -102,7 +103,8 @@ div#container .dropdown-menu {
 
   /* Substitute with icon */
   .remove {
-    background: url('../img/admin/trash-alt-regular.svg') 0 0/14px 14px no-repeat;
+    background: url('../img/admin/trash-alt-regular.svg') 0 0/14px 14px
+      no-repeat;
     width: 14px;
     line-height: 16px;
 
