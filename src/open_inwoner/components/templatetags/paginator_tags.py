@@ -20,15 +20,23 @@ def get_paginator_dict(request, object_list, per_page, current_page=None, lookar
     lookaround: int | The amount of pages to render around the active page number.
     """
 
-    # The current page (Optional, defaults to request.GET[page]).
-    if not current_page:
-        try:
-            current_page = int(request.GET.get('page', '1'))
-        except AttributeError:
-            pass
+    #
+    # Create paginator.
+    #
 
     p = Paginator(object_list, per_page)
 
+    #
+    # Get current page.
+    #
+
+    # Default.
+    try:
+        current_page = int(request.GET.get('page', '1'))
+    except AttributeError:
+        pass
+
+    # Support first last.
     if current_page == 'first':
         current_page = 1
     elif current_page == 'last':
@@ -38,6 +46,11 @@ def get_paginator_dict(request, object_list, per_page, current_page=None, lookar
     elif current_page < 1:
         current_page = 1
 
+    #
+    # Page numbers.
+    #
+
+    # Page numbers to render based on lookaround.
     page = p.get_page(current_page)
     page_numbers = [
         current_page - lookaround + i

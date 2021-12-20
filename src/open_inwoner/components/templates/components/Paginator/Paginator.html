@@ -1,19 +1,21 @@
 {% load i18n link_tags %}
 
+{% firstof paginator.num_pages|capfirst as last_page_str %}  {# Create string from int. #}
+
+
 <nav class="paginator">
     <ul class="paginator__list">
-        {# Previous. #}
+        <!-- Previous. -->
         {% if page_obj.has_previous %}
-            {% firstof page_obj.previous_page_number|capfirst as previous_page_number %} {# Create string from int. #}
-
+            {% firstof page_obj.previous_page_number|capfirst as previous_page_str %}  {# Create string from int. #}
             <li class="paginator__list-item paginator__list-item--previous">
-                {% get_query_string 'page='|add:previous_page_number as href_prev %}
+                {% get_query_string 'page='|add:previous_page_str as href_prev %}
                 {% link href_prev hide_text=True text=_('Vorige pagina') extra_classes='button' icon='chevron_left' %}
             </li>
         {% endif %}
 
 
-        {# First page.#}
+        <!-- First page.-->
         {% get_query_string 'page=1' as href_first %}
         {% if page_obj.number == 1 %}
             <li class="paginator__list-item paginator__list-item--page-number paginator__list-item--active">
@@ -27,55 +29,54 @@
         {% endif %}
 
 
-        {# Ellipsis. #}
-        {% if 2 not in page_numbers %}
+        <!-- Ellipsis. -->
+        {% if 2 not in page_numbers and 2 < paginator.num_pages %}
             <li class="paginator__list-item paginator__list-item--ellipsis">…</li>
         {% endif %}
 
 
-        {# Current page and lookaround in both directions. #}
+        <!-- Current page and lookaround in both directions. -->
         {% for p in page_numbers %}
-            {% firstof p|capfirst as page_number %} {# Create string from int. #}
+            {% firstof p|capfirst as page_str %}  {# Create string from int. #}
 
-            {% get_query_string 'page='|add:page_number as href_p %}
+            {% get_query_string 'page='|add:page_str as href_p %}
             {% if page_obj.number == p %}
                 <li class="paginator__list-item paginator__list-item--page-number paginator__list-item--active">
-                    {% link href_p text=page_number extra_classes='button button--primary' %}
+                    {% link href_p text=page_str extra_classes='button button--primary' %}
                 </li>
             {% else %}
                 <li class="paginator__list-item paginator__list-item--page-number">
-                    {% link href_p text=page_number extra_classes='button' %}
+                    {% link href_p text=page_str extra_classes='button' %}
                 </li>
             {% endif %}
         {% endfor %}
 
 
-        {% firstof paginator.num_pages|capfirst as last_page_number %} {# Create string from int. #}
-
-
-        {# Ellipsis. #}
-        {% if last_page_number|add:-1 not in page_numbers %}
+        <!-- Ellipsis. -->
+        {% if last_page_str|add:-1 not in page_numbers and last_page_str|add:-1 > 1 %}
             <li class="paginator__list-item paginator__list-item--ellipsis">…</li>
         {% endif %}
 
 
-        {# Last page.#}
-        {% get_query_string 'page='|add:last_page_number as href_last %}
-        {% if page_obj.number == paginator.num_pages %}
-            <li class="paginator__list-item paginator__list-item--page-number paginator__list-item--active">
-                {% link href_last text=last_page_number extra_classes='button button--primary' %}
-            </li>
-        {% else %}
-            <li class="paginator__list-item paginator__list-item--page-number">
-                {% link href_last text=last_page_number extra_classes='button' %}
-            </li>
+        <!-- Last page.-->
+        {% if paginator.num_pages > 1 %}
+            {% get_query_string 'page='|add:last_page_str as href_last %}
+            {% if page_obj.number == paginator.num_pages %}
+                <li class="paginator__list-item paginator__list-item--page-number paginator__list-item--active">
+                    {% link href_last text=last_page_str extra_classes='button button--primary' %}
+                </li>
+            {% else %}
+                <li class="paginator__list-item paginator__list-item--page-number">
+                    {% link href_last text=last_page_str extra_classes='button' %}
+                </li>
+            {% endif %}
         {% endif %}
 
 
-        {# Next. #}
+        <!-- Next. -->
         {% if page_obj.has_next %}
-            {% firstof page_obj.next_page_number|capfirst as next_page_number %}  {# Create string from int. #}
-            {% get_query_string 'page='|add:next_page_number as href_next %}
+            {% firstof page_obj.next_page_number|capfirst as next_page_str %}  {# Create string from int. #}
+            {% get_query_string 'page='|add:next_page_str as href_next %}
             <li class="paginator__list-item paginator__list-item--next">
                 {% link href_next hide_text=True text=_('Volgende pagina') extra_classes='button' icon='chevron_right' %}
             </li>

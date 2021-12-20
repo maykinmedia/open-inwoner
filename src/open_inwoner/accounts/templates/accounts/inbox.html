@@ -9,33 +9,28 @@
 
 
 {% block sidebar_content %}
-    {% render_list %}
-        {% for conversation in conversations.page_obj.object_list %}
-            {% get_query_string 'with={}&page={}' conversation.other_user_email conversations.page_obj.number as href %}
-            {% firstof conversation.other_user_first_name|add:' '|add:conversation.other_user_last_name as other_user_fullname %}
+    <div class="sticky">
+        {% render_list %}
+            {% for conversation in conversations.page_obj.object_list %}
+                {% get_query_string 'with={}&page={}' conversation.other_user_email conversations.page_obj.number as href %}
 
-            {% if other_user.email == conversation.other_user_email %}
-                {% list_item other_user_fullname conversation.content href active=True %}
-            {% else %}
-                {% list_item other_user_fullname conversation.content href %}
-            {% endif %}
-        {% endfor %}
-    {% endrender_list %}
+                {% firstof conversation.other_user_first_name|add:' '|add:conversation.other_user_last_name as other_user_fullname %}
 
-    {% paginator conversations %}
+                {% if other_user.email == conversation.other_user_email %}
+                    {% list_item other_user_fullname conversation.content|truncatechars:25 href active=True %}
+                {% else %}
+                    {% list_item other_user_fullname conversation.content|truncatechars:25 href %}
+                {% endif %}
+            {% endfor %}
+        {% endrender_list %}
+
+        {% paginator conversations %}
+    </div>
 {% endblock %}
 
 
 {% block content %}
     {% if messages %}
-        {% messages messages request.user.pk other_user status %}
-
-        {% render_form form_object=form method="POST" %}
-            {% csrf_token %}
-            {{ form.receiver }}
-            {% input form.content %}
-            {% form_actions primary_text=_("Versturen") primary_icon="arrow_forward" %}
-
-        {% endrender_form %}
+        {% messages messages request.user.pk form other_user status %}
     {% endif %}
 {% endblock %}

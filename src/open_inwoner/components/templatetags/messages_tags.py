@@ -4,14 +4,14 @@ from typing import Union
 from django import template
 from django.utils import timezone
 from django.utils.translation import gettext as _
-
+from django.forms import Form
 from ..types.messagetype import MessageType, MessageKind
 
 register = template.Library()
 
 
 @register.inclusion_tag('components/Messages/Messages.html')
-def messages(message_list: list[MessageType], my_sender_id: str, subject: str, status: str):
+def messages(message_list: list[MessageType], my_sender_id: str, form: Form, subject: str, status: str):
     def get_dates(message_list: list[MessageType]) -> list[datetime.date]:
         """
         Returns a list of dates to render message(s) for.
@@ -61,6 +61,7 @@ def messages(message_list: list[MessageType], my_sender_id: str, subject: str, s
 
     return {
         "days": get_messages_by_date(message_list),
+        "form": form,
         "my_sender_id": my_sender_id,
         "status": status,
         "subject": subject,

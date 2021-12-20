@@ -1,12 +1,12 @@
 {% load i18n %}
 
 
-<li class="message{% if ours %} message--ours{% else %} message-theirs{% endif %}" id="message-{{ message.id }}" title="{% trans 'Bericht van:' %} {{ message.sender.display_name }}">
-    <aside class="message__message">
+<aside class="message{% if ours %} message--ours{% else %} message-theirs{% endif %}" id="{{ message.message_id }}" title="{% trans 'Bericht van:' %} {{ message.sender.display_name }}">
+    <div class="message__body">
         <p class="p">{{ message_content }}</p>
-    </aside>
+    </div>
 
     <footer class="message__footer">
         <p class="p p--muted p--small" title="{{ message.sent_datetime }}">{{ message.sent_datetime|time }}</p>
     </footer>
-</li>
+</aside>

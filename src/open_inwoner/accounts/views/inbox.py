@@ -77,7 +77,7 @@ class InboxView(LoginRequiredMixin, FormView):
 
         if not other_user_email:
             try:
-                other_user_email = conversations["page_obj"].object_list[0].other_user_email
+                other_user_email = conversations["object_list"][0].other_user_email
             except (AttributeError, IndexError, KeyError):
                 return
 
@@ -93,6 +93,12 @@ class InboxView(LoginRequiredMixin, FormView):
             me=self.request.user, other_user=other_user
         ).as_message_type()
 
+    def get_last_message_id(self, messages):
+        try:
+            return messages[-1]["message_id"]
+        except (IndexError, KeyError):
+            return ""
+
     def get_status(self, messages: list[MessageType]) -> str:
         """
         Returns the status string of the conversation.
@@ -104,10 +110,11 @@ class InboxView(LoginRequiredMixin, FormView):
 
     def get_initial(self):
         initial = super().get_initial()
+        conversations = self.get_conversations()
+        other_user = self.get_other_user(conversations)
 
-        message_user_email = unquote(self.request.GET.get("with", ""))
-        if message_user_email:
-            initial["receiver"] = message_user_email
+        if other_user:
+            initial["receiver"] = other_user
 
         return initial
 
@@ -116,5 +123,4 @@ class InboxView(LoginRequiredMixin, FormView):
 
         # build redirect url based on form hidden data
         url = furl(self.request.path).add({"with": form.data["receiver"]}).url
-
-        return HttpResponseRedirect(url)
+        return HttpResponseRedirect(f"{url}#messages-last")

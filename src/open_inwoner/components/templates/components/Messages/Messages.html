@@ -1,4 +1,4 @@
-{% load messages_tags %}
+{% load form_tags messages_tags %}
 
 <section class="messages">
     <header class="messages__header">
@@ -15,17 +15,24 @@
                         <h4 class="p p--muted">{{ day.text }}</h4>
                     </header>
 
-                    <ol class="messages__messages">
+                    <ol class="messages__list">
                         {% for message in day.messages %}
-                            {% if message.sender.sender_id == my_sender_id %}
-                                {% message message True %}
-                            {% else %}
-                                {% message message False %}
-                            {% endif %}
+                            <li class="messages__list-item">
+                                {% if forloop.last %}
+                                    <a id="messages-last"></a>
+                                {% endif %}
+
+                                {% if message.sender.sender_id == my_sender_id %}
+                                    {% message message True %}
+                                {% else %}
+                                    {% message message False %}
+                                {% endif %}
+                            </li>
                         {% endfor %}
                     </ol>
                 </li>
             {% endfor %}
         </ol>
+        {% form form method='POST' %}
     </div>
 </section>

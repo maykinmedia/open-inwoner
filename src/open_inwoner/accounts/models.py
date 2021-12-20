@@ -362,7 +362,7 @@ class Message(models.Model):
                 "sender_id": self.sender.pk,
                 "display_name": str(self.sender),
             },
-            "message_id": self.pk,
+            "message_id": f"message-{self.pk}",
             "sent_datetime": self.created_on,
             "kind": MessageKind.TEXT,
             "data": self.content,
