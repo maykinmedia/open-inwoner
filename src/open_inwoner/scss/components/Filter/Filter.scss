@@ -1,25 +1,25 @@
 .filter {
-  &--open {
-    .filter__list {
-      display: grid;
+    &--open {
+        .filter__list {
+            display: grid;
+        }
     }
-  }
 
-  &__title {
-    color: var(--color-gray-dark);
-    font-family: var(--font-family-heading);
-    font-size: var(--font-size-heading-4);
-    font-weight: bold;
-    letter-spacing: 0;
-    line-height: 21px;
-    cursor: pointer;
-    display: flex;
-  }
+    &__title {
+        color: var(--color-gray-dark);
+        font-family: var(--font-family-heading);
+        font-size: var(--font-size-heading-4);
+        font-weight: bold;
+        letter-spacing: 0;
+        line-height: 21px;
+        cursor: pointer;
+        display: flex;
+    }
 
-  &__list {
-    padding-top: var(--spacing-large);
-    display: none;
-    grid-template-columns: 1fr;
-    gap: var(--spacing-large);
-  }
+    &__list {
+        padding-top: var(--spacing-large);
+        display: none;
+        grid-template-columns: 1fr;
+        gap: var(--spacing-large);
+    }
 }

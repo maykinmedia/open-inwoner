@@ -50,17 +50,15 @@ jobs:
         run: |
           black --check src
   prettier:
+    name: Check code formatting with prettier
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-      with:
-        # Make sure the actual branch is checked out when running on pull requests
-        ref: ${{ github.head_ref }}
-
-    - name: Prettify code
-      uses: creyD/prettier_action@v4.1
-      with:
-        dry: True
-        prettier_options: src/open_inwoner/{scss,js}/**/*.{js,md}
+    - name: Install dependencies
+      run: |
+        npm install
+    - name: Run black
+      run: |
+        npm run check-linting

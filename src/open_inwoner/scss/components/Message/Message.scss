@@ -1,23 +1,23 @@
 .message {
-  background-color: var(--color-orange);
-  padding: var(--spacing-extra-large);
-  display: grid;
-  grid-template-columns: 24px 1fr;
-  grid-gap: var(--spacing-extra-large);
-  color: var(--color-orange-dark);
-  margin: var(--row-height) 0;
-
-  .h2 {
-    line-height: var(--font-size-heading-2);
+    background-color: var(--color-orange);
+    padding: var(--spacing-extra-large);
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    grid-gap: var(--spacing-extra-large);
     color: var(--color-orange-dark);
-  }
+    margin: var(--row-height) 0;
 
-  .p {
-    color: var(--color-orange-dark);
-  }
+    .h2 {
+        line-height: var(--font-size-heading-2);
+        color: var(--color-orange-dark);
+    }
 
-  .button {
-    color: var(--color-white);
-    background-color: var(--color-orange-dark);
-  }
+    .p {
+        color: var(--color-orange-dark);
+    }
+
+    .button {
+        color: var(--color-white);
+        background-color: var(--color-orange-dark);
+    }
 }

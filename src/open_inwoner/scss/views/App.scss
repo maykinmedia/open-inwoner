@@ -1,168 +1,212 @@
 :root {
+    // Layout.
 
-  // Layout.
+    --container-width: 1024px;
+    --header-height: 187px;
 
-  --container-width: 1024px;
-  --header-height: 187px;
+    // Border.
 
+    --border-image: linear-gradient(
+        to right,
+        var(--color-accent-lighter),
+        var(--color-accent-darker),
+        var(--color-accent-lighter)
+    );
+    --border-width: 2px;
+    --border-radius: 3px;
 
-  // Border.
+    // Color.
 
-  --border-image: linear-gradient(to right, var(--color-accent-lighter), var(--color-accent-darker), var(--color-accent-lighter));
-  --border-width: 2px;
-  --border-radius: 3px;
+    --color-black: #000;
+    --color-blue: #1261a3;
+    --color-gray: #d2d2d2;
+    --color-gray-dark: #4b4b4b;
+    --color-gray-light: #d2d2d2;
+    --color-gray-lightest: #f1f1f1;
+    --color-green: #248641;
+    --color-red: #e5006c;
+    --color-white: #fff;
+    --color-yellow: #f8d62d;
+    --color-yellow-dark: #cca000;
+    --color-yellow-light: #fff7d1;
+    --color-orange: #ffdbad;
+    --color-orange-dark: #8c3600;
 
-  // Color.
+    --color-primary-h: 138;
+    --color-primary-s: 58%;
+    --color-primary-l: 33%;
+    --color-primary: hsl(
+        var(--color-primary-h),
+        var(--color-primary-s),
+        var(--color-primary-l)
+    );
+    --color-primary-darker: hsl(
+        var(--color-primary-h),
+        var(--color-primary-s),
+        calc(var(--color-primary-l) - 10%)
+    );
+    --color-primary-lighter: hsl(
+        var(--color-primary-h),
+        var(--color-primary-s),
+        calc(var(--color-primary-l) + 10%)
+    );
+    --color-secondary-h: 207;
+    --color-secondary-s: 80%;
+    --color-secondary-l: 35%;
+    --color-secondary: hsl(
+        var(--color-secondary-h),
+        var(--color-secondary-s),
+        var(--color-secondary-l)
+    );
+    --color-accent-h: 50;
+    --color-accent-s: 94%;
+    --color-accent-l: 57%;
+    --color-accent: hsl(
+        var(--color-accent-h),
+        var(--color-accent-s),
+        var(--color-accent-l)
+    );
+    --color-accent-darker: hsl(
+        var(--color-accent-h),
+        var(--color-accent-s),
+        calc(var(--color-accent-l) - 10%)
+    );
+    --color-accent-lighter: hsl(
+        var(--color-accent-h),
+        var(--color-accent-s),
+        calc(var(--color-accent-l) + 10%)
+    );
 
-  --color-black: #000;
-  --color-blue: #1261A3;
-  --color-gray: #D2D2D2;
-  --color-gray-dark: #4b4b4b;
-  --color-gray-light: #d2d2d2;
-  --color-gray-lightest: #f1f1f1;
-  --color-green: #248641;
-  --color-red: #e5006c;
-  --color-white: #fff;
-  --color-yellow: #f8d62d;
-  --color-yellow-dark: #cca000;
-  --color-yellow-light: #fff7d1;
-  --color-orange: #ffdbad;
-  --color-orange-dark: #8C3600;
+    --color-font-primary: var(--color-white);
+    --color-font-secondary: var(--color-white);
+    --color-font-accent: var(--color-gray-dark);
 
-  --color-primary-h: 138;
-  --color-primary-s: 58%;
-  --color-primary-l: 33%;
-  --color-primary: hsl(var(--color-primary-h), var(--color-primary-s), var(--color-primary-l));
-  --color-primary-darker: hsl(var(--color-primary-h), var(--color-primary-s), calc(var(--color-primary-l) - 10%));
-  --color-primary-lighter: hsl(var(--color-primary-h), var(--color-primary-s), calc(var(--color-primary-l) + 10%));
-  --color-secondary-h: 207;
-  --color-secondary-s: 80%;
-  --color-secondary-l: 35%;
-  --color-secondary: hsl(var(--color-secondary-h), var(--color-secondary-s), var(--color-secondary-l));
-  --color-accent-h: 50;
-  --color-accent-s: 94%;
-  --color-accent-l: 57%;
-  --color-accent: hsl(var(--color-accent-h), var(--color-accent-s), var(--color-accent-l));
-  --color-accent-darker: hsl(var(--color-accent-h), var(--color-accent-s), calc(var(--color-accent-l) - 10%));
-  --color-accent-lighter: hsl(var(--color-accent-h), var(--color-accent-s), calc(var(--color-accent-l) + 10%));
+    --color-body: var(--color-gray-dark);
+    --color-danger: var(--color-red);
+    --color-mute: var(--color-gray);
 
-  --color-font-primary: var(--color-white);
-  --color-font-secondary: var(--color-white);
-  --color-font-accent: var(--color-gray-dark);
+    /// Font.
 
-  --color-body: var(--color-gray-dark);
-  --color-danger: var(--color-red);
-  --color-mute: var(--color-gray);
+    --font-color-heading: var(--color-black);
+    --font-family-heading: 'TheMix C5';
+    --font-weight-heading: bold;
 
-  /// Font.
+    --font-color-heading-1: var(--font-color-heading);
+    --font-family-heading-1: var(--font-family-heading);
+    --font-line-height-heading-1: 41px;
+    --font-size-heading-1: 32px;
+    --font-weight-heading-1: var(--font-weight-heading);
 
-  --font-color-heading: var(--color-black);
-  --font-family-heading: 'TheMix C5';
-  --font-weight-heading: bold;
+    --font-color-heading-2: var(--font-color-heading);
+    --font-family-heading-2: var(--font-family-heading);
+    --font-line-height-heading-2: 36px;
+    --font-size-heading-2: 22px;
+    --font-weight-heading-2: var(--font-weight-heading);
 
-  --font-color-heading-1: var(--font-color-heading);
-  --font-family-heading-1: var(--font-family-heading);
-  --font-line-height-heading-1: 41px;
-  --font-size-heading-1: 32px;
-  --font-weight-heading-1: var(--font-weight-heading);
+    --font-color-heading-3: var(--font-color-heading);
+    --font-family-heading-3: var(--font-family-heading);
+    --font-line-height-heading-3: 30px;
+    --font-size-heading-3: 20px;
+    --font-weight-heading-3: var(--font-weight-heading);
 
-  --font-color-heading-2: var(--font-color-heading);
-  --font-family-heading-2: var(--font-family-heading);
-  --font-line-height-heading-2: 36px;
-  --font-size-heading-2: 22px;
-  --font-weight-heading-2: var(--font-weight-heading);
+    --font-color-heading-4: var(--font-color-heading);
+    --font-family-heading-4: var(--font-family-heading);
+    --font-line-height-heading-4: 26px;
+    --font-size-heading-4: 16px;
+    --font-weight-heading-4: var(--font-weight-heading);
 
-  --font-color-heading-3: var(--font-color-heading);
-  --font-family-heading-3: var(--font-family-heading);
-  --font-line-height-heading-3: 30px;
-  --font-size-heading-3: 20px;
-  --font-weight-heading-3: var(--font-weight-heading);
+    --font-family-body: 'TheSans C5';
+    --font-color-body: var(--color-gray-dark);
+    --font-size-body: 16px;
+    --font-line-height-body: 21px;
 
-  --font-color-heading-4: var(--font-color-heading);
-  --font-family-heading-4: var(--font-family-heading);
-  --font-line-height-heading-4: 26px;
-  --font-size-heading-4: 16px;
-  --font-weight-heading-4: var(--font-weight-heading);
+    --font-size-body-small: 12px;
+    --font-line-height-body-small: 20px;
 
-  --font-family-body: 'TheSans C5';
-  --font-color-body: var(--color-gray-dark);
-  --font-size-body: 16px;
-  --font-line-height-body: 21px;
+    /// Spacing.
 
-  --font-size-body-small: 12px;
-  --font-line-height-body-small: 20px;
+    --row-height: 40px;
+    --row-height-big: 48px;
+    --gutter-width: 32px;
 
-
-  /// Spacing.
-
-  --row-height: 40px;
-  --row-height-big: 48px;
-  --gutter-width: 32px;
-
-  --spacing-tiny: 2px;
-  --spacing-small: 4px;
-  --spacing-medium: 8px;
-  --spacing-large: 16px;
-  --spacing-extra-large: 24px;
-  --spacing-giant: 32px;
+    --spacing-tiny: 2px;
+    --spacing-small: 4px;
+    --spacing-medium: 8px;
+    --spacing-large: 16px;
+    --spacing-extra-large: 24px;
+    --spacing-giant: 32px;
 }
 
 @font-face {
-  font-family: 'TheMix C5';
-  src: local('TheMix C5'), url('/static/fonts/TheMixC5/DesktopFonts/TheMixC5-5_Plain.otf') format('opentype');
+    font-family: 'TheMix C5';
+    src: local('TheMix C5'),
+        url('/static/fonts/TheMixC5/DesktopFonts/TheMixC5-5_Plain.otf')
+            format('opentype');
 }
 
 @font-face {
-  font-family: 'TheMix C5';
-  font-weight: bold;
-  src: local('TheMix C5'), url('/static/fonts/TheMixC5/DesktopFonts/TheMixC5-7_Bold.otf') format('opentype');
+    font-family: 'TheMix C5';
+    font-weight: bold;
+    src: local('TheMix C5'),
+        url('/static/fonts/TheMixC5/DesktopFonts/TheMixC5-7_Bold.otf')
+            format('opentype');
 }
 
 @font-face {
-  font-family: 'TheSans C5';
-  src: local('TheSans C5'), url('/static/fonts/TheSansC5/DesktopFonts/TheSansC5-5_Plain.otf') format('opentype');
+    font-family: 'TheSans C5';
+    src: local('TheSans C5'),
+        url('/static/fonts/TheSansC5/DesktopFonts/TheSansC5-5_Plain.otf')
+            format('opentype');
 }
 
 @font-face {
-  font-family: 'TheSans C5';
-  font-weight: bold;
-  src: local('TheSans C5'), url('/static/fonts/TheSansC5/DesktopFonts/TheSansC5-7_Bold.otf') format('opentype');
+    font-family: 'TheSans C5';
+    font-weight: bold;
+    src: local('TheSans C5'),
+        url('/static/fonts/TheSansC5/DesktopFonts/TheSansC5-7_Bold.otf')
+            format('opentype');
 }
 
 @font-face {
-  font-family: 'Open Dyslexic';
-  src: local('TheSans C5'), url('/static/fonts/opendyslexic/OpenDyslexic-Regular.otf') format('opentype');
+    font-family: 'Open Dyslexic';
+    src: local('TheSans C5'),
+        url('/static/fonts/opendyslexic/OpenDyslexic-Regular.otf')
+            format('opentype');
 }
 
 @font-face {
-  font-family: 'Open Dyslexic';
-  font-weight: bold;
-  src: local('TheSans C5'), url('./fonts/opendyslexic/OpenDyslexic-Bold.otf') format('opentype');
+    font-family: 'Open Dyslexic';
+    font-weight: bold;
+    src: local('TheSans C5'),
+        url('./fonts/opendyslexic/OpenDyslexic-Bold.otf') format('opentype');
 }
 
 @font-face {
-  font-family: 'Open Dyslexic';
-  font-style: italic;
-  src: local('TheSans C5'), url('./fonts/opendyslexic/OpenDyslexic-Italic.otf') format('opentype');
+    font-family: 'Open Dyslexic';
+    font-style: italic;
+    src: local('TheSans C5'),
+        url('./fonts/opendyslexic/OpenDyslexic-Italic.otf') format('opentype');
 }
 
 @font-face {
-  font-family: 'Open Dyslexic';
-  font-weight: bold;
-  font-style: italic;
-  src: local('TheSans C5'), url('./fonts/opendyslexic/OpenDyslexic-Bold-Italic.otf') format('opentype');
+    font-family: 'Open Dyslexic';
+    font-weight: bold;
+    font-style: italic;
+    src: local('TheSans C5'),
+        url('./fonts/opendyslexic/OpenDyslexic-Bold-Italic.otf')
+            format('opentype');
 }
 
 html {
-  scroll-behavior: smooth;
+    scroll-behavior: smooth;
 }
 
 @media screen and (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
+    html {
+        scroll-behavior: auto;
+    }
 }
 
 body {
-  margin: 0;
+    margin: 0;
 }

@@ -3,73 +3,73 @@
 ///
 
 .link {
-  color: var(--font-color-body);
-  display: inline-flex;
-  flex-direction: row;
-  align-items: center;
-  font-family: var(--font-family-body);
-  font-size: var(--font-size-body);
-  line-height: var(--font-line-height-body);
-  text-decoration: none;
-  gap: var(--spacing-small);
+    color: var(--font-color-body);
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body);
+    line-height: var(--font-line-height-body);
+    text-decoration: none;
+    gap: var(--spacing-small);
 
-  &--bold {
-    font-weight: bold;
-  }
-
-  &--left {
-    text-align: left;
-  }
-
-  &--right {
-    text-align: right;
-  }
-
-  *[class*=icon],
-  *[class*=Icon] {
-    font-size: 20px;
-    width: 20px;
-  }
-
-  &--left {
-    text-align: left;
-  }
-
-  &--right {
-    text-align: right;
-  }
-
-  &--icon-before {
-    flex-direction: row-reverse;
-  }
-
-  &--primary {
-    color: var(--color-primary);
-  }
-
-  &--secondary {
-    color: var(--color-secondary);
-  }
-
-  &--active {
-    font-weight: bold;
-  }
-
-  &:active,
-  &:focus,
-  &:hover {
-    .link__text {
-      text-decoration: underline;
+    &--bold {
+        font-weight: bold;
     }
 
-    *[class*=icon],
-    *[class*=Icon] {
-      text-decoration: none;
+    &--left {
+        text-align: left;
     }
-  }
 
-  *[class*=icon]:first-child,
-  *[class*=Icon]:first-child {
-    transform: scale(0.75);
-  }
+    &--right {
+        text-align: right;
+    }
+
+    *[class*='icon'],
+    *[class*='Icon'] {
+        font-size: 20px;
+        width: 20px;
+    }
+
+    &--left {
+        text-align: left;
+    }
+
+    &--right {
+        text-align: right;
+    }
+
+    &--icon-before {
+        flex-direction: row-reverse;
+    }
+
+    &--primary {
+        color: var(--color-primary);
+    }
+
+    &--secondary {
+        color: var(--color-secondary);
+    }
+
+    &--active {
+        font-weight: bold;
+    }
+
+    &:active,
+    &:focus,
+    &:hover {
+        .link__text {
+            text-decoration: underline;
+        }
+
+        *[class*='icon'],
+        *[class*='Icon'] {
+            text-decoration: none;
+        }
+    }
+
+    *[class*='icon']:first-child,
+    *[class*='Icon']:first-child {
+        transform: scale(0.75);
+    }
 }

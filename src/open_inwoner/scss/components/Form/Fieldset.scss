@@ -1,12 +1,12 @@
 .fieldset {
-  border: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  margin-bottom: 20px;
+    border: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin-bottom: 20px;
 
-  &--horizontal {
-    flex-direction: row;
-  }
+    &--horizontal {
+        flex-direction: row;
+    }
 }
