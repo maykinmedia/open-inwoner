@@ -1,0 +1,100 @@
+{% extends 'master.html' %}
+{% load i18n l10n link_tags file_tags button_tags utils icon_tags form_tags %}
+
+{% block sidebar_content %}
+<aside class="anchor-menu">
+    <ul class="anchor-menu__list">
+        <li class="anchor-menu__list-item">
+            <a class="link" href="#title">{% trans "Persoonlijke gegevens" %}</a>
+        </li>
+        <li class="anchor-menu__list-item">
+            <a class="link" href="#overview">{% trans "Persoonlijk overzicht" %}</a>
+        </li>
+        <li class="anchor-menu__list-item">
+            <a class="link" href="#files">{% trans "Bestanden" %}</a>
+        </li>
+        <li class="anchor-menu__list-item anchor-menu__list-item--top">
+            <a class="link link--primary" href="#top">
+                {% icon icon="arrow_upward" %}
+                Terug naar boven
+            </a>
+        </li>
+    </ul>
+</aside>
+{% endblock sidebar_content %}
+
+{% block content %}
+<h1 class="h1" id="title">
+    {% trans "Persoonlijke gegevens" %}
+    {% trans "Bewerken" as button_text %}
+    {% button href="#" text=button_text icon="settings" icon_position="after" icon_outlined=True %}
+</h1>
+
+<table class="table table--vertical">
+    <tr>
+        <th class="table__header">
+            {% icon icon="person_outline" %}<br>
+            {{ request.user.get_full_name }}<br>
+            {% if request.user.get_address %}{{ request.user.get_address }}{% else %}-{% endif %}
+        </th>
+        <td class="table__item">
+            {% icon icon="calendar_today" %}<br>
+            {% trans "Geboortedatum" %}:<br>
+            {% if request.user.birthday %}{{ request.user.birthday|date:"d-m-Y" }}{% else %}-{% endif %}
+        </td>
+        <td class="table__item">
+            {% icon icon="desktop_windows" %}<br>
+            {% trans "Actief sinds" %}:<br>
+            {{ request.user.date_joined|date:"d-m-Y" }}
+        </td>
+        <td class="table__item">
+            {% icon icon="content_paste" %}<br>
+            {% trans "Volgende afspraak" %}:<br>
+            -
+        </td>
+    </tr>
+</table>
+
+<table class="table" id="overview">
+    <tr>
+        <th class="table__header">{% trans "Interessegebieden" %}</th>
+        <td class="table__item">{{ theme_text }}</td>
+        <td class="table__item table__item--right">{% link href="accounts:my_themes" text="Aanpassen" icon="arrow_forward" icon_position="after" primary=True %}</td>
+    </tr>
+    <tr>
+        <th class="table__header">{% trans "Begeleider van de de gemeente" %}</th>
+        <td class="table__item">Kees Korenmolen</td>
+        <td class="table__item table__item--right">{% link href="#" text="Stuur een bericht" icon="arrow_forward" icon_position="after" primary=True %}</td>
+    </tr>
+    <tr>
+        <th class="table__header">{% trans "Mijn netwerkcontacten" %}</th>
+        <td class="table__item">{{ contact_text }}</td>
+        <td class="table__item table__item--right">{% link href="accounts:contact_list" text=_("Beheer contacten") icon="arrow_forward" icon_position="after" primary=True %}</td>
+    </tr>
+    <tr>
+        <th class="table__header">{% trans "Zelfdiagnose" %}</th>
+        <td class="table__item">Van 30 juli 2021, uitkomst: maak verbeterplan aan</td>
+        <td class="table__item table__item--right">{% link href="#" text="Bekijk acties" icon="arrow_forward" icon_position="after" primary=True %}</td>
+    </tr>
+    <tr>
+        <th class="table__header">{% trans "Acties" %}</th>
+        <td class="table__item">{{ action_text }}</td>
+        <td class="table__item table__item--right">{% link href="accounts:action_list" text="Aanpassen" icon="arrow_forward" icon_position="after" primary=True %}</td>
+    </tr>
+    <tr>
+        <th class="table__header">{% trans "Afspraken" %}</th>
+        <td class="table__item">4 afspraken, eerstvolgende voor 6 september</td>
+        <td class="table__item table__item--right">{% link href="#" text="Aanpassen" icon="arrow_forward" icon_position="after" primary=True %}</td>
+    </tr>
+</table>
+
+{% render_form form=form method="POST" id="deactivate-form" %}
+    {% form_actions primary_text=_("Profiel deactiveren") primary_icon="close" transparent=True %}
+{% endrender_form %}
+
+{% file_list h1=True files=files allow_delete=True %}
+
+{% button_row align="right" %}
+    {% button href="accounts:documents_create" text="Bestand toevoegen" primary=True %}
+{% endbutton_row %}
+{% endblock content %}

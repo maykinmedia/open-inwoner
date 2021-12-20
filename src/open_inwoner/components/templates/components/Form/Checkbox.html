@@ -1,14 +1,15 @@
-{% for option in field.subwidgets %}
-    <label class="checkbox">
-        <input
-            id="{{option.data.attrs.id}}"
-            class="checkbox__input"
-            name="{{ option.data.name }}"
-            type="checkbox"
-            value="{{option.data.value}}"
-            {% if option.data.selected %}selected="selected" checked="checked"{% endif %}
-        >
-        <label class="label checkbox__label" for="{{option.data.attrs.id}}">{{option.data.label}}</label>
+{% load form_tags %}
 
+<div class="form__control">
+    <label class="checkbox">
+        {{ field|addclass:"checkbox__input" }}
+        {% if not no_label %}<label class="checkbox__label" for="{{ field.id }}">{{ field.label }}</label>{% endif %}
+        {% if field.help_text %}
+            <p class="p">{{ field.help_text }}</p>
+        {% endif %}
+
+        {% if field.errors %}
+            {% errors errors=field.errors %}
+        {% endif %}
     </label>
-{% endfor %}
+</div>

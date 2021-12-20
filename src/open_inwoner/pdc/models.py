@@ -48,7 +48,7 @@ class Category(MP_Node):
         verbose_name_plural = _("categories")
 
     def __str__(self):
-        return self.slug
+        return self.name
 
 
 class Product(models.Model):

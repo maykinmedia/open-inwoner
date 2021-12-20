@@ -1,3 +1,5 @@
+from re import search
+
 from django.urls import reverse_lazy
 
 from django_webtest import WebTest
@@ -40,10 +42,11 @@ class SearchPageTests(ESMixin, WebTest):
 
         self.assertEqual(response.status_code, 200)
         # check that form has `query` field
-        self.assertIn("query", response.form.fields)
+        search_form = response.forms[1]
+        self.assertIn("query", search_form.fields)
         for facet in FacetChoices.values:
             # check that facet fields are not shown
-            self.assertNotIn(facet, response.form.fields)
+            self.assertNotIn(facet, search_form.fields)
 
         results_div = response.html.find("div", {"class": "search-results"})
         self.assertIsNone(results_div)  # check that results are not shown
@@ -53,7 +56,7 @@ class SearchPageTests(ESMixin, WebTest):
 
         self.assertEqual(response.status_code, 200)
 
-        form = response.form
+        form = response.forms[1]
         form["query"] = "content"
         response = form.submit()
 
@@ -62,10 +65,11 @@ class SearchPageTests(ESMixin, WebTest):
             response.request.url, f"http://testserver{self.url}?query=content"
         )
         # check that form has `query` field
-        self.assertIn("query", response.form.fields)
+        search_form = response.forms[1]
+        self.assertIn("query", search_form.fields)
         # check that facet fields are shown
         for facet in FacetChoices.values:
-            self.assertIn(facet, response.form.fields)
+            self.assertIn(facet, search_form.fields)
 
         results_div = response.html.find("div", {"class": "search-results"})
         self.assertIsNotNone(results_div)  # check that results are shown
@@ -78,7 +82,7 @@ class SearchPageTests(ESMixin, WebTest):
 
         self.assertEqual(response.status_code, 200)
 
-        form = response.form
+        form = response.forms[1]
 
         self.assertEqual(form["query"].value, "content")
 
@@ -91,10 +95,11 @@ class SearchPageTests(ESMixin, WebTest):
             f"http://testserver{self.url}?query=content&tags={self.tag.slug}",
         )
         # check that form has `query` field
-        self.assertIn("query", response.form.fields)
+        search_form = response.forms[1]
+        self.assertIn("query", search_form.fields)
         # check that facet fields are shown
         for facet in FacetChoices.values:
-            self.assertIn(facet, response.form.fields)
+            self.assertIn(facet, search_form.fields)
 
         results_div = response.html.find("div", {"class": "search-results"})
         self.assertIsNotNone(results_div)  # check that results are shown

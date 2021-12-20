@@ -49,3 +49,16 @@ jobs:
       - name: Run black
         run: |
           black --check src
+  prettier:
+    name: Check code formatting with prettier
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Install dependencies
+      run: |
+        npm install
+    - name: Run black
+      run: |
+        npm run check-linting

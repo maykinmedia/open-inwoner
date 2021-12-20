@@ -3,86 +3,97 @@
 ///
 
 .header {
-  $hm: max(calc((100vw - var(--container-width)) / 2), var(--spacing-large));
-  $vm: var(--spacing-large);
-  box-sizing: border-box;
-  display: grid;
-  grid-column-gap: var(--gutter-width);
-  padding: 0 $hm;
-  position: relative;
+    $hm: max(calc((100vw - var(--container-width)) / 2), var(--spacing-large));
+    $vm: var(--spacing-large);
+    box-sizing: border-box;
+    display: grid;
+    grid-column-gap: var(--gutter-width);
+    padding: 0 $hm;
+    position: relative;
 
-  grid-template-areas: "actns actns actns actns"
-                       "lg    lg    lg    lg"
-                       "nv    nv    nv    nv"
-                       "bc    bc    bc    bc";
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: var(--row-height) calc(var(--header-height) - var(--row-height) * 3) var(--row-height) var(--row-height);
-
-
-  @media (min-width: 768px) {
-    grid-template-areas: "lg lg lg lg lg lg lg lg actns actns actns"
-                         "nv nv nv nv nv nv nv nv nv    nv    nv"
-                         "bc bc bc bc bc bc bc bc bc    bc    bc";
-    grid-template-columns: repeat(12, 1fr);
-    grid-template-rows: calc(var(--header-height) - var(--row-height) * 2) var(--row-height) var(--row-height);
-  }
-
-  /// Layout.
-
-  .logo {
-    grid-area: lg;
-    max-height: var(--row-height);
+    grid-template-areas:
+        'actns actns actns actns'
+        'lg    lg    lg    lg'
+        'nv    nv    nv    nv'
+        'bc    bc    bc    bc';
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows:
+        var(--row-height) calc(var(--header-height) - var(--row-height) * 3)
+        var(--row-height) var(--row-height);
 
     @media (min-width: 768px) {
-      margin: var(--row-height) 0;
+        grid-template-areas:
+            'lg lg lg lg lg lg lg lg actns actns actns'
+            'nv nv nv nv nv nv nv nv nv    nv    nv'
+            'bc bc bc bc bc bc bc bc bc    bc    bc';
+        grid-template-columns: repeat(12, 1fr);
+        grid-template-rows:
+            calc(var(--header-height) - var(--row-height) * 2) var(--row-height)
+            var(--row-height);
     }
-  }
 
-  &__actions {
-    align-self: center;
-    grid-area: actns;
-  }
+    /// Layout.
 
-  .primary-navigation {
-    grid-area: nv;
+    .logo {
+        grid-area: lg;
+        max-height: var(--row-height);
 
-    @media (min-width: 768px) {
-      grid-area: none;
-      left: 0;
-      bottom: var(--row-height);
-      position: absolute;
-      width: 100%;
-      padding: 0 $hm;
+        @media (min-width: 768px) {
+            margin: var(--row-height) 0;
+        }
     }
-  }
 
-  .breadcrumbs {
-    grid-area: bc;
-  }
+    &__actions {
+        align-self: center;
+        grid-area: actns;
+    }
 
+    .primary-navigation {
+        grid-area: nv;
 
-  /// Actions.
-  &__search {
-    flex-basis: 100%;
-  }
+        @media (min-width: 768px) {
+            grid-area: none;
+            left: 0;
+            bottom: var(--row-height);
+            position: absolute;
+            width: 100%;
+            padding: 0 $hm;
+        }
+    }
 
-  &__actions {
-    align-items: center;
-    display: flex;
-    height: var(--row-height);
-    justify-content: flex-end;
-    white-space: nowrap;
-  }
+    .breadcrumbs {
+        grid-area: bc;
+    }
 
-  &__actions &__list {
-    display: flex;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
+    /// Actions.
+    &__search {
+        flex-basis: 100%;
+    }
 
-  &__actions &__list-item {
-    display: inline;
-    margin-left: var(--spacing-extra-large);
-  }
+    &__actions {
+        align-items: flex-end;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+    }
+
+    &__text-actions {
+        align-items: center;
+        display: flex;
+        height: var(--row-height);
+        justify-content: flex-end;
+        white-space: nowrap;
+    }
+
+    &__actions &__list {
+        display: flex;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    &__actions &__list-item {
+        display: inline;
+        margin-left: var(--spacing-extra-large);
+    }
 }

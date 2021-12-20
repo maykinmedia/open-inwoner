@@ -21,8 +21,3 @@ def header(logo_url, categories, request, **kwargs):
 @register.inclusion_tag("components/Header/PrimaryNavigation.html")
 def primary_navigation(categories, request, **kwargs):
     return {**kwargs, "categories": categories, "request": request}
-
-
-@register.inclusion_tag("components/Header/Breadcrumbs.html")
-def breadcrumbs(**kwargs):
-    return {**kwargs}

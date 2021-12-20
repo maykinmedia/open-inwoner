@@ -1,66 +1,66 @@
 .card {
-  background-color: white;
-  border: 1px solid var(--color-mute);
-  border-radius: var(--border-radius);
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  text-decoration: none;
-
-  &--tinted {
-    background-color: var(--color-gray-lightest);
-  }
-
-  &__img {
-    height: 100px;
-    object-fit: cover;
-    width: 100%;
-  }
-
-  &__body {
-    padding: var(--spacing-large);
-  }
-
-  &__body--direction-horizontal {
+    background-color: white;
+    border: 1px solid var(--color-mute);
+    border-radius: var(--border-radius);
+    box-sizing: border-box;
     display: flex;
-    justify-content: space-between;
-  }
+    flex-direction: column;
+    text-decoration: none;
 
-  .h4 {
-    margin: 0 0 var(--spacing-large);
-  }
-
-  .link:not(.logo):not(.link--secondary) {
-    justify-content: space-between;
-    width: 100%;
-  }
-
-  &--product {
-    padding: 20px;
-    align-items: end;
-
-    .h3 {
-      // padding: 0;
-      // text-align: left;
-      width: 100%;
+    &--tinted {
+        background-color: var(--color-gray-lightest);
     }
 
-    .p {
-      width: 100%;
+    &__img {
+        height: 100px;
+        object-fit: cover;
+        width: 100%;
     }
-  }
 
-  ///
-  /// Exceptions.
-  ///
+    &__body {
+        padding: var(--spacing-large);
+    }
 
-  /// Cards within cards should leave some space.
-  .card + .card {
-    margin-top: calc(0.5 * var(--gutter-width));
-  }
+    &__body--direction-horizontal {
+        display: flex;
+        justify-content: space-between;
+    }
 
-  /// Form should not have padding within a card.
-  .form {
-    padding: 0;
-  }
+    .h4 {
+        margin: 0 0 var(--spacing-large);
+    }
+
+    .link:not(.logo):not(.link--secondary) {
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    &--product {
+        padding: 20px;
+        align-items: end;
+
+        .h3 {
+            // padding: 0;
+            // text-align: left;
+            width: 100%;
+        }
+
+        .p {
+            width: 100%;
+        }
+    }
+
+    ///
+    /// Exceptions.
+    ///
+
+    /// Cards within cards should leave some space.
+    .card + .card {
+        margin-top: calc(0.5 * var(--gutter-width));
+    }
+
+    /// Form should not have padding within a card.
+    .form {
+        padding: 0;
+    }
 }

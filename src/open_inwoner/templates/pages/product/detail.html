@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n l10n card_tags link_tags tag_tags file_tags utils %}
+{% load i18n l10n card_tags link_tags tag_tags file_tags utils icon_tags %}
 
 {% block sidebar_content %}
 <aside class="anchor-menu">
@@ -32,7 +32,7 @@
         </li>
         <li class="anchor-menu__list-item anchor-menu__list-item--top">
             <a class="link link--primary" href="#top">
-                <span class="material-icons">arrow_upward</span>
+                {% icon icon="arrow_upward" %}
                 Terug naar boven
             </a>
         </li>
