@@ -89,9 +89,13 @@ class InboxView(LoginRequiredMixin, FormView):
         """
         if not other_user:
             return []
-        return Message.objects.get_messages_between_users(
+
+        messages = Message.objects.get_messages_between_users(
             me=self.request.user, other_user=other_user
-        ).as_message_type()
+        )
+
+        message_types = messages.order_by('-created_on')[:1000:-1]  # Show max 1000 messages for now.
+        return [m.as_message_type() for m in message_types]
 
     def get_last_message_id(self, messages):
         try:

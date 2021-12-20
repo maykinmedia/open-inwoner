@@ -31,10 +31,11 @@ def get_paginator_dict(request, object_list, per_page, current_page=None, lookar
     #
 
     # Default.
-    try:
-        current_page = int(request.GET.get('page', '1'))
-    except AttributeError:
-        pass
+    if current_page == None:
+        try:
+            current_page = int(request.GET.get('page', '1'))
+        except AttributeError:
+            pass
 
     # Support first last.
     if current_page == 'first':
@@ -45,6 +46,8 @@ def get_paginator_dict(request, object_list, per_page, current_page=None, lookar
         current_page = p.num_pages
     elif current_page < 1:
         current_page = 1
+
+    print(2, current_page)
 
     #
     # Page numbers.
