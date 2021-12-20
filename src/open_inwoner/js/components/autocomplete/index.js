@@ -1,4 +1,4 @@
-const query = document.querySelector('#id_query')
+const query = document.querySelector('#search-form #id_query')
 const autocompleteUrl = '/api/search/autocomplete/'
 
 const addAutocomplete = (node) => {
