@@ -1,7 +1,7 @@
 {% load helpers icon_tags %}
 
 {% if href %}
-    <a class="{% create_button_classes %}" href="{{href}}">
+    <a class="{% create_button_classes %}" href="{{href}}" {% if href|startswith:"http" %}target="_blank"{% endif %}>
         {% if icon %}{% icon icon=icon outlined=icon_outlined %}{% endif %}
         {{text}}
     </a>
