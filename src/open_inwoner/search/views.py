@@ -92,12 +92,7 @@ class SearchView(PaginationMixin, FormView):
         if self.request.POST:
             form = FeedbackForm(data=self.request.POST)
         else:
-            form = FeedbackForm(
-                initial={
-                    "query_params": self.request.GET.get("query"),
-                    "query_url": self.request.get_full_path(),
-                }
-            )
+            form = FeedbackForm()
         return form
 
     def post(self, request, *args, **kwargs):

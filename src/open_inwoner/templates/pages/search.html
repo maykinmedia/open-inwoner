@@ -69,10 +69,12 @@
         {% render_form form_object=feedback_form method="POST" form_action=request.get_full_path %}
             {% csrf_token %}
             {{ feedback_form.errors }}
-            <input type="checkbox" name="positive"/>
-            <input type="checkbox"/>
-            {% input feedback_form.remark %}
-            {% form_actions primary_text="Feedback versturen" %}
-        {% endrender_form %}
+            <input type="checkbox" name="positive" id="positive" />
+            <input type="checkbox" name="negative" id="negative" />
+            <div class="remark">
+                {% input feedback_form.remark %}
+                {% form_actions primary_text="Feedback versturen" %}
+            </div>
+            {% endrender_form %}
     </aside>
 {% endblock main_inner %}
