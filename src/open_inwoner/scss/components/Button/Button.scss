@@ -1,106 +1,106 @@
 .button {
-    align-items: center;
-    border-radius: 3px;
-    box-sizing: border-box;
-    color: var(--color-secondary);
-    cursor: pointer;
-    display: inline-flex;
-    gap: var(--spacing-medium);
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-body);
-    letter-spacing: 0;
-    height: var(--row-height);
-    line-height: var(--font-line-height-body);
-    padding: var(--spacing-medium) var(--spacing-large);
-    text-align: center;
-    text-decoration: none;
-    transition: transform 300ms, background-color 300ms;
-    font-weight: normal;
+  align-items: center;
+  border-radius: 3px;
+  box-sizing: border-box;
+  color: var(--color-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  gap: var(--spacing-medium);
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-body);
+  letter-spacing: 0;
+  height: var(--row-height);
+  line-height: var(--font-line-height-body);
+  padding: var(--spacing-medium) var(--spacing-large);
+  text-align: center;
+  text-decoration: none;
+  transition: transform 300ms, background-color 300ms;
+  font-weight: normal;
+
+  &:focus,
+  &:hover {
+    transform: translateY(-1px);
+  }
+
+  *[class*='icon'],
+  *[class*='Icon'] {
+    font-size: 20px;
+    max-width: 20px;
+  }
+
+  &--icon-after {
+    flex-direction: row-reverse;
+  }
+
+  &--textless {
+    *[class*='icon'],
+    *[class*='Icon'] {
+      margin: 0;
+    }
+  }
+
+  &--big {
+    height: var(--row-height-big);
+
+    @media (max-width: 767px) {
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+
+  &--primary {
+    background-color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+    color: var(--color-font-primary);
 
     &:focus,
     &:hover {
-        transform: translateY(-1px);
+      background-color: var(--color-primary-darker);
     }
+  }
 
-    *[class*='icon'],
-    *[class*='Icon'] {
-        font-size: 20px;
-        max-width: 20px;
+  &--secondary {
+    background-color: var(--color-secondary);
+    border: 1px solid var(--color-secondary);
+    color: var(--color-white);
+
+    &:focus,
+    &:hover {
+      background-color: var(--color-secondary-darker);
     }
+  }
 
-    &--icon-after {
-        flex-direction: row-reverse;
+  &--transparent {
+    background-color: transparent;
+    border-color: transparent;
+    color: var(--color-primary);
+    padding-left: 0;
+    padding-right: 0;
+
+    &.button--secondary {
+      color: var(--color-secondary);
     }
+  }
 
-    &--textless {
-        *[class*='icon'],
-        *[class*='Icon'] {
-            margin: 0;
-        }
+  &--open {
+    background-color: transparent;
+    color: var(--color-primary);
+    border-color: transparent;
+
+    &:focus,
+    &:hover {
+      border-color: var(--color-primary);
     }
+  }
 
-    &--big {
-        height: var(--row-height-big);
-
-        @media (max-width: 767px) {
-            width: 100%;
-            justify-content: space-between;
-        }
-    }
-
-    &--primary {
-        background-color: var(--color-primary);
-        border: 1px solid var(--color-primary);
-        color: var(--color-font-primary);
-
-        &:focus,
-        &:hover {
-            background-color: var(--color-primary-darker);
-        }
-    }
-
-    &--secondary {
-        background-color: var(--color-secondary);
-        border: 1px solid var(--color-secondary);
-        color: var(--color-white);
-
-        &:focus,
-        &:hover {
-            background-color: var(--color-secondary-darker);
-        }
-    }
-
-    &--transparent {
-        background-color: transparent;
-        border-color: transparent;
-        color: var(--color-primary);
-        padding-left: 0;
-        padding-right: 0;
-
-        &.button--secondary {
-            color: var(--color-secondary);
-        }
-    }
-
-    &--open {
-        background-color: transparent;
-        color: var(--color-primary);
-        border-color: transparent;
-
-        &:focus,
-        &:hover {
-            border-color: var(--color-primary);
-        }
-    }
-
-    &--bordered {
-        background-color: transparent;
-        border-color: var(--color-primary);
-        color: var(--color-primary);
-    }
+  &--bordered {
+    background-color: transparent;
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
 }
 
 .h4 + .button,
 .p + .button {
-    margin-top: var(--spacing-large);
+  margin-top: var(--spacing-large);
 }

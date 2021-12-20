@@ -1,0 +1,121 @@
+/*
+ Project/app specific overrides, coupled to the data model.
+
+ Generic overrides should go in _admin_theme.scss
+ */
+@import './_vars';
+
+/**
+ * DJANGO ADMIN INDEX
+ */
+
+.dropdown-menu,
+div#container .dropdown-menu {
+  /* Override for Environment banner */
+  top: 48px;
+  /* Added to attach body */
+  border-bottom: 8px solid $color_secondary;
+}
+
+.breadcrumbs {
+  top: 48px !important;
+}
+
+/* Integration into color scheme */
+.dropdown-menu {
+  background-color: $color_primary;
+
+  .dropdown-menu__item,
+  .dropdown-menu__item:link,
+  .dropdown-menu__item:visited {
+    color: $color_lightest;
+
+    &.dropdown-menu__item--active {
+      background-color: $color_secondary;
+      text-decoration: none;
+      color: $color_primary;
+
+      &:hover {
+        color: $color_lightest;
+      }
+    }
+
+    &:hover {
+      background-color: $color_primary_dark;
+    }
+  }
+
+  .dropdown-menu__drop {
+    background-color: $color_primary;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  .dropdown-menu__link,
+  .dropdown-menu__link:link,
+  .dropdown-menu__link:visited {
+    color: $color_lightest;
+
+    &:hover {
+      background-color: $color_primary_dark;
+    }
+
+    &.dropdown-menu__link--active {
+      background-color: $color_primary_dark;
+      text-decoration: none;
+    }
+  }
+}
+/* Override for wider dropdown */
+.dropdown-menu .dropdown-menu__drop {
+  min-width: 250px;
+}
+
+/**
+ * DJANGO-BETTER-ADMIN-ARRAYFIELD
+ * Some elements are marked as !important because the style is loaded after
+ * this theme.
+ */
+.dynamic-array-widget {
+  button {
+    background: $color_primary !important;
+    color: $color_lightest !important;
+    &:hover {
+      background: $color_primary_dark !important;
+      /* border: 2px solid $color_dark !important; */
+    }
+
+    /* Substitute theme style above with icon. Solves translation string as well. */
+    &.add-array-item {
+      background: url('../img/admin/plus-square-regular.svg') 0 0/14px 14px
+        no-repeat !important;
+      width: 14px;
+      line-height: 16px;
+      text-indent: -9999px;
+      white-space: nowrap;
+      margin: 0 0 5px 170px;
+      display: block;
+
+      &:focus {
+        outline-width: 0;
+      }
+    }
+  }
+
+  /* Substitute with icon */
+  .remove {
+    background: url('../img/admin/trash-alt-regular.svg') 0 0/14px 14px
+      no-repeat;
+    width: 14px;
+    line-height: 16px;
+
+    .inline-deletelink {
+      display: none;
+    }
+  }
+
+  .array-item {
+    input {
+      width: $input-field-size;
+    }
+  }
+}
