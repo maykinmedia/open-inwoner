@@ -1,4 +1,4 @@
-const printButtons = document.querySelectorAll('.accessibility--print')
+const printButtons = document.querySelectorAll('.accessibility--print');
 
 class Print {
   constructor(node) {
@@ -12,4 +12,4 @@ class Print {
   }
 }
 
-;[...printButtons].forEach((printButton) => new Print(printButton))
+[...printButtons].forEach((printButton) => new Print(printButton));

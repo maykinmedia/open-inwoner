@@ -8,13 +8,11 @@ register = template.Library()
 
 
 @register.inclusion_tag("components/Message/Message.html")
-def message(type, inline, title, message, action, action_text, **kwargs):
+def message(type, inline, title, message, **kwargs):
     return {
         "type": type,
         "inline": inline,
         "title": title,
         "message": message,
-        "action": action,
-        "action_text": action_text,
         **kwargs,
     }
