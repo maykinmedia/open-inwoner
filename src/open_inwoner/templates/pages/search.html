@@ -1,8 +1,8 @@
 {% extends 'master.html' %}
-{% load i18n form_tags utils icon_tags %}
+{% load i18n form_tags utils icon_tags filter_tags %}
 
 {% block main_inner %}
-    {% render_form form_object=form method="GET" %}
+    {% render_form form=form method="GET" %}
         {#  zoek button section #}
         <div class="grid">
             {% spaceless %}<aside class="grid__sidebar">
@@ -23,9 +23,9 @@
         {% if results %}
             <div class="grid">
                 <aside class="grid__sidebar">
-                    {% include "samples/filter.html" with filter=form.categories %}
-                    {% include "samples/filter.html" with filter=form.tags %}
-                    {% include "samples/filter.html" with filter=form.organizations %}
+                    {% filter field=form.categories %}
+                    {% filter field=form.tags %}
+                    {% filter field=form.organizations %}
                 </aside>
 
                 <div class="grid__main">

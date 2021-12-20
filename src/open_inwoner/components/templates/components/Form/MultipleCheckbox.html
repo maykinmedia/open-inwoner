@@ -3,7 +3,8 @@
 <div class="form__control">
     <div class="form__grid-box">
         {% for choice in field.field.choices %}
-            {% choice_checkbox choice=choice name=field.name index=forloop.counter %}
+            {{ field.data }}
+            {% choice_checkbox choice=choice name=field.name data=field.data index=forloop.counter %}
         {% endfor %}
     </div>
 
