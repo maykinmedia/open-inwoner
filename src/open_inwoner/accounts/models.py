@@ -286,6 +286,11 @@ class Action(models.Model):
         choices=StatusChoices.choices,
         help_text=_("The current status of the action"),
     )
+    end_date = models.DateField(
+        verbose_name=_("Action end date"),
+        help_text=_("This is the date that the action should be done."),
+        null=True,
+    )
     created_on = models.DateTimeField(
         verbose_name=_("Created on"),
         auto_now_add=True,
@@ -305,7 +310,7 @@ class Action(models.Model):
     )
 
     class Meta:
-        ordering = ("-updated_on", "-created_on")
+        ordering = ("end_date", "-created_on")
 
     def __str__(self):
         return self.name

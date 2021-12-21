@@ -11,6 +11,7 @@ from .views import (
     ContactUpdateView,
     DocumentCreateView,
     DocumentDeleteView,
+    EditProfileView,
     MyCategoriesView,
     MyProfileView,
 )
@@ -41,5 +42,6 @@ urlpatterns = [
     ),
     path("contacts/", ContactListView.as_view(), name="contact_list"),
     path("themes/", MyCategoriesView.as_view(), name="my_themes"),
+    path("edit/", EditProfileView.as_view(), name="edit_profile"),
     path("", MyProfileView.as_view(), name="my_profile"),
 ]
