@@ -48,7 +48,7 @@ def fetch_data(instance):
 def on_bsn_change(instance, **kwargs):
     if (
         instance.bsn
-        and instance._old_bsn != instance.bsn
+        and instance.is_prepopulated is False
         and instance.login_type == LoginTypeChoices.digid
     ):
         data = fetch_data(instance)
