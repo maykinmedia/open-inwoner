@@ -12,10 +12,10 @@ from privates.storages import PrivateMediaFileSystemStorage
 
 from open_inwoner.utils.validators import validate_phone_number
 
+from ..components.types.messagetype import MessageKind, MessageType
 from .choices import ContactTypeChoices, LoginTypeChoices, StatusChoices
 from .managers import DigidManager, UserManager, eHerkenningManager
 from .query import MessageQuerySet
-from ..components.types.messagetype import MessageType, MessageKind
 
 
 class User(AbstractBaseUser, PermissionsMixin):

@@ -11,10 +11,10 @@ from django.views.generic import FormView
 
 from furl import furl
 
-from ..models import Message, User
-from ..query import MessageQuerySet
 from ...components.templatetags.paginator_tags import get_paginator_dict
 from ...components.types.messagetype import MessageType
+from ..models import Message, User
+from ..query import MessageQuerySet
 
 
 class InboxForm(forms.ModelForm):

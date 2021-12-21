@@ -1,10 +1,13 @@
 import datetime
+
 from django.forms import Form
 from django.utils import timezone
+
 from freezegun import freeze_time
 from typeguard import check_type
-from .abstract import InclusionTagWebTest
+
 from ..types.messagetype import MessageKind, MessageType
+from .abstract import InclusionTagWebTest
 
 
 class TestListItem(InclusionTagWebTest):

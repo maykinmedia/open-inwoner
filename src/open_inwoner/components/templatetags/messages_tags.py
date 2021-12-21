@@ -2,10 +2,11 @@ import datetime
 from typing import Union
 
 from django import template
+from django.forms import Form
 from django.utils import timezone
 from django.utils.translation import gettext as _
-from django.forms import Form
-from ..types.messagetype import MessageType, MessageKind
+
+from ..types.messagetype import MessageKind, MessageType
 
 register = template.Library()
 

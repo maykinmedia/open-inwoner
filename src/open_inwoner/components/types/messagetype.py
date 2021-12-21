@@ -2,7 +2,6 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, TypedDict
 
-
 # The next bit is inspired by MessageKit
 # https://github.com/MessageKit/MessageKit/blob/master/Documentation/QuickStart.md
 

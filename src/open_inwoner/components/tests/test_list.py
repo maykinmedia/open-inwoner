@@ -1,4 +1,4 @@
-from .abstract import InclusionTagWebTest, ContentsTagWebTest
+from .abstract import ContentsTagWebTest, InclusionTagWebTest
 
 
 class TestList(ContentsTagWebTest):

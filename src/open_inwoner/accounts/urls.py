@@ -1,7 +1,6 @@
 from django.urls import path
-from open_inwoner.pdc.views import HomeView
-from .views.inbox import InboxView
 
+from open_inwoner.pdc.views import HomeView
 
 from .views import (
     ActionCreateView,
@@ -16,9 +15,7 @@ from .views import (
     MyCategoriesView,
     MyProfileView,
 )
-
 from .views.inbox import InboxView
-
 
 app_name = "accounts"
 urlpatterns = [

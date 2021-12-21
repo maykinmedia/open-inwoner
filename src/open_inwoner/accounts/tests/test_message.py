@@ -1,10 +1,11 @@
 from django.test import TestCase
 from django.utils import timezone
+
 from freezegun import freeze_time
 from typeguard import check_type
 
-from .factories import MessageFactory, UserFactory
 from ...components.types.messagetype import MessageKind, MessageType
+from .factories import MessageFactory, UserFactory
 
 
 class MessageTest(TestCase):

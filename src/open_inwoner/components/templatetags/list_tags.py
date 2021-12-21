@@ -1,6 +1,7 @@
 from django import template
-from .form_tags import parse_component_with_args
+
 from ...utils.templatetags.abstract import ContentsNode
+from .form_tags import parse_component_with_args
 
 register = template.Library()
 
