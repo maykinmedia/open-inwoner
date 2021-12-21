@@ -33,6 +33,7 @@ def settings(request):
             "theme_intro": config.theme_intro,
             "home_map_title": config.home_map_title,
             "home_map_intro": config.home_map_intro,
+            "footer_visitor_mail": config,
         },
         "hero_image_login": config.hero_image_login.file.url
         if config.hero_image_login

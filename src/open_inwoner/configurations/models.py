@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+import markdown
+from bs4 import BeautifulSoup
 from colorfield.fields import ColorField
 from filer.fields.image import FilerImageField
 from solo.models import SingletonModel
@@ -96,6 +98,12 @@ class SiteConfiguration(SingletonModel):
         blank=True,
         help_text=_("Map's intro text on the home page."),
     )
+    footer_visitor_mail = models.TextField(
+        _("Footer content"),
+        blank=True,
+        default="",
+        help_text=_("Visitor and mailing content with build-in WYSIWYG editor"),
+    )
 
     class Meta:
         verbose_name = "Site Configuration"
@@ -160,3 +168,23 @@ class SiteConfiguration(SingletonModel):
         l = int((l * 100))
 
         return h, s, l
+
+    def get_rendered_content(self):
+        md = markdown.Markdown()
+        html = md.convert(self.footer_visitor_mail)
+        soup = BeautifulSoup(html, "html.parser")
+        class_adders = [
+            ("h1", "h1"),
+            ("h2", "h2"),
+            ("h3", "h3"),
+            ("h4", "h4"),
+            ("h5", "h5"),
+            ("h6", "h6"),
+            ("p", "p"),
+            ("a", "link"),
+        ]
+        for tag, class_name in class_adders:
+            for element in soup.find_all(tag):
+                element.attrs["class"] = class_name
+
+        return soup

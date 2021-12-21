@@ -1,13 +1,24 @@
+from django import forms
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 
 from solo.admin import SingletonModelAdmin
 
+from open_inwoner.ckeditor.widgets import CKEditorWidget
+
 from .models import SiteConfiguration
+
+
+class SiteConfigurationAdminForm(forms.ModelForm):
+    class Meta:
+        model = SiteConfiguration
+        fields = "__all__"
+        widgets = {"footer_visitor_mail": CKEditorWidget}
 
 
 @admin.register(SiteConfiguration)
 class SiteConfigurarionAdmin(SingletonModelAdmin):
+    form = SiteConfigurationAdminForm
     fieldsets = (
         (None, {"fields": ("name", "login_allow_registration")}),
         (
@@ -52,5 +63,9 @@ class SiteConfigurarionAdmin(SingletonModelAdmin):
                     "home_map_intro",
                 )
             },
+        ),
+        (
+            _("Footer"),
+            {"fields": ("footer_visitor_mail",)},
         ),
     )

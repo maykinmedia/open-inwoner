@@ -4,6 +4,10 @@
     {% logo src=logo_url alt=""%}
 
     <aside class="footer__visitor">
+        <p class="p">{{address_content}}</p>
+    </aside>
+
+    {% comment %} <aside class="footer__visitor">
         <h4 class="h4">{% trans "Bezoekadres" %}</h4>
         <p class="p">
             {% trans "Stadhuis Spui (stadsdeelkantoor Centrum)<br/>Spui 70, 2511 BT Den Haag" %}
@@ -24,7 +28,7 @@
         <h4 class="h4">{% trans "Meld je aan voor de nieuwsbrief" %}</h4>
         {% trans "Aanmelden" as singup_text %}
         {% button primary=True text=singup_text %}
-    </aside>
+    </aside> {% endcomment %}
 
     <nav class="footer__links">
         <ul class="footer__list">
