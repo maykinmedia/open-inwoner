@@ -16,10 +16,12 @@
   text-decoration: none;
   transition: transform 300ms, background-color 300ms;
   font-weight: normal;
+  outline: none;
 
   &:focus,
   &:hover {
     transform: translateY(-1px);
+    box-shadow: none;
   }
 
   *[class*='icon'],

@@ -1,11 +1,14 @@
 {% load form_tags link_tags %}
 {# Shared between Form and RenderForm. #}
 <form
-    class="form{% if columns %} form--columns-{{ columns }}{% endif %}{% if spaceless %} form--spaceless{% endif %}{% if inline %} form--inline{% endif %}"
+    class="form{% if columns %} form--columns-{{ columns }}{% endif %}{% if spaceless %} form--spaceless{% endif %}{% if inline %} form--inline{% endif %} {{ extra_classes }}"
     method="{{ method }}"
     action="{% firstof form_action "." %}"
     {% if enctype %}enctype="{{enctype}}"{% endif %}
     {% if id %}id="{{id}}"{% endif %}
+    {% if data_confirm_title %}data-confirm-title="{{ data_confirm_title }}"{% endif %}
+    {% if data_confirm_cancel %}data-confirm-cancel="{{ data_confirm_cancel }}"{% endif %}
+    {% if data_confirm_default %}data-confirm-default="{{ data_confirm_default }}"{% endif %}
 >
     {% if form.non_field_errors %}
         {% errors errors=form.non_field_errors %}

@@ -27,7 +27,7 @@
 <h1 class="h1" id="title">
     {% trans "Persoonlijke gegevens" %}
     {% trans "Bewerken" as button_text %}
-    {% button href="#" text=button_text icon="settings" icon_position="after" icon_outlined=True %}
+    {% button href="accounts:edit_profile" text=button_text icon="settings" icon_position="after" icon_outlined=True %}
 </h1>
 
 <table class="table table--vertical">
@@ -49,8 +49,8 @@
         </td>
         <td class="table__item">
             {% icon icon="content_paste" %}<br>
-            {% trans "Volgende afspraak" %}:<br>
-            -
+            {% trans "Volgende actie" %}:<br>
+            {{ next_action.end_date|date:"d-m-Y" }}
         </td>
     </tr>
 </table>
@@ -88,7 +88,8 @@
     </tr>
 </table>
 
-{% render_form form=form method="POST" id="deactivate-form" %}
+{% render_form form=form method="POST" id="deactivate-form" extra_classes="confirm" data_confirm_title=_("Weet je het zeker dat je je account wilt deactiveren") data_confirm_cancel=_("Nee") data_confirm_default=_("Ja") %}
+    {% csrf_token %}
     {% form_actions primary_text=_("Profiel deactiveren") primary_icon="close" transparent=True %}
 {% endrender_form %}
 

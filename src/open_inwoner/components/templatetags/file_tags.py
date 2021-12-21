@@ -38,7 +38,6 @@ def file(file, **kwargs):
     file: this is the file that needs to be rendered.
     """
     if isinstance(file, File):
-        print(file.file_type, file.file_type == "Image")
         kwargs.update(
             is_image=file.file_type == "Image",
             extension=file.extension,
