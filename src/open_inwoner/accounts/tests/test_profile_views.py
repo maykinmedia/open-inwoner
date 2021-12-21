@@ -13,6 +13,7 @@ from .factories import ActionFactory, ContactFactory, UserFactory
 class ProfileViewTests(WebTest):
     def setUp(self):
         self.url = reverse("accounts:my_profile")
+        self.return_url = reverse("logout")
         self.user = UserFactory()
 
     def test_login_required(self):
@@ -41,11 +42,39 @@ class ProfileViewTests(WebTest):
         )
         self.assertContains(response, "1 acties staan open.")
 
-    def test_get_filled_profile_page(self):
+    def test_only_open_actions(self):
         action = ActionFactory(created_by=self.user, status=StatusChoices.closed)
         response = self.app.get(self.url, user=self.user)
         self.assertEquals(response.status_code, 200)
         self.assertContains(response, "0 acties staan open.")
+
+    def test_deactivate_account(self):
+        self.app.set_user(user=self.user)  # Did not work without this..... No idea why?
+        response = self.app.get(self.url, user=self.user)
+        self.assertEquals(response.status_code, 200)
+        form = response.forms["deactivate-form"]
+        base_response = form.submit()
+        self.assertEquals(base_response.url, self.return_url)
+        followed_response = base_response.follow().follow()
+        self.assertEquals(followed_response.status_code, 200)
+        self.user.refresh_from_db()
+        self.assertFalse(self.user.is_active)
+        self.assertIsNotNone(self.user.deactivated_on)
+
+    def test_deactivate_account_staff(self):
+        self.user.is_staff = True
+        self.user.save()
+        self.app.set_user(user=self.user)  # Did not work without this..... No idea why?
+        response = self.app.get(self.url, user=self.user)
+        self.assertEquals(response.status_code, 200)
+        form = response.forms["deactivate-form"]
+        base_response = form.submit()
+        self.assertEquals(base_response.url, self.url)
+        followed_response = base_response.follow()
+        self.assertEquals(followed_response.status_code, 200)
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.is_active)
+        self.assertIsNone(self.user.deactivated_on)
 
 
 class EditProfileTests(WebTest):
