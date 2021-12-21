@@ -34,8 +34,9 @@
 @import './List/ListItem.scss';
 @import './Logo/Logo.scss';
 @import './Map/Map.scss';
-@import './Messages/Messages.scss';
 @import './Messages/Message.scss';
+@import './Messages/Messages.scss';
+@import './Notification/Notification.scss';
 @import './Paginator/Paginator.scss';
 @import './ProgressIndicator/ProgressIndicator.scss';
 @import './SearchResults/SearchResults.scss';
@@ -53,5 +54,3 @@
 @import './leaflet/leaflet.scss';
 @import './MainImage/MainImage.scss';
 @import './Table/Table.scss';
-@import './Message/Message.scss';
-@import './Message/Messages.scss';

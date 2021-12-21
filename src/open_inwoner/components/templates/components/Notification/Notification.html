@@ -1,13 +1,11 @@
 {% load icon_tags button_tags icon_tags %}
 
-<div class="message">
-    <div class="message__icon">
+<div class="notification">
+    <div class="notification__icon">
         {% icon icon="change_history" %}
     </div>
-    <div class="message__content">
-        {% if title %}
-            <h2 class="h2">{{title}}</h2>
-        {% endif %}
+    <div class="notification__content">
+        {% if title %}<h2 class="h2">{{title}}</h2>{% endif %}
         <p class="p">{{message}}</p>
         {% if action %}
             {% button href=action text=action_text %}
