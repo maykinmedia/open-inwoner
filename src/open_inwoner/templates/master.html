@@ -34,9 +34,7 @@
     <body>
         {% header logo_url=site_logo categories=menu_categories request=request breadcrumbs=breadcrumbs search_form=search_form %}
 
-        {% for message in messages %}
-            {% message type=message.level inline=false title="" message=message.message action="" action_text="" %}
-        {% endfor %}
+        {% messages messages %}
 
         {% block header_image %}{% endblock header_image %}
 
