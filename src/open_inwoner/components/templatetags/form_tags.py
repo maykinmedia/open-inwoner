@@ -75,7 +75,6 @@ def autorender_field(form_object, field_name, **kwargs):
     """
     bound_field = form_object[field_name]
     field = bound_field.field
-    print(type(field))
 
     fn = input
     tmplt = WIDGET_TEMPLATES["INPUT"]
@@ -141,7 +140,6 @@ class FormNode(template.Node):
         self.kwargs = kwargs
 
     def render(self, context):
-        print(context)
         corrected_kwargs = {
             key: safe_resolve(kwarg, context) for key, kwarg in self.kwargs.items()
         }
