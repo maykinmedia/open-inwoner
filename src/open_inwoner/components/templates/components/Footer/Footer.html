@@ -32,34 +32,11 @@
 
     <nav class="footer__links">
         <ul class="footer__list">
-            <li class="footer__list-item">
-                {% trans "Privacyverklaring" as link_text %}
-                {% link text=link_text secondary=True href="#" %}
-            </li>
-            <li class="footer__list-item">
-                {% trans "Cookieverklaring" as link_text %}
-                {% link text=link_text secondary=True href="#" %}
-            </li>
-            <li class="footer__list-item">
-                {% trans "Toegankelijkheidverklaring" as link_text %}
-                {% link text=link_text secondary=True href="#" %}
-            </li>
-            <li class="footer__list-item">
-                {% trans "Bescherming persoonsgegevens" as link_text %}
-                {% link text=link_text secondary=True href="#" %}
-            </li>
-            <li class="footer__list-item">
-                {% trans "Gebruiksvoorwaarden" as link_text %}
-                {% link text=link_text secondary=True href="#" %}
-            </li>
-            <li class="footer__list-item">
-                {% trans "Proclaimer" as link_text %}
-                {% link text=link_text secondary=True href="#" %}
-            </li>
-            <li class="footer__list-item">
-                {% trans "Disclaimer" as link_text %}
-                {% link text=link_text secondary=True href="#" %}
-            </li>
+            {% for flatpage in flatpages.all %}
+                <li class="footer__list-item">
+                    {% link text=flatpage.title secondary=True href="#" %}
+                </li>
+            {% endfor %}
         </ul>
     </nav>
 </footer>

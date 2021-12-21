@@ -98,6 +98,7 @@ INSTALLED_APPS = [
     "django.contrib.sites",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.flatpages",
     # Admin auth
     "django_otp",
     "django_otp.plugins.otp_static",
@@ -164,6 +165,7 @@ MIDDLEWARE = [
     "axes.middleware.AxesMiddleware",
     "hijack.middleware.HijackUserMiddleware",
     "django_otp.middleware.OTPMiddleware",
+    "django.contrib.flatpages.middleware.FlatpageFallbackMiddleware",
 ]
 
 ROOT_URLCONF = "open_inwoner.urls"

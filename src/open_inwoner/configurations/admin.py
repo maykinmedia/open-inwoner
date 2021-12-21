@@ -2,11 +2,12 @@ from django import forms
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 
+from ordered_model.admin import OrderedInlineModelAdminMixin, OrderedTabularInline
 from solo.admin import SingletonModelAdmin
 
 from open_inwoner.ckeditor.widgets import CKEditorWidget
 
-from .models import SiteConfiguration
+from .models import SiteConfiguration, SiteConfigurationPage
 
 
 class SiteConfigurationAdminForm(forms.ModelForm):
@@ -16,8 +17,24 @@ class SiteConfigurationAdminForm(forms.ModelForm):
         widgets = {"footer_visitor_mail": CKEditorWidget}
 
 
+class SiteConfigurationPageInline(OrderedTabularInline):
+    model = SiteConfigurationPage
+    fields = (
+        "flatpage",
+        "order",
+        "move_up_down_links",
+    )
+    readonly_fields = (
+        "order",
+        "move_up_down_links",
+    )
+    extra = 1
+    ordering = ("order",)
+    autocomplete_fields = ("flatpage",)
+
+
 @admin.register(SiteConfiguration)
-class SiteConfigurarionAdmin(SingletonModelAdmin):
+class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
     form = SiteConfigurationAdminForm
     fieldsets = (
         (None, {"fields": ("name", "login_allow_registration")}),
@@ -65,7 +82,8 @@ class SiteConfigurarionAdmin(SingletonModelAdmin):
             },
         ),
         (
-            _("Footer"),
+            _("Footer addresses"),
             {"fields": ("footer_visitor_mail",)},
         ),
     )
+    inlines = [SiteConfigurationPageInline]

@@ -1,3 +1,4 @@
+from django.contrib.flatpages.models import FlatPage
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -5,6 +6,7 @@ import markdown
 from bs4 import BeautifulSoup
 from colorfield.fields import ColorField
 from filer.fields.image import FilerImageField
+from ordered_model.models import OrderedModel, OrderedModelManager
 from solo.models import SingletonModel
 
 from .choices import ColorTypeChoices
@@ -104,6 +106,9 @@ class SiteConfiguration(SingletonModel):
         default="",
         help_text=_("Visitor and mailing content with build-in WYSIWYG editor"),
     )
+    flatpages = models.ManyToManyField(
+        FlatPage, through="SiteConfigurationPage", related_name="configurations"
+    )
 
     class Meta:
         verbose_name = "Site Configuration"
@@ -188,3 +193,18 @@ class SiteConfiguration(SingletonModel):
                 element.attrs["class"] = class_name
 
         return soup
+
+
+class SiteConfigurationPage(OrderedModel):
+    configuration = models.ForeignKey(SiteConfiguration, on_delete=models.CASCADE)
+    flatpage = models.ForeignKey(FlatPage, on_delete=models.CASCADE)
+    order_with_respect_to = "configuration"
+
+    objects = OrderedModelManager()
+
+    def __str__(self):
+        return self.flatpage.title
+
+    @property
+    def page_nr(self):
+        return self.order + 1
