@@ -112,6 +112,11 @@ class User(AbstractBaseUser, PermissionsMixin):
             return f"{self.street} {self.housenumber}, {self.city}"
         return ""
 
+    def deactivate(self):
+        self.is_active = False
+        self.deactivated_on = date.today()
+        self.save()
+
 
 class Contact(models.Model):
     uuid = models.UUIDField(

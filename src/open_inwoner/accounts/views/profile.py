@@ -1,7 +1,9 @@
 from datetime import date
 
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms.forms import Form
+from django.shortcuts import redirect
 from django.urls.base import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import FormView, UpdateView
@@ -15,7 +17,6 @@ from ..models import User
 class MyProfileView(LoginRequiredMixin, FormView):
     template_name = "pages/profile/me.html"
     form_class = Form
-    success_url = reverse_lazy("accounts:my_profile")
 
     def get_context_data(self, **kwargs):
         contact_names = [
@@ -49,6 +50,14 @@ class MyProfileView(LoginRequiredMixin, FormView):
         else:
             context["contact_text"] = _("U heeft nog geen contacten.")
         return context
+
+    def post(self, request, *args, **kwargs):
+        if request.user.is_authenticated and not request.user.is_staff:
+            self.request.user.deactivate()
+            return redirect("logout")
+        else:
+            messages.warning(request, _("Uw account kon niet worden gedeactiveerd"))
+            return redirect("accounts:my_profile")
 
 
 class EditProfileView(LoginRequiredMixin, UpdateView):
