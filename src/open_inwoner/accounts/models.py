@@ -367,4 +367,3 @@ class Message(models.Model):
             "kind": MessageKind.TEXT,
             "data": self.content,
         }
-

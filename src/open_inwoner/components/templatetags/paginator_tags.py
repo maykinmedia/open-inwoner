@@ -4,7 +4,7 @@ from django.core.paginator import Paginator
 register = template.Library()
 
 
-@register.inclusion_tag('components/Paginator/Paginator.html')
+@register.inclusion_tag("components/Paginator/Paginator.html")
 def paginator(paginator_context):
     """
     paginator_context: dict | Return value from get_paginator_dict.
@@ -33,14 +33,14 @@ def get_paginator_dict(request, object_list, per_page, current_page=None, lookar
     # Default.
     if current_page == None:
         try:
-            current_page = int(request.GET.get('page', '1'))
+            current_page = int(request.GET.get("page", "1"))
         except AttributeError:
             pass
 
     # Support first last.
-    if current_page == 'first':
+    if current_page == "first":
         current_page = 1
-    elif current_page == 'last':
+    elif current_page == "last":
         current_page = p.num_pages
     elif current_page > p.num_pages:
         current_page = p.num_pages
@@ -62,10 +62,10 @@ def get_paginator_dict(request, object_list, per_page, current_page=None, lookar
     ]
 
     return {
-        'is_paginated': len(object_list) <= per_page,
-        'object_list': object_list,
-        'page_numbers': page_numbers,
-        'page_obj': page,
-        'paginator': p,
-        'request': request,
+        "is_paginated": len(object_list) <= per_page,
+        "object_list": object_list,
+        "page_numbers": page_numbers,
+        "page_obj": page,
+        "paginator": p,
+        "request": request,
     }

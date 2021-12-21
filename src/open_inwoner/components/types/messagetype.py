@@ -13,7 +13,7 @@ class SenderType(TypedDict):
 
 
 class MessageKind(Enum):
-    TEXT = 'text'
+    TEXT = "text"
 
 
 class MessageType(TypedDict):

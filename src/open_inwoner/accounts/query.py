@@ -76,9 +76,16 @@ class MessageQuerySet(QuerySet):
 
     def get_messages_between_users(self, me, other_user) -> QuerySet:
         """grouped by date"""
-        return self.filter(
-            Q(sender=me, receiver=other_user) | Q(sender=other_user, receiver=me)
-        ).select_related('sender', 'receiver', ).order_by("created_on")
+        return (
+            self.filter(
+                Q(sender=me, receiver=other_user) | Q(sender=other_user, receiver=me)
+            )
+            .select_related(
+                "sender",
+                "receiver",
+            )
+            .order_by("created_on")
+        )
 
     def as_message_type(self) -> list[MessageType]:
         """

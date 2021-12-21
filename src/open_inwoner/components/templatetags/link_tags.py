@@ -13,7 +13,7 @@ def get_query_string(context, query, *values):
 
     query: str | The querystring to add (without "?).
     """
-    request = context['request']
+    request = context["request"]
     method = request.method
 
     rquerydict = getattr(request, method).copy()
@@ -25,7 +25,7 @@ def get_query_string(context, query, *values):
         rquerydict[key] = value
 
     rquerydict._mutable = False
-    return f'?{rquerydict.urlencode()}'
+    return f"?{rquerydict.urlencode()}"
 
 
 @register.inclusion_tag("components/Typography/Link.html")

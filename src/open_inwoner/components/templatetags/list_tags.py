@@ -17,14 +17,14 @@ def render_list(parser, token):
     return ContentsNode(nodelist, "components/List/List.html", **context_kwargs)
 
 
-@register.inclusion_tag('components/List/ListItem.html')
-def list_item(text, description='', href='', **kwargs):
+@register.inclusion_tag("components/List/ListItem.html")
+def list_item(text, description="", href="", **kwargs):
     """
     title: string | this will be the item's title.
     description: string | this will be the item's description. (Optional)
     href: url | where the item links to. (Optional)
     """
-    kwargs['text'] = text
-    kwargs['description'] = kwargs.get('description', description)
-    kwargs['href'] = kwargs.get('href', href)
+    kwargs["text"] = text
+    kwargs["description"] = kwargs.get("description", description)
+    kwargs["href"] = kwargs.get("href", href)
     return kwargs
