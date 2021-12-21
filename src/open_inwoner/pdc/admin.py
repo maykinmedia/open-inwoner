@@ -58,13 +58,13 @@ class ProductLinkInline(admin.TabularInline):
     extra = 1
 
 
-class ProductLocationInline(admin.TabularInline):
+class ProductLocationInline(admin.StackedInline):
     model = ProductLocation
     exclude = ("geometry",)
     extra = 1
 
 
-class ProductContactInline(admin.TabularInline):
+class ProductContactInline(admin.StackedInline):
     model = ProductContact
     extra = 1
 
@@ -85,6 +85,7 @@ class ProductAdmin(ImportExportMixin, admin.ModelAdmin):
     search_fields = ("name",)
     prepopulated_fields = {"slug": ("name",)}
     ordering = ("name",)
+    save_on_top = True
     form = ProductAdminForm
     inlines = (
         ProductFileInline,
