@@ -33,8 +33,9 @@ class InclusionTagWebTest(WebTest):
 
     def render(self, config={}, data={}):
         config = config or {}
+        template_context = self.get_template_context(config)
         context = Context(
-            {**config, "request": RequestFactory().get("/foo", data)}
+            {**template_context, "request": RequestFactory().get("/foo", data)}
         )
         template = self.get_template(config)
         return template.render(context)
@@ -58,19 +59,32 @@ class InclusionTagWebTest(WebTest):
 
     def get_template(self, config={}):
         args = self.get_args(config)
-        template = "{% load " + self.library + " %}{% " + self.tag + " " + args + " " + "config=config %}"
+        template = "{% load " + self.library + " %}{% " + self.tag + " " + args + " " + " %}"
         return Template(template)
 
     def get_args(self, config):
         args = []
 
         for k, v in config.items():
-            if v.isnumeric():
+            if isinstance(v, (int, float,)):
                 args.append(f"{k}={v}")
                 continue
-            args.append(f'{k}="{v}"')
+            elif isinstance(v, (str,)):
+                args.append(f'{k}="{v}"')
+                continue
+            args.append(f"{k}=template_context_{k}")
 
         return " ".join(args)
+
+    def get_template_context(self, config):
+        template_context = {}
+
+        for k, v in config.items():
+            if isinstance(v, (str, int, float,)):
+                continue
+            template_context[f"template_context_{k}"] = v
+
+        return template_context
 
 
 class ContentsTagWebTest(InclusionTagWebTest):
@@ -86,5 +100,5 @@ class ContentsTagWebTest(InclusionTagWebTest):
 
     def get_template(self, config={}):
         args = self.get_args(config)
-        template = "{% load " + self.library + " %}{% " + self.tag + " " + args + " " + "config=config %}" + self.contents + "{% end" + self.tag + " %}"
+        template = "{% load " + self.library + " %}{% " + self.tag + " " + args + " " + " %}" + self.contents + "{% end" + self.tag + " %}"
         return Template(template)
