@@ -51,7 +51,7 @@ class MyProfileView(LoginRequiredMixin, FormView):
         return context
 
 
-class EditProfileView(UpdateView):
+class EditProfileView(LoginRequiredMixin, UpdateView):
     template_name = "pages/profile/edit.html"
     model = User
     form_class = UserForm
@@ -61,7 +61,7 @@ class EditProfileView(UpdateView):
         return self.request.user
 
 
-class MyCategoriesView(UpdateView):
+class MyCategoriesView(LoginRequiredMixin, UpdateView):
     template_name = "pages/profile/categories.html"
     model = User
     form_class = ThemesForm
