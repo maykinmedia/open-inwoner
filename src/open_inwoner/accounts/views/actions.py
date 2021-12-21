@@ -13,6 +13,10 @@ class ActionListView(LoginRequiredMixin, ListView):
     model = Action
     paginate_by = 10
 
+    def get_queryset(self):
+        base_qs = super().get_queryset()
+        return base_qs.filter(created_by=self.request.user)
+
 
 class ActionUpdateView(LoginRequiredMixin, UpdateView):
     template_name = "pages/profile/actions/edit.html"
@@ -21,6 +25,10 @@ class ActionUpdateView(LoginRequiredMixin, UpdateView):
     slug_url_kwarg = "uuid"
     form_class = ActionForm
     success_url = reverse_lazy("accounts:action_list")
+
+    def get_queryset(self):
+        base_qs = super().get_queryset()
+        return base_qs.filter(created_by=self.request.user)
 
     def form_valid(self, form):
         self.object = form.save(self.request.user)

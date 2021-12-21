@@ -13,6 +13,10 @@ class ContactListView(LoginRequiredMixin, ListView):
     model = Contact
     paginate_by = 10
 
+    def get_queryset(self):
+        base_qs = super().get_queryset()
+        return base_qs.filter(created_by=self.request.user)
+
 
 class ContactUpdateView(LoginRequiredMixin, UpdateView):
     template_name = "pages/profile/contacts/edit.html"
@@ -21,6 +25,10 @@ class ContactUpdateView(LoginRequiredMixin, UpdateView):
     slug_url_kwarg = "uuid"
     form_class = ContactForm
     success_url = reverse_lazy("accounts:contact_list")
+
+    def get_queryset(self):
+        base_qs = super().get_queryset()
+        return base_qs.filter(created_by=self.request.user)
 
     def form_valid(self, form):
         self.object = form.save(self.request.user)
