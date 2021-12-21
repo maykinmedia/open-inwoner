@@ -21,6 +21,7 @@
   &:focus,
   &:hover {
     transform: translateY(-1px);
+    box-shadow: none;
   }
 
   *[class*='icon'],
