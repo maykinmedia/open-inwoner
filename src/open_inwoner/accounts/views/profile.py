@@ -4,7 +4,7 @@ from django.urls.base import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import FormView, UpdateView
 
-from open_inwoner.accounts.choices import StatusChioces
+from open_inwoner.accounts.choices import StatusChoices
 
 from ..forms import ThemesForm
 from ..models import User
@@ -30,7 +30,7 @@ class MyProfileView(LoginRequiredMixin, FormView):
         else:
             context["theme_text"] = _("U heeft geen intressegebieden aangegeven.")
         context["action_text"] = _(
-            f"{self.request.user.actions.filter(status=StatusChioces.open).count()} acties staan open."
+            f"{self.request.user.actions.filter(status=StatusChoices.open).count()} acties staan open."
         )
         if self.request.user.contacts.count() > 0:
             context[

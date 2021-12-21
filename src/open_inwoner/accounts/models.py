@@ -12,7 +12,7 @@ from privates.storages import PrivateMediaFileSystemStorage
 
 from open_inwoner.utils.validators import validate_phone_number
 
-from .choices import ContactTypeChoices, LoginTypeChoices, StatusChioces
+from .choices import ContactTypeChoices, LoginTypeChoices, StatusChoices
 from .managers import DigidManager, UserManager, eHerkenningManager
 
 
@@ -281,9 +281,9 @@ class Action(models.Model):
     )
     status = models.CharField(
         verbose_name=_("Status"),
-        default=StatusChioces.open,
+        default=StatusChoices.open,
         max_length=200,
-        choices=StatusChioces.choices,
+        choices=StatusChoices.choices,
         help_text=_("The current status of the action"),
     )
     created_on = models.DateTimeField(
