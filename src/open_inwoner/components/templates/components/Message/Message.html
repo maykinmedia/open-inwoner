@@ -1,4 +1,4 @@
-{% load icon_tags button_tags %}
+{% load icon_tags button_tags icon_tags %}
 
 <div class="message">
     <div class="message__icon">
@@ -13,4 +13,7 @@
             {% button href=action text=action_text %}
         {% endif %}
     </div>
+    {% if closable %}
+        {% icon icon="close" extra_classes="message__close" %}
+    {% endif %}
 </div>
