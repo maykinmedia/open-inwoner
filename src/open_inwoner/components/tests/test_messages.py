@@ -2,8 +2,9 @@ import datetime
 from django.forms import Form
 from django.utils import timezone
 from freezegun import freeze_time
+from typeguard import check_type
 from .abstract import InclusionTagWebTest
-from ..types.messagetype import MessageKind
+from ..types.messagetype import MessageKind, MessageType
 
 
 class TestListItem(InclusionTagWebTest):
@@ -58,6 +59,7 @@ class TestListItem(InclusionTagWebTest):
         })
 
     def test_message_list(self):
+        check_type("config['message_list']", self.config['message_list'], list[MessageType])
         messages = self.assertSelector('.message', self.config)
         self.assertEqual(len(messages), 3)
 

@@ -359,7 +359,7 @@ class Message(models.Model):
         """
         return {
             "sender": {
-                "sender_id": self.sender.pk,
+                "sender_id": f"sender-{self.sender.pk}",
                 "display_name": str(self.sender),
             },
             "message_id": f"message-{self.pk}",
