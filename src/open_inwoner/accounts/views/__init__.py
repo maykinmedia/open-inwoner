@@ -4,4 +4,4 @@ from .csrf import csrf_failure
 from .document import DocumentPrivateMediaView
 from .documents import DocumentCreateView, DocumentDeleteView
 from .password_reset import PasswordResetView
-from .profile import MyCategoriesView, MyProfileView
+from .profile import EditProfileView, MyCategoriesView, MyProfileView

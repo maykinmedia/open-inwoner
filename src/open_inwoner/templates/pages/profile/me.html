@@ -27,7 +27,7 @@
 <h1 class="h1" id="title">
     {% trans "Persoonlijke gegevens" %}
     {% trans "Bewerken" as button_text %}
-    {% button href="#" text=button_text icon="settings" icon_position="after" icon_outlined=True %}
+    {% button href="accounts:edit_profile" text=button_text icon="settings" icon_position="after" icon_outlined=True %}
 </h1>
 
 <table class="table table--vertical">
@@ -49,8 +49,8 @@
         </td>
         <td class="table__item">
             {% icon icon="content_paste" %}<br>
-            {% trans "Volgende afspraak" %}:<br>
-            -
+            {% trans "Volgende actie" %}:<br>
+            {{ next_action.end_date|date:"d-m-Y" }}
         </td>
     </tr>
 </table>

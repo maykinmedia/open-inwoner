@@ -22,6 +22,20 @@ class CustomRegistrationForm(RegistrationForm):
         )
 
 
+class UserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = (
+            "first_name",
+            "last_name",
+            "birthday",
+            "street",
+            "housenumber",
+            "postcode",
+            "city",
+        )
+
+
 class ThemesForm(forms.ModelForm):
     class Meta:
         model = User
@@ -42,7 +56,7 @@ class ContactForm(forms.ModelForm):
 class ActionForm(forms.ModelForm):
     class Meta:
         model = Action
-        fields = ("name", "status")
+        fields = ("name", "status", "end_date")
 
     def save(self, user, commit=True):
         self.instance.created_by = user
