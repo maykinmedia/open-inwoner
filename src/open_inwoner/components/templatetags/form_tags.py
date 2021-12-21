@@ -16,6 +16,7 @@ WIDGET_TEMPLATES = {
     "INPUT": "components/Form/Input.html",
     "CHECKBOX": "components/Form/Checkbox.html",
     "MULTIPLECHECKBOX": "components/Form/MultipleCheckbox.html",
+    "DATE": "components/Form/DateField.html",
 }
 
 
@@ -78,6 +79,9 @@ def autorender_field(form_object, field_name, **kwargs):
     fn = input
     tmplt = WIDGET_TEMPLATES["INPUT"]
 
+    if type(field) == fields.DateField:
+        tmplt = WIDGET_TEMPLATES["DATE"]
+
     if type(field) == models.ModelMultipleChoiceField:
         tmplt = WIDGET_TEMPLATES["MULTIPLECHECKBOX"]
 
@@ -136,7 +140,6 @@ class FormNode(template.Node):
         self.kwargs = kwargs
 
     def render(self, context):
-        print(context)
         corrected_kwargs = {
             key: safe_resolve(kwarg, context) for key, kwarg in self.kwargs.items()
         }
