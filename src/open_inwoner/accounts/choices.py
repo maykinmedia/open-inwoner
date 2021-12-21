@@ -15,6 +15,6 @@ class ContactTypeChoices(DjangoChoices):
     organization = ChoiceItem("organization", _("Orgnaisatie"))
 
 
-class StatusChioces(DjangoChoices):
+class StatusChoices(DjangoChoices):
     open = ChoiceItem("open", _("Open"))
     closed = ChoiceItem("closed", _("Afgerond"))

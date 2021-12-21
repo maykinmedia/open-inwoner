@@ -1,9 +1,10 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms.forms import Form
 from django.urls.base import reverse_lazy
+from django.utils.translation import ugettext_lazy as _
 from django.views.generic import FormView, UpdateView
 
-from open_inwoner.accounts.choices import StatusChioces
+from open_inwoner.accounts.choices import StatusChoices
 
 from ..forms import ThemesForm
 from ..models import User
@@ -22,15 +23,21 @@ class MyProfileView(LoginRequiredMixin, FormView):
 
         context = super().get_context_data(**kwargs)
         context["files"] = self.request.user.documents.all()
-        context["theme_text"] = ", ".join(
-            list(self.request.user.selected_themes.values_list("name", flat=True))
+        if self.request.user.selected_themes.exists():
+            context["theme_text"] = ", ".join(
+                list(self.request.user.selected_themes.values_list("name", flat=True))
+            )
+        else:
+            context["theme_text"] = _("U heeft geen intressegebieden aangegeven.")
+        context["action_text"] = _(
+            f"{self.request.user.actions.filter(status=StatusChoices.open).count()} acties staan open."
         )
-        context[
-            "action_text"
-        ] = f"{self.request.user.actions.filter(status=StatusChioces.open).count()} acties staan open."
-        context[
-            "contact_text"
-        ] = f"{', '.join(contact_names)}{'...' if self.request.user.contacts.count() > 3 else ''}"
+        if self.request.user.contacts.count() > 0:
+            context[
+                "contact_text"
+            ] = f"{', '.join(contact_names)}{'...' if self.request.user.contacts.count() > 3 else ''}"
+        else:
+            context["contact_text"] = _("U heeft nog geen contacten.")
         return context
 
 
