@@ -27,7 +27,7 @@ class MyProfileView(LoginRequiredMixin, FormView):
         today = date.today()
         context["next_action"] = (
             self.request.user.actions.filter(
-                end_date__gte=today, status=StatusChioces.open
+                end_date__gte=today, status=StatusChoices.open
             )
             .order_by("end_date")
             .first()
