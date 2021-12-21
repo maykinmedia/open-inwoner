@@ -66,6 +66,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     selected_themes = models.ManyToManyField(
         "pdc.Category",
         related_name="selected_by",
+        blank=True,
     )
 
     objects = UserManager()
