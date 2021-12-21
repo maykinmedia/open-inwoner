@@ -1,18 +1,22 @@
+from datetime import date
+
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms.forms import Form
+from django.shortcuts import redirect
 from django.urls.base import reverse_lazy
+from django.utils.translation import ugettext_lazy as _
 from django.views.generic import FormView, UpdateView
 
-from open_inwoner.accounts.choices import StatusChioces
+from open_inwoner.accounts.choices import StatusChoices
 
-from ..forms import ThemesForm
+from ..forms import ThemesForm, UserForm
 from ..models import User
 
 
 class MyProfileView(LoginRequiredMixin, FormView):
     template_name = "pages/profile/me.html"
     form_class = Form
-    success_url = reverse_lazy("accounts:my_profile")
 
     def get_context_data(self, **kwargs):
         contact_names = [
@@ -21,20 +25,52 @@ class MyProfileView(LoginRequiredMixin, FormView):
         ]
 
         context = super().get_context_data(**kwargs)
-        context["files"] = self.request.user.documents.all()
-        context["theme_text"] = ", ".join(
-            list(self.request.user.selected_themes.values_list("name", flat=True))
+        today = date.today()
+        context["next_action"] = (
+            self.request.user.actions.filter(
+                end_date__gte=today, status=StatusChoices.open
+            )
+            .order_by("end_date")
+            .first()
         )
-        context[
-            "action_text"
-        ] = f"{self.request.user.actions.filter(status=StatusChioces.open).count()} acties staan open."
-        context[
-            "contact_text"
-        ] = f"{', '.join(contact_names)}{'...' if self.request.user.contacts.count() > 3 else ''}"
+        context["files"] = self.request.user.documents.all()
+        if self.request.user.selected_themes.exists():
+            context["theme_text"] = ", ".join(
+                list(self.request.user.selected_themes.values_list("name", flat=True))
+            )
+        else:
+            context["theme_text"] = _("U heeft geen intressegebieden aangegeven.")
+        context["action_text"] = _(
+            f"{self.request.user.actions.filter(status=StatusChoices.open).count()} acties staan open."
+        )
+        if self.request.user.contacts.count() > 0:
+            context[
+                "contact_text"
+            ] = f"{', '.join(contact_names)}{'...' if self.request.user.contacts.count() > 3 else ''}"
+        else:
+            context["contact_text"] = _("U heeft nog geen contacten.")
         return context
 
+    def post(self, request, *args, **kwargs):
+        if request.user.is_authenticated and not request.user.is_staff:
+            self.request.user.deactivate()
+            return redirect("logout")
+        else:
+            messages.warning(request, _("Uw account kon niet worden gedeactiveerd"))
+            return redirect("accounts:my_profile")
 
-class MyCategoriesView(UpdateView):
+
+class EditProfileView(LoginRequiredMixin, UpdateView):
+    template_name = "pages/profile/edit.html"
+    model = User
+    form_class = UserForm
+    success_url = reverse_lazy("accounts:my_profile")
+
+    def get_object(self):
+        return self.request.user
+
+
+class MyCategoriesView(LoginRequiredMixin, UpdateView):
     template_name = "pages/profile/categories.html"
     model = User
     form_class = ThemesForm

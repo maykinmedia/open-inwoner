@@ -1,0 +1,10 @@
+{% extends 'master.html' %}
+{% load i18n l10n link_tags file_tags button_tags utils icon_tags form_tags %}
+
+{% block content %}
+<h1 class="h1" id="title">
+    {% trans "Profiel bewerken" %}
+</h1>
+
+{% form form_object=form method="POST" id="profile-edit" submit_text=_("Opslaan") secondary_href='accounts:contact_list' secondary_text=_('Terug') secondary_icon='arrow_backward' secondary_icon_position="before" %}
+{% endblock content %}

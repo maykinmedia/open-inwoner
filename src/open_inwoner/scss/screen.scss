@@ -1,7 +1,9 @@
 // External
 @import 'leaflet/dist/leaflet.css';
+@import '~flatpickr/dist/flatpickr.min.css';
 
 // Iinternal
 @import 'settings';
 @import 'components';
 @import 'views';
+@import 'overwrites';

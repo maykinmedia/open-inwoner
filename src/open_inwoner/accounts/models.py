@@ -12,7 +12,7 @@ from privates.storages import PrivateMediaFileSystemStorage
 
 from open_inwoner.utils.validators import validate_phone_number
 
-from .choices import ContactTypeChoices, LoginTypeChoices, StatusChioces
+from .choices import ContactTypeChoices, LoginTypeChoices, StatusChoices
 from .managers import DigidManager, UserManager, eHerkenningManager
 
 
@@ -66,6 +66,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     selected_themes = models.ManyToManyField(
         "pdc.Category",
         related_name="selected_by",
+        blank=True,
     )
 
     objects = UserManager()
@@ -110,6 +111,11 @@ class User(AbstractBaseUser, PermissionsMixin):
         if self.street:
             return f"{self.street} {self.housenumber}, {self.city}"
         return ""
+
+    def deactivate(self):
+        self.is_active = False
+        self.deactivated_on = date.today()
+        self.save()
 
 
 class Contact(models.Model):
@@ -280,10 +286,15 @@ class Action(models.Model):
     )
     status = models.CharField(
         verbose_name=_("Status"),
-        default=StatusChioces.open,
+        default=StatusChoices.open,
         max_length=200,
-        choices=StatusChioces.choices,
+        choices=StatusChoices.choices,
         help_text=_("The current status of the action"),
+    )
+    end_date = models.DateField(
+        verbose_name=_("Action end date"),
+        help_text=_("This is the date that the action should be done."),
+        null=True,
     )
     created_on = models.DateTimeField(
         verbose_name=_("Created on"),
@@ -304,7 +315,7 @@ class Action(models.Model):
     )
 
     class Meta:
-        ordering = ("-updated_on", "-created_on")
+        ordering = ("end_date", "-created_on")
 
     def __str__(self):
         return self.name

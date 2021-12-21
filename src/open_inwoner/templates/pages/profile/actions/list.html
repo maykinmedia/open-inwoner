@@ -12,7 +12,7 @@
     <thead class="table__heading">
         <tr>
             <td class="table__item">{% trans "Omschrijving" %}</td>
-            <td class="table__item">{% trans "Datum" %}</td>
+            <td class="table__item">{% trans "Eind datum" %}</td>
             <td class="table__item">{% trans "Status" %}</td>
             <td class="table__item">&nbsp;</td>
         </tr>
@@ -21,7 +21,7 @@
         {% for action in action_list %}
             <tr>
                 <th class="table__header">{{ action.name }}</th>
-                <td class="table__item">{{ action.created_on }}</td>
+                <td class="table__item">{{ action.end_date|date:"d-m-Y" }}</td>
                 <td class="table__item">{{ action.get_status_display }}</td>
                 <td class="table__item table__item--right">{% button icon="settings" href="accounts:action_edit" uuid=action.uuid icon_outlined=True transparent=True %}</td>
             </tr>

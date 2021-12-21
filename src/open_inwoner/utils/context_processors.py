@@ -16,6 +16,7 @@ def settings(request):
     config = SiteConfiguration.get_solo()
 
     context = {
+        "site_name": config.name,
         "site_logo": config.logo.file.url if config.logo else "",
         "theming": {
             "primary": config.get_primary_color,
