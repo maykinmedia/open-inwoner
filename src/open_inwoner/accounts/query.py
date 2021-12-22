@@ -84,7 +84,7 @@ class MessageQuerySet(QuerySet):
                 "sender",
                 "receiver",
             )
-            .order_by("created_on")
+            .order_by("-created_on")
         )
 
     def as_message_type(self) -> list[MessageType]:

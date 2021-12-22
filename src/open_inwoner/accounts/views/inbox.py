@@ -93,9 +93,7 @@ class InboxView(LoginRequiredMixin, FormView):
             me=self.request.user, other_user=other_user
         )
 
-        message_types = messages.order_by("-created_on")[
-            :1000:-1
-        ]  # Show max 1000 messages for now.
+        message_types = messages[:1000:-1]  # Show max 1000 messages for now.
         return [m.as_message_type() for m in message_types]
 
     def get_last_message_id(self, messages):
