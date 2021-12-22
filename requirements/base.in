@@ -52,7 +52,6 @@ sentry-sdk  # error monitoring
 elastic-apm  # Elastic APM integration
 
 beautifulsoup4
-typeguard
 
 # DigidLocal
 python3-saml

@@ -22,7 +22,7 @@
                                     <a id="messages-last"></a>
                                 {% endif %}
 
-                                {% if message.sender.sender_id == my_sender_id %}
+                                {% if message.sender.pk == me.pk %}
                                     {% message message True %}
                                 {% else %}
                                     {% message message False %}

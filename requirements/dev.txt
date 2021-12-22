@@ -698,10 +698,6 @@ tomli==1.2.1
     # via
     #   black
     #   pep517
-typeguard==2.13.3
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
 typing-extensions==3.10.0.2
     # via
     #   -c requirements/ci.txt

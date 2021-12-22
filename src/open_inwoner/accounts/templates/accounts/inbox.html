@@ -31,6 +31,6 @@
 
 {% block content %}
     {% if conversation_messages %}
-        {% messages conversation_messages my_sender_id form other_user status %}
+        {% messages conversation_messages request.user form other_user status %}
     {% endif %}
 {% endblock %}

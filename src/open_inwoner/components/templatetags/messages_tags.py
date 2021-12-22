@@ -6,24 +6,25 @@ from django.forms import Form
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
-from ..types.messagetype import MessageKind, MessageType
+from open_inwoner.accounts.models import Message, User
+from open_inwoner.accounts.query import MessageQuerySet
 
 register = template.Library()
 
 
 @register.inclusion_tag("components/Messages/Messages.html")
 def messages(
-    message_list: list[MessageType],
-    my_sender_id: str,
+    message_list: MessageQuerySet,
+    me: User,
     form: Form,
     subject: str,
     status: str,
 ):
-    def get_dates(message_list: list[MessageType]) -> list[datetime.date]:
+    def get_dates(message_list: MessageQuerySet) -> list[datetime.date]:
         """
         Returns a list of dates to render message(s) for.
         """
-        dates = sorted(set([m["sent_datetime"].date() for m in message_list]))
+        dates = sorted(set([m.created_on.date() for m in message_list]))
         return dates
 
     def get_date_text(date) -> Union[str, datetime.date]:
@@ -39,7 +40,7 @@ def messages(
 
         return date
 
-    def get_messages_by_date(message_list) -> list[dict]:
+    def get_messages_by_date(message_list: MessageQuerySet) -> list[dict]:
         """
         Returns a dict containing the date, it's text value and the messages sent on that date.
         """
@@ -50,8 +51,8 @@ def messages(
                 "date": d,
                 "text": get_date_text(d),
                 "messages": sorted(
-                    [m for m in message_list if m["sent_datetime"].date() == d],
-                    key=lambda m: m["sent_datetime"],
+                    [m for m in message_list if m.created_on.date() == d],
+                    key=lambda m: m.created_on,
                 ),
             }
             for d in dates
@@ -60,18 +61,15 @@ def messages(
     return {
         "days": get_messages_by_date(message_list),
         "form": form,
-        "my_sender_id": my_sender_id,
+        "me": me,
         "status": status,
         "subject": subject,
     }
 
 
 @register.inclusion_tag("components/Messages/Message.html")
-def message(message_dict: MessageType, ours: bool) -> dict:
+def message(message: Message, ours: bool) -> dict:
     return {
         "ours": ours,
-        "message": message_dict,
-        "message_content": message_dict["data"]
-        if message_dict["kind"] == MessageKind.TEXT
-        else None,
+        "message": message,
     }

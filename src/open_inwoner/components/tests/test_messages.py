@@ -2,12 +2,11 @@ import datetime
 
 from django.forms import Form
 from django.utils import timezone
-
 from freezegun import freeze_time
-from typeguard import check_type
 
-from ..types.messagetype import MessageKind, MessageType
 from .abstract import InclusionTagWebTest
+from ...accounts.models import Message
+from ...accounts.tests.factories import UserFactory, MessageFactory
 
 
 @freeze_time("2021-12-21")
@@ -16,40 +15,18 @@ class TestListItem(InclusionTagWebTest):
     tag = "messages"
 
     def setUp(self) -> None:
+        self.me = UserFactory.create(first_name='My', last_name='User', email='myuser@example.com')
+        other_user = UserFactory.create(first_name='Other', last_name='User', email='otheruser@example.com')
+
+        self.message_1 = MessageFactory.create(sender=self.me, receiver=other_user, created_on=timezone.now() - datetime.timedelta(days=2), content="Lorem ipsum.")
+        self.message_2 = MessageFactory.create(sender=self.me, receiver=other_user, created_on=timezone.now() - datetime.timedelta(days=1), content="Dolor sit amet.")
+        self.message_3 = MessageFactory.create(sender=other_user, receiver=self.me, created_on=timezone.now(), content="Consectetur adipiscing elit.")
+
+        message_queryset = Message.objects.all()
+
         self.config = {
-            "message_list": [
-                {
-                    "sender": {
-                        "sender_id": "sender-1",
-                        "display_name": "me",
-                    },
-                    "message_id": "message-1",
-                    "sent_datetime": timezone.now() - datetime.timedelta(days=2),
-                    "kind": MessageKind.TEXT,
-                    "data": "Lorem ipsum.",
-                },
-                {
-                    "sender": {
-                        "sender_id": "sender-1",
-                        "display_name": "me",
-                    },
-                    "message_id": "message-2",
-                    "sent_datetime": timezone.now() - datetime.timedelta(days=1),
-                    "kind": MessageKind.TEXT,
-                    "data": "Dolor sit amet.",
-                },
-                {
-                    "sender": {
-                        "sender_id": "sender-2",
-                        "display_name": "other user",
-                    },
-                    "message_id": "message-3",
-                    "sent_datetime": timezone.now(),
-                    "kind": MessageKind.TEXT,
-                    "data": "Consectetur adipiscing elit.",
-                },
-            ],
-            "my_sender_id": "sender-1",
+            "message_list": message_queryset,
+            "me": self.me,
             "form": Form(),
             "subject": "Lorem ipsum.",
             "status": "Dolor sit amet.",
@@ -59,7 +36,7 @@ class TestListItem(InclusionTagWebTest):
         self.assertRender(
             {
                 "message_list": [],
-                "my_sender_id": "sender-1",
+                "me": self.me,
                 "form": Form(),
                 "subject": "Lorem ipsum.",
                 "status": "Dolor sit amet.",
@@ -67,9 +44,6 @@ class TestListItem(InclusionTagWebTest):
         )
 
     def test_message_list(self):
-        check_type(
-            "config['message_list']", self.config["message_list"], list[MessageType]
-        )
         messages = self.assertSelector(".message", self.config)
         self.assertEqual(len(messages), 3)
 
@@ -97,9 +71,9 @@ class TestListItem(InclusionTagWebTest):
         )
 
     def test_my_sender_id(self):
-        self.assertSelector("#message-1.message--ours", self.config)
-        self.assertSelector("#message-2.message--ours", self.config)
-        self.assertSelector("#message-3.message--theirs", self.config)
+        self.assertSelector(f"#message-{self.message_1.pk}.message--ours", self.config)
+        self.assertSelector(f"#message-{self.message_2.pk}.message--ours", self.config)
+        self.assertSelector(f"#message-{self.message_3.pk}.message--theirs", self.config)
 
     def test_subject(self):
         self.assertTextContent(".messages__header .h4", "Lorem ipsum.", self.config)

@@ -5,14 +5,10 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-
-from djchoices import choices
 from localflavor.nl.models import NLBSNField, NLZipCodeField
 from privates.storages import PrivateMediaFileSystemStorage
 
 from open_inwoner.utils.validators import validate_phone_number
-
-from ..components.types.messagetype import MessageKind, MessageType
 from .choices import ContactTypeChoices, LoginTypeChoices, StatusChoices
 from .managers import DigidManager, UserManager, eHerkenningManager
 from .query import MessageQuerySet
@@ -352,18 +348,3 @@ class Message(models.Model):
 
     def __str__(self):
         return f"From: {self.sender}, To: {self.receiver} ({self.created_on.date()})"
-
-    def as_message_type(self) -> MessageType:
-        """
-        Returns message as MessageType.
-        """
-        return {
-            "sender": {
-                "sender_id": f"sender-{self.sender.pk}",
-                "display_name": str(self.sender),
-            },
-            "message_id": f"message-{self.pk}",
-            "sent_datetime": self.created_on,
-            "kind": MessageKind.TEXT,
-            "data": self.content,
-        }

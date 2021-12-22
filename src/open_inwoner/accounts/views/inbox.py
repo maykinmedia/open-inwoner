@@ -11,8 +11,8 @@ from django.views.generic import FormView
 from furl import furl
 
 from ..models import Message, User
+from ..query import MessageQuerySet
 from ...components.templatetags.paginator_tags import get_paginator_dict
-from ...components.types.messagetype import MessageType
 
 
 class InboxForm(forms.ModelForm):
@@ -52,7 +52,6 @@ class InboxView(LoginRequiredMixin, FormView):
             {
                 "conversations": conversations,
                 "conversation_messages": messages,
-                "my_sender_id": f"sender-{self.request.user.pk}",
                 "other_user": other_user,
                 "status": status,
             }
@@ -82,19 +81,18 @@ class InboxView(LoginRequiredMixin, FormView):
 
         return get_object_or_404(User, email=other_user_email)
 
-    def get_messages(self, other_user: User) -> list[MessageType]:
+    def get_messages(self, other_user: User) -> MessageQuerySet:
         """
-        Returns the messages (MessageType) of the currenct conversation.
+        Returns the messages (MessageType) of the current conversation.
         """
         if not other_user:
-            return []
+            return MessageQuerySet.none()
 
         messages = Message.objects.get_messages_between_users(
             me=self.request.user, other_user=other_user
         )
 
-        message_types = messages[:1000:-1]  # Show max 1000 messages for now.
-        return [m.as_message_type() for m in message_types]
+        return messages[:1000:-1]  # Show max 1000 messages for now.
 
     def get_last_message_id(self, messages):
         try:
@@ -102,12 +100,12 @@ class InboxView(LoginRequiredMixin, FormView):
         except (IndexError, KeyError):
             return ""
 
-    def get_status(self, messages: list[MessageType]) -> str:
+    def get_status(self, messages: MessageQuerySet) -> str:
         """
         Returns the status string of the conversation.
         """
         try:
-            return f"{_('Laatste bericht ontvangen op')} {formats.date_format(messages[-1]['sent_datetime'])}"
+            return f"{_('Laatste bericht ontvangen op')} {formats.date_format(messages[-1].created_on)}"
         except IndexError:
             return ""
 

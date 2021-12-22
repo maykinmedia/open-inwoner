@@ -1,11 +1,9 @@
 from django.db.models import Case, F, Max, OuterRef, Q, Subquery, When
 from django.db.models.query import QuerySet
 
-from open_inwoner.components.types.messagetype import MessageType
-
 
 class MessageQuerySet(QuerySet):
-    def get_conversations_for_user(self, me: "User") -> QuerySet:
+    def get_conversations_for_user(self, me: "User") -> 'MessageQuerySet':
         """
         I apologize;
 
@@ -74,7 +72,7 @@ class MessageQuerySet(QuerySet):
 
         return result
 
-    def get_messages_between_users(self, me, other_user) -> QuerySet:
+    def get_messages_between_users(self, me, other_user) -> 'MessageQuerySet':
         """grouped by date"""
         return (
             self.filter(
@@ -86,14 +84,3 @@ class MessageQuerySet(QuerySet):
             )
             .order_by("-created_on")
         )
-
-    def as_message_type(self) -> list[MessageType]:
-        """
-        Returns all messages as MessageType.
-        """
-        message_types = []
-        for message in self:
-            message_type = message.as_message_type()
-            message_types.append(message_type)
-
-        return message_types
