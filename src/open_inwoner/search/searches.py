@@ -33,6 +33,19 @@ class ProductSearch(FacetedSearch):
             filters &= f
         return search.filter(filters)
 
+    def query(self, search, query):
+        """
+        Add fuziness to the default search
+        """
+        if query:
+            if self.fields:
+                return search.query(
+                    "multi_match", fields=self.fields, query=query, fuzziness="AUTO"
+                )
+            else:
+                return search.query("multi_match", query=query, fuzziness="AUTO")
+        return search
+
 
 def search_products(query_str: str, filters=None) -> ProductSearchResult:
     s = ProductSearch(query_str, filters=filters or {})[: settings.ES_MAX_SIZE]
@@ -46,6 +59,7 @@ def search_autocomplete(query_str: str):
     completion_params = {
         "size": settings.ES_SUGGEST_SIZE,
         "skip_duplicates": True,
+        "fuzzy": True,
     }
     s = s.suggest(
         "name_suggest",
