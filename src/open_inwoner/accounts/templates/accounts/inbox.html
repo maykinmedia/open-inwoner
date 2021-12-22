@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n form_tags link_tags list_tags messages_tags paginator_tags %}
+{% load i18n form_tags link_tags list_tags messages_tags pagination_tags %}
 
 
 {% block main_inner %}
@@ -11,7 +11,7 @@
 {% block sidebar_content %}
     <div class="sticky">
         {% render_list %}
-            {% for conversation in conversations.page_obj.object_list %}
+            {% for conversation in conversations.page_obj %}
                 {% get_query_string 'with={}&page={}' conversation.other_user_email conversations.page_obj.number as href %}
 
                 {% firstof conversation.other_user_first_name|add:' '|add:conversation.other_user_last_name as other_user_fullname %}
@@ -24,7 +24,7 @@
             {% endfor %}
         {% endrender_list %}
 
-        {% paginator conversations %}
+        {% pagination page_obj=conversations.page_obj paginator=conversations.paginator request=request %}
     </div>
 {% endblock %}
 

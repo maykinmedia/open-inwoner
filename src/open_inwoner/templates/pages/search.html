@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n form_tags utils icon_tags filter_tags %}
+{% load i18n form_tags utils icon_tags filter_tags pagination_tags %}
 
 {% block main_inner %}
     {% render_form form=form method="GET" id="search-form" %}
@@ -48,7 +48,7 @@
                         </div>
                     </div>
 
-                    {% include "components/Pagination/Pagination.html" %}
+                    {% pagination page_obj=page_obj paginator=paginator request=request %}
 
                 </div>
             </div>

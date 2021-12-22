@@ -8,11 +8,13 @@ from django.shortcuts import get_object_or_404
 from django.utils import formats
 from django.utils.translation import gettext as _
 from django.views.generic import FormView
+
 from furl import furl
+
+from open_inwoner.utils.mixins import PaginationMixin
 
 from ..models import Message, User
 from ..query import MessageQuerySet
-from ...components.templatetags.paginator_tags import get_paginator_dict
 
 
 class InboxForm(forms.ModelForm):
@@ -33,9 +35,10 @@ class InboxForm(forms.ModelForm):
         return super().save(commit)
 
 
-class InboxView(LoginRequiredMixin, FormView):
+class InboxView(LoginRequiredMixin, PaginationMixin, FormView):
     template_name = "accounts/inbox.html"
     form_class = InboxForm
+    paginate_by = 10
 
     def get_context_data(self, **kwargs):
         """
@@ -64,8 +67,7 @@ class InboxView(LoginRequiredMixin, FormView):
         Returns the conversations with other users (used to navigate between conversations).
         """
         conversations = Message.objects.get_conversations_for_user(self.request.user)
-        paginator = get_paginator_dict(self.request, conversations, 10)
-        return paginator
+        return self.paginate_with_context(conversations)
 
     def get_other_user(self, conversations: dict) -> Optional[User]:
         """
