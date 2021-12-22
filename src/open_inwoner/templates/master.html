@@ -1,4 +1,4 @@
-{% load static i18n header_tags card_tags footer_tags button_tags message_tags utils %}<!DOCTYPE html>
+{% load static i18n header_tags card_tags footer_tags button_tags notification_tags utils %}<!DOCTYPE html>
 <html lang="en" class="view {% block view_class %}view--{{ request.resolver_match.namespaces|join:'-' }}-{{ request.resolver_match.url_name }}{% endblock %}">
     <head>
         <meta charset="utf-8">
@@ -34,7 +34,7 @@
     <body>
         {% header logo_url=site_logo categories=menu_categories request=request breadcrumbs=breadcrumbs search_form=search_form %}
 
-        {% messages messages %}
+        {% notifications messages %}
 
         {% block header_image %}{% endblock header_image %}
 

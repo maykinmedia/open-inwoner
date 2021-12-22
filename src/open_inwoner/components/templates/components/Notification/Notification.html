@@ -5,13 +5,15 @@
         {% icon icon="change_history" %}
     </div>
     <div class="notification__content">
-        {% if title %}<h2 class="h2">{{title}}</h2>{% endif %}
-        <p class="p">{{message}}</p>
+        {% if title %}
+            <h2 class="h2">{{title}}</h2>
+        {% endif %}
+        <p class="p">{{notification}}</p>
         {% if action %}
             {% button href=action text=action_text %}
         {% endif %}
     </div>
     {% if closable %}
-        {% icon icon="close" extra_classes="message__close" %}
+        {% icon icon="close" extra_classes="notification__close" %}
     {% endif %}
 </div>

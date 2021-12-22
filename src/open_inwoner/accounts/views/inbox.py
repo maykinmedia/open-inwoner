@@ -8,13 +8,11 @@ from django.shortcuts import get_object_or_404
 from django.utils import formats
 from django.utils.translation import gettext as _
 from django.views.generic import FormView
-
 from furl import furl
 
+from ..models import Message, User
 from ...components.templatetags.paginator_tags import get_paginator_dict
 from ...components.types.messagetype import MessageType
-from ..models import Message, User
-from ..query import MessageQuerySet
 
 
 class InboxForm(forms.ModelForm):
@@ -53,8 +51,9 @@ class InboxView(LoginRequiredMixin, FormView):
         context.update(
             {
                 "conversations": conversations,
+                "conversation_messages": messages,
+                "my_sender_id": f"sender-{self.request.user.pk}",
                 "other_user": other_user,
-                "messages": messages,
                 "status": status,
             }
         )

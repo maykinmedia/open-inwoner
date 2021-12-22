@@ -10,47 +10,50 @@ from ..types.messagetype import MessageKind, MessageType
 from .abstract import InclusionTagWebTest
 
 
+@freeze_time("2021-12-21")
 class TestListItem(InclusionTagWebTest):
     library = "messages_tags"
     tag = "messages"
-    config = {
-        "message_list": [
-            {
-                "sender": {
-                    "sender_id": "sender-1",
-                    "display_name": "me",
+
+    def setUp(self) -> None:
+        self.config = {
+            "message_list": [
+                {
+                    "sender": {
+                        "sender_id": "sender-1",
+                        "display_name": "me",
+                    },
+                    "message_id": "message-1",
+                    "sent_datetime": timezone.now() - datetime.timedelta(days=2),
+                    "kind": MessageKind.TEXT,
+                    "data": "Lorem ipsum.",
                 },
-                "message_id": "message-1",
-                "sent_datetime": timezone.now() - datetime.timedelta(days=2),
-                "kind": MessageKind.TEXT,
-                "data": "Lorem ipsum.",
-            },
-            {
-                "sender": {
-                    "sender_id": "sender-1",
-                    "display_name": "me",
+                {
+                    "sender": {
+                        "sender_id": "sender-1",
+                        "display_name": "me",
+                    },
+                    "message_id": "message-2",
+                    "sent_datetime": timezone.now() - datetime.timedelta(days=1),
+                    "kind": MessageKind.TEXT,
+                    "data": "Dolor sit amet.",
                 },
-                "message_id": "message-2",
-                "sent_datetime": timezone.now() - datetime.timedelta(days=1),
-                "kind": MessageKind.TEXT,
-                "data": "Dolor sit amet.",
-            },
-            {
-                "sender": {
-                    "sender_id": "sender-2",
-                    "display_name": "other user",
+                {
+                    "sender": {
+                        "sender_id": "sender-2",
+                        "display_name": "other user",
+                    },
+                    "message_id": "message-3",
+                    "sent_datetime": timezone.now(),
+                    "kind": MessageKind.TEXT,
+                    "data": "Consectetur adipiscing elit.",
                 },
-                "message_id": "message-3",
-                "sent_datetime": timezone.now(),
-                "kind": MessageKind.TEXT,
-                "data": "Consectetur adipiscing elit.",
-            },
-        ],
-        "my_sender_id": "sender-1",
-        "form": Form(),
-        "subject": "Lorem ipsum.",
-        "status": "Dolor sit amet.",
-    }
+            ],
+            "my_sender_id": "sender-1",
+            "form": Form(),
+            "subject": "Lorem ipsum.",
+            "status": "Dolor sit amet.",
+        }
 
     def test_render(self):
         self.assertRender(
@@ -70,7 +73,6 @@ class TestListItem(InclusionTagWebTest):
         messages = self.assertSelector(".message", self.config)
         self.assertEqual(len(messages), 3)
 
-    @freeze_time("2021-12-21")
     def test_message_day_headers(self):
         day_headers = self.assertSelector(".messages__day-header", self.config)
         self.assertEqual(day_headers[0].text.strip(), "19 december 2021")
