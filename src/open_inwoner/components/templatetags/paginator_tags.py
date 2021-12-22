@@ -47,8 +47,6 @@ def get_paginator_dict(request, object_list, per_page, current_page=None, lookar
     elif current_page < 1:
         current_page = 1
 
-    print(2, current_page)
-
     #
     # Page numbers.
     #
