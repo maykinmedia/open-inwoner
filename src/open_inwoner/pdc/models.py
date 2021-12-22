@@ -123,6 +123,12 @@ class Product(models.Model):
         blank=True,
         help_text=_("List of keywords for search"),
     )
+    uniforme_productnaam = models.CharField(
+        _("uniforme productnaam"),
+        max_length=250,
+        blank=True,
+        help_text=_("Attribute to sync data from PDC's (like SDG)"),
+    )
 
     class Meta:
         verbose_name = _("product")
