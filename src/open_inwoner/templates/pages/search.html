@@ -49,32 +49,44 @@
                     </div>
 
                     {% pagination page_obj=page_obj paginator=paginator request=request %}
-
-                    {% include "components/Pagination/Pagination.html" %}
-                    {% form form_object=feedback_form method="POST" %}
                 </div>
             </div>
+        {% endif %}
+    {% endrender_form %}
 
-            {% include "components/Pagination/Pagination.html" %}
-
+    <div class="grid">
+        {% spaceless %}<aside class="grid__sidebar">
+            &nbsp;
+        </aside>{% endspaceless %}
+        <div class="grid__main">
+            <div class="grid">
+                <aside class="feedback">
+                    <h4 class="h4">{% trans "Feedback" %}</h4>
+                    <p class="p">{% trans "Heeft u gevonden wat u zocht?" %}</p>
+                    {% render_form form=feedback_form method="POST" form_action=request.get_full_path %}
+                        {% csrf_token %}
+                        {{ feedback_form.errors }}
+                        <div class="feedback__options">
+                            {% spaceless %}
+                            <label class="button-radio" for="positive">
+                                <input class="button-radio__input" type="radio" name="feedback" id="positive" />
+                                <span class="button-radio__button">{% icon icon="thumb_up" outlined=True %}</span>
+                            </label>
+                            <label class="button-radio" for="negative">
+                                <input class="button-radio__input" type="radio" name="feedback" id="negative" />
+                                <span class="button-radio__button">{% icon icon="thumb_down" outlined=True %}</span>
+                            </label>
+                            {% endspaceless %}
+                        </div>
+                        <div class="feedback__remark">
+                            {% input feedback_form.remark %}
+                        </div>
+                        <div class="feedback__remark">
+                            {% form_actions primary_text="Feedback versturen" %}
+                        </div>
+                    {% endrender_form %}
+                </aside>
+            </div>
         </div>
     </div>
-
-    {% endif %}
-
-    {% endrender_form %}
-    <aside class="feedback">
-        <h4 class="h4">Feedback</h4>
-        <p class="p">Heeft u gevonden wat u zocht?</p>
-        {% render_form form_object=feedback_form method="POST" form_action=request.get_full_path %}
-            {% csrf_token %}
-            {{ feedback_form.errors }}
-            <input type="checkbox" name="positive" id="positive" />
-            <input type="checkbox" name="negative" id="negative" />
-            <div class="remark">
-                {% input feedback_form.remark %}
-                {% form_actions primary_text="Feedback versturen" %}
-            </div>
-            {% endrender_form %}
-    </aside>
 {% endblock main_inner %}
