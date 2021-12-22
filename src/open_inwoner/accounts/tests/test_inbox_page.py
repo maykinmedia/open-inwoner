@@ -28,7 +28,7 @@ class InboxPageTests(WebTest):
 
         self.assertEqual(conversations.count(), 2)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(messages[0]["data"], self.message2.content)
+        self.assertEqual(messages[0].id, self.message2.id)
 
     def test_show_conversation_with_user_specified(self):
         response = self.app.get(self.url, {"with": self.user1.email})
@@ -39,7 +39,7 @@ class InboxPageTests(WebTest):
 
         self.assertEqual(conversations.count(), 2)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(messages[0]["data"], self.message1.content)
+        self.assertEqual(messages[0].id, self.message1.id)
 
     def test_send_message(self):
         response = self.app.get(self.url, {"with": self.user1.email})
