@@ -1,16 +1,40 @@
 from django import template
+from django.http import QueryDict
 from django.urls import NoReverseMatch, reverse
 
 register = template.Library()
+
+
+@register.simple_tag(takes_context=True)
+def get_query_string(context, query, *values):
+    """
+    Combines query with existing querystring.
+    Usefull for creating querystrings utizling exist query parameters.
+
+    query: str | The querystring to add (without "?).
+    """
+    request = context["request"]
+    method = request.method
+
+    rquerydict = getattr(request, method).copy()
+    rquerydict._mutable = True
+
+    query_string = str(query).format(*values)
+    qquerydict = QueryDict(query_string)
+    for key, value in qquerydict.items():
+        rquerydict[key] = value
+
+    rquerydict._mutable = False
+    return f"?{rquerydict.urlencode()}"
 
 
 @register.inclusion_tag("components/Typography/Link.html")
 def link(href, **kwargs):
     """
     href: url | where the link links to (can be url name).
-
     bold: bool | whether the link should be bold. (Optional)
     uuid: str | if href is an url name, kwargs for reverse can be passed (Optional).
+    reverse_kwargs: dict | if href is an url name, kwargs for reverse can be passed (Optional).
     download: bool | If the linked file should be downoaded. (Optional)
     extra_classes: string | Extra classes (Optional)
     active: bool | If the link is active (Optional)
@@ -22,6 +46,7 @@ def link(href, **kwargs):
     social_icon: string | The icon that should be displayed from font-awesome (Optional)
     icon: string | The icon that should be displayed (Optional)
     text: string | The text that should be displayed in the link (Optional)
+    hide_text: bool | whether to hide the text and use aria attribute instead. (Optional).
     type: string | the type of button that should be used. (Optional)
     data_text: string | data-text (Optional)
     data_alt_text: string | data-alt-text (Optional)
@@ -37,6 +62,7 @@ def link(href, **kwargs):
     except NoReverseMatch:
         pass
 
+    kwargs["icon_position"] = kwargs.get("icon_position", kwargs.get("iconPosition"))
     kwargs["href"] = href
 
     return kwargs

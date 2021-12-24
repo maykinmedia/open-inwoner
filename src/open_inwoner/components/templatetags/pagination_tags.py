@@ -12,4 +12,9 @@ def pagination(page_obj, paginator, request, **kwargs):
 
     {% pagination page_obj=page_obj paginator=paginator request=request %}
     """
-    return {"page_obj": page_obj, "paginator": paginator, "request": request, **kwargs}
+    return {
+        "page_obj": page_obj,
+        "paginator": paginator,
+        "request": request,
+        **kwargs,
+    }

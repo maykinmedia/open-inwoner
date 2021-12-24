@@ -23,6 +23,7 @@ def button_row(parser, token):
 def button(**kwargs):
     """
     text: string | this will be the button text. (Optional)
+    hide_text: bool | whether to hide the text and use aria attribute instead. (Optional).
     href: url | where the link links to (can be url name). (Optional)
     uuid: str | if href is an url name, pk for reverse can be passed (Optional).
     size: "big" | If the button should be bigger. (Optional)

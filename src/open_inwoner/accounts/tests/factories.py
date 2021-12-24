@@ -66,3 +66,22 @@ class DocumentFactory(factory.django.DjangoModelFactory):
     name = factory.Faker("first_name")
     file = SimpleUploadedFile("file.jpg", b"file_content", content_type="image/jpeg")
     owner = factory.SubFactory(UserFactory)
+
+
+class MessageFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = "accounts.Message"
+
+    sender = factory.SubFactory(UserFactory)
+    receiver = factory.SubFactory(UserFactory)
+    content = factory.Faker("text")
+    seen = False
+
+    @classmethod
+    def _create(cls, target_class, *args, **kwargs):
+        created_on = kwargs.pop("created_on", None)
+        obj = super()._create(target_class, *args, **kwargs)
+        if created_on is not None:
+            obj.created_on = created_on
+            obj.save()
+        return obj

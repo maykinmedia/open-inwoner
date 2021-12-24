@@ -321,6 +321,10 @@ faker==9.9.0
     #   zgw-consumers
 freezegun==1.1.0
     # via -r requirements/test-tools.in
+furl==2.1.3
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
 gemma-zds-client==1.0.1
     # via
     #   -c requirements/base.txt
@@ -335,8 +339,11 @@ geopy==2.2.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-humanfriendly==10.0
 glom==20.11.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+humanfriendly==10.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -406,6 +413,11 @@ openpyxl==3.0.9
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   tablib
+orderedmultidict==1.0.1
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   furl
 pep8==1.7.1
     # via -r requirements/test-tools.in
 phonenumbers==8.12.33
@@ -538,7 +550,9 @@ six==1.16.0
     #   django-choices
     #   django-elasticsearch-dsl
     #   elasticsearch-dsl
+    #   furl
     #   isodate
+    #   orderedmultidict
     #   pyopenssl
     #   python-dateutil
     #   qrcode
@@ -616,15 +630,15 @@ xmlsec==1.3.12
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   python3-saml
+zgw-consumers==0.16.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
 zipp==3.6.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   importlib-metadata
-zgw-consumers==0.16.0
-    # via
-    #   -c requirements/base.txt
-    #   -r requirements/base.txt
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

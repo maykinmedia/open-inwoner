@@ -10,7 +10,7 @@
 
   /// Dimensions.
   box-sizing: border-box;
-  height: var(--row-height);
+  height: calc(var(--row-height) * 2);
   margin: 0;
   padding: var(--spacing-medium) var(--spacing-large);
 

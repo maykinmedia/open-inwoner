@@ -1,0 +1,7 @@
+{% load notification_tags %}
+
+<div class="notifications">
+    {% for message in messages %}
+        {% notification type=message.level title="" message=message.message action="" action_text="" closable=True %}
+    {% endfor %}
+</div>

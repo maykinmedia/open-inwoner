@@ -9,12 +9,13 @@
     {% if data_alt_text %}data-alt-text="{{ data_alt_text }}"{% endif %}
     {% if data_icon %}data-icon="{{ data_icon }}"{% endif %}
     {% if data_alt_icon %}data-alt-icon="{{ data_alt_icon }}"{% endif %}
+    {% if hide_text %}aria-describedby="{{ text }}" title="{{ text }}"{% endif %}
 >
     {% if src %}
         <img class="logo__image" src="{{src}}" alt="{{ text }}"{% if height %} height="{{ height }}"{% endif %}/>
     {% endif %}
 
-    {% if text %}<span class="link__text">{{ text }}</span>{% endif %}
+    {% if text and not hide_text %}<span class="link__text">{{ text }}</span>{% endif %}
 
     {% if social_icon %}
         <i class="fa-brands fa-{{social_icon}}"></i>

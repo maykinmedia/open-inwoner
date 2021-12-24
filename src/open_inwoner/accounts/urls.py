@@ -15,9 +15,11 @@ from .views import (
     MyCategoriesView,
     MyProfileView,
 )
+from .views.inbox import InboxView
 
 app_name = "accounts"
 urlpatterns = [
+    path("inbox/", InboxView.as_view(), name="inbox"),
     path("setup/", HomeView.as_view(), name="setup_1"),
     path("documents/create/", DocumentCreateView.as_view(), name="documents_create"),
     path(
