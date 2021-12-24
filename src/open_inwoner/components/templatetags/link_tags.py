@@ -76,9 +76,12 @@ def link(href, **kwargs):
 
         return href
 
-    def get_classes():
+    def get_base_class():
         button = kwargs.get("button", False)
-        base_class = "button" if button else "link"
+        return "button" if button else "link"
+
+    def get_classes():
+        base_class = get_base_class()
         classes = [base_class]
 
         for modifier_tuple in [
@@ -103,6 +106,7 @@ def link(href, **kwargs):
 
         return " ".join(classes).strip()
 
-    kwargs["href"] = get_href()
+    kwargs["base_class"] = get_base_class()
     kwargs["classes"] = get_classes()
+    kwargs["href"] = get_href()
     return kwargs
