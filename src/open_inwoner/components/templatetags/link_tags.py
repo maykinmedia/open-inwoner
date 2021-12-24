@@ -85,15 +85,15 @@ def link(href, **kwargs):
         classes = [base_class]
 
         for modifier_tuple in [
-            ('active', False),
-            ('align', ''),
-            ('bold', False),
-            ('icon_position', ''),
-            ('primary', False),
-            ('secondary', False)
+            ("active", False),
+            ("align", ""),
+            ("bold", False),
+            ("icon_position", ""),
+            ("primary", False),
+            ("secondary", False),
         ]:
             modifier, default = modifier_tuple
-            modifier_class = modifier.replace('_', '-')
+            modifier_class = modifier.replace("_", "-")
             value = kwargs.get(modifier, default)
 
             if not value:
@@ -102,7 +102,7 @@ def link(href, **kwargs):
             if type(default) is bool:
                 classes.append(f"{base_class}--{modifier_class}")
             classes.append(f"{base_class}--{modifier_class}-{value}")
-            classes.append(kwargs.get('extra_classes', ''))
+            classes.append(kwargs.get("extra_classes", ""))
 
         return " ".join(classes).strip()
 
