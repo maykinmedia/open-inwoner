@@ -4,7 +4,7 @@
     href="{{href}}"
     {% if download %}download{% endif %}
     {% if href|startswith:"http" %}target="_blank"{% endif %}
-    class="link{% if extra_classes %} {{ extra_classes }}{% endif %}{% if active %} link--active{% endif %} {% if align %}link--{{align}}{% endif %} {% if bold %} link--bold{% endif %}{% if icon_position %} link--icon-{{icon_position}}{% endif %}{% if primary %} link--primary{% endif %}{% if secondary %} link--secondary{% endif %}"
+    class="{{ classes }}{% if extra_classes %} {{ extra_classes }}{% endif %}"
     {% if data_text %}data-text="{{ data_text }}"{% endif %}
     {% if data_alt_text %}data-alt-text="{{ data_alt_text }}"{% endif %}
     {% if data_icon %}data-icon="{{ data_icon }}"{% endif %}

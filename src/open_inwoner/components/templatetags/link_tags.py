@@ -45,6 +45,7 @@ def link(href, **kwargs):
         - active, optional bool: If the link is active
         - align, optional str: "left" or "right".
         - bold, optional bool: whether the link should be bold.
+        - button, optional bool: Whether the link should appear as button.
         - data_text, optional str: data-text
         - data_alt_text, optional str: data-alt-text
         - data_icon, optional str: data-icon
@@ -55,7 +56,6 @@ def link(href, **kwargs):
         - icon, optional str: The icon that should be displayed.
         - icon_position, optional str: "before" or "after".
         - primary, optional bool: If the primary styling should be used
-        - reverse_kwargs, optional dict: if href is an url name, kwargs for reverse can be passed.
         - secondary, optional bool: If the secondary styling should be used
         - social_icon, optional str: The icon that should be displayed from font-awesome
         - src, optional str: The source of the image
@@ -63,16 +63,46 @@ def link(href, **kwargs):
         - type, optional str: the type of button that should be used.
         - uuid, optional str: if href is an url name, kwargs for reverse can be passed.
     """
-    try:
-        uuid = kwargs.get("uuid")
-        reverse_kwargs = {}
-        if uuid:
-            reverse_kwargs.update(uuid=uuid)
-        href = reverse(href, kwargs=reverse_kwargs)
-    except NoReverseMatch:
-        pass
 
-    kwargs["icon_position"] = kwargs.get("icon_position", kwargs.get("iconPosition"))
-    kwargs["href"] = href
+    def get_href():
+        try:
+            uuid = kwargs.get("uuid")
+            reverse_kwargs = {}
+            if uuid:
+                reverse_kwargs.update(uuid=uuid)
+            return reverse(href, kwargs=reverse_kwargs)
+        except NoReverseMatch:
+            pass
 
+        return href
+
+    def get_classes():
+        button = kwargs.get("button", False)
+        base_class = "button" if button else "link"
+        classes = [base_class]
+
+        for modifier_tuple in [
+            ('active', False),
+            ('align', ''),
+            ('bold', False),
+            ('icon_position', ''),
+            ('primary', False),
+            ('secondary', False)
+        ]:
+            modifier, default = modifier_tuple
+            modifier_class = modifier.replace('_', '-')
+            value = kwargs.get(modifier, default)
+
+            if not value:
+                continue
+
+            if type(default) is bool:
+                classes.append(f"{base_class}--{modifier_class}")
+            classes.append(f"{base_class}--{modifier_class}-{value}")
+            classes.append(kwargs.get('extra_classes', ''))
+
+        return " ".join(classes).strip()
+
+    kwargs["href"] = get_href()
+    kwargs["classes"] = get_classes()
     return kwargs
