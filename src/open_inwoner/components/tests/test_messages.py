@@ -2,11 +2,12 @@ import datetime
 
 from django.forms import Form
 from django.utils import timezone
+
 from freezegun import freeze_time
 
-from .abstract import InclusionTagWebTest
 from ...accounts.models import Message
-from ...accounts.tests.factories import UserFactory, MessageFactory
+from ...accounts.tests.factories import MessageFactory, UserFactory
+from .abstract import InclusionTagWebTest
 
 
 @freeze_time("2021-12-21 12:00:00")
