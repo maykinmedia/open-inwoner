@@ -1,5 +1,5 @@
 import datetime
-from typing import Union
+from typing import List, Union
 
 from django import template
 from django.forms import Form
@@ -20,7 +20,7 @@ def messages(
     subject: str,
     status: str,
 ):
-    def get_dates(message_list: MessageQuerySet) -> list[datetime.date]:
+    def get_dates(message_list: MessageQuerySet) -> List[datetime.date]:
         """
         Returns a list of dates to render message(s) for.
         """
@@ -40,7 +40,7 @@ def messages(
 
         return date
 
-    def get_messages_by_date(message_list: MessageQuerySet) -> list[dict]:
+    def get_messages_by_date(message_list: MessageQuerySet) -> List[dict]:
         """
         Returns a dict containing the date, it's text value and the messages sent on that date.
         """
