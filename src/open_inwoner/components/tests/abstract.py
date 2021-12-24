@@ -85,7 +85,9 @@ class InclusionTagWebTest(WebTest):
         self.assertTrue(html)
         return html
 
-    def assertSelector(self, selector: str, args: dict = {}, data: dict = {}) -> ResultSet:
+    def assertSelector(
+        self, selector: str, args: dict = {}, data: dict = {}
+    ) -> ResultSet:
         """
         Asserts that an HTML tag matching `selector` is present in the tag's rendered output.
 
@@ -101,7 +103,9 @@ class InclusionTagWebTest(WebTest):
         self.assertTrue(nodes)
         return nodes
 
-    def assertNotSelector(self, selector: str, args: dict = {}, data: dict = {}) -> ResultSet:
+    def assertNotSelector(
+        self, selector: str, args: dict = {}, data: dict = {}
+    ) -> ResultSet:
         """
         Asserts that an HTML tag matching `selector` is not present in the tag's rendered output.
 
@@ -117,7 +121,9 @@ class InclusionTagWebTest(WebTest):
         self.assertFalse(nodes)
         return nodes
 
-    def assertTextContent(self, selector: str, text: str, args: dict = {}, data: dict = {}) -> str:
+    def assertTextContent(
+        self, selector: str, text: str, args: dict = {}, data: dict = {}
+    ) -> str:
         """
         Asserts that an HTML tag matching `selector` has textual content matching `text`.
 

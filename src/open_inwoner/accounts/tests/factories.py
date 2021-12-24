@@ -79,7 +79,7 @@ class MessageFactory(factory.django.DjangoModelFactory):
 
     @classmethod
     def _create(cls, target_class, *args, **kwargs):
-        created_on = kwargs.pop('created_on', None)
+        created_on = kwargs.pop("created_on", None)
         obj = super()._create(target_class, *args, **kwargs)
         if created_on is not None:
             obj.created_on = created_on

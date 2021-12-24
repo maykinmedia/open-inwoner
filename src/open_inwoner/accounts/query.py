@@ -3,7 +3,7 @@ from django.db.models.query import QuerySet
 
 
 class MessageQuerySet(QuerySet):
-    def get_conversations_for_user(self, me: "User") -> 'MessageQuerySet':
+    def get_conversations_for_user(self, me: "User") -> "MessageQuerySet":
         """
         I apologize;
 
@@ -72,7 +72,7 @@ class MessageQuerySet(QuerySet):
 
         return result
 
-    def get_messages_between_users(self, me, other_user) -> 'MessageQuerySet':
+    def get_messages_between_users(self, me, other_user) -> "MessageQuerySet":
         """grouped by date"""
         return (
             self.filter(

@@ -15,13 +15,37 @@ class TestListItem(InclusionTagWebTest):
     tag = "messages"
 
     def setUp(self) -> None:
-        self.me = UserFactory.create(first_name='My', last_name='User', email='myuser@example.com')
-        other_user = UserFactory.create(first_name='Other', last_name='User', email='otheruser@example.com')
+        self.me = UserFactory.create(
+            first_name="My", last_name="User", email="myuser@example.com"
+        )
+        other_user = UserFactory.create(
+            first_name="Other", last_name="User", email="otheruser@example.com"
+        )
 
-        self.message_1 = MessageFactory.create(sender=self.me, receiver=other_user, created_on=timezone.now() - datetime.timedelta(days=2), content="Lorem ipsum.")
-        self.message_2 = MessageFactory.create(sender=self.me, receiver=other_user, created_on=timezone.now() - datetime.timedelta(days=1), content="Dolor sit amet.")
-        self.message_3 = MessageFactory.create(sender=other_user, receiver=self.me, created_on=timezone.now(), content="Consectetur adipiscing elit.")
-        self.message_4 = MessageFactory.create(sender=self.me, receiver=other_user, created_on=timezone.now() - datetime.timedelta(hours=2), content="Maecenas dignissim felis nec purus viverra.")
+        self.message_1 = MessageFactory.create(
+            sender=self.me,
+            receiver=other_user,
+            created_on=timezone.now() - datetime.timedelta(days=2),
+            content="Lorem ipsum.",
+        )
+        self.message_2 = MessageFactory.create(
+            sender=self.me,
+            receiver=other_user,
+            created_on=timezone.now() - datetime.timedelta(days=1),
+            content="Dolor sit amet.",
+        )
+        self.message_3 = MessageFactory.create(
+            sender=other_user,
+            receiver=self.me,
+            created_on=timezone.now(),
+            content="Consectetur adipiscing elit.",
+        )
+        self.message_4 = MessageFactory.create(
+            sender=self.me,
+            receiver=other_user,
+            created_on=timezone.now() - datetime.timedelta(hours=2),
+            content="Maecenas dignissim felis nec purus viverra.",
+        )
 
         message_queryset = Message.objects.all()
 
@@ -97,7 +121,9 @@ class TestListItem(InclusionTagWebTest):
         """
         self.assertSelector(f"#message-{self.message_1.pk}.message--ours", self.config)
         self.assertSelector(f"#message-{self.message_2.pk}.message--ours", self.config)
-        self.assertSelector(f"#message-{self.message_3.pk}.message--theirs", self.config)
+        self.assertSelector(
+            f"#message-{self.message_3.pk}.message--theirs", self.config
+        )
         self.assertSelector(f"#message-{self.message_4.pk}.message--ours", self.config)
 
     def test_subject(self):
