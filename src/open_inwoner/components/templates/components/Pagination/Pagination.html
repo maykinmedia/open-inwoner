@@ -1,4 +1,4 @@
-{% load icon_tags button_tags querystring %}
+{% load icon_tags button_tags querystring_tags %}
 
 <div class="pagination">
     {% if href %}
@@ -7,7 +7,7 @@
 
     <div class="pagination__pages">
         {% if page_obj.has_previous %}
-            <a class="pagination__link" href="?{% querystring request key='page' value=page_obj.previous_page_number %}">
+            <a class="pagination__link" href="?{% querystring key='page' value=page_obj.previous_page_number %}">
                 {% icon icon="chevron_left" %}
             </a>
         {% else %}
@@ -19,10 +19,10 @@
                 <span class="pagination__item pagination__item--active">{{ i }} <span class="sr-only">(current)</span></span>
             {% else %}
                 {% if i in page_numbers %}
-                    <a class="pagination__link" href="?{% querystring request key='page' value=i %}">{{ i }}</a>
+                    <a class="pagination__link" href="?{% querystring key='page' value=i %}">{{ i }}</a>
                 {% else %}
                     {% if i == 1 %}
-                        <a class="pagination__link" href="?{% querystring request key='page' value=i %}">{{ i }}</a>
+                        <a class="pagination__link" href="?{% querystring key='page' value=i %}">{{ i }}</a>
 
                         {% if 2 not in page_numbers %}
                             <span class="pagination__item">...</span>
@@ -34,14 +34,14 @@
                             <span class="pagination__item">...</span>
                         {% endif %}
 
-                        <a class="pagination__link" href="?{% querystring request key='page' value=i %}">{{ i }}</a>
+                        <a class="pagination__link" href="?{% querystring key='page' value=i %}">{{ i }}</a>
                     {% endif %}
                 {% endif %}
             {% endif %}
         {% endfor %}
 
         {% if page_obj.has_next %}
-            <a class="pagination__link" href="?{% querystring request key='page' value=page_obj.next_page_number %}">
+            <a class="pagination__link" href="?{% querystring key='page' value=page_obj.next_page_number %}">
                 {% icon icon="chevron_right" %}
             </a>
         {% else %}
