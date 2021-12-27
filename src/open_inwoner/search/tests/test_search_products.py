@@ -52,6 +52,12 @@ class SearchQueryTests(ESMixin, TestCase):
         self.assertEqual(len(results), 1)
         self.assertEqual(int(results[0].meta.id), self.product1.id)
 
+    def test_search_product_with_typo(self):
+        results = search_products("sumary").results
+
+        self.assertEqual(len(results), 1)
+        self.assertEqual(int(results[0].meta.id), self.product1.id)
+
 
 class SearchFacetTests(ESMixin, TestCase):
     def setUp(self):

@@ -73,3 +73,15 @@ class AutocompleteTests(ESMixin, TestCase):
         suggester_name, suggester_keyword = result.suggesters
         self.assertEqual(suggester_name.options, [])
         self.assertEqual(suggester_keyword.options, [])
+
+    def test_autocomplete_with_typo(self):
+        ProductFactory.create(name="thick", keywords=["Other"])
+        self.update_index()
+
+        result = search_autocomplete("thicc")
+
+        self.assertEqual(result.options, ["thick"])
+
+        suggester_name, suggester_keyword = result.suggesters
+        self.assertEqual(suggester_name.options, ["thick"])
+        self.assertEqual(suggester_keyword.options, [])
