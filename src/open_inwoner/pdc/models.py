@@ -51,7 +51,7 @@ class Category(MP_Node):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('pdc:category_detail', kwargs={'slug': self.slug})
+        return reverse("pdc:category_detail", kwargs={"slug": self.slug})
 
 
 class Product(models.Model):
@@ -141,7 +141,7 @@ class Product(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('pdc:product_detail', kwargs={'slug': self.slug})
+        return reverse("pdc:product_detail", kwargs={"slug": self.slug})
 
     def get_rendered_content(self):
         md = markdown.Markdown()
