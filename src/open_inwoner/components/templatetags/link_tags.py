@@ -5,29 +5,6 @@ from django.urls import NoReverseMatch, reverse
 register = template.Library()
 
 
-@register.simple_tag(takes_context=True)
-def get_query_string(context, query, *values):
-    """
-    Combines query with existing querystring.
-    Usefull for creating querystrings utizling exist query parameters.
-
-    query: str | The querystring to add (without "?).
-    """
-    request = context["request"]
-    method = request.method
-
-    rquerydict = getattr(request, method).copy()
-    rquerydict._mutable = True
-
-    query_string = str(query).format(*values)
-    qquerydict = QueryDict(query_string)
-    for key, value in qquerydict.items():
-        rquerydict[key] = value
-
-    rquerydict._mutable = False
-    return f"?{rquerydict.urlencode()}"
-
-
 @register.inclusion_tag("components/Typography/Link.html")
 def link(href, **kwargs):
     """
