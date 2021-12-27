@@ -1,0 +1,13 @@
+{% load link_tags list_tags %}
+
+<div class="dropdown">
+    {% link href='#' text=text id=id button=True primary=True icon='arrow_drop_down' %}
+
+    <nav class="dropdown__menu">
+        {% render_list %}
+            {% for kwargs in items %}
+                {% list_item text=kwargs.text href=kwargs.href %}
+            {% endfor %}
+        {% endrender_list %}
+    </nav>
+</div>

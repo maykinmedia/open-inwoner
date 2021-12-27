@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from urllib.parse import unquote
 
 from django import forms
@@ -46,6 +46,7 @@ class InboxView(LoginRequiredMixin, PaginationMixin, FormView):
         """
         context = super().get_context_data()
 
+        contact_conversation_items = self.get_contact_conversation_items()
         conversations = self.get_conversations()
         other_user = self.get_other_user(conversations)
         messages = self.get_messages(other_user)
@@ -53,6 +54,7 @@ class InboxView(LoginRequiredMixin, PaginationMixin, FormView):
 
         context.update(
             {
+                "contact_conversation_items": contact_conversation_items,
                 "conversations": conversations,
                 "conversation_messages": messages,
                 "other_user": other_user,
@@ -61,6 +63,17 @@ class InboxView(LoginRequiredMixin, PaginationMixin, FormView):
         )
 
         return context
+
+    def get_contact_conversation_items(self) -> List[dict]:
+        contacts = self.request.user.get_active_contacts()
+        return [
+            {
+                "text": str(contact),
+                "href": furl(self.request.path).add({"with": contact.email}).url
+            }
+            for contact
+            in contacts
+        ]
 
     def get_conversations(self) -> dict:
         """

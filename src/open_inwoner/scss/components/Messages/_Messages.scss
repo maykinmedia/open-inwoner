@@ -14,6 +14,10 @@
   }
 
   &__body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
     overflow-y: auto;
   }
 
@@ -76,5 +80,9 @@
 
   .message--ours {
     align-self: flex-end;
+  }
+
+  .form {
+    padding-bottom: 0;
   }
 }

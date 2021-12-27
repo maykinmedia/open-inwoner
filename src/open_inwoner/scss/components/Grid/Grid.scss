@@ -38,6 +38,7 @@
   }
 
   & > #{&}__sidebar ~ &__main {
+    grid-column-start: 4;
     grid-column-end: span 9;
   }
 

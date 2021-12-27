@@ -12,4 +12,12 @@
     border-radius: var(--border-radius);
     padding: var(--spacing-medium) var(--spacing-large);
   }
+
+  &__footer {
+    display: flex;
+  }
+
+  &--ours &__footer {
+    justify-content: flex-end;
+  }
 }
