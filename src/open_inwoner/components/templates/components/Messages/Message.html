@@ -1,0 +1,12 @@
+{% load i18n %}
+
+
+<aside class="message{% if ours %} message--ours{% else %} message--theirs{% endif %}" id="message-{{ message.pk }}" title="{% trans 'Bericht van:' %} {{ message.sender }}">
+    <div class="message__body">
+        <p class="p">{{ message.content }}</p>
+    </div>
+
+    <footer class="message__footer">
+        <p class="p p--muted p--small" title="{{ message.created_on }}">{{ message.created_on|time }}</p>
+    </footer>
+</aside>

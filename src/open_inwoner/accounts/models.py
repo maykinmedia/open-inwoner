@@ -6,7 +6,6 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
-from djchoices import choices
 from localflavor.nl.models import NLBSNField, NLZipCodeField
 from privates.storages import PrivateMediaFileSystemStorage
 
@@ -14,6 +13,7 @@ from open_inwoner.utils.validators import validate_phone_number
 
 from .choices import ContactTypeChoices, LoginTypeChoices, StatusChoices
 from .managers import DigidManager, UserManager, eHerkenningManager
+from .query import MessageQuerySet
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -319,3 +319,34 @@ class Action(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Message(models.Model):
+    sender = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="sent_messages",
+        help_text=_("THe sender of the message"),
+    )
+    receiver = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="received_messages",
+        help_text=_("The receiver of the message"),
+    )
+    created_on = models.DateTimeField(
+        _("Created on"),
+        auto_now_add=True,
+        help_text=_("This is the date the message was created"),
+    )
+    content = models.TextField(_("Content"), help_text=_("Text content of the message"))
+    seen = models.BooleanField(
+        _("Seen"),
+        default=False,
+        help_text=_("Boolean shows if the message was seem by the receiver"),
+    )
+
+    objects = MessageQuerySet.as_manager()
+
+    def __str__(self):
+        return f"From: {self.sender}, To: {self.receiver} ({self.created_on.date()})"

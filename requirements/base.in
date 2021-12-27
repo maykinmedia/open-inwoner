@@ -6,6 +6,7 @@ python-dotenv  # environment variables for secrets
 python-decouple  # processing of envvar configs
 geopy # geo decoder
 glom # processing nested data
+furl # processing urls
 
 # Framework libraries
 django < 4.0

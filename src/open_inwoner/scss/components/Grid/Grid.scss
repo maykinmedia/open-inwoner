@@ -3,6 +3,12 @@
   flex-direction: column;
   grid-gap: var(--gutter-width);
   width: 100%;
+  position: relative;
+
+  &--limit &__sidebar,
+  &--limit &__main {
+    max-height: 75vh;
+  }
 
   @media (min-width: 768px) {
     display: grid;
@@ -18,6 +24,12 @@
 
   & > #{&}__sidebar {
     grid-column-end: span 3;
+  }
+
+  @media (min-width: 768px) {
+    .container & #{&}__sidebar {
+      max-width: 228px;
+    }
   }
 
   & > #{&}__sidebar:empty {
@@ -46,4 +58,8 @@
     width: 50%;
     box-sizing: border-box;
   }
+}
+
+.h1 + .grid {
+  margin-top: var(--spacing-large);
 }

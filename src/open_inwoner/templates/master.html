@@ -1,4 +1,4 @@
-{% load static i18n header_tags card_tags footer_tags button_tags message_tags utils %}<!DOCTYPE html>
+{% load static i18n header_tags card_tags footer_tags button_tags notification_tags utils %}<!DOCTYPE html>
 <html lang="en" class="view {% block view_class %}view--{{ request.resolver_match.namespaces|join:'-' }}-{{ request.resolver_match.url_name }}{% endblock %}">
     <head>
         <meta charset="utf-8">
@@ -34,22 +34,18 @@
     <body>
         {% header logo_url=site_logo categories=menu_categories request=request breadcrumbs=breadcrumbs search_form=search_form %}
 
-        {% messages messages %}
+        {% notifications messages %}
 
         {% block header_image %}{% endblock header_image %}
 
         {% block main_outer %}
             <main class="container">
                 {% block main_inner %}
-                    <div class="grid">
-                        {% spaceless %}<aside class="grid__sidebar">
-                                {% block sidebar_content %}{% endblock sidebar_content %}
-                            </aside>{% endspaceless %}
+                    <div class="grid{% block grid_class %}{% endblock %}">
+                        {% spaceless %}<aside class="grid__sidebar">{% block sidebar_content %}{% endblock sidebar_content %}</aside>{% endspaceless %}
 
                         <div class="grid__main">
-                            {% block content %}
-                                Please provide the content
-                            {% endblock content %}
+                            {% block content %}Please provide the content{% endblock content %}
                         </div>
 
                         {% block extra_grid %}{% endblock extra_grid %}
