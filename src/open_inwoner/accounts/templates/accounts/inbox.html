@@ -30,7 +30,7 @@
 
 
 {% block content %}
-    {% if conversation_messages %}
+    {% if conversation_messages or other_user %}
         {% messages conversation_messages request.user form other_user status %}
     {% endif %}
 {% endblock %}

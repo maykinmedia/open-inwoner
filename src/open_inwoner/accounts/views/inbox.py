@@ -7,7 +7,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.utils import formats
 from django.utils.translation import gettext as _
-from django.views.generic import FormView
+from django.views.generic import FormView, TemplateView
 
 from furl import furl
 
@@ -121,3 +121,16 @@ class InboxView(LoginRequiredMixin, PaginationMixin, FormView):
         # build redirect url based on form hidden data
         url = furl(self.request.path).add({"with": form.data["receiver"]}).url
         return HttpResponseRedirect(f"{url}#messages-last")
+
+
+class InboxStartView(LoginRequiredMixin, TemplateView):
+    template_name = "accounts/inbox_start.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+
+        me = self.request.user
+        active_contacts = me.get_active_contacts()
+        context["active_contacts"] = active_contacts
+
+        return context
