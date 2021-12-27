@@ -13,10 +13,12 @@ register = template.Library()
 
 
 WIDGET_TEMPLATES = {
-    "INPUT": "components/Form/Input.html",
     "CHECKBOX": "components/Form/Checkbox.html",
     "MULTIPLECHECKBOX": "components/Form/MultipleCheckbox.html",
     "DATE": "components/Form/DateField.html",
+    "HIDDEN": "components/Form/Hidden.html",
+    "INPUT": "components/Form/Input.html",
+    "TEXTAREA": "components/Form/Textarea.html",
 }
 
 
@@ -84,10 +86,13 @@ def autorender_field(form_object, field_name, **kwargs):
 
     if type(field) == models.ModelMultipleChoiceField:
         tmplt = WIDGET_TEMPLATES["MULTIPLECHECKBOX"]
-
     if type(field) == fields.BooleanField:
         fn = checkbox
         tmplt = WIDGET_TEMPLATES["CHECKBOX"]
+    elif type(field.widget) == fields.HiddenInput:
+        tmplt = WIDGET_TEMPLATES["HIDDEN"]
+    elif type(field.widget) == fields.Textarea:
+        tmplt = WIDGET_TEMPLATES["TEXTAREA"]
 
     context = fn(bound_field, **kwargs)
     return render_to_string(tmplt, context)
@@ -110,6 +115,16 @@ def choice_checkbox(choice, **kwargs):
 
 @register.inclusion_tag("components/Form/Input.html")
 def input(field, **kwargs):
+    return {**kwargs, "field": field}
+
+
+@register.inclusion_tag("components/Form/Search.html")
+def search(field, **kwargs):
+    return {**kwargs, "field": field}
+
+
+@register.inclusion_tag("components/Form/Textarea.html")
+def textarea(field, **kwargs):
     return {**kwargs, "field": field}
 
 

@@ -1,7 +1,11 @@
 from time import time
+from typing import Iterable, Tuple
 
 from django.core.cache import caches
 from django.core.exceptions import PermissionDenied
+from django.core.paginator import InvalidPage, Page, Paginator
+from django.http import Http404
+from django.utils.translation import gettext as _
 
 
 class ThrottleMixin:
@@ -87,3 +91,62 @@ class IPThrottleMixin(ThrottleMixin):
     def get_throttle_identifier(self):
         # REMOTE_ADDR is correctly set in XForwardedForMiddleware
         return str(self.request.META["REMOTE_ADDR"])
+
+
+class PaginationMixin:
+    paginator_class = Paginator
+    page_kwarg = "page"
+    paginate_by = 10
+    paginate_orphans = 0
+    allow_empty = True
+
+    def paginate_object_list(
+        self, object_list: Iterable, page_size: int = None
+    ) -> Tuple[Paginator, Page, Iterable, bool]:
+        """copy MultipleObjectMixin.paginate_queryset method"""
+        page_size = page_size or self.paginate_by
+        paginator = self.paginator_class(
+            object_list,
+            page_size,
+            orphans=self.paginate_orphans,
+            allow_empty_first_page=self.allow_empty,
+        )
+        page_kwarg = self.page_kwarg
+        page = self.kwargs.get(page_kwarg) or self.request.GET.get(page_kwarg) or 1
+        try:
+            page_number = int(page)
+        except ValueError:
+            if page == "last":
+                page_number = paginator.num_pages
+            else:
+                raise Http404(
+                    _("Page is not 'last', nor can it be converted to an int.")
+                )
+        try:
+            page = paginator.page(page_number)
+            return paginator, page, page.object_list, page.has_other_pages()
+        except InvalidPage as e:
+            raise Http404(
+                _("Invalid page (%(page_number)s): %(message)s")
+                % {"page_number": page_number, "message": str(e)}
+            )
+
+    def paginate_with_context(
+        self, object_list: Iterable, page_size: int = None
+    ) -> dict:
+        """
+        Paginate objects with ``self.paginate_object_list`` but returns dict
+        instead of the tuple. The returned dict has keys which are used in
+        MultipleObjectMixin and is ready to be added to the context
+        """
+
+        page_size = page_size or self.paginate_by
+        paginator, page, object_list, is_paginated = self.paginate_object_list(
+            object_list, page_size
+        )
+        return {
+            "paginator": paginator,
+            "page_obj": page,
+            "object_list": object_list,
+            "is_paginated": is_paginated,
+        }

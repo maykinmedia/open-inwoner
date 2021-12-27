@@ -1,7 +1,0 @@
-{% load message_tags %}
-
-<div class="messages">
-    {% for message in messages %}
-        {% message type=message.level title="" message=message.message action="" action_text="" closable=True %}
-    {% endfor %}
-</div>

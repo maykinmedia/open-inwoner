@@ -36,10 +36,10 @@
 
   .logo {
     grid-area: lg;
-    max-height: var(--row-height);
+    //max-height: var(--row-height);
 
     @media (min-width: 768px) {
-      margin: var(--row-height) 0;
+      margin: var(--spacing-large) 0;
     }
   }
 

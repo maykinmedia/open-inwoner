@@ -10,7 +10,7 @@ class SearchPagination(PageNumberPagination):
     def get_paginated_response(self, data):
         pagination_data = OrderedDict(
             [
-                ("count", self.page.paginator.count),
+                ("count", self.page.get_paginator_dict.count),
                 ("next", self.get_next_link()),
                 ("previous", self.get_previous_link()),
             ]
