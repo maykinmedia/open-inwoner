@@ -1,8 +1,9 @@
 .list-item {
   border-top: 1px solid var(--color-gray-lightest);
   border-bottom: 1px solid var(--color-gray-lightest);
+  box-sizing: border-box;
   flex-basis: 100%;
-  padding: var(--spacing-large) 0;
+  padding: var(--spacing-large);
 
   .p--muted {
     margin-top: 0 !important;
