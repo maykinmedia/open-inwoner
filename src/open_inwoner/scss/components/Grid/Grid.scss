@@ -26,6 +26,12 @@
     grid-column-end: span 3;
   }
 
+  @media (min-width: 768px) {
+    .container & #{&}__sidebar {
+      max-width: 228px;
+    }
+  }
+
   & > #{&}__sidebar:empty {
     grid-column-end: span 12;
     display: none;
