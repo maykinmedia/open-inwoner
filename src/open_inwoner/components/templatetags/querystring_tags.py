@@ -1,11 +1,12 @@
 from django import template
 from django.http import QueryDict
 from django.utils.html import format_html
+
 register = template.Library()
 
 
 @register.simple_tag(takes_context=True)
-def querystring(context, *query_values, key='', value='', query=''):
+def querystring(context, *query_values, key="", value="", query=""):
     """
     Combines new items with existing querystring.
     Useful for creating a querystring utilizing existing query parameters.
