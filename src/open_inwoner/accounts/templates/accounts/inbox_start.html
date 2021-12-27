@@ -1,0 +1,15 @@
+{% extends 'master.html' %}
+{% load i18n link_tags  %}
+
+
+{% block main_inner %}
+    <h1 class="h1">{% trans 'Start conversation' %}</h1>
+    {{ block.super }}
+{% endblock %}
+
+{% block content %}
+    {% for contact in active_contacts %}
+        <a href="{% url 'accounts:inbox' %}?with={{ contact.contact_user.email }}">{{ contact.first_name }} {{ contact.last_name }}</a>
+
+    {% endfor %}
+{% endblock %}
