@@ -110,6 +110,8 @@ django-hijack==3.0.4
     # via -r requirements/base.in
 django-import-export==2.6.1
     # via -r requirements/base.in
+django-invitations==1.9.3
+    # via -r requirements/base.in
 django-ipware==4.0.0
     # via django-axes
 django-js-asset==1.2.2

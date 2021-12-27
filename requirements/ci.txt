@@ -179,6 +179,10 @@ django-import-export==2.6.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+django-invitations==1.9.3
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
 django-ipware==4.0.0
     # via
     #   -c requirements/base.txt

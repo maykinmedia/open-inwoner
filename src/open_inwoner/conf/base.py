@@ -140,6 +140,7 @@ INSTALLED_APPS = [
     "view_breadcrumbs",
     "django_better_admin_arrayfield",
     "zgw_consumers",
+    "invitations",
     # Project applications.
     "open_inwoner.accounts",
     "open_inwoner.components",
