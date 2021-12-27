@@ -2,6 +2,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
+
 import markdown
 from bs4 import BeautifulSoup
 from filer.fields.file import FilerFileField
