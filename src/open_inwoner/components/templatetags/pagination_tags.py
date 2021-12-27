@@ -16,7 +16,7 @@ def pagination(page_obj, paginator, request, lookaround=3, **kwargs):
     page_numbers = [
         page_obj.number - lookaround + i
         for i in range(lookaround * 2 + 1)
-        if (1 < page_obj.number - lookaround + i < paginator.num_pages)
+        if (1 <= page_obj.number - lookaround + i <= paginator.num_pages)
     ]
 
     return {
