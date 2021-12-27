@@ -117,6 +117,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         self.deactivated_on = date.today()
         self.save()
 
+    def get_active_contacts(self):
+        return self.contacts.filter(contact_user__is_active=True)
+
 
 class Contact(models.Model):
     uuid = models.UUIDField(
@@ -180,6 +183,17 @@ class Contact(models.Model):
         on_delete=models.CASCADE,
         related_name="contacts",
         help_text=_("This is the person that entered the contact person."),
+    )
+    contact_user = models.ForeignKey(
+        "accounts.User",
+        verbose_name=_("Contact user"),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="assigned_contacts",
+        help_text=_(
+            "The user from the contact, who was added based on the contact email."
+        ),
     )
 
     class Meta:
