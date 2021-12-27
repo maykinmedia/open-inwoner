@@ -52,14 +52,15 @@
   &__welcome {
     margin-top: calc(130px);
     margin-bottom: var(--row-height);
-    background-color: #ffffff;
-    box-shadow: 0 0 40px 0 rgba(0, 0, 0, 0.16);
+    background-color: var(--color-white);
+    box-shadow: 0 0 var(--row-height) 0 var(--color-mute);
     padding: var(--spacing-large);
     width: 50%;
     box-sizing: border-box;
   }
 }
 
+.grid + .grid,
 .h1 + .grid {
   margin-top: var(--spacing-large);
 }

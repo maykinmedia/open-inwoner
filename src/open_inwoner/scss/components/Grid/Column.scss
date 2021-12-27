@@ -12,4 +12,5 @@
   display: grid;
   grid-gap: var(--row-height);
   grid-auto-columns: 1fr;
+  position: relative;
 }

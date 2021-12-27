@@ -17,11 +17,11 @@
     font-weight: bold;
   }
 
-  &--left {
+  &--align-left {
     text-align: left;
   }
 
-  &--right {
+  &--align-right {
     text-align: right;
   }
 
@@ -31,15 +31,7 @@
     width: 20px;
   }
 
-  &--left {
-    text-align: left;
-  }
-
-  &--right {
-    text-align: right;
-  }
-
-  &--icon-before {
+  &--icon-position-before {
     flex-direction: row-reverse;
   }
 
