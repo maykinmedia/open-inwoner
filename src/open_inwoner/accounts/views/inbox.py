@@ -96,12 +96,6 @@ class InboxView(LoginRequiredMixin, PaginationMixin, FormView):
 
         return messages[:1000:-1]  # Show max 1000 messages for now.
 
-    def get_last_message_id(self, messages):
-        try:
-            return messages[-1]["message_id"]
-        except (IndexError, KeyError):
-            return ""
-
     def get_status(self, messages: MessageQuerySet) -> str:
         """
         Returns the status string of the conversation.
