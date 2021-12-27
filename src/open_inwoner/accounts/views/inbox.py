@@ -69,10 +69,9 @@ class InboxView(LoginRequiredMixin, PaginationMixin, FormView):
         return [
             {
                 "text": str(contact),
-                "href": furl(self.request.path).add({"with": contact.email}).url
+                "href": furl(self.request.path).add({"with": contact.email}).url,
             }
-            for contact
-            in contacts
+            for contact in contacts
         ]
 
     def get_conversations(self) -> dict:
