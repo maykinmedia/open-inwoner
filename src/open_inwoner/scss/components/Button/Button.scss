@@ -108,6 +108,10 @@
     border-color: var(--color-primary);
     color: var(--color-primary);
   }
+
+  > .link__text {
+    width: 100%;
+  }
 }
 
 .h4 + .button,
