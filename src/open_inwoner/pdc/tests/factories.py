@@ -1,10 +1,16 @@
 from django.contrib.gis.geos import Point
 from django.utils.text import slugify
 
-import factory
 import factory.fuzzy
 
-from ..models import Category, Organization, OrganizationType, Product, Tag
+from ..models import (
+    Category,
+    Organization,
+    OrganizationType,
+    Product,
+    ProductContact,
+    Tag,
+)
 
 
 class ProductFactory(factory.django.DjangoModelFactory):
@@ -65,3 +71,15 @@ class OrganizationFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = Organization
+
+
+class ProductContactFactory(factory.django.DjangoModelFactory):
+    product = factory.SubFactory(ProductFactory)
+    organization = factory.SubFactory(OrganizationFactory)
+    first_name = factory.Faker("first_name")
+    last_name = factory.Faker("last_name")
+    email = factory.Faker("email")
+    phonenumber = factory.Faker("phone_number")
+
+    class Meta:
+        model = ProductContact
