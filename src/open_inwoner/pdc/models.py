@@ -380,3 +380,19 @@ class ProductContact(models.Model):
 
     def __str__(self):
         return f"{self.product}: {self.first_name} {self.last_name}"
+
+    def get_mailto_link(self):
+        email = self.get_email()
+        if not email:
+            return
+        return f"mailto://{email}"
+
+    def get_email(self):
+        if self.email:
+            return self.email
+        return self.organization.email
+
+    def get_phone_number(self):
+        if self.phonenumber:
+            return self.phonenumber
+        return self.organization.phonenumber
