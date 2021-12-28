@@ -1,119 +1,158 @@
 {% extends 'master.html' %}
-{% load i18n l10n card_tags link_tags tag_tags file_tags utils icon_tags button_tags %}
+{% load i18n l10n button_tags card_tags file_tags grid_tags icon_tags link_tags tag_tags utils %}
 
 {% block sidebar_content %}
-<aside class="anchor-menu">
-    <ul class="anchor-menu__list">
-        <li class="anchor-menu__list-item">
-            <a class="link" href="#title">{{object.name}}</a>
-        </li>
-        {% if object.files.exists %}
+    <aside class="anchor-menu">
+        <ul class="anchor-menu__list">
             <li class="anchor-menu__list-item">
-                <a class="link" href="#files">{% trans "Bestanden" %}</a>
+                <a class="link" href="#title">{{ object.name }}</a>
             </li>
-        {% endif %}
-        {% if object.locations.exists %}
+            {% if object.files.exists %}
+                <li class="anchor-menu__list-item">
+                    <a class="link" href="#files">{% trans "Bestanden" %}</a>
+                </li>
+            {% endif %}
+            {% if object.locations.exists %}
+                <li class="anchor-menu__list-item">
+                    <a class="link" href="#locations">{% trans "Locaties" %}</a>
+                </li>
+            {% endif %}
+            {% if object.links.exists %}
+                <li class="anchor-menu__list-item">
+                    <a class="link" href="#links">{% trans "Links" %}</a>
+                </li>
+            {% endif %}
+            {% if product.product_contacts.exists %}
+                <li class="anchor-menu__list-item">
+                    <a class="link" href="#contact">{% trans "Contact" %}</a>
+                </li>
+            {% endif %}
+            {% if object.related_products.exists %}
+                <li class="anchor-menu__list-item">
+                    <a class="link" href="#see">{% trans "Zie ook" %}</a>
+                </li>
+            {% endif %}
             <li class="anchor-menu__list-item">
-                <a class="link" href="#locations">{% trans "Locaties" %}</a>
+                <a class="link" href="#share">{% trans "Delen" %}</a>
             </li>
-        {% endif %}
-        {% if object.links.exists %}
-            <li class="anchor-menu__list-item">
-                <a class="link" href="#links">{% trans "Links" %}</a>
+            <li class="anchor-menu__list-item anchor-menu__list-item--top">
+                <a class="link link--primary" href="#top">
+                    {% icon icon="arrow_upward" %}
+                    Terug naar boven
+                </a>
             </li>
-        {% endif %}
-        {% if object.related_products.exists %}
-            <li class="anchor-menu__list-item">
-                <a class="link" href="#see">{% trans "Zie ook" %}</a>
-            </li>
-        {% endif %}
-        <li class="anchor-menu__list-item">
-            <a class="link" href="#share">{% trans "Delen" %}</a>
-        </li>
-        <li class="anchor-menu__list-item anchor-menu__list-item--top">
-            <a class="link link--primary" href="#top">
-                {% icon icon="arrow_upward" %}
-                Terug naar boven
-            </a>
-        </li>
-    </ul>
-</aside>
+        </ul>
+    </aside>
 {% endblock sidebar_content %}
 
 {% block content %}
-<h1 class="h1" id="title">
-    {{object.name}}
-    {% if product.link %}
-        {% button href=product.link size="big" text=_("Aanvraag starten") primary=True icon="arrow_forward" icon_position="after" %}
+    <h1 class="h1" id="title">
+        {{ object.name }}
+        {% if product.link %}
+            {% button href=product.link size="big" text=_("Aanvraag starten") primary=True icon="arrow_forward" icon_position="after" %}
+        {% endif %}
+    </h1>
+    {% tag tags=object.tags.all %}
+    <p class="p">{{ object.summary }}</p>
+    {{ object.get_rendered_content|safe }}
+    {% if object.files.exists %}
+        <hr class="divider">
+        {% file_list files=object.files.all %}
     {% endif %}
-</h1>
-{% tag tags=object.tags.all %}
-<p class="p">{{object.summary}}</p>
-{{ object.get_rendered_content|safe }}
-{% if object.files.exists %}
-    <hr class="divider">
-    {% file_list files=object.files.all %}
-{% endif %}
-{% if object.locations.exists %}
-    <hr class="divider">
-    <nav class="location-card-list">
-        <h4 class="h4" id="locations">{% trans "Locaties" %}</h4>
-        <ul class="location-card-list__list">
-            {% for location in object.locations.all %}
-                <li class="location-card-list__list-item">
-                    <aside class="card">
-                        {% localize off %}
-                        <div class="leaflet--map leaflet--map--small" data-lan="{{ location.geometry.y }}" data-lng="{{ location.geometry.x }}" data-zoom="18"></div>
-                        {% endlocalize %}
-                        <div class="card__body">
-                            <h4 class="h4">{{location.name}}</h4>
-                            <p class="p">
-                                {{location.street}} {{location.number}}<br>
-                                {{location.postcode}} {{location.city}}
-                            </p>
-                        </div>
-                    </aside>
-                </li>
-            {% endfor %}
-        </ul>
-    </nav>
-{% endif %}
-<hr class="divider">
-
-<div class="grid">
-    {% if object.links.exists %}
-        <nav class="link-list">
-            <h4 class="h4" id="links">{% trans "Links" %}</h4>
-            <ul class="link-list__list">
-                {% for link in object.links.all %}
-                    <li class="link-list__list-item">
-                        {% link href=link.url secondary=True text=link.name %}
+    {% if object.locations.exists %}
+        <hr class="divider">
+        <nav class="location-card-list">
+            <h4 class="h4" id="locations">{% trans "Locaties" %}</h4>
+            <ul class="location-card-list__list">
+                {% for location in object.locations.all %}
+                    <li class="location-card-list__list-item">
+                        <aside class="card">
+                            {% localize off %}
+                                <div class="leaflet--map leaflet--map--small" data-lan="{{ location.geometry.y }}"
+                                     data-lng="{{ location.geometry.x }}" data-zoom="18"></div>
+                            {% endlocalize %}
+                            <div class="card__body">
+                                <h4 class="h4">{{ location.name }}</h4>
+                                <p class="p">
+                                    {{ location.street }} {{ location.number }}<br>
+                                    {{ location.postcode }} {{ location.city }}
+                                </p>
+                            </div>
+                        </aside>
                     </li>
                 {% endfor %}
             </ul>
         </nav>
     {% endif %}
-    <aside>
-        {% if object.related_products.exists %}
-            <nav class="link-list">
-                <h4 class="h4" id="see">{% trans "Zie ook" %}</h4>
-                <ul class="link-list__list">
-                    {% for related in object.related_products.all %}
-                        <li class="link-list__list-item">
-                            {% url 'pdc:product_detail' slug=related.slug as product_url %}
-                            {% link href=product_url text=related.name secondary=True %}
-                        </li>
-                    {% endfor %}
-                </ul>
+    <hr class="divider">
+
+    {% render_grid %}
+        {% render_column span=6 %}
+            {# Links. #}
+            {% if object.links.exists %}
+                <nav class="link-list">
+                    <h4 class="h4" id="links">{% trans "Links" %}</h4>
+                    <ul class="link-list__list">
+                        {% for link in object.links.all %}
+                            <li class="link-list__list-item">
+                                {% link href=link.url secondary=True text=link.name %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </nav>
+            {% endif %}
+
+            {% if object.product_contacts %}
+
+                <nav class="link-list">
+                    <h4 class="h4" id="contact">{% trans 'Contact' %}</h4>
+                    <ul class="link-list__list">
+                        {% for product_contact in object.product_contacts.all %}
+                            <li class="link-list__list-item">
+                                <p class="p">{{ product_contact.first_name }} {{ product_contact.last_name }}</p>
+                            </li>
+
+                            {% if product_contact.get_phone_number %}
+                                <li class="link-list__list-item">
+                                    <p class="p">{{ product_contact.get_phone_number }}</p>
+                                </li>
+                            {% endif %}
+
+                            {% if product_contact.get_mailto_link %}
+                                <li class="link-list__list-item">
+                                    {% link href=product_contact.get_mailto_link text=product_contact.email secondary=True %}
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% endrender_column %}
+
+        {% render_column start=7 span=6 %}
+            {# Related products. #}
+            {% if object.related_products.exists %}
+                <nav class="link-list">
+                    <h4 class="h4" id="see">{% trans "Zie ook" %}</h4>
+                    <ul class="link-list__list">
+                        {% for related in object.related_products.all %}
+                            <li class="link-list__list-item">
+                                {% url 'pdc:product_detail' slug=related.slug as product_url %}
+                                {% link href=product_url text=related.name secondary=True %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </nav>
+            {% endif %}
+
+            {# Social links. #}
+            <nav class="social">
+                <h4 class="h4" id="share">{% trans "Delen" %}</h4>
+                {% link social_icon="facebook" href="#" extra_classes="social__link" %}
+                {% link social_icon="twitter" href="#" extra_classes="social__link" %}
+                {% link social_icon="whatsapp" href="#" extra_classes="social__link" %}
+                {% link social_icon="linkedin" href="#" extra_classes="social__link" %}
             </nav>
-        {% endif %}
-        <nav class="social">
-            <h4 class="h4" id="share">{% trans "Delen" %}</h4>
-            {% link social_icon="facebook" href="#" extra_classes="social__link" %}
-            {% link social_icon="twitter" href="#" extra_classes="social__link" %}
-            {% link social_icon="whatsapp" href="#" extra_classes="social__link" %}
-            {% link social_icon="linkedin" href="#" extra_classes="social__link" %}
-        </nav>
-    </aside>
-</div>
+        {% endrender_column %}
+    {% endrender_grid %}
 {% endblock content %}
