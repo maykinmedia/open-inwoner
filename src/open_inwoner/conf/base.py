@@ -144,7 +144,7 @@ INSTALLED_APPS = [
     # Project applications.
     "open_inwoner.accounts",
     "open_inwoner.components",
-    "open_inwoner.ckeditor",
+    "open_inwoner.ckeditor5",
     "open_inwoner.pdc",
     "open_inwoner.search",
     "open_inwoner.utils",
