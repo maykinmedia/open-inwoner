@@ -4,6 +4,7 @@ from uuid import uuid4
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 from django.utils import timezone
+from django.utils.crypto import get_random_string
 from django.utils.translation import ugettext_lazy as _
 
 from localflavor.nl.models import NLBSNField, NLZipCodeField
@@ -364,3 +365,46 @@ class Message(models.Model):
 
     def __str__(self):
         return f"From: {self.sender}, To: {self.receiver} ({self.created_on.date()})"
+
+
+class Invite(models.Model):
+    inviter = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="sent_invites",
+        help_text=_("User who created the invite"),
+    )
+    invitee = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="received_invites",
+        help_text=_("User who received the invite"),
+    )
+    contact = models.ForeignKey(
+        Contact,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="invites",
+        help_text=_("THe contact the creation of which triggered sending the invite"),
+    )
+    accepted = models.BooleanField(verbose_name=_("accepted"), default=False)
+    key = models.CharField(verbose_name=_("key"), max_length=64, unique=True)
+    created_on = models.DateTimeField(
+        _("Created on"),
+        auto_now_add=True,
+        help_text=_("This is the date the message was created"),
+    )
+
+    def __str__(self):
+        return f"For: {self.invitee} ({self.created_on.date()})"
+
+    def save(self, **kwargs):
+        if not self.pk:
+            self.key = self.generate_key()
+
+        return super().save(**kwargs)
+
+    @staticmethod
+    def generate_key():
+        return get_random_string(64).lower()
