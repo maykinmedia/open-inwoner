@@ -8,6 +8,7 @@ from django.utils.crypto import get_random_string
 from django.utils.translation import ugettext_lazy as _
 
 from localflavor.nl.models import NLBSNField, NLZipCodeField
+from mail_editor.helpers import find_template
 from privates.storages import PrivateMediaFileSystemStorage
 
 from open_inwoner.utils.validators import validate_phone_number
@@ -408,3 +409,13 @@ class Invite(models.Model):
     @staticmethod
     def generate_key():
         return get_random_string(64).lower()
+
+    def send(self):
+        template = find_template("invite")
+        context = {
+            "inviter_name": self.inviter.get_full_name(),
+            "email": self.invitee.email,
+            "invite_link": "#",  # TODO
+        }
+
+        return template.send_email([self.invitee.email], context)
