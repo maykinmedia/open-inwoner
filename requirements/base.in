@@ -38,6 +38,7 @@ django-view-breadcrumbs
 markdown
 django_better_admin_arrayfield
 humanfriendly
+git+https://github.com/maykinmedia/mail-editor.git@763e1b81d8411ef7214560a8e6958193661f6e34#egg=mail-editor
 
 # API libraries
 djangorestframework

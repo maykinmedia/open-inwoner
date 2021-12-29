@@ -137,6 +137,7 @@ django==3.2.7
     #   djangorestframework
     #   drf-spectacular
     #   easy-thumbnails
+    #   mail-editor
     #   maykin-django-two-factor-auth
     #   zgw-consumers
 django-admin-index==1.5.0
@@ -164,7 +165,13 @@ django-choices==1.7.2
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   digid-eherkenning
+    #   mail-editor
     #   zgw-consumers
+django-ckeditor==6.2.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   mail-editor
 django-colorfield==0.4.5
     # via
     #   -c requirements/ci.txt
@@ -215,6 +222,7 @@ django-js-asset==1.2.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   django-ckeditor
     #   django-mptt
 django-leaflet==0.28.1
     # via
@@ -433,6 +441,10 @@ lxml==4.6.3
     #   pyquery
     #   python3-saml
     #   xmlsec
+mail-editor @ git+https://github.com/maykinmedia/mail-editor.git@763e1b81d8411ef7214560a8e6958193661f6e34
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 markdown==3.3.6
     # via
     #   -c requirements/ci.txt

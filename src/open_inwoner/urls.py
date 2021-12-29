@@ -61,6 +61,7 @@ urlpatterns = [
     # Views
     path("accounts/", include("open_inwoner.accounts.urls", namespace="accounts")),
     path("pages/", include("django.contrib.flatpages.urls"), name="flatpages"),
+    path("mail-editor/", include("mail_editor.urls", namespace="mail_editor")),
     path("", include("open_inwoner.pdc.urls", namespace="pdc")),
     path("", include("open_inwoner.search.urls", namespace="search")),
     path("", HomeView.as_view(), name="root"),
