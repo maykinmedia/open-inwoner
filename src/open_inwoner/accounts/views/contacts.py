@@ -5,7 +5,7 @@ from django.views.generic import CreateView, ListView
 from django.views.generic.edit import UpdateView
 
 from ..forms import ContactForm
-from ..models import Contact
+from ..models import Contact, Invite
 
 
 class ContactListView(LoginRequiredMixin, ListView):
@@ -43,4 +43,13 @@ class ContactCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         self.object = form.save(self.request.user)
+
+        # send invite to the contact
+        contact_user = self.object.contact_user
+        if not contact_user.is_active and not contact_user.deactivated_on:
+            invite = Invite.objects.create(
+                inviter=self.request.user, invitee=contact_user, contact=self.object
+            )
+            invite.send()
+
         return HttpResponseRedirect(self.get_success_url())
