@@ -20,6 +20,23 @@ def messages(
     subject: str,
     status: str,
 ):
+    """
+    Generate all messages in a conversation
+
+    Usage:
+        {% messages message_list=messages me=request.user form=message_form subject="this is the subject" status="open" %}
+
+    Variables:
+        + message_list: Message[] | a list of messages that needs to be displayed.
+        + me: User | currently loggedin user.
+        + form: Form | a django form.
+        + subject: string | The title that will be displayed above the messages.
+        + status: string | The status below the subject.
+
+    Extra context:
+        - days: set | the message_list grouped by date.
+    """
+
     def get_dates(message_list: MessageQuerySet) -> List[datetime.date]:
         """
         Returns a list of dates to render message(s) for.
@@ -69,6 +86,16 @@ def messages(
 
 @register.inclusion_tag("components/Messages/Message.html")
 def message(message: Message, ours: bool) -> dict:
+    """
+    Display a message
+
+    Usage:
+        {% message message="this is a message" ours=False %}
+
+    Variables:
+        + message: string | the message that needs to be displayed.
+        + ours: bool | if we send the message or not.
+    """
     return {
         "ours": ours,
         "message": message,

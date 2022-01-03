@@ -5,14 +5,37 @@ register = template.Library()
 
 @register.inclusion_tag("components/Notification/Notifications.html")
 def notifications(messages, **kwargs):
+    """
+    display multiple notifications. They will now always be positioned absolute.
+
+    Usage:
+        {% notifications messages=request.messages %}
+
+    Variables:
+        + messages: list | A list of messages that need to be displayed.
+    """
     return {"messages": messages, **kwargs}
 
 
 @register.inclusion_tag("components/Notification/Notification.html")
-def notification(type, title, message, **kwargs):
+def notification(type, message, **kwargs):
+    """
+    Add a notification to the screen. These will be places inline.
+
+    Usage:
+        {% notification type="success" message="this is the message" closable=True %}
+        {% notification type="warning" title="title" message="this is the message" action="#" action_text="Verzoek opsturen" %}
+
+    Variables:
+        + type: string | the type of notification. This will change the coloring.
+        + message: string | The message for the notification.
+        - title: string | The title that should be displayed.
+        - action: string | The href of the button.
+        - action_text: string | The text of the button.
+        - closable: bool | If a close button should be shown.
+    """
     return {
         "type": type,
-        "title": title,
         "message": message,
         **kwargs,
     }

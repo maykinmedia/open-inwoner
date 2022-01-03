@@ -9,7 +9,15 @@ register = template.Library()
 @register.tag()
 def render_list(parser, token):
     """
-    Nested content supported.
+    renders a list containing list items
+
+    Usage:
+        {% render_list %}
+            add a list of list items here
+        {% endrender_list %}
+
+    Extra context:
+        - contents: string (HTML) | this is the context between the render_list and endrender_list tags
     """
     bits = token.split_contents()
     context_kwargs = parse_component_with_args(parser, bits, "render_list")
@@ -21,9 +29,15 @@ def render_list(parser, token):
 @register.inclusion_tag("components/List/ListItem.html")
 def list_item(text, description="", href="", **kwargs):
     """
-    title: string | this will be the item's title.
-    description: string | this will be the item's description. (Optional)
-    href: url | where the item links to. (Optional)
+    A list item?
+
+    Usage:
+        {% list_item title=_("List item title") %}
+
+    Variables:
+        + title: string | this will be the item's title.
+        - description: string | this will be the item's description.
+        - href: url | where the item links to.
     """
     kwargs["text"] = text
     kwargs["description"] = kwargs.get("description", description)

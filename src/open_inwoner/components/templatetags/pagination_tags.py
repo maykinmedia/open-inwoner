@@ -6,12 +6,19 @@ register = template.Library()
 @register.inclusion_tag("components/Pagination/Pagination.html")
 def pagination(page_obj, paginator, request, lookaround=3, **kwargs):
     """
-    page_obj: Default django page object
-    paginator: Default django paginator
-    request: The django request (this will be for the querystring tag. So it is not used yet)
-    lookaround: int | The amount of pages to render around the active page number (default=3)
+    Describing information
 
-    {% pagination page_obj=page_obj paginator=paginator request=request %}
+    Usage:
+        {% pagination page_obj=page_obj paginator=paginator request=request %}
+
+    Variables:
+        + page_obj: Default django page object
+        + paginator: Default django paginator
+        + request: The django request (this will be for the querystring tag. So it is not used yet)
+        - lookaround: int | The amount of pages to render around the active page number
+
+    Extra context:
+        - page_numbers: int | The number of pages to show before showing the dots.
     """
     page_numbers = [
         page_obj.number - lookaround + i
