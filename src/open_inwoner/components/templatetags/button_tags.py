@@ -14,16 +14,16 @@ def button_row(parser, token):
     This is only a wrapper to make sure that the buttons are displayed correctly.
 
     Usage:
-    {% button_row %}
-        {% button text="button 1" %}
-        {% button text="button 2" %}
-    {% endbutton_row %}
+        {% button_row %}
+            {% button text="button 1" %}
+            {% button text="button 2" %}
+        {% endbutton_row %}
 
     Variables:
-    - align: enum[right] | if the buttons should be aligned left (no align should be given) or alinged right side.
+        - align: enum[right] | if the buttons should be aligned left (no align should be given) or alinged right side.
 
     Extra context:
-    - contents: string (HTML) | this is the context between the button_row and endbutton_row tags
+        - contents: string (HTML) | this is the context between the button_row and endbutton_row tags
     """
     bits = token.split_contents()
     context_kwargs = parse_component_with_args(parser, bits, "button_row")

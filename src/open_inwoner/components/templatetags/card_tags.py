@@ -10,13 +10,18 @@ register = template.Library()
 @register.inclusion_tag("components/Card/Card.html")
 def card(href, title, **kwargs):
     """
-    href: url | where the card links to. (Optional)
-    title: string | this will be the card title. (Optional)
+    Render in a card. Only using variables.
 
-    alt: string | the alt of the header image. (optional)
-    direction: string | can be set to "horizontal" to show contents horizontally (Optional).
-    src: string | the src of the header image. (optional)
-    tinted: bool | whether to use gray as background color. (Optional)
+    Usage:
+        {% card href="https://maykinmedia.nl" %}
+
+    Variables:
+        - href: url | where the card links to.
+        - title: string | this will be the card title.
+        - alt: string | the alt of the header image.
+        - direction: string | can be set to "horizontal" to show contents horizontally.
+        - src: string | the src of the header image.
+        - tinted: bool | whether to use gray as background color.
     """
     return {**kwargs, "href": href, "title": title}
 
@@ -24,8 +29,15 @@ def card(href, title, **kwargs):
 @register.tag
 def render_card(parser, token):
     """
-    Supports all options from card.
-    Nested content supported.
+    Render in a card. Using nested elements.
+
+    Usage:
+        {% render_card %}
+            <h1 class="h1">{% trans 'Welkom' %}</h1>
+        {% endrender_card %}
+
+    Extra context:
+        - contents: string (HTML) | this is the context between the render_card and endrender_card tags
     """
     bits = token.split_contents()
     context_kwargs = parse_component_with_args(parser, bits, "render_card")
@@ -37,14 +49,15 @@ def render_card(parser, token):
 @register.inclusion_tag("components/Card/CategoryCard.html")
 def category_card(category: Category, **kwargs):
     """
-    Renders a card prepopulated based on `category`.
+    Cards that are tailored for displaying the category with all the products listed inside.
 
-    Example:
-        {% category_card category %}
+    Usage:
+        {% category_card title=category.title products=category.products.all %}
 
-    Available options:
-
-        - category, Category: the category to render card for.
+    Variables:
+        + title: string | this will be the card title.
+        + products: Product[] | products to render.
+        - href: url | where the card links to.
     """
     return {**kwargs, "category": category}
 
@@ -52,14 +65,15 @@ def category_card(category: Category, **kwargs):
 @register.inclusion_tag("components/Card/ProductCard.html")
 def product_card(product: Product, **kwargs):
     """
-    Renders a card prepopulated based on `product`.
+    A card for rendering a product card.
 
-    Example:
-        {% product_card product %}
+    Usage:
+        {% product_card title=product.title description=product.description href=product.get_absolute_url %}
 
-    Available options:
-
-        - product, Product: the product to render card for.
+    Variables:
+        + title: string | this will be the card title.
+        + description: string | this will be the card description.
+        + href: url | where the card links to.
     """
     return {**kwargs, "product": product}
 
@@ -67,12 +81,19 @@ def product_card(product: Product, **kwargs):
 @register.inclusion_tag("components/Card/CardContainer.html")
 def card_container(categories=[], subcategories=[], products=[], **kwargs):
     """
-    categories: Category[] | categories to render.
-    subcategories: Category[] | subcategories to render.
-    products: Product[] | products to render.
+    A card container where the category card or product card will be rendered in.
+
+    Usage:
+    {% card_container categories=categories %}
+
+    Variables:
+    - categories: Category[] | categories to render. (Optional)
+    - subcategories: Category[] | subcategories to render. (Optional)
+    - products: Product[] | products to render. (Optional)
     """
     if categories is None and subcategories is None and products is None:
         assert False, "provide categories, subcategories or products"
+
     return {
         **kwargs,
         "categories": categories,

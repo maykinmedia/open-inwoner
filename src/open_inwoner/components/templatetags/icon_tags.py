@@ -6,7 +6,21 @@ register = template.Library()
 @register.inclusion_tag("components/Icon/Icon.html")
 def icon(icon, **kwargs):
     """
-    icon: the name of the icon.
-    outlined: if we need to use the outlined icon (Optional)
+    Displaying an icon. This can be from Material Icons or Fontawesome brands.
+
+    Material Icons: https://fonts.google.com/icons
+    Fontawesome Brands: https://fontawesome.com/v5.15/icons?d=gallery&p=2&s=brands
+
+    Example:
+        {% icon "arrow-forward" %}
+
+    Variables:
+        - icon: string | what icon to display.
+        - outlined: bool | if the outlined material icons should be used. (Optional)
+
+    Extra context:
+        - social: bool | if the icon is from Fontawesome brands.
     """
-    return {**kwargs, "icon": icon}
+
+    social = icon in ["facebook", "twitter", "whatsapp", "linkedin"]
+    return {**kwargs, "icon": icon, "social": social}
