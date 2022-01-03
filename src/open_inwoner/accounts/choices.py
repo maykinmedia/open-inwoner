@@ -12,7 +12,7 @@ class LoginTypeChoices(DjangoChoices):
 class ContactTypeChoices(DjangoChoices):
     contact = ChoiceItem("contact", _("Contactpersoon"))
     begeleider = ChoiceItem("begeleider", _("Begeleider"))
-    organization = ChoiceItem("organization", _("Orgnaisatie"))
+    organization = ChoiceItem("organization", _("Organisatie"))
 
 
 class StatusChoices(DjangoChoices):
