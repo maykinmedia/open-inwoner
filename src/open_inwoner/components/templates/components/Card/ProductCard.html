@@ -1,9 +1,6 @@
-{% load card_tags icon_tags %}
+{% load card_tags icon_tags link_tags %}
 {% render_card %}
-    <h3 class="h3">{{ title }}</h3>
-    <p class="p">{{ description }}</p>
-    {# todo: replace with link tag. #}
-    <a class="button button--icon-before button--transparent" href="{{ href }}">
-        {% icon icon="arrow_forward" %}
-    </a>
+    <h3 class="h3">{% link product.get_absolute_url text=product.name %}</h3>
+    <p class="p">{{ product.summary }}</p>
+    {% link product.get_absolute_url text=product.name hide_text=True icon='arrow_forward' button=True transparent=True %}
 {% endrender_card %}
