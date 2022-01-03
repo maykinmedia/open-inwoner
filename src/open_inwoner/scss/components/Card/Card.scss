@@ -63,4 +63,9 @@
   .form {
     padding: 0;
   }
+
+  /// Arrow button on product cards.
+  a.button:last-child {
+    float: right;
+  }
 }

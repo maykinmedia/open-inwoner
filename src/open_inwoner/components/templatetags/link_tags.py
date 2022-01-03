@@ -33,6 +33,7 @@ def link(href, **kwargs):
         - icon_position, optional str: "before" or "after".
         - primary, optional bool: If the primary styling should be used
         - secondary, optional bool: If the secondary styling should be used
+        - transparent, optional bool: Whether the button should not have a background or border.
         - social_icon, optional str: The icon that should be displayed from font-awesome
         - src, optional str: The source of the image
         - text, optional str: The text that should be displayed in the link
@@ -67,6 +68,7 @@ def link(href, **kwargs):
             ("icon_position", ""),
             ("primary", False),
             ("secondary", False),
+            ("transparent", False),
         ]:
             modifier, default = modifier_tuple
             modifier_class = modifier.replace("_", "-")
@@ -77,6 +79,7 @@ def link(href, **kwargs):
 
             if type(default) is bool:
                 classes.append(f"{base_class}--{modifier_class}")
+                continue
             classes.append(f"{base_class}--{modifier_class}-{value}")
             classes.append(kwargs.get("extra_classes", ""))
 

@@ -1,5 +1,6 @@
 from django import template
 
+from ...pdc.models import Category, Product
 from ...utils.templatetags.abstract import ContentsNode
 from .form_tags import parse_component_with_args
 
@@ -34,22 +35,33 @@ def render_card(parser, token):
 
 
 @register.inclusion_tag("components/Card/CategoryCard.html")
-def category_card(title, products, **kwargs):
+def category_card(category: Category, **kwargs):
     """
-    title: string | this will be the card title. (Optional)
-    products: Product[] | products to render.
-    href: url | where the card links to. (Optional)
+    Renders a card prepopulated based on `category`.
+
+    Example:
+        {% category_card category %}
+
+    Available options:
+
+        - category, Category: the category to render card for.
     """
-    return {**kwargs, "products": products, "title": title}
+    return {**kwargs, "category": category}
 
 
 @register.inclusion_tag("components/Card/ProductCard.html")
-def product_card(title, description, href, **kwargs):
+def product_card(product: Product, **kwargs):
     """
-    title: string | this will be the card title. (Optional)
-    description: string | this will be the card description. (Optional)
+    Renders a card prepopulated based on `product`.
+
+    Example:
+        {% product_card product %}
+
+    Available options:
+
+        - product, Product: the product to render card for.
     """
-    return {**kwargs, "description": description, "title": title, "href": href}
+    return {**kwargs, "product": product}
 
 
 @register.inclusion_tag("components/Card/CardContainer.html")

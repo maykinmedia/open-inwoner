@@ -1,5 +1,6 @@
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 import markdown
@@ -49,6 +50,9 @@ class Category(MP_Node):
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse("pdc:category_detail", kwargs={"slug": self.slug})
 
 
 class Product(models.Model):
@@ -136,6 +140,9 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse("pdc:product_detail", kwargs={"slug": self.slug})
 
     def get_rendered_content(self):
         md = markdown.Markdown()
