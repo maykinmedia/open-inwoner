@@ -45,13 +45,6 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                     "primary_color",
                     "secondary_color",
                     "accent_color",
-                )
-            },
-        ),
-        (
-            _("Font"),
-            {
-                "fields": (
                     "primary_font_color",
                     "secondary_font_color",
                     "accent_font_color",
@@ -74,6 +67,8 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                     "login_text",
                     "home_welcome_title",
                     "home_welcome_intro",
+                    "home_theme_title",
+                    "home_theme_intro",
                     "theme_title",
                     "theme_intro",
                     "home_map_title",
@@ -83,7 +78,15 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
         ),
         (
             _("Footer addresses"),
-            {"fields": ("footer_visitor_mail",)},
+            {
+                "fields": (
+                    "home_visiting_title",
+                    "home_visiting_intro",
+                    "home_visiting_map",
+                    "home_mailing_title",
+                    "home_mailing_intro",
+                )
+            },
         ),
     )
     inlines = [SiteConfigurationPageInline]

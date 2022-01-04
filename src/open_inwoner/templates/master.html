@@ -54,7 +54,7 @@
             </main>
         {% endblock main_outer %}
 
-        {% footer logo_url=site_logo address_content=configurable_text.footer_visitor_mail.get_rendered_content|safe flatpages=configurable_text.footer_flatpages%}
+        {% footer logo_url=site_logo flatpages=configurable_text.footer.flatpages home_visiting_title=configurable_text.footer.home_visiting_title home_visiting_intro=configurable_text.footer.home_visiting_intro home_visiting_map=configurable_text.footer.home_visiting_map home_mailing_title=configurable_text.footer.home_mailing_title home_mailing_intro=configurable_text.footer.home_mailing_intro %}
 
         <script defer src="{% static 'bundles/open_inwoner-js.js' %}"></script>
     </body>

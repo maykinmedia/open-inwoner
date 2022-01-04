@@ -27,14 +27,26 @@ def settings(request):
             "accent_font_color": config.accent_font_color,
         },
         "configurable_text": {
-            "home_welcome_title": config.home_welcome_title,
-            "home_welcome_intro": config.home_welcome_intro,
-            "theme_title": config.theme_title,
-            "theme_intro": config.theme_intro,
-            "home_map_title": config.home_map_title,
-            "home_map_intro": config.home_map_intro,
-            "footer_visitor_mail": config,
-            "footer_flatpages": config.flatpages,
+            "home_page": {
+                "home_welcome_title": config.home_welcome_title,
+                "home_welcome_intro": config.home_welcome_intro,
+                "home_theme_title": config.home_theme_title,
+                "home_theme_intro": config.home_theme_intro,
+                "home_map_title": config.home_map_title,
+                "home_map_intro": config.home_map_intro,
+            },
+            "theme_page": {
+                "theme_title": config.theme_title,
+                "theme_intro": config.theme_intro,
+            },
+            "footer": {
+                "home_visiting_title": config.home_visiting_title,
+                "home_visiting_intro": config.home_visiting_intro,
+                "home_visiting_map": config.home_visiting_map,
+                "home_mailing_title": config.home_mailing_title,
+                "home_mailing_intro": config.home_mailing_intro,
+                "flatpages": config.get_ordered_flatpages,
+            },
         },
         "hero_image_login": config.hero_image_login.file.url
         if config.hero_image_login

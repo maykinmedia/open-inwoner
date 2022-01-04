@@ -4,31 +4,20 @@
     {% logo src=logo_url alt=""%}
 
     <aside class="footer__visitor">
-        <p class="p">{{address_content}}</p>
+        <h4 class="h4">{{home_visiting_title}}</h4>
+        <p class="p">
+            {{home_visiting_intro}}
+        </p>
+        {% button icon="arrow_forward" icon_position='before' transparent=True text=_("Bekijk op Google Maps") href=home_visiting_map %}
     </aside>
 
-    {% comment %} <aside class="footer__visitor">
-        <h4 class="h4">{% trans "Bezoekadres" %}</h4>
-        <p class="p">
-            {% trans "Stadhuis Spui (stadsdeelkantoor Centrum)<br/>Spui 70, 2511 BT Den Haag" %}
-        </p>
-        {% button icon="arrow_forward" icon_position='before' transparent=True text=_("Bekijk op Google Maps") %}
-    </aside>
 
     <aside class="footer__mail">
-        <h4 class="h4">{% trans "Postadres" %}</h4>
+        <h4 class="h4">{{home_mailing_title}}</h4>
         <p class="p">
-            {% trans "Gemeente Den Haag<br/>Postbus 12 600<br/>2500 DJ Den Haag" %}
+            {{home_mailing_intro}}
         </p>
     </aside>
-
-    {% social primary=True %}
-
-    <aside class="footer__newsletter">
-        <h4 class="h4">{% trans "Meld je aan voor de nieuwsbrief" %}</h4>
-        {% trans "Aanmelden" as singup_text %}
-        {% button primary=True text=singup_text %}
-    </aside> {% endcomment %}
 
     <nav class="footer__links">
         <ul class="footer__list">
