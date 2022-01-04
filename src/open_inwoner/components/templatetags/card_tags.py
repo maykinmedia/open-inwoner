@@ -79,3 +79,28 @@ def card_container(categories=[], subcategories=[], products=[], **kwargs):
         "subcategories": subcategories,
         "products": products,
     }
+
+
+@register.tag()
+def render_card_container(parser, token):
+    """
+    Nested content supported.
+
+    Usage:
+        {% render_card_container %}
+            {% card href='https://www.example.com' title='example.com' %}
+        {% endrender_card_container %}
+
+    Variables:
+        Supports all options from card, but optional.
+
+     Extra context:
+         - contents: string (HTML) | this is the context between the render_card and endrender_card tags
+    """
+    bits = token.split_contents()
+    context_kwargs = parse_component_with_args(parser, bits, "render_list")
+    nodelist = parser.parse(("endrender_card_container",))  # End tag
+    parser.delete_first_token()
+    return ContentsNode(
+        nodelist, "components/Card/CardContainer.html", **context_kwargs
+    )  # Template
