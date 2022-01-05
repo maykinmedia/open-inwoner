@@ -35,9 +35,10 @@ def list_item(text, description="", href="", **kwargs):
         {% list_item title=_("List item title") %}
 
     Variables:
-        + title: string | this will be the item's title.
+        + text: string | this will be the item's title.
         - description: string | this will be the item's description.
         - href: url | where the item links to.
+        - active: bool | if the current list item is active or not.
     """
     kwargs["text"] = text
     kwargs["description"] = kwargs.get("description", description)

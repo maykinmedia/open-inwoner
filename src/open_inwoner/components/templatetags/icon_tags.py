@@ -11,12 +11,12 @@ def icon(icon, **kwargs):
     Material Icons: https://fonts.google.com/icons
     Fontawesome Brands: https://fontawesome.com/v5.15/icons?d=gallery&p=2&s=brands
 
-    Example:
+    Usage:
         {% icon "arrow-forward" %}
 
     Variables:
-        - icon: string | what icon to display.
-        - outlined: bool | if the outlined material icons should be used. (Optional)
+        + icon: string | what icon to display.
+        - outlined: bool | if the outlined material icons should be used.
 
     Extra context:
         - social: bool | if the icon is from Fontawesome brands.

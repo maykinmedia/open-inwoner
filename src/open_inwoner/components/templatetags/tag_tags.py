@@ -12,6 +12,6 @@ def tag(tags, **kwargs):
         {% tag tags=Tag.objects.all %}
 
     Variables:
-        - tag: Tag | a tag.
+        + tags: Tag | a tag.
     """
     return {**kwargs, "tags": tags}

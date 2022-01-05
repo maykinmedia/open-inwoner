@@ -22,24 +22,38 @@ WIDGET_TEMPLATES = {
 }
 
 
-def parse_component_with_args(parser, bits, tag_name):
-    tag_args, tag_kwargs = parse_bits(
-        parser=parser,
-        bits=bits,
-        params=["tag_name"],
-        takes_context=False,
-        name=tag_name,
-        varargs=True,
-        varkw=[],
-        defaults=None,
-        kwonly=[],
-        kwonly_defaults=None,
-    )
-    return tag_kwargs
-
-
 @register.tag()
 def render_form(parser, token):
+    """
+    Rendering the form where the contents will not be the standard form elements.
+
+    Usage:
+        {% render_form form=form method="GET" %}
+            <input type="text" />
+        {% endrender_form %}
+
+    Variables:
+        + form: Form | This is the django form that should be rendered.
+        + method: string | GET or POST, which function is needed.
+        - columns: int | the number of columns that the form should have.
+        - spaceless: bool | If the form element and sub elements should contain margins and paddings (not including the inputs).
+        - inline: bool | If the form actions should be displayed on the same line as a field.
+        - extra_classes: string | Extra css classes for the form.
+        - form_action: string | where the form should go after submit.
+        - enctype: string | set the encrypt when sending forms.
+        - id: string | set an id on the form. Usefull for testing.
+        - data_confirm_title: string | If a confirm dialog is shown this will be the title.
+        - data_confirm_cancel: string | If a confirm dialog is shown this will be the text on the cancel button.
+        - data_confirm_default: string | If a confirm dialog is shown this will be the text on the confirm button.
+        - submit_text: string | The text on the submit button when the form is auto rendered.
+        - secondary_href: string | The link for the secondary button when the form is auto rendered.
+        - secondary_text: string | The text for the secondary button when the form is auto rendered.
+        - secondary_icon: string | The icon for the secondary button when the form is auto rendered.
+        - secondary_icon_position: string | The icon position for the secondary button when the form is auto rendered.
+
+    Extra context:
+        - contents: string | The html content between all the open and closing tags.
+    """
     function_name = "render_form"
     nodelist = parser.parse(("endrender_form",))
     parser.delete_first_token()
@@ -63,6 +77,31 @@ def render_form(parser, token):
 def form(context, form_object, **kwargs):
     """
     Renders a form including all fields.
+
+    Usage:
+        {% form form_object=form method="GET" %}
+
+    Variables:
+        + form_object: Form | This is the django form that should be rendered.
+        + method: string | GET or POST, which function is needed.
+        - columns: int | the number of columns that the form should have.
+        - spaceless: bool | If the form element and sub elements should contain margins and paddings (not including the inputs).
+        - inline: bool | If the form actions should be displayed on the same line as a field.
+        - extra_classes: string | Extra css classes for the form.
+        - form_action: string | where the form should go after submit.
+        - enctype: string | set the encrypt when sending forms.
+        - id: string | set an id on the form. Usefull for testing.
+        - data_confirm_title: string | If a confirm dialog is shown this will be the title.
+        - data_confirm_cancel: string | If a confirm dialog is shown this will be the text on the cancel button.
+        - data_confirm_default: string | If a confirm dialog is shown this will be the text on the confirm button.
+        - submit_text: string | The text on the submit button when the form is auto rendered.
+        - secondary_href: string | The link for the secondary button when the form is auto rendered.
+        - secondary_text: string | The text for the secondary button when the form is auto rendered.
+        - secondary_icon: string | The icon for the secondary button when the form is auto rendered.
+        - secondary_icon_position: string | The icon position for the secondary button when the form is auto rendered.
+
+    Extra context:
+        - auto_render: True | Telling the template that the form should be rendered.
     """
     _context = context.flatten()
     kwargs["submit_text"] = kwargs.get("submit_text", _("Verzenden"))
@@ -72,8 +111,15 @@ def form(context, form_object, **kwargs):
 @register.simple_tag()
 def autorender_field(form_object, field_name, **kwargs):
     """
-    Auto renders field
+    Detecting what type of field sould be rendered.
     TODO: Keep updating with new fields.
+
+    Usage:
+        {% autorender_field form field %}
+
+    Variables:
+        + form_object: Form | This is the django form that contains the field.
+        + field_name: FormField | the field that needs to be rendered.
     """
     bound_field = form_object[field_name]
     field = bound_field.field
@@ -100,36 +146,109 @@ def autorender_field(form_object, field_name, **kwargs):
 
 @register.inclusion_tag("components/Form/Error.html")
 def errors(errors, **kwargs):
+    """
+    Displaying the form errors in a standard way.
+
+    Usage:
+        {% errors form.non_field_errors %}
+
+    Variables:
+        + errors: list | The non field errors or the field errors.
+    """
     return {**kwargs, "errors": errors}
 
 
 @register.inclusion_tag(WIDGET_TEMPLATES["CHECKBOX"])
 def checkbox(field, **kwargs):
+    """
+    Displaying a checkbox.
+
+    Usage:
+        {% checkbox form.checkbox_field %}
+
+    Variables:
+        + field: Field | The field that needs to be rendered.
+    """
     return {**kwargs, "field": field}
 
 
 @register.inclusion_tag("components/Form/ChoiceCheckbox.html")
 def choice_checkbox(choice, **kwargs):
+    """
+    Displaying a checkbox that is rendered from a multiple choice field.
+
+    Usage:
+        {% choice_checkbox form.checkbox_field %}
+
+    Variables:
+        + field: Field | The field that needs to be rendered.
+    """
     return {**kwargs, "choice": choice}
 
 
 @register.inclusion_tag("components/Form/Input.html")
 def input(field, **kwargs):
+    """
+    Displaying a input field. This is the fallback for every autorendered field.
+
+    Usage:
+        {% input form.field %}
+
+    Variables:
+        + field: Field | The field that needs to be rendered.
+    """
     return {**kwargs, "field": field}
 
 
 @register.inclusion_tag("components/Form/Search.html")
 def search(field, **kwargs):
+    """
+    Displaying a search field.
+
+    Usage:
+        {% search form.field %}
+
+    Variables:
+        + field: Field | The field that needs to be rendered.
+    """
     return {**kwargs, "field": field}
 
 
 @register.inclusion_tag("components/Form/Textarea.html")
 def textarea(field, **kwargs):
+    """
+    Displaying a textarea.
+
+    Usage:
+        {% textarea form.field %}
+
+    Variables:
+        + field: Field | The field that needs to be rendered.
+    """
     return {**kwargs, "field": field}
 
 
 @register.inclusion_tag("components/Form/FormActions.html")
 def form_actions(primary_text="", primary_icon=None, **kwargs):
+    """
+    Rendering the form actions. This will be the submit button and optionally a secondary button.
+
+    Usage:
+        {% form_actions primary_text="Submit" %}
+
+    Variables:
+        - primary_text: string | The text for the primary button
+        - primary_icon: string | The icon for the primary button
+        - single: bool | if it should be single
+        - secondary_href: string | The action when the secondary button is pressed.
+        - secondary_text: string | What the text for the secondary button should be.
+        - secondary_icon: string | What the icon for the secondary button should be.
+        - secondary_icon_position: string | What the icon position for the secondary button should be.
+        - transparent: bool | If the button should be transparent.
+
+    Extra context:
+        - primary: bool | If the primary styling should be used.
+    """
     if not primary_text and primary_icon is None:
         assert False, "provide primary_text or primary_icon"
 
@@ -143,8 +262,18 @@ def form_actions(primary_text="", primary_icon=None, **kwargs):
 
 
 @register.filter(name="addclass")
-def addclass(field, class_attr):
-    return field.as_widget(attrs={"class": class_attr})
+def addclass(field, class_string):
+    """
+    Adds a class to the default field rendering of django.
+
+    Usage:
+        {{ field|addclass:"input" }}
+
+    Varialbes:
+        + field: Field | The field where the class needs to be added to.
+        + class_string: string | The class that needs to be added.
+    """
+    return field.as_widget(attrs={"class": class_string})
 
 
 class FormNode(template.Node):
@@ -169,3 +298,19 @@ class FormNode(template.Node):
         }
         rendered = render_to_string("components/Form/Form.html", render_context)
         return rendered
+
+
+def parse_component_with_args(parser, bits, tag_name):
+    tag_args, tag_kwargs = parse_bits(
+        parser=parser,
+        bits=bits,
+        params=["tag_name"],
+        takes_context=False,
+        name=tag_name,
+        varargs=True,
+        varkw=[],
+        defaults=None,
+        kwonly=[],
+        kwonly_defaults=None,
+    )
+    return tag_kwargs
