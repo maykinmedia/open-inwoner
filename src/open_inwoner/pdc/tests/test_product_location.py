@@ -5,14 +5,6 @@ from .factories import ProductLocationFactory
 
 
 class ProductLocationTestCase(TestCase):
-    def test_create(self):
-        ProductLocationFactory.create(
-            street="Keizersgracht",
-            housenumber="117",
-            postcode="1015CJ",
-            city="Amsterdam",
-        )
-
     def test_geocode(self):
         product_location = ProductLocationFactory.create(
             street="Keizersgracht",
