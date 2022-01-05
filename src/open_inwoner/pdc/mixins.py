@@ -33,6 +33,9 @@ class GeoModelQuerySet(models.QuerySet):
         """
         ids = self.values_list("id", flat=True)
 
+        if not ids:
+            return
+
         with connection.cursor() as cursor:
             cursor.execute(
                 "SELECT ST_AsText(ST_Centroid(ST_Collect(geometry))) "
