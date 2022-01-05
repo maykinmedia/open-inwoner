@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n l10n button_tags card_tags file_tags grid_tags icon_tags link_tags tag_tags utils %}
+{% load i18n l10n button_tags card_tags file_tags grid_tags icon_tags link_tags map_tags tag_tags utils %}
 
 {% block sidebar_content %}
     <aside class="anchor-menu">
@@ -59,31 +59,24 @@
         <hr class="divider">
         {% file_list files=object.files.all %}
     {% endif %}
+
+    {# Locations #}
     {% if object.locations.exists %}
         <hr class="divider">
-        <nav class="location-card-list">
-            <h4 class="h4" id="locations">{% trans "Locaties" %}</h4>
-            <ul class="location-card-list__list">
-                {% for location in object.locations.all %}
-                    <li class="location-card-list__list-item">
-                        <aside class="card">
-                            {% localize off %}
-                                <div class="leaflet--map leaflet--map--small" data-lan="{{ location.geometry.y }}"
-                                     data-lng="{{ location.geometry.x }}" data-zoom="18"></div>
-                            {% endlocalize %}
-                            <div class="card__body">
-                                <h4 class="h4">{{ location.name }}</h4>
-                                <p class="p">
-                                    {{ location.street }} {{ location.number }}<br>
-                                    {{ location.postcode }} {{ location.city }}
-                                </p>
-                            </div>
-                        </aside>
-                    </li>
-                {% endfor %}
-            </ul>
-        </nav>
+
+        {% with centroid=object.locations.get_centroid %}
+            {% map centroid.lat centroid.lng id="locations" title=_('Locaties') geojson_feature_collection=object.locations.get_geojson_feature_collection %}
+        {% endwith %}
+
+        {% render_card_container columns=3 %}
+            {% for location in object.locations.all %}
+                {% render_card title=location.name %}
+                    <p class="p">{{ location.address_line_1 }}<br>{{ location.address_line_2 }}</p>
+                {% endrender_card %}
+            {% endfor %}
+        {% endrender_card_container %}
     {% endif %}
+
     <hr class="divider">
 
     {% render_grid %}
