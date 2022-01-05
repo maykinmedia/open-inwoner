@@ -2,8 +2,6 @@ from django.contrib.flatpages.models import FlatPage
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-import markdown
-from bs4 import BeautifulSoup
 from colorfield.fields import ColorField
 from filer.fields.image import FilerImageField
 from ordered_model.models import OrderedModel, OrderedModelManager

@@ -4,26 +4,26 @@
     {% logo src=logo_url alt=""%}
 
     <aside class="footer__visitor">
-        <h4 class="h4">{{home_visiting_title}}</h4>
+        <h4 class="h4">{{footer_texts.home_visiting_title}}</h4>
         <p class="p">
-            {{home_visiting_intro}}
+            {{footer_texts.home_visiting_intro}}
         </p>
-        {% button icon="arrow_forward" icon_position='before' transparent=True text=_("Bekijk op Google Maps") href=home_visiting_map %}
+        {% button icon="arrow_forward" icon_position='before' transparent=True text=_("Bekijk op Google Maps") href=footer_texts.home_visiting_map %}
     </aside>
 
 
     <aside class="footer__mail">
-        <h4 class="h4">{{home_mailing_title}}</h4>
+        <h4 class="h4">{{footer_texts.home_mailing_title}}</h4>
         <p class="p">
-            {{home_mailing_intro}}
+            {{footer_texts.home_mailing_intro}}
         </p>
     </aside>
 
     <nav class="footer__links">
         <ul class="footer__list">
-            {% for flatpage in flatpages.all %}
+            {% for flatpage in footer_texts.flatpages.all %}
                 <li class="footer__list-item">
-                    {% link text=flatpage.title secondary=True href="#" %}
+                    {% link text=flatpage.title secondary=True href=flatpage.get_absolute_url %}
                 </li>
             {% endfor %}
         </ul>
