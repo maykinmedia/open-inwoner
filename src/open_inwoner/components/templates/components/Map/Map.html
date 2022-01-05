@@ -1,0 +1,7 @@
+<aside class="{{ classes }}"{% if id %} id="{{ id }}"{% endif %}>
+    {% if title %}
+        <h4 class="h4">{{ title }}</h4>
+    {% endif %}
+
+    <div class="map__leaflet" style="height={{ height }}" data-lat="{{ lat }}" data-lng="{{ lng }}" data-zoom="{{ zoom }}"{% if geojson_feature_collection %} data-geojson-feature-collection="{{ geojson_feature_collection|force_escape }}"{% endif %}></div>
+</aside>

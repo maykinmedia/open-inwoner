@@ -1,5 +1,5 @@
 {% load card_tags %}
-<div class="card-container{% if columns %} card-container--columns-{{columns}}{% endif %} {% if small %}card-container--small{% endif %}">
+<div class="card-container{% if columns %} card-container--columns-{{columns}}{% endif %}{% if small %} card-container--small{% endif %}">
     {% if categories %}
         {% for category in categories %}
             {% url 'pdc:category_detail' slug=category.slug as category_url %}
@@ -18,4 +18,6 @@
             {% product_card product=product %}
         {% endfor %}
     {% endif %}
+
+    {{ contents }}
 </div>

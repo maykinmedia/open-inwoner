@@ -1,0 +1,17 @@
+.map {
+  .h4 {
+    margin-bottom: var(--spacing-large);
+  }
+
+  &__leaflet {
+    height: 500px;
+  }
+
+  &--small &__leaflet {
+    height: 100px;
+  }
+}
+
+.p + .map {
+  margin-top: var(--spacing-large);
+}
