@@ -7,8 +7,8 @@ from django.views.generic import FormView
 
 from open_inwoner.utils.mixins import PaginationMixin
 
-from .searches import search_products
 from .forms import FeedbackForm, SearchForm
+from .searches import search_products
 
 
 class SearchView(PaginationMixin, FormView):

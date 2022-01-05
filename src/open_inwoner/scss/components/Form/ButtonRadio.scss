@@ -10,8 +10,8 @@
   &__button {
     border: 1px solid #d2d2d2;
     border-left: 0;
-    background-color: #f1f1f1;
-    color: #7a7a7a;
+    background-color: var(--color-gray-lightest);
+    color: var(--color-gray-lighter);
     display: inline-block;
     padding: 12px;
   }
