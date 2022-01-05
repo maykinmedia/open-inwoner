@@ -48,5 +48,5 @@ def map(lat=None, lng=None, **kwargs):
     kwargs["lng"] = lng
     kwargs["classes"] = get_classes()
     kwargs["height"] = kwargs.get("height", "300px")
-    kwargs["zoom"] = kwargs.get("zoom", 13)
+    kwargs["zoom"] = kwargs.get("zoom", 8)
     return kwargs
