@@ -49,15 +49,13 @@ def render_card(parser, token):
 @register.inclusion_tag("components/Card/CategoryCard.html")
 def category_card(category: Category, **kwargs):
     """
-    Cards that are tailored for displaying the category with all the products listed inside.
+    Renders a card prepopulated based on `category`.
 
     Usage:
-        {% category_card title=category.title products=category.products.all %}
+        {% category_card category %}
 
-    Variables:
-        + title: string | this will be the card title.
-        + products: Product[] | products to render.
-        - href: url | where the card links to.
+    Available options:
+        - category, Category: the category to render card for.
     """
     return {**kwargs, "category": category}
 
@@ -65,15 +63,13 @@ def category_card(category: Category, **kwargs):
 @register.inclusion_tag("components/Card/ProductCard.html")
 def product_card(product: Product, **kwargs):
     """
-    A card for rendering a product card.
+    Renders a card prepopulated based on `product`.
 
     Usage:
-        {% product_card title=product.title description=product.description href=product.get_absolute_url %}
+        {% product_card product %}
 
-    Variables:
-        + title: string | this will be the card title.
-        + description: string | this will be the card description.
-        + href: url | where the card links to.
+    Available options:
+        - product, Product: the product to render card for.
     """
     return {**kwargs, "product": product}
 
