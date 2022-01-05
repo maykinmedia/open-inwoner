@@ -16,8 +16,8 @@ def card(href, title, **kwargs):
         {% card href="https://maykinmedia.nl" %}
 
     Variables:
-        - href: url | where the card links to.
-        - title: string | this will be the card title.
+        + href: url | where the card links to.
+        + title: string | this will be the card title.
         - alt: string | the alt of the header image.
         - direction: string | can be set to "horizontal" to show contents horizontally.
         - src: string | the src of the header image.
@@ -84,12 +84,12 @@ def card_container(categories=[], subcategories=[], products=[], **kwargs):
     A card container where the category card or product card will be rendered in.
 
     Usage:
-    {% card_container categories=categories %}
+        {% card_container categories=categories %}
 
     Variables:
-    - categories: Category[] | categories to render. (Optional)
-    - subcategories: Category[] | subcategories to render. (Optional)
-    - products: Product[] | products to render. (Optional)
+        - categories: Category[] | categories to render.
+        - subcategories: Category[] | subcategories to render.
+        - products: Product[] | products to render.
     """
     if categories is None and subcategories is None and products is None:
         assert False, "provide categories, subcategories or products"

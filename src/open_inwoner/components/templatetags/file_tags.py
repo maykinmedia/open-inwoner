@@ -23,23 +23,20 @@ IMAGE_TYPES = [
 
 
 @register.inclusion_tag("components/File/FileList.html")
-def file_list(**kwargs):
+def file_list(files, **kwargs):
     """
-        Describing information
+    Generate a list of files with the correct spacing.
 
     Usage:
-    {% button_row %}
+        {% file_list files=Product.files.all %}
+        {% file_list files=Product.files.all title="Bestanden" h1=True %}
 
     Variables:
-    - align: enum[right] | if the buttons should be aligned left (no align should be given) or alinged right side.
-
-    Extra context:
-    - contents: string (HTML) | this is the context between the button_row and endbutton_row tags
-        files: array | this is the list of file that need to be rendered. (Optional)
-        h1: bool | render the title in a h1 instead of a h4 (Optional)
-        title: string | the title that should be used (Optional)
+        + files: array | this is the list of file that need to be rendered.
+        - h1: bool | render the title in a h1 instead of a h4.
+        - title: string | the title that should be used.
     """
-    return {**kwargs}
+    return {**kwargs, "files": files}
 
 
 @register.inclusion_tag("components/File/File.html")
@@ -48,17 +45,18 @@ def file(file, **kwargs):
     Render in a file that needs to be displayed. This can be a filer file or a django filefield.
 
     Usage:
-    {% file model.file %}
+        {% file model.filefield %}
 
     Variables:
-    - file: File | the file that needs to be displayed.
+        + file: File | the file that needs to be displayed.
+        - allow_delete: bool | If you want to show a delete button.
 
     Extra context:
-    - is_image: bool | if the file that is given is an image.
-    - extension: string | the extension type of the file.
-    - size: string | the size of the file in bytes.
-    - url: string | the file location. the download link.
-    - name: string | the name of the file.
+        - is_image: bool | if the file that is given is an image.
+        - extension: string | the extension type of the file.
+        - size: string | the size of the file in bytes.
+        - url: string | the file location. the download link.
+        - name: string | the name of the file.
     """
     if isinstance(file, File):
         kwargs.update(

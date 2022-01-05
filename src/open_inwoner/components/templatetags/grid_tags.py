@@ -18,7 +18,7 @@ def render_grid(parser, token):
     {% endrender_grid %}
 
     Extra context:
-    - contents: string (HTML) | this is the context between the render_grid and endrender_grid tags
+        - contents: string (HTML) | this is the context between the render_grid and endrender_grid tags
     """
     bits = token.split_contents()
     context_kwargs = parse_component_with_args(parser, bits, "render_grid")
@@ -32,17 +32,17 @@ def render_column(parser, token):
     """
     Create a column on the page with content inside.
 
-    Example:
+    Usage:
         {% render_column start=1 span=12 %}
             contents of the column
         {% endrender_column %}
 
     Variables:
-    - start: int | column to start from.
-    - span: int | column span. Max is 12 columns
+        - start: int | column to start from.
+        - span: int | column span. Max is 12 columns
 
     Extra context:
-    - contents: string (HTML) | this is the context between the render_column and endrender_column tags
+        - contents: string (HTML) | this is the context between the render_column and endrender_column tags
     """
     bits = token.split_contents()
     context_kwargs = parse_component_with_args(parser, bits, "render_grid")

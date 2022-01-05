@@ -9,7 +9,7 @@ def accessibility_header(**kwargs):
     This is used to display the accessibility header
 
     Usage:
-    {% accessibility_header %}
+        {% accessibility_header %}
     """
     return {**kwargs}
 
@@ -19,13 +19,13 @@ def header(logo_url, categories, request, **kwargs):
     """
     Displaying the header.
 
-    Example:
+    Usage:
         {% header logo_url=settings.logo categories=Category.objects.all request=request %}
 
     Variables:
-    - logo_url: string | The url of the logo.
-    - categories: Category[] | The categories that should be displayed in the theme dropdown.
-    - request: Request | the django request object.
+        + logo_url: string | The url of the logo.
+        + categories: Category[] | The categories that should be displayed in the theme dropdown.
+        + request: Request | the django request object.
     """
     return {
         **kwargs,
@@ -40,11 +40,11 @@ def primary_navigation(categories, request, **kwargs):
     """
     Displaying the primary navigation
 
-    Example:
+    Usage:
         {% primary_navigation categories=Category.objects.all request=request %}
 
     Variables:
-    - categories: Category[] | The categories that should be displayed in the theme dropdown.
-    - request: Request | the django request object.
+        + categories: Category[] | The categories that should be displayed in the theme dropdown.
+        + request: Request | the django request object.
     """
     return {**kwargs, "categories": categories, "request": request}

@@ -9,7 +9,7 @@ def link(href, **kwargs):
     """
     Renders an hyperlink.
 
-    Example:
+    Usage:
         {% link 'http://www.example.com' %}
         {% link 'http://www.example.com' text=_('Example.com') %}
         {% link href='accounts:inbox' text=_('Mijn berichten') %}

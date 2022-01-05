@@ -38,27 +38,62 @@ def button(**kwargs):
     Creating a button. This can be a HTML button or an anchor element.
 
     Usage:
-    {% button text="Button" icon="arrow-forward" primary=True %}
+        {% button text="Button" icon="arrow-forward" primary=True %}
 
     Variables:
-    - text: string | this will be the button text. (Optional)
-    - hide_text: bool | whether to hide the text and use aria attribute instead. (Optional).
-    - href: url or string | where the link links to (can be url name). (Optional)
-    - object_id: str | if href is an url name, object_id for reverse can be passed (Optional).
-    - uuid: string | if href is an url name, pk for reverse can be passed (Optional).
-    - size: enum[big] | If the button should be bigger. (Optional)
-    - open: bool | If the open style button should be used. (Optional)
-    - bordered: bool | If the border should be colored. (Optional)
-    - primary: bool | If the primary colors should be used. (Optional)
-    - secondary: bool | If the secondary colors should be used. (Optional)
-    - transparent: bool | If the button does not have a background or border. (Optional)
-    - icon: string | the icon that you want to display. (Optional)
-    - icon_position: enum[before, after] | where the icon should be positioned to the text. (Optional)
-    - icon_outlined: bool | if the outlined icons should be used. (Optional)
-    - type: string | the type of button that should be used. (Optional)
+        - text: string | this will be the button text.
+        - hide_text: bool | whether to hide the text and use aria attribute instead.
+        - href: url or string | where the link links to (can be url name).
+        - uuid: string | if href is an url name, pk for reverse can be passed.
+        - size: enum[big] | If the button should be bigger.
+        - open: bool | If the open style button should be used.
+        - bordered: bool | If the border should be colored.
+        - primary: bool | If the primary colors should be used.
+        - secondary: bool | If the secondary colors should be used.
+        - transparent: bool | If the button does not have a background or border.
+        - icon: string | the icon that you want to display.
+        - icon_position: enum[before, after] | where the icon should be positioned to the text.
+        - icon_outlined: bool | if the outlined icons should be used.
+        - type: string | the type of button that should be used.
+
+    Extra context:
+        - classes: string | all the classes that the button should have.
     """
     if "text" not in kwargs and "icon" not in kwargs:
         assert False, "Either text or icon should be given"
+
+    def get_classes():
+        classnames = "button"
+
+        if kwargs.get("icon"):
+            if not kwargs.get("text"):
+                classnames += " button--textless"
+            classnames += " button--icon"
+
+        icon_position = kwargs.get("icon_position")
+        if icon_position:
+            classnames += f" button--icon-{icon_position}"
+
+        size = kwargs.get("size")
+        if size:
+            classnames += f" button--{size}"
+
+        if kwargs.get("open"):
+            classnames += " button--open"
+
+        if kwargs.get("bordered"):
+            classnames += " button--bordered"
+
+        if kwargs.get("primary"):
+            classnames += " button--primary"
+
+        if kwargs.get("secondary"):
+            classnames += " button--secondary"
+
+        if kwargs.get("transparent"):
+            classnames += " button--transparent"
+
+        return classnames
 
     if "href" in kwargs:
         try:
@@ -72,5 +107,7 @@ def button(**kwargs):
             kwargs["href"] = reverse(kwargs.get("href"), kwargs=reverse_kwargs)
         except NoReverseMatch:
             pass
+
+    kwargs["classes"] = get_classes()
 
     return {**kwargs}

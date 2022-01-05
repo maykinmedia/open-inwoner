@@ -46,11 +46,12 @@ def my_first_inclusion_tag(foo, bar):
     """
     An example of an inclusion tag.
 
-    Example:
+    Usage:
         {% my_first_inclusion_tag 'value_for_foo' 1 %}
-    Available options:
-        - foo: Required, a `str` example argument 1.
-        - bar: Required, an `int` example argument 1.
+
+    Variables:
+        + foo: string | a `str` example argument 1.
+        - bar: int | an `int` example argument 1.
     """
     return {"foo": foo, "bar": bar}
 ```
@@ -153,10 +154,13 @@ def render_my_first_contents_node(parser, token):  # Start tag
     An example contents node.
     Nested content supported.
 
-    Example:
+    Usage:
         {% render_my_first_contents_node %}
             Foo bar
         {% render_endmy_first_contents_node %}
+
+    Extra context:
+        - contents: stirng | The HTML content that is between the open and close tags,
     """
     bits = token.split_contents()
     context_kwargs = parse_component_with_args(parser, bits, "render_list")

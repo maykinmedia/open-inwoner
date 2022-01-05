@@ -9,9 +9,9 @@ def filter(field, **kwargs):
     Building the filter options for the search page.
 
     Usage:
-    {% filter field=field %}
+        {% filter field=field %}
 
     Variables:
-    - field: Field | This is a form field.
+        + field: Field | This is a form field.
     """
     return {**kwargs, "field": field}
