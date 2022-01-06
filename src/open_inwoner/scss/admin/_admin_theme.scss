@@ -283,6 +283,13 @@ input[type='submit'].default:hover {
 }
 
 /**
+ * Django form related widget
+ */
+.related-widget-wrapper {
+  display: inline-block;
+}
+
+/**
  * Branding
  */
 #branding h1 {
