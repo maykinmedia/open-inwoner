@@ -38,19 +38,19 @@ def link(href, **kwargs):
         - src, optional str: The source of the image
         - text, optional str: The text that should be displayed in the link
         - type, optional str: the type of button that should be used.
-        - pk: str | if href is an url name, pk for reverse can be passed.
+        - object_id: str | if href is an url name, object_id for reverse can be passed.
         - uuid: str | if href is an url name, uuid for reverse can be passed.
     """
 
     def get_href():
         try:
             uuid = kwargs.get("uuid")
-            pk = kwargs.get("pk")
+            object_id = kwargs.get("object_id")
             reverse_kwargs = {}
             if uuid:
                 reverse_kwargs.update(uuid=uuid)
-            if pk:
-                reverse_kwargs.update(object_id=pk)
+            if object_id:
+                reverse_kwargs.update(object_id=object_id)
             return reverse(href, kwargs=reverse_kwargs)
         except NoReverseMatch:
             pass

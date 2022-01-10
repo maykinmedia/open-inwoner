@@ -5,7 +5,7 @@
 <h1 class="h1">
     {{object.name}}
     {% if request.user.is_superuser %}
-        {% button icon="edit" href="admin:pdc_category_change" pk=object.pk %}
+        {% button icon="edit" href="admin:pdc_category_change" object_id=object.pk %}
     {% endif %}
 </h1>
 <p class="p">{{object.description}}</p>

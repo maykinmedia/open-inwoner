@@ -25,7 +25,7 @@ def button(**kwargs):
     text: string | this will be the button text. (Optional)
     hide_text: bool | whether to hide the text and use aria attribute instead. (Optional).
     href: url | where the link links to (can be url name). (Optional)
-    pk: str | if href is an url name, pk for reverse can be passed (Optional).
+    object_id: str | if href is an url name, object_id for reverse can be passed (Optional).
     uuid: str | if href is an url name, uuid for reverse can be passed (Optional).
     size: "big" | If the button should be bigger. (Optional)
     open: bool | If the open style button should be used. (Optional)
@@ -44,12 +44,12 @@ def button(**kwargs):
     if "href" in kwargs:
         try:
             uuid = kwargs.get("uuid")
-            pk = kwargs.get("pk")
+            object_id = kwargs.get("object_id")
             reverse_kwargs = {}
             if uuid:
                 reverse_kwargs.update(uuid=uuid)
-            if pk:
-                reverse_kwargs.update(object_id=pk)
+            if object_id:
+                reverse_kwargs.update(object_id=object_id)
             kwargs["href"] = reverse(kwargs.get("href"), kwargs=reverse_kwargs)
         except NoReverseMatch:
             pass
