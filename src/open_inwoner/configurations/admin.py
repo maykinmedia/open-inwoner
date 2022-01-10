@@ -69,11 +69,11 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
             _("Footer addresses"),
             {
                 "fields": (
-                    "home_visiting_title",
-                    "home_visiting_intro",
-                    "home_visiting_map",
-                    "home_mailing_title",
-                    "home_mailing_intro",
+                    "footer_visiting_title",
+                    "footer_visiting_intro",
+                    "footer_visiting_map",
+                    "footer_mailing_title",
+                    "footer_mailing_intro",
                 )
             },
         ),

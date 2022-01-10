@@ -109,38 +109,38 @@ class SiteConfiguration(SingletonModel):
         blank=True,
         help_text=_("Map's intro text on the home page."),
     )
-    home_visiting_title = models.CharField(
+    footer_visiting_title = models.CharField(
         max_length=255,
         default="",
         blank=True,
-        verbose_name=_("Home visiting title"),
-        help_text=_("Visiting title on the home page."),
+        verbose_name=_("Footer visiting title"),
+        help_text=_("Visiting title on the footer section."),
     )
-    home_visiting_intro = models.TextField(
+    footer_visiting_intro = models.TextField(
         verbose_name=_("Visiting details"),
         default="",
         blank=True,
-        help_text=_("Visiting intro text on the home page."),
+        help_text=_("Visiting intro text on the footer section."),
     )
-    home_visiting_map = models.CharField(
+    footer_visiting_map = models.CharField(
         max_length=255,
-        verbose_name=_("Home visiting map"),
+        verbose_name=_("Footer visiting map"),
         default="",
         blank=True,
-        help_text=_("Visiting address in google maps on the home page."),
+        help_text=_("Visiting address in google maps on the footer section."),
     )
-    home_mailing_title = models.CharField(
+    footer_mailing_title = models.CharField(
         max_length=255,
         default="",
         blank=True,
-        verbose_name=_("Home mailing title"),
-        help_text=_("Mailing title on the home page."),
+        verbose_name=_("Footer mailing title"),
+        help_text=_("Mailing title on the footer section."),
     )
-    home_mailing_intro = models.TextField(
+    footer_mailing_intro = models.TextField(
         verbose_name=_("Mailing details"),
         default="",
         blank=True,
-        help_text=_("Mailing intro text on the home page."),
+        help_text=_("Mailing intro text on the footer section."),
     )
     flatpages = models.ManyToManyField(
         FlatPage, through="SiteConfigurationPage", related_name="configurations"
