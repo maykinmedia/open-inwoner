@@ -4,7 +4,7 @@
 {% block content %}
 <h1 class="h1">
     {{object.name}}
-    {% if request.user.is_superuser %}
+    {% if request.user.is_staff %}
         {% button icon="edit" href="admin:pdc_category_change" object_id=object.pk %}
     {% endif %}
 </h1>

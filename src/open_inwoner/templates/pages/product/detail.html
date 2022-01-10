@@ -48,7 +48,7 @@
 {% block content %}
     <h1 class="h1" id="title">
         {{ object.name }}
-        {% if request.user.is_superuser %}
+        {% if request.user.is_staff %}
             {% button icon="edit" href="admin:pdc_product_change" object_id=object.pk %}
         {% endif %}
         {% if product.link %}
