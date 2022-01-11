@@ -1,7 +1,6 @@
 from typing import Optional
 from urllib.parse import unquote
 
-from django import forms
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
@@ -14,54 +13,9 @@ from furl import furl
 
 from open_inwoner.utils.mixins import PaginationMixin
 
+from ..forms import InboxForm, InboxStartForm
 from ..models import Message, User
 from ..query import MessageQuerySet
-
-
-class InboxForm(forms.ModelForm):
-    content = forms.CharField(label="", widget=forms.Textarea)
-    receiver = forms.ModelChoiceField(
-        queryset=User.objects.all(),
-        to_field_name="email",
-        widget=forms.HiddenInput(),
-    )
-
-    class Meta:
-        model = Message
-        fields = ("content", "receiver")
-
-    def save(self, sender=None, commit=True):
-        self.instance.sender = sender
-
-        return super().save(commit)
-
-
-class InboxStartForm(forms.ModelForm):
-    receiver = forms.ModelChoiceField(
-        label=_("Contactpersoon"), queryset=User.objects.all(), to_field_name="email"
-    )
-    content = forms.CharField(
-        label="",
-        widget=forms.Textarea(attrs={"placeholder": _("Schrijf een bericht...")}),
-    )
-
-    class Meta:
-        model = Message
-        fields = ("receiver", "content")
-
-    def __init__(self, user, **kwargs):
-        self.user = user
-
-        super().__init__(**kwargs)
-
-        active_contacts = self.user.get_active_contacts()
-        choices = [(c.email, f"{c.first_name} {c.last_name}") for c in active_contacts]
-        self.fields["receiver"].choices = choices
-
-    def save(self, commit=True):
-        self.instance.sender = self.user
-
-        return super().save(commit)
 
 
 class InboxView(LoginRequiredMixin, PaginationMixin, FormView):
