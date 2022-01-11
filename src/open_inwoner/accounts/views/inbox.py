@@ -5,9 +5,10 @@ from django import forms
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
+from django.urls import reverse_lazy
 from django.utils import formats
 from django.utils.translation import gettext as _
-from django.views.generic import FormView, TemplateView
+from django.views.generic import FormView
 
 from furl import furl
 
@@ -31,6 +32,34 @@ class InboxForm(forms.ModelForm):
 
     def save(self, sender=None, commit=True):
         self.instance.sender = sender
+
+        return super().save(commit)
+
+
+class InboxStartForm(forms.ModelForm):
+    receiver = forms.ModelChoiceField(
+        label=_("Contactpersoon"), queryset=User.objects.all(), to_field_name="email"
+    )
+    content = forms.CharField(
+        label="",
+        widget=forms.Textarea(attrs={"placeholder": _("Schrijf een bericht...")}),
+    )
+
+    class Meta:
+        model = Message
+        fields = ("receiver", "content")
+
+    def __init__(self, user, **kwargs):
+        self.user = user
+
+        super().__init__(**kwargs)
+
+        active_contacts = self.user.get_active_contacts()
+        choices = [(c.email, f"{c.first_name} {c.last_name}") for c in active_contacts]
+        self.fields["receiver"].choices = choices
+
+    def save(self, commit=True):
+        self.instance.sender = self.user
 
         return super().save(commit)
 
@@ -123,14 +152,20 @@ class InboxView(LoginRequiredMixin, PaginationMixin, FormView):
         return HttpResponseRedirect(f"{url}#messages-last")
 
 
-class InboxStartView(LoginRequiredMixin, TemplateView):
+class InboxStartView(LoginRequiredMixin, FormView):
     template_name = "accounts/inbox_start.html"
+    form_class = InboxStartForm
+    success_url = reverse_lazy("accounts:inbox")
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data()
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
 
-        me = self.request.user
-        active_contacts = me.get_active_contacts()
-        context["active_contacts"] = active_contacts
+        return kwargs
 
-        return context
+    def form_valid(self, form):
+        form.save()
+
+        # build redirect url based on form hidden data
+        url = furl(self.success_url).add({"with": form.data["receiver"]}).url
+        return HttpResponseRedirect(f"{url}#messages-last")
