@@ -1,46 +1,36 @@
-const query = document.querySelector('#search-form #id_query')
-const autocompleteUrl = '/api/search/autocomplete/'
+import autoComplete from "@tarekraafat/autocomplete.js/dist/autoComplete";
 
-const addAutocomplete = (node) => {
-  // turn off build in autocomplete
-  node.setAttribute('autocomplete', 'off')
 
-  node.addEventListener('input', function () {
-    removeAutocomplete()
+const autocompleteField = (node) => {
+  const choices = JSON.parse(node.dataset.autocompleteChoices.replace(/'/g, '"'));
+  const choiceLabels = choices.map((choice)=>choice[1]);
+  const fieldId = node.dataset.fieldId;
+  const hidden = node.querySelector(`#${fieldId}`);
 
-    const val = this.value
-    const url = `${autocompleteUrl}?search=${val}`
+  const autoCompleteJS = new autoComplete({
+    selector: `#${fieldId}-autocomplete`,
+    data: {
+        src: choiceLabels,
+        cache: true,
+    },
+    resultItem: {
+        highlight: true
+    },
+    events: {
+        input: {
+            selection: (event) => {
+                const selection = event.detail.selection.value;
+                const choiceValue = choices.filter(choice => choice[1] === selection)[0][0];
+                autoCompleteJS.input.value = selection;
+                hidden.value = choiceValue;
+            }
+        }
+    }
+  });
 
-    fetch(url)
-      .then((response) => response.json())
-      .then((data) => {
-        const options = data.options
+  return autoCompleteJS;
+};
 
-        const ul = document.createElement('div')
-        ul.setAttribute('class', 'autocomplete')
-        node.parentNode.parentNode.appendChild(ul)
 
-        options.forEach((option) => {
-          const li = document.createElement('div')
-          li.setAttribute('class', 'autocomplete__item')
-          li.innerHTML = option
-          li.addEventListener('click', () => {
-            node.value = option
-            removeAutocomplete()
-          })
-          ul.appendChild(li)
-        })
-      })
-      .catch((error) => {
-        console.error('Error:', error)
-      })
-  })
-}
-
-const removeAutocomplete = () => {
-  document.querySelectorAll('.autocomplete').forEach((el) => el.remove())
-}
-
-if (query) {
-  addAutocomplete(query)
-}
+const autocompleteFields = document.querySelectorAll('.autocomplete__input');
+[...autocompleteFields].forEach((autocompleteNode) => autocompleteField(autocompleteNode));

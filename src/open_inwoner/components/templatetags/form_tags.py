@@ -1,8 +1,5 @@
-from inspect import getfullargspec, unwrap
-
 from django import template
 from django.forms import fields, models
-from django.template.exceptions import TemplateSyntaxError
 from django.template.library import parse_bits
 from django.template.loader import render_to_string
 from django.utils.translation import gettext as _
@@ -125,6 +122,11 @@ def search(field, **kwargs):
 
 @register.inclusion_tag("components/Form/Textarea.html")
 def textarea(field, **kwargs):
+    return {**kwargs, "field": field}
+
+
+@register.inclusion_tag("components/Form/Autocomplete.html")
+def autocomplete(field, **kwargs):
     return {**kwargs, "field": field}
 
 

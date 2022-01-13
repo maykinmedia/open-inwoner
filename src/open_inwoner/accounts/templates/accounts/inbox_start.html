@@ -8,5 +8,10 @@
 {% endblock %}
 
 {% block content %}
-    {% form form method='POST' submit_text=_("Versturen") %}
+    {% render_form form=form method="POST" %}
+        {% csrf_token %}
+        {% autocomplete form.receiver %}
+        {% textarea form.content %}
+        {% form_actions primary_text=_("Versturen") %}
+    {% endrender_form %}
 {% endblock %}

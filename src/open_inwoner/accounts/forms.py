@@ -109,7 +109,7 @@ class InboxStartForm(forms.ModelForm):
         super().__init__(**kwargs)
 
         active_contacts = self.user.get_active_contacts()
-        choices = [(c.email, f"{c.first_name} {c.last_name}") for c in active_contacts]
+        choices = [[c.email, f"{c.first_name} {c.last_name}"] for c in active_contacts]
         self.fields["receiver"].choices = choices
 
     def save(self, commit=True):
