@@ -39,6 +39,7 @@
     "@ckeditor/ckeditor5-theme-lark": "^31.0.0",
     "@emotion/react": "^11.5.0",
     "@emotion/styled": "^11.3.0",
+    "@tarekraafat/autocomplete.js": "^10.2.6",
     "flatpickr": "^4.6.9",
     "gumshoejs": "^5.1.2",
     "leaflet": "^1.7.1",
