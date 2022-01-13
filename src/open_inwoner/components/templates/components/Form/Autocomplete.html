@@ -1,0 +1,19 @@
+{% load form_tags %}
+
+<div class="form__control autocomplete__input" data-autocomplete-choices="{{ field.field.choices }}" data-field-id="{{ field.auto_id }}">
+    <label class="label">
+        {% if not no_label %}{{ field.label }}{% endif %}
+
+        <input id="{{ field.auto_id }}-autocomplete" name="{{ field.name }}-autocomplete" class="input" type="search" spellcheck=false autocomplete="off" autocapitalize="off">
+
+        {% if field.help_text %}
+            <p class="p">{{ field.help_text }}</p>
+        {% endif %}
+
+        {% if field.errors %}
+            {% errors errors=field.errors %}
+        {% endif %}
+    </label>
+
+    <input id="{{ field.auto_id }}" name="{{ field.name }}" type="hidden">
+</div>
