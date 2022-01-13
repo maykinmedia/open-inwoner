@@ -40,6 +40,7 @@ class ContactFactory(factory.django.DjangoModelFactory):
     email = factory.Faker("email")
     phonenumber = factory.Faker("phone_number")
     created_by = factory.SubFactory(UserFactory)
+    contact_user = factory.SubFactory(UserFactory)
 
 
 class AppointmentFactory(factory.django.DjangoModelFactory):
