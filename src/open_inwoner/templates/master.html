@@ -54,7 +54,7 @@
             </main>
         {% endblock main_outer %}
 
-        {% footer logo_url=site_logo %}
+        {% footer logo_url=site_logo footer_texts=configurable_text.footer %}
 
         <script defer src="{% static 'bundles/open_inwoner-js.js' %}"></script>
     </body>
