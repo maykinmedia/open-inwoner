@@ -144,6 +144,7 @@ class SiteConfiguration(SingletonModel):
     )
     flatpages = models.ManyToManyField(
         FlatPage, through="SiteConfigurationPage", related_name="configurations"
+    )
     home_help_text = models.TextField(
         blank=True,
         default="",

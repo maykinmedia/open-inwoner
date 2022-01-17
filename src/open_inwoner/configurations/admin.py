@@ -52,6 +52,7 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
         (
             _("Text"),
             {
+                "classes": ("collapse",),
                 "fields": (
                     "login_text",
                     "home_welcome_title",
@@ -67,7 +68,7 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                     "product_help_text",
                     "search_help_text",
                     "account_help_text",
-                )
+                ),
             },
         ),
         (
