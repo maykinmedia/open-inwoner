@@ -144,6 +144,35 @@ class SiteConfiguration(SingletonModel):
     )
     flatpages = models.ManyToManyField(
         FlatPage, through="SiteConfigurationPage", related_name="configurations"
+    home_help_text = models.TextField(
+        blank=True,
+        default="",
+        verbose_name=_("Home help"),
+        help_text=_("The help text for the home page."),
+    )
+    theme_help_text = models.TextField(
+        blank=True,
+        default="",
+        verbose_name=_("Theme help"),
+        help_text=_("The help text for the theme page."),
+    )
+    product_help_text = models.TextField(
+        blank=True,
+        default="",
+        verbose_name=_("Product help"),
+        help_text=_("The help text for the product page."),
+    )
+    search_help_text = models.TextField(
+        blank=True,
+        default="",
+        verbose_name=_("Search help"),
+        help_text=_("The help text for the search page."),
+    )
+    account_help_text = models.TextField(
+        blank=True,
+        default="",
+        verbose_name=_("Account help"),
+        help_text=_("The help text for the profile page."),
     )
 
     class Meta:

@@ -62,6 +62,11 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                     "theme_intro",
                     "home_map_title",
                     "home_map_intro",
+                    "home_help_text",
+                    "theme_help_text",
+                    "product_help_text",
+                    "search_help_text",
+                    "account_help_text",
                 )
             },
         ),
