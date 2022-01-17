@@ -14,6 +14,7 @@ def settings(request):
     )
 
     config = SiteConfiguration.get_solo()
+    current_path = request.get_full_path()
 
     context = {
         "site_name": config.name,
@@ -47,13 +48,7 @@ def settings(request):
                 "footer_mailing_intro": config.footer_mailing_intro,
                 "flatpages": config.get_ordered_flatpages,
             },
-        },
-        "help": {
-            "home_help": config.home_help_text,
-            "theme_help": config.theme_help_text,
-            "product_help": config.product_help_text,
-            "search_help": config.search_help_text,
-            "account_help": config.account_help_text,
+            "help": config.get_help_text(current_path),
         },
         "hero_image_login": config.hero_image_login.file.url
         if config.hero_image_login

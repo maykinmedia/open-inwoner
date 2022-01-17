@@ -3,17 +3,22 @@ import swal from "sweetalert";
 class HelpModal {
     constructor(helpButton) {
         this.helpButton = helpButton
+        this.modal = document.querySelector(".help-modal")
         this.helpButton.addEventListener('click', this.showModal.bind(this))
     }
 
     showModal(event) {
         event.preventDefault()
+        this.helpButton.classList.add('focus')
         swal({
-            title: "Uitleg pagina",
-            text: "Help text",
+            title: this.modal.dataset.helpTitle,
+            text: this.modal.dataset.helpText,
             buttons: {
-                close: "Sluiten"
+                close: this.modal.dataset.helpClose
             }
+        })
+        .then((close) => {
+            this.helpButton.classList.remove('focus')
         })
     }
 }

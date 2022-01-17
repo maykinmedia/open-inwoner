@@ -1,11 +1,14 @@
 from django.contrib.flatpages.models import FlatPage
 from django.db import models
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from colorfield.fields import ColorField
 from filer.fields.image import FilerImageField
 from ordered_model.models import OrderedModel, OrderedModelManager
 from solo.models import SingletonModel
+
+from open_inwoner.pdc.urls import PRODUCT_PATH_NAME
 
 from .choices import ColorTypeChoices
 
@@ -147,31 +150,39 @@ class SiteConfiguration(SingletonModel):
     )
     home_help_text = models.TextField(
         blank=True,
-        default="",
+        default=_(
+            "Welkom! Op dit scherm vindt u een overzicht van de verschillende thema's en producten & diensten."
+        ),
         verbose_name=_("Home help"),
         help_text=_("The help text for the home page."),
     )
     theme_help_text = models.TextField(
         blank=True,
-        default="",
+        default=_(
+            "Op dit scherm vindt u de verschillende thema's waarvoor wij producten en diensten aanbieden."
+        ),
         verbose_name=_("Theme help"),
         help_text=_("The help text for the theme page."),
     )
     product_help_text = models.TextField(
         blank=True,
-        default="",
+        default=_(
+            "Op dit scherm kunt u de details vinden over het gekozen product of dienst. Afhankelijk van het product kunt u deze direct aanvragen of meer informatie opvragen."
+        ),
         verbose_name=_("Product help"),
         help_text=_("The help text for the product page."),
     )
     search_help_text = models.TextField(
         blank=True,
-        default="",
+        default=_("Op dit scherm kunt u zoeken naar de producten en diensten."),
         verbose_name=_("Search help"),
         help_text=_("The help text for the search page."),
     )
     account_help_text = models.TextField(
         blank=True,
-        default="",
+        default=_(
+            "Op dit scherm ziet u uw persoonlijke profielgegevens en gerelateerde gegevens."
+        ),
         verbose_name=_("Account help"),
         help_text=_("The help text for the profile page."),
     )
@@ -243,6 +254,21 @@ class SiteConfiguration(SingletonModel):
         l = int((l * 100))
 
         return h, s, l
+
+    def get_help_text(self, current_path):
+        if current_path == reverse("root"):
+            return self.home_help_text
+        if (
+            reverse("pdc:category_list") in current_path
+            or reverse("accounts:my_themes") in current_path
+        ):
+            return self.theme_help_text
+        if PRODUCT_PATH_NAME in current_path:
+            return self.product_help_text
+        if reverse("search:search") in current_path:
+            return self.search_help_text
+        if reverse("accounts:my_profile") in current_path:
+            return self.account_help_text
 
 
 class SiteConfigurationPage(OrderedModel):
