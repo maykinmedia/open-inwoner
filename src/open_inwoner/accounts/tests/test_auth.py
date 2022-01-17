@@ -1,9 +1,9 @@
-from unittest.case import skip
-
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from django_webtest import WebTest
+
+from open_inwoner.configurations.models import SiteConfiguration
 
 from ..models import User
 from .factories import UserFactory
@@ -59,14 +59,45 @@ class TestLoginLogoutFunctionality(WebTest):
         # because otherwise we do not have access to the raw one associated.
         self.user = UserFactory.create(password="test")
 
-    @skip
+        self.config = SiteConfiguration.get_solo()
+        self.config.login_allow_registration = True
+        self.config.save()
+
     def test_login(self):
         """Test that a user is successfully logged in."""
         form = self.app.get(reverse("login")).forms["login-form"]
         form["username"] = self.user.email
         form["password"] = "test"
-        response = form.submit().follow()
-        self.assertTrue(response.context["user"].is_authenticated)
+        form.submit().follow()
+        # Verify that the user has been authenticated
+        self.assertIn("_auth_user_id", self.app.session)
+
+    def test_login_for_inactive_user_shows_appropriate_message(self):
+        # Change user to inactive
+        self.user.is_active = False
+        self.user.save()
+
+        form = self.app.get(reverse("login")).forms["login-form"]
+        form["username"] = self.user.email
+        form["password"] = "test"
+        response = form.submit()
+
+        self.assertEquals(response.context["errors"], [_("Deze account is inactief.")])
+
+    def test_login_with_wrong_credentials_shows_appropriate_message(self):
+        form = self.app.get(reverse("login")).forms["login-form"]
+        form["username"] = self.user.email
+        form["password"] = "wrong_password"
+        response = form.submit()
+
+        self.assertEquals(
+            response.context["errors"],
+            [
+                _(
+                    "Voer een juiste e-mailadres en wachtwoord in. Let op dat beide velden hoofdlettergevoelig zijn."
+                )
+            ],
+        )
 
     def test_logout(self):
         """Test that a user is able to log out and page redirects to root endpoint."""
