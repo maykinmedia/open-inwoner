@@ -26,6 +26,28 @@ def settings(request):
             "secondary_font_color": config.secondary_font_color,
             "accent_font_color": config.accent_font_color,
         },
+        "configurable_text": {
+            "home_page": {
+                "home_welcome_title": config.home_welcome_title,
+                "home_welcome_intro": config.home_welcome_intro,
+                "home_theme_title": config.home_theme_title,
+                "home_theme_intro": config.home_theme_intro,
+                "home_map_title": config.home_map_title,
+                "home_map_intro": config.home_map_intro,
+            },
+            "theme_page": {
+                "theme_title": config.theme_title,
+                "theme_intro": config.theme_intro,
+            },
+            "footer": {
+                "footer_visiting_title": config.footer_visiting_title,
+                "footer_visiting_intro": config.footer_visiting_intro,
+                "footer_visiting_map": config.footer_visiting_map,
+                "footer_mailing_title": config.footer_mailing_title,
+                "footer_mailing_intro": config.footer_mailing_intro,
+                "flatpages": config.get_ordered_flatpages,
+            },
+        },
         "hero_image_login": config.hero_image_login.file.url
         if config.hero_image_login
         else "",

@@ -1,8 +1,10 @@
+from django.contrib.flatpages.models import FlatPage
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from colorfield.fields import ColorField
 from filer.fields.image import FilerImageField
+from ordered_model.models import OrderedModel, OrderedModelManager
 from solo.models import SingletonModel
 
 from .choices import ColorTypeChoices
@@ -63,6 +65,86 @@ class SiteConfiguration(SingletonModel):
         verbose_name=_("Login tekst"),
         help_text=_("Deze tekst wordt getoond op de login pagina."),
     )
+    home_welcome_title = models.CharField(
+        max_length=255,
+        default=_("Welcom"),
+        verbose_name=_("Home welcome title"),
+        help_text=_("Welcome title on the home page."),
+    )
+    home_welcome_intro = models.TextField(
+        verbose_name=_("Home welcome intro"),
+        blank=True,
+        help_text=_("Welcome intro text on the home page."),
+    )
+    home_theme_title = models.CharField(
+        max_length=255,
+        default=_("Thema's"),
+        verbose_name=_("Home theme's title"),
+        help_text=_("Theme's title on the home page."),
+    )
+    home_theme_intro = models.TextField(
+        verbose_name=_("Home theme's intro"),
+        blank=True,
+        help_text=_("Theme's intro text on the home page."),
+    )
+    theme_title = models.CharField(
+        max_length=255,
+        default=_("Thema's"),
+        verbose_name=_("Theme's title"),
+        help_text=_("Theme's title on the theme's page."),
+    )
+    theme_intro = models.TextField(
+        verbose_name=_("Theme's intro"),
+        blank=True,
+        help_text=_("Theme's intro text on the theme's page."),
+    )
+    home_map_title = models.CharField(
+        max_length=255,
+        default=_("In de buurt"),
+        verbose_name=_("Home map title"),
+        help_text=_("Map's title on the home page."),
+    )
+    home_map_intro = models.TextField(
+        verbose_name=_("Home map intro"),
+        blank=True,
+        help_text=_("Map's intro text on the home page."),
+    )
+    footer_visiting_title = models.CharField(
+        max_length=255,
+        default="",
+        blank=True,
+        verbose_name=_("Footer visiting title"),
+        help_text=_("Visiting title on the footer section."),
+    )
+    footer_visiting_intro = models.TextField(
+        verbose_name=_("Visiting details"),
+        default="",
+        blank=True,
+        help_text=_("Visiting intro text on the footer section."),
+    )
+    footer_visiting_map = models.CharField(
+        max_length=255,
+        verbose_name=_("Footer visiting map"),
+        default="",
+        blank=True,
+        help_text=_("Visiting address in google maps on the footer section."),
+    )
+    footer_mailing_title = models.CharField(
+        max_length=255,
+        default="",
+        blank=True,
+        verbose_name=_("Footer mailing title"),
+        help_text=_("Mailing title on the footer section."),
+    )
+    footer_mailing_intro = models.TextField(
+        verbose_name=_("Mailing details"),
+        default="",
+        blank=True,
+        help_text=_("Mailing intro text on the footer section."),
+    )
+    flatpages = models.ManyToManyField(
+        FlatPage, through="SiteConfigurationPage", related_name="configurations"
+    )
 
     class Meta:
         verbose_name = "Site Configuration"
@@ -81,6 +163,10 @@ class SiteConfiguration(SingletonModel):
     @property
     def get_accent_color(self):
         return self.hex_to_hsl(self.accent_color)
+
+    @property
+    def get_ordered_flatpages(self):
+        return self.flatpages.order_by("ordered_flatpages")
 
     def hex_to_hsl(self, color):
         # Convert hex to RGB first
@@ -127,3 +213,20 @@ class SiteConfiguration(SingletonModel):
         l = int((l * 100))
 
         return h, s, l
+
+
+class SiteConfigurationPage(OrderedModel):
+    configuration = models.ForeignKey(
+        SiteConfiguration,
+        related_name="ordered_configurations",
+        on_delete=models.CASCADE,
+    )
+    flatpage = models.ForeignKey(
+        FlatPage, related_name="ordered_flatpages", on_delete=models.CASCADE
+    )
+    order_with_respect_to = "configuration"
+
+    objects = OrderedModelManager()
+
+    def __str__(self):
+        return self.flatpage.title
