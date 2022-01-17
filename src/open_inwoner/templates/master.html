@@ -34,27 +34,6 @@
     <body>
         {% header logo_url=site_logo categories=menu_categories request=request breadcrumbs=breadcrumbs search_form=search_form %}
 
-        {% block help_modal %}
-            <div class="modal-container">
-                <div class="modal-body">
-                    <div class="modal-header">
-                        {% trans "Uitleg pagina" %}
-                        {% button_row align="right" %}
-                            {% button icon="close" transparent=True id="close-button" %}
-                        {% endbutton_row %}
-                    </div>
-                    <div class="modal-content">
-                        {% show_help current_path=request.get_full_path help=help %}
-                    </div>
-                    <div class="main-close-button">
-                        {% button_row align="right" %}
-                            {% button text=_("Sluiten") primary=True %}
-                        {% endbutton_row %}
-                    </div>
-                </div>
-            </div>
-        {% endblock help_modal %}
-
         {% notifications messages %}
 
         {% block header_image %}{% endblock header_image %}

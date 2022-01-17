@@ -12,8 +12,8 @@ class Confirmation {
       event.preventDefault()
       swal(this.form.dataset.confirmTitle, {
         buttons: {
-          cancel: this.form.dataset.confirmCancel,
           confirm: this.form.dataset.confirmDefault,
+          cancel: this.form.dataset.confirmCancel,
         },
       }).then((value) => {
         console.log(value)
