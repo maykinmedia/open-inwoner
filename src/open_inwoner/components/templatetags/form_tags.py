@@ -127,6 +127,13 @@ def textarea(field, **kwargs):
 
 @register.inclusion_tag("components/Form/Autocomplete.html")
 def autocomplete(field, **kwargs):
+    """
+    Displaying an autocomplete field using @tarekraafat/autocomplete lib
+    Usage:
+        {% autocomplete form.field %}
+    Variables:
+        + field: Field | The choice field that needs to be rendered.
+    """
     return {**kwargs, "field": field}
 
 
