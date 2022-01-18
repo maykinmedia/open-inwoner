@@ -13,7 +13,7 @@ from furl import furl
 
 from open_inwoner.utils.mixins import PaginationMixin
 
-from ..forms import InboxForm, InboxStartForm
+from ..forms import InboxForm
 from ..models import Message, User
 from ..query import MessageQuerySet
 
@@ -98,8 +98,14 @@ class InboxView(LoginRequiredMixin, PaginationMixin, FormView):
 
         return initial
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+
+        return kwargs
+
     def form_valid(self, form):
-        form.save(sender=self.request.user)
+        form.save()
 
         # build redirect url based on form hidden data
         url = furl(self.request.path).add({"with": form.data["receiver"]}).url
@@ -108,7 +114,7 @@ class InboxView(LoginRequiredMixin, PaginationMixin, FormView):
 
 class InboxStartView(LoginRequiredMixin, FormView):
     template_name = "accounts/inbox_start.html"
-    form_class = InboxStartForm
+    form_class = InboxForm
     success_url = reverse_lazy("accounts:inbox")
 
     def get_form_kwargs(self):

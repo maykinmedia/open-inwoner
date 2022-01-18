@@ -73,26 +73,11 @@ class DocumentForm(forms.ModelForm):
 
 
 class InboxForm(forms.ModelForm):
-    content = forms.CharField(label="", widget=forms.Textarea)
     receiver = forms.ModelChoiceField(
-        queryset=User.objects.all(),
+        label=_("Contactpersoon"),
+        queryset=User.objects.none(),
         to_field_name="email",
         widget=forms.HiddenInput(),
-    )
-
-    class Meta:
-        model = Message
-        fields = ("content", "receiver")
-
-    def save(self, sender=None, commit=True):
-        self.instance.sender = sender
-
-        return super().save(commit)
-
-
-class InboxStartForm(forms.ModelForm):
-    receiver = forms.ModelChoiceField(
-        label=_("Contactpersoon"), queryset=User.objects.all(), to_field_name="email"
     )
     content = forms.CharField(
         label="",
@@ -110,7 +95,9 @@ class InboxStartForm(forms.ModelForm):
 
         active_contacts = self.user.get_active_contacts()
         choices = [[c.email, f"{c.first_name} {c.last_name}"] for c in active_contacts]
+        active_contact_users = User.objects.get_active_contact_users(self.user)
         self.fields["receiver"].choices = choices
+        self.fields["receiver"].queryset = active_contact_users
 
     def save(self, commit=True):
         self.instance.sender = self.user
