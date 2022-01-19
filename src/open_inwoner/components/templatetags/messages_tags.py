@@ -21,7 +21,7 @@ def messages(
     status: str,
 ):
     """
-    Generate all messages in a conversation
+    Generate all messages in a conversation and shows the form to add a new message
 
     Usage:
         {% messages message_list=messages me=request.user form=message_form subject="this is the subject" status="open" %}
