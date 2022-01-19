@@ -9,15 +9,13 @@ def link(href, **kwargs):
     """
     Renders an hyperlink.
 
-    Example:
+    Usage:
         {% link 'http://www.example.com' %}
         {% link 'http://www.example.com' text=_('Example.com') %}
         {% link href='accounts:inbox' text=_('Mijn berichten') %}
 
-    Available options:
-
-        - href, str: where the link links to (can be url name to resolve).
-
+    Variables:
+        + href, str: where the link links to (can be url name to resolve).
         - active, optional bool: If the link is active
         - align, optional str: "left" or "right".
         - bold, optional bool: whether the link should be bold.
@@ -40,6 +38,10 @@ def link(href, **kwargs):
         - type, optional str: the type of button that should be used.
         - object_id: str | if href is an url name, object_id for reverse can be passed.
         - uuid: str | if href is an url name, uuid for reverse can be passed.
+
+    Extra context:
+        - base_class: string | If it is a button or a string.
+        - classes: string | All additional classes that need to be added.
     """
 
     def get_href():

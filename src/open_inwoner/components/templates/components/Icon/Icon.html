@@ -1,1 +1,5 @@
+{% if social %}
+<i class="fa-brands fa-{{social_icon}}"></i>
+{% else %}
 <span class="{% if outlined %}material-icons-outlined{% else %}material-icons{% endif %} {{ extra_classes }}">{{ icon }}</span>
+{% endif %}

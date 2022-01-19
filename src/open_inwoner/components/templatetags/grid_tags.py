@@ -9,7 +9,16 @@ register = template.Library()
 @register.tag
 def render_grid(parser, token):
     """
-    Nested content supported.
+    This is used to render in a grid.
+
+    Usage:
+    {% render_grid %}
+        <div>Some content here</div>
+        <div>Some content here too</div>
+    {% endrender_grid %}
+
+    Extra context:
+        - contents: string (HTML) | this is the context between the render_grid and endrender_grid tags
     """
     bits = token.split_contents()
     context_kwargs = parse_component_with_args(parser, bits, "render_grid")
@@ -21,9 +30,19 @@ def render_grid(parser, token):
 @register.tag
 def render_column(parser, token):
     """
-    start: int | column to start from.
-    span: int | column span.
-    Nested content supported.
+    Create a column on the page with content inside.
+
+    Usage:
+        {% render_column start=1 span=12 %}
+            contents of the column
+        {% endrender_column %}
+
+    Variables:
+        - start: int | column to start from.
+        - span: int | column span. Max is 12 columns
+
+    Extra context:
+        - contents: string (HTML) | this is the context between the render_column and endrender_column tags
     """
     bits = token.split_contents()
     context_kwargs = parse_component_with_args(parser, bits, "render_grid")

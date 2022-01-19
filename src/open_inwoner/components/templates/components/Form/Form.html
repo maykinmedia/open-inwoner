@@ -19,13 +19,15 @@
         {% for field in form.fields %}
             {% autorender_field form field %}
         {% endfor %}
+    {% endif %}
 
+    {{ contents }}
+
+    {% if auto_render %}
         {% if secondary_href %}
             {% form_actions primary_icon='arrow_forward' primary_text=submit_text secondary_href=secondary_href secondary_text=secondary_text secondary_icon=secondary_icon secondary_icon_position=secondary_icon_position %}
         {% else %}
             {% form_actions primary_icon='arrow_forward' primary_text=submit_text %}
         {% endif %}
     {% endif %}
-
-    {{ contents }}
 </form>

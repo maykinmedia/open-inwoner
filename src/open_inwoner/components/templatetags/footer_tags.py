@@ -6,10 +6,10 @@ register = template.Library()
 @register.inclusion_tag("components/Footer/Footer.html")
 def footer(logo_url, footer_texts, **kwargs):
     """
-    Describing information
+    Generating the entire footer.
 
     Usage:
-        {% footer logo_url=settings.logo %}
+        {% footer logo_url=settings.logo footer_texts=settings.footer_texts %}
 
     Variables:
         + logo_url: string | the location of the logo.
