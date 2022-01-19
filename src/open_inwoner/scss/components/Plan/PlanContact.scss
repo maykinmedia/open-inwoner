@@ -1,0 +1,26 @@
+.plan-contact {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin-bottom: 56px;
+
+  .plan-contact__container {
+    &:last-child {
+      .plan-contact__information {
+        border-right: 0;
+        margin-right: 0;
+      }
+    }
+  }
+
+  .plan-contact__information {
+    border-right: 1px solid #D2D2D2;
+    margin-right: 20px;
+    color: var(--font-color-body);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body);
+  }
+
+  .material-icons {
+    margin-bottom: var(--spacing-medium);
+  }
+}

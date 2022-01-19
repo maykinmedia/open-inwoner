@@ -6,6 +6,12 @@ from django_registration.forms import RegistrationForm
 from .models import Action, Contact, Document, Invite, Message, User
 
 
+class ActionListForm(forms.ModelForm):
+    class Meta:
+        model = Action
+        fields = ("status", "end_date", "created_by")
+
+
 class CustomRegistrationForm(RegistrationForm):
     first_name = forms.CharField(label=_("First name"), max_length=255, required=True)
     last_name = forms.CharField(label=_("Last name"), max_length=255, required=True)
@@ -92,7 +98,15 @@ class ContactForm(forms.ModelForm):
 class ActionForm(forms.ModelForm):
     class Meta:
         model = Action
-        fields = ("name", "status", "end_date")
+        fields = (
+            "name",
+            "description",
+            "status",
+            "end_date",
+            "is_for",
+            "file",
+            "goal",
+        )
 
     def save(self, user, commit=True):
         self.instance.created_by = user

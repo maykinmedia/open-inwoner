@@ -18,3 +18,8 @@ class ContactTypeChoices(DjangoChoices):
 class StatusChoices(DjangoChoices):
     open = ChoiceItem("open", _("Open"))
     closed = ChoiceItem("closed", _("Afgerond"))
+
+
+class TypeChoices(DjangoChoices):
+    incidental = ChoiceItem("incidental", _("Incidentieel"))
+    recurring = ChoiceItem("recurring", _("Terugkerend"))

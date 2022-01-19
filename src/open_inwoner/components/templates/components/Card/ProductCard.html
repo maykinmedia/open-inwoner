@@ -1,6 +1,18 @@
 {% load card_tags icon_tags link_tags %}
 {% render_card %}
-    <h3 class="h3">{% link product.get_absolute_url text=product.name %}</h3>
-    <p class="p">{{ product.summary }}</p>
-    {% link product.get_absolute_url text=product.name hide_text=True icon='arrow_forward' button=True transparent=True %}
+    <h3 class="h3">{% link url text=title %}</h3>
+    <p class="p">{{ description }}</p>
+    {% if object.end_date %}
+        <table class="table">
+            <tr>
+                <td>Einddatum:</td>
+                <td>{{ object.end_date }}</td>
+            </tr>
+            <tr>
+                <td>Contactpersonen:</td>
+                <td>{{ object.contactperson_list }}</td>
+            </tr>
+        </table>
+    {% endif %}
+    {% link url text=title hide_text=True icon='arrow_forward' button=True transparent=True %}
 {% endrender_card %}

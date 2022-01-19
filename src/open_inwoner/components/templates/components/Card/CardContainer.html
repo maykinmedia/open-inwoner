@@ -15,7 +15,13 @@
 
     {% if products %}
         {% for product in products %}
-            {% product_card product=product %}
+            {% description_card title=product.name description=product.summary url=product.get_absolute_url %}
+        {% endfor %}
+    {% endif %}
+
+    {% if plans %}
+        {% for plan in plans %}
+            {% description_card title=plan.title description=plan.goal|truncatechars:51 url=plan.get_absolute_url elypsis=True object=plan %}
         {% endfor %}
     {% endif %}
 
