@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from django_registration.forms import RegistrationForm
 
-from .models import Action, Contact, Document, Message, User
+from .models import Action, Contact, Document, Invite, Message, User
 
 
 class CustomRegistrationForm(RegistrationForm):
@@ -108,3 +108,11 @@ class InboxForm(forms.ModelForm):
         self.instance.sender = self.user
 
         return super().save(commit)
+
+
+class InviteForm(forms.ModelForm):
+    accepted = forms.CharField(initial=True, widget=forms.HiddenInput())
+
+    class Meta:
+        model = Invite
+        fields = ("accepted",)

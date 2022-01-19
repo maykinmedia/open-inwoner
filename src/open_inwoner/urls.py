@@ -5,7 +5,6 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import include, path
-from django.views.generic.base import TemplateView
 
 from django_registration.backends.one_step.views import RegistrationView
 
