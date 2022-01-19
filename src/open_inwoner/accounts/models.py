@@ -3,6 +3,7 @@ from uuid import uuid4
 
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.utils.translation import ugettext_lazy as _
@@ -415,7 +416,7 @@ class Invite(models.Model):
         context = {
             "inviter_name": self.inviter.get_full_name(),
             "email": self.invitee.email,
-            "invite_link": "#",  # TODO
+            "invite_link": reverse("accounts:invite_accept", args=[self.key]),
         }
 
         return template.send_email([self.invitee.email], context)
