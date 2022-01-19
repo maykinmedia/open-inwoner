@@ -1,4 +1,5 @@
 # Components
+
 This app contains the UI elements of the project implemented as inclusion tags.
 
 > Components are the reusable building blocks of our design system. Each component meets a specific interaction or UI
@@ -14,8 +15,10 @@ This app contains the UI elements of the project implemented as inclusion tags.
 - [Known issues](#known-issues)
 - [Further reading](#further-reading)
 
-<a id="what-are-inclusion-tags"/></a>
+`<a id="what-are-inclusion-tags"/></a>`
+
 ## What are inclusion tags?
+
 Inclusion tags are a mechanism in Django te render a (small) template based on (optionally) a set of arguments. We use
 these tags te create the individual building blocks of our interface, abstracting away the implementation
 (HTMl/CSS/JavaScript) from their (programming) interface.
@@ -23,8 +26,8 @@ these tags te create the individual building blocks of our interface, abstractin
 *Note: inclusion_tags are often referered to as "components". Components typically make up an inclusion tag, a template,
 a Sass (`.scss`) and sometimes a JavaScript file.*
 
- > Another common type of template tag is the type that displays some data by rendering another template. For example,
- > Django’s admin interface uses custom template tags to display the buttons along the bottom of the “add/change” form pages. Those buttons always look the same, but the link targets change depending on the object being edited – so they’re a perfect case for using a small template that is filled with details from the current object. (In the admin’s case, this is the submit_row tag.) - [Django documentation](https://docs.djangoproject.com/en/4.0/howto/custom-template-tags/#howto-custom-template-tags-inclusion-tags)
+> Another common type of template tag is the type that displays some data by rendering another template. For example,
+> Django’s admin interface uses custom template tags to display the buttons along the bottom of the “add/change” form pages. Those buttons always look the same, but the link targets change depending on the object being edited – so they’re a perfect case for using a small template that is filled with details from the current object. (In the admin’s case, this is the submit_row tag.) - [Django documentation](https://docs.djangoproject.com/en/4.0/howto/custom-template-tags/#howto-custom-template-tags-inclusion-tags)
 
 Inclusion tags in Django are provided in "libraries" that can be registered in apps. Libraries are Python files that
 register various template tags (like inclusion tags).
@@ -51,7 +54,7 @@ def my_first_inclusion_tag(foo, bar):
 
     Variables:
         + foo: string | a `str` example argument 1.
-        - bar: int | an `int` example argument 1.
+        - bar: int {default: 3} | an `int` example argument 1.
     """
     return {"foo": foo, "bar": bar}
 ```
@@ -59,8 +62,8 @@ def my_first_inclusion_tag(foo, bar):
 ```html
 <!-- components/MyFirstInclusionTag/MyFirstInclusionTag.html -->
 <div class="my-first-inclusion-tag">
-    <strong>foo:</strong>&nbsp;{{ foo }}
-    <strong>bar:</strong>&nbsp;{{ bar }}
+    <strong>foo:</strong> {{ foo }}
+    <strong>bar:</strong> {{ bar }}
 </div>
 ```
 
@@ -76,14 +79,16 @@ The inclusion tag can be rendered anywhere using:
 {% my_first_inclusion_tag 'value_for_foo' 1 %}
 ```
 
-<a id="why-do-we-use-inclusion-tags"/></a>
+`<a id="why-do-we-use-inclusion-tags"/></a>`
+
 ## Why do we use inclusion tags?
+
 Inclusion tags have various benefits over traditional templates:
 
--  Inclusion tags are highly reusable.
--  Inclusion tags can ensure consistency of the UI by providing a single source of truth of the implementation.
--  Inclusion tags can do their own centralized context processing.
--  Inclusion tags can be tested with little dependencies.
+- Inclusion tags are highly reusable.
+- Inclusion tags can ensure consistency of the UI by providing a single source of truth of the implementation.
+- Inclusion tags can do their own centralized context processing.
+- Inclusion tags can be tested with little dependencies.
 
 Example:
 
@@ -96,6 +101,7 @@ Given an example of a hyperlink with an icon:
     {% trans 'My messages' %}
 </a>
 ```
+
 This template may look simple at once, but contains various sources of logic that need to work together:
 
 - Button styling.
@@ -118,7 +124,8 @@ Gives us the ability to alter (upgrade) the implementation anytime without worry
 bonus: it allows us to do certain processing in the component (like url reversion) in the tag itself. Reducing workload
 for the developer.
 
-<a id="when-writing-inclusion-tags"/></a>
+`<a id="when-writing-inclusion-tags"/></a>`
+
 # When writing inclusion tags
 
 Writing inclusion tags allows a developer to split a view into smaller pieces. Although this has various advantages,
@@ -132,7 +139,8 @@ please adhere to the following:
 - Do: be implementation agnostic: preferably, an inclusion tag should not depend on specific business logic/models.
 - Don't: reinvent the wheel, handoff logic to Django builtin's (like paginaton) where possible.
 
-<a id="nesting-tags"/></a>
+`<a id="nesting-tags"/></a>`
+
 # Nesting tags
 
 ### TODO: Nested tags might use refactoring/improvements.
@@ -176,7 +184,8 @@ def render_my_first_contents_node(parser, token):  # Start tag
 </div>
 ```
 
-<a id="writing-tests"/></a>
+`<a id="writing-tests"/></a>`
+
 # Writing tests
 
 Tests for components are located in the `tests` package of the components app (`components/tests/`). In this directory a
@@ -208,6 +217,7 @@ class TestList(ContentsTagWebTest):
 ```
 
 Example 2 (`list_tags.list_item`):
+
 ```python
 class TestListItem(InclusionTagWebTest):
     library = "list_tags"
@@ -237,17 +247,20 @@ class TestListItem(InclusionTagWebTest):
         self.assertEqual(a[0]["href"], "https://www.example.com")
 ```
 
-<a id="known-issues"></a>
+`<a id="known-issues"></a>`
+
 # Known issues
 
 ### Inclusion tags don't get executed in all cases.
+
 Some requests, for instance: POST requests, might not invoke template rendering and skip code in template tags. This
 might complicate cases where processing of such requests is required.
 
 A possible solution is to manually invoke template rendering from within the `post` method on the view, or to handle
 this logic in a separate `url` and set that as the form's action.
 
-<a id="further-reading"></a>
+`<a id="further-reading"></a>`
+
 # Further reading
 
 - https://docs.djangoproject.com/en/4.0/howto/custom-template-tags/
