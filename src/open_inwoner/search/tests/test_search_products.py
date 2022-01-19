@@ -28,8 +28,14 @@ class SearchQueryTests(ESMixin, TestCase):
         )
         self.update_index()
 
-    def test_search_product_on_title(self):
+    def test_search_product_on_name(self):
         results = search_products("Name").results
+
+        self.assertEqual(len(results), 1)
+        self.assertEqual(int(results[0].meta.id), self.product1.id)
+
+    def test_search_product_on_name_partial(self):
+        results = search_products("nam").results
 
         self.assertEqual(len(results), 1)
         self.assertEqual(int(results[0].meta.id), self.product1.id)
@@ -40,14 +46,32 @@ class SearchQueryTests(ESMixin, TestCase):
         self.assertEqual(len(results), 1)
         self.assertEqual(int(results[0].meta.id), self.product1.id)
 
+    def test_search_product_on_summary_partial(self):
+        results = search_products("sum").results
+
+        self.assertEqual(len(results), 1)
+        self.assertEqual(int(results[0].meta.id), self.product1.id)
+
     def test_search_product_on_content(self):
         results = search_products("content").results
 
         self.assertEqual(len(results), 1)
         self.assertEqual(int(results[0].meta.id), self.product1.id)
 
+    def test_search_product_on_content_partial(self):
+        results = search_products("cont").results
+
+        self.assertEqual(len(results), 1)
+        self.assertEqual(int(results[0].meta.id), self.product1.id)
+
     def test_search_product_on_keyword(self):
         results = search_products("keyword1").results
+
+        self.assertEqual(len(results), 1)
+        self.assertEqual(int(results[0].meta.id), self.product1.id)
+
+    def test_search_product_on_keyword_partial(self):
+        results = search_products("key").results
 
         self.assertEqual(len(results), 1)
         self.assertEqual(int(results[0].meta.id), self.product1.id)
