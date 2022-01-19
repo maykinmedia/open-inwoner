@@ -160,7 +160,7 @@ def render_my_first_contents_node(parser, token):  # Start tag
         {% render_endmy_first_contents_node %}
 
     Extra context:
-        - contents: stirng | The HTML content that is between the open and close tags,
+        - contents: string | The HTML content that is between the open and close tags,
     """
     bits = token.split_contents()
     context_kwargs = parse_component_with_args(parser, bits, "render_list")
