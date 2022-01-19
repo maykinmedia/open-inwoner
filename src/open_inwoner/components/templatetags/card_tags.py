@@ -61,7 +61,7 @@ def category_card(category: Category, **kwargs):
 
 
 @register.inclusion_tag("components/Card/ProductCard.html")
-def product_card(product: Product, **kwargs):
+def description_card(title, description, url, **kwargs):
     """
     Renders a card prepopulated based on `product`.
 
@@ -70,12 +70,14 @@ def product_card(product: Product, **kwargs):
 
     Available options:
         - product, Product: the product to render card for.
+        - object: any | The object that needs to render aditional data.
     """
-    return {**kwargs, "product": product}
+    kwargs.update(title=title, description=description, url=url)
+    return kwargs
 
 
 @register.inclusion_tag("components/Card/CardContainer.html")
-def card_container(categories=[], subcategories=[], products=[], **kwargs):
+def card_container(categories=[], subcategories=[], products=[], plans=[], **kwargs):
     """
     A card container where the category card or product card will be rendered in.
 
@@ -87,14 +89,20 @@ def card_container(categories=[], subcategories=[], products=[], **kwargs):
         - subcategories: Category[] | subcategories to render.
         - products: Product[] | products to render.
     """
-    if categories is None and subcategories is None and products is None:
-        assert False, "provide categories, subcategories or products"
+    if (
+        categories is None
+        and subcategories is None
+        and products is None
+        and plans is None
+    ):
+        assert False, "provide categories, subcategories, products or plans"
 
     return {
         **kwargs,
         "categories": categories,
         "subcategories": subcategories,
         "products": products,
+        "plans": plans,
     }
 
 

@@ -149,6 +149,7 @@ INSTALLED_APPS = [
     "open_inwoner.components",
     "open_inwoner.ckeditor5",
     "open_inwoner.pdc",
+    "open_inwoner.plans",
     "open_inwoner.search",
     "open_inwoner.utils",
     "open_inwoner.configurations",

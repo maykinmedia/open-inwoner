@@ -197,6 +197,11 @@ def input(field, **kwargs):
     return {**kwargs, "field": field}
 
 
+@register.inclusion_tag("components/Form/DateField.html")
+def date_field(field, **kwargs):
+    return {**kwargs, "field": field}
+
+
 @register.inclusion_tag("components/Form/Search.html")
 def search(field, **kwargs):
     """

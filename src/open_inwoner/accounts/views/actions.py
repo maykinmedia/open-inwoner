@@ -4,7 +4,7 @@ from django.urls.base import reverse_lazy
 from django.views.generic import CreateView, ListView
 from django.views.generic.edit import UpdateView
 
-from ..forms import ActionForm
+from ..forms import ActionForm, ActionListForm
 from ..models import Action
 
 
@@ -16,6 +16,11 @@ class ActionListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         base_qs = super().get_queryset()
         return base_qs.filter(created_by=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["action_form"] = ActionListForm()
+        return context
 
 
 class ActionUpdateView(LoginRequiredMixin, UpdateView):

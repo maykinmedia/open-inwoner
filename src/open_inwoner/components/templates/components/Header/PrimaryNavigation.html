@@ -24,12 +24,13 @@
         </li>
         {% if request.user.is_authenticated %}
             <li class="primary-navigation__list-item">
-                {% trans "Mijn profiel" as link_text %}
-                {% url 'accounts:my_profile' as link %}
-                {% link text=link_text href=link icon="inventory_2" icon_position="before" icon_outlined=True %}
+                {% link text=_("Mijn profiel") href='accounts:my_profile' icon="inventory_2" icon_position="before" icon_outlined=True %}
             </li>
             <li class="primary-navigation__list-item">
                 {% link text=_('Mijn berichten') href='accounts:inbox' icon="inbox" icon_position="before" %}
+            </li>
+            <li class="primary-navigation__list-item">
+                {% link text=_('samenwerken') href='plans:plan_list' icon="people" icon_outlined=True icon_position="before" %}
             </li>
             {% if request.user.bsn %}
                 <li class="primary-navigation__list-item">
