@@ -153,6 +153,7 @@ INSTALLED_APPS = [
     "open_inwoner.utils",
     "open_inwoner.configurations",
     "open_inwoner.haalcentraal",
+    "open_inwoner.openzaak",
 ]
 
 MIDDLEWARE = [
