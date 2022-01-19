@@ -10,7 +10,16 @@ from .results import AutocompleteResult, ProductSearchResult
 class ProductSearch(FacetedSearch):
     index = settings.ES_INDEX_PRODUCTS
     doc_types = [ProductDocument]
-    fields = ["name^4", "summary", "content", "keywords"]
+    fields = [
+        "name^4",
+        "name.partial",
+        "summary",
+        "summary.partial",
+        "content",
+        "content.partial",
+        "keywords",
+        "keywords.partial",
+    ]
     facets = {
         FacetChoices.categories: NestedFacet(
             "categories", TermsFacet(field="categories.slug")

@@ -5,7 +5,7 @@ from django_elasticsearch_dsl.registries import registry
 
 from open_inwoner.pdc.models import Category, Organization, Product, Tag
 
-from .analyzers import synonym_analyzer
+from .analyzers import partial_analyzer, synonym_analyzer
 
 
 @registry.register_document
@@ -13,10 +13,22 @@ class ProductDocument(Document):
     name = fields.TextField(
         analyzer="standard",
         search_analyzer=synonym_analyzer,
-        fields={"raw": fields.KeywordField(), "suggest": fields.CompletionField()},
+        fields={
+            "raw": fields.KeywordField(),
+            "suggest": fields.CompletionField(),
+            "partial": fields.TextField(analyzer=partial_analyzer, boost=0.5),
+        },
     )
-    summary = fields.TextField(analyzer="standard", search_analyzer=synonym_analyzer)
-    content = fields.TextField(analyzer="standard", search_analyzer=synonym_analyzer)
+    summary = fields.TextField(
+        analyzer="standard",
+        search_analyzer=synonym_analyzer,
+        fields={"partial": fields.TextField(analyzer=partial_analyzer, boost=0.5)},
+    )
+    content = fields.TextField(
+        analyzer="standard",
+        search_analyzer=synonym_analyzer,
+        fields={"partial": fields.TextField(analyzer=partial_analyzer, boost=0.5)},
+    )
     slug = fields.KeywordField()
 
     categories = fields.NestedField(
@@ -41,7 +53,14 @@ class ProductDocument(Document):
             "neighbourhood": fields.TextField(attr="neighbourhood.name"),
         }
     )
-    keywords = fields.TextField(fields={"suggest": fields.CompletionField(multi=True)})
+    keywords = fields.TextField(
+        fields={
+            "suggest": fields.CompletionField(multi=True),
+            "partial": fields.TextField(
+                multi=True, analyzer=partial_analyzer, boost=0.5
+            ),
+        }
+    )
 
     class Index:
         name = settings.ES_INDEX_PRODUCTS
