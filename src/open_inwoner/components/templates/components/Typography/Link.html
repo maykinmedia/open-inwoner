@@ -18,10 +18,6 @@
 
     {% if text and not hide_text %}<span class="link__text">{{ text }}</span>{% endif %}
 
-    {% if social_icon %}
-        <i class="fa-brands fa-{{social_icon}}"></i>
-    {% endif %}
-
     {% if icon %}
         {% icon icon=icon outlined=icon_outlined %}
     {% endif %}

@@ -10,13 +10,18 @@ register = template.Library()
 @register.inclusion_tag("components/Card/Card.html")
 def card(href, title, **kwargs):
     """
-    href: url | where the card links to. (Optional)
-    title: string | this will be the card title. (Optional)
+    Render in a card. Only using variables.
 
-    alt: string | the alt of the header image. (optional)
-    direction: string | can be set to "horizontal" to show contents horizontally (Optional).
-    src: string | the src of the header image. (optional)
-    tinted: bool | whether to use gray as background color. (Optional)
+    Usage:
+        {% card href="https://maykinmedia.nl" %}
+
+    Variables:
+        + href: url | where the card links to.
+        + title: string | this will be the card title.
+        - alt: string | the alt of the header image.
+        - direction: string | can be set to "horizontal" to show contents horizontally.
+        - src: string | the src of the header image.
+        - tinted: bool | whether to use gray as background color.
     """
     return {**kwargs, "href": href, "title": title}
 
@@ -24,8 +29,15 @@ def card(href, title, **kwargs):
 @register.tag
 def render_card(parser, token):
     """
-    Supports all options from card.
-    Nested content supported.
+    Render in a card. Using nested elements.
+
+    Usage:
+        {% render_card %}
+            <h1 class="h1">{% trans 'Welkom' %}</h1>
+        {% endrender_card %}
+
+    Extra context:
+        - contents: string (HTML) | this is the context between the render_card and endrender_card tags
     """
     bits = token.split_contents()
     context_kwargs = parse_component_with_args(parser, bits, "render_card")
@@ -39,11 +51,10 @@ def category_card(category: Category, **kwargs):
     """
     Renders a card prepopulated based on `category`.
 
-    Example:
+    Usage:
         {% category_card category %}
 
     Available options:
-
         - category, Category: the category to render card for.
     """
     return {**kwargs, "category": category}
@@ -54,11 +65,10 @@ def product_card(product: Product, **kwargs):
     """
     Renders a card prepopulated based on `product`.
 
-    Example:
+    Usage:
         {% product_card product %}
 
     Available options:
-
         - product, Product: the product to render card for.
     """
     return {**kwargs, "product": product}
@@ -67,12 +77,19 @@ def product_card(product: Product, **kwargs):
 @register.inclusion_tag("components/Card/CardContainer.html")
 def card_container(categories=[], subcategories=[], products=[], **kwargs):
     """
-    categories: Category[] | categories to render.
-    subcategories: Category[] | subcategories to render.
-    products: Product[] | products to render.
+    A card container where the category card or product card will be rendered in.
+
+    Usage:
+        {% card_container categories=categories %}
+
+    Variables:
+        - categories: Category[] | categories to render.
+        - subcategories: Category[] | subcategories to render.
+        - products: Product[] | products to render.
     """
     if categories is None and subcategories is None and products is None:
         assert False, "provide categories, subcategories or products"
+
     return {
         **kwargs,
         "categories": categories,

@@ -24,8 +24,7 @@ def capture(parser, token):
     Captures contents and assigns them to variable.
     Allows capturing templatetags that don't support "as".
 
-    Example:
-
+    Usage:
         {% capture as body %}{% lorem 20 w random %}{% endcapture %}
         {% include 'components/text/text.html' with body=body only %}
     """
@@ -45,8 +44,7 @@ def placekitten(width=800, height=600):
     """
     Renders a "placekitten" placeholder image.
 
-    Example:
-
+    Usage:
         {%placekitten %}
         {%placekitten 200 200 %}
     """
@@ -58,8 +56,7 @@ def placekitten_src(width=800, height=600):
     """
     Return a "placekitten" placeholder image url.
 
-    Example:
-
+    Usage:
         {% placekitten_src as src %}
         {% placekitten_src 200 200 as mobile_src %}
         {% include 'components/image/image.html' with mobile_src=mobile_src src=src alt='placekitten' only %}
@@ -74,6 +71,13 @@ def version():
 
 @register.simple_tag(name="dir")
 def template_dir(value):
+    """
+    Lists all the available variables and methods for the given value
+
+    Usage:
+        {% dir request %}
+        {% dir "string" %}
+    """
     return dir(value)
 
 
