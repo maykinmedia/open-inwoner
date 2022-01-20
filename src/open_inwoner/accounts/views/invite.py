@@ -2,6 +2,8 @@ from django.http.response import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views.generic import UpdateView
 
+from furl import furl
+
 from ..forms import InviteForm
 from ..models import Invite
 
@@ -17,4 +19,5 @@ class InviteAcceptView(UpdateView):
     # todo not show GET and POST if invite is expired
     def form_valid(self, form):
         self.object = form.save()
-        return HttpResponseRedirect(self.get_success_url())
+        url = furl(self.success_url).add({"invite": self.object.key}).url
+        return HttpResponseRedirect(url)

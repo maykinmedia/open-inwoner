@@ -7,3 +7,4 @@ from .inbox import InboxStartView, InboxView
 from .invite import InviteAcceptView
 from .password_reset import PasswordResetView
 from .profile import EditProfileView, MyCategoriesView, MyProfileView
+from .registration import CustomRegistrationView

@@ -6,11 +6,16 @@ from django.contrib.auth import views as auth_views
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import include, path
 
-from django_registration.backends.one_step.views import RegistrationView
-
 from open_inwoner.accounts.forms import CustomRegistrationForm
-from open_inwoner.accounts.views import DocumentPrivateMediaView, PasswordResetView
+from open_inwoner.accounts.views import (
+    CustomRegistrationView,
+    DocumentPrivateMediaView,
+    PasswordResetView,
+)
 from open_inwoner.pdc.views import HomeView
+
+# from django_registration.backends.one_step.views import RegistrationView
+
 
 handler500 = "open_inwoner.utils.views.server_error"
 admin.site.site_header = "Open Inwoner beheeromgeving"
@@ -50,7 +55,7 @@ urlpatterns = [
     # Simply show the master template.
     path(
         "accounts/register/",
-        RegistrationView.as_view(form_class=CustomRegistrationForm),
+        CustomRegistrationView.as_view(form_class=CustomRegistrationForm),
         name="django_registration_register",
     ),
     path("accounts/", include("django_registration.backends.one_step.urls")),
