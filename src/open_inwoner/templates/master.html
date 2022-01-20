@@ -32,11 +32,7 @@
     </head>
 
     <body>
-        {% header logo_url=site_logo categories=menu_categories request=request breadcrumbs=breadcrumbs search_form=search_form %}
-
-        {% block help_text %}
-            <div class="help-modal" data-help-title="{% trans "Uitleg pagina" %}" data-help-text="{{ configurable_text.help }}" data-help-close="{% trans "Sluiten" %}"></div>
-        {% endblock help_text %}
+        {% header logo_url=site_logo categories=menu_categories request=request breadcrumbs=breadcrumbs search_form=search_form configurable_text=configurable_text %}
 
         {% notifications messages %}
 

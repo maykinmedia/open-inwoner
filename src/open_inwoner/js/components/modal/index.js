@@ -9,7 +9,7 @@ class HelpModal {
 
   showModal(event) {
     event.preventDefault()
-    this.helpButton.classList.add('focus')
+    this.helpButton.classList.add('accessibility-header__modal--highlight')
     swal({
       title: this.modal.dataset.helpTitle,
       text: this.modal.dataset.helpText,
@@ -17,10 +17,10 @@ class HelpModal {
         close: this.modal.dataset.helpClose,
       },
     }).then((close) => {
-      this.helpButton.classList.remove('focus')
+      this.helpButton.classList.remove('accessibility-header__modal--highlight')
     })
   }
 }
 
-const helpButton = document.querySelectorAll('.accessibility-modal')
+const helpButton = document.querySelectorAll('.modal')
 ;[...helpButton].forEach((button) => new HelpModal(button))

@@ -53,25 +53,6 @@ class TestHelpContext(WebTest):
 
         self.assertEquals(help_text, config.theme_help_text)
 
-    def test_default_help_text_on_accounts_themes_page(self):
-        response = self.app.get(reverse("accounts:my_themes"), user=self.user)
-        help_text = response.context.get("configurable_text", {}).get("help")
-
-        self.assertEquals(
-            help_text,
-            _(
-                "Op dit scherm vindt u de verschillende thema's waarvoor wij producten en diensten aanbieden."
-            ),
-        )
-
-    def test_custom_help_text_on_accounts_themes_page(self):
-        SiteConfigurationFactory()
-        config = SiteConfiguration.get_solo()
-        response = self.app.get(reverse("accounts:my_themes"), user=self.user)
-        help_text = response.context.get("configurable_text", {}).get("help")
-
-        self.assertEquals(help_text, config.theme_help_text)
-
     def test_default_help_text_on_products_page(self):
         response = self.app.get(
             reverse("pdc:product_detail", kwargs={"slug": self.product.slug})

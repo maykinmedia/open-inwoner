@@ -50,7 +50,7 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
             },
         ),
         (
-            _("Text"),
+            _("Page texts"),
             {
                 "classes": ("collapse",),
                 "fields": (
@@ -63,6 +63,14 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                     "theme_intro",
                     "home_map_title",
                     "home_map_intro",
+                ),
+            },
+        ),
+        (
+            _("Help texts"),
+            {
+                "classes": ("collapse",),
+                "fields": (
                     "home_help_text",
                     "theme_help_text",
                     "product_help_text",

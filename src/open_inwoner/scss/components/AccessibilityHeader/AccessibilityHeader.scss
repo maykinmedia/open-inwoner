@@ -4,8 +4,10 @@
   box-sizing: border-box;
   padding: 0 $hm;
 
-  .accessibility-modal.focus {
-    background-color: var(--color-yellow);
+  &__modal{
+    &--highlight {
+      background-color: var(--color-yellow);
+    }
   }
 
   /// List.

@@ -255,19 +255,23 @@ class SiteConfiguration(SingletonModel):
 
         return h, s, l
 
-    def get_help_text(self, current_path):
+    def get_help_text(self, request):
+        current_path = request.get_full_path()
+
         if current_path == reverse("root"):
             return self.home_help_text
         if (
-            reverse("pdc:category_list") in current_path
-            or reverse("accounts:my_themes") in current_path
+            current_path.startswith(reverse("pdc:category_list"))
+            and f"/{PRODUCT_PATH_NAME}/" in current_path
         ):
-            return self.theme_help_text
-        if PRODUCT_PATH_NAME in current_path:
             return self.product_help_text
-        if reverse("search:search") in current_path:
+        if current_path.startswith(f"/{PRODUCT_PATH_NAME}/"):
+            return self.product_help_text
+        if current_path.startswith(reverse("pdc:category_list")):
+            return self.theme_help_text
+        if current_path.startswith(reverse("search:search")):
             return self.search_help_text
-        if reverse("accounts:my_profile") in current_path:
+        if current_path.startswith(reverse("accounts:my_profile")):
             return self.account_help_text
 
 
