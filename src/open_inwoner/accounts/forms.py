@@ -20,6 +20,19 @@ class CustomRegistrationForm(RegistrationForm):
             "password2",
         )
 
+    def __init__(self, invite, *args, **kwargs):
+        self.invite = invite
+
+        super().__init__(*args, **kwargs)
+
+        if self.invite:
+            self.fields["email"].widget.attrs["readonly"] = "readonly"
+
+    def save(self, commit=True):
+        self.instance.is_active = True
+
+        return super().save(commit)
+
 
 class UserForm(forms.ModelForm):
     class Meta:

@@ -416,7 +416,9 @@ class Invite(models.Model):
         context = {
             "inviter_name": self.inviter.get_full_name(),
             "email": self.invitee.email,
-            "invite_link": reverse("accounts:invite_accept", args=[self.key]),
+            "invite_link": reverse(
+                "accounts:invite_accept", args=[self.key]
+            ),  # todo: absolute url
         }
 
         return template.send_email([self.invitee.email], context)
