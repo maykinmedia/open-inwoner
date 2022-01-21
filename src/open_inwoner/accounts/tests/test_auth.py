@@ -1,15 +1,18 @@
-from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
+
+from django.urls import reverse, reverse_lazy
 
 from django_webtest import WebTest
 
 from open_inwoner.configurations.models import SiteConfiguration
 
 from ..models import User
-from .factories import UserFactory
+from .factories import InviteFactory, UserFactory
 
 
 class TestRegistrationFunctionality(WebTest):
+    url = reverse_lazy("django_registration_register")
+
     def setUp(self):
         # Create a User instance that's not saved
         self.user = UserFactory.build()
@@ -51,6 +54,53 @@ class TestRegistrationFunctionality(WebTest):
         # Verify that the user has not been registered
         user_query = User.objects.filter(email=self.user.email)
         self.assertEquals(user_query.count(), 0)
+
+    def test_registration_inactive_user(self):
+        inactive_user = UserFactory.create(is_active=False)
+
+        register_page = self.app.get(self.url)
+        form = register_page.forms["registration-form"]
+        form["email"] = inactive_user.email
+        form["first_name"] = "John"
+        form["last_name"] = "Smith"
+        form["password1"] = "somepassword"
+        form["password2"] = "somepassword"
+
+        response = form.submit()
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("django_registration_complete"))
+
+        inactive_user.refresh_from_db()
+
+        self.assertTrue(inactive_user.is_active)
+        self.assertEqual(inactive_user.first_name, "John")
+        self.assertEqual(inactive_user.last_name, "Smith")
+
+    def test_registration_with_invite(self):
+        invite = InviteFactory.create(
+            contact__created_by__email=self.user.email,
+            contact__contact_user__is_active=False,
+        )
+        invitee = invite.invitee
+        register_page = self.app.get(f"{self.url}?invite={invite.key}")
+        form = register_page.forms["registration-form"]
+
+        # check that email is prefilled and read-only
+        self.assertEqual(form["email"].value, invitee.email)
+        self.assertEqual(form["email"].attrs.get("readonly"), "readonly")
+
+        form["password1"] = "somepassword"
+        form["password2"] = "somepassword"
+
+        response = form.submit()
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("django_registration_complete"))
+
+        invitee.refresh_from_db()
+
+        self.assertTrue(invitee.is_active)
 
 
 class TestLoginLogoutFunctionality(WebTest):

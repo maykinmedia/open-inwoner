@@ -63,7 +63,7 @@ class ContactForm(forms.ModelForm):
     def save(self, user, commit=True):
         self.instance.created_by = user
 
-        if not self.instance.pk:
+        if not self.instance.pk and self.instance.email:
             self.instance.contact_user, created = User.objects.get_or_create(
                 email=self.instance.email, defaults={"is_active": False}
             )
