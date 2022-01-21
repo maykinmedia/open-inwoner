@@ -1,10 +1,9 @@
 from django import forms
-from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
 from django_registration.forms import RegistrationForm
 
-from .models import Action, Contact, Document, User
+from .models import Action, Contact, Document, Message, User
 
 
 class CustomRegistrationForm(RegistrationForm):
@@ -71,3 +70,36 @@ class DocumentForm(forms.ModelForm):
     def save(self, user, commit=True):
         self.instance.owner = user
         return super().save(commit=commit)
+
+
+class InboxForm(forms.ModelForm):
+    receiver = forms.ModelChoiceField(
+        label=_("Contactpersoon"),
+        queryset=User.objects.none(),
+        to_field_name="email",
+        widget=forms.HiddenInput(),
+    )
+    content = forms.CharField(
+        label="",
+        widget=forms.Textarea(attrs={"placeholder": _("Schrijf een bericht...")}),
+    )
+
+    class Meta:
+        model = Message
+        fields = ("receiver", "content")
+
+    def __init__(self, user, **kwargs):
+        self.user = user
+
+        super().__init__(**kwargs)
+
+        active_contacts = self.user.get_active_contacts()
+        choices = [[c.email, f"{c.first_name} {c.last_name}"] for c in active_contacts]
+        active_contact_users = User.objects.get_active_contact_users(self.user)
+        self.fields["receiver"].choices = choices
+        self.fields["receiver"].queryset = active_contact_users
+
+    def save(self, commit=True):
+        self.instance.sender = self.user
+
+        return super().save(commit)

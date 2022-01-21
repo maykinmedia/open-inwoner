@@ -63,3 +63,9 @@ class UserManager(BaseUserManager):
             raise ValueError("Superuser must have is_superuser=True.")
 
         return self._create_user(email, password, **extra_fields)
+
+    def get_active_contact_users(self, me):
+        active_contacts = me.get_active_contacts().values_list(
+            "contact_user__id", flat=True
+        )
+        return self.get_queryset().filter(id__in=active_contacts)

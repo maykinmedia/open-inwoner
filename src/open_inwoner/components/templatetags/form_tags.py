@@ -1,8 +1,5 @@
-from inspect import getfullargspec, unwrap
-
 from django import template
 from django.forms import fields, models
-from django.template.exceptions import TemplateSyntaxError
 from django.template.library import parse_bits
 from django.template.loader import render_to_string
 from django.utils.translation import gettext as _
@@ -224,6 +221,18 @@ def textarea(field, **kwargs):
 
     Variables:
         + field: Field | The field that needs to be rendered.
+    """
+    return {**kwargs, "field": field}
+
+
+@register.inclusion_tag("components/Form/Autocomplete.html")
+def autocomplete(field, **kwargs):
+    """
+    Displaying an autocomplete field using @tarekraafat/autocomplete lib
+    Usage:
+        {% autocomplete form.field %}
+    Variables:
+        + field: Field | The choice field that needs to be rendered.
     """
     return {**kwargs, "field": field}
 
