@@ -3,7 +3,7 @@ from django.urls import reverse_lazy
 from django_webtest import WebTest
 
 from ..models import Message
-from .factories import MessageFactory, UserFactory
+from .factories import ContactFactory, MessageFactory, UserFactory
 
 
 class InboxPageTests(WebTest):
@@ -14,6 +14,12 @@ class InboxPageTests(WebTest):
 
         self.me = UserFactory.create()
         self.user1, self.user2 = UserFactory.create_batch(2)
+        ContactFactory.create(
+            created_by=self.me, contact_user=self.user1, email=self.user1.email
+        )
+        ContactFactory.create(
+            created_by=self.me, contact_user=self.user2, email=self.user2.email
+        )
         self.message1 = MessageFactory.create(sender=self.me, receiver=self.user1)
         self.message2 = MessageFactory.create(receiver=self.me, sender=self.user2)
 

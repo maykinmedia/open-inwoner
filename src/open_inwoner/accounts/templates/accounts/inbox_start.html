@@ -1,0 +1,21 @@
+{% extends 'master.html' %}
+{% load i18n link_tags form_tags grid_tags %}
+
+
+{% block main_inner %}
+    <h1 class="h1">{% trans 'Nieuw bericht' %}</h1>
+    {{ block.super }}
+{% endblock %}
+
+{% block content %}
+    {% render_grid %}
+        {% render_column start=1 span=8 %}
+            {% render_form form=form method="POST" %}
+                {% csrf_token %}
+                {% autocomplete form.receiver %}
+                {% textarea form.content %}
+                {% form_actions primary_text=_("Versturen") %}
+            {% endrender_form %}
+        {% endrender_column %}
+    {% endrender_grid %}
+{% endblock %}

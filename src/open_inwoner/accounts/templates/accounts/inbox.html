@@ -1,9 +1,17 @@
 {% extends 'master.html' %}
-{% load i18n form_tags link_tags list_tags messages_tags pagination_tags querystring_tags %}
+{% load i18n form_tags grid_tags button_tags link_tags list_tags messages_tags pagination_tags querystring_tags %}
 
 
 {% block main_inner %}
-    <h1 class="h1">{% trans 'Mijn berichten' %}</h1>
+    {% render_grid %}
+        {% render_column start=1 span=9 %}
+            <h1 class="h1">{% trans 'Mijn berichten' %}</h1>
+        {% endrender_column %}
+
+        {% render_column start=10 span=3 %}
+            {% button primary=True href='accounts:inbox_start' text=_('Nieuw bericht versturen') %}
+        {% endrender_column %}
+    {% endrender_grid %}
     {{ block.super }}
 {% endblock %}
 
@@ -30,7 +38,7 @@
 
 
 {% block content %}
-    {% if conversation_messages %}
+    {% if conversation_messages or other_user %}
         {% messages conversation_messages request.user form other_user status %}
     {% endif %}
 {% endblock %}

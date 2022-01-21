@@ -1,10 +1,10 @@
 from typing import Optional
 from urllib.parse import unquote
 
-from django import forms
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
+from django.urls import reverse_lazy
 from django.utils import formats
 from django.utils.translation import gettext as _
 from django.views.generic import FormView
@@ -13,26 +13,9 @@ from furl import furl
 
 from open_inwoner.utils.mixins import PaginationMixin
 
+from ..forms import InboxForm
 from ..models import Message, User
 from ..query import MessageQuerySet
-
-
-class InboxForm(forms.ModelForm):
-    content = forms.CharField(label="", widget=forms.Textarea)
-    receiver = forms.ModelChoiceField(
-        queryset=User.objects.all(),
-        to_field_name="email",
-        widget=forms.HiddenInput(),
-    )
-
-    class Meta:
-        model = Message
-        fields = ("content", "receiver")
-
-    def save(self, sender=None, commit=True):
-        self.instance.sender = sender
-
-        return super().save(commit)
 
 
 class InboxView(LoginRequiredMixin, PaginationMixin, FormView):
@@ -115,9 +98,34 @@ class InboxView(LoginRequiredMixin, PaginationMixin, FormView):
 
         return initial
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+
+        return kwargs
+
     def form_valid(self, form):
-        form.save(sender=self.request.user)
+        form.save()
 
         # build redirect url based on form hidden data
         url = furl(self.request.path).add({"with": form.data["receiver"]}).url
+        return HttpResponseRedirect(f"{url}#messages-last")
+
+
+class InboxStartView(LoginRequiredMixin, FormView):
+    template_name = "accounts/inbox_start.html"
+    form_class = InboxForm
+    success_url = reverse_lazy("accounts:inbox")
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+
+        return kwargs
+
+    def form_valid(self, form):
+        form.save()
+
+        # build redirect url based on form hidden data
+        url = furl(self.success_url).add({"with": form.data["receiver"]}).url
         return HttpResponseRedirect(f"{url}#messages-last")
