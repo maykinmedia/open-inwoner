@@ -1,1 +1,77 @@
-{% for item in cases %}{{ item }}{% endfor %}
+{% extends 'master.html' %}
+{% load i18n icon_tags %}
+
+{% block sidebar_content %}
+    <aside class="anchor-menu">
+        <ul class="anchor-menu__list">
+            <li class="anchor-menu__list-item">
+                <a class="link" href="#pending_apps">{% trans "Lopende aanvragen" %}</a>
+            </li>
+            <li class="anchor-menu__list-item">
+                <a class="link" href="#completed_apps">{% trans "Afgeronde aanvragen" %}</a>
+            </li>
+            <li class="anchor-menu__list-item anchor-menu__list-item--top">
+                <a class="link link--primary" href="#top">
+                    {% icon icon="arrow_upward" %}
+                    {% trans "Terug naar boven" %}
+                </a>
+            </li>
+        </ul>
+    </aside>
+{% endblock sidebar_content %}
+
+{% block content %}
+    <h1 class="h1" id="title">{% trans "Mijn aanvragen" %}</h2>
+    <p class="p p--color-black">{% trans "Hier werkt u samen met uw contactpersonen aan uw doelen." %}</p>
+
+    <div class="open_apps">
+        <h2 class="h2" id="pending_apps">{% trans "Lopende aanvragen" %}</h2>
+        <table class="table">
+            <thead class="table__heading">
+                <tr>
+                    <td class="table__item">{% trans "Identificatie" %}</td>
+                    <td class="table__item">{% trans "Omschrijving" %}</td>
+                    <td class="table__item">{% trans "Startdatum" %}</td>
+                </tr>
+            </thead>
+
+            {% if open_cases %}
+                <tbody>
+                    {% for case in open_cases %}
+                        <tr>
+                            <td class="table__item">{{ case.identificatie }}</td>
+                            <td class="table__item table__item--color-gray">{{ case.omschrijving }}</td>
+                            <td class="table__item table__item--color-gray">{{ case.startdatum }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            {% endif %}
+        </table>
+    </div>
+
+    <div class="closed_apps">
+        <h2 class="h2" id="completed_apps">{% trans "Afgeronde aanvragen" %}</h2>
+        <table class="table">
+            <thead class="table__heading">
+                <tr>
+                    <td class="table__item">{% trans "Identificatie" %}</td>
+                    <td class="table__item">{% trans "Omschrijving" %}</td>
+                    <td class="table__item">{% trans "Startdatum" %}</td>
+                    <td class="table__item">{% trans "Einddatum" %}</td>
+                </tr>
+            </thead>
+            {% if closed_cases %}
+                <tbody>
+                    {% for case in closed_cases %}
+                        <tr>
+                            <td class="table__item">{{ case.identificatie }}</td>
+                            <td class="table__item table__item--color-gray">{{ case.omschrijving }}</td>
+                            <td class="table__item table__item--color-gray">{{ case.startdatum }}</td>
+                            <td class="table__item table__item--color-gray">{{ case.einddatum }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            {% endif %}
+        </table>
+    </div>
+{% endblock content %}

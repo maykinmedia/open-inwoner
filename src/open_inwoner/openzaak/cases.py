@@ -1,5 +1,7 @@
 import logging
 
+from requests import RequestException
+from zds_client import ClientError
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.zaken import Zaak
 
@@ -13,23 +15,31 @@ def fetch_cases(user):
 
     if not config.service:
         logger.warning("no service defined for Open Zaak")
-        return None
+        return []
 
-    if not user.is_authenticated or user.bsn is None:
-        return None
+    if user.bsn is None:
+        return []
 
     client = config.service.build_client()
-    response = client.list(
-        "zaak",
-        request_kwargs={
-            "headers": {
-                "Accept-Crs": "EPSG:4326",
+    try:
+        response = client.list(
+            "zaak",
+            request_kwargs={
+                "headers": {
+                    "Accept-Crs": "EPSG:4326",
+                },
+                "params": {
+                    "rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn": f"{user.bsn}"
+                },
             },
-            "params": {
-                "rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn": f"{user.bsn}"
-            },
-        },
-    )
+        )
+    except RequestException as e:
+        logger.exception("exception while making request", exc_info=e)
+        return []
+    except ClientError as e:
+        logger.exception("exception while making request", exc_info=e)
+        return []
+
     cases = [factory(Zaak, data) for data in response.get("results", [])]
 
     return cases

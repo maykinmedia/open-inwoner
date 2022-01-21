@@ -61,6 +61,10 @@
       text-align: right;
       white-space: nowrap;
     }
+
+    &--color-gray {
+      color: var(--color-gray-dark);
+    }
   }
 
   &__header {

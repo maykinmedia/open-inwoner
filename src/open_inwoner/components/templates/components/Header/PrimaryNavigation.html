@@ -32,6 +32,9 @@
             <li class="primary-navigation__list-item">
                 {% link text=_('Mijn berichten') href='accounts:inbox' icon="inbox" icon_position="before" %}
             </li>
+            <li class="primary-navigation__list-item">
+                {% link text=_('Mijn aanvragen') href='accounts:my_cases' icon="inventory_2" icon_position="before" icon_outlined=True %}
+            </li>
         {% endif %}
     </ul>
 </nav>
