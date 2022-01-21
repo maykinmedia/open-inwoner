@@ -1,5 +1,6 @@
-from django.http.response import HttpResponseRedirect
+from django.http.response import Http404, HttpResponseRedirect
 from django.urls import reverse_lazy
+from django.utils.translation import ugettext_lazy as _
 from django.views.generic import UpdateView
 
 from furl import furl
@@ -21,3 +22,11 @@ class InviteAcceptView(UpdateView):
         self.object = form.save()
         url = furl(self.success_url).add({"invite": self.object.key}).url
         return HttpResponseRedirect(url)
+
+    def get_object(self, queryset=None):
+        invite = super().get_object(queryset)
+
+        if invite.expired():
+            raise Http404(_("The invitation was expired"))
+
+        return invite

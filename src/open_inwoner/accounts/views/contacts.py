@@ -50,6 +50,6 @@ class ContactCreateView(LoginRequiredMixin, CreateView):
             invite = Invite.objects.create(
                 inviter=self.request.user, invitee=contact_user, contact=self.object
             )
-            invite.send()
+            invite.send(self.request)
 
         return HttpResponseRedirect(self.get_success_url())

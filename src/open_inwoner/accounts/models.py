@@ -1,6 +1,7 @@
-from datetime import date
+from datetime import date, timedelta
 from uuid import uuid4
 
+from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 from django.urls import reverse
@@ -411,14 +412,23 @@ class Invite(models.Model):
     def generate_key():
         return get_random_string(64).lower()
 
-    def send(self):
+    def send(self, request=None):
+        url = self.get_absolute_url()
+        if request:
+            url = request.build_absolute_uri(url)
+
         template = find_template("invite")
         context = {
             "inviter_name": self.inviter.get_full_name(),
             "email": self.invitee.email,
-            "invite_link": reverse(
-                "accounts:invite_accept", args=[self.key]
-            ),  # todo: absolute url
+            "invite_link": url,
         }
 
         return template.send_email([self.invitee.email], context)
+
+    def get_absolute_url(self) -> str:
+        return reverse("accounts:invite_accept", kwargs={"key": self.key})
+
+    def expired(self) -> bool:
+        expiration_date = self.created_on + timedelta(days=settings.INVITE_EXPIRY)
+        return expiration_date <= timezone.now()
