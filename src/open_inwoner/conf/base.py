@@ -545,12 +545,12 @@ MAIL_EDITOR_CONF = {
         "description": _noop(
             "This email is used to invite people to sing up to the website"
         ),
-        "subject_default": "Invitation for {{ site_name }}: {{ inviter_name }} invites you to join {{ site_name }}",
+        "subject_default": "Invitation for {{ site_name }}",
         "body_default": """
             <h1>Hello {{ email }},</h1>
 
             <p> You were added by {{ inviter_name}} as their contact for {{ site_name }} website. 
-            Use the link below to sing up. </p>
+            Use the link below to sing up: </p>
 
             <p>{{ invite_link }}</p>
             

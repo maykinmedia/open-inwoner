@@ -46,7 +46,11 @@ class ContactCreateView(LoginRequiredMixin, CreateView):
 
         # send invite to the contact
         contact_user = self.object.contact_user
-        if not contact_user.is_active and not contact_user.deactivated_on:
+        if (
+            contact_user
+            and not contact_user.is_active
+            and not contact_user.deactivated_on
+        ):
             invite = Invite.objects.create(
                 inviter=self.request.user, invitee=contact_user, contact=self.object
             )
