@@ -591,3 +591,7 @@ CKEDITOR_CONFIGS = {
         "entities": False,  # This is added because CKEDITOR escapes the ' when you do an if statement
     }
 }
+
+
+# invite expires in X days after sending
+INVITE_EXPIRY = 14
