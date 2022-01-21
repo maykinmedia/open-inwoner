@@ -441,7 +441,7 @@ lxml==4.6.3
     #   pyquery
     #   python3-saml
     #   xmlsec
-mail-editor @ git+https://github.com/maykinmedia/mail-editor.git@763e1b81d8411ef7214560a8e6958193661f6e34
+mail-editor @ git+https://github.com/maykinmedia/mail-editor.git@0b4621b5c7f434586115b8e722af8940cfa70195
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
