@@ -1,0 +1,18 @@
+{% load i18n link_tags %}
+
+<table class="table table--light">
+    <tr>
+        <th class="table__header">{% trans "Oudere versie" %}</th>
+        <th class="table__header">{% trans "Geupload door" %}</th>
+        <th class="table__header">{% trans "Datum" %}</th>
+        <th class="table__header"></th>
+    </tr>
+    {% for file in files %}
+        <tr>
+            <td class="table__item">{{ file.file }}</td>
+            <td class="table__item">{{ file.owner.get_full_name }}</td>
+            <td class="table__item">{{ file.created_on }}</td>
+            <td class="table__item">{% link icon="download" href=file.file.url download=True %}</td>
+        </tr>
+    {% endfor %}
+</table>

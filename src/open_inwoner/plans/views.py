@@ -11,6 +11,7 @@ from view_breadcrumbs import (
     UpdateBreadcrumbMixin,
 )
 
+from open_inwoner.accounts.choices import EmptyStatusChoices
 from open_inwoner.accounts.forms import ActionListForm
 from open_inwoner.accounts.models import Action, Document
 from open_inwoner.utils.views import CustomDetailBreadcrumbMixin
@@ -24,11 +25,27 @@ class ActionListForm(forms.ModelForm):
         model = Action
         fields = ("status", "end_date", "created_by")
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["created_by"].required = False
+        self.fields["end_date"].required = False
+        self.fields["status"].required = False
+        self.fields["status"].initial = ""
+        self.fields["status"].choices = EmptyStatusChoices.choices
+
 
 class FileForm(forms.ModelForm):
     class Meta:
         model = Document
         fields = ("file", "name")
+
+    def save(self, user, plan=None, commit=True):
+        self.instance.owner = user
+        if plan:
+            self.instance.plan = plan
+
+        return super().save(commit=commit)
 
 
 class PlanListView(ListBreadcrumbMixin, ListView):
@@ -51,7 +68,7 @@ class PlanDetailView(DetailBreadcrumbMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["action_form"] = ActionListForm()
+        context["action_form"] = ActionListForm(data=self.request.GET)
         return context
 
 
@@ -92,3 +109,16 @@ class PlanFileUploadView(UpdateView):
     slug_url_kwarg = "uuid"
     form_class = FileForm
     success_url = reverse_lazy("plans:plan_list")
+
+    def get_form_kwargs(self):
+        """Return the keyword arguments for instantiating the form."""
+        kwargs = super().get_form_kwargs()
+        kwargs.update({"instance": None})
+        return kwargs
+
+    def form_valid(self, form):
+        form.save(self.request.user, plan=self.object)
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self) -> str:
+        return self.object.get_absolute_url()

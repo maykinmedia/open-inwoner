@@ -35,6 +35,7 @@ def render_form(parser, token):
         - columns: int | the number of columns that the form should have.
         - spaceless: bool | If the form element and sub elements should contain margins and paddings (not including the inputs).
         - inline: bool | If the form actions should be displayed on the same line as a field.
+        - autosubmit: bool | If the form should autosubmit if the inputs are changed.
         - extra_classes: string | Extra css classes for the form.
         - form_action: string | where the form should go after submit.
         - enctype: string | set the encrypt when sending forms.

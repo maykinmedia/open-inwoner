@@ -36,19 +36,9 @@ class Plan(models.Model):
         return ", ".join([contact.get_name() for contact in self.contacts.all()])
 
     def get_latest_file(self):
-        file = self.files.order_by("-created_at").first()
+        file = self.documents.order_by("-created_on").first()
         if file:
             return file.file
 
-
-class PlanFile(models.Model):
-    plan = models.ForeignKey(
-        "plans.Plan",
-        on_delete=models.CASCADE,
-        related_name="files",
-        help_text=_("To which plan the file belongs to"),
-    )
-    file = FilerFileField(
-        help_text=_("The file that should be connected to"), on_delete=models.CASCADE
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
+    def get_other_files(self):
+        return self.documents.order_by("-created_on")[1:]

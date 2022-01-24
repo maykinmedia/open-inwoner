@@ -39,6 +39,15 @@ def file_list(files, **kwargs):
     return {**kwargs, "files": files}
 
 
+@register.inclusion_tag("components/File/FileTable.html")
+def file_table(files, **kwargs):
+    """
+    files: array | this is the list of file that need to be rendered. (Optional)
+    """
+    kwargs.update(files=files)
+    return {**kwargs}
+
+
 @register.inclusion_tag("components/File/File.html")
 def file(file, **kwargs):
     """
