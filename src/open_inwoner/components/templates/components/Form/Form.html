@@ -1,7 +1,7 @@
 {% load form_tags link_tags %}
 {# Shared between Form and RenderForm. #}
 <form
-    class="form{% if columns %} form--columns-{{ columns }}{% endif %}{% if spaceless %} form--spaceless{% endif %}{% if inline %} form--inline{% endif %} {{ extra_classes }}"
+    class="form{% if columns %} form--columns-{{ columns }}{% endif %}{% if spaceless %} form--spaceless{% endif %}{% if inline %} form--inline{% endif %}{% if autosubmit %} form--autosubmit{% endif %} {{ extra_classes }}"
     method="{{ method }}"
     action="{% firstof form_action "." %}"
     {% if enctype %}enctype="{{enctype}}"{% endif %}

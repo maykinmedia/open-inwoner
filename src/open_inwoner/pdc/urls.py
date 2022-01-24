@@ -1,4 +1,6 @@
-from django.urls import path
+from unicodedata import category
+
+from django.urls import include, path
 
 from .views import CategoryDetailView, CategoryListView, ProductDetailView
 
@@ -10,6 +12,12 @@ product_urls = [
         ProductDetailView.as_view(),
         name="product_detail",
     )
+]
+
+category_url = [
+    path("<str:slug>/", CategoryDetailView.as_view(), name="category_detail"),
+    path("<str:slug>/", include(category_url, namespace="pdc")),
+    path("<str:slug>/", include(product_urls, namespace="pdc")),
 ]
 
 app_name = "pdc"

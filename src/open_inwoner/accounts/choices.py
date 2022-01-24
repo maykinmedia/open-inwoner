@@ -15,9 +15,17 @@ class ContactTypeChoices(DjangoChoices):
     organization = ChoiceItem("organization", _("Organisatie"))
 
 
+class EmptyChoices(DjangoChoices):
+    empty = ChoiceItem("", _("-------"))
+
+
 class StatusChoices(DjangoChoices):
     open = ChoiceItem("open", _("Open"))
     closed = ChoiceItem("closed", _("Afgerond"))
+
+
+class EmptyStatusChoices(EmptyChoices, StatusChoices):
+    pass
 
 
 class TypeChoices(DjangoChoices):

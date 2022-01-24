@@ -5,6 +5,13 @@
   border-collapse: collapse;
   border-spacing: 0;
 
+  &--light {
+    .table__header {
+      color: var(--color-gray-lighter);
+      font-weight: normal;
+    }
+  }
+
   &--spacious {
     .table__item {
       padding: var(--spacing-large) var(--spacing-medium);

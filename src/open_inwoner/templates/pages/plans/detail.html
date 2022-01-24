@@ -66,6 +66,8 @@
     {% if object.get_latest_file %}
         <br />
         {% file file=object.get_latest_file %}
+
+        {% file_table files=object.get_other_files %}
     {% endif %}
     <br />
     {% button href="plans:plan_add_file" uuid=object.uuid text=_("Upload nieuwe versie") primary=True %}

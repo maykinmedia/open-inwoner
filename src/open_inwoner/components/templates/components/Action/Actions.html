@@ -1,6 +1,7 @@
 {% load i18n form_tags icon_tags button_tags %}
 
 {% if actions %}
+{% render_form form=form method="GET" spaceless=True autosubmit=True %}
 <table class="table table--spacious">
     <tr>
         <td class="table__item">Filter op:</td>
@@ -49,6 +50,7 @@
         </tr>
     {% endfor %}
 </table>
+{% endrender_form %}
 {% else %}
 <p class="p">{% trans "Dit plan heeft nog geen acties" %}</p>
 {% endif %}
