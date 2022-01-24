@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
-from .models import Action, Appointment, Contact, Document, Message, User
+from .models import Action, Appointment, Contact, Document, Invite, Message, User
 
 
 @admin.register(User)
@@ -88,3 +88,10 @@ class AppointmentAdmin(admin.ModelAdmin):
 class MessageAdmin(admin.ModelAdmin):
     list_display = ("sender", "receiver", "created_on")
     list_filter = ("sender", "receiver")
+
+
+@admin.register(Invite)
+class InviteAdmin(admin.ModelAdmin):
+    list_display = ("inviter", "invitee", "accepted", "created_on")
+    list_filter = ("inviter", "invitee")
+    readonly_fields = ("key",)

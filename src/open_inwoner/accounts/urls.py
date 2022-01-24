@@ -12,10 +12,12 @@ from .views import (
     DocumentCreateView,
     DocumentDeleteView,
     EditProfileView,
+    InboxStartView,
+    InboxView,
+    InviteAcceptView,
     MyCategoriesView,
     MyProfileView,
 )
-from .views.inbox import InboxStartView, InboxView
 
 app_name = "accounts"
 urlpatterns = [
@@ -46,5 +48,6 @@ urlpatterns = [
     path("contacts/", ContactListView.as_view(), name="contact_list"),
     path("themes/", MyCategoriesView.as_view(), name="my_themes"),
     path("edit/", EditProfileView.as_view(), name="edit_profile"),
+    path("invite/<str:key>/accept/", InviteAcceptView.as_view(), name="invite_accept"),
     path("", MyProfileView.as_view(), name="my_profile"),
 ]

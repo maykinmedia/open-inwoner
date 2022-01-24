@@ -86,3 +86,12 @@ class MessageFactory(factory.django.DjangoModelFactory):
             obj.created_on = created_on
             obj.save()
         return obj
+
+
+class InviteFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = "accounts.Invite"
+
+    contact = factory.SubFactory(ContactFactory)
+    inviter = factory.LazyAttribute(lambda o: o.contact.created_by)
+    invitee = factory.LazyAttribute(lambda o: o.contact.contact_user)

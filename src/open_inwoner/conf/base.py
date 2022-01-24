@@ -2,10 +2,11 @@ import os
 
 # Django-hijack (and Django-hijack-admin)
 from django.urls import reverse_lazy
+from django.utils.translation import ugettext_noop as _noop
 
 import sentry_sdk
 
-from .utils import config, get_current_version, get_sentry_integrations
+from .utils import config, get_sentry_integrations
 
 # Build paths inside the project, so further paths can be defined relative to
 # the code root.
@@ -141,10 +142,12 @@ INSTALLED_APPS = [
     "view_breadcrumbs",
     "django_better_admin_arrayfield",
     "zgw_consumers",
+    "mail_editor",
+    "ckeditor",
     # Project applications.
     "open_inwoner.accounts",
     "open_inwoner.components",
-    "open_inwoner.ckeditor",
+    "open_inwoner.ckeditor5",
     "open_inwoner.pdc",
     "open_inwoner.search",
     "open_inwoner.utils",
@@ -534,3 +537,61 @@ DELETE_USER_AFTER_X_DAYS_INACTIVE = 14
 
 # django import-export
 IMPORT_EXPORT_USE_TRANSACTIONS = True
+
+# mail-editor
+MAIL_EDITOR_CONF = {
+    "invite": {
+        "name": _noop("Invitation Email"),
+        "description": _noop(
+            "This email is used to invite people to sing up to the website"
+        ),
+        "subject_default": "Invitation for {{ site_name }}",
+        "body_default": """
+            <h1>Hello {{ email }},</h1>
+
+            <p> You were added by {{ inviter_name}} as their contact for {{ site_name }} website. 
+            Use the link below to sing up: </p>
+
+            <p>{{ invite_link }}</p>
+            
+            <p>If you don't want to join us just ignore this email. </p>
+            
+            <p>Best regards, 
+            {{ site_name }} </p>
+        """,
+        "subject": [
+            {
+                "name": "site_name",
+                "description": _noop("Name of the site."),
+            },
+            {"name": "inviter_name", "description": _noop("Full name of the inviter")},
+        ],
+        "body": [
+            {
+                "name": "inviter_name",
+                "description": _noop("Full name of the inviter"),
+            },
+            {
+                "name": "site_name",
+                "description": _noop("Name of the site"),
+            },
+            {
+                "name": "invite_link",
+                "description": _noop("Link to activate their account."),
+            },
+            {"name": "email", "description": _noop("Email of the invited user")},
+        ],
+    }
+}
+MAIL_EDITOR_BASE_CONTEXT = {"site_name": "Open Inwoner Platform"}
+CKEDITOR_CONFIGS = {
+    "mail_editor": {
+        "allowedContent": True,
+        "height": 600,  # This is optional
+        "entities": False,  # This is added because CKEDITOR escapes the ' when you do an if statement
+    }
+}
+
+
+# invite expires in X days after sending
+INVITE_EXPIRY = 14
