@@ -145,7 +145,7 @@ class Product(models.Model):
         return reverse("pdc:product_detail", kwargs={"slug": self.slug})
 
     def get_rendered_content(self):
-        md = markdown.Markdown()
+        md = markdown.Markdown(extensions=["tables"])
         html = md.convert(self.content)
         soup = BeautifulSoup(html, "html.parser")
         class_adders = [
@@ -157,6 +157,9 @@ class Product(models.Model):
             ("h6", "h6"),
             ("p", "p"),
             ("a", "link"),
+            ("table", "table table--content"),
+            ("th", "table__header"),
+            ("td", "table__item"),
         ]
         for tag, class_name in class_adders:
             for element in soup.find_all(tag):

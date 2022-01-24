@@ -16,6 +16,15 @@
     }
   }
 
+  &--content {
+    margin-top: var(--spacing-giant);
+    margin-bottom: var(--spacing-giant);
+
+    .table__item {
+      border-right: 1px solid var(--color-gray-light);
+    }
+  }
+
   &__heading {
     .table__item {
       color: #7a7a7a;
