@@ -22,5 +22,5 @@ class HelpModal {
   }
 }
 
-const helpButton = document.querySelectorAll('.modal')
+const helpButton = document.querySelectorAll('.accessibility--modal')
 ;[...helpButton].forEach((button) => new HelpModal(button))
