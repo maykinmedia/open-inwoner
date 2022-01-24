@@ -1,12 +1,16 @@
-from datetime import date
+from datetime import date, timedelta
 from uuid import uuid4
 
+from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
+from django.urls import reverse
 from django.utils import timezone
+from django.utils.crypto import get_random_string
 from django.utils.translation import ugettext_lazy as _
 
 from localflavor.nl.models import NLBSNField, NLZipCodeField
+from mail_editor.helpers import find_template
 from privates.storages import PrivateMediaFileSystemStorage
 
 from open_inwoner.utils.validators import validate_phone_number
@@ -364,3 +368,67 @@ class Message(models.Model):
 
     def __str__(self):
         return f"From: {self.sender}, To: {self.receiver} ({self.created_on.date()})"
+
+
+class Invite(models.Model):
+    inviter = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="sent_invites",
+        help_text=_("User who created the invite"),
+    )
+    invitee = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="received_invites",
+        help_text=_("User who received the invite"),
+    )
+    contact = models.ForeignKey(
+        Contact,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="invites",
+        help_text=_("THe contact the creation of which triggered sending the invite"),
+    )
+    accepted = models.BooleanField(verbose_name=_("accepted"), default=False)
+    key = models.CharField(verbose_name=_("key"), max_length=64, unique=True)
+    created_on = models.DateTimeField(
+        _("Created on"),
+        auto_now_add=True,
+        help_text=_("This is the date the message was created"),
+    )
+
+    def __str__(self):
+        return f"For: {self.invitee} ({self.created_on.date()})"
+
+    def save(self, **kwargs):
+        if not self.pk:
+            self.key = self.generate_key()
+
+        return super().save(**kwargs)
+
+    @staticmethod
+    def generate_key():
+        return get_random_string(64).lower()
+
+    def send(self, request=None):
+        url = self.get_absolute_url()
+        if request:
+            url = request.build_absolute_uri(url)
+
+        template = find_template("invite")
+        context = {
+            "inviter_name": self.inviter.get_full_name(),
+            "email": self.invitee.email,
+            "invite_link": url,
+        }
+
+        return template.send_email([self.invitee.email], context)
+
+    def get_absolute_url(self) -> str:
+        return reverse("accounts:invite_accept", kwargs={"key": self.key})
+
+    def expired(self) -> bool:
+        expiration_date = self.created_on + timedelta(days=settings.INVITE_EXPIRY)
+        return expiration_date <= timezone.now()

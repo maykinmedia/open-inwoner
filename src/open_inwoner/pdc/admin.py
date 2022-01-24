@@ -8,7 +8,7 @@ from leaflet.admin import LeafletGeoAdmin
 from treebeard.admin import TreeAdmin
 from treebeard.forms import movenodeform_factory
 
-from open_inwoner.ckeditor.widgets import CKEditorWidget
+from open_inwoner.ckeditor5.widgets import CKEditorWidget
 
 from .models import (
     Category,

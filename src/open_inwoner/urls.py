@@ -5,13 +5,17 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import include, path
-from django.views.generic.base import TemplateView
-
-from django_registration.backends.one_step.views import RegistrationView
 
 from open_inwoner.accounts.forms import CustomRegistrationForm
-from open_inwoner.accounts.views import DocumentPrivateMediaView, PasswordResetView
+from open_inwoner.accounts.views import (
+    CustomRegistrationView,
+    DocumentPrivateMediaView,
+    PasswordResetView,
+)
 from open_inwoner.pdc.views import HomeView
+
+# from django_registration.backends.one_step.views import RegistrationView
+
 
 handler500 = "open_inwoner.utils.views.server_error"
 admin.site.site_header = "Open Inwoner beheeromgeving"
@@ -47,11 +51,11 @@ urlpatterns = [
     ),
     path("admin/hijack/", include("hijack.urls")),
     path("admin/", admin.site.urls),
-    path("ckeditor/", include("open_inwoner.ckeditor.urls")),
+    path("ckeditor/", include("open_inwoner.ckeditor5.urls")),
     # Simply show the master template.
     path(
         "accounts/register/",
-        RegistrationView.as_view(form_class=CustomRegistrationForm),
+        CustomRegistrationView.as_view(form_class=CustomRegistrationForm),
         name="django_registration_register",
     ),
     path("accounts/", include("django_registration.backends.one_step.urls")),
@@ -61,6 +65,7 @@ urlpatterns = [
     # Views
     path("accounts/", include("open_inwoner.accounts.urls", namespace="accounts")),
     path("pages/", include("django.contrib.flatpages.urls"), name="flatpages"),
+    path("mail-editor/", include("mail_editor.urls", namespace="mail_editor")),
     path("", include("open_inwoner.pdc.urls", namespace="pdc")),
     path("", include("open_inwoner.search.urls", namespace="search")),
     path("", HomeView.as_view(), name="root"),
