@@ -15,7 +15,7 @@ import ImageUpload from '@ckeditor/ckeditor5-image/src/imageupload'
 import ImageStyle from '@ckeditor/ckeditor5-image/src/imagestyle'
 import ImageToolbar from '@ckeditor/ckeditor5-image/src/imagetoolbar'
 import ImageCaption from '@ckeditor/ckeditor5-image/src/imagecaption'
-import Table from '@ckeditor/ckeditor5-table/src/table';
+import Table from '@ckeditor/ckeditor5-table/src/table'
 import TableToolbar from '@ckeditor/ckeditor5-table/src/tabletoolbar'
 import FilerImageAdapterPlugin from './plugins/filer/plugin'
 
@@ -82,7 +82,7 @@ ClassicEditor.defaultConfig = {
     },
   },
   table: {
-    contentToolbar: [ 'tableColumn', 'tableRow', 'mergeTableCells' ]
+    contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells'],
   },
 }
 
