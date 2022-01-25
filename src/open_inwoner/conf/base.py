@@ -547,12 +547,12 @@ MAIL_EDITOR_CONF = {
         ),
         "subject_default": "Invitation for {{ site_name }}",
         "body_default": """
-            <h1>Hello {{ email }},</h1>
+            <p>Hello {{ email }},</p>
 
             <p> You were added by {{ inviter_name}} as their contact for {{ site_name }} website. 
             Use the link below to sing up: </p>
 
-            <p>{{ invite_link }}</p>
+            <p><a href="{{ invite_link }}">link</a> </p>
             
             <p>If you don't want to join us just ignore this email. </p>
             
