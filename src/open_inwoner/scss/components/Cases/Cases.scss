@@ -3,13 +3,18 @@
   margin-top: var(--spacing-giant);
 
   .table {
-    margin-top: var(--spacing-medium);
-  }
+    &--space-medium {
+      margin-top: var(--spacing-medium);
+    }
 
-  .table {
     &__item {
       &--no-lb {
         white-space: nowrap;
+      }
+
+      &--no-left-padding {
+        padding: var(--spacing-medium) var(--spacing-medium)
+          var(--spacing-medium) 0;
       }
     }
   }

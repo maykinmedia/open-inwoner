@@ -25,21 +25,21 @@
 
     <div class="open_apps">
         <h2 class="h2" id="pending_apps">{% trans "Lopende aanvragen" %}</h2>
-        <table class="table">
+        <table class="table table--space-medium">
             <thead class="table__heading">
                 <tr>
-                    <td class="table__item">{% trans "Identificatie" %}</td>
-                    <td class="table__item">{% trans "Omschrijving" %}</td>
-                    <td class="table__item">{% trans "Startdatum" %}</td>
+                    <td class="table__item table__item--no-left-padding">{% trans "Identificatie" %}</td>
+                    <td class="table__item table__item--no-left-padding">{% trans "Omschrijving" %}</td>
+                    <td class="table__item table__item--no-left-padding">{% trans "Startdatum" %}</td>
                 </tr>
             </thead>
 
             <tbody>
                 {% for case in open_cases %}
                     <tr>
-                        <td class="table__item">{{ case.identificatie }}</td>
-                        <td class="table__item table__item--color-gray table__item--no-lb">{{ case.omschrijving }}</td>
-                        <td class="table__item table__item--color-gray table__item--no-lb">{{ case.startdatum }}</td>
+                        <td class="table__item table__item--no-left-padding">{{ case.identificatie }}</td>
+                        <td class="table__item table__item--color-gray table__item--no-lb table__item--no-left-padding">{{ case.omschrijving }}</td>
+                        <td class="table__item table__item--color-gray table__item--no-lb table__item--no-left-padding">{{ case.startdatum }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -48,23 +48,23 @@
 
     <div class="closed_apps">
         <h2 class="h2" id="completed_apps">{% trans "Afgeronde aanvragen" %}</h2>
-        <table class="table">
+        <table class="table table--space-medium">
             <thead class="table__heading">
                 <tr>
-                    <td class="table__item">{% trans "Identificatie" %}</td>
-                    <td class="table__item">{% trans "Omschrijving" %}</td>
-                    <td class="table__item">{% trans "Startdatum" %}</td>
-                    <td class="table__item">{% trans "Einddatum" %}</td>
+                    <td class="table__item table__item--no-left-padding">{% trans "Identificatie" %}</td>
+                    <td class="table__item table__item--no-left-padding">{% trans "Omschrijving" %}</td>
+                    <td class="table__item table__item--no-left-padding">{% trans "Startdatum" %}</td>
+                    <td class="table__item table__item--no-left-padding">{% trans "Einddatum" %}</td>
                 </tr>
             </thead>
 
             <tbody>
                 {% for case in closed_cases %}
                     <tr>
-                        <td class="table__item">{{ case.identificatie }}</td>
-                        <td class="table__item table__item--color-gray">{{ case.omschrijving }}</td>
-                        <td class="table__item table__item--color-gray table__item--no-lb">{{ case.startdatum }}</td>
-                        <td class="table__item table__item--color-gray table__item--no-lb">{{ case.einddatum }}</td>
+                        <td class="table__item table__item--no-left-padding">{{ case.identificatie }}</td>
+                        <td class="table__item table__item--color-gray table__item--no-left-padding">{{ case.omschrijving }}</td>
+                        <td class="table__item table__item--color-gray table__item--no-lb table__item--no-left-padding">{{ case.startdatum }}</td>
+                        <td class="table__item table__item--color-gray table__item--no-lb table__item--no-left-padding">{{ case.einddatum }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
