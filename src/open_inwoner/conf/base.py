@@ -545,18 +545,18 @@ MAIL_EDITOR_CONF = {
         "description": _noop(
             "This email is used to invite people to sing up to the website"
         ),
-        "subject_default": "Invitation for {{ site_name }}",
+        "subject_default": "Uitnodiging voor {{ site_name }}",
         "body_default": """
-            <p>Hello {{ email }},</p>
+            <p>Beste</p>
 
-            <p> You were added by {{ inviter_name}} as their contact for {{ site_name }} website. 
-            Use the link below to sing up: </p>
+            <p> Je bent door {{ inviter_name}} uitgenodigd om in te loggen op {{ site_name }}. 
+            Gebruik onderstaande link om je aan te melden </p>
 
-            <p><a href="{{ invite_link }}">link</a> </p>
+            <p><a href="{{ invite_link }}">aanmelden</a> </p>
             
-            <p>If you don't want to join us just ignore this email. </p>
+            <p>Mocht je geen behoefte hieraan hebben dan staat het je vrij om dit bericht te negeren </p>
             
-            <p>Best regards, 
+            <p>Met vriendelijke groet, 
             {{ site_name }} </p>
         """,
         "subject": [
