@@ -91,4 +91,5 @@ class ContactViewTests(WebTest):
         self.assertEqual(email.subject, "Invitation for Open Inwoner Platform")
         self.assertEqual(email.to, [contact_user.email])
         invite_url = f"http://testserver{invite.get_absolute_url()}"
-        self.assertIn(invite_url, email.body)
+        body = email.alternatives[0][0]  # html version of the email body
+        self.assertIn(invite_url, body)
