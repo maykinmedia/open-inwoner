@@ -19,13 +19,11 @@ class CasesListView(BaseBreadcrumbMixin, LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         cases = fetch_cases(self.request.user)
-        context["open_cases"] = []
-        context["closed_cases"] = []
 
-        for case in cases:
-            if case.einddatum:
-                context["closed_cases"].append(case)
-            else:
-                context["open_cases"].append(case)
+        context["open_cases"] = [case for case in cases if not case.einddatum]
+        context["closed_cases"] = [case for case in cases if case.einddatum]
+
+        context["open_cases"].sort(key=lambda case: case.startdatum, reverse=True)
+        context["closed_cases"].sort(key=lambda case: case.einddatum, reverse=True)
 
         return context
