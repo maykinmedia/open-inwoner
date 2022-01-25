@@ -71,7 +71,7 @@ class InboxView(LoginRequiredMixin, PaginationMixin, FormView):
         Returns the messages (MessageType) of the current conversation.
         """
         if not other_user:
-            return MessageQuerySet.none()
+            return Message.objects.none()
 
         messages = Message.objects.get_messages_between_users(
             me=self.request.user, other_user=other_user
