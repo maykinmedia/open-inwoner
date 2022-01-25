@@ -16,4 +16,12 @@
       }
     }
   }
+
+  .table {
+    &__item {
+      &--no-lb {
+        white-space: nowrap;
+      }
+    }
+  }
 }
