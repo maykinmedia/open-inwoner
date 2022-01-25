@@ -38,8 +38,8 @@
                 {% for case in open_cases %}
                     <tr>
                         <td class="table__item table__item--no-left-padding">{{ case.identificatie }}</td>
-                        <td class="table__item table__item--color-gray table__item--no-lb table__item--no-left-padding">{{ case.omschrijving }}</td>
-                        <td class="table__item table__item--color-gray table__item--no-lb table__item--no-left-padding">{{ case.startdatum }}</td>
+                        <td class="table__item table__item--color-gray-dark table__item--no-lb table__item--no-left-padding">{{ case.omschrijving }}</td>
+                        <td class="table__item table__item--color-gray-dark table__item--no-lb table__item--no-left-padding">{{ case.startdatum }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -62,9 +62,9 @@
                 {% for case in closed_cases %}
                     <tr>
                         <td class="table__item table__item--no-left-padding">{{ case.identificatie }}</td>
-                        <td class="table__item table__item--color-gray table__item--no-left-padding">{{ case.omschrijving }}</td>
-                        <td class="table__item table__item--color-gray table__item--no-lb table__item--no-left-padding">{{ case.startdatum }}</td>
-                        <td class="table__item table__item--color-gray table__item--no-lb table__item--no-left-padding">{{ case.einddatum }}</td>
+                        <td class="table__item table__item--color-gray-dark table__item--no-left-padding">{{ case.omschrijving }}</td>
+                        <td class="table__item table__item--color-gray-dark table__item--no-lb table__item--no-left-padding">{{ case.startdatum }}</td>
+                        <td class="table__item table__item--color-gray-dark table__item--no-lb table__item--no-left-padding">{{ case.einddatum }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

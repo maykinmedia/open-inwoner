@@ -8,6 +8,10 @@
     }
 
     &__item {
+      &--color-gray-dark {
+        color: var(--color-gray-dark);
+      }
+
       &--no-lb {
         white-space: nowrap;
       }
