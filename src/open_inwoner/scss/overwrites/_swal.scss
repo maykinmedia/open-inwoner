@@ -1,17 +1,33 @@
 .swal-modal {
+  border-radius: 0;
+  padding: var(--spacing-giant);
+
+  .swal-title {
+    margin: 0;
+    padding: 0 0 18px 0;
+    text-align: left;
+    color: var(--font-color-heading-2);
+    font-family: var(--font-family-heading-2);
+    font-size: var(--font-size-heading-2);
+    line-height: var(--font-line-height-heading-2);
+  }
+
   .swal-text {
+    margin: 0;
+    padding: 0 0 30px 0;
+    max-width: none;
+    display: block;
     color: var(--font-color-body);
     font-family: var(--font-family-body);
     font-size: var(--font-size-body);
     line-height: var(--font-line-height-body);
   }
 
-  .swal-button--cancel {
+  .swal-button {
     @extend .button;
   }
 
   .swal-button--confirm {
-    @extend .button;
     background-color: var(--color-danger);
     color: var(--color-white);
 
@@ -22,8 +38,27 @@
     }
   }
 
+  .swal-button--close {
+    background-color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+    color: var(--color-font-primary);
+
+    &:hover {
+      transform: translateY(-1px);
+      background-color: var(--color-primary-darker);
+    }
+  }
+
   .swal-footer {
     display: flex;
+    flex-direction: row-reverse;
     justify-content: space-between;
+    gap: var(--spacing-medium);
+    padding: 0;
+    margin: 0;
+  }
+
+  .swal-button-container {
+    margin: 0;
   }
 }
