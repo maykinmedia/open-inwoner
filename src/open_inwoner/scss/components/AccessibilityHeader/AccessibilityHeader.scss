@@ -4,6 +4,12 @@
   box-sizing: border-box;
   padding: 0 $hm;
 
+  &__modal {
+    &--highlight {
+      background-color: var(--color-accent-darker);
+    }
+  }
+
   /// List.
 
   &__list {
@@ -14,8 +20,6 @@
   }
 
   &__list-item {
-    margin: 0 var(--spacing-large);
-
     &:first-child {
       margin-left: 0;
     }
@@ -28,6 +32,7 @@
   /// Link.
 
   .link {
+    padding: 0 var(--spacing-large);
     color: var(--color-font-accent);
     line-height: var(--row-height);
     @media (max-width: 767px) {

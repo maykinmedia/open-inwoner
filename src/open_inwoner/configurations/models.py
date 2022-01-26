@@ -1,11 +1,14 @@
 from django.contrib.flatpages.models import FlatPage
 from django.db import models
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from colorfield.fields import ColorField
 from filer.fields.image import FilerImageField
 from ordered_model.models import OrderedModel, OrderedModelManager
 from solo.models import SingletonModel
+
+from open_inwoner.pdc.urls import PRODUCT_PATH_NAME
 
 from .choices import ColorTypeChoices
 
@@ -145,6 +148,44 @@ class SiteConfiguration(SingletonModel):
     flatpages = models.ManyToManyField(
         FlatPage, through="SiteConfigurationPage", related_name="configurations"
     )
+    home_help_text = models.TextField(
+        blank=True,
+        default=_(
+            "Welkom! Op dit scherm vindt u een overzicht van de verschillende thema's en producten & diensten."
+        ),
+        verbose_name=_("Home help"),
+        help_text=_("The help text for the home page."),
+    )
+    theme_help_text = models.TextField(
+        blank=True,
+        default=_(
+            "Op dit scherm vindt u de verschillende thema's waarvoor wij producten en diensten aanbieden."
+        ),
+        verbose_name=_("Theme help"),
+        help_text=_("The help text for the theme page."),
+    )
+    product_help_text = models.TextField(
+        blank=True,
+        default=_(
+            "Op dit scherm kunt u de details vinden over het gekozen product of dienst. Afhankelijk van het product kunt u deze direct aanvragen of meer informatie opvragen."
+        ),
+        verbose_name=_("Product help"),
+        help_text=_("The help text for the product page."),
+    )
+    search_help_text = models.TextField(
+        blank=True,
+        default=_("Op dit scherm kunt u zoeken naar de producten en diensten."),
+        verbose_name=_("Search help"),
+        help_text=_("The help text for the search page."),
+    )
+    account_help_text = models.TextField(
+        blank=True,
+        default=_(
+            "Op dit scherm ziet u uw persoonlijke profielgegevens en gerelateerde gegevens."
+        ),
+        verbose_name=_("Account help"),
+        help_text=_("The help text for the profile page."),
+    )
 
     class Meta:
         verbose_name = "Site Configuration"
@@ -213,6 +254,25 @@ class SiteConfiguration(SingletonModel):
         l = int((l * 100))
 
         return h, s, l
+
+    def get_help_text(self, request):
+        current_path = request.get_full_path()
+
+        if current_path == reverse("root"):
+            return self.home_help_text
+        if (
+            current_path.startswith(reverse("pdc:category_list"))
+            and f"/{PRODUCT_PATH_NAME}/" in current_path
+        ):
+            return self.product_help_text
+        if current_path.startswith(f"/{PRODUCT_PATH_NAME}/"):
+            return self.product_help_text
+        if current_path.startswith(reverse("pdc:category_list")):
+            return self.theme_help_text
+        if current_path.startswith(reverse("search:search")):
+            return self.search_help_text
+        if current_path.startswith(reverse("accounts:my_profile")):
+            return self.account_help_text
 
 
 class SiteConfigurationPage(OrderedModel):
