@@ -17,7 +17,6 @@ class InviteAcceptView(UpdateView):
     form_class = InviteForm
     success_url = reverse_lazy("django_registration_register")
 
-    # todo not show GET and POST if invite is expired
     def form_valid(self, form):
         self.object = form.save()
         url = furl(self.success_url).add({"invite": self.object.key}).url
