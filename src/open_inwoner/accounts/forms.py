@@ -3,6 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from django_registration.forms import RegistrationForm
 
+from .choices import EmptyStatusChoices
 from .models import Action, Contact, Document, Invite, Message, User
 
 
@@ -108,8 +109,10 @@ class ActionForm(forms.ModelForm):
             "goal",
         )
 
-    def save(self, user, commit=True):
+    def save(self, user, plan=None, commit=True):
         self.instance.created_by = user
+        if plan:
+            self.instance.plan = plan
         return super().save(commit=commit)
 
 
@@ -162,3 +165,19 @@ class InviteForm(forms.ModelForm):
     class Meta:
         model = Invite
         fields = ("accepted",)
+
+
+class ActionListForm(forms.ModelForm):
+    class Meta:
+        model = Action
+        fields = ("status", "end_date", "created_by")
+
+    def __init__(self, users, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["created_by"].queryset = User.objects.filter(pk__in=users)
+        self.fields["created_by"].required = False
+        self.fields["end_date"].required = False
+        self.fields["status"].required = False
+        self.fields["status"].initial = ""
+        self.fields["status"].choices = EmptyStatusChoices.choices

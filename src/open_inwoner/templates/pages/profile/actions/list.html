@@ -8,7 +8,7 @@
     {% button href="accounts:action_create" text=_("Nieuw actie toevoegen") icon="date_range" primary=True %}
 </h1>
 
-{% actions actions=action_list action_form=action_form %}
+{% actions actions=actions action_form=action_form %}
 
 {% pagination page_obj=page_obj paginator=paginator request=request href="accounts:my_profile" text=_("Terug naar mijn profiel") %}
 {% endblock content %}

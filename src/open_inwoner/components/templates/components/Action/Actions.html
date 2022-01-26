@@ -1,6 +1,5 @@
 {% load i18n form_tags icon_tags button_tags %}
 
-{% if actions %}
 {% render_form form=form method="GET" spaceless=True autosubmit=True %}
 <table class="table table--spacious">
     <tr>
@@ -23,7 +22,7 @@
                 <div class="table__explain">
                     Status
                     <div class="table__explain-icons">
-                        {% button icon="input" href="accounts:action_edit" uuid=action.uuid icon_outlined=True transparent=True %}
+                        {% button icon="input" href="#" icon_outlined=True transparent=True %}
                         {% button icon="settings" href="accounts:action_edit" uuid=action.uuid icon_outlined=True transparent=True %}
                     </div>
                 </div>
@@ -48,9 +47,8 @@
                 {{ action.created_on }}&nbsp;
             </td>
         </tr>
+    {% empty %}
+        <tr><td class="table__item" colspan="4"><p class="p">{% trans "er zijn geen acties gevonden met de huidige filter of er zijn geen acties" %}</p></td></tr>
     {% endfor %}
 </table>
 {% endrender_form %}
-{% else %}
-<p class="p">{% trans "Dit plan heeft nog geen acties" %}</p>
-{% endif %}

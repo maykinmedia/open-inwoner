@@ -5,4 +5,5 @@ flatpickr('.datefield', {
   weekNumbers: true,
   dateFormat: 'd-m-Y',
   locale: Dutch,
+  allowInput: true,
 })

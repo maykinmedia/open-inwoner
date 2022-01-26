@@ -1,6 +1,7 @@
 from django.urls import path
 
 from .views import (
+    PlanActionCreateView,
     PlanCreateView,
     PlanDetailView,
     PlanFileUploadView,
@@ -15,4 +16,9 @@ urlpatterns = [
     path("<uuid:uuid>/", PlanDetailView.as_view(), name="plan_detail"),
     path("<uuid:uuid>/edit/goal/", PlanGoalEditView.as_view(), name="plan_edit_goal"),
     path("<uuid:uuid>/add/file/", PlanFileUploadView.as_view(), name="plan_add_file"),
+    path(
+        "<uuid:uuid>/add/actions/",
+        PlanActionCreateView.as_view(),
+        name="plan_action_create",
+    ),
 ]
