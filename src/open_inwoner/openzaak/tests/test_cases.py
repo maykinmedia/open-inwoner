@@ -1,57 +1,60 @@
-import json
-import os
-
 from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse
 
 import requests_mock
 from django_webtest import WebTest
+from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.utils.test import paginated_response
 
 from ..cases import fetch_cases
 from ..models import OpenZaakConfig
 from .factories import ServiceFactory
 
-
-def load_json_mock(name):
-    path = os.path.join(os.path.dirname(__file__), "files", name)
-    with open(path, "r") as f:
-        return json.loads(f.read())
-
-
-def load_binary_mock(name):
-    path = os.path.join(os.path.dirname(__file__), "files", name)
-    with open(path, "rb") as f:
-        return f.read()
+ZAKEN_ROOT = "https://zaken.nl/api/v1/"
 
 
 @requests_mock.Mocker()
 class TestFetchingCases(WebTest):
-    def _setUp_mocks(self, m):
-        m.get(
-            "https://zaken/api/v1/schema/openapi.yaml?v=3",
-            status_code=200,
-            content=load_binary_mock("openapi.yaml"),
-        )
-        m.get(
-            "https://zaken/api/v1/zaken?rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn=900222086",
-            status_code=200,
-            json=load_json_mock("zaken.900222086.json"),
-        )
-
     def setUp(self):
         self.config = OpenZaakConfig.get_solo()
-        self.service = ServiceFactory(
-            api_root="https://zaken/api/v1/",
-            oas="https://zaken/api/v1/schema/openapi.yaml",
-        )
+        self.service = ServiceFactory(api_root=ZAKEN_ROOT)
         self.config.service = self.service
         self.config.save()
 
+        self.zaak1 = generate_oas_component(
+            "openapi",
+            "schemas/Zaak",
+            url=f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
+            startdatum="2022-01-02",
+            einddatum=None,
+        )
+        self.zaak2 = generate_oas_component(
+            "openapi",
+            "schemas/Zaak",
+            url=f"{ZAKEN_ROOT}zaken/e4d469b9-6666-4bdd-bf42-b53445298102",
+            startdatum="2022-01-12",
+            einddatum=None,
+        )
+        self.zaak3 = generate_oas_component(
+            "openapi",
+            "schemas/Zaak",
+            url=f"{ZAKEN_ROOT}zaken/6f8de38f-85ea-42d3-978c-845a033335a7",
+            startdatum="2021-07-26",
+            einddatum="2022-01-16",
+        )
+
+    def _setUpMocks(self, m):
+        mock_service_oas_get(m, ZAKEN_ROOT, "openapi")
+        m.get(
+            f"{ZAKEN_ROOT}zaken?rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn=900222086",
+            json=paginated_response([self.zaak1, self.zaak2, self.zaak3]),
+        )
+
     def test_sorted_cases_are_retrieved_when_user_logged_in_via_digid(self, m):
-        self._setUp_mocks(m)
+        self._setUpMocks(m)
 
         user = UserFactory(
             first_name="",
@@ -66,19 +69,17 @@ class TestFetchingCases(WebTest):
         self.assertListEqual(
             open_cases,
             [
-                "https: //openzaak.nl/zaken/api/v1/zaken/e4d469b9-6666-4bdd-bf42-b53445298102",
-                "https: //openzaak.nl/zaken/api/v1/zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
+                f"{ZAKEN_ROOT}zaken/e4d469b9-6666-4bdd-bf42-b53445298102",
+                f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
             ],
         )
         self.assertListEqual(
             closed_cases,
-            [
-                "https: //openzaak.nl/zaken/api/v1/zaken/6f8de38f-85ea-42d3-978c-845a033335a7"
-            ],
+            [f"{ZAKEN_ROOT}zaken/6f8de38f-85ea-42d3-978c-845a033335a7"],
         )
 
     def test_no_cases_are_retrieved_when_user_not_logged_in_via_digid(self, m):
-        self._setUp_mocks(m)
+        self._setUpMocks(m)
 
         # User's bsn is None when logged in by email (default method)
         user = UserFactory(
@@ -99,13 +100,9 @@ class TestFetchingCases(WebTest):
         )
 
     def test_no_cases_are_retrieved_when_http_404(self, m):
+        mock_service_oas_get(m, ZAKEN_ROOT, "openapi")
         m.get(
-            "https://zaken/api/v1/schema/openapi.yaml?v=3",
-            status_code=200,
-            content=load_binary_mock("openapi.yaml"),
-        )
-        m.get(
-            "https://zaken/api/v1/zaken?rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn=900222086",
+            f"{ZAKEN_ROOT}zaken?rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn=900222086",
             status_code=404,
         )
 
@@ -122,13 +119,9 @@ class TestFetchingCases(WebTest):
         self.assertListEqual(response.context.get("closed_cases"), [])
 
     def test_no_cases_are_retrieved_when_http_500(self, m):
+        mock_service_oas_get(m, ZAKEN_ROOT, "openapi")
         m.get(
-            "https://zaken/api/v1/schema/openapi.yaml?v=3",
-            status_code=200,
-            content=load_binary_mock("openapi.yaml"),
-        )
-        m.get(
-            "https://zaken/api/v1/zaken?rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn=900222086",
+            f"{ZAKEN_ROOT}zaken?rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn=900222086",
             status_code=500,
         )
 

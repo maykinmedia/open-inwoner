@@ -550,14 +550,14 @@ MAIL_EDITOR_CONF = {
         "body_default": """
             <p>Beste</p>
 
-            <p> Je bent door {{ inviter_name}} uitgenodigd om in te loggen op {{ site_name }}. 
+            <p> Je bent door {{ inviter_name}} uitgenodigd om in te loggen op {{ site_name }}.
             Gebruik onderstaande link om je aan te melden </p>
 
             <p><a href="{{ invite_link }}">aanmelden</a> </p>
-            
+
             <p>Mocht je geen behoefte hieraan hebben dan staat het je vrij om dit bericht te negeren </p>
-            
-            <p>Met vriendelijke groet, 
+
+            <p>Met vriendelijke groet,
             {{ site_name }} </p>
         """,
         "subject": [
@@ -596,3 +596,8 @@ CKEDITOR_CONFIGS = {
 
 # invite expires in X days after sending
 INVITE_EXPIRY = 14
+
+# zgw-consumers
+ZGW_CONSUMERS_TEST_SCHEMA_DIRS = [
+    os.path.join(DJANGO_PROJECT_DIR, "openzaak", "tests", "files"),
+]
