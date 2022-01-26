@@ -61,6 +61,35 @@ class TestListCasesView(WebTest):
             json=paginated_response([self.zaak1, self.zaak2, self.zaak3]),
         )
 
+        self.zaak1 = generate_oas_component(
+            "openapi",
+            "schemas/Zaak",
+            url=f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
+            startdatum="2022-01-02",
+            einddatum=None,
+        )
+        self.zaak2 = generate_oas_component(
+            "openapi",
+            "schemas/Zaak",
+            url=f"{ZAKEN_ROOT}zaken/e4d469b9-6666-4bdd-bf42-b53445298102",
+            startdatum="2022-01-12",
+            einddatum=None,
+        )
+        self.zaak3 = generate_oas_component(
+            "openapi",
+            "schemas/Zaak",
+            url=f"{ZAKEN_ROOT}zaken/6f8de38f-85ea-42d3-978c-845a033335a7",
+            startdatum="2021-07-26",
+            einddatum="2022-01-16",
+        )
+
+    def _setUpMocks(self, m):
+        mock_service_oas_get(m, ZAKEN_ROOT, "openapi")
+        m.get(
+            f"{ZAKEN_ROOT}zaken?rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn=900222086",
+            json=paginated_response([self.zaak1, self.zaak2, self.zaak3]),
+        )
+
     def test_sorted_cases_are_retrieved_when_user_logged_in_via_digid(self, m):
         self._setUpMocks(m)
 
