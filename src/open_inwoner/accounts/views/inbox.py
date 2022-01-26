@@ -87,6 +87,8 @@ class InboxView(LoginRequiredMixin, PaginationMixin, FormView):
             return f"{_('Laatste bericht ontvangen op')} {formats.date_format(messages[-1].created_on)}"
         except IndexError:
             return ""
+        except AssertionError:
+            return ""
 
     def get_initial(self):
         initial = super().get_initial()
