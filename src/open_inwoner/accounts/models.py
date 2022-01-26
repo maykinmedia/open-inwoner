@@ -1,5 +1,4 @@
 from datetime import date, timedelta
-from typing import Type
 from uuid import uuid4
 
 from django.conf import settings

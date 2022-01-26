@@ -7,12 +7,6 @@ from .choices import EmptyStatusChoices
 from .models import Action, Contact, Document, Invite, Message, User
 
 
-class ActionListForm(forms.ModelForm):
-    class Meta:
-        model = Action
-        fields = ("status", "end_date", "created_by")
-
-
 class CustomRegistrationForm(RegistrationForm):
     first_name = forms.CharField(label=_("First name"), max_length=255, required=True)
     last_name = forms.CharField(label=_("Last name"), max_length=255, required=True)
