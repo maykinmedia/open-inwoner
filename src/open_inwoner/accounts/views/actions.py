@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http.response import HttpResponseRedirect
 from django.urls.base import reverse_lazy
@@ -8,7 +10,23 @@ from ..forms import ActionForm, ActionListForm
 from ..models import Action
 
 
-class ActionListView(LoginRequiredMixin, ListView):
+class BaseActionFilter:
+    def get_actions(self, actions):
+        print(self.request.GET.get("end_date"))
+        if self.request.GET.get("end_date"):
+            end_date = datetime.strptime(
+                self.request.GET.get("end_date"), "%d-%m-%Y"
+            ).date()
+            print(end_date)
+            actions = actions.filter(end_date=end_date)
+        if self.request.GET.get("created_by"):
+            actions = actions.filter(created_by=self.request.GET.get("created_by"))
+        if self.request.GET.get("status"):
+            actions = actions.filter(status=self.request.GET.get("status"))
+        return actions
+
+
+class ActionListView(LoginRequiredMixin, BaseActionFilter, ListView):
     template_name = "pages/profile/actions/list.html"
     model = Action
     paginate_by = 10
@@ -19,7 +37,8 @@ class ActionListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["action_form"] = ActionListForm()
+        context["action_form"] = ActionListForm(data=self.request.GET)
+        context["actions"] = self.get_actions(self.get_queryset())
         return context
 
 

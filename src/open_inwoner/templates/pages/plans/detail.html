@@ -27,6 +27,7 @@
 {% endblock sidebar_content %}
 
 {% block content %}
+<div class="plans">
     <h1 class="h1" id="title">{{ object.title }}</h1>
 
     {% for contact in object.contacts.all %}
@@ -59,24 +60,18 @@
     <p class="p">{{ object.goal|linebreaksbr }}</p>
     {% button href="plans:plan_edit_goal" uuid=object.uuid text=_("Doel bewerken") primary=True %}
 
-    <br />
-    <br />
-    <br />
     <h3 class="h3" id="files">{% trans "Bestanden" %}</h3>
     {% if object.get_latest_file %}
-        <br />
         {% file file=object.get_latest_file %}
 
-        {% file_table files=object.get_other_files %}
+        {% if object.get_other_files %}
+            {% file_table files=object.get_other_files %}
+        {% endif %}
     {% endif %}
-    <br />
     {% button href="plans:plan_add_file" uuid=object.uuid text=_("Upload nieuwe versie") primary=True %}
 
-    <br />
-    <br />
-    <br />
     <h3 class="h3" id="actions">{% trans "Acties" %}</h3>
-    {% actions actions=object.actions.all action_form=action_form %}
-    <br />
-    {% button href="accounts:action_create" text=_("Nieuw actie toevoegen") icon="date_range" primary=True %}
+    {% actions actions=actions action_form=action_form %}
+    {% button href="plans:plan_action_create" uuid=object.uuid text=_("Nieuw actie toevoegen") icon="date_range" primary=True %}
+</div>
 {% endblock %}

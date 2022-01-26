@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django import forms
 from django.http.response import HttpResponseRedirect
 from django.urls.base import reverse_lazy
@@ -8,31 +10,15 @@ from view_breadcrumbs import (
     CreateBreadcrumbMixin,
     DetailBreadcrumbMixin,
     ListBreadcrumbMixin,
-    UpdateBreadcrumbMixin,
 )
 
-from open_inwoner.accounts.choices import EmptyStatusChoices
 from open_inwoner.accounts.forms import ActionListForm
-from open_inwoner.accounts.models import Action, Document
+from open_inwoner.accounts.models import Document
+from open_inwoner.accounts.views.actions import ActionCreateView, BaseActionFilter
 from open_inwoner.utils.views import CustomDetailBreadcrumbMixin
 
 from .forms import PlanForm, PlanGoalForm
 from .models import Plan
-
-
-class ActionListForm(forms.ModelForm):
-    class Meta:
-        model = Action
-        fields = ("status", "end_date", "created_by")
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.fields["created_by"].required = False
-        self.fields["end_date"].required = False
-        self.fields["status"].required = False
-        self.fields["status"].initial = ""
-        self.fields["status"].choices = EmptyStatusChoices.choices
 
 
 class FileForm(forms.ModelForm):
@@ -56,7 +42,7 @@ class PlanListView(ListBreadcrumbMixin, ListView):
         return Plan.objects.filter(created_by=self.request.user)
 
 
-class PlanDetailView(DetailBreadcrumbMixin, DetailView):
+class PlanDetailView(DetailBreadcrumbMixin, BaseActionFilter, DetailView):
     template_name = "pages/plans/detail.html"
     model = Plan
     slug_field = "uuid"
@@ -67,8 +53,12 @@ class PlanDetailView(DetailBreadcrumbMixin, DetailView):
         return Plan.objects.filter(created_by=self.request.user)
 
     def get_context_data(self, **kwargs):
+        actions = self.object.actions.all()
         context = super().get_context_data(**kwargs)
-        context["action_form"] = ActionListForm(data=self.request.GET)
+        context["action_form"] = ActionListForm(
+            data=self.request.GET, users=actions.values_list("created_by_id", flat=True)
+        )
+        context["actions"] = self.get_actions(actions)
         return context
 
 
@@ -108,7 +98,6 @@ class PlanFileUploadView(UpdateView):
     slug_field = "uuid"
     slug_url_kwarg = "uuid"
     form_class = FileForm
-    success_url = reverse_lazy("plans:plan_list")
 
     def get_form_kwargs(self):
         """Return the keyword arguments for instantiating the form."""
@@ -118,6 +107,22 @@ class PlanFileUploadView(UpdateView):
 
     def form_valid(self, form):
         form.save(self.request.user, plan=self.object)
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self) -> str:
+        return self.object.get_absolute_url()
+
+
+class PlanActionCreateView(ActionCreateView):
+    model = Plan
+
+    def get_object(self):
+        kwargs = self.kwargs
+        return Plan.objects.get(uuid=self.kwargs.get("uuid"))
+
+    def form_valid(self, form):
+        self.object = self.get_object()
+        action = form.save(self.request.user, plan=self.object)
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self) -> str:
