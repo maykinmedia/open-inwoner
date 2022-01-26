@@ -11,6 +11,15 @@ from ..models import Action
 
 
 class BaseActionFilter:
+    """
+    For when in the template the action tag is used. This will filter the actions correctly.
+    """
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["action_form"] = ActionListForm(data=self.request.GET)
+        return context
+
     def get_actions(self, actions):
         print(self.request.GET.get("end_date"))
         if self.request.GET.get("end_date"):
@@ -33,11 +42,10 @@ class ActionListView(LoginRequiredMixin, BaseActionFilter, ListView):
 
     def get_queryset(self):
         base_qs = super().get_queryset()
-        return base_qs.filter(created_by=self.request.user)
+        return base_qs.filter(is_for=self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["action_form"] = ActionListForm(data=self.request.GET)
         context["actions"] = self.get_actions(self.get_queryset())
         return context
 
@@ -52,7 +60,7 @@ class ActionUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_queryset(self):
         base_qs = super().get_queryset()
-        return base_qs.filter(created_by=self.request.user)
+        return base_qs.filter(is_for=self.request.user)
 
     def form_valid(self, form):
         self.object = form.save(self.request.user)
