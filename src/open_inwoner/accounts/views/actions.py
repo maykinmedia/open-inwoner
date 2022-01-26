@@ -21,12 +21,10 @@ class BaseActionFilter:
         return context
 
     def get_actions(self, actions):
-        print(self.request.GET.get("end_date"))
         if self.request.GET.get("end_date"):
             end_date = datetime.strptime(
                 self.request.GET.get("end_date"), "%d-%m-%Y"
             ).date()
-            print(end_date)
             actions = actions.filter(end_date=end_date)
         if self.request.GET.get("created_by"):
             actions = actions.filter(created_by=self.request.GET.get("created_by"))
