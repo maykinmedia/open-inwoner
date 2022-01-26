@@ -15,11 +15,6 @@ class BaseActionFilter:
     For when in the template the action tag is used. This will filter the actions correctly.
     """
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["action_form"] = ActionListForm(data=self.request.GET)
-        return context
-
     def get_actions(self, actions):
         if self.request.GET.get("end_date"):
             end_date = datetime.strptime(
@@ -44,6 +39,9 @@ class ActionListView(LoginRequiredMixin, BaseActionFilter, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["action_form"] = ActionListForm(
+            data=self.request.GET, users=self.get_queryset()
+        )
         context["actions"] = self.get_actions(self.get_queryset())
         return context
 

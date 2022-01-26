@@ -30,37 +30,35 @@
 <div class="plans">
     <h1 class="h1" id="title">{{ object.title }}</h1>
 
-    {% for contact in object.contacts.all %}
-        <div class="plan-contact">
-            <div class="plan-contact__container">
-                {% icon "person" outlined=True %}
-                <div class="plan-contact__information">
-                    {{ contact.get_name }}<br />
-                    {{ contact.function }}&nbsp;
-                </div>
-            </div>
-            <div class="plan-contact__container">
-                {% icon "phone" outlined=True %}
-                <div class="plan-contact__information">
-                    {{ contact.phonenumber }}<br />
-                    {{ contact.email }}&nbsp;
-                </div>
-            </div>
-            <div class="plan-contact__container">
-                {% icon "calendar_today" outlined=True %}
-                <div class="plan-contact__information">
-                    {% trans "Einddatum" %}<br />
-                    {{ object.end_date }}
-                </div>
+    <div class="plan-contact">
+        <div class="plan-contact__container">
+            {% icon "calendar_today" outlined=True %}
+            <div class="plan-contact__information">
+                <p class="plan-contact__title">{% trans "Einddatum" %}</p>
+                <p class="plan-contact__info">{{ object.end_date }}</p>
             </div>
         </div>
-    {% endfor %}
+        <div class="plan-contact__container">
+            {% icon "person" outlined=True %}
+            <p class="plan-contact__title">{% trans "Contactpersonen" %}</p>
+            <div class="plan-contact__grid plan-contact__grid--columns-{{ object.contacts.count }}">
+                {% for contact in object.contacts.all %}
+                    <div class="plan-contact__information">
+                        <p class="plan-contact__info">{{ contact.get_name }}</p>
+                        <p class="plan-contact__info">{{ contact.function }}</p>
+                        <p class="plan-contact__info">{{ contact.phonenumber }}</p>
+                        <p class="plan-contact__info">{{ contact.email }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
 
-    <h3 class="h3" id="goals">{% trans "Doel" %}</h3>
+    <h2 class="h2" id="goals">{% trans "Doel" %}</h2>
     <p class="p">{{ object.goal|linebreaksbr }}</p>
     {% button href="plans:plan_edit_goal" uuid=object.uuid text=_("Doel bewerken") primary=True %}
 
-    <h3 class="h3" id="files">{% trans "Bestanden" %}</h3>
+    <h2 class="h2" id="files">{% trans "Bestanden" %}</h2>
     {% if object.get_latest_file %}
         {% file file=object.get_latest_file %}
 
@@ -70,7 +68,7 @@
     {% endif %}
     {% button href="plans:plan_add_file" uuid=object.uuid text=_("Upload nieuwe versie") primary=True %}
 
-    <h3 class="h3" id="actions">{% trans "Acties" %}</h3>
+    <h2 class="h2" id="actions">{% trans "Acties" %}</h2>
     {% actions actions=actions action_form=action_form %}
     {% button href="plans:plan_action_create" uuid=object.uuid text=_("Nieuw actie toevoegen") icon="date_range" primary=True %}
 </div>
