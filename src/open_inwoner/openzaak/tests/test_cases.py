@@ -25,29 +25,35 @@ class TestFetchingCases(WebTest):
         self.config.save()
 
         self.zaak1 = generate_oas_component(
-            "openapi",
+            "zrc",
             "schemas/Zaak",
             url=f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
+            identificatie="ZAAK-2022-0000000024",
+            omschrijving="Zaak naar aanleiding van ingezonden formulier",
             startdatum="2022-01-02",
             einddatum=None,
         )
         self.zaak2 = generate_oas_component(
-            "openapi",
+            "zrc",
             "schemas/Zaak",
             url=f"{ZAKEN_ROOT}zaken/e4d469b9-6666-4bdd-bf42-b53445298102",
+            identificatie="ZAAK-2022-0008800024",
+            omschrijving="Zaak naar aanleiding van ingezonden formulier",
             startdatum="2022-01-12",
             einddatum=None,
         )
         self.zaak3 = generate_oas_component(
-            "openapi",
+            "zrc",
             "schemas/Zaak",
             url=f"{ZAKEN_ROOT}zaken/6f8de38f-85ea-42d3-978c-845a033335a7",
+            identificatie="ZAAK-2022-0001000024",
+            omschrijving="Zaak naar aanleiding van ingezonden formulier",
             startdatum="2021-07-26",
             einddatum="2022-01-16",
         )
 
     def _setUpMocks(self, m):
-        mock_service_oas_get(m, ZAKEN_ROOT, "openapi")
+        mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
         m.get(
             f"{ZAKEN_ROOT}zaken?rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn=900222086",
             json=paginated_response([self.zaak1, self.zaak2, self.zaak3]),
@@ -87,9 +93,10 @@ class TestFetchingCases(WebTest):
             last_name="",
             login_type=LoginTypeChoices.default,
         )
-        cases = fetch_cases(user)
+        response = self.app.get(reverse("accounts:my_cases"), user=user)
 
-        self.assertListEqual(cases, [])
+        self.assertListEqual(response.context.get("open_cases"), [])
+        self.assertListEqual(response.context.get("closed_cases"), [])
 
     def test_anonymous_user_has_no_access_to_cases_page(self, m):
         user = AnonymousUser()
@@ -100,7 +107,7 @@ class TestFetchingCases(WebTest):
         )
 
     def test_no_cases_are_retrieved_when_http_404(self, m):
-        mock_service_oas_get(m, ZAKEN_ROOT, "openapi")
+        mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
         m.get(
             f"{ZAKEN_ROOT}zaken?rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn=900222086",
             status_code=404,
@@ -119,7 +126,7 @@ class TestFetchingCases(WebTest):
         self.assertListEqual(response.context.get("closed_cases"), [])
 
     def test_no_cases_are_retrieved_when_http_500(self, m):
-        mock_service_oas_get(m, ZAKEN_ROOT, "openapi")
+        mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
         m.get(
             f"{ZAKEN_ROOT}zaken?rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn=900222086",
             status_code=500,

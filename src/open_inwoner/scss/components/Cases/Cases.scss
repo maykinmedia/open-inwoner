@@ -1,5 +1,4 @@
-.open_apps,
-.closed_apps {
+.applications {
   margin-top: var(--spacing-giant);
 
   .table {
@@ -14,11 +13,6 @@
 
       &--no-lb {
         white-space: nowrap;
-      }
-
-      &--no-left-padding {
-        padding: var(--spacing-medium) var(--spacing-medium)
-          var(--spacing-medium) 0;
       }
     }
   }

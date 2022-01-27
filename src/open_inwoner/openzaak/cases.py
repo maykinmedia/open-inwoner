@@ -4,6 +4,7 @@ from requests import RequestException
 from zds_client import ClientError
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.zaken import Zaak
+from zgw_consumers.service import get_paginated_results
 
 from .models import OpenZaakConfig
 
@@ -21,25 +22,22 @@ def fetch_cases(user):
         return []
 
     client = config.service.build_client()
+
+    # Retrieve the list of cases (results field from the API)
     try:
-        response = client.list(
+        response = get_paginated_results(
+            client,
             "zaak",
             request_kwargs={
-                "headers": {
-                    "Accept-Crs": "EPSG:4326",
-                },
                 "params": {
                     "rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn": f"{user.bsn}"
                 },
             },
         )
-    except RequestException as e:
-        logger.exception("exception while making request", exc_info=e)
-        return []
-    except ClientError as e:
+    except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return []
 
-    cases = [factory(Zaak, data) for data in response.get("results", [])]
+    cases = factory(Zaak, response)
 
     return cases
