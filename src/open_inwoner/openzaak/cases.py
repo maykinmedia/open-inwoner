@@ -30,6 +30,7 @@ def fetch_cases(user):
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return []
+
     cases = factory(Zaak, response)
 
     return cases
