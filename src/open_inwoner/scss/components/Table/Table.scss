@@ -16,6 +16,34 @@
     }
   }
 
+  &--content {
+    margin-top: var(--spacing-giant);
+    margin-bottom: var(--spacing-giant);
+
+    .table__item {
+      border-right: 1px solid var(--color-gray-light);
+    }
+
+    .table__item:first-of-type {
+      font-weight: bold;
+      padding-left: 0;
+    }
+
+    .table__item:not(:first-of-type) {
+      text-align: right;
+      padding-right: var(--spacing-giant);
+    }
+
+    .table__header:first-of-type {
+      padding-left: 0;
+    }
+
+    .table__header:not(:first-of-type) {
+      text-align: right;
+      padding-right: var(--spacing-giant);
+    }
+  }
+
   &__heading {
     .table__item {
       color: #7a7a7a;
