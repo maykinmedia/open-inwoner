@@ -13,6 +13,7 @@ class CustomRegistrationForm(RegistrationForm):
         queryset=Invite.objects.all(),
         to_field_name="key",
         widget=forms.HiddenInput(),
+        required=False,
     )
 
     class Meta:
