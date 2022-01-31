@@ -6,6 +6,11 @@ from django.utils.translation import ugettext_lazy as _
 from .models import Action, Appointment, Contact, Document, Invite, Message, User
 
 
+class ActionInlineAdmin(admin.StackedInline):
+    model = Action
+    extra = 1
+
+
 @admin.register(User)
 class _UserAdmin(UserAdmin):
     hijack_success_url = reverse_lazy("root")

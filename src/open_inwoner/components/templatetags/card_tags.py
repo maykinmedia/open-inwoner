@@ -55,21 +55,24 @@ def category_card(category: Category, **kwargs):
         {% category_card category %}
 
     Available options:
-        - category, Category: the category to render card for.
+        - category: Category | the category to render card for.
     """
     return {**kwargs, "category": category}
 
 
-@register.inclusion_tag("components/Card/ProductCard.html")
+@register.inclusion_tag("components/Card/DescriptionCard.html")
 def description_card(title, description, url, **kwargs):
     """
     Renders a card prepopulated based on `product`.
 
     Usage:
-        {% product_card product %}
+        {% description_card title=product.title description=product.intro url=product.get_absolute_url %}
+        {% description_card title="title" description="description" url="https://maykinmedia.nl" %}
 
     Available options:
-        - product, Product: the product to render card for.
+        + title: string | The title of the card that needs to be displayed.
+        + description: string | The description that needs to be displayed.
+        + url: string | The url that the card should point to.
         - object: any | The object that needs to render aditional data.
     """
     kwargs.update(title=title, description=description, url=url)
