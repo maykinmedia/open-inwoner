@@ -383,6 +383,13 @@ class ProductContact(models.Model):
         validators=[validate_phone_number],
         help_text=_("The phone number of the product contact"),
     )
+    role = models.CharField(
+        verbose_name=_("Rol"),
+        blank=True,
+        max_length=100,
+        help_text=_("The role/function of the product contact"),
+    )
+
 
     class Meta:
         verbose_name = _("product contact")
