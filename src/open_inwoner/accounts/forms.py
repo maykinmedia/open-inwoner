@@ -9,6 +9,12 @@ from .models import Action, Contact, Document, Invite, Message, User
 class CustomRegistrationForm(RegistrationForm):
     first_name = forms.CharField(label=_("First name"), max_length=255, required=True)
     last_name = forms.CharField(label=_("Last name"), max_length=255, required=True)
+    invite = forms.ModelChoiceField(
+        queryset=Invite.objects.all(),
+        to_field_name="key",
+        widget=forms.HiddenInput(),
+        required=False,
+    )
 
     class Meta:
         model = User
@@ -18,20 +24,33 @@ class CustomRegistrationForm(RegistrationForm):
             "last_name",
             "password1",
             "password2",
+            "invite",
         )
 
-    def __init__(self, invite, *args, **kwargs):
-        self.invite = invite
-
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        if self.invite:
+        if self.initial.get("invite") or self.data.get("invite"):
             self.fields["email"].widget.attrs["readonly"] = "readonly"
+            del self.fields["email"].widget.attrs["autofocus"]
 
     def save(self, commit=True):
         self.instance.is_active = True
 
-        return super().save(commit)
+        user = super().save(commit)
+
+        # if there is invite - create reverse contact relations
+        invite = self.cleaned_data.get("invite")
+        if invite:
+            inviter = invite.inviter
+            Contact.objects.create(
+                first_name=inviter.first_name,
+                last_name=inviter.last_name,
+                email=inviter.email,
+                contact_user=inviter,
+                created_by=user,
+            )
+        return user
 
 
 class UserForm(forms.ModelForm):
