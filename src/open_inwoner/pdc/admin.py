@@ -1,5 +1,7 @@
 from django import forms
 from django.contrib import admin
+from django.contrib.gis.db.models import PointField
+from django.contrib.gis.forms.widgets import BaseGeometryWidget
 from django.utils.translation import ugettext_lazy as _
 
 from import_export.admin import ImportExportMixin
@@ -29,6 +31,20 @@ from .resources import (
     ProductExportResource,
     ProductImportResource,
 )
+
+
+class MapWidget(BaseGeometryWidget):
+    template_name = "admin/widgets/map.html"
+
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+        if value and isinstance(value, str):
+            value = self.deserialize(value)
+
+        if value:
+            context.update({"lat": value.y, "lng": value.x})
+
+        return context
 
 
 @admin.register(Category)
@@ -133,13 +149,13 @@ class ProductFileAdmin(admin.ModelAdmin):
 
 
 @admin.register(ProductLocation)
-class ProductLocationAdmin(LeafletGeoAdmin):
+class ProductLocationAdmin(admin.ModelAdmin):
     # List
     list_display = ("product", "city", "postcode", "street", "housenumber")
     list_filter = ("city",)
 
     # Detail
-    modifiable = False
+    # modifiable = False
     fieldsets = (
         (None, {"fields": ("product",)}),
         (
@@ -147,6 +163,9 @@ class ProductLocationAdmin(LeafletGeoAdmin):
             {"fields": ("street", "housenumber", "postcode", "city", "geometry")},
         ),
     )
+    formfield_overrides = {
+        PointField: {"widget": MapWidget},
+    }
 
     def get_readonly_fields(self, request, obj=None):
         readonly_fields = super().get_readonly_fields(request, obj)

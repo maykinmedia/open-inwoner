@@ -14,8 +14,8 @@ class Map {
    */
   constructor(node) {
     this.node = node
-    this.lat = node.dataset.lat || 52
-    this.lng = node.dataset.lng || 11
+    this.lat = parseFloat(node.dataset.lat) || 52
+    this.lng = parseFloat(node.dataset.lng) || 11
     this.zoom = node.dataset.zoom || 13
 
     const mapOptions = {

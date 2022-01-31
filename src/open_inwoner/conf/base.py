@@ -100,6 +100,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.flatpages",
+    "django.forms",
     # Admin auth
     "django_otp",
     "django_otp.plugins.otp_static",
@@ -196,6 +197,7 @@ TEMPLATES = [
         },
     },
 ]
+FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
 WSGI_APPLICATION = "open_inwoner.wsgi.application"
 
