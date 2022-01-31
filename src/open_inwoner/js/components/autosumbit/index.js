@@ -3,8 +3,7 @@ class Autosubmit {
     this.form = form
     inputs = form.querySelectorAll('input')
     selects = form.querySelectorAll('select')
-    console.log('inputs', inputs)
-    console.log('selects', selects)
+
     inputs.forEach((input) => {
       input.addEventListener('input', this.handle)
     })

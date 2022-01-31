@@ -4,7 +4,11 @@
 
 {% block content %}
 <h1 class="h1">
-    {% trans "Creeer actie" %}
+    {% if object.pk %}
+        {% trans "Wijzig actie" %}
+    {% else %}
+        {% trans "Creeer actie" %}
+    {% endif %}
 </h1>
 
 {% render_form form=form method="POST" enctype="multipart/form-data" %}

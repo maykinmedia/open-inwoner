@@ -9,7 +9,7 @@ from ordered_model.models import OrderedModel
 
 
 class Plan(models.Model):
-    uuid = models.UUIDField(default=uuid4, blank=True, unique=True)
+    uuid = models.UUIDField(default=uuid4, unique=True)
     title = models.CharField(max_length=250, help_text=_("The title of the plan"))
     goal = models.TextField(
         help_text=_(

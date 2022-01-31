@@ -162,16 +162,14 @@ class InviteForm(forms.ModelForm):
 
 
 class ActionListForm(forms.ModelForm):
+    created_by = forms.ModelChoiceField(queryset=User.objects.all(), required=False)
+    end_date = forms.DateField(required=False)
+    status = forms.ChoiceField(choices=EmptyStatusChoices.choices, required=False)
+
     class Meta:
         model = Action
         fields = ("status", "end_date", "created_by")
 
     def __init__(self, users, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
         self.fields["created_by"].queryset = User.objects.filter(pk__in=users)
-        self.fields["created_by"].required = False
-        self.fields["end_date"].required = False
-        self.fields["status"].required = False
-        self.fields["status"].initial = ""
-        self.fields["status"].choices = EmptyStatusChoices.choices

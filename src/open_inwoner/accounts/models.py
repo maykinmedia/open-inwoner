@@ -203,6 +203,7 @@ class Contact(models.Model):
         verbose_name=_("Function"),
         default="",
         max_length=200,
+        help_text=_("The function of the contact within an organization."),
     )
 
     class Meta:
@@ -318,11 +319,13 @@ class Action(models.Model):
     description = models.TextField(
         verbose_name=_("description"),
         default="",
+        blank=True,
         help_text=_("The description of the action"),
     )
     goal = models.CharField(
         verbose_name=_("goal"),
         default="",
+        blank=True,
         max_length=250,
         help_text=_("The goal of the action"),
     )
@@ -344,17 +347,20 @@ class Action(models.Model):
         verbose_name=_("Action end date"),
         help_text=_("This is the date that the action should be done."),
         null=True,
+        blank=True,
     )
     file = models.FileField(
         verbose_name=_("File"),
         null=True,
+        blank=True,
         storage=PrivateMediaFileSystemStorage(),
         help_text="The document that is uploaded to the file",
     )
     is_for = models.ForeignKey(
         "accounts.User",
         null=True,
-        verbose_name=_("Created by"),
+        blank=True,
+        verbose_name=_("Is for"),
         on_delete=models.CASCADE,
         related_name="actions",
         help_text="The person that needs to do this action.",
@@ -390,6 +396,12 @@ class Action(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if self.created_by and not self.is_for:
+            self.is_for = self.created_by
+
+        return super().save(*args, **kwargs)
 
 
 class Message(models.Model):
