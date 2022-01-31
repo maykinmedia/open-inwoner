@@ -73,8 +73,18 @@ class ActionAdmin(admin.ModelAdmin):
 
 @admin.register(Contact)
 class ContactAdmin(admin.ModelAdmin):
-    list_display = ("first_name", "last_name", "email", "created_by", "created_on")
-    list_filter = ("created_by",)
+    list_display = (
+        "first_name",
+        "last_name",
+        "email",
+        "contact_user",
+        "created_by",
+        "created_on",
+    )
+    list_filter = (
+        "contact_user",
+        "created_by",
+    )
 
 
 @admin.register(Document)

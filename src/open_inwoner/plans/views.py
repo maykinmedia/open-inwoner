@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q
 from django.http.response import HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
@@ -36,7 +37,7 @@ class PlanListView(LoginRequiredMixin, ListBreadcrumbMixin, ListView):
     model = Plan
 
     def get_queryset(self):
-        return Plan.objects.filter(created_by=self.request.user)
+        return Plan.objects.connected(self.request.user)
 
 
 class PlanDetailView(
@@ -49,7 +50,7 @@ class PlanDetailView(
     breadcrumb_use_pk = False
 
     def get_queryset(self):
-        return Plan.objects.filter(created_by=self.request.user)
+        return Plan.objects.connected(self.request.user)
 
     def get_context_data(self, **kwargs):
         actions = self.object.actions.all()
@@ -82,6 +83,9 @@ class PlanGoalEditView(LoginRequiredMixin, UpdateView):
     form_class = PlanGoalForm
     breadcrumb_use_pk = False
 
+    def get_queryset(self):
+        return Plan.objects.connected(self.request.user)
+
     def form_valid(self, form):
         self.object = form.save(self.request.user)
         return HttpResponseRedirect(self.get_success_url())
@@ -96,6 +100,9 @@ class PlanFileUploadView(LoginRequiredMixin, UpdateView):
     slug_field = "uuid"
     slug_url_kwarg = "uuid"
     form_class = FileForm
+
+    def get_queryset(self):
+        return Plan.objects.connected(self.request.user)
 
     def get_form_kwargs(self):
         """Return the keyword arguments for instantiating the form."""
@@ -115,7 +122,9 @@ class PlanActionCreateView(ActionCreateView):
     model = Plan
 
     def get_object(self):
-        return Plan.objects.get(uuid=self.kwargs.get("uuid"))
+        return Plan.objects.connected(self.request.user).get(
+            uuid=self.kwargs.get("uuid")
+        )
 
     def form_valid(self, form):
         self.object = self.get_object()

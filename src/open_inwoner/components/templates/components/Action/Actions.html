@@ -1,6 +1,6 @@
 {% load i18n form_tags icon_tags button_tags %}
 
-{% render_form form=form method="GET" spaceless=True autosubmit=True %}
+{% render_form form=form method="GET" spaceless=True autosubmit=True form_action=form_action %}
 <table class="table table--spacious">
     <tr>
         <td class="table__item">Filter op:</td>
