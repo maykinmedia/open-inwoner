@@ -113,10 +113,13 @@ class ActionForm(forms.ModelForm):
 class DocumentForm(forms.ModelForm):
     class Meta:
         model = Document
-        fields = ("name", "file")
+        fields = ("file", "name")
 
-    def save(self, user, commit=True):
+    def save(self, user, plan=None, commit=True):
         self.instance.owner = user
+        if plan:
+            self.instance.plan = plan
+
         return super().save(commit=commit)
 
 

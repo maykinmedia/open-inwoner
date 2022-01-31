@@ -1,7 +1,6 @@
-from django import forms
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Q
-from django.http.response import HttpResponseRedirect
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import Http404, HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
@@ -11,25 +10,11 @@ from view_breadcrumbs import (
     ListBreadcrumbMixin,
 )
 
-from open_inwoner.accounts.forms import ActionListForm
-from open_inwoner.accounts.models import Document
+from open_inwoner.accounts.forms import ActionListForm, DocumentForm
 from open_inwoner.accounts.views.actions import ActionCreateView, BaseActionFilter
 
 from .forms import PlanForm, PlanGoalForm
 from .models import Plan
-
-
-class FileForm(forms.ModelForm):
-    class Meta:
-        model = Document
-        fields = ("file", "name")
-
-    def save(self, user, plan=None, commit=True):
-        self.instance.owner = user
-        if plan:
-            self.instance.plan = plan
-
-        return super().save(commit=commit)
 
 
 class PlanListView(LoginRequiredMixin, ListBreadcrumbMixin, ListView):
@@ -76,7 +61,7 @@ class PlanCreateView(LoginRequiredMixin, CreateBreadcrumbMixin, CreateView):
 
 
 class PlanGoalEditView(LoginRequiredMixin, UpdateView):
-    template_name = "pages/plans/create.html"
+    template_name = "pages/plans/goal_edit.html"
     model = Plan
     slug_field = "uuid"
     slug_url_kwarg = "uuid"
@@ -87,7 +72,7 @@ class PlanGoalEditView(LoginRequiredMixin, UpdateView):
         return Plan.objects.connected(self.request.user)
 
     def form_valid(self, form):
-        self.object = form.save(self.request.user)
+        self.object = form.save()
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self) -> str:
@@ -99,7 +84,7 @@ class PlanFileUploadView(LoginRequiredMixin, UpdateView):
     model = Plan
     slug_field = "uuid"
     slug_url_kwarg = "uuid"
-    form_class = FileForm
+    form_class = DocumentForm
 
     def get_queryset(self):
         return Plan.objects.connected(self.request.user)
@@ -121,10 +106,20 @@ class PlanFileUploadView(LoginRequiredMixin, UpdateView):
 class PlanActionCreateView(ActionCreateView):
     model = Plan
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        plan = self.get_object()
+        context["plan"] = plan
+        context["object"] = plan
+        return context
+
     def get_object(self):
-        return Plan.objects.connected(self.request.user).get(
-            uuid=self.kwargs.get("uuid")
-        )
+        try:
+            return Plan.objects.connected(self.request.user).get(
+                uuid=self.kwargs.get("uuid")
+            )
+        except ObjectDoesNotExist as e:
+            raise Http404
 
     def form_valid(self, form):
         self.object = self.get_object()

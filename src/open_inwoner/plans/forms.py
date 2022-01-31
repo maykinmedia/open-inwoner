@@ -18,5 +18,5 @@ class PlanGoalForm(forms.ModelForm):
         model = Plan
         fields = ("goal",)
 
-    def save(self, user, commit=True):
+    def save(self, commit=True):
         return super().save(commit=commit)

@@ -11,7 +11,7 @@
     {% endif %}
 </h1>
 
-{% render_form form=form method="POST" enctype="multipart/form-data" %}
+{% render_form id="action-create" form=form method="POST" enctype="multipart/form-data" %}
     {% csrf_token %}
     {% input form.name no_help=True %}
     {% input form.description no_help=True %}
