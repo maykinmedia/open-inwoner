@@ -1,10 +1,7 @@
-{% load card_tags icon_tags %}
+{% load card_tags icon_tags link_tags %}
 {% render_card title=category href=category.get_absolute_url %}
     {% for product in category.products.all %}
         {% url 'pdc:product_detail' slug=product.slug as product_url %}
-        <a class="link button--icon-after link--secondary" href="{{ product_url }}">
-            {% icon icon="arrow_forward" %}
-            {{ product.name }}
-        </a>
+        {% link href=product_url icon='arrow_forward' icon_position='before' secondary=True text=product.name %}
     {% endfor %}
 {% endrender_card %}
