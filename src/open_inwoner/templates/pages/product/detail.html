@@ -5,41 +5,38 @@
     <aside class="anchor-menu">
         <ul class="anchor-menu__list">
             <li class="anchor-menu__list-item">
-                <a class="link" href="#title">{{ object.name }}</a>
+                {% link href='#title' text=object.name %}
             </li>
             {% if object.files.exists %}
                 <li class="anchor-menu__list-item">
-                    <a class="link" href="#files">{% trans "Bestanden" %}</a>
+                    {% link href='#files' text=_('Bestanden') %}
                 </li>
             {% endif %}
             {% if object.locations.exists %}
                 <li class="anchor-menu__list-item">
-                    <a class="link" href="#locations">{% trans "Locaties" %}</a>
+                    {% link href='#locations' text=_('Locaties') %}
                 </li>
             {% endif %}
             {% if object.links.exists %}
                 <li class="anchor-menu__list-item">
-                    <a class="link" href="#links">{% trans "Links" %}</a>
+                    {% link href='#links' text=_('Links') %}
                 </li>
             {% endif %}
             {% if product.product_contacts.exists %}
                 <li class="anchor-menu__list-item">
-                    <a class="link" href="#contact">{% trans "Contact" %}</a>
+                    {% link href='#contact' text=_('Contact') %}
                 </li>
             {% endif %}
             {% if object.related_products.exists %}
                 <li class="anchor-menu__list-item">
-                    <a class="link" href="#see">{% trans "Zie ook" %}</a>
+                    {% link href='#see' text=_('Zie ook') %}
                 </li>
             {% endif %}
             <li class="anchor-menu__list-item">
-                <a class="link" href="#share">{% trans "Delen" %}</a>
+                {% link href='#share' text=_('Delen') %}
             </li>
             <li class="anchor-menu__list-item anchor-menu__list-item--top">
-                <a class="link link--primary" href="#top">
-                    {% icon icon="arrow_upward" %}
-                    Terug naar boven
-                </a>
+                {% link primary=True href='#top' icon='arrow_upward' icon_position='before' text=_('Terug naar boven') %}
             </li>
         </ul>
     </aside>
