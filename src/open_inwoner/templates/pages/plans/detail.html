@@ -69,7 +69,7 @@
     {% button href="plans:plan_add_file" uuid=object.uuid text=_("Upload nieuwe versie") primary=True %}
 
     <h2 class="h2" id="actions">{% trans "Acties" %}</h2>
-    {% actions actions=actions action_form=action_form %}
+    {% actions actions=actions action_form=action_form form_action=request.path|add:"#actions" %}
     {% button href="plans:plan_action_create" uuid=object.uuid text=_("Nieuw actie toevoegen") icon="date_range" primary=True %}
 </div>
 {% endblock %}

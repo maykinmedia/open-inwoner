@@ -4,8 +4,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
-from filer.fields.file import FilerFileField
-from ordered_model.models import OrderedModel
+from .managers import PlanQuerySet
 
 
 class Plan(models.Model):
@@ -25,6 +24,8 @@ class Plan(models.Model):
     created_by = models.ForeignKey("accounts.User", on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    objects = PlanQuerySet.as_manager()
 
     def __str__(self):
         return self.title

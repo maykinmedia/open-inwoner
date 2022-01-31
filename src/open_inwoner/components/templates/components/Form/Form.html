@@ -3,7 +3,7 @@
 <form
     class="form{% if columns %} form--columns-{{ columns }}{% endif %}{% if spaceless %} form--spaceless{% endif %}{% if inline %} form--inline{% endif %}{% if autosubmit %} form--autosubmit{% endif %} {{ extra_classes }}"
     method="{{ method }}"
-    action="{% firstof form_action "." %}"
+    action="{% firstof form_action request.path %}"
     {% if enctype %}enctype="{{enctype}}"{% endif %}
     {% if id %}id="{{id}}"{% endif %}
     {% if data_confirm_title %}data-confirm-title="{{ data_confirm_title }}"{% endif %}
