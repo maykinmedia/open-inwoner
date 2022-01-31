@@ -139,7 +139,9 @@ class TestPreSaveSignal(TestCase):
         config.service = service
         config.save()
 
-        user = UserFactory(first_name="", last_name="")
+        user = UserFactory(
+            first_name="", last_name="", login_type=LoginTypeChoices.digid
+        )
         user.bsn = "999993847"
         user.save()
 
@@ -158,7 +160,7 @@ class TestPreSaveSignal(TestCase):
             content=load_binary_mock("personen.yaml"),
         )
         m.get(
-            "https://personen/api/ingeschrevenpersonen/999990676",
+            "https://personen/api/ingeschrevenpersonen/999993847",
             status_code=500,
         )
 
@@ -170,7 +172,9 @@ class TestPreSaveSignal(TestCase):
         config.service = service
         config.save()
 
-        user = UserFactory(first_name="", last_name="")
+        user = UserFactory(
+            first_name="", last_name="", login_type=LoginTypeChoices.digid
+        )
         user.bsn = "999993847"
         user.save()
 
