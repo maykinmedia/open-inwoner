@@ -5,17 +5,12 @@ from solo.models import SingletonModel
 from zgw_consumers.constants import APITypes
 
 
-class OpenZaakConfigManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset().select_related("service")
-
-
 class OpenZaakConfig(SingletonModel):
     """
-    Global configuration and defaults
+    Global configuration and defaults for zaken and catalogi services.
     """
 
-    service = models.OneToOneField(
+    zaak_service = models.OneToOneField(
         "zgw_consumers.Service",
         verbose_name=_("Open Zaak API"),
         on_delete=models.PROTECT,
@@ -23,8 +18,14 @@ class OpenZaakConfig(SingletonModel):
         related_name="+",
         null=True,
     )
-
-    objects = OpenZaakConfigManager()
+    catalogi_service = models.OneToOneField(
+        "zgw_consumers.Service",
+        verbose_name=_("Catalogi API"),
+        on_delete=models.PROTECT,
+        limit_choices_to={"api_type": APITypes.ztc},
+        related_name="+",
+        null=True,
+    )
 
     class Meta:
         verbose_name = _("Open Zaak configuration")

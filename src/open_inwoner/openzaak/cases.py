@@ -6,24 +6,17 @@ from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.zaken import Zaak
 from zgw_consumers.service import get_paginated_results
 
-from .models import OpenZaakConfig
+from .clients import build_client
 
 logger = logging.getLogger(__name__)
 
 
 def fetch_cases(user):
-    config = OpenZaakConfig.get_solo()
+    client = build_client("zaak")
 
-    if not config.service:
-        logger.warning("no service defined for Open Zaak")
+    if client is None or user.bsn is None:
         return []
 
-    if user.bsn is None:
-        return []
-
-    client = config.service.build_client()
-
-    # Retrieve the list of cases (results field from the API)
     try:
         response = get_paginated_results(
             client,
@@ -37,7 +30,22 @@ def fetch_cases(user):
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return []
-
     cases = factory(Zaak, response)
 
     return cases
+
+
+def fetch_specific_case(user, case_uuid):
+    client = build_client("zaak")
+
+    if client is None or user.bsn is None:
+        return
+
+    try:
+        response = client.retrieve("zaak", uuid=case_uuid)
+    except (RequestException, ClientError) as e:
+        logger.exception("exception while making request", exc_info=e)
+        return
+    case = factory(Zaak, response)
+
+    return case

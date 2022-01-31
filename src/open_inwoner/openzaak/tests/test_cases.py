@@ -3,25 +3,27 @@ from django.urls import reverse
 
 import requests_mock
 from django_webtest import WebTest
+from zgw_consumers.constants import APITypes
 from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.openzaak.cases import fetch_specific_case
 from open_inwoner.utils.test import paginated_response
 
-from ..cases import fetch_cases
 from ..models import OpenZaakConfig
 from .factories import ServiceFactory
 
 ZAKEN_ROOT = "https://zaken.nl/api/v1/"
+CATALOGI_ROOT = "https://catalogi.nl/api/v1/"
 
 
 @requests_mock.Mocker()
-class TestFetchingCases(WebTest):
+class TestListCasesView(WebTest):
     def setUp(self):
         self.config = OpenZaakConfig.get_solo()
-        self.service = ServiceFactory(api_root=ZAKEN_ROOT)
-        self.config.service = self.service
+        self.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
+        self.config.zaak_service = self.zaak_service
         self.config.save()
 
         self.zaak1 = generate_oas_component(
@@ -143,3 +145,92 @@ class TestFetchingCases(WebTest):
         self.assertEquals(response.status_code, 200)
         self.assertListEqual(response.context.get("open_cases"), [])
         self.assertListEqual(response.context.get("closed_cases"), [])
+
+
+@requests_mock.Mocker()
+class TestFetchSpecificCase(WebTest):
+    def setUp(self):
+        self.config = OpenZaakConfig.get_solo()
+        self.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
+        self.config.zaak_service = self.zaak_service
+        self.config.save()
+
+        self.zaak = generate_oas_component(
+            "zrc",
+            "schemas/Zaak",
+            url=f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
+            identificatie="ZAAK-2022-0000000024",
+            omschrijving="Zaak naar aanleiding van ingezonden formulier",
+            startdatum="2022-01-02",
+            einddatum=None,
+        )
+
+    def _setUpMocks(self, m):
+        mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
+        m.get(
+            f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
+            json=self.zaak,
+        )
+
+    def test_specific_case_is_retrieved_when_user_is_logged_in_via_digid(self, m):
+        self._setUpMocks(m)
+
+        user = UserFactory(
+            first_name="",
+            last_name="",
+            login_type=LoginTypeChoices.digid,
+            bsn="900222086",
+        )
+
+        case = fetch_specific_case(user, "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d")
+
+        self.assertEquals(str(case.uuid), "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d")
+
+    def test_specific_case_is_not_retrieved_when_user_is_not_logged_in_via_digid(
+        self, m
+    ):
+        self._setUpMocks(m)
+
+        user = UserFactory(
+            first_name="",
+            last_name="",
+            login_type=LoginTypeChoices.default,
+        )
+
+        case = fetch_specific_case(user, "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d")
+
+        self.assertIsNone(case)
+
+    def test_no_case_is_retrieved_when_http_404(self, m):
+        mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
+        m.get(
+            f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
+            status_code=404,
+        )
+
+        user = UserFactory(
+            first_name="",
+            last_name="",
+            login_type=LoginTypeChoices.digid,
+            bsn="900222086",
+        )
+        case = fetch_specific_case(user, "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d")
+
+        self.assertIsNone(case)
+
+    def test_no_case_is_retrieved_when_http_500(self, m):
+        mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
+        m.get(
+            f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
+            status_code=500,
+        )
+
+        user = UserFactory(
+            first_name="",
+            last_name="",
+            login_type=LoginTypeChoices.digid,
+            bsn="900222086",
+        )
+        case = fetch_specific_case(user, "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d")
+
+        self.assertIsNone(case)

@@ -1,5 +1,5 @@
 from .actions import ActionCreateView, ActionListView, ActionUpdateView
-from .cases import CasesListView
+from .cases import CasesListView, CasesStatusView
 from .contacts import ContactCreateView, ContactListView, ContactUpdateView
 from .csrf import csrf_failure
 from .document import DocumentPrivateMediaView

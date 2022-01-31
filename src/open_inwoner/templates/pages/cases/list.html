@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n icon_tags %}
+{% load i18n icon_tags link_tags utils %}
 
 {% block sidebar_content %}
     <aside class="anchor-menu">
@@ -31,6 +31,7 @@
                     <td class="table__item table__item--no-left-padding">{% trans "Identificatie" %}</td>
                     <td class="table__item table__item--no-left-padding">{% trans "Omschrijving" %}</td>
                     <td class="table__item table__item--no-left-padding">{% trans "Startdatum" %}</td>
+                    <td class="table__item table__item--no-left-padding">{% trans "Status" %}</td>
                 </tr>
             </thead>
 
@@ -40,6 +41,9 @@
                         <td class="table__item table__item--no-left-padding">{{ case.identificatie }}</td>
                         <td class="table__item table__item--color-gray-dark table__item--no-lb table__item--no-left-padding">{{ case.omschrijving }}</td>
                         <td class="table__item table__item--color-gray-dark table__item--no-lb table__item--no-left-padding">{{ case.startdatum }}</td>
+                        <td class="table__item table__item--color-gray-dark table__item--no-lb">
+                            {% link href="accounts:case_status" object_id=case.uuid icon="arrow_forward" primary=True %}
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>

@@ -26,7 +26,7 @@ from .base import *  # noqa isort:skip
 #
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-SESSION_COOKIE_DOMAIN = ".localhost"
+# SESSION_COOKIE_DOMAIN = ".localhost"
 
 LOGGING["loggers"].update(
     {
