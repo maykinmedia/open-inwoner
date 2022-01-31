@@ -15,9 +15,6 @@ class CustomRegistrationView(RegistrationView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
 
-        invite = self.get_invite()
-        kwargs["invite"] = invite
-
         existing_user = self.get_object()
         if (
             existing_user
@@ -27,6 +24,15 @@ class CustomRegistrationView(RegistrationView):
             kwargs["instance"] = existing_user
 
         return kwargs
+
+    def get_initial(self):
+        initial = super().get_initial()
+
+        invite = self.get_invite()
+        if invite:
+            initial["invite"] = invite
+
+        return initial
 
     def get_invite(self) -> Optional[Invite]:
         """return Invite model instance if the user registers after accepting invite"""

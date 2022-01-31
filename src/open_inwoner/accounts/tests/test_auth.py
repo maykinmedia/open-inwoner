@@ -75,6 +75,7 @@ class TestRegistrationFunctionality(WebTest):
         self.assertTrue(inactive_user.is_active)
         self.assertEqual(inactive_user.first_name, "John")
         self.assertEqual(inactive_user.last_name, "Smith")
+        self.assertEqual(inactive_user.contacts.count(), 0)
 
     def test_registration_with_invite(self):
         invite = InviteFactory.create(
@@ -100,6 +101,10 @@ class TestRegistrationFunctionality(WebTest):
         invitee.refresh_from_db()
 
         self.assertTrue(invitee.is_active)
+        self.assertEqual(invitee.contacts.count(), 1)
+
+        contact = invitee.contacts.get()
+        self.assertEqual(contact.contact_user, invite.inviter)
 
 
 class TestLoginLogoutFunctionality(WebTest):
