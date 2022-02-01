@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from geopy.exc import GeopyError
 from localflavor.nl.models import NLZipCodeField
 
-from .geocode import geocode_address
+from open_inwoner.utils.geocode import geocode_address
 
 
 class GeoModelQuerySet(models.QuerySet):

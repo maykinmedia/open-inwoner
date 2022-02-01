@@ -524,6 +524,8 @@ if not ELASTIC_APM_SERVER_URL:
 # geopy
 GEOPY_APP = "Openinwoner"
 GEOPY_TIMEOUT = 10  # in seconds
+LOCATIESERVER_DOMAIN = "geodata.nationaalgeoregister.nl/locatieserver/v3"
+GEOCODER = "open_inwoner.utils.geocode.PdocLocatieserver"
 
 
 # ELASTICSEARCH CONFIG

@@ -10,8 +10,9 @@ class GeoAdminForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields["geometry"].widget.instance = self.instance
-        self.fields["geometry"].disabled = True
+        if "geometry" in self.fields:
+            self.fields["geometry"].widget.instance = self.instance
+            self.fields["geometry"].disabled = True
 
 
 class GeoAdminMixin:
