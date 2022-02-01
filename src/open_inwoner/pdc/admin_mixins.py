@@ -1,5 +1,7 @@
-from .widgets import MapWidget
 from django import forms
+
+from .widgets import MapWidget
+
 
 class GeoAdminForm(forms.ModelForm):
     class Meta:

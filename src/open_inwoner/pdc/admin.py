@@ -4,11 +4,11 @@ from django.utils.translation import ugettext_lazy as _
 
 from import_export.admin import ImportExportMixin
 from import_export.formats import base_formats
-from leaflet.admin import LeafletGeoAdmin
 from treebeard.admin import TreeAdmin
 from treebeard.forms import movenodeform_factory
 
 from open_inwoner.ckeditor5.widgets import CKEditorWidget
+
 from .admin_mixins import GeoAdminMixin
 from .models import (
     Category,
