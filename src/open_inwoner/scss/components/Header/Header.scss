@@ -18,7 +18,9 @@
     'bc    bc    bc    bc';
   grid-template-columns: repeat(4, 1fr);
   grid-template-rows:
-    calc(var(--header-height) - var(--row-height) * 3 + var(--spacing-large) * 2)
+    calc(
+      var(--header-height) - var(--row-height) * 3 + var(--spacing-large) * 2
+    )
     auto
     var(--row-height)
     var(--row-height);
