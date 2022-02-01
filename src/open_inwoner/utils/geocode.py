@@ -66,7 +66,7 @@ class PdocLocatieserver(Geocoder):
         :param ln: List of fields to display
         """
 
-        url = furl(self.api).add({"q": query, "fq": fq}).url
+        url = furl(self.api).add({"q": query, "fq": fq, "ln": ln}).url
         logger.debug("%s.geocode: %s", self.__class__.__name__, url)
         callback = self._parse_json
         return self._call_geocoder(url, callback, timeout=timeout)
