@@ -135,7 +135,6 @@ INSTALLED_APPS = [
     "filer",
     "mptt",  # used by filer
     "hijack.contrib.admin",
-    "leaflet",
     "django_elasticsearch_dsl",
     "import_export",
     "solo",
