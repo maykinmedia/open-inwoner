@@ -155,6 +155,7 @@ class Product(models.Model):
             ("h4", "h4"),
             ("h5", "h5"),
             ("h6", "h6"),
+            ("img", "image"),
             ("p", "p"),
             ("a", "link"),
             ("table", "table table--content"),
