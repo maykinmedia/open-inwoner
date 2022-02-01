@@ -1,3 +1,8 @@
+// External
+@import 'leaflet/dist/leaflet.css';
+
+//Internal
 @import './admin_theme';
 @import './app_overrides';
 @import './ck_editor';
+@import '../components/Map/Map.scss';
