@@ -73,6 +73,6 @@ class InboxPageTests(WebTest):
             f"New message from {self.me.get_full_name()} at Open Inwoner Platform",
         )
         self.assertEqual(email.to, [self.user1.email])
-        inbox_url = f"http://testserver{furl(self.url).add({'with':self.me.email}).url}"
+        inbox_url = f"http://testserver{furl(self.url).add({'with':self.me.email}).url}#messages-last"
         body = email.alternatives[0][0]  # html version of the email body
         self.assertIn(inbox_url, body)

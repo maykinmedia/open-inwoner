@@ -224,7 +224,8 @@ class Contact(models.Model):
         return not self.is_active()
 
     def get_message_url(self) -> str:
-        return furl(reverse("accounts:inbox")).add({"with": self.email}).url
+        url = furl(reverse("accounts:inbox")).add({"with": self.email}).url
+        return f"{url}#messages-last"
 
 
 class Document(models.Model):
@@ -456,6 +457,7 @@ class Message(models.Model):
 
     def send_to_receiver(self, request=None):
         inbox_url = furl(reverse("accounts:inbox")).add({"with": self.sender.email}).url
+        inbox_url = f"{inbox_url}#messages-last"
         if request:
             inbox_url = request.build_absolute_uri(inbox_url)
 
