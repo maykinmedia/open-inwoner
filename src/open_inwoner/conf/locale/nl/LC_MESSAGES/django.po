@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-01 23:13+0100\n"
+"POT-Creation-Date: 2022-02-02 10:30+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -417,7 +417,9 @@ msgid "Registreer"
 msgstr "Registreer"
 
 #: accounts/tests/test_auth.py:139
-msgid "Deze account is inactief."
+#, fuzzy
+#| msgid "Deze account is inactief."
+msgid "Uw account is inactief."
 msgstr "Uw account is inactief."
 
 #: accounts/tests/test_auth.py:151
@@ -991,7 +993,6 @@ msgid "Categories which the product relates to"
 msgstr "Thema's waar het product aan gerelateerd is"
 
 #: pdc/models.py:91
-#| msgid "Related product"
 msgid "related products"
 msgstr "gerelateerde producten"
 
