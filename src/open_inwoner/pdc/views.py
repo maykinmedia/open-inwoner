@@ -1,3 +1,5 @@
+from django.urls import reverse
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DetailView, ListView, TemplateView
 
@@ -30,6 +32,10 @@ class CategoryListView(ListBreadcrumbMixin, ListView):
 
     def get_queryset(self):
         return Category.get_root_nodes()
+
+    @cached_property
+    def crumbs(self):
+        return [(_("Categories"), reverse("pdc:category_list"))]
 
 
 class CategoryDetailView(CustomDetailBreadcrumbMixin, DetailView):

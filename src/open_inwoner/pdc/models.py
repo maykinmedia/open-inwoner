@@ -28,6 +28,7 @@ class Category(MP_Node):
         help_text=_("Description of the category"),
     )
     icon = FilerImageField(
+        verbose_name=_("icon"),
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -35,6 +36,7 @@ class Category(MP_Node):
         help_text=_("Icon of the category"),
     )
     image = FilerImageField(
+        verbose_name=_("image"),
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -80,16 +82,19 @@ class Product(models.Model):
     )
     categories = models.ManyToManyField(
         "pdc.Category",
+        verbose_name=_("categories"),
         related_name="products",
         help_text=_("Categories which the product relates to"),
     )
     related_products = models.ManyToManyField(
         "pdc.Product",
+        verbose_name=_("related products"),
         blank=True,
         help_text=_("Related products to this product"),
     )
     tags = models.ManyToManyField(
         "pdc.Tag",
+        verbose_name=_("tags"),
         blank=True,
         related_name="products",
         help_text=_("Tags which the product is linked to"),
@@ -117,12 +122,14 @@ class Product(models.Model):
     )
     organizations = models.ManyToManyField(
         "pdc.Organization",
+        verbose_name=_("organizations"),
         blank=True,
         related_name="products",
         help_text=_("Organizations which provides this product"),
     )
     keywords = ArrayField(
         models.CharField(max_length=100, blank=True),
+        verbose_name=_("keywords"),
         default=list,
         blank=True,
         help_text=_("List of keywords for search"),
@@ -189,6 +196,7 @@ class Tag(models.Model):
         _("slug"), max_length=100, unique=True, help_text=_("Slug of the tag")
     )
     icon = FilerImageField(
+        verbose_name=_("icon"),
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -335,6 +343,7 @@ class Organization(GeoModel):
     )
     neighbourhood = models.ForeignKey(
         "pdc.Neighbourhood",
+        verbose_name=_("neighbourhood"),
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -359,6 +368,7 @@ class ProductContact(models.Model):
     )
     organization = models.ForeignKey(
         "pdc.Organization",
+        verbose_name=_("organization"),
         null=True,
         blank=True,
         related_name="product_contacts",
@@ -384,6 +394,12 @@ class ProductContact(models.Model):
         max_length=100,
         validators=[validate_phone_number],
         help_text=_("The phone number of the product contact"),
+    )
+    role = models.CharField(
+        verbose_name=_("Rol"),
+        blank=True,
+        max_length=100,
+        help_text=_("The role/function of the product contact"),
     )
 
     class Meta:

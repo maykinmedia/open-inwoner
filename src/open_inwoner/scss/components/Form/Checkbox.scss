@@ -9,6 +9,8 @@
     font-size: var(--font-size-body);
     line-height: var(--font-line-height-body);
     margin: 0;
+    padding-left: 32px;
+    position: relative;
 
     &:before {
       position: absolute;
@@ -21,13 +23,9 @@
       width: 22px;
       height: 22px;
       border: 1px solid #4b4b4b;
-      border-radius: 1px;
+      border-radius: 1px; // intended-var-change.
       background-color: #ffffff;
     }
-
-    padding-left: 32px;
-    line-height: 20px;
-    position: relative;
   }
 
   .checkbox__input:checked ~ .checkbox__label:before {
