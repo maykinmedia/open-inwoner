@@ -50,13 +50,13 @@
 
   .primary-navigation {
     grid-area: nv;
+    width: 100%;
 
     @media (min-width: 768px) {
       grid-area: none;
       left: 0;
       bottom: var(--row-height);
       position: absolute;
-      width: 100%;
       padding: 0 $hm;
     }
   }
@@ -79,6 +79,7 @@
     height: var(--row-height);
     white-space: nowrap;
     width: 100%;
+
     @media (min-width: 768px) {
       justify-content: flex-end;
     }
