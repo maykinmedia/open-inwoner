@@ -1,5 +1,6 @@
 .notification {
   background-color: var(--color-orange);
+  border-radius: var(--border-radius);
   padding: var(--spacing-extra-large);
   display: grid;
   grid-template-columns: 24px 1fr;
@@ -8,6 +9,14 @@
   margin: var(--row-height) 0;
   position: relative;
 
+  &--contents {
+    display: block;
+  }
+
+  &--success {
+    background-color: var(--color-green);
+  }
+
   &__close {
     position: absolute;
     top: var(--spacing-small);
@@ -15,12 +24,12 @@
     cursor: pointer;
   }
 
-  .h2 {
+  &:not(#{&}--contents) .h2 {
     line-height: var(--font-size-heading-2);
     color: var(--color-orange-dark);
   }
 
-  .p {
+  &:not(#{&}--contents) .p {
     color: var(--color-orange-dark);
   }
 
