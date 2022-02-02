@@ -27,7 +27,6 @@ git+https://bitbucket.org/maykinmedia/django-digid-eherkenning.git@02ac61c42f6dd
 django-cors-headers
 dj-rest-auth
 django-allauth
-django-leaflet
 django-autoslug
 django-elasticsearch-dsl
 django-import-export

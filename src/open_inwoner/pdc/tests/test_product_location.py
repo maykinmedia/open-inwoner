@@ -1,19 +1,27 @@
+import json
+
+from django.contrib.gis.geos import Point
 from django.test import TestCase
 
 from ..models import ProductLocation
-from .factories import ProductLocationFactory
+from .factories import ProductFactory, ProductLocationFactory
 
 
 class ProductLocationTestCase(TestCase):
     def test_geocode(self):
-        product_location = ProductLocationFactory.create(
+        """FIXME this test request actual external API. Should be reworked"""
+        product = ProductFactory.create()
+        product_location = ProductLocation(
+            product=product,
             street="Keizersgracht",
             housenumber="117",
             postcode="1015 CJ",
             city="Amsterdam",
         )
+        product_location.clean()
+        product_location.save()
         self.assertEqual(
-            '{ "type": "Point", "coordinates": [ 4.8876515, 52.3775941 ] }',
+            '{ "type": "Point", "coordinates": [ 4.8876438, 52.37670043 ] }',
             product_location.geometry.geojson,
         )
 
@@ -53,9 +61,25 @@ class ProductLocationTestCase(TestCase):
             housenumber="117",
             postcode="1015 CJ",
             city="Amsterdam",
+            geometry=Point(4.8876515, 52.3775941),
         )
         self.assertEqual(
-            '{"type": "Feature", "geometry": {"type": "Point", "coordinates": [4.8876515, 52.3775941]}, "properties": {"name": "Maykin Media", "street": "Keizersgracht", "housenumber": "117", "postcode": "1015 CJ", "city": "Amsterdam"}}',
+            json.dumps(
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [4.8876515, 52.3775941],
+                    },
+                    "properties": {
+                        "name": "Maykin Media",
+                        "street": "Keizersgracht",
+                        "housenumber": "117",
+                        "postcode": "1015 CJ",
+                        "city": "Amsterdam",
+                    },
+                }
+            ),
             product_location.get_geojson_feature(),
         )
 
@@ -65,6 +89,7 @@ class ProductLocationTestCase(TestCase):
             housenumber="117",
             postcode="1015 CJ",
             city="Amsterdam",
+            geometry=Point(4.8876515, 52.3775941),
         )
         self.assertEqual(
             '{ "type": "Point", "coordinates": [ 4.8876515, 52.3775941 ] }',
@@ -97,6 +122,7 @@ class ProductLocationTestCase(TestCase):
             housenumber="117",
             postcode="1015 CJ",
             city="Amsterdam",
+            geometry=Point(4.8876515, 52.3775941),
         )
         ProductLocationFactory.create(
             name="Anne Frank Huis",
@@ -104,9 +130,44 @@ class ProductLocationTestCase(TestCase):
             housenumber="20",
             postcode="1016 GV",
             city="Amsterdam",
+            geometry=Point(4.884554379441582, 52.3744749),
         )
         self.assertEqual(
-            '{"type": "FeatureCollection", "features": [{"type": "Feature", "geometry": {"type": "Point", "coordinates": [4.8876515, 52.3775941]}, "properties": {"name": "Maykin Media", "street": "Keizersgracht", "housenumber": "117", "postcode": "1015 CJ", "city": "Amsterdam"}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [4.884554379441582, 52.3744749]}, "properties": {"name": "Anne Frank Huis", "street": "Westermarkt", "housenumber": "20", "postcode": "1016 GV", "city": "Amsterdam"}}]}',
+            json.dumps(
+                {
+                    "type": "FeatureCollection",
+                    "features": [
+                        {
+                            "type": "Feature",
+                            "geometry": {
+                                "type": "Point",
+                                "coordinates": [4.8876515, 52.3775941],
+                            },
+                            "properties": {
+                                "name": "Maykin Media",
+                                "street": "Keizersgracht",
+                                "housenumber": "117",
+                                "postcode": "1015 CJ",
+                                "city": "Amsterdam",
+                            },
+                        },
+                        {
+                            "type": "Feature",
+                            "geometry": {
+                                "type": "Point",
+                                "coordinates": [4.884554379441582, 52.3744749],
+                            },
+                            "properties": {
+                                "name": "Anne Frank Huis",
+                                "street": "Westermarkt",
+                                "housenumber": "20",
+                                "postcode": "1016 GV",
+                                "city": "Amsterdam",
+                            },
+                        },
+                    ],
+                }
+            ),
             ProductLocation.objects.all().get_geojson_feature_collection(),
         )
 
@@ -116,12 +177,14 @@ class ProductLocationTestCase(TestCase):
             housenumber="117",
             postcode="1015 CJ",
             city="Amsterdam",
+            geometry=Point(4.8876515, 52.3775941),
         )
         ProductLocationFactory.create(
             street="Westermarkt",
             housenumber="20",
             postcode="1016 GV",
             city="Amsterdam",
+            geometry=Point(4.884554379441582, 52.3744749),
         )
         self.assertIn(
             "4.88610293972079", ProductLocation.objects.all().get_centroid()["lng"]

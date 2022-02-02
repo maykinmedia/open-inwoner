@@ -120,7 +120,6 @@ django==3.2.7
     #   django-formtools
     #   django-hijack
     #   django-import-export
-    #   django-leaflet
     #   django-localflavor
     #   django-otp
     #   django-phonenumber-field
@@ -224,10 +223,6 @@ django-js-asset==1.2.2
     #   -r requirements/ci.txt
     #   django-ckeditor
     #   django-mptt
-django-leaflet==0.28.1
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
 django-localflavor==3.1
     # via
     #   -c requirements/ci.txt

@@ -29,6 +29,7 @@ def map(lat=None, lng=None, **kwargs):
 
         for modifier_tuple in [
             ("small", False),
+            ("admin", False),
         ]:
             modifier, default = modifier_tuple
             modifier_class = modifier.replace("_", "-")

@@ -3,7 +3,6 @@ from django.utils.text import slugify
 
 import factory.fuzzy
 
-from ..geocode import geocode_address
 from ..models import (
     Category,
     Organization,
@@ -90,15 +89,9 @@ class ProductContactFactory(factory.django.DjangoModelFactory):
 class ProductLocationFactory(factory.django.DjangoModelFactory):
     name = factory.Faker("word")
     product = factory.SubFactory(ProductFactory)
-    geometry = factory.LazyAttribute(lambda a: ProductLocationFactory.get_geometry(a))
-
-    @classmethod
-    def get_geometry(cls, obj):
-        address_line_1 = f"{obj.street} {obj.housenumber}"
-        postcode = obj.postcode.replace(" ", "")
-        address_line_2 = f"{postcode} {obj.city}"
-        address_str = f"{address_line_1}, {address_line_2}"
-        return geocode_address(address_str)
+    street = factory.Faker("street_name", locale="nl_NL")
+    postcode = factory.Faker("postcode", locale="nl_NL")
+    geometry = Point(5, 52)
 
     class Meta:
         model = ProductLocation
