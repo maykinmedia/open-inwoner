@@ -1,0 +1,28 @@
+{% extends 'master.html' %}
+{% load i18n %}
+
+{% block content %}
+    <h1 class="h1">{% trans "Status van zaak" %} {{ case.identificatie }}</h1>
+
+    <table class="table table--space-medium">
+        <thead class="table__heading">
+            <tr>
+                <td class="table__item table__item--no-left-padding">{% trans "Bijgewerkt op" %}</td>
+                <td class="table__item table__item--no-left-padding">{% trans "Omschrijving" %}</td>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for status in status_list %}
+                <tr>
+                    <td class="table__item table__item--no-left-padding">{{ status.datum_status_gezet }}</td>
+                    {% for type in status_type_list %}
+                        {% if type.url == status.statustype %}
+                            <td class="table__item table__item--no-left-padding">{{ type.omschrijving }}</td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock content %}

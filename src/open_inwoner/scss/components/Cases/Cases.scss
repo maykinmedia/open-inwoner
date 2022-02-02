@@ -1,0 +1,19 @@
+.applications {
+  margin-top: var(--spacing-giant);
+
+  .table {
+    &--space-medium {
+      margin-top: var(--spacing-medium);
+    }
+
+    &__item {
+      &--color-gray-dark {
+        color: var(--color-gray-dark);
+      }
+
+      &--no-lb {
+        white-space: nowrap;
+      }
+    }
+  }
+}
