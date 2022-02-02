@@ -57,7 +57,7 @@
     {{ object.get_rendered_content|safe }}
     {% if object.files.exists %}
         <hr class="divider">
-        {% file_list files=object.files.all %}
+        {% file_list files=object.files.all title=_("Bestanden") %}
     {% endif %}
 
     {# Locations #}
