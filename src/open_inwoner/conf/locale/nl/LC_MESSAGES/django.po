@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-02 14:55+0100\n"
+"POT-Creation-Date: 2022-02-02 18:34+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -264,10 +264,8 @@ msgid "Owner"
 msgstr "Eigenaar"
 
 #: accounts/models.py:260
-#| msgid "The phonenumber of the contact person. This field can be left empty."
 msgid "The plan that the document belongs to. This can be left empty."
-msgstr ""
-"Het plan waar het document bij hoort. Dit veld mag leeggelaten worden."
+msgstr "Het plan waar het document bij hoort. Dit veld mag leeggelaten worden."
 
 #: accounts/models.py:272
 msgid "Used as a reference in the appointments api."
@@ -306,7 +304,6 @@ msgid "description"
 msgstr "omschrijving"
 
 #: accounts/models.py:323
-#| msgid "Short description of the product"
 msgid "The description of the action"
 msgstr "Omschrijving van de actie"
 
@@ -315,7 +312,6 @@ msgid "goal"
 msgstr "doel"
 
 #: accounts/models.py:330
-#| msgid "The name of the action"
 msgid "The goal of the action"
 msgstr "Het doel van de actie"
 
@@ -354,8 +350,7 @@ msgstr "Wijzigingsdatum van de actie"
 
 #: accounts/models.py:391
 msgid "The plan that the action belongs to. This can be left empty."
-msgstr ""
-"Het plan waar de actie bij hoort. Dit veld mag leeggelaten worden."
+msgstr "Het plan waar de actie bij hoort. Dit veld mag leeggelaten worden."
 
 #: accounts/models.py:412
 msgid "THe sender of the message"
@@ -475,7 +470,7 @@ msgstr "Registreer"
 
 #: accounts/tests/test_auth.py:139
 msgid "Deze account is inactief."
-msgstr "Uw account is inactief."
+msgstr "Deze account is inactief."
 
 #: accounts/tests/test_auth.py:151
 msgid ""
@@ -496,7 +491,6 @@ msgstr "U heeft nog geen contacten."
 #: accounts/views/cases.py:18 accounts/views/cases.py:38
 #: components/templates/components/Header/PrimaryNavigation.html:37
 #: templates/pages/cases/list.html:24
-#| msgid "Mijn contacten"
 msgid "Mijn aanvragen"
 msgstr "Mijn aanvragen"
 
@@ -526,6 +520,7 @@ msgstr ""
 msgid ""
 "er zijn geen acties gevonden met de huidige filter of er zijn geen acties"
 msgstr ""
+"er zijn geen acties gevonden met de huidige filter of er zijn geen acties"
 
 #: components/templates/components/File/File.html:13
 msgid "Download"
@@ -727,7 +722,7 @@ msgid "Deze tekst wordt getoond op de login pagina."
 msgstr ""
 
 #: configurations/models.py:73
-msgid "Welcom"
+msgid "Welcome"
 msgstr "Welkom"
 
 #: configurations/models.py:74
@@ -933,7 +928,6 @@ msgid "Catalogi API"
 msgstr ""
 
 #: openzaak/models.py:31
-#| msgid "Haal Centraal configuration"
 msgid "Open Zaak configuration"
 msgstr "Open Zaak configuratie"
 
@@ -1333,7 +1327,8 @@ msgstr "De titel van het plan"
 msgid ""
 "The goal for the plan. So that you and the contact knows what the goal is."
 msgstr ""
-"Het doel van het plan, omschrijf in het algemeen wat je wilt bereiken met je plan."
+"Het doel van het plan, omschrijf in het algemeen wat je wilt bereiken met je "
+"plan."
 
 #: plans/models.py:18
 msgid "When the plan should be archived."
@@ -1499,7 +1494,6 @@ msgid "Omschrijving"
 msgstr "Omschrijving"
 
 #: templates/pages/cases/list.html:33 templates/pages/cases/list.html:60
-#| msgid "Geboortedatum"
 msgid "Startdatum"
 msgstr "Startdatum"
 
@@ -1557,7 +1551,6 @@ msgid "Upload nieuwe versie"
 msgstr "Upload nieuwe versie"
 
 #: templates/pages/plans/detail.html:73
-#| msgid "Nieuwe actie toevoegen"
 msgid "Nieuw actie toevoegen"
 msgstr "Nieuwe actie toevoegen"
 
@@ -1601,7 +1594,6 @@ msgid "Creeer actie"
 msgstr "Creëer actie"
 
 #: templates/pages/profile/actions/edit.html:28
-#| msgid "Actief sinds"
 msgid "Actie opslaan"
 msgstr "Actie opslaan"
 
