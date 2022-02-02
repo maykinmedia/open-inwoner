@@ -6,7 +6,12 @@ register = template.Library()
 
 
 @register.simple_tag()
-def get_category_url(category, parent_category=None):
+def get_category_url(category):
+    return category.get_absolute_url()
+
+
+@register.simple_tag()
+def get_product_url(category, parent_category=None):
     if category.is_root():
         return category.get_absolute_url()
 
