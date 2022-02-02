@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n l10n button_tags card_tags file_tags grid_tags icon_tags link_tags map_tags tag_tags utils %}
+{% load i18n l10n button_tags card_tags file_tags grid_tags icon_tags link_tags map_tags notification_tags tag_tags utils %}
 
 {% block sidebar_content %}
     <aside class="anchor-menu">
@@ -80,7 +80,7 @@
     <hr class="divider">
 
     {% render_grid %}
-        {% render_column span=6 %}
+        {% render_column span=5 %}
             {# Links. #}
             {% if object.links.exists %}
                 <nav class="link-list">
@@ -94,35 +94,9 @@
                     </ul>
                 </nav>
             {% endif %}
-
-            {% if object.product_contacts %}
-
-                <nav class="link-list">
-                    <h4 class="h4" id="contact">{% trans 'Contact' %}</h4>
-                    <ul class="link-list__list">
-                        {% for product_contact in object.product_contacts.all %}
-                            <li class="link-list__list-item">
-                                <p class="p">{{ product_contact.first_name }} {{ product_contact.last_name }}</p>
-                            </li>
-
-                            {% if product_contact.get_phone_number %}
-                                <li class="link-list__list-item">
-                                    <p class="p">{{ product_contact.get_phone_number }}</p>
-                                </li>
-                            {% endif %}
-
-                            {% if product_contact.get_mailto_link %}
-                                <li class="link-list__list-item">
-                                    {% link href=product_contact.get_mailto_link text=product_contact.email secondary=True %}
-                                </li>
-                            {% endif %}
-                        {% endfor %}
-                    </ul>
-                </nav>
-            {% endif %}
         {% endrender_column %}
 
-        {% render_column start=7 span=6 %}
+        {% render_column start=6 span=3 compact=True %}
             {# Related products. #}
             {% if object.related_products.exists %}
                 <nav class="link-list">
@@ -141,11 +115,43 @@
             {# Social links. #}
             <nav class="social">
                 <h4 class="h4" id="share">{% trans "Delen" %}</h4>
-                {% link icon="facebook" href="#" extra_classes="social__link" %}
-                {% link icon="twitter" href="#" extra_classes="social__link" %}
-                {% link icon="whatsapp" href="#" extra_classes="social__link" %}
-                {% link icon="linkedin" href="#" extra_classes="social__link" %}
+                {% link icon="facebook" href="#" extra_classes="social__link" text=_('Facebook') hide_text=True %}
+                {% link icon="twitter" href="#" extra_classes="social__link" text=_('Twitter') hide_text=True %}
+                {% link icon="whatsapp" href="#" extra_classes="social__link" text=_('Whatsapp') hide_text=True %}
+                {% link icon="linkedin" href="#" extra_classes="social__link" text=_('Linkedin') hide_text=True %}
             </nav>
+        {% endrender_column %}
+
+
+        {% render_column span=8 %}
+            {% if object.product_contacts %}
+                {% render_notification type='success' icon=False %}
+                    <h4 class="h4" id="contact">{% trans 'Contact' %}</h4>
+                    {% for product_contact in object.product_contacts.all %}
+                        {% render_grid compact=True %}
+                            {% render_column span=12 %}
+                                <h4 class="h4">{{ product_contact.first_name }} {{ product_contact.last_name }}</h4>
+                            {% endrender_column %}
+
+                            {% render_column span=6 %}
+                                <span class="p">{{ product_contact.role }}</span>
+                            {% endrender_column %}
+
+                            {% render_column start=7 span=6 %}
+                                {% link href='tel://'|add:product_contact.phonenumber text=product_contact.phonenumber primary=True %}
+                            {% endrender_column %}
+
+                            {% render_column span=6 %}
+                                <p class="p">{{ product_contact.organization }}</p>
+                            {% endrender_column %}
+
+                            {% render_column start=7 span=6 %}
+                                {% link href='mailto://'|add:product_contact.email text=product_contact.email primary=True %}
+                            {% endrender_column %}
+                        {% endrender_grid %}
+                    {% endfor %}
+                {% endrender_notification %}
+            {% endif %}
         {% endrender_column %}
     {% endrender_grid %}
 {% endblock content %}
