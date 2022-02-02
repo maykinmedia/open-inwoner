@@ -186,6 +186,11 @@ class SiteConfiguration(SingletonModel):
         verbose_name=_("Account help"),
         help_text=_("The help text for the profile page."),
     )
+    email_new_message = models.BooleanField(
+        verbose_name=_("Send email about a new message"),
+        default=True,
+        help_text=_("Whether to send email about each new message the user receives"),
+    )
 
     class Meta:
         verbose_name = "Site Configuration"
