@@ -101,7 +101,7 @@ dj-rest-auth==2.1.11
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-django==3.2.7
+django==3.2.12
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -497,7 +497,7 @@ phonenumbers==8.12.33
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-pillow==8.3.2
+pillow==9.0.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt

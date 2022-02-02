@@ -1,5 +1,5 @@
 # Core python libraries
-Pillow  # handle images
+Pillow>=9.0.0 # handle images
 psycopg2  # database driver
 pytz  # handle timezones
 python-dotenv  # environment variables for secrets
@@ -9,7 +9,7 @@ glom # processing nested data
 furl # processing urls
 
 # Framework libraries
-django < 4.0
+Django>=3.2.11<4.0
 django-admin-index
 django-axes
 django-choices
