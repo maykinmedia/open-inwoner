@@ -5,6 +5,10 @@
   width: 100%;
   position: relative;
 
+  &--compact {
+    grid-gap: 0;
+  }
+
   &--limit &__sidebar,
   &--limit &__main {
     max-height: 75vh;
@@ -61,6 +65,7 @@
 }
 
 .grid + .grid,
-.h1 + .grid {
+.h1 + .grid,
+.h4 + .grid {
   margin-top: var(--spacing-large);
 }

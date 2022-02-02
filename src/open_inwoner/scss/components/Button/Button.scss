@@ -1,6 +1,6 @@
 .button {
   align-items: center;
-  border-radius: 3px;
+  border-radius: var(--border-radius);
   box-sizing: border-box;
   color: var(--color-secondary);
   background-color: transparent;
