@@ -1,5 +1,8 @@
-{% load card_tags icon_tags link_tags %}
-{% render_card title=category href=category.get_absolute_url %}
+{% load card_tags icon_tags link_tags propper_urls %}
+
+{% get_category_url category parent_category as category_url %}
+
+{% render_card title=category href=category_url %}
     {% for product in category.products.all %}
         {% url 'pdc:product_detail' slug=product.slug as product_url %}
         {% link href=product_url icon='arrow_forward' icon_position='before' secondary=True text=product.name %}

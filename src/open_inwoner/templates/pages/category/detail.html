@@ -11,7 +11,7 @@
 <p class="p">{{object.description}}</p>
 
 {% if subcategories %}
-{% card_container subcategories=subcategories %}
+{% card_container subcategories=subcategories parent_category=object %}
 {% endif %}
 
 {% if products %}
