@@ -17,7 +17,7 @@ class ContactTypeChoices(DjangoChoices):
 
 # Created because of a filter that needs to happen. This way the form can take the empty choice and the modal is still filled.
 class EmptyChoices(DjangoChoices):
-    empty = ChoiceItem("", _("-------"))
+    empty = ChoiceItem("", _("Status"))
 
 
 class StatusChoices(DjangoChoices):
