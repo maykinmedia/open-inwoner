@@ -1,0 +1,77 @@
+{% extends 'master.html' %}
+{% load i18n icon_tags link_tags utils %}
+
+{% block sidebar_content %}
+    <aside class="anchor-menu">
+        <ul class="anchor-menu__list">
+            <li class="anchor-menu__list-item">
+                <a class="link" href="#pending_apps">{% trans "Lopende aanvragen" %}</a>
+            </li>
+            <li class="anchor-menu__list-item">
+                <a class="link" href="#completed_apps">{% trans "Afgeronde aanvragen" %}</a>
+            </li>
+            <li class="anchor-menu__list-item anchor-menu__list-item--top">
+                <a class="link link--primary" href="#top">
+                    {% icon icon="arrow_upward" %}
+                    {% trans "Terug naar boven" %}
+                </a>
+            </li>
+        </ul>
+    </aside>
+{% endblock sidebar_content %}
+
+{% block content %}
+    <h1 class="h1" id="title">{% trans "Mijn aanvragen" %}</h2>
+
+    <div class="applications">
+        <h2 class="h2" id="pending_apps">{% trans "Lopende aanvragen" %}</h2>
+        <table class="table table--space-medium">
+            <thead class="table__heading">
+                <tr>
+                    <td class="table__item table__item--no-left-padding">{% trans "Identificatie" %}</td>
+                    <td class="table__item table__item--no-left-padding">{% trans "Omschrijving" %}</td>
+                    <td class="table__item table__item--no-left-padding">{% trans "Startdatum" %}</td>
+                    <td class="table__item table__item--no-left-padding">{% trans "Status" %}</td>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for case in open_cases %}
+                    <tr>
+                        <td class="table__item table__item--no-left-padding">{{ case.identificatie }}</td>
+                        <td class="table__item table__item--color-gray-dark table__item--no-lb table__item--no-left-padding">{{ case.omschrijving }}</td>
+                        <td class="table__item table__item--color-gray-dark table__item--no-lb table__item--no-left-padding">{{ case.startdatum }}</td>
+                        <td class="table__item table__item--color-gray-dark table__item--no-lb">
+                            {% link href="accounts:case_status" object_id=case.uuid icon="arrow_forward" primary=True %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="applications">
+        <h2 class="h2" id="completed_apps">{% trans "Afgeronde aanvragen" %}</h2>
+        <table class="table table--space-medium">
+            <thead class="table__heading">
+                <tr>
+                    <td class="table__item table__item--no-left-padding">{% trans "Identificatie" %}</td>
+                    <td class="table__item table__item--no-left-padding">{% trans "Omschrijving" %}</td>
+                    <td class="table__item table__item--no-left-padding">{% trans "Startdatum" %}</td>
+                    <td class="table__item table__item--no-left-padding">{% trans "Einddatum" %}</td>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for case in closed_cases %}
+                    <tr>
+                        <td class="table__item table__item--no-left-padding">{{ case.identificatie }}</td>
+                        <td class="table__item table__item--color-gray-dark table__item--no-left-padding">{{ case.omschrijving }}</td>
+                        <td class="table__item table__item--color-gray-dark table__item--no-lb table__item--no-left-padding">{{ case.startdatum }}</td>
+                        <td class="table__item table__item--color-gray-dark table__item--no-lb table__item--no-left-padding">{{ case.einddatum }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock content %}
