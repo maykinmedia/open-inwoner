@@ -42,7 +42,7 @@
             {% icon "person" outlined=True %}
             <p class="plan-contact__title">{% trans "Contactpersonen" %}</p>
             <div class="plan-contact__grid plan-contact__grid--columns-{{ object.contacts.count }}">
-                {% for contact in object.contacts.all %}
+                {% for contact in object.get_active_contacts.all %}
                     <div class="plan-contact__information">
                         <p class="plan-contact__info">{{ contact.get_name }}</p>
                         <p class="plan-contact__info">{{ contact.function }}</p>
