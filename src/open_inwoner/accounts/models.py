@@ -202,6 +202,7 @@ class Contact(models.Model):
     function = models.CharField(
         verbose_name=_("Function"),
         default="",
+        blank=True,
         max_length=200,
         help_text=_("The function of the contact within an organization."),
     )

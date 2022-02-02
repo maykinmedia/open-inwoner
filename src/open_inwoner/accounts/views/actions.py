@@ -34,7 +34,7 @@ class ActionListView(LoginRequiredMixin, BaseActionFilter, ListView):
 
     def get_queryset(self):
         base_qs = super().get_queryset()
-        return base_qs.filter(is_for=self.request.user)
+        return base_qs.filter(is_for=self.request.user).select_related("created_by")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -63,6 +63,11 @@ class ActionUpdateView(LoginRequiredMixin, UpdateView):
         base_qs = super().get_queryset()
         return base_qs.filter(is_for=self.request.user)
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update(user=self.request.user)
+        return kwargs
+
     def form_valid(self, form):
         self.object = form.save(self.request.user)
         return HttpResponseRedirect(self.get_success_url())
@@ -73,6 +78,11 @@ class ActionCreateView(LoginRequiredMixin, CreateView):
     model = Action
     form_class = ActionForm
     success_url = reverse_lazy("accounts:action_list")
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update(user=self.request.user)
+        return kwargs
 
     def form_valid(self, form):
         self.object = form.save(self.request.user)

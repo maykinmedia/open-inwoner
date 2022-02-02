@@ -103,6 +103,14 @@ class ActionForm(forms.ModelForm):
             "goal",
         )
 
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+
+        self.fields["is_for"].queryset = User.objects.filter(
+            assigned_contacts__in=self.user.contacts.all()
+        )
+
     def save(self, user, plan=None, commit=True):
         self.instance.created_by = user
         if plan:
@@ -165,8 +173,12 @@ class InviteForm(forms.ModelForm):
 
 
 class ActionListForm(forms.ModelForm):
-    created_by = forms.ModelChoiceField(queryset=User.objects.all(), required=False)
-    end_date = forms.DateField(required=False)
+    created_by = forms.ModelChoiceField(
+        queryset=User.objects.all(), required=False, empty_label="Door"
+    )
+    end_date = forms.DateField(
+        required=False, widget=forms.DateInput(attrs={"placeholder": _("Deadline")})
+    )
     status = forms.ChoiceField(choices=EmptyStatusChoices.choices, required=False)
 
     class Meta:
