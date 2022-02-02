@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-02 19:32+0100\n"
+"POT-Creation-Date: 2022-02-02 21:05+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -53,7 +53,7 @@ msgstr "Begeleider"
 msgid "Organisatie"
 msgstr "Organisatie"
 
-#: accounts/choices.py:20 accounts/models.py:338 accounts/views/cases.py:40
+#: accounts/choices.py:20 accounts/models.py:337 accounts/views/cases.py:40
 #: templates/pages/cases/list.html:34
 msgid "Status"
 msgstr "Status"
@@ -149,8 +149,8 @@ msgstr "gebruiker"
 msgid "users"
 msgstr "gebruikers"
 
-#: accounts/models.py:130 accounts/models.py:222 accounts/models.py:270
-#: accounts/models.py:313
+#: accounts/models.py:130 accounts/models.py:222 accounts/models.py:269
+#: accounts/models.py:312
 msgid "UUID"
 msgstr ""
 
@@ -183,7 +183,7 @@ msgid "The phonenumber of the contact person. This field can be left empty."
 msgstr ""
 "De telefoonnummer van de contactpersoon. Dit veld mag leeggelaten worden."
 
-#: accounts/models.py:164 accounts/models.py:345
+#: accounts/models.py:164 accounts/models.py:344
 msgid "Type"
 msgstr "Type"
 
@@ -191,8 +191,8 @@ msgstr "Type"
 msgid "The type of contact"
 msgstr "Type contactpersoon"
 
-#: accounts/models.py:171 accounts/models.py:239 accounts/models.py:286
-#: accounts/models.py:374 accounts/models.py:428 accounts/models.py:473
+#: accounts/models.py:171 accounts/models.py:238 accounts/models.py:285
+#: accounts/models.py:373 accounts/models.py:427 accounts/models.py:472
 #: pdc/models.py:110 search/models.py:57
 msgid "Created on"
 msgstr "Aangemaakt op"
@@ -203,8 +203,8 @@ msgid ""
 msgstr ""
 "Datum dat de contactpersoon is aangemaakt. Dit veld wordt automatisch gevuld."
 
-#: accounts/models.py:178 accounts/models.py:244 accounts/models.py:291
-#: accounts/models.py:379 pdc/models.py:117
+#: accounts/models.py:178 accounts/models.py:243 accounts/models.py:290
+#: accounts/models.py:378 pdc/models.py:117
 msgid "Updated on"
 msgstr "Bijgewerkt op"
 
@@ -216,7 +216,7 @@ msgstr ""
 "Datum wanneer de contactpersoon voor het laatst is aangepast. Dit veld wordt "
 "automatisch gevuld."
 
-#: accounts/models.py:186 accounts/models.py:297 accounts/models.py:385
+#: accounts/models.py:186 accounts/models.py:296 accounts/models.py:384
 #: components/templates/components/Card/DescriptionCard.html:10
 #: templates/pages/plans/detail.html:46
 msgid "Created by"
@@ -248,7 +248,7 @@ msgstr "De functie van de contactpersoon binnen een organisatie"
 msgid "Used as a reference in the documents api."
 msgstr "Wordt gebruikt als referentie in de documenten API."
 
-#: accounts/models.py:228 accounts/models.py:276 accounts/models.py:319
+#: accounts/models.py:228 accounts/models.py:275 accounts/models.py:318
 msgid "Name"
 msgstr "Naam"
 
@@ -256,183 +256,183 @@ msgstr "Naam"
 msgid "The name of the document"
 msgstr "De naam van het document"
 
-#: accounts/models.py:234 accounts/models.py:358
+#: accounts/models.py:234 accounts/models.py:357
 msgid "File"
 msgstr "Bestand"
 
-#: accounts/models.py:241
+#: accounts/models.py:240
 msgid "This is the date the document was created"
 msgstr "Datum dat het bestand is aangemaakt"
 
-#: accounts/models.py:246
+#: accounts/models.py:245
 msgid "This is the date when the document was last changed"
 msgstr "Datum dat het bestand is aangepast"
 
-#: accounts/models.py:250
+#: accounts/models.py:249
 msgid "Owner"
 msgstr "Eigenaar"
 
-#: accounts/models.py:261
+#: accounts/models.py:260
 msgid "The plan that the document belongs to. This can be left empty."
 msgstr "Het plan waar het document bij hoort. Dit veld mag leeggelaten worden."
 
-#: accounts/models.py:273
+#: accounts/models.py:272
 msgid "Used as a reference in the appointments api."
 msgstr "Wordt gebruikt als referentie in de afspraken API."
 
-#: accounts/models.py:279
+#: accounts/models.py:278
 msgid "The name of the appointment."
 msgstr "Naam van de afspraak"
 
-#: accounts/models.py:282
+#: accounts/models.py:281
 msgid "Appointment time"
 msgstr "Afspraak tijd"
 
-#: accounts/models.py:283
+#: accounts/models.py:282
 msgid "This is the time that the appointment is at."
 msgstr "Tijdstip van de afspraak"
 
-#: accounts/models.py:288
+#: accounts/models.py:287
 msgid "This is the date the appointment was created"
 msgstr "Datum van de afspraak"
 
-#: accounts/models.py:293
+#: accounts/models.py:292
 msgid "This is the date when the appointment was last changed"
 msgstr "Datum wanner deze afspraak voor het laatst is gewijzigd"
 
-#: accounts/models.py:304
+#: accounts/models.py:303
 msgid "appointment"
 msgstr "afspraak"
 
-#: accounts/models.py:305
+#: accounts/models.py:304
 msgid "appointments"
 msgstr "afspraken"
 
-#: accounts/models.py:316
+#: accounts/models.py:315
 msgid "Used as a reference in the actions api."
 msgstr "Wordt gebruikt als referentie in de acties API"
 
-#: accounts/models.py:322
+#: accounts/models.py:321
 msgid "The name of the action"
 msgstr "De naam van de actie"
 
-#: accounts/models.py:325 pdc/models.py:25
+#: accounts/models.py:324 pdc/models.py:25
 msgid "description"
 msgstr "omschrijving"
 
-#: accounts/models.py:328
+#: accounts/models.py:327
 msgid "The description of the action"
 msgstr "Omschrijving van de actie"
 
-#: accounts/models.py:331
+#: accounts/models.py:330 plans/models.py:14
 msgid "goal"
 msgstr "doel"
 
-#: accounts/models.py:335
+#: accounts/models.py:334
 msgid "The goal of the action"
 msgstr "Het doel van de actie"
 
-#: accounts/models.py:342
+#: accounts/models.py:341
 msgid "The current status of the action"
 msgstr "Huidige status van de actie"
 
-#: accounts/models.py:349
+#: accounts/models.py:348
 msgid "The type of action that it is"
 msgstr "Type actie"
 
-#: accounts/models.py:352
+#: accounts/models.py:351
 msgid "Action end date"
 msgstr "Einddatum actie"
 
-#: accounts/models.py:353
+#: accounts/models.py:352
 msgid "This is the date that the action should be done."
 msgstr "De actie dient voor deze datum te zijn uitgevoerd"
 
-#: accounts/models.py:368
+#: accounts/models.py:367
 msgid "Is for"
 msgstr "Is voor"
 
-#: accounts/models.py:376
+#: accounts/models.py:375
 msgid "This is the date the action was created"
 msgstr "Aanmaakdatum van de actie"
 
-#: accounts/models.py:381
+#: accounts/models.py:380
 msgid "This is the date when the action was last changed"
 msgstr "Wijzigingsdatum van de actie"
 
-#: accounts/models.py:396
+#: accounts/models.py:395
 msgid "The plan that the action belongs to. This can be left empty."
 msgstr "Het plan waar de actie bij hoort. Dit veld mag leeggelaten worden."
 
-#: accounts/models.py:401
+#: accounts/models.py:400
 msgid "action"
 msgstr "actie"
 
-#: accounts/models.py:402
+#: accounts/models.py:401
 msgid "actions"
 msgstr "acties"
 
-#: accounts/models.py:419
+#: accounts/models.py:418
 msgid "THe sender of the message"
 msgstr "De afzender van het bericht"
 
-#: accounts/models.py:425
+#: accounts/models.py:424
 msgid "The receiver of the message"
 msgstr "De ontvanger van het bericht"
 
-#: accounts/models.py:430 accounts/models.py:475
+#: accounts/models.py:429 accounts/models.py:474
 msgid "This is the date the message was created"
 msgstr "Datum dat het bericht is aangemaakt"
 
-#: accounts/models.py:432
+#: accounts/models.py:431
 msgid "Content"
 msgstr "Content"
 
-#: accounts/models.py:432
+#: accounts/models.py:431
 msgid "Text content of the message"
 msgstr "Tekstuele inhoud van het bericht"
 
-#: accounts/models.py:434
+#: accounts/models.py:433
 msgid "Seen"
 msgstr "Gezien"
 
-#: accounts/models.py:436
+#: accounts/models.py:435
 msgid "Boolean shows if the message was seem by the receiver"
 msgstr "Geeft aan of de ontvanger het bericht heeft gezien"
 
-#: accounts/models.py:442
+#: accounts/models.py:441
 msgid "message"
 msgstr "bericht"
 
-#: accounts/models.py:443
+#: accounts/models.py:442
 msgid "messages"
 msgstr "berichten"
 
-#: accounts/models.py:454
+#: accounts/models.py:453
 msgid "User who created the invite"
 msgstr "Gebruiker die de uitnodiging heeft aangemaakt"
 
-#: accounts/models.py:460
+#: accounts/models.py:459
 msgid "User who received the invite"
 msgstr "Ontvanger van de uitnodiging"
 
-#: accounts/models.py:468
+#: accounts/models.py:467
 msgid "THe contact the creation of which triggered sending the invite"
 msgstr "Contact via welke de uitnodiging is aangemaakt"
 
-#: accounts/models.py:470
+#: accounts/models.py:469
 msgid "accepted"
 msgstr "geaccepteerd"
 
-#: accounts/models.py:471
+#: accounts/models.py:470
 msgid "key"
 msgstr ""
 
-#: accounts/models.py:479
+#: accounts/models.py:478
 msgid "invitation"
 msgstr "uitnodiging"
 
-#: accounts/models.py:480
+#: accounts/models.py:479
 msgid "invitations"
 msgstr "uitnodigingen"
 
@@ -1342,7 +1342,7 @@ msgstr "Telefoonnummer"
 
 #: pdc/models.py:399
 msgid "Rol"
-msgstr ""
+msgstr "Rol"
 
 #: pdc/models.py:402
 msgid "The role/function of the product contact"
@@ -1374,23 +1374,48 @@ msgid "Categories"
 msgstr "Thema's"
 
 #: plans/models.py:12
+msgid "Title"
+msgstr "Titel"
+
+#: plans/models.py:12
 msgid "The title of the plan"
 msgstr "De titel van het plan"
 
-#: plans/models.py:15
+#: plans/models.py:16
 msgid ""
 "The goal for the plan. So that you and the contact knows what the goal is."
 msgstr ""
 "Het doel van het plan, omschrijf in het algemeen wat je wilt bereiken met je "
 "plan."
 
-#: plans/models.py:18
+#: plans/models.py:19
+msgid "end date"
+msgstr "einddatum"
+
+#: plans/models.py:19
 msgid "When the plan should be archived."
 msgstr "Wanneer het plan afgerond zou moeten zijn."
 
 #: plans/models.py:22
+#| msgid "Contact"
+msgid "contacts"
+msgstr "contacten"
+
+#: plans/models.py:24
 msgid "The contact that will help you with this plan."
 msgstr "Een contactpersoon die je met het plan gaat helpen."
+
+#: plans/models.py:26
+msgid "created by"
+msgstr "aangemaakt door"
+
+#: plans/models.py:33
+msgid "plan"
+msgstr "samenwerkingsplan"
+
+#: plans/models.py:34
+msgid "plans"
+msgstr "samenwerkingsplannen"
 
 #: search/admin.py:21
 msgid ""
@@ -1524,7 +1549,7 @@ msgstr "overnemen"
 #: templates/hijack/contrib/admin/button.html:9
 #, python-format
 msgid "Hijack %(username)s"
-msgstr ""
+msgstr "Overname %(username)s"
 
 #: templates/pages/cases/list.html:8 templates/pages/cases/list.html:27
 msgid "Lopende aanvragen"
