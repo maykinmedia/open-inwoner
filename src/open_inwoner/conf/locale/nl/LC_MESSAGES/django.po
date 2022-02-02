@@ -342,7 +342,7 @@ msgstr "Type actie"
 
 #: accounts/models.py:352
 msgid "Action end date"
-msgstr "Actie einddatum"
+msgstr "Einddatum actie"
 
 #: accounts/models.py:353
 msgid "This is the date that the action should be done."
