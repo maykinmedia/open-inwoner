@@ -1,0 +1,14 @@
+{% extends 'master.html' %}
+{% load i18n button_tags card_tags map_tags utils %}
+
+{% block content %}
+    <h1 class="h1">
+        {% trans "Samenwerken" %}
+        {% button href="plans:plan_create" text=_("Start nieuwe samenwerking") primary=True icon="group" icon_outlined=True %}
+    </h1>
+    <p class="p">
+        {% trans "Hier werkt u samen met uw contactpersonen aan uw doelen." %}
+    </p>
+
+    {% card_container plans=object_list columns=2 %}
+{% endblock %}

@@ -3,6 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from django_registration.forms import RegistrationForm
 
+from .choices import EmptyStatusChoices
 from .models import Action, Contact, Document, Invite, Message, User
 
 
@@ -92,20 +93,33 @@ class ContactForm(forms.ModelForm):
 class ActionForm(forms.ModelForm):
     class Meta:
         model = Action
-        fields = ("name", "status", "end_date")
+        fields = (
+            "name",
+            "description",
+            "status",
+            "end_date",
+            "is_for",
+            "file",
+            "goal",
+        )
 
-    def save(self, user, commit=True):
+    def save(self, user, plan=None, commit=True):
         self.instance.created_by = user
+        if plan:
+            self.instance.plan = plan
         return super().save(commit=commit)
 
 
 class DocumentForm(forms.ModelForm):
     class Meta:
         model = Document
-        fields = ("name", "file")
+        fields = ("file", "name")
 
-    def save(self, user, commit=True):
+    def save(self, user, plan=None, commit=True):
         self.instance.owner = user
+        if plan:
+            self.instance.plan = plan
+
         return super().save(commit=commit)
 
 
@@ -148,3 +162,17 @@ class InviteForm(forms.ModelForm):
     class Meta:
         model = Invite
         fields = ("accepted",)
+
+
+class ActionListForm(forms.ModelForm):
+    created_by = forms.ModelChoiceField(queryset=User.objects.all(), required=False)
+    end_date = forms.DateField(required=False)
+    status = forms.ChoiceField(choices=EmptyStatusChoices.choices, required=False)
+
+    class Meta:
+        model = Action
+        fields = ("status", "end_date", "created_by")
+
+    def __init__(self, users, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["created_by"].queryset = User.objects.filter(pk__in=users)

@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n button_tags link_tags icon_tags pagination_tags %}
+{% load i18n button_tags link_tags icon_tags pagination_tags action_tags %}
 
 
 {% block content %}
@@ -8,26 +8,7 @@
     {% button href="accounts:action_create" text=_("Nieuwe actie toevoegen") icon="date_range" primary=True %}
 </h1>
 
-<table class="table">
-    <thead class="table__heading">
-        <tr>
-            <td class="table__item">{% trans "Omschrijving" %}</td>
-            <td class="table__item">{% trans "Eind datum" %}</td>
-            <td class="table__item">{% trans "Status" %}</td>
-            <td class="table__item">&nbsp;</td>
-        </tr>
-    </thead>
-    <tbody>
-        {% for action in action_list %}
-            <tr>
-                <th class="table__header">{{ action.name }}</th>
-                <td class="table__item">{{ action.end_date|date:"d-m-Y" }}</td>
-                <td class="table__item">{{ action.get_status_display }}</td>
-                <td class="table__item table__item--right">{% button icon="settings" href="accounts:action_edit" uuid=action.uuid icon_outlined=True transparent=True %}</td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
+{% actions actions=actions action_form=action_form %}
 
 {% pagination page_obj=page_obj paginator=paginator request=request href="accounts:my_profile" text=_("Terug naar mijn profiel") %}
 {% endblock content %}

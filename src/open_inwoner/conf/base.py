@@ -149,6 +149,7 @@ INSTALLED_APPS = [
     "open_inwoner.components",
     "open_inwoner.ckeditor5",
     "open_inwoner.pdc",
+    "open_inwoner.plans",
     "open_inwoner.search",
     "open_inwoner.utils",
     "open_inwoner.configurations",
@@ -506,7 +507,10 @@ if SENTRY_DSN:
     }
 
     sentry_sdk.init(
-        **SENTRY_CONFIG, integrations=get_sentry_integrations(), send_default_pii=True
+        **SENTRY_CONFIG,
+        traces_sample_rate=1,
+        integrations=get_sentry_integrations(),
+        send_default_pii=True,
     )
 
 # Elastic APM

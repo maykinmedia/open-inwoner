@@ -15,6 +15,20 @@ class ContactTypeChoices(DjangoChoices):
     organization = ChoiceItem("organization", _("Organisatie"))
 
 
+# Created because of a filter that needs to happen. This way the form can take the empty choice and the modal is still filled.
+class EmptyChoices(DjangoChoices):
+    empty = ChoiceItem("", _("-------"))
+
+
 class StatusChoices(DjangoChoices):
     open = ChoiceItem("open", _("Open"))
     closed = ChoiceItem("closed", _("Afgerond"))
+
+
+class EmptyStatusChoices(EmptyChoices, StatusChoices):
+    pass
+
+
+class TypeChoices(DjangoChoices):
+    incidental = ChoiceItem("incidental", _("Incidentieel"))
+    recurring = ChoiceItem("recurring", _("Terugkerend"))

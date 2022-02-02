@@ -1,0 +1,14 @@
+{% load card_tags icon_tags link_tags %}
+{% render_card %}
+    <h3 class="h3">{% link url text=title %}</h3>
+    <p class="p">{{ description }}</p>
+    {% if object.end_date %}
+        <div class="card__tabled">
+            <div>Einddatum:</div>
+            <div>{{ object.end_date }}</div>
+            <div>Contactpersonen:</div>
+            <div>{{ object.contactperson_list }}</div>
+        </div>
+    {% endif %}
+    {% link url text=title hide_text=True icon='arrow_forward' button=True transparent=True %}
+{% endrender_card %}
