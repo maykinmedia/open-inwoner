@@ -14,27 +14,15 @@
 </h2>
 
 <div class="card-container card-container--columns-3">
-    {% render_card %}
-        <h3 class="h3">{% trans "Verder aan mijn plan" %}</h3>
-        <p class="p">{% trans "Vestibulum id ligula porta felis euismod semper." %}</p>
-        <a class="button button--icon-before button--transparent button--secondary" href="#">
-            {% icon icon="arrow_forward" %}
-        </a>
-    {% endrender_card %}
-    {% render_card %}
-        <h3 class="h3">{% trans "Verder aan mijn plan" %}</h3>
-        <p class="p">{% trans "Vestibulum id ligula porta felis euismod semper." %}</p>
-        <a class="button button--icon-before button--transparent button--secondary" href="#">
-            {% icon icon="arrow_forward" %}
-        </a>
-        {% endrender_card %}
+    {% for plan in plans %}
         {% render_card %}
-        <h3 class="h3">{% trans "Verder aan mijn plan" %}</h3>
-        <p class="p">{% trans "Vestibulum id ligula porta felis euismod semper." %}</p>
-        <a class="button button--icon-before button--transparent button--secondary" href="#">
-            {% icon icon="arrow_forward" %}
-        </a>
-    {% endrender_card %}
+            <h3 class="h3">{{ plan.title }}</h3>
+            <p class="p">{{ plan.goal|truncatewords:20 }}</p>
+            <a class="button button--icon-before button--transparent button--secondary" href="{{ plan.get_absolute_url }}">
+                {% icon icon="arrow_forward" %}
+            </a>
+        {% endrender_card %}
+    {% endfor %}
 </div>
 
 <h2 class="h2 h2--extra">
