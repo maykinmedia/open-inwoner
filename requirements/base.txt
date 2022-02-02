@@ -43,7 +43,7 @@ digid-eherkenning @ git+https://bitbucket.org/maykinmedia/django-digid-eherkenni
     # via -r requirements/base.in
 dj-rest-auth==2.1.11
     # via -r requirements/base.in
-django==3.2.7
+django==3.2.12
     # via
     #   -r requirements/base.in
     #   digid-eherkenning
@@ -221,7 +221,7 @@ orderedmultidict==1.0.1
     # via furl
 phonenumbers==8.12.33
     # via -r requirements/base.in
-pillow==8.3.2
+pillow==9.0.0
     # via
     #   -r requirements/base.in
     #   easy-thumbnails
