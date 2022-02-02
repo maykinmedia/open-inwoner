@@ -100,6 +100,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.flatpages",
+    "django.forms",
     # Admin auth
     "django_otp",
     "django_otp.plugins.otp_static",
@@ -134,7 +135,6 @@ INSTALLED_APPS = [
     "filer",
     "mptt",  # used by filer
     "hijack.contrib.admin",
-    "leaflet",
     "django_elasticsearch_dsl",
     "import_export",
     "solo",
@@ -196,6 +196,7 @@ TEMPLATES = [
         },
     },
 ]
+FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
 WSGI_APPLICATION = "open_inwoner.wsgi.application"
 
@@ -522,6 +523,8 @@ if not ELASTIC_APM_SERVER_URL:
 # geopy
 GEOPY_APP = "Openinwoner"
 GEOPY_TIMEOUT = 10  # in seconds
+LOCATIESERVER_DOMAIN = "geodata.nationaalgeoregister.nl/locatieserver/v3"
+GEOCODER = "open_inwoner.utils.geocode.PdocLocatieserver"
 
 
 # ELASTICSEARCH CONFIG

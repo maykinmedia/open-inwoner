@@ -4,12 +4,12 @@ from django.utils.translation import ugettext_lazy as _
 
 from import_export.admin import ImportExportMixin
 from import_export.formats import base_formats
-from leaflet.admin import LeafletGeoAdmin
 from treebeard.admin import TreeAdmin
 from treebeard.forms import movenodeform_factory
 
 from open_inwoner.ckeditor5.widgets import CKEditorWidget
 
+from .admin_mixins import GeoAdminMixin
 from .models import (
     Category,
     Neighbourhood,
@@ -133,28 +133,19 @@ class ProductFileAdmin(admin.ModelAdmin):
 
 
 @admin.register(ProductLocation)
-class ProductLocationAdmin(LeafletGeoAdmin):
+class ProductLocationAdmin(GeoAdminMixin, admin.ModelAdmin):
     # List
-    list_display = ("product", "city", "postcode", "street", "housenumber")
+    list_display = ("product", "name", "city", "postcode", "street", "housenumber")
     list_filter = ("city",)
 
     # Detail
-    modifiable = False
     fieldsets = (
-        (None, {"fields": ("product",)}),
+        (None, {"fields": ("product", "name")}),
         (
             _("Address"),
             {"fields": ("street", "housenumber", "postcode", "city", "geometry")},
         ),
     )
-
-    def get_readonly_fields(self, request, obj=None):
-        readonly_fields = super().get_readonly_fields(request, obj)
-        # don't show map when creating new location
-        if not obj:
-            return readonly_fields + ("geometry",)
-
-        return readonly_fields
 
 
 @admin.register(ProductLink)
@@ -173,7 +164,7 @@ class OrganizationTypeAdmin(admin.ModelAdmin):
 
 
 @admin.register(Organization)
-class OrganizationAdmin(LeafletGeoAdmin):
+class OrganizationAdmin(GeoAdminMixin, admin.ModelAdmin):
     # List
     list_display = ("name", "type")
     list_filter = ("type__name", "city")
@@ -182,7 +173,6 @@ class OrganizationAdmin(LeafletGeoAdmin):
     prepopulated_fields = {"slug": ("name",)}
 
     # Detail
-    modifiable = False
     fieldsets = (
         (None, {"fields": ("name", "slug", "type", "logo", "neighbourhood")}),
         (_("Contact"), {"fields": ("email", "phonenumber")}),
@@ -191,14 +181,6 @@ class OrganizationAdmin(LeafletGeoAdmin):
             {"fields": ("street", "housenumber", "postcode", "city", "geometry")},
         ),
     )
-
-    def get_readonly_fields(self, request, obj=None):
-        readonly_fields = super().get_readonly_fields(request, obj)
-        # don't show map when creating new location
-        if not obj:
-            return readonly_fields + ("geometry",)
-
-        return readonly_fields
 
 
 @admin.register(ProductContact)

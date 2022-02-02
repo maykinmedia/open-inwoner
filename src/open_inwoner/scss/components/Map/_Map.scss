@@ -10,6 +10,11 @@
   &--small &__leaflet {
     height: 100px;
   }
+
+  &--admin {
+    display: inline-block;
+    width: calc(40em + 16px);
+  }
 }
 
 .p + .map {
