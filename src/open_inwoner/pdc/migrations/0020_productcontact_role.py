@@ -6,13 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('pdc', '0019_product_uniforme_productnaam'),
+        ("pdc", "0019_product_uniforme_productnaam"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='productcontact',
-            name='role',
-            field=models.CharField(blank=True, help_text='The role/function of the product contact', max_length=100, verbose_name='Rol'),
+            model_name="productcontact",
+            name="role",
+            field=models.CharField(
+                blank=True,
+                help_text="The role/function of the product contact",
+                max_length=100,
+                verbose_name="Rol",
+            ),
         ),
     ]

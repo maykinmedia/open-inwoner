@@ -390,7 +390,6 @@ class ProductContact(models.Model):
         help_text=_("The role/function of the product contact"),
     )
 
-
     class Meta:
         verbose_name = _("product contact")
         verbose_name_plural = _("product contacts")

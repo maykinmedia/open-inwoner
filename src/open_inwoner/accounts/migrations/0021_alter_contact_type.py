@@ -6,13 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0020_invite'),
+        ("accounts", "0020_invite"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='contact',
-            name='type',
-            field=models.CharField(choices=[('contact', 'Contactpersoon'), ('begeleider', 'Begeleider'), ('organization', 'Organisatie')], default='contact', help_text='The type of contact', max_length=200, verbose_name='Type'),
+            model_name="contact",
+            name="type",
+            field=models.CharField(
+                choices=[
+                    ("contact", "Contactpersoon"),
+                    ("begeleider", "Begeleider"),
+                    ("organization", "Organisatie"),
+                ],
+                default="contact",
+                help_text="The type of contact",
+                max_length=200,
+                verbose_name="Type",
+            ),
         ),
     ]
