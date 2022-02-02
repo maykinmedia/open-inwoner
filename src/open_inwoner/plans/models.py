@@ -9,23 +9,35 @@ from .managers import PlanQuerySet
 
 class Plan(models.Model):
     uuid = models.UUIDField(default=uuid4, unique=True)
-    title = models.CharField(max_length=250, help_text=_("The title of the plan"))
+    title = models.CharField(
+        _("Title"), max_length=250, help_text=_("The title of the plan")
+    )
     goal = models.TextField(
+        _("goal"),
         help_text=_(
             "The goal for the plan. So that you and the contact knows what the goal is."
-        )
+        ),
     )
-    end_date = models.DateField(help_text=_("When the plan should be archived."))
+    end_date = models.DateField(
+        _("end date"), help_text=_("When the plan should be archived.")
+    )
     contacts = models.ManyToManyField(
         "accounts.Contact",
+        verbose_name=_("contacts"),
         related_name="plans",
         help_text=_("The contact that will help you with this plan."),
     )
-    created_by = models.ForeignKey("accounts.User", on_delete=models.CASCADE)
+    created_by = models.ForeignKey(
+        "accounts.User", verbose_name=_("created by"), on_delete=models.CASCADE
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     objects = PlanQuerySet.as_manager()
+
+    class Meta:
+        verbose_name = _("plan")
+        verbose_name_plural = _("plans")
 
     def __str__(self):
         return self.title
