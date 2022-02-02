@@ -300,6 +300,10 @@ class Appointment(models.Model):
         help_text="The person that created the appointment.",
     )
 
+    class Meta:
+        verbose_name = _("appointment")
+        verbose_name_plural = _("appointments")
+
     def __str__(self):
         return self.name
 
@@ -394,6 +398,8 @@ class Action(models.Model):
 
     class Meta:
         ordering = ("end_date", "-created_on")
+        verbose_name = _("action")
+        verbose_name_plural = _("actions")
 
     def __str__(self):
         return self.name
@@ -432,6 +438,10 @@ class Message(models.Model):
 
     objects = MessageQuerySet.as_manager()
 
+    class Meta:
+        verbose_name = _("message")
+        verbose_name_plural = _("messages")
+
     def __str__(self):
         return f"From: {self.sender}, To: {self.receiver} ({self.created_on.date()})"
 
@@ -464,6 +474,10 @@ class Invite(models.Model):
         auto_now_add=True,
         help_text=_("This is the date the message was created"),
     )
+
+    class Meta:
+        verbose_name = _("invitation")
+        verbose_name_plural = _("invitations")
 
     def __str__(self):
         return f"For: {self.invitee} ({self.created_on.date()})"
