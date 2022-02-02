@@ -28,7 +28,10 @@
 
 {% block content %}
 <div class="plans">
-    <h1 class="h1" id="title">{{ object.title }}</h1>
+    <h1 class="h1" id="title">
+        {{ object.title }}
+        {% button href="plans:plan_edit" uuid=object.uuid text=_("Bewerken") icon="settings" icon_position="after" icon_outlined=True %}
+    </h1>
 
     <div class="plan-contact">
         <div class="plan-contact__container">
@@ -36,6 +39,16 @@
             <div class="plan-contact__information">
                 <p class="plan-contact__title">{% trans "Einddatum" %}</p>
                 <p class="plan-contact__info">{{ object.end_date }}</p>
+            </div>
+        </div>
+        <div class="plan-contact__container">
+            {% icon "person" outlined=True %}
+            <p class="plan-contact__title">{% trans "Created by" %}</p>
+            <div class="plan-contact__grid plan-contact__grid--columns-1">
+                <div class="plan-contact__information">
+                    <p class="plan-contact__info">{{ object.created_by.get_full_name }}</p>
+                    <p class="plan-contact__info">{{ object.created_by.email }}</p>
+                </div>
             </div>
         </div>
         <div class="plan-contact__container">
