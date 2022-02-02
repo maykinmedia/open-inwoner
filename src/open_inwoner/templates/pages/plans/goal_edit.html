@@ -1,0 +1,11 @@
+{% extends 'master.html' %}
+{% load i18n button_tags card_tags map_tags form_tags %}
+
+{% block content %}
+    <h1 class="h1">{% trans "Doel aanpassen" %}</h1>
+    <p class="p">
+        {% trans "Hier kunt u uw doel aanpassen" %}
+    </p>
+
+    {% form id="goal-edit" form_object=form method="POST" %}
+{% endblock %}

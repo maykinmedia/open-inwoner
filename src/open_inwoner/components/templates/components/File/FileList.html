@@ -1,11 +1,12 @@
 {% load i18n file_tags %}
 
 <nav class="file-list">
-    {% trans "Bestanden" as base_title %}
-    {% if h1 %}
-        <h1 class="h1 h1--bottom" id="files">{% firstof title base_title %}</h1>
-    {% else %}
-        <h4 class="h4" id="files">{% firstof title base_title %}</h4>
+    {% if title %}
+        {% if h1 %}
+            <h1 class="h1 h1--bottom" id="files">{{ title }}</h1>
+        {% else %}
+            <h4 class="h4" id="files">{{ title }}</h4>
+        {% endif %}
     {% endif %}
     <ul class="file-list__list">
         {% for file in files %}

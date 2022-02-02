@@ -15,7 +15,7 @@ from privates.storages import PrivateMediaFileSystemStorage
 
 from open_inwoner.utils.validators import validate_phone_number
 
-from .choices import ContactTypeChoices, LoginTypeChoices, StatusChoices
+from .choices import ContactTypeChoices, LoginTypeChoices, StatusChoices, TypeChoices
 from .managers import DigidManager, UserManager, eHerkenningManager
 from .query import MessageQuerySet
 
@@ -199,6 +199,12 @@ class Contact(models.Model):
             "The user from the contact, who was added based on the contact email."
         ),
     )
+    function = models.CharField(
+        verbose_name=_("Function"),
+        default="",
+        max_length=200,
+        help_text=_("The function of the contact within an organization."),
+    )
 
     class Meta:
         ordering = ("-updated_on", "-created_on")
@@ -244,6 +250,14 @@ class Document(models.Model):
         on_delete=models.CASCADE,
         related_name="documents",
         help_text="This is the user that created the document.",
+    )
+    plan = models.ForeignKey(
+        "plans.Plan",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="documents",
+        help_text=_("The plan that the document belongs to. This can be left empty."),
     )
 
     def __str__(self):
@@ -302,6 +316,19 @@ class Action(models.Model):
         max_length=250,
         help_text=_("The name of the action"),
     )
+    description = models.TextField(
+        verbose_name=_("description"),
+        default="",
+        blank=True,
+        help_text=_("The description of the action"),
+    )
+    goal = models.CharField(
+        verbose_name=_("goal"),
+        default="",
+        blank=True,
+        max_length=250,
+        help_text=_("The goal of the action"),
+    )
     status = models.CharField(
         verbose_name=_("Status"),
         default=StatusChoices.open,
@@ -309,10 +336,34 @@ class Action(models.Model):
         choices=StatusChoices.choices,
         help_text=_("The current status of the action"),
     )
+    type = models.CharField(
+        verbose_name=_("Type"),
+        default=TypeChoices.incidental,
+        max_length=200,
+        choices=TypeChoices.choices,
+        help_text=_("The type of action that it is"),
+    )
     end_date = models.DateField(
         verbose_name=_("Action end date"),
         help_text=_("This is the date that the action should be done."),
         null=True,
+        blank=True,
+    )
+    file = models.FileField(
+        verbose_name=_("File"),
+        null=True,
+        blank=True,
+        storage=PrivateMediaFileSystemStorage(),
+        help_text="The document that is uploaded to the file",
+    )
+    is_for = models.ForeignKey(
+        "accounts.User",
+        null=True,
+        blank=True,
+        verbose_name=_("Is for"),
+        on_delete=models.CASCADE,
+        related_name="actions",
+        help_text="The person that needs to do this action.",
     )
     created_on = models.DateTimeField(
         verbose_name=_("Created on"),
@@ -328,8 +379,16 @@ class Action(models.Model):
         "accounts.User",
         verbose_name=_("Created by"),
         on_delete=models.CASCADE,
-        related_name="actions",
+        related_name="created_actions",
         help_text="The person that created the action.",
+    )
+    plan = models.ForeignKey(
+        "plans.Plan",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="actions",
+        help_text=_("The plan that the action belongs to. This can be left empty."),
     )
 
     class Meta:
@@ -337,6 +396,12 @@ class Action(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if self.created_by and not self.is_for:
+            self.is_for = self.created_by
+
+        return super().save(*args, **kwargs)
 
 
 class Message(models.Model):

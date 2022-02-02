@@ -1,0 +1,75 @@
+{% extends 'master.html' %}
+{% load i18n button_tags card_tags map_tags utils icon_tags file_tags action_tags %}
+
+{% block sidebar_content %}
+    <aside class="anchor-menu">
+        <ul class="anchor-menu__list">
+            <li class="anchor-menu__list-item">
+                <a class="link" href="#title">{{ object.title }}</a>
+            </li>
+            <li class="anchor-menu__list-item">
+                <a class="link" href="#goals">{% trans "Doelen" %}</a>
+            </li>
+            <li class="anchor-menu__list-item">
+                <a class="link" href="#files">{% trans "Bestanden" %}</a>
+            </li>
+            <li class="anchor-menu__list-item">
+                <a class="link" href="#actions">{% trans "Acties" %}</a>
+            </li>
+            <li class="anchor-menu__list-item anchor-menu__list-item--top">
+                <a class="link link--primary" href="#top">
+                    {% icon icon="arrow_upward" %}
+                    Terug naar boven
+                </a>
+            </li>
+        </ul>
+    </aside>
+{% endblock sidebar_content %}
+
+{% block content %}
+<div class="plans">
+    <h1 class="h1" id="title">{{ object.title }}</h1>
+
+    <div class="plan-contact">
+        <div class="plan-contact__container">
+            {% icon "calendar_today" outlined=True %}
+            <div class="plan-contact__information">
+                <p class="plan-contact__title">{% trans "Einddatum" %}</p>
+                <p class="plan-contact__info">{{ object.end_date }}</p>
+            </div>
+        </div>
+        <div class="plan-contact__container">
+            {% icon "person" outlined=True %}
+            <p class="plan-contact__title">{% trans "Contactpersonen" %}</p>
+            <div class="plan-contact__grid plan-contact__grid--columns-{{ object.contacts.count }}">
+                {% for contact in object.get_active_contacts.all %}
+                    <div class="plan-contact__information">
+                        <p class="plan-contact__info">{{ contact.get_name }}</p>
+                        <p class="plan-contact__info">{{ contact.function }}</p>
+                        <p class="plan-contact__info">{{ contact.phonenumber }}</p>
+                        <p class="plan-contact__info">{{ contact.email }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <h2 class="h2" id="goals">{% trans "Doel" %}</h2>
+    <p class="p">{{ object.goal|linebreaksbr }}</p>
+    {% button href="plans:plan_edit_goal" uuid=object.uuid text=_("Doel bewerken") primary=True %}
+
+    <h2 class="h2" id="files">{% trans "Bestanden" %}</h2>
+    {% if object.get_latest_file %}
+        {% file file=object.get_latest_file %}
+
+        {% if object.get_other_files %}
+            {% file_table files=object.get_other_files %}
+        {% endif %}
+    {% endif %}
+    {% button href="plans:plan_add_file" uuid=object.uuid text=_("Upload nieuwe versie") primary=True %}
+
+    <h2 class="h2" id="actions">{% trans "Acties" %}</h2>
+    {% actions actions=actions action_form=action_form form_action=request.path|add:"#actions" %}
+    {% button href="plans:plan_action_create" uuid=object.uuid text=_("Nieuw actie toevoegen") icon="date_range" primary=True %}
+</div>
+{% endblock %}
