@@ -6,7 +6,7 @@
     <aside class="footer__visitor">
         <h4 class="h4">{{footer_texts.footer_visiting_title}}</h4>
         <p class="p">
-            {{footer_texts.footer_visiting_intro}}
+            {{footer_texts.footer_visiting_intro|linebreaksbr}}
         </p>
         {% button icon="arrow_forward" icon_position='before' transparent=True text=_("Bekijk op Google Maps") href=footer_texts.footer_visiting_map %}
     </aside>
@@ -15,7 +15,7 @@
     <aside class="footer__mail">
         <h4 class="h4">{{footer_texts.footer_mailing_title}}</h4>
         <p class="p">
-            {{footer_texts.footer_mailing_intro}}
+            {{footer_texts.footer_mailing_intro|linebreaksbr}}
         </p>
     </aside>
 
