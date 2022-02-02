@@ -9,7 +9,7 @@
 
     {% if subcategories %}
         {% for subcategory in subcategories %}
-            {% category_card category=subcategory %}
+            {% category_card category=subcategory parent_category=parent_category %}
         {% endfor %}
     {% endif %}
 
