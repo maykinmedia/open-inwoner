@@ -165,8 +165,12 @@ class InviteForm(forms.ModelForm):
 
 
 class ActionListForm(forms.ModelForm):
-    created_by = forms.ModelChoiceField(queryset=User.objects.all(), required=False)
-    end_date = forms.DateField(required=False)
+    created_by = forms.ModelChoiceField(
+        queryset=User.objects.all(), required=False, empty_label="Door"
+    )
+    end_date = forms.DateField(
+        required=False, widget=forms.DateInput(attrs={"placeholder": _("Deadline")})
+    )
     status = forms.ChoiceField(choices=EmptyStatusChoices.choices, required=False)
 
     class Meta:
