@@ -103,6 +103,14 @@ class ActionForm(forms.ModelForm):
             "goal",
         )
 
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+
+        self.fields["is_for"].queryset = User.objects.filter(
+            assigned_contacts__in=self.user.contacts.all()
+        )
+
     def save(self, user, plan=None, commit=True):
         self.instance.created_by = user
         if plan:

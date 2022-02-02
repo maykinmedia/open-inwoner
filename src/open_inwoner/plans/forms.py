@@ -8,6 +8,10 @@ class PlanForm(forms.ModelForm):
         model = Plan
         fields = ("title", "end_date", "contacts")
 
+    def __init__(self, user, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["contacts"].queryset = user.contacts.all()
+
     def save(self, user, commit=True):
         self.instance.created_by = user
         return super().save(commit=commit)

@@ -74,6 +74,11 @@ class ActionCreateView(LoginRequiredMixin, CreateView):
     form_class = ActionForm
     success_url = reverse_lazy("accounts:action_list")
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update(user=self.request.user)
+        return kwargs
+
     def form_valid(self, form):
         self.object = form.save(self.request.user)
         return HttpResponseRedirect(self.get_success_url())

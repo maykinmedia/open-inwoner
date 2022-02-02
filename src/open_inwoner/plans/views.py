@@ -47,10 +47,35 @@ class PlanDetailView(
         return context
 
 
-class PlanCreateView(LoginRequiredMixin, CreateBreadcrumbMixin, CreateView):
+class PlanCreateView(LoginRequiredMixin, CreateView):
     template_name = "pages/plans/create.html"
     model = Plan
     form_class = PlanForm
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update(user=self.request.user)
+        return kwargs
+
+    def form_valid(self, form):
+        self.object = form.save(self.request.user)
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self) -> str:
+        return self.object.get_absolute_url()
+
+
+class PlanEditView(LoginRequiredMixin, UpdateView):
+    template_name = "pages/plans/create.html"
+    model = Plan
+    slug_field = "uuid"
+    slug_url_kwarg = "uuid"
+    form_class = PlanForm
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update(user=self.request.user)
+        return kwargs
 
     def form_valid(self, form):
         self.object = form.save(self.request.user)

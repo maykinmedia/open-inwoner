@@ -1,12 +1,14 @@
-{% load card_tags icon_tags link_tags %}
+{% load card_tags icon_tags link_tags i18n %}
 {% render_card %}
     <h3 class="h3">{% link url text=title %}</h3>
     <p class="p">{{ description }}</p>
     {% if object.end_date %}
         <div class="card__tabled">
-            <div>Einddatum:</div>
+            <div>{% trans "Einddatum" %}:</div>
             <div>{{ object.end_date }}</div>
-            <div>Contactpersonen:</div>
+            <div>{% trans "Created by" %}:</div>
+            <div>{{ object.created_by.get_full_name }}</div>
+            <div>{% trans "Contactpersonen" %}:</div>
             <div>{{ object.contactperson_list }}</div>
         </div>
     {% endif %}
