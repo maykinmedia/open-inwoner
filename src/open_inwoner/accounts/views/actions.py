@@ -31,7 +31,6 @@ class BaseActionFilter:
 class ActionListView(LoginRequiredMixin, BaseActionFilter, ListView):
     template_name = "pages/profile/actions/list.html"
     model = Action
-    paginate_by = 10
 
     def get_queryset(self):
         base_qs = super().get_queryset()
@@ -42,7 +41,13 @@ class ActionListView(LoginRequiredMixin, BaseActionFilter, ListView):
         context["action_form"] = ActionListForm(
             data=self.request.GET, users=self.get_queryset()
         )
-        context["actions"] = self.get_actions(self.get_queryset())
+
+        actions = self.get_actions(self.get_queryset())
+        paginator, page, queryset, is_paginated = self.paginate_queryset(actions, 10)
+        context["paginator"] = paginator
+        context["page_obj"] = page
+        context["is_paginated"] = is_paginated
+        context["actions"] = queryset
         return context
 
 
