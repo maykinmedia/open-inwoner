@@ -54,7 +54,6 @@
   }
 
   &__welcome {
-    margin-top: calc(130px);
     margin-bottom: var(--row-height);
     background-color: var(--color-white);
     box-shadow: 0 0 var(--row-height) 0 var(--color-mute);
@@ -63,6 +62,7 @@
     width: 100%;
 
     @media (min-width: 768px) {
+      margin-top: calc(130px);
       width: 50%;
     }
   }
