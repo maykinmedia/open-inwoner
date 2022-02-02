@@ -70,7 +70,7 @@ class SiteConfiguration(SingletonModel):
     )
     home_welcome_title = models.CharField(
         max_length=255,
-        default=_("Welcom"),
+        default=_("Welcome"),
         verbose_name=_("Home welcome title"),
         help_text=_("Welcome title on the home page."),
     )
