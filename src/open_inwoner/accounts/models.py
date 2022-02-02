@@ -454,6 +454,19 @@ class Message(models.Model):
     def __str__(self):
         return f"From: {self.sender}, To: {self.receiver} ({self.created_on.date()})"
 
+    def send_to_receiver(self, request=None):
+        inbox_url = furl(reverse("accounts:inbox")).add({"with": self.sender.email}).url
+        if request:
+            inbox_url = request.build_absolute_uri(inbox_url)
+
+        template = find_template("message")
+        context = {
+            "sender_name": self.sender.get_full_name(),
+            "inbox_link": inbox_url,
+        }
+
+        return template.send_email([self.receiver.email], context)
+
 
 class Invite(models.Model):
     inviter = models.ForeignKey(

@@ -557,7 +557,7 @@ MAIL_EDITOR_CONF = {
         "body_default": """
             <p>Beste</p>
 
-            <p> Je bent door {{ inviter_name}} uitgenodigd om in te loggen op {{ site_name }}.
+            <p>Je bent door {{ inviter_name}} uitgenodigd om in te loggen op {{ site_name }}.
             Gebruik onderstaande link om je aan te melden </p>
 
             <p><a href="{{ invite_link }}">aanmelden</a> </p>
@@ -589,7 +589,45 @@ MAIL_EDITOR_CONF = {
             },
             {"name": "email", "description": _noop("Email of the invited user")},
         ],
-    }
+    },
+    "message": {
+        "name": _noop("New Message Email"),
+        "description": _noop(
+            "This email is used to inform users about the new messages in their inbox"
+        ),
+        "subject_default": "New message from {{ sender_name }} at {{ site_name }}",
+        "body_default": """
+           <p>Beste</p>
+
+           <p>You've received a new message from {{ sender_name }} </p>
+
+           <p><a href="{{ inbox_link }}">Show the message</a> </p>
+
+           <p>Met vriendelijke groet,
+           {{ site_name }} </p>
+       """,
+        "subject": [
+            {
+                "name": "site_name",
+                "description": _noop("Name of the site."),
+            },
+            {"name": "sender_name", "description": _noop("Full name of the sender")},
+        ],
+        "body": [
+            {
+                "name": "sender_name",
+                "description": _noop("Full name of the sender"),
+            },
+            {
+                "name": "site_name",
+                "description": _noop("Name of the site"),
+            },
+            {
+                "name": "inbox_link",
+                "description": _noop("Link to see the conversation."),
+            },
+        ],
+    },
 }
 MAIL_EDITOR_BASE_CONTEXT = {"site_name": "Open Inwoner Platform"}
 CKEDITOR_CONFIGS = {

@@ -1,6 +1,8 @@
+from django.core import mail
 from django.urls import reverse_lazy
 
 from django_webtest import WebTest
+from furl import furl
 
 from ..models import Message
 from .factories import ContactFactory, MessageFactory, UserFactory
@@ -62,3 +64,15 @@ class InboxPageTests(WebTest):
         self.assertEqual(last_message.content, "some msg")
         self.assertEqual(last_message.sender, self.me)
         self.assertEqual(last_message.receiver, self.user1)
+
+        # check that the email was send
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertEqual(
+            email.subject,
+            f"New message from {self.me.get_full_name()} at Open Inwoner Platform",
+        )
+        self.assertEqual(email.to, [self.user1.email])
+        inbox_url = f"http://testserver{furl(self.url).add({'with':self.me.email}).url}"
+        body = email.alternatives[0][0]  # html version of the email body
+        self.assertIn(inbox_url, body)
