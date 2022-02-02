@@ -9,6 +9,7 @@ from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.utils.translation import ugettext_lazy as _
 
+from furl import furl
 from localflavor.nl.models import NLBSNField, NLZipCodeField
 from mail_editor.helpers import find_template
 from privates.storages import PrivateMediaFileSystemStorage
@@ -215,6 +216,15 @@ class Contact(models.Model):
 
     def get_name(self):
         return f"{self.first_name} {self.last_name}"
+
+    def is_active(self) -> bool:
+        return self.contact_user and self.contact_user.is_active
+
+    def is_not_active(self) -> bool:
+        return not self.is_active()
+
+    def get_message_url(self) -> str:
+        return furl(reverse("accounts:inbox")).add({"with": self.email}).url
 
 
 class Document(models.Model):
