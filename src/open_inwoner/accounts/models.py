@@ -233,7 +233,6 @@ class Document(models.Model):
     file = models.FileField(
         verbose_name=_("File"),
         storage=PrivateMediaFileSystemStorage(),
-        help_text="This will be the actual document.",
     )
     created_on = models.DateTimeField(
         verbose_name=_("Created on"),
