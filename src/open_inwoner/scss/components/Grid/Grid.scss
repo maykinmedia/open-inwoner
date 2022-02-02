@@ -5,6 +5,10 @@
   width: 100%;
   position: relative;
 
+  &--compact {
+    grid-gap: 0;
+  }
+
   &--limit &__sidebar,
   &--limit &__main {
     max-height: 75vh;
@@ -55,12 +59,17 @@
     background-color: var(--color-white);
     box-shadow: 0 0 var(--row-height) 0 var(--color-mute);
     padding: var(--spacing-large);
-    width: 50%;
     box-sizing: border-box;
+    width: 100%;
+
+    @media (min-width: 768px) {
+      width: 50%;
+    }
   }
 }
 
 .grid + .grid,
-.h1 + .grid {
+.h1 + .grid,
+.h4 + .grid {
   margin-top: var(--spacing-large);
 }

@@ -17,6 +17,9 @@ def render_grid(parser, token):
         <div>Some content here too</div>
     {% endrender_grid %}
 
+    Variables:
+        - compact: bool | Whether to use compact mode (no gutters).
+
     Extra context:
         - contents: string (HTML) | this is the context between the render_grid and endrender_grid tags
     """
@@ -38,6 +41,7 @@ def render_column(parser, token):
         {% endrender_column %}
 
     Variables:
+        - compact: bool | Whether to use compact mode (no gutters).
         - start: int | column to start from.
         - span: int | column span. Max is 12 columns
 

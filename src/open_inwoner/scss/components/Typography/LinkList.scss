@@ -10,6 +10,9 @@
   }
 
   &__list-item {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     margin-bottom: var(--spacing-small);
 
     &:last-child {
