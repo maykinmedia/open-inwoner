@@ -60,7 +60,7 @@ class SiteConfiguration(SingletonModel):
         verbose_name=_("Sta lokale registratie toe"),
         default=False,
         help_text=_(
-            "Standaard is het enkel toegestraan middels DigiD in te loggen. Zet deze installing aan om ook registraties op website niveau toe te staan."
+            "Wanneer deze optie uit staat is het enkel toegestaan om met DigiD in te loggen. Zet deze instelling aan om ook het inloggen met gebruikersnaam/wachtwoord en het aanmelden zonder DigiD toe te staan."
         ),
     )
     login_text = models.TextField(
