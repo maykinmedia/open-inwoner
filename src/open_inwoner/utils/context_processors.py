@@ -53,6 +53,7 @@ def settings(request):
         if config.hero_image_login
         else "",
         "login_allow_registration": config.login_allow_registration,
+        "show_cases": config.show_cases,
         "login_text": config.login_text,
         "gtm_code": config.gtm_code,
         "ga_code": config.ga_code,
