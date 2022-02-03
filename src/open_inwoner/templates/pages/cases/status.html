@@ -13,14 +13,10 @@
         </thead>
 
         <tbody>
-            {% for status in status_list %}
+            {% for status in statuses %}
                 <tr>
                     <td class="table__item table__item--no-left-padding">{{ status.datum_status_gezet }}</td>
-                    {% for type in status_type_list %}
-                        {% if type.url == status.statustype %}
-                            <td class="table__item table__item--no-left-padding">{{ type.omschrijving }}</td>
-                        {% endif %}
-                    {% endfor %}
+                    <td class="table__item table__item--no-left-padding">{{ status.statustype.omschrijving }}</td>
                 </tr>
             {% endfor %}
         </tbody>

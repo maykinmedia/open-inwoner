@@ -132,8 +132,8 @@ class TestListCasesView(WebTest):
         )
         response = self.app.get(reverse("accounts:my_cases"), user=user)
 
-        self.assertListEqual(response.context.get("open_cases"), [])
-        self.assertListEqual(response.context.get("closed_cases"), [])
+        self.assertIsNone(response.context.get("open_cases"))
+        self.assertIsNone(response.context.get("closed_cases"))
 
     def test_anonymous_user_has_no_access_to_cases_page(self, m):
         user = AnonymousUser()
@@ -207,34 +207,14 @@ class TestFetchSpecificCase(WebTest):
             json=self.zaak,
         )
 
-    def test_specific_case_is_retrieved_when_user_is_logged_in_via_digid(self, m):
+    def test_case_is_retrieved(self, m):
         self._setUpMocks(m)
+        case = fetch_specific_case("d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d")
 
-        user = UserFactory(
-            first_name="",
-            last_name="",
-            login_type=LoginTypeChoices.digid,
-            bsn="900222086",
+        self.assertEquals(
+            case.url,
+            f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
         )
-
-        case = fetch_specific_case(user, "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d")
-
-        self.assertEquals(str(case.uuid), "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d")
-
-    def test_specific_case_is_not_retrieved_when_user_is_not_logged_in_via_digid(
-        self, m
-    ):
-        self._setUpMocks(m)
-
-        user = UserFactory(
-            first_name="",
-            last_name="",
-            login_type=LoginTypeChoices.default,
-        )
-
-        case = fetch_specific_case(user, "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d")
-
-        self.assertIsNone(case)
 
     def test_no_case_is_retrieved_when_http_404(self, m):
         mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
@@ -243,13 +223,13 @@ class TestFetchSpecificCase(WebTest):
             status_code=404,
         )
 
-        user = UserFactory(
+        UserFactory(
             first_name="",
             last_name="",
             login_type=LoginTypeChoices.digid,
             bsn="900222086",
         )
-        case = fetch_specific_case(user, "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d")
+        case = fetch_specific_case("d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d")
 
         self.assertIsNone(case)
 
@@ -260,12 +240,12 @@ class TestFetchSpecificCase(WebTest):
             status_code=500,
         )
 
-        user = UserFactory(
+        UserFactory(
             first_name="",
             last_name="",
             login_type=LoginTypeChoices.digid,
             bsn="900222086",
         )
-        case = fetch_specific_case(user, "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d")
+        case = fetch_specific_case("d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d")
 
         self.assertIsNone(case)

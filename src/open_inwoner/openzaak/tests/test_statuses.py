@@ -42,7 +42,7 @@ class TestListStatusView(WebTest):
             "zrc",
             "schemas/Zaak",
             url=f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-c8b22b70083c",
-            zaak=f"{ZAKEN_ROOT}zaken/d3bbdeb7-460f-4ca9-b1ea-77b4730bf67d",
+            zaak=f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
             statustype=f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-7afb71e71fe4",
             datum_status_gezet="2021-01-12",
             statustoelichting="",
@@ -51,7 +51,7 @@ class TestListStatusView(WebTest):
             "zrc",
             "schemas/Zaak",
             url=f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c8b22b60083c",
-            zaak=f"{ZAKEN_ROOT}zaken/d3bbdeb7-460f-4ca9-b1ea-77b4730bf67d",
+            zaak=f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
             statustype=f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-7afb71e71",
             datum_status_gezet="2021-03-12",
             statustoelichting="",
@@ -83,7 +83,7 @@ class TestListStatusView(WebTest):
         mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
         mock_service_oas_get(m, CATALOGI_ROOT, "ztc")
         m.get(
-            f"{ZAKEN_ROOT}zaken/d3bbdeb7-460f-4ca9-b1ea-77b4730bf67d",
+            f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
             json=self.zaak,
         )
         m.get(
@@ -91,12 +91,8 @@ class TestListStatusView(WebTest):
             json=paginated_response([self.status1, self.status2]),
         )
         m.get(
-            f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-7afb71e71fe4",
-            json=self.status_type1,
-        )
-        m.get(
-            f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-7afb71e71",
-            json=self.status_type2,
+            f"{CATALOGI_ROOT}statustypen",
+            json=paginated_response([self.status_type1, self.status_type2]),
         )
 
     def test_status_is_retrieved_when_user_logged_in_via_digid(self, m):
@@ -112,28 +108,28 @@ class TestListStatusView(WebTest):
         response = self.app.get(
             reverse(
                 "accounts:case_status",
-                kwargs={"object_id": "d3bbdeb7-460f-4ca9-b1ea-77b4730bf67d"},
+                kwargs={"object_id": "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d"},
             ),
             user=user,
         )
-
-        status_list = [status.url for status in response.context.get("status_list")]
-        status_type_list = [
-            status_type.url for status_type in response.context.get("status_type_list")
+        statuses = [status.url for status in response.context["statuses"]]
+        status_types = [
+            status.statustype.url for status in response.context["statuses"]
         ]
 
         self.assertListEqual(
-            status_list,
+            statuses,
             [
-                f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c8b22b60083c",
-                f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-c8b22b70083c",
+                "https://zaken.nl/api/v1/statussen/3da89990-c7fc-476a-ad13-c8b22b60083c",
+                "https://zaken.nl/api/v1/statussen/3da81560-c7fc-476a-ad13-c8b22b70083c",
             ],
         )
+
         self.assertListEqual(
-            status_type_list,
+            status_types,
             [
-                f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-7afb71e71fe4",
-                f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-7afb71e71",
+                "https://catalogi.nl/api/v1/statustypen/e3798107-ab27-4c3c-977d-7afb71e71",
+                "https://catalogi.nl/api/v1/statustypen/e3798107-ab27-4c3c-977d-7afb71e71fe4",
             ],
         )
 
@@ -149,39 +145,44 @@ class TestListStatusView(WebTest):
         response = self.app.get(
             reverse(
                 "accounts:case_status",
-                kwargs={"object_id": "d3bbdeb7-460f-4ca9-b1ea-77b4730bf67d"},
+                kwargs={"object_id": "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d"},
             ),
             user=user,
         )
 
-        self.assertIsNone(response.context.get("status_list"))
+        self.assertIsNone(response.context.get("statuses"))
 
     def test_anonymous_user_has_no_access_to_status_page(self, m):
+        self._setUpMocks(m)
         user = AnonymousUser()
         response = self.app.get(
             reverse(
                 "accounts:case_status",
-                kwargs={"object_id": "d3bbdeb7-460f-4ca9-b1ea-77b4730bf67d"},
+                kwargs={"object_id": "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d"},
             ),
             user=user,
         )
 
         self.assertRedirects(
             response,
-            f"{reverse('login')}?next={reverse('accounts:case_status', kwargs={'object_id': 'd3bbdeb7-460f-4ca9-b1ea-77b4730bf67d'})}",
+            f"{reverse('login')}?next={reverse('accounts:case_status', kwargs={'object_id': 'd8bbdeb7-770f-4ca9-b1ea-77b4730bf67d'})}",
         )
 
     def test_no_status_is_retrieved_when_http_404(self, m):
-        mock_service_oas_get(m, CATALOGI_ROOT, "ztc")
         mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
+        mock_service_oas_get(m, CATALOGI_ROOT, "ztc")
         m.get(
-            f"{ZAKEN_ROOT}zaken/d3bbdeb7-460f-4ca9-b1ea-77b4730bf67d",
+            f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
             json=self.zaak,
         )
         m.get(
             f"{ZAKEN_ROOT}statussen",
             status_code=404,
         )
+        m.get(
+            f"{CATALOGI_ROOT}statustypen",
+            json=paginated_response([self.status_type1, self.status_type2]),
+        )
 
         user = UserFactory(
             first_name="",
@@ -192,24 +193,28 @@ class TestListStatusView(WebTest):
         response = self.app.get(
             reverse(
                 "accounts:case_status",
-                kwargs={"object_id": "d3bbdeb7-460f-4ca9-b1ea-77b4730bf67d"},
+                kwargs={"object_id": "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d"},
             ),
             user=user,
         )
 
-        self.assertListEqual(response.context["status_list"], [])
+        self.assertListEqual(response.context["statuses"], [])
 
     def test_no_status_is_retrieved_when_http_500(self, m):
-        mock_service_oas_get(m, CATALOGI_ROOT, "ztc")
         mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
+        mock_service_oas_get(m, CATALOGI_ROOT, "ztc")
         m.get(
-            f"{ZAKEN_ROOT}zaken/d3bbdeb7-460f-4ca9-b1ea-77b4730bf67d",
+            f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
             json=self.zaak,
         )
         m.get(
             f"{ZAKEN_ROOT}statussen",
             status_code=500,
         )
+        m.get(
+            f"{CATALOGI_ROOT}statustypen",
+            json=paginated_response([self.status_type1, self.status_type2]),
+        )
 
         user = UserFactory(
             first_name="",
@@ -220,9 +225,9 @@ class TestListStatusView(WebTest):
         response = self.app.get(
             reverse(
                 "accounts:case_status",
-                kwargs={"object_id": "d3bbdeb7-460f-4ca9-b1ea-77b4730bf67d"},
+                kwargs={"object_id": "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d"},
             ),
             user=user,
         )
 
-        self.assertListEqual(response.context["status_list"], [])
+        self.assertListEqual(response.context["statuses"], [])

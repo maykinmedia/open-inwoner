@@ -7,7 +7,7 @@ from django.views.generic import TemplateView
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.openzaak.cases import fetch_cases, fetch_specific_case
-from open_inwoner.openzaak.status import fetch_status_history, fetch_status_type
+from open_inwoner.openzaak.statuses import fetch_status_history, fetch_status_types
 
 
 class CasesListView(BaseBreadcrumbMixin, LoginRequiredMixin, TemplateView):
@@ -19,9 +19,11 @@ class CasesListView(BaseBreadcrumbMixin, LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        cases = fetch_cases(self.request.user)
-        context["open_cases"] = []
-        context["closed_cases"] = []
+        user_bsn = self.request.user.bsn
+        if user_bsn is None:
+            return context
+
+        cases = fetch_cases(user_bsn)
 
         context["open_cases"] = [case for case in cases if not case.einddatum]
         context["open_cases"].sort(key=lambda case: case.startdatum, reverse=True)
@@ -46,25 +48,24 @@ class CasesStatusView(BaseBreadcrumbMixin, LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        user = self.request.user
+        if self.request.user.bsn is None:
+            return context
 
         case_uuid = context["object_id"]
-        case = fetch_specific_case(user, case_uuid)
+        case = fetch_specific_case(case_uuid)
 
         if case:
-            status_list = fetch_status_history(user, case.url)
-            status_url_list = [status.statustype for status in status_list]
-            status_type_list = fetch_status_type(user, status_url_list)
+            statuses = fetch_status_history(case.url)
+            status_types = fetch_status_types(case.zaaktype)
+
+            status_types = {st.url: st for st in status_types}
+            for status in statuses:
+                status.statustype = status_types[status.statustype]
 
             context["case"] = case
-            context["status_list"] = status_list
-            context["status_list"].sort(
+            context["statuses"] = statuses
+            context["statuses"].sort(
                 key=lambda status: status.datum_status_gezet, reverse=True
-            )
-            context["status_type_list"] = (
-                status_type_list
-                if isinstance(status_type_list, list)
-                else [status_type_list]
             )
 
         return context
