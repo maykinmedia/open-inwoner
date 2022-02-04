@@ -445,6 +445,13 @@ class Message(models.Model):
         default=False,
         help_text=_("Boolean shows if the message was seem by the receiver"),
     )
+    sent = models.BooleanField(
+        _("Sent"),
+        default=False,
+        help_text=_(
+            "Boolean shows if the email was sent to the receiver about this message"
+        ),
+    )
 
     objects = MessageQuerySet.as_manager()
 
@@ -454,20 +461,6 @@ class Message(models.Model):
 
     def __str__(self):
         return f"From: {self.sender}, To: {self.receiver} ({self.created_on.date()})"
-
-    def send_to_receiver(self, request=None):
-        inbox_url = furl(reverse("accounts:inbox")).add({"with": self.sender.email}).url
-        inbox_url = f"{inbox_url}#messages-last"
-        if request:
-            inbox_url = request.build_absolute_uri(inbox_url)
-
-        template = find_template("message")
-        context = {
-            "sender_name": self.sender.get_full_name(),
-            "inbox_link": inbox_url,
-        }
-
-        return template.send_email([self.receiver.email], context)
 
 
 class Invite(models.Model):

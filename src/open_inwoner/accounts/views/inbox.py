@@ -123,10 +123,7 @@ class InboxView(LoginRequiredMixin, PaginationMixin, FormView):
         return kwargs
 
     def form_valid(self, form):
-        message = form.save()
-
-        # send email about new message
-        message.send_to_receiver(request=self.request)
+        form.save()
 
         # build redirect url based on form hidden data
         url = furl(self.request.path).add({"with": form.data["receiver"]}).url

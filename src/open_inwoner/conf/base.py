@@ -590,18 +590,18 @@ MAIL_EDITOR_CONF = {
             {"name": "email", "description": _noop("Email of the invited user")},
         ],
     },
-    "message": {
+    "new_messages": {
         "name": _noop("New Message Email"),
         "description": _noop(
             "This email is used to inform users about the new messages in their inbox"
         ),
-        "subject_default": "New message from {{ sender_name }} at {{ site_name }}",
+        "subject_default": "New messages at {{ site_name }}",
         "body_default": """
            <p>Beste</p>
 
-           <p>You've received a new message from {{ sender_name }} </p>
+           <p>You've received {{ total_messages }} new messages from {{ total_senders }} users</p>
 
-           <p><a href="{{ inbox_link }}">Show the message</a> </p>
+           <p><a href="{{ inbox_link }}">Go to the inbox</a> </p>
 
            <p>Met vriendelijke groet,
            {{ site_name }} </p>
@@ -611,12 +611,15 @@ MAIL_EDITOR_CONF = {
                 "name": "site_name",
                 "description": _noop("Name of the site."),
             },
-            {"name": "sender_name", "description": _noop("Full name of the sender")},
         ],
         "body": [
             {
-                "name": "sender_name",
-                "description": _noop("Full name of the sender"),
+                "name": "total_messages",
+                "description": _noop("Number of the new messages"),
+            },
+            {
+                "name": "total_senders",
+                "description": _noop("Number of the senders"),
             },
             {
                 "name": "site_name",
