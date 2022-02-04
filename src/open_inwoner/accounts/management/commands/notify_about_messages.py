@@ -33,8 +33,8 @@ class Command(BaseCommand):
                 receiver=receiver, seen=False, sent=False
             ).annotate()
             total_senders = messages_to_update.aggregate(
-                senders_total=Count("sender", distinct=True)
-            )
+                total_senders=Count("sender", distinct=True)
+            )["total_senders"]
             total_messages = messages_to_update.count()
             self.send_email(
                 receiver=receiver,
