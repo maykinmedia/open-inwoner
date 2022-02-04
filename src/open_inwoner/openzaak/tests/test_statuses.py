@@ -120,16 +120,16 @@ class TestListStatusView(WebTest):
         self.assertListEqual(
             statuses,
             [
-                "https://zaken.nl/api/v1/statussen/3da89990-c7fc-476a-ad13-c8b22b60083c",
-                "https://zaken.nl/api/v1/statussen/3da81560-c7fc-476a-ad13-c8b22b70083c",
+                f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c8b22b60083c",
+                f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-c8b22b70083c",
             ],
         )
 
         self.assertListEqual(
             status_types,
             [
-                "https://catalogi.nl/api/v1/statustypen/e3798107-ab27-4c3c-977d-7afb71e71",
-                "https://catalogi.nl/api/v1/statustypen/e3798107-ab27-4c3c-977d-7afb71e71fe4",
+                f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-7afb71e71",
+                f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-7afb71e71fe4",
             ],
         )
 
