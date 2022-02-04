@@ -116,6 +116,7 @@
   }
 }
 
+.h2 + .button,
 .h4 + .button,
 .p + .button {
   margin-top: var(--spacing-large);
