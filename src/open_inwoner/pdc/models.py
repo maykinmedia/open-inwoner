@@ -165,7 +165,7 @@ class Product(models.Model):
             ("img", "image"),
             ("li", "li"),
             ("p", "p"),
-            ("a", "link"),
+            ("a", "link link--secondary"),
             ("table", "table table--content"),
             ("th", "table__header"),
             ("td", "table__item"),

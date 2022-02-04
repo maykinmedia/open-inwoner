@@ -50,6 +50,8 @@
   &:active,
   &:focus,
   &:hover {
+    text-decoration: underline;
+
     .link__text {
       text-decoration: underline;
     }
