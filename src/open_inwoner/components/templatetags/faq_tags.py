@@ -1,5 +1,6 @@
 from django import template
 from django.utils.translation import gettext as _
+
 from open_inwoner.pdc.models import QuestionQuerySet
 
 register = template.Library()

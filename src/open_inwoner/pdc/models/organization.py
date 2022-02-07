@@ -1,8 +1,10 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+
 from filer.fields.image import FilerImageField
 
 from open_inwoner.utils.validators import validate_phone_number
+
 from .mixins import GeoModel
 
 

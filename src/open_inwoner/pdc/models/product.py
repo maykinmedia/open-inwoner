@@ -1,12 +1,14 @@
-import markdown
-from bs4 import BeautifulSoup
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
+
+import markdown
+from bs4 import BeautifulSoup
 from filer.fields.file import FilerFileField
 
 from open_inwoner.utils.validators import validate_phone_number
+
 from .mixins import GeoModel
 
 

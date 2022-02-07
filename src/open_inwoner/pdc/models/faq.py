@@ -1,5 +1,6 @@
 from django.db import models
-from ordered_model.models import OrderedModel, OrderedModelQuerySet, OrderedModelManager
+
+from ordered_model.models import OrderedModel, OrderedModelManager, OrderedModelQuerySet
 
 
 class QuestionQuerySet(OrderedModelQuerySet):
