@@ -1,1 +1,1 @@
-import './toggle';
+import './toggle'

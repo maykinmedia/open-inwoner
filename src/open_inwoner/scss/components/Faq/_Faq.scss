@@ -30,12 +30,12 @@
     z-index: 1;
   }
 
-  .link [class*=icon] {
+  .link [class*='icon'] {
     transition: all 0.3s;
     transform-origin: center;
   }
 
-  .link[aria-expanded="true"] [class*=icon] {
+  .link[aria-expanded='true'] [class*='icon'] {
     transform: rotate(90deg);
   }
 
