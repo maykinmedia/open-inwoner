@@ -18,4 +18,8 @@ def faq(questions: QuestionQuerySet, **kwargs):
         + questions: array | this is the list of file that need to be rendered.
         - title: string | The title that should be used.
     """
-    return {**kwargs, "questions": questions, "title": kwargs.get("title", _("Veelgestelde vragen"))}
+    return {
+        **kwargs,
+        "questions": questions,
+        "title": kwargs.get("title", _("Veelgestelde vragen")),
+    }
