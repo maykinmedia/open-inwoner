@@ -53,8 +53,9 @@ class NotifyComandTests(TestCase):
         self.assertEqual(len(mail.outbox), 0)
 
     def test_notify_several_users(self):
-        user1, user2, sender = UserFactory.create_batch(
-            3, first_name="John", last_name="Smith"
+        user1, user2, sender = sorted(
+            UserFactory.create_batch(3, first_name="John", last_name="Smith"),
+            key=lambda x: x.email,
         )
         messages1 = MessageFactory.create_batch(3, receiver=user1, sender=sender)
         messages2 = MessageFactory.create_batch(2, receiver=user2, sender=sender)
