@@ -31,6 +31,9 @@ def link(href, **kwargs):
         - icon_position, optional str: "before" or "after".
         - primary, optional bool: If the primary styling should be used
         - secondary, optional bool: If the secondary styling should be used
+        - toggle, optional str: If set, creates a toggle for target specified in href, the value ot toggle is used as
+        - toggle_exclusive, optional str: If set, creates a toggle group with query selector set by value.
+          BEM (Block Element Modifier) modifier which is added/removed on toggle.
         - transparent, optional bool: Whether the button should not have a background or border.
         - social_icon, optional str: The icon that should be displayed from font-awesome
         - src, optional str: The source of the image
@@ -67,10 +70,14 @@ def link(href, **kwargs):
         base_class = get_base_class()
         classes = [base_class]
 
+        if kwargs.get("toggle"):
+            classes.append("toggle")
+
         for modifier_tuple in [
             ("active", False),
             ("align", ""),
             ("bold", False),
+            ("icon", False),
             ("icon_position", ""),
             ("primary", False),
             ("secondary", False),

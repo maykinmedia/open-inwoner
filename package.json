@@ -41,6 +41,7 @@
     "@emotion/react": "^11.5.0",
     "@emotion/styled": "^11.3.0",
     "@tarekraafat/autocomplete.js": "^10.2.6",
+    "bem.js": "^1.0.10",
     "flatpickr": "^4.6.9",
     "gumshoejs": "^5.1.2",
     "html-minifier": "^4.0.0",
