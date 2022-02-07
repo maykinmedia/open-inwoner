@@ -7,7 +7,7 @@
     "doc": "doc"
   },
   "scripts": {
-    "build": "npm run bundle",
+    "build": "npm run collect && npm run bundle",
     "bundle": "webpack",
     "collect": "cp -r node_modules/leaflet/dist/images src/open_inwoner/static/bundles",
     "test": "karma start",
