@@ -1,3 +1,6 @@
+import json
+from typing import Union
+
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.urls import reverse
@@ -258,5 +261,13 @@ class ProductLocation(GeoModel):
         verbose_name = _("product location")
         verbose_name_plural = _("product locations")
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.product}: {self.address_str}"
+
+    def get_geojson_feature(self, stringify: bool = True) -> Union[str, dict]:
+        feature = super().get_geojson_feature(False)
+        feature["properties"]["url"] = self.product.get_absolute_url()
+
+        if stringify:
+            return json.dumps(feature)
+        return feature
