@@ -77,6 +77,7 @@ class ProductLocationTestCase(TestCase):
                         "housenumber": "117",
                         "postcode": "1015 CJ",
                         "city": "Amsterdam",
+                        "url": product_location.product.get_absolute_url()
                     },
                 }
             ),
@@ -116,7 +117,7 @@ class ProductLocationTestCase(TestCase):
         )
 
     def test_queryset_get_geojson_feature_collection(self):
-        ProductLocationFactory.create(
+        product_location_1 = ProductLocationFactory.create(
             name="Maykin Media",
             street="Keizersgracht",
             housenumber="117",
@@ -124,7 +125,7 @@ class ProductLocationTestCase(TestCase):
             city="Amsterdam",
             geometry=Point(4.8876515, 52.3775941),
         )
-        ProductLocationFactory.create(
+        product_location_2 = ProductLocationFactory.create(
             name="Anne Frank Huis",
             street="Westermarkt",
             housenumber="20",
@@ -149,6 +150,7 @@ class ProductLocationTestCase(TestCase):
                                 "housenumber": "117",
                                 "postcode": "1015 CJ",
                                 "city": "Amsterdam",
+                                "url": product_location_1.product.get_absolute_url()
                             },
                         },
                         {
@@ -163,6 +165,7 @@ class ProductLocationTestCase(TestCase):
                                 "housenumber": "20",
                                 "postcode": "1016 GV",
                                 "city": "Amsterdam",
+                                "url": product_location_2.product.get_absolute_url()
                             },
                         },
                     ],
