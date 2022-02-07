@@ -24,7 +24,7 @@ def link(href, **kwargs):
         - data_alt_text, optional str: data-alt-text
         - data_icon, optional str: data-icon
         - data_alt_icon, optional str: data-alt-icon
-        - download, optional bool: If the linked file should be downoaded.
+        - download, optional bool: If the linked file should be downloaded.
         - extra_classes, optional str: Extra classes
         - hide_text, optional bool: whether to hide the text and use aria attribute instead.
         - icon, optional str: The icon that should be displayed.

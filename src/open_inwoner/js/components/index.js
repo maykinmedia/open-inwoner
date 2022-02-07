@@ -1,12 +1,13 @@
 // Use this file to include individual components.
-import './ckeditor/'
-import './map'
-import './accessibility'
-import './anchor-menu'
-import './autocomplete'
-import './autocomplete-search'
-import './datepicker'
-import './confirmation'
-import './messages'
-import './search'
-import './autosumbit'
+import './accessibility';
+import './autocomplete';
+import './autocomplete-search';
+import './autosumbit';
+import './anchor-menu';
+import './ckeditor/';
+import './confirmation';
+import './datepicker';
+import './map';
+import './messages';
+import './search';
+import './toggle';
