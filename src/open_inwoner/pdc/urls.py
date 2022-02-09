@@ -8,7 +8,7 @@ app_name = "pdc"
 urlpatterns = [
     path("themas/", CategoryListView.as_view(), name="category_list"),
     re_path(
-        r"^themas/(?P<theme_slug>[\w\-\/]+)/products/<str:slug>/$",
+        r"^themas/(?P<theme_slug>[\w\-\/]+)/products/(?P<slug>[\w\-]+)/$",
         ProductDetailView.as_view(),
         name="category_product_detail",
     ),

@@ -1,4 +1,4 @@
-{% load card_tags %}
+{% load card_tags helpers %}
 <div class="card-container{% if columns %} card-container--columns-{{columns}}{% endif %}{% if small %} card-container--small{% endif %}">
     {% if categories %}
         {% for category in categories %}
@@ -15,7 +15,8 @@
 
     {% if products %}
         {% for product in products %}
-            {% description_card title=product.name description=product.summary url=product.get_absolute_url %}
+            {% get_product_url product as product_url %}
+            {% description_card title=product.name description=product.summary url=product_url %}
         {% endfor %}
     {% endif %}
 

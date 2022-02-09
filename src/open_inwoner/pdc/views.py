@@ -12,6 +12,38 @@ from open_inwoner.utils.views import CustomDetailBreadcrumbMixin
 from .models import Category, Product, ProductLocation
 
 
+class CategoryBreadcrumbMixin:
+    def get_orderd_categories(self):
+        slug = self.kwargs.get("theme_slug", self.kwargs.get("slug", ""))
+        slugs = slug.split("/")
+        categories = []
+        older_slugs = ""
+        for sl in slugs:
+            categories.append(
+                {
+                    "slug": sl,
+                    "build_slug": f"{older_slugs}/{sl}" if older_slugs else sl,
+                    "category": Category.objects.get(slug=sl),
+                }
+            )
+            if older_slugs:
+                older_slugs = f"{older_slugs}/{sl}"
+            else:
+                older_slugs = sl
+        return categories
+
+    def get_categories_breadcrumbs(self):
+        return [
+            (
+                category.get("category").name,
+                reverse(
+                    "pdc:category_detail", kwargs={"slug": category.get("build_slug")}
+                ),
+            )
+            for category in self.get_orderd_categories()
+        ]
+
+
 class HomeView(TemplateView):
     template_name = "pages/home.html"
 
@@ -42,45 +74,15 @@ class CategoryListView(ListBreadcrumbMixin, ListView):
         return [(_("Categories"), reverse("pdc:category_list"))]
 
 
-class CategoryDetailView(BaseBreadcrumbMixin, DetailView):
+class CategoryDetailView(BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView):
     template_name = "pages/category/detail.html"
     model = Category
     breadcrumb_use_pk = False
 
     @cached_property
     def crumbs(self):
-        base_list = [
-            (_("Thema's"), reverse("pdc:category_list")),
-        ]
-
-        return base_list + [
-            (
-                category.get("category").name,
-                reverse(
-                    "pdc:category_detail", kwargs={"slug": category.get("build_slug")}
-                ),
-            )
-            for category in self.get_orderd_categories()
-        ]
-
-    def get_orderd_categories(self):
-        slug = self.kwargs.get("slug", "")
-        slugs = slug.split("/")
-        categories = []
-        older_slugs = ""
-        for sl in slugs:
-            categories.append(
-                {
-                    "slug": sl,
-                    "build_slug": f"{older_slugs}/{sl}" if older_slugs else sl,
-                    "category": Category.objects.get(slug=sl),
-                }
-            )
-            if older_slugs:
-                older_slugs = f"{older_slugs}/{sl}"
-            else:
-                older_slugs = sl
-        return categories
+        base_list = [(_("Thema's"), reverse("pdc:category_list"))]
+        return base_list + self.get_categories_breadcrumbs()
 
     def get_object(self, queryset=None):
         if queryset is None:
@@ -109,11 +111,14 @@ class CategoryDetailView(BaseBreadcrumbMixin, DetailView):
         return self.object.name
 
 
-class ProductDetailView(CustomDetailBreadcrumbMixin, DetailView):
+class ProductDetailView(BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView):
     template_name = "pages/product/detail.html"
     model = Product
     breadcrumb_use_pk = False
     no_list = True
 
-    def get_breadcrumb_name(self):
-        return self.object.name
+    @cached_property
+    def crumbs(self):
+        base_list = [(_("Thema's"), reverse("pdc:category_list"))]
+        base_list += self.get_categories_breadcrumbs()
+        return base_list + [(self.get_object().name, self.request.path)]
