@@ -49,8 +49,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(
         verbose_name=_("Date joined"), default=timezone.now
     )
-    rsin = models.CharField(max_length=9, null=True, blank=True)
-    bsn = NLBSNField(null=True, blank=True)
+    rsin = models.CharField(verbose_name=_("Rsin"), max_length=9, null=True, blank=True)
+    bsn = NLBSNField(verbose_name=_("Bsn"), null=True, blank=True)
     login_type = models.CharField(
         verbose_name=_("Login type"),
         choices=LoginTypeChoices.choices,
