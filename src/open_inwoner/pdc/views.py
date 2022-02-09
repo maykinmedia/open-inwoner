@@ -13,26 +13,27 @@ from .models import Category, Product, ProductLocation
 
 
 class CategoryBreadcrumbMixin:
-    def get_orderd_categories(self):
-        slug = self.kwargs.get("theme_slug", self.kwargs.get("slug", ""))
+    def get_orderd_categories(self, slug_name="slug"):
+        slug = self.kwargs.get(slug_name, "")
         slugs = slug.split("/")
         categories = []
         older_slugs = ""
         for sl in slugs:
-            categories.append(
-                {
-                    "slug": sl,
-                    "build_slug": f"{older_slugs}/{sl}" if older_slugs else sl,
-                    "category": Category.objects.get(slug=sl),
-                }
-            )
-            if older_slugs:
-                older_slugs = f"{older_slugs}/{sl}"
-            else:
-                older_slugs = sl
+            if sl:
+                categories.append(
+                    {
+                        "slug": sl,
+                        "build_slug": f"{older_slugs}/{sl}" if older_slugs else sl,
+                        "category": Category.objects.get(slug=sl),
+                    }
+                )
+                if older_slugs:
+                    older_slugs = f"{older_slugs}/{sl}"
+                else:
+                    older_slugs = sl
         return categories
 
-    def get_categories_breadcrumbs(self):
+    def get_categories_breadcrumbs(self, slug_name="slug"):
         return [
             (
                 category.get("category").name,
@@ -40,7 +41,7 @@ class CategoryBreadcrumbMixin:
                     "pdc:category_detail", kwargs={"slug": category.get("build_slug")}
                 ),
             )
-            for category in self.get_orderd_categories()
+            for category in self.get_orderd_categories(slug_name=slug_name)
         ]
 
 
@@ -120,5 +121,5 @@ class ProductDetailView(BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView
     @cached_property
     def crumbs(self):
         base_list = [(_("Thema's"), reverse("pdc:category_list"))]
-        base_list += self.get_categories_breadcrumbs()
+        base_list += self.get_categories_breadcrumbs(slug_name="theme_slug")
         return base_list + [(self.get_object().name, self.request.path)]
