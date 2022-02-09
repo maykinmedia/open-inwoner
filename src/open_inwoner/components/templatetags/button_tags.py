@@ -51,6 +51,7 @@ def button(**kwargs):
         - primary: bool | If the primary colors should be used.
         - secondary: bool | If the secondary colors should be used.
         - transparent: bool | If the button does not have a background or border.
+        - disabled: bool: If the button is disabled.
         - icon: string | the icon that you want to display.
         - icon_position: enum[before, after] | where the icon should be positioned to the text.
         - icon_outlined: bool | if the outlined icons should be used.
@@ -92,6 +93,9 @@ def button(**kwargs):
 
         if kwargs.get("transparent"):
             classnames += " button--transparent"
+
+        if kwargs.get("disabled"):
+            classnames += " button--disabled"
 
         return classnames
 
