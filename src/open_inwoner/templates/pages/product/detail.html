@@ -138,7 +138,7 @@
                             {% endrender_column %}
 
                             {% render_column start=7 span=6 %}
-                                {% link href='tel://'|add:product_contact.phonenumber text=product_contact.phonenumber primary=True %}
+                                {% link href='tel:'|add:product_contact.phonenumber text=product_contact.phonenumber primary=True %}
                             {% endrender_column %}
 
                             {% render_column span=6 %}
@@ -146,7 +146,7 @@
                             {% endrender_column %}
 
                             {% render_column start=7 span=6 %}
-                                {% link href='mailto://'|add:product_contact.email text=product_contact.email primary=True %}
+                                {% link href='mailto:'|add:product_contact.email text=product_contact.email primary=True %}
                             {% endrender_column %}
                         {% endrender_grid %}
                     {% endfor %}

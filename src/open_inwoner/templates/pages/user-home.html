@@ -1,33 +1,40 @@
 {% extends 'master.html' %}
-{% load i18n button_tags card_tags utils notification_tags icon_tags %}
+{% load i18n button_tags card_tags utils map_tags icon_tags %}
 
 
 {% block content %}
-<h1 class="h1">{{ configurable_text.home_page.home_welcome_title }} {{ request.user.get_full_name }}</h1>
-<p class="p">{{ configurable_text.home_page.home_welcome_intro|linebreaksbr }}</p>
+    <h1 class="h1">{{ configurable_text.home_page.home_welcome_title }} {{ request.user.get_full_name }}</h1>
+    <p class="p">{{ configurable_text.home_page.home_welcome_intro|linebreaksbr }}</p>
 
-{% notification type="warning" inline=True title="Vergeet niet om je verzoek tot kwijtschelding op te sturen" message="(voorbeeldmelding) Je verzoek met bewijs hebben wij voor 30 september nodig om het kwijtschelden van je gemeentelijke belastingen te kunnen behandelen." action="#" action_text="Verzoek opsturen" %}
+    <h2 class="h2 h2--extra">
+        Samenwerken
+        {% button href="plans:plan_list" text=_("Naar samenwerken") icon="arrow_forward" icon_position="after" %}
+    </h2>
 
-<h2 class="h2 h2--extra">
-    Samenwerken
-    {% button href="plans:plan_list" text=_("Naar samenwerken") icon="arrow_forward" icon_position="after" %}
-</h2>
+    <div class="card-container card-container--columns-3">
+        {% for plan in plans %}
+            {% render_card %}
+                <h3 class="h3">{{ plan.title }}</h3>
+                <p class="p">{{ plan.goal|truncatewords:20 }}</p>
+                <a class="button button--icon-before button--transparent button--secondary"
+                   href="{{ plan.get_absolute_url }}">
+                    {% icon icon="arrow_forward" %}
+                </a>
+            {% endrender_card %}
+        {% endfor %}
+    </div>
 
-<div class="card-container card-container--columns-3">
-    {% for plan in plans %}
-        {% render_card %}
-            <h3 class="h3">{{ plan.title }}</h3>
-            <p class="p">{{ plan.goal|truncatewords:20 }}</p>
-            <a class="button button--icon-before button--transparent button--secondary" href="{{ plan.get_absolute_url }}">
-                {% icon icon="arrow_forward" %}
-            </a>
-        {% endrender_card %}
-    {% endfor %}
-</div>
+    <h2 class="h2 h2--extra">
+        {{ configurable_text.home_page.home_theme_title }}
+        {% button href="pdc:category_list" text=_("Alle thema's") icon="arrow_forward" icon_position="after" %}
+    </h2>
+    {% card_container categories=categories columns=3 %}
 
-<h2 class="h2 h2--extra">
-    {{ configurable_text.home_page.home_theme_title }}
-    {% button href="pdc:category_list" text=_("Alle thema's") icon="arrow_forward" icon_position="after" %}
-</h2>
-{% card_container categories=categories columns=3 %}
+
+    <h2 class="h2 h2--extra">{{configurable_text.home_page.home_map_title}}</h2>
+    <p class="p">{{configurable_text.home_page.home_map_intro|linebreaksbr}}</p>
+
+    {% with centroid=product_locations.get_centroid %}
+        {% map centroid.lat centroid.lng geojson_feature_collection=product_locations.get_geojson_feature_collection %}
+    {% endwith %}
 {% endblock %}
