@@ -9,13 +9,12 @@ class Dropdown {
   toggleOpen(event) {
     event.stopPropagation()
     event.preventDefault()
-    this.node.classList.toggle("dropdown--open")
+    this.node.classList.toggle('dropdown--open')
   }
 
   doClosing(event) {
-    this.node.classList.remove("dropdown--open")
+    this.node.classList.remove('dropdown--open')
   }
-
 }
 
 const dropdowns = document.querySelectorAll('.dropdown')
