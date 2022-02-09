@@ -110,7 +110,7 @@ class ActionCreateView(LoginRequiredMixin, BaseBreadcrumbMixin, CreateView):
             (_("Mijn acties"), reverse("accounts:action_list")),
             (
                 _("Maak actie aan"),
-                reverse("accounts:action_create", kwargs=self.kwargs),
+                reverse("accounts:action_create"),
             ),
         ]
 

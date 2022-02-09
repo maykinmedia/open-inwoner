@@ -1,14 +1,12 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404, HttpResponseRedirect
+from django.urls.base import reverse
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
-from view_breadcrumbs import (
-    CreateBreadcrumbMixin,
-    DetailBreadcrumbMixin,
-    ListBreadcrumbMixin,
-)
+from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.accounts.forms import ActionListForm, DocumentForm
 from open_inwoner.accounts.views.actions import (
@@ -21,22 +19,35 @@ from .forms import PlanForm, PlanGoalForm
 from .models import Plan
 
 
-class PlanListView(LoginRequiredMixin, ListBreadcrumbMixin, ListView):
+class PlanListView(LoginRequiredMixin, BaseBreadcrumbMixin, ListView):
     template_name = "pages/plans/list.html"
     model = Plan
+
+    @cached_property
+    def crumbs(self):
+        return [
+            (_("Samenwerkingsplannen"), reverse("plans:plan_list")),
+        ]
 
     def get_queryset(self):
         return Plan.objects.connected(self.request.user)
 
 
 class PlanDetailView(
-    LoginRequiredMixin, DetailBreadcrumbMixin, BaseActionFilter, DetailView
+    LoginRequiredMixin, BaseBreadcrumbMixin, BaseActionFilter, DetailView
 ):
     template_name = "pages/plans/detail.html"
     model = Plan
     slug_field = "uuid"
     slug_url_kwarg = "uuid"
     breadcrumb_use_pk = False
+
+    @cached_property
+    def crumbs(self):
+        return [
+            (_("Samenwerkingsplannen"), reverse("plans:plan_list")),
+            (self.get_object().title, reverse("plans:plan_detail", kwargs=self.kwargs)),
+        ]
 
     def get_queryset(self):
         return Plan.objects.connected(self.request.user)
@@ -51,10 +62,17 @@ class PlanDetailView(
         return context
 
 
-class PlanCreateView(LoginRequiredMixin, CreateView):
+class PlanCreateView(LoginRequiredMixin, BaseBreadcrumbMixin, CreateView):
     template_name = "pages/plans/create.html"
     model = Plan
     form_class = PlanForm
+
+    @cached_property
+    def crumbs(self):
+        return [
+            (_("Samenwerkingsplannen"), reverse("plans:plan_list")),
+            (_("Maak samenwerkingsplan aan"), reverse("plans:plan_create")),
+        ]
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -69,13 +87,21 @@ class PlanCreateView(LoginRequiredMixin, CreateView):
         return self.object.get_absolute_url()
 
 
-class PlanEditView(LoginRequiredMixin, UpdateView):
+class PlanEditView(LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
     template_name = "pages/plans/create.html"
     model = Plan
     slug_field = "uuid"
     slug_url_kwarg = "uuid"
     form_class = PlanForm
 
+    @cached_property
+    def crumbs(self):
+        return [
+            (_("Samenwerkingsplannen"), reverse("plans:plan_list")),
+            (self.get_object().title, reverse("plans:plan_detail", kwargs=self.kwargs)),
+            (_("Bewerken"), reverse("plans:plan_edit", kwargs=self.kwargs)),
+        ]
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs.update(user=self.request.user)
@@ -89,13 +115,21 @@ class PlanEditView(LoginRequiredMixin, UpdateView):
         return self.object.get_absolute_url()
 
 
-class PlanGoalEditView(LoginRequiredMixin, UpdateView):
+class PlanGoalEditView(LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
     template_name = "pages/plans/goal_edit.html"
     model = Plan
     slug_field = "uuid"
     slug_url_kwarg = "uuid"
     form_class = PlanGoalForm
     breadcrumb_use_pk = False
+
+    @cached_property
+    def crumbs(self):
+        return [
+            (_("Samenwerkingsplannen"), reverse("plans:plan_list")),
+            (self.get_object().title, reverse("plans:plan_detail", kwargs=self.kwargs)),
+            (_("Doel bewerken"), reverse("plans:plan_edit_goal", kwargs=self.kwargs)),
+        ]
 
     def get_queryset(self):
         return Plan.objects.connected(self.request.user)
@@ -108,12 +142,23 @@ class PlanGoalEditView(LoginRequiredMixin, UpdateView):
         return self.object.get_absolute_url()
 
 
-class PlanFileUploadView(LoginRequiredMixin, UpdateView):
+class PlanFileUploadView(LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
     template_name = "pages/plans/file.html"
     model = Plan
     slug_field = "uuid"
     slug_url_kwarg = "uuid"
     form_class = DocumentForm
+
+    @cached_property
+    def crumbs(self):
+        return [
+            (_("Samenwerkingsplannen"), reverse("plans:plan_list")),
+            (self.get_object().title, reverse("plans:plan_detail", kwargs=self.kwargs)),
+            (
+                _("Nieuw bestand uploaden"),
+                reverse("plans:plan_add_file", kwargs=self.kwargs),
+            ),
+        ]
 
     def get_queryset(self):
         return Plan.objects.connected(self.request.user)
@@ -134,6 +179,17 @@ class PlanFileUploadView(LoginRequiredMixin, UpdateView):
 
 class PlanActionCreateView(ActionCreateView):
     model = Plan
+
+    @cached_property
+    def crumbs(self):
+        return [
+            (_("Samenwerkingsplannen"), reverse("plans:plan_list")),
+            (self.get_object().title, reverse("plans:plan_detail", kwargs=self.kwargs)),
+            (
+                _("Maak actie aan"),
+                reverse("plans:plan_action_create", kwargs=self.kwargs),
+            ),
+        ]
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -165,6 +221,20 @@ class PlanActionCreateView(ActionCreateView):
 
 
 class PlanActionEditView(ActionUpdateView):
+    @cached_property
+    def crumbs(self):
+        return [
+            (_("Samenwerkingsplannen"), reverse("plans:plan_list")),
+            (
+                self.get_plan().title,
+                reverse("plans:plan_detail", kwargs={"uuid": self.get_plan().uuid}),
+            ),
+            (
+                _("Bewerk {}").format(self.object.name),
+                reverse("plans:plan_action_edit", kwargs=self.kwargs),
+            ),
+        ]
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs.update(plan=self.get_plan())
