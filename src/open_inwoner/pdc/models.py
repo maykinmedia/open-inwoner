@@ -1,3 +1,5 @@
+from unicodedata import category
+
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.urls import reverse
@@ -53,8 +55,18 @@ class Category(MP_Node):
     def __str__(self):
         return self.name
 
+    def get_build_slug(self):
+        if self.is_root():
+            build_slug = self.slug
+        else:
+            build_slug = "/".join(
+                list(self.get_ancestors().values_list("slug", flat=True))
+            )
+            build_slug += f"/{self.slug}"
+        return build_slug
+
     def get_absolute_url(self):
-        return reverse("pdc:category_detail", kwargs={"slug": self.slug})
+        return reverse("pdc:category_detail", kwargs={"slug": self.get_build_slug()})
 
 
 class Product(models.Model):
@@ -148,8 +160,15 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
-    def get_absolute_url(self):
-        return reverse("pdc:product_detail", kwargs={"slug": self.slug})
+    def get_absolute_url(self, category=None):
+        if not category:
+            return reverse("pdc:product_detail", kwargs={"slug": self.slug})
+
+        category_slug = category.get_build_slug()
+        return reverse(
+            "pdc:category_product_detail",
+            kwargs={"slug": self.slug, "theme_slug": category_slug},
+        )
 
     def get_rendered_content(self):
         md = markdown.Markdown(extensions=["tables"])

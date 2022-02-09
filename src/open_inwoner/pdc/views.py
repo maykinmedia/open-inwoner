@@ -1,9 +1,10 @@
+from django.http import Http404
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DetailView, ListView, TemplateView
 
-from view_breadcrumbs import ListBreadcrumbMixin
+from view_breadcrumbs import BaseBreadcrumbMixin, ListBreadcrumbMixin
 
 from open_inwoner.plans.models import Plan
 from open_inwoner.utils.views import CustomDetailBreadcrumbMixin
@@ -41,10 +42,62 @@ class CategoryListView(ListBreadcrumbMixin, ListView):
         return [(_("Categories"), reverse("pdc:category_list"))]
 
 
-class CategoryDetailView(CustomDetailBreadcrumbMixin, DetailView):
+class CategoryDetailView(BaseBreadcrumbMixin, DetailView):
     template_name = "pages/category/detail.html"
     model = Category
     breadcrumb_use_pk = False
+
+    @cached_property
+    def crumbs(self):
+        base_list = [
+            (_("Thema's"), reverse("pdc:category_list")),
+        ]
+
+        return base_list + [
+            (
+                category.get("category").name,
+                reverse(
+                    "pdc:category_detail", kwargs={"slug": category.get("build_slug")}
+                ),
+            )
+            for category in self.get_orderd_categories()
+        ]
+
+    def get_orderd_categories(self):
+        slug = self.kwargs.get("slug", "")
+        slugs = slug.split("/")
+        categories = []
+        older_slugs = ""
+        for sl in slugs:
+            categories.append(
+                {
+                    "slug": sl,
+                    "build_slug": f"{older_slugs}/{sl}" if older_slugs else sl,
+                    "category": Category.objects.get(slug=sl),
+                }
+            )
+            if older_slugs:
+                older_slugs = f"{older_slugs}/{sl}"
+            else:
+                older_slugs = sl
+        return categories
+
+    def get_object(self, queryset=None):
+        if queryset is None:
+            queryset = self.get_queryset()
+
+        slug = self.kwargs.get("slug", "")
+        slugs = slug.split("/")
+        queryset = queryset.filter(slug=slugs[-1])
+        try:
+            obj = queryset.get()
+        except queryset.model.DoesNotExist:
+            raise Http404(
+                _("No %(verbose_name)s found matching the query")
+                % {"verbose_name": queryset.model._meta.verbose_name}
+            )
+
+        return obj
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
