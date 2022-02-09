@@ -11,7 +11,11 @@ from view_breadcrumbs import (
 )
 
 from open_inwoner.accounts.forms import ActionListForm, DocumentForm
-from open_inwoner.accounts.views.actions import ActionCreateView, BaseActionFilter
+from open_inwoner.accounts.views.actions import (
+    ActionCreateView,
+    ActionUpdateView,
+    BaseActionFilter,
+)
 
 from .forms import PlanForm, PlanGoalForm
 from .models import Plan
@@ -131,6 +135,11 @@ class PlanFileUploadView(LoginRequiredMixin, UpdateView):
 class PlanActionCreateView(ActionCreateView):
     model = Plan
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update(plan=self.get_object())
+        return kwargs
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         plan = self.get_object()
@@ -148,6 +157,36 @@ class PlanActionCreateView(ActionCreateView):
 
     def form_valid(self, form):
         self.object = self.get_object()
+        form.save(self.request.user, plan=self.object)
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self) -> str:
+        return self.object.get_absolute_url()
+
+
+class PlanActionEditView(ActionUpdateView):
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update(plan=self.get_plan())
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        plan = self.get_plan()
+        context["plan"] = plan
+        context["object"] = plan
+        return context
+
+    def get_plan(self):
+        try:
+            return Plan.objects.connected(self.request.user).get(
+                uuid=self.kwargs.get("plan_uuid")
+            )
+        except ObjectDoesNotExist as e:
+            raise Http404
+
+    def form_valid(self, form):
+        self.object = self.get_plan()
         form.save(self.request.user, plan=self.object)
         return HttpResponseRedirect(self.get_success_url())
 

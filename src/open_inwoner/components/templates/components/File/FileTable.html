@@ -9,7 +9,7 @@
     </tr>
     {% for file in files %}
         <tr>
-            <td class="table__item">{{ file.file }}</td>
+            <td class="table__item">{{ file.name }}</td>
             <td class="table__item">{{ file.owner.get_full_name }}</td>
             <td class="table__item">{{ file.created_on }}</td>
             <td class="table__item">{% link icon="download" href=file.file.url download=True %}</td>

@@ -34,7 +34,7 @@ class ActionListView(LoginRequiredMixin, BaseActionFilter, ListView):
 
     def get_queryset(self):
         base_qs = super().get_queryset()
-        return base_qs.filter(is_for=self.request.user).select_related("created_by")
+        return base_qs.connected(user=self.request.user).select_related("created_by")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -61,7 +61,7 @@ class ActionUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_queryset(self):
         base_qs = super().get_queryset()
-        return base_qs.filter(is_for=self.request.user)
+        return base_qs.connected(user=self.request.user)
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
