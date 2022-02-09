@@ -84,3 +84,10 @@ class MessageQuerySet(QuerySet):
             )
             .order_by("-created_on")
         )
+
+    def mark_seen(self, me, other_user) -> int:
+        """
+        Mark messages as seen between two users.
+        Returns the number of updated messages.
+        """
+        return self.filter(receiver=me, sender=other_user, seen=False).update(seen=True)

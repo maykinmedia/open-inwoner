@@ -15,6 +15,7 @@
             <td class="table__item">{% trans "Soort contact" %}</td>
             <td class="table__item">{% trans "E-mailadres" %}</td>
             <td class="table__item">{% trans "Telefoonnummer" %}</td>
+            <td class="table__item" colspan="2">{% trans "Actief" %}&nbsp;</td>
             <td class="table__item">&nbsp;</td>
         </tr>
     </thead>
@@ -25,6 +26,8 @@
                 <td class="table__item">{{ contact.get_type_display }}</td>
                 <td class="table__item">{{ contact.email }}</td>
                 <td class="table__item">{{ contact.phonenumber }}</td>
+                <td class="table__item">{% if contact.is_not_active %}{% icon "check" extra_classes="icon icon--disabled" %}{% else %}{% icon "check" %}{% endif %}</td>
+                <td class="table__item">{% button text=_('Stuur bericht') icon="message" icon_position="before" href=contact.get_message_url icon_outlined=True transparent=True disabled=contact.is_not_active %}</td>
                 <td class="table__item">{% button icon="settings" href="accounts:contact_edit" uuid=contact.uuid icon_outlined=True transparent=True %}</td>
             </tr>
         {% endfor %}
