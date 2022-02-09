@@ -1,4 +1,5 @@
 {% load card_tags icon_tags link_tags %}
+
 {% render_card title=category href=category.get_absolute_url %}
     {% for product in category.products.all %}
         {% url 'pdc:product_detail' slug=product.slug as product_url %}
