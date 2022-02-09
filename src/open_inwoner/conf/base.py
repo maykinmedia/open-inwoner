@@ -557,7 +557,7 @@ MAIL_EDITOR_CONF = {
         "body_default": """
             <p>Beste</p>
 
-            <p> Je bent door {{ inviter_name}} uitgenodigd om in te loggen op {{ site_name }}.
+            <p>Je bent door {{ inviter_name}} uitgenodigd om in te loggen op {{ site_name }}.
             Gebruik onderstaande link om je aan te melden </p>
 
             <p><a href="{{ invite_link }}">aanmelden</a> </p>
@@ -589,7 +589,48 @@ MAIL_EDITOR_CONF = {
             },
             {"name": "email", "description": _noop("Email of the invited user")},
         ],
-    }
+    },
+    "new_messages": {
+        "name": _noop("New Message Email"),
+        "description": _noop(
+            "This email is used to inform users about the new messages in their inbox"
+        ),
+        "subject_default": "New messages at {{ site_name }}",
+        "body_default": """
+           <p>Beste</p>
+
+           <p>You've received {{ total_messages }} new messages from {{ total_senders }} users</p>
+
+           <p><a href="{{ inbox_link }}">Go to the inbox</a> </p>
+
+           <p>Met vriendelijke groet,
+           {{ site_name }} </p>
+       """,
+        "subject": [
+            {
+                "name": "site_name",
+                "description": _noop("Name of the site."),
+            },
+        ],
+        "body": [
+            {
+                "name": "total_messages",
+                "description": _noop("Number of the new messages"),
+            },
+            {
+                "name": "total_senders",
+                "description": _noop("Number of the senders"),
+            },
+            {
+                "name": "site_name",
+                "description": _noop("Name of the site"),
+            },
+            {
+                "name": "inbox_link",
+                "description": _noop("Link to see the conversation."),
+            },
+        ],
+    },
 }
 MAIL_EDITOR_BASE_CONTEXT = {"site_name": "Open Inwoner Platform"}
 CKEDITOR_CONFIGS = {
@@ -603,6 +644,9 @@ CKEDITOR_CONFIGS = {
 
 # invite expires in X days after sending
 INVITE_EXPIRY = 14
+# send email about new messages during this interval after the message creation
+NEW_MESSAGE_INTERVAL_MINUTES = 15
+
 
 # zgw-consumers
 ZGW_CONSUMERS_TEST_SCHEMA_DIRS = [
