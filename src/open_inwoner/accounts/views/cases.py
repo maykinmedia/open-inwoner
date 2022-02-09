@@ -1,4 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -17,13 +18,18 @@ class CasesListView(BaseBreadcrumbMixin, LoginRequiredMixin, TemplateView):
     def crumbs(self):
         return [(_("Mijn aanvragen"), reverse("accounts:my_cases"))]
 
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return self.handle_no_permission()
+        if self.request.user.bsn is None:
+            return redirect("root")
+
+        return super().dispatch(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        user_bsn = self.request.user.bsn
-        if user_bsn is None:
-            return context
 
-        cases = fetch_cases(user_bsn)
+        cases = fetch_cases(self.request.user.bsn)
 
         context["open_cases"] = [case for case in cases if not case.einddatum]
         context["open_cases"].sort(key=lambda case: case.startdatum, reverse=True)
@@ -46,10 +52,16 @@ class CasesStatusView(BaseBreadcrumbMixin, LoginRequiredMixin, TemplateView):
             ),
         ]
 
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return self.handle_no_permission()
+        if self.request.user.bsn is None:
+            return redirect("root")
+
+        return super().dispatch(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.request.user.bsn is None:
-            return context
 
         case_uuid = context["object_id"]
         case = fetch_specific_case(case_uuid)

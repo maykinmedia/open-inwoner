@@ -86,7 +86,7 @@ class TestListCasesView(WebTest):
             [f"{ZAKEN_ROOT}zaken/6f8de38f-85ea-42d3-978c-845a033335a7"],
         )
 
-    def test_no_cases_are_retrieved_when_user_not_logged_in_via_digid(self, m):
+    def test_user_is_redirected_to_root_when_not_logged_in_via_digid(self, m):
         self._setUpMocks(m)
 
         # User's bsn is None when logged in by email (default method)
@@ -97,8 +97,7 @@ class TestListCasesView(WebTest):
         )
         response = self.app.get(reverse("accounts:my_cases"), user=user)
 
-        self.assertIsNone(response.context.get("open_cases"))
-        self.assertIsNone(response.context.get("closed_cases"))
+        self.assertRedirects(response, reverse("root"))
 
     def test_anonymous_user_has_no_access_to_cases_page(self, m):
         user = AnonymousUser()

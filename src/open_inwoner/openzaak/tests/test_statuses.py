@@ -133,7 +133,7 @@ class TestListStatusView(WebTest):
             ],
         )
 
-    def test_status_is_not_retrieved_when_user_not_logged_in_via_digid(self, m):
+    def test_user_is_redirected_to_root_when_not_logged_in_via_digid(self, m):
         self._setUpMocks(m)
 
         user = UserFactory(
@@ -150,7 +150,7 @@ class TestListStatusView(WebTest):
             user=user,
         )
 
-        self.assertIsNone(response.context.get("statuses"))
+        self.assertRedirects(response, reverse("root"))
 
     def test_anonymous_user_has_no_access_to_status_page(self, m):
         self._setUpMocks(m)
