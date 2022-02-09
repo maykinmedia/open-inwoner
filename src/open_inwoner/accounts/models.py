@@ -125,6 +125,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_active_contacts(self):
         return self.contacts.filter(contact_user__is_active=True)
 
+    def get_new_messages_total(self) -> int:
+        return self.received_messages.filter(seen=False).count()
+
 
 class Contact(models.Model):
     uuid = models.UUIDField(

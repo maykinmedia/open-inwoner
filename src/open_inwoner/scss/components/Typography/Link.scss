@@ -67,3 +67,7 @@
     transform: scale(0.75);
   }
 }
+
+.link + .link {
+  margin-left: var(--spacing-small);
+}
