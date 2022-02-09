@@ -22,13 +22,13 @@
     <tbody>
         {% for contact in contact_list %}
             <tr>
-                <th class="table__header">{{ contact.get_name }}</th>
+                <th class="table__header">{{ contact.other_user_first_name }} {{ contact.other_user_last_name }}</th>
                 <td class="table__item">{{ contact.get_type_display }}</td>
-                <td class="table__item">{{ contact.email }}</td>
-                <td class="table__item">{{ contact.phonenumber }}</td>
+                <td class="table__item">{{ contact.other_user_email }}</td>
+                <td class="table__item">{{ contact.other_user_phonenumber }}</td>
                 <td class="table__item">{% if contact.is_not_active %}{% icon "check" extra_classes="icon icon--disabled" %}{% else %}{% icon "check" %}{% endif %}</td>
                 <td class="table__item">{% button text=_('Stuur bericht') icon="message" icon_position="before" href=contact.get_message_url icon_outlined=True transparent=True disabled=contact.is_not_active %}</td>
-                <td class="table__item">{% button icon="settings" href="accounts:contact_edit" uuid=contact.uuid icon_outlined=True transparent=True %}</td>
+                <td class="table__item">{% button icon="settings" href="accounts:contact_edit" uuid=contact.uuid icon_outlined=True transparent=True disabled=contact.reverse %}</td>
             </tr>
         {% endfor %}
     </tbody>
