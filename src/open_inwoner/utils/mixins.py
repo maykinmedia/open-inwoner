@@ -11,7 +11,6 @@ from django.utils.translation import gettext as _
 class ThrottleMixin:
     """
     A very simple throttling implementation with, hopefully, sane defaults.
-
     You can specifiy the amount of visits (throttle_visits) a view can get,
     for a specific period (in seconds) throttle_period.
     """
