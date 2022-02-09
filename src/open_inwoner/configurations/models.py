@@ -238,7 +238,7 @@ class SiteConfiguration(SingletonModel):
         verbose_name=_("Show cases"),
         default=False,
         help_text=_(
-            "By default the cases are not shown. If the OpenZaak integration is configured this can be set to True."
+            "By default the cases are not shown. If the OpenZaak integration is configured this needs to be set to True."
         ),
     )
 
