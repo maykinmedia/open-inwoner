@@ -2,6 +2,7 @@ from django.core import mail
 from django.urls import reverse
 
 from django_webtest import WebTest
+from furl import furl
 
 from .factories import ContactFactory, UserFactory
 
@@ -34,6 +35,13 @@ class ContactViewTests(WebTest):
         response = self.app.get(self.list_url, user=other_user)
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, self.contact.first_name)
+
+    def test_contact_list_show_link_to_messages(self):
+        message_link = (
+            furl(reverse("accounts:inbox")).add({"with": self.contact.email}).url
+        )
+        response = self.app.get(self.list_url, user=self.user)
+        self.assertContains(response, message_link)
 
     def test_contact_edit_login_required(self):
         response = self.app.get(self.edit_url)

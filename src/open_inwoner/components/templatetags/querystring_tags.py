@@ -21,7 +21,7 @@ def querystring(context, *query_values, key="", value="", query=""):
     Variables:
         - key: str | The name of the item to add to the querystring.
         - value: str | The value of the item to add to the querystring.
-        - query: str | A template string (str.format()) to to apply positional arguments for.
+        - query: str | A template string (str.format()) to apply positional arguments for.
     """
     request = context["request"]
     method = request.method
