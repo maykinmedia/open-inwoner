@@ -103,16 +103,29 @@ class ActionForm(forms.ModelForm):
             "goal",
         )
 
-    def __init__(self, user, *args, **kwargs):
+    def __init__(self, user, plan=None, *args, **kwargs):
         self.user = user
+        self.plan = plan
         super().__init__(*args, **kwargs)
 
+        self.fields["is_for"].required = False
+        self.fields["is_for"].empty_label = _("Myself")
         self.fields["is_for"].queryset = User.objects.filter(
             assigned_contacts__in=self.user.contacts.all()
         )
 
+    def clean_end_date(self):
+        data = self.cleaned_data["end_date"]
+        if data and self.plan and data > self.plan.end_date:
+            self.add_error(
+                "end_date", _("The action can not end after the plan end date")
+            )
+        return data
+
     def save(self, user, plan=None, commit=True):
         self.instance.created_by = user
+        if not self.instance.is_for:
+            self.instance.is_for = user
         if plan:
             self.instance.plan = plan
         return super().save(commit=commit)

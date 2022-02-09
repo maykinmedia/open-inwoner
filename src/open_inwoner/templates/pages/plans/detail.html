@@ -54,7 +54,7 @@
         <div class="plan-contact__container">
             {% icon "person" outlined=True %}
             <p class="plan-contact__title">{% trans "Contactpersonen" %}</p>
-            <div class="plan-contact__grid plan-contact__grid--columns-{{ object.contacts.count }}">
+            <div class="plan-contact__grid plan-contact__grid--columns-{% if object.contacts.count > 1 %}2{% else %}1{% endif %}">
                 {% for contact in object.contacts.all %}
                     <div class="plan-contact__information">
                         <p class="plan-contact__info">{{ contact.get_name }}</p>
@@ -73,7 +73,7 @@
 
     <h2 class="h2" id="files">{% trans "Bestanden" %}</h2>
     {% if object.get_latest_file %}
-        {% file file=object.get_latest_file %}
+        {% file file=object.get_latest_file.file name=object.get_latest_file.name %}
 
         {% if object.get_other_files %}
             {% file_table files=object.get_other_files %}
@@ -82,7 +82,7 @@
     {% button href="plans:plan_add_file" uuid=object.uuid text=_("Upload nieuwe versie") primary=True %}
 
     <h2 class="h2" id="actions">{% trans "Acties" %}</h2>
-    {% actions actions=actions action_form=action_form form_action=request.path|add:"#actions" %}
+    {% actions actions=actions action_form=action_form form_action=request.path|add:"#actions" plan=plan %}
     {% button href="plans:plan_action_create" uuid=object.uuid text=_("Nieuw actie toevoegen") icon="date_range" primary=True %}
 </div>
 {% endblock %}

@@ -39,7 +39,7 @@ class Plan(models.Model):
     def get_latest_file(self):
         file = self.documents.order_by("-created_on").first()
         if file:
-            return file.file
+            return file
 
     def get_other_files(self):
         return self.documents.order_by("-created_on")[1:]
