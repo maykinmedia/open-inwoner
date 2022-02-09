@@ -25,6 +25,7 @@ class Plan(models.Model):
         "accounts.Contact",
         verbose_name=_("contacts"),
         related_name="plans",
+        blank=True,
         help_text=_("The contact that will help you with this plan."),
     )
     created_by = models.ForeignKey(
