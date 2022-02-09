@@ -11,6 +11,7 @@
         {% button href="plans:plan_list" text=_("Naar samenwerken") icon="arrow_forward" icon_position="after" %}
     </h2>
 
+    {% if plans %}
     <div class="card-container card-container--columns-3">
         {% for plan in plans %}
             {% render_card %}
@@ -23,6 +24,9 @@
             {% endrender_card %}
         {% endfor %}
     </div>
+    {% else %}
+        <p class="p">{% trans "U heeft nog geen plan gemaakt." %}</p>
+    {% endif %}
 
     <h2 class="h2 h2--extra">
         {{ configurable_text.home_page.home_theme_title }}
