@@ -644,6 +644,9 @@ CKEDITOR_CONFIGS = {
 
 # invite expires in X days after sending
 INVITE_EXPIRY = 14
+# send email about new messages during this interval after the message creation
+NEW_MESSAGE_INTERVAL_MINUTES = 15
+
 
 # zgw-consumers
 ZGW_CONSUMERS_TEST_SCHEMA_DIRS = [
