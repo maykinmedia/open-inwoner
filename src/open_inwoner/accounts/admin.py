@@ -9,6 +9,20 @@ from .models import Action, Appointment, Contact, Document, Invite, Message, Use
 class ActionInlineAdmin(admin.StackedInline):
     model = Action
     extra = 1
+    fields = (
+        "uuid",
+        "name",
+        "description",
+        "goal",
+        "status",
+        "type",
+        "end_date",
+        "file",
+        "is_for",
+        "created_by",
+        "plan",
+    )
+    readonly_fields = ("uuid",)
 
 
 @admin.register(User)
@@ -67,12 +81,38 @@ class _UserAdmin(UserAdmin):
 
 @admin.register(Action)
 class ActionAdmin(admin.ModelAdmin):
+    fields = (
+        "uuid",
+        "name",
+        "description",
+        "goal",
+        "status",
+        "type",
+        "end_date",
+        "file",
+        "is_for",
+        "created_by",
+        "plan",
+    )
+    readonly_fields = ("uuid",)
     list_display = ("name", "created_on", "created_by")
     list_filter = ("created_by",)
 
 
 @admin.register(Contact)
 class ContactAdmin(admin.ModelAdmin):
+    fields = (
+        "uuid",
+        "first_name",
+        "last_name",
+        "email",
+        "phonenumber",
+        "type",
+        "created_by",
+        "contact_user",
+        "function",
+    )
+    readonly_fields = ("uuid",)
     list_display = (
         "first_name",
         "last_name",
@@ -89,12 +129,27 @@ class ContactAdmin(admin.ModelAdmin):
 
 @admin.register(Document)
 class DocumentAdmin(admin.ModelAdmin):
+    fields = (
+        "uuid",
+        "name",
+        "file",
+        "owner",
+        "plan",
+    )
+    readonly_fields = ("uuid",)
     list_display = ("name", "file", "created_on", "owner")
     list_filter = ("owner",)
 
 
 @admin.register(Appointment)
 class AppointmentAdmin(admin.ModelAdmin):
+    fields = (
+        "uuid",
+        "name",
+        "datetime",
+        "created_by",
+    )
+    readonly_fields = ("uuid",)
     list_display = ("name", "datetime", "created_on", "created_by")
     list_filter = ("created_by",)
 
