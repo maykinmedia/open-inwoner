@@ -8,7 +8,7 @@ from .managers import PlanQuerySet
 
 
 class Plan(models.Model):
-    uuid = models.UUIDField(default=uuid4, unique=True)
+    uuid = models.UUIDField(verbose_name=_("uuid"), default=uuid4, unique=True)
     title = models.CharField(
         _("Title"), max_length=250, help_text=_("The title of the plan")
     )
@@ -30,8 +30,8 @@ class Plan(models.Model):
     created_by = models.ForeignKey(
         "accounts.User", verbose_name=_("created by"), on_delete=models.CASCADE
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(verbose_name=_("created at"), auto_now_add=True)
+    updated_at = models.DateTimeField(verbose_name=_("updated at"), auto_now=True)
 
     objects = PlanQuerySet.as_manager()
 

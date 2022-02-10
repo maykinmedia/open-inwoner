@@ -67,8 +67,12 @@ class Feedback(models.Model):
         null=True,
         on_delete=CASCADE,
         related_name="queries",
-        help_text="The logged in user who performed the search",
+        help_text=_("The logged in user who performed the search"),
     )
+
+    class Meta:
+        verbose_name = _("feedback")
+        verbose_name_plural = _("feedbacks")
 
     def __str__(self):
         return self.search_query

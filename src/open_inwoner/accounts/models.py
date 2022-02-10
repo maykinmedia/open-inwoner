@@ -237,6 +237,8 @@ class Contact(models.Model):
 
     class Meta:
         ordering = ("-updated_on", "-created_on")
+        verbose_name = _("contact")
+        verbose_name_plural = _("contacts")
 
     def __str__(self):
         return self.get_name()
@@ -290,16 +292,21 @@ class Document(models.Model):
         verbose_name=_("Owner"),
         on_delete=models.CASCADE,
         related_name="documents",
-        help_text="This is the user that created the document.",
+        help_text=_("This is the user that created the document."),
     )
     plan = models.ForeignKey(
         "plans.Plan",
+        verbose_name=_("Plan"),
         on_delete=models.CASCADE,
         null=True,
         blank=True,
         related_name="documents",
         help_text=_("The plan that the document belongs to. This can be left empty."),
     )
+
+    class Meta:
+        verbose_name = _("document")
+        verbose_name_plural = _("documents")
 
     def __str__(self):
         return self.name
@@ -337,7 +344,7 @@ class Appointment(models.Model):
         verbose_name=_("Created by"),
         on_delete=models.CASCADE,
         related_name="appointments",
-        help_text="The person that created the appointment.",
+        help_text=_("The person that created the appointment."),
     )
 
     class Meta:
@@ -368,7 +375,7 @@ class Action(models.Model):
         help_text=_("The description of the action"),
     )
     goal = models.CharField(
-        verbose_name=_("goal"),
+        verbose_name=_("Goal"),
         default="",
         blank=True,
         max_length=250,
@@ -399,7 +406,9 @@ class Action(models.Model):
         null=True,
         blank=True,
         storage=PrivateMediaFileSystemStorage(),
-        help_text="The document that is uploaded to the file",
+        help_text=_(
+            "The document that is uploaded to the file",
+        ),
     )
     is_for = models.ForeignKey(
         "accounts.User",
@@ -408,7 +417,7 @@ class Action(models.Model):
         verbose_name=_("Is for"),
         on_delete=models.CASCADE,
         related_name="actions",
-        help_text="The person that needs to do this action.",
+        help_text=_("The person that needs to do this action."),
     )
     created_on = models.DateTimeField(
         verbose_name=_("Created on"),
@@ -425,10 +434,11 @@ class Action(models.Model):
         verbose_name=_("Created by"),
         on_delete=models.CASCADE,
         related_name="created_actions",
-        help_text="The person that created the action.",
+        help_text=_("The person that created the action."),
     )
     plan = models.ForeignKey(
         "plans.Plan",
+        verbose_name=_("Plan"),
         on_delete=models.CASCADE,
         null=True,
         blank=True,
@@ -454,26 +464,30 @@ class Action(models.Model):
 class Message(models.Model):
     sender = models.ForeignKey(
         User,
+        verbose_name=_("Sender"),
         on_delete=models.CASCADE,
         related_name="sent_messages",
-        help_text=_("THe sender of the message"),
+        help_text=_("The sender of the message"),
     )
     receiver = models.ForeignKey(
         User,
+        verbose_name=_("Receiver"),
         on_delete=models.CASCADE,
         related_name="received_messages",
         help_text=_("The receiver of the message"),
     )
     created_on = models.DateTimeField(
-        _("Created on"),
+        verbose_name=_("Created on"),
         auto_now_add=True,
         help_text=_("This is the date the message was created"),
     )
-    content = models.TextField(_("Content"), help_text=_("Text content of the message"))
+    content = models.TextField(
+        verbose_name=_("Content"), help_text=_("Text content of the message")
+    )
     seen = models.BooleanField(
-        _("Seen"),
+        verbose_name=_("Seen"),
         default=False,
-        help_text=_("Boolean shows if the message was seem by the receiver"),
+        help_text=_("Boolean shows if the message was seen by the receiver"),
     )
     sent = models.BooleanField(
         _("Sent"),
@@ -496,28 +510,31 @@ class Message(models.Model):
 class Invite(models.Model):
     inviter = models.ForeignKey(
         User,
+        verbose_name=_("Inviter"),
         on_delete=models.CASCADE,
         related_name="sent_invites",
         help_text=_("User who created the invite"),
     )
     invitee = models.ForeignKey(
         User,
+        verbose_name=_("Invitee"),
         on_delete=models.CASCADE,
         related_name="received_invites",
         help_text=_("User who received the invite"),
     )
     contact = models.ForeignKey(
         Contact,
+        verbose_name=_("Contact"),
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
         related_name="invites",
-        help_text=_("THe contact the creation of which triggered sending the invite"),
+        help_text=_("The contact the creation of which triggered sending the invite"),
     )
-    accepted = models.BooleanField(verbose_name=_("accepted"), default=False)
-    key = models.CharField(verbose_name=_("key"), max_length=64, unique=True)
+    accepted = models.BooleanField(verbose_name=_("Accepted"), default=False)
+    key = models.CharField(verbose_name=_("Key"), max_length=64, unique=True)
     created_on = models.DateTimeField(
-        _("Created on"),
+        verbose_name=_("Created on"),
         auto_now_add=True,
         help_text=_("This is the date the message was created"),
     )

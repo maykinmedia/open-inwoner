@@ -138,11 +138,13 @@ class Product(models.Model):
 class ProductFile(models.Model):
     product = models.ForeignKey(
         "pdc.Product",
+        verbose_name=_("product"),
         related_name="files",
         on_delete=models.CASCADE,
         help_text=_("Related product"),
     )
     file = FilerFileField(
+        verbose_name=_("file"),
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -160,6 +162,7 @@ class ProductFile(models.Model):
 class ProductContact(models.Model):
     product = models.ForeignKey(
         "pdc.Product",
+        verbose_name=_("product"),
         related_name="product_contacts",
         on_delete=models.CASCADE,
         help_text=_("Related product"),
