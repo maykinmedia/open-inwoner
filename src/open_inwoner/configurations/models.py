@@ -14,35 +14,46 @@ from .choices import ColorTypeChoices
 
 
 class SiteConfiguration(SingletonModel):
-    name = models.CharField(max_length=255, help_text=_("The name of the municipality"))
+    name = models.CharField(
+        verbose_name=_("Name"),
+        max_length=255,
+        help_text=_("The name of the municipality"),
+    )
     primary_color = ColorField(
+        verbose_name=_("Primary color"),
         help_text=_("The primary color of the municipality's site"),
     )
     secondary_color = ColorField(
+        verbose_name=_("Secondary color"),
         help_text=_("The secondary color of the municipality's site"),
     )
     accent_color = ColorField(
+        verbose_name=_("Accent color"),
         help_text=_("The accent color of the municipality's site"),
     )
     primary_font_color = models.CharField(
+        verbose_name=_("Primary font color"),
         max_length=50,
         choices=ColorTypeChoices.choices,
         default=ColorTypeChoices.light,
         help_text=_("The font color for when the background is the primary color"),
     )
     secondary_font_color = models.CharField(
+        verbose_name=_("Secondary font color"),
         max_length=50,
         choices=ColorTypeChoices.choices,
         default=ColorTypeChoices.light,
         help_text=_("The font color for when the background is the secondary color"),
     )
     accent_font_color = models.CharField(
+        verbose_name=_("Accent font color"),
         max_length=50,
         choices=ColorTypeChoices.choices,
         default=ColorTypeChoices.dark,
         help_text=_("The font color for when the background is the accent color"),
     )
     logo = FilerImageField(
+        verbose_name=_("Logo"),
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -50,6 +61,7 @@ class SiteConfiguration(SingletonModel):
         help_text=_("Logo of the municipality"),
     )
     hero_image_login = FilerImageField(
+        verbose_name=_("Hero image login"),
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -146,7 +158,10 @@ class SiteConfiguration(SingletonModel):
         help_text=_("Mailing intro text on the footer section."),
     )
     flatpages = models.ManyToManyField(
-        FlatPage, through="SiteConfigurationPage", related_name="configurations"
+        FlatPage,
+        verbose_name=_("Flatpages"),
+        through="SiteConfigurationPage",
+        related_name="configurations",
     )
     home_help_text = models.TextField(
         blank=True,
@@ -193,10 +208,10 @@ class SiteConfiguration(SingletonModel):
     )
 
     class Meta:
-        verbose_name = "Site Configuration"
+        verbose_name = _("Site Configuration")
 
     def __str__(self):
-        return "Site Configuration"
+        return str(_("Site Configuration"))
 
     @property
     def get_primary_color(self):
@@ -283,11 +298,15 @@ class SiteConfiguration(SingletonModel):
 class SiteConfigurationPage(OrderedModel):
     configuration = models.ForeignKey(
         SiteConfiguration,
+        verbose_name=_("Configuration"),
         related_name="ordered_configurations",
         on_delete=models.CASCADE,
     )
     flatpage = models.ForeignKey(
-        FlatPage, related_name="ordered_flatpages", on_delete=models.CASCADE
+        FlatPage,
+        verbose_name=_("Flatpage"),
+        related_name="ordered_flatpages",
+        on_delete=models.CASCADE,
     )
     order_with_respect_to = "configuration"
 
