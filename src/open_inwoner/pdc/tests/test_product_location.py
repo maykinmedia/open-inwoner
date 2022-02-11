@@ -2,6 +2,12 @@ import json
 
 from django.contrib.gis.geos import Point
 from django.test import TestCase
+from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _
+
+from django_webtest import WebTest
+
+from open_inwoner.accounts.tests.factories import UserFactory
 
 from ..models import ProductLocation
 from .factories import ProductFactory, ProductLocationFactory
@@ -194,4 +200,24 @@ class ProductLocationTestCase(TestCase):
         )
         self.assertEqual(
             "52.3760345", ProductLocation.objects.all().get_centroid()["lat"]
+        )
+
+
+class TestLocationFormInput(WebTest):
+    def test_exception_is_handled_when_city_and_postcode_are_not_provided(self):
+        product = ProductFactory()
+        user = UserFactory(is_superuser=True, is_staff=True)
+
+        response = self.app.get(reverse("admin:pdc_productlocation_add"), user=user)
+        form = response.form
+        form["product"] = product.pk
+        form_response = form.submit("_save")
+
+        self.assertListEqual(
+            form_response.context["errors"],
+            [
+                [_("Dit veld is vereist.")],
+                [_("Dit veld is vereist.")],
+                [_("No location data was provided")],
+            ],
         )
