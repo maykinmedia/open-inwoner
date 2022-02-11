@@ -13,3 +13,8 @@ class QuestionAdmin(OrderedModelAdmin):
         "question",
         "answer",
     )
+
+
+class QuestionInline(admin.TabularInline):
+    model = Question
+    extra = 1

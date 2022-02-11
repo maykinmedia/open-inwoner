@@ -5,6 +5,7 @@ from import_export.formats import base_formats
 from treebeard.admin import TreeAdmin
 from treebeard.forms import movenodeform_factory
 
+from .faq import QuestionInline
 from ..models import Category
 from ..resources import CategoryExportResource, CategoryImportResource
 
@@ -13,6 +14,7 @@ from ..resources import CategoryExportResource, CategoryImportResource
 class CategoryAdmin(ImportExportMixin, TreeAdmin):
     change_list_template = "admin/category_change_list.html"
     form = movenodeform_factory(Category, fields="__all__")
+    inlines = (QuestionInline,)
     prepopulated_fields = {"slug": ("name",)}
     search_fields = ("name",)
     ordering = ("path",)
