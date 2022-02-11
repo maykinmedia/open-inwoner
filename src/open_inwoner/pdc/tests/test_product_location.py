@@ -77,7 +77,7 @@ class ProductLocationTestCase(TestCase):
                         "housenumber": "117",
                         "postcode": "1015 CJ",
                         "city": "Amsterdam",
-                        "url": product_location.product.get_absolute_url()
+                        "url": product_location.product.get_absolute_url(),
                     },
                 }
             ),
@@ -150,7 +150,7 @@ class ProductLocationTestCase(TestCase):
                                 "housenumber": "117",
                                 "postcode": "1015 CJ",
                                 "city": "Amsterdam",
-                                "url": product_location_1.product.get_absolute_url()
+                                "url": product_location_1.product.get_absolute_url(),
                             },
                         },
                         {
@@ -165,7 +165,7 @@ class ProductLocationTestCase(TestCase):
                                 "housenumber": "20",
                                 "postcode": "1016 GV",
                                 "city": "Amsterdam",
-                                "url": product_location_2.product.get_absolute_url()
+                                "url": product_location_2.product.get_absolute_url(),
                             },
                         },
                     ],
