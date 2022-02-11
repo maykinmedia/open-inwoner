@@ -45,13 +45,11 @@
     transform-origin: top;
   }
 
-  &__answer:focus,
-  &__answer:target,
   &__answer--open {
     margin-top: var(--spacing-large) !important;
   }
 
-  &__answer:not(:focus):not(:target):not(#{&}__answer--open) {
+  &__answer:not(#{&}__answer--open) {
     opacity: 0;
     height: 0;
   }
