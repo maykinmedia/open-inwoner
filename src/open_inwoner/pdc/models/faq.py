@@ -16,11 +16,6 @@ class QuestionCategoryQuerySet(OrderedModelQuerySet):
     pass
 
 
-class QuestionCategoryManager(OrderedModelManager):
-    def get_queryset(self):
-        return QuestionCategoryQuerySet(self.model, using=self._db)
-
-
 class Question(OrderedModel):
     category = models.ForeignKey("pdc.Category", on_delete=models.CASCADE)
     question = models.CharField("Vraag", max_length=250)
