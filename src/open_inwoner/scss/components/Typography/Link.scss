@@ -35,7 +35,8 @@
     flex-direction: row-reverse;
   }
 
-  &--primary {
+  &--primary,
+  .leaflet-container &--primary {
     color: var(--color-primary);
   }
 

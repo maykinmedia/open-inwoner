@@ -68,10 +68,28 @@ class Map {
    * @return {string}
    */
   featureToHTML(feature) {
+    console.log(feature)
+
     const { name, ...properties } = feature.properties
-    return `<h4 class="h4">${name}</h4><p class="p">${Object.values(
-      properties
-    ).join(' ')}</p>`
+    return `
+        <h4 class="h4">
+          ${
+            properties.url
+              ? `
+              <a class="link link--primary" href="${properties.url}">
+                <span class="link__text">${name}</span>
+              </a>
+            `
+              : name
+          }
+        </h4>
+        <p class="p">
+          ${Object.entries(properties)
+            .filter(([k, v]) => k !== 'url')
+            .map(([k, v]) => v)
+            .join(' ')}
+          </p>
+    `
   }
 }
 
