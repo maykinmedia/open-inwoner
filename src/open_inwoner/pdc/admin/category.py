@@ -5,9 +5,9 @@ from import_export.formats import base_formats
 from treebeard.admin import TreeAdmin
 from treebeard.forms import movenodeform_factory
 
-from .faq import QuestionInline
 from ..models import Category
 from ..resources import CategoryExportResource, CategoryImportResource
+from .faq import QuestionInline
 
 
 @admin.register(Category)
