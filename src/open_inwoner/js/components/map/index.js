@@ -68,8 +68,6 @@ class Map {
    * @return {string}
    */
   featureToHTML(feature) {
-    console.log(feature)
-
     const { name, ...properties } = feature.properties
     return `
         <h4 class="h4">
