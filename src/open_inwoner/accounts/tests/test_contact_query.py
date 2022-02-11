@@ -36,7 +36,7 @@ class ContactExtendedTests(TestCase):
     def test_reverse_contact(self):
         other_user = UserFactory.create()
         contact = ContactFactory.create(
-            created_by=other_user, contact_user=self.me, email=self.me.emaill
+            created_by=other_user, contact_user=self.me, email=self.me.email
         )
 
         contacts = Contact.objects.get_extended_contacts_for_user(self.me)
@@ -45,11 +45,11 @@ class ContactExtendedTests(TestCase):
 
         extended_contact = contacts.get()
         self.assertEqual(extended_contact.id, contact.id)
-        self.assertEqual(extended_contact.other_user_id, self.me.id)
+        self.assertEqual(extended_contact.other_user_id, other_user.id)
         self.assertTrue(extended_contact.reverse)
-        self.assertEqual(extended_contact.other_user_email, self.me.email)
-        self.assertEqual(extended_contact.other_user_first_name, self.me.first_name)
-        self.assertEqual(extended_contact.other_user_last_name, self.me.last_name)
+        self.assertEqual(extended_contact.other_user_email, other_user.email)
+        self.assertEqual(extended_contact.other_user_first_name, other_user.first_name)
+        self.assertEqual(extended_contact.other_user_last_name, other_user.last_name)
 
     def test_mine_and_reverse_contact(self):
         other_user = UserFactory.create()

@@ -17,7 +17,14 @@ class InboxPageTests(WebTest):
         self.app.set_user(self.me)
 
     def test_contact_choices_include_only_active_contacts(self):
-        contact1 = ContactFactory.create(created_by=self.me)
+        other_user = UserFactory.create()
+        contact1 = ContactFactory.create(
+            created_by=self.me,
+            contact_user=other_user,
+            first_name=other_user.first_name,
+            last_name=other_user.last_name,
+            email=other_user.email,
+        )
         ContactFactory.create(created_by=self.me, contact_user__is_active=False)
         ContactFactory.create(created_by=self.me, contact_user=None)
 
