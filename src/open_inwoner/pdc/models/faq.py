@@ -1,27 +1,12 @@
 from django.db import models
 
-from ordered_model.models import OrderedModel, OrderedModelManager, OrderedModelQuerySet
-
-
-class QuestionQuerySet(OrderedModelQuerySet):
-    pass
-
-
-class QuestionManager(OrderedModelManager):
-    def get_queryset(self):
-        return QuestionQuerySet(self.model, using=self._db)
-
-
-class QuestionCategoryQuerySet(OrderedModelQuerySet):
-    pass
+from ordered_model.models import OrderedModel
 
 
 class Question(OrderedModel):
     category = models.ForeignKey("pdc.Category", on_delete=models.CASCADE)
     question = models.CharField("Vraag", max_length=250)
     answer = models.TextField("Antwoord")
-
-    objects = QuestionManager()
 
     order_with_respect_to = "category"
 

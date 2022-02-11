@@ -1,13 +1,12 @@
 from django import template
+from django.db.models import QuerySet
 from django.utils.translation import gettext as _
-
-from open_inwoner.pdc.models import QuestionQuerySet
 
 register = template.Library()
 
 
 @register.inclusion_tag("components/Faq/Faq.html")
-def faq(questions: QuestionQuerySet, **kwargs):
+def faq(questions: QuerySet, **kwargs):
     """
     Shows a list of questions, with collapsible answers.
 
