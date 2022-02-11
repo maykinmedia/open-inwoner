@@ -43,6 +43,15 @@ class ContactViewTests(WebTest):
         response = self.app.get(self.list_url, user=self.user)
         self.assertContains(response, message_link)
 
+    def test_contact_list_show_reversed(self):
+        ContactFactory.create(
+            contact_user=self.user,
+            created_by__first_name="reverse_contact_user_should_be_found",
+        )
+        response = self.app.get(self.list_url, user=self.user)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "reverse_contact_user_should_be_found")
+
     def test_contact_edit_login_required(self):
         response = self.app.get(self.edit_url)
         self.assertRedirects(response, f"{self.login_url}?next={self.edit_url}")

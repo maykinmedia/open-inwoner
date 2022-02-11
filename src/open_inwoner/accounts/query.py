@@ -116,8 +116,8 @@ class ContactQuerySet(QuerySet):
             .annotate(reverse=Case(When(created_by=me, then=False), default=True))
             .annotate(
                 other_user_id=Case(
-                    When(created_by=me, then=F("created_by")),
-                    default=F("contact_user"),
+                    When(created_by=me, then=F("contact_user")),
+                    default=F("created_by"),
                 )
             )
             .annotate(
@@ -144,5 +144,4 @@ class ContactQuerySet(QuerySet):
                     default=Value(""),
                 )
             )
-        ).exclude(Exists(not_unique_emails), mine=False)
-
+        ).exclude(Exists(not_unique_emails), reverse=True)
