@@ -81,7 +81,7 @@ class NotifyComandTests(TestCase):
 
         self.assertEqual(len(mail.outbox), 2)
 
-        email1, email2 = mail.outbox
+        email1, email2 = sorted(mail.outbox, key=lambda x: x.to, reverse=True)
         for email in [email1, email2]:
             self.assertEqual(email.subject, "New messages at Open Inwoner Platform")
             html_body = email.alternatives[0][0]

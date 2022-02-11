@@ -62,6 +62,12 @@
     }
   }
 
+  &--icon:active,
+  &--icon:focus,
+  &--icon:hover {
+    text-decoration: none;
+  }
+
   *[class*='icon']:first-child,
   *[class*='Icon']:first-child {
     transform: scale(0.75);
