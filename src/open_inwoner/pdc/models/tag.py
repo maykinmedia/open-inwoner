@@ -21,6 +21,7 @@ class Tag(models.Model):
         "pdc.TagType",
         null=True,
         blank=True,
+        verbose_name=_("type"),
         on_delete=models.SET_NULL,
         related_name="tags",
         help_text=_("The related tag type"),
@@ -28,7 +29,7 @@ class Tag(models.Model):
 
     class Meta:
         verbose_name = _("tag")
-        verbose_name_plural = _("tag")
+        verbose_name_plural = _("tags")
 
     def __str__(self):
         return self.name
