@@ -15,7 +15,7 @@ class ContactListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         base_qs = super().get_queryset()
-        return base_qs.filter(created_by=self.request.user)
+        return base_qs.get_extended_contacts_for_user(me=self.request.user)
 
 
 class ContactUpdateView(LoginRequiredMixin, UpdateView):
