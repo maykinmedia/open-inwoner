@@ -18,7 +18,7 @@ from open_inwoner.utils.validators import validate_phone_number
 
 from .choices import ContactTypeChoices, LoginTypeChoices, StatusChoices, TypeChoices
 from .managers import DigidManager, UserManager, eHerkenningManager
-from .query import MessageQuerySet
+from .query import ContactQuerySet, MessageQuerySet
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -125,6 +125,17 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_active_contacts(self):
         return self.contacts.filter(contact_user__is_active=True)
 
+    def get_assigned_active_contacts(self):
+        return self.assigned_contacts.filter(created_by__is_active=True)
+
+    def get_extended_active_contacts(self):
+        return Contact.objects.get_extended_contacts_for_user(me=self).filter(
+            contact_user__is_active=True, created_by__is_active=True
+        )
+
+    def get_new_messages_total(self) -> int:
+        return self.received_messages.filter(seen=False).count()
+
 
 class Contact(models.Model):
     uuid = models.UUIDField(
@@ -208,6 +219,8 @@ class Contact(models.Model):
         help_text=_("The function of the contact within an organization."),
     )
 
+    objects = ContactQuerySet.as_manager()
+
     class Meta:
         ordering = ("-updated_on", "-created_on")
 
@@ -226,6 +239,9 @@ class Contact(models.Model):
     def get_message_url(self) -> str:
         url = furl(reverse("accounts:inbox")).add({"with": self.email}).url
         return f"{url}#messages-last"
+
+    def get_created_by_name(self):
+        return f"{self.created_by.first_name} {self.created_by.last_name}"
 
 
 class Document(models.Model):
