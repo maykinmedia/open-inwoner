@@ -8,39 +8,55 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0027_auto_20220214_1440'),
+        ("accounts", "0027_auto_20220214_1440"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('plans', '0001_initial'),
+        ("plans", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='plan',
-            options={'verbose_name': 'plan', 'verbose_name_plural': 'plans'},
+            name="plan",
+            options={"verbose_name": "plan", "verbose_name_plural": "plans"},
         ),
         migrations.AlterField(
-            model_name='plan',
-            name='contacts',
-            field=models.ManyToManyField(help_text='The contact that will help you with this plan.', related_name='plans', to='accounts.Contact', verbose_name='contacts'),
+            model_name="plan",
+            name="contacts",
+            field=models.ManyToManyField(
+                help_text="The contact that will help you with this plan.",
+                related_name="plans",
+                to="accounts.Contact",
+                verbose_name="contacts",
+            ),
         ),
         migrations.AlterField(
-            model_name='plan',
-            name='created_by',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL, verbose_name='created by'),
+            model_name="plan",
+            name="created_by",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="created by",
+            ),
         ),
         migrations.AlterField(
-            model_name='plan',
-            name='end_date',
-            field=models.DateField(help_text='When the plan should be archived.', verbose_name='end date'),
+            model_name="plan",
+            name="end_date",
+            field=models.DateField(
+                help_text="When the plan should be archived.", verbose_name="end date"
+            ),
         ),
         migrations.AlterField(
-            model_name='plan',
-            name='goal',
-            field=models.TextField(help_text='The goal for the plan. So that you and the contact knows what the goal is.', verbose_name='goal'),
+            model_name="plan",
+            name="goal",
+            field=models.TextField(
+                help_text="The goal for the plan. So that you and the contact knows what the goal is.",
+                verbose_name="goal",
+            ),
         ),
         migrations.AlterField(
-            model_name='plan',
-            name='title',
-            field=models.CharField(help_text='The title of the plan', max_length=250, verbose_name='Title'),
+            model_name="plan",
+            name="title",
+            field=models.CharField(
+                help_text="The title of the plan", max_length=250, verbose_name="Title"
+            ),
         ),
     ]
