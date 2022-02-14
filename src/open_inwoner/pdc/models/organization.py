@@ -18,12 +18,14 @@ class Organization(GeoModel):
     logo = FilerImageField(
         null=True,
         blank=True,
+        verbose_name=_("logo"),
         on_delete=models.SET_NULL,
         related_name="organization_logos",
         help_text=_("Logo of the orgaization"),
     )
     type = models.ForeignKey(
         "pdc.OrganizationType",
+        verbose_name=_("type"),
         related_name="organizations",
         on_delete=models.CASCADE,
         help_text=_("Organization type"),

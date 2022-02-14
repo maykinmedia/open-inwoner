@@ -230,6 +230,7 @@ class ProductContact(models.Model):
 class ProductLink(models.Model):
     product = models.ForeignKey(
         "pdc.Product",
+        verbose_name=_("product"),
         related_name="links",
         on_delete=models.CASCADE,
         help_text=_("Related product"),
@@ -255,6 +256,7 @@ class ProductLocation(GeoModel):
     )
     product = models.ForeignKey(
         "pdc.Product",
+        verbose_name=_("product"),
         related_name="locations",
         on_delete=models.CASCADE,
         help_text=_("Related product"),
