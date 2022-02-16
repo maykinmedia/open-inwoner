@@ -1,0 +1,37 @@
+.radio {
+  .radio__input {
+    display: none;
+  }
+
+  .radio__label {
+    color: var(--font-color-body);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body);
+    line-height: var(--font-line-height-body);
+    margin: 0;
+    padding-left: 32px;
+    position: relative;
+
+    &:before {
+      position: absolute;
+      left: 0;
+      top: 0;
+      content: ' ';
+      display: inline-block;
+      padding: 0 2px;
+      box-sizing: border-box;
+      width: 22px;
+      height: 22px;
+      border: 1px solid #4b4b4b;
+      border-radius: 100%;
+      background-color: #ffffff;
+    }
+  }
+
+  .radio__input:checked ~ .radio__label:before {
+    background-color: var(--color-secondary);
+    color: var(--color-font-secondary);
+    font-family: 'Material Icons';
+    content: '\e876';
+  }
+}

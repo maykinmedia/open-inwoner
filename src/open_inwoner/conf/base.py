@@ -133,7 +133,8 @@ INSTALLED_APPS = [
     "treebeard",
     "easy_thumbnails",  # used by filer
     "filer",
-    "mptt",  # used by filer
+    "mptt",
+    "django_mptt_admin",
     "hijack.contrib.admin",
     "django_elasticsearch_dsl",
     "import_export",
@@ -155,6 +156,7 @@ INSTALLED_APPS = [
     "open_inwoner.configurations",
     "open_inwoner.haalcentraal",
     "open_inwoner.openzaak",
+    "open_inwoner.questionnaire",
 ]
 
 MIDDLEWARE = [

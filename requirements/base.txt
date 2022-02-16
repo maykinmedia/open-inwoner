@@ -128,7 +128,12 @@ django-js-asset==1.2.2
 django-localflavor==3.1
     # via -r requirements/base.in
 django-mptt==0.13.4
-    # via django-filer
+    # via
+    #   -r requirements/base.in
+    #   django-filer
+    #   django-mptt-admin
+django-mptt-admin==2.2.0
+    # via -r requirements/base.in
 django-ordered-model==3.4.3
     # via
     #   -r requirements/base.in

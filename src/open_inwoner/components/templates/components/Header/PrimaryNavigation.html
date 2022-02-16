@@ -34,7 +34,7 @@
                     {% endwith %}
                 {% endif %}
             </li>
-            
+
             {% get_solo 'configurations.SiteConfiguration' as config %}
 
             {% if request.user.bsn and config.show_cases %}
@@ -44,6 +44,9 @@
             {% endif %}
             <li class="primary-navigation__list-item">
                 {% link text=_('Samenwerken') href='plans:plan_list' icon="people" icon_outlined=True icon_position="before" %}
+            </li>
+            <li class="primary-navigation__list-item">
+                {% link text=_('Zelfdiagnose') href='questionnaire:index' icon="person" icon_position="before" icon_outlined=True %}
             </li>
         {% endif %}
     </ul>
