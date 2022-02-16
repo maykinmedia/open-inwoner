@@ -15,6 +15,7 @@ django-axes
 django-choices
 django-filer
 django-hijack
+django-ordered-model
 django-redis
 django-rosetta
 django-sniplates

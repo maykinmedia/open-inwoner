@@ -1,4 +1,5 @@
 from django.contrib.auth.models import BaseUserManager
+from django.db.models import Q
 
 from digid_eherkenning.managers import BaseDigidManager, BaseeHerkenningManager
 
@@ -69,3 +70,15 @@ class UserManager(BaseUserManager):
             "contact_user__id", flat=True
         )
         return self.get_queryset().filter(id__in=active_contacts)
+
+    def get_extended_contact_users(self, me):
+        """returns active users from your contacts and active users who assigned you as a contact"""
+        active_contacts = me.get_active_contacts().values_list(
+            "contact_user__id", flat=True
+        )
+        assigned_contacts = me.get_assigned_active_contacts().values_list(
+            "created_by__id", flat=True
+        )
+        return self.get_queryset().filter(
+            id__in=list(active_contacts) + list(assigned_contacts)
+        )

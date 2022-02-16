@@ -21,7 +21,7 @@ class GeoModelQuerySet(models.QuerySet):
         return json.dumps(
             {
                 "type": "FeatureCollection",
-                "features": [json.loads(o.get_geojson_feature()) for o in self],
+                "features": [o.get_geojson_feature(False) for o in self],
             }
         )
 
@@ -120,17 +120,20 @@ class GeoModel(models.Model):
             )
         self.geometry = geometry
 
-    def get_geojson_feature(self) -> str:
+    def get_geojson_feature(self, stringify: bool = True) -> Union[str, dict]:
         """
         Returns a geojson feature for this object.
+        If stringify equals `True` (default), a JSON string is returned, a dict otherwise.
         """
-        return json.dumps(
-            {
-                "type": "Feature",
-                "geometry": json.loads(self.get_geojson_geometry()),
-                "properties": self.get_serialized_fields(),
-            }
-        )
+        feature = {
+            "type": "Feature",
+            "geometry": json.loads(self.get_geojson_geometry()),
+            "properties": self.get_serialized_fields(),
+        }
+
+        if stringify:
+            return json.dumps(feature)
+        return feature
 
     def get_geojson_geometry(self) -> str:
         """

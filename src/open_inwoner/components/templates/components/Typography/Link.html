@@ -10,6 +10,12 @@
     {% if data_alt_text %}data-alt-text="{{ data_alt_text }}"{% endif %}
     {% if data_icon %}data-icon="{{ data_icon }}"{% endif %}
     {% if data_alt_icon %}data-alt-icon="{{ data_alt_icon }}"{% endif %}
+    {% if toggle %}
+        data-toggle-target="{{ href }}"
+        data-toggle-modifier="{{ toggle }}"
+        data-use-aria="true"
+    {% endif %}
+    {% if toggle_exclusive %}data-toggle-exclusive="{{ toggle_exclusive }}"{% endif %}
     {% if hide_text %}aria-describedby="{{ text }}" title="{{ text }}"{% endif %}
 >
     {% if src %}

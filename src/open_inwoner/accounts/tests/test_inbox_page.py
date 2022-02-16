@@ -62,3 +62,23 @@ class InboxPageTests(WebTest):
         self.assertEqual(last_message.content, "some msg")
         self.assertEqual(last_message.sender, self.me)
         self.assertEqual(last_message.receiver, self.user1)
+
+    def test_mark_messages_as_seen(self):
+        other_user = UserFactory.create()
+        ContactFactory.create(
+            created_by=self.me, contact_user=self.user1, email=self.user1.email
+        )
+        message_received = MessageFactory.create(receiver=self.me, sender=other_user)
+        message_sent = MessageFactory.create(sender=self.me, receiver=other_user)
+
+        for message in [message_sent, message_received]:
+            self.assertFalse(message.seen)
+
+        response = self.app.get(self.url, {"with": other_user.email})
+        self.assertEqual(response.status_code, 200)
+
+        for message in [message_sent, message_received]:
+            message.refresh_from_db()
+
+        self.assertFalse(message_sent.seen)
+        self.assertTrue(message_received.seen)
