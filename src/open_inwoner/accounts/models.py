@@ -9,6 +9,7 @@ from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.utils.translation import ugettext_lazy as _
 
+from furl import furl
 from localflavor.nl.models import NLBSNField, NLZipCodeField
 from mail_editor.helpers import find_template
 from privates.storages import PrivateMediaFileSystemStorage
@@ -17,7 +18,7 @@ from open_inwoner.utils.validators import validate_phone_number
 
 from .choices import ContactTypeChoices, LoginTypeChoices, StatusChoices, TypeChoices
 from .managers import DigidManager, UserManager, eHerkenningManager
-from .query import MessageQuerySet
+from .query import ContactQuerySet, MessageQuerySet
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -124,6 +125,17 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_active_contacts(self):
         return self.contacts.filter(contact_user__is_active=True)
 
+    def get_assigned_active_contacts(self):
+        return self.assigned_contacts.filter(created_by__is_active=True)
+
+    def get_extended_active_contacts(self):
+        return Contact.objects.get_extended_contacts_for_user(me=self).filter(
+            contact_user__is_active=True, created_by__is_active=True
+        )
+
+    def get_new_messages_total(self) -> int:
+        return self.received_messages.filter(seen=False).count()
+
 
 class Contact(models.Model):
     uuid = models.UUIDField(
@@ -207,6 +219,8 @@ class Contact(models.Model):
         help_text=_("The function of the contact within an organization."),
     )
 
+    objects = ContactQuerySet.as_manager()
+
     class Meta:
         ordering = ("-updated_on", "-created_on")
 
@@ -215,6 +229,19 @@ class Contact(models.Model):
 
     def get_name(self):
         return f"{self.first_name} {self.last_name}"
+
+    def is_active(self) -> bool:
+        return self.contact_user and self.contact_user.is_active
+
+    def is_not_active(self) -> bool:
+        return not self.is_active()
+
+    def get_message_url(self) -> str:
+        url = furl(reverse("accounts:inbox")).add({"with": self.email}).url
+        return f"{url}#messages-last"
+
+    def get_created_by_name(self):
+        return f"{self.created_by.first_name} {self.created_by.last_name}"
 
 
 class Document(models.Model):
@@ -433,6 +460,13 @@ class Message(models.Model):
         _("Seen"),
         default=False,
         help_text=_("Boolean shows if the message was seem by the receiver"),
+    )
+    sent = models.BooleanField(
+        _("Sent"),
+        default=False,
+        help_text=_(
+            "Boolean shows if the email was sent to the receiver about this message"
+        ),
     )
 
     objects = MessageQuerySet.as_manager()

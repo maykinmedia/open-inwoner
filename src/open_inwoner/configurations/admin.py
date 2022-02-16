@@ -91,5 +91,6 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                 )
             },
         ),
+        (_("Emails"), {"fields": ("email_new_message",)}),
     )
     inlines = [SiteConfigurationPageInline]

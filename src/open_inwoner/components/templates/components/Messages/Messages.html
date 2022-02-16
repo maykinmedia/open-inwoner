@@ -18,7 +18,7 @@
                     <ol class="messages__list">
                         {% for message in day.messages %}
                             <li class="messages__list-item">
-                                {% if forloop.last %}
+                                {% if forloop.last and forloop.parentloop.last %}
                                     <a id="messages-last"></a>
                                 {% endif %}
 

@@ -1,3 +1,4 @@
+import logging
 from typing import Optional
 from urllib.parse import unquote
 
@@ -16,6 +17,8 @@ from open_inwoner.utils.mixins import PaginationMixin
 from ..forms import InboxForm
 from ..models import Message, User
 from ..query import MessageQuerySet
+
+logger = logging.getLogger(__name__)
 
 
 class InboxView(LoginRequiredMixin, PaginationMixin, FormView):
@@ -90,6 +93,19 @@ class InboxView(LoginRequiredMixin, PaginationMixin, FormView):
         except AssertionError:
             return ""
 
+    def mark_messages_seen(self, other_user: Optional[User]):
+        if not other_user:
+            return
+
+        total_marked = Message.objects.mark_seen(
+            me=self.request.user, other_user=other_user
+        )
+        if total_marked:
+            logger.info(
+                f"{total_marked} messages are marked as seen for receiver {self.request.user.email} "
+                f"and sender {other_user.email}"
+            )
+
     def get_initial(self):
         initial = super().get_initial()
         conversations = self.get_conversations()
@@ -112,6 +128,13 @@ class InboxView(LoginRequiredMixin, PaginationMixin, FormView):
         # build redirect url based on form hidden data
         url = furl(self.request.path).add({"with": form.data["receiver"]}).url
         return HttpResponseRedirect(f"{url}#messages-last")
+
+    def get(self, request, *args, **kwargs):
+        """Mark all messages as seen for the receiver"""
+        context = self.get_context_data()
+
+        self.mark_messages_seen(other_user=context["other_user"])
+        return self.render_to_response(context)
 
 
 class InboxStartView(LoginRequiredMixin, FormView):

@@ -101,7 +101,7 @@ class AppointmentAdmin(admin.ModelAdmin):
 
 @admin.register(Message)
 class MessageAdmin(admin.ModelAdmin):
-    list_display = ("sender", "receiver", "created_on")
+    list_display = ("sender", "receiver", "created_on", "seen", "sent")
     list_filter = ("sender", "receiver")
 
 
