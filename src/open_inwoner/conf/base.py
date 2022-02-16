@@ -397,7 +397,7 @@ ADMIN_INDEX_SHOW_REMAINING_APPS_TO_SUPERUSERS = True
 AXES_CACHE = "axes"  # refers to CACHES setting
 # The number of login attempts allowed before a record is created for the
 # failed logins. Default: 3
-AXES_FAILURE_LIMIT = 10
+AXES_FAILURE_LIMIT = 5
 # If set, defines a period of inactivity after which old failed login attempts
 # will be forgotten. Can be set to a python timedelta object or an integer. If
 # an integer, will be interpreted as a number of hours. Default: None
