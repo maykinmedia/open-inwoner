@@ -3,25 +3,14 @@ from django.contrib.auth.admin import UserAdmin
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
+from open_inwoner.utils.mixins import UUIDAdminFirstInOrder
+
 from .models import Action, Appointment, Contact, Document, Invite, Message, User
 
 
-class ActionInlineAdmin(admin.StackedInline):
+class ActionInlineAdmin(UUIDAdminFirstInOrder, admin.StackedInline):
     model = Action
     extra = 1
-    fields = (
-        "uuid",
-        "name",
-        "description",
-        "goal",
-        "status",
-        "type",
-        "end_date",
-        "file",
-        "is_for",
-        "created_by",
-        "plan",
-    )
     readonly_fields = ("uuid",)
 
 
@@ -80,38 +69,14 @@ class _UserAdmin(UserAdmin):
 
 
 @admin.register(Action)
-class ActionAdmin(admin.ModelAdmin):
-    fields = (
-        "uuid",
-        "name",
-        "description",
-        "goal",
-        "status",
-        "type",
-        "end_date",
-        "file",
-        "is_for",
-        "created_by",
-        "plan",
-    )
+class ActionAdmin(UUIDAdminFirstInOrder, admin.ModelAdmin):
     readonly_fields = ("uuid",)
     list_display = ("name", "created_on", "created_by")
     list_filter = ("created_by",)
 
 
 @admin.register(Contact)
-class ContactAdmin(admin.ModelAdmin):
-    fields = (
-        "uuid",
-        "first_name",
-        "last_name",
-        "email",
-        "phonenumber",
-        "type",
-        "created_by",
-        "contact_user",
-        "function",
-    )
+class ContactAdmin(UUIDAdminFirstInOrder, admin.ModelAdmin):
     readonly_fields = ("uuid",)
     list_display = (
         "first_name",
@@ -128,27 +93,14 @@ class ContactAdmin(admin.ModelAdmin):
 
 
 @admin.register(Document)
-class DocumentAdmin(admin.ModelAdmin):
-    fields = (
-        "uuid",
-        "name",
-        "file",
-        "owner",
-        "plan",
-    )
+class DocumentAdmin(UUIDAdminFirstInOrder, admin.ModelAdmin):
     readonly_fields = ("uuid",)
     list_display = ("name", "file", "created_on", "owner")
     list_filter = ("owner",)
 
 
 @admin.register(Appointment)
-class AppointmentAdmin(admin.ModelAdmin):
-    fields = (
-        "uuid",
-        "name",
-        "datetime",
-        "created_by",
-    )
+class AppointmentAdmin(UUIDAdminFirstInOrder, admin.ModelAdmin):
     readonly_fields = ("uuid",)
     list_display = ("name", "datetime", "created_on", "created_by")
     list_filter = ("created_by",)
