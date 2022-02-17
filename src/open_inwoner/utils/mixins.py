@@ -150,3 +150,13 @@ class PaginationMixin:
             "object_list": object_list,
             "is_paginated": is_paginated,
         }
+
+
+class UUIDAdminFirstInOrder:
+    def get_fields(self, request, obj):
+        fields = super().get_fields(request, obj)
+
+        # Put uuid first in the list
+        fields.remove("uuid")
+        fields.insert(0, "uuid")
+        return fields
