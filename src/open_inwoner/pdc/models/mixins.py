@@ -110,6 +110,8 @@ class GeoModel(models.Model):
             raise ValidationError(
                 _("Locating geo coordinates has failed: %(exc)s") % {"exc": exc}
             )
+        except IndexError:
+            raise ValidationError(_("No location data was provided"))
 
         if not geometry:
             raise ValidationError(
