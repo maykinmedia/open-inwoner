@@ -48,7 +48,7 @@ jobs:
           pip install -r requirements/dev.txt
       - name: Run black
         run: |
-          black --check src
+          black --check --diff src
   prettier:
     name: Check code formatting with prettier
     runs-on: ubuntu-latest
