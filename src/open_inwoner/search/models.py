@@ -7,18 +7,18 @@ from django_better_admin_arrayfield.models.fields import ArrayField
 
 class Synonym(models.Model):
     term = models.CharField(
-        _("term"), max_length=250, unique=True, help_text=_("The term")
+        verbose_name=_("Term"), max_length=250, unique=True, help_text=_("The term")
     )
     synonyms = ArrayField(
         models.TextField(
-            _("synonyms"),
+            verbose_name=_("Synonyms"),
         ),
         help_text=_("Words-synonyms concerning the term"),
     )
 
     class Meta:
-        verbose_name = _("synonym")
-        verbose_name_plural = _("synonyms")
+        verbose_name = _("Synonym")
+        verbose_name_plural = _("Synonyms")
 
     def __str__(self):
         return self.term
@@ -30,23 +30,23 @@ class Synonym(models.Model):
 
 class Feedback(models.Model):
     search_query = models.CharField(
-        verbose_name=_("search query"),
+        verbose_name=_("Search query"),
         max_length=250,
         help_text=_("Words which are used by the user in the search box"),
     )
     search_url = models.CharField(
-        verbose_name=_("search url"),
+        verbose_name=_("Search url"),
         max_length=250,
         blank=True,
         default="",
         help_text=_("The generated url of user's search"),
     )
     positive = models.BooleanField(
-        verbose_name=_("positive"),
+        verbose_name=_("Positive"),
         help_text=_("Designates whether the feedback was positive or not"),
     )
     remark = models.TextField(
-        verbose_name=_("remark"),
+        verbose_name=_("Remark"),
         blank=True,
         default="",
         help_text=_(
@@ -62,7 +62,7 @@ class Feedback(models.Model):
     )
     searched_by = models.ForeignKey(
         "accounts.User",
-        verbose_name=_("searched by"),
+        verbose_name=_("Searched by"),
         blank=True,
         null=True,
         on_delete=CASCADE,
@@ -71,8 +71,8 @@ class Feedback(models.Model):
     )
 
     class Meta:
-        verbose_name = _("feedback")
-        verbose_name_plural = _("feedbacks")
+        verbose_name = _("Feedback")
+        verbose_name_plural = _("Feedbacks")
 
     def __str__(self):
         return self.search_query
