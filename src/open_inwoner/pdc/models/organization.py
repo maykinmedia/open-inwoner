@@ -10,22 +10,25 @@ from .mixins import GeoModel
 
 class Organization(GeoModel):
     name = models.CharField(
-        _("name"), max_length=250, help_text=_("Name of the organization")
+        verbose_name=_("Name"), max_length=250, help_text=_("Name of the organization")
     )
     slug = models.SlugField(
-        _("slug"), max_length=100, unique=True, help_text=_("Slug of the organization")
+        verbose_name=_("Slug"),
+        max_length=100,
+        unique=True,
+        help_text=_("Slug of the organization"),
     )
     logo = FilerImageField(
         null=True,
         blank=True,
-        verbose_name=_("logo"),
+        verbose_name=_("Logo"),
         on_delete=models.SET_NULL,
         related_name="organization_logos",
         help_text=_("Logo of the orgaization"),
     )
     type = models.ForeignKey(
         "pdc.OrganizationType",
-        verbose_name=_("type"),
+        verbose_name=_("Type"),
         related_name="organizations",
         on_delete=models.CASCADE,
         help_text=_("Organization type"),
@@ -44,7 +47,7 @@ class Organization(GeoModel):
     )
     neighbourhood = models.ForeignKey(
         "pdc.Neighbourhood",
-        verbose_name=_("neighbourhood"),
+        verbose_name=_("Neighbourhood"),
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -53,8 +56,8 @@ class Organization(GeoModel):
     )
 
     class Meta:
-        verbose_name = _("organization")
-        verbose_name_plural = _("organizations")
+        verbose_name = _("Organization")
+        verbose_name_plural = _("Organizations")
 
     def __str__(self):
         return f"{self.name}"
@@ -62,12 +65,15 @@ class Organization(GeoModel):
 
 class OrganizationType(models.Model):
     name = models.CharField(
-        _("name"), max_length=100, unique=True, help_text=_("Organization type")
+        verbose_name=_("Name"),
+        max_length=100,
+        unique=True,
+        help_text=_("Organization type"),
     )
 
     class Meta:
-        verbose_name = _("organization type")
-        verbose_name_plural = _("organization types")
+        verbose_name = _("Organization type")
+        verbose_name_plural = _("Organization types")
 
     def __str__(self):
         return self.name

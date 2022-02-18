@@ -96,8 +96,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     _old_bsn = None
 
     class Meta:
-        verbose_name = _("user")
-        verbose_name_plural = _("users")
+        verbose_name = _("User")
+        verbose_name_plural = _("Users")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -237,8 +237,8 @@ class Contact(models.Model):
 
     class Meta:
         ordering = ("-updated_on", "-created_on")
-        verbose_name = _("contact")
-        verbose_name_plural = _("contacts")
+        verbose_name = _("Contact")
+        verbose_name_plural = _("Contacts")
 
     def __str__(self):
         return self.get_name()
@@ -305,8 +305,8 @@ class Document(models.Model):
     )
 
     class Meta:
-        verbose_name = _("document")
-        verbose_name_plural = _("documents")
+        verbose_name = _("Document")
+        verbose_name_plural = _("Documents")
 
     def __str__(self):
         return self.name
@@ -348,8 +348,8 @@ class Appointment(models.Model):
     )
 
     class Meta:
-        verbose_name = _("appointment")
-        verbose_name_plural = _("appointments")
+        verbose_name = _("Appointment")
+        verbose_name_plural = _("Appointments")
 
     def __str__(self):
         return self.name
@@ -369,7 +369,7 @@ class Action(models.Model):
         help_text=_("The name of the action"),
     )
     description = models.TextField(
-        verbose_name=_("description"),
+        verbose_name=_("Description"),
         default="",
         blank=True,
         help_text=_("The description of the action"),
@@ -448,8 +448,8 @@ class Action(models.Model):
 
     class Meta:
         ordering = ("end_date", "-created_on")
-        verbose_name = _("action")
-        verbose_name_plural = _("actions")
+        verbose_name = _("Action")
+        verbose_name_plural = _("Actions")
 
     def __str__(self):
         return self.name
@@ -490,7 +490,7 @@ class Message(models.Model):
         help_text=_("Boolean shows if the message was seen by the receiver"),
     )
     sent = models.BooleanField(
-        _("Sent"),
+        verbose_name=_("Sent"),
         default=False,
         help_text=_(
             "Boolean shows if the email was sent to the receiver about this message"
@@ -500,8 +500,8 @@ class Message(models.Model):
     objects = MessageQuerySet.as_manager()
 
     class Meta:
-        verbose_name = _("message")
-        verbose_name_plural = _("messages")
+        verbose_name = _("Message")
+        verbose_name_plural = _("Messages")
 
     def __str__(self):
         return f"From: {self.sender}, To: {self.receiver} ({self.created_on.date()})"
@@ -540,8 +540,8 @@ class Invite(models.Model):
     )
 
     class Meta:
-        verbose_name = _("invitation")
-        verbose_name_plural = _("invitations")
+        verbose_name = _("Invitation")
+        verbose_name_plural = _("Invitations")
 
     def __str__(self):
         return f"For: {self.invitee} ({self.created_on.date()})"
