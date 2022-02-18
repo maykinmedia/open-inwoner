@@ -5,15 +5,6 @@ from mptt.models import MPTTModel, TreeForeignKey
 from filer.fields.file import FilerFileField
 
 
-class QuestionnaireStepQuerySet(models.QuerySet):
-    def get_children_of_parent(self, parent: 'QuestionnaireStep') -> 'QuestionnaireStepQuerySet':
-        return self.filter(parent=parent)
-
-
-class QuestionnaireStepManager(models.Manager.from_queryset(QuestionnaireStepQuerySet)):
-    pass
-
-
 class QuestionnaireStep(MPTTModel):
     """
     A step in a questionnaire, can optionally have a related QuestionnaireStep as `parent`, in which case
@@ -45,8 +36,6 @@ class QuestionnaireStep(MPTTModel):
     related_products = models.ManyToManyField('pdc.Product',
                                               help_text=_('Deze producten worden weergegeven in deze stap.'),
                                               blank=True)
-
-    objects = QuestionnaireStepManager()
 
     class MPTTMeta:
         order_insertion_by = ['parent_answer']
@@ -92,4 +81,7 @@ class QuestionnaireStepFile(models.Model):
         verbose_name_plural = _("Questionnaire step files")
 
     def __str__(self):
-        return self.file.name
+        try:
+            return self.file.name
+        except AttributeError:
+            return _('Geen bestand geselecteerd.')

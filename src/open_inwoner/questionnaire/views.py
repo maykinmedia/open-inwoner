@@ -1,39 +1,9 @@
-from django import forms
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_list_or_404
 from django.views.generic import FormView
 
+from .forms import QuestionnaireStepForm
 from .models import QuestionnaireStep
-
-
-class QuestionnaireStepChoiceField(forms.ModelChoiceField):
-    """
-    The ModelChoiceField specific to QuestionnaireStep with a customized label.
-    """
-    def label_from_instance(self, obj):
-        return obj.parent_answer
-
-
-class QuestionnaireStepForm(forms.Form):
-    """
-    The form with possible answers for a questionnaire step.
-    """
-    answer = QuestionnaireStepChoiceField(queryset=QuestionnaireStep.objects.none(), widget=forms.RadioSelect())
-
-    def __init__(self, *args, **kwargs) -> None:
-        self.instance = kwargs.pop("instance")
-        super().__init__(*args, **kwargs)
-
-        if self.instance:
-            children = self.instance.get_children()
-            if children:
-                self.fields['answer'].queryset = self.instance.get_children()
-                return
-
-        self.fields.pop("answer")
-
-    class Meta:
-        model = QuestionnaireStep
 
 
 class QuestionnaireStepView(FormView):
