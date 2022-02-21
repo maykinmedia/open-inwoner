@@ -87,16 +87,25 @@ def file(file, **kwargs):
                 else file.label.replace(f".{file.extension}", ""),
             )
     else:
-        pathed = pathlib.Path(file.name)
-        extension = pathed.suffix.replace(".", "")
-        kwargs.update(
-            is_image=extension.lower() in IMAGE_TYPES,
-            extension=extension,
-            size=file.size,
-            url=file.url,
-        )
-        if not kwargs.get("name"):
+        try:
+            pathed = pathlib.Path(file.name)
+            extension = pathed.suffix.replace(".", "")
             kwargs.update(
-                name=pathed.stem,
+                is_image=extension.lower() in IMAGE_TYPES,
+                extension=extension,
+                size=file.size,
+                url=file.url,
+            )
+            if not kwargs.get("name"):
+                kwargs.update(
+                    name=pathed.stem,
+                )
+        except AttributeError:
+            kwargs.update(
+                is_image=False,
+                extension='',
+                size=0,
+                url='',
+                name=str(file)
             )
     return {**kwargs}

@@ -1,5 +1,5 @@
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_list_or_404
+from django.shortcuts import get_list_or_404, get_object_or_404
 from django.views.generic import FormView
 
 from .forms import QuestionnaireStepForm
@@ -10,7 +10,7 @@ class QuestionnaireStepView(FormView):
     """
     Shows a step in a questionnaire.
     """
-    session_key = 'questionnaire.views.QuestionnaireStepView.object.pk'
+    session_key = 'questionnaire.views.QuestionnaireStepView.object.slug'
     template_name = 'questionnaire/questionnaire-step.html'
     form_class = QuestionnaireStepForm
 
@@ -18,10 +18,7 @@ class QuestionnaireStepView(FormView):
         slug = self.kwargs.get('slug', self.request.session.get(self.session_key))
 
         if slug:
-            try:
-                return QuestionnaireStep.objects.get(slug=slug)
-            except QuestionnaireStep.DoesNotExist:
-                pass
+            return get_object_or_404(QuestionnaireStep, slug=slug)
 
         return get_list_or_404(QuestionnaireStep.objects.all())[0]
 
@@ -36,7 +33,7 @@ class QuestionnaireStepView(FormView):
     def form_valid(self, form: QuestionnaireStepForm):
         try:
             questionnaire_step = form.cleaned_data['answer']
-        except KeyError:
+        except (AttributeError, KeyError):
             return self.form_invalid(form)
 
         self.request.session[self.session_key] = questionnaire_step.slug
