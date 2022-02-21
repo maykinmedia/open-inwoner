@@ -168,11 +168,12 @@ class InboxForm(forms.ModelForm):
 
         super().__init__(**kwargs)
 
-        active_contacts = self.user.get_active_contacts()
-        choices = [[c.email, f"{c.first_name} {c.last_name}"] for c in active_contacts]
-        active_contact_users = User.objects.get_active_contact_users(self.user)
+        extended_contact_users = User.objects.get_extended_contact_users(self.user)
+        choices = [
+            [u.email, f"{u.first_name} {u.last_name}"] for u in extended_contact_users
+        ]
         self.fields["receiver"].choices = choices
-        self.fields["receiver"].queryset = active_contact_users
+        self.fields["receiver"].queryset = extended_contact_users
 
     def save(self, commit=True):
         self.instance.sender = self.user
