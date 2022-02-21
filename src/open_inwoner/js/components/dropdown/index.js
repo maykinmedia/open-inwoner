@@ -7,9 +7,11 @@ class Dropdown {
   }
 
   toggleOpen(event) {
-    event.stopPropagation()
+    // event.stopPropagation()
     event.preventDefault()
-    this.node.classList.toggle('dropdown--open')
+    setTimeout(() => {
+      this.node.classList.add('dropdown--open')
+    }, 5)
   }
 
   doClosing(event) {

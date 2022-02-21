@@ -81,7 +81,8 @@ class ContactForm(forms.ModelForm):
         fields = ("first_name", "last_name", "email", "phonenumber")
 
     def save(self, user, commit=True):
-        self.instance.created_by = user
+        if not self.instance.pk:
+            self.instance.created_by = user
 
         if not self.instance.pk and self.instance.email:
             self.instance.contact_user, created = User.objects.get_or_create(
@@ -122,12 +123,13 @@ class ActionForm(forms.ModelForm):
             )
         return data
 
-    def save(self, user, plan=None, commit=True):
-        self.instance.created_by = user
+    def save(self, user, commit=True):
+        if not self.instance.pk:
+            self.instance.created_by = user
         if not self.instance.is_for:
             self.instance.is_for = user
-        if plan:
-            self.instance.plan = plan
+        if self.plan:
+            self.instance.plan = self.plan
         return super().save(commit=commit)
 
 
@@ -137,7 +139,8 @@ class DocumentForm(forms.ModelForm):
         fields = ("file", "name")
 
     def save(self, user, plan=None, commit=True):
-        self.instance.owner = user
+        if not self.instance.pk:
+            self.instance.owner = user
         if plan:
             self.instance.plan = plan
 

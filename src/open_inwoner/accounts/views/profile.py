@@ -14,7 +14,7 @@ from view_breadcrumbs import BaseBreadcrumbMixin
 from open_inwoner.accounts.choices import StatusChoices
 
 from ..forms import ThemesForm, UserForm
-from ..models import User
+from ..models import Action, User
 
 
 class MyProfileView(LoginRequiredMixin, BaseBreadcrumbMixin, FormView):
@@ -34,9 +34,8 @@ class MyProfileView(LoginRequiredMixin, BaseBreadcrumbMixin, FormView):
         context = super().get_context_data(**kwargs)
         today = date.today()
         context["next_action"] = (
-            self.request.user.actions.filter(
-                end_date__gte=today, status=StatusChoices.open
-            )
+            Action.objects.connected(self.request.user)
+            .filter(end_date__gte=today, status=StatusChoices.open)
             .order_by("end_date")
             .first()
         )
@@ -48,7 +47,7 @@ class MyProfileView(LoginRequiredMixin, BaseBreadcrumbMixin, FormView):
         else:
             context["theme_text"] = _("U heeft geen intressegebieden aangegeven.")
         context["action_text"] = _(
-            f"{self.request.user.actions.filter(status=StatusChoices.open).count()} acties staan open."
+            f"{Action.objects.connected(self.request.user).filter(status=StatusChoices.open).count()} acties staan open."
         )
         if self.request.user.contacts.count() > 0:
             context[

@@ -13,7 +13,8 @@ class PlanForm(forms.ModelForm):
         self.fields["contacts"].queryset = user.contacts.all()
 
     def save(self, user, commit=True):
-        self.instance.created_by = user
+        if not self.instance.pk:
+            self.instance.created_by = user
         return super().save(commit=commit)
 
 
