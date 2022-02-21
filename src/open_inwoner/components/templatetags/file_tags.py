@@ -101,11 +101,5 @@ def file(file, **kwargs):
                     name=pathed.stem,
                 )
         except AttributeError:
-            kwargs.update(
-                is_image=False,
-                extension='',
-                size=0,
-                url='',
-                name=str(file)
-            )
+            kwargs.update(is_image=False, extension="", size=0, url="", name=str(file))
     return {**kwargs}

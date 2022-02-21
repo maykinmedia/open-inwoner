@@ -6,14 +6,14 @@ from ..forms import QuestionnaireStepChoiceField, QuestionnaireStepForm
 
 class QuestionnaireStepChoiceFieldTestCase(TestCase):
     def test_label_from_instance(self):
-        root = QuestionnaireStepFactory.create(question='foo')
-        QuestionnaireStepFactory.create(parent=root, parent_answer='bar')
+        root = QuestionnaireStepFactory.create(question="foo")
+        QuestionnaireStepFactory.create(parent=root, parent_answer="bar")
         field = QuestionnaireStepChoiceField(queryset=root.get_children())
 
         for (index, choice) in enumerate(field.choices):
             if index == 0:
                 continue
-            self.assertEqual('bar', choice[1])
+            self.assertEqual("bar", choice[1])
 
 
 class QuestionnaireStepFormTestCase(TestCase):
@@ -21,9 +21,9 @@ class QuestionnaireStepFormTestCase(TestCase):
         root = QuestionnaireStepFactory.create()
         QuestionnaireStepFactory.create(parent=root)
         form = QuestionnaireStepForm(instance=root)
-        self.assertIn('answer', form.fields)
+        self.assertIn("answer", form.fields)
 
     def test_no_answer(self):
         root = QuestionnaireStepFactory.create()
         form = QuestionnaireStepForm(instance=root)
-        self.assertNotIn('answer', form.fields)
+        self.assertNotIn("answer", form.fields)

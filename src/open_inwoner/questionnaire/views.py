@@ -10,12 +10,13 @@ class QuestionnaireStepView(FormView):
     """
     Shows a step in a questionnaire.
     """
-    session_key = 'questionnaire.views.QuestionnaireStepView.object.slug'
-    template_name = 'questionnaire/questionnaire-step.html'
+
+    session_key = "questionnaire.views.QuestionnaireStepView.object.slug"
+    template_name = "questionnaire/questionnaire-step.html"
     form_class = QuestionnaireStepForm
 
     def get_object(self) -> QuestionnaireStep:
-        slug = self.kwargs.get('slug', self.request.session.get(self.session_key))
+        slug = self.kwargs.get("slug", self.request.session.get(self.session_key))
 
         if slug:
             return get_object_or_404(QuestionnaireStep, slug=slug)
@@ -25,14 +26,11 @@ class QuestionnaireStepView(FormView):
     def get_form_kwargs(self) -> dict:
         instance = self.get_object()
 
-        return {
-            **super().get_form_kwargs(),
-            "instance": instance
-        }
+        return {**super().get_form_kwargs(), "instance": instance}
 
     def form_valid(self, form: QuestionnaireStepForm):
         try:
-            questionnaire_step = form.cleaned_data['answer']
+            questionnaire_step = form.cleaned_data["answer"]
         except (AttributeError, KeyError):
             return self.form_invalid(form)
 

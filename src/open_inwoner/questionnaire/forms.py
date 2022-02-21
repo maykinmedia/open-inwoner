@@ -15,7 +15,10 @@ class QuestionnaireStepForm(forms.Form):
     """
     The form with possible answers for a questionnaire step.
     """
-    answer = QuestionnaireStepChoiceField(queryset=QuestionnaireStep.objects.none(), widget=forms.RadioSelect())
+
+    answer = QuestionnaireStepChoiceField(
+        queryset=QuestionnaireStep.objects.none(), widget=forms.RadioSelect()
+    )
 
     def __init__(self, *args, **kwargs) -> None:
         self.instance = kwargs.pop("instance")
@@ -24,7 +27,7 @@ class QuestionnaireStepForm(forms.Form):
         if self.instance:
             children = self.instance.get_children()
             if children:
-                self.fields['answer'].queryset = self.instance.get_children()
+                self.fields["answer"].queryset = self.instance.get_children()
                 return
 
         self.fields.pop("answer")

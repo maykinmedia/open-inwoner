@@ -24,15 +24,27 @@ class QuestionnaireStepAdmin(DjangoMpttAdmin):
     inlines = (QuestionnaireStepFileInline,)
     prepopulated_fields = {"slug": ("question",)}
     fieldsets = (
-        (_('Vraag'), {
-            'fields': ('parent_answer', 'question', 'slug', 'help_text'),
-        }),
-        (_('Stappenplan'), {
-            'classes': ('collapse',),
-            'fields': ('parent', 'title', 'description'),
-        }),
-        (_('Optionele velden'), {
-            'classes': ('collapse in',),
-            'fields': ('content', 'related_products',),
-        }),
+        (
+            _("Vraag"),
+            {
+                "fields": ("parent_answer", "question", "slug", "help_text"),
+            },
+        ),
+        (
+            _("Stappenplan"),
+            {
+                "classes": ("collapse",),
+                "fields": ("parent", "title", "description"),
+            },
+        ),
+        (
+            _("Optionele velden"),
+            {
+                "classes": ("collapse in",),
+                "fields": (
+                    "content",
+                    "related_products",
+                ),
+            },
+        ),
     )
