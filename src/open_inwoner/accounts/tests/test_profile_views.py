@@ -170,3 +170,23 @@ class EditIntrestsTests(WebTest):
         self.assertTrue(form.get("selected_themes", index=0).checked)
         self.assertFalse(form.get("selected_themes", index=1).checked)
         self.assertFalse(form.get("selected_themes", index=2).checked)
+
+
+class ExportProfileTests(WebTest):
+    def setUp(self):
+        self.url = reverse("accounts:profile_export")
+        self.user = UserFactory()
+
+    def test_login_required(self):
+        login_url = reverse("login")
+        response = self.app.get(self.url)
+        self.assertRedirects(response, f"{login_url}?next={self.url}")
+
+    def test_export_profile(self):
+        response = self.app.get(self.url, user=self.user)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content_type, "application/pdf")
+        self.assertEqual(
+            response["Content-Disposition"],
+            f'attachment; filename="profile.pdf"',
+        )

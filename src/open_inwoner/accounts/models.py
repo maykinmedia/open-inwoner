@@ -150,6 +150,15 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_new_messages_total(self) -> int:
         return self.received_messages.filter(seen=False).count()
 
+    def get_all_files(self):
+        return self.documents.order_by("-created_on")
+
+    def get_interests(self) -> str:
+        if not self.selected_themes.exists():
+            return _("U heeft geen intressegebieden aangegeven.")
+
+        return ", ".join(list(self.selected_themes.values_list("name", flat=True)))
+
 
 class Contact(models.Model):
     uuid = models.UUIDField(
