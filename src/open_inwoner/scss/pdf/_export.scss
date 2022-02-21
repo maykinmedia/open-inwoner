@@ -1,0 +1,11 @@
+.export {
+  .logo {
+    .logo__image {
+      max-width: 10%;
+    }
+  }
+
+  .h1:first-of-type {
+    margin-top: var(--row-height);
+  }
+}

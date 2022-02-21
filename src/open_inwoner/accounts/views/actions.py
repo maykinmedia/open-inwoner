@@ -1,10 +1,12 @@
 from datetime import datetime
 
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http.response import HttpResponseRedirect
+from django.http.response import HttpResponse, HttpResponseRedirect
 from django.urls.base import reverse_lazy
-from django.views.generic import CreateView, ListView
+from django.views.generic import CreateView, DetailView, ListView
 from django.views.generic.edit import UpdateView
+
+from open_inwoner.utils.export import render_pdf
 
 from ..forms import ActionForm, ActionListForm
 from ..models import Action
@@ -87,3 +89,32 @@ class ActionCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         self.object = form.save(self.request.user)
         return HttpResponseRedirect(self.get_success_url())
+
+
+class ActionExportView(LoginRequiredMixin, DetailView):
+    template_name = "export/profile/action_export.html"
+    model = Action
+    slug_field = "uuid"
+    slug_url_kwarg = "uuid"
+
+    def get_queryset(self):
+        base_qs = super().get_queryset()
+        return base_qs.filter(is_for=self.request.user)
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        context = self.get_context_data(request=self.request)
+
+        # create pdf
+        file = render_pdf(
+            self.template_name,
+            context,
+            base_url=self.request.build_absolute_uri(),
+            request=self.request,
+        )
+        filename = f"action_{self.object.uuid}.pdf"
+
+        response = HttpResponse(file, content_type="application/pdf")
+        response["Content-Disposition"] = f'attachment; filename="{filename}"'
+
+        return response
