@@ -5,6 +5,7 @@ from .views import (
     PlanCreateView,
     PlanDetailView,
     PlanEditView,
+    PlanExportView,
     PlanFileUploadView,
     PlanGoalEditView,
     PlanListView,
@@ -23,4 +24,5 @@ urlpatterns = [
         PlanActionCreateView.as_view(),
         name="plan_action_create",
     ),
+    path("<uuid:uuid>/export/", PlanExportView.as_view(), name="plan_export"),
 ]

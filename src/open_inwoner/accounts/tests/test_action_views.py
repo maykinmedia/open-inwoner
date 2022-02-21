@@ -108,7 +108,7 @@ class ActionViewTests(WebTest):
 
     def test_action_export_login_required(self):
         response = self.app.get(self.export_url)
-        self.assertRedirects(response, f"{self.login_url}?next={self.create_url}")
+        self.assertRedirects(response, f"{self.login_url}?next={self.export_url}")
 
     def test_action_export_not_your_action(self):
         other_user = UserFactory()

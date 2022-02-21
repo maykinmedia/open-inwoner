@@ -55,3 +55,6 @@ class Plan(models.Model):
 
     def get_other_files(self):
         return self.documents.order_by("-created_on")[1:]
+
+    def get_all_files(self):
+        return self.documents.order_by("-created_on")
