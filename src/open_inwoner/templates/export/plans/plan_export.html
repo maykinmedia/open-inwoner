@@ -43,31 +43,6 @@
     {% endif %}
 
     <h2 class="h2 h2--extra">{% trans "Acties" %}</h2>
-    <table class="table">
-        <thead class="table__heading">
-            <tr>
-                <td class="table__item">{% trans "Name" %}</td>
-                <td class="table__item">{% trans "Status" %}</td>
-                <td class="table__item">{% trans "Type" %}</td>
-                <td class="table__item">{% trans "Is for" %}</td>
-                <td class="table__item">{% trans "End date" %}</td>
-                <td class="table__item">{% trans "Created on" %}</td>
-                <td class="table__item">{% trans "File" %}</td>
-            </tr>
-        </thead>
-        <tbody>
-            {% for action in object.actions.all %}
-                <tr>
-                    <td class="table__item">{{ action.name }}</td>
-                    <td class="table__item">{{ action.get_status_display }}</td>
-                    <td class="table__item">{{ action.get_type_display }}</td>
-                    <td class="table__item">{{ action.is_for.get_full_name }}</td>
-                    <td class="table__item">{{ action.end_date }}</td>
-                    <td class="table__item">{{ action.created_on }}</td>
-                    <td class="table__item">{% if action.file %}{% link href=action.file.url icon="download" download=True %}{% endif %}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    {% include "export/include/actions.html" with actions=objects.actions.all %}
 
 {% endblock %}

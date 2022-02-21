@@ -19,6 +19,7 @@ from .views import (
     InboxView,
     InviteAcceptView,
     MyCategoriesView,
+    MyProfileExportView,
     MyProfileView,
 )
 
@@ -63,5 +64,6 @@ urlpatterns = [
     ),
     path("edit/", EditProfileView.as_view(), name="edit_profile"),
     path("invite/<str:key>/accept/", InviteAcceptView.as_view(), name="invite_accept"),
+    path("export/", MyProfileExportView.as_view(), name="profile_export"),
     path("", MyProfileView.as_view(), name="my_profile"),
 ]
