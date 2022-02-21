@@ -213,7 +213,7 @@ class PlanActionCreateView(ActionCreateView):
 
     def form_valid(self, form):
         self.object = self.get_object()
-        form.save(self.request.user, plan=self.object)
+        form.save(self.request.user)
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self) -> str:
