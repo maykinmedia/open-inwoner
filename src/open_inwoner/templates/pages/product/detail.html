@@ -35,6 +35,11 @@
             <li class="anchor-menu__list-item">
                 {% link href='#share' text=_('Delen') %}
             </li>
+            {% if product.link %}
+                <li class="anchor-menu__list-item">
+                    {% button href=product.link size="big" text=_("Aanvraag starten") primary=True icon="arrow_forward" icon_position="before" %}
+                </li>
+            {% endif %}
             <li class="anchor-menu__list-item anchor-menu__list-item--top">
                 {% link primary=True href='#top' icon='arrow_upward' icon_position='before' text=_('Terug naar boven') %}
             </li>
@@ -47,9 +52,6 @@
         {{ object.name }}
         {% if request.user.is_staff %}
             {% button icon="edit" href="admin:pdc_product_change" object_id=object.pk %}
-        {% endif %}
-        {% if product.link %}
-            {% button href=product.link size="big" text=_("Aanvraag starten") primary=True icon="arrow_forward" icon_position="after" %}
         {% endif %}
     </h1>
     {% tag tags=object.tags.all %}
