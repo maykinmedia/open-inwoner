@@ -32,7 +32,7 @@
         </tr>
         <tr>
             <th class="table__header">{% trans "File" %}</th>
-            <td class="table__item">{% if object.file %}{% link href=object.file.url text=object.file.name %}{% endif %}</td>
+            <td class="table__item">{% if object.file %}{% link href=object.file.url text=object.file.name download=True %}{% endif %}</td>
         </tr>
         <tr>
             <th class="table__header">{% trans "Goal" %}</th>

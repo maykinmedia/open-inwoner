@@ -1,17 +1,13 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404, HttpResponseRedirect
-from django.utils.translation import ugettext_lazy as _
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
-from view_breadcrumbs import (
-    CreateBreadcrumbMixin,
-    DetailBreadcrumbMixin,
-    ListBreadcrumbMixin,
-)
+from view_breadcrumbs import DetailBreadcrumbMixin, ListBreadcrumbMixin
 
 from open_inwoner.accounts.forms import ActionListForm, DocumentForm
 from open_inwoner.accounts.views.actions import ActionCreateView, BaseActionFilter
+from open_inwoner.utils.mixins import ExportDetailMixin
 
 from .forms import PlanForm, PlanGoalForm
 from .models import Plan
@@ -153,3 +149,13 @@ class PlanActionCreateView(ActionCreateView):
 
     def get_success_url(self) -> str:
         return self.object.get_absolute_url()
+
+
+class PlanExportView(LoginRequiredMixin, ExportDetailMixin, DetailView):
+    template_name = "export/plans/plan_export.html"
+    model = Plan
+    slug_field = "uuid"
+    slug_url_kwarg = "uuid"
+
+    def get_queryset(self):
+        return Plan.objects.connected(self.request.user).prefetch_related("actions")
