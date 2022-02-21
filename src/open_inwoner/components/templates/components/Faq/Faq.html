@@ -1,0 +1,16 @@
+{% load link_tags %}
+
+<aside class="faq">
+    {% if title %}<h2 class="h2">{{ title }}</h2>{% endif %}
+
+    <ul class="faq__list">
+        {% for question in questions %}
+            <li class="faq__list-item">
+                {% firstof question.pk|slugify as id %}
+                {% firstof 'question-'|add:id|add:'-answer' as answer_id %}
+                {% link bold=True href='#'|add:answer_id icon='chevron_right' secondary=True text=question.question toggle="open"  %}
+                <p id="{{ answer_id }}" class="p faq__answer">{{ question.answer }}</p>
+            </li>
+        {% endfor %}
+    </ul>
+</aside>

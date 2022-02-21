@@ -18,7 +18,7 @@ from open_inwoner.utils.validators import validate_phone_number
 
 from .choices import ContactTypeChoices, LoginTypeChoices, StatusChoices, TypeChoices
 from .managers import ActionQueryset, DigidManager, UserManager, eHerkenningManager
-from .query import MessageQuerySet
+from .query import ContactQuerySet, MessageQuerySet
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -27,36 +27,49 @@ class User(AbstractBaseUser, PermissionsMixin):
     """
 
     first_name = models.CharField(
-        _("first name"), max_length=255, blank=True, default=""
+        verbose_name=_("First name"), max_length=255, blank=True, default=""
     )
-    last_name = models.CharField(_("last name"), max_length=255, blank=True, default="")
-    email = models.EmailField(_("email address"), unique=True)
+    last_name = models.CharField(
+        verbose_name=_("Last name"), max_length=255, blank=True, default=""
+    )
+    email = models.EmailField(verbose_name=_("Email address"), unique=True)
     is_staff = models.BooleanField(
-        _("staff status"),
+        verbose_name=_("Staff status"),
         default=False,
         help_text=_("Designates whether the user can log into this admin site."),
     )
     is_active = models.BooleanField(
-        _("active"),
+        verbose_name=_("Active"),
         default=True,
         help_text=_(
             "Designates whether this user should be treated as active. "
             "Unselect this instead of deleting accounts."
         ),
     )
-    date_joined = models.DateTimeField(_("date joined"), default=timezone.now)
-    rsin = models.CharField(max_length=9, null=True, blank=True)
-    bsn = NLBSNField(null=True, blank=True)
+    date_joined = models.DateTimeField(
+        verbose_name=_("Date joined"), default=timezone.now
+    )
+    rsin = models.CharField(verbose_name=_("Rsin"), max_length=9, null=True, blank=True)
+    bsn = NLBSNField(verbose_name=_("Bsn"), null=True, blank=True)
     login_type = models.CharField(
+        verbose_name=_("Login type"),
         choices=LoginTypeChoices.choices,
         default=LoginTypeChoices.default,
         max_length=250,
     )
-    birthday = models.DateField(null=True, blank=True)
-    street = models.CharField(default="", blank=True, max_length=250)
-    housenumber = models.CharField(default="", blank=True, max_length=250)
-    postcode = NLZipCodeField(null=True, blank=True, max_length=250)
-    city = models.CharField(default="", blank=True, max_length=250)
+    birthday = models.DateField(verbose_name=_("Birthday"), null=True, blank=True)
+    street = models.CharField(
+        verbose_name=_("Street"), default="", blank=True, max_length=250
+    )
+    housenumber = models.CharField(
+        verbose_name=_("House number"), default="", blank=True, max_length=250
+    )
+    postcode = NLZipCodeField(
+        verbose_name=_("Postcode"), null=True, blank=True, max_length=250
+    )
+    city = models.CharField(
+        verbose_name=_("City"), default="", blank=True, max_length=250
+    )
     deactivated_on = models.DateField(
         verbose_name=_("Deactivated on"),
         null=True,
@@ -64,12 +77,13 @@ class User(AbstractBaseUser, PermissionsMixin):
         help_text=_("This is the date the user decided to deactivate their account."),
     )
     is_prepopulated = models.BooleanField(
-        _("prepopulated"),
+        verbose_name=_("Prepopulated"),
         default=False,
         help_text=_("Indicates if fields have been prepopulated by Haal Central API."),
     )
     selected_themes = models.ManyToManyField(
         "pdc.Category",
+        verbose_name=_("Selected themes"),
         related_name="selected_by",
         blank=True,
     )
@@ -124,6 +138,17 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_active_contacts(self):
         return self.contacts.filter(contact_user__is_active=True)
+
+    def get_assigned_active_contacts(self):
+        return self.assigned_contacts.filter(created_by__is_active=True)
+
+    def get_extended_active_contacts(self):
+        return Contact.objects.get_extended_contacts_for_user(me=self).filter(
+            contact_user__is_active=True, created_by__is_active=True
+        )
+
+    def get_new_messages_total(self) -> int:
+        return self.received_messages.filter(seen=False).count()
 
 
 class Contact(models.Model):
@@ -208,6 +233,8 @@ class Contact(models.Model):
         help_text=_("The function of the contact within an organization."),
     )
 
+    objects = ContactQuerySet.as_manager()
+
     class Meta:
         ordering = ("-updated_on", "-created_on")
 
@@ -226,6 +253,9 @@ class Contact(models.Model):
     def get_message_url(self) -> str:
         url = furl(reverse("accounts:inbox")).add({"with": self.email}).url
         return f"{url}#messages-last"
+
+    def get_created_by_name(self):
+        return f"{self.created_by.first_name} {self.created_by.last_name}"
 
 
 class Document(models.Model):

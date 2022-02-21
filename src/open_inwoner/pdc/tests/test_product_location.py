@@ -2,6 +2,12 @@ import json
 
 from django.contrib.gis.geos import Point
 from django.test import TestCase
+from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _
+
+from django_webtest import WebTest
+
+from open_inwoner.accounts.tests.factories import UserFactory
 
 from ..models import ProductLocation
 from .factories import ProductFactory, ProductLocationFactory
@@ -77,6 +83,7 @@ class ProductLocationTestCase(TestCase):
                         "housenumber": "117",
                         "postcode": "1015 CJ",
                         "city": "Amsterdam",
+                        "url": product_location.product.get_absolute_url(),
                     },
                 }
             ),
@@ -116,7 +123,7 @@ class ProductLocationTestCase(TestCase):
         )
 
     def test_queryset_get_geojson_feature_collection(self):
-        ProductLocationFactory.create(
+        product_location_1 = ProductLocationFactory.create(
             name="Maykin Media",
             street="Keizersgracht",
             housenumber="117",
@@ -124,7 +131,7 @@ class ProductLocationTestCase(TestCase):
             city="Amsterdam",
             geometry=Point(4.8876515, 52.3775941),
         )
-        ProductLocationFactory.create(
+        product_location_2 = ProductLocationFactory.create(
             name="Anne Frank Huis",
             street="Westermarkt",
             housenumber="20",
@@ -149,6 +156,7 @@ class ProductLocationTestCase(TestCase):
                                 "housenumber": "117",
                                 "postcode": "1015 CJ",
                                 "city": "Amsterdam",
+                                "url": product_location_1.product.get_absolute_url(),
                             },
                         },
                         {
@@ -163,6 +171,7 @@ class ProductLocationTestCase(TestCase):
                                 "housenumber": "20",
                                 "postcode": "1016 GV",
                                 "city": "Amsterdam",
+                                "url": product_location_2.product.get_absolute_url(),
                             },
                         },
                     ],
@@ -191,4 +200,24 @@ class ProductLocationTestCase(TestCase):
         )
         self.assertEqual(
             "52.3760345", ProductLocation.objects.all().get_centroid()["lat"]
+        )
+
+
+class TestLocationFormInput(WebTest):
+    def test_exception_is_handled_when_city_and_postcode_are_not_provided(self):
+        product = ProductFactory()
+        user = UserFactory(is_superuser=True, is_staff=True)
+
+        response = self.app.get(reverse("admin:pdc_productlocation_add"), user=user)
+        form = response.form
+        form["product"] = product.pk
+        form_response = form.submit("_save")
+
+        self.assertListEqual(
+            form_response.context["errors"],
+            [
+                [_("Dit veld is vereist.")],
+                [_("Dit veld is vereist.")],
+                [_("No location data was provided")],
+            ],
         )
