@@ -1,7 +1,6 @@
 from django.test import TestCase
 from django.utils.translation import gettext as _
 
-
 from .factories import QuestionnaireStepFactory, QuestionnaireStepFileFactory
 
 

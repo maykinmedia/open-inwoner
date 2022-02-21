@@ -1,8 +1,9 @@
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext as _
-from mptt.models import MPTTModel, TreeForeignKey
+
 from filer.fields.file import FilerFileField
+from mptt.models import MPTTModel, TreeForeignKey
 
 
 class QuestionnaireStep(MPTTModel):

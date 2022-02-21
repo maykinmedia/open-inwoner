@@ -1,7 +1,8 @@
 from django import template
 from django.utils.html import format_html
-from bs4 import BeautifulSoup
+
 import markdown
+from bs4 import BeautifulSoup
 
 register = template.Library()
 

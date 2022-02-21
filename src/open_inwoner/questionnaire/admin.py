@@ -1,9 +1,11 @@
 from django import forms
 from django.contrib import admin
 from django.utils.translation import gettext as _
+
 from django_mptt_admin.admin import DjangoMpttAdmin
-from .models import QuestionnaireStep, QuestionnaireStepFile
+
 from ..ckeditor5.widgets import CKEditorWidget
+from .models import QuestionnaireStep, QuestionnaireStepFile
 
 
 class QuestionnaireStepFileInline(admin.TabularInline):

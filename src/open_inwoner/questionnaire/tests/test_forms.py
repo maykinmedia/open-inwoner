@@ -1,7 +1,7 @@
 from django.test import TestCase
 
-from .factories import QuestionnaireStepFactory
 from ..forms import QuestionnaireStepChoiceField, QuestionnaireStepForm
+from .factories import QuestionnaireStepFactory
 
 
 class QuestionnaireStepChoiceFieldTestCase(TestCase):

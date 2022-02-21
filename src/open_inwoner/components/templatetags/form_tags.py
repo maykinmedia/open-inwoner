@@ -1,5 +1,4 @@
-from django import template
-from django import forms
+from django import forms, template
 from django.template.library import parse_bits
 from django.template.loader import render_to_string
 from django.utils.translation import gettext as _
