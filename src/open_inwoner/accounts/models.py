@@ -142,6 +142,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_assigned_active_contacts(self):
         return self.assigned_contacts.filter(created_by__is_active=True)
 
+    def get_extended_contacts(self):
+        return Contact.objects.get_extended_contacts_for_user(me=self)
+
     def get_extended_active_contacts(self):
         return Contact.objects.get_extended_contacts_for_user(me=self).filter(
             contact_user__is_active=True, created_by__is_active=True
