@@ -1,4 +1,3 @@
-from unicodedata import category
 import json
 from typing import Union
 
