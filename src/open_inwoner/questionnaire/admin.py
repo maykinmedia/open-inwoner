@@ -1,8 +1,8 @@
 from django import forms
 from django.contrib import admin
 from django.utils.translation import gettext as _
-
-from django_mptt_admin.admin import DjangoMpttAdmin
+from treebeard.admin import TreeAdmin
+from treebeard.forms import movenodeform_factory
 
 from ..ckeditor5.widgets import CKEditorWidget
 from .models import QuestionnaireStep, QuestionnaireStepFile
@@ -13,7 +13,7 @@ class QuestionnaireStepFileInline(admin.TabularInline):
     model = QuestionnaireStepFile
 
 
-class QuestionnaireStepAdminForm(forms.ModelForm):
+class QuestionnaireStepAdminForm(movenodeform_factory(QuestionnaireStep)):
     class Meta:
         model = QuestionnaireStep
         fields = "__all__"
@@ -21,7 +21,7 @@ class QuestionnaireStepAdminForm(forms.ModelForm):
 
 
 @admin.register(QuestionnaireStep)
-class QuestionnaireStepAdmin(DjangoMpttAdmin):
+class QuestionnaireStepAdmin(TreeAdmin):
     form = QuestionnaireStepAdminForm
     inlines = (QuestionnaireStepFileInline,)
     prepopulated_fields = {"slug": ("question",)}
@@ -36,7 +36,7 @@ class QuestionnaireStepAdmin(DjangoMpttAdmin):
             _("Stappenplan"),
             {
                 "classes": ("collapse",),
-                "fields": ("parent", "title", "description"),
+                "fields": ("_position", "_ref_node_id", "title", "description"),
             },
         ),
         (

@@ -7,7 +7,7 @@ from .factories import QuestionnaireStepFactory
 class QuestionnaireStepChoiceFieldTestCase(TestCase):
     def test_label_from_instance(self):
         root = QuestionnaireStepFactory.create(question="foo")
-        QuestionnaireStepFactory.create(parent=root, parent_answer="bar")
+        root.add_child(parent_answer="bar")
         field = QuestionnaireStepChoiceField(queryset=root.get_children())
 
         for (index, choice) in enumerate(field.choices):
@@ -19,7 +19,7 @@ class QuestionnaireStepChoiceFieldTestCase(TestCase):
 class QuestionnaireStepFormTestCase(TestCase):
     def test_answer(self):
         root = QuestionnaireStepFactory.create()
-        QuestionnaireStepFactory.create(parent=root)
+        root.add_child()
         form = QuestionnaireStepForm(instance=root)
         self.assertIn("answer", form.fields)
 

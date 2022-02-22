@@ -69,7 +69,7 @@ class QuestionnaireStepViewTestCase(TestCase):
 
     def test_descendent_step_200(self):
         root = QuestionnaireStepFactory.create(slug="foo")
-        descendent = QuestionnaireStepFactory.create(parent=root, slug="bar")
+        descendent = root.add_child(slug="bar")
         path = reverse(
             "questionnaire:descendent_step", kwargs={"root_slug": "foo", "slug": "bar"}
         )
@@ -112,7 +112,7 @@ class QuestionnaireStepViewTestCase(TestCase):
 
     def test_render_answers(self):
         root = QuestionnaireStepFactory.create(slug="foo")
-        QuestionnaireStepFactory.create(parent=root, parent_answer="bar")
+        root.add_child(parent_answer="bar")
         path = reverse("questionnaire:index")
         response = self.client.get(path)
         self.assertContains(response, "bar")
@@ -142,8 +142,8 @@ class QuestionnaireStepViewTestCase(TestCase):
 
     def test_render_previous(self):
         root = QuestionnaireStepFactory.create(slug="foo")
-        parent = QuestionnaireStepFactory.create(parent=root, slug="baz")
-        QuestionnaireStepFactory.create(parent=parent, slug="bar")
+        parent = root.add_child(slug="baz")
+        parent.add_child(slug="bar")
         path = reverse(
             "questionnaire:descendent_step", kwargs={"root_slug": "foo", "slug": "baz"}
         )
@@ -152,7 +152,7 @@ class QuestionnaireStepViewTestCase(TestCase):
 
     def test_render_profile(self):
         root = QuestionnaireStepFactory.create(slug="foo")
-        QuestionnaireStepFactory.create(parent=root, slug="bar")
+        root.add_child(slug="bar")
         path = reverse(
             "questionnaire:descendent_step", kwargs={"root_slug": "foo", "slug": "bar"}
         )
@@ -165,7 +165,7 @@ class QuestionnaireStepViewTestCase(TestCase):
 
     def test_get_object_slug(self):
         root = QuestionnaireStepFactory.create(slug="foo")
-        descendent = QuestionnaireStepFactory.create(parent=root, slug="bar")
+        descendent = root.add_child(slug="bar")
         request = RequestFactory().get("/zelfdiagnose/bar")
         middleware = SessionMiddleware()
         middleware.process_request(request)
@@ -189,7 +189,7 @@ class QuestionnaireStepViewTestCase(TestCase):
 
     def test_get_object_session(self):
         root = QuestionnaireStepFactory.create(slug="foo")
-        descendent = QuestionnaireStepFactory.create(parent=root, slug="bar")
+        descendent = root.add_child(slug="bar")
         request = RequestFactory().get("/zelfdiagnose")
         middleware = SessionMiddleware()
         middleware.process_request(request)
@@ -215,7 +215,7 @@ class QuestionnaireStepViewTestCase(TestCase):
 
     def test_get_object_first(self):
         root = QuestionnaireStepFactory.create(slug="foo")
-        QuestionnaireStepFactory.create(parent=root, slug="bar")
+        root.add_child(slug="bar")
         request = RequestFactory().get("/zelfdiagnose")
         middleware = SessionMiddleware()
         middleware.process_request(request)
@@ -264,7 +264,7 @@ class QuestionnaireStepViewTestCase(TestCase):
 
     def test_form_valid_valid(self):
         root = QuestionnaireStepFactory.create(slug="foo")
-        descendent = QuestionnaireStepFactory.create(parent=root, slug="bar")
+        descendent = root.add_child(slug="bar")
         request = RequestFactory().get("/zelfdiagnose")
         middleware = SessionMiddleware()
         middleware.process_request(request)

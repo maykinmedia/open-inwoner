@@ -18,7 +18,7 @@ class QuestionnaireStepTestCase(TestCase):
 
     def test_get_absolute_url_descendent(self):
         root = QuestionnaireStepFactory.create(slug="foo")
-        descendent = QuestionnaireStepFactory.create(parent=root, slug="bar")
+        descendent = root.add_child(slug="bar")
         self.assertEqual("/zelfdiagnose/foo/bar", descendent.get_absolute_url())
 
     def test_get_title_root(self):
@@ -27,13 +27,13 @@ class QuestionnaireStepTestCase(TestCase):
 
     def test_get_title_descendent_self(self):
         root = QuestionnaireStepFactory.create(title="foo")
-        descendent = QuestionnaireStepFactory.create(parent=root, title="bar")
+        descendent = root.add_child(title="bar")
         self.assertEqual("bar", descendent.get_title())
 
     def test_get_title_descendent_inherited(self):
         root = QuestionnaireStepFactory.create(title="foo")
-        parent = QuestionnaireStepFactory.create(parent=root, title="baz")
-        descendent = QuestionnaireStepFactory.create(parent=parent)
+        parent = root.add_child(title="baz")
+        descendent = parent.add_child()
         self.assertEqual("foo", descendent.get_title())
 
     def test_get_description_root(self):
@@ -42,13 +42,13 @@ class QuestionnaireStepTestCase(TestCase):
 
     def test_get_description_descendent_self(self):
         root = QuestionnaireStepFactory.create(description="foo")
-        descendent = QuestionnaireStepFactory.create(parent=root, description="bar")
+        descendent = root.add_child(description="bar")
         self.assertEqual("bar", descendent.get_description())
 
     def test_get_description_descendent_inherited(self):
         root = QuestionnaireStepFactory.create(description="foo")
-        parent = QuestionnaireStepFactory.create(parent=root, description="baz")
-        descendent = QuestionnaireStepFactory.create(parent=parent)
+        parent = root.add_child(description="baz")
+        descendent = parent.add_child()
         self.assertEqual("foo", descendent.get_description())
 
 

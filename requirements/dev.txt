@@ -243,11 +243,6 @@ django-mptt==0.13.4
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-filer
-    #   django-mptt-admin
-django-mptt-admin==2.2.0
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
 django-ordered-model==3.4.3
     # via
     #   -c requirements/ci.txt

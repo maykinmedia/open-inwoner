@@ -3,23 +3,15 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from filer.fields.file import FilerFileField
-from mptt.models import MPTTModel, TreeForeignKey
+from treebeard.mp_tree import MP_Node
 
 
-class QuestionnaireStep(MPTTModel):
+class QuestionnaireStep(MP_Node):
     """
     A step in a questionnaire, can optionally have a related QuestionnaireStep as `parent`, in which case
     `parent_answer` will be rendered as an answer to the parent's form.
     """
 
-    parent = TreeForeignKey(
-        "self",
-        verbose_name=_("Vorige stap"),
-        help_text=_("Geeft aan op welke stap dit een vervolgstap is."),
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True,
-    )
     parent_answer = models.CharField(
         _("Antwoord op vorige vraag"),
         help_text=_("Dit label wordt getoond bij de keuzes van de vorige stap."),
@@ -66,14 +58,11 @@ class QuestionnaireStep(MPTTModel):
         blank=True,
     )
 
-    class MPTTMeta:
-        order_insertion_by = ["parent_answer"]
-
     def __str__(self) -> str:
         return self.question
 
     def get_absolute_url(self) -> str:
-        if self.is_root_node():
+        if self.is_root():
             return reverse("questionnaire:root_step", kwargs={"slug": self.slug})
         root = self.get_root()
         return reverse(
