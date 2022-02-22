@@ -20,7 +20,7 @@
             {% if form.instance.get_children %}
                 {% firstof form.instance.parent.get_absolute_url as secondary_href %}
             {% else %}
-                {% url 'accounts:my_profile' as secondary_href %}
+                {% url 'questionnaire:reset' as secondary_href %}
             {% endif %}
 
             {% render_form auto_render=form.instance.get_children extra_classes='form--compact' form=form method='POST' submit_text=_('Volgende') secondary_href=secondary_href secondary_icon='arrow_backward' secondary_icon_position='before' secondary_text=_('Vorige') %}

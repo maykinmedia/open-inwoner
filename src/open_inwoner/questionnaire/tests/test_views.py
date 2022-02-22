@@ -10,8 +10,25 @@ from ...pdc.models import Product
 from ...pdc.tests.factories import ProductFactory
 from ..forms import QuestionnaireStepForm
 from ..models import QuestionnaireStep
-from ..views import QuestionnaireStepView
+from ..views import (
+    QUESTIONNAIRE_SESSION_KEY,
+    QuestionnaireResetView,
+    QuestionnaireStepView,
+)
 from .factories import QuestionnaireStepFactory, QuestionnaireStepFileFactory
+
+
+class QuestionnaireResetViewTestCase(TestCase):
+    def test_clears_session(self):
+        path = reverse("questionnaire:reset")
+        self.client.get(path)
+        self.assertIsNone(self.client.session[QUESTIONNAIRE_SESSION_KEY])
+
+    def test_redirects(self):
+        path = reverse("questionnaire:reset")
+        response = self.client.get(path)
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(reverse("accounts:my_profile"), response.url)
 
 
 class QuestionnaireStepViewTestCase(TestCase):
@@ -179,7 +196,7 @@ class QuestionnaireStepViewTestCase(TestCase):
         request.session.save()
         view = QuestionnaireStepView()
         view.setup(request)
-        request.session[view.session_key] = "bar"
+        request.session[QUESTIONNAIRE_SESSION_KEY] = "bar"
         object = view.get_object()
         self.assertEqual(object, descendent)
 
@@ -191,7 +208,7 @@ class QuestionnaireStepViewTestCase(TestCase):
         request.session.save()
         view = QuestionnaireStepView()
         view.setup(request)
-        request.session[view.session_key] = "bar"
+        request.session[QUESTIONNAIRE_SESSION_KEY] = "bar"
 
         with self.assertRaises(Http404):
             view.get_object()
