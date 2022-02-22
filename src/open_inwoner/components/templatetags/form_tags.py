@@ -1,5 +1,5 @@
 from django import template
-from django.forms import fields, models
+from django.forms import fields, models, widgets
 from django.template.library import parse_bits
 from django.template.loader import render_to_string
 from django.utils.translation import gettext as _
@@ -11,6 +11,7 @@ register = template.Library()
 
 WIDGET_TEMPLATES = {
     "CHECKBOX": "components/Form/Checkbox.html",
+    "RADIOBUTTON": "components/Form/Radiobutton.html",
     "MULTIPLECHECKBOX": "components/Form/MultipleCheckbox.html",
     "DATE": "components/Form/DateField.html",
     "HIDDEN": "components/Form/Hidden.html",
@@ -137,6 +138,8 @@ def autorender_field(form_object, field_name, **kwargs):
         tmplt = WIDGET_TEMPLATES["HIDDEN"]
     elif type(field.widget) == fields.Textarea:
         tmplt = WIDGET_TEMPLATES["TEXTAREA"]
+    elif type(field.widget) == widgets.RadioSelect:
+        tmplt = WIDGET_TEMPLATES["RADIOBUTTON"]
 
     context = fn(bound_field, **kwargs)
     return render_to_string(tmplt, context)

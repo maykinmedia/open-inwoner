@@ -1,12 +1,25 @@
-from django import forms
+from datetime import timedelta
 
-from .models import Plan
+from django import forms
+from django.utils import timezone
+from django.utils.translation import gettext as _
+
+from open_inwoner.accounts.models import Action
+
+from .models import Plan, PlanTemplate
 
 
 class PlanForm(forms.ModelForm):
+    template = forms.ModelChoiceField(
+        queryset=PlanTemplate.objects.all(),
+        required=False,
+        empty_label=_("No template"),
+        widget=forms.widgets.RadioSelect(),
+    )
+
     class Meta:
         model = Plan
-        fields = ("title", "end_date", "contacts")
+        fields = ("title", "end_date", "contacts", "template")
 
     def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -20,7 +33,26 @@ class PlanForm(forms.ModelForm):
     def save(self, user, commit=True):
         if not self.instance.pk:
             self.instance.created_by = user
-        return super().save(commit=commit)
+
+        template = self.cleaned_data.get("template")
+        self.instance.goal = template.goal
+        plan = super().save(commit=commit)
+        actions = []
+        now = timezone.now()
+        for action_template in template.actiontemplates.all():
+            end_date = now + timedelta(days=action_template.end_in_days)
+            action = Action.objects.create(
+                name=action_template.name,
+                description=action_template.description,
+                goal=action_template.goal,
+                type=action_template.type,
+                end_date=end_date.date(),
+                is_for=user,
+                created_by=user,
+                plan=plan,
+            )
+        plan.actions.add(*actions)
+        return plan
 
 
 class PlanGoalForm(forms.ModelForm):
