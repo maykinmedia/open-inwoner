@@ -1,0 +1,32 @@
+{% load form_tags utils %}
+
+<div class="form__control">
+    <label for="" class="label">
+        {{ field.label }}
+    </label>
+
+    <div class="form__grid-rows">
+        <div></div>
+        {% for choice in field.field.choices %}
+            <label class="radiobutton">
+                <input
+                    class="radiobutton__input"
+                    type="radio"
+                    name="{{ field.name }}"
+                    value="{{ choice.0 }}"
+                    id="id_{{ field.name }}_{{ forloop.counter }}"
+                    {% if choice.0 in data %}checked="checked"{% endif %}
+                />
+                <label class="radiobutton__label" for="id_{{ field.name }}_{{ forloop.counter }}">{{ choice.1 }}</label>
+            </label>
+        {% endfor %}
+    </div>
+
+    {% if field.help_text %}
+        <p class="p">{{ field.help_text }}</p>
+    {% endif %}
+
+    {% if field.errors %}
+        {% errors errors=field.errors %}
+    {% endif %}
+</div>
