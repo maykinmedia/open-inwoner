@@ -3,12 +3,15 @@ from django.contrib.auth.admin import UserAdmin
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
+from open_inwoner.utils.mixins import UUIDAdminFirstInOrder
+
 from .models import Action, Appointment, Contact, Document, Invite, Message, User
 
 
-class ActionInlineAdmin(admin.StackedInline):
+class ActionInlineAdmin(UUIDAdminFirstInOrder, admin.StackedInline):
     model = Action
     extra = 1
+    readonly_fields = ("uuid",)
 
 
 @admin.register(User)
@@ -66,13 +69,15 @@ class _UserAdmin(UserAdmin):
 
 
 @admin.register(Action)
-class ActionAdmin(admin.ModelAdmin):
+class ActionAdmin(UUIDAdminFirstInOrder, admin.ModelAdmin):
+    readonly_fields = ("uuid",)
     list_display = ("name", "created_on", "created_by")
     list_filter = ("created_by",)
 
 
 @admin.register(Contact)
-class ContactAdmin(admin.ModelAdmin):
+class ContactAdmin(UUIDAdminFirstInOrder, admin.ModelAdmin):
+    readonly_fields = ("uuid",)
     list_display = (
         "first_name",
         "last_name",
@@ -88,13 +93,15 @@ class ContactAdmin(admin.ModelAdmin):
 
 
 @admin.register(Document)
-class DocumentAdmin(admin.ModelAdmin):
+class DocumentAdmin(UUIDAdminFirstInOrder, admin.ModelAdmin):
+    readonly_fields = ("uuid",)
     list_display = ("name", "file", "created_on", "owner")
     list_filter = ("owner",)
 
 
 @admin.register(Appointment)
-class AppointmentAdmin(admin.ModelAdmin):
+class AppointmentAdmin(UUIDAdminFirstInOrder, admin.ModelAdmin):
+    readonly_fields = ("uuid",)
     list_display = ("name", "datetime", "created_on", "created_by")
     list_filter = ("created_by",)
 
