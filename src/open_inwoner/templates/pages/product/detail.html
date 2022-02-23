@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n l10n button_tags card_tags file_tags grid_tags icon_tags link_tags map_tags notification_tags tag_tags utils %}
+{% load i18n l10n button_tags card_tags file_tags grid_tags icon_tags link_tags map_tags notification_tags tag_tags utils condition_tags %}
 
 {% block sidebar_content %}
     <aside class="anchor-menu">
@@ -60,6 +60,23 @@
     {% if object.files.exists %}
         <hr class="divider">
         {% file_list files=object.files.all title=_("Bestanden") %}
+    {% endif %}
+
+    {# Conditions #}
+    {% if object.conditions.exists %}
+        <hr class="divider">
+
+        {% render_grid %}
+            {% render_column span=6 compact=True %}
+                <h3 class="h3">{% trans "U komt in aanmerking" %}</h3>
+                {% condition_list conditions=object.conditions.all %}
+            {% endrender_column %}
+
+            {% render_column start=7 span=6 compact=True %}
+                <h3 class="h3">{% trans "U komt niet in aanmerking" %}</h3>
+                {% condition_list conditions=object.conditions.all negative=True %}
+            {% endrender_column %}
+        {% endrender_grid %}
     {% endif %}
 
     {# Locations #}
