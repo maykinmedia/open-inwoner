@@ -1,0 +1,48 @@
+{% extends 'base_pdf.html' %}
+{% load i18n link_tags file_tags %}
+
+{% block content %}
+
+    <h1 class="h1">{% trans "Plan" %} {{ object.title }}</h1>
+
+    <table class="table">
+        <tr>
+            <th class="table__header">{% trans "Title" %}</th>
+            <td class="table__item">{{ object.title }}</td>
+        </tr>
+                <tr>
+            <th class="table__header">{% trans "Goal" %}</th>
+            <td class="table__item">{{ object.goal }}</td>
+        </tr>
+        <tr>
+            <th class="table__header">{% trans "End date" %}</th>
+            <td class="table__item">{{ object.end_date }}</td>
+        </tr>
+        <tr>
+            <th class="table__header">{% trans "Contacts" %}</th>
+            <td class="table__item">{{ object.contactperson_list }}</td>
+        </tr>
+        <tr>
+            <th class="table__header">{% trans "Created by" %}</th>
+            <td class="table__item">{{ object.created_by.get_full_name }}</td>
+        </tr>
+        <tr>
+            <th class="table__header">{% trans "Created on" %}</th>
+            <td class="table__item">{{ object.created_at }}</td>
+        </tr>
+        <tr>
+            <th class="table__header">{% trans "Updated on" %}</th>
+            <td class="table__item">{{ object.updated_at }}</td>
+        </tr>
+    </table>
+
+
+    <h2 class="h2 h2--extra">{% trans "Bestanden" %}</h2>
+    {% if object.get_all_files %}
+        {% file_table files=object.get_all_files %}
+    {% endif %}
+
+    <h2 class="h2 h2--extra">{% trans "Acties" %}</h2>
+    {% include "export/include/actions.html" with actions=objects.actions.all %}
+
+{% endblock %}

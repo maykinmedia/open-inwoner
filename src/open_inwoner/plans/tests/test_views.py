@@ -29,6 +29,7 @@ class PlanViewTests(WebTest):
         self.action_add_url = reverse(
             "plans:plan_action_create", kwargs={"uuid": self.plan.uuid}
         )
+        self.export_url = reverse("plans:plan_export", kwargs={"uuid": self.plan.uuid})
 
     def test_plan_list_login_required(self):
         response = self.app.get(self.list_url)
@@ -145,3 +146,20 @@ class PlanViewTests(WebTest):
     def test_plan_create_login_required(self):
         response = self.app.get(self.create_url)
         self.assertRedirects(response, f"{self.login_url}?next={self.create_url}")
+
+    def test_plan_export(self):
+        response = self.app.get(self.export_url, user=self.user)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content_type, "application/pdf")
+        self.assertEqual(
+            response["Content-Disposition"],
+            f'attachment; filename="plan_{self.plan.uuid}.pdf"',
+        )
+
+    def test_plan_export_login_required(self):
+        response = self.app.get(self.export_url)
+        self.assertRedirects(response, f"{self.login_url}?next={self.export_url}")
+
+    def test_plan_export_not_your_plan(self):
+        other_user = UserFactory()
+        response = self.app.get(self.export_url, user=other_user, status=404)

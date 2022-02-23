@@ -4,8 +4,10 @@ from typing import Iterable, Tuple
 from django.core.cache import caches
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import InvalidPage, Page, Paginator
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.utils.translation import gettext as _
+
+from .export import render_pdf
 
 
 class ThrottleMixin:
@@ -160,3 +162,24 @@ class UUIDAdminFirstInOrder:
         fields.remove("uuid")
         fields.insert(0, "uuid")
         return fields
+
+
+class ExportDetailMixin:
+    def get_filename(self):
+        return f"{self.model.__name__.lower()}_{self.object.uuid}.pdf"
+
+    def render_to_response(self, context, **response_kwargs):
+        context["request"] = self.request
+
+        file = render_pdf(
+            self.template_name,
+            context,
+            base_url=self.request.build_absolute_uri(),
+            request=self.request,
+        )
+        filename = self.get_filename()
+
+        response = HttpResponse(file, content_type="application/pdf")
+        response["Content-Disposition"] = f'attachment; filename="{filename}"'
+
+        return response

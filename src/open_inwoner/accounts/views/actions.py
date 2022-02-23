@@ -1,10 +1,13 @@
 from datetime import datetime
 
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q
 from django.http.response import HttpResponseRedirect
 from django.urls.base import reverse_lazy
-from django.views.generic import CreateView, ListView
+from django.views.generic import CreateView, DetailView, ListView
 from django.views.generic.edit import UpdateView
+
+from open_inwoner.utils.mixins import ExportDetailMixin
 
 from ..forms import ActionForm, ActionListForm
 from ..models import Action
@@ -87,3 +90,16 @@ class ActionCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         self.object = form.save(self.request.user)
         return HttpResponseRedirect(self.get_success_url())
+
+
+class ActionExportView(LoginRequiredMixin, ExportDetailMixin, DetailView):
+    template_name = "export/profile/action_export.html"
+    model = Action
+    slug_field = "uuid"
+    slug_url_kwarg = "uuid"
+
+    def get_queryset(self):
+        base_qs = super().get_queryset()
+        return base_qs.filter(
+            Q(is_for=self.request.user) | Q(created_by=self.request.user)
+        )
