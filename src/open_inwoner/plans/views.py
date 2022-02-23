@@ -7,7 +7,7 @@ from view_breadcrumbs import DetailBreadcrumbMixin, ListBreadcrumbMixin
 
 from open_inwoner.accounts.forms import ActionListForm, DocumentForm
 from open_inwoner.accounts.views.actions import ActionCreateView, BaseActionFilter
-from open_inwoner.utils.mixins import ExportDetailMixin
+from open_inwoner.utils.mixins import ExportMixin
 
 from .forms import PlanForm, PlanGoalForm
 from .models import Plan
@@ -151,7 +151,7 @@ class PlanActionCreateView(ActionCreateView):
         return self.object.get_absolute_url()
 
 
-class PlanExportView(LoginRequiredMixin, ExportDetailMixin, DetailView):
+class PlanExportView(LoginRequiredMixin, ExportMixin, DetailView):
     template_name = "export/plans/plan_export.html"
     model = Plan
     slug_field = "uuid"

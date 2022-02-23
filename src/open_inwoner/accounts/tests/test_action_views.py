@@ -2,7 +2,6 @@ from datetime import date
 
 from django.urls import reverse
 
-import freezegun
 from django_webtest import WebTest
 
 from ..choices import StatusChoices
@@ -26,6 +25,7 @@ class ActionViewTests(WebTest):
         self.export_url = reverse(
             "accounts:action_export", kwargs={"uuid": self.action.uuid}
         )
+        self.export_list_url = reverse("accounts:action_list_export")
 
     def test_action_list_login_required(self):
         response = self.app.get(self.list_url)
@@ -113,3 +113,15 @@ class ActionViewTests(WebTest):
     def test_action_export_not_your_action(self):
         other_user = UserFactory()
         response = self.app.get(self.export_url, user=other_user, status=404)
+
+    def test_action_list_export(self):
+        response = self.app.get(self.export_list_url, user=self.user)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content_type, "application/pdf")
+        self.assertEqual(
+            response["Content-Disposition"], f'attachment; filename="actions.pdf"'
+        )
+
+    def test_action_list_export_login_required(self):
+        response = self.app.get(self.export_list_url)
+        self.assertRedirects(response, f"{self.login_url}?next={self.export_list_url}")
