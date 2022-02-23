@@ -4,10 +4,14 @@ from django.urls import reverse
 from django_webtest import WebTest
 from furl import furl
 
+from open_inwoner.accounts.models import Contact
+
 from .factories import ContactFactory, UserFactory
 
 
 class ContactViewTests(WebTest):
+    csrf_checks = False
+
     def setUp(self) -> None:
         self.user = UserFactory()
         self.contact = ContactFactory(
@@ -20,6 +24,9 @@ class ContactViewTests(WebTest):
             "accounts:contact_edit", kwargs={"uuid": self.contact.uuid}
         )
         self.create_url = reverse("accounts:contact_create")
+        self.delete_url = reverse(
+            "accounts:contact_delete", kwargs={"uuid": self.contact.uuid}
+        )
 
     def test_contact_list_login_required(self):
         response = self.app.get(self.list_url)
@@ -64,6 +71,7 @@ class ContactViewTests(WebTest):
     def test_contact_edit_not_your_contact(self):
         other_user = UserFactory()
         response = self.app.get(self.edit_url, user=other_user, status=404)
+        self.assertEquals(response.status_code, 404)
 
     def test_contact_create_login_required(self):
         response = self.app.get(self.create_url)
@@ -110,3 +118,22 @@ class ContactViewTests(WebTest):
         invite_url = f"http://testserver{invite.get_absolute_url()}"
         body = email.alternatives[0][0]  # html version of the email body
         self.assertIn(invite_url, body)
+
+    def test_users_contact_is_deleted(self):
+        self.app.post(self.delete_url, user=self.user)
+
+        new_contact_list = Contact.objects.all()
+        self.assertEquals(new_contact_list.count(), 0)
+
+    def test_delete_contact_action_requires_login(self):
+        response = self.app.post(self.list_url)
+        self.assertRedirects(response, f"{self.login_url}?next={self.list_url}")
+
+    def test_delete_action_redirects_to_contact_list_page(self):
+        response = self.app.post(self.delete_url, user=self.user)
+        self.assertRedirects(response, reverse("accounts:contact_list"))
+
+    def test_user_cannot_delete_other_users_contact(self):
+        other_user = UserFactory()
+        response = self.app.post(self.delete_url, user=other_user, status=404)
+        self.assertEquals(response.status_code, 404)

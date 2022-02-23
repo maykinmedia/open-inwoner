@@ -4,7 +4,9 @@ from django.urls.base import reverse, reverse_lazy
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import CreateView, ListView
-from django.views.generic.edit import UpdateView
+from django.views.generic.edit import DeleteView, UpdateView
+
+from view_breadcrumbs import BaseBreadcrumbMixin
 
 from view_breadcrumbs import BaseBreadcrumbMixin
 
@@ -90,3 +92,14 @@ class ContactCreateView(LoginRequiredMixin, BaseBreadcrumbMixin, CreateView):
             invite.send(self.request)
 
         return HttpResponseRedirect(self.get_success_url())
+
+
+class ContactDeleteView(LoginRequiredMixin, DeleteView):
+    model = Contact
+    slug_field = "uuid"
+    slug_url_kwarg = "uuid"
+    success_url = reverse_lazy("accounts:contact_list")
+
+    def get_queryset(self):
+        base_qs = super().get_queryset()
+        return base_qs.filter(created_by=self.request.user)

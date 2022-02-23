@@ -11,7 +11,6 @@ register = template.Library()
 def dropdown(parser, token):
     """
     Creating a dropdown. This is for hidden menus.
-
     Usage:
         {% dropdown %}
             <div class="dropdown__item">
