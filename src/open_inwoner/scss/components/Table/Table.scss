@@ -68,7 +68,8 @@
 
   &__item {
     padding: var(--spacing-medium);
-    border-bottom: 1px solid var(--color-gray-light);
+    border-bottom: 1px solid;
+    border-bottom-color: var(--color-gray-light);
 
     &--borderless {
       border: 0;
@@ -88,7 +89,8 @@
   &__header {
     padding: var(--spacing-medium);
     text-align: left;
-    border-bottom: 1px solid var(--color-gray-light);
+    border-bottom: 1px solid;
+    border-bottom-color: var(--color-gray-light);
   }
 
   &__explain {

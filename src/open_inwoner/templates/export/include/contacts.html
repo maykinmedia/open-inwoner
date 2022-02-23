@@ -1,0 +1,24 @@
+{% load i18n link_tags icon_tags %}
+
+<table class="table">
+    <thead class="table__heading">
+        <tr>
+            <td class="table__item">{% trans "Name" %}</td>
+            <td class="table__item">{% trans "Type" %}</td>
+            <td class="table__item">{% trans "Email" %}</td>
+            <td class="table__item">{% trans "Phone number" %}</td>
+            <td class="table__item">{% trans "Active" %}</td>
+        </tr>
+    </thead>
+    <tbody>
+        {% for contact in object.get_extended_contacts %}
+            <tr>
+                <td class="table__item">{{ contact.other_user_first_name }} {{ contact.other_user_last_name }}</td>
+                <td class="table__item">{{ contact.get_type_display }}</td>
+                <td class="table__item">{{ contact.other_user_email }}</td>
+                <td class="table__item">{{ contact.other_user_phonenumber|default:"-" }}</td>
+                <td class="table__item">{% if contact.is_active %}{% icon "check" %}{% endif %}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

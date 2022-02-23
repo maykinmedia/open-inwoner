@@ -23,6 +23,9 @@ class ActionViewTests(WebTest):
             "accounts:action_edit", kwargs={"uuid": self.action.uuid}
         )
         self.create_url = reverse("accounts:action_create")
+        self.export_url = reverse(
+            "accounts:action_export", kwargs={"uuid": self.action.uuid}
+        )
 
     def test_action_list_login_required(self):
         response = self.app.get(self.list_url)
@@ -93,3 +96,20 @@ class ActionViewTests(WebTest):
     def test_action_create_login_required(self):
         response = self.app.get(self.create_url)
         self.assertRedirects(response, f"{self.login_url}?next={self.create_url}")
+
+    def test_action_export(self):
+        response = self.app.get(self.export_url, user=self.user)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content_type, "application/pdf")
+        self.assertEqual(
+            response["Content-Disposition"],
+            f'attachment; filename="action_{self.action.uuid}.pdf"',
+        )
+
+    def test_action_export_login_required(self):
+        response = self.app.get(self.export_url)
+        self.assertRedirects(response, f"{self.login_url}?next={self.export_url}")
+
+    def test_action_export_not_your_action(self):
+        other_user = UserFactory()
+        response = self.app.get(self.export_url, user=other_user, status=404)

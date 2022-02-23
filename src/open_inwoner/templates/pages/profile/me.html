@@ -26,8 +26,11 @@
 {% block content %}
 <h1 class="h1" id="title">
     {% trans "Persoonlijke gegevens" %}
-    {% trans "Bewerken" as button_text %}
-    {% button href="accounts:edit_profile" text=button_text icon="settings" icon_position="after" icon_outlined=True %}
+
+    {% button_row align="right" %}
+        {% button href="accounts:edit_profile" icon="settings" icon_outlined=True  transparent=True secondary=True %}
+        {% button href="accounts:profile_export" icon="input" icon_outlined=True transparent=True secondary=True %}
+    {% endbutton_row %}
 </h1>
 
 <table class="table table--vertical">

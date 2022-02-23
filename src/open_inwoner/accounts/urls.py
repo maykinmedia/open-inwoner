@@ -4,6 +4,7 @@ from open_inwoner.pdc.views import HomeView
 
 from .views import (
     ActionCreateView,
+    ActionExportView,
     ActionListView,
     ActionUpdateView,
     CasesListView,
@@ -18,6 +19,7 @@ from .views import (
     InboxView,
     InviteAcceptView,
     MyCategoriesView,
+    MyProfileExportView,
     MyProfileView,
 )
 
@@ -39,6 +41,11 @@ urlpatterns = [
         ActionUpdateView.as_view(),
         name="action_delete",
     ),
+    path(
+        "actions/<str:uuid>/export/",
+        ActionExportView.as_view(),
+        name="action_export",
+    ),
     path("actions/", ActionListView.as_view(), name="action_list"),
     path("contacts/create/", ContactCreateView.as_view(), name="contact_create"),
     path("contacts/<str:uuid>/edit/", ContactUpdateView.as_view(), name="contact_edit"),
@@ -57,5 +64,6 @@ urlpatterns = [
     ),
     path("edit/", EditProfileView.as_view(), name="edit_profile"),
     path("invite/<str:key>/accept/", InviteAcceptView.as_view(), name="invite_accept"),
+    path("export/", MyProfileExportView.as_view(), name="profile_export"),
     path("", MyProfileView.as_view(), name="my_profile"),
 ]
