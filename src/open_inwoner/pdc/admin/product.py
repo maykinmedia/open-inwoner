@@ -52,7 +52,13 @@ class ProductAdmin(ImportExportMixin, admin.ModelAdmin):
     list_display = ("name", "created_on", "display_categories")
     list_filter = ("categories", "tags")
     date_hierarchy = "created_on"
-    autocomplete_fields = ("categories", "related_products", "tags", "organizations")
+    autocomplete_fields = (
+        "categories",
+        "related_products",
+        "tags",
+        "organizations",
+        "conditions",
+    )
     search_fields = ("name",)
     prepopulated_fields = {"slug": ("name",)}
     ordering = ("name",)
@@ -120,7 +126,7 @@ class ProductLocationAdmin(GeoAdminMixin, admin.ModelAdmin):
 class ProductConditionAdmin(admin.ModelAdmin):
     list_display = ("name", "question", "display_products")
     list_filter = ("products__name",)
-    autocomplete_fields = ("products",)
+    search_fields = ("name",)
 
     def display_products(self, obj):
         return ", ".join(p.name for p in obj.products.all())

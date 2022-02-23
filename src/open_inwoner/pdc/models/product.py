@@ -101,6 +101,13 @@ class Product(models.Model):
         blank=True,
         help_text=_("Attribute to sync data from PDC's (like SDG)"),
     )
+    conditions = models.ManyToManyField(
+        "pdc.ProductCondition",
+        related_name="products",
+        verbose_name=_("Conditions"),
+        blank=True,
+        help_text=_("Conditions applicable for the product"),
+    )
 
     class Meta:
         verbose_name = _("Product")
@@ -308,12 +315,6 @@ class ProductCondition(models.Model):
         blank=True,
         default="",
         help_text=_("Rule for the automated check"),
-    )
-    products = models.ManyToManyField(
-        "pdc.Product",
-        related_name="conditions",
-        verbose_name=_("Products"),
-        help_text=_("Products for which the condition is applicable"),
     )
 
     class Meta:
