@@ -7,7 +7,14 @@ from import_export.formats import base_formats
 
 from open_inwoner.ckeditor5.widgets import CKEditorWidget
 
-from ..models import Product, ProductContact, ProductFile, ProductLink, ProductLocation
+from ..models import (
+    Product,
+    ProductCondition,
+    ProductContact,
+    ProductFile,
+    ProductLink,
+    ProductLocation,
+)
 from ..resources import ProductExportResource, ProductImportResource
 from .mixins import GeoAdminMixin
 
@@ -45,7 +52,13 @@ class ProductAdmin(ImportExportMixin, admin.ModelAdmin):
     list_display = ("name", "created_on", "display_categories")
     list_filter = ("categories", "tags")
     date_hierarchy = "created_on"
-    autocomplete_fields = ("categories", "related_products", "tags", "organizations")
+    autocomplete_fields = (
+        "categories",
+        "related_products",
+        "tags",
+        "organizations",
+        "conditions",
+    )
     search_fields = ("name",)
     prepopulated_fields = {"slug": ("name",)}
     ordering = ("name",)
@@ -107,3 +120,15 @@ class ProductLocationAdmin(GeoAdminMixin, admin.ModelAdmin):
             {"fields": ("street", "housenumber", "postcode", "city", "geometry")},
         ),
     )
+
+
+@admin.register(ProductCondition)
+class ProductConditionAdmin(admin.ModelAdmin):
+    list_display = ("name", "question", "display_products")
+    list_filter = ("products__name",)
+    search_fields = ("name",)
+
+    def display_products(self, obj):
+        return ", ".join(p.name for p in obj.products.all())
+
+    display_products.short_description = "products"
