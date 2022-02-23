@@ -164,7 +164,7 @@ class UUIDAdminFirstInOrder:
         return fields
 
 
-class ExportDetailMixin:
+class ExportMixin:
     def get_filename(self):
         return f"{self.model.__name__.lower()}_{self.object.uuid}.pdf"
 

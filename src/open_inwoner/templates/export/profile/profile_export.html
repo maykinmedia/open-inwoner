@@ -42,7 +42,7 @@
 
 
     <h2 class="h2 h2--extra">{% trans "Acties" %}</h2>
-    {% include "export/include/actions.html" %}
+    {% include "export/include/actions.html" with actions=object.actions.all %}
 
 
     <h2 class="h2 h2--extra">{% trans "Bestanden" %}</h2>
