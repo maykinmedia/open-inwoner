@@ -5,6 +5,7 @@ from open_inwoner.pdc.views import HomeView
 from .views import (
     ActionCreateView,
     ActionExportView,
+    ActionListExportView,
     ActionListView,
     ActionUpdateView,
     CasesListView,
@@ -35,6 +36,7 @@ urlpatterns = [
         name="documents_delete",
     ),
     path("actions/create/", ActionCreateView.as_view(), name="action_create"),
+    path("actions/export/", ActionListExportView.as_view(), name="action_list_export"),
     path("actions/<str:uuid>/edit/", ActionUpdateView.as_view(), name="action_edit"),
     path(
         "actions/<str:uuid>/delete/",

@@ -9,7 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DetailView, FormView, UpdateView
 
 from open_inwoner.accounts.choices import StatusChoices
-from open_inwoner.utils.mixins import ExportDetailMixin
+from open_inwoner.utils.mixins import ExportMixin
 
 from ..forms import ThemesForm, UserForm
 from ..models import User
@@ -76,7 +76,7 @@ class MyCategoriesView(LoginRequiredMixin, UpdateView):
         return self.request.user
 
 
-class MyProfileExportView(LoginRequiredMixin, ExportDetailMixin, DetailView):
+class MyProfileExportView(LoginRequiredMixin, ExportMixin, DetailView):
     template_name = "export/profile/profile_export.html"
     model = User
 
