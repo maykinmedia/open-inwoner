@@ -12,7 +12,7 @@
         </tr>
         <tr>
             <th class="table__header">{% trans "Description" %}</th>
-            <td class="table__item">{{ object.description }}</td>
+            <td class="table__item">{{ object.description|linebreaks }}</td>
         </tr>
         <tr>
             <th class="table__header">{% trans "Status" %}</th>
