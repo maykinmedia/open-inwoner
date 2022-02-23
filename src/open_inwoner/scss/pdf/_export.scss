@@ -1,8 +1,6 @@
 .export {
-  .logo {
-    .logo__image {
-      max-width: 10%;
-    }
+  &__logo {
+    max-width: 10%;
   }
 
   .h1:first-of-type {
