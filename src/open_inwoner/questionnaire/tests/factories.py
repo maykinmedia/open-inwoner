@@ -1,4 +1,5 @@
 from django.utils.text import slugify
+
 import factory
 
 from ..models import QuestionnaireStep, QuestionnaireStepFile

@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib import admin
 from django.utils.translation import gettext as _
+
 from treebeard.admin import TreeAdmin
 from treebeard.forms import movenodeform_factory
 
