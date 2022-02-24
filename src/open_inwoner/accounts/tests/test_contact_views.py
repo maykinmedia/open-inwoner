@@ -71,7 +71,6 @@ class ContactViewTests(WebTest):
     def test_contact_edit_not_your_contact(self):
         other_user = UserFactory()
         response = self.app.get(self.edit_url, user=other_user, status=404)
-        self.assertEquals(response.status_code, 404)
 
     def test_contact_create_login_required(self):
         response = self.app.get(self.create_url)
@@ -136,4 +135,3 @@ class ContactViewTests(WebTest):
     def test_user_cannot_delete_other_users_contact(self):
         other_user = UserFactory()
         response = self.app.post(self.delete_url, user=other_user, status=404)
-        self.assertEquals(response.status_code, 404)
