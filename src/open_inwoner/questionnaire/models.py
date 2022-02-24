@@ -39,7 +39,7 @@ class QuestionnaireStep(MP_Node):
     question = models.CharField(
         _("Vraag"), help_text=_("De stelling of vraag"), max_length=255
     )
-    slug = models.SlugField(_("URL vriendelijke naam"), max_length=255)
+    slug = models.SlugField(_("URL vriendelijke naam"), max_length=255, unique=True)
     help_text = models.CharField(
         _("Ondersteunende tekst"),
         help_text=_("Beschrijvende tekst bij de vraag."),

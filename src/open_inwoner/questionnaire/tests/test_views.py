@@ -6,16 +6,15 @@ from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from django.views.generic import FormView
 
-from ...pdc.models import Product
-from ...pdc.tests.factories import ProductFactory
+from .factories import QuestionnaireStepFactory, QuestionnaireStepFileFactory
 from ..forms import QuestionnaireStepForm
 from ..models import QuestionnaireStep
 from ..views import (
     QUESTIONNAIRE_SESSION_KEY,
-    QuestionnaireResetView,
     QuestionnaireStepView,
 )
-from .factories import QuestionnaireStepFactory, QuestionnaireStepFileFactory
+from ...pdc.models import Product
+from ...pdc.tests.factories import ProductFactory
 
 
 class QuestionnaireResetViewTestCase(TestCase):
