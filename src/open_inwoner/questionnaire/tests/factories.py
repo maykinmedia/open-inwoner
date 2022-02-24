@@ -6,7 +6,7 @@ from ..models import QuestionnaireStep, QuestionnaireStepFile
 
 class QuestionnaireStepFactory(factory.django.DjangoModelFactory):
     depth = 1
-    path = '0001'
+    path = "0001"
     question = factory.Faker("sentence")
     slug = factory.LazyAttribute(lambda a: slugify(a.question))
     help_text = factory.Faker("sentence")
