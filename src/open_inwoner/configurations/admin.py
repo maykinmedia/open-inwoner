@@ -1,8 +1,13 @@
 from django.contrib import admin
+from django.contrib.flatpages.admin import FlatPageAdmin
+from django.contrib.flatpages.forms import FlatpageForm
+from django.contrib.flatpages.models import FlatPage
 from django.utils.translation import ugettext_lazy as _
 
 from ordered_model.admin import OrderedInlineModelAdminMixin, OrderedTabularInline
 from solo.admin import SingletonModelAdmin
+
+from open_inwoner.ckeditor5.widgets import CKEditorWidget
 
 from .models import SiteConfiguration, SiteConfigurationPage
 
@@ -94,3 +99,19 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
         (_("Emails"), {"fields": ("email_new_message",)}),
     )
     inlines = [SiteConfigurationPageInline]
+
+
+class FlatPageAdminForm(FlatpageForm):
+    class Meta:
+        model = FlatPage
+        fields = "__all__"
+        widgets = {"content": CKEditorWidget}
+
+
+class CustomFlatPageAdmin(FlatPageAdmin):
+    form = FlatPageAdminForm
+
+
+# Re-register FlatPageAdmin
+admin.site.unregister(FlatPage)
+admin.site.register(FlatPage, CustomFlatPageAdmin)

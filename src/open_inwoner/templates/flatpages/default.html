@@ -1,6 +1,7 @@
 {% extends 'master.html' %}
+{% load render_tags %}
 
 {% block content %}
   <h1 class="h1">{{ flatpage.title }}</h1>
-  <p class="p">{{ flatpage.content|linebreaksbr }}</p>
+  {{ flatpage.content|ckeditor_content|safe }}
 {% endblock content %}
