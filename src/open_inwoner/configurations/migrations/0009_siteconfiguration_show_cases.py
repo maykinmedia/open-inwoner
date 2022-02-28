@@ -6,13 +6,20 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('configurations', '0008_merge_0007_auto_20220202_1307_0007_auto_20220202_1835'),
+        (
+            "configurations",
+            "0008_merge_0007_auto_20220202_1307_0007_auto_20220202_1835",
+        ),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='siteconfiguration',
-            name='show_cases',
-            field=models.BooleanField(default=False, help_text='By default the cases are not shown. If the OpenZaak integration is configured this needs to be set to True.', verbose_name='Show cases'),
+            model_name="siteconfiguration",
+            name="show_cases",
+            field=models.BooleanField(
+                default=False,
+                help_text="By default the cases are not shown. If the OpenZaak integration is configured this needs to be set to True.",
+                verbose_name="Show cases",
+            ),
         ),
     ]
