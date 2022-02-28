@@ -134,7 +134,6 @@ INSTALLED_APPS = [
     "easy_thumbnails",  # used by filer
     "filer",
     "mptt",
-    "django_mptt_admin",
     "hijack.contrib.admin",
     "django_elasticsearch_dsl",
     "import_export",
