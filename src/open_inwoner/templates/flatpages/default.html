@@ -3,5 +3,5 @@
 
 {% block content %}
   <h1 class="h1">{{ flatpage.title }}</h1>
-  {{ flatpage.content|ckeditor_content|safe }}
+  <p class="p">{{ flatpage.content|ckeditor_content|safe }}</p>
 {% endblock content %}
