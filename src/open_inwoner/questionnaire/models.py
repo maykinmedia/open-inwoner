@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from filer.fields.file import FilerFileField
-from treebeard.mp_tree import MP_Node
+from treebeard.mp_tree import MP_Node, MP_NodeQuerySet
 
 
 class QuestionnaireStep(MP_Node):
@@ -82,6 +82,21 @@ class QuestionnaireStep(MP_Node):
         """
         return str(self.description) or str(self.get_root().description)
 
+    def get_max_descendant_depth(self) -> int:
+        """
+        Returns the depth of the deepest descendant of this step.
+        If this step has no descendants, self.depth is returned.
+        """
+        try:
+            return self.get_descendants().order_by("-depth").first().depth
+        except AttributeError:
+            return self.depth
+
+    def get_path(self) -> MP_NodeQuerySet:
+        """
+        Returns the path to this step.
+        """
+        return self.get_ancestors().union(QuestionnaireStep.objects.filter(pk=self.pk))
 
 class QuestionnaireStepFile(models.Model):
     """

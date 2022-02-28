@@ -3,6 +3,7 @@ from django.test import TestCase
 from django.utils.translation import gettext as _
 
 from .factories import QuestionnaireStepFactory, QuestionnaireStepFileFactory
+from ..models import QuestionnaireStep
 
 
 class QuestionnaireStepTestCase(TestCase):
@@ -57,6 +58,18 @@ class QuestionnaireStepTestCase(TestCase):
         descendent = parent.add_child()
         self.assertEqual("foo", descendent.get_description())
 
+    def test_get_max_descendant_depth(self):
+        root = QuestionnaireStep.add_root(slug="foo")
+        parent_1 = root.add_child(slug="baz_1")
+        descendant_1 = parent_1.add_child(slug="bar_1")
+        parent_2 = root.add_child(slug="baz_2")
+        parent_3 = parent_2.add_child(slug="baz_3")
+        descendant_2 = parent_3.add_child(slug="bar_2")
+
+        self.assertEqual(4, root.get_max_descendant_depth())
+        self.assertEqual(4, descendant_2.get_max_descendant_depth())
+        self.assertEqual(3, parent_1.get_max_descendant_depth())
+        self.assertEqual(3, descendant_1.get_max_descendant_depth())
 
 class QuestionnaireStepFileTestCase(TestCase):
     def test_create(self):

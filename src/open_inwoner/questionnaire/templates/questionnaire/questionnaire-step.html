@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n button_tags card_tags form_tags file_tags grid_tags string_tags %}
+{% load i18n button_tags card_tags form_tags file_tags grid_tags step_tags string_tags %}
 
 {% block content %}
     {% render_grid %}
@@ -8,8 +8,9 @@
 
             {% if form.instance.get_description %}
                 <p class="p">{{ form.instance.get_description }}</p>
-                <br>
             {% endif %}
+
+            {% step_indicator form.instance.depth form.instance.get_max_descendant_depth object_list=form.instance.get_path %}
 
             <h4 class="h4">{{ form.instance.question }}</h4>
 
