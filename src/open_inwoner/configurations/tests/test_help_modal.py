@@ -17,7 +17,7 @@ class TestHelpContext(WebTest):
 
     def test_default_help_text_on_home_page(self):
         response = self.app.get(reverse("root"))
-        help_text = response.context.get("configurable_text", {}).get("help")
+        help_text = response.context.get("help_text")
 
         self.assertEquals(
             help_text,
@@ -30,13 +30,13 @@ class TestHelpContext(WebTest):
         SiteConfigurationFactory()
         config = SiteConfiguration.get_solo()
         response = self.app.get(reverse("root"))
-        help_text = response.context.get("configurable_text", {}).get("help")
+        help_text = response.context.get("help_text")
 
         self.assertEquals(help_text, config.home_help_text)
 
     def test_default_help_text_on_themes_page(self):
         response = self.app.get(reverse("pdc:category_list"))
-        help_text = response.context.get("configurable_text", {}).get("help")
+        help_text = response.context.get("help_text")
 
         self.assertEquals(
             help_text,
@@ -49,7 +49,7 @@ class TestHelpContext(WebTest):
         SiteConfigurationFactory()
         config = SiteConfiguration.get_solo()
         response = self.app.get(reverse("pdc:category_list"))
-        help_text = response.context.get("configurable_text", {}).get("help")
+        help_text = response.context.get("help_text")
 
         self.assertEquals(help_text, config.theme_help_text)
 
@@ -57,7 +57,7 @@ class TestHelpContext(WebTest):
         response = self.app.get(
             reverse("pdc:product_detail", kwargs={"slug": self.product.slug})
         )
-        help_text = response.context.get("configurable_text", {}).get("help")
+        help_text = response.context.get("help_text")
 
         self.assertEquals(
             help_text,
@@ -72,13 +72,13 @@ class TestHelpContext(WebTest):
         response = self.app.get(
             reverse("pdc:product_detail", kwargs={"slug": self.product.slug})
         )
-        help_text = response.context.get("configurable_text", {}).get("help")
+        help_text = response.context.get("help_text")
 
         self.assertEquals(help_text, config.product_help_text)
 
     def test_default_help_text_on_search_page(self):
         response = self.app.get(reverse("search:search"))
-        help_text = response.context.get("configurable_text", {}).get("help")
+        help_text = response.context.get("help_text")
 
         self.assertEquals(
             help_text,
@@ -89,13 +89,13 @@ class TestHelpContext(WebTest):
         SiteConfigurationFactory()
         config = SiteConfiguration.get_solo()
         response = self.app.get(reverse("search:search"))
-        help_text = response.context.get("configurable_text", {}).get("help")
+        help_text = response.context.get("help_text")
 
         self.assertEquals(help_text, config.search_help_text)
 
     def test_default_help_text_on_profile_page(self):
         response = self.app.get(reverse("accounts:my_profile"), user=self.user)
-        help_text = response.context.get("configurable_text", {}).get("help")
+        help_text = response.context.get("help_text")
 
         self.assertEquals(
             help_text,
@@ -108,6 +108,6 @@ class TestHelpContext(WebTest):
         SiteConfigurationFactory()
         config = SiteConfiguration.get_solo()
         response = self.app.get(reverse("accounts:my_profile"), user=self.user)
-        help_text = response.context.get("configurable_text", {}).get("help")
+        help_text = response.context.get("help_text")
 
         self.assertEquals(help_text, config.account_help_text)
