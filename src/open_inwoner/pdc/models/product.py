@@ -6,8 +6,6 @@ from django.db import models
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
-import markdown
-from bs4 import BeautifulSoup
 from filer.fields.file import FilerFileField
 
 from open_inwoner.utils.validators import validate_phone_number
@@ -118,31 +116,6 @@ class Product(models.Model):
 
     def get_absolute_url(self):
         return reverse("pdc:product_detail", kwargs={"slug": self.slug})
-
-    def get_rendered_content(self):
-        md = markdown.Markdown(extensions=["tables"])
-        html = md.convert(self.content)
-        soup = BeautifulSoup(html, "html.parser")
-        class_adders = [
-            ("h1", "h1"),
-            ("h2", "h2"),
-            ("h3", "h3"),
-            ("h4", "h4"),
-            ("h5", "h5"),
-            ("h6", "h6"),
-            ("img", "image"),
-            ("li", "li"),
-            ("p", "p"),
-            ("a", "link link--secondary"),
-            ("table", "table table--content"),
-            ("th", "table__header"),
-            ("td", "table__item"),
-        ]
-        for tag, class_name in class_adders:
-            for element in soup.find_all(tag):
-                element.attrs["class"] = class_name
-
-        return soup
 
 
 class ProductFile(models.Model):
