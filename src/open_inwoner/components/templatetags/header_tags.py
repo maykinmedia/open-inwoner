@@ -18,19 +18,18 @@ def accessibility_header(configurable_text, **kwargs):
 
 
 @register.inclusion_tag("components/Header/Header.html")
-def header(logo_url, categories, request, configurable_text, show_cases, **kwargs):
+def header(logo_url, categories, request, configurable_text, **kwargs):
     """
     Displaying the header.
 
     Usage:
-        {% header logo_url=settings.logo categories=Category.objects.all request=request configurable_text=configurable_text show_cases=show_cases %}
+        {% header logo_url=settings.logo categories=Category.objects.all request=request configurable_text=configurable_text %}
 
     Variables:
         + logo_url: string | The url of the logo.
         + categories: Category[] | The categories that should be displayed in the theme dropdown.
         + request: Request | the django request object.
         + configurable_text: dict | The dictionary that contains all the configurable texts.
-        + show_cases: bool | The value concerning wether to show or not the cases button.
     """
     return {
         **kwargs,
@@ -38,7 +37,6 @@ def header(logo_url, categories, request, configurable_text, show_cases, **kwarg
         "categories": categories,
         "request": request,
         "configurable_text": configurable_text,
-        "show_cases": show_cases,
     }
 
 
