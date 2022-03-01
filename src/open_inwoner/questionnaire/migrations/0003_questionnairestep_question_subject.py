@@ -6,14 +6,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('questionnaire', '0002_alter_questionnairestep_slug'),
+        ("questionnaire", "0002_alter_questionnairestep_slug"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='questionnairestep',
-            name='question_subject',
-            field=models.CharField(default='', help_text='Het onderwerp van de vraag, dit wordt gebruikt waar er geen ruimte voor de volledige vraag is.', max_length=25, verbose_name='Onderwerp vraag'),
+            model_name="questionnairestep",
+            name="question_subject",
+            field=models.CharField(
+                default="",
+                help_text="Het onderwerp van de vraag, dit wordt gebruikt waar er geen ruimte voor de volledige vraag is.",
+                max_length=25,
+                verbose_name="Onderwerp vraag",
+            ),
             preserve_default=False,
         ),
     ]

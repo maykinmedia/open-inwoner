@@ -18,7 +18,9 @@ class QuestionnaireStepForm(forms.Form):
     """
 
     answer = QuestionnaireStepChoiceField(
-        queryset=QuestionnaireStep.objects.none(), widget=forms.RadioSelect(), required=True
+        queryset=QuestionnaireStep.objects.none(),
+        widget=forms.RadioSelect(),
+        required=True,
     )
 
     def __init__(self, *args, **kwargs) -> None:

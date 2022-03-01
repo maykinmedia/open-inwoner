@@ -8,14 +8,16 @@ import filer.fields.file
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('filer', '0012_file_mime_type'),
-        ('questionnaire', '0003_questionnairestep_question_subject'),
+        ("filer", "0012_file_mime_type"),
+        ("questionnaire", "0003_questionnairestep_question_subject"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='questionnairestepfile',
-            name='file',
-            field=filer.fields.file.FilerFileField(null=True, on_delete=django.db.models.deletion.SET_NULL, to='filer.file'),
+            model_name="questionnairestepfile",
+            name="file",
+            field=filer.fields.file.FilerFileField(
+                null=True, on_delete=django.db.models.deletion.SET_NULL, to="filer.file"
+            ),
         ),
     ]

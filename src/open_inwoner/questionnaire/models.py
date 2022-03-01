@@ -41,12 +41,15 @@ class QuestionnaireStep(MP_Node):
     )
 
     question_subject = models.CharField(
-        _("Onderwerp vraag"), help_text=_("Het onderwerp van de vraag, dit wordt gebruikt waar er geen ruimte voor de volledige vraag is."), max_length=25
+        _("Onderwerp vraag"),
+        help_text=_(
+            "Het onderwerp van de vraag, dit wordt gebruikt waar er geen ruimte voor de volledige vraag is."
+        ),
+        max_length=25,
     )
 
     def get_question_subject_display(self):
         return self.question_subject or self.question
-
 
     slug = models.SlugField(_("URL vriendelijke naam"), max_length=255, unique=True)
     help_text = models.CharField(
@@ -105,7 +108,12 @@ class QuestionnaireStep(MP_Node):
         """
         Returns the path to this step.
         """
-        return self.get_ancestors().union(QuestionnaireStep.objects.filter(pk=self.pk)).order_by('depth')
+        return (
+            self.get_ancestors()
+            .union(QuestionnaireStep.objects.filter(pk=self.pk))
+            .order_by("depth")
+        )
+
 
 class QuestionnaireStepFile(models.Model):
     """

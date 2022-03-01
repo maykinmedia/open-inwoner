@@ -30,7 +30,13 @@ class QuestionnaireStepAdmin(TreeAdmin):
         (
             _("Vraag"),
             {
-                "fields": ("parent_answer", "question", "question_subject", "slug", "help_text"),
+                "fields": (
+                    "parent_answer",
+                    "question",
+                    "question_subject",
+                    "slug",
+                    "help_text",
+                ),
             },
         ),
         (
