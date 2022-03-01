@@ -71,7 +71,7 @@ class QuestionnaireStepTestCase(TestCase):
         self.assertEqual(3, parent_1.get_max_descendant_depth())
         self.assertEqual(3, descendant_1.get_max_descendant_depth())
 
-    def test_get_path(self):
+    def test_get_tree_path(self):
         root = QuestionnaireStep.add_root(slug="foo")
         parent_1 = root.add_child(slug="baz_1")
         descendant_1 = parent_1.add_child(slug="bar_1")
@@ -79,33 +79,33 @@ class QuestionnaireStepTestCase(TestCase):
         parent_3 = parent_2.add_child(slug="baz_3")
         descendant_2 = parent_3.add_child(slug="bar_2")
 
-        path_root = root.get_path()
+        path_root = root.get_tree_path()
         self.assertEqual(1, len(path_root))
         self.assertEqual(root, path_root[0])
 
-        path_parent_1 = parent_1.get_path()
+        path_parent_1 = parent_1.get_tree_path()
         self.assertEqual(2, len(path_parent_1))
         self.assertEqual(root, path_parent_1[0])
         self.assertEqual(parent_1, path_parent_1[1])
 
-        path_descendant_1 = descendant_1.get_path()
+        path_descendant_1 = descendant_1.get_tree_path()
         self.assertEqual(3, len(path_descendant_1))
         self.assertEqual(root, path_descendant_1[0])
         self.assertEqual(parent_1, path_descendant_1[1])
         self.assertEqual(descendant_1, path_descendant_1[2])
 
-        path_parent_2 = parent_2.get_path()
+        path_parent_2 = parent_2.get_tree_path()
         self.assertEqual(2, len(path_parent_2))
         self.assertEqual(root, path_parent_2[0])
         self.assertEqual(parent_2, path_parent_2[1])
 
-        path_parent_3 = parent_3.get_path()
+        path_parent_3 = parent_3.get_tree_path()
         self.assertEqual(3, len(path_parent_3))
         self.assertEqual(root, path_parent_3[0])
         self.assertEqual(parent_2, path_parent_3[1])
         self.assertEqual(parent_3, path_parent_3[2])
 
-        path_descendant_2 = descendant_2.get_path()
+        path_descendant_2 = descendant_2.get_tree_path()
         self.assertEqual(4, len(path_descendant_2))
         self.assertEqual(root, path_descendant_2[0])
         self.assertEqual(parent_2, path_descendant_2[1])

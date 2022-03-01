@@ -101,7 +101,7 @@ class QuestionnaireStep(MP_Node):
         except AttributeError:
             return self.depth
 
-    def get_path(self) -> MP_NodeQuerySet:
+    def get_tree_path(self) -> MP_NodeQuerySet:
         """
         Returns the path to this step.
         """
