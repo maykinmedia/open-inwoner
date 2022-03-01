@@ -45,7 +45,6 @@ git+https://github.com/maykinmedia/mail-editor.git@0b4621b5c7f434586115b8e722af8
 djangorestframework
 django-extra-fields
 django-filter
-django-treebeard
 drf-spectacular # api documentation
 djangorestframework-camel-case
 
