@@ -105,7 +105,7 @@ class QuestionnaireStep(MP_Node):
         """
         Returns the path to this step.
         """
-        return self.get_ancestors().union(QuestionnaireStep.objects.filter(pk=self.pk))
+        return self.get_ancestors().union(QuestionnaireStep.objects.filter(pk=self.pk)).order_by('depth')
 
 class QuestionnaireStepFile(models.Model):
     """
