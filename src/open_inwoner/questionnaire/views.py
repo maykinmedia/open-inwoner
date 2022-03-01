@@ -44,10 +44,6 @@ class QuestionnaireStepView(FormView):
         return {**super().get_form_kwargs(), "instance": instance}
 
     def form_valid(self, form: QuestionnaireStepForm):
-        try:
-            questionnaire_step = form.cleaned_data["answer"]
-        except (AttributeError, KeyError):
-            return self.form_invalid(form)
-
+        questionnaire_step = form.cleaned_data["answer"]
         self.request.session[QUESTIONNAIRE_SESSION_KEY] = questionnaire_step.slug
         return HttpResponseRedirect(redirect_to=questionnaire_step.get_absolute_url())

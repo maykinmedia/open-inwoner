@@ -272,17 +272,3 @@ class QuestionnaireStepViewTestCase(TestCase):
         response = view.form_valid(form)
         self.assertEqual(302, response.status_code)
         self.assertEqual(response.url, descendent.get_absolute_url())
-
-    @patch("open_inwoner.questionnaire.views.QuestionnaireStepView.form_invalid")
-    def test_form_valid_invalid(self, mock):
-        root = QuestionnaireStepFactory.create(slug="foo")
-        request = RequestFactory().get("/zelfdiagnose")
-        middleware = SessionMiddleware()
-        middleware.process_request(request)
-        request.session.save()
-        view = QuestionnaireStepView()
-        view.setup(request)
-        form = QuestionnaireStepForm(instance=root, data={})
-        form.is_valid()
-        view.form_valid(form)
-        self.assertTrue(mock.called)
