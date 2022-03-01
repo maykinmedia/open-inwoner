@@ -2,8 +2,8 @@ from django.db import IntegrityError
 from django.test import TestCase
 from django.utils.translation import gettext as _
 
-from .factories import QuestionnaireStepFactory, QuestionnaireStepFileFactory
 from ..models import QuestionnaireStep
+from .factories import QuestionnaireStepFactory, QuestionnaireStepFileFactory
 
 
 class QuestionnaireStepTestCase(TestCase):
