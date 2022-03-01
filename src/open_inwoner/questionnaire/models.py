@@ -39,6 +39,15 @@ class QuestionnaireStep(MP_Node):
     question = models.CharField(
         _("Vraag"), help_text=_("De stelling of vraag"), max_length=255
     )
+
+    question_subject = models.CharField(
+        _("Onderwerp vraag"), help_text=_("Het onderwerp van de vraag, dit wordt gebruikt waar er geen ruimte voor de volledige vraag is."), max_length=25
+    )
+
+    def get_question_subject_display(self):
+        return self.question_subject or self.question
+
+
     slug = models.SlugField(_("URL vriendelijke naam"), max_length=255, unique=True)
     help_text = models.CharField(
         _("Ondersteunende tekst"),

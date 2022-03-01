@@ -4,12 +4,10 @@
     <aside class="step-indicator">
         <ol class="step-indicator__list">
             {% for step in steps %}
-                <li class="step-indicator__list-item{% if step == current_step %} step-indicator__list-item--active{% elif step < current_step %} step-indicator__list-item--completed{% endif %} P">
-                    {% for object in object_list %}
-                        {% if forloop.counter == step %}
-                            {% link href=object.get_absolute_url secondary=True bold=True text=object %}
-                        {% endif %}
-                    {% endfor %}
+                <li class="step-indicator__list-item{% if step.is_current %} step-indicator__list-item--active{% elif step.is_completed %} step-indicator__list-item--completed{% endif %} P">
+                    {% if step.object %}
+                        {% link href=step.object.get_absolute_url secondary=True bold=True text=step.object_display %}
+                    {% endif %}
                 </li>
             {% endfor %}
         </ol>
