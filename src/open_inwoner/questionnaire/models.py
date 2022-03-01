@@ -118,7 +118,6 @@ class QuestionnaireStepFile(models.Model):
     )
     file = FilerFileField(
         null=True,
-        blank=True,
         on_delete=models.SET_NULL,
     )
 
