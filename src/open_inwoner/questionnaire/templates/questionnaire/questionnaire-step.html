@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n button_tags card_tags form_tags file_tags grid_tags step_tags string_tags %}
+{% load i18n button_tags card_tags form_tags file_tags grid_tags render_tags step_tags string_tags %}
 
 {% block content %}
     {% render_grid %}
@@ -28,7 +28,7 @@
                 {% csrf_token %}
 
                 {% if form.instance.content %}
-                    {{ form.instance.content|markdown2html|safe }}
+                    {{ form.instance.content|ckeditor_content|safe }}
                 {% endif %}
 
                 {% if form.instance.questionnairestepfile_set.exists %}
