@@ -7,6 +7,9 @@
     {% trans "Mijn acties" %}
     {% button href="accounts:action_create" text=_("Nieuwe actie toevoegen") icon="date_range" primary=True %}
 </h1>
+{% button_row align="right" %}
+    {% button href="accounts:action_list_export" icon="input" icon_outlined=True transparent=True secondary=True %}
+{% endbutton_row %}
 
 {% actions actions=actions action_form=action_form %}
 

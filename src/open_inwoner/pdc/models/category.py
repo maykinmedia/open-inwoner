@@ -8,19 +8,22 @@ from treebeard.mp_tree import MP_Node
 
 class Category(MP_Node):
     name = models.CharField(
-        _("name"), max_length=100, help_text=_("Name of the category")
+        verbose_name=_("Name"), max_length=100, help_text=_("Name of the category")
     )
     slug = models.SlugField(
-        _("slug"), max_length=100, unique=True, help_text=_("Slug of the category")
+        verbose_name=_("Slug"),
+        max_length=100,
+        unique=True,
+        help_text=_("Slug of the category"),
     )
     description = models.TextField(
-        _("description"),
+        verbose_name=_("Description"),
         blank=True,
         default="",
         help_text=_("Description of the category"),
     )
     icon = FilerImageField(
-        verbose_name=_("icon"),
+        verbose_name=_("Icon"),
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -28,7 +31,7 @@ class Category(MP_Node):
         help_text=_("Icon of the category"),
     )
     image = FilerImageField(
-        verbose_name=_("image"),
+        verbose_name=_("Image"),
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -39,8 +42,8 @@ class Category(MP_Node):
     node_order_by = ["slug"]
 
     class Meta:
-        verbose_name = _("category")
-        verbose_name_plural = _("categories")
+        verbose_name = _("Category")
+        verbose_name_plural = _("Categories")
 
     def __str__(self):
         return self.name
