@@ -10,7 +10,7 @@ from treebeard.mp_tree import MP_Node, MP_NodeQuerySet
 
 
 class QuestionnaireStepQuerySet(MP_NodeQuerySet):
-    def default(self) -> Optional['QuestionnaireStep']:
+    def default(self) -> Optional["QuestionnaireStep"]:
         try:
             return self.get(is_default=True)
         except QuestionnaireStep.DoesNotExist:
@@ -19,7 +19,7 @@ class QuestionnaireStepQuerySet(MP_NodeQuerySet):
 
 class QuestionnaireStepManager(models.Manager.from_queryset(QuestionnaireStepQuerySet)):
     def get_queryset(self) -> QuestionnaireStepQuerySet:
-        return QuestionnaireStepQuerySet(self.model).order_by('path')
+        return QuestionnaireStepQuerySet(self.model).order_by("path")
 
 
 class QuestionnaireStep(MP_Node):
@@ -31,7 +31,9 @@ class QuestionnaireStep(MP_Node):
     is_default = models.BooleanField(
         _("Standaard zelfdiagnose"),
         default=False,
-        help_text=_("Geeft aan dat dit de standaard zelfdiagnose is, slechts een item mag deze waarde hebben.."),
+        help_text=_(
+            "Geeft aan dat dit de standaard zelfdiagnose is, slechts een item mag deze waarde hebben.."
+        ),
     )
 
     parent_answer = models.CharField(
@@ -95,8 +97,15 @@ class QuestionnaireStep(MP_Node):
         return self.question
 
     def clean(self):
-        if self.is_default and QuestionnaireStep.objects.filter(is_default=True).exclude(pk=self.pk).exists():
-            raise ValidationError("Er kan slechts één QuestionnaireStep de waarde `is_default` hebben.")
+        if (
+            self.is_default
+            and QuestionnaireStep.objects.filter(is_default=True)
+            .exclude(pk=self.pk)
+            .exists()
+        ):
+            raise ValidationError(
+                "Er kan slechts één QuestionnaireStep de waarde `is_default` hebben."
+            )
 
     def get_absolute_url(self) -> str:
         if self.is_root():
@@ -138,8 +147,8 @@ class QuestionnaireStep(MP_Node):
         """
         return (
             self.get_ancestors()
-                .union(QuestionnaireStep.objects.filter(pk=self.pk))
-                .order_by("depth")
+            .union(QuestionnaireStep.objects.filter(pk=self.pk))
+            .order_by("depth")
         )
 
 

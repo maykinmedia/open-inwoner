@@ -6,13 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('questionnaire', '0004_alter_questionnairestepfile_file'),
+        ("questionnaire", "0004_alter_questionnairestepfile_file"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='questionnairestep',
-            name='is_default',
-            field=models.BooleanField(default=False, help_text='Geeft aan dat dit de standaard zelfdiagnose is, slechts een item mag deze waarde hebben..', verbose_name='Standaard zelfdiagnose'),
+            model_name="questionnairestep",
+            name="is_default",
+            field=models.BooleanField(
+                default=False,
+                help_text="Geeft aan dat dit de standaard zelfdiagnose is, slechts een item mag deze waarde hebben..",
+                verbose_name="Standaard zelfdiagnose",
+            ),
         ),
     ]

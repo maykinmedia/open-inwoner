@@ -57,5 +57,9 @@ def primary_navigation(categories, request, **kwargs):
         + request: Request | the django request object.
     """
 
-    return {**kwargs, "categories": categories, "request": request,
-            "questionnaire": QuestionnaireStep.objects.default()}
+    return {
+        **kwargs,
+        "categories": categories,
+        "request": request,
+        "questionnaire": QuestionnaireStep.objects.default(),
+    }
