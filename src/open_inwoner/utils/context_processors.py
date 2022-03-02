@@ -54,6 +54,12 @@ def settings(request):
         else "",
         "login_allow_registration": config.login_allow_registration,
         "login_text": config.login_text,
+        "gtm_code": config.gtm_code,
+        "ga_code": config.ga_code,
+        "google_enabled": config.google_enabled,
+        "matomo_url": config.matomo_url,
+        "matomo_site_id": config.matomo_site_id,
+        "matomo_enabled": config.matomo_enabled,
         "menu_categories": Category.get_root_nodes(),
         "search_form": SearchForm(),
         "settings": dict(
