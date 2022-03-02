@@ -2,7 +2,9 @@
 
 {% render_card title=category href=category.get_absolute_url %}
     {% for product in category.products.all %}
-        {% get_product_url product as product_url %}
-        {% link href=product_url icon='arrow_forward' icon_position='before' secondary=True text=product.name %}
+        {% with category as parent %}
+            {% get_product_url product as product_url %}
+            {% link href=product_url icon='arrow_forward' icon_position='before' secondary=True text=product.name %}
+        {% endwith %}
     {% endfor %}
 {% endrender_card %}

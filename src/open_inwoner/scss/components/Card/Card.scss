@@ -79,4 +79,8 @@
   a.button:last-child {
     float: right;
   }
+
+  .link + .link {
+    margin-left: 0;
+  }
 }
