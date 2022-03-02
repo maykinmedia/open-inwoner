@@ -11,6 +11,8 @@ from django.views.generic.edit import UpdateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin
 
+from open_inwoner.utils.mixins import ExportMixin
+
 from ..forms import ActionForm, ActionListForm
 from ..models import Action
 
