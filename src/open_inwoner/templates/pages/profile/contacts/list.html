@@ -24,26 +24,24 @@
             <tr>
                 <th class="table__header">{{ contact.other_user_first_name }} {{ contact.other_user_last_name }}</th>
                 <td class="table__item">{{ contact.get_type_display }}</td>
-                <td class="table__item">{% if contact.email %}{{ contact.email }}{% endif %}</td>
-                <td class="table__item">{{ contact.phonenumber }}</td>
+                <td class="table__item">{% if contact.other_user_email %}{{ contact.other_user_email }}{% endif %}</td>
+                <td class="table__item">{{ contact.other_user_phonenumber }}</td>
                 <td class="table__item">{% if contact.is_not_active %}{% icon "check" extra_classes="icon icon--disabled" %}{% else %}{% icon "check" %}{% endif %}</td>
                 <td class="table__item">{% button text=_('Stuur bericht') icon="message" icon_position="before" href=contact.get_message_url icon_outlined=True transparent=True disabled=contact.is_not_active %}</td>
                 <td class="table__item">
-                    <div class="table__explain-icons">
-                        {% dropdown icon="settings" %}
-                            <div class="dropdown__item">
-                                {% url 'accounts:contact_edit' uuid=contact.uuid as edit_url %}
-                                {% button icon="edit" text=_("Bewerken") href=edit_url icon_outlined=True transparent=True %}
-                            </div>
-                            <div class="dropdown__item">
-                                {% url 'accounts:contact_delete' uuid=contact.uuid as delete_url %}
-                                {% render_form form=None form_action=delete_url method="POST" spaceless=True id="delete-contact-form" extra_classes="confirm" data_confirm_title=_("Are you sure you want to delete this contact?") data_confirm_cancel=_("Nee") data_confirm_default=_("Ja") %}
-                                    {% csrf_token %}
-                                    {% button icon="delete" text=_("Verwijderen") transparent=True %}
-                                {% endrender_form %}
-                            </div>
-                        {% enddropdown %}
-                    </div>
+                    {% dropdown icon="settings" disabled=contact.reverse %}
+                        <div class="dropdown__item">
+                            {% url 'accounts:contact_edit' uuid=contact.uuid as edit_url %}
+                            {% button icon="edit" text=_("Bewerken") href=edit_url icon_outlined=True transparent=True %}
+                        </div>
+                        <div class="dropdown__item">
+                            {% url 'accounts:contact_delete' uuid=contact.uuid as delete_url %}
+                            {% render_form form=None form_action=delete_url method="POST" spaceless=True id="delete-contact-form" extra_classes="confirm" data_confirm_title=_("Are you sure you want to delete this contact?") data_confirm_cancel=_("Nee") data_confirm_default=_("Ja") %}
+                                {% csrf_token %}
+                                {% button icon="delete" text=_("Verwijderen") transparent=True %}
+                            {% endrender_form %}
+                        </div>
+                    {% enddropdown %}
                 </td>
             </tr>
         {% endfor %}
