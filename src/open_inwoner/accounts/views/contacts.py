@@ -8,8 +8,6 @@ from django.views.generic.edit import DeleteView, UpdateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin
 
-from view_breadcrumbs import BaseBreadcrumbMixin
-
 from ..forms import ContactForm
 from ..models import Contact, Invite
 
