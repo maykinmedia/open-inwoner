@@ -261,15 +261,16 @@ def autocomplete(field, **kwargs):
 @register.inclusion_tag("components/Form/FormActions.html")
 def form_actions(primary_text="", primary_icon=None, **kwargs):
     """
-    Rendering the form actions. This will be the submit button and optionally a secondary button.
+    Rendering the form actions. This may contain a primary and or secondary button.
 
     Usage:
         {% form_actions primary_text="Submit" %}
 
     Variables:
-        - primary_text: string | The text for the primary button
-        - primary_icon: string | The icon for the primary button
-        - single: bool | if it should be single
+        - primary: bool | fF false, hide the primary button.
+        - primary_text: string | The text for the primary button.
+        - primary_icon: string | The icon for the primary button.
+        - single: bool | if it should be single.
         - secondary_href: string | The action when the secondary button is pressed.
         - secondary_text: string | What the text for the secondary button should be.
         - secondary_icon: string | What the icon for the secondary button should be.
