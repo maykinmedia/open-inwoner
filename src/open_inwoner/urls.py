@@ -68,7 +68,7 @@ urlpatterns = [
     path("mail-editor/", include("mail_editor.urls", namespace="mail_editor")),
     path("plans/", include("open_inwoner.plans.urls", namespace="plans")),
     path(
-        "zelfdiagnose/",
+        "questionnaire/",
         include("open_inwoner.questionnaire.urls", namespace="questionnaire"),
     ),
     path("", include("open_inwoner.pdc.urls", namespace="pdc")),
