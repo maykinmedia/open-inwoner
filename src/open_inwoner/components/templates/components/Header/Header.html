@@ -1,8 +1,10 @@
-{% load i18n logo_tags header_tags view_breadcrumbs form_tags link_tags %}
+{% load i18n logo_tags header_tags view_breadcrumbs form_tags link_tags solo_tags %}
 
-{% accessibility_header configurable_text=configurable_text %}
+{% get_solo "configurations.SiteConfiguration" as config %}
+
+{% accessibility_header request=request%}
 <header class="header">
-    {% logo src=logo_url alt="" %}
+    {% logo src=config.logo.file.url alt="" %}
 
     <nav class="header__actions">
         <div class="header__text-actions">

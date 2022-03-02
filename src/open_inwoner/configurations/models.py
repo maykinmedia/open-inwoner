@@ -234,6 +234,13 @@ class SiteConfiguration(SingletonModel):
         null=True,
         help_text=_("The 'idsite' of the website you're tracking in Matomo."),
     )
+    show_cases = models.BooleanField(
+        verbose_name=_("Show cases"),
+        default=False,
+        help_text=_(
+            "By default the cases are not shown. If the OpenZaak integration is configured this needs to be set to True."
+        ),
+    )
 
     class Meta:
         verbose_name = _("Site Configuration")
