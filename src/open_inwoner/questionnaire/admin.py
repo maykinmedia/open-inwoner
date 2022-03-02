@@ -25,6 +25,7 @@ class QuestionnaireStepAdminForm(movenodeform_factory(QuestionnaireStep)):
 class QuestionnaireStepAdmin(TreeAdmin):
     form = QuestionnaireStepAdminForm
     inlines = (QuestionnaireStepFileInline,)
+    list_display = ('question', 'is_default',)
     prepopulated_fields = {"slug": ("question",)}
     fieldsets = (
         (
@@ -43,7 +44,7 @@ class QuestionnaireStepAdmin(TreeAdmin):
             _("Stappenplan"),
             {
                 "classes": ("collapse",),
-                "fields": ("_position", "_ref_node_id", "title", "description"),
+                "fields": ("is_default", "_position", "_ref_node_id", "title", "description"),
             },
         ),
         (

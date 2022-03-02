@@ -1,3 +1,6 @@
+from typing import Optional
+
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext as _
@@ -6,11 +9,30 @@ from filer.fields.file import FilerFileField
 from treebeard.mp_tree import MP_Node, MP_NodeQuerySet
 
 
+class QuestionnaireStepQuerySet(MP_NodeQuerySet):
+    def default(self) -> Optional['QuestionnaireStep']:
+        try:
+            return self.get(is_default=True)
+        except QuestionnaireStep.DoesNotExist:
+            pass
+
+
+class QuestionnaireStepManager(models.Manager.from_queryset(QuestionnaireStepQuerySet)):
+    def get_queryset(self) -> QuestionnaireStepQuerySet:
+        return QuestionnaireStepQuerySet(self.model).order_by('path')
+
+
 class QuestionnaireStep(MP_Node):
     """
     A step in a questionnaire, can optionally have a related QuestionnaireStep as `parent`, in which case
     `parent_answer` will be rendered as an answer to the parent's form.
     """
+
+    is_default = models.BooleanField(
+        _("Standaard zelfdiagnose"),
+        default=False,
+        help_text=_("Geeft aan dat dit de standaard zelfdiagnose is, slechts een item mag deze waarde hebben.."),
+    )
 
     parent_answer = models.CharField(
         _("Antwoord op vorige vraag"),
@@ -70,6 +92,8 @@ class QuestionnaireStep(MP_Node):
         blank=True,
     )
 
+    objects = QuestionnaireStepManager()
+
     def __str__(self) -> str:
         return self.question
 
@@ -81,6 +105,13 @@ class QuestionnaireStep(MP_Node):
             "questionnaire:descendent_step",
             kwargs={"root_slug": root.slug, "slug": self.slug},
         )
+
+    def clean(self):
+        """
+        Extends save to run validation.
+        """
+        if self.is_default and QuestionnaireStep.objects.filter(is_default=True).exclude(pk=self.pk).exists():
+            raise ValidationError("Er kan slechts één QuestionnaireStep de waarde `is_default` hebben.")
 
     def get_title(self) -> str:
         """
@@ -104,14 +135,14 @@ class QuestionnaireStep(MP_Node):
         except AttributeError:
             return self.depth
 
-    def get_tree_path(self) -> MP_NodeQuerySet:
+    def get_tree_path(self) -> QuestionnaireStepQuerySet:
         """
         Returns the path to this step.
         """
         return (
             self.get_ancestors()
-            .union(QuestionnaireStep.objects.filter(pk=self.pk))
-            .order_by("depth")
+                .union(QuestionnaireStep.objects.filter(pk=self.pk))
+                .order_by("depth")
         )
 
 

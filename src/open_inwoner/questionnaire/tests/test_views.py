@@ -34,7 +34,7 @@ class QuestionnaireStepViewTestCase(TestCase):
         self.assertEqual(404, response.status_code)
 
     def test_index_200(self):
-        root = QuestionnaireStepFactory.create(slug="foo")
+        root = QuestionnaireStepFactory.create(slug="foo", is_default=True)
         path = reverse("questionnaire:index")
         response = self.client.get(path)
         self.assertEqual(200, response.status_code)
@@ -79,7 +79,7 @@ class QuestionnaireStepViewTestCase(TestCase):
         new_callable=lambda: "foo",
     )
     def test_render_get_title(self, mock):
-        QuestionnaireStepFactory.create()
+        QuestionnaireStepFactory.create(is_default=True)
         path = reverse("questionnaire:index")
         response = self.client.get(path)
         self.assertContains(response, "foo")
@@ -89,38 +89,38 @@ class QuestionnaireStepViewTestCase(TestCase):
         new_callable=lambda: "foo",
     )
     def test_render_get_description(self, mock):
-        QuestionnaireStepFactory.create()
+        QuestionnaireStepFactory.create(is_default=True)
         path = reverse("questionnaire:index")
         response = self.client.get(path)
         self.assertContains(response, "foo")
 
     def test_render_question(self):
-        QuestionnaireStepFactory.create(question="foo")
+        QuestionnaireStepFactory.create(question="foo", is_default=True)
         path = reverse("questionnaire:index")
         response = self.client.get(path)
         self.assertContains(response, "foo")
 
     def test_render_help_text(self):
-        QuestionnaireStepFactory.create(help_text="foo")
+        QuestionnaireStepFactory.create(help_text="foo", is_default=True)
         path = reverse("questionnaire:index")
         response = self.client.get(path)
         self.assertContains(response, "foo")
 
     def test_render_answers(self):
-        root = QuestionnaireStepFactory.create(slug="foo")
+        root = QuestionnaireStepFactory.create(slug="foo", is_default=True)
         root.add_child(parent_answer="bar")
         path = reverse("questionnaire:index")
         response = self.client.get(path)
         self.assertContains(response, "bar")
 
     def test_render_content(self):
-        QuestionnaireStepFactory.create(content="foo")
+        QuestionnaireStepFactory.create(content="foo", is_default=True)
         path = reverse("questionnaire:index")
         response = self.client.get(path)
         self.assertContains(response, "foo")
 
     def test_render_file(self):
-        root = QuestionnaireStepFactory.create(slug="foo")
+        root = QuestionnaireStepFactory.create(slug="foo", is_default=True)
         QuestionnaireStepFileFactory.create(questionnaire_step=root)
         path = reverse("questionnaire:index")
         response = self.client.get(path)
@@ -129,7 +129,7 @@ class QuestionnaireStepViewTestCase(TestCase):
     def test_render_products(self):
         ProductFactory.create(name="fooz")
         ProductFactory.create(name="barz")
-        root = QuestionnaireStepFactory.create(slug="foo")
+        root = QuestionnaireStepFactory.create(slug="foo", is_default=True)
         root.related_products.set(Product.objects.all())
         path = reverse("questionnaire:index")
         response = self.client.get(path)
@@ -209,8 +209,8 @@ class QuestionnaireStepViewTestCase(TestCase):
         with self.assertRaises(Http404):
             view.get_object()
 
-    def test_get_object_first(self):
-        root = QuestionnaireStepFactory.create(slug="foo")
+    def test_get_object_default(self):
+        root = QuestionnaireStepFactory.create(slug="foo", is_default=True)
         root.add_child(slug="bar")
         request = RequestFactory().get("/zelfdiagnose")
         middleware = SessionMiddleware()
@@ -248,7 +248,7 @@ class QuestionnaireStepViewTestCase(TestCase):
         self.assertEqual("foo", form_kwargs["instance"].slug)
 
     def test_get_form_kwargs(self):
-        root = QuestionnaireStepFactory.create(slug="foo")
+        root = QuestionnaireStepFactory.create(slug="foo", is_default=True)
         request = RequestFactory().get("/zelfdiagnose")
         middleware = SessionMiddleware()
         middleware.process_request(request)

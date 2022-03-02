@@ -36,7 +36,7 @@ class QuestionnaireStepView(FormView):
         if slug:
             return get_object_or_404(QuestionnaireStep, slug=slug)
 
-        return get_list_or_404(QuestionnaireStep.objects.all())[0]
+        return get_object_or_404(QuestionnaireStep.objects, is_default=True)
 
     def get_form_kwargs(self) -> dict:
         instance = self.get_object()

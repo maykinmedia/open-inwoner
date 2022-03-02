@@ -1,6 +1,7 @@
 from django import template
 
 from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.questionnaire.models import QuestionnaireStep
 
 register = template.Library()
 
@@ -55,4 +56,6 @@ def primary_navigation(categories, request, **kwargs):
         + categories: Category[] | The categories that should be displayed in the theme dropdown.
         + request: Request | the django request object.
     """
-    return {**kwargs, "categories": categories, "request": request}
+
+    return {**kwargs, "categories": categories, "request": request,
+            "questionnaire": QuestionnaireStep.objects.default()}
