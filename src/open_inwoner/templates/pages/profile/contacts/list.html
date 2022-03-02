@@ -24,7 +24,7 @@
             <tr>
                 <th class="table__header">{{ contact.other_user_first_name }} {{ contact.other_user_last_name }}</th>
                 <td class="table__item">{{ contact.get_type_display }}</td>
-                <td class="table__item">{% if contact.other_user_email %}{{ contact.other_user_email }}{% endif %}</td>
+                <td class="table__item">{{ contact.other_user_email|default:"" }}</td>
                 <td class="table__item">{{ contact.other_user_phonenumber }}</td>
                 <td class="table__item">{% if contact.is_not_active %}{% icon "check" extra_classes="icon icon--disabled" %}{% else %}{% icon "check" %}{% endif %}</td>
                 <td class="table__item">{% button text=_('Stuur bericht') icon="message" icon_position="before" href=contact.get_message_url icon_outlined=True transparent=True disabled=contact.is_not_active %}</td>
