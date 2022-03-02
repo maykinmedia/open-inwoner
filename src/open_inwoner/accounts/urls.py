@@ -11,6 +11,7 @@ from .views import (
     CasesListView,
     CasesStatusView,
     ContactCreateView,
+    ContactDeleteView,
     ContactListView,
     ContactUpdateView,
     DocumentCreateView,
@@ -53,7 +54,7 @@ urlpatterns = [
     path("contacts/<str:uuid>/edit/", ContactUpdateView.as_view(), name="contact_edit"),
     path(
         "contacts/<str:uuid>/delete/",
-        ContactUpdateView.as_view(),
+        ContactDeleteView.as_view(),
         name="contact_delete",
     ),
     path("contacts/", ContactListView.as_view(), name="contact_list"),
