@@ -114,8 +114,15 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
-    def get_absolute_url(self):
-        return reverse("pdc:product_detail", kwargs={"slug": self.slug})
+    def get_absolute_url(self, category=None):
+        if not category:
+            return reverse("pdc:product_detail", kwargs={"slug": self.slug})
+
+        category_slug = category.get_build_slug()
+        return reverse(
+            "pdc:category_product_detail",
+            kwargs={"slug": self.slug, "theme_slug": category_slug},
+        )
 
 
 class ProductFile(models.Model):

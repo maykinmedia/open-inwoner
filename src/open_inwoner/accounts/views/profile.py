@@ -4,20 +4,27 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms.forms import Form
 from django.shortcuts import redirect
-from django.urls.base import reverse_lazy
+from django.urls import reverse, reverse_lazy
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DetailView, FormView, UpdateView
+
+from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.accounts.choices import StatusChoices
 from open_inwoner.utils.mixins import ExportMixin
 
 from ..forms import ThemesForm, UserForm
-from ..models import User
+from ..models import Action, User
 
 
-class MyProfileView(LoginRequiredMixin, FormView):
+class MyProfileView(LoginRequiredMixin, BaseBreadcrumbMixin, FormView):
     template_name = "pages/profile/me.html"
     form_class = Form
+
+    @cached_property
+    def crumbs(self):
+        return [(_("Mijn profiel"), reverse("accounts:my_profile"))]
 
     def get_context_data(self, **kwargs):
         contact_names = [
@@ -28,16 +35,15 @@ class MyProfileView(LoginRequiredMixin, FormView):
         context = super().get_context_data(**kwargs)
         today = date.today()
         context["next_action"] = (
-            self.request.user.actions.filter(
-                end_date__gte=today, status=StatusChoices.open
-            )
+            Action.objects.connected(self.request.user)
+            .filter(end_date__gte=today, status=StatusChoices.open)
             .order_by("end_date")
             .first()
         )
         context["files"] = self.request.user.documents.all()
         context["theme_text"] = self.request.user.get_interests()
         context["action_text"] = _(
-            f"{self.request.user.actions.filter(status=StatusChoices.open).count()} acties staan open."
+            f"{Action.objects.connected(self.request.user).filter(status=StatusChoices.open).count()} acties staan open."
         )
         if self.request.user.contacts.count() > 0:
             context[
@@ -56,21 +62,35 @@ class MyProfileView(LoginRequiredMixin, FormView):
             return redirect("accounts:my_profile")
 
 
-class EditProfileView(LoginRequiredMixin, UpdateView):
+class EditProfileView(LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
     template_name = "pages/profile/edit.html"
     model = User
     form_class = UserForm
     success_url = reverse_lazy("accounts:my_profile")
 
+    @cached_property
+    def crumbs(self):
+        return [
+            (_("Mijn profiel"), reverse("accounts:my_profile")),
+            (_("Bewerk profiel"), reverse("accounts:edit_profile", kwargs=self.kwargs)),
+        ]
+
     def get_object(self):
         return self.request.user
 
 
-class MyCategoriesView(LoginRequiredMixin, UpdateView):
+class MyCategoriesView(LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
     template_name = "pages/profile/categories.html"
     model = User
     form_class = ThemesForm
     success_url = reverse_lazy("accounts:my_profile")
+
+    @cached_property
+    def crumbs(self):
+        return [
+            (_("Mijn profiel"), reverse("accounts:my_profile")),
+            (_("Mijn thema's"), reverse("accounts:my_themes")),
+        ]
 
     def get_object(self):
         return self.request.user

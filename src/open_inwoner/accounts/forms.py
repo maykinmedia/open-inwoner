@@ -81,7 +81,8 @@ class ContactForm(forms.ModelForm):
         fields = ("first_name", "last_name", "email", "phonenumber")
 
     def save(self, user, commit=True):
-        self.instance.created_by = user
+        if not self.instance.pk:
+            self.instance.created_by = user
 
         if not self.instance.pk and self.instance.email:
             self.instance.contact_user, created = User.objects.get_or_create(
@@ -103,18 +104,32 @@ class ActionForm(forms.ModelForm):
             "goal",
         )
 
-    def __init__(self, user, *args, **kwargs):
+    def __init__(self, user, plan=None, *args, **kwargs):
         self.user = user
+        self.plan = plan
         super().__init__(*args, **kwargs)
 
+        self.fields["is_for"].required = False
+        self.fields["is_for"].empty_label = _("Myself")
         self.fields["is_for"].queryset = User.objects.filter(
             assigned_contacts__in=self.user.contacts.all()
         )
 
-    def save(self, user, plan=None, commit=True):
-        self.instance.created_by = user
-        if plan:
-            self.instance.plan = plan
+    def clean_end_date(self):
+        data = self.cleaned_data["end_date"]
+        if data and self.plan and data > self.plan.end_date:
+            self.add_error(
+                "end_date", _("The action can not end after the plan end date")
+            )
+        return data
+
+    def save(self, user, commit=True):
+        if not self.instance.pk:
+            self.instance.created_by = user
+        if not self.instance.is_for:
+            self.instance.is_for = user
+        if self.plan:
+            self.instance.plan = self.plan
         return super().save(commit=commit)
 
 
@@ -124,7 +139,8 @@ class DocumentForm(forms.ModelForm):
         fields = ("file", "name")
 
     def save(self, user, plan=None, commit=True):
-        self.instance.owner = user
+        if not self.instance.pk:
+            self.instance.owner = user
         if plan:
             self.instance.plan = plan
 

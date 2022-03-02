@@ -1,5 +1,5 @@
 from django.contrib.auth.models import BaseUserManager
-from django.db.models import Q
+from django.db.models import Q, QuerySet
 
 from digid_eherkenning.managers import BaseDigidManager, BaseeHerkenningManager
 
@@ -82,3 +82,8 @@ class UserManager(BaseUserManager):
         return self.get_queryset().filter(
             id__in=list(active_contacts) + list(assigned_contacts)
         )
+
+
+class ActionQueryset(QuerySet):
+    def connected(self, user):
+        return self.filter(Q(created_by=user) | Q(is_for=user)).distinct()
