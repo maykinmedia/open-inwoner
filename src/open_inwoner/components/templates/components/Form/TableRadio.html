@@ -10,10 +10,20 @@
             </tr>
         </thead>
         <tbody>
+            <tr for="id_{{ field.name }}_{{ forloop.counter }}">
+                <td class="table__item">
+                    <label class="radio">
+                        <input class="radio__input" type="radio" name="template" value="" id="id_template_0">
+                        <label class="radio__label" for="id_template_0">Geen template</label>
+                    </label>
+                </td>
+                <td class="table__item"></td>
+                <td class="table__item table__item--right"></td>
+            </tr>
             {% for choice in field.field.choices %}
-                <tr for="id_{{ field.name }}_{{ forloop.counter }}">
+                <tr for="id_{{ field.name }}_{{ forloop.counter1 }}">
                     <td class="table__item">
-                        {% choice_radio choice=choice name=field.name data=field.value index=forloop.counter %}
+                        {% choice_radio choice=choice name=field.name data=field.value index=forloop.counter1 %}
                     </td>
                     <td class="table__item">
                         omschrijving
