@@ -97,6 +97,10 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
             },
         ),
         (_("Emails"), {"fields": ("email_new_message",)}),
+        (
+            _("Analytics"),
+            {"fields": ("gtm_code", "ga_code", "matomo_url", "matomo_site_id")},
+        ),
     )
     inlines = [SiteConfigurationPageInline]
 
