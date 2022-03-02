@@ -1,5 +1,4 @@
-from django import template
-from django.forms import fields, models, widgets
+from django import forms, template
 from django.template.library import parse_bits
 from django.template.loader import render_to_string
 from django.utils.translation import gettext as _
@@ -11,7 +10,7 @@ register = template.Library()
 
 WIDGET_TEMPLATES = {
     "CHECKBOX": "components/Form/Checkbox.html",
-    "RADIOBUTTON": "components/Form/Radiobutton.html",
+    "RADIO": "components/Form/MultipleRadio.html",
     "MULTIPLECHECKBOX": "components/Form/MultipleCheckbox.html",
     "DATE": "components/Form/DateField.html",
     "HIDDEN": "components/Form/Hidden.html",
@@ -126,20 +125,19 @@ def autorender_field(form_object, field_name, **kwargs):
     fn = input
     tmplt = WIDGET_TEMPLATES["INPUT"]
 
-    if type(field) == fields.DateField:
+    if type(field) == forms.fields.DateField:
         tmplt = WIDGET_TEMPLATES["DATE"]
-
-    if type(field) == models.ModelMultipleChoiceField:
+    elif type(field) == forms.models.ModelMultipleChoiceField:
         tmplt = WIDGET_TEMPLATES["MULTIPLECHECKBOX"]
-    if type(field) == fields.BooleanField:
+    elif type(field) == forms.fields.BooleanField:
         fn = checkbox
         tmplt = WIDGET_TEMPLATES["CHECKBOX"]
-    elif type(field.widget) == fields.HiddenInput:
+    elif type(field.widget) == forms.fields.HiddenInput:
         tmplt = WIDGET_TEMPLATES["HIDDEN"]
-    elif type(field.widget) == fields.Textarea:
+    elif type(field.widget) == forms.widgets.RadioSelect:
+        tmplt = WIDGET_TEMPLATES["RADIO"]
+    elif type(field.widget) == forms.fields.Textarea:
         tmplt = WIDGET_TEMPLATES["TEXTAREA"]
-    elif type(field.widget) == widgets.RadioSelect:
-        tmplt = WIDGET_TEMPLATES["RADIOBUTTON"]
 
     context = fn(bound_field, **kwargs)
     return render_to_string(tmplt, context)
@@ -183,6 +181,30 @@ def choice_checkbox(choice, **kwargs):
 
     Variables:
         + field: Field | The field that needs to be rendered.
+    """
+    return {**kwargs, "choice": choice}
+
+
+@register.inclusion_tag("components/Form/TableRadio.html")
+def table_radio(field, **kwargs):
+    """
+    Displaying a radio input that is rendered from a choice field.
+    Usage:
+        {% table_radio form.radio_field %}
+    Variables:
+        + choice: The choice that needs to be rendered.
+    """
+    return {**kwargs, "field": field}
+
+
+@register.inclusion_tag("components/Form/ChoiceRadio.html")
+def choice_radio(choice, **kwargs):
+    """
+    Displaying a radio input that is rendered from a choice field.
+    Usage:
+        {% choice_radio form.radio_field %}
+    Variables:
+        + choice: The choice that needs to be rendered.
     """
     return {**kwargs, "choice": choice}
 

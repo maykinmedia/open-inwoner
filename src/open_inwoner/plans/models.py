@@ -4,6 +4,8 @@ from django.db import models
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
+from filer.fields.file import FilerFileField
+
 from open_inwoner.accounts.choices import TypeChoices
 
 from .managers import PlanQuerySet
@@ -11,6 +13,7 @@ from .managers import PlanQuerySet
 
 class PlanTemplate(models.Model):
     name = models.CharField(_("Name"), max_length=250)
+    file = FilerFileField(blank=True, null=True, on_delete=models.SET_NULL)
     goal = models.TextField(
         _("goal"),
         help_text=_(
