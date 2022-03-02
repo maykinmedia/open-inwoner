@@ -1,4 +1,4 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.functional import cached_property
@@ -11,20 +11,23 @@ from open_inwoner.openzaak.cases import fetch_cases, fetch_specific_case
 from open_inwoner.openzaak.statuses import fetch_status_history, fetch_status_types
 
 
-class CasesListView(BaseBreadcrumbMixin, LoginRequiredMixin, TemplateView):
+class CasesListView(
+    BaseBreadcrumbMixin, LoginRequiredMixin, UserPassesTestMixin, TemplateView
+):
     template_name = "pages/cases/list.html"
 
     @cached_property
     def crumbs(self):
         return [(_("Mijn aanvragen"), reverse("accounts:my_cases"))]
 
-    def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return self.handle_no_permission()
-        if self.request.user.bsn is None:
-            return redirect("root")
+    def test_func(self):
+        return self.request.user.bsn is not None
 
-        return super().dispatch(request, *args, **kwargs)
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+            return redirect(reverse("root"))
+
+        return super().handle_no_permission()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -39,7 +42,9 @@ class CasesListView(BaseBreadcrumbMixin, LoginRequiredMixin, TemplateView):
         return context
 
 
-class CasesStatusView(BaseBreadcrumbMixin, LoginRequiredMixin, TemplateView):
+class CasesStatusView(
+    BaseBreadcrumbMixin, LoginRequiredMixin, UserPassesTestMixin, TemplateView
+):
     template_name = "pages/cases/status.html"
 
     @cached_property
@@ -52,13 +57,14 @@ class CasesStatusView(BaseBreadcrumbMixin, LoginRequiredMixin, TemplateView):
             ),
         ]
 
-    def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return self.handle_no_permission()
-        if self.request.user.bsn is None:
-            return redirect("root")
+    def test_func(self):
+        return self.request.user.bsn is not None
 
-        return super().dispatch(request, *args, **kwargs)
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+            return redirect(reverse("root"))
+
+        return super().handle_no_permission()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

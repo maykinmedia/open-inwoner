@@ -28,7 +28,7 @@ def fetch_status_history(case_url: str) -> List[Status]:
         logger.exception("exception while making request", exc_info=e)
         return []
 
-    statuses = [factory(Status, status) for status in response.get("results", [])]
+    statuses = factory(Status, response["results"])
 
     return statuses
 
