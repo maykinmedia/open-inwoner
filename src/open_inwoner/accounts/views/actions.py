@@ -1,11 +1,12 @@
 from datetime import datetime
 
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q
 from django.http.response import HttpResponseRedirect
 from django.urls.base import reverse, reverse_lazy
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic import CreateView, ListView
+from django.views.generic import CreateView, DetailView, ListView
 from django.views.generic.edit import UpdateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin
@@ -122,3 +123,30 @@ class ActionCreateView(LoginRequiredMixin, BaseBreadcrumbMixin, CreateView):
     def form_valid(self, form):
         self.object = form.save(self.request.user)
         return HttpResponseRedirect(self.get_success_url())
+
+
+class ActionListExportView(LoginRequiredMixin, ExportMixin, ListView):
+    template_name = "export/profile/action_list_export.html"
+    model = Action
+
+    def get_filename(self):
+        return "actions.pdf"
+
+    def get_queryset(self):
+        base_qs = super().get_queryset()
+        return base_qs.filter(
+            Q(is_for=self.request.user) | Q(created_by=self.request.user)
+        ).select_related("created_by")
+
+
+class ActionExportView(LoginRequiredMixin, ExportMixin, DetailView):
+    template_name = "export/profile/action_export.html"
+    model = Action
+    slug_field = "uuid"
+    slug_url_kwarg = "uuid"
+
+    def get_queryset(self):
+        base_qs = super().get_queryset()
+        return base_qs.filter(
+            Q(is_for=self.request.user) | Q(created_by=self.request.user)
+        )

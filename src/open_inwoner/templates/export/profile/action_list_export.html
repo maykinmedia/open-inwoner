@@ -1,0 +1,10 @@
+{% extends 'base_pdf.html' %}
+{% load i18n link_tags file_tags %}
+
+{% block content %}
+
+    <h1 class="h1">{% trans "Mijn acties" %}</h1>
+
+    {% include "export/include/actions.html" with actions=object_list %}
+
+{% endblock %}

@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n l10n button_tags card_tags file_tags grid_tags icon_tags link_tags map_tags notification_tags tag_tags utils %}
+{% load i18n l10n button_tags card_tags file_tags grid_tags icon_tags link_tags map_tags notification_tags tag_tags utils condition_tags render_tags %}
 
 {% block sidebar_content %}
     <aside class="anchor-menu">
@@ -35,6 +35,11 @@
             <li class="anchor-menu__list-item">
                 {% link href='#share' text=_('Delen') %}
             </li>
+            {% if product.link %}
+                <li class="anchor-menu__list-item">
+                    {% button href=product.link size="big" text=_("Aanvraag starten") primary=True icon="arrow_forward" icon_position="before" %}
+                </li>
+            {% endif %}
             <li class="anchor-menu__list-item anchor-menu__list-item--top">
                 {% link primary=True href='#top' icon='arrow_upward' icon_position='before' text=_('Terug naar boven') %}
             </li>
@@ -48,16 +53,30 @@
         {% if request.user.is_staff %}
             {% button icon="edit" href="admin:pdc_product_change" object_id=object.pk %}
         {% endif %}
-        {% if product.link %}
-            {% button href=product.link size="big" text=_("Aanvraag starten") primary=True icon="arrow_forward" icon_position="after" %}
-        {% endif %}
     </h1>
     {% tag tags=object.tags.all %}
     <p class="p">{{ object.summary }}</p>
-    {{ object.get_rendered_content|safe }}
+    {{ object.content|ckeditor_content|safe }}
     {% if object.files.exists %}
         <hr class="divider">
         {% file_list files=object.files.all title=_("Bestanden") %}
+    {% endif %}
+
+    {# Conditions #}
+    {% if object.conditions.exists %}
+        <hr class="divider">
+
+        {% render_grid %}
+            {% render_column span=6 compact=True %}
+                <h3 class="h3">{% trans "U komt in aanmerking" %}</h3>
+                {% condition_list conditions=object.conditions.all %}
+            {% endrender_column %}
+
+            {% render_column start=7 span=6 compact=True %}
+                <h3 class="h3">{% trans "U komt niet in aanmerking" %}</h3>
+                {% condition_list conditions=object.conditions.all negative=True %}
+            {% endrender_column %}
+        {% endrender_grid %}
     {% endif %}
 
     {# Locations #}

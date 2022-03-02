@@ -14,6 +14,7 @@ from open_inwoner.accounts.views.actions import (
     ActionUpdateView,
     BaseActionFilter,
 )
+from open_inwoner.utils.mixins import ExportMixin
 
 from .forms import PlanForm, PlanGoalForm
 from .models import Plan
@@ -262,3 +263,13 @@ class PlanActionEditView(ActionUpdateView):
 
     def get_success_url(self) -> str:
         return self.object.get_absolute_url()
+
+
+class PlanExportView(LoginRequiredMixin, ExportMixin, DetailView):
+    template_name = "export/plans/plan_export.html"
+    model = Plan
+    slug_field = "uuid"
+    slug_url_kwarg = "uuid"
+
+    def get_queryset(self):
+        return Plan.objects.connected(self.request.user).prefetch_related("actions")

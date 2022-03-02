@@ -96,8 +96,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     _old_bsn = None
 
     class Meta:
-        verbose_name = _("user")
-        verbose_name_plural = _("users")
+        verbose_name = _("User")
+        verbose_name_plural = _("Users")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -142,6 +142,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_assigned_active_contacts(self):
         return self.assigned_contacts.filter(created_by__is_active=True)
 
+    def get_extended_contacts(self):
+        return Contact.objects.get_extended_contacts_for_user(me=self)
+
     def get_extended_active_contacts(self):
         return Contact.objects.get_extended_contacts_for_user(me=self).filter(
             contact_user__is_active=True, created_by__is_active=True
@@ -149,6 +152,15 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_new_messages_total(self) -> int:
         return self.received_messages.filter(seen=False).count()
+
+    def get_all_files(self):
+        return self.documents.order_by("-created_on")
+
+    def get_interests(self) -> str:
+        if not self.selected_themes.exists():
+            return _("U heeft geen intressegebieden aangegeven.")
+
+        return ", ".join(list(self.selected_themes.values_list("name", flat=True)))
 
 
 class Contact(models.Model):
@@ -237,6 +249,8 @@ class Contact(models.Model):
 
     class Meta:
         ordering = ("-updated_on", "-created_on")
+        verbose_name = _("Contact")
+        verbose_name_plural = _("Contacts")
 
     def __str__(self):
         return self.get_name()
@@ -290,16 +304,21 @@ class Document(models.Model):
         verbose_name=_("Owner"),
         on_delete=models.CASCADE,
         related_name="documents",
-        help_text="This is the user that created the document.",
+        help_text=_("This is the user that created the document."),
     )
     plan = models.ForeignKey(
         "plans.Plan",
+        verbose_name=_("Plan"),
         on_delete=models.CASCADE,
         null=True,
         blank=True,
         related_name="documents",
         help_text=_("The plan that the document belongs to. This can be left empty."),
     )
+
+    class Meta:
+        verbose_name = _("Document")
+        verbose_name_plural = _("Documents")
 
     def __str__(self):
         return self.name
@@ -337,12 +356,12 @@ class Appointment(models.Model):
         verbose_name=_("Created by"),
         on_delete=models.CASCADE,
         related_name="appointments",
-        help_text="The person that created the appointment.",
+        help_text=_("The person that created the appointment."),
     )
 
     class Meta:
-        verbose_name = _("appointment")
-        verbose_name_plural = _("appointments")
+        verbose_name = _("Appointment")
+        verbose_name_plural = _("Appointments")
 
     def __str__(self):
         return self.name
@@ -362,13 +381,13 @@ class Action(models.Model):
         help_text=_("The name of the action"),
     )
     description = models.TextField(
-        verbose_name=_("description"),
+        verbose_name=_("Description"),
         default="",
         blank=True,
         help_text=_("The description of the action"),
     )
     goal = models.CharField(
-        verbose_name=_("goal"),
+        verbose_name=_("Goal"),
         default="",
         blank=True,
         max_length=250,
@@ -399,7 +418,9 @@ class Action(models.Model):
         null=True,
         blank=True,
         storage=PrivateMediaFileSystemStorage(),
-        help_text="The document that is uploaded to the file",
+        help_text=_(
+            "The document that is uploaded to the file",
+        ),
     )
     is_for = models.ForeignKey(
         "accounts.User",
@@ -408,7 +429,7 @@ class Action(models.Model):
         verbose_name=_("Is for"),
         on_delete=models.CASCADE,
         related_name="actions",
-        help_text="The person that needs to do this action.",
+        help_text=_("The person that needs to do this action."),
     )
     created_on = models.DateTimeField(
         verbose_name=_("Created on"),
@@ -425,10 +446,11 @@ class Action(models.Model):
         verbose_name=_("Created by"),
         on_delete=models.CASCADE,
         related_name="created_actions",
-        help_text="The person that created the action.",
+        help_text=_("The person that created the action."),
     )
     plan = models.ForeignKey(
         "plans.Plan",
+        verbose_name=_("Plan"),
         on_delete=models.CASCADE,
         null=True,
         blank=True,
@@ -440,8 +462,8 @@ class Action(models.Model):
 
     class Meta:
         ordering = ("end_date", "-created_on")
-        verbose_name = _("action")
-        verbose_name_plural = _("actions")
+        verbose_name = _("Action")
+        verbose_name_plural = _("Actions")
 
     def __str__(self):
         return self.name
@@ -456,29 +478,33 @@ class Action(models.Model):
 class Message(models.Model):
     sender = models.ForeignKey(
         User,
+        verbose_name=_("Sender"),
         on_delete=models.CASCADE,
         related_name="sent_messages",
-        help_text=_("THe sender of the message"),
+        help_text=_("The sender of the message"),
     )
     receiver = models.ForeignKey(
         User,
+        verbose_name=_("Receiver"),
         on_delete=models.CASCADE,
         related_name="received_messages",
         help_text=_("The receiver of the message"),
     )
     created_on = models.DateTimeField(
-        _("Created on"),
+        verbose_name=_("Created on"),
         auto_now_add=True,
         help_text=_("This is the date the message was created"),
     )
-    content = models.TextField(_("Content"), help_text=_("Text content of the message"))
+    content = models.TextField(
+        verbose_name=_("Content"), help_text=_("Text content of the message")
+    )
     seen = models.BooleanField(
-        _("Seen"),
+        verbose_name=_("Seen"),
         default=False,
-        help_text=_("Boolean shows if the message was seem by the receiver"),
+        help_text=_("Boolean shows if the message was seen by the receiver"),
     )
     sent = models.BooleanField(
-        _("Sent"),
+        verbose_name=_("Sent"),
         default=False,
         help_text=_(
             "Boolean shows if the email was sent to the receiver about this message"
@@ -488,8 +514,8 @@ class Message(models.Model):
     objects = MessageQuerySet.as_manager()
 
     class Meta:
-        verbose_name = _("message")
-        verbose_name_plural = _("messages")
+        verbose_name = _("Message")
+        verbose_name_plural = _("Messages")
 
     def __str__(self):
         return f"From: {self.sender}, To: {self.receiver} ({self.created_on.date()})"
@@ -498,35 +524,38 @@ class Message(models.Model):
 class Invite(models.Model):
     inviter = models.ForeignKey(
         User,
+        verbose_name=_("Inviter"),
         on_delete=models.CASCADE,
         related_name="sent_invites",
         help_text=_("User who created the invite"),
     )
     invitee = models.ForeignKey(
         User,
+        verbose_name=_("Invitee"),
         on_delete=models.CASCADE,
         related_name="received_invites",
         help_text=_("User who received the invite"),
     )
     contact = models.ForeignKey(
         Contact,
+        verbose_name=_("Contact"),
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
         related_name="invites",
-        help_text=_("THe contact the creation of which triggered sending the invite"),
+        help_text=_("The contact the creation of which triggered sending the invite"),
     )
-    accepted = models.BooleanField(verbose_name=_("accepted"), default=False)
-    key = models.CharField(verbose_name=_("key"), max_length=64, unique=True)
+    accepted = models.BooleanField(verbose_name=_("Accepted"), default=False)
+    key = models.CharField(verbose_name=_("Key"), max_length=64, unique=True)
     created_on = models.DateTimeField(
-        _("Created on"),
+        verbose_name=_("Created on"),
         auto_now_add=True,
         help_text=_("This is the date the message was created"),
     )
 
     class Meta:
-        verbose_name = _("invitation")
-        verbose_name_plural = _("invitations")
+        verbose_name = _("Invitation")
+        verbose_name_plural = _("Invitations")
 
     def __str__(self):
         return f"For: {self.invitee} ({self.created_on.date()})"
