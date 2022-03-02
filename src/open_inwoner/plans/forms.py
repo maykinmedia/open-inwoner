@@ -1,10 +1,11 @@
 from datetime import timedelta
 
 from django import forms
+from django.core.files import File
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
-from open_inwoner.accounts.models import Action
+from open_inwoner.accounts.models import Action, Document
 
 from .models import Plan, PlanTemplate
 
@@ -37,11 +38,20 @@ class PlanForm(forms.ModelForm):
         template = self.cleaned_data.get("template")
         self.instance.goal = template.goal
         plan = super().save(commit=commit)
-        actions = []
+        if template.file:
+            print(dir(template.file))
+            template_file = File(template.file.file)
+            Document.objects.create(
+                name=template.file.name,
+                file=template_file,
+                owner=user,
+                plan=plan,
+            )
+
         now = timezone.now()
         for action_template in template.actiontemplates.all():
             end_date = now + timedelta(days=action_template.end_in_days)
-            action = Action.objects.create(
+            Action.objects.create(
                 name=action_template.name,
                 description=action_template.description,
                 goal=action_template.goal,
@@ -51,7 +61,6 @@ class PlanForm(forms.ModelForm):
                 created_by=user,
                 plan=plan,
             )
-        plan.actions.add(*actions)
         return plan
 
 

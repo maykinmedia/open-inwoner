@@ -7,5 +7,12 @@
         {% trans "Hier werkt u samen met uw contactpersonen aan uw doelen." %}
     </p>
 
-    {% form id="plan-form" form_object=form method="POST" %}
+    {% render_form id="plan-form" form=form method="POST" %}
+        {% csrf_token %}
+        {% input form.title %}
+        {% autocomplete form.contacts %}
+        {% date_field form.end_date %}
+        {% table_radio form.template %}
+        {% form_actions primary_text=_("Verzenden") primary_icon="arrow_forward" %}
+    {% endrender_form %}
 {% endblock %}
