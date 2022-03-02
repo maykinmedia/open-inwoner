@@ -70,9 +70,6 @@ class QuestionnaireStep(MP_Node):
         max_length=25,
     )
 
-    def get_question_subject_display(self):
-        return self.question_subject or self.question
-
     slug = models.SlugField(_("URL vriendelijke naam"), max_length=255, unique=True)
     help_text = models.CharField(
         _("Ondersteunende tekst"),
@@ -97,6 +94,10 @@ class QuestionnaireStep(MP_Node):
     def __str__(self) -> str:
         return self.question
 
+    def clean(self):
+        if self.is_default and QuestionnaireStep.objects.filter(is_default=True).exclude(pk=self.pk).exists():
+            raise ValidationError("Er kan slechts één QuestionnaireStep de waarde `is_default` hebben.")
+
     def get_absolute_url(self) -> str:
         if self.is_root():
             return reverse("questionnaire:root_step", kwargs={"slug": self.slug})
@@ -106,12 +107,8 @@ class QuestionnaireStep(MP_Node):
             kwargs={"root_slug": root.slug, "slug": self.slug},
         )
 
-    def clean(self):
-        """
-        Extends save to run validation.
-        """
-        if self.is_default and QuestionnaireStep.objects.filter(is_default=True).exclude(pk=self.pk).exists():
-            raise ValidationError("Er kan slechts één QuestionnaireStep de waarde `is_default` hebben.")
+    def get_question_subject_display(self):
+        return self.question_subject or self.question
 
     def get_title(self) -> str:
         """
