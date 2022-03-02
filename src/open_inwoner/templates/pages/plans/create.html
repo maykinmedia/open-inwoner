@@ -14,7 +14,43 @@
             {% checkboxes form.contacts %}
             {% date_field form.end_date %}
         {% endrender_grid %}
-        {% table_radio form.template %}
+
+        <div class="">
+            <div class="tabled-radio">
+                <div class="tabled-radio__header">
+                    <div>{% trans "Templates" %}</div>
+                    <div>{% trans "Omschrijving" %}</div>
+                    <div></div>
+                </div>
+                <label class="tabled-radio__row radio">
+                    <div>
+                        <input class="radio__input" type="radio" name="template" value="" id="id_template_0">
+                        <label class="radio__label" for="id_template_0">Geen template</label>
+                    </div>
+                    <div></div>
+                    <div></div>
+                </label>
+                {% for plan_template in form.template.field.queryset %}
+                    <label class="tabled-radio__row radio">
+                        <div>
+                            <input class="radio__input" type="radio" name="template" value="{{ plan_template.id }}" id="id_template_{{ plan_template.id }}">
+                            <label class="radio__label" for="id_template_{{ plan_template.id }}">{{ plan_template.name }}</label>
+                        </div>
+                        <div>
+                            {{ plan_template.goal|truncatewords:8 }}
+                        </div>
+                        <div class="tabled-radio__icon">
+                            {% comment %} TODO: The popup is not implemented yet. {% endcomment %}
+                            {% comment %} {% icon icon="visibility" outlined=True %} {% endcomment %}
+                        </div>
+                    </label>
+                {% endfor %}
+            </div>
+
+            {% if form.template.errors %}
+                {% errors errors=form.template.errors %}
+            {% endif %}
+        </div>
         {% form_actions primary_text=_("Verzenden") primary_icon="arrow_forward" %}
     {% endrender_form %}
 {% endblock %}

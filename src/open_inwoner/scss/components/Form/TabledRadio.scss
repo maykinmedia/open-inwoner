@@ -1,0 +1,30 @@
+.tabled-radio {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-family-body);
+
+  .tabled-radio__header {
+    display: grid;
+    grid-template-columns: 1fr 1fr 16px;
+    gap: var(--spacing-small);
+  }
+
+  .tabled-radio__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 16px;
+    gap: var(--spacing-small);
+    border-bottom: 1px solid var(--color-gray-light);
+    padding: var(--spacing-medium);
+  }
+
+  .tabled-radio__icon {
+    display: flex;
+    align-items: center;
+  }
+
+  *[class*='icon'],
+  *[class*='Icon'] {
+    color: #4b4b4b;
+    font-size: 14px;
+  }
+}

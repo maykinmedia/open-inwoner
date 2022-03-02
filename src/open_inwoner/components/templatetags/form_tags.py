@@ -199,18 +199,6 @@ def choice_checkbox(choice, **kwargs):
     return {**kwargs, "choice": choice}
 
 
-@register.inclusion_tag("components/Form/TableRadio.html")
-def table_radio(field, **kwargs):
-    """
-    Displaying a radio input that is rendered from a choice field.
-    Usage:
-        {% table_radio form.radio_field %}
-    Variables:
-        + choice: The choice that needs to be rendered.
-    """
-    return {**kwargs, "field": field}
-
-
 @register.inclusion_tag("components/Form/ChoiceRadio.html")
 def choice_radio(choice, **kwargs):
     """
