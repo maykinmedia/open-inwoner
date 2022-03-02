@@ -7,11 +7,12 @@ from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic import FormView, UpdateView
+from django.views.generic import DetailView, FormView, UpdateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.accounts.choices import StatusChoices
+from open_inwoner.utils.mixins import ExportMixin
 
 from ..forms import ThemesForm, UserForm
 from ..models import Action, User
@@ -40,12 +41,7 @@ class MyProfileView(LoginRequiredMixin, BaseBreadcrumbMixin, FormView):
             .first()
         )
         context["files"] = self.request.user.documents.all()
-        if self.request.user.selected_themes.exists():
-            context["theme_text"] = ", ".join(
-                list(self.request.user.selected_themes.values_list("name", flat=True))
-            )
-        else:
-            context["theme_text"] = _("U heeft geen intressegebieden aangegeven.")
+        context["theme_text"] = self.request.user.get_interests()
         context["action_text"] = _(
             f"{Action.objects.connected(self.request.user).filter(status=StatusChoices.open).count()} acties staan open."
         )
@@ -98,3 +94,14 @@ class MyCategoriesView(LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
 
     def get_object(self):
         return self.request.user
+
+
+class MyProfileExportView(LoginRequiredMixin, ExportMixin, DetailView):
+    template_name = "export/profile/profile_export.html"
+    model = User
+
+    def get_object(self):
+        return self.request.user
+
+    def get_filename(self):
+        return "profile.pdf"

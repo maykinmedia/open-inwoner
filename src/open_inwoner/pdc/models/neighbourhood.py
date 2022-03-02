@@ -4,12 +4,15 @@ from django.utils.translation import ugettext_lazy as _
 
 class Neighbourhood(models.Model):
     name = models.CharField(
-        _("name"), max_length=100, unique=True, help_text=_("Neighbourhood name")
+        verbose_name=_("Name"),
+        max_length=100,
+        unique=True,
+        help_text=_("Neighbourhood name"),
     )
 
     class Meta:
-        verbose_name = _("neighbourhood")
-        verbose_name_plural = _("neighbourhoods")
+        verbose_name = _("Neighbourhood")
+        verbose_name_plural = _("Neighbourhoods")
 
     def __str__(self):
         return self.name

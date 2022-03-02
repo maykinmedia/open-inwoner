@@ -28,4 +28,8 @@
   &__list-item--top .link {
     border-color: transparent;
   }
+
+  .button {
+    margin: var(--spacing-medium) 0;
+  }
 }
