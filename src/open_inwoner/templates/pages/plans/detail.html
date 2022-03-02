@@ -30,7 +30,12 @@
 <div class="plans">
     <h1 class="h1" id="title">
         {{ object.title }}
-        {% button href="plans:plan_edit" uuid=object.uuid text=_("Bewerken") icon="settings" icon_position="after" icon_outlined=True %}
+
+        {% button_row align="right" %}
+            {% button href="plans:plan_edit" uuid=object.uuid icon="settings" icon_outlined=True transparent=True secondary=True %}
+            {% button href="plans:plan_export" uuid=object.uuid icon="input" icon_outlined=True transparent=True secondary=True %}
+        {% endbutton_row %}
+
     </h1>
 
     <div class="plan-contact">

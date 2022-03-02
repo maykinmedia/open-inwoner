@@ -1,0 +1,25 @@
+.condition-list {
+  list-style-type: none;
+  padding-left: 0;
+  font-family: var(--font-family-body);
+}
+
+.condition {
+  display: flex;
+}
+
+.condition + .condition {
+  margin-top: var(--spacing-medium);
+}
+
+.condition__mark {
+  margin-right: var(--spacing-medium);
+
+  &--positive {
+    color: var(--color-green-dark);
+  }
+
+  &--negative {
+    color: var(--color-red);
+  }
+}
