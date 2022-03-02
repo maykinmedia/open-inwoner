@@ -171,6 +171,20 @@ def checkbox(field, **kwargs):
     return {**kwargs, "field": field}
 
 
+@register.inclusion_tag(WIDGET_TEMPLATES["MULTIPLECHECKBOX"])
+def checkboxes(field, **kwargs):
+    """
+    Displaying a checkbox.
+
+    Usage:
+        {% checkbox form.checkbox_field %}
+
+    Variables:
+        + field: Field | The field that needs to be rendered.
+    """
+    return {**kwargs, "field": field}
+
+
 @register.inclusion_tag("components/Form/ChoiceCheckbox.html")
 def choice_checkbox(choice, **kwargs):
     """

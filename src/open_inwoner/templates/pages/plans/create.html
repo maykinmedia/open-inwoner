@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n button_tags card_tags map_tags form_tags %}
+{% load i18n button_tags card_tags map_tags form_tags grid_tags %}
 
 {% block content %}
     <h1 class="h1">{% trans "Samenwerken" %}</h1>
@@ -10,8 +10,10 @@
     {% render_form id="plan-form" form=form method="POST" %}
         {% csrf_token %}
         {% input form.title %}
-        {% autocomplete form.contacts %}
-        {% date_field form.end_date %}
+        {% render_grid %}
+            {% checkboxes form.contacts %}
+            {% date_field form.end_date %}
+        {% endrender_grid %}
         {% table_radio form.template %}
         {% form_actions primary_text=_("Verzenden") primary_icon="arrow_forward" %}
     {% endrender_form %}

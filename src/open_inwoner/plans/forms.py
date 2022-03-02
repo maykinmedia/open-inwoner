@@ -31,36 +31,40 @@ class PlanForm(forms.ModelForm):
             for c in extended_contacts
         ]
 
+        if self.instance.pk:
+            del self.fields["template"]
+
     def save(self, user, commit=True):
         if not self.instance.pk:
             self.instance.created_by = user
 
-        template = self.cleaned_data.get("template")
-        self.instance.goal = template.goal
         plan = super().save(commit=commit)
-        if template.file:
-            print(dir(template.file))
-            template_file = File(template.file.file)
-            Document.objects.create(
-                name=template.file.name,
-                file=template_file,
-                owner=user,
-                plan=plan,
-            )
 
-        now = timezone.now()
-        for action_template in template.actiontemplates.all():
-            end_date = now + timedelta(days=action_template.end_in_days)
-            Action.objects.create(
-                name=action_template.name,
-                description=action_template.description,
-                goal=action_template.goal,
-                type=action_template.type,
-                end_date=end_date.date(),
-                is_for=user,
-                created_by=user,
-                plan=plan,
-            )
+        template = self.cleaned_data.get("template")
+        if template:
+            self.instance.goal = template.goal
+            if template.file:
+                template_file = File(template.file.file)
+                Document.objects.create(
+                    name=template.file.name,
+                    file=template_file,
+                    owner=user,
+                    plan=plan,
+                )
+
+            now = timezone.now()
+            for action_template in template.actiontemplates.all():
+                end_date = now + timedelta(days=action_template.end_in_days)
+                Action.objects.create(
+                    name=action_template.name,
+                    description=action_template.description,
+                    goal=action_template.goal,
+                    type=action_template.type,
+                    end_date=end_date.date(),
+                    is_for=user,
+                    created_by=user,
+                    plan=plan,
+                )
         return plan
 
 
