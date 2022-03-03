@@ -7,20 +7,16 @@
     <table class="table table--space-medium">
         <thead class="table__heading">
             <tr>
-                <td class="table__item table__item--no-left-padding">{% trans "Bijgewerkt op" %}</td>
-                <td class="table__item table__item--no-left-padding">{% trans "Omschrijving" %}</td>
+                <td class="table__item">{% trans "Bijgewerkt op" %}</td>
+                <td class="table__item">{% trans "Omschrijving" %}</td>
             </tr>
         </thead>
 
         <tbody>
-            {% for status in status_list %}
+            {% for status in statuses %}
                 <tr>
-                    <td class="table__item table__item--no-left-padding">{{ status.datum_status_gezet }}</td>
-                    {% for type in status_type_list %}
-                        {% if type.url == status.statustype %}
-                            <td class="table__item table__item--no-left-padding">{{ type.omschrijving }}</td>
-                        {% endif %}
-                    {% endfor %}
+                    <td class="table__item">{{ status.datum_status_gezet }}</td>
+                    <td class="table__item">{{ status.statustype.omschrijving }}</td>
                 </tr>
             {% endfor %}
         </tbody>
