@@ -10,7 +10,7 @@
                 <p class="p">{{ form.instance.get_description }}</p>
             {% endif %}
 
-            {% step_indicator form.instance.depth form.instance.get_max_descendant_depth object_list=form.instance.get_tree_path object_list_str='question_subject' %}
+            {% step_indicator form.instance.depth form.instance.depth object_list=form.instance.get_tree_path object_list_str='question_subject' %}
 
             <h4 class="h4">{{ form.instance.question }}</h4>
 
