@@ -40,12 +40,12 @@ class QuestionnaireStepTestCase(TestCase):
 
     def test_get_absolute_url_root(self):
         root = QuestionnaireStepFactory.create(slug="foo")
-        self.assertEqual("/zelfdiagnose/foo", root.get_absolute_url())
+        self.assertEqual("/questionnaire/foo", root.get_absolute_url())
 
     def test_get_absolute_url_descendent(self):
         root = QuestionnaireStepFactory.create(slug="foo")
         descendent = root.add_child(slug="bar")
-        self.assertEqual("/zelfdiagnose/foo/bar", descendent.get_absolute_url())
+        self.assertEqual("/questionnaire/foo/bar", descendent.get_absolute_url())
 
     def test_get_title_root(self):
         root = QuestionnaireStepFactory.create(slug="foo", title="foo")
