@@ -23,6 +23,11 @@ class ImportResource(resources.ModelResource):
         # Add slug field when a new row has to be created
         if not row.get("slug") and row.get("name"):
             row["slug"] = slugify(row["name"])
+
+        # Remove excel's newlines
+        for key, value in row.items():
+            if isinstance(value, str):
+                row[key] = value.replace("_x000D_", "")
         return super().get_or_init_instance(instance_loader, row)
 
 
