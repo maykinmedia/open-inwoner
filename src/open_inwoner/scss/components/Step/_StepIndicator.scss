@@ -1,0 +1,66 @@
+.step-indicator {
+  overflow: hidden;
+  padding: var(--row-height) 0;
+
+  &__list {
+    border-bottom: var(--border-width) solid var(--color-gray-light);
+    counter-set: step-indicator-list-counter;
+    counter-reset: step-indicator-list-counter;
+    display: flex;
+    gap: var(--spacing-large);
+    list-style: none;
+    margin: 0;
+    padding: 0 0 var(--spacing-giant);
+  }
+
+  &__list-item {
+    counter-increment: step-indicator-list-counter;
+    display: flex;
+    margin-right: var(--spacing-medium);
+    position: relative;
+    overflow: hidden;
+  }
+
+  &__list-item:last-child {
+    margin-right: 0;
+  }
+
+  &__list-item .link {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    @media (max-width: 767px) {
+      display: none;
+    }
+  }
+
+  &__list-item:before {
+    align-items: center;
+    border: var(--border-width) solid var(--color-gray-dark);
+    border-radius: 100%;
+    content: counter(step-indicator-list-counter);
+    display: flex;
+    flex-shrink: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body-small);
+    height: var(--font-line-height-body-small);
+    justify-content: center;
+    margin-right: var(--spacing-small);
+    width: var(--font-line-height-body-small);
+  }
+
+  &__list-item--active:before {
+    background-color: var(--color-secondary);
+    color: var(--color-white);
+  }
+
+  &__list-item--completed:before {
+    background-color: transparent;
+    border-color: #008b38;
+    color: #008b38;
+    font-family: 'Material Icons';
+    content: '\e876';
+  }
+}
