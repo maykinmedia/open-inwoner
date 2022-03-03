@@ -1,5 +1,4 @@
-from django import template
-from django.forms import fields, models
+from django import forms, template
 from django.template.library import parse_bits
 from django.template.loader import render_to_string
 from django.utils.translation import gettext as _
@@ -8,13 +7,13 @@ from open_inwoner.utils.templatetags.abstract import safe_resolve
 
 register = template.Library()
 
-
 WIDGET_TEMPLATES = {
     "CHECKBOX": "components/Form/Checkbox.html",
     "MULTIPLECHECKBOX": "components/Form/MultipleCheckbox.html",
     "DATE": "components/Form/DateField.html",
     "HIDDEN": "components/Form/Hidden.html",
     "INPUT": "components/Form/Input.html",
+    "RADIO": "components/Form/MultipleRadio.html",
     "TEXTAREA": "components/Form/Textarea.html",
 }
 
@@ -125,17 +124,19 @@ def autorender_field(form_object, field_name, **kwargs):
     fn = input
     tmplt = WIDGET_TEMPLATES["INPUT"]
 
-    if type(field) == fields.DateField:
+    if type(field) == forms.fields.DateField:
         tmplt = WIDGET_TEMPLATES["DATE"]
 
-    if type(field) == models.ModelMultipleChoiceField:
+    if type(field) == forms.models.ModelMultipleChoiceField:
         tmplt = WIDGET_TEMPLATES["MULTIPLECHECKBOX"]
-    if type(field) == fields.BooleanField:
+    if type(field) == forms.fields.BooleanField:
         fn = checkbox
         tmplt = WIDGET_TEMPLATES["CHECKBOX"]
-    elif type(field.widget) == fields.HiddenInput:
+    elif type(field.widget) == forms.fields.HiddenInput:
         tmplt = WIDGET_TEMPLATES["HIDDEN"]
-    elif type(field.widget) == fields.Textarea:
+    elif type(field.widget) == forms.widgets.RadioSelect:
+        tmplt = WIDGET_TEMPLATES["RADIO"]
+    elif type(field.widget) == forms.fields.Textarea:
         tmplt = WIDGET_TEMPLATES["TEXTAREA"]
 
     context = fn(bound_field, **kwargs)
@@ -179,7 +180,21 @@ def choice_checkbox(choice, **kwargs):
         {% choice_checkbox form.checkbox_field %}
 
     Variables:
-        + field: Field | The field that needs to be rendered.
+        + choice: The choice that needs to be rendered.
+    """
+    return {**kwargs, "choice": choice}
+
+
+@register.inclusion_tag("components/Form/ChoiceRadio.html")
+def choice_radio(choice, **kwargs):
+    """
+    Displaying a radio input that is rendered from a choice field.
+
+    Usage:
+        {% choice_radio form.radio_field %}
+
+    Variables:
+        + choice: The choice that needs to be rendered.
     """
     return {**kwargs, "choice": choice}
 
@@ -246,15 +261,16 @@ def autocomplete(field, **kwargs):
 @register.inclusion_tag("components/Form/FormActions.html")
 def form_actions(primary_text="", primary_icon=None, **kwargs):
     """
-    Rendering the form actions. This will be the submit button and optionally a secondary button.
+    Rendering the form actions. This may contain a primary and or secondary button.
 
     Usage:
         {% form_actions primary_text="Submit" %}
 
     Variables:
-        - primary_text: string | The text for the primary button
-        - primary_icon: string | The icon for the primary button
-        - single: bool | if it should be single
+        - primary: bool | if false, hide the primary button.
+        - primary_text: string | The text for the primary button.
+        - primary_icon: string | The icon for the primary button.
+        - single: bool | if it should be single.
         - secondary_href: string | The action when the secondary button is pressed.
         - secondary_text: string | What the text for the secondary button should be.
         - secondary_icon: string | What the icon for the secondary button should be.
@@ -265,9 +281,11 @@ def form_actions(primary_text="", primary_icon=None, **kwargs):
         - primary: bool | If the primary styling should be used.
     """
     if not primary_text and primary_icon is None:
-        assert False, "provide primary_text or primary_icon"
+        if kwargs.get("primary", True):
+            assert False, "provide primary_text or primary_icon"
 
-    primary = "transparent" not in kwargs
+    primary = kwargs.get("primary", "transparent" not in kwargs)
+
     return {
         **kwargs,
         "primary_text": primary_text,
