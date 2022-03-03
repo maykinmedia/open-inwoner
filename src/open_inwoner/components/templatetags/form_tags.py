@@ -267,7 +267,7 @@ def form_actions(primary_text="", primary_icon=None, **kwargs):
         {% form_actions primary_text="Submit" %}
 
     Variables:
-        - primary: bool | fF false, hide the primary button.
+        - primary: bool | if false, hide the primary button.
         - primary_text: string | The text for the primary button.
         - primary_icon: string | The icon for the primary button.
         - single: bool | if it should be single.
