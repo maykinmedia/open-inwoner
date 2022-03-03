@@ -17,7 +17,6 @@ def settings(request):
 
     context = {
         "site_name": config.name,
-        "site_logo": config.logo.file.url if config.logo else "",
         "theming": {
             "primary": config.get_primary_color,
             "secondary": config.get_secondary_color,
@@ -47,7 +46,6 @@ def settings(request):
                 "footer_mailing_intro": config.footer_mailing_intro,
                 "flatpages": config.get_ordered_flatpages,
             },
-            "help": config.get_help_text(request),
         },
         "hero_image_login": config.hero_image_login.file.url
         if config.hero_image_login

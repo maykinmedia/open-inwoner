@@ -1,42 +1,45 @@
 from django import template
 
+from open_inwoner.configurations.models import SiteConfiguration
+
 register = template.Library()
 
 
 @register.inclusion_tag("components/Header/AccessibilityHeader.html")
-def accessibility_header(configurable_text, **kwargs):
+def accessibility_header(request, **kwargs):
     """
     This is used to display the accessibility header
 
     Usage:
-        {% accessibility_header configurable_text=configurable_text %}
+        {% accessibility_header request=request%}
 
     Variables:
-        + configurable_text: dict | The dictionary that contains all the configurable texts.
+        + request: Request | The django request object.
+
+    Extra context:
+        - help_text: str | The help text depending on the current path.
     """
-    return {**kwargs, "configurable_text": configurable_text}
+    config = SiteConfiguration.get_solo()
+    kwargs["help_text"] = config.get_help_text(request)
+    return {**kwargs, "request": request}
 
 
 @register.inclusion_tag("components/Header/Header.html")
-def header(logo_url, categories, request, configurable_text, **kwargs):
+def header(categories, request, **kwargs):
     """
     Displaying the header.
 
     Usage:
-        {% header logo_url=settings.logo categories=Category.objects.all request=request configurable_text=configurable_text %}
+        {% header categories=Category.objects.all request=request %}
 
     Variables:
-        + logo_url: string | The url of the logo.
         + categories: Category[] | The categories that should be displayed in the theme dropdown.
         + request: Request | the django request object.
-        + configurable_text: dict | The dictionary that contains all the configurable texts.
     """
     return {
         **kwargs,
-        "logo_url": logo_url,
         "categories": categories,
         "request": request,
-        "configurable_text": configurable_text,
     }
 
 
