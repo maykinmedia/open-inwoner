@@ -20,7 +20,7 @@ class PlanTemplate(models.Model):
         ),
     )
     file = FilerFileField(
-        _("File"),
+        verbose_name=_("File"),
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
