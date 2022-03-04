@@ -1,4 +1,6 @@
 .column {
+  position: relative;
+
   @for $i from 1 through 12 {
     &--start-#{$i} {
       grid-column-start: $i;
@@ -12,9 +14,4 @@
   &--compact {
     grid-gap: 0;
   }
-
-  display: grid;
-  grid-gap: var(--row-height);
-  grid-auto-columns: 1fr;
-  position: relative;
 }
