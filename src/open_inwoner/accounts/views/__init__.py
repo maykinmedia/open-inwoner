@@ -6,7 +6,12 @@ from .actions import (
     ActionUpdateView,
 )
 from .cases import CasesListView, CasesStatusView
-from .contacts import ContactCreateView, ContactListView, ContactUpdateView
+from .contacts import (
+    ContactCreateView,
+    ContactDeleteView,
+    ContactListView,
+    ContactUpdateView,
+)
 from .csrf import csrf_failure
 from .document import DocumentPrivateMediaView
 from .documents import DocumentCreateView, DocumentDeleteView

@@ -7,7 +7,6 @@ from open_inwoner.utils.templatetags.abstract import safe_resolve
 
 register = template.Library()
 
-
 WIDGET_TEMPLATES = {
     "CHECKBOX": "components/Form/Checkbox.html",
     "RADIO": "components/Form/MultipleRadio.html",
@@ -15,6 +14,7 @@ WIDGET_TEMPLATES = {
     "DATE": "components/Form/DateField.html",
     "HIDDEN": "components/Form/Hidden.html",
     "INPUT": "components/Form/Input.html",
+    "RADIO": "components/Form/MultipleRadio.html",
     "TEXTAREA": "components/Form/Textarea.html",
 }
 
@@ -194,7 +194,21 @@ def choice_checkbox(choice, **kwargs):
         {% choice_checkbox form.checkbox_field %}
 
     Variables:
-        + field: Field | The field that needs to be rendered.
+        + choice: The choice that needs to be rendered.
+    """
+    return {**kwargs, "choice": choice}
+
+
+@register.inclusion_tag("components/Form/ChoiceRadio.html")
+def choice_radio(choice, **kwargs):
+    """
+    Displaying a radio input that is rendered from a choice field.
+
+    Usage:
+        {% choice_radio form.radio_field %}
+
+    Variables:
+        + choice: The choice that needs to be rendered.
     """
     return {**kwargs, "choice": choice}
 
@@ -273,15 +287,16 @@ def autocomplete(field, **kwargs):
 @register.inclusion_tag("components/Form/FormActions.html")
 def form_actions(primary_text="", primary_icon=None, **kwargs):
     """
-    Rendering the form actions. This will be the submit button and optionally a secondary button.
+    Rendering the form actions. This may contain a primary and or secondary button.
 
     Usage:
         {% form_actions primary_text="Submit" %}
 
     Variables:
-        - primary_text: string | The text for the primary button
-        - primary_icon: string | The icon for the primary button
-        - single: bool | if it should be single
+        - primary: bool | if false, hide the primary button.
+        - primary_text: string | The text for the primary button.
+        - primary_icon: string | The icon for the primary button.
+        - single: bool | if it should be single.
         - secondary_href: string | The action when the secondary button is pressed.
         - secondary_text: string | What the text for the secondary button should be.
         - secondary_icon: string | What the icon for the secondary button should be.
@@ -292,9 +307,11 @@ def form_actions(primary_text="", primary_icon=None, **kwargs):
         - primary: bool | If the primary styling should be used.
     """
     if not primary_text and primary_icon is None:
-        assert False, "provide primary_text or primary_icon"
+        if kwargs.get("primary", True):
+            assert False, "provide primary_text or primary_icon"
 
-    primary = "transparent" not in kwargs
+    primary = kwargs.get("primary", "transparent" not in kwargs)
+
     return {
         **kwargs,
         "primary_text": primary_text,
