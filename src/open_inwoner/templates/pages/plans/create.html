@@ -16,13 +16,13 @@
         {% endrender_grid %}
 
         <div class="">
-            <div class="tabled-radio">
-                <div class="tabled-radio__header">
+            <div class="plan-template">
+                <div class="plan-template__header">
                     <div>{% trans "Templates" %}</div>
                     <div>{% trans "Omschrijving" %}</div>
                     <div></div>
                 </div>
-                <label class="tabled-radio__row radio">
+                <label class="plan-template__row radio">
                     <div>
                         <input class="radio__input" type="radio" name="template" value="" id="id_template_0">
                         <label class="radio__label" for="id_template_0">Geen template</label>
@@ -31,7 +31,7 @@
                     <div></div>
                 </label>
                 {% for plan_template in form.template.field.queryset %}
-                    <label class="tabled-radio__row radio">
+                    <label class="plan-template__row radio">
                         <div>
                             <input class="radio__input" type="radio" name="template" value="{{ plan_template.id }}" id="id_template_{{ plan_template.id }}">
                             <label class="radio__label" for="id_template_{{ plan_template.id }}">{{ plan_template.name }}</label>
@@ -39,7 +39,7 @@
                         <div>
                             {{ plan_template.goal|truncatewords:8 }}
                         </div>
-                        <div class="tabled-radio__icon">
+                        <div class="plan-template__icon">
                             {% comment %} TODO: The popup is not implemented yet. {% endcomment %}
                             {% comment %} {% icon icon="visibility" outlined=True %} {% endcomment %}
                         </div>
