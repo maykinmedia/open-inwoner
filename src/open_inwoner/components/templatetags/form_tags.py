@@ -9,7 +9,6 @@ register = template.Library()
 
 WIDGET_TEMPLATES = {
     "CHECKBOX": "components/Form/Checkbox.html",
-    "RADIO": "components/Form/MultipleRadio.html",
     "MULTIPLECHECKBOX": "components/Form/MultipleCheckbox.html",
     "DATE": "components/Form/DateField.html",
     "HIDDEN": "components/Form/Hidden.html",
@@ -207,18 +206,6 @@ def choice_radio(choice, **kwargs):
     Usage:
         {% choice_radio form.radio_field %}
 
-    Variables:
-        + choice: The choice that needs to be rendered.
-    """
-    return {**kwargs, "choice": choice}
-
-
-@register.inclusion_tag("components/Form/ChoiceRadio.html")
-def choice_radio(choice, **kwargs):
-    """
-    Displaying a radio input that is rendered from a choice field.
-    Usage:
-        {% choice_radio form.radio_field %}
     Variables:
         + choice: The choice that needs to be rendered.
     """
