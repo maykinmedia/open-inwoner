@@ -29,8 +29,8 @@
 
     @media (min-width: 768px) {
       grid-template-areas:
-        'lg lg lg lg lg lg lg lg actns actns actns'
-        'nv nv nv nv nv nv nv nv nv    nv    nv';
+        'lg lg lg lg lg lg lg lg lg actns actns actns'
+        'nv nv nv nv nv nv nv nv nv nv    nv    nv';
       grid-template-columns: repeat(12, 1fr);
       grid-template-rows: calc(var(--header-height) - var(--row-height) * 2) var(
           --row-height
