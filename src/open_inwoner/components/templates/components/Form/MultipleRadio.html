@@ -1,0 +1,17 @@
+{% load form_tags utils %}
+
+<div class="form__control">
+    <div class="form__stack">
+        {% for choice in field.field.choices %}
+            {% choice_radio choice=choice name=field.name data=field.value index=forloop.counter %}
+        {% endfor %}
+    </div>
+
+    {% if field.help_text %}
+        <p class="p">{{ field.help_text }}</p>
+    {% endif %}
+
+    {% if field.errors %}
+        {% errors errors=field.errors %}
+    {% endif %}
+</div>

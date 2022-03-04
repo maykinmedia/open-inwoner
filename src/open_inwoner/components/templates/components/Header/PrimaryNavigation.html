@@ -1,4 +1,4 @@
-{% load i18n icon_tags link_tags string_tags %}
+{% load i18n icon_tags link_tags string_tags solo_tags %}
 
 <nav class="primary-navigation">
     <ul class="primary-navigation__list">
@@ -34,12 +34,20 @@
                     {% endwith %}
                 {% endif %}
             </li>
+
+            {% get_solo 'configurations.SiteConfiguration' as config %}
+
+            {% if request.user.bsn and config.show_cases %}
+                <li class="primary-navigation__list-item">
+                    {% link text=_('Mijn aanvragen') href='accounts:my_cases' icon="inventory_2" icon_position="before" icon_outlined=True %}
+                </li>
+            {% endif %}
             <li class="primary-navigation__list-item">
                 {% link text=_('Samenwerken') href='plans:plan_list' icon="people" icon_outlined=True icon_position="before" %}
             </li>
-            {% if request.user.bsn %}
+            {% if questionnaire %}
                 <li class="primary-navigation__list-item">
-                    {% link text=_('Mijn aanvragen') href='accounts:my_cases' icon="inventory_2" icon_position="before" icon_outlined=True %}
+                    {% link text=_('Zelfdiagnose') href='questionnaire:index' icon="person" icon_position="before" icon_outlined=True %}
                 </li>
             {% endif %}
         {% endif %}
