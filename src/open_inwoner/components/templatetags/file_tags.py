@@ -35,6 +35,7 @@ def file_list(files, **kwargs):
         + files: array | this is the list of file that need to be rendered.
         - h1: bool | render the title in a h1 instead of a h4.
         - title: string | the title that should be used.
+        - download_view: sting | the view name to download file (used for private files)
     """
     return {**kwargs, "files": files}
 
@@ -49,6 +50,7 @@ def file_table(files, **kwargs):
 
     Variables:
         + files: array | this is the list of file that need to be rendered.
+        - download_view: sting | the view name to download file (used for private files)
     """
     kwargs.update(files=files)
     return {**kwargs}
@@ -65,6 +67,7 @@ def file(file, **kwargs):
     Variables:
         + file: File | the file that needs to be displayed.
         - allow_delete: bool | If you want to show a delete button.
+        - download_url: url | If there is a special view to download (used for private files)
 
     Extra context:
         - is_image: bool | if the file that is given is an image.
@@ -102,4 +105,8 @@ def file(file, **kwargs):
                 )
         except AttributeError:
             kwargs.update(is_image=False, extension="", size=0, url="", name=str(file))
+
+    if kwargs.get("download_url"):
+        kwargs["url"] = kwargs["download_url"]
+
     return {**kwargs}
