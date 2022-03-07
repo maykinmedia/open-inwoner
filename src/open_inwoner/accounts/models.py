@@ -510,6 +510,15 @@ class Message(models.Model):
             "Boolean shows if the email was sent to the receiver about this message"
         ),
     )
+    file = models.FileField(
+        verbose_name=_("File"),
+        blank=True,
+        null=True,
+        # storage=PrivateMediaFileSystemStorage(),
+        help_text=_(
+            "The file that is attached to the message",
+        ),
+    )
 
     objects = MessageQuerySet.as_manager()
 
