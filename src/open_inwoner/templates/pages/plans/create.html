@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n button_tags card_tags map_tags form_tags grid_tags %}
+{% load i18n button_tags card_tags map_tags form_tags grid_tags icon_tags %}
 
 {% block content %}
     <h1 class="h1">{% trans "Samenwerken" %}</h1>
@@ -41,7 +41,9 @@
                         </div>
                         <div class="plan-template__icon">
                             {% comment %} TODO: The popup is not implemented yet. {% endcomment %}
-                            {% comment %} {% icon icon="visibility" outlined=True %} {% endcomment %}
+                            <div class="show-preview" data-close="{% trans "Sluiten" %}" data-title="{{ plan_template.name }}" data-text="{{ plan_template.string_preview }}">
+                                {% icon icon="visibility" outlined=True %}
+                            </div>
                         </div>
                     </label>
                 {% endfor %}
