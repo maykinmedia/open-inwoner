@@ -96,7 +96,7 @@
     {% form_actions primary_text=_("Profiel deactiveren") primary_icon="close" transparent=True %}
 {% endrender_form %}
 
-{% file_list h1=True files=files allow_delete=True title=_("Bestanden") %}
+{% file_list h1=True files=files allow_delete=True title=_("Bestanden") download_view="accounts:documents_download" %}
 
 {% button_row align="right" %}
     {% button href="accounts:documents_create" text="Bestand toevoegen" primary=True %}
