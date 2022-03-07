@@ -5,6 +5,8 @@
 
     <h1 class="h1">{% trans "Action" %} {{ object }}</h1>
 
+    {% url "accounts:action_download" uuid=object.uuid as download_url %}
+
     <table class="table">
         <tr>
             <th class="table__header">{% trans "Name" %}</th>
@@ -32,7 +34,7 @@
         </tr>
         <tr>
             <th class="table__header">{% trans "File" %}</th>
-            <td class="table__item">{% if object.file %}{% link href=object.file.url text=object.file.name download=True %}{% endif %}</td>
+            <td class="table__item">{% if object.file %}{% link href=download_url text=object.file.name download=True %}{% endif %}</td>
         </tr>
         <tr>
             <th class="table__header">{% trans "Goal" %}</th>
