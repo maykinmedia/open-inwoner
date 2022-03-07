@@ -7,15 +7,8 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import include, path
 
 from open_inwoner.accounts.forms import CustomRegistrationForm
-from open_inwoner.accounts.views import (
-    CustomRegistrationView,
-    DocumentPrivateMediaView,
-    PasswordResetView,
-)
+from open_inwoner.accounts.views import CustomRegistrationView, PasswordResetView
 from open_inwoner.pdc.views import HomeView
-
-# from django_registration.backends.one_step.views import RegistrationView
-
 
 handler500 = "open_inwoner.utils.views.server_error"
 admin.site.site_header = "Open Inwoner beheeromgeving"
@@ -43,11 +36,6 @@ urlpatterns = [
         "reset/done/",
         auth_views.PasswordResetCompleteView.as_view(),
         name="password_reset_complete",
-    ),
-    path(
-        "private_files/<path>",
-        DocumentPrivateMediaView.as_view(),
-        name="private_file",
     ),
     path("admin/hijack/", include("hijack.urls")),
     path("admin/", admin.site.urls),

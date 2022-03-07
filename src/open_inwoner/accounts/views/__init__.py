@@ -3,6 +3,7 @@ from .actions import (
     ActionExportView,
     ActionListExportView,
     ActionListView,
+    ActionPrivateMediaView,
     ActionUpdateView,
 )
 from .cases import CasesListView, CasesStatusView
