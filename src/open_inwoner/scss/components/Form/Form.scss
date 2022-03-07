@@ -35,17 +35,10 @@
     width: 100%;
   }
 
-  &__grid-rows {
-    display: grid;
-    grid-template-columns: repeat(1, 1fr);
-    grid-gap: 18px;
-  }
-
   &__grid-box {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     grid-gap: 18px;
-    margin-bottom: 8px;
   }
 
   &__stack {
@@ -89,13 +82,14 @@
   }
   &--inline {
     grid-template-columns: 1fr auto;
-    align-items: end;
+    align-items: start;
 
     .form__actions {
       grid-column-start: auto;
       grid-column-end: auto;
       padding: 0;
       grid-gap: 0;
+      margin: 0;
     }
   }
 
