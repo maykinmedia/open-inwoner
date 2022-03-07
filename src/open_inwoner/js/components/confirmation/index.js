@@ -1,4 +1,4 @@
-import swal from 'sweetalert'
+import Swal from 'sweetalert2'
 
 class Confirmation {
   constructor(form) {
@@ -10,19 +10,17 @@ class Confirmation {
   confirmDialog(event) {
     if (!this.real_submit) {
       event.preventDefault()
-      swal(this.form.dataset.confirmTitle, {
-        buttons: {
-          confirm: this.form.dataset.confirmDefault,
-          cancel: this.form.dataset.confirmCancel,
-        },
+      Swal.fire({
+        text: this.form.dataset.confirmTitle,
+        showCancelButton: true,
+        showConfirmButton: true,
+        confirmButtonText: this.form.dataset.confirmDefault,
+        cancelButtonText: this.form.dataset.confirmCancel,
       }).then((value) => {
-        console.log(value)
-        switch (value) {
-          case true:
-            this.real_submit = true
-            this.form.submit()
-            event.target.dispatchEvent(event)
-            break
+        if (result.isConfirmed) {
+          this.real_submit = true
+          this.form.submit()
+          event.target.dispatchEvent(event)
         }
       })
     }

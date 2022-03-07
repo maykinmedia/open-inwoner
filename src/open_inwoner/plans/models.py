@@ -38,6 +38,37 @@ class PlanTemplate(models.Model):
     def __str__(self):
         return self.name
 
+    def string_preview(self):
+        html_string = "<div class='preview'>"
+
+        if self.goal:
+            html_string += (
+                f"<div class='preview__title'>{_('Doel:')}</div><div>{self.goal}</div>"
+            )
+
+        if self.file:
+            html_string += (
+                f"<div class='preview__title'>{_('File:')}</div><div>{self.file}</div>"
+            )
+
+        if self.actiontemplates.exists():
+            html_string += (
+                f"<div class='preview__title'>{_('Actions:')}</div><div></div>"
+            )
+
+            for index, action_template in enumerate(self.actiontemplates.all()):
+                html_string += "<div class='preview__span'>"
+                html_string += f"<div>{index+1}</div><div class='preview__title'>{_('Name:')}</div><div>{action_template.name}</div>"
+                html_string += f"<div></div><div class='preview__title'>{_('Description:')}</div><div>{action_template.description}</div>"
+                html_string += f"<div></div><div class='preview__title'>{_('Goal:')}</div><div>{action_template.goal}</div>"
+                html_string += f"<div></div><div class='preview__title'>{_('Type:')}</div><div>{action_template.get_type_display()}</div>"
+                html_string += f"<div></div><div class='preview__title'>{_('Ends in x days:')}</div><div>{action_template.end_in_days}</div>"
+                html_string += "</div>"
+
+        html_string += "</div>"
+
+        return html_string
+
 
 class ActionTemplate(models.Model):
     plan_template = models.ForeignKey(
