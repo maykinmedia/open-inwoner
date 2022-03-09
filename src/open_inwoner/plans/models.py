@@ -1,6 +1,7 @@
 from uuid import uuid4
 
 from django.db import models
+from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
@@ -39,35 +40,7 @@ class PlanTemplate(models.Model):
         return self.name
 
     def string_preview(self):
-        html_string = "<div class='preview'>"
-
-        if self.goal:
-            html_string += (
-                f"<div class='preview__title'>{_('Doel:')}</div><div>{self.goal}</div>"
-            )
-
-        if self.file:
-            html_string += (
-                f"<div class='preview__title'>{_('File:')}</div><div>{self.file}</div>"
-            )
-
-        if self.actiontemplates.exists():
-            html_string += (
-                f"<div class='preview__title'>{_('Actions:')}</div><div></div>"
-            )
-
-            for index, action_template in enumerate(self.actiontemplates.all()):
-                html_string += "<div class='preview__span'>"
-                html_string += f"<div>{index+1}</div><div class='preview__title'>{_('Name:')}</div><div>{action_template.name}</div>"
-                html_string += f"<div></div><div class='preview__title'>{_('Description:')}</div><div>{action_template.description}</div>"
-                html_string += f"<div></div><div class='preview__title'>{_('Goal:')}</div><div>{action_template.goal}</div>"
-                html_string += f"<div></div><div class='preview__title'>{_('Type:')}</div><div>{action_template.get_type_display()}</div>"
-                html_string += f"<div></div><div class='preview__title'>{_('Ends in x days:')}</div><div>{action_template.end_in_days}</div>"
-                html_string += "</div>"
-
-        html_string += "</div>"
-
-        return html_string
+        return render_to_string("plans/preview.html", {"plan_template": self})
 
 
 class ActionTemplate(models.Model):
@@ -150,6 +123,7 @@ class Plan(models.Model):
     class Meta:
         verbose_name = _("Plan")
         verbose_name_plural = _("Plans")
+        ordering = ("end_date",)
 
     def __str__(self):
         return self.title
