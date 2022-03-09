@@ -1,19 +1,24 @@
 from datetime import date
 
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 
 from django_webtest import WebTest
+from privates.test import temp_private_root
 
 from ..choices import StatusChoices
 from ..models import Action
 from .factories import ActionFactory, UserFactory
 
 
+@temp_private_root()
 class ActionViewTests(WebTest):
     def setUp(self) -> None:
         self.user = UserFactory()
         self.action = ActionFactory(
-            name="action_that_should_be_found", created_by=self.user
+            name="action_that_should_be_found",
+            created_by=self.user,
+            file=SimpleUploadedFile("file.txt", b"test content"),
         )
 
         self.login_url = reverse("login")
@@ -26,6 +31,9 @@ class ActionViewTests(WebTest):
             "accounts:action_export", kwargs={"uuid": self.action.uuid}
         )
         self.export_list_url = reverse("accounts:action_list_export")
+        self.download_url = reverse(
+            "accounts:action_download", kwargs={"uuid": self.action.uuid}
+        )
 
     def test_action_list_login_required(self):
         response = self.app.get(self.list_url)
@@ -125,3 +133,17 @@ class ActionViewTests(WebTest):
     def test_action_list_export_login_required(self):
         response = self.app.get(self.export_list_url)
         self.assertRedirects(response, f"{self.login_url}?next={self.export_list_url}")
+
+    def test_action_download_file(self):
+        response = self.app.get(self.download_url, user=self.user)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content_type, "text/plain")
+        self.assertEqual(response.content, b"test content")
+
+    def test_action_download_login_required(self):
+        response = self.app.get(self.download_url)
+        self.assertRedirects(response, f"{self.login_url}?next={self.download_url}")
+
+    def test_action_download_not_your_action(self):
+        other_user = UserFactory()
+        response = self.app.get(self.download_url, user=other_user, status=403)

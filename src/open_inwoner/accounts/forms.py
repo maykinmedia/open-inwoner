@@ -3,6 +3,8 @@ from django.utils.translation import ugettext_lazy as _
 
 from django_registration.forms import RegistrationForm
 
+from open_inwoner.utils.forms import PrivateFileWidget
+
 from .choices import EmptyStatusChoices
 from .models import Action, Contact, Document, Invite, Message, User
 
@@ -113,6 +115,10 @@ class ActionForm(forms.ModelForm):
         self.fields["is_for"].empty_label = _("Myself")
         self.fields["is_for"].queryset = User.objects.filter(
             assigned_contacts__in=self.user.contacts.all()
+        )
+
+        self.fields["file"].widget = PrivateFileWidget(
+            url_name="accounts:action_download"
         )
 
     def clean_end_date(self):

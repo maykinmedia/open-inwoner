@@ -9,6 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic import CreateView, DetailView, ListView
 from django.views.generic.edit import UpdateView
 
+from privates.views import PrivateMediaView
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.utils.mixins import ExportMixin
@@ -152,3 +153,17 @@ class ActionExportView(LoginRequiredMixin, ExportMixin, DetailView):
         return base_qs.filter(
             Q(is_for=self.request.user) | Q(created_by=self.request.user)
         )
+
+
+class ActionPrivateMediaView(LoginRequiredMixin, PrivateMediaView):
+    model = Action
+    slug_field = "uuid"
+    slug_url_kwarg = "uuid"
+    file_field = "file"
+
+    def has_permission(self):
+        action = self.get_object()
+        return self.request.user.is_superuser or self.request.user in [
+            action.created_by,
+            action.is_for,
+        ]
