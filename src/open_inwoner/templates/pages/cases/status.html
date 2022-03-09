@@ -26,7 +26,12 @@
             </tbody>
         </table>
     </div>
-
+    
+    <div>
+        <h1 class="h1">{% trans "Status toelichting" %}</h1>
+        {{ case.current_status.statustoelichting }}
+    </div>
+    
     <div class="status-history">
         <h1 class="h1">{% trans "Status" %}</h1>
         {% for status in case.statuses %}
