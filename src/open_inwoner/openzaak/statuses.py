@@ -1,10 +1,11 @@
 import logging
-from typing import List, Optional
+from typing import List
 
 from requests import RequestException
 from zds_client import ClientError
 from zgw_consumers.api_models.base import factory
-from zgw_consumers.api_models.zaken import Zaak
+from zgw_consumers.api_models.catalogi import StatusType
+from zgw_consumers.api_models.zaken import Status
 from zgw_consumers.service import get_paginated_results
 
 from .clients import build_client
@@ -12,8 +13,28 @@ from .clients import build_client
 logger = logging.getLogger(__name__)
 
 
-def fetch_cases(user_bsn: str) -> List[Zaak]:
+def fetch_status_history(case_url: str) -> List[Status]:
     client = build_client("zaak")
+
+    if client is None:
+        return []
+
+    try:
+        response = client.list("status", request_kwargs={"params": {"zaak": case_url}})
+    except RequestException as e:
+        logger.exception("exception while making request", exc_info=e)
+        return []
+    except ClientError as e:
+        logger.exception("exception while making request", exc_info=e)
+        return []
+
+    statuses = factory(Status, response["results"])
+
+    return statuses
+
+
+def fetch_status_types(zaaktype: str) -> List[StatusType]:
+    client = build_client("catalogi")
 
     if client is None:
         return []
@@ -21,11 +42,9 @@ def fetch_cases(user_bsn: str) -> List[Zaak]:
     try:
         response = get_paginated_results(
             client,
-            "zaak",
+            "statustype",
             request_kwargs={
-                "params": {
-                    "rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn": f"{user_bsn}"
-                },
+                "params": {"zaaktype": f"{zaaktype}"},
             },
         )
     except RequestException as e:
@@ -35,26 +54,6 @@ def fetch_cases(user_bsn: str) -> List[Zaak]:
         logger.exception("exception while making request", exc_info=e)
         return []
 
-    cases = factory(Zaak, response)
+    status_types = factory(StatusType, response)
 
-    return cases
-
-
-def fetch_specific_case(case_uuid: str) -> Optional[Zaak]:
-    client = build_client("zaak")
-
-    if client is None:
-        return
-
-    try:
-        response = client.retrieve("zaak", uuid=case_uuid)
-    except RequestException as e:
-        logger.exception("exception while making request", exc_info=e)
-        return
-    except ClientError as e:
-        logger.exception("exception while making request", exc_info=e)
-        return
-
-    case = factory(Zaak, response)
-
-    return case
+    return status_types
