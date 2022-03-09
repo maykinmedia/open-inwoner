@@ -653,3 +653,6 @@ NEW_MESSAGE_INTERVAL_MINUTES = 15
 ZGW_CONSUMERS_TEST_SCHEMA_DIRS = [
     os.path.join(DJANGO_PROJECT_DIR, "openzaak", "tests", "files"),
 ]
+
+
+SESSION_WARN_DELTA = 60  # Warn 1 minute before end of session.
