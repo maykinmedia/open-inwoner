@@ -5,6 +5,10 @@
   border-collapse: collapse;
   border-spacing: 0;
 
+  &--space-medium {
+    margin-top: var(--spacing-medium);
+  }
+
   &--light {
     .table__header {
       color: var(--color-gray-lighter);
@@ -80,9 +84,13 @@
       text-align: right;
       white-space: nowrap;
     }
-    &--no-left-padding {
-      padding: var(--spacing-medium) var(--spacing-medium) var(--spacing-medium)
-        0;
+
+    &--color-gray-dark {
+      color: var(--color-gray-dark);
+    }
+
+    &--no-lb {
+      white-space: nowrap;
     }
   }
 
