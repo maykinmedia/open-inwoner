@@ -16,7 +16,6 @@ class Preview {
       html: this.node.dataset.text,
       showConfirmButton: true,
       confirmButtonText: this.node.dataset.close,
-      grow: 'fullscreen',
     })
   }
 }
