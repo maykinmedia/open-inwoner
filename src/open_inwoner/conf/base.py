@@ -144,6 +144,7 @@ INSTALLED_APPS = [
     "zgw_consumers",
     "mail_editor",
     "ckeditor",
+    "privates",
     # Project applications.
     "open_inwoner.accounts",
     "open_inwoner.components",

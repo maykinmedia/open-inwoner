@@ -5,8 +5,8 @@ from open_inwoner.accounts.models import Document
 
 class DocumentPrivateMediaView(PrivateMediaView):
     model = Document
-    slug_url_kwarg = "path"
-    slug_field = "file"
+    slug_field = "uuid"
+    slug_url_kwarg = "uuid"
     file_field = "file"
 
     def has_permission(self):
