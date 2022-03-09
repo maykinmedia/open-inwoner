@@ -1,7 +1,8 @@
 from datetime import timedelta
+from io import BytesIO
 
 from django import forms
-from django.core.files import File
+from django.core.files.base import File
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
@@ -43,8 +44,13 @@ class PlanForm(forms.ModelForm):
         template = self.cleaned_data.get("template")
         if template:
             self.instance.goal = template.goal
+            self.instance.save()
+
             if template.file:
-                template_file = File(template.file.file)
+                template.file.file.seek(0)
+                template_file = File(
+                    BytesIO(template.file.file.read()), template.file.original_filename
+                )
                 Document.objects.create(
                     name=template.file.name,
                     file=template_file,

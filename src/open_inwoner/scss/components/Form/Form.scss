@@ -53,7 +53,7 @@
     grid-template-areas: 'secondary spacing primary';
     grid-template-columns: auto 1fr auto;
     grid-gap: var(--gutter-width);
-    margin-top: calc(2 * var(--spacing-large));
+    margin-top: 28px;
 
     &--single {
       grid-gap: 0;
@@ -90,7 +90,6 @@
       grid-column-end: auto;
       padding: 0;
       grid-gap: 0;
-      margin: 0;
     }
   }
 
