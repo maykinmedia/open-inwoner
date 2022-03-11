@@ -91,6 +91,7 @@ def card_container(categories=[], subcategories=[], products=[], plans=[], **kwa
         - categories: Category[] | categories to render.
         - subcategories: Category[] | subcategories to render.
         - products: Product[] | products to render.
+        - parent: Category | The parent of the given card_container
     """
     if (
         categories is None

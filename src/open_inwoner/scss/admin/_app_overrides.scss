@@ -70,6 +70,11 @@ div#container .dropdown-menu {
   min-width: 250px;
 }
 
+/* Override for wider filer dropzone Taiga #359 */
+.js-filer-dropzone {
+  min-width: 600px !important;
+}
+
 /**
  * DJANGO-BETTER-ADMIN-ARRAYFIELD
  * Some elements are marked as !important because the style is loaded after

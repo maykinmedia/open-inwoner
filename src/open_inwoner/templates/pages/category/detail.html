@@ -11,13 +11,12 @@
     <p class="p">{{ object.description|linebreaks }}</p>
 
     {% if subcategories %}
-        {% card_container subcategories=subcategories %}
+        {% card_container subcategories=subcategories parent_category=object %}
     {% endif %}
 
     {% if products %}
-        {% card_container products=products small=True %}
+        {% card_container products=products small=True parent=object %}
     {% endif %}
-
 
     {% if category.question_set.all %}
         {% render_grid %}

@@ -60,6 +60,11 @@
     var(--color-secondary-s),
     var(--color-secondary-l)
   );
+  --color-secondary-darker: hsl(
+    var(--color-secondary-h),
+    var(--color-secondary-s),
+    calc(var(--color-secondary-l) - 10%)
+  );
   --color-accent-h: 50;
   --color-accent-s: 94%;
   --color-accent-l: 57%;

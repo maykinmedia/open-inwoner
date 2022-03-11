@@ -3,6 +3,8 @@ from django.contrib.auth.admin import UserAdmin
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
+from privates.admin import PrivateMediaMixin
+
 from open_inwoner.utils.mixins import UUIDAdminFirstInOrder
 
 from .models import Action, Appointment, Contact, Document, Invite, Message, User
@@ -69,10 +71,11 @@ class _UserAdmin(UserAdmin):
 
 
 @admin.register(Action)
-class ActionAdmin(UUIDAdminFirstInOrder, admin.ModelAdmin):
+class ActionAdmin(UUIDAdminFirstInOrder, PrivateMediaMixin, admin.ModelAdmin):
     readonly_fields = ("uuid",)
     list_display = ("name", "created_on", "created_by")
     list_filter = ("created_by",)
+    private_media_fields = ("file",)
 
 
 @admin.register(Contact)
@@ -93,10 +96,11 @@ class ContactAdmin(UUIDAdminFirstInOrder, admin.ModelAdmin):
 
 
 @admin.register(Document)
-class DocumentAdmin(UUIDAdminFirstInOrder, admin.ModelAdmin):
+class DocumentAdmin(UUIDAdminFirstInOrder, PrivateMediaMixin, admin.ModelAdmin):
     readonly_fields = ("uuid",)
     list_display = ("name", "file", "created_on", "owner")
     list_filter = ("owner",)
+    private_media_fields = ("file",)
 
 
 @admin.register(Appointment)

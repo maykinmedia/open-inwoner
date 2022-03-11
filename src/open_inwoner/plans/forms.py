@@ -18,7 +18,8 @@ class PlanForm(forms.ModelForm):
         ]
 
     def save(self, user, commit=True):
-        self.instance.created_by = user
+        if not self.instance.pk:
+            self.instance.created_by = user
         return super().save(commit=commit)
 
 

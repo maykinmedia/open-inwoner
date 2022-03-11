@@ -25,6 +25,7 @@ class Plan(models.Model):
         "accounts.Contact",
         verbose_name=_("Contacts"),
         related_name="plans",
+        blank=True,
         help_text=_("The contact that will help you with this plan."),
     )
     created_by = models.ForeignKey(
@@ -51,7 +52,7 @@ class Plan(models.Model):
     def get_latest_file(self):
         file = self.documents.order_by("-created_on").first()
         if file:
-            return file.file
+            return file
 
     def get_other_files(self):
         return self.documents.order_by("-created_on")[1:]

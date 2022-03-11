@@ -17,7 +17,6 @@ def settings(request):
 
     context = {
         "site_name": config.name,
-        "site_logo": config.logo.file.url if config.logo else "",
         "theming": {
             "primary": config.get_primary_color,
             "secondary": config.get_secondary_color,
@@ -47,13 +46,18 @@ def settings(request):
                 "footer_mailing_intro": config.footer_mailing_intro,
                 "flatpages": config.get_ordered_flatpages,
             },
-            "help": config.get_help_text(request),
         },
         "hero_image_login": config.hero_image_login.file.url
         if config.hero_image_login
         else "",
         "login_allow_registration": config.login_allow_registration,
         "login_text": config.login_text,
+        "gtm_code": config.gtm_code,
+        "ga_code": config.ga_code,
+        "google_enabled": config.google_enabled,
+        "matomo_url": config.matomo_url,
+        "matomo_site_id": config.matomo_site_id,
+        "matomo_enabled": config.matomo_enabled,
         "menu_categories": Category.get_root_nodes(),
         "search_form": SearchForm(),
         "settings": dict(
