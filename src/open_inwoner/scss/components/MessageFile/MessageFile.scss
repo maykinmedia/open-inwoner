@@ -1,0 +1,21 @@
+.message-file {
+  height: var(--row-height);
+  display: flex;
+
+  *[class*="icon"] {
+    left: var(--spacing-medium);
+    color: var(--color-gray-lighter);
+    transform: none;
+    position: relative;
+
+  }
+
+  input[type='file'] {
+    display: none;
+  }
+
+  .label {
+    cursor: pointer;
+  }
+
+}
