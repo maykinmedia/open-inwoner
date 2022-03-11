@@ -1,6 +1,6 @@
-{% load form_tags icon_tags %}
+{% load form_tags icon_tags string_tags %}
 
-<div class="form__control">
+<div class="form__control {{ extra_classes|default:"" }}">
     <label class="label">
         {% if icon %}{% icon icon outlined=True %}{% endif %}
         {% if not no_label %}{{ field.label }}{% endif %}
@@ -13,4 +13,5 @@
             {% errors errors=field.errors %}
         {% endif %}
     </label>
+    <div class="preview"></div>
 </div>

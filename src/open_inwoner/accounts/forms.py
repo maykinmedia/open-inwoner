@@ -164,10 +164,11 @@ class InboxForm(forms.ModelForm):
         label="",
         widget=forms.Textarea(attrs={"placeholder": _("Schrijf een bericht...")}),
     )
+    file = forms.FileField(required=False, label="")
 
     class Meta:
         model = Message
-        fields = ("receiver", "content")
+        fields = ("receiver", "content", "file")
 
     def __init__(self, user, **kwargs):
         self.user = user
