@@ -8,7 +8,7 @@
             {% button icon="edit" href="admin:pdc_category_change" object_id=object.pk %}
         {% endif %}
     </h1>
-    <p class="p">{{ object.description|linebreaks }}</p>
+    <p class="p">{{ object.description|linebreaksbr }}</p>
 
     {% if subcategories %}
         {% card_container subcategories=subcategories parent_category=object %}
