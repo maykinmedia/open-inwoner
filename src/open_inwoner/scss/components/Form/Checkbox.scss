@@ -9,22 +9,23 @@
     font-size: var(--font-size-body);
     line-height: var(--font-line-height-body);
     margin: 0;
-    padding-left: 32px;
+    padding-left: var(--gutter-width);
     position: relative;
 
     &:before {
+      align-items: center;
+      display: inline-flex;
+      justify-content: center;
       position: absolute;
       left: 0;
       top: 0;
       content: ' ';
-      display: inline-block;
-      padding: 0 2px;
       box-sizing: border-box;
-      width: 22px;
-      height: 22px;
-      border: 1px solid #4b4b4b;
+      width: var(--font-line-height-body-small);
+      height: var(--font-line-height-body-small);
+      border: var(--border-width) solid var(--color-gray-dark);
       border-radius: 1px; // intended-var-change.
-      background-color: #ffffff;
+      background-color: var(--color-white);
     }
   }
 

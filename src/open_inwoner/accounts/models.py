@@ -17,7 +17,7 @@ from privates.storages import PrivateMediaFileSystemStorage
 from open_inwoner.utils.validators import validate_phone_number
 
 from .choices import ContactTypeChoices, LoginTypeChoices, StatusChoices, TypeChoices
-from .managers import DigidManager, UserManager, eHerkenningManager
+from .managers import ActionQueryset, DigidManager, UserManager, eHerkenningManager
 from .query import ContactQuerySet, MessageQuerySet
 
 
@@ -457,6 +457,8 @@ class Action(models.Model):
         related_name="actions",
         help_text=_("The plan that the action belongs to. This can be left empty."),
     )
+
+    objects = ActionQueryset.as_manager()
 
     class Meta:
         ordering = ("end_date", "-created_on")

@@ -206,6 +206,41 @@ class SiteConfiguration(SingletonModel):
         default=True,
         help_text=_("Whether to send email about each new message the user receives"),
     )
+    gtm_code = models.CharField(
+        verbose_name=_("Google Tag Manager code"),
+        max_length=50,
+        blank=True,
+        help_text=_(
+            "Typically looks like 'GTM-XXXX'. Supplying this installs Google Tag Manager."
+        ),
+    )
+    ga_code = models.CharField(
+        verbose_name=_("Google Analytics code"),
+        max_length=50,
+        blank=True,
+        help_text=_(
+            "Typically looks like 'G-XXXXX'. Supplying this installs Google Analytics."
+        ),
+    )
+    matomo_url = models.CharField(
+        verbose_name=_("Matomo server URL"),
+        max_length=255,
+        blank=True,
+        help_text=_("The base URL of your Matomo server, e.g. 'matomo.example.com'."),
+    )
+    matomo_site_id = models.PositiveIntegerField(
+        verbose_name=_("Matomo site ID"),
+        blank=True,
+        null=True,
+        help_text=_("The 'idsite' of the website you're tracking in Matomo."),
+    )
+    show_cases = models.BooleanField(
+        verbose_name=_("Show cases"),
+        default=False,
+        help_text=_(
+            "By default the cases are not shown. If the OpenZaak integration is configured this needs to be set to True."
+        ),
+    )
 
     class Meta:
         verbose_name = _("Site Configuration")
@@ -228,6 +263,14 @@ class SiteConfiguration(SingletonModel):
     @property
     def get_ordered_flatpages(self):
         return self.flatpages.order_by("ordered_flatpages")
+
+    @property
+    def google_enabled(self):
+        return self.gtm_code and self.ga_code
+
+    @property
+    def matomo_enabled(self):
+        return self.matomo_url and self.matomo_site_id
 
     def hex_to_hsl(self, color):
         # Convert hex to RGB first

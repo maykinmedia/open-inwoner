@@ -4,6 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from import_export import fields, resources
 from import_export.exceptions import ImportExportError
 from import_export.instance_loaders import CachedInstanceLoader
+from import_export.widgets import CharWidget
 
 from ..models import Category, Organization, Product, Tag
 from .widgets import ValidatedManyToManyWidget
@@ -23,6 +24,12 @@ class ImportResource(resources.ModelResource):
         # Add slug field when a new row has to be created
         if not row.get("slug") and row.get("name"):
             row["slug"] = slugify(row["name"])
+
+        # Replace newlines from excel
+        for key, value in row.items():
+            if isinstance(value, str):
+                row[key] = value.replace("_x000D_", "\n")
+
         return super().get_or_init_instance(instance_loader, row)
 
 
@@ -65,7 +72,6 @@ class ProductImportResource(ImportResource):
     summary = fields.Field(column_name="summary", attribute="summary", default="")
     link = fields.Field(column_name="link", attribute="link", default="")
     content = fields.Field(column_name="content", attribute="content")
-    costs = fields.Field(column_name="costs", attribute="costs", default=0)
     categories = fields.Field(
         column_name="categories",
         attribute="categories",
@@ -85,6 +91,12 @@ class ProductImportResource(ImportResource):
         column_name="tags",
         attribute="tags",
         widget=ValidatedManyToManyWidget(Tag, field="name"),
+    )
+    costs = fields.Field(
+        column_name="costs",
+        attribute="costs",
+        default=0,
+        widget=CharWidget(),
     )
 
     class Meta:

@@ -1,10 +1,18 @@
+from gettext import gettext
+
 from django.urls import reverse
+from django.utils.translation import ugettext as _
 
 from django_webtest import WebTest
 from webtest import Upload
 
-from open_inwoner.accounts.tests.factories import ContactFactory, UserFactory
+from open_inwoner.accounts.tests.factories import (
+    ActionFactory,
+    ContactFactory,
+    UserFactory,
+)
 
+from ..models import Plan
 from .factories import PlanFactory
 
 
@@ -12,14 +20,19 @@ class PlanViewTests(WebTest):
     def setUp(self) -> None:
         self.user = UserFactory()
         self.contact_user = UserFactory()
-        self.contact = ContactFactory(contact_user=self.contact_user)
+        self.contact = ContactFactory(
+            contact_user=self.contact_user, created_by=self.user
+        )
         self.plan = PlanFactory(title="plan_that_should_be_found", created_by=self.user)
         self.plan.contacts.add(self.contact)
+
+        self.action = ActionFactory(plan=self.plan, created_by=self.user)
 
         self.login_url = reverse("login")
         self.list_url = reverse("plans:plan_list")
         self.create_url = reverse("plans:plan_create")
         self.detail_url = reverse("plans:plan_detail", kwargs={"uuid": self.plan.uuid})
+        self.edit_url = reverse("plans:plan_edit", kwargs={"uuid": self.plan.uuid})
         self.goal_edit_url = reverse(
             "plans:plan_edit_goal", kwargs={"uuid": self.plan.uuid}
         )
@@ -28,6 +41,10 @@ class PlanViewTests(WebTest):
         )
         self.action_add_url = reverse(
             "plans:plan_action_create", kwargs={"uuid": self.plan.uuid}
+        )
+        self.action_edit_url = reverse(
+            "plans:plan_action_edit",
+            kwargs={"plan_uuid": self.plan.uuid, "uuid": self.action.uuid},
         )
         self.export_url = reverse("plans:plan_export", kwargs={"uuid": self.plan.uuid})
 
@@ -126,7 +143,7 @@ class PlanViewTests(WebTest):
         response = form.submit(user=self.user)
         self.assertEqual(response.status_code, 302)
 
-        self.assertEqual(self.plan.actions.count(), 1)
+        self.assertEqual(self.plan.actions.count(), 2)
 
     def test_plan_action_create_contact_can_access(self):
         response = self.app.get(self.action_add_url, user=self.contact_user)
@@ -137,7 +154,7 @@ class PlanViewTests(WebTest):
         response = form.submit(user=self.user)
         self.assertEqual(response.status_code, 302)
 
-        self.assertEqual(self.plan.actions.count(), 1)
+        self.assertEqual(self.plan.actions.count(), 2)
 
     def test_plan_action_create_not_your_action(self):
         other_user = UserFactory()
@@ -146,6 +163,71 @@ class PlanViewTests(WebTest):
     def test_plan_create_login_required(self):
         response = self.app.get(self.create_url)
         self.assertRedirects(response, f"{self.login_url}?next={self.create_url}")
+
+    def test_plan_create_fields_required(self):
+        response = self.app.get(self.create_url, user=self.user)
+        form = response.forms["plan-form"]
+        response = form.submit()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context["form"].errors,
+            {
+                "title": [_("This field is required.")],
+                "end_date": [_("This field is required.")],
+            },
+        )
+
+    def test_plan_create_plan(self):
+        self.assertEqual(Plan.objects.count(), 1)
+        response = self.app.get(self.create_url, user=self.user)
+        form = response.forms["plan-form"]
+        form["title"] = "Plan"
+        form["end_date"] = "2022-01-01"
+        form["contacts"] = [self.contact.pk]
+        response = form.submit().follow()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Plan.objects.count(), 2)
+
+    def test_plan_edit_login_required(self):
+        response = self.app.get(self.edit_url)
+        self.assertRedirects(response, f"{self.login_url}?next={self.edit_url}")
+
+    def test_plan_edit_fields_required(self):
+        response = self.app.get(self.edit_url, user=self.user)
+        form = response.forms["plan-form"]
+        form["title"] = ""
+        response = form.submit()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context["form"].errors,
+            {
+                "title": [_("This field is required.")],
+            },
+        )
+
+    def test_plan_edit_plan(self):
+        self.assertNotEqual(self.plan.title, "Plan title")
+        response = self.app.get(self.edit_url, user=self.user)
+        form = response.forms["plan-form"]
+        form["title"] = "Plan title"
+        response = form.submit().follow()
+        self.assertEqual(response.status_code, 200)
+        self.plan.refresh_from_db()
+        self.assertEqual(self.plan.title, "Plan title")
+
+    def test_plan_action_edit_login_required(self):
+        response = self.app.get(self.action_edit_url)
+        self.assertRedirects(response, f"{self.login_url}?next={self.action_edit_url}")
+
+    def test_plan_action_edit(self):
+        response = self.app.get(self.action_edit_url, user=self.user)
+        self.assertEqual(response.status_code, 200)
+        form = response.forms["action-create"]
+        form["name"] = "action name"
+        response = form.submit(user=self.user)
+        self.assertEqual(response.status_code, 302)
+        self.action.refresh_from_db()
+        self.assertEqual(self.action.name, "action name")
 
     def test_plan_export(self):
         response = self.app.get(self.export_url, user=self.user)

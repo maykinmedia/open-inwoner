@@ -1,5 +1,5 @@
 from import_export import fields, resources
-from import_export.widgets import ManyToManyWidget
+from import_export.widgets import CharWidget, ManyToManyWidget
 
 from ..models import Category, Organization, Product, Tag
 
@@ -42,6 +42,11 @@ class ProductExportResource(resources.ModelResource):
         column_name="tags",
         attribute="tags",
         widget=ManyToManyWidget(Tag, field="name"),
+    )
+    costs = fields.Field(
+        column_name="costs",
+        attribute="costs",
+        widget=CharWidget(),
     )
 
     class Meta:

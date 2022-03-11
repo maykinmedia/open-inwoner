@@ -3,9 +3,14 @@ from datetime import datetime
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.http.response import HttpResponseRedirect
-from django.urls.base import reverse_lazy
+from django.urls.base import reverse, reverse_lazy
+from django.utils.functional import cached_property
+from django.utils.translation import ugettext_lazy as _
 from django.views.generic import CreateView, DetailView, ListView
 from django.views.generic.edit import UpdateView
+
+from privates.views import PrivateMediaView
+from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.utils.mixins import ExportMixin
 
@@ -31,13 +36,22 @@ class BaseActionFilter:
         return actions
 
 
-class ActionListView(LoginRequiredMixin, BaseActionFilter, ListView):
+class ActionListView(
+    LoginRequiredMixin, BaseBreadcrumbMixin, BaseActionFilter, ListView
+):
     template_name = "pages/profile/actions/list.html"
     model = Action
 
+    @cached_property
+    def crumbs(self):
+        return [
+            (_("Mijn profiel"), reverse("accounts:my_profile")),
+            (_("Mijn acties"), reverse("accounts:action_list")),
+        ]
+
     def get_queryset(self):
         base_qs = super().get_queryset()
-        return base_qs.filter(is_for=self.request.user).select_related("created_by")
+        return base_qs.connected(user=self.request.user).select_related("created_by")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -54,7 +68,7 @@ class ActionListView(LoginRequiredMixin, BaseActionFilter, ListView):
         return context
 
 
-class ActionUpdateView(LoginRequiredMixin, UpdateView):
+class ActionUpdateView(LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
     template_name = "pages/profile/actions/edit.html"
     model = Action
     slug_field = "uuid"
@@ -62,9 +76,20 @@ class ActionUpdateView(LoginRequiredMixin, UpdateView):
     form_class = ActionForm
     success_url = reverse_lazy("accounts:action_list")
 
+    @cached_property
+    def crumbs(self):
+        return [
+            (_("Mijn profiel"), reverse("accounts:my_profile")),
+            (_("Mijn acties"), reverse("accounts:action_list")),
+            (
+                _("Bewerk {}").format(self.object.name),
+                reverse("accounts:action_edit", kwargs=self.kwargs),
+            ),
+        ]
+
     def get_queryset(self):
         base_qs = super().get_queryset()
-        return base_qs.filter(is_for=self.request.user)
+        return base_qs.connected(user=self.request.user)
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -76,11 +101,22 @@ class ActionUpdateView(LoginRequiredMixin, UpdateView):
         return HttpResponseRedirect(self.get_success_url())
 
 
-class ActionCreateView(LoginRequiredMixin, CreateView):
+class ActionCreateView(LoginRequiredMixin, BaseBreadcrumbMixin, CreateView):
     template_name = "pages/profile/actions/edit.html"
     model = Action
     form_class = ActionForm
     success_url = reverse_lazy("accounts:action_list")
+
+    @cached_property
+    def crumbs(self):
+        return [
+            (_("Mijn profiel"), reverse("accounts:my_profile")),
+            (_("Mijn acties"), reverse("accounts:action_list")),
+            (
+                _("Maak actie aan"),
+                reverse("accounts:action_create"),
+            ),
+        ]
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -117,3 +153,17 @@ class ActionExportView(LoginRequiredMixin, ExportMixin, DetailView):
         return base_qs.filter(
             Q(is_for=self.request.user) | Q(created_by=self.request.user)
         )
+
+
+class ActionPrivateMediaView(LoginRequiredMixin, PrivateMediaView):
+    model = Action
+    slug_field = "uuid"
+    slug_url_kwarg = "uuid"
+    file_field = "file"
+
+    def has_permission(self):
+        action = self.get_object()
+        return self.request.user.is_superuser or self.request.user in [
+            action.created_by,
+            action.is_for,
+        ]

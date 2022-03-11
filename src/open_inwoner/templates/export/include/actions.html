@@ -13,13 +13,14 @@
     </thead>
     <tbody>
         {% for action in actions %}
+            {% url "accounts:action_download" uuid=action.uuid as download_url %}
             <tr>
                 <td class="table__item">{{ action.name }}</td>
                 <td class="table__item">{{ action.get_status_display }}</td>
                 <td class="table__item">{{ action.get_type_display }}</td>
                 <td class="table__item">{{ action.is_for.get_full_name }}</td>
                 <td class="table__item">{{ action.end_date|default:"-" }}</td>
-                <td class="table__item">{% if action.file %}{% link href=action.file.url icon="download" download=True %}{% endif %}</td>
+                <td class="table__item">{% if action.file %}{% link href=download_url icon="download" download=True %}{% endif %}</td>
             </tr>
         {% endfor %}
     </tbody>

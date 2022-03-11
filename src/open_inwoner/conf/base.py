@@ -133,7 +133,7 @@ INSTALLED_APPS = [
     "treebeard",
     "easy_thumbnails",  # used by filer
     "filer",
-    "mptt",  # used by filer
+    "mptt",
     "hijack.contrib.admin",
     "django_elasticsearch_dsl",
     "import_export",
@@ -144,6 +144,7 @@ INSTALLED_APPS = [
     "zgw_consumers",
     "mail_editor",
     "ckeditor",
+    "privates",
     # Project applications.
     "open_inwoner.accounts",
     "open_inwoner.components",
@@ -155,6 +156,7 @@ INSTALLED_APPS = [
     "open_inwoner.configurations",
     "open_inwoner.haalcentraal",
     "open_inwoner.openzaak",
+    "open_inwoner.questionnaire",
 ]
 
 MIDDLEWARE = [

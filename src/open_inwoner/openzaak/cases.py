@@ -1,4 +1,5 @@
 import logging
+from typing import List, Optional
 
 from requests import RequestException
 from zds_client import ClientError
@@ -11,10 +12,10 @@ from .clients import build_client
 logger = logging.getLogger(__name__)
 
 
-def fetch_cases(user):
+def fetch_cases(user_bsn: str) -> List[Zaak]:
     client = build_client("zaak")
 
-    if client is None or user.bsn is None:
+    if client is None:
         return []
 
     try:
@@ -23,29 +24,37 @@ def fetch_cases(user):
             "zaak",
             request_kwargs={
                 "params": {
-                    "rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn": f"{user.bsn}"
+                    "rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn": f"{user_bsn}"
                 },
             },
         )
-    except (RequestException, ClientError) as e:
+    except RequestException as e:
         logger.exception("exception while making request", exc_info=e)
         return []
+    except ClientError as e:
+        logger.exception("exception while making request", exc_info=e)
+        return []
+
     cases = factory(Zaak, response)
 
     return cases
 
 
-def fetch_specific_case(user, case_uuid):
+def fetch_specific_case(case_uuid: str) -> Optional[Zaak]:
     client = build_client("zaak")
 
-    if client is None or user.bsn is None:
+    if client is None:
         return
 
     try:
         response = client.retrieve("zaak", uuid=case_uuid)
-    except (RequestException, ClientError) as e:
+    except RequestException as e:
         logger.exception("exception while making request", exc_info=e)
         return
+    except ClientError as e:
+        logger.exception("exception while making request", exc_info=e)
+        return
+
     case = factory(Zaak, response)
 
     return case
