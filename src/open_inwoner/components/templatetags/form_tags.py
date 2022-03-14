@@ -126,10 +126,9 @@ def autorender_field(form_object, field_name, **kwargs):
 
     if type(field) == forms.fields.DateField:
         tmplt = WIDGET_TEMPLATES["DATE"]
-
-    if type(field) == forms.models.ModelMultipleChoiceField:
+    elif type(field) == forms.models.ModelMultipleChoiceField:
         tmplt = WIDGET_TEMPLATES["MULTIPLECHECKBOX"]
-    if type(field) == forms.fields.BooleanField:
+    elif type(field) == forms.fields.BooleanField:
         fn = checkbox
         tmplt = WIDGET_TEMPLATES["CHECKBOX"]
     elif type(field.widget) == forms.fields.HiddenInput:
@@ -159,6 +158,20 @@ def errors(errors, **kwargs):
 
 @register.inclusion_tag(WIDGET_TEMPLATES["CHECKBOX"])
 def checkbox(field, **kwargs):
+    """
+    Displaying a checkbox.
+
+    Usage:
+        {% checkbox form.checkbox_field %}
+
+    Variables:
+        + field: Field | The field that needs to be rendered.
+    """
+    return {**kwargs, "field": field}
+
+
+@register.inclusion_tag(WIDGET_TEMPLATES["MULTIPLECHECKBOX"])
+def checkboxes(field, **kwargs):
     """
     Displaying a checkbox.
 

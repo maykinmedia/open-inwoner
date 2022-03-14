@@ -89,7 +89,7 @@ class PlanCreateView(LoginRequiredMixin, BaseBreadcrumbMixin, CreateView):
 
 
 class PlanEditView(LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
-    template_name = "pages/plans/create.html"
+    template_name = "pages/plans/edit.html"
     model = Plan
     slug_field = "uuid"
     slug_url_kwarg = "uuid"

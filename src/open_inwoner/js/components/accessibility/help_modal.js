@@ -1,4 +1,4 @@
-import swal from 'sweetalert'
+import Swal from 'sweetalert2'
 
 class HelpModal {
   constructor(helpButton) {
@@ -10,12 +10,11 @@ class HelpModal {
   showModal(event) {
     event.preventDefault()
     this.helpButton.classList.add('accessibility-header__modal--highlight')
-    swal({
+    Swal.fire({
       title: this.modal.dataset.helpTitle,
       text: this.modal.dataset.helpText,
-      buttons: {
-        close: this.modal.dataset.helpClose,
-      },
+      showConfirmButton: true,
+      confirmButtonText: this.modal.dataset.helpClose,
     }).then((close) => {
       this.helpButton.classList.remove('accessibility-header__modal--highlight')
     })
