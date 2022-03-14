@@ -258,6 +258,20 @@ def autocomplete(field, **kwargs):
     return {**kwargs, "field": field}
 
 
+@register.inclusion_tag("components/Form/Hidden.html")
+def hidden(field, **kwargs):
+    """
+    Displaying a hidden field
+
+    Usage:
+        {% hidden form.field %}
+
+    Variables:
+        + field: Field | The choice field that needs to be rendered.
+    """
+    return {**kwargs, "field": field}
+
+
 @register.inclusion_tag("components/Form/FormActions.html")
 def form_actions(primary_text="", primary_icon=None, **kwargs):
     """
