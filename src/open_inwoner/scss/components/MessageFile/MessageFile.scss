@@ -1,13 +1,31 @@
 .message-file {
-  height: var(--row-height);
+  // layout
   display: flex;
+  padding: var(--spacing-medium) var(--spacing-large);
+  gap: var(--spacing-extra-large);
 
-  *[class*="icon"] {
-    left: var(--spacing-medium);
+  // font
+  color: var(--font-color-body);
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-body);
+
+  &__preview {
+    display: flex;
+    background-color: var(--color-mute);
+    border-radius: 10px;
+    padding: var(--spacing-small);
+  }
+
+  &__delete {
+    cursor: pointer;
+  }
+
+  *[class*='icon'] {
     color: var(--color-gray-lighter);
+    left: 0;
+    top: 0;
     transform: none;
     position: relative;
-
   }
 
   input[type='file'] {
@@ -16,6 +34,10 @@
 
   .label {
     cursor: pointer;
-  }
 
+    *[class*='icon'] {
+      top: var(--spacing-tiny);
+      left: -5px;
+    }
+  }
 }
