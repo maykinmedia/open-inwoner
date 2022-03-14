@@ -82,13 +82,14 @@
   }
   &--inline {
     grid-template-columns: 1fr auto;
-    align-items: end;
+    align-items: start;
 
     .form__actions {
       grid-column-start: auto;
       grid-column-end: auto;
       padding: 0;
       grid-gap: 0;
+      margin: 0;
     }
   }
 

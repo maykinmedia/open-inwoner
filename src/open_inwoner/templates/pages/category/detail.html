@@ -1,6 +1,12 @@
 {% extends 'master.html' %}
 {% load button_tags card_tags faq_tags grid_tags %}
 
+{% block header_image %}
+{% if object.image %}
+    <img class="main-image main-image--start-after" src="{{ object.image.url }}" alt="Header image">
+{% endif %}
+{% endblock header_image %}
+
 {% block content %}
     <h1 class="h1">
         {{ object.name }}
