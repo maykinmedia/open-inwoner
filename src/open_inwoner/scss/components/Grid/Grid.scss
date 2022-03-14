@@ -66,6 +66,10 @@
       width: 50%;
     }
   }
+
+  .form__grid-box {
+    grid-template-columns: 1fr;
+  }
 }
 
 .grid + .grid,
