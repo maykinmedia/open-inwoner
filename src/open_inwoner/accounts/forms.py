@@ -195,6 +195,8 @@ class InboxForm(forms.ModelForm):
                 _("Either message content or file should be filled in")
             )
 
+        return cleaned_data
+
     def save(self, commit=True):
         self.instance.sender = self.user
 

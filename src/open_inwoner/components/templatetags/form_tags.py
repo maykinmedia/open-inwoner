@@ -209,6 +209,7 @@ def input(field, **kwargs):
 
     Variables:
         + field: Field | The field that needs to be rendered.
+        - extra_classes: string| classes which should be added to the top-level container
     """
     return {**kwargs, "field": field}
 
