@@ -476,6 +476,12 @@ class Action(models.Model):
 
 
 class Message(models.Model):
+    uuid = models.UUIDField(
+        verbose_name=_("UUID"),
+        unique=True,
+        default=uuid4,
+        help_text=_("Unique identifier"),
+    )
     sender = models.ForeignKey(
         User,
         verbose_name=_("Sender"),
@@ -514,7 +520,7 @@ class Message(models.Model):
         verbose_name=_("File"),
         blank=True,
         null=True,
-        # storage=PrivateMediaFileSystemStorage(),
+        storage=PrivateMediaFileSystemStorage(),
         help_text=_(
             "The file that is attached to the message",
         ),
