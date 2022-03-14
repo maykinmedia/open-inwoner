@@ -502,7 +502,9 @@ class Message(models.Model):
         help_text=_("This is the date the message was created"),
     )
     content = models.TextField(
-        verbose_name=_("Content"), help_text=_("Text content of the message")
+        verbose_name=_("Content"),
+        blank=True,
+        help_text=_("Text content of the message"),
     )
     seen = models.BooleanField(
         verbose_name=_("Seen"),
