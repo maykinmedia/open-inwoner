@@ -39,7 +39,7 @@
 
         {% render_form form=form method="POST" enctype="multipart/form-data" %}
             {% csrf_token %}
-            {% input form.receiver no_label=True no_help=True  %}
+            {% hidden form.receiver %}
             <div class="group-input">
                 {% textarea form.content %}
                 {% input form.file icon="attach_file" no_label=True no_help=True extra_classes="message-file" %}
