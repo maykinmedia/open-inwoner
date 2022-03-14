@@ -1,5 +1,7 @@
+$image-height: 261px;
+
 .main-image {
-  height: 261px;
+  height: $image-height;
   object-fit: cover;
   width: 100%;
 
@@ -8,5 +10,11 @@
     left: 0;
     right: 0;
     top: var(--header-height);
+  }
+
+  &.main-image--start-after ~ .container {
+    @media (min-width: 768px) {
+      margin-top: $image-height;
+    }
   }
 }
