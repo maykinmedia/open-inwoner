@@ -32,6 +32,15 @@ class ProductFactory(factory.django.DjangoModelFactory):
             for category in extracted:
                 self.categories.add(category)
 
+    @factory.post_generation
+    def locations(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted:
+            for location in extracted:
+                self.locations.add(location)
+
 
 class CategoryFactory(factory.django.DjangoModelFactory):
     name = factory.Faker("word")
@@ -75,7 +84,6 @@ class OrganizationFactory(factory.django.DjangoModelFactory):
 
 
 class ProductContactFactory(factory.django.DjangoModelFactory):
-    product = factory.SubFactory(ProductFactory)
     organization = factory.SubFactory(OrganizationFactory)
     first_name = factory.Faker("first_name")
     last_name = factory.Faker("last_name")
@@ -88,7 +96,6 @@ class ProductContactFactory(factory.django.DjangoModelFactory):
 
 class ProductLocationFactory(factory.django.DjangoModelFactory):
     name = factory.Faker("word")
-    product = factory.SubFactory(ProductFactory)
     street = factory.Faker("street_name", locale="nl_NL")
     postcode = factory.Faker("postcode", locale="nl_NL")
     geometry = Point(5, 52)
