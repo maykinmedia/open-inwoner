@@ -97,7 +97,7 @@
   &--open {
     background-color: transparent;
     color: var(--color-primary);
-    border-color: transparent;
+    border: 1px solid transparent;
 
     &:focus,
     &:hover {
@@ -107,7 +107,7 @@
 
   &--bordered {
     background-color: transparent;
-    border-color: var(--color-primary);
+    border: 1px solid var(--color-primary);
     color: var(--color-primary);
   }
 
