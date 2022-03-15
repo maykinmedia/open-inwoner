@@ -1,0 +1,30 @@
+.plan-template {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-family-body);
+
+  .plan-template__header {
+    display: grid;
+    grid-template-columns: 1fr 1fr 16px;
+    gap: var(--spacing-small);
+  }
+
+  .plan-template__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 16px;
+    gap: var(--spacing-small);
+    border-bottom: 1px solid var(--color-gray-light);
+    padding: var(--spacing-medium);
+  }
+
+  .plan-template__icon {
+    display: flex;
+    align-items: center;
+  }
+
+  *[class*='icon'],
+  *[class*='Icon'] {
+    color: #4b4b4b;
+    font-size: 14px;
+  }
+}
