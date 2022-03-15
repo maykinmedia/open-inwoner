@@ -16,9 +16,7 @@ from .factories import ProductFactory, ProductLocationFactory
 class ProductLocationTestCase(TestCase):
     def test_geocode(self):
         """FIXME this test request actual external API. Should be reworked"""
-        product = ProductFactory.create()
         product_location = ProductLocation(
-            product=product,
             street="Keizersgracht",
             housenumber="117",
             postcode="1015 CJ",
@@ -69,6 +67,8 @@ class ProductLocationTestCase(TestCase):
             city="Amsterdam",
             geometry=Point(4.8876515, 52.3775941),
         )
+        product = ProductFactory.create(locations=(product_location,))
+
         self.assertEqual(
             json.dumps(
                 {
@@ -83,7 +83,7 @@ class ProductLocationTestCase(TestCase):
                         "housenumber": "117",
                         "postcode": "1015 CJ",
                         "city": "Amsterdam",
-                        "url": product_location.product.get_absolute_url(),
+                        "url": product.get_absolute_url(),
                     },
                 }
             ),
@@ -124,21 +124,23 @@ class ProductLocationTestCase(TestCase):
 
     def test_queryset_get_geojson_feature_collection(self):
         product_location_1 = ProductLocationFactory.create(
-            name="Maykin Media",
-            street="Keizersgracht",
-            housenumber="117",
-            postcode="1015 CJ",
-            city="Amsterdam",
-            geometry=Point(4.8876515, 52.3775941),
+            name="Gemeente Deventer",
+            street="Grote Kerkhof",
+            housenumber="4",
+            postcode="7411 KT",
+            city="Deventer",
+            geometry=Point(6.155650, 52.251550),
         )
         product_location_2 = ProductLocationFactory.create(
-            name="Anne Frank Huis",
-            street="Westermarkt",
-            housenumber="20",
-            postcode="1016 GV",
+            name="Gemeente Amsterdam",
+            street="Lindengracht",
+            housenumber="204",
+            postcode="1015 KL",
             city="Amsterdam",
-            geometry=Point(4.884554379441582, 52.3744749),
+            geometry=Point(4.883400, 52.380260),
         )
+        product_1 = ProductFactory(locations=(product_location_1,))
+        product_2 = ProductFactory(locations=(product_location_1, product_location_2))
         self.assertEqual(
             json.dumps(
                 {
@@ -148,30 +150,30 @@ class ProductLocationTestCase(TestCase):
                             "type": "Feature",
                             "geometry": {
                                 "type": "Point",
-                                "coordinates": [4.8876515, 52.3775941],
+                                "coordinates": [6.155650, 52.251550],
                             },
                             "properties": {
-                                "name": "Maykin Media",
-                                "street": "Keizersgracht",
-                                "housenumber": "117",
-                                "postcode": "1015 CJ",
-                                "city": "Amsterdam",
-                                "url": product_location_1.product.get_absolute_url(),
+                                "name": "Gemeente Deventer",
+                                "street": "Grote Kerkhof",
+                                "housenumber": "4",
+                                "postcode": "7411 KT",
+                                "city": "Deventer",
+                                "url": product_1.get_absolute_url(),
                             },
                         },
                         {
                             "type": "Feature",
                             "geometry": {
                                 "type": "Point",
-                                "coordinates": [4.884554379441582, 52.3744749],
+                                "coordinates": [4.883400, 52.380260],
                             },
                             "properties": {
-                                "name": "Anne Frank Huis",
-                                "street": "Westermarkt",
-                                "housenumber": "20",
-                                "postcode": "1016 GV",
+                                "name": "Gemeente Amsterdam",
+                                "street": "Lindengracht",
+                                "housenumber": "204",
+                                "postcode": "1015 KL",
                                 "city": "Amsterdam",
-                                "url": product_location_2.product.get_absolute_url(),
+                                "url": product_2.get_absolute_url(),
                             },
                         },
                     ],
@@ -205,12 +207,10 @@ class ProductLocationTestCase(TestCase):
 
 class TestLocationFormInput(WebTest):
     def test_exception_is_handled_when_city_and_postcode_are_not_provided(self):
-        product = ProductFactory()
         user = UserFactory(is_superuser=True, is_staff=True)
 
         response = self.app.get(reverse("admin:pdc_productlocation_add"), user=user)
         form = response.form
-        form["product"] = product.pk
         form_response = form.submit("_save")
 
         self.assertListEqual(
