@@ -9,6 +9,12 @@
     }
   }
 
+  .actions__filter-button {
+    @media (min-width: 768px) {
+      display: none;
+    }
+  }
+
   .actions__filter-container {
     display: none;
     grid-template-columns: 1fr;
