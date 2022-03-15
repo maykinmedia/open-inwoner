@@ -474,6 +474,9 @@ class Action(models.Model):
 
         return super().save(*args, **kwargs)
 
+    def is_connected(self, user):
+        return Action.objects.filter(pk=self.pk).connected(user=user).exists()
+
 
 class Message(models.Model):
     uuid = models.UUIDField(
