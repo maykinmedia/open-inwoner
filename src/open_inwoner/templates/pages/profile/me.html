@@ -1,26 +1,8 @@
 {% extends 'master.html' %}
-{% load i18n l10n link_tags file_tags button_tags utils icon_tags form_tags %}
+{% load i18n l10n link_tags file_tags button_tags utils icon_tags form_tags anchor_menu_tags %}
 
 {% block sidebar_content %}
-<aside class="anchor-menu">
-    <ul class="anchor-menu__list">
-        <li class="anchor-menu__list-item">
-            <a class="link" href="#title">{% trans "Persoonlijke gegevens" %}</a>
-        </li>
-        <li class="anchor-menu__list-item">
-            <a class="link" href="#overview">{% trans "Persoonlijk overzicht" %}</a>
-        </li>
-        <li class="anchor-menu__list-item">
-            <a class="link" href="#files">{% trans "Bestanden" %}</a>
-        </li>
-        <li class="anchor-menu__list-item anchor-menu__list-item--top">
-            <a class="link link--primary" href="#top">
-                {% icon icon="arrow_upward" %}
-                Terug naar boven
-            </a>
-        </li>
-    </ul>
-</aside>
+{% anchor_menu anchors desktop=True %}
 {% endblock sidebar_content %}
 
 {% block content %}
