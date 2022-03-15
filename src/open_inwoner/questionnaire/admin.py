@@ -26,7 +26,7 @@ class QuestionnaireStepAdmin(TreeAdmin):
     form = QuestionnaireStepAdminForm
     inlines = (QuestionnaireStepFileInline,)
     list_display = (
-        "question",
+        "display_question_answer",
         "is_default",
     )
     prepopulated_fields = {"slug": ("question",)}
@@ -57,7 +57,7 @@ class QuestionnaireStepAdmin(TreeAdmin):
             },
         ),
         (
-            _("Optionele velden"),
+            _("Eindstatus velden (uitgebreide informatie en producten)"),
             {
                 "classes": ("collapse in",),
                 "fields": (
@@ -67,3 +67,9 @@ class QuestionnaireStepAdmin(TreeAdmin):
             },
         ),
     )
+
+    def display_question_answer(self, obj):
+        if not obj.parent_answer:
+            return obj.question
+        return "{} -> {}</p>".format(obj.parent_answer, obj.question)
+    display_question_answer.allow_tags = True
