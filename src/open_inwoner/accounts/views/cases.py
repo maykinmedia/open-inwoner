@@ -92,10 +92,7 @@ class CasesStatusView(
 
         context["case"] = {
             "obj": case,
-            "info": {
-                "count": len(case_info_objects),
-                "objects": case_info_objects,
-            },
+            "documents": case_info_objects,
             "statuses": statuses,
             "current_status": statuses[0] if statuses else None,
         }

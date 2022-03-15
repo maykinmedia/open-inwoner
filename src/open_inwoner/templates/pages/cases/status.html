@@ -21,7 +21,7 @@
                     <td class="table__item">{{ case.obj.identificatie }}</td>
                     <td class="table__item">{{ case.current_status.datum_status_gezet }}</td>
                     <td class="table__item">{{ case.current_status.statustype.omschrijving }}</td>
-                    <td class="table__item">{{ case.info.count }}</td>
+                    <td class="table__item">{{ case.documents|length }}</td>
                 </tr>
             </tbody>
         </table>
@@ -41,8 +41,8 @@
 
     <div class="status-objects">
         <h1 class="h1">{% trans "Documenten" %}</h1>
-        {% for obj in case.info.objects %}
-            {{ obj.titel }}
+        {% for document in case.documents %}
+            {{ document.titel }}
         {% endfor %}
     </div>
 {% endblock content %}
