@@ -5,7 +5,7 @@ register = template.Library()
 
 
 @register.inclusion_tag("components/Action/Actions.html")
-def actions(actions, **kwargs):
+def actions(actions, request, action_form, **kwargs):
     """
     Renders the actions in a filterable table.
 
@@ -15,9 +15,10 @@ def actions(actions, **kwargs):
     Available options:
         + actions: Action[] | All the actions that will be shown. This should be the filtered list if filters are applied.
         + action_form: Form | The form containing the needed filters for the actions.
+        - form_action: string | A url for something
         - plan: Plan | The plan that the actions belong to
     """
-    kwargs.update(actions=actions)
+    kwargs.update(actions=actions, request=request, action_form=action_form)
     return kwargs
 
 
@@ -40,3 +41,19 @@ def get_action_edit_url(action, plan=None):
             kwargs={"plan_uuid": plan.uuid, "uuid": action.uuid},
         )
     return reverse("accounts:action_edit", kwargs={"uuid": action.uuid})
+
+
+@register.filter()
+def is_connected(action, user):
+    """
+    see if the given user is connected to the action.
+
+    Usage:
+        {% if action|is_connected:request.user %}
+        {{ action|is_connected:request.user }}
+
+    Variables:
+        + action: Action | The action we check if the user has access.
+        + user: User | The user we check if has access to the action.
+    """
+    return action.is_connected(user)
