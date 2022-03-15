@@ -56,7 +56,8 @@ class ActionListView(
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["action_form"] = ActionListForm(
-            data=self.request.GET, users=self.get_queryset()
+            data=self.request.GET,
+            users=self.get_queryset().values_list("is_for_id", flat=True),
         )
 
         actions = self.get_actions(self.get_queryset())
