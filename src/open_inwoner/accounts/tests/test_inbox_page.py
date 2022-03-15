@@ -1,6 +1,7 @@
 from django.urls import reverse_lazy
 
 from django_webtest import WebTest
+from privates.test import temp_private_root
 
 from ..models import Message
 from .factories import ContactFactory, MessageFactory, UserFactory
@@ -62,6 +63,40 @@ class InboxPageTests(WebTest):
         self.assertEqual(last_message.content, "some msg")
         self.assertEqual(last_message.sender, self.me)
         self.assertEqual(last_message.receiver, self.user1)
+
+    @temp_private_root()
+    def test_send_file(self):
+        response = self.app.get(self.url, {"with": self.user1.email})
+        self.assertEqual(response.status_code, 200)
+
+        form = response.forms[1]
+        form["file"] = ("file.txt", b"test content")
+
+        response = form.submit()
+
+        self.assertEqual(response.status_code, 302)
+
+        last_message = Message.objects.order_by("-pk").first()
+        self.assertEqual(last_message.content, "")
+        self.assertEqual(last_message.sender, self.me)
+        self.assertEqual(last_message.receiver, self.user1)
+
+        file = last_message.file
+        self.assertEqual(file.name, "file.txt")
+        self.assertEqual(file.read(), b"test content")
+
+    def test_send_empty_message(self):
+        response = self.app.get(self.url, {"with": self.user1.email})
+        self.assertEqual(response.status_code, 200)
+
+        form = response.forms[1]
+        response = form.submit()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context["errors"][0],
+            "Either message content or file should be filled in",
+        )
 
     def test_mark_messages_as_seen(self):
         other_user = UserFactory.create()
