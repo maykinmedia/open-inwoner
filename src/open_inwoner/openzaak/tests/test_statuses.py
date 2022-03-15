@@ -181,11 +181,9 @@ class TestListStatusView(WebTest):
             user=self.user,
         )
 
+        self.assertEquals(len(response.context.get("case", {}).get("documents", {})), 1)
         self.assertEquals(
-            response.context.get("case", {}).get("info", {}).get("count"), 1
-        )
-        self.assertEquals(
-            response.context.get("case", {}).get("info", {}).get("objects")[0].url,
+            response.context.get("case", {}).get("documents", {})[0].url,
             f"{ZAKEN_ROOT}zaakinformatieobjecten/e55153aa-ad2c-4a07-ae75-15add57d6",
         )
 
