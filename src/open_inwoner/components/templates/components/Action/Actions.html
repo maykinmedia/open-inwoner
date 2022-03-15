@@ -18,12 +18,14 @@
             <div class="actions__action">
                 <div class="actions__actions">
                     {% button icon="input" href="accounts:action_export" uuid=action.uuid icon_outlined=True transparent=True %}
-                    {% dropdown icon="settings" %}
-                        <div class="dropdown__item">
-                            {% get_action_edit_url action=action plan=plan as action_url %}
-                            {% button icon="edit" text=_("Bewerken") href=action_url icon_outlined=True transparent=True %}
-                        </div>
-                    {% enddropdown %}
+                    {% if action|is_connected:request.user %}
+                        {% dropdown icon="settings" %}
+                            <div class="dropdown__item">
+                                {% get_action_edit_url action=action plan=plan as action_url %}
+                                {% button icon="edit" text=_("Bewerken") href=action_url icon_outlined=True transparent=True %}
+                            </div>
+                        {% enddropdown %}
+                    {% endif %}
                 </div>
                 <div class="actions__label actions__label--big">
                     <div class="table__explain">Actie</div>
