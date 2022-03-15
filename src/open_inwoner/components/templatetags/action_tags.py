@@ -45,4 +45,15 @@ def get_action_edit_url(action, plan=None):
 
 @register.filter()
 def is_connected(action, user):
+    """
+    see if the given user is connected to the action.
+
+    Usage:
+        {% if action|is_connected:request.user %}
+        {{ action|is_connected:request.user }}
+
+    Variables:
+        + action: Action | The action we check if the user has access.
+        + user: User | The user we check if has access to the action.
+    """
     return action.is_connected(user)
