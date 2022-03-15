@@ -1,50 +1,14 @@
 {% extends 'master.html' %}
-{% load i18n l10n button_tags card_tags file_tags grid_tags icon_tags link_tags map_tags notification_tags tag_tags utils condition_tags render_tags %}
+{% load i18n l10n button_tags card_tags file_tags grid_tags icon_tags link_tags map_tags notification_tags tag_tags utils condition_tags render_tags anchor_menu_tags %}
 
 {% block sidebar_content %}
-    <aside class="anchor-menu">
-        <ul class="anchor-menu__list">
-            <li class="anchor-menu__list-item">
-                {% link href='#title' text=object.name %}
-            </li>
-            {% if object.files.exists %}
-                <li class="anchor-menu__list-item">
-                    {% link href='#files' text=_('Bestanden') %}
-                </li>
-            {% endif %}
-            {% if object.locations.exists %}
-                <li class="anchor-menu__list-item">
-                    {% link href='#locations' text=_('Locaties') %}
-                </li>
-            {% endif %}
-            {% if object.links.exists %}
-                <li class="anchor-menu__list-item">
-                    {% link href='#links' text=_('Links') %}
-                </li>
-            {% endif %}
-            {% if product.contacts.exists %}
-                <li class="anchor-menu__list-item">
-                    {% link href='#contact' text=_('Contact') %}
-                </li>
-            {% endif %}
-            {% if object.related_products.exists %}
-                <li class="anchor-menu__list-item">
-                    {% link href='#see' text=_('Zie ook') %}
-                </li>
-            {% endif %}
-            <li class="anchor-menu__list-item">
-                {% link href='#share' text=_('Delen') %}
-            </li>
-            {% if product.link %}
-                <li class="anchor-menu__list-item">
-                    {% button href=product.link size="big" text=_("Aanvraag starten") primary=True icon="arrow_forward" icon_position="before" %}
-                </li>
-            {% endif %}
-            <li class="anchor-menu__list-item anchor-menu__list-item--top">
-                {% link primary=True href='#top' icon='arrow_upward' icon_position='before' text=_('Terug naar boven') %}
-            </li>
-        </ul>
-    </aside>
+{% anchor_menu anchors desktop=True %}
+{% if product.link %}
+    <li class="anchor-menu__list-item">
+        {% button href=product.link size="big" text=_("Aanvraag starten") primary=True icon="arrow_forward" icon_position="before" %}
+    </li>
+{% endif %}
+{% endanchor_menu %}
 {% endblock sidebar_content %}
 
 {% block content %}

@@ -34,6 +34,11 @@ class MyProfileView(LoginRequiredMixin, BaseBreadcrumbMixin, FormView):
 
         context = super().get_context_data(**kwargs)
         today = date.today()
+        context["anchors"] = [
+            ("#title", _("Persoonlijke gegevens")),
+            ("#overview", _("Persoonlijk overzicht")),
+            ("#files", _("Bestanden")),
+        ]
         context["next_action"] = (
             Action.objects.connected(self.request.user)
             .filter(end_date__gte=today, status=StatusChoices.open)
