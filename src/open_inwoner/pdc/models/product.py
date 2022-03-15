@@ -99,6 +99,20 @@ class Product(models.Model):
         blank=True,
         help_text=_("Attribute to sync data from PDC's (like SDG)"),
     )
+    contacts = models.ManyToManyField(
+        "pdc.ProductContact",
+        verbose_name=_("Product contacts"),
+        related_name="products",
+        blank=True,
+        help_text=_("The contacts responsible for the product"),
+    )
+    locations = models.ManyToManyField(
+        "pdc.ProductLocation",
+        verbose_name=_("Product locations"),
+        related_name="products",
+        blank=True,
+        help_text=_("Locations where the product is available at."),
+    )
     conditions = models.ManyToManyField(
         "pdc.ProductCondition",
         related_name="products",
@@ -150,13 +164,6 @@ class ProductFile(models.Model):
 
 
 class ProductContact(models.Model):
-    product = models.ForeignKey(
-        "pdc.Product",
-        verbose_name=_("Product"),
-        related_name="product_contacts",
-        on_delete=models.CASCADE,
-        help_text=_("Related product"),
-    )
     organization = models.ForeignKey(
         "pdc.Organization",
         verbose_name=_("Organization"),
@@ -200,7 +207,9 @@ class ProductContact(models.Model):
         verbose_name_plural = _("Product contacts")
 
     def __str__(self):
-        return f"{self.product}: {self.first_name} {self.last_name}"
+        if self.organization:
+            return f"{self.organization.name}: {self.first_name} {self.last_name}"
+        return f"{self.first_name} {self.last_name}"
 
     def get_mailto_link(self):
         email = self.get_email()
@@ -248,24 +257,21 @@ class ProductLocation(GeoModel):
         blank=True,
         null=True,
     )
-    product = models.ForeignKey(
-        "pdc.Product",
-        verbose_name=_("Product"),
-        related_name="locations",
-        on_delete=models.CASCADE,
-        help_text=_("Related product"),
-    )
 
     class Meta:
         verbose_name = _("Product location")
         verbose_name_plural = _("Product locations")
 
     def __str__(self) -> str:
-        return f"{self.product}: {self.address_str}"
+        return f"{self.name}: {self.address_str}" if self.name else self.address_str
 
     def get_geojson_feature(self, stringify: bool = True) -> Union[str, dict]:
         feature = super().get_geojson_feature(False)
-        feature["properties"]["url"] = self.product.get_absolute_url()
+        first_product = self.products.first()
+        if first_product:
+            feature["properties"]["url"] = first_product.get_absolute_url()
+            if not self.name:
+                feature["properties"]["name"] = first_product.name
 
         if stringify:
             return json.dumps(feature)
