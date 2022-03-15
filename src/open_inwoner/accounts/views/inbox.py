@@ -11,6 +11,7 @@ from django.utils.translation import gettext as _
 from django.views.generic import FormView
 
 from furl import furl
+from privates.views import PrivateMediaView
 
 from open_inwoner.utils.mixins import PaginationMixin
 
@@ -154,3 +155,21 @@ class InboxStartView(LoginRequiredMixin, FormView):
         # build redirect url based on form hidden data
         url = furl(self.success_url).add({"with": form.data["receiver"]}).url
         return HttpResponseRedirect(f"{url}#messages-last")
+
+
+class InboxPrivateMediaView(PrivateMediaView):
+    model = Message
+    slug_field = "uuid"
+    slug_url_kwarg = "uuid"
+    file_field = "file"
+
+    def has_permission(self):
+        """
+        Override this method to customize the way permissions are checked.
+        """
+        object = self.get_object()
+
+        if self.request.user == object.sender or self.request.user == object.receiver:
+            return True
+
+        return False

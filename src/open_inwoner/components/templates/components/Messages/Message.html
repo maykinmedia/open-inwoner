@@ -1,9 +1,14 @@
-{% load i18n %}
+{% load i18n link_tags %}
 
 
 <aside class="message{% if ours %} message--ours{% else %} message--theirs{% endif %}" id="message-{{ message.pk }}" title="{% trans 'Bericht van:' %} {{ message.sender }}">
     <div class="message__body">
-        <p class="p">{{ message.content }}</p>
+        {% if file %}
+            {% url "accounts:inbox_download" uuid=message.uuid as download_url %}
+            {% link href=download_url text=message.file secondary=True download=True %}
+        {% else %}
+            <p class="p">{{ message.content }}</p>
+        {% endif %}
     </div>
 
     <footer class="message__footer">

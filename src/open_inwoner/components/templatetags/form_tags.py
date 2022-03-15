@@ -222,6 +222,7 @@ def input(field, **kwargs):
 
     Variables:
         + field: Field | The field that needs to be rendered.
+        - extra_classes: string| classes which should be added to the top-level container
     """
     return {**kwargs, "field": field}
 
@@ -265,6 +266,20 @@ def autocomplete(field, **kwargs):
     Displaying an autocomplete field using @tarekraafat/autocomplete lib
     Usage:
         {% autocomplete form.field %}
+    Variables:
+        + field: Field | The choice field that needs to be rendered.
+    """
+    return {**kwargs, "field": field}
+
+
+@register.inclusion_tag("components/Form/Hidden.html")
+def hidden(field, **kwargs):
+    """
+    Displaying a hidden field
+
+    Usage:
+        {% hidden form.field %}
+
     Variables:
         + field: Field | The choice field that needs to be rendered.
     """
