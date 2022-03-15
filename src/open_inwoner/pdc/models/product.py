@@ -207,11 +207,9 @@ class ProductContact(models.Model):
         verbose_name_plural = _("Product contacts")
 
     def __str__(self):
-        return (
-            f"{self.organization.name}: {self.first_name} {self.last_name}"
-            if self.organization
-            else f"{self.first_name} {self.last_name}"
-        )
+        if self.organization:
+            return f"{self.organization.name}: {self.first_name} {self.last_name}"
+        return f"{self.first_name} {self.last_name}"
 
     def get_mailto_link(self):
         email = self.get_email()
@@ -270,9 +268,10 @@ class ProductLocation(GeoModel):
     def get_geojson_feature(self, stringify: bool = True) -> Union[str, dict]:
         feature = super().get_geojson_feature(False)
         first_product = self.products.first()
-        feature["properties"]["url"] = (
-            first_product.get_absolute_url() if first_product else ""
-        )
+        if first_product:
+            feature["properties"]["url"] = first_product.get_absolute_url()
+            if not self.name:
+                feature["properties"]["name"] = first_product.name
 
         if stringify:
             return json.dumps(feature)
