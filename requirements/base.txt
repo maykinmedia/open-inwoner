@@ -140,7 +140,9 @@ django-phonenumber-field==5.2.0
 django-polymorphic==3.0.0
     # via django-filer
 django-privates==1.2.2
-    # via -r requirements/base.in
+    # via
+    #   -r requirements/base.in
+    #   zgw-consumers
 django-redis==5.0.0
     # via -r requirements/base.in
 django-registration==3.2
@@ -251,7 +253,9 @@ pyjwt[crypto]==2.3.0
     #   django-allauth
     #   gemma-zds-client
 pyopenssl==21.0.0
-    # via -r requirements/base.in
+    # via
+    #   -r requirements/base.in
+    #   zgw-consumers
 pyphen==0.12.0
     # via weasyprint
 pyrsistent==0.18.0
@@ -348,7 +352,7 @@ xlwt==1.3.0
     # via tablib
 xmlsec==1.3.12
     # via python3-saml
-zgw-consumers==0.16.0
+zgw-consumers==0.18.0
     # via -r requirements/base.in
 zipp==3.6.0
     # via importlib-metadata

@@ -21,6 +21,12 @@ CATALOGI_ROOT = "https://catalogi.nl/api/v1/"
 @requests_mock.Mocker()
 class TestListCasesView(WebTest):
     def setUp(self):
+        self.user = UserFactory(
+            first_name="",
+            last_name="",
+            login_type=LoginTypeChoices.digid,
+            bsn="900222086",
+        )
         self.config = OpenZaakConfig.get_solo()
         self.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
         self.config.zaak_service = self.zaak_service
@@ -64,13 +70,7 @@ class TestListCasesView(WebTest):
     def test_sorted_cases_are_retrieved_when_user_logged_in_via_digid(self, m):
         self._setUpMocks(m)
 
-        user = UserFactory(
-            first_name="",
-            last_name="",
-            login_type=LoginTypeChoices.digid,
-            bsn="900222086",
-        )
-        response = self.app.get(reverse("accounts:my_cases"), user=user)
+        response = self.app.get(reverse("accounts:my_cases"), user=self.user)
         open_cases = [case.url for case in response.context.get("open_cases")]
         closed_cases = [case.url for case in response.context.get("closed_cases")]
 
@@ -107,6 +107,18 @@ class TestListCasesView(WebTest):
             response, f"{reverse('login')}?next={reverse('accounts:my_cases')}"
         )
 
+    def test_missing_zaak_client_returns_empty_list(self, m):
+        self._setUpMocks(m)
+
+        self.config.zaak_service = None
+        self.config.save()
+
+        response = self.app.get(reverse("accounts:my_cases"), user=self.user)
+
+        self.assertEquals(response.status_code, 200)
+        self.assertListEqual(response.context.get("open_cases"), [])
+        self.assertListEqual(response.context.get("closed_cases"), [])
+
     def test_no_cases_are_retrieved_when_http_404(self, m):
         mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
         m.get(
@@ -114,13 +126,7 @@ class TestListCasesView(WebTest):
             status_code=404,
         )
 
-        user = UserFactory(
-            first_name="",
-            last_name="",
-            login_type=LoginTypeChoices.digid,
-            bsn="900222086",
-        )
-        response = self.app.get(reverse("accounts:my_cases"), user=user)
+        response = self.app.get(reverse("accounts:my_cases"), user=self.user)
 
         self.assertEquals(response.status_code, 200)
         self.assertListEqual(response.context.get("open_cases"), [])
@@ -133,13 +139,7 @@ class TestListCasesView(WebTest):
             status_code=500,
         )
 
-        user = UserFactory(
-            first_name="",
-            last_name="",
-            login_type=LoginTypeChoices.digid,
-            bsn="900222086",
-        )
-        response = self.app.get(reverse("accounts:my_cases"), user=user)
+        response = self.app.get(reverse("accounts:my_cases"), user=self.user)
 
         self.assertEquals(response.status_code, 200)
         self.assertListEqual(response.context.get("open_cases"), [])
@@ -173,6 +173,7 @@ class TestFetchSpecificCase(WebTest):
 
     def test_case_is_retrieved(self, m):
         self._setUpMocks(m)
+
         case = fetch_specific_case("d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d")
 
         self.assertEquals(
@@ -187,12 +188,6 @@ class TestFetchSpecificCase(WebTest):
             status_code=404,
         )
 
-        UserFactory(
-            first_name="",
-            last_name="",
-            login_type=LoginTypeChoices.digid,
-            bsn="900222086",
-        )
         case = fetch_specific_case("d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d")
 
         self.assertIsNone(case)
@@ -204,12 +199,6 @@ class TestFetchSpecificCase(WebTest):
             status_code=500,
         )
 
-        UserFactory(
-            first_name="",
-            last_name="",
-            login_type=LoginTypeChoices.digid,
-            bsn="900222086",
-        )
         case = fetch_specific_case("d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d")
 
         self.assertIsNone(case)

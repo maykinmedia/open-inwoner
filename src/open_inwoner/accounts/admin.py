@@ -111,9 +111,10 @@ class AppointmentAdmin(UUIDAdminFirstInOrder, admin.ModelAdmin):
 
 
 @admin.register(Message)
-class MessageAdmin(admin.ModelAdmin):
+class MessageAdmin(PrivateMediaMixin, admin.ModelAdmin):
     list_display = ("sender", "receiver", "created_on", "seen", "sent")
     list_filter = ("sender", "receiver")
+    private_media_fields = ("file",)
 
 
 @admin.register(Invite)
