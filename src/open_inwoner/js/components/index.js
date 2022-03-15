@@ -1,5 +1,5 @@
-// Use this file to include individual components.
 import './accessibility'
+import './actions'
 import './anchor-menu'
 import './autocomplete-search'
 import './autocomplete'
