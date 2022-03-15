@@ -3,37 +3,39 @@
 ///
 
 .header {
+  z-index: 1;
+  position: relative;
   $hm: max(calc((100vw - var(--container-width)) / 2), var(--spacing-large));
   $vm: var(--spacing-large);
-  box-sizing: border-box;
-  display: grid;
-  grid-column-gap: var(--gutter-width);
-  padding: 0 $hm;
-  position: relative;
 
-  grid-template-areas:
-    'lg    lg    lg    lg'
-    'actns actns actns actns'
-    'nv    nv    nv    nv'
-    'bc    bc    bc    bc';
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-rows:
-    calc(
-      var(--header-height) - var(--row-height) * 3 + var(--spacing-large) * 2
-    )
-    auto
-    var(--row-height)
-    var(--row-height);
+  &__container {
+    box-sizing: border-box;
+    display: grid;
+    grid-column-gap: var(--gutter-width);
+    position: relative;
+    padding: 0 $hm;
 
-  @media (min-width: 768px) {
     grid-template-areas:
-      'lg lg lg lg lg lg lg lg lg actns actns actns'
-      'nv nv nv nv nv nv nv nv nv nv    nv    nv'
-      'bc bc bc bc bc bc bc bc bc bc    bc    bc';
-    grid-template-columns: repeat(12, 1fr);
+      'lg    lg    lg    lg'
+      'actns actns actns actns'
+      'nv    nv    nv    nv';
+    grid-template-columns: repeat(4, 1fr);
     grid-template-rows:
-      calc(var(--header-height) - var(--row-height) * 2) var(--row-height)
+      calc(
+        var(--header-height) - var(--row-height) * 2 + var(--spacing-large) * 2
+      )
+      auto
       var(--row-height);
+
+    @media (min-width: 768px) {
+      grid-template-areas:
+        'lg lg lg lg lg lg lg lg lg actns actns actns'
+        'nv nv nv nv nv nv nv nv nv nv    nv    nv';
+      grid-template-columns: repeat(12, 1fr);
+      grid-template-rows: calc(var(--header-height) - var(--row-height) * 2) var(
+          --row-height
+        );
+    }
   }
 
   /// Layout.
@@ -55,7 +57,7 @@
     @media (min-width: 768px) {
       grid-area: none;
       left: 0;
-      bottom: var(--row-height);
+      bottom: 0;
       position: absolute;
       padding: 0 $hm;
     }
@@ -100,6 +102,10 @@
   .form {
     @media (max-width: 767px) {
       width: 100%;
+    }
+
+    .form__actions {
+      margin: 0;
     }
   }
 }
