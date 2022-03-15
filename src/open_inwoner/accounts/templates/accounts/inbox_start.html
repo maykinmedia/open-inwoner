@@ -10,10 +10,13 @@
 {% block content %}
     {% render_grid %}
         {% render_column start=1 span=8 %}
-            {% render_form form=form method="POST" %}
+            {% render_form form=form method="POST" enctype="multipart/form-data" %}
                 {% csrf_token %}
                 {% autocomplete form.receiver %}
-                {% textarea form.content %}
+                <div class="group-input">
+                    {% textarea form.content %}
+                    {% input form.file icon="attach_file" no_label=True no_help=True extra_classes="message-file" %}
+                </div>
                 {% form_actions primary_text=_("Versturen") %}
             {% endrender_form %}
         {% endrender_column %}

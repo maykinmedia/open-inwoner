@@ -85,7 +85,7 @@ def messages(
 
 
 @register.inclusion_tag("components/Messages/Message.html")
-def message(message: Message, ours: bool) -> dict:
+def message(message: Message, me: User, file=False) -> dict:
     """
     Display a message
 
@@ -94,9 +94,10 @@ def message(message: Message, ours: bool) -> dict:
 
     Variables:
         + message: string | the message that needs to be displayed.
-        + ours: bool | if we send the message or not.
+        + me: User | currently loggedin user.
+        - file: bool | If we display the file
+
+    Extra context:
+        - ours: bool | if we send the message or not.
     """
-    return {
-        "ours": ours,
-        "message": message,
-    }
+    return {"message": message, "ours": message.sender == me, "file": file}

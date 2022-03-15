@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n button_tags card_tags map_tags utils icon_tags file_tags action_tags %}
+{% load i18n button_tags card_tags map_tags utils icon_tags file_tags action_tags dropdown_tags %}
 
 {% block sidebar_content %}
     <aside class="anchor-menu">
@@ -32,7 +32,11 @@
         {{ object.title }}
 
         {% button_row align="right" %}
-            {% button href="plans:plan_edit" uuid=object.uuid icon="settings" icon_outlined=True transparent=True secondary=True %}
+            {% dropdown icon="settings" secondary=True %}
+                <div class="dropdown__item">
+                    {% button icon="edit" text=_("Bewerken") href="plans:plan_edit" uuid=object.uuid icon_outlined=True transparent=True %}
+                </div>
+            {% enddropdown %}
             {% button href="plans:plan_export" uuid=object.uuid icon="input" icon_outlined=True transparent=True secondary=True %}
         {% endbutton_row %}
 
@@ -62,7 +66,7 @@
             <div class="plan-contact__grid plan-contact__grid--columns-{% if object.contacts.count > 1 %}2{% else %}1{% endif %}">
                 {% for contact in object.contacts.all %}
                     <div class="plan-contact__information">
-                    {% if contact.create_by == request.user %}
+                    {% if contact.created_by == request.user %}
                         <p class="plan-contact__info">{{ contact.get_name }}</p>
                         <p class="plan-contact__info">{{ contact.function }}</p>
                         <p class="plan-contact__info">{{ contact.phonenumber }}</p>
@@ -95,7 +99,7 @@
     {% button href="plans:plan_add_file" uuid=object.uuid text=_("Upload nieuwe versie") primary=True %}
 
     <h2 class="h2" id="actions">{% trans "Acties" %}</h2>
-    {% actions actions=actions action_form=action_form form_action=request.path|add:"#actions" plan=plan %}
+    {% actions actions=actions request=request action_form=action_form form_action=request.path|add:"#actions" plan=plan %}
     {% button href="plans:plan_action_create" uuid=object.uuid text=_("Nieuw actie toevoegen") icon="date_range" primary=True %}
 </div>
 {% endblock %}
