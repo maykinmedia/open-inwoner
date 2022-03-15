@@ -72,4 +72,5 @@ class QuestionnaireStepAdmin(TreeAdmin):
         if not obj.parent_answer:
             return obj.question
         return "{} -> {}</p>".format(obj.parent_answer, obj.question)
+
     display_question_answer.allow_tags = True
