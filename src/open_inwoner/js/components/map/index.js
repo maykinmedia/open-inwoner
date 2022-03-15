@@ -68,23 +68,23 @@ class Map {
    * @return {string}
    */
   featureToHTML(feature) {
-    const { name, ...properties } = feature.properties
+    const { name, url, ...properties } = feature.properties
+    const displayName = name ? name : ''
     return `
         <h4 class="h4">
           ${
-            properties.url
+            url
               ? `
-              <a class="link link--primary" href="${properties.url}">
-                <span class="link__text">${name}</span>
+              <a class="link link--primary" href="${url}">
+                <span class="link__text">${displayName}</span>
               </a>
             `
-              : name
+              : displayName
           }
         </h4>
         <p class="p">
           ${Object.entries(properties)
-            .filter(([k, v]) => k !== 'url')
-            .map(([k, v]) => v)
+            .map(([key, value]) => value)
             .join(' ')}
           </p>
     `

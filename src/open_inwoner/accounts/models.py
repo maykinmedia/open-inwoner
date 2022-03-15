@@ -474,8 +474,17 @@ class Action(models.Model):
 
         return super().save(*args, **kwargs)
 
+    def is_connected(self, user):
+        return Action.objects.filter(pk=self.pk).connected(user=user).exists()
+
 
 class Message(models.Model):
+    uuid = models.UUIDField(
+        verbose_name=_("UUID"),
+        unique=True,
+        default=uuid4,
+        help_text=_("Unique identifier"),
+    )
     sender = models.ForeignKey(
         User,
         verbose_name=_("Sender"),
@@ -496,7 +505,9 @@ class Message(models.Model):
         help_text=_("This is the date the message was created"),
     )
     content = models.TextField(
-        verbose_name=_("Content"), help_text=_("Text content of the message")
+        verbose_name=_("Content"),
+        blank=True,
+        help_text=_("Text content of the message"),
     )
     seen = models.BooleanField(
         verbose_name=_("Seen"),
@@ -508,6 +519,15 @@ class Message(models.Model):
         default=False,
         help_text=_(
             "Boolean shows if the email was sent to the receiver about this message"
+        ),
+    )
+    file = models.FileField(
+        verbose_name=_("File"),
+        blank=True,
+        null=True,
+        storage=PrivateMediaFileSystemStorage(),
+        help_text=_(
+            "The file that is attached to the message",
         ),
     )
 

@@ -267,6 +267,7 @@ django-privates==1.2.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   zgw-consumers
 django-redis==5.0.0
     # via
     #   -c requirements/ci.txt
@@ -571,6 +572,7 @@ pyopenssl==21.0.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   zgw-consumers
 pyparsing==2.4.7
     # via packaging
 pyphen==0.12.0
@@ -821,7 +823,7 @@ xmlsec==1.3.12
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   python3-saml
-zgw-consumers==0.16.0
+zgw-consumers==0.18.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt

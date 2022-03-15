@@ -1,0 +1,38 @@
+{% load i18n %}
+
+<div class='preview'>
+    {% if plan_template.goal %}
+        <div class='preview__title'>{% trans "Doel:" %}</div>
+        <div>{{ plan_template.goal }}</div>
+    {% endif %}
+
+    {% if plan_template.file %}
+        <div class='preview__title'>{% trans 'File:' %}</div>
+        <div>{{ plan_template.file }}</div>
+    {% endif %}
+
+    {% if plan_template.actiontemplates.exists %}
+        <div class='preview__title'>{% trans 'Actions:' %}</div>
+        <div></div>
+
+        {% for action_template in plan_template.actiontemplates.all %}
+            <div class='preview__span'>
+                <div>{{ forloop.counter }}</div>
+                <div class='preview__title'>{% trans 'Name:' %}</div>
+                <div>{{ action_template.name }}</div>
+                <div></div>
+                <div class='preview__title'>{% trans 'Description:' %}</div>
+                <div>{{ action_template.description }}</div>
+                <div></div>
+                <div class='preview__title'>{% trans 'Goal:' %}</div>
+                <div>{{ action_template.goal }}</div>
+                <div></div>
+                <div class='preview__title'>{% trans 'Type:' %}</div>
+                <div>{{ action_template.get_type_display }}</div>
+                <div></div>
+                <div class='preview__title'>{% trans 'Ends in x days:' %}</div>
+                <div>{{ action_template.end_in_days }}</div>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>

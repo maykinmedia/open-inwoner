@@ -1,10 +1,10 @@
 import datetime
 
-from django.forms import Form
 from django.utils import timezone
 
 from freezegun import freeze_time
 
+from ...accounts.forms import InboxForm
 from ...accounts.models import Message
 from ...accounts.tests.factories import MessageFactory, UserFactory
 from .abstract import InclusionTagWebTest
@@ -53,7 +53,7 @@ class TestListItem(InclusionTagWebTest):
         self.config = {
             "message_list": message_queryset,
             "me": self.me,
-            "form": Form(),
+            "form": InboxForm(user=self.me),
             "subject": "Lorem ipsum.",
             "status": "Dolor sit amet.",
         }
@@ -63,7 +63,7 @@ class TestListItem(InclusionTagWebTest):
             {
                 "message_list": [],
                 "me": self.me,
-                "form": Form(),
+                "form": InboxForm(user=self.me),
                 "subject": "Lorem ipsum.",
                 "status": "Dolor sit amet.",
             }

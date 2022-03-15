@@ -1,0 +1,21 @@
+.show-preview {
+  cursor: pointer;
+}
+
+.preview {
+  display: grid;
+  grid-template-columns: 134px 1fr;
+  gap: var(--spacing-small);
+  text-align: left;
+
+  .preview__span {
+    grid-column: 1 / 3;
+    display: grid;
+    grid-template-columns: 20px 110px 1fr;
+    gap: var(--spacing-small);
+  }
+
+  .preview__title {
+    font-weight: bold;
+  }
+}

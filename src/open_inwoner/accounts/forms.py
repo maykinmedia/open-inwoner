@@ -1,4 +1,5 @@
 from django import forms
+from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
 from django_registration.forms import RegistrationForm
@@ -162,12 +163,14 @@ class InboxForm(forms.ModelForm):
     )
     content = forms.CharField(
         label="",
+        required=False,
         widget=forms.Textarea(attrs={"placeholder": _("Schrijf een bericht...")}),
     )
+    file = forms.FileField(required=False, label="")
 
     class Meta:
         model = Message
-        fields = ("receiver", "content")
+        fields = ("receiver", "content", "file")
 
     def __init__(self, user, **kwargs):
         self.user = user
@@ -180,6 +183,19 @@ class InboxForm(forms.ModelForm):
         ]
         self.fields["receiver"].choices = choices
         self.fields["receiver"].queryset = extended_contact_users
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        content = cleaned_data.get("content")
+        file = cleaned_data.get("file")
+
+        if not file and not content:
+            raise ValidationError(
+                _("Either message content or file should be filled in")
+            )
+
+        return cleaned_data
 
     def save(self, commit=True):
         self.instance.sender = self.user

@@ -24,7 +24,7 @@ def fetch_cases(user_bsn: str) -> List[Zaak]:
             "zaak",
             request_kwargs={
                 "params": {
-                    "rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn": f"{user_bsn}"
+                    "rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn": user_bsn
                 },
             },
         )

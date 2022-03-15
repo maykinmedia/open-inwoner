@@ -19,6 +19,7 @@ from .views import (
     DocumentDeleteView,
     DocumentPrivateMediaView,
     EditProfileView,
+    InboxPrivateMediaView,
     InboxStartView,
     InboxView,
     InviteAcceptView,
@@ -31,6 +32,11 @@ app_name = "accounts"
 urlpatterns = [
     path("inbox/", InboxView.as_view(), name="inbox"),
     path("inbox/start/", InboxStartView.as_view(), name="inbox_start"),
+    path(
+        "inbox/<str:uuid>/download/",
+        InboxPrivateMediaView.as_view(),
+        name="inbox_download",
+    ),
     path("setup/", HomeView.as_view(), name="setup_1"),
     path("documents/create/", DocumentCreateView.as_view(), name="documents_create"),
     path(
