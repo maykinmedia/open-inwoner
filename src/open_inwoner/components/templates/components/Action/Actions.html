@@ -23,12 +23,14 @@
                     Status
                     <div class="table__explain-icons">
                         {% button icon="input" href="accounts:action_export" uuid=action.uuid icon_outlined=True transparent=True %}
-                        {% dropdown icon="settings" %}
+                        {% if action|is_connected:request.user %}
+                            {% dropdown icon="settings" %}
                             <div class="dropdown__item">
                                 {% get_action_edit_url action=action plan=plan as action_url %}
                                 {% button icon="edit" text=_("Bewerken") href=action_url icon_outlined=True transparent=True %}
                             </div>
-                        {% enddropdown %}
+                            {% enddropdown %}
+                        {% endif %}
                     </div>
                 </div>
                 {{ action.get_status_display }}&nbsp;

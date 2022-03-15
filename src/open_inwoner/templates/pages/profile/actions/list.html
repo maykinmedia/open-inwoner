@@ -11,7 +11,7 @@
     {% button href="accounts:action_list_export" icon="input" icon_outlined=True transparent=True secondary=True %}
 {% endbutton_row %}
 
-{% actions actions=actions action_form=action_form %}
+{% actions actions=actions request=request action_form=action_form %}
 
 {% pagination page_obj=page_obj paginator=paginator request=request href="accounts:my_profile" text=_("Terug naar mijn profiel") %}
 {% endblock content %}
