@@ -5,7 +5,7 @@
     <tr>
         <td class="table__item">Filter op:</td>
         <td class="table__item">{% date_field action_form.end_date no_label=True no_help=True icon="today" %}</td>
-        <td class="table__item">{% input action_form.created_by no_label=True no_help=True icon="person" %}</td>
+        <td class="table__item">{% input action_form.is_for no_label=True no_help=True icon="person" %}</td>
         <td class="table__item">{% input action_form.status no_label=True no_help=True icon="expand_more" %}</td>
     </tr>
     {% for action in actions %}
