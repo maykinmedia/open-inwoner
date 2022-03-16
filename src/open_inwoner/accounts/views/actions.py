@@ -29,8 +29,8 @@ class BaseActionFilter:
                 self.request.GET.get("end_date"), "%d-%m-%Y"
             ).date()
             actions = actions.filter(end_date=end_date)
-        if self.request.GET.get("created_by"):
-            actions = actions.filter(created_by=self.request.GET.get("created_by"))
+        if self.request.GET.get("is_for"):
+            actions = actions.filter(is_for=self.request.GET.get("is_for"))
         if self.request.GET.get("status"):
             actions = actions.filter(status=self.request.GET.get("status"))
         return actions
@@ -51,12 +51,13 @@ class ActionListView(
 
     def get_queryset(self):
         base_qs = super().get_queryset()
-        return base_qs.connected(user=self.request.user).select_related("created_by")
+        return base_qs.connected(user=self.request.user).select_related("is_for")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["action_form"] = ActionListForm(
-            data=self.request.GET, users=self.get_queryset()
+            data=self.request.GET,
+            users=self.get_queryset().values_list("is_for_id", flat=True),
         )
 
         actions = self.get_actions(self.get_queryset())
