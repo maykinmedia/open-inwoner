@@ -1,10 +1,15 @@
 import Gumshoe from 'gumshoejs'
 
-const anchor = document.querySelectorAll('.anchor-menu')
+const anchors = document.querySelectorAll('.anchor-menu')
 
-if (anchor.length > 0) {
-  new Gumshoe('.anchor-menu a', {
+if (anchors.length > 0) {
+  new Gumshoe('.anchor-menu--desktop a', {
     navClass: 'anchor-menu__list-item--active',
-    offset: 75,
+    offset: 30,
+  })
+
+  new Gumshoe('.anchor-menu--mobile a', {
+    navClass: 'anchor-menu__list-item--active',
+    offset: 130,
   })
 }

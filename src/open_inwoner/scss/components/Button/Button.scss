@@ -104,6 +104,25 @@
     color: var(--color-primary);
   }
 
+  &--pill {
+    background-color: #fff;
+    position: relative;
+    color: var(--color-primary);
+    border-radius: 100px; // This is big to make sure the corners are rounded properly.
+
+    &:before {
+      content: ' ';
+      border-radius: 100px; // This is big to make sure the corners are rounded properly.
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: var(--color-primary);
+      opacity: 0.4;
+    }
+  }
+
   &--disabled {
     color: var(--color-gray-light);
     pointer-events: none;

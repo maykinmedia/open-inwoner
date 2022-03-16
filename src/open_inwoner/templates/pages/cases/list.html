@@ -1,30 +1,15 @@
 {% extends 'master.html' %}
-{% load i18n icon_tags link_tags utils %}
+{% load i18n icon_tags link_tags anchor_menu_tags utils %}
 
 {% block sidebar_content %}
-    <aside class="anchor-menu">
-        <ul class="anchor-menu__list">
-            <li class="anchor-menu__list-item">
-                <a class="link" href="#pending_apps">{% trans "Lopende aanvragen" %}</a>
-            </li>
-            <li class="anchor-menu__list-item">
-                <a class="link" href="#completed_apps">{% trans "Afgeronde aanvragen" %}</a>
-            </li>
-            <li class="anchor-menu__list-item anchor-menu__list-item--top">
-                <a class="link link--primary" href="#top">
-                    {% icon icon="arrow_upward" %}
-                    {% trans "Terug naar boven" %}
-                </a>
-            </li>
-        </ul>
-    </aside>
+{% anchor_menu anchors=anchors desktop=True %}
 {% endblock sidebar_content %}
 
 {% block content %}
-    <h1 class="h1" id="title">{% trans "Mijn aanvragen" %}</h2>
+    <h1 class="h1 anchor_menu--content" id="title">{% trans "Mijn aanvragen" %}</h2>
 
     <div class="cases">
-        <h2 class="h2" id="pending_apps">{% trans "Lopende aanvragen" %}</h2>
+        <h2 class="h2 anchor_menu--content" id="pending_apps">{% trans "Lopende aanvragen" %}</h2>
         <table class="table table--space-medium">
             <thead class="table__heading">
                 <tr>
@@ -51,7 +36,7 @@
     </div>
 
     <div class="cases">
-        <h2 class="h2" id="completed_apps">{% trans "Afgeronde aanvragen" %}</h2>
+        <h2 class="h2 anchor_menu--content" id="completed_apps">{% trans "Afgeronde aanvragen" %}</h2>
         <table class="table table--space-medium">
             <thead class="table__heading">
                 <tr>

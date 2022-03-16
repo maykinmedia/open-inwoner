@@ -1,7 +1,6 @@
 class Actions {
   constructor(node) {
     this.node = node
-    this.button = node.querySelector('.button')
     this.node.addEventListener('click', this.toggleOpen.bind(this))
   }
 

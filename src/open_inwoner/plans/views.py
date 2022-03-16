@@ -56,6 +56,12 @@ class PlanDetailView(
     def get_context_data(self, **kwargs):
         actions = self.object.actions.all()
         context = super().get_context_data(**kwargs)
+        context["anchors"] = [
+            ("#title", self.object.title),
+            ("#goals", _("Doelen")),
+            ("#files", _("Bestanden")),
+            ("#actions", _("Acties")),
+        ]
         context["action_form"] = ActionListForm(
             data=self.request.GET, users=actions.values_list("created_by_id", flat=True)
         )
