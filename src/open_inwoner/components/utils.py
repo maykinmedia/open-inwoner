@@ -4,7 +4,7 @@ from django.template.loader import render_to_string
 
 
 class ContentsNode(template.Node):
-    def __init__(self, nodelist, template_name, context_func, **kwargs):
+    def __init__(self, nodelist, template_name, context_func=None, **kwargs):
         self.nodelist = nodelist
         self.template_name = template_name
         self.context_func = context_func
@@ -14,7 +14,10 @@ class ContentsNode(template.Node):
         corrected_kwargs = {
             key: safe_resolve(kwarg, context) for key, kwarg in self.kwargs.items()
         }
-        context_kwargs = self.context_func(context=context, **corrected_kwargs)
+        if self.context_func:
+            context_kwargs = self.context_func(context=context, **corrected_kwargs)
+        else:
+            context_kwargs = corrected_kwargs
         output = self.nodelist.render(context)
         render_context = {
             "contents": output,
@@ -22,6 +25,22 @@ class ContentsNode(template.Node):
         }
         rendered = render_to_string(self.template_name, render_context)
         return rendered
+
+
+def parse_component_with_args(parser, bits, tag_name):
+    tag_args, tag_kwargs = parse_bits(
+        parser=parser,
+        bits=bits,
+        params=["tag_name"],
+        takes_context=False,
+        name=tag_name,
+        varargs=True,
+        varkw=[],
+        defaults=None,
+        kwonly=[],
+        kwonly_defaults=None,
+    )
+    return tag_kwargs
 
 
 def safe_resolve(context_item, context):
