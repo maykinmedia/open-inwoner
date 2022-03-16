@@ -35,6 +35,29 @@ def safe_resolve(context_item, context):
 
 
 class ComponentNode:
+    """
+    A component node that either renders an InclusionNode or a ContentsNode.
+
+    Usage:
+        @register.tag()
+        def new_tag(parser, token):
+            def context_func(context, variable1, **kwargs):
+                _context = context.flatten()
+                kwargs.update(variable1=variable1)
+                return {**_context, **kwargs}
+
+            node = ComponentNode(
+                "tag_name",
+                "template/location.html",
+                parser,
+                token,
+                context_func,
+            )
+            return node.render()
+
+    Hopefully this can be improved in the future. But it is a good start.
+    """
+
     def __init__(self, tag_name, template_name, parser, token, context_func):
         self.tag_name = tag_name
         self.template_name = template_name

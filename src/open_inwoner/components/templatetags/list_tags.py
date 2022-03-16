@@ -1,6 +1,7 @@
 from django import template
 
-from ...utils.templatetags.abstract import ContentsNode
+from open_inwoner.components.utils import ContentsNode
+
 from .form_tags import parse_component_with_args
 
 register = template.Library()
