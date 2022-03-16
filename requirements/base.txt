@@ -235,7 +235,7 @@ orderedmultidict==1.0.1
     # via furl
 phonenumbers==8.12.33
     # via -r requirements/base.in
-pillow==9.0.0
+pillow==9.0.1
     # via
     #   -r requirements/base.in
     #   easy-thumbnails

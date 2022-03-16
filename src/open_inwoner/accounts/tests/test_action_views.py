@@ -44,18 +44,23 @@ class ActionViewTests(WebTest):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.action.name)
 
-    def test_action_list_filter_created_by(self):
+    def test_action_list_filter_is_for(self):
+        user = UserFactory()
         action = ActionFactory(
-            created_by=self.user, status=StatusChoices.closed, end_date=date.today()
+            created_by=self.user,
+            status=StatusChoices.closed,
+            end_date=date.today(),
+            is_for=user,
         )
         action2 = ActionFactory(
             end_date="2021-04-02", status=StatusChoices.open, is_for=self.user
         )
+        self.assertNotEqual(action.is_for_id, self.user.id)
         response = self.app.get(
-            f"{self.list_url}?created_by={self.user.id}", user=self.user
+            f"{self.list_url}?is_for={self.user.id}", user=self.user
         )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(list(response.context["actions"]), [action, self.action])
+        self.assertEqual(list(response.context["actions"]), [action2, self.action])
 
     def test_action_list_filter_status(self):
         action = ActionFactory(

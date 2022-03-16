@@ -212,7 +212,7 @@ class InviteForm(forms.ModelForm):
 
 
 class ActionListForm(forms.ModelForm):
-    created_by = forms.ModelChoiceField(
+    is_for = forms.ModelChoiceField(
         queryset=User.objects.all(), required=False, empty_label="Door"
     )
     end_date = forms.DateField(
@@ -222,8 +222,8 @@ class ActionListForm(forms.ModelForm):
 
     class Meta:
         model = Action
-        fields = ("status", "end_date", "created_by")
+        fields = ("status", "end_date", "is_for")
 
     def __init__(self, users, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["created_by"].queryset = User.objects.filter(pk__in=users)
+        self.fields["is_for"].queryset = User.objects.filter(pk__in=users)

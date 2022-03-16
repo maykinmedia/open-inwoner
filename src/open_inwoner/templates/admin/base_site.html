@@ -28,7 +28,7 @@
 
 {% block userlinks %}
     {% if site_url %}
-        <a href="{{ site_url }}">{{ settings.SITE_TITLE }}</a> /
+        <a href="{{ site_url }}">{% if settings.SITE_TITLE %}{{ settings.SITE_TITLE }}{% else %}{% trans 'View site' %}{% endif %}</a> /
     {% endif %}
     {% url 'admin:two_factor:profile' as 2fa_profile_url %}
     {% if 2fa_profile_url %}
