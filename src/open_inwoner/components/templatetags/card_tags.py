@@ -1,9 +1,8 @@
 from django import template
 
-from open_inwoner.components.utils import ContentsNode
+from open_inwoner.components.utils import ContentsNode, parse_component_with_args
 
-from ...pdc.models import Category, Product
-from .form_tags import parse_component_with_args
+from ...pdc.models import Category
 
 register = template.Library()
 

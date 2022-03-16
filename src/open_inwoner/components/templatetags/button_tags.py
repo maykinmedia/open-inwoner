@@ -1,8 +1,7 @@
 from django import template
 from django.urls import NoReverseMatch, reverse
 
-from open_inwoner.components.templatetags.form_tags import parse_component_with_args
-from open_inwoner.components.utils import ContentsNode
+from open_inwoner.components.utils import ContentsNode, parse_component_with_args
 
 register = template.Library()
 
