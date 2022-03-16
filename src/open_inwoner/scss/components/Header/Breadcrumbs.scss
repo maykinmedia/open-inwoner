@@ -1,4 +1,5 @@
 .breadcrumbs {
+  display: none;
   background-color: rgba(255, 255, 255, 0.4);
   overflow-x: auto;
   $hm: max(calc((100vw - var(--container-width)) / 2), var(--spacing-large));

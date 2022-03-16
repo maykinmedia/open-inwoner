@@ -2,7 +2,7 @@
 {% load i18n l10n button_tags card_tags file_tags grid_tags icon_tags link_tags map_tags notification_tags tag_tags utils condition_tags render_tags anchor_menu_tags %}
 
 {% block sidebar_content %}
-{% anchor_menu anchors desktop=True %}
+{% anchor_menu anchors=anchors desktop=True %}
 {% if product.link %}
     <li class="anchor-menu__list-item">
         {% button href=product.link size="big" text=_("Aanvraag starten") primary=True icon="arrow_forward" icon_position="before" %}
@@ -12,7 +12,7 @@
 {% endblock sidebar_content %}
 
 {% block content %}
-    <h1 class="h1" id="title">
+    <h1 class="h1 anchor_menu--content" id="title">
         {{ object.name }}
         {% if request.user.is_staff %}
             {% button icon="edit" href="admin:pdc_product_change" object_id=object.pk %}
@@ -67,7 +67,7 @@
             {# Links. #}
             {% if object.links.exists %}
                 <nav class="link-list">
-                    <h4 class="h4" id="links">{% trans "Links" %}</h4>
+                    <h4 class="h4 anchor_menu--content" id="links">{% trans "Links" %}</h4>
                     <ul class="link-list__list">
                         {% for link in object.links.all %}
                             <li class="link-list__list-item">
@@ -83,7 +83,7 @@
             {# Related products. #}
             {% if object.related_products.exists %}
                 <nav class="link-list">
-                    <h4 class="h4" id="see">{% trans "Zie ook" %}</h4>
+                    <h4 class="h4 anchor_menu--content" id="see">{% trans "Zie ook" %}</h4>
                     <ul class="link-list__list">
                         {% for related in object.related_products.all %}
                             <li class="link-list__list-item">
@@ -97,7 +97,7 @@
 
             {# Social links. #}
             <nav class="social">
-                <h4 class="h4" id="share">{% trans "Delen" %}</h4>
+                <h4 class="h4 anchor_menu--content" id="share">{% trans "Delen" %}</h4>
                 {% link icon="facebook" href="#" extra_classes="social__link" text=_('Facebook') hide_text=True %}
                 {% link icon="twitter" href="#" extra_classes="social__link" text=_('Twitter') hide_text=True %}
                 {% link icon="whatsapp" href="#" extra_classes="social__link" text=_('Whatsapp') hide_text=True %}
@@ -109,7 +109,7 @@
         {% render_column span=8 %}
             {% if object.contacts %}
                 {% render_notification type='success' icon=False %}
-                    <h4 class="h4" id="contact">{% trans 'Contact' %}</h4>
+                    <h4 class="h4 anchor_menu--content" id="contact">{% trans 'Contact' %}</h4>
                     {% for contact in object.contacts.all %}
                         {% render_grid compact=True %}
                             {% render_column span=12 %}

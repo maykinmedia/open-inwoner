@@ -5,74 +5,84 @@
 .primary-navigation {
   $hm: max(calc((100vw - var(--container-width)) / 2), var(--spacing-large));
   box-sizing: border-box;
-  //display: grid;
-  //grid-template-areas: "ml-1 nav mr-1";
-  //grid-template-columns: $hm 1fr $hm;
-  //padding: 0 $hm;
   position: relative;
-
-  &:before {
-    border-bottom: var(--border-width) solid;
-    border-image: var(--border-image);
-    border-image-slice: 1;
-    content: '';
-    left: 0;
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    z-index: -1;
-  }
 
   /// Top list.
 
   & > &__list {
     grid-area: nav;
     display: flex;
+    flex-direction: column;
     list-style: none;
     margin: 0;
     padding: 0;
     overflow-x: auto;
+
+    @media (min-width: 768px) {
+      flex-direction: row;
+    }
   }
 
   & > &__list > &__list-item {
     box-sizing: border-box;
     display: flex;
-    align-items: center;
-    height: var(--row-height);
-    padding: 0 var(--spacing-large);
+    align-items: start;
+    justify-content: center;
+    flex-direction: column;
+    min-height: var(--row-height);
+    padding: 0;
     white-space: nowrap;
 
-    &:first-child {
-      padding-left: 0;
+    > .material-icons {
+      display: none;
+
+      @media (min-width: 768px) {
+        display: block;
+      }
     }
 
-    &:last-child {
-      padding-right: 0;
+    @media (min-width: 768px) {
+      align-items: center;
+      flex-direction: row;
+      height: var(--row-height);
+      padding: 0 var(--spacing-large);
+
+      &:first-child {
+        padding-left: 0;
+      }
+
+      &:last-child {
+        padding-right: 0;
+      }
     }
   }
 
   /// Nested list.
 
   & > &__list > &__list-item > &__list {
-    background-color: var(--color-accent);
+    // padding: 0;
     box-sizing: border-box;
-    padding: var(--spacing-large)
-      max(calc((100vw - var(--container-width)) / 2), var(--spacing-large));
-    position: absolute;
-    left: 0;
-    list-style: none;
+    // list-style: none;
     margin: 0;
-    top: 100%;
-    transform: scaleY(0);
     width: 100%;
     z-index: 100;
+    padding-bottom: var(--spacing-medium);
 
     @media (min-width: 768px) {
+      background-color: var(--color-accent);
+      transform: scaleY(0);
+      left: 0;
+      top: 100%;
+      position: absolute;
+      padding: var(--spacing-large)
+        max(calc((100vw - var(--container-width)) / 2), var(--spacing-large));
       column-count: 4;
     }
 
     .link {
-      color: var(--color-font-accent);
+      @media (min-width: 768px) {
+        color: var(--color-font-accent);
+      }
     }
   }
 

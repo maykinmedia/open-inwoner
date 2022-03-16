@@ -1,4 +1,4 @@
-{% load i18n icon_tags %}
+{% load i18n icon_tags button_tags %}
 
 <aside class="anchor-menu {% if desktop %}anchor-menu--desktop{% else %}anchor-menu--mobile{% endif %}">
     <ul class="anchor-menu__list">
@@ -7,11 +7,11 @@
                 <a class="link" href="{{ anchor.0 }}">{{ anchor.1 }}</a>
             </li>
         {% endfor %}
+        {{ contents }}
         <li class="anchor-menu__list-item anchor-menu__list-item--top">
-            <a class="link link--primary" href="#top">
-                {% icon icon="arrow_upward" %}
-                {% trans "Terug naar boven" %}
-            </a>
+            {% button href="#top" text=_("Terug naar boven") icon="arrow_upward" pill=True %}
+            {% comment %} <a class="link link--primary" href="#top">
+            </a> {% endcomment %}
         </li>
     </ul>
 </aside>
