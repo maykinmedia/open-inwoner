@@ -2,7 +2,7 @@ from django import template
 from django.urls import NoReverseMatch, reverse
 
 from open_inwoner.components.templatetags.form_tags import parse_component_with_args
-from open_inwoner.utils.templatetags.abstract import ContentsNode
+from open_inwoner.components.utils import ContentsNode
 
 register = template.Library()
 
