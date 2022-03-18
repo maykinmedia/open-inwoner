@@ -7,6 +7,7 @@ from django.views.generic import DetailView, ListView, TemplateView
 from view_breadcrumbs import BaseBreadcrumbMixin, ListBreadcrumbMixin
 
 from open_inwoner.plans.models import Plan
+from open_inwoner.questionnaire.models import QuestionnaireStep
 from open_inwoner.utils.views import CustomDetailBreadcrumbMixin
 
 from .models import Category, Product, ProductLocation
@@ -52,6 +53,7 @@ class HomeView(TemplateView):
         limit = 3 if self.request.user.is_authenticated else 4
         kwargs.update(categories=Category.get_root_nodes()[:limit])
         kwargs.update(product_locations=ProductLocation.objects.all()[:1000])
+        kwargs.update(questionnaire_roots=QuestionnaireStep.get_root_nodes()[:6])
         if self.request.user.is_authenticated:
             kwargs.update(plans=Plan.objects.connected(self.request.user)[:limit])
         return super().get_context_data(**kwargs)
