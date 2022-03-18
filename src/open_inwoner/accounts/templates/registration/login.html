@@ -9,7 +9,7 @@
 
 {% block content %}
     {% render_grid %}
-        {% render_column start=5 span=4 %}
+        {% render_column start=5 span=5 %}
             {% render_card %}
                 <h1 class="h1">{% trans 'Welkom' %}</h1>
                 {% if login_text %}<p class="p">{{ login_text }}</p>{% endif %}
