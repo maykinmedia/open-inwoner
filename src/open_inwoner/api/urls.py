@@ -3,10 +3,13 @@ from django.urls import include, path
 from drf_spectacular.views import SpectacularJSONAPIView, SpectacularRedocView
 from rest_framework import routers
 
+from .pdc.views import CategoryViewSet, ProductViewSet
 from .search.views import AutocompleteView
 
 app_name = "api"
 router = routers.SimpleRouter()
+router.register("categories", CategoryViewSet, basename="categories")
+router.register("products", ProductViewSet, basename="products")
 
 
 urlpatterns = [
