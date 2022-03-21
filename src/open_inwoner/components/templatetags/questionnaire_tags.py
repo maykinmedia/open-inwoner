@@ -14,6 +14,6 @@ def questionnaire(root_nodes: QuerySet, **kwargs):
         {% questionnaire root_nodes=QuestionnaireStep.get_root_nodes %}
 
     Variables:
-        + root_nodes: array | this is the list of root nodes that need to be rendered.
+        + root_nodes: QuestionnaireStep[] | this is the list of QuestionnaireStep root nodes that need to be rendered.
     """
     return {**kwargs, "root_nodes": root_nodes}
