@@ -16,7 +16,7 @@ class Confirmation {
         showConfirmButton: true,
         confirmButtonText: this.form.dataset.confirmDefault,
         cancelButtonText: this.form.dataset.confirmCancel,
-      }).then((value) => {
+      }).then((result) => {
         if (result.isConfirmed) {
           this.real_submit = true
           this.form.submit()
