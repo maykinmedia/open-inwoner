@@ -38,6 +38,10 @@ class CasesListView(
 
         cases = fetch_cases(self.request.user.bsn)
 
+        context["anchors"] = [
+            ("#pending_apps", _("Lopende aanvragen")),
+            ("#completed_apps", _("Afgeronde aanvragen")),
+        ]
         context["open_cases"] = [case for case in cases if not case.einddatum]
         context["open_cases"].sort(key=lambda case: case.startdatum, reverse=True)
         context["closed_cases"] = [case for case in cases if case.einddatum]

@@ -123,3 +123,25 @@ class ProductDetailView(BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView
         base_list = [(_("Thema's"), reverse("pdc:category_list"))]
         base_list += self.get_categories_breadcrumbs(slug_name="theme_slug")
         return base_list + [(self.get_object().name, self.request.path)]
+
+    def get_context_data(self, **kwargs):
+        product = self.get_object()
+        context = super().get_context_data(**kwargs)
+
+        anchors = [
+            ("#title", product.name),
+        ]
+        if product.files.exists():
+            anchors.append(("#files", _("Bestanden")))
+        if product.locations.exists():
+            anchors.append(("#locations", _("Locaties")))
+        if product.links.exists():
+            anchors.append(("#links", _("Links")))
+        if product.contacts.exists():
+            anchors.append(("#contact", _("Contact")))
+        if product.related_products.exists():
+            anchors.append(("#see", _("Zie ook")))
+        anchors.append(("#share", _("Delen")))
+
+        context["anchors"] = anchors
+        return context

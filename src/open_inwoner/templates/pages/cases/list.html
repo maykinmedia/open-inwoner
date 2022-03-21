@@ -1,23 +1,8 @@
 {% extends 'master.html' %}
-{% load i18n icon_tags link_tags utils %}
+{% load i18n icon_tags link_tags anchor_menu_tags utils %}
 
 {% block sidebar_content %}
-    <aside class="anchor-menu">
-        <ul class="anchor-menu__list">
-            <li class="anchor-menu__list-item">
-                <a class="link" href="#pending_apps">{% trans "Lopende aanvragen" %}</a>
-            </li>
-            <li class="anchor-menu__list-item">
-                <a class="link" href="#completed_apps">{% trans "Afgeronde aanvragen" %}</a>
-            </li>
-            <li class="anchor-menu__list-item anchor-menu__list-item--top">
-                <a class="link link--primary" href="#top">
-                    {% icon icon="arrow_upward" %}
-                    {% trans "Terug naar boven" %}
-                </a>
-            </li>
-        </ul>
-    </aside>
+{% anchor_menu anchors=anchors desktop=True %}
 {% endblock sidebar_content %}
 
 {% block content %}

@@ -3,7 +3,7 @@ from django.template.library import parse_bits
 from django.template.loader import render_to_string
 from django.utils.translation import gettext as _
 
-from open_inwoner.utils.templatetags.abstract import safe_resolve
+from open_inwoner.components.utils import safe_resolve
 
 register = template.Library()
 
@@ -359,19 +359,3 @@ class FormNode(template.Node):
         }
         rendered = render_to_string("components/Form/Form.html", render_context)
         return rendered
-
-
-def parse_component_with_args(parser, bits, tag_name):
-    tag_args, tag_kwargs = parse_bits(
-        parser=parser,
-        bits=bits,
-        params=["tag_name"],
-        takes_context=False,
-        name=tag_name,
-        varargs=True,
-        varkw=[],
-        defaults=None,
-        kwonly=[],
-        kwonly_defaults=None,
-    )
-    return tag_kwargs
