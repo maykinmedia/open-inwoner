@@ -56,11 +56,13 @@
         <td class="table__item">{{ contact_text }}</td>
         <td class="table__item table__item--right">{% link href="accounts:contact_list" text=_("Beheer contacten") icon="arrow_forward" icon_position="after" primary=True %}</td>
     </tr>
-    <tr>
-        <th class="table__header">{% trans "Zelfdiagnose" %}</th>
-        <td class="table__item">Van 30 juli 2021, uitkomst: maak verbeterplan aan</td>
-        <td class="table__item table__item--right">{% link href='questionnaire:index' text=_('Start zelfdiagnose') icon="arrow_forward" icon_position="after" primary=True %}</td>
-    </tr>
+    {% if default_questionnaire %}
+        <tr>
+            <th class="table__header">{% trans "Zelfdiagnose" %}</th>
+            <td class="table__item">{{ default_questionnaire.question_subject }}</td>
+            <td class="table__item table__item--right">{% link href='questionnaire:index' text=_('Start zelfdiagnose') icon="arrow_forward" icon_position="after" primary=True %}</td>
+        </tr>
+    {% endif %}
     <tr>
         <th class="table__header">{% trans "Acties" %}</th>
         <td class="table__item">{{ action_text }}</td>
