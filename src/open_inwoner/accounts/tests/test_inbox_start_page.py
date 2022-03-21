@@ -50,7 +50,7 @@ class InboxPageTests(WebTest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Message.objects.count(), 0)
 
-        form = response.forms[1]
+        form = response.forms["start-message-form"]
         form["receiver"] = contact.email
         form["content"] = "some message"
 
@@ -82,7 +82,7 @@ class InboxPageTests(WebTest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Message.objects.count(), 0)
 
-        form = response.forms[1]
+        form = response.forms["start-message-form"]
         form["receiver"] = contact.email
         form["file"] = ("file.txt", b"test content")
 
@@ -117,7 +117,7 @@ class InboxPageTests(WebTest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Message.objects.count(), 0)
 
-        form = response.forms[1]
+        form = response.forms["start-message-form"]
         form["receiver"] = contact.email
 
         response = form.submit()

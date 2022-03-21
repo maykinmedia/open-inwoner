@@ -42,7 +42,7 @@ class SearchPageTests(ESMixin, WebTest):
 
         self.assertEqual(response.status_code, 200)
         # check that form has `query` field
-        search_form = response.forms[1]
+        search_form = response.forms["search-form"]
         self.assertIn("query", search_form.fields)
         for facet in FacetChoices.values:
             # check that facet fields are not shown
@@ -56,7 +56,7 @@ class SearchPageTests(ESMixin, WebTest):
 
         self.assertEqual(response.status_code, 200)
 
-        form = response.forms[1]
+        form = response.forms["search-form"]
         form["query"] = "content"
         response = form.submit()
 
@@ -65,7 +65,7 @@ class SearchPageTests(ESMixin, WebTest):
             response.request.url, f"http://testserver{self.url}?query=content"
         )
         # check that form has `query` field
-        search_form = response.forms[1]
+        search_form = response.forms["search-form"]
         self.assertIn("query", search_form.fields)
         # check that facet fields are shown
         for facet in FacetChoices.values:
@@ -82,7 +82,7 @@ class SearchPageTests(ESMixin, WebTest):
 
         self.assertEqual(response.status_code, 200)
 
-        form = response.forms[1]
+        form = response.forms["search-form"]
 
         self.assertEqual(form["query"].value, "content")
 
@@ -95,7 +95,7 @@ class SearchPageTests(ESMixin, WebTest):
             f"http://testserver{self.url}?query=content&tags={self.tag.slug}",
         )
         # check that form has `query` field
-        search_form = response.forms[1]
+        search_form = response.forms["search-form"]
         self.assertIn("query", search_form.fields)
         # check that facet fields are shown
         for facet in FacetChoices.values:

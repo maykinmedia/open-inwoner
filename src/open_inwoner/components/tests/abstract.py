@@ -100,7 +100,7 @@ class InclusionTagWebTest(WebTest):
         Returns: bs4.element.ResultSet
         """
         nodes = self.select(selector, args, data)
-        self.assertTrue(nodes)
+        self.assertTrue(nodes, msg=f"Did not find selector {selector}")
         return nodes
 
     def assertNotSelector(

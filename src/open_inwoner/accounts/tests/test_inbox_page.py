@@ -52,7 +52,7 @@ class InboxPageTests(WebTest):
         response = self.app.get(self.url, {"with": self.user1.email})
         self.assertEqual(response.status_code, 200)
 
-        form = response.forms[1]
+        form = response.forms["message-form"]
         form["content"] = "some msg"
 
         response = form.submit()
@@ -69,7 +69,7 @@ class InboxPageTests(WebTest):
         response = self.app.get(self.url, {"with": self.user1.email})
         self.assertEqual(response.status_code, 200)
 
-        form = response.forms[1]
+        form = response.forms["message-form"]
         form["file"] = ("file.txt", b"test content")
 
         response = form.submit()
@@ -89,7 +89,7 @@ class InboxPageTests(WebTest):
         response = self.app.get(self.url, {"with": self.user1.email})
         self.assertEqual(response.status_code, 200)
 
-        form = response.forms[1]
+        form = response.forms["message-form"]
         response = form.submit()
 
         self.assertEqual(response.status_code, 200)
