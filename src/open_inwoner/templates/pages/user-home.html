@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n button_tags card_tags utils map_tags icon_tags %}
+{% load i18n button_tags card_tags utils map_tags icon_tags questionnaire_tags %}
 
 
 {% block content %}
@@ -33,6 +33,8 @@
         {% button href="pdc:category_list" text=_("Alle thema's") icon="arrow_forward" icon_position="after" %}
     </h2>
     {% card_container categories=categories columns=3 %}
+
+    {% questionnaire root_nodes=questionnaire_roots %}
 
     <h2 class="h2 h2--extra">{{configurable_text.home_page.home_map_title}}</h2>
     <p class="p">{{configurable_text.home_page.home_map_intro|linebreaksbr}}</p>

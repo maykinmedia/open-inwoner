@@ -53,7 +53,7 @@ class HomeView(TemplateView):
         limit = 3 if self.request.user.is_authenticated else 4
         kwargs.update(categories=Category.get_root_nodes()[:limit])
         kwargs.update(product_locations=ProductLocation.objects.all()[:1000])
-        kwargs.update(questionnaire_roots=QuestionnaireStep.get_root_nodes()[:6])
+        kwargs.update(questionnaire_roots=QuestionnaireStep.get_root_nodes())
         if self.request.user.is_authenticated:
             kwargs.update(plans=Plan.objects.connected(self.request.user)[:limit])
         return super().get_context_data(**kwargs)
