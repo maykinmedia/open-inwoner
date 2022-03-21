@@ -37,7 +37,7 @@
             {% endfor %}
         </ol>
 
-        {% render_form form=form method="POST" enctype="multipart/form-data" %}
+        {% render_form id="message-form" form=form method="POST" enctype="multipart/form-data" %}
             {% csrf_token %}
             {% hidden form.receiver %}
             <div class="group-input">

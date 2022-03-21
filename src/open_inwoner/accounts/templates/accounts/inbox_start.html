@@ -10,7 +10,7 @@
 {% block content %}
     {% render_grid %}
         {% render_column start=1 span=8 %}
-            {% render_form form=form method="POST" enctype="multipart/form-data" %}
+            {% render_form id="start-message-form" form=form method="POST" enctype="multipart/form-data" %}
                 {% csrf_token %}
                 {% autocomplete form.receiver %}
                 <div class="group-input">
