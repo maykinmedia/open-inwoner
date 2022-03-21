@@ -81,7 +81,7 @@ class ContactViewTests(WebTest):
         response = self.app.get(self.create_url, user=self.user)
         self.assertEqual(response.status_code, 200)
 
-        form = response.forms[1]
+        form = response.forms["contact-form"]
         form["first_name"] = "John"
         form["last_name"] = "Smith"
         form["email"] = "john@smith.nl"

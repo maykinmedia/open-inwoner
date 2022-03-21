@@ -22,7 +22,7 @@ class InvitePageTests(WebTest):
 
         self.assertEqual(response.status_code, 200)
 
-        form = response.forms[1]
+        form = response.forms["invite-form"]
         response = form.submit()
 
         self.assertEqual(response.status_code, 302)
