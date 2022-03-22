@@ -1,5 +1,8 @@
+from typing import Optional
+
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_list_or_404, get_object_or_404
+from django.shortcuts import get_object_or_404
+from django.urls import reverse
 from django.views.generic import FormView, RedirectView
 
 from .forms import QuestionnaireStepForm
@@ -18,6 +21,11 @@ class QuestionnaireResetView(RedirectView):
     def get(self, request, *args, **kwargs) -> HttpResponseRedirect:
         request.session[QUESTIONNAIRE_SESSION_KEY] = None
         return super().get(request, *args, **kwargs)
+
+    def get_redirect_url(self, *args, **kwargs) -> Optional[str]:
+        if not self.request.user.is_authenticated:
+            return reverse("root")
+        return super().get_redirect_url(*args, **kwargs)
 
 
 class QuestionnaireStepView(FormView):

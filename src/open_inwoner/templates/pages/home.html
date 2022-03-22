@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n button_tags card_tags map_tags utils %}
+{% load i18n button_tags card_tags map_tags questionnaire_tags utils %}
 
 
 {% block header_image %}
@@ -22,6 +22,7 @@
 
     {% card_container categories=categories %}
 
+    {% questionnaire root_nodes=questionnaire_roots %}
 
     <h1 class="h1">{{configurable_text.home_page.home_map_title}}</h1>
     <p class="p">{{configurable_text.home_page.home_map_intro|linebreaksbr}}</p>

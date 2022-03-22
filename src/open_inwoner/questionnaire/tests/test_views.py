@@ -6,6 +6,9 @@ from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from django.views.generic import FormView
 
+from django_webtest import WebTest
+
+from ...accounts.tests.factories import UserFactory
 from ...pdc.models import Product
 from ...pdc.tests.factories import ProductFactory
 from ..forms import QuestionnaireStepForm
@@ -14,17 +17,24 @@ from ..views import QUESTIONNAIRE_SESSION_KEY, QuestionnaireStepView
 from .factories import QuestionnaireStepFactory, QuestionnaireStepFileFactory
 
 
-class QuestionnaireResetViewTestCase(TestCase):
+class QuestionnaireResetViewTestCase(WebTest):
     def test_clears_session(self):
         path = reverse("questionnaire:reset")
-        self.client.get(path)
-        self.assertIsNone(self.client.session[QUESTIONNAIRE_SESSION_KEY])
+        self.app.get(path)
+        self.assertIsNone(self.app.session[QUESTIONNAIRE_SESSION_KEY])
 
-    def test_redirects(self):
+    def test_authenticated_user_redirects(self):
+        user = UserFactory()
         path = reverse("questionnaire:reset")
-        response = self.client.get(path)
+        response = self.app.get(path, user=user)
         self.assertEqual(302, response.status_code)
         self.assertEqual(reverse("accounts:my_profile"), response.url)
+
+    def test_anonymous_user_redirects(self):
+        path = reverse("questionnaire:reset")
+        response = self.app.get(path)
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(reverse("root"), response.url)
 
 
 class QuestionnaireStepViewTestCase(TestCase):
