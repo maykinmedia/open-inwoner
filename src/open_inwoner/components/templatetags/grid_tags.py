@@ -44,6 +44,7 @@ def render_column(parser, token):
         - compact: bool | Whether to use compact mode (no gutters).
         - start: int | column to start from.
         - span: int | column span. Max is 12 columns
+        - extra_classes: string | Extra classes for the column
 
     Extra context:
         - contents: string (HTML) | this is the context between the render_column and endrender_column tags

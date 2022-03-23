@@ -1,10 +1,10 @@
 {% load i18n grid_tags form_tags button_tags %}
 
-{% render_column span=6 compact=True %}
+{% render_column span=6 compact=True extra_classes="product-finder" %}
     <h1 class="h1">{% trans "Productzoeker" %}</h1>
     <p class="p">Met een paar simpele vragen ziet u welke producten op uw situatie van toepassing zijn.</p>
 
-    <div class="product-finder">
+    <div class="product-finder__form">
         {% if not conditions_done %}
             <h4 class="h4">{{ condition.question }}</h4>
             {% if condition.rule %}
@@ -20,9 +20,11 @@
             <p class="p p--compact">
                 {% trans "Er zijn geen extra vragen meer. Bekijk de producten hiernaast." %}
             </p>
-            {% render_form method="POST" form=form %}
+            {% render_form id="product-finder" method="POST" form=form %}
                 {% csrf_token %}
-                {% button type="submit" name="reset" text=_("Begin opnieuw") icon="undo" %}
+                <div class="form__actions">
+                    {% button type="submit" name="reset" text=_("Begin opnieuw") icon="undo" primary=True %}
+                </div>
             {% endrender_form %}
         {% endif %}
     </div>

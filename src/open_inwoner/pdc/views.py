@@ -1,4 +1,5 @@
-from django.http import Http404
+from django.db.models import Q
+from django.http import Http404, HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
@@ -212,28 +213,49 @@ class ProductFinderView(FormView):
                 }
             }
 
-    def filter_products(self):
+    def filter_matched_products(self):
         products = Product.objects.all()
-        print(products)
         current_answers = self.request.session.get("product_finder")
-        print(current_answers)
         if current_answers:
             for _order, answer in current_answers.items():
-                print(answer)
                 if answer.get("answer") == YesNo.yes:
                     products = products.filter(conditions=answer.get("condition"))
                 else:
                     products = products.exclude(conditions=answer.get("condition"))
-                print(products)
-
         return products
+
+    def filter_possible_products(self, matched_products):
+        current_answers = self.request.session.get("product_finder")
+        filters = None
+        has_filters = False
+        if current_answers:
+            for _order, answer in current_answers.items():
+                has_filters = True
+                if answer.get("answer") == YesNo.yes:
+                    new_filter = Q(conditions=answer.get("condition"))
+                    if filters:
+                        filters = filters | new_filter
+                    else:
+                        filters = new_filter
+
+        if has_filters:
+            return (
+                Product.objects.exclude(
+                    pk__in=matched_products.values_list("pk", flat=True)
+                )
+                .filter(filters)
+                .distinct()
+            )
+        return Product.objects.none()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         previous_condition = self.get_previous_condition()
         context["show_previous"] = previous_condition is not None
         context["condition"] = self.condition
-        context["products"] = self.filter_products()
+        matched_products = self.filter_matched_products()
+        context["matched_products"] = matched_products
+        context["possible_products"] = self.filter_possible_products(matched_products)
         context["conditions_done"] = self.request.session.get("conditions_done", False)
         return context
 
@@ -251,4 +273,5 @@ class ProductFinderView(FormView):
             or self.request.POST.get("previous") is not None
         ):
             del form.errors["answer"]
+            return HttpResponseRedirect(self.get_success_url())
         return super().form_invalid(form)
