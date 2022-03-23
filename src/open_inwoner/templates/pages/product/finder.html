@@ -1,37 +1,9 @@
 {% extends 'master.html' %}
-{% load i18n l10n grid_tags link_tags form_tags button_tags utils %}
+{% load i18n l10n grid_tags link_tags form_tags button_tags product_tags utils %}
 
 {% block content %}
     {% render_grid %}
-        {% render_column span=6 compact=True %}
-            <h1 class="h1" id="title">
-                {% trans "Productzoeker" %}
-            </h1>
-            <p class="p">Met een paar simpele vragen ziet u welke producten op uw situatie van toepassing zijn.</p>
-
-            <div class="product-finder">
-                {% if not conditions_done %}
-                    <h4 class="h4">{{ condition.question }}</h4>
-                    {% if condition.rule %}
-                    <p class="p p--compact">{{ condition.rule }}</p>
-                    {% endif %}
-
-                    {% if show_previous %}
-                        {% form id="product-finder" spaceless=True form_object=form method="POST" submit_text=_("Volgende") secondary_name='previous' secondary_text=_('Vorige') secondary_icon='arrow_backward' secondary_icon_position="before" secondary=False %}
-                    {% else %}
-                        {% form id="product-finder" spaceless=True form_object=form method="POST" submit_text=_("Volgende") %}
-                    {% endif %}
-                {% else %}
-                    <p class="p p--compact">
-                        {% trans "Er zijn geen extra vragen meer. Bekijk de producten hiernaast." %}
-                    </p>
-                    {% render_form method="POST" form=form %}
-                        {% csrf_token %}
-                        {% button type="submit" name="reset" text=_("Begin opnieuw") icon="undo" %}
-                    {% endrender_form %}
-                {% endif %}
-            </div>
-        {% endrender_column %}
+        {% product_finder condition=condition form=form show_previous=show_previous conditions_done=conditions_done %}
 
         {% render_column start=7 span=6 compact=True %}
             <h1 class="h1" id="title">
