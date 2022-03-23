@@ -1,0 +1,29 @@
+{% load i18n grid_tags form_tags button_tags %}
+
+{% render_column span=6 compact=True %}
+    <h1 class="h1">{% trans "Productzoeker" %}</h1>
+    <p class="p">Met een paar simpele vragen ziet u welke producten op uw situatie van toepassing zijn.</p>
+
+    <div class="product-finder">
+        {% if not conditions_done %}
+            <h4 class="h4">{{ condition.question }}</h4>
+            {% if condition.rule %}
+            <p class="p p--compact">{{ condition.rule }}</p>
+            {% endif %}
+
+            {% if show_previous %}
+                {% form id="product-finder" spaceless=True form_object=form method="POST" submit_text=primary_text secondary_name='previous' secondary_text=_('Vorige') secondary_icon='arrow_backward' secondary_icon_position="before" secondary=False %}
+            {% else %}
+                {% form id="product-finder" spaceless=True form_object=form method="POST" submit_text=primary_text %}
+            {% endif %}
+        {% else %}
+            <p class="p p--compact">
+                {% trans "Er zijn geen extra vragen meer. Bekijk de producten hiernaast." %}
+            </p>
+            {% render_form method="POST" form=form %}
+                {% csrf_token %}
+                {% button type="submit" name="reset" text=_("Begin opnieuw") icon="undo" %}
+            {% endrender_form %}
+        {% endif %}
+    </div>
+{% endrender_column %}

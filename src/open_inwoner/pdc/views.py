@@ -6,6 +6,7 @@ from django.views.generic import DetailView, FormView, ListView, TemplateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin, ListBreadcrumbMixin
 
+from open_inwoner.pdc.forms import ProductFinderForm
 from open_inwoner.pdc.models.product import ProductCondition
 from open_inwoner.plans.models import Plan
 
@@ -56,6 +57,12 @@ class HomeView(TemplateView):
         kwargs.update(product_locations=ProductLocation.objects.all()[:1000])
         if self.request.user.is_authenticated:
             kwargs.update(plans=Plan.objects.connected(self.request.user)[:limit])
+
+        # Product finder:
+        kwargs.update(
+            condition=ProductCondition.objects.first(),
+            condition_form=ProductFinderForm(),
+        )
         return super().get_context_data(**kwargs)
 
     def get_template_names(self):
