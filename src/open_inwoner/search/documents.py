@@ -8,7 +8,7 @@ from open_inwoner.pdc.models import Category, Organization, Product, Tag
 from .analyzers import partial_analyzer, synonym_analyzer
 
 
-@registry.register_document
+# @registry.register_document
 class ProductDocument(Document):
     name = fields.TextField(
         analyzer="standard",

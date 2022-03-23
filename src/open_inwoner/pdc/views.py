@@ -1,14 +1,16 @@
 from django.http import Http404
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic import DetailView, ListView, TemplateView
+from django.views.generic import DetailView, FormView, ListView, TemplateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin, ListBreadcrumbMixin
 
+from open_inwoner.pdc.models.product import ProductCondition
 from open_inwoner.plans.models import Plan
-from open_inwoner.utils.views import CustomDetailBreadcrumbMixin
 
+from .choices import YesNo
+from .forms import ProductFinderForm
 from .models import Category, Product, ProductLocation
 
 
@@ -123,3 +125,123 @@ class ProductDetailView(BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView
         base_list = [(_("Thema's"), reverse("pdc:category_list"))]
         base_list += self.get_categories_breadcrumbs(slug_name="theme_slug")
         return base_list + [(self.get_object().name, self.request.path)]
+
+
+class ProductFinderView(FormView):
+    template_name = "pages/product/finder.html"
+    form_class = ProductFinderForm
+    condition = None
+    success_url = reverse_lazy("pdc:product_finder")
+
+    def get(self, request, *args, **kwargs):
+        self.condition = self.get_product_condition()
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.loaded_previous = False
+        if self.request.POST.get("reset") is not None:
+            self.request.session["product_finder"] = {}
+            self.request.session["current_condition"] = None
+            self.request.session["conditions_done"] = False
+
+        self.condition = self.get_product_condition()
+        previous_condition = self.get_previous_condition()
+        if self.request.POST.get("previous") is not None and previous_condition:
+            self.request.session["current_condition"] = previous_condition.pk
+            self.condition = previous_condition
+            self.loaded_previous = True
+
+        return super().post(request, *args, **kwargs)
+
+    def get_initial(self):
+        """See if we have an initial value to be set."""
+        initial = super().get_initial()
+        current_answers = self.request.session.get("product_finder")
+        if current_answers:
+            for _order, answer in current_answers.items():
+                if answer.get("condition") == self.condition.pk:
+                    initial["answer"] = answer.get("answer")
+        return initial
+
+    def get_next_condition(self):
+        try:
+            return ProductCondition.objects.filter(
+                order__gt=self.condition.order
+            ).first()
+        except AttributeError:
+            return None
+
+    def get_previous_condition(self):
+        try:
+            return ProductCondition.objects.filter(
+                order__lt=self.condition.order
+            ).last()
+        except AttributeError:
+            return None
+
+    def get_product_condition(self):
+        current_condition = self.request.session.get("current_condition")
+        if current_condition:
+            try:
+                return ProductCondition.objects.get(pk=current_condition)
+            except ProductCondition.DoesNotExist:
+                pass
+
+        return ProductCondition.objects.first()
+
+    def set_product_condition_sessions(self, answer):
+        current_answers = self.request.session.get("product_finder")
+        if current_answers:
+            current_answers[str(self.condition.order)] = {
+                "answer": answer,
+                "condition": self.condition.pk,
+            }
+            self.request.session["product_finder"] = current_answers
+        else:
+            self.request.session["product_finder"] = {
+                str(self.condition.order): {
+                    "answer": answer,
+                    "condition": self.condition.pk,
+                }
+            }
+
+    def filter_products(self):
+        products = Product.objects.all()
+        print(products)
+        current_answers = self.request.session.get("product_finder")
+        print(current_answers)
+        if current_answers:
+            for _order, answer in current_answers.items():
+                print(answer)
+                if answer.get("answer") == YesNo.yes:
+                    products = products.filter(conditions=answer.get("condition"))
+                else:
+                    products = products.exclude(conditions=answer.get("condition"))
+                print(products)
+
+        return products
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        previous_condition = self.get_previous_condition()
+        context["show_previous"] = previous_condition is not None
+        context["condition"] = self.condition
+        context["products"] = self.filter_products()
+        context["conditions_done"] = self.request.session.get("conditions_done", False)
+        return context
+
+    def form_valid(self, form):
+        self.set_product_condition_sessions(form.cleaned_data.get("answer"))
+        next_condition = self.get_next_condition()
+        if next_condition:
+            self.request.session["current_condition"] = next_condition.pk
+        self.request.session["conditions_done"] = next_condition is None
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        if (
+            self.request.POST.get("reset") is not None
+            or self.request.POST.get("previous") is not None
+        ):
+            del form.errors["answer"]
+        return super().form_invalid(form)
