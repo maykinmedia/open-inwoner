@@ -2,9 +2,15 @@
 
 <div class="form__control">
     <div class="form__stack">
-        {% for choice in field.field.choices %}
-            {% choice_radio choice=choice name=field.name data=field.value index=forloop.counter %}
-        {% endfor %}
+        {% if field.field.choices %}
+            {% for choice in field.field.choices %}
+                {% choice_radio choice=choice name=field.name data=field.value index=forloop.counter initial=field.form.initial %}
+            {% endfor %}
+        {% else %}
+            {% for choice in field.field.widget.choices %}
+                {% choice_radio choice=choice name=field.name data=field.value index=forloop.counter initial=field.form.initial %}
+            {% endfor %}
+        {% endif %}
     </div>
 
     {% if field.help_text %}
