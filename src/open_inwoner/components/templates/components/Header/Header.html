@@ -1,4 +1,4 @@
-{% load i18n logo_tags header_tags view_breadcrumbs form_tags link_tags solo_tags icon_tags %}
+{% load i18n logo_tags header_tags form_tags link_tags solo_tags icon_tags %}
 
 {% get_solo "configurations.SiteConfiguration" as config %}
 
@@ -84,5 +84,4 @@
 
         {% primary_navigation categories=categories request=request %}
     </div>
-    {% render_breadcrumbs "components/Header/Breadcrumbs.html" %}
 </header>

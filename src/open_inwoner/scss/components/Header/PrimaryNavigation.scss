@@ -60,15 +60,14 @@
   /// Nested list.
 
   & > &__list > &__list-item > &__list {
-    // padding: 0;
     box-sizing: border-box;
-    // list-style: none;
     margin: 0;
     width: 100%;
     z-index: 100;
     padding-bottom: var(--spacing-medium);
 
     @media (min-width: 768px) {
+      list-style: none;
       background-color: var(--color-accent);
       transform: scaleY(0);
       left: 0;
