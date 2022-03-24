@@ -42,8 +42,12 @@ class QuestionnaireStepView(BaseBreadcrumbMixin, FormView):
 
     @cached_property
     def crumbs(self):
+        if self.request.user.is_authenticated:
+            return [
+                (_("Mijn profiel"), reverse("accounts:my_profile")),
+                (_("Zelfdiagnose"), reverse("questionnaire:index")),
+            ]
         return [
-            (_("Mijn profiel"), reverse("accounts:my_profile")),
             (_("Zelfdiagnose"), reverse("questionnaire:index")),
         ]
 
