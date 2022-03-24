@@ -5,7 +5,7 @@ $hm: max(calc((100vw - var(--container-width)) / 2), var(--spacing-large));
 $vm: var(--spacing-large);
 
 .header {
-  z-index: 2;
+  z-index: 1003;
   position: sticky;
   top: 0;
   background-color: var(--color-white);
