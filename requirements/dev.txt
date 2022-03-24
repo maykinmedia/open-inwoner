@@ -780,7 +780,7 @@ waitress==2.0.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   webtest
-weasyprint==54.1
+weasyprint==54.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt

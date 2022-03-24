@@ -1,11 +1,13 @@
-from typing import Optional
+from typing import Any, Dict, Optional
 
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import FormView, RedirectView
+from django.views.generic import FormView, RedirectView, TemplateView
+
+from open_inwoner.utils.mixins import ExportMixin
 
 from view_breadcrumbs import BaseBreadcrumbMixin
 
@@ -70,3 +72,34 @@ class QuestionnaireStepView(BaseBreadcrumbMixin, FormView):
         questionnaire_step = form.cleaned_data["answer"]
         self.request.session[QUESTIONNAIRE_SESSION_KEY] = questionnaire_step.slug
         return HttpResponseRedirect(redirect_to=questionnaire_step.get_absolute_url())
+
+
+class QuestionnaireExportView(ExportMixin, TemplateView):
+    template_name = "export/questionnaire/questionnaire_export.html"
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        questionnaire = QuestionnaireStep.objects.filter(
+            slug=self.request.session.get(QUESTIONNAIRE_SESSION_KEY)
+        )
+        tree = questionnaire.first().get_tree_path()
+        questions = [q.question for q in tree]
+        answers = [a.parent_answer for a in tree[1:]]
+        content = [c.content for c in tree]
+        root_title = tree.first().title
+
+        steps = []
+        for i in range(len(answers)):
+            steps.append(
+                {"question": questions[i], "answer": answers[i], "content": content[i]}
+            )
+        last_step = tree.last()
+
+        context["root_title"] = root_title
+        context["steps"] = steps
+        context["last_step"] = {
+            "question": last_step.question,
+            "content": last_step.content,
+        }
+        context["related_products"] = last_step.related_products.all()
+        return context

@@ -1,0 +1,34 @@
+{% extends 'base_pdf.html' %}
+{% load i18n render_tags %}
+
+{% block content %}
+    <div class="qa">
+        <h1 class="h1">{% trans "Zelfdiagnose results" %}</h1>
+        <ol>
+            {% for step in steps %}
+            <li>
+                <h4>{% trans "Question:" %}</h4>
+                <p class="p">{{ step.question }}</p>
+                <h4>{% trans "Answer:" %}</h4>
+                <p class="p">{{ step.answer }}</p>
+            </li>
+            {% endfor %}
+        </ol>
+    </div>
+    
+    <div class="qa_results">
+        <h4 class="h4">{{ last_step.question }}</h4>
+        <p class="p">{{ last_step.content|ckeditor_content|safe}}</p>
+        {% if related_products.exists %}
+            <h4>{% trans "Related products:" %}</h4>
+            <ol>
+                {% for product in related_products %}
+                <li>
+                    <h4>{{ product.name }}</h4>
+                    <p class="p">{{ product.summary }}</p>
+                </li>
+                {% endfor %}
+            </ol>
+        {% endif %}
+    </div>
+{% endblock %}
