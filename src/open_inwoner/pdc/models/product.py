@@ -191,7 +191,7 @@ class ProductContact(models.Model):
     phonenumber = models.CharField(
         verbose_name=_("Phonenumber"),
         blank=True,
-        max_length=100,
+        max_length=15,
         validators=[validate_phone_number],
         help_text=_("The phone number of the product contact"),
     )
