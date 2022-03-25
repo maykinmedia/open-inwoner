@@ -192,7 +192,7 @@ class Contact(models.Model):
         verbose_name=_("Phonenumber"),
         blank=True,
         default="",
-        max_length=250,
+        max_length=15,
         validators=[validate_phone_number],
         help_text=_(
             "The phonenumber of the contact person. This field can be left empty."
