@@ -1,12 +1,13 @@
 from typing import Any, Dict, Optional
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import FormView, RedirectView, TemplateView
+from django.views.generic import FormView, ListView, RedirectView, TemplateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin
 
@@ -62,8 +63,6 @@ class QuestionnaireStepView(BaseBreadcrumbMixin, FormView):
 
         if slug:
             return get_object_or_404(QuestionnaireStep, slug=slug)
-
-        return get_object_or_404(QuestionnaireStep.objects, is_default=True)
 
     def get_form_kwargs(self) -> dict:
         instance = self.get_object()
@@ -126,3 +125,19 @@ class QuestionnaireExportView(ExportMixin, TemplateView):
         }
         context["related_products"] = last_step.related_products.all()
         return context
+
+
+class QuestionnaireRootListView(LoginRequiredMixin, BaseBreadcrumbMixin, ListView):
+    template_name = "pages/profile/questionnaire.html"
+    model = QuestionnaireStep
+    context_object_name = "root_nodes"
+
+    @cached_property
+    def crumbs(self):
+        return [
+            (_("Mijn profiel"), reverse("accounts:my_profile")),
+            (_("Zelfdiagnose"), reverse("questionnaire:questionnaire_list")),
+        ]
+
+    def get_queryset(self):
+        return QuestionnaireStep.get_root_nodes()

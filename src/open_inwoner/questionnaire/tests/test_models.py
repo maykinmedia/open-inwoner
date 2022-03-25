@@ -10,19 +10,6 @@ class QuestionnaireStepTestCase(TestCase):
     def test_create(self):
         QuestionnaireStepFactory.create()
 
-    def test_default_none(self):
-        QuestionnaireStep.add_root(slug="foo")
-        self.assertIsNone(QuestionnaireStep.objects.default())
-
-    def test_default_root(self):
-        root = QuestionnaireStep.add_root(slug="foo", is_default=True)
-        self.assertEqual(root, QuestionnaireStep.objects.default())
-
-    def test_default_descendant(self):
-        root = QuestionnaireStep.add_root(slug="foo")
-        descendant = root.add_child(slug="bar", is_default=True)
-        self.assertEqual(descendant, QuestionnaireStep.objects.default())
-
     def test_multiple_root(self):
         root_1 = QuestionnaireStep.add_root(slug="foo")
         root_2 = QuestionnaireStep.add_root(slug="fooz")

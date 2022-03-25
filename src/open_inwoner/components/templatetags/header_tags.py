@@ -55,12 +55,10 @@ def primary_navigation(categories, request, **kwargs):
     Variables:
         + categories: Category[] | The categories that should be displayed in the theme dropdown.
         + request: Request | The django request object.
-        + questionnaire: QuestionnaireStep | The default QuestionnaireStep, if any.
     """
 
     return {
         **kwargs,
         "categories": categories,
         "request": request,
-        "questionnaire": QuestionnaireStep.objects.default(),
     }
