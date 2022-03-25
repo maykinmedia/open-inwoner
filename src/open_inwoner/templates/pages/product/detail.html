@@ -63,7 +63,7 @@
     <hr class="divider">
 
     {% render_grid %}
-        {% render_column span=5 %}
+        {% render_column span=4 %}
             {# Links. #}
             {% if object.links.exists %}
                 <nav class="link-list">
@@ -79,7 +79,7 @@
             {% endif %}
         {% endrender_column %}
 
-        {% render_column start=6 span=3 compact=True %}
+        {% render_column start=6 span=4 compact=True %}
             {# Related products. #}
             {% if object.related_products.exists %}
                 <nav class="link-list">
@@ -106,10 +106,11 @@
         {% endrender_column %}
 
 
-        {% render_column span=8 %}
+        {% render_column span=9 %}
             {% if object.contacts %}
                 {% render_notification type='success' icon=False %}
                     <h4 class="h4" id="contact">{% trans 'Contact' %}</h4>
+
                     {% for contact in object.contacts.all %}
                         {% render_grid compact=True %}
                             {% render_column span=12 %}
@@ -117,7 +118,7 @@
                             {% endrender_column %}
 
                             {% render_column span=6 %}
-                                <span class="p">{{ contact.role }}</span>
+                                <span class="p">{{ contact.role|default:_('Telefoonnummer') }}</span>
                             {% endrender_column %}
 
                             {% render_column start=7 span=6 %}
@@ -125,7 +126,7 @@
                             {% endrender_column %}
 
                             {% render_column span=6 %}
-                                <p class="p">{{ contact.organization|default:"" }}</p>
+                                <p class="p">{{ contact.organization|default:_('E-mail')}}</p>
                             {% endrender_column %}
 
                             {% render_column start=7 span=6 %}
