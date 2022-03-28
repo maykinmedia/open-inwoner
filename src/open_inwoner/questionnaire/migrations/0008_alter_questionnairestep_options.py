@@ -6,12 +6,16 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('questionnaire', '0007_auto_20220328_1122'),
+        ("questionnaire", "0007_auto_20220328_1122"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='questionnairestep',
-            options={'ordering': ('path',), 'verbose_name': 'Vragenlijststap', 'verbose_name_plural': 'Vragenlijststappen'},
+            name="questionnairestep",
+            options={
+                "ordering": ("path",),
+                "verbose_name": "Vragenlijststap",
+                "verbose_name_plural": "Vragenlijststappen",
+            },
         ),
     ]
