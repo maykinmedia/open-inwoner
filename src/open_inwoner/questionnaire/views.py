@@ -8,10 +8,10 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView, RedirectView, TemplateView
 
+from view_breadcrumbs import BaseBreadcrumbMixin
+
 from open_inwoner.accounts.models import Document
 from open_inwoner.utils.mixins import ExportMixin
-
-from view_breadcrumbs import BaseBreadcrumbMixin
 
 from .forms import QuestionnaireStepForm
 from .models import QuestionnaireStep
