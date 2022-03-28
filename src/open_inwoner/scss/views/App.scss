@@ -65,6 +65,7 @@
     var(--color-secondary-s),
     calc(var(--color-secondary-l) - 10%)
   );
+
   --color-accent-h: 50;
   --color-accent-s: 94%;
   --color-accent-l: 57%;
@@ -84,12 +85,44 @@
     calc(var(--color-accent-l) + 10%)
   );
 
+  --color-danger-h: 0;
+  --color-danger-s: 100%;
+  --color-danger-l: 13%;
+  --color-danger: hsl(
+    var(--color-danger-h),
+    var(--color-danger-s),
+    var(--color-danger-l)
+  );
+  --color-danger-darker: hsl(
+    var(--color-danger-h),
+    var(--color-danger-s),
+    calc(var(--color-danger-l) - 10%)
+  );
+  --color-danger-lighter: hsl(
+    var(--color-danger-h),
+    var(--color-danger-s),
+    calc(var(--color-danger-l) + 80%)
+  );
+
+  --color-success-h: 117;
+  --color-success-s: 28%;
+  --color-success-l: 87%;
+  --color-success: hsl(
+    var(--color-success-h),
+    var(--color-success-s),
+    var(--color-success-l)
+  );
+  --color-success-darker: hsl(
+    var(--color-success-h),
+    var(--color-success-s),
+    calc(var(--color-success-l) - 50%)
+  );
+
   --color-font-primary: var(--color-white);
   --color-font-secondary: var(--color-white);
   --color-font-accent: var(--color-gray-dark);
 
   --color-body: var(--color-gray-dark);
-  --color-danger: var(--color-red);
   --color-mute: var(--color-gray);
 
   /// Font.

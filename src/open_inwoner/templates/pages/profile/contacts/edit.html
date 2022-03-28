@@ -1,15 +1,22 @@
 {% extends 'master.html' %}
-{% load i18n form_tags %}
+{% load i18n form_tags grid_tags %}
+
+
+{% block notifications %}{% endblock %}
 
 
 {% block content %}
-<h1 class="h1">
-    {% if object.pk %}
-        {% trans "Wijzig contact" %}
-    {% else %}
-        {% trans "Creeer contact" %}
-    {% endif %}
-</h1>
+    <h1 class="h1">
+        {% if object.pk %}
+            {% trans "Wijzig contact" %}
+        {% else %}
+            {% trans "Creeer contact" %}
+        {% endif %}
+    </h1>
 
-{% form id="contact-form" form_object=form method="POST" submit_text=_("Opslaan") secondary_href='accounts:contact_list' secondary_text=_('Terug') secondary_icon='arrow_backward' secondary_icon_position="before" %}
+    {% render_grid %}
+        {% render_column span=9 %}
+            {% form columns=2 id="contact-form" form_object=form method="POST" show_notifications=True submit_text=_("Opslaan") secondary_href='accounts:contact_list' secondary_text=_('Terug') secondary_icon='arrow_backward' secondary_icon_position="before" %}
+        {% endrender_column %}
+    {% endrender_grid %}
 {% endblock content %}
