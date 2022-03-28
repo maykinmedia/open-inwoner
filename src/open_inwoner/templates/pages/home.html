@@ -6,10 +6,12 @@
 {% endblock header_image %}
 
 {% block content %}
-    <div class="grid__welcome">
-        <h1 class="h1">{{configurable_text.home_page.home_welcome_title}}</h1>
-        <p class="p">{{configurable_text.home_page.home_welcome_intro|linebreaksbr}}</p>
-    </div>
+    {% block user_content %}
+        <div class="grid__welcome">
+            <h1 class="h1">{{configurable_text.home_page.home_welcome_title}}</h1>
+            <p class="p">{{configurable_text.home_page.home_welcome_intro|linebreaksbr}}</p>
+        </div>
+    {% endblock %}
 
 
     <h1 class="h1">
@@ -19,7 +21,11 @@
     </h1>
     <p class="p">{{configurable_text.home_page.home_theme_intro|linebreaksbr}}</p>
 
-    {% card_container categories=categories %}
+    {% if request.user.is_authenticated %}
+        {% card_container categories=categories columns=3 %}
+    {% else %}
+        {% card_container categories=categories %}
+    {% endif %}
 
     {% questionnaire root_nodes=questionnaire_roots %}
 

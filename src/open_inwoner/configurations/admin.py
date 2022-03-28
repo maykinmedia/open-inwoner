@@ -31,7 +31,17 @@ class SiteConfigurationPageInline(OrderedTabularInline):
 @admin.register(SiteConfiguration)
 class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
     fieldsets = (
-        (None, {"fields": ("name", "login_allow_registration", "show_cases")}),
+        (
+            None,
+            {
+                "fields": (
+                    "name",
+                    "login_allow_registration",
+                    "show_cases",
+                    "show_product_finder",
+                )
+            },
+        ),
         (
             _("Color"),
             {

@@ -1,13 +1,12 @@
 from django.urls import include, path, re_path
 
+from .utils import PRODUCT_PATH_NAME
 from .views import (
     CategoryDetailView,
     CategoryListView,
     ProductDetailView,
     ProductFinderView,
 )
-
-PRODUCT_PATH_NAME = "products"
 
 app_name = "pdc"
 urlpatterns = [

@@ -33,14 +33,5 @@ class Migration(migrations.Migration):
                 validators=[open_inwoner.utils.validators.validate_phone_number],
                 verbose_name="Phonenumber",
             ),
-            model_name="organization",
-            name="phonenumber",
-            field=models.CharField(
-                blank=True,
-                help_text="The phone number of the organization",
-                max_length=15,
-                validators=[open_inwoner.utils.validators.validate_phone_number],
-                verbose_name="Phonenumber",
-            ),
         ),
     ]
