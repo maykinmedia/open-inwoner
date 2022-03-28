@@ -41,7 +41,7 @@ class QuestionnaireStepView(BaseBreadcrumbMixin, FormView):
     Shows a step in a questionnaire.
     """
 
-    template_name = "questionnaire/questionnaire-step.html"
+    template_name = "pages/questionnaire/questionnaire-step.html"
     form_class = QuestionnaireStepForm
 
     @cached_property
