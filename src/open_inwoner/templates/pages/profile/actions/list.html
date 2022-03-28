@@ -1,17 +1,21 @@
 {% extends 'master.html' %}
-{% load i18n button_tags link_tags icon_tags pagination_tags action_tags %}
+{% load i18n button_tags grid_tags link_tags icon_tags pagination_tags action_tags %}
 
 
 {% block content %}
-<h1 class="h1" id="title">
-    {% trans "Mijn acties" %}
-    {% button href="accounts:action_create" text=_("Nieuwe actie toevoegen") icon="date_range" primary=True %}
-</h1>
-{% button_row align="right" %}
-    {% button href="accounts:action_list_export" icon="input" icon_outlined=True transparent=True secondary=True %}
-{% endbutton_row %}
+    {% render_grid %}
+        {% render_column span=9 %}
+            <h1 class="h1" id="title">
+                {% trans "Mijn acties" %}
+                {% button href="accounts:action_create" text=_("Nieuwe actie toevoegen") icon="date_range" primary=True %}
+            </h1>
+            {% button_row align="right" %}
+                {% button href="accounts:action_list_export" icon="input" icon_outlined=True transparent=True secondary=True %}
+            {% endbutton_row %}
 
-{% actions actions=actions request=request action_form=action_form %}
+            {% actions actions=actions request=request action_form=action_form %}
 
-{% pagination page_obj=page_obj paginator=paginator request=request href="accounts:my_profile" text=_("Terug naar mijn profiel") %}
+            {% pagination page_obj=page_obj paginator=paginator request=request href="accounts:my_profile" text=_("Terug naar mijn profiel") %}
+        {% endrender_column %}
+    {% endrender_grid %}
 {% endblock content %}
