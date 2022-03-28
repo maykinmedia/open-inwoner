@@ -8,7 +8,7 @@ from filer.fields.image import FilerImageField
 from ordered_model.models import OrderedModel, OrderedModelManager
 from solo.models import SingletonModel
 
-from open_inwoner.pdc.urls import PRODUCT_PATH_NAME
+from open_inwoner.pdc.utils import PRODUCT_PATH_NAME
 
 from .choices import ColorTypeChoices
 
@@ -239,6 +239,14 @@ class SiteConfiguration(SingletonModel):
         default=False,
         help_text=_(
             "By default the cases are not shown. If the OpenZaak integration is configured this needs to be set to True."
+        ),
+    )
+    show_product_finder = models.BooleanField(
+        verbose_name=_("Laat productzoeker zien op de homepagina."),
+        blank=True,
+        default=False,
+        help_text=_(
+            "Als dit is aangevinkt en er zijn product condities gemaakt, dan wordt op de homepagina de productzoeker weergegeven."
         ),
     )
 

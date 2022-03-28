@@ -10,16 +10,21 @@
   }
 
   .actions__filter-button {
+    border-bottom: 1px solid var(--color-gray-light);
+    padding: 8px;
+
     @media (min-width: 768px) {
       display: none;
     }
   }
 
   .actions__filter-container {
-    display: none;
-    grid-template-columns: 1fr;
-    grid-gap: var(--spacing-medium);
     align-items: center;
+    border-bottom: 1px solid var(--color-gray-light);
+    display: none;
+    grid-gap: var(--spacing-medium);
+    grid-template-columns: 1fr;
+    margin-bottom: var(--spacing-medium);
     padding: 8px;
 
     @media (min-width: 768px) {
@@ -31,10 +36,6 @@
     .input {
       min-width: auto;
     }
-  }
-
-  .actions__filter-text {
-    margin: 0;
   }
 
   .actions__list {

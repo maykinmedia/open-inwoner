@@ -4,7 +4,11 @@
 {% block content %}
     {% render_grid %}
         {% render_column span=9 %}
-            <h1 class="h1">{{ form.instance.get_title }}</h1>
+            <h1 class="h1">{{ form.instance.get_title }}
+                {% if not form.instance.get_children %}
+                    {% button href="questionnaire:questionnaire_export" icon="input" icon_outlined=True transparent=True secondary=True %}
+                {% endif %}
+            </h1>
 
             {% if form.instance.get_description %}
                 <p class="p">{{ form.instance.get_description }}</p>
@@ -18,13 +22,20 @@
                 <p class="p p--compact">{{ form.instance.help_text }}</p>
             {% endif %}
 
+            {% firstof form.instance.get_parent.get_absolute_url as secondary_href %}
+            {% firstof request.path as form_action %}
+
             {% if form.instance.get_children %}
-                {% firstof form.instance.get_parent.get_absolute_url as secondary_href %}
+                {% trans 'Volgende' as submit_text %}
+            {% elif request.user.is_authenticated %}
+                {% trans 'Naar profiel' as submit_text %}
+                {% url 'questionnaire:reset' as form_action %}
             {% else %}
-                {% url 'questionnaire:reset' as secondary_href %}
+                {% trans 'Naar home' as submit_text %}
+                {% url 'questionnaire:reset' as form_action %}
             {% endif %}
 
-            {% render_form auto_render=form.instance.get_children extra_classes='form--compact' form=form method='POST' submit_text=_('Volgende') secondary_href=secondary_href secondary_icon='arrow_backward' secondary_icon_position='before' secondary_text=_('Vorige') %}
+            {% render_form form_action=form_action auto_render=True autosubmit=True extra_classes='form--compact' form=form method='POST' submit_text=submit_text secondary_href=secondary_href secondary_icon='arrow_backward' secondary_icon_position='before' secondary_text=_('Vorige') %}
                 {% csrf_token %}
 
                 {% if form.instance.content %}
@@ -39,14 +50,6 @@
                 {% if form.instance.related_products.exists %}
                     <hr class="divider">
                     {% card_container products=form.instance.related_products.all small=True %}
-                {% endif %}
-
-                {% if not form.instance.get_children %}
-                    {% if request.user.is_authenticated %}    
-                        {% form_actions primary=False secondary_href=secondary_href secondary_icon='arrow_backward' secondary_icon_position='before' secondary_text=_('Terug naar mijn profiel') %}
-                    {% else %}
-                        {% form_actions primary=False secondary_href=secondary_href secondary_icon='arrow_backward' secondary_icon_position='before' secondary_text=_('Terug naar homepage') %}
-                    {% endif %}
                 {% endif %}
             {% endrender_form %}
 

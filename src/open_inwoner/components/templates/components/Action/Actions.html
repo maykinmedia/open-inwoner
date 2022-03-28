@@ -7,7 +7,7 @@
             {% button text="Filter" type="button" bordered=True %}
         </div>
         <div class="actions__filter-container">
-            <p class="actions__filter-text">{% trans "Filter op:" %}</p>
+            <p class="p">{% trans "Filter op:" %}</p>
             {% date_field action_form.end_date no_label=True no_help=True icon="today" %}
             {% input action_form.is_for no_label=True no_help=True icon="person" %}
             {% input action_form.status no_label=True no_help=True icon="expand_more" %}

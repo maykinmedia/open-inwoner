@@ -1,0 +1,23 @@
+.product-finder {
+  margin-top: var(--spacing-giant);
+
+  &__form {
+    margin-top: var(--spacing-large);
+  }
+
+  .form {
+    padding-top: var(--spacing-medium);
+  }
+
+  .form__stack {
+    gap: var(--spacing-medium);
+  }
+
+  .form__actions {
+    margin-top: var(--spacing-medium);
+  }
+}
+
+.view--pdc-product_finder .product-finder {
+  margin-top: 0;
+}

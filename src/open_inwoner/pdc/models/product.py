@@ -7,6 +7,7 @@ from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from filer.fields.file import FilerFileField
+from ordered_model.models import OrderedModel
 
 from open_inwoner.utils.validators import validate_phone_number
 
@@ -278,7 +279,7 @@ class ProductLocation(GeoModel):
         return feature
 
 
-class ProductCondition(models.Model):
+class ProductCondition(OrderedModel):
     name = models.CharField(
         verbose_name=_("Name"),
         max_length=100,
@@ -306,6 +307,7 @@ class ProductCondition(models.Model):
     class Meta:
         verbose_name = _("Condition")
         verbose_name_plural = _("Conditions")
+        ordering = ("order",)
 
     def __str__(self):
         return self.name

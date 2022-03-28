@@ -41,7 +41,7 @@
         {% endif %}
         {% render_breadcrumbs "components/Header/Breadcrumbs.html" %}
 
-        {% notifications messages %}
+        {% block notifications %}{% notifications messages %}{% endblock %}
 
         {% block header_image %}{% endblock header_image %}
 
