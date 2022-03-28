@@ -6,7 +6,7 @@
         {% if not hide_text %}{{text}}{% endif %}
     </a>
 {% else %}
-    <button class="{{ classes }}" type="{{type}}">
+    <button class="{{ classes }}" type="{{type}}" name="{{ name }}">
         {% if icon %}{% icon icon=icon outlined=icon_outlined %}{% endif %}
         {% if not hide_text %}{{text}}{% endif %}
     </button>

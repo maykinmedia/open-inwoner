@@ -8,6 +8,7 @@ from ..models import (
     Organization,
     OrganizationType,
     Product,
+    ProductCondition,
     ProductContact,
     ProductLocation,
     Tag,
@@ -102,3 +103,14 @@ class ProductLocationFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = ProductLocation
+
+
+class ProductConditionFactory(factory.django.DjangoModelFactory):
+    name = factory.Faker("word")
+    question = factory.Faker("word")
+    positive_text = factory.Faker("word")
+    negative_text = factory.Faker("word")
+    rule = factory.Faker("word")
+
+    class Meta:
+        model = ProductCondition

@@ -1,0 +1,13 @@
+.product-filter {
+  list-style: none;
+  padding: 0;
+
+  &__item {
+    padding: var(--spacing-extra-large);
+    border-bottom: 1px solid vaR(--color-gray-light);
+
+    &:first-child {
+      border-top: 1px solid vaR(--color-gray-light);
+    }
+  }
+}

@@ -47,6 +47,7 @@ def render_form(parser, token):
         - secondary_text: string | The text for the secondary button when the form is auto rendered.
         - secondary_icon: string | The icon for the secondary button when the form is auto rendered.
         - secondary_icon_position: string | The icon position for the secondary button when the form is auto rendered.
+        - secondary: bool | If the secondary button should be styled like a secondary button or not.
 
     Extra context:
         - contents: string | The html content between all the open and closing tags.
@@ -71,7 +72,7 @@ def render_form(parser, token):
 
 
 @register.inclusion_tag("components/Form/Form.html", takes_context=True)
-def form(context, form_object, **kwargs):
+def form(context, form_object, secondary=True, **kwargs):
     """
     Renders a form including all fields.
 
@@ -94,16 +95,24 @@ def form(context, form_object, **kwargs):
         - show_notifications: bool | Whether to show messages from Django messages framework.
         - submit_text: string | The text on the submit button when the form is auto rendered.
         - secondary_href: string | The link for the secondary button when the form is auto rendered.
+        - secondary_name: string | The name of the button when it is submitted. Should not be used with secondary_href
         - secondary_text: string | The text for the secondary button when the form is auto rendered.
         - secondary_icon: string | The icon for the secondary button when the form is auto rendered.
         - secondary_icon_position: string | The icon position for the secondary button when the form is auto rendered.
+        - secondary: bool | If the secondary button should be styled like a secondary button or not.
 
     Extra context:
         - auto_render: True | Telling the template that the form should be rendered.
     """
     _context = context.flatten()
     kwargs["submit_text"] = kwargs.get("submit_text", _("Verzenden"))
-    return {**_context, **kwargs, "form": form_object, "auto_render": True}
+    return {
+        **_context,
+        **kwargs,
+        "form": form_object,
+        "secondary": secondary,
+        "auto_render": True,
+    }
 
 
 @register.simple_tag()
@@ -294,7 +303,7 @@ def hidden(field, **kwargs):
 
 
 @register.inclusion_tag("components/Form/FormActions.html")
-def form_actions(primary_text="", primary_icon=None, **kwargs):
+def form_actions(primary_text="", primary_icon=None, secondary=True, **kwargs):
     """
     Rendering the form actions. This may contain a primary and or secondary button.
 
@@ -306,7 +315,9 @@ def form_actions(primary_text="", primary_icon=None, **kwargs):
         - primary_text: string | The text for the primary button.
         - primary_icon: string | The icon for the primary button.
         - single: bool | if it should be single.
+        - secondary: bool | if the secondary button should be styled like a secondary button or not.
         - secondary_href: string | The action when the secondary button is pressed.
+        - secondary_name: string | The name of the button when it is submitted.
         - secondary_text: string | What the text for the secondary button should be.
         - secondary_icon: string | What the icon for the secondary button should be.
         - secondary_icon_position: string | What the icon position for the secondary button should be.
@@ -326,6 +337,7 @@ def form_actions(primary_text="", primary_icon=None, **kwargs):
         "primary_text": primary_text,
         "primary_icon": primary_icon,
         "primary": primary,
+        "secondary": secondary,
     }
 
 
@@ -342,6 +354,14 @@ def addclass(field, class_string):
         + class_string: string | The class that needs to be added.
     """
     return field.as_widget(attrs={"class": class_string})
+
+
+@register.simple_tag(takes_context=True)
+def initial_match(context):
+    initial = context.get("initial")
+    choice = context.get("choice")
+    name = context.get("name")
+    return initial.get(name) == choice[0]
 
 
 class FormNode(template.Node):
