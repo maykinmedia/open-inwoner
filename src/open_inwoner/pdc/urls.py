@@ -1,8 +1,12 @@
 from django.urls import include, path, re_path
 
-from .views import CategoryDetailView, CategoryListView, ProductDetailView
-
-PRODUCT_PATH_NAME = "products"
+from .utils import PRODUCT_PATH_NAME
+from .views import (
+    CategoryDetailView,
+    CategoryListView,
+    ProductDetailView,
+    ProductFinderView,
+)
 
 app_name = "pdc"
 urlpatterns = [
@@ -22,4 +26,5 @@ urlpatterns = [
         ProductDetailView.as_view(),
         name="product_detail",
     ),
+    path("finder/", ProductFinderView.as_view(), name="product_finder"),
 ]

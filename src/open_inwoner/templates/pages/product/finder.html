@@ -1,0 +1,36 @@
+{% extends 'master.html' %}
+{% load i18n l10n grid_tags link_tags form_tags button_tags product_tags utils %}
+
+{% block content %}
+    {% render_grid %}
+        {% product_finder condition=condition form=form show_previous=show_previous conditions_done=conditions_done %}
+
+        {% render_column start=7 span=6 compact=True %}
+            <h1 class="h1" id="title">
+                {% trans "Producten" %}
+            </h1>
+
+            <ul class="product-filter">
+                {% for product in matched_products %}
+                    <li class="product-filter__item">
+                        {% link href=product.get_absolute_url text=product.name primary=True icon="arrow_forward" %}
+                    </li>
+                {% endfor %}
+            </ul>
+
+            {% if possible_products %}
+                <h1 class="h1" id="title">
+                    {% trans "Mogelijke producten" %}
+                </h1>
+
+                <ul class="product-filter">
+                    {% for product in possible_products %}
+                        <li class="product-filter__item">
+                            {% link href=product.get_absolute_url text=product.name primary=True icon="arrow_forward" %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endrender_column %}
+    {% endrender_grid %}
+{% endblock content %}

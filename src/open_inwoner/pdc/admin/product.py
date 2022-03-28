@@ -4,6 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from import_export.admin import ImportExportMixin
 from import_export.formats import base_formats
+from ordered_model.admin import OrderedModelAdmin
 
 from open_inwoner.ckeditor5.widgets import CKEditorWidget
 
@@ -104,8 +105,14 @@ class ProductLocationAdmin(GeoAdminMixin, admin.ModelAdmin):
 
 
 @admin.register(ProductCondition)
-class ProductConditionAdmin(admin.ModelAdmin):
-    list_display = ("name", "question", "display_products")
+class ProductConditionAdmin(OrderedModelAdmin):
+    list_display = (
+        "name",
+        "question",
+        "display_products",
+        "order",
+        "move_up_down_links",
+    )
     list_filter = ("products__name",)
     search_fields = ("name",)
 
