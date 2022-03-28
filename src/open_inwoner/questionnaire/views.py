@@ -50,10 +50,10 @@ class QuestionnaireStepView(BaseBreadcrumbMixin, FormView):
         if self.request.user.is_authenticated:
             return [
                 (_("Mijn profiel"), reverse("accounts:my_profile")),
-                (_("Zelfdiagnose"), reverse("questionnaire:index")),
+                (_("Zelfdiagnose"), reverse("questionnaire:questionnaire_list")),
             ]
         return [
-            (_("Zelfdiagnose"), reverse("questionnaire:index")),
+            (_("Zelfdiagnose"), reverse("root")),
         ]
 
     def get_object(self) -> QuestionnaireStep:

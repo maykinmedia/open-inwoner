@@ -51,7 +51,6 @@ class MyProfileView(LoginRequiredMixin, BaseBreadcrumbMixin, FormView):
         context["action_text"] = _(
             f"{Action.objects.connected(self.request.user).filter(status=StatusChoices.open).count()} acties staan open."
         )
-        context["default_questionnaire"] = QuestionnaireStep.objects.default()
         if self.request.user.contacts.count() > 0:
             context[
                 "contact_text"
