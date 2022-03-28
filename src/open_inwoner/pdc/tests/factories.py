@@ -89,7 +89,7 @@ class ProductContactFactory(factory.django.DjangoModelFactory):
     first_name = factory.Faker("first_name")
     last_name = factory.Faker("last_name")
     email = factory.Faker("email")
-    phonenumber = factory.Faker("phone_number")
+    phonenumber = "0612345678"
 
     class Meta:
         model = ProductContact

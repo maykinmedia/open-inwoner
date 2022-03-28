@@ -7,6 +7,7 @@ from django.views.generic import DetailView, FormView, ListView, TemplateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin, ListBreadcrumbMixin
 
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.pdc.forms import ProductFinderForm
 from open_inwoner.pdc.models.product import ProductCondition
 from open_inwoner.plans.models import Plan
@@ -55,6 +56,8 @@ class HomeView(TemplateView):
     template_name = "pages/home.html"
 
     def get_context_data(self, **kwargs):
+        config = SiteConfiguration.get_solo()
+
         limit = 3 if self.request.user.is_authenticated else 4
         kwargs.update(categories=Category.get_root_nodes()[:limit])
         kwargs.update(product_locations=ProductLocation.objects.all()[:1000])
@@ -63,10 +66,11 @@ class HomeView(TemplateView):
             kwargs.update(plans=Plan.objects.connected(self.request.user)[:limit])
 
         # Product finder:
-        kwargs.update(
-            condition=ProductCondition.objects.first(),
-            condition_form=ProductFinderForm(),
-        )
+        if config.show_product_finder:
+            kwargs.update(
+                condition=ProductCondition.objects.first(),
+                condition_form=ProductFinderForm(),
+            )
         return super().get_context_data(**kwargs)
 
     def get_template_names(self):
@@ -255,8 +259,8 @@ class ProductFinderView(FormView):
         has_filters = False
         if current_answers:
             for _order, answer in current_answers.items():
-                has_filters = True
                 if answer.get("answer") == YesNo.yes:
+                    has_filters = True
                     new_filter = Q(conditions=answer.get("condition"))
                     if filters:
                         filters = filters | new_filter
