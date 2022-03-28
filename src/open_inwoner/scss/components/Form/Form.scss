@@ -15,7 +15,27 @@
       &--columns-#{$i} {
         grid-template-columns: repeat($i, 1fr);
       }
+
+      &--columns-#{$i} &__actions {
+        grid-column-start: 1;
+        grid-column-end: $i + 1;
+      }
+
+      &--columns-#{$i} .notifications {
+        grid-column-end: span $i;
+      }
     }
+  }
+
+  /// Errors.
+
+  > .notifications {
+    padding: 0;
+    position: static;
+  }
+
+  > .notifications .notification {
+    margin: 0;
   }
 
   /// Control.
@@ -27,9 +47,10 @@
     gap: var(--spacing-medium);
   }
 
-  // &__control > .label * {
-  //   margin-top: var(--spacing-medium);
-  // }
+  &__control > .label .p:last-child {
+    //color: var(--color-mute);
+    font-size: var(--font-size-body-small);
+  }
 
   &__control > .label *:not(.button) {
     width: 100%;
@@ -65,15 +86,6 @@
     grid-area: secondary;
   }
 
-  @media (min-width: 768px) {
-    @for $i from 1 through 12 {
-      &--columns-#{$i} &__actions {
-        grid-column-start: 1;
-        grid-column-end: $i + 1;
-      }
-    }
-  }
-
   &__actions > * {
     grid-area: secondary;
   }
@@ -81,6 +93,7 @@
   &__actions > *:last-child {
     grid-area: primary;
   }
+
   &--inline {
     grid-template-columns: 1fr auto;
     align-items: start;

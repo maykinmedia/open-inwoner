@@ -91,6 +91,7 @@ def form(context, form_object, **kwargs):
         - data_confirm_title: string | If a confirm dialog is shown this will be the title.
         - data_confirm_cancel: string | If a confirm dialog is shown this will be the text on the cancel button.
         - data_confirm_default: string | If a confirm dialog is shown this will be the text on the confirm button.
+        - show_notifications: bool | Whether to show messages from Django messages framework.
         - submit_text: string | The text on the submit button when the form is auto rendered.
         - secondary_href: string | The link for the secondary button when the form is auto rendered.
         - secondary_text: string | The text for the secondary button when the form is auto rendered.
@@ -153,7 +154,7 @@ def errors(errors, **kwargs):
     Variables:
         + errors: list | The non field errors or the field errors.
     """
-    return {**kwargs, "errors": errors}
+    return {**kwargs, "errors": errors, "messages": [{"level": "error", "message": error, "icon": False} for error in errors]}
 
 
 @register.inclusion_tag(WIDGET_TEMPLATES["CHECKBOX"])
