@@ -1,4 +1,4 @@
-{% spaceless %}{% load i18n static logo_tags %}
+{% spaceless %}{% load i18n static logo_tags solo_tags %}
     <!DOCTYPE html>
     <html lang="en" class="view view--full-width">
         <head>
@@ -14,7 +14,8 @@
 
         <body>
             <div class="export">
-                {% logo src=site_logo alt="" %}
+                {% get_solo "configurations.SiteConfiguration" as config %}
+                {% logo src=config.logo.file.url alt="" %}
 
                 {% block content %}Please provide the content{% endblock content %}
             </div>

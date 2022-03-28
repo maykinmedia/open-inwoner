@@ -4,7 +4,11 @@
 {% block content %}
     {% render_grid %}
         {% render_column span=9 %}
-            <h1 class="h1">{{ form.instance.get_title }}</h1>
+            <h1 class="h1">{{ form.instance.get_title }}
+                {% if not form.instance.get_children %}
+                    {% button href="questionnaire:questionnaire_export" icon="input" icon_outlined=True transparent=True secondary=True %}
+                {% endif %}
+            </h1>
 
             {% if form.instance.get_description %}
                 <p class="p">{{ form.instance.get_description }}</p>

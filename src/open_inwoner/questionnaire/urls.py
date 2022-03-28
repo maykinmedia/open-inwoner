@@ -1,6 +1,7 @@
 from django.urls import path
 
 from open_inwoner.questionnaire.views import (
+    QuestionnaireExportView,
     QuestionnaireResetView,
     QuestionnaireStepView,
 )
@@ -16,4 +17,5 @@ urlpatterns = [
         name="descendent_step",
     ),
     path("", QuestionnaireStepView.as_view(), name="index"),
+    path("export/", QuestionnaireExportView.as_view(), name="questionnaire_export"),
 ]

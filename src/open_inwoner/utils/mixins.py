@@ -5,6 +5,7 @@ from django.core.cache import caches
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import InvalidPage, Page, Paginator
 from django.http import Http404, HttpResponse
+from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from .export import render_pdf
@@ -178,6 +179,7 @@ class ExportMixin:
             request=self.request,
         )
         filename = self.get_filename()
+        context["file"] = file
 
         response = HttpResponse(file, content_type="application/pdf")
         response["Content-Disposition"] = f'attachment; filename="{filename}"'

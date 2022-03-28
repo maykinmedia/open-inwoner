@@ -185,14 +185,14 @@
   font-family: 'Open Dyslexic';
   font-weight: bold;
   src: local('TheSans C5'),
-    url('./fonts/opendyslexic/OpenDyslexic-Bold.otf') format('opentype');
+    url('/static/fonts/opendyslexic/OpenDyslexic-Bold.otf') format('opentype');
 }
 
 @font-face {
   font-family: 'Open Dyslexic';
   font-style: italic;
   src: local('TheSans C5'),
-    url('./fonts/opendyslexic/OpenDyslexic-Italic.otf') format('opentype');
+    url('/static/fonts/opendyslexic/OpenDyslexic-Italic.otf') format('opentype');
 }
 
 @font-face {
@@ -200,7 +200,8 @@
   font-weight: bold;
   font-style: italic;
   src: local('TheSans C5'),
-    url('./fonts/opendyslexic/OpenDyslexic-Bold-Italic.otf') format('opentype');
+    url('/static/fonts/opendyslexic/OpenDyslexic-Bold-Italic.otf')
+      format('opentype');
 }
 
 html {
