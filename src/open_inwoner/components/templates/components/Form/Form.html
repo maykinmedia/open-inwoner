@@ -1,4 +1,4 @@
-{% load form_tags link_tags %}
+{% load form_tags link_tags notification_tags %}
 {# Shared between Form and RenderForm. #}
 <form
     class="form{% if columns %} form--columns-{{ columns }}{% endif %}{% if spaceless %} form--spaceless{% endif %}{% if inline %} form--inline{% endif %}{% if autosubmit %} form--autosubmit{% endif %} {{ extra_classes }}"
@@ -12,6 +12,10 @@
 >
     {% if form.non_field_errors %}
         {% errors errors=form.non_field_errors %}
+    {% endif %}
+
+    {% if show_notifications %}
+        {% notifications messages icon=False %}
     {% endif %}
 
     {% if auto_render %}

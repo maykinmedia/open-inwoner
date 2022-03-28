@@ -79,13 +79,29 @@ class ThemesForm(forms.ModelForm):
 
 
 class ContactForm(forms.ModelForm):
+    def __init__(self, user, create, *args, **kwargs):
+        self.user = user
+        self.create = create
+        return super().__init__(*args, **kwargs)
+
     class Meta:
         model = Contact
         fields = ("first_name", "last_name", "email", "phonenumber")
 
-    def save(self, user, commit=True):
+    def clean(self):
+        cleaned_data = super().clean()
+        email = cleaned_data.get("email")
+
+        if self.create and self.user.contacts.filter(email=email).exists():
+            raise ValidationError(
+                _(
+                    "Het ingevoerde e-mailadres komt al voor in uw contactpersonen. Pas de gegevens aan en probeer het opnieuw."
+                )
+            )
+
+    def save(self, commit=True):
         if not self.instance.pk:
-            self.instance.created_by = user
+            self.instance.created_by = self.user
 
         if not self.instance.pk and self.instance.email:
             self.instance.contact_user, created = User.objects.get_or_create(
