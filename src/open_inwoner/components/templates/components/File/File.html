@@ -8,7 +8,13 @@
     {% endif %}
     <p class="p">
         {% firstof name %}
-        ({{extension}}, {{size|readable_size}})
+        {% if extension and size %}
+            ({{extension}}, {{size|readable_size}})
+        {% elif extension %}
+            ({{extension}})
+        {% elif size %}
+            ({{size|readable_size}})
+        {% endif %}
     </p>
     {% trans "Download" as download %}
     {% link href=url text=download secondary=True download=True icon="file_download" %}

@@ -1,8 +1,10 @@
 import pathlib
 
 from django import template
+from django.utils.translation import gettext_lazy as _
 
 from filer.models.filemodels import File
+from zgw_consumers.api_models.zaken import ZaakInformatieObject
 
 register = template.Library()
 
@@ -37,6 +39,28 @@ def file_list(files, **kwargs):
         - title: string | the title that should be used.
         - download_view: sting | the view name to download file (used for private files)
     """
+    return {**kwargs, "files": files}
+
+
+@register.inclusion_tag("components/File/FileList.html")
+def case_document_list(documents: list[ZaakInformatieObject], **kwargs) -> dict:
+    """
+    Shows multiple case documents in a file_list.
+
+    Usage:
+        {% case_document_list documents %}
+
+    Variables:
+        + documents: ZaakInformatieObject[] | List ZaakInformatieObject objects.
+    """
+
+    files = [
+        {
+            "download_url": document.url,
+            "file": document.titel or document.beschrijving or _("Geen titel"),
+        }
+        for document in documents
+    ]
     return {**kwargs, "files": files}
 
 

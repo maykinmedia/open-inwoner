@@ -1,7 +1,7 @@
 {% load link_tags %}
 
 {# Utilizes same template as Card. #}
-<div class="card{% if tinted %} card--tinted{% endif %}">
+<div class="card{% if inline %} card--inline{% endif %}{% if tinted %} card--tinted{% endif %}{% if type %} card--type-{{ type }}{% endif %}">
     {% if src %}
         <a class="card__header" href="{{ href }}">
             <img class="card__img" src="{{ src }}" alt="{{ alt }}"/>
