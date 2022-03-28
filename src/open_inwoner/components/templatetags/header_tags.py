@@ -36,6 +36,7 @@ def header(categories, request, **kwargs):
     Variables:
         + categories: Category[] | The categories that should be displayed in the theme dropdown.
         + request: Request | the django request object.
+        - has_general_faq_questions: boolean | If the FAQ menu item should be shown.
     """
     return {
         **kwargs,
@@ -56,6 +57,7 @@ def primary_navigation(categories, request, **kwargs):
         + categories: Category[] | The categories that should be displayed in the theme dropdown.
         + request: Request | The django request object.
         + questionnaire: QuestionnaireStep | The default QuestionnaireStep, if any.
+        - has_general_faq_questions: boolean | If the FAQ menu item should be shown.
     """
 
     return {

@@ -35,7 +35,7 @@
     </head>
 
     <body>
-        {% header categories=menu_categories request=request breadcrumbs=breadcrumbs search_form=search_form %}
+        {% header categories=menu_categories request=request breadcrumbs=breadcrumbs search_form=search_form has_general_faq_questions=has_general_faq_questions %}
         {% if anchors %}
         {% anchor_menu anchors=anchors desktop=False %}
         {% endif %}
