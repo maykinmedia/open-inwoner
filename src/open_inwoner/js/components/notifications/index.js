@@ -1,5 +1,5 @@
 /** @type {NodeListOf<Element>} */
-const NOTIFICATIONS = document.querySelectorAll('.notification');
+const NOTIFICATIONS = document.querySelectorAll('.notification')
 
 /**
  * Notification class.
@@ -12,9 +12,9 @@ class Notification {
    */
   constructor(node) {
     /** @type {HTMLElement} */
-    this.node = node;
+    this.node = node
 
-    this.bindEvents();
+    this.bindEvents()
   }
 
   /**
@@ -22,7 +22,7 @@ class Notification {
    * @return {(HTMLElement|null)}
    */
   getClose() {
-    return this.node.querySelector('.notification__close');
+    return this.node.querySelector('.notification__close')
   }
 
   /**
@@ -30,18 +30,18 @@ class Notification {
    */
   bindEvents() {
     this.getClose()?.addEventListener('click', (e) => {
-      e.preventDefault();
-      this.close();
-    });
+      e.preventDefault()
+      this.close()
+    })
   }
 
   /**
    * Closes the notification.
    */
   close() {
-    this.node.parentElement.removeChild(this.node);
+    this.node.parentElement.removeChild(this.node)
   }
 }
 
 // Start!
-[...NOTIFICATIONS].forEach((node) => new Notification(node));
+;[...NOTIFICATIONS].forEach((node) => new Notification(node))
