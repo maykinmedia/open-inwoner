@@ -1,5 +1,6 @@
 from typing import Any, Dict, Optional
 
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -7,6 +8,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView, RedirectView, TemplateView
 
+from open_inwoner.accounts.models import Document
 from open_inwoner.utils.mixins import ExportMixin
 
 from view_breadcrumbs import BaseBreadcrumbMixin
@@ -76,6 +78,27 @@ class QuestionnaireStepView(BaseBreadcrumbMixin, FormView):
 
 class QuestionnaireExportView(ExportMixin, TemplateView):
     template_name = "export/questionnaire/questionnaire_export.html"
+
+    def get_filename(self):
+        return f"questionnaire_{self.request.session.get('questionnaire.views.QuestionnaireStepView.object.slug')}.pdf"
+
+    def save_pdf_file(self, file, filename):
+        document = Document(
+            name=filename,
+            file=SimpleUploadedFile(
+                filename,
+                file,
+                content_type="application/pdf",
+            ),
+            owner=self.request.user,
+        )
+        document.save()
+
+    def render_to_response(self, context, **response_kwargs):
+        response = super().render_to_response(context, **response_kwargs)
+        if self.request.user.is_authenticated:
+            self.save_pdf_file(context["file"], self.get_filename())
+        return response
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)

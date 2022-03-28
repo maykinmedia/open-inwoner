@@ -3,13 +3,10 @@ from typing import Iterable, Tuple
 
 from django.core.cache import caches
 from django.core.exceptions import PermissionDenied
-from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.paginator import InvalidPage, Page, Paginator
 from django.http import Http404, HttpResponse
 from django.urls import reverse
 from django.utils.translation import gettext as _
-
-from open_inwoner.accounts.models import Document
 
 from .export import render_pdf
 
@@ -170,21 +167,7 @@ class UUIDAdminFirstInOrder:
 
 class ExportMixin:
     def get_filename(self):
-        if self.request.path == reverse("questionnaire:questionnaire_export"):
-            return f"questionnaire_{self.request.session.get('questionnaire.views.QuestionnaireStepView.object.slug')}.pdf"
         return f"{self.model.__name__.lower()}_{self.object.uuid}.pdf"
-
-    def save_pdf_file(self, file, filename):
-        document = Document(
-            name=filename,
-            file=SimpleUploadedFile(
-                filename,
-                file,
-                content_type="application/pdf",
-            ),
-            owner=self.request.user,
-        )
-        document.save()
 
     def render_to_response(self, context, **response_kwargs):
         context["request"] = self.request
@@ -196,12 +179,7 @@ class ExportMixin:
             request=self.request,
         )
         filename = self.get_filename()
-
-        if (
-            self.request.path == reverse("questionnaire:questionnaire_export")
-            and self.request.user.is_authenticated
-        ):
-            self.save_pdf_file(file, filename)
+        context["file"] = file
 
         response = HttpResponse(file, content_type="application/pdf")
         response["Content-Disposition"] = f'attachment; filename="{filename}"'
