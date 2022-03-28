@@ -21,7 +21,8 @@
   }
 
   &--success {
-    background-color: var(--color-green);
+    --notification-color-background: var(--color-success);
+    --notification-color-text: var(--color-success-darker);
   }
 
   &__icon {

@@ -2,6 +2,6 @@
 
 <div class="notifications">
     {% for message in messages %}
-        {% notification icon=message.icon type=message.level message=message.message closable=True %}
+        {% notification icon=message.icon type=message.level_tag message=message.message closable=True %}
     {% endfor %}
 </div>
