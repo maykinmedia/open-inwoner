@@ -7,11 +7,6 @@ from filer.fields.file import FilerFileField
 from treebeard.mp_tree import MP_Node
 
 
-class QuestionnaireStepManager(models.Manager):
-    def get_queryset(self) -> QuerySet:
-        return super().get_queryset().order_by("path")
-
-
 class QuestionnaireStep(MP_Node):
     """
     A step in a questionnaire, can optionally have a related QuestionnaireStep as `parent`, in which case
@@ -76,8 +71,7 @@ class QuestionnaireStep(MP_Node):
     class Meta:
         verbose_name = _("Questionnaire step")
         verbose_name_plural = _("Questionnaire steps")
-
-    objects = QuestionnaireStepManager()
+        ordering = ("path",)
 
     def __str__(self) -> str:
         return self.question

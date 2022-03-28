@@ -1,5 +1,6 @@
 from unittest.mock import patch
 
+from django.contrib.auth.models import AnonymousUser
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.http import Http404
 from django.test import RequestFactory, TestCase
@@ -258,16 +259,17 @@ class QuestionnaireStepListViewTestCase(TestCase):
         self.user = UserFactory()
         self.client.force_login(self.user)
 
-    def test_zelfdiagnose_via_profile_requires_login(self):
-        self.user = self.client.logout()
+    def test_render_root_nodes_when_user_is_logged_in(self):
+        questionnaire = QuestionnaireStepFactory(slug="foo")
         path = reverse("questionnaire:questionnaire_list")
         response = self.client.get(path)
-        self.assertRedirects(
-            response,
-            f"{reverse('login')}?next={reverse('questionnaire:questionnaire_list')}",
+        self.assertTrue(
+            response.context["root_nodes"].filter(slug=questionnaire.slug).exists()
         )
+        self.assertContains(response, questionnaire.slug)
 
-    def test_render_root_nodes_when_user_is_logged_in(self):
+    def test_render_root_nodes_when_user_is_anonymous(self):
+        self.user = AnonymousUser()
         questionnaire = QuestionnaireStepFactory(slug="foo")
         path = reverse("questionnaire:questionnaire_list")
         response = self.client.get(path)

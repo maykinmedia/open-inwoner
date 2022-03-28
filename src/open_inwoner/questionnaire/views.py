@@ -1,6 +1,5 @@
 from typing import Any, Dict, Optional
 
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
@@ -53,7 +52,7 @@ class QuestionnaireStepView(BaseBreadcrumbMixin, FormView):
                 (_("Zelfdiagnose"), reverse("questionnaire:questionnaire_list")),
             ]
         return [
-            (_("Zelfdiagnose"), reverse("root")),
+            (_("Zelfdiagnose"), reverse("questionnaire:questionnaire_list")),
         ]
 
     def get_object(self) -> QuestionnaireStep:
@@ -127,15 +126,19 @@ class QuestionnaireExportView(ExportMixin, TemplateView):
         return context
 
 
-class QuestionnaireRootListView(LoginRequiredMixin, BaseBreadcrumbMixin, ListView):
+class QuestionnaireRootListView(BaseBreadcrumbMixin, ListView):
     template_name = "pages/profile/questionnaire.html"
     model = QuestionnaireStep
     context_object_name = "root_nodes"
 
     @cached_property
     def crumbs(self):
+        if self.request.user.is_authenticated:
+            return [
+                (_("Mijn profiel"), reverse("accounts:my_profile")),
+                (_("Zelfdiagnose"), reverse("questionnaire:questionnaire_list")),
+            ]
         return [
-            (_("Mijn profiel"), reverse("accounts:my_profile")),
             (_("Zelfdiagnose"), reverse("questionnaire:questionnaire_list")),
         ]
 
