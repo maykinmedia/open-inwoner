@@ -108,10 +108,7 @@ class TestProductImportResource(TestCase):
         with self.assertRaises(ValidationError) as e:
             self.resource.import_data(dataset, raise_errors=True)
 
-        self.assertEqual(
-            e.exception.message,
-            "The field categories is required",
-        )
+        self.assertEqual(e.exception.message, "Het veld categories is verplicht")
 
     def test_import_raises_validation_error_when_category_does_not_exist(self):
         dataset = tablib.Dataset(

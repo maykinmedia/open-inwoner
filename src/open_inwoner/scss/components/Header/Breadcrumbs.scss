@@ -3,6 +3,13 @@
   overflow-x: auto;
   $hm: max(calc((100vw - var(--container-width)) / 2), var(--spacing-large));
   padding: 0 $hm;
+  display: block;
+  position: relative;
+  z-index: 1001;
+
+  @media (min-width: 768px) {
+    z-index: 1002;
+  }
 
   &__list {
     display: flex;

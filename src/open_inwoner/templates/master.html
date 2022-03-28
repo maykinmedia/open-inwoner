@@ -1,4 +1,4 @@
-{% load static i18n header_tags card_tags footer_tags button_tags notification_tags utils %}<!DOCTYPE html>
+{% load static i18n header_tags card_tags footer_tags button_tags notification_tags anchor_menu_tags view_breadcrumbs utils %}<!DOCTYPE html>
 <html lang="en" class="view {% block view_class %}view--{{ request.resolver_match.namespaces|join:'-' }}-{{ request.resolver_match.url_name }}{% endblock %}">
     <head>
         <meta charset="utf-8">
@@ -35,7 +35,11 @@
     </head>
 
     <body>
-      {% header categories=menu_categories request=request breadcrumbs=breadcrumbs search_form=search_form %}
+        {% header categories=menu_categories request=request breadcrumbs=breadcrumbs search_form=search_form %}
+        {% if anchors %}
+        {% anchor_menu anchors=anchors desktop=False %}
+        {% endif %}
+        {% render_breadcrumbs "components/Header/Breadcrumbs.html" %}
 
         {% notifications messages %}
 

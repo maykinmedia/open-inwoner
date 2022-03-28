@@ -12,6 +12,7 @@ from django.views.generic import DetailView, FormView, UpdateView
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.accounts.choices import StatusChoices
+from open_inwoner.questionnaire.models import QuestionnaireStep
 from open_inwoner.utils.mixins import ExportMixin
 
 from ..forms import ThemesForm, UserForm
@@ -34,6 +35,11 @@ class MyProfileView(LoginRequiredMixin, BaseBreadcrumbMixin, FormView):
 
         context = super().get_context_data(**kwargs)
         today = date.today()
+        context["anchors"] = [
+            ("#title", _("Persoonlijke gegevens")),
+            ("#overview", _("Persoonlijk overzicht")),
+            ("#files", _("Bestanden")),
+        ]
         context["next_action"] = (
             Action.objects.connected(self.request.user)
             .filter(end_date__gte=today, status=StatusChoices.open)
@@ -45,6 +51,7 @@ class MyProfileView(LoginRequiredMixin, BaseBreadcrumbMixin, FormView):
         context["action_text"] = _(
             f"{Action.objects.connected(self.request.user).filter(status=StatusChoices.open).count()} acties staan open."
         )
+        context["default_questionnaire"] = QuestionnaireStep.objects.default()
         if self.request.user.contacts.count() > 0:
             context[
                 "contact_text"

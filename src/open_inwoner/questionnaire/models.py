@@ -91,6 +91,10 @@ class QuestionnaireStep(MP_Node):
         blank=True,
     )
 
+    class Meta:
+        verbose_name = _("Questionnaire step")
+        verbose_name_plural = _("Questionnaire steps")
+
     objects = QuestionnaireStepManager()
 
     def __str__(self) -> str:
