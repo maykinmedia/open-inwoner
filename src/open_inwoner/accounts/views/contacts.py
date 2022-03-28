@@ -109,7 +109,15 @@ class ContactCreateView(LoginRequiredMixin, BaseBreadcrumbMixin, CreateView):
             invite.send(self.request)
 
         # FIXME type off message
-        messages.add_message(self.request, messages.SUCCESS, _('{contact} is toegevoegd aan uw contactpersonen.'.format(contact=self.object)))
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            _(
+                "{contact} is toegevoegd aan uw contactpersonen.".format(
+                    contact=self.object
+                )
+            ),
+        )
 
         return HttpResponseRedirect(self.get_success_url())
 

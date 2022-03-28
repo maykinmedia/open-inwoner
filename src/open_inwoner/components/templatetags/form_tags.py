@@ -154,7 +154,13 @@ def errors(errors, **kwargs):
     Variables:
         + errors: list | The non field errors or the field errors.
     """
-    return {**kwargs, "errors": errors, "messages": [{"level": "error", "message": error, "icon": False} for error in errors]}
+    return {
+        **kwargs,
+        "errors": errors,
+        "messages": [
+            {"level": "error", "message": error, "icon": False} for error in errors
+        ],
+    }
 
 
 @register.inclusion_tag(WIDGET_TEMPLATES["CHECKBOX"])

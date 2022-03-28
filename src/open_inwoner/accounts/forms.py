@@ -90,10 +90,14 @@ class ContactForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        email = cleaned_data.get('email')
+        email = cleaned_data.get("email")
 
         if self.create and self.user.contacts.filter(email=email).exists():
-            raise ValidationError(_('Het ingevoerde e-mailadres komt al voor in uw contactpersonen. Pas de gegevens aan en probeer het opnieuw.'))
+            raise ValidationError(
+                _(
+                    "Het ingevoerde e-mailadres komt al voor in uw contactpersonen. Pas de gegevens aan en probeer het opnieuw."
+                )
+            )
 
     def save(self, commit=True):
         if not self.instance.pk:

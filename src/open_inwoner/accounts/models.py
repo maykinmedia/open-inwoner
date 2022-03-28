@@ -256,7 +256,7 @@ class Contact(models.Model):
         return self.get_name()
 
     def get_update_url(self):
-        return reverse('accounts:contact_edit', kwargs={"uuid": self.uuid})
+        return reverse("accounts:contact_edit", kwargs={"uuid": self.uuid})
 
     def get_name(self):
         return f"{self.first_name} {self.last_name}"
