@@ -1,11 +1,53 @@
-{% load i18n logo_tags header_tags view_breadcrumbs form_tags link_tags solo_tags %}
+{% load i18n logo_tags header_tags form_tags link_tags solo_tags icon_tags %}
 
 {% get_solo "configurations.SiteConfiguration" as config %}
 
-{% accessibility_header request=request%}
+{% accessibility_header request=request %}
 <header class="header">
     <div class="header__container">
         {% logo src=config.logo.file.url alt="" %}
+
+        <div class="header__menu">
+            <div class="header__menu-icon">
+                {% icon icon="menu" %}
+            </div>
+            <div class="header__submenu">
+                <nav class="header__actions">
+                    <div class="header__text-actions">
+                        <p class="p">
+                            {% trans "Welkom" %}
+                            {% if request.user %}{{ request.user.get_full_name }}{% endif %}
+                        </p>
+
+                        {% if request.user.is_authenticated %}
+                            <ul class="header__list">
+                                <li class="header__list-item">
+                                    {% url 'logout' as logout_url %}
+                                    {% trans "Logout" as logout %}
+                                    {% link text=logout href=logout_url primary=True %}
+                                </li>
+                            </ul>
+                        {% else %}
+                            <ul class="header__list">
+                                <li class="header__list-item">
+                                    {% url 'login' as login_url %}
+                                    {% trans "Login" as login %}
+                                    {% link text=login href=login_url primary=True %}
+                                </li>
+                            </ul>
+                        {% endif %}
+                    </div>
+
+                    {% url 'search:search' as search_url %}
+                    {% render_form form=search_form method="GET" form_action=search_url inline=True spaceless=True %}
+                        {% input search_form.query no_label=True %}
+                        {% form_actions primary_icon="search" %}
+                    {% endrender_form %}
+                </nav>
+
+                {% primary_navigation categories=categories request=request %}
+            </div>
+        </div>
 
         <nav class="header__actions">
             <div class="header__text-actions">
@@ -42,5 +84,4 @@
 
         {% primary_navigation categories=categories request=request %}
     </div>
-    {% render_breadcrumbs "components/Header/Breadcrumbs.html" %}
 </header>

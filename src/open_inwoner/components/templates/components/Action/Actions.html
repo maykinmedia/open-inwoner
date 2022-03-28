@@ -1,61 +1,72 @@
-{% load i18n form_tags icon_tags button_tags dropdown_tags action_tags %}
+{% load i18n form_tags icon_tags button_tags dropdown_tags action_tags link_tags %}
 
 {% render_form form=form method="GET" spaceless=True autosubmit=True form_action=form_action %}
-<table class="table table--spacious">
-    <tr>
-        <td class="table__item">Filter op:</td>
-        <td class="table__item">{% date_field action_form.end_date no_label=True no_help=True icon="today" %}</td>
-        <td class="table__item">{% input action_form.is_for no_label=True no_help=True icon="person" %}</td>
-        <td class="table__item">{% input action_form.status no_label=True no_help=True icon="expand_more" %}</td>
-    </tr>
-    {% for action in actions %}
-        <tr>
-            <td class="table__item table__item--borderless" colspan="2">
-                <div class="table__explain">Actie</div>
-                {{ action.name }}&nbsp;
-            </td>
-            <td class="table__item table__item--borderless">
-                <div class="table__explain">Door</div>
-                {{ action.is_for.get_full_name }}&nbsp;
-            </td>
-            <td class="table__item table__item--borderless">
-                <div class="table__explain">
-                    Status
-                    <div class="table__explain-icons">
-                        {% button icon="input" href="accounts:action_export" uuid=action.uuid icon_outlined=True transparent=True %}
-                        {% if action|is_connected:request.user %}
-                            {% dropdown icon="settings" %}
+<div class="actions">
+    <div class="actions__filters">
+        <div class="actions__filter-button">
+            {% button text="Filter" type="button" bordered=True %}
+        </div>
+        <div class="actions__filter-container">
+            <p class="actions__filter-text">{% trans "Filter op:" %}</p>
+            {% date_field action_form.end_date no_label=True no_help=True icon="today" %}
+            {% input action_form.is_for no_label=True no_help=True icon="person" %}
+            {% input action_form.status no_label=True no_help=True icon="expand_more" %}
+        </div>
+    </div>
+    <div class="actions__list">
+        {% for action in actions %}
+            <div class="actions__action">
+                <div class="actions__actions">
+                    {% button icon="input" href="accounts:action_export" uuid=action.uuid icon_outlined=True transparent=True %}
+                    {% if action|is_connected:request.user %}
+                        {% dropdown icon="settings" %}
                             <div class="dropdown__item">
                                 {% get_action_edit_url action=action plan=plan as action_url %}
                                 {% button icon="edit" text=_("Bewerken") href=action_url icon_outlined=True transparent=True %}
                             </div>
-                            {% enddropdown %}
-                        {% endif %}
-                    </div>
+                        {% enddropdown %}
+                    {% endif %}
                 </div>
-                {{ action.get_status_display }}&nbsp;
-            </td>
-        </tr>
-        <tr>
-            <td class="table__item">
-                <div class="table__explain">Type</div>
-                {{ action.get_type_display }}&nbsp;
-            </td>
-            <td class="table__item">
-                <div class="table__explain">Planning</div>
-                {{ action.end_date }}&nbsp;
-            </td>
-            <td class="table__item">
-                <div class="table__explain">Document</div>
-                {{ action.file.name }}&nbsp;
-            </td>
-            <td class="table__item">
-                <div class="table__explain">Toegevoegd op</div>
-                {{ action.created_on }}&nbsp;
-            </td>
-        </tr>
-    {% empty %}
-        <tr><td class="table__item" colspan="4"><p class="p">{% trans "er zijn geen acties gevonden met de huidige filter of er zijn geen acties" %}</p></td></tr>
-    {% endfor %}
-</table>
+                <div class="actions__label actions__label--big">
+                    <div class="table__explain">{% trans "Actie" %}</div>
+                    {{ action.name }}
+                </div>
+                <div class="actions__label">
+                    <div class="table__explain">{% trans "Onderdeel van" %}</div>
+                    {% if action.plan %}
+                        {% link href=action.plan.get_absolute_url text=action.plan.title %}
+                    {% endif %}
+                </div>
+                <div class="actions__label">
+                    <div class="table__explain">{% trans "Door" %}</div>
+                    {{ action.is_for.get_full_name }}
+                </div>
+                <div class="actions__label">
+                    <div class="table__explain">
+                        {% trans "Status" %}
+                    </div>
+                    {{ action.get_status_display }}
+                </div>
+                <div class="actions__label">
+                    <div class="table__explain">{% trans "Type" %}</div>
+                    {{ action.get_type_display }}
+                </div>
+                <div class="actions__label">
+                    <div class="table__explain">{% trans "Planning" %}</div>
+                    {{ action.end_date }}
+                </div>
+                <div class="actions__label">
+                    <div class="table__explain">{% trans "Document" %}</div>
+                    {{ action.file.name }}
+                </div>
+                <div class="actions__label">
+                    <div class="table__explain">{% trans "Toegevoegd op" %}</div>
+                    {{ action.created_on }}
+                </div>
+            </div>
+        {% empty %}
+            <div class="table__item" colspan="4"><p class="p">{% trans "er zijn geen acties gevonden met de huidige filter of er zijn geen acties" %}</p></div>
+        {% endfor %}
+    </div>
+</div>
 {% endrender_form %}

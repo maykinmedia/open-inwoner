@@ -42,7 +42,11 @@
                 {% endif %}
 
                 {% if not form.instance.get_children %}
-                    {% form_actions primary=False secondary_href=secondary_href secondary_icon='arrow_backward' secondary_icon_position='before' secondary_text=_('Terug naar mijn profiel') %}
+                    {% if request.user.is_authenticated %}    
+                        {% form_actions primary=False secondary_href=secondary_href secondary_icon='arrow_backward' secondary_icon_position='before' secondary_text=_('Terug naar mijn profiel') %}
+                    {% else %}
+                        {% form_actions primary=False secondary_href=secondary_href secondary_icon='arrow_backward' secondary_icon_position='before' secondary_text=_('Terug naar homepage') %}
+                    {% endif %}
                 {% endif %}
             {% endrender_form %}
 

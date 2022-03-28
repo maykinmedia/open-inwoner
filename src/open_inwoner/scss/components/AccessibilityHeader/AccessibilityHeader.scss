@@ -1,8 +1,13 @@
 .accessibility-header {
+  display: none;
   $hm: max(calc((100vw - var(--container-width)) / 2), var(--spacing-large));
   background-color: var(--color-accent);
   box-sizing: border-box;
   padding: 0 $hm;
+
+  @media (min-width: 768px) {
+    display: block;
+  }
 
   &__modal {
     &--highlight {

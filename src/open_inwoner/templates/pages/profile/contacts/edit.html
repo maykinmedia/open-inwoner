@@ -11,5 +11,5 @@
     {% endif %}
 </h1>
 
-{% form form_object=form method="POST" submit_text=_("Opslaan") secondary_href='accounts:contact_list' secondary_text=_('Terug') secondary_icon='arrow_backward' secondary_icon_position="before" %}
+{% form id="contact-form" form_object=form method="POST" submit_text=_("Opslaan") secondary_href='accounts:contact_list' secondary_text=_('Terug') secondary_icon='arrow_backward' secondary_icon_position="before" %}
 {% endblock content %}
