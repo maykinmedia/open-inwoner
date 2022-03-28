@@ -1,0 +1,39 @@
+.status-list {
+  &__list {
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+  }
+
+  &__list:before {
+    content: '';
+    background-color: var(--color-success-lighter);
+    display: block;
+    height: calc(100% - 1.5em);
+    left: 0.75em;
+    position: absolute;
+    top: 0.75em;
+    width: 2px;
+    z-index: -1;
+  }
+
+  &__list-item {
+    display: flex;
+    gap: var(--spacing-large);
+  }
+
+  [class*='icon'] {
+    color: var(--color-success);
+  }
+}
+
+///
+/// Contextual
+///
+
+.h2 + .status-list {
+  margin-top: var(--spacing-large);
+}

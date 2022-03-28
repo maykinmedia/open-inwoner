@@ -1,0 +1,13 @@
+{% load icon_tags %}
+
+<aside class="status-list">
+    <ul class="status-list__list">
+        {% for object in object_list %}
+        <li class="status-list__list-item">
+            {% icon object.icon %}
+            <p class="p p--compact">{{ object.date|date }}</p>
+            <p class="p p--compact">{{ object.label }}</p>
+        </li>
+        {% endfor %}
+    </ul>
+</aside>

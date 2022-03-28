@@ -1,0 +1,32 @@
+.dashboard {
+  &__list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-medium);
+    justify-content: space-between;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    @media (min-width: 768px) {
+      display: flex;
+    }
+  }
+
+  &__list-item {
+    white-space: nowrap;
+    text-align: center;
+
+    @media (min-width: 768px) {
+      text-align: start;
+    }
+  }
+
+  .h4 {
+    margin-top: var(--spacing-large);
+  }
+}
+
+.h1 + .dashboard {
+  margin-top: var(--row-height);
+}
