@@ -363,5 +363,9 @@ class SiteConfigurationPage(OrderedModel):
 
     objects = OrderedModelManager()
 
+    class Meta:
+        verbose_name = _("Flatpage in the footer")
+        verbose_name_plural = _("Flatpages in the footer")
+
     def __str__(self):
         return self.flatpage.title
