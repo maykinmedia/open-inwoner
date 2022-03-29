@@ -254,37 +254,35 @@ class QuestionnaireStepViewTestCase(TestCase):
         self.assertEqual(response.url, descendent.get_absolute_url())
 
 
-class QuestionnaireStepListViewTestCase(TestCase):
+class QuestionnaireStepListViewTestCase(WebTest):
     def setUp(self):
         self.user = UserFactory()
-        self.client.force_login(self.user)
 
     def test_render_root_nodes_when_user_is_logged_in(self):
         questionnaire = QuestionnaireStepFactory(slug="foo")
         path = reverse("questionnaire:questionnaire_list")
-        response = self.client.get(path)
+        response = self.app.get(path, user=self.user)
         self.assertTrue(
             response.context["root_nodes"].filter(slug=questionnaire.slug).exists()
         )
         self.assertContains(response, questionnaire.slug)
 
     def test_render_root_nodes_when_user_is_anonymous(self):
-        self.user = AnonymousUser()
         questionnaire = QuestionnaireStepFactory(slug="foo")
         path = reverse("questionnaire:questionnaire_list")
-        response = self.client.get(path)
+        response = self.app.get(path)
         self.assertTrue(
             response.context["root_nodes"].filter(slug=questionnaire.slug).exists()
         )
         self.assertContains(response, questionnaire.slug)
 
-    def test_zelfdiagnose_is_shown_when_there_are_questionnaires(self):
+    def test_zelfdiagnose_button_is_shown_when_there_are_questionnaires(self):
         QuestionnaireStepFactory()
         path = reverse("accounts:my_profile")
-        response = self.client.get(path)
+        response = self.app.get(path, user=self.user)
         self.assertContains(response, "Start zelfdiagnose")
 
-    def test_zelfdiagnose_is_not_shown_when_there_are_no_questionnaires(self):
+    def test_zelfdiagnose_button_is_not_shown_when_there_are_no_questionnaires(self):
         path = reverse("accounts:my_profile")
-        response = self.client.get(path)
+        response = self.app.get(path, user=self.user)
         self.assertNotContains(response, "Start zelfdiagnose")
