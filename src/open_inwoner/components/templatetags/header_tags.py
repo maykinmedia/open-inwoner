@@ -64,5 +64,4 @@ def primary_navigation(categories, request, **kwargs):
         **kwargs,
         "categories": categories,
         "request": request,
-        "questionnaire": QuestionnaireStep.objects.default(),
     }

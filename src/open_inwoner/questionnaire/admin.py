@@ -1,4 +1,3 @@
-from django import forms
 from django.contrib import admin
 from django.utils.translation import gettext as _
 
@@ -25,10 +24,7 @@ class QuestionnaireStepAdminForm(movenodeform_factory(QuestionnaireStep)):
 class QuestionnaireStepAdmin(TreeAdmin):
     form = QuestionnaireStepAdminForm
     inlines = (QuestionnaireStepFileInline,)
-    list_display = (
-        "display_question_answer",
-        "is_default",
-    )
+    list_display = ("display_question_answer",)
     prepopulated_fields = {"slug": ("question",)}
     fieldsets = (
         (
@@ -48,7 +44,6 @@ class QuestionnaireStepAdmin(TreeAdmin):
             {
                 "classes": ("collapse",),
                 "fields": (
-                    "is_default",
                     "_position",
                     "_ref_node_id",
                     "title",
