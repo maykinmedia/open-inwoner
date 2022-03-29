@@ -35,9 +35,9 @@ class MessageFile {
     preview.classList.add('message-file__preview')
     this.node.appendChild(preview)
 
-    const fileName = document.createElement('span')
-    fileName.textContent = filename
-    preview.appendChild(fileName)
+    const fileNameElement = document.createElement('span')
+    fileNameElement.textContent = filename
+    preview.appendChild(fileNameElement)
 
     const deleteIcon = document.createElement('span')
     deleteIcon.classList.add('message-file__delete')
