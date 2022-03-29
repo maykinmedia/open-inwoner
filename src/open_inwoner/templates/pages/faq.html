@@ -1,0 +1,10 @@
+{% extends 'master.html' %}
+{% load i18n faq_tags %}
+
+{% block content %}
+    <h1 class="h1">
+        {% trans "Veelgestelde vragen" %}
+    </h1>
+
+    {% faq questions=faqs title=None %}
+{% endblock %}

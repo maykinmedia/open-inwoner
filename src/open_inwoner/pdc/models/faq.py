@@ -6,7 +6,11 @@ from ordered_model.models import OrderedModel
 
 class Question(OrderedModel):
     category = models.ForeignKey(
-        "pdc.Category", verbose_name=_("Category"), on_delete=models.CASCADE
+        "pdc.Category",
+        verbose_name=_("Category"),
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
     )
     question = models.CharField(verbose_name=_("Vraag"), max_length=250)
     answer = models.TextField(verbose_name=_("Antwoord"))

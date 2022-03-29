@@ -16,7 +16,7 @@ from open_inwoner.utils.views import CustomDetailBreadcrumbMixin
 
 from .choices import YesNo
 from .forms import ProductFinderForm
-from .models import Category, Product, ProductLocation
+from .models import Category, Product, ProductLocation, Question
 
 
 class CategoryBreadcrumbMixin:
@@ -78,6 +78,14 @@ class HomeView(TemplateView):
             return ["pages/user-home.html"]
         else:
             return [self.template_name]
+
+
+class FAQView(TemplateView):
+    template_name = "pages/faq.html"
+
+    def get_context_data(self, **kwargs):
+        kwargs.update(faqs=Question.objects.filter(category__isnull=True))
+        return super().get_context_data(**kwargs)
 
 
 class CategoryListView(ListBreadcrumbMixin, ListView):
