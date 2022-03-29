@@ -5,9 +5,12 @@
     {% render_grid %}
         {% render_column span=9 %}
             <h1 class="h1">{{ form.instance.get_title }}
-                {% if not form.instance.get_children %}
-                    {% button href="questionnaire:questionnaire_export" icon="input" icon_outlined=True transparent=True secondary=True %}
-                {% endif %}
+                <div class="questionnaire__export">
+                    {% if not form.instance.get_children %}
+                        {% button href="questionnaire:questionnaire_export" text=_("Export pdf") primary=True icon="input" icon_position="after" %}
+                        <p class="p">{% trans "Your results are also saved to your profile if you are logged in." %}</p>
+                    {% endif %}
+                </div>
             </h1>
 
             {% if form.instance.get_description %}
