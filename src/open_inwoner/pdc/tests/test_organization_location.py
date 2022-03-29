@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
@@ -9,7 +11,10 @@ from .factories import OrganizationFactory
 
 
 class TestLocationFormInput(WebTest):
-    def test_exception_is_handled_when_city_and_postcode_are_not_provided(self):
+    @patch("open_inwoner.pdc.models.mixins.geocode_address", side_effect=IndexError)
+    def test_exception_is_handled_when_city_and_postcode_are_not_provided(
+        self, mock_geocoding
+    ):
         organization = OrganizationFactory()
         user = UserFactory(is_superuser=True, is_staff=True)
 
@@ -28,3 +33,4 @@ class TestLocationFormInput(WebTest):
                 [_("No location data was provided")],
             ],
         )
+        mock_geocoding.assert_called_once_with(" ,  ")
