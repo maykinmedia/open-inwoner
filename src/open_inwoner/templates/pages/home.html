@@ -27,7 +27,12 @@
         {% card_container categories=categories %}
     {% endif %}
 
-    {% questionnaire root_nodes=questionnaire_roots %}
+    {% if questionnaire_roots.exists %}
+        <h1 class="h1">{% trans "Waar bent u naar op zoek?" %}</h1>
+        <p class="p">{% trans "Wij helpen u graag op weg." %}</p>
+        
+        {% questionnaire root_nodes=questionnaire_roots %}
+    {% endif %}
 
     {% if condition %}
         {% render_grid %}
