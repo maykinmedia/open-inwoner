@@ -170,6 +170,36 @@ class DocumentForm(forms.ModelForm):
         return super().save(commit=commit)
 
 
+class MessageFileInputWidget(forms.ClearableFileInput):
+    template_name = "utils/widgets/message_file_input.html"
+
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+
+        context["widget"].update(
+            {
+                "init_name": name + "-init",
+                "init_id": name + "-init-id",
+            }
+        )
+        return context
+
+    def value_from_datadict(self, data, files, name):
+        upload = super().value_from_datadict(data, files, name)
+
+        if upload:
+            return upload
+
+        # check if there is initial file
+        init_value = forms.TextInput().value_from_datadict(data, files, name + "-init")
+        if init_value:
+            document = Document.objects.filter(uuid=init_value).first()
+            if document:
+                return document.file
+
+        return False
+
+
 class InboxForm(forms.ModelForm):
     receiver = forms.ModelChoiceField(
         label=_("Contactpersoon"),
@@ -182,7 +212,7 @@ class InboxForm(forms.ModelForm):
         required=False,
         widget=forms.Textarea(attrs={"placeholder": _("Schrijf een bericht...")}),
     )
-    file = forms.FileField(required=False, label="")
+    file = forms.FileField(required=False, label="", widget=MessageFileInputWidget())
 
     class Meta:
         model = Message
