@@ -1399,11 +1399,11 @@ msgstr "Pagina"
 
 #: configurations/models.py:367
 msgid "Flatpage in the footer"
-msgstr ""
+msgstr "Platte pagina in footer"
 
 #: configurations/models.py:368
 msgid "Flatpages in the footer"
-msgstr ""
+msgstr "Platte pagina's in footer"
 
 #: haalcentraal/models.py:20
 msgid "Haal Centraal API"
