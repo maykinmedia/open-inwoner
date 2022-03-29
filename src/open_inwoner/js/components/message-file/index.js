@@ -1,30 +1,42 @@
 class MessageFile {
   constructor(node) {
+    // nodes
     this.node = node
     this.fileInput = node.querySelector('input[type=file]')
+
+    // init value
+    this.init = this.fileInput.dataset.init
+    if (this.init) {
+      this.addPreview(this.init)
+    }
+
+    // listeners
     this.fileInput.addEventListener('change', this.changeFile.bind(this))
   }
 
   changeFile(event) {
     const files = event.target.files
     if (files.length) {
+      this.removePreview()
+      this.clearInitInput()
+
       const file = files[0]
-      this.addPreview(file)
+      this.addPreview(file.name)
     }
   }
 
   removeFile(event) {
-    console.log(event.target)
-    event.target.parentNode.remove()
+    this.removePreview()
+    this.clearInitInput()
   }
 
-  addPreview(file) {
+  addPreview(filename) {
     const preview = document.createElement('div')
     preview.classList.add('message-file__preview')
     this.node.appendChild(preview)
 
     const fileName = document.createElement('span')
-    fileName.textContent = file.name
+    fileName.textContent = filename
     preview.appendChild(fileName)
 
     const deleteIcon = document.createElement('span')
@@ -34,6 +46,21 @@ class MessageFile {
     preview.appendChild(deleteIcon)
 
     deleteIcon.addEventListener('click', this.removeFile.bind(this))
+  }
+
+  removePreview() {
+    const preview = this.node.querySelector('.message-file__preview')
+    if (preview) {
+      preview.remove()
+    }
+  }
+
+  clearInitInput() {
+    const initInput = this.node.querySelector('.message-file__init')
+    if (initInput) {
+      initInput.value = ''
+      initInput.defaultValue = ''
+    }
   }
 }
 
