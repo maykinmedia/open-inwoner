@@ -59,12 +59,12 @@ class NotifyComandTests(TestCase):
         user = UserFactory.create()
 
         MessageFactory.create(
-            receiver=user, seen=True, created_on=timezone.now() - timedelta(minutes=16)
+            receiver=user, seen=False, created_on=timezone.now() - timedelta(minutes=16)
         )
 
         call_command("notify_about_messages")
 
-        self.assertEqual(len(mail.outbox), 0)
+        self.assertEqual(len(mail.outbox), 1)
 
     def test_notify_several_users(self):
         user1, user2, sender = sorted(
