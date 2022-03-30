@@ -8,7 +8,7 @@ from django.urls import include, path
 
 from open_inwoner.accounts.forms import CustomRegistrationForm
 from open_inwoner.accounts.views import CustomRegistrationView, PasswordResetView
-from open_inwoner.pdc.views import HomeView
+from open_inwoner.pdc.views import FAQView, HomeView
 
 handler500 = "open_inwoner.utils.views.server_error"
 admin.site.site_header = "Open Inwoner beheeromgeving"
@@ -59,6 +59,7 @@ urlpatterns = [
         "questionnaire/",
         include("open_inwoner.questionnaire.urls", namespace="questionnaire"),
     ),
+    path("faq/", FAQView.as_view(), name="general_faq"),
     path("", include("open_inwoner.pdc.urls", namespace="pdc")),
     path("", include("open_inwoner.search.urls", namespace="search")),
     path("", HomeView.as_view(), name="root"),

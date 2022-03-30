@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-25 19:49+0100\n"
+"POT-Creation-Date: 2022-03-29 23:45+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,8 +30,8 @@ msgid "Important dates"
 msgstr "Belangrijke datums"
 
 #: accounts/choices.py:7
-msgid "Email en Wachtwoord"
-msgstr "Email en Wachtwoord"
+msgid "E-mail en Wachtwoord"
+msgstr "E-mail en Wachtwoord"
 
 #: accounts/choices.py:8
 msgid "DigiD"
@@ -41,7 +41,7 @@ msgstr "DigiD"
 msgid "eHerkenning"
 msgstr "eHerkenning"
 
-#: accounts/choices.py:13 accounts/forms.py:159
+#: accounts/choices.py:13 accounts/forms.py:175
 msgid "Contactpersoon"
 msgstr "Contactpersoon"
 
@@ -53,7 +53,7 @@ msgstr "Begeleider"
 msgid "Organisatie"
 msgstr "Organisatie"
 
-#: accounts/choices.py:20 accounts/models.py:397 accounts/views/cases.py:63
+#: accounts/choices.py:20 accounts/models.py:400 accounts/views/cases.py:63
 #: components/templates/components/Action/Actions.html:46
 #: templates/export/include/actions.html:7
 #: templates/export/profile/action_export.html:20
@@ -79,37 +79,43 @@ msgid "Terugkerend"
 msgstr "Terugkerend"
 
 #: accounts/forms.py:14 accounts/models.py:30 accounts/models.py:174
-#: pdc/models/product.py:177
+#: pdc/models/product.py:178
 msgid "First name"
 msgstr "Voornaam"
 
 #: accounts/forms.py:15 accounts/models.py:33 accounts/models.py:179
-#: pdc/models/product.py:182
+#: pdc/models/product.py:183
 msgid "Last name"
 msgstr "Achternaam"
 
-#: accounts/forms.py:116
+#: accounts/forms.py:98
+msgid ""
+"Het ingevoerde e-mailadres komt al voor in uw contactpersonen. Pas de "
+"gegevens aan en probeer het opnieuw."
+msgstr ""
+
+#: accounts/forms.py:132
 msgid "Myself"
 msgstr "Mezelf"
 
-#: accounts/forms.py:129
+#: accounts/forms.py:145
 msgid "The action can not end after the plan end date"
 msgstr "De actie kan niet later eindigen dan de einddatum van het plan"
 
-#: accounts/forms.py:167
+#: accounts/forms.py:183
 msgid "Schrijf een bericht..."
 msgstr "Schrijf een bericht..."
 
-#: accounts/forms.py:195
+#: accounts/forms.py:211
 msgid "Either message content or file should be filled in"
 msgstr "Of een bericht of een bestand dient te zijn ingevuld"
 
-#: accounts/forms.py:219
+#: accounts/forms.py:235
 msgid "Deadline"
 msgstr "Einddatum"
 
 #: accounts/models.py:35 accounts/models.py:184 pdc/models/organization.py:37
-#: pdc/models/product.py:187
+#: pdc/models/product.py:188
 msgid "Email address"
 msgstr "E-mailadres"
 
@@ -200,8 +206,8 @@ msgstr "Gebruikers"
 msgid "U heeft geen intressegebieden aangegeven."
 msgstr "U heeft geen intressegebieden aangegeven."
 
-#: accounts/models.py:168 accounts/models.py:277 accounts/models.py:329
-#: accounts/models.py:372 accounts/models.py:483 plans/models.py:95
+#: accounts/models.py:168 accounts/models.py:280 accounts/models.py:332
+#: accounts/models.py:375 accounts/models.py:486 plans/models.py:95
 msgid "UUID"
 msgstr "UUID"
 
@@ -222,7 +228,7 @@ msgid "The email address of the contact person. This field can be left empty."
 msgstr "E-mailadres van de contactpersoon. Dit veld mag leeggelaten worden."
 
 #: accounts/models.py:192 pdc/models/organization.py:42
-#: pdc/models/product.py:192
+#: pdc/models/product.py:193
 msgid "Phonenumber"
 msgstr "Telefoonnummer"
 
@@ -231,7 +237,7 @@ msgid "The phonenumber of the contact person. This field can be left empty."
 msgstr ""
 "De telefoonnummer van de contactpersoon. Dit veld mag leeggelaten worden."
 
-#: accounts/models.py:202 accounts/models.py:404
+#: accounts/models.py:202 accounts/models.py:407
 #: components/templates/components/Action/Actions.html:51
 #: pdc/models/organization.py:31 pdc/models/tag.py:29 plans/models.py:80
 #: templates/export/include/actions.html:8
@@ -243,9 +249,9 @@ msgstr "Type"
 msgid "The type of contact"
 msgstr "Type contactpersoon"
 
-#: accounts/models.py:209 accounts/models.py:293 accounts/models.py:345
-#: accounts/models.py:435 accounts/models.py:503 accounts/models.py:571
-#: pdc/models/product.py:69 search/models.py:57
+#: accounts/models.py:209 accounts/models.py:296 accounts/models.py:348
+#: accounts/models.py:438 accounts/models.py:506 accounts/models.py:574
+#: pdc/models/product.py:70 search/models.py:57
 #: templates/export/plans/plan_export.html:30
 #: templates/export/profile/action_export.html:44
 msgid "Created on"
@@ -257,8 +263,8 @@ msgid ""
 msgstr ""
 "Datum dat de contactpersoon is aangemaakt. Dit veld wordt automatisch gevuld."
 
-#: accounts/models.py:216 accounts/models.py:298 accounts/models.py:350
-#: accounts/models.py:440 pdc/models/product.py:76
+#: accounts/models.py:216 accounts/models.py:301 accounts/models.py:353
+#: accounts/models.py:443 pdc/models/product.py:77
 #: templates/export/plans/plan_export.html:34
 #: templates/export/profile/action_export.html:48
 msgid "Updated on"
@@ -272,7 +278,7 @@ msgstr ""
 "Datum wanneer de contactpersoon voor het laatst is aangepast. Dit veld wordt "
 "automatisch gevuld."
 
-#: accounts/models.py:224 accounts/models.py:356 accounts/models.py:446
+#: accounts/models.py:224 accounts/models.py:359 accounts/models.py:449
 #: components/templates/components/Card/DescriptionCard.html:10
 #: plans/models.py:116 templates/export/plans/plan_export.html:26
 #: templates/export/profile/action_export.html:32
@@ -292,7 +298,7 @@ msgstr "Contact gebruiker"
 msgid "The user from the contact, who was added based on the contact email."
 msgstr ""
 "De gebruikersaccount van dit contactpersoon, dit wordt bepaald op basis van "
-"het emailadres."
+"het e-mailadres."
 
 #: accounts/models.py:241
 msgid "Function"
@@ -302,8 +308,8 @@ msgstr "Functie"
 msgid "The function of the contact within an organization."
 msgstr "De functie van de contactpersoon binnen een organisatie"
 
-#: accounts/models.py:252 accounts/models.py:561 pdc/admin/organization.py:20
-#: pdc/views.py:143 templates/pages/product/detail.html:112
+#: accounts/models.py:252 accounts/models.py:564 pdc/admin/organization.py:20
+#: pdc/views.py:166 templates/pages/product/detail.html:112
 msgid "Contact"
 msgstr "Contact"
 
@@ -312,16 +318,16 @@ msgstr "Contact"
 msgid "Contacts"
 msgstr "Contacten"
 
-#: accounts/models.py:280
+#: accounts/models.py:283
 msgid "Used as a reference in the documents api."
 msgstr "Wordt gebruikt als referentie in de documenten API."
 
-#: accounts/models.py:283 accounts/models.py:335 accounts/models.py:378
+#: accounts/models.py:286 accounts/models.py:338 accounts/models.py:381
 #: configurations/models.py:18 pdc/models/category.py:11
 #: pdc/models/neighbourhood.py:7 pdc/models/organization.py:13
-#: pdc/models/organization.py:68 pdc/models/product.py:18
-#: pdc/models/product.py:240 pdc/models/product.py:254
-#: pdc/models/product.py:283 pdc/models/tag.py:9 pdc/models/tag.py:45
+#: pdc/models/organization.py:68 pdc/models/product.py:19
+#: pdc/models/product.py:241 pdc/models/product.py:255
+#: pdc/models/product.py:284 pdc/models/tag.py:9 pdc/models/tag.py:45
 #: plans/models.py:17 plans/models.py:55
 #: templates/export/include/actions.html:6
 #: templates/export/include/contacts.html:6
@@ -329,260 +335,260 @@ msgstr "Wordt gebruikt als referentie in de documenten API."
 msgid "Name"
 msgstr "Naam"
 
-#: accounts/models.py:286
+#: accounts/models.py:289
 msgid "The name of the document"
 msgstr "De naam van het document"
 
-#: accounts/models.py:289 accounts/models.py:417 accounts/models.py:525
-#: pdc/models/product.py:151 plans/models.py:24
+#: accounts/models.py:292 accounts/models.py:420 accounts/models.py:528
+#: pdc/models/product.py:152 plans/models.py:24
 #: templates/export/include/actions.html:11
 #: templates/export/profile/action_export.html:36
 msgid "File"
 msgstr "Bestand"
 
-#: accounts/models.py:295
+#: accounts/models.py:298
 msgid "This is the date the document was created"
 msgstr "Datum dat het bestand is aangemaakt"
 
-#: accounts/models.py:300
+#: accounts/models.py:303
 msgid "This is the date when the document was last changed"
 msgstr "Datum dat het bestand is aangepast"
 
-#: accounts/models.py:304
+#: accounts/models.py:307
 msgid "Owner"
 msgstr "Eigenaar"
 
-#: accounts/models.py:307
+#: accounts/models.py:310
 msgid "This is the user that created the document."
 msgstr "Door deze gebruiker is het document aangemaakt"
 
-#: accounts/models.py:311 accounts/models.py:453 plans/models.py:124
+#: accounts/models.py:314 accounts/models.py:456 plans/models.py:124
 #: templates/export/plans/plan_export.html:6
 msgid "Plan"
 msgstr "Plan"
 
-#: accounts/models.py:316
+#: accounts/models.py:319
 msgid "The plan that the document belongs to. This can be left empty."
 msgstr "Het plan waar het document bij hoort. Dit veld mag leeggelaten worden."
 
-#: accounts/models.py:320
+#: accounts/models.py:323
 #: components/templates/components/Action/Actions.html:59
 msgid "Document"
 msgstr "Document"
 
-#: accounts/models.py:321
+#: accounts/models.py:324
 msgid "Documents"
 msgstr "Documenten"
 
-#: accounts/models.py:332
+#: accounts/models.py:335
 msgid "Used as a reference in the appointments api."
 msgstr "Wordt gebruikt als referentie in de afspraken API."
 
-#: accounts/models.py:338
+#: accounts/models.py:341
 msgid "The name of the appointment."
 msgstr "Naam van de afspraak"
 
-#: accounts/models.py:341
+#: accounts/models.py:344
 msgid "Appointment time"
-msgstr "Afspraak tijd"
+msgstr "Afspraaktijd"
 
-#: accounts/models.py:342
+#: accounts/models.py:345
 msgid "This is the time that the appointment is at."
 msgstr "Tijdstip van de afspraak"
 
-#: accounts/models.py:347
+#: accounts/models.py:350
 msgid "This is the date the appointment was created"
 msgstr "Datum van de afspraak"
 
-#: accounts/models.py:352
+#: accounts/models.py:355
 msgid "This is the date when the appointment was last changed"
 msgstr "Datum wanner deze afspraak voor het laatst is gewijzigd"
 
-#: accounts/models.py:359
+#: accounts/models.py:362
 msgid "The person that created the appointment."
 msgstr "De persoon die de afspraak heeft aangemaakt."
 
-#: accounts/models.py:363
+#: accounts/models.py:366
 msgid "Appointment"
 msgstr "Afspraak"
 
-#: accounts/models.py:364
+#: accounts/models.py:367
 msgid "Appointments"
 msgstr "Afspraken"
 
-#: accounts/models.py:375
+#: accounts/models.py:378
 msgid "Used as a reference in the actions api."
 msgstr "Wordt gebruikt als referentie in de acties API"
 
-#: accounts/models.py:381
+#: accounts/models.py:384
 msgid "The name of the action"
 msgstr "De naam van de actie"
 
-#: accounts/models.py:384 pdc/models/category.py:20
+#: accounts/models.py:387 pdc/models/category.py:20
 #: templates/export/profile/action_export.html:16
 msgid "Description"
 msgstr "Omschrijving"
 
-#: accounts/models.py:387
+#: accounts/models.py:390
 msgid "The description of the action"
 msgstr "Omschrijving van de actie"
 
-#: accounts/models.py:390 plans/models.py:100
+#: accounts/models.py:393 plans/models.py:100
 #: templates/export/plans/plan_export.html:14
 #: templates/export/profile/action_export.html:40
 msgid "Goal"
 msgstr "Doel"
 
-#: accounts/models.py:394
+#: accounts/models.py:397
 msgid "The goal of the action"
 msgstr "Het doel van de actie"
 
-#: accounts/models.py:401
+#: accounts/models.py:404
 msgid "The current status of the action"
 msgstr "Huidige status van de actie"
 
-#: accounts/models.py:408
+#: accounts/models.py:411
 msgid "The type of action that it is"
 msgstr "Type actie"
 
-#: accounts/models.py:411
+#: accounts/models.py:414
 msgid "Action end date"
 msgstr "Einddatum actie"
 
-#: accounts/models.py:412
+#: accounts/models.py:415
 msgid "This is the date that the action should be done."
 msgstr "De actie dient voor deze datum te zijn uitgevoerd"
 
-#: accounts/models.py:422
+#: accounts/models.py:425
 msgid "The document that is uploaded to the file"
 msgstr "Het document waarbij het bestand is geupload"
 
-#: accounts/models.py:429 templates/export/include/actions.html:9
+#: accounts/models.py:432 templates/export/include/actions.html:9
 #: templates/export/profile/action_export.html:28
 msgid "Is for"
 msgstr "Is voor"
 
-#: accounts/models.py:432
+#: accounts/models.py:435
 msgid "The person that needs to do this action."
 msgstr "Wie deze actie dient uit te voeren"
 
-#: accounts/models.py:437
+#: accounts/models.py:440
 msgid "This is the date the action was created"
 msgstr "Aanmaakdatum van de actie"
 
-#: accounts/models.py:442
+#: accounts/models.py:445
 msgid "This is the date when the action was last changed"
 msgstr "Wijzigingsdatum van de actie"
 
-#: accounts/models.py:449
+#: accounts/models.py:452
 msgid "The person that created the action."
 msgstr "Door deze gebruiker is de actie aangemaakt"
 
-#: accounts/models.py:458
+#: accounts/models.py:461
 msgid "The plan that the action belongs to. This can be left empty."
 msgstr "Het plan waar de actie bij hoort. Dit veld mag leeggelaten worden."
 
-#: accounts/models.py:465 templates/export/profile/action_export.html:6
+#: accounts/models.py:468 templates/export/profile/action_export.html:6
 msgid "Action"
 msgstr "Actie"
 
-#: accounts/models.py:466
+#: accounts/models.py:469
 msgid "Actions"
 msgstr "Acties"
 
-#: accounts/models.py:486
+#: accounts/models.py:489
 msgid "Unique identifier"
 msgstr "Unieke identificatie"
 
-#: accounts/models.py:490
+#: accounts/models.py:493
 msgid "Sender"
 msgstr "Afzender"
 
-#: accounts/models.py:493
+#: accounts/models.py:496
 msgid "The sender of the message"
 msgstr "De afzender van het bericht"
 
-#: accounts/models.py:497
+#: accounts/models.py:500
 msgid "Receiver"
 msgstr "Ontvanger"
 
-#: accounts/models.py:500
+#: accounts/models.py:503
 msgid "The receiver of the message"
 msgstr "De ontvanger van het bericht"
 
-#: accounts/models.py:505 accounts/models.py:573
+#: accounts/models.py:508 accounts/models.py:576
 msgid "This is the date the message was created"
 msgstr "Datum dat het bericht is aangemaakt"
 
-#: accounts/models.py:508 pdc/models/product.py:39
+#: accounts/models.py:511 pdc/models/product.py:40
 msgid "Content"
 msgstr "Content"
 
-#: accounts/models.py:510
+#: accounts/models.py:513
 msgid "Text content of the message"
 msgstr "Tekstuele inhoud van het bericht"
 
-#: accounts/models.py:513
+#: accounts/models.py:516
 msgid "Seen"
 msgstr "Gezien"
 
-#: accounts/models.py:515
+#: accounts/models.py:518
 msgid "Boolean shows if the message was seen by the receiver"
 msgstr "Geeft aan of de ontvanger het bericht heeft gezien"
 
-#: accounts/models.py:518
+#: accounts/models.py:521
 msgid "Sent"
 msgstr "Verzonden"
 
-#: accounts/models.py:521
+#: accounts/models.py:524
 msgid "Boolean shows if the email was sent to the receiver about this message"
 msgstr "Geeft aan of de ontvanger het bericht heeft gezien"
 
-#: accounts/models.py:530
+#: accounts/models.py:533
 msgid "The file that is attached to the message"
 msgstr "Bestand wat aan het bericht is toegevoegd"
 
-#: accounts/models.py:537
+#: accounts/models.py:540
 msgid "Message"
 msgstr "Bericht"
 
-#: accounts/models.py:538
+#: accounts/models.py:541
 msgid "Messages"
 msgstr "Berichten"
 
-#: accounts/models.py:547
+#: accounts/models.py:550
 msgid "Inviter"
 msgstr "Uitnodiger"
 
-#: accounts/models.py:550
+#: accounts/models.py:553
 msgid "User who created the invite"
 msgstr "Gebruiker die de uitnodiging heeft aangemaakt"
 
-#: accounts/models.py:554
+#: accounts/models.py:557
 msgid "Invitee"
 msgstr "Uitgenodigde"
 
-#: accounts/models.py:557
+#: accounts/models.py:560
 msgid "User who received the invite"
 msgstr "Ontvanger van de uitnodiging"
 
-#: accounts/models.py:566
+#: accounts/models.py:569
 msgid "The contact the creation of which triggered sending the invite"
 msgstr "Contact waardoor de uitnodiging is aangemaakt"
 
-#: accounts/models.py:568
+#: accounts/models.py:571
 msgid "Accepted"
 msgstr "Geaccepteerd"
 
-#: accounts/models.py:569
+#: accounts/models.py:572
 msgid "Key"
 msgstr "Sleutel"
 
-#: accounts/models.py:577
+#: accounts/models.py:580
 msgid "Invitation"
 msgstr "Uitnodiging"
 
-#: accounts/models.py:578
+#: accounts/models.py:581
 msgid "Invitations"
 msgstr "Uitnodigingen"
 
@@ -618,7 +624,7 @@ msgstr "Aanvaard"
 
 #: accounts/templates/accounts/invite_accept.html:13
 #: templates/pages/profile/categories.html:12
-#: templates/pages/profile/contacts/edit.html:14
+#: templates/pages/profile/contacts/edit.html:19
 #: templates/pages/profile/documents/edit.html:10
 #: templates/pages/profile/edit.html:9
 msgid "Terug"
@@ -645,11 +651,11 @@ msgstr "Welkom"
 #: accounts/templates/registration/login.html:20
 #: accounts/templates/registration/login.html:21
 msgid "Inloggen met DigiD"
-msgstr "Inloggen met DigiD"
+msgstr "Log in met DigiD"
 
 #: accounts/templates/registration/login.html:26
 msgid "Inloggen"
-msgstr "Inloggen"
+msgstr "Log in"
 
 #: accounts/templates/registration/login.html:26
 msgid "Registreer"
@@ -667,27 +673,28 @@ msgstr ""
 "Voer een juiste E-mailadres en wachtwoord in. Let op dat beide velden "
 "hoofdlettergevoelig zijn."
 
-#: accounts/tests/test_profile_views.py:28 accounts/views/profile.py:58
+#: accounts/tests/test_profile_views.py:28 accounts/views/profile.py:59
 msgid "U heeft nog geen contacten."
 msgstr "U heeft nog geen contacten."
 
 #: accounts/views/actions.py:48 accounts/views/actions.py:83
-#: accounts/views/actions.py:114 accounts/views/contacts.py:23
-#: accounts/views/contacts.py:43 accounts/views/contacts.py:69
-#: accounts/views/profile.py:27 accounts/views/profile.py:79
-#: accounts/views/profile.py:96
+#: accounts/views/actions.py:114 accounts/views/contacts.py:24
+#: accounts/views/contacts.py:44 accounts/views/contacts.py:76
+#: accounts/views/profile.py:28 accounts/views/profile.py:81
+#: accounts/views/profile.py:98
 #: components/templates/components/Header/PrimaryNavigation.html:27
+#: questionnaire/views.py:51 questionnaire/views.py:138
 msgid "Mijn profiel"
 msgstr "Mijn profiel"
 
 #: accounts/views/actions.py:49 accounts/views/actions.py:84
 #: accounts/views/actions.py:115
 #: templates/export/profile/action_list_export.html:6
-#: templates/pages/profile/actions/list.html:7
+#: templates/pages/profile/actions/list.html:9
 msgid "Mijn acties"
 msgstr "Mijn acties"
 
-#: accounts/views/actions.py:86 accounts/views/contacts.py:46
+#: accounts/views/actions.py:86 accounts/views/contacts.py:47
 #: plans/views.py:248
 msgid "Bewerk {}"
 msgstr "Bewerk {}"
@@ -714,51 +721,56 @@ msgstr "Lopende aanvragen"
 msgid "Afgeronde aanvragen"
 msgstr "Afgeronde aanvragen"
 
-#: accounts/views/contacts.py:24 accounts/views/contacts.py:44
-#: accounts/views/contacts.py:70 templates/pages/profile/contacts/list.html:7
+#: accounts/views/contacts.py:25 accounts/views/contacts.py:45
+#: accounts/views/contacts.py:77 templates/pages/profile/contacts/list.html:7
 msgid "Mijn contacten"
 msgstr "Mijn contacten"
 
-#: accounts/views/contacts.py:72
+#: accounts/views/contacts.py:79
 msgid "Maak contact aan"
 msgstr "Maak contact aan"
+
+#: accounts/views/contacts.py:116
+#, python-brace-format
+msgid "{contact} is toegevoegd aan uw contactpersonen."
+msgstr ""
 
 #: accounts/views/invite.py:29
 msgid "The invitation was expired"
 msgstr "De uitnodiging is verlopen"
 
-#: accounts/views/profile.py:38 templates/pages/profile/me.html:10
+#: accounts/views/profile.py:39 templates/pages/profile/me.html:10
 msgid "Persoonlijke gegevens"
 msgstr "Persoonlijke gegevens"
 
-#: accounts/views/profile.py:39
+#: accounts/views/profile.py:40
 msgid "Persoonlijk overzicht"
 msgstr "Persoonlijk overzicht"
 
-#: accounts/views/profile.py:40 pdc/views.py:137 plans/views.py:70
-#: questionnaire/templates/questionnaire/questionnaire-step.html:36
+#: accounts/views/profile.py:41 pdc/views.py:160 plans/views.py:70
 #: templates/export/plans/plan_export.html:40
 #: templates/export/profile/profile_export.html:48
 #: templates/pages/plans/detail.html:69 templates/pages/product/detail.html:26
-#: templates/pages/profile/me.html:81
+#: templates/pages/profile/me.html:83
+#: templates/pages/questionnaire/questionnaire-step.html:47
 msgid "Bestanden"
 msgstr "Bestanden"
 
-#: accounts/views/profile.py:51
+#: accounts/views/profile.py:52
 msgid ""
 "{Action.objects.connected(self.request.user).filter(status=StatusChoices."
 "open).count()} acties staan open."
 msgstr ""
 
-#: accounts/views/profile.py:66
+#: accounts/views/profile.py:68
 msgid "Uw account kon niet worden gedeactiveerd"
 msgstr "Uw account kon niet worden gedeactiveerd."
 
-#: accounts/views/profile.py:80
+#: accounts/views/profile.py:82
 msgid "Bewerk profiel"
 msgstr "Bewerk profiel"
 
-#: accounts/views/profile.py:97
+#: accounts/views/profile.py:99
 msgid "Mijn thema's"
 msgstr "Mijn thema's"
 
@@ -828,15 +840,15 @@ msgstr "Download"
 msgid "Weet je het zeker dat je dit bestand wilt verwijderen?"
 msgstr "Weet je het zeker dat je dit bestand wilt verwijderen?"
 
-#: components/templates/components/File/File.html:19
+#: components/templates/components/File/File.html:19 pdc/choices.py:8
 #: templates/pages/profile/contacts/list.html:39
-#: templates/pages/profile/me.html:76
+#: templates/pages/profile/me.html:78
 msgid "Nee"
 msgstr "Nee"
 
-#: components/templates/components/File/File.html:19
+#: components/templates/components/File/File.html:19 pdc/choices.py:7
 #: templates/pages/profile/contacts/list.html:39
-#: templates/pages/profile/me.html:76
+#: templates/pages/profile/me.html:78
 msgid "Ja"
 msgstr "Ja"
 
@@ -861,7 +873,7 @@ msgstr "Datum"
 msgid "Bekijk op Google Maps"
 msgstr "Bekijk op Google Maps"
 
-#: components/templates/components/Footer/Social.html:4 pdc/views.py:146
+#: components/templates/components/Footer/Social.html:4 pdc/views.py:169
 #: templates/pages/product/detail.html:100
 msgid "Delen"
 msgstr "Delen"
@@ -900,7 +912,7 @@ msgstr "Print pagina"
 
 #: components/templates/components/Header/AccessibilityHeader.html:32
 msgid "Uitleg pagina"
-msgstr "Uitleg pagina"
+msgstr "Uitleg over de huidige pagina"
 
 #: components/templates/components/Header/AccessibilityHeader.html:32
 #: templates/pages/plans/create.html:43
@@ -922,8 +934,8 @@ msgid "Home"
 msgstr "Home"
 
 #: components/templates/components/Header/PrimaryNavigation.html:11
-#: configurations/models.py:96 configurations/models.py:107 pdc/views.py:87
-#: pdc/views.py:125
+#: configurations/models.py:96 configurations/models.py:107 pdc/views.py:110
+#: pdc/views.py:148
 msgid "Thema's"
 msgstr "Thema's"
 
@@ -933,30 +945,38 @@ msgstr "Thema's"
 msgid "Samenwerken"
 msgstr "Samenwerken"
 
-#: components/templates/components/Header/PrimaryNavigation.html:50
-#: templates/pages/profile/me.html:60
-msgid "Zelfdiagnose"
-msgstr "Zelfdiagnose"
+#: components/templates/components/Header/PrimaryNavigation.html:51
+msgid "FAQ"
+msgstr ""
 
 #: components/templates/components/Messages/Message.html:4
 msgid "Bericht van:"
 msgstr "Bericht van:"
 
 #: components/templates/components/Messages/Messages.html:47
-#: components/templatetags/form_tags.py:104
+#: components/templatetags/form_tags.py:108
 #: templates/pages/plans/create.html:55 templates/pages/plans/edit.html:17
 msgid "Verzenden"
 msgstr "Verzenden"
 
-#: components/templates/components/Questionnaire/Questionnaire.html:4
-msgid "Waar bent u naar op zoek?"
-msgstr "Waar bent u naar op zoek?"
+#: components/templates/components/Product/finder.html:4
+msgid "Productzoeker"
+msgstr "Productzoeker"
 
-#: components/templates/components/Questionnaire/Questionnaire.html:5
-msgid "Wij helpen u graag op weg."
-msgstr "Wij helpen u graag op weg"
+#: components/templates/components/Product/finder.html:15
+#: templates/pages/questionnaire/questionnaire-step.html:38
+msgid "Vorige"
+msgstr "Vorige"
 
-#: components/templatetags/faq_tags.py:24
+#: components/templates/components/Product/finder.html:21
+msgid "Er zijn geen extra vragen meer. Bekijk de producten hiernaast."
+msgstr ""
+
+#: components/templates/components/Product/finder.html:26
+msgid "Begin opnieuw"
+msgstr ""
+
+#: components/templatetags/faq_tags.py:24 templates/pages/faq.html:6
 msgid "Veelgestelde vragen"
 msgstr "Veelgestelde vragen"
 
@@ -968,31 +988,36 @@ msgstr "Vandaag"
 msgid "Gisteren"
 msgstr "Gisteren"
 
-#: configurations/admin.py:36
+#: components/templatetags/product_tags.py:23
+#: templates/pages/questionnaire/questionnaire-step.html:29
+msgid "Volgende"
+msgstr "Volgende"
+
+#: configurations/admin.py:46
 msgid "Color"
 msgstr "Kleur"
 
-#: configurations/admin.py:49
+#: configurations/admin.py:59
 msgid "Images"
 msgstr "Afbeeldingen"
 
-#: configurations/admin.py:58
+#: configurations/admin.py:68
 msgid "Page texts"
 msgstr "Paginateksten"
 
-#: configurations/admin.py:75
+#: configurations/admin.py:85
 msgid "Help texts"
 msgstr "Helpteksten"
 
-#: configurations/admin.py:88
+#: configurations/admin.py:98
 msgid "Footer addresses"
 msgstr "Footer adres"
 
-#: configurations/admin.py:99
+#: configurations/admin.py:109
 msgid "Emails"
-msgstr "Emails"
+msgstr "E-mails"
 
-#: configurations/admin.py:101
+#: configurations/admin.py:111
 msgid "Analytics"
 msgstr "Analytics"
 
@@ -1100,51 +1125,51 @@ msgstr "Welkom"
 
 #: configurations/models.py:86
 msgid "Home welcome title"
-msgstr "Voorpagina welkom tekst"
+msgstr "Koptekst homepage"
 
 #: configurations/models.py:87
 msgid "Welcome title on the home page."
-msgstr "Welkom tekst op de voorpagina"
+msgstr "Koptekst op de homepagina"
 
 #: configurations/models.py:90
 msgid "Home welcome intro"
-msgstr "Voorpagina introductietekst"
+msgstr "Introductietekst homepage"
 
 #: configurations/models.py:92
 msgid "Welcome intro text on the home page."
-msgstr "Welkom introductietekst op de voorpagina"
+msgstr "Introductietekst op de homepage"
 
 #: configurations/models.py:97
 msgid "Home theme's title"
-msgstr "Titel van de voorpagina"
+msgstr "Thema titel op de homepage"
 
 #: configurations/models.py:98
 msgid "Theme's title on the home page."
-msgstr "Thema titel op de voorpagina"
+msgstr "Thema titel op de homepage"
 
 #: configurations/models.py:101
 msgid "Home theme's intro"
-msgstr "Voorpagina thema introductie"
+msgstr "Thema introductietekst op de homepage"
 
 #: configurations/models.py:103
 msgid "Theme's intro text on the home page."
-msgstr "Thema introductietekst op de voorpagina"
+msgstr "Thema introductietekst op de homepage"
 
 #: configurations/models.py:108
 msgid "Theme's title"
-msgstr "Thema titel"
+msgstr "Paginatitel themapagina"
 
 #: configurations/models.py:109
 msgid "Theme's title on the theme's page."
-msgstr "Titel op de thema's pagina"
+msgstr "Titel op de themapagina"
 
 #: configurations/models.py:112
 msgid "Theme's intro"
-msgstr "Thema's introductie"
+msgstr "Introductietekst themapagina"
 
 #: configurations/models.py:114
 msgid "Theme's intro text on the theme's page."
-msgstr "Introductietekst op de thema's pagina"
+msgstr "Introductietekst op de themapagina"
 
 #: configurations/models.py:118
 msgid "In de buurt"
@@ -1152,27 +1177,27 @@ msgstr "In de buurt"
 
 #: configurations/models.py:119
 msgid "Home map title"
-msgstr "Titel van de kaart"
+msgstr "Koptekst van de kaart op de homepage"
 
 #: configurations/models.py:120
 msgid "Map's title on the home page."
-msgstr "Titel van de kaart op de voorpagina"
+msgstr "Koptekst van de kaart op de homepage"
 
 #: configurations/models.py:123
 msgid "Home map intro"
-msgstr "Kaart introductie"
+msgstr "Kaart introductietekst op de homepage"
 
 #: configurations/models.py:125
 msgid "Map's intro text on the home page."
-msgstr "Introductietekst van de kaart op de voorpagina"
+msgstr "Introductietekst van de kaart op de homepage"
 
 #: configurations/models.py:131
 msgid "Footer visiting title"
-msgstr "Footer titel bezoek"
+msgstr "Koptekst bezoek"
 
 #: configurations/models.py:132
 msgid "Visiting title on the footer section."
-msgstr "Titel van het bezoek-deel in de footer."
+msgstr "Kop bezoekadres"
 
 #: configurations/models.py:135
 msgid "Visiting details"
@@ -1184,7 +1209,7 @@ msgstr "Tekst over bezoek in de footer."
 
 #: configurations/models.py:142
 msgid "Footer visiting map"
-msgstr "Route"
+msgstr "Routetekst in de footer"
 
 #: configurations/models.py:145
 msgid "Visiting address in google maps on the footer section."
@@ -1192,7 +1217,7 @@ msgstr "Route naar de organisatie in de footer, adresgegevens"
 
 #: configurations/models.py:151
 msgid "Footer mailing title"
-msgstr "Contacttitel"
+msgstr "Kop postadres"
 
 #: configurations/models.py:152
 msgid "Mailing title on the footer section."
@@ -1290,12 +1315,12 @@ msgstr "De helptekst in de popup van de profielpagina's"
 
 #: configurations/models.py:205
 msgid "Send email about a new message"
-msgstr "Verstuur email over nieuwe berichten"
+msgstr "Stuur een mail bij nieuwe berichten"
 
 #: configurations/models.py:207
 msgid "Whether to send email about each new message the user receives"
 msgstr ""
-"Of er een email ter notificatie verstuurd dient te worden na een nieuw "
+"Of er een e-mail ter notificatie verstuurd dient te worden na een nieuw "
 "bericht voor de gebruiker."
 
 #: configurations/models.py:210
@@ -1350,17 +1375,35 @@ msgstr ""
 "geconfigureerd dan worden na het inschakelen de zaken van de gebruiker "
 "inzichtelijk via 'Mijn Aanvragen'."
 
-#: configurations/models.py:246 configurations/models.py:249
+#: configurations/models.py:245
+msgid "Laat productzoeker zien op de homepagina."
+msgstr ""
+
+#: configurations/models.py:249
+msgid ""
+"Als dit is aangevinkt en er zijn product condities gemaakt, dan wordt op de "
+"homepagina de productzoeker weergegeven."
+msgstr ""
+
+#: configurations/models.py:254 configurations/models.py:257
 msgid "Site Configuration"
 msgstr "Algemene configuratie"
 
-#: configurations/models.py:344
+#: configurations/models.py:352
 msgid "Configuration"
 msgstr "Configuratie"
 
-#: configurations/models.py:350
+#: configurations/models.py:358
 msgid "Flatpage"
 msgstr "Pagina"
+
+#: configurations/models.py:367
+msgid "Flatpage in the footer"
+msgstr "Platte pagina in footer"
+
+#: configurations/models.py:368
+msgid "Flatpages in the footer"
+msgstr "Platte pagina's in footer"
 
 #: haalcentraal/models.py:20
 msgid "Haal Centraal API"
@@ -1368,7 +1411,7 @@ msgstr "Haal Centraal API"
 
 #: haalcentraal/models.py:30
 msgid "Haal Centraal configuration"
-msgstr "Haal Centraal configuratie"
+msgstr "Configuratie 'Haal Centraal'"
 
 #: openzaak/models.py:15
 msgid "Open Zaak API"
@@ -1380,7 +1423,7 @@ msgstr "Catalogi API"
 
 #: openzaak/models.py:31
 msgid "Open Zaak configuration"
-msgstr "Open Zaak configuratie"
+msgstr "Configuratie 'Open Zaak'"
 
 #: pdc/admin/organization.py:22 templates/export/profile/profile_export.html:18
 msgid "Address"
@@ -1391,7 +1434,7 @@ msgid "Name of the category"
 msgstr "Naam van het thema"
 
 #: pdc/models/category.py:14 pdc/models/organization.py:16
-#: pdc/models/product.py:21 pdc/models/tag.py:12
+#: pdc/models/product.py:22 pdc/models/tag.py:12
 msgid "Slug"
 msgstr "Slug"
 
@@ -1419,25 +1462,25 @@ msgstr "Afbeelding"
 msgid "Image of the category"
 msgstr "Afbeelding van het thema"
 
-#: pdc/models/category.py:45 pdc/models/faq.py:9
+#: pdc/models/category.py:45 pdc/models/faq.py:10
 msgid "Category"
 msgstr "Thema"
 
-#: pdc/models/category.py:46 pdc/models/product.py:44 pdc/views.py:77
+#: pdc/models/category.py:46 pdc/models/product.py:45 pdc/views.py:100
 #: search/forms.py:22
 msgid "Categories"
 msgstr "Thema's"
 
-#: pdc/models/faq.py:11 pdc/models/faq.py:17 questionnaire/admin.py:35
-#: questionnaire/models.py:64
+#: pdc/models/faq.py:15 pdc/models/faq.py:21 questionnaire/admin.py:31
+#: questionnaire/models.py:41
 msgid "Vraag"
 msgstr "Vraag"
 
-#: pdc/models/faq.py:12
+#: pdc/models/faq.py:16
 msgid "Antwoord"
 msgstr "Antwoord"
 
-#: pdc/models/faq.py:18
+#: pdc/models/faq.py:22
 msgid "FAQ vragen"
 msgstr "Veelgestelde vragen"
 
@@ -1530,7 +1573,7 @@ msgstr "Organisatietype"
 
 #: pdc/models/organization.py:39
 msgid "The email address of the organization"
-msgstr "Emailadres van de organisatie"
+msgstr "E-mailadres van de organisatie"
 
 #: pdc/models/organization.py:46
 msgid "The phone number of the organization"
@@ -1540,11 +1583,11 @@ msgstr "Telefoonnummer van de organisatie"
 msgid "The neighbourhood of the organization"
 msgstr "Wijk van de organisatie"
 
-#: pdc/models/organization.py:59 pdc/models/product.py:169
+#: pdc/models/organization.py:59 pdc/models/product.py:170
 msgid "Organization"
 msgstr "Organisatie"
 
-#: pdc/models/organization.py:60 pdc/models/product.py:84 search/forms.py:28
+#: pdc/models/organization.py:60 pdc/models/product.py:85 search/forms.py:28
 msgid "Organizations"
 msgstr "Organisaties"
 
@@ -1552,69 +1595,69 @@ msgstr "Organisaties"
 msgid "Organization types"
 msgstr "Organisatietypes"
 
-#: pdc/models/product.py:18
+#: pdc/models/product.py:19
 msgid "Name of the product"
 msgstr "Productnaam"
 
-#: pdc/models/product.py:24
+#: pdc/models/product.py:25
 msgid "Slug of the product"
 msgstr "slug van het product"
 
-#: pdc/models/product.py:27
+#: pdc/models/product.py:28
 msgid "Summary"
 msgstr "Samenvatting"
 
-#: pdc/models/product.py:30
+#: pdc/models/product.py:31
 msgid "Short description of the product"
 msgstr "Korte omschrijving van het product"
 
-#: pdc/models/product.py:33
+#: pdc/models/product.py:34
 msgid "Link"
 msgstr "Link"
 
-#: pdc/models/product.py:36
+#: pdc/models/product.py:37
 msgid "Action link to request the product"
 msgstr "Actielink om het product aan te vragen"
 
-#: pdc/models/product.py:40
+#: pdc/models/product.py:41
 msgid "Product content with build-in WYSIWYG editor"
 msgstr "Product content met ingebouwde WYSIWYG editor"
 
-#: pdc/models/product.py:46
+#: pdc/models/product.py:47
 msgid "Categories which the product relates to"
 msgstr "Thema's waar het product aan gerelateerd is"
 
-#: pdc/models/product.py:50
+#: pdc/models/product.py:51
 msgid "Related products"
 msgstr "Gerelateerde producten"
 
-#: pdc/models/product.py:52
+#: pdc/models/product.py:53
 msgid "Related products to this product"
 msgstr "Producten die gerelateerd zijn aan dit product"
 
-#: pdc/models/product.py:56 pdc/models/tag.py:37 search/forms.py:25
+#: pdc/models/product.py:57 pdc/models/tag.py:37 search/forms.py:25
 msgid "Tags"
 msgstr "Tags"
 
-#: pdc/models/product.py:59
+#: pdc/models/product.py:60
 msgid "Tags which the product is linked to"
 msgstr "Tags waar dit product aan gekoppeld is"
 
-#: pdc/models/product.py:62
+#: pdc/models/product.py:63
 msgid "Costs"
 msgstr "Kosten"
 
-#: pdc/models/product.py:66
+#: pdc/models/product.py:67
 msgid "Cost of the product in EUR"
 msgstr "Kosten van het product in EUR"
 
-#: pdc/models/product.py:72
+#: pdc/models/product.py:73
 msgid ""
 "This is the date the product was created. This field is automatically set."
 msgstr ""
 "Datum dat het product is aangemaakt, dit veld wordt automatisch ingevuld."
 
-#: pdc/models/product.py:79
+#: pdc/models/product.py:80
 msgid ""
 "This is the date when the product was last changed. This field is "
 "automatically set."
@@ -1622,169 +1665,169 @@ msgstr ""
 "Datum dat het product voor het laatst is gewijzigd, dit veld wordt "
 "automatisch ingevuld."
 
-#: pdc/models/product.py:87
+#: pdc/models/product.py:88
 msgid "Organizations which provides this product"
 msgstr "Aangeboden door deze organisaties"
 
-#: pdc/models/product.py:91
+#: pdc/models/product.py:92
 msgid "Keywords"
 msgstr "Zoekwoorden"
 
-#: pdc/models/product.py:94
+#: pdc/models/product.py:95
 msgid "List of keywords for search"
 msgstr "Lijst van zoekwoorden waarop het product gevonden kan worden"
 
-#: pdc/models/product.py:97
+#: pdc/models/product.py:98
 msgid "Uniforme productnaam"
 msgstr "Uniforme productnaam"
 
-#: pdc/models/product.py:100
+#: pdc/models/product.py:101
 msgid "Attribute to sync data from PDC's (like SDG)"
 msgstr ""
 "Attribuut om gegevens vanuit andere bronnen te synchroniseren (zoals SDG)"
 
-#: pdc/models/product.py:104 pdc/models/product.py:207
+#: pdc/models/product.py:105 pdc/models/product.py:208
 msgid "Product contacts"
 msgstr "Productcontacten"
 
-#: pdc/models/product.py:107
+#: pdc/models/product.py:108
 msgid "The contacts responsible for the product"
 msgstr "De contactpersonen verantwoordelijk voor het product"
 
-#: pdc/models/product.py:111 pdc/models/product.py:263
+#: pdc/models/product.py:112 pdc/models/product.py:264
 msgid "Product locations"
 msgstr "Productlocaties"
 
-#: pdc/models/product.py:114
+#: pdc/models/product.py:115
 msgid "Locations where the product is available at."
 msgstr "Locaties waar het product beschikbaar is."
 
-#: pdc/models/product.py:119 pdc/models/product.py:308
+#: pdc/models/product.py:120 pdc/models/product.py:309
 msgid "Conditions"
 msgstr "Condities"
 
-#: pdc/models/product.py:121
+#: pdc/models/product.py:122
 msgid "Conditions applicable for the product"
 msgstr "Voorwaarden waar de aanvrager van het product dient te voldoen"
 
-#: pdc/models/product.py:125 pdc/models/product.py:145
-#: pdc/models/product.py:234
+#: pdc/models/product.py:126 pdc/models/product.py:146
+#: pdc/models/product.py:235
 msgid "Product"
 msgstr "Product"
 
-#: pdc/models/product.py:126
+#: pdc/models/product.py:127
 msgid "Products"
 msgstr "Producten"
 
-#: pdc/models/product.py:148 pdc/models/product.py:237
+#: pdc/models/product.py:149 pdc/models/product.py:238
 msgid "Related product"
 msgstr "Gerelateerd product"
 
-#: pdc/models/product.py:159
+#: pdc/models/product.py:160
 msgid "Product file"
 msgstr "Productbestand"
 
-#: pdc/models/product.py:160
+#: pdc/models/product.py:161
 msgid "Product files"
 msgstr "Productbestanden"
 
-#: pdc/models/product.py:174
+#: pdc/models/product.py:175
 msgid "The organization of the product contact"
 msgstr "Organisatie van het productcontact"
 
-#: pdc/models/product.py:179
+#: pdc/models/product.py:180
 msgid "First name of the product contact"
 msgstr "Voornaam"
 
-#: pdc/models/product.py:184
+#: pdc/models/product.py:185
 msgid "Last name of the product contact"
 msgstr "Achternaam"
 
-#: pdc/models/product.py:189
+#: pdc/models/product.py:190
 msgid "The email address of the product contact"
 msgstr "E-mailadres"
 
-#: pdc/models/product.py:196
+#: pdc/models/product.py:197
 msgid "The phone number of the product contact"
 msgstr "Telefoonnummer"
 
-#: pdc/models/product.py:199
+#: pdc/models/product.py:200
 msgid "Rol"
 msgstr "Rol"
 
-#: pdc/models/product.py:202
+#: pdc/models/product.py:203
 msgid "The role/function of the product contact"
 msgstr "De rol/functie van de contactpersoon"
 
-#: pdc/models/product.py:206
+#: pdc/models/product.py:207
 msgid "Product contact"
 msgstr "Productcontact"
 
-#: pdc/models/product.py:240
+#: pdc/models/product.py:241
 msgid "Name for the link"
 msgstr "Naam voor de link"
 
-#: pdc/models/product.py:242
+#: pdc/models/product.py:243
 msgid "Url"
 msgstr "URL"
 
-#: pdc/models/product.py:242
+#: pdc/models/product.py:243
 msgid "Url of the link"
 msgstr "URL van de link"
 
-#: pdc/models/product.py:245
+#: pdc/models/product.py:246
 msgid "Product link"
 msgstr "Productlink"
 
-#: pdc/models/product.py:246
+#: pdc/models/product.py:247
 msgid "Product links"
 msgstr "Productlinks"
 
-#: pdc/models/product.py:256
+#: pdc/models/product.py:257
 msgid "Location name"
 msgstr "Locatie naam"
 
-#: pdc/models/product.py:262
+#: pdc/models/product.py:263
 msgid "Product location"
 msgstr "Productlocatie"
 
-#: pdc/models/product.py:285
+#: pdc/models/product.py:286
 msgid "Short name of the condition"
 msgstr "Verkorte naam van de conditie"
 
-#: pdc/models/product.py:288
+#: pdc/models/product.py:289
 msgid "Question"
 msgstr "Vraag"
 
-#: pdc/models/product.py:289
+#: pdc/models/product.py:290
 msgid "Question used in the question-answer game"
 msgstr "Vraag gebruikt in het vraag-antwoordspel"
 
-#: pdc/models/product.py:292
-msgid "Positive text"
-msgstr "Positieve tekst"
-
 #: pdc/models/product.py:293
+msgid "Positive text"
+msgstr "Bevestigend antwoord"
+
+#: pdc/models/product.py:294
 msgid "Description how to meet the condition"
 msgstr "Omschrijving waarmee je voldoet aan de conditie"
 
-#: pdc/models/product.py:296
-msgid "Negative text"
-msgstr "Negatieve tekst"
-
 #: pdc/models/product.py:297
+msgid "Negative text"
+msgstr "Ontkennend antwoord"
+
+#: pdc/models/product.py:298
 msgid "Description how not to meet the condition"
 msgstr "Omschrijving wanneer je niet voldoet aan de conditie"
 
-#: pdc/models/product.py:300
+#: pdc/models/product.py:301
 msgid "Rule"
 msgstr "Regel"
 
-#: pdc/models/product.py:303
+#: pdc/models/product.py:304
 msgid "Rule for the automated check"
 msgstr "Regels voor geautomatiseerde controle (nog niet beschikbaar)"
 
-#: pdc/models/product.py:307
+#: pdc/models/product.py:308
 msgid "Condition"
 msgstr "Conditie"
 
@@ -1840,20 +1883,20 @@ msgstr "Het ingevulde {self.model.__name__.lower()} bestaat niet"
 msgid "Dit veld is vereist."
 msgstr "Dit veld is vereist."
 
-#: pdc/views.py:101
+#: pdc/views.py:124
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
 msgstr "Geen %(verbose_name)s gevonden"
 
-#: pdc/views.py:139 templates/pages/product/detail.html:51
+#: pdc/views.py:162 templates/pages/product/detail.html:51
 msgid "Locaties"
 msgstr "Locaties"
 
-#: pdc/views.py:141 templates/pages/product/detail.html:70
+#: pdc/views.py:164 templates/pages/product/detail.html:70
 msgid "Links"
 msgstr "Links"
 
-#: pdc/views.py:145 templates/pages/product/detail.html:86
+#: pdc/views.py:168 templates/pages/product/detail.html:86
 msgid "Zie ook"
 msgstr "Zie ook"
 
@@ -2011,7 +2054,7 @@ msgstr "Doelen"
 
 #: plans/views.py:71 templates/export/plans/plan_export.html:45
 #: templates/export/profile/profile_export.html:44
-#: templates/pages/plans/detail.html:80 templates/pages/profile/me.html:65
+#: templates/pages/plans/detail.html:80 templates/pages/profile/me.html:67
 msgid "Acties"
 msgstr "Acties"
 
@@ -2027,51 +2070,39 @@ msgstr "Doel bewerken"
 msgid "Nieuw bestand uploaden"
 msgstr "Nieuw bestand uploaden"
 
-#: questionnaire/admin.py:47
+#: questionnaire/admin.py:43
 msgid "Stappenplan"
 msgstr "Stappenplan"
 
-#: questionnaire/admin.py:60
+#: questionnaire/admin.py:55
 msgid "Eindstatus velden (uitgebreide informatie en producten)"
 msgstr "Eindstatus velden (uitgebreide informatie en producten)"
 
-#: questionnaire/models.py:32
-msgid "Standaard zelfdiagnose"
-msgstr "Standaard zelfdiagnose"
-
-#: questionnaire/models.py:35
-msgid ""
-"Geeft aan dat dit de standaard zelfdiagnose is, slechts een item mag deze "
-"waarde hebben.."
-msgstr ""
-"Geeft aan dat dit de standaard zelfdiagnose is, slechts een item mag deze "
-"waarde hebben.."
-
-#: questionnaire/models.py:40
+#: questionnaire/models.py:17
 msgid "Antwoord op vorige vraag"
 msgstr "Antwoord op de vorige vraag"
 
-#: questionnaire/models.py:41
+#: questionnaire/models.py:18
 msgid "Dit label wordt getoond bij de keuzes van de vorige stap."
 msgstr ""
 "Dit label wordt getoond bij de keuzes van de vorige stap. Dient voor de "
 "hoofdvraag leeggelaten te worden."
 
-#: questionnaire/models.py:47
+#: questionnaire/models.py:24
 msgid "Titel"
 msgstr "Titel"
 
-#: questionnaire/models.py:49
+#: questionnaire/models.py:26
 msgid ""
 "Titel van deze stap, wordt overgenomen van de hoofdstap indien leeggelaten."
 msgstr ""
 "Titel van deze stap, wordt overgenomen van de hoofdstap indien leeggelaten."
 
-#: questionnaire/models.py:55
+#: questionnaire/models.py:32
 msgid "Beschrijving"
 msgstr "Beschrijving"
 
-#: questionnaire/models.py:57
+#: questionnaire/models.py:34
 msgid ""
 "Deze tekst wordt ter ondersteuning onder de titel getoond, wordt overgenomen "
 "van de hoofdstap indien leeggelaten."
@@ -2079,15 +2110,15 @@ msgstr ""
 "Deze tekst wordt ter ondersteuning onder de titel getoond, wordt overgenomen "
 "van de hoofdstap indien leeggelaten."
 
-#: questionnaire/models.py:64
+#: questionnaire/models.py:41
 msgid "De stelling of vraag"
 msgstr "De stelling of vraag"
 
-#: questionnaire/models.py:68
+#: questionnaire/models.py:45
 msgid "Onderwerp vraag"
 msgstr "Onderwerp vraag"
 
-#: questionnaire/models.py:70
+#: questionnaire/models.py:47
 msgid ""
 "Het onderwerp van de vraag, dit wordt gebruikt waar er geen ruimte voor de "
 "volledige vraag is."
@@ -2095,73 +2126,59 @@ msgstr ""
 "Het onderwerp van de vraag, dit wordt gebruikt waar er geen ruimte voor de "
 "volledige vraag is."
 
-#: questionnaire/models.py:75
+#: questionnaire/models.py:52
 msgid "URL vriendelijke naam"
 msgstr "URL-vriendelijke naam / Slug"
 
-#: questionnaire/models.py:77
+#: questionnaire/models.py:54
 msgid "Ondersteunende tekst"
 msgstr "Ondersteunende tekst"
 
-#: questionnaire/models.py:78
+#: questionnaire/models.py:55
 msgid "Beschrijvende tekst bij de vraag."
 msgstr "Beschrijvende tekst bij de vraag."
 
-#: questionnaire/models.py:79
+#: questionnaire/models.py:56
 msgid "Kies het antwoord dat het meest van toepassing is"
 msgstr "Kies het antwoord dat het meest van toepassing is"
 
-#: questionnaire/models.py:84
+#: questionnaire/models.py:61
 msgid "Uitgebreide informatie"
 msgstr "Uitgebreide informatie"
 
-#: questionnaire/models.py:85
+#: questionnaire/models.py:62
 msgid "Deze inhoud wordt weergegeven in deze stap."
 msgstr "Deze inhoud wordt weergegeven in deze stap."
 
-#: questionnaire/models.py:90
+#: questionnaire/models.py:67
 msgid "Deze producten worden weergegeven in deze stap."
 msgstr "Deze producten worden weergegeven in deze stap."
 
-#: questionnaire/models.py:95
-#| msgid "Questionnaire step file"
+#: questionnaire/models.py:72
 msgid "Questionnaire step"
 msgstr "Vragenlijststap"
 
-#: questionnaire/models.py:96
-#| msgid "Questionnaire step files"
+#: questionnaire/models.py:73
 msgid "Questionnaire steps"
 msgstr "Vragenlijststappen"
 
-#: questionnaire/models.py:174
+#: questionnaire/models.py:139
 msgid "Questionnaire step file"
 msgstr "Vragenlijststap bijlage"
 
-#: questionnaire/models.py:175
+#: questionnaire/models.py:140
 msgid "Questionnaire step files"
 msgstr "Vragenlijststap bijlagen"
 
-#: questionnaire/models.py:181 questionnaire/tests/test_models.py:141
+#: questionnaire/models.py:146 questionnaire/tests/test_models.py:128
 msgid "Geen bestand geselecteerd."
 msgstr "Geen bestand geselecteerd."
 
-#: questionnaire/templates/questionnaire/questionnaire-step.html:27
-msgid "Volgende"
-msgstr "Volgende"
-
-#: questionnaire/templates/questionnaire/questionnaire-step.html:27
-msgid "Vorige"
-msgstr "Vorige"
-
-#: questionnaire/templates/questionnaire/questionnaire-step.html:46
-#: templates/pages/profile/actions/list.html:16
-#: templates/pages/profile/contacts/list.html:51
-msgid "Terug naar mijn profiel"
-msgstr "Terug naar mijn profiel"
-
-#: questionnaire/templates/questionnaire/questionnaire-step.html:48
-msgid "Terug naar homepage"
-msgstr "Terug naar homepage"
+#: questionnaire/views.py:52 questionnaire/views.py:55
+#: questionnaire/views.py:139 questionnaire/views.py:142
+#: templates/pages/profile/me.html:61
+msgid "Zelfdiagnose"
+msgstr "Zelfdiagnose"
 
 #: search/admin.py:21
 msgid ""
@@ -2258,19 +2275,25 @@ msgid "Feedback"
 msgstr "Feedback"
 
 #: search/models.py:75
-#, fuzzy
-#| msgid "Feedback"
 msgid "Feedbacks"
 msgstr "Feedback"
 
-#: search/views.py:75 utils/mixins.py:125
+#: search/views.py:75 utils/mixins.py:126
 msgid "Page is not 'last', nor can it be converted to an int."
 msgstr "Page is not 'last', nor can it be converted to an int."
 
-#: search/views.py:82 utils/mixins.py:132
+#: search/views.py:82 utils/mixins.py:133
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
 msgstr "Ongelidge pagina (%(page_number)s): %(message)s"
+
+#: templates/404.html:5
+msgid "Sorry, the requested page could not be found (404)"
+msgstr ""
+
+#: templates/404.html:6
+msgid "Ga naar de home pagina"
+msgstr "Terug naar homepage"
 
 #: templates/admin/base_site.html:5 templates/admin/base_site.html:18
 msgid "Administration"
@@ -2327,6 +2350,22 @@ msgstr "Interessegebieden"
 msgid "Netwerkcontacten"
 msgstr "Netwerkcontacten"
 
+#: templates/export/questionnaire/questionnaire_export.html:6
+msgid "Zelfdiagnose results"
+msgstr "Resultaten zelfdiagnose"
+
+#: templates/export/questionnaire/questionnaire_export.html:10
+msgid "Question:"
+msgstr "Vraag:"
+
+#: templates/export/questionnaire/questionnaire_export.html:12
+msgid "Answer:"
+msgstr "Antwoord:"
+
+#: templates/export/questionnaire/questionnaire_export.html:23
+msgid "Related products:"
+msgstr "Gerelateerde producten:"
+
 #: templates/hijack/contrib/admin/button.html:7
 msgid "hijack"
 msgstr "overnemen"
@@ -2365,9 +2404,21 @@ msgstr "Documenten"
 msgid "Status toelichting"
 msgstr "Toelichting van de status"
 
-#: templates/pages/home.html:18 templates/pages/user-home.html:33
+#: templates/pages/home.html:19
 msgid "Alle thema's"
 msgstr "Alle thema's"
+
+#: templates/pages/home.html:31
+msgid "Waar bent u naar op zoek?"
+msgstr "Waar bent u naar op zoek?"
+
+#: templates/pages/home.html:32
+msgid "Wij helpen u graag op weg."
+msgstr "Wij helpen u graag op weg"
+
+#: templates/pages/home.html:39
+msgid "Start"
+msgstr "Start"
 
 #: templates/pages/plans/create.html:7 templates/pages/plans/edit.html:7
 #: templates/pages/plans/file.html:7 templates/pages/plans/list.html:10
@@ -2436,10 +2487,16 @@ msgid "Telefoonnummer"
 msgstr "Telefoonnummer"
 
 #: templates/pages/product/detail.html:129
-#, fuzzy
-#| msgid "Email"
 msgid "E-mail"
 msgstr "E-mail"
+
+#: templates/pages/product/finder.html:10
+msgid "Producten"
+msgstr "Producten"
+
+#: templates/pages/product/finder.html:23
+msgid "Mogelijke producten"
+msgstr "Mogelijke producten"
 
 #: templates/pages/profile/actions/edit.html:8
 msgid "Wijzig actie"
@@ -2453,9 +2510,14 @@ msgstr "Creëer actie"
 msgid "Actie opslaan"
 msgstr "Actie opslaan"
 
-#: templates/pages/profile/actions/list.html:8
+#: templates/pages/profile/actions/list.html:10
 msgid "Nieuwe actie toevoegen"
 msgstr "Nieuwe actie toevoegen"
+
+#: templates/pages/profile/actions/list.html:18
+#: templates/pages/profile/contacts/list.html:51
+msgid "Terug naar mijn profiel"
+msgstr "Terug naar mijn profiel"
 
 #: templates/pages/profile/categories.html:6
 msgid "Mijn Thema's"
@@ -2470,17 +2532,17 @@ msgstr ""
 "krijgen en nog beter te kunnen zoeken en vinden"
 
 #: templates/pages/profile/categories.html:12
-#: templates/pages/profile/contacts/edit.html:14
+#: templates/pages/profile/contacts/edit.html:19
 #: templates/pages/profile/documents/edit.html:10
 #: templates/pages/profile/edit.html:9
 msgid "Opslaan"
 msgstr "Opslaan"
 
-#: templates/pages/profile/contacts/edit.html:8
+#: templates/pages/profile/contacts/edit.html:11
 msgid "Wijzig contact"
 msgstr "Wijzig contact"
 
-#: templates/pages/profile/contacts/edit.html:10
+#: templates/pages/profile/contacts/edit.html:13
 msgid "Creeer contact"
 msgstr "Creëer Contact"
 
@@ -2544,17 +2606,39 @@ msgstr "Mijn netwerkcontacten"
 msgid "Beheer contacten"
 msgstr "Beheer contacten"
 
-#: templates/pages/profile/me.html:70
+#: templates/pages/profile/me.html:63
+msgid "Start zelfdiagnose"
+msgstr "Start zelfdiagnose"
+
+#: templates/pages/profile/me.html:72
 msgid "Afspraken"
 msgstr "Afspraken"
 
-#: templates/pages/profile/me.html:76
+#: templates/pages/profile/me.html:78
 msgid "Weet je het zeker dat je je account wilt deactiveren?"
 msgstr "Weet je het zeker dat je je account wilt deactiveren?"
 
-#: templates/pages/profile/me.html:78
+#: templates/pages/profile/me.html:80
 msgid "Profiel deactiveren"
 msgstr "Profiel deactiveren"
+
+#: templates/pages/profile/questionnaire.html:5
+msgid "Keuze zelfdiagnose"
+msgstr "Keuze zelfdiagnose"
+
+#: templates/pages/profile/questionnaire.html:6
+msgid ""
+"Kies hieronder één van de volgende vragenlijsten om de zelfdiagnose te "
+"starten."
+msgstr ""
+
+#: templates/pages/questionnaire/questionnaire-step.html:31
+msgid "Naar profiel"
+msgstr "Naar profiel"
+
+#: templates/pages/questionnaire/questionnaire-step.html:34
+msgid "Naar home"
+msgstr ""
 
 #: templates/pages/search.html:44
 msgid "product"
@@ -2564,11 +2648,11 @@ msgstr "product"
 msgid "Heeft u gevonden wat u zocht?"
 msgstr "Heeft u gevonden wat u zocht?"
 
-#: templates/pages/user-home.html:11
+#: templates/pages/user-home.html:12
 msgid "Naar samenwerken"
 msgstr "Naar samenwerken"
 
-#: templates/pages/user-home.html:28
+#: templates/pages/user-home.html:29
 msgid "U heeft nog geen plan gemaakt."
 msgstr "U heeft nog geen plan gemaakt."
 
@@ -2588,6 +2672,13 @@ msgstr "Het opgegeven mobiele telefoonnummer is ongeldig."
 #: utils/validators.py:50
 msgid "Ongeldige postcode"
 msgstr "Ongeldige postcode"
+
+#~ msgid ""
+#~ "Geeft aan dat dit de standaard zelfdiagnose is, slechts een item mag deze "
+#~ "waarde hebben.."
+#~ msgstr ""
+#~ "Geeft aan dat dit de standaard zelfdiagnose is, slechts een item mag deze "
+#~ "waarde hebben.."
 
 #~ msgid "first name"
 #~ msgstr "voornaam"
