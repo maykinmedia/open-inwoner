@@ -1,4 +1,5 @@
 import json
+from unittest.mock import patch
 
 from django.contrib.gis.geos import Point
 from django.test import TestCase
@@ -14,8 +15,11 @@ from .factories import ProductFactory, ProductLocationFactory
 
 
 class ProductLocationTestCase(TestCase):
-    def test_geocode(self):
-        """FIXME this test request actual external API. Should be reworked"""
+    @patch(
+        "open_inwoner.pdc.models.mixins.geocode_address",
+        return_value=Point(4.8876438, 52.37670043),
+    )
+    def test_geocode(self, mock_geocoding):
         product_location = ProductLocation(
             street="Keizersgracht",
             housenumber="117",
@@ -28,6 +32,7 @@ class ProductLocationTestCase(TestCase):
             '{ "type": "Point", "coordinates": [ 4.8876438, 52.37670043 ] }',
             product_location.geometry.geojson,
         )
+        mock_geocoding.assert_called_once_with("Keizersgracht 117, 1015CJ Amsterdam")
 
     def test_address_str(self):
         product_location = ProductLocationFactory.create(
@@ -206,7 +211,10 @@ class ProductLocationTestCase(TestCase):
 
 
 class TestLocationFormInput(WebTest):
-    def test_exception_is_handled_when_city_and_postcode_are_not_provided(self):
+    @patch("open_inwoner.pdc.models.mixins.geocode_address", side_effect=IndexError)
+    def test_exception_is_handled_when_city_and_postcode_are_not_provided(
+        self, mock_geocoding
+    ):
         user = UserFactory(is_superuser=True, is_staff=True)
 
         response = self.app.get(reverse("admin:pdc_productlocation_add"), user=user)
@@ -221,3 +229,4 @@ class TestLocationFormInput(WebTest):
                 [_("No location data was provided")],
             ],
         )
+        mock_geocoding.assert_called_once_with(" ,  ")
