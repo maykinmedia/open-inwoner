@@ -43,6 +43,10 @@
     padding-right: 56px;
     transition: all 0.3s;
     transform-origin: top;
+
+    .link {
+      display: inline-flex;
+    }
   }
 
   &__answer--open {
