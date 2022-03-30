@@ -28,7 +28,7 @@ class Command(BaseCommand):
         user_ids = Action.objects.filter(end_date=today).values_list(
             "is_for_id", flat=True
         )
-        receivers = User.objects.filter(pk__in=user_ids).distinct()
+        receivers = User.objects.filter(is_active=True, pk__in=user_ids).distinct()
 
         for receiver in receivers:
             """send email to each user"""
