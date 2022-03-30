@@ -10,7 +10,7 @@
                 {% button href="accounts:action_create" text=_("Nieuwe actie toevoegen") icon="date_range" primary=True %}
             </h1>
             {% button_row align="right" %}
-                {% button href="accounts:action_list_export" icon="input" icon_outlined=True transparent=True secondary=True %}
+                {% button href="accounts:action_list_export" text=_("Exporteer naar PDF") hide_text=True icon="input" icon_outlined=True transparent=True secondary=True %}
             {% endbutton_row %}
 
             {% actions actions=actions request=request action_form=action_form %}

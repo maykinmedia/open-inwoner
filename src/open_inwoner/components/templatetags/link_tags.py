@@ -5,17 +5,17 @@ register = template.Library()
 
 
 @register.inclusion_tag("components/Typography/Link.html")
-def link(href, **kwargs):
+def link(href, text, **kwargs):
     """
     Renders an hyperlink.
 
     Usage:
-        {% link 'http://www.example.com' %}
         {% link 'http://www.example.com' text=_('Example.com') %}
         {% link href='accounts:inbox' text=_('Mijn berichten') %}
 
     Variables:
         + href, str: where the link links to (can be url name to resolve).
+        + text, optional str: The text that should be displayed in the link
         - active, optional bool: If the link is active
         - align, optional str: "left" or "right".
         - bold, optional bool: whether the link should be bold.
@@ -37,10 +37,10 @@ def link(href, **kwargs):
         - transparent, optional bool: Whether the button should not have a background or border.
         - social_icon, optional str: The icon that should be displayed from font-awesome
         - src, optional str: The source of the image
-        - text, optional str: The text that should be displayed in the link
         - type, optional str: the type of button that should be used.
         - object_id: str | if href is an url name, object_id for reverse can be passed.
         - uuid: str | if href is an url name, uuid for reverse can be passed.
+        - title: string | The HTML title attribute if different than the text.
 
     Extra context:
         - base_class: string | If it is a button or a string.
@@ -101,4 +101,5 @@ def link(href, **kwargs):
     kwargs["base_class"] = get_base_class()
     kwargs["classes"] = get_classes()
     kwargs["href"] = get_href()
+    kwargs["text"] = text
     return kwargs
