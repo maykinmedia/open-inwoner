@@ -11,7 +11,7 @@ from django.views.generic import DetailView, FormView, UpdateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin
 
-from open_inwoner.accounts.choices import StatusChoices
+from open_inwoner.accounts.choices import ContactTypeChoices, StatusChoices
 from open_inwoner.questionnaire.models import QuestionnaireStep
 from open_inwoner.utils.mixins import ExportMixin
 
@@ -40,6 +40,9 @@ class MyProfileView(LoginRequiredMixin, BaseBreadcrumbMixin, FormView):
             ("#overview", _("Persoonlijk overzicht")),
             ("#files", _("Bestanden")),
         ]
+        context["mentor_contacts"] = self.request.user.contacts.filter(
+            type=ContactTypeChoices.begeleider
+        )
         context["next_action"] = (
             Action.objects.connected(self.request.user)
             .filter(end_date__gte=today, status=StatusChoices.open)

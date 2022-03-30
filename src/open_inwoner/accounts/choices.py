@@ -1,4 +1,4 @@
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from djchoices import ChoiceItem, DjangoChoices
 
@@ -9,14 +9,23 @@ class LoginTypeChoices(DjangoChoices):
     eherkenning = ChoiceItem("eherkenning", _("eHerkenning"))
 
 
+# Created because of a filter that needs to happen. This way the form can take the empty choice and the modal is still filled.
+class AllEmptyChoice(DjangoChoices):
+    empty = ChoiceItem("", _("Alle"))
+
+
 class ContactTypeChoices(DjangoChoices):
     contact = ChoiceItem("contact", _("Contactpersoon"))
     begeleider = ChoiceItem("begeleider", _("Begeleider"))
     organization = ChoiceItem("organization", _("Organisatie"))
 
 
+class EmptyContactTypeChoices(AllEmptyChoice, ContactTypeChoices):
+    pass
+
+
 # Created because of a filter that needs to happen. This way the form can take the empty choice and the modal is still filled.
-class EmptyChoices(DjangoChoices):
+class StatusEmptyChoice(DjangoChoices):
     empty = ChoiceItem("", _("Status"))
 
 
@@ -25,7 +34,7 @@ class StatusChoices(DjangoChoices):
     closed = ChoiceItem("closed", _("Afgerond"))
 
 
-class EmptyStatusChoices(EmptyChoices, StatusChoices):
+class EmptyStatusChoices(StatusEmptyChoice, StatusChoices):
     pass
 
 

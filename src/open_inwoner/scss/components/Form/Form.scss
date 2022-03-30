@@ -8,6 +8,14 @@
     grid-gap: 0;
   }
 
+  &--horizontal {
+    .form__control > .label {
+      flex-direction: row;
+      align-items: center;
+      white-space: nowrap;
+    }
+  }
+
   /// Columns.
 
   @media (min-width: 768px) {
