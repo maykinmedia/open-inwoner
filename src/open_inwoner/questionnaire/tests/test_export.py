@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.test import Client, TestCase
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 from privates.test import temp_private_root
 
@@ -26,29 +27,27 @@ class QuestionnaireExportTests(TestCase):
         self.client.cookies[self.session_cookie_name] = self.session.session_key
 
     def test_anonymous_user_exports_file_without_being_saved(self):
+        filename = _("questionnaire_{slug}.pdf").format(slug=self.questionnaire.slug)
         response = self.client.get(reverse("questionnaire:questionnaire_export"))
         self.assertEquals(response.status_code, 200)
         self.assertEquals(response.headers["Content-Type"], "application/pdf")
         self.assertEquals(
             response.headers["Content-Disposition"],
-            f'attachment; filename="questionnaire_{self.questionnaire.slug}.pdf"',
+            f'attachment; filename="{filename}"',
         )
         self.assertFalse(Document.objects.exists())
 
     def test_logged_in_user_exports_file_and_it_is_automatically_saved(self):
         self.client.force_login(self.user)
+        filename = _("questionnaire_{slug}.pdf").format(slug=self.questionnaire.slug)
         response = self.client.get(reverse("questionnaire:questionnaire_export"))
         self.assertEquals(response.status_code, 200)
         self.assertEquals(response.headers["Content-Type"], "application/pdf")
         self.assertEquals(
             response.headers["Content-Disposition"],
-            f'attachment; filename="questionnaire_{self.questionnaire.slug}.pdf"',
+            f'attachment; filename="{filename}"',
         )
-        self.assertTrue(
-            Document.objects.filter(
-                name=f"questionnaire_{self.questionnaire.slug}.pdf"
-            ).exists()
-        )
+        self.assertTrue(Document.objects.filter(name=filename).exists())
 
     def test_response_contains_right_data(self):
         product = ProductFactory()

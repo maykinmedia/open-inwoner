@@ -111,3 +111,41 @@ class TestHelpContext(WebTest):
         help_text = response.context.get("help_text")
 
         self.assertEquals(help_text, config.account_help_text)
+
+    def test_default_help_text_on_questionnaire_page(self):
+        response = self.app.get(reverse("questionnaire:questionnaire_list"))
+        help_text = response.context.get("help_text")
+
+        self.assertEquals(
+            help_text,
+            _(
+                "Het onderdeel Zelfdiagnose stelt u in staat om met het beantwoorden van enkele vragen een advies te krijgen van de gemeente, met concrete vervolgstappen en producten en diensten. U kunt tevens uw antwoorden en het advies bewaren om met een begeleider van de gemeente te bespreken."
+            ),
+        )
+
+    def test_custom_help_text_on_questionnaire_page(self):
+        SiteConfigurationFactory()
+        config = SiteConfiguration.get_solo()
+        response = self.app.get(reverse("questionnaire:questionnaire_list"))
+        help_text = response.context.get("help_text")
+
+        self.assertEquals(help_text, config.questionnaire_help_text)
+
+    def test_default_help_text_on_plan_page(self):
+        response = self.app.get(reverse("plans:plan_list"), user=self.user)
+        help_text = response.context.get("help_text")
+
+        self.assertEquals(
+            help_text,
+            _(
+                "Met het onderdeel Samenwerken kunt u samen met uw contactpersonen of begeleider van de gemeente aan de slag om met een samenwerkingsplan uw persoonlijke situatie te verbeteren. Door samen aan uw doelen te werken en acties te omschrijven kunnen we elkaar helpen."
+            ),
+        )
+
+    def test_custom_help_text_on_plan_page(self):
+        SiteConfigurationFactory()
+        config = SiteConfiguration.get_solo()
+        response = self.app.get(reverse("plans:plan_list"), user=self.user)
+        help_text = response.context.get("help_text")
+
+        self.assertEquals(help_text, config.plan_help_text)
