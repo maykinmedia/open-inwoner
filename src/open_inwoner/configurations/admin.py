@@ -91,6 +91,8 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                     "product_help_text",
                     "search_help_text",
                     "account_help_text",
+                    "questionnaire_help_text",
+                    "plan_help_text",
                 ),
             },
         ),
