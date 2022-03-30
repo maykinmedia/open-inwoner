@@ -91,14 +91,24 @@
   --color-danger: hsl(
     var(--color-danger-h),
     var(--color-danger-s),
-    var(--color-danger-l)
+    calc(var(--color-danger-l) + 27%)
   );
   --color-danger-darker: hsl(
+    var(--color-danger-h),
+    var(--color-danger-s),
+    var(--color-danger-l)
+  );
+  --color-danger-darkest: hsl(
     var(--color-danger-h),
     var(--color-danger-s),
     calc(var(--color-danger-l) - 10%)
   );
   --color-danger-lighter: hsl(
+    var(--color-danger-h),
+    var(--color-danger-s),
+    calc(var(--color-danger-l) + 40%)
+  );
+  --color-danger-lightest: hsl(
     var(--color-danger-h),
     var(--color-danger-s),
     calc(var(--color-danger-l) + 80%)
