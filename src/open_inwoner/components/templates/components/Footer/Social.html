@@ -3,8 +3,8 @@
 <nav class="social {% if primary %}social--primary{% endif %}">
     <h4 class="h4">{% trans "Delen" %}</h4>
 
-    {% link icon="facebook" href="#" extra_classes="social__link" %}
-    {% link icon="twitter" href="#" extra_classes="social__link" %}
-    {% link icon="whatsapp" href="#" extra_classes="social__link" %}
-    {% link icon="linkedin" href="#" extra_classes="social__link" %}
+    {% link icon="facebook" href="#" text=_("Facebook") hide_text=True extra_classes="social__link" %}
+    {% link icon="twitter" href="#" text=_("Twitter") hide_text=True extra_classes="social__link" %}
+    {% link icon="whatsapp" href="#" text=_("Whatsapp") hide_text=True extra_classes="social__link" %}
+    {% link icon="linkedin" href="#" text=_("LinkedIn") hide_text=True extra_classes="social__link" %}
 </nav>
