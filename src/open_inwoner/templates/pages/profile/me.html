@@ -10,8 +10,8 @@
     {% trans "Persoonlijke gegevens" %}
 
     {% button_row align="right" %}
-        {% button href="accounts:edit_profile" icon="settings" icon_outlined=True  transparent=True secondary=True %}
-        {% button href="accounts:profile_export" icon="input" icon_outlined=True transparent=True secondary=True %}
+        {% button href="accounts:edit_profile" text=_("Bewerken") hide_text=True icon="settings" icon_outlined=True  transparent=True secondary=True %}
+        {% button href="accounts:profile_export" icon="input" text=_("Exporteer naar PDF") hide_text=True icon_outlined=True transparent=True secondary=True %}
     {% endbutton_row %}
 </h1>
 
@@ -83,6 +83,6 @@
 {% file_list h1=True files=files allow_delete=True title=_("Bestanden") download_view="accounts:documents_download" %}
 
 {% button_row align="right" %}
-    {% button href="accounts:documents_create" text="Bestand toevoegen" primary=True %}
+    {% button href="accounts:documents_create" text=_("Bestand toevoegen") hide_text=True primary=True %}
 {% endbutton_row %}
 {% endblock content %}
