@@ -35,15 +35,5 @@
         padding: var(--spacing-giant) var(--spacing-medium);
       }
     }
-
-    &__export .p {
-      display: none;
-    }
-
-    &__export:hover .p {
-      display: block;
-      position: absolute;
-      width: 100%;
-    }
   }
 }
