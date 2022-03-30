@@ -27,7 +27,7 @@
                         <td class="table__item table__item--color-gray-dark table__item--no-lb">{{ case.omschrijving }}</td>
                         <td class="table__item table__item--color-gray-dark table__item--no-lb">{{ case.startdatum }}</td>
                         <td class="table__item table__item--color-gray-dark table__item--no-lb">
-                            {% link href="accounts:case_status" object_id=case.uuid icon="arrow_forward" primary=True %}
+                            {% link href="accounts:case_status" object_id=case.uuid text=_("Bekijk status") hide_text=True icon="arrow_forward" primary=True %}
                         </td>
                     </tr>
                 {% endfor %}

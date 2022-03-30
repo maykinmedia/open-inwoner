@@ -16,7 +16,8 @@
         data-use-aria="true"
     {% endif %}
     {% if toggle_exclusive %}data-toggle-exclusive="{{ toggle_exclusive }}"{% endif %}
-    {% if hide_text %}aria-describedby="{{ text }}" title="{{ text }}"{% endif %}
+    aria-describedby="{{ text }}"
+    title="{% firstof title text %}"
 >
     {% if src %}
         <img class="logo__image" src="{{src}}" alt="{{ text }}"{% if height %} height="{{ height }}"{% endif %}/>

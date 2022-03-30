@@ -20,7 +20,7 @@
                 <td class="table__item">{{ action.get_type_display }}</td>
                 <td class="table__item">{{ action.is_for.get_full_name }}</td>
                 <td class="table__item">{{ action.end_date|default:"-" }}</td>
-                <td class="table__item">{% if action.file %}{% link href=download_url icon="download" download=True %}{% endif %}</td>
+                <td class="table__item">{% if action.file %}{% link href=download_url text=_("Download action") hide_text=True icon="download" download=True %}{% endif %}</td>
             </tr>
         {% endfor %}
     </tbody>

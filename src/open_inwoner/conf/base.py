@@ -2,7 +2,7 @@ import os
 
 # Django-hijack (and Django-hijack-admin)
 from django.urls import reverse_lazy
-from django.utils.translation import ugettext_noop as _noop
+from django.utils.translation import gettext_lazy as _
 
 import sentry_sdk
 
@@ -445,7 +445,7 @@ HIJACK_ALLOW_GET_REQUESTS = True
 # SENTRY - error monitoring
 #
 SENTRY_DSN = config("SENTRY_DSN", None)
-RELEASE = "v0.5"  # get_current_version()
+RELEASE = "v0.6"  # get_current_version()
 
 PRIVATE_MEDIA_ROOT = os.path.join(BASE_DIR, "private_media")
 SENDFILE_ROOT = PRIVATE_MEDIA_ROOT
@@ -551,8 +551,8 @@ IMPORT_EXPORT_USE_TRANSACTIONS = True
 # mail-editor
 MAIL_EDITOR_CONF = {
     "invite": {
-        "name": _noop("Invitation Email"),
-        "description": _noop(
+        "name": _("Invitation Email"),
+        "description": _(
             "This email is used to invite people to sing up to the website"
         ),
         "subject_default": "Uitnodiging voor {{ site_name }}",
@@ -572,29 +572,29 @@ MAIL_EDITOR_CONF = {
         "subject": [
             {
                 "name": "site_name",
-                "description": _noop("Name of the site."),
+                "description": _("Name of the site."),
             },
-            {"name": "inviter_name", "description": _noop("Full name of the inviter")},
+            {"name": "inviter_name", "description": _("Full name of the inviter")},
         ],
         "body": [
             {
                 "name": "inviter_name",
-                "description": _noop("Full name of the inviter"),
+                "description": _("Full name of the inviter"),
             },
             {
                 "name": "site_name",
-                "description": _noop("Name of the site"),
+                "description": _("Name of the site"),
             },
             {
                 "name": "invite_link",
-                "description": _noop("Link to activate their account."),
+                "description": _("Link to activate their account."),
             },
-            {"name": "email", "description": _noop("Email of the invited user")},
+            {"name": "email", "description": _("Email of the invited user")},
         ],
     },
     "new_messages": {
-        "name": _noop("New Message Email"),
-        "description": _noop(
+        "name": _("New Message Email"),
+        "description": _(
             "This email is used to inform users about the new messages in their inbox"
         ),
         "subject_default": "New messages at {{ site_name }}",
@@ -611,25 +611,129 @@ MAIL_EDITOR_CONF = {
         "subject": [
             {
                 "name": "site_name",
-                "description": _noop("Name of the site."),
+                "description": _("Name of the site."),
             },
         ],
         "body": [
             {
                 "name": "total_messages",
-                "description": _noop("Number of the new messages"),
+                "description": _("Number of the new messages"),
             },
             {
                 "name": "total_senders",
-                "description": _noop("Number of the senders"),
+                "description": _("Number of the senders"),
             },
             {
                 "name": "site_name",
-                "description": _noop("Name of the site"),
+                "description": _("Name of the site"),
             },
             {
                 "name": "inbox_link",
-                "description": _noop("Link to see the conversation."),
+                "description": _("Link to see the conversation."),
+            },
+        ],
+    },
+    "expiring_action": {
+        "name": _("Action end date today"),
+        "description": _(
+            "This email is used to remind users that there are actions that are ending today"
+        ),
+        "subject_default": "Actions about to end today at {{ site_name }}",
+        "body_default": """
+            <p>Beste</p>
+
+            <p>You are receiving this email because you have some actions that are expiring.</p>
+
+            <table>
+                <tr>
+                    <td>Action name</td>
+                    <td>Goal</td>
+                    <td>End date</td>
+                </tr>
+            {% for action in actions %}
+                <tr>
+                    <td>{{ action.name }}</td>
+                    <td>{{ action.goal }}</td>
+                    <td>{{ action.end_date|date:"d-m-Y" }}</td>
+                </tr>
+            {% endfor %}
+            </table>
+
+            <p><a href="{{ actions_link }}">Go to your actions</a> </p>
+
+            <p>Met vriendelijke groet,
+            {{ site_name }} </p>
+       """,
+        "subject": [
+            {
+                "name": "site_name",
+                "description": _("Name of the site."),
+            },
+        ],
+        "body": [
+            {
+                "name": "actions",
+                "description": _("A list of actions that will expire today"),
+            },
+            {
+                "name": "actions_link",
+                "description": _("The link to your actions page."),
+            },
+            {
+                "name": "site_name",
+                "description": _("Name of the site"),
+            },
+        ],
+    },
+    "expiring_plan": {
+        "name": _("Plan end date today"),
+        "description": _(
+            "This email is used to remind users that there are plans that are ending today"
+        ),
+        "subject_default": "Plans about to end today at {{ site_name }}",
+        "body_default": """
+            <p>Beste</p>
+
+            <p>You are receiving this email because you have some plans that are expiring.</p>
+
+            <table>
+                <tr>
+                    <td>Plan name</td>
+                    <td>Goal</td>
+                    <td>End date</td>
+                </tr>
+            {% for plan in plans %}
+                <tr>
+                    <td>{{ plan.title }}</td>
+                    <td>{{ plan.goal }}</td>
+                    <td>{{ plan.end_date|date:"d-m-Y" }}</td>
+                </tr>
+            {% endfor %}
+            </table>
+
+            <p><a href="{{ plan_list_link }}">Go to your plans</a> </p>
+
+            <p>Met vriendelijke groet,
+            {{ site_name }} </p>
+       """,
+        "subject": [
+            {
+                "name": "site_name",
+                "description": _("Name of the site."),
+            },
+        ],
+        "body": [
+            {
+                "name": "plans",
+                "description": _("A list of plans that will expire today"),
+            },
+            {
+                "name": "plan_list_link",
+                "description": _("The link to your plans page."),
+            },
+            {
+                "name": "site_name",
+                "description": _("Name of the site"),
             },
         ],
     },
@@ -646,9 +750,6 @@ CKEDITOR_CONFIGS = {
 
 # invite expires in X days after sending
 INVITE_EXPIRY = 14
-# send email about new messages during this interval after the message creation
-NEW_MESSAGE_INTERVAL_MINUTES = 15
-
 
 # zgw-consumers
 ZGW_CONSUMERS_TEST_SCHEMA_DIRS = [

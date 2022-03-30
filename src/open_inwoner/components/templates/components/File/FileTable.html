@@ -13,7 +13,7 @@
             <td class="table__item">{{ file.name }}</td>
             <td class="table__item">{{ file.owner.get_full_name }}</td>
             <td class="table__item">{{ file.created_on }}</td>
-            <td class="table__item">{% link icon="download" href=download_url|default:file.file.url download=True %}</td>
+            <td class="table__item">{% link icon="download" text=_("Download bestand") hide_text=True href=download_url|default:file.file.url download=True %}</td>
         </tr>
     {% endfor %}
 </table>
