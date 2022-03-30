@@ -40,3 +40,9 @@ class NotifyComandTests(TestCase):
         PlanFactory(end_date=date.today() - timedelta(days=1), created_by=user)
         call_command("plans_expire")
         self.assertEqual(len(mail.outbox), 0)
+
+    def test_notify_about_expiring_plan_inactive_user(self):
+        user = UserFactory(is_active=False)
+        plan = PlanFactory(end_date=date.today(), created_by=user)
+        call_command("plans_expire")
+        self.assertEqual(len(mail.outbox), 0)

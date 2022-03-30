@@ -38,3 +38,9 @@ class NotifyComandTests(TestCase):
         ActionFactory(end_date=date.today() - timedelta(days=1), created_by=user)
         call_command("actions_expire")
         self.assertEqual(len(mail.outbox), 0)
+
+    def test_notify_about_expiring_action_inactive_user(self):
+        user = UserFactory(is_active=False)
+        action = ActionFactory(end_date=date.today(), created_by=user)
+        call_command("actions_expire")
+        self.assertEqual(len(mail.outbox), 0)
