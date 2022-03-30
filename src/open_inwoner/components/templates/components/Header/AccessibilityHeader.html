@@ -19,10 +19,12 @@
             {% link href="#" icon="font_download" text=link_text extra_classes="accessibility--change-font" data_text=link_text data_alt_text=alt_link_text %}
         </li>
 
-        <li class="accessibility-header__list-item">
-            {% trans "Help" as link_text %}
-            {% link href="#" icon="help_outline" text=link_text extra_classes="accessibility--modal" %}
-        </li>
+        {% if help_text %}
+            <li class="accessibility-header__list-item">
+                {% trans "Help" as link_text %}
+                {% link href="#" icon="help_outline" text=link_text extra_classes="accessibility--modal" %}
+            </li>
+        {% endif %}
 
         <li class="accessibility-header__list-item">
             {% trans "Print pagina" as link_text %}
