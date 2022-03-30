@@ -3,7 +3,7 @@
 {# Utilizes same template as Card. #}
 <div class="card{% if tinted %} card--tinted{% endif %}">
     {% if src %}
-        <a class="card__header" href="{{ href }}">
+        <a class="card__header" href="{{ href }}" title="{{ title }}" aria-describedby="{{ title }}">
             <img class="card__img" src="{{ src }}" alt="{{ alt }}"/>
         </a>
     {% endif %}

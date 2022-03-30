@@ -1,5 +1,5 @@
 .breadcrumbs {
-  background-color: rgba(255, 255, 255, 0.4);
+  background-color: rgba(255, 255, 255, 0.7);
   overflow-x: auto;
   $hm: max(calc((100vw - var(--container-width)) / 2), var(--spacing-large));
   padding: 0 $hm;

@@ -5,42 +5,42 @@ register = template.Library()
 
 
 @register.inclusion_tag("components/Typography/Link.html")
-def link(href, **kwargs):
+def link(href, text, **kwargs):
     """
     Renders an hyperlink.
 
     Usage:
-        {% link 'http://www.example.com' %}
         {% link 'http://www.example.com' text=_('Example.com') %}
         {% link href='accounts:inbox' text=_('Mijn berichten') %}
 
     Variables:
-        + href, str: where the link links to (can be url name to resolve).
-        - active, optional bool: If the link is active
-        - align, optional str: "left" or "right".
-        - bold, optional bool: whether the link should be bold.
-        - button, optional bool: Whether the link should appear as button.
-        - data_text, optional str: data-text
-        - data_alt_text, optional str: data-alt-text
-        - data_icon, optional str: data-icon
-        - data_alt_icon, optional str: data-alt-icon
-        - download, optional bool: If the linked file should be downloaded.
-        - extra_classes, optional str: Extra classes
-        - hide_text, optional bool: whether to hide the text and use aria attribute instead.
-        - icon, optional str: The icon that should be displayed.
-        - icon_position, optional str: "before" or "after".
-        - primary, optional bool: If the primary styling should be used
-        - secondary, optional bool: If the secondary styling should be used
-        - toggle, optional str: If set, creates a toggle for target specified in href, the value ot toggle is used as
-        - toggle_exclusive, optional str: If set, creates a toggle group with query selector set by value.
+        + href: str | where the link links to (can be url name to resolve).
+        + text: str | The text that should be displayed in the link
+        - active: bool | If the link is active
+        - align: str | "left" or "right".
+        - bold: bool | whether the link should be bold.
+        - button: bool | Whether the link should appear as button.
+        - data_text: str | data-text
+        - data_alt_text: str | data-alt-text
+        - data_icon: str | data-icon
+        - data_alt_icon: str | data-alt-icon
+        - download: bool | If the linked file should be downloaded.
+        - extra_classes: str | Extra classes
+        - hide_text: bool | whether to hide the text and use aria attribute instead.
+        - icon: str | The icon that should be displayed.
+        - icon_position: str | "before" or "after".
+        - primary: bool | If the primary styling should be used
+        - secondary: bool | If the secondary styling should be used
+        - toggle: str | If set, creates a toggle for target specified in href, the value ot toggle is used as
+        - toggle_exclusive: str | If set, creates a toggle group with query selector set by value.
           BEM (Block Element Modifier) modifier which is added/removed on toggle.
-        - transparent, optional bool: Whether the button should not have a background or border.
-        - social_icon, optional str: The icon that should be displayed from font-awesome
-        - src, optional str: The source of the image
-        - text, optional str: The text that should be displayed in the link
-        - type, optional str: the type of button that should be used.
+        - transparent: bool | Whether the button should not have a background or border.
+        - social_icon: str | The icon that should be displayed from font-awesome
+        - src: str | The source of the image
+        - type: str | the type of button that should be used.
         - object_id: str | if href is an url name, object_id for reverse can be passed.
         - uuid: str | if href is an url name, uuid for reverse can be passed.
+        - title: string | The HTML title attribute if different than the text.
 
     Extra context:
         - base_class: string | If it is a button or a string.
@@ -101,4 +101,5 @@ def link(href, **kwargs):
     kwargs["base_class"] = get_base_class()
     kwargs["classes"] = get_classes()
     kwargs["href"] = get_href()
+    kwargs["text"] = text
     return kwargs
