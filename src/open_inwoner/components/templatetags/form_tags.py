@@ -18,6 +18,21 @@ WIDGET_TEMPLATES = {
 }
 
 
+def get_form_classes(**kwargs):
+    classes = f"form {kwargs.get('extra_classes', '')}"
+    if kwargs.get("columns"):
+        classes += f" form--columns-{kwargs.get('columns')}"
+    if kwargs.get("spaceless"):
+        classes += " form--spaceless"
+    if kwargs.get("inline"):
+        classes += " form--inline"
+    if kwargs.get("autosubmit"):
+        classes += " form--autosubmit"
+    if kwargs.get("horizontal"):
+        classes += " form--horizontal"
+    return classes
+
+
 @register.tag()
 def render_form(parser, token):
     """
@@ -51,6 +66,7 @@ def render_form(parser, token):
 
     Extra context:
         - contents: string | The html content between all the open and closing tags.
+        - classes: string | The classes that should be generated according to the options.
     """
     function_name = "render_form"
     nodelist = parser.parse(("endrender_form",))
@@ -103,15 +119,17 @@ def form(context, form_object, secondary=True, **kwargs):
 
     Extra context:
         - auto_render: True | Telling the template that the form should be rendered.
+        - classes: string | The classes that should be generated according to the options.
     """
     _context = context.flatten()
     kwargs["submit_text"] = kwargs.get("submit_text", _("Verzenden"))
+    kwargs["secondary"] = secondary
+    kwargs["auto_render"] = True
+    kwargs["form"] = form_object
+    kwargs["classes"] = get_form_classes(**kwargs)
     return {
         **_context,
         **kwargs,
-        "form": form_object,
-        "secondary": secondary,
-        "auto_render": True,
     }
 
 
@@ -375,14 +393,10 @@ class FormNode(template.Node):
         corrected_kwargs = {
             key: safe_resolve(kwarg, context) for key, kwarg in self.kwargs.items()
         }
-        output = self.nodelist.render(context)
-        method = self.method.resolve(context)
-        render_context = {
-            "contents": output,
-            "form": self.form.resolve(context),
-            "request": context.get("request"),
-            "method": method,
-            **corrected_kwargs,
-        }
-        rendered = render_to_string("components/Form/Form.html", render_context)
+        corrected_kwargs["contents"] = self.nodelist.render(context)
+        corrected_kwargs["form"] = self.form.resolve(context)
+        corrected_kwargs["request"] = context.get("request")
+        corrected_kwargs["method"] = self.method.resolve(context)
+        corrected_kwargs["classes"] = get_form_classes(**corrected_kwargs)
+        rendered = render_to_string("components/Form/Form.html", corrected_kwargs)
         return rendered
