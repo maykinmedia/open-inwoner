@@ -6,7 +6,7 @@ from django_registration.forms import RegistrationForm
 
 from open_inwoner.utils.forms import PrivateFileWidget
 
-from .choices import EmptyStatusChoices
+from .choices import EmptyContactTypeChoices, EmptyStatusChoices
 from .models import Action, Contact, Document, Invite, Message, User
 
 
@@ -76,6 +76,12 @@ class ThemesForm(forms.ModelForm):
         model = User
         fields = ("selected_themes",)
         widgets = {"selected_themes": forms.widgets.CheckboxSelectMultiple}
+
+
+class ContactFilterForm(forms.Form):
+    type = forms.ChoiceField(
+        label=_("Type contact"), choices=EmptyContactTypeChoices.choices, required=False
+    )
 
 
 class ContactForm(forms.ModelForm):

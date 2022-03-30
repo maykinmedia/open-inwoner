@@ -1,7 +1,7 @@
 {% load form_tags link_tags notification_tags %}
 {# Shared between Form and RenderForm. #}
 <form
-    class="form{% if columns %} form--columns-{{ columns }}{% endif %}{% if spaceless %} form--spaceless{% endif %}{% if inline %} form--inline{% endif %}{% if autosubmit %} form--autosubmit{% endif %} {{ extra_classes }}"
+    class="{{ classes }}"
     method="{{ method }}"
     action="{% firstof form_action request.path %}"
     {% if enctype %}enctype="{{enctype}}"{% endif %}
@@ -19,7 +19,9 @@
     {% endif %}
 
     {% if auto_render %}
-        {% csrf_token %}
+        {% if method != "GET" %}
+            {% csrf_token %}
+        {% endif %}
         {% for field in form.fields %}
             {% autorender_field form field %}
         {% endfor %}
@@ -27,7 +29,7 @@
 
     {{ contents }}
 
-    {% if auto_render %}
+    {% if auto_render and not no_actions %}
         {% if secondary_href %}
             {% form_actions primary_icon='arrow_forward' primary_text=submit_text secondary_href=secondary_href secondary_text=secondary_text secondary_icon=secondary_icon secondary_icon_position=secondary_icon_position secondary=secondary %}
         {% elif secondary_name %}
