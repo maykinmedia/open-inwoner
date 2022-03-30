@@ -27,7 +27,11 @@ class ContactListView(LoginRequiredMixin, BaseBreadcrumbMixin, ListView):
 
     def get_queryset(self):
         base_qs = super().get_queryset()
-        return base_qs.get_extended_contacts_for_user(me=self.request.user)
+        base_qs = base_qs.get_extended_contacts_for_user(me=self.request.user)
+        if self.request.GET.get("type"):
+            base_qs = base_qs.filter(type=self.request.GET.get("type"))
+
+        return base_qs
 
 
 class ContactUpdateView(LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
