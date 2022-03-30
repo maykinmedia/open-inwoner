@@ -45,11 +45,11 @@
             <li class="primary-navigation__list-item">
                 {% link text=_('Samenwerken') href='plans:plan_list' icon="people" icon_outlined=True icon_position="before" %}
             </li>
-            {% if questionnaire %}
-                <li class="primary-navigation__list-item">
-                    {% link text=_('Zelfdiagnose') href='questionnaire:index' icon="content_paste" icon_position="before" icon_outlined=True %}
-                </li>
-            {% endif %}
+        {% endif %}
+        {% if has_general_faq_questions %}
+            <li class="primary-navigation__list-item">
+                {% link text=_('FAQ') href='general_faq' icon="help_outline" icon_position="before" icon_outlined=True %}
+            </li>
         {% endif %}
     </ul>
 </nav>

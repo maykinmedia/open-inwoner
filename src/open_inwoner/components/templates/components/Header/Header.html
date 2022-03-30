@@ -45,7 +45,7 @@
                     {% endrender_form %}
                 </nav>
 
-                {% primary_navigation categories=categories request=request %}
+                {% primary_navigation categories=categories request=request has_general_faq_questions=has_general_faq_questions %}
             </div>
         </div>
 
@@ -82,6 +82,6 @@
             {% endrender_form %}
         </nav>
 
-        {% primary_navigation categories=categories request=request %}
+        {% primary_navigation categories=categories request=request has_general_faq_questions=has_general_faq_questions %}
     </div>
 </header>

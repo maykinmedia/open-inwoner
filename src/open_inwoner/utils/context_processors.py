@@ -1,7 +1,7 @@
 from django.conf import settings as django_settings
 
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.pdc.models import Category
+from open_inwoner.pdc.models import Category, Question
 from open_inwoner.search.forms import SearchForm
 
 
@@ -60,6 +60,9 @@ def settings(request):
         "matomo_enabled": config.matomo_enabled,
         "menu_categories": Category.get_root_nodes(),
         "search_form": SearchForm(),
+        "has_general_faq_questions": Question.objects.filter(
+            category__isnull=True
+        ).exists(),
         "settings": dict(
             [(k, getattr(django_settings, k, None)) for k in public_settings]
         ),

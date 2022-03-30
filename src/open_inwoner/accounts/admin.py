@@ -112,6 +112,7 @@ class AppointmentAdmin(UUIDAdminFirstInOrder, admin.ModelAdmin):
 
 @admin.register(Message)
 class MessageAdmin(PrivateMediaMixin, admin.ModelAdmin):
+    readonly_fields = ("uuid",)
     list_display = ("sender", "receiver", "created_on", "seen", "sent")
     list_filter = ("sender", "receiver")
     private_media_fields = ("file",)
