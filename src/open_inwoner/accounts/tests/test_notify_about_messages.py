@@ -55,17 +55,6 @@ class NotifyComandTests(TestCase):
 
         self.assertEqual(len(mail.outbox), 0)
 
-    def test_expired_message(self):
-        user = UserFactory.create()
-
-        MessageFactory.create(
-            receiver=user, seen=False, created_on=timezone.now() - timedelta(minutes=16)
-        )
-
-        call_command("notify_about_messages")
-
-        self.assertEqual(len(mail.outbox), 1)
-
     def test_notify_several_users(self):
         user1, user2, sender = sorted(
             UserFactory.create_batch(3, first_name="John", last_name="Smith"),
