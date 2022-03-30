@@ -633,6 +633,110 @@ MAIL_EDITOR_CONF = {
             },
         ],
     },
+    "expiring_action": {
+        "name": _("Action end date today"),
+        "description": _(
+            "This email is used to remind users that there are actions that are ending today"
+        ),
+        "subject_default": "Actions about to end today at {{ site_name }}",
+        "body_default": """
+            <p>Beste</p>
+
+            <p>You are receiving this email because you have some actions that are expiring.</p>
+
+            <table>
+                <tr>
+                    <td>Action name</td>
+                    <td>Goal</td>
+                    <td>End date</td>
+                </tr>
+            {% for action in actions %}
+                <tr>
+                    <td>{{ action.name }}</td>
+                    <td>{{ action.goal }}</td>
+                    <td>{{ action.end_date|date:"d-m-Y" }}</td>
+                </tr>
+            {% endfor %}
+            </table>
+
+            <p><a href="{{ actions_link }}">Go to your actions</a> </p>
+
+            <p>Met vriendelijke groet,
+            {{ site_name }} </p>
+       """,
+        "subject": [
+            {
+                "name": "site_name",
+                "description": _("Name of the site."),
+            },
+        ],
+        "body": [
+            {
+                "name": "actions",
+                "description": _("A list of actions that will expire today"),
+            },
+            {
+                "name": "actions_link",
+                "description": _("The link to your actions page."),
+            },
+            {
+                "name": "site_name",
+                "description": _("Name of the site"),
+            },
+        ],
+    },
+    "expiring_plan": {
+        "name": _("Plan end date today"),
+        "description": _(
+            "This email is used to remind users that there are plans that are ending today"
+        ),
+        "subject_default": "Plans about to end today at {{ site_name }}",
+        "body_default": """
+            <p>Beste</p>
+
+            <p>You are receiving this email because you have some plans that are expiring.</p>
+
+            <table>
+                <tr>
+                    <td>Plan name</td>
+                    <td>Goal</td>
+                    <td>End date</td>
+                </tr>
+            {% for plan in plans %}
+                <tr>
+                    <td>{{ plan.title }}</td>
+                    <td>{{ plan.goal }}</td>
+                    <td>{{ plan.end_date|date:"d-m-Y" }}</td>
+                </tr>
+            {% endfor %}
+            </table>
+
+            <p><a href="{{ plan_list_link }}">Go to your plans</a> </p>
+
+            <p>Met vriendelijke groet,
+            {{ site_name }} </p>
+       """,
+        "subject": [
+            {
+                "name": "site_name",
+                "description": _("Name of the site."),
+            },
+        ],
+        "body": [
+            {
+                "name": "plans",
+                "description": _("A list of plans that will expire today"),
+            },
+            {
+                "name": "plan_list_link",
+                "description": _("The link to your plans page."),
+            },
+            {
+                "name": "site_name",
+                "description": _("Name of the site"),
+            },
+        ],
+    },
 }
 MAIL_EDITOR_BASE_CONTEXT = {"site_name": "Open Inwoner Platform"}
 CKEDITOR_CONFIGS = {
