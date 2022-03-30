@@ -16,6 +16,11 @@ class Confirmation {
         showConfirmButton: true,
         confirmButtonText: this.form.dataset.confirmDefault,
         cancelButtonText: this.form.dataset.confirmCancel,
+        focusConfirm: false,
+        focusCancel: false,
+        customClass: {
+          confirmButton: 'swal2-danger',
+        },
       }).then((result) => {
         if (result.isConfirmed) {
           this.real_submit = true

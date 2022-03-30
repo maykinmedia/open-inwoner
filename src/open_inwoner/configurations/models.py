@@ -201,6 +201,22 @@ class SiteConfiguration(SingletonModel):
         verbose_name=_("Account help"),
         help_text=_("The help text for the profile page."),
     )
+    questionnaire_help_text = models.TextField(
+        blank=True,
+        default=_(
+            "Het onderdeel Zelfdiagnose stelt u in staat om met het beantwoorden van enkele vragen een advies te krijgen van de gemeente, met concrete vervolgstappen en producten en diensten. U kunt tevens uw antwoorden en het advies bewaren om met een begeleider van de gemeente te bespreken."
+        ),
+        verbose_name=_("Questionnaire help"),
+        help_text=_("The help text for the questionnaire page."),
+    )
+    plan_help_text = models.TextField(
+        blank=True,
+        default=_(
+            "Met het onderdeel Samenwerken kunt u samen met uw contactpersonen of begeleider van de gemeente aan de slag om met een samenwerkingsplan uw persoonlijke situatie te verbeteren. Door samen aan uw doelen te werken en acties te omschrijven kunnen we elkaar helpen."
+        ),
+        verbose_name=_("Plan help"),
+        help_text=_("The help text for the plan page."),
+    )
     email_new_message = models.BooleanField(
         verbose_name=_("Send email about a new message"),
         default=True,
@@ -344,6 +360,10 @@ class SiteConfiguration(SingletonModel):
             return self.search_help_text
         if current_path.startswith(reverse("accounts:my_profile")):
             return self.account_help_text
+        if current_path.startswith(reverse("questionnaire:questionnaire_list")):
+            return self.questionnaire_help_text
+        if current_path.startswith(reverse("plans:plan_list")):
+            return self.plan_help_text
 
 
 class SiteConfigurationPage(OrderedModel):
