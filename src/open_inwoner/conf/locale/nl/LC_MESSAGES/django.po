@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-30 17:03+0200\n"
+"POT-Creation-Date: 2022-03-30 18:26+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -41,19 +41,23 @@ msgstr "DigiD"
 msgid "eHerkenning"
 msgstr "eHerkenning"
 
-#: accounts/choices.py:13 accounts/forms.py:205
+#: accounts/choices.py:14
+msgid "Alle"
+msgstr "Alle"
+
+#: accounts/choices.py:18 accounts/forms.py:211
 msgid "Contactpersoon"
 msgstr "Contactpersoon"
 
-#: accounts/choices.py:14
+#: accounts/choices.py:19
 msgid "Begeleider"
 msgstr "Begeleider"
 
-#: accounts/choices.py:15
+#: accounts/choices.py:20
 msgid "Organisatie"
 msgstr "Organisatie"
 
-#: accounts/choices.py:20 accounts/models.py:400 accounts/views/cases.py:63
+#: accounts/choices.py:29 accounts/models.py:400 accounts/views/cases.py:63
 #: components/templates/components/Action/Actions.html:46
 #: templates/export/include/actions.html:7
 #: templates/export/profile/action_export.html:20
@@ -62,19 +66,19 @@ msgstr "Organisatie"
 msgid "Status"
 msgstr "Status"
 
-#: accounts/choices.py:24
+#: accounts/choices.py:33
 msgid "Open"
 msgstr "Open"
 
-#: accounts/choices.py:25
+#: accounts/choices.py:34
 msgid "Afgerond"
 msgstr "Afgerond"
 
-#: accounts/choices.py:33
+#: accounts/choices.py:42
 msgid "Incidentieel"
 msgstr "Eenmalig"
 
-#: accounts/choices.py:34
+#: accounts/choices.py:43
 msgid "Terugkerend"
 msgstr "Terugkerend"
 
@@ -88,7 +92,11 @@ msgstr "Voornaam"
 msgid "Last name"
 msgstr "Achternaam"
 
-#: accounts/forms.py:98
+#: accounts/forms.py:83
+msgid "Type contact"
+msgstr "Type contactpersoon"
+
+#: accounts/forms.py:104
 msgid ""
 "Het ingevoerde e-mailadres komt al voor in uw contactpersonen. Pas de "
 "gegevens aan en probeer het opnieuw."
@@ -96,23 +104,23 @@ msgstr ""
 "Het ingevoerde e-mailadres komt al voor in uw contactpersonen. Pas de "
 "gegevens aan en probeer het opnieuw."
 
-#: accounts/forms.py:132
+#: accounts/forms.py:138
 msgid "Myself"
 msgstr "Mezelf"
 
-#: accounts/forms.py:145
+#: accounts/forms.py:151
 msgid "The action can not end after the plan end date"
 msgstr "De actie kan niet later eindigen dan de einddatum van het plan"
 
-#: accounts/forms.py:213
+#: accounts/forms.py:219
 msgid "Schrijf een bericht..."
 msgstr "Schrijf een bericht..."
 
-#: accounts/forms.py:241
+#: accounts/forms.py:247
 msgid "Either message content or file should be filled in"
 msgstr "Of een bericht of een bestand dient te zijn ingevuld"
 
-#: accounts/forms.py:265
+#: accounts/forms.py:271
 msgid "Deadline"
 msgstr "Einddatum"
 
@@ -675,15 +683,15 @@ msgstr ""
 "Voer een juiste E-mailadres en wachtwoord in. Let op dat beide velden "
 "hoofdlettergevoelig zijn."
 
-#: accounts/tests/test_profile_views.py:28 accounts/views/profile.py:59
+#: accounts/tests/test_profile_views.py:28 accounts/views/profile.py:62
 msgid "U heeft nog geen contacten."
 msgstr "U heeft nog geen contacten."
 
 #: accounts/views/actions.py:48 accounts/views/actions.py:83
 #: accounts/views/actions.py:114 accounts/views/contacts.py:24
-#: accounts/views/contacts.py:44 accounts/views/contacts.py:76
-#: accounts/views/profile.py:28 accounts/views/profile.py:81
-#: accounts/views/profile.py:98
+#: accounts/views/contacts.py:53 accounts/views/contacts.py:85
+#: accounts/views/profile.py:28 accounts/views/profile.py:84
+#: accounts/views/profile.py:101
 #: components/templates/components/Header/PrimaryNavigation.html:27
 #: questionnaire/views.py:51 questionnaire/views.py:142
 msgid "Mijn profiel"
@@ -696,7 +704,7 @@ msgstr "Mijn profiel"
 msgid "Mijn acties"
 msgstr "Mijn acties"
 
-#: accounts/views/actions.py:86 accounts/views/contacts.py:47
+#: accounts/views/actions.py:86 accounts/views/contacts.py:56
 #: plans/views.py:248
 msgid "Bewerk {}"
 msgstr "Bewerk {}"
@@ -723,16 +731,16 @@ msgstr "Lopende aanvragen"
 msgid "Afgeronde aanvragen"
 msgstr "Afgeronde aanvragen"
 
-#: accounts/views/contacts.py:25 accounts/views/contacts.py:45
-#: accounts/views/contacts.py:77 templates/pages/profile/contacts/list.html:7
+#: accounts/views/contacts.py:25 accounts/views/contacts.py:54
+#: accounts/views/contacts.py:86 templates/pages/profile/contacts/list.html:7
 msgid "Mijn contacten"
 msgstr "Mijn contacten"
 
-#: accounts/views/contacts.py:79
+#: accounts/views/contacts.py:88
 msgid "Maak contact aan"
 msgstr "Maak contact aan"
 
-#: accounts/views/contacts.py:116
+#: accounts/views/contacts.py:125
 #, python-brace-format
 msgid "{contact} is toegevoegd aan uw contactpersonen."
 msgstr "{contact} is toegevoegd aan uw contactpersonen."
@@ -753,12 +761,12 @@ msgstr "Persoonlijk overzicht"
 #: templates/export/plans/plan_export.html:40
 #: templates/export/profile/profile_export.html:48
 #: templates/pages/plans/detail.html:69 templates/pages/product/detail.html:26
-#: templates/pages/profile/me.html:83
+#: templates/pages/profile/me.html:89
 #: templates/pages/questionnaire/questionnaire-step.html:48
 msgid "Bestanden"
 msgstr "Bestanden"
 
-#: accounts/views/profile.py:52
+#: accounts/views/profile.py:55
 msgid ""
 "{Action.objects.connected(self.request.user).filter(status=StatusChoices."
 "open).count()} acties staan open."
@@ -766,15 +774,15 @@ msgstr ""
 "{Action.objects.connected(self.request.user).filter(status=StatusChoices."
 "open).count()} acties staan open."
 
-#: accounts/views/profile.py:68
+#: accounts/views/profile.py:71
 msgid "Uw account kon niet worden gedeactiveerd"
 msgstr "Uw account kon niet worden gedeactiveerd."
 
-#: accounts/views/profile.py:82
+#: accounts/views/profile.py:85
 msgid "Bewerk profiel"
 msgstr "Bewerk profiel"
 
-#: accounts/views/profile.py:99
+#: accounts/views/profile.py:102
 msgid "Mijn thema's"
 msgstr "Mijn thema's"
 
@@ -800,7 +808,7 @@ msgstr "Opslaan als PDF"
 
 #: components/templates/components/Action/Actions.html:25 plans/views.py:117
 #: templates/pages/plans/detail.html:16
-#: templates/pages/profile/contacts/list.html:35
+#: templates/pages/profile/contacts/list.html:37
 #: templates/pages/profile/me.html:13
 msgid "Bewerken"
 msgstr "Bewerken"
@@ -858,19 +866,19 @@ msgid "Weet je het zeker dat je dit bestand wilt verwijderen?"
 msgstr "Weet je het zeker dat je dit bestand wilt verwijderen?"
 
 #: components/templates/components/File/File.html:26 pdc/choices.py:8
-#: templates/pages/profile/contacts/list.html:39
-#: templates/pages/profile/me.html:78
+#: templates/pages/profile/contacts/list.html:41
+#: templates/pages/profile/me.html:84
 msgid "Nee"
 msgstr "Nee"
 
 #: components/templates/components/File/File.html:26 pdc/choices.py:7
-#: templates/pages/profile/contacts/list.html:39
-#: templates/pages/profile/me.html:78
+#: templates/pages/profile/contacts/list.html:41
+#: templates/pages/profile/me.html:84
 msgid "Ja"
 msgstr "Ja"
 
 #: components/templates/components/File/File.html:28
-#: templates/pages/profile/contacts/list.html:41
+#: templates/pages/profile/contacts/list.html:43
 msgid "Verwijderen"
 msgstr "Verwijderen"
 
@@ -947,19 +955,19 @@ msgstr "Dyslexie"
 msgid "Normaal lettertype"
 msgstr "Normaal lettertype"
 
-#: components/templates/components/Header/AccessibilityHeader.html:23
+#: components/templates/components/Header/AccessibilityHeader.html:24
 msgid "Help"
 msgstr "Help"
 
-#: components/templates/components/Header/AccessibilityHeader.html:28
+#: components/templates/components/Header/AccessibilityHeader.html:30
 msgid "Print pagina"
 msgstr "Print pagina"
 
-#: components/templates/components/Header/AccessibilityHeader.html:32
+#: components/templates/components/Header/AccessibilityHeader.html:34
 msgid "Uitleg pagina"
 msgstr "Uitleg over de huidige pagina"
 
-#: components/templates/components/Header/AccessibilityHeader.html:32
+#: components/templates/components/Header/AccessibilityHeader.html:34
 #: templates/pages/plans/create.html:43
 msgid "Sluiten"
 msgstr "Sluiten"
@@ -999,7 +1007,7 @@ msgid "Bericht van:"
 msgstr "Bericht van:"
 
 #: components/templates/components/Messages/Messages.html:47
-#: components/templatetags/form_tags.py:108
+#: components/templatetags/form_tags.py:129
 #: templates/pages/plans/create.html:55 templates/pages/plans/edit.html:17
 msgid "Verzenden"
 msgstr "Verzenden"
@@ -1097,7 +1105,8 @@ msgid ""
 "This email is used to remind users that there are actions that are ending "
 "today"
 msgstr ""
-"Deze e-mail is om gebruikers te herinneren dat er acties zijn die vandaag aflopen"
+"Deze e-mail is om gebruikers te herinneren dat er acties zijn die vandaag "
+"aflopen"
 
 #: conf/base.py:676
 msgid "A list of actions that will expire today"
@@ -1115,7 +1124,8 @@ msgstr "Plan einddatum vandaag"
 msgid ""
 "This email is used to remind users that there are plans that are ending today"
 msgstr ""
-"Deze e-mail is bedoeld om gebruikers te herinneren dat hun plan vandaag afloopt"
+"Deze e-mail is bedoeld om gebruikers te herinneren dat hun plan vandaag "
+"afloopt"
 
 #: conf/base.py:728
 msgid "A list of plans that will expire today"
@@ -1141,15 +1151,15 @@ msgstr "Paginateksten"
 msgid "Help texts"
 msgstr "Helpteksten"
 
-#: configurations/admin.py:98
+#: configurations/admin.py:100
 msgid "Footer addresses"
 msgstr "Footer adres"
 
-#: configurations/admin.py:109
+#: configurations/admin.py:111
 msgid "Emails"
 msgstr "E-mails"
 
-#: configurations/admin.py:111
+#: configurations/admin.py:113
 msgid "Analytics"
 msgstr "Analytics"
 
@@ -1445,60 +1455,103 @@ msgstr "Mijn Profiel help"
 msgid "The help text for the profile page."
 msgstr "De helptekst in de popup van de profielpagina's"
 
-#: configurations/models.py:205
+#: configurations/models.py:207 configurations/tests/test_help_modal.py:122
+msgid ""
+"Het onderdeel Zelfdiagnose stelt u in staat om met het beantwoorden van "
+"enkele vragen een advies te krijgen van de gemeente, met concrete "
+"vervolgstappen en producten en diensten. U kunt tevens uw antwoorden en het "
+"advies bewaren om met een begeleider van de gemeente te bespreken."
+msgstr ""
+"Het onderdeel Zelfdiagnose stelt u in staat om met het beantwoorden van "
+"enkele vragen een advies te krijgen van de gemeente, met concrete "
+"vervolgstappen en producten en diensten. U kunt tevens uw antwoorden en het "
+"advies bewaren om met een begeleider van de gemeente te bespreken."
+
+#: configurations/models.py:209
+#| msgid "Questionnaire step"
+msgid "Questionnaire help"
+msgstr "Vragenlijst/Zelfdiagnose help"
+
+#: configurations/models.py:210
+#| msgid "The help text for the search page."
+msgid "The help text for the questionnaire page."
+msgstr "De helptekst in de popup op de vragenlijst/zelfdiagnosepagina's"
+
+#: configurations/models.py:215 configurations/tests/test_help_modal.py:141
+msgid ""
+"Met het onderdeel Samenwerken kunt u samen met uw contactpersonen of "
+"begeleider van de gemeente aan de slag om met een samenwerkingsplan uw "
+"persoonlijke situatie te verbeteren. Door samen aan uw doelen te werken en "
+"acties te omschrijven kunnen we elkaar helpen."
+msgstr ""
+"Met het onderdeel Samenwerken kunt u samen met uw contactpersonen of "
+"begeleider van de gemeente aan de slag om met een samenwerkingsplan uw "
+"persoonlijke situatie te verbeteren. Door samen aan uw doelen te werken en "
+"acties te omschrijven kunnen we elkaar helpen."
+
+#: configurations/models.py:217
+#| msgid "Plan template"
+msgid "Plan help"
+msgstr "Plan help"
+
+#: configurations/models.py:218
+msgid "The help text for the plan page."
+msgstr "De helptekst in de popup van de planpagina's"
+
+#: configurations/models.py:221
 msgid "Send email about a new message"
 msgstr "Stuur een mail bij nieuwe berichten"
 
-#: configurations/models.py:207
+#: configurations/models.py:223
 msgid "Whether to send email about each new message the user receives"
 msgstr ""
 "Of er een e-mail ter notificatie verstuurd dient te worden na een nieuw "
 "bericht voor de gebruiker."
 
-#: configurations/models.py:210
+#: configurations/models.py:226
 msgid "Google Tag Manager code"
 msgstr "Google Tag Manager code"
 
-#: configurations/models.py:214
+#: configurations/models.py:230
 msgid ""
 "Typically looks like 'GTM-XXXX'. Supplying this installs Google Tag Manager."
 msgstr ""
 "Normaalgesproken is dit een code van het formaat 'GTM-XXXX'. Door dit in te "
 "stellen wordt Google Tag Manager gebruikt."
 
-#: configurations/models.py:218
+#: configurations/models.py:234
 msgid "Google Analytics code"
 msgstr "Google Analytics code"
 
-#: configurations/models.py:222
+#: configurations/models.py:238
 msgid ""
 "Typically looks like 'G-XXXXX'. Supplying this installs Google Analytics."
 msgstr ""
 "Normaalgesproken is dit een code van het formaat 'G-XXXX'. Door dit in te "
 "stellen wordt Google Analytics gebruikt."
 
-#: configurations/models.py:226
+#: configurations/models.py:242
 msgid "Matomo server URL"
 msgstr "Matamo server URL"
 
-#: configurations/models.py:229
+#: configurations/models.py:245
 msgid "The base URL of your Matomo server, e.g. 'matomo.example.com'."
 msgstr ""
 "De domeinnaam / URL van de Matamo server, bijvoorbeeld 'matamo.example.com'."
 
-#: configurations/models.py:232
+#: configurations/models.py:248
 msgid "Matomo site ID"
 msgstr "Matamo site ID"
 
-#: configurations/models.py:235
+#: configurations/models.py:251
 msgid "The 'idsite' of the website you're tracking in Matomo."
 msgstr "De 'idsite' van de website in Matamo die getrackt dient te worden."
 
-#: configurations/models.py:238
+#: configurations/models.py:254
 msgid "Show cases"
 msgstr "Toon 'Mijn Aanvragen'"
 
-#: configurations/models.py:241
+#: configurations/models.py:257
 msgid ""
 "By default the cases are not shown. If the OpenZaak integration is "
 "configured this needs to be set to True."
@@ -1507,11 +1560,11 @@ msgstr ""
 "geconfigureerd dan worden na het inschakelen de zaken van de gebruiker "
 "inzichtelijk via 'Mijn Aanvragen'."
 
-#: configurations/models.py:245
+#: configurations/models.py:261
 msgid "Laat productzoeker zien op de homepagina."
 msgstr "Laat productzoeker zien op de homepagina."
 
-#: configurations/models.py:249
+#: configurations/models.py:265
 msgid ""
 "Als dit is aangevinkt en er zijn product condities gemaakt, dan wordt op de "
 "homepagina de productzoeker weergegeven."
@@ -1519,23 +1572,23 @@ msgstr ""
 "Als dit is aangevinkt en er zijn product condities gemaakt, dan wordt op de "
 "homepagina de productzoeker weergegeven."
 
-#: configurations/models.py:254 configurations/models.py:257
+#: configurations/models.py:270 configurations/models.py:273
 msgid "Site Configuration"
 msgstr "Algemene configuratie"
 
-#: configurations/models.py:352
+#: configurations/models.py:372
 msgid "Configuration"
 msgstr "Configuratie"
 
-#: configurations/models.py:358
+#: configurations/models.py:378
 msgid "Flatpage"
 msgstr "Pagina"
 
-#: configurations/models.py:367
+#: configurations/models.py:387
 msgid "Flatpage in the footer"
 msgstr "Platte pagina in footer"
 
-#: configurations/models.py:368
+#: configurations/models.py:388
 msgid "Flatpages in the footer"
 msgstr "Platte pagina's in footer"
 
@@ -2188,7 +2241,7 @@ msgstr "Doelen"
 
 #: plans/views.py:71 templates/export/plans/plan_export.html:45
 #: templates/export/profile/profile_export.html:44
-#: templates/pages/plans/detail.html:80 templates/pages/profile/me.html:67
+#: templates/pages/plans/detail.html:80 templates/pages/profile/me.html:73
 msgid "Acties"
 msgstr "Acties"
 
@@ -2308,15 +2361,17 @@ msgstr "Vragenlijststap bijlagen"
 msgid "Geen bestand geselecteerd."
 msgstr "Geen bestand geselecteerd."
 
-#: questionnaire/views.py:52 questionnaire/views.py:55
-#: questionnaire/views.py:143 questionnaire/views.py:146
-#: templates/pages/profile/me.html:61
-msgid "Zelfdiagnose"
-msgstr "Zelfdiagnose"
-
+#: questionnaire/tests/test_export.py:30 questionnaire/tests/test_export.py:42
 #: questionnaire/views.py:81
+#, python-brace-format
 msgid "questionnaire_{slug}.pdf"
 msgstr "Resultaten_vragenlijst_{slug}.pdf"
+
+#: questionnaire/views.py:52 questionnaire/views.py:55
+#: questionnaire/views.py:143 questionnaire/views.py:146
+#: templates/pages/profile/me.html:67
+msgid "Zelfdiagnose"
+msgstr "Zelfdiagnose"
 
 #: search/admin.py:21
 msgid ""
@@ -2630,7 +2685,7 @@ msgid "Linkedin"
 msgstr "Linkedin"
 
 #: templates/pages/product/detail.html:121
-#: templates/pages/profile/contacts/list.html:17
+#: templates/pages/profile/contacts/list.html:19
 msgid "Telefoonnummer"
 msgstr "Telefoonnummer"
 
@@ -2642,7 +2697,11 @@ msgstr "E-mail"
 msgid "Producten"
 msgstr "Producten"
 
-#: templates/pages/product/finder.html:23
+#: templates/pages/product/finder.html:20
+msgid "Geen producten gevonden"
+msgstr "Geen producten gevonden"
+
+#: templates/pages/product/finder.html:27
 msgid "Mogelijke producten"
 msgstr "Mogelijke producten"
 
@@ -2663,7 +2722,7 @@ msgid "Nieuwe actie toevoegen"
 msgstr "Nieuwe actie toevoegen"
 
 #: templates/pages/profile/actions/list.html:18
-#: templates/pages/profile/contacts/list.html:51
+#: templates/pages/profile/contacts/list.html:53
 msgid "Terug naar mijn profiel"
 msgstr "Terug naar mijn profiel"
 
@@ -2698,27 +2757,27 @@ msgstr "Creëer Contact"
 msgid "Nieuw contact toevoegen"
 msgstr "Nieuw contact toevoegen"
 
-#: templates/pages/profile/contacts/list.html:14
+#: templates/pages/profile/contacts/list.html:16
 msgid "Naam"
 msgstr "Naam"
 
-#: templates/pages/profile/contacts/list.html:15
+#: templates/pages/profile/contacts/list.html:17
 msgid "Soort contact"
 msgstr "Soort contact"
 
-#: templates/pages/profile/contacts/list.html:16
+#: templates/pages/profile/contacts/list.html:18
 msgid "E-mailadres"
 msgstr "E-mailadres"
 
-#: templates/pages/profile/contacts/list.html:18
+#: templates/pages/profile/contacts/list.html:20
 msgid "Actief"
 msgstr "Actief"
 
-#: templates/pages/profile/contacts/list.html:30
+#: templates/pages/profile/contacts/list.html:32
 msgid "Stuur bericht"
 msgstr "Stuur bericht"
 
-#: templates/pages/profile/contacts/list.html:39
+#: templates/pages/profile/contacts/list.html:41
 msgid "Are you sure you want to delete this contact?"
 msgstr "Weet je zeker dat je je contact wilt verwijderen?"
 
@@ -2742,31 +2801,35 @@ msgstr "Volgende actie"
 msgid "Begeleider van de gemeente"
 msgstr "Begeleider van de gemeente"
 
-#: templates/pages/profile/me.html:55
+#: templates/pages/profile/me.html:56
+msgid "U heeft (nog) geen gemeentelijke begeleider."
+msgstr "U heeft geen gemeentelijke begeleider."
+
+#: templates/pages/profile/me.html:61
 msgid "Mijn netwerkcontacten"
 msgstr "Mijn netwerkcontacten"
 
-#: templates/pages/profile/me.html:57
+#: templates/pages/profile/me.html:63
 msgid "Beheer contacten"
 msgstr "Beheer contacten"
 
-#: templates/pages/profile/me.html:63
+#: templates/pages/profile/me.html:69
 msgid "Start zelfdiagnose"
 msgstr "Start zelfdiagnose"
 
-#: templates/pages/profile/me.html:72
+#: templates/pages/profile/me.html:78
 msgid "Afspraken"
 msgstr "Afspraken"
 
-#: templates/pages/profile/me.html:78
+#: templates/pages/profile/me.html:84
 msgid "Weet je het zeker dat je je account wilt deactiveren?"
 msgstr "Weet je het zeker dat je je account wilt deactiveren?"
 
-#: templates/pages/profile/me.html:80
+#: templates/pages/profile/me.html:86
 msgid "Profiel deactiveren"
 msgstr "Profiel deactiveren"
 
-#: templates/pages/profile/me.html:86
+#: templates/pages/profile/me.html:92
 msgid "Bestand toevoegen"
 msgstr "Bestand toevoegen"
 
@@ -2788,7 +2851,8 @@ msgstr "Opslaan als PDF"
 
 #: templates/pages/questionnaire/questionnaire-step.html:10
 msgid "Your results are also saved to your profile if you are logged in."
-msgstr "Mocht je ingelogd zijn dan wordt de PDF tevens toegevoegd aan je profiel."
+msgstr ""
+"Mocht je ingelogd zijn dan wordt de PDF tevens toegevoegd aan je profiel."
 
 #: templates/pages/questionnaire/questionnaire-step.html:32
 msgid "Naar profiel"
