@@ -1,20 +1,18 @@
 $image-height: 261px;
 
 .main-image {
-  height: $image-height;
+  // height: $image-height;
   object-fit: cover;
   width: 100%;
+  aspect-ratio: 64 / 32;
 
   @media (min-width: 768px) {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: var(--header-height);
+    aspect-ratio: 64 / 13;
+    position: relative;
+    top: -var(--row-height);
   }
 
   &.main-image--start-after ~ .container {
-    @media (min-width: 768px) {
-      margin-top: $image-height;
-    }
+    margin-top: 0;
   }
 }
