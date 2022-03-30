@@ -2,7 +2,7 @@ import os
 
 # Django-hijack (and Django-hijack-admin)
 from django.urls import reverse_lazy
-from django.utils.translation import ugettext_noop as _noop
+from django.utils.translation import gettext_lazy as _
 
 import sentry_sdk
 
@@ -551,8 +551,8 @@ IMPORT_EXPORT_USE_TRANSACTIONS = True
 # mail-editor
 MAIL_EDITOR_CONF = {
     "invite": {
-        "name": _noop("Invitation Email"),
-        "description": _noop(
+        "name": _("Invitation Email"),
+        "description": _(
             "This email is used to invite people to sing up to the website"
         ),
         "subject_default": "Uitnodiging voor {{ site_name }}",
@@ -572,29 +572,29 @@ MAIL_EDITOR_CONF = {
         "subject": [
             {
                 "name": "site_name",
-                "description": _noop("Name of the site."),
+                "description": _("Name of the site."),
             },
-            {"name": "inviter_name", "description": _noop("Full name of the inviter")},
+            {"name": "inviter_name", "description": _("Full name of the inviter")},
         ],
         "body": [
             {
                 "name": "inviter_name",
-                "description": _noop("Full name of the inviter"),
+                "description": _("Full name of the inviter"),
             },
             {
                 "name": "site_name",
-                "description": _noop("Name of the site"),
+                "description": _("Name of the site"),
             },
             {
                 "name": "invite_link",
-                "description": _noop("Link to activate their account."),
+                "description": _("Link to activate their account."),
             },
-            {"name": "email", "description": _noop("Email of the invited user")},
+            {"name": "email", "description": _("Email of the invited user")},
         ],
     },
     "new_messages": {
-        "name": _noop("New Message Email"),
-        "description": _noop(
+        "name": _("New Message Email"),
+        "description": _(
             "This email is used to inform users about the new messages in their inbox"
         ),
         "subject_default": "New messages at {{ site_name }}",
@@ -611,25 +611,25 @@ MAIL_EDITOR_CONF = {
         "subject": [
             {
                 "name": "site_name",
-                "description": _noop("Name of the site."),
+                "description": _("Name of the site."),
             },
         ],
         "body": [
             {
                 "name": "total_messages",
-                "description": _noop("Number of the new messages"),
+                "description": _("Number of the new messages"),
             },
             {
                 "name": "total_senders",
-                "description": _noop("Number of the senders"),
+                "description": _("Number of the senders"),
             },
             {
                 "name": "site_name",
-                "description": _noop("Name of the site"),
+                "description": _("Name of the site"),
             },
             {
                 "name": "inbox_link",
-                "description": _noop("Link to see the conversation."),
+                "description": _("Link to see the conversation."),
             },
         ],
     },
