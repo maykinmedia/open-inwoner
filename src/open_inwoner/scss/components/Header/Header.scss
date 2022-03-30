@@ -42,7 +42,7 @@ $vm: var(--spacing-large);
 
       > .header__actions {
         display: block;
-        grid-column: 9 / span 3;
+        grid-column: 9 / span 4;
       }
 
       > .primary-navigation {
@@ -113,10 +113,6 @@ $vm: var(--spacing-large);
     }
   }
 
-  &__actions {
-    align-self: center;
-  }
-
   .primary-navigation {
     grid-area: nv;
     width: 100%;
@@ -138,6 +134,7 @@ $vm: var(--spacing-large);
     align-items: flex-end;
     display: flex;
     flex-direction: column;
+    align-self: center;
     justify-content: flex-end;
   }
 
@@ -173,6 +170,10 @@ $vm: var(--spacing-large);
 
     .form__actions {
       margin: 0;
+    }
+
+    .input {
+      min-width: auto;
     }
   }
 }
