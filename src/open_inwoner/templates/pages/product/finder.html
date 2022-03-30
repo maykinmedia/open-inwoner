@@ -16,7 +16,9 @@
                         {% link href=product.get_absolute_url text=product.name primary=True icon="arrow_forward" %}
                     </li>
 		{% empty %}
-		    <li class="product-filter__item">{% trans "Geen producten gevonden" %}</li>
+		<li class="product-filter__item">
+		  <p class="p">{% trans "Geen producten gevonden" %}</p>
+		</li>
                 {% endfor %}
             </ul>
 
