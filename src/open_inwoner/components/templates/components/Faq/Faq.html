@@ -8,7 +8,7 @@
             <li class="faq__list-item">
                 {% firstof question.pk|slugify as id %}
                 {% firstof 'question-'|add:id|add:'-answer' as answer_id %}
-                {% link bold=True text=_("Open vraag") hide_text=True href='#'|add:answer_id icon='chevron_right' secondary=True text=question.question toggle="open"  %}
+                {% link bold=True href='#'|add:answer_id icon='chevron_right' secondary=True text=question.question toggle="open"  %}
                 <p id="{{ answer_id }}" class="p faq__answer">{{ question.answer }}</p>
             </li>
         {% endfor %}
