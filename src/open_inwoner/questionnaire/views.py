@@ -78,9 +78,9 @@ class QuestionnaireExportView(ExportMixin, TemplateView):
     template_name = "export/questionnaire/questionnaire_export.html"
 
     def get_filename(self):
-        return str(
-            _(
-                f"questionnaire_{self.request.session.get('questionnaire.views.QuestionnaireStepView.object.slug')}.pdf"
+        return _("questionnaire_{slug}.pdf").format(
+            slug=self.request.session.get(
+                "questionnaire.views.QuestionnaireStepView.object.slug"
             )
         )
 
