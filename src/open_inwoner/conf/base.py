@@ -634,8 +634,8 @@ MAIL_EDITOR_CONF = {
         ],
     },
     "expiring_action": {
-        "name": _noop("Action end date today"),
-        "description": _noop(
+        "name": _("Action end date today"),
+        "description": _(
             "This email is used to remind users that there are actions that are ending today"
         ),
         "subject_default": "Actions about to end today at {{ site_name }}",
@@ -667,27 +667,27 @@ MAIL_EDITOR_CONF = {
         "subject": [
             {
                 "name": "site_name",
-                "description": _noop("Name of the site."),
+                "description": _("Name of the site."),
             },
         ],
         "body": [
             {
                 "name": "actions",
-                "description": _noop("A list of actions that will expire today"),
+                "description": _("A list of actions that will expire today"),
             },
             {
                 "name": "actions_link",
-                "description": _noop("The link to your actions page."),
+                "description": _("The link to your actions page."),
             },
             {
                 "name": "site_name",
-                "description": _noop("Name of the site"),
+                "description": _("Name of the site"),
             },
         ],
     },
     "expiring_plan": {
-        "name": _noop("Plan end date today"),
-        "description": _noop(
+        "name": _("Plan end date today"),
+        "description": _(
             "This email is used to remind users that there are plans that are ending today"
         ),
         "subject_default": "Plans about to end today at {{ site_name }}",
@@ -719,21 +719,21 @@ MAIL_EDITOR_CONF = {
         "subject": [
             {
                 "name": "site_name",
-                "description": _noop("Name of the site."),
+                "description": _("Name of the site."),
             },
         ],
         "body": [
             {
                 "name": "plans",
-                "description": _noop("A list of plans that will expire today"),
+                "description": _("A list of plans that will expire today"),
             },
             {
                 "name": "plan_list_link",
-                "description": _noop("The link to your plans page."),
+                "description": _("The link to your plans page."),
             },
             {
                 "name": "site_name",
-                "description": _noop("Name of the site"),
+                "description": _("Name of the site"),
             },
         ],
     },
