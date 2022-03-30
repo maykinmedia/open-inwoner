@@ -1044,7 +1044,7 @@ msgstr "Uitnodiging E-mail"
 
 #: conf/base.py:556
 msgid "This email is used to invite people to sing up to the website"
-msgstr "Dit e-mail wordt gebruikt om personen uit te nodigen voor de website"
+msgstr "Deze e-mail wordt gebruikt om personen uit te nodigen voor de website"
 
 #: conf/base.py:575 conf/base.py:614 conf/base.py:670 conf/base.py:722
 msgid "Name of the site."
