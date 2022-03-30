@@ -5,6 +5,7 @@ from typing import List
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
+from django.db.models import Q
 from django.urls import reverse
 
 from mail_editor.helpers import find_template
@@ -26,14 +27,23 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         today = date.today()
-        user_ids = Plan.objects.filter(end_date=today).values_list(
-            "created_by_id", flat=True
+        created_by_ids = list(
+            Plan.objects.filter(end_date=today).values_list("created_by_id", flat=True)
         )
+        contact_ids = list(
+            Plan.objects.filter(end_date=today).values_list(
+                "contacts__contact_user_id", flat=True
+            )
+        )
+
+        user_ids = created_by_ids + contact_ids
         receivers = User.objects.filter(is_active=True, pk__in=user_ids).distinct()
 
         for receiver in receivers:
             """send email to each user"""
-            plans = Plan.objects.filter(created_by=receiver, end_date=today)
+            plans = Plan.objects.filter(end_date=today).filter(
+                Q(created_by=receiver) | Q(contacts__contact_user=receiver)
+            )
             self.send_email(
                 receiver=receiver,
                 plans=plans,
