@@ -50,7 +50,8 @@
         <th class="table__header">{% trans "Begeleider van de gemeente" %}</th>
         {% if mentor_contacts %}
             <td class="table__item">{{ mentor_contacts|join:", " }}</td>
-            <td class="table__item table__item--right">{% link href="accounts:contact_list" text="Stuur een bericht" icon="arrow_forward" icon_position="after" primary=True %}</td>
+            {% url 'accounts:contact_list' as mentor_url %}
+            <td class="table__item table__item--right">{% link href=mentor_url|add:"?type=begeleider" text="Stuur een bericht" icon="arrow_forward" icon_position="after" primary=True %}</td>
         {% else %}
             <td class="table__item">{% trans "U heeft (nog) geen gemeentelijke begeleider." %}</td>
             <td class="table__item table__item--right"></td>
