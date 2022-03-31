@@ -2,9 +2,9 @@ from django.test import TestCase
 
 from open_inwoner.pdc.tests.factories import ProductFactory
 
+from ..models import FieldBoost
 from ..searches import search_products
 from .utils import ESMixin
-from ..models import FieldBoost
 
 
 class SearchBoostTests(ESMixin, TestCase):
