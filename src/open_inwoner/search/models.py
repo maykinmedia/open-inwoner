@@ -1,8 +1,12 @@
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models.deletion import CASCADE
 from django.utils.translation import ugettext_lazy as _
 
 from django_better_admin_arrayfield.models.fields import ArrayField
+from solo.models import SingletonModel
+
+from .query import FieldBoostQueryset
 
 
 class Synonym(models.Model):
@@ -79,3 +83,31 @@ class Feedback(models.Model):
 
     def get_absolute_url(self):
         return self.search_url
+
+
+class FieldBoost(models.Model):
+    field = models.CharField(
+        verbose_name=_("Field"),
+        unique=True,
+        max_length=200,
+        help_text=_("Field name of the Elastic document. For nested fields use '.' "),
+    )
+    boost = models.DecimalField(
+        verbose_name=_("Boost"),
+        decimal_places=2,
+        max_digits=4,
+        validators=[MinValueValidator(0)],
+        help_text=_(
+            "Boost which multiplies the score for the particular field. "
+            "The default boost for all fields = 1"
+        ),
+    )
+
+    objects = FieldBoostQueryset.as_manager()
+
+    class Meta:
+        verbose_name = _("Field boost")
+        verbose_name_plural = _("Field boosts")
+
+    def __str__(self):
+        return f"{self.field} - {self.boost}"
