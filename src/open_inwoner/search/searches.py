@@ -4,6 +4,7 @@ from elasticsearch_dsl import FacetedSearch, NestedFacet, TermsFacet, query
 
 from .constants import FacetChoices
 from .documents import ProductDocument
+from .models import FieldBoost
 from .results import AutocompleteResult, ProductSearchResult
 
 
@@ -11,7 +12,7 @@ class ProductSearch(FacetedSearch):
     index = settings.ES_INDEX_PRODUCTS
     doc_types = [ProductDocument]
     fields = [
-        "name^4",
+        "name",
         "name.partial",
         "summary",
         "summary.partial",
@@ -42,17 +43,30 @@ class ProductSearch(FacetedSearch):
             filters &= f
         return search.filter(filters)
 
+    def get_boosted_fields(self) -> list:
+        """
+        Add boosts for particular fields which are configured in the FieldBoost model
+        """
+        boosted_fields = []
+        boost_mapping = FieldBoost.objects.as_dict()
+
+        for field in self.fields:
+            boosted_field = (
+                f"{field}^{boost_mapping[field]}" if field in boost_mapping else field
+            )
+            boosted_fields.append(boosted_field)
+
+        return boosted_fields
+
     def query(self, search, query):
         """
-        Add fuziness to the default search
+        Add fuzziness and boosting to the default search
         """
         if query:
-            if self.fields:
-                return search.query(
-                    "multi_match", fields=self.fields, query=query, fuzziness="AUTO"
-                )
-            else:
-                return search.query("multi_match", query=query, fuzziness="AUTO")
+            fields = self.get_boosted_fields()
+            return search.query(
+                "multi_match", fields=fields, query=query, fuzziness="AUTO"
+            )
         return search
 
 
