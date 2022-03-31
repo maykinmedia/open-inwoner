@@ -401,6 +401,8 @@ class FormNode(template.Node):
         corrected_kwargs["form"] = self.form.resolve(context)
         corrected_kwargs["request"] = context.get("request")
         corrected_kwargs["method"] = self.method.resolve(context)
+        corrected_kwargs["csrf_token"] = context.get("csrf_token")
+        # The classes should stay at the bottom
         corrected_kwargs["classes"] = get_form_classes(**corrected_kwargs)
         rendered = render_to_string("components/Form/Form.html", corrected_kwargs)
         return rendered
