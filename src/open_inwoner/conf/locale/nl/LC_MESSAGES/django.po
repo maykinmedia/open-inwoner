@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-30 18:26+0200\n"
+"POT-Creation-Date: 2022-04-01 14:33+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,17 +17,22 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: accounts/admin.py:25
+#: accounts/admin.py:26
 msgid "Personal info"
 msgstr "Persoonlijke informatie"
 
-#: accounts/admin.py:42
+#: accounts/admin.py:43
 msgid "Permissions"
 msgstr "Permissies"
 
-#: accounts/admin.py:56
+#: accounts/admin.py:57
 msgid "Important dates"
 msgstr "Belangrijke datums"
+
+#: accounts/admin.py:108
+#, python-brace-format
+msgid "<a href='{url}'>{text}</a>"
+msgstr ""
 
 #: accounts/choices.py:7
 msgid "E-mail en Wachtwoord"
@@ -261,7 +266,7 @@ msgstr "Type contactpersoon"
 
 #: accounts/models.py:209 accounts/models.py:296 accounts/models.py:348
 #: accounts/models.py:438 accounts/models.py:506 accounts/models.py:574
-#: pdc/models/product.py:70 search/models.py:57
+#: pdc/models/product.py:70 search/models.py:61
 #: templates/export/plans/plan_export.html:30
 #: templates/export/profile/action_export.html:44
 msgid "Created on"
@@ -858,6 +863,7 @@ msgid "Deel"
 msgstr "Deel"
 
 #: components/templates/components/File/File.html:22
+#: components/templates/components/File/File.html:33
 msgid "Download"
 msgstr "Download"
 
@@ -1468,12 +1474,10 @@ msgstr ""
 "advies bewaren om met een begeleider van de gemeente te bespreken."
 
 #: configurations/models.py:209
-#| msgid "Questionnaire step"
 msgid "Questionnaire help"
 msgstr "Vragenlijst/Zelfdiagnose help"
 
 #: configurations/models.py:210
-#| msgid "The help text for the search page."
 msgid "The help text for the questionnaire page."
 msgstr "De helptekst in de popup op de vragenlijst/zelfdiagnosepagina's"
 
@@ -1490,7 +1494,6 @@ msgstr ""
 "acties te omschrijven kunnen we elkaar helpen."
 
 #: configurations/models.py:217
-#| msgid "Plan template"
 msgid "Plan help"
 msgstr "Plan help"
 
@@ -2373,7 +2376,7 @@ msgstr "Resultaten_vragenlijst_{slug}.pdf"
 msgid "Zelfdiagnose"
 msgstr "Zelfdiagnose"
 
-#: search/admin.py:21
+#: search/admin.py:22
 msgid ""
 "After the synonyms are changed the search engine has to be restarted. "
 "Contact your administrators for help."
@@ -2397,79 +2400,106 @@ msgstr "Filter op organisaties"
 msgid "Zoek op trefwoord"
 msgstr "Zoek op trefwoord"
 
-#: search/models.py:10
+#: search/models.py:14
 msgid "Term"
 msgstr "Term"
 
-#: search/models.py:10
+#: search/models.py:14
 msgid "The term"
 msgstr "De term"
 
-#: search/models.py:14 search/models.py:21
+#: search/models.py:18 search/models.py:25
 msgid "Synonyms"
 msgstr "Synoniemen"
 
-#: search/models.py:16
+#: search/models.py:20
 msgid "Words-synonyms concerning the term"
 msgstr "Woord-synoniemen voor deze term"
 
-#: search/models.py:20
+#: search/models.py:24
 msgid "Synonym"
 msgstr "Synoniem"
 
-#: search/models.py:33
+#: search/models.py:37
 msgid "Search query"
 msgstr "Zoekterm"
 
-#: search/models.py:35
+#: search/models.py:39
 msgid "Words which are used by the user in the search box"
 msgstr "Ingevuld door de gebruiker om te zoeken"
 
-#: search/models.py:38
+#: search/models.py:42
 msgid "Search url"
 msgstr "Zoek url"
 
-#: search/models.py:42
+#: search/models.py:46
 msgid "The generated url of user's search"
 msgstr "De URL geneereerd door de zoekopdracht van de gebruiker"
 
-#: search/models.py:45
+#: search/models.py:49
 msgid "Positive"
 msgstr "Positief"
 
-#: search/models.py:46
+#: search/models.py:50
 msgid "Designates whether the feedback was positive or not"
 msgstr "Bepaalt of de feedback positief was of niet"
 
-#: search/models.py:49
+#: search/models.py:53
 msgid "Remark"
 msgstr "Opmerking"
 
-#: search/models.py:53
+#: search/models.py:57
 msgid "A remark concerning the feedback (positive or negative) that was given"
 msgstr "Het bijbehorende opmerking bij de feedback"
 
-#: search/models.py:60
+#: search/models.py:64
 msgid ""
 "This is the date the feedback was saved. This field is automatically set"
 msgstr ""
 "Datum dat de feedback is aangemaakt. Dit veld wordt automatisch gevuld."
 
-#: search/models.py:65
+#: search/models.py:69
 msgid "Searched by"
 msgstr "Gezocht door"
 
-#: search/models.py:70
+#: search/models.py:74
 msgid "The logged in user who performed the search"
 msgstr "De gebruiker die de zoekopdracht uitvoerde (indien ingelogd)"
 
-#: search/models.py:74 templates/pages/search.html:65
+#: search/models.py:78 templates/pages/search.html:65
 msgid "Feedback"
 msgstr "Feedback"
 
-#: search/models.py:75
+#: search/models.py:79
 msgid "Feedbacks"
 msgstr "Feedback"
+
+#: search/models.py:90
+msgid "Field"
+msgstr "Veld"
+
+#: search/models.py:93
+msgid "Field name of the Elastic document. For nested fields use '.' "
+msgstr "Veldnaam van het product, voor geneste velden gebruik '.'"
+
+#: search/models.py:96
+msgid "Boost"
+msgstr "Zwaarte"
+
+#: search/models.py:101
+msgid ""
+"Boost which multiplies the score for the particular field. The default boost "
+"for all fields = 1"
+msgstr ""
+"Vermenigvuldig de zwaarte van de opgegeven veld met dit aantal. Standaard is de zwaarte van alle velden gelijk aan 1"
+
+#: search/models.py:109
+msgid "Field boost"
+msgstr "Zoekveld zwaarte"
+
+#: search/models.py:110
+msgid "Field boosts"
+msgstr "Zoekveld zwaarte"
 
 #: search/views.py:75 utils/mixins.py:126
 msgid "Page is not 'last', nor can it be converted to an int."
