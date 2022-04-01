@@ -53,6 +53,7 @@ def case_dashboard(case: Zaak, **kwargs) -> dict:
     """
     documents = fetch_case_information_objects(case.url)
     statuses = fetch_status_history(case.url)
+    status = None
 
     try:
         status = statuses[0].statustoelichting
