@@ -29,5 +29,8 @@
                 {% endrender_form %}
             </div>
         {% enddropdown %}
+    {% else %}
+        {% trans "Download" as download %}
+        {% link href=url text=download secondary=True download=True icon="file_download" icon_position="before" %}
     {% endif %}
 </aside>
