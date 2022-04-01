@@ -55,8 +55,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libgdal20 \
         libgeos-c1v5 \
         libproj13 \
-        # lxml deps
-        # libxslt \
+        pkg-config \
+        libxmlsec1 \
+        libxml2-dev \
+        libxmlsec1-dev \
+        libxmlsec1-openssl \
+        xmlsec1 \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
