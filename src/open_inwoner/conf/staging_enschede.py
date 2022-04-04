@@ -14,3 +14,4 @@ os.environ["ALLOWED_HOSTS"] = "enschede.openinwoner.nl"
 from .production import *  # noqa isort:skip
 
 ES_INDEX_PRODUCTS = "products-enschede"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media", "enschede")
