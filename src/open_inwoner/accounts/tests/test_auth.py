@@ -1,3 +1,5 @@
+from django.contrib.sites.models import Site
+from django.core import mail
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
@@ -159,3 +161,49 @@ class TestLoginLogoutFunctionality(WebTest):
         logout_response = self.app.get(reverse("logout"), user=self.user)
         self.assertRedirects(logout_response, reverse("root"))
         self.assertFalse(logout_response.follow().context["user"].is_authenticated)
+
+
+class TestPasswordResetFunctionality(WebTest):
+    csrf_checks = False
+
+    def setUp(self):
+        self.user = UserFactory()
+
+    def test_password_reset_form_custom_template_is_rendered(self):
+        response = self.app.get(reverse("password_reset"))
+        self.assertIn(str(_("Mijn wachtwoord opnieuw instellen")), response)
+
+    def test_password_reset_email_contains_proper_data(self):
+        current_site = Site.objects.get_current()
+        self.app.post(reverse("password_reset"), {"email": self.user.email})
+        self.assertEqual(len(mail.outbox), 1)
+
+        sent_mail = mail.outbox[0]
+        body = sent_mail.body
+        self.assertEqual(
+            _("Wachtwoordherinitialisatie voor {domain}").format(
+                domain=current_site.domain
+            ),
+            sent_mail.subject,
+        )
+        self.assertIn(
+            _(
+                "U ontvangt deze e-mail, omdat u een aanvraag voor opnieuw instellen van het wachtwoord voor uw account op {domain} hebt gedaan."
+            ).format(domain=current_site.domain),
+            body,
+        )
+        self.assertIn(
+            _("Uw gebruikersnaam, mocht u deze vergeten zijn: {user_email}").format(
+                user_email=self.user.email
+            ),
+            body,
+        )
+
+    def test_password_reset_confirm_custom_template_is_rendered(self):
+        response = self.app.post(reverse("password_reset"), {"email": self.user.email})
+        token = response.context[0]["token"]
+        uid = response.context[0]["uid"]
+        confirm_response = self.app.get(
+            reverse("password_reset_confirm", kwargs={"token": token, "uidb64": uid})
+        ).follow()
+        self.assertIn(str(_("Mijn wachtwoord wijzigen")), confirm_response)

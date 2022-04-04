@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n static logo_tags grid_tags card_tags form_tags link_tags %}
+{% load i18n static logo_tags grid_tags card_tags form_tags link_tags button_tags %}
 
 
 {% block header_image %}
@@ -24,6 +24,7 @@
                 {% if login_allow_registration %}
                     {% render_card tinted=True %}
                         {% form form_object=form method="POST" submit_text=_('Inloggen') secondary_href='django_registration_register' secondary_text=_('Registreer') secondary_icon='arrow_forward' id="login-form" %}
+                        {% button text=_('Wachtwoord vergeten?') href='password_reset' secondary=True transparent=True %}
                     {% endrender_card %}
                 {% endif %}
             {% endrender_card %}
