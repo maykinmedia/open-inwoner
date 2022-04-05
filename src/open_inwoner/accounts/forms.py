@@ -5,6 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from django_registration.forms import RegistrationForm
 
 from open_inwoner.utils.forms import PrivateFileWidget
+from open_inwoner.utils.mixins import FileUploadLimitMixin
 
 from .choices import EmptyContactTypeChoices, EmptyStatusChoices
 from .models import Action, Contact, Document, Invite, Message, User
@@ -162,7 +163,7 @@ class ActionForm(forms.ModelForm):
         return super().save(commit=commit)
 
 
-class DocumentForm(forms.ModelForm):
+class DocumentForm(FileUploadLimitMixin, forms.ModelForm):
     class Meta:
         model = Document
         fields = ("file", "name")
@@ -174,6 +175,9 @@ class DocumentForm(forms.ModelForm):
             self.instance.plan = plan
 
         return super().save(commit=commit)
+
+    def clean_file(self):
+        return self._clean_file_field("file")
 
 
 class MessageFileInputWidget(forms.ClearableFileInput):

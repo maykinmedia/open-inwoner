@@ -1,11 +1,13 @@
 from time import time
 from typing import Iterable, Tuple
 
+from django import forms
+from django.conf import settings
 from django.core.cache import caches
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import InvalidPage, Page, Paginator
 from django.http import Http404, HttpResponse
-from django.urls import reverse
+from django.template.defaultfilters import filesizeformat
 from django.utils.translation import gettext as _
 
 from .export import render_pdf
@@ -185,3 +187,45 @@ class ExportMixin:
         response["Content-Disposition"] = f'attachment; filename="{filename}"'
 
         return response
+
+
+class FileUploadLimitMixin(object):
+    upload_error_messages = {
+        "min_size": _(
+            "Een aangeleverd bestand dient minimaal %(size)s te zijn, uw bestand is te klein."
+        ),
+        "max_size": _(
+            "Een aangeleverd bestand dient maximaal %(size)s te zijn, uw bestand is te groot."
+        ),
+        "file_type": _(
+            "Het type bestand dat u hebt geüpload is ongeldig. Geldige bestandstypen zijn: docx, pdf, doc, xlsx, xls, jpeg, jpg, png, txt, odt, odf, ods"
+        ),
+    }
+
+    def _clean_file_field(self, field_name, error_messages=None):
+        _error_messages = error_messages or self.upload_error_messages
+
+        min_upload_size = settings.MIN_UPLOAD_SIZE
+        max_upload_size = settings.MAX_UPLOAD_SIZE
+        file_types = settings.FILE_TYPES
+
+        f = self.cleaned_data[field_name]
+
+        # checking file size limits
+        if f and f.size < min_upload_size:
+            raise forms.ValidationError(
+                _error_messages["min_size"],
+                params={"size": filesizeformat(min_upload_size)},
+            )
+        if f and f.size > max_upload_size:
+            raise forms.ValidationError(
+                _error_messages["max_size"],
+                params={"size": filesizeformat(max_upload_size)},
+            )
+
+        # checking file type limits
+        upload_file_type = f.content_type.split("/")[1]
+        if upload_file_type not in file_types.split(","):
+            raise forms.ValidationError(_error_messages["file_type"])
+
+        return f

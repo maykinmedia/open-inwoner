@@ -761,3 +761,8 @@ ZGW_CONSUMERS_TEST_SCHEMA_DIRS = [
 #
 TWO_FACTOR_FORCE_OTP_ADMIN = config("TWO_FACTOR_FORCE_OTP_ADMIN", default=not DEBUG)
 TWO_FACTOR_PATCH_ADMIN = config("TWO_FACTOR_PATCH_ADMIN", default=True)
+
+# file upload limits
+MIN_UPLOAD_SIZE = 1  # in bytes
+MAX_UPLOAD_SIZE = 1024 ** 2 * 100  # 100MB
+FILE_TYPES = "vnd.openxmlformats-officedocument.wordprocessingml.document,msword,vnd.openxmlformats-officedocument.spreadsheetml.sheet,vnd.ms-excel,plain,vnd.oasis.opendocument.text,vnd.oasis.opendocument.formula,vnd.oasis.opendocument.spreadsheet,pdf,jpeg,png"
