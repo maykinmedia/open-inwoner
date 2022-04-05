@@ -9,7 +9,7 @@ os.environ.setdefault("ENVIRONMENT", "staging")
 os.environ.setdefault("CACHE_DEFAULT", "127.0.0.1:6379/14")
 
 os.environ["DB_NAME"] = "oip-staging-enschede"
-os.environ["ALLOWED_HOSTS"] = "enschede.openinwoner.nl"
+os.environ["ALLOWED_HOSTS"] = "mijn-acceptatie.enschede.nl"
 
 from .production import *  # noqa isort:skip
 
