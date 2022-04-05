@@ -20,7 +20,7 @@ services:
     volumes:
       - es_data:/usr/share/elasticsearch/data
     ports:
-      - 9201:9200
+      - 9200:9200
 
   redis:
     image: redis
@@ -37,7 +37,7 @@ services:
       - TWO_FACTOR_FORCE_OTP_ADMIN=0
       - TWO_FACTOR_PATCH_ADMIN=0
     ports:
-      - 8001:8000
+      - 8000:8000
     depends_on:
       - db
       - redis
