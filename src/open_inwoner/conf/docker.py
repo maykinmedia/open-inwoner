@@ -1,8 +1,8 @@
 import os
 
-os.environ.setdefault("DB_USER", os.getenv("DATABASE_USER", "postgres"))
-os.environ.setdefault("DB_NAME", os.getenv("DATABASE_NAME", "postgres"))
-os.environ.setdefault("DB_PASSWORD", os.getenv("DATABASE_PASSWORD", ""))
+os.environ.setdefault("DB_USER", os.getenv("DATABASE_USER", "open_inwoner"))
+os.environ.setdefault("DB_NAME", os.getenv("DATABASE_NAME", "open_inwoner"))
+os.environ.setdefault("DB_PASSWORD", os.getenv("DATABASE_PASSWORD", "open_inwoner"))
 os.environ.setdefault("DB_HOST", os.getenv("DATABASE_HOST", "db"))
 
 os.environ.setdefault("ENVIRONMENT", "docker")
