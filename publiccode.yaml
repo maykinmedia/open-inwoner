@@ -1,0 +1,94 @@
+# This repository adheres to the publiccode.yml standard by including this
+# metadata file that makes public software easily discoverable.
+# More info at https://github.com/italia/publiccode.yml
+
+publiccodeYmlVersion: '0.2'
+
+name: Open Inwoner Platform
+url: 'http://github.com/maykinmedia/open-inwoner.git'
+softwareType: standalone
+softwareVersion: 0.1.0
+releaseDate: 't.b.d.'
+logo: 'https://github.com/maykinmedia/open-inwoner/blob/develop/docs/logo.png'
+platforms:
+  - web
+  - linux
+  - windows
+  - mac
+
+developmentStatus: beta
+
+description:
+  en:
+    shortDescription: Provide digital services to the residents
+    documentation: 'https://github.com/maykinmedia/open-inwoner/blob/develop/README.rst'
+    features:
+      - Display information about available products
+      - Search for the applicable products
+      - Interact with other users of the platform
+      - Expose products via an API
+    genericName: Open Inwoner component
+    longDescription: >
+      Using Open Inwoner platform administrators can easily fill in the information 
+      about municipality products and services with the convenient WYSIWYG editor. 
+      The users can search through the products with the power of the full-text 
+      search and the questionnaires to access the services which are applicable and 
+      useful in their situation.
+      
+      The users can interact with each other and exchange messages and documents. 
+      The users can create plans together to achieve their goals.
+      
+      The style of the application is easily configurable: all the colors, images, 
+      help texts and the logo can be set up and changed in the admin page.
+      
+      Open Inwoner is developed in line with the Common Ground principles and provides 
+      integration with Common Ground services such as Open Zaak and Haal Centraal. 
+
+legal:
+  license: EUPL-1.2
+  mainCopyrightOwner: Dimpact
+  repoOwner: Maykin Media
+
+dependsOn:
+  open:
+    - name: PostgreSQL
+      optional: false
+      versionMin: '10.0'
+    - name: Redis
+      optional: false
+      versionMin: '5.0'
+    - name: Elasticsearch
+      optional: false
+      versionMin: '7.9'
+    - name: Docker
+      optional: true
+      versionMin: '18.0'
+
+inputTypes:
+  - application/json
+
+outputTypes:
+  - application/json
+  - text/html
+
+intendedAudience:
+  countries:
+    - nl
+  scope:
+    - government
+
+localisation:
+  availableLanguages:
+    - nl
+    - en
+  localisationReady: false
+
+maintenance:
+  type: contract
+  contractors:
+  - name: Maykin Media
+    email: info@maykinmedia.nl
+    website: https://www.maykinmedia.nl/
+  contacts:
+  - name: Alex de Landgraaf
+    affiliation: Maykin Media
