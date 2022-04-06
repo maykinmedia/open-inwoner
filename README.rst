@@ -11,7 +11,8 @@ Open Inwoner
 
 Platform to provide digital services to the residents.
 
-Developed by `Maykin Media B.V.`_ .
+Developed by `Maykin Media B.V.`_ for Dimpact and the `i4Sociaal`_ gemeenten:
+Deventer, Enschede, Groningen, Leeuwarden, Zaanstad, Zwolle.
 
 
 Introduction
@@ -51,3 +52,4 @@ References
 
 
 .. _Maykin Media B.V.: https://www.maykinmedia.nl
+.. _i4Sociaal: https://www.dimpact.nl/i4sociaal
