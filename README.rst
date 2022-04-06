@@ -18,8 +18,25 @@ Deventer, Enschede, Groningen, Leeuwarden, Zaanstad, Zwolle.
 Introduction
 ============
 
-Open Inwoner Platform is designed to help municipalities to support their residents and to inform them about
-available services.
+Open Inwoner Platform is designed to help municipalities to support their residents and
+to inform them about available services.
+
+Using Open Inwoner platform administrators can easily fill in the information
+about municipality products and services with the convenient WYSIWYG editor.
+The users can search through the products with the power of the full-text
+search and the questionnaires to access the services which are applicable and
+useful in their situation.
+
+The users can interact with each other and exchange messages and documents.
+The users can create plans together to achieve their goals.
+
+The style of the application is easily configurable: all the colors, images,
+help texts and the logo can be set up and changed in the admin page.
+
+Open Forms is developed in line with the `Common Ground`_ principles and provides
+integration with Common Ground services such as Open Zaak and Haal Centraal.
+
+.. _`Common Ground`: https://commonground.nl/
 
 
 Documentation
@@ -28,12 +45,20 @@ Documentation
 See ``INSTALL.rst`` for installation instructions, available settings and
 commands.
 
+License
+=======
+
+Copyright © Maykin Media, 2021 - 2022
+
+Licensed under the EUPL_.
+
 
 References
 ==========
 
-* `Issues <https://taiga.maykinmedia.nl/project/open_inwoner>`_
+* `Issues <https://github.com/maykinmedia/open-inwoner/issues>`_
 * `Code <https://github.com/maykinmedia/open-inwoner>`_
+* `Docker image <https://hub.docker.com/r/maykinmedia/open-inwoner>`_
 
 .. |build-status| image:: https://github.com/maykinmedia/open-inwoner/actions/workflows/ci.yml/badge.svg?branch=develop
     :alt: Build status
@@ -53,3 +78,4 @@ References
 
 .. _Maykin Media B.V.: https://www.maykinmedia.nl
 .. _i4Sociaal: https://www.dimpact.nl/i4sociaal
+.. _EUPL: LICENSE.md

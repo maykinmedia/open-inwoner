@@ -2,6 +2,7 @@
 Installation
 ============
 
+This installation is meant for developers of Open Inwoner Platform.
 The project is developed in Python using the `Django framework`_. There are 3
 sections below, focussing on developers, running the project using Docker and
 hints for running the project in production.
@@ -18,12 +19,21 @@ Prerequisites
 
 You need the following libraries and/or programs:
 
-* `Python`_ 3.6 or above
+* `Python`_ 3.8 or above
 * Python `Virtualenv`_ and `Pip`_
 * `PostgreSQL`_ 10 or above with PostGIS extension
 * `Node.js`_
 * `npm`_
 * `Elastic Search`_ 7.9.2 or above
+
+You will also need the `Libxml2`_ and `GDAL`_ development libraries.
+For Linux (Debian) they are following:
+
+* libxml2-dev
+* libxmlsec1-dev
+* libxmlsec1-openssl
+* libgdal-dev
+* gdal-bin
 
 .. _Python: https://www.python.org/
 .. _Virtualenv: https://virtualenv.pypa.io/en/stable/
@@ -32,6 +42,8 @@ You need the following libraries and/or programs:
 .. _Node.js: http://nodejs.org/
 .. _npm: https://www.npmjs.com/
 .. _Elastic Search: https://www.elastic.co/
+.. _Libxml2: https://gitlab.gnome.org/GNOME/libxml2/-/wikis/home
+.. _GDAL: https://gdal.org/
 
 
 Getting started
@@ -46,8 +58,8 @@ development machine.
 
    .. code-block:: bash
 
-       $ git clone git@bitbucket.org:maykinmedia/open_inwoner.git
-       $ cd open_inwoner
+       $ git clone git@github.com:maykinmedia/open-inwoner.git
+       $ cd open-inwoner
 
 3. Install all required (backend) libraries.
    **Tip:** You can use the ``bootstrap.py`` script to install the requirements
@@ -60,26 +72,17 @@ development machine.
        $ source env/bin/activate
        $ pip install -r requirements/dev.txt
 
-4. Install all required (admin) libraries and build static files.
+4. Install and build the frontend libraries:
 
    .. code-block:: bash
 
        $ npm install
        $ npm run build
 
-5. For the frontend, Install all required libraries and run it on port 3000.
+5. Create the statics and database:
 
    .. code-block:: bash
 
-       $ cd frontend
-       $ npm install
-       $ npm run dev
-
-6. Activate your virtual environment and create the statics and database:
-
-   .. code-block:: bash
-
-       $ source env/bin/activate
        $ python src/manage.py collectstatic --link
        $ python src/manage.py migrate
 
@@ -105,6 +108,12 @@ development machine.
 ``src/open_inwoner/conf/local.py``. You can base this file on the
 example file included in the same directory.
 
+**Note:** You can run watch-tasks to compile `Sass`_ to CSS and `ECMA`_ to JS
+using ``npm run watch``.
+
+.. _ECMA: https://ecma-international.org/
+.. _Sass: https://sass-lang.com/
+
 
 Update installation
 -------------------
@@ -115,7 +124,7 @@ When updating an existing installation:
 
    .. code-block:: bash
 
-       $ cd open_inwoner
+       $ cd open-inwoner
        $ source env/bin/activate
 
 2. Update the code and libraries:
@@ -163,29 +172,34 @@ file or as part of the ``(post)activate`` of your virtualenv.
   logger and will send errors/logging to Sentry. If unset, Sentry SDK will be
   disabled.
 
+* ``TWO_FACTOR_FORCE_OTP_ADMIN``: Enforce 2 Factor Authentication in the admin or not.
+  Defaults to ``True``.
+* ``TWO_FACTOR_PATCH_ADMIN``: Whether to use the 2 Factor Authentication login flow for
+  the admin or not. Defaults to ``True``.
+
 Docker
 ======
 
 The easiest way to get the project started is by using `Docker Compose`_.
 
 1. Clone or download the code from `Github`_ in a folder like
-   ``open_inwoner``:
+   ``open-inwoner``:
 
    .. code-block:: bash
 
-       $ git clone git@bitbucket.org:maykinmedia/open_inwoner.git
-       Cloning into 'open_inwoner'...
+       $ git clone git@bitbucket.org:maykinmedia/open-inwoner.git
+       Cloning into 'open-inwoner'...
        ...
 
-       $ cd open_inwoner
+       $ cd open-inwoner
 
 2. Start the database and web services:
 
    .. code-block:: bash
 
        $ docker-compose up -d
-       Starting open_inwoner_db_1 ... done
-       Starting open_inwoner_web_1 ... done
+       Starting open-inwoner_db_1 ... done
+       Starting open-inwoner_web_1 ... done
 
    It can take a while before everything is done. Even after starting the web
    container, the database might still be migrating. You can always check the
@@ -193,20 +207,17 @@ The easiest way to get the project started is by using `Docker Compose`_.
 
    .. code-block:: bash
 
-       $ docker logs -f open_inwoner_web_1
+       $ docker logs -f open-inwoner_web_1
 
-3. Create an admin user and load initial data. If different container names
-   are shown above, use the container name ending with ``_web_1``:
+3. Create an admin user. If different container names are shown above, use
+   the container name ending with ``_web_1``:
 
    .. code-block:: bash
 
-       $ docker exec -it open_inwoner_web_1 /app/src/manage.py createsuperuser
-       Username: admin
+       $ docker exec -it open-inwoner_web_1 /app/src/manage.py createsuperuser
+       E-mail address: admin@admin.com
        ...
        Superuser created successfully.
-
-       $ docker exec -it open_inwoner_web_1 /app/src/manage.py loaddata admin_index groups
-       Installed 5 object(s) from 2 fixture(s)
 
 4. Point your browser to ``http://localhost:8000/`` to access the project's
    management interface with the credentials used in step 3.
@@ -250,27 +261,6 @@ all settings.
         open_inwoner
 
     $ docker exec -it open_inwoner /app/src/manage.py createsuperuser
-
-Building and publishing the image
----------------------------------
-
-Using ``bin/release-docker-image``, you can easily build and tag the image.
-
-The script is based on git branches and tags - if you're on the ``master``
-branch and the current ``HEAD`` is tagged, the tag will be used as
-``RELEASE_TAG`` and the image will be pushed. If you want to push the image
-without a git tag, you can use the ``RELEASE_TAG`` envvar.
-
-The image will only be pushed if the ``JOB_NAME`` envvar is set. The image
-will always be built, even if no envvar is set. The default release tag is
-``latest``.
-
-Example usage:
-
-.. code-block:: bash
-
-    JOB_NAME=publish RELEASE_TAG=dev ./bin/release-docker-image.sh
-
 
 Staging and production
 ======================
