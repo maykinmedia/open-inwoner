@@ -28,7 +28,7 @@
                             {% input form.username %}
                             {% input form.password %}
                             {% button text=_('Wachtwoord vergeten?') href='password_reset' secondary=True transparent=True align='right' %}
-                            {% form_actions primary_text=_("Inloggen") primary_icon="arrow_forward" secondary_href='django_registration_register' secondary_text=_('Registreer') secondary_icon='arrow_forward' %}
+                            {% form_actions primary_text=_("Inloggen") primary_icon="arrow_forward" secondary_href='django_registration_register' secondary_text=_('Registreer') secondary_icon='arrow_forward' single=True %}
                         {% endrender_form %}
                     {% endrender_card %}
                 {% endif %}
