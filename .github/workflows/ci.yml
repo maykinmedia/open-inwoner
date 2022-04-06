@@ -9,6 +9,8 @@ on:
   pull_request:
   workflow_dispatch:
 
+env:
+  IMAGE_NAME: maykinmedia/open-inwoner
 
 jobs:
   tests:
@@ -75,3 +77,30 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
         
+  docker:
+    needs: tests
+
+    name: Build (and push) Docker image
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set tag
+        id: vars
+        run: |
+          # Strip git ref prefix from version
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+
+          # Strip "v" prefix from tag name (if present at all)
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+
+          # Use Docker `latest` tag convention
+          [ "$VERSION" == "master" ] && VERSION=latest
+
+          echo ::set-output name=tag::${VERSION}
+
+      - name: Build the Docker image
+        env:
+          RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
+        run: docker build . --tag $IMAGE_NAME:$RELEASE_VERSION
