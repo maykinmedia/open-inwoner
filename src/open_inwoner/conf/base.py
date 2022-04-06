@@ -755,3 +755,9 @@ INVITE_EXPIRY = 14
 ZGW_CONSUMERS_TEST_SCHEMA_DIRS = [
     os.path.join(DJANGO_PROJECT_DIR, "openzaak", "tests", "files"),
 ]
+
+#
+# Maykin fork of DJANGO-TWO-FACTOR-AUTH
+#
+TWO_FACTOR_FORCE_OTP_ADMIN = config("TWO_FACTOR_FORCE_OTP_ADMIN", default=not DEBUG)
+TWO_FACTOR_PATCH_ADMIN = config("TWO_FACTOR_PATCH_ADMIN", default=True)
