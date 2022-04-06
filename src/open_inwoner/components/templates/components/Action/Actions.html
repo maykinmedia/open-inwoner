@@ -57,7 +57,7 @@
                 </div>
                 <div class="actions__label">
                     <div class="table__explain">{% trans "Document" %}</div>
-                    {{ action.file.name }}
+                    {% link href="accounts:action_download" text=action.file.name uuid=action.uuid %}
                 </div>
                 <div class="actions__label">
                     <div class="table__explain">{% trans "Toegevoegd op" %}</div>
