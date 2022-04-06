@@ -3,7 +3,8 @@ name: ci
 on:
   push:
     branches:
-      - master
+      - main
+      - develop
     tags:
       - '**'
   pull_request:

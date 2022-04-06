@@ -3,7 +3,8 @@ name: code-quality
 on:
   push:
     branches:
-      - master
+      - main
+      - develop
     tags:
       - '*'
   pull_request:
