@@ -40,6 +40,10 @@ description:
       
       The style of the application is easily configurable: all the colors, images, 
       help texts and the logo can be set up and changed in the admin page.
+      
+      Open Inwoner is developed in line with the Common Ground principles and provides 
+      integration with Common Ground services such as Open Zaak and Haal Centraal. 
+
 legal:
   license: EUPL-1.2
   mainCopyrightOwner: Dimpact
