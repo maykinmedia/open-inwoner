@@ -26,6 +26,7 @@ class QuestionnaireStepAdmin(TreeAdmin):
     inlines = (QuestionnaireStepFileInline,)
     list_display = ("display_question_answer",)
     prepopulated_fields = {"slug": ("question",)}
+    save_as = True
     fieldsets = (
         (
             _("Vraag"),
