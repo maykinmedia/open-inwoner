@@ -38,7 +38,11 @@ class LimitedUploadFileField(forms.FileField):
             "Het type bestand dat u hebt geüpload is ongeldig. Geldige bestandstypen zijn: pdf, docx, doc, xlsx, xls, jpeg, jpg, png, txt, odt, odf, ods"
         ),
     }
-    widget = forms.ClearableFileInput(attrs={"accept": settings.UPLOAD_FILE_TYPES})
+
+    def widget_attrs(self, widget):
+        attrs = super().widget_attrs(widget)
+        attrs.update({"accept": settings.UPLOAD_FILE_TYPES})
+        return attrs
 
     def clean(self, *args, **kwargs):
         f = super().clean(*args, **kwargs)
@@ -64,4 +68,4 @@ class LimitedUploadFileField(forms.FileField):
             if f.content_type not in file_types.split(","):
                 raise forms.ValidationError(_error_messages["file_type"])
 
-            return f
+        return f
