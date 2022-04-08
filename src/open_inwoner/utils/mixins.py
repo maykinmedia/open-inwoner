@@ -5,7 +5,6 @@ from django.core.cache import caches
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import InvalidPage, Page, Paginator
 from django.http import Http404, HttpResponse
-from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from .export import render_pdf

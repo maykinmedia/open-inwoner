@@ -1,10 +1,11 @@
 from django import forms
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
 from django_registration.forms import RegistrationForm
 
-from open_inwoner.utils.forms import PrivateFileWidget
+from open_inwoner.utils.forms import LimitedUploadFileField, PrivateFileWidget
 
 from .choices import EmptyContactTypeChoices, EmptyStatusChoices
 from .models import Action, Contact, Document, Invite, Message, User
@@ -117,6 +118,8 @@ class ContactForm(forms.ModelForm):
 
 
 class ActionForm(forms.ModelForm):
+    file = LimitedUploadFileField(required=False)
+
     class Meta:
         model = Action
         fields = (
@@ -163,6 +166,8 @@ class ActionForm(forms.ModelForm):
 
 
 class DocumentForm(forms.ModelForm):
+    file = LimitedUploadFileField()
+
     class Meta:
         model = Document
         fields = ("file", "name")
@@ -218,7 +223,11 @@ class InboxForm(forms.ModelForm):
         required=False,
         widget=forms.Textarea(attrs={"placeholder": _("Schrijf een bericht...")}),
     )
-    file = forms.FileField(required=False, label="", widget=MessageFileInputWidget())
+    file = LimitedUploadFileField(
+        required=False,
+        label="",
+        widget=MessageFileInputWidget(attrs={"accept": settings.UPLOAD_FILE_TYPES}),
+    )
 
     class Meta:
         model = Message
