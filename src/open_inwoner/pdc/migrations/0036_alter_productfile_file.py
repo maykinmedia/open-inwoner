@@ -8,14 +8,19 @@ import filer.fields.file
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('filer', '0012_file_mime_type'),
-        ('pdc', '0035_alter_productfile_file'),
+        ("filer", "0012_file_mime_type"),
+        ("pdc", "0035_alter_productfile_file"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='productfile',
-            name='file',
-            field=filer.fields.file.FilerFileField(on_delete=django.db.models.deletion.CASCADE, related_name='product_files', to='filer.file', verbose_name='File'),
+            model_name="productfile",
+            name="file",
+            field=filer.fields.file.FilerFileField(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="product_files",
+                to="filer.file",
+                verbose_name="File",
+            ),
         ),
     ]
