@@ -150,9 +150,7 @@ class ProductFile(models.Model):
     )
     file = FilerFileField(
         verbose_name=_("File"),
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         related_name="product_files",
     )
 
@@ -161,7 +159,9 @@ class ProductFile(models.Model):
         verbose_name_plural = _("Product files")
 
     def __str__(self):
-        return self.file.name
+        if self.file:
+            return self.file.name
+        return ""
 
 
 class ProductContact(models.Model):
