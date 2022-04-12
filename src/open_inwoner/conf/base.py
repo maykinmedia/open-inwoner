@@ -146,6 +146,7 @@ INSTALLED_APPS = [
     "ckeditor",
     "privates",
     "fontawesomefree",
+    "timeline_logger",
     # Project applications.
     "open_inwoner.accounts",
     "open_inwoner.components",
