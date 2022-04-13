@@ -16,8 +16,8 @@
   }
 
   &--error {
-    --notification-color-background: var(--color-danger-lighter);
-    --notification-color-text: var(--color-danger);
+    --notification-color-background: var(--color-danger-lightest);
+    --notification-color-text: var(--color-danger-darker);
   }
 
   &--success {

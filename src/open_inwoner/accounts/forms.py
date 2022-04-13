@@ -1,12 +1,13 @@
 from django import forms
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
 from django_registration.forms import RegistrationForm
 
-from open_inwoner.utils.forms import PrivateFileWidget
+from open_inwoner.utils.forms import LimitedUploadFileField, PrivateFileWidget
 
-from .choices import EmptyStatusChoices
+from .choices import EmptyContactTypeChoices, EmptyStatusChoices
 from .models import Action, Contact, Document, Invite, Message, User
 
 
@@ -78,6 +79,12 @@ class ThemesForm(forms.ModelForm):
         widgets = {"selected_themes": forms.widgets.CheckboxSelectMultiple}
 
 
+class ContactFilterForm(forms.Form):
+    type = forms.ChoiceField(
+        label=_("Type contact"), choices=EmptyContactTypeChoices.choices, required=False
+    )
+
+
 class ContactForm(forms.ModelForm):
     def __init__(self, user, create, *args, **kwargs):
         self.user = user
@@ -111,6 +118,8 @@ class ContactForm(forms.ModelForm):
 
 
 class ActionForm(forms.ModelForm):
+    file = LimitedUploadFileField(required=False)
+
     class Meta:
         model = Action
         fields = (
@@ -157,6 +166,8 @@ class ActionForm(forms.ModelForm):
 
 
 class DocumentForm(forms.ModelForm):
+    file = LimitedUploadFileField()
+
     class Meta:
         model = Document
         fields = ("file", "name")
@@ -168,6 +179,36 @@ class DocumentForm(forms.ModelForm):
             self.instance.plan = plan
 
         return super().save(commit=commit)
+
+
+class MessageFileInputWidget(forms.ClearableFileInput):
+    template_name = "utils/widgets/message_file_input.html"
+
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+
+        context["widget"].update(
+            {
+                "init_name": name + "-init",
+                "init_id": name + "-init-id",
+            }
+        )
+        return context
+
+    def value_from_datadict(self, data, files, name):
+        upload = super().value_from_datadict(data, files, name)
+
+        if upload:
+            return upload
+
+        # check if there is initial file
+        init_value = forms.TextInput().value_from_datadict(data, files, name + "-init")
+        if init_value:
+            document = Document.objects.filter(uuid=init_value).first()
+            if document:
+                return document.file
+
+        return False
 
 
 class InboxForm(forms.ModelForm):
@@ -182,7 +223,11 @@ class InboxForm(forms.ModelForm):
         required=False,
         widget=forms.Textarea(attrs={"placeholder": _("Schrijf een bericht...")}),
     )
-    file = forms.FileField(required=False, label="")
+    file = LimitedUploadFileField(
+        required=False,
+        label="",
+        widget=MessageFileInputWidget(attrs={"accept": settings.UPLOAD_FILE_TYPES}),
+    )
 
     class Meta:
         model = Message

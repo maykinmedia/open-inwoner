@@ -8,6 +8,8 @@
     {% button href="accounts:contact_create" text=_("Nieuw contact toevoegen") icon="person" primary=True %}
 </h1>
 
+{% form id="contact-filter" form_object=form method="GET" columns=2 no_actions=True horizontal=True spaceless=True autosubmit=True form_action=form_action %}
+
 <table class="table">
     <thead class="table__heading">
         <tr>
