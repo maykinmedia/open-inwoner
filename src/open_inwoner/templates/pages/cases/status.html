@@ -6,33 +6,17 @@
 {% endblock sidebar_content %}
 
 {% block content %}
-
-    {# Obtain some results by checking multiple fields as case fiels may be empty. #}
-    {% firstof case.obj.titel case.obj.omschrijving as title %}
-    {% firstof case.current_status.statustype.statustekst case.current_status.statustype.omschrijving as status_description %}
-
     {% render_grid %}
         {% render_column span=9 %}
 
             {# Title/dashboard. #}
-            <h1 class="h1" id="title">{% firstof case.obj.titel case.obj.omschrijving %}</h1>
-            {% case_dashboard case.obj %}
-
-            {# Status summary. #}
-            {# TODO: Unclear what to show here. #}
-            {% if status_description %}
-                <h2 class="h2" id="summary">{% trans 'Overzicht' %}</h2>
-                {% render_card inline=True type='info' %}
-                    <h3 class="h3">{{ title }}</h3>
-                    <p class="p">{{ status_description }}</p>
-                    <p class="p">{{ case.current_status.datum_status_gezet }}</p>
-                {% endrender_card %}
-            {% endif %}
+            <h1 class="h1" id="title">{{ case.obj.omschrijving }}</h1>
+            {% case_dashboard case=case.obj statuses=case.statuses documents=case.documents %}
 
             {#  Status history. #}
             {% if case.statuses %}
                 <h2 class="h2" id="statuses">{% trans 'Status' %}</h2>
-                {% case_status_list case.statuses %}
+                {% status_list case.statuses %}
             {% endif %}
 
             {#  Documents. #}

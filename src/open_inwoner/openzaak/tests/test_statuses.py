@@ -161,7 +161,7 @@ class TestListStatusView(WebTest):
             ),
             user=self.user,
         )
-        current_status = response.context.get("case", {}).get("current_status")
+        current_status = response.context.get("statuses")[0]
 
         self.assertEquals(
             current_status.url,
@@ -235,9 +235,7 @@ class TestListStatusView(WebTest):
             user=self.user,
         )
 
-        self.assertIsNone(
-            response.context.get("case", {}).get("current_status").statustype
-        )
+        self.assertIsNone(response.context.get("statuses")[0].statustype)
 
     def test_no_status_is_retrieved_when_http_404(self, m):
         mock_service_oas_get(m, ZAKEN_ROOT, "zrc")

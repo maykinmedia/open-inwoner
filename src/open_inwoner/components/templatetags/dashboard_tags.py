@@ -6,11 +6,6 @@ from django.utils.translation import gettext as _
 from zgw_consumers.api_models.documenten import Document
 from zgw_consumers.api_models.zaken import Status, Zaak
 
-from open_inwoner.openzaak.statuses import (
-    fetch_case_information_objects,
-    fetch_status_history,
-)
-
 register = template.Library()
 
 
@@ -42,7 +37,9 @@ def dashboard(config: DashboardConfig, **kwargs) -> dict:
 
 
 @register.inclusion_tag("components/Dashboard/Dashboard.html")
-def case_dashboard(case: Zaak, **kwargs) -> dict:
+def case_dashboard(
+    case: Zaak, statuses: list[Status], documents: list[Document], **kwargs
+) -> dict:
     """
     Renders a dashboard for values related to a Zaak (case).
 
@@ -51,14 +48,12 @@ def case_dashboard(case: Zaak, **kwargs) -> dict:
 
     Variables:
         + case: Zaak | The case to be able to build the dashbaord, fetching the documents and statusses of the case.
+        + statuses: list[Status] | The statusses that are connected to the given case.
+        + documents: list[Document] | The documents that are connected to the given case.
 
     Extra context:
-        + documents: list[Document] | The documents that are connected to the given case.
-        + statuses: list[Status] | The statusses that are connected to the given case.
         + config: DashbaordConfig | The configuration of the dashboard.
     """
-    documents: list[Document] = fetch_case_information_objects(case.url)
-    statuses: list[Status] = fetch_status_history(case.url)
     status = None
 
     try:
@@ -78,7 +73,7 @@ def case_dashboard(case: Zaak, **kwargs) -> dict:
                 "label": _("Datum"),
                 "value": case.registratiedatum,
             },
-            {"icon": "check", "label": _("status"), "value": status},
+            {"icon": "task_alt", "label": _("status"), "value": status},
             {"icon": "description", "label": _("documenten"), "value": len(documents)},
         ]
     }

@@ -1,6 +1,7 @@
 .status-list {
   &__list {
     display: flex;
+    gap: var(--spacing-medium);
     flex-direction: column;
     list-style: none;
     margin: 0;
@@ -10,10 +11,10 @@
 
   &__list:before {
     content: '';
-    background-color: var(--color-success-lighter);
+    background-color: var(--color-success);
     display: block;
     height: calc(100% - 1.5em);
-    left: 0.75em;
+    left: 11px;
     position: absolute;
     top: 0.75em;
     width: 2px;
@@ -27,6 +28,7 @@
 
   [class*='icon'] {
     color: var(--color-success);
+    background-color: var(--color-white);
   }
 }
 
