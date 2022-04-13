@@ -2,7 +2,7 @@
   &__list {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: var(--spacing-medium);
+    gap: var(--spacing-large) var(--spacing-medium);
     justify-content: space-between;
     list-style: none;
     margin: 0;
@@ -10,6 +10,7 @@
 
     @media (min-width: 768px) {
       display: flex;
+      gap: var(--spacing-medium);
     }
   }
 
@@ -23,10 +24,16 @@
   }
 
   .h4 {
-    margin-top: var(--spacing-large);
+    @media (min-width: 768px) {
+      margin-top: var(--spacing-large);
+    }
   }
 }
 
 .h1 + .dashboard {
-  margin-top: var(--row-height);
+  margin-top: var(--spacing-large);
+
+  @media (min-width: 768px) {
+    margin-top: var(--row-height);
+  }
 }

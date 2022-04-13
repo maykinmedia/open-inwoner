@@ -3,7 +3,8 @@ from typing import TypedDict
 from django import template
 from django.utils.translation import gettext as _
 
-from zgw_consumers.api_models.zaken import Zaak
+from zgw_consumers.api_models.documenten import Document
+from zgw_consumers.api_models.zaken import Status, Zaak
 
 from open_inwoner.openzaak.statuses import (
     fetch_case_information_objects,
@@ -49,10 +50,15 @@ def case_dashboard(case: Zaak, **kwargs) -> dict:
         {% case_dashboard case %}
 
     Variables:
-        + case: Zaak | The case to show values for.
+        + case: Zaak | The case to be able to build the dashbaord, fetching the documents and statusses of the case.
+
+    Extra context:
+        + documents: list[Document] | The documents that are connected to the given case.
+        + statuses: list[Status] | The statusses that are connected to the given case.
+        + config: DashbaordConfig | The configuration of the dashboard.
     """
-    documents = fetch_case_information_objects(case.url)
-    statuses = fetch_status_history(case.url)
+    documents: list[Document] = fetch_case_information_objects(case.url)
+    statuses: list[Status] = fetch_status_history(case.url)
     status = None
 
     try:
@@ -65,7 +71,7 @@ def case_dashboard(case: Zaak, **kwargs) -> dict:
             {
                 "icon": "inventory_2",
                 "label": _("Zaaknummer"),
-                "value": case.identificatie.replace("ZAAK-", ""),
+                "value": case.identificatie,
             },
             {
                 "icon": "calendar_today",
@@ -81,5 +87,6 @@ def case_dashboard(case: Zaak, **kwargs) -> dict:
         **kwargs,
         "case": case,
         "documents": documents,
+        "statuses": statuses,
         "config": config,
     }

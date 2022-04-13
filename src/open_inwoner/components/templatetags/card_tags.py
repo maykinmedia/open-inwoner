@@ -23,7 +23,7 @@ def card(href, title, **kwargs):
         - inline: bool | Whether the card should be rendered inline.
         - src: string | the src of the header image.
         - tinted: bool | whether to use gray as background color.
-        - type: string | Set to info for an info card.
+        - type: string (info) | Set to info for an info card.
     """
     return {**kwargs, "href": href, "title": title}
 
