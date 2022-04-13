@@ -3,7 +3,11 @@
     {% if categories %}
         {% for category in categories %}
             {% url 'pdc:category_detail' slug=category.slug as category_url %}
-            {% card src=category.image.file.url alt=category.image.name title=category.name href=category_url %}
+            {% if category.icon %}
+                {% card src=category.icon.file.url alt=category.icon.name title=category.name href=category_url %}
+            {% else %}
+                {% card src=category.image.file.url alt=category.image.name title=category.name href=category_url %}
+            {% endif %}
         {% endfor %}
     {% endif %}
 
