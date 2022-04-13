@@ -655,7 +655,7 @@ uwsgi==2.0.19.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-waitress==2.0.0
+waitress==2.1.1
     # via webtest
 weasyprint==54.2
     # via

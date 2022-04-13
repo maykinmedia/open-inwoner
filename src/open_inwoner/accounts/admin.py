@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
+from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
 
 from privates.admin import PrivateMediaMixin
@@ -98,9 +99,18 @@ class ContactAdmin(UUIDAdminFirstInOrder, admin.ModelAdmin):
 @admin.register(Document)
 class DocumentAdmin(UUIDAdminFirstInOrder, PrivateMediaMixin, admin.ModelAdmin):
     readonly_fields = ("uuid",)
-    list_display = ("name", "file", "created_on", "owner")
+    list_display = ("name", "preview", "created_on", "owner")
     list_filter = ("owner",)
     private_media_fields = ("file",)
+
+    def preview(self, obj):
+        return format_html(
+            _("<a href='{url}'>{text}</a>"),
+            url=reverse("admin:accounts_document_file", kwargs={"pk": obj.pk}),
+            text=obj.file.name,
+        )
+
+    preview.short_description = "Preview file"
 
 
 @admin.register(Appointment)
@@ -112,6 +122,7 @@ class AppointmentAdmin(UUIDAdminFirstInOrder, admin.ModelAdmin):
 
 @admin.register(Message)
 class MessageAdmin(PrivateMediaMixin, admin.ModelAdmin):
+    readonly_fields = ("uuid",)
     list_display = ("sender", "receiver", "created_on", "seen", "sent")
     list_filter = ("sender", "receiver")
     private_media_fields = ("file",)

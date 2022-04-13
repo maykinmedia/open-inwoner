@@ -4,7 +4,7 @@
 <div class="actions">
     <div class="actions__filters">
         <div class="actions__filter-button">
-            {% button text="Filter" type="button" bordered=True %}
+            {% button text=_("Filter") type="button" bordered=True %}
         </div>
         <div class="actions__filter-container">
             <p class="p">{% trans "Filter op:" %}</p>
@@ -17,7 +17,7 @@
         {% for action in actions %}
             <div class="actions__action">
                 <div class="actions__actions">
-                    {% button icon="input" href="accounts:action_export" uuid=action.uuid icon_outlined=True transparent=True %}
+                    {% button icon="input" text=_("Export to PDF") hide_text=True href="accounts:action_export" uuid=action.uuid icon_outlined=True transparent=True %}
                     {% if action|is_connected:request.user %}
                         {% dropdown icon="settings" %}
                             <div class="dropdown__item">
@@ -57,7 +57,7 @@
                 </div>
                 <div class="actions__label">
                     <div class="table__explain">{% trans "Document" %}</div>
-                    {{ action.file.name }}
+                    {% link href="accounts:action_download" text=action.file.name uuid=action.uuid %}
                 </div>
                 <div class="actions__label">
                     <div class="table__explain">{% trans "Toegevoegd op" %}</div>

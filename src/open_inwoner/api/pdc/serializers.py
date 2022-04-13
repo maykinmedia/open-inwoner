@@ -8,7 +8,6 @@ from open_inwoner.pdc.models import Category, Product, ProductLink, Question, Ta
 from open_inwoner.pdc.models.organization import Organization
 from open_inwoner.pdc.models.product import (
     ProductCondition,
-    ProductContact,
     ProductFile,
     ProductLocation,
 )
@@ -121,21 +120,6 @@ class OrganizationSerializer(serializers.ModelSerializer):
         )
 
 
-class ProductContactSerializer(serializers.ModelSerializer):
-    organization = serializers.StringRelatedField()
-
-    class Meta:
-        model = ProductContact
-        fields = (
-            "organization",
-            "first_name",
-            "last_name",
-            "email",
-            "phonenumber",
-            "role",
-        )
-
-
 class ProductLocationSerializer(serializers.ModelSerializer):
     coordinates = serializers.SerializerMethodField()
 
@@ -169,7 +153,6 @@ class ProductSerializer(serializers.ModelSerializer):
     related_products = SmallProductSerializer(many=True, required=False)
     tags = TagSerializer(many=True, required=False)
     organizations = OrganizationSerializer(many=True, required=False)
-    contacts = ProductContactSerializer(many=True, required=False)
     locations = ProductLocationSerializer(many=True, required=False)
     conditions = ProductConditionSerializer(many=True, required=False)
     files = ProductFileSerializer(many=True, required=False)
@@ -191,7 +174,6 @@ class ProductSerializer(serializers.ModelSerializer):
             "links",
             "keywords",
             "uniforme_productnaam",
-            "contacts",
             "locations",
             "conditions",
             "files",

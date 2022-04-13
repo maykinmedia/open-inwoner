@@ -1,16 +1,17 @@
 {% extends 'master.html' %}
-{% load i18n button_tags card_tags map_tags questionnaire_tags utils %}
-
+{% load i18n button_tags card_tags map_tags questionnaire_tags grid_tags product_tags utils %}
 
 {% block header_image %}
     <img class="main-image" src="{{ hero_image_login }}" alt="Header image">
 {% endblock header_image %}
 
 {% block content %}
-    <div class="grid__welcome">
-        <h1 class="h1">{{configurable_text.home_page.home_welcome_title}}</h1>
-        <p class="p">{{configurable_text.home_page.home_welcome_intro|linebreaksbr}}</p>
-    </div>
+    {% block user_content %}
+        <div class="grid__welcome">
+            <h1 class="h1">{{configurable_text.home_page.home_welcome_title}}</h1>
+            <p class="p">{{configurable_text.home_page.home_welcome_intro|linebreaksbr}}</p>
+        </div>
+    {% endblock %}
 
 
     <h1 class="h1">
@@ -20,9 +21,24 @@
     </h1>
     <p class="p">{{configurable_text.home_page.home_theme_intro|linebreaksbr}}</p>
 
-    {% card_container categories=categories %}
+    {% if request.user.is_authenticated %}
+        {% card_container categories=categories columns=3 %}
+    {% else %}
+        {% card_container categories=categories %}
+    {% endif %}
 
-    {% questionnaire root_nodes=questionnaire_roots %}
+    {% if questionnaire_roots.exists %}
+        <h1 class="h1">{% trans "Waar bent u naar op zoek?" %}</h1>
+        <p class="p">{% trans "Wij helpen u graag op weg." %}</p>
+        
+        {% questionnaire root_nodes=questionnaire_roots %}
+    {% endif %}
+
+    {% if condition %}
+        {% render_grid %}
+            {% product_finder condition=condition form=condition_form form_action="pdc:product_finder" primary_text=_("Start") %}
+        {% endrender_grid %}
+    {% endif %}
 
     <h1 class="h1">{{configurable_text.home_page.home_map_title}}</h1>
     <p class="p">{{configurable_text.home_page.home_map_intro|linebreaksbr}}</p>

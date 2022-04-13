@@ -41,13 +41,12 @@
     }
 
     .swal2-confirm {
-      background-color: var(--color-danger);
+      background-color: var(--color-primary);
       color: var(--color-white);
 
-      &:focus,
       &:hover {
         transform: translateY(-1px);
-        background-color: var(--color-danger);
+        background-color: var(--color-primary-darker);
       }
     }
 
@@ -59,6 +58,16 @@
       &:hover {
         transform: translateY(-1px);
         background-color: var(--color-secondary-darker);
+      }
+    }
+
+    .swal2-danger {
+      background-color: var(--color-danger-lighter);
+      color: var(--color-white);
+
+      &:hover {
+        transform: translateY(-1px);
+        background-color: var(--color-danger);
       }
     }
   }

@@ -1,4 +1,4 @@
-{% load link_tags %}
+{% load link_tags render_tags %}
 
 <aside class="faq">
     {% if title %}<h2 class="h2">{{ title }}</h2>{% endif %}
@@ -9,7 +9,7 @@
                 {% firstof question.pk|slugify as id %}
                 {% firstof 'question-'|add:id|add:'-answer' as answer_id %}
                 {% link bold=True href='#'|add:answer_id icon='chevron_right' secondary=True text=question.question toggle="open"  %}
-                <p id="{{ answer_id }}" class="p faq__answer">{{ question.answer }}</p>
+                <div id="{{ answer_id }}" class="p faq__answer">{{ question.answer|ckeditor_content|safe }}</div>
             </li>
         {% endfor %}
     </ul>

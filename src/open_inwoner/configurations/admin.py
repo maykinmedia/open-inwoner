@@ -31,7 +31,17 @@ class SiteConfigurationPageInline(OrderedTabularInline):
 @admin.register(SiteConfiguration)
 class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
     fieldsets = (
-        (None, {"fields": ("name", "login_allow_registration", "show_cases")}),
+        (
+            None,
+            {
+                "fields": (
+                    "name",
+                    "login_allow_registration",
+                    "show_cases",
+                    "show_product_finder",
+                )
+            },
+        ),
         (
             _("Color"),
             {
@@ -64,10 +74,10 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                     "home_welcome_intro",
                     "home_theme_title",
                     "home_theme_intro",
-                    "theme_title",
-                    "theme_intro",
                     "home_map_title",
                     "home_map_intro",
+                    "theme_title",
+                    "theme_intro",
                 ),
             },
         ),
@@ -81,6 +91,8 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                     "product_help_text",
                     "search_help_text",
                     "account_help_text",
+                    "questionnaire_help_text",
+                    "plan_help_text",
                 ),
             },
         ),

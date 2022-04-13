@@ -9,7 +9,7 @@ from django.views.generic.edit import DeleteView, UpdateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin
 
-from ..forms import ContactForm
+from ..forms import ContactFilterForm, ContactForm
 from ..models import Contact, Invite
 
 
@@ -27,7 +27,16 @@ class ContactListView(LoginRequiredMixin, BaseBreadcrumbMixin, ListView):
 
     def get_queryset(self):
         base_qs = super().get_queryset()
-        return base_qs.get_extended_contacts_for_user(me=self.request.user)
+        base_qs = base_qs.get_extended_contacts_for_user(me=self.request.user)
+        if self.request.GET.get("type"):
+            base_qs = base_qs.filter(type=self.request.GET.get("type"))
+
+        return base_qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["form"] = ContactFilterForm(data=self.request.GET)
+        return context
 
 
 class ContactUpdateView(LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
