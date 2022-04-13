@@ -52,6 +52,9 @@ def case_document_list(documents: list[ZaakInformatieObject], **kwargs) -> dict:
 
     Variables:
         + documents: ZaakInformatieObject[] | List ZaakInformatieObject objects.
+
+    Extra context:
+        + files: list[dict] | A list of objects that are needed to render a file
     """
 
     files = [
@@ -61,7 +64,7 @@ def case_document_list(documents: list[ZaakInformatieObject], **kwargs) -> dict:
         }
         for document in documents
     ]
-    return {**kwargs, "files": files}
+    return {**kwargs, "documents": documents, "files": files}
 
 
 @register.inclusion_tag("components/File/FileTable.html")
