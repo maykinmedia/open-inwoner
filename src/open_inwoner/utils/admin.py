@@ -7,9 +7,14 @@ from timeline_logger.models import TimelineLog
 
 
 class CustomTimelineLogAdmin(TimelineLogAdmin):
-    list_display = ["__str__", "timestamp", "get_action_flag", "user"]
+    list_display = ["get_object_title", "timestamp", "get_action_flag", "user"]
     list_filter = ["timestamp", "content_type"]
     list_select_related = ["content_type"]
+
+    def get_object_title(self, obj):
+        return f"{obj.content_type.name} - {obj.object_id}"
+
+    get_object_title.short_description = _("Logboekvermelding")
 
     def get_action_flag(self, obj):
         if obj.extra_data:

@@ -23,3 +23,8 @@ def copy_log_entry_to_timeline_logger(sender, **kwargs):
             "message": log_entry.get_change_message(),
         },
     )
+    logger.info(
+        "Modified: %s, %s",
+        log_entry.content_type,
+        log_entry.get_change_message(),
+    )
