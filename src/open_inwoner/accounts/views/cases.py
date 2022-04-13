@@ -99,7 +99,6 @@ class CasesStatusView(
             "obj": case,
             "documents": case_info_objects,
             "statuses": statuses,
-            "current_status": statuses[0] if statuses else None,
         }
 
         return context

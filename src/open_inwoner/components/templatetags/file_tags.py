@@ -38,8 +38,11 @@ def file_list(files, **kwargs):
         - h1: bool | render the title in a h1 instead of a h4.
         - title: string | the title that should be used.
         - download_view: sting | the view name to download file (used for private files)
+
+    Extra context:
+        + show_download: bool | We enable the download button for the files.
     """
-    return {**kwargs, "files": files}
+    return {**kwargs, "files": files, "show_download": True}
 
 
 @register.inclusion_tag("components/File/FileList.html")
@@ -55,16 +58,16 @@ def case_document_list(documents: list[ZaakInformatieObject], **kwargs) -> dict:
 
     Extra context:
         + files: list[dict] | A list of objects that are needed to render a file
+        + show_download: bool | We disable the download button for the files.
     """
 
     files = [
         {
-            "download_url": document.url,
             "file": document.titel or document.beschrijving or _("Geen titel"),
         }
         for document in documents
     ]
-    return {**kwargs, "documents": documents, "files": files}
+    return {**kwargs, "documents": documents, "files": files, "show_download": False}
 
 
 @register.inclusion_tag("components/File/FileTable.html")
@@ -95,6 +98,7 @@ def file(file, **kwargs):
         + file: File | the file that needs to be displayed.
         - allow_delete: bool | If you want to show a delete button.
         - download_url: url | If there is a special view to download (used for private files)
+        - show_download: bool | If you want to show the download button.
 
     Extra context:
         - is_image: bool | if the file that is given is an image.
@@ -135,5 +139,8 @@ def file(file, **kwargs):
 
     if kwargs.get("download_url"):
         kwargs["url"] = kwargs["download_url"]
+
+    if "show_download" not in kwargs:
+        kwargs["show_download"] = True
 
     return {**kwargs}

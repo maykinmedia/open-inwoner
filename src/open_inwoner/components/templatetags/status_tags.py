@@ -24,41 +24,8 @@ def status_list(statuses: list[Status], **kwargs) -> dict:
 
     Variables:
         + statuses: list[Status] | List of Status objects.
-
-    Extra context:
-        + object_list: list[Status] | The statusses sorted by date.
     """
     return {
         **kwargs,
         "statuses": statuses,
-        "object_list": sorted(statuses, key=lambda s: s["date"]),
-    }
-
-
-@register.inclusion_tag("components/status/status_list.html")
-def case_status_list(case_statuses: StatusType, **kwargs) -> dict:
-    """
-    Shows multiple statuses in an (historic) list for a case.
-
-    Usage:
-        {% case_status_list case_statuses %}
-
-    Variables:
-        + case_statuses: list[StatusType] | List of StatusType objects to grab the statusses.
-
-    Extra context:
-        + object_list: list[Status] | The statusses sorted by date.
-    """
-    statuses = [
-        {
-            "icon": "check",
-            "label": case_status.statustoelichting,
-            "date": case_status.datum_status_gezet,
-        }
-        for case_status in case_statuses
-    ]
-    return {
-        **kwargs,
-        "case_statuses": case_statuses,
-        "object_list": sorted(statuses, key=lambda s: s["date"]),
     }
