@@ -334,6 +334,10 @@ faker==9.9.0
     #   -r requirements/base.txt
     #   factory-boy
     #   zgw-consumers
+fontawesomefree==6.1.1
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
 fonttools[woff]==4.29.1
     # via
     #   -c requirements/base.txt
