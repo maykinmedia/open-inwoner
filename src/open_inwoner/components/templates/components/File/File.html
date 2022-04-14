@@ -8,7 +8,13 @@
     {% endif %}
     <p class="p">
         {% firstof name %}
-        ({{extension}}, {{size|readable_size}})
+        {% if extension and size %}
+            ({{extension}}, {{size|readable_size}})
+        {% elif extension %}
+            ({{extension}})
+        {% elif size %}
+            ({{size|readable_size}})
+        {% endif %}
     </p>
     {% if allow_delete %}
         {% dropdown icon="more_horiz" %}
@@ -18,9 +24,11 @@
                     {% button icon="send" text=_("Deel") href=share_url icon_outlined=True transparent=True %}
                 {% endwith %}
             </div>
-            <div class="dropdown__item">
-                {% button icon="file_download" text=_("Download") href=url icon_outlined=True transparent=True %}
-            </div>
+            {% if show_download %}
+                <div class="dropdown__item">
+                    {% button icon="file_download" text=_("Download") href=url icon_outlined=True transparent=True %}
+                </div>
+            {% endif %}
             <div class="dropdown__item">
                 {% url 'accounts:documents_delete' uuid=uuid as delete_url %}
                 {% render_form form=None form_action=delete_url method="POST" spaceless=True id="deactivate-form" extra_classes="confirm" data_confirm_title=_("Weet je het zeker dat je dit bestand wilt verwijderen?") data_confirm_cancel=_("Nee") data_confirm_default=_("Ja") %}
@@ -29,7 +37,7 @@
                 {% endrender_form %}
             </div>
         {% enddropdown %}
-    {% else %}
+    {% elif show_download %}
         {% trans "Download" as download %}
         {% link href=url text=download secondary=True download=True icon="file_download" icon_position="before" %}
     {% endif %}

@@ -18,7 +18,7 @@
 }
 
 *[class^='h'] + .p {
-  margin-top: var(--spacing-medium);
+  margin-top: var(--font-line-height-body);
 }
 
 .p + .p {

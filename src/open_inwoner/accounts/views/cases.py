@@ -94,11 +94,22 @@ class CasesStatusView(
         # Sort list of statuses in order to able to get the most recent one
         statuses.sort(key=lambda status: status.datum_status_gezet, reverse=True)
 
+        context["anchors"] = self.get_anchors(case, statuses, case_info_objects)
         context["case"] = {
             "obj": case,
             "documents": case_info_objects,
             "statuses": statuses,
-            "current_status": statuses[0] if statuses else None,
         }
 
         return context
+
+    def get_anchors(self, case, statuses, documents):
+        anchors = [["#title", _("Gegevens")]]
+
+        if statuses:
+            anchors.append(["#statuses", _("Status")])
+
+        if documents:
+            anchors.append(["#documents", _("Documenten")])
+
+        return anchors
