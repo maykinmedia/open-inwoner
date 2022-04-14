@@ -17,7 +17,7 @@
         {% for action in actions %}
             <div class="actions__action">
                 <div class="actions__actions">
-                    {% button icon="input" text=_("Export to PDF") hide_text=True href="accounts:action_export" uuid=action.uuid icon_outlined=True transparent=True %}
+                    {% button icon="file-pdf" text=_("Export to PDF") hide_text=True href="accounts:action_export" uuid=action.uuid icon_outlined=True transparent=True %}
                     {% if action|is_connected:request.user %}
                         {% dropdown icon="settings" %}
                             <div class="dropdown__item">

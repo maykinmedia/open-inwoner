@@ -187,6 +187,8 @@ face==20.1.1
     # via glom
 faker==9.9.0
     # via zgw-consumers
+fontawesomefree==6.1.1
+    # via -r requirements/base.in
 fonttools[woff]==4.29.1
     # via weasyprint
 furl==2.1.3

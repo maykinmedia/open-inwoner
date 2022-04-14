@@ -371,6 +371,10 @@ faker==9.9.0
     #   zgw-consumers
 flake8==3.9.2
     # via -r requirements/dev.in
+fontawesomefree==6.1.1
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 fonttools[woff]==4.29.1
     # via
     #   -c requirements/ci.txt
