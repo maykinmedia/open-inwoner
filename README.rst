@@ -5,7 +5,7 @@ Open Inwoner
 :Version: 0.6.0
 :Source: https://github.com/maykinmedia/open-inwoner
 :Keywords: inwoner
-:PythonVersion: 3.8
+:PythonVersion: 3.9
 
 |build-status| |docker| |black| |python-versions|
 

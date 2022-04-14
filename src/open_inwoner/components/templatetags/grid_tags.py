@@ -41,7 +41,7 @@ def render_column(parser, token):
 
     Variables:
         - compact: bool | Whether to use compact mode (no gutters).
-        - start: int | column to start from.
+        - start: (int|string) | column to start from, set to auto for standard flow.
         - span: int | column span. Max is 12 columns
         - extra_classes: string | Extra classes for the column
 

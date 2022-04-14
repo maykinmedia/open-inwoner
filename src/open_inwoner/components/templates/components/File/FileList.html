@@ -12,7 +12,7 @@
         {% for file in files %}
             {% url download_view uuid=file.uuid as download_url %}
             <li class="file-list__list-item">
-                {% file file=file.file name=file.name uuid=file.uuid allow_delete=allow_delete download_url=download_url %}
+                {% file file=file.file name=file.name uuid=file.uuid allow_delete=allow_delete download_url=download_url show_download=show_download %}
             </li>
         {% empty %}
             <li><p class="p">{% trans "Er zijn nog geen bestanden geupload" %}</p></li>
