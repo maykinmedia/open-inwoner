@@ -11,4 +11,6 @@ class HeaderMenu {
 }
 
 const headerMenu = document.querySelector('.header .header__menu-icon')
-new HeaderMenu(headerMenu)
+if (headerMenu) {
+  new HeaderMenu(headerMenu)
+}
