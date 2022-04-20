@@ -1,4 +1,4 @@
-{% load static i18n header_tags card_tags footer_tags button_tags notification_tags session_tags utils %}<!DOCTYPE html>
+{% load static i18n header_tags card_tags footer_tags button_tags notification_tags anchor_menu_tags view_breadcrumbs utils %}<!DOCTYPE html>
 <html lang="en" class="view {% block view_class %}view--{{ request.resolver_match.namespaces|join:'-' }}-{{ request.resolver_match.url_name }}{% endblock %}">
     <head>
         <meta charset="utf-8">
@@ -26,8 +26,7 @@
         {% comment %} TODO: Make self hosted {% endcomment %}
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
-        <link href="{% static 'fontawesome6/css/fontawesome.min.css' %}" rel="stylesheet">
-        <link href="{% static 'fontawesome6/css/brands.min.css' %}" rel="stylesheet">
+        <script src="{% static 'fontawesomefree/js/all.min.js' %}"></script>
         {% block extra_css %}{% endblock %}
 
         {% include "analytics/google.html" %}
@@ -35,9 +34,13 @@
     </head>
 
     <body>
-      {% header categories=menu_categories request=request breadcrumbs=breadcrumbs search_form=search_form %}
+        {% header categories=menu_categories request=request breadcrumbs=breadcrumbs search_form=search_form has_general_faq_questions=has_general_faq_questions %}
+        {% if anchors %}
+        {% anchor_menu anchors=anchors desktop=False %}
+        {% endif %}
+        {% render_breadcrumbs "components/Header/Breadcrumbs.html" %}
 
-        {% notifications messages %}
+        {% block notifications %}{% notifications messages %}{% endblock %}
 
         {% block header_image %}{% endblock header_image %}
 

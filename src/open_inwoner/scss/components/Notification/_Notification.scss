@@ -1,20 +1,37 @@
 .notification {
-  background-color: var(--color-orange);
+  --notification-color-background: var(--color-orange);
+  --notification-color-text: var(--color-orange-dark);
+
+  background-color: var(--notification-color-background);
   border-radius: var(--border-radius);
-  padding: var(--spacing-extra-large);
-  display: grid;
-  grid-template-columns: 24px 1fr;
+  color: var(--notification-color-text);
+  display: flex;
   grid-gap: var(--spacing-extra-large);
-  color: var(--color-orange-dark);
   margin: var(--row-height) 0;
+  padding: var(--spacing-extra-large);
   position: relative;
 
   &--contents {
     display: block;
   }
 
+  &--error {
+    --notification-color-background: var(--color-danger-lightest);
+    --notification-color-text: var(--color-danger-darker);
+  }
+
   &--success {
-    background-color: var(--color-green);
+    --notification-color-background: var(--color-success-lighter);
+    --notification-color-text: var(--color-success);
+  }
+
+  &__icon {
+    flex-shrink: 0;
+    width: 24px;
+  }
+
+  &__content {
+    width: 100%;
   }
 
   &__close {
@@ -26,15 +43,15 @@
 
   &:not(#{&}--contents) .h2 {
     line-height: var(--font-size-heading-2);
-    color: var(--color-orange-dark);
+    color: var(--notification-color-text);
   }
 
   &:not(#{&}--contents) .p {
-    color: var(--color-orange-dark);
+    color: var(--notification-color-text);
   }
 
   .button {
     color: var(--color-white);
-    background-color: var(--color-orange-dark);
+    background-color: var(--notification-color-text);
   }
 }

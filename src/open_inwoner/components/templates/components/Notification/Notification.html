@@ -1,5 +1,4 @@
 {% load icon_tags button_tags icon_tags %}
-
 <div class="notification{% if contents %} notification--contents{% endif %}{% if type %} notification--{{ type }}{% endif %}">
     {% if not icon == False %}
         <div class="notification__icon">
@@ -11,7 +10,11 @@
         {% if title %}<h2 class="h2">{{ title }}</h2>{% endif %}
         {% if notification %}<p class="p">{{ notification }}</p>{% endif %}
         {% if action %}{% button href=action text=action_text %}{% endif %}
-        {{ contents }}
+        {% if contents %}
+            {{ contents }}
+        {% else %}
+            <p class="p p--compact">{{ message }}</p>
+        {% endif %}
     </div>
 
     {% if closable %}

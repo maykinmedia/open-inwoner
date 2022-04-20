@@ -3,7 +3,7 @@ from django.template.library import parse_bits
 from django.template.loader import render_to_string
 from django.utils.translation import gettext as _
 
-from open_inwoner.utils.templatetags.abstract import safe_resolve
+from open_inwoner.components.utils import safe_resolve
 
 register = template.Library()
 
@@ -16,6 +16,21 @@ WIDGET_TEMPLATES = {
     "RADIO": "components/Form/MultipleRadio.html",
     "TEXTAREA": "components/Form/Textarea.html",
 }
+
+
+def get_form_classes(**kwargs):
+    classes = f"form {kwargs.get('extra_classes', '')}"
+    if kwargs.get("columns"):
+        classes += f" form--columns-{kwargs.get('columns')}"
+    if kwargs.get("spaceless"):
+        classes += " form--spaceless"
+    if kwargs.get("inline"):
+        classes += " form--inline"
+    if kwargs.get("autosubmit"):
+        classes += " form--autosubmit"
+    if kwargs.get("horizontal"):
+        classes += " form--horizontal"
+    return classes
 
 
 @register.tag()
@@ -47,9 +62,13 @@ def render_form(parser, token):
         - secondary_text: string | The text for the secondary button when the form is auto rendered.
         - secondary_icon: string | The icon for the secondary button when the form is auto rendered.
         - secondary_icon_position: string | The icon position for the secondary button when the form is auto rendered.
+        - secondary: bool | If the secondary button should be styled like a secondary button or not.
+        - no_actions: bool | If you want to auto-generate the submit buttons.
+        - horizontal: bool | If you want the label next to the fields.
 
     Extra context:
         - contents: string | The html content between all the open and closing tags.
+        - classes: string | The classes that should be generated according to the options.
     """
     function_name = "render_form"
     nodelist = parser.parse(("endrender_form",))
@@ -71,7 +90,7 @@ def render_form(parser, token):
 
 
 @register.inclusion_tag("components/Form/Form.html", takes_context=True)
-def form(context, form_object, **kwargs):
+def form(context, form_object, secondary=True, **kwargs):
     """
     Renders a form including all fields.
 
@@ -91,18 +110,31 @@ def form(context, form_object, **kwargs):
         - data_confirm_title: string | If a confirm dialog is shown this will be the title.
         - data_confirm_cancel: string | If a confirm dialog is shown this will be the text on the cancel button.
         - data_confirm_default: string | If a confirm dialog is shown this will be the text on the confirm button.
+        - show_notifications: bool | Whether to show messages from Django messages framework.
         - submit_text: string | The text on the submit button when the form is auto rendered.
         - secondary_href: string | The link for the secondary button when the form is auto rendered.
+        - secondary_name: string | The name of the button when it is submitted. Should not be used with secondary_href
         - secondary_text: string | The text for the secondary button when the form is auto rendered.
         - secondary_icon: string | The icon for the secondary button when the form is auto rendered.
         - secondary_icon_position: string | The icon position for the secondary button when the form is auto rendered.
+        - secondary: bool | If the secondary button should be styled like a secondary button or not.
+        - no_actions: bool | If you want to auto-generate the submit buttons.
+        - horizontal: bool | If you want the label next to the fields.
 
     Extra context:
         - auto_render: True | Telling the template that the form should be rendered.
+        - classes: string | The classes that should be generated according to the options.
     """
     _context = context.flatten()
     kwargs["submit_text"] = kwargs.get("submit_text", _("Verzenden"))
-    return {**_context, **kwargs, "form": form_object, "auto_render": True}
+    kwargs["secondary"] = secondary
+    kwargs["auto_render"] = True
+    kwargs["form"] = form_object
+    kwargs["classes"] = get_form_classes(**kwargs)
+    return {
+        **_context,
+        **kwargs,
+    }
 
 
 @register.simple_tag()
@@ -126,10 +158,9 @@ def autorender_field(form_object, field_name, **kwargs):
 
     if type(field) == forms.fields.DateField:
         tmplt = WIDGET_TEMPLATES["DATE"]
-
-    if type(field) == forms.models.ModelMultipleChoiceField:
+    elif type(field) == forms.models.ModelMultipleChoiceField:
         tmplt = WIDGET_TEMPLATES["MULTIPLECHECKBOX"]
-    if type(field) == forms.fields.BooleanField:
+    elif type(field) == forms.fields.BooleanField:
         fn = checkbox
         tmplt = WIDGET_TEMPLATES["CHECKBOX"]
     elif type(field.widget) == forms.fields.HiddenInput:
@@ -154,11 +185,31 @@ def errors(errors, **kwargs):
     Variables:
         + errors: list | The non field errors or the field errors.
     """
-    return {**kwargs, "errors": errors}
+    return {
+        **kwargs,
+        "errors": errors,
+        "messages": [
+            {"level": "error", "message": error, "icon": False} for error in errors
+        ],
+    }
 
 
 @register.inclusion_tag(WIDGET_TEMPLATES["CHECKBOX"])
 def checkbox(field, **kwargs):
+    """
+    Displaying a checkbox.
+
+    Usage:
+        {% checkbox form.checkbox_field %}
+
+    Variables:
+        + field: Field | The field that needs to be rendered.
+    """
+    return {**kwargs, "field": field}
+
+
+@register.inclusion_tag(WIDGET_TEMPLATES["MULTIPLECHECKBOX"])
+def checkboxes(field, **kwargs):
     """
     Displaying a checkbox.
 
@@ -209,6 +260,7 @@ def input(field, **kwargs):
 
     Variables:
         + field: Field | The field that needs to be rendered.
+        - extra_classes: string| classes which should be added to the top-level container
     """
     return {**kwargs, "field": field}
 
@@ -258,8 +310,22 @@ def autocomplete(field, **kwargs):
     return {**kwargs, "field": field}
 
 
+@register.inclusion_tag("components/Form/Hidden.html")
+def hidden(field, **kwargs):
+    """
+    Displaying a hidden field
+
+    Usage:
+        {% hidden form.field %}
+
+    Variables:
+        + field: Field | The choice field that needs to be rendered.
+    """
+    return {**kwargs, "field": field}
+
+
 @register.inclusion_tag("components/Form/FormActions.html")
-def form_actions(primary_text="", primary_icon=None, **kwargs):
+def form_actions(primary_text="", primary_icon=None, secondary=True, **kwargs):
     """
     Rendering the form actions. This may contain a primary and or secondary button.
 
@@ -271,7 +337,9 @@ def form_actions(primary_text="", primary_icon=None, **kwargs):
         - primary_text: string | The text for the primary button.
         - primary_icon: string | The icon for the primary button.
         - single: bool | if it should be single.
+        - secondary: bool | if the secondary button should be styled like a secondary button or not.
         - secondary_href: string | The action when the secondary button is pressed.
+        - secondary_name: string | The name of the button when it is submitted.
         - secondary_text: string | What the text for the secondary button should be.
         - secondary_icon: string | What the icon for the secondary button should be.
         - secondary_icon_position: string | What the icon position for the secondary button should be.
@@ -291,6 +359,7 @@ def form_actions(primary_text="", primary_icon=None, **kwargs):
         "primary_text": primary_text,
         "primary_icon": primary_icon,
         "primary": primary,
+        "secondary": secondary,
     }
 
 
@@ -309,6 +378,14 @@ def addclass(field, class_string):
     return field.as_widget(attrs={"class": class_string})
 
 
+@register.simple_tag(takes_context=True)
+def initial_match(context):
+    initial = context.get("initial")
+    choice = context.get("choice")
+    name = context.get("name")
+    return initial.get(name) == choice[0]
+
+
 class FormNode(template.Node):
     def __init__(self, nodelist, form, method, **kwargs):
         self.nodelist = nodelist
@@ -320,30 +397,12 @@ class FormNode(template.Node):
         corrected_kwargs = {
             key: safe_resolve(kwarg, context) for key, kwarg in self.kwargs.items()
         }
-        output = self.nodelist.render(context)
-        method = self.method.resolve(context)
-        render_context = {
-            "contents": output,
-            "form": self.form.resolve(context),
-            "request": context.get("request"),
-            "method": method,
-            **corrected_kwargs,
-        }
-        rendered = render_to_string("components/Form/Form.html", render_context)
+        corrected_kwargs["contents"] = self.nodelist.render(context)
+        corrected_kwargs["form"] = self.form.resolve(context)
+        corrected_kwargs["request"] = context.get("request")
+        corrected_kwargs["method"] = self.method.resolve(context)
+        corrected_kwargs["csrf_token"] = context.get("csrf_token")
+        # The classes should stay at the bottom
+        corrected_kwargs["classes"] = get_form_classes(**corrected_kwargs)
+        rendered = render_to_string("components/Form/Form.html", corrected_kwargs)
         return rendered
-
-
-def parse_component_with_args(parser, bits, tag_name):
-    tag_args, tag_kwargs = parse_bits(
-        parser=parser,
-        bits=bits,
-        params=["tag_name"],
-        takes_context=False,
-        name=tag_name,
-        varargs=True,
-        varkw=[],
-        defaults=None,
-        kwonly=[],
-        kwonly_defaults=None,
-    )
-    return tag_kwargs

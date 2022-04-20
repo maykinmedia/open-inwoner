@@ -1,7 +1,6 @@
 from django import template
 
-from open_inwoner.components.templatetags.form_tags import parse_component_with_args
-from open_inwoner.utils.templatetags.abstract import ContentsNode
+from open_inwoner.components.utils import ContentsNode, parse_component_with_args
 
 register = template.Library()
 
@@ -16,7 +15,12 @@ def notifications(messages, **kwargs):
 
     Variables:
         + messages: list | A list of messages that need to be displayed.
+        - icon: string | The icon, can be false.
     """
+    if kwargs.get("icon") is not None:
+        for message in messages:
+            message.icon = kwargs.get("icon")
+
     return {"messages": messages, **kwargs}
 
 
@@ -32,6 +36,7 @@ def notification(type, message, **kwargs):
     Variables:
         + type: string | the type of notification. This will change the coloring.
         + message: string | The message for the notification.
+        - icon: string | The icon, can be false.
         - title: string | The title that should be displayed.
         - action: string | The href of the button.
         - action_text: string | The text of the button.

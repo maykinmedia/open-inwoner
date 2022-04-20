@@ -108,10 +108,7 @@ class TestProductImportResource(TestCase):
         with self.assertRaises(ValidationError) as e:
             self.resource.import_data(dataset, raise_errors=True)
 
-        self.assertEqual(
-            e.exception.message,
-            "The field categories is required",
-        )
+        self.assertEqual(e.exception.message, "Het veld categories is verplicht")
 
     def test_import_raises_validation_error_when_category_does_not_exist(self):
         dataset = tablib.Dataset(
@@ -215,6 +212,38 @@ class TestProductImportResource(TestCase):
         self.assertEqual(qs[0].summary, updated_product.summary)
         self.assertEqual(qs[0].content, updated_product.content)
 
+    def test_import_replaces_windows_newlines(self):
+        dataset = tablib.Dataset(
+            [
+                self.product.name,
+                self.product.summary,
+                "some content_x000D__x000D_and some extra",
+                self.category.slug,
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+            ],
+            headers=[
+                "name",
+                "summary",
+                "content",
+                "categories",
+                "slug",
+                "link",
+                "related_products",
+                "tags",
+                "costs",
+                "organizations",
+            ],
+        )
+        self.resource.import_data(dataset)
+        qs = Product.objects.filter(name=self.product.name)
+
+        self.assertEqual(qs[0].content, "some content\n\nand some extra")
+
 
 class TestProductExportResource(TestCase):
     @freeze_time("2021-10-18 13:00:00")
@@ -242,7 +271,7 @@ class TestProductExportResource(TestCase):
                         (dataset.headers[6], ""),
                         (dataset.headers[7], ""),
                         (dataset.headers[8], ""),
-                        (dataset.headers[9], Decimal("0.00")),
+                        (dataset.headers[9], "0.00"),
                         (dataset.headers[10], "2021-10-18 15:00:00"),
                         (dataset.headers[11], "2021-10-18 15:00:00"),
                     ]

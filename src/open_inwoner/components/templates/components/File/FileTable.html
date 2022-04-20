@@ -8,11 +8,12 @@
         <th class="table__header"></th>
     </tr>
     {% for file in files %}
+        {% url download_view uuid=file.uuid as download_url %}
         <tr>
             <td class="table__item">{{ file.name }}</td>
             <td class="table__item">{{ file.owner.get_full_name }}</td>
             <td class="table__item">{{ file.created_on }}</td>
-            <td class="table__item">{% link icon="download" href=file.file.url download=True %}</td>
+            <td class="table__item">{% link icon="download" text=_("Download bestand") hide_text=True href=download_url|default:file.file.url download=True %}</td>
         </tr>
     {% endfor %}
 </table>

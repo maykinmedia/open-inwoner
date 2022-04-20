@@ -8,6 +8,7 @@ from ..models import (
     Organization,
     OrganizationType,
     Product,
+    ProductCondition,
     ProductContact,
     ProductLocation,
     Tag,
@@ -31,6 +32,15 @@ class ProductFactory(factory.django.DjangoModelFactory):
         if extracted:
             for category in extracted:
                 self.categories.add(category)
+
+    @factory.post_generation
+    def locations(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted:
+            for location in extracted:
+                self.locations.add(location)
 
 
 class CategoryFactory(factory.django.DjangoModelFactory):
@@ -75,12 +85,11 @@ class OrganizationFactory(factory.django.DjangoModelFactory):
 
 
 class ProductContactFactory(factory.django.DjangoModelFactory):
-    product = factory.SubFactory(ProductFactory)
     organization = factory.SubFactory(OrganizationFactory)
     first_name = factory.Faker("first_name")
     last_name = factory.Faker("last_name")
     email = factory.Faker("email")
-    phonenumber = factory.Faker("phone_number")
+    phonenumber = "0612345678"
 
     class Meta:
         model = ProductContact
@@ -88,10 +97,20 @@ class ProductContactFactory(factory.django.DjangoModelFactory):
 
 class ProductLocationFactory(factory.django.DjangoModelFactory):
     name = factory.Faker("word")
-    product = factory.SubFactory(ProductFactory)
     street = factory.Faker("street_name", locale="nl_NL")
     postcode = factory.Faker("postcode", locale="nl_NL")
     geometry = Point(5, 52)
 
     class Meta:
         model = ProductLocation
+
+
+class ProductConditionFactory(factory.django.DjangoModelFactory):
+    name = factory.Faker("word")
+    question = factory.Faker("word")
+    positive_text = factory.Faker("word")
+    negative_text = factory.Faker("word")
+    rule = factory.Faker("word")
+
+    class Meta:
+        model = ProductCondition

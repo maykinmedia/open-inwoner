@@ -1,14 +1,20 @@
 {% extends 'master.html' %}
 {% load button_tags card_tags faq_tags grid_tags %}
 
+{% block header_image %}
+{% if object.image %}
+    <img class="main-image main-image--start-after" src="{{ object.image.url }}" alt="Header image">
+{% endif %}
+{% endblock header_image %}
+
 {% block content %}
     <h1 class="h1">
         {{ object.name }}
         {% if request.user.is_staff %}
-            {% button icon="edit" href="admin:pdc_category_change" object_id=object.pk %}
+            {% button icon="edit" text=_("Open in admin") hide_text=True href="admin:pdc_category_change" object_id=object.pk %}
         {% endif %}
     </h1>
-    <p class="p">{{ object.description }}</p>
+    <p class="p">{{ object.description|linebreaksbr }}</p>
 
     {% if subcategories %}
         {% card_container subcategories=subcategories parent_category=object %}

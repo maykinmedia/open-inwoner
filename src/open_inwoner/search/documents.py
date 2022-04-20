@@ -16,18 +16,18 @@ class ProductDocument(Document):
         fields={
             "raw": fields.KeywordField(),
             "suggest": fields.CompletionField(),
-            "partial": fields.TextField(analyzer=partial_analyzer, boost=0.5),
+            "partial": fields.TextField(analyzer=partial_analyzer),
         },
     )
     summary = fields.TextField(
         analyzer="standard",
         search_analyzer=synonym_analyzer,
-        fields={"partial": fields.TextField(analyzer=partial_analyzer, boost=0.5)},
+        fields={"partial": fields.TextField(analyzer=partial_analyzer)},
     )
     content = fields.TextField(
         analyzer="standard",
         search_analyzer=synonym_analyzer,
-        fields={"partial": fields.TextField(analyzer=partial_analyzer, boost=0.5)},
+        fields={"partial": fields.TextField(analyzer=partial_analyzer)},
     )
     slug = fields.KeywordField()
 
@@ -56,9 +56,7 @@ class ProductDocument(Document):
     keywords = fields.TextField(
         fields={
             "suggest": fields.CompletionField(multi=True),
-            "partial": fields.TextField(
-                multi=True, analyzer=partial_analyzer, boost=0.5
-            ),
+            "partial": fields.TextField(multi=True, analyzer=partial_analyzer),
         }
     )
 

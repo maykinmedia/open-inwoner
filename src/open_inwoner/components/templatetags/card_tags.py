@@ -1,8 +1,8 @@
 from django import template
 
-from ...pdc.models import Category, Product
-from ...utils.templatetags.abstract import ContentsNode
-from .form_tags import parse_component_with_args
+from open_inwoner.components.utils import ContentsNode, parse_component_with_args
+
+from ...pdc.models import Category
 
 register = template.Library()
 
@@ -20,8 +20,10 @@ def card(href, title, **kwargs):
         + title: string | this will be the card title.
         - alt: string | the alt of the header image.
         - direction: string | can be set to "horizontal" to show contents horizontally.
+        - inline: bool | Whether the card should be rendered inline.
         - src: string | the src of the header image.
         - tinted: bool | whether to use gray as background color.
+        - type: string (info) | Set to info for an info card.
     """
     return {**kwargs, "href": href, "title": title}
 

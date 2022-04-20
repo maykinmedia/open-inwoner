@@ -7,15 +7,8 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import include, path
 
 from open_inwoner.accounts.forms import CustomRegistrationForm
-from open_inwoner.accounts.views import (
-    CustomRegistrationView,
-    DocumentPrivateMediaView,
-    PasswordResetView,
-)
-from open_inwoner.pdc.views import HomeView
-
-# from django_registration.backends.one_step.views import RegistrationView
-
+from open_inwoner.accounts.views import CustomRegistrationView, PasswordResetView
+from open_inwoner.pdc.views import FAQView, HomeView
 
 handler500 = "open_inwoner.utils.views.server_error"
 admin.site.site_header = "Open Inwoner beheeromgeving"
@@ -44,11 +37,6 @@ urlpatterns = [
         auth_views.PasswordResetCompleteView.as_view(),
         name="password_reset_complete",
     ),
-    path(
-        "private_files/<path>",
-        DocumentPrivateMediaView.as_view(),
-        name="private_file",
-    ),
     path("admin/hijack/", include("hijack.urls")),
     path("admin/", admin.site.urls),
     path("ckeditor/", include("open_inwoner.ckeditor5.urls")),
@@ -71,6 +59,7 @@ urlpatterns = [
         "questionnaire/",
         include("open_inwoner.questionnaire.urls", namespace="questionnaire"),
     ),
+    path("faq/", FAQView.as_view(), name="general_faq"),
     path("", include("open_inwoner.pdc.urls", namespace="pdc")),
     path("", include("open_inwoner.search.urls", namespace="search")),
     path("", HomeView.as_view(), name="root"),

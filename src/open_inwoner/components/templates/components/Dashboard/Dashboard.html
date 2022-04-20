@@ -1,0 +1,13 @@
+{% load icon_tags %}
+
+<aside class="dashboard">
+    <ul class="dashboard__list">
+        {% for metric in config.metrics %}
+            <li class="dashboard__list-item">
+                {% icon metric.icon outlined=True %}
+                <h4 class="h4">{{ metric.label }}</h4>
+                <p class="p p--compact">{{ metric.value|default:'-' }}</p>
+            </li>
+        {% endfor %}
+    </ul>
+</aside>

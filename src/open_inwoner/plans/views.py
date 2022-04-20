@@ -31,7 +31,11 @@ class PlanListView(LoginRequiredMixin, BaseBreadcrumbMixin, ListView):
         ]
 
     def get_queryset(self):
-        return Plan.objects.connected(self.request.user)
+        return (
+            Plan.objects.connected(self.request.user)
+            .select_related("created_by")
+            .prefetch_related("contacts")
+        )
 
 
 class PlanDetailView(
@@ -51,13 +55,23 @@ class PlanDetailView(
         ]
 
     def get_queryset(self):
-        return Plan.objects.connected(self.request.user)
+        return (
+            Plan.objects.connected(self.request.user)
+            .select_related("created_by")
+            .prefetch_related("contacts")
+        )
 
     def get_context_data(self, **kwargs):
         actions = self.object.actions.all()
         context = super().get_context_data(**kwargs)
+        context["anchors"] = [
+            ("#title", self.object.title),
+            ("#goals", _("Doelen")),
+            ("#files", _("Bestanden")),
+            ("#actions", _("Acties")),
+        ]
         context["action_form"] = ActionListForm(
-            data=self.request.GET, users=actions.values_list("created_by_id", flat=True)
+            data=self.request.GET, users=actions.values_list("is_for_id", flat=True)
         )
         context["actions"] = self.get_actions(actions)
         return context
@@ -89,7 +103,7 @@ class PlanCreateView(LoginRequiredMixin, BaseBreadcrumbMixin, CreateView):
 
 
 class PlanEditView(LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
-    template_name = "pages/plans/create.html"
+    template_name = "pages/plans/edit.html"
     model = Plan
     slug_field = "uuid"
     slug_url_kwarg = "uuid"

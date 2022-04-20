@@ -62,9 +62,13 @@
     width: 100%;
 
     @media (min-width: 768px) {
-      margin-top: calc(130px);
+      margin-top: -130px;
       width: 50%;
     }
+  }
+
+  .form__grid-box {
+    grid-template-columns: 1fr;
   }
 }
 

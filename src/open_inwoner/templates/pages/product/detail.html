@@ -1,57 +1,21 @@
 {% extends 'master.html' %}
-{% load i18n l10n button_tags card_tags file_tags grid_tags icon_tags link_tags map_tags notification_tags tag_tags utils condition_tags render_tags %}
+{% load i18n l10n button_tags card_tags file_tags grid_tags icon_tags link_tags map_tags notification_tags tag_tags utils condition_tags render_tags anchor_menu_tags %}
 
 {% block sidebar_content %}
-    <aside class="anchor-menu">
-        <ul class="anchor-menu__list">
-            <li class="anchor-menu__list-item">
-                {% link href='#title' text=object.name %}
-            </li>
-            {% if object.files.exists %}
-                <li class="anchor-menu__list-item">
-                    {% link href='#files' text=_('Bestanden') %}
-                </li>
-            {% endif %}
-            {% if object.locations.exists %}
-                <li class="anchor-menu__list-item">
-                    {% link href='#locations' text=_('Locaties') %}
-                </li>
-            {% endif %}
-            {% if object.links.exists %}
-                <li class="anchor-menu__list-item">
-                    {% link href='#links' text=_('Links') %}
-                </li>
-            {% endif %}
-            {% if product.product_contacts.exists %}
-                <li class="anchor-menu__list-item">
-                    {% link href='#contact' text=_('Contact') %}
-                </li>
-            {% endif %}
-            {% if object.related_products.exists %}
-                <li class="anchor-menu__list-item">
-                    {% link href='#see' text=_('Zie ook') %}
-                </li>
-            {% endif %}
-            <li class="anchor-menu__list-item">
-                {% link href='#share' text=_('Delen') %}
-            </li>
-            {% if product.link %}
-                <li class="anchor-menu__list-item">
-                    {% button href=product.link size="big" text=_("Aanvraag starten") primary=True icon="arrow_forward" icon_position="before" %}
-                </li>
-            {% endif %}
-            <li class="anchor-menu__list-item anchor-menu__list-item--top">
-                {% link primary=True href='#top' icon='arrow_upward' icon_position='before' text=_('Terug naar boven') %}
-            </li>
-        </ul>
-    </aside>
+{% anchor_menu anchors=anchors desktop=True %}
+{% if product.link %}
+    <li class="anchor-menu__list-item">
+        {% button href=product.link size="big" text=_("Aanvraag starten") primary=True icon="arrow_forward" icon_position="before" %}
+    </li>
+{% endif %}
+{% endanchor_menu %}
 {% endblock sidebar_content %}
 
 {% block content %}
     <h1 class="h1" id="title">
         {{ object.name }}
         {% if request.user.is_staff %}
-            {% button icon="edit" href="admin:pdc_product_change" object_id=object.pk %}
+            {% button icon="edit" text=_("Bewerken in de Admin") hide_text=True href="admin:pdc_product_change" object_id=object.pk %}
         {% endif %}
     </h1>
     {% tag tags=object.tags.all %}
@@ -99,7 +63,7 @@
     <hr class="divider">
 
     {% render_grid %}
-        {% render_column span=5 %}
+        {% render_column span=4 %}
             {# Links. #}
             {% if object.links.exists %}
                 <nav class="link-list">
@@ -115,7 +79,7 @@
             {% endif %}
         {% endrender_column %}
 
-        {% render_column start=6 span=3 compact=True %}
+        {% render_column start=6 span=4 compact=True %}
             {# Related products. #}
             {% if object.related_products.exists %}
                 <nav class="link-list">
@@ -142,30 +106,31 @@
         {% endrender_column %}
 
 
-        {% render_column span=8 %}
-            {% if object.product_contacts %}
+        {% render_column span=9 %}
+            {% if object.contacts %}
                 {% render_notification type='success' icon=False %}
                     <h4 class="h4" id="contact">{% trans 'Contact' %}</h4>
-                    {% for product_contact in object.product_contacts.all %}
+
+                    {% for contact in object.contacts.all %}
                         {% render_grid compact=True %}
                             {% render_column span=12 %}
-                                <h4 class="h4">{{ product_contact.first_name }} {{ product_contact.last_name }}</h4>
+                                <h4 class="h4">{{ contact.first_name }} {{ contact.last_name }}</h4>
                             {% endrender_column %}
 
                             {% render_column span=6 %}
-                                <span class="p">{{ product_contact.role }}</span>
+                                <span class="p">{{ contact.role|default:_('Telefoonnummer') }}</span>
                             {% endrender_column %}
 
                             {% render_column start=7 span=6 %}
-                                {% link href='tel:'|add:product_contact.phonenumber text=product_contact.phonenumber primary=True %}
+                                {% link href='tel:'|add:contact.phonenumber text=contact.phonenumber primary=True %}
                             {% endrender_column %}
 
                             {% render_column span=6 %}
-                                <p class="p">{{ product_contact.organization }}</p>
+                                <p class="p">{{ contact.organization|default:_('E-mail')}}</p>
                             {% endrender_column %}
 
                             {% render_column start=7 span=6 %}
-                                {% link href='mailto:'|add:product_contact.email text=product_contact.email primary=True %}
+                                {% link href='mailto:'|add:contact.email text=contact.email primary=True %}
                             {% endrender_column %}
                         {% endrender_grid %}
                     {% endfor %}

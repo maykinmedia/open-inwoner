@@ -1,29 +1,8 @@
 {% extends 'master.html' %}
-{% load i18n button_tags card_tags map_tags utils icon_tags file_tags action_tags %}
+{% load i18n button_tags card_tags map_tags utils icon_tags file_tags action_tags dropdown_tags anchor_menu_tags %}
 
 {% block sidebar_content %}
-    <aside class="anchor-menu">
-        <ul class="anchor-menu__list">
-            <li class="anchor-menu__list-item">
-                <a class="link" href="#title">{{ object.title }}</a>
-            </li>
-            <li class="anchor-menu__list-item">
-                <a class="link" href="#goals">{% trans "Doelen" %}</a>
-            </li>
-            <li class="anchor-menu__list-item">
-                <a class="link" href="#files">{% trans "Bestanden" %}</a>
-            </li>
-            <li class="anchor-menu__list-item">
-                <a class="link" href="#actions">{% trans "Acties" %}</a>
-            </li>
-            <li class="anchor-menu__list-item anchor-menu__list-item--top">
-                <a class="link link--primary" href="#top">
-                    {% icon icon="arrow_upward" %}
-                    Terug naar boven
-                </a>
-            </li>
-        </ul>
-    </aside>
+{% anchor_menu anchors=anchors desktop=True %}
 {% endblock sidebar_content %}
 
 {% block content %}
@@ -32,8 +11,12 @@
         {{ object.title }}
 
         {% button_row align="right" %}
-            {% button href="plans:plan_edit" uuid=object.uuid icon="settings" icon_outlined=True transparent=True secondary=True %}
-            {% button href="plans:plan_export" uuid=object.uuid icon="input" icon_outlined=True transparent=True secondary=True %}
+            {% dropdown icon="settings" secondary=True %}
+                <div class="dropdown__item">
+                    {% button icon="edit" text=_("Bewerken") href="plans:plan_edit" uuid=object.uuid icon_outlined=True transparent=True %}
+                </div>
+            {% enddropdown %}
+            {% button href="plans:plan_export" uuid=object.uuid icon="file-pdf" text=_("Exporteer naar PDF") hide_text=True icon_outlined=True transparent=True secondary=True %}
         {% endbutton_row %}
 
     </h1>
@@ -62,7 +45,7 @@
             <div class="plan-contact__grid plan-contact__grid--columns-{% if object.contacts.count > 1 %}2{% else %}1{% endif %}">
                 {% for contact in object.contacts.all %}
                     <div class="plan-contact__information">
-                    {% if contact.create_by == request.user %}
+                    {% if contact.created_by == request.user %}
                         <p class="plan-contact__info">{{ contact.get_name }}</p>
                         <p class="plan-contact__info">{{ contact.function }}</p>
                         <p class="plan-contact__info">{{ contact.phonenumber }}</p>
@@ -85,16 +68,17 @@
 
     <h2 class="h2" id="files">{% trans "Bestanden" %}</h2>
     {% if object.get_latest_file %}
-        {% file file=object.get_latest_file.file name=object.get_latest_file.name %}
+        {% url "accounts:documents_download" uuid=object.get_latest_file.uuid as download_url %}
+        {% file file=object.get_latest_file.file name=object.get_latest_file.name download_url=download_url %}
 
         {% if object.get_other_files %}
-            {% file_table files=object.get_other_files %}
+            {% file_table files=object.get_other_files download_view="accounts:documents_download" %}
         {% endif %}
     {% endif %}
     {% button href="plans:plan_add_file" uuid=object.uuid text=_("Upload nieuwe versie") primary=True %}
 
     <h2 class="h2" id="actions">{% trans "Acties" %}</h2>
-    {% actions actions=actions action_form=action_form form_action=request.path|add:"#actions" plan=plan %}
+    {% actions actions=actions request=request action_form=action_form form_action=request.path|add:"#actions" plan=plan %}
     {% button href="plans:plan_action_create" uuid=object.uuid text=_("Nieuw actie toevoegen") icon="date_range" primary=True %}
 </div>
 {% endblock %}

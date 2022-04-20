@@ -65,6 +65,7 @@
     var(--color-secondary-s),
     calc(var(--color-secondary-l) - 10%)
   );
+
   --color-accent-h: 50;
   --color-accent-s: 94%;
   --color-accent-l: 57%;
@@ -84,12 +85,68 @@
     calc(var(--color-accent-l) + 10%)
   );
 
+  --color-danger-h: 0;
+  --color-danger-s: 100%;
+  --color-danger-l: 40%;
+  --color-danger: hsl(
+    var(--color-danger-h),
+    var(--color-danger-s),
+    var(--color-danger-l)
+  );
+  --color-danger-darker: hsl(
+    var(--color-danger-h),
+    var(--color-danger-s),
+    calc(var(--color-danger-l) - 27%)
+  );
+  --color-danger-lighter: hsl(
+    var(--color-danger-h),
+    var(--color-danger-s),
+    calc(var(--color-danger-l) + 13%)
+  );
+  --color-danger-lightest: hsl(
+    var(--color-danger-h),
+    var(--color-danger-s),
+    calc(var(--color-danger-l) + 53%)
+  );
+
+  --color-info-h: 2010;
+  --color-info-s: 64%;
+  --color-info-l: 80%;
+  --color-info: hsl(
+    var(--color-info-h),
+    var(--color-info-s),
+    var(--color-info-l)
+  );
+  --color-info-lighter: hsl(
+    var(--color-info-h),
+    var(--color-info-s),
+    calc(var(--color-info-l) + 10%)
+  );
+  --color-info-darker: hsl(
+    var(--color-info-h),
+    var(--color-info-s),
+    calc(var(--color-info-l) - 40%)
+  );
+
+  --color-success-h: 115;
+  --color-success-s: 26%;
+  --color-success-l: 37%;
+  --color-success: hsl(
+    var(--color-success-h),
+    var(--color-success-s),
+    var(--color-success-l)
+  );
+  --color-success-lighter: hsl(
+    var(--color-success-h),
+    var(--color-success-s),
+    calc(var(--color-success-l) + 50%)
+  );
+
   --color-font-primary: var(--color-white);
   --color-font-secondary: var(--color-white);
   --color-font-accent: var(--color-gray-dark);
 
   --color-body: var(--color-gray-dark);
-  --color-danger: var(--color-red);
   --color-mute: var(--color-gray);
 
   /// Font.
@@ -185,14 +242,14 @@
   font-family: 'Open Dyslexic';
   font-weight: bold;
   src: local('TheSans C5'),
-    url('./fonts/opendyslexic/OpenDyslexic-Bold.otf') format('opentype');
+    url('/static/fonts/opendyslexic/OpenDyslexic-Bold.otf') format('opentype');
 }
 
 @font-face {
   font-family: 'Open Dyslexic';
   font-style: italic;
   src: local('TheSans C5'),
-    url('./fonts/opendyslexic/OpenDyslexic-Italic.otf') format('opentype');
+    url('/static/fonts/opendyslexic/OpenDyslexic-Italic.otf') format('opentype');
 }
 
 @font-face {
@@ -200,7 +257,8 @@
   font-weight: bold;
   font-style: italic;
   src: local('TheSans C5'),
-    url('./fonts/opendyslexic/OpenDyslexic-Bold-Italic.otf') format('opentype');
+    url('/static/fonts/opendyslexic/OpenDyslexic-Bold-Italic.otf')
+      format('opentype');
 }
 
 html {

@@ -26,6 +26,8 @@ from .base import *  # noqa isort:skip
 #
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+# This is commented out because it causes tests in the CI to fail. It can be enabled in the local.py settings.
 # SESSION_COOKIE_DOMAIN = ".localhost"
 
 LOGGING["loggers"].update(

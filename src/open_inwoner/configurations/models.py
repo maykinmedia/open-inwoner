@@ -8,7 +8,7 @@ from filer.fields.image import FilerImageField
 from ordered_model.models import OrderedModel, OrderedModelManager
 from solo.models import SingletonModel
 
-from open_inwoner.pdc.urls import PRODUCT_PATH_NAME
+from open_inwoner.pdc.utils import PRODUCT_PATH_NAME
 
 from .choices import ColorTypeChoices
 
@@ -201,6 +201,22 @@ class SiteConfiguration(SingletonModel):
         verbose_name=_("Account help"),
         help_text=_("The help text for the profile page."),
     )
+    questionnaire_help_text = models.TextField(
+        blank=True,
+        default=_(
+            "Het onderdeel Zelfdiagnose stelt u in staat om met het beantwoorden van enkele vragen een advies te krijgen van de gemeente, met concrete vervolgstappen en producten en diensten. U kunt tevens uw antwoorden en het advies bewaren om met een begeleider van de gemeente te bespreken."
+        ),
+        verbose_name=_("Questionnaire help"),
+        help_text=_("The help text for the questionnaire page."),
+    )
+    plan_help_text = models.TextField(
+        blank=True,
+        default=_(
+            "Met het onderdeel Samenwerken kunt u samen met uw contactpersonen of begeleider van de gemeente aan de slag om met een samenwerkingsplan uw persoonlijke situatie te verbeteren. Door samen aan uw doelen te werken en acties te omschrijven kunnen we elkaar helpen."
+        ),
+        verbose_name=_("Plan help"),
+        help_text=_("The help text for the plan page."),
+    )
     email_new_message = models.BooleanField(
         verbose_name=_("Send email about a new message"),
         default=True,
@@ -239,6 +255,14 @@ class SiteConfiguration(SingletonModel):
         default=False,
         help_text=_(
             "By default the cases are not shown. If the OpenZaak integration is configured this needs to be set to True."
+        ),
+    )
+    show_product_finder = models.BooleanField(
+        verbose_name=_("Laat productzoeker zien op de homepagina."),
+        blank=True,
+        default=False,
+        help_text=_(
+            "Als dit is aangevinkt en er zijn product condities gemaakt, dan wordt op de homepagina de productzoeker weergegeven."
         ),
     )
 
@@ -336,6 +360,10 @@ class SiteConfiguration(SingletonModel):
             return self.search_help_text
         if current_path.startswith(reverse("accounts:my_profile")):
             return self.account_help_text
+        if current_path.startswith(reverse("questionnaire:questionnaire_list")):
+            return self.questionnaire_help_text
+        if current_path.startswith(reverse("plans:plan_list")):
+            return self.plan_help_text
 
 
 class SiteConfigurationPage(OrderedModel):
@@ -354,6 +382,10 @@ class SiteConfigurationPage(OrderedModel):
     order_with_respect_to = "configuration"
 
     objects = OrderedModelManager()
+
+    class Meta:
+        verbose_name = _("Flatpage in the footer")
+        verbose_name_plural = _("Flatpages in the footer")
 
     def __str__(self):
         return self.flatpage.title

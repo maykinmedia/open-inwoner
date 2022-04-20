@@ -3,39 +3,46 @@ version: '3'
 
 services:
   db:
-    # NOTE: No persistance storage configured.
-    # See: https://hub.docker.com/_/postgres/
-    image: postgis/postgis:10-2.5
-    # NOTE: this works for bitnami, not sure if this works for regular
-    # postgres image
+    image: postgis/postgis:12-2.5
+    environment:
+      - POSTGRES_USER=${DB_USER:-open_inwoner}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-open_inwoner}
     volumes:
-      - ./docker-init-db.sql:/docker-entrypoint-initdb.d/init_db.sql
+      - db_data:/var/lib/postgresql/data
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.2
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - cluster.routing.allocation.disk.threshold_enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+
+  redis:
+    image: redis
 
   web:
     build: .
     environment:
       - DJANGO_SETTINGS_MODULE=open_inwoner.conf.docker
       - SECRET_KEY=${SECRET_KEY:-7bk)w=_%lnm#68rc!c)h@gy&5+%^f$=okq17bv!)yv!l0udu2y}
+      - ALLOWED_HOSTS=*
+      - CACHE_DEFAULT=redis:6379/0
+      - CACHE_AXES=redis:6379/0
+      - ES_HOST=elasticsearch
+      - TWO_FACTOR_FORCE_OTP_ADMIN=0
+      - TWO_FACTOR_PATCH_ADMIN=0
     ports:
       - 8000:8000
     depends_on:
       - db
+      - redis
+      - elasticsearch
 
-# See: src/open_inwoner/conf/docker.py
-# Optional containers below:
-#  elasticsearch:
-#    # NOTE: No persistance storage configured.
-#    # See: https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html
-#    image: docker.elastic.co/elasticsearch/elasticsearch:6.2.4
-#    container_name: elasticsearch
-#    environment:
-#      - discovery.type=single-node
-#      - cluster.routing.allocation.disk.threshold_enabled=false
-#    ports:
-#      - 9200:9200
-#  redis:
-#    # NOTE: No persistance storage configured.
-#    # See: https://hub.docker.com/_/redis/
-#    image: redis
-#    ports:
-#        - 6379:6379
+volumes:
+  db_data:
+  es_data:

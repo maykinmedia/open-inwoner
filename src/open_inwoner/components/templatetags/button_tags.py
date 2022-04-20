@@ -1,8 +1,7 @@
 from django import template
 from django.urls import NoReverseMatch, reverse
 
-from open_inwoner.components.templatetags.form_tags import parse_component_with_args
-from open_inwoner.utils.templatetags.abstract import ContentsNode
+from open_inwoner.components.utils import ContentsNode, parse_component_with_args
 
 register = template.Library()
 
@@ -33,7 +32,7 @@ def button_row(parser, token):
 
 
 @register.inclusion_tag("components/Button/Button.html")
-def button(**kwargs):
+def button(text, **kwargs):
     """
     Creating a button. This can be a HTML button or an anchor element.
 
@@ -41,7 +40,7 @@ def button(**kwargs):
         {% button text="Button" icon="arrow-forward" primary=True %}
 
     Variables:
-        - text: string | this will be the button text.
+        + text: string | this will be the button text.
         - hide_text: bool | whether to hide the text and use aria attribute instead.
         - href: url or string | where the link links to (can be url name).
         - uuid: string | if href is an url name, pk for reverse can be passed.
@@ -51,17 +50,17 @@ def button(**kwargs):
         - primary: bool | If the primary colors should be used.
         - secondary: bool | If the secondary colors should be used.
         - transparent: bool | If the button does not have a background or border.
+        - pill: bool | Display the button as a pill.
         - disabled: bool: If the button is disabled.
         - icon: string | the icon that you want to display.
         - icon_position: enum[before, after] | where the icon should be positioned to the text.
         - icon_outlined: bool | if the outlined icons should be used.
         - type: string | the type of button that should be used.
+        - title: string | The HTML title attribute if different than the text.
 
     Extra context:
         - classes: string | all the classes that the button should have.
     """
-    if "text" not in kwargs and "icon" not in kwargs:
-        assert False, "Either text or icon should be given"
 
     def get_classes():
         classnames = "button"
@@ -97,6 +96,9 @@ def button(**kwargs):
         if kwargs.get("disabled"):
             classnames += " button--disabled"
 
+        if kwargs.get("pill"):
+            classnames += " button--pill"
+
         return classnames
 
     if "href" in kwargs:
@@ -113,5 +115,5 @@ def button(**kwargs):
             pass
 
     kwargs["classes"] = get_classes()
-
+    kwargs["text"] = text
     return {**kwargs}

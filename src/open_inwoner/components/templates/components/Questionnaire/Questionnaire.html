@@ -1,0 +1,9 @@
+{% load i18n button_tags %}
+
+<ul class="questionnaire__list">
+    {% for node in root_nodes %}
+        <li class="questionnaire__list-item">
+            {% button href=node.get_absolute_url icon='arrow_forward' icon_position='after' text=node.title|default:node.question|truncatechars:51 %}
+        </li>
+    {% endfor %}
+</ul>

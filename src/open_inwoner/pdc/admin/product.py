@@ -4,6 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from import_export.admin import ImportExportMixin
 from import_export.formats import base_formats
+from ordered_model.admin import OrderedModelAdmin
 
 from open_inwoner.ckeditor5.widgets import CKEditorWidget
 
@@ -19,11 +20,6 @@ from ..resources import ProductExportResource, ProductImportResource
 from .mixins import GeoAdminMixin
 
 
-class ProductContactInline(admin.StackedInline):
-    model = ProductContact
-    extra = 1
-
-
 class ProductFileInline(admin.TabularInline):
     model = ProductFile
     extra = 1
@@ -31,12 +27,6 @@ class ProductFileInline(admin.TabularInline):
 
 class ProductLinkInline(admin.TabularInline):
     model = ProductLink
-    extra = 1
-
-
-class ProductLocationInline(admin.StackedInline):
-    model = ProductLocation
-    exclude = ("geometry",)
     extra = 1
 
 
@@ -57,6 +47,8 @@ class ProductAdmin(ImportExportMixin, admin.ModelAdmin):
         "related_products",
         "tags",
         "organizations",
+        "contacts",
+        "locations",
         "conditions",
     )
     search_fields = ("name",)
@@ -67,8 +59,6 @@ class ProductAdmin(ImportExportMixin, admin.ModelAdmin):
     inlines = (
         ProductFileInline,
         ProductLinkInline,
-        ProductLocationInline,
-        ProductContactInline,
     )
 
     # import-export
@@ -81,7 +71,7 @@ class ProductAdmin(ImportExportMixin, admin.ModelAdmin):
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
-        return qs.prefetch_related("links", "locations", "product_contacts")
+        return qs.prefetch_related("links", "locations", "contacts")
 
     def display_categories(self, obj):
         return ", ".join(p.name for p in obj.categories.all())
@@ -91,8 +81,9 @@ class ProductAdmin(ImportExportMixin, admin.ModelAdmin):
 
 @admin.register(ProductContact)
 class ProductContactAdmin(admin.ModelAdmin):
-    list_display = ("product", "organization", "last_name", "first_name")
-    list_filter = ("product__name",)
+    list_display = ("organization", "last_name", "first_name")
+    list_filter = ("organization",)
+    search_fields = ("first_name", "last_name")
 
 
 @admin.register(ProductFile)
@@ -108,23 +99,20 @@ class ProductLinkAdmin(admin.ModelAdmin):
 
 @admin.register(ProductLocation)
 class ProductLocationAdmin(GeoAdminMixin, admin.ModelAdmin):
-    # List
-    list_display = ("product", "name", "city", "postcode", "street", "housenumber")
+    list_display = ("name", "city", "postcode", "street", "housenumber")
     list_filter = ("city",)
-
-    # Detail
-    fieldsets = (
-        (None, {"fields": ("product", "name")}),
-        (
-            _("Address"),
-            {"fields": ("street", "housenumber", "postcode", "city", "geometry")},
-        ),
-    )
+    search_fields = ("name", "city")
 
 
 @admin.register(ProductCondition)
-class ProductConditionAdmin(admin.ModelAdmin):
-    list_display = ("name", "question", "display_products")
+class ProductConditionAdmin(OrderedModelAdmin):
+    list_display = (
+        "name",
+        "question",
+        "display_products",
+        "order",
+        "move_up_down_links",
+    )
     list_filter = ("products__name",)
     search_fields = ("name",)
 

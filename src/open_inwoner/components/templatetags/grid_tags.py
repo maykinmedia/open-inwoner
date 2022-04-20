@@ -1,7 +1,6 @@
 from django import template
 
-from open_inwoner.components.templatetags.form_tags import parse_component_with_args
-from open_inwoner.utils.templatetags.abstract import ContentsNode
+from open_inwoner.components.utils import ContentsNode, parse_component_with_args
 
 register = template.Library()
 
@@ -42,8 +41,9 @@ def render_column(parser, token):
 
     Variables:
         - compact: bool | Whether to use compact mode (no gutters).
-        - start: int | column to start from.
+        - start: (int|string) | column to start from, set to auto for standard flow.
         - span: int | column span. Max is 12 columns
+        - extra_classes: string | Extra classes for the column
 
     Extra context:
         - contents: string (HTML) | this is the context between the render_column and endrender_column tags

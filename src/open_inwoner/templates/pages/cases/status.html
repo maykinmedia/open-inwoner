@@ -1,28 +1,29 @@
 {% extends 'master.html' %}
-{% load i18n %}
+{% load i18n anchor_menu_tags card_tags dashboard_tags file_tags grid_tags status_tags %}
+
+{% block sidebar_content %}
+    {% anchor_menu anchors desktop=True %}
+{% endblock sidebar_content %}
 
 {% block content %}
-    <h1 class="h1">{% trans "Status van zaak" %} {{ case.identificatie }}</h1>
+    {% render_grid %}
+        {% render_column span=9 %}
 
-    <table class="table table--space-medium">
-        <thead class="table__heading">
-            <tr>
-                <td class="table__item table__item--no-left-padding">{% trans "Bijgewerkt op" %}</td>
-                <td class="table__item table__item--no-left-padding">{% trans "Omschrijving" %}</td>
-            </tr>
-        </thead>
+            {# Title/dashboard. #}
+            <h1 class="h1" id="title">{{ case.obj.omschrijving }}</h1>
+            {% case_dashboard case=case.obj statuses=case.statuses documents=case.documents %}
 
-        <tbody>
-            {% for status in status_list %}
-                <tr>
-                    <td class="table__item table__item--no-left-padding">{{ status.datum_status_gezet }}</td>
-                    {% for type in status_type_list %}
-                        {% if type.url == status.statustype %}
-                            <td class="table__item table__item--no-left-padding">{{ type.omschrijving }}</td>
-                        {% endif %}
-                    {% endfor %}
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            {#  Status history. #}
+            {% if case.statuses %}
+                <h2 class="h2" id="statuses">{% trans 'Status' %}</h2>
+                {% status_list case.statuses %}
+            {% endif %}
+
+            {#  Documents. #}
+            {% if case.documents %}
+                <h2 class="h2" id="documents">{% trans 'Documenten' %}</h2>
+                {% case_document_list case.documents %}
+            {% endif %}
+        {% endrender_column %}
+    {% endrender_grid %}
 {% endblock content %}

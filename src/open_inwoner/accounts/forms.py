@@ -1,9 +1,13 @@
 from django import forms
+from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
 from django_registration.forms import RegistrationForm
 
-from .choices import EmptyStatusChoices
+from open_inwoner.utils.forms import LimitedUploadFileField, PrivateFileWidget
+
+from .choices import EmptyContactTypeChoices, EmptyStatusChoices
 from .models import Action, Contact, Document, Invite, Message, User
 
 
@@ -75,14 +79,36 @@ class ThemesForm(forms.ModelForm):
         widgets = {"selected_themes": forms.widgets.CheckboxSelectMultiple}
 
 
+class ContactFilterForm(forms.Form):
+    type = forms.ChoiceField(
+        label=_("Type contact"), choices=EmptyContactTypeChoices.choices, required=False
+    )
+
+
 class ContactForm(forms.ModelForm):
+    def __init__(self, user, create, *args, **kwargs):
+        self.user = user
+        self.create = create
+        return super().__init__(*args, **kwargs)
+
     class Meta:
         model = Contact
         fields = ("first_name", "last_name", "email", "phonenumber")
 
-    def save(self, user, commit=True):
+    def clean(self):
+        cleaned_data = super().clean()
+        email = cleaned_data.get("email")
+
+        if self.create and self.user.contacts.filter(email=email).exists():
+            raise ValidationError(
+                _(
+                    "Het ingevoerde e-mailadres komt al voor in uw contactpersonen. Pas de gegevens aan en probeer het opnieuw."
+                )
+            )
+
+    def save(self, commit=True):
         if not self.instance.pk:
-            self.instance.created_by = user
+            self.instance.created_by = self.user
 
         if not self.instance.pk and self.instance.email:
             self.instance.contact_user, created = User.objects.get_or_create(
@@ -92,6 +118,8 @@ class ContactForm(forms.ModelForm):
 
 
 class ActionForm(forms.ModelForm):
+    file = LimitedUploadFileField(required=False)
+
     class Meta:
         model = Action
         fields = (
@@ -115,6 +143,10 @@ class ActionForm(forms.ModelForm):
             assigned_contacts__in=self.user.contacts.all()
         )
 
+        self.fields["file"].widget = PrivateFileWidget(
+            url_name="accounts:action_download"
+        )
+
     def clean_end_date(self):
         data = self.cleaned_data["end_date"]
         if data and self.plan and data > self.plan.end_date:
@@ -134,6 +166,8 @@ class ActionForm(forms.ModelForm):
 
 
 class DocumentForm(forms.ModelForm):
+    file = LimitedUploadFileField()
+
     class Meta:
         model = Document
         fields = ("file", "name")
@@ -147,6 +181,36 @@ class DocumentForm(forms.ModelForm):
         return super().save(commit=commit)
 
 
+class MessageFileInputWidget(forms.ClearableFileInput):
+    template_name = "utils/widgets/message_file_input.html"
+
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+
+        context["widget"].update(
+            {
+                "init_name": name + "-init",
+                "init_id": name + "-init-id",
+            }
+        )
+        return context
+
+    def value_from_datadict(self, data, files, name):
+        upload = super().value_from_datadict(data, files, name)
+
+        if upload:
+            return upload
+
+        # check if there is initial file
+        init_value = forms.TextInput().value_from_datadict(data, files, name + "-init")
+        if init_value:
+            document = Document.objects.filter(uuid=init_value).first()
+            if document:
+                return document.file
+
+        return False
+
+
 class InboxForm(forms.ModelForm):
     receiver = forms.ModelChoiceField(
         label=_("Contactpersoon"),
@@ -156,12 +220,18 @@ class InboxForm(forms.ModelForm):
     )
     content = forms.CharField(
         label="",
+        required=False,
         widget=forms.Textarea(attrs={"placeholder": _("Schrijf een bericht...")}),
+    )
+    file = LimitedUploadFileField(
+        required=False,
+        label="",
+        widget=MessageFileInputWidget(attrs={"accept": settings.UPLOAD_FILE_TYPES}),
     )
 
     class Meta:
         model = Message
-        fields = ("receiver", "content")
+        fields = ("receiver", "content", "file")
 
     def __init__(self, user, **kwargs):
         self.user = user
@@ -174,6 +244,19 @@ class InboxForm(forms.ModelForm):
         ]
         self.fields["receiver"].choices = choices
         self.fields["receiver"].queryset = extended_contact_users
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        content = cleaned_data.get("content")
+        file = cleaned_data.get("file")
+
+        if not file and not content:
+            raise ValidationError(
+                _("Either message content or file should be filled in")
+            )
+
+        return cleaned_data
 
     def save(self, commit=True):
         self.instance.sender = self.user
@@ -190,7 +273,7 @@ class InviteForm(forms.ModelForm):
 
 
 class ActionListForm(forms.ModelForm):
-    created_by = forms.ModelChoiceField(
+    is_for = forms.ModelChoiceField(
         queryset=User.objects.all(), required=False, empty_label="Door"
     )
     end_date = forms.DateField(
@@ -200,8 +283,8 @@ class ActionListForm(forms.ModelForm):
 
     class Meta:
         model = Action
-        fields = ("status", "end_date", "created_by")
+        fields = ("status", "end_date", "is_for")
 
     def __init__(self, users, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["created_by"].queryset = User.objects.filter(pk__in=users)
+        self.fields["is_for"].queryset = User.objects.filter(pk__in=users)

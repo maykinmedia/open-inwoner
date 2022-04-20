@@ -24,4 +24,16 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
+
+  .link__text {
+    display: none;
+
+    @media (min-width: 768px) {
+      display: block;
+    }
+  }
+
+  .dropdown {
+    padding-right: var(--spacing-large);
+  }
 }

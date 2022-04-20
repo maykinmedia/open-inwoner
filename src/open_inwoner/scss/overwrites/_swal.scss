@@ -1,8 +1,10 @@
-.swal-modal {
-  border-radius: 0;
-  padding: var(--spacing-giant);
+.swal2-modal {
+  border-radius: 0 !important;
+  padding: var(--spacing-giant) !important;
+  display: flex !important;
+  flex-direction: column !important;
 
-  .swal-title {
+  .swal2-title {
     margin: 0;
     padding: 0 0 18px 0;
     text-align: left;
@@ -10,9 +12,11 @@
     font-family: var(--font-family-heading-2);
     font-size: var(--font-size-heading-2);
     line-height: var(--font-line-height-heading-2);
+    align-self: start;
   }
 
-  .swal-text {
+  .swal2-html-container {
+    flex-grow: 1;
     margin: 0;
     padding: 0 0 30px 0;
     max-width: none;
@@ -23,29 +27,48 @@
     line-height: var(--font-line-height-body);
   }
 
-  .swal-button {
-    @extend .button;
-  }
+  .swal2-actions {
+    align-self: start;
 
-  .swal-button--confirm {
-    background-color: var(--color-danger);
-    color: var(--color-white);
+    .swal2-confirm,
+    .swal2-deny,
+    .swal2-cancel {
+      @extend .button;
 
-    &:focus,
-    &:hover {
-      transform: translateY(-1px);
-      background-color: var(--color-danger);
+      &:focus {
+        box-shadow: none;
+      }
     }
-  }
 
-  .swal-button--close {
-    background-color: var(--color-primary);
-    border: 1px solid var(--color-primary);
-    color: var(--color-font-primary);
+    .swal2-confirm {
+      background-color: var(--color-primary);
+      color: var(--color-white);
 
-    &:hover {
-      transform: translateY(-1px);
-      background-color: var(--color-primary-darker);
+      &:hover {
+        transform: translateY(-1px);
+        background-color: var(--color-primary-darker);
+      }
+    }
+
+    .swal2-cancel {
+      background-color: var(--color-secondary);
+      border: 1px solid var(--color-secondary);
+      color: var(--color-font-secondary);
+
+      &:hover {
+        transform: translateY(-1px);
+        background-color: var(--color-secondary-darker);
+      }
+    }
+
+    .swal2-danger {
+      background-color: var(--color-danger-lighter);
+      color: var(--color-white);
+
+      &:hover {
+        transform: translateY(-1px);
+        background-color: var(--color-danger);
+      }
     }
   }
 

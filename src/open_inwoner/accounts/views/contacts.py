@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http.response import HttpResponseRedirect
 from django.urls.base import reverse, reverse_lazy
@@ -8,7 +9,7 @@ from django.views.generic.edit import DeleteView, UpdateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin
 
-from ..forms import ContactForm
+from ..forms import ContactFilterForm, ContactForm
 from ..models import Contact, Invite
 
 
@@ -26,7 +27,16 @@ class ContactListView(LoginRequiredMixin, BaseBreadcrumbMixin, ListView):
 
     def get_queryset(self):
         base_qs = super().get_queryset()
-        return base_qs.get_extended_contacts_for_user(me=self.request.user)
+        base_qs = base_qs.get_extended_contacts_for_user(me=self.request.user)
+        if self.request.GET.get("type"):
+            base_qs = base_qs.filter(type=self.request.GET.get("type"))
+
+        return base_qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["form"] = ContactFilterForm(data=self.request.GET)
+        return context
 
 
 class ContactUpdateView(LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
@@ -48,12 +58,19 @@ class ContactUpdateView(LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
             ),
         ]
 
+    def get_form_kwargs(self):
+        return {
+            **super().get_form_kwargs(),
+            "user": self.request.user,
+            "create": False,
+        }
+
     def get_queryset(self):
         base_qs = super().get_queryset()
         return base_qs.filter(created_by=self.request.user)
 
     def form_valid(self, form):
-        self.object = form.save(self.request.user)
+        self.object = form.save()
         return HttpResponseRedirect(self.get_success_url())
 
 
@@ -61,7 +78,6 @@ class ContactCreateView(LoginRequiredMixin, BaseBreadcrumbMixin, CreateView):
     template_name = "pages/profile/contacts/edit.html"
     model = Contact
     form_class = ContactForm
-    success_url = reverse_lazy("accounts:contact_list")
 
     @cached_property
     def crumbs(self):
@@ -74,8 +90,20 @@ class ContactCreateView(LoginRequiredMixin, BaseBreadcrumbMixin, CreateView):
             ),
         ]
 
+    def get_success_url(self):
+        if self.object:
+            return self.object.get_update_url()
+        return reverse_lazy("accounts:contact_list")
+
+    def get_form_kwargs(self):
+        return {
+            **super().get_form_kwargs(),
+            "user": self.request.user,
+            "create": True,
+        }
+
     def form_valid(self, form):
-        self.object = form.save(self.request.user)
+        self.object = form.save()
 
         # send invite to the contact
         contact_user = self.object.contact_user
@@ -88,6 +116,17 @@ class ContactCreateView(LoginRequiredMixin, BaseBreadcrumbMixin, CreateView):
                 inviter=self.request.user, invitee=contact_user, contact=self.object
             )
             invite.send(self.request)
+
+        # FIXME type off message
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            _(
+                "{contact} is toegevoegd aan uw contactpersonen.".format(
+                    contact=self.object
+                )
+            ),
+        )
 
         return HttpResponseRedirect(self.get_success_url())
 

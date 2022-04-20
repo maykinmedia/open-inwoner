@@ -6,6 +6,7 @@ from furl import furl
 
 from open_inwoner.accounts.models import Contact
 
+from ..choices import ContactTypeChoices
 from .factories import ContactFactory, UserFactory
 
 
@@ -42,6 +43,22 @@ class ContactViewTests(WebTest):
         response = self.app.get(self.list_url, user=other_user)
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, self.contact.first_name)
+
+    def test_contact_filter(self):
+        begeleider = ContactFactory(
+            type=ContactTypeChoices.begeleider, created_by=self.user
+        )
+        response = self.app.get(self.list_url, user=self.user)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.contact.first_name)
+        self.assertContains(response, begeleider.first_name)
+
+        form = response.forms["contact-filter"]
+        form["type"] = ContactTypeChoices.begeleider
+        response = form.submit()
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, self.contact.first_name)
+        self.assertContains(response, begeleider.first_name)
 
     def test_contact_list_show_link_to_messages(self):
         message_link = (
@@ -81,7 +98,7 @@ class ContactViewTests(WebTest):
         response = self.app.get(self.create_url, user=self.user)
         self.assertEqual(response.status_code, 200)
 
-        form = response.forms[1]
+        form = response.forms["contact-form"]
         form["first_name"] = "John"
         form["last_name"] = "Smith"
         form["email"] = "john@smith.nl"

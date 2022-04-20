@@ -1,5 +1,6 @@
 {% load button_tags %}
 <div class="form__actions {% if single %}form__actions--single{% endif %}">
-    {% if secondary_text %}{% button href=secondary_href secondary=True text=secondary_text icon=secondary_icon icon_position=secondary_icon_position %}{% endif %}
-    {% if primary %}{% button text=primary_text icon=primary_icon primary=primary type="submit" icon_position="after" transparent=transparent %}{% endif %}
+    {% if secondary_text %}{% button href=secondary_href secondary=secondary text=secondary_text icon=secondary_icon icon_position=secondary_icon_position %}{% endif %}
+    {% if secondary_name %}{% button name=secondary_name type="submit" secondary=secondary text=secondary_text icon=secondary_icon icon_position=secondary_icon_position %}{% endif %}
+    {% button text=primary_text icon=primary_icon primary=primary type="submit" icon_position="after" transparent=transparent %}
 </div>

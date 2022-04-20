@@ -240,6 +240,7 @@ django-privates==1.2.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   zgw-consumers
 django-redis==5.0.0
     # via
     #   -c requirements/base.txt
@@ -333,6 +334,10 @@ faker==9.9.0
     #   -r requirements/base.txt
     #   factory-boy
     #   zgw-consumers
+fontawesomefree==6.1.1
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
 fonttools[woff]==4.29.1
     # via
     #   -c requirements/base.txt
@@ -452,7 +457,7 @@ phonenumbers==8.12.33
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-pillow==9.0.0
+pillow==9.0.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -492,6 +497,7 @@ pyopenssl==21.0.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   -r requirements/test-tools.in
+    #   zgw-consumers
 pyphen==0.12.0
     # via
     #   -c requirements/base.txt
@@ -653,9 +659,9 @@ uwsgi==2.0.19.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-waitress==2.0.0
+waitress==2.1.1
     # via webtest
-weasyprint==54.1
+weasyprint==54.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -687,7 +693,7 @@ xmlsec==1.3.12
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   python3-saml
-zgw-consumers==0.16.0
+zgw-consumers==0.18.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt

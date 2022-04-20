@@ -178,6 +178,7 @@ class ExportMixin:
             request=self.request,
         )
         filename = self.get_filename()
+        context["file"] = file
 
         response = HttpResponse(file, content_type="application/pdf")
         response["Content-Disposition"] = f'attachment; filename="{filename}"'

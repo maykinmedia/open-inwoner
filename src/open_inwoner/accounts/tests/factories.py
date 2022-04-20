@@ -38,7 +38,7 @@ class ContactFactory(factory.django.DjangoModelFactory):
     first_name = factory.Faker("first_name")
     last_name = factory.Faker("last_name")
     email = factory.Faker("email")
-    phonenumber = factory.Faker("phone_number")
+    phonenumber = "0612345678"
     created_by = factory.SubFactory(UserFactory)
     contact_user = factory.SubFactory(UserFactory)
 

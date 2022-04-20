@@ -1,4 +1,4 @@
-from gettext import gettext
+from unittest import expectedFailure
 
 from django.urls import reverse
 from django.utils.translation import ugettext as _
@@ -13,7 +13,7 @@ from open_inwoner.accounts.tests.factories import (
 )
 
 from ..models import Plan
-from .factories import PlanFactory
+from .factories import ActionTemplateFactory, PlanFactory, PlanTemplateFactory
 
 
 class PlanViewTests(WebTest):
@@ -187,6 +187,64 @@ class PlanViewTests(WebTest):
         response = form.submit().follow()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Plan.objects.count(), 2)
+        plan = Plan.objects.exclude(pk=self.plan.id).first()
+        self.assertEqual(plan.title, "Plan")
+        self.assertEqual(plan.goal, "")
+
+    def test_plan_create_plan_with_template(self):
+        plan_template = PlanTemplateFactory(file=None)
+        self.assertEqual(Plan.objects.count(), 1)
+        response = self.app.get(self.create_url, user=self.user)
+        form = response.forms["plan-form"]
+        form["title"] = "Plan"
+        form["end_date"] = "2022-01-01"
+        form["contacts"] = [self.contact.pk]
+        form["template"] = plan_template.pk
+        response = form.submit().follow()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Plan.objects.count(), 2)
+        plan = Plan.objects.exclude(pk=self.plan.id).first()
+        self.assertEqual(plan.title, "Plan")
+        self.assertEqual(plan.goal, plan_template.goal)
+        self.assertEqual(plan.documents.count(), 0)
+        self.assertEqual(plan.actions.count(), 0)
+
+    def test_plan_create_plan_with_template_and_file(self):
+        plan_template = PlanTemplateFactory()
+        self.assertEqual(Plan.objects.count(), 1)
+        response = self.app.get(self.create_url, user=self.user)
+        form = response.forms["plan-form"]
+        form["title"] = "Plan"
+        form["end_date"] = "2022-01-01"
+        form["contacts"] = [self.contact.pk]
+        form["template"] = plan_template.pk
+        response = form.submit().follow()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Plan.objects.count(), 2)
+        plan = Plan.objects.exclude(pk=self.plan.id).first()
+        self.assertEqual(plan.title, "Plan")
+        self.assertEqual(plan.goal, plan_template.goal)
+        self.assertEqual(plan.documents.count(), 1)
+        self.assertEqual(plan.actions.count(), 0)
+
+    def test_plan_create_plan_with_template_and_actions(self):
+        plan_template = PlanTemplateFactory(file=None)
+        ActionTemplateFactory(plan_template=plan_template)
+        self.assertEqual(Plan.objects.count(), 1)
+        response = self.app.get(self.create_url, user=self.user)
+        form = response.forms["plan-form"]
+        form["title"] = "Plan"
+        form["end_date"] = "2022-01-01"
+        form["contacts"] = [self.contact.pk]
+        form["template"] = plan_template.pk
+        response = form.submit().follow()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Plan.objects.count(), 2)
+        plan = Plan.objects.exclude(pk=self.plan.id).first()
+        self.assertEqual(plan.title, "Plan")
+        self.assertEqual(plan.goal, plan_template.goal)
+        self.assertEqual(plan.documents.count(), 0)
+        self.assertEqual(plan.actions.count(), 1)
 
     def test_plan_edit_login_required(self):
         response = self.app.get(self.edit_url)
