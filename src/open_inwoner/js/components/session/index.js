@@ -1,4 +1,4 @@
-import swal from 'sweetalert'
+import Swal from 'sweetalert2'
 
 function currentTime() {
   return Math.floor(Date.now() / 1000)
@@ -90,12 +90,11 @@ class SessionTimeout {
   //! Not using yet....
 
   configureModal(title, bodyText, buttonText, callback) {
-    swal({
+    Swal.fire({
       title: title,
-      text: bodyText,
-      buttons: {
-        continue: buttonText,
-      },
+      html: bodyText,
+      showConfirmButton: true,
+      confirmButtonText: callback,
     }).then(callback)
   }
 
