@@ -85,28 +85,47 @@ class CasesStatusView(
             return context
 
         statuses = fetch_status_history(case.url)
-        statuses_urls = [status.url for status in statuses]
+        status_types_done = [status.statustype for status in statuses]
+        # status
+
         status_types = fetch_status_types(case.zaaktype)
         status_types.sort(key=lambda status_type: status_type.volgnummer)
-        status_types_done = [status.statustype for status in statuses]
+        status_types_urls = {st.url: st for st in status_types}
 
         substatuses = fetch_substatuses(case.url)
         substatuses.sort(key=lambda substatus: substatus.tijdstip)
+
+        # dict with statustype as a key and the substatuses as a value
+        final_substatuses = {}
+        for status in statuses:
+            for substatus in substatuses:
+                if substatus.status == status.url:
+                    if status.statustype in final_substatuses:
+                        final_substatuses[status.statustype].append(substatus)
+                    else:
+                        final_substatuses[status.statustype] = [substatus]
+
+        # dict with all the necessary data for the frontend
+        final_statuses = []
+        for status_type in status_types:
+            status = {
+                "done": status_type.url in status_types_done,
+                "description": status_type.omschrijving,
+                "substatuses": final_substatuses.get(status_type.url),
+            }
+            final_statuses.append(status)
 
         case_info_objects = fetch_case_information_objects(case.url)
 
         context["anchors"] = self.get_anchors(case, statuses, case_info_objects)
         context["case"] = {
             "obj": case,
-            "current_status": case.status,
             "statuses": statuses,
-            "statuses_urls": statuses_urls,
-            "status_types": status_types,
-            "status_types_done": status_types_done,
-            "substatuses": substatuses,
+            "current_status": status_types_urls.get(case.status),
+            "final_statuses": final_statuses,
             "documents": case_info_objects,
         }
-
+        # breakpoint()
         return context
 
     def get_anchors(self, case, statuses, documents):

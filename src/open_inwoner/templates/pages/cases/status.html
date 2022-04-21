@@ -14,9 +14,9 @@
             {% case_dashboard case=case.obj statuses=case.statuses documents=case.documents %}
 
             {#  Status history. #}
-            {% if case.status_types %}
+            {% if case.final_statuses %}
                 <h2 class="h2" id="statuses">{% trans 'Status' %}</h2>
-                {% status_list case.statuses_urls case.status_types case.status_types_done case.substatuses %}
+                {% status_list case.final_statuses %}
             {% endif %}
 
             {#  Documents. #}

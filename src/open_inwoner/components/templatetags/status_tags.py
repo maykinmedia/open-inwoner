@@ -8,13 +8,7 @@ register = template.Library()
 
 
 @register.inclusion_tag("components/status/status_list.html")
-def status_list(
-    statuses_urls,
-    status_types: list[StatusType],
-    status_types_done: list[str],
-    substatuses: list[SubStatus],
-    **kwargs
-) -> dict:
+def status_list(final_statuses, **kwargs) -> dict:
     """
     Shows multiple statuses in an (historic) list.
 
@@ -28,9 +22,6 @@ def status_list(
         + substatuses: list[SubStatus] | List of StatusType objects.
     """
     return {
-        "statuses_urls": statuses_urls,
-        "status_types": status_types,
-        "status_types_done": status_types_done,
-        "substatuses": substatuses,
+        "final_statuses": final_statuses,
         **kwargs,
     }
