@@ -54,13 +54,6 @@ def case_dashboard(
     Extra context:
         + config: DashbaordConfig | The configuration of the dashboard.
     """
-    status = None
-
-    try:
-        status = statuses[0].statustoelichting
-    except IndexError:
-        pass
-
     config: DashboardConfig = {
         "metrics": [
             {
@@ -73,7 +66,7 @@ def case_dashboard(
                 "label": _("Datum"),
                 "value": case.registratiedatum,
             },
-            {"icon": "task_alt", "label": _("status"), "value": status},
+            {"icon": "task_alt", "label": _("status"), "value": case.status},
             {"icon": "description", "label": _("documenten"), "value": len(documents)},
         ]
     }

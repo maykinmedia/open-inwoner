@@ -12,6 +12,7 @@ from open_inwoner.openzaak.statuses import (
     fetch_case_information_objects,
     fetch_status_history,
     fetch_status_types,
+    fetch_substatuses,
 )
 
 
@@ -83,22 +84,27 @@ class CasesStatusView(
         if not case:
             return context
 
-        case_info_objects = fetch_case_information_objects(case.url)
         statuses = fetch_status_history(case.url)
+        statuses_urls = [status.url for status in statuses]
         status_types = fetch_status_types(case.zaaktype)
+        status_types.sort(key=lambda status_type: status_type.volgnummer)
+        status_types_done = [status.statustype for status in statuses]
 
-        status_types = {st.url: st for st in status_types}
-        for status in statuses:
-            status.statustype = status_types.get(status.statustype)
+        substatuses = fetch_substatuses(case.url)
+        substatuses.sort(key=lambda substatus: substatus.tijdstip)
 
-        # Sort list of statuses in order to able to get the most recent one
-        statuses.sort(key=lambda status: status.datum_status_gezet, reverse=True)
+        case_info_objects = fetch_case_information_objects(case.url)
 
         context["anchors"] = self.get_anchors(case, statuses, case_info_objects)
         context["case"] = {
             "obj": case,
-            "documents": case_info_objects,
+            "current_status": case.status,
             "statuses": statuses,
+            "statuses_urls": statuses_urls,
+            "status_types": status_types,
+            "status_types_done": status_types_done,
+            "substatuses": substatuses,
+            "documents": case_info_objects,
         }
 
         return context
