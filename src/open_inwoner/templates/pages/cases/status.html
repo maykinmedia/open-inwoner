@@ -11,7 +11,7 @@
 
             {# Title/dashboard. #}
             <h1 class="h1" id="title">{{ case.obj.omschrijving }}</h1>
-            {% case_dashboard case=case.obj statuses=case.statuses documents=case.documents %}
+            {% case_dashboard case=case.obj status=case.current_status documents=case.documents %}
 
             {#  Status history. #}
             {% if case.final_statuses %}

@@ -4,7 +4,8 @@ from django import template
 from django.utils.translation import gettext as _
 
 from zgw_consumers.api_models.documenten import Document
-from zgw_consumers.api_models.zaken import Status, Zaak
+from zgw_consumers.api_models.zaken import Zaak
+from zgw_consumers.api_models.catalogi import StatusType
 
 register = template.Library()
 
@@ -38,7 +39,7 @@ def dashboard(config: DashboardConfig, **kwargs) -> dict:
 
 @register.inclusion_tag("components/Dashboard/Dashboard.html")
 def case_dashboard(
-    case: Zaak, statuses: list[Status], documents: list[Document], **kwargs
+    case: Zaak, status: StatusType, documents: list[Document], **kwargs
 ) -> dict:
     """
     Renders a dashboard for values related to a Zaak (case).
@@ -66,7 +67,7 @@ def case_dashboard(
                 "label": _("Datum"),
                 "value": case.registratiedatum,
             },
-            {"icon": "task_alt", "label": _("status"), "value": case.status},
+            {"icon": "task_alt", "label": _("status"), "value": status.omschrijving},
             {"icon": "description", "label": _("documenten"), "value": len(documents)},
         ]
     }
@@ -75,6 +76,6 @@ def case_dashboard(
         **kwargs,
         "case": case,
         "documents": documents,
-        "statuses": statuses,
+        "status": status,
         "config": config,
     }

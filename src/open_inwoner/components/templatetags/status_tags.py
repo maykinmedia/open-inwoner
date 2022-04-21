@@ -1,25 +1,18 @@
 from django import template
 
-from zgw_consumers.api_models.catalogi import StatusType
-
-from open_inwoner.openzaak.statuses import SubStatus
-
 register = template.Library()
 
 
 @register.inclusion_tag("components/status/status_list.html")
-def status_list(final_statuses, **kwargs) -> dict:
+def status_list(final_statuses: list[dict], **kwargs) -> dict:
     """
     Shows multiple statuses in an (historic) list.
 
     Usage:
-        {% status_list statuses_urls status_types status_types_done substatuses %}
+        {% status_list final_statuses %}
 
     Variables:
-        + statuses_urls: list[str] | List of Status urls.
-        + status_types: list[StatusType] | List of StatusType objects.
-        + status_types_done: list[str] | List of status type urls.
-        + substatuses: list[SubStatus] | List of StatusType objects.
+        + final_statuses: list[dict] | List of dictionaries with all the necessary data for the frontend.
     """
     return {
         "final_statuses": final_statuses,

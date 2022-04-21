@@ -86,7 +86,7 @@ class CasesStatusView(
 
         statuses = fetch_status_history(case.url)
         status_types_done = [status.statustype for status in statuses]
-        # status
+        status_with_status_type = {status.url: status.statustype for status in statuses}
 
         status_types = fetch_status_types(case.zaaktype)
         status_types.sort(key=lambda status_type: status_type.volgnummer)
@@ -94,6 +94,8 @@ class CasesStatusView(
 
         substatuses = fetch_substatuses(case.url)
         substatuses.sort(key=lambda substatus: substatus.tijdstip)
+
+        case_info_objects = fetch_case_information_objects(case.url)
 
         # dict with statustype as a key and the substatuses as a value
         final_substatuses = {}
@@ -108,20 +110,20 @@ class CasesStatusView(
         # dict with all the necessary data for the frontend
         final_statuses = []
         for status_type in status_types:
-            status = {
-                "done": status_type.url in status_types_done,
-                "description": status_type.omschrijving,
-                "substatuses": final_substatuses.get(status_type.url),
-            }
-            final_statuses.append(status)
-
-        case_info_objects = fetch_case_information_objects(case.url)
+            final_statuses.append(
+                {
+                    "done": status_type.url in status_types_done,
+                    "description": status_type.omschrijving,
+                    "substatuses": final_substatuses.get(status_type.url),
+                }
+            )
 
         context["anchors"] = self.get_anchors(case, statuses, case_info_objects)
         context["case"] = {
             "obj": case,
-            "statuses": statuses,
-            "current_status": status_types_urls.get(case.status),
+            "current_status": status_types_urls.get(
+                status_with_status_type.get(case.status)
+            ),
             "final_statuses": final_statuses,
             "documents": case_info_objects,
         }
