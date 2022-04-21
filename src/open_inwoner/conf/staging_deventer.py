@@ -13,5 +13,5 @@ os.environ["ALLOWED_HOSTS"] = "deventer.openinwoner.nl"
 
 from .production import *  # noqa isort:skip
 
-ES_INDEX_PRODUCTS = "products-deventer"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media", "deventer")
+os.environ.setdefault("ES_INDEX_PRODUCTS", "products-deventer")
+os.environ.setdefault("MEDIA_SUBFOLDER", "deventer")

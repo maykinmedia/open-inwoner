@@ -13,5 +13,5 @@ os.environ["ALLOWED_HOSTS"] = "mijn-acceptatie.enschede.nl"
 
 from .production import *  # noqa isort:skip
 
-ES_INDEX_PRODUCTS = "products-enschede"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media", "enschede")
+os.environ.setdefault("ES_INDEX_PRODUCTS", "products-enschede")
+os.environ.setdefault("MEDIA_SUBFOLDER", "enschede")

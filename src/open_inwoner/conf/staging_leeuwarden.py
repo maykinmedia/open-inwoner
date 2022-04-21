@@ -13,5 +13,5 @@ os.environ["ALLOWED_HOSTS"] = "leeuwarden.openinwoner.nl"
 
 from .production import *  # noqa isort:skip
 
-ES_INDEX_PRODUCTS = "products-leeuwarden"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media", "leeuwarden")
+os.environ.setdefault("ES_INDEX_PRODUCTS", "products-leeuwarden")
+os.environ.setdefault("MEDIA_SUBFOLDER", "leeuwarden")
