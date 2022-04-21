@@ -127,7 +127,7 @@ class CasesStatusView(
             "final_statuses": final_statuses,
             "documents": case_info_objects,
         }
-        # breakpoint()
+
         return context
 
     def get_anchors(self, case, statuses, documents):
