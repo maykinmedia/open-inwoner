@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# Set environment variables which depend on sites.item
+export CACHE_DEFAULT={{ item.cache_default }}
+export DB_NAME={{ item.dbname }}
+export ALLOWED_HOSTS={{ item.nginx_server_name }},www.{{ item.nginx_server_name }}
+export ES_INDEX_PRODUCTS=products-{{ item.name }}
+export MEDIA_SUBFOLDER={{ item.name }}

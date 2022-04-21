@@ -47,6 +47,7 @@
     - include: tasks/db-all-sites.yml
     - include: tasks/django-project.yml
     - include: tasks/migrate-all-sites.yml
+    - include: tasks/env-all-sites.yml
     # Uncomment the next 3 lines (certbot) to use Let's Encrypt.
     # Run the below once on your local machine
     # - include: maykin-deployment/ansible/tasks/ansible-galaxy.yml
