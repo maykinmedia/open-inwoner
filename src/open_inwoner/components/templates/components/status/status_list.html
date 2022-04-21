@@ -12,7 +12,7 @@
                     {% for substatus in status.substatuses %}
                         <li class="status-list__list-item">
                             {% icon icon="circle" outlined=True %}
-                            <p class="p p--compact">{{ substatus.tijdstip }}: {{ substatus.omschrijving }}</p>
+                            <p class="p p--compact">{{ substatus.date }}: {{ substatus.description }}</p>
                         </li>
                     {% endfor %}
                 {% endif %}

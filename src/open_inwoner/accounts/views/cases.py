@@ -102,10 +102,15 @@ class CasesStatusView(
         for status in statuses:
             for substatus in substatuses:
                 if substatus.status == status.url:
+                    data = {
+                        "substatus": substatus.url,
+                        "description": substatus.omschrijving,
+                        "date": substatus.tijdstip,
+                    }
                     if status.statustype in final_substatuses:
-                        final_substatuses[status.statustype].append(substatus)
+                        final_substatuses[status.statustype].append(data)
                     else:
-                        final_substatuses[status.statustype] = [substatus]
+                        final_substatuses[status.statustype] = [data]
 
         # dict with all the necessary data for the frontend
         final_statuses = []
