@@ -67,7 +67,11 @@ def case_dashboard(
                 "label": _("Datum"),
                 "value": case.registratiedatum,
             },
-            {"icon": "task_alt", "label": _("status"), "value": status.omschrijving},
+            {
+                "icon": "task_alt",
+                "label": _("status"),
+                "value": status.omschrijving if status else None,
+            },
             {"icon": "description", "label": _("documenten"), "value": len(documents)},
         ]
     }
