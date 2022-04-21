@@ -227,6 +227,10 @@ STATICFILES_FINDERS = [
 ]
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_SUBFOLDER = config("MEDIA_SUBFOLDER", "")
+
+if MEDIA_SUBFOLDER:
+    MEDIA_ROOT = os.path.join(MEDIA_ROOT, MEDIA_SUBFOLDER)
 
 MEDIA_URL = "/media/"
 
@@ -539,7 +543,7 @@ GEOCODER = "open_inwoner.utils.geocode.PdocLocatieserver"
 ELASTICSEARCH_DSL = {
     "default": {"hosts": config("ES_HOST", "localhost:9200")},
 }
-ES_INDEX_PRODUCTS = "products"
+ES_INDEX_PRODUCTS = config("ES_INDEX_PRODUCTS", "products")
 ES_MAX_SIZE = 10000
 ES_SUGGEST_SIZE = 5
 
