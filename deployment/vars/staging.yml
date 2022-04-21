@@ -2,12 +2,12 @@
 target: staging
 
 sites:
-  - { name: "groningen", nginx_server_name: "groningen.openinwoner.nl", dbname: "oip-staging-groningen", uwsgi_port: 8201 }
-  - { name: "leeuwarden", nginx_server_name: "leeuwarden.openinwoner.nl", dbname: "oip-staging-leeuwarden", uwsgi_port: 8202 }
-  - { name: "zwolle", nginx_server_name: "zwolle.openinwoner.nl", dbname: "oip-staging-zwolle", uwsgi_port: 8203}
-  - { name: "enschede", nginx_server_name: "mijn-acceptatie.enschede.nl", dbname: "oip-staging-enschede", uwsgi_port: 8204}
-  - { name: "deventer", nginx_server_name: "deventer.openinwoner.nl", dbname: "oip-staging-deventer", uwsgi_port: 8205}
-  - { name: "zaanstad", nginx_server_name: "zaanstad.openinwoner.nl", dbname: "oip-staging-zaanstad", uwsgi_port: 8206}
+  - { name: "groningen", nginx_server_name: "groningen.openinwoner.nl", dbname: "oip-staging-groningen", uwsgi_port: 8201, cache_default: "127.0.0.1:6379/11" }
+  - { name: "leeuwarden", nginx_server_name: "leeuwarden.openinwoner.nl", dbname: "oip-staging-leeuwarden", uwsgi_port: 8202, cache_default: "127.0.0.1:6379/12" }
+  - { name: "zwolle", nginx_server_name: "zwolle.openinwoner.nl", dbname: "oip-staging-zwolle", uwsgi_port: 8203, cache_default: "127.0.0.1:6379/13"}
+  - { name: "enschede", nginx_server_name: "mijn-acceptatie.enschede.nl", dbname: "oip-staging-enschede", uwsgi_port: 8204, cache_default: "127.0.0.1:6379/14"}
+  - { name: "deventer", nginx_server_name: "deventer.openinwoner.nl", dbname: "oip-staging-deventer", uwsgi_port: 8205, cache_default: "127.0.0.1:6379/15"}
+  - { name: "zaanstad", nginx_server_name: "zaanstad.openinwoner.nl", dbname: "oip-staging-zaanstad", uwsgi_port: 8206, cache_default: "127.0.0.1:6379/10"}
 
 
 dbuser: "{{ project_name }}-{{ target }}"
