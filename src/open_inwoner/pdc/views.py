@@ -250,49 +250,42 @@ class ProductFinderView(FormView):
                 }
             }
 
-    def filter_matched_products(self):
-        products = Product.objects.all()
+    def get_condition_products(self):
+        current_answers = self.request.session.get("product_finder")
+        filters = None
+        if current_answers:
+            for _order, answer in current_answers.items():
+                new_filter = Q(conditions=answer.get("condition"))
+
+                if filters:
+                    filters = filters | new_filter
+                else:
+                    filters = new_filter
+
+        if filters:
+            return Product.objects.filter(filters).distinct()
+        return Product.objects.none()
+
+    def filter_matched_products(self, condition_products):
+        products = condition_products
         current_answers = self.request.session.get("product_finder")
         if current_answers:
             for _order, answer in current_answers.items():
-                if answer.get("answer") == YesNo.yes:
-                    products = products.filter(conditions=answer.get("condition"))
-                else:
+                if answer.get("answer") == YesNo.no:
                     products = products.exclude(conditions=answer.get("condition"))
         return products
 
-    def filter_possible_products(self, matched_products):
-        current_answers = self.request.session.get("product_finder")
-        filters = None
-        has_filters = False
-        if current_answers:
-            for _order, answer in current_answers.items():
-                if answer.get("answer") == YesNo.yes:
-                    has_filters = True
-                    new_filter = Q(conditions=answer.get("condition"))
-                    if filters:
-                        filters = filters | new_filter
-                    else:
-                        filters = new_filter
-
-        if has_filters:
-            return (
-                Product.objects.exclude(
-                    pk__in=matched_products.values_list("pk", flat=True)
-                )
-                .filter(filters)
-                .distinct()
-            )
-        return Product.objects.none()
+    def filter_possible_products(self, condition_products):
+        return Product.objects.exclude(pk__in=condition_products)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         previous_condition = self.get_previous_condition()
         context["show_previous"] = previous_condition is not None
         context["condition"] = self.condition
-        matched_products = self.filter_matched_products()
-        context["matched_products"] = matched_products
-        context["possible_products"] = self.filter_possible_products(matched_products)
+        condition_products = self.get_condition_products()
+        context["matched_products"] = self.filter_matched_products(condition_products)
+        context["possible_products"] = self.filter_possible_products(condition_products)
         context["conditions_done"] = self.request.session.get("conditions_done", False)
         return context
 
