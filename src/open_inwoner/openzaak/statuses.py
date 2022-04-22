@@ -4,11 +4,10 @@ from typing import List
 
 from requests import RequestException
 from zds_client import ClientError
-from zgw_consumers.api_models.base import factory
+from zgw_consumers.api_models.base import ZGWModel, factory
 from zgw_consumers.api_models.catalogi import StatusType
 from zgw_consumers.api_models.zaken import Status, ZaakInformatieObject
 from zgw_consumers.service import get_paginated_results
-from zgw_consumers.api_models.base import ZGWModel
 
 from .clients import build_client
 

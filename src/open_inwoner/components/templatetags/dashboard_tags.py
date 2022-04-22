@@ -3,9 +3,9 @@ from typing import TypedDict
 from django import template
 from django.utils.translation import gettext as _
 
+from zgw_consumers.api_models.catalogi import StatusType
 from zgw_consumers.api_models.documenten import Document
 from zgw_consumers.api_models.zaken import Zaak
-from zgw_consumers.api_models.catalogi import StatusType
 
 register = template.Library()
 
