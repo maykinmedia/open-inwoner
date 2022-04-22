@@ -1,27 +1,4 @@
 {% load icon_tags %}
 
-<aside class="status-list">
-    <ul class="status-list__list">
-        {% for status in final_statuses %}
-            {% if status.done %}
-                <li class="status-list__list-item">
-                    {% icon icon="task_alt" %}
-                    <h4 class="h4">{{ status.description }}</h4>
-                </li>
-                {% if status.substatuses %}
-                    {% for substatus in status.substatuses %}
-                        <li class="status-list__list-item">
-                            {% icon icon="circle" outlined=True %}
-                            <p class="p p--compact">{{ substatus.date }}: {{ substatus.description }}</p>
-                        </li>
-                    {% endfor %}
-                {% endif %}
-            {% else %}
-                <li class="status-list__list-item">
-                    {% icon icon="circle" outlined=True %}
-                    <h4 class="h4">{{ status.description }}</h4>
-                </li>
-            {% endif %}
-        {% endfor %}
-    </ul>
-</aside>
+
+<div class="status-list" data-status-list="{{ status_list }}"></div>

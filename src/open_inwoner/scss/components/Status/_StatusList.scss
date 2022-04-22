@@ -1,40 +1,28 @@
 .status-list {
-  &__list {
-    display: flex;
-    gap: var(--spacing-medium);
-    flex-direction: column;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    position: relative;
+  --denhaag-process-steps-step-heading-color: var(--denhaag-process-steps-step-heading-color);
+  --denhaag-process-steps-step-heading-font-family: var(--font-family-heading-4);
+  --denhaag-process-steps-step-heading-font-size: var(--font-size-heading-4);
+  --denhaag-process-steps-step-heading-checked-font-weight: var(--font-weight-heading-4);
+  --denhaag-process-steps-step-heading-line-height: var(--font-line-height-heading-4);
+
+  --denhaag-process-steps-font-family: var(--font-family-body);
+  --denhaag-process-steps-font-size: var(--font-size-body);
+  --denhaag-process-steps-line-height: var(--font-line-height-body);
+
+  --denhaag-color-green-3: var(--color-success);
+  --denhaag-process-steps-step-marker-background-color: var(--color-success);
+  --denhaag-process-steps-step-marker-color: var(--color-mute);
+  --denhaag-process-steps-step-marker-checked-color: var(--color-success);
+  --denhaag-process-steps-step-marker-size: 32px;
+
+  .denhaag-process-steps__sub-step {
+    --denhaag-process-steps-sub-step-distance: var(--spacing-large);
   }
 
-  &__list:before {
-    content: '';
-    background-color: var(--color-success);
-    display: block;
-    height: calc(100% - 1.5em);
-    left: 11px;
-    position: absolute;
-    top: 0.75em;
-    width: 2px;
-    z-index: -1;
-  }
-
-  &__list-item {
-    display: flex;
-    gap: var(--spacing-large);
-  }
-
-  [class*='icon'] {
-    color: var(--color-success);
-    background-color: var(--color-white);
+  .denhaag-process-steps__sub-step-heading {
+    font-family: var(--denhaag-process-steps-step-heading-font-family);
   }
 }
-
-///
-/// Contextual
-///
 
 .h2 + .status-list {
   margin-top: var(--spacing-large);

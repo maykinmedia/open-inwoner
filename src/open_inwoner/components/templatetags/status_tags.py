@@ -1,3 +1,5 @@
+import json
+
 from django import template
 
 register = template.Library()
@@ -15,6 +17,6 @@ def status_list(final_statuses: list[dict], **kwargs) -> dict:
         + final_statuses: list[dict] | List of dictionaries with all the necessary data for the frontend.
     """
     return {
-        "final_statuses": final_statuses,
+        "status_list": json.dumps(final_statuses),
         **kwargs,
     }
