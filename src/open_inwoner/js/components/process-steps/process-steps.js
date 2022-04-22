@@ -1,5 +1,5 @@
-import React from 'react';
-import {createRoot} from 'react-dom/client';
+import React from 'react'
+import { createRoot } from 'react-dom/client'
 import {
   Step,
   StepHeader,
@@ -11,11 +11,10 @@ import {
   SubStepHeading,
   SubStepList,
   SubStepMarker,
-} from '@gemeente-denhaag/process-steps';
+} from '@gemeente-denhaag/process-steps'
 
 /** @type {NodeListOf<HTMLElement>} */
-const PROCESS_STEPS = document.querySelectorAll('.status-list');
-
+const PROCESS_STEPS = document.querySelectorAll('.status-list')
 
 /**
  * The process steps list with bot steps and sub steps.
@@ -23,14 +22,10 @@ const PROCESS_STEPS = document.querySelectorAll('.status-list');
  * @return {jsx.JSX.Element}
  */
 const renderProcessSteps = (node) => {
-  const json = node.dataset.statusList;
-  const statusList = JSON.parse(json);
+  const json = node.dataset.statusList
+  const statusList = JSON.parse(json)
 
-  return (
-    <StepList>
-      {statusList.map(renderStep)}
-    </StepList>
-  );
+  return <StepList>{statusList.map(renderStep)}</StepList>
 }
 
 /**
@@ -51,12 +46,10 @@ const renderStep = (step, index) => {
         </StepHeader>
       </StepSection>
 
-      <SubStepList>
-        {step.substatuses?.map(renderSubStep)}
-      </SubStepList>
+      <SubStepList>{step.substatuses?.map(renderSubStep)}</SubStepList>
     </Step>
-  );
-};
+  )
+}
 
 /**
  * A step with sub steps.
@@ -65,22 +58,34 @@ const renderStep = (step, index) => {
  * @return {jsx.JSX.Element}
  */
 const renderSubStep = (subStep, index) => {
-  const date = new Date(subStep.date);
-  const months = ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december']
+  const date = new Date(subStep.date)
+  const months = [
+    'januari',
+    'februari',
+    'maart',
+    'april',
+    'mei',
+    'juni',
+    'juli',
+    'augustus',
+    'september',
+    'oktober',
+    'november',
+    'december',
+  ]
   const day = date.getDay()
-  const month = months[date.getMonth()];
+  const month = months[date.getMonth()]
 
   return (
     <SubStep key={index}>
       <SubStepMarker> </SubStepMarker>
       <SubStepHeading>{`${day} ${month}: ${subStep.description}`}</SubStepHeading>
     </SubStep>
-  );
+  )
 }
 
-
 // Start!
-[...PROCESS_STEPS].forEach((node) => {
-  const root = createRoot(node);
-  root.render(renderProcessSteps(node));
-});
+;[...PROCESS_STEPS].forEach((node) => {
+  const root = createRoot(node)
+  root.render(renderProcessSteps(node))
+})
