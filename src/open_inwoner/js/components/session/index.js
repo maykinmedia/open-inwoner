@@ -30,7 +30,7 @@ class SessionTimeout {
 
     this.warningTimeout = setTimeout(
       this.showWarningModal.bind(this),
-      1000 // this.warnTime * 1000
+      this.warnTime * 1000
     )
     this.expiredTimeout = setTimeout(
       this.showExpiredModal,
@@ -42,6 +42,8 @@ class SessionTimeout {
     console.log('setDataset')
     this.expiryAge = parseInt(this.element.dataset.expiryAge)
     this.warnTime = parseInt(this.element.dataset.warnTime)
+    console.log('this.expiryAge', this.expiryAge)
+    console.log('this.warnTime', this.warnTime)
   }
 
   showWarningModal() {
@@ -72,30 +74,22 @@ class SessionTimeout {
    * Restart the HTTP session by doing an HTTP-request.
    */
   restartSession() {
-    console.log('Restarting session.')
-
-    let restartRequest = new XMLHttpRequest()
-    let sessionTimeout = this
-    restartRequest.addEventListener('load', function (event) {
-      sessionTimeout.resetWarnTime(this, event)
-    })
-    restartRequest.open('GET', '/accounts/restart_session/')
-    restartRequest.send()
+    fetch('/sessions/restart/')
+      .then((response) => response.text())
+      .then((data) => this.resetWarnTime(data))
   }
 
   reloadPage() {
-    location.reload()
+    window.location.reload()
   }
-
-  //! Not using yet....
 
   configureModal(title, bodyText, buttonText, callback) {
     Swal.fire({
       title: title,
       html: bodyText,
       showConfirmButton: true,
-      confirmButtonText: callback,
-    }).then(callback)
+      confirmButtonText: buttonText,
+    }).then(callback.bind(this))
   }
 
   configureActivityCheck() {
@@ -154,18 +148,14 @@ class SessionTimeout {
     console.log(`Registered user activity, timestamp: ${this.userActive}`)
   }
 
-  resetWarnTime(response, event) {
+  resetWarnTime(response) {
     // If we are redirected to a login page.
-    if (response.response !== 'restarted') {
+    if (response !== 'restarted') {
       clearTimeout(this.expiredTimeout)
 
       // Wait for the current modal to close and then open the expired one.
       // Ensure that the event is unbound after, to avoid an additional pop up before reload.
-      const callback = () => {
-        this.showExpiredModal()
-        jQuery(this.element).off('hidden.bs.modal', callback)
-      }
-      jQuery(this.element).on('hidden.bs.modal', callback)
+      this.showExpiredModal()
     } else {
       this.configureTimeout()
     }

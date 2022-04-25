@@ -4,7 +4,7 @@ from django.conf import settings
 register = template.Library()
 
 
-@register.inclusion_tag("components/Session/session_timeout.html", takes_context=True)
+@register.inclusion_tag("session/session_timeout.html", takes_context=True)
 def session_timeout(context):
     session = context["request"].session
     context.update(

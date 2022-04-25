@@ -159,6 +159,7 @@ INSTALLED_APPS = [
     "open_inwoner.haalcentraal",
     "open_inwoner.openzaak",
     "open_inwoner.questionnaire",
+    "open_inwoner.session",
 ]
 
 MIDDLEWARE = [
@@ -357,7 +358,10 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 SESSION_COOKIE_NAME = "open_inwoner_sessionid"
-SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_ENGINE = "open_inwoner.session.backends.cache"
+SESSION_COOKIE_AGE_ADMIN = 86400
+SESSION_COOKIE_AGE = 900  # Set to 15 minutes
+SESSION_WARN_DELTA = 60  # Warn 1 minute before end of session.
 
 LOGIN_REDIRECT_URL = reverse_lazy("root")
 LOGOUT_REDIRECT_URL = reverse_lazy("root")
@@ -761,8 +765,6 @@ INVITE_EXPIRY = 14
 ZGW_CONSUMERS_TEST_SCHEMA_DIRS = [
     os.path.join(DJANGO_PROJECT_DIR, "openzaak", "tests", "files"),
 ]
-
-SESSION_WARN_DELTA = 60  # Warn 1 minute before end of session.
 
 #
 # Maykin fork of DJANGO-TWO-FACTOR-AUTH
