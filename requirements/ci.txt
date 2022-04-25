@@ -99,6 +99,7 @@ django==3.2.12
     #   digid-eherkenning
     #   dj-rest-auth
     #   django-allauth
+    #   django-appconf
     #   django-axes
     #   django-choices
     #   django-cors-headers
@@ -119,6 +120,7 @@ django==3.2.12
     #   django-rosetta
     #   django-sendfile2
     #   django-sniplates
+    #   django-timeline-logger
     #   django-treebeard
     #   django-view-breadcrumbs
     #   djangorestframework
@@ -135,6 +137,11 @@ django-allauth==0.45.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+django-appconf==1.0.5
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   django-timeline-logger
 django-autoslug==1.9.8
     # via
     #   -c requirements/base.txt
@@ -272,6 +279,10 @@ django-solo==1.2.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   zgw-consumers
+django-timeline-logger==2.0.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
 django-treebeard==4.5.1
     # via
     #   -c requirements/base.txt
