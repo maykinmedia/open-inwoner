@@ -92,7 +92,7 @@ dj-rest-auth==2.1.11
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-django==3.2.12
+django==3.2.13
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
