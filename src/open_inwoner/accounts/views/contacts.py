@@ -10,6 +10,8 @@ from django.views.generic.edit import DeleteView, UpdateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin
 
+from open_inwoner.utils.logentry import LogMixin
+
 from ..choices import ContactTypeChoices
 from ..forms import ContactFilterForm, ContactForm
 from ..models import Contact, Invite
@@ -47,7 +49,7 @@ class ContactListView(LoginRequiredMixin, BaseBreadcrumbMixin, ListView):
         return context
 
 
-class ContactUpdateView(LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
+class ContactUpdateView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
     template_name = "pages/profile/contacts/edit.html"
     model = Contact
     slug_field = "uuid"
@@ -79,10 +81,12 @@ class ContactUpdateView(LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
 
     def form_valid(self, form):
         self.object = form.save()
+
+        self.log_change(self.object, str(_("contact was modified")))
         return HttpResponseRedirect(self.get_success_url())
 
 
-class ContactCreateView(LoginRequiredMixin, BaseBreadcrumbMixin, CreateView):
+class ContactCreateView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, CreateView):
     template_name = "pages/profile/contacts/edit.html"
     model = Contact
     form_class = ContactForm
@@ -136,10 +140,11 @@ class ContactCreateView(LoginRequiredMixin, BaseBreadcrumbMixin, CreateView):
             ),
         )
 
+        self.log_addition(self.object, str(_("contact was created")))
         return HttpResponseRedirect(self.get_success_url())
 
 
-class ContactDeleteView(LoginRequiredMixin, DeleteView):
+class ContactDeleteView(LogMixin, LoginRequiredMixin, DeleteView):
     model = Contact
     slug_field = "uuid"
     slug_url_kwarg = "uuid"
@@ -148,3 +153,10 @@ class ContactDeleteView(LoginRequiredMixin, DeleteView):
     def get_queryset(self):
         base_qs = super().get_queryset()
         return base_qs.filter(created_by=self.request.user)
+
+    def delete(self, request, *args, **kwargs):
+        object = self.get_object()
+        super().delete(request, *args, **kwargs)
+
+        self.log_deletion(object, str(_("contact was deleted")))
+        return HttpResponseRedirect(self.success_url)

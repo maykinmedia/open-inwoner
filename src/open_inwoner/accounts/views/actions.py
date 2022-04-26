@@ -12,6 +12,7 @@ from django.views.generic.edit import UpdateView
 from privates.views import PrivateMediaView
 from view_breadcrumbs import BaseBreadcrumbMixin
 
+from open_inwoner.utils.logentry import LogMixin
 from open_inwoner.utils.mixins import ExportMixin
 
 from ..forms import ActionForm, ActionListForm
@@ -69,7 +70,7 @@ class ActionListView(
         return context
 
 
-class ActionUpdateView(LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
+class ActionUpdateView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
     template_name = "pages/profile/actions/edit.html"
     model = Action
     slug_field = "uuid"
@@ -99,10 +100,12 @@ class ActionUpdateView(LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
 
     def form_valid(self, form):
         self.object = form.save(self.request.user)
+
+        self.log_change(self.object, str(_("action was modified")))
         return HttpResponseRedirect(self.get_success_url())
 
 
-class ActionCreateView(LoginRequiredMixin, BaseBreadcrumbMixin, CreateView):
+class ActionCreateView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, CreateView):
     template_name = "pages/profile/actions/edit.html"
     model = Action
     form_class = ActionForm
@@ -126,6 +129,8 @@ class ActionCreateView(LoginRequiredMixin, BaseBreadcrumbMixin, CreateView):
 
     def form_valid(self, form):
         self.object = form.save(self.request.user)
+
+        self.log_addition(self.object, str(_("action was created")))
         return HttpResponseRedirect(self.get_success_url())
 
 
@@ -156,7 +161,7 @@ class ActionExportView(LoginRequiredMixin, ExportMixin, DetailView):
         )
 
 
-class ActionPrivateMediaView(LoginRequiredMixin, PrivateMediaView):
+class ActionPrivateMediaView(LogMixin, LoginRequiredMixin, PrivateMediaView):
     model = Action
     slug_field = "uuid"
     slug_url_kwarg = "uuid"
@@ -164,7 +169,9 @@ class ActionPrivateMediaView(LoginRequiredMixin, PrivateMediaView):
 
     def has_permission(self):
         action = self.get_object()
-        return self.request.user.is_superuser or self.request.user in [
-            action.created_by,
-            action.is_for,
-        ]
+        if self.request.user.is_superuser or self.request.user in [
+            self.action.created_by,
+            self.action.is_for,
+        ]:
+            self.log_user_action(action, str(_("file was downloaded")))
+            return True

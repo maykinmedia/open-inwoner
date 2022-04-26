@@ -8,6 +8,7 @@ from timeline_logger.models import TimelineLog
 
 from open_inwoner.accounts.models import Contact
 from open_inwoner.accounts.tests.factories import ContactFactory, UserFactory
+from open_inwoner.utils.logentry import LOG_ACTIONS
 
 from ..admin import CustomTimelineLogAdmin
 from ..logentry import LOG_ACTIONS

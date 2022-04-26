@@ -3,6 +3,7 @@ from datetime import date
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms.forms import Form
+from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.functional import cached_property
@@ -13,6 +14,7 @@ from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.accounts.choices import ContactTypeChoices, StatusChoices
 from open_inwoner.questionnaire.models import QuestionnaireStep
+from open_inwoner.utils.logentry import LogMixin
 from open_inwoner.utils.mixins import ExportMixin
 
 from ..forms import ThemesForm, UserForm
@@ -72,7 +74,7 @@ class MyProfileView(LoginRequiredMixin, BaseBreadcrumbMixin, FormView):
             return redirect("accounts:my_profile")
 
 
-class EditProfileView(LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
+class EditProfileView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
     template_name = "pages/profile/edit.html"
     model = User
     form_class = UserForm
@@ -88,8 +90,14 @@ class EditProfileView(LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
     def get_object(self):
         return self.request.user
 
+    def form_valid(self, form):
+        form.save()
 
-class MyCategoriesView(LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
+        self.log_change(self.get_object(), str(_("user profile was modified")))
+        return HttpResponseRedirect(self.get_success_url())
+
+
+class MyCategoriesView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
     template_name = "pages/profile/categories.html"
     model = User
     form_class = ThemesForm
@@ -104,6 +112,12 @@ class MyCategoriesView(LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
 
     def get_object(self):
         return self.request.user
+
+    def form_valid(self, form):
+        form.save()
+
+        self.log_user_action(self.object, str(_("user's categories were modified")))
+        return HttpResponseRedirect(self.get_success_url())
 
 
 class MyProfileExportView(LoginRequiredMixin, ExportMixin, DetailView):

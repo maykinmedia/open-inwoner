@@ -14,6 +14,7 @@ from open_inwoner.accounts.views.actions import (
     ActionUpdateView,
     BaseActionFilter,
 )
+from open_inwoner.utils.logentry import LogMixin
 from open_inwoner.utils.mixins import ExportMixin
 
 from .forms import PlanForm, PlanGoalForm
@@ -77,7 +78,7 @@ class PlanDetailView(
         return context
 
 
-class PlanCreateView(LoginRequiredMixin, BaseBreadcrumbMixin, CreateView):
+class PlanCreateView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, CreateView):
     template_name = "pages/plans/create.html"
     model = Plan
     form_class = PlanForm
@@ -96,13 +97,15 @@ class PlanCreateView(LoginRequiredMixin, BaseBreadcrumbMixin, CreateView):
 
     def form_valid(self, form):
         self.object = form.save(self.request.user)
+
+        self.log_addition(self.object, str(_("plan was created")))
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self) -> str:
         return self.object.get_absolute_url()
 
 
-class PlanEditView(LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
+class PlanEditView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
     template_name = "pages/plans/edit.html"
     model = Plan
     slug_field = "uuid"
@@ -124,13 +127,15 @@ class PlanEditView(LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
 
     def form_valid(self, form):
         self.object = form.save(self.request.user)
+
+        self.log_change(self.object, str(_("plan was modified")))
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self) -> str:
         return self.object.get_absolute_url()
 
 
-class PlanGoalEditView(LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
+class PlanGoalEditView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
     template_name = "pages/plans/goal_edit.html"
     model = Plan
     slug_field = "uuid"
@@ -151,13 +156,15 @@ class PlanGoalEditView(LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
 
     def form_valid(self, form):
         self.object = form.save()
+
+        self.log_change(self.object, str(_("plan goal was modified")))
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self) -> str:
         return self.object.get_absolute_url()
 
 
-class PlanFileUploadView(LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
+class PlanFileUploadView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
     template_name = "pages/plans/file.html"
     model = Plan
     slug_field = "uuid"
@@ -185,7 +192,10 @@ class PlanFileUploadView(LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
         return kwargs
 
     def form_valid(self, form):
+        object = self.get_object()
         form.save(self.request.user, plan=self.object)
+
+        self.log_user_action(object, str(_("file was uploaded")))
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self) -> str:
@@ -228,7 +238,12 @@ class PlanActionCreateView(ActionCreateView):
 
     def form_valid(self, form):
         self.object = self.get_object()
-        form.save(self.request.user)
+        self.action = form.save(self.request.user)
+
+        self.log_addition(
+            self.action,
+            str(_("action was created via plan")),
+        )
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self) -> str:
@@ -272,7 +287,9 @@ class PlanActionEditView(ActionUpdateView):
 
     def form_valid(self, form):
         self.object = self.get_plan()
-        form.save(self.request.user)
+        self.action = form.save(self.request.user)
+
+        self.log_change(self.action, str(_("action was modified via plan")))
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self) -> str:
