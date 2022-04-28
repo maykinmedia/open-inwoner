@@ -7,7 +7,6 @@ from django.utils.translation import ugettext_lazy as _
 
 from timeline_logger.models import TimelineLog
 
-
 LOG_ACTIONS = {
     models.ADDITION: (models.ADDITION, "Addition"),
     models.CHANGE: (models.CHANGE, "Change"),

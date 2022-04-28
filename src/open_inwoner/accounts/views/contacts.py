@@ -4,7 +4,7 @@ from django.db.models import Q
 from django.http.response import HttpResponseRedirect
 from django.urls.base import reverse, reverse_lazy
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext as _
 from django.views.generic import CreateView, ListView
 from django.views.generic.edit import DeleteView, UpdateView
 
@@ -82,7 +82,7 @@ class ContactUpdateView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, Updat
     def form_valid(self, form):
         self.object = form.save()
 
-        self.log_change(self.object, str(_("contact was modified")))
+        self.log_change(self.object, _("contact was modified"))
         return HttpResponseRedirect(self.get_success_url())
 
 
@@ -140,7 +140,7 @@ class ContactCreateView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, Creat
             ),
         )
 
-        self.log_addition(self.object, str(_("contact was created")))
+        self.log_addition(self.object, _("contact was created"))
         return HttpResponseRedirect(self.get_success_url())
 
 
@@ -158,5 +158,5 @@ class ContactDeleteView(LogMixin, LoginRequiredMixin, DeleteView):
         object = self.get_object()
         super().delete(request, *args, **kwargs)
 
-        self.log_deletion(object, str(_("contact was deleted")))
+        self.log_deletion(object, _("contact was deleted"))
         return HttpResponseRedirect(self.success_url)
