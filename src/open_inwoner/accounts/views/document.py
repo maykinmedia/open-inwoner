@@ -1,4 +1,4 @@
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext as _
 
 from privates.views import PrivateMediaView
 
@@ -22,7 +22,7 @@ class DocumentPrivateMediaView(LogMixin, PrivateMediaView):
             return False  # If user is not authenticated, the file is not visible
 
         if self.request.user == object.owner or self.request.user.is_superuser:
-            self.log_user_action(object, str(_("file was downloaded")))
+            self.log_user_action(object, _("file was downloaded"))
             return True
 
         return False

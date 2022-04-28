@@ -3,7 +3,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404, HttpResponseRedirect
 from django.urls.base import reverse
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext as _
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin
@@ -98,7 +98,7 @@ class PlanCreateView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, CreateVi
     def form_valid(self, form):
         self.object = form.save(self.request.user)
 
-        self.log_addition(self.object, str(_("plan was created")))
+        self.log_addition(self.object, _("plan was created"))
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self) -> str:
@@ -128,7 +128,7 @@ class PlanEditView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView
     def form_valid(self, form):
         self.object = form.save(self.request.user)
 
-        self.log_change(self.object, str(_("plan was modified")))
+        self.log_change(self.object, _("plan was modified"))
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self) -> str:
@@ -157,7 +157,7 @@ class PlanGoalEditView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, Update
     def form_valid(self, form):
         self.object = form.save()
 
-        self.log_change(self.object, str(_("plan goal was modified")))
+        self.log_change(self.object, _("plan goal was modified"))
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self) -> str:
@@ -195,7 +195,7 @@ class PlanFileUploadView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, Upda
         object = self.get_object()
         form.save(self.request.user, plan=self.object)
 
-        self.log_user_action(object, str(_("file was uploaded")))
+        self.log_user_action(object, _("file was uploaded"))
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self) -> str:
@@ -242,7 +242,7 @@ class PlanActionCreateView(ActionCreateView):
 
         self.log_addition(
             self.action,
-            str(_("action was created via plan")),
+            _("action was created via plan"),
         )
         return HttpResponseRedirect(self.get_success_url())
 
@@ -289,14 +289,14 @@ class PlanActionEditView(ActionUpdateView):
         self.object = self.get_plan()
         self.action = form.save(self.request.user)
 
-        self.log_change(self.action, str(_("action was modified via plan")))
+        self.log_change(self.action, _("action was modified via plan"))
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self) -> str:
         return self.object.get_absolute_url()
 
 
-class PlanExportView(LoginRequiredMixin, ExportMixin, DetailView):
+class PlanExportView(LogMixin, LoginRequiredMixin, ExportMixin, DetailView):
     template_name = "export/plans/plan_export.html"
     model = Plan
     slug_field = "uuid"

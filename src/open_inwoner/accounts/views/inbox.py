@@ -130,7 +130,7 @@ class InboxView(LogMixin, LoginRequiredMixin, PaginationMixin, FormView):
         # build redirect url based on form hidden data
         url = furl(self.request.path).add({"with": form.data["receiver"]}).url
 
-        self.log_addition(object, str(_("message was created")))
+        self.log_addition(object, _("message was created"))
         return HttpResponseRedirect(f"{url}#messages-last")
 
     def get(self, request, *args, **kwargs):
@@ -158,7 +158,7 @@ class InboxStartView(LogMixin, LoginRequiredMixin, FormView):
         # build redirect url based on form hidden data
         url = furl(self.success_url).add({"with": form.data["receiver"]}).url
 
-        self.log_addition(object, str(_("message was created")))
+        self.log_addition(object, _("message was created"))
         return HttpResponseRedirect(f"{url}#messages-last")
 
     def get_initial(self):
@@ -193,7 +193,7 @@ class InboxPrivateMediaView(LogMixin, PrivateMediaView):
         object = self.get_object()
 
         if self.request.user == object.sender or self.request.user == object.receiver:
-            self.log_user_action(object, str(_("file was downloaded")))
+            self.log_user_action(object, _("file was downloaded"))
             return True
 
         return False

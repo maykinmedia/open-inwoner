@@ -7,7 +7,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext as _
 from django.views.generic import DetailView, FormView, UpdateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin
@@ -21,7 +21,7 @@ from ..forms import ThemesForm, UserForm
 from ..models import Action, User
 
 
-class MyProfileView(LoginRequiredMixin, BaseBreadcrumbMixin, FormView):
+class MyProfileView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormView):
     template_name = "pages/profile/me.html"
     form_class = Form
 
@@ -67,7 +67,10 @@ class MyProfileView(LoginRequiredMixin, BaseBreadcrumbMixin, FormView):
 
     def post(self, request, *args, **kwargs):
         if request.user.is_authenticated and not request.user.is_staff:
+            instance = User.objects.get(id=request.user.id)
             self.request.user.deactivate()
+
+            self.log_user_action(instance, _("user was deactivated via frontend"))
             return redirect("logout")
         else:
             messages.warning(request, _("Uw account kon niet worden gedeactiveerd"))
@@ -93,7 +96,7 @@ class EditProfileView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateV
     def form_valid(self, form):
         form.save()
 
-        self.log_change(self.get_object(), str(_("user profile was modified")))
+        self.log_change(self.get_object(), _("profile was modified"))
         return HttpResponseRedirect(self.get_success_url())
 
 
@@ -116,11 +119,11 @@ class MyCategoriesView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, Update
     def form_valid(self, form):
         form.save()
 
-        self.log_user_action(self.object, str(_("user's categories were modified")))
+        self.log_change(self.object, _("categories were modified"))
         return HttpResponseRedirect(self.get_success_url())
 
 
-class MyProfileExportView(LoginRequiredMixin, ExportMixin, DetailView):
+class MyProfileExportView(LogMixin, LoginRequiredMixin, ExportMixin, DetailView):
     template_name = "export/profile/profile_export.html"
     model = User
 

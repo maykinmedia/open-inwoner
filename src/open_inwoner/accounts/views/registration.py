@@ -3,7 +3,7 @@ from urllib.parse import unquote
 
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext as _
 
 from django_registration.backends.one_step.views import RegistrationView
 
@@ -64,5 +64,5 @@ class CustomRegistrationView(LogMixin, RegistrationView):
         object = form.save()
 
         self.request.user = object
-        self.log_user_action(object, str(_("user was created")))
+        self.log_user_action(object, _("user was created"))
         return HttpResponseRedirect(self.get_success_url())

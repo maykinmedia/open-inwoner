@@ -46,17 +46,10 @@ def addition(request, object, message=""):
     )
 
 
-def change(request, object, message_or_fields):
+def change(request, object, message):
     """
     Log that an object has been successfully changed.
-
-    The argument *message_or_fields* must be a sequence of modified field names
-    or a custom change message.
     """
-    if isinstance(message_or_fields, str):
-        message = message_or_fields
-    else:
-        message = get_change_message(message_or_fields)
     logger.info(
         ("Changed: {object}, {message}. \n{request}").format(
             object=object, message=message, request=request
@@ -133,26 +126,6 @@ def system_action(message, object=None, user=None, log_level=None):
     )
 
 
-def action(message, object=None, user=None):
-    """
-    Log a generic action when request is not specified
-    """
-    logger.info(
-        ("System action: {object}, {message}. \n").format(
-            object=object, message=message
-        )
-    )
-    TimelineLog.objects.create(
-        content_object=object,
-        user=user,
-        extra_data={
-            "content_object_repr": force_str(object) if object else "",
-            "action_flag": LOG_ACTIONS[4],
-            "message": message,
-        },
-    )
-
-
 class LogMixin(object):
     """
     Class based views mixin that adds simple wrappers to
@@ -165,11 +138,11 @@ class LogMixin(object):
         """
         addition(self.request, instance, message)
 
-    def log_change(self, instance, message_or_fields):
+    def log_change(self, instance, message):
         """
         Log that an object has been successfully changed.
         """
-        change(self.request, instance, message_or_fields)
+        change(self.request, instance, message)
 
     def log_deletion(self, instance, message):
         """
