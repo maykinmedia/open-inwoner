@@ -6,6 +6,8 @@ from django.dispatch import receiver
 
 from timeline_logger.models import TimelineLog
 
+from .logentry import LOG_ACTIONS
+
 logger = logging.getLogger(__name__)
 
 
@@ -19,7 +21,7 @@ def copy_log_entry_to_timeline_logger(sender, **kwargs):
         user=log_entry.user,
         extra_data={
             "content_object_repr": log_entry.object_repr or "",
-            "action_flag": log_entry.action_flag,
+            "action_flag": LOG_ACTIONS[log_entry.action_flag],
             "message": log_entry.get_change_message(),
         },
     )

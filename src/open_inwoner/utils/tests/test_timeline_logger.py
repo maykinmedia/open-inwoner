@@ -10,6 +10,7 @@ from open_inwoner.accounts.models import Contact
 from open_inwoner.accounts.tests.factories import ContactFactory, UserFactory
 
 from ..admin import CustomTimelineLogAdmin
+from ..logentry import LOG_ACTIONS
 
 
 class TestAdminTimelineLogging(WebTest):
@@ -31,7 +32,7 @@ class TestAdminTimelineLogging(WebTest):
     @freeze_time("2021-10-18 13:00:00")
     def test_added_object_is_logged(self):
         self.add_instance()
-        log_entry = TimelineLog.objects.first()
+        log_entry = TimelineLog.objects.last()
         self.assertEquals(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
@@ -40,7 +41,7 @@ class TestAdminTimelineLogging(WebTest):
             log_entry.extra_data,
             {
                 "message": _("Toegevoegd."),
-                "action_flag": 1,
+                "action_flag": list(LOG_ACTIONS[ADDITION]),
                 "content_object_repr": self.contact.get_name(),
             },
         )
@@ -56,7 +57,7 @@ class TestAdminTimelineLogging(WebTest):
         form["created_by"] = self.user.id
         form.submit()
 
-        log_entry = TimelineLog.objects.first()
+        log_entry = TimelineLog.objects.last()
         self.assertEquals(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
@@ -65,7 +66,7 @@ class TestAdminTimelineLogging(WebTest):
             log_entry.extra_data,
             {
                 "message": _("Voornaam en Aangemaakt door gewijzigd."),
-                "action_flag": 2,
+                "action_flag": list(LOG_ACTIONS[CHANGE]),
                 "content_object_repr": f"Vasileios {contact.last_name}",
             },
         )
@@ -77,7 +78,7 @@ class TestAdminTimelineLogging(WebTest):
         delete_form = self.app.get(url, user=self.user).forms[0]
         delete_form.submit()
 
-        log_entry = TimelineLog.objects.first()
+        log_entry = TimelineLog.objects.last()
         self.assertEquals(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
@@ -85,7 +86,7 @@ class TestAdminTimelineLogging(WebTest):
             log_entry.extra_data,
             {
                 "message": "",
-                "action_flag": 3,
+                "action_flag": list(LOG_ACTIONS[DELETION]),
                 "content_object_repr": contact.get_name(),
             },
         )
@@ -103,7 +104,6 @@ class TestAdminTimelineLogging(WebTest):
         add_form["email"] = self.contact.email
         add_form["created_by"] = self.user.id
         add_form.submit()
-
         log_entry = TimelineLog.objects.first()
         log_url = reverse(
             "admin:timeline_logger_timelinelog_change",
@@ -122,7 +122,6 @@ class TestAdminTimelineLogging(WebTest):
         add_form["email"] = self.contact.email
         add_form["created_by"] = self.user.id
         add_form.submit()
-
         log_entry = TimelineLog.objects.first()
         log_url = reverse(
             "admin:timeline_logger_timelinelog_delete",
@@ -140,7 +139,7 @@ class TestAdminTimelineLogging(WebTest):
         form["created_by"] = self.user.id
         form.submit()
 
-        log_entry = TimelineLog.objects.first()
+        log_entry = TimelineLog.objects.last()
         action = CustomTimelineLogAdmin.get_action_flag(
             CustomTimelineLogAdmin, log_entry
         )
@@ -153,7 +152,7 @@ class TestAdminTimelineLogging(WebTest):
         form["first_name"] = "Another name"
         form.submit()
 
-        log_entry = TimelineLog.objects.first()
+        log_entry = TimelineLog.objects.last()
         action = CustomTimelineLogAdmin.get_action_flag(
             CustomTimelineLogAdmin, log_entry
         )
@@ -165,7 +164,7 @@ class TestAdminTimelineLogging(WebTest):
         form = self.app.get(url, user=self.user).forms[0]
         form.submit()
 
-        log_entry = TimelineLog.objects.first()
+        log_entry = TimelineLog.objects.last()
         action = CustomTimelineLogAdmin.get_action_flag(
             CustomTimelineLogAdmin, log_entry
         )
@@ -175,8 +174,37 @@ class TestAdminTimelineLogging(WebTest):
         contact = ContactFactory()
         TimelineLog.objects.create(content_object=contact, user=self.user)
 
-        log_entry = TimelineLog.objects.first()
+        log_entry = TimelineLog.objects.last()
         action = CustomTimelineLogAdmin.get_action_flag(
             CustomTimelineLogAdmin, log_entry
         )
         self.assertEquals(action, "")
+
+
+class TestTimelineLogExport(WebTest):
+    @freeze_time("2021-10-18 13:00:00")
+    def test_proper_data_is_exported(self):
+        user = UserFactory(is_superuser=True, is_staff=True)
+        log_entry = TimelineLog.objects.create(content_object=user, user=user)
+        form = self.app.get(
+            reverse("admin:timeline_logger_timelinelog_export"), user=user
+        ).forms[0]
+
+        # json format chosen
+        form["file_format"] = "0"
+        response = form.submit()
+
+        self.assertEqual(
+            response.json,
+            [
+                {
+                    "extra_data": "",
+                    "id": log_entry.id,
+                    "content_type": log_entry.content_type_id,
+                    "object_id": str(user.id),
+                    "timestamp": "2021-10-18 15:00:00",
+                    "user": user.id,
+                    "template": "timeline_logger/default.txt",
+                }
+            ],
+        )
