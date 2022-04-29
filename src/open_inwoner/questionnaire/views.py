@@ -11,6 +11,7 @@ from django.views.generic import FormView, ListView, RedirectView, TemplateView
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.accounts.models import Document
+from open_inwoner.utils.logentry import LogMixin
 from open_inwoner.utils.mixins import ExportMixin
 
 from .forms import QuestionnaireStepForm
@@ -74,7 +75,7 @@ class QuestionnaireStepView(BaseBreadcrumbMixin, FormView):
         return HttpResponseRedirect(redirect_to=questionnaire_step.get_absolute_url())
 
 
-class QuestionnaireExportView(ExportMixin, TemplateView):
+class QuestionnaireExportView(LogMixin, ExportMixin, TemplateView):
     template_name = "export/questionnaire/questionnaire_export.html"
 
     def get_filename(self):

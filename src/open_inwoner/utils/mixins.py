@@ -182,7 +182,9 @@ class ExportMixin:
 
         response = HttpResponse(file, content_type="application/pdf")
         response["Content-Disposition"] = f'attachment; filename="{filename}"'
-        self.log_export_action()
+
+        if not self.request.user.is_anonymous:
+            self.log_export_action()
 
         return response
 
