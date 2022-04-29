@@ -16,7 +16,6 @@ class DocumentPrivateMediaView(LogMixin, PrivateMediaView):
         """
         Override this method to customize the way permissions are checked.
         """
-        print("has_permission")
         object = self.get_object()
         if not self.request.user.is_authenticated:
             return False  # If user is not authenticated, the file is not visible
