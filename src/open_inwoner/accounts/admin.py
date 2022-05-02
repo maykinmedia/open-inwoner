@@ -1,4 +1,3 @@
-from django import forms
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.urls import reverse, reverse_lazy
@@ -80,28 +79,6 @@ class ActionAdmin(UUIDAdminFirstInOrder, PrivateMediaMixin, admin.ModelAdmin):
     private_media_fields = ("file",)
 
 
-class CustomContactForm(forms.ModelForm):
-    class Meta:
-        model = Contact
-        fields = "__all__"
-
-    def clean(self, *args, **kwargs):
-        cleaned_data = super().clean(*args, **kwargs)
-
-        contact_email = cleaned_data["email"]
-        contact_user = cleaned_data["contact_user"]
-        if contact_email and not contact_user:
-            raise forms.ValidationError(
-                _('"Contact gebruiker" is mandatory when "E-mailadres" is filled in.')
-            )
-        if contact_user and contact_email != contact_user.email:
-            raise forms.ValidationError(
-                _(
-                    'The email addresses of "E-mailadres" and "Contact gebruiker" do not match.'
-                )
-            )
-
-
 @admin.register(Contact)
 class ContactAdmin(UUIDAdminFirstInOrder, admin.ModelAdmin):
     readonly_fields = ("uuid",)
@@ -117,7 +94,6 @@ class ContactAdmin(UUIDAdminFirstInOrder, admin.ModelAdmin):
         "contact_user",
         "created_by",
     )
-    form = CustomContactForm
 
 
 @admin.register(Document)
