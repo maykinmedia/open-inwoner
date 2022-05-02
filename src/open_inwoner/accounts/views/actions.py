@@ -12,8 +12,8 @@ from django.views.generic.edit import UpdateView
 from privates.views import PrivateMediaView
 from view_breadcrumbs import BaseBreadcrumbMixin
 
-from open_inwoner.utils.logentry import LogMixin
 from open_inwoner.utils.mixins import ExportMixin
+from open_inwoner.utils.views import LogMixin
 
 from ..forms import ActionForm, ActionListForm
 from ..models import Action

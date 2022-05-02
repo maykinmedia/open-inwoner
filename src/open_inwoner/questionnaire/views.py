@@ -11,8 +11,8 @@ from django.views.generic import FormView, ListView, RedirectView, TemplateView
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.accounts.models import Document
-from open_inwoner.utils.logentry import LogMixin
 from open_inwoner.utils.mixins import ExportMixin
+from open_inwoner.utils.views import LogMixin
 
 from .forms import QuestionnaireStepForm
 from .models import QuestionnaireStep

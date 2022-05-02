@@ -5,7 +5,7 @@ from django.views.generic import UpdateView
 
 from furl import furl
 
-from open_inwoner.utils.logentry import LogMixin
+from open_inwoner.utils.views import LogMixin
 
 from ..forms import InviteForm
 from ..models import Invite

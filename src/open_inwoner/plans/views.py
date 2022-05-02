@@ -14,8 +14,8 @@ from open_inwoner.accounts.views.actions import (
     ActionUpdateView,
     BaseActionFilter,
 )
-from open_inwoner.utils.logentry import LogMixin
 from open_inwoner.utils.mixins import ExportMixin
+from open_inwoner.utils.views import LogMixin
 
 from .forms import PlanForm, PlanGoalForm
 from .models import Plan

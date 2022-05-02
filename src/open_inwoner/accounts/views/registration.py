@@ -7,7 +7,7 @@ from django.utils.translation import gettext as _
 
 from django_registration.backends.one_step.views import RegistrationView
 
-from open_inwoner.utils.logentry import LogMixin
+from open_inwoner.utils.views import LogMixin
 
 from ..forms import CustomRegistrationForm
 from ..models import Invite, User

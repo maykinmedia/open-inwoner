@@ -14,8 +14,8 @@ from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.accounts.choices import ContactTypeChoices, StatusChoices
 from open_inwoner.questionnaire.models import QuestionnaireStep
-from open_inwoner.utils.logentry import LogMixin
 from open_inwoner.utils.mixins import ExportMixin
+from open_inwoner.utils.views import LogMixin
 
 from ..forms import ThemesForm, UserForm
 from ..models import Action, User

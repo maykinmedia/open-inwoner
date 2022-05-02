@@ -4,7 +4,7 @@ from django.urls.base import reverse_lazy
 from django.utils.translation import gettext as _
 from django.views.generic import CreateView, DeleteView
 
-from open_inwoner.utils.logentry import LogMixin
+from open_inwoner.utils.views import LogMixin
 
 from ..forms import DocumentForm
 from ..models import Document

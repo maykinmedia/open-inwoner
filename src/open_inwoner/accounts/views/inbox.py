@@ -13,8 +13,8 @@ from django.views.generic import FormView
 from furl import furl
 from privates.views import PrivateMediaView
 
-from open_inwoner.utils.logentry import LogMixin
 from open_inwoner.utils.mixins import PaginationMixin
+from open_inwoner.utils.views import LogMixin
 
 from ..forms import InboxForm
 from ..models import Document, Message, User

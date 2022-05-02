@@ -3,7 +3,7 @@ from django.utils.translation import gettext as _
 from privates.views import PrivateMediaView
 
 from open_inwoner.accounts.models import Document
-from open_inwoner.utils.logentry import LogMixin
+from open_inwoner.utils.views import LogMixin
 
 
 class DocumentPrivateMediaView(LogMixin, PrivateMediaView):

@@ -10,7 +10,7 @@ from django.views.generic.edit import DeleteView, UpdateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin
 
-from open_inwoner.utils.logentry import LogMixin
+from open_inwoner.utils.views import LogMixin
 
 from ..choices import ContactTypeChoices
 from ..forms import ContactFilterForm, ContactForm
