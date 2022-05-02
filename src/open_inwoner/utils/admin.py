@@ -17,12 +17,7 @@ class CustomTimelineLogAdmin(ExportMixin, TimelineLogAdmin):
     # export
     resource_class = TimelineLogResource
     formats = [
-        base_formats.JSON,
         base_formats.CSV,
-        base_formats.YAML,
-        base_formats.TSV,
-        base_formats.ODS,
-        base_formats.HTML,
         base_formats.XLSX,
     ]
 

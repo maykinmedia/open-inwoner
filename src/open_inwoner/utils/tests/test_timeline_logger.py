@@ -190,21 +190,26 @@ class TestTimelineLogExport(WebTest):
             reverse("admin:timeline_logger_timelinelog_export"), user=user
         ).forms[0]
 
-        # json format chosen
+        # csv format chosen
         form["file_format"] = "0"
         response = form.submit()
+        exported_data = response.content.decode("utf-8").replace("\r\n", "").split(",")
 
         self.assertEqual(
-            response.json,
+            exported_data,
             [
-                {
-                    "extra_data": "",
-                    "id": log_entry.id,
-                    "content_type": log_entry.content_type_id,
-                    "object_id": str(user.id),
-                    "timestamp": "2021-10-18 15:00:00",
-                    "user": user.id,
-                    "template": "timeline_logger/default.txt",
-                }
+                "extra_data",
+                "id",
+                "content_type",
+                "object_id",
+                "timestamp",
+                "user",
+                "template",
+                str(log_entry.id),
+                str(log_entry.content_type_id),
+                str(user.id),
+                "2021-10-18 15:00:00",
+                str(user.id),
+                "timeline_logger/default.txt",
             ],
         )
