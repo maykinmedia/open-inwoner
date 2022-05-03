@@ -137,6 +137,9 @@ class InboxView(LogMixin, LoginRequiredMixin, PaginationMixin, FormView):
         """Mark all messages as seen for the receiver"""
         context = self.get_context_data()
 
+        if not request.GET.get("redirected"):
+            return HttpResponseRedirect(f"{request.path}?redirected=true#messages-last")
+
         self.mark_messages_seen(other_user=context["other_user"])
         return self.render_to_response(context)
 
