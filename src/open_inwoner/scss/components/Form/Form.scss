@@ -104,7 +104,7 @@
 
   &--inline {
     grid-template-columns: 1fr auto;
-    align-items: start;
+    align-items: end;
 
     .form__actions {
       grid-column-start: auto;
