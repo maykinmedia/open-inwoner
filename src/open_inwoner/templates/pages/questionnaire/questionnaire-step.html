@@ -5,7 +5,7 @@
     {% render_grid %}
         {% render_column span=9 %}
             <h1 class="h1">
-                {{ form.instance.get_title }}
+                <span ondblclick="this.textContent='{{ form.instance.code|escapejs|striptags }}';">{{ form.instance.get_title }}</span>
                 {% if not form.instance.get_children %}
                     {% button href="questionnaire:questionnaire_export" text=_("Export pdf") primary=True icon="file-pdf" icon_position="after" title=_("Your results are also saved to your profile if you are logged in.") %}
                 {% endif %}

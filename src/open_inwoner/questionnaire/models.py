@@ -49,6 +49,7 @@ class QuestionnaireStep(MP_Node):
         max_length=25,
     )
 
+    code = models.CharField(_("Code voor intern gebruik"), max_length=255, unique=True)
     slug = models.SlugField(_("URL vriendelijke naam"), max_length=255, unique=True)
     help_text = models.CharField(
         _("Ondersteunende tekst"),
