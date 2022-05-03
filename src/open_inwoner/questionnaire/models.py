@@ -56,6 +56,7 @@ class QuestionnaireStep(MP_Node):
         help_text=_("Beschrijvende tekst bij de vraag."),
         default=_("Kies het antwoord dat het meest van toepassing is"),
         max_length=510,
+        blank=True,
     )
 
     content = models.TextField(
