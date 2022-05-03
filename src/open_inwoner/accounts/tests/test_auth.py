@@ -1,7 +1,7 @@
 from django.contrib.sites.models import Site
 from django.core import mail
 from django.urls import reverse, reverse_lazy
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext as _
 
 from django_webtest import WebTest
 
@@ -171,7 +171,7 @@ class TestPasswordResetFunctionality(WebTest):
 
     def test_password_reset_form_custom_template_is_rendered(self):
         response = self.app.get(reverse("password_reset"))
-        self.assertIn(str(_("Mijn wachtwoord opnieuw instellen")), response)
+        self.assertIn(_("Mijn wachtwoord opnieuw instellen"), response)
 
     def test_password_reset_email_contains_proper_data(self):
         current_site = Site.objects.get_current()
@@ -206,4 +206,21 @@ class TestPasswordResetFunctionality(WebTest):
         confirm_response = self.app.get(
             reverse("password_reset_confirm", kwargs={"token": token, "uidb64": uid})
         ).follow()
-        self.assertIn(str(_("Mijn wachtwoord wijzigen")), confirm_response)
+        self.assertIn(_("Mijn wachtwoord wijzigen"), confirm_response)
+
+
+class TestPasswordChangeTemplates(WebTest):
+    def setUp(self):
+        self.user = UserFactory()
+
+    def test_password_change_button_is_rendered(self):
+        response = self.app.get(reverse("accounts:my_profile"), user=self.user)
+        self.assertIn(_("Wijzig wachtwoord"), response)
+
+    def test_password_change_form_custom_template_is_rendered(self):
+        response = self.app.get(reverse("password_change"), user=self.user)
+        self.assertIn(_("Wachtwoordwijziging"), response)
+
+    def test_password_change_form_done_custom_template_is_rendered(self):
+        response = self.app.get(reverse("password_change_done"), user=self.user)
+        self.assertIn(_("Uw wachtwoord is gewijzigd."), response)
