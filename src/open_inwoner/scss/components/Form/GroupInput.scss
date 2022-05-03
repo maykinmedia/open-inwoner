@@ -2,12 +2,21 @@
   border: 1px solid var(--color-mute);
   border-radius: var(--border-radius);
 
-  input {
-    border: none;
+  &__toolbar {
+    align-items: center;
+    display: flex;
   }
 
   textarea {
     border: none;
     resize: none;
+  }
+
+  input {
+    border: none;
+  }
+
+  .button {
+    padding: 0;
   }
 }
