@@ -110,6 +110,7 @@ def file(file, **kwargs):
     if isinstance(file, File):
         kwargs.update(
             is_image=file.file_type == "Image",
+            description=file.description,
             extension=file.extension,
             size=file.size,
             url=file.url,
