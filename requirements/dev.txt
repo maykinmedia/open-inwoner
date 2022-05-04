@@ -104,7 +104,7 @@ diff-match-patch==20200713
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-import-export
-digid-eherkenning @ git+https://bitbucket.org/maykinmedia/django-digid-eherkenning.git@02ac61c42f6dd2f229ba9f0f687fa1a4160511be
+digid_eherkenning @ git+https://bitbucket.org/maykinmedia/django-digid-eherkenning.git@02ac61c42f6dd2f229ba9f0f687fa1a4160511be
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -149,6 +149,7 @@ django==3.2.12
     #   djangorestframework
     #   drf-spectacular
     #   easy-thumbnails
+    #   extended-admin-session
     #   mail-editor
     #   maykin-django-two-factor-auth
     #   zgw-consumers
@@ -365,6 +366,10 @@ et-xmlfile==1.1.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   openpyxl
+extended-admin-session==0.1.1
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 face==20.1.1
     # via
     #   -c requirements/ci.txt

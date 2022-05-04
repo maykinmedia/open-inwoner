@@ -42,6 +42,7 @@ humanfriendly
 git+https://github.com/maykinmedia/mail-editor.git@0b4621b5c7f434586115b8e722af8940cfa70195#egg=mail-editor
 fontawesomefree
 django-timeline-logger
+extended-admin-session
 
 # API libraries
 djangorestframework

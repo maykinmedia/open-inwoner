@@ -147,6 +147,7 @@ INSTALLED_APPS = [
     "privates",
     "fontawesomefree",
     "timeline_logger",
+    "extended_admin_session",
     # Project applications.
     "open_inwoner.accounts",
     "open_inwoner.components",
@@ -359,9 +360,10 @@ AUTHENTICATION_BACKENDS = [
 
 SESSION_COOKIE_NAME = "open_inwoner_sessionid"
 SESSION_ENGINE = "open_inwoner.session.backends.cache"
-SESSION_COOKIE_AGE_ADMIN = 86400
+EXTENDED_ADMIN_SESSION_ON_STAFF_USER = True
+EXTENDED_ADMIN_SESSION_COOKIE_AGE = 86400
+EXTENDED_ADMIN_SESSION_WARN_DELTA = 60  # Warn 1 minute before end of session.
 SESSION_COOKIE_AGE = 900  # Set to 15 minutes
-SESSION_WARN_DELTA = 60  # Warn 1 minute before end of session.
 
 LOGIN_REDIRECT_URL = reverse_lazy("root")
 LOGOUT_REDIRECT_URL = reverse_lazy("root")

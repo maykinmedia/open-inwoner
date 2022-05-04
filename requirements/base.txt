@@ -45,7 +45,7 @@ defusedxml==0.7.1
     #   python3-openid
 diff-match-patch==20200713
     # via django-import-export
-digid-eherkenning @ git+https://bitbucket.org/maykinmedia/django-digid-eherkenning.git@02ac61c42f6dd2f229ba9f0f687fa1a4160511be
+digid_eherkenning @ git+https://bitbucket.org/maykinmedia/django-digid-eherkenning.git@02ac61c42f6dd2f229ba9f0f687fa1a4160511be
     # via -r requirements/base.in
 dj-rest-auth==2.1.11
     # via -r requirements/base.in
@@ -82,6 +82,7 @@ django==3.2.12
     #   djangorestframework
     #   drf-spectacular
     #   easy-thumbnails
+    #   extended-admin-session
     #   mail-editor
     #   maykin-django-two-factor-auth
     #   zgw-consumers
@@ -189,6 +190,8 @@ elasticsearch-dsl==7.4.0
     # via django-elasticsearch-dsl
 et-xmlfile==1.1.0
     # via openpyxl
+extended-admin-session==0.1.1
+    # via -r requirements/base.in
 face==20.1.1
     # via glom
 faker==9.9.0
