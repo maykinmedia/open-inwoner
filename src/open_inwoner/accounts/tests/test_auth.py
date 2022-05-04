@@ -215,12 +215,12 @@ class TestPasswordChangeTemplates(WebTest):
 
     def test_password_change_button_is_rendered(self):
         response = self.app.get(reverse("accounts:my_profile"), user=self.user)
-        self.assertIn(_("Wijzig wachtwoord"), response)
+        self.assertContains(response, _("Wijzig wachtwoord"))
 
     def test_password_change_form_custom_template_is_rendered(self):
         response = self.app.get(reverse("password_change"), user=self.user)
-        self.assertIn(_("Wachtwoordwijziging"), response)
+        self.assertContains(response, _("Wachtwoordwijziging"))
 
     def test_password_change_form_done_custom_template_is_rendered(self):
         response = self.app.get(reverse("password_change_done"), user=self.user)
-        self.assertIn(_("Uw wachtwoord is gewijzigd."), response)
+        self.assertContains(response, _("Uw wachtwoord is gewijzigd."))
