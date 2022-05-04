@@ -160,7 +160,6 @@ INSTALLED_APPS = [
     "open_inwoner.haalcentraal",
     "open_inwoner.openzaak",
     "open_inwoner.questionnaire",
-    "open_inwoner.session",
 ]
 
 MIDDLEWARE = [
