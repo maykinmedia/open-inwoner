@@ -1,0 +1,9 @@
+.logo {
+  &__image {
+    max-width: 100%;
+  }
+
+  &__image:not([height]) {
+    height: 100%;
+  }
+}

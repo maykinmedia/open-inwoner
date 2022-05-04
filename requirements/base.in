@@ -1,30 +1,65 @@
 # Core python libraries
-Pillow  # handle images
+Pillow>=9.0.0 # handle images
 psycopg2  # database driver
 pytz  # handle timezones
 python-dotenv  # environment variables for secrets
 python-decouple  # processing of envvar configs
+geopy # geo decoder
+glom # processing nested data
+furl # processing urls
+weasyprint # export to pdf
 
 # Framework libraries
-django < 4.0
+Django>=3.2.11<4.0
 django-admin-index
 django-axes
 django-choices
+django-filer
 django-hijack
-django-hijack-admin
+django-ordered-model
 django-redis
 django-rosetta
 django-sniplates
--e git+git://github.com/maykinmedia/django-two-factor-auth@729249e647674c7022b894fcb0ccc4c231ed23d8#egg=django-two-factor-auth
+django-treebeard
+maykin-django-two-factor-auth
 phonenumbers
+django-localflavor
+django-privates
+git+https://bitbucket.org/maykinmedia/django-digid-eherkenning.git@02ac61c42f6dd2f229ba9f0f687fa1a4160511be#egg=digid_eherkenning
+django-cors-headers
+dj-rest-auth
+django-allauth
+django-autoslug
+django-elasticsearch-dsl
+django-import-export
+django-solo
+django-colorfield
+django-registration
+django-view-breadcrumbs
+markdown
+django_better_admin_arrayfield
+humanfriendly
+git+https://github.com/maykinmedia/mail-editor.git@0b4621b5c7f434586115b8e722af8940cfa70195#egg=mail-editor
+fontawesomefree
+django-timeline-logger
 
 # API libraries
-# djangorestframework
-# django-extra-fields
-# django-filter
-# drf-yasg  # api documentation
+djangorestframework
+django-extra-fields
+django-filter
+drf-spectacular # api documentation
+djangorestframework-camel-case
 
 # WSGI servers & monitoring - production oriented
 uwsgi
 sentry-sdk  # error monitoring
 elastic-apm  # Elastic APM integration
+
+beautifulsoup4
+
+# DigidLocal
+python3-saml
+pyopenssl
+
+# Common Ground integration
+zgw-consumers

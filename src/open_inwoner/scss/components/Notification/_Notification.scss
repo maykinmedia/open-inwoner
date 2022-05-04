@@ -1,0 +1,57 @@
+.notification {
+  --notification-color-background: var(--color-orange);
+  --notification-color-text: var(--color-orange-dark);
+
+  background-color: var(--notification-color-background);
+  border-radius: var(--border-radius);
+  color: var(--notification-color-text);
+  display: flex;
+  grid-gap: var(--spacing-extra-large);
+  margin: var(--row-height) 0;
+  padding: var(--spacing-extra-large);
+  position: relative;
+
+  &--contents {
+    display: block;
+  }
+
+  &--error {
+    --notification-color-background: var(--color-danger-lightest);
+    --notification-color-text: var(--color-danger-darker);
+  }
+
+  &--success {
+    --notification-color-background: var(--color-success-lighter);
+    --notification-color-text: var(--color-success);
+  }
+
+  &__icon {
+    flex-shrink: 0;
+    width: 24px;
+  }
+
+  &__content {
+    width: 100%;
+  }
+
+  &__close {
+    position: absolute;
+    top: var(--spacing-small);
+    right: var(--spacing-small);
+    cursor: pointer;
+  }
+
+  &:not(#{&}--contents) .h2 {
+    line-height: var(--font-size-heading-2);
+    color: var(--notification-color-text);
+  }
+
+  &:not(#{&}--contents) .p {
+    color: var(--notification-color-text);
+  }
+
+  .button {
+    color: var(--color-white);
+    background-color: var(--notification-color-text);
+  }
+}

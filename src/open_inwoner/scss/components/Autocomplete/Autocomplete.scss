@@ -1,0 +1,38 @@
+.autoComplete_wrapper {
+  display: inline-block;
+  position: relative;
+}
+
+.autoComplete_wrapper > ul {
+  // position
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  padding: 0;
+  z-index: 1000;
+
+  // color
+  background-color: var(--color-white);
+
+  // border
+  border: 1px solid var(--color-mute);
+  border-radius: var(--border-radius);
+}
+
+.autoComplete_wrapper > ul > li {
+  padding: var(--spacing-small) var(--spacing-large);
+  list-style: none;
+  color: var(--color-gray-lighter);
+}
+
+.autoComplete_wrapper > ul > li:hover {
+  cursor: pointer;
+  background-color: var(--color-gray-lightest);
+}
+
+.autoComplete_wrapper > ul > li mark {
+  background-color: transparent;
+  color: var(--font-color-body);
+  font-weight: bold;
+}

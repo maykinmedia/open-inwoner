@@ -1,0 +1,7 @@
+{% if icon == "file-pdf" %}
+    <i class="fa-regular fa-file-pdf"></i>
+{% elif social %}
+    <i class="fa-brands fa-{{ icon }}"></i>
+{% else %}
+    <span class="{% if outlined %}material-icons-outlined{% else %}material-icons{% endif %} {{ extra_classes }}">{{ icon }}</span>
+{% endif %}

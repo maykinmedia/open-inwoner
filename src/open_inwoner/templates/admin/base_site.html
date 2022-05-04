@@ -1,5 +1,5 @@
 {% extends "admin/base.html" %}
-{% load i18n static hijack_tags utils %}
+{% load i18n static utils %}
 
 {% block title %}
 {{ title }} | {{ site_title|default:_('Administration') }}
@@ -8,7 +8,6 @@
 {% block extrastyle %}
     {{ block.super }}
 
-    <link rel="stylesheet" type="text/css" href="{% static 'hijack/hijack-styles.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'bundles/admin_overrides.css' %}">
 {% endblock %}
 
@@ -27,10 +26,26 @@
     </h1>
 {% endblock %}
 
+{% block userlinks %}
+    {% if site_url %}
+        <a href="{{ site_url }}">{% if settings.SITE_TITLE %}{{ settings.SITE_TITLE }}{% else %}{% trans 'View site' %}{% endif %}</a> /
+    {% endif %}
+    {% url 'admin:two_factor:profile' as 2fa_profile_url %}
+    {% if 2fa_profile_url %}
+        <a href="{{ 2fa_profile_url }}">{% trans "View 2fa profile" %}</a> /
+    {% endif %}
+    {% if user.has_usable_password %}
+    <a href="{% url 'admin:password_change' %}">{% trans 'Change password' %}</a> /
+    {% endif %}
+    <a href="{% url 'admin:logout' %}">{% trans 'Log out' %}</a>
+{% endblock %}
+
 {% block nav-global %}
 {% endblock %}
 
-{% block messages %}
-    {% hijack_notification %}
+
+{% block footer %}
     {{ block.super }}
+    {# Load the custom JS #}
+    <script src="{% static 'bundles/open_inwoner-js.js' %}"></script>
 {% endblock %}

@@ -1,0 +1,12 @@
+.plans {
+  .h1 {
+    margin-bottom: var(--spacing-large);
+  }
+  .h2 {
+    margin-top: var(--spacing-giant);
+  }
+
+  > .button {
+    margin-top: var(--spacing-large);
+  }
+}

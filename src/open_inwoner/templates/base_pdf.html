@@ -1,0 +1,24 @@
+{% spaceless %}{% load i18n static logo_tags solo_tags %}
+    <!DOCTYPE html>
+    <html lang="en" class="view view--full-width">
+        <head>
+            <meta charset="utf-8">
+            <title>{% block title %}{{ site_name }}{% endblock %}</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <link href="{% static 'bundles/pdf-p.css' %}" media="all" rel="stylesheet" />
+            <link href="{% static 'bundles/open_inwoner-css.css' %}" media="all" rel="stylesheet" />
+
+            <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+            <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+        </head>
+
+        <body>
+            <div class="export">
+                {% get_solo "configurations.SiteConfiguration" as config %}
+                {% logo src=config.logo.file.url alt="" %}
+
+                {% block content %}Please provide the content{% endblock content %}
+            </div>
+        </body>
+    </html>
+{% endspaceless %}

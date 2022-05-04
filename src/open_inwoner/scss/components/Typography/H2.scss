@@ -1,0 +1,28 @@
+.h2 {
+  color: var(--font-color-heading-2);
+  font-family: var(--font-family-heading-2);
+  font-size: var(--font-size-heading-2);
+  font-weight: var(--font-weight-heading-2);
+  line-height: var(--font-line-height-heading-2);
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+
+  &--extra {
+    margin: var(--row-height) 0 var(--spacing-medium) 0;
+  }
+}
+
+///
+/// Contextual.
+///
+
+.card + .h2,
+.dashboard + .h2,
+.status-list + .h2 {
+  margin-top: var(--row-height);
+}
+
+.p + .h2 {
+  margin-top: var(--spacing-large);
+}

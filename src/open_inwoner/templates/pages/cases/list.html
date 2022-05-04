@@ -1,0 +1,53 @@
+{% extends 'master.html' %}
+{% load i18n icon_tags link_tags anchor_menu_tags utils %}
+
+{% block sidebar_content %}
+{% anchor_menu anchors=anchors desktop=True %}
+{% endblock sidebar_content %}
+
+{% block content %}
+    <h1 class="h1" id="title">{% trans "Mijn aanvragen" %}</h2>
+
+    <div class="cases">
+        <h2 class="h2" id="pending_apps">{% trans "Lopende aanvragen" %}</h2>
+        <div class="tabled tabled--tiny-end">
+            <div class="tabled__header">
+                <div class="tabled__item">{% trans "Identificatie" %}</div>
+                <div class="tabled__item">{% trans "Omschrijving" %}</div>
+                <div class="tabled__item">{% trans "Startdatum" %}</div>
+                <div class="tabled__item tabled__item--right">{% trans "Status" %}</div>
+            </div>
+            {% for case in open_cases %}
+                <div class="tabled__row">
+                    <div class="tabled__item">{{ case.identificatie }}</div>
+                    <div class="tabled__item">{{ case.omschrijving }}</div>
+                    <div class="tabled__item">{{ case.startdatum }}</div>
+                    <div class="tabled__item tabled__item--right">
+                        {% link href="accounts:case_status" object_id=case.uuid text=_("Bekijk status") hide_text=True icon="arrow_forward" primary=True %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="cases">
+        <h2 class="h2" id="completed_apps">{% trans "Afgeronde aanvragen" %}</h2>
+        <div class="tabled">
+            <div class="tabled__header">
+                <div class="tabled__item">{% trans "Identificatie" %}</div>
+                <div class="tabled__item">{% trans "Omschrijving" %}</div>
+                <div class="tabled__item">{% trans "Startdatum" %}</div>
+                <div class="tabled__item">{% trans "Einddatum" %}</div>
+            </div>
+
+            {% for case in closed_cases %}
+                <div class="tabled__row">
+                    <div class="tabled__item">{{ case.identificatie }}</div>
+                    <div class="tabled__item tabled__item--color-gray-dark">{{ case.omschrijving }}</div>
+                    <div class="tabled__item">{{ case.startdatum }}</div>
+                    <div class="tabled__item">{{ case.einddatum }}</div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock content %}

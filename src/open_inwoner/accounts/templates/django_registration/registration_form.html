@@ -1,0 +1,6 @@
+{% extends 'master.html' %}
+{% load form_tags %}
+
+{% block content %}
+{% form form_object=form method="POST" id="registration-form" submit_text=_('Registreren') %}
+{% endblock content %}

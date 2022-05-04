@@ -1,0 +1,44 @@
+{% extends 'master.html' %}
+{% load i18n form_tags grid_tags button_tags link_tags list_tags messages_tags pagination_tags querystring_tags %}
+
+
+{% block main_inner %}
+    {% render_grid %}
+        {% render_column start=1 span=9 %}
+            <h1 class="h1">{% trans 'Mijn berichten' %}</h1>
+        {% endrender_column %}
+
+        {% render_column start=10 span=3 %}
+            {% button primary=True href='accounts:inbox_start' text=_('Nieuw bericht versturen') %}
+        {% endrender_column %}
+    {% endrender_grid %}
+    {{ block.super }}
+{% endblock %}
+
+
+{% block sidebar_content %}
+    <div class="sticky">
+        {% render_list %}
+            {% for conversation in conversations.page_obj %}
+                {% querystring conversation.other_user_email conversations.page_obj.number query='with={}&page={}' as href %}
+                {% firstof '?'|add:href as href %}
+                {% firstof conversation.other_user_first_name|add:' '|add:conversation.other_user_last_name as other_user_fullname %}
+
+                {% if other_user.email == conversation.other_user_email %}
+                    {% list_item other_user_fullname|truncatechars:25 conversation.content|truncatechars:25 href active=True %}
+                {% else %}
+                    {% list_item other_user_fullname|truncatechars:25 conversation.content|truncatechars:25 href %}
+                {% endif %}
+            {% endfor %}
+        {% endrender_list %}
+
+        {% pagination page_obj=conversations.page_obj paginator=conversations.paginator request=request lookaround=1 %}
+    </div>
+{% endblock %}
+
+
+{% block content %}
+    {% if conversation_messages or other_user %}
+        {% messages conversation_messages request.user form other_user status %}
+    {% endif %}
+{% endblock %}

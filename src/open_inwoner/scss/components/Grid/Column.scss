@@ -1,0 +1,17 @@
+.column {
+  position: relative;
+
+  @for $i from 1 through 12 {
+    &#{&}--start-#{$i} {
+      grid-column-start: $i;
+    }
+
+    &#{&}--span-#{$i} {
+      grid-column-end: span $i;
+    }
+  }
+
+  &--compact {
+    grid-gap: 0;
+  }
+}

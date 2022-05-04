@@ -1,0 +1,38 @@
+.radio {
+  .radio__input {
+    display: none;
+  }
+
+  .radio__label {
+    color: var(--font-color-body);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body);
+    line-height: var(--font-line-height-body);
+    margin: 0;
+    padding-left: var(--gutter-width);
+    position: relative;
+
+    &:before {
+      align-items: center;
+      display: inline-flex;
+      justify-content: center;
+      position: absolute;
+      left: 0;
+      top: 0;
+      content: ' ';
+      box-sizing: border-box;
+      width: var(--font-line-height-body-small);
+      height: var(--font-line-height-body-small);
+      border: 1px solid var(--color-gray-dark);
+      border-radius: 100%;
+      background-color: var(--color-white);
+    }
+  }
+
+  .radio__input:checked ~ .radio__label:before {
+    background-color: var(--color-secondary);
+    color: var(--color-font-secondary);
+    font-family: 'Material Icons';
+    content: '\e876';
+  }
+}

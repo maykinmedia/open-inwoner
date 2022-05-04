@@ -1,0 +1,29 @@
+{% extends 'master.html' %}
+{% load i18n anchor_menu_tags card_tags dashboard_tags file_tags grid_tags status_tags %}
+
+{% block sidebar_content %}
+    {% anchor_menu anchors desktop=True %}
+{% endblock sidebar_content %}
+
+{% block content %}
+    {% render_grid %}
+        {% render_column span=9 %}
+
+            {# Title/dashboard. #}
+            <h1 class="h1" id="title">{{ case.obj.omschrijving }}</h1>
+            {% case_dashboard case=case.obj statuses=case.statuses documents=case.documents %}
+
+            {#  Status history. #}
+            {% if case.statuses %}
+                <h2 class="h2" id="statuses">{% trans 'Status' %}</h2>
+                {% status_list case.statuses %}
+            {% endif %}
+
+            {#  Documents. #}
+            {% if case.documents %}
+                <h2 class="h2" id="documents">{% trans 'Documenten' %}</h2>
+                {% case_document_list case.documents %}
+            {% endif %}
+        {% endrender_column %}
+    {% endrender_grid %}
+{% endblock content %}

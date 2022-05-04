@@ -1,24 +1,67 @@
-{% load static hijack_tags %}<!DOCTYPE html>
+{% load static i18n header_tags card_tags footer_tags button_tags notification_tags anchor_menu_tags view_breadcrumbs utils %}<!DOCTYPE html>
 <html lang="en" class="view {% block view_class %}view--{{ request.resolver_match.namespaces|join:'-' }}-{{ request.resolver_match.url_name }}{% endblock %}">
     <head>
         <meta charset="utf-8">
-        <title>{% block title %}Open_Inwoner{% endblock %}</title>
+        <title>{% block title %}{{ site_name }}{% endblock %}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link href="{% static 'ico/favicon.png' %}" rel="shortcut icon">
+        <link href="{{site_logo}}" rel="shortcut icon">
         <link href="{% static 'bundles/open_inwoner-css.css' %}" media="all" rel="stylesheet" />
-        <link href="{% static 'hijack/hijack-styles.css' %}" rel="stylesheet" type="text/css" />
+
+        <style>
+            :root {
+                --color-primary-h: {{theming.primary.0}};
+                --color-primary-s: {{theming.primary.1}}%;
+                --color-primary-l: {{theming.primary.2}}%;
+                --color-secondary-h: {{theming.secondary.0}};
+                --color-secondary-s: {{theming.secondary.1}}%;
+                --color-secondary-l: {{theming.secondary.2}}%;
+                --color-accent-h: {{theming.accent.0}};
+                --color-accent-s: {{theming.accent.1}}%;
+                --color-accent-l: {{theming.accent.2}}%;
+                --color-font-primary: {{theming.primary_font_color}};
+                --color-font-secondary: {{theming.secondary_font_color}};
+                --color-font-accent: {{theming.accent_font_color}};
+            }
+        </style>
+        {% comment %} TODO: Make self hosted {% endcomment %}
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+        <script src="{% static 'fontawesomefree/js/all.min.js' %}"></script>
         {% block extra_css %}{% endblock %}
+
+        {% include "analytics/google.html" %}
+        {% include "analytics/matomo.html" %}
     </head>
 
-    <body class="view__body">
-        {% hijack_notification %}
-        <main>
-            {% block content %}
-                Override <code>{% verbatim %}{% block content %}{% endverbatim %}</code>
-                to get some actual content.
-            {% endblock %}
-        </main>
-        
-        <script src="{% static 'bundles/open_inwoner-js.js' %}"></script>
+    <body>
+        {% header categories=menu_categories request=request breadcrumbs=breadcrumbs search_form=search_form has_general_faq_questions=has_general_faq_questions %}
+        {% if anchors %}
+        {% anchor_menu anchors=anchors desktop=False %}
+        {% endif %}
+        {% render_breadcrumbs "components/Header/Breadcrumbs.html" %}
+
+        {% block notifications %}{% notifications messages %}{% endblock %}
+
+        {% block header_image %}{% endblock header_image %}
+
+        {% block main_outer %}
+            <main class="container">
+                {% block main_inner %}
+                    <div class="grid{% block grid_class %}{% endblock %}">
+                        {% spaceless %}<aside class="grid__sidebar">{% block sidebar_content %}{% endblock sidebar_content %}</aside>{% endspaceless %}
+
+                        <div class="grid__main">
+                            {% block content %}Please provide the content{% endblock content %}
+                        </div>
+
+                        {% block extra_grid %}{% endblock extra_grid %}
+                    </div>
+                {% endblock main_inner %}
+            </main>
+        {% endblock main_outer %}
+
+        {% footer logo_url=site_logo footer_texts=configurable_text.footer %}
+
+        <script defer src="{% static 'bundles/open_inwoner-js.js' %}"></script>
     </body>
 </html>

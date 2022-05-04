@@ -1,0 +1,15 @@
+.export {
+  .logo {
+    .logo__image {
+      max-height: 75px;
+    }
+  }
+
+  .h1:first-of-type {
+    margin-top: var(--row-height);
+  }
+
+  div.qa_results {
+    page-break-before: always;
+  }
+}

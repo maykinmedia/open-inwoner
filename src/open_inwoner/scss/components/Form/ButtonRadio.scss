@@ -1,0 +1,24 @@
+.button-radio {
+  &__input {
+    display: none;
+
+    &:checked ~ .button-radio__button {
+      color: var(--color-primary);
+    }
+  }
+
+  &__button {
+    border: 1px solid #d2d2d2;
+    border-left: 0;
+    background-color: var(--color-gray-lightest);
+    color: var(--color-gray-lighter);
+    display: inline-block;
+    padding: 12px;
+  }
+
+  &:first-child {
+    .button-radio__button {
+      border-left: 1px solid #d2d2d2;
+    }
+  }
+}

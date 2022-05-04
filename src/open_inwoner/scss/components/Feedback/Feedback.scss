@@ -1,0 +1,16 @@
+.feedback {
+  &__remark {
+    display: none;
+
+    &--show {
+      display: block;
+    }
+  }
+
+  &__options {
+    border-radius: var(--border-radius);
+  }
+
+  .button-radio {
+  }
+}

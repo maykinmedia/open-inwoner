@@ -1,0 +1,23 @@
+{% load link_tags %}
+
+{# Utilizes same template as Card. #}
+<div class="card{% if inline %} card--inline{% endif %}{% if tinted %} card--tinted{% endif %}{% if type %} card--type-{{ type }}{% endif %}">
+    {% if src %}
+        <a class="card__header" href="{{ href }}" title="{{ title }}" aria-describedby="{{ title }}">
+            <img class="card__img" src="{{ src }}" alt="{{ alt }}"/>
+        </a>
+    {% endif %}
+
+    <div class="card__body{% if direction %} card__body--direction-{{ direction }}{% endif %}">
+        {% if title %}
+            <h4 class="h4">
+                {% if href %}
+                    {% link href=href text=title %}
+                {% else %}
+                    {{ title }}
+                {% endif %}
+            </h4>
+        {% endif %}
+        {{ contents }}
+    </div>
+</div>

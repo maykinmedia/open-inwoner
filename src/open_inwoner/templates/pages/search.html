@@ -1,0 +1,94 @@
+{% extends 'master.html' %}
+{% load i18n form_tags utils icon_tags filter_tags pagination_tags %}
+
+{% block main_inner %}
+    {% render_form form=form method="GET" id="search-form" %}
+        {#  zoek button section #}
+        <div class="grid">
+            {% spaceless %}<aside class="grid__sidebar">
+                &nbsp;
+            </aside>{% endspaceless %}
+            <div class="grid__main">
+                <h1 class="h1">Zoeken</h1>
+                <p class="p">Hier vind u hoe wonen, zorg, welzijn, werk en geldzaken in uw gemeente geregeld zijn en wijzen we u de weg naar organisaties, activiteiten, hulp en initiatieven in uw eigen buurt.</p>
+
+                <div class="form form--columns-2 form--inline">
+                    {% input form.query %}
+                    {% form_actions primary_text="Zoeken" primary_icon="arrow_forward" %}
+                </div>
+            </div>
+        </div>
+
+        {#  facets and results section #}
+        {% if results %}
+            <div class="grid">
+                <aside class="grid__sidebar">
+                    {% filter field=form.categories %}
+                    {% filter field=form.tags %}
+                    {% filter field=form.organizations %}
+                </aside>
+
+                <div class="grid__main">
+                    <div class="search-results">
+                        <h1 class="h1 search-results__title">
+                            Zoekresultaten
+                            <span class="search-results__title-small">{{paginator.count}} zoekresultaten</span>
+
+                        </h1>
+                        <div class="search-results__list">
+                            {% for hit in page_obj %}
+                                <a class="search-results__item" href="{% url 'pdc:product_detail' hit.slug %}">
+                                    <p class="search-results__item-title">{{ hit.name }}</p>
+                                    <div class="search-results__item-info-container">
+                                        <p class="search-results__item-intro">{{ hit.summary }}</p>
+                                        <p class="search-results__item-type">{% trans "product" %}</p>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    {% pagination page_obj=page_obj paginator=paginator request=request %}
+                </div>
+            </div>
+        {% endif %}
+    {% endrender_form %}
+
+    {% if results %}
+        <div class="grid">
+            {% spaceless %}<aside class="grid__sidebar">
+                &nbsp;
+            </aside>{% endspaceless %}
+            <div class="grid__main">
+                <div class="grid">
+                    <aside class="feedback">
+                        <h4 class="h4">{% trans "Feedback" %}</h4>
+                        <p class="p">{% trans "Heeft u gevonden wat u zocht?" %}</p>
+                        {% render_form form=feedback_form method="POST" form_action=request.get_full_path id="feedback_form" %}
+                            {% csrf_token %}
+                            {{ feedback_form.errors }}
+                            <div class="feedback__options">
+                                {% spaceless %}
+                                <label class="button-radio" for="positive">
+                                    <input class="button-radio__input" type="radio" name="positive" id="positive" value="true" />
+                                    <span class="button-radio__button">{% icon icon="thumb_up" outlined=True %}</span>
+                                </label>
+                                <label class="button-radio" for="negative">
+                                    <input class="button-radio__input" type="radio" name="positive" id="negative" value="false" />
+                                    <span class="button-radio__button">{% icon icon="thumb_down" outlined=True %}</span>
+                                </label>
+                                {% endspaceless %}
+                            </div>
+                            <div class="feedback__remark">
+                                {% textarea feedback_form.remark %}
+                            </div>
+                            <div class="feedback__remark">
+                                {% form_actions primary_text="Feedback versturen" %}
+                            </div>
+                        {% endrender_form %}
+                    </aside>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock main_inner %}

@@ -9,7 +9,6 @@
 *.pyc
 __pycache__
 *~
-*.mo
 
 # Javascript libraries
 /node_modules/
@@ -21,6 +20,7 @@ __pycache__
 /reports/
 /htmlcov/
 .coverage
+coverage.xml
 
 # Environment
 #/deployment/app.*.yml
@@ -28,11 +28,13 @@ __pycache__
 local.py
 /env/
 /media/
+/private_media/
 /static/
 /mail/
 /log/*.log*
 /log/nginx/*.log*
 /.env
+.DS_STORE
 
 # Static files
 src/open_inwoner/static/bundles/

@@ -5,21 +5,16 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import include, path
-from django.views.generic.base import TemplateView
 
-from two_factor.admin import AdminSiteOTPRequired
-from two_factor.urls import urlpatterns as tf_urls
-
-from open_inwoner.accounts.views.password_reset import PasswordResetView
+from open_inwoner.accounts.forms import CustomRegistrationForm
+from open_inwoner.accounts.views import CustomRegistrationView, PasswordResetView
+from open_inwoner.pdc.views import FAQView, HomeView
 
 handler500 = "open_inwoner.utils.views.server_error"
-admin.site.site_header = "open_inwoner admin"
-admin.site.site_title = "open_inwoner admin"
-admin.site.index_title = "Welcome to the open_inwoner admin"
+admin.site.site_header = "Open Inwoner beheeromgeving"
+admin.site.site_title = "Open Inwoner beheeromgeving"
+admin.site.index_title = "Welkom op de OpenInwoner beheeromgeving"
 
-# This will cause users not to be able to login any longer without the OTP setup. There are some
-# issues in this package that need to be resolved.
-admin.site.__class__ = AdminSiteOTPRequired
 
 urlpatterns = [
     path(
@@ -32,9 +27,6 @@ urlpatterns = [
         auth_views.PasswordResetDoneView.as_view(),
         name="password_reset_done",
     ),
-    path("admin/hijack/", include("hijack.urls")),
-    path("admin/", admin.site.urls),
-    path('admin/', include(tf_urls)),
     path(
         "reset/<uidb64>/<token>/",
         auth_views.PasswordResetConfirmView.as_view(),
@@ -45,8 +37,32 @@ urlpatterns = [
         auth_views.PasswordResetCompleteView.as_view(),
         name="password_reset_complete",
     ),
+    path("admin/hijack/", include("hijack.urls")),
+    path("admin/", admin.site.urls),
+    path("ckeditor/", include("open_inwoner.ckeditor5.urls")),
     # Simply show the master template.
-    path("", TemplateView.as_view(template_name="master.html")),
+    path(
+        "accounts/register/",
+        CustomRegistrationView.as_view(form_class=CustomRegistrationForm),
+        name="django_registration_register",
+    ),
+    path("accounts/", include("django_registration.backends.one_step.urls")),
+    path("accounts/", include("django.contrib.auth.urls")),
+    path("api/", include("open_inwoner.api.urls", namespace="api")),
+    path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
+    # Views
+    path("accounts/", include("open_inwoner.accounts.urls", namespace="accounts")),
+    path("pages/", include("django.contrib.flatpages.urls"), name="flatpages"),
+    path("mail-editor/", include("mail_editor.urls", namespace="mail_editor")),
+    path("plans/", include("open_inwoner.plans.urls", namespace="plans")),
+    path(
+        "questionnaire/",
+        include("open_inwoner.questionnaire.urls", namespace="questionnaire"),
+    ),
+    path("faq/", FAQView.as_view(), name="general_faq"),
+    path("", include("open_inwoner.pdc.urls", namespace="pdc")),
+    path("", include("open_inwoner.search.urls", namespace="search")),
+    path("", HomeView.as_view(), name="root"),
 ]
 
 # NOTE: The staticfiles_urlpatterns also discovers static files (ie. no need to run collectstatic). Both the static
@@ -55,7 +71,19 @@ urlpatterns += staticfiles_urlpatterns() + static(
     settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
 )
 
+if "digid_eherkenning.backends.DigiDBackend" in settings.AUTHENTICATION_BACKENDS:
+    urlpatterns = [
+        path("digid/", include("digid_eherkenning.digid_urls")),
+    ] + urlpatterns
+else:
+    urlpatterns = [
+        path("digid/", include("digid_eherkenning.mock.digid_urls")),
+        path("digid/idp/", include("digid_eherkenning.mock.idp.digid_urls")),
+    ] + urlpatterns
+
 if settings.DEBUG and apps.is_installed("debug_toolbar"):
     import debug_toolbar
 
-    urlpatterns = [path("__debug__/", include(debug_toolbar.urls)),] + urlpatterns
+    urlpatterns = [
+        path("__debug__/", include(debug_toolbar.urls)),
+    ] + urlpatterns

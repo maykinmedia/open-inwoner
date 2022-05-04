@@ -1,0 +1,45 @@
+{
+  "extends": [
+    "stylelint-config-sass-guidelines",
+    "./node_modules/prettier-stylelint/config.js"
+  ],
+  "rules": {
+    "color-hex-case": "upper",
+    "color-hex-length": "long",
+    "max-nesting-depth": 3,
+    "declaration-block-single-line-max-declarations": 1,
+    "declaration-block-semicolon-newline-after": "always-multi-line",
+    "number-leading-zero": "never",
+    "declaration-property-value-whitelist": {
+      "color": ["/^\\$|initial|inherit|transparent/"]
+    },
+    "order/order": [
+      [
+        {
+          "type": "at-rule",
+          "name": "include",
+          "hasBlock": false
+        },
+        "dollar-variables",
+        "custom-properties",
+        {
+          "type": "at-rule",
+          "name": "extend"
+        },
+        "declarations",
+        {
+          "type": "at-rule",
+          "name": "include",
+          "hasBlock": true
+        },
+        {
+          "type": "at-rule",
+          "name": "include",
+          "parameter": "breakpoint",
+          "hasBlock": true
+        },
+        "rules"
+      ]
+    ]
+  }
+}

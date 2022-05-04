@@ -1,0 +1,14 @@
+{% extends 'master.html' %}
+{% load i18n form_tags %}
+
+
+{% block content %}
+<h1 class="h1">
+    {% trans "Accept an invitation" %}
+</h1>
+<p class="p">
+    {% blocktranslate with inviter_name=object.inviter.get_full_name %}Accept invitation from {{ inviter_name }} and join Open Inwoner Platform {% endblocktranslate %}
+</p>
+
+{% form id="invite-form" form_object=form method="POST" submit_text=_("Aanvaard") secondary_href='root' secondary_text=_('Terug') secondary_icon='arrow_backward' secondary_icon_position="before" %}
+{% endblock content %}

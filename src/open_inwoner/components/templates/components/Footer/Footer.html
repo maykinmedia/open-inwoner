@@ -1,0 +1,31 @@
+{% load i18n link_tags button_tags logo_tags footer_tags %}
+
+<footer class='footer'>
+    {% logo src=logo_url alt=""%}
+
+    <aside class="footer__visitor">
+        <h4 class="h4">{{footer_texts.footer_visiting_title}}</h4>
+        <p class="p">
+            {{footer_texts.footer_visiting_intro|linebreaksbr}}
+        </p>
+        {% button icon="arrow_forward" icon_position='before' transparent=True text=_("Bekijk op Google Maps") href=footer_texts.footer_visiting_map %}
+    </aside>
+
+
+    <aside class="footer__mail">
+        <h4 class="h4">{{footer_texts.footer_mailing_title}}</h4>
+        <p class="p">
+            {{footer_texts.footer_mailing_intro|linebreaksbr}}
+        </p>
+    </aside>
+
+    <nav class="footer__links">
+        <ul class="footer__list">
+            {% for flatpage in footer_texts.flatpages.all %}
+                <li class="footer__list-item">
+                    {% link text=flatpage.title secondary=True href=flatpage.get_absolute_url %}
+                </li>
+            {% endfor %}
+        </ul>
+    </nav>
+</footer>

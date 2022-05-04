@@ -1,0 +1,35 @@
+.breadcrumbs {
+  background-color: rgba(255, 255, 255, 0.7);
+  overflow-x: auto;
+  $hm: max(calc((100vw - var(--container-width)) / 2), var(--spacing-large));
+  padding: 0 $hm;
+  display: block;
+  position: relative;
+  z-index: 1001;
+
+  @media (min-width: 768px) {
+    z-index: 1002;
+  }
+
+  &__list {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  &__list-item {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+  }
+
+  .link {
+    line-height: var(--row-height);
+  }
+
+  &__list-item > *[class*='icon'],
+  &__list-item > *[class*='Icon'] {
+    margin: 0 var(--spacing-medium);
+  }
+}

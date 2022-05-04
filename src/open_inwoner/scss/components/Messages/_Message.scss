@@ -1,0 +1,15 @@
+.message {
+  &--ours {
+    align-self: flex-end;
+  }
+
+  &--ours &__body {
+    background-color: var(--color-gray-lightest);
+  }
+
+  &__body {
+    border: 1px solid var(--color-gray-lightest);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-medium) var(--spacing-large);
+  }
+}

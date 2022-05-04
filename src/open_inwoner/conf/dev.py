@@ -1,9 +1,12 @@
 import os
+import sys
 import warnings
 
 os.environ.setdefault("DEBUG", "yes")
 os.environ.setdefault("ALLOWED_HOSTS", "*")
-os.environ.setdefault("SECRET_KEY", "7bk)w=_%lnm#68rc!c)h@gy&5+%^f$=okq17bv!)yv!l0udu2y")
+os.environ.setdefault(
+    "SECRET_KEY", "7bk)w=_%lnm#68rc!c)h@gy&5+%^f$=okq17bv!)yv!l0udu2y"
+)
 os.environ.setdefault("IS_HTTPS", "no")
 os.environ.setdefault("VERSION_TAG", "dev")
 
@@ -21,7 +24,11 @@ from .base import *  # noqa isort:skip
 #
 # Standard Django settings.
 #
+SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+# This is commented out because it causes tests in the CI to fail. It can be enabled in the local.py settings.
+# SESSION_COOKIE_DOMAIN = ".localhost"
 
 LOGGING["loggers"].update(
     {
@@ -68,10 +75,23 @@ CACHES = {
 # Library settings
 #
 
+# Allow logging in with both username+password and email+password
+AUTHENTICATION_BACKENDS = [
+    "open_inwoner.accounts.backends.CustomAxesBackend",
+    "open_inwoner.accounts.backends.UserModelEmailBackend",
+    "django.contrib.auth.backends.ModelBackend",
+    "digid_eherkenning.mock.backends.DigiDBackend",
+]
+
 ELASTIC_APM["DEBUG"] = True
 
+if "test" in sys.argv:
+    ELASTICSEARCH_DSL_AUTO_REFRESH = False
+    ELASTICSEARCH_DSL_AUTOSYNC = False
+    ES_INDEX_PRODUCTS = "products_test"
+
 # Django debug toolbar
-INSTALLED_APPS += ["debug_toolbar", "ddt_api_calls"]
+INSTALLED_APPS += ["debug_toolbar", "ddt_api_calls", "django_extensions"]
 MIDDLEWARE += [
     "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
@@ -101,6 +121,16 @@ warnings.filterwarnings(
     RuntimeWarning,
     r"django\.db\.models\.fields",
 )
+
+# django-filer
+FILER_DEBUG = True
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8000",
+    "http://localhost:3000",
+]
+
+TWO_FACTOR_PATCH_ADMIN = False
 
 # Override settings with local settings.
 try:

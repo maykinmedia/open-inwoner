@@ -1,0 +1,14 @@
+.submit {
+  border-radius: var(--border-radius);
+  background-color: #248641;
+  padding: 8px 16px;
+  border: 0;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 300ms, background-color 300ms;
+
+  &:hover {
+    background-color: darken(#248641, 5);
+    transform: translateY(-1px);
+  }
+}

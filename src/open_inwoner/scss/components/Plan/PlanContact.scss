@@ -1,0 +1,49 @@
+.plan-contact {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-medium);
+  margin-bottom: 56px;
+  color: var(--font-color-body);
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-body);
+
+  @media (min-width: 768px) {
+    grid-template-columns: 1fr 1fr 2fr;
+  }
+
+  .plan-contact__container {
+    color: var(--font-color-body);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body);
+  }
+
+  .plan-contact__title {
+    margin: 0;
+    font-weight: bold;
+  }
+
+  .plan-contact__info {
+    margin: 0;
+  }
+
+  .plan-contact__grid {
+    --card-columns: 1;
+    display: grid;
+    grid-template-columns: repeat(var(--card-columns), 1fr);
+    gap: var(--spacing-medium);
+
+    @for $i from 1 through 12 {
+      &--columns-#{$i} {
+        --card-columns: 1;
+
+        @media (min-width: 768px) {
+          --card-columns: #{$i};
+        }
+      }
+    }
+  }
+
+  .material-icons {
+    margin-bottom: var(--spacing-medium);
+  }
+}

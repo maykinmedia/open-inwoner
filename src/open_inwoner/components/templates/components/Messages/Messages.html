@@ -1,0 +1,51 @@
+{% load form_tags messages_tags %}
+
+<section class="messages">
+    <header class="messages__header">
+        <h4 class="h4">{{ subject }}</h4>
+        <p class="p p--muted">{{ status }}</p>
+    </header>
+
+
+    <div class="messages__body">
+        <ol class="messages__days">
+            {% for day in days %}
+                <li class="messages__day">
+                    <header class="messages__day-header">
+                        <h4 class="p p--muted">{{ day.text }}</h4>
+                    </header>
+
+                    <ol class="messages__list">
+                        {% for message in day.messages %}
+                            <li class="messages__list-item">
+                                {% if forloop.last and forloop.parentloop.last %}
+                                    <a id="messages-last"></a>
+                                {% endif %}
+
+                                {% if message.content %}
+                                    {% message message me=me %}
+                                {% endif %}
+
+                                {% if message.file %}
+                                    {% message message me=me file=True %}
+                                {% endif %}
+
+                            </li>
+                        {% endfor %}
+                    </ol>
+                </li>
+            {% endfor %}
+        </ol>
+
+        {% render_form id="message-form" form=form method="POST" enctype="multipart/form-data" %}
+            {% csrf_token %}
+            {% hidden form.receiver %}
+            <div class="group-input">
+                {% textarea form.content %}
+                {% input form.file icon="attach_file" no_label=True no_help=True extra_classes="message-file" %}
+            </div>
+            {% form_actions primary_text=_("Verzenden") primary_icon='arrow_forward' %}
+        {% endrender_form %}
+
+    </div>
+</section>

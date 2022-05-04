@@ -1,10 +1,7 @@
 from subprocess import CalledProcessError
-from unittest import skipIf
 from unittest.mock import mock_open, patch
 
-from django.conf import settings
 from django.test import TestCase
-from django.utils.module_loading import import_string
 
 from open_inwoner.conf.utils import get_current_version
 
@@ -27,7 +24,9 @@ class GitVersionTestCase(VersionTestCase):
     def setUp(self):
         super().setUp()
 
-        self.mocked_which.return_value = True # assume git is installed for this testcase
+        self.mocked_which.return_value = (
+            True  # assume git is installed for this testcase
+        )
 
     def tearDown(self):
         patch.stopall()
@@ -92,9 +91,7 @@ class FileVersionTestCase(VersionTestCase):
 
     @patch("builtins.open", new_callable=mock_open, read_data="commit-hash")
     def test_simple(self, mock_file):
-        self.mocked_listdir.return_value = (
-            "master", "main", "foo"
-        )
+        self.mocked_listdir.return_value = ("master", "main", "foo")
 
         self.assertEqual(get_current_version(), "commit-hash")
 
@@ -112,20 +109,3 @@ class FileVersionTestCase(VersionTestCase):
         self.mocked_listdir.return_value = ("foo", "bar", "foobar")
 
         self.assertEqual(get_current_version(), "")
-
-
-class BeatConfigTests(SimpleTestCase):
-    @skipIf(not hasattr(settings, "CELERY_BEAT_SCHEDULE")
-    def test_task_references_correct(self):
-        """
-        Assert that the task import paths in the Beat config are valid.
-        """
-        for entry in settings.CELERY_BEAT_SCHEDULE.values():
-            task = entry["task"]
-            with self.subTest(task=task):
-                try:
-                    import_string(task)
-                except ImportError:
-                    self.fail(
-                        f"Could not import task '{task}' in settings.CELERY_BEAT_SCHEDULE"
-                    )

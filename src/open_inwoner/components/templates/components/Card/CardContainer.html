@@ -1,0 +1,34 @@
+{% load card_tags helpers %}
+<div class="card-container{% if columns %} card-container--columns-{{columns}}{% endif %}{% if small %} card-container--small{% endif %}">
+    {% if categories %}
+        {% for category in categories %}
+            {% url 'pdc:category_detail' slug=category.slug as category_url %}
+            {% if category.icon %}
+                {% card src=category.icon.file.url alt=category.icon.name title=category.name href=category_url %}
+            {% else %}
+                {% card src=category.image.file.url alt=category.image.name title=category.name href=category_url %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    {% if subcategories %}
+        {% for subcategory in subcategories %}
+            {% category_card category=subcategory parent_category=parent_category %}
+        {% endfor %}
+    {% endif %}
+
+    {% if products %}
+        {% for product in products %}
+            {% get_product_url product as product_url %}
+            {% description_card title=product.name description=product.summary url=product_url %}
+        {% endfor %}
+    {% endif %}
+
+    {% if plans %}
+        {% for plan in plans %}
+            {% description_card title=plan.title description=plan.goal|truncatechars:51 url=plan.get_absolute_url elypsis=True object=plan %}
+        {% endfor %}
+    {% endif %}
+
+    {{ contents }}
+</div>

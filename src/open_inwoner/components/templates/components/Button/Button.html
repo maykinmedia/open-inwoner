@@ -1,0 +1,25 @@
+{% load helpers icon_tags %}
+
+{% if href %}
+    <a
+        class="{{ classes }}"
+        href="{{href}}"
+        title="{% firstof title text %}"
+        aria-describedby="{{ text }}"
+        {% if href|startswith:"http" %}target="_blank"{% endif %}
+    >
+        {% if icon %}{% icon icon=icon outlined=icon_outlined %}{% endif %}
+        {% if not hide_text %}{{text}}{% endif %}
+    </a>
+{% else %}
+    <button
+        class="{{ classes }}"
+        type="{{type}}"
+        name="{{ name }}"
+        title="{% firstof title text %}"
+        aria-describedby="{{ text }}"
+    >
+        {% if icon %}{% icon icon=icon outlined=icon_outlined %}{% endif %}
+        {% if not hide_text %}{{text}}{% endif %}
+    </button>
+{% endif %}

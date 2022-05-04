@@ -1,0 +1,36 @@
+{% load i18n link_tags %}
+
+<header class="accessibility-header">
+    <ul class="accessibility-header__list">
+        <li class="accessibility-header__list-item">
+            {% trans "Lees voor" as link_text %}
+            {% link href="#" icon="hearing" text=link_text extra_classes="accessibility--read" %}
+        </li>
+
+        <li class="accessibility-header__list-item">
+            {% trans "Vergroten" as link_text %}
+            {% trans "Verkleinen" as alt_link_text %}
+            {% link href="#" icon="zoom_in" text=link_text extra_classes="accessibility--enlarge-font" data_text=link_text data_alt_text=alt_link_text data_icon="zoom_in" data_alt_icon="zoom_out" %}
+        </li>
+
+        <li class="accessibility-header__list-item">
+            {% trans "Dyslexie" as link_text %}
+            {% trans "Normaal lettertype" as alt_link_text %}
+            {% link href="#" icon="font_download" text=link_text extra_classes="accessibility--change-font" data_text=link_text data_alt_text=alt_link_text %}
+        </li>
+
+        {% if help_text %}
+            <li class="accessibility-header__list-item">
+                {% trans "Help" as link_text %}
+                {% link href="#" icon="help_outline" text=link_text extra_classes="accessibility--modal" %}
+            </li>
+        {% endif %}
+
+        <li class="accessibility-header__list-item">
+            {% trans "Print pagina" as link_text %}
+            {% link href="#" icon="print" text=link_text extra_classes="accessibility--print" %}
+        </li>
+    </ul>
+    <div class="help-modal" data-help-title="{% trans 'Uitleg pagina' %}" data-help-text="{{ help_text }}" data-help-close="{% trans 'Sluiten' %}"></div>
+</header>
+

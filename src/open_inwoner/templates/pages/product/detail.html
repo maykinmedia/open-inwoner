@@ -1,0 +1,141 @@
+{% extends 'master.html' %}
+{% load i18n l10n button_tags card_tags file_tags grid_tags icon_tags link_tags map_tags notification_tags tag_tags utils condition_tags render_tags anchor_menu_tags %}
+
+{% block sidebar_content %}
+{% anchor_menu anchors=anchors desktop=True %}
+{% if product.link %}
+    <li class="anchor-menu__list-item">
+        {% button href=product.link size="big" text=_("Aanvraag starten") primary=True icon="arrow_forward" icon_position="before" %}
+    </li>
+{% endif %}
+{% endanchor_menu %}
+{% endblock sidebar_content %}
+
+{% block content %}
+    <h1 class="h1" id="title">
+        {{ object.name }}
+        {% if request.user.is_staff %}
+            {% button icon="edit" text=_("Bewerken in de Admin") hide_text=True href="admin:pdc_product_change" object_id=object.pk %}
+        {% endif %}
+    </h1>
+    {% tag tags=object.tags.all %}
+    <p class="p">{{ object.summary }}</p>
+    {{ object.content|ckeditor_content|safe }}
+    {% if object.files.exists %}
+        <hr class="divider">
+        {% file_list files=object.files.all title=_("Bestanden") %}
+    {% endif %}
+
+    {# Conditions #}
+    {% if object.conditions.exists %}
+        <hr class="divider">
+
+        {% render_grid %}
+            {% render_column span=6 compact=True %}
+                <h3 class="h3">{% trans "U komt in aanmerking" %}</h3>
+                {% condition_list conditions=object.conditions.all %}
+            {% endrender_column %}
+
+            {% render_column start=7 span=6 compact=True %}
+                <h3 class="h3">{% trans "U komt niet in aanmerking" %}</h3>
+                {% condition_list conditions=object.conditions.all negative=True %}
+            {% endrender_column %}
+        {% endrender_grid %}
+    {% endif %}
+
+    {# Locations #}
+    {% if object.locations.exists %}
+        <hr class="divider">
+
+        {% with centroid=object.locations.get_centroid %}
+            {% map centroid.lat centroid.lng id="locations" title=_('Locaties') geojson_feature_collection=object.locations.get_geojson_feature_collection %}
+        {% endwith %}
+
+        {% render_card_container columns=3 %}
+            {% for location in object.locations.all %}
+                {% render_card title=location.name %}
+                    <p class="p">{{ location.address_line_1 }}<br>{{ location.address_line_2 }}</p>
+                {% endrender_card %}
+            {% endfor %}
+        {% endrender_card_container %}
+    {% endif %}
+
+    <hr class="divider">
+
+    {% render_grid %}
+        {% render_column span=4 %}
+            {# Links. #}
+            {% if object.links.exists %}
+                <nav class="link-list">
+                    <h4 class="h4" id="links">{% trans "Links" %}</h4>
+                    <ul class="link-list__list">
+                        {% for link in object.links.all %}
+                            <li class="link-list__list-item">
+                                {% link href=link.url secondary=True text=link.name %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% endrender_column %}
+
+        {% render_column start=6 span=4 compact=True %}
+            {# Related products. #}
+            {% if object.related_products.exists %}
+                <nav class="link-list">
+                    <h4 class="h4" id="see">{% trans "Zie ook" %}</h4>
+                    <ul class="link-list__list">
+                        {% for related in object.related_products.all %}
+                            <li class="link-list__list-item">
+                                {% url 'pdc:product_detail' slug=related.slug as product_url %}
+                                {% link href=product_url text=related.name secondary=True %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </nav>
+            {% endif %}
+
+            {# Social links. #}
+            <nav class="social">
+                <h4 class="h4" id="share">{% trans "Delen" %}</h4>
+                {% link icon="facebook" href="#" extra_classes="social__link" text=_('Facebook') hide_text=True %}
+                {% link icon="twitter" href="#" extra_classes="social__link" text=_('Twitter') hide_text=True %}
+                {% link icon="whatsapp" href="#" extra_classes="social__link" text=_('Whatsapp') hide_text=True %}
+                {% link icon="linkedin" href="#" extra_classes="social__link" text=_('Linkedin') hide_text=True %}
+            </nav>
+        {% endrender_column %}
+
+
+        {% render_column span=9 %}
+            {% if object.contacts %}
+                {% render_notification type='success' icon=False %}
+                    <h4 class="h4" id="contact">{% trans 'Contact' %}</h4>
+
+                    {% for contact in object.contacts.all %}
+                        {% render_grid compact=True %}
+                            {% render_column span=12 %}
+                                <h4 class="h4">{{ contact.first_name }} {{ contact.last_name }}</h4>
+                            {% endrender_column %}
+
+                            {% render_column span=6 %}
+                                <span class="p">{{ contact.role|default:_('Telefoonnummer') }}</span>
+                            {% endrender_column %}
+
+                            {% render_column start=7 span=6 %}
+                                {% link href='tel:'|add:contact.phonenumber text=contact.phonenumber primary=True %}
+                            {% endrender_column %}
+
+                            {% render_column span=6 %}
+                                <p class="p">{{ contact.organization|default:_('E-mail')}}</p>
+                            {% endrender_column %}
+
+                            {% render_column start=7 span=6 %}
+                                {% link href='mailto:'|add:contact.email text=contact.email primary=True %}
+                            {% endrender_column %}
+                        {% endrender_grid %}
+                    {% endfor %}
+                {% endrender_notification %}
+            {% endif %}
+        {% endrender_column %}
+    {% endrender_grid %}
+{% endblock content %}

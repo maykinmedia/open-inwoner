@@ -1,0 +1,13 @@
+{% load l10n form_tags %}
+
+<label class="checkbox">
+    <input
+        class="checkbox__input"
+        type="checkbox"
+        name="{{ name }}"
+        value="{{ choice.0|unlocalize }}"
+        id="id_{{ name }}_{{ index }}"
+        {% if choice.0 in data %}checked="checked"{% endif %}
+    />
+    <label class="checkbox__label" for="id_{{ name }}_{{ index }}">{{ choice.1 }}</label>
+</label>

@@ -1,0 +1,141 @@
+.card {
+  --card-color-background: white;
+  --card-color-border: var(--color-mute);
+  --card-size-border: var(--border-width);
+  --card-size-dog-ear: var(--gutter-width);
+  --card-spacing: var(--spacing-large);
+
+  background-color: var(--card-color-background);
+  border: var(--card-size-border) solid var(--card-color-border);
+  border-radius: var(--border-radius);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  text-decoration: none;
+
+  &--inline {
+    display: inline-flex;
+  }
+
+  &--type-info {
+    --card-color-background: var(--color-info-lighter);
+    --card-color-border: transparent;
+    --card-spacing: var(--spacing-extra-large);
+    clip-path: polygon(
+      0% 0%,
+      calc(100% - var(--card-size-dog-ear)) 0%,
+      100% var(--card-size-dog-ear),
+      100% 100%,
+      0% 100%
+    );
+    max-width: 320px;
+  }
+
+  &--type-info:after {
+    background-color: var(--color-info);
+    border-radius: var(--border-radius);
+    //box-shadow: -2px 2px 1px 1px rgba(0, 0, 0, 0.1);
+    content: '';
+    height: var(--card-size-dog-ear);
+    position: absolute;
+    right: calc(-1 * var(--card-size-border));
+    top: calc(-1 * var(--card-size-border));
+    width: var(--card-size-dog-ear);
+  }
+
+  &--type-info .h1,
+  &--type-info .h2,
+  &--type-info .h3,
+  &--type-info .h4,
+  &--type-info .h5,
+  &--type-info .h5,
+  &--type-info .p {
+    color: var(--color-info-darker);
+  }
+
+  &--tinted {
+    --card-color-background: var(--color-gray-lightest);
+  }
+
+  &__img {
+    height: 100px;
+    object-fit: cover;
+    width: 100%;
+  }
+
+  &__body {
+    padding: var(--card-spacing);
+  }
+
+  &__body--direction-horizontal {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &__tabled {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0px 16px;
+    color: var(--font-color-body);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body);
+    line-height: var(--font-line-height-body);
+    margin-top: var(--spacing-extra-large);
+  }
+
+  .h4 {
+    margin: 0 0 var(--card-spacing);
+  }
+
+  .link:not(.logo):not(.link--secondary) {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  &--product {
+    padding: 20px;
+    align-items: end;
+
+    .h3 {
+      // padding: 0;
+      // text-align: left;
+      width: 100%;
+    }
+
+    .p {
+      width: 100%;
+    }
+  }
+
+  ///
+  /// Exceptions.
+  ///
+
+  /// Cards within cards should leave some space.
+  .card + .card {
+    margin-top: calc(0.5 * var(--gutter-width));
+  }
+
+  /// Form should not have padding within a card.
+  .form {
+    padding: 0;
+  }
+
+  /// Arrow button on product cards.
+  a.button:last-child {
+    float: right;
+  }
+
+  .link + .link {
+    margin-left: 0;
+  }
+}
+
+///
+/// Contextual.
+///
+
+.h2 + .card {
+  margin-top: var(--spacing-large);
+}

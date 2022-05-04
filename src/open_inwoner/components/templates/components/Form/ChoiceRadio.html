@@ -1,0 +1,14 @@
+{% load l10n form_tags %}
+
+<label class="radio">
+    {% initial_match as checked %}
+    <input
+        class="radio__input"
+        type="radio"
+        name="{{ name }}"
+        value="{{ choice.0|unlocalize }}"
+        id="id_{{ name }}_{{ index }}"
+        {% if choice.0 in data or checked %}checked="checked"{% endif %}
+    />
+    <label class="radio__label" for="id_{{ name }}_{{ index }}">{{ choice.1 }}</label>
+</label>

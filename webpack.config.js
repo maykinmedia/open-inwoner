@@ -1,7 +1,8 @@
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const argv = require('yargs').argv;
-const paths = require('./build/paths');
+const { styles } = require( '@ckeditor/ckeditor5-dev-utils' );
 
+const paths = require('./build/paths');
 
 // Set isProduction based on environment or argv.
 
@@ -21,6 +22,7 @@ module.exports = {
         [`${paths.package.name}-js`]: `${__dirname}/${paths.jsEntry}`,
 
         'admin_overrides': `${__dirname}/${paths.scssSrcDir}/admin/admin_overrides.scss`,
+        'pdf-p': `${__dirname}/${paths.scssSrcDir}/pdf/pdf_portrait.scss`,
     },
 
     // (Output) bundle locations.
@@ -39,16 +41,48 @@ module.exports = {
     // Modules
     module: {
         rules: [
+            // CKEditor
+            {
+                test: /ckeditor5-[^/\\]+[/\\]theme[/\\]icons[/\\][^/\\]+\.svg$/,
+                use: [ 'raw-loader' ]
+            },
+            {
+                test: /ckeditor5-[^/\\]+[/\\]theme[/\\].+\.css$/,
+                use: [
+                    {
+                        loader: 'style-loader',
+                        options: {
+                            injectType: 'singletonStyleTag',
+                            attributes: {
+                                'data-cke': true
+                            }
+                        }
+                    },
+                    'css-loader',
+                    {
+                        loader: 'postcss-loader',
+                        options: {
+                            postcssOptions: styles.getPostCssConfig( {
+                                themeImporter: {
+                                    themePath: require.resolve( '@ckeditor/ckeditor5-theme-lark' )
+                                },
+                                minify: true
+                            } )
+                        }
+                    }
+                ]
+            },
+
             // .js
             {
-                test: /.js?$/,
+                test: /src\/.*.js?$/,
                 exclude: /node_modules/,
                 loader: 'babel-loader',
             },
 
             // .scss
             {
-                test: /\.(sa|sc|c)ss$/,
+                test: /src\/.*.(sa|sc|c)ss$/,
                 use: [
                     // Writes css files.
                     MiniCssExtractPlugin.loader,

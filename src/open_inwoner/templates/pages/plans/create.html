@@ -1,0 +1,57 @@
+{% extends 'master.html' %}
+{% load i18n button_tags card_tags map_tags form_tags grid_tags icon_tags %}
+
+{% block content %}
+    <h1 class="h1">{% trans "Samenwerken" %}</h1>
+    <p class="p">
+        {% trans "Hier werkt u samen met uw contactpersonen aan uw doelen." %}
+    </p>
+
+    {% render_form id="plan-form" form=form method="POST" %}
+        {% csrf_token %}
+        {% input form.title %}
+        {% render_grid %}
+            {% checkboxes form.contacts %}
+            {% date_field form.end_date %}
+        {% endrender_grid %}
+
+        <div class="">
+            <div class="plan-template">
+                <div class="plan-template__header">
+                    <div>{% trans "Templates" %}</div>
+                    <div>{% trans "Omschrijving" %}</div>
+                    <div></div>
+                </div>
+                <label class="plan-template__row radio">
+                    <div>
+                        <input class="radio__input" type="radio" name="template" value="" id="id_template_0">
+                        <label class="radio__label" for="id_template_0">Geen template</label>
+                    </div>
+                    <div></div>
+                    <div></div>
+                </label>
+                {% for plan_template in form.template.field.queryset %}
+                    <label class="plan-template__row radio">
+                        <div>
+                            <input class="radio__input" type="radio" name="template" value="{{ plan_template.id }}" id="id_template_{{ plan_template.id }}">
+                            <label class="radio__label" for="id_template_{{ plan_template.id }}">{{ plan_template.name }}</label>
+                        </div>
+                        <div>
+                            {{ plan_template.goal|truncatewords:8 }}
+                        </div>
+                        <div class="plan-template__icon">
+                            <div class="show-preview" data-close="{% trans "Sluiten" %}" data-title="{{ plan_template.name }}" data-text="{{ plan_template.string_preview }}">
+                                {% icon icon="visibility" outlined=True %}
+                            </div>
+                        </div>
+                    </label>
+                {% endfor %}
+            </div>
+
+            {% if form.template.errors %}
+                {% errors errors=form.template.errors %}
+            {% endif %}
+        </div>
+        {% form_actions primary_text=_("Verzenden") primary_icon="arrow_forward" %}
+    {% endrender_form %}
+{% endblock %}

@@ -1,0 +1,19 @@
+.flatpickr-calendar {
+  font-family: var(--font-family-body);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--color-mute);
+}
+
+.flatpickr-weekwrapper span.flatpickr-day,
+.flatpickr-weekwrapper span.flatpickr-day:hover {
+  color: var(--color-mute);
+}
+
+.flatpickr-calendar.arrowTop:before,
+.flatpickr-calendar.arrowTop:after {
+  border-color: transparent;
+}
+
+.flatpickr-clear {
+  @extend .button;
+}

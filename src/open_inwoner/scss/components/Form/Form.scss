@@ -1,0 +1,135 @@
+.form {
+  box-sizing: border-box;
+  display: grid;
+  grid-gap: var(--gutter-width);
+  padding: var(--gutter-width) 0;
+
+  &--compact {
+    grid-gap: 0;
+  }
+
+  &--horizontal {
+    .form__control > .label {
+      flex-direction: row;
+      align-items: center;
+      white-space: nowrap;
+    }
+  }
+
+  /// Columns.
+
+  @media (min-width: 768px) {
+    @for $i from 1 through 12 {
+      &--columns-#{$i} {
+        grid-template-columns: repeat($i, 1fr);
+      }
+
+      &--columns-#{$i} &__actions {
+        grid-column-start: 1;
+        grid-column-end: $i + 1;
+      }
+
+      &--columns-#{$i} .notifications {
+        grid-column-end: span $i;
+      }
+    }
+  }
+
+  /// Errors.
+
+  > .notifications {
+    padding: 0;
+    position: static;
+  }
+
+  > .notifications .notification {
+    margin: 0;
+  }
+
+  /// Control.
+
+  &__control > .label {
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-medium);
+  }
+
+  &__control > .label .p:last-child {
+    //color: var(--color-mute);
+    font-size: var(--font-size-body-small);
+  }
+
+  &__control > .label *:not(.button) {
+    width: 100%;
+  }
+
+  &__grid-box {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 18px;
+  }
+
+  &__stack {
+    display: flex;
+    flex-direction: column;
+    grid-gap: 18px;
+  }
+
+  /// Actions.
+  &__actions {
+    display: grid;
+    grid-template-areas: 'secondary spacing primary';
+    grid-template-columns: auto 1fr auto;
+    grid-gap: var(--gutter-width);
+    margin-top: 28px;
+
+    &--single {
+      grid-gap: 0;
+      margin-top: 0;
+    }
+  }
+
+  &__actions .button--secondary:last-child {
+    grid-area: secondary;
+  }
+
+  &__actions > * {
+    grid-area: secondary;
+  }
+
+  &__actions > *:last-child {
+    grid-area: primary;
+  }
+
+  &--inline {
+    grid-template-columns: 1fr auto;
+    align-items: start;
+
+    .form__actions {
+      grid-column-start: auto;
+      grid-column-end: auto;
+      padding: 0;
+      grid-gap: 0;
+      margin: 0;
+    }
+  }
+
+  &--spaceless {
+    padding: 0;
+    grid-gap: var(--spacing-small);
+  }
+
+  &__control {
+    position: relative;
+
+    *[class*='icon'],
+    *[class*='Icon'] {
+      width: auto !important;
+      position: absolute;
+      right: 5px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+  }
+}

@@ -10,27 +10,22 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "username", help="Specifies the username for the superuser.",
-        )
-        parser.add_argument(
-            "email", help="Specifies the email for the superuser.",
+            "email",
+            help="Specifies the email for the superuser.",
         )
 
     def handle(self, *args, **options):
         User = get_user_model()
-        username = options["username"]
         email = options["email"]
 
-        if User.objects.filter(username=username).exists():
+        if User.objects.filter(email=email).exists():
             self.stdout.write(
                 self.style.WARNING("Initial superuser already exists, doing nothing")
             )
             return
 
         password = User.objects.make_random_password(length=20)
-        user = User.objects.create_superuser(
-            username=username, email=email, password=password
-        )
+        User.objects.create_superuser(email=email, password=password)
 
         try:
             link = f'{settings.ALLOWED_HOSTS[0]}{reverse("admin:index")}'
@@ -41,7 +36,7 @@ class Command(BaseCommand):
 
         send_mail(
             f"Credentials for {settings.PROJECT_NAME} ({link})",
-            f"Credentials for project: {settings.PROJECT_NAME}\n\nUsername: {username}\nPassword: {password}",
+            f"Credentials for project: {settings.PROJECT_NAME}\n\nEmail: {email}\nPassword: {password}",
             settings.DEFAULT_FROM_EMAIL,
             [email],
             fail_silently=False,

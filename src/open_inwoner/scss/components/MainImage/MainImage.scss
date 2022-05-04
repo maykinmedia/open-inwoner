@@ -1,0 +1,21 @@
+$image-height: 261px;
+
+.main-image {
+  object-fit: cover;
+  width: 100%;
+  aspect-ratio: 64 / 32;
+
+  @supports not (aspect-ratio: auto) {
+    height: $image-height;
+  }
+
+  @media (min-width: 768px) {
+    aspect-ratio: 64 / 13;
+    position: relative;
+    top: calc(-1 * var(--row-height));
+  }
+
+  &.main-image--start-after ~ .container {
+    margin-top: 0;
+  }
+}

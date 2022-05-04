@@ -1,0 +1,30 @@
+{% extends 'master.html' %}
+{% load i18n form_tags grid_tags %}
+
+
+{% block content %}
+<h1 class="h1">
+    {% if object.pk %}
+        {% trans "Wijzig actie" %}
+    {% else %}
+        {% trans "Creeer actie" %}
+    {% endif %}
+</h1>
+
+{% render_form id="action-create" form=form method="POST" enctype="multipart/form-data" %}
+    {% csrf_token %}
+    {% input form.name no_help=True %}
+    {% input form.description no_help=True %}
+    {% render_grid %}
+        {% input form.status no_help=True %}
+        {% date_field form.end_date no_help=True %}
+    {% endrender_grid %}
+    {% render_grid %}
+        {% input form.is_for no_help=True %}
+        {% input form.file no_help=True %}
+    {% endrender_grid %}
+    {% input form.goal no_help=True %}
+
+    {% form_actions primary_text=_("Actie opslaan") %}
+{% endrender_form %}
+{% endblock content %}

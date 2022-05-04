@@ -1,0 +1,41 @@
+{% load form_tags link_tags notification_tags %}
+{# Shared between Form and RenderForm. #}
+<form
+    class="{{ classes }}"
+    method="{{ method }}"
+    action="{% firstof form_action request.path %}"
+    {% if enctype %}enctype="{{enctype}}"{% endif %}
+    {% if id %}id="{{id}}"{% endif %}
+    {% if data_confirm_title %}data-confirm-title="{{ data_confirm_title }}"{% endif %}
+    {% if data_confirm_cancel %}data-confirm-cancel="{{ data_confirm_cancel }}"{% endif %}
+    {% if data_confirm_default %}data-confirm-default="{{ data_confirm_default }}"{% endif %}
+>
+    {% if form.non_field_errors %}
+        {% errors errors=form.non_field_errors %}
+    {% endif %}
+
+    {% if show_notifications %}
+        {% notifications messages icon=False %}
+    {% endif %}
+
+    {% if auto_render %}
+        {% if method != "GET" %}
+            {% csrf_token %}
+        {% endif %}
+        {% for field in form.fields %}
+            {% autorender_field form field %}
+        {% endfor %}
+    {% endif %}
+
+    {{ contents }}
+
+    {% if auto_render and not no_actions %}
+        {% if secondary_href %}
+            {% form_actions primary_icon='arrow_forward' primary_text=submit_text secondary_href=secondary_href secondary_text=secondary_text secondary_icon=secondary_icon secondary_icon_position=secondary_icon_position secondary=secondary %}
+        {% elif secondary_name %}
+            {% form_actions primary_icon='arrow_forward' primary_text=submit_text secondary_name=secondary_name secondary_text=secondary_text secondary_icon=secondary_icon secondary_icon_position=secondary_icon_position secondary=secondary %}
+        {% else %}
+            {% form_actions primary_icon='arrow_forward' primary_text=submit_text %}
+        {% endif %}
+    {% endif %}
+</form>

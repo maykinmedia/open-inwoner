@@ -1,0 +1,31 @@
+{% extends 'pages/home.html' %}
+{% load i18n button_tags card_tags utils map_tags icon_tags questionnaire_tags %}
+
+{% block header_image %}{% endblock header_image %}
+
+{% block user_content %}
+    <h1 class="h1">{{ configurable_text.home_page.home_welcome_title }} {{ request.user.get_full_name }}</h1>
+    <p class="p">{{ configurable_text.home_page.home_welcome_intro|linebreaksbr }}</p>
+
+    <h2 class="h2 h2--extra">
+        Samenwerken
+        {% button href="plans:plan_list" text=_("Naar samenwerken") icon="arrow_forward" icon_position="after" %}
+    </h2>
+
+    {% if plans %}
+    <div class="card-container card-container--columns-3">
+        {% for plan in plans %}
+            {% render_card %}
+                <h3 class="h3">{{ plan.title }}</h3>
+                <p class="p">{{ plan.goal|truncatewords:20 }}</p>
+                <a class="button button--icon-before button--transparent button--secondary"
+                   href="{{ plan.get_absolute_url }}">
+                    {% icon icon="arrow_forward" %}
+                </a>
+            {% endrender_card %}
+        {% endfor %}
+    </div>
+    {% else %}
+        <p class="p">{% trans "U heeft nog geen plan gemaakt." %}</p>
+    {% endif %}
+{% endblock user_content %}

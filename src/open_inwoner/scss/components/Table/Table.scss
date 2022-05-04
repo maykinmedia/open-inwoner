@@ -1,0 +1,127 @@
+.table {
+  margin-top: var(--row-height);
+  width: 100%;
+  font-family: var(--font-family-body);
+  border-collapse: collapse;
+  border-spacing: 0;
+
+  &--space-medium {
+    margin-top: var(--spacing-medium);
+  }
+
+  &--light {
+    .table__header {
+      color: var(--color-gray-lighter);
+      font-weight: normal;
+    }
+  }
+
+  &--spacious {
+    .table__item {
+      padding: var(--spacing-large) var(--spacing-medium);
+    }
+  }
+
+  &--vertical {
+    .table__item {
+      border-bottom: 0;
+      border-left: 1px solid var(--color-gray-light);
+    }
+
+    .table__header {
+      border-bottom: 0;
+    }
+  }
+
+  &--content {
+    margin-top: var(--spacing-giant);
+    margin-bottom: var(--spacing-giant);
+
+    .table__item {
+      border-right: 1px solid var(--color-gray-light);
+    }
+
+    .table__item:first-of-type {
+      font-weight: bold;
+      padding-left: 0;
+    }
+
+    .table__item:not(:first-of-type) {
+      text-align: right;
+      padding-right: var(--spacing-giant);
+    }
+
+    .table__header:first-of-type {
+      padding-left: 0;
+    }
+
+    .table__header:not(:first-of-type) {
+      text-align: right;
+      padding-right: var(--spacing-giant);
+    }
+  }
+
+  &__heading {
+    .table__item {
+      color: var(--color-gray-lighter);
+      font-size: 16px;
+      letter-spacing: 0;
+      line-height: 24px;
+    }
+  }
+
+  &__item {
+    padding: var(--spacing-medium);
+    border-bottom: 1px solid;
+    border-bottom-color: var(--color-gray-light);
+
+    &--borderless {
+      border: 0;
+      padding: var(--spacing-medium);
+    }
+
+    &--right {
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    &--color-gray-dark {
+      color: var(--color-gray-dark);
+    }
+
+    &--no-lb {
+      white-space: nowrap;
+    }
+  }
+
+  &__header {
+    padding: var(--spacing-medium);
+    text-align: left;
+    border-bottom: 1px solid;
+    border-bottom-color: var(--color-gray-light);
+  }
+
+  &__explain {
+    color: var(--color-gray-lighter);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body);
+
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &__explain-icons {
+    display: flex;
+    gap: var(--spacing-medium);
+
+    .button {
+      height: auto;
+    }
+
+    *[class*='icon'],
+    *[class*='Icon'] {
+      color: var(--color-gray-lighter);
+      font-size: var(--font-size-body);
+    }
+  }
+}

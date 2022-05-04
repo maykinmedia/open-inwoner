@@ -1,0 +1,99 @@
+///
+/// Primary navigation.
+///
+
+.primary-navigation {
+  $hm: max(calc((100vw - var(--container-width)) / 2), var(--spacing-large));
+  box-sizing: border-box;
+  position: relative;
+
+  /// Top list.
+
+  & > &__list {
+    grid-area: nav;
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    overflow-x: auto;
+
+    @media (min-width: 768px) {
+      flex-direction: row;
+    }
+  }
+
+  & > &__list > &__list-item {
+    box-sizing: border-box;
+    display: flex;
+    align-items: start;
+    justify-content: center;
+    flex-direction: column;
+    min-height: var(--row-height);
+    padding: 0;
+    white-space: nowrap;
+
+    > .material-icons {
+      display: none;
+
+      @media (min-width: 768px) {
+        display: block;
+      }
+    }
+
+    @media (min-width: 768px) {
+      align-items: center;
+      flex-direction: row;
+      height: var(--row-height);
+      padding: 0 var(--spacing-large);
+
+      &:first-child {
+        padding-left: 0;
+      }
+
+      &:last-child {
+        padding-right: 0;
+      }
+    }
+  }
+
+  /// Nested list.
+
+  & > &__list > &__list-item > &__list {
+    box-sizing: border-box;
+    margin: 0;
+    width: 100%;
+    z-index: 100;
+    padding-bottom: var(--spacing-medium);
+
+    @media (min-width: 768px) {
+      list-style: none;
+      background-color: var(--color-accent);
+      transform: scaleY(0);
+      left: 0;
+      top: 100%;
+      position: absolute;
+      padding: var(--spacing-large)
+        max(calc((100vw - var(--container-width)) / 2), var(--spacing-large));
+      column-count: 4;
+    }
+
+    .link {
+      @media (min-width: 768px) {
+        color: var(--color-font-accent);
+      }
+    }
+  }
+
+  & > &__list > &__list-item > &__list > &__list-item {
+    line-height: var(--row-height);
+  }
+
+  /// Interaction.
+
+  & > &__list > &__list-item:focus &__list,
+  & > &__list > &__list-item:focus-within &__list,
+  & > &__list > &__list-item:hover &__list {
+    transform: scaleY(1);
+  }
+}
