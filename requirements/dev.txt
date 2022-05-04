@@ -96,7 +96,7 @@ defusedxml==0.7.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-    #   digid-eherkenning
+    #   django-digid-eherkenning
     #   odfpy
     #   python3-openid
 diff-match-patch==20200713
@@ -104,10 +104,6 @@ diff-match-patch==20200713
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-import-export
-digid_eherkenning @ git+https://bitbucket.org/maykinmedia/django-digid-eherkenning.git@02ac61c42f6dd2f229ba9f0f687fa1a4160511be
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
 dj-rest-auth==2.1.11
     # via
     #   -c requirements/ci.txt
@@ -117,7 +113,6 @@ django==3.2.12
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   ddt-api-calls
-    #   digid-eherkenning
     #   dj-rest-auth
     #   django-allauth
     #   django-appconf
@@ -125,6 +120,7 @@ django==3.2.12
     #   django-choices
     #   django-cors-headers
     #   django-debug-toolbar
+    #   django-digid-eherkenning
     #   django-extensions
     #   django-extra-fields
     #   django-filer
@@ -182,7 +178,7 @@ django-choices==1.7.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-    #   digid-eherkenning
+    #   django-digid-eherkenning
     #   mail-editor
     #   zgw-consumers
 django-ckeditor==6.2.0
@@ -200,6 +196,10 @@ django-cors-headers==3.10.0
     #   -r requirements/ci.txt
 django-debug-toolbar==3.2.2
     # via -r requirements/dev.in
+django-digid-eherkenning==0.3.1
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 django-elasticsearch-dsl==7.2.1
     # via
     #   -c requirements/ci.txt
@@ -404,6 +404,7 @@ furl==2.1.3
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   django-digid-eherkenning
 gemma-zds-client==1.0.1
     # via
     #   -c requirements/ci.txt
@@ -475,6 +476,7 @@ lxml==4.6.3
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   django-digid-eherkenning
     #   pyquery
     #   python3-saml
     #   xmlsec

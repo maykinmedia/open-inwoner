@@ -76,7 +76,7 @@ defusedxml==0.7.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-    #   digid-eherkenning
+    #   django-digid-eherkenning
     #   odfpy
     #   python3-openid
 diff-match-patch==20200713
@@ -84,10 +84,6 @@ diff-match-patch==20200713
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-import-export
-digid_eherkenning @ git+https://bitbucket.org/maykinmedia/django-digid-eherkenning.git@02ac61c42f6dd2f229ba9f0f687fa1a4160511be
-    # via
-    #   -c requirements/base.txt
-    #   -r requirements/base.txt
 dj-rest-auth==2.1.11
     # via
     #   -c requirements/base.txt
@@ -96,13 +92,13 @@ django==3.2.12
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-    #   digid-eherkenning
     #   dj-rest-auth
     #   django-allauth
     #   django-appconf
     #   django-axes
     #   django-choices
     #   django-cors-headers
+    #   django-digid-eherkenning
     #   django-extra-fields
     #   django-filer
     #   django-filter
@@ -159,7 +155,7 @@ django-choices==1.7.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-    #   digid-eherkenning
+    #   django-digid-eherkenning
     #   mail-editor
     #   zgw-consumers
 django-ckeditor==6.2.0
@@ -172,6 +168,10 @@ django-colorfield==0.4.5
     #   -c requirements/base.txt
     #   -r requirements/base.txt
 django-cors-headers==3.10.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+django-digid-eherkenning==0.3.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -365,6 +365,7 @@ furl==2.1.3
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   django-digid-eherkenning
 gemma-zds-client==1.0.1
     # via
     #   -c requirements/base.txt
@@ -425,6 +426,7 @@ lxml==4.6.3
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   django-digid-eherkenning
     #   pyquery
     #   python3-saml
     #   xmlsec
