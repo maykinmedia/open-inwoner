@@ -175,3 +175,5 @@ class ActionPrivateMediaView(LogMixin, LoginRequiredMixin, PrivateMediaView):
         ]:
             self.log_user_action(action, _("file was downloaded"))
             return True
+
+        return False
