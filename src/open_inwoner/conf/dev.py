@@ -24,7 +24,7 @@ from .base import *  # noqa isort:skip
 #
 # Standard Django settings.
 #
-SESSION_ENGINE = "open_inwoner.session.backends.cached_db"
+SESSION_ENGINE = "extended_admin_session.backends.cached_db"
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 # This is commented out because it causes tests in the CI to fail. It can be enabled in the local.py settings.

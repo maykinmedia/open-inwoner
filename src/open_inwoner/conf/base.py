@@ -359,7 +359,7 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 SESSION_COOKIE_NAME = "open_inwoner_sessionid"
-SESSION_ENGINE = "open_inwoner.session.backends.cache"
+SESSION_ENGINE = "extended_admin_session.backends.cache"
 EXTENDED_ADMIN_SESSION_ON_STAFF_USER = True
 EXTENDED_ADMIN_SESSION_COOKIE_AGE = 86400
 EXTENDED_ADMIN_SESSION_WARN_DELTA = 60  # Warn 1 minute before end of session.
