@@ -1,5 +1,6 @@
 from django.core import mail
 from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _
 
 from django_webtest import WebTest
 from furl import furl
@@ -46,7 +47,8 @@ class ContactViewTests(WebTest):
 
     def test_contact_filter(self):
         begeleider = ContactFactory(
-            type=ContactTypeChoices.begeleider, created_by=self.user
+            contact_user__contact_type=ContactTypeChoices.begeleider,
+            created_by=self.user,
         )
         response = self.app.get(self.list_url, user=self.user)
         self.assertEqual(response.status_code, 200)
@@ -59,6 +61,40 @@ class ContactViewTests(WebTest):
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, self.contact.first_name)
         self.assertContains(response, begeleider.first_name)
+
+    def test_contact_filter_when_no_user_is_connected(self):
+        contact = ContactFactory(created_by=self.user, email=None, contact_user=None)
+        begeleider = ContactFactory(
+            contact_user__contact_type=ContactTypeChoices.begeleider,
+            created_by=self.user,
+        )
+        response = self.app.get(self.list_url, user=self.user)
+        self.assertContains(response, self.contact.first_name)
+        self.assertContains(response, contact.first_name)
+
+        form = response.forms["contact-filter"]
+        form["type"] = ContactTypeChoices.contact
+        response = form.submit()
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.contact.first_name)
+        self.assertContains(response, contact.first_name)
+        self.assertNotContains(response, begeleider.first_name)
+
+    def test_contact_filter_without_any_contacts(self):
+        self.contact.delete()
+        response = self.app.get(self.list_url, user=self.user)
+        self.assertNotContains(response, self.contact.first_name)
+
+        form = response.forms["contact-filter"]
+        form["type"] = ContactTypeChoices.contact
+        response = form.submit()
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response,
+            _(
+                "Er zijn geen contacten gevonden met deze filter, of u heeft nog geen contacten."
+            ),
+        )
 
     def test_contact_list_show_link_to_messages(self):
         message_link = (

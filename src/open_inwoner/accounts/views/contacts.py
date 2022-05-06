@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q
 from django.http.response import HttpResponseRedirect
 from django.urls.base import reverse, reverse_lazy
 from django.utils.functional import cached_property
@@ -9,6 +10,7 @@ from django.views.generic.edit import DeleteView, UpdateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin
 
+from ..choices import ContactTypeChoices
 from ..forms import ContactFilterForm, ContactForm
 from ..models import Contact, Invite
 
@@ -28,9 +30,15 @@ class ContactListView(LoginRequiredMixin, BaseBreadcrumbMixin, ListView):
     def get_queryset(self):
         base_qs = super().get_queryset()
         base_qs = base_qs.get_extended_contacts_for_user(me=self.request.user)
-        if self.request.GET.get("type"):
-            base_qs = base_qs.filter(type=self.request.GET.get("type"))
-
+        type_filter = self.request.GET.get("type")
+        if type_filter:
+            if type_filter == ContactTypeChoices.contact:
+                base_qs = base_qs.filter(
+                    Q(contact_user__contact_type=type_filter)
+                    | Q(contact_user__isnull=True)
+                )
+            else:
+                base_qs = base_qs.filter(contact_user__contact_type=type_filter)
         return base_qs
 
     def get_context_data(self, **kwargs):

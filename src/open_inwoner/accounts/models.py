@@ -46,6 +46,13 @@ class User(AbstractBaseUser, PermissionsMixin):
             "Unselect this instead of deleting accounts."
         ),
     )
+    contact_type = models.CharField(
+        verbose_name=_("Contact type"),
+        default=ContactTypeChoices.contact,
+        max_length=200,
+        choices=ContactTypeChoices.choices,
+        help_text=_("The type of contact"),
+    )
     date_joined = models.DateTimeField(
         verbose_name=_("Date joined"), default=timezone.now
     )
@@ -198,13 +205,6 @@ class Contact(models.Model):
             "The phonenumber of the contact person. This field can be left empty."
         ),
     )
-    type = models.CharField(
-        verbose_name=_("Type"),
-        default=ContactTypeChoices.contact,
-        max_length=200,
-        choices=ContactTypeChoices.choices,
-        help_text=_("The type of contact"),
-    )
     created_on = models.DateTimeField(
         verbose_name=_("Created on"),
         auto_now_add=True,
@@ -255,6 +255,13 @@ class Contact(models.Model):
     def __str__(self):
         return self.get_name()
 
+    @property
+    def _type(self):
+        if self.contact_user:
+            return self.contact_user.contact_type
+
+        return ContactTypeChoices.contact
+
     def get_update_url(self):
         return reverse("accounts:contact_edit", kwargs={"uuid": self.uuid})
 
@@ -273,6 +280,13 @@ class Contact(models.Model):
 
     def get_created_by_name(self):
         return f"{self.created_by.first_name} {self.created_by.last_name}"
+
+    def get_type_display(self):
+        if self.contact_user:
+            return self.contact_user.get_contact_type_display()
+
+        choice = ContactTypeChoices.get_choice(ContactTypeChoices.contact)
+        return choice.label
 
 
 class Document(models.Model):
