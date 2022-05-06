@@ -8,6 +8,7 @@ from timeline_logger.models import TimelineLog
 
 from open_inwoner.accounts.models import Contact
 from open_inwoner.accounts.tests.factories import ContactFactory, UserFactory
+from open_inwoner.utils.logentry import LOG_ACTIONS
 
 from ..admin import CustomTimelineLogAdmin
 from ..logentry import LOG_ACTIONS
@@ -185,7 +186,6 @@ class TestTimelineLogExport(WebTest):
     @freeze_time("2021-10-18 13:00:00")
     def test_proper_data_is_exported(self):
         user = UserFactory(is_superuser=True, is_staff=True)
-        log_entry = TimelineLog.objects.create(content_object=user, user=user)
         form = self.app.get(
             reverse("admin:timeline_logger_timelinelog_export"), user=user
         ).forms[0]
@@ -193,23 +193,13 @@ class TestTimelineLogExport(WebTest):
         # csv format chosen
         form["file_format"] = "0"
         response = form.submit()
-        exported_data = response.content.decode("utf-8").replace("\r\n", "").split(",")
+        exported_data = response.content.decode("utf-8").splitlines()
+        log_entry = TimelineLog.objects.first()
 
         self.assertEqual(
             exported_data,
             [
-                "extra_data",
-                "id",
-                "content_type",
-                "object_id",
-                "timestamp",
-                "user",
-                "template",
-                str(log_entry.id),
-                str(log_entry.content_type_id),
-                str(user.id),
-                "2021-10-18 15:00:00",
-                str(user.id),
-                "timeline_logger/default.txt",
+                "extra_data,id,content_type,object_id,timestamp,user,template",
+                f'"{log_entry.extra_data}",{log_entry.id},{log_entry.content_type_id},{log_entry.user.id},2021-10-18 15:00:00,{user.id},timeline_logger/default.txt',
             ],
         )

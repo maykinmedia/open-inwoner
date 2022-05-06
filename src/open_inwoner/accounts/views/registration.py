@@ -1,15 +1,19 @@
 from typing import Optional
 from urllib.parse import unquote
 
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
+from django.utils.translation import gettext as _
 
 from django_registration.backends.one_step.views import RegistrationView
+
+from open_inwoner.utils.views import LogMixin
 
 from ..forms import CustomRegistrationForm
 from ..models import Invite, User
 
 
-class CustomRegistrationView(RegistrationView):
+class CustomRegistrationView(LogMixin, RegistrationView):
     form_class = CustomRegistrationForm
 
     def get_form_kwargs(self):
@@ -55,3 +59,10 @@ class CustomRegistrationView(RegistrationView):
             return
 
         return User.objects.filter(email=email).first()
+
+    def form_valid(self, form):
+        object = form.save()
+
+        self.request.user = object
+        self.log_user_action(object, _("user was created"))
+        return HttpResponseRedirect(self.get_success_url())

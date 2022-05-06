@@ -36,7 +36,7 @@
                 {% url 'questionnaire:reset' as form_action %}
             {% endif %}
 
-            {% render_form form_action=form_action auto_render=True autosubmit=True extra_classes='form--compact' form=form method='POST' submit_text=submit_text secondary_href=secondary_href secondary_icon='arrow_backward' secondary_icon_position='before' secondary_text=_('Vorige') %}
+            {% render_form id="questionnaire_step" form_action=form_action auto_render=True autosubmit=True extra_classes='form--compact' form=form method='POST' submit_text=submit_text secondary_href=secondary_href secondary_icon='arrow_backward' secondary_icon_position='before' secondary_text=_('Vorige') %}
                 {% csrf_token %}
 
                 {% if form.instance.content %}
