@@ -28,6 +28,7 @@ class _UserAdmin(UserAdmin):
                 "fields": (
                     "first_name",
                     "last_name",
+                    "contact_type",
                     "bsn",
                     "rsin",
                     "birthday",
@@ -66,7 +67,14 @@ class _UserAdmin(UserAdmin):
         ),
     )
     readonly_fields = ("bsn", "rsin", "is_prepopulated")
-    list_display = ("email", "first_name", "last_name", "is_staff", "is_active")
+    list_display = (
+        "email",
+        "first_name",
+        "last_name",
+        "is_staff",
+        "is_active",
+        "contact_type",
+    )
     search_fields = ("first_name", "last_name", "email")
     ordering = ("email",)
 

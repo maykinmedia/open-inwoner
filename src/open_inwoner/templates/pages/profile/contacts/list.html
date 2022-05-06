@@ -46,6 +46,10 @@
                     {% enddropdown %}
                 </td>
             </tr>
+        {% empty %}
+            <tr>
+                <td class="table__item" colspan="7" >{% trans "Er zijn geen contacten gevonden met deze filter, of u heeft nog geen contacten." %}</td>
+            </tr>
         {% endfor %}
     </tbody>
 </table>

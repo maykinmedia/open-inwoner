@@ -41,7 +41,7 @@ class MyProfileView(LoginRequiredMixin, BaseBreadcrumbMixin, FormView):
             ("#files", _("Bestanden")),
         ]
         context["mentor_contacts"] = self.request.user.contacts.filter(
-            type=ContactTypeChoices.begeleider
+            contact_user__contact_type=ContactTypeChoices.begeleider
         )
         context["next_action"] = (
             Action.objects.connected(self.request.user)
