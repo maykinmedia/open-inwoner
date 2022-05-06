@@ -12,6 +12,7 @@ from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.accounts.models import Document
 from open_inwoner.utils.mixins import ExportMixin
+from open_inwoner.utils.views import LogMixin
 
 from .forms import QuestionnaireStepForm
 from .models import QuestionnaireStep
@@ -74,7 +75,7 @@ class QuestionnaireStepView(BaseBreadcrumbMixin, FormView):
         return HttpResponseRedirect(redirect_to=questionnaire_step.get_absolute_url())
 
 
-class QuestionnaireExportView(ExportMixin, TemplateView):
+class QuestionnaireExportView(LogMixin, ExportMixin, TemplateView):
     template_name = "export/questionnaire/questionnaire_export.html"
 
     def get_filename(self):

@@ -1,9 +1,12 @@
+from django.utils.translation import gettext as _
+
 from privates.views import PrivateMediaView
 
 from open_inwoner.accounts.models import Document
+from open_inwoner.utils.views import LogMixin
 
 
-class DocumentPrivateMediaView(PrivateMediaView):
+class DocumentPrivateMediaView(LogMixin, PrivateMediaView):
     model = Document
     slug_field = "uuid"
     slug_url_kwarg = "uuid"
@@ -18,6 +21,7 @@ class DocumentPrivateMediaView(PrivateMediaView):
             return False  # If user is not authenticated, the file is not visible
 
         if self.request.user == object.owner or self.request.user.is_superuser:
+            self.log_user_action(object, _("file was downloaded"))
             return True
 
         return False

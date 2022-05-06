@@ -14,6 +14,7 @@ from furl import furl
 from privates.views import PrivateMediaView
 
 from open_inwoner.utils.mixins import PaginationMixin
+from open_inwoner.utils.views import LogMixin
 
 from ..forms import InboxForm
 from ..models import Document, Message, User
@@ -22,7 +23,7 @@ from ..query import MessageQuerySet
 logger = logging.getLogger(__name__)
 
 
-class InboxView(LoginRequiredMixin, PaginationMixin, FormView):
+class InboxView(LogMixin, LoginRequiredMixin, PaginationMixin, FormView):
     template_name = "accounts/inbox.html"
     form_class = InboxForm
     paginate_by = 10
@@ -124,10 +125,12 @@ class InboxView(LoginRequiredMixin, PaginationMixin, FormView):
         return kwargs
 
     def form_valid(self, form):
-        form.save()
+        object = form.save()
 
         # build redirect url based on form hidden data
         url = furl(self.request.path).add({"with": form.data["receiver"]}).url
+
+        self.log_addition(object, _("message was created"))
         return HttpResponseRedirect(f"{url}#messages-last")
 
     def get(self, request, *args, **kwargs):
@@ -138,7 +141,7 @@ class InboxView(LoginRequiredMixin, PaginationMixin, FormView):
         return self.render_to_response(context)
 
 
-class InboxStartView(LoginRequiredMixin, FormView):
+class InboxStartView(LogMixin, LoginRequiredMixin, FormView):
     template_name = "accounts/inbox_start.html"
     form_class = InboxForm
     success_url = reverse_lazy("accounts:inbox")
@@ -150,10 +153,12 @@ class InboxStartView(LoginRequiredMixin, FormView):
         return kwargs
 
     def form_valid(self, form):
-        form.save()
+        object = form.save()
 
         # build redirect url based on form hidden data
         url = furl(self.success_url).add({"with": form.data["receiver"]}).url
+
+        self.log_addition(object, _("message was created"))
         return HttpResponseRedirect(f"{url}#messages-last")
 
     def get_initial(self):
@@ -175,7 +180,7 @@ class InboxStartView(LoginRequiredMixin, FormView):
         return document.file
 
 
-class InboxPrivateMediaView(PrivateMediaView):
+class InboxPrivateMediaView(LogMixin, PrivateMediaView):
     model = Message
     slug_field = "uuid"
     slug_url_kwarg = "uuid"
@@ -188,6 +193,7 @@ class InboxPrivateMediaView(PrivateMediaView):
         object = self.get_object()
 
         if self.request.user == object.sender or self.request.user == object.receiver:
+            self.log_user_action(object, _("file was downloaded"))
             return True
 
         return False
