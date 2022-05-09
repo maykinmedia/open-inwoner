@@ -333,6 +333,7 @@ def form_actions(primary_text="", primary_icon=None, secondary=True, **kwargs):
         {% form_actions primary_text="Submit" %}
 
     Variables:
+        - disabled: bool | Whether the form is disabled.
         - primary: bool | if false, hide the primary button.
         - primary_text: string | The text for the primary button.
         - primary_icon: string | The icon for the primary button.
@@ -356,6 +357,7 @@ def form_actions(primary_text="", primary_icon=None, secondary=True, **kwargs):
 
     return {
         **kwargs,
+        "disabled": kwargs.get("disabled", False),
         "primary_text": primary_text,
         "primary_icon": primary_icon,
         "primary": primary,

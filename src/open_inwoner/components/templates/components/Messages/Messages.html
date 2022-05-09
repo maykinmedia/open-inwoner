@@ -44,7 +44,7 @@
                 {% textarea form.content %}
                 {% input form.file icon="attach_file" no_label=True no_help=True extra_classes="message-file" %}
             </div>
-            {% form_actions primary_text=_("Verzenden") primary_icon='arrow_forward' %}
+            {% form_actions disabled=disabled primary_text=_("Verzenden") primary_icon='arrow_forward' %}
         {% endrender_form %}
 
     </div>
