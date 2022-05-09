@@ -171,7 +171,7 @@ class TestPasswordResetFunctionality(WebTest):
 
     def test_password_reset_form_custom_template_is_rendered(self):
         response = self.app.get(reverse("password_reset"))
-        self.assertIn(_("Mijn wachtwoord opnieuw instellen"), response)
+        self.assertContains(response, _("Mijn wachtwoord opnieuw instellen"))
 
     def test_password_reset_email_contains_proper_data(self):
         current_site = Site.objects.get_current()
@@ -206,7 +206,7 @@ class TestPasswordResetFunctionality(WebTest):
         confirm_response = self.app.get(
             reverse("password_reset_confirm", kwargs={"token": token, "uidb64": uid})
         ).follow()
-        self.assertIn(_("Mijn wachtwoord wijzigen"), confirm_response)
+        self.assertContains(confirm_response, _("Mijn wachtwoord wijzigen"))
 
 
 class TestPasswordChangeTemplates(WebTest):
