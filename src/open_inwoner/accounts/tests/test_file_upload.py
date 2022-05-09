@@ -176,7 +176,7 @@ class TestMessageFileUploadLimits(WebTest):
             upload_response,
             furl(reverse("accounts:inbox")).add({"with": self.contact.email}).url
             + "#messages-last",
-        )
+        fetch_redirect_response=False)
 
     @temp_private_root()
     def test_invalid_type_of_file_is_not_uploaded(self):

@@ -46,7 +46,7 @@ class QuestionnaireStepViewTestCase(TestCase):
         self.assertEqual(404, response.status_code)
 
     def test_root_step_200(self):
-        root = QuestionnaireStepFactory.create(slug="foo")
+        root = QuestionnaireStepFactory.create(code="foo", slug="foo")
         path = reverse("questionnaire:root_step", kwargs={"slug": "foo"})
         self.assertEqual(path, "/questionnaire/foo")
         response = self.client.get(path)
@@ -63,8 +63,8 @@ class QuestionnaireStepViewTestCase(TestCase):
         self.assertEqual(404, response.status_code)
 
     def test_descendent_step_200(self):
-        root = QuestionnaireStepFactory.create(slug="foo")
-        descendent = root.add_child(slug="bar")
+        root = QuestionnaireStepFactory.create(code="foo", slug="foo")
+        descendent = root.add_child(code="bar", slug="bar")
         path = reverse(
             "questionnaire:descendent_step", kwargs={"root_slug": "foo", "slug": "bar"}
         )
@@ -78,7 +78,7 @@ class QuestionnaireStepViewTestCase(TestCase):
         new_callable=lambda: "foo",
     )
     def test_render_get_title(self, mock):
-        QuestionnaireStepFactory.create(slug="bar")
+        QuestionnaireStepFactory.create(code="bar", slug="bar")
         path = reverse("questionnaire:root_step", kwargs={"slug": "bar"})
         response = self.client.get(path)
         self.assertContains(response, "foo")
@@ -88,38 +88,38 @@ class QuestionnaireStepViewTestCase(TestCase):
         new_callable=lambda: "foo",
     )
     def test_render_get_description(self, mock):
-        QuestionnaireStepFactory.create(slug="bar")
+        QuestionnaireStepFactory.create(code="bar", slug="bar")
         path = reverse("questionnaire:root_step", kwargs={"slug": "bar"})
         response = self.client.get(path)
         self.assertContains(response, "foo")
 
     def test_render_question(self):
-        QuestionnaireStepFactory.create(slug="bar", question="foo")
+        QuestionnaireStepFactory.create(code="bar", slug="bar", question="foo")
         path = reverse("questionnaire:root_step", kwargs={"slug": "bar"})
         response = self.client.get(path)
         self.assertContains(response, "foo")
 
     def test_render_help_text(self):
-        QuestionnaireStepFactory.create(slug="bar", help_text="foo")
+        QuestionnaireStepFactory.create(code="bar", slug="bar", help_text="foo")
         path = reverse("questionnaire:root_step", kwargs={"slug": "bar"})
         response = self.client.get(path)
         self.assertContains(response, "foo")
 
     def test_render_answers(self):
-        root = QuestionnaireStepFactory.create(slug="foo")
+        root = QuestionnaireStepFactory.create(code="foo", slug="foo")
         root.add_child(parent_answer="bar")
         path = reverse("questionnaire:root_step", kwargs={"slug": "foo"})
         response = self.client.get(path)
         self.assertContains(response, "bar")
 
     def test_render_content(self):
-        QuestionnaireStepFactory.create(slug="bar", content="foo")
+        QuestionnaireStepFactory.create(code="bar", slug="bar", content="foo")
         path = reverse("questionnaire:root_step", kwargs={"slug": "bar"})
         response = self.client.get(path)
         self.assertContains(response, "foo")
 
     def test_render_file(self):
-        root = QuestionnaireStepFactory.create(slug="foo")
+        root = QuestionnaireStepFactory.create(code="foo", slug="foo")
         QuestionnaireStepFileFactory.create(questionnaire_step=root)
         path = reverse("questionnaire:root_step", kwargs={"slug": "foo"})
         response = self.client.get(path)
@@ -128,7 +128,7 @@ class QuestionnaireStepViewTestCase(TestCase):
     def test_render_products(self):
         ProductFactory.create(name="fooz")
         ProductFactory.create(name="barz")
-        root = QuestionnaireStepFactory.create(slug="foo")
+        root = QuestionnaireStepFactory.create(code="foo", slug="foo")
         root.related_products.set(Product.objects.all())
         path = reverse("questionnaire:root_step", kwargs={"slug": "foo"})
         response = self.client.get(path)
@@ -136,9 +136,9 @@ class QuestionnaireStepViewTestCase(TestCase):
         self.assertContains(response, "barz")
 
     def test_render_previous(self):
-        root = QuestionnaireStepFactory.create(slug="foo")
-        parent = root.add_child(slug="baz")
-        parent.add_child(slug="bar")
+        root = QuestionnaireStepFactory.create(code="foo", slug="foo")
+        parent = root.add_child(code="baz", slug="baz")
+        parent.add_child(code="bar", slug="bar")
         path = reverse(
             "questionnaire:descendent_step", kwargs={"root_slug": "foo", "slug": "baz"}
         )
@@ -146,8 +146,8 @@ class QuestionnaireStepViewTestCase(TestCase):
         self.assertContains(response, root.get_absolute_url())
 
     def test_render_profile(self):
-        root = QuestionnaireStepFactory.create(slug="foo")
-        root.add_child(slug="bar")
+        root = QuestionnaireStepFactory.create(code="foo", slug="foo")
+        root.add_child(code="bar", slug="bar")
         path = reverse(
             "questionnaire:descendent_step", kwargs={"root_slug": "foo", "slug": "bar"}
         )
@@ -159,32 +159,32 @@ class QuestionnaireStepViewTestCase(TestCase):
         self.assertIsInstance(view, FormView)
 
     def test_get_object_slug(self):
-        root = QuestionnaireStepFactory.create(slug="foo")
-        descendent = root.add_child(slug="bar")
+        root = QuestionnaireStepFactory.create(code="foo", slug="foo")
+        descendent = root.add_child(code="bar", slug="bar")
         request = RequestFactory().get("/questionnaire/bar")
         middleware = SessionMiddleware()
         middleware.process_request(request)
         request.session.save()
         view = QuestionnaireStepView()
-        view.setup(request, slug="bar")
+        view.setup(request, code="bar", slug="bar")
         object = view.get_object()
         self.assertEqual(object, descendent)
 
     def test_get_object_slug_404(self):
-        QuestionnaireStepFactory.create(slug="foo")
+        QuestionnaireStepFactory.create(code="foo", slug="foo")
         request = RequestFactory().get("/questionnaire/bar")
         middleware = SessionMiddleware()
         middleware.process_request(request)
         request.session.save()
         view = QuestionnaireStepView()
-        view.setup(request, slug="bar")
+        view.setup(request, code="bar", slug="bar")
 
         with self.assertRaises(Http404):
             view.get_object()
 
     def test_get_object_session(self):
-        root = QuestionnaireStepFactory.create(slug="foo")
-        descendent = root.add_child(slug="bar")
+        root = QuestionnaireStepFactory.create(code="foo", slug="foo")
+        descendent = root.add_child(code="bar", slug="bar")
         request = RequestFactory().get("/zelfdiagnose")
         middleware = SessionMiddleware()
         middleware.process_request(request)
@@ -196,7 +196,7 @@ class QuestionnaireStepViewTestCase(TestCase):
         self.assertEqual(object, descendent)
 
     def test_get_object_session_404(self):
-        QuestionnaireStepFactory.create(slug="foo")
+        QuestionnaireStepFactory.create(code="foo", slug="foo")
         request = RequestFactory().get("/zelfdiagnose")
         middleware = SessionMiddleware()
         middleware.process_request(request)
@@ -210,7 +210,7 @@ class QuestionnaireStepViewTestCase(TestCase):
 
     @patch(
         "open_inwoner.questionnaire.views.QuestionnaireStepView.get_object",
-        return_value=QuestionnaireStep(slug="foo"),
+        return_value=QuestionnaireStep(code="foo", slug="foo"),
     )
     def test_get_form_kwargs_get_object(self, mock):
         request = RequestFactory().get("/zelfdiagnose")
@@ -225,7 +225,7 @@ class QuestionnaireStepViewTestCase(TestCase):
 
     @patch(
         "open_inwoner.questionnaire.views.QuestionnaireStepView.get_object",
-        return_value=QuestionnaireStep(slug="foo"),
+        return_value=QuestionnaireStep(code="foo", slug="foo"),
     )
     def test_get_form_kwargs(self, mock):
         request = RequestFactory().get("/zelfdiagnose")
@@ -239,8 +239,8 @@ class QuestionnaireStepViewTestCase(TestCase):
         self.assertEqual("foo", form_kwargs["instance"].slug)
 
     def test_form_valid_valid(self):
-        root = QuestionnaireStepFactory.create(slug="foo")
-        descendent = root.add_child(slug="bar")
+        root = QuestionnaireStepFactory.create(code="foo", slug="foo")
+        descendent = root.add_child(code="bar", slug="bar")
         request = RequestFactory().get("/zelfdiagnose")
         middleware = SessionMiddleware()
         middleware.process_request(request)
@@ -259,20 +259,20 @@ class QuestionnaireStepListViewTestCase(WebTest):
         self.user = UserFactory()
 
     def test_render_root_nodes_when_user_is_logged_in(self):
-        questionnaire = QuestionnaireStepFactory(slug="foo")
+        questionnaire = QuestionnaireStepFactory(code="foo", slug="foo")
         path = reverse("questionnaire:questionnaire_list")
         response = self.app.get(path, user=self.user)
         self.assertTrue(
-            response.context["root_nodes"].filter(slug=questionnaire.slug).exists()
+            response.context["root_nodes"].filter(code=questionnaire.slug, slug=questionnaire.slug).exists()
         )
         self.assertContains(response, questionnaire.slug)
 
     def test_render_root_nodes_when_user_is_anonymous(self):
-        questionnaire = QuestionnaireStepFactory(slug="foo")
+        questionnaire = QuestionnaireStepFactory(code="foo", slug="foo")
         path = reverse("questionnaire:questionnaire_list")
         response = self.app.get(path)
         self.assertTrue(
-            response.context["root_nodes"].filter(slug=questionnaire.slug).exists()
+            response.context["root_nodes"].filter(code=questionnaire.slug, slug=questionnaire.slug).exists()
         )
         self.assertContains(response, questionnaire.slug)
 

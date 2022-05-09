@@ -9,8 +9,8 @@ from open_inwoner.questionnaire.tests.factories import QuestionnaireStepFactory
 
 class QuestionnaireTestCase(WebTest):
     def setUp(self):
-        QuestionnaireStepFactory(slug="foo", path="0001")
-        QuestionnaireStepFactory(slug="foo-bar", path="0002")
+        QuestionnaireStepFactory(code="foo", slug="foo", path="0001")
+        QuestionnaireStepFactory(code="foo-bar", slug="foo-bar", path="0002")
         self.root_nodes = QuestionnaireStep.get_root_nodes()
 
     def test_home_page_contains_root_nodes(self):
