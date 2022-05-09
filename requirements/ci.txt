@@ -84,7 +84,7 @@ diff-match-patch==20200713
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-import-export
-digid-eherkenning @ git+https://bitbucket.org/maykinmedia/django-digid-eherkenning.git@02ac61c42f6dd2f229ba9f0f687fa1a4160511be
+digid_eherkenning @ git+https://bitbucket.org/maykinmedia/django-digid-eherkenning.git@02ac61c42f6dd2f229ba9f0f687fa1a4160511be
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -103,6 +103,8 @@ django==3.2.13
     #   django-axes
     #   django-choices
     #   django-cors-headers
+    #   django-csp
+    #   django-csp-reports
     #   django-extra-fields
     #   django-filer
     #   django-filter
@@ -171,6 +173,14 @@ django-colorfield==0.4.5
     #   -c requirements/base.txt
     #   -r requirements/base.txt
 django-cors-headers==3.10.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+django-csp==3.7
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+django-csp-reports==1.8.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt

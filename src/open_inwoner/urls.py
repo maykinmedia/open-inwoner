@@ -39,6 +39,7 @@ urlpatterns = [
     ),
     path("admin/hijack/", include("hijack.urls")),
     path("admin/", admin.site.urls),
+    path("csp/", include("cspreports.urls")),
     path("ckeditor/", include("open_inwoner.ckeditor5.urls")),
     # Simply show the master template.
     path(

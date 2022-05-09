@@ -13,7 +13,8 @@
     "test": "karma start",
     "check-linting": "prettier src/open_inwoner/js src/open_inwoner/scss -c",
     "fix-linting": "prettier src/open_inwoner/js src/open_inwoner/scss -w",
-    "watch": "webpack -w"
+    "watch": "webpack -w",
+    "esbuild": "esbuild --bundle ./src/open_inwoner/js/index.js --outdir=./src/open_inwonwer/static/bundle --minify --sourcemap"
   },
   "repository": {
     "type": "git",
@@ -40,17 +41,21 @@
     "@ckeditor/ckeditor5-theme-lark": "^33.0.0",
     "@emotion/react": "^11.5.0",
     "@emotion/styled": "^11.3.0",
+    "@fortawesome/fontawesome-free": "^6.1.1",
     "@tarekraafat/autocomplete.js": "^10.2.6",
     "bem.js": "^1.0.10",
+    "esbuild": "^0.14.38",
     "flatpickr": "^4.6.9",
     "gumshoejs": "^5.1.2",
     "html-minifier": "^4.0.0",
     "inline-css": "^3.0.0",
     "leaflet": "^1.7.1",
+    "material-icons": "^1.10.11",
     "microscope-sass": "latest",
     "proj4leaflet": "^1.0.2",
     "style-loader": "^2.0.0",
-    "sweetalert2": "^11.4.4"
+    "sweetalert2": "^11.4.4",
+    "vite": "^2.9.8"
   },
   "devDependencies": {
     "@babel/core": "latest",

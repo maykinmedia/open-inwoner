@@ -5,9 +5,9 @@
         <title>{% block title %}{{ site_name }}{% endblock %}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="{{site_logo}}" rel="shortcut icon">
-        <link href="{% static 'bundles/open_inwoner-css.css' %}" media="all" rel="stylesheet" />
+        <link nonce="{{ request.csp_nonce }}" href="{% static 'bundles/open_inwoner-css.css' %}" media="all" rel="stylesheet" />
 
-        <style>
+        <style nonce="{{ request.csp_nonce }}">
             :root {
                 --color-primary-h: {{theming.primary.0}};
                 --color-primary-s: {{theming.primary.1}}%;
@@ -23,10 +23,6 @@
                 --color-font-accent: {{theming.accent_font_color}};
             }
         </style>
-        {% comment %} TODO: Make self hosted {% endcomment %}
-        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-        <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
-        <script src="{% static 'fontawesomefree/js/all.min.js' %}"></script>
         {% block extra_css %}{% endblock %}
 
         {% include "analytics/google.html" %}
@@ -62,6 +58,6 @@
 
         {% footer logo_url=site_logo footer_texts=configurable_text.footer %}
 
-        <script defer src="{% static 'bundles/open_inwoner-js.js' %}"></script>
+        <script nonce="{{ request.csp_nonce }}" src="{% static 'bundles/open_inwoner-js.js' %}"></script>
     </body>
 </html>
