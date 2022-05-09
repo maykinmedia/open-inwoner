@@ -1,6 +1,7 @@
 /** @type {HTMLHtmlElement} The questionnaire step view (root or descendent). */
-const VIEW_QUESTIONNAIRE_STEP = document.querySelector('.view--questionnaire-root_step, .view--questionnaire-descendent_step')
-
+const VIEW_QUESTIONNAIRE_STEP = document.querySelector(
+  '.view--questionnaire-root_step, .view--questionnaire-descendent_step'
+)
 
 /**
  * Provides toggling between title and code of a questionnaire step.
@@ -12,15 +13,15 @@ class QuestionnaireStep {
    */
   constructor(node) {
     /** @type {HTMLElement} */
-    this.node = node;
+    this.node = node
 
     /** @type {Object} The state, do no update directly. */
     this.state = {
       titleText: this.getTitleText(),
-    };
+    }
 
-    this.bindEvents();
-    this.render(this.state);
+    this.bindEvents()
+    this.render(this.state)
   }
 
   /**
@@ -28,17 +29,20 @@ class QuestionnaireStep {
    * @param {Object} partialState
    */
   setState(partialState) {
-    const newState = {...this.state};
-    Object.assign(newState, partialState);
-    this.state = newState;
-    this.render(newState);
+    const newState = { ...this.state }
+    Object.assign(newState, partialState)
+    this.state = newState
+    this.render(newState)
   }
 
   /**
    * Binds events to callbacks.
    */
   bindEvents() {
-    this.getTitleElement()?.addEventListener('dblclick', this.onTitleDblClick.bind(this));
+    this.getTitleElement()?.addEventListener(
+      'dblclick',
+      this.onTitleDblClick.bind(this)
+    )
   }
 
   /**
@@ -46,10 +50,10 @@ class QuestionnaireStep {
    */
   onTitleDblClick() {
     if (this.state.titleText === this.getTitleText()) {
-      this.setState({titleText: this.getCodeText()});
-      return;
+      this.setState({ titleText: this.getCodeText() })
+      return
     }
-    this.setState({titleText: this.getTitleText()});
+    this.setState({ titleText: this.getTitleText() })
   }
 
   /**
@@ -57,7 +61,7 @@ class QuestionnaireStep {
    * @return {(HTMLElement|null)}
    */
   getTitleElement() {
-    return this.node.querySelector('.grid__main .h1');
+    return this.node.querySelector('.grid__main .h1')
   }
 
   /**
@@ -65,7 +69,7 @@ class QuestionnaireStep {
    * @return {(HTMLSpanElement|null)}
    */
   getTitleTextElement() {
-    return this.getTitleElement()?.querySelector('span');
+    return this.getTitleElement()?.querySelector('span')
   }
 
   /**
@@ -73,7 +77,7 @@ class QuestionnaireStep {
    * @return {string}
    */
   getTitleText() {
-    return this.getTitleElement()?.dataset?.title || '';
+    return this.getTitleElement()?.dataset?.title || ''
   }
 
   /**
@@ -81,7 +85,7 @@ class QuestionnaireStep {
    * @return {string}
    */
   getCodeText() {
-    return this.getTitleElement()?.dataset?.code || '';
+    return this.getTitleElement()?.dataset?.code || ''
   }
 
   /**
@@ -90,13 +94,13 @@ class QuestionnaireStep {
    */
   render(state) {
     if (!this.getTitleTextElement()) {
-      return;
+      return
     }
-    this.getTitleTextElement().textContent = state.titleText;
+    this.getTitleTextElement().textContent = state.titleText
   }
 }
 
 // Start!
-if(VIEW_QUESTIONNAIRE_STEP) {
-  new QuestionnaireStep(VIEW_QUESTIONNAIRE_STEP);
+if (VIEW_QUESTIONNAIRE_STEP) {
+  new QuestionnaireStep(VIEW_QUESTIONNAIRE_STEP)
 }

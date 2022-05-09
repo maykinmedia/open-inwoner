@@ -1,8 +1,7 @@
-import { EmojiButton } from '@joeattardi/emoji-button';
+import { EmojiButton } from '@joeattardi/emoji-button'
 
 /** @type {NodeList} All the emoji buttons. */
-const EMOJI_BUTTONS = document.querySelectorAll('.emoji-button');
-
+const EMOJI_BUTTONS = document.querySelectorAll('.emoji-button')
 
 /**
  * Allows selecting emojis.
@@ -14,20 +13,22 @@ class EmojiButtonSelector {
    */
   constructor(node) {
     /** @type {HTMLElement} */
-    this.node = node;
+    this.node = node
 
     /** @type {EmojiButton} */
-    this.picker = this.getPicker();
+    this.picker = this.getPicker()
 
-    this.bindEvents();
+    this.bindEvents()
   }
 
   /**
    * Binds events to callbacks.
    */
   bindEvents() {
-    this.node.addEventListener('click', () => this.getPicker().togglePicker(this.node));
-    this.getPicker().on('emoji', this.onEmoji.bind(this));
+    this.node.addEventListener('click', () =>
+      this.getPicker().togglePicker(this.node)
+    )
+    this.getPicker().on('emoji', this.onEmoji.bind(this))
   }
 
   /**
@@ -35,7 +36,9 @@ class EmojiButtonSelector {
    * @return {HTMLElement}
    */
   getInput() {
-    return this.node.parentElement?.parentElement?.querySelector('input, textarea');
+    return this.node.parentElement?.parentElement?.querySelector(
+      'input, textarea'
+    )
   }
 
   /**
@@ -43,11 +46,11 @@ class EmojiButtonSelector {
    * @return {EmojiButton}
    */
   getPicker() {
-    if(!this.picker) {
-      this.picker = new EmojiButton();
+    if (!this.picker) {
+      this.picker = new EmojiButton()
     }
 
-    return this.picker;
+    return this.picker
   }
 
   /**
@@ -55,11 +58,11 @@ class EmojiButtonSelector {
    * @param {Object} selection
    */
   onEmoji(selection) {
-    const input = this.getInput();
-    const emoji = selection.emoji;
-    input.value += emoji;
+    const input = this.getInput()
+    const emoji = selection.emoji
+    input.value += emoji
   }
 }
 
 // Start1
-[...EMOJI_BUTTONS].forEach((node) => new EmojiButtonSelector(node));
+;[...EMOJI_BUTTONS].forEach((node) => new EmojiButtonSelector(node))
