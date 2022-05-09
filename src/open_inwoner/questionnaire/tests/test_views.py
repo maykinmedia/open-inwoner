@@ -263,7 +263,9 @@ class QuestionnaireStepListViewTestCase(WebTest):
         path = reverse("questionnaire:questionnaire_list")
         response = self.app.get(path, user=self.user)
         self.assertTrue(
-            response.context["root_nodes"].filter(code=questionnaire.slug, slug=questionnaire.slug).exists()
+            response.context["root_nodes"]
+            .filter(code=questionnaire.slug, slug=questionnaire.slug)
+            .exists()
         )
         self.assertContains(response, questionnaire.slug)
 
@@ -272,7 +274,9 @@ class QuestionnaireStepListViewTestCase(WebTest):
         path = reverse("questionnaire:questionnaire_list")
         response = self.app.get(path)
         self.assertTrue(
-            response.context["root_nodes"].filter(code=questionnaire.slug, slug=questionnaire.slug).exists()
+            response.context["root_nodes"]
+            .filter(code=questionnaire.slug, slug=questionnaire.slug)
+            .exists()
         )
         self.assertContains(response, questionnaire.slug)
 

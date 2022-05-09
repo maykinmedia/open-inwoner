@@ -50,16 +50,22 @@ class QuestionnaireStepTestCase(TestCase):
         self.assertEqual("foo", descendent.get_title())
 
     def test_get_description_root(self):
-        root = QuestionnaireStepFactory.create(code="foo", slug="foo", description="foo")
+        root = QuestionnaireStepFactory.create(
+            code="foo", slug="foo", description="foo"
+        )
         self.assertEqual("foo", root.get_description())
 
     def test_get_description_descendent_self(self):
-        root = QuestionnaireStepFactory.create(code="foo", slug="foo", description="foo")
+        root = QuestionnaireStepFactory.create(
+            code="foo", slug="foo", description="foo"
+        )
         descendent = root.add_child(code="bar", slug="bar", description="bar")
         self.assertEqual("bar", descendent.get_description())
 
     def test_get_description_descendent_inherited(self):
-        root = QuestionnaireStepFactory.create(code="foo", slug="foo", description="foo")
+        root = QuestionnaireStepFactory.create(
+            code="foo", slug="foo", description="foo"
+        )
         parent = root.add_child(code="baz", slug="baz", description="baz")
         descendent = parent.add_child()
         self.assertEqual("foo", descendent.get_description())
