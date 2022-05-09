@@ -125,8 +125,6 @@
   }
 
   &--disabled {
-    background-color: var(--color-gray) !important;
-    border-color: var(--color-gray) !important;
     color: var(--color-gray-light);
     pointer-events: none;
     cursor: default;
