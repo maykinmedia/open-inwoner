@@ -122,7 +122,6 @@ django==3.2.12
     #   djangorestframework
     #   drf-spectacular
     #   easy-thumbnails
-    #   extended-admin-session
     #   mail-editor
     #   maykin-django-two-factor-auth
     #   zgw-consumers
@@ -333,10 +332,6 @@ et-xmlfile==1.1.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   openpyxl
-extended-admin-session==0.1.1
-    # via
-    #   -c requirements/base.txt
-    #   -r requirements/base.txt
 face==20.1.1
     # via
     #   -c requirements/base.txt

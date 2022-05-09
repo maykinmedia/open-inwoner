@@ -59,7 +59,7 @@ urlpatterns = [
         "questionnaire/",
         include("open_inwoner.questionnaire.urls", namespace="questionnaire"),
     ),
-    path("sessions/", include("extended_admin_session.urls", namespace="extended")),
+    path("sessions/", include("open_inwoner.extended_sessions.urls", namespace="sessions")),
     path("faq/", FAQView.as_view(), name="general_faq"),
     path("", include("open_inwoner.pdc.urls", namespace="pdc")),
     path("", include("open_inwoner.search.urls", namespace="search")),
