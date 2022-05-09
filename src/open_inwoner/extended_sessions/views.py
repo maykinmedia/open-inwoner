@@ -18,7 +18,6 @@ class RestartSessionView(View):
     ]
 
     def get(self, request):
-        print(request.user)
         if request.user.is_authenticated:
             return HttpResponse("restarted")
         return HttpResponse()

@@ -21,7 +21,6 @@ class SessionTimeoutMiddleware:
             else settings.SESSION_COOKIE_AGE
         )
         # https://docs.djangoproject.com/en/2.2/topics/http/sessions/#django.contrib.sessions.backends.base.SessionBase.set_expiry
-        print(request.session)
         request.session.set_expiry(timeout)
         response = self.get_response(request)
         response[SESSION_EXPIRES_IN_HEADER] = timeout
