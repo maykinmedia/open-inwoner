@@ -4,6 +4,10 @@
   grid-gap: var(--gutter-width);
   padding: var(--gutter-width) 0;
 
+  &#{&}--align-end {
+    align-items: end;
+  }
+
   &--compact {
     grid-gap: 0;
   }
@@ -104,7 +108,7 @@
 
   &--inline {
     grid-template-columns: 1fr auto;
-    align-items: end;
+    align-items: start;
 
     .form__actions {
       grid-column-start: auto;
