@@ -6,14 +6,16 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('questionnaire', '0011_alter_questionnairestep_options'),
+        ("questionnaire", "0011_alter_questionnairestep_options"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='questionnairestep',
-            name='code',
-            field=models.CharField(default='', max_length=255, verbose_name='Code voor intern gebruik'),
+            model_name="questionnairestep",
+            name="code",
+            field=models.CharField(
+                default="", max_length=255, verbose_name="Code voor intern gebruik"
+            ),
             preserve_default=False,
         ),
     ]
