@@ -34,7 +34,6 @@ def messages(
         + status: string | The status below the subject.
 
     Extra context:
-        - disabled: bool | Whether the form is disabled.
         - days: set | the message_list grouped by date.
     """
 
@@ -78,7 +77,6 @@ def messages(
 
     return {
         "days": get_messages_by_date(message_list),
-        "disabled": form.fields["content"].disabled,
         "form": form,
         "me": me,
         "status": status,
