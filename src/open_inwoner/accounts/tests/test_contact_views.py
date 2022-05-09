@@ -171,6 +171,19 @@ class ContactViewTests(WebTest):
         body = email.alternatives[0][0]  # html version of the email body
         self.assertIn(invite_url, body)
 
+    def test_multiple_contact_create_without_providing_email(self):
+        ContactFactory(email=None)
+        response = self.app.get(self.create_url, user=self.user)
+        self.assertEqual(response.status_code, 200)
+
+        form = response.forms["contact-form"]
+        form["first_name"] = "John"
+        form["last_name"] = "Smith"
+        response = form.submit(user=self.user)
+        contacts_without_email = Contact.objects.filter(email__isnull=True)
+
+        self.assertEqual(contacts_without_email.count(), 2)
+
     def test_users_contact_is_deleted(self):
         self.app.post(self.delete_url, user=self.user)
 
