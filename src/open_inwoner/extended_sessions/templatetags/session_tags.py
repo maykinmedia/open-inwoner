@@ -11,8 +11,7 @@ def session_timeout(context):
         {
             "expiry_age": session.get_expiry_age()
             + 1,  # Add a second to make sure the session has expired.
-            "warn_time": session.get_expiry_age()
-            - settings.SESSION_WARN_DELTA,
+            "warn_time": session.get_expiry_age() - settings.SESSION_WARN_DELTA,
         }
     )
     return context

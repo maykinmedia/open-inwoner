@@ -20,7 +20,8 @@ class SessionBackendTest(WebTest):
         response = self.app.get(self.url, user=user)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
-            self.app.session._get_session().get("_session_expiry"), settings.SESSION_COOKIE_AGE
+            self.app.session._get_session().get("_session_expiry"),
+            settings.SESSION_COOKIE_AGE,
         )
 
     def test_extended_session_length_when_staff_user(self):

@@ -2,7 +2,6 @@ from datetime import timedelta
 
 from django.conf import settings
 
-
 SESSION_EXPIRES_IN_HEADER = "X-Session-Expires-In"
 
 
