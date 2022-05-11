@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.core.paginator import InvalidPage, Paginator
 from django.http import Http404
 from django.http.response import HttpResponseRedirect
@@ -116,4 +117,12 @@ class SearchView(PaginationMixin, FormView):
             [f"{key}: {', '.join(value)}" for key, value in search_data.items()]
         )
         form.save()
+
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            _(
+                "Thank you for your feedback. It will help us to improve our search engine"
+            ),
+        )
         return HttpResponseRedirect(http_referer)
