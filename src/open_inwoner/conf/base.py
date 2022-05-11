@@ -792,7 +792,7 @@ CSP_IMG_SRC = (
 )
 
 CSP_UPGRADE_INSECURE_REQUESTS = False  # TODO enable on production?
-CSP_INCLUDE_NONCE_IN = ["script-src"]  # if we inline we should at least have this
+CSP_INCLUDE_NONCE_IN = ["script-src", "style-src"]  # if we inline we should at least have this
 
 # note these are outdated/deprecated django-csp options
 # CSP_BLOCK_ALL_MIXED_CONTENT
