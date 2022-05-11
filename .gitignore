@@ -38,4 +38,5 @@ local.py
 
 # Static files
 src/open_inwoner/static/bundles/
+src/open_inwoner/static/webfonts/
 src/open_inwoner/fonts/

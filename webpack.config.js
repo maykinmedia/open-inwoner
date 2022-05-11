@@ -39,10 +39,6 @@ module.exports = {
   // Modules
   module: {
     rules: [
-      {
-        test: /.(ttf|otf|eot|woff(2)?)(\?[a-z0-9]+)?$/,
-        use: ['raw-loader'],
-      },
       // CKEditor
       {
         test: /ckeditor5-[^/\\]+[/\\]theme[/\\]icons[/\\][^/\\]+\.svg$/,

@@ -16,7 +16,6 @@ def map(lat=None, lng=None, **kwargs):
         + lng: float | The longitude position to center the map to.
 
         - extra_classes: str | Extra (css) classes to add .
-        - height: str | (Css) height to set (defaults to 300).
         - id: str | The id attribute.
         - small: bool | Whether the map should be small.
         - title: str | The card title.
@@ -48,6 +47,5 @@ def map(lat=None, lng=None, **kwargs):
     kwargs["lat"] = lat
     kwargs["lng"] = lng
     kwargs["classes"] = get_classes()
-    kwargs["height"] = kwargs.get("height", "300px")
     kwargs["zoom"] = kwargs.get("zoom", 8)
     return kwargs

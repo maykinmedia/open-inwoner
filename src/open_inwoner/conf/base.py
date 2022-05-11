@@ -786,13 +786,16 @@ UPLOAD_FILE_TYPES = "application/vnd.openxmlformats-officedocument.wordprocessin
 # NOTE: make sure values are a tuple or list, and to quote special values like 'self'
 CSP_DEFAULT_SRC = ("'self'", )  # ideally we'd use BASE_URI but it'd have to be lazy or cause issues
 CSP_BASE_URI = ("'self'", )
+CSP_SCRIPT_SRC = ("'self'", "'unsafe-eval'", "https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:28992/",) # See if the unsafe-eval can be removed....
+CSP_STYLE_SRC = ("'self'", "'unsafe-inline'",) # Fix this. I do not want to have the unsafe-inline here....
 CSP_IMG_SRC = (
     "'self'",
+    "data:",
     "https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:28992/",
 )
 
 CSP_UPGRADE_INSECURE_REQUESTS = False  # TODO enable on production?
-CSP_INCLUDE_NONCE_IN = ["script-src", "style-src"]  # if we inline we should at least have this
+CSP_INCLUDE_NONCE_IN = ["script-src"]  # Want to have "style-src" here too.... but does not work with unsafe-inline
 
 # note these are outdated/deprecated django-csp options
 # CSP_BLOCK_ALL_MIXED_CONTENT

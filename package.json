@@ -3,18 +3,17 @@
   "version": "1.0.0-alpha.0",
   "description": "open_inwoner project",
   "main": "src/static/open_inwoner/js/open_inwoner.js",
-  "type": "module",
   "directories": {
     "doc": "doc"
   },
   "scripts": {
     "build": "npm run collect && npm run bundle",
     "bundle": "webpack",
-    "collect": "cp -r node_modules/leaflet/dist/images src/open_inwoner/static/bundles",
+    "collect": "cp -r node_modules/leaflet/dist/images src/open_inwoner/static/bundles && cp -r node_modules/material-icons/iconfont/*.woff src/open_inwoner/static/bundles && cp -r node_modules/material-icons/iconfont/*.woff2 src/open_inwoner/static/bundles && cp -r node_modules/@fortawesome/fontawesome-free/webfonts src/open_inwoner/static/",
     "test": "karma start",
     "check-linting": "prettier src/open_inwoner/js src/open_inwoner/scss -c",
     "fix-linting": "prettier src/open_inwoner/js src/open_inwoner/scss -w",
-    "watch": "webpack -w"
+    "watch": "npm run collect && webpack -w"
   },
   "repository": {
     "type": "git",
