@@ -3,6 +3,7 @@
   "version": "1.0.0-alpha.0",
   "description": "open_inwoner project",
   "main": "src/static/open_inwoner/js/open_inwoner.js",
+  "type": "module",
   "directories": {
     "doc": "doc"
   },
@@ -14,7 +15,7 @@
     "check-linting": "prettier src/open_inwoner/js src/open_inwoner/scss -c",
     "fix-linting": "prettier src/open_inwoner/js src/open_inwoner/scss -w",
     "watch": "webpack -w",
-    "esbuild": "esbuild --bundle ./src/open_inwoner/js/index.js --outdir=./src/open_inwonwer/static/bundle --minify --sourcemap"
+    "esbuild": "node build.js"
   },
   "repository": {
     "type": "git",
@@ -45,6 +46,7 @@
     "@tarekraafat/autocomplete.js": "^10.2.6",
     "bem.js": "^1.0.10",
     "esbuild": "^0.14.38",
+    "esbuild-plugin-sass": "^1.0.1",
     "flatpickr": "^4.6.9",
     "gumshoejs": "^5.1.2",
     "html-minifier": "^4.0.0",
@@ -67,6 +69,7 @@
     "chai": "latest",
     "css-loader": "latest",
     "cssnano": "latest",
+    "esbuild-plugin-svg": "^0.1.0",
     "istanbul-instrumenter-loader": "latest",
     "karma": "latest",
     "karma-chrome-launcher": "latest",

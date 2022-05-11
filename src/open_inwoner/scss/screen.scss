@@ -1,10 +1,10 @@
 // External
 // @import 'material-icons/iconfont/material-icons-outlined.woff2';
 $material-icons-font-path: '/static/fonts/';
-@import 'material-icons/css/material-icons.scss';
-@import '@fortawesome/fontawesome-free/scss/fontawesome.scss';
-@import 'leaflet/dist/leaflet.css';
-@import 'flatpickr/dist/flatpickr.min.css';
+@import '../../../node_modules/material-icons/css/material-icons.scss';
+@import '../../../node_modules/@fortawesome/fontawesome-free/scss/fontawesome.scss';
+@import '../../../node_modules/leaflet/dist/leaflet.css';
+@import '../../../node_modules/flatpickr/dist/flatpickr.min.css';
 
 // Internal
 @import 'settings';

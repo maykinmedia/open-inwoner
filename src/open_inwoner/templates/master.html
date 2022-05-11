@@ -6,6 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="{{site_logo}}" rel="shortcut icon">
         <link nonce="{{ request.csp_nonce }}" href="{% static 'bundles/open_inwoner-css.css' %}" media="all" rel="stylesheet" />
+        <link nonce="{{ request.csp_nonce }}" href="{% static 'bundles/index.css' %}" media="all" rel="stylesheet" />
 
         <style nonce="{{ request.csp_nonce }}">
             :root {
@@ -58,6 +59,6 @@
 
         {% footer logo_url=site_logo footer_texts=configurable_text.footer %}
 
-        <script nonce="{{ request.csp_nonce }}" src="{% static 'bundles/open_inwoner-js.js' %}"></script>
+        <script nonce="{{ request.csp_nonce }}" src="{% static 'bundles/index.js' %}"></script>
     </body>
 </html>
