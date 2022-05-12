@@ -772,3 +772,34 @@ TWO_FACTOR_PATCH_ADMIN = config("TWO_FACTOR_PATCH_ADMIN", default=True)
 MIN_UPLOAD_SIZE = 1  # in bytes
 MAX_UPLOAD_SIZE = 1024 ** 2 * 100  # 100MB
 UPLOAD_FILE_TYPES = "application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/plain,application/vnd.oasis.opendocument.text,application/vnd.oasis.opendocument.formula,application/vnd.oasis.opendocument.spreadsheet,application/pdf,image/jpeg,image/png"
+
+#
+# DIGID
+#
+
+BASE_URL = "https://{}".format(ALLOWED_HOSTS[0])
+
+DIGID_METADATA = config("DIGID_METADATA", "")
+SSL_CERTIFICATE_PATH = config("SSL_CERTIFICATE_PATH", "")
+SSL_KEY_PATH = config("SSL_KEY_PATH", "")
+DIGID_SERVICE_ENTITY_ID = config(
+    "DIGID_SERVICE_ENTITY_ID", "https://was-preprod1.digid.nl/saml/idp/metadata"
+)
+DIGID_WANT_ASSERTIONS_SIGNED = config("DIGID_WANT_ASSERTIONS_SIGNED", default=True)
+
+DIGID = {
+    "base_url": BASE_URL,
+    "entity_id": BASE_URL,
+    # This is the metadata of the **Identity provider** NOT our own!
+    "metadata_file": DIGID_METADATA,
+    # SSL/TLS key
+    "key_file": SSL_KEY_PATH,
+    "cert_file": SSL_CERTIFICATE_PATH,
+    "service_entity_id": DIGID_SERVICE_ENTITY_ID,
+    "attribute_consuming_service_index": "1",
+    "requested_attributes": ["bsn"],
+    # Logius can sign the assertions (True) but others sign the entire response
+    # (False).
+    "want_assertions_signed": DIGID_WANT_ASSERTIONS_SIGNED,
+}
+
