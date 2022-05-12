@@ -97,8 +97,14 @@ class ContactViewTests(WebTest):
         )
 
     def test_contact_list_show_link_to_messages(self):
+        other_user = UserFactory()
+        contact = ContactFactory.create(created_by=self.user, contact_user=other_user)
+        contacts = Contact.objects.get_extended_contacts_for_user(self.user)
+        extended_contact = contacts.get(id=contact.id)
         message_link = (
-            furl(reverse("accounts:inbox")).add({"with": self.contact.email}).url
+            furl(reverse("accounts:inbox"))
+            .add({"with": extended_contact.other_user_email})
+            .url
         )
         response = self.app.get(self.list_url, user=self.user)
         self.assertContains(response, message_link)

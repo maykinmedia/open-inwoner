@@ -49,7 +49,7 @@
                         <p class="plan-contact__info">{{ contact.get_name }}</p>
                         <p class="plan-contact__info">{{ contact.function }}</p>
                         <p class="plan-contact__info">{{ contact.phonenumber }}</p>
-                        <p class="plan-contact__info">{{ contact.email }}</p>
+                        <p class="plan-contact__info">{{ contact.contact_user.email }}</p>
                     {% else %}
                         <p class="plan-contact__info">{{ contact.get_created_by_name }}</p>
                         <p class="plan-contact__info">{{ contact.function }}</p>

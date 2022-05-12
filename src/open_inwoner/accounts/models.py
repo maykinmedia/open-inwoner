@@ -275,7 +275,7 @@ class Contact(models.Model):
         return not self.is_active()
 
     def get_message_url(self) -> str:
-        url = furl(reverse("accounts:inbox")).add({"with": self.email}).url
+        url = furl(reverse("accounts:inbox")).add({"with": self.other_user_email}).url
         return f"{url}#messages-last"
 
     def get_created_by_name(self):
