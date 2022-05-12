@@ -802,4 +802,3 @@ DIGID = {
     # (False).
     "want_assertions_signed": DIGID_WANT_ASSERTIONS_SIGNED,
 }
-
