@@ -777,7 +777,10 @@ UPLOAD_FILE_TYPES = "application/vnd.openxmlformats-officedocument.wordprocessin
 # DIGID
 #
 
-BASE_URL = "https://{}".format(ALLOWED_HOSTS[0])
+if ALLOWED_HOSTS:
+    BASE_URL = "https://{}".format(ALLOWED_HOSTS[0])
+else:
+    BASE_URL = "https://example.com"
 
 DIGID_METADATA = config("DIGID_METADATA", "")
 SSL_CERTIFICATE_PATH = config("SSL_CERTIFICATE_PATH", "")
