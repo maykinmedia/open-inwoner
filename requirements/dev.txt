@@ -99,6 +99,7 @@ defusedxml==0.7.1
     #   django-digid-eherkenning
     #   odfpy
     #   python3-openid
+    #   python3-saml
 diff-match-patch==20200713
     # via
     #   -c requirements/ci.txt
@@ -444,7 +445,7 @@ inflection==0.5.1
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   drf-spectacular
-isodate==0.6.0
+isodate==0.6.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -589,6 +590,7 @@ pyopenssl==21.0.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   python3-saml
     #   zgw-consumers
 pyparsing==2.4.7
     # via packaging
@@ -632,7 +634,7 @@ python3-openid==3.2.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-allauth
-python3-saml==1.12.0
+python3_saml @ git+https://github.com/maykinmedia/python3-saml.git@f587f77b78be79d51139f29a957b406072e2b537
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -669,6 +671,7 @@ requests==2.26.0
     #   django-allauth
     #   django-rosetta
     #   gemma-zds-client
+    #   python3-saml
     #   requests-mock
     #   requests-oauthlib
     #   sphinx
