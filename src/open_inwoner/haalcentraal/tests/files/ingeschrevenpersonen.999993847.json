@@ -1,24 +1,36 @@
 {
-    "_links": {
-        "self": {
-            "href": "https://www.haalcentraal.nl/haalcentraal/api/brp/ingeschrevenpersonen/999993847"
-        }
-    },
-    "naam": {
+  "personen": [
+    {
+      "naam": {
         "aanhef": "Geachte mevrouw Kooyman",
-        "aanschrijfwijze": "M. Kooyman",
+        "aanschrijfwijze": {
+          "naam": "M. Kooyman"
+        },
         "gebruikInLopendeTekst": "mevrouw Kooyman",
-        "aanduidingNaamgebruik": "eigen",
+        "aanduidingNaamgebruik": {
+          "code": "E",
+          "omschrijving": "gebruik alleen de eigen naam."
+        },
         "voornamen": "Merel",
-        "voorletters": "M.",
-        "geslachtsnaam": "Kooyman"
-    },
-    "geboorte": {
+        "geslachtsnaam": "Kooyman",
+        "volledigeNaam": "Merel Kooyman",
+        "voorletters": "M."
+      },
+      "geboorte": {
+        "land": {
+          "code": "6030",
+          "omschrijving": "Nederland"
+        },
+        "plaats": {
+          "code": "0545",
+          "omschrijving": "Leerdam"
+        },
         "datum": {
-            "datum": "1982-04-10",
-            "jaar": 1982,
-            "maand": 4,
-            "dag": 10
+          "datum": "1982-04-10",
+          "type": "Datum"
         }
+      }
     }
+  ],
+  "type": "RaadpleegMetBurgerservicenummer"
 }
