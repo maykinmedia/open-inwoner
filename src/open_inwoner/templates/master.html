@@ -1,4 +1,4 @@
-{% load static i18n header_tags card_tags footer_tags button_tags notification_tags anchor_menu_tags view_breadcrumbs utils %}<!DOCTYPE html>
+{% load static i18n header_tags card_tags footer_tags button_tags notification_tags anchor_menu_tags view_breadcrumbs utils session_tags %}<!DOCTYPE html>
 <html lang="en" class="view {% block view_class %}view--{{ request.resolver_match.namespaces|join:'-' }}-{{ request.resolver_match.url_name }}{% endblock %}">
     <head>
         <meta charset="utf-8">
@@ -61,6 +61,7 @@
         {% endblock main_outer %}
 
         {% footer logo_url=site_logo footer_texts=configurable_text.footer %}
+        {% session_timeout %}
 
         <script defer src="{% static 'bundles/open_inwoner-js.js' %}"></script>
     </body>
