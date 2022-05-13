@@ -1,12 +1,13 @@
 from django import forms
 from django.contrib import admin
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext as _
 
 from import_export.admin import ImportExportMixin
 from import_export.formats import base_formats
 from ordered_model.admin import OrderedModelAdmin
 
 from open_inwoner.ckeditor5.widgets import CKEditorWidget
+from open_inwoner.utils.views import LogMixin
 
 from ..models import (
     Product,
@@ -38,7 +39,7 @@ class ProductAdminForm(forms.ModelForm):
 
 
 @admin.register(Product)
-class ProductAdmin(ImportExportMixin, admin.ModelAdmin):
+class ProductAdmin(ImportExportMixin, LogMixin, admin.ModelAdmin):
     list_display = ("name", "created_on", "display_categories")
     list_filter = ("categories", "tags")
     date_hierarchy = "created_on"
@@ -68,6 +69,15 @@ class ProductAdmin(ImportExportMixin, admin.ModelAdmin):
 
     def get_export_resource_class(self):
         return ProductExportResource
+
+    def export_action(self, request, *args, **kwargs):
+        response = super().export_action(request, *args, **kwargs)
+
+        if request.method == "POST":
+            user = request.user
+            self.log_system_action(_("products were exported"), user)
+
+        return response
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
