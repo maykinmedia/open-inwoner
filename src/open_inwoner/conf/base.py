@@ -456,9 +456,12 @@ HIJACK_ALLOW_GET_REQUESTS = True
 # SENTRY - error monitoring
 #
 SENTRY_DSN = config("SENTRY_DSN", None)
-RELEASE = "v0.6"  # get_current_version()
+RELEASE = "v0.7"  # get_current_version()
 
 PRIVATE_MEDIA_ROOT = os.path.join(BASE_DIR, "private_media")
+if MEDIA_SUBFOLDER:
+    PRIVATE_MEDIA_ROOT = os.path.join(PRIVATE_MEDIA_ROOT, MEDIA_SUBFOLDER)
+
 SENDFILE_ROOT = PRIVATE_MEDIA_ROOT
 SENDFILE_BACKEND = "django_sendfile.backends.simple"
 PRIVATE_MEDIA_URL = "/private_files/"
