@@ -12,12 +12,11 @@ from open_inwoner.utils.views import LogMixin
 
 class LogPasswordChangeView(LogMixin, PasswordChangeView):
     def form_valid(self, form):
-        object = form.save()
+        response = super().form_valid(form)
+
+        object = self.request.user
         self.log_user_action(object, _("password was changed"))
-        # Updating the password logs out all other sessions for the user
-        # except the current one.
-        update_session_auth_hash(self.request, form.user)
-        return super().form_valid(form)
+        return response
 
 
 class LogPasswordResetView(LogMixin, PasswordResetView):
@@ -28,8 +27,8 @@ class LogPasswordResetView(LogMixin, PasswordResetView):
 
 class LogPasswordResetConfirmView(LogMixin, PasswordResetConfirmView):
     def form_valid(self, form):
-        super().form_valid(form)
-        object = self.get_user(self.kwargs["uidb64"])
+        response = super().form_valid(form)
 
+        object = self.get_user(self.kwargs["uidb64"])
         self.log_system_action(_("password reset was completed"), object)
-        return HttpResponseRedirect(self.get_success_url())
+        return response
