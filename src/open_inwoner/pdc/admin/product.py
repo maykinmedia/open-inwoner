@@ -37,6 +37,16 @@ class ProductAdminForm(forms.ModelForm):
         fields = "__all__"
         widgets = {"content": CKEditorWidget}
 
+    def clean(self, *args, **kwargs):
+        form_snippet = self.cleaned_data["form_snippet"]
+        link = self.cleaned_data["link"]
+        if form_snippet and link:
+            raise forms.ValidationError(
+                _(
+                    "Either link or form snippet should be provided. You can not fill in both."
+                )
+            )
+
 
 @admin.register(Product)
 class ProductAdmin(ImportExportMixin, LogMixin, admin.ModelAdmin):

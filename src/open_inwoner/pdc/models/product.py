@@ -36,6 +36,12 @@ class Product(models.Model):
         default="",
         help_text=_("Action link to request the product"),
     )
+    form_snippet = models.TextField(
+        verbose_name=_("Form snippet"),
+        blank=True,
+        default="",
+        help_text=_("Code snippet for open-forms sdk integration"),
+    )
     content = models.TextField(
         verbose_name=_("Content"),
         help_text=_("Product content with build-in WYSIWYG editor"),
