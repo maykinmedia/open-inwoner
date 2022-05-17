@@ -294,7 +294,9 @@ class ProductFinderView(FormView):
         condition_products = self.get_condition_products()
         matched = self.filter_matched_products(condition_products)
         context["matched_products"] = matched
-        context["possible_products"] = self.filter_possible_products(condition_products, matched)
+        context["possible_products"] = self.filter_possible_products(
+            condition_products, matched
+        )
         context["conditions_done"] = self.request.session.get("conditions_done", False)
         return context
 
