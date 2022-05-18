@@ -230,10 +230,31 @@ STATICFILES_FINDERS = [
 ]
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-MEDIA_SUBFOLDER = config("MEDIA_SUBFOLDER", "")
+MEDIA_SUBFOLDER = config("MEDIA_SUBFOLDER", "appels")
 
 if MEDIA_SUBFOLDER:
     MEDIA_ROOT = os.path.join(MEDIA_ROOT, MEDIA_SUBFOLDER)
+
+FILER_STORAGES = {
+    "public": {
+        "main": {
+            "ENGINE": "filer.storage.PublicFileSystemStorage",
+            "OPTIONS": {
+                "location": "/path/to/media/filer",
+                "base_url": "/media/filer/",
+            },
+            "UPLOAD_TO": "filer.utils.generate_filename.randomized",
+            "UPLOAD_TO_PREFIX": "filer_public",
+        },
+        "thumbnails": {
+            "ENGINE": "filer.storage.PublicFileSystemStorage",
+            "OPTIONS": {
+                "location": "/path/to/media/filer_thumbnails",
+                "base_url": "/media/filer_thumbnails/",
+            },
+        },
+    },
+}
 
 MEDIA_URL = "/media/"
 
@@ -459,8 +480,29 @@ SENTRY_DSN = config("SENTRY_DSN", None)
 RELEASE = "v0.7"  # get_current_version()
 
 PRIVATE_MEDIA_ROOT = os.path.join(BASE_DIR, "private_media")
+FILER_ROOT = os.path.join(BASE_DIR, "media", "filer")
+FILER_THUMBNAIL_ROOT = os.path.join(BASE_DIR, "media", "filer_thumbnails")
 if MEDIA_SUBFOLDER:
     PRIVATE_MEDIA_ROOT = os.path.join(PRIVATE_MEDIA_ROOT, MEDIA_SUBFOLDER)
+    FILER_ROOT = os.path.join(FILER_ROOT, MEDIA_SUBFOLDER)
+    FILER_THUMBNAIL_ROOT = os.path.join(FILER_THUMBNAIL_ROOT, MEDIA_SUBFOLDER)
+
+FILER_STORAGES = {
+    "public": {
+        "main": {
+            "OPTIONS": {
+                "location": FILER_ROOT,
+                "base_url": "/media/filer/",
+            },
+        },
+        "thumbnails": {
+            "OPTIONS": {
+                "location": FILER_THUMBNAIL_ROOT,
+                "base_url": "/media/filer_thumbnails/",
+            },
+        },
+    },
+}
 
 SENDFILE_ROOT = PRIVATE_MEDIA_ROOT
 SENDFILE_BACKEND = "django_sendfile.backends.simple"
@@ -813,3 +855,5 @@ DIGID = {
     # (False).
     "want_assertions_signed": DIGID_WANT_ASSERTIONS_SIGNED,
 }
+
+TEST_RUNNER = "django_rich.test.RichRunner"
