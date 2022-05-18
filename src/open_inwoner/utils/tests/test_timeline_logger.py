@@ -97,40 +97,6 @@ class TestAdminTimelineLogging(WebTest):
         response = self.app.get(url, user=self.user, expect_errors=True)
         self.assertEquals(response.status_code, 403)
 
-    def test_user_does_not_have_change_permission(self):
-        add_url = reverse("admin:accounts_contact_add")
-        add_form = self.app.get(add_url, user=self.user).forms.get("contact_form")
-        add_form["first_name"] = self.contact.first_name
-        add_form["last_name"] = self.contact.last_name
-        add_form["email"] = self.contact.email
-        add_form["created_by"] = self.user.id
-        add_form.submit()
-        log_entry = TimelineLog.objects.first()
-        log_url = reverse(
-            "admin:timeline_logger_timelinelog_change",
-            kwargs={"object_id": log_entry.id},
-        )
-        log_form = self.app.get(log_url, user=self.user).forms["timelinelog_form"]
-        log_form["object_id"] = 29
-        response = log_form.submit(expect_errors=True)
-        self.assertEquals(response.status_code, 403)
-
-    def test_user_does_not_have_delete_permission(self):
-        add_url = reverse("admin:accounts_contact_add")
-        add_form = self.app.get(add_url, user=self.user).forms.get("contact_form")
-        add_form["first_name"] = self.contact.first_name
-        add_form["last_name"] = self.contact.last_name
-        add_form["email"] = self.contact.email
-        add_form["created_by"] = self.user.id
-        add_form.submit()
-        log_entry = TimelineLog.objects.first()
-        log_url = reverse(
-            "admin:timeline_logger_timelinelog_delete",
-            kwargs={"object_id": log_entry.id},
-        )
-        response = self.app.post(log_url, user=self.user, expect_errors=True)
-        self.assertEquals(response.status_code, 403)
-
     def test_get_action_returns_addition_when_object_is_added(self):
         url = reverse("admin:accounts_contact_add")
         form = self.app.get(url, user=self.user).forms.get("contact_form")
