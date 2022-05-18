@@ -10,31 +10,25 @@ from django_registration.backends.one_step.views import RegistrationView
 from open_inwoner.utils.views import LogMixin
 
 from ..forms import CustomRegistrationForm
-from ..models import Invite, User
+from ..models import Invite
 
 
 class CustomRegistrationView(LogMixin, RegistrationView):
     form_class = CustomRegistrationForm
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-
-        existing_user = self.get_object()
-        if (
-            existing_user
-            and not existing_user.is_active
-            and not existing_user.deactivated_on
-        ):
-            kwargs["instance"] = existing_user
-
-        return kwargs
 
     def get_initial(self):
         initial = super().get_initial()
 
         invite = self.get_invite()
         if invite:
-            initial["invite"] = invite
+            initial.update(
+                {
+                    "invite": invite,
+                    "email": invite.invitee_email,
+                    "first_name": invite.contact.first_name,
+                    "last_name": invite.contact.last_name,
+                }
+            )
 
         return initial
 
@@ -46,23 +40,13 @@ class CustomRegistrationView(LogMixin, RegistrationView):
 
         return get_object_or_404(Invite, key=invite_key)
 
-    def get_object(self) -> Optional[User]:
-        """return existing user with this email"""
-        invite = self.get_invite()
-
-        email = (
-            invite.invitee.email
-            if invite
-            else self.request.POST.get("email", self.get_initial().get("email"))
-        )
-        if not email:
-            return
-
-        return User.objects.filter(email=email).first()
-
     def form_valid(self, form):
-        object = form.save()
+        user = form.save()
 
-        self.request.user = object
-        self.log_user_action(object, _("user was created"))
+        invite = form.cleaned_data["invite"]
+        if invite:
+            invite.add_invitee(user)
+
+        self.request.user = user
+        self.log_user_action(user, _("user was created"))
         return HttpResponseRedirect(self.get_success_url())
