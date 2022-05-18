@@ -118,14 +118,11 @@ class ContactCreateView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, Creat
         self.object = form.save()
 
         # send invite to the contact
-        contact_user = self.object.contact_user
-        if (
-            contact_user
-            and not contact_user.is_active
-            and not contact_user.deactivated_on
-        ):
+        if not self.object.contact_user:
             invite = Invite.objects.create(
-                inviter=self.request.user, invitee=contact_user, contact=self.object
+                inviter=self.request.user,
+                invitee_email=self.object.email,
+                contact=self.object,
             )
             invite.send(self.request)
 

@@ -111,9 +111,10 @@ class ContactForm(forms.ModelForm):
             self.instance.created_by = self.user
 
         if not self.instance.pk and self.instance.email:
-            self.instance.contact_user, created = User.objects.get_or_create(
-                email=self.instance.email, defaults={"is_active": False}
-            )
+            contact_user = User.objects.filter(email=self.isntance.email).first()
+            if contact_user:
+                self.instance.contact_user = contact_user
+
         return super().save(commit=commit)
 
 
