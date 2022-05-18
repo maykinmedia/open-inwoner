@@ -59,6 +59,6 @@
         {% footer logo_url=site_logo footer_texts=configurable_text.footer %}
         {% session_timeout %}
 
-        <script nonce="{{ request.csp_nonce }}" src="{% static 'bundles/open_inwoner-js.js' %}"></script>
+        <script nonce="{{ request.csp_nonce }}" src="{% static 'bundles/open_inwoner-js.js' %}" type="text/javascript"></script>
     </body>
 </html>
