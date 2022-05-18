@@ -107,7 +107,7 @@
 
 
         {% render_column span=9 %}
-            {% if object.contacts %}
+            {% if object.contacts.exists %}
                 {% render_notification type='success' icon=False %}
                     <h4 class="h4" id="contact">{% trans 'Contact' %}</h4>
 

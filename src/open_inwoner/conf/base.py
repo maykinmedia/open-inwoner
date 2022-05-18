@@ -161,6 +161,7 @@ INSTALLED_APPS = [
     "open_inwoner.haalcentraal",
     "open_inwoner.openzaak",
     "open_inwoner.questionnaire",
+    "open_inwoner.extended_sessions",
 ]
 
 MIDDLEWARE = [
@@ -179,6 +180,7 @@ MIDDLEWARE = [
     "hijack.middleware.HijackUserMiddleware",
     "django_otp.middleware.OTPMiddleware",
     "django.contrib.flatpages.middleware.FlatpageFallbackMiddleware",
+    "open_inwoner.extended_sessions.middleware.SessionTimeoutMiddleware",
 ]
 
 ROOT_URLCONF = "open_inwoner.urls"
@@ -362,6 +364,9 @@ AUTHENTICATION_BACKENDS = [
 
 SESSION_COOKIE_NAME = "open_inwoner_sessionid"
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+ADMIN_SESSION_COOKIE_AGE = 86400
+SESSION_WARN_DELTA = 60  # Warn 1 minute before end of session.
+SESSION_COOKIE_AGE = 900  # Set to 15 minutes
 
 LOGIN_REDIRECT_URL = reverse_lazy("root")
 LOGOUT_REDIRECT_URL = reverse_lazy("root")
@@ -455,9 +460,12 @@ HIJACK_ALLOW_GET_REQUESTS = True
 # SENTRY - error monitoring
 #
 SENTRY_DSN = config("SENTRY_DSN", None)
-RELEASE = "v0.6"  # get_current_version()
+RELEASE = "v0.7"  # get_current_version()
 
 PRIVATE_MEDIA_ROOT = os.path.join(BASE_DIR, "private_media")
+if MEDIA_SUBFOLDER:
+    PRIVATE_MEDIA_ROOT = os.path.join(PRIVATE_MEDIA_ROOT, MEDIA_SUBFOLDER)
+
 SENDFILE_ROOT = PRIVATE_MEDIA_ROOT
 SENDFILE_BACKEND = "django_sendfile.backends.simple"
 PRIVATE_MEDIA_URL = "/private_files/"
@@ -778,47 +786,36 @@ MAX_UPLOAD_SIZE = 1024 ** 2 * 100  # 100MB
 UPLOAD_FILE_TYPES = "application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/plain,application/vnd.oasis.opendocument.text,application/vnd.oasis.opendocument.formula,application/vnd.oasis.opendocument.spreadsheet,application/pdf,image/jpeg,image/png"
 
 #
-# Django CSP settings
+# DIGID
 #
-# explanation of directives: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy
-# and how to specify them: https://django-csp.readthedocs.io/en/latest/configuration.html
-#
-# NOTE: make sure values are a tuple or list, and to quote special values like 'self'
-CSP_DEFAULT_SRC = ("'self'", )  # ideally we'd use BASE_URI but it'd have to be lazy or cause issues
-CSP_BASE_URI = ("'self'", )
-CSP_SCRIPT_SRC = ("'self'", "'unsafe-eval'", "https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:28992/",) # See if the unsafe-eval can be removed....
-CSP_STYLE_SRC = ("'self'", "'unsafe-inline'",) # Fix this. I do not want to have the unsafe-inline here....
-CSP_IMG_SRC = (
-    "'self'",
-    "data:",
-    "https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:28992/",
+
+if ALLOWED_HOSTS:
+    BASE_URL = "https://{}".format(ALLOWED_HOSTS[0])
+else:
+    BASE_URL = "https://example.com"
+
+DIGID_METADATA = config("DIGID_METADATA", "")
+SSL_CERTIFICATE_PATH = config("SSL_CERTIFICATE_PATH", "")
+SSL_KEY_PATH = config("SSL_KEY_PATH", "")
+DIGID_SERVICE_ENTITY_ID = config(
+    "DIGID_SERVICE_ENTITY_ID", "https://was-preprod1.digid.nl/saml/idp/metadata"
 )
+DIGID_WANT_ASSERTIONS_SIGNED = config("DIGID_WANT_ASSERTIONS_SIGNED", default=True)
 
-CSP_UPGRADE_INSECURE_REQUESTS = False  # TODO enable on production?
-CSP_INCLUDE_NONCE_IN = ["script-src"]  # Want to have "style-src" here too.... but does not work with unsafe-inline
+DIGID = {
+    "base_url": BASE_URL,
+    "entity_id": BASE_URL,
+    # This is the metadata of the **Identity provider** NOT our own!
+    "metadata_file": DIGID_METADATA,
+    # SSL/TLS key
+    "key_file": SSL_KEY_PATH,
+    "cert_file": SSL_CERTIFICATE_PATH,
+    "service_entity_id": DIGID_SERVICE_ENTITY_ID,
+    "attribute_consuming_service_index": "1",
+    "requested_attributes": ["bsn"],
+    # Logius can sign the assertions (True) but others sign the entire response
+    # (False).
+    "want_assertions_signed": DIGID_WANT_ASSERTIONS_SIGNED,
+}
 
-# note these are outdated/deprecated django-csp options
-# CSP_BLOCK_ALL_MIXED_CONTENT
-# CSP_PLUGIN_TYPES
-# CSP_CHILD_SRC
-
-CSP_EXCLUDE_URL_PREFIXES = (
-    # ReDoc/Swagger pull in external sources, so don't enforce CSP on API endpoints/documentation.
-    "/api/",
-    # FIXME: Admin pulls in bootstrap from CDN & has inline styles/scripts probably
-    "/admin/",
-)
-
-# report to our own django-csp-reports
-CSP_REPORT_ONLY = config("CSP_REPORT_ONLY", False)  # danger
-CSP_REPORT_URI = reverse_lazy("report_csp")
-
-#
-# Django CSP-report settings
-#
-CSP_REPORTS_SAVE = config("CSP_REPORTS_SAVE", True)  # save as model
-CSP_REPORTS_LOG = config("CSP_REPORTS_LOG", True)  # logging
-CSP_REPORTS_LOG_LEVEL = "warning"
-CSP_REPORTS_EMAIL_ADMINS = False
-CSP_REPORT_PERCENTAGE = config("CSP_REPORT_PERCENTAGE", 1.0)  # float between 0 and 1
-CSP_REPORTS_FILTER_FUNCTION = "cspreports.filters.filter_browser_extensions"
+from .app.csp import *  # noqa

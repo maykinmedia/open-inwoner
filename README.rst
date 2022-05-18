@@ -33,7 +33,7 @@ The users can create plans together to achieve their goals.
 The style of the application is easily configurable: all the colors, images,
 help texts and the logo can be set up and changed in the admin page.
 
-Open Forms is developed in line with the `Common Ground`_ principles and provides
+Open Inwoner is developed in line with the `Common Ground`_ principles and provides
 integration with Common Ground services such as Open Zaak and Haal Centraal.
 
 .. _`Common Ground`: https://commonground.nl/

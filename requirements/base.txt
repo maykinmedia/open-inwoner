@@ -40,19 +40,17 @@ cssselect2==0.4.1
     # via weasyprint
 defusedxml==0.7.1
     # via
-    #   digid-eherkenning
+    #   django-digid-eherkenning
     #   odfpy
     #   python3-openid
+    #   python3-saml
 diff-match-patch==20200713
     # via django-import-export
-digid_eherkenning @ git+https://bitbucket.org/maykinmedia/django-digid-eherkenning.git@02ac61c42f6dd2f229ba9f0f687fa1a4160511be
-    # via -r requirements/base.in
 dj-rest-auth==2.1.11
     # via -r requirements/base.in
 django==3.2.13
     # via
     #   -r requirements/base.in
-    #   digid-eherkenning
     #   dj-rest-auth
     #   django-allauth
     #   django-appconf
@@ -61,6 +59,7 @@ django==3.2.13
     #   django-cors-headers
     #   django-csp
     #   django-csp-reports
+    #   django-digid-eherkenning
     #   django-extra-fields
     #   django-filer
     #   django-filter
@@ -102,7 +101,7 @@ django-better-admin-arrayfield==1.4.2
 django-choices==1.7.2
     # via
     #   -r requirements/base.in
-    #   digid-eherkenning
+    #   django-digid-eherkenning
     #   mail-editor
     #   zgw-consumers
 django-ckeditor==6.2.0
@@ -114,6 +113,7 @@ django-cors-headers==3.10.0
 django-csp==3.7
     # via -r requirements/base.in
 django-csp-reports==1.8.1
+django-digid-eherkenning==0.3.1
     # via -r requirements/base.in
 django-elasticsearch-dsl==7.2.1
     # via -r requirements/base.in
@@ -204,7 +204,9 @@ fontawesomefree==6.1.1
 fonttools[woff]==4.29.1
     # via weasyprint
 furl==2.1.3
-    # via -r requirements/base.in
+    # via
+    #   -r requirements/base.in
+    #   django-digid-eherkenning
 gemma-zds-client==1.0.1
     # via zgw-consumers
 geographiclib==1.52
@@ -223,12 +225,13 @@ importlib-metadata==4.8.2
     # via markdown
 inflection==0.5.1
     # via drf-spectacular
-isodate==0.6.0
+isodate==0.6.1
     # via python3-saml
 jsonschema==4.1.0
     # via drf-spectacular
 lxml==4.6.3
     # via
+    #   django-digid-eherkenning
     #   python3-saml
     #   xmlsec
 mail-editor @ git+https://github.com/maykinmedia/mail-editor.git@0b4621b5c7f434586115b8e722af8940cfa70195
@@ -269,6 +272,7 @@ pyjwt[crypto]==2.3.0
 pyopenssl==21.0.0
     # via
     #   -r requirements/base.in
+    #   python3-saml
     #   zgw-consumers
 pyphen==0.12.0
     # via weasyprint
@@ -287,7 +291,7 @@ python-stdnum==1.17
     # via django-localflavor
 python3-openid==3.2.0
     # via django-allauth
-python3-saml==1.12.0
+python3_saml @ git+https://github.com/maykinmedia/python3-saml.git@f587f77b78be79d51139f29a957b406072e2b537
     # via -r requirements/base.in
 pytz==2021.3
     # via
@@ -307,6 +311,7 @@ requests==2.26.0
     #   django-allauth
     #   django-rosetta
     #   gemma-zds-client
+    #   python3-saml
     #   requests-mock
     #   requests-oauthlib
     #   zgw-consumers
