@@ -23,7 +23,7 @@ class ImageUploadView(APIView):
             defaults={"owner": request.user},
             name="ckeditor",
         )
-        sha1 = hashlib.sha1(uploaded_file.read()).hexdigest()
+        sha1 = hashlib.sha1(uploaded_file.read(), usedforsecurity=False).hexdigest()
 
         img, created = Image.objects.get_or_create(
             defaults={
