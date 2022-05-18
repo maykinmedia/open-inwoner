@@ -511,7 +511,6 @@ pyopenssl==21.0.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   -r requirements/test-tools.in
-    #   python3-saml
     #   zgw-consumers
 pyphen==0.12.0
     # via
@@ -551,7 +550,7 @@ python3-openid==3.2.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-allauth
-python3_saml @ git+https://github.com/maykinmedia/python3-saml.git@f587f77b78be79d51139f29a957b406072e2b537
+python3-saml==1.14.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -585,7 +584,6 @@ requests==2.26.0
     #   django-allauth
     #   django-rosetta
     #   gemma-zds-client
-    #   python3-saml
     #   requests-mock
     #   requests-oauthlib
     #   zgw-consumers
