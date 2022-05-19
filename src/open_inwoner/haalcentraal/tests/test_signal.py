@@ -170,15 +170,15 @@ class TestLogging(TestCase):
             status_code=200,
             content=load_binary_mock("personen.yaml"),
         )
-        m.get(
-            "https://personen/api/ingeschrevenpersonen/999993847",
+        m.post(
+            "https://personen/api/brp/personen",
             status_code=200,
             json=load_json_mock("ingeschrevenpersonen.999993847.json"),
         )
 
         config = HaalCentraalConfig.get_solo()
         service = ServiceFactory(
-            api_root="https://personen/api/",
+            api_root="https://personen/api/brp",
             oas="https://personen/api/schema/openapi.yaml",
         )
         config.service = service
@@ -213,14 +213,14 @@ class TestLogging(TestCase):
             status_code=200,
             content=load_binary_mock("personen.yaml"),
         )
-        m.get(
-            "https://personen/api/ingeschrevenpersonen/999993847",
+        m.post(
+            "https://personen/api/brp/personen",
             status_code=500,
         )
 
         config = HaalCentraalConfig.get_solo()
         service = ServiceFactory(
-            api_root="https://personen/api/",
+            api_root="https://personen/api/brp",
             oas="https://personen/api/schema/openapi.yaml",
         )
         config.service = service
