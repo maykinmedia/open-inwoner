@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.admin.models import ADDITION, CHANGE, DELETION
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext as _
 
 from import_export.admin import ExportMixin
 from import_export.formats import base_formats
@@ -22,7 +22,9 @@ class CustomTimelineLogAdmin(ExportMixin, TimelineLogAdmin):
     ]
 
     def get_object_title(self, obj):
-        return f"{obj.content_type.name} - {obj.object_id}"
+        if obj.content_type:
+            return f"{obj.content_type.name} - {obj.object_id}"
+        return _("System - anonymous user")
 
     get_object_title.short_description = _("Logboekvermelding")
 
@@ -36,6 +38,8 @@ class CustomTimelineLogAdmin(ExportMixin, TimelineLogAdmin):
                 return _("Verwijderd")
             if obj.extra_data.get("action_flag")[0] == 4:
                 return _("User action")
+            if obj.extra_data.get("action_flag")[0] == 5:
+                return _("System action")
         return ""
 
     get_action_flag.short_description = _("Actie")

@@ -3,6 +3,7 @@ from urllib.parse import urljoin
 
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
+from django.utils.translation import gettext as _
 
 from glom import PathAccessError, glom
 from requests import RequestException
@@ -11,6 +12,7 @@ from zds_client import ClientError
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.models import User
 from open_inwoner.haalcentraal.models import HaalCentraalConfig
+from open_inwoner.utils.logentry import system_action
 
 logger = logging.getLogger(__name__)
 
@@ -67,3 +69,5 @@ def on_bsn_change(instance, **kwargs):
                 logger.exception(
                     "exception while trying to access fetched data", exc_info=e
                 )
+            else:
+                system_action(_("data was retrieved from haal centraal"), instance)

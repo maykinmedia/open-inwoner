@@ -12,6 +12,7 @@ LOG_ACTIONS = {
     models.CHANGE: (models.CHANGE, "Change"),
     models.DELETION: (models.DELETION, "Deletion"),
     4: (4, "User action"),
+    5: (5, "System action"),
 }
 
 logger = logging.getLogger(__name__)
@@ -105,12 +106,13 @@ def user_action(request, object, message):
 
 def system_action(message, object=None, user=None, log_level=None):
     """
-    Log a generic action done by business logic. ``User`` instance in the log
-    will be a randomly selected superuser if not specified
+    Log a generic action done by business logic.
     """
+    object_text = object if object else "Anonymous user"
+
     logger.info(
         ("System action: {object}, {message}. \n").format(
-            object=object, message=message
+            object=object_text, message=message
         )
     )
     TimelineLog.objects.create(
@@ -118,7 +120,7 @@ def system_action(message, object=None, user=None, log_level=None):
         user=user,
         extra_data={
             "content_object_repr": force_str(object) if object else "",
-            "action_flag": LOG_ACTIONS[4],
+            "action_flag": LOG_ACTIONS[5],
             "message": message,
             "log_level": log_level,
         },

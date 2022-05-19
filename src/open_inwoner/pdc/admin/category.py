@@ -1,9 +1,12 @@
 from django.contrib import admin
+from django.utils.translation import gettext as _
 
 from import_export.admin import ImportExportMixin
 from import_export.formats import base_formats
 from treebeard.admin import TreeAdmin
 from treebeard.forms import movenodeform_factory
+
+from open_inwoner.utils.views import LogMixin
 
 from ..models import Category
 from ..resources import CategoryExportResource, CategoryImportResource
@@ -11,7 +14,7 @@ from .faq import QuestionInline
 
 
 @admin.register(Category)
-class CategoryAdmin(ImportExportMixin, TreeAdmin):
+class CategoryAdmin(ImportExportMixin, LogMixin, TreeAdmin):
     change_list_template = "admin/category_change_list.html"
     form = movenodeform_factory(Category, fields="__all__")
     inlines = (QuestionInline,)
@@ -26,3 +29,12 @@ class CategoryAdmin(ImportExportMixin, TreeAdmin):
 
     def get_export_resource_class(self):
         return CategoryExportResource
+
+    def export_action(self, request, *args, **kwargs):
+        response = super().export_action(request, *args, **kwargs)
+
+        if request.method == "POST":
+            user = request.user
+            self.log_system_action(_("categories were exported"), user)
+
+        return response
