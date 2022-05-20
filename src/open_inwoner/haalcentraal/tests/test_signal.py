@@ -30,27 +30,32 @@ def load_binary_mock(name):
         return f.read()
 
 
+@requests_mock.Mocker()
 class TestPreSaveSignal(TestCase):
-    @requests_mock.Mocker()
-    def test_signal_updates_users_data_when_logged_in_via_digid(self, m):
+    def _setUpService(self):
+        config = HaalCentraalConfig.get_solo()
+        service = ServiceFactory(
+            api_root="https://personen/api/brp",
+            oas="https://personen/api/schema/openapi.yaml",
+        )
+        config.service = service
+        config.save()
+
+    def _setUpMocks(self, m):
         m.get(
             "https://personen/api/schema/openapi.yaml?v=3",
             status_code=200,
             content=load_binary_mock("personen.yaml"),
         )
-        m.get(
-            "https://personen/api/ingeschrevenpersonen/999993847",
+        m.post(
+            "https://personen/api/brp/personen",
             status_code=200,
             json=load_json_mock("ingeschrevenpersonen.999993847.json"),
         )
 
-        config = HaalCentraalConfig.get_solo()
-        service = ServiceFactory(
-            api_root="https://personen/api/",
-            oas="https://personen/api/schema/openapi.yaml",
-        )
-        config.service = service
-        config.save()
+    def test_signal_updates_users_data_when_logged_in_via_digid(self, m):
+        self._setUpMocks(m)
+        self._setUpService()
 
         user = UserFactory(
             first_name="", last_name="", login_type=LoginTypeChoices.digid
@@ -65,18 +70,8 @@ class TestPreSaveSignal(TestCase):
         self.assertEqual(updated_user[0].birthday, date(1982, 4, 10))
         self.assertTrue(updated_user[0].is_prepopulated)
 
-    @requests_mock.Mocker()
     def test_user_is_not_updated_without_defining_service(self, m):
-        m.get(
-            "https://personen/api/schema/openapi.yaml?v=3",
-            status_code=200,
-            content=load_binary_mock("personen.yaml"),
-        )
-        m.get(
-            "https://personen/api/ingeschrevenpersonen/999993847",
-            status_code=200,
-            json=load_json_mock("ingeschrevenpersonen.999993847.json"),
-        )
+        self._setUpMocks(m)
 
         user = UserFactory(
             first_name="", last_name="", login_type=LoginTypeChoices.digid
@@ -97,18 +92,8 @@ class TestPreSaveSignal(TestCase):
         self.assertEqual(updated_user[0].birthday, None)
         self.assertFalse(updated_user[0].is_prepopulated)
 
-    @requests_mock.Mocker()
     def test_user_is_not_updated_when_not_logged_in_via_digid(self, m):
-        m.get(
-            "https://personen/api/schema/openapi.yaml?v=3",
-            status_code=200,
-            content=load_binary_mock("personen.yaml"),
-        )
-        m.get(
-            "https://personen/api/ingeschrevenpersonen/999993847",
-            status_code=200,
-            json=load_json_mock("ingeschrevenpersonen.999993847.json"),
-        )
+        self._setUpMocks(m)
 
         user = UserFactory(
             first_name="", last_name="", login_type=LoginTypeChoices.default
@@ -123,25 +108,18 @@ class TestPreSaveSignal(TestCase):
         self.assertEqual(updated_user[0].birthday, None)
         self.assertFalse(updated_user[0].is_prepopulated)
 
-    @requests_mock.Mocker()
     def test_user_is_not_updated_when_http_404(self, m):
+        self._setUpService()
+
         m.get(
             "https://personen/api/schema/openapi.yaml?v=3",
             status_code=200,
             content=load_binary_mock("personen.yaml"),
         )
-        m.get(
-            "https://personen/api/ingeschrevenpersonen/999993847",
+        m.post(
+            "https://personen/api/brp/personen",
             status_code=404,
         )
-
-        config = HaalCentraalConfig.get_solo()
-        service = ServiceFactory(
-            api_root="https://personen/api/",
-            oas="https://personen/api/schema/openapi.yaml",
-        )
-        config.service = service
-        config.save()
 
         user = UserFactory(
             first_name="", last_name="", login_type=LoginTypeChoices.digid
@@ -156,25 +134,18 @@ class TestPreSaveSignal(TestCase):
         self.assertEqual(updated_user[0].birthday, None)
         self.assertFalse(updated_user[0].is_prepopulated)
 
-    @requests_mock.Mocker()
     def test_user_is_not_updated_when_http_500(self, m):
+        self._setUpService()
+
         m.get(
             "https://personen/api/schema/openapi.yaml?v=3",
             status_code=200,
             content=load_binary_mock("personen.yaml"),
         )
-        m.get(
-            "https://personen/api/ingeschrevenpersonen/999993847",
+        m.post(
+            "https://personen/api/brp/personen",
             status_code=500,
         )
-
-        config = HaalCentraalConfig.get_solo()
-        service = ServiceFactory(
-            api_root="https://personen/api/",
-            oas="https://personen/api/schema/openapi.yaml",
-        )
-        config.service = service
-        config.save()
 
         user = UserFactory(
             first_name="", last_name="", login_type=LoginTypeChoices.digid
@@ -199,15 +170,15 @@ class TestLogging(TestCase):
             status_code=200,
             content=load_binary_mock("personen.yaml"),
         )
-        m.get(
-            "https://personen/api/ingeschrevenpersonen/999993847",
+        m.post(
+            "https://personen/api/brp/personen",
             status_code=200,
             json=load_json_mock("ingeschrevenpersonen.999993847.json"),
         )
 
         config = HaalCentraalConfig.get_solo()
         service = ServiceFactory(
-            api_root="https://personen/api/",
+            api_root="https://personen/api/brp",
             oas="https://personen/api/schema/openapi.yaml",
         )
         config.service = service
@@ -242,14 +213,14 @@ class TestLogging(TestCase):
             status_code=200,
             content=load_binary_mock("personen.yaml"),
         )
-        m.get(
-            "https://personen/api/ingeschrevenpersonen/999993847",
+        m.post(
+            "https://personen/api/brp/personen",
             status_code=500,
         )
 
         config = HaalCentraalConfig.get_solo()
         service = ServiceFactory(
-            api_root="https://personen/api/",
+            api_root="https://personen/api/brp",
             oas="https://personen/api/schema/openapi.yaml",
         )
         config.service = service

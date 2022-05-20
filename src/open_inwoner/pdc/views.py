@@ -273,10 +273,18 @@ class ProductFinderView(FormView):
             for _order, answer in current_answers.items():
                 if answer.get("answer") == YesNo.no:
                     products = products.exclude(conditions=answer.get("condition"))
+                else:
+                    products = products.filter(conditions=answer.get("condition"))
         return products
 
-    def filter_possible_products(self, condition_products):
-        return Product.objects.exclude(pk__in=condition_products)
+    def filter_possible_products(self, condition_products, matched):
+        qs = Product.objects.exclude(pk__in=matched.values_list("pk"))
+        current_answers = self.request.session.get("product_finder")
+        if current_answers:
+            for _order, answer in current_answers.items():
+                if answer.get("answer") == YesNo.no:
+                    qs = qs.exclude(conditions=answer.get("condition"))
+        return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -284,8 +292,11 @@ class ProductFinderView(FormView):
         context["show_previous"] = previous_condition is not None
         context["condition"] = self.condition
         condition_products = self.get_condition_products()
-        context["matched_products"] = self.filter_matched_products(condition_products)
-        context["possible_products"] = self.filter_possible_products(condition_products)
+        matched = self.filter_matched_products(condition_products)
+        context["matched_products"] = matched
+        context["possible_products"] = self.filter_possible_products(
+            condition_products, matched
+        )
         context["conditions_done"] = self.request.session.get("conditions_done", False)
         return context
 

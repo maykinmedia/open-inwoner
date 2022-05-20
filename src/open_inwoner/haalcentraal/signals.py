@@ -25,14 +25,19 @@ def fetch_data(instance):
         return {}
 
     client = config.service.build_client()
-    url = urljoin(client.base_url, f"ingeschrevenpersonen/{instance.bsn}")
+    url = urljoin(client.base_url, "personen")
+
     try:
-        data = client.retrieve(
-            "ingeschrevenpersonen",
+        data = client.operation(
+            operation_id="GetPersonen",
             url=url,
+            data={
+                "fields": "naam,geboorte",
+                "type": "RaadpleegMetBurgerservicenummer",
+                "burgerservicenummer": [instance.bsn],
+            },
             request_kwargs=dict(
                 headers={"Accept": "application/hal+json"},
-                params={"fields": "naam,geboorte.datum"},
             ),
         )
     except RequestException as e:
@@ -54,10 +59,11 @@ def on_bsn_change(instance, **kwargs):
     ):
         data = fetch_data(instance)
         if data:
+            person = glom(data, "personen")[0]
             try:
-                instance.first_name = glom(data, "naam.voornamen")
-                instance.last_name = glom(data, "naam.geslachtsnaam")
-                instance.birthday = glom(data, "geboorte.datum.datum")
+                instance.first_name = glom(person, "naam.voornamen")
+                instance.last_name = glom(person, "naam.geslachtsnaam")
+                instance.birthday = glom(person, "geboorte.datum.datum")
                 instance.is_prepopulated = True
             except PathAccessError as e:
                 logger.exception(
