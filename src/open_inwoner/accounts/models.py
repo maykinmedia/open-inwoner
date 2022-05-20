@@ -633,26 +633,3 @@ class Invite(models.Model):
     def expired(self) -> bool:
         expiration_date = self.created_on + timedelta(days=settings.INVITE_EXPIRY)
         return expiration_date <= timezone.now()
-
-    def add_invitee(self, user):
-        # update invitee
-        if not self.invitee:
-            self.invitee = user
-            self.save()
-
-        #  update contact user
-        contact = self.contact
-        if contact and not contact.contact_user:
-            contact.contact_user = user
-            contact.save()
-
-        # create reverse contact
-        Contact.objects.get_or_create(
-            contact_user=self.inviter,
-            created_by=self.invitee,
-            defaults={
-                "first_name": self.inviter.first_name,
-                "last_name": self.inviter.last_name,
-                "email": self.inviter.email,
-            },
-        )

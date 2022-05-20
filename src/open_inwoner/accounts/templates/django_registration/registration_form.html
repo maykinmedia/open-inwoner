@@ -1,6 +1,16 @@
 {% extends 'master.html' %}
-{% load form_tags %}
+{% load i18n static form_tags card_tags logo_tags link_tags %}
 
 {% block content %}
-{% form form_object=form method="POST" id="registration-form" submit_text=_('Registreren') %}
+
+{% render_card direction='horizontal' tinted=True %}
+    {% static 'accounts/digid_logo.svg' as digid_logo_src %}
+    {% logo src=digid_logo_src alt=_('Inloggen met DigiD') height="40" href='digid:login' %}
+    {% link bold=True href=digit_url text=_('Registreren met DigiD') secondary=True icon='arrow_forward' %}
+{% endrender_card %}
+
+{% if login_allow_registration %}
+    {% form form_object=form method="POST" id="registration-form" submit_text=_('Registreren') %}
+{% endif %}
+
 {% endblock content %}
