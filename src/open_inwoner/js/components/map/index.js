@@ -57,7 +57,7 @@ class Map {
     L.geoJSON(data, {
       onEachFeature: (feature, layer) =>
         layer.bindPopup(this.featureToHTML(feature), {
-          maxWidth: 150,
+          maxWidth: 300,
         }),
     }).addTo(this.map)
   }
