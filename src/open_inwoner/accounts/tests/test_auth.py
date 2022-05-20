@@ -4,6 +4,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
 
 from django_webtest import WebTest
+from furl import furl
 
 from open_inwoner.configurations.models import SiteConfiguration
 
@@ -17,6 +18,10 @@ class TestRegistrationFunctionality(WebTest):
     def setUp(self):
         # Create a User instance that's not saved
         self.user = UserFactory.build()
+
+        self.config = SiteConfiguration.get_solo()
+        self.config.login_allow_registration = True
+        self.config.save()
 
     def test_registration_succeeds_with_right_user_input(self):
         register_page = self.app.get(reverse("django_registration_register"))
@@ -113,6 +118,77 @@ class TestRegistrationFunctionality(WebTest):
         self.assertEqual(reverse_contact.email, contact.created_by.email)
         self.assertEqual(reverse_contact.first_name, contact.created_by.first_name)
         self.assertEqual(reverse_contact.last_name, contact.created_by.last_name)
+
+    def test_registration_active_user(self):
+        """the user should be redirected to the registration complete page"""
+
+        user = UserFactory.create()
+
+        get_response = self.app.get(self.url, user=user)
+
+        self.assertEqual(get_response.status_code, 302)
+        self.assertEqual(get_response.url, reverse("django_registration_complete"))
+
+    def test_registration_active_user_with_invite(self):
+        """
+        the user should be redirected to the registration complete page
+        and the invite should be updated
+        """
+
+        user = UserFactory.create()
+        contact = ContactFactory.create(email=user.email, contact_user=None)
+        invite = InviteFactory.create(contact=contact, invitee=None)
+        self.assertEqual(user.contacts.count(), 0)
+
+        get_response = self.app.get(f"{self.url}?invite={invite.key}", user=user)
+
+        self.assertEqual(get_response.status_code, 302)
+        self.assertEqual(get_response.url, reverse("django_registration_complete"))
+
+        contact.refresh_from_db()
+        invite.refresh_from_db()
+        self.assertEqual(contact.contact_user, user)
+        self.assertEqual(invite.invitee, user)
+
+        # reverse contact was created
+        self.assertEqual(user.contacts.count(), 1)
+        reverse_contact = user.contacts.get()
+        self.assertEqual(reverse_contact.contact_user, contact.created_by)
+        self.assertEqual(reverse_contact.email, contact.created_by.email)
+        self.assertEqual(reverse_contact.first_name, contact.created_by.first_name)
+        self.assertEqual(reverse_contact.last_name, contact.created_by.last_name)
+
+
+class TestRegistrationDigid(WebTest):
+    url = reverse_lazy("django_registration_register")
+
+    def test_registration_page_only_digid(self):
+        get_response = self.app.get(self.url)
+
+        self.assertEqual(get_response.status_code, 200)
+        self.assertIsNone(get_response.html.find(id="registration-form"))
+
+        digid_tag = get_response.html.find("a", title="Registreren met DigiD")
+        self.assertIsNotNone(digid_tag)
+        self.assertEqual(
+            digid_tag.attrs["href"],
+            furl(reverse("digid:login")).add({"next": str(self.url)}).url,
+        )
+
+    def test_registration_page_only_digid_with_invite(self):
+        invite = InviteFactory.create()
+        url = f"{self.url}?invite={invite.key}"
+
+        get_response = self.app.get(url)
+
+        self.assertEqual(get_response.status_code, 200)
+        self.assertIsNone(get_response.html.find(id="registration-form"))
+
+        digid_tag = get_response.html.find("a", title="Registreren met DigiD")
+        self.assertIsNotNone(digid_tag)
+        self.assertEqual(
+            digid_tag.attrs["href"], furl(reverse("digid:login")).add({"next": url}).url
+        )
 
 
 class TestLoginLogoutFunctionality(WebTest):
