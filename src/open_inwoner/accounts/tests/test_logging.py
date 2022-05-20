@@ -12,6 +12,7 @@ from privates.test import temp_private_root
 from timeline_logger.models import TimelineLog
 from webtest import Upload
 
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.pdc.tests.factories import CategoryFactory
 from open_inwoner.utils.logentry import LOG_ACTIONS
 
@@ -32,6 +33,10 @@ class TestProfile(WebTest):
 
     def setUp(self):
         self.user = UserFactory()
+
+        self.config = SiteConfiguration.get_solo()
+        self.config.login_allow_registration = True
+        self.config.save()
 
     def test_registration_is_logged(self):
         user = UserFactory.build()
