@@ -108,6 +108,31 @@ class TestPreSaveSignal(TestCase):
         self.assertEqual(updated_user[0].birthday, None)
         self.assertFalse(updated_user[0].is_prepopulated)
 
+    def test_empty_response_from_haalcentraal(self, m):
+        self._setUpService()
+
+        m.get(
+            "https://personen/api/schema/openapi.yaml?v=3",
+            status_code=200,
+            content=load_binary_mock("personen.yaml"),
+        )
+        m.post(
+            "https://personen/api/brp/personen",
+            status_code=200,
+            json={"personen": [], "type": "RaadpleegMetBurgerservicenummer"},
+        )
+        user = UserFactory(
+            first_name="", last_name="", login_type=LoginTypeChoices.digid
+        )
+        user.bsn = "999993847"
+        user.save()
+
+        updated_user = User.objects.filter(email=user.email)
+
+        self.assertEqual(updated_user[0].first_name, "")
+        self.assertEqual(updated_user[0].last_name, "")
+        self.assertEqual(updated_user[0].birthday, None)
+
     def test_user_is_not_updated_when_http_404(self, m):
         self._setUpService()
 
