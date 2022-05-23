@@ -4,7 +4,7 @@ register = template.Library()
 
 
 @register.inclusion_tag("components/Footer/Footer.html")
-def footer(logo_url, footer_texts, **kwargs):
+def footer(footer_texts, **kwargs):
     """
     Generating the entire footer.
 
@@ -12,10 +12,9 @@ def footer(logo_url, footer_texts, **kwargs):
         {% footer logo_url=settings.logo footer_texts=settings.footer_texts %}
 
     Variables:
-        + logo_url: string | the location of the logo.
         + footer_texts: dict | the dictionary with the footer texts.
     """
-    return {**kwargs, "logo_url": logo_url, "footer_texts": footer_texts}
+    return {**kwargs, "footer_texts": footer_texts}
 
 
 @register.inclusion_tag("components/Footer/Social.html")
