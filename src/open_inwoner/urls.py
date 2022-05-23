@@ -7,7 +7,13 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import include, path
 
 from open_inwoner.accounts.forms import CustomRegistrationForm
-from open_inwoner.accounts.views import CustomRegistrationView, PasswordResetView
+from open_inwoner.accounts.views import (
+    CustomRegistrationView,
+    LogPasswordChangeView,
+    LogPasswordResetConfirmView,
+    LogPasswordResetView,
+    PasswordResetView,
+)
 from open_inwoner.pdc.views import FAQView, HomeView
 
 handler500 = "open_inwoner.utils.views.server_error"
@@ -46,6 +52,21 @@ urlpatterns = [
         "accounts/register/",
         CustomRegistrationView.as_view(form_class=CustomRegistrationForm),
         name="django_registration_register",
+    ),
+    path(
+        "accounts/password_change/",
+        LogPasswordChangeView.as_view(),
+        name="password_change",
+    ),
+    path(
+        "accounts/password_reset/",
+        LogPasswordResetView.as_view(),
+        name="password_reset",
+    ),
+    path(
+        "accounts/reset/<uidb64>/<token>/",
+        LogPasswordResetConfirmView.as_view(),
+        name="password_reset_confirm",
     ),
     path("accounts/", include("django_registration.backends.one_step.urls")),
     path("accounts/", include("django.contrib.auth.urls")),

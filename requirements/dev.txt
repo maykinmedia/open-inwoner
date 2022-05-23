@@ -24,6 +24,8 @@ attrs==21.2.0
     #   jsonschema
 babel==2.9.1
     # via sphinx
+bandit==1.7.4
+    # via -r requirements/dev.in
 beautifulsoup4==4.10.0
     # via
     #   -c requirements/ci.txt
@@ -99,7 +101,6 @@ defusedxml==0.7.1
     #   django-digid-eherkenning
     #   odfpy
     #   python3-openid
-    #   python3-saml
 diff-match-patch==20200713
     # via
     #   -c requirements/ci.txt
@@ -425,6 +426,10 @@ geopy==2.2.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+gitdb==4.0.9
+    # via gitpython
+gitpython==3.1.27
+    # via bandit
 glom==20.11.0
     # via
     #   -c requirements/ci.txt
@@ -537,6 +542,8 @@ packaging==21.0
     # via sphinx
 pathspec==0.9.0
     # via black
+pbr==5.9.0
+    # via stevedore
 pep517==0.11.0
     # via pip-tools
 pep8==1.7.1
@@ -600,7 +607,6 @@ pyopenssl==21.0.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-    #   python3-saml
     #   zgw-consumers
 pyparsing==2.4.7
     # via packaging
@@ -644,7 +650,7 @@ python3-openid==3.2.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-allauth
-python3_saml @ git+https://github.com/maykinmedia/python3-saml.git@f587f77b78be79d51139f29a957b406072e2b537
+python3-saml==1.14.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -658,6 +664,7 @@ pyyaml==6.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   bandit
     #   drf-spectacular
     #   gemma-zds-client
     #   tablib
@@ -681,7 +688,6 @@ requests==2.26.0
     #   django-allauth
     #   django-rosetta
     #   gemma-zds-client
-    #   python3-saml
     #   requests-mock
     #   requests-oauthlib
     #   sphinx
@@ -716,6 +722,8 @@ six==1.16.0
     #   python-dateutil
     #   qrcode
     #   requests-mock
+smmap==5.0.0
+    # via gitdb
 snowballstemmer==2.1.0
     # via sphinx
 soupsieve==2.3.1
@@ -747,6 +755,8 @@ sqlparse==0.4.2
     #   -r requirements/ci.txt
     #   django
     #   django-debug-toolbar
+stevedore==3.5.0
+    # via bandit
 tablib[html,ods,xls,xlsx,yaml]==3.1.0
     # via
     #   -c requirements/ci.txt

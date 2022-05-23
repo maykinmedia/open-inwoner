@@ -3,12 +3,16 @@ import os
 from datetime import date
 
 from django.test import TestCase
+from django.utils.translation import gettext as _
 
 import requests_mock
+from freezegun import freeze_time
+from timeline_logger.models import TimelineLog
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.models import User
 from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.utils.logentry import LOG_ACTIONS
 
 from ..models import HaalCentraalConfig
 from .factories import ServiceFactory
@@ -155,3 +159,79 @@ class TestPreSaveSignal(TestCase):
         self.assertEqual(updated_user[0].last_name, "")
         self.assertEqual(updated_user[0].birthday, None)
         self.assertFalse(updated_user[0].is_prepopulated)
+
+
+class TestLogging(TestCase):
+    @freeze_time("2021-10-18 13:00:00")
+    @requests_mock.Mocker()
+    def test_signal_updates_logging(self, m):
+        m.get(
+            "https://personen/api/schema/openapi.yaml?v=3",
+            status_code=200,
+            content=load_binary_mock("personen.yaml"),
+        )
+        m.post(
+            "https://personen/api/brp/personen",
+            status_code=200,
+            json=load_json_mock("ingeschrevenpersonen.999993847.json"),
+        )
+
+        config = HaalCentraalConfig.get_solo()
+        service = ServiceFactory(
+            api_root="https://personen/api/brp",
+            oas="https://personen/api/schema/openapi.yaml",
+        )
+        config.service = service
+        config.save()
+
+        user = UserFactory(
+            first_name="", last_name="", login_type=LoginTypeChoices.digid
+        )
+        user.bsn = "999993847"
+        user.save()
+
+        log_entry = TimelineLog.objects.first()
+
+        self.assertEquals(
+            log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
+        )
+        self.assertEquals(log_entry.content_object.id, user.id)
+        self.assertEquals(
+            log_entry.extra_data,
+            {
+                "message": _("data was retrieved from haal centraal"),
+                "log_level": None,
+                "action_flag": list(LOG_ACTIONS[5]),
+                "content_object_repr": user.email,
+            },
+        )
+
+    @requests_mock.Mocker()
+    def test_nothing_is_logged_when_there_is_an_error(self, m):
+        m.get(
+            "https://personen/api/schema/openapi.yaml?v=3",
+            status_code=200,
+            content=load_binary_mock("personen.yaml"),
+        )
+        m.post(
+            "https://personen/api/brp/personen",
+            status_code=500,
+        )
+
+        config = HaalCentraalConfig.get_solo()
+        service = ServiceFactory(
+            api_root="https://personen/api/brp",
+            oas="https://personen/api/schema/openapi.yaml",
+        )
+        config.service = service
+        config.save()
+
+        user = UserFactory(
+            first_name="", last_name="", login_type=LoginTypeChoices.digid
+        )
+        user.bsn = "999993847"
+        user.save()
+
+        log_entries = TimelineLog.objects.count()
+
+        self.assertEqual(log_entries, 0)
