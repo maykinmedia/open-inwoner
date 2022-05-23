@@ -26,13 +26,18 @@ export default class Modal {
     this.text.innerText = text
   }
 
-  setClose(text) {
+  setClose(text, className = 'button--primary') {
     this.close.innerText = text
+    this.close.classList.add(className)
   }
 
-  setConfirm(text, callback) {
+  setConfirm(text, callback, className = 'button--primary') {
     this.confirm.innerText = text
-    this.confirm.addEventListener('click', callback)
+    this.confirm.addEventListener('click', (event) => {
+      callback(event)
+      this.hide()
+    })
+    this.confirm.classList.add(className)
   }
 
   show() {

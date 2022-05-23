@@ -89,6 +89,7 @@ class SessionTimeout {
     modal.setTitle(title)
     modal.setText(bodyText)
     modal.setConfirm(buttonText, callback.bind(this))
+    modal.show()
   }
 
   configureActivityCheck() {

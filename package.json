@@ -51,8 +51,7 @@
     "material-icons": "^1.10.11",
     "microscope-sass": "latest",
     "proj4leaflet": "^1.0.2",
-    "style-loader": "^2.0.0",
-    "sweetalert2": "^11.4.4"
+    "style-loader": "^2.0.0"
   },
   "devDependencies": {
     "@babel/core": "latest",
@@ -64,7 +63,6 @@
     "chai": "latest",
     "css-loader": "latest",
     "cssnano": "latest",
-    "esbuild-plugin-svg": "^0.1.0",
     "istanbul-instrumenter-loader": "latest",
     "karma": "latest",
     "karma-chrome-launcher": "latest",

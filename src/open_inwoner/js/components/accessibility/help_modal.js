@@ -17,6 +17,7 @@ class HelpModal {
     modal.setConfirm(this.modal.dataset.helpClose, (close) => {
       this.helpButton.classList.remove('accessibility-header__modal--highlight')
     })
+    modal.show()
   }
 }
 

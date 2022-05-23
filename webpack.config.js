@@ -23,6 +23,7 @@ module.exports = {
 
     admin_overrides: `${__dirname}/${paths.scssSrcDir}/admin/admin_overrides.scss`,
     'pdf-p': `${__dirname}/${paths.scssSrcDir}/pdf/pdf_portrait.scss`,
+    ckeditor: `${__dirname}/${paths.jsSrcDir}/ckeditor.js`,
   },
 
   // (Output) bundle locations.

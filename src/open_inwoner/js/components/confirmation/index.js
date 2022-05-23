@@ -14,14 +14,19 @@ class Confirmation {
       const modal = new Modal(modalId)
       modal.setTitle(this.form.dataset.confirmTitle)
       modal.setClose(this.form.dataset.confirmCancel)
-      modal.setConfirm(this.form.dataset.confirmDefault, (result) => {
-        if (result.isConfirmed) {
-          this.real_submit = true
-          this.form.submit()
-          event.target.dispatchEvent(event)
-        }
-      })
+      modal.setConfirm(
+        this.form.dataset.confirmDefault,
+        this.handleConfirm.bind(this),
+        'button--danger'
+      )
+      modal.show()
     }
+  }
+
+  handleConfirm(event) {
+    this.real_submit = true
+    this.form.submit()
+    event.target.dispatchEvent(event)
   }
 }
 

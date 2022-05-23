@@ -130,6 +130,16 @@
     cursor: default;
   }
 
+  &--danger {
+    background-color: var(--color-danger-lighter);
+    color: var(--color-white);
+
+    &:hover {
+      transform: translateY(-1px);
+      background-color: var(--color-danger);
+    }
+  }
+
   > .link__text {
     width: 100%;
   }

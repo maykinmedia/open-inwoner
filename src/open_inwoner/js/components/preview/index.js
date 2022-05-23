@@ -11,11 +11,8 @@ class Preview {
     event.stopPropagation()
     event.preventDefault()
 
-    const modalId = document.getElementById('modal')
+    const modalId = document.getElementById(this.node.dataset.id)
     const modal = new Modal(modalId)
-    modal.setTitle(this.node.dataset.title)
-    modal.setText(this.node.dataset.text)
-    modal.setClose(this.node.dataset.close)
     modal.show()
   }
 }
