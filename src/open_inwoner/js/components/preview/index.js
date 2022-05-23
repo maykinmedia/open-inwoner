@@ -1,4 +1,4 @@
-import Swal from 'sweetalert2'
+import Modal from '../modal'
 
 class Preview {
   constructor(node) {
@@ -11,12 +11,12 @@ class Preview {
     event.stopPropagation()
     event.preventDefault()
 
-    Swal.fire({
-      title: this.node.dataset.title,
-      html: this.node.dataset.text,
-      showConfirmButton: true,
-      confirmButtonText: this.node.dataset.close,
-    })
+    const modalId = document.getElementById('modal')
+    const modal = new Modal(modalId)
+    modal.setTitle(this.node.dataset.title)
+    modal.setText(this.node.dataset.text)
+    modal.setClose(this.node.dataset.close)
+    modal.show()
   }
 }
 

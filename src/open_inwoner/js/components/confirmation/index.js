@@ -1,4 +1,4 @@
-import Swal from 'sweetalert2'
+import Modal from '../modal'
 
 class Confirmation {
   constructor(form) {
@@ -10,18 +10,11 @@ class Confirmation {
   confirmDialog(event) {
     if (!this.real_submit) {
       event.preventDefault()
-      Swal.fire({
-        text: this.form.dataset.confirmTitle,
-        showCancelButton: true,
-        showConfirmButton: true,
-        confirmButtonText: this.form.dataset.confirmDefault,
-        cancelButtonText: this.form.dataset.confirmCancel,
-        focusConfirm: false,
-        focusCancel: false,
-        customClass: {
-          confirmButton: 'swal2-danger',
-        },
-      }).then((result) => {
+      const modalId = document.getElementById('modal')
+      const modal = new Modal(modalId)
+      modal.setTitle(this.form.dataset.confirmTitle)
+      modal.setClose(this.form.dataset.confirmCancel)
+      modal.setConfirm(this.form.dataset.confirmDefault, (result) => {
         if (result.isConfirmed) {
           this.real_submit = true
           this.form.submit()

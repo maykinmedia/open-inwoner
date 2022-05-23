@@ -16,12 +16,10 @@ CSP_BASE_URI = ("'self'",)
 CSP_FONT_SRC = ("'self'",)
 CSP_SCRIPT_SRC = (
     "'self'",
-    "'unsafe-eval'",
     "https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:28992/",
 )  # See if the unsafe-eval can be removed....
 CSP_STYLE_SRC = (
     "'self'",
-    "'unsafe-inline'",
 )  # Fix this. I do not want to have the unsafe-inline here....
 CSP_IMG_SRC = (
     "'self'",
@@ -32,6 +30,7 @@ CSP_IMG_SRC = (
 CSP_UPGRADE_INSECURE_REQUESTS = False  # TODO enable on production?
 CSP_INCLUDE_NONCE_IN = [
     "script-src",
+    "style-src",
 ]  # Want to have "style-src" here too.... but does not work with unsafe-inline
 
 # note these are outdated/deprecated django-csp options
@@ -42,7 +41,6 @@ CSP_INCLUDE_NONCE_IN = [
 CSP_EXCLUDE_URL_PREFIXES = (
     # ReDoc/Swagger pull in external sources, so don't enforce CSP on API endpoints/documentation.
     "/api/",
-    # FIXME: Admin pulls in bootstrap from CDN & has inline styles/scripts probably
     "/admin/",
 )
 
@@ -53,7 +51,7 @@ CSP_REPORT_URI = reverse_lazy("report_csp")
 #
 # Django CSP-report settings
 #
-CSP_REPORTS_SAVE = config("CSP_REPORTS_SAVE", True)  # save as model
+CSP_REPORTS_SAVE = config("CSP_REPORTS_SAVE", False)  # save as model
 CSP_REPORTS_LOG = config("CSP_REPORTS_LOG", True)  # logging
 CSP_REPORTS_LOG_LEVEL = "warning"
 CSP_REPORTS_EMAIL_ADMINS = False
