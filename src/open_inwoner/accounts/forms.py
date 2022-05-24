@@ -216,7 +216,9 @@ class InboxForm(forms.ModelForm):
         label=_("Contactpersoon"),
         queryset=User.objects.none(),
         to_field_name="email",
-        widget=forms.HiddenInput(),
+        widget=forms.HiddenInput(
+            attrs={"placeholder": _("Voer de naam in van uw contactpersoon")}
+        ),
     )
     content = forms.CharField(
         label="",
