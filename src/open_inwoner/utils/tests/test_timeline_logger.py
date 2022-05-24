@@ -97,6 +97,43 @@ class TestAdminTimelineLogging(WebTest):
         response = self.app.get(url, user=self.user, expect_errors=True)
         self.assertEquals(response.status_code, 403)
 
+    def test_superuser_does_not_have_add_permission(self):
+        log_url = reverse("admin:timeline_logger_timelinelog_add")
+        response = self.app.get(log_url, user=self.user, expect_errors=True)
+        self.assertEquals(response.status_code, 403)
+
+    def test_superuser_does_not_have_change_permission(self):
+        add_url = reverse("admin:accounts_contact_add")
+        add_form = self.app.get(add_url, user=self.user).forms.get("contact_form")
+        add_form["first_name"] = self.contact.first_name
+        add_form["last_name"] = self.contact.last_name
+        add_form["email"] = self.contact.email
+        add_form["created_by"] = self.user.id
+        add_form.submit()
+        log_entry = TimelineLog.objects.first()
+        log_url = reverse(
+            "admin:timeline_logger_timelinelog_change",
+            kwargs={"object_id": log_entry.id},
+        )
+        response = self.app.post(log_url, user=self.user, expect_errors=True)
+        self.assertEquals(response.status_code, 403)
+
+    def test_superuser_does_not_have_delete_permission(self):
+        add_url = reverse("admin:accounts_contact_add")
+        add_form = self.app.get(add_url, user=self.user).forms.get("contact_form")
+        add_form["first_name"] = self.contact.first_name
+        add_form["last_name"] = self.contact.last_name
+        add_form["email"] = self.contact.email
+        add_form["created_by"] = self.user.id
+        add_form.submit()
+        log_entry = TimelineLog.objects.first()
+        log_url = reverse(
+            "admin:timeline_logger_timelinelog_delete",
+            kwargs={"object_id": log_entry.id},
+        )
+        response = self.app.post(log_url, user=self.user, expect_errors=True)
+        self.assertEquals(response.status_code, 403)
+
     def test_get_action_returns_addition_when_object_is_added(self):
         url = reverse("admin:accounts_contact_add")
         form = self.app.get(url, user=self.user).forms.get("contact_form")
@@ -146,6 +183,16 @@ class TestAdminTimelineLogging(WebTest):
             CustomTimelineLogAdmin, log_entry
         )
         self.assertEquals(action, "")
+
+    def test_object_link_returns_right_link(self):
+        self.add_instance()
+        url = reverse("admin:timeline_logger_timelinelog_changelist")
+        response = self.app.get(url, user=self.user)
+        contact = Contact.objects.first()
+        obj_link = reverse(
+            "admin:accounts_contact_change", kwargs={"object_id": contact.id}
+        )
+        self.assertContains(response, obj_link)
 
 
 class TestTimelineLogExport(WebTest):
