@@ -44,6 +44,8 @@ git+https://github.com/maykinmedia/mail-editor.git@0b4621b5c7f434586115b8e722af8
 fontawesomefree
 django-timeline-logger
 django-rich
+django-csp
+django-csp-reports
 
 # API libraries
 djangorestframework

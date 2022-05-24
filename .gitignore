@@ -38,6 +38,7 @@ local.py
 
 # Static files
 src/open_inwoner/static/bundles/
+src/open_inwoner/static/webfonts/
 src/open_inwoner/fonts/
 src/open_inwoner/static/webfonts/fa-brands-400.ttf
 src/open_inwoner/static/webfonts/fa-brands-400.woff2
@@ -47,3 +48,5 @@ src/open_inwoner/static/webfonts/fa-solid-900.ttf
 src/open_inwoner/static/webfonts/fa-solid-900.woff2
 src/open_inwoner/static/webfonts/fa-v4compatibility.ttf
 src/open_inwoner/static/webfonts/fa-v4compatibility.woff2
+src/open_inwoner/static/fonts/material-icons/
+

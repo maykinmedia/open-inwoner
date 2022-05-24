@@ -147,6 +147,8 @@ INSTALLED_APPS = [
     "privates",
     "fontawesomefree",
     "timeline_logger",
+    "csp",
+    "cspreports",
     # Project applications.
     "open_inwoner.accounts",
     "open_inwoner.components",
@@ -170,6 +172,8 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "csp.contrib.rate_limiting.RateLimitedCSPMiddleware",
+    "csp.middleware.CSPMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "axes.middleware.AxesMiddleware",
@@ -835,4 +839,7 @@ DIGID = {
     "want_assertions_signed": DIGID_WANT_ASSERTIONS_SIGNED,
 }
 
+
 TEST_RUNNER = "django_rich.test.RichRunner"
+
+from .app.csp import *  # noqa

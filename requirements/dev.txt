@@ -126,6 +126,8 @@ django==3.2.13
     #   django-axes
     #   django-choices
     #   django-cors-headers
+    #   django-csp
+    #   django-csp-reports
     #   django-debug-toolbar
     #   django-digid-eherkenning
     #   django-extensions
@@ -198,6 +200,14 @@ django-colorfield==0.4.5
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
 django-cors-headers==3.10.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+django-csp==3.7
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+django-csp-reports==1.8.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt

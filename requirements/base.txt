@@ -59,6 +59,8 @@ django==3.2.13
     #   django-axes
     #   django-choices
     #   django-cors-headers
+    #   django-csp
+    #   django-csp-reports
     #   django-digid-eherkenning
     #   django-extra-fields
     #   django-filer
@@ -111,6 +113,9 @@ django-colorfield==0.4.5
     # via -r requirements/base.in
 django-cors-headers==3.10.0
     # via -r requirements/base.in
+django-csp==3.7
+    # via -r requirements/base.in
+django-csp-reports==1.8.1
 django-digid-eherkenning==0.3.1
     # via -r requirements/base.in
 django-elasticsearch-dsl==7.2.1

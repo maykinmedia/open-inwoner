@@ -1,4 +1,4 @@
-import Swal from 'sweetalert2'
+import Modal from '../modal'
 
 function currentTime() {
   return Math.floor(Date.now() / 1000)
@@ -84,12 +84,12 @@ class SessionTimeout {
   }
 
   configureModal(title, bodyText, buttonText, callback) {
-    Swal.fire({
-      title: title,
-      html: bodyText,
-      showConfirmButton: true,
-      confirmButtonText: buttonText,
-    }).then(callback.bind(this))
+    const modalId = document.getElementById('modal')
+    const modal = new Modal(modalId)
+    modal.setTitle(title)
+    modal.setText(bodyText)
+    modal.setConfirm(buttonText, callback.bind(this))
+    modal.show()
   }
 
   configureActivityCheck() {
