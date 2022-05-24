@@ -32,30 +32,17 @@ class CustomRegistrationForm(RegistrationForm):
             "invite",
         )
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def clean_email(self):
+        email = self.cleaned_data["email"]
 
-        if self.initial.get("invite") or self.data.get("invite"):
-            self.fields["email"].widget.attrs["readonly"] = "readonly"
-            del self.fields["email"].widget.attrs["autofocus"]
+        existing_user = User.objects.filter(email=email).first()
+        if not existing_user:
+            return email
 
-    def save(self, commit=True):
-        self.instance.is_active = True
+        if existing_user.is_active:
+            raise ValidationError(_("The user with this email already exists"))
 
-        user = super().save(commit)
-
-        # if there is invite - create reverse contact relations
-        invite = self.cleaned_data.get("invite")
-        if invite:
-            inviter = invite.inviter
-            Contact.objects.create(
-                first_name=inviter.first_name,
-                last_name=inviter.last_name,
-                email=inviter.email,
-                contact_user=inviter,
-                created_by=user,
-            )
-        return user
+        raise ValidationError(_("This user has been deactivated"))
 
 
 class UserForm(forms.ModelForm):
@@ -111,9 +98,10 @@ class ContactForm(forms.ModelForm):
             self.instance.created_by = self.user
 
         if not self.instance.pk and self.instance.email:
-            self.instance.contact_user, created = User.objects.get_or_create(
-                email=self.instance.email, defaults={"is_active": False}
-            )
+            contact_user = User.objects.filter(email=self.instance.email).first()
+            if contact_user:
+                self.instance.contact_user = contact_user
+
         return super().save(commit=commit)
 
 
