@@ -10,7 +10,6 @@ on:
   pull_request:
   workflow_dispatch:
 
-
 jobs:
   isort:
     name: Check import sorting
@@ -28,7 +27,7 @@ jobs:
       - uses: isort/isort-action@v0.1.0
         with:
           requirementsFiles: requirements/dev.txt
-          sortPaths: "src"
+          sortPaths: 'src'
           configuration: '--check-only --diff'
 
   black:
@@ -43,7 +42,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
-          python-version: '3.7'
+          python-version: '3.9'
       - name: Install dependencies
         run: |
           pip install -r requirements/dev.txt
@@ -55,11 +54,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-    - name: Install dependencies
-      run: |
-        npm install
-    - name: Run Prettier
-      run: |
-        npm run check-linting
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install dependencies
+        run: |
+          npm install
+      - name: Run Prettier
+        run: |
+          npm run check-linting
+  bandit:
+    name: Python security check using Bandit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install libxml
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxml2-dev libxmlsec1-dev libxmlsec1-openssl
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+      - name: Install dependencies
+        run: |
+          pip install -r requirements/dev.txt
+      - name: Run Bandit
+        run: |
+          bandit -r ./src/ -x tests,conf/utils.py -s B101

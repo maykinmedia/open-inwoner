@@ -94,4 +94,4 @@ class InviteFactory(factory.django.DjangoModelFactory):
 
     contact = factory.SubFactory(ContactFactory)
     inviter = factory.LazyAttribute(lambda o: o.contact.created_by)
-    invitee = factory.LazyAttribute(lambda o: o.contact.contact_user)
+    invitee_email = factory.LazyAttribute(lambda o: o.contact.email)

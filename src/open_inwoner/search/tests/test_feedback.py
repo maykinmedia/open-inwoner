@@ -1,8 +1,11 @@
 import urllib
 
+from django.contrib import messages
 from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _
 
 from django_webtest import WebTest
+from furl import furl
 
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.pdc.tests.factories import CategoryFactory, TagFactory
@@ -149,3 +152,30 @@ class TestFeedbackFunctionality(ESMixin, WebTest):
         self.assertTrue(feedback.positive)
         self.assertEqual(feedback.remark, self.feedback.remark)
         self.assertIsNone(feedback.searched_by)
+
+    def test_feedback_form_not_displayed_after_submit(self):
+        params = {"query": self.feedback.search_query}
+        url = furl(reverse("search:search")).add(params).url
+        get_response = self.app.get(url)
+
+        self.assertIsNotNone(get_response.html.find(id="feedback_form"))
+        self.assertEqual(list(get_response.context["messages"]), [])
+
+        feedback_form = get_response.forms["feedback_form"]
+        feedback_form["remark"] = self.feedback.remark
+        feedback_form["positive"] = "true"
+
+        post_response = feedback_form.submit().follow()
+
+        self.assertIsNone(post_response.html.find(id="feedback_form"))
+        post_messages = list(post_response.context["messages"])
+        self.assertEqual(len(post_messages), 1)
+
+        message = post_messages[0]
+        self.assertEqual(message.level, messages.SUCCESS)
+        self.assertEqual(
+            message.message,
+            _(
+                "Thank you for your feedback. It will help us to improve our search engine"
+            ),
+        )

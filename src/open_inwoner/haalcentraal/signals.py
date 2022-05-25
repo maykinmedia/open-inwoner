@@ -1,9 +1,9 @@
 import logging
-from sys import exc_info
 from urllib.parse import urljoin
 
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
+from django.utils.translation import gettext as _
 
 from glom import PathAccessError, glom
 from requests import RequestException
@@ -12,6 +12,7 @@ from zds_client import ClientError
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.models import User
 from open_inwoner.haalcentraal.models import HaalCentraalConfig
+from open_inwoner.utils.logentry import system_action
 
 logger = logging.getLogger(__name__)
 
@@ -24,14 +25,19 @@ def fetch_data(instance):
         return {}
 
     client = config.service.build_client()
-    url = urljoin(client.base_url, f"ingeschrevenpersonen/{instance.bsn}")
+    url = urljoin(client.base_url, "personen")
+
     try:
-        data = client.retrieve(
-            "ingeschrevenpersonen",
+        data = client.operation(
+            operation_id="GetPersonen",
             url=url,
+            data={
+                "fields": "naam,geboorte",
+                "type": "RaadpleegMetBurgerservicenummer",
+                "burgerservicenummer": [instance.bsn],
+            },
             request_kwargs=dict(
                 headers={"Accept": "application/hal+json"},
-                params={"fields": "naam,geboorte.datum"},
             ),
         )
     except RequestException as e:
@@ -52,13 +58,16 @@ def on_bsn_change(instance, **kwargs):
         and instance.login_type == LoginTypeChoices.digid
     ):
         data = fetch_data(instance)
-        if data:
+        if data.get("personen"):
+            person = glom(data, "personen")[0]
             try:
-                instance.first_name = glom(data, "naam.voornamen")
-                instance.last_name = glom(data, "naam.geslachtsnaam")
-                instance.birthday = glom(data, "geboorte.datum.datum")
+                instance.first_name = glom(person, "naam.voornamen")
+                instance.last_name = glom(person, "naam.geslachtsnaam")
+                instance.birthday = glom(person, "geboorte.datum.datum")
                 instance.is_prepopulated = True
             except PathAccessError as e:
                 logger.exception(
                     "exception while trying to access fetched data", exc_info=e
                 )
+            else:
+                system_action(_("data was retrieved from haal centraal"), instance)

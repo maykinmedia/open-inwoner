@@ -138,6 +138,6 @@ class MessageAdmin(PrivateMediaMixin, admin.ModelAdmin):
 
 @admin.register(Invite)
 class InviteAdmin(admin.ModelAdmin):
-    list_display = ("inviter", "invitee", "accepted", "created_on")
+    list_display = ("inviter", "invitee_email", "invitee", "accepted", "created_on")
     list_filter = ("inviter", "invitee")
     readonly_fields = ("key",)

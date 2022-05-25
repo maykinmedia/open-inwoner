@@ -2,7 +2,7 @@ from datetime import timedelta
 
 from django.contrib.admin.models import ADDITION, CHANGE, DELETION
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
@@ -12,9 +12,11 @@ from privates.test import temp_private_root
 from timeline_logger.models import TimelineLog
 from webtest import Upload
 
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.pdc.tests.factories import CategoryFactory
 from open_inwoner.utils.logentry import LOG_ACTIONS
 
+from ..choices import LoginTypeChoices
 from ..models import Action, Contact, Document, Message, User
 from .factories import (
     ActionFactory,
@@ -33,6 +35,10 @@ class TestProfile(WebTest):
     def setUp(self):
         self.user = UserFactory()
 
+        self.config = SiteConfiguration.get_solo()
+        self.config.login_allow_registration = True
+        self.config.save()
+
     def test_registration_is_logged(self):
         user = UserFactory.build()
         form = self.app.get(reverse("django_registration_register")).forms[
@@ -46,11 +52,11 @@ class TestProfile(WebTest):
         form.submit()
         log_entry = TimelineLog.objects.first()
 
-        self.assertEquals(
+        self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEquals(log_entry.content_object.id, User.objects.all()[1].id)
-        self.assertEquals(
+        self.assertEqual(log_entry.content_object.id, User.objects.all()[1].id)
+        self.assertEqual(
             log_entry.extra_data,
             {
                 "message": _("user was created"),
@@ -67,11 +73,11 @@ class TestProfile(WebTest):
         form.submit()
         log_entry = TimelineLog.objects.last()
 
-        self.assertEquals(
+        self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEquals(log_entry.content_object.id, self.user.id)
-        self.assertEquals(
+        self.assertEqual(log_entry.content_object.id, self.user.id)
+        self.assertEqual(
             log_entry.extra_data,
             {
                 "message": _("profile was modified"),
@@ -91,11 +97,11 @@ class TestProfile(WebTest):
         form.submit()
         log_entry = TimelineLog.objects.last()
 
-        self.assertEquals(
+        self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEquals(log_entry.content_object.id, self.user.id)
-        self.assertEquals(
+        self.assertEqual(log_entry.content_object.id, self.user.id)
+        self.assertEqual(
             log_entry.extra_data,
             {
                 "message": _("categories were modified"),
@@ -108,11 +114,11 @@ class TestProfile(WebTest):
         self.app.post(reverse("admin:login"), user=self.user)
         log_entry = TimelineLog.objects.first()
 
-        self.assertEquals(
+        self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEquals(log_entry.content_object.id, self.user.id)
-        self.assertEquals(
+        self.assertEqual(log_entry.content_object.id, self.user.id)
+        self.assertEqual(
             log_entry.extra_data,
             {
                 "message": _("user was logged in via admin page"),
@@ -121,20 +127,38 @@ class TestProfile(WebTest):
             },
         )
 
-    def test_login_via_frontend_is_logged(self):
+    def test_login_via_frontend_using_email_is_logged(self):
         self.app.post(reverse("login"), user=self.user)
         log_entry = TimelineLog.objects.first()
 
-        self.assertEquals(
+        self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEquals(log_entry.content_object.id, self.user.id)
-        self.assertEquals(
+        self.assertEqual(log_entry.content_object.id, self.user.id)
+        self.assertEqual(
             log_entry.extra_data,
             {
-                "message": _("user was logged in via frontend"),
+                "message": _("user was logged in via frontend using email"),
                 "action_flag": list(LOG_ACTIONS[4]),
                 "content_object_repr": self.user.email,
+            },
+        )
+
+    def test_login_via_frontend_using_digid_is_logged(self):
+        user = UserFactory(login_type=LoginTypeChoices.digid)
+        self.app.get(reverse("digid:acs"), {"bsn": "123123222"}, user=user)
+        log_entry = TimelineLog.objects.first()
+
+        self.assertEqual(
+            log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
+        )
+        self.assertEqual(log_entry.content_object.id, user.id)
+        self.assertEqual(
+            log_entry.extra_data,
+            {
+                "message": _("user was logged in via frontend using digid"),
+                "action_flag": list(LOG_ACTIONS[4]),
+                "content_object_repr": user.email,
             },
         )
 
@@ -142,11 +166,11 @@ class TestProfile(WebTest):
         self.app.get(reverse("logout"), user=self.user)
         log_entry = TimelineLog.objects.last()
 
-        self.assertEquals(
+        self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEquals(log_entry.content_object.id, self.user.id)
-        self.assertEquals(
+        self.assertEqual(log_entry.content_object.id, self.user.id)
+        self.assertEqual(
             log_entry.extra_data,
             {
                 "message": _("user was logged out"),
@@ -162,15 +186,88 @@ class TestProfile(WebTest):
         form.submit()
         log_entry = TimelineLog.objects.last()
 
-        self.assertEquals(
+        self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEquals(log_entry.content_object.id, self.user.id)
-        self.assertEquals(
+        self.assertEqual(log_entry.content_object.id, self.user.id)
+        self.assertEqual(
             log_entry.extra_data,
             {
                 "message": _("user was deactivated via frontend"),
                 "action_flag": list(LOG_ACTIONS[4]),
+                "content_object_repr": self.user.email,
+            },
+        )
+
+    def test_password_change_is_logged(self):
+        user = UserFactory(password="test")
+        form = self.app.get(reverse("password_change"), user=user).forms[
+            "password-change-form"
+        ]
+        form["old_password"] = "test"
+        form["new_password1"] = "newPassw0rd"
+        form["new_password2"] = "newPassw0rd"
+        form.submit()
+        log_entry = TimelineLog.objects.last()
+
+        self.assertEqual(
+            log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
+        )
+        self.assertEqual(log_entry.content_object.id, user.id)
+        self.assertEqual(
+            log_entry.extra_data,
+            {
+                "message": _("password was changed"),
+                "action_flag": list(LOG_ACTIONS[4]),
+                "content_object_repr": user.email,
+            },
+        )
+
+    def test_password_reset_access_is_logged(self):
+        form = self.app.get(reverse("password_reset")).forms["password-reset-form"]
+        form["email"] = self.user.email
+        form.submit()
+        log_entry = TimelineLog.objects.last()
+
+        self.assertEqual(
+            log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
+        )
+        self.assertEqual(
+            log_entry.extra_data,
+            {
+                "message": _("password reset was accessed"),
+                "log_level": None,
+                "action_flag": list(LOG_ACTIONS[5]),
+                "content_object_repr": "",
+            },
+        )
+
+    def test_password_reset_confirm_is_logged(self):
+        form = self.app.get(reverse("password_reset")).forms["password-reset-form"]
+        form["email"] = self.user.email
+        response = form.submit()
+
+        token = response.context[0]["token"]
+        uid = response.context[0]["uid"]
+        confirm_response = self.app.get(
+            reverse("password_reset_confirm", kwargs={"token": token, "uidb64": uid})
+        ).follow()
+        form = confirm_response.forms["password-reset-confirm"]
+        form["new_password1"] = "passW0rd@"
+        form["new_password2"] = "passW0rd@"
+        form.submit()
+
+        log_entry = TimelineLog.objects.last()
+
+        self.assertEqual(
+            log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
+        )
+        self.assertEqual(
+            log_entry.extra_data,
+            {
+                "message": _("password reset was completed"),
+                "log_level": None,
+                "action_flag": list(LOG_ACTIONS[5]),
                 "content_object_repr": self.user.email,
             },
         )
@@ -189,16 +286,16 @@ class TestInvites(WebTest):
         form.submit()
         log_entry = TimelineLog.objects.last()
 
-        self.assertEquals(
+        self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEquals(log_entry.content_object.invitee.id, self.invitee.id)
-        self.assertEquals(
+        self.assertEqual(log_entry.content_object.invitee.id, self.invitee.id)
+        self.assertEqual(
             log_entry.extra_data,
             {
                 "message": _("invitation accepted"),
                 "log_level": None,
-                "action_flag": list(LOG_ACTIONS[4]),
+                "action_flag": list(LOG_ACTIONS[5]),
                 "content_object_repr": _("For: {invitee} (2021-10-18)").format(
                     invitee=self.invitee.email
                 ),
@@ -215,16 +312,16 @@ class TestInvites(WebTest):
 
         log_entry = TimelineLog.objects.last()
 
-        self.assertEquals(
+        self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEquals(log_entry.content_object.invitee.id, self.invitee.id)
-        self.assertEquals(
+        self.assertEqual(log_entry.content_object.invitee.id, self.invitee.id)
+        self.assertEqual(
             log_entry.extra_data,
             {
                 "message": _("invitation expired"),
                 "log_level": None,
-                "action_flag": list(LOG_ACTIONS[4]),
+                "action_flag": list(LOG_ACTIONS[5]),
                 "content_object_repr": _("For: {invitee} (2021-09-18)").format(
                     invitee=self.invitee.email
                 ),
@@ -251,13 +348,13 @@ class TestContacts(WebTest):
         form.submit()
         log_entry = TimelineLog.objects.last()
 
-        self.assertEquals(
+        self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEquals(
+        self.assertEqual(
             log_entry.content_object.id, Contact.objects.get(email=contact.email).id
         )
-        self.assertEquals(
+        self.assertEqual(
             log_entry.extra_data,
             {
                 "message": _("contact was created"),
@@ -275,11 +372,11 @@ class TestContacts(WebTest):
         form.submit()
         log_entry = TimelineLog.objects.last()
 
-        self.assertEquals(
+        self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEquals(log_entry.content_object.id, self.contact.id)
-        self.assertEquals(
+        self.assertEqual(log_entry.content_object.id, self.contact.id)
+        self.assertEqual(
             log_entry.extra_data,
             {
                 "message": _("contact was modified"),
@@ -295,11 +392,11 @@ class TestContacts(WebTest):
         )
         log_entry = TimelineLog.objects.last()
 
-        self.assertEquals(
+        self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEquals(log_entry.object_id, str(self.contact.id))
-        self.assertEquals(
+        self.assertEqual(log_entry.object_id, str(self.contact.id))
+        self.assertEqual(
             log_entry.extra_data,
             {
                 "action_flag": list(LOG_ACTIONS[DELETION]),
@@ -324,11 +421,11 @@ class TestDocuments(WebTest):
         )
         log_entry = TimelineLog.objects.last()
 
-        self.assertEquals(
+        self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEquals(log_entry.content_object.id, self.document.id)
-        self.assertEquals(
+        self.assertEqual(log_entry.content_object.id, self.document.id)
+        self.assertEqual(
             log_entry.extra_data,
             {
                 "message": _("file was downloaded"),
@@ -348,11 +445,11 @@ class TestDocuments(WebTest):
         form.submit()
         log_entry = TimelineLog.objects.last()
 
-        self.assertEquals(
+        self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEquals(log_entry.content_object.id, Document.objects.all()[1].id)
-        self.assertEquals(
+        self.assertEqual(log_entry.content_object.id, Document.objects.all()[1].id)
+        self.assertEqual(
             log_entry.extra_data,
             {
                 "message": _("file was uploaded"),
@@ -369,11 +466,11 @@ class TestDocuments(WebTest):
         )
         log_entry = TimelineLog.objects.last()
 
-        self.assertEquals(
+        self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEquals(log_entry.object_id, str(self.document.id))
-        self.assertEquals(
+        self.assertEqual(log_entry.object_id, str(self.document.id))
+        self.assertEqual(
             log_entry.extra_data,
             {
                 "message": _("file was deleted"),
@@ -398,11 +495,11 @@ class TestActions(WebTest):
         form.submit()
         log_entry = TimelineLog.objects.last()
 
-        self.assertEquals(
+        self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEquals(log_entry.content_object.id, Action.objects.all()[1].id)
-        self.assertEquals(
+        self.assertEqual(log_entry.content_object.id, Action.objects.all()[1].id)
+        self.assertEqual(
             log_entry.extra_data,
             {
                 "message": _("action was created"),
@@ -420,11 +517,11 @@ class TestActions(WebTest):
         form.submit()
         log_entry = TimelineLog.objects.last()
 
-        self.assertEquals(
+        self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEquals(log_entry.content_object.id, self.action.id)
-        self.assertEquals(
+        self.assertEqual(log_entry.content_object.id, self.action.id)
+        self.assertEqual(
             log_entry.extra_data,
             {
                 "message": _("action was modified"),
@@ -454,11 +551,11 @@ class TestMessages(WebTest):
         form.submit()
         log_entry = TimelineLog.objects.last()
 
-        self.assertEquals(
+        self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEquals(log_entry.content_object.id, Message.objects.first().id)
-        self.assertEquals(
+        self.assertEqual(log_entry.content_object.id, Message.objects.first().id)
+        self.assertEqual(
             log_entry.extra_data,
             {
                 "message": _("message was created"),
@@ -479,11 +576,11 @@ class TestMessages(WebTest):
         form["content"] = "some content"
         form.submit()
         log_entry = TimelineLog.objects.last()
-        self.assertEquals(
+        self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEquals(log_entry.content_object.id, Message.objects.first().id)
-        self.assertEquals(
+        self.assertEqual(log_entry.content_object.id, Message.objects.first().id)
+        self.assertEqual(
             log_entry.extra_data,
             {
                 "message": _("message was created"),
@@ -503,11 +600,11 @@ class TestMessages(WebTest):
         self.app.get(download_url, user=message.receiver)
         log_entry = TimelineLog.objects.last()
 
-        self.assertEquals(
+        self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEquals(log_entry.content_object.id, message.id)
-        self.assertEquals(
+        self.assertEqual(log_entry.content_object.id, message.id)
+        self.assertEqual(
             log_entry.extra_data,
             {
                 "message": _("file was downloaded"),
@@ -530,11 +627,11 @@ class TestExport(WebTest):
         self.app.get(reverse("accounts:profile_export"), user=self.user)
         log_entry = TimelineLog.objects.last()
 
-        self.assertEquals(
+        self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEquals(log_entry.content_object.id, self.user.id)
-        self.assertEquals(
+        self.assertEqual(log_entry.content_object.id, self.user.id)
+        self.assertEqual(
             log_entry.extra_data,
             {
                 "message": _("file profile.pdf was exported"),
@@ -550,11 +647,11 @@ class TestExport(WebTest):
         )
         log_entry = TimelineLog.objects.last()
 
-        self.assertEquals(
+        self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEquals(log_entry.content_object.id, self.user.id)
-        self.assertEquals(
+        self.assertEqual(log_entry.content_object.id, self.user.id)
+        self.assertEqual(
             log_entry.extra_data,
             {
                 "message": _("file action_{action_uuid}.pdf was exported").format(
@@ -572,11 +669,11 @@ class TestExport(WebTest):
         )
         log_entry = TimelineLog.objects.last()
 
-        self.assertEquals(
+        self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEquals(log_entry.content_object.id, self.user.id)
-        self.assertEquals(
+        self.assertEqual(log_entry.content_object.id, self.user.id)
+        self.assertEqual(
             log_entry.extra_data,
             {
                 "message": _("file actions.pdf was exported"),

@@ -2,13 +2,13 @@
 {% load i18n l10n button_tags card_tags file_tags grid_tags icon_tags link_tags map_tags notification_tags tag_tags utils condition_tags render_tags anchor_menu_tags %}
 
 {% block sidebar_content %}
-{% anchor_menu anchors=anchors desktop=True %}
-{% if product.link %}
-    <li class="anchor-menu__list-item">
-        {% button href=product.link size="big" text=_("Aanvraag starten") primary=True icon="arrow_forward" icon_position="before" %}
-    </li>
-{% endif %}
-{% endanchor_menu %}
+    {% anchor_menu anchors=anchors desktop=True %}
+        {% if product.link %}
+            <li class="anchor-menu__list-item">
+                {% button href=product.link size="big" text=_("Aanvraag starten") primary=True icon="arrow_forward" icon_position="before" %}
+            </li>
+        {% endif %}
+    {% endanchor_menu %}
 {% endblock sidebar_content %}
 
 {% block content %}
@@ -21,6 +21,13 @@
     {% tag tags=object.tags.all %}
     <p class="p">{{ object.summary }}</p>
     {{ object.content|ckeditor_content|safe }}
+
+    {% if product.link %}
+        {% button_row mobile=True %}
+            {% button href=product.link text=_("Aanvraag starten") primary=True icon="arrow_forward" icon_position="before" %}
+        {% endbutton_row %}
+    {% endif %}
+
     {% if object.files.exists %}
         <hr class="divider">
         {% file_list files=object.files.all title=_("Bestanden") %}
@@ -94,20 +101,11 @@
                     </ul>
                 </nav>
             {% endif %}
-
-            {# Social links. #}
-            <nav class="social">
-                <h4 class="h4" id="share">{% trans "Delen" %}</h4>
-                {% link icon="facebook" href="#" extra_classes="social__link" text=_('Facebook') hide_text=True %}
-                {% link icon="twitter" href="#" extra_classes="social__link" text=_('Twitter') hide_text=True %}
-                {% link icon="whatsapp" href="#" extra_classes="social__link" text=_('Whatsapp') hide_text=True %}
-                {% link icon="linkedin" href="#" extra_classes="social__link" text=_('Linkedin') hide_text=True %}
-            </nav>
         {% endrender_column %}
 
 
         {% render_column span=9 %}
-            {% if object.contacts %}
+            {% if object.contacts.exists %}
                 {% render_notification type='success' icon=False %}
                     <h4 class="h4" id="contact">{% trans 'Contact' %}</h4>
 

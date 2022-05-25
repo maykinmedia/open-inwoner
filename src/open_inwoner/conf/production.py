@@ -16,8 +16,12 @@ AUTHENTICATION_BACKENDS = [
     "open_inwoner.accounts.backends.CustomAxesBackend",
     "open_inwoner.accounts.backends.UserModelEmailBackend",
     "django.contrib.auth.backends.ModelBackend",
-    "digid_eherkenning.mock.backends.DigiDBackend",
 ]
+
+if DIGID_METADATA and not DEBUG:
+    AUTHENTICATION_BACKENDS += ["digid_eherkenning.backends.DigiDBackend"]
+else:
+    AUTHENTICATION_BACKENDS += ["digid_eherkenning.mock.backends.DigiDBackend"]
 
 # Database performance
 for db_config in DATABASES.values():

@@ -1,0 +1,10 @@
+{% load l10n %}
+
+{% if user.is_authenticated %}
+    <div
+        id="session-timeout"
+        data-expiry-age="{{ expiry_age|unlocalize }}"
+        data-warn-time="{{ warn_time|unlocalize }}"
+    >
+    </div>
+{% endif %}
