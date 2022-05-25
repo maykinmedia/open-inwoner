@@ -1,11 +1,11 @@
-{% load i18n logo_tags header_tags form_tags link_tags solo_tags icon_tags %}
+{% load i18n logo_tags header_tags form_tags link_tags solo_tags icon_tags thumbnail %}
 
 {% get_solo "configurations.SiteConfiguration" as config %}
 
 {% accessibility_header request=request %}
 <header class="header">
     <div class="header__container">
-        {% logo src=config.logo.file.url alt="" %}
+        {% logo src=config.logo.file|thumbnail_url:'logo' alt="" %}
 
         <div class="header__menu">
             <div class="header__menu-icon">

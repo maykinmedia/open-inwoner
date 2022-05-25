@@ -813,3 +813,12 @@ DIGID = {
     # (False).
     "want_assertions_signed": DIGID_WANT_ASSERTIONS_SIGNED,
 }
+
+THUMBNAIL_ALIASES = {
+    "": {
+        "logo": {
+            "size": (21600, 60),
+            "upscale": True,
+        },
+    }
+}

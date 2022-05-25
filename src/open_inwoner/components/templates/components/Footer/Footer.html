@@ -1,9 +1,9 @@
-{% load i18n link_tags button_tags logo_tags footer_tags solo_tags %}
+{% load i18n link_tags button_tags logo_tags footer_tags solo_tags thumbnail %}
 
 {% get_solo "configurations.SiteConfiguration" as config %}
 
 <footer class='footer'>
-    {% logo src=config.logo.file.url alt=""%}
+    {% logo src=config.logo.file|thumbnail_url:'logo' alt=""%}
 
     <aside class="footer__visitor">
         <h4 class="h4">{{footer_texts.footer_visiting_title}}</h4>

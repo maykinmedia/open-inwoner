@@ -9,7 +9,7 @@ def footer(footer_texts, **kwargs):
     Generating the entire footer.
 
     Usage:
-        {% footer logo_url=settings.logo footer_texts=settings.footer_texts %}
+        {% footer footer_texts=settings.footer_texts %}
 
     Variables:
         + footer_texts: dict | the dictionary with the footer texts.
