@@ -6,6 +6,11 @@ from .actions import (
     ActionPrivateMediaView,
     ActionUpdateView,
 )
+from .auth import (
+    LogPasswordChangeView,
+    LogPasswordResetConfirmView,
+    LogPasswordResetView,
+)
 from .cases import CasesListView, CasesStatusView
 from .contacts import (
     ContactCreateView,

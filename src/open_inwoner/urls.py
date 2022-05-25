@@ -7,7 +7,13 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import include, path
 
 from open_inwoner.accounts.forms import CustomRegistrationForm
-from open_inwoner.accounts.views import CustomRegistrationView, PasswordResetView
+from open_inwoner.accounts.views import (
+    CustomRegistrationView,
+    LogPasswordChangeView,
+    LogPasswordResetConfirmView,
+    LogPasswordResetView,
+    PasswordResetView,
+)
 from open_inwoner.pdc.views import FAQView, HomeView
 
 handler500 = "open_inwoner.utils.views.server_error"
@@ -39,12 +45,28 @@ urlpatterns = [
     ),
     path("admin/hijack/", include("hijack.urls")),
     path("admin/", admin.site.urls),
+    path("csp/", include("cspreports.urls")),
     path("ckeditor/", include("open_inwoner.ckeditor5.urls")),
     # Simply show the master template.
     path(
         "accounts/register/",
         CustomRegistrationView.as_view(form_class=CustomRegistrationForm),
         name="django_registration_register",
+    ),
+    path(
+        "accounts/password_change/",
+        LogPasswordChangeView.as_view(),
+        name="password_change",
+    ),
+    path(
+        "accounts/password_reset/",
+        LogPasswordResetView.as_view(),
+        name="password_reset",
+    ),
+    path(
+        "accounts/reset/<uidb64>/<token>/",
+        LogPasswordResetConfirmView.as_view(),
+        name="password_reset_confirm",
     ),
     path("accounts/", include("django_registration.backends.one_step.urls")),
     path("accounts/", include("django.contrib.auth.urls")),
@@ -58,6 +80,10 @@ urlpatterns = [
     path(
         "questionnaire/",
         include("open_inwoner.questionnaire.urls", namespace="questionnaire"),
+    ),
+    path(
+        "sessions/",
+        include("open_inwoner.extended_sessions.urls", namespace="sessions"),
     ),
     path("faq/", FAQView.as_view(), name="general_faq"),
     path("", include("open_inwoner.pdc.urls", namespace="pdc")),

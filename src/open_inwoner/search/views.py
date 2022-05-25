@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.core.paginator import InvalidPage, Paginator
 from django.http import Http404
 from django.http.response import HttpResponseRedirect
@@ -6,12 +7,13 @@ from django.utils.translation import gettext as _
 from django.views.generic import FormView
 
 from open_inwoner.utils.mixins import PaginationMixin
+from open_inwoner.utils.views import LogMixin
 
 from .forms import FeedbackForm, SearchForm
 from .searches import search_products
 
 
-class SearchView(PaginationMixin, FormView):
+class SearchView(LogMixin, PaginationMixin, FormView):
     form_class = SearchForm
     template_name = "pages/search.html"
     paginate_by = 20
@@ -40,9 +42,14 @@ class SearchView(PaginationMixin, FormView):
         data = form.cleaned_data.copy()
         query = data.pop("query")
         context = self.get_context_data(form=form)
+        user = self.request.user
 
         if not query:
             return self.render_to_response(context)
+
+        # log search query of authenticated users
+        if user.is_authenticated:
+            self.log_user_action(user, (_("search query: {query}")).format(query=query))
 
         # perform search
         results = search_products(query, filters=data)
@@ -116,4 +123,12 @@ class SearchView(PaginationMixin, FormView):
             [f"{key}: {', '.join(value)}" for key, value in search_data.items()]
         )
         form.save()
+
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            _(
+                "Thank you for your feedback. It will help us to improve our search engine"
+            ),
+        )
         return HttpResponseRedirect(http_referer)

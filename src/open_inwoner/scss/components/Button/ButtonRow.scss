@@ -9,4 +9,10 @@
     flex-direction: row-reverse;
     justify-content: end;
   }
+
+  &--mobile-only {
+    @media (min-width: 768px) {
+      display: none;
+    }
+  }
 }

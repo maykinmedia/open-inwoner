@@ -275,7 +275,7 @@ class Contact(models.Model):
         return not self.is_active()
 
     def get_message_url(self) -> str:
-        url = furl(reverse("accounts:inbox")).add({"with": self.email}).url
+        url = furl(reverse("accounts:inbox")).add({"with": self.other_user_email}).url
         return f"{url}#messages-last"
 
     def get_created_by_name(self):
@@ -569,9 +569,15 @@ class Invite(models.Model):
     invitee = models.ForeignKey(
         User,
         verbose_name=_("Invitee"),
-        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
         related_name="received_invites",
         help_text=_("User who received the invite"),
+    )
+    invitee_email = models.EmailField(
+        verbose_name=_("Invitee email"),
+        help_text=_("The email used to send the invite"),
     )
     contact = models.ForeignKey(
         Contact,
@@ -615,11 +621,11 @@ class Invite(models.Model):
         template = find_template("invite")
         context = {
             "inviter_name": self.inviter.get_full_name(),
-            "email": self.invitee.email,
+            "email": self.invitee_email,
             "invite_link": url,
         }
 
-        return template.send_email([self.invitee.email], context)
+        return template.send_email([self.invitee_email], context)
 
     def get_absolute_url(self) -> str:
         return reverse("accounts:invite_accept", kwargs={"key": self.key})

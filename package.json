@@ -9,11 +9,11 @@
   "scripts": {
     "build": "npm run collect && npm run bundle",
     "bundle": "webpack",
-    "collect": "cp -r node_modules/leaflet/dist/images src/open_inwoner/static/bundles",
+    "collect": "cp -r node_modules/leaflet/dist/images src/open_inwoner/static/bundles && cp -r node_modules/material-icons/iconfont/*.woff src/open_inwoner/static/bundles && cp -r node_modules/material-icons/iconfont/*.woff2 src/open_inwoner/static/bundles && cp -r node_modules/@fortawesome/fontawesome-free/webfonts src/open_inwoner/static/",
     "test": "karma start",
     "check-linting": "prettier src/open_inwoner/js src/open_inwoner/scss -c",
     "fix-linting": "prettier src/open_inwoner/js src/open_inwoner/scss -w",
-    "watch": "webpack -w"
+    "watch": "npm run collect && webpack -w"
   },
   "repository": {
     "type": "git",
@@ -40,6 +40,7 @@
     "@ckeditor/ckeditor5-theme-lark": "^33.0.0",
     "@emotion/react": "^11.5.0",
     "@emotion/styled": "^11.3.0",
+    "@fortawesome/fontawesome-free": "^6.1.1",
     "@joeattardi/emoji-button": "^4.6.4",
     "@tarekraafat/autocomplete.js": "^10.2.6",
     "bem.js": "^1.0.10",
@@ -48,10 +49,10 @@
     "html-minifier": "^4.0.0",
     "inline-css": "^3.0.0",
     "leaflet": "^1.7.1",
+    "material-icons": "^1.10.11",
     "microscope-sass": "latest",
     "proj4leaflet": "^1.0.2",
-    "style-loader": "^2.0.0",
-    "sweetalert2": "^11.4.4"
+    "style-loader": "^2.0.0"
   },
   "devDependencies": {
     "@babel/core": "latest",

@@ -97,8 +97,14 @@ class ContactViewTests(WebTest):
         )
 
     def test_contact_list_show_link_to_messages(self):
+        other_user = UserFactory()
+        contact = ContactFactory.create(created_by=self.user, contact_user=other_user)
+        contacts = Contact.objects.get_extended_contacts_for_user(self.user)
+        extended_contact = contacts.get(id=contact.id)
         message_link = (
-            furl(reverse("accounts:inbox")).add({"with": self.contact.email}).url
+            furl(reverse("accounts:inbox"))
+            .add({"with": extended_contact.other_user_email})
+            .url
         )
         response = self.app.get(self.list_url, user=self.user)
         self.assertContains(response, message_link)
@@ -150,23 +156,20 @@ class ContactViewTests(WebTest):
         self.assertEqual(contact.last_name, "Smith")
         self.assertEqual(contact.email, "john@smith.nl")
 
-        # check that the contact was created
-        contact_user = contact.contact_user
-        self.assertIsNotNone(contact_user)
-        self.assertEqual(contact_user.email, "john@smith.nl")
-        self.assertFalse(contact_user.is_active)
+        # check that the contact user was not created
+        self.assertIsNone(contact.contact_user)
 
         # check that the invite was created
         self.assertEqual(contact.invites.count(), 1)
         invite = contact.invites.get()
         self.assertEqual(invite.inviter, self.user)
-        self.assertEqual(invite.invitee, contact_user)
+        self.assertEqual(invite.invitee_email, contact.email)
 
         # check that the invite was sent
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
         self.assertEqual(email.subject, "Uitnodiging voor Open Inwoner Platform")
-        self.assertEqual(email.to, [contact_user.email])
+        self.assertEqual(email.to, [invite.invitee_email])
         invite_url = f"http://testserver{invite.get_absolute_url()}"
         body = email.alternatives[0][0]  # html version of the email body
         self.assertIn(invite_url, body)

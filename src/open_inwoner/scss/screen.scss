@@ -1,8 +1,13 @@
 // External
-@import 'leaflet/dist/leaflet.css';
+// @import 'material-icons/iconfont/material-icons-outlined.woff2';
+@import 'material-icons/iconfont/material-icons.css';
+@import '~@fortawesome/fontawesome-free/scss/fontawesome.scss';
+@import '~@fortawesome/fontawesome-free/scss/regular.scss';
+@import '~@fortawesome/fontawesome-free/scss/brands.scss';
+@import '~leaflet/dist/leaflet.css';
 @import '~flatpickr/dist/flatpickr.min.css';
 
-// Iinternal
+// Internal
 @import 'settings';
 @import 'components';
 @import 'views';
