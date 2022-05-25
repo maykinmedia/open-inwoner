@@ -8,6 +8,7 @@ geopy # geo decoder
 glom # processing nested data
 furl # processing urls
 weasyprint # export to pdf
+pywatchman
 
 # Framework libraries
 Django>=3.2.11<4.0
@@ -42,6 +43,9 @@ humanfriendly
 git+https://github.com/maykinmedia/mail-editor.git@0b4621b5c7f434586115b8e722af8940cfa70195#egg=mail-editor
 fontawesomefree
 django-timeline-logger
+django-rich
+django-csp
+django-csp-reports
 
 # API libraries
 djangorestframework

@@ -58,7 +58,7 @@ def on_bsn_change(instance, **kwargs):
         and instance.login_type == LoginTypeChoices.digid
     ):
         data = fetch_data(instance)
-        if data:
+        if data.get("personen"):
             person = glom(data, "personen")[0]
             try:
                 instance.first_name = glom(person, "naam.voornamen")

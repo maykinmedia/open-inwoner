@@ -147,6 +147,8 @@ INSTALLED_APPS = [
     "privates",
     "fontawesomefree",
     "timeline_logger",
+    "csp",
+    "cspreports",
     # Project applications.
     "open_inwoner.accounts",
     "open_inwoner.components",
@@ -170,6 +172,8 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "csp.contrib.rate_limiting.RateLimitedCSPMiddleware",
+    "csp.middleware.CSPMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "axes.middleware.AxesMiddleware",
@@ -459,8 +463,29 @@ SENTRY_DSN = config("SENTRY_DSN", None)
 RELEASE = "v0.7"  # get_current_version()
 
 PRIVATE_MEDIA_ROOT = os.path.join(BASE_DIR, "private_media")
+FILER_ROOT = os.path.join(BASE_DIR, "media", "filer")
+FILER_THUMBNAIL_ROOT = os.path.join(BASE_DIR, "media", "filer_thumbnails")
 if MEDIA_SUBFOLDER:
     PRIVATE_MEDIA_ROOT = os.path.join(PRIVATE_MEDIA_ROOT, MEDIA_SUBFOLDER)
+    FILER_ROOT = os.path.join(FILER_ROOT, MEDIA_SUBFOLDER)
+    FILER_THUMBNAIL_ROOT = os.path.join(FILER_THUMBNAIL_ROOT, MEDIA_SUBFOLDER)
+
+FILER_STORAGES = {
+    "public": {
+        "main": {
+            "OPTIONS": {
+                "location": FILER_ROOT,
+                "base_url": "/media/filer/",
+            },
+        },
+        "thumbnails": {
+            "OPTIONS": {
+                "location": FILER_THUMBNAIL_ROOT,
+                "base_url": "/media/filer_thumbnails/",
+            },
+        },
+    },
+}
 
 SENDFILE_ROOT = PRIVATE_MEDIA_ROOT
 SENDFILE_BACKEND = "django_sendfile.backends.simple"
@@ -822,3 +847,7 @@ THUMBNAIL_ALIASES = {
         },
     }
 }
+
+TEST_RUNNER = "django_rich.test.RichRunner"
+
+from .app.csp import *  # noqa

@@ -91,10 +91,10 @@ if "test" in sys.argv:
     ES_INDEX_PRODUCTS = "products_test"
 
 # Django debug toolbar
-INSTALLED_APPS += ["debug_toolbar", "ddt_api_calls", "django_extensions"]
-MIDDLEWARE += [
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
-]
+INSTALLED_APPS += ["ddt_api_calls", "django_extensions"]
+# MIDDLEWARE += [
+#     "debug_toolbar.middleware.DebugToolbarMiddleware",
+# ]
 INTERNAL_IPS = ("127.0.0.1",)
 DEBUG_TOOLBAR_CONFIG = {"INTERCEPT_REDIRECTS": False}
 DEBUG_TOOLBAR_PANELS = [

@@ -1,5 +1,3 @@
-from urllib import response
-
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
@@ -23,6 +21,70 @@ class TestProductLogging(WebTest):
         self.category = CategoryFactory()
         self.product = ProductFactory.build(categories=(self.category,))
         self.user = UserFactory(is_superuser=True, is_staff=True)
+
+    def test_addition(self):
+        response = self.app.get(reverse("admin:pdc_product_add"), user=self.user)
+        form = response.forms["product_form"]
+        form["name"] = self.product.name
+        form["slug"] = self.product.slug
+        form["content"] = self.product.content
+        form["categories"].force_value(self.category.id)
+        form["costs"] = 0.0
+        form.submit()
+        product = Product.objects.filter(slug=self.product.slug).first()
+        log_entry = TimelineLog.objects.last()
+
+        self.assertEqual(
+            log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
+        )
+        self.assertEqual(log_entry.content_object.id, product.id)
+        self.assertEqual(
+            log_entry.extra_data,
+            {
+                "message": _("Toegevoegd."),
+                "action_flag": [1, "Addition"],
+                "content_object_repr": product.name,
+            },
+        )
+
+    def test_change(self):
+        self.product.save()
+        self.product.categories.add(self.category.id)
+        response = self.app.get(
+            reverse("admin:pdc_product_change", kwargs={"object_id": self.product.id}),
+            user=self.user,
+        )
+        form = response.forms["product_form"]
+        form["content"] = "Updated content"
+        form.submit()
+        log_entry = TimelineLog.objects.last()
+
+        self.assertEqual(
+            log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
+        )
+
+        self.assertEqual(log_entry.content_object.id, self.product.id)
+        self.assertEqual(
+            log_entry.extra_data,
+            {
+                "message": _("Content gewijzigd."),
+                "action_flag": [2, "Change"],
+                "content_object_repr": self.product.name,
+            },
+        )
+
+    def test_deletion(self):
+        self.product.save()
+        self.product.categories.add(self.category.id)
+        response = self.app.get(
+            reverse("admin:pdc_product_delete", kwargs={"object_id": self.product.id}),
+            user=self.user,
+        )
+        form = response.forms[0]
+        form.submit()
+        products = Product.objects.all().count()
+
+        self.assertEqual(products, 0)
 
     def test_import_is_logged(self):
         dataset = tablib.Dataset(
@@ -102,6 +164,65 @@ class TestCategoryLogging(WebTest):
     def setUp(self):
         self.category = CategoryFactory.build()
         self.user = UserFactory(is_superuser=True, is_staff=True)
+
+    def test_addition(self):
+        response = self.app.get(reverse("admin:pdc_category_add"), user=self.user)
+        form = response.forms["category_form"]
+        form["name"] = self.category.name
+        form["slug"] = self.category.slug
+        form.submit()
+        category = Category.objects.filter(slug=self.category.slug).first()
+        log_entry = TimelineLog.objects.last()
+
+        self.assertEqual(
+            log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
+        )
+        self.assertEqual(log_entry.content_object.id, category.id)
+        self.assertEqual(
+            log_entry.extra_data,
+            {
+                "message": _("Toegevoegd."),
+                "action_flag": [1, "Addition"],
+                "content_object_repr": self.category.name,
+            },
+        )
+
+    def test_change(self):
+        category = CategoryFactory()
+        response = self.app.get(
+            reverse("admin:pdc_category_change", kwargs={"object_id": category.id}),
+            user=self.user,
+        )
+        form = response.forms["category_form"]
+        form["description"] = "Updated description"
+        form.submit()
+        log_entry = TimelineLog.objects.last()
+
+        self.assertEqual(
+            log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
+        )
+
+        self.assertEqual(log_entry.content_object.id, category.id)
+        self.assertEqual(
+            log_entry.extra_data,
+            {
+                "message": _("Omschrijving gewijzigd."),
+                "action_flag": [2, "Change"],
+                "content_object_repr": category.name,
+            },
+        )
+
+    def test_deletion(self):
+        category = CategoryFactory()
+        response = self.app.get(
+            reverse("admin:pdc_category_delete", kwargs={"object_id": category.id}),
+            user=self.user,
+        )
+        form = response.forms[0]
+        form.submit()
+        categories = Category.objects.all().count()
+
+        self.assertEqual(categories, 0)
 
     def test_import_is_logged(self):
         category = CategoryFactory.build()
