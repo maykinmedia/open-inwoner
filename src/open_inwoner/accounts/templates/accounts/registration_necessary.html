@@ -1,0 +1,15 @@
+{% extends 'master.html' %}
+{% load i18n static form_tags card_tags grid_tags %}
+
+{% block content %}
+
+{% render_grid %}
+    {% render_column span=9 %}
+        {% render_card tinted=True  %}
+            <h1 class="h1">{% trans "Registratie voltooien" %}</h1><br>
+            {% form form_object=form method="POST" id="registration-form" %}
+        {% endrender_card %}
+    {% endrender_column %}
+{% endrender_grid %}
+
+{% endblock content %}

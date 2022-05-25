@@ -181,6 +181,7 @@ MIDDLEWARE = [
     "django_otp.middleware.OTPMiddleware",
     "django.contrib.flatpages.middleware.FlatpageFallbackMiddleware",
     "open_inwoner.extended_sessions.middleware.SessionTimeoutMiddleware",
+    "open_inwoner.accounts.middleware.NecessaryFieldsMiddleware",
 ]
 
 ROOT_URLCONF = "open_inwoner.urls"

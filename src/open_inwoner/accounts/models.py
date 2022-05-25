@@ -169,6 +169,14 @@ class User(AbstractBaseUser, PermissionsMixin):
 
         return ", ".join(list(self.selected_themes.values_list("name", flat=True)))
 
+    def require_necessary_fields(self) -> bool:
+        """returns whether user needs to fill in necessary fields"""
+        return (
+            self.login_type == LoginTypeChoices.digid
+            and not self.first_name
+            and not self.last_name
+        )
+
 
 class Contact(models.Model):
     uuid = models.UUIDField(

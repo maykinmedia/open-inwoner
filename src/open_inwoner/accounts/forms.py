@@ -59,6 +59,30 @@ class UserForm(forms.ModelForm):
         )
 
 
+class NecessaryUserForm(forms.ModelForm):
+    invite = forms.ModelChoiceField(
+        queryset=Invite.objects.all(),
+        to_field_name="key",
+        widget=forms.HiddenInput(),
+        required=False,
+    )
+
+    class Meta:
+        model = User
+        fields = (
+            "first_name",
+            "last_name",
+            "email",
+            "invite",
+        )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["first_name"].required = True
+        self.fields["last_name"].required = True
+
+
 class ThemesForm(forms.ModelForm):
     class Meta:
         model = User
@@ -76,7 +100,7 @@ class ContactForm(forms.ModelForm):
     def __init__(self, user, create, *args, **kwargs):
         self.user = user
         self.create = create
-        return super().__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     class Meta:
         model = Contact
