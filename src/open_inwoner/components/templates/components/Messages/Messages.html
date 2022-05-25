@@ -1,4 +1,4 @@
-{% load form_tags messages_tags %}
+{% load i18n form_tags messages_tags %}
 
 <section class="messages">
     <header class="messages__header">
@@ -37,15 +37,19 @@
             {% endfor %}
         </ol>
 
-        {% render_form id="message-form" form=form method="POST" enctype="multipart/form-data" %}
-            {% csrf_token %}
-            {% hidden form.receiver %}
-            <div class="group-input">
-                {% textarea form.content %}
-                {% input form.file icon="attach_file" no_label=True no_help=True extra_classes="message-file" %}
-            </div>
-            {% form_actions disabled=disabled primary_text=_("Verzenden") primary_icon='arrow_forward' %}
-        {% endrender_form %}
+        {% if other_user.is_active %}
+            {% render_form id="message-form" form=form method="POST" enctype="multipart/form-data" %}
+                {% csrf_token %}
+                {% hidden form.receiver %}
+                <div class="group-input">
+                    {% textarea form.content %}
+                    {% input form.file icon="attach_file" no_label=True no_help=True extra_classes="message-file" %}
+                </div>
+                {% form_actions disabled=disabled primary_text=_("Verzenden") primary_icon='arrow_forward' %}
+            {% endrender_form %}
+        {% else %}
+            <p class="p p--muted">{% trans "De gebruiker is inactief. Het is niet mogelijk een bericht te sturen." %}</p>
+        {% endif %}
 
     </div>
 </section>

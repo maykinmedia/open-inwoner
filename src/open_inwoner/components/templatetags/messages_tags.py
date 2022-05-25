@@ -17,25 +17,26 @@ def messages(
     message_list: MessageQuerySet,
     me: User,
     form: Form,
-    subject: str,
+    other_user: str,
     status: str,
 ):
     """
     Generate all messages in a conversation and shows the form to add a new message
 
     Usage:
-        {% messages message_list=messages me=request.user form=message_form subject="this is the subject" status="open" %}
+        {% messages message_list=messages me=request.user form=message_form other_user=other_user status="open" %}
 
     Variables:
         + message_list: Message[] | a list of messages that needs to be displayed.
         + me: User | currently loggedin user.
         + form: Form | a django form.
-        + subject: string | The title that will be displayed above the messages.
+        + other_user: User | The user that we will be messaging.
         + status: string | The status below the subject.
 
     Extra context:
         - disabled: bool | Whether the form is disabled.
         - days: set | the message_list grouped by date.
+        - subject: string | The title that will be displayed above the messages.
     """
 
     def get_dates(message_list: MessageQuerySet) -> List[datetime.date]:
@@ -82,7 +83,8 @@ def messages(
         "form": form,
         "me": me,
         "status": status,
-        "subject": subject,
+        "other_user": other_user,
+        "subject": str(other_user),
     }
 
 

@@ -245,10 +245,6 @@ class InboxForm(forms.ModelForm):
         self.fields["receiver"].choices = choices
         self.fields["receiver"].queryset = extended_contact_users
 
-        if disabled:
-            self.fields["content"].disabled = True
-            self.fields["content"].widget.attrs["placeholder"] = _("Gebruiker inactief")
-
     def clean(self):
         cleaned_data = super().clean()
 
