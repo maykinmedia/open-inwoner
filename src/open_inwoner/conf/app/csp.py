@@ -51,7 +51,7 @@ CSP_REPORT_URI = reverse_lazy("report_csp")
 #
 # Django CSP-report settings
 #
-CSP_REPORTS_SAVE = config("CSP_REPORTS_SAVE", False)  # save as model
+CSP_REPORTS_SAVE = config("CSP_REPORTS_SAVE", True)  # save as model
 CSP_REPORTS_LOG = config("CSP_REPORTS_LOG", True)  # logging
 CSP_REPORTS_LOG_LEVEL = "warning"
 CSP_REPORTS_EMAIL_ADMINS = False
