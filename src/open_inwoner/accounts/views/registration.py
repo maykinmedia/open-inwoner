@@ -88,10 +88,13 @@ class CustomRegistrationView(LogMixin, InviteMixin, RegistrationView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        invite_key = self.request.GET.get("invite")
         necessary_fields_url = (
             furl(reverse("accounts:registration_necessary"))
-            .add({"invite": self.request.GET.get("invite", "")})
+            .add({"invite": invite_key})
             .url
+            if invite_key
+            else reverse("accounts:registration_necessary")
         )
         context["digit_url"] = (
             furl(reverse("digid:login")).add({"next": necessary_fields_url}).url

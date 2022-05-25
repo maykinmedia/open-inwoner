@@ -22,8 +22,6 @@ DOCUMENTEN_ROOT = "https://documenten.nl/api/v1/"
 class TestListStatusView(WebTest):
     def setUp(self):
         self.user = UserFactory(
-            first_name="",
-            last_name="",
             login_type=LoginTypeChoices.digid,
             bsn="900222086",
         )
