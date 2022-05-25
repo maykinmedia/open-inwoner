@@ -268,11 +268,6 @@ class ProductLocation(GeoModel):
 
     def get_geojson_feature(self, stringify: bool = True) -> Union[str, dict]:
         feature = super().get_geojson_feature(False)
-        first_product = self.products.first()
-        if first_product:
-            feature["properties"]["url"] = first_product.get_absolute_url()
-            if not self.name:
-                feature["properties"]["name"] = first_product.name
 
         if stringify:
             return json.dumps(feature)
