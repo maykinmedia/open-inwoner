@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth.views import (
     PasswordChangeView,
     PasswordResetConfirmView,
@@ -7,10 +8,14 @@ from django.utils.translation import gettext as _
 
 from open_inwoner.utils.views import LogMixin
 
+from ..choices import LoginTypeChoices
 from ..forms import CustomPasswordResetForm
 
 
-class LogPasswordChangeView(LogMixin, PasswordChangeView):
+class LogPasswordChangeView(UserPassesTestMixin, LogMixin, PasswordChangeView):
+    def test_func(self):
+        return self.request.user.login_type == LoginTypeChoices.default
+
     def form_valid(self, form):
         response = super().form_valid(form)
 
