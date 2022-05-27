@@ -223,7 +223,7 @@ class InboxForm(forms.ModelForm):
         model = Message
         fields = ("receiver", "content", "file")
 
-    def __init__(self, user, disabled=False, **kwargs):
+    def __init__(self, user, **kwargs):
         self.user = user
 
         super().__init__(**kwargs)

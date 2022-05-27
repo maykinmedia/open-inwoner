@@ -121,7 +121,6 @@ class InboxView(LogMixin, LoginRequiredMixin, PaginationMixin, FormView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["user"] = self.request.user
-        kwargs["disabled"] = not self.get_other_user(self.get_conversations()).is_active
         return kwargs
 
     def form_valid(self, form):
