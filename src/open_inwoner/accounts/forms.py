@@ -1,5 +1,6 @@
 from django import forms
 from django.conf import settings
+from django.contrib.auth.forms import PasswordResetForm
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
@@ -7,7 +8,7 @@ from django_registration.forms import RegistrationForm
 
 from open_inwoner.utils.forms import LimitedUploadFileField, PrivateFileWidget
 
-from .choices import EmptyContactTypeChoices, EmptyStatusChoices
+from .choices import EmptyContactTypeChoices, EmptyStatusChoices, LoginTypeChoices
 from .models import Action, Contact, Document, Invite, Message, User
 
 
@@ -81,6 +82,15 @@ class NecessaryUserForm(forms.ModelForm):
 
         self.fields["first_name"].required = True
         self.fields["last_name"].required = True
+
+
+class CustomPasswordResetForm(PasswordResetForm):
+    def send_mail(self, *args, **kwargs):
+        email = self.cleaned_data.get("email")
+        user = User.objects.get(email=email)
+
+        if user.login_type == LoginTypeChoices.default:
+            return super().send_mail(*args, **kwargs)
 
 
 class ThemesForm(forms.ModelForm):

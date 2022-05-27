@@ -63,6 +63,10 @@ class MyProfileView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormView)
         else:
             context["contact_text"] = _("U heeft nog geen contacten.")
         context["questionnaire_exists"] = QuestionnaireStep.objects.exists()
+        context["backend_auth_is_email"] = (
+            self.request.session.get("_auth_user_backend")
+            == "open_inwoner.accounts.backends.UserModelEmailBackend"
+        )
         return context
 
     def post(self, request, *args, **kwargs):
