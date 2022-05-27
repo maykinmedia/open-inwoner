@@ -12,6 +12,7 @@ from django_registration.backends.one_step.views import RegistrationView
 from furl import furl
 
 from open_inwoner.accounts.models import Contact
+from open_inwoner.utils.hash import generate_email_from_string
 from open_inwoner.utils.views import LogMixin
 
 from ..forms import CustomRegistrationForm, NecessaryUserForm
@@ -127,3 +128,18 @@ class NecessaryFieldsUserView(LogMixin, LoginRequiredMixin, InviteMixin, UpdateV
 
         self.log_user_action(user, _("user was updated with necessary fields"))
         return HttpResponseRedirect(self.get_success_url())
+
+    def get_initial(self):
+        initial = super().get_initial()
+
+        user = self.get_object()
+        invite = self.get_invite()
+
+        if (
+            user.bsn
+            and not invite
+            and user.email == generate_email_from_string(user.bsn)
+        ):
+            initial["email"] = ""
+
+        return initial
