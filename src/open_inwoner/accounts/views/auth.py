@@ -1,4 +1,6 @@
 from django.contrib.auth.mixins import UserPassesTestMixin
+from django.shortcuts import redirect
+from django.urls import reverse
 from django.contrib.auth.views import (
     PasswordChangeView,
     PasswordResetConfirmView,
@@ -14,7 +16,15 @@ from ..forms import CustomPasswordResetForm
 
 class LogPasswordChangeView(UserPassesTestMixin, LogMixin, PasswordChangeView):
     def test_func(self):
-        return self.request.user.login_type == LoginTypeChoices.default
+        if self.request.user.is_authenticated:
+            return self.request.user.login_type == LoginTypeChoices.default
+        return False
+
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+            return redirect(reverse("root"))
+
+        return super().handle_no_permission()
 
     def form_valid(self, form):
         response = super().form_valid(form)
