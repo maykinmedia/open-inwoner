@@ -137,7 +137,9 @@ class InboxView(LogMixin, LoginRequiredMixin, PaginationMixin, FormView):
         """Mark all messages as seen for the receiver"""
         context = self.get_context_data()
 
-        # Alter URL with redirected query param in order to go to the last message.
+        # Redirect to the end of page.
+        # Redirecting to a hash doesn't work, so we need to change the url.
+        # Alter URL with redirected query param in order to go to the last message (#messages-last).
         if not request.GET.get("redirected"):
             return HttpResponseRedirect(
                 str(furl(request.get_full_path()).add({"redirected": True}))
