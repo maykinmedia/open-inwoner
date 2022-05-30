@@ -17,7 +17,7 @@
 
             {% step_indicator form.instance.depth form.instance.depth object_list=form.instance.get_tree_path object_list_str='question_subject' %}
 
-            <h4 class="h4">{{ form.instance.question }}</h4>
+            <h4 class="h4" id="question">{{ form.instance.question }}</h4>
 
             {% if form.instance.help_text %}
                 <p class="p p--compact">{{ form.instance.help_text }}</p>
