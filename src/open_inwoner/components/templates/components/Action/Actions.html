@@ -56,8 +56,10 @@
                     {{ action.end_date }}
                 </div>
                 <div class="actions__label">
-                    <div class="table__explain">{% trans "Document" %}</div>
-                    {% link href="accounts:action_download" text=action.file.name uuid=action.uuid %}
+                    {% if action.file %}
+                        <div class="table__explain">{% trans "Document" %}</div>
+                        {% link href="accounts:action_download" text=action.file.name uuid=action.uuid %}
+                    {% endif %}
                 </div>
                 <div class="actions__label">
                     <div class="table__explain">{% trans "Toegevoegd op" %}</div>
