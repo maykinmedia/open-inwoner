@@ -65,6 +65,14 @@ class HomeView(TemplateView):
         if self.request.user.is_authenticated:
             kwargs.update(plans=Plan.objects.connected(self.request.user)[:limit])
 
+        # Highlighted categories
+        if not self.request.user.is_authenticated:
+            kwargs.update(
+                highlighted_categories=Category.get_root_nodes()
+                .filter(highlighted=True)
+                .order_by("name")[:limit]
+            )
+
         # Product finder:
         if config.show_product_finder:
             kwargs.update(
