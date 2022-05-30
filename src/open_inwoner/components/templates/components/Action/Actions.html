@@ -37,23 +37,9 @@
                         {% link href=action.plan.get_absolute_url text=action.plan.title %}
                     {% endif %}
                 </div>
-                <div class="actions__label">
+                <div class="actions__label actions__label--big">
                     <div class="table__explain">{% trans "Door" %}</div>
                     {{ action.is_for.get_full_name }}
-                </div>
-                <div class="actions__label">
-                    <div class="table__explain">
-                        {% trans "Status" %}
-                    </div>
-                    {{ action.get_status_display }}
-                </div>
-                <div class="actions__label">
-                    <div class="table__explain">{% trans "Type" %}</div>
-                    {{ action.get_type_display }}
-                </div>
-                <div class="actions__label">
-                    <div class="table__explain">{% trans "Planning" %}</div>
-                    {{ action.end_date }}
                 </div>
                 <div class="actions__label">
                     {% if action.file %}
@@ -62,8 +48,18 @@
                     {% endif %}
                 </div>
                 <div class="actions__label">
+                    <div class="table__explain">{% trans "Planning" %}</div>
+                    {{ action.end_date }}
+                </div>
+                <div class="actions__label">
                     <div class="table__explain">{% trans "Toegevoegd op" %}</div>
                     {{ action.created_on }}
+                </div>
+                <div class="actions__label">
+                    <div class="table__explain">
+                        {% trans "Status" %}
+                    </div>
+                    {{ action.get_status_display }}
                 </div>
             </div>
         {% empty %}
