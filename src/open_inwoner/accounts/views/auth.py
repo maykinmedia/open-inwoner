@@ -1,11 +1,11 @@
 from django.contrib.auth.mixins import UserPassesTestMixin
-from django.shortcuts import redirect
-from django.urls import reverse
 from django.contrib.auth.views import (
     PasswordChangeView,
     PasswordResetConfirmView,
     PasswordResetView,
 )
+from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from open_inwoner.utils.views import LogMixin
