@@ -4,6 +4,10 @@
   grid-gap: var(--gutter-width);
   padding: var(--gutter-width) 0;
 
+  &#{&}--align-end {
+    align-items: end;
+  }
+
   &--compact {
     grid-gap: 0;
   }

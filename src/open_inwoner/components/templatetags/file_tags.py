@@ -101,6 +101,7 @@ def file(file, **kwargs):
         - show_download: bool | If you want to show the download button.
 
     Extra context:
+        - description: str | The description of the (filer) file.
         - is_image: bool | if the file that is given is an image.
         - extension: string | the extension type of the file.
         - size: string | the size of the file in bytes.
@@ -110,6 +111,7 @@ def file(file, **kwargs):
     if isinstance(file, File):
         kwargs.update(
             is_image=file.file_type == "Image",
+            description=file.description,
             extension=file.extension,
             size=file.size,
             url=file.url,

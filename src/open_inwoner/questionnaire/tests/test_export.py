@@ -51,8 +51,8 @@ class QuestionnaireExportTests(TestCase):
 
     def test_response_contains_right_data(self):
         product = ProductFactory()
-        child = self.questionnaire.add_child(path="00030001", slug="foo")
-        grandchild = child.add_child(path="000300010001", slug="bar")
+        child = self.questionnaire.add_child(path="00030001", code="foo", slug="foo")
+        grandchild = child.add_child(path="000300010001", code="bar", slug="bar")
         grandchild.related_products.add(product)
         self.session[QUESTIONNAIRE_SESSION_KEY] = grandchild.slug
         self.session.save()

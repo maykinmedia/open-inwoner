@@ -5,11 +5,13 @@
   flex-basis: 100%;
   padding: var(--spacing-large);
 
+  .link {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
   .p--muted {
     margin-top: 0 !important;
-    //overflow: hidden;
-    //text-overflow: ellipsis;
-    //white-space: nowrap;
   }
 
   &:focus-within,
