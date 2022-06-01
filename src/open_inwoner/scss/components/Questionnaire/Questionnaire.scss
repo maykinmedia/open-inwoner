@@ -15,6 +15,11 @@
     border-top: var(--border-width) solid var(--color-mute);
   }
 
+  h2 {
+    margin-top: var(--row-height);
+    margin-bottom: var(--spacing-large);
+  }
+
   @media (min-width: 768px) {
     &__list {
       display: grid;
