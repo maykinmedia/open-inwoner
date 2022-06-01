@@ -18,5 +18,7 @@ AUTHENTICATION_BACKENDS = [
     "digid_eherkenning.mock.backends.DigiDBackend",
 ]
 
+CSP_REPORTS_SAVE = True
+
 for db_alias in DATABASES.keys():
     del DATABASES[db_alias]["CONN_MAX_AGE"]

@@ -69,7 +69,7 @@ class Questionserializer(serializers.ModelSerializer):
 class SmallCategorySerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Category
-        fields = ("url", "name", "slug", "description")
+        fields = ("url", "name", "slug", "highlighted", "description")
         extra_kwargs = {
             "url": {"view_name": "api:categories-detail", "lookup_field": "slug"},
         }
@@ -87,6 +87,7 @@ class CategoryWithChildSerializer(serializers.ModelSerializer):
         fields = (
             "name",
             "slug",
+            "highlighted",
             "description",
             "icon",
             "image",

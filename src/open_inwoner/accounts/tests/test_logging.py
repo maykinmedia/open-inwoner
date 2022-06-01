@@ -544,7 +544,10 @@ class TestMessages(WebTest):
 
     def test_created_message_action_from_contacts_is_logged(self):
         response = self.app.get(
-            reverse("accounts:inbox"), {"with": self.other_user.email}, user=self.me
+            reverse("accounts:inbox"),
+            {"with": self.other_user.email},
+            user=self.me,
+            auto_follow=True,
         )
         form = response.forms["message-form"]
         form["content"] = "some content"

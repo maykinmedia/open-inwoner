@@ -27,7 +27,7 @@ class InboxPageTests(WebTest):
         self.app.set_user(self.me)
 
     def test_show_last_conversation_without_other_user(self):
-        response = self.app.get(self.url)
+        response = self.app.get(self.url, auto_follow=True)
 
         self.assertEqual(response.status_code, 200)
         conversations = response.context["conversations"]["object_list"]
@@ -38,7 +38,7 @@ class InboxPageTests(WebTest):
         self.assertEqual(messages[0].id, self.message2.id)
 
     def test_show_conversation_with_user_specified(self):
-        response = self.app.get(self.url, {"with": self.user1.email})
+        response = self.app.get(self.url, {"with": self.user1.email}, auto_follow=True)
 
         self.assertEqual(response.status_code, 200)
         conversations = response.context["conversations"]["object_list"]
@@ -49,7 +49,7 @@ class InboxPageTests(WebTest):
         self.assertEqual(messages[0].id, self.message1.id)
 
     def test_send_message(self):
-        response = self.app.get(self.url, {"with": self.user1.email})
+        response = self.app.get(self.url, {"with": self.user1.email}, auto_follow=True)
         self.assertEqual(response.status_code, 200)
 
         form = response.forms["message-form"]
@@ -66,7 +66,7 @@ class InboxPageTests(WebTest):
 
     @temp_private_root()
     def test_send_file(self):
-        response = self.app.get(self.url, {"with": self.user1.email})
+        response = self.app.get(self.url, {"with": self.user1.email}, auto_follow=True)
         self.assertEqual(response.status_code, 200)
 
         form = response.forms["message-form"]
@@ -86,7 +86,7 @@ class InboxPageTests(WebTest):
         self.assertEqual(file.read(), b"test content")
 
     def test_send_empty_message(self):
-        response = self.app.get(self.url, {"with": self.user1.email})
+        response = self.app.get(self.url, {"with": self.user1.email}, auto_follow=True)
         self.assertEqual(response.status_code, 200)
 
         form = response.forms["message-form"]
@@ -109,7 +109,7 @@ class InboxPageTests(WebTest):
         for message in [message_sent, message_received]:
             self.assertFalse(message.seen)
 
-        response = self.app.get(self.url, {"with": other_user.email})
+        response = self.app.get(self.url, {"with": other_user.email}, auto_follow=True)
         self.assertEqual(response.status_code, 200)
 
         for message in [message_sent, message_received]:

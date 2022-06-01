@@ -21,6 +21,8 @@ class CategoryAdmin(ImportExportMixin, TreeAdmin):
     prepopulated_fields = {"slug": ("name",)}
     search_fields = ("name",)
     ordering = ("path",)
+    list_display = ("name", "highlighted")
+    list_editable = ("highlighted",)
 
     # import-export
     import_template_name = "admin/category_import.html"
