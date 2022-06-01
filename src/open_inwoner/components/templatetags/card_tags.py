@@ -24,6 +24,8 @@ def card(href, title, **kwargs):
         - src: string | the src of the header image.
         - tinted: bool | whether to use gray as background color.
         - type: string (info) | Set to info for an info card.
+        - image: FilerImageField | an image that should be used.
+        - grid: boolean | if the card should be a grid.
     """
     return {**kwargs, "href": href, "title": title}
 
@@ -37,6 +39,9 @@ def render_card(parser, token):
         {% render_card %}
             <h1 class="h1">{% trans 'Welkom' %}</h1>
         {% endrender_card %}
+
+    Variables:
+        - grid: boolean | if the card should be a grid.
 
     Extra context:
         - contents: string (HTML) | this is the context between the render_card and endrender_card tags
@@ -76,6 +81,7 @@ def description_card(title, description, url, **kwargs):
         + description: string | The description that needs to be displayed.
         + url: string | The url that the card should point to.
         - object: any | The object that needs to render aditional data.
+        - image: FilerImageField | an image that should be used.
     """
     kwargs.update(title=title, description=description, url=url)
     return kwargs
