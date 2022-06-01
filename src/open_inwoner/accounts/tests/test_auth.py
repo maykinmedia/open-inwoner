@@ -386,23 +386,13 @@ class TestPasswordChange(WebTest):
         response = self.app.get(reverse("password_change_done"), user=self.user)
         self.assertContains(response, _("Uw wachtwoord is gewijzigd."))
 
-    def test_password_change_button_is_rendered_with_email_backend(self):
-        self.client.force_login(self.user)
-        session = self.client.session
-        session[
-            "_auth_user_backend"
-        ] = "open_inwoner.accounts.backends.UserModelEmailBackend"
-        session.save()
-        response = self.client.get(reverse("accounts:my_profile"))
+    def test_password_change_button_is_rendered_with_default_login_type(self):
+        response = self.app.get(reverse("accounts:my_profile"), user=self.user)
         self.assertContains(response, _("Wijzig wachtwoord"))
 
-    def test_password_change_button_is_not_rendered_with_digid_backend(self):
+    def test_password_change_button_is_not_rendered_with_digid_login_type(self):
         digid_user = UserFactory(login_type=LoginTypeChoices.digid)
-        self.client.force_login(digid_user)
-        session = self.client.session
-        session["_auth_user_backend"] = "digid_eherkenning.mock.backends.DigiDBackend"
-        session.save()
-        response = self.client.get(reverse("accounts:my_profile"))
+        response = self.app.get(reverse("accounts:my_profile"), user=digid_user)
         self.assertNotContains(response, _("Wijzig wachtwoord"))
 
     def test_digid_user_is_redirected_to_root_if_password_change_is_accessed(self):
