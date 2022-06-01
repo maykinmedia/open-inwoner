@@ -82,7 +82,7 @@ def messages(
         "me": me,
         "status": status,
         "other_user": other_user,
-        "subject": str(other_user),
+        "subject": other_user.get_full_name(),
     }
 
 
