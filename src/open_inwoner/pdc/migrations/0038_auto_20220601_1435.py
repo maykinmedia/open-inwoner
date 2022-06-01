@@ -10,23 +10,43 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.FILER_IMAGE_MODEL),
-        ('pdc', '0037_category_highlighted'),
+        ("pdc", "0037_category_highlighted"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='product',
-            name='icon',
-            field=filer.fields.image.FilerImageField(blank=True, help_text='Icon of the product', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='product_icons', to=settings.FILER_IMAGE_MODEL, verbose_name='Icon'),
+            model_name="product",
+            name="icon",
+            field=filer.fields.image.FilerImageField(
+                blank=True,
+                help_text="Icon of the product",
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="product_icons",
+                to=settings.FILER_IMAGE_MODEL,
+                verbose_name="Icon",
+            ),
         ),
         migrations.AddField(
-            model_name='product',
-            name='image',
-            field=filer.fields.image.FilerImageField(blank=True, help_text='Image of the product', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='product_images', to=settings.FILER_IMAGE_MODEL, verbose_name='Image'),
+            model_name="product",
+            name="image",
+            field=filer.fields.image.FilerImageField(
+                blank=True,
+                help_text="Image of the product",
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="product_images",
+                to=settings.FILER_IMAGE_MODEL,
+                verbose_name="Image",
+            ),
         ),
         migrations.AlterField(
-            model_name='category',
-            name='highlighted',
-            field=models.BooleanField(default=False, help_text='Wether the category should be highlighted or not.', verbose_name='Highlighted'),
+            model_name="category",
+            name="highlighted",
+            field=models.BooleanField(
+                default=False,
+                help_text="Wether the category should be highlighted or not.",
+                verbose_name="Highlighted",
+            ),
         ),
     ]
