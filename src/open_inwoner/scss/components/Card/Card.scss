@@ -68,9 +68,28 @@
     padding: var(--card-spacing);
   }
 
+  &__body--grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    padding: 0;
+
+    .card__content {
+      padding: var(--card-spacing);
+
+      .p,
+      .button {
+        margin-top: 4px;
+      }
+    }
+  }
+
   &__body--direction-horizontal {
     display: flex;
     justify-content: space-between;
+  }
+
+  &__image {
+    height: 100%;
   }
 
   &__tabled {
@@ -130,6 +149,10 @@
   .link + .link {
     margin-left: 0;
     white-space: nowrap;
+
+    @media (min-width: 768px) {
+      white-space: normal;
+    }
   }
 }
 

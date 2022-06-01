@@ -7,6 +7,7 @@ from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from filer.fields.file import FilerFileField
+from filer.fields.image import FilerImageField
 from ordered_model.models import OrderedModel
 
 from open_inwoner.utils.validators import validate_phone_number
@@ -29,6 +30,22 @@ class Product(models.Model):
         blank=True,
         default="",
         help_text=_("Short description of the product"),
+    )
+    icon = FilerImageField(
+        verbose_name=_("Icon"),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="product_icons",
+        help_text=_("Icon of the product"),
+    )
+    image = FilerImageField(
+        verbose_name=_("Image"),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="product_images",
+        help_text=_("Image of the product"),
     )
     link = models.URLField(
         verbose_name=_("Link"),

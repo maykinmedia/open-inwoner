@@ -1,6 +1,12 @@
-{% load card_tags icon_tags link_tags i18n %}
+{% load card_tags icon_tags link_tags i18n grid_tags thumbnail %}
 
-{% render_card %}
+{% render_card grid=image %}
+    {% if image %}
+        <a href="{{ url }}" class="card__image-container">
+            <img class="card__image" src="{{ image|thumbnail_url:'card-image' }}" />
+        </a>
+        <div class="card__content">
+    {% endif %}
     <h3 class="h3">{% link url text=title %}</h3>
     <p class="p">{{ description }}</p>
     {% if object.end_date %}
@@ -14,4 +20,7 @@
         </div>
     {% endif %}
     {% link url text=title hide_text=True icon='arrow_forward' button=True transparent=True %}
+    {% if image %}
+        </div>
+    {% endif %}
 {% endrender_card %}

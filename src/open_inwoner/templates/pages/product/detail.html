@@ -1,6 +1,12 @@
 {% extends 'master.html' %}
 {% load i18n l10n button_tags card_tags file_tags grid_tags icon_tags link_tags map_tags notification_tags tag_tags utils condition_tags render_tags anchor_menu_tags %}
 
+{% block header_image %}
+{% if object.image %}
+    <img class="main-image main-image--start-after" src="{{ object.image.url }}" alt="Header image">
+{% endif %}
+{% endblock header_image %}
+
 {% block sidebar_content %}
     {% anchor_menu anchors=anchors desktop=True %}
         {% if product.link %}
