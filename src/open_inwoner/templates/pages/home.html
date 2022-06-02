@@ -24,7 +24,7 @@
     {% if request.user.is_authenticated %}
         {% card_container categories=categories columns=3 %}
     {% else %}
-        {% card_container categories=highlighted_categories %}
+        {% card_container categories=categories %}
     {% endif %}
 
     {% if questionnaire_roots.exists %}
