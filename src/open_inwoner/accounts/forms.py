@@ -106,7 +106,15 @@ class ContactForm(forms.ModelForm):
 
 
 class ActionForm(forms.ModelForm):
-    file = LimitedUploadFileField(required=False)
+    is_for = forms.ModelChoiceField(
+        label=_("Is voor"),
+        queryset=User.objects.none(),
+        to_field_name="email",
+        required=False,
+    )
+    file = LimitedUploadFileField(
+        required=False, widget=PrivateFileWidget(url_name="accounts:action_download")
+    )
 
     class Meta:
         model = Action
@@ -125,15 +133,13 @@ class ActionForm(forms.ModelForm):
         self.plan = plan
         super().__init__(*args, **kwargs)
 
-        self.fields["is_for"].required = False
-        self.fields["is_for"].empty_label = _("Myself")
-        self.fields["is_for"].queryset = User.objects.filter(
+        contact_users = User.objects.filter(
             assigned_contacts__in=self.user.contacts.all()
         )
-
-        self.fields["file"].widget = PrivateFileWidget(
-            url_name="accounts:action_download"
-        )
+        choices = [[u.email, f"{u.first_name} {u.last_name}"] for u in contact_users]
+        choices.insert(0, ["", _("Myself")])
+        self.fields["is_for"].queryset = contact_users
+        self.fields["is_for"].choices = choices
 
     def clean_end_date(self):
         data = self.cleaned_data["end_date"]
