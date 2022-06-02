@@ -28,8 +28,6 @@ django-localflavor
 django-privates
 django-digid-eherkenning
 django-cors-headers
-dj-rest-auth
-django-allauth
 django-autoslug
 django-elasticsearch-dsl
 django-import-export
