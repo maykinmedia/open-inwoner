@@ -39,6 +39,6 @@
 
 {% block content %}
     {% if conversation_messages or other_user %}
-        {% messages conversation_messages request.user form other_user.get_full_name status %}
+        {% messages message_list=conversation_messages me=request.user form=form other_user=other_user status=status %}
     {% endif %}
 {% endblock %}
