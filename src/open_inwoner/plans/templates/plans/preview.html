@@ -13,11 +13,10 @@
 
     {% if plan_template.actiontemplates.exists %}
         <div class='preview__title'>{% trans 'Actions:' %}</div>
-        <div></div>
 
         {% for action_template in plan_template.actiontemplates.all %}
             <div class='preview__span'>
-                <div>{{ forloop.counter }}</div>
+                <div class='preview__title'>{{ forloop.counter }}</div>
                 <div class='preview__title'>{% trans 'Name:' %}</div>
                 <div>{{ action_template.name }}</div>
                 <div></div>
@@ -30,8 +29,8 @@
                 <div class='preview__title'>{% trans 'Type:' %}</div>
                 <div>{{ action_template.get_type_display }}</div>
                 <div></div>
-                <div class='preview__title'>{% trans 'Ends in x days:' %}</div>
-                <div>{{ action_template.end_in_days }}</div>
+                <div class='preview__title'>{% trans 'Eindigt' %}</div>
+                <div>{% trans "Over" %}{{ over }} {{ action_template.end_in_days }} {% trans "dagen" %} {{ days }}</div>
             </div>
         {% endfor %}
     {% endif %}
