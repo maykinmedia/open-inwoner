@@ -15,10 +15,17 @@
   }
 
   &__container {
-    max-width: 700px;
+    max-width: 90%;
+    max-height: 90vh;
     background-color: #fff;
     border-radius: var(--border-radius);
     padding: var(--spacing-giant);
+    overflow-y: auto;
+    box-sizing: border-box;
+
+    @media (min-width: 768px) {
+      max-width: 700px;
+    }
   }
 
   &__title {
@@ -47,6 +54,10 @@
     display: flex;
     justify-content: center;
     gap: var(--spacing-medium);
+
+    &--align-right {
+      justify-content: right;
+    }
   }
 
   &__button:empty {

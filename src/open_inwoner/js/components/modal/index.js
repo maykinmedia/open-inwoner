@@ -42,9 +42,11 @@ export default class Modal {
 
   show() {
     this.node.classList.add('modal--open')
+    document.body.style.overflow = 'hidden'
   }
 
   hide() {
     this.node.classList.remove('modal--open')
+    document.body.style.overflow = 'visible'
   }
 }

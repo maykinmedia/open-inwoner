@@ -48,7 +48,7 @@
                             <div class="modal__container">
                                 <h2 class="modal__title" id="modal__title">{{ plan_template.name }}</h2>
                                 <div class="modal__text" id="modal__text">{{ plan_template.string_preview }}</div>
-                                <div class="modal__actions" id="modal__actions">
+                                <div class="modal__actions modal__actions--align-right" id="modal__actions">
                                     {% spaceless %}
                                         {% button text=_("Sluiten") extra_classes="modal__button modal__close" primary=True %}
                                     {% endspaceless %}
