@@ -162,7 +162,6 @@ INSTALLED_APPS = [
     "open_inwoner.openzaak",
     "open_inwoner.questionnaire",
     "open_inwoner.extended_sessions",
-    "open_inwoner.custom_csp",
 ]
 
 MIDDLEWARE = [
@@ -175,7 +174,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "csp.contrib.rate_limiting.RateLimitedCSPMiddleware",
     "csp.middleware.CSPMiddleware",
-    "open_inwoner.custom_csp.middleware.UpdateCSPMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "axes.middleware.AxesMiddleware",
