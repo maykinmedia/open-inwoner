@@ -1,0 +1,31 @@
+{% extends 'master.html' %}
+{% load i18n button_tags link_tags icon_tags %}
+
+
+{% block content %}
+<h1 class="h1" id="title">
+    {% trans "History of changes" %}
+</h1>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th class="table__header">{% trans "Date" %}</th>
+            <th class="table__header">{% trans "Changed by" %}</th>
+            <th class="table__header">{% trans "Details" %}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for log in logs %}
+            <tr>
+                <td class="table__item">{{ log.timestamp }}</td>
+                <td class="table__item">{{ log.user.get_full_name }}</td>
+                <td class="table__item">{{ log.extra_data.message }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+{% endblock content %}

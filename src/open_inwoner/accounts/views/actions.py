@@ -180,3 +180,31 @@ class ActionPrivateMediaView(LogMixin, LoginRequiredMixin, PrivateMediaView):
             return True
 
         return False
+
+
+class ActionHistoryView(LoginRequiredMixin, BaseBreadcrumbMixin, DetailView):
+    template_name = "pages/history.html"
+    model = Action
+    slug_field = "uuid"
+    slug_url_kwarg = "uuid"
+
+    @cached_property
+    def crumbs(self):
+        return [
+            (_("Mijn profiel"), reverse("accounts:my_profile")),
+            (_("Mijn acties"), reverse("accounts:action_list")),
+            (
+                _("History of {}").format(self.object.name),
+                reverse("accounts:action_history", kwargs=self.kwargs),
+            ),
+        ]
+
+    def get_queryset(self):
+        base_qs = super().get_queryset()
+        return base_qs.connected(user=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context["logs"] = self.object.logs.order_by()
+        return context
