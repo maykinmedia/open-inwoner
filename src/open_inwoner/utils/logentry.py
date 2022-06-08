@@ -1,7 +1,6 @@
 import logging
 
 from django.contrib.admin import models
-from django.contrib.admin.utils import _get_changed_field_labels_from_form
 from django.utils.encoding import force_str
 from django.utils.text import get_text_list
 from django.utils.translation import ugettext_lazy as _
@@ -19,17 +18,12 @@ LOG_ACTIONS = {
 logger = logging.getLogger(__name__)
 
 
-def get_change_message(fields=None, form=None):
+def get_change_message(fields):
     """
     Create a change message for *fields* (a sequence of field names).
-    If *fields* are empty they can be extracted from the *form* instance
     """
-    changed_fields = fields or _get_changed_field_labels_from_form(
-        form, form.changed_data
-    )
-
     return _("Changed {changed_fields}.").format(
-        changed_fields=get_text_list(changed_fields, _("and"))
+        changed_fields=get_text_list(fields, _("and"))
     )
 
 
