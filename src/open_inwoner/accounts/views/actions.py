@@ -12,6 +12,7 @@ from django.views.generic.edit import UpdateView
 from privates.views import PrivateMediaView
 from view_breadcrumbs import BaseBreadcrumbMixin
 
+from open_inwoner.utils.logentry import get_change_message
 from open_inwoner.utils.mixins import ExportMixin
 from open_inwoner.utils.views import LogMixin
 
@@ -101,7 +102,9 @@ class ActionUpdateView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, Update
     def form_valid(self, form):
         self.object = form.save(self.request.user)
 
-        self.log_change(self.object, _("action was modified"))
+        # log
+        changed_message = get_change_message(form=form)
+        self.log_change(self.object, changed_message)
         return HttpResponseRedirect(self.get_success_url())
 
 
