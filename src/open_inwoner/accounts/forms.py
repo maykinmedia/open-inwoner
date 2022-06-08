@@ -105,28 +105,11 @@ class ContactForm(forms.ModelForm):
         return super().save(commit=commit)
 
 
-class UserField(forms.ModelChoiceField):
-    me = None
-
-    def label_from_instance(self, obj: User) -> str:
-        return obj.get_full_name()
-
-    def has_changed(self, initial, data):
-        # consider 'me' as empty value
-        if initial == self.me.id and not data:
-            return False
-
-        if data == self.me.id and not initial:
-            return False
-
-        return super().has_changed(initial, data)
-
-
 class ActionForm(forms.ModelForm):
-    is_for = UserField(
+    is_for = forms.ModelChoiceField(
         label=_("Is voor"),
         queryset=User.objects.none(),
-        empty_label=_("Myself"),
+        to_field_name="email",
         required=False,
     )
     file = LimitedUploadFileField(
@@ -153,8 +136,10 @@ class ActionForm(forms.ModelForm):
         contact_users = User.objects.filter(
             assigned_contacts__in=self.user.contacts.all()
         )
+        choices = [[u.email, f"{u.first_name} {u.last_name}"] for u in contact_users]
+        choices.insert(0, ["", _("Myself")])
         self.fields["is_for"].queryset = contact_users
-        self.fields["is_for"].me = user
+        self.fields["is_for"].choices = choices
 
     def clean_end_date(self):
         data = self.cleaned_data["end_date"]

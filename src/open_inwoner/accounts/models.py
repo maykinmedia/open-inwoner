@@ -494,22 +494,6 @@ class Action(models.Model):
     def is_connected(self, user):
         return Action.objects.filter(pk=self.pk).connected(user=user).exists()
 
-    def send(self, plan, message, receivers, request=None):
-        plan_url = plan.get_absolute_url()
-        if request:
-            plan_url = request.build_absolute_uri(plan_url)
-
-        template = find_template("plan_action_update")
-        context = {
-            "action": self,
-            "plan": plan,
-            "plan_url": plan_url,
-            "message": message,
-        }
-        to_emails = [r.email for r in receivers]
-
-        return template.send_email(to_emails, context)
-
 
 class Message(models.Model):
     uuid = models.UUIDField(

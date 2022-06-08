@@ -776,64 +776,6 @@ MAIL_EDITOR_CONF = {
             },
         ],
     },
-    "plan_action_update": {
-        "name": _("Plan action update"),
-        "description": _(
-            "This email is used to notify plan participants about the change in the plan action"
-        ),
-        "subject_default": "Plan action has been updated at {{ site_name }}",
-        "body_default": """
-            <p>Beste</p>
-
-            <p>You are receiving this email because the action in your <a href="{{ plan_url }}">plan</a> was updated.</p>
-
-            <table>
-                <tr>
-                    <th>Action name</th>
-                    <td>{{ action.name }}</td>
-                </tr>
-                <tr>
-                    <th>Plan</th>
-                    <td><a href="{{ plan_url }}">{{ plan.title }}</a></td>
-                </tr>
-                <tr>
-                    <th>Updated at</th>
-                    <td>{{ action.updated_on }}</td>
-                </tr>
-                <tr>
-                    <th>Details</th>
-                    <td>{{ message }}</td>
-                </tr>
-            </table>
-
-            <p>Met vriendelijke groet,
-            {{ site_name }} </p>
-       """,
-        "subject": [
-            {
-                "name": "site_name",
-                "description": _("Name of the site."),
-            },
-        ],
-        "body": [
-            {
-                "name": "action",
-                "description": _("Action that was updated"),
-            },
-            {
-                "name": "plan",
-                "description": _("Plan the updated action belongs to"),
-            },
-            {
-                "name": "plan_url",
-                "description": _("The link to the plan."),
-            },
-            {
-                "name": "site_name",
-                "description": _("Name of the site"),
-            },
-        ],
-    },
 }
 MAIL_EDITOR_BASE_CONTEXT = {"site_name": "Open Inwoner Platform"}
 CKEDITOR_CONFIGS = {
