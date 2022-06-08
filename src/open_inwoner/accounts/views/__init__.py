@@ -30,4 +30,4 @@ from .profile import (
     MyProfileExportView,
     MyProfileView,
 )
-from .registration import CustomRegistrationView
+from .registration import CustomRegistrationView, NecessaryFieldsUserView

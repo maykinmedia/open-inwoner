@@ -26,6 +26,7 @@ from .views import (
     MyCategoriesView,
     MyProfileExportView,
     MyProfileView,
+    NecessaryFieldsUserView,
 )
 
 app_name = "accounts"
@@ -86,5 +87,10 @@ urlpatterns = [
     path("edit/", EditProfileView.as_view(), name="edit_profile"),
     path("invite/<str:key>/accept/", InviteAcceptView.as_view(), name="invite_accept"),
     path("export/", MyProfileExportView.as_view(), name="profile_export"),
+    path(
+        "register/necessary/",
+        NecessaryFieldsUserView.as_view(),
+        name="registration_necessary",
+    ),
     path("", MyProfileView.as_view(), name="my_profile"),
 ]

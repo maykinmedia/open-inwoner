@@ -3,6 +3,8 @@ from django.db.models import Q, QuerySet
 
 from digid_eherkenning.managers import BaseDigidManager, BaseeHerkenningManager
 
+from open_inwoner.utils.hash import generate_email_from_string
+
 from .choices import LoginTypeChoices
 
 
@@ -14,8 +16,9 @@ class DigidManager(BaseDigidManager):
         return self.get_queryset().get(bsn=bsn)
 
     def digid_create(self, bsn, **kwargs):
+        email = generate_email_from_string(bsn)
         return super().create(
-            email="user-{}@bsn.com".format(bsn),
+            email=email,
             login_type=LoginTypeChoices.digid,
             bsn=bsn,
         )
