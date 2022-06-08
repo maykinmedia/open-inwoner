@@ -298,7 +298,7 @@ class PlanViewTests(WebTest):
         plan_url = f"http://testserver{self.detail_url}"
         body = email.alternatives[0][0]  # html version of the email body
         self.assertIn(plan_url, body)
-        self.assertIn("Changed Naam.", body)
+        self.assertIn("Changed: Naam.", body)
 
     def test_plan_export(self):
         response = self.app.get(self.export_url, user=self.user)
