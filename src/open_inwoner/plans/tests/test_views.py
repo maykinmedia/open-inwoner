@@ -1,5 +1,4 @@
-from unittest import expectedFailure
-
+from django.core import mail
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
@@ -282,10 +281,24 @@ class PlanViewTests(WebTest):
         self.assertEqual(response.status_code, 200)
         form = response.forms["action-create"]
         form["name"] = "action name"
+
         response = form.submit(user=self.user)
+
         self.assertEqual(response.status_code, 302)
         self.action.refresh_from_db()
         self.assertEqual(self.action.name, "action name")
+
+        # send notification to the contact
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertEqual(
+            email.subject, "Plan action has been updated at Open Inwoner Platform"
+        )
+        self.assertEqual(email.to, [self.contact_user.email])
+        plan_url = f"http://testserver{self.detail_url}"
+        body = email.alternatives[0][0]  # html version of the email body
+        self.assertIn(plan_url, body)
+        self.assertIn("Changed Naam.", body)
 
     def test_plan_export(self):
         response = self.app.get(self.export_url, user=self.user)
