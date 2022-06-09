@@ -53,15 +53,25 @@ class TestHighlightedQuestionnaire(WebTest):
         self.questionnaire = QuestionnaireStepFactory(
             path="0001", category=self.category
         )
-        self.highlighted_questionnaire = QuestionnaireStepFactory(
-            path="0002", category=self.category, highlighted=True
+        self.highlighted_questionnaire_1 = QuestionnaireStepFactory(
+            path="0003", category=self.category, highlighted=True
+        )
+        self.highlighted_questionnaire_2 = QuestionnaireStepFactory(
+            path="0004", category=self.category, highlighted=True
+        )
+        self.highlighted_questionnaire_3 = QuestionnaireStepFactory(
+            path="0005", category=self.category, highlighted=True
         )
 
     def test_only_highlighted_questionnaires_are_shown_on_anonymous_home_page(self):
         response = self.app.get(reverse("root"))
         self.assertEqual(
             list(response.context["questionnaire_roots"]),
-            [self.highlighted_questionnaire],
+            [
+                self.highlighted_questionnaire_1,
+                self.highlighted_questionnaire_2,
+                self.highlighted_questionnaire_3,
+            ],
         )
 
     def test_only_highlighted_questionnaires_are_shown_on_user_home_page(self):
@@ -69,7 +79,11 @@ class TestHighlightedQuestionnaire(WebTest):
         response = self.app.get(reverse("root"), user=user)
         self.assertEqual(
             list(response.context["questionnaire_roots"]),
-            [self.highlighted_questionnaire],
+            [
+                self.highlighted_questionnaire_1,
+                self.highlighted_questionnaire_2,
+                self.highlighted_questionnaire_3,
+            ],
         )
 
     def test_all_questionnaires_are_shown_on_anonymous_category_detailed_page(self):
@@ -78,7 +92,12 @@ class TestHighlightedQuestionnaire(WebTest):
         )
         self.assertEqual(
             list(response.context["questionnaire_roots"]),
-            [self.questionnaire, self.highlighted_questionnaire],
+            [
+                self.questionnaire,
+                self.highlighted_questionnaire_1,
+                self.highlighted_questionnaire_2,
+                self.highlighted_questionnaire_3,
+            ],
         )
 
     def test_all_questionnaires_are_shown_on_user_category_detailed_page(self):
@@ -89,5 +108,10 @@ class TestHighlightedQuestionnaire(WebTest):
         )
         self.assertEqual(
             list(response.context["questionnaire_roots"]),
-            [self.questionnaire, self.highlighted_questionnaire],
+            [
+                self.questionnaire,
+                self.highlighted_questionnaire_1,
+                self.highlighted_questionnaire_2,
+                self.highlighted_questionnaire_3,
+            ],
         )

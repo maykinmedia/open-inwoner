@@ -19,7 +19,7 @@ class Category(MP_Node):
     highlighted = models.BooleanField(
         verbose_name=_("Highlighted"),
         default=False,
-        help_text=_("Wether the category should be highlighted or not"),
+        help_text=_("Whether the category should be highlighted or not"),
     )
     description = models.TextField(
         verbose_name=_("Description"),
