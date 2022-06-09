@@ -12,7 +12,6 @@ from open_inwoner.pdc.forms import ProductFinderForm
 from open_inwoner.pdc.models.product import ProductCondition
 from open_inwoner.plans.models import Plan
 from open_inwoner.questionnaire.models import QuestionnaireStep
-from open_inwoner.utils.views import CustomDetailBreadcrumbMixin
 
 from .choices import YesNo
 from .forms import ProductFinderForm
@@ -59,19 +58,18 @@ class HomeView(TemplateView):
         config = SiteConfiguration.get_solo()
 
         limit = 3 if self.request.user.is_authenticated else 4
-        kwargs.update(categories=Category.get_root_nodes()[:limit])
+        kwargs.update(categories=Category.objects.all().order_by("name")[:limit])
         kwargs.update(product_locations=ProductLocation.objects.all()[:1000])
         kwargs.update(questionnaire_roots=QuestionnaireStep.get_root_nodes())
         if self.request.user.is_authenticated:
             kwargs.update(plans=Plan.objects.connected(self.request.user)[:limit])
 
         # Highlighted categories
-        if not self.request.user.is_authenticated:
-            kwargs.update(
-                highlighted_categories=Category.get_root_nodes()
-                .filter(highlighted=True)
-                .order_by("name")[:limit]
-            )
+        highlighted_categories = (
+            Category.objects.all().filter(highlighted=True).order_by("name")[:limit]
+        )
+        if not self.request.user.is_authenticated and highlighted_categories:
+            kwargs.update(categories=highlighted_categories)
 
         # Product finder:
         if config.show_product_finder:
