@@ -160,7 +160,7 @@ class TestPlans(WebTest):
         self.assertEquals(
             log_entry.extra_data,
             {
-                "message": _("action was modified via plan"),
+                "message": _("Changed Naam."),
                 "action_flag": list(LOG_ACTIONS[CHANGE]),
                 "content_object_repr": "Updated name",
             },
