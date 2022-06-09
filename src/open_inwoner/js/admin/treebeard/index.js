@@ -19,7 +19,6 @@ function updateNodeStatus() {
       const buttonId = event.currentTarget.parentElement.parentElement.id
       setTimeout(() => {
         if (button.classList.contains('expanded')) {
-          console.log('mesa')
           window.localStorage.setItem(`${buttonId}-open`, true)
         } else {
           window.localStorage.removeItem(`${buttonId}-open`)
