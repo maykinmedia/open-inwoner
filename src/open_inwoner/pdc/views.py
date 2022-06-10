@@ -281,8 +281,6 @@ class ProductFinderView(FormView):
             for _order, answer in current_answers.items():
                 if answer.get("answer") == YesNo.no:
                     products = products.exclude(conditions=answer.get("condition"))
-                else:
-                    products = products.filter(conditions=answer.get("condition"))
         return products
 
     def filter_possible_products(self, condition_products, matched):
