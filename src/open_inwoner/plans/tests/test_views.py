@@ -300,6 +300,18 @@ class PlanViewTests(WebTest):
         self.assertIn(plan_url, body)
         self.assertIn("Changed: Naam.", body)
 
+    def test_plan_action_edit_not_changed(self):
+        response = self.app.get(self.action_edit_url, user=self.user)
+        self.assertEqual(response.status_code, 200)
+        form = response.forms["action-create"]
+
+        response = form.submit(user=self.user)
+
+        self.assertEqual(response.status_code, 302)
+
+        # no notification is sent
+        self.assertEqual(len(mail.outbox), 0)
+
     def test_plan_export(self):
         response = self.app.get(self.export_url, user=self.user)
         self.assertEqual(response.status_code, 200)

@@ -102,9 +102,10 @@ class ActionUpdateView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, Update
     def form_valid(self, form):
         self.object = form.save(self.request.user)
 
-        # log
-        changed_message = get_change_message(form=form)
-        self.log_change(self.object, changed_message)
+        # log if the action was changed
+        if form.changed_data:
+            changed_message = get_change_message(form=form)
+            self.log_change(self.object, changed_message)
         return HttpResponseRedirect(self.get_success_url())
 
 
