@@ -19,10 +19,11 @@ class Emoji {
         this.popup.classList.remove('emoji__popup--open')
       }
     })
-    this.search.addEventListener('keydown', (event) => {
-      const searchValue = event.currentTarget.value
+    this.search.addEventListener('keyup', (event) => {
+      const searchValue = event.currentTarget.value.toUpperCase()
       document.querySelectorAll('.emoji__emoji-button').forEach((button) => {
-        if (button.dataset.label.includes(searchValue)) {
+        const label = button.dataset.label.toUpperCase()
+        if (label.includes(searchValue)) {
           button.classList.remove('emoji__emoji-button--hidden')
         } else {
           button.classList.add('emoji__emoji-button--hidden')
