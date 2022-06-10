@@ -1,4 +1,4 @@
-{% load i18n %}
+{% load i18n link_tags %}
 
 <div class='preview'>
     {% if plan_template.goal %}
@@ -8,7 +8,7 @@
 
     {% if plan_template.file %}
         <div class='preview__title'>{% trans 'File:' %}</div>
-        <div>{{ plan_template.file }}</div>
+        <div>{% link href=plan_template.file.url text=plan_template.file %}</div>
     {% endif %}
 
     {% if plan_template.actiontemplates.exists %}

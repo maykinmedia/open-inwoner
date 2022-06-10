@@ -8,6 +8,10 @@
   gap: var(--spacing-large);
   text-align: left;
 
+  @media (min-width: 768px) {
+    grid-template-columns: 90px 1fr;
+  }
+
   .preview__span {
     grid-column: 1 / 3;
     display: grid;
