@@ -45,7 +45,12 @@
                     {% textarea form.content %}
                     <div class="group-input__toolbar">
                         {% input form.file icon="attach_file" no_label=True no_help=True extra_classes="message-file" %}
-                        {% button class="emoji-button" icon="tag_faces" text=_('Selecteer emoji') hide_text=True type="button" %}
+                        <div class="emoji">
+                            {% button class="emoji__button" icon="tag_faces" text=_('Selecteer emoji') hide_text=True type="button" %}
+                            <div class="emoji__popup">
+                                <input class="emoji__search input" type="search">
+                            </div>
+                        </div>
                     </div>
                 </div>
                 {% form_actions primary_text=_("Verzenden") primary_icon='arrow_forward' %}

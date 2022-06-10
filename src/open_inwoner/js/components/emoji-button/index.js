@@ -1,68 +1,49 @@
-import { EmojiButton } from '@joeattardi/emoji-button'
+import emojis from 'emojibase-data/nl/data.json'
 
-/** @type {NodeList} All the emoji buttons. */
-const EMOJI_BUTTONS = document.querySelectorAll('.emoji-button')
+const emojiElements = document.querySelectorAll('.emoji')
 
-/**
- * Allows selecting emojis.
- */
-class EmojiButtonSelector {
-  /**
-   * Constructor method.
-   * @param {HTMLElement} node
-   */
+class Emoji {
   constructor(node) {
-    /** @type {HTMLElement} */
     this.node = node
-
-    /** @type {EmojiButton} */
-    this.picker = this.getPicker()
-
-    this.bindEvents()
+    this.content = document.getElementById('id_content')
+    this.search = node.querySelector('.emoji__search')
+    this.button = node.querySelector('.emoji__button')
+    this.popup = node.querySelector('.emoji__popup')
+    this.populatePopup()
+    this.button.addEventListener('click', (event) => {
+      event.preventDefault()
+      this.popup.classList.toggle('emoji__popup--open')
+    })
+    document.addEventListener('keyup', (event) => {
+      if (event.key === 'Escape') {
+        this.popup.classList.remove('emoji__popup--open')
+      }
+    })
+    this.search.addEventListener('keydown', (event) => {
+      const searchValue = event.currentTarget.value
+      document.querySelectorAll('.emoji__emoji-button').forEach((button) => {
+        if (button.dataset.label.includes(searchValue)) {
+          button.classList.remove('emoji__emoji-button--hidden')
+        } else {
+          button.classList.add('emoji__emoji-button--hidden')
+        }
+      })
+    })
   }
 
-  /**
-   * Binds events to callbacks.
-   */
-  bindEvents() {
-    this.node.addEventListener('click', () =>
-      this.getPicker().togglePicker(this.node)
-    )
-    this.getPicker().on('emoji', this.onEmoji.bind(this))
-  }
-
-  /**
-   * Returns the input to add emoji's to.
-   * @return {HTMLElement}
-   */
-  getInput() {
-    return this.node.parentElement?.parentElement?.querySelector(
-      'input, textarea'
-    )
-  }
-
-  /**
-   * Returns/instantiates the picker instances.
-   * @return {EmojiButton}
-   */
-  getPicker() {
-    if (!this.picker) {
-      this.picker = new EmojiButton()
-    }
-
-    return this.picker
-  }
-
-  /**
-   * Gets called when an emoji is selected.
-   * @param {Object} selection
-   */
-  onEmoji(selection) {
-    const input = this.getInput()
-    const emoji = selection.emoji
-    input.value += emoji
+  populatePopup() {
+    emojis.forEach((emoji) => {
+      const emojiButton = document.createElement('div')
+      emojiButton.classList.add('emoji__emoji-button')
+      emojiButton.append(emoji.emoji)
+      emojiButton.title = emoji.label
+      emojiButton.setAttribute('data-label', emoji.label)
+      emojiButton.addEventListener('click', (event) => {
+        this.content.append(emoji.emoji)
+      })
+      this.popup.append(emojiButton)
+    })
   }
 }
 
-// Start1
-;[...EMOJI_BUTTONS].forEach((node) => new EmojiButtonSelector(node))
+;[...emojiElements].forEach((emojiElement) => new Emoji(emojiElement))

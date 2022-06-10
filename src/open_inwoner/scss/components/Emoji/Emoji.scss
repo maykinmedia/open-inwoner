@@ -1,0 +1,32 @@
+.emoji {
+  &__button {
+  }
+
+  &__search {
+    grid-column: 1 / span 8;
+  }
+
+  &__emoji-button {
+    cursor: pointer;
+
+    &--hidden {
+      display: none;
+    }
+  }
+
+  &__popup {
+    display: none;
+    grid-template-columns: repeat(8, 1fr);
+    position: absolute;
+    max-height: 200px;
+    overflow: auto;
+    background-color: #fff;
+    padding: var(--spacing-medium);
+    border: 1px solid #000;
+    gap: var(--spacing-medium);
+
+    &--open {
+      display: grid;
+    }
+  }
+}
