@@ -66,6 +66,7 @@ class QuestionnaireStep(MP_Node):
     )
     related_products = models.ManyToManyField(
         "pdc.Product",
+        verbose_name=_("Gerelateerde producten"),
         help_text=_("Deze producten worden weergegeven in deze stap."),
         blank=True,
     )
