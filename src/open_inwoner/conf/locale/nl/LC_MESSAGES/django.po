@@ -831,11 +831,11 @@ msgstr "gebruikersaccount is aangemaakt"
 
 #: accounts/tests/test_logging.py:83 accounts/views/profile.py:99
 msgid "profile was modified"
-msgstr "profiel is aangepast"
+msgstr "profiel is gewijzigd"
 
 #: accounts/tests/test_logging.py:107 accounts/views/profile.py:122
 msgid "categories were modified"
-msgstr "categorieen zijn aangepast"
+msgstr "categorieen zijn gewijzigd"
 
 #: accounts/tests/test_logging.py:196 accounts/views/profile.py:73
 msgid "user was deactivated via frontend"
@@ -843,7 +843,7 @@ msgstr "gebruikersaccount is op eigen verzoek gedeactiveerd"
 
 #: accounts/tests/test_logging.py:220 accounts/views/auth.py:18
 msgid "password was changed"
-msgstr "wachtwoord is aangepast"
+msgstr "wachtwoord is gewijzigd"
 
 #: accounts/tests/test_logging.py:238 accounts/views/auth.py:24
 msgid "password reset was accessed"
@@ -880,7 +880,7 @@ msgstr "contact is aangemaakt"
 
 #: accounts/tests/test_logging.py:382 accounts/views/contacts.py:85
 msgid "contact was modified"
-msgstr "contact is aangepast"
+msgstr "contact is gewijzigd"
 
 #: accounts/tests/test_logging.py:404 accounts/views/contacts.py:158
 msgid "contact was deleted"
@@ -907,7 +907,7 @@ msgstr "actie is aangemaakt"
 
 #: accounts/tests/test_logging.py:527 accounts/views/actions.py:104
 msgid "action was modified"
-msgstr "actie is aangepast"
+msgstr "actie is gewijzigd"
 
 #: accounts/tests/test_logging.py:564 accounts/tests/test_logging.py:589
 #: accounts/views/inbox.py:132 accounts/views/inbox.py:168
@@ -1445,7 +1445,7 @@ msgstr ""
 
 #: conf/base.py:812
 msgid "Action that was updated"
-msgstr "Actie dat is aangepast"
+msgstr "Actie dat is gewijzigd"
 
 #: conf/base.py:816
 msgid "Plan the updated action belongs to"

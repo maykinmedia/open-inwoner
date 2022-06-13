@@ -77,7 +77,7 @@ class TestRegistrationFunctionality(WebTest):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
-            response.context["errors"].as_text(), "* This user has been deactivated"
+            response.context["errors"].as_text(), "* Deze gebruiker is gedeactiveerd"
         )
 
     def test_registration_with_invite(self):

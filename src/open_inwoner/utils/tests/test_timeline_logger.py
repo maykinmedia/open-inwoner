@@ -66,7 +66,7 @@ class TestAdminTimelineLogging(WebTest):
         self.assertEquals(
             log_entry.extra_data,
             {
-                "message": _("Voornaam en Aangemaakt door gewijzigd."),
+                "message": "Voornaam and Aangemaakt door gewijzigd.",
                 "action_flag": list(LOG_ACTIONS[CHANGE]),
                 "content_object_repr": f"Vasileios {contact.last_name}",
             },
