@@ -9,7 +9,13 @@ class Emoji {
     this.search = node.querySelector('.emoji__search')
     this.button = node.querySelector('.emoji__button')
     this.popup = node.querySelector('.emoji__popup')
+    this.container = node.querySelector('.emoji__emojis')
+    this.close = this.popup.querySelector('.material-icons')
     this.populatePopup()
+    this.addListeners()
+  }
+
+  addListeners() {
     this.button.addEventListener('click', (event) => {
       event.preventDefault()
       this.popup.classList.toggle('emoji__popup--open')
@@ -19,16 +25,21 @@ class Emoji {
         this.popup.classList.remove('emoji__popup--open')
       }
     })
-    this.search.addEventListener('keyup', (event) => {
-      const searchValue = event.currentTarget.value.toUpperCase()
-      document.querySelectorAll('.emoji__emoji-button').forEach((button) => {
-        const label = button.dataset.label.toUpperCase()
-        if (label.includes(searchValue)) {
-          button.classList.remove('emoji__emoji-button--hidden')
-        } else {
-          button.classList.add('emoji__emoji-button--hidden')
-        }
-      })
+    this.close.addEventListener('click', (event) => {
+      this.popup.classList.remove('emoji__popup--open')
+    })
+    this.search.addEventListener('keyup', this.searchEmoji.bind(this))
+  }
+
+  searchEmoji(event) {
+    const searchValue = event.currentTarget.value.toUpperCase()
+    document.querySelectorAll('.emoji__emoji-button').forEach((button) => {
+      const label = button.dataset.label.toUpperCase()
+      if (label.includes(searchValue)) {
+        button.classList.remove('emoji__emoji-button--hidden')
+      } else {
+        button.classList.add('emoji__emoji-button--hidden')
+      }
     })
   }
 
@@ -42,7 +53,7 @@ class Emoji {
       emojiButton.addEventListener('click', (event) => {
         this.content.append(emoji.emoji)
       })
-      this.popup.append(emojiButton)
+      this.container.append(emojiButton)
     })
   }
 }

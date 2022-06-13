@@ -1,9 +1,19 @@
 .emoji {
-  &__button {
+  &__header {
+    display: grid;
+    grid-template-columns: 1fr 25px;
+    align-items: center;
+    padding: 8px 0 0 8px;
+    gap: 8px;
   }
 
   &__search {
-    grid-column: 1 / span 8;
+    // grid-column: 1 / span 8;
+    min-width: 0;
+  }
+
+  .material-icons {
+    cursor: pointer;
   }
 
   &__emoji-button {
@@ -16,17 +26,23 @@
 
   &__popup {
     display: none;
-    grid-template-columns: repeat(8, 1fr);
     position: absolute;
-    max-height: 200px;
-    overflow: auto;
     background-color: #fff;
-    padding: var(--spacing-medium);
     border: 1px solid #000;
-    gap: var(--spacing-medium);
+    width: 260px;
 
     &--open {
-      display: grid;
+      display: block;
     }
+  }
+
+  &__emojis {
+    display: grid;
+    gap: var(--spacing-medium);
+    grid-template-columns: repeat(8, 1fr);
+    padding: var(--spacing-medium);
+    max-height: 200px;
+    overflow: auto;
+    text-align: center;
   }
 }

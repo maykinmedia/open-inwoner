@@ -20,6 +20,10 @@
   font-family: var(--font-family-body);
   font-size: var(--font-size-body);
   background-color: var(--color-white);
+
+  &.input--bordered {
+    border: 1px solid var(--color-mute);
+  }
 }
 
 textarea.input {
