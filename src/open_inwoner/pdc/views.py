@@ -175,6 +175,7 @@ class ProductDetailView(BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView
         anchors.append(("#share", _("Delen")))
 
         context["anchors"] = anchors
+        context["related_products_start"] = 6 if product.links.exists() else 1
         return context
 
 
