@@ -67,7 +67,7 @@ class QuestionnaireStep(MP_Node):
     highlighted = models.BooleanField(
         _("Highlighted"),
         default=False,
-        help_text=_("Wether the questionnaire should be highlighted or not."),
+        help_text=_("Whether the questionnaire should be highlighted or not."),
     )
     related_products = models.ManyToManyField(
         "pdc.Product",
