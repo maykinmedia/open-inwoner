@@ -92,7 +92,7 @@
             {% endif %}
         {% endrender_column %}
 
-        {% render_column start=6 span=4 compact=True %}
+        {% render_column start=related_products_start span=4 compact=True %}
             {# Related products. #}
             {% if object.related_products.exists %}
                 <nav class="link-list">
