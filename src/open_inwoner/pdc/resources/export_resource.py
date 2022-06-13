@@ -31,7 +31,7 @@ class ProductExportResource(resources.ModelResource):
     organizations = fields.Field(
         column_name="organizations",
         attribute="organizations",
-        widget=ManyToManyWidget(Organization, field="name"),
+        widget=ManyToManyWidget(Organization, field="slug"),
     )
     related_products = fields.Field(
         column_name="related_products",
@@ -41,7 +41,7 @@ class ProductExportResource(resources.ModelResource):
     tags = fields.Field(
         column_name="tags",
         attribute="tags",
-        widget=ManyToManyWidget(Tag, field="name"),
+        widget=ManyToManyWidget(Tag, field="slug"),
     )
     costs = fields.Field(
         column_name="costs",
