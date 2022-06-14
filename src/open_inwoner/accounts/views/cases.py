@@ -7,9 +7,17 @@ from django.views.generic import TemplateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin
 
-from open_inwoner.openzaak.cases import fetch_cases, fetch_specific_case
+from open_inwoner.openzaak.cases import (
+    fetch_case_types,
+    fetch_cases,
+    fetch_single_case,
+    fetch_single_case_type,
+)
 from open_inwoner.openzaak.statuses import (
     fetch_case_information_objects,
+    fetch_single_status,
+    fetch_single_status_type,
+    fetch_specific_status_types,
     fetch_status_history,
     fetch_status_types,
 )
@@ -37,15 +45,45 @@ class CasesListView(
         context = super().get_context_data(**kwargs)
 
         cases = fetch_cases(self.request.user.bsn)
+        case_types = {case_type.url: case_type for case_type in fetch_case_types()}
+        status_types = {
+            status_type.url: status_type for status_type in fetch_status_types()
+        }
+
+        updated_cases = []
+        for case in cases:
+            current_status = fetch_single_status(case.status)
+
+            # If the status type does not exist in the status types, retrieve it manually
+            if current_status and not current_status.statustype in status_types:
+                status_type = fetch_single_status_type(current_status.statustype)
+                status_types.update({status_type.url: status_type})
+
+            updated_cases.append(
+                {
+                    "uuid": str(case.uuid),
+                    "start_date": case.startdatum,
+                    "end_date": case.einddatum,
+                    "description": case_types[case.zaaktype].omschrijving
+                    if case_types
+                    else _("No data available"),
+                    "current_status": status_types[
+                        current_status.statustype
+                    ].omschrijving
+                    if current_status and status_types
+                    else _("No data available"),
+                }
+            )
 
         context["anchors"] = [
             ("#pending_apps", _("Lopende aanvragen")),
             ("#completed_apps", _("Afgeronde aanvragen")),
         ]
-        context["open_cases"] = [case for case in cases if not case.einddatum]
-        context["open_cases"].sort(key=lambda case: case.startdatum, reverse=True)
-        context["closed_cases"] = [case for case in cases if case.einddatum]
-        context["closed_cases"].sort(key=lambda case: case.einddatum, reverse=True)
+
+        context["open_cases"] = [case for case in updated_cases if not case["end_date"]]
+        context["open_cases"].sort(key=lambda case: case["start_date"])
+        context["closed_cases"] = [case for case in updated_cases if case["end_date"]]
+        context["closed_cases"].sort(key=lambda case: case["end_date"])
 
         return context
 
@@ -78,32 +116,42 @@ class CasesStatusView(
         context = super().get_context_data(**kwargs)
 
         case_uuid = context["object_id"]
-        case = fetch_specific_case(case_uuid)
+        case = fetch_single_case(case_uuid)
 
-        if not case:
-            return context
+        if case:
+            case_info_objects = fetch_case_information_objects(case.url)
+            statuses = fetch_status_history(case.url)
+            statuses.sort(key=lambda status: status.datum_status_gezet)
 
-        case_info_objects = fetch_case_information_objects(case.url)
-        statuses = fetch_status_history(case.url)
-        status_types = fetch_status_types(case.zaaktype)
+            case_type = fetch_single_case_type(case.zaaktype)
+            status_types = fetch_specific_status_types(
+                [status.statustype for status in statuses]
+            )
 
-        status_types = {st.url: st for st in status_types}
-        for status in statuses:
-            status.statustype = status_types.get(status.statustype)
+            for status in statuses:
+                for status_type in status_types:
+                    if status.statustype == status_type.url:
+                        status.statustype = status_type.omschrijving
 
-        # Sort list of statuses in order to able to get the most recent one
-        statuses.sort(key=lambda status: status.datum_status_gezet, reverse=True)
-
-        context["anchors"] = self.get_anchors(case, statuses, case_info_objects)
-        context["case"] = {
-            "obj": case,
-            "documents": case_info_objects,
-            "statuses": statuses,
-        }
-
+            context["case"] = {
+                "start_date": case.startdatum,
+                "end_date": case.einddatum,
+                "description": case_type.omschrijving
+                if case_type
+                else _("No data available"),
+                "current_status": statuses[-1].statustype
+                if statuses
+                and statuses[-1].statustype in [st.omschrijving for st in status_types]
+                else _("No data available"),
+                "statuses": statuses if statuses and status_types else None,
+                "documents": case_info_objects,
+            }
+            context["anchors"] = self.get_anchors(statuses, case_info_objects)
+        else:
+            context["case"] = None
         return context
 
-    def get_anchors(self, case, statuses, documents):
+    def get_anchors(self, statuses, documents):
         anchors = [["#title", _("Gegevens")]]
 
         if statuses:
