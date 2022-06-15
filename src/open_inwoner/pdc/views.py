@@ -60,7 +60,11 @@ class HomeView(TemplateView):
         limit = 3 if self.request.user.is_authenticated else 4
         kwargs.update(categories=Category.objects.all().order_by("name")[:limit])
         kwargs.update(product_locations=ProductLocation.objects.all()[:1000])
-        kwargs.update(questionnaire_roots=QuestionnaireStep.get_root_nodes())
+        kwargs.update(
+            questionnaire_roots=QuestionnaireStep.get_root_nodes().filter(
+                highlighted=True
+            )
+        )
         if self.request.user.is_authenticated:
             kwargs.update(plans=Plan.objects.connected(self.request.user)[:limit])
 
@@ -137,6 +141,9 @@ class CategoryDetailView(BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailVie
         context = super().get_context_data(**kwargs)
         context["subcategories"] = self.object.get_children()
         context["products"] = self.object.products.order_by("name")
+        context["questionnaire_roots"] = QuestionnaireStep.get_root_nodes().filter(
+            category=self.object
+        )
         return context
 
     def get_breadcrumb_name(self):
