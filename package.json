@@ -44,6 +44,7 @@
     "@joeattardi/emoji-button": "^4.6.4",
     "@tarekraafat/autocomplete.js": "^10.2.6",
     "bem.js": "^1.0.10",
+    "emojibase-data": "^7.0.1",
     "flatpickr": "^4.6.9",
     "gumshoejs": "^5.1.2",
     "html-minifier": "^4.0.0",
