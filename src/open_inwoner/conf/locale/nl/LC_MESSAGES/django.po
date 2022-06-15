@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-13 18:13+0200\n"
+"POT-Creation-Date: 2022-06-15 11:41+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -62,9 +62,9 @@ msgstr "Begeleider"
 msgid "Organisatie"
 msgstr "Organisatie"
 
-#: accounts/choices.py:29 accounts/models.py:422 accounts/views/cases.py:63
+#: accounts/choices.py:29 accounts/models.py:424 accounts/views/cases.py:63
 #: accounts/views/cases.py:110
-#: components/templates/components/Action/Actions.html:60
+#: components/templates/components/Action/Actions.html:63
 #: templates/export/include/actions.html:7
 #: templates/export/profile/action_export.html:20
 #: templates/pages/cases/list.html:18 templates/pages/cases/status.html:18
@@ -87,12 +87,12 @@ msgstr "Eenmalig"
 msgid "Terugkerend"
 msgstr "Terugkerend"
 
-#: accounts/forms.py:15 accounts/models.py:30 accounts/models.py:189
+#: accounts/forms.py:15 accounts/models.py:32 accounts/models.py:191
 #: pdc/models/product.py:195
 msgid "First name"
 msgstr "Voornaam"
 
-#: accounts/forms.py:16 accounts/models.py:33 accounts/models.py:194
+#: accounts/forms.py:16 accounts/models.py:35 accounts/models.py:196
 #: pdc/models/product.py:200
 msgid "Last name"
 msgstr "Achternaam"
@@ -145,159 +145,159 @@ msgstr "Of een bericht of een bestand dient te zijn ingevuld"
 msgid "Deadline"
 msgstr "Einddatum"
 
-#: accounts/models.py:35 accounts/models.py:199 pdc/models/organization.py:37
+#: accounts/models.py:37 accounts/models.py:201 pdc/models/organization.py:37
 #: pdc/models/product.py:205
 msgid "Email address"
 msgstr "E-mailadres"
 
-#: accounts/models.py:37
+#: accounts/models.py:39
 msgid "Staff status"
 msgstr "Beheerder status"
 
-#: accounts/models.py:39
+#: accounts/models.py:41
 msgid "Designates whether the user can log into this admin site."
 msgstr "Bepaalt of de gebruiker mag inloggen op de beheeromgeving."
 
-#: accounts/models.py:42 templates/export/include/contacts.html:10
+#: accounts/models.py:44 templates/export/include/contacts.html:10
 msgid "Active"
 msgstr "Actief"
 
-#: accounts/models.py:45
+#: accounts/models.py:47
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr "Bepaalt of deze gebruiker een actief account heeft."
 
-#: accounts/models.py:50
+#: accounts/models.py:52
 msgid "Contact type"
 msgstr "Contact type"
 
-#: accounts/models.py:54
+#: accounts/models.py:56
 msgid "The type of contact"
 msgstr "Type contactpersoon"
 
-#: accounts/models.py:57
+#: accounts/models.py:59
 msgid "Date joined"
 msgstr "Datum aangemeld"
 
-#: accounts/models.py:59
+#: accounts/models.py:61
 msgid "Rsin"
 msgstr "RSIN"
 
-#: accounts/models.py:60
+#: accounts/models.py:62
 msgid "Bsn"
 msgstr "BSN"
 
-#: accounts/models.py:62
+#: accounts/models.py:64
 msgid "Login type"
 msgstr "Logintype"
 
-#: accounts/models.py:67 templates/export/profile/profile_export.html:14
+#: accounts/models.py:69 templates/export/profile/profile_export.html:14
 msgid "Birthday"
 msgstr "Geboortedatum"
 
-#: accounts/models.py:69
+#: accounts/models.py:71
 msgid "Street"
 msgstr "Straat"
 
-#: accounts/models.py:72
+#: accounts/models.py:74
 msgid "House number"
 msgstr "Huisnummer"
 
-#: accounts/models.py:75
+#: accounts/models.py:77
 msgid "Postcode"
 msgstr "Postcode"
 
-#: accounts/models.py:78
+#: accounts/models.py:80
 msgid "City"
 msgstr "Stad"
 
-#: accounts/models.py:81
+#: accounts/models.py:83
 msgid "Deactivated on"
 msgstr "Gedeactiveerd op"
 
-#: accounts/models.py:84
+#: accounts/models.py:86
 msgid "This is the date the user decided to deactivate their account."
 msgstr "Op deze datum is dit account gedeactiveerd."
 
-#: accounts/models.py:87
+#: accounts/models.py:89
 msgid "Prepopulated"
 msgstr "Vooringevuld"
 
-#: accounts/models.py:89
+#: accounts/models.py:91
 msgid "Indicates if fields have been prepopulated by Haal Central API."
 msgstr ""
 "Bepaalt of de velden automatisch ingevuld zijn via de Haal Centraal API"
 
-#: accounts/models.py:93
+#: accounts/models.py:95
 msgid "Selected themes"
 msgstr "Geselecteerde thema's"
 
-#: accounts/models.py:106
+#: accounts/models.py:108
 msgid "User"
 msgstr "Gebruiker"
 
-#: accounts/models.py:107
+#: accounts/models.py:109
 msgid "Users"
 msgstr "Gebruikers"
 
-#: accounts/models.py:168 accounts/tests/test_profile_views.py:27
+#: accounts/models.py:170 accounts/tests/test_profile_views.py:27
 msgid "U heeft geen intressegebieden aangegeven."
 msgstr "U heeft geen intressegebieden aangegeven."
 
-#: accounts/models.py:183 accounts/models.py:302 accounts/models.py:354
-#: accounts/models.py:397 accounts/models.py:524 plans/models.py:95
+#: accounts/models.py:185 accounts/models.py:304 accounts/models.py:356
+#: accounts/models.py:399 accounts/models.py:527 plans/models.py:95
 msgid "UUID"
 msgstr "UUID"
 
-#: accounts/models.py:186
+#: accounts/models.py:188
 msgid "Used as a reference in the contacts api."
 msgstr "Wordt gebruikt als referentie via de contacten API"
 
-#: accounts/models.py:191
+#: accounts/models.py:193
 msgid "The first name of the contact person."
 msgstr "Voornaam van de contactpersoon"
 
-#: accounts/models.py:196
+#: accounts/models.py:198
 msgid "The last name of the contact person"
 msgstr "Achternaam van de contactpersoon"
 
-#: accounts/models.py:203
+#: accounts/models.py:205
 msgid "The email address of the contact person. This field can be left empty."
 msgstr "E-mailadres van de contactpersoon. Dit veld mag leeggelaten worden."
 
-#: accounts/models.py:207 pdc/models/organization.py:42
+#: accounts/models.py:209 pdc/models/organization.py:42
 #: pdc/models/product.py:210
 msgid "Phonenumber"
 msgstr "Telefoonnummer"
 
-#: accounts/models.py:213
+#: accounts/models.py:215
 msgid "The phonenumber of the contact person. This field can be left empty."
 msgstr ""
 "De telefoonnummer van de contactpersoon. Dit veld mag leeggelaten worden."
 
-#: accounts/models.py:217 accounts/models.py:318 accounts/models.py:370
-#: accounts/models.py:460 accounts/models.py:544 accounts/models.py:618
+#: accounts/models.py:219 accounts/models.py:320 accounts/models.py:372
+#: accounts/models.py:462 accounts/models.py:547 accounts/models.py:621
 #: pdc/models/product.py:87 search/models.py:61
 #: templates/export/plans/plan_export.html:30
 #: templates/export/profile/action_export.html:44
 msgid "Created on"
 msgstr "Aangemaakt op"
 
-#: accounts/models.py:220
+#: accounts/models.py:222
 msgid ""
 "This is the date the contact was created. This field is automatically set."
 msgstr ""
 "Datum dat de contactpersoon is aangemaakt. Dit veld wordt automatisch gevuld."
 
-#: accounts/models.py:224 accounts/models.py:323 accounts/models.py:375
-#: accounts/models.py:465 pdc/models/product.py:94
+#: accounts/models.py:226 accounts/models.py:325 accounts/models.py:377
+#: accounts/models.py:467 pdc/models/product.py:94
 #: templates/export/plans/plan_export.html:34
 #: templates/export/profile/action_export.html:48
 msgid "Updated on"
 msgstr "Bijgewerkt op"
 
-#: accounts/models.py:227
+#: accounts/models.py:229
 msgid ""
 "This is the date when the contact was last changed. This field is "
 "automatically set."
@@ -305,7 +305,7 @@ msgstr ""
 "Datum wanneer de contactpersoon voor het laatst is aangepast. Dit veld wordt "
 "automatisch gevuld."
 
-#: accounts/models.py:232 accounts/models.py:381 accounts/models.py:471
+#: accounts/models.py:234 accounts/models.py:383 accounts/models.py:473
 #: components/templates/components/Card/DescriptionCard.html:16
 #: plans/models.py:116 templates/export/plans/plan_export.html:26
 #: templates/export/profile/action_export.html:32
@@ -313,43 +313,43 @@ msgstr ""
 msgid "Created by"
 msgstr "Aangemaakt door"
 
-#: accounts/models.py:235
+#: accounts/models.py:237
 msgid "This is the person that entered the contact person."
 msgstr "Door deze gebruiker is de contactpersoon aangemaakt"
 
-#: accounts/models.py:239
+#: accounts/models.py:241
 msgid "Contact user"
 msgstr "Contact gebruiker"
 
-#: accounts/models.py:245
+#: accounts/models.py:247
 msgid "The user from the contact, who was added based on the contact email."
 msgstr ""
 "De gebruikersaccount van dit contactpersoon, dit wordt bepaald op basis van "
 "het e-mailadres."
 
-#: accounts/models.py:249
+#: accounts/models.py:251
 msgid "Function"
 msgstr "Functie"
 
-#: accounts/models.py:253
+#: accounts/models.py:255
 msgid "The function of the contact within an organization."
 msgstr "De functie van de contactpersoon binnen een organisatie"
 
-#: accounts/models.py:260 accounts/models.py:608 pdc/admin/organization.py:20
-#: pdc/views.py:172 templates/pages/product/detail.html:116
+#: accounts/models.py:262 accounts/models.py:611 pdc/admin/organization.py:20
+#: pdc/views.py:179 templates/pages/product/detail.html:116
 msgid "Contact"
 msgstr "Contact"
 
-#: accounts/models.py:261 plans/models.py:110
+#: accounts/models.py:263 plans/models.py:110
 #: templates/export/plans/plan_export.html:22
 msgid "Contacts"
 msgstr "Contacten"
 
-#: accounts/models.py:305
+#: accounts/models.py:307
 msgid "Used as a reference in the documents api."
 msgstr "Wordt gebruikt als referentie in de documenten API."
 
-#: accounts/models.py:308 accounts/models.py:360 accounts/models.py:403
+#: accounts/models.py:310 accounts/models.py:362 accounts/models.py:405
 #: configurations/models.py:18 pdc/models/category.py:11
 #: pdc/models/neighbourhood.py:7 pdc/models/organization.py:13
 #: pdc/models/organization.py:68 pdc/models/product.py:20
@@ -362,274 +362,274 @@ msgstr "Wordt gebruikt als referentie in de documenten API."
 msgid "Name"
 msgstr "Naam"
 
-#: accounts/models.py:311
+#: accounts/models.py:313
 msgid "The name of the document"
 msgstr "De naam van het document"
 
-#: accounts/models.py:314 accounts/models.py:442 accounts/models.py:566
+#: accounts/models.py:316 accounts/models.py:444 accounts/models.py:569
 #: pdc/models/product.py:169 plans/models.py:24
 #: templates/export/include/actions.html:11
 #: templates/export/profile/action_export.html:36
 msgid "File"
 msgstr "Bestand"
 
-#: accounts/models.py:320
+#: accounts/models.py:322
 msgid "This is the date the document was created"
 msgstr "Datum dat het bestand is aangemaakt"
 
-#: accounts/models.py:325
+#: accounts/models.py:327
 msgid "This is the date when the document was last changed"
 msgstr "Datum dat het bestand is aangepast"
 
-#: accounts/models.py:329
+#: accounts/models.py:331
 msgid "Owner"
 msgstr "Eigenaar"
 
-#: accounts/models.py:332
+#: accounts/models.py:334
 msgid "This is the user that created the document."
 msgstr "Door deze gebruiker is het document aangemaakt"
 
-#: accounts/models.py:336 accounts/models.py:478 plans/models.py:124
+#: accounts/models.py:338 accounts/models.py:480 plans/models.py:124
 #: templates/export/plans/plan_export.html:6
 msgid "Plan"
 msgstr "Plan"
 
-#: accounts/models.py:341
+#: accounts/models.py:343
 msgid "The plan that the document belongs to. This can be left empty."
 msgstr "Het plan waar het document bij hoort. Dit veld mag leeggelaten worden."
 
-#: accounts/models.py:345
-#: components/templates/components/Action/Actions.html:46
+#: accounts/models.py:347
+#: components/templates/components/Action/Actions.html:49
 msgid "Document"
 msgstr "Document"
 
-#: accounts/models.py:346
+#: accounts/models.py:348
 msgid "Documents"
 msgstr "Documenten"
 
-#: accounts/models.py:357
+#: accounts/models.py:359
 msgid "Used as a reference in the appointments api."
 msgstr "Wordt gebruikt als referentie in de afspraken API."
 
-#: accounts/models.py:363
+#: accounts/models.py:365
 msgid "The name of the appointment."
 msgstr "Naam van de afspraak"
 
-#: accounts/models.py:366
+#: accounts/models.py:368
 msgid "Appointment time"
 msgstr "Afspraaktijd"
 
-#: accounts/models.py:367
+#: accounts/models.py:369
 msgid "This is the time that the appointment is at."
 msgstr "Tijdstip van de afspraak"
 
-#: accounts/models.py:372
+#: accounts/models.py:374
 msgid "This is the date the appointment was created"
 msgstr "Datum van de afspraak"
 
-#: accounts/models.py:377
+#: accounts/models.py:379
 msgid "This is the date when the appointment was last changed"
 msgstr "Datum wanner deze afspraak voor het laatst is gewijzigd"
 
-#: accounts/models.py:384
+#: accounts/models.py:386
 msgid "The person that created the appointment."
 msgstr "De persoon die de afspraak heeft aangemaakt."
 
-#: accounts/models.py:388
+#: accounts/models.py:390
 msgid "Appointment"
 msgstr "Afspraak"
 
-#: accounts/models.py:389
+#: accounts/models.py:391
 msgid "Appointments"
 msgstr "Afspraken"
 
-#: accounts/models.py:400
+#: accounts/models.py:402
 msgid "Used as a reference in the actions api."
 msgstr "Wordt gebruikt als referentie in de acties API"
 
-#: accounts/models.py:406
+#: accounts/models.py:408
 msgid "The name of the action"
 msgstr "De naam van de actie"
 
-#: accounts/models.py:409 pdc/models/category.py:25
+#: accounts/models.py:411 pdc/models/category.py:25
 #: templates/export/profile/action_export.html:16
 msgid "Description"
 msgstr "Omschrijving"
 
-#: accounts/models.py:412
+#: accounts/models.py:414
 msgid "The description of the action"
 msgstr "Omschrijving van de actie"
 
-#: accounts/models.py:415 plans/models.py:100
+#: accounts/models.py:417 plans/models.py:100
 #: templates/export/plans/plan_export.html:14
 #: templates/export/profile/action_export.html:40
 msgid "Goal"
 msgstr "Doel"
 
-#: accounts/models.py:419
+#: accounts/models.py:421
 msgid "The goal of the action"
 msgstr "Het doel van de actie"
 
-#: accounts/models.py:426
+#: accounts/models.py:428
 msgid "The current status of the action"
 msgstr "Huidige status van de actie"
 
-#: accounts/models.py:429 pdc/models/organization.py:31 pdc/models/tag.py:29
+#: accounts/models.py:431 pdc/models/organization.py:31 pdc/models/tag.py:29
 #: plans/models.py:80 templates/export/include/actions.html:8
 #: templates/export/include/contacts.html:7
 msgid "Type"
 msgstr "Type"
 
-#: accounts/models.py:433
+#: accounts/models.py:435
 msgid "The type of action that it is"
 msgstr "Type actie"
 
-#: accounts/models.py:436
+#: accounts/models.py:438
 msgid "Action end date"
 msgstr "Einddatum actie"
 
-#: accounts/models.py:437
+#: accounts/models.py:439
 msgid "This is the date that the action should be done."
 msgstr "De actie dient voor deze datum te zijn uitgevoerd"
 
-#: accounts/models.py:447
+#: accounts/models.py:449
 msgid "The document that is uploaded to the file"
 msgstr "Het document waarbij het bestand is geupload"
 
-#: accounts/models.py:454 templates/export/include/actions.html:9
+#: accounts/models.py:456 templates/export/include/actions.html:9
 #: templates/export/profile/action_export.html:28
 msgid "Is for"
 msgstr "Is voor"
 
-#: accounts/models.py:457
+#: accounts/models.py:459
 msgid "The person that needs to do this action."
 msgstr "Wie deze actie dient uit te voeren"
 
-#: accounts/models.py:462
+#: accounts/models.py:464
 msgid "This is the date the action was created"
 msgstr "Aanmaakdatum van de actie"
 
-#: accounts/models.py:467
+#: accounts/models.py:469
 msgid "This is the date when the action was last changed"
 msgstr "Wijzigingsdatum van de actie"
 
-#: accounts/models.py:474
+#: accounts/models.py:476
 msgid "The person that created the action."
 msgstr "Door deze gebruiker is de actie aangemaakt"
 
-#: accounts/models.py:483
+#: accounts/models.py:485
 msgid "The plan that the action belongs to. This can be left empty."
 msgstr "Het plan waar de actie bij hoort. Dit veld mag leeggelaten worden."
 
-#: accounts/models.py:490 templates/export/profile/action_export.html:6
+#: accounts/models.py:493 templates/export/profile/action_export.html:6
 msgid "Action"
 msgstr "Actie"
 
-#: accounts/models.py:491
+#: accounts/models.py:494
 msgid "Actions"
 msgstr "Acties"
 
-#: accounts/models.py:527
+#: accounts/models.py:530
 msgid "Unique identifier"
 msgstr "Unieke identificatie"
 
-#: accounts/models.py:531
+#: accounts/models.py:534
 msgid "Sender"
 msgstr "Afzender"
 
-#: accounts/models.py:534
+#: accounts/models.py:537
 msgid "The sender of the message"
 msgstr "De afzender van het bericht"
 
-#: accounts/models.py:538
+#: accounts/models.py:541
 msgid "Receiver"
 msgstr "Ontvanger"
 
-#: accounts/models.py:541
+#: accounts/models.py:544
 msgid "The receiver of the message"
 msgstr "De ontvanger van het bericht"
 
-#: accounts/models.py:546 accounts/models.py:620
+#: accounts/models.py:549 accounts/models.py:623
 msgid "This is the date the message was created"
 msgstr "Datum dat het bericht is aangemaakt"
 
-#: accounts/models.py:549 pdc/models/product.py:57
+#: accounts/models.py:552 pdc/models/product.py:57
 msgid "Content"
 msgstr "Content"
 
-#: accounts/models.py:551
+#: accounts/models.py:554
 msgid "Text content of the message"
 msgstr "Tekstuele inhoud van het bericht"
 
-#: accounts/models.py:554
+#: accounts/models.py:557
 msgid "Seen"
 msgstr "Gezien"
 
-#: accounts/models.py:556
+#: accounts/models.py:559
 msgid "Boolean shows if the message was seen by the receiver"
 msgstr "Geeft aan of de ontvanger het bericht heeft gezien"
 
-#: accounts/models.py:559
+#: accounts/models.py:562
 msgid "Sent"
 msgstr "Verzonden"
 
-#: accounts/models.py:562
+#: accounts/models.py:565
 msgid "Boolean shows if the email was sent to the receiver about this message"
 msgstr "Geeft aan of de ontvanger het bericht heeft gezien"
 
-#: accounts/models.py:571
+#: accounts/models.py:574
 msgid "The file that is attached to the message"
 msgstr "Bestand wat aan het bericht is toegevoegd"
 
-#: accounts/models.py:578
+#: accounts/models.py:581
 msgid "Message"
 msgstr "Bericht"
 
-#: accounts/models.py:579
+#: accounts/models.py:582
 msgid "Messages"
 msgstr "Berichten"
 
-#: accounts/models.py:588
+#: accounts/models.py:591
 msgid "Inviter"
 msgstr "Uitnodiger"
 
-#: accounts/models.py:591
+#: accounts/models.py:594
 msgid "User who created the invite"
 msgstr "Gebruiker die de uitnodiging heeft aangemaakt"
 
-#: accounts/models.py:595
+#: accounts/models.py:598
 msgid "Invitee"
 msgstr "Uitgenodigde"
 
-#: accounts/models.py:600
+#: accounts/models.py:603
 msgid "User who received the invite"
 msgstr "Ontvanger van de uitnodiging"
 
-#: accounts/models.py:603
+#: accounts/models.py:606
 msgid "Invitee email"
 msgstr "E-mailadres uitgenodigde"
 
-#: accounts/models.py:604
+#: accounts/models.py:607
 msgid "The email used to send the invite"
 msgstr "Het e-mailadres waar de uitnodiging naar toe is gestuurd"
 
-#: accounts/models.py:613
+#: accounts/models.py:616
 msgid "The contact the creation of which triggered sending the invite"
 msgstr "Contact waardoor de uitnodiging is aangemaakt"
 
-#: accounts/models.py:615
+#: accounts/models.py:618
 msgid "Accepted"
 msgstr "Geaccepteerd"
 
-#: accounts/models.py:616
+#: accounts/models.py:619
 msgid "Key"
 msgstr "Sleutel"
 
-#: accounts/models.py:624
+#: accounts/models.py:627
 msgid "Invitation"
 msgstr "Uitnodiging"
 
-#: accounts/models.py:625
+#: accounts/models.py:628
 msgid "Invitations"
 msgstr "Uitnodigingen"
 
@@ -795,7 +795,8 @@ msgid ""
 "Er zijn geen contacten gevonden met deze filter, of u heeft nog geen "
 "contacten."
 msgstr ""
-"er zijn geen contacten gevonden met deze filter, of u heeft nog geen contacten."
+"er zijn geen contacten gevonden met deze filter, of u heeft nog geen "
+"contacten."
 
 #: accounts/tests/test_file_upload.py:42 accounts/tests/test_file_upload.py:111
 #: accounts/tests/test_file_upload.py:192 utils/forms.py:38
@@ -854,7 +855,6 @@ msgid "password reset was completed"
 msgstr "wachtwoordreset is uitgevoerd"
 
 #: accounts/tests/test_logging.py:296 accounts/views/invite.py:26
-#| msgid "The invitation was expired"
 msgid "invitation accepted"
 msgstr "uitnodiging is geaccepteerd"
 
@@ -864,7 +864,6 @@ msgid "For: {invitee} (2021-10-18)"
 msgstr ""
 
 #: accounts/tests/test_logging.py:322 accounts/views/invite.py:33
-#| msgid "The invitation was expired"
 msgid "invitation expired"
 msgstr "uitnodiging verlopen"
 
@@ -887,7 +886,7 @@ msgid "contact was deleted"
 msgstr "contact is verwijderd"
 
 #: accounts/tests/test_logging.py:431 accounts/tests/test_logging.py:613
-#: accounts/views/actions.py:176 accounts/views/document.py:24
+#: accounts/views/actions.py:180 accounts/views/document.py:24
 #: accounts/views/inbox.py:203
 msgid "file was downloaded"
 msgstr "bestand is gedownload"
@@ -901,13 +900,9 @@ msgstr "bestand is geupload"
 msgid "file was deleted"
 msgstr "bestand is verwijderd"
 
-#: accounts/tests/test_logging.py:505 accounts/views/actions.py:133
+#: accounts/tests/test_logging.py:505 accounts/views/actions.py:137
 msgid "action was created"
 msgstr "actie is aangemaakt"
-
-#: accounts/tests/test_logging.py:527 accounts/views/actions.py:104
-msgid "action was modified"
-msgstr "actie is gewijzigd"
 
 #: accounts/tests/test_logging.py:564 accounts/tests/test_logging.py:589
 #: accounts/views/inbox.py:132 accounts/views/inbox.py:168
@@ -941,31 +936,35 @@ msgstr "file actions.pdf was exported"
 msgid "U heeft nog geen contacten."
 msgstr "U heeft nog geen contacten."
 
-#: accounts/views/actions.py:49 accounts/views/actions.py:84
-#: accounts/views/actions.py:117 accounts/views/contacts.py:28
-#: accounts/views/contacts.py:63 accounts/views/contacts.py:97
-#: accounts/views/profile.py:30 accounts/views/profile.py:89
-#: accounts/views/profile.py:112
+#: accounts/views/actions.py:50 accounts/views/actions.py:85
+#: accounts/views/actions.py:121 accounts/views/actions.py:195
+#: accounts/views/contacts.py:28 accounts/views/contacts.py:63
+#: accounts/views/contacts.py:97 accounts/views/profile.py:30
+#: accounts/views/profile.py:89 accounts/views/profile.py:112
 #: components/templates/components/Header/PrimaryNavigation.html:27
 #: questionnaire/views.py:52 questionnaire/views.py:143
 msgid "Mijn profiel"
 msgstr "Mijn profiel"
 
-#: accounts/views/actions.py:50 accounts/views/actions.py:85
-#: accounts/views/actions.py:118
+#: accounts/views/actions.py:51 accounts/views/actions.py:86
+#: accounts/views/actions.py:122 accounts/views/actions.py:196
 #: templates/export/profile/action_list_export.html:6
 #: templates/pages/profile/actions/list.html:9
 msgid "Mijn acties"
 msgstr "Mijn acties"
 
-#: accounts/views/actions.py:87 accounts/views/contacts.py:66
+#: accounts/views/actions.py:88 accounts/views/contacts.py:66
 #: plans/views.py:264
 msgid "Bewerk {}"
 msgstr "Bewerk {}"
 
-#: accounts/views/actions.py:120 plans/views.py:215
+#: accounts/views/actions.py:124 plans/views.py:215
 msgid "Maak actie aan"
 msgstr "Maak actie aan"
+
+#: accounts/views/actions.py:198
+msgid "History of {}"
+msgstr "Geschiedenis van {}"
 
 #: accounts/views/cases.py:25 accounts/views/cases.py:61
 #: components/templates/components/Header/PrimaryNavigation.html:42
@@ -1027,7 +1026,7 @@ msgstr "Persoonlijke gegevens"
 msgid "Persoonlijk overzicht"
 msgstr "Persoonlijk overzicht"
 
-#: accounts/views/profile.py:43 pdc/views.py:166 plans/views.py:72
+#: accounts/views/profile.py:43 pdc/views.py:173 plans/views.py:72
 #: templates/export/plans/plan_export.html:40
 #: templates/export/profile/profile_export.html:48
 #: templates/pages/plans/detail.html:62 templates/pages/product/detail.html:39
@@ -1087,27 +1086,31 @@ msgstr "Opslaan als PDF"
 msgid "Bewerken"
 msgstr "Bewerken"
 
-#: components/templates/components/Action/Actions.html:31 utils/admin.py:90
+#: components/templates/components/Action/Actions.html:28
+msgid "History"
+msgstr "Geschiedenis"
+
+#: components/templates/components/Action/Actions.html:34 utils/admin.py:90
 msgid "Actie"
 msgstr "Actie"
 
-#: components/templates/components/Action/Actions.html:35
+#: components/templates/components/Action/Actions.html:38
 msgid "Onderdeel van"
 msgstr "Onderdeel van"
 
-#: components/templates/components/Action/Actions.html:41
+#: components/templates/components/Action/Actions.html:44
 msgid "Aangemaakt door"
 msgstr "Aangemaakt door"
 
-#: components/templates/components/Action/Actions.html:51
+#: components/templates/components/Action/Actions.html:54
 msgid "Uitvoeren voor"
 msgstr "Uitvoeren voor"
 
-#: components/templates/components/Action/Actions.html:55
+#: components/templates/components/Action/Actions.html:58
 msgid "Toegevoegd op"
 msgstr "Toegevoegd op"
 
-#: components/templates/components/Action/Actions.html:66
+#: components/templates/components/Action/Actions.html:69
 msgid ""
 "er zijn geen acties gevonden met de huidige filter of er zijn geen acties"
 msgstr ""
@@ -1182,7 +1185,7 @@ msgstr "Download bestand"
 msgid "Bekijk op Google Maps"
 msgstr "Bekijk op Google Maps"
 
-#: components/templates/components/Footer/Social.html:4 pdc/views.py:175
+#: components/templates/components/Footer/Social.html:4 pdc/views.py:182
 msgid "Delen"
 msgstr "Delen"
 
@@ -1258,8 +1261,8 @@ msgid "Home"
 msgstr "Home"
 
 #: components/templates/components/Header/PrimaryNavigation.html:11
-#: configurations/models.py:96 configurations/models.py:107 pdc/views.py:116
-#: pdc/views.py:154
+#: configurations/models.py:96 configurations/models.py:107 pdc/views.py:120
+#: pdc/views.py:161
 msgid "Thema's"
 msgstr "Thema's"
 
@@ -1277,17 +1280,22 @@ msgstr "FAQ"
 msgid "Bericht van:"
 msgstr "Bericht van:"
 
-#: components/templates/components/Messages/Messages.html:48
+#: components/templates/components/Messages/Messages.html:49
 msgid "Selecteer emoji"
 msgstr "Selecteer emoji"
 
-#: components/templates/components/Messages/Messages.html:51
+#: components/templates/components/Messages/Messages.html:52
+#| msgid "Zoeken"
+msgid "Zoek emoji"
+msgstr "Zoek emoji"
+
+#: components/templates/components/Messages/Messages.html:60
 #: components/templatetags/form_tags.py:129
 #: templates/pages/plans/create.html:66 templates/pages/plans/edit.html:17
 msgid "Verzenden"
 msgstr "Verzenden"
 
-#: components/templates/components/Messages/Messages.html:54
+#: components/templates/components/Messages/Messages.html:63
 msgid "De gebruiker is inactief. Het is niet mogelijk een bericht te sturen."
 msgstr "De gebruiker is inactief. Het is niet mogelijk een bericht te sturen."
 
@@ -1441,7 +1449,8 @@ msgid ""
 "This email is used to notify plan participants about the change in the plan "
 "action"
 msgstr ""
-"Deze e-mail wordt gebruikt om gebruikers te informeren over aanpassingen aan de acties binnen een plan."
+"Deze e-mail wordt gebruikt om gebruikers te informeren over aanpassingen aan "
+"de acties binnen een plan."
 
 #: conf/base.py:812
 msgid "Action that was updated"
@@ -1449,8 +1458,7 @@ msgstr "Actie dat is gewijzigd"
 
 #: conf/base.py:816
 msgid "Plan the updated action belongs to"
-msgstr ""
-"Het plansjabloon waar de actie bij hoort."
+msgstr "Het plansjabloon waar de actie bij hoort."
 
 #: conf/base.py:820
 msgid "The link to the plan."
@@ -1975,12 +1983,12 @@ msgstr "Slug"
 msgid "Slug of the category"
 msgstr "Slug van het thema"
 
-#: pdc/models/category.py:20
+#: pdc/models/category.py:20 questionnaire/models.py:68
 msgid "Highlighted"
 msgstr "Uitgelicht"
 
 #: pdc/models/category.py:22
-msgid "Wether the category should be highlighted or not."
+msgid "Whether the category should be highlighted or not"
 msgstr "Of de thema uitgelicht moet worden op de homepage of niet."
 
 #: pdc/models/category.py:28
@@ -2003,16 +2011,16 @@ msgstr "Afbeelding"
 msgid "Image of the category"
 msgstr "Afbeelding van het thema"
 
-#: pdc/models/category.py:50 pdc/models/faq.py:10
+#: pdc/models/category.py:50 pdc/models/faq.py:10 questionnaire/models.py:80
 msgid "Category"
 msgstr "Thema"
 
-#: pdc/models/category.py:51 pdc/models/product.py:62 pdc/views.py:106
+#: pdc/models/category.py:51 pdc/models/product.py:62 pdc/views.py:110
 #: search/forms.py:22
 msgid "Categories"
 msgstr "Thema's"
 
-#: pdc/models/faq.py:15 pdc/models/faq.py:21 questionnaire/admin.py:32
+#: pdc/models/faq.py:15 pdc/models/faq.py:21 questionnaire/admin.py:57
 #: questionnaire/models.py:41
 msgid "Vraag"
 msgstr "Vraag"
@@ -2449,20 +2457,20 @@ msgstr "Omschrijving gewijzigd."
 msgid "Dit veld is vereist."
 msgstr "Dit veld is vereist."
 
-#: pdc/views.py:130
+#: pdc/views.py:134
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
 msgstr "Geen %(verbose_name)s gevonden"
 
-#: pdc/views.py:168 templates/pages/product/detail.html:64
+#: pdc/views.py:175 templates/pages/product/detail.html:64
 msgid "Locaties"
 msgstr "Locaties"
 
-#: pdc/views.py:170 templates/pages/product/detail.html:83
+#: pdc/views.py:177 templates/pages/product/detail.html:83
 msgid "Links"
 msgstr "Links"
 
-#: pdc/views.py:174 templates/pages/product/detail.html:99
+#: pdc/views.py:181 templates/pages/product/detail.html:99
 msgid "Zie ook"
 msgstr "Zie ook"
 
@@ -2606,25 +2614,25 @@ msgstr "Eindigt in x dagen"
 
 #: plans/tests/test_logging.py:45 plans/views.py:102
 msgid "plan was created"
-msgstr ""
+msgstr "plan is aangemaakt"
 
 #: plans/tests/test_logging.py:66 plans/views.py:132
 msgid "plan was modified"
-msgstr ""
+msgstr "plan is gewijzigd"
 
 #: plans/tests/test_logging.py:89 plans/views.py:161
 msgid "plan goal was modified"
-msgstr ""
+msgstr "plan doel is gewijzigd"
 
 #: plans/tests/test_logging.py:137 plans/views.py:246
 msgid "action was created via plan"
-msgstr ""
+msgstr "actie is aangemaakt voor plan"
 
 #: plans/tests/test_logging.py:163
-msgid "Changed Naam."
+msgid "Changed: Naam."
 msgstr ""
 
-#: plans/tests/test_logging.py:183
+#: plans/tests/test_logging.py:196
 #, python-brace-format
 msgid "file plan_{plan_uuid}.pdf was exported"
 msgstr ""
@@ -2661,11 +2669,16 @@ msgstr "Doel bewerken"
 msgid "Nieuw bestand uploaden"
 msgstr "Nieuw bestand uploaden"
 
-#: questionnaire/admin.py:44
+#: questionnaire/admin.py:31 questionnaire/admin.py:41
+#: questionnaire/tests/test_admin.py:72
+msgid "Only root nodes (parent questionnaire steps) can be highlighted."
+msgstr "Alleen hoofdstappen kunnen worden uitgelicht"
+
+#: questionnaire/admin.py:70
 msgid "Stappenplan"
 msgstr "Stappenplan"
 
-#: questionnaire/admin.py:56
+#: questionnaire/admin.py:84
 msgid "Eindstatus velden (uitgebreide informatie en producten)"
 msgstr "Eindstatus velden (uitgebreide informatie en producten)"
 
@@ -2745,27 +2758,39 @@ msgstr "Uitgebreide informatie"
 msgid "Deze inhoud wordt weergegeven in deze stap."
 msgstr "Deze inhoud wordt weergegeven in deze stap."
 
-#: questionnaire/models.py:69
+#: questionnaire/models.py:70
+msgid "Whether the questionnaire should be highlighted or not."
+msgstr "Of de thema uitgelicht moet worden op de homepage of niet."
+
+#: questionnaire/models.py:74
+msgid "Gerelateerde producten"
+msgstr "Gerelateerde producten"
+
+#: questionnaire/models.py:75
 msgid "Deze producten worden weergegeven in deze stap."
 msgstr "Deze producten worden weergegeven in deze stap."
 
-#: questionnaire/models.py:74
+#: questionnaire/models.py:83
+msgid "Related category"
+msgstr "Gerelateerde thema"
+
+#: questionnaire/models.py:89
 msgid "Questionnaire step"
 msgstr "Vragenlijststap"
 
-#: questionnaire/models.py:75
+#: questionnaire/models.py:90
 msgid "Questionnaire steps"
 msgstr "Vragenlijststappen"
 
-#: questionnaire/models.py:141
+#: questionnaire/models.py:156
 msgid "Questionnaire step file"
 msgstr "Bijlage vragenlijststap"
 
-#: questionnaire/models.py:142
+#: questionnaire/models.py:157
 msgid "Questionnaire step files"
 msgstr "Bijlagen vragenlijststap"
 
-#: questionnaire/models.py:148 questionnaire/tests/test_models.py:134
+#: questionnaire/models.py:163 questionnaire/tests/test_models.py:134
 msgid "Geen bestand geselecteerd."
 msgstr "Geen bestand geselecteerd."
 
@@ -2911,8 +2936,10 @@ msgstr "Zoekveldgewicht"
 msgid ""
 "Thank you for your feedback. It will help us to improve our search engine"
 msgstr ""
+"Dank u voor uw feedback, hiermee kunnen wij de omgeving verder verbeteren"
 
 #: search/tests/test_logging.py:31 search/views.py:52
+#, python-brace-format
 msgid "search query: {query}"
 msgstr "zoekterm: {query}"
 
@@ -3029,6 +3056,35 @@ msgstr "Bekijk status"
 #: templates/pages/category/detail.html:14
 msgid "Open in admin"
 msgstr "Bekijk in beheeromgeving"
+
+#: templates/pages/category/detail.html:39
+msgid "Keuze zelfdiagnose?"
+msgstr "Keuze zelfdiagnose?"
+
+#: templates/pages/category/detail.html:40
+#: templates/pages/profile/questionnaire.html:6
+msgid ""
+"Kies hieronder één van de volgende vragenlijsten om de zelfdiagnose te "
+"starten."
+msgstr ""
+"Kies hieronder één van de volgende vragenlijsten om de zelfdiagnose te "
+"starten."
+
+#: templates/pages/history.html:7
+msgid "History of changes"
+msgstr "Wijzigingsgeschiedenis"
+
+#: templates/pages/history.html:14
+msgid "Date"
+msgstr "Datum"
+
+#: templates/pages/history.html:15
+msgid "Changed by"
+msgstr "Gewijzigd door"
+
+#: templates/pages/history.html:16
+msgid "Details"
+msgstr "Details"
 
 #: templates/pages/home.html:19
 msgid "Alle thema's"
@@ -3255,14 +3311,6 @@ msgstr "Bestand toevoegen"
 msgid "Keuze zelfdiagnose"
 msgstr "Keuze zelfdiagnose"
 
-#: templates/pages/profile/questionnaire.html:6
-msgid ""
-"Kies hieronder één van de volgende vragenlijsten om de zelfdiagnose te "
-"starten."
-msgstr ""
-"Kies hieronder één van de volgende vragenlijsten om de zelfdiagnose te "
-"starten."
-
 #: templates/pages/questionnaire/questionnaire-step.html:10
 msgid "Export pdf"
 msgstr "Opslaan als PDF"
@@ -3298,7 +3346,7 @@ msgstr "U heeft nog geen plan gemaakt."
 
 #: templates/registration/password_change_done.html:5
 msgid "Wachtwoordwijziging is geslaagd"
-msgstr ""
+msgstr "Wachtwoordwijziging is geslaagd"
 
 #: templates/registration/password_change_form.html:6
 msgid ""
@@ -3308,19 +3356,19 @@ msgstr ""
 
 #: templates/registration/password_reset_complete.html:5
 msgid "Wachtwoordherinitialisatie voltooid"
-msgstr ""
+msgstr "Wachtwoordherinitialisatie voltooid"
 
 #: templates/registration/password_reset_complete.html:6
 msgid "Uw wachtwoord is ingesteld. U kunt nu verdergaan en zich aanmelden."
-msgstr ""
+msgstr "Uw wachtwoord is ingesteld. U kunt nu verdergaan en zich aanmelden."
 
 #: templates/registration/password_reset_complete.html:9
 msgid "Aanmelden"
-msgstr ""
+msgstr "Aanmelden"
 
 #: templates/registration/password_reset_confirm.html:6
 msgid "Voer nieuw wachtwoord in"
-msgstr ""
+msgstr "Voer nieuw wachtwoord in"
 
 #: templates/registration/password_reset_confirm.html:7
 msgid ""
@@ -3330,7 +3378,7 @@ msgstr ""
 
 #: templates/registration/password_reset_confirm.html:10
 msgid "Wachtwoordherinitialisatie mislukt"
-msgstr ""
+msgstr "Wachtwoordherinitialisatie mislukt"
 
 #: templates/registration/password_reset_confirm.html:11
 msgid ""
@@ -3340,7 +3388,7 @@ msgstr ""
 
 #: templates/registration/password_reset_done.html:5
 msgid "Wachtwoordherinitialisatie verstuurd"
-msgstr ""
+msgstr "Wachtwoordherinitialisatie verstuurd"
 
 #: templates/registration/password_reset_done.html:6
 msgid ""
@@ -3354,6 +3402,8 @@ msgid ""
 "Als u geen e-mail ontvangt, controleer dan of u het e-mailadres hebt "
 "ingevoerd waarmee u zich hebt geregistreerd, en controleer uw spam-map."
 msgstr ""
+"Als u geen e-mail ontvangt, controleer dan of u het e-mailadres hebt "
+"ingevoerd waarmee u zich hebt geregistreerd, en controleer uw spam-map."
 
 #: templates/registration/password_reset_email.html:3
 msgid "Beste"
@@ -3446,9 +3496,8 @@ msgstr ""
 "groot."
 
 #: utils/logentry.py:31
-#, python-brace-format
-msgid "Changed {changed_fields}."
-msgstr "Changed {changed_fields}."
+msgid "Changed: {changed_fields}."
+msgstr "Changed: {changed_fields}."
 
 #: utils/logentry.py:32
 msgid "and"
@@ -3463,10 +3512,6 @@ msgstr "Clear given cache only"
 msgid "file {filename} was exported"
 msgstr "file {filename} was exported"
 
-#: utils/tests/test_timeline_logger.py:69
-msgid "Voornaam en Aangemaakt door gewijzigd."
-msgstr ""
-
 #: utils/validators.py:22
 #, python-format
 msgid "Uw invoer bevat een ongeldig teken: %s"
@@ -3479,6 +3524,9 @@ msgstr "Het opgegeven mobiele telefoonnummer is ongeldig."
 #: utils/validators.py:50
 msgid "Ongeldige postcode"
 msgstr "Ongeldige postcode"
+
+#~ msgid "action was modified"
+#~ msgstr "actie is gewijzigd"
 
 #~ msgid "Door"
 #~ msgstr "Door"
@@ -3537,9 +3585,6 @@ msgstr "Ongeldige postcode"
 
 #~ msgid "content"
 #~ msgstr "content"
-
-#~ msgid "related products"
-#~ msgstr "gerelateerde producten"
 
 #~ msgid "tag"
 #~ msgstr "tag"
