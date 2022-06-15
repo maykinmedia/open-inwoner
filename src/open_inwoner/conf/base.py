@@ -895,7 +895,7 @@ THUMBNAIL_ALIASES = {
             "upscale": True,
         },
         "card-image": {
-            "size": (152, 190),
+            "size": (256, 320),
             "crop": True,
         },
     }
