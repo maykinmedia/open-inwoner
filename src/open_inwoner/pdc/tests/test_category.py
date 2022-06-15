@@ -46,6 +46,20 @@ class TestCategoryContext(WebTest):
             [category, highlighted_category],
         )
 
+    def test_category_selected(self):
+        user = UserFactory()
+        category = CategoryFactory(name="Should be first")
+        highlighted_category = CategoryFactory(
+            name="This should be second", highlighted=True
+        )
+        selected_category = CategoryFactory(name="This should the only one")
+        user.selected_themes.add(selected_category)
+        response = self.app.get(reverse("root"), user=user)
+        self.assertEqual(
+            list(response.context["categories"]),
+            [selected_category],
+        )
+
 
 class TestHighlightedQuestionnaire(WebTest):
     def setUp(self):
