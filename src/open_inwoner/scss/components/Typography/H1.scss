@@ -6,6 +6,7 @@
   line-height: var(--font-line-height-heading-1);
   margin: var(--row-height) 0 0 0;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
 
   &:first-of-type {

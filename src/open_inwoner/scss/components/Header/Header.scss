@@ -42,7 +42,7 @@ $vm: var(--spacing-large);
 
       > .header__actions {
         display: block;
-        grid-column: 9 / span 4;
+        grid-column: 8 / span 5;
       }
 
       > .primary-navigation {
@@ -61,7 +61,7 @@ $vm: var(--spacing-large);
 
     @media (min-width: 768px) {
       height: auto;
-      grid-column: 1 / span 8;
+      grid-column: 1 / span 7;
       margin: var(--spacing-large) 0;
     }
   }

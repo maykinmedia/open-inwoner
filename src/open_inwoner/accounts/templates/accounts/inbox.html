@@ -4,11 +4,11 @@
 
 {% block main_inner %}
     {% render_grid %}
-        {% render_column start=1 span=9 %}
+        {% render_column start=1 span=8 %}
             <h1 class="h1">{% trans 'Mijn berichten' %}</h1>
         {% endrender_column %}
 
-        {% render_column start=10 span=3 %}
+        {% render_column start=9 span=4 %}
             {% button primary=True href='accounts:inbox_start' text=_('Nieuw bericht versturen') %}
         {% endrender_column %}
     {% endrender_grid %}

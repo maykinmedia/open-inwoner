@@ -14,4 +14,9 @@
   &--compact {
     grid-gap: 0;
   }
+
+  > .button {
+    width: 100%;
+    display: block;
+  }
 }
