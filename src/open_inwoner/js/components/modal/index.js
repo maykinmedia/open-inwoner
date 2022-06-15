@@ -7,6 +7,12 @@ export default class Modal {
     this.close = this.node.querySelector('.modal__close')
     this.confirm = this.node.querySelector('.modal__confirm')
 
+    this.node.addEventListener('click', (event) => {
+      if (!event.target.closest('.modal__container')) {
+        this.hide()
+      }
+    })
+
     this.close.addEventListener('click', () => {
       this.hide()
     })
@@ -42,9 +48,11 @@ export default class Modal {
 
   show() {
     this.node.classList.add('modal--open')
+    document.body.style.overflow = 'hidden'
   }
 
   hide() {
     this.node.classList.remove('modal--open')
+    document.body.style.overflow = 'visible'
   }
 }
