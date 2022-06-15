@@ -149,7 +149,7 @@ class UserField(forms.ModelChoiceField):
 class ActionForm(forms.ModelForm):
     is_for = UserField(
         label=_("Is voor"),
-        queryset=User.objects.none(),
+        queryset=User.objects.all(),
         empty_label=_("Myself"),
         required=False,
     )
@@ -174,10 +174,14 @@ class ActionForm(forms.ModelForm):
         self.plan = plan
         super().__init__(*args, **kwargs)
 
-        contact_users = User.objects.filter(
-            assigned_contacts__in=self.user.contacts.all()
-        )
-        self.fields["is_for"].queryset = contact_users
+        if plan:
+            # action can be assigned to somebody in the plan
+            self.fields["is_for"].queryset = plan.get_other_users(user=user)
+        else:
+            # otherwise it's always assigned to the user
+            # options are not limited to None for old actions support
+            self.fields["is_for"].disabled = True
+
         self.fields["is_for"].me = user
 
     def clean_end_date(self):
