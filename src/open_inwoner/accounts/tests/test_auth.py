@@ -395,12 +395,6 @@ class TestPasswordChange(WebTest):
         response = self.app.get(reverse("accounts:my_profile"), user=digid_user)
         self.assertNotContains(response, _("Wijzig wachtwoord"))
 
-    def test_digid_user_is_redirected_to_root_if_password_change_is_accessed(self):
-        digid_user = UserFactory(login_type=LoginTypeChoices.digid)
-        response = self.app.get(reverse("password_change"), user=digid_user)
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse("root"))
-
     def test_anonymous_user_is_redirected_to_login_page_if_password_change_is_accessed(
         self,
     ):
