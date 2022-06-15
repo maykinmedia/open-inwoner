@@ -34,6 +34,9 @@ class ActionViewTests(WebTest):
         self.download_url = reverse(
             "accounts:action_download", kwargs={"uuid": self.action.uuid}
         )
+        self.history_url = reverse(
+            "accounts:action_history", kwargs={"uuid": self.action.uuid}
+        )
 
     def test_action_list_login_required(self):
         response = self.app.get(self.list_url)
@@ -152,3 +155,16 @@ class ActionViewTests(WebTest):
     def test_action_download_not_your_action(self):
         other_user = UserFactory()
         response = self.app.get(self.download_url, user=other_user, status=403)
+
+    def test_action_history(self):
+        response = self.app.get(self.history_url, user=self.user)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.action.name)
+
+    def test_action_history_not_your_action(self):
+        other_user = UserFactory()
+        response = self.app.get(self.history_url, user=other_user, status=404)
+
+    def test_action_history_login_required(self):
+        response = self.app.get(self.history_url)
+        self.assertRedirects(response, f"{self.login_url}?next={self.history_url}")

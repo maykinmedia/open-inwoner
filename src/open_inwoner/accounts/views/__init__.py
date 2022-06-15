@@ -1,6 +1,7 @@
 from .actions import (
     ActionCreateView,
     ActionExportView,
+    ActionHistoryView,
     ActionListExportView,
     ActionListView,
     ActionPrivateMediaView,

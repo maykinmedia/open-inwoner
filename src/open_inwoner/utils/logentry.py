@@ -28,7 +28,7 @@ def get_change_message(fields=None, form=None):
         form, form.changed_data
     )
 
-    return _("Changed {changed_fields}.").format(
+    return _("Changed: {changed_fields}.").format(
         changed_fields=get_text_list(changed_fields, _("and"))
     )
 

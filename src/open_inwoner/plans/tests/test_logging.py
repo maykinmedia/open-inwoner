@@ -160,11 +160,24 @@ class TestPlans(WebTest):
         self.assertEquals(
             log_entry.extra_data,
             {
-                "message": _("Changed Naam."),
+                "message": _("Changed: Naam."),
                 "action_flag": list(LOG_ACTIONS[CHANGE]),
                 "content_object_repr": "Updated name",
             },
         )
+
+    def test_plan_action_submitted_but_not_changed_not_logged(self):
+        action = ActionFactory(created_by=self.user)
+        form = self.app.get(
+            reverse(
+                "plans:plan_action_edit",
+                kwargs={"plan_uuid": self.plan.uuid, "uuid": action.uuid},
+            ),
+            user=self.user,
+        ).forms["action-create"]
+        form.submit()
+
+        self.assertEqual(action.logs.count(), 0)
 
     def test_plan_export_is_logged(self):
         self.app.get(

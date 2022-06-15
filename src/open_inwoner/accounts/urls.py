@@ -5,6 +5,7 @@ from open_inwoner.pdc.views import HomeView
 from .views import (
     ActionCreateView,
     ActionExportView,
+    ActionHistoryView,
     ActionListExportView,
     ActionListView,
     ActionPrivateMediaView,
@@ -67,6 +68,11 @@ urlpatterns = [
         "actions/<str:uuid>/download/",
         ActionPrivateMediaView.as_view(),
         name="action_download",
+    ),
+    path(
+        "actions/<str:uuid>/history/",
+        ActionHistoryView.as_view(),
+        name="action_history",
     ),
     path("actions/", ActionListView.as_view(), name="action_list"),
     path("contacts/create/", ContactCreateView.as_view(), name="contact_create"),
