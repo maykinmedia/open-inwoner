@@ -20,12 +20,6 @@ class LogPasswordChangeView(UserPassesTestMixin, LogMixin, PasswordChangeView):
             return self.request.user.login_type == LoginTypeChoices.default
         return False
 
-    def handle_no_permission(self):
-        if self.request.user.is_authenticated:
-            return redirect(reverse("root"))
-
-        return super().handle_no_permission()
-
     def form_valid(self, form):
         response = super().form_valid(form)
 
