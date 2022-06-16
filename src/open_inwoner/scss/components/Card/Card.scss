@@ -13,6 +13,7 @@
   flex-direction: column;
   position: relative;
   text-decoration: none;
+  height: 100%;
 
   &--inline {
     display: inline-flex;
@@ -72,6 +73,7 @@
     display: grid;
     grid-template-columns: 1fr 2fr;
     padding: 0;
+    height: 100%;
 
     .card__content {
       padding: var(--card-spacing);
