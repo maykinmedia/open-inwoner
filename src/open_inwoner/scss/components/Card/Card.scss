@@ -70,7 +70,7 @@
 
   &__body--grid {
     display: grid;
-    grid-template-columns: auto 1fr;
+    grid-template-columns: 1fr 2fr;
     padding: 0;
 
     .card__content {
