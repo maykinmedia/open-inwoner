@@ -76,7 +76,7 @@
     <hr class="divider">
 
     {% render_grid %}
-        {% render_column span=4 %}
+        {% render_column span=5 %}
             {# Links. #}
             {% if object.links.exists %}
                 <nav class="link-list">
@@ -94,11 +94,11 @@
 
         {% render_column start=related_products_start span=4 compact=True %}
             {# Related products. #}
-            {% if object.related_products.exists %}
+            {% if object.related_products.published.exists %}
                 <nav class="link-list">
                     <h4 class="h4" id="see">{% trans "Zie ook" %}</h4>
                     <ul class="link-list__list">
-                        {% for related in object.related_products.all %}
+                        {% for related in object.related_products.published %}
                             <li class="link-list__list-item">
                                 {% url 'pdc:product_detail' slug=related.slug as product_url %}
                                 {% link href=product_url text=related.name secondary=True %}

@@ -10,6 +10,7 @@ from filer.fields.file import FilerFileField
 from filer.fields.image import FilerImageField
 from ordered_model.models import OrderedModel
 
+from open_inwoner.utils.managers import PublishedQueryset
 from open_inwoner.utils.validators import validate_phone_number
 
 from .mixins import GeoModel
@@ -24,6 +25,11 @@ class Product(models.Model):
         max_length=100,
         unique=True,
         help_text=_("Slug of the product"),
+    )
+    published = models.BooleanField(
+        verbose_name=_("Published"),
+        default=True,
+        help_text=_("Whether the product should be published or not."),
     )
     summary = models.TextField(
         verbose_name=_("Summary"),
@@ -138,6 +144,8 @@ class Product(models.Model):
         blank=True,
         help_text=_("Conditions applicable for the product"),
     )
+
+    objects = PublishedQueryset.as_manager()
 
     class Meta:
         verbose_name = _("Product")

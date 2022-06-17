@@ -16,6 +16,15 @@ class QuestionnaireStepFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = QuestionnaireStep
 
+    @factory.post_generation
+    def related_products(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted:
+            for related_product in extracted:
+                self.related_products.add(related_product)
+
 
 class QuestionnaireStepFileFactory(factory.django.DjangoModelFactory):
     questionnaire_step = factory.SubFactory(QuestionnaireStepFactory)

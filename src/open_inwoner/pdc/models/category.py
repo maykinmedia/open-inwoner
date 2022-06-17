@@ -3,7 +3,19 @@ from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from filer.fields.image import FilerImageField
-from treebeard.mp_tree import MP_Node
+from treebeard.exceptions import InvalidMoveToDescendant
+from treebeard.mp_tree import MP_MoveHandler, MP_Node
+
+from open_inwoner.utils.managers import PublishedQueryset
+
+
+class PublishedMoveHandler(MP_MoveHandler):
+    def process(self):
+        if self.node.published and not self.target.published:
+            raise InvalidMoveToDescendant(
+                _("Published parent nodes cannot be children of an unpublished parent.")
+            )
+        return super().process()
 
 
 class Category(MP_Node):
@@ -15,6 +27,11 @@ class Category(MP_Node):
         max_length=100,
         unique=True,
         help_text=_("Slug of the category"),
+    )
+    published = models.BooleanField(
+        verbose_name=_("Published"),
+        default=True,
+        help_text=_("Whether the category should be published or not."),
     )
     highlighted = models.BooleanField(
         verbose_name=_("Highlighted"),
@@ -45,6 +62,7 @@ class Category(MP_Node):
     )
 
     node_order_by = ["slug"]
+    objects = PublishedQueryset.as_manager()
 
     class Meta:
         verbose_name = _("Category")
@@ -65,3 +83,6 @@ class Category(MP_Node):
 
     def get_absolute_url(self):
         return reverse("pdc:category_detail", kwargs={"slug": self.get_build_slug()})
+
+    def move(self, target, pos=None):
+        return PublishedMoveHandler(self, target, pos).process()
