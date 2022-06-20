@@ -6,6 +6,8 @@ from django.contrib.auth import views as auth_views
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import include, path
 
+from mozilla_django_oidc_db.views import AdminLoginFailure
+
 from open_inwoner.accounts.forms import CustomRegistrationForm
 from open_inwoner.accounts.views import (
     CustomRegistrationView,
@@ -15,7 +17,6 @@ from open_inwoner.accounts.views import (
     PasswordResetView,
 )
 from open_inwoner.pdc.views import FAQView, HomeView
-from mozilla_django_oidc_db.views import AdminLoginFailure
 
 handler500 = "open_inwoner.utils.views.server_error"
 admin.site.site_header = "Open Inwoner beheeromgeving"
