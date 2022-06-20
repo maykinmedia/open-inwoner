@@ -73,6 +73,10 @@
   *[class*='Icon']:first-child {
     transform: scale(0.75);
   }
+
+  &.link--digid {
+    white-space: nowrap !important;
+  }
 }
 
 .link + .link {

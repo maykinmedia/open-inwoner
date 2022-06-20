@@ -15,6 +15,7 @@ from open_inwoner.accounts.views import (
     PasswordResetView,
 )
 from open_inwoner.pdc.views import FAQView, HomeView
+from mozilla_django_oidc_db.views import AdminLoginFailure
 
 handler500 = "open_inwoner.utils.views.server_error"
 admin.site.site_header = "Open Inwoner beheeromgeving"
@@ -85,7 +86,9 @@ urlpatterns = [
         "sessions/",
         include("open_inwoner.extended_sessions.urls", namespace="sessions"),
     ),
+    path("oidc/", include("mozilla_django_oidc.urls")),
     path("faq/", FAQView.as_view(), name="general_faq"),
+    path("admin/login/failure/", AdminLoginFailure.as_view(), name="admin-oidc-error"),
     path("", include("open_inwoner.pdc.urls", namespace="pdc")),
     path("", include("open_inwoner.search.urls", namespace="search")),
     path("", HomeView.as_view(), name="root"),

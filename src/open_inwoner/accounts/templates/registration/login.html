@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n static logo_tags grid_tags card_tags form_tags link_tags button_tags %}
+{% load i18n static logo_tags grid_tags card_tags form_tags link_tags button_tags solo_tags %}
 
 
 {% block header_image %}
@@ -19,8 +19,15 @@
                         <a href="{% url 'digid:login' %}" class="link digid-logo" aria-describedby="Digid logo" title="Digid logo">
                             <img class="digid-logo__image" src="{% static 'accounts/digid_logo.svg' %}" alt="Digid logo">
                         </a>
-                        {% link bold=True href='digid:login' text=_('Inloggen met DigiD') secondary=True icon='arrow_forward' %}
+                        {% link bold=True href='digid:login' text=_('Inloggen met DigiD') secondary=True icon='arrow_forward' extra_classes="link--digid" %}
                     {% endrender_card %}
+
+                {% get_solo 'mozilla_django_oidc_db.OpenIDConnectConfig' as oidc_config %}
+                {% if oidc_config.enabled %}
+                    {% render_card tinted=True %}
+                        {% button text=_('Login with Azure AD') href='oidc_authentication_init' primary=True icon='arrow_forward' icon_position="after" %}
+                    {% endrender_card %}
+                {% endif %}
 
                 {% if login_allow_registration %}
                     {% render_card tinted=True %}
