@@ -85,6 +85,8 @@ cryptography==35.0.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   josepy
+    #   mozilla-django-oidc
     #   pyopenssl
 cssselect==1.1.0
     # via
@@ -150,6 +152,8 @@ django==3.2.13
     #   easy-thumbnails
     #   mail-editor
     #   maykin-django-two-factor-auth
+    #   mozilla-django-oidc
+    #   mozilla-django-oidc-db
     #   zgw-consumers
 django-admin-index==1.5.0
     # via
@@ -172,6 +176,7 @@ django-better-admin-arrayfield==1.4.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   mozilla-django-oidc-db
 django-choices==1.7.2
     # via
     #   -c requirements/ci.txt
@@ -316,6 +321,7 @@ django-solo==1.2.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   mozilla-django-oidc-db
     #   zgw-consumers
 django-timeline-logger==2.0.0
     # via
@@ -432,6 +438,7 @@ glom==20.11.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   mozilla-django-oidc-db
 html5lib==1.1
     # via
     #   -c requirements/ci.txt
@@ -471,6 +478,11 @@ isort==5.9.3
     #   pylint
 jinja2==3.0.1
     # via sphinx
+josepy==1.13.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   mozilla-django-oidc
 jsonschema==4.1.0
     # via
     #   -c requirements/ci.txt
@@ -514,6 +526,15 @@ mccabe==0.6.1
     #   -r requirements/ci.txt
     #   flake8
     #   pylint
+mozilla-django-oidc==2.0.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   mozilla-django-oidc-db
+mozilla-django-oidc-db==0.10.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 mypy-extensions==0.4.3
     # via black
 odfpy==1.4.1
@@ -603,6 +624,7 @@ pyopenssl==21.0.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   josepy
     #   python3-saml
     #   zgw-consumers
 pyparsing==2.4.7
@@ -683,6 +705,7 @@ requests==2.26.0
     #   ddt-api-calls
     #   django-rosetta
     #   gemma-zds-client
+    #   mozilla-django-oidc
     #   python3-saml
     #   requests-mock
     #   sphinx
