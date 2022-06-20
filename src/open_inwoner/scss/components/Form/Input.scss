@@ -24,6 +24,11 @@
   &.input--bordered {
     border: 1px solid var(--color-mute);
   }
+
+  &:disabled {
+    background-color: var(--color-gray-lightest);
+    color: var(--color-gray-lighter);
+  }
 }
 
 textarea.input {

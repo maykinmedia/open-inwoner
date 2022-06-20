@@ -74,6 +74,13 @@ class HomeView(TemplateView):
         )
         if not self.request.user.is_authenticated and highlighted_categories:
             kwargs.update(categories=highlighted_categories)
+        if (
+            self.request.user.is_authenticated
+            and self.request.user.selected_themes.exists()
+        ):
+            kwargs.update(
+                categories=self.request.user.selected_themes.order_by("name")[:3]
+            )
 
         # Product finder:
         if config.show_product_finder:

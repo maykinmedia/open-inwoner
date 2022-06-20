@@ -37,6 +37,7 @@ export default class Modal {
 
     this.close.addEventListener('click', (event) => {
       event.preventDefault()
+
       this.hide()
     })
 

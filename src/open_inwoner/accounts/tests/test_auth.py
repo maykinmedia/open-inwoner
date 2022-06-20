@@ -364,14 +364,19 @@ class TestPasswordResetFunctionality(WebTest):
         ).follow()
         self.assertContains(confirm_response, _("Mijn wachtwoord wijzigen"))
 
+    def test_custom_password_reset_form_sends_email_when_user_is_default(self):
+        self.app.post(reverse("password_reset"), {"email": self.user.email})
+        self.assertEqual(len(mail.outbox), 1)
 
-class TestPasswordChangeTemplates(WebTest):
+    def test_custom_password_reset_form_does_not_send_email_when_user_is_digid(self):
+        digid_user = UserFactory(login_type=LoginTypeChoices.digid)
+        self.app.post(reverse("password_reset"), {"email": digid_user.email})
+        self.assertEqual(len(mail.outbox), 0)
+
+
+class TestPasswordChange(WebTest):
     def setUp(self):
         self.user = UserFactory()
-
-    def test_password_change_button_is_rendered(self):
-        response = self.app.get(reverse("accounts:my_profile"), user=self.user)
-        self.assertContains(response, _("Wijzig wachtwoord"))
 
     def test_password_change_form_custom_template_is_rendered(self):
         response = self.app.get(reverse("password_change"), user=self.user)
@@ -380,3 +385,21 @@ class TestPasswordChangeTemplates(WebTest):
     def test_password_change_form_done_custom_template_is_rendered(self):
         response = self.app.get(reverse("password_change_done"), user=self.user)
         self.assertContains(response, _("Uw wachtwoord is gewijzigd."))
+
+    def test_password_change_button_is_rendered_with_default_login_type(self):
+        response = self.app.get(reverse("accounts:my_profile"), user=self.user)
+        self.assertContains(response, _("Wijzig wachtwoord"))
+
+    def test_password_change_button_is_not_rendered_with_digid_login_type(self):
+        digid_user = UserFactory(login_type=LoginTypeChoices.digid)
+        response = self.app.get(reverse("accounts:my_profile"), user=digid_user)
+        self.assertNotContains(response, _("Wijzig wachtwoord"))
+
+    def test_anonymous_user_is_redirected_to_login_page_if_password_change_is_accessed(
+        self,
+    ):
+        response = self.app.get(reverse("password_change"))
+        expected_url = (
+            furl(reverse("login")).add({"next": reverse("password_change")}).url
+        )
+        self.assertRedirects(response, expected_url)

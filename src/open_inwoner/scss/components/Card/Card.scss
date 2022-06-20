@@ -70,8 +70,9 @@
 
   &__body--grid {
     display: grid;
-    grid-template-columns: auto 1fr;
+    grid-template-columns: 1fr 2fr;
     padding: 0;
+    height: 100%;
 
     .card__content {
       padding: var(--card-spacing);
