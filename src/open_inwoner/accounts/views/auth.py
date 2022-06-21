@@ -1,16 +1,25 @@
-from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth.views import (
     PasswordChangeView,
     PasswordResetConfirmView,
     PasswordResetView,
 )
-from django.http import HttpResponseRedirect
+from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from open_inwoner.utils.views import LogMixin
 
+from ..choices import LoginTypeChoices
+from ..forms import CustomPasswordResetForm
 
-class LogPasswordChangeView(LogMixin, PasswordChangeView):
+
+class LogPasswordChangeView(UserPassesTestMixin, LogMixin, PasswordChangeView):
+    def test_func(self):
+        if self.request.user.is_authenticated:
+            return self.request.user.login_type == LoginTypeChoices.default
+        return False
+
     def form_valid(self, form):
         response = super().form_valid(form)
 
@@ -20,6 +29,8 @@ class LogPasswordChangeView(LogMixin, PasswordChangeView):
 
 
 class LogPasswordResetView(LogMixin, PasswordResetView):
+    form_class = CustomPasswordResetForm
+
     def form_valid(self, form):
         self.log_system_action(_("password reset was accessed"))
         return super().form_valid(form)

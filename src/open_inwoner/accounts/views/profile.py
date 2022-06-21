@@ -12,7 +12,11 @@ from django.views.generic import DetailView, FormView, UpdateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin
 
-from open_inwoner.accounts.choices import ContactTypeChoices, StatusChoices
+from open_inwoner.accounts.choices import (
+    ContactTypeChoices,
+    LoginTypeChoices,
+    StatusChoices,
+)
 from open_inwoner.questionnaire.models import QuestionnaireStep
 from open_inwoner.utils.mixins import ExportMixin
 from open_inwoner.utils.views import LogMixin
@@ -63,6 +67,9 @@ class MyProfileView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormView)
         else:
             context["contact_text"] = _("U heeft nog geen contacten.")
         context["questionnaire_exists"] = QuestionnaireStep.objects.exists()
+        context["can_change_password"] = (
+            self.request.user.login_type != LoginTypeChoices.digid
+        )
         return context
 
     def post(self, request, *args, **kwargs):

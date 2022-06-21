@@ -14,9 +14,11 @@
             <div class="dropdown__item">
                 {% button href="accounts:edit_profile" text=_("Bewerken") icon="edit" icon_outlined=True  transparent=True secondary=True %}
             </div>
-            <div class="dropdown__item">
-                {% button href="password_change" text=_("Wijzig wachtwoord") icon="key" icon_outlined=True  transparent=True secondary=True %}
-            </div>
+            {% if can_change_password %}
+                <div class="dropdown__item">
+                    {% button href="password_change" text=_("Wijzig wachtwoord") icon="key" icon_outlined=True  transparent=True secondary=True %}
+                </div>
+            {% endif %}
         {% enddropdown %}
         {% button href="accounts:profile_export" icon="file-pdf" text=_("Exporteer naar PDF") hide_text=True icon_outlined=True transparent=True secondary=True %}
     {% endbutton_row %}
