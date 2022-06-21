@@ -3,10 +3,11 @@ from datetime import date
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms.forms import Form
+from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext as _
 from django.views.generic import DetailView, FormView, UpdateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin
@@ -14,12 +15,13 @@ from view_breadcrumbs import BaseBreadcrumbMixin
 from open_inwoner.accounts.choices import ContactTypeChoices, StatusChoices
 from open_inwoner.questionnaire.models import QuestionnaireStep
 from open_inwoner.utils.mixins import ExportMixin
+from open_inwoner.utils.views import LogMixin
 
 from ..forms import ThemesForm, UserForm
 from ..models import Action, User
 
 
-class MyProfileView(LoginRequiredMixin, BaseBreadcrumbMixin, FormView):
+class MyProfileView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormView):
     template_name = "pages/profile/me.html"
     form_class = Form
 
@@ -41,7 +43,7 @@ class MyProfileView(LoginRequiredMixin, BaseBreadcrumbMixin, FormView):
             ("#files", _("Bestanden")),
         ]
         context["mentor_contacts"] = self.request.user.contacts.filter(
-            type=ContactTypeChoices.begeleider
+            contact_user__contact_type=ContactTypeChoices.begeleider
         )
         context["next_action"] = (
             Action.objects.connected(self.request.user)
@@ -65,14 +67,17 @@ class MyProfileView(LoginRequiredMixin, BaseBreadcrumbMixin, FormView):
 
     def post(self, request, *args, **kwargs):
         if request.user.is_authenticated and not request.user.is_staff:
+            instance = User.objects.get(id=request.user.id)
             self.request.user.deactivate()
+
+            self.log_user_action(instance, _("user was deactivated via frontend"))
             return redirect("logout")
         else:
             messages.warning(request, _("Uw account kon niet worden gedeactiveerd"))
             return redirect("accounts:my_profile")
 
 
-class EditProfileView(LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
+class EditProfileView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
     template_name = "pages/profile/edit.html"
     model = User
     form_class = UserForm
@@ -88,8 +93,14 @@ class EditProfileView(LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
     def get_object(self):
         return self.request.user
 
+    def form_valid(self, form):
+        form.save()
 
-class MyCategoriesView(LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
+        self.log_change(self.get_object(), _("profile was modified"))
+        return HttpResponseRedirect(self.get_success_url())
+
+
+class MyCategoriesView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
     template_name = "pages/profile/categories.html"
     model = User
     form_class = ThemesForm
@@ -105,8 +116,14 @@ class MyCategoriesView(LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
     def get_object(self):
         return self.request.user
 
+    def form_valid(self, form):
+        form.save()
 
-class MyProfileExportView(LoginRequiredMixin, ExportMixin, DetailView):
+        self.log_change(self.object, _("categories were modified"))
+        return HttpResponseRedirect(self.get_success_url())
+
+
+class MyProfileExportView(LogMixin, LoginRequiredMixin, ExportMixin, DetailView):
     template_name = "export/profile/profile_export.html"
     model = User
 

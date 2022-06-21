@@ -80,7 +80,7 @@ class ProductImportResource(ImportResource):
     organizations = fields.Field(
         column_name="organizations",
         attribute="organizations",
-        widget=ValidatedManyToManyWidget(Organization, field="name"),
+        widget=ValidatedManyToManyWidget(Organization, field="slug"),
     )
     related_products = fields.Field(
         column_name="related_products",
@@ -90,7 +90,7 @@ class ProductImportResource(ImportResource):
     tags = fields.Field(
         column_name="tags",
         attribute="tags",
-        widget=ValidatedManyToManyWidget(Tag, field="name"),
+        widget=ValidatedManyToManyWidget(Tag, field="slug"),
     )
     costs = fields.Field(
         column_name="costs",

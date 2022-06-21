@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load button_tags card_tags faq_tags grid_tags %}
+{% load i18n button_tags card_tags faq_tags grid_tags questionnaire_tags %}
 
 {% block header_image %}
 {% if object.image %}
@@ -30,5 +30,17 @@
                 {% faq category.question_set.all %}
             {% endrender_column %}
         {% endrender_grid %}
+    {% endif %}
+
+    {% if questionnaire_roots %}
+        <div class="grid">
+            <div class="column column--start-1 column--span-6 ">
+                <aside class="questionnaire">
+                    <h2 class="h2">{% trans "Keuze zelfdiagnose?" %}</h2>
+                    <p class="p">{% trans "Kies hieronder één van de volgende vragenlijsten om de zelfdiagnose te starten." %}</p>
+                    {% questionnaire root_nodes=questionnaire_roots %}
+                </aside>
+            </div>
+        </div>
     {% endif %}
 {% endblock content %}

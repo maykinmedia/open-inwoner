@@ -16,6 +16,11 @@ class Category(MP_Node):
         unique=True,
         help_text=_("Slug of the category"),
     )
+    highlighted = models.BooleanField(
+        verbose_name=_("Highlighted"),
+        default=False,
+        help_text=_("Whether the category should be highlighted or not"),
+    )
     description = models.TextField(
         verbose_name=_("Description"),
         blank=True,

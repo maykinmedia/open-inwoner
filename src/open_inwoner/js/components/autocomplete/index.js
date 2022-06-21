@@ -27,8 +27,13 @@ const autocompleteField = (node) => {
           autoCompleteJS.input.value = selection
           hidden.value = choiceValue
         },
+        focus() {
+          //  show list when focusing
+          autoCompleteJS.start()
+        },
       },
     },
+    threshold: 0,
   })
 
   return autoCompleteJS

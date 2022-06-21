@@ -19,31 +19,31 @@ class TestListItem(InclusionTagWebTest):
         self.me = UserFactory.create(
             first_name="My", last_name="User", email="myuser@example.com"
         )
-        other_user = UserFactory.create(
+        self.other_user = UserFactory.create(
             first_name="Other", last_name="User", email="otheruser@example.com"
         )
 
         self.message_1 = MessageFactory.create(
             sender=self.me,
-            receiver=other_user,
+            receiver=self.other_user,
             created_on=timezone.now() - datetime.timedelta(days=2),
             content="Lorem ipsum.",
         )
         self.message_2 = MessageFactory.create(
             sender=self.me,
-            receiver=other_user,
+            receiver=self.other_user,
             created_on=timezone.now() - datetime.timedelta(days=1),
             content="Dolor sit amet.",
         )
         self.message_3 = MessageFactory.create(
-            sender=other_user,
+            sender=self.other_user,
             receiver=self.me,
             created_on=timezone.now(),
             content="Consectetur adipiscing elit.",
         )
         self.message_4 = MessageFactory.create(
             sender=self.me,
-            receiver=other_user,
+            receiver=self.other_user,
             created_on=timezone.now() - datetime.timedelta(hours=2),
             content="Maecenas dignissim felis nec purus viverra.",
         )
@@ -54,7 +54,7 @@ class TestListItem(InclusionTagWebTest):
             "message_list": message_queryset,
             "me": self.me,
             "form": InboxForm(user=self.me),
-            "subject": "Lorem ipsum.",
+            "other_user": self.other_user,
             "status": "Dolor sit amet.",
         }
 
@@ -64,7 +64,7 @@ class TestListItem(InclusionTagWebTest):
                 "message_list": [],
                 "me": self.me,
                 "form": InboxForm(user=self.me),
-                "subject": "Lorem ipsum.",
+                "other_user": self.other_user,
                 "status": "Dolor sit amet.",
             }
         )
@@ -133,7 +133,9 @@ class TestListItem(InclusionTagWebTest):
         Tests that:
             - Header renders the correct subject.
         """
-        self.assertTextContent(".messages__header .h4", "Lorem ipsum.", self.config)
+        self.assertTextContent(
+            ".messages__header .h4", self.other_user.get_full_name(), self.config
+        )
 
     def test_status(self):
         """

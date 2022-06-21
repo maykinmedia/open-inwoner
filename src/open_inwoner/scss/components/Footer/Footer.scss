@@ -17,7 +17,6 @@
     'nws  nws  nws  nws'
     'lnks lnks lnks lnks';
   grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: var(--row-height);
   padding: $vm $hm;
 
   @media (min-width: 768px) {
@@ -26,7 +25,6 @@
       'vstr vstr vstr vstr scl scl scl scl scl lnks lnks lnks'
       'ml   ml   ml   ml   nws nws nws nws nws lnks lnks lnks';
     grid-template-columns: repeat(12, 1fr);
-    grid-template-rows: var(--row-height);
   }
 
   /// Layout.

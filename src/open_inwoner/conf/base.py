@@ -118,11 +118,6 @@ INSTALLED_APPS = [
     "corsheaders",
     "rest_framework",
     "rest_framework.authtoken",
-    "allauth",
-    "allauth.account",
-    "allauth.socialaccount",
-    "dj_rest_auth",
-    "dj_rest_auth.registration",
     "drf_spectacular",
     "axes",
     "sniplates",
@@ -147,6 +142,8 @@ INSTALLED_APPS = [
     "privates",
     "fontawesomefree",
     "timeline_logger",
+    "csp",
+    "cspreports",
     # Project applications.
     "open_inwoner.accounts",
     "open_inwoner.components",
@@ -159,6 +156,8 @@ INSTALLED_APPS = [
     "open_inwoner.haalcentraal",
     "open_inwoner.openzaak",
     "open_inwoner.questionnaire",
+    "open_inwoner.extended_sessions",
+    "open_inwoner.custom_csp",
 ]
 
 MIDDLEWARE = [
@@ -169,12 +168,17 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "csp.contrib.rate_limiting.RateLimitedCSPMiddleware",
+    "csp.middleware.CSPMiddleware",
+    "open_inwoner.custom_csp.middleware.UpdateCSPMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "axes.middleware.AxesMiddleware",
     "hijack.middleware.HijackUserMiddleware",
     "django_otp.middleware.OTPMiddleware",
     "django.contrib.flatpages.middleware.FlatpageFallbackMiddleware",
+    "open_inwoner.extended_sessions.middleware.SessionTimeoutMiddleware",
+    "open_inwoner.accounts.middleware.NecessaryFieldsMiddleware",
 ]
 
 ROOT_URLCONF = "open_inwoner.urls"
@@ -358,6 +362,9 @@ AUTHENTICATION_BACKENDS = [
 
 SESSION_COOKIE_NAME = "open_inwoner_sessionid"
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+ADMIN_SESSION_COOKIE_AGE = 86400
+SESSION_WARN_DELTA = 60  # Warn 1 minute before end of session.
+SESSION_COOKIE_AGE = 900  # Set to 15 minutes
 
 LOGIN_REDIRECT_URL = reverse_lazy("root")
 LOGOUT_REDIRECT_URL = reverse_lazy("root")
@@ -451,9 +458,33 @@ HIJACK_ALLOW_GET_REQUESTS = True
 # SENTRY - error monitoring
 #
 SENTRY_DSN = config("SENTRY_DSN", None)
-RELEASE = "v0.6"  # get_current_version()
+RELEASE = "v0.8"  # get_current_version()
 
 PRIVATE_MEDIA_ROOT = os.path.join(BASE_DIR, "private_media")
+FILER_ROOT = os.path.join(BASE_DIR, "media", "filer")
+FILER_THUMBNAIL_ROOT = os.path.join(BASE_DIR, "media", "filer_thumbnails")
+if MEDIA_SUBFOLDER:
+    PRIVATE_MEDIA_ROOT = os.path.join(PRIVATE_MEDIA_ROOT, MEDIA_SUBFOLDER)
+    FILER_ROOT = os.path.join(FILER_ROOT, MEDIA_SUBFOLDER)
+    FILER_THUMBNAIL_ROOT = os.path.join(FILER_THUMBNAIL_ROOT, MEDIA_SUBFOLDER)
+
+FILER_STORAGES = {
+    "public": {
+        "main": {
+            "OPTIONS": {
+                "location": FILER_ROOT,
+                "base_url": "/media/filer/",
+            },
+        },
+        "thumbnails": {
+            "OPTIONS": {
+                "location": FILER_THUMBNAIL_ROOT,
+                "base_url": "/media/filer_thumbnails/",
+            },
+        },
+    },
+}
+
 SENDFILE_ROOT = PRIVATE_MEDIA_ROOT
 SENDFILE_BACKEND = "django_sendfile.backends.simple"
 PRIVATE_MEDIA_URL = "/private_files/"
@@ -466,13 +497,6 @@ ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_EMAIL_VERIFICATION = "none"
-REST_AUTH_REGISTER_SERIALIZERS = {
-    "REGISTER_SERIALIZER": "open_inwoner.api.accounts.serializers.RegisterSerializer"
-}
-
-REST_AUTH_SERIALIZERS = {
-    "USER_DETAILS_SERIALIZER": "open_inwoner.api.accounts.serializers.users.UserCustomSerializer",
-}
 
 REST_FRAMEWORK = {
     # YOUR SETTINGS
@@ -743,6 +767,64 @@ MAIL_EDITOR_CONF = {
             },
         ],
     },
+    "plan_action_update": {
+        "name": _("Plan action update"),
+        "description": _(
+            "This email is used to notify plan participants about the change in the plan action"
+        ),
+        "subject_default": "Plan action has been updated at {{ site_name }}",
+        "body_default": """
+            <p>Beste</p>
+
+            <p>You are receiving this email because the action in your <a href="{{ plan_url }}">plan</a> was updated.</p>
+
+            <table>
+                <tr>
+                    <th>Action name</th>
+                    <td>{{ action.name }}</td>
+                </tr>
+                <tr>
+                    <th>Plan</th>
+                    <td><a href="{{ plan_url }}">{{ plan.title }}</a></td>
+                </tr>
+                <tr>
+                    <th>Updated at</th>
+                    <td>{{ action.updated_on }}</td>
+                </tr>
+                <tr>
+                    <th>Details</th>
+                    <td>{{ message }}</td>
+                </tr>
+            </table>
+
+            <p>Met vriendelijke groet,
+            {{ site_name }} </p>
+       """,
+        "subject": [
+            {
+                "name": "site_name",
+                "description": _("Name of the site."),
+            },
+        ],
+        "body": [
+            {
+                "name": "action",
+                "description": _("Action that was updated"),
+            },
+            {
+                "name": "plan",
+                "description": _("Plan the updated action belongs to"),
+            },
+            {
+                "name": "plan_url",
+                "description": _("The link to the plan."),
+            },
+            {
+                "name": "site_name",
+                "description": _("Name of the site"),
+            },
+        ],
+    },
 }
 MAIL_EDITOR_BASE_CONTEXT = {"site_name": "Open Inwoner Platform"}
 CKEDITOR_CONFIGS = {
@@ -772,3 +854,53 @@ TWO_FACTOR_PATCH_ADMIN = config("TWO_FACTOR_PATCH_ADMIN", default=True)
 MIN_UPLOAD_SIZE = 1  # in bytes
 MAX_UPLOAD_SIZE = 1024 ** 2 * 100  # 100MB
 UPLOAD_FILE_TYPES = "application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/plain,application/vnd.oasis.opendocument.text,application/vnd.oasis.opendocument.formula,application/vnd.oasis.opendocument.spreadsheet,application/pdf,image/jpeg,image/png"
+
+#
+# DIGID
+#
+
+if ALLOWED_HOSTS:
+    BASE_URL = "https://{}".format(ALLOWED_HOSTS[0])
+else:
+    BASE_URL = "https://example.com"
+
+DIGID_METADATA = config("DIGID_METADATA", "")
+SSL_CERTIFICATE_PATH = config("SSL_CERTIFICATE_PATH", "")
+SSL_KEY_PATH = config("SSL_KEY_PATH", "")
+DIGID_SERVICE_ENTITY_ID = config(
+    "DIGID_SERVICE_ENTITY_ID", "https://was-preprod1.digid.nl/saml/idp/metadata"
+)
+DIGID_WANT_ASSERTIONS_SIGNED = config("DIGID_WANT_ASSERTIONS_SIGNED", default=True)
+
+DIGID = {
+    "base_url": BASE_URL,
+    "entity_id": BASE_URL,
+    # This is the metadata of the **Identity provider** NOT our own!
+    "metadata_file": DIGID_METADATA,
+    # SSL/TLS key
+    "key_file": SSL_KEY_PATH,
+    "cert_file": SSL_CERTIFICATE_PATH,
+    "service_entity_id": DIGID_SERVICE_ENTITY_ID,
+    "attribute_consuming_service_index": "1",
+    "requested_attributes": ["bsn"],
+    # Logius can sign the assertions (True) but others sign the entire response
+    # (False).
+    "want_assertions_signed": DIGID_WANT_ASSERTIONS_SIGNED,
+}
+
+THUMBNAIL_ALIASES = {
+    "": {
+        "logo": {
+            "size": (21600, 60),
+            "upscale": True,
+        },
+        "card-image": {
+            "size": (256, 320),
+            "crop": True,
+        },
+    }
+}
+
+TEST_RUNNER = "django_rich.test.RichRunner"
+
+from .app.csp import *  # noqa

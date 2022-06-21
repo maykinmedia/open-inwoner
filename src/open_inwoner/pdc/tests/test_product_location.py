@@ -88,7 +88,6 @@ class ProductLocationTestCase(TestCase):
                         "housenumber": "117",
                         "postcode": "1015 CJ",
                         "city": "Amsterdam",
-                        "url": product.get_absolute_url(),
                     },
                 }
             ),
@@ -163,7 +162,6 @@ class ProductLocationTestCase(TestCase):
                                 "housenumber": "4",
                                 "postcode": "7411 KT",
                                 "city": "Deventer",
-                                "url": product_1.get_absolute_url(),
                             },
                         },
                         {
@@ -178,7 +176,6 @@ class ProductLocationTestCase(TestCase):
                                 "housenumber": "204",
                                 "postcode": "1015 KL",
                                 "city": "Amsterdam",
-                                "url": product_2.get_absolute_url(),
                             },
                         },
                     ],

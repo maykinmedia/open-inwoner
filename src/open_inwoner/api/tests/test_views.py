@@ -36,6 +36,7 @@ class TestPDCLocation(APITestCase):
                     {
                         "name": self.root_category_1.name,
                         "slug": self.root_category_1.slug,
+                        "highlighted": self.root_category_1.highlighted,
                         "description": self.root_category_1.description,
                         "icon": None,
                         "image": None,
@@ -46,6 +47,7 @@ class TestPDCLocation(APITestCase):
                                 "url": f"http://testserver/api/categories/{self.child_category_1.slug}/",
                                 "name": self.child_category_1.name,
                                 "slug": self.child_category_1.slug,
+                                "highlighted": self.child_category_1.highlighted,
                                 "description": self.child_category_1.description,
                             }
                         ],
@@ -53,6 +55,7 @@ class TestPDCLocation(APITestCase):
                     {
                         "name": self.root_category_2.name,
                         "slug": self.root_category_2.slug,
+                        "highlighted": self.root_category_2.highlighted,
                         "description": self.root_category_2.description,
                         "icon": None,
                         "image": None,
@@ -63,6 +66,7 @@ class TestPDCLocation(APITestCase):
                                 "url": f"http://testserver/api/categories/{self.child_category_2.slug}/",
                                 "name": self.child_category_2.name,
                                 "slug": self.child_category_2.slug,
+                                "highlighted": self.child_category_2.highlighted,
                                 "description": self.child_category_2.description,
                             }
                         ],
@@ -86,6 +90,7 @@ class TestPDCLocation(APITestCase):
             {
                 "name": self.child_category_1.name,
                 "slug": self.child_category_1.slug,
+                "highlighted": self.child_category_1.highlighted,
                 "description": self.child_category_1.description,
                 "icon": None,
                 "image": None,
@@ -96,6 +101,7 @@ class TestPDCLocation(APITestCase):
                         "url": f"http://testserver/api/categories/{self.grandchild_category.slug}/",
                         "name": self.grandchild_category.name,
                         "slug": self.grandchild_category.slug,
+                        "highlighted": self.grandchild_category.highlighted,
                         "description": self.grandchild_category.description,
                     }
                 ],

@@ -1,5 +1,6 @@
 from django.core import mail
 from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _
 
 from django_webtest import WebTest
 from furl import furl
@@ -46,7 +47,8 @@ class ContactViewTests(WebTest):
 
     def test_contact_filter(self):
         begeleider = ContactFactory(
-            type=ContactTypeChoices.begeleider, created_by=self.user
+            contact_user__contact_type=ContactTypeChoices.begeleider,
+            created_by=self.user,
         )
         response = self.app.get(self.list_url, user=self.user)
         self.assertEqual(response.status_code, 200)
@@ -60,9 +62,49 @@ class ContactViewTests(WebTest):
         self.assertNotContains(response, self.contact.first_name)
         self.assertContains(response, begeleider.first_name)
 
+    def test_contact_filter_when_no_user_is_connected(self):
+        contact = ContactFactory(created_by=self.user, email=None, contact_user=None)
+        begeleider = ContactFactory(
+            contact_user__contact_type=ContactTypeChoices.begeleider,
+            created_by=self.user,
+        )
+        response = self.app.get(self.list_url, user=self.user)
+        self.assertContains(response, self.contact.first_name)
+        self.assertContains(response, contact.first_name)
+
+        form = response.forms["contact-filter"]
+        form["type"] = ContactTypeChoices.contact
+        response = form.submit()
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.contact.first_name)
+        self.assertContains(response, contact.first_name)
+        self.assertNotContains(response, begeleider.first_name)
+
+    def test_contact_filter_without_any_contacts(self):
+        self.contact.delete()
+        response = self.app.get(self.list_url, user=self.user)
+        self.assertNotContains(response, self.contact.first_name)
+
+        form = response.forms["contact-filter"]
+        form["type"] = ContactTypeChoices.contact
+        response = form.submit()
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response,
+            _(
+                "Er zijn geen contacten gevonden met deze filter, of u heeft nog geen contacten."
+            ),
+        )
+
     def test_contact_list_show_link_to_messages(self):
+        other_user = UserFactory()
+        contact = ContactFactory.create(created_by=self.user, contact_user=other_user)
+        contacts = Contact.objects.get_extended_contacts_for_user(self.user)
+        extended_contact = contacts.get(id=contact.id)
         message_link = (
-            furl(reverse("accounts:inbox")).add({"with": self.contact.email}).url
+            furl(reverse("accounts:inbox"))
+            .add({"with": extended_contact.other_user_email})
+            .url
         )
         response = self.app.get(self.list_url, user=self.user)
         self.assertContains(response, message_link)
@@ -114,26 +156,36 @@ class ContactViewTests(WebTest):
         self.assertEqual(contact.last_name, "Smith")
         self.assertEqual(contact.email, "john@smith.nl")
 
-        # check that the contact was created
-        contact_user = contact.contact_user
-        self.assertIsNotNone(contact_user)
-        self.assertEqual(contact_user.email, "john@smith.nl")
-        self.assertFalse(contact_user.is_active)
+        # check that the contact user was not created
+        self.assertIsNone(contact.contact_user)
 
         # check that the invite was created
         self.assertEqual(contact.invites.count(), 1)
         invite = contact.invites.get()
         self.assertEqual(invite.inviter, self.user)
-        self.assertEqual(invite.invitee, contact_user)
+        self.assertEqual(invite.invitee_email, contact.email)
 
         # check that the invite was sent
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
         self.assertEqual(email.subject, "Uitnodiging voor Open Inwoner Platform")
-        self.assertEqual(email.to, [contact_user.email])
+        self.assertEqual(email.to, [invite.invitee_email])
         invite_url = f"http://testserver{invite.get_absolute_url()}"
         body = email.alternatives[0][0]  # html version of the email body
         self.assertIn(invite_url, body)
+
+    def test_multiple_contact_create_without_providing_email(self):
+        ContactFactory(email=None)
+        response = self.app.get(self.create_url, user=self.user)
+        self.assertEqual(response.status_code, 200)
+
+        form = response.forms["contact-form"]
+        form["first_name"] = "John"
+        form["last_name"] = "Smith"
+        response = form.submit(user=self.user)
+        contacts_without_email = Contact.objects.filter(email__isnull=True)
+
+        self.assertEqual(contacts_without_email.count(), 2)
 
     def test_users_contact_is_deleted(self):
         self.app.post(self.delete_url, user=self.user)

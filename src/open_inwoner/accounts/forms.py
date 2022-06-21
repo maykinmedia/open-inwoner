@@ -32,30 +32,17 @@ class CustomRegistrationForm(RegistrationForm):
             "invite",
         )
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def clean_email(self):
+        email = self.cleaned_data["email"]
 
-        if self.initial.get("invite") or self.data.get("invite"):
-            self.fields["email"].widget.attrs["readonly"] = "readonly"
-            del self.fields["email"].widget.attrs["autofocus"]
+        existing_user = User.objects.filter(email=email).first()
+        if not existing_user:
+            return email
 
-    def save(self, commit=True):
-        self.instance.is_active = True
+        if existing_user.is_active:
+            raise ValidationError(_("The user with this email already exists"))
 
-        user = super().save(commit)
-
-        # if there is invite - create reverse contact relations
-        invite = self.cleaned_data.get("invite")
-        if invite:
-            inviter = invite.inviter
-            Contact.objects.create(
-                first_name=inviter.first_name,
-                last_name=inviter.last_name,
-                email=inviter.email,
-                contact_user=inviter,
-                created_by=user,
-            )
-        return user
+        raise ValidationError(_("This user has been deactivated"))
 
 
 class UserForm(forms.ModelForm):
@@ -70,6 +57,30 @@ class UserForm(forms.ModelForm):
             "postcode",
             "city",
         )
+
+
+class NecessaryUserForm(forms.ModelForm):
+    invite = forms.ModelChoiceField(
+        queryset=Invite.objects.all(),
+        to_field_name="key",
+        widget=forms.HiddenInput(),
+        required=False,
+    )
+
+    class Meta:
+        model = User
+        fields = (
+            "first_name",
+            "last_name",
+            "email",
+            "invite",
+        )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["first_name"].required = True
+        self.fields["last_name"].required = True
 
 
 class ThemesForm(forms.ModelForm):
@@ -89,7 +100,7 @@ class ContactForm(forms.ModelForm):
     def __init__(self, user, create, *args, **kwargs):
         self.user = user
         self.create = create
-        return super().__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     class Meta:
         model = Contact
@@ -99,7 +110,7 @@ class ContactForm(forms.ModelForm):
         cleaned_data = super().clean()
         email = cleaned_data.get("email")
 
-        if self.create and self.user.contacts.filter(email=email).exists():
+        if self.create and email and self.user.contacts.filter(email=email).exists():
             raise ValidationError(
                 _(
                     "Het ingevoerde e-mailadres komt al voor in uw contactpersonen. Pas de gegevens aan en probeer het opnieuw."
@@ -111,14 +122,40 @@ class ContactForm(forms.ModelForm):
             self.instance.created_by = self.user
 
         if not self.instance.pk and self.instance.email:
-            self.instance.contact_user, created = User.objects.get_or_create(
-                email=self.instance.email, defaults={"is_active": False}
-            )
+            contact_user = User.objects.filter(email=self.instance.email).first()
+            if contact_user:
+                self.instance.contact_user = contact_user
+
         return super().save(commit=commit)
 
 
+class UserField(forms.ModelChoiceField):
+    me = None
+
+    def label_from_instance(self, obj: User) -> str:
+        return obj.get_full_name()
+
+    def has_changed(self, initial, data):
+        # consider 'me' as empty value
+        if initial == self.me.id and not data:
+            return False
+
+        if data == self.me.id and not initial:
+            return False
+
+        return super().has_changed(initial, data)
+
+
 class ActionForm(forms.ModelForm):
-    file = LimitedUploadFileField(required=False)
+    is_for = UserField(
+        label=_("Is voor"),
+        queryset=User.objects.all(),
+        empty_label=_("Myself"),
+        required=False,
+    )
+    file = LimitedUploadFileField(
+        required=False, widget=PrivateFileWidget(url_name="accounts:action_download")
+    )
 
     class Meta:
         model = Action
@@ -137,15 +174,15 @@ class ActionForm(forms.ModelForm):
         self.plan = plan
         super().__init__(*args, **kwargs)
 
-        self.fields["is_for"].required = False
-        self.fields["is_for"].empty_label = _("Myself")
-        self.fields["is_for"].queryset = User.objects.filter(
-            assigned_contacts__in=self.user.contacts.all()
-        )
+        if plan:
+            # action can be assigned to somebody in the plan
+            self.fields["is_for"].queryset = plan.get_other_users(user=user)
+        else:
+            # otherwise it's always assigned to the user
+            # options are not limited to None for old actions support
+            self.fields["is_for"].disabled = True
 
-        self.fields["file"].widget = PrivateFileWidget(
-            url_name="accounts:action_download"
-        )
+        self.fields["is_for"].me = user
 
     def clean_end_date(self):
         data = self.cleaned_data["end_date"]
@@ -216,7 +253,9 @@ class InboxForm(forms.ModelForm):
         label=_("Contactpersoon"),
         queryset=User.objects.none(),
         to_field_name="email",
-        widget=forms.HiddenInput(),
+        widget=forms.HiddenInput(
+            attrs={"placeholder": _("Voer de naam in van uw contactpersoon")}
+        ),
     )
     content = forms.CharField(
         label="",

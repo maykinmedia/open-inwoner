@@ -1,13 +1,13 @@
-{% load static i18n header_tags card_tags footer_tags button_tags notification_tags anchor_menu_tags view_breadcrumbs utils %}<!DOCTYPE html>
+{% load static i18n header_tags card_tags footer_tags button_tags notification_tags anchor_menu_tags view_breadcrumbs utils session_tags %}<!DOCTYPE html>
 <html lang="en" class="view {% block view_class %}view--{{ request.resolver_match.namespaces|join:'-' }}-{{ request.resolver_match.url_name }}{% endblock %}">
     <head>
         <meta charset="utf-8">
         <title>{% block title %}{{ site_name }}{% endblock %}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="{{site_logo}}" rel="shortcut icon">
-        <link href="{% static 'bundles/open_inwoner-css.css' %}" media="all" rel="stylesheet" />
+        <link nonce="{{ request.csp_nonce }}" href="{% static 'bundles/open_inwoner-css.css' %}" media="all" rel="stylesheet" />
 
-        <style>
+        <style nonce="{{ request.csp_nonce }}">
             :root {
                 --color-primary-h: {{theming.primary.0}};
                 --color-primary-s: {{theming.primary.1}}%;
@@ -23,10 +23,6 @@
                 --color-font-accent: {{theming.accent_font_color}};
             }
         </style>
-        {% comment %} TODO: Make self hosted {% endcomment %}
-        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-        <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
-        <script src="{% static 'fontawesomefree/js/all.min.js' %}"></script>
         {% block extra_css %}{% endblock %}
 
         {% include "analytics/google.html" %}
@@ -37,12 +33,14 @@
         {% header categories=menu_categories request=request breadcrumbs=breadcrumbs search_form=search_form has_general_faq_questions=has_general_faq_questions %}
         {% if anchors %}
         {% anchor_menu anchors=anchors desktop=False %}
+            {% block extra_mobile_anchor %}{% endblock extra_mobile_anchor %}
+        {% endanchor_menu%}
         {% endif %}
         {% render_breadcrumbs "components/Header/Breadcrumbs.html" %}
 
-        {% block notifications %}{% notifications messages %}{% endblock %}
-
         {% block header_image %}{% endblock header_image %}
+
+        {% block notifications %}{% notifications messages %}{% endblock %}
 
         {% block main_outer %}
             <main class="container">
@@ -60,8 +58,22 @@
             </main>
         {% endblock main_outer %}
 
-        {% footer logo_url=site_logo footer_texts=configurable_text.footer %}
+        {% footer footer_texts=configurable_text.footer %}
+        {% session_timeout %}
 
-        <script defer src="{% static 'bundles/open_inwoner-js.js' %}"></script>
+        <div class="modal" id="modal">
+            <div class="modal__container">
+                <h2 class="modal__title" id="modal__title"></h2>
+                <div class="modal__text" id="modal__text"></div>
+                <div class="modal__actions" id="modal__actions">
+                    {% spaceless %}
+                        {% button text="" extra_classes="modal__button modal__close" %}
+                        {% button text="" extra_classes="modal__button modal__confirm" %}
+                    {% endspaceless %}
+                </div>
+            </div>
+        </div>
+
+        <script nonce="{{ request.csp_nonce }}" src="{% static 'bundles/open_inwoner-js.js' %}" type="text/javascript"></script>
     </body>
 </html>

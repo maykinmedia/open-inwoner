@@ -3,9 +3,5 @@ Change history
 ==============
 
 
-0.1.0
-=====
+See the Github releases: https://github.com/maykinmedia/open-inwoner/releases
 
-*<month, day year>*
-
-* Initial release.

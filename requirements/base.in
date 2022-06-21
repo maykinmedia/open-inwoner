@@ -8,6 +8,7 @@ geopy # geo decoder
 glom # processing nested data
 furl # processing urls
 weasyprint # export to pdf
+pywatchman
 
 # Framework libraries
 Django>=3.2.11<4.0
@@ -25,10 +26,8 @@ maykin-django-two-factor-auth
 phonenumbers
 django-localflavor
 django-privates
-git+https://bitbucket.org/maykinmedia/django-digid-eherkenning.git@02ac61c42f6dd2f229ba9f0f687fa1a4160511be#egg=digid_eherkenning
+django-digid-eherkenning
 django-cors-headers
-dj-rest-auth
-django-allauth
 django-autoslug
 django-elasticsearch-dsl
 django-import-export
@@ -42,6 +41,9 @@ humanfriendly
 git+https://github.com/maykinmedia/mail-editor.git@0b4621b5c7f434586115b8e722af8940cfa70195#egg=mail-editor
 fontawesomefree
 django-timeline-logger
+django-rich
+django-csp
+django-csp-reports
 
 # API libraries
 djangorestframework
@@ -58,7 +60,7 @@ elastic-apm  # Elastic APM integration
 beautifulsoup4
 
 # DigidLocal
-python3-saml
+git+https://github.com/maykinmedia/python3-saml.git@f587f77b78be79d51139f29a957b406072e2b537#egg=python3_saml
 pyopenssl
 
 # Common Ground integration

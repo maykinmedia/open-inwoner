@@ -5,6 +5,7 @@ from open_inwoner.pdc.views import HomeView
 from .views import (
     ActionCreateView,
     ActionExportView,
+    ActionHistoryView,
     ActionListExportView,
     ActionListView,
     ActionPrivateMediaView,
@@ -26,6 +27,7 @@ from .views import (
     MyCategoriesView,
     MyProfileExportView,
     MyProfileView,
+    NecessaryFieldsUserView,
 )
 
 app_name = "accounts"
@@ -67,6 +69,11 @@ urlpatterns = [
         ActionPrivateMediaView.as_view(),
         name="action_download",
     ),
+    path(
+        "actions/<str:uuid>/history/",
+        ActionHistoryView.as_view(),
+        name="action_history",
+    ),
     path("actions/", ActionListView.as_view(), name="action_list"),
     path("contacts/create/", ContactCreateView.as_view(), name="contact_create"),
     path("contacts/<str:uuid>/edit/", ContactUpdateView.as_view(), name="contact_edit"),
@@ -86,5 +93,10 @@ urlpatterns = [
     path("edit/", EditProfileView.as_view(), name="edit_profile"),
     path("invite/<str:key>/accept/", InviteAcceptView.as_view(), name="invite_accept"),
     path("export/", MyProfileExportView.as_view(), name="profile_export"),
+    path(
+        "register/necessary/",
+        NecessaryFieldsUserView.as_view(),
+        name="registration_necessary",
+    ),
     path("", MyProfileView.as_view(), name="my_profile"),
 ]

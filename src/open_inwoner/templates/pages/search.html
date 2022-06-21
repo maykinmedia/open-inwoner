@@ -10,9 +10,9 @@
             </aside>{% endspaceless %}
             <div class="grid__main">
                 <h1 class="h1">Zoeken</h1>
-                <p class="p">Hier vind u hoe wonen, zorg, welzijn, werk en geldzaken in uw gemeente geregeld zijn en wijzen we u de weg naar organisaties, activiteiten, hulp en initiatieven in uw eigen buurt.</p>
+                <p class="p">Hier vindt u hoe wonen, zorg, welzijn, werk en geldzaken in uw gemeente geregeld zijn en wijzen we u de weg naar organisaties, activiteiten, hulp en initiatieven in uw eigen buurt.</p>
 
-                <div class="form form--columns-2 form--inline">
+                <div class="form form--columns-2 form--inline form--align-end">
                     {% input form.query %}
                     {% form_actions primary_text="Zoeken" primary_icon="arrow_forward" %}
                 </div>
@@ -54,7 +54,7 @@
         {% endif %}
     {% endrender_form %}
 
-    {% if results %}
+    {% if results and not messages %}
         <div class="grid">
             {% spaceless %}<aside class="grid__sidebar">
                 &nbsp;
@@ -64,7 +64,7 @@
                     <aside class="feedback">
                         <h4 class="h4">{% trans "Feedback" %}</h4>
                         <p class="p">{% trans "Heeft u gevonden wat u zocht?" %}</p>
-                        {% render_form form=feedback_form method="POST" form_action=request.get_full_path id="feedback_form" %}
+                        {% render_form form=feedback_form method="POST" form_action=request.get_full_path id="feedback_form" show_notifications=True %}
                             {% csrf_token %}
                             {{ feedback_form.errors }}
                             <div class="feedback__options">

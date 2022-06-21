@@ -7,6 +7,7 @@ class HeaderMenu {
   toggleOpen(event) {
     event.preventDefault()
     this.node.parentElement.classList.toggle('header__menu--open')
+    document.body.classList.toggle('body--open')
   }
 }
 

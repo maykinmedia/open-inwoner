@@ -16,6 +16,10 @@
     padding: var(--spacing-small);
   }
 
+  &__init {
+    display: none;
+  }
+
   &__delete {
     cursor: pointer;
   }
@@ -34,6 +38,7 @@
 
   .label {
     cursor: pointer;
+    flex-direction: row;
 
     *[class*='icon'] {
       top: var(--spacing-tiny);

@@ -5,14 +5,16 @@ from django.db.models import Q
 from django.http.response import HttpResponseRedirect
 from django.urls.base import reverse, reverse_lazy
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext as _
 from django.views.generic import CreateView, DetailView, ListView
 from django.views.generic.edit import UpdateView
 
 from privates.views import PrivateMediaView
 from view_breadcrumbs import BaseBreadcrumbMixin
 
+from open_inwoner.utils.logentry import get_change_message
 from open_inwoner.utils.mixins import ExportMixin
+from open_inwoner.utils.views import LogMixin
 
 from ..forms import ActionForm, ActionListForm
 from ..models import Action
@@ -69,7 +71,7 @@ class ActionListView(
         return context
 
 
-class ActionUpdateView(LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
+class ActionUpdateView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
     template_name = "pages/profile/actions/edit.html"
     model = Action
     slug_field = "uuid"
@@ -99,10 +101,15 @@ class ActionUpdateView(LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
 
     def form_valid(self, form):
         self.object = form.save(self.request.user)
+
+        # log if the action was changed
+        if form.changed_data:
+            changed_message = get_change_message(form=form)
+            self.log_change(self.object, changed_message)
         return HttpResponseRedirect(self.get_success_url())
 
 
-class ActionCreateView(LoginRequiredMixin, BaseBreadcrumbMixin, CreateView):
+class ActionCreateView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, CreateView):
     template_name = "pages/profile/actions/edit.html"
     model = Action
     form_class = ActionForm
@@ -126,10 +133,12 @@ class ActionCreateView(LoginRequiredMixin, BaseBreadcrumbMixin, CreateView):
 
     def form_valid(self, form):
         self.object = form.save(self.request.user)
+
+        self.log_addition(self.object, _("action was created"))
         return HttpResponseRedirect(self.get_success_url())
 
 
-class ActionListExportView(LoginRequiredMixin, ExportMixin, ListView):
+class ActionListExportView(LogMixin, LoginRequiredMixin, ExportMixin, ListView):
     template_name = "export/profile/action_list_export.html"
     model = Action
 
@@ -143,7 +152,7 @@ class ActionListExportView(LoginRequiredMixin, ExportMixin, ListView):
         ).select_related("created_by")
 
 
-class ActionExportView(LoginRequiredMixin, ExportMixin, DetailView):
+class ActionExportView(LogMixin, LoginRequiredMixin, ExportMixin, DetailView):
     template_name = "export/profile/action_export.html"
     model = Action
     slug_field = "uuid"
@@ -156,7 +165,7 @@ class ActionExportView(LoginRequiredMixin, ExportMixin, DetailView):
         )
 
 
-class ActionPrivateMediaView(LoginRequiredMixin, PrivateMediaView):
+class ActionPrivateMediaView(LogMixin, LoginRequiredMixin, PrivateMediaView):
     model = Action
     slug_field = "uuid"
     slug_url_kwarg = "uuid"
@@ -164,7 +173,39 @@ class ActionPrivateMediaView(LoginRequiredMixin, PrivateMediaView):
 
     def has_permission(self):
         action = self.get_object()
-        return self.request.user.is_superuser or self.request.user in [
+        if self.request.user.is_superuser or self.request.user in [
             action.created_by,
             action.is_for,
+        ]:
+            self.log_user_action(action, _("file was downloaded"))
+            return True
+
+        return False
+
+
+class ActionHistoryView(LoginRequiredMixin, BaseBreadcrumbMixin, DetailView):
+    template_name = "pages/history.html"
+    model = Action
+    slug_field = "uuid"
+    slug_url_kwarg = "uuid"
+
+    @cached_property
+    def crumbs(self):
+        return [
+            (_("Mijn profiel"), reverse("accounts:my_profile")),
+            (_("Mijn acties"), reverse("accounts:action_list")),
+            (
+                _("History of {}").format(self.object.name),
+                reverse("accounts:action_history", kwargs=self.kwargs),
+            ),
         ]
+
+    def get_queryset(self):
+        base_qs = super().get_queryset()
+        return base_qs.connected(user=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context["logs"] = self.object.logs.order_by()
+        return context

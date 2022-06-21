@@ -49,12 +49,14 @@ class QuestionnaireStep(MP_Node):
         max_length=25,
     )
 
+    code = models.CharField(_("Code voor intern gebruik"), max_length=255, unique=True)
     slug = models.SlugField(_("URL vriendelijke naam"), max_length=255, unique=True)
     help_text = models.CharField(
         _("Ondersteunende tekst"),
         help_text=_("Beschrijvende tekst bij de vraag."),
         default=_("Kies het antwoord dat het meest van toepassing is"),
         max_length=510,
+        blank=True,
     )
 
     content = models.TextField(
@@ -62,9 +64,24 @@ class QuestionnaireStep(MP_Node):
         help_text=_("Deze inhoud wordt weergegeven in deze stap."),
         blank=True,
     )
+    highlighted = models.BooleanField(
+        _("Highlighted"),
+        default=False,
+        help_text=_("Whether the questionnaire should be highlighted or not."),
+    )
     related_products = models.ManyToManyField(
         "pdc.Product",
+        verbose_name=_("Gerelateerde producten"),
         help_text=_("Deze producten worden weergegeven in deze stap."),
+        blank=True,
+    )
+    category = models.ForeignKey(
+        "pdc.Category",
+        verbose_name=_("Category"),
+        on_delete=models.CASCADE,
+        related_name="questionnaires",
+        help_text=_("Related category"),
+        null=True,
         blank=True,
     )
 

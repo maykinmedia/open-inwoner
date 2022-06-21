@@ -24,6 +24,9 @@
                                 {% get_action_edit_url action=action plan=plan as action_url %}
                                 {% button icon="edit" text=_("Bewerken") href=action_url icon_outlined=True transparent=True %}
                             </div>
+                            <div class="dropdown__item">
+                                {% button icon="history" text=_("History") href="accounts:action_history" uuid=action.uuid icon_outlined=True transparent=True %}
+                            </div>
                         {% enddropdown %}
                     {% endif %}
                 </div>
@@ -35,33 +38,33 @@
                     <div class="table__explain">{% trans "Onderdeel van" %}</div>
                     {% if action.plan %}
                         {% link href=action.plan.get_absolute_url text=action.plan.title %}
+                    {% else %}
+                        -
+                    {% endif %}
+                </div>
+                <div class="actions__label actions__label--big">
+                    <div class="table__explain">{% trans "Aangemaakt door" %}</div>
+                    {{ action.is_for.get_full_name }}
+                </div>
+                <div class="actions__label">
+                    {% if action.file %}
+                        <div class="table__explain">{% trans "Document" %}</div>
+                        {% link href="accounts:action_download" text=action.file.name uuid=action.uuid %}
                     {% endif %}
                 </div>
                 <div class="actions__label">
-                    <div class="table__explain">{% trans "Door" %}</div>
-                    {{ action.is_for.get_full_name }}
+                    <div class="table__explain">{% trans "Toegevoegd op" %}</div>
+                    {{ action.created_on|date:"d-m-Y" }}
+                </div>
+                <div class="actions__label">
+                    <div class="table__explain">{% trans "Uitvoeren voor" %}</div>
+                    {{ action.end_date|date:"d-m-Y"|default:"-" }}
                 </div>
                 <div class="actions__label">
                     <div class="table__explain">
                         {% trans "Status" %}
                     </div>
                     {{ action.get_status_display }}
-                </div>
-                <div class="actions__label">
-                    <div class="table__explain">{% trans "Type" %}</div>
-                    {{ action.get_type_display }}
-                </div>
-                <div class="actions__label">
-                    <div class="table__explain">{% trans "Planning" %}</div>
-                    {{ action.end_date }}
-                </div>
-                <div class="actions__label">
-                    <div class="table__explain">{% trans "Document" %}</div>
-                    {% link href="accounts:action_download" text=action.file.name uuid=action.uuid %}
-                </div>
-                <div class="actions__label">
-                    <div class="table__explain">{% trans "Toegevoegd op" %}</div>
-                    {{ action.created_on }}
                 </div>
             </div>
         {% empty %}

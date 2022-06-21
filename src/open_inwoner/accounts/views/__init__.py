@@ -1,10 +1,16 @@
 from .actions import (
     ActionCreateView,
     ActionExportView,
+    ActionHistoryView,
     ActionListExportView,
     ActionListView,
     ActionPrivateMediaView,
     ActionUpdateView,
+)
+from .auth import (
+    LogPasswordChangeView,
+    LogPasswordResetConfirmView,
+    LogPasswordResetView,
 )
 from .cases import CasesListView, CasesStatusView
 from .contacts import (
@@ -25,4 +31,4 @@ from .profile import (
     MyProfileExportView,
     MyProfileView,
 )
-from .registration import CustomRegistrationView
+from .registration import CustomRegistrationView, NecessaryFieldsUserView

@@ -45,17 +45,10 @@
             <div class="plan-contact__grid plan-contact__grid--columns-{% if object.contacts.count > 1 %}2{% else %}1{% endif %}">
                 {% for contact in object.contacts.all %}
                     <div class="plan-contact__information">
-                    {% if contact.created_by == request.user %}
                         <p class="plan-contact__info">{{ contact.get_name }}</p>
                         <p class="plan-contact__info">{{ contact.function }}</p>
                         <p class="plan-contact__info">{{ contact.phonenumber }}</p>
-                        <p class="plan-contact__info">{{ contact.email }}</p>
-                    {% else %}
-                        <p class="plan-contact__info">{{ contact.get_created_by_name }}</p>
-                        <p class="plan-contact__info">{{ contact.function }}</p>
-                        <p class="plan-contact__info"></p>
-                        <p class="plan-contact__info">{{ contact.created_by.email }}</p>
-                    {% endif %}
+                        <p class="plan-contact__info">{{ contact.contact_user.email }}</p>
                     </div>
                 {% endfor %}
             </div>

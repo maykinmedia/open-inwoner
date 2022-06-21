@@ -108,11 +108,14 @@ class ContactQuerySet(QuerySet):
         If the user and other user have contacts with each other only mine contact is shown
         """
 
-        not_unique_emails = self.filter(
-            created_by=me, email=OuterRef("created_by__email")
-        ).values("email")
+        my_contacts_users = self.filter(created_by=me).values_list(
+            "contact_user", flat=True
+        )
         return (
-            self.filter(Q(contact_user=me) | Q(created_by=me))
+            self.filter(
+                Q(created_by=me)
+                | Q(~Q(created_by__in=my_contacts_users), contact_user=me)
+            )
             .annotate(reverse=Case(When(created_by=me, then=False), default=True))
             .annotate(
                 other_user_id=Case(
@@ -134,7 +137,7 @@ class ContactQuerySet(QuerySet):
             )
             .annotate(
                 other_user_email=Case(
-                    When(created_by=me, then=F("email")),
+                    When(created_by=me, then=F("contact_user__email")),
                     default=F("created_by__email"),
                 )
             )
@@ -144,4 +147,4 @@ class ContactQuerySet(QuerySet):
                     default=Value(""),
                 )
             )
-        ).exclude(Exists(not_unique_emails), reverse=True)
+        )

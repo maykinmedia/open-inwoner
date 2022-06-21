@@ -3,6 +3,7 @@ from uuid import uuid4
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
@@ -13,6 +14,7 @@ from furl import furl
 from localflavor.nl.models import NLBSNField, NLZipCodeField
 from mail_editor.helpers import find_template
 from privates.storages import PrivateMediaFileSystemStorage
+from timeline_logger.models import TimelineLog
 
 from open_inwoner.utils.validators import validate_phone_number
 
@@ -45,6 +47,13 @@ class User(AbstractBaseUser, PermissionsMixin):
             "Designates whether this user should be treated as active. "
             "Unselect this instead of deleting accounts."
         ),
+    )
+    contact_type = models.CharField(
+        verbose_name=_("Contact type"),
+        default=ContactTypeChoices.contact,
+        max_length=200,
+        choices=ContactTypeChoices.choices,
+        help_text=_("The type of contact"),
     )
     date_joined = models.DateTimeField(
         verbose_name=_("Date joined"), default=timezone.now
@@ -162,6 +171,14 @@ class User(AbstractBaseUser, PermissionsMixin):
 
         return ", ".join(list(self.selected_themes.values_list("name", flat=True)))
 
+    def require_necessary_fields(self) -> bool:
+        """returns whether user needs to fill in necessary fields"""
+        return (
+            self.login_type == LoginTypeChoices.digid
+            and not self.first_name
+            and not self.last_name
+        )
+
 
 class Contact(models.Model):
     uuid = models.UUIDField(
@@ -197,13 +214,6 @@ class Contact(models.Model):
         help_text=_(
             "The phonenumber of the contact person. This field can be left empty."
         ),
-    )
-    type = models.CharField(
-        verbose_name=_("Type"),
-        default=ContactTypeChoices.contact,
-        max_length=200,
-        choices=ContactTypeChoices.choices,
-        help_text=_("The type of contact"),
     )
     created_on = models.DateTimeField(
         verbose_name=_("Created on"),
@@ -255,6 +265,13 @@ class Contact(models.Model):
     def __str__(self):
         return self.get_name()
 
+    @property
+    def _type(self):
+        if self.contact_user:
+            return self.contact_user.contact_type
+
+        return ContactTypeChoices.contact
+
     def get_update_url(self):
         return reverse("accounts:contact_edit", kwargs={"uuid": self.uuid})
 
@@ -268,11 +285,18 @@ class Contact(models.Model):
         return not self.is_active()
 
     def get_message_url(self) -> str:
-        url = furl(reverse("accounts:inbox")).add({"with": self.email}).url
+        url = furl(reverse("accounts:inbox")).add({"with": self.other_user_email}).url
         return f"{url}#messages-last"
 
     def get_created_by_name(self):
         return f"{self.created_by.first_name} {self.created_by.last_name}"
+
+    def get_type_display(self):
+        if self.contact_user:
+            return self.contact_user.get_contact_type_display()
+
+        choice = ContactTypeChoices.get_choice(ContactTypeChoices.contact)
+        return choice.label
 
 
 class Document(models.Model):
@@ -460,6 +484,7 @@ class Action(models.Model):
         related_name="actions",
         help_text=_("The plan that the action belongs to. This can be left empty."),
     )
+    logs = GenericRelation(TimelineLog)
 
     objects = ActionQueryset.as_manager()
 
@@ -479,6 +504,22 @@ class Action(models.Model):
 
     def is_connected(self, user):
         return Action.objects.filter(pk=self.pk).connected(user=user).exists()
+
+    def send(self, plan, message, receivers, request=None):
+        plan_url = plan.get_absolute_url()
+        if request:
+            plan_url = request.build_absolute_uri(plan_url)
+
+        template = find_template("plan_action_update")
+        context = {
+            "action": self,
+            "plan": plan,
+            "plan_url": plan_url,
+            "message": message,
+        }
+        to_emails = [r.email for r in receivers]
+
+        return template.send_email(to_emails, context)
 
 
 class Message(models.Model):
@@ -555,9 +596,15 @@ class Invite(models.Model):
     invitee = models.ForeignKey(
         User,
         verbose_name=_("Invitee"),
-        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
         related_name="received_invites",
         help_text=_("User who received the invite"),
+    )
+    invitee_email = models.EmailField(
+        verbose_name=_("Invitee email"),
+        help_text=_("The email used to send the invite"),
     )
     contact = models.ForeignKey(
         Contact,
@@ -601,11 +648,11 @@ class Invite(models.Model):
         template = find_template("invite")
         context = {
             "inviter_name": self.inviter.get_full_name(),
-            "email": self.invitee.email,
+            "email": self.invitee_email,
             "invite_link": url,
         }
 
-        return template.send_email([self.invitee.email], context)
+        return template.send_email([self.invitee_email], context)
 
     def get_absolute_url(self) -> str:
         return reverse("accounts:invite_accept", kwargs={"key": self.key})

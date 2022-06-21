@@ -20,7 +20,7 @@
     {% if products %}
         {% for product in products %}
             {% get_product_url product as product_url %}
-            {% description_card title=product.name description=product.summary url=product_url %}
+            {% description_card title=product.name description=product.summary url=product_url image=product.icon %}
         {% endfor %}
     {% endif %}
 

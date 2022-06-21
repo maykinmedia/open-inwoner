@@ -23,6 +23,7 @@ const addAutocomplete = (node) => {
     resultItem: {
       highlight: true,
     },
+    submit: true,
     events: {
       input: {
         selection: (event) => {

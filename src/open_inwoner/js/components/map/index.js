@@ -57,7 +57,7 @@ class Map {
     L.geoJSON(data, {
       onEachFeature: (feature, layer) =>
         layer.bindPopup(this.featureToHTML(feature), {
-          maxWidth: 150,
+          maxWidth: 300,
         }),
     }).addTo(this.map)
   }
@@ -68,19 +68,11 @@ class Map {
    * @return {string}
    */
   featureToHTML(feature) {
-    const { name, url, ...properties } = feature.properties
+    const { name, ...properties } = feature.properties
     const displayName = name ? name : ''
     return `
         <h4 class="h4">
-          ${
-            url
-              ? `
-              <a class="link link--primary" href="${url}">
-                <span class="link__text">${displayName}</span>
-              </a>
-            `
-              : displayName
-          }
+          ${displayName}
         </h4>
         <p class="p">
           ${Object.entries(properties)
