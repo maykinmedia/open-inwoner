@@ -6,7 +6,7 @@
         <li class="status-list__list-item">
             {% icon icon="task_alt" %}
             <p class="p p--compact">{{ object.datum_status_gezet|date }}</p>
-            <p class="p p--compact">{{ object.statustype }}</p>
+            <p class="p p--compact">{{ object.statustype.omschrijving }}</p>
         </li>
         {% endfor %}
     </ul>

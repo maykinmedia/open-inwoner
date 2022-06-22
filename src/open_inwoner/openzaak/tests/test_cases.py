@@ -67,7 +67,7 @@ class TestListCasesView(WebTest):
             omschrijving="Zaak naar aanleiding van ingezonden formulier",
             startdatum="2021-07-26",
             einddatum=None,
-            status=f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-beu760sle929",
+            status=f"{ZAKEN_ROOT}statussen/98659876-bbb3-476a-ad13-n3nvcght758js",
         )
         self.zaaktype = generate_oas_component(
             "ztc",
@@ -102,9 +102,18 @@ class TestListCasesView(WebTest):
             "zrc",
             "schemas/Zaak",
             url=f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
-            zaak=f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
+            zaak=f"{ZAKEN_ROOT}zaken/e4d469b9-6666-4bdd-bf42-b53445298102",
             statustype=f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-744516671fe4",
             datum_status_gezet="2021-03-12",
+            statustoelichting="",
+        )
+        self.status3 = generate_oas_component(
+            "zrc",
+            "schemas/Zaak",
+            url=f"{ZAKEN_ROOT}statussen/98659876-bbb3-476a-ad13-n3nvcght758js",
+            zaak=f"{ZAKEN_ROOT}zaken/6f8de38f-85ea-42d3-978c-845a033335a7",
+            statustype=f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-744516671fe4",
+            datum_status_gezet="2021-03-15",
             statustoelichting="",
         )
         self.status_type1 = generate_oas_component(
@@ -151,6 +160,10 @@ class TestListCasesView(WebTest):
             json=self.status2,
         )
         m.get(
+            f"{ZAKEN_ROOT}statussen/98659876-bbb3-476a-ad13-n3nvcght758js",
+            json=self.status3,
+        )
+        m.get(
             f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-744516671fe4",
             json=self.status_type2,
         )
@@ -167,14 +180,14 @@ class TestListCasesView(WebTest):
                     "start_date": datetime.date(2021, 7, 26),
                     "end_date": None,
                     "description": "Coffee zaaktype",
-                    "current_status": "Initial request",
+                    "current_status": "Finish",
                 },
                 {
                     "uuid": "e4d469b9-6666-4bdd-bf42-b53445298102",
                     "start_date": datetime.date(2022, 1, 12),
                     "end_date": None,
                     "description": "Coffee zaaktype",
-                    "current_status": "Initial request",
+                    "current_status": "Finish",
                 },
             ],
         )
@@ -186,7 +199,7 @@ class TestListCasesView(WebTest):
                     "start_date": datetime.date(2022, 1, 2),
                     "end_date": datetime.date(2022, 1, 16),
                     "description": "Coffee zaaktype",
-                    "current_status": "Finish",
+                    "current_status": "Initial request",
                 }
             ],
         )
@@ -207,14 +220,14 @@ class TestListCasesView(WebTest):
                     "start_date": datetime.date(2021, 7, 26),
                     "end_date": None,
                     "description": "Coffee zaaktype",
-                    "current_status": "Initial request",
+                    "current_status": "Finish",
                 },
                 {
                     "uuid": "e4d469b9-6666-4bdd-bf42-b53445298102",
                     "start_date": datetime.date(2022, 1, 12),
                     "end_date": None,
                     "description": "Coffee zaaktype",
-                    "current_status": "Initial request",
+                    "current_status": "Finish",
                 },
             ],
         )
@@ -226,7 +239,7 @@ class TestListCasesView(WebTest):
                     "start_date": datetime.date(2022, 1, 2),
                     "end_date": datetime.date(2022, 1, 16),
                     "description": "Coffee zaaktype",
-                    "current_status": "Finish",
+                    "current_status": "Initial request",
                 }
             ],
         )

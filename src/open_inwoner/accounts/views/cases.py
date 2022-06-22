@@ -15,11 +15,11 @@ from open_inwoner.openzaak.cases import (
 )
 from open_inwoner.openzaak.statuses import (
     fetch_case_information_objects,
-    fetch_single_status,
     fetch_single_status_type,
     fetch_specific_status_types,
     fetch_status_history,
     fetch_status_types,
+    fetch_specific_statuses,
 )
 
 
@@ -49,10 +49,13 @@ class CasesListView(
         status_types = {
             status_type.url: status_type for status_type in fetch_status_types()
         }
-
+        current_statuses = {
+            status.zaak: status
+            for status in fetch_specific_statuses([case.status for case in cases])
+        }
         updated_cases = []
         for case in cases:
-            current_status = fetch_single_status(case.status)
+            current_status = current_statuses[case.url]
 
             # If the status type does not exist in the status types, retrieve it manually
             if current_status and not current_status.statustype in status_types:
@@ -124,14 +127,12 @@ class CasesStatusView(
             statuses.sort(key=lambda status: status.datum_status_gezet)
 
             case_type = fetch_single_case_type(case.zaaktype)
-            status_types = fetch_specific_status_types(
-                [status.statustype for status in statuses]
-            )
+            status_types = fetch_specific_status_types(case.zaaktype)
 
+            status_types_mapping = {st.url: st for st in status_types}
             for status in statuses:
-                for status_type in status_types:
-                    if status.statustype == status_type.url:
-                        status.statustype = status_type.omschrijving
+                status_type = status_types_mapping[status.statustype]
+                status.statustype = status_type
 
             context["case"] = {
                 "start_date": case.startdatum,
@@ -139,11 +140,12 @@ class CasesStatusView(
                 "description": case_type.omschrijving
                 if case_type
                 else _("No data available"),
-                "current_status": statuses[-1].statustype
+                "current_status": statuses[-1].statustype.omschrijving
                 if statuses
-                and statuses[-1].statustype in [st.omschrijving for st in status_types]
+                and statuses[-1].statustype.omschrijving
+                in [st.omschrijving for st in status_types]
                 else _("No data available"),
-                "statuses": statuses if statuses and status_types else None,
+                "statuses": statuses,
                 "documents": case_info_objects,
             }
             context["anchors"] = self.get_anchors(statuses, case_info_objects)
