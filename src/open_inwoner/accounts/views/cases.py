@@ -17,9 +17,9 @@ from open_inwoner.openzaak.statuses import (
     fetch_case_information_objects,
     fetch_single_status_type,
     fetch_specific_status_types,
+    fetch_specific_statuses,
     fetch_status_history,
     fetch_status_types,
-    fetch_specific_statuses,
 )
 
 

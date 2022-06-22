@@ -6,8 +6,8 @@ from django.utils.translation import gettext_lazy as _
 
 import requests_mock
 from django_webtest import WebTest
-from zgw_consumers.api_models.zaken import Status, ZaakInformatieObject
 from zgw_consumers.api_models.catalogi import StatusType
+from zgw_consumers.api_models.zaken import Status, ZaakInformatieObject
 from zgw_consumers.constants import APITypes
 from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 
