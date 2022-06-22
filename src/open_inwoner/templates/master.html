@@ -38,9 +38,9 @@
         {% endif %}
         {% render_breadcrumbs "components/Header/Breadcrumbs.html" %}
 
-        {% block notifications %}{% notifications messages %}{% endblock %}
-
         {% block header_image %}{% endblock header_image %}
+
+        {% block notifications %}{% notifications messages %}{% endblock %}
 
         {% block main_outer %}
             <main class="container">

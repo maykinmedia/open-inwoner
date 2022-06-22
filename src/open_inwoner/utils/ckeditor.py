@@ -27,5 +27,7 @@ def get_rendered_content(content):
     for tag, class_name in class_adders:
         for element in soup.find_all(tag):
             element.attrs["class"] = class_name
+            if element.name == "a" and element.attrs.get("href", "").startswith("http"):
+                element.attrs["target"] = "_blank"
 
     return soup

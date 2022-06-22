@@ -1,5 +1,6 @@
 from django import forms
 from django.conf import settings
+from django.contrib.auth.forms import PasswordResetForm
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
@@ -7,7 +8,7 @@ from django_registration.forms import RegistrationForm
 
 from open_inwoner.utils.forms import LimitedUploadFileField, PrivateFileWidget
 
-from .choices import EmptyContactTypeChoices, EmptyStatusChoices
+from .choices import EmptyContactTypeChoices, EmptyStatusChoices, LoginTypeChoices
 from .models import Action, Contact, Document, Invite, Message, User
 
 
@@ -59,6 +60,39 @@ class UserForm(forms.ModelForm):
         )
 
 
+class NecessaryUserForm(forms.ModelForm):
+    invite = forms.ModelChoiceField(
+        queryset=Invite.objects.all(),
+        to_field_name="key",
+        widget=forms.HiddenInput(),
+        required=False,
+    )
+
+    class Meta:
+        model = User
+        fields = (
+            "first_name",
+            "last_name",
+            "email",
+            "invite",
+        )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["first_name"].required = True
+        self.fields["last_name"].required = True
+
+
+class CustomPasswordResetForm(PasswordResetForm):
+    def send_mail(self, *args, **kwargs):
+        email = self.cleaned_data.get("email")
+        user = User.objects.get(email=email)
+
+        if user.login_type == LoginTypeChoices.default:
+            return super().send_mail(*args, **kwargs)
+
+
 class ThemesForm(forms.ModelForm):
     class Meta:
         model = User
@@ -76,7 +110,7 @@ class ContactForm(forms.ModelForm):
     def __init__(self, user, create, *args, **kwargs):
         self.user = user
         self.create = create
-        return super().__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     class Meta:
         model = Contact
@@ -105,11 +139,28 @@ class ContactForm(forms.ModelForm):
         return super().save(commit=commit)
 
 
+class UserField(forms.ModelChoiceField):
+    me = None
+
+    def label_from_instance(self, obj: User) -> str:
+        return obj.get_full_name()
+
+    def has_changed(self, initial, data):
+        # consider 'me' as empty value
+        if initial == self.me.id and not data:
+            return False
+
+        if data == self.me.id and not initial:
+            return False
+
+        return super().has_changed(initial, data)
+
+
 class ActionForm(forms.ModelForm):
-    is_for = forms.ModelChoiceField(
+    is_for = UserField(
         label=_("Is voor"),
-        queryset=User.objects.none(),
-        to_field_name="email",
+        queryset=User.objects.all(),
+        empty_label=_("Myself"),
         required=False,
     )
     file = LimitedUploadFileField(
@@ -133,13 +184,15 @@ class ActionForm(forms.ModelForm):
         self.plan = plan
         super().__init__(*args, **kwargs)
 
-        contact_users = User.objects.filter(
-            assigned_contacts__in=self.user.contacts.all()
-        )
-        choices = [[u.email, f"{u.first_name} {u.last_name}"] for u in contact_users]
-        choices.insert(0, ["", _("Myself")])
-        self.fields["is_for"].queryset = contact_users
-        self.fields["is_for"].choices = choices
+        if plan:
+            # action can be assigned to somebody in the plan
+            self.fields["is_for"].queryset = plan.get_other_users(user=user)
+        else:
+            # otherwise it's always assigned to the user
+            # options are not limited to None for old actions support
+            self.fields["is_for"].disabled = True
+
+        self.fields["is_for"].me = user
 
     def clean_end_date(self):
         data = self.cleaned_data["end_date"]

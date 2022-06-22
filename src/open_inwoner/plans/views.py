@@ -14,6 +14,7 @@ from open_inwoner.accounts.views.actions import (
     ActionUpdateView,
     BaseActionFilter,
 )
+from open_inwoner.utils.logentry import get_change_message
 from open_inwoner.utils.mixins import ExportMixin
 from open_inwoner.utils.views import LogMixin
 
@@ -289,7 +290,21 @@ class PlanActionEditView(ActionUpdateView):
         self.object = self.get_plan()
         self.action = form.save(self.request.user)
 
-        self.log_change(self.action, _("action was modified via plan"))
+        # log and notify if the action was changed
+        if form.changed_data:
+            # log
+            changed_message = get_change_message(form=form)
+            self.log_change(self.action, changed_message)
+
+            # notify
+            other_users = self.object.get_other_users(user=self.request.user)
+            if other_users.count():
+                self.action.send(
+                    plan=self.object,
+                    message=changed_message,
+                    receivers=other_users,
+                    request=self.request,
+                )
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self) -> str:

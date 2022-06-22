@@ -24,6 +24,9 @@
                                 {% get_action_edit_url action=action plan=plan as action_url %}
                                 {% button icon="edit" text=_("Bewerken") href=action_url icon_outlined=True transparent=True %}
                             </div>
+                            <div class="dropdown__item">
+                                {% button icon="history" text=_("History") href="accounts:action_history" uuid=action.uuid icon_outlined=True transparent=True %}
+                            </div>
                         {% enddropdown %}
                     {% endif %}
                 </div>
@@ -35,6 +38,8 @@
                     <div class="table__explain">{% trans "Onderdeel van" %}</div>
                     {% if action.plan %}
                         {% link href=action.plan.get_absolute_url text=action.plan.title %}
+                    {% else %}
+                        -
                     {% endif %}
                 </div>
                 <div class="actions__label actions__label--big">
@@ -48,12 +53,12 @@
                     {% endif %}
                 </div>
                 <div class="actions__label">
-                    <div class="table__explain">{% trans "Uitvoeren voor" %}</div>
-                    {{ action.end_date }}
+                    <div class="table__explain">{% trans "Toegevoegd op" %}</div>
+                    {{ action.created_on|date:"d-m-Y" }}
                 </div>
                 <div class="actions__label">
-                    <div class="table__explain">{% trans "Toegevoegd op" %}</div>
-                    {{ action.created_on }}
+                    <div class="table__explain">{% trans "Uitvoeren voor" %}</div>
+                    {{ action.end_date|date:"d-m-Y"|default:"-" }}
                 </div>
                 <div class="actions__label">
                     <div class="table__explain">

@@ -24,8 +24,6 @@ CATALOGI_ROOT = "https://catalogi.nl/api/v1/"
 class TestListCasesView(WebTest):
     def setUp(self):
         self.user = UserFactory(
-            first_name="",
-            last_name="",
             login_type=LoginTypeChoices.digid,
             bsn="900222086",
         )

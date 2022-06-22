@@ -1,0 +1,34 @@
+[
+  {
+    "model": "custom_csp.cspsetting",
+    "pk": 1,
+    "fields": {
+      "directive": "script-src",
+      "value": "https://www.googletagmanager.com"
+    }
+  },
+  {
+    "model": "custom_csp.cspsetting",
+    "pk": 2,
+    "fields": {
+      "directive": "script-src",
+      "value": "http://open-inwoner.matomo.cloud/"
+    }
+  },
+  {
+    "model": "custom_csp.cspsetting",
+    "pk": 3,
+    "fields": {
+      "directive": "connect-src",
+      "value": "http://open-inwoner.matomo.cloud/"
+    }
+  },
+  {
+    "model": "custom_csp.cspsetting",
+    "pk": 4,
+    "fields": {
+      "directive": "connect-src",
+      "value": "https://www.google-analytics.com"
+    }
+  }
+]

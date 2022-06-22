@@ -3,6 +3,7 @@ from uuid import uuid4
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
@@ -13,6 +14,7 @@ from furl import furl
 from localflavor.nl.models import NLBSNField, NLZipCodeField
 from mail_editor.helpers import find_template
 from privates.storages import PrivateMediaFileSystemStorage
+from timeline_logger.models import TimelineLog
 
 from open_inwoner.utils.validators import validate_phone_number
 
@@ -168,6 +170,14 @@ class User(AbstractBaseUser, PermissionsMixin):
             return _("U heeft geen intressegebieden aangegeven.")
 
         return ", ".join(list(self.selected_themes.values_list("name", flat=True)))
+
+    def require_necessary_fields(self) -> bool:
+        """returns whether user needs to fill in necessary fields"""
+        return (
+            self.login_type == LoginTypeChoices.digid
+            and not self.first_name
+            and not self.last_name
+        )
 
 
 class Contact(models.Model):
@@ -474,6 +484,7 @@ class Action(models.Model):
         related_name="actions",
         help_text=_("The plan that the action belongs to. This can be left empty."),
     )
+    logs = GenericRelation(TimelineLog)
 
     objects = ActionQueryset.as_manager()
 
@@ -493,6 +504,22 @@ class Action(models.Model):
 
     def is_connected(self, user):
         return Action.objects.filter(pk=self.pk).connected(user=user).exists()
+
+    def send(self, plan, message, receivers, request=None):
+        plan_url = plan.get_absolute_url()
+        if request:
+            plan_url = request.build_absolute_uri(plan_url)
+
+        template = find_template("plan_action_update")
+        context = {
+            "action": self,
+            "plan": plan,
+            "plan_url": plan_url,
+            "message": message,
+        }
+        to_emails = [r.email for r in receivers]
+
+        return template.send_email(to_emails, context)
 
 
 class Message(models.Model):
