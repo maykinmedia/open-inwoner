@@ -14,7 +14,8 @@ class HelpModal {
     const modal = new Modal(modalId)
     modal.setTitle(this.modal.dataset.helpTitle)
     modal.setText(this.modal.dataset.helpText)
-    modal.setConfirm(this.modal.dataset.helpClose, (close) => {
+    modal.setClose(this.modal.dataset.helpClose)
+    modal.setModalClosedCallback(() => {
       this.helpButton.classList.remove('accessibility-header__modal--highlight')
     })
     modal.show()
