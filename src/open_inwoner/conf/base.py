@@ -369,7 +369,7 @@ AUTHENTICATION_BACKENDS = [
     "open_inwoner.accounts.backends.UserModelEmailBackend",
     "django.contrib.auth.backends.ModelBackend",
     "digid_eherkenning.backends.DigiDBackend",
-    "mozilla_django_oidc_db.backends.OIDCAuthenticationBackend",
+    "open_inwoner.accounts.backends.CustomOIDCBackend",
 ]
 
 SESSION_COOKIE_NAME = "open_inwoner_sessionid"

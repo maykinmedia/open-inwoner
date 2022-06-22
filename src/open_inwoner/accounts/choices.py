@@ -7,6 +7,7 @@ class LoginTypeChoices(DjangoChoices):
     default = ChoiceItem("default", _("E-mail en Wachtwoord"))
     digid = ChoiceItem("digid", _("DigiD"))
     eherkenning = ChoiceItem("eherkenning", _("eHerkenning"))
+    oidc = ChoiceItem("oidc", _("OpenId connect"))
 
 
 # Created because of a filter that needs to happen. This way the form can take the empty choice and the modal is still filled.
