@@ -6,6 +6,7 @@ from django.utils.translation import gettext_lazy as _
 
 import requests_mock
 from django_webtest import WebTest
+from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.catalogi import StatusType
 from zgw_consumers.api_models.zaken import Status, ZaakInformatieObject
 from zgw_consumers.constants import APITypes
@@ -144,6 +145,9 @@ class TestListStatusView(WebTest):
 
     def test_status_is_retrieved_when_user_logged_in_via_digid(self, m):
         self._setUpMocks(m)
+        status1_obj, status2_obj = factory(Status, [self.status1, self.status2])
+        status1_obj.statustype = factory(StatusType, self.status_type1)
+        status2_obj.statustype = factory(StatusType, self.status_type2)
 
         response = self.app.get(
             reverse(
@@ -157,51 +161,12 @@ class TestListStatusView(WebTest):
             response.context.get("case"),
             {
                 "start_date": datetime.date(2022, 1, 2),
-                "end_date": datetime.date(2022, 1, 16),
+                "end_date": None,
                 "description": "Coffee zaaktype",
                 "current_status": "Finish",
-                "statuses": [
-                    Status(
-                        url="https://zaken.nl/api/v1/statussen/3da81560-c7fc-476a-ad13-beu760sle929",
-                        zaak="https://zaken.nl/api/v1/zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
-                        statustype=StatusType(
-                            url="https://catalogi.nl/api/v1/statustypen/e3798107-ab27-4c3c-977d-777yu878km09",
-                            zaaktype="https://catalogi.nl/api/v1/zaaktypen/53340e34-7581-4b04-884f",
-                            omschrijving="Initial request",
-                            omschrijving_generiek="some content",
-                            statustekst="",
-                            volgnummer=1,
-                            is_eindstatus=False,
-                        ),
-                        datum_status_gezet=datetime.datetime(2021, 1, 12, 0, 0),
-                        statustoelichting="",
-                    ),
-                    Status(
-                        url="https://zaken.nl/api/v1/statussen/3da89990-c7fc-476a-ad13-c9023450083c",
-                        zaak="https://zaken.nl/api/v1/zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
-                        statustype=StatusType(
-                            url="https://catalogi.nl/api/v1/statustypen/e3798107-ab27-4c3c-977d-744516671fe4",
-                            zaaktype="https://catalogi.nl/api/v1/zaaktypen/53340e34-7581-4b04-884f",
-                            omschrijving="Finish",
-                            omschrijving_generiek="some content",
-                            statustekst="",
-                            volgnummer=2,
-                            is_eindstatus=False,
-                        ),
-                        datum_status_gezet=datetime.datetime(2021, 3, 12, 0, 0),
-                        statustoelichting="",
-                    ),
-                ],
+                "statuses": [status1_obj, status2_obj],
                 "documents": [
-                    ZaakInformatieObject(
-                        url="https://zaken.nl/api/v1/zaakinformatieobjecten/e55153aa-ad2c-4a07-ae75-15add57d6",
-                        informatieobject="https://documenten.nl/api/v1/enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812",
-                        zaak="https://zaken.nl/api/v1/zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
-                        aard_relatie_weergave="Hoort bij, omgekeerd: kent",
-                        titel="",
-                        beschrijving="",
-                        registratiedatum=datetime.datetime(2021, 1, 12, 0, 0),
-                    )
+                    factory(ZaakInformatieObject, self.zaak_informatie_object)
                 ],
             },
         )
