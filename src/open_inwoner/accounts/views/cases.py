@@ -16,7 +16,6 @@ from open_inwoner.openzaak.cases import (
 from open_inwoner.openzaak.statuses import (
     fetch_case_information_objects,
     fetch_single_status_type,
-    fetch_specific_status_types,
     fetch_specific_statuses,
     fetch_status_history,
     fetch_status_types,
@@ -127,7 +126,7 @@ class CasesStatusView(
             statuses.sort(key=lambda status: status.datum_status_gezet)
 
             case_type = fetch_single_case_type(case.zaaktype)
-            status_types = fetch_specific_status_types(case.zaaktype)
+            status_types = fetch_status_types(case.zaaktype)
 
             status_types_mapping = {st.url: st for st in status_types}
             for status in statuses:

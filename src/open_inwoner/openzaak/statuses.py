@@ -51,27 +51,7 @@ def fetch_specific_statuses(status_urls: List[str]) -> List[Status]:
     return statuses
 
 
-def fetch_status_types() -> List[StatusType]:
-    client = build_client("catalogi")
-
-    if client is None:
-        return []
-
-    try:
-        response = get_paginated_results(client, "statustype")
-    except RequestException as e:
-        logger.exception("exception while making request", exc_info=e)
-        return []
-    except ClientError as e:
-        logger.exception("exception while making request", exc_info=e)
-        return []
-
-    status_types = factory(StatusType, response)
-
-    return status_types
-
-
-def fetch_specific_status_types(case_type: str) -> List[StatusType]:
+def fetch_status_types(*case_type: str) -> List[StatusType]:
     client = build_client("catalogi")
 
     if client is None:
@@ -83,7 +63,9 @@ def fetch_specific_status_types(case_type: str) -> List[StatusType]:
             "statustype",
             request_kwargs={
                 "params": {"zaaktype": case_type},
-            },
+            }
+            if case_type
+            else None,
         )
     except RequestException as e:
         logger.exception("exception while making request", exc_info=e)
