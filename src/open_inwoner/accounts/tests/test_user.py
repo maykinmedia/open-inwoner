@@ -4,6 +4,9 @@ from django.test import TestCase
 
 from freezegun import freeze_time
 
+from open_inwoner.accounts.choices import LoginTypeChoices
+
+from .factories import UserFactory
 from ..models import User
 
 
@@ -31,3 +34,33 @@ class UserTests(TestCase):
         with freeze_time("2014-01-07"):
             user = User(birthday=date.today())
         self.assertEqual(user.get_age(), 7)
+
+    def test_require_necessary_fields(self):
+        user = UserFactory()
+        self.assertFalse(user.require_necessary_fields())
+
+    def test_require_necessary_fields_digid(self):
+        user = UserFactory(login_type=LoginTypeChoices.digid)
+        self.assertFalse(user.require_necessary_fields())
+
+    def test_require_necessary_fields_digid_no_first_name(self):
+        user = UserFactory(login_type=LoginTypeChoices.digid, first_name="")
+        self.assertTrue(user.require_necessary_fields())
+
+    def test_require_necessary_fields_digid_no_last_name(self):
+        user = UserFactory(login_type=LoginTypeChoices.digid, last_name="")
+        self.assertTrue(user.require_necessary_fields())
+
+    def test_require_necessary_fields_oidc(self):
+        user = UserFactory(login_type=LoginTypeChoices.oidc)
+        self.assertFalse(user.require_necessary_fields())
+
+    def test_require_necessary_fields_oidc_no_email(self):
+        user = UserFactory(login_type=LoginTypeChoices.oidc, email="")
+        self.assertTrue(user.require_necessary_fields())
+
+    def test_require_necessary_fields_oidc_openinwoner_email(self):
+        user = UserFactory(
+            login_type=LoginTypeChoices.oidc, email="test@openinwoner.nl"
+        )
+        self.assertTrue(user.require_necessary_fields())

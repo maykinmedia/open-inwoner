@@ -42,7 +42,7 @@ class CustomOIDCBackend(OIDCAuthenticationBackend):
 
         kwargs = {
             "oidc_id": unique_id,
-            "email": unique_id,
+            "email": f"{unique_id}@openinwoner.nl",
             "login_type": LoginTypeChoices.oidc,
         }
 

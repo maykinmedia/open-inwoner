@@ -175,9 +175,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     def require_necessary_fields(self) -> bool:
         """returns whether user needs to fill in necessary fields"""
         if self.login_type == LoginTypeChoices.digid:
-            return not self.first_name and not self.last_name
+            return not self.first_name or not self.last_name
         elif self.login_type == LoginTypeChoices.oidc:
-            return not self.email or "@" not in self.email
+            return not self.email or self.email.endswith("@openinwoner.nl")
         return False
 
 
