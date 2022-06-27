@@ -13,7 +13,7 @@ class PublishedMoveHandler(MP_MoveHandler):
     def process(self):
         if self.node.published and not self.target.published:
             raise InvalidMoveToDescendant(
-                _("Published parent nodes cannot be children of an unpublished parent.")
+                _("Published nodes cannot be moved to unpublished ones.")
             )
         return super().process()
 
