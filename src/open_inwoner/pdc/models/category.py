@@ -6,7 +6,7 @@ from filer.fields.image import FilerImageField
 from treebeard.exceptions import InvalidMoveToDescendant
 from treebeard.mp_tree import MP_MoveHandler, MP_Node
 
-from open_inwoner.utils.managers import PublishedQueryset
+from ..managers import PublishedQueryset
 
 
 class PublishedMoveHandler(MP_MoveHandler):

@@ -10,9 +10,9 @@ from filer.fields.file import FilerFileField
 from filer.fields.image import FilerImageField
 from ordered_model.models import OrderedModel
 
-from open_inwoner.utils.managers import PublishedQueryset
 from open_inwoner.utils.validators import validate_phone_number
 
+from ..managers import PublishedQueryset
 from .mixins import GeoModel
 
 
