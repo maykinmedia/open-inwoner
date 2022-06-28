@@ -126,7 +126,7 @@ class CasesStatusView(
             statuses.sort(key=lambda status: status.datum_status_gezet)
 
             case_type = fetch_single_case_type(case.zaaktype)
-            status_types = fetch_status_types(case.zaaktype)
+            status_types = fetch_status_types(case_type=case.zaaktype)
 
             status_types_mapping = {st.url: st for st in status_types}
             for status in statuses:

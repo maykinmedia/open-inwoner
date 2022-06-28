@@ -51,7 +51,7 @@ def fetch_specific_statuses(status_urls: List[str]) -> List[Status]:
     return statuses
 
 
-def fetch_status_types(*case_type: str) -> List[StatusType]:
+def fetch_status_types(case_type=None) -> List[StatusType]:
     client = build_client("catalogi")
 
     if client is None:
