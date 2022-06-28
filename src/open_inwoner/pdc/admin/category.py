@@ -6,7 +6,7 @@ from import_export.formats import base_formats
 from treebeard.admin import TreeAdmin
 from treebeard.forms import movenodeform_factory
 
-from open_inwoner.utils.views import LogMixin
+from open_inwoner.utils.logentry import system_action
 
 from ..models import Category
 from ..resources import CategoryExportResource, CategoryImportResource
@@ -14,13 +14,15 @@ from .faq import QuestionInline
 
 
 @admin.register(Category)
-class CategoryAdmin(ImportExportMixin, LogMixin, TreeAdmin):
+class CategoryAdmin(ImportExportMixin, TreeAdmin):
     change_list_template = "admin/category_change_list.html"
     form = movenodeform_factory(Category, fields="__all__")
     inlines = (QuestionInline,)
     prepopulated_fields = {"slug": ("name",)}
     search_fields = ("name",)
     ordering = ("path",)
+    list_display = ("name", "highlighted")
+    list_editable = ("highlighted",)
 
     # import-export
     import_template_name = "admin/category_import.html"
@@ -35,6 +37,6 @@ class CategoryAdmin(ImportExportMixin, LogMixin, TreeAdmin):
 
         if request.method == "POST":
             user = request.user
-            self.log_system_action(_("categories were exported"), user)
+            system_action(_("categories were exported"), user)
 
         return response

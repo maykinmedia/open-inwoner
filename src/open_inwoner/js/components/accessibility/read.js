@@ -15,7 +15,7 @@ class ReadOut {
 
   read = (event) => {
     event.preventDefault()
-    console.log(this.speechSynthesis)
+
     if (this.speechSynthesis.speaking) {
       this.speechSynthesis.pause()
     } else if (this.speechSynthesis.paused) {
@@ -23,7 +23,7 @@ class ReadOut {
     } else {
       const main =
         typeof document === 'undefined' ? null : document.querySelector('main')
-      console.log(main.textContent)
+
       var msg = new SpeechSynthesisUtterance()
       msg.text = main.textContent
       this.speechSynthesis.speak(msg)

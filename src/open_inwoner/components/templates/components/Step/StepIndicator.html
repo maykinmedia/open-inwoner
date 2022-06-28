@@ -4,7 +4,7 @@
     <aside class="step-indicator">
         <ol class="step-indicator__list">
             {% for step in steps %}
-                <li class="step-indicator__list-item{% if step.is_current %} step-indicator__list-item--active{% elif step.is_completed %} step-indicator__list-item--completed{% endif %} P">
+                <li class="step-indicator__list-item{% if step.is_current %} step-indicator__list-item--active{% elif step.is_completed %} step-indicator__list-item--completed{% endif %} P" data-step={{ step.step }}>
                     {% if step.object %}
                         {% link href=step.object.get_absolute_url secondary=True bold=True text=step.object_display %}
                     {% endif %}

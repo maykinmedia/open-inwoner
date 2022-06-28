@@ -40,8 +40,21 @@
                             {{ plan_template.goal|truncatewords:8 }}
                         </div>
                         <div class="plan-template__icon">
-                            <div class="show-preview" data-close="{% trans "Sluiten" %}" data-title="{{ plan_template.name }}" data-text="{{ plan_template.string_preview }}">
+                            <div class="show-preview" data-id="template-{{ plan_template.id }}">
                                 {% icon icon="visibility" outlined=True %}
+                            </div>
+                        </div>
+                        <div class="modal modal--no-reset" id="template-{{ plan_template.id }}">
+                            <div class="modal__container">
+                                <h2 class="h2 modal__title" id="modal__title">{{ plan_template.name }}
+                                    {% button text=_("Sluiten") hide_text=True icon="close" extra_classes="modal__button modal__close-title" %}
+                                </h2>
+                                <div class="modal__text" id="modal__text">{{ plan_template.string_preview }}</div>
+                                <div class="modal__actions modal__actions--align-right" id="modal__actions">
+                                    {% spaceless %}
+                                        {% button text=_("Sluiten") extra_classes="modal__button modal__close" primary=True %}
+                                    {% endspaceless %}
+                                </div>
                             </div>
                         </div>
                     </label>

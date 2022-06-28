@@ -20,6 +20,7 @@ def button_row(parser, token):
 
     Variables:
         - align: enum[right] | if the buttons should be aligned left (no align should be given) or alinged right side.
+        - mobile: booleam | If the button row should only be displayed on mobile screens.
 
     Extra context:
         - contents: string (HTML) | this is the context between the button_row and endbutton_row tags
@@ -41,6 +42,7 @@ def button(text, **kwargs):
 
     Variables:
         + text: string | this will be the button text.
+        - class: str | Additional classes.
         - hide_text: bool | whether to hide the text and use aria attribute instead.
         - href: url or string | where the link links to (can be url name).
         - uuid: string | if href is an url name, pk for reverse can be passed.
@@ -57,13 +59,15 @@ def button(text, **kwargs):
         - icon_outlined: bool | if the outlined icons should be used.
         - type: string | the type of button that should be used.
         - title: string | The HTML title attribute if different than the text.
+        - extra_classes: string | Extra classes that need to be added to the button
 
     Extra context:
         - classes: string | all the classes that the button should have.
     """
 
     def get_classes():
-        classnames = "button"
+        extra_classes = kwargs.get("extra_classes")
+        classnames = f"button {extra_classes}"
 
         if kwargs.get("icon"):
             if not kwargs.get("text"):
@@ -98,6 +102,9 @@ def button(text, **kwargs):
 
         if kwargs.get("pill"):
             classnames += " button--pill"
+
+        if kwargs.get("class"):
+            classnames += f" {kwargs.get('class')}"
 
         return classnames
 

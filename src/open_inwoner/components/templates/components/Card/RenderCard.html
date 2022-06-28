@@ -8,7 +8,7 @@
         </a>
     {% endif %}
 
-    <div class="card__body{% if direction %} card__body--direction-{{ direction }}{% endif %}">
+    <div class="card__body{% if direction %} card__body--direction-{{ direction }}{% endif %}{% if grid %} card__body--grid{% endif %}">
         {% if title %}
             <h4 class="h4">
                 {% if href %}

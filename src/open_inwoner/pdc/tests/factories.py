@@ -47,6 +47,7 @@ class CategoryFactory(factory.django.DjangoModelFactory):
     name = factory.Faker("word")
     slug = factory.LazyAttribute(lambda a: slugify(a.name))
     description = factory.Faker("sentence")
+    highlighted = False
 
     class Meta:
         model = Category

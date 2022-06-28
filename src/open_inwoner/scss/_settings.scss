@@ -39,7 +39,7 @@ $grid-gutter-tablet: $grid-gutter-base !default;
 $grid-gutter-laptop: $grid-gutter-base !default;
 $grid-gutter-desktop: $grid-gutter-base !default;
 $grid-row-height: 40px !default;
-$grid-container-margin-base: $grid-gutter-base / 2 !default;
+$grid-container-margin-base: calc($grid-gutter-base / 2) !default;
 $grid-container-padding-base: 0px !default;
 $grid-container-margin: $grid-container-margin-base !default;
 $grid-container-margin-small: $grid-container-margin-base !default;

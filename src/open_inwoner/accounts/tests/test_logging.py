@@ -12,6 +12,7 @@ from privates.test import temp_private_root
 from timeline_logger.models import TimelineLog
 from webtest import Upload
 
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.pdc.tests.factories import CategoryFactory
 from open_inwoner.utils.logentry import LOG_ACTIONS
 
@@ -33,6 +34,10 @@ class TestProfile(WebTest):
 
     def setUp(self):
         self.user = UserFactory()
+
+        self.config = SiteConfiguration.get_solo()
+        self.config.login_allow_registration = True
+        self.config.save()
 
     def test_registration_is_logged(self):
         user = UserFactory.build()
@@ -519,7 +524,7 @@ class TestActions(WebTest):
         self.assertEqual(
             log_entry.extra_data,
             {
-                "message": _("action was modified"),
+                "message": "Changed: Naam.",
                 "action_flag": list(LOG_ACTIONS[CHANGE]),
                 "content_object_repr": "Updated name",
             },
@@ -539,7 +544,10 @@ class TestMessages(WebTest):
 
     def test_created_message_action_from_contacts_is_logged(self):
         response = self.app.get(
-            reverse("accounts:inbox"), {"with": self.other_user.email}, user=self.me
+            reverse("accounts:inbox"),
+            {"with": self.other_user.email},
+            user=self.me,
+            auto_follow=True,
         )
         form = response.forms["message-form"]
         form["content"] = "some content"

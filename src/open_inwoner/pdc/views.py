@@ -12,7 +12,6 @@ from open_inwoner.pdc.forms import ProductFinderForm
 from open_inwoner.pdc.models.product import ProductCondition
 from open_inwoner.plans.models import Plan
 from open_inwoner.questionnaire.models import QuestionnaireStep
-from open_inwoner.utils.views import CustomDetailBreadcrumbMixin
 
 from .choices import YesNo
 from .forms import ProductFinderForm
@@ -59,11 +58,29 @@ class HomeView(TemplateView):
         config = SiteConfiguration.get_solo()
 
         limit = 3 if self.request.user.is_authenticated else 4
-        kwargs.update(categories=Category.get_root_nodes()[:limit])
+        kwargs.update(categories=Category.objects.all().order_by("name")[:limit])
         kwargs.update(product_locations=ProductLocation.objects.all()[:1000])
-        kwargs.update(questionnaire_roots=QuestionnaireStep.get_root_nodes())
+        kwargs.update(
+            questionnaire_roots=QuestionnaireStep.get_root_nodes().filter(
+                highlighted=True
+            )
+        )
         if self.request.user.is_authenticated:
             kwargs.update(plans=Plan.objects.connected(self.request.user)[:limit])
+
+        # Highlighted categories
+        highlighted_categories = (
+            Category.objects.all().filter(highlighted=True).order_by("name")[:limit]
+        )
+        if not self.request.user.is_authenticated and highlighted_categories:
+            kwargs.update(categories=highlighted_categories)
+        if (
+            self.request.user.is_authenticated
+            and self.request.user.selected_themes.exists()
+        ):
+            kwargs.update(
+                categories=self.request.user.selected_themes.order_by("name")[:3]
+            )
 
         # Product finder:
         if config.show_product_finder:
@@ -130,7 +147,10 @@ class CategoryDetailView(BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailVie
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["subcategories"] = self.object.get_children()
-        context["products"] = self.object.products.all()
+        context["products"] = self.object.products.order_by("name")
+        context["questionnaire_roots"] = QuestionnaireStep.get_root_nodes().filter(
+            category=self.object
+        )
         return context
 
     def get_breadcrumb_name(self):
@@ -169,6 +189,7 @@ class ProductDetailView(BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView
         anchors.append(("#share", _("Delen")))
 
         context["anchors"] = anchors
+        context["related_products_start"] = 6 if product.links.exists() else 1
         return context
 
 
@@ -273,8 +294,6 @@ class ProductFinderView(FormView):
             for _order, answer in current_answers.items():
                 if answer.get("answer") == YesNo.no:
                     products = products.exclude(conditions=answer.get("condition"))
-                else:
-                    products = products.filter(conditions=answer.get("condition"))
         return products
 
     def filter_possible_products(self, condition_products, matched):

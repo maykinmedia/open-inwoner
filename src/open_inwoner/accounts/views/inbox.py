@@ -121,7 +121,6 @@ class InboxView(LogMixin, LoginRequiredMixin, PaginationMixin, FormView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["user"] = self.request.user
-
         return kwargs
 
     def form_valid(self, form):
@@ -136,6 +135,14 @@ class InboxView(LogMixin, LoginRequiredMixin, PaginationMixin, FormView):
     def get(self, request, *args, **kwargs):
         """Mark all messages as seen for the receiver"""
         context = self.get_context_data()
+
+        # Redirect to the end of page.
+        # Redirecting to a hash doesn't work, so we need to change the url.
+        # Alter URL with redirected query param in order to go to the last message (#messages-last).
+        if not request.GET.get("redirected"):
+            return HttpResponseRedirect(
+                str(furl(request.get_full_path()).add({"redirected": True}))
+            )
 
         self.mark_messages_seen(other_user=context["other_user"])
         return self.render_to_response(context)

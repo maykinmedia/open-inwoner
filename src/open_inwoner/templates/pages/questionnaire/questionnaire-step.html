@@ -4,8 +4,8 @@
 {% block content %}
     {% render_grid %}
         {% render_column span=9 %}
-            <h1 class="h1">
-                {{ form.instance.get_title }}
+            <h1 class="h1" data-title="{{ form.instance.get_title }}" data-code="{{ form.instance.code }}">
+                <span>{{ form.instance.get_title }}</span>
                 {% if not form.instance.get_children %}
                     {% button href="questionnaire:questionnaire_export" text=_("Export pdf") primary=True icon="file-pdf" icon_position="after" title=_("Your results are also saved to your profile if you are logged in.") %}
                 {% endif %}
@@ -17,7 +17,7 @@
 
             {% step_indicator form.instance.depth form.instance.depth object_list=form.instance.get_tree_path object_list_str='question_subject' %}
 
-            <h4 class="h4">{{ form.instance.question }}</h4>
+            <h4 class="h4" id="question">{{ form.instance.question }}</h4>
 
             {% if form.instance.help_text %}
                 <p class="p p--compact">{{ form.instance.help_text }}</p>

@@ -7,7 +7,7 @@ from import_export.formats import base_formats
 from ordered_model.admin import OrderedModelAdmin
 
 from open_inwoner.ckeditor5.widgets import CKEditorWidget
-from open_inwoner.utils.views import LogMixin
+from open_inwoner.utils.logentry import system_action
 
 from ..models import (
     Product,
@@ -49,7 +49,7 @@ class ProductAdminForm(forms.ModelForm):
 
 
 @admin.register(Product)
-class ProductAdmin(ImportExportMixin, LogMixin, admin.ModelAdmin):
+class ProductAdmin(ImportExportMixin, admin.ModelAdmin):
     list_display = ("name", "created_on", "display_categories")
     list_filter = ("categories", "tags")
     date_hierarchy = "created_on"
@@ -85,7 +85,7 @@ class ProductAdmin(ImportExportMixin, LogMixin, admin.ModelAdmin):
 
         if request.method == "POST":
             user = request.user
-            self.log_system_action(_("products were exported"), user)
+            system_action(_("products were exported"), user)
 
         return response
 

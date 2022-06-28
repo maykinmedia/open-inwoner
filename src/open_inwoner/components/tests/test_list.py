@@ -31,7 +31,7 @@ class TestListItem(InclusionTagWebTest):
     def test_href(self):
         self.assertNotSelector("a", {"text": "Lorem ipsum", "description": "Dolor sit"})
         a = self.assertSelector(
-            "h4 a",
+            "a",
             {
                 "text": "Lorem ipsum",
                 "description": "Dolor sit",

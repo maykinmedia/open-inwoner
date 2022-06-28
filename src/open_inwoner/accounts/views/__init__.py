@@ -1,6 +1,7 @@
 from .actions import (
     ActionCreateView,
     ActionExportView,
+    ActionHistoryView,
     ActionListExportView,
     ActionListView,
     ActionPrivateMediaView,
@@ -30,4 +31,4 @@ from .profile import (
     MyProfileExportView,
     MyProfileView,
 )
-from .registration import CustomRegistrationView
+from .registration import CustomRegistrationView, NecessaryFieldsUserView

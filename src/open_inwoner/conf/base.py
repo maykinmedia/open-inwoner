@@ -118,11 +118,6 @@ INSTALLED_APPS = [
     "corsheaders",
     "rest_framework",
     "rest_framework.authtoken",
-    "allauth",
-    "allauth.account",
-    "allauth.socialaccount",
-    "dj_rest_auth",
-    "dj_rest_auth.registration",
     "drf_spectacular",
     "axes",
     "sniplates",
@@ -147,6 +142,8 @@ INSTALLED_APPS = [
     "privates",
     "fontawesomefree",
     "timeline_logger",
+    "csp",
+    "cspreports",
     # Project applications.
     "open_inwoner.accounts",
     "open_inwoner.components",
@@ -160,6 +157,7 @@ INSTALLED_APPS = [
     "open_inwoner.openzaak",
     "open_inwoner.questionnaire",
     "open_inwoner.extended_sessions",
+    "open_inwoner.custom_csp",
 ]
 
 MIDDLEWARE = [
@@ -170,6 +168,9 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "csp.contrib.rate_limiting.RateLimitedCSPMiddleware",
+    "csp.middleware.CSPMiddleware",
+    "open_inwoner.custom_csp.middleware.UpdateCSPMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "axes.middleware.AxesMiddleware",
@@ -177,6 +178,7 @@ MIDDLEWARE = [
     "django_otp.middleware.OTPMiddleware",
     "django.contrib.flatpages.middleware.FlatpageFallbackMiddleware",
     "open_inwoner.extended_sessions.middleware.SessionTimeoutMiddleware",
+    "open_inwoner.accounts.middleware.NecessaryFieldsMiddleware",
 ]
 
 ROOT_URLCONF = "open_inwoner.urls"
@@ -456,11 +458,32 @@ HIJACK_ALLOW_GET_REQUESTS = True
 # SENTRY - error monitoring
 #
 SENTRY_DSN = config("SENTRY_DSN", None)
-RELEASE = "v0.7"  # get_current_version()
+RELEASE = "v0.8"  # get_current_version()
 
 PRIVATE_MEDIA_ROOT = os.path.join(BASE_DIR, "private_media")
+FILER_ROOT = os.path.join(BASE_DIR, "media", "filer")
+FILER_THUMBNAIL_ROOT = os.path.join(BASE_DIR, "media", "filer_thumbnails")
 if MEDIA_SUBFOLDER:
     PRIVATE_MEDIA_ROOT = os.path.join(PRIVATE_MEDIA_ROOT, MEDIA_SUBFOLDER)
+    FILER_ROOT = os.path.join(FILER_ROOT, MEDIA_SUBFOLDER)
+    FILER_THUMBNAIL_ROOT = os.path.join(FILER_THUMBNAIL_ROOT, MEDIA_SUBFOLDER)
+
+FILER_STORAGES = {
+    "public": {
+        "main": {
+            "OPTIONS": {
+                "location": FILER_ROOT,
+                "base_url": "/media/filer/",
+            },
+        },
+        "thumbnails": {
+            "OPTIONS": {
+                "location": FILER_THUMBNAIL_ROOT,
+                "base_url": "/media/filer_thumbnails/",
+            },
+        },
+    },
+}
 
 SENDFILE_ROOT = PRIVATE_MEDIA_ROOT
 SENDFILE_BACKEND = "django_sendfile.backends.simple"
@@ -474,13 +497,6 @@ ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_EMAIL_VERIFICATION = "none"
-REST_AUTH_REGISTER_SERIALIZERS = {
-    "REGISTER_SERIALIZER": "open_inwoner.api.accounts.serializers.RegisterSerializer"
-}
-
-REST_AUTH_SERIALIZERS = {
-    "USER_DETAILS_SERIALIZER": "open_inwoner.api.accounts.serializers.users.UserCustomSerializer",
-}
 
 REST_FRAMEWORK = {
     # YOUR SETTINGS
@@ -751,6 +767,64 @@ MAIL_EDITOR_CONF = {
             },
         ],
     },
+    "plan_action_update": {
+        "name": _("Plan action update"),
+        "description": _(
+            "This email is used to notify plan participants about the change in the plan action"
+        ),
+        "subject_default": "Plan action has been updated at {{ site_name }}",
+        "body_default": """
+            <p>Beste</p>
+
+            <p>You are receiving this email because the action in your <a href="{{ plan_url }}">plan</a> was updated.</p>
+
+            <table>
+                <tr>
+                    <th>Action name</th>
+                    <td>{{ action.name }}</td>
+                </tr>
+                <tr>
+                    <th>Plan</th>
+                    <td><a href="{{ plan_url }}">{{ plan.title }}</a></td>
+                </tr>
+                <tr>
+                    <th>Updated at</th>
+                    <td>{{ action.updated_on }}</td>
+                </tr>
+                <tr>
+                    <th>Details</th>
+                    <td>{{ message }}</td>
+                </tr>
+            </table>
+
+            <p>Met vriendelijke groet,
+            {{ site_name }} </p>
+       """,
+        "subject": [
+            {
+                "name": "site_name",
+                "description": _("Name of the site."),
+            },
+        ],
+        "body": [
+            {
+                "name": "action",
+                "description": _("Action that was updated"),
+            },
+            {
+                "name": "plan",
+                "description": _("Plan the updated action belongs to"),
+            },
+            {
+                "name": "plan_url",
+                "description": _("The link to the plan."),
+            },
+            {
+                "name": "site_name",
+                "description": _("Name of the site"),
+            },
+        ],
+    },
 }
 MAIL_EDITOR_BASE_CONTEXT = {"site_name": "Open Inwoner Platform"}
 CKEDITOR_CONFIGS = {
@@ -813,3 +887,20 @@ DIGID = {
     # (False).
     "want_assertions_signed": DIGID_WANT_ASSERTIONS_SIGNED,
 }
+
+THUMBNAIL_ALIASES = {
+    "": {
+        "logo": {
+            "size": (21600, 60),
+            "upscale": True,
+        },
+        "card-image": {
+            "size": (256, 320),
+            "crop": True,
+        },
+    }
+}
+
+TEST_RUNNER = "django_rich.test.RichRunner"
+
+from .app.csp import *  # noqa

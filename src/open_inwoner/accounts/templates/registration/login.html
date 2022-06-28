@@ -16,13 +16,14 @@
                 <br>
 
                     {% render_card direction='horizontal' tinted=True %}
-                        {% static 'accounts/digid_logo.svg' as digid_logo_src %}
-                        {% logo src=digid_logo_src alt=_('Inloggen met DigiD') height="40" href='digid:login' %}
+                        <a href="{% url 'digid:login' %}" class="link digid-logo" aria-describedby="Digid logo" title="Digid logo">
+                            <img class="digid-logo__image" src="{% static 'accounts/digid_logo.svg' %}" alt="Digid logo">
+                        </a>
                         {% link bold=True href='digid:login' text=_('Inloggen met DigiD') secondary=True icon='arrow_forward' %}
                     {% endrender_card %}
 
                 {% if login_allow_registration %}
-                    {% render_card tinted=True %} 
+                    {% render_card tinted=True %}
                         {% render_form id="login-form" method="POST" form=form %}
                             {% csrf_token %}
                             {% input form.username %}

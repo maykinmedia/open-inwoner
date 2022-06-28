@@ -66,7 +66,7 @@ class TestAdminTimelineLogging(WebTest):
         self.assertEquals(
             log_entry.extra_data,
             {
-                "message": _("Voornaam en Aangemaakt door gewijzigd."),
+                "message": "Voornaam and Aangemaakt door gewijzigd.",
                 "action_flag": list(LOG_ACTIONS[CHANGE]),
                 "content_object_repr": f"Vasileios {contact.last_name}",
             },
@@ -97,7 +97,12 @@ class TestAdminTimelineLogging(WebTest):
         response = self.app.get(url, user=self.user, expect_errors=True)
         self.assertEquals(response.status_code, 403)
 
-    def test_user_does_not_have_change_permission(self):
+    def test_superuser_does_not_have_add_permission(self):
+        log_url = reverse("admin:timeline_logger_timelinelog_add")
+        response = self.app.get(log_url, user=self.user, expect_errors=True)
+        self.assertEquals(response.status_code, 403)
+
+    def test_superuser_does_not_have_change_permission(self):
         add_url = reverse("admin:accounts_contact_add")
         add_form = self.app.get(add_url, user=self.user).forms.get("contact_form")
         add_form["first_name"] = self.contact.first_name
@@ -110,12 +115,10 @@ class TestAdminTimelineLogging(WebTest):
             "admin:timeline_logger_timelinelog_change",
             kwargs={"object_id": log_entry.id},
         )
-        log_form = self.app.get(log_url, user=self.user).forms["timelinelog_form"]
-        log_form["object_id"] = 29
-        response = log_form.submit(expect_errors=True)
+        response = self.app.post(log_url, user=self.user, expect_errors=True)
         self.assertEquals(response.status_code, 403)
 
-    def test_user_does_not_have_delete_permission(self):
+    def test_superuser_does_not_have_delete_permission(self):
         add_url = reverse("admin:accounts_contact_add")
         add_form = self.app.get(add_url, user=self.user).forms.get("contact_form")
         add_form["first_name"] = self.contact.first_name
@@ -180,6 +183,16 @@ class TestAdminTimelineLogging(WebTest):
             CustomTimelineLogAdmin, log_entry
         )
         self.assertEquals(action, "")
+
+    def test_object_link_returns_right_link(self):
+        self.add_instance()
+        url = reverse("admin:timeline_logger_timelinelog_changelist")
+        response = self.app.get(url, user=self.user)
+        contact = Contact.objects.first()
+        obj_link = reverse(
+            "admin:accounts_contact_change", kwargs={"object_id": contact.id}
+        )
+        self.assertContains(response, obj_link)
 
 
 class TestTimelineLogExport(WebTest):

@@ -4,11 +4,13 @@ from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
 
 from django_webtest import WebTest
+from furl import furl
 
 from open_inwoner.configurations.models import SiteConfiguration
 
+from ..choices import LoginTypeChoices
 from ..models import User
-from .factories import InviteFactory, UserFactory
+from .factories import ContactFactory, InviteFactory, UserFactory
 
 
 class TestRegistrationFunctionality(WebTest):
@@ -17,6 +19,10 @@ class TestRegistrationFunctionality(WebTest):
     def setUp(self):
         # Create a User instance that's not saved
         self.user = UserFactory.build()
+
+        self.config = SiteConfiguration.get_solo()
+        self.config.login_allow_registration = True
+        self.config.save()
 
     def test_registration_succeeds_with_right_user_input(self):
         register_page = self.app.get(reverse("django_registration_register"))
@@ -69,28 +75,24 @@ class TestRegistrationFunctionality(WebTest):
 
         response = form.submit()
 
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("django_registration_complete"))
-
-        inactive_user.refresh_from_db()
-
-        self.assertTrue(inactive_user.is_active)
-        self.assertEqual(inactive_user.first_name, "John")
-        self.assertEqual(inactive_user.last_name, "Smith")
-        self.assertEqual(inactive_user.contacts.count(), 0)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context["errors"].as_text(), "* Deze gebruiker is gedeactiveerd"
+        )
 
     def test_registration_with_invite(self):
-        invite = InviteFactory.create(
-            contact__created_by__email=self.user.email,
-            contact__contact_user__is_active=False,
-        )
-        invitee = invite.invitee
+        email = self.user.email
+        contact = ContactFactory.create(email=email, contact_user=None)
+        invite = InviteFactory.create(contact=contact, invitee=None)
+        self.assertFalse(User.objects.filter(email=email).exists())
+
         register_page = self.app.get(f"{self.url}?invite={invite.key}")
         form = register_page.forms["registration-form"]
 
-        # check that email is prefilled and read-only
-        self.assertEqual(form["email"].value, invitee.email)
-        self.assertEqual(form["email"].attrs.get("readonly"), "readonly")
+        # check that fields are prefilled with invite data
+        self.assertEqual(form["email"].value, email)
+        self.assertEqual(form["first_name"].value, contact.first_name)
+        self.assertEqual(form["last_name"].value, contact.last_name)
 
         form["password1"] = "somepassword"
         form["password2"] = "somepassword"
@@ -99,14 +101,168 @@ class TestRegistrationFunctionality(WebTest):
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("django_registration_complete"))
+        self.assertTrue(User.objects.filter(email=email).exists())
 
-        invitee.refresh_from_db()
+        user = User.objects.get(email=email)
+        contact.refresh_from_db()
+        invite.refresh_from_db()
 
-        self.assertTrue(invitee.is_active)
-        self.assertEqual(invitee.contacts.count(), 1)
+        self.assertEqual(user.first_name, contact.first_name)
+        self.assertEqual(user.last_name, contact.last_name)
+        self.assertEqual(contact.contact_user, user)
+        self.assertEqual(invite.invitee, user)
 
-        contact = invitee.contacts.get()
-        self.assertEqual(contact.contact_user, invite.inviter)
+        # reverse contact checks
+        self.assertEqual(user.contacts.count(), 1)
+        reverse_contact = user.contacts.get()
+        self.assertEqual(reverse_contact.contact_user, contact.created_by)
+        self.assertEqual(reverse_contact.email, contact.created_by.email)
+        self.assertEqual(reverse_contact.first_name, contact.created_by.first_name)
+        self.assertEqual(reverse_contact.last_name, contact.created_by.last_name)
+
+    def test_registration_active_user(self):
+        """the user should be redirected to the registration complete page"""
+
+        user = UserFactory.create()
+
+        get_response = self.app.get(self.url, user=user)
+
+        self.assertEqual(get_response.status_code, 302)
+        self.assertEqual(get_response.url, reverse("django_registration_complete"))
+
+
+class TestRegistrationDigid(WebTest):
+    url = reverse_lazy("django_registration_register")
+
+    def test_registration_page_only_digid(self):
+        get_response = self.app.get(self.url)
+
+        self.assertEqual(get_response.status_code, 200)
+        self.assertIsNone(get_response.html.find(id="registration-form"))
+
+        digid_tag = get_response.html.find("a", title="Registreren met DigiD")
+        self.assertIsNotNone(digid_tag)
+        self.assertEqual(
+            digid_tag.attrs["href"],
+            furl(reverse("digid:login"))
+            .add({"next": reverse("accounts:registration_necessary")})
+            .url,
+        )
+
+    def test_registration_page_only_digid_with_invite(self):
+        invite = InviteFactory.create()
+
+        get_response = self.app.get(f"{self.url}?invite={invite.key}")
+
+        self.assertEqual(get_response.status_code, 200)
+        self.assertIsNone(get_response.html.find(id="registration-form"))
+
+        digid_tag = get_response.html.find("a", title="Registreren met DigiD")
+        self.assertIsNotNone(digid_tag)
+        necessary_url = (
+            furl(reverse("accounts:registration_necessary"))
+            .add({"invite": invite.key})
+            .url
+        )
+        self.assertEqual(
+            digid_tag.attrs["href"],
+            furl(reverse("digid:login")).add({"next": necessary_url}).url,
+        )
+
+
+class TestRegistrationNecessary(WebTest):
+    url = reverse_lazy("accounts:registration_necessary")
+
+    def test_any_page_for_digid_user_redirect_to_necessary_fields(self):
+        user = UserFactory(
+            first_name="",
+            last_name="",
+            login_type=LoginTypeChoices.digid,
+        )
+        urls = [
+            reverse("root"),
+            reverse("pdc:category_list"),
+            reverse("accounts:my_profile"),
+            reverse("accounts:inbox"),
+            reverse("accounts:my_cases"),
+            reverse("plans:plan_list"),
+            reverse("general_faq"),
+        ]
+
+        for url in urls:
+            with self.subTest(url=url):
+                response = self.app.get(url, user=user)
+
+                self.assertRedirects(
+                    response, reverse("accounts:registration_necessary")
+                )
+
+    def test_submit_without_invite(self):
+        user = UserFactory(
+            first_name="",
+            last_name="",
+            login_type=LoginTypeChoices.digid,
+        )
+        self.assertTrue(user.require_necessary_fields())
+
+        get_response = self.app.get(self.url, user=user)
+        form = get_response.forms["necessary-form"]
+
+        form["email"] = "john@smith.com"
+        form["first_name"] = "John"
+        form["last_name"] = "Smith"
+
+        response = form.submit()
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("django_registration_complete"))
+
+        user.refresh_from_db()
+
+        self.assertFalse(user.require_necessary_fields())
+        self.assertEqual(user.email, "john@smith.com")
+        self.assertEqual(user.first_name, "John")
+        self.assertEqual(user.last_name, "Smith")
+
+    def test_submit_with_invite(self):
+        user = UserFactory(
+            first_name="",
+            last_name="",
+            login_type=LoginTypeChoices.digid,
+        )
+        contact = ContactFactory.create(contact_user=None)
+        invite = InviteFactory.create(contact=contact, invitee=None)
+
+        get_response = self.app.get(f"{self.url}?invite={invite.key}", user=user)
+        form = get_response.forms["necessary-form"]
+
+        # assert initials are retrieved from invite.contact
+        self.assertEqual(form["email"].value, contact.email)
+        self.assertEqual(form["first_name"].value, contact.first_name)
+        self.assertEqual(form["last_name"].value, contact.last_name)
+
+        response = form.submit()
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("django_registration_complete"))
+
+        user.refresh_from_db()
+        contact.refresh_from_db()
+        invite.refresh_from_db()
+
+        self.assertEqual(user.first_name, contact.first_name)
+        self.assertEqual(user.last_name, contact.last_name)
+        self.assertEqual(user.email, contact.email)
+        self.assertEqual(contact.contact_user, user)
+        self.assertEqual(invite.invitee, user)
+
+        # reverse contact checks
+        self.assertEqual(user.contacts.count(), 1)
+        reverse_contact = user.contacts.get()
+        self.assertEqual(reverse_contact.contact_user, contact.created_by)
+        self.assertEqual(reverse_contact.email, contact.created_by.email)
+        self.assertEqual(reverse_contact.first_name, contact.created_by.first_name)
+        self.assertEqual(reverse_contact.last_name, contact.created_by.last_name)
 
 
 class TestLoginLogoutFunctionality(WebTest):
@@ -208,14 +364,19 @@ class TestPasswordResetFunctionality(WebTest):
         ).follow()
         self.assertContains(confirm_response, _("Mijn wachtwoord wijzigen"))
 
+    def test_custom_password_reset_form_sends_email_when_user_is_default(self):
+        self.app.post(reverse("password_reset"), {"email": self.user.email})
+        self.assertEqual(len(mail.outbox), 1)
 
-class TestPasswordChangeTemplates(WebTest):
+    def test_custom_password_reset_form_does_not_send_email_when_user_is_digid(self):
+        digid_user = UserFactory(login_type=LoginTypeChoices.digid)
+        self.app.post(reverse("password_reset"), {"email": digid_user.email})
+        self.assertEqual(len(mail.outbox), 0)
+
+
+class TestPasswordChange(WebTest):
     def setUp(self):
         self.user = UserFactory()
-
-    def test_password_change_button_is_rendered(self):
-        response = self.app.get(reverse("accounts:my_profile"), user=self.user)
-        self.assertContains(response, _("Wijzig wachtwoord"))
 
     def test_password_change_form_custom_template_is_rendered(self):
         response = self.app.get(reverse("password_change"), user=self.user)
@@ -224,3 +385,21 @@ class TestPasswordChangeTemplates(WebTest):
     def test_password_change_form_done_custom_template_is_rendered(self):
         response = self.app.get(reverse("password_change_done"), user=self.user)
         self.assertContains(response, _("Uw wachtwoord is gewijzigd."))
+
+    def test_password_change_button_is_rendered_with_default_login_type(self):
+        response = self.app.get(reverse("accounts:my_profile"), user=self.user)
+        self.assertContains(response, _("Wijzig wachtwoord"))
+
+    def test_password_change_button_is_not_rendered_with_digid_login_type(self):
+        digid_user = UserFactory(login_type=LoginTypeChoices.digid)
+        response = self.app.get(reverse("accounts:my_profile"), user=digid_user)
+        self.assertNotContains(response, _("Wijzig wachtwoord"))
+
+    def test_anonymous_user_is_redirected_to_login_page_if_password_change_is_accessed(
+        self,
+    ):
+        response = self.app.get(reverse("password_change"))
+        expected_url = (
+            furl(reverse("login")).add({"next": reverse("password_change")}).url
+        )
+        self.assertRedirects(response, expected_url)

@@ -56,10 +56,8 @@
   }
 
   .link {
-    height: var(--row-height);
     box-sizing: border-box;
     padding: var(--spacing-large);
-    white-space: nowrap;
 
     @media (min-width: 768px) {
       border-left: var(--border-width) solid;
@@ -90,6 +88,14 @@
   }
 
   .button {
-    margin: var(--spacing-medium) 0;
+    margin: 0;
+    border-radius: 0;
+    height: var(--row-height);
+
+    @media (min-width: 768px) {
+      margin: var(--spacing-medium) 0;
+      height: var(--row-height-big);
+      border-radius: var(--border-radius);
+    }
   }
 }

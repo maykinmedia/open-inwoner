@@ -125,9 +125,21 @@
   }
 
   &--disabled {
+    background-color: var(--color-gray) !important;
+    border-color: var(--color-gray) !important;
     color: var(--color-gray-light);
     pointer-events: none;
     cursor: default;
+  }
+
+  &--danger {
+    background-color: var(--color-danger-lighter);
+    color: var(--color-white);
+
+    &:hover {
+      transform: translateY(-1px);
+      background-color: var(--color-danger);
+    }
   }
 
   > .link__text {

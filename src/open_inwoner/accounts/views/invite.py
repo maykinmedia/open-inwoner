@@ -33,4 +33,8 @@ class InviteAcceptView(LogMixin, UpdateView):
             self.log_system_action(_("invitation expired"), invite)
             raise Http404(_("The invitation was expired"))
 
+        if invite.accepted:
+            self.log_system_action(_("invitation used"), invite)
+            raise Http404(_("The invitation was already used"))
+
         return invite

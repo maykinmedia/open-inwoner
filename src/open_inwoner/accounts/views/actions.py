@@ -12,6 +12,7 @@ from django.views.generic.edit import UpdateView
 from privates.views import PrivateMediaView
 from view_breadcrumbs import BaseBreadcrumbMixin
 
+from open_inwoner.utils.logentry import get_change_message
 from open_inwoner.utils.mixins import ExportMixin
 from open_inwoner.utils.views import LogMixin
 
@@ -101,7 +102,10 @@ class ActionUpdateView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, Update
     def form_valid(self, form):
         self.object = form.save(self.request.user)
 
-        self.log_change(self.object, _("action was modified"))
+        # log if the action was changed
+        if form.changed_data:
+            changed_message = get_change_message(form=form)
+            self.log_change(self.object, changed_message)
         return HttpResponseRedirect(self.get_success_url())
 
 
@@ -177,3 +181,31 @@ class ActionPrivateMediaView(LogMixin, LoginRequiredMixin, PrivateMediaView):
             return True
 
         return False
+
+
+class ActionHistoryView(LoginRequiredMixin, BaseBreadcrumbMixin, DetailView):
+    template_name = "pages/history.html"
+    model = Action
+    slug_field = "uuid"
+    slug_url_kwarg = "uuid"
+
+    @cached_property
+    def crumbs(self):
+        return [
+            (_("Mijn profiel"), reverse("accounts:my_profile")),
+            (_("Mijn acties"), reverse("accounts:action_list")),
+            (
+                _("History of {}").format(self.object.name),
+                reverse("accounts:action_history", kwargs=self.kwargs),
+            ),
+        ]
+
+    def get_queryset(self):
+        base_qs = super().get_queryset()
+        return base_qs.connected(user=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context["logs"] = self.object.logs.order_by()
+        return context
