@@ -6,8 +6,8 @@ from freezegun import freeze_time
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 
-from .factories import UserFactory
 from ..models import User
+from .factories import UserFactory
 
 
 class UserTests(TestCase):
