@@ -24,75 +24,73 @@
     {% endbutton_row %}
 </h1>
 
-<table class="table table--vertical">
-    <tr>
-        <th class="table__header">
-            {% icon icon="person_outline" %}<br>
-            {{ request.user.get_full_name }}<br>
-            {% if request.user.get_address %}{{ request.user.get_address }}{% else %}-{% endif %}
-        </th>
-        <td class="table__item">
-            {% icon icon="calendar_today" %}<br>
-            {% trans "Geboortedatum" %}:<br>
-            {% if request.user.birthday %}{{ request.user.birthday|date:"d-m-Y" }}{% else %}-{% endif %}
-        </td>
-        <td class="table__item">
-            {% icon icon="desktop_windows" %}<br>
-            {% trans "Actief sinds" %}:<br>
-            {{ request.user.date_joined|date:"d-m-Y" }}
-        </td>
-        <td class="table__item">
-            {% icon icon="content_paste" %}<br>
-            {% trans "Volgende actie" %}:<br>
-            {{ next_action.end_date|date:"d-m-Y" }}
-        </td>
-    </tr>
-</table>
+<div class="personal-information">
+    <div class="personal-information__block personal-information__block--bold">
+        {% icon icon="person_outline" %}<br>
+        {{ request.user.get_full_name }}<br>
+        {% if request.user.get_address %}{{ request.user.get_address }}{% else %}-{% endif %}
+    </div>
+    <div class="personal-information__block">
+        {% icon icon="calendar_today" %}<br>
+        {% trans "Geboortedatum" %}:<br>
+        {% if request.user.birthday %}{{ request.user.birthday|date:"d-m-Y" }}{% else %}-{% endif %}
+    </div>
+    <div class="personal-information__block">
+        {% icon icon="desktop_windows" %}<br>
+        {% trans "Actief sinds" %}:<br>
+        {{ request.user.date_joined|date:"d-m-Y" }}
+    </div>
+    <div class="personal-information__block">
+        {% icon icon="content_paste" %}<br>
+        {% trans "Volgende actie" %}:<br>
+        {{ next_action.end_date|date:"d-m-Y" }}
+    </div>
+</div>
 
-<table class="table" id="overview">
-    <tr>
-        <th class="table__header">{% trans "Interessegebieden" %}</th>
-        <td class="table__item">{{ theme_text }}</td>
-        <td class="table__item table__item--right">{% link href="accounts:my_themes" text="Aanpassen" icon="arrow_forward" icon_position="after" primary=True %}</td>
-    </tr>
-    <tr>
-        <th class="table__header">{% trans "Begeleider van de gemeente" %}</th>
+<h1 class="h1" id="overview">{% trans "Persoonlijk overzicht" %}</h1>
+
+<div class="tabled tabled--flexible" id="overview">
+    <div class="tabled__row">
+        <div class="tabled__item tabled__item--bold">{% trans "Interessegebieden" %}</div>
+        <div class="tabled__item">{{ theme_text }}</div>
+        <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="accounts:my_themes" text="Aanpassen" icon="arrow_forward" icon_position="after" primary=True %}</div>
+    </div>
+    <div class="tabled__row">
+        <div class="tabled__item tabled__item--bold">{% trans "Begeleider van de gemeente" %}</div>
         {% if mentor_contacts %}
-            <td class="table__item">{{ mentor_contacts|join:", " }}</td>
+            <div class="tabled__item">{{ mentor_contacts|join:", " }}</div>
             {% url 'accounts:contact_list' as mentor_url %}
-            <td class="table__item table__item--right">{% link href=mentor_url|add:"?type=begeleider" text="Stuur een bericht" icon="arrow_forward" icon_position="after" primary=True %}</td>
+            <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href=mentor_url|add:"?type=begeleider" text="Stuur een bericht" icon="arrow_forward" icon_position="after" primary=True %}</div>
         {% else %}
-            <td class="table__item">{% trans "U heeft (nog) geen gemeentelijke begeleider." %}</td>
-            <td class="table__item table__item--right"></td>
+            <div class="tabled__item">{% trans "U heeft (nog) geen gemeentelijke begeleider." %}</div>
+            <div class="tabled__item tabled__item--force-right tabled__item--mobile-big"></div>
         {% endif %}
-    </tr>
-    <tr>
-        <th class="table__header">{% trans "Mijn netwerkcontacten" %}</th>
-        <td class="table__item">{{ contact_text }}</td>
-        <td class="table__item table__item--right">{% link href="accounts:contact_list" text=_("Beheer contacten") icon="arrow_forward" icon_position="after" primary=True %}</td>
-    </tr>
+    </div>
+    <div class="tabled__row">
+        <div class="tabled__item tabled__item--bold">{% trans "Mijn netwerkcontacten" %}</div>
+        <div class="tabled__item">{{ contact_text }}</div>
+        <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="accounts:contact_list" text=_("Beheer contacten") icon="arrow_forward" icon_position="after" primary=True %}</div>
+    </div>
     {% if questionnaire_exists %}
-        <tr>
-            <th class="table__header">{% trans "Zelfdiagnose" %}</th>
-            <td class="table__item"></td>
-            <td class="table__item table__item--right">{% link href='questionnaire:questionnaire_list' text=_('Start zelfdiagnose') icon="arrow_forward" icon_position="after" primary=True %}</td>
-        </tr>
+        <div class="tabled__row">
+            <div class="tabled__item tabled__item--bold">{% trans "Zelfdiagnose" %}</div>
+            <div class="tabled__item"></div>
+            <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href='questionnaire:questionnaire_list' text=_('Start zelfdiagnose') icon="arrow_forward" icon_position="after" primary=True %}</div>
+        </div>
     {% endif %}
-    <tr>
-        <th class="table__header">{% trans "Acties" %}</th>
-        <td class="table__item">{{ action_text }}</td>
-        <td class="table__item table__item--right">{% link href="accounts:action_list" text="Aanpassen" icon="arrow_forward" icon_position="after" primary=True %}</td>
-    </tr>
-    {% comment %}
-    <tr>
-        <th class="table__header">{% trans "Afspraken" %}</th>
-        <td class="table__item">4 afspraken, eerstvolgende voor 6 september</td>
-        <td class="table__item table__item--right">{% link href="#" text="Aanpassen" icon="arrow_forward" icon_position="after" primary=True %}</td>
-    </tr>
-    {% endcomment %}
-</table>
+    <div class="tabled__row">
+        <div class="tabled__item tabled__item--bold">{% trans "Acties" %}</div>
+        <div class="tabled__item">{{ action_text }}</div>
+        <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="accounts:action_list" text="Aanpassen" icon="arrow_forward" icon_position="after" primary=True %}</div>
+    </div>
+    {% comment %} <div class="tabled__row">
+        <div class="tabled__item tabled__item--bold">{% trans "Afspraken" %}</div>
+        <div class="tabled__item">4 afspraken, eerstvolgende voor 6 september</div>
+        <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="#" text="Aanpassen" icon="arrow_forward" icon_position="after" primary=True %}</div>
+    </div> {% endcomment %}
+</div>
 
-{% render_form form=form method="POST" id="deactivate-form" extra_classes="confirm" data_confirm_title=_("Weet je het zeker dat je je account wilt deactiveren?") data_confirm_cancel=_("Nee") data_confirm_default=_("Ja") %}
+{% render_form form=form method="POST" id="deactivate-form" extra_classes="confirm" spaceless=True data_confirm_title=_("Weet je het zeker dat je je account wilt deactiveren?") data_confirm_cancel=_("Nee") data_confirm_default=_("Ja") %}
     {% csrf_token %}
     {% form_actions primary_text=_("Profiel deactiveren") primary_icon="close" transparent=True %}
 {% endrender_form %}
