@@ -180,7 +180,7 @@ django-csp-reports==1.8.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-django-digid-eherkenning==0.3.3
+django-digid-eherkenning @ git+https://github.com/maykinmedia/django-digid-eherkenning.git@feature/digid-logout-callback
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt

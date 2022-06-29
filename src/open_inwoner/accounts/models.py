@@ -180,6 +180,13 @@ class User(AbstractBaseUser, PermissionsMixin):
             return not self.email or self.email.endswith("@openinwoner.nl")
         return False
 
+    def get_logout_url(self) -> str:
+        return (
+            reverse("digid:logout")
+            if self.login_type == LoginTypeChoices.digid
+            else reverse("logout")
+        )
+
 
 class Contact(models.Model):
     uuid = models.UUIDField(
