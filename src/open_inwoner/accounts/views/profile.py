@@ -78,7 +78,7 @@ class MyProfileView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormView)
             self.request.user.deactivate()
 
             self.log_user_action(instance, _("user was deactivated via frontend"))
-            return redirect("logout")
+            return redirect(instance.get_logout_url())
         else:
             messages.warning(request, _("Uw account kon niet worden gedeactiveerd"))
             return redirect("accounts:my_profile")
