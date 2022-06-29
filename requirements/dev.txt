@@ -202,7 +202,7 @@ django-csp-reports==1.8.1
     #   -r requirements/ci.txt
 django-debug-toolbar==3.2.2
     # via -r requirements/dev.in
-django-digid-eherkenning==0.4.0
+django-digid-eherkenning @ git+https://github.com/maykinmedia/django-digid-eherkenning.git@feature/digid-logout-callback
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
