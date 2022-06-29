@@ -7,6 +7,7 @@
         title="{% firstof title text %}"
         aria-describedby="{{ text }}"
         {% if href|startswith:"http" %}target="_blank"{% endif %}
+        {% if id %}id="{{ id }}"{% endif %}
     >
         {% if icon %}{% icon icon=icon outlined=icon_outlined %}{% endif %}
         {% if not hide_text %}{{text}}{% endif %}
