@@ -95,7 +95,7 @@ class InboxPageTests(WebTest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.context["errors"][0],
-            "Of een bericht of een bestand dient te zijn ingevuld",
+            "Of een bericht of een bestand moet ingevuld zijn",
         )
 
     def test_mark_messages_as_seen(self):
