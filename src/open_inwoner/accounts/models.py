@@ -179,6 +179,13 @@ class User(AbstractBaseUser, PermissionsMixin):
             and not self.last_name
         )
 
+    def get_logout_url(self) -> str:
+        return (
+            reverse("digid:logout")
+            if self.login_type == LoginTypeChoices.digid
+            else reverse("logout")
+        )
+
 
 class Contact(models.Model):
     uuid = models.UUIDField(
