@@ -27,8 +27,8 @@
                 {% if oidc_config.enabled %}
                     {% render_card tinted=True direction='horizontal' %}
                     {% if site_config.openid_connect_logo %}
-                        <a href="{% url 'oidc_authentication_init' %}" class="link digid-logo" aria-describedby="{{ site_config.openid_connect_logo.desciption }}" title="{{ site_config.openid_connect_logo.desciption }}">
-                            <img class="digid-logo__image" src="{{ site_config.openid_connect_logo.url }}" alt="{{ site_config.openid_connect_logo.desciption }}">
+                        <a href="{% url 'oidc_authentication_init' %}" class="link digid-logo" aria-describedby="{{ site_config.openid_connect_logo.default_alt_text }}" title="{{ site_config.openid_connect_logo.default_alt_text }}">
+                            <img class="digid-logo__image" src="{{ site_config.openid_connect_logo.url }}" alt="{{ site_config.openid_connect_logo.default_alt_text }}">
                         </a>
                     {% else %}
                         <div></div>
