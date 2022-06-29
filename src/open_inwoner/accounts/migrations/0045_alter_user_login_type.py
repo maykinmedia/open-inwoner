@@ -6,13 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0044_user_oidc_id'),
+        ("accounts", "0044_user_oidc_id"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='user',
-            name='login_type',
-            field=models.CharField(choices=[('default', 'E-mail en Wachtwoord'), ('digid', 'DigiD'), ('eherkenning', 'eHerkenning'), ('oidc', 'OpenId connect')], default='default', max_length=250, verbose_name='Login type'),
+            model_name="user",
+            name="login_type",
+            field=models.CharField(
+                choices=[
+                    ("default", "E-mail en Wachtwoord"),
+                    ("digid", "DigiD"),
+                    ("eherkenning", "eHerkenning"),
+                    ("oidc", "OpenId connect"),
+                ],
+                default="default",
+                max_length=250,
+                verbose_name="Login type",
+            ),
         ),
     ]
