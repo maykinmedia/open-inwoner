@@ -42,6 +42,7 @@ def button(text, **kwargs):
 
     Variables:
         + text: string | this will be the button text.
+        - id: string | the id of the button.
         - class: str | Additional classes.
         - hide_text: bool | whether to hide the text and use aria attribute instead.
         - href: url or string | where the link links to (can be url name).
