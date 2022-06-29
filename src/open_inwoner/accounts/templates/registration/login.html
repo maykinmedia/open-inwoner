@@ -19,13 +19,21 @@
                         <a href="{% url 'digid:login' %}" class="link digid-logo" aria-describedby="Digid logo" title="Digid logo">
                             <img class="digid-logo__image" src="{% static 'accounts/digid_logo.svg' %}" alt="Digid logo">
                         </a>
-                        {% link bold=True href='digid:login' text=_('Inloggen met DigiD') secondary=True icon='arrow_forward' extra_classes="link--digid" %}
+                        {% link href='digid:login' text=_('Inloggen met DigiD') secondary=True icon='arrow_forward' extra_classes="link--digid" %}
                     {% endrender_card %}
 
                 {% get_solo 'mozilla_django_oidc_db.OpenIDConnectConfig' as oidc_config %}
+                {% get_solo 'configurations.SiteConfiguration' as site_config %}
                 {% if oidc_config.enabled %}
-                    {% render_card tinted=True %}
-                        {% button text=_('Login with Azure AD') href='oidc_authentication_init' primary=True icon='arrow_forward' icon_position="after" %}
+                    {% render_card tinted=True direction='horizontal' %}
+                    {% if site_config.openid_connect_logo %}
+                        <a href="{% url 'digid:login' %}" class="link digid-logo" aria-describedby="{{ site_config.openid_connect_logo.desciption }}" title="{{ site_config.openid_connect_logo.desciption }}">
+                            <img class="digid-logo__image" src="{{ site_config.openid_connect_logo.url }}" alt="{{ site_config.openid_connect_logo.desciption }}">
+                        </a>
+                    {% else %}
+                        <div></div>
+                    {% endif %}
+                        {% link text=site_config.openid_connect_login_text href='oidc_authentication_init' secondary=True icon='arrow_forward' icon_position="after" %}
                     {% endrender_card %}
                 {% endif %}
 

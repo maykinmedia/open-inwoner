@@ -38,11 +38,15 @@ class CustomOIDCBackend(OIDCAuthenticationBackend):
         """Return object for a newly created user account."""
         unique_id = self.retrieve_identifier_claim(claims)
 
+        email = f"{unique_id}@openinwoner.nl"
+        if "email" in claims:
+            email = claims["email"]
+
         logger.debug("Creating OIDC user: %s", unique_id)
 
         kwargs = {
             "oidc_id": unique_id,
-            "email": f"{unique_id}@openinwoner.nl",
+            "email": email,
             "login_type": LoginTypeChoices.oidc,
         }
 

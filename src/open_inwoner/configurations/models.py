@@ -265,6 +265,22 @@ class SiteConfiguration(SingletonModel):
             "Als dit is aangevinkt en er zijn product condities gemaakt, dan wordt op de homepagina de productzoeker weergegeven."
         ),
     )
+    openid_connect_logo = FilerImageField(
+        verbose_name=_("Openid Connect Logo"),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="oidc_logo",
+        help_text=_("Logo that can be used for the openid commect login method"),
+    )
+    openid_connect_login_text = models.CharField(
+        verbose_name=_("Openid Connect login text"),
+        max_length=250,
+        default="Login with Azure AD",
+        help_text=_(
+            "The text that should display when Openid connect is set as a login method"
+        ),
+    )
 
     class Meta:
         verbose_name = _("Site Configuration")

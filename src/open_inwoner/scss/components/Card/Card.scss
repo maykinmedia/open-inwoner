@@ -110,18 +110,11 @@
     margin: 0 0 var(--card-spacing);
   }
 
-  .link:not(.logo):not(.link--secondary) {
-    justify-content: space-between;
-    width: 100%;
-  }
-
   &--product {
     padding: 20px;
     align-items: end;
 
     .h3 {
-      // padding: 0;
-      // text-align: left;
       width: 100%;
     }
 
