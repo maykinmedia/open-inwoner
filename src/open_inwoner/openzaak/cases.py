@@ -4,6 +4,7 @@ from typing import List, Optional
 from requests import RequestException
 from zds_client import ClientError
 from zgw_consumers.api_models.base import factory
+from zgw_consumers.api_models.catalogi import ZaakType
 from zgw_consumers.api_models.zaken import Zaak
 from zgw_consumers.service import get_paginated_results
 
@@ -40,7 +41,7 @@ def fetch_cases(user_bsn: str) -> List[Zaak]:
     return cases
 
 
-def fetch_specific_case(case_uuid: str) -> Optional[Zaak]:
+def fetch_single_case(case_uuid: str) -> Optional[Zaak]:
     client = build_client("zaak")
 
     if client is None:
@@ -58,3 +59,43 @@ def fetch_specific_case(case_uuid: str) -> Optional[Zaak]:
     case = factory(Zaak, response)
 
     return case
+
+
+def fetch_case_types() -> List[ZaakType]:
+    client = build_client("catalogi")
+
+    if client is None:
+        return []
+
+    try:
+        response = get_paginated_results(client, "zaaktype")
+    except RequestException as e:
+        logger.exception("exception while making request", exc_info=e)
+        return []
+    except ClientError as e:
+        logger.exception("exception while making request", exc_info=e)
+        return []
+
+    case_types = factory(ZaakType, response)
+
+    return case_types
+
+
+def fetch_single_case_type(case_type_url: str) -> Optional[ZaakType]:
+    client = build_client("catalogi")
+
+    if client is None:
+        return
+
+    try:
+        response = client.retrieve("zaaktype", url=case_type_url)
+    except RequestException as e:
+        logger.exception("exception while making request", exc_info=e)
+        return
+    except ClientError as e:
+        logger.exception("exception while making request", exc_info=e)
+        return
+
+    case_type = factory(ZaakType, response)
+
+    return case_type

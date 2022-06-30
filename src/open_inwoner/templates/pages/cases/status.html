@@ -2,28 +2,34 @@
 {% load i18n anchor_menu_tags card_tags dashboard_tags file_tags grid_tags status_tags %}
 
 {% block sidebar_content %}
-    {% anchor_menu anchors desktop=True %}
+    {% if case %}
+        {% anchor_menu anchors desktop=True %}
+    {% endif %}
 {% endblock sidebar_content %}
 
 {% block content %}
-    {% render_grid %}
-        {% render_column span=9 %}
+    {% if case %}
+        {% render_grid %}
+            {% render_column span=9 %}
 
-            {# Title/dashboard. #}
-            <h1 class="h1" id="title">{{ case.obj.omschrijving }}</h1>
-            {% case_dashboard case=case.obj statuses=case.statuses documents=case.documents %}
+                {# Title/dashboard. #}
+                <h1 class="h1" id="title">{{ case.obj.omschrijving }}</h1>
+                {% case_dashboard case %}
 
-            {#  Status history. #}
-            {% if case.statuses %}
-                <h2 class="h2" id="statuses">{% trans 'Status' %}</h2>
-                {% status_list case.statuses %}
-            {% endif %}
+                {#  Status history. #}
+                {% if case.statuses %}
+                    <h2 class="h2" id="statuses">{% trans 'Status' %}</h2>
+                    {% status_list case.statuses %}
+                {% endif %}
 
-            {#  Documents. #}
-            {% if case.documents %}
-                <h2 class="h2" id="documents">{% trans 'Documenten' %}</h2>
-                {% case_document_list case.documents %}
-            {% endif %}
-        {% endrender_column %}
-    {% endrender_grid %}
+                {#  Documents. #}
+                {% if case.documents %}
+                    <h2 class="h2" id="documents">{% trans 'Documenten' %}</h2>
+                    {% case_document_list case.documents %}
+                {% endif %}
+            {% endrender_column %}
+        {% endrender_grid %}
+    {% else %}
+        <h2 class="h2">{% trans 'There is no available data at the moment.' %}</h2>
+    {% endif %}
 {% endblock content %}
