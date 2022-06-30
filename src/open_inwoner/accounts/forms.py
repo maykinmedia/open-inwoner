@@ -6,6 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from django_registration.forms import RegistrationForm
 
+from open_inwoner.pdc.models.category import Category
 from open_inwoner.utils.forms import LimitedUploadFileField, PrivateFileWidget
 
 from .choices import EmptyContactTypeChoices, EmptyStatusChoices, LoginTypeChoices
@@ -98,6 +99,10 @@ class ThemesForm(forms.ModelForm):
         model = User
         fields = ("selected_themes",)
         widgets = {"selected_themes": forms.widgets.CheckboxSelectMultiple}
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.fields["selected_themes"].queryset = Category.objects.published()
 
 
 class ContactFilterForm(forms.Form):
