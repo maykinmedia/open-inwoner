@@ -139,7 +139,7 @@ msgstr "Schrijf een bericht..."
 
 #: accounts/forms.py:291
 msgid "Either message content or file should be filled in"
-msgstr "Of een bericht of een bestand dient te zijn ingevuld"
+msgstr "Of een bericht of een bestand moet ingevuld zijn"
 
 #: accounts/forms.py:315
 msgid "Deadline"
@@ -1791,18 +1791,18 @@ msgid ""
 "vervolgstappen en producten en diensten. U kunt tevens uw antwoorden en het "
 "advies bewaren om met een begeleider van de gemeente te bespreken."
 msgstr ""
-"Het onderdeel Zelfdiagnose stelt u in staat om met het beantwoorden van "
+"Het onderdeel Zelftest stelt u in staat om met het beantwoorden van "
 "enkele vragen een advies te krijgen van de gemeente, met concrete "
 "vervolgstappen en producten en diensten. U kunt tevens uw antwoorden en het "
 "advies bewaren om met een begeleider van de gemeente te bespreken."
 
 #: configurations/models.py:209
 msgid "Questionnaire help"
-msgstr "Vragenlijst/Zelfdiagnose help"
+msgstr "Vragenlijst/Zelftest help"
 
 #: configurations/models.py:210
 msgid "The help text for the questionnaire page."
-msgstr "De helptekst in de popup op de vragenlijst/zelfdiagnosepagina's"
+msgstr "De helptekst in de popup op de vragenlijst/zelftestpagina's"
 
 #: configurations/models.py:215 configurations/tests/test_help_modal.py:141
 msgid ""
@@ -2804,7 +2804,7 @@ msgstr "Resultaten_vragenlijst_{slug}.pdf"
 #: questionnaire/views.py:144 questionnaire/views.py:147
 #: templates/pages/profile/me.html:74
 msgid "Zelfdiagnose"
-msgstr "Zelfdiagnose"
+msgstr "Zelftest"
 
 #: search/admin.py:22
 msgid ""
@@ -2996,7 +2996,7 @@ msgstr "Telefoonnummer"
 #: templates/export/profile/profile_export.html:22
 #: templates/pages/profile/me.html:39
 msgid "Actief sinds"
-msgstr "Actief sinds"
+msgstr "Eerste keer ingelogd op"
 
 #: templates/export/profile/profile_export.html:28
 msgid "BSN"
@@ -3009,11 +3009,11 @@ msgstr "Interessegebieden"
 
 #: templates/export/profile/profile_export.html:40
 msgid "Netwerkcontacten"
-msgstr "Netwerkcontacten"
+msgstr "Contacten"
 
 #: templates/export/questionnaire/questionnaire_export.html:6
 msgid "Zelfdiagnose results"
-msgstr "Resultaten zelfdiagnose"
+msgstr "Resultaten zelftest"
 
 #: templates/export/questionnaire/questionnaire_export.html:10
 msgid "Question:"
@@ -3038,7 +3038,7 @@ msgstr "Overname %(username)s"
 
 #: templates/pages/cases/list.html:15 templates/pages/cases/list.html:37
 msgid "Identificatie"
-msgstr "Identificatie"
+msgstr "Aanvraag"
 
 #: templates/pages/cases/list.html:16 templates/pages/cases/list.html:38
 #: templates/pages/plans/create.html:22
@@ -3059,7 +3059,7 @@ msgstr "Bekijk in beheeromgeving"
 
 #: templates/pages/category/detail.html:39
 msgid "Keuze zelfdiagnose?"
-msgstr "Keuze zelfdiagnose?"
+msgstr "Keuze zelftest?"
 
 #: templates/pages/category/detail.html:40
 #: templates/pages/profile/questionnaire.html:6
@@ -3067,7 +3067,7 @@ msgid ""
 "Kies hieronder één van de volgende vragenlijsten om de zelfdiagnose te "
 "starten."
 msgstr ""
-"Kies hieronder één van de volgende vragenlijsten om de zelfdiagnose te "
+"Kies hieronder één van de volgende vragenlijsten om de zelftest te "
 "starten."
 
 #: templates/pages/history.html:7
@@ -3096,7 +3096,7 @@ msgstr "Waar bent u naar op zoek?"
 
 #: templates/pages/home.html:32
 msgid "Wij helpen u graag op weg."
-msgstr "Wij helpen u graag op weg"
+msgstr "Test met een paar simpele vragen of u recht heeft op een product"
 
 #: templates/pages/home.html:39
 msgid "Start"
@@ -3105,7 +3105,7 @@ msgstr "Start"
 #: templates/pages/plans/create.html:7 templates/pages/plans/edit.html:7
 #: templates/pages/plans/file.html:7 templates/pages/plans/list.html:10
 msgid "Hier werkt u samen met uw contactpersonen aan uw doelen."
-msgstr "Hier werkt u samen met uw contactpersonen aan uw doelen."
+msgstr "Hier werkt u aan uw doelen. Dit doet u samen met uw contactpersoon bij de gemeente. "
 
 #: templates/pages/plans/create.html:21
 msgid "Templates"
@@ -3209,8 +3209,7 @@ msgid ""
 "Selecteer hier uw thema’s om op maat gemaakte content voorgeschoteld te "
 "krijgen en nog beter te kunnen zoeken en vinden"
 msgstr ""
-"Selecteer hier uw thema’s om op maat gemaakte content voorgeschoteld te "
-"krijgen en nog beter te kunnen zoeken en vinden"
+"Selecteer zelf thema’s. Zo krijgt u alleen inhoud te zien die voor u interessant is."
 
 #: templates/pages/profile/categories.html:12
 #: templates/pages/profile/contacts/edit.html:19
@@ -3281,7 +3280,7 @@ msgstr "U heeft geen gemeentelijke begeleider."
 
 #: templates/pages/profile/me.html:68
 msgid "Mijn netwerkcontacten"
-msgstr "Mijn netwerkcontacten"
+msgstr "Mijn contacten"
 
 #: templates/pages/profile/me.html:70
 msgid "Beheer contacten"
@@ -3289,7 +3288,7 @@ msgstr "Beheer contacten"
 
 #: templates/pages/profile/me.html:76
 msgid "Start zelfdiagnose"
-msgstr "Start zelfdiagnose"
+msgstr "Start zelftest"
 
 #: templates/pages/profile/me.html:85
 msgid "Afspraken"
@@ -3297,11 +3296,11 @@ msgstr "Afspraken"
 
 #: templates/pages/profile/me.html:91
 msgid "Weet je het zeker dat je je account wilt deactiveren?"
-msgstr "Weet je het zeker dat je je account wilt deactiveren?"
+msgstr "Weet je het zeker dat je je account wilt verwijderen?"
 
 #: templates/pages/profile/me.html:93
 msgid "Profiel deactiveren"
-msgstr "Profiel deactiveren"
+msgstr "Profiel verwijderen"
 
 #: templates/pages/profile/me.html:99
 msgid "Bestand toevoegen"
@@ -3309,7 +3308,7 @@ msgstr "Bestand toevoegen"
 
 #: templates/pages/profile/questionnaire.html:5
 msgid "Keuze zelfdiagnose"
-msgstr "Keuze zelfdiagnose"
+msgstr "Keuze zelftest"
 
 #: templates/pages/questionnaire/questionnaire-step.html:10
 msgid "Export pdf"

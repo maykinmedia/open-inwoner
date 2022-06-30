@@ -284,9 +284,9 @@ class QuestionnaireStepListViewTestCase(WebTest):
         QuestionnaireStepFactory()
         path = reverse("accounts:my_profile")
         response = self.app.get(path, user=self.user)
-        self.assertContains(response, "Start zelfdiagnose")
+        self.assertContains(response, "Start zelftest")
 
     def test_zelfdiagnose_button_is_not_shown_when_there_are_no_questionnaires(self):
         path = reverse("accounts:my_profile")
         response = self.app.get(path, user=self.user)
-        self.assertNotContains(response, "Start zelfdiagnose")
+        self.assertNotContains(response, "Start zelftest")
