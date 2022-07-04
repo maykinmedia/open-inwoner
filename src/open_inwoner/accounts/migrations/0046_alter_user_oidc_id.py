@@ -6,13 +6,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0045_alter_user_login_type'),
+        ("accounts", "0045_alter_user_login_type"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='user',
-            name='oidc_id',
-            field=models.CharField(blank=True, default='', help_text='This field indicates if a user signed up with OpenId Connect or not.', max_length=250, verbose_name='OpenId Connect id'),
+            model_name="user",
+            name="oidc_id",
+            field=models.CharField(
+                blank=True,
+                default="",
+                help_text="This field indicates if a user signed up with OpenId Connect or not.",
+                max_length=250,
+                verbose_name="OpenId Connect id",
+            ),
         ),
     ]
