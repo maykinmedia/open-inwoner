@@ -271,14 +271,14 @@ class SiteConfiguration(SingletonModel):
         blank=True,
         on_delete=models.SET_NULL,
         related_name="oidc_logo",
-        help_text=_("Logo that can be used for the openid commect login method"),
+        help_text=_("Logo that can be used for the OpenId connect login method"),
     )
     openid_connect_login_text = models.CharField(
         verbose_name=_("Openid Connect login text"),
         max_length=250,
         default="Login with Azure AD",
         help_text=_(
-            "The text that should display when Openid connect is set as a login method"
+            "The text that should display when OpenId connect is set as a login method"
         ),
     )
 

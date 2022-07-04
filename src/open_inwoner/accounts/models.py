@@ -96,7 +96,13 @@ class User(AbstractBaseUser, PermissionsMixin):
         related_name="selected_by",
         blank=True,
     )
-    oidc_id = models.CharField(max_length=250, default="", blank=True)
+    oidc_id = models.CharField(
+        verbose_name=_("OpenId Connect id"),
+        max_length=250,
+        default="",
+        blank=True,
+        help_Text="This field indicates if a user signed up with OpenId Connect or not.",
+    )
 
     objects = UserManager()
     digid_objects = DigidManager()
@@ -177,7 +183,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         if self.login_type == LoginTypeChoices.digid:
             return not self.first_name or not self.last_name
         elif self.login_type == LoginTypeChoices.oidc:
-            return not self.email or self.email.endswith("@openinwoner.nl")
+            return not self.email or self.email.endswith("@example.org")
         return False
 
     def get_logout_url(self) -> str:

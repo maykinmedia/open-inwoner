@@ -7,6 +7,8 @@ from django.contrib.auth.hashers import check_password
 from axes.backends import AxesBackend
 from mozilla_django_oidc_db.backends import OIDCAuthenticationBackend
 
+from open_inwoner.utils.hash import generate_email_from_string
+
 from .choices import LoginTypeChoices
 
 logger = logging.getLogger(__name__)
@@ -38,7 +40,7 @@ class CustomOIDCBackend(OIDCAuthenticationBackend):
         """Return object for a newly created user account."""
         unique_id = self.retrieve_identifier_claim(claims)
 
-        email = f"{unique_id}@openinwoner.nl"
+        email = generate_email_from_string(bsn)
         if "email" in claims:
             email = claims["email"]
 

@@ -61,6 +61,6 @@ class UserTests(TestCase):
 
     def test_require_necessary_fields_oidc_openinwoner_email(self):
         user = UserFactory(
-            login_type=LoginTypeChoices.oidc, email="test@openinwoner.nl"
+            login_type=LoginTypeChoices.oidc, email="test@example.org", oidc_id="test"
         )
         self.assertTrue(user.require_necessary_fields())
