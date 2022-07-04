@@ -101,7 +101,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         max_length=250,
         default="",
         blank=True,
-        help_Text="This field indicates if a user signed up with OpenId Connect or not.",
+        help_text="This field indicates if a user signed up with OpenId Connect or not.",
     )
 
     objects = UserManager()
