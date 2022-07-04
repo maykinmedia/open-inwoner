@@ -52,8 +52,10 @@ class UserTests(TestCase):
         self.assertTrue(user.require_necessary_fields())
 
     def test_require_necessary_fields_oidc(self):
-        user = UserFactory(login_type=LoginTypeChoices.oidc)
-        self.assertFalse(user.require_necessary_fields(), email="test@maykinmedia.nl")
+        user = UserFactory(
+            login_type=LoginTypeChoices.oidc, email="test@maykinmedia.nl"
+        )
+        self.assertFalse(user.require_necessary_fields())
 
     def test_require_necessary_fields_oidc_no_email(self):
         user = UserFactory(login_type=LoginTypeChoices.oidc, email="")
