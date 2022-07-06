@@ -336,6 +336,11 @@ LOGGING = {
             "level": "INFO",
             "propagate": True,
         },
+        "digid_eherkenning": {
+            "handlers": ["django"] if not LOG_STDOUT else ["console"],
+            "level": "INFO",
+            "propagate": True,
+        },
     },
 }
 
