@@ -135,10 +135,9 @@ class NecessaryFieldsUserView(LogMixin, LoginRequiredMixin, InviteMixin, UpdateV
         user = self.get_object()
         invite = self.get_invite()
 
-        if (
-            user.bsn
-            and not invite
-            and user.email == generate_email_from_string(user.bsn)
+        if not invite and (
+            (user.bsn and user.email == generate_email_from_string(user.bsn))
+            or (user.oidc_id and user.email == generate_email_from_string(user.oidc_id))
         ):
             initial["email"] = ""
 

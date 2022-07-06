@@ -96,6 +96,13 @@ class User(AbstractBaseUser, PermissionsMixin):
         related_name="selected_by",
         blank=True,
     )
+    oidc_id = models.CharField(
+        verbose_name=_("OpenId Connect id"),
+        max_length=250,
+        default="",
+        blank=True,
+        help_text="This field indicates if a user signed up with OpenId Connect or not.",
+    )
 
     objects = UserManager()
     digid_objects = DigidManager()
@@ -173,11 +180,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def require_necessary_fields(self) -> bool:
         """returns whether user needs to fill in necessary fields"""
-        return (
-            self.login_type == LoginTypeChoices.digid
-            and not self.first_name
-            and not self.last_name
-        )
+        if self.login_type == LoginTypeChoices.digid:
+            return not self.first_name or not self.last_name
+        elif self.login_type == LoginTypeChoices.oidc:
+            return not self.email or self.email.endswith("@example.org")
+        return False
 
     def get_logout_url(self) -> str:
         return (

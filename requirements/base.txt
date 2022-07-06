@@ -35,7 +35,10 @@ commonmark==0.9.1
 confusable-homoglyphs==3.2.0
     # via django-registration
 cryptography==35.0.0
-    # via pyopenssl
+    # via
+    #   josepy
+    #   mozilla-django-oidc
+    #   pyopenssl
 cssselect2==0.4.1
     # via weasyprint
 defusedxml==0.7.1
@@ -81,6 +84,8 @@ django==3.2.13
     #   easy-thumbnails
     #   mail-editor
     #   maykin-django-two-factor-auth
+    #   mozilla-django-oidc
+    #   mozilla-django-oidc-db
     #   zgw-consumers
 django-admin-index==1.5.0
     # via -r requirements/base.in
@@ -91,7 +96,9 @@ django-autoslug==1.9.8
 django-axes==5.25.0
     # via -r requirements/base.in
 django-better-admin-arrayfield==1.4.2
-    # via -r requirements/base.in
+    # via
+    #   -r requirements/base.in
+    #   mozilla-django-oidc-db
 django-choices==1.7.2
     # via
     #   -r requirements/base.in
@@ -169,6 +176,7 @@ django-sniplates==0.7.0
 django-solo==1.2.0
     # via
     #   -r requirements/base.in
+    #   mozilla-django-oidc-db
     #   zgw-consumers
 django-timeline-logger==2.0.0
     # via -r requirements/base.in
@@ -214,7 +222,9 @@ geographiclib==1.52
 geopy==2.2.0
     # via -r requirements/base.in
 glom==20.11.0
-    # via -r requirements/base.in
+    # via
+    #   -r requirements/base.in
+    #   mozilla-django-oidc-db
 html5lib==1.1
     # via weasyprint
 humanfriendly==10.0
@@ -227,6 +237,8 @@ inflection==0.5.1
     # via drf-spectacular
 isodate==0.6.1
     # via python3-saml
+josepy==1.13.0
+    # via mozilla-django-oidc
 jsonschema==4.1.0
     # via drf-spectacular
 lxml==4.6.3
@@ -241,6 +253,10 @@ markdown==3.3.6
 markuppy==1.14
     # via tablib
 maykin-django-two-factor-auth==2.0.4
+    # via -r requirements/base.in
+mozilla-django-oidc==2.0.0
+    # via mozilla-django-oidc-db
+mozilla-django-oidc-db==0.10.0
     # via -r requirements/base.in
 odfpy==1.4.1
     # via tablib
@@ -270,6 +286,7 @@ pyjwt==2.3.0
 pyopenssl==21.0.0
     # via
     #   -r requirements/base.in
+    #   josepy
     #   python3-saml
     #   zgw-consumers
 pyphen==0.12.0
@@ -308,6 +325,7 @@ requests==2.26.0
     # via
     #   django-rosetta
     #   gemma-zds-client
+    #   mozilla-django-oidc
     #   python3-saml
     #   requests-mock
     #   zgw-consumers
@@ -373,3 +391,6 @@ zipp==3.6.0
     # via importlib-metadata
 zopfli==0.1.9
     # via fonttools
+
+# The following packages are considered to be unsafe in a requirements file:
+# setuptools

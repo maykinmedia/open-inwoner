@@ -6,6 +6,8 @@ from django.contrib.auth import views as auth_views
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import include, path
 
+from mozilla_django_oidc_db.views import AdminLoginFailure
+
 from open_inwoner.accounts.forms import CustomRegistrationForm
 from open_inwoner.accounts.views import (
     CustomRegistrationView,
@@ -44,6 +46,7 @@ urlpatterns = [
         name="password_reset_complete",
     ),
     path("admin/hijack/", include("hijack.urls")),
+    path("admin/login/failure/", AdminLoginFailure.as_view(), name="admin-oidc-error"),
     path("admin/", admin.site.urls),
     path("csp/", include("cspreports.urls")),
     path("ckeditor/", include("open_inwoner.ckeditor5.urls")),
@@ -85,6 +88,7 @@ urlpatterns = [
         "sessions/",
         include("open_inwoner.extended_sessions.urls", namespace="sessions"),
     ),
+    path("oidc/", include("mozilla_django_oidc.urls")),
     path("faq/", FAQView.as_view(), name="general_faq"),
     path("", include("open_inwoner.pdc.urls", namespace="pdc")),
     path("", include("open_inwoner.search.urls", namespace="search")),

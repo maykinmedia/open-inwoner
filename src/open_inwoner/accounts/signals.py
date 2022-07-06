@@ -9,6 +9,7 @@ MESSAGE_TYPE = {
     "admin": _("user was logged in via admin page"),
     "frontend_email": _("user was logged in via frontend using email"),
     "frontend_digid": _("user was logged in via frontend using digid"),
+    "frontend_oidc": _("user was logged in via frontend using OpenIdConnect"),
     "logout": _("user was logged out"),
 }
 
@@ -21,6 +22,8 @@ def log_user_login(sender, user, request, *args, **kwargs):
         user_action(request, user, MESSAGE_TYPE["admin"])
     elif current_path == reverse("digid:acs"):
         user_action(request, user, MESSAGE_TYPE["frontend_digid"])
+    elif current_path == reverse("oidc_authentication_callback"):
+        user_action(request, user, MESSAGE_TYPE["frontend_oidc"])
     else:
         user_action(request, user, MESSAGE_TYPE["frontend_email"])
 

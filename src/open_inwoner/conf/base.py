@@ -82,6 +82,14 @@ CACHES = {
             "IGNORE_EXCEPTIONS": True,
         },
     },
+    "oidc": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": f"redis://{config('CACHE_OIDC', 'localhost:6379/0')}",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "IGNORE_EXCEPTIONS": True,
+        },
+    },
 }
 
 
@@ -144,6 +152,8 @@ INSTALLED_APPS = [
     "timeline_logger",
     "csp",
     "cspreports",
+    "mozilla_django_oidc",
+    "mozilla_django_oidc_db",
     "sessionprofile",
     # Project applications.
     "open_inwoner.accounts",
@@ -181,6 +191,7 @@ MIDDLEWARE = [
     "django.contrib.flatpages.middleware.FlatpageFallbackMiddleware",
     "open_inwoner.extended_sessions.middleware.SessionTimeoutMiddleware",
     "open_inwoner.accounts.middleware.NecessaryFieldsMiddleware",
+    "mozilla_django_oidc_db.middleware.SessionRefresh",
 ]
 
 ROOT_URLCONF = "open_inwoner.urls"
@@ -365,6 +376,7 @@ AUTHENTICATION_BACKENDS = [
     "open_inwoner.accounts.backends.UserModelEmailBackend",
     "django.contrib.auth.backends.ModelBackend",
     "digid_eherkenning.backends.DigiDBackend",
+    "open_inwoner.accounts.backends.CustomOIDCBackend",
 ]
 
 SESSION_COOKIE_NAME = "open_inwoner_sessionid"
@@ -909,5 +921,10 @@ THUMBNAIL_ALIASES = {
 }
 
 TEST_RUNNER = "django_rich.test.RichRunner"
+
+OIDC_AUTHENTICATE_CLASS = "mozilla_django_oidc_db.views.OIDCAuthenticationRequestView"
+OIDC_CALLBACK_CLASS = "mozilla_django_oidc_db.views.OIDCCallbackView"
+MOZILLA_DJANGO_OIDC_DB_CACHE = "oidc"
+MOZILLA_DJANGO_OIDC_DB_CACHE_TIMEOUT = 1
 
 from .app.csp import *  # noqa

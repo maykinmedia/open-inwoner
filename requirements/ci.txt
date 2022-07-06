@@ -68,6 +68,8 @@ cryptography==35.0.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   josepy
+    #   mozilla-django-oidc
     #   pyopenssl
 cssselect==1.1.0
     # via pyquery
@@ -125,6 +127,8 @@ django==3.2.13
     #   easy-thumbnails
     #   mail-editor
     #   maykin-django-two-factor-auth
+    #   mozilla-django-oidc
+    #   mozilla-django-oidc-db
     #   zgw-consumers
 django-admin-index==1.5.0
     # via
@@ -147,6 +151,7 @@ django-better-admin-arrayfield==1.4.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   mozilla-django-oidc-db
 django-choices==1.7.2
     # via
     #   -c requirements/base.txt
@@ -292,6 +297,7 @@ django-solo==1.2.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   mozilla-django-oidc-db
     #   zgw-consumers
 django-timeline-logger==2.0.0
     # via
@@ -392,6 +398,7 @@ glom==20.11.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   mozilla-django-oidc-db
 html5lib==1.1
     # via
     #   -c requirements/base.txt
@@ -423,6 +430,11 @@ isodate==0.6.1
     #   python3-saml
 isort==5.9.3
     # via pylint
+josepy==1.13.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   mozilla-django-oidc
 jsonschema==4.1.0
     # via
     #   -c requirements/base.txt
@@ -457,6 +469,15 @@ maykin-django-two-factor-auth==2.0.4
     #   -r requirements/base.txt
 mccabe==0.6.1
     # via pylint
+mozilla-django-oidc==2.0.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   mozilla-django-oidc-db
+mozilla-django-oidc-db==0.10.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
 odfpy==1.4.1
     # via
     #   -c requirements/base.txt
@@ -522,6 +543,7 @@ pyopenssl==21.0.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   -r requirements/test-tools.in
+    #   josepy
     #   python3-saml
     #   zgw-consumers
 pyphen==0.12.0
@@ -594,6 +616,7 @@ requests==2.26.0
     #   -r requirements/base.txt
     #   django-rosetta
     #   gemma-zds-client
+    #   mozilla-django-oidc
     #   python3-saml
     #   requests-mock
     #   zgw-consumers

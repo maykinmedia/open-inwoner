@@ -20,6 +20,10 @@ class ActionInlineAdmin(UUIDAdminFirstInOrder, admin.StackedInline):
 @admin.register(User)
 class _UserAdmin(UserAdmin):
     hijack_success_url = reverse_lazy("root")
+    list_display_links = (
+        "email",
+        "first_name",
+    )
     fieldsets = (
         (None, {"fields": ("email", "password", "login_type")}),
         (
@@ -31,6 +35,7 @@ class _UserAdmin(UserAdmin):
                     "contact_type",
                     "bsn",
                     "rsin",
+                    "oidc_id",
                     "birthday",
                     "street",
                     "housenumber",
@@ -66,11 +71,12 @@ class _UserAdmin(UserAdmin):
             },
         ),
     )
-    readonly_fields = ("bsn", "rsin", "is_prepopulated")
+    readonly_fields = ("bsn", "rsin", "is_prepopulated", "oidc_id")
     list_display = (
         "email",
         "first_name",
         "last_name",
+        "login_type",
         "is_staff",
         "is_active",
         "contact_type",
