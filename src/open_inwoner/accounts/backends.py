@@ -40,7 +40,7 @@ class CustomOIDCBackend(OIDCAuthenticationBackend):
         """Return object for a newly created user account."""
         unique_id = self.retrieve_identifier_claim(claims)
 
-        email = generate_email_from_string(bsn)
+        email = generate_email_from_string(unique_id)
         if "email" in claims:
             email = claims["email"]
 
