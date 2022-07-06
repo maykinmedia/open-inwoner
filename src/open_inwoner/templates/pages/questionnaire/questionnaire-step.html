@@ -48,9 +48,9 @@
                     {% file_list files=form.instance.questionnairestepfile_set.all title=_("Bestanden") %}
                 {% endif %}
 
-                {% if form.instance.related_products.exists %}
+                {% if form.instance.related_products.published.exists %}
                     <hr class="divider">
-                    {% card_container products=form.instance.related_products.all small=True %}
+                    {% card_container products=form.instance.related_products.published small=True %}
                 {% endif %}
             {% endrender_form %}
 

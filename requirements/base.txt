@@ -115,7 +115,7 @@ django-csp==3.7
     # via -r requirements/base.in
 django-csp-reports==1.8.1
     # via -r requirements/base.in
-django-digid-eherkenning @ git+https://github.com/maykinmedia/django-digid-eherkenning.git@feature/digid-logout-callback
+django-digid-eherkenning @ git+https://github.com/maykinmedia/django-digid-eherkenning.git@feature/digid-logout-soap
     # via -r requirements/base.in
 django-elasticsearch-dsl==7.2.1
     # via -r requirements/base.in
@@ -167,6 +167,10 @@ django-rosetta==0.9.7
     # via -r requirements/base.in
 django-sendfile2==0.6.0
     # via django-privates
+django-sessionprofile==1.0
+    # via
+    #   -r requirements/base.in
+    #   django-digid-eherkenning
 django-sniplates==0.7.0
     # via -r requirements/base.in
 django-solo==1.2.0

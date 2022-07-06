@@ -40,8 +40,9 @@ class ProductAdminForm(forms.ModelForm):
 
 @admin.register(Product)
 class ProductAdmin(ImportExportMixin, admin.ModelAdmin):
-    list_display = ("name", "created_on", "display_categories")
-    list_filter = ("categories", "tags")
+    list_display = ("name", "created_on", "display_categories", "published")
+    list_filter = ("published", "categories", "tags")
+    list_editable = ("published",)
     date_hierarchy = "created_on"
     autocomplete_fields = (
         "categories",

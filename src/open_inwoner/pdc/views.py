@@ -58,7 +58,7 @@ class HomeView(TemplateView):
         config = SiteConfiguration.get_solo()
 
         limit = 3 if self.request.user.is_authenticated else 4
-        kwargs.update(categories=Category.objects.all().order_by("name")[:limit])
+        kwargs.update(categories=Category.objects.published().order_by("name")[:limit])
         kwargs.update(product_locations=ProductLocation.objects.all()[:1000])
         kwargs.update(
             questionnaire_roots=QuestionnaireStep.get_root_nodes().filter(
@@ -70,7 +70,9 @@ class HomeView(TemplateView):
 
         # Highlighted categories
         highlighted_categories = (
-            Category.objects.all().filter(highlighted=True).order_by("name")[:limit]
+            Category.objects.published()
+            .filter(highlighted=True)
+            .order_by("name")[:limit]
         )
         if not self.request.user.is_authenticated and highlighted_categories:
             kwargs.update(categories=highlighted_categories)
@@ -110,7 +112,7 @@ class CategoryListView(ListBreadcrumbMixin, ListView):
     model = Category
 
     def get_queryset(self):
-        return Category.get_root_nodes()
+        return Category.get_root_nodes().published()
 
     @cached_property
     def crumbs(self):
@@ -146,8 +148,8 @@ class CategoryDetailView(BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailVie
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["subcategories"] = self.object.get_children()
-        context["products"] = self.object.products.order_by("name")
+        context["subcategories"] = self.object.get_children().published()
+        context["products"] = self.object.products.published().order_by("name")
         context["questionnaire_roots"] = QuestionnaireStep.get_root_nodes().filter(
             category=self.object
         )
@@ -184,7 +186,7 @@ class ProductDetailView(BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView
             anchors.append(("#links", _("Links")))
         if product.contacts.exists():
             anchors.append(("#contact", _("Contact")))
-        if product.related_products.exists():
+        if product.related_products.published().exists():
             anchors.append(("#see", _("Zie ook")))
         anchors.append(("#share", _("Delen")))
 
@@ -284,7 +286,7 @@ class ProductFinderView(FormView):
                     filters = new_filter
 
         if filters:
-            return Product.objects.filter(filters).distinct()
+            return Product.objects.published().filter(filters).distinct()
         return Product.objects.none()
 
     def filter_matched_products(self, condition_products):
@@ -297,7 +299,7 @@ class ProductFinderView(FormView):
         return products
 
     def filter_possible_products(self, condition_products, matched):
-        qs = Product.objects.exclude(pk__in=matched.values_list("pk"))
+        qs = Product.objects.published().exclude(pk__in=matched.values_list("pk"))
         current_answers = self.request.session.get("product_finder")
         if current_answers:
             for _order, answer in current_answers.items():

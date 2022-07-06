@@ -58,7 +58,7 @@ def settings(request):
         "matomo_url": config.matomo_url,
         "matomo_site_id": config.matomo_site_id,
         "matomo_enabled": config.matomo_enabled,
-        "menu_categories": Category.get_root_nodes(),
+        "menu_categories": Category.get_root_nodes().published(),
         "search_form": SearchForm(),
         "has_general_faq_questions": Question.objects.filter(
             category__isnull=True

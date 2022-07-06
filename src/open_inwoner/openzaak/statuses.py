@@ -1,11 +1,12 @@
 import logging
-from typing import List
+from typing import List, Optional
 
 from requests import RequestException
 from zds_client import ClientError
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.catalogi import StatusType
 from zgw_consumers.api_models.zaken import Status, ZaakInformatieObject
+from zgw_consumers.concurrent import parallel
 from zgw_consumers.service import get_paginated_results
 
 from .clients import build_client
@@ -33,7 +34,24 @@ def fetch_status_history(case_url: str) -> List[Status]:
     return statuses
 
 
-def fetch_status_types(zaaktype: str) -> List[StatusType]:
+def fetch_specific_statuses(status_urls: List[str]) -> List[Status]:
+    client = build_client("zaak")
+
+    if client is None:
+        return []
+
+    with parallel() as executor:
+        _statuses = executor.map(
+            lambda url: client.retrieve("status", url=url),
+            status_urls,
+        )
+
+    statuses = factory(Status, list(_statuses))
+
+    return statuses
+
+
+def fetch_status_types(case_type=None) -> List[StatusType]:
     client = build_client("catalogi")
 
     if client is None:
@@ -44,8 +62,10 @@ def fetch_status_types(zaaktype: str) -> List[StatusType]:
             client,
             "statustype",
             request_kwargs={
-                "params": {"zaaktype": zaaktype},
-            },
+                "params": {"zaaktype": case_type},
+            }
+            if case_type
+            else None,
         )
     except RequestException as e:
         logger.exception("exception while making request", exc_info=e)
@@ -57,6 +77,26 @@ def fetch_status_types(zaaktype: str) -> List[StatusType]:
     status_types = factory(StatusType, response)
 
     return status_types
+
+
+def fetch_single_status_type(status_type_url: str) -> Optional[StatusType]:
+    client = build_client("catalogi")
+
+    if client is None:
+        return
+
+    try:
+        response = client.retrieve("statustype", url=status_type_url)
+    except RequestException as e:
+        logger.exception("exception while making request", exc_info=e)
+        return
+    except ClientError as e:
+        logger.exception("exception while making request", exc_info=e)
+        return
+
+    status_type = factory(StatusType, response)
+
+    return status_type
 
 
 def fetch_case_information_objects(case_url: str) -> List[ZaakInformatieObject]:

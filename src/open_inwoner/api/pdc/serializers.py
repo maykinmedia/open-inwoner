@@ -54,7 +54,7 @@ class TagSerializer(serializers.ModelSerializer):
 class SmallProductSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Product
-        fields = ("url", "name", "slug", "summary")
+        fields = ("url", "name", "slug", "published", "summary")
         extra_kwargs = {
             "url": {"view_name": "api:products-detail", "lookup_field": "slug"},
         }
@@ -69,7 +69,7 @@ class Questionserializer(serializers.ModelSerializer):
 class SmallCategorySerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Category
-        fields = ("url", "name", "slug", "highlighted", "description")
+        fields = ("url", "name", "slug", "published", "highlighted", "description")
         extra_kwargs = {
             "url": {"view_name": "api:categories-detail", "lookup_field": "slug"},
         }
@@ -87,6 +87,7 @@ class CategoryWithChildSerializer(serializers.ModelSerializer):
         fields = (
             "name",
             "slug",
+            "published",
             "highlighted",
             "description",
             "icon",
@@ -163,6 +164,7 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = (
             "name",
             "slug",
+            "published",
             "summary",
             "link",
             "content",

@@ -1,0 +1,37 @@
+.personal-information {
+  --personal-columns: 1;
+  display: grid;
+  grid-template-columns: repeat(var(--personal-columns), 1fr);
+  font-family: var(--font-family-body);
+
+  @media (min-width: 768px) {
+    --personal-columns: 2;
+  }
+
+  @media (min-width: 1024px) {
+    --personal-columns: 4;
+  }
+
+  &__block {
+    padding: var(--spacing-medium);
+    border-top: 1px solid var(--color-gray-light);
+
+    @media (min-width: 768px) {
+      border-top: 0;
+      &:nth-child(even) {
+        border-left: 1px solid var(--color-gray-light);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      border-top: 0;
+      border-left: 1px solid var(--color-gray-light);
+    }
+
+    &--bold {
+      font-weight: bold;
+      border-left: 0;
+      border-top: 0;
+    }
+  }
+}
