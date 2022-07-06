@@ -144,6 +144,7 @@ INSTALLED_APPS = [
     "timeline_logger",
     "csp",
     "cspreports",
+    "sessionprofile",
     # Project applications.
     "open_inwoner.accounts",
     "open_inwoner.components",
@@ -162,6 +163,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "sessionprofile.middleware.SessionProfileMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     # 'django.middleware.locale.LocaleMiddleware',
     "corsheaders.middleware.CorsMiddleware",
@@ -331,6 +333,11 @@ LOGGING = {
         },
         "django.template": {
             "handlers": ["console"],
+            "level": "INFO",
+            "propagate": True,
+        },
+        "digid_eherkenning": {
+            "handlers": ["django"] if not LOG_STDOUT else ["console"],
             "level": "INFO",
             "propagate": True,
         },

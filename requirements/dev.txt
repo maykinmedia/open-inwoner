@@ -202,7 +202,7 @@ django-csp-reports==1.8.1
     #   -r requirements/ci.txt
 django-debug-toolbar==3.2.2
     # via -r requirements/dev.in
-django-digid-eherkenning @ git+https://github.com/maykinmedia/django-digid-eherkenning.git@feature/digid-logout-callback
+django-digid-eherkenning @ git+https://github.com/maykinmedia/django-digid-eherkenning.git@feature/digid-logout-soap
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -308,6 +308,11 @@ django-sendfile2==0.6.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-privates
+django-sessionprofile==1.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   django-digid-eherkenning
 django-sniplates==0.7.0
     # via
     #   -c requirements/ci.txt
