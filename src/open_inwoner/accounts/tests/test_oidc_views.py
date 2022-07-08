@@ -50,7 +50,7 @@ class OIDCFlowTests(TestCase):
         callback_response = self.client.get(
             callback_url, {"code": "mock", "state": "mock"}
         )
-        
+
         self.assertRedirects(
             callback_response, reverse("root"), fetch_redirect_response=False
         )

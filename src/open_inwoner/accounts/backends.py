@@ -43,7 +43,7 @@ class CustomOIDCBackend(OIDCAuthenticationBackend):
         email = generate_email_from_string(unique_id)
         if "email" in claims:
             email = claims["email"]
-            
+
         existing_user = self.UserModel.objects.filter(email=email).first()
         if existing_user:
             logger.debug("Updating OIDC user: %s with email %s", unique_id, email)
@@ -53,16 +53,16 @@ class CustomOIDCBackend(OIDCAuthenticationBackend):
             return existing_user
         else:
             logger.debug("Creating OIDC user: %s", unique_id)
-    
+
             kwargs = {
                 "oidc_id": unique_id,
                 "email": email,
                 "login_type": LoginTypeChoices.oidc,
             }
-    
+
             user = self.UserModel.objects.create_user(**kwargs)
             self.update_user(user, claims)
-    
+
             return user
 
     def filter_users_by_claims(self, claims):
