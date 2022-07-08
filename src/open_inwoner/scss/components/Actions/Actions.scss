@@ -22,7 +22,7 @@
     align-items: center;
     border-bottom: 1px solid var(--color-gray-light);
     display: none;
-    grid-gap: var(--spacing-medium);
+    gap: var(--spacing-medium);
     grid-template-columns: 1fr;
     margin-bottom: var(--spacing-medium);
     padding: 8px;
@@ -30,7 +30,7 @@
     @media (min-width: 768px) {
       display: grid;
       grid-template-columns: 2fr 3fr 2fr 2fr;
-      grid-gap: var(--spacing-giant);
+      gap: var(--spacing-giant);
     }
 
     .input {

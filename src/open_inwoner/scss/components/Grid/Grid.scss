@@ -1,12 +1,12 @@
 .grid {
   display: flex;
   flex-direction: column;
-  grid-gap: var(--gutter-width);
+  gap: var(--gutter-width);
   width: 100%;
   position: relative;
 
   &--compact {
-    grid-gap: 0;
+    gap: 0;
   }
 
   &--limit &__sidebar,
