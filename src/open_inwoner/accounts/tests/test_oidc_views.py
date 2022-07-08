@@ -37,9 +37,7 @@ class OIDCFlowTests(TestCase):
             "email": "collision@example.com",
             "sub": "some_username",
         }
-        user = UserFactory.create(
-            email="collision@example.com"
-        )
+        user = UserFactory.create(email="collision@example.com")
         self.assertEqual(user.oidc_id, "")
         session = self.client.session
         session["oidc_states"] = {"mock": {"nonce": "nonce"}}
@@ -84,9 +82,7 @@ class OIDCFlowTests(TestCase):
             "email": "nocollision@example.com",
             "sub": "some_username",
         }
-        UserFactory.create(
-            email="collision@example.com"
-        )
+        UserFactory.create(email="collision@example.com")
         session = self.client.session
         session["oidc_states"] = {"mock": {"nonce": "nonce"}}
         session.save()
