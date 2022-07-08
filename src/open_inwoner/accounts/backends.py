@@ -44,18 +44,26 @@ class CustomOIDCBackend(OIDCAuthenticationBackend):
         if "email" in claims:
             email = claims["email"]
 
-        logger.debug("Creating OIDC user: %s", unique_id)
+        existing_user = self.UserModel.objects.filter(email=email).first()
+        if existing_user:
+            logger.debug("Updating OIDC user: %s with email %s", unique_id, email)
+            existing_user.oidc_id = unique_id
+            existing_user.login_type = LoginTypeChoices.oidc
+            existing_user.save()
+            return existing_user
+        else:
+            logger.debug("Creating OIDC user: %s", unique_id)
 
-        kwargs = {
-            "oidc_id": unique_id,
-            "email": email,
-            "login_type": LoginTypeChoices.oidc,
-        }
+            kwargs = {
+                "oidc_id": unique_id,
+                "email": email,
+                "login_type": LoginTypeChoices.oidc,
+            }
 
-        user = self.UserModel.objects.create_user(**kwargs)
-        self.update_user(user, claims)
+            user = self.UserModel.objects.create_user(**kwargs)
+            self.update_user(user, claims)
 
-        return user
+            return user
 
     def filter_users_by_claims(self, claims):
         """Return all users matching the specified subject."""
