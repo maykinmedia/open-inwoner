@@ -42,12 +42,20 @@ class ProductFactory(factory.django.DjangoModelFactory):
             for location in extracted:
                 self.locations.add(location)
 
+    @factory.post_generation
+    def related_products(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted:
+            for related_product in extracted:
+                self.related_products.add(related_product)
+
 
 class CategoryFactory(factory.django.DjangoModelFactory):
     name = factory.Faker("word")
     slug = factory.LazyAttribute(lambda a: slugify(a.name))
     description = factory.Faker("sentence")
-    highlighted = False
 
     class Meta:
         model = Category

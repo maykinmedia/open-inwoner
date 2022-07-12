@@ -4,6 +4,7 @@ from django.utils.translation import gettext as _
 from django_webtest import WebTest
 
 from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.pdc.tests.factories import ProductFactory
 from open_inwoner.questionnaire.tests.factories import QuestionnaireStepFactory
 
 from ..models import QuestionnaireStep
@@ -70,4 +71,27 @@ class TestQuestionnaireStepForm(WebTest):
         self.assertContains(
             response,
             _("Only root nodes (parent questionnaire steps) can be highlighted."),
+        )
+
+    def test_draft_related_products_are_not_rendered(self):
+        product1 = ProductFactory()
+        product2 = ProductFactory()
+        product3 = ProductFactory(published=False)
+        questionnaire = QuestionnaireStepFactory(
+            related_products=(product1, product2, product3)
+        )
+        form = self.app.get(
+            reverse(
+                "admin:questionnaire_questionnairestep_change",
+                kwargs={"object_id": questionnaire.id},
+            ),
+            user=self.user,
+        ).forms["questionnairestep_form"]
+        options = form["related_products"].options
+        self.assertEqual(
+            options,
+            [
+                (str(product1.id), True, product1.name),
+                (str(product2.id), True, product2.name),
+            ],
         )

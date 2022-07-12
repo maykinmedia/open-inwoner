@@ -63,4 +63,9 @@
   &__button:empty {
     display: none;
   }
+
+  *[class*='icon'],
+  *[class*='Icon'] {
+    font-size: var(--font-size-heading-2);
+  }
 }

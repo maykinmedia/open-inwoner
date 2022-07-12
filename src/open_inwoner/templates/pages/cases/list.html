@@ -12,18 +12,19 @@
         <h2 class="h2" id="pending_apps">{% trans "Lopende aanvragen" %}</h2>
         <div class="tabled tabled--tiny-end">
             <div class="tabled__header">
-                <div class="tabled__item">{% trans "Identificatie" %}</div>
-                <div class="tabled__item">{% trans "Omschrijving" %}</div>
+                <div class="tabled__item">{% trans "Aanvraag" %}</div>
+                <div class="tabled__item">{% trans "Status" %}</div>
                 <div class="tabled__item">{% trans "Startdatum" %}</div>
-                <div class="tabled__item tabled__item--right">{% trans "Status" %}</div>
             </div>
             {% for case in open_cases %}
                 <div class="tabled__row">
-                    <div class="tabled__item">{{ case.identificatie }}</div>
-                    <div class="tabled__item">{{ case.omschrijving }}</div>
-                    <div class="tabled__item">{{ case.startdatum }}</div>
+                    <div class="tabled__item">
+                        {% link href="accounts:case_status" object_id=case.uuid text=case.description hide_text=False %}
+                    </div>
+                    <div class="tabled__item">{{ case.current_status }}</div>
+                    <div class="tabled__item">{{ case.start_date }}</div>
                     <div class="tabled__item tabled__item--right">
-                        {% link href="accounts:case_status" object_id=case.uuid text=_("Bekijk status") hide_text=True icon="arrow_forward" primary=True %}
+                        
                     </div>
                 </div>
             {% endfor %}
@@ -34,18 +35,18 @@
         <h2 class="h2" id="completed_apps">{% trans "Afgeronde aanvragen" %}</h2>
         <div class="tabled">
             <div class="tabled__header">
-                <div class="tabled__item">{% trans "Identificatie" %}</div>
-                <div class="tabled__item">{% trans "Omschrijving" %}</div>
+                <div class="tabled__item">{% trans "Aanvraag" %}</div>
+                <div class="tabled__item">{% trans "Status" %}</div>
                 <div class="tabled__item">{% trans "Startdatum" %}</div>
                 <div class="tabled__item">{% trans "Einddatum" %}</div>
             </div>
 
             {% for case in closed_cases %}
                 <div class="tabled__row">
-                    <div class="tabled__item">{{ case.identificatie }}</div>
-                    <div class="tabled__item tabled__item--color-gray-dark">{{ case.omschrijving }}</div>
-                    <div class="tabled__item">{{ case.startdatum }}</div>
-                    <div class="tabled__item">{{ case.einddatum }}</div>
+                    <div class="tabled__item">{{ case.description }}</div>
+                    <div class="tabled__item tabled__item--color-gray-dark">{{ case.current_status }}</div>
+                    <div class="tabled__item">{{ case.start_date }}</div>
+                    <div class="tabled__item">{{ case.end_date }}</div>
                 </div>
             {% endfor %}
         </div>

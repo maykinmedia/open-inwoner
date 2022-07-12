@@ -22,9 +22,8 @@
                         {% if request.user.is_authenticated %}
                             <ul class="header__list">
                                 <li class="header__list-item">
-                                    {% url 'logout' as logout_url %}
                                     {% trans "Logout" as logout %}
-                                    {% link text=logout href=logout_url primary=True %}
+                                    {% link text=logout href=request.user.get_logout_url primary=True %}
                                 </li>
                             </ul>
                         {% else %}
@@ -59,9 +58,8 @@
                 {% if request.user.is_authenticated %}
                     <ul class="header__list">
                         <li class="header__list-item">
-                            {% url 'logout' as logout_url %}
                             {% trans "Logout" as logout %}
-                            {% link text=logout href=logout_url primary=True %}
+                            {% link text=logout href=request.user.get_logout_url primary=True %}
                         </li>
                     </ul>
                 {% else %}

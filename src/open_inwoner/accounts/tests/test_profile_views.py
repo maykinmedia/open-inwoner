@@ -4,9 +4,9 @@ from django.utils.translation import ugettext_lazy as _
 from django_webtest import WebTest
 
 from open_inwoner.accounts.choices import StatusChoices
-from open_inwoner.accounts.models import Action
 from open_inwoner.pdc.tests.factories import CategoryFactory
 
+from ..choices import LoginTypeChoices
 from .factories import ActionFactory, ContactFactory, UserFactory
 
 
@@ -75,6 +75,21 @@ class ProfileViewTests(WebTest):
         self.user.refresh_from_db()
         self.assertTrue(self.user.is_active)
         self.assertIsNone(self.user.deactivated_on)
+
+    def test_deactivate_account_digid(self):
+        """
+        check that user is redirected to digid:logout
+        """
+        user = UserFactory.create(login_type=LoginTypeChoices.digid)
+
+        get_response = self.app.get(self.url, user=user)
+        self.assertEquals(get_response.status_code, 200)
+        form = get_response.forms["deactivate-form"]
+
+        response = form.submit()
+
+        self.assertEquals(response.status_code, 302)
+        self.assertEquals(response.url, reverse("digid:logout"))
 
 
 class EditProfileTests(WebTest):

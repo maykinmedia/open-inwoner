@@ -82,6 +82,14 @@ CACHES = {
             "IGNORE_EXCEPTIONS": True,
         },
     },
+    "oidc": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": f"redis://{config('CACHE_OIDC', 'localhost:6379/0')}",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "IGNORE_EXCEPTIONS": True,
+        },
+    },
 }
 
 
@@ -144,6 +152,9 @@ INSTALLED_APPS = [
     "timeline_logger",
     "csp",
     "cspreports",
+    "mozilla_django_oidc",
+    "mozilla_django_oidc_db",
+    "sessionprofile",
     # Project applications.
     "open_inwoner.accounts",
     "open_inwoner.components",
@@ -162,6 +173,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "sessionprofile.middleware.SessionProfileMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     # 'django.middleware.locale.LocaleMiddleware',
     "corsheaders.middleware.CorsMiddleware",
@@ -179,6 +191,7 @@ MIDDLEWARE = [
     "django.contrib.flatpages.middleware.FlatpageFallbackMiddleware",
     "open_inwoner.extended_sessions.middleware.SessionTimeoutMiddleware",
     "open_inwoner.accounts.middleware.NecessaryFieldsMiddleware",
+    "mozilla_django_oidc_db.middleware.SessionRefresh",
 ]
 
 ROOT_URLCONF = "open_inwoner.urls"
@@ -334,6 +347,11 @@ LOGGING = {
             "level": "INFO",
             "propagate": True,
         },
+        "digid_eherkenning": {
+            "handlers": ["django"] if not LOG_STDOUT else ["console"],
+            "level": "INFO",
+            "propagate": True,
+        },
     },
 }
 
@@ -358,6 +376,7 @@ AUTHENTICATION_BACKENDS = [
     "open_inwoner.accounts.backends.UserModelEmailBackend",
     "django.contrib.auth.backends.ModelBackend",
     "digid_eherkenning.backends.DigiDBackend",
+    "open_inwoner.accounts.backends.CustomOIDCBackend",
 ]
 
 SESSION_COOKIE_NAME = "open_inwoner_sessionid"
@@ -458,7 +477,7 @@ HIJACK_ALLOW_GET_REQUESTS = True
 # SENTRY - error monitoring
 #
 SENTRY_DSN = config("SENTRY_DSN", None)
-RELEASE = "v0.8"  # get_current_version()
+RELEASE = "v1.0"  # get_current_version()
 
 PRIVATE_MEDIA_ROOT = os.path.join(BASE_DIR, "private_media")
 FILER_ROOT = os.path.join(BASE_DIR, "media", "filer")
@@ -902,5 +921,10 @@ THUMBNAIL_ALIASES = {
 }
 
 TEST_RUNNER = "django_rich.test.RichRunner"
+
+OIDC_AUTHENTICATE_CLASS = "mozilla_django_oidc_db.views.OIDCAuthenticationRequestView"
+OIDC_CALLBACK_CLASS = "mozilla_django_oidc_db.views.OIDCCallbackView"
+MOZILLA_DJANGO_OIDC_DB_CACHE = "oidc"
+MOZILLA_DJANGO_OIDC_DB_CACHE_TIMEOUT = 1
 
 from .app.csp import *  # noqa

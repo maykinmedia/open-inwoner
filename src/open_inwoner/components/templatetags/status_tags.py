@@ -3,8 +3,6 @@ from typing import TypedDict
 
 from django import template
 
-from zgw_consumers.api_models.catalogi import StatusType
-
 register = template.Library()
 
 

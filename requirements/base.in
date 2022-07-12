@@ -26,7 +26,6 @@ maykin-django-two-factor-auth
 phonenumbers
 django-localflavor
 django-privates
-django-digid-eherkenning
 django-cors-headers
 django-autoslug
 django-elasticsearch-dsl
@@ -44,6 +43,7 @@ django-timeline-logger
 django-rich
 django-csp
 django-csp-reports
+mozilla-django-oidc-db
 
 # API libraries
 djangorestframework
@@ -60,8 +60,10 @@ elastic-apm  # Elastic APM integration
 beautifulsoup4
 
 # DigidLocal
-git+https://github.com/maykinmedia/python3-saml.git@f587f77b78be79d51139f29a957b406072e2b537#egg=python3_saml
+django-digid-eherkenning
+git+https://github.com/maykinmedia/python3-saml.git@9f1ffa86fdfe68ccbcf063613c6e6cbb5447c360#egg=python3_saml
 pyopenssl
+django-sessionprofile
 
 # Common Ground integration
 zgw-consumers

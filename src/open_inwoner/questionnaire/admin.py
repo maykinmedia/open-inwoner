@@ -6,6 +6,8 @@ from django.utils.translation import gettext as _
 from treebeard.admin import TreeAdmin
 from treebeard.forms import movenodeform_factory
 
+from open_inwoner.pdc.models.product import Product
+
 from ..ckeditor5.widgets import CKEditorWidget
 from .models import QuestionnaireStep, QuestionnaireStepFile
 
@@ -20,6 +22,10 @@ class QuestionnaireStepAdminForm(movenodeform_factory(QuestionnaireStep)):
         model = QuestionnaireStep
         fields = "__all__"
         widgets = {"content": CKEditorWidget}
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.fields["related_products"].queryset = Product.objects.published()
 
     def clean(self, *args, **kwargs):
         cleaned_data = super().clean(*args, **kwargs)

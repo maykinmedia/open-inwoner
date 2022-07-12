@@ -6,7 +6,7 @@
   border-radius: var(--border-radius);
   color: var(--notification-color-text);
   display: flex;
-  grid-gap: var(--spacing-extra-large);
+  gap: var(--spacing-extra-large);
   margin: var(--row-height) 0;
   padding: var(--spacing-extra-large);
   position: relative;

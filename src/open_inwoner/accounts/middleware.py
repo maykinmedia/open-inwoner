@@ -18,7 +18,9 @@ class NecessaryFieldsMiddleware:
             # If the user is currently not editing their information, but it is required
             # redirect to that view.
             if (
-                not request.path.startswith((necessary_fields_url, reverse("logout")))
+                not request.path.startswith(
+                    (necessary_fields_url, reverse("logout"), reverse("digid:logout"))
+                )
                 and request.user.require_necessary_fields()
             ):
                 return HttpResponseRedirect(necessary_fields_url)

@@ -110,6 +110,15 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
         ),
         (_("Emails"), {"fields": ("email_new_message",)}),
         (
+            _("Openid Connect"),
+            {
+                "fields": (
+                    "openid_connect_logo",
+                    "openid_connect_login_text",
+                )
+            },
+        ),
+        (
             _("Analytics"),
             {"fields": ("gtm_code", "ga_code", "matomo_url", "matomo_site_id")},
         ),

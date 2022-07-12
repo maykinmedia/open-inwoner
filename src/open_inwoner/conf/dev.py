@@ -69,6 +69,7 @@ LOGGING["loggers"].update(
 CACHES = {
     "default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"},
     "axes": {"BACKEND": "django.core.cache.backends.dummy.DummyCache"},
+    "oidc": {"BACKEND": "django.core.cache.backends.dummy.DummyCache"},
 }
 
 #
@@ -81,6 +82,7 @@ AUTHENTICATION_BACKENDS = [
     "open_inwoner.accounts.backends.UserModelEmailBackend",
     "django.contrib.auth.backends.ModelBackend",
     "digid_eherkenning.mock.backends.DigiDBackend",
+    "open_inwoner.accounts.backends.CustomOIDCBackend",
 ]
 
 ELASTIC_APM["DEBUG"] = True

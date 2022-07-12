@@ -8,7 +8,7 @@
   background-color: var(--color-gray-lightest);
   box-sizing: border-box;
   display: grid;
-  grid-gap: var(--gutter-width);
+  gap: var(--gutter-width);
   grid-template-areas:
     'lg   lg   lg   lg'
     'vstr vstr vstr vstr'

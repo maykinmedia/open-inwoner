@@ -16,6 +16,7 @@ AUTHENTICATION_BACKENDS = [
     "open_inwoner.accounts.backends.CustomAxesBackend",
     "open_inwoner.accounts.backends.UserModelEmailBackend",
     "django.contrib.auth.backends.ModelBackend",
+    "open_inwoner.accounts.backends.CustomOIDCBackend",
 ]
 
 if DIGID_METADATA and not DEBUG:

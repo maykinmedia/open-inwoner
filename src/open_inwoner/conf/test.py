@@ -16,6 +16,7 @@ AUTHENTICATION_BACKENDS = [
     "open_inwoner.accounts.backends.UserModelEmailBackend",
     "django.contrib.auth.backends.ModelBackend",
     "digid_eherkenning.mock.backends.DigiDBackend",
+    "open_inwoner.accounts.backends.CustomOIDCBackend",
 ]
 
 CSP_REPORTS_SAVE = True

@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n static logo_tags grid_tags card_tags form_tags link_tags button_tags %}
+{% load i18n static logo_tags grid_tags card_tags form_tags link_tags button_tags solo_tags %}
 
 
 {% block header_image %}
@@ -19,8 +19,23 @@
                         <a href="{% url 'digid:login' %}" class="link digid-logo" aria-describedby="Digid logo" title="Digid logo">
                             <img class="digid-logo__image" src="{% static 'accounts/digid_logo.svg' %}" alt="Digid logo">
                         </a>
-                        {% link bold=True href='digid:login' text=_('Inloggen met DigiD') secondary=True icon='arrow_forward' %}
+                        {% link href='digid:login' text=_('Inloggen met DigiD') secondary=True icon='arrow_forward' extra_classes="link--digid" %}
                     {% endrender_card %}
+
+                {% get_solo 'mozilla_django_oidc_db.OpenIDConnectConfig' as oidc_config %}
+                {% get_solo 'configurations.SiteConfiguration' as site_config %}
+                {% if oidc_config.enabled %}
+                    {% render_card tinted=True direction='horizontal' %}
+                    {% if site_config.openid_connect_logo %}
+                        <a href="{% url 'oidc_authentication_init' %}" class="link digid-logo" aria-describedby="{{ site_config.openid_connect_logo.default_alt_text }}" title="{{ site_config.openid_connect_logo.default_alt_text }}">
+                            <img class="digid-logo__image" src="{{ site_config.openid_connect_logo.url }}" alt="{{ site_config.openid_connect_logo.default_alt_text }}">
+                        </a>
+                    {% else %}
+                        <div></div>
+                    {% endif %}
+                        {% link text=site_config.openid_connect_login_text href='oidc_authentication_init' secondary=True icon='arrow_forward' icon_position="after" %}
+                    {% endrender_card %}
+                {% endif %}
 
                 {% if login_allow_registration %}
                     {% render_card tinted=True %}
