@@ -60,9 +60,8 @@ elastic-apm  # Elastic APM integration
 beautifulsoup4
 
 # DigidLocal
-# UNSAFE! Should be replaced with pinned version
-git+https://github.com/maykinmedia/django-digid-eherkenning.git@feature/digid-logout-soap
-git+https://github.com/maykinmedia/python3-saml.git@f587f77b78be79d51139f29a957b406072e2b537#egg=python3_saml
+django-digid-eherkenning
+git+https://github.com/maykinmedia/python3-saml.git@9f1ffa86fdfe68ccbcf063613c6e6cbb5447c360#egg=python3_saml
 pyopenssl
 django-sessionprofile
 
