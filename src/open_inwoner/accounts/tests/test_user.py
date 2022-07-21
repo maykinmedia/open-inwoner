@@ -5,6 +5,7 @@ from django.test import TestCase
 from freezegun import freeze_time
 
 from open_inwoner.accounts.choices import LoginTypeChoices
+from open_inwoner.utils.hash import generate_email_from_string
 
 from ..models import User
 from .factories import UserFactory
@@ -49,6 +50,12 @@ class UserTests(TestCase):
 
     def test_require_necessary_fields_digid_no_last_name(self):
         user = UserFactory(login_type=LoginTypeChoices.digid, last_name="")
+        self.assertTrue(user.require_necessary_fields())
+
+    def test_require_necessary_fields_digid_openinwoner_email(self):
+        bsn = "123456789"
+        oip_email = generate_email_from_string(bsn)
+        user = UserFactory(login_type=LoginTypeChoices.digid, bsn=bsn, email=oip_email)
         self.assertTrue(user.require_necessary_fields())
 
     def test_require_necessary_fields_oidc(self):
