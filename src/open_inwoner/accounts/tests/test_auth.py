@@ -303,7 +303,7 @@ class TestRegistrationNecessary(WebTest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.context["errors"].as_text(),
-            "* Er bestaat al een Gebruiker met eenzelfde E-mailadres.",
+            "* Een gebruiker met dit e-mailadres bestaat al",
         )
 
     def test_submit_not_unique_email_different_case(self):
