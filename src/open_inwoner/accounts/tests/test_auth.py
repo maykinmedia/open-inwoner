@@ -130,6 +130,25 @@ class TestRegistrationFunctionality(WebTest):
         self.assertEqual(get_response.status_code, 302)
         self.assertEqual(get_response.url, reverse("django_registration_complete"))
 
+    def test_registration_non_unique_email_different_case(self):
+        UserFactory.create(email="john@smith.com")
+
+        register_page = self.app.get(self.url)
+        form = register_page.forms["registration-form"]
+        form["email"] = "John@smith.com"
+        form["first_name"] = "John"
+        form["last_name"] = "Smith"
+        form["password1"] = "somepassword"
+        form["password2"] = "somepassword"
+
+        response = form.submit()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context["errors"].as_text(),
+            "* Een gebruiker met dit e-mailadres bestaat al",
+        )
+
 
 class TestRegistrationDigid(WebTest):
     url = reverse_lazy("django_registration_register")
@@ -263,6 +282,52 @@ class TestRegistrationNecessary(WebTest):
         self.assertEqual(reverse_contact.email, contact.created_by.email)
         self.assertEqual(reverse_contact.first_name, contact.created_by.first_name)
         self.assertEqual(reverse_contact.last_name, contact.created_by.last_name)
+
+    def test_submit_not_unique_email(self):
+        UserFactory.create(email="john@smith.com")
+        user = UserFactory.create(
+            first_name="",
+            last_name="",
+            login_type=LoginTypeChoices.digid,
+        )
+
+        get_response = self.app.get(self.url, user=user)
+        form = get_response.forms["necessary-form"]
+
+        form["email"] = "john@smith.com"
+        form["first_name"] = "John"
+        form["last_name"] = "Smith"
+
+        response = form.submit()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context["errors"].as_text(),
+            "* Een gebruiker met dit e-mailadres bestaat al",
+        )
+
+    def test_submit_not_unique_email_different_case(self):
+        UserFactory.create(email="john@smith.com")
+        user = UserFactory.create(
+            first_name="",
+            last_name="",
+            login_type=LoginTypeChoices.digid,
+        )
+
+        get_response = self.app.get(self.url, user=user)
+        form = get_response.forms["necessary-form"]
+
+        form["email"] = "John@smith.com"
+        form["first_name"] = "John"
+        form["last_name"] = "Smith"
+
+        response = form.submit()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context["errors"].as_text(),
+            "* Een gebruiker met dit e-mailadres bestaat al",
+        )
 
 
 class TestLoginLogoutFunctionality(WebTest):

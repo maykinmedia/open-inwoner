@@ -37,7 +37,7 @@ class CustomRegistrationForm(RegistrationForm):
     def clean_email(self):
         email = self.cleaned_data["email"]
 
-        existing_user = User.objects.filter(email=email).first()
+        existing_user = User.objects.filter(email__iexact=email).first()
         if not existing_user:
             return email
 
@@ -83,6 +83,15 @@ class NecessaryUserForm(forms.ModelForm):
 
         self.fields["first_name"].required = True
         self.fields["last_name"].required = True
+
+    def clean_email(self):
+        email = self.cleaned_data["email"]
+
+        is_existing_user = User.objects.filter(email__iexact=email).exists()
+        if is_existing_user:
+            raise ValidationError(_("The user with this email already exists"))
+
+        return email
 
 
 class CustomPasswordResetForm(PasswordResetForm):
