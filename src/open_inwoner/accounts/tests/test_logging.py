@@ -55,7 +55,8 @@ class TestProfile(WebTest):
         self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEqual(log_entry.content_object.id, User.objects.all()[1].id)
+        user = User.objects.get(email=user.email)
+        self.assertEqual(log_entry.content_object.id, user.id)
         self.assertEqual(
             log_entry.extra_data,
             {
