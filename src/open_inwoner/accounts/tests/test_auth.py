@@ -434,7 +434,9 @@ class TestPasswordResetFunctionality(WebTest):
         self.assertEqual(len(mail.outbox), 1)
 
     def test_custom_password_reset_form_does_not_send_email_when_user_is_digid(self):
-        digid_user = UserFactory(login_type=LoginTypeChoices.digid)
+        digid_user = UserFactory(
+            login_type=LoginTypeChoices.digid, email="john@smith.nl"
+        )
         self.app.post(reverse("password_reset"), {"email": digid_user.email})
         self.assertEqual(len(mail.outbox), 0)
 
@@ -456,7 +458,9 @@ class TestPasswordChange(WebTest):
         self.assertContains(response, _("Wijzig wachtwoord"))
 
     def test_password_change_button_is_not_rendered_with_digid_login_type(self):
-        digid_user = UserFactory(login_type=LoginTypeChoices.digid)
+        digid_user = UserFactory(
+            login_type=LoginTypeChoices.digid, email="john@smith.nl"
+        )
         response = self.app.get(reverse("accounts:my_profile"), user=digid_user)
         self.assertNotContains(response, _("Wijzig wachtwoord"))
 

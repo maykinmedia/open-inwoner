@@ -41,7 +41,7 @@ class UserTests(TestCase):
         self.assertFalse(user.require_necessary_fields())
 
     def test_require_necessary_fields_digid(self):
-        user = UserFactory(login_type=LoginTypeChoices.digid)
+        user = UserFactory(login_type=LoginTypeChoices.digid, email="john@smith.nl")
         self.assertFalse(user.require_necessary_fields())
 
     def test_require_necessary_fields_digid_no_first_name(self):
