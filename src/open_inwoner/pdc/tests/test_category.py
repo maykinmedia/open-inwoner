@@ -43,7 +43,7 @@ class TestHighlightedCategories(WebTest):
         response = self.app.get(reverse("root"), user=user)
         self.assertEqual(
             list(response.context["categories"]),
-            [category, highlighted_category],
+            [highlighted_category],
         )
 
     def test_category_selected(self):
