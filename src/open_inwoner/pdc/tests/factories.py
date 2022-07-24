@@ -20,6 +20,7 @@ class ProductFactory(factory.django.DjangoModelFactory):
     slug = factory.LazyAttribute(lambda a: slugify(a.name))
     summary = factory.Faker("sentence")
     content = factory.Faker("paragraph")
+    published = True
 
     class Meta:
         model = Product
@@ -56,6 +57,7 @@ class CategoryFactory(factory.django.DjangoModelFactory):
     name = factory.Faker("word")
     slug = factory.LazyAttribute(lambda a: slugify(a.name))
     description = factory.Faker("sentence")
+    published = True
 
     class Meta:
         model = Category

@@ -18,6 +18,7 @@ class TestAdminCategoryForm(WebTest):
         ]
         form["name"] = "foo1"
         form["slug"] = "foo1"
+        form["published"] = True
         form["_position"] = "sorted-child"
         form["_ref_node_id"] = ""
         form.submit()
@@ -32,6 +33,7 @@ class TestAdminCategoryForm(WebTest):
         ]
         form["name"] = "bar1"
         form["slug"] = "bar1"
+        form["published"] = True
         form["_position"] = "sorted-child"
         form["_ref_node_id"] = root.id
         form.submit()
@@ -48,6 +50,7 @@ class TestAdminCategoryForm(WebTest):
 
         form["name"] = "bar2"
         form["slug"] = "bar2"
+        form["published"] = True
         form["_position"] = "sorted-child"
         form["_ref_node_id"] = category.id
         form.submit()

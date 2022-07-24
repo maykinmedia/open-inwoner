@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-06 18:32+0200\n"
+"POT-Creation-Date: 2022-07-24 13:52+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -47,16 +47,15 @@ msgid "eHerkenning"
 msgstr "eHerkenning"
 
 #: accounts/choices.py:10
-#, fuzzy
 #| msgid "Type contact"
 msgid "OpenId connect"
-msgstr "Type contactpersoon"
+msgstr "OpenId connect"
 
 #: accounts/choices.py:15
 msgid "Alle"
 msgstr "Alle"
 
-#: accounts/choices.py:19 accounts/forms.py:268
+#: accounts/choices.py:19 accounts/forms.py:277
 msgid "Contactpersoon"
 msgstr "Contactpersoon"
 
@@ -104,7 +103,7 @@ msgstr "Voornaam"
 msgid "Last name"
 msgstr "Achternaam"
 
-#: accounts/forms.py:45
+#: accounts/forms.py:45 accounts/forms.py:92
 msgid "The user with this email already exists"
 msgstr "Een gebruiker met dit e-mailadres bestaat al"
 
@@ -112,11 +111,11 @@ msgstr "Een gebruiker met dit e-mailadres bestaat al"
 msgid "This user has been deactivated"
 msgstr "Deze gebruiker is gedeactiveerd"
 
-#: accounts/forms.py:110
+#: accounts/forms.py:119
 msgid "Type contact"
 msgstr "Type contactpersoon"
 
-#: accounts/forms.py:131
+#: accounts/forms.py:140
 msgid ""
 "Het ingevoerde e-mailadres komt al voor in uw contactpersonen. Pas de "
 "gegevens aan en probeer het opnieuw."
@@ -124,31 +123,31 @@ msgstr ""
 "Het ingevoerde e-mailadres komt al voor in uw contactpersonen. Pas de "
 "gegevens aan en probeer het opnieuw."
 
-#: accounts/forms.py:166
+#: accounts/forms.py:175
 msgid "Is voor"
 msgstr "Is voor"
 
-#: accounts/forms.py:168
+#: accounts/forms.py:177
 msgid "Myself"
 msgstr "Mezelf"
 
-#: accounts/forms.py:206
+#: accounts/forms.py:215
 msgid "The action can not end after the plan end date"
 msgstr "De actie kan niet later eindigen dan de einddatum van het plan"
 
-#: accounts/forms.py:272
+#: accounts/forms.py:281
 msgid "Voer de naam in van uw contactpersoon"
 msgstr "Voer de naam in van uw contactpersoon"
 
-#: accounts/forms.py:278
+#: accounts/forms.py:287
 msgid "Schrijf een bericht..."
 msgstr "Schrijf een bericht..."
 
-#: accounts/forms.py:310
+#: accounts/forms.py:319
 msgid "Either message content or file should be filled in"
 msgstr "Of een bericht of een bestand moet ingevuld zijn"
 
-#: accounts/forms.py:334
+#: accounts/forms.py:343
 msgid "Deadline"
 msgstr "Einddatum"
 
@@ -644,25 +643,24 @@ msgstr "Uitnodiging"
 msgid "Invitations"
 msgstr "Uitnodigingen"
 
-#: accounts/signals.py:9 accounts/tests/test_logging.py:124
+#: accounts/signals.py:9 accounts/tests/test_logging.py:125
 msgid "user was logged in via admin page"
 msgstr "gebruiker is ingelogd via de admin pagina"
 
-#: accounts/signals.py:10 accounts/tests/test_logging.py:141
+#: accounts/signals.py:10 accounts/tests/test_logging.py:142
 msgid "user was logged in via frontend using email"
 msgstr "gebruiker is ingelogd via de voorkant met e-mailadres en wachtwoord"
 
-#: accounts/signals.py:11 accounts/tests/test_logging.py:159
+#: accounts/signals.py:11 accounts/tests/test_logging.py:160
 msgid "user was logged in via frontend using digid"
 msgstr "gebruiker is ingelogd via de voorkant met DigiD"
 
 #: accounts/signals.py:12
-#, fuzzy
 #| msgid "user was logged in via frontend using email"
 msgid "user was logged in via frontend using OpenIdConnect"
-msgstr "gebruiker is ingelogd via de voorkant met e-mailadres en wachtwoord"
+msgstr "gebruiker is ingelogd via de voorkant met gehulp van OpenId Connect"
 
-#: accounts/signals.py:13 accounts/tests/test_logging.py:176
+#: accounts/signals.py:13 accounts/tests/test_logging.py:177
 msgid "user was logged out"
 msgstr "gebruiker is uitgelogd"
 
@@ -750,11 +748,11 @@ msgstr "Log in"
 msgid "Registreer"
 msgstr "Registreer"
 
-#: accounts/tests/test_auth.py:297
+#: accounts/tests/test_auth.py:362
 msgid "Deze account is inactief."
 msgstr "Deze account is inactief."
 
-#: accounts/tests/test_auth.py:309
+#: accounts/tests/test_auth.py:374
 msgid ""
 "Voer een juiste E-mailadres en wachtwoord in. Let op dat beide velden "
 "hoofdlettergevoelig zijn."
@@ -762,17 +760,17 @@ msgstr ""
 "Voer een juiste E-mailadres en wachtwoord in. Let op dat beide velden "
 "hoofdlettergevoelig zijn."
 
-#: accounts/tests/test_auth.py:330
+#: accounts/tests/test_auth.py:395
 #: templates/registration/password_reset_form.html:12
 msgid "Mijn wachtwoord opnieuw instellen"
 msgstr "Mijn wachtwoord opnieuw instellen"
 
-#: accounts/tests/test_auth.py:340
+#: accounts/tests/test_auth.py:405
 #, python-brace-format
 msgid "Wachtwoordherinitialisatie voor {domain}"
 msgstr "Wachtwoordherinitialisatie voor {domain}"
 
-#: accounts/tests/test_auth.py:347
+#: accounts/tests/test_auth.py:412
 #, python-brace-format
 msgid ""
 "U ontvangt deze e-mail, omdat u een aanvraag voor opnieuw instellen van het "
@@ -781,28 +779,28 @@ msgstr ""
 "U ontvangt deze e-mail, omdat u een aanvraag voor opnieuw instellen van het "
 "wachtwoord voor uw account op {domain} hebt gedaan."
 
-#: accounts/tests/test_auth.py:352
+#: accounts/tests/test_auth.py:417
 #, python-brace-format
 msgid "Uw gebruikersnaam, mocht u deze vergeten zijn: {user_email}"
 msgstr "Uw gebruikersnaam, mocht u deze vergeten zijn: {user_email}"
 
-#: accounts/tests/test_auth.py:365
+#: accounts/tests/test_auth.py:430
 #: templates/registration/password_change_form.html:13
 #: templates/registration/password_reset_confirm.html:8
 msgid "Mijn wachtwoord wijzigen"
 msgstr "Mijn wachtwoord wijzigen"
 
-#: accounts/tests/test_auth.py:383
+#: accounts/tests/test_auth.py:448
 #: templates/registration/password_change_form.html:5
 msgid "Wachtwoordwijziging"
 msgstr "Wachtwoordwijziging"
 
-#: accounts/tests/test_auth.py:387
+#: accounts/tests/test_auth.py:452
 #: templates/registration/password_change_done.html:6
 msgid "Uw wachtwoord is gewijzigd."
 msgstr "Uw wachtwoord is gewijzigd."
 
-#: accounts/tests/test_auth.py:391 accounts/tests/test_auth.py:396
+#: accounts/tests/test_auth.py:456 accounts/tests/test_auth.py:461
 #: templates/pages/profile/me.html:19
 msgid "Wijzig wachtwoord"
 msgstr "Wijzig wachtwoord"
@@ -844,109 +842,109 @@ msgstr ""
 msgid "Het verstuurde bestand is leeg."
 msgstr ""
 
-#: accounts/tests/test_logging.py:62 accounts/views/registration.py:86
+#: accounts/tests/test_logging.py:63 accounts/views/registration.py:86
 msgid "user was created"
 msgstr "gebruikersaccount is aangemaakt"
 
-#: accounts/tests/test_logging.py:83 accounts/views/profile.py:106
+#: accounts/tests/test_logging.py:84 accounts/views/profile.py:106
 msgid "profile was modified"
 msgstr "profiel is gewijzigd"
 
-#: accounts/tests/test_logging.py:107 accounts/views/profile.py:129
+#: accounts/tests/test_logging.py:108 accounts/views/profile.py:129
 msgid "categories were modified"
 msgstr "categorieen zijn gewijzigd"
 
-#: accounts/tests/test_logging.py:196 accounts/views/profile.py:80
+#: accounts/tests/test_logging.py:197 accounts/views/profile.py:80
 msgid "user was deactivated via frontend"
 msgstr "gebruikersaccount is op eigen verzoek gedeactiveerd"
 
-#: accounts/tests/test_logging.py:220 accounts/views/auth.py:27
+#: accounts/tests/test_logging.py:221 accounts/views/auth.py:27
 msgid "password was changed"
 msgstr "wachtwoord is gewijzigd"
 
-#: accounts/tests/test_logging.py:238 accounts/views/auth.py:35
+#: accounts/tests/test_logging.py:239 accounts/views/auth.py:35
 msgid "password reset was accessed"
 msgstr "wachtwoord reset is uitgevoerd"
 
-#: accounts/tests/test_logging.py:268 accounts/views/auth.py:44
+#: accounts/tests/test_logging.py:269 accounts/views/auth.py:44
 msgid "password reset was completed"
 msgstr "wachtwoordreset is uitgevoerd"
 
-#: accounts/tests/test_logging.py:296 accounts/views/invite.py:26
+#: accounts/tests/test_logging.py:297 accounts/views/invite.py:26
 msgid "invitation accepted"
 msgstr "uitnodiging is geaccepteerd"
 
-#: accounts/tests/test_logging.py:299
+#: accounts/tests/test_logging.py:300
 #, python-brace-format
 msgid "For: {invitee} (2021-10-18)"
 msgstr ""
 
-#: accounts/tests/test_logging.py:322 accounts/views/invite.py:33
+#: accounts/tests/test_logging.py:323 accounts/views/invite.py:33
 msgid "invitation expired"
 msgstr "uitnodiging verlopen"
 
-#: accounts/tests/test_logging.py:325
+#: accounts/tests/test_logging.py:326
 #, python-brace-format
 msgid "For: {invitee} (2021-09-18)"
 msgstr ""
 
-#: accounts/tests/test_logging.py:360 accounts/views/contacts.py:140
+#: accounts/tests/test_logging.py:361 accounts/views/contacts.py:140
 #: accounts/views/registration.py:72
 msgid "contact was created"
 msgstr "contact is aangemaakt"
 
-#: accounts/tests/test_logging.py:382 accounts/views/contacts.py:85
+#: accounts/tests/test_logging.py:383 accounts/views/contacts.py:85
 msgid "contact was modified"
 msgstr "contact is gewijzigd"
 
-#: accounts/tests/test_logging.py:404 accounts/views/contacts.py:158
+#: accounts/tests/test_logging.py:405 accounts/views/contacts.py:158
 msgid "contact was deleted"
 msgstr "contact is verwijderd"
 
-#: accounts/tests/test_logging.py:431 accounts/tests/test_logging.py:613
+#: accounts/tests/test_logging.py:432 accounts/tests/test_logging.py:614
 #: accounts/views/actions.py:180 accounts/views/document.py:24
 #: accounts/views/inbox.py:203
 msgid "file was downloaded"
 msgstr "bestand is gedownload"
 
-#: accounts/tests/test_logging.py:455 accounts/views/documents.py:26
+#: accounts/tests/test_logging.py:456 accounts/views/documents.py:26
 #: plans/tests/test_logging.py:114 plans/views.py:199
 msgid "file was uploaded"
 msgstr "bestand is geupload"
 
-#: accounts/tests/test_logging.py:476 accounts/views/documents.py:45
+#: accounts/tests/test_logging.py:477 accounts/views/documents.py:45
 msgid "file was deleted"
 msgstr "bestand is verwijderd"
 
-#: accounts/tests/test_logging.py:505 accounts/views/actions.py:137
+#: accounts/tests/test_logging.py:506 accounts/views/actions.py:137
 msgid "action was created"
 msgstr "actie is aangemaakt"
 
-#: accounts/tests/test_logging.py:564 accounts/tests/test_logging.py:589
+#: accounts/tests/test_logging.py:565 accounts/tests/test_logging.py:590
 #: accounts/views/inbox.py:132 accounts/views/inbox.py:168
 msgid "message was created"
 msgstr "bericht is aangemaakt"
 
-#: accounts/tests/test_logging.py:566 accounts/tests/test_logging.py:591
+#: accounts/tests/test_logging.py:567 accounts/tests/test_logging.py:592
 #, python-brace-format
 msgid "From: {me}, To: {other} (2021-10-18)"
 msgstr ""
 
-#: accounts/tests/test_logging.py:616
+#: accounts/tests/test_logging.py:617
 #, python-brace-format
 msgid "From: {sender}, To: {receiver} (2021-10-18)"
 msgstr ""
 
-#: accounts/tests/test_logging.py:640
+#: accounts/tests/test_logging.py:641
 msgid "file profile.pdf was exported"
 msgstr ""
 
-#: accounts/tests/test_logging.py:660
+#: accounts/tests/test_logging.py:661
 #, python-brace-format
 msgid "file action_{action_uuid}.pdf was exported"
 msgstr ""
 
-#: accounts/tests/test_logging.py:682
+#: accounts/tests/test_logging.py:683
 msgid "file actions.pdf was exported"
 msgstr "file actions.pdf was exported"
 
@@ -2005,15 +2003,15 @@ msgstr "Configuratie 'Open Zaak'"
 #: openzaak/tests/test_statuses.py:257 openzaak/tests/test_statuses.py:276
 #: templates/pages/cases/status.html:33
 msgid "There is no available data at the moment."
-msgstr ""
+msgstr "Op dit moment zijn er geen aanvragen beschikbaar."
 
 #: pdc/admin/category.py:32 pdc/admin/category.py:54
 msgid "Parent nodes have to be published in order to publish a child."
-msgstr ""
+msgstr "Bovenliggende thema's dienen gepubliceerd te zijn om een onderliggende thema te kunnen publiceren."
 
 #: pdc/admin/category.py:45
 msgid "Parent nodes cannot be unpublished if they have published children."
-msgstr ""
+msgstr "Bovenliggende thema's kunnen niet op ongepubliceerd worden gezet zolang er onderliggende gepubliceerde thema's zijn."
 
 #: pdc/admin/category.py:84 pdc/tests/test_logging.py:279
 msgid "categories were exported"
@@ -2029,7 +2027,7 @@ msgstr "producten zijn geexporteerd"
 
 #: pdc/models/category.py:16
 msgid "Published nodes cannot be moved to unpublished ones."
-msgstr ""
+msgstr "Gepubliceerde thema's kunnen niet worden verplaatst onder ongepubliceerde thema's"
 
 #: pdc/models/category.py:23
 msgid "Name of the category"
@@ -2046,13 +2044,12 @@ msgstr "Slug van het thema"
 
 #: pdc/models/category.py:32 pdc/models/product.py:30
 msgid "Published"
-msgstr ""
+msgstr "Gepubliceerd"
 
 #: pdc/models/category.py:34
-#, fuzzy
 #| msgid "Whether the category should be highlighted or not"
 msgid "Whether the category should be published or not."
-msgstr "Of de thema uitgelicht moet worden op de homepage of niet."
+msgstr "Of de thema publiekelijk zichtbaar dient te zijn of niet."
 
 #: pdc/models/category.py:37 questionnaire/models.py:68
 msgid "Highlighted"

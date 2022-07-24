@@ -117,7 +117,7 @@ class TestPublishedCategories(WebTest):
 
     def test_only_published_subcategories_exist_in_detail_page_when_anonymous(self):
         descendent1 = self.published1.add_child(
-            path="00010001", name="first-child", slug="first-child"
+            path="00010001", name="first-child", slug="first-child", published=True
         )
         descendent2 = self.published1.add_child(
             path="00010002", name="second-child", slug="second-child", published=False
@@ -129,7 +129,7 @@ class TestPublishedCategories(WebTest):
 
     def test_only_published_subcategories_exist_in_detail_page_when_logged_in(self):
         descendent1 = self.published1.add_child(
-            path="00010003", name="first-child-2", slug="first-child-2"
+            path="00010003", name="first-child-2", slug="first-child-2", published=True
         )
         descendent2 = self.published1.add_child(
             path="00010004",
