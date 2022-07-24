@@ -2069,7 +2069,7 @@ msgstr "Icoon"
 
 #: pdc/models/category.py:53
 msgid "Icon of the category"
-msgstr "Thema icoon"
+msgstr "Thema icoon, afmeting: 228x100"
 
 #: pdc/models/category.py:56 pdc/models/product.py:49
 msgid "Image"
@@ -2077,7 +2077,7 @@ msgstr "Afbeelding"
 
 #: pdc/models/category.py:61
 msgid "Image of the category"
-msgstr "Afbeelding van het thema"
+msgstr "Afbeelding van het thema in bannerformaat bovenaan de pagina, afmeting: bij voorkeur minimaal 1200 pixels breed en minimaal 150 pixels hoog"
 
 #: pdc/models/category.py:68 pdc/models/faq.py:10 questionnaire/models.py:80
 msgid "Category"
@@ -2236,11 +2236,11 @@ msgstr "Korte omschrijving van het product"
 
 #: pdc/models/product.py:46
 msgid "Icon of the product"
-msgstr "Icoon van het product"
+msgstr "Icoon van het product, resolutie 256x300"
 
 #: pdc/models/product.py:54
 msgid "Image of the product"
-msgstr "Afbeelding van het product"
+msgstr "Afbeelding van het product in bannerformaat bovenaan de pagina, afmeting: bij voorkeur minimaal 1200 pixels breed en minimaal 150 pixels hoog"
 
 #: pdc/models/product.py:57
 msgid "Link"
