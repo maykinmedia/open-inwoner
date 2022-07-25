@@ -57,6 +57,7 @@ def on_bsn_change(instance, **kwargs):
         and instance.is_prepopulated is False
         and instance.login_type == LoginTypeChoices.digid
     ):
+        system_action("Retrieving data from haal centraal based on BSN")
         data = fetch_data(instance)
         if data.get("personen"):
             person = glom(data, "personen")[0]
