@@ -1,6 +1,6 @@
 {% load i18n icon_tags button_tags %}
 
-<aside class="anchor-menu {% if desktop %}anchor-menu--desktop{% else %}anchor-menu--mobile{% endif %}">
+<aside class="anchor-menu {% if desktop %}anchor-menu--desktop{% else %}anchor-menu--mobile{% endif %}" aria-label="{% trans "Zijmenu mobiel" %}">
     <ul class="anchor-menu__list">
         {% for anchor in anchors %}
             <li class="anchor-menu__list-item">

@@ -1,7 +1,7 @@
 {% load filter_tags icon_tags form_tags %}
 
 <div>
-    <aside class="filter filter--open">
+    <aside class="filter filter--open" aria-label="{% trans "Filter" %}">
         <h4 class="h4 filter__title">
             {{ field.label }}
             {% icon icon="expand_more" %}

@@ -15,6 +15,10 @@
     font-size: var(--font-size-body-small);
     line-height: var(--font-line-height-body-small);
   }
+
+  &:empty {
+    margin: 0 !important;
+  }
 }
 
 *[class^='h'] + .p {

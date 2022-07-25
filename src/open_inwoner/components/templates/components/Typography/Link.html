@@ -17,6 +17,7 @@
     {% endif %}
     {% if toggle_exclusive %}data-toggle-exclusive="{{ toggle_exclusive }}"{% endif %}
     aria-describedby="{{ text }}"
+    {% if hide_text %}aria-hidden="true"{% endif %}
     title="{% firstof title text %}"
 >
     {% if src %}

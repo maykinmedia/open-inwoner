@@ -3,7 +3,9 @@
 
 {% block header_image %}
 {% if object.image %}
-    <img class="main-image main-image--start-after" src="{{ object.image.url }}" alt="Header image">
+    <aside aria-label="{% trans "Header afbeelding" %}">
+        <img class="main-image main-image--start-after" src="{{ object.image.url }}" alt="Header image">
+    </aside>
 {% endif %}
 {% endblock header_image %}
 
@@ -79,8 +81,8 @@
         {% render_column span=5 %}
             {# Links. #}
             {% if object.links.exists %}
-                <nav class="link-list">
-                    <h4 class="h4" id="links">{% trans "Links" %}</h4>
+                <nav class="link-list" aria-label="{% trans "links" %}">
+                    <h3 class="h3" id="links">{% trans "Links" %}</h3>
                     <ul class="link-list__list">
                         {% for link in object.links.all %}
                             <li class="link-list__list-item">
@@ -95,8 +97,8 @@
         {% render_column start=related_products_start span=4 compact=True %}
             {# Related products. #}
             {% if object.related_products.published.exists %}
-                <nav class="link-list">
-                    <h4 class="h4" id="see">{% trans "Zie ook" %}</h4>
+                <nav class="link-list" aria-label="{% trans "Zie ook links" %}">
+                    <h3 class="h3" id="see">{% trans "Zie ook" %}</h3>
                     <ul class="link-list__list">
                         {% for related in object.related_products.published %}
                             <li class="link-list__list-item">
@@ -113,7 +115,7 @@
         {% render_column span=9 %}
             {% if object.contacts.exists %}
                 {% render_notification type='success' icon=False %}
-                    <h4 class="h4" id="contact">{% trans 'Contact' %}</h4>
+                    <h3 class="h3" id="contact">{% trans 'Contact' %}</h3>
 
                     {% for contact in object.contacts.all %}
                         {% render_grid compact=True %}

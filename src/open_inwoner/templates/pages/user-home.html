@@ -18,8 +18,12 @@
             {% render_card %}
                 <h3 class="h3">{{ plan.title }}</h3>
                 <p class="p">{{ plan.goal|truncatewords:20 }}</p>
-                <a class="button button--icon-before button--transparent button--secondary"
-                   href="{{ plan.get_absolute_url }}">
+                <a
+                    class="button button--icon-before button--transparent button--secondary"
+                    href="{{ plan.get_absolute_url }}"
+                    aria-describedby="{{ plan.title }}"
+                    aria-hidden="true"
+                >
                     {% icon icon="arrow_forward" %}
                 </a>
             {% endrender_card %}

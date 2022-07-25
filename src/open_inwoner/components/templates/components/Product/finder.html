@@ -1,12 +1,12 @@
 {% load i18n grid_tags form_tags button_tags %}
 
 {% render_column span=6 compact=True extra_classes="product-finder" %}
-    <h1 class="h1">{% trans "Productzoeker" %}</h1>
+    <h2 class="h2">{% trans "Productzoeker" %}</h2>
     <p class="p">Met een paar simpele vragen ziet u welke producten passen bij uw situatie</p>
 
     <div class="product-finder__form">
         {% if not conditions_done %}
-            <h4 class="h4">{{ condition.question }}</h4>
+            <h3 class="h3">{{ condition.question }}</h3>
             {% if condition.rule %}
             <p class="p p--compact">{{ condition.rule }}</p>
             {% endif %}

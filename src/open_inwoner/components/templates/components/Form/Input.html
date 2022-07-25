@@ -1,9 +1,11 @@
 {% load form_tags icon_tags %}
 
 <div class="form__control {{ extra_classes|default:"" }}">
-    <label class="label">
+    <label class="label {% if no_label %}label--gapless{% endif %}">
         {% if icon %}{% icon icon outlined=True %}{% endif %}
-        {% if not no_label %}{{ field.label }}{% endif %}
+        <label class="label__label {% if no_label %}label__label--hidden{% endif %}">
+            {{ field.label }}
+        </label>
         {{ field|addclass:"input" }}
         {% if field.help_text and not no_help %}
             <p class="p">{{ field.help_text }}</p>

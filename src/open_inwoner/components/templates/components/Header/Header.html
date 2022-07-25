@@ -3,16 +3,16 @@
 {% get_solo "configurations.SiteConfiguration" as config %}
 
 {% accessibility_header request=request %}
-<header class="header">
+<header class="header" aria-label="Navigatie header">
     <div class="header__container">
-        {% logo src=config.logo.file|thumbnail_url:'logo' alt="" %}
+        {% logo src=config.logo.file|thumbnail_url:'logo' alt=config.logo.default_alt_text %}
 
         <div class="header__menu">
             <div class="header__menu-icon">
                 {% icon icon="menu" %}
             </div>
             <div class="header__submenu">
-                <nav class="header__actions">
+                <nav class="header__actions" aria-label="Zoek navigatie mobiel">
                     <div class="header__text-actions">
                         <p class="p">
                             {% trans "Welkom" %}
@@ -40,7 +40,7 @@
                     {% url 'search:search' as search_url %}
                     {% render_form form=search_form method="GET" form_action=search_url inline=True spaceless=True %}
                         {% input search_form.query no_label=True %}
-                        {% form_actions primary_icon="search" %}
+                        {% form_actions primary_icon="search" primary_text=_("Zoeken") hide_primary_text=True %}
                     {% endrender_form %}
                 </nav>
 
@@ -48,7 +48,7 @@
             </div>
         </div>
 
-        <nav class="header__actions">
+        <nav class="header__actions" aria-label="Zoek navigatie desktop">
             <div class="header__text-actions">
                 <p class="p">
                     {% trans "Welkom" %}
@@ -76,7 +76,7 @@
             {% url 'search:search' as search_url %}
             {% render_form form=search_form method="GET" form_action=search_url inline=True spaceless=True %}
                 {% input search_form.query no_label=True %}
-                {% form_actions primary_icon="search" %}
+                {% form_actions primary_icon="search" primary_text=_("Zoeken") hide_primary_text=True %}
             {% endrender_form %}
         </nav>
 

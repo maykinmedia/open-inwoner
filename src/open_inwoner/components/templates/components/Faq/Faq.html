@@ -1,6 +1,6 @@
-{% load link_tags render_tags %}
+{% load i18n link_tags render_tags %}
 
-<aside class="faq">
+<aside class="faq" aria-label="{% trans "Veelgestelde vragen" %}">
     {% if title %}<h2 class="h2">{{ title }}</h2>{% endif %}
 
     <ul class="faq__list">
