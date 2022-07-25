@@ -68,14 +68,16 @@ class HomeView(TemplateView):
         if self.request.user.is_authenticated:
             kwargs.update(plans=Plan.objects.connected(self.request.user)[:limit])
 
+        # Show the categories if the user has selected them, otherwise
+        # Show the highlighted published categories if they have been specified, otherwise
+        # Show the first X published categories
+
         # Highlighted categories
         highlighted_categories = (
             Category.objects.published()
             .filter(highlighted=True)
             .order_by("name")[:limit]
         )
-        if not self.request.user.is_authenticated and highlighted_categories:
-            kwargs.update(categories=highlighted_categories)
         if (
             self.request.user.is_authenticated
             and self.request.user.selected_themes.exists()
@@ -83,6 +85,8 @@ class HomeView(TemplateView):
             kwargs.update(
                 categories=self.request.user.selected_themes.order_by("name")[:3]
             )
+        elif highlighted_categories:
+            kwargs.update(categories=highlighted_categories)
 
         # Product finder:
         if config.show_product_finder:
