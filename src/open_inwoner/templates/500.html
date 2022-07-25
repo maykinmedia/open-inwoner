@@ -189,10 +189,10 @@ body {
       <div class="cover-container">
 
         <div class="inner cover">
-          <h1 class="cover-heading">Sorry, a server error has occurred (500)</h1>
-          <p class="lead">We have been automatically notified about the problem and will investigate as soon as possible.</p>
+          <h1 class="cover-heading">Sorry, een onbekende fout is opgetreden (500)</h1>
+          <p class="lead">Er is een onbekende fout opgetreden. Probeer het later nog een keer, mocht het probleem nogmaals optreden neem dan contact met ons op.</p>
           {% if request.sentry.id %}
-            <p>If you need assistance, you may reference this error as
+            <p>Foutmelding referentie:
             <strong>{{ request.sentry.id }}</strong>.</p>
           {% endif %}
           <p class="lead">

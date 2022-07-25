@@ -130,6 +130,25 @@ class TestRegistrationFunctionality(WebTest):
         self.assertEqual(get_response.status_code, 302)
         self.assertEqual(get_response.url, reverse("django_registration_complete"))
 
+    def test_registration_non_unique_email_different_case(self):
+        UserFactory.create(email="john@smith.com")
+
+        register_page = self.app.get(self.url)
+        form = register_page.forms["registration-form"]
+        form["email"] = "John@smith.com"
+        form["first_name"] = "John"
+        form["last_name"] = "Smith"
+        form["password1"] = "somepassword"
+        form["password2"] = "somepassword"
+
+        response = form.submit()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context["errors"].as_text(),
+            "* Een gebruiker met dit e-mailadres bestaat al",
+        )
+
 
 class TestRegistrationDigid(WebTest):
     url = reverse_lazy("django_registration_register")
@@ -264,6 +283,52 @@ class TestRegistrationNecessary(WebTest):
         self.assertEqual(reverse_contact.first_name, contact.created_by.first_name)
         self.assertEqual(reverse_contact.last_name, contact.created_by.last_name)
 
+    def test_submit_not_unique_email(self):
+        UserFactory.create(email="john@smith.com")
+        user = UserFactory.create(
+            first_name="",
+            last_name="",
+            login_type=LoginTypeChoices.digid,
+        )
+
+        get_response = self.app.get(self.url, user=user)
+        form = get_response.forms["necessary-form"]
+
+        form["email"] = "john@smith.com"
+        form["first_name"] = "John"
+        form["last_name"] = "Smith"
+
+        response = form.submit()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context["errors"].as_text(),
+            "* Een gebruiker met dit e-mailadres bestaat al",
+        )
+
+    def test_submit_not_unique_email_different_case(self):
+        UserFactory.create(email="john@smith.com")
+        user = UserFactory.create(
+            first_name="",
+            last_name="",
+            login_type=LoginTypeChoices.digid,
+        )
+
+        get_response = self.app.get(self.url, user=user)
+        form = get_response.forms["necessary-form"]
+
+        form["email"] = "John@smith.com"
+        form["first_name"] = "John"
+        form["last_name"] = "Smith"
+
+        response = form.submit()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context["errors"].as_text(),
+            "* Een gebruiker met dit e-mailadres bestaat al",
+        )
+
 
 class TestLoginLogoutFunctionality(WebTest):
     def setUp(self):
@@ -369,7 +434,9 @@ class TestPasswordResetFunctionality(WebTest):
         self.assertEqual(len(mail.outbox), 1)
 
     def test_custom_password_reset_form_does_not_send_email_when_user_is_digid(self):
-        digid_user = UserFactory(login_type=LoginTypeChoices.digid)
+        digid_user = UserFactory(
+            login_type=LoginTypeChoices.digid, email="john@smith.nl"
+        )
         self.app.post(reverse("password_reset"), {"email": digid_user.email})
         self.assertEqual(len(mail.outbox), 0)
 
@@ -391,7 +458,9 @@ class TestPasswordChange(WebTest):
         self.assertContains(response, _("Wijzig wachtwoord"))
 
     def test_password_change_button_is_not_rendered_with_digid_login_type(self):
-        digid_user = UserFactory(login_type=LoginTypeChoices.digid)
+        digid_user = UserFactory(
+            login_type=LoginTypeChoices.digid, email="john@smith.nl"
+        )
         response = self.app.get(reverse("accounts:my_profile"), user=digid_user)
         self.assertNotContains(response, _("Wijzig wachtwoord"))
 
