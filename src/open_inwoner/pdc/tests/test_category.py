@@ -34,7 +34,7 @@ class TestHighlightedCategories(WebTest):
             [highlighted_category1, highlighted_category2],
         )
 
-    def test_all_categories_exist_in_context_when_logged_in(self):
+    def test_only_highlighted_categories_are_shown_when_they_exist(self):
         user = UserFactory()
         category = CategoryFactory(name="Should be first")
         highlighted_category = CategoryFactory(
