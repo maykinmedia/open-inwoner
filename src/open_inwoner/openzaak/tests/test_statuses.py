@@ -28,8 +28,7 @@ DOCUMENTEN_ROOT = "https://documenten.nl/api/v1/"
 class TestListStatusView(WebTest):
     def setUp(self):
         self.user = UserFactory(
-            login_type=LoginTypeChoices.digid,
-            bsn="900222086",
+            login_type=LoginTypeChoices.digid, bsn="900222086", email="johm@smith.nl"
         )
         self.config = OpenZaakConfig.get_solo()
         self.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
