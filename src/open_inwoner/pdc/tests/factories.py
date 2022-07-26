@@ -54,7 +54,7 @@ class ProductFactory(factory.django.DjangoModelFactory):
 
 
 class CategoryFactory(factory.django.DjangoModelFactory):
-    name = factory.Faker("word")
+    name = factory.Sequence(lambda n: f"category {n}")
     slug = factory.LazyAttribute(lambda a: slugify(a.name))
     description = factory.Faker("sentence")
     published = True
@@ -69,7 +69,7 @@ class CategoryFactory(factory.django.DjangoModelFactory):
 
 
 class TagFactory(factory.django.DjangoModelFactory):
-    name = factory.Faker("word")
+    name = factory.Sequence(lambda n: f"tag {n}")
     slug = factory.LazyAttribute(lambda a: slugify(a.name))
 
     class Meta:
@@ -84,7 +84,7 @@ class OrganizationTypeFactory(factory.django.DjangoModelFactory):
 
 
 class OrganizationFactory(factory.django.DjangoModelFactory):
-    name = factory.Faker("word")
+    name = factory.Sequence(lambda n: f"organization {n}")
     slug = factory.LazyAttribute(lambda a: slugify(a.name))
     type = factory.SubFactory(OrganizationTypeFactory)
     street = factory.Faker("street_name", locale="nl_NL")
