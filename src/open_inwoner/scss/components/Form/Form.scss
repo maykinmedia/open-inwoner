@@ -4,6 +4,10 @@
   gap: var(--gutter-width);
   padding: var(--gutter-width) 0;
 
+  @media (min-width: 768px) {
+    gap: var(--gutter-width);
+  }
+
   &#{&}--align-end {
     align-items: end;
   }
