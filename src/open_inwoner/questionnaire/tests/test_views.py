@@ -123,7 +123,7 @@ class QuestionnaireStepViewTestCase(TestCase):
         QuestionnaireStepFileFactory.create(questionnaire_step=root)
         path = reverse("questionnaire:root_step", kwargs={"slug": "foo"})
         response = self.client.get(path)
-        self.assertIn('<aside class="file">', str(response.content))
+        self.assertIn('<aside class="file"', str(response.content))
 
     def test_render_products(self):
         ProductFactory.create(name="fooz")
