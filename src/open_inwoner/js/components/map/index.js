@@ -1,5 +1,6 @@
 import 'leaflet'
 import { RD_CRS } from './rd'
+import { isMobile } from '../../lib/device/is-mobile'
 
 /** @type {NodeListOf<Element>} All the leaflet maps. */
 const LEAFLET_MAPS = document.querySelectorAll('.map__leaflet')
@@ -41,6 +42,10 @@ class Map {
     const tileLayer = L.tileLayer(tileConfig.url, tileConfig.options)
     tileLayer.addTo(this.map)
     this.addGeoJSON()
+
+    if (isMobile()) {
+      this.map.dragging.disable()
+    }
   }
 
   /**
