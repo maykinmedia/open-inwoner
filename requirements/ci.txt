@@ -90,7 +90,7 @@ diff-match-patch==20200713
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-import-export
-django==3.2.13
+django==3.2.15
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -279,7 +279,7 @@ django-rosetta==0.9.7
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-django-sendfile2==0.6.0
+django-sendfile2==0.7.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -442,7 +442,7 @@ jsonschema==4.1.0
     #   drf-spectacular
 lazy-object-proxy==1.6.0
     # via astroid
-lxml==4.6.3
+lxml==4.6.5
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -579,7 +579,7 @@ python-stdnum==1.17
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-localflavor
-python3-saml @ git+https://github.com/maykinmedia/python3-saml.git@9f1ffa86fdfe68ccbcf063613c6e6cbb5447c360
+python3_saml @ git+https://github.com/maykinmedia/python3-saml.git@9f1ffa86fdfe68ccbcf063613c6e6cbb5447c360
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -706,7 +706,7 @@ uwsgi==2.0.19.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-waitress==2.1.1
+waitress==2.1.2
     # via webtest
 weasyprint==54.2
     # via
