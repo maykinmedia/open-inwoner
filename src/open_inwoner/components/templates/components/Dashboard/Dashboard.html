@@ -1,6 +1,6 @@
-{% load icon_tags %}
+{% load i18n icon_tags %}
 
-<aside class="dashboard">
+<aside class="dashboard" aria-label="{% trans "Dashboard" %}">
     <ul class="dashboard__list">
         {% for metric in config.metrics %}
             <li class="dashboard__list-item">

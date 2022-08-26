@@ -1,6 +1,6 @@
-{% load icon_tags %}
+{% load icon_tags i18n %}
 
-<aside class="status-list">
+<aside class="status-list" aria-label="{% trans "Status lijst" %}">
     <ul class="status-list__list">
         {% for object in statuses %}
         <li class="status-list__list-item">

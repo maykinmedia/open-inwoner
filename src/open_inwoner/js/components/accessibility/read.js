@@ -11,6 +11,17 @@ class ReadOut {
     } else {
       this.node.parentElement.remove()
     }
+
+    let voices = []
+    function populateVoiceList() {
+      voices = this.speechSynthesis.getVoices()
+      // console.log(voices)
+    }
+
+    populateVoiceList()
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+      speechSynthesis.onvoiceschanged = populateVoiceList
+    }
   }
 
   read = (event) => {
@@ -21,13 +32,55 @@ class ReadOut {
     } else if (this.speechSynthesis.paused) {
       this.speechSynthesis.resume()
     } else {
-      const main =
-        typeof document === 'undefined' ? null : document.querySelector('main')
+      let main = document.querySelector('.grid__main')
+      if (!main) {
+        main = document.querySelector('main')
+      }
 
-      var msg = new SpeechSynthesisUtterance()
-      msg.text = main.textContent
-      this.speechSynthesis.speak(msg)
+      // console.log(main.innerText)
+      // console.log(main.textContent)
+      let text = this.getText(main)
+      // console.log(text)
+
+      const utterThis = new SpeechSynthesisUtterance(text)
+      this.speechSynthesis.speak(utterThis)
     }
+  }
+
+  getText = (node) => {
+    let baseText = ''
+    if (node.getAttribute('aria-hidden')) {
+      return undefined
+    }
+    // console.log('node', node)
+    if (node.childNodes) {
+      for (let index = 0; index < node.childNodes.length; index++) {
+        const childNode = node.childNodes[index]
+        // console.log('childNode', childNode, baseText)
+        if (childNode.nodeName === '#text') {
+          if (childNode.nodeValue) {
+            let nodeValue = childNode.nodeValue.replaceAll('\n', '').trim()
+            if (
+              nodeValue.replace(/\s/g, '') !== '' &&
+              nodeValue.replace(/\s/g, '')
+            ) {
+              baseText += ` ${nodeValue}`
+            }
+          }
+        } else {
+          // console.log('test', childNode)
+          const childText = this.getText(childNode)
+          if (childText) {
+            baseText += childText
+
+            if (!baseText.endsWith('\n')) {
+              baseText += '\n'
+            }
+          }
+        }
+      }
+    }
+    return baseText
   }
 }
 

@@ -16,7 +16,7 @@
         data-use-aria="true"
     {% endif %}
     {% if toggle_exclusive %}data-toggle-exclusive="{{ toggle_exclusive }}"{% endif %}
-    aria-describedby="{{ text }}"
+    aria-label="{{ text }}"
     title="{% firstof title text %}"
 >
     {% if src %}

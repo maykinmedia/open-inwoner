@@ -27,6 +27,7 @@
 
 .card-container + .card-container,
 .map + .card-container,
-.p + .card-container {
+.p + .card-container,
+.card-container + h2 {
   margin-top: var(--gutter-width);
 }

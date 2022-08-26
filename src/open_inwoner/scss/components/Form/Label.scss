@@ -4,4 +4,13 @@
   font-size: var(--font-size-body);
   line-height: var(--font-line-height-body);
   margin: 0;
+
+  &--gapless {
+    gap: 0 !important;
+  }
+
+  &__label--hidden {
+    height: 0;
+    overflow: hidden;
+  }
 }

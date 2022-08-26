@@ -3,7 +3,9 @@
 
 {% block header_image %}
 {% if object.image %}
-    <img class="main-image main-image--start-after" src="{{ object.image.url }}" alt="Header image">
+    <aside aria-hidden="true">
+        <img class="main-image main-image--start-after" src="{{ object.image.url }}" alt="{{ object.image.default_alt_text|default:'Header afbeelding' }}">
+    </aside>
 {% endif %}
 {% endblock header_image %}
 

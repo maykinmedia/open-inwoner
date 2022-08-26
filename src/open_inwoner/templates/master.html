@@ -46,7 +46,7 @@
             <main class="container">
                 {% block main_inner %}
                     <div class="grid{% block grid_class %}{% endblock %}">
-                        {% spaceless %}<aside class="grid__sidebar">{% block sidebar_content %}{% endblock sidebar_content %}</aside>{% endspaceless %}
+                        {% spaceless %}<div class="grid__sidebar">{% block sidebar_content %}{% endblock sidebar_content %}</div>{% endspaceless %}
 
                         <div class="grid__main">
                             {% block content %}Please provide the content{% endblock content %}

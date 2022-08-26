@@ -1,6 +1,6 @@
-{% load icon_tags %}
+{% load i18n icon_tags %}
 
-<nav class="breadcrumbs">
+<nav class="breadcrumbs" aria-label="{% trans "breadcrumbs" %}">
     <ul class="breadcrumbs__list">
         {% for url, name in breadcrumbs %}
             <li class="breadcrumbs__list-item">

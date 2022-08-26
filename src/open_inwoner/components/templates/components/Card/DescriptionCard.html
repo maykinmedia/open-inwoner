@@ -3,11 +3,11 @@
 {% render_card grid=image %}
     {% if image %}
         <a href="{{ url }}" class="card__image-container">
-            <img class="card__image" src="{{ image|thumbnail_url:'card-image' }}" />
+            <img class="card__image" src="{{ image|thumbnail_url:'card-image' }}" alt="{{ image.default_alt_text }}" />
         </a>
         <div class="card__content">
     {% endif %}
-    <h3 class="h3">{% link url text=title %}</h3>
+    <h2 class="h2">{% link url text=title %}</h2>
     <p class="p">{{ description }}</p>
     {% if object.end_date %}
         <div class="card__tabled">
