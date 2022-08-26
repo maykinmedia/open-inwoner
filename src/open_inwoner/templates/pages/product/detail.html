@@ -3,7 +3,7 @@
 
 {% block header_image %}
 {% if object.image %}
-    <aside aria-label="{% trans "Header afbeelding" %}">
+    <aside aria-hidden="true">
         <img class="main-image main-image--start-after" src="{{ object.image.url }}" alt="Header image">
     </aside>
 {% endif %}
