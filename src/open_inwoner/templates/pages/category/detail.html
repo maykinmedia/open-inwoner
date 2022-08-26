@@ -4,7 +4,7 @@
 {% block header_image %}
 {% if object.image %}
     <aside aria-label="{% trans "Header afbeelding" %}">
-        <img class="main-image main-image--start-after" src="{{ object.image.url }}" alt="Header image">
+        <img class="main-image main-image--start-after" src="{{ object.image.url }}" alt="{{ object.image.default_alt_text|default:'Header afbeelding' }}">
     </aside>
 {% endif %}
 {% endblock header_image %}
@@ -37,7 +37,7 @@
     {% if questionnaire_roots %}
         <div class="grid">
             <div class="column column--start-1 column--span-6 ">
-                <aside class="questionnaire" aria-label="{% trans "zelfdiagnose" %}">
+                <aside class="questionnaire">
                     <h2 class="h2">{% trans "Keuze zelfdiagnose?" %}</h2>
                     <p class="p">{% trans "Kies hieronder één van de volgende vragenlijsten om de zelfdiagnose te starten." %}</p>
                     {% questionnaire root_nodes=questionnaire_roots %}

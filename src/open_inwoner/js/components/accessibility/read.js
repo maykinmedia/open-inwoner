@@ -15,7 +15,7 @@ class ReadOut {
     let voices = []
     function populateVoiceList() {
       voices = this.speechSynthesis.getVoices()
-      console.log(voices)
+      // console.log(voices)
     }
 
     populateVoiceList()
@@ -40,7 +40,7 @@ class ReadOut {
       // console.log(main.innerText)
       // console.log(main.textContent)
       let text = this.getText(main)
-      console.log(text)
+      // console.log(text)
 
       const utterThis = new SpeechSynthesisUtterance(text)
       this.speechSynthesis.speak(utterThis)
@@ -52,11 +52,11 @@ class ReadOut {
     if (node.getAttribute('aria-hidden')) {
       return undefined
     }
-    console.log('node', node)
+    // console.log('node', node)
     if (node.childNodes) {
       for (let index = 0; index < node.childNodes.length; index++) {
         const childNode = node.childNodes[index]
-        console.log('childNode', childNode, baseText)
+        // console.log('childNode', childNode, baseText)
         if (childNode.nodeName === '#text') {
           if (childNode.nodeValue) {
             let nodeValue = childNode.nodeValue.replaceAll('\n', '').trim()
@@ -68,7 +68,7 @@ class ReadOut {
             }
           }
         } else {
-          console.log('test', childNode)
+          // console.log('test', childNode)
           const childText = this.getText(childNode)
           if (childText) {
             baseText += childText

@@ -5,9 +5,8 @@
         class="{{ classes }}"
         href="{{href}}"
         title="{% firstof title text %}"
-        {% if text %}aria-describedby="{{ text }}"{% endif %}
+        aria-label="{% firstof title text %}"
         {% if href|startswith:"http" %}target="_blank"{% endif %}
-        {% if hide_text %}aria-hidden="true"{% endif %}
     >
         {% if icon %}{% icon icon=icon outlined=icon_outlined %}{% endif %}
         {% if not hide_text %}{{text}}{% endif %}
@@ -18,7 +17,7 @@
         type="{{type}}"
         name="{{ name }}"
         title="{% firstof title text %}"
-        {% if text %}aria-describedby="{{ text }}"{% endif %}
+        aria-label="{% firstof title text %}"
     >
         {% if icon %}{% icon icon=icon outlined=icon_outlined %}{% endif %}
         {% if not hide_text %}{{text}}{% endif %}

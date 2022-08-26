@@ -97,7 +97,7 @@
         {% render_column start=related_products_start span=4 compact=True %}
             {# Related products. #}
             {% if object.related_products.published.exists %}
-                <nav class="link-list" aria-label="{% trans "Zie ook links" %}">
+                <nav class="link-list" aria-label="{% trans "Gerelateerde links" %}">
                     <h3 class="h3" id="see">{% trans "Zie ook" %}</h3>
                     <ul class="link-list__list">
                         {% for related in object.related_products.published %}
