@@ -84,7 +84,7 @@ class TestPreSaveSignal(TestCase):
         updated_user = User.objects.filter(email=user.email)
 
         self.assertEqual(
-            captured.records[0].getMessage(),
+            captured.records[1].getMessage(),
             "no service defined for Haal Centraal",
         )
         self.assertEqual(updated_user[0].first_name, "")
@@ -215,7 +215,7 @@ class TestLogging(TestCase):
         user.bsn = "999993847"
         user.save()
 
-        log_entry = TimelineLog.objects.first()
+        log_entry = TimelineLog.objects.all()[1]
 
         self.assertEquals(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
@@ -232,7 +232,7 @@ class TestLogging(TestCase):
         )
 
     @requests_mock.Mocker()
-    def test_nothing_is_logged_when_there_is_an_error(self, m):
+    def test_single_entry_is_logged_when_there_is_an_error(self, m):
         m.get(
             "https://personen/api/schema/openapi.yaml?v=3",
             status_code=200,
@@ -259,4 +259,4 @@ class TestLogging(TestCase):
 
         log_entries = TimelineLog.objects.count()
 
-        self.assertEqual(log_entries, 0)
+        self.assertEqual(log_entries, 1)

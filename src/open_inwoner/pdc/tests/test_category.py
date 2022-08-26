@@ -34,7 +34,7 @@ class TestHighlightedCategories(WebTest):
             [highlighted_category1, highlighted_category2],
         )
 
-    def test_all_categories_exist_in_context_when_logged_in(self):
+    def test_only_highlighted_categories_are_shown_when_they_exist(self):
         user = UserFactory()
         category = CategoryFactory(name="Should be first")
         highlighted_category = CategoryFactory(
@@ -43,7 +43,7 @@ class TestHighlightedCategories(WebTest):
         response = self.app.get(reverse("root"), user=user)
         self.assertEqual(
             list(response.context["categories"]),
-            [category, highlighted_category],
+            [highlighted_category],
         )
 
     def test_category_selected(self):
@@ -117,7 +117,7 @@ class TestPublishedCategories(WebTest):
 
     def test_only_published_subcategories_exist_in_detail_page_when_anonymous(self):
         descendent1 = self.published1.add_child(
-            path="00010001", name="first-child", slug="first-child"
+            path="00010001", name="first-child", slug="first-child", published=True
         )
         descendent2 = self.published1.add_child(
             path="00010002", name="second-child", slug="second-child", published=False
@@ -129,7 +129,7 @@ class TestPublishedCategories(WebTest):
 
     def test_only_published_subcategories_exist_in_detail_page_when_logged_in(self):
         descendent1 = self.published1.add_child(
-            path="00010003", name="first-child-2", slug="first-child-2"
+            path="00010003", name="first-child-2", slug="first-child-2", published=True
         )
         descendent2 = self.published1.add_child(
             path="00010004",

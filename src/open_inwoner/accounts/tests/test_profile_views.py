@@ -80,7 +80,9 @@ class ProfileViewTests(WebTest):
         """
         check that user is redirected to digid:logout
         """
-        user = UserFactory.create(login_type=LoginTypeChoices.digid)
+        user = UserFactory.create(
+            login_type=LoginTypeChoices.digid, email="john@smith.nl"
+        )
 
         get_response = self.app.get(self.url, user=user)
         self.assertEquals(get_response.status_code, 200)

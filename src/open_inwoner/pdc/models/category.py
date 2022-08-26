@@ -30,7 +30,7 @@ class Category(MP_Node):
     )
     published = models.BooleanField(
         verbose_name=_("Published"),
-        default=True,
+        default=False,
         help_text=_("Whether the category should be published or not."),
     )
     highlighted = models.BooleanField(

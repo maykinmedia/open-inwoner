@@ -1,3 +1,4 @@
+import random
 from datetime import datetime, timezone
 from uuid import uuid4
 
@@ -13,7 +14,10 @@ class UserFactory(factory.django.DjangoModelFactory):
 
     first_name = factory.Faker("first_name")
     last_name = factory.Faker("last_name")
-    email = factory.Faker("email")
+    # Note that 'example.org' addresses are always redirected to the registration_necessary view
+    email = factory.LazyAttribute(
+        lambda o: "%s%d@example.com" % (o.first_name, random.randint(0, 10000))
+    )
     password = factory.PostGenerationMethodCall("set_password", "secret")
 
 

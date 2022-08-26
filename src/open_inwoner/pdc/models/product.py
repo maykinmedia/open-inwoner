@@ -28,7 +28,7 @@ class Product(models.Model):
     )
     published = models.BooleanField(
         verbose_name=_("Published"),
-        default=True,
+        default=False,
         help_text=_("Whether the product should be published or not."),
     )
     summary = models.TextField(
