@@ -215,7 +215,7 @@ class TestLogging(TestCase):
         user.bsn = "999993847"
         user.save()
 
-        log_entry = TimelineLog.objects.all()[1]
+        log_entry = TimelineLog.objects.filter(object_id=user.id)[0]
 
         self.assertEquals(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
