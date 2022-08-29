@@ -392,7 +392,7 @@ LOGOUT_REDIRECT_URL = reverse_lazy("root")
 # SECURITY settings
 #
 SESSION_COOKIE_SECURE = IS_HTTPS
-SESSION_COOKIE_HTTPONLY = False
+SESSION_COOKIE_HTTPONLY = True
 
 CSRF_COOKIE_SECURE = IS_HTTPS
 CSRF_FAILURE_VIEW = "open_inwoner.accounts.views.csrf_failure"
