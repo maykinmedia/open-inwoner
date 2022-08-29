@@ -14,6 +14,8 @@ CSP_DEFAULT_SRC = (
 )  # ideally we'd use BASE_URI but it'd have to be lazy or cause issues
 CSP_BASE_URI = ("'self'",)
 CSP_FONT_SRC = ("'self'",)
+CSP_FRAME_ANCESTORS = ["'self'"]
+CSP_FRAME_SRC = ["'self'"]
 CSP_SCRIPT_SRC = (
     "'self'",
     "https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:28992/",
