@@ -15,7 +15,7 @@
         <body>
             <div class="export">
                 {% get_solo "configurations.SiteConfiguration" as config %}
-                {% logo src=config.logo.file.url alt="" %}
+                {% logo src=config.logo.file.url alt=config.logo.default_alt_text %}
 
                 {% block content %}Please provide the content{% endblock content %}
             </div>

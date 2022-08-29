@@ -1,11 +1,11 @@
 {% load i18n file_tags %}
 
-<nav class="file-list">
+<div class="file-list">
     {% if title %}
         {% if h1 %}
             <h1 class="h1 h1--bottom" id="files">{{ title }}</h1>
         {% else %}
-            <h4 class="h4" id="files">{{ title }}</h4>
+            <h3 class="h3" id="files">{{ title }}</h3>
         {% endif %}
     {% endif %}
     <ul class="file-list__list">
@@ -18,4 +18,4 @@
             <li><p class="p">{% trans "Er zijn nog geen bestanden geupload" %}</p></li>
         {% endfor %}
     </ul>
-</nav>
+</div>

@@ -1,7 +1,7 @@
 .form {
   box-sizing: border-box;
   display: grid;
-  gap: var(--spacing-medium);
+  gap: var(--gutter-width);
   padding: var(--gutter-width) 0;
 
   @media (min-width: 768px) {
@@ -82,6 +82,14 @@
     display: flex;
     flex-direction: column;
     gap: 18px;
+    border: 0;
+    margin: 0;
+    padding: 0;
+
+    legend {
+      opacity: 0;
+      height: 0;
+    }
   }
 
   /// Actions.

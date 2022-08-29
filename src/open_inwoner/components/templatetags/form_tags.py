@@ -336,6 +336,7 @@ def form_actions(primary_text="", primary_icon=None, secondary=True, **kwargs):
         - primary: bool | if false, hide the primary button.
         - primary_text: string | The text for the primary button.
         - primary_icon: string | The icon for the primary button.
+        - hide_primary_text: boolean | Hide the primary text.
         - single: bool | if it should be single.
         - secondary: bool | if the secondary button should be styled like a secondary button or not.
         - secondary_href: string | The action when the secondary button is pressed.

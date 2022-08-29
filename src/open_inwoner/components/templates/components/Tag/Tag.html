@@ -1,4 +1,6 @@
-<aside class="tag-list">
+{% load i18n %}
+
+<aside class="tag-list" aria-label="{% trans "Tag lijst" %}">
     <ul class="tag-list__list">
         {% for tag in tags %}
             <li class="tag-list__list-item">

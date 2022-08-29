@@ -10,13 +10,13 @@
 
     <div class="card__body{% if direction %} card__body--direction-{{ direction }}{% endif %}{% if grid %} card__body--grid{% endif %}">
         {% if title %}
-            <h4 class="h4">
+            <p class="h3">
                 {% if href %}
                     {% link href=href text=title %}
                 {% else %}
                     {{ title }}
                 {% endif %}
-            </h4>
+            </p>
         {% endif %}
         {{ contents }}
     </div>

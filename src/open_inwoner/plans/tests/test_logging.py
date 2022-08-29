@@ -31,7 +31,9 @@ class TestPlans(WebTest):
         form["end_date"] = plan.end_date
         form.submit()
 
-        log_entry = TimelineLog.objects.last()
+        log_entry = TimelineLog.objects.filter(
+            object_id=Plan.objects.get(title=plan.title).id
+        ).last()
 
         self.assertEquals(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
@@ -54,7 +56,7 @@ class TestPlans(WebTest):
         ).forms["plan-form"]
         form["title"] = "Updated title"
         form.submit()
-        log_entry = TimelineLog.objects.last()
+        log_entry = TimelineLog.objects.filter(object_id=self.plan.id).last()
 
         self.assertEquals(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
@@ -77,7 +79,7 @@ class TestPlans(WebTest):
 
         form["goal"] = "Some text"
         form.submit()
-        log_entry = TimelineLog.objects.last()
+        log_entry = TimelineLog.objects.filter(object_id=self.plan.id).last()
 
         self.assertEquals(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
@@ -102,7 +104,7 @@ class TestPlans(WebTest):
         form["file"] = Upload("readme.xlsx", b"data", "application/vnd.ms-excel")
         form["name"] = "readme"
         form.submit()
-        log_entry = TimelineLog.objects.last()
+        log_entry = TimelineLog.objects.filter(object_id=self.plan.id).last()
 
         self.assertEquals(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
@@ -125,7 +127,9 @@ class TestPlans(WebTest):
         ).forms["action-create"]
         form["name"] = action.name
         form.submit()
-        log_entry = TimelineLog.objects.last()
+        log_entry = TimelineLog.objects.filter(
+            object_id=Action.objects.first().id
+        ).last()
 
         self.assertEquals(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
@@ -151,7 +155,9 @@ class TestPlans(WebTest):
         ).forms["action-create"]
         form["name"] = "Updated name"
         form.submit()
-        log_entry = TimelineLog.objects.last()
+        log_entry = TimelineLog.objects.filter(
+            object_id=Action.objects.first().id
+        ).last()
 
         self.assertEquals(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
@@ -184,7 +190,7 @@ class TestPlans(WebTest):
             reverse("plans:plan_export", kwargs={"uuid": self.plan.uuid}),
             user=self.user,
         )
-        log_entry = TimelineLog.objects.last()
+        log_entry = TimelineLog.objects.filter(object_id=self.user.id).last()
 
         self.assertEquals(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"

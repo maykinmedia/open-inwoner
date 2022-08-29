@@ -3,25 +3,25 @@
 {% get_solo "configurations.SiteConfiguration" as config %}
 
 <footer class='footer'>
-    {% logo src=config.logo.file|thumbnail_url:'logo' alt=""%}
+    {% logo src=config.logo.file|thumbnail_url:'logo' alt=config.logo.default_alt_text %}
 
-    <aside class="footer__visitor">
-        <h4 class="h4">{{footer_texts.footer_visiting_title}}</h4>
+    <div class="footer__visitor">
+        <h2 class="h2">{{footer_texts.footer_visiting_title}}</h2>
         <p class="p">
             {{footer_texts.footer_visiting_intro|linebreaksbr}}
         </p>
         {% button icon="arrow_forward" icon_position='before' transparent=True text=_("Bekijk op Google Maps") href=footer_texts.footer_visiting_map %}
-    </aside>
+    </div>
 
 
-    <aside class="footer__mail">
-        <h4 class="h4">{{footer_texts.footer_mailing_title}}</h4>
+    <div class="footer__mail">
+        <h2 class="h2">{{footer_texts.footer_mailing_title}}</h2>
         <p class="p">
             {{footer_texts.footer_mailing_intro|linebreaksbr}}
         </p>
-    </aside>
+    </div>
 
-    <nav class="footer__links">
+    <nav class="footer__links" aria-label="Footer navigatie">
         <ul class="footer__list">
             {% for flatpage in footer_texts.flatpages.all %}
                 <li class="footer__list-item">
