@@ -18,8 +18,7 @@ from open_inwoner.utils.logentry import system_action
 logger = logging.getLogger(__name__)
 
 
-def fetch_data(instance):
-    brp_version = settings.BRP_VERSION
+def fetch_data(instance, brp_version):
     config = HaalCentraalConfig.get_solo()
 
     if not config.service:
@@ -81,33 +80,21 @@ def on_bsn_change(instance, **kwargs):
         and instance.login_type == LoginTypeChoices.digid
     ):
         system_action("Retrieving data from haal centraal based on BSN")
-        data = fetch_data(instance)
+        data = fetch_data(instance, brp_version)
 
         if (brp_version == "ENSCHEDE" or brp_version == "DEFAULT") and data.get(
             "personen"
         ):
-            person = glom(data, "personen")[0]
-            try:
-                instance.first_name = glom(person, "naam.voornamen")
-                instance.last_name = glom(person, "naam.geslachtsnaam")
-                instance.birthday = glom(person, "geboorte.datum.datum")
-                instance.is_prepopulated = True
-            except PathAccessError as e:
-                logger.exception(
-                    "exception while trying to access fetched data", exc_info=e
-                )
-            else:
-                system_action(_("data was retrieved from haal centraal"), instance)
+            data = glom(data, "personen")[0]
 
-        elif brp_version == "GRONINGEN" and data:
-            try:
-                instance.first_name = glom(data, "naam.voornamen")
-                instance.last_name = glom(data, "naam.geslachtsnaam")
-                instance.birthday = glom(data, "geboorte.datum.datum")
-                instance.is_prepopulated = True
-            except PathAccessError as e:
-                logger.exception(
-                    "exception while trying to access fetched data", exc_info=e
-                )
-            else:
-                system_action(_("data was retrieved from haal centraal"), instance)
+        try:
+            instance.first_name = glom(data, "naam.voornamen")
+            instance.last_name = glom(data, "naam.geslachtsnaam")
+            instance.birthday = glom(data, "geboorte.datum.datum")
+            instance.is_prepopulated = True
+        except PathAccessError as e:
+            logger.exception(
+                "exception while trying to access fetched data", exc_info=e
+            )
+        else:
+            system_action(_("data was retrieved from haal centraal"), instance)
