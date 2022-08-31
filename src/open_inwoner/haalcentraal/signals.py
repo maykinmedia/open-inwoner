@@ -27,7 +27,7 @@ def fetch_data(instance, brp_version):
 
     client = config.service.build_client()
 
-    if brp_version == "ENSCHEDE" or brp_version == "DEFAULT":
+    if brp_version == "2.0":
         url = urljoin(client.base_url, "personen")
         try:
             data = client.operation(
@@ -49,7 +49,7 @@ def fetch_data(instance, brp_version):
             logger.exception("exception while making request", exc_info=e)
             return {}
 
-    elif brp_version == "GRONINGEN":
+    elif brp_version == "1.3":
         url = urljoin(client.base_url, f"ingeschrevenpersonen/{instance.bsn}")
         try:
             data = client.retrieve(
@@ -82,9 +82,7 @@ def on_bsn_change(instance, **kwargs):
         system_action("Retrieving data from haal centraal based on BSN")
         data = fetch_data(instance, brp_version)
 
-        if (brp_version == "ENSCHEDE" or brp_version == "DEFAULT") and data.get(
-            "personen"
-        ):
+        if brp_version == "2.0" and data.get("personen"):
             data = glom(data, "personen")[0]
 
         try:

@@ -82,7 +82,7 @@ class TestPreSaveSignal(TestCase):
         self.assertEqual(updated_user[0].birthday, date(1982, 4, 10))
         self.assertTrue(updated_user[0].is_prepopulated)
 
-    @override_settings(BRP_VERSION="GRONINGEN")
+    @override_settings(BRP_VERSION="1.3")
     def test_signal_updates_users_data_when_logged_in_via_digid_v_1_3(self, m):
         self._setUpMocks_v_1_3(m)
         self._setUpService()

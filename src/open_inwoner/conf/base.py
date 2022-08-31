@@ -874,8 +874,8 @@ MIN_UPLOAD_SIZE = 1  # in bytes
 MAX_UPLOAD_SIZE = 1024 ** 2 * 100  # 100MB
 UPLOAD_FILE_TYPES = "application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/plain,application/vnd.oasis.opendocument.text,application/vnd.oasis.opendocument.formula,application/vnd.oasis.opendocument.spreadsheet,application/pdf,image/jpeg,image/png"
 
-# HaalCentraal BRP versions (default is v2.0)
-BRP_VERSION = config("BRP_VERSION", default="DEFAULT")
+# HaalCentraal BRP versions
+BRP_VERSION = config("BRP_VERSION", default="2.0")
 
 #
 # DIGID
