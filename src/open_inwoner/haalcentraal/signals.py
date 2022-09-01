@@ -26,7 +26,7 @@ def fetch_data(instance, brp_version):
         return {}
 
     client = config.service.build_client()
-
+    logger.warning(brp_version)
     if brp_version == "2.0":
         url = urljoin(client.base_url, "personen")
         try:
@@ -40,6 +40,7 @@ def fetch_data(instance, brp_version):
                 },
                 request_kwargs=dict(
                     headers={"Accept": "application/hal+json"},
+                    verify=False
                 ),
             )
         except RequestException as e:
@@ -58,6 +59,7 @@ def fetch_data(instance, brp_version):
                 request_kwargs=dict(
                     headers={"Accept": "application/hal+json"},
                     params={"fields": "naam,geboorte.datum"},
+                    verify=False
                 ),
             )
         except RequestException as e:
