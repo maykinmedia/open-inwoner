@@ -5,13 +5,30 @@ from requests import RequestException
 from zds_client import ClientError
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.catalogi import StatusType
-from zgw_consumers.api_models.zaken import Status, ZaakInformatieObject
+from zgw_consumers.api_models.zaken import ZGWModel, Status
 from zgw_consumers.concurrent import parallel
 from zgw_consumers.service import get_paginated_results
 
 from .clients import build_client
 
 logger = logging.getLogger(__name__)
+
+### Workaround for Groningen e-Suite #773 ###
+
+from dataclasses import dataclass
+from datetime import date, datetime
+
+@dataclass
+class ZaakInformatieObject(ZGWModel):
+    url: str
+    informatieobject: str
+    zaak: str
+    # aard_relatie_weergave: str
+    titel: str
+    # beschrijving: str
+    registratiedatum: datetime
+
+### ###
 
 
 def fetch_status_history(case_url: str) -> List[Status]:
@@ -39,7 +56,7 @@ def fetch_specific_statuses(status_urls: List[str]) -> List[Status]:
 
     if client is None:
         return []
-
+    status_urls = [u.replace("dacceptatiemidoffice", "service-tst.gateway") for u in status_urls]
     with parallel() as executor:
         _statuses = executor.map(
             lambda url: client.retrieve("status", url=url),

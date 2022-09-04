@@ -65,7 +65,7 @@ class CasesListView(
                 {
                     "uuid": str(case.uuid),
                     "start_date": case.startdatum,
-                    "end_date": case.einddatum,
+                    "end_date": case.einddatum if hasattr(case, 'einddatum') else None,
                     "description": case_types[case.zaaktype].omschrijving
                     if case_types
                     else _("No data available"),
@@ -135,7 +135,7 @@ class CasesStatusView(
 
             context["case"] = {
                 "start_date": case.startdatum,
-                "end_date": case.einddatum,
+                "end_date": case.einddatum if hasattr(case, 'einddatum') else None,
                 "description": case_type.omschrijving
                 if case_type
                 else _("No data available"),

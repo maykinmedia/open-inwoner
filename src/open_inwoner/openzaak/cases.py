@@ -4,7 +4,7 @@ from typing import List, Optional
 from requests import RequestException
 from zds_client import ClientError
 from zgw_consumers.api_models.base import factory
-from zgw_consumers.api_models.catalogi import ZaakType
+from zgw_consumers.api_models.catalogi import ZGWModel
 from zgw_consumers.api_models.zaken import Zaak
 from zgw_consumers.service import get_paginated_results
 
@@ -12,7 +12,69 @@ from .clients import build_client
 
 logger = logging.getLogger(__name__)
 
+### Workaround for Groningen e-Suite #773 ###
 
+from dataclasses import dataclass
+from datetime import date, datetime
+from decimal import Decimal
+from typing import List, Optional, Union
+
+from dateutil.parser import parse
+from dateutil.relativedelta import relativedelta
+
+
+@dataclass
+class ZaakType(ZGWModel):
+    url: str
+    # catalogus: str
+    identificatie: str
+    omschrijving: str
+    vertrouwelijkheidaanduiding: str
+    doel: str
+    aanleiding: str
+    indicatie_intern_of_extern: str
+    handeling_initiator: str
+    onderwerp: str
+    handeling_behandelaar: str
+    # doorlooptijd: relativedelta
+    # servicenorm: Optional[relativedelta]
+    # opschorting_en_aanhouding_mogelijk: bool
+    # verlenging_mogelijk: bool
+    # verlengingstermijn: Optional[relativedelta]
+    # publicatie_indicatie: bool
+    # producten_of_diensten: list
+    statustypen: list
+    #resultaattypen: list
+    #informatieobjecttypen: list
+    #roltypen: list
+    # besluittypen: list
+
+    #begin_geldigheid: date
+    # versiedatum: date
+
+@dataclass
+class Zaak(ZGWModel):
+    url: str
+    identificatie: str
+    bronorganisatie: str
+    omschrijving: str
+#    toelichting: str
+    zaaktype: str
+    registratiedatum: date
+    startdatum: date
+#    einddatum: Optional[date]
+    einddatum_gepland: Optional[date]
+    uiterlijke_einddatum_afdoening: Optional[date]
+#    publicatiedatum: Optional[date]
+    vertrouwelijkheidaanduiding: str
+    status: str
+#    resultaat: str
+#    relevante_andere_zaken: list
+#    zaakgeometrie: dict
+
+
+### ###
+    
 def fetch_cases(user_bsn: str) -> List[Zaak]:
     client = build_client("zaak")
 
