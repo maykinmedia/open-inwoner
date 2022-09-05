@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
+from django.core.cache import cache
 
 from view_breadcrumbs import BaseBreadcrumbMixin
 
@@ -44,7 +45,10 @@ class CasesListView(
         context = super().get_context_data(**kwargs)
 
         cases = fetch_cases(self.request.user.bsn)
-        case_types = {case_type.url: case_type for case_type in fetch_case_types()}
+        case_types = cache.get('case_types')
+        if not case_types:
+            case_types = {case_type.url: case_type for case_type in fetch_case_types()}
+            cache.set('case_types', case_types, 60*60)
         status_types = {
             status_type.url: status_type for status_type in fetch_status_types()
         }
