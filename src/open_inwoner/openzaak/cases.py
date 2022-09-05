@@ -44,13 +44,14 @@ class ZaakType(ZGWModel):
     # publicatie_indicatie: bool
     # producten_of_diensten: list
     statustypen: list
-    #resultaattypen: list
-    #informatieobjecttypen: list
-    #roltypen: list
+    # resultaattypen: list
+    # informatieobjecttypen: list
+    # roltypen: list
     # besluittypen: list
 
-    #begin_geldigheid: date
+    # begin_geldigheid: date
     # versiedatum: date
+
 
 @dataclass
 class Zaak(ZGWModel):
@@ -58,23 +59,26 @@ class Zaak(ZGWModel):
     identificatie: str
     bronorganisatie: str
     omschrijving: str
-#    toelichting: str
+    #    toelichting: str
     zaaktype: str
     registratiedatum: date
     startdatum: date
-#    einddatum: Optional[date]
+    #    einddatum: Optional[date]
     einddatum_gepland: Optional[date]
     uiterlijke_einddatum_afdoening: Optional[date]
-#    publicatiedatum: Optional[date]
+    #    publicatiedatum: Optional[date]
     vertrouwelijkheidaanduiding: str
     status: str
+
+
 #    resultaat: str
 #    relevante_andere_zaken: list
 #    zaakgeometrie: dict
 
 
 ### ###
-    
+
+
 def fetch_cases(user_bsn: str) -> List[Zaak]:
     client = build_client("zaak")
 
