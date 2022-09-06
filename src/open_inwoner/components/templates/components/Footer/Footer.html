@@ -10,7 +10,9 @@
         <p class="p">
             {{footer_texts.footer_visiting_intro|linebreaksbr}}
         </p>
+	{% if footer_texts.footer_visiting_map %}
         {% button icon="arrow_forward" icon_position='before' transparent=True text=_("Bekijk op Google Maps") href=footer_texts.footer_visiting_map %}
+	{% endif %}
     </div>
 
 
