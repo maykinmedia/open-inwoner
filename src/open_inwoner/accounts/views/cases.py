@@ -1,10 +1,10 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.core.cache import cache
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
-from django.core.cache import cache
 
 from view_breadcrumbs import BaseBreadcrumbMixin
 
@@ -45,10 +45,10 @@ class CasesListView(
         context = super().get_context_data(**kwargs)
 
         cases = fetch_cases(self.request.user.bsn)
-        case_types = cache.get('case_types')
+        case_types = cache.get("case_types")
         if not case_types:
             case_types = {case_type.url: case_type for case_type in fetch_case_types()}
-            cache.set('case_types', case_types, 60*60)
+            cache.set("case_types", case_types, 60 * 60)
         status_types = {
             status_type.url: status_type for status_type in fetch_status_types()
         }
@@ -69,7 +69,7 @@ class CasesListView(
                 {
                     "uuid": str(case.uuid),
                     "start_date": case.startdatum,
-                    "end_date": case.einddatum if hasattr(case, 'einddatum') else None,
+                    "end_date": case.einddatum if hasattr(case, "einddatum") else None,
                     "description": case_types[case.zaaktype].omschrijving
                     if case_types
                     else _("No data available"),
@@ -139,7 +139,7 @@ class CasesStatusView(
 
             context["case"] = {
                 "start_date": case.startdatum,
-                "end_date": case.einddatum if hasattr(case, 'einddatum') else None,
+                "end_date": case.einddatum if hasattr(case, "einddatum") else None,
                 "description": case_type.omschrijving
                 if case_type
                 else _("No data available"),
