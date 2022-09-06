@@ -27,6 +27,7 @@ def fetch_data(instance, brp_version):
 
     client = config.service.build_client()
     logger.warning(brp_version)
+    data = {}
     if brp_version == "2.0":
         url = urljoin(client.base_url, "personen")
         try:
