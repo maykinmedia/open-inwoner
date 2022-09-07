@@ -13,7 +13,7 @@
             {% render_column span=9 %}
 
                 {# Title/dashboard. #}
-                <h1 class="h1" id="title">{{ case.obj.omschrijving }}</h1>
+<h1 class="h1" id="title">{{ case.description }}</h1>
                 {% case_dashboard case %}
 
                 {#  Status history. #}
@@ -26,7 +26,8 @@
                 {% if case.documents %}
                     <h2 class="h2" id="documents">{% trans 'Documenten' %}</h2>
                     {% case_document_list case.documents %}
-                {% endif %}
+                    {% endif %}
+  		 <p class="p">{{ case.type_description }}</p>
             {% endrender_column %}
         {% endrender_grid %}
     {% else %}

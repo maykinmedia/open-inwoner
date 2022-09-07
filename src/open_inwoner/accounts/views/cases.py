@@ -138,9 +138,11 @@ class CasesStatusView(
                 status.statustype = status_type
 
             context["case"] = {
+                "identification": case.identificatie,
                 "start_date": case.startdatum,
                 "end_date": case.einddatum if hasattr(case, "einddatum") else None,
-                "description": case_type.omschrijving
+                "description": case.omschrijving,
+                "type_description": case_type.omschrijving
                 if case_type
                 else _("No data available"),
                 "current_status": statuses[-1].statustype.omschrijving
