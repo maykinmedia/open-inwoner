@@ -59,12 +59,10 @@ def fetch_specific_statuses(status_urls: List[str]) -> List[Status]:
     if client is None:
         return []
 
-    with parallel() as executor:
-        _statuses = executor.map(
-            lambda url: client.retrieve("status", url=url),
-            status_urls,
-        )
-
+    _statuses = []
+    for url in status_urls:
+        _statuses += [client.retrieve("status", url=url)]
+    
     statuses = factory(Status, list(_statuses))
 
     return statuses
