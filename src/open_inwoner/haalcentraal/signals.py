@@ -58,7 +58,9 @@ def fetch_data(instance, brp_version):
                 "ingeschrevenpersonen",
                 url=url,
                 request_kwargs=dict(
-                    headers={"Accept": "application/hal+json"},
+                    headers={"Accept": "application/hal+json",
+                             "x-doelbinding": "Huisvesting", # See Taiga #755
+                             "x-origin-oin": "00000003273229750000"}, # See Taiga #755
                     params={"fields": "naam,geboorte.datum"},
                     verify=False
                 ),
