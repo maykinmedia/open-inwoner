@@ -8,7 +8,7 @@ import requests_mock
 from django_webtest import WebTest
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.catalogi import StatusType
-from zgw_consumers.api_models.zaken import Status, ZaakInformatieObject
+from zgw_consumers.api_models.zaken import Status
 from zgw_consumers.constants import APITypes
 from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 
@@ -17,6 +17,7 @@ from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.utils.test import paginated_response
 
 from ..models import OpenZaakConfig
+from ..statuses import ZaakInformatieObject
 from .factories import ServiceFactory
 
 ZAKEN_ROOT = "https://zaken.nl/api/v1/"
@@ -27,6 +28,7 @@ DOCUMENTEN_ROOT = "https://documenten.nl/api/v1/"
 @requests_mock.Mocker()
 class TestListStatusView(WebTest):
     def setUp(self):
+        self.maxDiff = None
         self.user = UserFactory(
             login_type=LoginTypeChoices.digid, bsn="900222086", email="johm@smith.nl"
         )
@@ -159,9 +161,11 @@ class TestListStatusView(WebTest):
         self.assertEqual(
             response.context.get("case"),
             {
+                "identification": "ZAAK-2022-0000000024",
                 "start_date": datetime.date(2022, 1, 2),
                 "end_date": None,
-                "description": "Coffee zaaktype",
+                "description": "Zaak naar aanleiding van ingezonden formulier",
+                "type_description": "Coffee zaaktype",
                 "current_status": "Finish",
                 "statuses": [status1_obj, status2_obj],
                 "documents": [
