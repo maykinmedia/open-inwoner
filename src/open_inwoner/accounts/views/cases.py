@@ -87,9 +87,17 @@ class CasesListView(
             ("#completed_apps", _("Afgeronde aanvragen")),
         ]
 
-        context["open_cases"] = [case for case in updated_cases if not case["end_date"] and not case["current_status"] == "Afgerond"]
+        context["open_cases"] = [
+            case
+            for case in updated_cases
+            if not case["end_date"] and not case["current_status"] == "Afgerond"
+        ]
         context["open_cases"].sort(key=lambda case: case["start_date"])
-        context["closed_cases"] = [case for case in updated_cases if case["end_date"] or case["current_status"] == "Afgerond"]
+        context["closed_cases"] = [
+            case
+            for case in updated_cases
+            if case["end_date"] or case["current_status"] == "Afgerond"
+        ]
         context["closed_cases"].sort(key=lambda case: case["end_date"])
 
         return context

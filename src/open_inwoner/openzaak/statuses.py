@@ -62,7 +62,7 @@ def fetch_specific_statuses(status_urls: List[str]) -> List[Status]:
     _statuses = []
     for url in status_urls:
         _statuses += [client.retrieve("status", url=url)]
-    
+
     statuses = factory(Status, list(_statuses))
 
     return statuses
