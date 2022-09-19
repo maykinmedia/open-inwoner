@@ -35,7 +35,7 @@ def case_dashboard(case: dict, **kwargs) -> dict:
             {
                 "icon": "inventory_2",
                 "label": _("Aanvraag"),
-                "value": case.get("description"),
+                "value": case.get("identification"),
             },
             {
                 "icon": "calendar_today",

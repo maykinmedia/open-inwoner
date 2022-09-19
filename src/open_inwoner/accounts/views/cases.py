@@ -1,4 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.core.cache import cache
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.functional import cached_property
@@ -44,7 +45,10 @@ class CasesListView(
         context = super().get_context_data(**kwargs)
 
         cases = fetch_cases(self.request.user.bsn)
-        case_types = {case_type.url: case_type for case_type in fetch_case_types()}
+        case_types = cache.get("case_types")
+        if not case_types:
+            case_types = {case_type.url: case_type for case_type in fetch_case_types()}
+            cache.set("case_types", case_types, 60 * 60)
         status_types = {
             status_type.url: status_type for status_type in fetch_status_types()
         }
@@ -65,8 +69,9 @@ class CasesListView(
                 {
                     "uuid": str(case.uuid),
                     "start_date": case.startdatum,
-                    "end_date": case.einddatum,
-                    "description": case_types[case.zaaktype].omschrijving
+                    "end_date": case.einddatum if hasattr(case, "einddatum") else None,
+                    "description": case.omschrijving,
+                    "zaaktype_description": case_types[case.zaaktype].omschrijving
                     if case_types
                     else _("No data available"),
                     "current_status": status_types[
@@ -82,9 +87,17 @@ class CasesListView(
             ("#completed_apps", _("Afgeronde aanvragen")),
         ]
 
-        context["open_cases"] = [case for case in updated_cases if not case["end_date"]]
+        context["open_cases"] = [
+            case
+            for case in updated_cases
+            if not case["end_date"] and not case["current_status"] == "Afgerond"
+        ]
         context["open_cases"].sort(key=lambda case: case["start_date"])
-        context["closed_cases"] = [case for case in updated_cases if case["end_date"]]
+        context["closed_cases"] = [
+            case
+            for case in updated_cases
+            if case["end_date"] or case["current_status"] == "Afgerond"
+        ]
         context["closed_cases"].sort(key=lambda case: case["end_date"])
 
         return context
@@ -134,9 +147,11 @@ class CasesStatusView(
                 status.statustype = status_type
 
             context["case"] = {
+                "identification": case.identificatie,
                 "start_date": case.startdatum,
-                "end_date": case.einddatum,
-                "description": case_type.omschrijving
+                "end_date": case.einddatum if hasattr(case, "einddatum") else None,
+                "description": case.omschrijving,
+                "type_description": case_type.omschrijving
                 if case_type
                 else _("No data available"),
                 "current_status": statuses[-1].statustype.omschrijving
