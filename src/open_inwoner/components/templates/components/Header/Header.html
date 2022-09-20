@@ -15,8 +15,7 @@
                 <nav class="header__actions" aria-label="Zoek navigatie mobiel">
                     <div class="header__text-actions">
                         <p class="p">
-                            {% trans "Welkom" %}
-                            {% if request.user %}{{ request.user.get_full_name }}{% endif %}
+                            {% if request.user.is_authenticated %}{% trans "Welkom" %} {{ request.user.get_full_name }}{% endif %}
                         </p>
 
                         {% if request.user.is_authenticated %}
@@ -26,7 +25,7 @@
                                     {% link text=logout href=request.user.get_logout_url primary=True %}
                                 </li>
                             </ul>
-                        {% else %}
+                        {% elif config.login_show %}
                             <ul class="header__list">
                                 <li class="header__list-item">
                                     {% url 'login' as login_url %}
@@ -51,8 +50,7 @@
         <nav class="header__actions" aria-label="Zoek navigatie desktop">
             <div class="header__text-actions">
                 <p class="p">
-                    {% trans "Welkom" %}
-                    {% if request.user %}{{ request.user.get_full_name }}{% endif %}
+                    {% if request.user.is_authenticated %}{% trans "Welkom" %} {{ request.user.get_full_name }}{% endif %}
                 </p>
 
                 {% if request.user.is_authenticated %}
@@ -62,7 +60,7 @@
                             {% link text=logout href=request.user.get_logout_url primary=True %}
                         </li>
                     </ul>
-                {% else %}
+                {% elif config.login_show %}
                     <ul class="header__list">
                         <li class="header__list-item">
                             {% url 'login' as login_url %}
