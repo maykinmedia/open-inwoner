@@ -266,7 +266,7 @@ EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
 EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=False)
 EMAIL_TIMEOUT = 10
 
-DEFAULT_FROM_EMAIL = "openinwoner@maykinmedia.nl"
+DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="openinwoner@maykinmedia.nl")
 
 #
 # LOGGING
@@ -876,6 +876,9 @@ TWO_FACTOR_PATCH_ADMIN = config("TWO_FACTOR_PATCH_ADMIN", default=True)
 MIN_UPLOAD_SIZE = 1  # in bytes
 MAX_UPLOAD_SIZE = 1024 ** 2 * 100  # 100MB
 UPLOAD_FILE_TYPES = "application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/plain,application/vnd.oasis.opendocument.text,application/vnd.oasis.opendocument.formula,application/vnd.oasis.opendocument.spreadsheet,application/pdf,image/jpeg,image/png"
+
+# HaalCentraal BRP versions
+BRP_VERSION = config("BRP_VERSION", default="2.0")
 
 #
 # DIGID

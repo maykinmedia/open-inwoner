@@ -63,7 +63,7 @@ def case_document_list(documents: list[ZaakInformatieObject], **kwargs) -> dict:
 
     files = [
         {
-            "file": document.titel or document.beschrijving or _("Geen titel"),
+            "file": document.titel or _("Geen titel"),
         }
         for document in documents
     ]

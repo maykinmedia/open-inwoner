@@ -2,7 +2,7 @@ import json
 import os
 from datetime import date
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.utils.translation import gettext as _
 
 import requests_mock
@@ -41,20 +41,50 @@ class TestPreSaveSignal(TestCase):
         config.service = service
         config.save()
 
-    def _setUpMocks(self, m):
+    def _setUpMocks_v_2(self, m):
         m.get(
             "https://personen/api/schema/openapi.yaml?v=3",
             status_code=200,
-            content=load_binary_mock("personen.yaml"),
+            content=load_binary_mock("personen_2.0.yaml"),
         )
         m.post(
             "https://personen/api/brp/personen",
             status_code=200,
-            json=load_json_mock("ingeschrevenpersonen.999993847.json"),
+            json=load_json_mock("ingeschrevenpersonen.999993847_2.0.json"),
         )
 
-    def test_signal_updates_users_data_when_logged_in_via_digid(self, m):
-        self._setUpMocks(m)
+    def _setUpMocks_v_1_3(self, m):
+        m.get(
+            "https://personen/api/schema/openapi.yaml?v=3",
+            status_code=200,
+            content=load_binary_mock("personen_1.3.yaml"),
+        )
+        m.get(
+            "https://personen/api/brp/ingeschrevenpersonen/999993847?fields=naam,geboorte.datum",
+            status_code=200,
+            json=load_json_mock("ingeschrevenpersonen.999993847_1.3.json"),
+        )
+
+    def test_signal_updates_users_data_when_logged_in_via_digid_v_2(self, m):
+        self._setUpMocks_v_2(m)
+        self._setUpService()
+
+        user = UserFactory(
+            first_name="", last_name="", login_type=LoginTypeChoices.digid
+        )
+        user.bsn = "999993847"
+        user.save()
+
+        updated_user = User.objects.filter(email=user.email)
+
+        self.assertEqual(updated_user[0].first_name, "Merel")
+        self.assertEqual(updated_user[0].last_name, "Kooyman")
+        self.assertEqual(updated_user[0].birthday, date(1982, 4, 10))
+        self.assertTrue(updated_user[0].is_prepopulated)
+
+    @override_settings(BRP_VERSION="1.3")
+    def test_signal_updates_users_data_when_logged_in_via_digid_v_1_3(self, m):
+        self._setUpMocks_v_1_3(m)
         self._setUpService()
 
         user = UserFactory(
@@ -71,7 +101,7 @@ class TestPreSaveSignal(TestCase):
         self.assertTrue(updated_user[0].is_prepopulated)
 
     def test_user_is_not_updated_without_defining_service(self, m):
-        self._setUpMocks(m)
+        self._setUpMocks_v_2(m)
 
         user = UserFactory(
             first_name="", last_name="", login_type=LoginTypeChoices.digid
@@ -93,7 +123,7 @@ class TestPreSaveSignal(TestCase):
         self.assertFalse(updated_user[0].is_prepopulated)
 
     def test_user_is_not_updated_when_not_logged_in_via_digid(self, m):
-        self._setUpMocks(m)
+        self._setUpMocks_v_2(m)
 
         user = UserFactory(
             first_name="", last_name="", login_type=LoginTypeChoices.default
@@ -114,7 +144,7 @@ class TestPreSaveSignal(TestCase):
         m.get(
             "https://personen/api/schema/openapi.yaml?v=3",
             status_code=200,
-            content=load_binary_mock("personen.yaml"),
+            content=load_binary_mock("personen_2.0.yaml"),
         )
         m.post(
             "https://personen/api/brp/personen",
@@ -139,7 +169,7 @@ class TestPreSaveSignal(TestCase):
         m.get(
             "https://personen/api/schema/openapi.yaml?v=3",
             status_code=200,
-            content=load_binary_mock("personen.yaml"),
+            content=load_binary_mock("personen_2.0.yaml"),
         )
         m.post(
             "https://personen/api/brp/personen",
@@ -165,7 +195,7 @@ class TestPreSaveSignal(TestCase):
         m.get(
             "https://personen/api/schema/openapi.yaml?v=3",
             status_code=200,
-            content=load_binary_mock("personen.yaml"),
+            content=load_binary_mock("personen_2.0.yaml"),
         )
         m.post(
             "https://personen/api/brp/personen",
@@ -193,12 +223,12 @@ class TestLogging(TestCase):
         m.get(
             "https://personen/api/schema/openapi.yaml?v=3",
             status_code=200,
-            content=load_binary_mock("personen.yaml"),
+            content=load_binary_mock("personen_2.0.yaml"),
         )
         m.post(
             "https://personen/api/brp/personen",
             status_code=200,
-            json=load_json_mock("ingeschrevenpersonen.999993847.json"),
+            json=load_json_mock("ingeschrevenpersonen.999993847_2.0.json"),
         )
 
         config = HaalCentraalConfig.get_solo()
@@ -236,7 +266,7 @@ class TestLogging(TestCase):
         m.get(
             "https://personen/api/schema/openapi.yaml?v=3",
             status_code=200,
-            content=load_binary_mock("personen.yaml"),
+            content=load_binary_mock("personen_2.0.yaml"),
         )
         m.post(
             "https://personen/api/brp/personen",
