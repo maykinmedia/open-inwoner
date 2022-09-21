@@ -68,6 +68,13 @@ class SiteConfiguration(SingletonModel):
         related_name="hero_image_login",
         help_text=_("Hero image on the login page"),
     )
+    login_show = models.BooleanField(
+        verbose_name=_("Toon inlogknop rechts bovenin"),
+        default=True,
+        help_text=_(
+            "Wanneer deze optie uit staat dan kan nog wel worden ingelogd via /accounts/login/ , echter het inloggen is verborgen"
+        ),
+    )
     login_allow_registration = models.BooleanField(
         verbose_name=_("Sta lokale registratie toe"),
         default=False,

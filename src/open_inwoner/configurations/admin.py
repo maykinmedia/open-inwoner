@@ -36,6 +36,7 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
             {
                 "fields": (
                     "name",
+                    "login_show",
                     "login_allow_registration",
                     "show_cases",
                     "show_product_finder",
