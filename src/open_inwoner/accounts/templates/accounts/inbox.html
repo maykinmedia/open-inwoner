@@ -20,7 +20,7 @@
     <div class="sticky">
         {% render_list %}
             {% for conversation in conversations.page_obj %}
-                {% querystring conversation.other_user_email conversations.page_obj.number query='with={}&page={}' as href %}
+                {% querystring conversation.other_user_email|urlencode conversations.page_obj.number query='with={}&page={}' as href %}
                 {% firstof '?'|add:href as href %}
                 {% firstof conversation.other_user_first_name|add:' '|add:conversation.other_user_last_name as other_user_fullname %}
 
