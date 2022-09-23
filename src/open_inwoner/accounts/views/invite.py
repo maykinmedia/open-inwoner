@@ -29,6 +29,9 @@ class InviteAcceptView(LogMixin, UpdateView):
     def get_object(self, queryset=None):
         invite = super().get_object(queryset)
 
+        if self.request.user.is_authenticated:
+            raise Http404(_("U bent al ingelogd."))
+
         if invite.expired():
             self.log_system_action(_("invitation expired"), invite)
             raise Http404(_("The invitation was expired"))

@@ -57,10 +57,6 @@ class InviteMixin:
             contact.contact_user = user
             contact.save()
 
-        if created:
-            self.request.user = user
-            self.log_user_action(reverse_contact, _("contact was created"))
-
 
 class CustomRegistrationView(LogMixin, InviteMixin, RegistrationView):
     form_class = CustomRegistrationForm
