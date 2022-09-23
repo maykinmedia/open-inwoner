@@ -1705,11 +1705,11 @@ msgstr "Tekst over bezoek in de footer."
 
 #: configurations/models.py:142
 msgid "Footer visiting map"
-msgstr "Routetekst in de footer"
+msgstr "Bezoekadres url op Google maps"
 
 #: configurations/models.py:145
 msgid "Visiting address in google maps on the footer section."
-msgstr "Route naar de organisatie in de footer, adresgegevens"
+msgstr "De link naar het bezoekadres via google maps"
 
 #: configurations/models.py:151
 msgid "Footer mailing title"
