@@ -112,10 +112,8 @@ class ContactQuerySet(QuerySet):
             "contact_user", flat=True
         )
         return (
-            self.filter(
-                Q(created_by=me)
-                | Q(contact_user=me)
-            ).distinct()
+            self.filter(Q(created_by=me) | Q(contact_user=me))
+            .distinct()
             .annotate(reverse=Case(When(created_by=me, then=False), default=True))
             .annotate(
                 other_user_id=Case(
