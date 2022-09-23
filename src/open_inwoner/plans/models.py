@@ -131,6 +131,21 @@ class Plan(models.Model):
     def get_absolute_url(self):
         return reverse("plans:plan_detail", kwargs={"uuid": self.uuid})
 
+    def get_contact_users(self, request_user):
+        users = []
+        for contact in self.contacts.all():
+            if contact.created_by == request_user:
+                users += [contact.contact_user]
+            else:
+                users += [contact.created_by]
+        return users
+
+    def get_all_users(self, request_user):
+        users = self.get_contact_users(request_user)
+        if self.created_by != request_user:
+            users += [self.created_by]
+        return users
+
     def contactperson_list(self):
         return ", ".join([contact.get_name() for contact in self.contacts.all()])
 
