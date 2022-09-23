@@ -57,16 +57,6 @@ class InviteMixin:
             contact.contact_user = user
             contact.save()
 
-        # create reverse contact
-        reverse_contact, created = Contact.objects.get_or_create(
-            contact_user=invite.inviter,
-            created_by=user,
-            defaults={
-                "first_name": invite.inviter.first_name,
-                "last_name": invite.inviter.last_name,
-                "email": invite.inviter.email,
-            },
-        )
         if created:
             self.request.user = user
             self.log_user_action(reverse_contact, _("contact was created"))
