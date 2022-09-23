@@ -22,7 +22,7 @@ from open_inwoner.utils.mixins import ExportMixin
 from open_inwoner.utils.views import LogMixin
 
 from ..forms import ThemesForm, UserForm
-from ..models import Action, User
+from ..models import Action, Contact, User
 
 
 class MyProfileView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormView):
@@ -60,10 +60,11 @@ class MyProfileView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormView)
         context["action_text"] = _(
             f"{Action.objects.connected(self.request.user).filter(status=StatusChoices.open).count()} acties staan open."
         )
-        if self.request.user.contacts.count() > 0:
+        contacts = Contact.objects.get_extended_contacts_for_user(self.request.user)
+        if contacts.count() > 0:
             context[
                 "contact_text"
-            ] = f"{', '.join(contact_names)}{'...' if self.request.user.contacts.count() > 3 else ''}"
+            ] = f"{', '.join(contact_names)}{'...' if contacts.count() > 3 else ''}"
         else:
             context["contact_text"] = _("U heeft nog geen contacten.")
         context["questionnaire_exists"] = QuestionnaireStep.objects.exists()
