@@ -62,9 +62,9 @@ class ContactExtendedTests(TestCase):
 
         contacts = Contact.objects.get_extended_contacts_for_user(self.me)
 
-        self.assertEqual(contacts.count(), 1)
+        self.assertEqual(contacts.count(), 2)
 
-        extended_contact = contacts.get()
+        extended_contact = contacts.filter(created_by=self.me)[0]
         self.assertEqual(extended_contact.id, direct_contact.id)
         self.assertEqual(extended_contact.other_user_id, other_user.id)
         self.assertFalse(extended_contact.reverse)
