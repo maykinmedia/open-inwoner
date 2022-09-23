@@ -46,9 +46,17 @@ class MyProfileView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormView)
             ("#overview", _("Persoonlijk overzicht")),
             ("#files", _("Bestanden")),
         ]
-        context["mentor_contacts"] = self.request.user.contacts.filter(
-            contact_user__contact_type=ContactTypeChoices.begeleider
+        mentor_contacts = list(
+            self.request.user.contacts.filter(
+                contact_user__contact_type=ContactTypeChoices.begeleider
+            )
+        ) + list(
+            Contact.objects.filter(
+                created_by__contact_type=ContactTypeChoices.begeleider,
+                contact_user=self.request.user,
+            )
         )
+        context["mentor_contacts"] = mentor_contacts
         context["next_action"] = (
             Action.objects.connected(self.request.user)
             .filter(end_date__gte=today, status=StatusChoices.open)
