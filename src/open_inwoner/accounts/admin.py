@@ -96,6 +96,7 @@ class ActionAdmin(UUIDAdminFirstInOrder, PrivateMediaMixin, admin.ModelAdmin):
 @admin.register(Contact)
 class ContactAdmin(UUIDAdminFirstInOrder, admin.ModelAdmin):
     readonly_fields = ("uuid",)
+    search_fields = ("first_name", "last_name", "email", "contact_user__email", "created_by__email")
     list_display = (
         "first_name",
         "last_name",
