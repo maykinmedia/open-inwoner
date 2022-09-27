@@ -42,11 +42,18 @@ class MyProfileView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormView)
             ("#files", _("Bestanden")),
         ]
         # List of names of 'mentor' users that are a contact of me
-        mentor_contacts = [str(c.contact_user.get_full_name()) for c in self.request.user.contacts.filter(
-            contact_user__contact_type=ContactTypeChoices.begeleider
-        )] + [str(c.created_by.get_full_name()) for c in Contact.objects.filter(
-            created_by__contact_type=ContactTypeChoices.begeleider,
-            contact_user=self.request.user)]
+        mentor_contacts = [
+            str(c.contact_user.get_full_name())
+            for c in self.request.user.contacts.filter(
+                contact_user__contact_type=ContactTypeChoices.begeleider
+            )
+        ] + [
+            str(c.created_by.get_full_name())
+            for c in Contact.objects.filter(
+                created_by__contact_type=ContactTypeChoices.begeleider,
+                contact_user=self.request.user,
+            )
+        ]
 
         context["mentor_contacts"] = mentor_contacts
         context["next_action"] = (
