@@ -135,6 +135,7 @@ django==3.2.15
     #   django-hijack
     #   django-import-export
     #   django-localflavor
+    #   django-open-forms-client
     #   django-otp
     #   django-phonenumber-field
     #   django-polymorphic
@@ -264,6 +265,10 @@ django-mptt==0.13.4
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-filer
+django-open-forms-client==0.2.2
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 django-ordered-model==3.4.3
     # via
     #   -c requirements/ci.txt
@@ -328,6 +333,7 @@ django-solo==1.2.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   django-open-forms-client
     #   mozilla-django-oidc-db
     #   zgw-consumers
 django-timeline-logger==2.0.0
@@ -712,6 +718,7 @@ requests==2.26.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   ddt-api-calls
+    #   django-open-forms-client
     #   django-rosetta
     #   gemma-zds-client
     #   mozilla-django-oidc

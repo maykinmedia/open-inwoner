@@ -11,7 +11,11 @@
 
 {% block sidebar_content %}
     {% anchor_menu anchors=anchors desktop=True %}
-        {% if product.link %}
+        {% if product.form %}
+            <li class="anchor-menu__list-item">
+                {% button href=product.form_link size="big" text=_("Aanvraag starten") primary=True icon="arrow_forward" icon_position="before" %}
+            </li>
+        {% elif product.link %}
             <li class="anchor-menu__list-item">
                 {% button href=product.link size="big" text=_("Aanvraag starten") primary=True icon="arrow_forward" icon_position="before" %}
             </li>
@@ -30,7 +34,11 @@
     <p class="p">{{ object.summary }}</p>
     {{ object.content|ckeditor_content|safe }}
 
-    {% if product.link %}
+    {% if product.form %}
+        {% button_row mobile=True %}
+            {% button href=product.form_link text=_("Aanvraag starten") primary=True icon="arrow_forward" icon_position="before" %}
+        {% endbutton_row %}
+    {% elif product.link %}
         {% button_row mobile=True %}
             {% button href=product.link text=_("Aanvraag starten") primary=True icon="arrow_forward" icon_position="before" %}
         {% endbutton_row %}

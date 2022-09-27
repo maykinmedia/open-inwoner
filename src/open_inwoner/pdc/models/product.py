@@ -8,6 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from filer.fields.file import FilerFileField
 from filer.fields.image import FilerImageField
+from openformsclient.models import OpenFormsSlugField
 from ordered_model.models import OrderedModel
 
 from open_inwoner.utils.validators import validate_phone_number
@@ -57,7 +58,14 @@ class Product(models.Model):
         verbose_name=_("Link"),
         blank=True,
         default="",
-        help_text=_("Action link to request the product"),
+        help_text=_("Action link to request the product."),
+    )
+    form = OpenFormsSlugField(
+        _("Request form"),
+        blank=True,
+        help_text=_(
+            "Select a form to show this form on the product page. If a form is selected, the link will not be shown."
+        ),
     )
     content = models.TextField(
         verbose_name=_("Content"),
@@ -153,6 +161,10 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def form_link(self):
+        return reverse("pdc:product_form", kwargs={"slug": self.slug})
 
     def get_absolute_url(self, category=None):
         if not category:
