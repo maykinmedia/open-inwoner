@@ -32,12 +32,6 @@ Quick start
 Next steps
 ----------
 
-Optionally, you can load demo data and extract demo media files::
-
-    $ python src/manage.py loaddata demo
-    $ cd media
-    $ tar -xzf demo.tgz
-
 You can now run your installation and point your browser to the address given
 by this command::
 
