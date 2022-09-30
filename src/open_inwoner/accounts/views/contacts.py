@@ -40,7 +40,10 @@ class ContactListView(LoginRequiredMixin, BaseBreadcrumbMixin, ListView):
                     | Q(contact_user__isnull=True)
                 )
             else:
-                base_qs = base_qs.filter(contact_user__contact_type=type_filter)
+                base_qs = base_qs.filter(
+                    Q(contact_user__contact_type=type_filter)
+                    | Q(created_by__contact_type=type_filter)
+                )
         return base_qs
 
     def get_context_data(self, **kwargs):

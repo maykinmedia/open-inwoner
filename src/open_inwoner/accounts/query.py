@@ -105,17 +105,15 @@ class ContactQuerySet(QuerySet):
         - other_user_email
         - other_user_phonenumber (Null in case of reversed contacts)
 
-        If the user and other user have contacts with each other only mine contact is shown
+        If the user and other user have contacts with each other return both contacts
         """
 
         my_contacts_users = self.filter(created_by=me).values_list(
             "contact_user", flat=True
         )
         return (
-            self.filter(
-                Q(created_by=me)
-                | Q(~Q(created_by__in=my_contacts_users), contact_user=me)
-            )
+            self.filter(Q(created_by=me) | Q(contact_user=me))
+            .distinct()
             .annotate(reverse=Case(When(created_by=me, then=False), default=True))
             .annotate(
                 other_user_id=Case(

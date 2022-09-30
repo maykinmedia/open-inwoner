@@ -22,7 +22,7 @@ from open_inwoner.utils.mixins import ExportMixin
 from open_inwoner.utils.views import LogMixin
 
 from ..forms import ThemesForm, UserForm
-from ..models import Action, User
+from ..models import Action, Contact, User
 
 
 class MyProfileView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormView):
@@ -34,11 +34,6 @@ class MyProfileView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormView)
         return [(_("Mijn profiel"), reverse("accounts:my_profile"))]
 
     def get_context_data(self, **kwargs):
-        contact_names = [
-            f"{contact.first_name} ({contact.get_type_display()})"
-            for contact in self.request.user.contacts.all()[:3]
-        ]
-
         context = super().get_context_data(**kwargs)
         today = date.today()
         context["anchors"] = [
@@ -46,9 +41,21 @@ class MyProfileView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormView)
             ("#overview", _("Persoonlijk overzicht")),
             ("#files", _("Bestanden")),
         ]
-        context["mentor_contacts"] = self.request.user.contacts.filter(
-            contact_user__contact_type=ContactTypeChoices.begeleider
-        )
+        # List of names of 'mentor' users that are a contact of me
+        mentor_contacts = [
+            str(c.contact_user.get_full_name())
+            for c in self.request.user.contacts.filter(
+                contact_user__contact_type=ContactTypeChoices.begeleider
+            )
+        ] + [
+            str(c.created_by.get_full_name())
+            for c in Contact.objects.filter(
+                created_by__contact_type=ContactTypeChoices.begeleider,
+                contact_user=self.request.user,
+            )
+        ]
+
+        context["mentor_contacts"] = mentor_contacts
         context["next_action"] = (
             Action.objects.connected(self.request.user)
             .filter(end_date__gte=today, status=StatusChoices.open)
@@ -60,10 +67,22 @@ class MyProfileView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormView)
         context["action_text"] = _(
             f"{Action.objects.connected(self.request.user).filter(status=StatusChoices.open).count()} acties staan open."
         )
-        if self.request.user.contacts.count() > 0:
+        contacts = Contact.objects.get_extended_contacts_for_user(self.request.user)
+        # Invited contacts
+        contact_names = [
+            f"{contact.first_name} ({contact.get_type_display()})"
+            for contact in self.request.user.contacts.all()[:3]
+        ]
+        # Reverse contacts
+        contact_names += [
+            f"{contact.created_by.first_name} ({contact.created_by.get_contact_type_display()})"
+            for contact in self.request.user.assigned_contacts.all()[:3]
+        ]
+
+        if contacts.count() > 0:
             context[
                 "contact_text"
-            ] = f"{', '.join(contact_names)}{'...' if self.request.user.contacts.count() > 3 else ''}"
+            ] = f"{', '.join(contact_names)}{'...' if contacts.count() > 3 else ''}"
         else:
             context["contact_text"] = _("U heeft nog geen contacten.")
         context["questionnaire_exists"] = QuestionnaireStep.objects.exists()

@@ -43,12 +43,10 @@
             {% icon "person" outlined=True %}
             <p class="plan-contact__title">{% trans "Contactpersonen" %}</p>
             <div class="plan-contact__grid plan-contact__grid--columns-{% if object.contacts.count > 1 %}2{% else %}1{% endif %}">
-                {% for contact in object.contacts.all %}
+                {% for user in contact_users %}
                     <div class="plan-contact__information">
-                        <p class="plan-contact__info">{{ contact.get_name }}</p>
-                        <p class="plan-contact__info">{{ contact.function }}</p>
-                        <p class="plan-contact__info">{{ contact.phonenumber }}</p>
-                        <p class="plan-contact__info">{{ contact.contact_user.email }}</p>
+                        <p class="plan-contact__info">{{ user.get_full_name }}</p>
+                        <p class="plan-contact__info">{{ user.email }}</p>
                     </div>
                 {% endfor %}
             </div>
