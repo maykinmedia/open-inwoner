@@ -192,7 +192,7 @@ class ProductDetailView(BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView
             anchors.append(("#contact", _("Contact")))
         if product.related_products.published().exists():
             anchors.append(("#see", _("Zie ook")))
-        #anchors.append(("#share", _("Delen")))  disabled for #822
+        # anchors.append(("#share", _("Delen")))  disabled for #822
 
         context["anchors"] = anchors
         context["related_products_start"] = 6 if product.links.exists() else 1
