@@ -155,6 +155,7 @@ INSTALLED_APPS = [
     "mozilla_django_oidc",
     "mozilla_django_oidc_db",
     "sessionprofile",
+    "openformsclient",
     # Project applications.
     "open_inwoner.accounts",
     "open_inwoner.components",

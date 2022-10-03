@@ -2,6 +2,10 @@ from django.urls import reverse_lazy
 
 from ..utils import config
 
+# The Open Forms SDK files might differ from the API domain.
+OPEN_FORMS_API_DOMAIN = config("OPEN_FORMS_DOMAIN", "")
+OPEN_FORMS_SDK_DOMAIN = OPEN_FORMS_API_DOMAIN
+
 #
 # Django CSP settings
 #
@@ -13,22 +17,26 @@ CSP_DEFAULT_SRC = (
     "'self'",
 )  # ideally we'd use BASE_URI but it'd have to be lazy or cause issues
 CSP_BASE_URI = ("'self'",)
-CSP_FONT_SRC = ("'self'",)
+CSP_FONT_SRC = ("'self'", OPEN_FORMS_SDK_DOMAIN)
 CSP_FRAME_ANCESTORS = ["'self'"]
 CSP_FRAME_SRC = ["'self'"]
 CSP_OBJECT_SRC = "'none'"
 CSP_SCRIPT_SRC = (
     "'self'",
     "https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:28992/",
+    OPEN_FORMS_SDK_DOMAIN,
 )  # See if the unsafe-eval can be removed....
 CSP_STYLE_SRC = (
     "'self'",
+    OPEN_FORMS_SDK_DOMAIN,
 )  # Fix this. I do not want to have the unsafe-inline here....
 CSP_IMG_SRC = (
     "'self'",
     "data:",
     "https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:28992/",
+    OPEN_FORMS_SDK_DOMAIN,
 )
+CSP_CONNECT_SRC = ("'self'", OPEN_FORMS_API_DOMAIN)
 
 CSP_UPGRADE_INSECURE_REQUESTS = False  # TODO enable on production?
 CSP_INCLUDE_NONCE_IN = [

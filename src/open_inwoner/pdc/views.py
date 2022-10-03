@@ -199,6 +199,33 @@ class ProductDetailView(BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView
         return context
 
 
+class ProductFormView(BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView):
+    template_name = "pages/product/form.html"
+    model = Product
+    breadcrumb_use_pk = False
+    no_list = True
+
+    @cached_property
+    def crumbs(self):
+        base_list = [(_("Thema's"), reverse("pdc:category_list"))]
+        base_list += self.get_categories_breadcrumbs(slug_name="theme_slug")
+        return base_list + [
+            (self.get_object().name, self.get_object().get_absolute_url()),
+            (_("Formulier"), self.request.path),
+        ]
+
+    def get_context_data(self, **kwargs):
+        product = self.get_object()
+        context = super().get_context_data(**kwargs)
+
+        anchors = [
+            ("#title", product.name),
+        ]
+
+        context["anchors"] = anchors
+        return context
+
+
 class ProductFinderView(FormView):
     template_name = "pages/product/finder.html"
     form_class = ProductFinderForm

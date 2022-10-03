@@ -6,6 +6,7 @@ from .views import (
     CategoryListView,
     ProductDetailView,
     ProductFinderView,
+    ProductFormView,
 )
 
 app_name = "pdc"
@@ -25,6 +26,17 @@ urlpatterns = [
         f"{PRODUCT_PATH_NAME}/<str:slug>/",
         ProductDetailView.as_view(),
         name="product_detail",
+    ),
+    path(
+        f"{PRODUCT_PATH_NAME}/<str:slug>/formulier/",
+        ProductFormView.as_view(),
+        name="product_form",
+    ),
+    # Required to handle dynamic URL-paths appended by Open Forms.
+    path(
+        f"{PRODUCT_PATH_NAME}/<str:slug>/formulier/<path:rest>",
+        ProductFormView.as_view(),
+        name="product_form",
     ),
     path("finder/", ProductFinderView.as_view(), name="product_finder"),
 ]
