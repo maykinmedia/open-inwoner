@@ -937,4 +937,3 @@ MOZILLA_DJANGO_OIDC_DB_CACHE_TIMEOUT = 1
 from .app.csp import *  # noqa
 
 SECURE_REFERRER_POLICY = "origin-when-cross-origin"
-
