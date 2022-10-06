@@ -21,6 +21,7 @@ class SiteConfiguration(SingletonModel):
     )
     primary_color = ColorField(
         verbose_name=_("Primary color"),
+        default="#FFFFFF",
         help_text=_("The primary color of the municipality's site"),
     )
     secondary_color = ColorField(
