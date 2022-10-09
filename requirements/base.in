@@ -65,6 +65,7 @@ django-digid-eherkenning
 git+https://github.com/maykinmedia/python3-saml.git@9f1ffa86fdfe68ccbcf063613c6e6cbb5447c360#egg=python3_saml
 pyopenssl
 django-sessionprofile
+sharing-configs
 
 # Common Ground integration
 zgw-consumers

@@ -157,6 +157,7 @@ django==3.2.15
     #   maykin-django-two-factor-auth
     #   mozilla-django-oidc
     #   mozilla-django-oidc-db
+    #   sharing-configs
     #   zgw-consumers
 django-admin-index==1.5.0
     # via
@@ -335,6 +336,7 @@ django-solo==1.2.0
     #   -r requirements/ci.txt
     #   django-open-forms-client
     #   mozilla-django-oidc-db
+    #   sharing-configs
     #   zgw-consumers
 django-timeline-logger==2.0.0
     # via
@@ -724,6 +726,7 @@ requests==2.26.0
     #   mozilla-django-oidc
     #   python3-saml
     #   requests-mock
+    #   sharing-configs
     #   sphinx
     #   zgw-consumers
 requests-mock==1.9.3
@@ -738,6 +741,10 @@ rich==12.4.1
     #   -r requirements/ci.txt
     #   django-rich
 sentry-sdk==1.4.3
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+sharing-configs==0.1.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt

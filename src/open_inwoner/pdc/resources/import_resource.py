@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from import_export import fields, resources
 from import_export.exceptions import ImportExportError
 from import_export.instance_loaders import CachedInstanceLoader
-from import_export.widgets import CharWidget
+from import_export.widgets import CharWidget, ManyToManyWidget
 
 from ..models import Category, Organization, Product, Tag
 from .widgets import ValidatedManyToManyWidget
@@ -75,22 +75,22 @@ class ProductImportResource(ImportResource):
     categories = fields.Field(
         column_name="categories",
         attribute="categories",
-        widget=ValidatedManyToManyWidget(Category, field="slug"),
+        widget=ManyToManyWidget(Category, field="slug"),
     )
     organizations = fields.Field(
         column_name="organizations",
         attribute="organizations",
-        widget=ValidatedManyToManyWidget(Organization, field="slug"),
+        widget=ManyToManyWidget(Organization, field="slug"),
     )
     related_products = fields.Field(
         column_name="related_products",
         attribute="related_products",
-        widget=ValidatedManyToManyWidget(Product, field="slug"),
+        widget=ManyToManyWidget(Product, field="slug"),
     )
     tags = fields.Field(
         column_name="tags",
         attribute="tags",
-        widget=ValidatedManyToManyWidget(Tag, field="slug"),
+        widget=ManyToManyWidget(Tag, field="slug"),
     )
     costs = fields.Field(
         column_name="costs",

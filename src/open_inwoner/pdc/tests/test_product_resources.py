@@ -78,7 +78,7 @@ class TestProductImportResource(TestCase):
         )
         self.assertEqual(error_message_list, expected_error_message_list)
 
-    def test_import_raises_validation_error_when_category_value_is_null(self):
+    def test_import_does_not_raise_validation_error_when_category_value_is_null(self):
         dataset = tablib.Dataset(
             [
                 self.product.name,
@@ -105,12 +105,11 @@ class TestProductImportResource(TestCase):
                 "organizations",
             ],
         )
-        with self.assertRaises(ValidationError) as e:
-            self.resource.import_data(dataset, raise_errors=True)
+        self.resource.import_data(dataset, raise_errors=True)
+        qs = Product.objects.filter(name=self.product.name)
+        self.assertEqual(qs.count(), 1)
 
-        self.assertEqual(e.exception.message, "Het veld categories is verplicht")
-
-    def test_import_raises_validation_error_when_category_does_not_exist(self):
+    def test_import_does_not_raise_validation_error_when_category_does_not_exist(self):
         dataset = tablib.Dataset(
             [
                 self.product.name,
@@ -137,10 +136,9 @@ class TestProductImportResource(TestCase):
                 "organizations",
             ],
         )
-        with self.assertRaises(ValidationError) as e:
-            self.resource.import_data(dataset, raise_errors=True)
-
-        self.assertEqual(e.exception.message, "The category you entered does not exist")
+        self.resource.import_data(dataset, raise_errors=True)
+        qs = Product.objects.filter(name=self.product.name)
+        self.assertEqual(qs.count(), 1)
 
     def test_import_creates_slug_field_when_it_is_not_given(self):
         dataset = tablib.Dataset(

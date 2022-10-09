@@ -5,6 +5,8 @@ from django.utils.translation import gettext as _
 from import_export.admin import ImportExportMixin
 from import_export.formats import base_formats
 from ordered_model.admin import OrderedModelAdmin
+from sharing_configs.admin import SharingConfigsMixin
+from tablib import Dataset
 
 from open_inwoner.ckeditor5.widgets import CKEditorWidget
 from open_inwoner.utils.logentry import system_action
@@ -39,7 +41,7 @@ class ProductAdminForm(forms.ModelForm):
 
 
 @admin.register(Product)
-class ProductAdmin(ImportExportMixin, admin.ModelAdmin):
+class ProductAdmin(SharingConfigsMixin, ImportExportMixin, admin.ModelAdmin):
     list_display = ("name", "created_on", "display_categories", "published")
     list_filter = ("published", "categories", "tags")
     list_editable = ("published",)
@@ -68,6 +70,8 @@ class ProductAdmin(ImportExportMixin, admin.ModelAdmin):
     import_template_name = "admin/product_import.html"
     formats = [base_formats.XLSX, base_formats.CSV]
 
+    change_list_template = "admin/pdc/change_list_products.html"
+
     def get_export_resource_class(self):
         return ProductExportResource
 
@@ -79,6 +83,18 @@ class ProductAdmin(ImportExportMixin, admin.ModelAdmin):
             system_action(_("products were exported"), user)
 
         return response
+
+    def get_sharing_configs_export_data(self, obj: object) -> bytes:
+        return bytes(
+            ProductExportResource().export(Product.objects.filter(id=obj.id)).json,
+            "utf-8",
+        )
+
+    def get_sharing_configs_import_data(self, content: bytes) -> object:
+        result = ProductImportResource().import_data(
+            Dataset().load(content), raise_errors=True
+        )
+        return result
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
