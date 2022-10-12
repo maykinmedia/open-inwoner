@@ -25,7 +25,7 @@
         {% for contact in contact_list %}
             <tr>
                 <th class="table__header">{{ contact.other_user_first_name }} {{ contact.other_user_last_name }}</th>
-                <td class="table__item">{{ contact.get_type_display }}</td>
+                <td class="table__item">{% if contact.other_user_type == "contact" %}Contactpersoon{% elif contact.other_user_type == "begeleider" %}Begeleider{% elif contact.other_user_type == "organization" %}Organisatie{% endif %}</td>
                 <td class="table__item">{{ contact.other_user_email|default:"" }}</td>
                 <td class="table__item">{{ contact.other_user_phonenumber }}</td>
                 <td class="table__item">{% if contact.is_not_active %}{% icon "check" extra_classes="icon icon--disabled" %}{% else %}{% icon "check" %}{% endif %}</td>
