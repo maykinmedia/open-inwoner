@@ -146,11 +146,16 @@ class Plan(models.Model):
         return self.documents.order_by("-created_on")
 
     def get_other_users(self, user=None):
-        """return list of users participated in the plan with exception of the current user"""
+        """return list of users participating in the plan with exception of the current user"""
         contact_user_ids = self.contacts.exclude(contact_user__isnull=True).values_list(
             "contact_user", flat=True
         )
-        user_ids = list(contact_user_ids) + [self.created_by.id]
+        created_by_ids = self.contacts.exclude(contact_user__isnull=True).values_list(
+            "created_by", flat=True
+        )
+        user_ids = list(
+            set(list(contact_user_ids) + list(created_by_ids) + [self.created_by.id])
+        )
 
         if user and user.id in user_ids:
             user_ids.remove(user.id)

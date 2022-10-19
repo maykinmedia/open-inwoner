@@ -56,6 +56,62 @@ class PlanViewTests(WebTest):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.plan.title)
 
+    def test_plan_detail_contacts(self):
+        response = self.app.get(self.detail_url, user=self.user)
+        self.assertContains(response, self.contact_user.get_full_name())
+        self.assertContains(response, self.user.get_full_name())
+
+        response = self.app.get(self.detail_url, user=self.contact_user)
+        self.assertContains(response, self.user.get_full_name())
+        self.assertContains(response, self.contact_user.get_full_name())
+
+        # Contact for one user, but not the other
+        # Check if all users can see eachother in the plan
+        new_user = UserFactory()
+        new_contact = ContactFactory(contact_user=new_user, created_by=self.user)
+        self.plan.contacts.add(new_contact)
+
+        response = self.app.get(self.detail_url, user=self.user)
+        self.assertContains(response, self.contact_user.get_full_name())
+        self.assertContains(response, new_user.get_full_name())
+
+        response = self.app.get(self.detail_url, user=self.contact_user)
+        self.assertContains(response, self.user.get_full_name())
+        self.assertContains(response, new_user.get_full_name())
+
+        response = self.app.get(self.detail_url, user=new_user)
+        self.assertContains(response, self.contact_user.get_full_name())
+        self.assertContains(response, self.user.get_full_name())
+
+        new_user.delete()
+
+        # Verify the reverse Contact-relationship
+        new_user = UserFactory()
+        new_contact = ContactFactory(created_by=new_user, contact_user=self.user)
+        self.plan.contacts.add(new_contact)
+
+        response = self.app.get(self.detail_url, user=self.user)
+        self.assertContains(response, self.contact_user.get_full_name())
+        self.assertContains(response, new_user.get_full_name())
+
+        response = self.app.get(self.detail_url, user=self.contact_user)
+        self.assertContains(response, self.user.get_full_name())
+        self.assertContains(response, new_user.get_full_name())
+
+        response = self.app.get(self.detail_url, user=new_user)
+        self.assertContains(response, self.contact_user.get_full_name())
+        self.assertContains(response, self.user.get_full_name())
+
+        new_user.delete()
+
+        # Verify that without being added to the plan the contact isn't visible
+        new_user = UserFactory()
+        new_contact = ContactFactory(created_by=new_user, contact_user=self.user)
+
+        response = self.app.get(self.detail_url, user=self.user)
+        self.assertContains(response, self.contact_user.get_full_name())
+        self.assertNotContains(response, new_user.get_full_name())
+
     def test_plan_contact_can_access(self):
         response = self.app.get(self.list_url, user=self.contact_user)
         self.assertEqual(response.status_code, 200)
