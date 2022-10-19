@@ -67,6 +67,7 @@ class PlanDetailView(
         actions = self.object.actions.all()
         context = super().get_context_data(**kwargs)
         context["contact_users"] = self.object.get_other_users(self.request.user)
+        context["is_creator"] = self.request.user == self.object.created_by
         context["anchors"] = [
             ("#title", self.object.title),
             ("#goals", _("Doelen")),
@@ -121,6 +122,13 @@ class PlanEditView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView
             (self.get_object().title, reverse("plans:plan_detail", kwargs=self.kwargs)),
             (_("Bewerken"), reverse("plans:plan_edit", kwargs=self.kwargs)),
         ]
+
+    def get_queryset(self):
+        return (
+            super(PlanEditView, self)
+            .get_queryset()
+            .filter(created_by=self.request.user)
+        )
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
