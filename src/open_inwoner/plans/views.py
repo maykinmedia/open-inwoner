@@ -66,7 +66,7 @@ class PlanDetailView(
     def get_context_data(self, **kwargs):
         actions = self.object.actions.all()
         context = super().get_context_data(**kwargs)
-        context["contact_users"] = self.object.get_contact_users(self.request.user)
+        context["contact_users"] = self.object.get_other_users(self.request.user)
         context["is_creator"] = self.request.user == self.object.created_by
         context["anchors"] = [
             ("#title", self.object.title),
