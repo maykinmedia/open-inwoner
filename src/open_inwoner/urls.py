@@ -105,7 +105,7 @@ if "digid_eherkenning.backends.DigiDBackend" in settings.AUTHENTICATION_BACKENDS
     urlpatterns = [
         path("digid/", include("digid_eherkenning.digid_urls")),
     ] + urlpatterns
-else:
+elif settings.DIGID_MOCK:
     urlpatterns = [
         path("digid/", include("digid_eherkenning.mock.digid_urls")),
         path("digid/idp/", include("digid_eherkenning.mock.idp.digid_urls")),
