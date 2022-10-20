@@ -16,14 +16,15 @@
                 <h1 class="h1">{% trans 'Welkom' %}</h1>
                 {% if login_text %}<p class="p">{{ login_text }}</p>{% endif %}
                 <br>
-
+		{% if settings.DIGID_ENABLED %}
                     {% render_card direction='horizontal' tinted=True %}
                         <a href="{% url 'digid:login' %}" class="link digid-logo" aria-describedby="Digid logo" title="Digid logo">
                             <img class="digid-logo__image" src="{% static 'accounts/digid_logo.svg' %}" alt="Digid logo">
                         </a>
                         {% link href='digid:login' text=_('Inloggen met DigiD') secondary=True icon='arrow_forward' extra_classes="link--digid" %}
                     {% endrender_card %}
-
+		{% endif %}
+			
                 {% get_solo 'mozilla_django_oidc_db.OpenIDConnectConfig' as oidc_config %}
                 {% get_solo 'configurations.SiteConfiguration' as site_config %}
                 {% if oidc_config.enabled %}

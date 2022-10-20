@@ -15,8 +15,6 @@
             <div>{{ object.end_date }}</div>
             <div>{% trans "Created by" %}:</div>
             <div>{{ object.created_by.get_full_name }}</div>
-            <div>{% trans "Contactpersonen" %}:</div>
-            <div>{{ object.contactperson_list }}</div>
         </div>
     {% endif %}
     {% link url text=title hide_text=True icon='arrow_forward' button=True transparent=True %}

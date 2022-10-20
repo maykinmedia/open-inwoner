@@ -155,6 +155,7 @@ INSTALLED_APPS = [
     "mozilla_django_oidc",
     "mozilla_django_oidc_db",
     "sessionprofile",
+    "openformsclient",
     # Project applications.
     "open_inwoner.accounts",
     "open_inwoner.components",
@@ -889,6 +890,8 @@ if ALLOWED_HOSTS:
 else:
     BASE_URL = "https://example.com"
 
+DIGID_MOCK = config("DIGID_MOCK", default=True)
+DIGID_ENABLED = config("DIGID_ENABLED", default=True)
 DIGID_METADATA = config("DIGID_METADATA", "")
 SSL_CERTIFICATE_PATH = config("SSL_CERTIFICATE_PATH", "")
 SSL_KEY_PATH = config("SSL_KEY_PATH", "")
@@ -934,3 +937,5 @@ MOZILLA_DJANGO_OIDC_DB_CACHE = "oidc"
 MOZILLA_DJANGO_OIDC_DB_CACHE_TIMEOUT = 1
 
 from .app.csp import *  # noqa
+
+SECURE_REFERRER_POLICY = "origin-when-cross-origin"

@@ -65,6 +65,7 @@ django==3.2.15
     #   django-hijack
     #   django-import-export
     #   django-localflavor
+    #   django-open-forms-client
     #   django-otp
     #   django-phonenumber-field
     #   django-polymorphic
@@ -141,6 +142,8 @@ django-localflavor==3.1
     # via -r requirements/base.in
 django-mptt==0.13.4
     # via django-filer
+django-open-forms-client==0.2.2
+    # via -r requirements/base.in
 django-ordered-model==3.4.3
     # via
     #   -r requirements/base.in
@@ -176,6 +179,7 @@ django-sniplates==0.7.0
 django-solo==1.2.0
     # via
     #   -r requirements/base.in
+    #   django-open-forms-client
     #   mozilla-django-oidc-db
     #   zgw-consumers
 django-timeline-logger==2.0.0
@@ -323,6 +327,7 @@ redis==3.5.3
     # via django-redis
 requests==2.26.0
     # via
+    #   django-open-forms-client
     #   django-rosetta
     #   gemma-zds-client
     #   mozilla-django-oidc

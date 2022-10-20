@@ -113,12 +113,7 @@ class TestRegistrationFunctionality(WebTest):
         self.assertEqual(invite.invitee, user)
 
         # reverse contact checks
-        self.assertEqual(user.contacts.count(), 1)
-        reverse_contact = user.contacts.get()
-        self.assertEqual(reverse_contact.contact_user, contact.created_by)
-        self.assertEqual(reverse_contact.email, contact.created_by.email)
-        self.assertEqual(reverse_contact.first_name, contact.created_by.first_name)
-        self.assertEqual(reverse_contact.last_name, contact.created_by.last_name)
+        self.assertEqual(user.contacts.count(), 0)
 
     def test_registration_active_user(self):
         """the user should be redirected to the registration complete page"""
@@ -276,12 +271,7 @@ class TestRegistrationNecessary(WebTest):
         self.assertEqual(invite.invitee, user)
 
         # reverse contact checks
-        self.assertEqual(user.contacts.count(), 1)
-        reverse_contact = user.contacts.get()
-        self.assertEqual(reverse_contact.contact_user, contact.created_by)
-        self.assertEqual(reverse_contact.email, contact.created_by.email)
-        self.assertEqual(reverse_contact.first_name, contact.created_by.first_name)
-        self.assertEqual(reverse_contact.last_name, contact.created_by.last_name)
+        self.assertEqual(user.contacts.count(), 0)
 
     def test_submit_not_unique_email(self):
         UserFactory.create(email="john@smith.com")

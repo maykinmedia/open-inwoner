@@ -44,6 +44,7 @@ django-rich
 django-csp
 django-csp-reports
 mozilla-django-oidc-db
+django-open-forms-client
 
 # API libraries
 djangorestframework
