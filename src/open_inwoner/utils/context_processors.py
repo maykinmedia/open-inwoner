@@ -11,6 +11,7 @@ def settings(request):
         "ENVIRONMENT",
         "SHOW_ALERT",
         "PROJECT_NAME",
+        "DIGID_ENABLED",
     )
 
     config = SiteConfiguration.get_solo()

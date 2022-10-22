@@ -19,10 +19,15 @@ AUTHENTICATION_BACKENDS = [
     "open_inwoner.accounts.backends.CustomOIDCBackend",
 ]
 
+DIGID_MOCK = config("DIGID_MOCK", default=False)
 if DIGID_METADATA and not DEBUG:
     AUTHENTICATION_BACKENDS += ["digid_eherkenning.backends.DigiDBackend"]
-else:
+    DIGID_ENABLED = True
+elif DIGID_MOCK:
     AUTHENTICATION_BACKENDS += ["digid_eherkenning.mock.backends.DigiDBackend"]
+    DIGID_ENABLED = True
+else:
+    DIGID_ENABLED = False
 
 # Database performance
 for db_config in DATABASES.values():

@@ -134,6 +134,12 @@ class ContactQuerySet(QuerySet):
                 )
             )
             .annotate(
+                other_user_type=Case(
+                    When(created_by=me, then=F("contact_user__contact_type")),
+                    default=F("created_by__contact_type"),
+                )
+            )
+            .annotate(
                 other_user_email=Case(
                     When(created_by=me, then=F("contact_user__email")),
                     default=F("created_by__email"),

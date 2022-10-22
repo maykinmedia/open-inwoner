@@ -891,6 +891,8 @@ if ALLOWED_HOSTS:
 else:
     BASE_URL = "https://example.com"
 
+DIGID_MOCK = config("DIGID_MOCK", default=True)
+DIGID_ENABLED = config("DIGID_ENABLED", default=True)
 DIGID_METADATA = config("DIGID_METADATA", "")
 SSL_CERTIFICATE_PATH = config("SSL_CERTIFICATE_PATH", "")
 SSL_KEY_PATH = config("SSL_KEY_PATH", "")
