@@ -6,7 +6,7 @@ from filer.fields.image import FilerImageField
 from treebeard.exceptions import InvalidMoveToDescendant
 from treebeard.mp_tree import MP_MoveHandler, MP_Node
 
-from ..managers import PublishedQueryset
+from ..managers import CategoryPublishedQueryset
 
 
 class PublishedMoveHandler(MP_MoveHandler):
@@ -62,7 +62,7 @@ class Category(MP_Node):
     )
 
     node_order_by = ["slug"]
-    objects = PublishedQueryset.as_manager()
+    objects = CategoryPublishedQueryset.as_manager()
 
     class Meta:
         verbose_name = _("Category")
