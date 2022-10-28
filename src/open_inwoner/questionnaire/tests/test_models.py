@@ -23,7 +23,7 @@ class QuestionnaireStepTestCase(TestCase):
 
     def test_str(self):
         root = QuestionnaireStepFactory.create(question="foo")
-        self.assertEqual("foo", str(root))
+        self.assertTrue(str(root).startswith("foo"))
 
     def test_get_absolute_url_root(self):
         root = QuestionnaireStepFactory.create(code="foo", slug="foo")

@@ -62,7 +62,7 @@ class HomeView(TemplateView):
         kwargs.update(product_locations=ProductLocation.objects.all()[:1000])
         kwargs.update(
             questionnaire_roots=QuestionnaireStep.get_root_nodes().filter(
-                highlighted=True
+                highlighted=True, published=True
             )
         )
         if self.request.user.is_authenticated:
