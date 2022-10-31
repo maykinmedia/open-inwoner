@@ -8,8 +8,10 @@ class PasswordResetViewTests(TestCase):
         url = reverse("admin_password_reset")
         cache.clear()
 
-        for i in range(5):
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        for i in range(10):
             response = self.client.get(url)
-            self.assertEqual(response.status_code, 200)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 403)
