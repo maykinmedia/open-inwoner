@@ -62,7 +62,10 @@ class QuestionnaireStepView(BaseBreadcrumbMixin, FormView):
         )
 
         if slug:
-            return get_object_or_404(QuestionnaireStep, slug=slug)
+            if getattr(self.request, "user", False) and self.request.user.is_staff:
+                return get_object_or_404(QuestionnaireStep, slug=slug)
+            else:
+                return get_object_or_404(QuestionnaireStep, slug=slug, published=True)
 
     def get_form_kwargs(self) -> dict:
         instance = self.get_object()
@@ -71,6 +74,8 @@ class QuestionnaireStepView(BaseBreadcrumbMixin, FormView):
 
     def form_valid(self, form: QuestionnaireStepForm):
         questionnaire_step = form.cleaned_data["answer"]
+        if questionnaire_step.redirect_to:
+            questionnaire_step = questionnaire_step.redirect_to
         self.request.session[QUESTIONNAIRE_SESSION_KEY] = questionnaire_step.slug
         return HttpResponseRedirect(redirect_to=questionnaire_step.get_absolute_url())
 
@@ -148,4 +153,4 @@ class QuestionnaireRootListView(BaseBreadcrumbMixin, ListView):
         ]
 
     def get_queryset(self):
-        return QuestionnaireStep.get_root_nodes()
+        return QuestionnaireStep.get_root_nodes().filter(published=True)

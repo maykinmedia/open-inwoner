@@ -54,7 +54,7 @@ class QuestionnaireStepAdminFormSet(BaseModelFormSet):
 class QuestionnaireStepAdmin(TreeAdmin):
     form = QuestionnaireStepAdminForm
     inlines = (QuestionnaireStepFileInline,)
-    list_display = ("display_question_answer", "highlighted")
+    list_display = ("display_question_answer", "highlighted", "published")
     prepopulated_fields = {"slug": ("question",)}
     save_as = True
     list_editable = ("highlighted",)
@@ -83,6 +83,8 @@ class QuestionnaireStepAdmin(TreeAdmin):
                     "description",
                     "category",
                     "highlighted",
+                    "published",
+                    "redirect_to",
                 ),
             },
         ),
@@ -97,11 +99,19 @@ class QuestionnaireStepAdmin(TreeAdmin):
             },
         ),
     )
+    raw_id_fields = ("redirect_to",)
 
     def display_question_answer(self, obj):
+        redirect = ""
+        if obj.redirect_to:
+            redirect = " - doorsturen -> {} - {}".format(
+                obj.redirect_to.question, obj.redirect_to.id
+            )
+
+        postfix = " <small>({} - {}{})</small>".format(obj.id, obj.code, redirect)
         if not obj.parent_answer:
-            return obj.question
-        return "{} -> {}</p>".format(obj.parent_answer, obj.question)
+            return obj.question + postfix
+        return "{} -> {}".format(obj.parent_answer, obj.question) + postfix
 
     display_question_answer.allow_tags = True
 
