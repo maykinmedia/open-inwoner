@@ -17,9 +17,14 @@ class NecessaryFieldsMiddleware:
 
             # If the user is currently not editing their information, but it is required
             # redirect to that view.
+            digid_logout = "/digid/logout/"
+            try:
+                digid_logout = reverse("digid:logout")
+            except:
+                pass
             if (
                 not request.path.startswith(
-                    (necessary_fields_url, reverse("logout"), reverse("digid:logout"))
+                    (necessary_fields_url, reverse("logout"), digid_logout)
                 )
                 and request.user.require_necessary_fields()
             ):
