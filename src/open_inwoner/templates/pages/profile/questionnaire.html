@@ -2,8 +2,8 @@
 {% load i18n questionnaire_tags %}
 
 {% block content %}
-    <h1 class="h1">{% trans "Keuze zelfdiagnose" %}</h1>
-    <p class="p">{% trans "Kies hieronder één van de volgende vragenlijsten om de zelfdiagnose te starten." %}</p>
+    <h1 class="h1">{{configurable_text.questionnaire_page.select_questionnaire_title}}</h1>
+    <p class="p">{{configurable_text.questionnaire_page.select_questionnaire_subtitle}}</p>
 
     {% questionnaire root_nodes=root_nodes %}
 {% endblock content %}

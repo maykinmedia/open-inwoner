@@ -34,10 +34,16 @@ def settings(request):
                 "home_theme_intro": config.home_theme_intro,
                 "home_map_title": config.home_map_title,
                 "home_map_intro": config.home_map_intro,
+                "home_questionnaire_title": config.home_questionnaire_title,
+                "home_questionnaire_subtitle": config.home_questionnaire_subtitle,
             },
             "theme_page": {
                 "theme_title": config.theme_title,
                 "theme_intro": config.theme_intro,
+            },
+            "questionnaire_page": {
+                "select_questionnaire_title": config.select_questionnaire_title,
+                "select_questionnaire_subtitle": config.select_questionnaire_subtitle,
             },
             "footer": {
                 "footer_visiting_title": config.footer_visiting_title,

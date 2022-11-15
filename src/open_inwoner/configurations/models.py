@@ -132,6 +132,32 @@ class SiteConfiguration(SingletonModel):
         blank=True,
         help_text=_("Map's intro text on the home page."),
     )
+    home_questionnaire_title = models.CharField(
+        max_length=255,
+        default=_("Waar bent u naar op zoek?"),
+        verbose_name=_("Home page questionaire title"),
+        help_text=_("Questionnaire title on the home page."),
+    )
+    home_questionnaire_subtitle = models.CharField(
+        max_length=255,
+        default=_("Test met een paar simpele vragen of u recht heeft op een product"),
+        verbose_name=_("Home page questionaire sub-title"),
+        help_text=_("Questionnaire sub-title on the home page."),
+    )
+    select_questionnaire_title = models.CharField(
+        max_length=255,
+        default=_("Keuze zelfdiagnose?"),
+        verbose_name=_("Questionaire selector widget title"),
+        help_text=_("Questionaire selector title on the theme and profile pages."),
+    )
+    select_questionnaire_subtitle = models.CharField(
+        max_length=255,
+        default=_(
+            "Kies hieronder één van de volgende vragenlijsten om de zelfdiagnose te starten."
+        ),
+        verbose_name=_("Questionaire selector widget sub-title"),
+        help_text=_("Questionaire selector sub-title on the theme and profile pages."),
+    )
     footer_visiting_title = models.CharField(
         max_length=255,
         default="",

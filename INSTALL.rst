@@ -19,7 +19,7 @@ Prerequisites
 
 You need the following libraries and/or programs:
 
-* `Python`_ 3.8 or above
+* `Python`_ 3.9 or above
 * Python `Virtualenv`_ and `Pip`_
 * `PostgreSQL`_ 10 or above with PostGIS extension
 * `Node.js`_
@@ -161,6 +161,7 @@ environment variables. You can persist these in your ``local.py`` settings
 file or as part of the ``(post)activate`` of your virtualenv.
 
 * ``SECRET_KEY``: the secret key to use. A default is set in ``dev.py``
+* ``DIGID_MOCK``: determines if a mock-DigiD interface is to be shown on the frontend, if configured in the admin this has to be set to ``True`` to avoid switching to the mock-authentication by accident.
 
 * ``DB_NAME``: name of the database for the project. Defaults to ``open_inwoner``.
 * ``DB_USER``: username to connect to the database with. Defaults to ``open_inwoner``.
