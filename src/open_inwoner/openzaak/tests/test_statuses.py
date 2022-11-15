@@ -16,8 +16,8 @@ from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.utils.test import paginated_response
 
+from ..info_objects import ZaakInformatieObject
 from ..models import OpenZaakConfig
-from ..statuses import ZaakInformatieObject
 from .factories import ServiceFactory
 
 ZAKEN_ROOT = "https://zaken.nl/api/v1/"

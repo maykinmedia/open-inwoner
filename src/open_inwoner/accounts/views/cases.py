@@ -1,12 +1,18 @@
+import dataclasses
+from typing import List
+
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.cache import cache
+from django.http import Http404, StreamingHttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
+from django.views import View
 from django.views.generic import TemplateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin
+from zgw_consumers.concurrent import parallel
 
 from open_inwoner.openzaak.cases import (
     fetch_case_types,
@@ -14,8 +20,13 @@ from open_inwoner.openzaak.cases import (
     fetch_single_case,
     fetch_single_case_type,
 )
-from open_inwoner.openzaak.statuses import (
+from open_inwoner.openzaak.info_objects import (
+    create_document_content_stream,
     fetch_case_information_objects,
+    fetch_single_information_object,
+    fetch_single_information_object_uuid,
+)
+from open_inwoner.openzaak.statuses import (
     fetch_single_status_type,
     fetch_specific_statuses,
     fetch_status_history,
@@ -103,6 +114,13 @@ class CasesListView(
         return context
 
 
+@dataclasses.dataclass
+class SimpleFile:
+    name: str
+    size: int
+    url: str
+
+
 class CasesStatusView(
     BaseBreadcrumbMixin, LoginRequiredMixin, UserPassesTestMixin, TemplateView
 ):
@@ -134,7 +152,8 @@ class CasesStatusView(
         case = fetch_single_case(case_uuid)
 
         if case:
-            case_info_objects = fetch_case_information_objects(case.url)
+            documents = self.get_case_documents(case)
+
             statuses = fetch_status_history(case.url)
             statuses.sort(key=lambda status: status.datum_status_gezet)
 
@@ -149,23 +168,54 @@ class CasesStatusView(
             context["case"] = {
                 "identification": case.identificatie,
                 "start_date": case.startdatum,
-                "end_date": case.einddatum if hasattr(case, "einddatum") else None,
+                "end_date": (case.einddatum if hasattr(case, "einddatum") else None),
                 "description": case.omschrijving,
-                "type_description": case_type.omschrijving
-                if case_type
-                else _("No data available"),
-                "current_status": statuses[-1].statustype.omschrijving
-                if statuses
-                and statuses[-1].statustype.omschrijving
-                in [st.omschrijving for st in status_types]
-                else _("No data available"),
+                "type_description": (
+                    case_type.omschrijving if case_type else _("No data available")
+                ),
+                "current_status": (
+                    statuses[-1].statustype.omschrijving
+                    if statuses
+                    and statuses[-1].statustype.omschrijving
+                    in [st.omschrijving for st in status_types]
+                    else _("No data available")
+                ),
                 "statuses": statuses,
-                "documents": case_info_objects,
+                "documents": documents,
             }
-            context["anchors"] = self.get_anchors(statuses, case_info_objects)
+            context["anchors"] = self.get_anchors(statuses, documents)
         else:
             context["case"] = None
         return context
+
+    def get_case_documents(self, case) -> List[SimpleFile]:
+        case_info_objects = fetch_case_information_objects(case.url)
+
+        # get the information objects for the case objects
+        with parallel() as executor:
+            info_objects = executor.map(
+                fetch_single_information_object,
+                [case_info.informatieobject for case_info in case_info_objects],
+            )
+
+        documents = []
+        for case_info_obj, info_obj in zip(case_info_objects, info_objects):
+            if not info_obj:
+                continue
+            # structure into something understood by the FileList template tag
+            documents.append(
+                SimpleFile(
+                    name=info_obj.bestandsnaam,
+                    size=info_obj.bestandsomvang,
+                    url=reverse(
+                        "accounts:case_document_download",
+                        kwargs={
+                            "object_id": info_obj.uuid,
+                        },
+                    ),
+                )
+            )
+        return documents
 
     def get_anchors(self, statuses, documents):
         anchors = [["#title", _("Gegevens")]]
@@ -177,3 +227,30 @@ class CasesStatusView(
             anchors.append(["#documents", _("Documenten")])
 
         return anchors
+
+
+class CasesDocumentDownloadView(LoginRequiredMixin, UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.bsn is not None
+
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+            return redirect(reverse("root"))
+
+        return super().handle_no_permission()
+
+    def get(self, *args, **kwargs):
+        info_object_uuid = kwargs["object_id"]
+
+        info_object = fetch_single_information_object_uuid(info_object_uuid)
+        if not info_object:
+            raise Http404
+
+        content_stream = create_document_content_stream(info_object.inhoud)
+        headers = {
+            "Content-Disposition": f'attachment; filename="{info_object.bestandsnaam}"',
+            "Content-Type": info_object.formaat,
+            "Content-Length": info_object.bestandsomvang,
+        }
+        response = StreamingHttpResponse(content_stream, headers=headers)
+        return response

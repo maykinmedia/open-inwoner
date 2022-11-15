@@ -10,6 +10,7 @@ from .views import (
     ActionListView,
     ActionPrivateMediaView,
     ActionUpdateView,
+    CasesDocumentDownloadView,
     CasesListView,
     CasesStatusView,
     ContactCreateView,
@@ -85,6 +86,11 @@ urlpatterns = [
     path("contacts/", ContactListView.as_view(), name="contact_list"),
     path("themes/", MyCategoriesView.as_view(), name="my_themes"),
     path("cases/", CasesListView.as_view(), name="my_cases"),
+    path(
+        "cases/document/<str:object_id>/",
+        CasesDocumentDownloadView.as_view(),
+        name="case_document_download",
+    ),
     path(
         "cases/<str:object_id>/status/",
         CasesStatusView.as_view(),

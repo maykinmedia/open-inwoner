@@ -26,6 +26,14 @@ class OpenZaakConfig(SingletonModel):
         related_name="+",
         null=True,
     )
+    document_service = models.OneToOneField(
+        "zgw_consumers.Service",
+        verbose_name=_("Documents API"),
+        on_delete=models.PROTECT,
+        limit_choices_to={"api_type": APITypes.drc},
+        related_name="+",
+        null=True,
+    )
 
     class Meta:
         verbose_name = _("Open Zaak configuration")
