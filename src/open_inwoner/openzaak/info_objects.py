@@ -4,7 +4,7 @@ from datetime import date, datetime
 from typing import List, Optional
 
 import requests
-from requests import RequestException, Response
+from requests import HTTPError, RequestException, Response
 from zds_client import ClientError
 from zgw_consumers.api_models.base import ZGWModel, factory
 
@@ -40,7 +40,7 @@ class InformatieObject(ZGWModel):
     integriteit: dict  # {'algoritme': '', 'waarde': '', 'datum': None}
     informatieobjecttype: str
     locked: bool
-    bestandsdelen: List[str]
+    # bestandsdelen: List[str]
 
 
 @dataclass
@@ -130,6 +130,10 @@ def create_document_content_stream(url: str, **headers) -> Optional[Response]:
     if client.auth:
         headers.update(client.auth.credentials())
 
-    res = requests.get(url, headers=headers)
-    res.raise_for_status()
-    return res
+    try:
+        res = requests.get(url, headers=headers)
+        res.raise_for_status()
+    except HTTPError:
+        return
+    else:
+        return res
