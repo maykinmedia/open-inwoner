@@ -1,4 +1,6 @@
 import logging
+from dataclasses import dataclass
+from datetime import date
 from typing import List, Optional
 
 from requests import RequestException
@@ -11,16 +13,6 @@ from zgw_consumers.service import get_paginated_results
 from .clients import build_client
 
 logger = logging.getLogger(__name__)
-
-### Workaround for Groningen e-Suite #773 ###
-
-from dataclasses import dataclass
-from datetime import date, datetime
-from decimal import Decimal
-from typing import List, Optional, Union
-
-from dateutil.parser import parse
-from dateutil.relativedelta import relativedelta
 
 
 @dataclass
@@ -69,14 +61,9 @@ class Zaak(ZGWModel):
     vertrouwelijkheidaanduiding: str
     status: str
     einddatum: Optional[date] = None
-
-
-#    resultaat: str
-#    relevante_andere_zaken: list
-#    zaakgeometrie: dict
-
-
-### ###
+    #    resultaat: str
+    #    relevante_andere_zaken: list
+    #    zaakgeometrie: dict
 
 
 def fetch_cases(user_bsn: str) -> List[Zaak]:
