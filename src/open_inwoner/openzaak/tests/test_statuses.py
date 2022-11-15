@@ -15,9 +15,9 @@ from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.accounts.views.cases import SimpleFile
 from open_inwoner.utils.test import paginated_response
 
-from ...accounts.views.cases import SimpleFile
 from ..models import OpenZaakConfig
 from .factories import ServiceFactory
 
@@ -58,6 +58,7 @@ class TestListStatusView(WebTest):
         self.zaak = generate_oas_component(
             "zrc",
             "schemas/Zaak",
+            uuid="d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
             url=f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
             zaaktype=f"{CATALOGI_ROOT}zaaktypen/53340e34-7581-4b04-884f",
             identificatie="ZAAK-2022-0000000024",
@@ -126,6 +127,12 @@ class TestListStatusView(WebTest):
             volgnummer=2,
             is_eindstatus=False,
         )
+        self.role = generate_oas_component(
+            "zrc",
+            "schemas/Rol",
+            url=f"{ZAKEN_ROOT}rollen/f33153aa-ad2c-4a07-ae75-15add5891",
+            betrokkene_identificatie="foo",
+        )
         self.zaak_informatie_object = generate_oas_component(
             "zrc",
             "schemas/ZaakInformatieObject",
@@ -185,7 +192,8 @@ class TestListStatusView(WebTest):
             url=reverse(
                 "accounts:case_document_download",
                 kwargs={
-                    "object_id": self.informatie_object["uuid"],
+                    "object_id": self.zaak["uuid"],
+                    "info_id": self.informatie_object["uuid"],
                 },
             ),
         )
@@ -205,6 +213,10 @@ class TestListStatusView(WebTest):
         m.get(
             f"{ZAKEN_ROOT}statussen?zaak={self.zaak['url']}",
             json=paginated_response([self.status1, self.status2]),
+        )
+        m.get(
+            f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}&betrokkeneIdentificatie__natuurlijkPersoon__inpBsn={self.user.bsn}",
+            json=paginated_response([self.role]),
         )
         m.get(f"{CATALOGI_ROOT}zaaktypen/53340e34-7581-4b04-884f", json=self.zaaktype)
         m.get(
@@ -322,6 +334,36 @@ class TestListStatusView(WebTest):
         self.assertRedirects(
             response,
             f"{reverse('login')}?next={reverse('accounts:case_status', kwargs={'object_id': 'd8bbdeb7-770f-4ca9-b1ea-77b4730bf67d'})}",
+        )
+
+    def test_no_access_when_no_roles_are_found_for_user_bsn(self, m):
+        mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
+        mock_service_oas_get(m, CATALOGI_ROOT, "ztc")
+        mock_service_oas_get(m, DOCUMENTEN_ROOT, "drc")
+        m.get(
+            f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
+            json=self.zaak,
+        )
+        m.get(
+            f"{ZAKEN_ROOT}zaakinformatieobjecten?zaak={self.zaak['url']}",
+            json=[self.zaak_informatie_object, self.zaak_informatie_object_invisible],
+        )
+        m.get(
+            f"{ZAKEN_ROOT}statussen?zaak={self.zaak['url']}",
+            json=paginated_response([self.status1, self.status2]),
+        )
+        m.get(
+            f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}&betrokkeneIdentificatie__natuurlijkPersoon__inpBsn={self.user.bsn}",
+            # no roles found
+            json=paginated_response([]),
+        )
+        self.app.get(
+            reverse(
+                "accounts:case_status",
+                kwargs={"object_id": "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d"},
+            ),
+            user=self.user,
+            status=403,
         )
 
     def test_no_data_is_retrieved_when_http_404(self, m):

@@ -4,7 +4,7 @@ from typing import List, Optional
 from requests import RequestException
 from zds_client import ClientError
 from zgw_consumers.api_models.base import factory
-from zgw_consumers.api_models.zaken import Status, Zaak
+from zgw_consumers.api_models.zaken import Rol, Status, Zaak
 from zgw_consumers.service import get_paginated_results
 
 from .api_models import Zaak, ZaakInformatieObject
@@ -119,3 +119,61 @@ def fetch_specific_statuses(status_urls: List[str]) -> List[Status]:
     statuses = factory(Status, list(_statuses))
 
     return statuses
+
+
+def fetch_roles_for_case_and_bsn(case_url: str, bsn: str) -> List[Rol]:
+    client = build_client("zaak")
+
+    if client is None:
+        return []
+
+    try:
+        response = client.list(
+            "rol",
+            request_kwargs={
+                "params": {
+                    "zaak": case_url,
+                    "betrokkeneIdentificatie__natuurlijkPersoon__inpBsn": bsn,
+                }
+            },
+        )
+    except RequestException as e:
+        logger.exception("exception while making request", exc_info=e)
+        return []
+    except ClientError as e:
+        logger.exception("exception while making request", exc_info=e)
+        return []
+
+    roles = factory(Rol, response["results"])
+
+    return roles
+
+
+def fetch_case_information_objects_for_case_and_info(
+    case_url: str, info_object_url: str
+) -> List[ZaakInformatieObject]:
+    client = build_client("zaak")
+
+    if client is None:
+        return []
+
+    try:
+        response = client.list(
+            "zaakinformatieobject",
+            request_kwargs={
+                "params": {
+                    "zaak": case_url,
+                    "informatieobject": info_object_url,
+                },
+            },
+        )
+    except RequestException as e:
+        logger.exception("exception while making request", exc_info=e)
+        return []
+    except ClientError as e:
+        logger.exception("exception while making request", exc_info=e)
+        return []
+
+    case_info_objects = factory(ZaakInformatieObject, response)
+
+    return case_info_objects

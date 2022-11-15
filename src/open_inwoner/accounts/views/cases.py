@@ -16,7 +16,9 @@ from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.openzaak.cases import (
     fetch_case_information_objects,
+    fetch_case_information_objects_for_case_and_info,
     fetch_cases,
+    fetch_roles_for_case_and_bsn,
     fetch_single_case,
     fetch_specific_statuses,
     fetch_status_history,
@@ -153,6 +155,10 @@ class CaseDetailView(
         case = fetch_single_case(case_uuid)
 
         if case:
+            # check if we have a role in this case
+            if not fetch_roles_for_case_and_bsn(case.url, self.request.user.bsn):
+                raise PermissionDenied()
+
             documents = self.get_case_document_files(case)
 
             statuses = fetch_status_history(case.url)
@@ -222,7 +228,8 @@ class CaseDetailView(
                     url=reverse(
                         "accounts:case_document_download",
                         kwargs={
-                            "object_id": info_obj.uuid,
+                            "object_id": case.uuid,
+                            "info_id": info_obj.uuid,
                         },
                     ),
                 )
@@ -252,12 +259,27 @@ class CaseDocumentDownloadView(LoginRequiredMixin, UserPassesTestMixin, View):
         return super().handle_no_permission()
 
     def get(self, *args, **kwargs):
-        info_object_uuid = kwargs["object_id"]
+        case_uuid = kwargs["object_id"]
+        case = fetch_single_case(case_uuid)
+        if not case:
+            raise Http404
 
+        # check if we have a role this case
+        if not fetch_roles_for_case_and_bsn(case.url, self.request.user.bsn):
+            raise PermissionDenied()
+
+        info_object_uuid = kwargs["info_id"]
         info_object = fetch_single_information_object(uuid=info_object_uuid)
         if not info_object:
             raise Http404
 
+        # check if this info_object belongs to this case
+        if not fetch_case_information_objects_for_case_and_info(
+            case.url, info_object.url
+        ):
+            raise PermissionDenied()
+
+        # check if this info_object should be visible
         config = OpenZaakConfig.get_solo()
         if not filter_info_object_visibility(
             info_object, config.document_max_confidentiality
