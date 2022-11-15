@@ -3,6 +3,7 @@ from typing import List
 
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.cache import cache
+from django.core.exceptions import PermissionDenied
 from django.http import Http404, StreamingHttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -12,6 +13,7 @@ from django.views import View
 from django.views.generic import TemplateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin
+from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 from zgw_consumers.concurrent import parallel
 
 from open_inwoner.openzaak.cases import (
@@ -21,11 +23,13 @@ from open_inwoner.openzaak.cases import (
     fetch_single_case_type,
 )
 from open_inwoner.openzaak.info_objects import (
+    InformatieObject,
     create_document_content_stream,
     fetch_case_information_objects,
     fetch_single_information_object,
     fetch_single_information_object_uuid,
 )
+from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.statuses import (
     fetch_single_status_type,
     fetch_specific_statuses,
@@ -121,6 +125,24 @@ class SimpleFile:
     url: str
 
 
+def filter_info_object_visibility(
+    document: InformatieObject, max_confidentiality_level: str
+) -> bool:
+    if not document:
+        return False
+    if document.status != "definitief":
+        return False
+
+    levels = [c[0] for c in VertrouwelijkheidsAanduidingen.choices]
+    max_index = levels.index(max_confidentiality_level)
+    doc_index = levels.index(document.vertrouwelijkheidaanduiding)
+
+    if doc_index <= max_index:
+        return True
+    else:
+        return False
+
+
 class CasesStatusView(
     BaseBreadcrumbMixin, LoginRequiredMixin, UserPassesTestMixin, TemplateView
 ):
@@ -204,9 +226,14 @@ class CasesStatusView(
             for case_info in case_info_objects
         ]
 
+        config = OpenZaakConfig.get_solo()
         documents = []
         for case_info_obj, info_obj in zip(case_info_objects, info_objects):
             if not info_obj:
+                continue
+            if not filter_info_object_visibility(
+                info_obj, config.document_max_confidentiality
+            ):
                 continue
             # restructure into something understood by the FileList template tag
             documents.append(
@@ -251,6 +278,12 @@ class CasesDocumentDownloadView(LoginRequiredMixin, UserPassesTestMixin, View):
         info_object = fetch_single_information_object_uuid(info_object_uuid)
         if not info_object:
             raise Http404
+
+        config = OpenZaakConfig.get_solo()
+        if not filter_info_object_visibility(
+            info_object, config.document_max_confidentiality
+        ):
+            raise PermissionDenied()
 
         content_stream = create_document_content_stream(info_object.inhoud)
         if not content_stream:

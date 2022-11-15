@@ -8,6 +8,7 @@ import requests_mock
 from django_webtest import WebTest
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.catalogi import StatusType
+from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 from zgw_consumers.api_models.zaken import Status
 from zgw_consumers.constants import APITypes
 from zgw_consumers.test import generate_oas_component, mock_service_oas_get
@@ -48,6 +49,10 @@ class TestListStatusView(WebTest):
             api_root=DOCUMENTEN_ROOT, api_type=APITypes.drc
         )
         self.config.document_service = self.document_service
+
+        self.config.document_max_confidentiality = (
+            VertrouwelijkheidsAanduidingen.beperkt_openbaar
+        )
 
         self.config.save()
         self.zaak = generate_oas_component(
@@ -144,10 +149,36 @@ class TestListStatusView(WebTest):
             url=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812",
             inhoud=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812/download",
             informatieobjecttype=f"{CATALOGI_ROOT}informatieobjecttype/014c38fe-b010-4412-881c-3000032fb321",
-            status="in_bewerking",
+            status="definitief",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
             bestandsnaam="document.txt",
             bestandsomvang=123,
         )
+
+        self.zaak_informatie_object_invisible = generate_oas_component(
+            "zrc",
+            "schemas/ZaakInformatieObject",
+            url=f"{ZAKEN_ROOT}zaakinformatieobjecten/fa5153aa-ad2c-4a07-ae75-15add57ee",
+            informatieobject=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/994c38fe-b010-4412-881c-3000032fb123",
+            zaak=f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
+            aard_relatie_weergave="some invisible content",
+            titel="",
+            beschrijving="",
+            registratiedatum="2021-01-12",
+        )
+        self.informatie_object_invisible = generate_oas_component(
+            "drc",
+            "schemas/EnkelvoudigInformatieObject",
+            uuid="994c38fe-b010-4412-881c-3000032fb123",
+            url=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/994c38fe-b010-4412-881c-3000032fb123",
+            inhoud=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/994c38fe-b010-4412-881c-3000032fb123/download",
+            informatieobjecttype=f"{CATALOGI_ROOT}informatieobjecttype/994c38fe-b010-4412-881c-3000032fb123",
+            status="definitief",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.geheim,
+            bestandsnaam="geheim-document.txt",
+            bestandsomvang=123,
+        )
+
         self.informatie_object_file = SimpleFile(
             name="document.txt",
             size=123,
@@ -169,7 +200,7 @@ class TestListStatusView(WebTest):
         )
         m.get(
             f"{ZAKEN_ROOT}zaakinformatieobjecten?zaak={self.zaak['url']}",
-            json=[self.zaak_informatie_object],
+            json=[self.zaak_informatie_object, self.zaak_informatie_object_invisible],
         )
         m.get(
             f"{ZAKEN_ROOT}statussen?zaak={self.zaak['url']}",
@@ -187,6 +218,10 @@ class TestListStatusView(WebTest):
         m.get(
             f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812",
             json=self.informatie_object,
+        )
+        m.get(
+            f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/994c38fe-b010-4412-881c-3000032fb123",
+            json=self.informatie_object_invisible,
         )
         m.get(
             f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812/download",
@@ -217,6 +252,7 @@ class TestListStatusView(WebTest):
                 "type_description": "Coffee zaaktype",
                 "current_status": "Finish",
                 "statuses": [status1_obj, status2_obj],
+                # only one visible information object
                 "documents": [self.informatie_object_file],
             },
         )
@@ -249,8 +285,9 @@ class TestListStatusView(WebTest):
         documents = response.context.get("case", {}).get("documents")
         self.assertEquals(len(documents), 1)
         self.assertEquals(
-            documents[0].url,
-            self.informatie_object_file.url,
+            documents,
+            # only one visible information object
+            [self.informatie_object_file],
         )
 
     def test_user_is_redirected_to_root_when_not_logged_in_via_digid(self, m):

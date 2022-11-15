@@ -3,6 +3,7 @@ from django.urls import reverse
 
 import requests_mock
 from django_webtest import WebTest
+from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 from zgw_consumers.constants import APITypes
 from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 
@@ -34,6 +35,9 @@ class TestDocumentDownloadView(WebTest):
             api_root=DOCUMENTEN_ROOT, api_type=APITypes.drc
         )
         self.config.document_service = self.document_service
+        self.config.document_max_confidentiality = (
+            VertrouwelijkheidsAanduidingen.beperkt_openbaar
+        )
         self.config.save()
 
         self.informatie_object_content = "my document content".encode("utf8")
@@ -44,7 +48,8 @@ class TestDocumentDownloadView(WebTest):
             url=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812",
             inhoud=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812/download",
             informatieobjecttype=f"{CATALOGI_ROOT}informatieobjecttype/014c38fe-b010-4412-881c-3000032fb321",
-            status="in_bewerking",
+            status="definitief",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
             formaat="text/plain",
             bestandsnaam="my_document.txt",
             bestandsomvang=len(self.informatie_object_content),
@@ -62,18 +67,18 @@ class TestDocumentDownloadView(WebTest):
 
     def _setUpMocks(self, m):
         mock_service_oas_get(m, DOCUMENTEN_ROOT, "drc")
-        m.get(
-            f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812",
-            json=self.informatie_object,
-        )
-        m.get(
-            f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812/download",
-            content=self.informatie_object_content,
-        )
+        m.get(self.informatie_object["url"], json=self.informatie_object)
+        m.get(self.informatie_object["inhoud"], content=self.informatie_object_content)
 
     def test_document_content_is_retrieved_when_user_logged_in_via_digid(self, m):
         self._setUpMocks(m)
-        response = self.app.get(self.informatie_object_file.url, user=self.user)
+        url = reverse(
+            "accounts:case_document_download",
+            kwargs={
+                "object_id": self.informatie_object["uuid"],
+            },
+        )
+        response = self.app.get(url, user=self.user)
 
         self.assertEqual(response.body, self.informatie_object_content)
         self.assertIn("Content-Disposition", response.headers)
@@ -88,9 +93,50 @@ class TestDocumentDownloadView(WebTest):
             response.headers["Content-Length"], str(len(self.informatie_object_content))
         )
 
+    def test_document_content_with_bad_status_is_http_403(self, m):
+        mock_service_oas_get(m, DOCUMENTEN_ROOT, "drc")
+        info_object = generate_oas_component(
+            "drc",
+            "schemas/EnkelvoudigInformatieObject",
+            uuid="014c38fe-b010-4412-881c-3000032fb812",
+            url=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812",
+            informatieobjecttype=f"{CATALOGI_ROOT}informatieobjecttype/014c38fe-b010-4412-881c-3000032fb321",
+            # bad status
+            status="archief",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+        )
+        m.get(info_object["url"], json=info_object)
+        url = reverse(
+            "accounts:case_document_download",
+            kwargs={
+                "object_id": info_object["uuid"],
+            },
+        )
+        self.app.get(url, user=self.user, status=403)
+
+    def test_document_content_with_bad_confidentiality_is_http_403(self, m):
+        mock_service_oas_get(m, DOCUMENTEN_ROOT, "drc")
+        info_object = generate_oas_component(
+            "drc",
+            "schemas/EnkelvoudigInformatieObject",
+            uuid="014c38fe-b010-4412-881c-3000032fb812",
+            url=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812",
+            informatieobjecttype=f"{CATALOGI_ROOT}informatieobjecttype/014c38fe-b010-4412-881c-3000032fb321",
+            status="definitief",
+            # bad confidentiality
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.geheim,
+        )
+        m.get(info_object["url"], json=info_object)
+        url = reverse(
+            "accounts:case_document_download",
+            kwargs={
+                "object_id": info_object["uuid"],
+            },
+        )
+        self.app.get(url, user=self.user, status=403)
+
     def test_user_is_redirected_to_root_when_not_logged_in_via_digid(self, m):
         self._setUpMocks(m)
-
         user = UserFactory(
             first_name="",
             last_name="",
@@ -103,10 +149,7 @@ class TestDocumentDownloadView(WebTest):
     def test_anonymous_user_has_no_access_to_download_page(self, m):
         self._setUpMocks(m)
         user = AnonymousUser()
-        response = self.app.get(
-            self.informatie_object_file.url,
-            user=user,
-        )
+        response = self.app.get(self.informatie_object_file.url, user=user)
 
         self.assertRedirects(
             response,
@@ -115,40 +158,26 @@ class TestDocumentDownloadView(WebTest):
 
     def test_no_data_is_retrieved_when_info_object_http_404(self, m):
         mock_service_oas_get(m, DOCUMENTEN_ROOT, "drc")
-        m.get(
-            f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812",
-            status_code=404,
-        )
+        m.get(self.informatie_object["url"], status_code=404)
+
         self.app.get(self.informatie_object_file.url, user=self.user, status=404)
 
     def test_no_data_is_retrieved_when_info_object_http_500(self, m):
         mock_service_oas_get(m, DOCUMENTEN_ROOT, "drc")
-        m.get(
-            f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812",
-            status_code=500,
-        )
+        m.get(self.informatie_object["url"], status_code=500)
+
         self.app.get(self.informatie_object_file.url, user=self.user, status=404)
 
     def test_no_data_is_retrieved_when_document_download_data_http_404(self, m):
         mock_service_oas_get(m, DOCUMENTEN_ROOT, "drc")
-        m.get(
-            f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812",
-            json=self.informatie_object,
-        )
-        m.get(
-            f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812/download",
-            status_code=404,
-        )
+        m.get(self.informatie_object["url"], json=self.informatie_object)
+        m.get(self.informatie_object["inhoud"], status_code=404)
+
         self.app.get(self.informatie_object_file.url, user=self.user, status=404)
 
     def test_no_data_is_retrieved_when_document_download_data_http_500(self, m):
         mock_service_oas_get(m, DOCUMENTEN_ROOT, "drc")
-        m.get(
-            f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812",
-            json=self.informatie_object,
-        )
-        m.get(
-            f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812/download",
-            status_code=500,
-        )
+        m.get(self.informatie_object["url"], json=self.informatie_object)
+        m.get(self.informatie_object["inhoud"], status_code=500)
+
         self.app.get(self.informatie_object_file.url, user=self.user, status=404)
