@@ -163,13 +163,12 @@ class SiteConfiguration(SingletonModel):
         verbose_name=_("Questionaire selector widget title"),
         help_text=_("Questionaire selector title on the theme and profile pages."),
     )
-    select_questionnaire_subtitle = models.CharField(
-        max_length=255,
+    select_questionnaire_intro = models.TextField(
         default=_(
             "Kies hieronder één van de volgende vragenlijsten om de zelfdiagnose te starten."
         ),
-        verbose_name=_("Questionaire selector widget sub-title"),
-        help_text=_("Questionaire selector sub-title on the theme and profile pages."),
+        verbose_name=_("Questionaire selector widget intro"),
+        help_text=_("Questionaire selector intro on the theme and profile pages."),
     )
     plans_intro = models.TextField(
         default=_(

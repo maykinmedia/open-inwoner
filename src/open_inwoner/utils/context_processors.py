@@ -50,7 +50,7 @@ def settings(request):
             },
             "questionnaire_page": {
                 "select_questionnaire_title": config.select_questionnaire_title,
-                "select_questionnaire_subtitle": config.select_questionnaire_subtitle,
+                "select_questionnaire_intro": config.select_questionnaire_intro,
             },
             "footer": {
                 "footer_visiting_title": config.footer_visiting_title,

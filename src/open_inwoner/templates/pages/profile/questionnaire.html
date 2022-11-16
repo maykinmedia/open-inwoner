@@ -3,7 +3,7 @@
 
 {% block content %}
     <h1 class="h1">{{configurable_text.questionnaire_page.select_questionnaire_title}}</h1>
-    <p class="p">{{configurable_text.questionnaire_page.select_questionnaire_subtitle}}</p>
+    <p class="p">{{configurable_text.questionnaire_page.select_questionnaire_intro|linebreaksbr}}</p>
 
     {% questionnaire root_nodes=root_nodes %}
 {% endblock content %}

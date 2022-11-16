@@ -84,7 +84,7 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                     "home_questionnaire_title",
                     "home_questionnaire_intro",
                     "select_questionnaire_title",
-                    "select_questionnaire_subtitle",
+                    "select_questionnaire_intro",
                     "plans_intro",
                     "plans_no_plans_message",
                     "plans_edit_message",
