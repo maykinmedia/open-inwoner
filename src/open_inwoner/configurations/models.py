@@ -144,6 +144,20 @@ class SiteConfiguration(SingletonModel):
         verbose_name=_("Home page questionaire sub-title"),
         help_text=_("Questionnaire sub-title on the home page."),
     )
+    home_product_finder_title = models.CharField(
+        max_length=255,
+        default=_("Productzoeker"),
+        verbose_name=_("Product finder title"),
+        help_text=_("Product finder's title on the home page."),
+    )
+    home_product_finder_intro = models.TextField(
+        default=_(
+            "Met een paar simpele vragen ziet u welke producten passen bij uw situatie"
+        ),
+        verbose_name=_("Home product finder intro"),
+        blank=True,
+        help_text=_("Product finder's intro text on the home page."),
+    )
     select_questionnaire_title = models.CharField(
         max_length=255,
         default=_("Keuze zelfdiagnose?"),
@@ -158,6 +172,26 @@ class SiteConfiguration(SingletonModel):
         verbose_name=_("Questionaire selector widget sub-title"),
         help_text=_("Questionaire selector sub-title on the theme and profile pages."),
     )
+    plans_intro = models.TextField(
+        default=_(
+            "Hier werkt u aan uw doelen. Dit doet u samen met uw contactpersoon bij de gemeente. "
+        ),
+        verbose_name=_("Plan pages intro"),
+        help_text=_("The sub-title for the plan page."),
+    )
+    plans_no_plans_message = models.CharField(
+        max_length=255,
+        default=_("U heeft nog geen plan gemaakt."),
+        verbose_name=_("No plans message"),
+        help_text=_("The message in the plans listing when user has no plans."),
+    )
+    plans_edit_message = models.CharField(
+        max_length=255,
+        default=_("Hier kunt u uw doel aanpassen"),
+        verbose_name=_("Edit goal message"),
+        help_text=_("The message when a user edits a goal."),
+    )
+
     footer_visiting_title = models.CharField(
         max_length=255,
         default="",

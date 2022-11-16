@@ -36,10 +36,17 @@ def settings(request):
                 "home_map_intro": config.home_map_intro,
                 "home_questionnaire_title": config.home_questionnaire_title,
                 "home_questionnaire_subtitle": config.home_questionnaire_subtitle,
+                "home_product_finder_title": config.home_product_finder_title,
+                "home_product_finder_intro": config.home_product_finder_intro,
             },
             "theme_page": {
                 "theme_title": config.theme_title,
                 "theme_intro": config.theme_intro,
+            },
+            "plans_page": {
+                "plans_intro": config.plans_intro,
+                "plans_no_plans_message": config.plans_no_plans_message,
+                "plans_edit_message": config.plans_edit_message,
             },
             "questionnaire_page": {
                 "select_questionnaire_title": config.select_questionnaire_title,
