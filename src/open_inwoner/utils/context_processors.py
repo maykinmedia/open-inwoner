@@ -35,7 +35,7 @@ def settings(request):
                 "home_map_title": config.home_map_title,
                 "home_map_intro": config.home_map_intro,
                 "home_questionnaire_title": config.home_questionnaire_title,
-                "home_questionnaire_subtitle": config.home_questionnaire_subtitle,
+                "home_questionnaire_intro": config.home_questionnaire_intro,
                 "home_product_finder_title": config.home_product_finder_title,
                 "home_product_finder_intro": config.home_product_finder_intro,
             },

@@ -138,11 +138,10 @@ class SiteConfiguration(SingletonModel):
         verbose_name=_("Home page questionaire title"),
         help_text=_("Questionnaire title on the home page."),
     )
-    home_questionnaire_subtitle = models.CharField(
-        max_length=255,
+    home_questionnaire_intro = models.TextField(
         default=_("Test met een paar simpele vragen of u recht heeft op een product"),
-        verbose_name=_("Home page questionaire sub-title"),
-        help_text=_("Questionnaire sub-title on the home page."),
+        verbose_name=_("Home page questionaire intro"),
+        help_text=_("Questionnaire intro text on the home page."),
     )
     home_product_finder_title = models.CharField(
         max_length=255,

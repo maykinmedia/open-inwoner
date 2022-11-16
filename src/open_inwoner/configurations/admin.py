@@ -82,7 +82,7 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                     "theme_title",
                     "theme_intro",
                     "home_questionnaire_title",
-                    "home_questionnaire_subtitle",
+                    "home_questionnaire_intro",
                     "select_questionnaire_title",
                     "select_questionnaire_subtitle",
                     "plans_intro",
