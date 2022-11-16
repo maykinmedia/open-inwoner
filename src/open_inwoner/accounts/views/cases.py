@@ -7,8 +7,10 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin
+from zgw_consumers.api_models.constants import RolOmschrijving
 
 from open_inwoner.openzaak.cases import (
+    fetch_case_roles,
     fetch_case_types,
     fetch_cases,
     fetch_single_case,
@@ -21,6 +23,7 @@ from open_inwoner.openzaak.statuses import (
     fetch_status_history,
     fetch_status_types,
 )
+from open_inwoner.openzaak.utils import get_role_identification_display
 
 
 class CasesListView(
@@ -148,6 +151,7 @@ class CasesStatusView(
 
             context["case"] = {
                 "identification": case.identificatie,
+                "initiator": self.get_initiator_display(case),
                 "start_date": case.startdatum,
                 "end_date": case.einddatum if hasattr(case, "einddatum") else None,
                 "description": case.omschrijving,
@@ -166,6 +170,12 @@ class CasesStatusView(
         else:
             context["case"] = None
         return context
+
+    def get_initiator_display(self, case):
+        roles = fetch_case_roles(case.url, RolOmschrijving.initiator)
+        if not roles:
+            return ""
+        return ", ".join([get_role_identification_display(r) for r in roles])
 
     def get_anchors(self, statuses, documents):
         anchors = [["#title", _("Gegevens")]]

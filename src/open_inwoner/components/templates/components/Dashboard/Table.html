@@ -1,0 +1,13 @@
+{% load i18n icon_tags %}
+
+{% if table and table.rows %}
+{# TODO apply styling #}
+<table border="5">
+{% for row in table.rows %}
+    <tr>
+        <th>{{ row.label }}</th>
+        <td>{{ row.value|default:'-' }}</td>
+    </tr>
+{% endfor %}
+</table>
+{% endif %}

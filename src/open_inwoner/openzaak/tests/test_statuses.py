@@ -25,7 +25,7 @@ CATALOGI_ROOT = "https://catalogi.nl/api/v1/"
 DOCUMENTEN_ROOT = "https://documenten.nl/api/v1/"
 
 
-@requests_mock.Mocker()
+@requests_mock.Mocker(real_http=False)
 class TestListStatusView(WebTest):
     def setUp(self):
         self.maxDiff = None

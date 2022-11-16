@@ -5,7 +5,8 @@ from requests import RequestException
 from zds_client import ClientError
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.catalogi import ZGWModel
-from zgw_consumers.api_models.zaken import Zaak
+from zgw_consumers.api_models.constants import RolOmschrijving
+from zgw_consumers.api_models.zaken import Rol, Zaak
 from zgw_consumers.service import get_paginated_results
 
 from .clients import build_client
@@ -165,3 +166,36 @@ def fetch_single_case_type(case_type_url: str) -> Optional[ZaakType]:
     case_type = factory(ZaakType, response)
 
     return case_type
+
+
+def fetch_case_roles(
+    case_url: str, role_desc_generic: Optional[str] = None
+) -> List[Rol]:
+    client = build_client("zaak")
+
+    if client is None:
+        return []
+
+    params = {
+        "zaak": case_url,
+    }
+    if role_desc_generic:
+        assert role_desc_generic in RolOmschrijving.values
+        params["omschrijvingGeneriek"] = role_desc_generic
+
+    try:
+        response = get_paginated_results(
+            client,
+            "rol",
+            request_kwargs={"params": params},
+        )
+    except RequestException as e:
+        logger.exception("exception while making request", exc_info=e)
+        return []
+    except ClientError as e:
+        logger.exception("exception while making request", exc_info=e)
+        return []
+
+    roles = factory(Rol, response)
+
+    return roles
