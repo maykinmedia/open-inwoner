@@ -13,15 +13,18 @@ from django.views import View
 from django.views.generic import TemplateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin
+from zgw_consumers.api_models.constants import RolOmschrijving
 
 from open_inwoner.openzaak.api_models import Zaak
 from open_inwoner.openzaak.cases import (
     fetch_case_information_objects,
     fetch_case_information_objects_for_case_and_info,
+    fetch_case_roles,
     fetch_cases,
     fetch_roles_for_case_and_bsn,
     fetch_single_case,
     fetch_specific_status,
+    fetch_single_result,
     fetch_status_history,
 )
 from open_inwoner.openzaak.catalog import (
@@ -34,7 +37,11 @@ from open_inwoner.openzaak.documents import (
     fetch_single_information_object,
 )
 from open_inwoner.openzaak.models import OpenZaakConfig
-from open_inwoner.openzaak.utils import is_info_object_visible, is_zaak_visible
+from open_inwoner.openzaak.utils import (
+    get_role_identification_display,
+    is_info_object_visible,
+    is_zaak_visible,
+)
 
 
 class CaseAccessMixin(AccessMixin):
@@ -206,10 +213,11 @@ class CaseDetailView(BaseBreadcrumbMixin, CaseAccessMixin, TemplateView):
 
             context["case"] = {
                 "identification": self.case.identificatie,
+                "initiator": self.get_initiator_display(self.case),
+                "result": self.get_result_display(self.case),
                 "start_date": self.case.startdatum,
-                "end_date": (
-                    self.case.einddatum if hasattr(self.case, "einddatum") else None
-                ),
+                "end_date": getattr(self.case, "einddatum", None),
+                "end_date_planned": getattr(self.case, "einddatum_gepland", None),
                 "description": self.case.omschrijving,
                 "type_description": (
                     case_type.omschrijving if case_type else _("No data available")
@@ -228,6 +236,19 @@ class CaseDetailView(BaseBreadcrumbMixin, CaseAccessMixin, TemplateView):
         else:
             context["case"] = None
         return context
+
+    def get_result_display(self, case) -> str:
+        if case.resultaat:
+            result = fetch_single_result(case.resultaat)
+            if result:
+                return result.toelichting
+        return _("Onbekend")
+
+    def get_initiator_display(self, case) -> str:
+        roles = fetch_case_roles(case.url, RolOmschrijving.initiator)
+        if not roles:
+            return ""
+        return ", ".join([get_role_identification_display(r) for r in roles])
 
     def get_case_document_files(self, case) -> List[SimpleFile]:
         case_info_objects = fetch_case_information_objects(case.url)

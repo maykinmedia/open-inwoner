@@ -26,7 +26,7 @@ class Zaak(ZGWModel):
     vertrouwelijkheidaanduiding: str
     status: str
     einddatum: Optional[date] = None
-    #    resultaat: str
+    resultaat: Optional[str] = None
     #    relevante_andere_zaken: list
     #    zaakgeometrie: dict
 

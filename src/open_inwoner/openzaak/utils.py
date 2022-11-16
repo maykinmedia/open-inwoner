@@ -4,7 +4,8 @@ from functools import wraps
 
 from django.core.cache import caches
 
-from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
+from zgw_consumers.api_models.constants import RolTypes, VertrouwelijkheidsAanduidingen
+from zgw_consumers.api_models.zaken import Rol
 
 from open_inwoner.openzaak.api_models import InformatieObject, Zaak
 
@@ -50,6 +51,54 @@ def is_zaak_visible(zaak: Zaak) -> bool:
     """Check if zaak is visible for users"""
     config = OpenZaakConfig.get_solo()
     return is_object_visible(zaak, config.zaak_max_confidentiality)
+
+
+def get_role_identification_display(rol: Rol) -> str:
+    """
+    best effort to get a presentable display string from a role
+    """
+    if not rol.betrokkene_identificatie:
+        return ""
+
+    def value(key):
+        return rol.betrokkene_identificatie.get(key, "")
+
+    def join(*values):
+        return " ".join(v for v in values if v)
+
+    display = ""
+
+    if rol.betrokkene_type == RolTypes.natuurlijk_persoon:
+        display = join(
+            (value("voornamen") or value("voorletters")),
+            value("voorvoegsel_geslachtsnaam"),
+            value("geslachtsnaam"),
+        )
+
+    elif rol.betrokkene_type == RolTypes.niet_natuurlijk_persoon:
+        display = value("statutaire_naam")
+
+    elif rol.betrokkene_type == RolTypes.vestiging:
+        # it is a list.. let's pick the first
+        names = value("handelsnaam")
+        if names:
+            display = names[0]
+
+    elif rol.betrokkene_type == RolTypes.organisatorische_eenheid:
+        display = value("naam")
+
+    elif rol.betrokkene_type == RolTypes.medewerker:
+        display = join(
+            value("voorletters"),
+            value("voorvoegsel_achternaam"),
+            value("achternaam"),
+        )
+
+    if not display:
+        # fallback to generic role description
+        return RolTypes.labels.get(rol.betrokkene_type, rol.betrokkene_type)
+    else:
+        return display
 
 
 def cache(key: str, alias: str = "default", **set_options):
