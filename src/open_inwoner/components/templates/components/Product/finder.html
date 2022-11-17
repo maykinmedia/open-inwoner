@@ -1,8 +1,8 @@
 {% load i18n grid_tags form_tags button_tags %}
 
 {% render_column span=6 compact=True extra_classes="product-finder" %}
-    <h2 class="h2">{% trans "Productzoeker" %}</h2>
-    <p class="p">Met een paar simpele vragen ziet u welke producten passen bij uw situatie</p>
+    <h2 class="h2">{{configurable_text.home_page.home_product_finder_title}}</h2>
+    <p class="p">{{configurable_text.home_page.home_product_finder_intro|linebreaksbr}}</p>
 
     <div class="product-finder__form">
         {% if not conditions_done %}

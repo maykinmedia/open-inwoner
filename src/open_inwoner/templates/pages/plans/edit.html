@@ -4,7 +4,7 @@
 {% block content %}
     <h1 class="h1">{% trans "Samenwerken" %}</h1>
     <p class="p">
-        {% trans "Hier werkt u samen met uw contactpersonen aan uw doelen." %}
+        {{configurable_text.plans_page.plans_intro|linebreaksbr}}
     </p>
 
     {% render_form id="plan-form" form=form method="POST" %}

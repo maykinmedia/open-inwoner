@@ -30,6 +30,6 @@
         {% endfor %}
     </div>
     {% else %}
-        <p class="p">{% trans "U heeft nog geen plan gemaakt." %}</p>
+        <p class="p">{{configurable_text.plans_page.plans_no_plans_message}}</p>
     {% endif %}
 {% endblock user_content %}
