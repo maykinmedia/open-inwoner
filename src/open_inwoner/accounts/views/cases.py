@@ -15,23 +15,23 @@ from django.views.generic import TemplateView
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.openzaak.cases import (
-    fetch_case_types,
+    fetch_case_information_objects,
     fetch_cases,
     fetch_single_case,
-    fetch_single_case_type,
+    fetch_specific_statuses,
+    fetch_status_history,
 )
-from open_inwoner.openzaak.info_objects import (
+from open_inwoner.openzaak.catalog import (
+    fetch_case_types,
+    fetch_single_case_type,
+    fetch_single_status_type,
+    fetch_status_types,
+)
+from open_inwoner.openzaak.documents import (
     download_document,
-    fetch_case_information_objects,
     fetch_single_information_object,
 )
 from open_inwoner.openzaak.models import OpenZaakConfig
-from open_inwoner.openzaak.statuses import (
-    fetch_single_status_type,
-    fetch_specific_statuses,
-    fetch_status_history,
-    fetch_status_types,
-)
 from open_inwoner.openzaak.utils import filter_info_object_visibility
 
 

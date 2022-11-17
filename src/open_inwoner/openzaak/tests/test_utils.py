@@ -4,7 +4,7 @@ from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 from zgw_consumers.test import generate_oas_component
 
-from open_inwoner.openzaak.info_objects import InformatieObject
+from open_inwoner.openzaak.api_models import InformatieObject
 from open_inwoner.openzaak.utils import filter_info_object_visibility
 
 

@@ -1,6 +1,6 @@
 from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 
-from open_inwoner.openzaak.info_objects import InformatieObject
+from open_inwoner.openzaak.api_models import InformatieObject
 
 
 def filter_info_object_visibility(
