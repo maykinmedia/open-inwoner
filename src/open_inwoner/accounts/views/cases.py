@@ -35,7 +35,7 @@ from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.utils import filter_info_object_visibility
 
 
-class CasesListView(
+class CaseListView(
     BaseBreadcrumbMixin, LoginRequiredMixin, UserPassesTestMixin, TemplateView
 ):
     template_name = "pages/cases/list.html"
@@ -122,7 +122,7 @@ class SimpleFile:
     url: str
 
 
-class CasesStatusView(
+class CaseDetailView(
     BaseBreadcrumbMixin, LoginRequiredMixin, UserPassesTestMixin, TemplateView
 ):
     template_name = "pages/cases/status.html"
@@ -241,7 +241,7 @@ class CasesStatusView(
         return anchors
 
 
-class CasesDocumentDownloadView(LoginRequiredMixin, UserPassesTestMixin, View):
+class CaseDocumentDownloadView(LoginRequiredMixin, UserPassesTestMixin, View):
     def test_func(self):
         return self.request.user.bsn is not None
 
