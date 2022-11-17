@@ -197,26 +197,19 @@ class TestDocumentDownloadView(WebTest):
         )
         self.app.get(url, user=self.user, status=403)
 
-    def test_user_is_redirected_to_root_when_not_logged_in_via_digid(self, m):
+    def test_response_is_http_403_when_not_logged_in_via_digid(self, m):
         self._setUpMocks(m)
         user = UserFactory(
             first_name="",
             last_name="",
             login_type=LoginTypeChoices.default,
         )
-        response = self.app.get(self.informatie_object_file.url, user=user)
-
-        self.assertRedirects(response, reverse("root"))
+        self.app.get(self.informatie_object_file.url, user=user, status=403)
 
     def test_anonymous_user_has_no_access_to_download_page(self, m):
         self._setUpMocks(m)
         user = AnonymousUser()
-        response = self.app.get(self.informatie_object_file.url, user=user)
-
-        self.assertRedirects(
-            response,
-            f"{reverse('login')}?next={self.informatie_object_file.url}",
-        )
+        self.app.get(self.informatie_object_file.url, user=user, status=403)
 
     def test_no_data_is_retrieved_when_case_object_http_404(self, m):
         self._setUpOASMocks(m)

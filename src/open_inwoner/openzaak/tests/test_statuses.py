@@ -357,14 +357,14 @@ class TestListStatusView(WebTest):
             # no roles found
             json=paginated_response([]),
         )
-        self.app.get(
+        response = self.app.get(
             reverse(
                 "accounts:case_status",
                 kwargs={"object_id": "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d"},
             ),
             user=self.user,
-            status=403,
         )
+        self.assertRedirects(response, reverse("root"))
 
     def test_no_data_is_retrieved_when_http_404(self, m):
         mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
