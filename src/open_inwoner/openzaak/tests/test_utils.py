@@ -68,3 +68,30 @@ class TestUtils(TestCase):
                 self.assertEqual(
                     expected, filter_info_object_visibility(info_object, max_level)
                 )
+
+        # test we don't leak on bad input
+        with self.subTest(f"bad vertrouwelijkheidaanduiding in info object"):
+            info_object = factory(
+                InformatieObject,
+                generate_oas_component(
+                    "drc",
+                    "schemas/EnkelvoudigInformatieObject",
+                    status="definitief",
+                    vertrouwelijkheidaanduiding="non_existent_key",
+                ),
+            )
+            self.assertFalse(filter_info_object_visibility(info_object, max_level))
+
+        with self.subTest(f"bad vertrouwelijkheidaanduiding as parameter"):
+            info_object = factory(
+                InformatieObject,
+                generate_oas_component(
+                    "drc",
+                    "schemas/EnkelvoudigInformatieObject",
+                    status="definitief",
+                    vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.vertrouwelijk,
+                ),
+            )
+            self.assertFalse(
+                filter_info_object_visibility(info_object, "non_existent_key")
+            )
