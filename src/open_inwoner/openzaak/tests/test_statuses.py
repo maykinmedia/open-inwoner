@@ -8,6 +8,7 @@ import requests_mock
 from django_webtest import WebTest
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.catalogi import StatusType
+from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 from zgw_consumers.api_models.zaken import Status
 from zgw_consumers.constants import APITypes
 from zgw_consumers.test import generate_oas_component, mock_service_oas_get
@@ -16,8 +17,8 @@ from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.utils.test import paginated_response
 
+from ...accounts.views.cases import SimpleFile
 from ..models import OpenZaakConfig
-from ..statuses import ZaakInformatieObject
 from .factories import ServiceFactory
 
 ZAKEN_ROOT = "https://zaken.nl/api/v1/"
@@ -29,6 +30,11 @@ DOCUMENTEN_ROOT = "https://documenten.nl/api/v1/"
 class TestListStatusView(WebTest):
     def setUp(self):
         self.maxDiff = None
+
+    @classmethod
+    def setUpTestData(self):
+        super().setUpTestData()
+
         self.user = UserFactory(
             login_type=LoginTypeChoices.digid, bsn="900222086", email="johm@smith.nl"
         )
@@ -39,6 +45,15 @@ class TestListStatusView(WebTest):
             api_root=CATALOGI_ROOT, api_type=APITypes.ztc
         )
         self.config.catalogi_service = self.catalogi_service
+        self.document_service = ServiceFactory(
+            api_root=DOCUMENTEN_ROOT, api_type=APITypes.drc
+        )
+        self.config.document_service = self.document_service
+
+        self.config.document_max_confidentiality = (
+            VertrouwelijkheidsAanduidingen.beperkt_openbaar
+        )
+
         self.config.save()
         self.zaak = generate_oas_component(
             "zrc",
@@ -122,17 +137,70 @@ class TestListStatusView(WebTest):
             beschrijving="",
             registratiedatum="2021-01-12",
         )
+        self.informatie_object_type = generate_oas_component(
+            "ztc",
+            "schemas/InformatieObjectType",
+            url=f"{CATALOGI_ROOT}informatieobjecttype/014c38fe-b010-4412-881c-3000032fb321",
+        )
+        self.informatie_object = generate_oas_component(
+            "drc",
+            "schemas/EnkelvoudigInformatieObject",
+            uuid="014c38fe-b010-4412-881c-3000032fb812",
+            url=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812",
+            inhoud=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812/download",
+            informatieobjecttype=f"{CATALOGI_ROOT}informatieobjecttype/014c38fe-b010-4412-881c-3000032fb321",
+            status="definitief",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+            bestandsnaam="document.txt",
+            bestandsomvang=123,
+        )
+
+        self.zaak_informatie_object_invisible = generate_oas_component(
+            "zrc",
+            "schemas/ZaakInformatieObject",
+            url=f"{ZAKEN_ROOT}zaakinformatieobjecten/fa5153aa-ad2c-4a07-ae75-15add57ee",
+            informatieobject=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/994c38fe-b010-4412-881c-3000032fb123",
+            zaak=f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
+            aard_relatie_weergave="some invisible content",
+            titel="",
+            beschrijving="",
+            registratiedatum="2021-01-12",
+        )
+        self.informatie_object_invisible = generate_oas_component(
+            "drc",
+            "schemas/EnkelvoudigInformatieObject",
+            uuid="994c38fe-b010-4412-881c-3000032fb123",
+            url=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/994c38fe-b010-4412-881c-3000032fb123",
+            inhoud=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/994c38fe-b010-4412-881c-3000032fb123/download",
+            informatieobjecttype=f"{CATALOGI_ROOT}informatieobjecttype/994c38fe-b010-4412-881c-3000032fb123",
+            status="definitief",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.geheim,
+            bestandsnaam="geheim-document.txt",
+            bestandsomvang=123,
+        )
+
+        self.informatie_object_file = SimpleFile(
+            name="document.txt",
+            size=123,
+            url=reverse(
+                "accounts:case_document_download",
+                kwargs={
+                    "object_id": self.informatie_object["uuid"],
+                },
+            ),
+        )
 
     def _setUpMocks(self, m):
         mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
         mock_service_oas_get(m, CATALOGI_ROOT, "ztc")
+        mock_service_oas_get(m, DOCUMENTEN_ROOT, "drc")
         m.get(
             f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
             json=self.zaak,
         )
         m.get(
             f"{ZAKEN_ROOT}zaakinformatieobjecten?zaak={self.zaak['url']}",
-            json=[self.zaak_informatie_object],
+            json=[self.zaak_informatie_object, self.zaak_informatie_object_invisible],
         )
         m.get(
             f"{ZAKEN_ROOT}statussen?zaak={self.zaak['url']}",
@@ -142,6 +210,22 @@ class TestListStatusView(WebTest):
         m.get(
             f"{CATALOGI_ROOT}statustypen?zaaktype={self.zaaktype['url']}",
             json=paginated_response([self.status_type1, self.status_type2]),
+        )
+        m.get(
+            f"{CATALOGI_ROOT}informatieobjecttype/014c38fe-b010-4412-881c-3000032fb321",
+            json=self.informatie_object_type,
+        )
+        m.get(
+            f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812",
+            json=self.informatie_object,
+        )
+        m.get(
+            f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/994c38fe-b010-4412-881c-3000032fb123",
+            json=self.informatie_object_invisible,
+        )
+        m.get(
+            f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812/download",
+            text="document content",
         )
 
     def test_status_is_retrieved_when_user_logged_in_via_digid(self, m):
@@ -168,9 +252,8 @@ class TestListStatusView(WebTest):
                 "type_description": "Coffee zaaktype",
                 "current_status": "Finish",
                 "statuses": [status1_obj, status2_obj],
-                "documents": [
-                    factory(ZaakInformatieObject, self.zaak_informatie_object)
-                ],
+                # only one visible information object
+                "documents": [self.informatie_object_file],
             },
         )
 
@@ -202,8 +285,9 @@ class TestListStatusView(WebTest):
         documents = response.context.get("case", {}).get("documents")
         self.assertEquals(len(documents), 1)
         self.assertEquals(
-            documents[0].url,
-            f"{ZAKEN_ROOT}zaakinformatieobjecten/e55153aa-ad2c-4a07-ae75-15add57d6",
+            documents,
+            # only one visible information object
+            [self.informatie_object_file],
         )
 
     def test_user_is_redirected_to_root_when_not_logged_in_via_digid(self, m):
@@ -243,6 +327,7 @@ class TestListStatusView(WebTest):
     def test_no_data_is_retrieved_when_http_404(self, m):
         mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
         mock_service_oas_get(m, CATALOGI_ROOT, "ztc")
+        mock_service_oas_get(m, DOCUMENTEN_ROOT, "drc")
         m.get(
             f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
             status_code=404,
@@ -262,6 +347,7 @@ class TestListStatusView(WebTest):
     def test_no_data_is_retrieved_when_http_500(self, m):
         mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
         mock_service_oas_get(m, CATALOGI_ROOT, "ztc")
+        mock_service_oas_get(m, DOCUMENTEN_ROOT, "drc")
         m.get(
             f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
             status_code=500,

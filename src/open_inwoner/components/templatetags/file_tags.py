@@ -54,20 +54,19 @@ def case_document_list(documents: list[ZaakInformatieObject], **kwargs) -> dict:
         {% case_document_list documents %}
 
     Variables:
-        + documents: ZaakInformatieObject[] | List ZaakInformatieObject objects.
+        + documents: SimpleFile[]
 
     Extra context:
-        + files: list[dict] | A list of objects that are needed to render a file
         + show_download: bool | We disable the download button for the files.
     """
 
     files = [
         {
-            "file": document.titel or _("Geen titel"),
+            "file": document,
         }
         for document in documents
     ]
-    return {**kwargs, "documents": documents, "files": files, "show_download": False}
+    return {**kwargs, "documents": documents, "files": files, "show_download": True}
 
 
 @register.inclusion_tag("components/File/FileTable.html")
