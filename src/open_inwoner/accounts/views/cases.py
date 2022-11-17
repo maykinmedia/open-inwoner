@@ -137,10 +137,7 @@ def filter_info_object_visibility(
     max_index = levels.index(max_confidentiality_level)
     doc_index = levels.index(document.vertrouwelijkheidaanduiding)
 
-    if doc_index <= max_index:
-        return True
-    else:
-        return False
+    return doc_index <= max_index
 
 
 class CasesStatusView(

@@ -121,7 +121,7 @@ def fetch_single_information_object_uuid(
     return info_object
 
 
-def create_document_content_stream(url: str, **headers) -> Optional[Response]:
+def download_document(url: str, **headers) -> Optional[Response]:
     client = build_client("document")
 
     if client is None:
