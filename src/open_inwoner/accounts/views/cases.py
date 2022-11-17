@@ -13,8 +13,6 @@ from django.views import View
 from django.views.generic import TemplateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin
-from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
-from zgw_consumers.concurrent import parallel
 
 from open_inwoner.openzaak.cases import (
     fetch_case_types,
@@ -23,8 +21,7 @@ from open_inwoner.openzaak.cases import (
     fetch_single_case_type,
 )
 from open_inwoner.openzaak.info_objects import (
-    InformatieObject,
-    create_document_content_stream,
+    download_document,
     fetch_case_information_objects,
     fetch_single_information_object,
     fetch_single_information_object_uuid,
@@ -36,6 +33,7 @@ from open_inwoner.openzaak.statuses import (
     fetch_status_history,
     fetch_status_types,
 )
+from open_inwoner.openzaak.utils import filter_info_object_visibility
 
 
 class CasesListView(
@@ -123,21 +121,6 @@ class SimpleFile:
     name: str
     size: int
     url: str
-
-
-def filter_info_object_visibility(
-    document: InformatieObject, max_confidentiality_level: str
-) -> bool:
-    if not document:
-        return False
-    if document.status != "definitief":
-        return False
-
-    levels = [c[0] for c in VertrouwelijkheidsAanduidingen.choices]
-    max_index = levels.index(max_confidentiality_level)
-    doc_index = levels.index(document.vertrouwelijkheidaanduiding)
-
-    return doc_index <= max_index
 
 
 class CasesStatusView(
@@ -282,7 +265,7 @@ class CasesDocumentDownloadView(LoginRequiredMixin, UserPassesTestMixin, View):
         ):
             raise PermissionDenied()
 
-        content_stream = create_document_content_stream(info_object.inhoud)
+        content_stream = download_document(info_object.inhoud)
         if not content_stream:
             raise Http404
 

@@ -9,7 +9,6 @@ from zds_client import ClientError
 from zgw_consumers.api_models.base import ZGWModel, factory
 
 from open_inwoner.openzaak.clients import build_client
-from open_inwoner.openzaak.statuses import logger
 
 logger = logging.getLogger(__name__)
 

@@ -18,7 +18,7 @@ CATALOGI_ROOT = "https://catalogi.nl/api/v1/"
 DOCUMENTEN_ROOT = "https://documenten.nl/api/v1/"
 
 
-@requests_mock.Mocker(real_http=False)
+@requests_mock.Mocker()
 class TestDocumentDownloadView(WebTest):
     def setUp(self):
         self.maxDiff = None
