@@ -24,7 +24,6 @@ from open_inwoner.openzaak.info_objects import (
     download_document,
     fetch_case_information_objects,
     fetch_single_information_object,
-    fetch_single_information_object_uuid,
 )
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.statuses import (
@@ -202,7 +201,7 @@ class CasesStatusView(
         #         [case_info.informatieobject for case_info in case_info_objects],
         #     )
         info_objects = [
-            fetch_single_information_object(case_info.informatieobject)
+            fetch_single_information_object(url=case_info.informatieobject)
             for case_info in case_info_objects
         ]
 
@@ -255,7 +254,7 @@ class CasesDocumentDownloadView(LoginRequiredMixin, UserPassesTestMixin, View):
     def get(self, *args, **kwargs):
         info_object_uuid = kwargs["object_id"]
 
-        info_object = fetch_single_information_object_uuid(info_object_uuid)
+        info_object = fetch_single_information_object(uuid=info_object_uuid)
         if not info_object:
             raise Http404
 

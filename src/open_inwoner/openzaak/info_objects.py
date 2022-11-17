@@ -78,36 +78,22 @@ def fetch_case_information_objects(case_url: str) -> List[ZaakInformatieObject]:
     return case_info_objects
 
 
-def fetch_single_information_object(info_object_url: str) -> Optional[InformatieObject]:
-    client = build_client("document")
-
-    if client is None:
-        return
-
-    try:
-        response = client.retrieve("enkelvoudiginformatieobject", url=info_object_url)
-    except RequestException as e:
-        logger.exception("exception while making request", exc_info=e)
-        return
-    except ClientError as e:
-        logger.exception("exception while making request", exc_info=e)
-        return
-
-    info_object = factory(InformatieObject, response)
-
-    return info_object
-
-
-def fetch_single_information_object_uuid(
-    info_object_uuid: str,
+def fetch_single_information_object(
+    *, url: Optional[str] = None, uuid: Optional[str] = None
 ) -> Optional[InformatieObject]:
+    if (url and uuid) or (not url and not uuid):
+        raise ValueError("supply either 'url' or 'uuid' argument")
+
     client = build_client("document")
 
     if client is None:
         return
 
     try:
-        response = client.retrieve("enkelvoudiginformatieobject", uuid=info_object_uuid)
+        if url:
+            response = client.retrieve("enkelvoudiginformatieobject", url=url)
+        else:
+            response = client.retrieve("enkelvoudiginformatieobject", uuid=uuid)
     except RequestException as e:
         logger.exception("exception while making request", exc_info=e)
         return
