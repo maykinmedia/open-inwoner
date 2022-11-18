@@ -1,8 +1,16 @@
+import inspect
+import logging
+from functools import wraps
+
+from django.core.cache import caches
+
 from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 
 from open_inwoner.openzaak.api_models import InformatieObject, Zaak
 
 from .models import OpenZaakConfig
+
+logger = logging.getLogger(__name__)
 
 
 def is_object_visible(obj, max_confidentiality_level: str) -> bool:
@@ -42,3 +50,49 @@ def is_zaak_visible(zaak: Zaak) -> bool:
     """Check if zaak is visible for users"""
     config = OpenZaakConfig.get_solo()
     return is_object_visible(zaak, config.zaak_max_confidentiality)
+
+
+def cache(key: str, alias: str = "default", **set_options):
+    def decorator(func: callable):
+        argspec = inspect.getfullargspec(func)
+
+        if argspec.defaults:
+            positional_count = len(argspec.args) - len(argspec.defaults)
+            defaults = dict(zip(argspec.args[positional_count:], argspec.defaults))
+        else:
+            defaults = {}
+
+        @wraps(func)
+        def wrapped(*args, **kwargs):
+            skip_cache = kwargs.pop("skip_cache", False)
+            if skip_cache:
+                return func(*args, **kwargs)
+
+            key_kwargs = defaults.copy()
+            named_args = dict(zip(argspec.args, args), **kwargs)
+            key_kwargs.update(**named_args)
+
+            if argspec.varkw:
+                var_kwargs = {
+                    key: value
+                    for key, value in named_args.items()
+                    if key not in argspec.args
+                }
+                key_kwargs[argspec.varkw] = var_kwargs
+
+            cache_key = key.format(**key_kwargs)
+
+            _cache = caches[alias]
+            result = _cache.get(cache_key)
+            if result is not None:
+                logger.debug("Cache key '%s' hit", cache_key)
+                return result
+
+            result = func(*args, **kwargs)
+            _cache.set(cache_key, result, **set_options)
+
+            return result
+
+        return wrapped
+
+    return decorator

@@ -21,7 +21,7 @@ from open_inwoner.openzaak.cases import (
     fetch_cases,
     fetch_roles_for_case_and_bsn,
     fetch_single_case,
-    fetch_specific_statuses,
+    fetch_specific_status,
     fetch_status_history,
 )
 from open_inwoner.openzaak.catalog import (
@@ -96,17 +96,31 @@ class CaseListView(BaseBreadcrumbMixin, CaseAccessMixin, TemplateView):
         context = super().get_context_data(**kwargs)
 
         cases = fetch_cases(self.request.user.bsn)
-        case_types = cache.get("case_types")
-        if not case_types:
-            case_types = {case_type.url: case_type for case_type in fetch_case_types()}
-            cache.set("case_types", case_types, 60 * 60)
-        status_types = {
-            status_type.url: status_type for status_type in fetch_status_types()
-        }
-        current_statuses = {
-            status.zaak: status
-            for status in fetch_specific_statuses([case.status for case in cases])
-        }
+
+        case_types = {}
+        status_types = {}
+        temp_status_types = []
+        current_statuses = {}
+
+        for case in cases:
+            # Fetch new case types
+            if case.zaaktype not in case_types.keys():
+                case_type = fetch_single_case_type(case.zaaktype)
+                case_types.update({case_type.url: case_type})
+
+            # Fetch list of case's status types and each one (unique) separately
+            temp_status_types += [st.url for st in fetch_status_types(case.zaaktype)]
+
+            for status_type_url in set(temp_status_types):
+                if status_type_url not in status_types:
+                    status_type = fetch_single_status_type(status_type_url)
+                    status_types.update({status_type.url: status_type})
+
+            # Fetch case's current status
+            current_status = fetch_specific_status(case.status)
+            current_statuses.update({current_status.zaak: current_status})
+
+        # Prepare data for frontend
         updated_cases = []
         for case in cases:
             current_status = current_statuses[case.url]
