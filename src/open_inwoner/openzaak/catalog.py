@@ -63,26 +63,6 @@ def fetch_single_status_type(status_type_url: str) -> Optional[StatusType]:
     return status_type
 
 
-def fetch_case_types() -> List[ZaakType]:
-    client = build_client("catalogi")
-
-    if client is None:
-        return []
-
-    try:
-        response = get_paginated_results(client, "zaaktype")
-    except RequestException as e:
-        logger.exception("exception while making request", exc_info=e)
-        return []
-    except ClientError as e:
-        logger.exception("exception while making request", exc_info=e)
-        return []
-
-    case_types = factory(ZaakType, response)
-
-    return case_types
-
-
 @cache_result("zaaktype:{case_type_url}", timeout=60 * 60)
 def fetch_single_case_type(case_type_url: str) -> Optional[ZaakType]:
     client = build_client("catalogi")

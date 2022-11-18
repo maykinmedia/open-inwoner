@@ -25,7 +25,6 @@ from open_inwoner.openzaak.cases import (
     fetch_status_history,
 )
 from open_inwoner.openzaak.catalog import (
-    fetch_case_types,
     fetch_single_case_type,
     fetch_single_status_type,
     fetch_status_types,
