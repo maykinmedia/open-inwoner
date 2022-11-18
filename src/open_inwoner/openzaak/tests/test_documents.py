@@ -9,11 +9,13 @@ from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.accounts.views.cases import SimpleFile
+from open_inwoner.utils.test import paginated_response
 
-from ...accounts.views.cases import SimpleFile
 from ..models import OpenZaakConfig
 from .factories import ServiceFactory
 
+ZAKEN_ROOT = "https://zaken.nl/api/v1/"
 CATALOGI_ROOT = "https://catalogi.nl/api/v1/"
 DOCUMENTEN_ROOT = "https://documenten.nl/api/v1/"
 
@@ -31,6 +33,12 @@ class TestDocumentDownloadView(WebTest):
             login_type=LoginTypeChoices.digid, bsn="900222086", email="johm@smith.nl"
         )
         self.config = OpenZaakConfig.get_solo()
+        self.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
+        self.config.zaak_service = self.zaak_service
+        self.catalogi_service = ServiceFactory(
+            api_root=CATALOGI_ROOT, api_type=APITypes.ztc
+        )
+        self.config.catalogi_service = self.catalogi_service
         self.document_service = ServiceFactory(
             api_root=DOCUMENTEN_ROOT, api_type=APITypes.drc
         )
@@ -40,6 +48,35 @@ class TestDocumentDownloadView(WebTest):
         )
         self.config.save()
 
+        self.zaak = generate_oas_component(
+            "zrc",
+            "schemas/Zaak",
+            uuid="d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
+            url=f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
+            zaaktype=f"{CATALOGI_ROOT}zaaktypen/53340e34-7581-4b04-884f",
+            identificatie="ZAAK-2022-0000000024",
+            omschrijving="Zaak naar aanleiding van ingezonden formulier",
+            startdatum="2022-01-02",
+            einddatum=None,
+            status=f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
+        )
+        self.zaak_informatie_object = generate_oas_component(
+            "zrc",
+            "schemas/ZaakInformatieObject",
+            url=f"{ZAKEN_ROOT}zaakinformatieobjecten/e55153aa-ad2c-4a07-ae75-15add57d6",
+            informatieobject=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812",
+            zaak=f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
+            aard_relatie_weergave="some content",
+            titel="",
+            beschrijving="",
+            registratiedatum="2021-01-12",
+        )
+        self.role = generate_oas_component(
+            "zrc",
+            "schemas/Rol",
+            url=f"{ZAKEN_ROOT}rollen/f33153aa-ad2c-4a07-ae75-15add5891",
+            betrokkene_identificatie="foo",
+        )
         self.informatie_object_content = "my document content".encode("utf8")
         self.informatie_object = generate_oas_component(
             "drc",
@@ -60,13 +97,33 @@ class TestDocumentDownloadView(WebTest):
             url=reverse(
                 "accounts:case_document_download",
                 kwargs={
-                    "object_id": self.informatie_object["uuid"],
+                    "object_id": self.zaak["uuid"],
+                    "info_id": self.informatie_object["uuid"],
                 },
             ),
         )
 
-    def _setUpMocks(self, m):
+    def _setUpOASMocks(self, m):
+        mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
+        mock_service_oas_get(m, CATALOGI_ROOT, "ztc")
         mock_service_oas_get(m, DOCUMENTEN_ROOT, "drc")
+
+    def _setUpAccessMocks(self, m):
+        # the minimal mocks needed to be able to access the information object
+        self._setUpOASMocks(m)
+        m.get(self.zaak["url"], json=self.zaak)
+        m.get(
+            f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}&betrokkeneIdentificatie__natuurlijkPersoon__inpBsn={self.user.bsn}",
+            json=paginated_response([self.role]),
+        )
+        m.get(
+            f"{ZAKEN_ROOT}zaakinformatieobjecten?zaak={self.zaak['url']}&informatieobject={self.informatie_object['url']}",
+            # note the real API doesn't return a paginated_response here
+            json=[self.zaak_informatie_object],
+        )
+
+    def _setUpMocks(self, m):
+        self._setUpAccessMocks(m)
         m.get(self.informatie_object["url"], json=self.informatie_object)
         m.get(self.informatie_object["inhoud"], content=self.informatie_object_content)
 
@@ -75,7 +132,8 @@ class TestDocumentDownloadView(WebTest):
         url = reverse(
             "accounts:case_document_download",
             kwargs={
-                "object_id": self.informatie_object["uuid"],
+                "object_id": self.zaak["uuid"],
+                "info_id": self.informatie_object["uuid"],
             },
         )
         response = self.app.get(url, user=self.user)
@@ -94,7 +152,8 @@ class TestDocumentDownloadView(WebTest):
         )
 
     def test_document_content_with_bad_status_is_http_403(self, m):
-        mock_service_oas_get(m, DOCUMENTEN_ROOT, "drc")
+        self._setUpAccessMocks(m)
+
         info_object = generate_oas_component(
             "drc",
             "schemas/EnkelvoudigInformatieObject",
@@ -109,13 +168,15 @@ class TestDocumentDownloadView(WebTest):
         url = reverse(
             "accounts:case_document_download",
             kwargs={
-                "object_id": info_object["uuid"],
+                "object_id": self.zaak["uuid"],
+                "info_id": info_object["uuid"],
             },
         )
         self.app.get(url, user=self.user, status=403)
 
     def test_document_content_with_bad_confidentiality_is_http_403(self, m):
-        mock_service_oas_get(m, DOCUMENTEN_ROOT, "drc")
+        self._setUpAccessMocks(m)
+
         info_object = generate_oas_component(
             "drc",
             "schemas/EnkelvoudigInformatieObject",
@@ -130,53 +191,78 @@ class TestDocumentDownloadView(WebTest):
         url = reverse(
             "accounts:case_document_download",
             kwargs={
-                "object_id": info_object["uuid"],
+                "object_id": self.zaak["uuid"],
+                "info_id": info_object["uuid"],
             },
         )
         self.app.get(url, user=self.user, status=403)
 
-    def test_user_is_redirected_to_root_when_not_logged_in_via_digid(self, m):
+    def test_response_is_http_403_when_not_logged_in_via_digid(self, m):
         self._setUpMocks(m)
         user = UserFactory(
             first_name="",
             last_name="",
             login_type=LoginTypeChoices.default,
         )
-        response = self.app.get(self.informatie_object_file.url, user=user)
-
-        self.assertRedirects(response, reverse("root"))
+        self.app.get(self.informatie_object_file.url, user=user, status=403)
 
     def test_anonymous_user_has_no_access_to_download_page(self, m):
         self._setUpMocks(m)
         user = AnonymousUser()
-        response = self.app.get(self.informatie_object_file.url, user=user)
+        self.app.get(self.informatie_object_file.url, user=user, status=403)
 
-        self.assertRedirects(
-            response,
-            f"{reverse('login')}?next={self.informatie_object_file.url}",
+    def test_no_data_is_retrieved_when_case_object_http_404(self, m):
+        self._setUpOASMocks(m)
+        m.get(self.zaak["url"], status_code=404)
+
+        self.app.get(self.informatie_object_file.url, user=self.user, status=404)
+
+    def test_no_data_is_retrieved_when_no_related_roles_are_found_for_user_bsn(self, m):
+        self._setUpOASMocks(m)
+        m.get(self.zaak["url"], json=self.zaak)
+        m.get(
+            f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}&betrokkeneIdentificatie__natuurlijkPersoon__inpBsn={self.user.bsn}",
+            # no roles found
+            json=paginated_response([]),
         )
+        self.app.get(self.informatie_object_file.url, user=self.user, status=403)
+
+    def test_no_data_is_retrieved_when_no_matching_case_info_object_is_found(self, m):
+        self._setUpOASMocks(m)
+        m.get(self.zaak["url"], json=self.zaak)
+        m.get(
+            f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}&betrokkeneIdentificatie__natuurlijkPersoon__inpBsn={self.user.bsn}",
+            json=paginated_response([self.role]),
+        )
+        m.get(self.informatie_object["url"], json=self.informatie_object)
+        m.get(
+            f"{ZAKEN_ROOT}zaakinformatieobjecten?zaak={self.zaak['url']}&informatieobject={self.informatie_object['url']}",
+            # no case info objects found
+            json=[],
+        )
+        self.app.get(self.informatie_object_file.url, user=self.user, status=403)
 
     def test_no_data_is_retrieved_when_info_object_http_404(self, m):
-        mock_service_oas_get(m, DOCUMENTEN_ROOT, "drc")
+        self._setUpAccessMocks(m)
         m.get(self.informatie_object["url"], status_code=404)
 
         self.app.get(self.informatie_object_file.url, user=self.user, status=404)
 
     def test_no_data_is_retrieved_when_info_object_http_500(self, m):
-        mock_service_oas_get(m, DOCUMENTEN_ROOT, "drc")
+        self._setUpAccessMocks(m)
         m.get(self.informatie_object["url"], status_code=500)
 
         self.app.get(self.informatie_object_file.url, user=self.user, status=404)
 
     def test_no_data_is_retrieved_when_document_download_data_http_404(self, m):
-        mock_service_oas_get(m, DOCUMENTEN_ROOT, "drc")
+        self._setUpAccessMocks(m)
         m.get(self.informatie_object["url"], json=self.informatie_object)
         m.get(self.informatie_object["inhoud"], status_code=404)
 
         self.app.get(self.informatie_object_file.url, user=self.user, status=404)
 
     def test_no_data_is_retrieved_when_document_download_data_http_500(self, m):
-        mock_service_oas_get(m, DOCUMENTEN_ROOT, "drc")
+        self._setUpAccessMocks(m)
         m.get(self.informatie_object["url"], json=self.informatie_object)
         m.get(self.informatie_object["inhoud"], status_code=500)
 

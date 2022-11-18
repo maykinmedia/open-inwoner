@@ -87,7 +87,7 @@ urlpatterns = [
     path("themes/", MyCategoriesView.as_view(), name="my_themes"),
     path("cases/", CaseListView.as_view(), name="my_cases"),
     path(
-        "cases/document/<str:object_id>/",
+        "cases/<str:object_id>/document/<str:info_id>/",
         CaseDocumentDownloadView.as_view(),
         name="case_document_download",
     ),

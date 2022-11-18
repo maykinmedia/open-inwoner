@@ -1,7 +1,7 @@
 import dataclasses
 from typing import List
 
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import AccessMixin
 from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, StreamingHttpResponse
@@ -14,9 +14,12 @@ from django.views.generic import TemplateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin
 
+from open_inwoner.openzaak.api_models import Zaak
 from open_inwoner.openzaak.cases import (
     fetch_case_information_objects,
+    fetch_case_information_objects_for_case_and_info,
     fetch_cases,
+    fetch_roles_for_case_and_bsn,
     fetch_single_case,
     fetch_specific_statuses,
     fetch_status_history,
@@ -35,23 +38,51 @@ from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.utils import filter_info_object_visibility
 
 
-class CaseListView(
-    BaseBreadcrumbMixin, LoginRequiredMixin, UserPassesTestMixin, TemplateView
-):
-    template_name = "pages/cases/list.html"
+class CaseAccessMixin(AccessMixin):
+    """
+    Shared authorisation check
 
-    @cached_property
-    def crumbs(self):
-        return [(_("Mijn aanvragen"), reverse("accounts:my_cases"))]
+    Base checks:
+    - user is authenticated
+    - user has a BSN
 
-    def test_func(self):
-        return self.request.user.bsn is not None
+    When retrieving a case :
+    - users BSN has a role for this case
+    """
+
+    case: Zaak = None
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return self.handle_no_permission()
+
+        if not request.user.bsn:
+            return self.handle_no_permission()
+
+        if "object_id" in kwargs:
+            case_uuid = kwargs["object_id"]
+            self.case = fetch_single_case(case_uuid)
+
+            if self.case:
+                # check if we have a role in this case
+                if not fetch_roles_for_case_and_bsn(self.case.url, request.user.bsn):
+                    return self.handle_no_permission()
+
+        return super().dispatch(request, *args, **kwargs)
 
     def handle_no_permission(self):
         if self.request.user.is_authenticated:
             return redirect(reverse("root"))
 
         return super().handle_no_permission()
+
+
+class CaseListView(BaseBreadcrumbMixin, CaseAccessMixin, TemplateView):
+    template_name = "pages/cases/list.html"
+
+    @cached_property
+    def crumbs(self):
+        return [(_("Mijn aanvragen"), reverse("accounts:my_cases"))]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -122,9 +153,7 @@ class SimpleFile:
     url: str
 
 
-class CaseDetailView(
-    BaseBreadcrumbMixin, LoginRequiredMixin, UserPassesTestMixin, TemplateView
-):
+class CaseDetailView(BaseBreadcrumbMixin, CaseAccessMixin, TemplateView):
     template_name = "pages/cases/status.html"
 
     @cached_property
@@ -137,29 +166,17 @@ class CaseDetailView(
             ),
         ]
 
-    def test_func(self):
-        return self.request.user.bsn is not None
-
-    def handle_no_permission(self):
-        if self.request.user.is_authenticated:
-            return redirect(reverse("root"))
-
-        return super().handle_no_permission()
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        case_uuid = context["object_id"]
-        case = fetch_single_case(case_uuid)
+        if self.case:
+            documents = self.get_case_document_files(self.case)
 
-        if case:
-            documents = self.get_case_document_files(case)
-
-            statuses = fetch_status_history(case.url)
+            statuses = fetch_status_history(self.case.url)
             statuses.sort(key=lambda status: status.datum_status_gezet)
 
-            case_type = fetch_single_case_type(case.zaaktype)
-            status_types = fetch_status_types(case_type=case.zaaktype)
+            case_type = fetch_single_case_type(self.case.zaaktype)
+            status_types = fetch_status_types(case_type=self.case.zaaktype)
 
             status_types_mapping = {st.url: st for st in status_types}
             for status in statuses:
@@ -167,10 +184,12 @@ class CaseDetailView(
                 status.statustype = status_type
 
             context["case"] = {
-                "identification": case.identificatie,
-                "start_date": case.startdatum,
-                "end_date": (case.einddatum if hasattr(case, "einddatum") else None),
-                "description": case.omschrijving,
+                "identification": self.case.identificatie,
+                "start_date": self.case.startdatum,
+                "end_date": (
+                    self.case.einddatum if hasattr(self.case, "einddatum") else None
+                ),
+                "description": self.case.omschrijving,
                 "type_description": (
                     case_type.omschrijving if case_type else _("No data available")
                 ),
@@ -222,7 +241,8 @@ class CaseDetailView(
                     url=reverse(
                         "accounts:case_document_download",
                         kwargs={
-                            "object_id": info_obj.uuid,
+                            "object_id": case.uuid,
+                            "info_id": info_obj.uuid,
                         },
                     ),
                 )
@@ -241,29 +261,30 @@ class CaseDetailView(
         return anchors
 
 
-class CaseDocumentDownloadView(LoginRequiredMixin, UserPassesTestMixin, View):
-    def test_func(self):
-        return self.request.user.bsn is not None
+class CaseDocumentDownloadView(CaseAccessMixin, View):
+    def get(self, request, *args, **kwargs):
+        if not self.case:
+            raise Http404
 
-    def handle_no_permission(self):
-        if self.request.user.is_authenticated:
-            return redirect(reverse("root"))
-
-        return super().handle_no_permission()
-
-    def get(self, *args, **kwargs):
-        info_object_uuid = kwargs["object_id"]
-
+        info_object_uuid = kwargs["info_id"]
         info_object = fetch_single_information_object(uuid=info_object_uuid)
         if not info_object:
             raise Http404
 
+        # check if this info_object belongs to this case
+        if not fetch_case_information_objects_for_case_and_info(
+            self.case.url, info_object.url
+        ):
+            raise PermissionDenied()
+
+        # check if this info_object should be visible
         config = OpenZaakConfig.get_solo()
         if not filter_info_object_visibility(
             info_object, config.document_max_confidentiality
         ):
             raise PermissionDenied()
 
+        # retrieve and stream content
         content_stream = download_document(info_object.inhoud)
         if not content_stream:
             raise Http404
@@ -275,3 +296,7 @@ class CaseDocumentDownloadView(LoginRequiredMixin, UserPassesTestMixin, View):
         }
         response = StreamingHttpResponse(content_stream, headers=headers)
         return response
+
+    def handle_no_permission(self):
+        # plain error and no redirect
+        raise PermissionDenied()
