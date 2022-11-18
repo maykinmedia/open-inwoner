@@ -27,7 +27,7 @@ DOCUMENTEN_ROOT = "https://documenten.nl/api/v1/"
 
 
 @requests_mock.Mocker()
-class TestListStatusView(WebTest):
+class TestCaseDetailView(WebTest):
     def setUp(self):
         self.maxDiff = None
 
@@ -38,23 +38,28 @@ class TestListStatusView(WebTest):
         self.user = UserFactory(
             login_type=LoginTypeChoices.digid, bsn="900222086", email="johm@smith.nl"
         )
-        self.config = OpenZaakConfig.get_solo()
+        # services
         self.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
-        self.config.zaak_service = self.zaak_service
         self.catalogi_service = ServiceFactory(
             api_root=CATALOGI_ROOT, api_type=APITypes.ztc
         )
-        self.config.catalogi_service = self.catalogi_service
         self.document_service = ServiceFactory(
             api_root=DOCUMENTEN_ROOT, api_type=APITypes.drc
         )
+        # openzaak config
+        self.config = OpenZaakConfig.get_solo()
+        self.config.zaak_service = self.zaak_service
+        self.config.catalogi_service = self.catalogi_service
         self.config.document_service = self.document_service
-
         self.config.document_max_confidentiality = (
             VertrouwelijkheidsAanduidingen.beperkt_openbaar
         )
-
+        self.config.zaak_max_confidentiality = (
+            VertrouwelijkheidsAanduidingen.beperkt_openbaar
+        )
         self.config.save()
+
+        # openzaak resources
         self.zaak = generate_oas_component(
             "zrc",
             "schemas/Zaak",
@@ -66,6 +71,18 @@ class TestListStatusView(WebTest):
             startdatum="2022-01-02",
             einddatum=None,
             status=f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+        )
+        self.zaak_invisible = generate_oas_component(
+            "zrc",
+            "schemas/Zaak",
+            uuid="213b0a04-fcbc-4fee-8d11-cf950a0a0bbb",
+            url=f"{ZAKEN_ROOT}zaken/213b0a04-fcbc-4fee-8d11-cf950a0a0bbb",
+            zaaktype=f"{CATALOGI_ROOT}zaaktypen/53340e34-7581-4b04-884f",
+            identificatie="ZAAK-2022-invisible",
+            omschrijving="Zaak invisible",
+            startdatum="2022-01-02",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.geheim,
         )
         self.zaaktype = generate_oas_component(
             "ztc",
@@ -405,3 +422,20 @@ class TestListStatusView(WebTest):
 
         self.assertIsNone(response.context.get("case"))
         self.assertContains(response, _("There is no available data at the moment."))
+
+    def test_no_access_when_case_is_confidential(self, m):
+        mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
+        mock_service_oas_get(m, CATALOGI_ROOT, "ztc")
+        m.get(
+            f"{ZAKEN_ROOT}zaken/213b0a04-fcbc-4fee-8d11-cf950a0a0bbb",
+            json=self.zaak,
+        )
+
+        response = self.app.get(
+            reverse(
+                "accounts:case_status",
+                kwargs={"object_id": "213b0a04-fcbc-4fee-8d11-cf950a0a0bbb"},
+            ),
+            user=self.user,
+        )
+        self.assertRedirects(response, reverse("root"))

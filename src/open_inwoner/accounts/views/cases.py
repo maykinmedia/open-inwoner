@@ -1,5 +1,5 @@
 import dataclasses
-from typing import List
+from typing import List, Optional
 
 from django.contrib.auth.mixins import AccessMixin
 from django.core.cache import cache
@@ -59,10 +59,8 @@ class CaseAccessMixin(AccessMixin):
         if not request.user.bsn:
             return self.handle_no_permission()
 
-        if "object_id" in kwargs:
-            case_uuid = kwargs["object_id"]
-            self.case = fetch_single_case(case_uuid)
-
+        self.case = self.get_case(kwargs)
+        if self.case:
             # check if we have a role in this case
             if not fetch_roles_for_case_and_bsn(self.case.url, request.user.bsn):
                 return self.handle_no_permission()
@@ -78,6 +76,13 @@ class CaseAccessMixin(AccessMixin):
             return redirect(reverse("root"))
 
         return super().handle_no_permission()
+
+    def get_case(self, kwargs) -> Optional[Zaak]:
+        case_uuid = kwargs.get("object_id")
+        if not case_uuid:
+            return None
+
+        return fetch_single_case(case_uuid)
 
 
 class CaseListView(BaseBreadcrumbMixin, CaseAccessMixin, TemplateView):

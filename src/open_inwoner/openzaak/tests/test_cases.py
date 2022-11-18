@@ -5,6 +5,8 @@ from django.urls import reverse
 
 import requests_mock
 from django_webtest import WebTest
+from furl import furl
+from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 from zgw_consumers.constants import APITypes
 from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 
@@ -32,13 +34,18 @@ class TestListCasesView(WebTest):
         self.user = UserFactory(
             login_type=LoginTypeChoices.digid, bsn="900222086", email="johm@smith.nl"
         )
-        self.config = OpenZaakConfig.get_solo()
+        # services
         self.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
-        self.config.zaak_service = self.zaak_service
         self.catalogi_service = ServiceFactory(
             api_root=CATALOGI_ROOT, api_type=APITypes.ztc
         )
+        # operzaak config
+        self.config = OpenZaakConfig.get_solo()
+        self.config.zaak_service = self.zaak_service
         self.config.catalogi_service = self.catalogi_service
+        self.config.zaak_max_confidentiality = (
+            VertrouwelijkheidsAanduidingen.beperkt_openbaar
+        )
         self.config.save()
 
         self.zaak1 = generate_oas_component(
@@ -51,6 +58,7 @@ class TestListCasesView(WebTest):
             startdatum="2022-01-02",
             einddatum="2022-01-16",
             status=f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
         )
         self.zaak2 = generate_oas_component(
             "zrc",
@@ -62,6 +70,7 @@ class TestListCasesView(WebTest):
             startdatum="2022-01-12",
             einddatum=None,
             status=f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-beu760sle929",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
         )
         self.zaak3 = generate_oas_component(
             "zrc",
@@ -73,6 +82,7 @@ class TestListCasesView(WebTest):
             startdatum="2021-07-26",
             einddatum=None,
             status=f"{ZAKEN_ROOT}statussen/98659876-bbb3-476a-ad13-n3nvcght758js",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
         )
         self.zaaktype = generate_oas_component(
             "ztc",
@@ -148,7 +158,14 @@ class TestListCasesView(WebTest):
         mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
         mock_service_oas_get(m, CATALOGI_ROOT, "ztc")
         m.get(
-            f"{ZAKEN_ROOT}zaken?rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn=900222086",
+            furl(f"{ZAKEN_ROOT}zaken")
+            .add(
+                {
+                    "rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn": self.user.bsn,
+                    "maximaleVertrouwelijkheidaanduiding": VertrouwelijkheidsAanduidingen.beperkt_openbaar,
+                }
+            )
+            .url,
             json=paginated_response([self.zaak1, self.zaak2, self.zaak3]),
         )
         m.get(f"{CATALOGI_ROOT}zaaktypen", json=paginated_response([self.zaaktype]))
@@ -210,6 +227,26 @@ class TestListCasesView(WebTest):
                     "current_status": "Initial request",
                 }
             ],
+        )
+        # check zaken request query parameters
+        list_zaken_req = [
+            req
+            for req in m.request_history
+            if req.hostname == "zaken.nl" and req.path == "/api/v1/zaken"
+        ][0]
+        self.assertEqual(len(list_zaken_req.qs), 2)
+        self.assertEqual(
+            list_zaken_req.qs,
+            {
+                {
+                    "rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn": [
+                        self.user.bsn
+                    ],
+                    "maximaleVertrouwelijkheidaanduiding": [
+                        VertrouwelijkheidsAanduidingen.beperkt_openbaar
+                    ],
+                }
+            },
         )
 
     def test_status_type_is_manually_retrieved_if_not_in_status_types(self, m):
