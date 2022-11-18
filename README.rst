@@ -10,32 +10,24 @@ Open Inwoner
 
 |build-status| |docker| |black| |python-versions|
 
-Platform to provide digital services to the residents.
+Platform voor gemeenten en overheden om producten inzichtelijker en toegankelijker te maken voor inwoners.
 
-Developed by `Maykin Media B.V.`_ for Dimpact and the `i4Sociaal`_ gemeenten:
+Ontwikkeld door `Maykin Media B.V.`_ voor Dimpact en de `i4Sociaal`_ gemeenten:
 Deventer, Enschede, Groningen, Leeuwarden, Zaanstad, Zwolle.
 
 
-Introduction
+Introductie
 ============
 
-Open Inwoner Platform is designed to help municipalities to support their residents and
-to inform them about available services.
+Zie ook onze [PDF Introductie handout](https://github.com/maykinmedia/open-inwoner/blob/develop/docs/OpenInwoner%20Introductie%20v1.0.pdf).
 
-Using Open Inwoner platform administrators can easily fill in the information
-about municipality products and services with the convenient WYSIWYG editor.
-The users can search through the products with the power of the full-text
-search and the questionnaires to access the services which are applicable and
-useful in their situation.
+Het Open Inwoner Platform is ontwikkeld voor en door gemeenten om producten en diensten aan te bieden aan hun inwoners, gecombineerd met een "Mijn" omgeving.
 
-The users can interact with each other and exchange messages and documents.
-The users can create plans together to achieve their goals.
+Informatie over de producten kan eenvoudig beheerd worden middels een handige WYSIWYG editor. Gebruikers van het platform kunnen door de beschikbare producten zoeken, veelgestelde vragen bekijken en tevens eenvoudige vragenlijsten invullen om zo de voor hun relevante informatie zo laagdrempelig mogelijk te vinden.
 
-The style of the application is easily configurable: all the colors, images,
-help texts and the logo can be set up and changed in the admin page.
+Gebruikers kunnen tevens berichten en documenten uitwisselen, dit vindt plaats door middel van samenwerkingsplannen en desgewenst zonder of met de gemeente.
 
-Open Inwoner is developed in line with the `Common Ground`_ principles and provides
-integration with Common Ground services such as Open Zaak and Haal Centraal.
+Open Inwoner is ontwikkeld in lijn met de `Common Ground`_ principes en bevat integraties met Common Ground componenten zoals Open Zaak en Haal Centraal.
 
 .. _`Common Ground`: https://commonground.nl/
 
