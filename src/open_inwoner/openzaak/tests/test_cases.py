@@ -238,14 +238,12 @@ class TestListCasesView(WebTest):
         self.assertEqual(
             list_zaken_req.qs,
             {
-                {
-                    "rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn": [
-                        self.user.bsn
-                    ],
-                    "maximaleVertrouwelijkheidaanduiding": [
-                        VertrouwelijkheidsAanduidingen.beperkt_openbaar
-                    ],
-                }
+                "rol__betrokkeneidentificatie__natuurlijkpersoon__inpbsn": [
+                    self.user.bsn
+                ],
+                "maximalevertrouwelijkheidaanduiding": [
+                    VertrouwelijkheidsAanduidingen.beperkt_openbaar
+                ],
             },
         )
 

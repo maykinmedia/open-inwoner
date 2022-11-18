@@ -426,15 +426,16 @@ class TestCaseDetailView(WebTest):
     def test_no_access_when_case_is_confidential(self, m):
         mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
         mock_service_oas_get(m, CATALOGI_ROOT, "ztc")
+        m.get(self.zaak_invisible["url"], json=self.zaak_invisible)
         m.get(
-            f"{ZAKEN_ROOT}zaken/213b0a04-fcbc-4fee-8d11-cf950a0a0bbb",
-            json=self.zaak,
+            f"{ZAKEN_ROOT}rollen?zaak={self.zaak_invisible['url']}&betrokkeneIdentificatie__natuurlijkPersoon__inpBsn={self.user.bsn}",
+            json=paginated_response([self.role]),
         )
 
         response = self.app.get(
             reverse(
                 "accounts:case_status",
-                kwargs={"object_id": "213b0a04-fcbc-4fee-8d11-cf950a0a0bbb"},
+                kwargs={"object_id": self.zaak_invisible["uuid"]},
             ),
             user=self.user,
         )
