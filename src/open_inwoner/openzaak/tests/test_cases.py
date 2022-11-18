@@ -50,10 +50,6 @@ class TestListCasesView(WebTest):
         )
         self.config.save()
 
-        for key in cache._cache:
-            if "zaaktype" in key or "status" in key:
-                cache.delete(key)
-
         self.zaak1 = generate_oas_component(
             "zrc",
             "schemas/Zaak",
@@ -159,6 +155,9 @@ class TestListCasesView(WebTest):
             volgnummer=1,
             is_eindstatus=False,
         )
+
+    def tearDown(self):
+        cache.clear()
 
     def _setUpMocks(self, m):
         mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
@@ -274,7 +273,7 @@ class TestListCasesView(WebTest):
         with freeze_time("2022-01-01 12:00") as frozen_time:
             self.app.get(reverse("accounts:my_cases"), user=self.user)
 
-            # After one day the results should be deleted
+            # After one hour the results should be deleted
             frozen_time.tick(delta=datetime.timedelta(hours=1))
             self.assertIsNone(cache.get(f"zaaktype:{self.zaaktype['url']}"))
 
@@ -390,7 +389,7 @@ class TestListCasesView(WebTest):
             self.app.get(reverse("accounts:my_cases"), user=self.user)
 
             # After one day the results should be deleted
-            frozen_time.tick(delta=datetime.timedelta(hours=25))
+            frozen_time.tick(delta=datetime.timedelta(hours=24))
             self.assertIsNone(cache.get(f"statustype:{self.status_type1['url']}"))
             self.assertIsNone(cache.get(f"statustype:{self.status_type2['url']}"))
 
@@ -485,6 +484,7 @@ class TestListCasesView(WebTest):
 
         self.app.get(reverse("accounts:my_cases"), user=self.user)
 
+        self.assertIsNotNone(cache.get(f"statustype:{new_status_type['url']}"))
         self.assertIsNotNone(cache.get(f"statustype:{self.status_type1['url']}"))
         self.assertIsNotNone(cache.get(f"statustype:{self.status_type2['url']}"))
 
@@ -511,9 +511,9 @@ class TestListCasesView(WebTest):
 
             # After one hour the results should be deleted
             frozen_time.tick(delta=datetime.timedelta(hours=1))
-            self.assertIsNotNone(cache.get(f"status:{self.status1['url']}"))
-            self.assertIsNotNone(cache.get(f"status:{self.status2['url']}"))
-            self.assertIsNotNone(cache.get(f"status:{self.status3['url']}"))
+            self.assertIsNone(cache.get(f"status:{self.status1['url']}"))
+            self.assertIsNone(cache.get(f"status:{self.status2['url']}"))
+            self.assertIsNone(cache.get(f"status:{self.status3['url']}"))
 
     def test_cached_statuses_in_combination_with_new_ones(self, m):
         self._setUpMocks(m)
