@@ -35,7 +35,7 @@ from open_inwoner.openzaak.documents import (
     fetch_single_information_object,
 )
 from open_inwoner.openzaak.models import OpenZaakConfig
-from open_inwoner.openzaak.utils import filter_info_object_visibility
+from open_inwoner.openzaak.utils import filter_info_object_visibility, is_zaak_visible
 
 
 class CaseAccessMixin(AccessMixin):
@@ -63,10 +63,13 @@ class CaseAccessMixin(AccessMixin):
             case_uuid = kwargs["object_id"]
             self.case = fetch_single_case(case_uuid)
 
-            if self.case:
-                # check if we have a role in this case
-                if not fetch_roles_for_case_and_bsn(self.case.url, request.user.bsn):
-                    return self.handle_no_permission()
+            # check if we have a role in this case
+            if not fetch_roles_for_case_and_bsn(self.case.url, request.user.bsn):
+                return self.handle_no_permission()
+
+            # check confidentiality level
+            if not is_zaak_visible(self.case):
+                return self.handle_no_permission()
 
         return super().dispatch(request, *args, **kwargs)
 
