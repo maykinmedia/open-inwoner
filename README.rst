@@ -3,7 +3,7 @@ Open Inwoner
 ==================
 
 
-:Version: 1.0.5
+:Version: 1.0.6
 :Source: https://github.com/maykinmedia/open-inwoner
 :Keywords: inwoner
 :PythonVersion: 3.9
@@ -19,7 +19,7 @@ Deventer, Enschede, Groningen, Leeuwarden, Zaanstad, Zwolle.
 Introductie
 ============
 
-Zie ook onze [PDF Introductie handout](https://github.com/maykinmedia/open-inwoner/blob/develop/docs/OpenInwoner%20Introductie%20v1.0.pdf).
+Zie ook onze PDF Introductie handout: https://github.com/maykinmedia/open-inwoner/blob/develop/docs/OpenInwoner_Introductie_v1.pdf
 
 Het Open Inwoner Platform is ontwikkeld voor en door gemeenten om producten en diensten aan te bieden aan hun inwoners, gecombineerd met een "Mijn" omgeving.
 
