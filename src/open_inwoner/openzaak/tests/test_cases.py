@@ -23,6 +23,12 @@ CATALOGI_ROOT = "https://catalogi.nl/api/v1/"
 @requests_mock.Mocker()
 class TestListCasesView(WebTest):
     def setUp(self):
+        self.maxDiff = None
+
+    @classmethod
+    def setUpTestData(self):
+        super().setUpTestData()
+
         self.user = UserFactory(
             login_type=LoginTypeChoices.digid, bsn="900222086", email="johm@smith.nl"
         )

@@ -209,7 +209,9 @@ class TestProfile(WebTest):
         form["new_password1"] = "newPassw0rd"
         form["new_password2"] = "newPassw0rd"
         form.submit()
-        log_entry = TimelineLog.objects.last()
+        log_entry = TimelineLog.objects.filter(
+            extra_data__message=str(_("password was changed"))
+        ).last()
 
         self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"

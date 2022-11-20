@@ -38,8 +38,8 @@
         <div class="grid">
             <div class="column column--start-1 column--span-6 ">
                 <aside class="questionnaire">
-                    <h2 class="h2">{% trans "Keuze zelfdiagnose?" %}</h2>
-                    <p class="p">{% trans "Kies hieronder één van de volgende vragenlijsten om de zelfdiagnose te starten." %}</p>
+                    <h2 class="h2">{{configurable_text.questionnaire_page.select_questionnaire_title}}</h2>
+                    <p class="p">{{configurable_text.questionnaire_page.select_questionnaire_intro|linebreaksbr}}</p>
                     {% questionnaire root_nodes=questionnaire_roots %}
                 </aside>
             </div>

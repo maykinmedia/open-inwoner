@@ -4,7 +4,7 @@
 {% block content %}
     <h1 class="h1">{% trans "Doel aanpassen" %}</h1>
     <p class="p">
-        {% trans "Hier kunt u uw doel aanpassen" %}
+        {{configurable_text.plans_page.plans_edit_message}}
     </p>
 
     {% form id="goal-edit" form_object=form method="POST" %}

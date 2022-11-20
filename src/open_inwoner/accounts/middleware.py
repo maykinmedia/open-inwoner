@@ -17,9 +17,16 @@ class NecessaryFieldsMiddleware:
 
             # If the user is currently not editing their information, but it is required
             # redirect to that view.
+
+            # DigiD can be disabled, in which case the digid app isn't available
+            digid_logout = "/digid/logout/"
+            try:
+                digid_logout = reverse("digid:logout")
+            except:  # nosec
+                pass
             if (
                 not request.path.startswith(
-                    (necessary_fields_url, reverse("logout"), reverse("digid:logout"))
+                    (necessary_fields_url, reverse("logout"), digid_logout)
                 )
                 and request.user.require_necessary_fields()
             ):

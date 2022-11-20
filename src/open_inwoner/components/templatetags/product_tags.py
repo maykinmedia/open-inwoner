@@ -5,8 +5,10 @@ from django.utils.translation import gettext as _
 register = template.Library()
 
 
-@register.inclusion_tag("components/Product/finder.html")
-def product_finder(condition, form, form_action=".", primary_text=None, **kwargs):
+@register.inclusion_tag("components/Product/finder.html", takes_context=True)
+def product_finder(
+    context, condition, form, form_action=".", primary_text=None, **kwargs
+):
     """
     Renders the actions in a filterable table.
 
@@ -31,5 +33,6 @@ def product_finder(condition, form, form_action=".", primary_text=None, **kwargs
         form=form,
         form_action=form_action,
         primary_text=primary_text,
+        configurable_text=context["configurable_text"],
     )
     return kwargs

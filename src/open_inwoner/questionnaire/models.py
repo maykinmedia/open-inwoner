@@ -67,7 +67,26 @@ class QuestionnaireStep(MP_Node):
     highlighted = models.BooleanField(
         _("Highlighted"),
         default=False,
-        help_text=_("Whether the questionnaire should be highlighted or not."),
+        help_text=_(
+            "Alleen relevant voor vraag op het hoofdniveau. Indien aangevinkt dan wordt deze vraag getoond op de homepage."
+        ),
+    )
+    published = models.BooleanField(
+        verbose_name=_("Published"),
+        default=True,
+        help_text=_(
+            "Alleen relevant voor vraag op het hoofdniveau. Indien uitgevinkt dan kunnen alleen beheerders de vragenlijst zien & doorlopen."
+        ),
+    )
+    redirect_to = models.ForeignKey(
+        "self",
+        on_delete=models.SET_NULL,
+        verbose_name=_("Doorsturen naar andere stap (experimenteel)"),
+        blank=True,
+        null=True,
+        help_text=_(
+            "Indien ingesteld dan wordt de gebruiker na het kiezen van het antwoord doorgestuurd naar een andere vragenlijststap (eventueel in een andere boom)"
+        ),
     )
     related_products = models.ManyToManyField(
         "pdc.Product",
@@ -91,7 +110,7 @@ class QuestionnaireStep(MP_Node):
         ordering = ("path",)
 
     def __str__(self) -> str:
-        return self.question
+        return "({} - {}) {}".format(self.id, self.code, self.question)
 
     def get_absolute_url(self) -> str:
         if self.is_root():

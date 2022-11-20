@@ -57,10 +57,13 @@ RUN npm run build
 
 
 # Stage 3 - Build docker image suitable for production
+
 FROM python:3.9-slim-buster
 
 # Stage 3.1 - Set up the needed production dependencies
-# install all the dependencies for GeoDjango
+# Note: mime-support becomes media-types in Debian Bullseye (required for correctly serving mime-types for images)
+# Also install the dependencies for GeoDjango
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
         procps \
         vim \
@@ -77,6 +80,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libgdk-pixbuf2.0-0 \
         libffi-dev \
         shared-mime-info \
+        mime-support \ 
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -104,6 +108,7 @@ USER maykin
 ARG COMMIT_HASH
 ENV GIT_SHA=${COMMIT_HASH}
 ENV DJANGO_SETTINGS_MODULE=open_inwoner.conf.docker
+ENV DIGID_MOCK=True
 
 ARG SECRET_KEY=dummy
 

@@ -22,4 +22,11 @@ def build_client(type_):
 
         client = config.catalogi_service.build_client()
 
+    elif type_ == "document":
+        if not config.document_service:
+            logger.warning("no service defined for Document")
+            return
+
+        client = config.document_service.build_client()
+
     return client
