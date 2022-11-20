@@ -94,6 +94,8 @@ class ProductAdmin(SharingConfigsMixin, ImportExportMixin, admin.ModelAdmin):
         result = ProductImportResource().import_data(
             Dataset().load(content), raise_errors=True
         )
+        if result.rows:
+            return Product.objects.get(id=result.rows[0].object_id)
         return result
 
     def get_queryset(self, request):
