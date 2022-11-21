@@ -7,6 +7,7 @@
   margin: 0;
   display: flex;
   justify-content: space-between;
+  word-break: break-all;
 
   &--extra {
     margin: var(--row-height) 0 var(--spacing-medium) 0;
