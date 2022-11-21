@@ -2,7 +2,6 @@ import dataclasses
 from typing import List, Optional
 
 from django.contrib.auth.mixins import AccessMixin
-from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, StreamingHttpResponse
 from django.shortcuts import redirect
@@ -93,50 +92,45 @@ class CaseListView(BaseBreadcrumbMixin, CaseAccessMixin, TemplateView):
 
     def get_cases(self):
         cases = fetch_cases(self.request.user.bsn)
+        return cases
 
+    def process_cases(self, cases):
+        # fetch catalogi resources: zaaktypen and statustypen
         case_types = {}
         status_types = {}
-        current_statuses = {}
+        case_types_set = {case.zaaktype for case in cases}
 
+        for case_type_url in case_types_set:
+            # todo parallel
+            case_type = fetch_single_case_type(case_type_url)
+            case_types[case_type.url] = case_type
+
+            # Fetch new status types
+            # todo parallel
+            for st in fetch_status_types(case_type_url):
+                status_types[st.url] = st
+
+        # fetch zaken resources: statuses
         for case in cases:
-            # Fetch new case types
-            if case.zaaktype not in case_types.keys():
-                case_type = fetch_single_case_type(case.zaaktype)
-                case_types[case_type.url] = case_type
-
-                # Fetch new status types
-                for st in fetch_status_types(case.zaaktype):
-                    status_types[st.url] = st
-
             # Fetch case's current status
-            current_status = fetch_specific_status(case.status)
-            current_statuses[current_status.zaak] = current_status
+            # todo parallel
+            case.status_obj = fetch_specific_status(case.status)
+
+            case.zaaktype_obj = case_types[case.zaaktype]
+            case.status_obj.status_type_obj = status_types[case.status_obj.status_type]
 
         # Prepare data for frontend
         updated_cases = []
         for case in cases:
-            current_status = current_statuses[case.url]
-
-            # If the status type does not exist in the status types, retrieve it manually
-            if current_status and not current_status.statustype in status_types:
-                status_type = fetch_single_status_type(current_status.statustype)
-                status_types[status_type.url] = status_type
-
             updated_cases.append(
                 {
                     "identificatie": str(case.identificatie),
                     "uuid": str(case.uuid),
                     "start_date": case.startdatum,
-                    "end_date": case.einddatum if hasattr(case, "einddatum") else None,
+                    "end_date": getattr(case, "einddatum", None),
                     "description": case.omschrijving,
-                    "zaaktype_description": case_types[case.zaaktype].omschrijving
-                    if case_types
-                    else _("No data available"),
-                    "current_status": status_types[
-                        current_status.statustype
-                    ].omschrijving
-                    if current_status and status_types
-                    else _("No data available"),
+                    "zaaktype_description": case.zaaktype_obj.omschrijving,
+                    "current_status": case.status_obj.statustype_obj.omschrijving,
                 }
             )
 
@@ -145,7 +139,8 @@ class CaseListView(BaseBreadcrumbMixin, CaseAccessMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        cases = self.get_cases()
+        raw_cases = self.get_cases()
+        cases = self.process_cases(raw_cases)
 
         context["anchors"] = [
             ("#pending_apps", _("Lopende aanvragen")),

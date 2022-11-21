@@ -14,8 +14,8 @@ from .utils import cache as cache_result
 logger = logging.getLogger(__name__)
 
 
-@cache_result("status_types_for_case_type:{case_type}", timeout=60 * 60 * 24)
-def fetch_status_types(case_type=None) -> List[StatusType]:
+@cache_result("status_types_for_case_type:{case_type_url}", timeout=60 * 60 * 24)
+def fetch_status_types(case_type_url: str) -> List[StatusType]:
     client = build_client("catalogi")
 
     if client is None:
@@ -25,11 +25,7 @@ def fetch_status_types(case_type=None) -> List[StatusType]:
         response = get_paginated_results(
             client,
             "statustype",
-            request_kwargs={
-                "params": {"zaaktype": case_type},
-            }
-            if case_type
-            else None,
+            request_kwargs={"params": {"zaaktype": case_type_url}},
         )
     except RequestException as e:
         logger.exception("exception while making request", exc_info=e)
