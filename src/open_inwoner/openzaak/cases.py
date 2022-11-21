@@ -9,15 +9,21 @@ from zgw_consumers.service import get_paginated_results
 
 from .api_models import Zaak, ZaakInformatieObject
 from .clients import build_client
+from .models import OpenZaakConfig
 
 logger = logging.getLogger(__name__)
 
 
 def fetch_cases(user_bsn: str) -> List[Zaak]:
+    """
+    retrieve cases for particular user with allowed confidentiality level
+    """
     client = build_client("zaak")
 
     if client is None:
         return []
+
+    config = OpenZaakConfig.get_solo()
 
     try:
         response = get_paginated_results(
@@ -25,7 +31,8 @@ def fetch_cases(user_bsn: str) -> List[Zaak]:
             "zaak",
             request_kwargs={
                 "params": {
-                    "rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn": user_bsn
+                    "rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn": user_bsn,
+                    "maximaleVertrouwelijkheidaanduiding": config.zaak_max_confidentiality,
                 },
             },
         )

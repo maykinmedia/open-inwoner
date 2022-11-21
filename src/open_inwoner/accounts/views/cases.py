@@ -1,5 +1,5 @@
 import dataclasses
-from typing import List
+from typing import List, Optional
 
 from django.contrib.auth.mixins import AccessMixin
 from django.core.cache import cache
@@ -35,7 +35,7 @@ from open_inwoner.openzaak.documents import (
     fetch_single_information_object,
 )
 from open_inwoner.openzaak.models import OpenZaakConfig
-from open_inwoner.openzaak.utils import filter_info_object_visibility
+from open_inwoner.openzaak.utils import is_info_object_visible, is_zaak_visible
 
 
 class CaseAccessMixin(AccessMixin):
@@ -59,14 +59,15 @@ class CaseAccessMixin(AccessMixin):
         if not request.user.bsn:
             return self.handle_no_permission()
 
-        if "object_id" in kwargs:
-            case_uuid = kwargs["object_id"]
-            self.case = fetch_single_case(case_uuid)
+        self.case = self.get_case(kwargs)
+        if self.case:
+            # check if we have a role in this case
+            if not fetch_roles_for_case_and_bsn(self.case.url, request.user.bsn):
+                return self.handle_no_permission()
 
-            if self.case:
-                # check if we have a role in this case
-                if not fetch_roles_for_case_and_bsn(self.case.url, request.user.bsn):
-                    return self.handle_no_permission()
+            # check confidentiality level
+            if not is_zaak_visible(self.case):
+                return self.handle_no_permission()
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -75,6 +76,13 @@ class CaseAccessMixin(AccessMixin):
             return redirect(reverse("root"))
 
         return super().handle_no_permission()
+
+    def get_case(self, kwargs) -> Optional[Zaak]:
+        case_uuid = kwargs.get("object_id")
+        if not case_uuid:
+            return None
+
+        return fetch_single_case(case_uuid)
 
 
 class CaseListView(BaseBreadcrumbMixin, CaseAccessMixin, TemplateView):
@@ -229,7 +237,7 @@ class CaseDetailView(BaseBreadcrumbMixin, CaseAccessMixin, TemplateView):
         for case_info_obj, info_obj in zip(case_info_objects, info_objects):
             if not info_obj:
                 continue
-            if not filter_info_object_visibility(
+            if not is_info_object_visible(
                 info_obj, config.document_max_confidentiality
             ):
                 continue
@@ -279,9 +287,7 @@ class CaseDocumentDownloadView(CaseAccessMixin, View):
 
         # check if this info_object should be visible
         config = OpenZaakConfig.get_solo()
-        if not filter_info_object_visibility(
-            info_object, config.document_max_confidentiality
-        ):
+        if not is_info_object_visible(info_object, config.document_max_confidentiality):
             raise PermissionDenied()
 
         # retrieve and stream content

@@ -19,6 +19,13 @@ class OpenZaakConfig(SingletonModel):
         related_name="+",
         null=True,
     )
+    zaak_max_confidentiality = models.CharField(
+        max_length=32,
+        choices=VertrouwelijkheidsAanduidingen.choices,
+        default=VertrouwelijkheidsAanduidingen.openbaar,
+        verbose_name=_("Case confidentiality"),
+        help_text=_("Select maximum confidentiality level of cases"),
+    )
     catalogi_service = models.OneToOneField(
         "zgw_consumers.Service",
         verbose_name=_("Catalogi API"),

@@ -46,6 +46,9 @@ class TestDocumentDownloadView(WebTest):
         self.config.document_max_confidentiality = (
             VertrouwelijkheidsAanduidingen.beperkt_openbaar
         )
+        self.config.zaak_max_confidentiality = (
+            VertrouwelijkheidsAanduidingen.beperkt_openbaar
+        )
         self.config.save()
 
         self.zaak = generate_oas_component(
@@ -59,6 +62,7 @@ class TestDocumentDownloadView(WebTest):
             startdatum="2022-01-02",
             einddatum=None,
             status=f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
         )
         self.zaak_informatie_object = generate_oas_component(
             "zrc",
