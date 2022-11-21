@@ -62,7 +62,7 @@ class MyProfileView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormView)
             .order_by("end_date")
             .first()
         )
-        context["files"] = self.request.user.documents.all()
+        context["files"] = self.request.user.get_all_files()
         context["theme_text"] = self.request.user.get_interests()
         context["action_text"] = _(
             f"{Action.objects.connected(self.request.user).filter(status=StatusChoices.open).count()} acties staan open."
