@@ -120,6 +120,7 @@ def form(context, form_object, secondary=True, **kwargs):
         - secondary: bool | If the secondary button should be styled like a secondary button or not.
         - no_actions: bool | If you want to auto-generate the submit buttons.
         - horizontal: bool | If you want the label next to the fields.
+        - async_selector: string | Specifies selector for element to replace asynchronously on submit.
 
     Extra context:
         - auto_render: True | Telling the template that the form should be rendered.

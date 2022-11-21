@@ -38,7 +38,7 @@
         </ol>
 
         {% if other_user.is_active %}
-            {% render_form id="message-form" form=form method="POST" enctype="multipart/form-data" %}
+            {% render_form id="message-form" form=form method="POST" enctype="multipart/form-data" async_selector=".messages" %}
                 {% csrf_token %}
                 {% hidden form.receiver %}
                 <div class="group-input">

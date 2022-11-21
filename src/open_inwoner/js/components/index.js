@@ -1,3 +1,5 @@
+import 'htmx.org';
+
 import './accessibility'
 import './actions'
 import './anchor-menu'
@@ -19,3 +21,5 @@ import './questionnaire'
 import './search'
 import './toggle'
 import './session'
+
+window.htmx = require('htmx.org');
