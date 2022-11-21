@@ -88,8 +88,11 @@ class _UserAdmin(UserAdmin):
 @admin.register(Action)
 class ActionAdmin(UUIDAdminFirstInOrder, PrivateMediaMixin, admin.ModelAdmin):
     readonly_fields = ("uuid",)
-    list_display = ("name", "created_on", "created_by")
-    list_filter = ("created_by",)
+    list_display = ("name", "created_on", "created_by", "is_deleted")
+    list_filter = (
+        "is_deleted",
+        "created_by",
+    )
     private_media_fields = ("file",)
 
 

@@ -26,6 +26,9 @@ class ActionViewTests(WebTest):
         self.edit_url = reverse(
             "accounts:action_edit", kwargs={"uuid": self.action.uuid}
         )
+        self.delete_url = reverse(
+            "accounts:action_delete", kwargs={"uuid": self.action.uuid}
+        )
         self.create_url = reverse("accounts:action_create")
         self.export_url = reverse(
             "accounts:action_export", kwargs={"uuid": self.action.uuid}
@@ -108,6 +111,31 @@ class ActionViewTests(WebTest):
     def test_action_edit_not_your_action(self):
         other_user = UserFactory()
         response = self.app.get(self.edit_url, user=other_user, status=404)
+
+    def test_action_delete_login_required(self):
+        response = self.client.post(self.delete_url)
+        self.assertRedirects(response, f"{self.login_url}?next={self.delete_url}")
+
+    def test_action_delete_http_get_is_not_allowed(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.delete_url)
+        self.assertEqual(response.status_code, 405)
+
+    def test_action_delete(self):
+        self.client.force_login(self.user)
+        response = self.client.post(self.delete_url)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, self.list_url)
+
+        # Action is now marked as .is_deleted (and not actually deleted)
+        action = Action.objects.get(id=self.action.id)
+        self.assertTrue(action.is_deleted)
+
+    def test_action_delete_not_your_action(self):
+        other_user = UserFactory()
+        self.client.force_login(other_user)
+        response = self.client.post(self.delete_url)
+        self.assertEqual(response.status_code, 404)
 
     def test_action_create_login_required(self):
         response = self.app.get(self.create_url)

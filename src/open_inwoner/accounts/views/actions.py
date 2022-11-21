@@ -6,8 +6,10 @@ from django.http.response import HttpResponseRedirect
 from django.urls.base import reverse, reverse_lazy
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
+from django.views import View
 from django.views.generic import CreateView, DetailView, ListView
-from django.views.generic.edit import UpdateView
+from django.views.generic.detail import SingleObjectMixin
+from django.views.generic.edit import DeletionMixin, UpdateView
 
 from privates.views import PrivateMediaView
 from view_breadcrumbs import BaseBreadcrumbMixin
@@ -53,7 +55,9 @@ class ActionListView(
 
     def get_queryset(self):
         base_qs = super().get_queryset()
-        return base_qs.connected(user=self.request.user).select_related("is_for")
+        return (
+            base_qs.visible().connected(user=self.request.user).select_related("is_for")
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -92,7 +96,7 @@ class ActionUpdateView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, Update
 
     def get_queryset(self):
         base_qs = super().get_queryset()
-        return base_qs.connected(user=self.request.user)
+        return base_qs.visible().connected(user=self.request.user)
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -106,6 +110,28 @@ class ActionUpdateView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, Update
         if form.changed_data:
             changed_message = get_change_message(form=form)
             self.log_change(self.object, changed_message)
+        return HttpResponseRedirect(self.get_success_url())
+
+
+class ActionDeleteView(
+    LogMixin, LoginRequiredMixin, DeletionMixin, SingleObjectMixin, View
+):
+    model = Action
+    slug_field = "uuid"
+    slug_url_kwarg = "uuid"
+    success_url = reverse_lazy("accounts:action_list")
+
+    # no GET, we don't want to render anything
+    # http_method_names = ['post', 'delete', 'head', 'options', 'trace']
+
+    def get_queryset(self):
+        base_qs = super().get_queryset()
+        return base_qs.visible().connected(user=self.request.user)
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.is_deleted = True
+        self.object.save()
         return HttpResponseRedirect(self.get_success_url())
 
 
@@ -147,9 +173,11 @@ class ActionListExportView(LogMixin, LoginRequiredMixin, ExportMixin, ListView):
 
     def get_queryset(self):
         base_qs = super().get_queryset()
-        return base_qs.filter(
-            Q(is_for=self.request.user) | Q(created_by=self.request.user)
-        ).select_related("created_by")
+        return (
+            base_qs.visible()
+            .filter(Q(is_for=self.request.user) | Q(created_by=self.request.user))
+            .select_related("created_by")
+        )
 
 
 class ActionExportView(LogMixin, LoginRequiredMixin, ExportMixin, DetailView):
@@ -160,7 +188,7 @@ class ActionExportView(LogMixin, LoginRequiredMixin, ExportMixin, DetailView):
 
     def get_queryset(self):
         base_qs = super().get_queryset()
-        return base_qs.filter(
+        return base_qs.visible().filter(
             Q(is_for=self.request.user) | Q(created_by=self.request.user)
         )
 
@@ -170,6 +198,9 @@ class ActionPrivateMediaView(LogMixin, LoginRequiredMixin, PrivateMediaView):
     slug_field = "uuid"
     slug_url_kwarg = "uuid"
     file_field = "file"
+
+    def get_queryset(self):
+        return super().get_queryset().visible()
 
     def has_permission(self):
         action = self.get_object()
@@ -202,7 +233,7 @@ class ActionHistoryView(LoginRequiredMixin, BaseBreadcrumbMixin, DetailView):
 
     def get_queryset(self):
         base_qs = super().get_queryset()
-        return base_qs.connected(user=self.request.user)
+        return base_qs.visible().connected(user=self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

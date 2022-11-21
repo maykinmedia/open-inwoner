@@ -30,6 +30,7 @@ from .views import (
     MyProfileView,
     NecessaryFieldsUserView,
 )
+from .views.actions import ActionDeleteView
 
 app_name = "accounts"
 urlpatterns = [
@@ -57,7 +58,7 @@ urlpatterns = [
     path("actions/<str:uuid>/edit/", ActionUpdateView.as_view(), name="action_edit"),
     path(
         "actions/<str:uuid>/delete/",
-        ActionUpdateView.as_view(),
+        ActionDeleteView.as_view(),
         name="action_delete",
     ),
     path(

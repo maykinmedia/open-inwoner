@@ -503,6 +503,10 @@ class Action(models.Model):
         related_name="actions",
         help_text=_("The plan that the action belongs to. This can be left empty."),
     )
+    is_deleted = models.BooleanField(
+        verbose_name=_("Is deleted"),
+        default=False,
+    )
     logs = GenericRelation(TimelineLog)
 
     objects = ActionQueryset.as_manager()
