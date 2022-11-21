@@ -9,10 +9,12 @@ from zgw_consumers.service import get_paginated_results
 
 from .api_models import ZaakType
 from .clients import build_client
+from .utils import cache as cache_result
 
 logger = logging.getLogger(__name__)
 
 
+@cache_result("status_types_for_case_type:{case_type}", timeout=60 * 60 * 24)
 def fetch_status_types(case_type=None) -> List[StatusType]:
     client = build_client("catalogi")
 
@@ -61,26 +63,7 @@ def fetch_single_status_type(status_type_url: str) -> Optional[StatusType]:
     return status_type
 
 
-def fetch_case_types() -> List[ZaakType]:
-    client = build_client("catalogi")
-
-    if client is None:
-        return []
-
-    try:
-        response = get_paginated_results(client, "zaaktype")
-    except RequestException as e:
-        logger.exception("exception while making request", exc_info=e)
-        return []
-    except ClientError as e:
-        logger.exception("exception while making request", exc_info=e)
-        return []
-
-    case_types = factory(ZaakType, response)
-
-    return case_types
-
-
+@cache_result("case_type:{case_type_url}", timeout=60 * 60 * 24)
 def fetch_single_case_type(case_type_url: str) -> Optional[ZaakType]:
     client = build_client("catalogi")
 

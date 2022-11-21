@@ -10,6 +10,7 @@ from zgw_consumers.service import get_paginated_results
 from .api_models import Zaak, ZaakInformatieObject
 from .clients import build_client
 from .models import OpenZaakConfig
+from .utils import cache as cache_result
 
 logger = logging.getLogger(__name__)
 
@@ -113,19 +114,25 @@ def fetch_status_history(case_url: str) -> List[Status]:
     return statuses
 
 
-def fetch_specific_statuses(status_urls: List[str]) -> List[Status]:
+@cache_result("status:{status_url}", timeout=60 * 60)
+def fetch_specific_status(status_url: str) -> List[Status]:
     client = build_client("zaak")
 
     if client is None:
         return []
 
-    _statuses = []
-    for url in status_urls:
-        _statuses += [client.retrieve("status", url=url)]
+    try:
+        response = client.retrieve("status", url=status_url)
+    except RequestException as e:
+        logger.exception("exception while making request", exc_info=e)
+        return []
+    except ClientError as e:
+        logger.exception("exception while making request", exc_info=e)
+        return []
 
-    statuses = factory(Status, list(_statuses))
+    status = factory(Status, response)
 
-    return statuses
+    return status
 
 
 def fetch_roles_for_case_and_bsn(case_url: str, bsn: str) -> List[Rol]:
