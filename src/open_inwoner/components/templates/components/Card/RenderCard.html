@@ -4,7 +4,7 @@
 <div class="card{% if inline %} card--inline{% endif %}{% if tinted %} card--tinted{% endif %}{% if type %} card--type-{{ type }}{% endif %}">
     {% if src %}
         <a class="card__header" href="{{ href }}" title="{{ title }}" aria-describedby="{{ title }}">
-            <img class="card__img" src="{{ src }}" alt="{{ alt }}"/>
+            <img class="card__img{% if image_object_fit %} card__img--{{ image_object_fit }}{% endif %}" src="{{ src }}" alt="{{ alt }}"/>
         </a>
     {% endif %}
 
