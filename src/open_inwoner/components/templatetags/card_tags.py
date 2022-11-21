@@ -25,6 +25,7 @@ def card(href, title, **kwargs):
         - tinted: bool | whether to use gray as background color.
         - type: string (info) | Set to info for an info card.
         - image: FilerImageField | an image that should be used.
+        - image_object_fit: string | Can be set to either "cover" (default) or "contain".
         - grid: boolean | if the card should be a grid.
     """
     return {**kwargs, "href": href, "title": title}
@@ -100,6 +101,7 @@ def card_container(categories=[], subcategories=[], products=[], plans=[], **kwa
         - subcategories: Category[] | subcategories to render.
         - products: Product[] | products to render.
         - parent: Category | The parent of the given card_container
+        - image_object_fit: string | Can be set to either "cover" (default) or "contain".
     """
     if (
         categories is None

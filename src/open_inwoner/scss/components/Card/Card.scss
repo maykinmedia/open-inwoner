@@ -64,6 +64,9 @@
     width: 100%;
   }
 
+  &__img--contain {
+    object-fit: contain;
+  }
   &__body {
     padding: var(--card-spacing);
   }
