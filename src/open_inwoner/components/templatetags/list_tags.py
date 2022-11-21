@@ -35,11 +35,14 @@ def list_item(text, description="", href="", **kwargs):
 
     Variables:
         + text: string | this will be the item's title.
+        - caption: string | this will be the item's caption.
         - description: string | this will be the item's description.
-        - href: url | where the item links to.
         - active: bool | if the current list item is active or not.
+        - href: url | where the item links to.
+        - strong: bool | Whether to use strong text.
     """
     kwargs["text"] = text
     kwargs["description"] = kwargs.get("description", description)
     kwargs["href"] = kwargs.get("href", href)
+    kwargs["strong"] = kwargs.get("strong", True)
     return kwargs

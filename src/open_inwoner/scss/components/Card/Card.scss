@@ -150,6 +150,11 @@
       white-space: normal;
     }
   }
+
+  /// List should have extra margin within a card.
+  .list {
+    margin: calc(var(--row-height) / 2) 0;
+  }
 }
 
 ///

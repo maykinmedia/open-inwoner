@@ -118,6 +118,7 @@ class CaseListView(BaseBreadcrumbMixin, CaseAccessMixin, TemplateView):
 
             updated_cases.append(
                 {
+                    "identificatie": str(case.identificatie),
                     "uuid": str(case.uuid),
                     "start_date": case.startdatum,
                     "end_date": case.einddatum if hasattr(case, "einddatum") else None,

@@ -19,6 +19,7 @@ def card(href, title, **kwargs):
         + href: url | where the card links to.
         + title: string | this will be the card title.
         - alt: string | the alt of the header image.
+        - compact: bool | Whether to use compact styling.
         - direction: string | can be set to "horizontal" to show contents horizontally.
         - inline: bool | Whether the card should be rendered inline.
         - src: string | the src of the header image.
