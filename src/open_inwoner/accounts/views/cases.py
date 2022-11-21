@@ -23,8 +23,8 @@ from open_inwoner.openzaak.cases import (
     fetch_cases,
     fetch_roles_for_case_and_bsn,
     fetch_single_case,
-    fetch_specific_status,
     fetch_single_result,
+    fetch_specific_status,
     fetch_status_history,
 )
 from open_inwoner.openzaak.catalog import (
@@ -218,6 +218,9 @@ class CaseDetailView(BaseBreadcrumbMixin, CaseAccessMixin, TemplateView):
                 "start_date": self.case.startdatum,
                 "end_date": getattr(self.case, "einddatum", None),
                 "end_date_planned": getattr(self.case, "einddatum_gepland", None),
+                "end_date_legal": getattr(
+                    self.case, "uiterlijke_einddatum_afdoening", None
+                ),
                 "description": self.case.omschrijving,
                 "type_description": (
                     case_type.omschrijving if case_type else _("No data available")

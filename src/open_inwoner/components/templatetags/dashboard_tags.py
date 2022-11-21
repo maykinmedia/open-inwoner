@@ -111,15 +111,22 @@ def case_table(case: dict, **kwargs) -> dict:
     if case.get("end_date"):
         rows.append(
             {
-                "label": _("Eind datum"),
+                "label": _("Einddatum"),
                 "value": case.get("end_date"),
             }
         )
     if case.get("end_date_planned"):
         rows.append(
             {
-                "label": _("Verwachte eind datum"),
+                "label": _("Verwachte einddatum"),
                 "value": case.get("end_date_planned"),
+            }
+        )
+    if case.get("end_date_legal"):
+        rows.append(
+            {
+                "label": _("Wettelijke termijn"),
+                "value": case.get("end_date_legal"),
             }
         )
 
