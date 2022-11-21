@@ -5,7 +5,7 @@ from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 from zgw_consumers.test import generate_oas_component
 
 from open_inwoner.openzaak.api_models import InformatieObject
-from open_inwoner.openzaak.utils import filter_info_object_visibility
+from open_inwoner.openzaak.utils import is_info_object_visible
 
 
 class TestUtils(TestCase):
@@ -66,7 +66,7 @@ class TestUtils(TestCase):
                     ),
                 )
                 self.assertEqual(
-                    expected, filter_info_object_visibility(info_object, max_level)
+                    expected, is_info_object_visible(info_object, max_level)
                 )
 
         # test we don't leak on bad input
@@ -80,7 +80,7 @@ class TestUtils(TestCase):
                     vertrouwelijkheidaanduiding="non_existent_key",
                 ),
             )
-            self.assertFalse(filter_info_object_visibility(info_object, max_level))
+            self.assertFalse(is_info_object_visible(info_object, max_level))
 
         with self.subTest(f"bad vertrouwelijkheidaanduiding as parameter"):
             info_object = factory(
@@ -92,6 +92,4 @@ class TestUtils(TestCase):
                     vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.vertrouwelijk,
                 ),
             )
-            self.assertFalse(
-                filter_info_object_visibility(info_object, "non_existent_key")
-            )
+            self.assertFalse(is_info_object_visible(info_object, "non_existent_key"))

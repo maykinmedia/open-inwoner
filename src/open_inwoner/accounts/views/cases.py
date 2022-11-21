@@ -35,7 +35,7 @@ from open_inwoner.openzaak.documents import (
     fetch_single_information_object,
 )
 from open_inwoner.openzaak.models import OpenZaakConfig
-from open_inwoner.openzaak.utils import filter_info_object_visibility, is_zaak_visible
+from open_inwoner.openzaak.utils import is_info_object_visible, is_zaak_visible
 
 
 class CaseAccessMixin(AccessMixin):
@@ -237,7 +237,7 @@ class CaseDetailView(BaseBreadcrumbMixin, CaseAccessMixin, TemplateView):
         for case_info_obj, info_obj in zip(case_info_objects, info_objects):
             if not info_obj:
                 continue
-            if not filter_info_object_visibility(
+            if not is_info_object_visible(
                 info_obj, config.document_max_confidentiality
             ):
                 continue
@@ -287,9 +287,7 @@ class CaseDocumentDownloadView(CaseAccessMixin, View):
 
         # check if this info_object should be visible
         config = OpenZaakConfig.get_solo()
-        if not filter_info_object_visibility(
-            info_object, config.document_max_confidentiality
-        ):
+        if not is_info_object_visible(info_object, config.document_max_confidentiality):
             raise PermissionDenied()
 
         # retrieve and stream content

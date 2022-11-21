@@ -23,7 +23,7 @@ def is_object_visible(obj, max_confidentiality_level: str) -> bool:
     return doc_index <= max_index
 
 
-def filter_info_object_visibility(
+def is_info_object_visible(
     info_object: InformatieObject, max_confidentiality_level: str
 ) -> bool:
     """
