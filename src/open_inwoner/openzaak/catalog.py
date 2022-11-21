@@ -14,6 +14,7 @@ from .utils import cache as cache_result
 logger = logging.getLogger(__name__)
 
 
+@cache_result("status_types_for_case_type:{case_type}", timeout=60 * 60 * 24)
 def fetch_status_types(case_type=None) -> List[StatusType]:
     client = build_client("catalogi")
 
@@ -42,7 +43,6 @@ def fetch_status_types(case_type=None) -> List[StatusType]:
     return status_types
 
 
-@cache_result("statustype:{status_type_url}", timeout=60 * 60 * 24)
 def fetch_single_status_type(status_type_url: str) -> Optional[StatusType]:
     client = build_client("catalogi")
 
@@ -63,7 +63,7 @@ def fetch_single_status_type(status_type_url: str) -> Optional[StatusType]:
     return status_type
 
 
-@cache_result("zaaktype:{case_type_url}", timeout=60 * 60)
+@cache_result("case_type:{case_type_url}", timeout=60 * 60 * 24)
 def fetch_single_case_type(case_type_url: str) -> Optional[ZaakType]:
     client = build_client("catalogi")
 

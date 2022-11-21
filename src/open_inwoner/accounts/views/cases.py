@@ -91,33 +91,26 @@ class CaseListView(BaseBreadcrumbMixin, CaseAccessMixin, TemplateView):
     def crumbs(self):
         return [(_("Mijn aanvragen"), reverse("accounts:my_cases"))]
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
+    def get_cases(self):
         cases = fetch_cases(self.request.user.bsn)
 
         case_types = {}
         status_types = {}
-        temp_status_types = []
         current_statuses = {}
 
         for case in cases:
             # Fetch new case types
             if case.zaaktype not in case_types.keys():
                 case_type = fetch_single_case_type(case.zaaktype)
-                case_types.update({case_type.url: case_type})
+                case_types[case_type.url] = case_type
 
-            # Fetch list of case's status types and each one (unique) separately
-            temp_status_types += [st.url for st in fetch_status_types(case.zaaktype)]
-
-            for status_type_url in set(temp_status_types):
-                if status_type_url not in status_types:
-                    status_type = fetch_single_status_type(status_type_url)
-                    status_types.update({status_type.url: status_type})
+                # Fetch new status types
+                for st in fetch_status_types(case.zaaktype):
+                    status_types[st.url] = st
 
             # Fetch case's current status
             current_status = fetch_specific_status(case.status)
-            current_statuses.update({current_status.zaak: current_status})
+            current_statuses[current_status.zaak] = current_status
 
         # Prepare data for frontend
         updated_cases = []
@@ -127,7 +120,7 @@ class CaseListView(BaseBreadcrumbMixin, CaseAccessMixin, TemplateView):
             # If the status type does not exist in the status types, retrieve it manually
             if current_status and not current_status.statustype in status_types:
                 status_type = fetch_single_status_type(current_status.statustype)
-                status_types.update({status_type.url: status_type})
+                status_types[status_type.url] = status_type
 
             updated_cases.append(
                 {
@@ -146,6 +139,13 @@ class CaseListView(BaseBreadcrumbMixin, CaseAccessMixin, TemplateView):
                 }
             )
 
+        return updated_cases
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        cases = self.get_cases()
+
         context["anchors"] = [
             ("#pending_apps", _("Lopende aanvragen")),
             ("#completed_apps", _("Afgeronde aanvragen")),
@@ -153,13 +153,13 @@ class CaseListView(BaseBreadcrumbMixin, CaseAccessMixin, TemplateView):
 
         context["open_cases"] = [
             case
-            for case in updated_cases
+            for case in cases
             if not case["end_date"] and not case["current_status"] == "Afgerond"
         ]
         context["open_cases"].sort(key=lambda case: case["start_date"])
         context["closed_cases"] = [
             case
-            for case in updated_cases
+            for case in cases
             if case["end_date"] or case["current_status"] == "Afgerond"
         ]
         context["closed_cases"].sort(key=lambda case: case["end_date"])

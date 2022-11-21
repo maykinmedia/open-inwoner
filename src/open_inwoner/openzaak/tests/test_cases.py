@@ -260,32 +260,32 @@ class TestListCasesView(WebTest):
         self._setUpMocks(m)
 
         # Cache is empty before the request
-        self.assertIsNone(cache.get(f"zaaktype:{self.zaaktype['url']}"))
+        self.assertIsNone(cache.get(f"case_type:{self.zaaktype['url']}"))
 
         self.app.get(reverse("accounts:my_cases"), user=self.user)
 
         # Case type is cached after the request
-        self.assertIsNotNone(cache.get(f"zaaktype:{self.zaaktype['url']}"))
+        self.assertIsNotNone(cache.get(f"case_type:{self.zaaktype['url']}"))
 
-    def test_cached_case_types_are_deleted_after_one_hour(self, m):
+    def test_cached_case_types_are_deleted_after_one_day(self, m):
         self._setUpMocks(m)
 
         with freeze_time("2022-01-01 12:00") as frozen_time:
             self.app.get(reverse("accounts:my_cases"), user=self.user)
 
-            # After one hour the results should be deleted
-            frozen_time.tick(delta=datetime.timedelta(hours=1))
-            self.assertIsNone(cache.get(f"zaaktype:{self.zaaktype['url']}"))
+            # After one day the results should be deleted
+            frozen_time.tick(delta=datetime.timedelta(days=1))
+            self.assertIsNone(cache.get(f"case_type:{self.zaaktype['url']}"))
 
     def test_cached_case_types_in_combination_with_new_ones(self, m):
         self._setUpMocks(m)
 
         # First attempt
-        self.assertIsNone(cache.get(f"zaaktype:{self.zaaktype['url']}"))
+        self.assertIsNone(cache.get(f"case_type:{self.zaaktype['url']}"))
 
         self.app.get(reverse("accounts:my_cases"), user=self.user)
 
-        self.assertIsNotNone(cache.get(f"zaaktype:{self.zaaktype['url']}"))
+        self.assertIsNotNone(cache.get(f"case_type:{self.zaaktype['url']}"))
 
         # Second attempt with new case and case type
         new_zaak = generate_oas_component(
@@ -362,25 +362,33 @@ class TestListCasesView(WebTest):
             json=new_status,
         )
 
-        self.assertIsNone(cache.get(f"zaaktype:{new_zaaktype['url']}"))
+        self.assertIsNone(cache.get(f"case_type:{new_zaaktype['url']}"))
 
         self.app.get(reverse("accounts:my_cases"), user=self.user)
 
-        self.assertIsNotNone(cache.get(f"zaaktype:{self.zaaktype['url']}"))
-        self.assertIsNotNone(cache.get(f"zaaktype:{new_zaaktype['url']}"))
+        self.assertIsNotNone(cache.get(f"case_type:{self.zaaktype['url']}"))
+        self.assertIsNotNone(cache.get(f"case_type:{new_zaaktype['url']}"))
 
     def test_status_types_are_cached(self, m):
         self._setUpMocks(m)
 
         # Cache is empty before the request
-        self.assertIsNone(cache.get(f"statustype:{self.status_type1['url']}"))
-        self.assertIsNone(cache.get(f"statustype:{self.status_type2['url']}"))
+        self.assertIsNone(
+            cache.get(f"status_types_for_case_type:{self.zaaktype['url']}")
+        )
+        self.assertIsNone(
+            cache.get(f"status_types_for_case_type:{self.zaaktype['url']}")
+        )
 
         self.app.get(reverse("accounts:my_cases"), user=self.user)
 
         # Case type is cached after the request
-        self.assertIsNotNone(cache.get(f"statustype:{self.status_type1['url']}"))
-        self.assertIsNotNone(cache.get(f"statustype:{self.status_type2['url']}"))
+        self.assertIsNotNone(
+            cache.get(f"status_types_for_case_type:{self.zaaktype['url']}")
+        )
+        self.assertIsNotNone(
+            cache.get(f"status_types_for_case_type:{self.zaaktype['url']}")
+        )
 
     def test_cached_status_types_are_deleted_after_one_day(self, m):
         self._setUpMocks(m)
@@ -390,20 +398,32 @@ class TestListCasesView(WebTest):
 
             # After one day the results should be deleted
             frozen_time.tick(delta=datetime.timedelta(hours=24))
-            self.assertIsNone(cache.get(f"statustype:{self.status_type1['url']}"))
-            self.assertIsNone(cache.get(f"statustype:{self.status_type2['url']}"))
+            self.assertIsNone(
+                cache.get(f"status_types_for_case_type:{self.zaaktype['url']}")
+            )
+            self.assertIsNone(
+                cache.get(f"status_types_for_case_type:{self.zaaktype['url']}")
+            )
 
     def test_cached_status_types_in_combination_with_new_ones(self, m):
         self._setUpMocks(m)
 
         # First attempt
-        self.assertIsNone(cache.get(f"statustype:{self.status_type1['url']}"))
-        self.assertIsNone(cache.get(f"statustype:{self.status_type2['url']}"))
+        self.assertIsNone(
+            cache.get(f"status_types_for_case_type:{self.zaaktype['url']}")
+        )
+        self.assertIsNone(
+            cache.get(f"status_types_for_case_type:{self.zaaktype['url']}")
+        )
 
         self.app.get(reverse("accounts:my_cases"), user=self.user)
 
-        self.assertIsNotNone(cache.get(f"statustype:{self.status_type1['url']}"))
-        self.assertIsNotNone(cache.get(f"statustype:{self.status_type2['url']}"))
+        self.assertIsNotNone(
+            cache.get(f"status_types_for_case_type:{self.zaaktype['url']}")
+        )
+        self.assertIsNotNone(
+            cache.get(f"status_types_for_case_type:{self.zaaktype['url']}")
+        )
 
         # Second attempt with new case and status type
         new_zaak = generate_oas_component(
@@ -475,18 +495,22 @@ class TestListCasesView(WebTest):
             f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-oie8u899923g",
             json=new_status,
         )
-        m.get(
-            f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-984yr8887rhe",
-            json=new_status_type,
-        )
 
-        self.assertIsNone(cache.get(f"statustype:{new_status_type['url']}"))
+        self.assertIsNone(
+            cache.get(f"status_types_for_case_type:{new_zaaktype['url']}")
+        )
 
         self.app.get(reverse("accounts:my_cases"), user=self.user)
 
-        self.assertIsNotNone(cache.get(f"statustype:{new_status_type['url']}"))
-        self.assertIsNotNone(cache.get(f"statustype:{self.status_type1['url']}"))
-        self.assertIsNotNone(cache.get(f"statustype:{self.status_type2['url']}"))
+        self.assertIsNotNone(
+            cache.get(f"status_types_for_case_type:{new_zaaktype['url']}")
+        )
+        self.assertIsNotNone(
+            cache.get(f"status_types_for_case_type:{self.zaaktype['url']}")
+        )
+        self.assertIsNotNone(
+            cache.get(f"status_types_for_case_type:{self.zaaktype['url']}")
+        )
 
     def test_statuses_are_cached(self, m):
         self._setUpMocks(m)

@@ -53,6 +53,16 @@ def is_zaak_visible(zaak: Zaak) -> bool:
 
 
 def cache(key: str, alias: str = "default", **set_options):
+    """
+    Function-decorator for updating the django low-level cache.
+
+    It determines if the key exists in cache and skips it by calling the decorated function
+    or creates it if doesn't exist.
+
+    We can pass a keyword argument for the time we want the cache the data in
+    seconds (timeout=60).
+    """
+
     def decorator(func: callable):
         argspec = inspect.getfullargspec(func)
 
@@ -84,10 +94,13 @@ def cache(key: str, alias: str = "default", **set_options):
 
             _cache = caches[alias]
             result = _cache.get(cache_key)
+
+            # The key exists in cache so we return the already cached data
             if result is not None:
                 logger.debug("Cache key '%s' hit", cache_key)
                 return result
 
+            # The key does not exist so we call the decorated function and set the cache
             result = func(*args, **kwargs)
             _cache.set(cache_key, result, **set_options)
 
