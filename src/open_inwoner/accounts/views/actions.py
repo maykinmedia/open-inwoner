@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.http.response import HttpResponseRedirect
@@ -128,9 +129,19 @@ class ActionDeleteView(
 
     def delete(self, request, *args, **kwargs):
         self.object = self.get_object()
+        # soft-delete
         self.object.is_deleted = True
         self.object.save()
-        self.log_change(self.object, f"soft-deleted by user {self.request.user}")
+
+        self.log_deletion(
+            self.object,
+            _("action soft-deleted by user {user}").format(user=self.request.user),
+        )
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            _("Actie '{action}' is verwijdered.").format(action=self.object),
+        )
         return HttpResponseRedirect(self.get_success_url())
 
 

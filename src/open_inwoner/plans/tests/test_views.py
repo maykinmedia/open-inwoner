@@ -1,3 +1,4 @@
+from django.contrib.messages import get_messages
 from django.core import mail
 from django.urls import reverse
 from django.utils.translation import ugettext as _
@@ -401,6 +402,11 @@ class PlanViewTests(WebTest):
         # Action is now marked as .is_deleted (and not actually deleted)
         action = Action.objects.get(id=self.action.id)
         self.assertTrue(action.is_deleted)
+
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        expected = _("Actie '{action}' is verwijdered.").format(action=self.action)
+        self.assertEqual(str(messages[0]), expected)
 
     def test_plan_action_delete_not_your_action(self):
         other_user = UserFactory()
