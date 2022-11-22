@@ -58,6 +58,7 @@ class ActionFactory(factory.django.DjangoModelFactory):
 
     name = factory.Faker("first_name")
     created_by = factory.SubFactory(UserFactory)
+    is_deleted = False
 
 
 class DocumentFactory(factory.django.DjangoModelFactory):

@@ -20,6 +20,11 @@ class ActionViewTests(WebTest):
             created_by=self.user,
             file=SimpleUploadedFile("file.txt", b"test content"),
         )
+        self.action_deleted = ActionFactory(
+            name="action_that_was_deleted",
+            created_by=self.user,
+            is_deleted=True,
+        )
 
         self.login_url = reverse("login")
         self.list_url = reverse("accounts:action_list")
@@ -41,6 +46,9 @@ class ActionViewTests(WebTest):
             "accounts:action_history", kwargs={"uuid": self.action.uuid}
         )
 
+    def test_queryset_visible(self):
+        self.assertEqual(list(Action.objects.visible()), [self.action])
+
     def test_action_list_login_required(self):
         response = self.app.get(self.list_url)
         self.assertRedirects(response, f"{self.login_url}?next={self.list_url}")
@@ -49,6 +57,7 @@ class ActionViewTests(WebTest):
         response = self.app.get(self.list_url, user=self.user)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.action.name)
+        self.assertEqual(list(response.context["actions"]), [self.action])
 
     def test_action_list_filter_is_for(self):
         user = UserFactory()
@@ -75,7 +84,6 @@ class ActionViewTests(WebTest):
         action2 = ActionFactory(
             end_date="2021-04-02", status=StatusChoices.open, is_for=self.user
         )
-        self.assertEqual(Action.objects.count(), 3)
         response = self.app.get(
             f"{self.list_url}?status={StatusChoices.open}", user=self.user
         )
@@ -98,6 +106,7 @@ class ActionViewTests(WebTest):
         response = self.app.get(self.list_url, user=other_user)
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, self.action.name)
+        self.assertEqual(list(response.context["actions"]), [])
 
     def test_action_edit_login_required(self):
         response = self.app.get(self.edit_url)
@@ -110,7 +119,11 @@ class ActionViewTests(WebTest):
 
     def test_action_edit_not_your_action(self):
         other_user = UserFactory()
-        response = self.app.get(self.edit_url, user=other_user, status=404)
+        self.app.get(self.edit_url, user=other_user, status=404)
+
+    def test_action_edit_deleted_action(self):
+        url = reverse("accounts:action_edit", kwargs={"uuid": self.action_deleted.uuid})
+        self.app.get(url, user=self.user, status=404)
 
     def test_action_delete_login_required(self):
         response = self.client.post(self.delete_url)
@@ -156,7 +169,13 @@ class ActionViewTests(WebTest):
 
     def test_action_export_not_your_action(self):
         other_user = UserFactory()
-        response = self.app.get(self.export_url, user=other_user, status=404)
+        self.app.get(self.export_url, user=other_user, status=404)
+
+    def test_action_export_deleted_action(self):
+        url = reverse(
+            "accounts:action_export", kwargs={"uuid": self.action_deleted.uuid}
+        )
+        self.app.get(url, user=self.user, status=404)
 
     def test_action_list_export(self):
         response = self.app.get(self.export_list_url, user=self.user)
@@ -165,6 +184,7 @@ class ActionViewTests(WebTest):
         self.assertEqual(
             response["Content-Disposition"], f'attachment; filename="actions.pdf"'
         )
+        self.assertEqual(list(response.context["actions"]), [self.action])
 
     def test_action_list_export_login_required(self):
         response = self.app.get(self.export_list_url)
@@ -182,7 +202,13 @@ class ActionViewTests(WebTest):
 
     def test_action_download_not_your_action(self):
         other_user = UserFactory()
-        response = self.app.get(self.download_url, user=other_user, status=403)
+        self.app.get(self.download_url, user=other_user, status=403)
+
+    def test_action_download_deleted_action(self):
+        url = reverse(
+            "accounts:action_download", kwargs={"uuid": self.action_deleted.uuid}
+        )
+        self.app.get(url, user=self.user, status=404)
 
     def test_action_history(self):
         response = self.app.get(self.history_url, user=self.user)
@@ -191,8 +217,14 @@ class ActionViewTests(WebTest):
 
     def test_action_history_not_your_action(self):
         other_user = UserFactory()
-        response = self.app.get(self.history_url, user=other_user, status=404)
+        self.app.get(self.history_url, user=other_user, status=404)
 
     def test_action_history_login_required(self):
         response = self.app.get(self.history_url)
         self.assertRedirects(response, f"{self.login_url}?next={self.history_url}")
+
+    def test_action_history_deleted_action(self):
+        url = reverse(
+            "accounts:action_history", kwargs={"uuid": self.action_deleted.uuid}
+        )
+        self.app.get(url, user=self.user, status=404)
