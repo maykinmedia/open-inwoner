@@ -23,6 +23,7 @@ def card(href, title, **kwargs):
         - direction: string | can be set to "horizontal" to show contents horizontally.
         - inline: bool | Whether the card should be rendered inline.
         - src: string | the src of the header image.
+        - stretch: bool | Whether to stretch the card vertically.
         - tinted: bool | whether to use gray as background color.
         - type: string (info) | Set to info for an info card.
         - image: FilerImageField | an image that should be used.

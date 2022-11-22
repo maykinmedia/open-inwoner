@@ -18,6 +18,10 @@
     display: inline-flex;
   }
 
+  &--stretch {
+    height: 100%;
+  }
+
   &--type-info {
     --card-color-background: var(--color-info-lighter);
     --card-color-border: transparent;
@@ -154,6 +158,24 @@
   /// List should have extra margin within a card.
   .list {
     margin: calc(var(--row-height) / 2) 0;
+  }
+
+  &--compact .list {
+    margin-top: 0;
+  }
+
+  /// On a stretched card, the one and only link after a list should be placed on above the bottom border.
+  &--stretch &__body {
+    padding-bottom: 0;
+  }
+
+  &--stretch &__body .list:last-of-type {
+    padding-bottom: calc(var(--font-size-body) + var(--card-spacing));
+  }
+
+  &--stretch .list + .link:first-of-type:last-of-type {
+    bottom: var(--card-spacing);
+    position: absolute;
   }
 }
 
