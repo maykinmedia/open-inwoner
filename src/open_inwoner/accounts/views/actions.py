@@ -120,9 +120,7 @@ class ActionDeleteView(
     slug_field = "uuid"
     slug_url_kwarg = "uuid"
     success_url = reverse_lazy("accounts:action_list")
-
-    # no GET, we don't want to render anything
-    # http_method_names = ['post', 'delete', 'head', 'options', 'trace']
+    raise_exception = True
 
     def get_queryset(self):
         base_qs = super().get_queryset()
@@ -132,6 +130,7 @@ class ActionDeleteView(
         self.object = self.get_object()
         self.object.is_deleted = True
         self.object.save()
+        self.log_change(self.object, f"soft-deleted by user {self.request.user}")
         return HttpResponseRedirect(self.get_success_url())
 
 
