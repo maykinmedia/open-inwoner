@@ -135,33 +135,33 @@ class MySeleniumTests(StaticLiveServerTestCase):
 
     def test_async_selector(self):
         # Create fixtures.
-        me = UserFactory.create(email="johndoe@example.com", password="s3cret", is_staff=True)
+        me = UserFactory.create(
+            email="johndoe@example.com", password="s3cret", is_staff=True
+        )
         user1, user2 = UserFactory.create_batch(2)
-        ContactFactory.create(
-            created_by=me, contact_user=user1, email=user1.email
-        )
-        ContactFactory.create(
-            created_by=me, contact_user=user2, email=user2.email
-        )
+        ContactFactory.create(created_by=me, contact_user=user1, email=user1.email)
+        ContactFactory.create(created_by=me, contact_user=user2, email=user2.email)
         MessageFactory.create(sender=me, receiver=user1)
         MessageFactory.create(receiver=me, sender=user2)
 
         # Log in.
-        self.selenium.get('%s%s' % (self.live_server_url, reverse_lazy('admin:login')))
+        self.selenium.get("%s%s" % (self.live_server_url, reverse_lazy("admin:login")))
         username_input = self.selenium.find_element(By.NAME, "username")
         username_input.send_keys("johndoe@example.com")
         password_input = self.selenium.find_element(By.NAME, "password")
-        password_input.send_keys('s3cret')
+        password_input.send_keys("s3cret")
         self.selenium.find_element(By.XPATH, '//input[@type="submit"]').click()
 
         # Go to messages page.
-        self.selenium.get('%s%s' % (self.live_server_url, reverse_lazy('accounts:inbox')))
+        self.selenium.get(
+            "%s%s" % (self.live_server_url, reverse_lazy("accounts:inbox"))
+        )
 
         # Send message.
-        message_count = len(self.selenium.find_elements(By.CSS_SELECTOR, '.message'))
+        message_count = len(self.selenium.find_elements(By.CSS_SELECTOR, ".message"))
         content_textarea = self.selenium.find_element(By.NAME, "content")
         content_textarea.send_keys("Lorem ipsum dolor sit amet.")
-        form = self.selenium.find_element(By.CSS_SELECTOR, '#message-form')
+        form = self.selenium.find_element(By.CSS_SELECTOR, "#message-form")
         form.submit()
 
         # Assert message.
