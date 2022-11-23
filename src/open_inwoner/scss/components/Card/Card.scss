@@ -114,6 +114,20 @@
     margin: 0 0 var(--card-spacing);
   }
 
+  &--compact .h4 {
+    padding: 0 0 var(--card-spacing);
+    position: relative;
+
+    &:before {
+      bottom: 0;
+      content: '';
+      border-bottom: var(--card-size-border) solid var(--card-color-border);
+      width: calc(100% + 2 * var(--card-spacing));
+      position: absolute;
+      left: calc(-1 * var(--card-spacing));
+    }
+  }
+
   &--product {
     padding: 20px;
     align-items: end;
@@ -155,22 +169,13 @@
     }
   }
 
-  /// List should have extra margin within a card.
-  .list {
-    margin: calc(var(--row-height) / 2) 0;
-  }
-
-  &--compact .list {
-    margin-top: 0;
-  }
-
   /// On a stretched card, the one and only link after a list should be placed on above the bottom border.
   &--stretch &__body {
     padding-bottom: 0;
   }
 
   &--stretch &__body .list:last-of-type {
-    padding-bottom: calc(var(--font-size-body) + var(--card-spacing));
+    padding-bottom: calc(var(--font-size-body) + var(--card-spacing) + 1em);
   }
 
   &--stretch .list + .link:first-of-type:last-of-type {

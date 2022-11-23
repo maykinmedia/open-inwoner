@@ -1,5 +1,5 @@
 {% load link_tags %}
-<li class="list-item{% if active %} list-item--active{% endif %}">
+<li class="list-item{% if active %} list-item--active{% endif %}{% if compact %} list-item--compact{% endif %}">
     {% if href %}<a class="link" href="{{ href }}">{% endif %}
     {% if caption %}<p class="p list-item__caption">{{ caption }}</p>{% endif %}
     {% if strong %}
