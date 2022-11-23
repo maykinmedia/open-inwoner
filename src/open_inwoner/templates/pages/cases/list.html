@@ -20,7 +20,7 @@
                             {% list_item case.description caption=_("Omschrijving") compact=True strong=False %}
                         {% endrender_list %}
 
-                        {% link href="accounts:case_status" object_id=case.uuid icon="arrow_forward" primary=True text=_("Bekijk zaak") %}
+                        {% link href="accounts:case_status" object_id=case.uuid icon="arrow_forward" primary=True text=_("Bekijk aanvraag") %}
                     {% endrender_card %}
                 {% endrender_column %}
             {% endfor %}
