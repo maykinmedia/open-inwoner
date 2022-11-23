@@ -33,6 +33,9 @@ class ActionViewTests(WebTest):
         self.edit_url = reverse(
             "accounts:action_edit", kwargs={"uuid": self.action.uuid}
         )
+        self.edit_status_url = reverse(
+            "accounts:action_edit_status", kwargs={"uuid": self.action.uuid}
+        )
         self.delete_url = reverse(
             "accounts:action_delete", kwargs={"uuid": self.action.uuid}
         )
@@ -235,3 +238,57 @@ class ActionViewTests(WebTest):
             "accounts:action_history", kwargs={"uuid": self.action_deleted.uuid}
         )
         self.app.get(url, user=self.user, status=404)
+
+    def test_action_status(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            self.edit_status_url,
+            {"status": StatusChoices.closed},
+            HTTP_HX_REQUEST="true",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.action.refresh_from_db()
+        self.assertEqual(self.action.status, StatusChoices.closed)
+
+    def test_action_status_requires_htmx_header(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            self.edit_status_url,
+            {"status": StatusChoices.closed},
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_action_status_invalid_post_data(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            self.edit_status_url,
+            {"not_the_parameter": 123},
+            HTTP_HX_REQUEST="true",
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_action_status_http_get_disallowed(self):
+        self.client.force_login(self.user)
+        response = self.client.get(
+            self.edit_status_url,
+            HTTP_HX_REQUEST="true",
+        )
+        self.assertEqual(response.status_code, 405)
+
+    def test_action_status_login_required(self):
+        response = self.client.post(
+            self.edit_status_url,
+            {"status": StatusChoices.closed},
+            HTTP_HX_REQUEST="true",
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_action_status_not_your_action(self):
+        other_user = UserFactory()
+        self.client.force_login(other_user)
+        response = self.client.post(
+            self.edit_status_url,
+            {"status": StatusChoices.closed},
+            HTTP_HX_REQUEST="true",
+        )
+        self.assertEqual(response.status_code, 404)

@@ -22,6 +22,24 @@ def actions(actions, request, action_form, **kwargs):
     return kwargs
 
 
+@register.inclusion_tag("components/Action/ActionStatusButton.html")
+def action_status_button(action, request, **kwargs):
+    """
+    Renders the actions in a filterable table.
+
+    Usage:
+        {% action_status_button actions=actions action_form=action_form %}
+
+
+        + action
+        - plan
+    """
+    # TODO update docs
+
+    kwargs.update(action=action, request=request)
+    return kwargs
+
+
 @register.simple_tag()
 def get_action_edit_url(action, plan=None):
     """
@@ -41,6 +59,27 @@ def get_action_edit_url(action, plan=None):
             kwargs={"plan_uuid": plan.uuid, "uuid": action.uuid},
         )
     return reverse("accounts:action_edit", kwargs={"uuid": action.uuid})
+
+
+@register.simple_tag()
+def get_action_edit_status_url(action, plan=None):
+    """
+    generates the correct action edit url. It can be plan action or a general action.
+
+    Usage:
+        {% get_action_edit_status_url action=action plan=plan %}
+        {% get_action_edit_status_url action=action %}
+
+    Variables:
+        + action: Action | The action the url should be generated from.
+        - plan: Plan | The plan the action edit url should be generated for.
+    """
+    if plan:
+        return reverse(
+            "plans:plan_action_edit_status",
+            kwargs={"plan_uuid": plan.uuid, "uuid": action.uuid},
+        )
+    return reverse("accounts:action_edit_status", kwargs={"uuid": action.uuid})
 
 
 @register.simple_tag()

@@ -83,4 +83,27 @@
       font-size: var(--font-size-body);
     }
   }
+
+  .actions__status-button {
+    border-width: 0;
+    border-radius: 5px;
+    padding: var(--spacing-small) var(--spacing-medium);
+    font-size: var(--font-size-body-small);
+    cursor: pointer;
+
+    &--open {
+      color: midnightblue;
+      background-color: powderblue;
+    }
+    &--closed {
+      color: darkgreen;
+      background-color: darkseagreen;
+    }
+
+    [class*='icon'],
+    [class*='Icon'] {
+      font-size: var(--font-size-body-small);
+      vertical-align: sub;
+    }
+  }
 }

@@ -156,6 +156,7 @@ INSTALLED_APPS = [
     "mozilla_django_oidc_db",
     "sessionprofile",
     "openformsclient",
+    "django_htmx",
     # Project applications.
     "open_inwoner.accounts",
     "open_inwoner.components",
@@ -180,6 +181,7 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
+    "django_htmx.middleware.HtmxMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "csp.contrib.rate_limiting.RateLimitedCSPMiddleware",
     "csp.middleware.CSPMiddleware",

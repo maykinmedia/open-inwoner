@@ -63,6 +63,7 @@ django==3.2.15
     #   django-filter
     #   django-formtools
     #   django-hijack
+    #   django-htmx
     #   django-import-export
     #   django-localflavor
     #   django-open-forms-client
@@ -129,6 +130,8 @@ django-filter==21.1
 django-formtools==2.3
     # via maykin-django-two-factor-auth
 django-hijack==3.0.4
+    # via -r requirements/base.in
+django-htmx==1.13.0
     # via -r requirements/base.in
 django-import-export==2.6.1
     # via -r requirements/base.in

@@ -23,3 +23,12 @@ import './toggle'
 import './session'
 
 window.htmx = require('htmx.org')
+
+// eval() is an issue with CSP
+window.htmx.config.allowEval = false
+
+// injecting a style element is an issue with CSP
+window.htmx.config.includeIndicatorStyles = false
+
+// for debugging
+// window.htmx.logAll();

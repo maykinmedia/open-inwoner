@@ -1,0 +1,6 @@
+{% load i18n testing_tags %}
+<div>
+    <h1>{{ title }}</h1>
+    <p>{% simple_test_tag %}</p>
+    {% inclusion_test_tag content %}
+</div>

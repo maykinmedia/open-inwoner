@@ -6,6 +6,7 @@ from django.utils.translation import ugettext as _
 from django_webtest import WebTest
 from webtest import Upload
 
+from open_inwoner.accounts.choices import StatusChoices
 from open_inwoner.accounts.models import Action
 from open_inwoner.accounts.tests.factories import ActionFactory, UserFactory
 
@@ -43,6 +44,10 @@ class PlanViewTests(WebTest):
         )
         self.action_edit_url = reverse(
             "plans:plan_action_edit",
+            kwargs={"plan_uuid": self.plan.uuid, "uuid": self.action.uuid},
+        )
+        self.action_edit_status_url = reverse(
+            "plans:plan_action_edit_status",
             kwargs={"plan_uuid": self.plan.uuid, "uuid": self.action.uuid},
         )
         self.action_delete_url = reverse(
@@ -434,3 +439,57 @@ class PlanViewTests(WebTest):
     def test_plan_export_not_your_plan(self):
         other_user = UserFactory()
         self.app.get(self.export_url, user=other_user, status=404)
+
+    def test_plan_action_status(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            self.action_edit_status_url,
+            {"status": StatusChoices.closed},
+            HTTP_HX_REQUEST="true",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.action.refresh_from_db()
+        self.assertEqual(self.action.status, StatusChoices.closed)
+
+    def test_plan_action_status_requires_htmx_header(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            self.action_edit_status_url,
+            {"status": StatusChoices.closed},
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_plan_action_status_invalid_post_data(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            self.action_edit_status_url,
+            {"not_the_parameter": 123},
+            HTTP_HX_REQUEST="true",
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_plan_action_status_http_get_disallowed(self):
+        self.client.force_login(self.user)
+        response = self.client.get(
+            self.action_edit_status_url,
+            HTTP_HX_REQUEST="true",
+        )
+        self.assertEqual(response.status_code, 405)
+
+    def test_plan_action_status_login_required(self):
+        response = self.client.post(
+            self.action_edit_status_url,
+            {"status": StatusChoices.closed},
+            HTTP_HX_REQUEST="true",
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_plan_action_status_not_your_action(self):
+        other_user = UserFactory()
+        self.client.force_login(other_user)
+        response = self.client.post(
+            self.action_edit_status_url,
+            {"status": StatusChoices.closed},
+            HTTP_HX_REQUEST="true",
+        )
+        self.assertEqual(response.status_code, 404)

@@ -3,6 +3,7 @@
 <div class="actions">
     {% render_form form=form method="GET" spaceless=True autosubmit=True form_action=form_action %}
     <div class="actions__filters">
+        {% render_form form=form method="GET" spaceless=True autosubmit=True form_action=form_action %}
         <div class="actions__filter-button">
             {% button text=_("Filter") type="button" bordered=True %}
         </div>
@@ -12,6 +13,7 @@
             {% input action_form.is_for no_label=True no_help=True icon="person" %}
             {% input action_form.status no_label=True no_help=True icon="expand_more" %}
         </div>
+        {% endrender_form %}
     </div>
     {% endrender_form %}
     <div class="actions__list">
@@ -72,7 +74,7 @@
                     <div class="table__explain">
                         {% trans "Status" %}
                     </div>
-                    {{ action.get_status_display }}
+                    {% action_status_button action=action request=request plan=plan %}
                 </div>
             </div>
         {% empty %}

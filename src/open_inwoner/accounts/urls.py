@@ -9,6 +9,7 @@ from .views import (
     ActionListExportView,
     ActionListView,
     ActionPrivateMediaView,
+    ActionUpdateStatusTagView,
     ActionUpdateView,
     CaseDetailView,
     CaseDocumentDownloadView,
@@ -56,6 +57,11 @@ urlpatterns = [
     path("actions/create/", ActionCreateView.as_view(), name="action_create"),
     path("actions/export/", ActionListExportView.as_view(), name="action_list_export"),
     path("actions/<str:uuid>/edit/", ActionUpdateView.as_view(), name="action_edit"),
+    path(
+        "actions/<str:uuid>/edit/status/",
+        ActionUpdateStatusTagView.as_view(),
+        name="action_edit_status",
+    ),
     path(
         "actions/<str:uuid>/delete/",
         ActionDeleteView.as_view(),
