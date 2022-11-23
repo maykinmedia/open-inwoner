@@ -12,5 +12,4 @@ requests-mock
 tblib
 
 # DigidLocal
-python3-saml
 pyopenssl
