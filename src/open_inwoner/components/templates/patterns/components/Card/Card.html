@@ -1,0 +1,22 @@
+{% load card_tags button_tags %}
+
+{% card title="Simple card" href="https://maykinmedia.nl" %}
+<br>
+<br>
+{% card title="Card with image" href="https://maykinmedia.nl" alt="sample image" src=image_src %}
+<br>
+<br>
+{% render_card title="Card with content" %}
+    {% button_row %}
+        {% button "Primary button" primary=True %}
+        {% button "Secondary button" secondary=True %}
+    {% endbutton_row %}
+{% endrender_card %}
+<br>
+<br>
+{% render_card title="Horizontal card" direction="horizontal" %}
+    {% button_row %}
+        {% button "Primary button" primary=True %}
+        {% button "Secondary button" secondary=True %}
+    {% endbutton_row %}
+{% endrender_card %}

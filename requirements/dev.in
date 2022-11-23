@@ -13,6 +13,7 @@ bandit
 django-debug-toolbar
 ddt-api-calls
 django-extensions
+django-pattern-library
 
 # Documentation
 sphinx

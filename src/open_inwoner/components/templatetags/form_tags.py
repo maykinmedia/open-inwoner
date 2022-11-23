@@ -376,7 +376,7 @@ def addclass(field, class_string):
         + field: Field | The field where the class needs to be added to.
         + class_string: string | The class that needs to be added.
     """
-    return field.as_widget(attrs={"class": class_string})
+    return field.as_widget(attrs={"class": class_string}) if field else ""
 
 
 @register.simple_tag(takes_context=True)

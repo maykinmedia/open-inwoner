@@ -1,0 +1,6 @@
+context:
+  conditions:
+    - positive_text: "Afgerond"
+      negative_text: "Niet afgerond"
+    - positive_text: "Afgerond"
+      negative_text: "Niet afgerond"

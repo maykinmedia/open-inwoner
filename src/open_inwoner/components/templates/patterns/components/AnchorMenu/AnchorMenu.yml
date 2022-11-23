@@ -1,0 +1,5 @@
+context:
+    anchors: [
+       ["http://www.maykinmedia.nl", "Maykin Media"],
+       ["https://opengem.nl", "Open Gemeente Initiatief"],
+    ]

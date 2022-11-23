@@ -585,7 +585,7 @@ python-stdnum==1.17
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-localflavor
-python3_saml @ git+https://github.com/maykinmedia/python3-saml.git@9f1ffa86fdfe68ccbcf063613c6e6cbb5447c360
+python3-saml @ git+https://github.com/maykinmedia/python3-saml.git@9f1ffa86fdfe68ccbcf063613c6e6cbb5447c360
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt

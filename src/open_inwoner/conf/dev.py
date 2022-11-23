@@ -93,10 +93,13 @@ if "test" in sys.argv:
     ES_INDEX_PRODUCTS = "products_test"
 
 # Django debug toolbar
-INSTALLED_APPS += ["ddt_api_calls", "django_extensions"]
+INSTALLED_APPS += ["ddt_api_calls", "django_extensions", "pattern_library"]
 # MIDDLEWARE += [
 #     "debug_toolbar.middleware.DebugToolbarMiddleware",
 # ]
+
+TEMPLATES[0]["OPTIONS"]["builtins"] = ["pattern_library.loader_tags"]
+
 INTERNAL_IPS = ("127.0.0.1",)
 DEBUG_TOOLBAR_CONFIG = {"INTERCEPT_REDIRECTS": False}
 DEBUG_TOOLBAR_PANELS = [
@@ -116,6 +119,7 @@ DEBUG_TOOLBAR_PANELS = [
     "ddt_api_calls.panels.APICallsPanel",
 ]
 
+
 # THOU SHALT NOT USE NAIVE DATETIMES
 warnings.filterwarnings(
     "error",
@@ -133,6 +137,28 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 TWO_FACTOR_PATCH_ADMIN = False
+
+PATTERN_LIBRARY = {
+    # Groups of templates for the pattern library navigation. The keys
+    # are the group titles and the values are lists of template name prefixes that will
+    # be searched to populate the groups.
+    "SECTIONS": (
+        ("components", ["patterns/components"]),
+    ),
+
+    # Configure which files to detect as templates.
+    "TEMPLATE_SUFFIX": ".html",
+
+    # Set which template components should be rendered inside of,
+    # so they may use page-level component dependencies like CSS.
+    "PATTERN_BASE_TEMPLATE_NAME": "patterns/base.html",
+
+    # Any template in BASE_TEMPLATE_NAMES or any template that extends a template in
+    # BASE_TEMPLATE_NAMES is a "page" and will be rendered as-is without being wrapped.
+    "BASE_TEMPLATE_NAMES": ["patterns/base_page.html"],
+}
+
+CSP_STYLE_SRC += "'sha256-XiOF6tyOyw+nMhIb/yCrJ01U9gjtghjEPwU0HkYJ5dM='",  # Django patterns library
 
 # Override settings with local settings.
 try:

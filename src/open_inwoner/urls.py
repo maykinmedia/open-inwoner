@@ -118,3 +118,8 @@ if settings.DEBUG and apps.is_installed("debug_toolbar"):
     urlpatterns = [
         path("__debug__/", include(debug_toolbar.urls)),
     ] + urlpatterns
+
+if settings.DEBUG and apps.is_installed("pattern_library"):
+    urlpatterns += [
+        path("pattern-library/", include("pattern_library.urls")),
+    ]

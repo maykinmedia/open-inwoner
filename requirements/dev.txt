@@ -137,6 +137,7 @@ django==3.2.15
     #   django-localflavor
     #   django-open-forms-client
     #   django-otp
+    #   django-pattern-library
     #   django-phonenumber-field
     #   django-polymorphic
     #   django-privates
@@ -279,6 +280,8 @@ django-otp==1.1.1
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   maykin-django-two-factor-auth
+django-pattern-library==1.0.0
+    # via -r requirements/dev.in
 django-phonenumber-field==5.2.0
     # via
     #   -c requirements/ci.txt
@@ -522,6 +525,7 @@ markdown==3.3.6
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   django-pattern-library
 markuppy==1.14
     # via
     #   -c requirements/ci.txt
@@ -679,7 +683,7 @@ python-stdnum==1.17
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-localflavor
-python3_saml @ git+https://github.com/maykinmedia/python3-saml.git@9f1ffa86fdfe68ccbcf063613c6e6cbb5447c360
+python3-saml @ git+https://github.com/maykinmedia/python3-saml.git@9f1ffa86fdfe68ccbcf063613c6e6cbb5447c360
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -698,6 +702,7 @@ pyyaml==6.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   bandit
+    #   django-pattern-library
     #   drf-spectacular
     #   gemma-zds-client
     #   tablib

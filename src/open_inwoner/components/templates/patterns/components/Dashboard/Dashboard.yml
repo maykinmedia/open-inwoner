@@ -1,0 +1,9 @@
+context:
+  case:
+    identification: "ZAAK-1"
+    start_date: "2022-11-23"
+    current_status: "Afgerond"
+    documents:
+      - "Fake document"
+      - "Another fake document"
+      - "Another fake document"

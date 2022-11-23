@@ -1,0 +1,20 @@
+{% load button_tags %}
+
+{% button "Primary button" primary=True %}
+{% button "Secondary button" secondary=True %}
+{% button "Normal button" %}
+{% button "Bordered button" bordered=True %}
+{% button "Pill button" pill=True %}
+{% button "Transparent button" transparent=True %}
+<br>
+<br>
+{% button "Button link" primary=True href="http://www.example.com" %}
+<br>
+<br>
+{% button "\"Previous\" button" icon="arrow_backward" icon_position="before" %}
+{% button "\"Next\" button" icon="arrow_forward" icon_position="after" %}
+{% button "Icon only" icon="arrow_forward" icon_position="after" hide_text=True %}
+{% button "Outlined icon button" icon="home" icon_outlined=True %}
+<br>
+<br>
+{% button "Disabled button" primary=True disabled=True %}
