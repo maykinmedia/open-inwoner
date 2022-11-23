@@ -1,4 +1,4 @@
-import 'htmx.org';
+import 'htmx.org'
 
 import './accessibility'
 import './actions'
@@ -22,4 +22,4 @@ import './search'
 import './toggle'
 import './session'
 
-window.htmx = require('htmx.org');
+window.htmx = require('htmx.org')
