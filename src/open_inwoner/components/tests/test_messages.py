@@ -115,18 +115,17 @@ class TestListItem(InclusionTagWebTest):
             self.config,
         )
 
-    # def test_my_sender_id(self):
-    # TODO: Test is failing. For sven to take a look
-    #     """
-    #     Tests that:
-    #         - Message tags receive the correct value for `ours`.
-    #     """
-    #     self.assertSelector(f"#message-{self.message_1.pk}.message--ours", self.config)
-    #     self.assertSelector(f"#message-{self.message_2.pk}.message--ours", self.config)
-    #     self.assertSelector(
-    #         f"#message-{self.message_3.pk}.message--theirs", self.config
-    #     )
-    #     self.assertSelector(f"#message-{self.message_4.pk}.message--ours", self.config)
+    def test_my_sender_id(self):
+        """
+        Tests that:
+            - Message tags receive the correct value for `ours`.
+        """
+        self.assertSelector(f"#message-{self.message_1.pk}.message--ours", self.config)
+        self.assertSelector(f"#message-{self.message_2.pk}.message--ours", self.config)
+        self.assertSelector(
+            f"#message-{self.message_3.pk}.message--theirs", self.config
+        )
+        self.assertSelector(f"#message-{self.message_4.pk}.message--ours", self.config)
 
     def test_subject(self):
         """
