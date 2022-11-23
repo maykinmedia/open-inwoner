@@ -1,54 +1,48 @@
 {% extends 'master.html' %}
-{% load i18n icon_tags link_tags anchor_menu_tags utils %}
+{% load i18n anchor_menu_tags card_tags grid_tags icon_tags link_tags list_tags utils %}
 
 {% block sidebar_content %}
-{% anchor_menu anchors=anchors desktop=True %}
+    {% anchor_menu anchors=anchors desktop=True %}
 {% endblock sidebar_content %}
 
 {% block content %}
     <h1 class="h1" id="title">{% trans "Mijn aanvragen" %}</h2>
 
     <div class="cases">
-        <h2 class="h2" id="pending_apps">{% trans "Lopende aanvragen" %}</h2>
-        <div class="tabled tabled--tiny-end">
-            <div class="tabled__header">
-                <div class="tabled__item">{% trans "Aanvraag" %}</div>
-                <div class="tabled__item">{% trans "Status" %}</div>
-                <div class="tabled__item">{% trans "Startdatum" %}</div>
-            </div>
+        <h2 class="h2" id="pending_apps">{% trans "Lopende aanvragen" %} ({{ open_cases|length }})</h2>
+        {% render_grid %}
             {% for case in open_cases %}
-                <div class="tabled__row">
-                    <div class="tabled__item">
-                        {% link href="accounts:case_status" object_id=case.uuid text=case.description hide_text=False %}
-                    </div>
-                    <div class="tabled__item">{{ case.current_status }}</div>
-                    <div class="tabled__item">{{ case.start_date }}</div>
-                    <div class="tabled__item tabled__item--right">
-                        
-                    </div>
-                </div>
+                {% render_column start=forloop.counter_0|multiply:4 span=4 %}
+                    {% render_card compact=True stretch=True title=case.identificatie %}
+                        {% render_list %}
+                            {% list_item case.current_status caption=_("Status") compact=True strong=False %}
+                            {% list_item case.start_date caption=_("Ontvangstdatum") compact=True strong=False %}
+                            {% list_item case.description caption=_("Omschrijving") compact=True strong=False %}
+                        {% endrender_list %}
+
+                        {% link href="accounts:case_status" object_id=case.uuid icon="arrow_forward" primary=True text=_("Bekijk aanvraag") %}
+                    {% endrender_card %}
+                {% endrender_column %}
             {% endfor %}
-        </div>
+        {% endrender_grid %}
     </div>
 
     <div class="cases">
-        <h2 class="h2" id="completed_apps">{% trans "Afgeronde aanvragen" %}</h2>
-        <div class="tabled">
-            <div class="tabled__header">
-                <div class="tabled__item">{% trans "Aanvraag" %}</div>
-                <div class="tabled__item">{% trans "Status" %}</div>
-                <div class="tabled__item">{% trans "Startdatum" %}</div>
-                <div class="tabled__item">{% trans "Einddatum" %}</div>
-            </div>
-
+        <h2 class="h2" id="completed_apps">{% trans "Afgeronde aanvragen" %} ({{ closed_cases|length }})</h2>
+        {% render_grid %}
             {% for case in closed_cases %}
-                <div class="tabled__row">
-                    <div class="tabled__item">{{ case.description }}</div>
-                    <div class="tabled__item tabled__item--color-gray-dark">{{ case.current_status }}</div>
-                    <div class="tabled__item">{{ case.start_date }}</div>
-                    <div class="tabled__item">{{ case.end_date }}</div>
-                </div>
+                {% render_column start=forloop.counter_0|multiply:4 span=4 %}
+                    {% render_card compact=True stretch=True title=case.identificatie %}
+                        {% render_list %}
+                            {% list_item case.current_status caption=_("Status") compact=True strong=False %}
+                            {% list_item case.start_date caption=_("Ontvangstdatum") compact=True strong=False %}
+                            {% list_item case.description caption=_("Omschrijving") compact=True strong=False %}
+                        {% endrender_list %}
+
+                        {% link href="accounts:case_status" object_id=case.uuid icon="arrow_forward" primary=True text=_("Bekijk aanvraag") %}
+                    {% endrender_card %}
+                {% endrender_column %}
             {% endfor %}
-        </div>
+        {% endrender_grid %}
     </div>
 {% endblock content %}

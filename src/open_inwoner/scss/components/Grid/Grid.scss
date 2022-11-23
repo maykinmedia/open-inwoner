@@ -74,6 +74,7 @@
 
 .grid + .grid,
 .h1 + .grid,
+.h2 + .grid,
 .h4 + .grid {
   margin-top: var(--spacing-large);
 }
