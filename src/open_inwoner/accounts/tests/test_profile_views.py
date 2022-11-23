@@ -16,6 +16,13 @@ class ProfileViewTests(WebTest):
         self.return_url = reverse("logout")
         self.user = UserFactory()
 
+        self.action_deleted = ActionFactory(
+            name="deleted action, should not show up",
+            created_by=self.user,
+            is_deleted=True,
+            status=StatusChoices.open,
+        )
+
     def test_login_required(self):
         login_url = reverse("login")
         response = self.app.get(self.url)

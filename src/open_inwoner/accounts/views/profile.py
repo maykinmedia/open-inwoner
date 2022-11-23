@@ -2,6 +2,7 @@ from datetime import date
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q
 from django.forms.forms import Form
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
@@ -57,7 +58,8 @@ class MyProfileView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormView)
 
         context["mentor_contacts"] = mentor_contacts
         context["next_action"] = (
-            Action.objects.connected(self.request.user)
+            Action.objects.visible()
+            .connected(self.request.user)
             .filter(end_date__gte=today, status=StatusChoices.open)
             .order_by("end_date")
             .first()
@@ -65,7 +67,7 @@ class MyProfileView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormView)
         context["files"] = self.request.user.get_all_files()
         context["theme_text"] = self.request.user.get_interests()
         context["action_text"] = _(
-            f"{Action.objects.connected(self.request.user).filter(status=StatusChoices.open).count()} acties staan open."
+            f"{Action.objects.visible().connected(self.request.user).filter(status=StatusChoices.open).count()} acties staan open."
         )
         contacts = Contact.objects.get_extended_contacts_for_user(self.request.user)
         # Invited contacts
