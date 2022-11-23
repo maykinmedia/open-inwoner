@@ -3,8 +3,8 @@ from django.urls import reverse_lazy
 from django_webtest import WebTest
 from privates.test import temp_private_root
 from selenium.webdriver.common.by import By
+from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.webdriver import WebDriver
-
 from .factories import ContactFactory, MessageFactory, UserFactory
 from ..models import Message
 
@@ -125,7 +125,9 @@ class MySeleniumTests(StaticLiveServerTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.selenium = WebDriver()
+        options = Options()
+        options.headless = True
+        cls.selenium = WebDriver(options=options)
         cls.selenium.implicitly_wait(10)
 
     @classmethod
