@@ -1,0 +1,51 @@
+name: Resolve dependencies
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    tags:
+      - '**'
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  compile_dependencies_linux:
+    name: Run compile_dependencies on Linux
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Install pip-tools
+        run: pip install pip-tools
+
+      - name: Make sure current directory can be detected a git repository
+        run: git init
+
+      - name: Run bin/compile_dependencies.sh
+        run: ./bin/compile_dependencies.sh
+
+
+  compile_dependencies_macos:
+    name: Run compile_dependencies on MacOS
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Install pip-tools
+        run: pip install pip-tools
+
+      - name: Make sure current directory can be detected a git repository
+        run: git init
+
+      - name: Run bin/compile_dependencies.sh
+        run: ./bin/compile_dependencies.sh
