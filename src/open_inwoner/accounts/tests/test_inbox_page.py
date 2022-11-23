@@ -1,12 +1,14 @@
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.urls import reverse_lazy
+
 from django_webtest import WebTest
 from privates.test import temp_private_root
 from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.webdriver import WebDriver
-from .factories import ContactFactory, MessageFactory, UserFactory
+
 from ..models import Message
+from .factories import ContactFactory, MessageFactory, UserFactory
 
 
 class InboxPageTests(WebTest):
