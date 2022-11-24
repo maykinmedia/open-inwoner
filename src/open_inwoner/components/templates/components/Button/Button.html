@@ -7,6 +7,7 @@
         title="{% firstof title text %}"
         aria-label="{% firstof title text %}"
         {% if href|startswith:"http" %}target="_blank"{% endif %}
+        {% as_attributes extra_attributes %}
     >
         {% if icon %}{% icon icon=icon outlined=icon_outlined %}{% endif %}
         {% if not hide_text %}{{text}}{% endif %}
@@ -18,6 +19,7 @@
         name="{{ name }}"
         title="{% firstof title text %}"
         aria-label="{% firstof title text %}"
+        {% as_attributes extra_attributes %}
     >
         {% if icon %}{% icon icon=icon outlined=icon_outlined %}{% endif %}
         {% if not hide_text %}{{text}}{% endif %}

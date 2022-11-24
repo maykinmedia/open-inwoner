@@ -24,6 +24,7 @@ def dropdown(parser, token):
     Variables:
         - icon: string | The icon that should be shown in the dropdown button.
         - text: string | The text that should be shown in the dropdown button.
+        - class: str | Additional classes.
         - disabled: bool | Wether the dropdown should be disabled.
 
     Extra context:

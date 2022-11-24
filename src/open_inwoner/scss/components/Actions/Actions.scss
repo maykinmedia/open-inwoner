@@ -83,13 +83,10 @@
       font-size: var(--font-size-body);
     }
   }
-
-  .actions__status-button {
-    border-width: 0;
+  .actions__status-selector {
     border-radius: 5px;
     padding: var(--spacing-small) var(--spacing-medium);
-    font-size: var(--font-size-body-small);
-    cursor: pointer;
+    font-size: var(--font-size-body);
 
     &--open {
       color: midnightblue;
@@ -99,11 +96,9 @@
       color: darkgreen;
       background-color: darkseagreen;
     }
-
-    [class*='icon'],
-    [class*='Icon'] {
-      font-size: var(--font-size-body-small);
-      vertical-align: sub;
+    &--approval {
+      color: darkred;
+      background-color: sandybrown;
     }
   }
 }

@@ -439,11 +439,6 @@ class Action(models.Model):
 
     objects = ActionQueryset.as_manager()
 
-    status_icons = {
-        StatusChoices.open: "format_list_bulleted",
-        StatusChoices.closed: "check",
-    }
-
     class Meta:
         ordering = ("end_date", "-created_on")
         verbose_name = _("Action")
@@ -477,15 +472,8 @@ class Action(models.Model):
 
         return template.send_email(to_emails, context)
 
-    def get_next_status(self):
-        if self.status == StatusChoices.open:
-            return StatusChoices.closed
-        else:
-            return StatusChoices.open
-
-    def get_icon_for_status(self, status: str = None):
-        status = status or self.status
-        return self.status_icons.get(status, "help")
+    def get_status_icon(self):
+        return StatusChoices.get_icon(self.status)
 
 
 class Message(models.Model):

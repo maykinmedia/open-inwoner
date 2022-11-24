@@ -1,10 +1,11 @@
 {% load i18n form_tags icon_tags button_tags dropdown_tags action_tags link_tags %}
 
-{% get_action_edit_status_url action=action plan=plan as action_url %}
-<button
-    id="actions_{{ action.pk }}__status"
-    class="actions__status-button actions__status-button--{{ action.status }}"
-    hx-post="{{ action_url }}"
-    hx-swap="outerHTML"
-    hx-vals='{"status": "{{ action.get_next_status }}"}'
->{% icon icon=action.get_icon_for_status %} {{ action.get_status_display }}</button>
+<div id="{{ swap_target_id }}">
+{% dropdown icon=icon text=text class=class %}
+    {% for status in choices %}
+    <div class="dropdown__item">
+        {% button icon=status.icon text=status.text class=status.class disabled=status.disabled extra_attributes=status.extra_attributes type="button" %}
+    </div>
+    {% endfor %}
+{% enddropdown %}
+</div>

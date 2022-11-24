@@ -1,5 +1,6 @@
 from django import template
 from django.urls import reverse
+from django.utils.html import format_html_join
 
 register = template.Library()
 
@@ -40,3 +41,10 @@ def get_product_url(context, product):
             kwargs={"theme_slug": category.get_build_slug(), "slug": product.slug},
         )
     return product.get_absolute_url()
+
+
+@register.simple_tag
+def as_attributes(attribute_dict):
+    if not attribute_dict:
+        return ""
+    return format_html_join(" ", '{}="{}"', attribute_dict.items())
