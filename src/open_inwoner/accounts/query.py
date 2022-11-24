@@ -1,4 +1,4 @@
-from django.db.models import Case, Exists, F, Max, OuterRef, Q, Subquery, Value, When
+from django.db.models import Case, F, Max, OuterRef, Q, Subquery, Value, When
 from django.db.models.query import QuerySet
 
 
@@ -152,3 +152,8 @@ class ContactQuerySet(QuerySet):
                 )
             )
         )
+
+
+class InviteQuerySet(QuerySet):
+    def get_pending_invitations_for_user(self, me: "User") -> "InviteQuerySet":
+        return self.filter(inviter=me, accepted=False)

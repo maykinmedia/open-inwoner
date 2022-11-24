@@ -25,7 +25,7 @@ class _UserAdmin(UserAdmin):
         "first_name",
     )
     fieldsets = (
-        (None, {"fields": ("email", "password", "login_type")}),
+        (None, {"fields": ("uuid", "email", "password", "login_type")}),
         (
             _("Personal info"),
             {
@@ -60,6 +60,10 @@ class _UserAdmin(UserAdmin):
                 ),
             },
         ),
+        (
+            _("Contacts - invites"),
+            {"fields": ("user_contacts", "contacts_for_approval")},
+        ),
         (_("Important dates"), {"fields": ("last_login", "date_joined")}),
     )
     add_fieldsets = (
@@ -71,7 +75,7 @@ class _UserAdmin(UserAdmin):
             },
         ),
     )
-    readonly_fields = ("bsn", "rsin", "is_prepopulated", "oidc_id")
+    readonly_fields = ("bsn", "rsin", "is_prepopulated", "oidc_id", "uuid")
     list_display = (
         "email",
         "first_name",

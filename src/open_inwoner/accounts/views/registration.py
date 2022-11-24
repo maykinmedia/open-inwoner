@@ -29,8 +29,8 @@ class InviteMixin:
                 {
                     "invite": invite,
                     "email": invite.invitee_email,
-                    "first_name": invite.contact.first_name,
-                    "last_name": invite.contact.last_name,
+                    "first_name": invite.invitee_first_name,
+                    "last_name": invite.invitee_last_name,
                 }
             )
 
@@ -45,17 +45,16 @@ class InviteMixin:
         return get_object_or_404(Invite, key=invite_key)
 
     def add_invitee(self, invite, user):
-        """update invite and related contact and create reversed contact"""
+        """update invite and related contact"""
         if not invite.invitee:
             invite.accepted = True
             invite.invitee = user
             invite.save()
 
-        #  update contact user
-        contact = invite.contact
-        if contact and not contact.contact_user:
-            contact.contact_user = user
-            contact.save()
+        #  update inviter - invitee relationship
+        inviter_contacts = invite.inviter.user_contacts.all()
+        if not invite.invitee in inviter_contacts:
+            invite.inviter.user_contacts.add(invite.invitee)
 
 
 class CustomRegistrationView(LogMixin, InviteMixin, RegistrationView):

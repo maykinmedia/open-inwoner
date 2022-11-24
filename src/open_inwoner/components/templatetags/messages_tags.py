@@ -105,3 +105,18 @@ def message(message: Message, me: User, file=False) -> dict:
         - ours: bool | if we send the message or not.
     """
     return {"message": message, "ours": message.sender == me, "file": file}
+
+
+@register.simple_tag(takes_context=True)
+def get_message_url(context, user, contact):
+    """
+    Builds the message url based on the given user and contact.
+
+    Usage:
+        {% get_message_url user=self.request.user contact=contact as message_url %}
+
+    Variables:
+        + user: User | The loggedin user.
+        + contact: User | The contact we should generate the url for.
+    """
+    return user.get_contact_message_url(contact)

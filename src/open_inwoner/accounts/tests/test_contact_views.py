@@ -16,10 +16,9 @@ class ContactViewTests(WebTest):
 
     def setUp(self) -> None:
         self.user = UserFactory()
-        self.contact = ContactFactory(
-            first_name="contact_that_should_be_found", created_by=self.user
-        )
 
+        self.contact = UserFactory()
+        self.user.user_contacts.add(self.contact)
         self.login_url = reverse("login")
         self.list_url = reverse("accounts:contact_list")
         self.edit_url = reverse(
@@ -46,10 +45,9 @@ class ContactViewTests(WebTest):
         self.assertNotContains(response, self.contact.first_name)
 
     def test_contact_filter(self):
-        begeleider = ContactFactory(
-            contact_user__contact_type=ContactTypeChoices.begeleider,
-            created_by=self.user,
-        )
+        begeleider = UserFactory(contact_type=ContactTypeChoices.begeleider)
+        self.user.user_contacts.add(begeleider)
+
         response = self.app.get(self.list_url, user=self.user)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.contact.first_name)
@@ -61,24 +59,6 @@ class ContactViewTests(WebTest):
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, self.contact.first_name)
         self.assertContains(response, begeleider.first_name)
-
-    def test_contact_filter_when_no_user_is_connected(self):
-        contact = ContactFactory(created_by=self.user, email=None, contact_user=None)
-        begeleider = ContactFactory(
-            contact_user__contact_type=ContactTypeChoices.begeleider,
-            created_by=self.user,
-        )
-        response = self.app.get(self.list_url, user=self.user)
-        self.assertContains(response, self.contact.first_name)
-        self.assertContains(response, contact.first_name)
-
-        form = response.forms["contact-filter"]
-        form["type"] = ContactTypeChoices.contact
-        response = form.submit()
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.contact.first_name)
-        self.assertContains(response, contact.first_name)
-        self.assertNotContains(response, begeleider.first_name)
 
     def test_contact_filter_without_any_contacts(self):
         self.contact.delete()
@@ -97,23 +77,16 @@ class ContactViewTests(WebTest):
         )
 
     def test_contact_list_show_link_to_messages(self):
-        other_user = UserFactory()
-        contact = ContactFactory.create(created_by=self.user, contact_user=other_user)
-        contacts = Contact.objects.get_extended_contacts_for_user(self.user)
-        extended_contact = contacts.get(id=contact.id)
         message_link = (
-            furl(reverse("accounts:inbox"))
-            .add({"with": extended_contact.other_user_email})
-            .url
+            furl(reverse("accounts:inbox")).add({"with": self.contact.email}).url
         )
         response = self.app.get(self.list_url, user=self.user)
         self.assertContains(response, message_link)
 
     def test_contact_list_show_reversed(self):
-        ContactFactory.create(
-            contact_user=self.user,
-            created_by__first_name="reverse_contact_user_should_be_found",
-        )
+        other_contact = UserFactory(first_name="reverse_contact_user_should_be_found")
+        other_contact.user_contacts.add(self.user)
+
         response = self.app.get(self.list_url, user=self.user)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "reverse_contact_user_should_be_found")
@@ -135,8 +108,8 @@ class ContactViewTests(WebTest):
         response = self.app.get(self.create_url)
         self.assertRedirects(response, f"{self.login_url}?next={self.create_url}")
 
-    def test_contact_create_send_invite(self):
-        contacts_before = self.user.contacts.count()
+    def test_non_existing_user_contact_not_created_and_invite_sent(self):
+        contacts_before = self.user.user_contacts.count()
         response = self.app.get(self.create_url, user=self.user)
         self.assertEqual(response.status_code, 200)
 
@@ -148,20 +121,13 @@ class ContactViewTests(WebTest):
         response = form.submit(user=self.user)
 
         self.assertEqual(response.status_code, 302)
-
-        # check that the contact was created
-        self.assertEqual(self.user.contacts.count(), contacts_before + 1)
-        contact = self.user.contacts.order_by("-pk").first()
-        self.assertEqual(contact.first_name, "John")
-        self.assertEqual(contact.last_name, "Smith")
-        self.assertEqual(contact.email, "john@smith.nl")
-
-        # check that the contact user was not created
-        self.assertIsNone(contact.contact_user)
+        # check that the contact was not created
+        self.assertEqual(self.user.user_contacts.count(), contacts_before)
+        contact = self.user.user_contacts.order_by("-pk").first()
 
         # check that the invite was created
-        self.assertEqual(contact.invites.count(), 1)
-        invite = contact.invites.get()
+        self.assertEqual(contact.received_invites.count(), 1)
+        invite = contact.sent_invites.first()
         self.assertEqual(invite.inviter, self.user)
         self.assertEqual(invite.invitee_email, contact.email)
 

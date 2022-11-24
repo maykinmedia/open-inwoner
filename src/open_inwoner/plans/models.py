@@ -112,6 +112,13 @@ class Plan(models.Model):
         blank=True,
         help_text=_("The contact that will help you with this plan."),
     )
+    plan_contacts = models.ManyToManyField(
+        "accounts.User",
+        verbose_name=_("Contacts"),
+        related_name="plans",
+        blank=True,
+        help_text=_("The contact that will help you with this plan."),
+    )
     created_by = models.ForeignKey(
         "accounts.User", verbose_name=_("Created by"), on_delete=models.CASCADE
     )

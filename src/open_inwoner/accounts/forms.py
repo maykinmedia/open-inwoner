@@ -120,41 +120,33 @@ class ContactFilterForm(forms.Form):
     )
 
 
-class ContactForm(forms.ModelForm):
-    def __init__(self, user, create, *args, **kwargs):
-        self.user = user
-        self.create = create
-        super().__init__(*args, **kwargs)
+class ContactCreateForm(forms.Form):
+    first_name = forms.CharField(max_length=255)
+    last_name = forms.CharField(max_length=255)
+    email = forms.EmailField()
+    phonenumber = forms.CharField(required=False, max_length=15)
 
-    class Meta:
-        model = Contact
-        fields = ("first_name", "last_name", "email", "phonenumber")
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
 
     def clean(self):
         cleaned_data = super().clean()
         email = cleaned_data.get("email")
 
-        if self.create and email:
-            if (
-                self.user.contacts.filter(email=email).exists()
-                or self.user.assigned_contacts.filter(created_by__email=email).exists()
-            ):
+        if email:
+            if self.user.user_contacts.filter(email=email).exists():
                 raise ValidationError(
                     _(
                         "Het ingevoerde e-mailadres komt al voor in uw contactpersonen. Pas de gegevens aan en probeer het opnieuw."
                     )
                 )
 
-    def save(self, commit=True):
-        if not self.instance.pk:
-            self.instance.created_by = self.user
 
-        if not self.instance.pk and self.instance.email:
-            contact_user = User.objects.filter(email=self.instance.email).first()
-            if contact_user:
-                self.instance.contact_user = contact_user
-
-        return super().save(commit=commit)
+class ContactUpdateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ("first_name", "last_name", "email", "phonenumber")
 
 
 class UserField(forms.ModelChoiceField):
