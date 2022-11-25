@@ -83,12 +83,8 @@ class CaseAccessMixin(AccessMixin):
         return fetch_single_case(case_uuid)
 
 
-class CaseListView(BaseBreadcrumbMixin, CaseAccessMixin, TemplateView):
+class CaseListMixin:
     template_name = "pages/cases/list.html"
-
-    @cached_property
-    def crumbs(self):
-        return [(_("Mijn aanvragen"), reverse("accounts:my_cases"))]
 
     def get_cases(self):
         cases = fetch_cases(self.request.user.bsn)
@@ -114,10 +110,10 @@ class CaseListView(BaseBreadcrumbMixin, CaseAccessMixin, TemplateView):
         for case in cases:
             # Fetch case's current status
             # todo parallel
-            case.status_obj = fetch_specific_status(case.status)
+            case.status = fetch_specific_status(case.status)
 
-            case.zaaktype_obj = case_types[case.zaaktype]
-            case.status_obj.status_type_obj = status_types[case.status_obj.status_type]
+            case.zaaktype = case_types[case.zaaktype]
+            case.status.statustype = status_types[case.status.statustype]
 
         # Prepare data for frontend
         updated_cases = []
@@ -129,8 +125,8 @@ class CaseListView(BaseBreadcrumbMixin, CaseAccessMixin, TemplateView):
                     "start_date": case.startdatum,
                     "end_date": getattr(case, "einddatum", None),
                     "description": case.omschrijving,
-                    "zaaktype_description": case.zaaktype_obj.omschrijving,
-                    "current_status": case.status_obj.statustype_obj.omschrijving,
+                    "zaaktype_description": case.zaaktype.omschrijving,
+                    "current_status": case.status.statustype.omschrijving,
                 }
             )
 
@@ -141,26 +137,65 @@ class CaseListView(BaseBreadcrumbMixin, CaseAccessMixin, TemplateView):
 
         raw_cases = self.get_cases()
         cases = self.process_cases(raw_cases)
+        context["cases"] = cases
 
-        context["anchors"] = [
-            ("#pending_apps", _("Lopende aanvragen")),
-            ("#completed_apps", _("Afgeronde aanvragen")),
-        ]
-
-        context["open_cases"] = [
-            case
-            for case in cases
-            if not case["end_date"] and not case["current_status"] == "Afgerond"
-        ]
-        context["open_cases"].sort(key=lambda case: case["start_date"])
-        context["closed_cases"] = [
-            case
-            for case in cases
-            if case["end_date"] or case["current_status"] == "Afgerond"
-        ]
-        context["closed_cases"].sort(key=lambda case: case["end_date"])
-
+        context["anchors"] = self.get_anchors()
+        context["title"] = self.get_title()
         return context
+
+    def get_anchors(self) -> list:
+        return []
+
+    def get_title(self) -> str:
+        return ""
+
+
+class OpenCaseListView(
+    BaseBreadcrumbMixin, CaseAccessMixin, CaseListMixin, TemplateView
+):
+    @cached_property
+    def crumbs(self):
+        return [(_("Mijn aanvragen"), reverse("accounts:my_open_cases"))]
+
+    def get_cases(self):
+        all_cases = super().get_cases()
+
+        cases = [case for case in all_cases if not case.einddatum]
+        cases.sort(key=lambda case: case.startdatum)
+        return cases
+
+    def get_anchors(self) -> list:
+        return [
+            ("#cases", _("Lopende aanvragen")),
+            (reverse("accounts:my_closed_cases"), _("Afgeronde aanvragen")),
+        ]
+
+    def get_title(self) -> str:
+        return _("Lopende aanvragen")
+
+
+class ClosedCaseListView(
+    BaseBreadcrumbMixin, CaseAccessMixin, CaseListMixin, TemplateView
+):
+    @cached_property
+    def crumbs(self):
+        return [(_("Mijn aanvragen"), reverse("accounts:my_closed_cases"))]
+
+    def get_cases(self):
+        all_cases = super().get_cases()
+
+        cases = [case for case in all_cases if case.einddatum]
+        cases.sort(key=lambda case: case.einddatum)
+        return cases
+
+    def get_anchors(self) -> list:
+        return [
+            (reverse("accounts:my_closed_cases"), _("Lopende aanvragen")),
+            ("#cases", _("Afgeronde aanvragen")),
+        ]
+
+    def get_title(self) -> str:
+        return _("Afgeronde aanvragen")
 
 
 @dataclasses.dataclass
@@ -176,7 +211,7 @@ class CaseDetailView(BaseBreadcrumbMixin, CaseAccessMixin, TemplateView):
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn aanvragen"), reverse("accounts:my_cases")),
+            (_("Mijn aanvragen"), reverse("accounts:my_open_cases")),
             (
                 _("Status"),
                 reverse("accounts:case_status", kwargs=self.kwargs),

@@ -115,11 +115,11 @@ def fetch_status_history(case_url: str) -> List[Status]:
 
 
 @cache_result("status:{status_url}", timeout=60 * 60)
-def fetch_specific_status(status_url: str) -> List[Status]:
+def fetch_specific_status(status_url: str) -> Optional[Status]:
     client = build_client("zaak")
 
     if client is None:
-        return []
+        return
 
     try:
         response = client.retrieve("status", url=status_url)

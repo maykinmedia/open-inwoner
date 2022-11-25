@@ -12,7 +12,7 @@ from .views import (
     ActionUpdateView,
     CaseDetailView,
     CaseDocumentDownloadView,
-    CaseListView,
+    ClosedCaseListView,
     ContactCreateView,
     ContactDeleteView,
     ContactListView,
@@ -29,6 +29,7 @@ from .views import (
     MyProfileExportView,
     MyProfileView,
     NecessaryFieldsUserView,
+    OpenCaseListView,
 )
 
 app_name = "accounts"
@@ -85,7 +86,8 @@ urlpatterns = [
     ),
     path("contacts/", ContactListView.as_view(), name="contact_list"),
     path("themes/", MyCategoriesView.as_view(), name="my_themes"),
-    path("cases/", CaseListView.as_view(), name="my_cases"),
+    path("cases/open/", OpenCaseListView.as_view(), name="my_open_cases"),
+    path("cases/closed/", ClosedCaseListView.as_view(), name="my_closed_cases"),
     path(
         "cases/<str:object_id>/document/<str:info_id>/",
         CaseDocumentDownloadView.as_view(),

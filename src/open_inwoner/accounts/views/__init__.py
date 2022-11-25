@@ -12,7 +12,12 @@ from .auth import (
     LogPasswordResetConfirmView,
     LogPasswordResetView,
 )
-from .cases import CaseDetailView, CaseDocumentDownloadView, CaseListView
+from .cases import (
+    CaseDetailView,
+    CaseDocumentDownloadView,
+    ClosedCaseListView,
+    OpenCaseListView,
+)
 from .contacts import (
     ContactCreateView,
     ContactDeleteView,

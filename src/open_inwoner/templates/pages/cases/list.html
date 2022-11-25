@@ -9,9 +9,9 @@
     <h1 class="h1" id="title">{% trans "Mijn aanvragen" %}</h1>
 
     <div class="cases">
-        <h2 class="h2" id="pending_apps">{% trans "Lopende aanvragen" %} ({{ open_cases|length }})</h2>
+        <h2 class="h2" id="cases">{{ title }} ({{ cases|length }})</h2>
         {% render_grid %}
-            {% for case in open_cases %}
+            {% for case in cases %}
                 {% render_column start=forloop.counter_0|multiply:4 span=4 %}
                     {% render_card compact=True stretch=True title=case.identificatie %}
                         {% render_list %}
@@ -27,22 +27,4 @@
         {% endrender_grid %}
     </div>
 
-    <div class="cases">
-        <h2 class="h2" id="completed_apps">{% trans "Afgeronde aanvragen" %} ({{ closed_cases|length }})</h2>
-        {% render_grid %}
-            {% for case in closed_cases %}
-                {% render_column start=forloop.counter_0|multiply:4 span=4 %}
-                    {% render_card compact=True stretch=True title=case.identificatie %}
-                        {% render_list %}
-                            {% list_item case.current_status caption=_("Status") compact=True strong=False %}
-                            {% list_item case.start_date caption=_("Ontvangstdatum") compact=True strong=False %}
-                            {% list_item case.description caption=_("Omschrijving") compact=True strong=False %}
-                        {% endrender_list %}
-
-                        {% link href="accounts:case_status" object_id=case.uuid icon="arrow_forward" primary=True text=_("Bekijk aanvraag") %}
-                    {% endrender_card %}
-                {% endrender_column %}
-            {% endfor %}
-        {% endrender_grid %}
-    </div>
 {% endblock content %}
