@@ -157,7 +157,7 @@ class OpenCaseListView(
         all_cases = super().get_cases()
 
         cases = [case for case in all_cases if not case.einddatum]
-        cases.sort(key=lambda case: case.startdatum)
+        cases.sort(key=lambda case: case.startdatum, reverse=True)
         return cases
 
     def get_anchors(self) -> list:
@@ -181,7 +181,7 @@ class ClosedCaseListView(
         all_cases = super().get_cases()
 
         cases = [case for case in all_cases if case.einddatum]
-        cases.sort(key=lambda case: case.einddatum)
+        cases.sort(key=lambda case: case.einddatum, reverse=True)
         return cases
 
     def get_anchors(self) -> list:
@@ -224,7 +224,7 @@ class CaseDetailView(BaseBreadcrumbMixin, CaseAccessMixin, TemplateView):
             statuses.sort(key=lambda status: status.datum_status_gezet)
 
             case_type = fetch_single_case_type(self.case.zaaktype)
-            status_types = fetch_status_types(case_type=self.case.zaaktype)
+            status_types = fetch_status_types(case_type_url=self.case.zaaktype)
 
             status_types_mapping = {st.url: st for st in status_types}
             for status in statuses:

@@ -47,30 +47,6 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
         )
         cls.config.save()
 
-        cls.zaak1 = generate_oas_component(
-            "zrc",
-            "schemas/Zaak",
-            url=f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
-            zaaktype=f"{CATALOGI_ROOT}zaaktypen/53340e34-7581-4b04-884f",
-            identificatie="ZAAK-2022-0000000001",
-            omschrijving="Coffee zaak1",
-            startdatum="2022-01-02",
-            einddatum=None,
-            status=f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
-            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
-        )
-        cls.zaak2 = generate_oas_component(
-            "zrc",
-            "schemas/Zaak",
-            url=f"{ZAKEN_ROOT}zaken/e4d469b9-6666-4bdd-bf42-b53445298102",
-            zaaktype=f"{CATALOGI_ROOT}zaaktypen/53340e34-7581-4b04-884f",
-            identificatie="ZAAK-2022-0008800002",
-            omschrijving="Coffee zaak2",
-            startdatum="2022-01-12",
-            einddatum=None,
-            status=f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-beu760sle929",
-            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
-        )
         cls.zaaktype = generate_oas_component(
             "ztc",
             "schemas/ZaakType",
@@ -79,29 +55,11 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
             catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             vertrouwelijkheidaanduiding="openbaar",
         )
-        cls.status1 = generate_oas_component(
-            "zrc",
-            "schemas/Zaak",
-            url=f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-beu760sle929",
-            zaak=f"{ZAKEN_ROOT}zaken/e4d469b9-6666-4bdd-bf42-b53445298102",
-            statustype=f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-777yu878km09",
-            datum_status_gezet="2021-01-12",
-            statustoelichting="",
-        )
-        cls.status2 = generate_oas_component(
-            "zrc",
-            "schemas/Zaak",
-            url=f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
-            zaak=f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
-            statustype=f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-744516671fe4",
-            datum_status_gezet="2021-03-12",
-            statustoelichting="",
-        )
         cls.status_type1 = generate_oas_component(
             "ztc",
             "schemas/StatusType",
             url=f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-777yu878km09",
-            zaaktype=f"{CATALOGI_ROOT}zaaktypen/53340e34-7581-4b04-884f-8ff7e6a73c2c",
+            zaaktype=cls.zaaktype["url"],
             omschrijving="Initial request",
             volgnummer=1,
             is_eindstatus=False,
@@ -110,24 +68,55 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
             "ztc",
             "schemas/StatusType",
             url=f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-744516671fe4",
-            zaaktype=f"{CATALOGI_ROOT}zaaktypen/53340e34-7581-4b04-884f-8ff7e6a73c2c",
+            zaaktype=cls.zaaktype["url"],
             omschrijving="Finish",
             volgnummer=2,
             is_eindstatus=True,
         )
-
-        # objects needed to test how the cache is updated
-        cls.new_zaak = generate_oas_component(
+        cls.zaak1 = generate_oas_component(
             "zrc",
             "schemas/Zaak",
-            url=f"{ZAKEN_ROOT}zaken/a25b2dce-1cae-4fc9-b9e9-141b0ad5189f",
-            zaaktype=f"{CATALOGI_ROOT}zaaktypen/53340e34-7581-4b04-884f-98ui7y87i876",
-            identificatie="ZAAK-2022-0000000003",
-            omschrijving="Tea zaak",
+            url=f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
+            zaaktype=cls.zaaktype["url"],
+            identificatie="ZAAK-2022-0000000001",
+            omschrijving="Coffee zaak1",
             startdatum="2022-01-02",
             einddatum=None,
-            status=f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-oie8u899923g",
+            status=f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
         )
+        cls.status1 = generate_oas_component(
+            "zrc",
+            "schemas/Zaak",
+            url=f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-beu760sle929",
+            zaak=cls.zaak1["url"],
+            statustype=cls.status_type1["url"],
+            datum_status_gezet="2021-01-12",
+            statustoelichting="",
+        )
+        cls.zaak2 = generate_oas_component(
+            "zrc",
+            "schemas/Zaak",
+            url=f"{ZAKEN_ROOT}zaken/e4d469b9-6666-4bdd-bf42-b53445298102",
+            zaaktype=cls.zaaktype["url"],
+            identificatie="ZAAK-2022-0008800002",
+            omschrijving="Coffee zaak2",
+            startdatum="2022-01-12",
+            einddatum=None,
+            status=f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-beu760sle929",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+        )
+        cls.status2 = generate_oas_component(
+            "zrc",
+            "schemas/Zaak",
+            url=f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
+            zaak=cls.zaak2["url"],
+            statustype=cls.status_type2["url"],
+            datum_status_gezet="2021-03-12",
+            statustoelichting="",
+        )
+
+        # objects needed to test how the cache is updated
         cls.new_zaaktype = generate_oas_component(
             "ztc",
             "schemas/ZaakType",
@@ -136,23 +125,34 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
             catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             vertrouwelijkheidaanduiding="openbaar",
         )
-        cls.new_status = generate_oas_component(
-            "zrc",
-            "schemas/Zaak",
-            url=f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-oie8u899923g",
-            zaak=f"{ZAKEN_ROOT}zaken/a25b2dce-1cae-4fc9-b9e9-141b0ad5189f",
-            statustype=f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-984yr8887rhe",
-            datum_status_gezet="2021-01-12",
-            statustoelichting="",
-        )
         cls.new_status_type = generate_oas_component(
             "ztc",
             "schemas/StatusType",
             url=f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-984yr8887rhe",
-            zaaktype=f"{CATALOGI_ROOT}zaaktypen/53340e34-7581-4b04-884f-98ui7y87i876",
+            zaaktype=cls.new_zaaktype["url"],
             omschrijving="Process",
             volgnummer=1,
             is_eindstatus=False,
+        )
+        cls.new_zaak = generate_oas_component(
+            "zrc",
+            "schemas/Zaak",
+            url=f"{ZAKEN_ROOT}zaken/a25b2dce-1cae-4fc9-b9e9-141b0ad5189f",
+            zaaktype=cls.new_zaaktype["url"],
+            identificatie="ZAAK-2022-0000000003",
+            omschrijving="Tea zaak",
+            startdatum="2022-01-02",
+            einddatum=None,
+            status=f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-oie8u899923g",
+        )
+        cls.new_status = generate_oas_component(
+            "zrc",
+            "schemas/Zaak",
+            url=f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-oie8u899923g",
+            zaak=cls.new_zaak["url"],
+            statustype=cls.new_status_type["url"],
+            datum_status_gezet="2021-01-12",
+            statustoelichting="",
         )
 
     def _setUpMocks(self, m):
@@ -169,27 +169,32 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
             .url,
             json=paginated_response([self.zaak1, self.zaak2]),
         )
-        m.get(f"{CATALOGI_ROOT}zaaktypen/53340e34-7581-4b04-884f", json=self.zaaktype)
         m.get(
             f"{CATALOGI_ROOT}statustypen",
             json=paginated_response([self.status_type1, self.status_type2]),
         )
+        for resource in [
+            self.zaaktype,
+            self.status_type1,
+            self.status_type2,
+            self.status1,
+            self.status2,
+        ]:
+            m.get(resource["url"], json=resource)
+
+    def _setUpNewMock(self, m):
         m.get(
-            f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-beu760sle929",
-            json=self.status1,
+            f"{ZAKEN_ROOT}zaken?rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn=900222086",
+            json=paginated_response([self.zaak1, self.zaak2, self.new_zaak]),
         )
         m.get(
-            f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
-            json=self.status2,
+            f"{CATALOGI_ROOT}statustypen",
+            json=paginated_response(
+                [self.status_type1, self.status_type2, self.new_status_type]
+            ),
         )
-        m.get(
-            f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-777yu878km09",
-            json=self.status_type1,
-        )
-        m.get(
-            f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-744516671fe4",
-            json=self.status_type2,
-        )
+        for new_resource in [self.new_zaaktype, self.new_status]:
+            m.get(new_resource["url"], json=new_resource)
 
     def test_case_types_are_cached(self, m):
         self._setUpMocks(m)
@@ -223,30 +228,8 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
         self.assertIsNotNone(cache.get(f"case_type:{self.zaaktype['url']}"))
 
         # Second attempt with new case and case type
-        m.get(
-            f"{ZAKEN_ROOT}zaken?rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn=900222086",
-            json=paginated_response([self.zaak1, self.zaak2, self.new_zaak]),
-        )
-        m.get(
-            f"{CATALOGI_ROOT}zaaktypen/53340e34-7581-4b04-884f-98ui7y87i876",
-            json=self.new_zaaktype,
-        )
-        m.get(
-            f"{CATALOGI_ROOT}statustypen",
-            json=paginated_response(
-                [self.status_type1, self.status_type2, self.new_status_type]
-            ),
-        )
-        m.get(
-            f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-984yr8887rhe",
-            json=self.new_status_type,
-        )
-        m.get(
-            f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-oie8u899923g",
-            json=self.new_status,
-        )
-
         self.assertIsNone(cache.get(f"case_type:{self.new_zaaktype['url']}"))
+        self._setUpNewMock(m)
 
         self.app.get(self.url, user=self.user)
 
@@ -310,24 +293,7 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
         )
 
         # Second attempt with new case and status type
-        m.get(
-            f"{ZAKEN_ROOT}zaken?rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn=900222086",
-            json=paginated_response([self.zaak1, self.zaak2, self.new_zaak]),
-        )
-        m.get(
-            f"{CATALOGI_ROOT}zaaktypen/53340e34-7581-4b04-884f-98ui7y87i876",
-            json=self.new_zaaktype,
-        )
-        m.get(
-            f"{CATALOGI_ROOT}statustypen",
-            json=paginated_response(
-                [self.status_type1, self.status_type2, self.new_status_type]
-            ),
-        )
-        m.get(
-            f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-oie8u899923g",
-            json=self.new_status,
-        )
+        self._setUpNewMock(m)
 
         self.assertIsNone(
             cache.get(f"status_types_for_case_type:{self.new_zaaktype['url']}")
@@ -382,28 +348,7 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
         self.assertIsNotNone(cache.get(f"status:{self.status2['url']}"))
 
         # Second attempt with new case and status type
-        m.get(
-            f"{ZAKEN_ROOT}zaken?rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn=900222086",
-            json=paginated_response([self.zaak1, self.zaak2, self.new_zaak]),
-        )
-        m.get(
-            f"{CATALOGI_ROOT}zaaktypen/53340e34-7581-4b04-884f-98ui7y87i876",
-            json=self.new_zaaktype,
-        )
-        m.get(
-            f"{CATALOGI_ROOT}statustypen",
-            json=paginated_response(
-                [self.status_type1, self.status_type2, self.new_status_type]
-            ),
-        )
-        m.get(
-            f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-oie8u899923g",
-            json=self.new_status,
-        )
-        m.get(
-            f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-984yr8887rhe",
-            json=self.new_status_type,
-        )
+        self._setUpNewMock(m)
 
         self.assertIsNone(cache.get(f"status:{self.new_status['url']}"))
 

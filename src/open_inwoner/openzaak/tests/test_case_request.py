@@ -33,15 +33,9 @@ class TestFetchSpecificCase(TestCase):
             einddatum=None,
         )
 
-    def _setUpMocks(self, m):
-        mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
-        m.get(
-            f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
-            json=self.zaak,
-        )
-
     def test_case_is_retrieved(self, m):
-        self._setUpMocks(m)
+        mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
+        m.get(self.zaak["url"], json=self.zaak)
 
         case = fetch_single_case("d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d")
 
@@ -52,10 +46,7 @@ class TestFetchSpecificCase(TestCase):
 
     def test_no_case_is_retrieved_when_http_404(self, m):
         mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
-        m.get(
-            f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
-            status_code=404,
-        )
+        m.get(self.zaak["url"], status_code=404)
 
         case = fetch_single_case("d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d")
 
@@ -64,7 +55,7 @@ class TestFetchSpecificCase(TestCase):
     def test_no_case_is_retrieved_when_http_500(self, m):
         mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
         m.get(
-            f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
+            self.zaak["url"],
             status_code=500,
         )
 
