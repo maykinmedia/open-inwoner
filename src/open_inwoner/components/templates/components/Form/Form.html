@@ -13,7 +13,6 @@
         hx-{{ method|lower }}="{{ action|default:"./" }}"
         hx-select="{{ async_selector }}"
         hx-target="{{ async_selector }}"
-        hx-swap="outerHTML"
     {% endif %}
 >
     {% if form.non_field_errors %}
