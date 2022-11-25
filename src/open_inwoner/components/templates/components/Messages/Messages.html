@@ -8,7 +8,12 @@
 
 
     <div class="messages__body">
-        <ol class="messages__days">
+        <ol
+            class="messages__days"
+            hx-get="./"
+            hx-select=".messages__days"
+            hx-trigger="every 2s"
+        >
             {% for day in days %}
                 <li class="messages__day">
                     <header class="messages__day-header">
