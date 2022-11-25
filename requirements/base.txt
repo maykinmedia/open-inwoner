@@ -18,7 +18,7 @@ boltons==21.0.0
     #   glom
 brotli==1.0.9
     # via fonttools
-certifi==2021.5.30
+certifi==2022.9.24
     # via
     #   elastic-apm
     #   elasticsearch
