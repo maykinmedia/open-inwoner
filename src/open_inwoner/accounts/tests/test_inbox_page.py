@@ -4,8 +4,10 @@ from django.urls import reverse_lazy
 from django_webtest import WebTest
 from privates.test import temp_private_root
 from selenium.webdriver.common.by import By
-from selenium.webdriver.firefox.options import Options
-from selenium.webdriver.firefox.webdriver import WebDriver
+from selenium.webdriver.chrome.options import Options as ChromeOptions
+from selenium.webdriver.chrome.webdriver import WebDriver as ChromeDriver
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
+from selenium.webdriver.firefox.webdriver import WebDriver as FirefoxDriver
 
 from ..models import Message
 from .factories import ContactFactory, MessageFactory, UserFactory
@@ -123,13 +125,13 @@ class InboxPageTests(WebTest):
         self.assertTrue(message_received.seen)
 
 
-class MySeleniumTests(StaticLiveServerTestCase):
+class BaseInboxPageSeleniumTests:
+    options = None
+    driver = None
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        options = Options()
-        options.headless = True
-        cls.selenium = WebDriver(options=options)
         cls.selenium.implicitly_wait(10)
 
     @classmethod
@@ -177,3 +179,25 @@ class MySeleniumTests(StaticLiveServerTestCase):
         url = f"{self.live_server_url}{reverse_lazy('accounts:inbox')}?redirected=True"
         self.assertEqual(url, self.selenium.current_url)
         self.assertNotIn("#messages-last", self.selenium.current_url)
+
+
+class InboxPageFirefoxSeleniumTests(BaseInboxPageSeleniumTests, StaticLiveServerTestCase):
+    options = FirefoxOptions()
+    driver_class = FirefoxDriver
+
+    @classmethod
+    def setUpClass(cls):
+        cls.options.headless = True
+        cls.selenium = cls.driver_class(options=cls.options)
+        super().setUpClass()
+
+
+class InboxPageChromeSeleniumTests(BaseInboxPageSeleniumTests, StaticLiveServerTestCase):
+    options = ChromeOptions()
+    driver_class = ChromeDriver
+
+    @classmethod
+    def setUpClass(cls):
+        cls.options.headless = True
+        cls.selenium = cls.driver_class(options=cls.options)
+        super().setUpClass()
