@@ -11,7 +11,7 @@
         {% csrf_token %}
         {% input form.title %}
         {% render_grid %}
-            {% checkboxes form.contacts %}
+            {% checkboxes form.plan_contacts %}
             {% date_field form.end_date %}
         {% endrender_grid %}
 

@@ -5,10 +5,10 @@ from django.utils.translation import ugettext_lazy as _
 from django_webtest import WebTest
 from furl import furl
 
-from open_inwoner.accounts.models import Contact
+from open_inwoner.accounts.models import User
 
 from ..choices import ContactTypeChoices
-from .factories import ContactFactory, UserFactory
+from .factories import UserFactory
 
 
 class ContactViewTests(WebTest):
@@ -43,6 +43,12 @@ class ContactViewTests(WebTest):
         response = self.app.get(self.list_url, user=other_user)
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, self.contact.first_name)
+
+    def test_list_shows_pending_invitations(self):
+        existing_user = UserFactory()
+        self.user.contacts_for_approval.add(existing_user)
+        response = self.app.get(self.list_url, user=self.user)
+        self.assertContains(response, existing_user.first_name)
 
     def test_contact_filter(self):
         begeleider = UserFactory(contact_type=ContactTypeChoices.begeleider)
@@ -96,9 +102,13 @@ class ContactViewTests(WebTest):
         self.assertRedirects(response, f"{self.login_url}?next={self.edit_url}")
 
     def test_contact_edit(self):
-        response = self.app.get(self.edit_url, user=self.user)
+        form = self.app.get(self.edit_url, user=self.user).forms["contact-form"]
+        form["first_name"] = "Updated"
+        response = form.submit(user=self.user).follow()
+        self.contact.refresh_from_db()
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.contact.first_name)
+        self.assertContains(response, "Updated")
+        self.assertEqual(self.contact.first_name, "Updated")
 
     def test_contact_edit_not_your_contact(self):
         other_user = UserFactory()
@@ -108,7 +118,7 @@ class ContactViewTests(WebTest):
         response = self.app.get(self.create_url)
         self.assertRedirects(response, f"{self.login_url}?next={self.create_url}")
 
-    def test_non_existing_user_contact_not_created_and_invite_sent(self):
+    def test_new_user_contact_not_created_and_invite_sent(self):
         contacts_before = self.user.user_contacts.count()
         response = self.app.get(self.create_url, user=self.user)
         self.assertEqual(response.status_code, 200)
@@ -117,19 +127,16 @@ class ContactViewTests(WebTest):
         form["first_name"] = "John"
         form["last_name"] = "Smith"
         form["email"] = "john@smith.nl"
-
         response = form.submit(user=self.user)
-
         self.assertEqual(response.status_code, 302)
+
         # check that the contact was not created
         self.assertEqual(self.user.user_contacts.count(), contacts_before)
-        contact = self.user.user_contacts.order_by("-pk").first()
 
         # check that the invite was created
-        self.assertEqual(contact.received_invites.count(), 1)
-        invite = contact.sent_invites.first()
+        self.assertEqual(self.user.sent_invites.count(), 1)
+        invite = self.user.sent_invites.first()
         self.assertEqual(invite.inviter, self.user)
-        self.assertEqual(invite.invitee_email, contact.email)
 
         # check that the invite was sent
         self.assertEqual(len(mail.outbox), 1)
@@ -140,24 +147,46 @@ class ContactViewTests(WebTest):
         body = email.alternatives[0][0]  # html version of the email body
         self.assertIn(invite_url, body)
 
-    def test_multiple_contact_create_without_providing_email(self):
-        ContactFactory(email=None)
+    def test_existing_user_contact(self):
+        existing_user = UserFactory()
         response = self.app.get(self.create_url, user=self.user)
-        self.assertEqual(response.status_code, 200)
-
         form = response.forms["contact-form"]
-        form["first_name"] = "John"
-        form["last_name"] = "Smith"
+
+        form["first_name"] = existing_user.first_name
+        form["last_name"] = existing_user.last_name
+        form["email"] = existing_user.email
         response = form.submit(user=self.user)
-        contacts_without_email = Contact.objects.filter(email__isnull=True)
+        pending_invitation = self.user.contacts_for_approval.first()
 
-        self.assertEqual(contacts_without_email.count(), 2)
+        self.assertEqual(response.status_code, 302)
+        self.assertContains(response.follow(), existing_user.first_name)
+        self.assertEqual(existing_user, pending_invitation)
 
-    def test_users_contact_is_deleted(self):
-        self.app.post(self.delete_url, user=self.user)
+    def test_adding_same_contact_fails(self):
+        response = self.app.get(self.create_url, user=self.user)
+        form = response.forms["contact-form"]
 
-        new_contact_list = Contact.objects.all()
-        self.assertEquals(new_contact_list.count(), 0)
+        form["first_name"] = self.contact.first_name
+        form["last_name"] = self.contact.last_name
+        form["email"] = self.contact.email
+        response = form.submit(user=self.user)
+        expected_errors = {
+            "__all__": [
+                "Het ingevoerde e-mailadres komt al voor in uw contactpersonen. Pas de gegevens aan en probeer het opnieuw."
+            ]
+        }
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["form"].errors, expected_errors)
+
+    def test_users_contact_is_removed(self):
+        response = self.app.post(self.delete_url, user=self.user)
+
+        new_contact_list = self.user.user_contacts.all()
+        new_contact = User.objects.filter(email=self.contact.email)
+
+        self.assertEqual(new_contact_list.count(), 0)
+        self.assertTrue(new_contact.exists())
+        self.assertNotContains(response.follow(), self.contact.email)
 
     def test_delete_contact_action_requires_login(self):
         response = self.app.post(self.list_url)

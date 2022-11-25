@@ -297,12 +297,10 @@ class InboxForm(forms.ModelForm):
 
         super().__init__(**kwargs)
 
-        extended_contact_users = User.objects.get_extended_contact_users(self.user)
-        choices = [
-            [u.email, f"{u.first_name} {u.last_name}"] for u in extended_contact_users
-        ]
+        contact_users = self.user.get_active_contacts()
+        choices = [[u.email, f"{u.first_name} {u.last_name}"] for u in contact_users]
         self.fields["receiver"].choices = choices
-        self.fields["receiver"].queryset = extended_contact_users
+        self.fields["receiver"].queryset = contact_users
 
     def clean(self):
         cleaned_data = super().clean()

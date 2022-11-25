@@ -139,7 +139,9 @@ class Plan(models.Model):
         return reverse("plans:plan_detail", kwargs={"uuid": self.uuid})
 
     def contactperson_list(self):
-        return ", ".join([contact.get_name() for contact in self.contacts.all()])
+        return ", ".join(
+            [contact.get_full_name() for contact in self.plan_contacts.all()]
+        )
 
     def get_latest_file(self):
         file = self.documents.order_by("-created_on").first()
@@ -154,16 +156,12 @@ class Plan(models.Model):
 
     def get_other_users(self, user=None):
         """return list of users participating in the plan with exception of the current user"""
-        contact_user_ids = self.contacts.exclude(contact_user__isnull=True).values_list(
-            "contact_user", flat=True
-        )
-        created_by_ids = self.contacts.exclude(contact_user__isnull=True).values_list(
-            "created_by", flat=True
-        )
+        contacts_ids = self.plan_contacts.values_list("pk", flat=True)
+        created_by_ids = self.contacts.values_list("created_by", flat=True)
         user_ids = list(
-            set(list(contact_user_ids) + list(created_by_ids) + [self.created_by.id])
+            set(list(contacts_ids) + list(created_by_ids) + [self.created_by.id])
         )
-
+        breakpoint()
         if user and user.id in user_ids:
             user_ids.remove(user.id)
 

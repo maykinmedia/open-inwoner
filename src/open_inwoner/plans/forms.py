@@ -21,15 +21,15 @@ class PlanForm(forms.ModelForm):
 
     class Meta:
         model = Plan
-        fields = ("title", "end_date", "contacts", "template")
+        fields = ("title", "end_date", "plan_contacts", "template")
 
     def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        extended_contacts = user.get_extended_active_contacts()
-        self.fields["contacts"].queryset = extended_contacts
-        self.fields["contacts"].choices = [
-            [c.id, f"{c.other_user_first_name} {c.other_user_last_name}"]
-            for c in extended_contacts
+
+        user_contacts = user.get_active_contacts()
+        self.fields["plan_contacts"].queryset = user_contacts
+        self.fields["plan_contacts"].choices = [
+            [c.id, f"{c.first_name} {c.last_name}"] for c in user_contacts
         ]
 
         if self.instance.pk:

@@ -241,8 +241,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         url = furl(reverse("accounts:inbox")).add({"with": contact.email}).url
         return f"{url}#messages-last"
 
-    def get_contact_type_display(self, contact) -> str:
-        choice = ContactTypeChoices.get_choice(contact.contact_type)
+    def get_contact_type_display(self) -> str:
+        choice = ContactTypeChoices.get_choice(self.contact_type)
         return choice.label
 
     def is_not_active(self):
@@ -251,6 +251,19 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_contact_email(self):
         email = self.email
         return email if "@example.org" not in email else ""
+
+    def get_active_contacts(self):
+        return self.user_contacts.filter(is_active=True)
+
+    def get_contacts_for_approval(self):
+        return self.contacts_for_approval.filter(is_active=True)
+
+    def get_all_contacts(self):
+        qs = self.get_active_contacts() | self.get_contacts_for_approval()
+        return qs.order_by("-date_joined")
+
+    def get_pending_contacts(self):
+        return Invite.objects.get_pending_invitations_for_user(self)
 
 
 class Contact(models.Model):

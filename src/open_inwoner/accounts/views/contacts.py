@@ -13,8 +13,7 @@ from view_breadcrumbs import BaseBreadcrumbMixin
 from open_inwoner.utils.views import LogMixin
 
 from ..choices import ContactTypeChoices
-from ..forms import ContactFilterForm, ContactCreateForm, ContactUpdateForm
-
+from ..forms import ContactCreateForm, ContactFilterForm, ContactUpdateForm
 from ..models import Contact, Invite, User
 
 
@@ -33,11 +32,7 @@ class ContactListView(LoginRequiredMixin, BaseBreadcrumbMixin, ListView):
     def get_queryset(self):
         base_qs = super().get_queryset()
 
-        current_user = self.request.user
-        user_contacts = current_user.user_contacts.all()
-        contacts_for_approval = current_user.contacts_for_approval.all()
-        base_qs = user_contacts | contacts_for_approval
-
+        base_qs = self.request.user.get_all_contacts()
         type_filter = self.request.GET.get("type")
 
         if type_filter:
@@ -48,9 +43,7 @@ class ContactListView(LoginRequiredMixin, BaseBreadcrumbMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context[
-            "pending_invitations"
-        ] = Invite.objects.get_pending_invitations_for_user(self.request.user)
+        context["pending_invitations"] = self.request.user.get_pending_contacts()
         context["form"] = ContactFilterForm(data=self.request.GET)
         return context
 
@@ -168,5 +161,5 @@ class ContactDeleteView(LogMixin, LoginRequiredMixin, DeleteView):
         # Remove relationship between the two users
         current_user.user_contacts.remove(object)
 
-        self.log_deletion(object, _("contact was deleted"))
+        self.log_change(object, _("contact relationship was removed"))
         return HttpResponseRedirect(self.success_url)
