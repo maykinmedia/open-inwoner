@@ -2,7 +2,7 @@ import datetime
 
 from django.contrib.auth.models import AnonymousUser
 from django.core.cache import cache
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 
 import requests_mock
 from django_webtest import WebTest
@@ -40,7 +40,7 @@ class TestListCasesView(WebTest):
         self.catalogi_service = ServiceFactory(
             api_root=CATALOGI_ROOT, api_type=APITypes.ztc
         )
-        # operzaak config
+        # openzaak config
         self.config = OpenZaakConfig.get_solo()
         self.config.zaak_service = self.zaak_service
         self.config.catalogi_service = self.catalogi_service
@@ -685,73 +685,94 @@ class TestListCasesView(WebTest):
             ],
         )
 
-    def test_user_is_redirected_to_root_when_not_logged_in_via_digid(self, m):
-        self._setUpMocks(m)
 
+class ListCaseAccessTests(WebTest):
+    urls = [
+        reverse_lazy("accounts:my_open_cases"),
+        reverse_lazy("accounts:my_closed_cases"),
+    ]
+
+    @classmethod
+    def setUpTestData(cls):
+        # services
+        cls.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
+        cls.catalogi_service = ServiceFactory(
+            api_root=CATALOGI_ROOT, api_type=APITypes.ztc
+        )
+        # openzaak config
+        cls.config = OpenZaakConfig.get_solo()
+        cls.config.zaak_service = cls.zaak_service
+        cls.config.catalogi_service = cls.catalogi_service
+        cls.config.save()
+
+    def test_user_is_redirected_to_root_when_not_logged_in_via_digid(self):
         # User's bsn is None when logged in by email (default method)
         user = UserFactory(
             first_name="",
             last_name="",
             login_type=LoginTypeChoices.default,
         )
-        response = self.app.get(reverse("accounts:my_cases"), user=user)
+        for url in self.urls:
+            with self.subTest(url):
+                response = self.app.get(url, user=user)
 
-        self.assertRedirects(response, reverse("root"))
+                self.assertRedirects(response, reverse("root"))
 
-    def test_anonymous_user_has_no_access_to_cases_page(self, m):
+    def test_anonymous_user_has_no_access_to_cases_page(self):
         user = AnonymousUser()
-        response = self.app.get(reverse("accounts:my_cases"), user=user)
 
-        self.assertRedirects(
-            response, f"{reverse('login')}?next={reverse('accounts:my_cases')}"
+        for url in self.urls:
+            with self.subTest(url):
+                response = self.app.get(url, user=user)
+
+                self.assertRedirects(response, f"{reverse('login')}?next={url}")
+
+    def test_missing_zaak_client_returns_empty_list(self):
+        user = UserFactory(
+            login_type=LoginTypeChoices.digid, bsn="900222086", email="john@smith.nl"
         )
-
-    def test_missing_zaak_client_returns_empty_list(self, m):
-        self._setUpMocks(m)
-
         self.config.zaak_service = None
         self.config.save()
 
-        response = self.app.get(reverse("accounts:my_cases"), user=self.user)
+        for url in self.urls:
+            with self.subTest(url):
+                response = self.app.get(url, user=user)
 
-        self.assertEquals(response.status_code, 200)
-        self.assertListEqual(response.context.get("open_cases"), [])
-        self.assertListEqual(response.context.get("closed_cases"), [])
+                self.assertEquals(response.status_code, 200)
+                self.assertListEqual(response.context.get("cases"), [])
 
+    @requests_mock.Mocker()
     def test_no_cases_are_retrieved_when_http_404(self, m):
+        user = UserFactory(
+            login_type=LoginTypeChoices.digid, bsn="900222086", email="john@smith.nl"
+        )
         mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
-        mock_service_oas_get(m, CATALOGI_ROOT, "ztc")
         m.get(
             f"{ZAKEN_ROOT}zaken?rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn=900222086",
             status_code=404,
         )
-        m.get(f"{CATALOGI_ROOT}zaaktypen", json=paginated_response([self.zaaktype]))
-        m.get(
-            f"{CATALOGI_ROOT}statustypen",
-            json=paginated_response([self.status_type1]),
-        )
 
-        response = self.app.get(reverse("accounts:my_cases"), user=self.user)
+        for url in self.urls:
+            with self.subTest(url):
+                response = self.app.get(url, user=user)
 
-        self.assertEquals(response.status_code, 200)
-        self.assertListEqual(response.context.get("open_cases"), [])
-        self.assertListEqual(response.context.get("closed_cases"), [])
+                self.assertEquals(response.status_code, 200)
+                self.assertListEqual(response.context.get("cases"), [])
 
+    @requests_mock.Mocker()
     def test_no_cases_are_retrieved_when_http_500(self, m):
+        user = UserFactory(
+            login_type=LoginTypeChoices.digid, bsn="900222086", email="john@smith.nl"
+        )
         mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
-        mock_service_oas_get(m, CATALOGI_ROOT, "ztc")
         m.get(
             f"{ZAKEN_ROOT}zaken?rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn=900222086",
             status_code=500,
         )
-        m.get(f"{CATALOGI_ROOT}zaaktypen", json=paginated_response([self.zaaktype]))
-        m.get(
-            f"{CATALOGI_ROOT}statustypen",
-            json=paginated_response([self.status_type1]),
-        )
 
-        response = self.app.get(reverse("accounts:my_cases"), user=self.user)
+        for url in self.urls:
+            with self.subTest(url):
+                response = self.app.get(url, user=user)
 
-        self.assertEquals(response.status_code, 200)
-        self.assertListEqual(response.context.get("open_cases"), [])
-        self.assertListEqual(response.context.get("closed_cases"), [])
+                self.assertEquals(response.status_code, 200)
+                self.assertListEqual(response.context.get("cases"), [])

@@ -23,11 +23,7 @@ from open_inwoner.openzaak.cases import (
     fetch_specific_status,
     fetch_status_history,
 )
-from open_inwoner.openzaak.catalog import (
-    fetch_single_case_type,
-    fetch_single_status_type,
-    fetch_status_types,
-)
+from open_inwoner.openzaak.catalog import fetch_single_case_type, fetch_status_types
 from open_inwoner.openzaak.documents import (
     download_document,
     fetch_single_information_object,
