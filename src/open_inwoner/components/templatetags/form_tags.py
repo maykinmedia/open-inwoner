@@ -44,6 +44,7 @@ def render_form(parser, token):
         {% endrender_form %}
 
     Variables:
+        + action: string | The action attribute of the form.
         + form: Form | This is the django form that should be rendered.
         + method: string | GET or POST, which function is needed.
         - columns: int | the number of columns that the form should have.
