@@ -11,6 +11,9 @@ on:
       - 'bin/*'
       - 'requirements/*'
   pull_request:
+    paths:
+      - 'bin/*'
+      - 'requirements/*'
   workflow_dispatch:
 
 jobs:
