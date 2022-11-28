@@ -403,10 +403,22 @@ class PlanViewTests(WebTest):
         action = Action.objects.get(id=self.action.id)
         self.assertTrue(action.is_deleted)
 
+        # django message to user
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
         expected = _("Actie '{action}' is verwijdered.").format(action=self.action)
         self.assertEqual(str(messages[0]), expected)
+
+        # email is sent to out contact
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertEqual(
+            email.subject, "Plan action has been updated at Open Inwoner Platform"
+        )
+        self.assertEqual(email.to, [self.contact_user.email])
+        plan_url = f"http://testserver{self.detail_url}"
+        body = email.alternatives[0][0]  # html version of the email body
+        self.assertIn(plan_url, body)
 
     def test_plan_action_delete_not_your_action(self):
         other_user = UserFactory()

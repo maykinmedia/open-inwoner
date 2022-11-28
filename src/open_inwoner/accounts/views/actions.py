@@ -133,16 +133,20 @@ class ActionDeleteView(
         self.object.is_deleted = True
         self.object.save()
 
+        self.on_delete_action(self.object)
+
+        return HttpResponseRedirect(self.get_success_url())
+
+    def on_delete_action(self, action):
         self.log_deletion(
-            self.object,
+            action,
             _("action soft-deleted by user {user}").format(user=self.request.user),
         )
         messages.add_message(
             self.request,
             messages.SUCCESS,
-            _("Actie '{action}' is verwijdered.").format(action=self.object),
+            _("Actie '{action}' is verwijdered.").format(action=action),
         )
-        return HttpResponseRedirect(self.get_success_url())
 
 
 class ActionCreateView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, CreateView):
