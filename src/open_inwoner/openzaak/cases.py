@@ -4,7 +4,8 @@ from typing import List, Optional
 from requests import RequestException
 from zds_client import ClientError
 from zgw_consumers.api_models.base import factory
-from zgw_consumers.api_models.zaken import Rol, Status, Zaak
+from zgw_consumers.api_models.constants import RolOmschrijving
+from zgw_consumers.api_models.zaken import Resultaat, Rol, Status, Zaak
 from zgw_consumers.service import get_paginated_results
 
 from .api_models import Zaak, ZaakInformatieObject
@@ -135,6 +136,39 @@ def fetch_specific_status(status_url: str) -> Optional[Status]:
     return status
 
 
+def fetch_case_roles(
+    case_url: str, role_desc_generic: Optional[str] = None
+) -> List[Rol]:
+    client = build_client("zaak")
+
+    if client is None:
+        return []
+
+    params = {
+        "zaak": case_url,
+    }
+    if role_desc_generic:
+        assert role_desc_generic in RolOmschrijving.values
+        params["omschrijvingGeneriek"] = role_desc_generic
+
+    try:
+        response = get_paginated_results(
+            client,
+            "rol",
+            request_kwargs={"params": params},
+        )
+    except RequestException as e:
+        logger.exception("exception while making request", exc_info=e)
+        return []
+    except ClientError as e:
+        logger.exception("exception while making request", exc_info=e)
+        return []
+
+    roles = factory(Rol, response)
+
+    return roles
+
+
 def fetch_roles_for_case_and_bsn(case_url: str, bsn: str) -> List[Rol]:
     client = build_client("zaak")
 
@@ -191,3 +225,23 @@ def fetch_case_information_objects_for_case_and_info(
     case_info_objects = factory(ZaakInformatieObject, response)
 
     return case_info_objects
+
+
+def fetch_single_result(result_url: str) -> Optional[Resultaat]:
+    client = build_client("zaak")
+
+    if client is None:
+        return
+
+    try:
+        response = client.retrieve("result", url=result_url)
+    except RequestException as e:
+        logger.exception("exception while making request", exc_info=e)
+        return
+    except ClientError as e:
+        logger.exception("exception while making request", exc_info=e)
+        return
+
+    result = factory(Resultaat, response)
+
+    return result

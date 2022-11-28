@@ -8,7 +8,11 @@ import requests_mock
 from django_webtest import WebTest
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.catalogi import StatusType
-from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
+from zgw_consumers.api_models.constants import (
+    RolOmschrijving,
+    RolTypes,
+    VertrouwelijkheidsAanduidingen,
+)
 from zgw_consumers.api_models.zaken import Status
 from zgw_consumers.constants import APITypes
 from zgw_consumers.test import generate_oas_component, mock_service_oas_get
@@ -69,8 +73,11 @@ class TestCaseDetailView(WebTest):
             identificatie="ZAAK-2022-0000000024",
             omschrijving="Zaak naar aanleiding van ingezonden formulier",
             startdatum="2022-01-02",
-            einddatum=None,
+            einddatum="2022-01-03",
+            einddatumGepland="2022-01-04",
+            uiterlijkeEinddatumAfdoening="2022-01-05",
             status=f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
+            resultaat=f"{ZAKEN_ROOT}resultaten/a44153aa-ad2c-6a07-be75-15add5113",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
         )
         self.zaak_invisible = generate_oas_component(
@@ -147,8 +154,22 @@ class TestCaseDetailView(WebTest):
         self.role = generate_oas_component(
             "zrc",
             "schemas/Rol",
-            url=f"{ZAKEN_ROOT}rollen/f33153aa-ad2c-4a07-ae75-15add5891",
-            betrokkene_identificatie="foo",
+            url=f"{ZAKEN_ROOT}rollen/f33153aa-adnatuurlijk_persoon2c-4a07-ae75-15add5891",
+            betrokkeneType=RolTypes.natuurlijk_persoon,
+            betrokkeneIdentificatie={
+                "geslachtsnaam": "Bazz",
+                "voorvoegselGeslachtsnaam": "van der",
+                "voornamen": "Foo Bar",
+            },
+        )
+        self.result = generate_oas_component(
+            "zrc",
+            "schemas/Resultaat",
+            uuid="a44153aa-ad2c-6a07-be75-15add5113",
+            url=f"{ZAKEN_ROOT}resultaten/a44153aa-ad2c-6a07-be75-15add5113",
+            resultaattype=f"{CATALOGI_ROOT}resultaattypen/b1a268dd-4322-47bb-a930-b83066b4a32c",
+            zaak=self.zaak["url"],
+            toelichting="resultaat toelichting",
         )
         self.zaak_informatie_object = generate_oas_component(
             "zrc",
@@ -232,8 +253,16 @@ class TestCaseDetailView(WebTest):
             json=paginated_response([self.status1, self.status2]),
         )
         m.get(
+            f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}&omschrijvingGeneriek={RolOmschrijving.initiator}",
+            json=paginated_response([self.role]),
+        )
+        m.get(
             f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}&betrokkeneIdentificatie__natuurlijkPersoon__inpBsn={self.user.bsn}",
             json=paginated_response([self.role]),
+        )
+        m.get(
+            f"{ZAKEN_ROOT}resultaten/a44153aa-ad2c-6a07-be75-15add5113",
+            json=self.result,
         )
         m.get(f"{CATALOGI_ROOT}zaaktypen/53340e34-7581-4b04-884f", json=self.zaaktype)
         m.get(
@@ -276,15 +305,38 @@ class TestCaseDetailView(WebTest):
             {
                 "identification": "ZAAK-2022-0000000024",
                 "start_date": datetime.date(2022, 1, 2),
-                "end_date": None,
+                "end_date": datetime.date(2022, 1, 3),
+                "end_date_planned": datetime.date(2022, 1, 4),
+                "end_date_legal": datetime.date(2022, 1, 5),
                 "description": "Zaak naar aanleiding van ingezonden formulier",
                 "type_description": "Coffee zaaktype",
                 "current_status": "Finish",
                 "statuses": [status1_obj, status2_obj],
                 # only one visible information object
                 "documents": [self.informatie_object_file],
+                "initiator": "Foo Bar van der Bazz",
+                "result": "resultaat toelichting",
             },
         )
+
+    def test_page_displays_expected_data(self, m):
+        self._setUpMocks(m)
+
+        response = self.app.get(
+            reverse(
+                "accounts:case_status",
+                kwargs={"object_id": "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d"},
+            ),
+            user=self.user,
+        )
+
+        self.assertContains(response, "ZAAK-2022-0000000024")
+        self.assertContains(response, "Zaak naar aanleiding van ingezonden formulier")
+        self.assertContains(response, "Coffee zaaktype")
+        self.assertContains(response, "Finish")
+        self.assertContains(response, "document")
+        self.assertContains(response, "Foo Bar van der Bazz")
+        self.assertContains(response, "resultaat toelichting")
 
     def test_current_status_in_context_is_the_most_recent_one(self, m):
         self._setUpMocks(m)

@@ -16,6 +16,15 @@ class DashboardConfig(TypedDict):
     metrics: list[Metric]
 
 
+class Row(TypedDict):
+    label: str
+    value: str
+
+
+class TableConfig(TypedDict):
+    rows: list[Row]
+
+
 @register.inclusion_tag("components/Dashboard/Dashboard.html")
 def case_dashboard(case: dict, **kwargs) -> dict:
     """
@@ -44,12 +53,12 @@ def case_dashboard(case: dict, **kwargs) -> dict:
             },
             {
                 "icon": "task_alt",
-                "label": _("status"),
+                "label": _("Status"),
                 "value": case.get("current_status"),
             },
             {
                 "icon": "description",
-                "label": _("documenten"),
+                "label": _("Documenten"),
                 "value": len(case.get("documents")),
             },
         ]
@@ -58,4 +67,47 @@ def case_dashboard(case: dict, **kwargs) -> dict:
     return {
         **kwargs,
         "config": config,
+    }
+
+
+@register.inclusion_tag("components/Dashboard/Table.html")
+def case_table(case: dict, **kwargs) -> dict:
+    """
+    Renders a table below the dashboard for additional values related to a Zaak (case).
+
+    Usage:
+        {% case_table case %}
+
+    Variables:
+        + case: dict | The case to be able to build the dashboard, fetching the documents and statusses of the case.
+
+    Extra context:
+        + table: TableConfig | The configuration of the table.
+    """
+
+    # build rows for data we actually have
+    rows = []
+
+    def add_row_if_not_empty(key, label):
+        value = case.get(key)
+        if value:
+            rows.append(
+                {
+                    "label": label,
+                    "value": value,
+                }
+            )
+
+    add_row_if_not_empty("initiator", _("Aanvrager"))
+    add_row_if_not_empty("type_description", _("Type"))
+    add_row_if_not_empty("result", _("Resultaat"))
+    add_row_if_not_empty("end_date", _("Einddatum"))
+    add_row_if_not_empty("end_date_planned", _("Verwachte einddatum"))
+    add_row_if_not_empty("end_date_legal", _("Wettelijke termijn"))
+
+    table: TableConfig = {"rows": rows}
+
+    return {
+        **kwargs,
+        "table": table,
     }
