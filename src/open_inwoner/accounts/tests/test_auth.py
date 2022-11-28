@@ -198,7 +198,7 @@ class TestRegistrationNecessary(WebTest):
             reverse("pdc:category_list"),
             reverse("accounts:my_profile"),
             reverse("accounts:inbox"),
-            reverse("accounts:my_cases"),
+            reverse("accounts:my_open_cases"),
             reverse("plans:plan_list"),
             reverse("general_faq"),
         ]
