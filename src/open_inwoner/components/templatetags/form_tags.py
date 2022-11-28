@@ -44,7 +44,6 @@ def render_form(parser, token):
         {% endrender_form %}
 
     Variables:
-        + action: string | The action attribute of the form.
         + form: Form | This is the django form that should be rendered.
         + method: string | GET or POST, which function is needed.
         - columns: int | the number of columns that the form should have.
@@ -66,6 +65,7 @@ def render_form(parser, token):
         - secondary: bool | If the secondary button should be styled like a secondary button or not.
         - no_actions: bool | If you want to auto-generate the submit buttons.
         - horizontal: bool | If you want the label next to the fields.
+        - async_selector: string | Specifies selector for element to replace asynchronously on submit.
 
     Extra context:
         - contents: string | The html content between all the open and closing tags.
