@@ -13,6 +13,10 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="action",
             name="is_deleted",
-            field=models.BooleanField(default=False, verbose_name="Is deleted"),
+            field=models.BooleanField(
+                default=False,
+                verbose_name="Is soft-deleted",
+                help_text="This indicates a soft-delete where an admin can restore the record.",
+            ),
         ),
     ]
