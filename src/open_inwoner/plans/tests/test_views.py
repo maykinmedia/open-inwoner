@@ -300,6 +300,29 @@ class PlanViewTests(WebTest):
         self.assertEqual(plan.documents.count(), 0)
         self.assertEqual(plan.actions.count(), 1)
 
+    def test_plan_create_plan_validation_error_reselects_template_and_contact(self):
+        plan_template = PlanTemplateFactory(file=None)
+        ActionTemplateFactory(plan_template=plan_template)
+        self.assertEqual(Plan.objects.count(), 1)
+        response = self.app.get(self.create_url, user=self.user)
+        form = response.forms["plan-form"]
+        form["title"] = "Plan"
+        form["end_date"] = ""  # empty end_date so validation fails
+        form["contacts"] = [self.contact.pk]
+        form["template"] = plan_template.pk
+        response = form.submit()
+        self.assertEqual(response.status_code, 200)
+        # nothing was created
+        self.assertEqual(Plan.objects.count(), 1)
+
+        # check if we reselected the template and contact
+        elem = response.pyquery(f"#id_template_{plan_template.id}")[0]
+        self.assertEqual(elem.attrib.get("checked"), "checked")
+
+        # NOTE: custom widget ID hardcoded on index of choice
+        elem = response.pyquery(f"#id_contacts_1")[0]
+        self.assertEqual(elem.attrib.get("checked"), "checked")
+
     def test_plan_edit_login_required(self):
         response = self.app.get(self.edit_url)
         self.assertRedirects(response, f"{self.login_url}?next={self.edit_url}")
