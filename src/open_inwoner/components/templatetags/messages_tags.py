@@ -12,8 +12,9 @@ from open_inwoner.accounts.query import MessageQuerySet
 register = template.Library()
 
 
-@register.inclusion_tag("components/Messages/Messages.html")
+@register.inclusion_tag("components/Messages/Messages.html", takes_context=True)
 def messages(
+    context,
     message_list: MessageQuerySet,
     me: User,
     form: Form,
@@ -77,6 +78,7 @@ def messages(
         ]
 
     return {
+        **context.flatten(),
         "days": get_messages_by_date(message_list),
         "form": form,
         "me": me,

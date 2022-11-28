@@ -128,6 +128,7 @@ class InboxPageTests(WebTest):
 class BaseInboxPageSeleniumTests:
     options = None
     driver = None
+    selenium = None
 
     @classmethod
     def setUpClass(cls):
@@ -139,29 +140,23 @@ class BaseInboxPageSeleniumTests:
         cls.selenium.quit()
         super().tearDownClass()
 
+    def setUp(self):
+        self.me = UserFactory.create(
+            email="me@example.com", password="s3cret", is_staff=True
+        )
+        self.user1 = UserFactory.create(first_name="user", last_name="1", email="user1@example.com")
+        self.user2 = UserFactory.create(first_name="user", last_name="2", email="user2@example.com")
+        ContactFactory.create(created_by=self.me, contact_user=self.user1, email=self.user1.email)
+        ContactFactory.create(created_by=self.me, contact_user=self.user2, email=self.user2.email)
+        MessageFactory.create(sender=self.me, receiver=self.user1)
+        MessageFactory.create(receiver=self.me, sender=self.user2)
+
+    def tearDown(self):
+        self.selenium.delete_all_cookies()
+
     def test_async_selector(self):
-        # Create fixtures.
-        me = UserFactory.create(
-            email="johndoe@example.com", password="s3cret", is_staff=True
-        )
-        user1, user2 = UserFactory.create_batch(2)
-        ContactFactory.create(created_by=me, contact_user=user1, email=user1.email)
-        ContactFactory.create(created_by=me, contact_user=user2, email=user2.email)
-        MessageFactory.create(sender=me, receiver=user1)
-        MessageFactory.create(receiver=me, sender=user2)
-
-        # Log in.
-        self.selenium.get("%s%s" % (self.live_server_url, reverse_lazy("admin:login")))
-        username_input = self.selenium.find_element(By.NAME, "username")
-        username_input.send_keys("johndoe@example.com")
-        password_input = self.selenium.find_element(By.NAME, "password")
-        password_input.send_keys("s3cret")
-        self.selenium.find_element(By.XPATH, '//input[@type="submit"]').click()
-
-        # Go to messages page.
-        self.selenium.get(
-            "%s%s" % (self.live_server_url, reverse_lazy("accounts:inbox"))
-        )
+        self.given_i_am_logged_in();
+        self.when_i_navigate_to_page()
 
         # Send message.
         message_count = len(self.selenium.find_elements(By.CSS_SELECTOR, ".message"))
@@ -179,6 +174,46 @@ class BaseInboxPageSeleniumTests:
         url = f"{self.live_server_url}{reverse_lazy('accounts:inbox')}?redirected=True"
         self.assertEqual(url, self.selenium.current_url)
         self.assertNotIn("#messages-last", self.selenium.current_url)
+
+    def test_polling(self):
+        self.given_i_am_logged_in()
+        self.when_i_navigate_to_page()
+
+        # Create message.
+        initial_message_count = len(self.selenium.find_elements(By.CSS_SELECTOR, ".message"))
+        initial_selector = f".messages__list-item:nth-child({initial_message_count}) .message"
+        initial_message = self.selenium.find_element(By.CSS_SELECTOR, initial_selector)
+        initial_text = initial_message.text
+
+        Message.objects.create(receiver=self.me, sender=self.user2, content="Lorem ipsum dolor sit amet.")
+
+        # Assert message.
+        new_selector = f".messages__list-item:nth-child({initial_message_count + 1}) .message"
+        new_message = self.selenium.find_element(By.CSS_SELECTOR, new_selector)
+        self.assertIn("Lorem ipsum dolor sit amet.", new_message.text)
+
+        # Previous message.
+        previous_selector = f".messages__list-item:nth-child({initial_message_count}) .message"
+        previous_message = self.selenium.find_element(By.CSS_SELECTOR, previous_selector)
+        self.assertEqual(initial_text, previous_message.text)
+
+        # assert async.
+        url = f"{self.live_server_url}{reverse_lazy('accounts:inbox')}?redirected=True"
+        self.assertEqual(url, self.selenium.current_url)
+        self.assertNotIn("#messages-last", self.selenium.current_url)
+
+    def given_i_am_logged_in(self):
+        self.selenium.get("%s%s" % (self.live_server_url, reverse_lazy("admin:login")))
+        username_input = self.selenium.find_element(By.NAME, "username")
+        username_input.send_keys("me@example.com")
+        password_input = self.selenium.find_element(By.NAME, "password")
+        password_input.send_keys("s3cret")
+        self.selenium.find_element(By.XPATH, '//input[@type="submit"]').click()
+
+    def when_i_navigate_to_page(self):
+        self.selenium.get(
+            "%s%s" % (self.live_server_url, reverse_lazy("accounts:inbox"))
+        )
 
 
 class InboxPageFirefoxSeleniumTests(

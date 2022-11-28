@@ -10,7 +10,7 @@
     <div class="messages__body">
         <ol
             class="messages__days"
-            hx-get="./"
+            hx-get="{{ request.get_full_path }}"
             hx-select=".messages__days"
             hx-trigger="every 5s"
         >
@@ -43,7 +43,7 @@
         </ol>
 
         {% if other_user.is_active %}
-            {% render_form id="message-form" form=form method="POST" enctype="multipart/form-data" async_selector=".messages" %}
+            {% render_form id="message-form" form=form method="POST" action=request.get_full_path enctype="multipart/form-data" async_selector=".messages" %}
                 {% csrf_token %}
                 {% hidden form.receiver %}
                 <div class="group-input">
