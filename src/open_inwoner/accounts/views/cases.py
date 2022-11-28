@@ -38,7 +38,7 @@ from open_inwoner.openzaak.documents import (
 )
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.utils import (
-    get_role_identification_display,
+    get_role_name_display,
     is_info_object_visible,
     is_zaak_visible,
 )
@@ -251,7 +251,7 @@ class CaseDetailView(BaseBreadcrumbMixin, CaseAccessMixin, TemplateView):
         roles = fetch_case_roles(case.url, RolOmschrijving.initiator)
         if not roles:
             return ""
-        return ", ".join([get_role_identification_display(r) for r in roles])
+        return ", ".join([get_role_name_display(r) for r in roles])
 
     def get_case_document_files(self, case) -> List[SimpleFile]:
         case_info_objects = fetch_case_information_objects(case.url)

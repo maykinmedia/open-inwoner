@@ -87,48 +87,23 @@ def case_table(case: dict, **kwargs) -> dict:
 
     # build rows for data we actually have
     rows = []
-    if case.get("initiator"):
-        rows.append(
-            {
-                "label": _("Aanvrager"),
-                "value": case.get("initiator"),
-            }
-        )
-    if case.get("type_description"):
-        rows.append(
-            {
-                "label": _("Type"),
-                "value": case.get("type_description"),
-            }
-        )
-    if case.get("result"):
-        rows.append(
-            {
-                "label": _("Resultaat"),
-                "value": case.get("result"),
-            }
-        )
-    if case.get("end_date"):
-        rows.append(
-            {
-                "label": _("Einddatum"),
-                "value": case.get("end_date"),
-            }
-        )
-    if case.get("end_date_planned"):
-        rows.append(
-            {
-                "label": _("Verwachte einddatum"),
-                "value": case.get("end_date_planned"),
-            }
-        )
-    if case.get("end_date_legal"):
-        rows.append(
-            {
-                "label": _("Wettelijke termijn"),
-                "value": case.get("end_date_legal"),
-            }
-        )
+
+    def add_row_if_not_empty(key, label):
+        value = case.get(key)
+        if value:
+            rows.append(
+                {
+                    "label": label,
+                    "value": value,
+                }
+            )
+
+    add_row_if_not_empty("initiator", _("Aanvrager"))
+    add_row_if_not_empty("type_description", _("Type"))
+    add_row_if_not_empty("result", _("Resultaat"))
+    add_row_if_not_empty("end_date", _("Einddatum"))
+    add_row_if_not_empty("end_date_planned", _("Verwachte einddatum"))
+    add_row_if_not_empty("end_date_legal", _("Wettelijke termijn"))
 
     table: TableConfig = {"rows": rows}
 

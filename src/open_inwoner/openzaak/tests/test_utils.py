@@ -6,10 +6,7 @@ from zgw_consumers.api_models.zaken import Rol
 from zgw_consumers.test import generate_oas_component
 
 from open_inwoner.openzaak.api_models import InformatieObject
-from open_inwoner.openzaak.utils import (
-    get_role_identification_display,
-    is_info_object_visible,
-)
+from open_inwoner.openzaak.utils import get_role_name_display, is_info_object_visible
 
 
 class TestUtils(TestCase):
@@ -98,7 +95,7 @@ class TestUtils(TestCase):
             )
             self.assertFalse(is_info_object_visible(info_object, "non_existent_key"))
 
-    def test_get_role_identification_display(self):
+    def test_get_role_name_display(self):
         def get_role(type_: str, identification: dict) -> Rol:
             # helper for readability
             component = generate_oas_component(
@@ -120,7 +117,7 @@ class TestUtils(TestCase):
                 },
             )
             expected = "Foo Bar van der Bazz"
-            self.assertEqual(expected, get_role_identification_display(role))
+            self.assertEqual(expected, get_role_name_display(role))
 
         with self.subTest("natuurlijk_persoon > some fields"):
             role = get_role(
@@ -131,7 +128,7 @@ class TestUtils(TestCase):
                 },
             )
             expected = "F. Bazz"
-            self.assertEqual(expected, get_role_identification_display(role))
+            self.assertEqual(expected, get_role_name_display(role))
 
         with self.subTest("natuurlijk_persoon > bad data"):
             role = get_role(
@@ -144,7 +141,7 @@ class TestUtils(TestCase):
                 },
             )
             expected = RolTypes.labels[RolTypes.natuurlijk_persoon]
-            self.assertEqual(expected, get_role_identification_display(role))
+            self.assertEqual(expected, get_role_name_display(role))
 
         with self.subTest("niet_natuurlijk_persoon"):
             role = get_role(
@@ -154,7 +151,7 @@ class TestUtils(TestCase):
                 },
             )
             expected = "Foo Bar"
-            self.assertEqual(expected, get_role_identification_display(role))
+            self.assertEqual(expected, get_role_name_display(role))
 
         with self.subTest("vestiging"):
             role = get_role(
@@ -164,7 +161,7 @@ class TestUtils(TestCase):
                 },
             )
             expected = "Foo Bar"
-            self.assertEqual(expected, get_role_identification_display(role))
+            self.assertEqual(expected, get_role_name_display(role))
 
         with self.subTest("organisatorische_eenheid"):
             role = get_role(
@@ -174,7 +171,7 @@ class TestUtils(TestCase):
                 },
             )
             expected = "Foo Bar"
-            self.assertEqual(expected, get_role_identification_display(role))
+            self.assertEqual(expected, get_role_name_display(role))
 
         with self.subTest("medewerker > all fields"):
             role = get_role(
@@ -186,7 +183,7 @@ class TestUtils(TestCase):
                 },
             )
             expected = "F. B. van der Bazz"
-            self.assertEqual(expected, get_role_identification_display(role))
+            self.assertEqual(expected, get_role_name_display(role))
 
         with self.subTest("medewerker > some fields"):
             role = get_role(
@@ -198,4 +195,4 @@ class TestUtils(TestCase):
                 },
             )
             expected = "Bazz"
-            self.assertEqual(expected, get_role_identification_display(role))
+            self.assertEqual(expected, get_role_name_display(role))
