@@ -186,7 +186,7 @@ class ClosedCaseListView(
 
     def get_anchors(self) -> list:
         return [
-            (reverse("accounts:my_closed_cases"), _("Lopende aanvragen")),
+            (reverse("accounts:my_open_cases"), _("Lopende aanvragen")),
             ("#cases", _("Afgeronde aanvragen")),
         ]
 
