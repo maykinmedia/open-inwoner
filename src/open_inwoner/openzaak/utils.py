@@ -53,7 +53,7 @@ def is_zaak_visible(zaak: Zaak) -> bool:
     return is_object_visible(zaak, config.zaak_max_confidentiality)
 
 
-def get_role_identification_display(rol: Rol) -> str:
+def get_role_name_display(rol: Rol) -> str:
     """
     best effort to get a presentable display string from a role
     """
@@ -96,7 +96,7 @@ def get_role_identification_display(rol: Rol) -> str:
 
     if not display:
         # fallback to generic role description
-        return RolTypes.labels.get(rol.betrokkene_type, rol.betrokkene_type)
+        return rol.get_betrokkene_type_display()
     else:
         return display
 

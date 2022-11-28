@@ -87,7 +87,7 @@ def case_table(case: dict, **kwargs) -> dict:
 
     # build rows for data we actually have
     rows = []
-    if case.get("identification"):
+    if case.get("initiator"):
         rows.append(
             {
                 "label": _("Aanvrager"),
