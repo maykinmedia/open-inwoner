@@ -10,7 +10,7 @@
     {% if data_confirm_cancel %}data-confirm-cancel="{{ data_confirm_cancel }}"{% endif %}
     {% if data_confirm_default %}data-confirm-default="{{ data_confirm_default }}"{% endif %}
     {% if async_selector %}
-        hx-{{ method|lower }}="{{ action|default:"./" }}"
+        hx-{{ method|lower }}="{{ form_action|default:"./" }}"
         hx-select="{{ async_selector }}"
         hx-target="{{ async_selector }}"
     {% endif %}
