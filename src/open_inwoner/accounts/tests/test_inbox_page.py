@@ -144,10 +144,18 @@ class BaseInboxPageSeleniumTests:
         self.me = UserFactory.create(
             email="me@example.com", password="s3cret", is_staff=True
         )
-        self.user1 = UserFactory.create(first_name="user", last_name="1", email="user1@example.com")
-        self.user2 = UserFactory.create(first_name="user", last_name="2", email="user2@example.com")
-        ContactFactory.create(created_by=self.me, contact_user=self.user1, email=self.user1.email)
-        ContactFactory.create(created_by=self.me, contact_user=self.user2, email=self.user2.email)
+        self.user1 = UserFactory.create(
+            first_name="user", last_name="1", email="user1@example.com"
+        )
+        self.user2 = UserFactory.create(
+            first_name="user", last_name="2", email="user2@example.com"
+        )
+        ContactFactory.create(
+            created_by=self.me, contact_user=self.user1, email=self.user1.email
+        )
+        ContactFactory.create(
+            created_by=self.me, contact_user=self.user2, email=self.user2.email
+        )
         MessageFactory.create(sender=self.me, receiver=self.user1)
         MessageFactory.create(receiver=self.me, sender=self.user2)
 
@@ -155,7 +163,7 @@ class BaseInboxPageSeleniumTests:
         self.selenium.delete_all_cookies()
 
     def test_async_selector(self):
-        self.given_i_am_logged_in();
+        self.given_i_am_logged_in()
         self.when_i_navigate_to_page()
 
         # Send message.
@@ -180,21 +188,33 @@ class BaseInboxPageSeleniumTests:
         self.when_i_navigate_to_page()
 
         # Create message.
-        initial_message_count = len(self.selenium.find_elements(By.CSS_SELECTOR, ".message"))
-        initial_selector = f".messages__list-item:nth-child({initial_message_count}) .message"
+        initial_message_count = len(
+            self.selenium.find_elements(By.CSS_SELECTOR, ".message")
+        )
+        initial_selector = (
+            f".messages__list-item:nth-child({initial_message_count}) .message"
+        )
         initial_message = self.selenium.find_element(By.CSS_SELECTOR, initial_selector)
         initial_text = initial_message.text
 
-        Message.objects.create(receiver=self.me, sender=self.user2, content="Lorem ipsum dolor sit amet.")
+        Message.objects.create(
+            receiver=self.me, sender=self.user2, content="Lorem ipsum dolor sit amet."
+        )
 
         # Assert message.
-        new_selector = f".messages__list-item:nth-child({initial_message_count + 1}) .message"
+        new_selector = (
+            f".messages__list-item:nth-child({initial_message_count + 1}) .message"
+        )
         new_message = self.selenium.find_element(By.CSS_SELECTOR, new_selector)
         self.assertIn("Lorem ipsum dolor sit amet.", new_message.text)
 
         # Previous message.
-        previous_selector = f".messages__list-item:nth-child({initial_message_count}) .message"
-        previous_message = self.selenium.find_element(By.CSS_SELECTOR, previous_selector)
+        previous_selector = (
+            f".messages__list-item:nth-child({initial_message_count}) .message"
+        )
+        previous_message = self.selenium.find_element(
+            By.CSS_SELECTOR, previous_selector
+        )
         self.assertEqual(initial_text, previous_message.text)
 
         # assert async.
