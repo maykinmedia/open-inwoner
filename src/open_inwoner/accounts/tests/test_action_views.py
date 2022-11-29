@@ -1,5 +1,6 @@
 from datetime import date
 
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.contrib.messages import get_messages
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
@@ -7,6 +8,9 @@ from django.utils.translation import gettext as _
 
 from django_webtest import WebTest
 from privates.test import temp_private_root
+from selenium.webdriver.common.by import By
+
+from open_inwoner.utils.tests.selenium import ChromeSeleniumMixin, FirefoxSeleniumMixin
 
 from ..choices import StatusChoices
 from ..models import Action
@@ -292,3 +296,98 @@ class ActionViewTests(WebTest):
             HTTP_HX_REQUEST="true",
         )
         self.assertEqual(response.status_code, 404)
+
+
+class ActionStatusSeleniumBaseTests:
+    options = None
+    driver = None
+    selenium = None
+
+    def setUp(self) -> None:
+        super().setUp()
+
+        self.user = UserFactory.create()
+
+        self.action = ActionFactory(
+            name="my_action",
+            created_by=self.user,
+            status=StatusChoices.open,
+        )
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.selenium.implicitly_wait(10)
+
+    def test_action_status(self):
+        self.force_login(self.user)
+
+        self.selenium.get(self.live_server_url + reverse("accounts:action_list"))
+
+        wrapper = self.selenium.find_element(
+            By.CSS_SELECTOR, f"#actions_{self.action.id}__status"
+        )
+        dropdown = wrapper.find_element(By.CSS_SELECTOR, ".dropdown")
+        dropdown_content = dropdown.find_element(By.CSS_SELECTOR, ".dropdown__content")
+
+        self.selenium.execute_script("arguments[0].scrollIntoView(true);", wrapper)
+
+        # grab and check our button is Open
+        button = wrapper.find_element(
+            By.CSS_SELECTOR,
+            f"#actions_{self.action.id}__status .actions__status-selector",
+        )
+        self.assertEqual(
+            button.get_dom_attribute("title"), StatusChoices.labels[StatusChoices.open]
+        )
+        self.assertIn(
+            f"actions__status-selector--{StatusChoices.open}",
+            button.get_attribute("class"),
+        )
+
+        # open the dropdown
+        button.click()
+        self.assertIn(
+            f"dropdown--{StatusChoices.open}", dropdown.get_attribute("class")
+        )
+        self.assertTrue(dropdown_content.is_displayed())
+
+        # find and click the closed button
+        status_closed_button = dropdown_content.find_element(
+            By.CSS_SELECTOR, f".actions__status-{StatusChoices.closed}"
+        )
+        self.assertTrue(status_closed_button.is_displayed())
+
+        # click button and htmx should run
+        status_closed_button.click()
+
+        # grab and check our button is now Closed
+        button = self.selenium.find_element(
+            By.CSS_SELECTOR,
+            f"#actions_{self.action.id}__status .actions__status-selector",
+        )
+        self.assertEqual(
+            button.get_dom_attribute("title"),
+            StatusChoices.labels[StatusChoices.closed],
+        )
+        self.assertIn(
+            f"actions__status-selector--{StatusChoices.closed}",
+            button.get_attribute("class"),
+        )
+        # check our action in the database
+        self.action.refresh_from_db()
+        self.assertEqual(self.action.status, StatusChoices.closed)
+
+
+@temp_private_root()
+class ActionStatusFirefoxSeleniumTests(
+    FirefoxSeleniumMixin, ActionStatusSeleniumBaseTests, StaticLiveServerTestCase
+):
+    pass
+
+
+@temp_private_root()
+class ActionStatusChromeSeleniumTests(
+    ChromeSeleniumMixin, ActionStatusSeleniumBaseTests, StaticLiveServerTestCase
+):
+    pass

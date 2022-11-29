@@ -5,7 +5,7 @@ from django_webtest import WebTest
 from privates.test import temp_private_root
 from selenium.webdriver.common.by import By
 
-from open_inwoner.utils.tests.selenium import ChromeSeleniumTests, FirefoxSeleniumTests
+from open_inwoner.utils.tests.selenium import ChromeSeleniumMixin, FirefoxSeleniumMixin
 
 from ..models import Message
 from .factories import MessageFactory, UserFactory
@@ -135,15 +135,8 @@ class BaseInboxPageSeleniumTests:
         super().setUpClass()
         cls.selenium.implicitly_wait(10)
 
-    @classmethod
-    def tearDownClass(cls):
-        cls.selenium.quit()
-        super().tearDownClass()
-
     def setUp(self):
-        self.me = UserFactory.create(
-            email="me@example.com", password="s3cret", is_staff=True
-        )
+        self.me = UserFactory.create()
         self.user1 = UserFactory.create(
             first_name="user", last_name="1", email="user1@example.com"
         )
@@ -154,9 +147,6 @@ class BaseInboxPageSeleniumTests:
         self.me.user_contacts.add(self.user2)
         MessageFactory.create(sender=self.me, receiver=self.user1)
         MessageFactory.create(receiver=self.me, sender=self.user2)
-
-    def tearDown(self):
-        self.selenium.delete_all_cookies()
 
     def test_async_selector(self):
         self.given_i_am_logged_in()
@@ -219,12 +209,7 @@ class BaseInboxPageSeleniumTests:
         self.assertNotIn("#messages-last", self.selenium.current_url)
 
     def given_i_am_logged_in(self):
-        self.selenium.get("%s%s" % (self.live_server_url, reverse_lazy("admin:login")))
-        username_input = self.selenium.find_element(By.NAME, "username")
-        username_input.send_keys("me@example.com")
-        password_input = self.selenium.find_element(By.NAME, "password")
-        password_input.send_keys("s3cret")
-        self.selenium.find_element(By.XPATH, '//input[@type="submit"]').click()
+        self.force_login(self.me)
 
     def when_i_navigate_to_page(self):
         self.selenium.get(
@@ -233,12 +218,12 @@ class BaseInboxPageSeleniumTests:
 
 
 class InboxPageFirefoxSeleniumTests(
-    FirefoxSeleniumTests, BaseInboxPageSeleniumTests, StaticLiveServerTestCase
+    FirefoxSeleniumMixin, BaseInboxPageSeleniumTests, StaticLiveServerTestCase
 ):
     pass
 
 
 class InboxPageChromeSeleniumTests(
-    ChromeSeleniumTests, BaseInboxPageSeleniumTests, StaticLiveServerTestCase
+    ChromeSeleniumMixin, BaseInboxPageSeleniumTests, StaticLiveServerTestCase
 ):
     pass

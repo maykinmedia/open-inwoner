@@ -62,7 +62,7 @@ def action_status_button(action, request, plan=None, **kwargs):
         {
             "text": label,
             "icon": icon,
-            "class": f"actions__status-button",
+            "class": f"actions__status-button actions__status-{value}",
             "selected": (value == action.status),
             # TODO enable this disabled disabled option after fixing the style issue
             # "disabled": (value == action.status),

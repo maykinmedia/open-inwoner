@@ -4,11 +4,37 @@ from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.chrome.webdriver import WebDriver as ChromeDriver
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.firefox.webdriver import WebDriver as FirefoxDriver
+from seleniumlogin import force_login as selenium_force_login
 
 
-class FirefoxSeleniumTests:
+class SeleniumBrowserMixinBase:
     """
-    usage: mix with your base class and StaticLiveServerTestCase
+    shared baseclass for browser-specific selenium mixins
+
+    expected to be mixed in with StaticLiveServerTestCase
+    """
+
+    options = None
+    driver = None
+    selenium = None
+
+    def force_login(self, user):
+        selenium_force_login(user, self.selenium, self.live_server_url)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.selenium.quit()
+        super().tearDownClass()
+
+    def tearDown(self):
+        self.selenium.delete_all_cookies()
+
+
+class FirefoxSeleniumMixin(SeleniumBrowserMixinBase):
+    """
+    usage: mix with your baseclass and StaticLiveServerTestCase
+
+    example:
 
     class MyPageFirefoxTests(FirefoxSeleniumTests, BaseMyPageTests, StaticLiveServerTestCase):
         pass
@@ -26,9 +52,11 @@ class FirefoxSeleniumTests:
         super().setUpClass()
 
 
-class ChromeSeleniumTests:
+class ChromeSeleniumMixin(SeleniumBrowserMixinBase):
     """
-    usage: mix with your base class and StaticLiveServerTestCase
+    usage: mix with your baseclass and StaticLiveServerTestCase
+
+    example:
 
     class MyPageChromeTests(ChromeSeleniumTests, BaseMyPageTests, StaticLiveServerTestCase):
         pass

@@ -126,6 +126,7 @@ django==3.2.15
     #   django-relativedelta
     #   django-rich
     #   django-rosetta
+    #   django-selenium-login
     #   django-sendfile2
     #   django-sniplates
     #   django-timeline-logger
@@ -296,6 +297,8 @@ django-rosetta==0.9.7
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+django-selenium-login==2.0.0
+    # via -r requirements/test-tools.in
 django-sendfile2==0.7.0
     # via
     #   -c requirements/base.txt
