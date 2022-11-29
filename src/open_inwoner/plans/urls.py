@@ -2,8 +2,8 @@ from django.urls import path
 
 from .views import (
     PlanActionCreateView,
-    PlanActionEditStatusTagView,
     PlanActionDeleteView,
+    PlanActionEditStatusTagView,
     PlanActionEditView,
     PlanCreateView,
     PlanDetailView,

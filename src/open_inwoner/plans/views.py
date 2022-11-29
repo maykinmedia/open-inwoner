@@ -11,8 +11,8 @@ from view_breadcrumbs import BaseBreadcrumbMixin
 from open_inwoner.accounts.forms import ActionListForm, DocumentForm
 from open_inwoner.accounts.views.actions import (
     ActionCreateView,
-    ActionUpdateStatusTagView,
     ActionDeleteView,
+    ActionUpdateStatusTagView,
     ActionUpdateView,
     BaseActionFilter,
 )

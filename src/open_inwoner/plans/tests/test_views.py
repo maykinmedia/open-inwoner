@@ -1,14 +1,19 @@
 from django.contrib.messages import get_messages
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.core import mail
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from django_webtest import WebTest
+from privates.test import temp_private_root
 from webtest import Upload
 
 from open_inwoner.accounts.choices import StatusChoices
 from open_inwoner.accounts.models import Action
+
 from open_inwoner.accounts.tests.factories import ActionFactory, UserFactory
+from open_inwoner.accounts.tests.test_action_views import ActionStatusSeleniumBaseTests
+from open_inwoner.utils.tests.selenium import ChromeSeleniumMixin, FirefoxSeleniumMixin
 
 from ..models import Plan
 from .factories import ActionTemplateFactory, PlanFactory, PlanTemplateFactory
@@ -493,3 +498,38 @@ class PlanViewTests(WebTest):
             HTTP_HX_REQUEST="true",
         )
         self.assertEqual(response.status_code, 404)
+
+
+class _PlanActionStatusSeleniumMixin:
+    def setUp(self) -> None:
+        super().setUp()
+
+        # update the action to belong to our plan
+        self.plan = PlanFactory(created_by=self.user)
+        self.action.plan = self.plan
+        self.action.save()
+
+        # override the url to show plan detail page
+        self.action_list_url = reverse(
+            "plans:plan_detail", kwargs={"uuid": self.plan.uuid}
+        )
+
+
+@temp_private_root()
+class PlanActionStatusFirefoxSeleniumTests(
+    FirefoxSeleniumMixin,
+    _PlanActionStatusSeleniumMixin,
+    ActionStatusSeleniumBaseTests,
+    StaticLiveServerTestCase,
+):
+    pass
+
+
+@temp_private_root()
+class PlanActionStatusChromeSeleniumTests(
+    ChromeSeleniumMixin,
+    _PlanActionStatusSeleniumMixin,
+    ActionStatusSeleniumBaseTests,
+    StaticLiveServerTestCase,
+):
+    pass

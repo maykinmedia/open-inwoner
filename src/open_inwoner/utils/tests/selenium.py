@@ -4,6 +4,7 @@ from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.chrome.webdriver import WebDriver as ChromeDriver
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.firefox.webdriver import WebDriver as FirefoxDriver
+from selenium.webdriver.remote.webdriver import WebDriver
 from seleniumlogin import force_login as selenium_force_login
 
 
@@ -14,9 +15,7 @@ class SeleniumBrowserMixinBase:
     expected to be mixed in with StaticLiveServerTestCase
     """
 
-    options = None
-    driver = None
-    selenium = None
+    selenium: WebDriver = None
 
     def force_login(self, user):
         selenium_force_login(user, self.selenium, self.live_server_url)
