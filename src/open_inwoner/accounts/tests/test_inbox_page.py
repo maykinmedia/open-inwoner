@@ -3,11 +3,9 @@ from django.urls import reverse_lazy
 
 from django_webtest import WebTest
 from privates.test import temp_private_root
-from selenium.webdriver.chrome.options import Options as ChromeOptions
-from selenium.webdriver.chrome.webdriver import WebDriver as ChromeDriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.firefox.options import Options as FirefoxOptions
-from selenium.webdriver.firefox.webdriver import WebDriver as FirefoxDriver
+
+from open_inwoner.utils.tests.selenium import ChromeSeleniumTests, FirefoxSeleniumTests
 
 from ..models import Message
 from .factories import MessageFactory, UserFactory
@@ -235,26 +233,12 @@ class BaseInboxPageSeleniumTests:
 
 
 class InboxPageFirefoxSeleniumTests(
-    BaseInboxPageSeleniumTests, StaticLiveServerTestCase
+    FirefoxSeleniumTests, BaseInboxPageSeleniumTests, StaticLiveServerTestCase
 ):
-    options = FirefoxOptions()
-    driver_class = FirefoxDriver
-
-    @classmethod
-    def setUpClass(cls):
-        cls.options.headless = True
-        cls.selenium = cls.driver_class(options=cls.options)
-        super().setUpClass()
+    pass
 
 
 class InboxPageChromeSeleniumTests(
-    BaseInboxPageSeleniumTests, StaticLiveServerTestCase
+    ChromeSeleniumTests, BaseInboxPageSeleniumTests, StaticLiveServerTestCase
 ):
-    options = ChromeOptions()
-    driver_class = ChromeDriver
-
-    @classmethod
-    def setUpClass(cls):
-        cls.options.headless = True
-        cls.selenium = cls.driver_class(options=cls.options)
-        super().setUpClass()
+    pass
