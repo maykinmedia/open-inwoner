@@ -66,11 +66,14 @@ class PlanDetailView(
 
     def get_context_data(self, **kwargs):
         actions = self.object.actions.visible()
+        obj = self.object
+        user = self.request.user
         context = super().get_context_data(**kwargs)
-        context["contact_users"] = self.request.user.get_active_contacts()
-        context["is_creator"] = self.request.user == self.object.created_by
+
+        context["contact_users"] = obj.get_other_users(user)
+        context["is_creator"] = user == obj.created_by
         context["anchors"] = [
-            ("#title", self.object.title),
+            ("#title", obj.title),
             ("#goals", _("Doelen")),
             ("#files", _("Bestanden")),
             ("#actions", _("Acties")),

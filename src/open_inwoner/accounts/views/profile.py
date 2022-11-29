@@ -23,7 +23,7 @@ from open_inwoner.utils.mixins import ExportMixin
 from open_inwoner.utils.views import LogMixin
 
 from ..forms import ThemesForm, UserForm
-from ..models import Action, Contact, User
+from ..models import Action, User
 
 
 class MyProfileView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormView):
@@ -65,7 +65,7 @@ class MyProfileView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormView)
         context["action_text"] = _(
             f"{Action.objects.visible().connected(self.request.user).filter(status=StatusChoices.open).count()} acties staan open."
         )
-        contacts = user.get_all_contacts()
+        contacts = user.get_active_contacts()
         # Invited contacts
         contact_names = [
             f"{contact.first_name} ({contact.get_contact_type_display()})"

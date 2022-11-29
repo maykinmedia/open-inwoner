@@ -11,7 +11,6 @@ from django.views.generic import UpdateView
 from django_registration.backends.one_step.views import RegistrationView
 from furl import furl
 
-from open_inwoner.accounts.models import Contact
 from open_inwoner.utils.hash import generate_email_from_string
 from open_inwoner.utils.views import LogMixin
 
@@ -53,8 +52,9 @@ class InviteMixin:
 
         #  update inviter - invitee relationship
         inviter_contacts = invite.inviter.user_contacts.all()
-        if not invite.invitee in inviter_contacts:
-            invite.inviter.user_contacts.add(invite.invitee)
+        invitee = invite.invitee
+        if not invitee in inviter_contacts:
+            invite.inviter.user_contacts.add(invitee)
 
 
 class CustomRegistrationView(LogMixin, InviteMixin, RegistrationView):

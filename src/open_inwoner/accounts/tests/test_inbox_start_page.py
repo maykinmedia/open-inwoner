@@ -5,7 +5,7 @@ from furl import furl
 from privates.test import temp_private_root
 
 from ..models import Message
-from .factories import ContactFactory, DocumentFactory, UserFactory
+from .factories import DocumentFactory, UserFactory
 
 
 class InboxPageTests(WebTest):
@@ -18,16 +18,9 @@ class InboxPageTests(WebTest):
         self.app.set_user(self.me)
 
     def test_contact_choices_include_only_active_contacts(self):
-        other_user = UserFactory.create()
-        contact1 = ContactFactory.create(
-            created_by=self.me,
-            contact_user=other_user,
-            first_name=other_user.first_name,
-            last_name=other_user.last_name,
-            email=other_user.email,
-        )
-        ContactFactory.create(created_by=self.me, contact_user__is_active=False)
-        ContactFactory.create(created_by=self.me, contact_user=None)
+        active_contact = UserFactory()
+        inactive_contact = UserFactory(is_active=False)
+        self.me.user_contacts.add(active_contact, inactive_contact)
 
         response = self.app.get(self.url)
 
@@ -36,14 +29,17 @@ class InboxPageTests(WebTest):
         receiver_choices = response.context["form"].fields["receiver"].choices
         self.assertEqual(
             receiver_choices,
-            [[contact1.email, f"{contact1.first_name} {contact1.last_name}"]],
+            [
+                [
+                    active_contact.email,
+                    f"{active_contact.first_name} {active_contact.last_name}",
+                ]
+            ],
         )
 
     def test_send_message(self):
-        other_user = UserFactory.create()
-        contact = ContactFactory.create(
-            created_by=self.me, contact_user=other_user, email=other_user.email
-        )
+        contact = UserFactory()
+        self.me.user_contacts.add(contact)
 
         response = self.app.get(self.url)
 
@@ -68,14 +64,12 @@ class InboxPageTests(WebTest):
 
         self.assertEqual(message.content, "some message")
         self.assertEqual(message.sender, self.me)
-        self.assertEqual(message.receiver, other_user)
+        self.assertEqual(message.receiver, contact)
 
     @temp_private_root()
     def test_send_file(self):
-        other_user = UserFactory.create()
-        contact = ContactFactory.create(
-            created_by=self.me, contact_user=other_user, email=other_user.email
-        )
+        contact = UserFactory()
+        self.me.user_contacts.add(contact)
 
         response = self.app.get(self.url)
 
@@ -100,17 +94,15 @@ class InboxPageTests(WebTest):
 
         self.assertEqual(message.content, "")
         self.assertEqual(message.sender, self.me)
-        self.assertEqual(message.receiver, other_user)
+        self.assertEqual(message.receiver, contact)
 
         file = message.file
         self.assertEqual(file.name, "file.txt")
         self.assertEqual(file.read(), b"test content")
 
     def test_send_empty_message(self):
-        other_user = UserFactory.create()
-        contact = ContactFactory.create(
-            created_by=self.me, contact_user=other_user, email=other_user.email
-        )
+        contact = UserFactory()
+        self.me.user_contacts.add(contact)
 
         response = self.app.get(self.url)
 
@@ -131,10 +123,8 @@ class InboxPageTests(WebTest):
 
     @temp_private_root()
     def test_send_init_file(self):
-        other_user = UserFactory.create()
-        contact = ContactFactory.create(
-            created_by=self.me, contact_user=other_user, email=other_user.email
-        )
+        contact = UserFactory()
+        self.me.user_contacts.add(contact)
         document = DocumentFactory.create(owner=self.me)
         url = furl(self.url).add({"file": document.uuid}).url
 
@@ -158,5 +148,5 @@ class InboxPageTests(WebTest):
 
         self.assertEqual(message.content, "")
         self.assertEqual(message.sender, self.me)
-        self.assertEqual(message.receiver, other_user)
+        self.assertEqual(message.receiver, contact)
         self.assertEqual(message.file, document.file)

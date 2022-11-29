@@ -12,9 +12,8 @@ from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.utils.views import LogMixin
 
-from ..choices import ContactTypeChoices
-from ..forms import ContactCreateForm, ContactFilterForm, ContactUpdateForm
-from ..models import Contact, Invite, User
+from ..forms import ContactCreateForm, ContactFilterForm
+from ..models import Invite, User
 
 
 class ContactListView(LoginRequiredMixin, BaseBreadcrumbMixin, ListView):
@@ -32,7 +31,7 @@ class ContactListView(LoginRequiredMixin, BaseBreadcrumbMixin, ListView):
     def get_queryset(self):
         base_qs = super().get_queryset()
 
-        base_qs = self.request.user.get_all_contacts()
+        base_qs = self.request.user.get_active_contacts()
         type_filter = self.request.GET.get("type")
 
         if type_filter:
@@ -43,42 +42,11 @@ class ContactListView(LoginRequiredMixin, BaseBreadcrumbMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context["pending_invitations"] = self.request.user.get_pending_contacts()
+        user = self.request.user
+        context["pending_approvals"] = user.get_contacts_for_approval()
+        context["pending_invitations"] = user.get_pending_contacts()
         context["form"] = ContactFilterForm(data=self.request.GET)
         return context
-
-
-class ContactUpdateView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
-    template_name = "pages/profile/contacts/edit.html"
-    model = User
-    slug_field = "uuid"
-    slug_url_kwarg = "uuid"
-    form_class = ContactUpdateForm
-    success_url = reverse_lazy("accounts:contact_list")
-
-    @cached_property
-    def crumbs(self):
-        return [
-            (_("Mijn profiel"), reverse("accounts:my_profile")),
-            (_("Mijn contacten"), reverse("accounts:contact_list")),
-            (
-                _("Bewerk {}").format(self.object.get_full_name()),
-                reverse("accounts:contact_edit", kwargs=self.kwargs),
-            ),
-        ]
-
-    def get_queryset(self):
-        base_qs = super().get_queryset()
-
-        current_user = self.request.user
-        base_qs = current_user.user_contacts.all()
-        return base_qs
-
-    def form_valid(self, form):
-        self.object = form.save()
-
-        self.log_change(self.object, _("contact was modified"))
-        return HttpResponseRedirect(self.get_success_url())
 
 
 class ContactCreateView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormView):
@@ -109,7 +77,7 @@ class ContactCreateView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormV
         # Adding a contact-user which already exists in the platform
         if contact_user.exists():
             user.contacts_for_approval.add(contact_user[0])
-
+            self.log_addition(contact_user[0], _("contact was added, pending approval"))
         # New contact-user which triggers an invite
         else:
             invite = Invite.objects.create(
@@ -119,6 +87,10 @@ class ContactCreateView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormV
                 invitee_last_name=cleaned_data["last_name"],
             )
             invite.send(self.request)
+            self.log_addition(
+                invite,
+                _("invite was created"),
+            )
 
         # FIXME type off message
         messages.add_message(
@@ -126,17 +98,10 @@ class ContactCreateView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormV
             messages.SUCCESS,
             _(
                 "{contact} is toegevoegd aan uw contactpersonen.".format(
-                    contact=contact_user[0]
-                    if contact_user.exists()
-                    else f"{cleaned_data['first_name']} {cleaned_data['last_name']}"
+                    contact=cleaned_data["email"]
                 )
             ),
         )
-        if contact_user.exists():
-            self.log_addition(
-                contact_user[0],
-                _("contact was created"),
-            )
         return HttpResponseRedirect(self.get_success_url())
 
 

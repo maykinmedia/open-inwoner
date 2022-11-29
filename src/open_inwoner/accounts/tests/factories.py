@@ -31,18 +31,6 @@ class TokenFactory(factory.django.DjangoModelFactory):
     user_id = factory.LazyAttribute(lambda o: o.created_for.id)
 
 
-class ContactFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = "accounts.Contact"
-
-    first_name = factory.Faker("first_name")
-    last_name = factory.Faker("last_name")
-    email = factory.Faker("email")
-    phonenumber = "0612345678"
-    created_by = factory.SubFactory(UserFactory)
-    contact_user = factory.SubFactory(UserFactory)
-
-
 class AppointmentFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "accounts.Appointment"
@@ -92,6 +80,9 @@ class InviteFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "accounts.Invite"
 
-    contact = factory.SubFactory(ContactFactory)
-    inviter = factory.LazyAttribute(lambda o: o.contact.created_by)
-    invitee_email = factory.LazyAttribute(lambda o: o.contact.email)
+    inviter = factory.SubFactory(UserFactory)
+    invitee_first_name = factory.Faker("first_name")
+    invitee_last_name = factory.Faker("last_name")
+    invitee_email = factory.LazyAttribute(
+        lambda o: "%s%d@invites.com" % (o.invitee_first_name, random.randint(0, 10000))
+    )

@@ -10,7 +10,7 @@ from open_inwoner.pdc.models.category import Category
 from open_inwoner.utils.forms import LimitedUploadFileField, PrivateFileWidget
 
 from .choices import EmptyContactTypeChoices, EmptyStatusChoices, LoginTypeChoices
-from .models import Action, Contact, Document, Invite, Message, User
+from .models import Action, Document, Invite, Message, User
 
 
 class CustomRegistrationForm(RegistrationForm):
@@ -53,6 +53,7 @@ class UserForm(forms.ModelForm):
         fields = (
             "first_name",
             "last_name",
+            "phonenumber",
             "birthday",
             "street",
             "housenumber",
@@ -124,7 +125,6 @@ class ContactCreateForm(forms.Form):
     first_name = forms.CharField(max_length=255)
     last_name = forms.CharField(max_length=255)
     email = forms.EmailField()
-    phonenumber = forms.CharField(required=False, max_length=15)
 
     def __init__(self, user, *args, **kwargs):
         self.user = user
@@ -141,12 +141,6 @@ class ContactCreateForm(forms.Form):
                         "Het ingevoerde e-mailadres komt al voor in uw contactpersonen. Pas de gegevens aan en probeer het opnieuw."
                     )
                 )
-
-
-class ContactUpdateForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = ("first_name", "last_name", "email", "phonenumber")
 
 
 class UserField(forms.ModelChoiceField):

@@ -8,7 +8,7 @@ from privates.admin import PrivateMediaMixin
 
 from open_inwoner.utils.mixins import UUIDAdminFirstInOrder
 
-from .models import Action, Appointment, Contact, Document, Invite, Message, User
+from .models import Action, Appointment, Document, Invite, Message, User
 
 
 class ActionInlineAdmin(UUIDAdminFirstInOrder, admin.StackedInline):
@@ -131,30 +131,6 @@ class ActionAdmin(UUIDAdminFirstInOrder, PrivateMediaMixin, admin.ModelAdmin):
             % updated,
             messages.SUCCESS,
         )
-
-
-@admin.register(Contact)
-class ContactAdmin(UUIDAdminFirstInOrder, admin.ModelAdmin):
-    readonly_fields = ("uuid",)
-    search_fields = (
-        "first_name",
-        "last_name",
-        "email",
-        "contact_user__email",
-        "created_by__email",
-    )
-    list_display = (
-        "first_name",
-        "last_name",
-        "email",
-        "contact_user",
-        "created_by",
-        "created_on",
-    )
-    list_filter = (
-        "contact_user",
-        "created_by",
-    )
 
 
 @admin.register(Document)

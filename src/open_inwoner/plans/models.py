@@ -105,13 +105,6 @@ class Plan(models.Model):
     end_date = models.DateField(
         verbose_name=_("End date"), help_text=_("When the plan should be archived.")
     )
-    contacts = models.ManyToManyField(
-        "accounts.Contact",
-        verbose_name=_("Contacts"),
-        related_name="plans",
-        blank=True,
-        help_text=_("The contact that will help you with this plan."),
-    )
     plan_contacts = models.ManyToManyField(
         "accounts.User",
         verbose_name=_("Contacts"),
@@ -157,11 +150,8 @@ class Plan(models.Model):
     def get_other_users(self, user=None):
         """return list of users participating in the plan with exception of the current user"""
         contacts_ids = self.plan_contacts.values_list("pk", flat=True)
-        created_by_ids = self.contacts.values_list("created_by", flat=True)
-        user_ids = list(
-            set(list(contacts_ids) + list(created_by_ids) + [self.created_by.id])
-        )
-        breakpoint()
+        user_ids = list(set(list(contacts_ids) + [self.created_by.id]))
+
         if user and user.id in user_ids:
             user_ids.remove(user.id)
 

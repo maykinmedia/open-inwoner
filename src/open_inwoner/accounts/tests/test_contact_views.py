@@ -21,9 +21,6 @@ class ContactViewTests(WebTest):
         self.user.user_contacts.add(self.contact)
         self.login_url = reverse("login")
         self.list_url = reverse("accounts:contact_list")
-        self.edit_url = reverse(
-            "accounts:contact_edit", kwargs={"uuid": self.contact.uuid}
-        )
         self.create_url = reverse("accounts:contact_create")
         self.delete_url = reverse(
             "accounts:contact_delete", kwargs={"uuid": self.contact.uuid}
@@ -97,23 +94,6 @@ class ContactViewTests(WebTest):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "reverse_contact_user_should_be_found")
 
-    def test_contact_edit_login_required(self):
-        response = self.app.get(self.edit_url)
-        self.assertRedirects(response, f"{self.login_url}?next={self.edit_url}")
-
-    def test_contact_edit(self):
-        form = self.app.get(self.edit_url, user=self.user).forms["contact-form"]
-        form["first_name"] = "Updated"
-        response = form.submit(user=self.user).follow()
-        self.contact.refresh_from_db()
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Updated")
-        self.assertEqual(self.contact.first_name, "Updated")
-
-    def test_contact_edit_not_your_contact(self):
-        other_user = UserFactory()
-        response = self.app.get(self.edit_url, user=other_user, status=404)
-
     def test_contact_create_login_required(self):
         response = self.app.get(self.create_url)
         self.assertRedirects(response, f"{self.login_url}?next={self.create_url}")
@@ -175,6 +155,17 @@ class ContactViewTests(WebTest):
                 "Het ingevoerde e-mailadres komt al voor in uw contactpersonen. Pas de gegevens aan en probeer het opnieuw."
             ]
         }
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["form"].errors, expected_errors)
+
+    def test_email_required(self):
+        response = self.app.get(self.create_url, user=self.user)
+        form = response.forms["contact-form"]
+
+        form["first_name"] = self.contact.first_name
+        form["last_name"] = self.contact.last_name
+        response = form.submit(user=self.user)
+        expected_errors = {"email": ["Dit veld is vereist."]}
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["form"].errors, expected_errors)
 

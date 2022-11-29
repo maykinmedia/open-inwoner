@@ -10,7 +10,7 @@ from open_inwoner.configurations.models import SiteConfiguration
 
 from ..choices import LoginTypeChoices
 from ..models import User
-from .factories import ContactFactory, InviteFactory, UserFactory
+from .factories import InviteFactory, UserFactory
 
 
 class TestRegistrationFunctionality(WebTest):
@@ -81,16 +81,21 @@ class TestRegistrationFunctionality(WebTest):
         )
 
     def test_registration_with_invite(self):
-        email = self.user.email
-        contact = ContactFactory.create(email=email, contact_user=None)
-        invite = InviteFactory.create(contact=contact, invitee=None)
-        self.assertFalse(User.objects.filter(email=email).exists())
+        user = UserFactory()
+        contact = UserFactory.build(email="test@testemail.com")
+        invite = InviteFactory.create(
+            inviter=user,
+            invitee_email=contact.email,
+            invitee_first_name=contact.first_name,
+            invitee_last_name=contact.last_name,
+        )
+        self.assertFalse(User.objects.filter(email=contact.email).exists())
 
         register_page = self.app.get(f"{self.url}?invite={invite.key}")
         form = register_page.forms["registration-form"]
 
         # check that fields are prefilled with invite data
-        self.assertEqual(form["email"].value, email)
+        self.assertEqual(form["email"].value, contact.email)
         self.assertEqual(form["first_name"].value, contact.first_name)
         self.assertEqual(form["last_name"].value, contact.last_name)
 
@@ -101,19 +106,18 @@ class TestRegistrationFunctionality(WebTest):
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("django_registration_complete"))
-        self.assertTrue(User.objects.filter(email=email).exists())
+        self.assertTrue(User.objects.filter(email=contact.email).exists())
 
-        user = User.objects.get(email=email)
-        contact.refresh_from_db()
+        user = User.objects.get(email=contact.email)
         invite.refresh_from_db()
 
         self.assertEqual(user.first_name, contact.first_name)
         self.assertEqual(user.last_name, contact.last_name)
-        self.assertEqual(contact.contact_user, user)
+        self.assertEqual(user.email, contact.email)
         self.assertEqual(invite.invitee, user)
 
         # reverse contact checks
-        self.assertEqual(user.contacts.count(), 0)
+        self.assertEqual(user.user_contacts.count(), 1)
 
     def test_registration_active_user(self):
         """the user should be redirected to the registration complete page"""
@@ -239,18 +243,19 @@ class TestRegistrationNecessary(WebTest):
         self.assertEqual(user.last_name, "Smith")
 
     def test_submit_with_invite(self):
-        user = UserFactory(
-            first_name="",
-            last_name="",
-            login_type=LoginTypeChoices.digid,
+        user = UserFactory()
+        contact = UserFactory.build()
+        invite = InviteFactory.create(
+            inviter=user,
+            invitee_email=contact.email,
+            invitee_first_name=contact.first_name,
+            invitee_last_name=contact.last_name,
         )
-        contact = ContactFactory.create(contact_user=None)
-        invite = InviteFactory.create(contact=contact, invitee=None)
 
         get_response = self.app.get(f"{self.url}?invite={invite.key}", user=user)
         form = get_response.forms["necessary-form"]
 
-        # assert initials are retrieved from invite.contact
+        # assert initials are retrieved from invite
         self.assertEqual(form["email"].value, contact.email)
         self.assertEqual(form["first_name"].value, contact.first_name)
         self.assertEqual(form["last_name"].value, contact.last_name)
@@ -260,18 +265,13 @@ class TestRegistrationNecessary(WebTest):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("django_registration_complete"))
 
-        user.refresh_from_db()
-        contact.refresh_from_db()
+        user_contact = User.objects.get(email=contact.email)
         invite.refresh_from_db()
 
-        self.assertEqual(user.first_name, contact.first_name)
-        self.assertEqual(user.last_name, contact.last_name)
-        self.assertEqual(user.email, contact.email)
-        self.assertEqual(contact.contact_user, user)
-        self.assertEqual(invite.invitee, user)
-
-        # reverse contact checks
-        self.assertEqual(user.contacts.count(), 0)
+        self.assertEqual(user_contact.first_name, contact.first_name)
+        self.assertEqual(user_contact.last_name, contact.last_name)
+        self.assertEqual(user_contact.email, contact.email)
+        self.assertEqual(user.user_contacts.count(), 1)
 
     def test_submit_not_unique_email(self):
         UserFactory.create(email="john@smith.com")

@@ -12,15 +12,15 @@ from privates.test import temp_private_root
 from timeline_logger.models import TimelineLog
 from webtest import Upload
 
+from open_inwoner.accounts.models import Invite
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.pdc.tests.factories import CategoryFactory
 from open_inwoner.utils.logentry import LOG_ACTIONS
 
 from ..choices import LoginTypeChoices
-from ..models import Action, Contact, Document, Message, User
+from ..models import Action, Document, Message, User
 from .factories import (
     ActionFactory,
-    ContactFactory,
     DocumentFactory,
     InviteFactory,
     MessageFactory,
@@ -338,57 +338,58 @@ class TestContacts(WebTest):
 
     def setUp(self):
         self.user = UserFactory()
-        self.contact = ContactFactory(created_by=self.user)
+        self.contact = UserFactory()
+        self.user.user_contacts.add(self.contact)
 
-    def test_contact_addition_is_logged(self):
-        contact = ContactFactory.build(created_by=self.user)
+    def test_new_contact_invite_is_logged(self):
         form = self.app.get(reverse("accounts:contact_create"), user=self.user).forms[
             "contact-form"
         ]
-        form["email"] = contact.email
-        form["first_name"] = contact.first_name
-        form["last_name"] = contact.last_name
+        form["email"] = "em@ail.com"
+        form["first_name"] = "Koe"
+        form["last_name"] = "Kilsor"
         form.submit()
         log_entry = TimelineLog.objects.last()
+        invite = Invite.objects.get(invitee_email="em@ail.com")
 
         self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEqual(
-            log_entry.content_object.id, Contact.objects.get(email=contact.email).id
-        )
+        self.assertEqual(log_entry.content_object.id, invite.id)
         self.assertEqual(
             log_entry.extra_data,
             {
-                "message": _("contact was created"),
+                "message": _("invite was created"),
                 "action_flag": list(LOG_ACTIONS[ADDITION]),
-                "content_object_repr": f"{contact.first_name} {contact.last_name}",
+                "content_object_repr": invite.__str__(),
             },
         )
 
-    def test_contact_update_is_logged(self):
-        form = self.app.get(
-            reverse("accounts:contact_edit", kwargs={"uuid": self.contact.uuid}),
-            user=self.user,
-        ).forms["contact-form"]
-        form["email"] = "updated@email.com"
+    def test_existing_user_contact_approval_is_logged(self):
+        existing_user = UserFactory()
+        form = self.app.get(reverse("accounts:contact_create"), user=self.user).forms[
+            "contact-form"
+        ]
+        form["email"] = existing_user.email
+        form["first_name"] = existing_user.first_name
+        form["last_name"] = existing_user.last_name
         form.submit()
         log_entry = TimelineLog.objects.last()
 
         self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEqual(log_entry.content_object.id, self.contact.id)
+        self.assertEqual(log_entry.content_object.id, existing_user.id)
         self.assertEqual(
             log_entry.extra_data,
             {
-                "message": _("contact was modified"),
-                "action_flag": list(LOG_ACTIONS[CHANGE]),
-                "content_object_repr": f"{self.contact.first_name} {self.contact.last_name}",
+                "message": _("contact was added, pending approval"),
+                "action_flag": list(LOG_ACTIONS[ADDITION]),
+                "content_object_repr": existing_user.__str__(),
             },
         )
 
-    def test_contact_deletion_is_logged(self):
+    def test_contact_removal_is_logged(self):
         self.app.post(
             reverse("accounts:contact_delete", kwargs={"uuid": self.contact.uuid}),
             user=self.user,
@@ -402,9 +403,9 @@ class TestContacts(WebTest):
         self.assertEqual(
             log_entry.extra_data,
             {
-                "action_flag": list(LOG_ACTIONS[DELETION]),
-                "content_object_repr": f"{self.contact.first_name} {self.contact.last_name}",
-                "message": _("contact was deleted"),
+                "message": _("contact relationship was removed"),
+                "action_flag": list(LOG_ACTIONS[CHANGE]),
+                "content_object_repr": self.contact.__str__(),
             },
         )
 
@@ -539,11 +540,7 @@ class TestMessages(WebTest):
     def setUp(self):
         self.me = UserFactory()
         self.other_user = UserFactory()
-        ContactFactory(
-            created_by=self.me,
-            contact_user=self.other_user,
-            email=self.other_user.email,
-        )
+        self.me.user_contacts.add(self.other_user)
 
     def test_created_message_action_from_contacts_is_logged(self):
         response = self.app.get(

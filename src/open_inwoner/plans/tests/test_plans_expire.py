@@ -5,7 +5,7 @@ from django.core.management import call_command
 from django.test import TestCase
 from django.urls import reverse
 
-from open_inwoner.accounts.tests.factories import ContactFactory, UserFactory
+from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.plans.models import Plan
 
 from .factories import PlanFactory
@@ -50,10 +50,9 @@ class NotifyComandTests(TestCase):
 
     def test_notify_about_expiring_plan(self):
         user = UserFactory()
-        user2 = UserFactory()
-        contact = ContactFactory(contact_user=user2)
+        contact = UserFactory()
         plan = PlanFactory(end_date=date.today(), created_by=user)
-        plan.contacts.add(contact)
+        plan.plan_contacts.add(contact)
 
         call_command("plans_expire")
         self.assertEqual(len(mail.outbox), 2)
@@ -76,7 +75,7 @@ class NotifyComandTests(TestCase):
         self.assertEqual(
             sent_mail2.subject, "Plans about to end today at Open Inwoner Platform"
         )
-        self.assertEqual(sent_mail2.to, [user2.email])
+        self.assertEqual(sent_mail2.to, [contact.email])
         self.assertIn(plan.title, html_body2)
         self.assertIn(plan.goal, html_body2)
         self.assertIn(reverse("plans:plan_list"), html_body2)

@@ -10,7 +10,7 @@ from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.firefox.webdriver import WebDriver as FirefoxDriver
 
 from ..models import Message
-from .factories import ContactFactory, MessageFactory, UserFactory
+from .factories import MessageFactory, UserFactory
 
 
 class InboxPageTests(WebTest):
@@ -20,15 +20,12 @@ class InboxPageTests(WebTest):
         super().setUp()
 
         self.me = UserFactory.create()
-        self.user1, self.user2 = UserFactory.create_batch(2)
-        ContactFactory.create(
-            created_by=self.me, contact_user=self.user1, email=self.user1.email
-        )
-        ContactFactory.create(
-            created_by=self.me, contact_user=self.user2, email=self.user2.email
-        )
-        self.message1 = MessageFactory.create(sender=self.me, receiver=self.user1)
-        self.message2 = MessageFactory.create(receiver=self.me, sender=self.user2)
+        self.contact1 = UserFactory.create()
+        self.contact2 = UserFactory.create()
+        self.me.user_contacts.add(self.contact1)
+        self.me.user_contacts.add(self.contact2)
+        self.message1 = MessageFactory.create(sender=self.me, receiver=self.contact1)
+        self.message2 = MessageFactory.create(receiver=self.me, sender=self.contact2)
 
         self.app.set_user(self.me)
 
@@ -44,7 +41,9 @@ class InboxPageTests(WebTest):
         self.assertEqual(messages[0].id, self.message2.id)
 
     def test_show_conversation_with_user_specified(self):
-        response = self.app.get(self.url, {"with": self.user1.email}, auto_follow=True)
+        response = self.app.get(
+            self.url, {"with": self.contact1.email}, auto_follow=True
+        )
 
         self.assertEqual(response.status_code, 200)
         conversations = response.context["conversations"]["object_list"]
@@ -55,7 +54,9 @@ class InboxPageTests(WebTest):
         self.assertEqual(messages[0].id, self.message1.id)
 
     def test_send_message(self):
-        response = self.app.get(self.url, {"with": self.user1.email}, auto_follow=True)
+        response = self.app.get(
+            self.url, {"with": self.contact1.email}, auto_follow=True
+        )
         self.assertEqual(response.status_code, 200)
 
         form = response.forms["message-form"]
@@ -68,11 +69,13 @@ class InboxPageTests(WebTest):
         last_message = Message.objects.order_by("-pk").first()
         self.assertEqual(last_message.content, "some msg")
         self.assertEqual(last_message.sender, self.me)
-        self.assertEqual(last_message.receiver, self.user1)
+        self.assertEqual(last_message.receiver, self.contact1)
 
     @temp_private_root()
     def test_send_file(self):
-        response = self.app.get(self.url, {"with": self.user1.email}, auto_follow=True)
+        response = self.app.get(
+            self.url, {"with": self.contact1.email}, auto_follow=True
+        )
         self.assertEqual(response.status_code, 200)
 
         form = response.forms["message-form"]
@@ -85,14 +88,16 @@ class InboxPageTests(WebTest):
         last_message = Message.objects.order_by("-pk").first()
         self.assertEqual(last_message.content, "")
         self.assertEqual(last_message.sender, self.me)
-        self.assertEqual(last_message.receiver, self.user1)
+        self.assertEqual(last_message.receiver, self.contact1)
 
         file = last_message.file
         self.assertEqual(file.name, "file.txt")
         self.assertEqual(file.read(), b"test content")
 
     def test_send_empty_message(self):
-        response = self.app.get(self.url, {"with": self.user1.email}, auto_follow=True)
+        response = self.app.get(
+            self.url, {"with": self.contact1.email}, auto_follow=True
+        )
         self.assertEqual(response.status_code, 200)
 
         form = response.forms["message-form"]
@@ -106,9 +111,6 @@ class InboxPageTests(WebTest):
 
     def test_mark_messages_as_seen(self):
         other_user = UserFactory.create()
-        ContactFactory.create(
-            created_by=self.me, contact_user=self.user1, email=self.user1.email
-        )
         message_received = MessageFactory.create(receiver=self.me, sender=other_user)
         message_sent = MessageFactory.create(sender=self.me, receiver=other_user)
 

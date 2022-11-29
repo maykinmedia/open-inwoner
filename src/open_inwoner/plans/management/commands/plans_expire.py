@@ -32,7 +32,7 @@ class Command(BaseCommand):
         )
         contact_ids = list(
             Plan.objects.filter(end_date=today).values_list(
-                "contacts__contact_user_id", flat=True
+                "plan_contacts__id", flat=True
             )
         )
 
@@ -42,7 +42,7 @@ class Command(BaseCommand):
         for receiver in receivers:
             """send email to each user"""
             plans = Plan.objects.filter(end_date=today).filter(
-                Q(created_by=receiver) | Q(contacts__contact_user=receiver)
+                Q(created_by=receiver) | Q(plan_contacts__id=receiver.id)
             )
             self.send_email(
                 receiver=receiver,
