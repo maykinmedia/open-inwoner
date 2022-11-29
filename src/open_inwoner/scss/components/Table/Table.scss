@@ -75,6 +75,11 @@
     border-bottom: 1px solid;
     border-bottom-color: var(--color-gray-light);
 
+    &:first-of-type {
+      border-top: 1px solid;
+      border-top-color: var(--color-gray-light);
+    }
+
     &--borderless {
       border: 0;
       padding: var(--spacing-medium);
@@ -99,6 +104,11 @@
     text-align: left;
     border-bottom: 1px solid;
     border-bottom-color: var(--color-gray-light);
+
+    &:first-of-type {
+      border-top: 1px solid;
+      border-top-color: var(--color-gray-light);
+    }
   }
 
   &__explain {

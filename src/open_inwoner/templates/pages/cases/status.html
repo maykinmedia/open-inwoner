@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n anchor_menu_tags card_tags dashboard_tags file_tags grid_tags status_tags %}
+{% load i18n anchor_menu_tags card_tags dashboard_tags file_tags grid_tags status_tags table_tags %}
 
 {% block sidebar_content %}
     {% if case %}
@@ -15,7 +15,6 @@
                 {# Title/dashboard. #}
                 <h1 class="h1" id="title">{{ case.description }}</h1>
                 {% case_dashboard case %}
-
                 {% case_table case %}
 
                 {#  Status history. #}
