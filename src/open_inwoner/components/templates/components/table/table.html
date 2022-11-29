@@ -1,0 +1,20 @@
+{% load table_tags %}
+{% spaceless %}
+    {% if table.body %}
+        {% render_table %}
+            {% render_table_body %}
+                {% for row in table.body %}
+                    {% render_table_row %}
+                        {% for header in row.headers %}
+                            {% render_table_header %}{{ header.text }}{% endrender_table_header %}
+                        {% endfor %}
+
+                        {% for cell in row.cells %}
+                            {% render_table_cell %}{{ cell.text }}{% endrender_table_cell %}
+                        {% endfor %}
+                    {% endrender_table_row %}
+                {% endfor %}
+            {% endrender_table_body %}
+        {% endrender_table %}
+    {% endif %}
+{% endspaceless %}
