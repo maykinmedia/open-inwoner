@@ -152,12 +152,8 @@ class BaseInboxPageSeleniumTests:
         self.user2 = UserFactory.create(
             first_name="user", last_name="2", email="user2@example.com"
         )
-        ContactFactory.create(
-            created_by=self.me, contact_user=self.user1, email=self.user1.email
-        )
-        ContactFactory.create(
-            created_by=self.me, contact_user=self.user2, email=self.user2.email
-        )
+        self.me.user_contacts.add(self.user1)
+        self.me.user_contacts.add(self.user2)
         MessageFactory.create(sender=self.me, receiver=self.user1)
         MessageFactory.create(receiver=self.me, sender=self.user2)
 
