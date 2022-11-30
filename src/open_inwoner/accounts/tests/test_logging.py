@@ -50,7 +50,7 @@ class TestProfile(WebTest):
         form["password1"] = user.password
         form["password2"] = user.password
         form.submit()
-        log_entry = TimelineLog.objects.first()
+        log_entry = TimelineLog.objects.get()
 
         self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
@@ -113,7 +113,7 @@ class TestProfile(WebTest):
 
     def test_login_via_admin_is_logged(self):
         self.app.post(reverse("admin:login"), user=self.user)
-        log_entry = TimelineLog.objects.first()
+        log_entry = TimelineLog.objects.get()
 
         self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
@@ -130,7 +130,7 @@ class TestProfile(WebTest):
 
     def test_login_via_frontend_using_email_is_logged(self):
         self.app.post(reverse("login"), user=self.user)
-        log_entry = TimelineLog.objects.first()
+        log_entry = TimelineLog.objects.get()
 
         self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
@@ -345,12 +345,12 @@ class TestContacts(WebTest):
         form = self.app.get(reverse("accounts:contact_create"), user=self.user).forms[
             "contact-form"
         ]
-        form["email"] = "em@ail.com"
+        form["email"] = "user@example.com"
         form["first_name"] = "Koe"
         form["last_name"] = "Kilsor"
         form.submit()
         log_entry = TimelineLog.objects.last()
-        invite = Invite.objects.get(invitee_email="em@ail.com")
+        invite = Invite.objects.get(invitee_email="user@example.com")
 
         self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
@@ -361,7 +361,7 @@ class TestContacts(WebTest):
             {
                 "message": _("invite was created"),
                 "action_flag": list(LOG_ACTIONS[ADDITION]),
-                "content_object_repr": invite.__str__(),
+                "content_object_repr": str(invite),
             },
         )
 
@@ -385,7 +385,7 @@ class TestContacts(WebTest):
             {
                 "message": _("contact was added, pending approval"),
                 "action_flag": list(LOG_ACTIONS[ADDITION]),
-                "content_object_repr": existing_user.__str__(),
+                "content_object_repr": str(existing_user),
             },
         )
 
@@ -405,7 +405,7 @@ class TestContacts(WebTest):
             {
                 "message": _("contact relationship was removed"),
                 "action_flag": list(LOG_ACTIONS[CHANGE]),
-                "content_object_repr": self.contact.__str__(),
+                "content_object_repr": str(self.contact),
             },
         )
 
@@ -557,7 +557,7 @@ class TestMessages(WebTest):
         self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEqual(log_entry.content_object.id, Message.objects.first().id)
+        self.assertEqual(log_entry.content_object.id, Message.objects.get().id)
         self.assertEqual(
             log_entry.extra_data,
             {
@@ -582,7 +582,7 @@ class TestMessages(WebTest):
         self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEqual(log_entry.content_object.id, Message.objects.first().id)
+        self.assertEqual(log_entry.content_object.id, Message.objects.get().id)
         self.assertEqual(
             log_entry.extra_data,
             {

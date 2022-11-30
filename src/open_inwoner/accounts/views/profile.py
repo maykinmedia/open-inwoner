@@ -46,7 +46,7 @@ class MyProfileView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormView)
         ]
         # List of names of 'mentor' users that are a contact of me
         mentor_contacts = [
-            str(c.get_full_name())
+            c.get_full_name()
             for c in user.user_contacts.filter(
                 contact_type=ContactTypeChoices.begeleider
             )

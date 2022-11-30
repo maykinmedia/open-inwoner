@@ -99,7 +99,7 @@ class ContactViewTests(WebTest):
         self.assertRedirects(response, f"{self.login_url}?next={self.create_url}")
 
     def test_new_user_contact_not_created_and_invite_sent(self):
-        contacts_before = self.user.user_contacts.count()
+        contacts_before = list(self.user.user_contacts.all())
         response = self.app.get(self.create_url, user=self.user)
         self.assertEqual(response.status_code, 200)
 
@@ -111,11 +111,11 @@ class ContactViewTests(WebTest):
         self.assertEqual(response.status_code, 302)
 
         # check that the contact was not created
-        self.assertEqual(self.user.user_contacts.count(), contacts_before)
+        self.assertEqual(list(self.user.user_contacts.all()), contacts_before)
 
         # check that the invite was created
         self.assertEqual(self.user.sent_invites.count(), 1)
-        invite = self.user.sent_invites.first()
+        invite = self.user.sent_invites.get()
         self.assertEqual(invite.inviter, self.user)
 
         # check that the invite was sent
@@ -152,7 +152,9 @@ class ContactViewTests(WebTest):
         response = form.submit(user=self.user)
         expected_errors = {
             "__all__": [
-                "Het ingevoerde e-mailadres komt al voor in uw contactpersonen. Pas de gegevens aan en probeer het opnieuw."
+                _(
+                    "Het ingevoerde e-mailadres komt al voor in uw contactpersonen. Pas de gegevens aan en probeer het opnieuw."
+                )
             ]
         }
         self.assertEqual(response.status_code, 200)

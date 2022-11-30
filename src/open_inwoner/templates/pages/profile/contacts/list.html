@@ -51,7 +51,7 @@
             {% endfor %}        
             {% for contact in object_list %}
                 <tr>
-                    <th class="table__header">{{ contact.first_name }} {{ contact.last_name }}</th>
+                    <th class="table__header">{{ contact.get_full_name }}</th>
                     <td class="table__item">{% if contact.contact_type == "contact" %}Contactpersoon{% elif contact.contact_type == "begeleider" %}Begeleider{% elif contact.contact_type == "organization" %}Organisatie{% endif %}</td>
                     <td class="table__item">{{ contact.get_contact_email|default:"" }}</td>
                     <td class="table__item">{{ contact.phonenumber }}</td>

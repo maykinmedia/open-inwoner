@@ -29,7 +29,7 @@ class PlanForm(forms.ModelForm):
         user_contacts = user.get_active_contacts()
         self.fields["plan_contacts"].queryset = user_contacts
         self.fields["plan_contacts"].choices = [
-            [c.id, f"{c.first_name} {c.last_name}"] for c in user_contacts
+            [c.id, c.get_full_name()] for c in user_contacts
         ]
 
         if self.instance.pk:

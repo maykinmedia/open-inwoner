@@ -150,7 +150,7 @@ class Plan(models.Model):
     def get_other_users(self, user=None):
         """return list of users participating in the plan with exception of the current user"""
         contacts_ids = self.plan_contacts.values_list("pk", flat=True)
-        user_ids = list(set(list(contacts_ids) + [self.created_by.id]))
+        user_ids = {self.created_by.id, *contacts_ids}
 
         if user and user.id in user_ids:
             user_ids.remove(user.id)

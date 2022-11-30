@@ -36,16 +36,16 @@ class TestAdminTimelineLogging(WebTest):
         self.add_instance()
 
         log_entry = TimelineLog.objects.last()
-        self.assertEquals(
+        self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEquals(log_entry.content_object.id, Plan.objects.first().id)
-        self.assertEquals(
+        self.assertEqual(log_entry.content_object.id, Plan.objects.first().id)
+        self.assertEqual(
             log_entry.extra_data,
             {
                 "message": _("Toegevoegd."),
                 "action_flag": list(LOG_ACTIONS[ADDITION]),
-                "content_object_repr": self.plan.__str__(),
+                "content_object_repr": str(self.plan),
             },
         )
 
@@ -61,11 +61,11 @@ class TestAdminTimelineLogging(WebTest):
         form.submit()
 
         log_entry = TimelineLog.objects.last()
-        self.assertEquals(
+        self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEquals(log_entry.content_object.id, Plan.objects.first().id)
-        self.assertEquals(
+        self.assertEqual(log_entry.content_object.id, Plan.objects.first().id)
+        self.assertEqual(
             log_entry.extra_data,
             {
                 "message": "Titel, Doel and Einddatum gewijzigd.",
@@ -82,27 +82,27 @@ class TestAdminTimelineLogging(WebTest):
         delete_form.submit()
 
         log_entry = TimelineLog.objects.last()
-        self.assertEquals(
+        self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEquals(
+        self.assertEqual(
             log_entry.extra_data,
             {
                 "message": "",
                 "action_flag": list(LOG_ACTIONS[DELETION]),
-                "content_object_repr": plan.__str__(),
+                "content_object_repr": str(plan),
             },
         )
 
     def test_user_does_not_have_add_permission(self):
         url = reverse("admin:timeline_logger_timelinelog_add")
         response = self.app.get(url, user=self.user, expect_errors=True)
-        self.assertEquals(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)
 
     def test_superuser_does_not_have_add_permission(self):
         log_url = reverse("admin:timeline_logger_timelinelog_add")
         response = self.app.get(log_url, user=self.user, expect_errors=True)
-        self.assertEquals(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)
 
     def test_superuser_does_not_have_change_permission(self):
         add_url = reverse("admin:plans_plan_add")
@@ -118,7 +118,7 @@ class TestAdminTimelineLogging(WebTest):
             kwargs={"object_id": log_entry.id},
         )
         response = self.app.post(log_url, user=self.user, expect_errors=True)
-        self.assertEquals(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)
 
     def test_superuser_does_not_have_delete_permission(self):
         add_url = reverse("admin:plans_plan_add")
@@ -134,7 +134,7 @@ class TestAdminTimelineLogging(WebTest):
             kwargs={"object_id": log_entry.id},
         )
         response = self.app.post(log_url, user=self.user, expect_errors=True)
-        self.assertEquals(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)
 
     def test_get_action_returns_addition_when_object_is_added(self):
         url = reverse("admin:plans_plan_add")
@@ -149,7 +149,7 @@ class TestAdminTimelineLogging(WebTest):
         action = CustomTimelineLogAdmin.get_action_flag(
             CustomTimelineLogAdmin, log_entry
         )
-        self.assertEquals(action, _("Aangemaakt"))
+        self.assertEqual(action, _("Aangemaakt"))
 
     def test_get_action_returns_change_when_object_is_modified(self):
         plan = PlanFactory()
@@ -162,7 +162,7 @@ class TestAdminTimelineLogging(WebTest):
         action = CustomTimelineLogAdmin.get_action_flag(
             CustomTimelineLogAdmin, log_entry
         )
-        self.assertEquals(action, _("Gewijzigd"))
+        self.assertEqual(action, _("Gewijzigd"))
 
     def test_get_action_returns_delete_when_object_is_deleted(self):
         plan = PlanFactory()
@@ -174,7 +174,7 @@ class TestAdminTimelineLogging(WebTest):
         action = CustomTimelineLogAdmin.get_action_flag(
             CustomTimelineLogAdmin, log_entry
         )
-        self.assertEquals(action, _("Verwijderd"))
+        self.assertEqual(action, _("Verwijderd"))
 
     def test_get_action_returns_empty_string_when_no_extra_data_exists(self):
         plan = PlanFactory()
@@ -184,7 +184,7 @@ class TestAdminTimelineLogging(WebTest):
         action = CustomTimelineLogAdmin.get_action_flag(
             CustomTimelineLogAdmin, log_entry
         )
-        self.assertEquals(action, "")
+        self.assertEqual(action, "")
 
     def test_object_link_returns_right_link(self):
         self.add_instance()

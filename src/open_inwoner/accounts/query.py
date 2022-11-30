@@ -94,5 +94,5 @@ class MessageQuerySet(QuerySet):
 
 
 class InviteQuerySet(QuerySet):
-    def get_pending_invitations_for_user(self, me: "User") -> "InviteQuerySet":
-        return self.filter(inviter=me, accepted=False).order_by("-pk")
+    def get_pending_invitations_for_user(self, user: "User") -> "InviteQuerySet":
+        return self.filter(inviter=user, accepted=False).order_by("-pk")

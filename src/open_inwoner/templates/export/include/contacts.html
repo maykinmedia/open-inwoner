@@ -13,7 +13,7 @@
     <tbody>
         {% for contact in object.get_all_contacts %}
             <tr>
-                <td class="table__item">{{ contact.first_name }} {{ contact.last_name }}</td>
+                <td class="table__item">{{contact.get_full_name}}</td>
                 <td class="table__item">{{ contact.get_contact_type_display }}</td>
                 <td class="table__item">{{ contact.email }}</td>
                 <td class="table__item">{{ contact.phonenumber|default:"-" }}</td>

@@ -35,7 +35,7 @@ class TestRegistrationFunctionality(WebTest):
         form.submit()
         # Verify the registered user.
         registered_user = User.objects.get(email=self.user.email)
-        self.assertEquals(registered_user.email, self.user.email)
+        self.assertEqual(registered_user.email, self.user.email)
         self.assertTrue(registered_user.check_password(self.user.password))
 
     def test_registration_fails_without_filling_out_first_name(self):
@@ -48,7 +48,7 @@ class TestRegistrationFunctionality(WebTest):
         form.submit()
         # Verify that the user has not been registered
         user_query = User.objects.filter(email=self.user.email)
-        self.assertEquals(user_query.count(), 0)
+        self.assertEqual(user_query.count(), 0)
 
     def test_registration_fails_without_filling_out_last_name(self):
         register_page = self.app.get(reverse("django_registration_register"))
@@ -60,7 +60,7 @@ class TestRegistrationFunctionality(WebTest):
         form.submit()
         # Verify that the user has not been registered
         user_query = User.objects.filter(email=self.user.email)
-        self.assertEquals(user_query.count(), 0)
+        self.assertEqual(user_query.count(), 0)
 
     def test_registration_inactive_user(self):
         inactive_user = UserFactory.create(is_active=False)
@@ -89,7 +89,7 @@ class TestRegistrationFunctionality(WebTest):
             invitee_first_name=contact.first_name,
             invitee_last_name=contact.last_name,
         )
-        self.assertFalse(User.objects.filter(email=contact.email).exists())
+        self.assertEqual(list(User.objects.filter(email=contact.email)), [])
 
         register_page = self.app.get(f"{self.url}?invite={invite.key}")
         form = register_page.forms["registration-form"]
@@ -108,16 +108,16 @@ class TestRegistrationFunctionality(WebTest):
         self.assertEqual(response.url, reverse("django_registration_complete"))
         self.assertTrue(User.objects.filter(email=contact.email).exists())
 
-        user = User.objects.get(email=contact.email)
+        new_user = User.objects.get(email=contact.email)
         invite.refresh_from_db()
 
-        self.assertEqual(user.first_name, contact.first_name)
-        self.assertEqual(user.last_name, contact.last_name)
-        self.assertEqual(user.email, contact.email)
-        self.assertEqual(invite.invitee, user)
+        self.assertEqual(new_user.first_name, contact.first_name)
+        self.assertEqual(new_user.last_name, contact.last_name)
+        self.assertEqual(new_user.email, contact.email)
+        self.assertEqual(invite.invitee, new_user)
 
         # reverse contact checks
-        self.assertEqual(user.user_contacts.count(), 1)
+        self.assertEqual(list(user.user_contacts.all()), [new_user])
 
     def test_registration_active_user(self):
         """the user should be redirected to the registration complete page"""
@@ -271,7 +271,7 @@ class TestRegistrationNecessary(WebTest):
         self.assertEqual(user_contact.first_name, contact.first_name)
         self.assertEqual(user_contact.last_name, contact.last_name)
         self.assertEqual(user_contact.email, contact.email)
-        self.assertEqual(user.user_contacts.count(), 1)
+        self.assertEqual(list(user.user_contacts.all()), [user_contact])
 
     def test_submit_not_unique_email(self):
         UserFactory.create(email="john@smith.com")
@@ -349,7 +349,7 @@ class TestLoginLogoutFunctionality(WebTest):
         form["password"] = "test"
         response = form.submit()
 
-        self.assertEquals(response.context["errors"], [_("Deze account is inactief.")])
+        self.assertEqual(response.context["errors"], [_("Deze account is inactief.")])
 
     def test_login_with_wrong_credentials_shows_appropriate_message(self):
         form = self.app.get(reverse("login")).forms["login-form"]
@@ -357,7 +357,7 @@ class TestLoginLogoutFunctionality(WebTest):
         form["password"] = "wrong_password"
         response = form.submit()
 
-        self.assertEquals(
+        self.assertEqual(
             response.context["errors"],
             [
                 _(
