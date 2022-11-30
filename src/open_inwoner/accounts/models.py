@@ -503,6 +503,13 @@ class Action(models.Model):
         related_name="actions",
         help_text=_("The plan that the action belongs to. This can be left empty."),
     )
+    is_deleted = models.BooleanField(
+        verbose_name=_("Is soft-deleted"),
+        default=False,
+        help_text=_(
+            "This indicates a soft-delete where an admin can restore the record."
+        ),
+    )
     logs = GenericRelation(TimelineLog)
 
     objects = ActionQueryset.as_manager()

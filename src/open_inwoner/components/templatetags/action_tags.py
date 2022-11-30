@@ -43,6 +43,27 @@ def get_action_edit_url(action, plan=None):
     return reverse("accounts:action_edit", kwargs={"uuid": action.uuid})
 
 
+@register.simple_tag()
+def get_action_delete_url(action, plan=None):
+    """
+    generates the correct action delete url. It can be plan action or a general action.
+
+    Usage:
+        {% get_action_delete_url action=action plan=plan %}
+        {% get_action_delete_url action=action %}
+
+    Variables:
+        + action: Action | The action the url should be generated from.
+        - plan: Plan | The plan the action edit url should be generated for.
+    """
+    if plan:
+        return reverse(
+            "plans:plan_action_delete",
+            kwargs={"plan_uuid": plan.uuid, "uuid": action.uuid},
+        )
+    return reverse("accounts:action_delete", kwargs={"uuid": action.uuid})
+
+
 @register.filter()
 def is_connected(action, user):
     """

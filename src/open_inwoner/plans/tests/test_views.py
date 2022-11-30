@@ -1,3 +1,4 @@
+from django.contrib.messages import get_messages
 from django.core import mail
 from django.urls import reverse
 from django.utils.translation import ugettext as _
@@ -5,6 +6,7 @@ from django.utils.translation import ugettext as _
 from django_webtest import WebTest
 from webtest import Upload
 
+from open_inwoner.accounts.models import Action
 from open_inwoner.accounts.tests.factories import (
     ActionFactory,
     ContactFactory,
@@ -26,6 +28,9 @@ class PlanViewTests(WebTest):
         self.plan.contacts.add(self.contact)
 
         self.action = ActionFactory(plan=self.plan, created_by=self.user)
+        self.action_deleted = ActionFactory(
+            plan=self.plan, created_by=self.user, is_deleted=True
+        )
 
         self.login_url = reverse("login")
         self.list_url = reverse("plans:plan_list")
@@ -43,6 +48,10 @@ class PlanViewTests(WebTest):
         )
         self.action_edit_url = reverse(
             "plans:plan_action_edit",
+            kwargs={"plan_uuid": self.plan.uuid, "uuid": self.action.uuid},
+        )
+        self.action_delete_url = reverse(
+            "plans:plan_action_delete",
             kwargs={"plan_uuid": self.plan.uuid, "uuid": self.action.uuid},
         )
         self.export_url = reverse("plans:plan_export", kwargs={"uuid": self.plan.uuid})
@@ -106,7 +115,7 @@ class PlanViewTests(WebTest):
 
         # Verify that without being added to the plan the contact isn't visible
         new_user = UserFactory()
-        new_contact = ContactFactory(created_by=new_user, contact_user=self.user)
+        ContactFactory(created_by=new_user, contact_user=self.user)
 
         response = self.app.get(self.detail_url, user=self.user)
         self.assertContains(response, self.contact_user.get_full_name())
@@ -153,7 +162,7 @@ class PlanViewTests(WebTest):
 
     def test_plan_goal_edit_not_your_action(self):
         other_user = UserFactory()
-        response = self.app.get(self.goal_edit_url, user=other_user, status=404)
+        self.app.get(self.goal_edit_url, user=other_user, status=404)
 
     def test_plan_file_add_login_required(self):
         response = self.app.get(self.file_add_url)
@@ -198,7 +207,7 @@ class PlanViewTests(WebTest):
         response = form.submit(user=self.user)
         self.assertEqual(response.status_code, 302)
 
-        self.assertEqual(self.plan.actions.count(), 2)
+        self.assertEqual(self.plan.actions.visible().count(), 2)
 
     def test_plan_action_create_contact_can_access(self):
         response = self.app.get(self.action_add_url, user=self.contact_user)
@@ -209,11 +218,11 @@ class PlanViewTests(WebTest):
         response = form.submit(user=self.user)
         self.assertEqual(response.status_code, 302)
 
-        self.assertEqual(self.plan.actions.count(), 2)
+        self.assertEqual(self.plan.actions.visible().count(), 2)
 
     def test_plan_action_create_not_your_action(self):
         other_user = UserFactory()
-        response = self.app.get(self.action_add_url, user=other_user, status=404)
+        self.app.get(self.action_add_url, user=other_user, status=404)
 
     def test_plan_create_login_required(self):
         response = self.app.get(self.create_url)
@@ -332,6 +341,13 @@ class PlanViewTests(WebTest):
         response = self.app.get(self.action_edit_url)
         self.assertRedirects(response, f"{self.login_url}?next={self.action_edit_url}")
 
+    def test_plan_action_edit_deleted_action(self):
+        url = reverse(
+            "plans:plan_action_edit",
+            kwargs={"plan_uuid": self.plan.uuid, "uuid": self.action_deleted.uuid},
+        )
+        self.app.get(url, user=self.user, status=404)
+
     def test_plan_action_edit(self):
         response = self.app.get(self.action_edit_url, user=self.user)
         self.assertEqual(response.status_code, 200)
@@ -368,6 +384,48 @@ class PlanViewTests(WebTest):
         # no notification is sent
         self.assertEqual(len(mail.outbox), 0)
 
+    def test_plan_action_delete_login_required_http_403(self):
+        response = self.client.post(self.action_delete_url)
+        self.assertEquals(response.status_code, 403)
+
+    def test_plan_action_delete_http_get_is_not_allowed(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.action_delete_url)
+        self.assertEqual(response.status_code, 405)
+
+    def test_plan_action_delete(self):
+        self.client.force_login(self.user)
+        response = self.client.post(self.action_delete_url)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, self.detail_url)
+
+        # Action is now marked as .is_deleted (and not actually deleted)
+        action = Action.objects.get(id=self.action.id)
+        self.assertTrue(action.is_deleted)
+
+        # django message to user
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        expected = _("Actie '{action}' is verwijdered.").format(action=self.action)
+        self.assertEqual(str(messages[0]), expected)
+
+        # email is sent to out contact
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertEqual(
+            email.subject, "Plan action has been updated at Open Inwoner Platform"
+        )
+        self.assertEqual(email.to, [self.contact_user.email])
+        plan_url = f"http://testserver{self.detail_url}"
+        body = email.alternatives[0][0]  # html version of the email body
+        self.assertIn(plan_url, body)
+
+    def test_plan_action_delete_not_your_action(self):
+        other_user = UserFactory()
+        self.client.force_login(other_user)
+        response = self.client.post(self.action_delete_url)
+        self.assertEqual(response.status_code, 404)
+
     def test_plan_export(self):
         response = self.app.get(self.export_url, user=self.user)
         self.assertEqual(response.status_code, 200)
@@ -376,6 +434,7 @@ class PlanViewTests(WebTest):
             response["Content-Disposition"],
             f'attachment; filename="plan_{self.plan.uuid}.pdf"',
         )
+        self.assertEqual(list(response.context["actions"]), [self.action])
 
     def test_plan_export_login_required(self):
         response = self.app.get(self.export_url)
@@ -383,4 +442,4 @@ class PlanViewTests(WebTest):
 
     def test_plan_export_not_your_plan(self):
         other_user = UserFactory()
-        response = self.app.get(self.export_url, user=other_user, status=404)
+        self.app.get(self.export_url, user=other_user, status=404)

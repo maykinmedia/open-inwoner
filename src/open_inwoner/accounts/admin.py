@@ -1,8 +1,8 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin
 from django.urls import reverse, reverse_lazy
 from django.utils.html import format_html
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ngettext, ugettext_lazy as _
 
 from privates.admin import PrivateMediaMixin
 
@@ -88,9 +88,44 @@ class _UserAdmin(UserAdmin):
 @admin.register(Action)
 class ActionAdmin(UUIDAdminFirstInOrder, PrivateMediaMixin, admin.ModelAdmin):
     readonly_fields = ("uuid",)
-    list_display = ("name", "created_on", "created_by")
-    list_filter = ("created_by",)
+    list_display = ("name", "created_on", "created_by", "is_deleted")
+    list_filter = (
+        "is_deleted",
+        "created_by",
+    )
     private_media_fields = ("file",)
+    actions = [
+        "mark_not_deleted",
+        "mark_deleted",
+    ]
+
+    @admin.action(description=_("Mark selected actions as soft-deleted by user."))
+    def mark_deleted(self, request, queryset):
+        updated = queryset.update(is_deleted=True)
+        self.message_user(
+            request,
+            ngettext(
+                "%d actions was successfully marked as deleted.",
+                "%d stories were successfully marked as deleted.",
+                updated,
+            )
+            % updated,
+            messages.SUCCESS,
+        )
+
+    @admin.action(description=_("Restore selected soft-deleted actions"))
+    def mark_not_deleted(self, request, queryset):
+        updated = queryset.update(is_deleted=False)
+        self.message_user(
+            request,
+            ngettext(
+                "%d actions was successfully restored.",
+                "%d stories were successfully restored.",
+                updated,
+            )
+            % updated,
+            messages.SUCCESS,
+        )
 
 
 @admin.register(Contact)

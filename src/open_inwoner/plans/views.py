@@ -11,6 +11,7 @@ from view_breadcrumbs import BaseBreadcrumbMixin
 from open_inwoner.accounts.forms import ActionListForm, DocumentForm
 from open_inwoner.accounts.views.actions import (
     ActionCreateView,
+    ActionDeleteView,
     ActionUpdateView,
     BaseActionFilter,
 )
@@ -64,7 +65,7 @@ class PlanDetailView(
         )
 
     def get_context_data(self, **kwargs):
-        actions = self.object.actions.all()
+        actions = self.object.actions.visible()
         context = super().get_context_data(**kwargs)
         context["contact_users"] = self.object.get_other_users(self.request.user)
         context["is_creator"] = self.request.user == self.object.created_by
@@ -318,6 +319,33 @@ class PlanActionEditView(ActionUpdateView):
 
     def get_success_url(self) -> str:
         return self.object.get_absolute_url()
+
+
+class PlanActionDeleteView(ActionDeleteView):
+    def get_plan(self):
+        try:
+            return Plan.objects.connected(self.request.user).get(
+                uuid=self.kwargs.get("plan_uuid")
+            )
+        except ObjectDoesNotExist as e:
+            raise Http404
+
+    def get_success_url(self) -> str:
+        return self.get_plan().get_absolute_url()
+
+    def on_delete_action(self, action):
+        super().on_delete_action(action)
+
+        # notify
+        plan = self.get_plan()
+        other_users = plan.get_other_users(user=self.request.user)
+        if other_users.count():
+            action.send(
+                plan=plan,
+                message=_("Actie '{action}' is verwijdered.").format(action=action),
+                receivers=other_users,
+                request=self.request,
+            )
 
 
 class PlanExportView(LogMixin, LoginRequiredMixin, ExportMixin, DetailView):

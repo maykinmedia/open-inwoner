@@ -88,5 +88,8 @@ class UserManager(BaseUserManager):
 
 
 class ActionQueryset(QuerySet):
+    def visible(self):
+        return self.filter(is_deleted=False)
+
     def connected(self, user):
         return self.filter(Q(created_by=user) | Q(is_for=user)).distinct()
