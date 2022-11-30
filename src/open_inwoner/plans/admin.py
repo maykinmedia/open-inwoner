@@ -30,4 +30,3 @@ class PlanAdmin(UUIDAdminFirstInOrder, admin.ModelAdmin):
     )
     inlines = [ActionInlineAdmin]
     filter_horizontal = ("plan_contacts",)
-    exclude = ("contacts",)

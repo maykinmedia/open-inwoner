@@ -5,8 +5,8 @@ from django.urls.base import reverse, reverse_lazy
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 from django.views.generic import ListView, View
-from django.views.generic.edit import FormView
 from django.views.generic.detail import SingleObjectMixin
+from django.views.generic.edit import FormView
 
 from view_breadcrumbs import BaseBreadcrumbMixin
 
