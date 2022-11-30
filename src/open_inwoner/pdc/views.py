@@ -107,7 +107,7 @@ class FAQView(TemplateView):
     template_name = "pages/faq.html"
 
     def get_context_data(self, **kwargs):
-        kwargs.update(faqs=Question.objects.filter(category__isnull=True))
+        kwargs.update(faqs=Question.objects.general())
         return super().get_context_data(**kwargs)
 
 

@@ -74,9 +74,7 @@ def settings(request):
         "matomo_enabled": config.matomo_enabled,
         "menu_categories": Category.get_root_nodes().published(),
         "search_form": SearchForm(),
-        "has_general_faq_questions": Question.objects.filter(
-            category__isnull=True
-        ).exists(),
+        "has_general_faq_questions": Question.objects.general().exists(),
         "settings": dict(
             [(k, getattr(django_settings, k, None)) for k in public_settings]
         ),

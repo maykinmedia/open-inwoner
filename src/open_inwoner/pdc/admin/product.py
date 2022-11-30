@@ -18,6 +18,7 @@ from ..models import (
     ProductLocation,
 )
 from ..resources import ProductExportResource, ProductImportResource
+from . import QuestionInline
 from .mixins import GeoAdminMixin
 
 
@@ -61,6 +62,7 @@ class ProductAdmin(ImportExportMixin, admin.ModelAdmin):
     inlines = (
         ProductFileInline,
         ProductLinkInline,
+        QuestionInline,
     )
 
     # import-export

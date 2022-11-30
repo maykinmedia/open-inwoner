@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n l10n button_tags card_tags file_tags grid_tags icon_tags link_tags map_tags notification_tags tag_tags utils condition_tags render_tags anchor_menu_tags %}
+{% load i18n l10n button_tags card_tags faq_tags file_tags grid_tags icon_tags link_tags map_tags notification_tags tag_tags utils condition_tags render_tags anchor_menu_tags %}
 
 {% block header_image %}
 {% if object.image %}
@@ -42,6 +42,11 @@
         {% button_row mobile=True %}
             {% button href=product.link text=_("Aanvraag starten") primary=True icon="arrow_forward" icon_position="before" %}
         {% endbutton_row %}
+    {% endif %}
+
+    {% if object.question_set.all %}
+        <hr class="divider">
+        {% faq object.question_set.all %}
     {% endif %}
 
     {% if object.files.exists %}
