@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import CheckConstraint, Q
 from django.utils.translation import ugettext_lazy as _
 
 from ordered_model.models import OrderedModel
@@ -33,6 +34,12 @@ class Question(OrderedModel):
         verbose_name = _("Vraag")
         verbose_name_plural = _("FAQ vragen")
         ordering = ("category", "order")
+        constraints = [
+            CheckConstraint(
+                check=Q(category__isnull=True) | Q(product__isnull=True),
+                name="category_or_product_null",
+            ),
+        ]
 
     def clean(self):
         super().clean()
