@@ -241,7 +241,7 @@ django-mptt==0.13.4
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-filer
-django-open-forms-client==0.2.2
+django-open-forms-client==0.2.3
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
