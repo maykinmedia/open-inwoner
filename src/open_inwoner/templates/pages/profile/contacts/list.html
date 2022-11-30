@@ -40,7 +40,7 @@
             {% endfor %}
             {% for approval in pending_approvals %}
                 <tr>
-                    <th class="table__header">{{approval.first_name}} {{approval.last_name}}</th>
+                    <th class="table__header"></th>
                     <td class="table__item"></td>
                     <td class="table__item">{{approval.email}}</td>
                     <td class="table__item"></td>
@@ -49,7 +49,7 @@
                     <td class="table__item">{% button icon="settings" text="" hide_text=True disabled=True %}<td>
                 </tr>
             {% endfor %}        
-            {% for contact in object_list %}     
+            {% for contact in object_list %}
                 <tr>
                     <th class="table__header">{{ contact.first_name }} {{ contact.last_name }}</th>
                     <td class="table__item">{% if contact.contact_type == "contact" %}Contactpersoon{% elif contact.contact_type == "begeleider" %}Begeleider{% elif contact.contact_type == "organization" %}Organisatie{% endif %}</td>

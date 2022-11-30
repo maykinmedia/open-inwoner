@@ -1,12 +1,12 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Q
 from django.http.response import HttpResponseRedirect
 from django.urls.base import reverse, reverse_lazy
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
-from django.views.generic import ListView
-from django.views.generic.edit import DeleteView, FormView, UpdateView
+from django.views.generic import ListView, View
+from django.views.generic.edit import FormView
+from django.views.generic.detail import SingleObjectMixin
 
 from view_breadcrumbs import BaseBreadcrumbMixin
 
@@ -105,7 +105,7 @@ class ContactCreateView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormV
         return HttpResponseRedirect(self.get_success_url())
 
 
-class ContactDeleteView(LogMixin, LoginRequiredMixin, DeleteView):
+class ContactDeleteView(LogMixin, LoginRequiredMixin, SingleObjectMixin, View):
     model = User
     slug_field = "uuid"
     slug_url_kwarg = "uuid"
@@ -118,9 +118,8 @@ class ContactDeleteView(LogMixin, LoginRequiredMixin, DeleteView):
         base_qs = current_user.user_contacts.all()
         return base_qs
 
-    def delete(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         object = self.get_object()
-
         current_user = self.request.user
 
         # Remove relationship between the two users
