@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+        ("accounts", "0047_auto_20221130_1609"),
         ("plans", "0008_alter_plan_options"),
     ]
 
