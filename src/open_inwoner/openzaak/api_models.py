@@ -114,10 +114,27 @@ class Rol(ZGWModel):
     indicatie_machtiging: Optional[str] = ""
     registratiedatum: Optional[datetime] = None
     betrokkene: Optional[str] = ""
-    betrokkene_identificatie: Optional[dict] = ""
+    betrokkene_identificatie: Optional[dict] = None
 
     def get_betrokkene_type_display(self):
         return RolTypes.values[self.betrokkene_type]
 
     def get_omschrijving_generiek_display(self):
         return RolOmschrijving.values[self.omschrijving_generiek]
+
+
+@dataclass
+class Resultaat(ZGWModel):
+    url: str
+    zaak: str
+    resultaattype: str
+    toelichting: Optional[str] = ""
+
+
+@dataclass
+class Status(ZGWModel):
+    url: str
+    zaak: str
+    statustype: str
+    datum_status_gezet: Optional[datetime] = None
+    statustoelichting: Optional[str] = ""
