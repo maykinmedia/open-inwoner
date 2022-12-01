@@ -234,8 +234,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         return not self.is_active
 
     def get_contact_email(self):
-        email = self.email
-        return email if "@example.org" not in email else ""
+        return self.email if "@example.org" not in self.email else ""
 
     def get_active_contacts(self):
         return self.user_contacts.filter(is_active=True)
@@ -590,10 +589,7 @@ class Invite(models.Model):
         verbose_name_plural = _("Invitations")
 
     def __str__(self):
-        invitee = self.invitee
-        return (
-            f"For: {invitee if invitee else _('new user')} ({self.created_on.date()})"
-        )
+        return f"For: {self.invitee if self.invitee else _('new user')} ({self.created_on.date()})"
 
     def save(self, **kwargs):
         if not self.pk:
