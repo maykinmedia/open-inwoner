@@ -13,7 +13,6 @@ from zgw_consumers.api_models.constants import (
     RolTypes,
     VertrouwelijkheidsAanduidingen,
 )
-from zgw_consumers.api_models.zaken import Status
 from zgw_consumers.constants import APITypes
 from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 
@@ -22,6 +21,7 @@ from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.accounts.views.cases import SimpleFile
 from open_inwoner.utils.test import paginated_response
 
+from ..api_models import Status
 from ..models import OpenZaakConfig
 from .factories import ServiceFactory
 
