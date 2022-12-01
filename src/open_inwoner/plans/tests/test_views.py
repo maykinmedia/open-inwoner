@@ -393,7 +393,7 @@ class PlanViewTests(WebTest):
         self.assertEqual(
             email.subject, "Plan action has been updated at Open Inwoner Platform"
         )
-        self.assertEqual(email.to, [self.contact_user.email])
+        self.assertEqual(email.to, [self.contact.email])
         plan_url = f"http://testserver{self.detail_url}"
         body = email.alternatives[0][0]  # html version of the email body
         self.assertIn(plan_url, body)
