@@ -3,7 +3,11 @@ from django.urls import reverse
 
 import requests_mock
 from django_webtest import WebTest
-from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
+from zgw_consumers.api_models.constants import (
+    RolOmschrijving,
+    RolTypes,
+    VertrouwelijkheidsAanduidingen,
+)
 from zgw_consumers.constants import APITypes
 from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 
@@ -75,11 +79,30 @@ class TestDocumentDownloadView(WebTest):
             beschrijving="",
             registratiedatum="2021-01-12",
         )
-        self.role = generate_oas_component(
+        self.user_role = generate_oas_component(
             "zrc",
             "schemas/Rol",
             url=f"{ZAKEN_ROOT}rollen/f33153aa-ad2c-4a07-ae75-15add5891",
-            betrokkene_identificatie="foo",
+            omschrijvingGeneriek=RolOmschrijving.initiator,
+            betrokkeneType=RolTypes.natuurlijk_persoon,
+            betrokkeneIdentificatie={
+                "inpBsn": "900222086",
+                "voornamen": "Foo Bar",
+                "voorvoegselGeslachtsnaam": "van der",
+                "geslachtsnaam": "Bazz",
+            },
+        )
+        self.not_our_user_role = generate_oas_component(
+            "zrc",
+            "schemas/Rol",
+            url=f"{ZAKEN_ROOT}rollen/aa353aa-ad2c-4a07-ae75-15add5822",
+            omschrijvingGeneriek=RolOmschrijving.behandelaar,
+            betrokkeneType=RolTypes.natuurlijk_persoon,
+            betrokkeneIdentificatie={
+                "inpBsn": "123456789",
+                "voornamen": "Somebody",
+                "geslachtsnaam": "Else",
+            },
         )
         self.informatie_object_content = "my document content".encode("utf8")
         self.informatie_object = generate_oas_component(
@@ -117,8 +140,8 @@ class TestDocumentDownloadView(WebTest):
         self._setUpOASMocks(m)
         m.get(self.zaak["url"], json=self.zaak)
         m.get(
-            f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}&betrokkeneIdentificatie__natuurlijkPersoon__inpBsn={self.user.bsn}",
-            json=paginated_response([self.role]),
+            f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}",
+            json=paginated_response([self.user_role, self.not_our_user_role]),
         )
         m.get(
             f"{ZAKEN_ROOT}zaakinformatieobjecten?zaak={self.zaak['url']}&informatieobject={self.informatie_object['url']}",
@@ -225,9 +248,9 @@ class TestDocumentDownloadView(WebTest):
         self._setUpOASMocks(m)
         m.get(self.zaak["url"], json=self.zaak)
         m.get(
-            f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}&betrokkeneIdentificatie__natuurlijkPersoon__inpBsn={self.user.bsn}",
-            # no roles found
-            json=paginated_response([]),
+            f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}",
+            # no roles for our user found
+            json=paginated_response([self.not_our_user_role]),
         )
         self.app.get(self.informatie_object_file.url, user=self.user, status=403)
 
@@ -235,8 +258,8 @@ class TestDocumentDownloadView(WebTest):
         self._setUpOASMocks(m)
         m.get(self.zaak["url"], json=self.zaak)
         m.get(
-            f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}&betrokkeneIdentificatie__natuurlijkPersoon__inpBsn={self.user.bsn}",
-            json=paginated_response([self.role]),
+            f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}",
+            json=paginated_response([self.user_role, self.not_our_user_role]),
         )
         m.get(self.informatie_object["url"], json=self.informatie_object)
         m.get(
