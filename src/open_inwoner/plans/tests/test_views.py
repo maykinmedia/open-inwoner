@@ -515,7 +515,6 @@ class _PlanActionStatusSeleniumMixin:
         )
 
 
-@temp_private_root()
 class PlanActionStatusFirefoxSeleniumTests(
     FirefoxSeleniumMixin,
     _PlanActionStatusSeleniumMixin,
@@ -523,9 +522,9 @@ class PlanActionStatusFirefoxSeleniumTests(
     StaticLiveServerTestCase,
 ):
     pass
+    # note these use the same ActionStatusSeleniumBaseTests as the Actions without Plan
 
 
-@temp_private_root()
 class PlanActionStatusChromeSeleniumTests(
     ChromeSeleniumMixin,
     _PlanActionStatusSeleniumMixin,

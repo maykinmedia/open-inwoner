@@ -321,11 +321,19 @@ class ActionStatusSeleniumBaseTests:
         cls.selenium.implicitly_wait(10)
 
     def test_action_status(self):
+        """
+        note: there are some issues with both selenium and the threading in StaticLiveServerTestCase
+          that make it seemingly impossible to get this to pass with either implicit or explicit wait conditions
+
+        after trying everything in the docs and stackoverflow with inconsistent results on both the Firefox and Chrome
+          versions running both locally and on CI, the solution was to simply put time.sleep(1) after each async action
+        """
         self.force_login(self.user)
 
-        # wait for user and session to be visible from the server thread
+        # wait for user and session to be visible from the server thread (weirdly only a problem on CI)
         time.sleep(1)
 
+        # use a big screen because scroll_into_view or JS scroll commands are problematic
         self.selenium.set_window_size(1200, 1200)
         self.selenium.get(self.live_server_url + self.action_list_url)
 
@@ -355,7 +363,7 @@ class ActionStatusSeleniumBaseTests:
             0, 200
         ).click(button).perform()
 
-        # wait for htmx to return (neither implicit or explicit wait/until nor ActionChains.pause will help)
+        # wait for htmx to return (neither implicit or explicit waits nor ActionChains.pause will help)
         time.sleep(1)
 
         self.assertIn(
@@ -363,16 +371,16 @@ class ActionStatusSeleniumBaseTests:
         )
         self.assertTrue(dropdown_content.is_displayed())
 
-        # find and click the closed button
+        # find and click the close-state button
         status_closed_button = dropdown_content.find_element(
             By.CSS_SELECTOR, f".actions__status-{StatusChoices.closed}"
         )
         self.assertTrue(status_closed_button.is_displayed())
 
         # click button and htmx should run
-        ActionChains(self.selenium).click(status_closed_button).perform()
+        status_closed_button.click()
 
-        # wait for htmx to return (neither implicit or explicit wait/until nor ActionChains.pause will help)
+        # wait for htmx to return
         time.sleep(1)
 
         # regrab and check our button is now Closed
@@ -388,19 +396,18 @@ class ActionStatusSeleniumBaseTests:
             f"actions__status-selector--{StatusChoices.closed}",
             button.get_attribute("class"),
         )
-        # check our action in the database
+
+        # check our action in the database is closed now
         self.action.refresh_from_db()
         self.assertEqual(self.action.status, StatusChoices.closed)
 
 
-@temp_private_root()
 class ActionStatusFirefoxSeleniumTests(
     FirefoxSeleniumMixin, ActionStatusSeleniumBaseTests, StaticLiveServerTestCase
 ):
     pass
 
 
-@temp_private_root()
 class ActionStatusChromeSeleniumTests(
     ChromeSeleniumMixin, ActionStatusSeleniumBaseTests, StaticLiveServerTestCase
 ):

@@ -35,6 +35,8 @@ class StatusChoices(DjangoChoices):
     approval = ChoiceItem("approval", _("Accordering"), icon="question_mark")
     closed = ChoiceItem("closed", _("Afgerond"), icon="check")
 
+    # note the icons are names from Material Symbols and Icons - Google Fonts
+
     @classmethod
     def get_icon(cls, status, default="label"):
         if status in cls.values:
