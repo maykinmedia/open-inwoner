@@ -90,16 +90,16 @@ class InformatieObject(ZGWModel):
     bestandsnaam: str
     inhoud: str
     bestandsomvang: int
-    link: str
-    beschrijving: str
-    ontvangstdatum: str
-    verzenddatum: str
     # indicatieGebruiksrecht: str
-    ondertekening: dict  # {'soort': '', 'datum': None}
-    integriteit: dict  # {'algoritme': '', 'waarde': '', 'datum': None}
     informatieobjecttype: str
     locked: bool
     # bestandsdelen: List[str]
+    beschrijving: Optional[str] = ""
+    link: Optional[str] = ""
+    ontvangstdatum: Optional[str] = ""
+    verzenddatum: Optional[str] = ""
+    ondertekening: Optional[dict] = None  # {'soort': '', 'datum': None}
+    integriteit: Optional[dict] = None  # {'algoritme': '', 'waarde': '', 'datum': None}
 
 
 @dataclass
