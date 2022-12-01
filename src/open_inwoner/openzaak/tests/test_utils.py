@@ -2,10 +2,9 @@ from django.test import TestCase
 
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.constants import RolTypes, VertrouwelijkheidsAanduidingen
-from zgw_consumers.api_models.zaken import Rol
 from zgw_consumers.test import generate_oas_component
 
-from open_inwoner.openzaak.api_models import InformatieObject
+from open_inwoner.openzaak.api_models import InformatieObject, Rol
 from open_inwoner.openzaak.utils import get_role_name_display, is_info_object_visible
 
 

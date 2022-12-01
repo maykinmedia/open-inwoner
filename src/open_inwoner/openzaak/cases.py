@@ -5,10 +5,10 @@ from requests import RequestException
 from zds_client import ClientError
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
-from zgw_consumers.api_models.zaken import Resultaat, Rol, Status, Zaak
+from zgw_consumers.api_models.zaken import Resultaat, Status
 from zgw_consumers.service import get_paginated_results
 
-from .api_models import Zaak, ZaakInformatieObject
+from .api_models import Rol, Zaak, ZaakInformatieObject
 from .clients import build_client
 from .models import OpenZaakConfig
 from .utils import cache as cache_result

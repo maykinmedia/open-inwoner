@@ -5,9 +5,8 @@ from functools import wraps
 from django.core.cache import caches
 
 from zgw_consumers.api_models.constants import RolTypes, VertrouwelijkheidsAanduidingen
-from zgw_consumers.api_models.zaken import Rol
 
-from open_inwoner.openzaak.api_models import InformatieObject, Zaak
+from open_inwoner.openzaak.api_models import InformatieObject, Rol, Zaak
 
 from .models import OpenZaakConfig
 

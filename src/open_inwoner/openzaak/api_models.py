@@ -3,6 +3,7 @@ from datetime import date, datetime
 from typing import Optional
 
 from zgw_consumers.api_models.base import ZGWModel
+from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 
 """
 Modified ZGWModel's to work with both OpenZaak and e-Suite implementations,
@@ -99,3 +100,24 @@ class InformatieObject(ZGWModel):
     informatieobjecttype: str
     locked: bool
     # bestandsdelen: List[str]
+
+
+@dataclass
+class Rol(ZGWModel):
+    url: str
+    zaak: str
+    betrokkene_type: str
+    roltype: str
+    omschrijving: str
+    omschrijving_generiek: str
+    roltoelichting: str
+    indicatie_machtiging: Optional[str] = ""
+    registratiedatum: Optional[datetime] = None
+    betrokkene: Optional[str] = ""
+    betrokkene_identificatie: Optional[dict] = ""
+
+    def get_betrokkene_type_display(self):
+        return RolTypes.values[self.betrokkene_type]
+
+    def get_omschrijving_generiek_display(self):
+        return RolOmschrijving.values[self.omschrijving_generiek]
