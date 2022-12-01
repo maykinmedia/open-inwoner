@@ -4,7 +4,7 @@ from typing import List, Optional
 from requests import RequestException
 from zds_client import ClientError
 from zgw_consumers.api_models.base import factory
-from zgw_consumers.api_models.constants import RolOmschrijving
+from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 from zgw_consumers.api_models.zaken import Resultaat, Rol, Status, Zaak
 from zgw_consumers.service import get_paginated_results
 
@@ -170,31 +170,24 @@ def fetch_case_roles(
 
 
 def fetch_roles_for_case_and_bsn(case_url: str, bsn: str) -> List[Rol]:
-    client = build_client("zaak")
+    """
+    note we do a query on all case_roles and then manually filter our roles from the result,
+    because e-Suite doesn't support querying on both "zaak" AND "betrokkeneIdentificatie__natuurlijkPersoon__inpBsn"
 
-    if client is None:
+    see Taiga #948
+    """
+    case_roles = fetch_case_roles(case_url)
+    if not case_roles:
         return []
 
-    try:
-        response = client.list(
-            "rol",
-            request_kwargs={
-                "params": {
-                    "zaak": case_url,
-                    "betrokkeneIdentificatie__natuurlijkPersoon__inpBsn": bsn,
-                }
-            },
-        )
-    except RequestException as e:
-        logger.exception("exception while making request", exc_info=e)
-        return []
-    except ClientError as e:
-        logger.exception("exception while making request", exc_info=e)
-        return []
+    bsn_roles = []
+    for role in case_roles:
+        if role.betrokkene_type == RolTypes.natuurlijk_persoon:
+            inp_bsn = role.betrokkene_identificatie.get("inp_bsn")
+            if inp_bsn and inp_bsn == bsn:
+                bsn_roles.append(role)
 
-    roles = factory(Rol, response["results"])
-
-    return roles
+    return bsn_roles
 
 
 def fetch_case_information_objects_for_case_and_info(

@@ -151,15 +151,29 @@ class TestCaseDetailView(WebTest):
             volgnummer=2,
             is_eindstatus=False,
         )
-        self.role = generate_oas_component(
+        self.user_role = generate_oas_component(
             "zrc",
             "schemas/Rol",
-            url=f"{ZAKEN_ROOT}rollen/f33153aa-adnatuurlijk_persoon2c-4a07-ae75-15add5891",
+            url=f"{ZAKEN_ROOT}rollen/f33153aa-ad2c-4a07-ae75-15add5891",
+            omschrijvingGeneriek=RolOmschrijving.initiator,
             betrokkeneType=RolTypes.natuurlijk_persoon,
             betrokkeneIdentificatie={
-                "geslachtsnaam": "Bazz",
-                "voorvoegselGeslachtsnaam": "van der",
+                "inpBsn": "900222086",
                 "voornamen": "Foo Bar",
+                "voorvoegselGeslachtsnaam": "van der",
+                "geslachtsnaam": "Bazz",
+            },
+        )
+        self.not_our_user_role = generate_oas_component(
+            "zrc",
+            "schemas/Rol",
+            url=f"{ZAKEN_ROOT}rollen/aa353aa-ad2c-4a07-ae75-15add5822",
+            omschrijvingGeneriek=RolOmschrijving.behandelaar,
+            betrokkeneType=RolTypes.natuurlijk_persoon,
+            betrokkeneIdentificatie={
+                "inpBsn": "123456789",
+                "voornamen": "Somebody",
+                "geslachtsnaam": "Else",
             },
         )
         self.result = generate_oas_component(
@@ -253,12 +267,12 @@ class TestCaseDetailView(WebTest):
             json=paginated_response([self.status1, self.status2]),
         )
         m.get(
-            f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}&omschrijvingGeneriek={RolOmschrijving.initiator}",
-            json=paginated_response([self.role]),
+            f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}",
+            json=paginated_response([self.user_role, self.not_our_user_role]),
         )
         m.get(
-            f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}&betrokkeneIdentificatie__natuurlijkPersoon__inpBsn={self.user.bsn}",
-            json=paginated_response([self.role]),
+            f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}&omschrijvingGeneriek={RolOmschrijving.initiator}",
+            json=paginated_response([self.user_role]),
         )
         m.get(
             f"{ZAKEN_ROOT}resultaten/a44153aa-ad2c-6a07-be75-15add5113",
@@ -422,9 +436,9 @@ class TestCaseDetailView(WebTest):
             json=paginated_response([self.status1, self.status2]),
         )
         m.get(
-            f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}&betrokkeneIdentificatie__natuurlijkPersoon__inpBsn={self.user.bsn}",
-            # no roles found
-            json=paginated_response([]),
+            f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}",
+            # no roles for our user found
+            json=paginated_response([self.not_our_user_role]),
         )
         response = self.app.get(
             reverse(
@@ -480,8 +494,8 @@ class TestCaseDetailView(WebTest):
         mock_service_oas_get(m, CATALOGI_ROOT, "ztc")
         m.get(self.zaak_invisible["url"], json=self.zaak_invisible)
         m.get(
-            f"{ZAKEN_ROOT}rollen?zaak={self.zaak_invisible['url']}&betrokkeneIdentificatie__natuurlijkPersoon__inpBsn={self.user.bsn}",
-            json=paginated_response([self.role]),
+            f"{ZAKEN_ROOT}rollen?zaak={self.zaak_invisible['url']}",
+            json=paginated_response([self.user_role, self.not_our_user_role]),
         )
 
         response = self.app.get(
