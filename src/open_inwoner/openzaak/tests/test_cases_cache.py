@@ -220,21 +220,24 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
     def test_cached_case_types_in_combination_with_new_ones(self, m):
         self._setUpMocks(m)
 
-        # First attempt
-        self.assertIsNone(cache.get(f"case_type:{self.zaaktype['url']}"))
+        with freeze_time("2022-01-01 12:00") as frozen_time:
+            # First attempt
+            self.assertIsNone(cache.get(f"case_type:{self.zaaktype['url']}"))
 
-        self.app.get(self.url, user=self.user)
+            self.app.get(self.url, user=self.user)
 
-        self.assertIsNotNone(cache.get(f"case_type:{self.zaaktype['url']}"))
+            self.assertIsNotNone(cache.get(f"case_type:{self.zaaktype['url']}"))
 
-        # Second attempt with new case and case type
-        self.assertIsNone(cache.get(f"case_type:{self.new_zaaktype['url']}"))
-        self._setUpNewMock(m)
+            # Second attempt with new case and case type
+            self._setUpNewMock(m)
+            # Wait 3 minutes for the list cases cache to expire
+            frozen_time.tick(delta=datetime.timedelta(minutes=3))
+            self.assertIsNone(cache.get(f"case_type:{self.new_zaaktype['url']}"))
 
-        self.app.get(self.url, user=self.user)
+            self.app.get(self.url, user=self.user)
 
-        self.assertIsNotNone(cache.get(f"case_type:{self.zaaktype['url']}"))
-        self.assertIsNotNone(cache.get(f"case_type:{self.new_zaaktype['url']}"))
+            self.assertIsNotNone(cache.get(f"case_type:{self.zaaktype['url']}"))
+            self.assertIsNotNone(cache.get(f"case_type:{self.new_zaaktype['url']}"))
 
     def test_status_types_are_cached(self, m):
         self._setUpMocks(m)
@@ -275,41 +278,43 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
     def test_cached_status_types_in_combination_with_new_ones(self, m):
         self._setUpMocks(m)
 
-        # First attempt
-        self.assertIsNone(
-            cache.get(f"status_types_for_case_type:{self.zaaktype['url']}")
-        )
-        self.assertIsNone(
-            cache.get(f"status_types_for_case_type:{self.zaaktype['url']}")
-        )
+        with freeze_time("2022-01-01 12:00") as frozen_time:
+            # First attempt
+            self.assertIsNone(
+                cache.get(f"status_types_for_case_type:{self.zaaktype['url']}")
+            )
+            self.assertIsNone(
+                cache.get(f"status_types_for_case_type:{self.zaaktype['url']}")
+            )
 
-        self.app.get(self.url, user=self.user)
+            self.app.get(self.url, user=self.user)
 
-        self.assertIsNotNone(
-            cache.get(f"status_types_for_case_type:{self.zaaktype['url']}")
-        )
-        self.assertIsNotNone(
-            cache.get(f"status_types_for_case_type:{self.zaaktype['url']}")
-        )
+            self.assertIsNotNone(
+                cache.get(f"status_types_for_case_type:{self.zaaktype['url']}")
+            )
+            self.assertIsNotNone(
+                cache.get(f"status_types_for_case_type:{self.zaaktype['url']}")
+            )
 
-        # Second attempt with new case and status type
-        self._setUpNewMock(m)
+            # Second attempt with new case and status type
+            self._setUpNewMock(m)
+            # Wait 3 minutes for the list cases cache to expire
+            frozen_time.tick(delta=datetime.timedelta(minutes=3))
+            self.assertIsNone(
+                cache.get(f"status_types_for_case_type:{self.new_zaaktype['url']}")
+            )
 
-        self.assertIsNone(
-            cache.get(f"status_types_for_case_type:{self.new_zaaktype['url']}")
-        )
+            self.app.get(self.url, user=self.user)
 
-        self.app.get(self.url, user=self.user)
-
-        self.assertIsNotNone(
-            cache.get(f"status_types_for_case_type:{self.new_zaaktype['url']}")
-        )
-        self.assertIsNotNone(
-            cache.get(f"status_types_for_case_type:{self.zaaktype['url']}")
-        )
-        self.assertIsNotNone(
-            cache.get(f"status_types_for_case_type:{self.zaaktype['url']}")
-        )
+            self.assertIsNotNone(
+                cache.get(f"status_types_for_case_type:{self.new_zaaktype['url']}")
+            )
+            self.assertIsNotNone(
+                cache.get(f"status_types_for_case_type:{self.zaaktype['url']}")
+            )
+            self.assertIsNotNone(
+                cache.get(f"status_types_for_case_type:{self.zaaktype['url']}")
+            )
 
     def test_statuses_are_cached(self, m):
         self._setUpMocks(m)
@@ -338,25 +343,27 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
     def test_cached_statuses_in_combination_with_new_ones(self, m):
         self._setUpMocks(m)
 
-        # First attempt
-        self.assertIsNone(cache.get(f"status:{self.status1['url']}"))
-        self.assertIsNone(cache.get(f"status:{self.status2['url']}"))
+        with freeze_time("2022-01-01 12:00") as frozen_time:
+            # First attempt
+            self.assertIsNone(cache.get(f"status:{self.status1['url']}"))
+            self.assertIsNone(cache.get(f"status:{self.status2['url']}"))
 
-        self.app.get(self.url, user=self.user)
+            self.app.get(self.url, user=self.user)
 
-        self.assertIsNotNone(cache.get(f"status:{self.status1['url']}"))
-        self.assertIsNotNone(cache.get(f"status:{self.status2['url']}"))
+            self.assertIsNotNone(cache.get(f"status:{self.status1['url']}"))
+            self.assertIsNotNone(cache.get(f"status:{self.status2['url']}"))
 
-        # Second attempt with new case and status type
-        self._setUpNewMock(m)
+            # Second attempt with new case and status type
+            self._setUpNewMock(m)
+            # Wait 3 minutes for the list cases cache to expire
+            frozen_time.tick(delta=datetime.timedelta(minutes=3))
+            self.assertIsNone(cache.get(f"status:{self.new_status['url']}"))
 
-        self.assertIsNone(cache.get(f"status:{self.new_status['url']}"))
+            self.app.get(self.url, user=self.user)
 
-        self.app.get(self.url, user=self.user)
-
-        self.assertIsNotNone(cache.get(f"status:{self.new_status['url']}"))
-        self.assertIsNotNone(cache.get(f"status:{self.status1['url']}"))
-        self.assertIsNotNone(cache.get(f"status:{self.status2['url']}"))
+            self.assertIsNotNone(cache.get(f"status:{self.new_status['url']}"))
+            self.assertIsNotNone(cache.get(f"status:{self.status1['url']}"))
+            self.assertIsNotNone(cache.get(f"status:{self.status2['url']}"))
 
 
 class ClosedCaseListCacheTests(OpenCaseListCacheTests):
