@@ -89,7 +89,6 @@ class CaseAccessMixin(AccessMixin):
 
 class CaseListMixin(PaginationMixin):
     paginate_by = 9
-    max_cases = 50
     template_name = "pages/cases/list.html"
 
     def get_cases(self):
@@ -142,9 +141,6 @@ class CaseListMixin(PaginationMixin):
         context = super().get_context_data(**kwargs)
 
         raw_cases = self.get_cases()
-        # Limit amount of total cases
-        if self.max_cases:
-            raw_cases = raw_cases[: self.max_cases]
         paginator_dict = self.paginate_with_context(raw_cases)
         cases = self.process_cases(paginator_dict["object_list"])
 
