@@ -35,7 +35,7 @@ def fetch_cases(user_bsn: str, max_cases: Optional[int] = 100) -> List[Zaak]:
         response = get_paginated_results(
             client,
             "zaak",
-            minumum=max_cases,
+            minimum=max_cases,
             request_kwargs={
                 "params": {
                     "rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn": user_bsn,
