@@ -3,12 +3,13 @@ from django.urls import reverse
 
 import requests_mock
 from django_webtest import WebTest
+from privates.test import temp_private_root
 from zgw_consumers.api_models.constants import (
     RolOmschrijving,
     RolTypes,
     VertrouwelijkheidsAanduidingen,
 )
-from zgw_consumers.constants import APITypes
+from zgw_consumers.constants import APITypes, AuthTypes
 from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 
 from open_inwoner.accounts.choices import LoginTypeChoices
@@ -16,22 +17,20 @@ from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.accounts.views.cases import SimpleFile
 from open_inwoner.utils.test import paginated_response
 
+from ..documents import download_document
 from ..models import OpenZaakConfig
-from .factories import ServiceFactory
+from .factories import CertificateFactory, ServiceFactory
 
 ZAKEN_ROOT = "https://zaken.nl/api/v1/"
 CATALOGI_ROOT = "https://catalogi.nl/api/v1/"
 DOCUMENTEN_ROOT = "https://documenten.nl/api/v1/"
 
 
+@temp_private_root()
 @requests_mock.Mocker()
 class TestDocumentDownloadView(WebTest):
     def setUp(self):
         self.maxDiff = None
-
-    @classmethod
-    def setUpTestData(self):
-        super().setUpTestData()
 
         self.user = UserFactory(
             login_type=LoginTypeChoices.digid, bsn="900222086", email="johm@smith.nl"
@@ -294,3 +293,25 @@ class TestDocumentDownloadView(WebTest):
         m.get(self.informatie_object["inhoud"], status_code=500)
 
         self.app.get(self.informatie_object_file.url, user=self.user, status=404)
+
+    def test_document_download_request_uses_service_credentials(self, m):
+        server = CertificateFactory(label="server", cert_only=True)
+        client = CertificateFactory(label="client", key_pair=True)
+
+        self.document_service.server_certificate = server
+        self.document_service.client_certificate = client
+
+        self.document_service.client_id = "abc123"
+        self.document_service.secret = "secret"
+        self.document_service.auth_type = AuthTypes.zgw
+        self.document_service.save()
+
+        m.get(self.informatie_object["inhoud"], content=self.informatie_object_content)
+
+        download_document(self.informatie_object["inhoud"])
+
+        req = m.request_history[0]
+        self.assertEqual(req.verify, server.public_certificate.path)
+        self.assertEqual(req.cert[0], client.public_certificate.path)
+        self.assertEqual(req.cert[1], client.private_key.path)
+        self.assertIn("Bearer ", req.headers["Authorization"])
