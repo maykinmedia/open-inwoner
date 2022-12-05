@@ -1,4 +1,5 @@
 import datetime
+from unittest.mock import patch
 
 from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse, reverse_lazy
@@ -12,6 +13,7 @@ from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.accounts.views.cases import CaseListMixin
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 
 from ..models import OpenZaakConfig
@@ -357,3 +359,53 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
                 ],
             },
         )
+
+    @patch.object(CaseListMixin, "paginate_by", 1)
+    def test_list_cases_paginated(self, m):
+        """
+        show only one case and url to the next page
+        """
+        self._setUpMocks(m)
+
+        # 1. test first page
+        response_1 = self.app.get(self.url_open, user=self.user)
+
+        self.assertListEqual(
+            response_1.context.get("cases"),
+            [
+                {
+                    "uuid": self.zaak2["uuid"],
+                    "start_date": datetime.date.fromisoformat(self.zaak2["startdatum"]),
+                    "end_date": None,
+                    "identificatie": self.zaak2["identificatie"],
+                    "description": self.zaak2["omschrijving"],
+                    "zaaktype_description": self.zaaktype["omschrijving"],
+                    "current_status": self.status_type1["omschrijving"],
+                },
+            ],
+        )
+        self.assertNotContains(response_1, self.zaak1["identificatie"])
+        self.assertNotContains(response_1, self.zaak1["omschrijving"])
+        self.assertContains(response_1, "?page=2")
+
+        # 2. test next page
+        next_page = f"{self.url_open}?page=2"
+        response_2 = self.app.get(next_page, user=self.user)
+
+        self.assertListEqual(
+            response_2.context.get("cases"),
+            [
+                {
+                    "uuid": self.zaak1["uuid"],
+                    "start_date": datetime.date.fromisoformat(self.zaak1["startdatum"]),
+                    "end_date": None,
+                    "identificatie": self.zaak1["identificatie"],
+                    "description": self.zaak1["omschrijving"],
+                    "zaaktype_description": self.zaaktype["omschrijving"],
+                    "current_status": self.status_type1["omschrijving"],
+                },
+            ],
+        )
+        self.assertNotContains(response_2, self.zaak2["identificatie"])
+        self.assertNotContains(response_2, self.zaak2["omschrijving"])
+        self.assertContains(response_2, "?page=1")

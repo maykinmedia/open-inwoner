@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n anchor_menu_tags card_tags grid_tags icon_tags link_tags list_tags utils %}
+{% load i18n anchor_menu_tags card_tags grid_tags icon_tags link_tags list_tags pagination_tags utils %}
 
 {% block sidebar_content %}
     {% anchor_menu anchors=anchors desktop=True %}
@@ -9,7 +9,7 @@
     <h1 class="h1" id="title">{% trans "Mijn aanvragen" %}</h1>
 
     <div class="cases">
-        <h2 class="h2" id="cases">{{ title }} ({{ cases|length }})</h2>
+        <h2 class="h2" id="cases">{{ title }} ({{ paginator.count }})</h2>
         {% render_grid %}
             {% for case in cases %}
                 {% render_column start=forloop.counter_0|multiply:4 span=4 %}
@@ -25,6 +25,8 @@
                 {% endrender_column %}
             {% endfor %}
         {% endrender_grid %}
+
+        {% pagination page_obj=page_obj paginator=paginator request=request %}
     </div>
 
 {% endblock content %}
