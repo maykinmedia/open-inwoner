@@ -8,6 +8,7 @@ from zgw_consumers.api_models.base import factory
 
 from open_inwoner.openzaak.api_models import InformatieObject
 from open_inwoner.openzaak.clients import build_client
+from open_inwoner.openzaak.models import OpenZaakConfig
 
 logger = logging.getLogger(__name__)
 
@@ -40,19 +41,35 @@ def fetch_single_information_object(
     return info_object
 
 
-def download_document(url: str, **headers) -> Optional[Response]:
-    client = build_client("document")
-
+def download_document(url: str) -> Optional[Response]:
+    config = OpenZaakConfig.get_solo()
+    client = config.document_service.build_client()
     if client is None:
         return
 
+    service = config.document_service
+
+    req_args = {}
+
     if client.auth:
-        headers.update(client.auth.credentials())
+        req_args["headers"] = client.auth.credentials()
+
+    if service.server_certificate:
+        req_args["verify"] = service.server_certificate.public_certificate.path
+
+    if service.client_certificate:
+        if service.client_certificate.private_key:
+            req_args["cert"] = (
+                service.client_certificate.public_certificate.path,
+                service.client_certificate.private_key.path,
+            )
+        else:
+            req_args["cert"] = service.client_certificate.public_certificate.path
 
     try:
-        res = requests.get(url, headers=headers)
+        res = requests.get(url, **req_args)
         res.raise_for_status()
-    except HTTPError:
-        return
+    except HTTPError as e:
+        logger.exception("exception while making request", exc_info=e)
     else:
         return res
