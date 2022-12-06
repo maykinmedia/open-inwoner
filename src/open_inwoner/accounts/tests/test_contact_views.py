@@ -160,6 +160,21 @@ class ContactViewTests(WebTest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["form"].errors, expected_errors)
 
+    def test_adding_inactive_contact_fails(self):
+        inactive_user = UserFactory(is_active=False)
+        response = self.app.get(self.create_url, user=self.user)
+        form = response.forms["contact-form"]
+
+        form["first_name"] = inactive_user.first_name
+        form["last_name"] = inactive_user.last_name
+        form["email"] = inactive_user.email
+        response = form.submit(user=self.user)
+        expected_errors = {
+            "__all__": [_("The user cannot be added, their account has been deleted.")]
+        }
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["form"].errors, expected_errors)
+
     def test_email_required(self):
         response = self.app.get(self.create_url, user=self.user)
         form = response.forms["contact-form"]

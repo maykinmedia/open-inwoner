@@ -142,6 +142,12 @@ class ContactCreateForm(forms.Form):
                     )
                 )
 
+            existing_user = User.objects.filter(email=email)
+            if existing_user and existing_user.get().is_not_active():
+                raise ValidationError(
+                    _("The user cannot be added, their account has been deleted.")
+                )
+
 
 class UserField(forms.ModelChoiceField):
     me = None

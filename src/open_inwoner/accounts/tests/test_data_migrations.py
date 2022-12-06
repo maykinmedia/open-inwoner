@@ -3,8 +3,8 @@ from open_inwoner.utils.tests.test_migrations import TestMigrations
 
 class RemoveContactMigrationTests(TestMigrations):
     app = "accounts"
-    migrate_from = "0047_auto_20221130_1609"
-    migrate_to = "0048_auto_20221130_1610"
+    migrate_from = "0048_auto_20221205_0921"
+    migrate_to = "0049_auto_20221205_0921"
 
     def setUpBeforeMigration(self, apps):
         # Create user

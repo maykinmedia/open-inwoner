@@ -19,6 +19,7 @@ class PlanViewTests(WebTest):
         self.contact = UserFactory()
         self.user.user_contacts.add(self.contact)
         self.plan = PlanFactory(title="plan_that_should_be_found", created_by=self.user)
+        self.plan.plan_contacts.add(self.user)
         self.plan.plan_contacts.add(self.contact)
 
         self.action = ActionFactory(plan=self.plan, created_by=self.user)
@@ -53,6 +54,17 @@ class PlanViewTests(WebTest):
     def test_plan_list_login_required(self):
         response = self.app.get(self.list_url)
         self.assertRedirects(response, f"{self.login_url}?next={self.list_url}")
+
+    def test_creator_is_added_when_create_plan(self):
+        plan = PlanFactory.build()
+        response = self.app.get(self.create_url, user=self.user)
+        form = response.forms["plan-form"]
+        form["title"] = plan.title
+        form["end_date"] = plan.end_date
+        response = form.submit()
+        created_plan = Plan.objects.get(title=plan.title)
+        self.assertEqual(created_plan.plan_contacts.get(), self.user)
+        self.assertEqual(created_plan.created_by, self.user)
 
     def test_plan_list_filled(self):
         response = self.app.get(self.list_url, user=self.user)
@@ -310,6 +322,7 @@ class PlanViewTests(WebTest):
         response = self.app.get(self.edit_url, user=self.user)
         form = response.forms["plan-form"]
         form["title"] = "Plan title"
+        # breakpoint()
         response = form.submit().follow()
         self.assertEqual(response.status_code, 200)
         self.plan.refresh_from_db()

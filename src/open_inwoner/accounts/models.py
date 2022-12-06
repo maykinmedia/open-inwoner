@@ -48,13 +48,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         max_length=15,
         validators=[validate_phone_number],
     )
-    function = models.CharField(
-        verbose_name=_("Function"),
-        default="",
-        blank=True,
-        max_length=200,
-        help_text=_("The function of the user within an organization."),
-    )
     is_staff = models.BooleanField(
         verbose_name=_("Staff status"),
         default=False,
@@ -246,7 +239,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         qs = self.get_active_contacts() | self.get_contacts_for_approval()
         return qs.order_by("-date_joined")
 
-    def get_pending_contacts(self):
+    def get_pending_invitations(self):
         return Invite.objects.get_pending_invitations_for_user(self)
 
 

@@ -6,7 +6,7 @@ from django.core.files.base import File
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
-from open_inwoner.accounts.models import Action, Document
+from open_inwoner.accounts.models import Action, Document, User
 
 from .models import Plan, PlanTemplate
 
@@ -26,7 +26,8 @@ class PlanForm(forms.ModelForm):
     def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        user_contacts = user.get_active_contacts()
+        self.user = user
+        user_contacts = self.user.get_active_contacts()
         self.fields["plan_contacts"].queryset = user_contacts
         self.fields["plan_contacts"].choices = [
             [c.id, c.get_full_name()] for c in user_contacts
@@ -34,6 +35,13 @@ class PlanForm(forms.ModelForm):
 
         if self.instance.pk:
             del self.fields["template"]
+
+    def clean_plan_contacts(self):
+        # Make sure current user exists in plan_contacts when editing form
+        data = self.cleaned_data["plan_contacts"]
+        if self.instance.pk:
+            data |= User.objects.filter(pk=self.user.pk)
+        return data.distinct()
 
     def save(self, user, commit=True):
         if not self.instance.pk:

@@ -1,6 +1,6 @@
-from django.db.models import Q, QuerySet
+from django.db.models import QuerySet
 
 
 class PlanQuerySet(QuerySet):
     def connected(self, user):
-        return self.filter(Q(created_by=user) | Q(plan_contacts__id=user.id)).distinct()
+        return self.filter(plan_contacts=user)

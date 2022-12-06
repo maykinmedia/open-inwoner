@@ -29,8 +29,6 @@ class ContactListView(LoginRequiredMixin, BaseBreadcrumbMixin, ListView):
         ]
 
     def get_queryset(self):
-        base_qs = super().get_queryset()
-
         base_qs = self.request.user.get_active_contacts()
         type_filter = self.request.GET.get("type")
 
@@ -44,7 +42,7 @@ class ContactListView(LoginRequiredMixin, BaseBreadcrumbMixin, ListView):
 
         user = self.request.user
         context["pending_approvals"] = user.get_contacts_for_approval()
-        context["pending_invitations"] = user.get_pending_contacts()
+        context["pending_invitations"] = user.get_pending_invitations()
         context["form"] = ContactFilterForm(data=self.request.GET)
         return context
 
@@ -76,7 +74,7 @@ class ContactCreateView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormV
 
         # Adding a contact-user which already exists in the platform
         if contact_user.exists():
-            user.contacts_for_approval.add(contact_user[0])
+            user.contacts_for_approval.add(contact_user.get())
             self.log_addition(contact_user[0], _("contact was added, pending approval"))
         # New contact-user which triggers an invite
         else:
