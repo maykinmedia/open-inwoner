@@ -72,7 +72,11 @@
                     <div class="table__explain">
                         {% trans "Status" %}
                     </div>
-                    {% action_status_button action=action request=request plan=plan %}
+                    {% if action|is_connected:request.user %}
+                        {% action_status_button action=action request=request plan=plan %}
+                    {% else %}
+                        {{ action.get_status_display }}
+                    {% endif %}
                 </div>
             </div>
         {% empty %}

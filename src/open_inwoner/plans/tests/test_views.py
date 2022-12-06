@@ -132,6 +132,34 @@ class PlanViewTests(WebTest):
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, self.plan.title)
 
+    def test_plan_doesnt_show_action_status_button_for_actions_not_connected_to_plan_contacts(
+        self,
+    ):
+        self.action.is_for = self.user
+        self.action.save()
+
+        # note self.user is connected to the action
+        self.assertTrue(self.action.is_connected(self.user))
+
+        # but contact user is only connected to the plan (and not the action)
+        self.assertFalse(self.action.is_connected(self.contact_user))
+
+        button_selector = f"#actions_{self.action.id}__status .actions__status-button"
+
+        # list our connected action
+        response = self.app.get(self.detail_url, user=self.user)
+        self.assertEqual(list(response.context["actions"]), [self.action])
+
+        # we have the button
+        self.assertNotEqual(list(response.pyquery(button_selector)), [])
+
+        # list actions part of the contact user's connection to the plan
+        response = self.app.get(self.detail_url, user=self.contact_user)
+        self.assertEqual(list(response.context["actions"]), [self.action])
+
+        # action is there but there is no button for the contact
+        self.assertEqual(list(response.pyquery(button_selector)), [])
+
     def test_plan_goal_edit_login_required(self):
         response = self.app.get(self.goal_edit_url)
         self.assertRedirects(response, f"{self.login_url}?next={self.goal_edit_url}")

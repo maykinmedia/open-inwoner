@@ -454,7 +454,7 @@ class Action(models.Model):
         return super().save(*args, **kwargs)
 
     def is_connected(self, user):
-        return Action.objects.filter(pk=self.pk).connected(user=user).exists()
+        return Action.objects.visible().filter(pk=self.pk).connected(user=user).exists()
 
     def send(self, plan, message, receivers, request=None):
         plan_url = plan.get_absolute_url()
