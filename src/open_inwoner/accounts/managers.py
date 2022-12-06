@@ -68,6 +68,9 @@ class UserManager(BaseUserManager):
 
         return self._create_user(email, password, **extra_fields)
 
+    def get_pending_approvals(self, user):
+        return self.filter(contacts_for_approval=user)
+
 
 class ActionQueryset(QuerySet):
     def visible(self):

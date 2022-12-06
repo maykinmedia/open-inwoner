@@ -41,7 +41,12 @@ class ContactListView(LoginRequiredMixin, BaseBreadcrumbMixin, ListView):
         context = super().get_context_data(**kwargs)
 
         user = self.request.user
-        context["pending_approvals"] = user.get_contacts_for_approval()
+        pending_approvals = User.objects.get_pending_approvals(user)
+        if pending_approvals.count() == 1:
+            context["pending_approval"] = pending_approvals.get()
+        else:
+            context["pending_approval_list"] = pending_approvals
+        context["contacts_for_approval"] = user.get_contacts_for_approval()
         context["pending_invitations"] = user.get_pending_invitations()
         context["form"] = ContactFilterForm(data=self.request.GET)
         return context
@@ -125,3 +130,34 @@ class ContactDeleteView(LogMixin, LoginRequiredMixin, SingleObjectMixin, View):
 
         self.log_change(object, _("contact relationship was removed"))
         return HttpResponseRedirect(self.success_url)
+
+
+class ContactApprovalView(LogMixin, LoginRequiredMixin, SingleObjectMixin, View):
+    model = User
+    slug_field = "uuid"
+    slug_url_kwarg = "uuid"
+    success_url = reverse_lazy("accounts:contact_list")
+
+    def get_queryset(self):
+        current_user = self.request.user
+        base_qs = User.objects.get_pending_approvals(current_user)
+        return base_qs
+
+    def post(self, request, *args, **kwargs):
+        sender = self.get_object()
+        receiver = self.request.user
+        approved = request.POST.get("contact_approve")
+        rejected = request.POST.get("contact_reject")
+        if approved or rejected:
+            self.update_contact(sender, receiver, (approved or rejected))
+            return HttpResponseRedirect(self.success_url)
+
+    def update_contact(self, sender, receiver, type_of_approval):
+        if type_of_approval == "approve":
+            sender.contacts_for_approval.remove(receiver)
+            sender.user_contacts.add(receiver)
+            self.log_change(sender, _("contact was approved"))
+
+        elif type_of_approval == "reject":
+            sender.contacts_for_approval.remove(receiver)
+            self.log_change(sender, _("contact was rejected"))

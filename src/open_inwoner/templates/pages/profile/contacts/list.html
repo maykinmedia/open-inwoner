@@ -8,6 +8,45 @@
     {% button href="accounts:contact_create" text=_("Nieuw contact toevoegen") icon="person" primary=True %}
 </h1>
 
+<!--List of contact requests: receiver's view-->
+{% if pending_approval or pending_approval_list %}
+    <div class={% if pending_approval %}"approval approval--single"{% else %}"approval"{% endif %}>
+        <div class="approval__header">
+            <h2 class="h2">{% trans "U bent toegevoegd als contactpersoon" %}</h2>
+            <p>{% trans "By accepting you agree on sharing your personal data (first name, last name and phonenumber)." %}</p>
+        </div>
+        {% if pending_approval %}
+            <div class="approval__single">
+                <p>{{pending_approval.get_full_name}} {% trans "heeft u toegevoegd aan diens contactpersonen." %}</p>
+                {% url 'accounts:contact_approval' uuid=pending_approval.uuid as approval_url %}
+                {% render_form form=None method="POST" form_action=approval_url id="approval_form" spaceless=True show_notifications=True %}
+                    {% csrf_token %}
+                    {% button_row %}
+                        {% button text=_("Weigeren") name="contact_reject" value="reject" secondary=True bordered=True %}
+                        {% button text=_("Accepteren") name="contact_approve" value="approve" primary=True %}
+                    {% endbutton_row %}
+                {% endrender_form %}
+            </div>
+        {% elif pending_approval_list %}
+            <ul class="approval__list">        
+                {% for approval in pending_approval_list %}
+                    <li class="approval__list-item">
+                        <p>{{approval.get_full_name}}</p>
+                        {% url 'accounts:contact_approval' uuid=approval.uuid as approval_url %}
+                        {% render_form form=None method="POST" form_action=approval_url id="approval_form" spaceless=True show_notifications=True %}
+                            {% csrf_token %}
+                            {% button_row %}
+                                {% button text=_("Weigeren") name="contact_reject" value="reject" icon="close" icon_position="before" %}
+                                {% button text=_("Accepteren") name="contact_approve" value="approve" icon="check" icon_position="before" %}
+                            {% endbutton_row %}
+                        {% endrender_form %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+{% endif %}
+
 {% form id="contact-filter" form_object=form method="GET" columns=2 no_actions=True horizontal=True spaceless=True autosubmit=True form_action=form_action %}
 
 <table class="table">
@@ -22,11 +61,13 @@
         </tr>
     </thead>
     <tbody>
-        {% if not pending_invitations and not pending_approvals and not object_list %}
+        {% if not pending_invitations and not contacts_for_approval and not pending_approval and not pending_approval_list and not object_list %}
             <tr>
                 <td class="table__item" colspan="7" >{% trans "Er zijn geen contacten gevonden met deze filter, of u heeft nog geen contacten." %}</td>
             </tr>
         {% else %}
+
+            <!--New contacts-users with pending invitations for registration-->
             {% for invite in pending_invitations %}
                 <tr>
                     <th class="table__header">{{invite.invitee_first_name}} {{invite.invitee_last_name}}</th>
@@ -38,17 +79,21 @@
                     <td class="table__item">{% button icon="settings" icon_position="before" text="" hide_text=True transparent=True disabled=True %}<td>
                 </tr>
             {% endfor %}
-            {% for approval in pending_approvals %}
+
+            <!--Existing contacts-users which require approval - sender's view-->
+            {% for contact in contacts_for_approval %}
                 <tr>
                     <th class="table__header"></th>
                     <td class="table__item"></td>
-                    <td class="table__item">{{approval.email}}</td>
+                    <td class="table__item">{{contact.email}}</td>
                     <td class="table__item"></td>
                     <td class="table__item">{% icon "check" extra_classes="icon icon--disabled" %}</td>
                     <td class="table__item">{% button text=_('Stuur bericht') icon="message" icon_position="before" icon_outlined=True transparent=True disabled=True %}</td>
                     <td class="table__item">{% button icon="settings" icon_position="before" text="" hide_text=True transparent=True disabled=True %}<td>
                 </tr>
-            {% endfor %}        
+            {% endfor %}
+
+            <!--Active contacts list-->
             {% for contact in object_list %}
                 <tr>
                     <th class="table__header">{{ contact.get_full_name }}</th>
