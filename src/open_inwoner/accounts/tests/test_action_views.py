@@ -331,7 +331,7 @@ class ActionStatusSeleniumBaseTests:
         self.force_login(self.user)
 
         # wait for user and session to be visible from the server thread (weirdly only a problem on CI)
-        time.sleep(1)
+        time.sleep(2)
 
         # use a big screen because scroll_into_view or JS scroll commands are problematic
         self.selenium.set_window_size(1200, 1200)
@@ -364,7 +364,7 @@ class ActionStatusSeleniumBaseTests:
         ).click(button).perform()
 
         # wait for htmx to return (neither implicit or explicit waits nor ActionChains.pause will help)
-        time.sleep(1)
+        time.sleep(2)
 
         self.assertIn(
             f"dropdown--{StatusChoices.open}", dropdown.get_attribute("class")
@@ -381,7 +381,7 @@ class ActionStatusSeleniumBaseTests:
         status_closed_button.click()
 
         # wait for htmx to return
-        time.sleep(1)
+        time.sleep(2)
 
         # regrab and check our button is now Closed
         button = self.selenium.find_element(
