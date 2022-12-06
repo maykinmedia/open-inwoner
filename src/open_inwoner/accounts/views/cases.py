@@ -38,6 +38,7 @@ from open_inwoner.openzaak.utils import (
     is_zaak_visible,
 )
 from open_inwoner.utils.mixins import PaginationMixin
+from open_inwoner.utils.views import LogMixin
 
 
 class CaseAccessMixin(AccessMixin):
@@ -338,7 +339,7 @@ class CaseDetailView(BaseBreadcrumbMixin, CaseAccessMixin, TemplateView):
         return anchors
 
 
-class CaseDocumentDownloadView(CaseAccessMixin, View):
+class CaseDocumentDownloadView(LogMixin, CaseAccessMixin, View):
     def get(self, request, *args, **kwargs):
         if not self.case:
             raise Http404
@@ -363,6 +364,14 @@ class CaseDocumentDownloadView(CaseAccessMixin, View):
         content_stream = download_document(info_object.inhoud)
         if not content_stream:
             raise Http404
+
+        self.log_user_action(
+            self.request.user,
+            _("Document van zaak gedownload {case}: {filename}").format(
+                case=self.case.identificatie,
+                filename=info_object.bestandsnaam,
+            ),
+        )
 
         headers = {
             "Content-Disposition": f'attachment; filename="{info_object.bestandsnaam}"',

@@ -1,9 +1,11 @@
 from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 import requests_mock
 from django_webtest import WebTest
 from privates.test import temp_private_root
+from timeline_logger.models import TimelineLog
 from zgw_consumers.api_models.constants import (
     RolOmschrijving,
     RolTypes,
@@ -176,6 +178,15 @@ class TestDocumentDownloadView(WebTest):
         self.assertEqual(
             response.headers["Content-Length"], str(len(self.informatie_object_content))
         )
+
+        log = TimelineLog.objects.last()
+        self.assertEqual(log.user, self.user)
+        self.assertEqual(log.content_object, self.user)
+        expected = _("Document van zaak gedownload {case}: {filename}").format(
+            case=self.zaak["identificatie"],
+            filename=self.informatie_object_file.name,
+        )
+        self.assertEqual(log.extra_data["message"], expected)
 
     def test_document_content_with_bad_status_is_http_403(self, m):
         self._setUpAccessMocks(m)
