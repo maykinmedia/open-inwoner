@@ -40,6 +40,7 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                     "login_allow_registration",
                     "show_cases",
                     "show_product_finder",
+                    "show_plans",
                 )
             },
         ),

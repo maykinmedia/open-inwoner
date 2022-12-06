@@ -331,6 +331,13 @@ class SiteConfiguration(SingletonModel):
             "Als dit is aangevinkt en er zijn product condities gemaakt, dan wordt op de homepagina de productzoeker weergegeven."
         ),
     )
+    show_plans = models.BooleanField(
+        verbose_name=_("Laat samenwerken zien op de homepage en menu"),
+        default=True,
+        help_text=_(
+            "Als dit is aangevinkt, dan wordt op de homepagina en het gebruikers profiel de samenwerken feature weergegeven."
+        ),
+    )
     openid_connect_logo = FilerImageField(
         verbose_name=_("Openid Connect Logo"),
         null=True,

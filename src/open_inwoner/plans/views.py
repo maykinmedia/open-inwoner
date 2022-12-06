@@ -16,6 +16,7 @@ from open_inwoner.accounts.views.actions import (
     ActionUpdateView,
     BaseActionFilter,
 )
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.utils.logentry import get_change_message
 from open_inwoner.utils.mixins import ExportMixin
 from open_inwoner.utils.views import LogMixin
@@ -24,7 +25,17 @@ from .forms import PlanForm, PlanGoalForm
 from .models import Plan
 
 
-class PlanListView(LoginRequiredMixin, BaseBreadcrumbMixin, ListView):
+class PlansEnabledMixin:
+    def dispatch(self, request, *args, **kwargs):
+        config = SiteConfiguration.get_solo()
+        if not config.show_plans:
+            raise Http404("plans not enabled")
+        return super().dispatch(request, *args, **kwargs)
+
+
+class PlanListView(
+    PlansEnabledMixin, LoginRequiredMixin, BaseBreadcrumbMixin, ListView
+):
     template_name = "pages/plans/list.html"
     model = Plan
 
@@ -41,7 +52,11 @@ class PlanListView(LoginRequiredMixin, BaseBreadcrumbMixin, ListView):
 
 
 class PlanDetailView(
-    LoginRequiredMixin, BaseBreadcrumbMixin, BaseActionFilter, DetailView
+    PlansEnabledMixin,
+    LoginRequiredMixin,
+    BaseBreadcrumbMixin,
+    BaseActionFilter,
+    DetailView,
 ):
     template_name = "pages/plans/detail.html"
     model = Plan
@@ -82,7 +97,9 @@ class PlanDetailView(
         return context
 
 
-class PlanCreateView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, CreateView):
+class PlanCreateView(
+    PlansEnabledMixin, LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, CreateView
+):
     template_name = "pages/plans/create.html"
     model = Plan
     form_class = PlanForm
@@ -112,7 +129,9 @@ class PlanCreateView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, CreateVi
         return self.object.get_absolute_url()
 
 
-class PlanEditView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
+class PlanEditView(
+    PlansEnabledMixin, LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView
+):
     template_name = "pages/plans/edit.html"
     model = Plan
     slug_field = "uuid"
@@ -149,7 +168,9 @@ class PlanEditView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView
         return self.object.get_absolute_url()
 
 
-class PlanGoalEditView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
+class PlanGoalEditView(
+    PlansEnabledMixin, LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView
+):
     template_name = "pages/plans/goal_edit.html"
     model = Plan
     slug_field = "uuid"
@@ -178,7 +199,9 @@ class PlanGoalEditView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, Update
         return self.object.get_absolute_url()
 
 
-class PlanFileUploadView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
+class PlanFileUploadView(
+    PlansEnabledMixin, LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView
+):
     template_name = "pages/plans/file.html"
     model = Plan
     slug_field = "uuid"
@@ -216,7 +239,7 @@ class PlanFileUploadView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, Upda
         return self.object.get_absolute_url()
 
 
-class PlanActionCreateView(ActionCreateView):
+class PlanActionCreateView(PlansEnabledMixin, ActionCreateView):
     model = Plan
 
     @cached_property
@@ -264,7 +287,7 @@ class PlanActionCreateView(ActionCreateView):
         return self.object.get_absolute_url()
 
 
-class PlanActionEditView(ActionUpdateView):
+class PlanActionEditView(PlansEnabledMixin, ActionUpdateView):
     @cached_property
     def crumbs(self):
         return [
@@ -324,7 +347,7 @@ class PlanActionEditView(ActionUpdateView):
         return self.object.get_absolute_url()
 
 
-class PlanActionEditStatusTagView(ActionUpdateStatusTagView):
+class PlanActionEditStatusTagView(PlansEnabledMixin, ActionUpdateStatusTagView):
     def get_plan(self):
         try:
             return Plan.objects.connected(self.request.user).get(
@@ -339,7 +362,7 @@ class PlanActionEditStatusTagView(ActionUpdateStatusTagView):
         return args
 
 
-class PlanActionDeleteView(ActionDeleteView):
+class PlanActionDeleteView(PlansEnabledMixin, ActionDeleteView):
     def get_plan(self):
         try:
             return Plan.objects.connected(self.request.user).get(
@@ -366,7 +389,9 @@ class PlanActionDeleteView(ActionDeleteView):
             )
 
 
-class PlanExportView(LogMixin, LoginRequiredMixin, ExportMixin, DetailView):
+class PlanExportView(
+    PlansEnabledMixin, LogMixin, LoginRequiredMixin, ExportMixin, DetailView
+):
     template_name = "export/plans/plan_export.html"
     model = Plan
     slug_field = "uuid"

@@ -65,7 +65,7 @@ class HomeView(TemplateView):
                 highlighted=True, published=True
             )
         )
-        if self.request.user.is_authenticated:
+        if self.request.user.is_authenticated and config.show_plans:
             kwargs.update(plans=Plan.objects.connected(self.request.user)[:limit])
 
         # Show the categories if the user has selected them, otherwise
