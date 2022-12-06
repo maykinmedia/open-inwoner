@@ -11,7 +11,7 @@ from webtest import Upload
 
 from open_inwoner.accounts.models import Action, Document, Message
 
-from .factories import ContactFactory, UserFactory
+from .factories import UserFactory
 
 
 class TestDocumentFileUploadLimits(WebTest):
@@ -156,12 +156,8 @@ class TestActionFileUploadLimits(WebTest):
 class TestMessageFileUploadLimits(WebTest):
     def setUp(self):
         self.me = UserFactory()
-        self.other_user = UserFactory()
-        self.contact = ContactFactory.create(
-            created_by=self.me,
-            contact_user=self.other_user,
-            email=self.other_user.email,
-        )
+        self.contact = UserFactory()
+        self.me.user_contacts.add(self.contact)
         self.response = self.app.get(reverse("accounts:inbox_start"), user=self.me)
         self.form = self.response.forms["start-message-form"]
 

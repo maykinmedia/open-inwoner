@@ -7,7 +7,7 @@ from open_inwoner.accounts.choices import StatusChoices
 from open_inwoner.pdc.tests.factories import CategoryFactory
 
 from ..choices import LoginTypeChoices
-from .factories import ActionFactory, ContactFactory, DocumentFactory, UserFactory
+from .factories import ActionFactory, DocumentFactory, UserFactory
 
 
 class ProfileViewTests(WebTest):
@@ -37,7 +37,8 @@ class ProfileViewTests(WebTest):
 
     def test_get_filled_profile_page(self):
         action = ActionFactory(created_by=self.user)
-        contact = ContactFactory(created_by=self.user)
+        contact = UserFactory()
+        self.user.user_contacts.add(contact)
         category = CategoryFactory()
         self.user.selected_themes.add(category)
         response = self.app.get(self.url, user=self.user)
@@ -45,7 +46,7 @@ class ProfileViewTests(WebTest):
         self.assertContains(response, category.name)
         self.assertContains(
             response,
-            f"{contact.first_name} ({contact.get_type_display()})",
+            f"{contact.first_name} ({contact.get_contact_type_display()})",
         )
         self.assertContains(response, "1 acties staan open.")
 
@@ -56,7 +57,6 @@ class ProfileViewTests(WebTest):
         self.assertContains(response, "0 acties staan open.")
 
     def test_deactivate_account(self):
-        self.app.set_user(user=self.user)  # Did not work without this..... No idea why?
         response = self.app.get(self.url, user=self.user)
         self.assertEquals(response.status_code, 200)
         form = response.forms["deactivate-form"]
@@ -71,7 +71,6 @@ class ProfileViewTests(WebTest):
     def test_deactivate_account_staff(self):
         self.user.is_staff = True
         self.user.save()
-        self.app.set_user(user=self.user)  # Did not work without this..... No idea why?
         response = self.app.get(self.url, user=self.user)
         self.assertEquals(response.status_code, 200)
         form = response.forms["deactivate-form"]
@@ -130,7 +129,6 @@ class EditProfileTests(WebTest):
         self.assertRedirects(response, f"{login_url}?next={self.url}")
 
     def test_save_form(self):
-        self.app.set_user(user=self.user)  # Did not work without this..... No idea why?
         response = self.app.get(self.url, user=self.user)
         self.assertEquals(response.status_code, 200)
         form = response.forms["profile-edit"]
@@ -140,12 +138,12 @@ class EditProfileTests(WebTest):
         self.assertEquals(followed_response.status_code, 200)
 
     def test_save_empty_form(self):
-        self.app.set_user(user=self.user)  # Did not work without this..... No idea why?
         response = self.app.get(self.url, user=self.user)
         self.assertEquals(response.status_code, 200)
         form = response.forms["profile-edit"]
         form["first_name"] = ""
         form["last_name"] = ""
+        form["phonenumber"] = ""
         form["birthday"] = ""
         form["street"] = ""
         form["housenumber"] = ""
@@ -165,12 +163,12 @@ class EditProfileTests(WebTest):
         self.assertEquals(self.user.city, "")
 
     def test_save_filled_form(self):
-        self.app.set_user(user=self.user)  # Did not work without this..... No idea why?
         response = self.app.get(self.url, user=self.user)
         self.assertEquals(response.status_code, 200)
         form = response.forms["profile-edit"]
         form["first_name"] = "First name"
         form["last_name"] = "Last name"
+        form["phonenumber"] = "06987878787"
         form["birthday"] = "21-01-1992"
         form["street"] = "Keizersgracht"
         form["housenumber"] = "17 d"
@@ -204,7 +202,6 @@ class EditIntrestsTests(WebTest):
         category = CategoryFactory(name="a")
         CategoryFactory(name="b")
         CategoryFactory(name="c")
-        self.app.set_user(user=self.user)  # Did not work without this..... No idea why?
         self.user.selected_themes.add(category)
         response = self.app.get(self.url, user=self.user)
         form = response.forms["change-themes"]

@@ -20,7 +20,7 @@ from open_inwoner.utils.validators import validate_phone_number
 
 from .choices import ContactTypeChoices, LoginTypeChoices, StatusChoices, TypeChoices
 from .managers import ActionQueryset, DigidManager, UserManager, eHerkenningManager
-from .query import ContactQuerySet, MessageQuerySet
+from .query import InviteQuerySet, MessageQuerySet
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -28,6 +28,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     Use the built-in user model.
     """
 
+    uuid = models.UUIDField(
+        verbose_name=_("UUID"),
+        unique=True,
+        default=uuid4,
+        help_text=_("Unique identifier."),
+    )
     first_name = models.CharField(
         verbose_name=_("First name"), max_length=255, blank=True, default=""
     )
@@ -35,6 +41,13 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name=_("Last name"), max_length=255, blank=True, default=""
     )
     email = models.EmailField(verbose_name=_("Email address"), unique=True)
+    phonenumber = models.CharField(
+        verbose_name=_("Phonenumber"),
+        blank=True,
+        default="",
+        max_length=15,
+        validators=[validate_phone_number],
+    )
     is_staff = models.BooleanField(
         verbose_name=_("Staff status"),
         default=False,
@@ -103,6 +116,21 @@ class User(AbstractBaseUser, PermissionsMixin):
         blank=True,
         help_text="This field indicates if a user signed up with OpenId Connect or not.",
     )
+    user_contacts = models.ManyToManyField(
+        "self",
+        verbose_name=_("Contacts"),
+        blank=True,
+        help_text=_("The contacts of the specific user"),
+    )
+    contacts_for_approval = models.ManyToManyField(
+        "self",
+        verbose_name=_("Contacts for approval"),
+        blank=True,
+        symmetrical=False,
+        help_text=_(
+            "User's contacts waiting for approval. This field is used for existing users in the application"
+        ),
+    )
 
     objects = UserManager()
     digid_objects = DigidManager()
@@ -152,20 +180,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         self.deactivated_on = date.today()
         self.save()
 
-    def get_active_contacts(self):
-        return self.contacts.filter(contact_user__is_active=True)
-
-    def get_assigned_active_contacts(self):
-        return self.assigned_contacts.filter(created_by__is_active=True)
-
-    def get_extended_contacts(self):
-        return Contact.objects.get_extended_contacts_for_user(me=self)
-
-    def get_extended_active_contacts(self):
-        return Contact.objects.get_extended_contacts_for_user(me=self).filter(
-            contact_user__is_active=True, created_by__is_active=True
-        )
-
     def get_new_messages_total(self) -> int:
         return self.received_messages.filter(seen=False).count()
 
@@ -198,124 +212,35 @@ class User(AbstractBaseUser, PermissionsMixin):
             else reverse("logout")
         )
 
-
-class Contact(models.Model):
-    uuid = models.UUIDField(
-        verbose_name=_("UUID"),
-        unique=True,
-        default=uuid4,
-        help_text=_("Used as a reference in the contacts api."),
-    )
-    first_name = models.CharField(
-        verbose_name=_("First name"),
-        max_length=250,
-        help_text=_("The first name of the contact person."),
-    )
-    last_name = models.CharField(
-        verbose_name=_("Last name"),
-        max_length=250,
-        help_text=_("The last name of the contact person"),
-    )
-    email = models.EmailField(
-        verbose_name=_("Email address"),
-        null=True,
-        blank=True,
-        help_text=_(
-            "The email address of the contact person. This field can be left empty."
-        ),
-    )
-    phonenumber = models.CharField(
-        verbose_name=_("Phonenumber"),
-        blank=True,
-        default="",
-        max_length=15,
-        validators=[validate_phone_number],
-        help_text=_(
-            "The phonenumber of the contact person. This field can be left empty."
-        ),
-    )
-    created_on = models.DateTimeField(
-        verbose_name=_("Created on"),
-        auto_now_add=True,
-        help_text=_(
-            "This is the date the contact was created. This field is automatically set."
-        ),
-    )
-    updated_on = models.DateTimeField(
-        verbose_name=_("Updated on"),
-        auto_now=True,
-        help_text=_(
-            "This is the date when the contact was last changed. This field is automatically set."
-        ),
-    )
-    created_by = models.ForeignKey(
-        "accounts.User",
-        verbose_name=_("Created by"),
-        on_delete=models.CASCADE,
-        related_name="contacts",
-        help_text=_("This is the person that entered the contact person."),
-    )
-    contact_user = models.ForeignKey(
-        "accounts.User",
-        verbose_name=_("Contact user"),
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name="assigned_contacts",
-        help_text=_(
-            "The user from the contact, who was added based on the contact email."
-        ),
-    )
-    function = models.CharField(
-        verbose_name=_("Function"),
-        default="",
-        blank=True,
-        max_length=200,
-        help_text=_("The function of the contact within an organization."),
-    )
-
-    objects = ContactQuerySet.as_manager()
-
-    class Meta:
-        ordering = ("-updated_on", "-created_on")
-        verbose_name = _("Contact")
-        verbose_name_plural = _("Contacts")
-
-    def __str__(self):
-        return self.get_name()
-
-    @property
-    def _type(self):
-        if self.contact_user:
-            return self.contact_user.contact_type
-
-        return ContactTypeChoices.contact
-
-    def get_update_url(self):
+    def get_contact_update_url(self):
         return reverse("accounts:contact_edit", kwargs={"uuid": self.uuid})
 
-    def get_name(self):
-        return f"{self.first_name} {self.last_name}"
-
-    def is_active(self) -> bool:
-        return self.contact_user and self.contact_user.is_active
-
-    def is_not_active(self) -> bool:
-        return not self.is_active()
-
-    def get_message_url(self) -> str:
-        url = furl(reverse("accounts:inbox")).add({"with": self.other_user_email}).url
+    def get_contact_message_url(self) -> str:
+        url = furl(reverse("accounts:inbox")).add({"with": self.email}).url
         return f"{url}#messages-last"
 
-    def get_created_by_name(self):
-        return f"{self.created_by.first_name} {self.created_by.last_name}"
-
-    def get_type_display(self):
-        if self.contact_user:
-            return self.contact_user.get_contact_type_display()
-
-        choice = ContactTypeChoices.get_choice(ContactTypeChoices.contact)
+    def get_contact_type_display(self) -> str:
+        choice = ContactTypeChoices.get_choice(self.contact_type)
         return choice.label
+
+    def is_not_active(self):
+        return not self.is_active
+
+    def get_contact_email(self):
+        return self.email if "@example.org" not in self.email else ""
+
+    def get_active_contacts(self):
+        return self.user_contacts.filter(is_active=True)
+
+    def get_contacts_for_approval(self):
+        return self.contacts_for_approval.filter(is_active=True)
+
+    def get_all_contacts(self):
+        qs = self.get_active_contacts() | self.get_contacts_for_approval()
+        return qs.order_by("-date_joined")
+
+    def get_pending_invitations(self):
+        return Invite.objects.get_pending_invitations_for_user(self)
 
 
 class Document(models.Model):
@@ -628,18 +553,19 @@ class Invite(models.Model):
         related_name="received_invites",
         help_text=_("User who received the invite"),
     )
+    invitee_first_name = models.CharField(
+        verbose_name=_("First name"),
+        max_length=250,
+        help_text=_("The first name of the invitee."),
+    )
+    invitee_last_name = models.CharField(
+        verbose_name=_("Last name"),
+        max_length=250,
+        help_text=_("The last name of the invitee"),
+    )
     invitee_email = models.EmailField(
         verbose_name=_("Invitee email"),
         help_text=_("The email used to send the invite"),
-    )
-    contact = models.ForeignKey(
-        Contact,
-        verbose_name=_("Contact"),
-        blank=True,
-        null=True,
-        on_delete=models.SET_NULL,
-        related_name="invites",
-        help_text=_("The contact the creation of which triggered sending the invite"),
     )
     accepted = models.BooleanField(verbose_name=_("Accepted"), default=False)
     key = models.CharField(verbose_name=_("Key"), max_length=64, unique=True)
@@ -649,12 +575,14 @@ class Invite(models.Model):
         help_text=_("This is the date the message was created"),
     )
 
+    objects = InviteQuerySet.as_manager()
+
     class Meta:
         verbose_name = _("Invitation")
         verbose_name_plural = _("Invitations")
 
     def __str__(self):
-        return f"For: {self.invitee} ({self.created_on.date()})"
+        return f"For: {self.invitee if self.invitee else _('new user')} ({self.created_on.date()})"
 
     def save(self, **kwargs):
         if not self.pk:

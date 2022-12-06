@@ -1,4 +1,4 @@
-from django.db.models import Case, Exists, F, Max, OuterRef, Q, Subquery, Value, When
+from django.db.models import Case, F, Max, OuterRef, Q, Subquery, Value, When
 from django.db.models.query import QuerySet
 
 
@@ -93,62 +93,6 @@ class MessageQuerySet(QuerySet):
         return self.filter(receiver=me, sender=other_user, seen=False).update(seen=True)
 
 
-class ContactQuerySet(QuerySet):
-    def get_extended_contacts_for_user(self, me):
-        """
-        Returns both active contacts and active reversed contacts for the user.
-        The returned queryset is annotated with:
-        - reverse (bool)
-        - other_user_id
-        - other_user_first_name
-        - other_user_last_name
-        - other_user_email
-        - other_user_phonenumber (Null in case of reversed contacts)
-
-        If the user and other user have contacts with each other return both contacts
-        """
-
-        my_contacts_users = self.filter(created_by=me).values_list(
-            "contact_user", flat=True
-        )
-        return (
-            self.filter(Q(created_by=me) | Q(contact_user=me))
-            .distinct()
-            .annotate(reverse=Case(When(created_by=me, then=False), default=True))
-            .annotate(
-                other_user_id=Case(
-                    When(created_by=me, then=F("contact_user")),
-                    default=F("created_by"),
-                )
-            )
-            .annotate(
-                other_user_first_name=Case(
-                    When(created_by=me, then=F("first_name")),
-                    default=F("created_by__first_name"),
-                )
-            )
-            .annotate(
-                other_user_last_name=Case(
-                    When(created_by=me, then=F("last_name")),
-                    default=F("created_by__last_name"),
-                )
-            )
-            .annotate(
-                other_user_type=Case(
-                    When(created_by=me, then=F("contact_user__contact_type")),
-                    default=F("created_by__contact_type"),
-                )
-            )
-            .annotate(
-                other_user_email=Case(
-                    When(created_by=me, then=F("contact_user__email")),
-                    default=F("created_by__email"),
-                )
-            )
-            .annotate(
-                other_user_phonenumber=Case(
-                    When(created_by=me, then=F("phonenumber")),
-                    default=Value(""),
-                )
-            )
-        )
+class InviteQuerySet(QuerySet):
+    def get_pending_invitations_for_user(self, user: "User") -> "InviteQuerySet":
+        return self.filter(inviter=user, accepted=False).order_by("-pk")

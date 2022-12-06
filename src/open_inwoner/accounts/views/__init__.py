@@ -18,12 +18,7 @@ from .cases import (
     ClosedCaseListView,
     OpenCaseListView,
 )
-from .contacts import (
-    ContactCreateView,
-    ContactDeleteView,
-    ContactListView,
-    ContactUpdateView,
-)
+from .contacts import ContactCreateView, ContactDeleteView, ContactListView
 from .csrf import csrf_failure
 from .document import DocumentPrivateMediaView
 from .documents import DocumentCreateView, DocumentDeleteView

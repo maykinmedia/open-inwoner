@@ -11,12 +11,12 @@
         </tr>
     </thead>
     <tbody>
-        {% for contact in object.get_extended_contacts %}
+        {% for contact in object.get_all_contacts %}
             <tr>
-                <td class="table__item">{{ contact.other_user_first_name }} {{ contact.other_user_last_name }}</td>
-                <td class="table__item">{{ contact.get_type_display }}</td>
-                <td class="table__item">{{ contact.other_user_email }}</td>
-                <td class="table__item">{{ contact.other_user_phonenumber|default:"-" }}</td>
+                <td class="table__item">{{contact.get_full_name}}</td>
+                <td class="table__item">{{ contact.get_contact_type_display }}</td>
+                <td class="table__item">{{ contact.email }}</td>
+                <td class="table__item">{{ contact.phonenumber|default:"-" }}</td>
                 <td class="table__item">{% if contact.is_active %}{% icon "check" %}{% endif %}</td>
             </tr>
         {% endfor %}

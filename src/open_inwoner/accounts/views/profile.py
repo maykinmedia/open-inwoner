@@ -23,7 +23,7 @@ from open_inwoner.utils.mixins import ExportMixin
 from open_inwoner.utils.views import LogMixin
 
 from ..forms import ThemesForm, UserForm
-from ..models import Action, Contact, User
+from ..models import Action, User
 
 
 class MyProfileView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormView):
@@ -36,7 +36,9 @@ class MyProfileView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormView)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        user = self.request.user
         today = date.today()
+
         context["anchors"] = [
             ("#title", _("Persoonlijke gegevens")),
             ("#overview", _("Persoonlijk overzicht")),
@@ -44,15 +46,9 @@ class MyProfileView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormView)
         ]
         # List of names of 'mentor' users that are a contact of me
         mentor_contacts = [
-            str(c.contact_user.get_full_name())
-            for c in self.request.user.contacts.filter(
-                contact_user__contact_type=ContactTypeChoices.begeleider
-            )
-        ] + [
-            str(c.created_by.get_full_name())
-            for c in Contact.objects.filter(
-                created_by__contact_type=ContactTypeChoices.begeleider,
-                contact_user=self.request.user,
+            c.get_full_name()
+            for c in user.user_contacts.filter(
+                contact_type=ContactTypeChoices.begeleider
             )
         ]
 
@@ -64,21 +60,16 @@ class MyProfileView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormView)
             .order_by("end_date")
             .first()
         )
-        context["files"] = self.request.user.get_all_files()
-        context["theme_text"] = self.request.user.get_interests()
+        context["files"] = user.get_all_files()
+        context["theme_text"] = user.get_interests()
         context["action_text"] = _(
             f"{Action.objects.visible().connected(self.request.user).filter(status=StatusChoices.open).count()} acties staan open."
         )
-        contacts = Contact.objects.get_extended_contacts_for_user(self.request.user)
+        contacts = user.get_active_contacts()
         # Invited contacts
         contact_names = [
-            f"{contact.first_name} ({contact.get_type_display()})"
-            for contact in self.request.user.contacts.all()[:3]
-        ]
-        # Reverse contacts
-        contact_names += [
-            f"{contact.created_by.first_name} ({contact.created_by.get_contact_type_display()})"
-            for contact in self.request.user.assigned_contacts.all()[:3]
+            f"{contact.first_name} ({contact.get_contact_type_display()})"
+            for contact in contacts[:3]
         ]
 
         if contacts.count() > 0:
@@ -88,9 +79,7 @@ class MyProfileView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormView)
         else:
             context["contact_text"] = _("U heeft nog geen contacten.")
         context["questionnaire_exists"] = QuestionnaireStep.objects.exists()
-        context["can_change_password"] = (
-            self.request.user.login_type != LoginTypeChoices.digid
-        )
+        context["can_change_password"] = user.login_type != LoginTypeChoices.digid
         return context
 
     def post(self, request, *args, **kwargs):

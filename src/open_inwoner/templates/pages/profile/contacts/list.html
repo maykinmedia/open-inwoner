@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n button_tags link_tags icon_tags pagination_tags form_tags dropdown_tags %}
+{% load i18n button_tags link_tags icon_tags pagination_tags form_tags dropdown_tags messages_tags %}
 
 
 {% block content %}
@@ -22,35 +22,55 @@
         </tr>
     </thead>
     <tbody>
-        {% for contact in contact_list %}
-            <tr>
-                <th class="table__header">{{ contact.other_user_first_name }} {{ contact.other_user_last_name }}</th>
-                <td class="table__item">{% if contact.other_user_type == "contact" %}Contactpersoon{% elif contact.other_user_type == "begeleider" %}Begeleider{% elif contact.other_user_type == "organization" %}Organisatie{% endif %}</td>
-                <td class="table__item">{{ contact.other_user_email|default:"" }}</td>
-                <td class="table__item">{{ contact.other_user_phonenumber }}</td>
-                <td class="table__item">{% if contact.is_not_active %}{% icon "check" extra_classes="icon icon--disabled" %}{% else %}{% icon "check" %}{% endif %}</td>
-                <td class="table__item">{% button text=_('Stuur bericht') icon="message" icon_position="before" href=contact.get_message_url icon_outlined=True transparent=True disabled=contact.is_not_active %}</td>
-                <td class="table__item">
-                    {% dropdown icon="settings" disabled=contact.reverse %}
-                        <div class="dropdown__item">
-                            {% url 'accounts:contact_edit' uuid=contact.uuid as edit_url %}
-                            {% button icon="edit" text=_("Bewerken") href=edit_url icon_outlined=True transparent=True %}
-                        </div>
-                        <div class="dropdown__item">
-                            {% url 'accounts:contact_delete' uuid=contact.uuid as delete_url %}
-                            {% render_form form=None form_action=delete_url method="POST" spaceless=True id="delete-contact-form" extra_classes="confirm" data_confirm_title=_("Are you sure you want to delete this contact?") data_confirm_cancel=_("Nee") data_confirm_default=_("Ja") %}
-                                {% csrf_token %}
-                                {% button icon="delete" text=_("Verwijderen") transparent=True %}
-                            {% endrender_form %}
-                        </div>
-                    {% enddropdown %}
-                </td>
-            </tr>
-        {% empty %}
+        {% if not pending_invitations and not pending_approvals and not object_list %}
             <tr>
                 <td class="table__item" colspan="7" >{% trans "Er zijn geen contacten gevonden met deze filter, of u heeft nog geen contacten." %}</td>
             </tr>
-        {% endfor %}
+        {% else %}
+            {% for invite in pending_invitations %}
+                <tr>
+                    <th class="table__header">{{invite.invitee_first_name}} {{invite.invitee_last_name}}</th>
+                    <td class="table__item"></td>
+                    <td class="table__item">{{invite.invitee_email}}</td>
+                    <td class="table__item"></td>
+                    <td class="table__item">{% icon "check" extra_classes="icon icon--disabled" %}</td>
+                    <td class="table__item">{% button text=_('Stuur bericht') disabled=True %}</td>
+                    <td class="table__item">{% button icon="settings" text="" hide_text=True disabled=True %}<td>
+                </tr>
+            {% endfor %}
+            {% for approval in pending_approvals %}
+                <tr>
+                    <th class="table__header"></th>
+                    <td class="table__item"></td>
+                    <td class="table__item">{{approval.email}}</td>
+                    <td class="table__item"></td>
+                    <td class="table__item">{% icon "check" extra_classes="icon icon--disabled" %}</td>
+                    <td class="table__item">{% button text=_('Stuur bericht') disabled=True %}</td>
+                    <td class="table__item">{% button icon="settings" text="" hide_text=True disabled=True %}<td>
+                </tr>
+            {% endfor %}        
+            {% for contact in object_list %}
+                <tr>
+                    <th class="table__header">{{ contact.get_full_name }}</th>
+                    <td class="table__item">{% if contact.contact_type == "contact" %}Contactpersoon{% elif contact.contact_type == "begeleider" %}Begeleider{% elif contact.contact_type == "organization" %}Organisatie{% endif %}</td>
+                    <td class="table__item">{{ contact.get_contact_email|default:"" }}</td>
+                    <td class="table__item">{{ contact.phonenumber }}</td>
+                    <td class="table__item">{% if contact.is_not_active %}{% icon "check" extra_classes="icon icon--disabled" %}{% else %}{% icon "check" %}{% endif %}</td>
+                    <td class="table__item">{% button text=_('Stuur bericht') icon="message" icon_position="before" href=contact.get_contact_message_url icon_outlined=True transparent=True disabled=contact.is_not_active %}</td>
+                    <td class="table__item">
+                        {% dropdown icon="settings" disabled=contact.is_not_active %}
+                            <div class="dropdown__item">
+                                {% url 'accounts:contact_delete' uuid=contact.uuid as delete_url %}
+                                {% render_form form=None form_action=delete_url method="POST" spaceless=True id="delete-contact-form" extra_classes="confirm" data_confirm_title=_("Are you sure you want to delete this contact?") data_confirm_cancel=_("Nee") data_confirm_default=_("Ja") %}
+                                    {% csrf_token %}
+                                    {% button icon="delete" text=_("Verwijderen") transparent=True %}
+                                {% endrender_form %}
+                            </div>
+                        {% enddropdown %}
+                    </td>
+                </tr>
+            {% endfor %}
+        {% endif %}
     </tbody>
 </table>
 

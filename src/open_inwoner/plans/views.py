@@ -34,10 +34,8 @@ class PlanListView(LoginRequiredMixin, BaseBreadcrumbMixin, ListView):
         ]
 
     def get_queryset(self):
-        return (
-            Plan.objects.connected(self.request.user)
-            .select_related("created_by")
-            .prefetch_related("contacts")
+        return Plan.objects.connected(self.request.user).prefetch_related(
+            "plan_contacts"
         )
 
 
@@ -58,19 +56,20 @@ class PlanDetailView(
         ]
 
     def get_queryset(self):
-        return (
-            Plan.objects.connected(self.request.user)
-            .select_related("created_by")
-            .prefetch_related("contacts")
+        return Plan.objects.connected(self.request.user).prefetch_related(
+            "plan_contacts"
         )
 
     def get_context_data(self, **kwargs):
         actions = self.object.actions.visible()
+        obj = self.object
+        user = self.request.user
         context = super().get_context_data(**kwargs)
-        context["contact_users"] = self.object.get_other_users(self.request.user)
-        context["is_creator"] = self.request.user == self.object.created_by
+
+        context["contact_users"] = obj.get_other_users(user)
+        context["is_creator"] = user == obj.created_by
         context["anchors"] = [
-            ("#title", self.object.title),
+            ("#title", obj.title),
             ("#goals", _("Doelen")),
             ("#files", _("Bestanden")),
             ("#actions", _("Acties")),
@@ -101,6 +100,9 @@ class PlanCreateView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, CreateVi
 
     def form_valid(self, form):
         self.object = form.save(self.request.user)
+
+        # Add plan creator as a plan_contact as well
+        self.object.plan_contacts.add(self.object.created_by)
 
         self.log_addition(self.object, _("plan was created"))
         return HttpResponseRedirect(self.get_success_url())

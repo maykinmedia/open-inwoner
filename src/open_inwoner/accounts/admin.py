@@ -8,7 +8,7 @@ from privates.admin import PrivateMediaMixin
 
 from open_inwoner.utils.mixins import UUIDAdminFirstInOrder
 
-from .models import Action, Appointment, Contact, Document, Invite, Message, User
+from .models import Action, Appointment, Document, Invite, Message, User
 
 
 class ActionInlineAdmin(UUIDAdminFirstInOrder, admin.StackedInline):
@@ -25,7 +25,7 @@ class _UserAdmin(UserAdmin):
         "first_name",
     )
     fieldsets = (
-        (None, {"fields": ("email", "password", "login_type")}),
+        (None, {"fields": ("uuid", "email", "password", "login_type")}),
         (
             _("Personal info"),
             {
@@ -60,6 +60,10 @@ class _UserAdmin(UserAdmin):
                 ),
             },
         ),
+        (
+            _("Contacts - invites"),
+            {"fields": ("user_contacts", "contacts_for_approval")},
+        ),
         (_("Important dates"), {"fields": ("last_login", "date_joined")}),
     )
     add_fieldsets = (
@@ -71,7 +75,7 @@ class _UserAdmin(UserAdmin):
             },
         ),
     )
-    readonly_fields = ("bsn", "rsin", "is_prepopulated", "oidc_id")
+    readonly_fields = ("bsn", "rsin", "is_prepopulated", "oidc_id", "uuid")
     list_display = (
         "email",
         "first_name",
@@ -83,6 +87,7 @@ class _UserAdmin(UserAdmin):
     )
     search_fields = ("first_name", "last_name", "email")
     ordering = ("email",)
+    filter_horizontal = ("user_contacts", "contacts_for_approval")
 
 
 @admin.register(Action)
@@ -126,30 +131,6 @@ class ActionAdmin(UUIDAdminFirstInOrder, PrivateMediaMixin, admin.ModelAdmin):
             % updated,
             messages.SUCCESS,
         )
-
-
-@admin.register(Contact)
-class ContactAdmin(UUIDAdminFirstInOrder, admin.ModelAdmin):
-    readonly_fields = ("uuid",)
-    search_fields = (
-        "first_name",
-        "last_name",
-        "email",
-        "contact_user__email",
-        "created_by__email",
-    )
-    list_display = (
-        "first_name",
-        "last_name",
-        "email",
-        "contact_user",
-        "created_by",
-        "created_on",
-    )
-    list_filter = (
-        "contact_user",
-        "created_by",
-    )
 
 
 @admin.register(Document)

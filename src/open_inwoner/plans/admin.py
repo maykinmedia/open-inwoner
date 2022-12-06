@@ -29,3 +29,4 @@ class PlanAdmin(UUIDAdminFirstInOrder, admin.ModelAdmin):
         "created_by",
     )
     inlines = [ActionInlineAdmin]
+    filter_horizontal = ("plan_contacts",)

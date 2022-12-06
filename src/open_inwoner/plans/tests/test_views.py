@@ -7,11 +7,7 @@ from django_webtest import WebTest
 from webtest import Upload
 
 from open_inwoner.accounts.models import Action
-from open_inwoner.accounts.tests.factories import (
-    ActionFactory,
-    ContactFactory,
-    UserFactory,
-)
+from open_inwoner.accounts.tests.factories import ActionFactory, UserFactory
 
 from ..models import Plan
 from .factories import ActionTemplateFactory, PlanFactory, PlanTemplateFactory
@@ -20,12 +16,11 @@ from .factories import ActionTemplateFactory, PlanFactory, PlanTemplateFactory
 class PlanViewTests(WebTest):
     def setUp(self) -> None:
         self.user = UserFactory()
-        self.contact_user = UserFactory()
-        self.contact = ContactFactory(
-            contact_user=self.contact_user, created_by=self.user
-        )
+        self.contact = UserFactory()
+        self.user.user_contacts.add(self.contact)
         self.plan = PlanFactory(title="plan_that_should_be_found", created_by=self.user)
-        self.plan.contacts.add(self.contact)
+        self.plan.plan_contacts.add(self.user)
+        self.plan.plan_contacts.add(self.contact)
 
         self.action = ActionFactory(plan=self.plan, created_by=self.user)
         self.action_deleted = ActionFactory(
@@ -60,6 +55,17 @@ class PlanViewTests(WebTest):
         response = self.app.get(self.list_url)
         self.assertRedirects(response, f"{self.login_url}?next={self.list_url}")
 
+    def test_creator_is_added_when_create_plan(self):
+        plan = PlanFactory.build()
+        response = self.app.get(self.create_url, user=self.user)
+        form = response.forms["plan-form"]
+        form["title"] = plan.title
+        form["end_date"] = plan.end_date
+        response = form.submit()
+        created_plan = Plan.objects.get(title=plan.title)
+        self.assertEqual(created_plan.plan_contacts.get(), self.user)
+        self.assertEqual(created_plan.created_by, self.user)
+
     def test_plan_list_filled(self):
         response = self.app.get(self.list_url, user=self.user)
         self.assertEqual(response.status_code, 200)
@@ -67,62 +73,46 @@ class PlanViewTests(WebTest):
 
     def test_plan_detail_contacts(self):
         response = self.app.get(self.detail_url, user=self.user)
-        self.assertContains(response, self.contact_user.get_full_name())
+        self.assertContains(response, self.contact.get_full_name())
         self.assertContains(response, self.user.get_full_name())
 
-        response = self.app.get(self.detail_url, user=self.contact_user)
+        response = self.app.get(self.detail_url, user=self.contact)
         self.assertContains(response, self.user.get_full_name())
-        self.assertContains(response, self.contact_user.get_full_name())
+        self.assertContains(response, self.contact.get_full_name())
 
         # Contact for one user, but not the other
         # Check if all users can see eachother in the plan
-        new_user = UserFactory()
-        new_contact = ContactFactory(contact_user=new_user, created_by=self.user)
-        self.plan.contacts.add(new_contact)
+        new_contact = UserFactory()
+        self.user.user_contacts.add(new_contact)
+        self.plan.plan_contacts.add(new_contact)
 
         response = self.app.get(self.detail_url, user=self.user)
-        self.assertContains(response, self.contact_user.get_full_name())
-        self.assertContains(response, new_user.get_full_name())
-
-        response = self.app.get(self.detail_url, user=self.contact_user)
-        self.assertContains(response, self.user.get_full_name())
-        self.assertContains(response, new_user.get_full_name())
-
-        response = self.app.get(self.detail_url, user=new_user)
-        self.assertContains(response, self.contact_user.get_full_name())
+        self.assertContains(response, self.contact.get_full_name())
+        self.assertContains(response, new_contact.get_full_name())
         self.assertContains(response, self.user.get_full_name())
 
-        new_user.delete()
-
-        # Verify the reverse Contact-relationship
-        new_user = UserFactory()
-        new_contact = ContactFactory(created_by=new_user, contact_user=self.user)
-        self.plan.contacts.add(new_contact)
-
-        response = self.app.get(self.detail_url, user=self.user)
-        self.assertContains(response, self.contact_user.get_full_name())
-        self.assertContains(response, new_user.get_full_name())
-
-        response = self.app.get(self.detail_url, user=self.contact_user)
+        response = self.app.get(self.detail_url, user=self.contact)
         self.assertContains(response, self.user.get_full_name())
-        self.assertContains(response, new_user.get_full_name())
+        self.assertContains(response, self.contact.get_full_name())
+        self.assertContains(response, new_contact.get_full_name())
 
-        response = self.app.get(self.detail_url, user=new_user)
-        self.assertContains(response, self.contact_user.get_full_name())
+        response = self.app.get(self.detail_url, user=new_contact)
         self.assertContains(response, self.user.get_full_name())
+        self.assertContains(response, new_contact.get_full_name())
+        self.assertContains(response, self.contact.get_full_name())
 
-        new_user.delete()
+        new_contact.delete()
 
         # Verify that without being added to the plan the contact isn't visible
-        new_user = UserFactory()
-        ContactFactory(created_by=new_user, contact_user=self.user)
+        new_contact = UserFactory()
+        self.user.user_contacts.add(new_contact)
 
         response = self.app.get(self.detail_url, user=self.user)
-        self.assertContains(response, self.contact_user.get_full_name())
-        self.assertNotContains(response, new_user.get_full_name())
+        self.assertContains(response, self.contact.get_full_name())
+        self.assertNotContains(response, new_contact.get_full_name())
 
     def test_plan_contact_can_access(self):
-        response = self.app.get(self.list_url, user=self.contact_user)
+        response = self.app.get(self.list_url, user=self.contact)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.plan.title)
 
@@ -149,7 +139,7 @@ class PlanViewTests(WebTest):
         self.assertEqual(self.plan.goal, "editted goal")
 
     def test_plan_goal_edit_contact_can_access(self):
-        response = self.app.get(self.goal_edit_url, user=self.contact_user)
+        response = self.app.get(self.goal_edit_url, user=self.contact)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.plan.goal)
         form = response.forms["goal-edit"]
@@ -180,7 +170,7 @@ class PlanViewTests(WebTest):
         self.assertEqual(self.plan.documents.count(), 1)
 
     def test_plan_file_add_contact_can_access(self):
-        response = self.app.get(self.file_add_url, user=self.contact_user)
+        response = self.app.get(self.file_add_url, user=self.contact)
         self.assertEqual(response.status_code, 200)
         form = response.forms["document-create"]
         form["file"] = Upload("filename.txt", b"contents")
@@ -210,7 +200,7 @@ class PlanViewTests(WebTest):
         self.assertEqual(self.plan.actions.visible().count(), 2)
 
     def test_plan_action_create_contact_can_access(self):
-        response = self.app.get(self.action_add_url, user=self.contact_user)
+        response = self.app.get(self.action_add_url, user=self.contact)
         self.assertEqual(response.status_code, 200)
         form = response.forms["action-create"]
         form["name"] = "action"
@@ -247,7 +237,7 @@ class PlanViewTests(WebTest):
         form = response.forms["plan-form"]
         form["title"] = "Plan"
         form["end_date"] = "2022-01-01"
-        form["contacts"] = [self.contact.pk]
+        form["plan_contacts"] = [self.contact.pk]
         response = form.submit().follow()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Plan.objects.count(), 2)
@@ -262,7 +252,7 @@ class PlanViewTests(WebTest):
         form = response.forms["plan-form"]
         form["title"] = "Plan"
         form["end_date"] = "2022-01-01"
-        form["contacts"] = [self.contact.pk]
+        form["plan_contacts"] = [self.contact.pk]
         form["template"] = plan_template.pk
         response = form.submit().follow()
         self.assertEqual(response.status_code, 200)
@@ -280,7 +270,7 @@ class PlanViewTests(WebTest):
         form = response.forms["plan-form"]
         form["title"] = "Plan"
         form["end_date"] = "2022-01-01"
-        form["contacts"] = [self.contact.pk]
+        form["plan_contacts"] = [self.contact.pk]
         form["template"] = plan_template.pk
         response = form.submit().follow()
         self.assertEqual(response.status_code, 200)
@@ -299,7 +289,7 @@ class PlanViewTests(WebTest):
         form = response.forms["plan-form"]
         form["title"] = "Plan"
         form["end_date"] = "2022-01-01"
-        form["contacts"] = [self.contact.pk]
+        form["plan_contacts"] = [self.contact.pk]
         form["template"] = plan_template.pk
         response = form.submit().follow()
         self.assertEqual(response.status_code, 200)
@@ -332,6 +322,7 @@ class PlanViewTests(WebTest):
         response = self.app.get(self.edit_url, user=self.user)
         form = response.forms["plan-form"]
         form["title"] = "Plan title"
+        # breakpoint()
         response = form.submit().follow()
         self.assertEqual(response.status_code, 200)
         self.plan.refresh_from_db()
@@ -366,7 +357,7 @@ class PlanViewTests(WebTest):
         self.assertEqual(
             email.subject, "Plan action has been updated at Open Inwoner Platform"
         )
-        self.assertEqual(email.to, [self.contact_user.email])
+        self.assertEqual(email.to, [self.contact.email])
         plan_url = f"http://testserver{self.detail_url}"
         body = email.alternatives[0][0]  # html version of the email body
         self.assertIn(plan_url, body)
@@ -415,7 +406,7 @@ class PlanViewTests(WebTest):
         self.assertEqual(
             email.subject, "Plan action has been updated at Open Inwoner Platform"
         )
-        self.assertEqual(email.to, [self.contact_user.email])
+        self.assertEqual(email.to, [self.contact.email])
         plan_url = f"http://testserver{self.detail_url}"
         body = email.alternatives[0][0]  # html version of the email body
         self.assertIn(plan_url, body)

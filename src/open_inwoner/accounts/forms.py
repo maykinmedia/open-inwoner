@@ -10,7 +10,7 @@ from open_inwoner.pdc.models.category import Category
 from open_inwoner.utils.forms import LimitedUploadFileField, PrivateFileWidget
 
 from .choices import EmptyContactTypeChoices, EmptyStatusChoices, LoginTypeChoices
-from .models import Action, Contact, Document, Invite, Message, User
+from .models import Action, Document, Invite, Message, User
 
 
 class CustomRegistrationForm(RegistrationForm):
@@ -53,6 +53,7 @@ class UserForm(forms.ModelForm):
         fields = (
             "first_name",
             "last_name",
+            "phonenumber",
             "birthday",
             "street",
             "housenumber",
@@ -120,41 +121,32 @@ class ContactFilterForm(forms.Form):
     )
 
 
-class ContactForm(forms.ModelForm):
-    def __init__(self, user, create, *args, **kwargs):
-        self.user = user
-        self.create = create
-        super().__init__(*args, **kwargs)
+class ContactCreateForm(forms.Form):
+    first_name = forms.CharField(max_length=255)
+    last_name = forms.CharField(max_length=255)
+    email = forms.EmailField()
 
-    class Meta:
-        model = Contact
-        fields = ("first_name", "last_name", "email", "phonenumber")
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
 
     def clean(self):
         cleaned_data = super().clean()
         email = cleaned_data.get("email")
 
-        if self.create and email:
-            if (
-                self.user.contacts.filter(email=email).exists()
-                or self.user.assigned_contacts.filter(created_by__email=email).exists()
-            ):
+        if email:
+            if self.user.user_contacts.filter(email=email).exists():
                 raise ValidationError(
                     _(
                         "Het ingevoerde e-mailadres komt al voor in uw contactpersonen. Pas de gegevens aan en probeer het opnieuw."
                     )
                 )
 
-    def save(self, commit=True):
-        if not self.instance.pk:
-            self.instance.created_by = self.user
-
-        if not self.instance.pk and self.instance.email:
-            contact_user = User.objects.filter(email=self.instance.email).first()
-            if contact_user:
-                self.instance.contact_user = contact_user
-
-        return super().save(commit=commit)
+            existing_user = User.objects.filter(email=email)
+            if existing_user and existing_user.get().is_not_active():
+                raise ValidationError(
+                    _("The user cannot be added, their account has been deleted.")
+                )
 
 
 class UserField(forms.ModelChoiceField):
@@ -305,12 +297,10 @@ class InboxForm(forms.ModelForm):
 
         super().__init__(**kwargs)
 
-        extended_contact_users = User.objects.get_extended_contact_users(self.user)
-        choices = [
-            [u.email, f"{u.first_name} {u.last_name}"] for u in extended_contact_users
-        ]
+        contact_users = self.user.get_active_contacts()
+        choices = [[u.email, f"{u.first_name} {u.last_name}"] for u in contact_users]
         self.fields["receiver"].choices = choices
-        self.fields["receiver"].queryset = extended_contact_users
+        self.fields["receiver"].queryset = contact_users
 
     def clean(self):
         cleaned_data = super().clean()
