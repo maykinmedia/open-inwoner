@@ -93,7 +93,7 @@ class _UserAdmin(UserAdmin):
 @admin.register(Action)
 class ActionAdmin(UUIDAdminFirstInOrder, PrivateMediaMixin, admin.ModelAdmin):
     readonly_fields = ("uuid",)
-    list_display = ("name", "created_on", "created_by", "is_deleted")
+    list_display = ("name", "status", "plan", "created_on", "created_by", "is_deleted")
     list_filter = (
         "is_deleted",
         "created_by",
@@ -102,6 +102,9 @@ class ActionAdmin(UUIDAdminFirstInOrder, PrivateMediaMixin, admin.ModelAdmin):
     actions = [
         "mark_not_deleted",
         "mark_deleted",
+    ]
+    raw_id_fields = [
+        "plan",
     ]
 
     @admin.action(description=_("Mark selected actions as soft-deleted by user."))
