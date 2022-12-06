@@ -98,9 +98,9 @@ class TestShowPlans(WebTest):
         self.config.save()
 
         for url in urls:
-            with self.subTest(f"hide anon {url}"):
+            with self.subTest(f"anon {url}"):
                 self.app.get(url, status=404)
 
         for url in urls:
-            with self.subTest(f"hide authenticated {url}"):
+            with self.subTest(f"authenticated {url}"):
                 self.app.get(url, status=404, user=self.user)

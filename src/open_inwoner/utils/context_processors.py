@@ -73,6 +73,7 @@ def settings(request):
         "matomo_site_id": config.matomo_site_id,
         "matomo_enabled": config.matomo_enabled,
         "show_plans": config.show_plans,
+        "show_actions": config.show_actions,
         "menu_categories": Category.get_root_nodes().published(),
         "search_form": SearchForm(),
         "has_general_faq_questions": Question.objects.general().exists(),

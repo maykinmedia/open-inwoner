@@ -41,6 +41,7 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                     "show_cases",
                     "show_product_finder",
                     "show_plans",
+                    "show_actions",
                 )
             },
         ),

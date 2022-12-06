@@ -3,7 +3,7 @@ from datetime import datetime
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
-from django.http.response import HttpResponseRedirect
+from django.http.response import Http404, HttpResponseRedirect
 from django.urls.base import reverse, reverse_lazy
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
@@ -16,6 +16,7 @@ from privates.views import PrivateMediaView
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.components.utils import RenderableTag
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.htmx.views import HtmxTemplateTagModelFormView
 from open_inwoner.utils.logentry import get_change_message
 from open_inwoner.utils.mixins import ExportMixin
@@ -23,6 +24,14 @@ from open_inwoner.utils.views import LogMixin
 
 from ..forms import ActionForm, ActionListForm
 from ..models import Action
+
+
+class ActionsEnabledMixin:
+    def dispatch(self, request, *args, **kwargs):
+        config = SiteConfiguration.get_solo()
+        if not config.show_actions:
+            raise Http404("actions not enabled")
+        return super().dispatch(request, *args, **kwargs)
 
 
 class BaseActionFilter:
@@ -44,7 +53,11 @@ class BaseActionFilter:
 
 
 class ActionListView(
-    LoginRequiredMixin, BaseBreadcrumbMixin, BaseActionFilter, ListView
+    ActionsEnabledMixin,
+    LoginRequiredMixin,
+    BaseBreadcrumbMixin,
+    BaseActionFilter,
+    ListView,
 ):
     template_name = "pages/profile/actions/list.html"
     model = Action
@@ -78,7 +91,9 @@ class ActionListView(
         return context
 
 
-class ActionUpdateView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
+class ActionUpdateView(
+    ActionsEnabledMixin, LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView
+):
     template_name = "pages/profile/actions/edit.html"
     model = Action
     slug_field = "uuid"
@@ -149,7 +164,12 @@ class ActionUpdateStatusTagView(
 
 
 class ActionDeleteView(
-    LogMixin, LoginRequiredMixin, DeletionMixin, SingleObjectMixin, View
+    ActionsEnabledMixin,
+    LogMixin,
+    LoginRequiredMixin,
+    DeletionMixin,
+    SingleObjectMixin,
+    View,
 ):
     model = Action
     slug_field = "uuid"
@@ -183,7 +203,9 @@ class ActionDeleteView(
         )
 
 
-class ActionCreateView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, CreateView):
+class ActionCreateView(
+    ActionsEnabledMixin, LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, CreateView
+):
     template_name = "pages/profile/actions/edit.html"
     model = Action
     form_class = ActionForm
@@ -212,7 +234,9 @@ class ActionCreateView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, Create
         return HttpResponseRedirect(self.get_success_url())
 
 
-class ActionListExportView(LogMixin, LoginRequiredMixin, ExportMixin, ListView):
+class ActionListExportView(
+    ActionsEnabledMixin, LogMixin, LoginRequiredMixin, ExportMixin, ListView
+):
     template_name = "export/profile/action_list_export.html"
     model = Action
 
@@ -228,7 +252,9 @@ class ActionListExportView(LogMixin, LoginRequiredMixin, ExportMixin, ListView):
         )
 
 
-class ActionExportView(LogMixin, LoginRequiredMixin, ExportMixin, DetailView):
+class ActionExportView(
+    ActionsEnabledMixin, LogMixin, LoginRequiredMixin, ExportMixin, DetailView
+):
     template_name = "export/profile/action_export.html"
     model = Action
     slug_field = "uuid"
@@ -241,7 +267,9 @@ class ActionExportView(LogMixin, LoginRequiredMixin, ExportMixin, DetailView):
         )
 
 
-class ActionPrivateMediaView(LogMixin, LoginRequiredMixin, PrivateMediaView):
+class ActionPrivateMediaView(
+    ActionsEnabledMixin, LogMixin, LoginRequiredMixin, PrivateMediaView
+):
     model = Action
     slug_field = "uuid"
     slug_url_kwarg = "uuid"
@@ -262,7 +290,9 @@ class ActionPrivateMediaView(LogMixin, LoginRequiredMixin, PrivateMediaView):
         return False
 
 
-class ActionHistoryView(LoginRequiredMixin, BaseBreadcrumbMixin, DetailView):
+class ActionHistoryView(
+    ActionsEnabledMixin, LoginRequiredMixin, BaseBreadcrumbMixin, DetailView
+):
     template_name = "pages/history.html"
     model = Action
     slug_field = "uuid"
