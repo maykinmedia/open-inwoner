@@ -144,6 +144,7 @@ INSTALLED_APPS = [
     "colorfield",
     "view_breadcrumbs",
     "django_better_admin_arrayfield",
+    "simple_certmanager",
     "zgw_consumers",
     "mail_editor",
     "ckeditor",

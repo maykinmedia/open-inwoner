@@ -58,6 +58,7 @@ certifi==2022.9.24
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   django-simple-certmanager
     #   elastic-apm
     #   elasticsearch
     #   requests
@@ -92,10 +93,11 @@ coverage==4.5.4
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-cryptography==35.0.0
+cryptography==38.0.4
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   django-simple-certmanager
     #   josepy
     #   mozilla-django-oidc
     #   pyopenssl
@@ -155,6 +157,7 @@ django==3.2.15
     #   django-rich
     #   django-rosetta
     #   django-sendfile2
+    #   django-simple-certmanager
     #   django-sniplates
     #   django-timeline-logger
     #   django-treebeard
@@ -194,6 +197,7 @@ django-choices==1.7.2
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-digid-eherkenning
+    #   django-simple-certmanager
     #   mail-editor
     #   zgw-consumers
 django-ckeditor==6.2.0
@@ -302,7 +306,7 @@ django-privates==1.2.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-    #   zgw-consumers
+    #   django-simple-certmanager
 django-redis==5.0.0
     # via
     #   -c requirements/ci.txt
@@ -334,6 +338,11 @@ django-sessionprofile==1.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-digid-eherkenning
+django-simple-certmanager==1.1.2
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   zgw-consumers
 django-sniplates==0.7.0
     # via
     #   -c requirements/ci.txt
@@ -664,10 +673,11 @@ pylint==2.11.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-pyopenssl==21.0.0
+pyopenssl==22.1.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   django-simple-certmanager
     #   josepy
     #   maykin-python3-saml
     #   zgw-consumers
@@ -786,7 +796,6 @@ six==1.16.0
     #   html5lib
     #   isodate
     #   orderedmultidict
-    #   pyopenssl
     #   python-dateutil
     #   qrcode
     #   requests-mock
@@ -959,7 +968,7 @@ xmlsec==1.3.12
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   maykin-python3-saml
-zgw-consumers==0.18.0
+zgw-consumers==0.23.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
