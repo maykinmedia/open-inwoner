@@ -144,6 +144,7 @@ django==3.2.15
     #   django-filter
     #   django-formtools
     #   django-hijack
+    #   django-htmx
     #   django-import-export
     #   django-localflavor
     #   django-open-forms-client
@@ -156,6 +157,7 @@ django==3.2.15
     #   django-relativedelta
     #   django-rich
     #   django-rosetta
+    #   django-selenium-login
     #   django-sendfile2
     #   django-simple-certmanager
     #   django-sniplates
@@ -254,6 +256,10 @@ django-hijack==3.0.4
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+django-htmx==1.13.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 django-import-export==2.6.1
     # via
     #   -c requirements/ci.txt
@@ -325,6 +331,10 @@ django-rich==1.3.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
 django-rosetta==0.9.7
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+django-selenium-login==2.0.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt

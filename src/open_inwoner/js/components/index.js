@@ -6,11 +6,9 @@ import './anchor-menu'
 import './autocomplete-search'
 import './autocomplete'
 import './autosumbit'
-import './autosumbit'
 import './confirmation'
 import './datepicker'
-import './dropdown'
-import './dropdown'
+import { Dropdown } from './dropdown'
 import './emoji-button'
 import './header'
 import './map'
@@ -22,4 +20,32 @@ import './search'
 import './toggle'
 import './session'
 
-window.htmx = require('htmx.org')
+const htmx = (window.htmx = require('htmx.org'))
+
+// eval() is problematic with CSP
+htmx.config.allowEval = false
+
+// injecting a style element is problematic with CSP
+htmx.config.includeIndicatorStyles = false
+
+// define selectors and callables to apply after we loaded a html fragment
+const elementWrappers = [
+  [Dropdown.selector, (elt) => new Dropdown(elt)],
+  // add more when needed
+]
+
+function wrapComponentsOf(targetElement) {
+  // apply the javascript component wrappers
+  for (const [selector, callable] of elementWrappers) {
+    for (const elt of htmx.findAll(targetElement, selector)) {
+      callable(elt)
+      console.debug(['htmx re-activated component on: ' + selector, elt])
+    }
+  }
+}
+
+htmx.onLoad(() => {
+  document.body.addEventListener('htmx:afterSwap', (event) => {
+    wrapComponentsOf(event.target)
+  })
+})

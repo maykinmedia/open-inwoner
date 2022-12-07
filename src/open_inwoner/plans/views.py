@@ -12,6 +12,7 @@ from open_inwoner.accounts.forms import ActionListForm, DocumentForm
 from open_inwoner.accounts.views.actions import (
     ActionCreateView,
     ActionDeleteView,
+    ActionUpdateStatusTagView,
     ActionUpdateView,
     BaseActionFilter,
 )
@@ -321,6 +322,21 @@ class PlanActionEditView(ActionUpdateView):
 
     def get_success_url(self) -> str:
         return self.object.get_absolute_url()
+
+
+class PlanActionEditStatusTagView(ActionUpdateStatusTagView):
+    def get_plan(self):
+        try:
+            return Plan.objects.connected(self.request.user).get(
+                uuid=self.kwargs.get("plan_uuid")
+            )
+        except ObjectDoesNotExist as e:
+            raise Http404
+
+    def get_template_tag_args(self, context):
+        args = super().get_template_tag_args(context)
+        args["plan"] = self.get_plan()
+        return args
 
 
 class PlanActionDeleteView(ActionDeleteView):

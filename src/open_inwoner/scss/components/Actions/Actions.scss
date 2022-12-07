@@ -83,4 +83,22 @@
       font-size: var(--font-size-body);
     }
   }
+  .actions__status-selector {
+    border-radius: 5px;
+    padding: var(--spacing-small) var(--spacing-medium);
+    font-size: var(--font-size-body);
+
+    &--open {
+      color: midnightblue;
+      background-color: powderblue;
+    }
+    &--closed {
+      color: darkgreen;
+      background-color: darkseagreen;
+    }
+    &--approval {
+      color: darkred;
+      background-color: sandybrown;
+    }
+  }
 }

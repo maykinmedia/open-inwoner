@@ -1,12 +1,19 @@
+import time
 from datetime import date
 
 from django.contrib.messages import get_messages
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from django_webtest import WebTest
 from privates.test import temp_private_root
+from selenium.webdriver import ActionChains
+from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.webdriver import WebDriver
+
+from open_inwoner.utils.tests.selenium import ChromeSeleniumMixin, FirefoxSeleniumMixin
 
 from ..choices import StatusChoices
 from ..models import Action
@@ -32,6 +39,9 @@ class ActionViewTests(WebTest):
         self.list_url = reverse("accounts:action_list")
         self.edit_url = reverse(
             "accounts:action_edit", kwargs={"uuid": self.action.uuid}
+        )
+        self.edit_status_url = reverse(
+            "accounts:action_edit_status", kwargs={"uuid": self.action.uuid}
         )
         self.delete_url = reverse(
             "accounts:action_delete", kwargs={"uuid": self.action.uuid}
@@ -235,3 +245,170 @@ class ActionViewTests(WebTest):
             "accounts:action_history", kwargs={"uuid": self.action_deleted.uuid}
         )
         self.app.get(url, user=self.user, status=404)
+
+    def test_action_status(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            self.edit_status_url,
+            {"status": StatusChoices.closed},
+            HTTP_HX_REQUEST="true",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.action.refresh_from_db()
+        self.assertEqual(self.action.status, StatusChoices.closed)
+
+    def test_action_status_requires_htmx_header(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            self.edit_status_url,
+            {"status": StatusChoices.closed},
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_action_status_invalid_post_data(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            self.edit_status_url,
+            {"not_the_parameter": 123},
+            HTTP_HX_REQUEST="true",
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_action_status_http_get_disallowed(self):
+        self.client.force_login(self.user)
+        response = self.client.get(
+            self.edit_status_url,
+            HTTP_HX_REQUEST="true",
+        )
+        self.assertEqual(response.status_code, 405)
+
+    def test_action_status_login_required(self):
+        response = self.client.post(
+            self.edit_status_url,
+            {"status": StatusChoices.closed},
+            HTTP_HX_REQUEST="true",
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_action_status_not_your_action(self):
+        other_user = UserFactory()
+        self.client.force_login(other_user)
+        response = self.client.post(
+            self.edit_status_url,
+            {"status": StatusChoices.closed},
+            HTTP_HX_REQUEST="true",
+        )
+        self.assertEqual(response.status_code, 404)
+
+
+class ActionStatusSeleniumBaseTests:
+    selenium: WebDriver
+
+    def setUp(self) -> None:
+        super().setUp()
+
+        self.user = UserFactory.create()
+        self.action = ActionFactory(
+            name="my_action",
+            created_by=self.user,
+            status=StatusChoices.open,
+        )
+        self.action_list_url = reverse("accounts:action_list")
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.selenium.implicitly_wait(10)
+
+    def test_action_status(self):
+        """
+        note: there are some issues with both selenium and the threading in StaticLiveServerTestCase
+          that make it seemingly impossible to get this to pass with either implicit or explicit wait conditions
+
+        after trying everything in the docs and stackoverflow with inconsistent results on both the Firefox and Chrome
+          versions running both locally and on CI, the solution was to simply put time.sleep(1) after each async action
+        """
+        self.force_login(self.user)
+
+        # wait for user and session to be visible from the server thread (weirdly only a problem on CI)
+        time.sleep(2)
+
+        # use a big screen because scroll_into_view or JS scroll commands are problematic
+        self.selenium.set_window_size(1200, 1200)
+        self.selenium.get(self.live_server_url + self.action_list_url)
+
+        self.assertEqual(self.action.status, StatusChoices.open)
+
+        wrapper = self.selenium.find_element(
+            By.CSS_SELECTOR, f"#actions_{self.action.id}__status"
+        )
+        dropdown = wrapper.find_element(By.CSS_SELECTOR, ".dropdown")
+        dropdown_content = dropdown.find_element(By.CSS_SELECTOR, ".dropdown__content")
+
+        # grab and check our button is Open
+        button = wrapper.find_element(
+            By.CSS_SELECTOR,
+            f"#actions_{self.action.id}__status .actions__status-selector",
+        )
+        self.assertEqual(
+            button.get_dom_attribute("title"), StatusChoices.labels[StatusChoices.open]
+        )
+        self.assertIn(
+            f"actions__status-selector--{StatusChoices.open}",
+            button.get_attribute("class"),
+        )
+
+        # scroll the dropdown into view and open it
+        ActionChains(self.selenium).scroll_to_element(wrapper).scroll_by_amount(
+            0, 200
+        ).click(button).perform()
+
+        # wait for htmx to return (neither implicit or explicit waits nor ActionChains.pause will help)
+        time.sleep(2)
+
+        self.assertIn(
+            f"dropdown--{StatusChoices.open}", dropdown.get_attribute("class")
+        )
+        self.assertTrue(dropdown_content.is_displayed())
+
+        # find and click the close-state button
+        status_closed_button = dropdown_content.find_element(
+            By.CSS_SELECTOR, f".actions__status-{StatusChoices.closed}"
+        )
+        self.assertTrue(status_closed_button.is_displayed())
+
+        # click button and htmx should run
+        status_closed_button.click()
+
+        # wait for htmx to return
+        time.sleep(2)
+
+        # regrab and check our button is now Closed
+        button = self.selenium.find_element(
+            By.CSS_SELECTOR,
+            f"#actions_{self.action.id}__status .actions__status-selector",
+        )
+        self.assertEqual(
+            button.get_dom_attribute("title"),
+            StatusChoices.labels[StatusChoices.closed],
+        )
+        self.assertIn(
+            f"actions__status-selector--{StatusChoices.closed}",
+            button.get_attribute("class"),
+        )
+
+        # check our action in the database is closed now
+        self.action.refresh_from_db()
+        self.assertEqual(self.action.status, StatusChoices.closed)
+
+
+class ActionStatusFirefoxSeleniumTests(
+    FirefoxSeleniumMixin, ActionStatusSeleniumBaseTests, StaticLiveServerTestCase
+):
+    pass
+
+
+class ActionStatusChromeSeleniumTests(
+    ChromeSeleniumMixin, ActionStatusSeleniumBaseTests, StaticLiveServerTestCase
+):
+    pass

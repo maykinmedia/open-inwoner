@@ -15,6 +15,8 @@ from django.views.generic.edit import DeletionMixin, UpdateView
 from privates.views import PrivateMediaView
 from view_breadcrumbs import BaseBreadcrumbMixin
 
+from open_inwoner.components.utils import RenderableTag
+from open_inwoner.htmx.views import HtmxTemplateTagModelFormView
 from open_inwoner.utils.logentry import get_change_message
 from open_inwoner.utils.mixins import ExportMixin
 from open_inwoner.utils.views import LogMixin
@@ -112,6 +114,38 @@ class ActionUpdateView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, Update
             changed_message = get_change_message(form=form)
             self.log_change(self.object, changed_message)
         return HttpResponseRedirect(self.get_success_url())
+
+
+class ActionUpdateStatusTagView(
+    LogMixin, LoginRequiredMixin, HtmxTemplateTagModelFormView
+):
+    model = Action
+    fields = ("status",)
+    slug_field = "uuid"
+    slug_url_kwarg = "uuid"
+    template_tag = RenderableTag("action_tags", "action_status_button")
+    raise_exception = True
+
+    def get_queryset(self):
+        base_qs = super().get_queryset()
+        return base_qs.visible().connected(user=self.request.user)
+
+    def get_template_tag_args(self, context):
+        args = super().get_template_tag_args(context)
+        args.update(
+            action=context["action"],
+        )
+        return args
+
+    def form_valid(self, form):
+        self.object = form.save()
+
+        # log if the action was changed
+        if form.changed_data:
+            changed_message = get_change_message(form=form)
+            self.log_change(self.object, changed_message)
+
+        return self.get_response()
 
 
 class ActionDeleteView(

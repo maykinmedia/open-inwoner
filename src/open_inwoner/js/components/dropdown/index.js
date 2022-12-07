@@ -1,4 +1,6 @@
-class Dropdown {
+export class Dropdown {
+  static selector = '.dropdown'
+
   constructor(node) {
     this.node = node
     this.button = node.querySelector('.button')
@@ -19,5 +21,5 @@ class Dropdown {
   }
 }
 
-const dropdowns = document.querySelectorAll('.dropdown')
+const dropdowns = document.querySelectorAll(Dropdown.selector)
 ;[...dropdowns].forEach((dropdown) => new Dropdown(dropdown))

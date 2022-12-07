@@ -60,6 +60,7 @@ def button(text, **kwargs):
         - type: string | the type of button that should be used.
         - title: string | The HTML title attribute if different than the text.
         - extra_classes: string | Extra classes that need to be added to the button
+        - extra_attributes: dict | Extra attributes that need to be added to the button
 
     Extra context:
         - classes: string | all the classes that the button should have.

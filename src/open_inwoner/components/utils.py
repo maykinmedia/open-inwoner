@@ -1,4 +1,7 @@
+from typing import Optional
+
 from django import template
+from django.template import Context, Template
 from django.template.library import InclusionNode, parse_bits
 from django.template.loader import render_to_string
 
@@ -132,3 +135,118 @@ class ComponentNode:
                 kwargs,
                 self.template_name,
             )
+
+
+class RenderableTag:
+    """
+    Render a template tag to string
+
+    based on InclusionTagWebTest
+
+        Usage:
+            tag = RenderableTag("my_custom_tags", "my_tag")
+            html = tag.render({"some_argument": "value", "request": request})
+    """
+
+    def __init__(self, library_name: str, tag_name: str):
+        self.library = library_name
+        self.tag = tag_name
+
+    def __call__(self, **kwargs) -> str:
+        """
+        Renders the template tag with given keyword arguments.
+
+        Args:
+            **kwargs: Every argument that should be passed to the tag.
+
+        Returns: The str rendered by the tag.
+        """
+        return self.render(kwargs)
+
+    def render(self, tag_args: Optional[dict] = None) -> str:
+        """
+        Renders the template tag with arguments.
+
+        Args:
+            tag_args: Optional, a dict containing a key+value mapping of every argument that should be passed to the tag.
+
+        Returns: The str rendered by the tag.
+        """
+        tag_args = tag_args or {}
+        template_context = self.get_template_context(tag_args)
+        context = Context(template_context)
+        template = self.get_template(tag_args)
+        return template.render(context)
+
+    def get_template(self, tag_args: Optional[dict] = None):
+        """
+        Returns the (Django) Template instance (in order to render the tag).
+        A templates str is constructed and then passed to a django.template.Template, the resulting instance is
+        returned.
+
+        Args:
+            tag_args: Optional, a dict containing a key+value mapping of every argument that should be passed to the tag.
+
+        Returns: django.template.Template
+        """
+        tag_args = self.get_args(tag_args or {})
+        template = (
+            "{% load "
+            + self.library
+            + " %}{% "
+            + self.tag
+            + " "
+            + tag_args
+            + " "
+            + " %}"
+        )
+        return Template(template)
+
+    def get_args(self, tag_args: dict) -> str:
+        """
+        Returns a str with variable assignments in a format suitable for template rendering.
+        Values in args may not be directly passed but might also refer to template_context_<key>. The variable may then
+        be provided by `get_template_context()` and passed to the Template (provided by `get_template`) by `render()`.
+
+        Args:
+            tag_args: a dict containing a key+value mapping of every argument that should be passed to the tag.
+
+        Returns: A str with variable assignments in a format suitable for template rendering
+        """
+        args_list = []
+
+        for k, v in tag_args.items():
+            if isinstance(v, (int, float)):
+                args_list.append(f"{k}={v}")
+                continue
+            elif isinstance(v, (str,)):
+                args_list.append(f'{k}="{v}"')
+                continue
+            args_list.append(f"{k}=template_context_{k}")
+
+        return " ".join(args_list)
+
+    def get_template_context(self, tag_args: dict) -> dict:
+        """
+        Returns the context required to render the template.
+        Args:
+            tag_args: a dict containing a key+value mapping of every argument that should be passed to the tag.
+
+        Returns: A dict representing the template context.
+
+        """
+        template_context = {}
+
+        for k, v in tag_args.items():
+            if isinstance(
+                v,
+                (
+                    str,
+                    int,
+                    float,
+                ),
+            ):
+                continue
+            template_context[f"template_context_{k}"] = v
+
+        return template_context

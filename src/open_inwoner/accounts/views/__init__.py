@@ -5,6 +5,7 @@ from .actions import (
     ActionListExportView,
     ActionListView,
     ActionPrivateMediaView,
+    ActionUpdateStatusTagView,
     ActionUpdateView,
 )
 from .auth import (

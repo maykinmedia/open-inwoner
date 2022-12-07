@@ -31,8 +31,22 @@ class StatusEmptyChoice(DjangoChoices):
 
 
 class StatusChoices(DjangoChoices):
-    open = ChoiceItem("open", _("Open"))
-    closed = ChoiceItem("closed", _("Afgerond"))
+    open = ChoiceItem("open", _("Open"), icon="format_list_bulleted")
+    approval = ChoiceItem("approval", _("Accordering"), icon="question_mark")
+    closed = ChoiceItem("closed", _("Afgerond"), icon="check")
+
+    # note the icons are names from Material Symbols and Icons - Google Fonts
+
+    @classmethod
+    def get_icon(cls, status, default="label"):
+        if status in cls.values:
+            return cls.get_choice(status).icon
+        else:
+            return default
+
+    @classmethod
+    def choices_with_icons(cls):
+        return [(value, label, cls.get_icon(value)) for value, label in cls.choices]
 
 
 class EmptyStatusChoices(StatusEmptyChoice, StatusChoices):

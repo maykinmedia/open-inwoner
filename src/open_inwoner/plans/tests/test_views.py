@@ -1,13 +1,18 @@
 from django.contrib.messages import get_messages
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.core import mail
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from django_webtest import WebTest
+from privates.test import temp_private_root
 from webtest import Upload
 
+from open_inwoner.accounts.choices import StatusChoices
 from open_inwoner.accounts.models import Action
 from open_inwoner.accounts.tests.factories import ActionFactory, UserFactory
+from open_inwoner.accounts.tests.test_action_views import ActionStatusSeleniumBaseTests
+from open_inwoner.utils.tests.selenium import ChromeSeleniumMixin, FirefoxSeleniumMixin
 
 from ..models import Plan
 from .factories import ActionTemplateFactory, PlanFactory, PlanTemplateFactory
@@ -43,6 +48,10 @@ class PlanViewTests(WebTest):
         )
         self.action_edit_url = reverse(
             "plans:plan_action_edit",
+            kwargs={"plan_uuid": self.plan.uuid, "uuid": self.action.uuid},
+        )
+        self.action_edit_status_url = reverse(
+            "plans:plan_action_edit_status",
             kwargs={"plan_uuid": self.plan.uuid, "uuid": self.action.uuid},
         )
         self.action_delete_url = reverse(
@@ -121,6 +130,34 @@ class PlanViewTests(WebTest):
         response = self.app.get(self.list_url, user=other_user)
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, self.plan.title)
+
+    def test_plan_doesnt_show_action_status_button_for_actions_not_connected_to_plan_contacts(
+        self,
+    ):
+        self.action.is_for = self.user
+        self.action.save()
+
+        # note self.user is connected to the action
+        self.assertTrue(self.action.is_connected(self.user))
+
+        # but contact user is only connected to the plan (and not the action)
+        self.assertFalse(self.action.is_connected(self.contact))
+
+        button_selector = f"#actions_{self.action.id}__status .actions__status-button"
+
+        # list our connected action
+        response = self.app.get(self.detail_url, user=self.user)
+        self.assertEqual(list(response.context["actions"]), [self.action])
+
+        # we have the button
+        self.assertNotEqual(list(response.pyquery(button_selector)), [])
+
+        # list actions part of the contact user's connection to the plan
+        response = self.app.get(self.detail_url, user=self.contact)
+        self.assertEqual(list(response.context["actions"]), [self.action])
+
+        # action is there but there is no button for the contact
+        self.assertEqual(list(response.pyquery(button_selector)), [])
 
     def test_plan_goal_edit_login_required(self):
         response = self.app.get(self.goal_edit_url)
@@ -460,3 +497,92 @@ class PlanViewTests(WebTest):
     def test_plan_export_not_your_plan(self):
         other_user = UserFactory()
         self.app.get(self.export_url, user=other_user, status=404)
+
+    def test_plan_action_status(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            self.action_edit_status_url,
+            {"status": StatusChoices.closed},
+            HTTP_HX_REQUEST="true",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.action.refresh_from_db()
+        self.assertEqual(self.action.status, StatusChoices.closed)
+
+    def test_plan_action_status_requires_htmx_header(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            self.action_edit_status_url,
+            {"status": StatusChoices.closed},
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_plan_action_status_invalid_post_data(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            self.action_edit_status_url,
+            {"not_the_parameter": 123},
+            HTTP_HX_REQUEST="true",
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_plan_action_status_http_get_disallowed(self):
+        self.client.force_login(self.user)
+        response = self.client.get(
+            self.action_edit_status_url,
+            HTTP_HX_REQUEST="true",
+        )
+        self.assertEqual(response.status_code, 405)
+
+    def test_plan_action_status_login_required(self):
+        response = self.client.post(
+            self.action_edit_status_url,
+            {"status": StatusChoices.closed},
+            HTTP_HX_REQUEST="true",
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_plan_action_status_not_your_action(self):
+        other_user = UserFactory()
+        self.client.force_login(other_user)
+        response = self.client.post(
+            self.action_edit_status_url,
+            {"status": StatusChoices.closed},
+            HTTP_HX_REQUEST="true",
+        )
+        self.assertEqual(response.status_code, 404)
+
+
+class _PlanActionStatusSeleniumMixin:
+    def setUp(self) -> None:
+        super().setUp()
+
+        # update the action to belong to our plan
+        self.plan = PlanFactory(created_by=self.user)
+        self.plan.plan_contacts.add(self.user)
+        self.action.plan = self.plan
+        self.action.save()
+
+        # override the url to show plan detail page
+        self.action_list_url = reverse(
+            "plans:plan_detail", kwargs={"uuid": self.plan.uuid}
+        )
+
+
+class PlanActionStatusFirefoxSeleniumTests(
+    FirefoxSeleniumMixin,
+    _PlanActionStatusSeleniumMixin,
+    ActionStatusSeleniumBaseTests,
+    StaticLiveServerTestCase,
+):
+    pass
+    # note these use the same ActionStatusSeleniumBaseTests as the Actions without Plan
+
+
+class PlanActionStatusChromeSeleniumTests(
+    ChromeSeleniumMixin,
+    _PlanActionStatusSeleniumMixin,
+    ActionStatusSeleniumBaseTests,
+    StaticLiveServerTestCase,
+):
+    pass
