@@ -34,8 +34,8 @@
                     <td class="table__item">{{invite.invitee_email}}</td>
                     <td class="table__item"></td>
                     <td class="table__item">{% icon "check" extra_classes="icon icon--disabled" %}</td>
-                    <td class="table__item">{% button text=_('Stuur bericht') disabled=True %}</td>
-                    <td class="table__item">{% button icon="settings" text="" hide_text=True disabled=True %}<td>
+                    <td class="table__item">{% button text=_('Stuur bericht') icon="message" icon_position="before" icon_outlined=True transparent=True disabled=True %}</td>
+                    <td class="table__item">{% button icon="settings" icon_position="before" text="" hide_text=True transparent=True disabled=True %}<td>
                 </tr>
             {% endfor %}
             {% for approval in pending_approvals %}
@@ -45,8 +45,8 @@
                     <td class="table__item">{{approval.email}}</td>
                     <td class="table__item"></td>
                     <td class="table__item">{% icon "check" extra_classes="icon icon--disabled" %}</td>
-                    <td class="table__item">{% button text=_('Stuur bericht') disabled=True %}</td>
-                    <td class="table__item">{% button icon="settings" text="" hide_text=True disabled=True %}<td>
+                    <td class="table__item">{% button text=_('Stuur bericht') icon="message" icon_position="before" icon_outlined=True transparent=True disabled=True %}</td>
+                    <td class="table__item">{% button icon="settings" icon_position="before" text="" hide_text=True transparent=True disabled=True %}<td>
                 </tr>
             {% endfor %}        
             {% for contact in object_list %}
