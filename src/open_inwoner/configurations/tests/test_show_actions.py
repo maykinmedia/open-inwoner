@@ -5,7 +5,6 @@ from django_webtest import WebTest
 
 from open_inwoner.accounts.tests.factories import ActionFactory, UserFactory
 
-from ...plans.tests.factories import PlanFactory
 from ..models import SiteConfiguration
 
 

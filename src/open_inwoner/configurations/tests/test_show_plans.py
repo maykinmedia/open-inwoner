@@ -13,10 +13,13 @@ class TestShowPlans(WebTest):
         self.user = UserFactory()
         self.config = SiteConfiguration.get_solo()
 
-        self.plan = PlanFactory(created_by=self.user)
+        self.plan = PlanFactory(plan_contacts=[self.user])
         self.action = ActionFactory(created_by=self.user, plan=self.plan)
 
         self.plan_list_url = reverse("plans:plan_list")
+        self.plan_detail_url = reverse(
+            "plans:plan_detail", kwargs={"uuid": self.plan.uuid}
+        )
 
     def test_default_enabled(self):
         self.assertTrue(self.config.show_plans)
@@ -104,3 +107,25 @@ class TestShowPlans(WebTest):
         for url in urls:
             with self.subTest(f"authenticated {url}"):
                 self.app.get(url, status=404, user=self.user)
+
+    def test_user_action_page_doesnt_link_to_plan_when_show_plans_disabled(self):
+        with self.subTest("check"):
+            self.config.show_plans = False
+            self.config.save()
+
+            response = self.app.get(reverse("accounts:action_list"), user=self.user)
+
+            # no link to plan
+            self.assertEqual([], response.pyquery(f'a[href="{self.plan_detail_url}"]'))
+
+        with self.subTest("safety check"):
+            # because checking for absence is tricky let's check if it works as normal
+            self.config.show_plans = True
+            self.config.save()
+
+            response = self.app.get(reverse("accounts:action_list"), user=self.user)
+
+            # got the link to plan
+            self.assertNotEqual(
+                [], response.pyquery(f'a[href="{self.plan_detail_url}"]')
+            )
