@@ -43,6 +43,7 @@ certifi==2022.9.24
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   django-simple-certmanager
     #   elastic-apm
     #   elasticsearch
     #   requests
@@ -71,10 +72,11 @@ confusable-homoglyphs==3.2.0
     #   django-registration
 coverage==4.5.4
     # via -r requirements/test-tools.in
-cryptography==35.0.0
+cryptography==38.0.4
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   django-simple-certmanager
     #   josepy
     #   mozilla-django-oidc
     #   pyopenssl
@@ -126,6 +128,7 @@ django==3.2.15
     #   django-rich
     #   django-rosetta
     #   django-sendfile2
+    #   django-simple-certmanager
     #   django-sniplates
     #   django-timeline-logger
     #   django-treebeard
@@ -165,6 +168,7 @@ django-choices==1.7.2
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-digid-eherkenning
+    #   django-simple-certmanager
     #   mail-editor
     #   zgw-consumers
 django-ckeditor==6.2.0
@@ -269,7 +273,7 @@ django-privates==1.2.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-    #   zgw-consumers
+    #   django-simple-certmanager
 django-redis==5.0.0
     # via
     #   -c requirements/base.txt
@@ -301,6 +305,11 @@ django-sessionprofile==1.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-digid-eherkenning
+django-simple-certmanager==1.1.2
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   zgw-consumers
 django-sniplates==0.7.0
     # via
     #   -c requirements/base.txt
@@ -562,11 +571,12 @@ pyjwt==2.3.0
     #   gemma-zds-client
 pylint==2.11.1
     # via -r requirements/test-tools.in
-pyopenssl==21.0.0
+pyopenssl==22.1.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   -r requirements/test-tools.in
+    #   django-simple-certmanager
     #   josepy
     #   maykin-python3-saml
     #   zgw-consumers
@@ -670,7 +680,6 @@ six==1.16.0
     #   html5lib
     #   isodate
     #   orderedmultidict
-    #   pyopenssl
     #   python-dateutil
     #   qrcode
     #   requests-mock
@@ -777,7 +786,7 @@ xmlsec==1.3.12
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   maykin-python3-saml
-zgw-consumers==0.18.0
+zgw-consumers==0.23.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt

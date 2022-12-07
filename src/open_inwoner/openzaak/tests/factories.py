@@ -1,6 +1,7 @@
 import factory
-from zgw_consumers.constants import CertificateTypes
-from zgw_consumers.models import Certificate, Service
+from simple_certmanager.constants import CertificateTypes
+from simple_certmanager.models import Certificate
+from zgw_consumers.models import Service
 
 
 class ServiceFactory(factory.django.DjangoModelFactory):
