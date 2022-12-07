@@ -8,6 +8,7 @@ from django.views.generic import ListView, View
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import FormView
 
+from mail_editor.helpers import find_template
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.utils.views import LogMixin
@@ -75,8 +76,10 @@ class ContactCreateView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormV
 
         # Adding a contact-user which already exists in the platform
         if contact_user.exists():
-            user.contacts_for_approval.add(contact_user.get())
-            self.log_addition(contact_user[0], _("contact was added, pending approval"))
+            contact_user = contact_user.get()
+            user.contacts_for_approval.add(contact_user)
+            self.send_email_to_existing_user(contact_user, user, self.request)
+            self.log_addition(contact_user, _("contact was added, pending approval"))
         # New contact-user which triggers an invite
         else:
             invite = Invite.objects.create(
@@ -102,6 +105,22 @@ class ContactCreateView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormV
             ),
         )
         return HttpResponseRedirect(self.get_success_url())
+
+    def send_email_to_existing_user(self, receiver: User, sender: User, request=None):
+        login_url = reverse("login")
+        contacts_url = reverse("accounts:contact_list")
+        url = f"{login_url}?next={contacts_url}"
+        if request:
+            url = request.build_absolute_uri(url)
+
+        template = find_template("contact_approval")
+        context = {
+            "sender_name": sender.get_full_name(),
+            "email": receiver.email,
+            "contacts_link": url,
+        }
+
+        return template.send_email([receiver.email], context)
 
 
 class ContactDeleteView(LogMixin, LoginRequiredMixin, SingleObjectMixin, View):
