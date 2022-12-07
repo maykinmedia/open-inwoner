@@ -179,6 +179,17 @@ class TestDocumentDownloadView(WebTest):
             response.headers["Content-Length"], str(len(self.informatie_object_content))
         )
 
+    def test_document_retrieval_logs_case_identification_and_file(self, m):
+        self._setUpMocks(m)
+        url = reverse(
+            "accounts:case_document_download",
+            kwargs={
+                "object_id": self.zaak["uuid"],
+                "info_id": self.informatie_object["uuid"],
+            },
+        )
+        self.app.get(url, user=self.user)
+
         log = TimelineLog.objects.last()
         self.assertEqual(log.user, self.user)
         self.assertEqual(log.content_object, self.user)
