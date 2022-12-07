@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http.response import HttpResponseRedirect
+from django.http.response import HttpResponseBadRequest, HttpResponseRedirect
 from django.urls.base import reverse, reverse_lazy
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
@@ -151,6 +151,8 @@ class ContactApprovalView(LogMixin, LoginRequiredMixin, SingleObjectMixin, View)
         if approved or rejected:
             self.update_contact(sender, receiver, (approved or rejected))
             return HttpResponseRedirect(self.success_url)
+
+        return HttpResponseBadRequest
 
     def update_contact(self, sender, receiver, type_of_approval):
         if type_of_approval == "approve":

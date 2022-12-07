@@ -235,12 +235,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_contacts_for_approval(self):
         return self.contacts_for_approval.filter(is_active=True)
 
-    def get_all_contacts(self):
-        qs = self.get_active_contacts() | self.get_contacts_for_approval()
-        return qs.order_by("-date_joined")
-
     def get_pending_invitations(self):
         return Invite.objects.get_pending_invitations_for_user(self)
+
+    def is_email_of_contact(self, email):
+        return (
+            self.user_contacts.filter(email=email).exists()
+            or self.contacts_for_approval.filter(email=email).exists()
+        )
 
 
 class Document(models.Model):
@@ -586,6 +588,13 @@ class Invite(models.Model):
 
     def __str__(self):
         return f"For: {self.invitee if self.invitee else _('new user')} ({self.created_on.date()})"
+
+    def get_full_name(self):
+        """
+        Returns the first_name plus the last_name of the invitee, with a space in between.
+        """
+        full_name = "%s %s" % (self.invitee_first_name, self.invitee_last_name)
+        return full_name.strip()
 
     def save(self, **kwargs):
         if not self.pk:

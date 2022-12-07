@@ -33,14 +33,14 @@
     form {
       flex: 1;
     }
-
-    button[name='contact_reject'] {
-      color: var(--color-danger-lighter);
-    }
   }
 
   p {
     margin: 0;
+  }
+
+  .btn-reject {
+    color: var(--color-danger-lighter);
   }
 
   @media (min-width: 768px) {

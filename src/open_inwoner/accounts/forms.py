@@ -140,10 +140,7 @@ class ContactCreateForm(forms.Form):
                     _("Please enter a valid email address of a contact.")
                 )
 
-            if (
-                self.user.user_contacts.filter(email=email).exists()
-                or self.user.contacts_for_approval.filter(email=email).exists()
-            ):
+            if self.user.is_email_of_contact(email):
                 raise ValidationError(
                     _(
                         "Het ingevoerde e-mailadres komt al voor in uw contactpersonen. Pas de gegevens aan en probeer het opnieuw."

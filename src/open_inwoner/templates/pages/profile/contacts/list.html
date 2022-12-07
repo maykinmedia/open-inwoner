@@ -10,14 +10,16 @@
 
 <!--List of contact requests: receiver's view-->
 {% if pending_approval or pending_approval_list %}
-    <div class={% if pending_approval %}"approval approval--single"{% else %}"approval"{% endif %}>
+    <div class="approval{% if pending_approval %} approval--single{% endif %}">
         <div class="approval__header">
             <h2 class="h2">{% trans "U bent toegevoegd als contactpersoon" %}</h2>
-            <p>{% trans "By accepting you agree on sharing your personal data (first name, last name and phonenumber)." %}</p>
+            <p class="p">{% trans "By accepting you agree on sharing your personal data (first name, last name and phonenumber)." %}</p>
         </div>
         {% if pending_approval %}
             <div class="approval__single">
-                <p>{{pending_approval.get_full_name}} {% trans "heeft u toegevoegd aan diens contactpersonen." %}</p>
+                <p class="p">
+                    {% blocktrans with full_name=pending_approval.get_full_name %}{{ full_name }} heeft u toegevoegd aan diens contactpersonen.{% endblocktrans %}
+                </p>
                 {% url 'accounts:contact_approval' uuid=pending_approval.uuid as approval_url %}
                 {% render_form form=None method="POST" form_action=approval_url id="approval_form" spaceless=True show_notifications=True %}
                     {% csrf_token %}
@@ -31,13 +33,13 @@
             <ul class="approval__list">        
                 {% for approval in pending_approval_list %}
                     <li class="approval__list-item">
-                        <p>{{approval.get_full_name}}</p>
+                        <p class="p">{{approval.get_full_name}}</p>
                         {% url 'accounts:contact_approval' uuid=approval.uuid as approval_url %}
                         {% render_form form=None method="POST" form_action=approval_url id="approval_form" spaceless=True show_notifications=True %}
                             {% csrf_token %}
                             {% button_row %}
-                                {% button text=_("Weigeren") name="contact_reject" value="reject" icon="close" icon_position="before" %}
-                                {% button text=_("Accepteren") name="contact_approve" value="approve" icon="check" icon_position="before" %}
+                                {% button text=_("Weigeren") name="contact_reject" value="reject" icon="close" icon_position="before" extra_classes="btn-reject" %}
+                                {% button text=_("Accepteren") name="contact_approve" value="approve" icon="check" icon_position="before" extra_classes="btn-approve" %}
                             {% endbutton_row %}
                         {% endrender_form %}
                     </li>
