@@ -59,7 +59,7 @@ class CaseAccessMixin(AccessMixin):
 
     When retrieving a case :
     - users BSN has a role for this case
-    - case confidentiality is lower then globally configured
+    - case confidentiality is not higher than globally configured
     """
 
     case: Zaak = None
