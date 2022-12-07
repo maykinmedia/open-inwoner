@@ -11,6 +11,15 @@
         </tr>
     </thead>
     <tbody>
+        {% for invite in request.user.get_pending_invitations %}
+            <tr>
+                <td class="table__item">{{invite.invitee_first_name}} {{invite.invitee_last_name}}</td>
+                <td class="table__item"></td>
+                <td class="table__item">{{invite.invitee_email}}</td>
+                <td class="table__item">-</td>
+                <td class="table__item">{% icon "check" extra_classes="icon icon--disabled" %}</td>
+            </tr>
+        {% endfor %}
         {% for contact in object.get_all_contacts %}
             <tr>
                 <td class="table__item">{{contact.get_full_name}}</td>

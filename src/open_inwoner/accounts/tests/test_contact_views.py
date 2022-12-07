@@ -160,6 +160,20 @@ class ContactViewTests(WebTest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["form"].errors, expected_errors)
 
+    def test_adding_contact_with_users_email_fails(self):
+        response = self.app.get(self.create_url, user=self.user)
+        form = response.forms["contact-form"]
+
+        form["first_name"] = self.contact.first_name
+        form["last_name"] = self.contact.last_name
+        form["email"] = self.user.email
+        response = form.submit(user=self.user)
+        expected_errors = {
+            "__all__": [_("Please enter a valid email address of a contact.")]
+        }
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["form"].errors, expected_errors)
+
     def test_adding_inactive_contact_fails(self):
         inactive_user = UserFactory(is_active=False)
         response = self.app.get(self.create_url, user=self.user)
