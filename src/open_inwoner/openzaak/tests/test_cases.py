@@ -7,6 +7,7 @@ from django.urls import reverse, reverse_lazy
 import requests_mock
 from django_webtest import WebTest
 from furl import furl
+from timeline_logger.models import TimelineLog
 from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 from zgw_consumers.constants import APITypes
 from zgw_consumers.test import generate_oas_component, mock_service_oas_get
@@ -317,6 +318,28 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
             },
         )
 
+    def test_list_open_cases_logs_displayed_case_ids(self, m):
+        self._setUpMocks(m)
+
+        self.app.get(self.url_open, user=self.user)
+
+        # check access logs for displayed cases
+        logs = list(TimelineLog.objects.all())
+
+        log = logs[-1]
+        self.assertIn(self.zaak1["identificatie"], log.extra_data["message"])
+        self.assertEqual(self.user, log.user)
+        self.assertEqual(self.user, log.content_object)
+
+        log = logs[-2]
+        self.assertIn(self.zaak2["identificatie"], log.extra_data["message"])
+        self.assertEqual(self.user, log.user)
+        self.assertEqual(self.user, log.content_object)
+
+        # no logs for non-displayed cases
+        for log in logs:
+            self.assertNotIn(self.zaak3["identificatie"], log.extra_data["message"])
+
     def test_list_closed_cases(self, m):
         self._setUpMocks(m)
 
@@ -359,6 +382,24 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
                 ],
             },
         )
+
+    def test_list_closed_cases_logs_displayed_case_ids(self, m):
+        self._setUpMocks(m)
+
+        self.app.get(self.url_closed, user=self.user)
+
+        # check access logs for displayed cases
+        logs = list(TimelineLog.objects.all())
+
+        log = logs[-1]
+        self.assertIn(self.zaak3["identificatie"], log.extra_data["message"])
+        self.assertEqual(self.user, log.user)
+        self.assertEqual(self.user, log.content_object)
+
+        # no logs for non-displayed cases
+        for log in logs:
+            self.assertNotIn(self.zaak1["identificatie"], log.extra_data["message"])
+            self.assertNotIn(self.zaak2["identificatie"], log.extra_data["message"])
 
     @patch.object(CaseListMixin, "paginate_by", 1)
     def test_list_cases_paginated(self, m):
@@ -409,3 +450,39 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
         self.assertNotContains(response_2, self.zaak2["identificatie"])
         self.assertNotContains(response_2, self.zaak2["omschrijving"])
         self.assertContains(response_2, "?page=1")
+
+    @patch.object(CaseListMixin, "paginate_by", 1)
+    def test_list_cases_paginated_logs_displayed_case_ids(self, m):
+        self._setUpMocks(m)
+
+        # 1. test first page
+        response = self.app.get(self.url_open, user=self.user)
+        self.assertEqual(response.context.get("cases")[0]["uuid"], self.zaak2["uuid"])
+
+        # check access logs for displayed cases
+        logs = list(TimelineLog.objects.all())
+        log = logs[-1]
+        self.assertIn(self.zaak2["identificatie"], log.extra_data["message"])
+
+        # no logs for non-displayed cases
+        for log in logs:
+            self.assertNotIn(self.zaak1["identificatie"], log.extra_data["message"])
+            self.assertNotIn(self.zaak3["identificatie"], log.extra_data["message"])
+
+        # clear logs for testing
+        TimelineLog.objects.all().delete()
+
+        # 2. test next page
+        next_page = f"{self.url_open}?page=2"
+        response = self.app.get(next_page, user=self.user)
+        self.assertEqual(response.context.get("cases")[0]["uuid"], self.zaak1["uuid"])
+
+        # check access logs for displayed cases
+        logs = list(TimelineLog.objects.all())
+        log = logs[-1]
+        self.assertIn(self.zaak1["identificatie"], log.extra_data["message"])
+
+        # no logs for non-displayed cases (after we cleared just above)
+        for log in logs:
+            self.assertNotIn(self.zaak2["identificatie"], log.extra_data["message"])
+            self.assertNotIn(self.zaak3["identificatie"], log.extra_data["message"])
