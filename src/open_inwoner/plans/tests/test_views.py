@@ -10,7 +10,6 @@ from webtest import Upload
 
 from open_inwoner.accounts.choices import StatusChoices
 from open_inwoner.accounts.models import Action
-
 from open_inwoner.accounts.tests.factories import ActionFactory, UserFactory
 from open_inwoner.accounts.tests.test_action_views import ActionStatusSeleniumBaseTests
 from open_inwoner.utils.tests.selenium import ChromeSeleniumMixin, FirefoxSeleniumMixin
@@ -142,7 +141,7 @@ class PlanViewTests(WebTest):
         self.assertTrue(self.action.is_connected(self.user))
 
         # but contact user is only connected to the plan (and not the action)
-        self.assertFalse(self.action.is_connected(self.contact_user))
+        self.assertFalse(self.action.is_connected(self.contact))
 
         button_selector = f"#actions_{self.action.id}__status .actions__status-button"
 
@@ -154,7 +153,7 @@ class PlanViewTests(WebTest):
         self.assertNotEqual(list(response.pyquery(button_selector)), [])
 
         # list actions part of the contact user's connection to the plan
-        response = self.app.get(self.detail_url, user=self.contact_user)
+        response = self.app.get(self.detail_url, user=self.contact)
         self.assertEqual(list(response.context["actions"]), [self.action])
 
         # action is there but there is no button for the contact
@@ -534,6 +533,7 @@ class _PlanActionStatusSeleniumMixin:
 
         # update the action to belong to our plan
         self.plan = PlanFactory(created_by=self.user)
+        self.plan.plan_contacts.add(self.user)
         self.action.plan = self.plan
         self.action.save()
 
