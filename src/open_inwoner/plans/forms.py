@@ -29,8 +29,13 @@ class PlanForm(forms.ModelForm):
         self.user = user
         user_contacts = self.user.get_active_contacts()
         self.fields["plan_contacts"].queryset = user_contacts
+
+        # NOTE we have to convert the ID value of the choice to string to make components recognize checked (taiga 899)
         self.fields["plan_contacts"].choices = [
-            [c.id, c.get_full_name()] for c in user_contacts
+            [str(c.id), c.get_full_name()] for c in user_contacts
+        ]
+        self.fields["template"].choices = [
+            (str(t.id), t) for t in self.fields["template"].queryset
         ]
 
         if self.instance.pk:
