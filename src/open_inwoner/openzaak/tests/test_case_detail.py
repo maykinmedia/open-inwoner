@@ -6,6 +6,7 @@ from django.utils.translation import gettext_lazy as _
 
 import requests_mock
 from django_webtest import WebTest
+from timeline_logger.models import TimelineLog
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.catalogi import StatusType
 from zgw_consumers.api_models.constants import (
@@ -62,6 +63,11 @@ class TestCaseDetailView(WebTest):
             VertrouwelijkheidsAanduidingen.beperkt_openbaar
         )
         self.config.save()
+
+        self.case_detail_url = reverse(
+            "accounts:case_status",
+            kwargs={"object_id": "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d"},
+        )
 
         # openzaak resources
         self.zaak = generate_oas_component(
@@ -306,13 +312,7 @@ class TestCaseDetailView(WebTest):
         status1_obj.statustype = factory(StatusType, self.status_type1)
         status2_obj.statustype = factory(StatusType, self.status_type2)
 
-        response = self.app.get(
-            reverse(
-                "accounts:case_status",
-                kwargs={"object_id": "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d"},
-            ),
-            user=self.user,
-        )
+        response = self.app.get(self.case_detail_url, user=self.user)
 
         self.assertEqual(
             response.context.get("case"),
@@ -336,13 +336,7 @@ class TestCaseDetailView(WebTest):
     def test_page_displays_expected_data(self, m):
         self._setUpMocks(m)
 
-        response = self.app.get(
-            reverse(
-                "accounts:case_status",
-                kwargs={"object_id": "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d"},
-            ),
-            user=self.user,
-        )
+        response = self.app.get(self.case_detail_url, user=self.user)
 
         self.assertContains(response, "ZAAK-2022-0000000024")
         self.assertContains(response, "Zaak naar aanleiding van ingezonden formulier")
@@ -352,16 +346,20 @@ class TestCaseDetailView(WebTest):
         self.assertContains(response, "Foo Bar van der Bazz")
         self.assertContains(response, "resultaat toelichting")
 
+    def test_when_accessing_case_detail_a_timelinelog_is_created(self, m):
+        self._setUpMocks(m)
+
+        self.app.get(self.case_detail_url, user=self.user)
+
+        log = TimelineLog.objects.last()
+        self.assertIn(self.zaak["identificatie"], log.extra_data["message"])
+        self.assertEqual(self.user, log.user)
+        self.assertEqual(self.user, log.content_object)
+
     def test_current_status_in_context_is_the_most_recent_one(self, m):
         self._setUpMocks(m)
 
-        response = self.app.get(
-            reverse(
-                "accounts:case_status",
-                kwargs={"object_id": "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d"},
-            ),
-            user=self.user,
-        )
+        response = self.app.get(self.case_detail_url, user=self.user)
         current_status = response.context.get("case", {}).get("current_status")
         self.assertEquals(current_status, "Finish")
 
@@ -370,13 +368,7 @@ class TestCaseDetailView(WebTest):
     ):
         self._setUpMocks(m)
 
-        response = self.app.get(
-            reverse(
-                "accounts:case_status",
-                kwargs={"object_id": "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d"},
-            ),
-            user=self.user,
-        )
+        response = self.app.get(self.case_detail_url, user=self.user)
         documents = response.context.get("case", {}).get("documents")
         self.assertEquals(len(documents), 1)
         self.assertEquals(
@@ -393,26 +385,14 @@ class TestCaseDetailView(WebTest):
             last_name="",
             login_type=LoginTypeChoices.default,
         )
-        response = self.app.get(
-            reverse(
-                "accounts:case_status",
-                kwargs={"object_id": "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d"},
-            ),
-            user=user,
-        )
+        response = self.app.get(self.case_detail_url, user=user)
 
         self.assertRedirects(response, reverse("root"))
 
     def test_anonymous_user_has_no_access_to_status_page(self, m):
         self._setUpMocks(m)
         user = AnonymousUser()
-        response = self.app.get(
-            reverse(
-                "accounts:case_status",
-                kwargs={"object_id": "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d"},
-            ),
-            user=user,
-        )
+        response = self.app.get(self.case_detail_url, user=user)
 
         self.assertRedirects(
             response,
@@ -440,13 +420,7 @@ class TestCaseDetailView(WebTest):
             # no roles for our user found
             json=paginated_response([self.not_our_user_role]),
         )
-        response = self.app.get(
-            reverse(
-                "accounts:case_status",
-                kwargs={"object_id": "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d"},
-            ),
-            user=self.user,
-        )
+        response = self.app.get(self.case_detail_url, user=self.user)
         self.assertRedirects(response, reverse("root"))
 
     def test_no_data_is_retrieved_when_http_404(self, m):
@@ -458,13 +432,7 @@ class TestCaseDetailView(WebTest):
             status_code=404,
         )
 
-        response = self.app.get(
-            reverse(
-                "accounts:case_status",
-                kwargs={"object_id": "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d"},
-            ),
-            user=self.user,
-        )
+        response = self.app.get(self.case_detail_url, user=self.user)
 
         self.assertIsNone(response.context.get("case"))
         self.assertContains(response, _("There is no available data at the moment."))
@@ -478,13 +446,7 @@ class TestCaseDetailView(WebTest):
             status_code=500,
         )
 
-        response = self.app.get(
-            reverse(
-                "accounts:case_status",
-                kwargs={"object_id": "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d"},
-            ),
-            user=self.user,
-        )
+        response = self.app.get(self.case_detail_url, user=self.user)
 
         self.assertIsNone(response.context.get("case"))
         self.assertContains(response, _("There is no available data at the moment."))

@@ -1,5 +1,5 @@
 import dataclasses
-from typing import List, Optional
+from typing import Iterable, List, Optional
 
 from django.contrib.auth.mixins import AccessMixin
 from django.core.exceptions import PermissionDenied
@@ -41,6 +41,14 @@ from open_inwoner.utils.mixins import PaginationMixin
 from open_inwoner.utils.views import LogMixin
 
 
+class CaseLogMixin(LogMixin):
+    def log_case_access(self, case_identificatie: str):
+        self.log_user_action(
+            self.request.user,
+            _("Zaak bekeken: {case}").format(case=case_identificatie),
+        )
+
+
 class CaseAccessMixin(AccessMixin):
     """
     Shared authorisation check
@@ -51,6 +59,7 @@ class CaseAccessMixin(AccessMixin):
 
     When retrieving a case :
     - users BSN has a role for this case
+    - case confidentiality is not higher than globally configured
     """
 
     case: Zaak = None
@@ -88,7 +97,7 @@ class CaseAccessMixin(AccessMixin):
         return fetch_single_case(case_uuid)
 
 
-class CaseListMixin(PaginationMixin):
+class CaseListMixin(CaseLogMixin, PaginationMixin):
     paginate_by = 9
     template_name = "pages/cases/list.html"
 
@@ -147,6 +156,9 @@ class CaseListMixin(PaginationMixin):
 
         context["cases"] = cases
         context.update(paginator_dict)
+
+        for case in cases:
+            self.log_case_access(case["identificatie"])
 
         context["anchors"] = self.get_anchors()
         context["title"] = self.get_title()
@@ -214,7 +226,7 @@ class SimpleFile:
     url: str
 
 
-class CaseDetailView(BaseBreadcrumbMixin, CaseAccessMixin, TemplateView):
+class CaseDetailView(CaseLogMixin, BaseBreadcrumbMixin, CaseAccessMixin, TemplateView):
     template_name = "pages/cases/status.html"
 
     @cached_property
@@ -231,6 +243,8 @@ class CaseDetailView(BaseBreadcrumbMixin, CaseAccessMixin, TemplateView):
         context = super().get_context_data(**kwargs)
 
         if self.case:
+            self.log_case_access(self.case.identificatie)
+
             documents = self.get_case_document_files(self.case)
 
             statuses = fetch_status_history(self.case.url)
