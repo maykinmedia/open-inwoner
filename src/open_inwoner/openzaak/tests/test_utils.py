@@ -195,3 +195,14 @@ class TestUtils(TestCase):
             )
             expected = "Bazz"
             self.assertEqual(expected, get_role_name_display(role))
+
+        with self.subTest("medewerker > non-standard field name from Taiga #961"):
+            role = get_role(
+                RolTypes.medewerker,
+                {
+                    # this is not following spec
+                    "volledigeNaam": "Bazz, Foo van der",
+                },
+            )
+            expected = "Bazz, Foo van der"
+            self.assertEqual(expected, get_role_name_display(role))

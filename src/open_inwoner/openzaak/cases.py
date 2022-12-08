@@ -171,6 +171,10 @@ def fetch_case_roles(
 
     roles = factory(Rol, response)
 
+    # Taiga #961 process eSuite response to apply ignored filter query
+    if role_desc_generic:
+        roles = [r for r in roles if r.omschrijving_generiek == role_desc_generic]
+
     return roles
 
 
