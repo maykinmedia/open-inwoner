@@ -24,6 +24,13 @@
     }
   }
 
+  &--flex {
+    .form__actions {
+      display: flex;
+      gap: var(--spacing-medium);
+    }
+  }
+
   /// Columns.
 
   @media (min-width: 768px) {
