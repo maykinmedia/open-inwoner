@@ -1,3 +1,5 @@
+from unittest import skip
+
 from django.contrib.messages import get_messages
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.core import mail
@@ -569,6 +571,7 @@ class _PlanActionStatusSeleniumMixin:
         )
 
 
+@skip("skipped for now because of random CI failures, ref Taiga #963")
 class PlanActionStatusFirefoxSeleniumTests(
     FirefoxSeleniumMixin,
     _PlanActionStatusSeleniumMixin,
@@ -579,6 +582,7 @@ class PlanActionStatusFirefoxSeleniumTests(
     # note these use the same ActionStatusSeleniumBaseTests as the Actions without Plan
 
 
+@skip("skipped for now because of random CI failures, ref Taiga #963")
 class PlanActionStatusChromeSeleniumTests(
     ChromeSeleniumMixin,
     _PlanActionStatusSeleniumMixin,
