@@ -20,7 +20,7 @@ from open_inwoner.utils.validators import validate_phone_number
 
 from .choices import ContactTypeChoices, LoginTypeChoices, StatusChoices, TypeChoices
 from .managers import ActionQueryset, DigidManager, UserManager, eHerkenningManager
-from .query import InviteQuerySet, MessageQuerySet
+from .query import InviteQuerySet, MessageQuerySet, UserQuerySet
 
 
 class User(AbstractBaseUser, PermissionsMixin):

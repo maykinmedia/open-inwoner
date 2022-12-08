@@ -140,8 +140,7 @@ class ContactApprovalView(LogMixin, LoginRequiredMixin, SingleObjectMixin, View)
 
     def get_queryset(self):
         base_qs = super().get_queryset()
-        base_qs = User.objects.get_pending_approvals(self.request.user)
-        return base_qs
+        return base_qs.get_pending_approvals(self.request.user)
 
     def post(self, request, *args, **kwargs):
         sender = self.get_object()
