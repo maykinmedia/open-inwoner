@@ -170,7 +170,7 @@ class TestCaseDetailView(WebTest):
                 "geslachtsnaam": "Bazz",
             },
         )
-        self.not_our_user_role = generate_oas_component(
+        self.not_initiator_role = generate_oas_component(
             "zrc",
             "schemas/Rol",
             url=f"{ZAKEN_ROOT}rollen/aa353aa-ad2c-4a07-ae75-15add5822",
@@ -274,11 +274,13 @@ class TestCaseDetailView(WebTest):
         )
         m.get(
             f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}",
-            json=paginated_response([self.user_role, self.not_our_user_role]),
+            json=paginated_response([self.user_role, self.not_initiator_role]),
         )
         m.get(
             f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}&omschrijvingGeneriek={RolOmschrijving.initiator}",
-            json=paginated_response([self.user_role]),
+            # Taiga #961 this is not an accurate OpenZaak response as it has a 'behandelaar' even when we filter on 'initiator'
+            # but eSuite doesn't filter the response in the API, so we use filtering in Python to remove the not-initiator
+            json=paginated_response([self.user_role, self.not_initiator_role]),
         )
         m.get(
             f"{ZAKEN_ROOT}resultaten/a44153aa-ad2c-6a07-be75-15add5113",
@@ -418,7 +420,7 @@ class TestCaseDetailView(WebTest):
         m.get(
             f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}",
             # no roles for our user found
-            json=paginated_response([self.not_our_user_role]),
+            json=paginated_response([self.not_initiator_role]),
         )
         response = self.app.get(self.case_detail_url, user=self.user)
         self.assertRedirects(response, reverse("root"))
@@ -457,7 +459,7 @@ class TestCaseDetailView(WebTest):
         m.get(self.zaak_invisible["url"], json=self.zaak_invisible)
         m.get(
             f"{ZAKEN_ROOT}rollen?zaak={self.zaak_invisible['url']}",
-            json=paginated_response([self.user_role, self.not_our_user_role]),
+            json=paginated_response([self.user_role, self.not_initiator_role]),
         )
 
         response = self.app.get(
