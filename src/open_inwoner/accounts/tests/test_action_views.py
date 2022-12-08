@@ -1,5 +1,6 @@
 import time
 from datetime import date
+from unittest import skip
 
 from django.contrib.messages import get_messages
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
@@ -402,12 +403,14 @@ class ActionStatusSeleniumBaseTests:
         self.assertEqual(self.action.status, StatusChoices.closed)
 
 
+@skip("skipped for now because of random CI failures, ref Taiga #963")
 class ActionStatusFirefoxSeleniumTests(
     FirefoxSeleniumMixin, ActionStatusSeleniumBaseTests, StaticLiveServerTestCase
 ):
     pass
 
 
+@skip("skipped for now because of random CI failures, ref Taiga #963")
 class ActionStatusChromeSeleniumTests(
     ChromeSeleniumMixin, ActionStatusSeleniumBaseTests, StaticLiveServerTestCase
 ):

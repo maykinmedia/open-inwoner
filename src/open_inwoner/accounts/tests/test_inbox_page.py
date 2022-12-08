@@ -1,3 +1,5 @@
+from unittest import skip
+
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.urls import reverse_lazy
 
@@ -217,12 +219,14 @@ class BaseInboxPageSeleniumTests:
         )
 
 
+@skip("skipped for now because of random CI failures, ref Taiga #963")
 class InboxPageFirefoxSeleniumTests(
     FirefoxSeleniumMixin, BaseInboxPageSeleniumTests, StaticLiveServerTestCase
 ):
     pass
 
 
+@skip("skipped for now because of random CI failures, ref Taiga #963")
 class InboxPageChromeSeleniumTests(
     ChromeSeleniumMixin, BaseInboxPageSeleniumTests, StaticLiveServerTestCase
 ):
