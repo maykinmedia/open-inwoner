@@ -78,8 +78,12 @@ class MyProfileView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormView)
             ] = f"{', '.join(contact_names)}{'...' if contacts.count() > 3 else ''}"
         else:
             context["contact_text"] = _("U heeft nog geen contacten.")
-        context["questionnaire_exists"] = QuestionnaireStep.objects.exists()
+
+        context["questionnaire_exists"] = QuestionnaireStep.objects.filter(
+            published=True
+        ).exists()
         context["can_change_password"] = user.login_type != LoginTypeChoices.digid
+
         return context
 
     def post(self, request, *args, **kwargs):

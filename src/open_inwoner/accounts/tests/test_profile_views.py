@@ -6,6 +6,7 @@ from django_webtest import WebTest
 from open_inwoner.accounts.choices import StatusChoices
 from open_inwoner.pdc.tests.factories import CategoryFactory
 
+from ...questionnaire.tests.factories import QuestionnaireStepFactory
 from ..choices import LoginTypeChoices
 from .factories import ActionFactory, DocumentFactory, UserFactory
 
@@ -30,17 +31,21 @@ class ProfileViewTests(WebTest):
 
     def test_get_empty_profile_page(self):
         response = self.app.get(self.url, user=self.user)
+
         self.assertEquals(response.status_code, 200)
         self.assertContains(response, _("U heeft geen intressegebieden aangegeven."))
         self.assertContains(response, _("U heeft nog geen contacten."))
         self.assertContains(response, "0 acties staan open.")
+        self.assertNotContains(response, reverse("questionnaire:questionnaire_list"))
 
     def test_get_filled_profile_page(self):
-        action = ActionFactory(created_by=self.user)
+        ActionFactory(created_by=self.user)
         contact = UserFactory()
         self.user.user_contacts.add(contact)
         category = CategoryFactory()
         self.user.selected_themes.add(category)
+        QuestionnaireStepFactory(published=True)
+
         response = self.app.get(self.url, user=self.user)
         self.assertEquals(response.status_code, 200)
         self.assertContains(response, category.name)
@@ -49,6 +54,7 @@ class ProfileViewTests(WebTest):
             f"{contact.first_name} ({contact.get_contact_type_display()})",
         )
         self.assertContains(response, "1 acties staan open.")
+        self.assertContains(response, reverse("questionnaire:questionnaire_list"))
 
     def test_only_open_actions(self):
         action = ActionFactory(created_by=self.user, status=StatusChoices.closed)
