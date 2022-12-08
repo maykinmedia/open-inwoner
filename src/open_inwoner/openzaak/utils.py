@@ -78,7 +78,7 @@ def get_role_name_display(rol: Rol) -> str:
         display = value("statutaire_naam")
 
     elif rol.betrokkene_type == RolTypes.vestiging:
-        # it is a list.. let's pick the first
+        # it is a list... let's pick the first
         names = value("handelsnaam")
         if names:
             display = names[0]
@@ -92,6 +92,9 @@ def get_role_name_display(rol: Rol) -> str:
             value("voorvoegsel_achternaam"),
             value("achternaam"),
         )
+        if not display:
+            # Taiga #961: eSuite doesn't follow spec and gives just a "volledige_naam"
+            display = value("volledige_naam")
 
     if not display:
         # fallback to generic role description
