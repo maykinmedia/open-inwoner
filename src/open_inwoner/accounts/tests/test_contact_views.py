@@ -316,3 +316,12 @@ class ContactViewTests(WebTest):
         self.assertContains(response, existing_user.first_name)
         self.assertContains(response, existing_user.last_name)
         self.assertContains(response, existing_user.email)
+
+    def test_post_with_no_params_in_contact_approval_returns_bad_request(self):
+        existing_user = UserFactory(email="ex@example.com")
+        self.user.contacts_for_approval.add(existing_user)
+        url = reverse("accounts:contact_approval", kwargs={"uuid": self.user.uuid})
+        response = self.app.post(url, user=existing_user, status=400)
+        self.assertEqual(
+            response.text, "contact_approve or contact_reject must be provided"
+        )

@@ -139,8 +139,8 @@ class ContactApprovalView(LogMixin, LoginRequiredMixin, SingleObjectMixin, View)
     success_url = reverse_lazy("accounts:contact_list")
 
     def get_queryset(self):
-        current_user = self.request.user
-        base_qs = User.objects.get_pending_approvals(current_user)
+        base_qs = super().get_queryset()
+        base_qs = User.objects.get_pending_approvals(self.request.user)
         return base_qs
 
     def post(self, request, *args, **kwargs):
@@ -152,7 +152,9 @@ class ContactApprovalView(LogMixin, LoginRequiredMixin, SingleObjectMixin, View)
             self.update_contact(sender, receiver, (approved or rejected))
             return HttpResponseRedirect(self.success_url)
 
-        return HttpResponseBadRequest
+        return HttpResponseBadRequest(
+            "contact_approve or contact_reject must be provided"
+        )
 
     def update_contact(self, sender, receiver, type_of_approval):
         if type_of_approval == "approve":

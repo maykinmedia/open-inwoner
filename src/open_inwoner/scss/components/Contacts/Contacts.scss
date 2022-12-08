@@ -39,10 +39,6 @@
     margin: 0;
   }
 
-  .btn-reject {
-    color: var(--color-danger-lighter);
-  }
-
   @media (min-width: 768px) {
     &__list {
       display: grid;
@@ -50,7 +46,7 @@
       gap: 0 var(--spacing-giant);
     }
 
-    &--single {
+    &--solo {
       width: 50%;
     }
   }

@@ -10,7 +10,7 @@
 
 <!--List of contact requests: receiver's view-->
 {% if pending_approval or pending_approval_list %}
-    <div class="approval{% if pending_approval %} approval--single{% endif %}">
+    <div class="approval{% if pending_approval %} approval--solo{% endif %}">
         <div class="approval__header">
             <h2 class="h2">{% trans "U bent toegevoegd als contactpersoon" %}</h2>
             <p class="p">{% trans "By accepting you agree on sharing your personal data (first name, last name and phonenumber)." %}</p>
@@ -38,8 +38,8 @@
                         {% render_form form=None method="POST" form_action=approval_url id="approval_form" spaceless=True show_notifications=True %}
                             {% csrf_token %}
                             {% button_row %}
-                                {% button text=_("Weigeren") name="contact_reject" value="reject" icon="close" icon_position="before" extra_classes="btn-reject" %}
-                                {% button text=_("Accepteren") name="contact_approve" value="approve" icon="check" icon_position="before" extra_classes="btn-approve" %}
+                                {% button text=_("Weigeren") name="contact_reject" value="reject" icon="close" icon_position="before" extra_classes="button--danger-borderless" %}
+                                {% button text=_("Accepteren") name="contact_approve" value="approve" icon="check" icon_position="before" %}
                             {% endbutton_row %}
                         {% endrender_form %}
                     </li>
