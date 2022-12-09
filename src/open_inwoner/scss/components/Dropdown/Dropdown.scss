@@ -8,7 +8,8 @@
   .dropdown__content {
     display: none;
     flex-direction: column;
-    gap: var(--spacing-medium);
+    row-gap: var(--spacing-medium);
+    padding: var(--spacing-medium) 0;
     position: absolute;
     right: 0;
     border-radius: var(--border-radius);
@@ -19,5 +20,10 @@
 
   .dropdown__item {
     padding: 0 var(--spacing-medium);
+  }
+
+  .dropdown__item .button {
+    height: var(--font-line-height-body);
+    padding: 0;
   }
 }
