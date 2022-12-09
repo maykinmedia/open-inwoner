@@ -17,7 +17,7 @@ from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.pdc.tests.factories import CategoryFactory
 from open_inwoner.utils.logentry import LOG_ACTIONS
 
-from ..choices import LoginTypeChoices
+from ..choices import LoginTypeChoices, StatusChoices
 from ..models import Action, Document, Message, User
 from .factories import (
     ActionFactory,
@@ -512,7 +512,7 @@ class TestActions(WebTest):
             },
         )
 
-    def test_action_update_is_logged(self):
+    def test_action_single_field_update_is_logged(self):
         form = self.app.get(
             reverse("accounts:action_edit", kwargs={"uuid": self.action.uuid}),
             user=self.user,
@@ -528,9 +528,60 @@ class TestActions(WebTest):
         self.assertEqual(
             log_entry.extra_data,
             {
-                "message": "Changed: Naam.",
+                "message": [_("Naam changed to Updated name.")],
                 "action_flag": list(LOG_ACTIONS[CHANGE]),
                 "content_object_repr": "Updated name",
+            },
+        )
+
+    def test_action_multiple_fields_update_is_logged(self):
+        form = self.app.get(
+            reverse("accounts:action_edit", kwargs={"uuid": self.action.uuid}),
+            user=self.user,
+        ).forms["action-create"]
+        form["name"] = "Updated name"
+        form["status"] = StatusChoices.approval
+        form.submit()
+        log_entry = TimelineLog.objects.last()
+
+        self.assertEqual(
+            log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
+        )
+        self.assertEqual(log_entry.content_object.id, self.action.id)
+        self.assertEqual(
+            log_entry.extra_data,
+            {
+                "message": [
+                    _("Naam changed to Updated name."),
+                    _("Status changed to Accordering."),
+                ],
+                "action_flag": list(LOG_ACTIONS[CHANGE]),
+                "content_object_repr": "Updated name",
+            },
+        )
+
+    def test_action_status_toggle_is_logged(self):
+        edit_status_url = reverse(
+            "accounts:action_edit_status", kwargs={"uuid": self.action.uuid}
+        )
+        self.client.force_login(self.user)
+        response = self.client.post(
+            edit_status_url,
+            {"status": StatusChoices.closed},
+            HTTP_HX_REQUEST="true",
+        )
+        log_entry = TimelineLog.objects.last()
+
+        self.assertEqual(
+            log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
+        )
+        self.assertEqual(log_entry.content_object.id, self.action.id)
+        self.assertEqual(
+            log_entry.extra_data,
+            {
+                "message": [_("Status changed to Afgerond.")],
+                "action_flag": list(LOG_ACTIONS[CHANGE]),
+                "content_object_repr": str(self.action),
             },
         )
 
