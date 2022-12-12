@@ -33,7 +33,7 @@
             </div>
             {% endwith %}
         {% else %}
-            <ul class="approval__list">        
+            <ul class="approval__list">
                 {% for approval in pending_approvals %}
                     <li class="approval__list-item">
                         <p class="p">{{approval.get_full_name}}</p>
@@ -80,7 +80,7 @@
                     <td class="table__item"></td>
                     <td class="table__item">{{invite.invitee_email}}</td>
                     <td class="table__item"></td>
-                    <td class="table__item">{% icon "check" extra_classes="icon icon--disabled" %}</td>
+                    <td class="table__item">{% icon "close" extra_classes="icon icon--danger" %}</td>
                     <td class="table__item">{% button text=_('Stuur bericht') icon="message" icon_position="before" icon_outlined=True transparent=True disabled=True %}</td>
                     <td class="table__item">{% button icon="settings" icon_position="before" text="" hide_text=True transparent=True disabled=True %}<td>
                 </tr>
@@ -93,7 +93,7 @@
                     <td class="table__item"></td>
                     <td class="table__item">{{contact.email}}</td>
                     <td class="table__item"></td>
-                    <td class="table__item">{% icon "check" extra_classes="icon icon--disabled" %}</td>
+                    <td class="table__item">{% icon "close" extra_classes="icon icon--danger" %}</td>
                     <td class="table__item">{% button text=_('Stuur bericht') icon="message" icon_position="before" icon_outlined=True transparent=True disabled=True %}</td>
                     <td class="table__item">{% button icon="settings" icon_position="before" text="" hide_text=True transparent=True disabled=True %}<td>
                 </tr>
@@ -106,7 +106,7 @@
                     <td class="table__item">{% if contact.contact_type == "contact" %}Contactpersoon{% elif contact.contact_type == "begeleider" %}Begeleider{% elif contact.contact_type == "organization" %}Organisatie{% endif %}</td>
                     <td class="table__item">{{ contact.get_contact_email|default:"" }}</td>
                     <td class="table__item">{{ contact.phonenumber }}</td>
-                    <td class="table__item">{% if contact.is_not_active %}{% icon "check" extra_classes="icon icon--disabled" %}{% else %}{% icon "check" %}{% endif %}</td>
+                    <td class="table__item">{% if contact.is_not_active %}{% icon "close" extra_classes="icon icon--danger" %}{% else %}{% icon "check" %}{% endif %}</td>
                     <td class="table__item">{% button text=_('Stuur bericht') icon="message" icon_position="before" href=contact.get_contact_message_url icon_outlined=True transparent=True disabled=contact.is_not_active %}</td>
                     <td class="table__item">
                         {% dropdown icon="settings" disabled=contact.is_not_active %}
