@@ -326,15 +326,19 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
         # check access logs for displayed cases
         logs = list(TimelineLog.objects.all())
 
-        log = logs[-1]
-        self.assertIn(self.zaak1["identificatie"], log.extra_data["message"])
-        self.assertEqual(self.user, log.user)
-        self.assertEqual(self.user, log.content_object)
+        case_log = [
+            l for l in logs if self.zaak1["identificatie"] in l.extra_data["message"]
+        ]
+        self.assertEqual(len(case_log), 1)
+        self.assertEqual(self.user, case_log[0].user)
+        self.assertEqual(self.user, case_log[0].content_object)
 
-        log = logs[-2]
-        self.assertIn(self.zaak2["identificatie"], log.extra_data["message"])
-        self.assertEqual(self.user, log.user)
-        self.assertEqual(self.user, log.content_object)
+        case_log = [
+            l for l in logs if self.zaak2["identificatie"] in l.extra_data["message"]
+        ]
+        self.assertEqual(len(case_log), 1)
+        self.assertEqual(self.user, case_log[0].user)
+        self.assertEqual(self.user, case_log[0].content_object)
 
         # no logs for non-displayed cases
         for log in logs:
@@ -391,10 +395,12 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
         # check access logs for displayed cases
         logs = list(TimelineLog.objects.all())
 
-        log = logs[-1]
-        self.assertIn(self.zaak3["identificatie"], log.extra_data["message"])
-        self.assertEqual(self.user, log.user)
-        self.assertEqual(self.user, log.content_object)
+        case_log = [
+            l for l in logs if self.zaak3["identificatie"] in l.extra_data["message"]
+        ]
+        self.assertEqual(len(case_log), 1)
+        self.assertEqual(self.user, case_log[0].user)
+        self.assertEqual(self.user, case_log[0].content_object)
 
         # no logs for non-displayed cases
         for log in logs:
@@ -461,8 +467,13 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
 
         # check access logs for displayed cases
         logs = list(TimelineLog.objects.all())
-        log = logs[-1]
-        self.assertIn(self.zaak2["identificatie"], log.extra_data["message"])
+
+        case_log = [
+            l for l in logs if self.zaak2["identificatie"] in l.extra_data["message"]
+        ]
+        self.assertEqual(len(case_log), 1)
+        self.assertEqual(self.user, case_log[0].user)
+        self.assertEqual(self.user, case_log[0].content_object)
 
         # no logs for non-displayed cases
         for log in logs:
@@ -479,8 +490,10 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
 
         # check access logs for displayed cases
         logs = list(TimelineLog.objects.all())
-        log = logs[-1]
-        self.assertIn(self.zaak1["identificatie"], log.extra_data["message"])
+        case_log = [
+            l for l in logs if self.zaak1["identificatie"] in l.extra_data["message"]
+        ]
+        self.assertEqual(len(case_log), 1)
 
         # no logs for non-displayed cases (after we cleared just above)
         for log in logs:
