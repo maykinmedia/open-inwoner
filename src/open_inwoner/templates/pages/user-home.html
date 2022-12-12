@@ -16,7 +16,7 @@
         {% if plans %}
         <div class="plans-cards card-container card-container--columns-3">
             {% for plan in plans %}
-                {% render_card image_object_fit="contain" %}
+                {% render_card image_object_fit="cover" %}
                     <h3 class="h3">{{ plan.title }}</h3>
                     <p class="p">{{ plan.goal|truncatewords:20 }}</p>
                     <a
