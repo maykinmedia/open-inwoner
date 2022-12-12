@@ -1,3 +1,5 @@
+@import "~microscope-sass/lib/responsive";
+
 .h4 {
   color: var(--font-color-heading-4);
   font-family: var(--font-family-heading-4);
@@ -6,4 +8,8 @@
   line-height: var(--font-line-height-heading-4);
   margin: 0;
   word-break: break-all;
+
+  @include mobile-only {
+    word-break: break-all;
+  }
 }

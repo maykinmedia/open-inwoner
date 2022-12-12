@@ -1,3 +1,5 @@
+@import "~microscope-sass/lib/responsive";
+
 .h2 {
   color: var(--font-color-heading-2);
   font-family: var(--font-family-heading-2);
@@ -7,10 +9,13 @@
   margin: 0;
   display: flex;
   justify-content: space-between;
-  word-break: break-all;
 
   &--extra {
     margin: var(--row-height) 0 var(--spacing-medium) 0;
+  }
+
+  @include mobile-only {
+    word-break: break-all;
   }
 }
 
