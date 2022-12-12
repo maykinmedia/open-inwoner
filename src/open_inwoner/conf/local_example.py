@@ -12,3 +12,7 @@ DATABASES = {
         "PORT": "",  # Set to empty string for default.
     }
 }
+
+
+# option to supress noisy signals during testing
+# ENABLE_USER_SIGNALS = False

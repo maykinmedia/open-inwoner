@@ -28,3 +28,6 @@ CACHES = {
 }
 
 ELASTIC_APM["DEBUG"] = True
+
+# option to supress noisy signals during testing
+ENABLE_USER_SIGNALS = False
