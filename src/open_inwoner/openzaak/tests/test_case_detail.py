@@ -1,6 +1,7 @@
 import datetime
 
 from django.contrib.auth.models import AnonymousUser
+from django.core.cache import cache
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -34,7 +35,13 @@ DOCUMENTEN_ROOT = "https://documenten.nl/api/v1/"
 @requests_mock.Mocker()
 class TestCaseDetailView(WebTest):
     def setUp(self):
+        super().setUp()
         self.maxDiff = None
+        cache.clear()
+
+    def tearDown(self):
+        super().tearDown()
+        cache.clear()
 
     @classmethod
     def setUpTestData(self):

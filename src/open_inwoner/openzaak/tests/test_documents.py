@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AnonymousUser
+from django.core.cache import cache
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -130,6 +131,11 @@ class TestDocumentDownloadView(WebTest):
                 },
             ),
         )
+        cache.clear()
+
+    def tearDown(self):
+        super().tearDown()
+        cache.clear()
 
     def _setUpOASMocks(self, m):
         mock_service_oas_get(m, ZAKEN_ROOT, "zrc")

@@ -2,6 +2,7 @@ import datetime
 from unittest.mock import patch
 
 from django.contrib.auth.models import AnonymousUser
+from django.core.cache import cache
 from django.urls import reverse, reverse_lazy
 
 import requests_mock
@@ -29,6 +30,14 @@ class CaseListAccessTests(WebTest):
         reverse_lazy("accounts:my_open_cases"),
         reverse_lazy("accounts:my_closed_cases"),
     ]
+
+    def setUp(cls):
+        super().setUp()
+        cache.clear()
+
+    def tearDown(self):
+        super().tearDown()
+        cache.clear()
 
     @classmethod
     def setUpTestData(cls):
