@@ -325,3 +325,50 @@ class ContactViewTests(WebTest):
         self.assertEqual(
             response.text, "contact_approve or contact_reject must be provided"
         )
+
+    def test_notification_email_for_approval_is_sent(self):
+        existing_user = UserFactory(email="ex@example.com")
+
+        # Create a contact which addresses an existing user
+        create_form = self.app.get(self.create_url, user=self.user).forms[
+            "contact-form"
+        ]
+        create_form["first_name"] = existing_user.first_name
+        create_form["last_name"] = existing_user.last_name
+        create_form["email"] = existing_user.email
+        create_form.submit()
+
+        # check that the notification email was sent
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertEqual(
+            email.subject,
+            f"Goedkeuring geven op Open Inwoner Platform: {self.user.get_full_name()} wilt u toevoegen als contactpersoon",
+        )
+        self.assertEqual(email.to, [existing_user.email])
+        invite_url = f"http://testserver{reverse('accounts:contact_list')}"
+        body = email.alternatives[0][0]  # html version of the email body
+        self.assertIn(invite_url, body)
+
+    def test_notification_email_for_approval_is_not_sent_when_new_user(self):
+        response = self.app.get(self.create_url, user=self.user)
+        form = response.forms["contact-form"]
+
+        form["first_name"] = "John"
+        form["last_name"] = "Smith"
+        form["email"] = "john@example.nl"
+        response = form.submit()
+
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertNotEqual(
+            email.subject,
+            f"Goedkeuring geven op Open Inwoner Platform: {self.user.get_full_name()} wilt u toevoegen als contactpersoon",
+        )
+        self.assertNotEqual(email.to, ["john@example.com"])
+        invite_url = f"http://testserver{reverse('accounts:contact_list')}"
+        body = email.alternatives[0][0]  # html version of the email body
+        self.assertNotIn(invite_url, body)
+
+        # Email should be the one for registration, not for approval
+        self.assertEqual(email.subject, "Uitnodiging voor Open Inwoner Platform")

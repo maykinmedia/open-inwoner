@@ -648,6 +648,51 @@ MAIL_EDITOR_CONF = {
             {"name": "email", "description": _("Email of the invited user")},
         ],
     },
+    "contact_approval": {
+        "name": _("Contact Approval Email"),
+        "description": _(
+            "This email is used to notify people for pending approvals of new contacts"
+        ),
+        "subject_default": "Goedkeuring geven op {{ site_name }}: {{ sender_name }} wilt u toevoegen als contactpersoon",
+        "body_default": """
+            <p>Beste</p>
+
+            <p>Gebruiker {{ sender_name }} wilt u toevoegen als contactpersoon op {{ site_name }}. 
+            Volg onderstaande link waarop u uw goedkeuring kan geven of kan aangeven {{ sender_name }} niet als contactpersoon te willen. </p>
+
+            <p><a href="{{ contacts_link }}">Mijn Contacten</a> </p>
+
+            <p>U kunt ook op een later moment toestemming geven, het verzoek van {{ sender_name }} blijft open staat totdat u een keuze heeft gemaakt.</p>
+
+            <p>Met vriendelijke groet,
+            {{ site_name }} </p>
+        """,
+        "subject": [
+            {
+                "name": "site_name",
+                "description": _("Name of the site."),
+            },
+            {
+                "name": "sender_name",
+                "description": _("Full name of the inviter-sender"),
+            },
+        ],
+        "body": [
+            {
+                "name": "sender_name",
+                "description": _("Full name of the inviter-sender"),
+            },
+            {
+                "name": "site_name",
+                "description": _("Name of the site"),
+            },
+            {
+                "name": "contacts_link",
+                "description": _("Link to contact list page."),
+            },
+            {"name": "email", "description": _("Email of the receiver user")},
+        ],
+    },
     "new_messages": {
         "name": _("New Message Email"),
         "description": _(
