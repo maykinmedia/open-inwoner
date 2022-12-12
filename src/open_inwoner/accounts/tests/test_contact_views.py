@@ -341,9 +341,12 @@ class ContactViewTests(WebTest):
         # check that the notification email was sent
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
-        self.assertEqual(email.subject, "Approval for Open Inwoner Platform")
+        self.assertEqual(
+            email.subject,
+            f"Goedkeuring geven op Open Inwoner Platform: {self.user.get_full_name()} wilt u toevoegen als contactpersoon",
+        )
         self.assertEqual(email.to, [existing_user.email])
-        invite_url = f"http://testserver{reverse('login')}?next={reverse('accounts:contact_list')}"
+        invite_url = f"http://testserver{reverse('accounts:contact_list')}"
         body = email.alternatives[0][0]  # html version of the email body
         self.assertIn(invite_url, body)
 
@@ -358,9 +361,12 @@ class ContactViewTests(WebTest):
 
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
-        self.assertNotEqual(email.subject, "Approval for Open Inwoner Platform")
+        self.assertNotEqual(
+            email.subject,
+            f"Goedkeuring geven op Open Inwoner Platform: {self.user.get_full_name()} wilt u toevoegen als contactpersoon",
+        )
         self.assertNotEqual(email.to, ["john@example.com"])
-        invite_url = f"http://testserver{reverse('login')}?next={reverse('accounts:contact_list')}"
+        invite_url = f"http://testserver{reverse('accounts:contact_list')}"
         body = email.alternatives[0][0]  # html version of the email body
         self.assertNotIn(invite_url, body)
 

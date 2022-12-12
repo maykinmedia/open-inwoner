@@ -653,18 +653,18 @@ MAIL_EDITOR_CONF = {
         "description": _(
             "This email is used to notify people for pending approvals of new contacts"
         ),
-        "subject_default": "Approval for {{ site_name }}",
+        "subject_default": "Goedkeuring geven op {{ site_name }}: {{ sender_name }} wilt u toevoegen als contactpersoon",
         "body_default": """
             <p>Beste</p>
 
-            <p>User {{ sender_name }} has requested to be your contact.
-            Follow the link below to approve or reject the connection </p>
+            <p>Gebruiker {{ sender_name }} wilt u toevoegen als contactpersoon op {{ site_name }}. 
+            Volg onderstaande link waarop u uw goedkeuring kan geven of kan aangeven {{ sender_name }} niet als contactpersoon te willen. </p>
 
-            <p><a href="{{ contacts_link }}">My contacts</a> </p>
+            <p><a href="{{ contacts_link }}">Mijn Contacten</a> </p>
 
-            <p>The notification will remain on your contact list page until your approval/rejection </p>
+            <p>U kunt ook op een later moment toestemming geven, het verzoek van {{ sender_name }} blijft open staat totdat u een keuze heeft gemaakt.</p>
 
-            <p>Sincerely,
+            <p>Met vriendelijke groet,
             {{ site_name }} </p>
         """,
         "subject": [

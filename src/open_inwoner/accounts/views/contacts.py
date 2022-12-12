@@ -109,9 +109,8 @@ class ContactCreateView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormV
     def send_email_to_existing_user(self, receiver: User, sender: User, request=None):
         login_url = reverse("login")
         contacts_url = reverse("accounts:contact_list")
-        url = f"{login_url}?next={contacts_url}"
         if request:
-            url = request.build_absolute_uri(url)
+            url = request.build_absolute_uri(contacts_url)
 
         template = find_template("contact_approval")
         context = {
