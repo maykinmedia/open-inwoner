@@ -39,6 +39,7 @@ def fetch_status_types(case_type_url: str) -> List[StatusType]:
     return status_types
 
 
+@cache_result("status_type:{status_type_url}", timeout=60 * 60 * 24)
 def fetch_single_status_type(status_type_url: str) -> Optional[StatusType]:
     client = build_client("catalogi")
 

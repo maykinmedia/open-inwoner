@@ -55,6 +55,7 @@ def fetch_cases(user_bsn: str, max_cases: Optional[int] = 100) -> List[Zaak]:
     return cases
 
 
+@cache_result("single_case:{case_uuid}", timeout=60 * 3)
 def fetch_single_case(case_uuid: str) -> Optional[Zaak]:
     client = build_client("zaak")
 
@@ -75,6 +76,7 @@ def fetch_single_case(case_uuid: str) -> Optional[Zaak]:
     return case
 
 
+@cache_result("case_information_objects:{case_url}", timeout=60 * 3)
 def fetch_case_information_objects(case_url: str) -> List[ZaakInformatieObject]:
     client = build_client("zaak")
 
@@ -100,6 +102,7 @@ def fetch_case_information_objects(case_url: str) -> List[ZaakInformatieObject]:
     return case_info_objects
 
 
+@cache_result("status_history:{case_url}", timeout=60 * 3)
 def fetch_status_history(case_url: str) -> List[Status]:
     client = build_client("zaak")
 
@@ -141,6 +144,7 @@ def fetch_specific_status(status_url: str) -> Optional[Status]:
     return status
 
 
+@cache_result("case_roles:{case_url}:{role_desc_generic}", timeout=60 * 3)
 def fetch_case_roles(
     case_url: str, role_desc_generic: Optional[str] = None
 ) -> List[Rol]:
@@ -178,6 +182,7 @@ def fetch_case_roles(
     return roles
 
 
+# implicitly cached because it uses fetch_case_roles()
 def fetch_roles_for_case_and_bsn(case_url: str, bsn: str) -> List[Rol]:
     """
     note we do a query on all case_roles and then manually filter our roles from the result,
@@ -199,6 +204,7 @@ def fetch_roles_for_case_and_bsn(case_url: str, bsn: str) -> List[Rol]:
     return bsn_roles
 
 
+@cache_result("info_objects_for_case_info:{case_url}:{info_object_url}", timeout=60 * 3)
 def fetch_case_information_objects_for_case_and_info(
     case_url: str, info_object_url: str
 ) -> List[ZaakInformatieObject]:
@@ -229,6 +235,7 @@ def fetch_case_information_objects_for_case_and_info(
     return case_info_objects
 
 
+@cache_result("single_result:{result_url}", timeout=60 * 3)
 def fetch_single_result(result_url: str) -> Optional[Resultaat]:
     client = build_client("zaak")
 
