@@ -7,29 +7,31 @@
     <h1 class="h1">{{ configurable_text.home_page.home_welcome_title }} {{ request.user.get_full_name }}</h1>
     <p class="p">{{ configurable_text.home_page.home_welcome_intro|linebreaksbr }}</p>
 
-    <h2 class="h2">
-        Samenwerken
-        {% button href="plans:plan_list" text=_("Naar samenwerken") icon="arrow_forward" icon_position="after" %}
-    </h2>
+    {% if show_plans %}
+        <h2 class="h2">
+            Samenwerken
+            {% button href="plans:plan_list" text=_("Naar samenwerken") icon="arrow_forward" icon_position="after" %}
+        </h2>
 
-    {% if plans %}
-    <div class="card-container card-container--columns-3">
-        {% for plan in plans %}
-            {% render_card image_object_fit="contain" %}
-                <h3 class="h3">{{ plan.title }}</h3>
-                <p class="p">{{ plan.goal|truncatewords:20 }}</p>
-                <a
-                    class="button button--icon-before button--transparent button--secondary"
-                    href="{{ plan.get_absolute_url }}"
-                    aria-label="{{ plan.title }}"
-                    aria-hidden="true"
-                >
-                    {% icon icon="arrow_forward" %}
-                </a>
-            {% endrender_card %}
-        {% endfor %}
-    </div>
-    {% else %}
-        <p class="p">{{configurable_text.plans_page.plans_no_plans_message}}</p>
+        {% if plans %}
+        <div class="plans-cards card-container card-container--columns-3">
+            {% for plan in plans %}
+                {% render_card image_object_fit="contain" %}
+                    <h3 class="h3">{{ plan.title }}</h3>
+                    <p class="p">{{ plan.goal|truncatewords:20 }}</p>
+                    <a
+                        class="button button--icon-before button--transparent button--secondary"
+                        href="{{ plan.get_absolute_url }}"
+                        aria-label="{{ plan.title }}"
+                        aria-hidden="true"
+                    >
+                        {% icon icon="arrow_forward" %}
+                    </a>
+                {% endrender_card %}
+            {% endfor %}
+        </div>
+        {% else %}
+            <p class="p">{{configurable_text.plans_page.plans_no_plans_message}}</p>
+        {% endif %}
     {% endif %}
 {% endblock user_content %}

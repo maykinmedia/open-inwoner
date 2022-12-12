@@ -22,8 +22,14 @@ def actions(actions, request, action_form, **kwargs):
         + action_form: Form | The form containing the needed filters for the actions.
         - form_action: string | A url for something
         - plan: Plan | The plan that the actions belong to.
+        - show_plans: bool | If plan functionality is enabled
     """
-    kwargs.update(actions=actions, request=request, action_form=action_form)
+    kwargs.update(
+        actions=actions,
+        request=request,
+        action_form=action_form,
+        show_plans=kwargs.get("show_plans", True),
+    )
     return kwargs
 
 

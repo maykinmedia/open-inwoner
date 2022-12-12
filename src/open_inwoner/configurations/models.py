@@ -1,4 +1,5 @@
 from django.contrib.flatpages.models import FlatPage
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
@@ -331,6 +332,20 @@ class SiteConfiguration(SingletonModel):
             "Als dit is aangevinkt en er zijn product condities gemaakt, dan wordt op de homepagina de productzoeker weergegeven."
         ),
     )
+    show_plans = models.BooleanField(
+        verbose_name=_("Laat samenwerken zien op de homepage en menu"),
+        default=True,
+        help_text=_(
+            "Als dit is aangevinkt, dan wordt op de homepagina en het gebruikers profiel de samenwerken feature weergegeven."
+        ),
+    )
+    show_actions = models.BooleanField(
+        verbose_name=_("Laat acties zien op de profiel pagina"),
+        default=True,
+        help_text=_(
+            "Als dit is aangevinkt, dan worded op de gebruikers profiel pagina de acties weergegeven."
+        ),
+    )
     openid_connect_logo = FilerImageField(
         verbose_name=_("Openid Connect Logo"),
         null=True,
@@ -353,6 +368,13 @@ class SiteConfiguration(SingletonModel):
 
     def __str__(self):
         return str(_("Site Configuration"))
+
+    def clean(self):
+        super().clean()
+
+        if self.show_plans and not self.show_actions:
+            msg = _("Als Samenwerken actief is moeten Acties ook actief zijn")
+            raise ValidationError({"show_actions": msg, "show_plans": msg})
 
     @property
     def get_primary_color(self):

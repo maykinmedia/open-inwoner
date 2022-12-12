@@ -58,6 +58,7 @@ def primary_navigation(categories, request, **kwargs):
         + request: Request | The django request object.
         + questionnaire: QuestionnaireStep | The default QuestionnaireStep, if any.
         - has_general_faq_questions: boolean | If the FAQ menu item should be shown.
+        - show_plans: boolean | If the Plan item should be shown.
     """
 
     return {

@@ -45,7 +45,11 @@
                 <div class="actions__label">
                     <div class="table__explain">{% trans "Onderdeel van" %}</div>
                     {% if action.plan %}
-                        {% link href=action.plan.get_absolute_url text=action.plan.title %}
+                        {% if show_plans %}
+                            {% link href=action.plan.get_absolute_url text=action.plan.title %}
+                        {% else %}
+                            {{ action.plan.title }}
+                        {% endif %}
                     {% else %}
                         -
                     {% endif %}
