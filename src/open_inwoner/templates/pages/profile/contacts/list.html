@@ -9,13 +9,15 @@
 </h1>
 
 <!--List of contact requests: receiver's view-->
-{% if pending_approval or pending_approval_list %}
-    <div class="approval{% if pending_approval %} approval--solo{% endif %}">
+{% if pending_approvals %}
+    {% with pending_approvals.count as approvals_count %}
+    <div class="approval{% if approvals_count == 1 %} approval--solo{% endif %}">
         <div class="approval__header">
             <h2 class="h2">{% trans "U bent toegevoegd als contactpersoon" %}</h2>
             <p class="p">{% trans "By accepting you agree on sharing your personal data (first name, last name and phonenumber)." %}</p>
         </div>
-        {% if pending_approval %}
+        {% if approvals_count == 1 %}
+            {% with pending_approvals.get as pending_approval %}
             <div class="approval__single">
                 <p class="p">
                     {% blocktrans with full_name=pending_approval.get_full_name %}{{ full_name }} heeft u toegevoegd aan diens contactpersonen.{% endblocktrans %}
@@ -24,14 +26,15 @@
                 {% render_form form=None method="POST" form_action=approval_url id="approval_form" spaceless=True show_notifications=True %}
                     {% csrf_token %}
                     {% button_row %}
-                        {% button text=_("Weigeren") name="contact_reject" value="reject" secondary=True bordered=True %}
-                        {% button text=_("Accepteren") name="contact_approve" value="approve" primary=True %}
+                        {% button text=_("Weigeren") name="contact_reject" secondary=True bordered=True %}
+                        {% button text=_("Accepteren") name="contact_approve" primary=True %}
                     {% endbutton_row %}
                 {% endrender_form %}
             </div>
-        {% elif pending_approval_list %}
+            {% endwith %}
+        {% else %}
             <ul class="approval__list">        
-                {% for approval in pending_approval_list %}
+                {% for approval in pending_approvals %}
                     <li class="approval__list-item">
                         <p class="p">{{approval.get_full_name}}</p>
                         {% url 'accounts:contact_approval' uuid=approval.uuid as approval_url %}
@@ -47,6 +50,7 @@
             </ul>
         {% endif %}
     </div>
+    {% endwith %}
 {% endif %}
 
 {% form id="contact-filter" form_object=form method="GET" columns=2 no_actions=True horizontal=True spaceless=True autosubmit=True form_action=form_action %}

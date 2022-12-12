@@ -41,11 +41,7 @@ class ContactListView(LoginRequiredMixin, BaseBreadcrumbMixin, ListView):
         context = super().get_context_data(**kwargs)
 
         user = self.request.user
-        pending_approvals = User.objects.get_pending_approvals(user)
-        if pending_approvals.count() == 1:
-            context["pending_approval"] = pending_approvals.get()
-        else:
-            context["pending_approval_list"] = pending_approvals
+        context["pending_approvals"] = User.objects.get_pending_approvals(user)
         context["contacts_for_approval"] = user.get_contacts_for_approval()
         context["pending_invitations"] = user.get_pending_invitations()
         context["form"] = ContactFilterForm(data=self.request.GET)
@@ -145,10 +141,10 @@ class ContactApprovalView(LogMixin, LoginRequiredMixin, SingleObjectMixin, View)
     def post(self, request, *args, **kwargs):
         sender = self.get_object()
         receiver = self.request.user
-        approved = request.POST.get("contact_approve")
-        rejected = request.POST.get("contact_reject")
+        approved = "contact_approve" in request.POST
+        rejected = "contact_reject" in request.POST
         if approved or rejected:
-            self.update_contact(sender, receiver, (approved or rejected))
+            self.update_contact(sender, receiver, "approve" if approved else "reject")
             return HttpResponseRedirect(self.success_url)
 
         return HttpResponseBadRequest(
