@@ -160,6 +160,20 @@ class ContactViewTests(WebTest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["form"].errors, expected_errors)
 
+    def test_adding_contact_with_users_email_fails(self):
+        response = self.app.get(self.create_url, user=self.user)
+        form = response.forms["contact-form"]
+
+        form["first_name"] = self.contact.first_name
+        form["last_name"] = self.contact.last_name
+        form["email"] = self.user.email
+        response = form.submit(user=self.user)
+        expected_errors = {
+            "__all__": [_("Please enter a valid email address of a contact.")]
+        }
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["form"].errors, expected_errors)
+
     def test_adding_inactive_contact_fails(self):
         inactive_user = UserFactory(is_active=False)
         response = self.app.get(self.create_url, user=self.user)
@@ -207,3 +221,107 @@ class ContactViewTests(WebTest):
     def test_user_cannot_delete_other_users_contact(self):
         other_user = UserFactory()
         response = self.app.post(self.delete_url, user=other_user, status=404)
+
+    def test_approve_with_existing_user(self):
+        existing_user = UserFactory(email="ex@example.com")
+
+        # Create a contact which addresses an existing user
+        create_form = self.app.get(self.create_url, user=self.user).forms[
+            "contact-form"
+        ]
+        create_form["first_name"] = existing_user.first_name
+        create_form["last_name"] = existing_user.last_name
+        create_form["email"] = existing_user.email
+        create_form.submit()
+
+        # Test approval by the existing user
+        response = self.app.get(self.list_url, user=existing_user)
+        self.assertContains(response, self.user.first_name)
+
+        form = response.forms["approval_form"]
+        response = form.submit("contact_approve")
+
+        self.assertFalse(self.user.contacts_for_approval.exists())
+        self.assertIn(existing_user, self.user.user_contacts.all())
+        self.assertIn(self.user, existing_user.user_contacts.all())
+
+    def test_reject_with_existing_user(self):
+        existing_user = UserFactory(email="ex@example.com")
+
+        # Create a contact which addresses an existing user
+        create_form = self.app.get(self.create_url, user=self.user).forms[
+            "contact-form"
+        ]
+        create_form["first_name"] = existing_user.first_name
+        create_form["last_name"] = existing_user.last_name
+        create_form["email"] = existing_user.email
+        create_form.submit()
+
+        # Test approval by the existing user
+        response = self.app.get(self.list_url, user=existing_user)
+        self.assertContains(response, self.user.first_name)
+
+        form = response.forms["approval_form"]
+        response = form.submit("contact_reject")
+
+        self.assertFalse(self.user.contacts_for_approval.exists())
+        self.assertNotIn(existing_user, self.user.user_contacts.all())
+        self.assertNotIn(self.user, existing_user.user_contacts.all())
+
+    def test_approve_action_redirects_to_contact_list_page(self):
+        existing_user = UserFactory(email="ex@example.com")
+        self.user.contacts_for_approval.add(existing_user)
+
+        response = self.app.get(self.list_url, user=existing_user)
+        form = response.forms["approval_form"]
+        response = form.submit("contact_approve")
+        self.assertRedirects(response, reverse("accounts:contact_list"))
+
+    def test_user_cannot_approve_other_users_contact(self):
+        other_user = UserFactory()
+        contact = UserFactory()
+        self.user.contacts_for_approval.add(contact)
+        url = reverse("accounts:contact_approval", kwargs={"uuid": contact.uuid})
+        response = self.app.post(url, user=other_user, status=404)
+
+    def test_pending_approval_shows_only_email_in_creator_page(self):
+        existing_user = UserFactory(email="uu@example.com", phonenumber="06988989898")
+        self.user.contacts_for_approval.add(existing_user)
+
+        response = self.app.get(self.list_url, user=self.user)
+
+        self.assertContains(response, existing_user.email)
+        self.assertNotContains(response, existing_user.first_name)
+        self.assertNotContains(response, existing_user.last_name)
+        self.assertNotContains(response, existing_user.phonenumber)
+
+    def test_accepted_contact_appears_in_both_contact_lists(self):
+        existing_user = UserFactory(email="ex@example.com")
+        self.user.contacts_for_approval.add(existing_user)
+
+        # Receiver contact list page
+        response = self.app.get(self.list_url, user=existing_user)
+        self.assertContains(response, self.user.first_name)
+
+        form = response.forms["approval_form"]
+        response = form.submit("contact_approve").follow()
+
+        self.assertContains(response, self.user.first_name)
+        self.assertContains(response, self.user.last_name)
+        self.assertContains(response, self.user.email)
+
+        # Sender contact list page
+        response = self.app.get(self.list_url, user=self.user)
+
+        self.assertContains(response, existing_user.first_name)
+        self.assertContains(response, existing_user.last_name)
+        self.assertContains(response, existing_user.email)
+
+    def test_post_with_no_params_in_contact_approval_returns_bad_request(self):
+        existing_user = UserFactory(email="ex@example.com")
+        self.user.contacts_for_approval.add(existing_user)
+        url = reverse("accounts:contact_approval", kwargs={"uuid": self.user.uuid})
+        response = self.app.post(url, user=existing_user, status=400)
+        self.assertEqual(
+            response.text, "contact_approve or contact_reject must be provided"
+        )

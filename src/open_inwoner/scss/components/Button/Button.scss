@@ -141,6 +141,10 @@
     }
   }
 
+  &--danger-borderless {
+    color: var(--color-danger-lighter);
+  }
+
   > .link__text {
     width: 100%;
   }

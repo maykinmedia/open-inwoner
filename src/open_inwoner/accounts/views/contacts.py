@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http.response import HttpResponseRedirect
+from django.http.response import HttpResponseBadRequest, HttpResponseRedirect
 from django.urls.base import reverse, reverse_lazy
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
@@ -41,7 +41,8 @@ class ContactListView(LoginRequiredMixin, BaseBreadcrumbMixin, ListView):
         context = super().get_context_data(**kwargs)
 
         user = self.request.user
-        context["pending_approvals"] = user.get_contacts_for_approval()
+        context["pending_approvals"] = User.objects.get_pending_approvals(user)
+        context["contacts_for_approval"] = user.get_contacts_for_approval()
         context["pending_invitations"] = user.get_pending_invitations()
         context["form"] = ContactFilterForm(data=self.request.GET)
         return context
@@ -125,3 +126,37 @@ class ContactDeleteView(LogMixin, LoginRequiredMixin, SingleObjectMixin, View):
 
         self.log_change(object, _("contact relationship was removed"))
         return HttpResponseRedirect(self.success_url)
+
+
+class ContactApprovalView(LogMixin, LoginRequiredMixin, SingleObjectMixin, View):
+    model = User
+    slug_field = "uuid"
+    slug_url_kwarg = "uuid"
+    success_url = reverse_lazy("accounts:contact_list")
+
+    def get_queryset(self):
+        base_qs = super().get_queryset()
+        return base_qs.get_pending_approvals(self.request.user)
+
+    def post(self, request, *args, **kwargs):
+        sender = self.get_object()
+        receiver = self.request.user
+        approved = "contact_approve" in request.POST
+        rejected = "contact_reject" in request.POST
+        if approved or rejected:
+            self.update_contact(sender, receiver, "approve" if approved else "reject")
+            return HttpResponseRedirect(self.success_url)
+
+        return HttpResponseBadRequest(
+            "contact_approve or contact_reject must be provided"
+        )
+
+    def update_contact(self, sender, receiver, type_of_approval):
+        if type_of_approval == "approve":
+            sender.contacts_for_approval.remove(receiver)
+            sender.user_contacts.add(receiver)
+            self.log_change(sender, _("contact was approved"))
+
+        elif type_of_approval == "reject":
+            sender.contacts_for_approval.remove(receiver)
+            self.log_change(sender, _("contact was rejected"))

@@ -96,3 +96,8 @@ class MessageQuerySet(QuerySet):
 class InviteQuerySet(QuerySet):
     def get_pending_invitations_for_user(self, user: "User") -> "InviteQuerySet":
         return self.filter(inviter=user, accepted=False).order_by("-pk")
+
+
+class UserQuerySet(QuerySet):
+    def get_pending_approvals(self, user):
+        return self.filter(contacts_for_approval=user)

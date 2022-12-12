@@ -6,6 +6,7 @@ from digid_eherkenning.managers import BaseDigidManager, BaseeHerkenningManager
 from open_inwoner.utils.hash import generate_email_from_string
 
 from .choices import LoginTypeChoices
+from .query import UserQuerySet
 
 
 class DigidManager(BaseDigidManager):
@@ -39,7 +40,7 @@ class eHerkenningManager(BaseeHerkenningManager):
         )
 
 
-class UserManager(BaseUserManager):
+class UserManager(BaseUserManager.from_queryset(UserQuerySet)):
     use_in_migrations = True
 
     def _create_user(self, email, password, **extra_fields):
