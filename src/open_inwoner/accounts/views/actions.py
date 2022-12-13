@@ -18,7 +18,7 @@ from view_breadcrumbs import BaseBreadcrumbMixin
 from open_inwoner.components.utils import RenderableTag
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.htmx.views import HtmxTemplateTagModelFormView
-from open_inwoner.utils.logentry import get_change_message
+from open_inwoner.utils.logentry import get_verbose_change_message
 from open_inwoner.utils.mixins import ExportMixin
 from open_inwoner.utils.views import LogMixin
 
@@ -126,7 +126,7 @@ class ActionUpdateView(
 
         # log if the action was changed
         if form.changed_data:
-            changed_message = get_change_message(form=form)
+            changed_message = get_verbose_change_message(form=form)
             self.log_change(self.object, changed_message)
         return HttpResponseRedirect(self.get_success_url())
 
@@ -157,7 +157,7 @@ class ActionUpdateStatusTagView(
 
         # log if the action was changed
         if form.changed_data:
-            changed_message = get_change_message(form=form)
+            changed_message = get_verbose_change_message(form=form)
             self.log_change(self.object, changed_message)
 
         return self.get_response()

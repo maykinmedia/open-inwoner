@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n button_tags link_tags icon_tags %}
+{% load i18n button_tags link_tags icon_tags helpers %}
 
 
 {% block content %}
@@ -18,11 +18,21 @@
     </thead>
     <tbody>
         {% for log in logs %}
+            {% with log.extra_data.message as log_message %}
             <tr>
-                <td class="table__item">{{ log.timestamp }}</td>
-                <td class="table__item">{{ log.user.get_full_name }}</td>
-                <td class="table__item">{{ log.extra_data.message }}</td>
+                <td class="table__item table__item--top">{{ log.timestamp|date:"d-m-Y" }}</td>
+                <td class="table__item table__item--top">{{ log.user.get_full_name }}</td>
+                <td class="table__item">
+                    {% if not log_message|is_list_instance %}
+                        - {{ log_message }}
+                    {% else %}
+                        {% for message in log_message %}
+                            - {{message}}<br>
+                        {% endfor %}
+                    {% endif %}
+                </td>
             </tr>
+            {% endwith %}
         {% endfor %}
     </tbody>
 </table>

@@ -22,6 +22,22 @@ def startswith(text, starts):
     return False
 
 
+@register.filter
+def is_list_instance(obj):
+    """
+    check if an object is a list instance
+
+    Usage:
+        {% if log_message|is_list_instance %}
+            do_something
+        {% endif %}
+
+    Variables:
+        + obj: object | the object we want to check if it is a list instance.
+    """
+    return isinstance(obj, list)
+
+
 @register.simple_tag(takes_context=True)
 def get_product_url(context, product):
     """
