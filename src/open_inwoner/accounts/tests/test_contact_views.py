@@ -151,7 +151,7 @@ class ContactViewTests(WebTest):
         form["last_name"] = existing_user.last_name
         form["email"] = "User@example.com"
         response = form.submit()
-        pending_invitation = self.user.contacts_for_approval.first()
+        pending_invitation = self.user.contacts_for_approval.get()
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(existing_user, pending_invitation)

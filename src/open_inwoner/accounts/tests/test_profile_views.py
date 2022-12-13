@@ -240,7 +240,6 @@ class EditProfileTests(WebTest):
         form = response.forms["profile-edit"]
         form["email"] = "user@example.com"
         response = form.submit()
-        self.assertEqual(self.user.email, self.user.email)
         self.user.refresh_from_db()
         self.assertEqual(response.url, self.return_url)
         self.assertEqual(self.user.email, "user@example.com")

@@ -356,7 +356,7 @@ class TestRegistrationNecessary(WebTest):
         )
 
     def test_submit_with_case_sensitive_email_fails(self):
-        UserFactory.create(email="john@smith.com")
+        UserFactory.create(email="john@example.com")
         user = UserFactory.create(
             first_name="",
             last_name="",
@@ -366,7 +366,7 @@ class TestRegistrationNecessary(WebTest):
         response = self.app.get(self.url, user=user)
         form = response.forms["necessary-form"]
 
-        form["email"] = "John@smith.com"
+        form["email"] = "John@example.com"
         form["first_name"] = "John"
         form["last_name"] = "Smith"
 
