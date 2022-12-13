@@ -137,6 +137,9 @@ TWO_FACTOR_PATCH_ADMIN = False
 # django-selenium-login needs an arbitrary and fast page to grab cookies
 SELENIUM_LOGIN_START_PAGE = "/admin/password_reset/"
 
+# option to supress noisy signals during testing
+ENABLE_USER_SIGNALS = False
+
 # Override settings with local settings.
 try:
     from .local import *  # noqa
