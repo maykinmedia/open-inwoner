@@ -54,6 +54,7 @@ class UserForm(forms.ModelForm):
         fields = (
             "first_name",
             "last_name",
+            "email",
             "phonenumber",
             "birthday",
             "street",
@@ -148,7 +149,7 @@ class ContactCreateForm(forms.Form):
                     )
                 )
 
-            existing_user = User.objects.filter(email=email)
+            existing_user = User.objects.filter(email__iexact=email)
             if existing_user and existing_user.get().is_not_active():
                 raise ValidationError(
                     _("The user cannot be added, their account has been deleted.")

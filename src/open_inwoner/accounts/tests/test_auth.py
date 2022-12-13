@@ -106,6 +106,21 @@ class TestRegistrationFunctionality(WebTest):
                 }
                 self.assertEqual(response.context["form"].errors, expected_errors)
 
+    def test_registration_fails_with_case_sensitive_email(self):
+        register_page = self.app.get(reverse("django_registration_register"))
+        form = register_page.forms["registration-form"]
+        user = UserFactory(email="user@example.com")
+        form["email"] = "User@example.com"
+        form["first_name"] = self.user.first_name
+        form["last_name"] = self.user.last_name
+        form["password1"] = self.user.password
+        form["password2"] = self.user.password
+        response = form.submit()
+        expected_errors = {"email": [_("The user with this email already exists")]}
+        user_query = User.objects.filter(email=self.user.email)
+        self.assertEqual(user_query.count(), 0)
+        self.assertEqual(response.context["form"].errors, expected_errors)
+
     def test_registration_inactive_user(self):
         inactive_user = UserFactory.create(is_active=False)
 
@@ -339,6 +354,26 @@ class TestRegistrationNecessary(WebTest):
             response.context["errors"].as_text(),
             "* Een gebruiker met dit e-mailadres bestaat al",
         )
+
+    def test_submit_with_case_sensitive_email_fails(self):
+        UserFactory.create(email="john@smith.com")
+        user = UserFactory.create(
+            first_name="",
+            last_name="",
+            login_type=LoginTypeChoices.digid,
+        )
+
+        response = self.app.get(self.url, user=user)
+        form = response.forms["necessary-form"]
+
+        form["email"] = "John@smith.com"
+        form["first_name"] = "John"
+        form["last_name"] = "Smith"
+
+        response = form.submit()
+        expected_errors = {"email": [_("The user with this email already exists")]}
+
+        self.assertEqual(response.context["form"].errors, expected_errors)
 
     def test_submit_not_unique_email_different_case(self):
         UserFactory.create(email="john@smith.com")
