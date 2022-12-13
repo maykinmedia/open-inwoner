@@ -142,6 +142,20 @@ class ContactViewTests(WebTest):
         self.assertContains(response.follow(), existing_user.first_name)
         self.assertEqual(existing_user, pending_invitation)
 
+    def test_existing_user_contact_with_case_sensitive_email(self):
+        existing_user = UserFactory(email="user@example.com")
+        response = self.app.get(self.create_url, user=self.user)
+        form = response.forms["contact-form"]
+
+        form["first_name"] = existing_user.first_name
+        form["last_name"] = existing_user.last_name
+        form["email"] = "User@example.com"
+        response = form.submit()
+        pending_invitation = self.user.contacts_for_approval.get()
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(existing_user, pending_invitation)
+
     def test_adding_same_contact_fails(self):
         response = self.app.get(self.create_url, user=self.user)
         form = response.forms["contact-form"]

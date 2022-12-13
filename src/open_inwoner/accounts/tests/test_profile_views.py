@@ -143,12 +143,12 @@ class EditProfileTests(WebTest):
         followed_response = base_response.follow()
         self.assertEquals(followed_response.status_code, 200)
 
-    def test_save_empty_form(self):
-        response = self.app.get(self.url, user=self.user)
-        self.assertEquals(response.status_code, 200)
+    def test_save_empty_form_fails(self):
+        response = self.app.get(self.url, user=self.user, status=200)
         form = response.forms["profile-edit"]
         form["first_name"] = ""
         form["last_name"] = ""
+        form["email"] = ""
         form["phonenumber"] = ""
         form["birthday"] = ""
         form["street"] = ""
@@ -156,24 +156,15 @@ class EditProfileTests(WebTest):
         form["postcode"] = ""
         form["city"] = ""
         base_response = form.submit()
-        self.assertEquals(base_response.url, self.return_url)
-        followed_response = base_response.follow()
-        self.assertEquals(followed_response.status_code, 200)
-        self.user.refresh_from_db()
-        self.assertEquals(self.user.first_name, "")
-        self.assertEquals(self.user.last_name, "")
-        self.assertEquals(self.user.birthday, None)
-        self.assertEquals(self.user.street, "")
-        self.assertEquals(self.user.housenumber, "")
-        self.assertEquals(self.user.postcode, None)
-        self.assertEquals(self.user.city, "")
+        expected_errors = {"email": [_("Dit veld is vereist.")]}
+        self.assertEqual(base_response.context["form"].errors, expected_errors)
 
     def test_save_filled_form(self):
-        response = self.app.get(self.url, user=self.user)
-        self.assertEquals(response.status_code, 200)
+        response = self.app.get(self.url, user=self.user, status=200)
         form = response.forms["profile-edit"]
         form["first_name"] = "First name"
         form["last_name"] = "Last name"
+        form["email"] = "user@example.com"
         form["phonenumber"] = "06987878787"
         form["birthday"] = "21-01-1992"
         form["street"] = "Keizersgracht"
@@ -187,6 +178,7 @@ class EditProfileTests(WebTest):
         self.user.refresh_from_db()
         self.assertEquals(self.user.first_name, "First name")
         self.assertEquals(self.user.last_name, "Last name")
+        self.assertEquals(self.user.email, "user@example.com")
         self.assertEquals(self.user.birthday.strftime("%d-%m-%Y"), "21-01-1992")
         self.assertEquals(self.user.street, "Keizersgracht")
         self.assertEquals(self.user.housenumber, "17 d")
@@ -242,6 +234,28 @@ class EditProfileTests(WebTest):
                     ]
                 }
                 self.assertEqual(response.context["form"].errors, expected_errors)
+
+    def test_modify_email_succeeds(self):
+        response = self.app.get(self.url, user=self.user)
+        form = response.forms["profile-edit"]
+        form["email"] = "user@example.com"
+        response = form.submit()
+        self.user.refresh_from_db()
+        self.assertEqual(response.url, self.return_url)
+        self.assertEqual(self.user.email, "user@example.com")
+
+    def test_updating_a_field_without_modifying_email_succeeds(self):
+        initial_email = self.user.email
+        initial_first_name = self.user.first_name
+        response = self.app.get(self.url, user=self.user)
+        form = response.forms["profile-edit"]
+        form["first_name"] = "Testing"
+        response = form.submit()
+        self.assertEqual(self.user.first_name, initial_first_name)
+        self.user.refresh_from_db()
+        self.assertEqual(response.url, self.return_url)
+        self.assertEqual(self.user.email, initial_email)
+        self.assertEqual(self.user.first_name, "Testing")
 
 
 class EditIntrestsTests(WebTest):

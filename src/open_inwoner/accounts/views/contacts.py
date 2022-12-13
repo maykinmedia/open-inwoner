@@ -72,7 +72,7 @@ class ContactCreateView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormV
         cleaned_data = form.cleaned_data
         email = cleaned_data["email"]
         user = self.request.user
-        contact_user = User.objects.filter(email=email)
+        contact_user = User.objects.filter(email__iexact=email)
 
         # Adding a contact-user which already exists in the platform
         if contact_user.exists():
