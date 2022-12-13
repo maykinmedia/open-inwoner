@@ -96,9 +96,9 @@ class ProfileViewTests(WebTest):
             login_type=LoginTypeChoices.digid, email="john@smith.nl"
         )
 
-        get_response = self.app.get(self.url, user=user)
-        self.assertEquals(get_response.status_code, 200)
-        form = get_response.forms["deactivate-form"]
+        response = self.app.get(self.url, user=user)
+        self.assertEquals(response.status_code, 200)
+        form = response.forms["deactivate-form"]
 
         response = form.submit()
 
@@ -192,6 +192,56 @@ class EditProfileTests(WebTest):
         self.assertEquals(self.user.housenumber, "17 d")
         self.assertEquals(self.user.postcode, "1013 RM")
         self.assertEquals(self.user.city, "Amsterdam")
+
+    def test_save_with_invalid_first_name_chars_fails(self):
+        invalid_characters = "/\"\\,.:;'"
+
+        for char in invalid_characters:
+            with self.subTest(char=char):
+                response = self.app.get(self.url, user=self.user, status=200)
+                form = response.forms["profile-edit"]
+                form["first_name"] = char
+                form["last_name"] = "Last name"
+                form["phonenumber"] = "06987878787"
+                form["birthday"] = "21-01-1992"
+                form["street"] = "Keizersgracht"
+                form["housenumber"] = "17 d"
+                form["postcode"] = "1013 RM"
+                form["city"] = "Amsterdam"
+                response = form.submit()
+                expected_errors = {
+                    "first_name": [
+                        _("Uw invoer bevat een ongeldig teken: {char}").format(
+                            char=char
+                        )
+                    ]
+                }
+                self.assertEqual(response.context["form"].errors, expected_errors)
+
+    def test_save_with_invalid_last_name_chars_fails(self):
+        invalid_characters = "/\"\\,.:;'"
+
+        for char in invalid_characters:
+            with self.subTest(char=char):
+                response = self.app.get(self.url, user=self.user, status=200)
+                form = response.forms["profile-edit"]
+                form["first_name"] = "John"
+                form["last_name"] = char
+                form["phonenumber"] = "06987878787"
+                form["birthday"] = "21-01-1992"
+                form["street"] = "Keizersgracht"
+                form["housenumber"] = "17 d"
+                form["postcode"] = "1013 RM"
+                form["city"] = "Amsterdam"
+                response = form.submit()
+                expected_errors = {
+                    "last_name": [
+                        _("Uw invoer bevat een ongeldig teken: {char}").format(
+                            char=char
+                        )
+                    ]
+                }
+                self.assertEqual(response.context["form"].errors, expected_errors)
 
 
 class EditIntrestsTests(WebTest):

@@ -8,6 +8,7 @@ from django_registration.forms import RegistrationForm
 
 from open_inwoner.pdc.models.category import Category
 from open_inwoner.utils.forms import LimitedUploadFileField, PrivateFileWidget
+from open_inwoner.utils.validators import validate_charfield_entry
 
 from .choices import EmptyContactTypeChoices, EmptyStatusChoices, LoginTypeChoices
 from .models import Action, Document, Invite, Message, User
@@ -122,8 +123,8 @@ class ContactFilterForm(forms.Form):
 
 
 class ContactCreateForm(forms.Form):
-    first_name = forms.CharField(max_length=255)
-    last_name = forms.CharField(max_length=255)
+    first_name = forms.CharField(max_length=255, validators=[validate_charfield_entry])
+    last_name = forms.CharField(max_length=255, validators=[validate_charfield_entry])
     email = forms.EmailField()
 
     def __init__(self, user, *args, **kwargs):

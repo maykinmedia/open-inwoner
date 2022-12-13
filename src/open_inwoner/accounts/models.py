@@ -16,7 +16,10 @@ from mail_editor.helpers import find_template
 from privates.storages import PrivateMediaFileSystemStorage
 from timeline_logger.models import TimelineLog
 
-from open_inwoner.utils.validators import validate_phone_number
+from open_inwoner.utils.validators import (
+    validate_charfield_entry,
+    validate_phone_number,
+)
 
 from .choices import ContactTypeChoices, LoginTypeChoices, StatusChoices, TypeChoices
 from .managers import ActionQueryset, DigidManager, UserManager, eHerkenningManager
@@ -35,10 +38,18 @@ class User(AbstractBaseUser, PermissionsMixin):
         help_text=_("Unique identifier."),
     )
     first_name = models.CharField(
-        verbose_name=_("First name"), max_length=255, blank=True, default=""
+        verbose_name=_("First name"),
+        max_length=255,
+        blank=True,
+        default="",
+        validators=[validate_charfield_entry],
     )
     last_name = models.CharField(
-        verbose_name=_("Last name"), max_length=255, blank=True, default=""
+        verbose_name=_("Last name"),
+        max_length=255,
+        blank=True,
+        default="",
+        validators=[validate_charfield_entry],
     )
     email = models.EmailField(verbose_name=_("Email address"), unique=True)
     phonenumber = models.CharField(
@@ -562,11 +573,13 @@ class Invite(models.Model):
         verbose_name=_("First name"),
         max_length=250,
         help_text=_("The first name of the invitee."),
+        validators=[validate_charfield_entry],
     )
     invitee_last_name = models.CharField(
         verbose_name=_("Last name"),
         max_length=250,
         help_text=_("The last name of the invitee"),
+        validators=[validate_charfield_entry],
     )
     invitee_email = models.EmailField(
         verbose_name=_("Invitee email"),
