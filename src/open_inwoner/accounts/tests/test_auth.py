@@ -168,10 +168,10 @@ class TestRegistrationFunctionality(WebTest):
 
         user = UserFactory.create()
 
-        get_response = self.app.get(self.url, user=user)
+        response = self.app.get(self.url, user=user)
 
-        self.assertEqual(get_response.status_code, 302)
-        self.assertEqual(get_response.url, reverse("django_registration_complete"))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("django_registration_complete"))
 
     def test_registration_non_unique_email_different_case(self):
         UserFactory.create(email="john@smith.com")
@@ -197,12 +197,12 @@ class TestRegistrationDigid(WebTest):
     url = reverse_lazy("django_registration_register")
 
     def test_registration_page_only_digid(self):
-        get_response = self.app.get(self.url)
+        response = self.app.get(self.url)
 
-        self.assertEqual(get_response.status_code, 200)
-        self.assertIsNone(get_response.html.find(id="registration-form"))
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNone(response.html.find(id="registration-form"))
 
-        digid_tag = get_response.html.find("a", title="Registreren met DigiD")
+        digid_tag = response.html.find("a", title="Registreren met DigiD")
         self.assertIsNotNone(digid_tag)
         self.assertEqual(
             digid_tag.attrs["href"],
@@ -214,12 +214,12 @@ class TestRegistrationDigid(WebTest):
     def test_registration_page_only_digid_with_invite(self):
         invite = InviteFactory.create()
 
-        get_response = self.app.get(f"{self.url}?invite={invite.key}")
+        response = self.app.get(f"{self.url}?invite={invite.key}")
 
-        self.assertEqual(get_response.status_code, 200)
-        self.assertIsNone(get_response.html.find(id="registration-form"))
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNone(response.html.find(id="registration-form"))
 
-        digid_tag = get_response.html.find("a", title="Registreren met DigiD")
+        digid_tag = response.html.find("a", title="Registreren met DigiD")
         self.assertIsNotNone(digid_tag)
         necessary_url = (
             furl(reverse("accounts:registration_necessary"))
@@ -267,8 +267,8 @@ class TestRegistrationNecessary(WebTest):
         )
         self.assertTrue(user.require_necessary_fields())
 
-        get_response = self.app.get(self.url, user=user)
-        form = get_response.forms["necessary-form"]
+        response = self.app.get(self.url, user=user)
+        form = response.forms["necessary-form"]
 
         form["email"] = "john@smith.com"
         form["first_name"] = "John"
@@ -296,8 +296,8 @@ class TestRegistrationNecessary(WebTest):
             invitee_last_name=contact.last_name,
         )
 
-        get_response = self.app.get(f"{self.url}?invite={invite.key}", user=user)
-        form = get_response.forms["necessary-form"]
+        response = self.app.get(f"{self.url}?invite={invite.key}", user=user)
+        form = response.forms["necessary-form"]
 
         # assert initials are retrieved from invite
         self.assertEqual(form["email"].value, contact.email)
@@ -325,8 +325,8 @@ class TestRegistrationNecessary(WebTest):
             login_type=LoginTypeChoices.digid,
         )
 
-        get_response = self.app.get(self.url, user=user)
-        form = get_response.forms["necessary-form"]
+        response = self.app.get(self.url, user=user)
+        form = response.forms["necessary-form"]
 
         form["email"] = "john@smith.com"
         form["first_name"] = "John"
@@ -348,8 +348,8 @@ class TestRegistrationNecessary(WebTest):
             login_type=LoginTypeChoices.digid,
         )
 
-        get_response = self.app.get(self.url, user=user)
-        form = get_response.forms["necessary-form"]
+        response = self.app.get(self.url, user=user)
+        form = response.forms["necessary-form"]
 
         form["email"] = "John@smith.com"
         form["first_name"] = "John"
@@ -374,8 +374,8 @@ class TestRegistrationNecessary(WebTest):
 
         for char in invalid_characters:
             with self.subTest(char=char):
-                get_response = self.app.get(self.url, user=user)
-                form = get_response.forms["necessary-form"]
+                response = self.app.get(self.url, user=user)
+                form = response.forms["necessary-form"]
                 form["email"] = "user@example.com"
                 form["first_name"] = char
                 form["last_name"] = "Smith"
@@ -400,8 +400,8 @@ class TestRegistrationNecessary(WebTest):
 
         for char in invalid_characters:
             with self.subTest(char=char):
-                get_response = self.app.get(self.url, user=user)
-                form = get_response.forms["necessary-form"]
+                response = self.app.get(self.url, user=user)
+                form = response.forms["necessary-form"]
                 form["email"] = "user@example.com"
                 form["first_name"] = "John"
                 form["last_name"] = char

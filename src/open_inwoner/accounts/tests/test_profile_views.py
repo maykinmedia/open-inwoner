@@ -96,9 +96,9 @@ class ProfileViewTests(WebTest):
             login_type=LoginTypeChoices.digid, email="john@smith.nl"
         )
 
-        get_response = self.app.get(self.url, user=user)
-        self.assertEquals(get_response.status_code, 200)
-        form = get_response.forms["deactivate-form"]
+        response = self.app.get(self.url, user=user)
+        self.assertEquals(response.status_code, 200)
+        form = response.forms["deactivate-form"]
 
         response = form.submit()
 
@@ -198,8 +198,7 @@ class EditProfileTests(WebTest):
 
         for char in invalid_characters:
             with self.subTest(char=char):
-                response = self.app.get(self.url, user=self.user)
-                self.assertEquals(response.status_code, 200)
+                response = self.app.get(self.url, user=self.user, status=200)
                 form = response.forms["profile-edit"]
                 form["first_name"] = char
                 form["last_name"] = "Last name"
@@ -224,8 +223,7 @@ class EditProfileTests(WebTest):
 
         for char in invalid_characters:
             with self.subTest(char=char):
-                response = self.app.get(self.url, user=self.user)
-                self.assertEquals(response.status_code, 200)
+                response = self.app.get(self.url, user=self.user, status=200)
                 form = response.forms["profile-edit"]
                 form["first_name"] = "John"
                 form["last_name"] = char

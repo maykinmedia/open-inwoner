@@ -156,12 +156,12 @@ class TestFeedbackFunctionality(ESMixin, WebTest):
     def test_feedback_form_not_displayed_after_submit(self):
         params = {"query": self.feedback.search_query}
         url = furl(reverse("search:search")).add(params).url
-        get_response = self.app.get(url)
+        response = self.app.get(url)
 
-        self.assertIsNotNone(get_response.html.find(id="feedback_form"))
-        self.assertEqual(list(get_response.context["messages"]), [])
+        self.assertIsNotNone(response.html.find(id="feedback_form"))
+        self.assertEqual(list(response.context["messages"]), [])
 
-        feedback_form = get_response.forms["feedback_form"]
+        feedback_form = response.forms["feedback_form"]
         feedback_form["remark"] = self.feedback.remark
         feedback_form["positive"] = "true"
 
