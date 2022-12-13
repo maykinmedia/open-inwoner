@@ -62,6 +62,50 @@ class TestRegistrationFunctionality(WebTest):
         user_query = User.objects.filter(email=self.user.email)
         self.assertEqual(user_query.count(), 0)
 
+    def test_registration_fails_with_invalid_first_name_characters(self):
+        invalid_characters = "/\"\\,.:;'"
+
+        for char in invalid_characters:
+            with self.subTest(char=char):
+                register_page = self.app.get(reverse("django_registration_register"))
+                form = register_page.forms["registration-form"]
+                form["email"] = self.user.email
+                form["first_name"] = char
+                form["last_name"] = self.user.last_name
+                form["password1"] = self.user.password
+                form["password2"] = self.user.password
+                response = form.submit()
+                expected_errors = {
+                    "first_name": [
+                        _("Uw invoer bevat een ongeldig teken: {char}").format(
+                            char=char
+                        )
+                    ]
+                }
+                self.assertEqual(response.context["form"].errors, expected_errors)
+
+    def test_registration_fails_with_invalid_last_name_characters(self):
+        invalid_characters = "/\"\\,.:;'"
+
+        for char in invalid_characters:
+            with self.subTest(char=char):
+                register_page = self.app.get(reverse("django_registration_register"))
+                form = register_page.forms["registration-form"]
+                form["email"] = self.user.email
+                form["first_name"] = self.user.first_name
+                form["last_name"] = char
+                form["password1"] = self.user.password
+                form["password2"] = self.user.password
+                response = form.submit()
+                expected_errors = {
+                    "last_name": [
+                        _("Uw invoer bevat een ongeldig teken: {char}").format(
+                            char=char
+                        )
+                    ]
+                }
+                self.assertEqual(response.context["form"].errors, expected_errors)
+
     def test_registration_inactive_user(self):
         inactive_user = UserFactory.create(is_active=False)
 
@@ -318,6 +362,58 @@ class TestRegistrationNecessary(WebTest):
             response.context["errors"].as_text(),
             "* Een gebruiker met dit e-mailadres bestaat al",
         )
+
+    def test_submit_invalid_first_name_chars_fails(self):
+        UserFactory.create(email="john@smith.com")
+        user = UserFactory.create(
+            first_name="",
+            last_name="",
+            login_type=LoginTypeChoices.digid,
+        )
+        invalid_characters = "/\"\\,.:;'"
+
+        for char in invalid_characters:
+            with self.subTest(char=char):
+                get_response = self.app.get(self.url, user=user)
+                form = get_response.forms["necessary-form"]
+                form["email"] = "user@example.com"
+                form["first_name"] = char
+                form["last_name"] = "Smith"
+                response = form.submit()
+                expected_errors = {
+                    "first_name": [
+                        _("Uw invoer bevat een ongeldig teken: {char}").format(
+                            char=char
+                        )
+                    ]
+                }
+                self.assertEqual(response.context["form"].errors, expected_errors)
+
+    def test_submit_invalid_last_name_chars_fails(self):
+        UserFactory.create(email="john@smith.com")
+        user = UserFactory.create(
+            first_name="",
+            last_name="",
+            login_type=LoginTypeChoices.digid,
+        )
+        invalid_characters = "/\"\\,.:;'"
+
+        for char in invalid_characters:
+            with self.subTest(char=char):
+                get_response = self.app.get(self.url, user=user)
+                form = get_response.forms["necessary-form"]
+                form["email"] = "user@example.com"
+                form["first_name"] = "John"
+                form["last_name"] = char
+                response = form.submit()
+                expected_errors = {
+                    "last_name": [
+                        _("Uw invoer bevat een ongeldig teken: {char}").format(
+                            char=char
+                        )
+                    ]
+                }
+                self.assertEqual(response.context["form"].errors, expected_errors)
 
 
 class TestLoginLogoutFunctionality(WebTest):

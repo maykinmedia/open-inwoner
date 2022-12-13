@@ -189,6 +189,46 @@ class ContactViewTests(WebTest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["form"].errors, expected_errors)
 
+    def test_adding_contact_with_invalid_first_name_chars_fails(self):
+        invalid_characters = "/\"\\,.:;'"
+
+        for char in invalid_characters:
+            with self.subTest(char=char):
+                response = self.app.get(self.create_url, user=self.user)
+                form = response.forms["contact-form"]
+                form["first_name"] = char
+                form["last_name"] = "Smith"
+                form["email"] = "john@smith.nl"
+                response = form.submit()
+                expected_errors = {
+                    "first_name": [
+                        _("Uw invoer bevat een ongeldig teken: {char}").format(
+                            char=char
+                        )
+                    ]
+                }
+                self.assertEqual(response.context["form"].errors, expected_errors)
+
+    def test_adding_contact_with_invalid_last_name_chars_fails(self):
+        invalid_characters = "/\"\\,.:;'"
+
+        for char in invalid_characters:
+            with self.subTest(char=char):
+                response = self.app.get(self.create_url, user=self.user)
+                form = response.forms["contact-form"]
+                form["first_name"] = "John"
+                form["last_name"] = char
+                form["email"] = "john@smith.nl"
+                response = form.submit()
+                expected_errors = {
+                    "last_name": [
+                        _("Uw invoer bevat een ongeldig teken: {char}").format(
+                            char=char
+                        )
+                    ]
+                }
+                self.assertEqual(response.context["form"].errors, expected_errors)
+
     def test_email_required(self):
         response = self.app.get(self.create_url, user=self.user)
         form = response.forms["contact-form"]
