@@ -660,7 +660,7 @@ MAIL_EDITOR_CONF = {
         "body_default": """
             <p>Beste</p>
 
-            <p>Gebruiker {{ sender_name }} wilt u toevoegen als contactpersoon op {{ site_name }}. 
+            <p>Gebruiker {{ sender_name }} wilt u toevoegen als contactpersoon op {{ site_name }}.
             Volg onderstaande link waarop u uw goedkeuring kan geven of kan aangeven {{ sender_name }} niet als contactpersoon te willen. </p>
 
             <p><a href="{{ contacts_link }}">Mijn Contacten</a> </p>
@@ -971,7 +971,7 @@ THUMBNAIL_ALIASES = {
     "": {
         "logo": {
             "size": (21600, 60),
-            "upscale": True,
+            "upscale": False,
         },
         "card-image": {
             "size": (256, 320),
