@@ -122,3 +122,8 @@ class TestProductFAQ(WebTest):
         q1_pos = response.text.index(question_1.question)
         q2_pos = response.text.index(question_2.question)
         self.assertGreater(q1_pos, q2_pos)
+
+        # check if the menu item shows
+        self.assertTrue(response.pyquery('.anchor-menu a[href="#faq"]'))
+        # check if the menu link target
+        self.assertTrue(response.pyquery("#faq"))
