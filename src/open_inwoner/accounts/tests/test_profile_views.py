@@ -245,6 +245,19 @@ class EditProfileTests(WebTest):
         self.assertEqual(response.url, self.return_url)
         self.assertEqual(self.user.email, "user@example.com")
 
+    def test_updating_a_field_without_modifying_email_succeeds(self):
+        initial_email = self.user.email
+        initial_first_name = self.user.first_name
+        response = self.app.get(self.url, user=self.user)
+        form = response.forms["profile-edit"]
+        form["first_name"] = "Testing"
+        response = form.submit()
+        self.assertEqual(self.user.first_name, initial_first_name)
+        self.user.refresh_from_db()
+        self.assertEqual(response.url, self.return_url)
+        self.assertEqual(self.user.email, initial_email)
+        self.assertEqual(self.user.first_name, "Testing")
+
 
 class EditIntrestsTests(WebTest):
     def setUp(self):
