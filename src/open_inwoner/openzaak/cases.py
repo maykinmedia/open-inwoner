@@ -17,7 +17,6 @@ from .utils import cache as cache_result
 logger = logging.getLogger(__name__)
 
 
-# cache for 3 minutes to quickly switch between open and closed cases
 @cache_result("cases:{user_bsn}:{max_cases}", timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT)
 def fetch_cases(user_bsn: str, max_cases: Optional[int] = 100) -> List[Zaak]:
     """
