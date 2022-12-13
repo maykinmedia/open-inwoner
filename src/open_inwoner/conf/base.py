@@ -92,6 +92,9 @@ CACHES = {
     },
 }
 
+# ZGW API caches
+CACHE_ZGW_CATALOGI_TIMEOUT = config("CACHE_ZGW_CATALOGI_TIMEOUT", default=60 * 60 * 24)
+CACHE_ZGW_ZAKEN_TIMEOUT = config("CACHE_ZGW_ZAKEN_TIMEOUT", default=60 * 3)
 
 #
 # APPLICATIONS enabled for this project

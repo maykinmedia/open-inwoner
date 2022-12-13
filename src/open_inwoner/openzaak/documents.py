@@ -1,6 +1,8 @@
 import logging
 from typing import Optional
 
+from django.conf import settings
+
 import requests
 from requests import HTTPError, RequestException, Response
 from zds_client import ClientError
@@ -15,12 +17,12 @@ from .utils import cache as cache_result
 logger = logging.getLogger(__name__)
 
 
-@cache_result("information_object_url:{url}", timeout=60 * 3)
+@cache_result("information_object_url:{url}", timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT)
 def fetch_single_information_object_url(url: str) -> Optional[InformatieObject]:
     return _fetch_single_information_object(url=url)
 
 
-@cache_result("information_object_uuid:{uuid}", timeout=60 * 3)
+# not cached because currently only used in info-object download view
 def fetch_single_information_object_uuid(uuid: str) -> Optional[InformatieObject]:
     return _fetch_single_information_object(uuid=uuid)
 

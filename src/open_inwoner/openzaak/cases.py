@@ -1,6 +1,8 @@
 import logging
 from typing import List, Optional
 
+from django.conf import settings
+
 from requests import RequestException
 from zds_client import ClientError
 from zgw_consumers.api_models.base import factory
@@ -16,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 # cache for 3 minutes to quickly switch between open and closed cases
-@cache_result("cases:{user_bsn}:{max_cases}", timeout=60 * 3)
+@cache_result("cases:{user_bsn}:{max_cases}", timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT)
 def fetch_cases(user_bsn: str, max_cases: Optional[int] = 100) -> List[Zaak]:
     """
     retrieve cases for particular user with allowed confidentiality level
@@ -55,7 +57,7 @@ def fetch_cases(user_bsn: str, max_cases: Optional[int] = 100) -> List[Zaak]:
     return cases
 
 
-@cache_result("single_case:{case_uuid}", timeout=60 * 3)
+@cache_result("single_case:{case_uuid}", timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT)
 def fetch_single_case(case_uuid: str) -> Optional[Zaak]:
     client = build_client("zaak")
 
@@ -76,7 +78,9 @@ def fetch_single_case(case_uuid: str) -> Optional[Zaak]:
     return case
 
 
-@cache_result("case_information_objects:{case_url}", timeout=60 * 3)
+@cache_result(
+    "case_information_objects:{case_url}", timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT
+)
 def fetch_case_information_objects(case_url: str) -> List[ZaakInformatieObject]:
     client = build_client("zaak")
 
@@ -102,7 +106,7 @@ def fetch_case_information_objects(case_url: str) -> List[ZaakInformatieObject]:
     return case_info_objects
 
 
-@cache_result("status_history:{case_url}", timeout=60 * 3)
+@cache_result("status_history:{case_url}", timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT)
 def fetch_status_history(case_url: str) -> List[Status]:
     client = build_client("zaak")
 
@@ -144,7 +148,10 @@ def fetch_specific_status(status_url: str) -> Optional[Status]:
     return status
 
 
-@cache_result("case_roles:{case_url}:{role_desc_generic}", timeout=60 * 3)
+@cache_result(
+    "case_roles:{case_url}:{role_desc_generic}",
+    timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
+)
 def fetch_case_roles(
     case_url: str, role_desc_generic: Optional[str] = None
 ) -> List[Rol]:
@@ -204,7 +211,7 @@ def fetch_roles_for_case_and_bsn(case_url: str, bsn: str) -> List[Rol]:
     return bsn_roles
 
 
-@cache_result("info_objects_for_case_info:{case_url}:{info_object_url}", timeout=60 * 3)
+# not cached because currently only used in info-object download view
 def fetch_case_information_objects_for_case_and_info(
     case_url: str, info_object_url: str
 ) -> List[ZaakInformatieObject]:
@@ -235,7 +242,7 @@ def fetch_case_information_objects_for_case_and_info(
     return case_info_objects
 
 
-@cache_result("single_result:{result_url}", timeout=60 * 3)
+@cache_result("single_result:{result_url}", timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT)
 def fetch_single_result(result_url: str) -> Optional[Resultaat]:
     client = build_client("zaak")
 
