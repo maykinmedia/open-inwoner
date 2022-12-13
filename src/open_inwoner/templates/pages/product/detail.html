@@ -44,7 +44,7 @@
         {% endbutton_row %}
     {% endif %}
 
-    {% if object.question_set.all %}
+    {% if object.question_set.exists %}
         <hr class="divider">
         {% faq object.question_set.all %}
     {% endif %}

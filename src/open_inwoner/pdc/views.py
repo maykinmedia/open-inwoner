@@ -182,6 +182,8 @@ class ProductDetailView(BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView
         anchors = [
             ("#title", product.name),
         ]
+        if product.question_set.exists():
+            anchors.append(("#faq", _("Veelgestelde vragen")))
         if product.files.exists():
             anchors.append(("#files", _("Bestanden")))
         if product.locations.exists():
