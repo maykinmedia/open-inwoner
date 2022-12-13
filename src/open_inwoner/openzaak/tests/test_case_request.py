@@ -1,3 +1,4 @@
+from django.core.cache import cache
 from django.test import TestCase
 
 import requests_mock
@@ -23,6 +24,7 @@ class TestFetchSpecificCase(TestCase):
         cls.config.save()
 
     def setUp(self):
+        super().setUp()
         self.zaak = generate_oas_component(
             "zrc",
             "schemas/Zaak",
@@ -32,6 +34,11 @@ class TestFetchSpecificCase(TestCase):
             startdatum="2022-01-02",
             einddatum=None,
         )
+        cache.clear()
+
+    def tearDown(self):
+        super().tearDown()
+        cache.clear()
 
     def test_case_is_retrieved(self, m):
         mock_service_oas_get(m, ZAKEN_ROOT, "zrc")

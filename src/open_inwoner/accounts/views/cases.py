@@ -29,7 +29,8 @@ from open_inwoner.openzaak.cases import (
 from open_inwoner.openzaak.catalog import fetch_single_case_type, fetch_status_types
 from open_inwoner.openzaak.documents import (
     download_document,
-    fetch_single_information_object,
+    fetch_single_information_object_url,
+    fetch_single_information_object_uuid,
 )
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.utils import (
@@ -312,7 +313,7 @@ class CaseDetailView(CaseLogMixin, BaseBreadcrumbMixin, CaseAccessMixin, Templat
         #         [case_info.informatieobject for case_info in case_info_objects],
         #     )
         info_objects = [
-            fetch_single_information_object(url=case_info.informatieobject)
+            fetch_single_information_object_url(case_info.informatieobject)
             for case_info in case_info_objects
         ]
 
@@ -359,7 +360,7 @@ class CaseDocumentDownloadView(LogMixin, CaseAccessMixin, View):
             raise Http404
 
         info_object_uuid = kwargs["info_id"]
-        info_object = fetch_single_information_object(uuid=info_object_uuid)
+        info_object = fetch_single_information_object_uuid(info_object_uuid)
         if not info_object:
             raise Http404
 
