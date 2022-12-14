@@ -27,6 +27,7 @@ from open_inwoner.openzaak.cases import (
     fetch_status_history,
 )
 from open_inwoner.openzaak.catalog import fetch_single_case_type, fetch_status_types
+from open_inwoner.openzaak.clients import ZGWClients
 from open_inwoner.openzaak.documents import (
     download_document,
     fetch_single_information_object_url,
@@ -50,6 +51,16 @@ class CaseLogMixin(LogMixin):
         )
 
 
+class CaseClientsMixin:
+    def dispatch(self, request, *args, **kwargs):
+        self.zgw = ZGWClients()
+        try:
+            response = super().dispatch(request, *args, **kwargs)
+        finally:
+            self.zgw.close()
+        return response
+
+
 class CaseAccessMixin(AccessMixin):
     """
     Shared authorisation check
@@ -64,6 +75,7 @@ class CaseAccessMixin(AccessMixin):
     """
 
     case: Zaak = None
+    zgw: ZGWClients
 
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
@@ -75,11 +87,15 @@ class CaseAccessMixin(AccessMixin):
         self.case = self.get_case(kwargs)
         if self.case:
             # check if we have a role in this case
-            if not fetch_roles_for_case_and_bsn(self.case.url, request.user.bsn):
+            if not fetch_roles_for_case_and_bsn(
+                self.zgw.zaak, self.case.url, request.user.bsn
+            ):
                 return self.handle_no_permission()
 
             # resolve case-type
-            self.case.zaaktype = fetch_single_case_type(self.case.zaaktype)
+            self.case.zaaktype = fetch_single_case_type(
+                self.zgw.catalogi, self.case.zaaktype
+            )
             if not self.case.zaaktype:
                 return self.handle_no_permission()
 
@@ -100,15 +116,15 @@ class CaseAccessMixin(AccessMixin):
         if not case_uuid:
             return None
 
-        return fetch_single_case(case_uuid)
+        return fetch_single_case(self.zgw.zaak, case_uuid)
 
 
-class CaseListMixin(CaseLogMixin, PaginationMixin):
+class CaseListMixin(CaseClientsMixin, CaseLogMixin, PaginationMixin):
     paginate_by = 9
     template_name = "pages/cases/list.html"
 
     def get_cases(self) -> List[Zaak]:
-        cases = fetch_cases(self.request.user.bsn)
+        cases = fetch_cases(self.zgw.zaak, self.request.user.bsn)
 
         case_types = {}
         status_types = {}
@@ -117,7 +133,9 @@ class CaseListMixin(CaseLogMixin, PaginationMixin):
         # fetch unique case types
         for case_type_url in case_types_set:
             # todo parallel
-            case_types[case_type_url] = fetch_single_case_type(case_type_url)
+            case_types[case_type_url] = fetch_single_case_type(
+                self.zgw.catalogi, case_type_url
+            )
 
         # set resolved case types
         for case in cases:
@@ -132,13 +150,13 @@ class CaseListMixin(CaseLogMixin, PaginationMixin):
         # fetch status types for case types
         for case_type_url in case_types_set:
             # todo parallel
-            for st in fetch_status_types(case_type_url):
+            for st in fetch_status_types(self.zgw.catalogi, case_type_url):
                 status_types[st.url] = st
 
         # fetch case status resources and attach resolved to case
         for case in cases:
             # todo parallel
-            case.status = fetch_specific_status(case.status)
+            case.status = fetch_specific_status(self.zgw.zaak, case.status)
             case.status.statustype = status_types[case.status.statustype]
 
         return cases
@@ -239,7 +257,9 @@ class SimpleFile:
     url: str
 
 
-class CaseDetailView(CaseLogMixin, BaseBreadcrumbMixin, CaseAccessMixin, TemplateView):
+class CaseDetailView(
+    CaseClientsMixin, CaseLogMixin, BaseBreadcrumbMixin, CaseAccessMixin, TemplateView
+):
     template_name = "pages/cases/status.html"
 
     @cached_property
@@ -260,13 +280,13 @@ class CaseDetailView(CaseLogMixin, BaseBreadcrumbMixin, CaseAccessMixin, Templat
 
             documents = self.get_case_document_files(self.case)
 
-            statuses = fetch_status_history(self.case.url)
+            statuses = fetch_status_history(self.zgw.zaak, self.case.url)
             # NOTE we cannot sort on the Status.datum_status_gezet (datetime) because eSuite returns zeros as the time component of the datetime,
             # so we're going with the observation that on both OpenZaak and eSuite the returned list is ordered 'oldest-last'
             # here we want it 'oldest-first' so we reverse() it instead of sort()-ing
             statuses.reverse()
 
-            status_types = fetch_status_types(self.case.zaaktype.url)
+            status_types = fetch_status_types(self.zgw.catalogi, self.case.zaaktype.url)
 
             status_types_mapping = {st.url: st for st in status_types}
             for status in statuses:
@@ -302,19 +322,19 @@ class CaseDetailView(CaseLogMixin, BaseBreadcrumbMixin, CaseAccessMixin, Templat
 
     def get_result_display(self, case) -> str:
         if case.resultaat:
-            result = fetch_single_result(case.resultaat)
+            result = fetch_single_result(self.zgw.zaak, case.resultaat)
             if result:
                 return result.toelichting
         return _("Onbekend")
 
     def get_initiator_display(self, case) -> str:
-        roles = fetch_case_roles(case.url, RolOmschrijving.initiator)
+        roles = fetch_case_roles(self.zgw.zaak, case.url, RolOmschrijving.initiator)
         if not roles:
             return ""
         return ", ".join([get_role_name_display(r) for r in roles])
 
     def get_case_document_files(self, case) -> List[SimpleFile]:
-        case_info_objects = fetch_case_information_objects(case.url)
+        case_info_objects = fetch_case_information_objects(self.zgw.zaak, case.url)
 
         # get the information objects for the case objects
 
@@ -325,7 +345,9 @@ class CaseDetailView(CaseLogMixin, BaseBreadcrumbMixin, CaseAccessMixin, Templat
         #         [case_info.informatieobject for case_info in case_info_objects],
         #     )
         info_objects = [
-            fetch_single_information_object_url(case_info.informatieobject)
+            fetch_single_information_object_url(
+                self.zgw.document, case_info.informatieobject
+            )
             for case_info in case_info_objects
         ]
 
@@ -366,19 +388,21 @@ class CaseDetailView(CaseLogMixin, BaseBreadcrumbMixin, CaseAccessMixin, Templat
         return anchors
 
 
-class CaseDocumentDownloadView(LogMixin, CaseAccessMixin, View):
+class CaseDocumentDownloadView(CaseClientsMixin, LogMixin, CaseAccessMixin, View):
     def get(self, request, *args, **kwargs):
         if not self.case:
             raise Http404
 
         info_object_uuid = kwargs["info_id"]
-        info_object = fetch_single_information_object_uuid(info_object_uuid)
+        info_object = fetch_single_information_object_uuid(
+            self.zgw.document, info_object_uuid
+        )
         if not info_object:
             raise Http404
 
         # check if this info_object belongs to this case
         if not fetch_case_information_objects_for_case_and_info(
-            self.case.url, info_object.url
+            self.zgw.zaak, self.case.url, info_object.url
         ):
             raise PermissionDenied()
 
@@ -388,7 +412,7 @@ class CaseDocumentDownloadView(LogMixin, CaseAccessMixin, View):
             raise PermissionDenied()
 
         # retrieve and stream content
-        content_stream = download_document(info_object.inhoud)
+        content_stream = download_document(self.zgw.document, info_object.inhoud)
         if not content_stream:
             raise Http404
 
