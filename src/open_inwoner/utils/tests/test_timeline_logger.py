@@ -55,7 +55,7 @@ class TestAdminTimelineLogging(WebTest):
         url = reverse("admin:plans_plan_change", kwargs={"object_id": plan.id})
         form = self.app.get(url, user=self.user).forms.get("plan_form")
         form["title"] = "Updated"
-        form["goal"] = self.plan.goal
+        form["goal"] = "Foo"
         form["end_date"] = self.plan.end_date
         form["created_by"] = self.user.id
         form.submit()
