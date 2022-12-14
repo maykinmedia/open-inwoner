@@ -30,6 +30,7 @@ class ProductFileInline(admin.TabularInline):
 class ProductLinkInline(admin.TabularInline):
     model = ProductLink
     extra = 1
+    ordering = ("pk",)
 
 
 class ProductAdminForm(forms.ModelForm):
