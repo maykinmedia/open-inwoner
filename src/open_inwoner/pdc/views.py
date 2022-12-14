@@ -198,6 +198,7 @@ class ProductDetailView(BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView
 
         context["anchors"] = anchors
         context["related_products_start"] = 6 if product.links.exists() else 1
+        context["product_links"] = product.links.order_by("pk")
         return context
 
 
