@@ -249,7 +249,10 @@ class CaseDetailView(CaseLogMixin, BaseBreadcrumbMixin, CaseAccessMixin, Templat
             documents = self.get_case_document_files(self.case)
 
             statuses = fetch_status_history(self.case.url)
-            statuses.sort(key=lambda status: status.datum_status_gezet)
+            # NOTE we cannot sort on the Status.datum_status_gezet (datetime) because eSuite returns zeros as the time component of the datetime,
+            # so we're going with the observation that on both OpenZaak and eSuite the returned list is ordered 'oldest-last'
+            # here we want it 'oldest-first' so we reverse() it instead of sort()-ing
+            statuses.reverse()
 
             case_type = fetch_single_case_type(self.case.zaaktype)
             status_types = fetch_status_types(case_type_url=self.case.zaaktype)
