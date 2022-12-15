@@ -1,7 +1,6 @@
 import datetime
 
 from django.contrib.auth.models import AnonymousUser
-from django.core.cache import cache
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -21,7 +20,7 @@ from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.accounts.views.cases import SimpleFile
-from open_inwoner.utils.test import paginated_response
+from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 
 from ..api_models import Status
 from ..models import OpenZaakConfig
@@ -33,15 +32,10 @@ DOCUMENTEN_ROOT = "https://documenten.nl/api/v1/"
 
 
 @requests_mock.Mocker()
-class TestCaseDetailView(WebTest):
+class TestCaseDetailView(ClearCachesMixin, WebTest):
     def setUp(self):
         super().setUp()
         self.maxDiff = None
-        cache.clear()
-
-    def tearDown(self):
-        super().tearDown()
-        cache.clear()
 
     @classmethod
     def setUpTestData(self):

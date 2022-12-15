@@ -1,4 +1,3 @@
-from django.core.cache import cache
 from django.test import TestCase
 
 import requests_mock
@@ -6,6 +5,7 @@ from zgw_consumers.constants import APITypes
 from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 
 from open_inwoner.openzaak.cases import fetch_single_case
+from open_inwoner.utils.test import ClearCachesMixin
 
 from ..models import OpenZaakConfig
 from .factories import ServiceFactory
@@ -15,7 +15,7 @@ CATALOGI_ROOT = "https://catalogi.nl/api/v1/"
 
 
 @requests_mock.Mocker()
-class TestFetchSpecificCase(TestCase):
+class TestFetchSpecificCase(ClearCachesMixin, TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
@@ -34,11 +34,6 @@ class TestFetchSpecificCase(TestCase):
             startdatum="2022-01-02",
             einddatum=None,
         )
-        cache.clear()
-
-    def tearDown(self):
-        super().tearDown()
-        cache.clear()
 
     def test_case_is_retrieved(self, m):
         mock_service_oas_get(m, ZAKEN_ROOT, "zrc")

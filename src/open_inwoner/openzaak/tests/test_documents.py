@@ -1,5 +1,4 @@
 from django.contrib.auth.models import AnonymousUser
-from django.core.cache import cache
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -18,7 +17,7 @@ from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.accounts.views.cases import SimpleFile
-from open_inwoner.utils.test import paginated_response
+from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 
 from ..documents import download_document
 from ..models import OpenZaakConfig
@@ -31,7 +30,7 @@ DOCUMENTEN_ROOT = "https://documenten.nl/api/v1/"
 
 @temp_private_root()
 @requests_mock.Mocker()
-class TestDocumentDownloadView(WebTest):
+class TestDocumentDownloadView(ClearCachesMixin, WebTest):
     def setUp(self):
         self.maxDiff = None
 
@@ -131,11 +130,6 @@ class TestDocumentDownloadView(WebTest):
                 },
             ),
         )
-        cache.clear()
-
-    def tearDown(self):
-        super().tearDown()
-        cache.clear()
 
     def _setUpOASMocks(self, m):
         mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
