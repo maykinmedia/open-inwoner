@@ -25,22 +25,16 @@ ZAKEN_ROOT = "https://zaken.nl/api/v1/"
 CATALOGI_ROOT = "https://catalogi.nl/api/v1/"
 
 
-class CaseListAccessTests(WebTest):
+class CaseListAccessTests(ClearCachesMixin, WebTest):
     urls = [
         reverse_lazy("accounts:my_open_cases"),
         reverse_lazy("accounts:my_closed_cases"),
     ]
 
-    def setUp(cls):
-        super().setUp()
-        cache.clear()
-
-    def tearDown(self):
-        super().tearDown()
-        cache.clear()
-
     @classmethod
     def setUpTestData(cls):
+        super().setUpTestData()
+
         # services
         cls.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
         cls.catalogi_service = ServiceFactory(
@@ -130,8 +124,6 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
     url_open = reverse_lazy("accounts:my_open_cases")
     url_closed = reverse_lazy("accounts:my_closed_cases")
 
-    maxDiff = None
-
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -159,7 +151,17 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
             url=f"{CATALOGI_ROOT}zaaktypen/53340e34-7581-4b04-884f",
             omschrijving="Coffee zaaktype",
             catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
-            vertrouwelijkheidaanduiding="openbaar",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+            indicatieInternOfExtern="extern",
+        )
+        cls.zaak_type_intern = generate_oas_component(
+            "ztc",
+            "schemas/ZaakType",
+            url=f"{CATALOGI_ROOT}zaaktypen/53340e34-75a1-4b04-1234",
+            omschrijving="Intern zaaktype",
+            catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+            indicatieInternOfExtern="intern",
         )
         cls.status_type1 = generate_oas_component(
             "ztc",
@@ -168,7 +170,7 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
             zaaktype=cls.zaaktype["url"],
             omschrijving="Initial request",
             volgnummer=1,
-            is_eindstatus=False,
+            isEindstatus=False,
         )
         cls.status_type2 = generate_oas_component(
             "ztc",
@@ -177,7 +179,7 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
             zaaktype=cls.zaaktype["url"],
             omschrijving="Finish",
             volgnummer=2,
-            is_eindstatus=True,
+            isEindstatus=True,
         )
         # open
         cls.zaak1 = generate_oas_component(
@@ -195,11 +197,11 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
         )
         cls.status1 = generate_oas_component(
             "zrc",
-            "schemas/Zaak",
+            "schemas/Status",
             url=cls.zaak1["status"],
             zaak=cls.zaak1["url"],
             statustype=cls.status_type1["url"],
-            datum_status_gezet="2021-01-12",
+            datumStatusGezet="2021-01-12",
             statustoelichting="",
         )
         cls.zaak2 = generate_oas_component(
@@ -217,11 +219,11 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
         )
         cls.status2 = generate_oas_component(
             "zrc",
-            "schemas/Zaak",
+            "schemas/Status",
             url=cls.zaak2["status"],
             zaak=cls.zaak2["url"],
             statustype=cls.status_type1["url"],
-            datum_status_gezet="2021-03-12",
+            datumStatusGezet="2021-03-12",
             statustoelichting="",
         )
         # closed
@@ -240,11 +242,34 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
         )
         cls.status3 = generate_oas_component(
             "zrc",
-            "schemas/Zaak",
+            "schemas/Status",
             url=cls.zaak3["status"],
             zaak=cls.zaak3["url"],
             statustype=cls.status_type2["url"],
-            datum_status_gezet="2021-03-15",
+            datumStatusGezet="2021-03-15",
+            statustoelichting="",
+        )
+        # not visible
+        cls.zaak_intern = generate_oas_component(
+            "zrc",
+            "schemas/Zaak",
+            url=f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4ee0bf67d",
+            uuid="d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
+            zaaktype=cls.zaak_type_intern["url"],
+            identificatie="ZAAK-2022-0000000009",
+            omschrijving="Intern zaak",
+            startdatum="2022-01-02",
+            einddatum=None,
+            status=f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c90234500333",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+        )
+        cls.status_intern = generate_oas_component(
+            "zrc",
+            "schemas/Status",
+            url=cls.zaak_intern["status"],
+            zaak=cls.zaak_intern["url"],
+            statustype=cls.status_type1["url"],
+            datumStatusGezet="2021-01-12",
             statustoelichting="",
         )
 
@@ -260,7 +285,9 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
                 }
             )
             .url,
-            json=paginated_response([self.zaak1, self.zaak2, self.zaak3]),
+            json=paginated_response(
+                [self.zaak1, self.zaak2, self.zaak3, self.zaak_intern]
+            ),
         )
         m.get(
             f"{CATALOGI_ROOT}statustypen",
@@ -273,6 +300,9 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
             self.status1,
             self.status2,
             self.status3,
+            self.zaak_intern,
+            self.status_intern,
+            self.zaak_type_intern,
         ]:
             m.get(resource["url"], json=resource)
 
@@ -282,7 +312,7 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
         response = self.app.get(self.url_open, user=self.user)
 
         self.assertListEqual(
-            response.context.get("cases"),
+            response.context["cases"],
             [
                 {
                     "uuid": self.zaak2["uuid"],
@@ -307,6 +337,8 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
         # don't show closed cases
         self.assertNotContains(response, self.zaak3["identificatie"])
         self.assertNotContains(response, self.zaak3["omschrijving"])
+        self.assertNotContains(response, self.zaak_intern["identificatie"])
+        self.assertNotContains(response, self.zaak_intern["omschrijving"])
 
         # check zaken request query parameters
         list_zaken_req = [
