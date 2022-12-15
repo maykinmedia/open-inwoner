@@ -84,18 +84,18 @@
       font-size: var(--font-size-body);
     }
   }
-    .button.actions__status-selector {
-      &--open {
-        color: var(--color-info-darker);
-        border-color: var(--color-info-darker);
-      }
-      &--closed {
-        color: var(--color-mute);
-        border-color: var(--color-mute);
-      }
-      &--approval {
-        color: var(--color-danger);
-        border-color: var(--color-danger);
+  .button.actions__status-selector {
+    &--open {
+      color: var(--color-info-darker);
+      border-color: var(--color-info-darker);
+    }
+    &--closed {
+      color: var(--color-mute);
+      border-color: var(--color-mute);
+    }
+    &--approval {
+      color: var(--color-danger);
+      border-color: var(--color-danger);
     }
   }
 }
