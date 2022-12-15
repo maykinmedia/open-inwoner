@@ -3,11 +3,13 @@ from datetime import datetime, timezone
 from uuid import uuid4
 
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.db.models.signals import post_save, pre_save
 
 import factory
 import factory.fuzzy
 
 
+@factory.django.mute_signals(pre_save, post_save)
 class UserFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "accounts.User"
