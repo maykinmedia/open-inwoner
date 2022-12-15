@@ -15,6 +15,10 @@
     white-space: nowrap;
     margin-bottom: var(--spacing-small);
 
+    &--wrap {
+      white-space: normal;
+    }
+
     &:last-child {
       margin-bottom: 0;
     }

@@ -7,7 +7,7 @@
         name="{{ name }}"
         value="{{ choice.0|unlocalize }}"
         id="id_{{ name }}_{{ index }}"
-        {% if choice.0 in data %}checked="checked"{% endif %}
+        {% if choice.0 in data or choice.0|add:0 in data %}checked="checked"{% endif %}
     />
     <label class="checkbox__label" for="id_{{ name }}_{{ index }}">{{ choice.1 }}</label>
 </label>

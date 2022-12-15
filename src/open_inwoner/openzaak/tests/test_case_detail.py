@@ -124,7 +124,7 @@ class TestCaseDetailView(WebTest):
             begin_geldigheid="2020-09-25",
             versiedatum="2020-09-25",
         )
-        self.status1 = generate_oas_component(
+        self.status_new = generate_oas_component(
             "zrc",
             "schemas/Zaak",
             url=f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-beu760sle929",
@@ -133,7 +133,7 @@ class TestCaseDetailView(WebTest):
             datum_status_gezet="2021-01-12",
             statustoelichting="",
         )
-        self.status2 = generate_oas_component(
+        self.status_finish = generate_oas_component(
             "zrc",
             "schemas/Zaak",
             url=f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
@@ -142,7 +142,7 @@ class TestCaseDetailView(WebTest):
             datum_status_gezet="2021-03-12",
             statustoelichting="",
         )
-        self.status_type1 = generate_oas_component(
+        self.status_type_new = generate_oas_component(
             "ztc",
             "schemas/StatusType",
             url=f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-777yu878km09",
@@ -153,7 +153,7 @@ class TestCaseDetailView(WebTest):
             volgnummer=1,
             is_eindstatus=False,
         )
-        self.status_type2 = generate_oas_component(
+        self.status_type_finish = generate_oas_component(
             "ztc",
             "schemas/StatusType",
             url=f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-744516671fe4",
@@ -277,7 +277,8 @@ class TestCaseDetailView(WebTest):
         )
         m.get(
             f"{ZAKEN_ROOT}statussen?zaak={self.zaak['url']}",
-            json=paginated_response([self.status1, self.status2]),
+            # Taiga #972 these have to be oldest-last (newest-first) and cannot be resorted on
+            json=paginated_response([self.status_finish, self.status_new]),
         )
         m.get(
             f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}",
@@ -296,7 +297,7 @@ class TestCaseDetailView(WebTest):
         m.get(f"{CATALOGI_ROOT}zaaktypen/53340e34-7581-4b04-884f", json=self.zaaktype)
         m.get(
             f"{CATALOGI_ROOT}statustypen?zaaktype={self.zaaktype['url']}",
-            json=paginated_response([self.status_type1, self.status_type2]),
+            json=paginated_response([self.status_type_new, self.status_type_finish]),
         )
         m.get(
             f"{CATALOGI_ROOT}informatieobjecttype/014c38fe-b010-4412-881c-3000032fb321",
@@ -317,9 +318,11 @@ class TestCaseDetailView(WebTest):
 
     def test_status_is_retrieved_when_user_logged_in_via_digid(self, m):
         self._setUpMocks(m)
-        status1_obj, status2_obj = factory(Status, [self.status1, self.status2])
-        status1_obj.statustype = factory(StatusType, self.status_type1)
-        status2_obj.statustype = factory(StatusType, self.status_type2)
+        status_new_obj, status_finish_obj = factory(
+            Status, [self.status_new, self.status_finish]
+        )
+        status_new_obj.statustype = factory(StatusType, self.status_type_new)
+        status_finish_obj.statustype = factory(StatusType, self.status_type_finish)
 
         response = self.app.get(self.case_detail_url, user=self.user)
 
@@ -334,7 +337,7 @@ class TestCaseDetailView(WebTest):
                 "description": "Zaak naar aanleiding van ingezonden formulier",
                 "type_description": "Coffee zaaktype",
                 "current_status": "Finish",
-                "statuses": [status1_obj, status2_obj],
+                "statuses": [status_new_obj, status_finish_obj],
                 # only one visible information object
                 "documents": [self.informatie_object_file],
                 "initiator": "Foo Bar van der Bazz",
@@ -422,7 +425,7 @@ class TestCaseDetailView(WebTest):
         )
         m.get(
             f"{ZAKEN_ROOT}statussen?zaak={self.zaak['url']}",
-            json=paginated_response([self.status1, self.status2]),
+            json=paginated_response([self.status_finish, self.status_new]),
         )
         m.get(
             f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}",
