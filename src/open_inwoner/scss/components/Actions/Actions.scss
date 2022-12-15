@@ -66,6 +66,7 @@
   }
 
   .actions__actions {
+    align-items: center;
     position: absolute;
     top: 0;
     right: 0;
@@ -83,22 +84,18 @@
       font-size: var(--font-size-body);
     }
   }
-  .actions__status-selector {
-    border-radius: 5px;
-    padding: var(--spacing-small) var(--spacing-medium);
-    font-size: var(--font-size-body);
-
-    &--open {
-      color: midnightblue;
-      background-color: powderblue;
-    }
-    &--closed {
-      color: darkgreen;
-      background-color: darkseagreen;
-    }
-    &--approval {
-      color: darkred;
-      background-color: sandybrown;
+    .button.actions__status-selector {
+      &--open {
+        color: var(--color-info-darker);
+        border-color: var(--color-info-darker);
+      }
+      &--closed {
+        color: var(--color-mute);
+        border-color: var(--color-mute);
+      }
+      &--approval {
+        color: var(--color-danger);
+        border-color: var(--color-danger);
     }
   }
 }

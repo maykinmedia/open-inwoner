@@ -1,5 +1,6 @@
 .dropdown {
   position: relative;
+  display: inline-block;
 
   &.dropdown--open .dropdown__content {
     display: flex;
@@ -8,10 +9,10 @@
   .dropdown__content {
     display: none;
     flex-direction: column;
-    row-gap: var(--spacing-medium);
+    row-gap: var(--spacing-small);
     padding: var(--spacing-medium) 0;
     position: absolute;
-    right: 0;
+    left: 0%;
     border-radius: var(--border-radius);
     background-color: var(--color-white);
     border: 1px solid var(--color-mute);
@@ -22,7 +23,14 @@
     padding: 0 var(--spacing-medium);
   }
 
+  .button {
+    border-color: var(--font-color-body);
+    color: var(--font-color-body);
+  }
+
   .dropdown__item .button {
+    border-color: var(--font-color-body);
+    color: var(--font-color-body);
     height: var(--font-line-height-body);
     padding: 0;
   }

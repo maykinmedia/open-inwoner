@@ -46,7 +46,7 @@ def button(text, **kwargs):
         - hide_text: bool | whether to hide the text and use aria attribute instead.
         - href: url or string | where the link links to (can be url name).
         - uuid: string | if href is an url name, pk for reverse can be passed.
-        - size: enum[big] | If the button should be bigger.
+        - size: enum[small, big] | If the button should be smaller or bigger.
         - open: bool | If the open style button should be used.
         - bordered: bool | If the border should be colored.
         - primary: bool | If the primary colors should be used.
@@ -68,7 +68,10 @@ def button(text, **kwargs):
 
     def get_classes():
         extra_classes = kwargs.get("extra_classes")
-        classnames = f"button {extra_classes}"
+        classnames = "button"
+
+        if extra_classes:
+            classnames += f" {extra_classes}"
 
         if kwargs.get("icon"):
             if not kwargs.get("text"):
