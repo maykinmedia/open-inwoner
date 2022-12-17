@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 from datetime import date, datetime
-from typing import Optional
+from typing import List, Optional
 
+from dateutil.relativedelta import relativedelta
 from zgw_consumers.api_models.base import ZGWModel
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 
@@ -17,25 +18,24 @@ class Zaak(ZGWModel):
     identificatie: str
     bronorganisatie: str
     omschrijving: str
-    #    toelichting: str
     zaaktype: str
     registratiedatum: date
     startdatum: date
-    einddatum_gepland: Optional[date]
-    uiterlijke_einddatum_afdoening: Optional[date]
-    #    publicatiedatum: Optional[date]
-    vertrouwelijkheidaanduiding: str
     status: str
+    vertrouwelijkheidaanduiding: str
+    toelichting: Optional[str] = None
+    einddatum_gepland: Optional[date] = None
+    uiterlijke_einddatum_afdoening: Optional[date] = None
+    publicatiedatum: Optional[date] = None
     einddatum: Optional[date] = None
     resultaat: Optional[str] = None
-    #    relevante_andere_zaken: list
-    #    zaakgeometrie: dict
+    relevante_andere_zaken: Optional[List[str]] = None
+    zaakgeometrie: Optional[dict] = None
 
 
 @dataclass
 class ZaakType(ZGWModel):
     url: str
-    # catalogus: str
     identificatie: str
     omschrijving: str
     vertrouwelijkheidaanduiding: str
@@ -45,21 +45,22 @@ class ZaakType(ZGWModel):
     handeling_initiator: str
     onderwerp: str
     handeling_behandelaar: str
-    # doorlooptijd: relativedelta
-    # servicenorm: Optional[relativedelta]
+    statustypen: list
+    catalogus: Optional[str] = None
+    doorlooptijd: Optional[relativedelta] = None
+    servicenorm: Optional[relativedelta] = None
     # opschorting_en_aanhouding_mogelijk: bool
     # verlenging_mogelijk: bool
-    # verlengingstermijn: Optional[relativedelta]
     # publicatie_indicatie: bool
-    # producten_of_diensten: list
-    statustypen: list
-    # resultaattypen: list
-    # informatieobjecttypen: list
-    # roltypen: list
-    # besluittypen: list
+    verlengingstermijn: Optional[relativedelta] = None
+    producten_of_diensten: Optional[List[str]] = None
+    resultaattypen: Optional[List[str]] = None
+    informatieobjecttypen: Optional[List[str]] = None
+    roltypen: Optional[List[str]] = None
+    besluittypen: Optional[List[str]] = None
 
-    # begin_geldigheid: date
-    # versiedatum: date
+    begin_geldigheid: Optional[date] = None
+    versiedatum: Optional[date] = None
 
 
 @dataclass
@@ -67,10 +68,10 @@ class ZaakInformatieObject(ZGWModel):
     url: str
     informatieobject: str
     zaak: str
-    # aard_relatie_weergave: str
     titel: str
-    # beschrijving: str
     registratiedatum: datetime
+    aard_relatie_weergave: Optional[str] = None
+    beschrijving: Optional[str] = None
 
 
 @dataclass
@@ -86,18 +87,18 @@ class InformatieObject(ZGWModel):
     formaat: str
     taal: str
     versie: int
-    # beginRegistratie: datetime
     bestandsnaam: str
     inhoud: str
     bestandsomvang: int
-    # indicatieGebruiksrecht: str
     informatieobjecttype: str
     locked: bool
-    # bestandsdelen: List[str]
-    beschrijving: Optional[str] = ""
-    link: Optional[str] = ""
-    ontvangstdatum: Optional[str] = ""
-    verzenddatum: Optional[str] = ""
+    beginRegistratie: Optional[datetime] = None
+    indicatieGebruiksrecht: Optional[str] = None
+    bestandsdelen: Optional[List[str]] = None
+    beschrijving: Optional[str] = None
+    link: Optional[str] = None
+    ontvangstdatum: Optional[str] = None
+    verzenddatum: Optional[str] = None
     ondertekening: Optional[dict] = None  # {'soort': '', 'datum': None}
     integriteit: Optional[dict] = None  # {'algoritme': '', 'waarde': '', 'datum': None}
 
@@ -111,9 +112,9 @@ class Rol(ZGWModel):
     omschrijving: str
     omschrijving_generiek: str
     roltoelichting: str
-    indicatie_machtiging: Optional[str] = ""
+    indicatie_machtiging: Optional[str] = None
     registratiedatum: Optional[datetime] = None
-    betrokkene: Optional[str] = ""
+    betrokkene: Optional[str] = None
     betrokkene_identificatie: Optional[dict] = None
 
     def get_betrokkene_type_display(self):
@@ -128,7 +129,7 @@ class Resultaat(ZGWModel):
     url: str
     zaak: str
     resultaattype: str
-    toelichting: Optional[str] = ""
+    toelichting: Optional[str] = None
 
 
 @dataclass
@@ -137,4 +138,4 @@ class Status(ZGWModel):
     zaak: str
     statustype: str
     datum_status_gezet: Optional[datetime] = None
-    statustoelichting: Optional[str] = ""
+    statustoelichting: Optional[str] = None
