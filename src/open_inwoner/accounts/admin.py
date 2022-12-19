@@ -19,20 +19,26 @@ class ActionInlineAdmin(UUIDAdminFirstInOrder, admin.StackedInline):
     readonly_fields = ("uuid",)
 
 
-class UserUniqueEmailMixin:
+class _UserChangeForm(UserChangeForm):
     def clean(self, *args, **kwargs):
         cleaned_data = super().clean(*args, **kwargs)
 
-        if User.objects.filter(email__iexact=cleaned_data["email"]):
+        if (
+            User.objects.filter(email__iexact=cleaned_data["email"])
+            and self.instance.email != cleaned_data["email"]
+        ):
             raise ValidationError(_("The user with this email already exists."))
 
 
-class _UserChangeForm(UserUniqueEmailMixin, UserChangeForm):
-    pass
+class _UserCreationForm(UserCreationForm):
+    def clean(self, *args, **kwargs):
+        cleaned_data = super().clean(*args, **kwargs)
 
-
-class _UserCreationForm(UserUniqueEmailMixin, UserCreationForm):
-    pass
+        # we use both queries in order to avoid the duplicate validation errors
+        if User.objects.filter(
+            email__iexact=cleaned_data["email"]
+        ) and not User.objects.filter(email=cleaned_data["email"]):
+            raise ValidationError(_("The user with this email already exists."))
 
 
 @admin.register(User)
