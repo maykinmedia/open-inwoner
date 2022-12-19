@@ -36,6 +36,20 @@ class TestAdminUser(WebTest):
 
         self.assertEqual(existing_user.email, "john2@example.com")
 
+    def test_user_is_updated_without_modifying_email(self):
+        response = self.app.get(
+            reverse("admin:accounts_user_change", kwargs={"object_id": self.user.pk}),
+            user=self.user,
+        )
+        form = response.forms["user_form"]
+        form["first_name"] = "Updated"
+        response = form.submit("_save")
+
+        existing_user = User.objects.get()
+
+        self.assertEqual(existing_user.first_name, "Updated")
+        self.assertEqual(existing_user.email, self.user.email)
+
     def test_user_not_created_with_case_sensitive_email(self):
         response = self.app.get(reverse("admin:accounts_user_add"), user=self.user)
         form = response.forms["user_form"]
