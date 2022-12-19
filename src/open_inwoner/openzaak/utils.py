@@ -49,6 +49,12 @@ def is_info_object_visible(
 def is_zaak_visible(zaak: Zaak) -> bool:
     """Check if zaak is visible for users"""
     config = OpenZaakConfig.get_solo()
+    if isinstance(zaak.zaaktype, str):
+        raise ValueError("expected zaak.zaaktype to be resolved from url to model")
+
+    if zaak.zaaktype.indicatie_intern_of_extern != "extern":
+        return False
+
     return is_object_visible(zaak, config.zaak_max_confidentiality)
 
 

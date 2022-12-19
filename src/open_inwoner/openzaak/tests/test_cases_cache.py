@@ -53,7 +53,8 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
             url=f"{CATALOGI_ROOT}zaaktypen/53340e34-7581-4b04-884f",
             omschrijving="Coffee zaaktype",
             catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
-            vertrouwelijkheidaanduiding="openbaar",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+            indicatieInternOfExtern="extern",
         )
         cls.status_type1 = generate_oas_component(
             "ztc",
@@ -62,7 +63,7 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
             zaaktype=cls.zaaktype["url"],
             omschrijving="Initial request",
             volgnummer=1,
-            is_eindstatus=False,
+            isEindstatus=False,
         )
         cls.status_type2 = generate_oas_component(
             "ztc",
@@ -71,7 +72,7 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
             zaaktype=cls.zaaktype["url"],
             omschrijving="Finish",
             volgnummer=2,
-            is_eindstatus=True,
+            isEindstatus=True,
         )
         cls.zaak1 = generate_oas_component(
             "zrc",
@@ -91,7 +92,7 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
             url=f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-beu760sle929",
             zaak=cls.zaak1["url"],
             statustype=cls.status_type1["url"],
-            datum_status_gezet="2021-01-12",
+            datumStatusGezet="2021-01-12",
             statustoelichting="",
         )
         cls.zaak2 = generate_oas_component(
@@ -112,7 +113,7 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
             url=f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
             zaak=cls.zaak2["url"],
             statustype=cls.status_type2["url"],
-            datum_status_gezet="2021-03-12",
+            datumStatusGezet="2021-03-12",
             statustoelichting="",
         )
 
@@ -123,7 +124,8 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
             url=f"{CATALOGI_ROOT}zaaktypen/53340e34-7581-4b04-884f-98ui7y87i876",
             omschrijving="Tea zaaktype",
             catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
-            vertrouwelijkheidaanduiding="openbaar",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+            indicatieInternOfExtern="extern",
         )
         cls.new_status_type = generate_oas_component(
             "ztc",
@@ -132,7 +134,7 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
             zaaktype=cls.new_zaaktype["url"],
             omschrijving="Process",
             volgnummer=1,
-            is_eindstatus=False,
+            isEindstatus=False,
         )
         cls.new_zaak = generate_oas_component(
             "zrc",
@@ -144,6 +146,7 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
             startdatum="2022-01-02",
             einddatum=None,
             status=f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-oie8u899923g",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
         )
         cls.new_status = generate_oas_component(
             "zrc",
@@ -151,7 +154,7 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
             url=f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-oie8u899923g",
             zaak=cls.new_zaak["url"],
             statustype=cls.new_status_type["url"],
-            datum_status_gezet="2021-01-12",
+            datumStatusGezet="2021-01-12",
             statustoelichting="",
         )
 

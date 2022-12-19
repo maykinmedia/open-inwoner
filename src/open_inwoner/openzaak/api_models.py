@@ -1,8 +1,14 @@
 from dataclasses import dataclass
 from datetime import date, datetime
-from typing import Optional
+from typing import Optional, Union
 
 from zgw_consumers.api_models.base import ZGWModel
+from zgw_consumers.api_models.catalogi import (
+    InformatieObjectType,
+    ResultaatType,
+    RolType,
+    StatusType,
+)
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 
 """
@@ -18,14 +24,14 @@ class Zaak(ZGWModel):
     bronorganisatie: str
     omschrijving: str
     #    toelichting: str
-    zaaktype: str
+    zaaktype: Union[str, "ZaakType"]
     registratiedatum: date
     startdatum: date
-    einddatum_gepland: Optional[date]
-    uiterlijke_einddatum_afdoening: Optional[date]
-    #    publicatiedatum: Optional[date]
     vertrouwelijkheidaanduiding: str
-    status: str
+    status: Optional[Union[str, "Status"]]
+    einddatum_gepland: Optional[date] = None
+    uiterlijke_einddatum_afdoening: Optional[date] = None
+    #    publicatiedatum: Optional[date]
     einddatum: Optional[date] = None
     resultaat: Optional[str] = None
     #    relevante_andere_zaken: list
@@ -65,8 +71,8 @@ class ZaakType(ZGWModel):
 @dataclass
 class ZaakInformatieObject(ZGWModel):
     url: str
-    informatieobject: str
-    zaak: str
+    informatieobject: Union[str, "InformatieObject"]
+    zaak: Union[str, Zaak]
     # aard_relatie_weergave: str
     titel: str
     # beschrijving: str
@@ -91,7 +97,7 @@ class InformatieObject(ZGWModel):
     inhoud: str
     bestandsomvang: int
     # indicatieGebruiksrecht: str
-    informatieobjecttype: str
+    informatieobjecttype: Union[str, InformatieObjectType]
     locked: bool
     # bestandsdelen: List[str]
     beschrijving: Optional[str] = ""
@@ -107,7 +113,7 @@ class Rol(ZGWModel):
     url: str
     zaak: str
     betrokkene_type: str
-    roltype: str
+    roltype: Union[str, RolType]
     omschrijving: str
     omschrijving_generiek: str
     roltoelichting: str
@@ -126,15 +132,15 @@ class Rol(ZGWModel):
 @dataclass
 class Resultaat(ZGWModel):
     url: str
-    zaak: str
-    resultaattype: str
+    zaak: Union[str, Zaak]
+    resultaattype: Union[str, ResultaatType]
     toelichting: Optional[str] = ""
 
 
 @dataclass
 class Status(ZGWModel):
     url: str
-    zaak: str
-    statustype: str
+    zaak: Union[str, Zaak]
+    statustype: Union[str, StatusType]
     datum_status_gezet: Optional[datetime] = None
     statustoelichting: Optional[str] = ""

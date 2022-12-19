@@ -78,7 +78,12 @@ class CaseAccessMixin(AccessMixin):
             if not fetch_roles_for_case_and_bsn(self.case.url, request.user.bsn):
                 return self.handle_no_permission()
 
-            # check confidentiality level
+            # resolve case-type
+            self.case.zaaktype = fetch_single_case_type(self.case.zaaktype)
+            if not self.case.zaaktype:
+                return self.handle_no_permission()
+
+            # check if case + case-type are visible
             if not is_zaak_visible(self.case):
                 return self.handle_no_permission()
 
@@ -102,35 +107,43 @@ class CaseListMixin(CaseLogMixin, PaginationMixin):
     paginate_by = 9
     template_name = "pages/cases/list.html"
 
-    def get_cases(self):
+    def get_cases(self) -> List[Zaak]:
         cases = fetch_cases(self.request.user.bsn)
-        return cases
 
-    def process_cases(self, cases):
-        # fetch catalogi resources: zaaktypen and statustypen
         case_types = {}
         status_types = {}
         case_types_set = {case.zaaktype for case in cases}
 
+        # fetch unique case types
         for case_type_url in case_types_set:
             # todo parallel
-            case_type = fetch_single_case_type(case_type_url)
-            case_types[case_type.url] = case_type
+            case_types[case_type_url] = fetch_single_case_type(case_type_url)
 
-            # Fetch new status types
+        # set resolved case types
+        for case in cases:
+            case.zaaktype = case_types[case.zaaktype]
+
+        # filter visibility
+        cases = [case for case in cases if is_zaak_visible(case)]
+
+        # grab types of remaining cases
+        case_types_set = {case.zaaktype.url for case in cases}
+
+        # fetch status types for case types
+        for case_type_url in case_types_set:
             # todo parallel
             for st in fetch_status_types(case_type_url):
                 status_types[st.url] = st
 
-        # fetch zaken resources: statuses
+        # fetch case status resources and attach resolved to case
         for case in cases:
-            # Fetch case's current status
             # todo parallel
             case.status = fetch_specific_status(case.status)
-
-            case.zaaktype = case_types[case.zaaktype]
             case.status.statustype = status_types[case.status.statustype]
 
+        return cases
+
+    def process_cases(self, cases: List[Zaak]) -> List[Zaak]:
         # Prepare data for frontend
         updated_cases = []
         for case in cases:
@@ -145,7 +158,6 @@ class CaseListMixin(CaseLogMixin, PaginationMixin):
                     "current_status": case.status.statustype.omschrijving,
                 }
             )
-
         return updated_cases
 
     def get_context_data(self, **kwargs):
@@ -254,8 +266,7 @@ class CaseDetailView(CaseLogMixin, BaseBreadcrumbMixin, CaseAccessMixin, Templat
             # here we want it 'oldest-first' so we reverse() it instead of sort()-ing
             statuses.reverse()
 
-            case_type = fetch_single_case_type(self.case.zaaktype)
-            status_types = fetch_status_types(case_type_url=self.case.zaaktype)
+            status_types = fetch_status_types(self.case.zaaktype.url)
 
             status_types_mapping = {st.url: st for st in status_types}
             for status in statuses:
@@ -273,9 +284,7 @@ class CaseDetailView(CaseLogMixin, BaseBreadcrumbMixin, CaseAccessMixin, Templat
                     self.case, "uiterlijke_einddatum_afdoening", None
                 ),
                 "description": self.case.omschrijving,
-                "type_description": (
-                    case_type.omschrijving if case_type else _("No data available")
-                ),
+                "type_description": self.case.zaaktype.omschrijving,
                 "current_status": (
                     statuses[-1].statustype.omschrijving
                     if statuses
