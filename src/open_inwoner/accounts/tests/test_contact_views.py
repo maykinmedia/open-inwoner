@@ -80,9 +80,7 @@ class ContactViewTests(WebTest):
         )
 
     def test_contact_list_show_link_to_messages(self):
-        message_link = (
-            furl(reverse("accounts:inbox")).add({"with": self.contact.email}).url
-        )
+        message_link = reverse("accounts:inbox", kwargs={"uuid": self.contact.uuid})
         response = self.app.get(self.list_url, user=self.user)
         self.assertContains(response, message_link)
 
@@ -362,14 +360,19 @@ class ContactViewTests(WebTest):
 
         self.assertContains(response, self.user.first_name)
         self.assertContains(response, self.user.last_name)
-        self.assertContains(response, self.user.email)
+        self.assertContains(
+            response, reverse("accounts:inbox", kwargs={"uuid": self.user.uuid})
+        )
 
         # Sender contact list page
         response = self.app.get(self.list_url, user=self.user)
 
         self.assertContains(response, existing_user.first_name)
         self.assertContains(response, existing_user.last_name)
-        self.assertContains(response, existing_user.email)
+        self.assertContains(
+            response,
+            reverse("accounts:inbox", kwargs={"uuid": existing_user.uuid}),
+        )
 
     def test_post_with_no_params_in_contact_approval_returns_bad_request(self):
         existing_user = UserFactory(email="ex@example.com")

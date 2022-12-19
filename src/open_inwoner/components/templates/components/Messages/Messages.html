@@ -28,11 +28,11 @@
                                 {% endif %}
 
                                 {% if message.content %}
-                                    {% message message me=me %}
+                                    {% message message user=user %}
                                 {% endif %}
 
                                 {% if message.file %}
-                                    {% message message me=me file=True %}
+                                    {% message message user=user file=True %}
                                 {% endif %}
 
                             </li>
@@ -43,7 +43,8 @@
         </ol>
 
         {% if other_user.is_active %}
-            {% render_form id="message-form" form=form method="POST" action=request.get_full_path enctype="multipart/form-data" async_selector=".messages" %}
+            {% url 'accounts:inbox' as form_action %}
+            {% render_form id="message-form" form=form method="POST" form_action=form_action enctype="multipart/form-data" async_selector=".messages" %}
                 {% csrf_token %}
                 {% hidden form.receiver %}
                 <div class="group-input">
