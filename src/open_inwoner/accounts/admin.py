@@ -1,5 +1,7 @@
 from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.forms import UserChangeForm, UserCreationForm
+from django.forms import ValidationError
 from django.urls import reverse, reverse_lazy
 from django.utils.html import format_html
 from django.utils.translation import ngettext, ugettext_lazy as _
@@ -17,8 +19,32 @@ class ActionInlineAdmin(UUIDAdminFirstInOrder, admin.StackedInline):
     readonly_fields = ("uuid",)
 
 
+class _UserChangeForm(UserChangeForm):
+    def clean(self, *args, **kwargs):
+        cleaned_data = super().clean(*args, **kwargs)
+
+        if (
+            User.objects.filter(email__iexact=cleaned_data["email"])
+            and self.instance.email != cleaned_data["email"]
+        ):
+            raise ValidationError(_("The user with this email already exists."))
+
+
+class _UserCreationForm(UserCreationForm):
+    def clean(self, *args, **kwargs):
+        cleaned_data = super().clean(*args, **kwargs)
+
+        # we use both queries in order to avoid the duplicate validation errors
+        if User.objects.filter(
+            email__iexact=cleaned_data["email"]
+        ) and not User.objects.filter(email=cleaned_data["email"]):
+            raise ValidationError(_("The user with this email already exists."))
+
+
 @admin.register(User)
 class _UserAdmin(UserAdmin):
+    form = _UserChangeForm
+    add_form = _UserCreationForm
     hijack_success_url = reverse_lazy("root")
     list_display_links = (
         "email",
