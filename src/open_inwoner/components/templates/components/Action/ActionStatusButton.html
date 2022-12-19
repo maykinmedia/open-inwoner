@@ -1,10 +1,10 @@
 {% load i18n form_tags icon_tags button_tags dropdown_tags action_tags link_tags %}
 
 <div id="{{ swap_target_id }}">
-{% dropdown text=text class=class %}
+{% dropdown class=class text=text text_icon=icon %}
     {% for status in choices %}
     <div class="dropdown__item">
-        {% button icon=status.icon text=status.text class=status.class disabled=status.disabled extra_attributes=status.extra_attributes size="small" type="button" %}
+        {% button text_icon=None icon=status.icon text=status.text class=status.class disabled=status.disabled extra_attributes=status.extra_attributes size="small" type="button" %}
     </div>
     {% endfor %}
 {% enddropdown %}

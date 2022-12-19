@@ -57,6 +57,7 @@ def button(text, **kwargs):
         - icon: string | the icon that you want to display.
         - icon_position: enum[before, after] | where the icon should be positioned to the text.
         - icon_outlined: bool | if the outlined icons should be used.
+        - text_icon: string | An additional icon to show before the (current value) text.
         - type: string | the type of button that should be used.
         - title: string | The HTML title attribute if different than the text.
         - extra_classes: string | Extra classes that need to be added to the button

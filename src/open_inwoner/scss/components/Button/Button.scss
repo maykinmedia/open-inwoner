@@ -151,6 +151,10 @@
     color: var(--color-danger-lighter);
   }
 
+  &__text-wrapper {
+    display: flex;
+  }
+
   > .link__text {
     width: 100%;
   }
