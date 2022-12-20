@@ -16,7 +16,7 @@ class TestListItem(InclusionTagWebTest):
     tag = "messages"
 
     def setUp(self) -> None:
-        self.me = UserFactory.create(
+        self.user = UserFactory.create(
             first_name="My", last_name="User", email="myuser@example.com"
         )
         self.other_user = UserFactory.create(
@@ -24,25 +24,25 @@ class TestListItem(InclusionTagWebTest):
         )
 
         self.message_1 = MessageFactory.create(
-            sender=self.me,
+            sender=self.user,
             receiver=self.other_user,
             created_on=timezone.now() - datetime.timedelta(days=2),
             content="Lorem ipsum.",
         )
         self.message_2 = MessageFactory.create(
-            sender=self.me,
+            sender=self.user,
             receiver=self.other_user,
             created_on=timezone.now() - datetime.timedelta(days=1),
             content="Dolor sit amet.",
         )
         self.message_3 = MessageFactory.create(
             sender=self.other_user,
-            receiver=self.me,
+            receiver=self.user,
             created_on=timezone.now(),
             content="Consectetur adipiscing elit.",
         )
         self.message_4 = MessageFactory.create(
-            sender=self.me,
+            sender=self.user,
             receiver=self.other_user,
             created_on=timezone.now() - datetime.timedelta(hours=2),
             content="Maecenas dignissim felis nec purus viverra.",
@@ -52,8 +52,8 @@ class TestListItem(InclusionTagWebTest):
 
         self.config = {
             "message_list": message_queryset,
-            "me": self.me,
-            "form": InboxForm(user=self.me),
+            "user": self.user,
+            "form": InboxForm(user=self.user),
             "other_user": self.other_user,
             "status": "Dolor sit amet.",
         }
@@ -62,8 +62,8 @@ class TestListItem(InclusionTagWebTest):
         self.assertRender(
             {
                 "message_list": [],
-                "me": self.me,
-                "form": InboxForm(user=self.me),
+                "user": self.user,
+                "form": InboxForm(user=self.user),
                 "other_user": self.other_user,
                 "status": "Dolor sit amet.",
             }

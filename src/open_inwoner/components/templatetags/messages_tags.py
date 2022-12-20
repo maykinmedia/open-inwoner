@@ -16,7 +16,7 @@ register = template.Library()
 def messages(
     context,
     message_list: MessageQuerySet,
-    me: User,
+    user: User,
     form: Form,
     other_user: str,
     status: str,
@@ -25,7 +25,7 @@ def messages(
     Generate all messages in a conversation and shows the form to add a new message
 
     Usage:
-        {% messages message_list=messages me=request.user form=message_form other_user=other_user status="open" %}
+        {% messages message_list=messages user=request.user form=message_form other_user=other_user status="open" %}
 
     Variables:
         + message_list: Message[] | a list of messages that needs to be displayed.
@@ -43,7 +43,7 @@ def messages(
         """
         Returns a list of dates to render message(s) for.
         """
-        dates = sorted(set([m.created_on.date() for m in message_list]))
+        dates = sorted(set(m.created_on.date() for m in message_list))
         return dates
 
     def get_date_text(date) -> Union[str, datetime.date]:
@@ -69,9 +69,11 @@ def messages(
             {
                 "date": d,
                 "text": get_date_text(d),
-                "messages": sorted(
-                    [m for m in message_list if m.created_on.date() == d],
-                    key=lambda m: m.created_on,
+                "messages": list(
+                    sorted(
+                        (m for m in message_list if m.created_on.date() == d),
+                        key=lambda m: m.created_on,
+                    )
                 ),
             }
             for d in dates
@@ -81,7 +83,7 @@ def messages(
         **context.flatten(),
         "days": get_messages_by_date(message_list),
         "form": form,
-        "me": me,
+        "user": user,
         "status": status,
         "other_user": other_user,
         "subject": other_user.get_full_name(),
@@ -89,12 +91,12 @@ def messages(
 
 
 @register.inclusion_tag("components/Messages/Message.html")
-def message(message: Message, me: User, file=False) -> dict:
+def message(message: Message, user: User, file=False) -> dict:
     """
     Display a message
 
     Usage:
-        {% message message="this is a message" ours=False %}
+        {% message message user %}
 
     Variables:
         + message: string | the message that needs to be displayed.
@@ -104,4 +106,4 @@ def message(message: Message, me: User, file=False) -> dict:
     Extra context:
         - ours: bool | if we send the message or not.
     """
-    return {"message": message, "ours": message.sender == me, "file": file}
+    return {"message": message, "ours": message.sender == user, "file": file}

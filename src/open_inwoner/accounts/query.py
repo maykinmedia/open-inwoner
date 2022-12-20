@@ -3,13 +3,13 @@ from django.db.models.query import QuerySet
 
 
 class MessageQuerySet(QuerySet):
-    def get_conversations_for_user(self, me: "User") -> "MessageQuerySet":
+    def get_conversations_for_user(self, user: "User") -> "MessageQuerySet":
         """
         I apologize;
 
         Summary:
 
-            Returns every conversation involving me, newest first.
+            Returns every conversation involving user, newest first.
 
         Details:
 
@@ -28,42 +28,38 @@ class MessageQuerySet(QuerySet):
 
         """
         filtered_messages = (
-            self.filter(Q(receiver=me) | Q(sender=me))
+            self.filter(Q(receiver=user) | Q(sender=user))
             .annotate(
-                other_user_id=Case(
-                    When(receiver=me, then=F("sender")), default=F("receiver")
+                other_user_uuid=Case(
+                    When(receiver=user, then=F("sender__uuid")),
+                    default=F("receiver__uuid"),
                 )
             )
             .order_by()
         )
         grouped_messages = (
-            filtered_messages.filter(other_user_id=OuterRef("other_user_id"))
-            .values("other_user_id")
+            filtered_messages.filter(other_user_uuid=OuterRef("other_user_uuid"))
+            .values("other_user_uuid")
             .annotate(max_id=Max("id"))
             .values("max_id")
         )
         result = (
             self.annotate(
-                other_user_id=Case(
-                    When(receiver=me, then=F("sender")), default=F("receiver")
+                other_user_uuid=Case(
+                    When(receiver=user, then=F("sender__uuid")),
+                    default=F("receiver__uuid"),
                 )
             )
             .filter(id=Subquery(grouped_messages))
             .annotate(
-                other_user_email=Case(
-                    When(receiver=me, then=F("sender__email")),
-                    default=F("receiver__email"),
-                )
-            )
-            .annotate(
                 other_user_first_name=Case(
-                    When(receiver=me, then=F("sender__first_name")),
+                    When(receiver=user, then=F("sender__first_name")),
                     default=F("receiver__first_name"),
                 )
             )
             .annotate(
                 other_user_last_name=Case(
-                    When(receiver=me, then=F("sender__last_name")),
+                    When(receiver=user, then=F("sender__last_name")),
                     default=F("receiver__last_name"),
                 )
             )
@@ -72,11 +68,12 @@ class MessageQuerySet(QuerySet):
 
         return result
 
-    def get_messages_between_users(self, me, other_user) -> "MessageQuerySet":
+    def get_messages_between_users(self, user, other_user) -> "MessageQuerySet":
         """grouped by date"""
         return (
             self.filter(
-                Q(sender=me, receiver=other_user) | Q(sender=other_user, receiver=me)
+                Q(sender=user, receiver=other_user)
+                | Q(sender=other_user, receiver=user)
             )
             .select_related(
                 "sender",
@@ -85,12 +82,14 @@ class MessageQuerySet(QuerySet):
             .order_by("-created_on")
         )
 
-    def mark_seen(self, me, other_user) -> int:
+    def mark_seen(self, user, other_user) -> int:
         """
         Mark messages as seen between two users.
         Returns the number of updated messages.
         """
-        return self.filter(receiver=me, sender=other_user, seen=False).update(seen=True)
+        return self.filter(receiver=user, sender=other_user, seen=False).update(
+            seen=True
+        )
 
 
 class InviteQuerySet(QuerySet):

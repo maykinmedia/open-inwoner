@@ -37,9 +37,10 @@ from .views.actions import ActionDeleteView
 app_name = "accounts"
 urlpatterns = [
     path("inbox/", InboxView.as_view(), name="inbox"),
+    path("inbox/conversation/<str:uuid>/", InboxView.as_view(), name="inbox"),
     path("inbox/start/", InboxStartView.as_view(), name="inbox_start"),
     path(
-        "inbox/<str:uuid>/download/",
+        "inbox/files/<str:uuid>/download/",
         InboxPrivateMediaView.as_view(),
         name="inbox_download",
     ),

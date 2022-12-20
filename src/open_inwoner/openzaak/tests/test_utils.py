@@ -4,12 +4,21 @@ from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.constants import RolTypes, VertrouwelijkheidsAanduidingen
 from zgw_consumers.test import generate_oas_component
 
-from open_inwoner.openzaak.api_models import InformatieObject, Rol
-from open_inwoner.openzaak.utils import get_role_name_display, is_info_object_visible
+from open_inwoner.openzaak.api_models import InformatieObject, Rol, Zaak, ZaakType
+from open_inwoner.openzaak.models import OpenZaakConfig
+from open_inwoner.openzaak.utils import (
+    get_role_name_display,
+    is_info_object_visible,
+    is_zaak_visible,
+)
+
+ZAKEN_ROOT = "https://zaken.nl/api/v1/"
+CATALOGI_ROOT = "https://catalogi.nl/api/v1/"
+DOCUMENTEN_ROOT = "https://documenten.nl/api/v1/"
 
 
 class TestUtils(TestCase):
-    def test_filter_info_object_visibility(self):
+    def test_is_info_object_visible(self):
         """
         openbaar
         beperkt_openbaar
@@ -93,6 +102,56 @@ class TestUtils(TestCase):
                 ),
             )
             self.assertFalse(is_info_object_visible(info_object, "non_existent_key"))
+
+    def test_is_zaak_visible(self):
+        config = OpenZaakConfig.get_solo()
+        self.assertEqual(
+            config.zaak_max_confidentiality, VertrouwelijkheidsAanduidingen.openbaar
+        )
+
+        zaak = factory(
+            Zaak,
+            generate_oas_component(
+                "zrc",
+                "schemas/Zaak",
+                uuid="d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
+                url=f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
+                zaaktype=f"{CATALOGI_ROOT}zaaktypen/53340e34-7581-4b04-884f",
+                identificatie="ZAAK-2022-0000000024",
+                vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+            ),
+        )
+        zaaktype = factory(
+            ZaakType,
+            generate_oas_component(
+                "ztc",
+                "schemas/ZaakType",
+                url=f"{CATALOGI_ROOT}zaaktypen/53340e34-7581-4b04-884f",
+                catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+                indicatieInternOfExtern="extern",
+            ),
+        )
+
+        with self.subTest("raise when zaak.zaaktype not resolved"):
+            with self.assertRaisesMessage(
+                ValueError, "expected zaak.zaaktype to be resolved from url to model"
+            ):
+                is_zaak_visible(zaak)
+
+        # resolve the zaaktype
+        zaak.zaaktype = zaaktype
+
+        with self.subTest("normal visible"):
+            self.assertTrue(is_zaak_visible(zaak))
+
+        with self.subTest("invisible when zaaktype intern"):
+            zaaktype.indicatie_intern_of_extern = "intern"
+            self.assertFalse(is_zaak_visible(zaak))
+
+        with self.subTest("invisible when zaak vertrouwelijkheidaanduiding too high"):
+            zaaktype.indicatie_intern_of_extern = "extern"
+            zaak.vertrouwelijkheidaanduiding = VertrouwelijkheidsAanduidingen.geheim
+            self.assertFalse(is_zaak_visible(zaak))
 
     def test_get_role_name_display(self):
         def get_role(type_: str, identification: dict) -> Rol:

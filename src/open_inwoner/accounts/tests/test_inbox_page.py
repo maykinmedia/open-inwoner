@@ -1,7 +1,7 @@
 from unittest import skip
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 
 from django_webtest import WebTest
 from privates.test import temp_private_root
@@ -14,20 +14,37 @@ from .factories import MessageFactory, UserFactory
 
 
 class InboxPageTests(WebTest):
-    url = reverse_lazy("accounts:inbox")
-
     def setUp(self) -> None:
         super().setUp()
 
-        self.me = UserFactory.create()
-        self.contact1 = UserFactory.create()
-        self.contact2 = UserFactory.create()
-        self.me.user_contacts.add(self.contact1)
-        self.me.user_contacts.add(self.contact2)
-        self.message1 = MessageFactory.create(sender=self.me, receiver=self.contact1)
-        self.message2 = MessageFactory.create(receiver=self.me, sender=self.contact2)
+        self.user = UserFactory.create(
+            email="user@exampel.com", first_name="User", last_name="U"
+        )
+        self.contact1 = UserFactory.create(
+            email="contact1@exampel.com", first_name="Contact1", last_name="U"
+        )
+        self.contact2 = UserFactory.create(
+            email="contact2@exampel.com", first_name="Contact2", last_name="U"
+        )
+        self.user.user_contacts.add(self.contact1)
+        self.user.user_contacts.add(self.contact2)
+        self.message1 = MessageFactory.create(
+            content="from user to contact1", sender=self.user, receiver=self.contact1
+        )
+        self.message2 = MessageFactory.create(
+            content="from contact2 to user", receiver=self.user, sender=self.contact2
+        )
 
-        self.app.set_user(self.me)
+        self.app.set_user(self.user)
+
+        self.url = reverse("accounts:inbox")
+        self.contact1_url = reverse(
+            "accounts:inbox", kwargs={"uuid": self.contact1.uuid}
+        )
+
+    def test_user_contacts_are_symetrical(self):
+        self.assertIn(self.contact1, self.user.user_contacts.all())
+        self.assertIn(self.user, self.contact1.user_contacts.all())
 
     def test_show_last_conversation_without_other_user(self):
         response = self.app.get(self.url, auto_follow=True)
@@ -41,9 +58,7 @@ class InboxPageTests(WebTest):
         self.assertEqual(messages[0].id, self.message2.id)
 
     def test_show_conversation_with_user_specified(self):
-        response = self.app.get(
-            self.url, {"with": self.contact1.email}, auto_follow=True
-        )
+        response = self.app.get(self.contact1_url, auto_follow=True)
 
         self.assertEqual(response.status_code, 200)
         conversations = response.context["conversations"]["object_list"]
@@ -54,9 +69,7 @@ class InboxPageTests(WebTest):
         self.assertEqual(messages[0].id, self.message1.id)
 
     def test_send_message(self):
-        response = self.app.get(
-            self.url, {"with": self.contact1.email}, auto_follow=True
-        )
+        response = self.app.get(self.contact1_url, auto_follow=True)
         self.assertEqual(response.status_code, 200)
 
         form = response.forms["message-form"]
@@ -68,14 +81,12 @@ class InboxPageTests(WebTest):
 
         last_message = Message.objects.order_by("-pk").first()
         self.assertEqual(last_message.content, "some msg")
-        self.assertEqual(last_message.sender, self.me)
+        self.assertEqual(last_message.sender, self.user)
         self.assertEqual(last_message.receiver, self.contact1)
 
     @temp_private_root()
     def test_send_file(self):
-        response = self.app.get(
-            self.url, {"with": self.contact1.email}, auto_follow=True
-        )
+        response = self.app.get(self.contact1_url, auto_follow=True)
         self.assertEqual(response.status_code, 200)
 
         form = response.forms["message-form"]
@@ -87,7 +98,7 @@ class InboxPageTests(WebTest):
 
         last_message = Message.objects.order_by("-pk").first()
         self.assertEqual(last_message.content, "")
-        self.assertEqual(last_message.sender, self.me)
+        self.assertEqual(last_message.sender, self.user)
         self.assertEqual(last_message.receiver, self.contact1)
 
         file = last_message.file
@@ -95,9 +106,7 @@ class InboxPageTests(WebTest):
         self.assertEqual(file.read(), b"test content")
 
     def test_send_empty_message(self):
-        response = self.app.get(
-            self.url, {"with": self.contact1.email}, auto_follow=True
-        )
+        response = self.app.get(self.contact1_url, auto_follow=True)
         self.assertEqual(response.status_code, 200)
 
         form = response.forms["message-form"]
@@ -111,13 +120,16 @@ class InboxPageTests(WebTest):
 
     def test_mark_messages_as_seen(self):
         other_user = UserFactory.create()
-        message_received = MessageFactory.create(receiver=self.me, sender=other_user)
-        message_sent = MessageFactory.create(sender=self.me, receiver=other_user)
+        message_received = MessageFactory.create(receiver=self.user, sender=other_user)
+        message_sent = MessageFactory.create(sender=self.user, receiver=other_user)
 
         for message in [message_sent, message_received]:
             self.assertFalse(message.seen)
 
-        response = self.app.get(self.url, {"with": other_user.email}, auto_follow=True)
+        response = self.app.get(
+            reverse("accounts:inbox", kwargs={"uuid": other_user.uuid}),
+            auto_follow=True,
+        )
         self.assertEqual(response.status_code, 200)
 
         for message in [message_sent, message_received]:
@@ -125,6 +137,43 @@ class InboxPageTests(WebTest):
 
         self.assertFalse(message_sent.seen)
         self.assertTrue(message_received.seen)
+
+    def test_reply_message(self):
+        # test if a contact can reply if they were added to 'self.user.user_contacts' (eg: symmetrical)
+        self.app.set_user(self.contact1)
+        response = self.app.get(self.url, auto_follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertContains(response, self.message1.content)
+
+        form = response.forms["message-form"]
+        form["content"] = "some msg"
+
+        response = form.submit().follow()
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "some msg")
+
+        last_message = Message.objects.order_by("-pk").first()
+        self.assertEqual(last_message.content, "some msg")
+        self.assertEqual(last_message.sender, self.contact1)
+        self.assertEqual(last_message.receiver, self.user)
+
+    def test_no_messages(self):
+        Message.objects.all().delete()
+
+        response = self.app.get(self.url, auto_follow=True)
+        self.assertEqual(response.status_code, 200)
+        # no form
+        self.assertFalse(response.pyquery("form#message-form"))
+
+    def test_no_contacts(self):
+        self.contact1.delete()
+        self.contact2.delete()
+
+        response = self.app.get(self.url, auto_follow=True)
+        self.assertEqual(response.status_code, 200)
+        # no form
+        self.assertFalse(response.pyquery("form#message-form"))
 
 
 class BaseInboxPageSeleniumTests:
@@ -138,17 +187,17 @@ class BaseInboxPageSeleniumTests:
         cls.selenium.implicitly_wait(10)
 
     def setUp(self):
-        self.me = UserFactory.create()
-        self.user1 = UserFactory.create(
+        self.user = UserFactory.create()
+        self.contact_1 = UserFactory.create(
             first_name="user", last_name="1", email="user1@example.com"
         )
-        self.user2 = UserFactory.create(
+        self.contact_2 = UserFactory.create(
             first_name="user", last_name="2", email="user2@example.com"
         )
-        self.me.user_contacts.add(self.user1)
-        self.me.user_contacts.add(self.user2)
-        MessageFactory.create(sender=self.me, receiver=self.user1)
-        MessageFactory.create(receiver=self.me, sender=self.user2)
+        self.user.user_contacts.add(self.contact_1)
+        self.user.user_contacts.add(self.contact_2)
+        MessageFactory.create(sender=self.user, receiver=self.contact_1)
+        MessageFactory.create(receiver=self.user, sender=self.contact_2)
 
     def test_async_selector(self):
         self.given_i_am_logged_in()
@@ -186,7 +235,9 @@ class BaseInboxPageSeleniumTests:
         initial_text = initial_message.text
 
         Message.objects.create(
-            receiver=self.me, sender=self.user2, content="Lorem ipsum dolor sit amet."
+            receiver=self.user,
+            sender=self.contact_2,
+            content="Lorem ipsum dolor sit amet.",
         )
 
         # Assert message.
@@ -211,7 +262,7 @@ class BaseInboxPageSeleniumTests:
         self.assertNotIn("#messages-last", self.selenium.current_url)
 
     def given_i_am_logged_in(self):
-        self.force_login(self.me)
+        self.force_login(self.user)
 
     def when_i_navigate_to_page(self):
         self.selenium.get(
