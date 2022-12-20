@@ -7,19 +7,36 @@
         title="{% firstof title text %}"
         aria-label="{% firstof title text %}"
         {% if href|startswith:"http" %}target="_blank"{% endif %}
+        {% as_attributes extra_attributes %}
     >
         {% if icon %}{% icon icon=icon outlined=icon_outlined %}{% endif %}
-        {% if not hide_text %}{{text}}{% endif %}
+        {% if text_icon %}
+            <span class="button__text-wrapper">
+            {% icon icon=text_icon outlined=icon_outlined %}
+            {% if not hide_text %}{{text}}{% endif %}
+            </span>
+        {% else %}
+            {% if not hide_text %}{{text}}{% endif %}
+        {% endif %}
     </a>
 {% else %}
     <button
         class="{{ classes }}"
         type="{{type}}"
         name="{{ name }}"
+        value="{{ value }}"
         title="{% firstof title text %}"
         aria-label="{% firstof title text %}"
+        {% as_attributes extra_attributes %}
     >
         {% if icon %}{% icon icon=icon outlined=icon_outlined %}{% endif %}
-        {% if not hide_text %}{{text}}{% endif %}
+        {% if text_icon %}
+            <span class="button__text-wrapper">
+            {% icon icon=text_icon outlined=icon_outlined %}
+            {% if not hide_text %}{{text}}{% endif %}
+            </span>
+        {% else %}
+            {% if not hide_text %}{{text}}{% endif %}
+        {% endif %}
     </button>
 {% endif %}

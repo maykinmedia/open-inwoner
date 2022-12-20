@@ -35,15 +35,22 @@ def settings(request):
                 "home_map_title": config.home_map_title,
                 "home_map_intro": config.home_map_intro,
                 "home_questionnaire_title": config.home_questionnaire_title,
-                "home_questionnaire_subtitle": config.home_questionnaire_subtitle,
+                "home_questionnaire_intro": config.home_questionnaire_intro,
+                "home_product_finder_title": config.home_product_finder_title,
+                "home_product_finder_intro": config.home_product_finder_intro,
             },
             "theme_page": {
                 "theme_title": config.theme_title,
                 "theme_intro": config.theme_intro,
             },
+            "plans_page": {
+                "plans_intro": config.plans_intro,
+                "plans_no_plans_message": config.plans_no_plans_message,
+                "plans_edit_message": config.plans_edit_message,
+            },
             "questionnaire_page": {
                 "select_questionnaire_title": config.select_questionnaire_title,
-                "select_questionnaire_subtitle": config.select_questionnaire_subtitle,
+                "select_questionnaire_intro": config.select_questionnaire_intro,
             },
             "footer": {
                 "footer_visiting_title": config.footer_visiting_title,
@@ -65,11 +72,11 @@ def settings(request):
         "matomo_url": config.matomo_url,
         "matomo_site_id": config.matomo_site_id,
         "matomo_enabled": config.matomo_enabled,
+        "show_plans": config.show_plans,
+        "show_actions": config.show_actions,
         "menu_categories": Category.get_root_nodes().published(),
         "search_form": SearchForm(),
-        "has_general_faq_questions": Question.objects.filter(
-            category__isnull=True
-        ).exists(),
+        "has_general_faq_questions": Question.objects.general().exists(),
         "settings": dict(
             [(k, getattr(django_settings, k, None)) for k in public_settings]
         ),

@@ -44,12 +44,12 @@ def case_dashboard(case: dict, **kwargs) -> dict:
             },
             {
                 "icon": "task_alt",
-                "label": _("status"),
+                "label": _("Status"),
                 "value": case.get("current_status"),
             },
             {
                 "icon": "description",
-                "label": _("documenten"),
+                "label": _("Documenten"),
                 "value": len(case.get("documents")),
             },
         ]

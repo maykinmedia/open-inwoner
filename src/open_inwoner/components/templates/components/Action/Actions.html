@@ -1,7 +1,7 @@
 {% load i18n form_tags icon_tags button_tags dropdown_tags action_tags link_tags %}
 
-{% render_form form=form method="GET" spaceless=True autosubmit=True form_action=form_action %}
 <div class="actions">
+    {% render_form form=form method="GET" spaceless=True autosubmit=True form_action=form_action %}
     <div class="actions__filters">
         <div class="actions__filter-button">
             {% button text=_("Filter") type="button" bordered=True %}
@@ -13,6 +13,7 @@
             {% input action_form.status no_label=True no_help=True icon="expand_more" %}
         </div>
     </div>
+    {% endrender_form %}
     <div class="actions__list">
         {% for action in actions %}
             <div class="actions__action">
@@ -27,6 +28,13 @@
                             <div class="dropdown__item">
                                 {% button icon="history" text=_("History") href="accounts:action_history" uuid=action.uuid icon_outlined=True transparent=True %}
                             </div>
+                            <div class="dropdown__item">
+                                {% get_action_delete_url action=action plan=plan as action_url %}
+                                {% render_form form=form method="POST" form_action=action_url extra_classes="confirm" spaceless=True data_confirm_title=_("Weet je het zeker dat je deze actie wilt verwijderen?") data_confirm_cancel=_("Nee") data_confirm_default=_("Ja") %}
+                                    {% csrf_token %}
+                                    {% button icon="delete" text=_("Verwijderen") icon_outlined=True transparent=True %}
+                                {% endrender_form %}
+                            </div>
                         {% enddropdown %}
                     {% endif %}
                 </div>
@@ -37,7 +45,11 @@
                 <div class="actions__label">
                     <div class="table__explain">{% trans "Onderdeel van" %}</div>
                     {% if action.plan %}
-                        {% link href=action.plan.get_absolute_url text=action.plan.title %}
+                        {% if show_plans %}
+                            {% link href=action.plan.get_absolute_url text=action.plan.title %}
+                        {% else %}
+                            {{ action.plan.title }}
+                        {% endif %}
                     {% else %}
                         -
                     {% endif %}
@@ -64,7 +76,11 @@
                     <div class="table__explain">
                         {% trans "Status" %}
                     </div>
-                    {{ action.get_status_display }}
+                    {% if action|is_connected:request.user %}
+                        {% action_status_button action=action request=request plan=plan %}
+                    {% else %}
+                        {{ action.get_status_display }}
+                    {% endif %}
                 </div>
             </div>
         {% empty %}
@@ -72,4 +88,3 @@
         {% endfor %}
     </div>
 </div>
-{% endrender_form %}

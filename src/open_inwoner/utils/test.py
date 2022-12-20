@@ -1,6 +1,7 @@
 import tempfile
 from typing import Any, Dict, List
 
+from django.core.cache import caches
 from django.test import override_settings
 
 
@@ -19,3 +20,12 @@ def paginated_response(results: List[dict]) -> Dict[str, Any]:
         "results": results,
     }
     return body
+
+
+class ClearCachesMixin:
+    def setUp(self):
+        super().setUp()
+
+        for cache in caches.all():
+            cache.clear()
+            self.addCleanup(cache.clear)

@@ -1,4 +1,5 @@
 from django.contrib.flatpages.models import FlatPage
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
@@ -138,11 +139,24 @@ class SiteConfiguration(SingletonModel):
         verbose_name=_("Home page questionaire title"),
         help_text=_("Questionnaire title on the home page."),
     )
-    home_questionnaire_subtitle = models.CharField(
-        max_length=255,
+    home_questionnaire_intro = models.TextField(
         default=_("Test met een paar simpele vragen of u recht heeft op een product"),
-        verbose_name=_("Home page questionaire sub-title"),
-        help_text=_("Questionnaire sub-title on the home page."),
+        verbose_name=_("Home page questionaire intro"),
+        help_text=_("Questionnaire intro text on the home page."),
+    )
+    home_product_finder_title = models.CharField(
+        max_length=255,
+        default=_("Productzoeker"),
+        verbose_name=_("Product finder title"),
+        help_text=_("Product finder's title on the home page."),
+    )
+    home_product_finder_intro = models.TextField(
+        default=_(
+            "Met een paar simpele vragen ziet u welke producten passen bij uw situatie"
+        ),
+        verbose_name=_("Home product finder intro"),
+        blank=True,
+        help_text=_("Product finder's intro text on the home page."),
     )
     select_questionnaire_title = models.CharField(
         max_length=255,
@@ -150,14 +164,33 @@ class SiteConfiguration(SingletonModel):
         verbose_name=_("Questionaire selector widget title"),
         help_text=_("Questionaire selector title on the theme and profile pages."),
     )
-    select_questionnaire_subtitle = models.CharField(
-        max_length=255,
+    select_questionnaire_intro = models.TextField(
         default=_(
             "Kies hieronder één van de volgende vragenlijsten om de zelfdiagnose te starten."
         ),
-        verbose_name=_("Questionaire selector widget sub-title"),
-        help_text=_("Questionaire selector sub-title on the theme and profile pages."),
+        verbose_name=_("Questionaire selector widget intro"),
+        help_text=_("Questionaire selector intro on the theme and profile pages."),
     )
+    plans_intro = models.TextField(
+        default=_(
+            "Hier werkt u aan uw doelen. Dit doet u samen met uw contactpersoon bij de gemeente. "
+        ),
+        verbose_name=_("Plan pages intro"),
+        help_text=_("The sub-title for the plan page."),
+    )
+    plans_no_plans_message = models.CharField(
+        max_length=255,
+        default=_("U heeft nog geen plan gemaakt."),
+        verbose_name=_("No plans message"),
+        help_text=_("The message in the plans listing when user has no plans."),
+    )
+    plans_edit_message = models.CharField(
+        max_length=255,
+        default=_("Hier kunt u uw doel aanpassen"),
+        verbose_name=_("Edit goal message"),
+        help_text=_("The message when a user edits a goal."),
+    )
+
     footer_visiting_title = models.CharField(
         max_length=255,
         default="",
@@ -299,6 +332,20 @@ class SiteConfiguration(SingletonModel):
             "Als dit is aangevinkt en er zijn product condities gemaakt, dan wordt op de homepagina de productzoeker weergegeven."
         ),
     )
+    show_plans = models.BooleanField(
+        verbose_name=_("Laat samenwerken zien op de homepage en menu"),
+        default=True,
+        help_text=_(
+            "Als dit is aangevinkt, dan wordt op de homepagina en het gebruikers profiel de samenwerken feature weergegeven."
+        ),
+    )
+    show_actions = models.BooleanField(
+        verbose_name=_("Laat acties zien op de profiel pagina"),
+        default=True,
+        help_text=_(
+            "Als dit is aangevinkt, dan worded op de gebruikers profiel pagina de acties weergegeven."
+        ),
+    )
     openid_connect_logo = FilerImageField(
         verbose_name=_("Openid Connect Logo"),
         null=True,
@@ -321,6 +368,13 @@ class SiteConfiguration(SingletonModel):
 
     def __str__(self):
         return str(_("Site Configuration"))
+
+    def clean(self):
+        super().clean()
+
+        if self.show_plans and not self.show_actions:
+            msg = _("Als Samenwerken actief is moeten Acties ook actief zijn")
+            raise ValidationError({"show_actions": msg, "show_plans": msg})
 
     @property
     def get_primary_color(self):

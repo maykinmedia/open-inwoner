@@ -13,7 +13,7 @@
                 {% button href="accounts:action_list_export" text=_("Exporteer naar PDF") hide_text=True icon="file-pdf" icon_outlined=True transparent=True secondary=True %}
             {% endbutton_row %}
 
-            {% actions actions=actions request=request action_form=action_form %}
+            {% actions actions=actions request=request action_form=action_form show_plans=show_plans %}
 
             {% pagination page_obj=page_obj paginator=paginator request=request href="accounts:my_profile" text=_("Terug naar mijn profiel") %}
         {% endrender_column %}

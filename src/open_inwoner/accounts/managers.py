@@ -6,6 +6,7 @@ from digid_eherkenning.managers import BaseDigidManager, BaseeHerkenningManager
 from open_inwoner.utils.hash import generate_email_from_string
 
 from .choices import LoginTypeChoices
+from .query import UserQuerySet
 
 
 class DigidManager(BaseDigidManager):
@@ -39,7 +40,7 @@ class eHerkenningManager(BaseeHerkenningManager):
         )
 
 
-class UserManager(BaseUserManager):
+class UserManager(BaseUserManager.from_queryset(UserQuerySet)):
     use_in_migrations = True
 
     def _create_user(self, email, password, **extra_fields):
@@ -68,25 +69,10 @@ class UserManager(BaseUserManager):
 
         return self._create_user(email, password, **extra_fields)
 
-    def get_active_contact_users(self, me):
-        active_contacts = me.get_active_contacts().values_list(
-            "contact_user__id", flat=True
-        )
-        return self.get_queryset().filter(id__in=active_contacts)
-
-    def get_extended_contact_users(self, me):
-        """returns active users from your contacts and active users who assigned you as a contact"""
-        active_contacts = me.get_active_contacts().values_list(
-            "contact_user__id", flat=True
-        )
-        assigned_contacts = me.get_assigned_active_contacts().values_list(
-            "created_by__id", flat=True
-        )
-        return self.get_queryset().filter(
-            id__in=list(active_contacts) + list(assigned_contacts)
-        )
-
 
 class ActionQueryset(QuerySet):
+    def visible(self):
+        return self.filter(is_deleted=False)
+
     def connected(self, user):
         return self.filter(Q(created_by=user) | Q(is_for=user)).distinct()

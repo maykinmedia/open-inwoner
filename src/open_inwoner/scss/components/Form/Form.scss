@@ -24,6 +24,13 @@
     }
   }
 
+  &--flex {
+    .form__actions {
+      display: flex;
+      gap: var(--spacing-medium);
+    }
+  }
+
   /// Columns.
 
   @media (min-width: 768px) {
@@ -146,6 +153,7 @@
       right: 5px;
       top: 50%;
       transform: translateY(-50%);
+      pointer-events: none;
     }
   }
 }

@@ -92,6 +92,9 @@ CACHES = {
     },
 }
 
+# ZGW API caches
+CACHE_ZGW_CATALOGI_TIMEOUT = config("CACHE_ZGW_CATALOGI_TIMEOUT", default=60 * 60 * 24)
+CACHE_ZGW_ZAKEN_TIMEOUT = config("CACHE_ZGW_ZAKEN_TIMEOUT", default=60 * 3)
 
 #
 # APPLICATIONS enabled for this project
@@ -144,6 +147,7 @@ INSTALLED_APPS = [
     "colorfield",
     "view_breadcrumbs",
     "django_better_admin_arrayfield",
+    "simple_certmanager",
     "zgw_consumers",
     "mail_editor",
     "ckeditor",
@@ -156,6 +160,7 @@ INSTALLED_APPS = [
     "mozilla_django_oidc_db",
     "sessionprofile",
     "openformsclient",
+    "django_htmx",
     # Project applications.
     "open_inwoner.accounts",
     "open_inwoner.components",
@@ -180,6 +185,7 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
+    "django_htmx.middleware.HtmxMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "csp.contrib.rate_limiting.RateLimitedCSPMiddleware",
     "csp.middleware.CSPMiddleware",
@@ -645,6 +651,51 @@ MAIL_EDITOR_CONF = {
             {"name": "email", "description": _("Email of the invited user")},
         ],
     },
+    "contact_approval": {
+        "name": _("Contact Approval Email"),
+        "description": _(
+            "This email is used to notify people for pending approvals of new contacts"
+        ),
+        "subject_default": "Goedkeuring geven op {{ site_name }}: {{ sender_name }} wilt u toevoegen als contactpersoon",
+        "body_default": """
+            <p>Beste</p>
+
+            <p>Gebruiker {{ sender_name }} wilt u toevoegen als contactpersoon op {{ site_name }}.
+            Volg onderstaande link waarop u uw goedkeuring kan geven of kan aangeven {{ sender_name }} niet als contactpersoon te willen. </p>
+
+            <p><a href="{{ contacts_link }}">Mijn Contacten</a> </p>
+
+            <p>U kunt ook op een later moment toestemming geven, het verzoek van {{ sender_name }} blijft open staat totdat u een keuze heeft gemaakt.</p>
+
+            <p>Met vriendelijke groet,
+            {{ site_name }} </p>
+        """,
+        "subject": [
+            {
+                "name": "site_name",
+                "description": _("Name of the site."),
+            },
+            {
+                "name": "sender_name",
+                "description": _("Full name of the inviter-sender"),
+            },
+        ],
+        "body": [
+            {
+                "name": "sender_name",
+                "description": _("Full name of the inviter-sender"),
+            },
+            {
+                "name": "site_name",
+                "description": _("Name of the site"),
+            },
+            {
+                "name": "contacts_link",
+                "description": _("Link to contact list page."),
+            },
+            {"name": "email", "description": _("Email of the receiver user")},
+        ],
+    },
     "new_messages": {
         "name": _("New Message Email"),
         "description": _(
@@ -920,7 +971,7 @@ THUMBNAIL_ALIASES = {
     "": {
         "logo": {
             "size": (21600, 60),
-            "upscale": True,
+            "upscale": False,
         },
         "card-image": {
             "size": (256, 320),

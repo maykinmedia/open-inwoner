@@ -2,6 +2,7 @@ import logging
 
 from django.contrib.admin import models
 from django.contrib.admin.utils import _get_changed_field_labels_from_form
+from django.forms.fields import TypedChoiceField
 from django.utils.encoding import force_str
 from django.utils.text import get_text_list
 from django.utils.translation import ugettext_lazy as _
@@ -31,6 +32,36 @@ def get_change_message(fields=None, form=None):
     return _("Changed: {changed_fields}.").format(
         changed_fields=get_text_list(changed_fields, _("and"))
     )
+
+
+def get_verbose_change_message(form):
+    """
+    Create a change message with extended data.
+    Details about the modified values are also returned.
+    """
+    messages = []
+
+    for field in form.changed_data:
+        updated_data = form.cleaned_data[field] or "null"
+        updated_field = form.fields[field]
+
+        # Prepare message with translated labels
+        if isinstance(updated_field, TypedChoiceField):
+            updated_data = dict(updated_field.choices)[updated_data]
+            messages.append(
+                _("{label} changed to {updated_data}.").format(
+                    label=updated_field.label.capitalize(),
+                    updated_data=updated_data,
+                )
+            )
+        else:
+            label = updated_field.label or field
+            messages.append(
+                _("{label} changed to {updated_data}.").format(
+                    label=label.capitalize(), updated_data=updated_data
+                )
+            )
+    return messages
 
 
 def addition(request, object, message=""):

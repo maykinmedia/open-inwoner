@@ -7,7 +7,7 @@
         {% button href="plans:plan_create" text=_("Start nieuwe samenwerking") primary=True icon="group" icon_outlined=True %}
     </h1>
     <p class="p">
-        {% trans "Hier werkt u samen met uw contactpersonen aan uw doelen." %}
+        {{configurable_text.plans_page.plans_intro|linebreaksbr}}
     </p>
 
     {% card_container plans=object_list columns=2 %}

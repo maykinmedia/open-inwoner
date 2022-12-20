@@ -43,6 +43,6 @@
     {% endif %}
 
     <h2 class="h2 h2--extra">{% trans "Acties" %}</h2>
-    {% include "export/include/actions.html" with actions=object.actions.all %}
+    {% include "export/include/actions.html" with actions=object.actions.visible %}
 
 {% endblock %}

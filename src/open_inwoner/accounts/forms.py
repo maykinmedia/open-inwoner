@@ -8,9 +8,10 @@ from django_registration.forms import RegistrationForm
 
 from open_inwoner.pdc.models.category import Category
 from open_inwoner.utils.forms import LimitedUploadFileField, PrivateFileWidget
+from open_inwoner.utils.validators import validate_charfield_entry
 
 from .choices import EmptyContactTypeChoices, EmptyStatusChoices, LoginTypeChoices
-from .models import Action, Contact, Document, Invite, Message, User
+from .models import Action, Document, Invite, Message, User
 
 
 class CustomRegistrationForm(RegistrationForm):
@@ -53,6 +54,8 @@ class UserForm(forms.ModelForm):
         fields = (
             "first_name",
             "last_name",
+            "email",
+            "phonenumber",
             "birthday",
             "street",
             "housenumber",
@@ -120,55 +123,51 @@ class ContactFilterForm(forms.Form):
     )
 
 
-class ContactForm(forms.ModelForm):
-    def __init__(self, user, create, *args, **kwargs):
-        self.user = user
-        self.create = create
-        super().__init__(*args, **kwargs)
+class ContactCreateForm(forms.Form):
+    first_name = forms.CharField(max_length=255, validators=[validate_charfield_entry])
+    last_name = forms.CharField(max_length=255, validators=[validate_charfield_entry])
+    email = forms.EmailField()
 
-    class Meta:
-        model = Contact
-        fields = ("first_name", "last_name", "email", "phonenumber")
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
 
     def clean(self):
         cleaned_data = super().clean()
         email = cleaned_data.get("email")
 
-        if self.create and email:
-            if (
-                self.user.contacts.filter(email=email).exists()
-                or self.user.assigned_contacts.filter(created_by__email=email).exists()
-            ):
+        if email:
+            if email == self.user.email:
+                raise ValidationError(
+                    _("Please enter a valid email address of a contact.")
+                )
+
+            if self.user.is_email_of_contact(email):
                 raise ValidationError(
                     _(
                         "Het ingevoerde e-mailadres komt al voor in uw contactpersonen. Pas de gegevens aan en probeer het opnieuw."
                     )
                 )
 
-    def save(self, commit=True):
-        if not self.instance.pk:
-            self.instance.created_by = self.user
-
-        if not self.instance.pk and self.instance.email:
-            contact_user = User.objects.filter(email=self.instance.email).first()
-            if contact_user:
-                self.instance.contact_user = contact_user
-
-        return super().save(commit=commit)
+            existing_user = User.objects.filter(email__iexact=email)
+            if existing_user and existing_user.get().is_not_active():
+                raise ValidationError(
+                    _("The user cannot be added, their account has been deleted.")
+                )
 
 
 class UserField(forms.ModelChoiceField):
-    me = None
+    user = None
 
     def label_from_instance(self, obj: User) -> str:
         return obj.get_full_name()
 
     def has_changed(self, initial, data):
-        # consider 'me' as empty value
-        if initial == self.me.id and not data:
+        # consider 'user' as empty value
+        if initial == self.user.id and not data:
             return False
 
-        if data == self.me.id and not initial:
+        if data == self.user.id and not initial:
             return False
 
         return super().has_changed(initial, data)
@@ -210,7 +209,7 @@ class ActionForm(forms.ModelForm):
             # options are not limited to None for old actions support
             self.fields["is_for"].disabled = True
 
-        self.fields["is_for"].me = user
+        self.fields["is_for"].user = user
 
     def clean_end_date(self):
         data = self.cleaned_data["end_date"]
@@ -280,7 +279,7 @@ class InboxForm(forms.ModelForm):
     receiver = forms.ModelChoiceField(
         label=_("Contactpersoon"),
         queryset=User.objects.none(),
-        to_field_name="email",
+        to_field_name="uuid",
         widget=forms.HiddenInput(
             attrs={"placeholder": _("Voer de naam in van uw contactpersoon")}
         ),
@@ -305,12 +304,10 @@ class InboxForm(forms.ModelForm):
 
         super().__init__(**kwargs)
 
-        extended_contact_users = User.objects.get_extended_contact_users(self.user)
-        choices = [
-            [u.email, f"{u.first_name} {u.last_name}"] for u in extended_contact_users
-        ]
+        contact_users = self.user.get_active_contacts()
+        choices = [[str(u.uuid), u.get_full_name()] for u in contact_users]
         self.fields["receiver"].choices = choices
-        self.fields["receiver"].queryset = extended_contact_users
+        self.fields["receiver"].queryset = contact_users
 
     def clean(self):
         cleaned_data = super().clean()

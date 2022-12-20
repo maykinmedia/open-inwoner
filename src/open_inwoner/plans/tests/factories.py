@@ -28,6 +28,15 @@ class PlanFactory(factory.django.DjangoModelFactory):
     end_date = factory.Faker("date")
     created_by = factory.SubFactory(UserFactory)
 
+    @factory.post_generation
+    def plan_contacts(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted:
+            for user in extracted:
+                self.plan_contacts.add(user)
+
 
 class PlanTemplateFactory(factory.django.DjangoModelFactory):
     class Meta:

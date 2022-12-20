@@ -5,6 +5,7 @@ from .actions import (
     ActionListExportView,
     ActionListView,
     ActionPrivateMediaView,
+    ActionUpdateStatusTagView,
     ActionUpdateView,
 )
 from .auth import (
@@ -12,12 +13,17 @@ from .auth import (
     LogPasswordResetConfirmView,
     LogPasswordResetView,
 )
-from .cases import CasesListView, CasesStatusView
+from .cases import (
+    CaseDetailView,
+    CaseDocumentDownloadView,
+    ClosedCaseListView,
+    OpenCaseListView,
+)
 from .contacts import (
+    ContactApprovalView,
     ContactCreateView,
     ContactDeleteView,
     ContactListView,
-    ContactUpdateView,
 )
 from .csrf import csrf_failure
 from .document import DocumentPrivateMediaView

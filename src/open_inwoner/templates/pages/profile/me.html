@@ -50,7 +50,7 @@
 
 <h1 class="h1" id="overview">{% trans "Persoonlijk overzicht" %}</h1>
 
-<div class="tabled tabled--flexible" id="overview">
+<div class="tabled tabled--flexible personal-overview">
     <div class="tabled__row">
         <div class="tabled__item tabled__item--bold">{% trans "Interessegebieden" %}</div>
         <div class="tabled__item">{{ theme_text }}</div>
@@ -79,11 +79,13 @@
             <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href='questionnaire:questionnaire_list' text=_('Start zelfdiagnose') icon="arrow_forward" icon_position="after" primary=True %}</div>
         </div>
     {% endif %}
-    <div class="tabled__row">
+    {% if show_actions %}
+    <div class="personal-overview__actions tabled__row">
         <div class="tabled__item tabled__item--bold">{% trans "Acties" %}</div>
         <div class="tabled__item">{{ action_text }}</div>
         <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="accounts:action_list" text="Aanpassen" icon="arrow_forward" icon_position="after" primary=True %}</div>
     </div>
+    {% endif %}
     {% comment %} <div class="tabled__row">
         <div class="tabled__item tabled__item--bold">{% trans "Afspraken" %}</div>
         <div class="tabled__item">4 afspraken, eerstvolgende voor 6 september</div>

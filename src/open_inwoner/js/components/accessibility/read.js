@@ -13,7 +13,7 @@ class ReadOut {
     }
 
     let voices = []
-    function populateVoiceList() {
+    const populateVoiceList = () => {
       voices = this.speechSynthesis.getVoices()
       // console.log(voices)
     }

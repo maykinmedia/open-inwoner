@@ -75,6 +75,11 @@
     border-bottom: 1px solid;
     border-bottom-color: var(--color-gray-light);
 
+    &--status:first-of-type {
+      border-top: 1px solid;
+      border-top-color: var(--color-gray-light);
+    }
+
     &--borderless {
       border: 0;
       padding: var(--spacing-medium);
@@ -92,6 +97,10 @@
     &--no-lb {
       white-space: nowrap;
     }
+
+    &--top {
+      vertical-align: top;
+    }
   }
 
   &__header {
@@ -99,6 +108,11 @@
     text-align: left;
     border-bottom: 1px solid;
     border-bottom-color: var(--color-gray-light);
+
+    &--status:first-of-type {
+      border-top: 1px solid;
+      border-top-color: var(--color-gray-light);
+    }
   }
 
   &__explain {

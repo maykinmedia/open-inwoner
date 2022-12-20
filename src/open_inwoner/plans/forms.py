@@ -6,7 +6,7 @@ from django.core.files.base import File
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
-from open_inwoner.accounts.models import Action, Document
+from open_inwoner.accounts.models import Action, Document, User
 
 from .models import Plan, PlanTemplate
 
@@ -21,19 +21,32 @@ class PlanForm(forms.ModelForm):
 
     class Meta:
         model = Plan
-        fields = ("title", "end_date", "contacts", "template")
+        fields = ("title", "end_date", "plan_contacts", "template")
 
     def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        extended_contacts = user.get_extended_active_contacts()
-        self.fields["contacts"].queryset = extended_contacts
-        self.fields["contacts"].choices = [
-            [c.id, f"{c.other_user_first_name} {c.other_user_last_name}"]
-            for c in extended_contacts
+
+        self.user = user
+        user_contacts = self.user.get_active_contacts()
+        self.fields["plan_contacts"].queryset = user_contacts
+
+        # NOTE we have to convert the ID value of the choice to string to make components recognize checked (taiga 899)
+        self.fields["plan_contacts"].choices = [
+            [str(c.id), c.get_full_name()] for c in user_contacts
+        ]
+        self.fields["template"].choices = [
+            (str(t.id), t) for t in self.fields["template"].queryset
         ]
 
         if self.instance.pk:
             del self.fields["template"]
+
+    def clean_plan_contacts(self):
+        # Make sure current user exists in plan_contacts when editing form
+        data = self.cleaned_data["plan_contacts"]
+        if self.instance.pk:
+            data |= User.objects.filter(pk=self.user.pk)
+        return data.distinct()
 
     def save(self, user, commit=True):
         if not self.instance.pk:

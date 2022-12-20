@@ -66,6 +66,7 @@
   }
 
   .actions__actions {
+    align-items: center;
     position: absolute;
     top: 0;
     right: 0;
@@ -81,6 +82,20 @@
     [class*='Icon'] {
       color: var(--color-gray-lighter);
       font-size: var(--font-size-body);
+    }
+  }
+  .button.actions__status-selector {
+    &--open {
+      color: var(--color-info-darker);
+      border-color: var(--color-info-darker);
+    }
+    &--closed {
+      color: var(--color-success);
+      border-color: var(--color-success);
+    }
+    &--approval {
+      color: var(--color-danger);
+      border-color: var(--color-danger);
     }
   }
 }

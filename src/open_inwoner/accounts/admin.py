@@ -1,14 +1,16 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.forms import UserChangeForm, UserCreationForm
+from django.forms import ValidationError
 from django.urls import reverse, reverse_lazy
 from django.utils.html import format_html
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ngettext, ugettext_lazy as _
 
 from privates.admin import PrivateMediaMixin
 
 from open_inwoner.utils.mixins import UUIDAdminFirstInOrder
 
-from .models import Action, Appointment, Contact, Document, Invite, Message, User
+from .models import Action, Appointment, Document, Invite, Message, User
 
 
 class ActionInlineAdmin(UUIDAdminFirstInOrder, admin.StackedInline):
@@ -17,15 +19,39 @@ class ActionInlineAdmin(UUIDAdminFirstInOrder, admin.StackedInline):
     readonly_fields = ("uuid",)
 
 
+class _UserChangeForm(UserChangeForm):
+    def clean(self, *args, **kwargs):
+        cleaned_data = super().clean(*args, **kwargs)
+
+        if (
+            User.objects.filter(email__iexact=cleaned_data["email"])
+            and self.instance.email != cleaned_data["email"]
+        ):
+            raise ValidationError(_("The user with this email already exists."))
+
+
+class _UserCreationForm(UserCreationForm):
+    def clean(self, *args, **kwargs):
+        cleaned_data = super().clean(*args, **kwargs)
+
+        # we use both queries in order to avoid the duplicate validation errors
+        if User.objects.filter(
+            email__iexact=cleaned_data["email"]
+        ) and not User.objects.filter(email=cleaned_data["email"]):
+            raise ValidationError(_("The user with this email already exists."))
+
+
 @admin.register(User)
 class _UserAdmin(UserAdmin):
+    form = _UserChangeForm
+    add_form = _UserCreationForm
     hijack_success_url = reverse_lazy("root")
     list_display_links = (
         "email",
         "first_name",
     )
     fieldsets = (
-        (None, {"fields": ("email", "password", "login_type")}),
+        (None, {"fields": ("uuid", "email", "password", "login_type")}),
         (
             _("Personal info"),
             {
@@ -60,6 +86,10 @@ class _UserAdmin(UserAdmin):
                 ),
             },
         ),
+        (
+            _("Contacts - invites"),
+            {"fields": ("user_contacts", "contacts_for_approval")},
+        ),
         (_("Important dates"), {"fields": ("last_login", "date_joined")}),
     )
     add_fieldsets = (
@@ -71,7 +101,7 @@ class _UserAdmin(UserAdmin):
             },
         ),
     )
-    readonly_fields = ("bsn", "rsin", "is_prepopulated", "oidc_id")
+    readonly_fields = ("bsn", "rsin", "is_prepopulated", "oidc_id", "uuid")
     list_display = (
         "email",
         "first_name",
@@ -83,38 +113,53 @@ class _UserAdmin(UserAdmin):
     )
     search_fields = ("first_name", "last_name", "email")
     ordering = ("email",)
+    filter_horizontal = ("user_contacts", "contacts_for_approval")
 
 
 @admin.register(Action)
 class ActionAdmin(UUIDAdminFirstInOrder, PrivateMediaMixin, admin.ModelAdmin):
     readonly_fields = ("uuid",)
-    list_display = ("name", "created_on", "created_by")
-    list_filter = ("created_by",)
-    private_media_fields = ("file",)
-
-
-@admin.register(Contact)
-class ContactAdmin(UUIDAdminFirstInOrder, admin.ModelAdmin):
-    readonly_fields = ("uuid",)
-    search_fields = (
-        "first_name",
-        "last_name",
-        "email",
-        "contact_user__email",
-        "created_by__email",
-    )
-    list_display = (
-        "first_name",
-        "last_name",
-        "email",
-        "contact_user",
-        "created_by",
-        "created_on",
-    )
+    list_display = ("name", "status", "plan", "created_on", "created_by", "is_deleted")
     list_filter = (
-        "contact_user",
+        "is_deleted",
         "created_by",
     )
+    private_media_fields = ("file",)
+    actions = [
+        "mark_not_deleted",
+        "mark_deleted",
+    ]
+    raw_id_fields = [
+        "plan",
+    ]
+
+    @admin.action(description=_("Mark selected actions as soft-deleted by user."))
+    def mark_deleted(self, request, queryset):
+        updated = queryset.update(is_deleted=True)
+        self.message_user(
+            request,
+            ngettext(
+                "%d actions was successfully marked as deleted.",
+                "%d stories were successfully marked as deleted.",
+                updated,
+            )
+            % updated,
+            messages.SUCCESS,
+        )
+
+    @admin.action(description=_("Restore selected soft-deleted actions"))
+    def mark_not_deleted(self, request, queryset):
+        updated = queryset.update(is_deleted=False)
+        self.message_user(
+            request,
+            ngettext(
+                "%d actions was successfully restored.",
+                "%d stories were successfully restored.",
+                updated,
+            )
+            % updated,
+            messages.SUCCESS,
+        )
 
 
 @admin.register(Document)

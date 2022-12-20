@@ -24,22 +24,20 @@
     <p class="p">{{configurable_text.home_page.home_theme_intro|linebreaksbr}}</p>
 
     {% if request.user.is_authenticated %}
-        {% card_container categories=categories columns=3 %}
+        {% card_container categories=categories columns=3 image_object_fit="cover" %}
     {% else %}
-        {% card_container categories=categories %}
+        {% card_container categories=categories image_object_fit="cover" %}
     {% endif %}
 
     {% if questionnaire_roots.exists %}
         <h2 class="h2">{{configurable_text.home_page.home_questionnaire_title}}</h2>
-        <p class="p">{{configurable_text.home_page.home_questionnaire_subtitle}}</p>
+        <p class="p">{{configurable_text.home_page.home_questionnaire_intro|linebreaksbr}}</p>
 
         {% questionnaire root_nodes=questionnaire_roots %}
     {% endif %}
 
     {% if condition %}
-        {% render_grid %}
-            {% product_finder condition=condition form=condition_form form_action="pdc:product_finder" primary_text=_("Start") %}
-        {% endrender_grid %}
+        {% product_finder condition=condition form=condition_form form_action="pdc:product_finder" primary_text=_("Start") %}
     {% endif %}
 
     <h2 class="h2">{{configurable_text.home_page.home_map_title}}</h2>

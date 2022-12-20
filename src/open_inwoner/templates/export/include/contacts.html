@@ -11,13 +11,31 @@
         </tr>
     </thead>
     <tbody>
-        {% for contact in object.get_extended_contacts %}
+        {% for invite in request.user.get_pending_invitations %}
             <tr>
-                <td class="table__item">{{ contact.other_user_first_name }} {{ contact.other_user_last_name }}</td>
-                <td class="table__item">{{ contact.get_type_display }}</td>
-                <td class="table__item">{{ contact.other_user_email }}</td>
-                <td class="table__item">{{ contact.other_user_phonenumber|default:"-" }}</td>
-                <td class="table__item">{% if contact.is_active %}{% icon "check" %}{% endif %}</td>
+                <td class="table__item">{{invite.get_full_name}}</td>
+                <td class="table__item"></td>
+                <td class="table__item">{{invite.invitee_email}}</td>
+                <td class="table__item">-</td>
+                <td class="table__item">{% icon "check" extra_classes="icon icon--disabled" %}</td>
+            </tr>
+        {% endfor %}
+        {% for contact in object.get_contacts_for_approval %}
+            <tr>
+                <td class="table__item">{{contact.get_full_name}}</td>
+                <td class="table__item">{{ contact.get_contact_type_display }}</td>
+                <td class="table__item">{{ contact.email }}</td>
+                <td class="table__item">{{ contact.phonenumber|default:"-" }}</td>
+                <td class="table__item">{% icon "check" extra_classes="icon icon--disabled" %}</td>
+            </tr>
+        {% endfor %}
+        {% for contact in object.get_active_contacts %}
+            <tr>
+                <td class="table__item">{{contact.get_full_name}}</td>
+                <td class="table__item">{{ contact.get_contact_type_display }}</td>
+                <td class="table__item">{{ contact.email }}</td>
+                <td class="table__item">{{ contact.phonenumber|default:"-" }}</td>
+                <td class="table__item">{% icon "check" %}</td>
             </tr>
         {% endfor %}
     </tbody>
