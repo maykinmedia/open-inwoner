@@ -157,17 +157,17 @@ class ContactCreateForm(forms.Form):
 
 
 class UserField(forms.ModelChoiceField):
-    me = None
+    user = None
 
     def label_from_instance(self, obj: User) -> str:
         return obj.get_full_name()
 
     def has_changed(self, initial, data):
-        # consider 'me' as empty value
-        if initial == self.me.id and not data:
+        # consider 'user' as empty value
+        if initial == self.user.id and not data:
             return False
 
-        if data == self.me.id and not initial:
+        if data == self.user.id and not initial:
             return False
 
         return super().has_changed(initial, data)
@@ -209,7 +209,7 @@ class ActionForm(forms.ModelForm):
             # options are not limited to None for old actions support
             self.fields["is_for"].disabled = True
 
-        self.fields["is_for"].me = user
+        self.fields["is_for"].user = user
 
     def clean_end_date(self):
         data = self.cleaned_data["end_date"]
@@ -279,7 +279,7 @@ class InboxForm(forms.ModelForm):
     receiver = forms.ModelChoiceField(
         label=_("Contactpersoon"),
         queryset=User.objects.none(),
-        to_field_name="email",
+        to_field_name="uuid",
         widget=forms.HiddenInput(
             attrs={"placeholder": _("Voer de naam in van uw contactpersoon")}
         ),
@@ -305,7 +305,7 @@ class InboxForm(forms.ModelForm):
         super().__init__(**kwargs)
 
         contact_users = self.user.get_active_contacts()
-        choices = [[u.email, f"{u.first_name} {u.last_name}"] for u in contact_users]
+        choices = [[str(u.uuid), u.get_full_name()] for u in contact_users]
         self.fields["receiver"].choices = choices
         self.fields["receiver"].queryset = contact_users
 

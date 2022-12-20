@@ -14,10 +14,6 @@ class MessageTest(TestCase):
             first_name="Person", last_name="B", email="person-b@example.com"
         )
 
-    def tearDown(self):
-        self.sender.delete()
-        self.receiver.delete()
-
     def test_create(self):
         MessageFactory.create()
 

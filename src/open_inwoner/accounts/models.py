@@ -227,7 +227,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         return reverse("accounts:contact_edit", kwargs={"uuid": self.uuid})
 
     def get_contact_message_url(self) -> str:
-        url = furl(reverse("accounts:inbox")).add({"with": self.email}).url
+        url = reverse("accounts:inbox", kwargs={"uuid": self.uuid})
         return f"{url}#messages-last"
 
     def get_contact_type_display(self) -> str:

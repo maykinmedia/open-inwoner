@@ -614,15 +614,14 @@ class TestActions(WebTest):
 @freeze_time("2021-10-18 13:00:00")
 class TestMessages(WebTest):
     def setUp(self):
-        self.me = UserFactory()
+        self.user = UserFactory()
         self.other_user = UserFactory()
-        self.me.user_contacts.add(self.other_user)
+        self.user.user_contacts.add(self.other_user)
 
     def test_created_message_action_from_contacts_is_logged(self):
         response = self.app.get(
-            reverse("accounts:inbox"),
-            {"with": self.other_user.email},
-            user=self.me,
+            reverse("accounts:inbox", kwargs={"uuid": self.other_user.uuid}),
+            user=self.user,
             auto_follow=True,
         )
         form = response.forms["message-form"]
@@ -640,7 +639,7 @@ class TestMessages(WebTest):
                 "message": _("message was created"),
                 "action_flag": list(LOG_ACTIONS[ADDITION]),
                 "content_object_repr": _("From: {me}, To: {other} (2021-10-18)").format(
-                    me=self.me.email, other=self.other_user.email
+                    me=self.user.email, other=self.other_user.email
                 ),
             },
         )
@@ -648,10 +647,10 @@ class TestMessages(WebTest):
     def test_created_message_action_from_start_is_logged(self):
         response = self.app.get(
             reverse("accounts:inbox_start"),
-            user=self.me,
+            user=self.user,
         )
         form = response.forms["start-message-form"]
-        form["receiver"] = self.other_user.email
+        form["receiver"] = str(self.other_user.uuid)
         form["content"] = "some content"
         form.submit()
         log_entry = TimelineLog.objects.last()
@@ -665,7 +664,7 @@ class TestMessages(WebTest):
                 "message": _("message was created"),
                 "action_flag": list(LOG_ACTIONS[ADDITION]),
                 "content_object_repr": _("From: {me}, To: {other} (2021-10-18)").format(
-                    me=self.me.email, other=self.other_user.email
+                    me=self.user.email, other=self.other_user.email
                 ),
             },
         )
