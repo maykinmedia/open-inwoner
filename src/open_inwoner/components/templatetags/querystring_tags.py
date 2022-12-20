@@ -54,11 +54,26 @@ def querystring(context, *query_values, key="", value="", query=""):
 
 
 @register.filter
-def qs_page(url, value):
-    if value > 1:
+def qs_page(url, page_num):
+    """
+    Set query-string 'page' parameter on a URL, if page_num is not page one.
+
+    Usage:
+        url = "https://example.com/list"
+        {{ url|qs_page:1 }} -> https://example.com/list
+        {{ url|qs_page:2 }} -> https://example.com/list?page=2
+
+        url = "https://example.com/list?foo=bar"
+        {{ url|qs_page:2 }} -> https://example.com/list?foo=bar&page=2
+
+    Variables:
+        + url: str | The URL
+        + page_num: int | The page number to set on the URL
+    """
+    if page_num > 1:
         # only if not first page
         f = furl(url)
-        f.args["page"] = value
+        f.args["page"] = page_num
         return f.url
     else:
         return str(url)

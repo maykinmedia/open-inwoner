@@ -163,7 +163,7 @@ class UserField(forms.ModelChoiceField):
         return obj.get_full_name()
 
     def has_changed(self, initial, data):
-        # consider 'me' as empty value
+        # consider 'user' as empty value
         if initial == self.user.id and not data:
             return False
 
