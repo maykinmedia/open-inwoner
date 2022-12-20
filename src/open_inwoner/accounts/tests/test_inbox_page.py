@@ -17,13 +17,23 @@ class InboxPageTests(WebTest):
     def setUp(self) -> None:
         super().setUp()
 
-        self.user = UserFactory.create()
-        self.contact1 = UserFactory.create()
-        self.contact2 = UserFactory.create()
+        self.user = UserFactory.create(
+            email="user@exampel.com", first_name="User", last_name="U"
+        )
+        self.contact1 = UserFactory.create(
+            email="contact1@exampel.com", first_name="Contact1", last_name="U"
+        )
+        self.contact2 = UserFactory.create(
+            email="contact2@exampel.com", first_name="Contact2", last_name="U"
+        )
         self.user.user_contacts.add(self.contact1)
         self.user.user_contacts.add(self.contact2)
-        self.message1 = MessageFactory.create(sender=self.user, receiver=self.contact1)
-        self.message2 = MessageFactory.create(receiver=self.user, sender=self.contact2)
+        self.message1 = MessageFactory.create(
+            content="from user to contact1", sender=self.user, receiver=self.contact1
+        )
+        self.message2 = MessageFactory.create(
+            content="from contact2 to user", receiver=self.user, sender=self.contact2
+        )
 
         self.app.set_user(self.user)
 
@@ -31,6 +41,10 @@ class InboxPageTests(WebTest):
         self.contact1_url = reverse(
             "accounts:inbox", kwargs={"uuid": self.contact1.uuid}
         )
+
+    def test_user_contacts_are_symetrical(self):
+        self.assertIn(self.contact1, self.user.user_contacts.all())
+        self.assertIn(self.user, self.contact1.user_contacts.all())
 
     def test_show_last_conversation_without_other_user(self):
         response = self.app.get(self.url, auto_follow=True)
@@ -123,6 +137,26 @@ class InboxPageTests(WebTest):
 
         self.assertFalse(message_sent.seen)
         self.assertTrue(message_received.seen)
+
+    def test_reply_message(self):
+        # test if a contact can reply if they were added to 'self.user.user_contacts' (eg: symmetrical)
+        self.app.set_user(self.contact1)
+        response = self.app.get(self.url, auto_follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertContains(response, self.message1.content)
+
+        form = response.forms["message-form"]
+        form["content"] = "some msg"
+
+        response = form.submit().follow()
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "some msg")
+
+        last_message = Message.objects.order_by("-pk").first()
+        self.assertEqual(last_message.content, "some msg")
+        self.assertEqual(last_message.sender, self.contact1)
+        self.assertEqual(last_message.receiver, self.user)
 
 
 class BaseInboxPageSeleniumTests:
