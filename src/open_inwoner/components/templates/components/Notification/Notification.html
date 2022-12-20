@@ -1,8 +1,8 @@
 {% load icon_tags button_tags icon_tags %}
-<div class="notification{% if contents %} notification--contents{% endif %}{% if type %} notification--{{ type }}{% endif %}">
+<div class="notification{% if contents %} notification--contents{% endif %}{% if type %} notification--{{ type }}{% endif %}{% if compact %} notification--compact{% endif %}">
     {% if not icon == False %}
         <div class="notification__icon">
-            {% icon icon|default:'change_history' %}
+            {% icon icon %}
         </div>
     {% endif %}
 
