@@ -40,13 +40,18 @@ class InboxView(LogMixin, LoginRequiredMixin, PaginationMixin, FormView):
         messages = self.get_messages(other_user)
         status = self.get_status(messages)
 
+        if other_user:
+            conversation_url = reverse(
+                "accounts:inbox", kwargs={self.slug_field: other_user.uuid}
+            )
+        else:
+            conversation_url = ""
+
         context.update(
             {
                 "conversations": conversations,
                 "conversation_messages": messages,
-                "conversation_url": reverse(
-                    "accounts:inbox", kwargs={self.slug_field: other_user.uuid}
-                ),
+                "conversation_url": conversation_url,
                 "other_user": other_user,
                 "status": status,
             }

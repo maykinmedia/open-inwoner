@@ -158,6 +158,23 @@ class InboxPageTests(WebTest):
         self.assertEqual(last_message.sender, self.contact1)
         self.assertEqual(last_message.receiver, self.user)
 
+    def test_no_messages(self):
+        Message.objects.all().delete()
+
+        response = self.app.get(self.url, auto_follow=True)
+        self.assertEqual(response.status_code, 200)
+        # no form
+        self.assertFalse(response.pyquery("form#message-form"))
+
+    def test_no_contacts(self):
+        self.contact1.delete()
+        self.contact2.delete()
+
+        response = self.app.get(self.url, auto_follow=True)
+        self.assertEqual(response.status_code, 200)
+        # no form
+        self.assertFalse(response.pyquery("form#message-form"))
+
 
 class BaseInboxPageSeleniumTests:
     options = None
