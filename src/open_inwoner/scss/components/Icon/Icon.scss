@@ -2,4 +2,8 @@
   &--disabled {
     color: var(--color-gray-light);
   }
+
+  &--danger {
+    color: var(--color-danger);
+  }
 }

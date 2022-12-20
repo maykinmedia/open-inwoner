@@ -1,10 +1,7 @@
-from datetime import timedelta
-
 from django.core import mail
 from django.core.management import call_command
 from django.test import TestCase
 from django.urls import reverse
-from django.utils import timezone
 
 from .factories import MessageFactory, UserFactory
 

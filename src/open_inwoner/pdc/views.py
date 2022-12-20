@@ -65,7 +65,7 @@ class HomeView(TemplateView):
                 highlighted=True, published=True
             )
         )
-        if self.request.user.is_authenticated:
+        if self.request.user.is_authenticated and config.show_plans:
             kwargs.update(plans=Plan.objects.connected(self.request.user)[:limit])
 
         # Show the categories if the user has selected them, otherwise
@@ -107,7 +107,7 @@ class FAQView(TemplateView):
     template_name = "pages/faq.html"
 
     def get_context_data(self, **kwargs):
-        kwargs.update(faqs=Question.objects.filter(category__isnull=True))
+        kwargs.update(faqs=Question.objects.general())
         return super().get_context_data(**kwargs)
 
 
@@ -182,6 +182,8 @@ class ProductDetailView(BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView
         anchors = [
             ("#title", product.name),
         ]
+        if product.question_set.exists():
+            anchors.append(("#faq", _("Veelgestelde vragen")))
         if product.files.exists():
             anchors.append(("#files", _("Bestanden")))
         if product.locations.exists():
@@ -196,6 +198,7 @@ class ProductDetailView(BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView
 
         context["anchors"] = anchors
         context["related_products_start"] = 6 if product.links.exists() else 1
+        context["product_links"] = product.links.order_by("pk")
         return context
 
 

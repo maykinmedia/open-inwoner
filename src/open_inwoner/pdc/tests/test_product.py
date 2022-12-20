@@ -5,7 +5,7 @@ from django_webtest import WebTest
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.questionnaire.tests.factories import QuestionnaireStepFactory
 
-from .factories import CategoryFactory, ProductFactory
+from .factories import CategoryFactory, ProductFactory, QuestionFactory
 
 
 class TestPublishedProducts(WebTest):
@@ -93,3 +93,37 @@ class TestPublishedProducts(WebTest):
         self.assertEqual(len(possible_products), 1)
         self.assertIn(product1, possible_products)
         self.assertNotIn(product2, possible_products)
+
+
+class TestProductFAQ(WebTest):
+    def test_product_detail_shows_product_faq(self):
+        product = ProductFactory()
+        question_1 = QuestionFactory(
+            question="Does this sort to the bottom?", order=10, product=product
+        )
+        question_2 = QuestionFactory(
+            question="Sorting to the top", order=1, product=product
+        )
+
+        other_product = ProductFactory()
+        other_question = QuestionFactory(product=other_product)
+
+        response = self.app.get(
+            reverse("pdc:product_detail", kwargs={"slug": product.slug})
+        )
+        self.assertEqual(response.context["product"], product)
+
+        # check we got our questions
+        self.assertContains(response, question_1.question)
+        self.assertContains(response, question_2.question)
+        self.assertNotContains(response, other_question.question)
+
+        # check ordering: Q1 comes after Q2
+        q1_pos = response.text.index(question_1.question)
+        q2_pos = response.text.index(question_2.question)
+        self.assertGreater(q1_pos, q2_pos)
+
+        # check if the menu item shows
+        self.assertTrue(response.pyquery('.anchor-menu a[href="#faq"]'))
+        # check if the menu link target
+        self.assertTrue(response.pyquery("#faq"))

@@ -1,10 +1,20 @@
+import time
 from datetime import date
+from unittest import skip
 
+from django.contrib.messages import get_messages
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
+from django.utils.translation import gettext as _
 
 from django_webtest import WebTest
 from privates.test import temp_private_root
+from selenium.webdriver import ActionChains
+from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.webdriver import WebDriver
+
+from open_inwoner.utils.tests.selenium import ChromeSeleniumMixin, FirefoxSeleniumMixin
 
 from ..choices import StatusChoices
 from ..models import Action
@@ -20,11 +30,22 @@ class ActionViewTests(WebTest):
             created_by=self.user,
             file=SimpleUploadedFile("file.txt", b"test content"),
         )
+        self.action_deleted = ActionFactory(
+            name="action_that_was_deleted",
+            created_by=self.user,
+            is_deleted=True,
+        )
 
         self.login_url = reverse("login")
         self.list_url = reverse("accounts:action_list")
         self.edit_url = reverse(
             "accounts:action_edit", kwargs={"uuid": self.action.uuid}
+        )
+        self.edit_status_url = reverse(
+            "accounts:action_edit_status", kwargs={"uuid": self.action.uuid}
+        )
+        self.delete_url = reverse(
+            "accounts:action_delete", kwargs={"uuid": self.action.uuid}
         )
         self.create_url = reverse("accounts:action_create")
         self.export_url = reverse(
@@ -38,6 +59,9 @@ class ActionViewTests(WebTest):
             "accounts:action_history", kwargs={"uuid": self.action.uuid}
         )
 
+    def test_queryset_visible(self):
+        self.assertEqual(list(Action.objects.visible()), [self.action])
+
     def test_action_list_login_required(self):
         response = self.app.get(self.list_url)
         self.assertRedirects(response, f"{self.login_url}?next={self.list_url}")
@@ -46,6 +70,7 @@ class ActionViewTests(WebTest):
         response = self.app.get(self.list_url, user=self.user)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.action.name)
+        self.assertEqual(list(response.context["actions"]), [self.action])
 
     def test_action_list_filter_is_for(self):
         user = UserFactory()
@@ -72,7 +97,6 @@ class ActionViewTests(WebTest):
         action2 = ActionFactory(
             end_date="2021-04-02", status=StatusChoices.open, is_for=self.user
         )
-        self.assertEqual(Action.objects.count(), 3)
         response = self.app.get(
             f"{self.list_url}?status={StatusChoices.open}", user=self.user
         )
@@ -95,6 +119,7 @@ class ActionViewTests(WebTest):
         response = self.app.get(self.list_url, user=other_user)
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, self.action.name)
+        self.assertEqual(list(response.context["actions"]), [])
 
     def test_action_edit_login_required(self):
         response = self.app.get(self.edit_url)
@@ -107,7 +132,41 @@ class ActionViewTests(WebTest):
 
     def test_action_edit_not_your_action(self):
         other_user = UserFactory()
-        response = self.app.get(self.edit_url, user=other_user, status=404)
+        self.app.get(self.edit_url, user=other_user, status=404)
+
+    def test_action_edit_deleted_action(self):
+        url = reverse("accounts:action_edit", kwargs={"uuid": self.action_deleted.uuid})
+        self.app.get(url, user=self.user, status=404)
+
+    def test_action_delete_login_required(self):
+        response = self.client.post(self.delete_url)
+        self.assertEquals(response.status_code, 403)
+
+    def test_action_delete_http_get_is_not_allowed(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.delete_url)
+        self.assertEqual(response.status_code, 405)
+
+    def test_action_delete(self):
+        self.client.force_login(self.user)
+        response = self.client.post(self.delete_url)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, self.list_url)
+
+        # Action is now marked as .is_deleted (and not actually deleted)
+        action = Action.objects.get(id=self.action.id)
+        self.assertTrue(action.is_deleted)
+
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        expected = _("Actie '{action}' is verwijdered.").format(action=self.action)
+        self.assertEqual(str(messages[0]), expected)
+
+    def test_action_delete_not_your_action(self):
+        other_user = UserFactory()
+        self.client.force_login(other_user)
+        response = self.client.post(self.delete_url)
+        self.assertEqual(response.status_code, 404)
 
     def test_action_create_login_required(self):
         response = self.app.get(self.create_url)
@@ -128,7 +187,13 @@ class ActionViewTests(WebTest):
 
     def test_action_export_not_your_action(self):
         other_user = UserFactory()
-        response = self.app.get(self.export_url, user=other_user, status=404)
+        self.app.get(self.export_url, user=other_user, status=404)
+
+    def test_action_export_deleted_action(self):
+        url = reverse(
+            "accounts:action_export", kwargs={"uuid": self.action_deleted.uuid}
+        )
+        self.app.get(url, user=self.user, status=404)
 
     def test_action_list_export(self):
         response = self.app.get(self.export_list_url, user=self.user)
@@ -137,6 +202,7 @@ class ActionViewTests(WebTest):
         self.assertEqual(
             response["Content-Disposition"], f'attachment; filename="actions.pdf"'
         )
+        self.assertEqual(list(response.context["actions"]), [self.action])
 
     def test_action_list_export_login_required(self):
         response = self.app.get(self.export_list_url)
@@ -154,7 +220,13 @@ class ActionViewTests(WebTest):
 
     def test_action_download_not_your_action(self):
         other_user = UserFactory()
-        response = self.app.get(self.download_url, user=other_user, status=403)
+        self.app.get(self.download_url, user=other_user, status=403)
+
+    def test_action_download_deleted_action(self):
+        url = reverse(
+            "accounts:action_download", kwargs={"uuid": self.action_deleted.uuid}
+        )
+        self.app.get(url, user=self.user, status=404)
 
     def test_action_history(self):
         response = self.app.get(self.history_url, user=self.user)
@@ -163,8 +235,183 @@ class ActionViewTests(WebTest):
 
     def test_action_history_not_your_action(self):
         other_user = UserFactory()
-        response = self.app.get(self.history_url, user=other_user, status=404)
+        self.app.get(self.history_url, user=other_user, status=404)
 
     def test_action_history_login_required(self):
         response = self.app.get(self.history_url)
         self.assertRedirects(response, f"{self.login_url}?next={self.history_url}")
+
+    def test_action_history_deleted_action(self):
+        url = reverse(
+            "accounts:action_history", kwargs={"uuid": self.action_deleted.uuid}
+        )
+        self.app.get(url, user=self.user, status=404)
+
+    def test_action_status(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            self.edit_status_url,
+            {"status": StatusChoices.closed},
+            HTTP_HX_REQUEST="true",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.action.refresh_from_db()
+        self.assertEqual(self.action.status, StatusChoices.closed)
+
+    def test_action_status_requires_htmx_header(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            self.edit_status_url,
+            {"status": StatusChoices.closed},
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_action_status_invalid_post_data(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            self.edit_status_url,
+            {"not_the_parameter": 123},
+            HTTP_HX_REQUEST="true",
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_action_status_http_get_disallowed(self):
+        self.client.force_login(self.user)
+        response = self.client.get(
+            self.edit_status_url,
+            HTTP_HX_REQUEST="true",
+        )
+        self.assertEqual(response.status_code, 405)
+
+    def test_action_status_login_required(self):
+        response = self.client.post(
+            self.edit_status_url,
+            {"status": StatusChoices.closed},
+            HTTP_HX_REQUEST="true",
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_action_status_not_your_action(self):
+        other_user = UserFactory()
+        self.client.force_login(other_user)
+        response = self.client.post(
+            self.edit_status_url,
+            {"status": StatusChoices.closed},
+            HTTP_HX_REQUEST="true",
+        )
+        self.assertEqual(response.status_code, 404)
+
+
+class ActionStatusSeleniumBaseTests:
+    selenium: WebDriver
+
+    def setUp(self) -> None:
+        super().setUp()
+
+        self.user = UserFactory.create()
+        self.action = ActionFactory(
+            name="my_action",
+            created_by=self.user,
+            status=StatusChoices.open,
+        )
+        self.action_list_url = reverse("accounts:action_list")
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.selenium.implicitly_wait(10)
+
+    def test_action_status(self):
+        """
+        note: there are some issues with both selenium and the threading in StaticLiveServerTestCase
+          that make it seemingly impossible to get this to pass with either implicit or explicit wait conditions
+
+        after trying everything in the docs and stackoverflow with inconsistent results on both the Firefox and Chrome
+          versions running both locally and on CI, the solution was to simply put time.sleep(1) after each async action
+        """
+        self.force_login(self.user)
+
+        # wait for user and session to be visible from the server thread (weirdly only a problem on CI)
+        time.sleep(2)
+
+        # use a big screen because scroll_into_view or JS scroll commands are problematic
+        self.selenium.set_window_size(1200, 1200)
+        self.selenium.get(self.live_server_url + self.action_list_url)
+
+        self.assertEqual(self.action.status, StatusChoices.open)
+
+        wrapper = self.selenium.find_element(
+            By.CSS_SELECTOR, f"#actions_{self.action.id}__status"
+        )
+        dropdown = wrapper.find_element(By.CSS_SELECTOR, ".dropdown")
+        dropdown_content = dropdown.find_element(By.CSS_SELECTOR, ".dropdown__content")
+
+        # grab and check our button is Open
+        button = wrapper.find_element(
+            By.CSS_SELECTOR,
+            f"#actions_{self.action.id}__status .actions__status-selector",
+        )
+        self.assertEqual(
+            button.get_dom_attribute("title"), StatusChoices.labels[StatusChoices.open]
+        )
+        self.assertIn(
+            f"actions__status-selector--{StatusChoices.open}",
+            button.get_attribute("class"),
+        )
+
+        # scroll the dropdown into view and open it
+        ActionChains(self.selenium).scroll_to_element(wrapper).scroll_by_amount(
+            0, 200
+        ).click(button).perform()
+
+        # wait for htmx to return (neither implicit or explicit waits nor ActionChains.pause will help)
+        time.sleep(2)
+
+        self.assertIn(
+            f"dropdown--{StatusChoices.open}", dropdown.get_attribute("class")
+        )
+        self.assertTrue(dropdown_content.is_displayed())
+
+        # find and click the close-state button
+        status_closed_button = dropdown_content.find_element(
+            By.CSS_SELECTOR, f".actions__status-{StatusChoices.closed}"
+        )
+        self.assertTrue(status_closed_button.is_displayed())
+
+        # click button and htmx should run
+        status_closed_button.click()
+
+        # wait for htmx to return
+        time.sleep(2)
+
+        # regrab and check our button is now Closed
+        button = self.selenium.find_element(
+            By.CSS_SELECTOR,
+            f"#actions_{self.action.id}__status .actions__status-selector",
+        )
+        self.assertEqual(
+            button.get_dom_attribute("title"),
+            StatusChoices.labels[StatusChoices.closed],
+        )
+        self.assertIn(
+            f"actions__status-selector--{StatusChoices.closed}",
+            button.get_attribute("class"),
+        )
+
+        # check our action in the database is closed now
+        self.action.refresh_from_db()
+        self.assertEqual(self.action.status, StatusChoices.closed)
+
+
+@skip("skipped for now because of random CI failures, ref Taiga #963")
+class ActionStatusFirefoxSeleniumTests(
+    FirefoxSeleniumMixin, ActionStatusSeleniumBaseTests, StaticLiveServerTestCase
+):
+    pass
+
+
+@skip("skipped for now because of random CI failures, ref Taiga #963")
+class ActionStatusChromeSeleniumTests(
+    ChromeSeleniumMixin, ActionStatusSeleniumBaseTests, StaticLiveServerTestCase
+):
+    pass

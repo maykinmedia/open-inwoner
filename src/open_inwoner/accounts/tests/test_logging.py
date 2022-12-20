@@ -12,15 +12,16 @@ from privates.test import temp_private_root
 from timeline_logger.models import TimelineLog
 from webtest import Upload
 
+from open_inwoner.accounts.models import Invite
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.pdc.tests.factories import CategoryFactory
 from open_inwoner.utils.logentry import LOG_ACTIONS
 
-from ..choices import LoginTypeChoices
-from ..models import Action, Contact, Document, Message, User
+from ..choices import LoginTypeChoices, StatusChoices
+from ..forms import ActionForm
+from ..models import Action, Document, Message, User
 from .factories import (
     ActionFactory,
-    ContactFactory,
     DocumentFactory,
     InviteFactory,
     MessageFactory,
@@ -50,7 +51,7 @@ class TestProfile(WebTest):
         form["password1"] = user.password
         form["password2"] = user.password
         form.submit()
-        log_entry = TimelineLog.objects.first()
+        log_entry = TimelineLog.objects.get()
 
         self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
@@ -113,7 +114,7 @@ class TestProfile(WebTest):
 
     def test_login_via_admin_is_logged(self):
         self.app.post(reverse("admin:login"), user=self.user)
-        log_entry = TimelineLog.objects.first()
+        log_entry = TimelineLog.objects.get()
 
         self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
@@ -130,7 +131,7 @@ class TestProfile(WebTest):
 
     def test_login_via_frontend_using_email_is_logged(self):
         self.app.post(reverse("login"), user=self.user)
-        log_entry = TimelineLog.objects.first()
+        log_entry = TimelineLog.objects.get()
 
         self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
@@ -338,57 +339,58 @@ class TestContacts(WebTest):
 
     def setUp(self):
         self.user = UserFactory()
-        self.contact = ContactFactory(created_by=self.user)
+        self.contact = UserFactory()
+        self.user.user_contacts.add(self.contact)
 
-    def test_contact_addition_is_logged(self):
-        contact = ContactFactory.build(created_by=self.user)
+    def test_new_contact_invite_is_logged(self):
         form = self.app.get(reverse("accounts:contact_create"), user=self.user).forms[
             "contact-form"
         ]
-        form["email"] = contact.email
-        form["first_name"] = contact.first_name
-        form["last_name"] = contact.last_name
+        form["email"] = "user@example.com"
+        form["first_name"] = "Koe"
+        form["last_name"] = "Kilsor"
         form.submit()
         log_entry = TimelineLog.objects.last()
+        invite = Invite.objects.get(invitee_email="user@example.com")
 
         self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEqual(
-            log_entry.content_object.id, Contact.objects.get(email=contact.email).id
-        )
+        self.assertEqual(log_entry.content_object.id, invite.id)
         self.assertEqual(
             log_entry.extra_data,
             {
-                "message": _("contact was created"),
+                "message": _("invite was created"),
                 "action_flag": list(LOG_ACTIONS[ADDITION]),
-                "content_object_repr": f"{contact.first_name} {contact.last_name}",
+                "content_object_repr": str(invite),
             },
         )
 
-    def test_contact_update_is_logged(self):
-        form = self.app.get(
-            reverse("accounts:contact_edit", kwargs={"uuid": self.contact.uuid}),
-            user=self.user,
-        ).forms["contact-form"]
-        form["email"] = "updated@email.com"
+    def test_existing_user_contact_approval_is_logged(self):
+        existing_user = UserFactory()
+        form = self.app.get(reverse("accounts:contact_create"), user=self.user).forms[
+            "contact-form"
+        ]
+        form["email"] = existing_user.email
+        form["first_name"] = existing_user.first_name
+        form["last_name"] = existing_user.last_name
         form.submit()
         log_entry = TimelineLog.objects.last()
 
         self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEqual(log_entry.content_object.id, self.contact.id)
+        self.assertEqual(log_entry.content_object.id, existing_user.id)
         self.assertEqual(
             log_entry.extra_data,
             {
-                "message": _("contact was modified"),
-                "action_flag": list(LOG_ACTIONS[CHANGE]),
-                "content_object_repr": f"{self.contact.first_name} {self.contact.last_name}",
+                "message": _("contact was added, pending approval"),
+                "action_flag": list(LOG_ACTIONS[ADDITION]),
+                "content_object_repr": str(existing_user),
             },
         )
 
-    def test_contact_deletion_is_logged(self):
+    def test_contact_removal_is_logged(self):
         self.app.post(
             reverse("accounts:contact_delete", kwargs={"uuid": self.contact.uuid}),
             user=self.user,
@@ -402,9 +404,9 @@ class TestContacts(WebTest):
         self.assertEqual(
             log_entry.extra_data,
             {
-                "action_flag": list(LOG_ACTIONS[DELETION]),
-                "content_object_repr": f"{self.contact.first_name} {self.contact.last_name}",
-                "message": _("contact was deleted"),
+                "message": _("contact relationship was removed"),
+                "action_flag": list(LOG_ACTIONS[CHANGE]),
+                "content_object_repr": str(self.contact),
             },
         )
 
@@ -511,13 +513,16 @@ class TestActions(WebTest):
             },
         )
 
-    def test_action_update_is_logged(self):
+    def test_action_single_field_update_is_logged(self):
         form = self.app.get(
             reverse("accounts:action_edit", kwargs={"uuid": self.action.uuid}),
             user=self.user,
         ).forms["action-create"]
         form["name"] = "Updated name"
         form.submit()
+
+        updated_action = Action.objects.get(uuid=self.action.uuid)
+        name_label = ActionForm.base_fields["name"].label
         log_entry = TimelineLog.objects.last()
 
         self.assertEqual(
@@ -527,9 +532,81 @@ class TestActions(WebTest):
         self.assertEqual(
             log_entry.extra_data,
             {
-                "message": "Changed: Naam.",
+                "message": [
+                    _("{label} changed to {updated_data}.").format(
+                        label=name_label, updated_data=updated_action.name
+                    )
+                ],
                 "action_flag": list(LOG_ACTIONS[CHANGE]),
                 "content_object_repr": "Updated name",
+            },
+        )
+
+    def test_action_multiple_fields_update_is_logged(self):
+        form = self.app.get(
+            reverse("accounts:action_edit", kwargs={"uuid": self.action.uuid}),
+            user=self.user,
+        ).forms["action-create"]
+        form["name"] = "Updated name"
+        form["status"] = StatusChoices.approval
+        form.submit()
+
+        updated_action = Action.objects.get(uuid=self.action.uuid)
+        name_label = ActionForm.base_fields["name"].label
+        status_label = ActionForm.base_fields["status"].label
+        log_entry = TimelineLog.objects.last()
+
+        self.assertEqual(
+            log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
+        )
+        self.assertEqual(log_entry.content_object.id, self.action.id)
+        self.assertEqual(
+            log_entry.extra_data,
+            {
+                "message": [
+                    _("{name_label} changed to {updated_name}.").format(
+                        name_label=name_label, updated_name=updated_action.name
+                    ),
+                    _("{status_label} changed to {updated_status}.").format(
+                        status_label=status_label,
+                        updated_status=updated_action.get_status_display(),
+                    ),
+                ],
+                "action_flag": list(LOG_ACTIONS[CHANGE]),
+                "content_object_repr": "Updated name",
+            },
+        )
+
+    def test_action_status_toggle_is_logged(self):
+        edit_status_url = reverse(
+            "accounts:action_edit_status", kwargs={"uuid": self.action.uuid}
+        )
+        self.client.force_login(self.user)
+        response = self.client.post(
+            edit_status_url,
+            {"status": StatusChoices.closed},
+            HTTP_HX_REQUEST="true",
+        )
+
+        updated_action = Action.objects.get(uuid=self.action.uuid)
+        status_label = ActionForm.base_fields["status"].label
+        log_entry = TimelineLog.objects.last()
+
+        self.assertEqual(
+            log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
+        )
+        self.assertEqual(log_entry.content_object.id, self.action.id)
+        self.assertEqual(
+            log_entry.extra_data,
+            {
+                "message": [
+                    _("{status_label} changed to {updated_status}.").format(
+                        status_label=status_label,
+                        updated_status=updated_action.get_status_display(),
+                    )
+                ],
+                "action_flag": list(LOG_ACTIONS[CHANGE]),
+                "content_object_repr": str(self.action),
             },
         )
 
@@ -537,19 +614,14 @@ class TestActions(WebTest):
 @freeze_time("2021-10-18 13:00:00")
 class TestMessages(WebTest):
     def setUp(self):
-        self.me = UserFactory()
+        self.user = UserFactory()
         self.other_user = UserFactory()
-        ContactFactory(
-            created_by=self.me,
-            contact_user=self.other_user,
-            email=self.other_user.email,
-        )
+        self.user.user_contacts.add(self.other_user)
 
     def test_created_message_action_from_contacts_is_logged(self):
         response = self.app.get(
-            reverse("accounts:inbox"),
-            {"with": self.other_user.email},
-            user=self.me,
+            reverse("accounts:inbox", kwargs={"uuid": self.other_user.uuid}),
+            user=self.user,
             auto_follow=True,
         )
         form = response.forms["message-form"]
@@ -560,14 +632,14 @@ class TestMessages(WebTest):
         self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEqual(log_entry.content_object.id, Message.objects.first().id)
+        self.assertEqual(log_entry.content_object.id, Message.objects.get().id)
         self.assertEqual(
             log_entry.extra_data,
             {
                 "message": _("message was created"),
                 "action_flag": list(LOG_ACTIONS[ADDITION]),
                 "content_object_repr": _("From: {me}, To: {other} (2021-10-18)").format(
-                    me=self.me.email, other=self.other_user.email
+                    me=self.user.email, other=self.other_user.email
                 ),
             },
         )
@@ -575,24 +647,24 @@ class TestMessages(WebTest):
     def test_created_message_action_from_start_is_logged(self):
         response = self.app.get(
             reverse("accounts:inbox_start"),
-            user=self.me,
+            user=self.user,
         )
         form = response.forms["start-message-form"]
-        form["receiver"] = self.other_user.email
+        form["receiver"] = str(self.other_user.uuid)
         form["content"] = "some content"
         form.submit()
         log_entry = TimelineLog.objects.last()
         self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEqual(log_entry.content_object.id, Message.objects.first().id)
+        self.assertEqual(log_entry.content_object.id, Message.objects.get().id)
         self.assertEqual(
             log_entry.extra_data,
             {
                 "message": _("message was created"),
                 "action_flag": list(LOG_ACTIONS[ADDITION]),
                 "content_object_repr": _("From: {me}, To: {other} (2021-10-18)").format(
-                    me=self.me.email, other=self.other_user.email
+                    me=self.user.email, other=self.other_user.email
                 ),
             },
         )

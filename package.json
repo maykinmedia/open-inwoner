@@ -48,6 +48,7 @@
     "flatpickr": "^4.6.9",
     "gumshoejs": "^5.1.2",
     "html-minifier": "^4.0.0",
+    "htmx.org": "^1.8.4",
     "inline-css": "^3.0.0",
     "leaflet": "^1.7.1",
     "material-icons": "^1.10.11",

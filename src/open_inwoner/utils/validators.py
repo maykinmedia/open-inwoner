@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 
 def validate_charfield_entry(value, allow_apostrophe=False):
     """
-    Validates a charfield entry according with Belastingdienst requirements.
+    Validates a charfield entry according with requirements.
 
     :param value: The input value string to be validated.
     :param allow_apostrophe: Boolean to add the apostrophe character to the
@@ -15,7 +15,7 @@ def validate_charfield_entry(value, allow_apostrophe=False):
     :return: The input value if validation passed. Otherwise, raises a
     ``ValidationError`` exception.
     """
-    invalid_chars = '/"\\,;' if allow_apostrophe else "/\"\\,;'"
+    invalid_chars = '/"\\,;' if allow_apostrophe else "/\"\\,.:;'"
 
     for char in invalid_chars:
         if char in value:

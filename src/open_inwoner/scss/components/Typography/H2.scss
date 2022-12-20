@@ -1,3 +1,5 @@
+@import '~microscope-sass/lib/responsive';
+
 .h2 {
   color: var(--font-color-heading-2);
   font-family: var(--font-family-heading-2);
@@ -11,6 +13,10 @@
   &--extra {
     margin: var(--row-height) 0 var(--spacing-medium) 0;
   }
+
+  @include mobile-only {
+    word-break: break-all;
+  }
 }
 
 ///
@@ -19,7 +25,8 @@
 
 .card + .h2,
 .dashboard + .h2,
-.status-list + .h2 {
+.status-list + .h2,
+.table + .h2 {
   margin-top: var(--row-height);
 }
 

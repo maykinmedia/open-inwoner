@@ -28,3 +28,18 @@ class QuestionnaireTestCase(WebTest):
 
         self.assertContains(response, self.root_nodes[0].get_absolute_url())
         self.assertContains(response, self.root_nodes[1].get_absolute_url())
+
+    def test_home_page_doesnt_show_unpublished_nodes(self):
+        QuestionnaireStep.objects.update(published=False)
+
+        response = self.app.get(reverse("root"))
+        self.assertNotContains(response, self.root_nodes[0].get_absolute_url())
+        self.assertNotContains(response, self.root_nodes[1].get_absolute_url())
+
+    def test_user_home_page_doesnt_show_unpublished_nodes(self):
+        QuestionnaireStep.objects.update(published=False)
+
+        user = UserFactory()
+        response = self.app.get(reverse("root"), user=user)
+        self.assertNotContains(response, self.root_nodes[0].get_absolute_url())
+        self.assertNotContains(response, self.root_nodes[1].get_absolute_url())

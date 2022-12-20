@@ -18,6 +18,10 @@
     display: inline-flex;
   }
 
+  &--stretch {
+    height: 100%;
+  }
+
   &--type-info {
     --card-color-background: var(--color-info-lighter);
     --card-color-border: transparent;
@@ -64,6 +68,9 @@
     width: 100%;
   }
 
+  &__img--contain {
+    object-fit: contain;
+  }
   &__body {
     padding: var(--card-spacing);
   }
@@ -110,6 +117,20 @@
     margin: 0 0 var(--card-spacing);
   }
 
+  &--compact .h4 {
+    padding: 0 0 var(--card-spacing);
+    position: relative;
+
+    &:before {
+      bottom: 0;
+      content: '';
+      border-bottom: var(--card-size-border) solid var(--card-color-border);
+      width: calc(100% + 2 * var(--card-spacing));
+      position: absolute;
+      left: calc(-1 * var(--card-spacing));
+    }
+  }
+
   &--product {
     padding: 20px;
     align-items: end;
@@ -149,6 +170,20 @@
     @media (min-width: 768px) {
       white-space: normal;
     }
+  }
+
+  /// On a stretched card, the one and only link after a list should be placed on above the bottom border.
+  &--stretch &__body {
+    padding-bottom: 0;
+  }
+
+  &--stretch &__body .list:last-of-type {
+    padding-bottom: calc(var(--font-size-body) + var(--card-spacing) + 1em);
+  }
+
+  &--stretch .list + .link:first-of-type:last-of-type {
+    bottom: var(--card-spacing);
+    position: absolute;
   }
 }
 

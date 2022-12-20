@@ -11,7 +11,7 @@ from webtest import Upload
 
 from open_inwoner.accounts.models import Action, Document, Message
 
-from .factories import ContactFactory, UserFactory
+from .factories import UserFactory
 
 
 class TestDocumentFileUploadLimits(WebTest):
@@ -156,12 +156,8 @@ class TestActionFileUploadLimits(WebTest):
 class TestMessageFileUploadLimits(WebTest):
     def setUp(self):
         self.me = UserFactory()
-        self.other_user = UserFactory()
-        self.contact = ContactFactory.create(
-            created_by=self.me,
-            contact_user=self.other_user,
-            email=self.other_user.email,
-        )
+        self.contact = UserFactory()
+        self.me.user_contacts.add(self.contact)
         self.response = self.app.get(reverse("accounts:inbox_start"), user=self.me)
         self.form = self.response.forms["start-message-form"]
 
@@ -169,12 +165,12 @@ class TestMessageFileUploadLimits(WebTest):
     def test_valid_type_of_file_is_uploaded(self):
         self.form["file"] = Upload("readme.xlsx", b"data", "application/vnd.ms-excel")
         self.form["content"] = "The message content"
-        self.form["receiver"] = self.contact.email
+        self.form["receiver"] = str(self.contact.uuid)
         upload_response = self.form.submit()
         self.assertEquals(Message.objects.first().file.name, "readme.xlsx")
         self.assertRedirects(
             upload_response,
-            furl(reverse("accounts:inbox")).add({"with": self.contact.email}).url
+            reverse("accounts:inbox", kwargs={"uuid": self.contact.uuid})
             + "#messages-last",
             fetch_redirect_response=False,
         )
@@ -183,7 +179,7 @@ class TestMessageFileUploadLimits(WebTest):
     def test_invalid_type_of_file_is_not_uploaded(self):
         self.form["file"] = Upload("readme.svg", b"data", "image/svg+xml")
         self.form["content"] = "The message content"
-        self.form["receiver"] = self.contact.email
+        self.form["receiver"] = str(self.contact.uuid)
         upload_response = self.form.submit()
         self.assertEquals(
             upload_response.context["errors"],
@@ -199,7 +195,7 @@ class TestMessageFileUploadLimits(WebTest):
     def test_files_bigger_than_max_size_are_not_uploaded(self):
         self.form["file"] = Upload("readme.png", b"data", "image/png")
         self.form["content"] = "The message content"
-        self.form["receiver"] = self.contact.email
+        self.form["receiver"] = str(self.contact.uuid)
         upload_response = self.form.submit()
         self.assertEquals(
             upload_response.context["errors"],
@@ -215,7 +211,7 @@ class TestMessageFileUploadLimits(WebTest):
     def test_files_smaller_than_min_size_are_not_uploaded(self):
         self.form["file"] = Upload("readme.png", b"data", "image/png")
         self.form["content"] = "The message content"
-        self.form["receiver"] = self.contact.email
+        self.form["receiver"] = str(self.contact.uuid)
         upload_response = self.form.submit()
         self.assertEquals(
             upload_response.context["errors"],
@@ -230,7 +226,7 @@ class TestMessageFileUploadLimits(WebTest):
     def test_files_with_no_content_are_not_uploaded(self):
         self.form["file"] = Upload("readme.png", b"", "image/png")
         self.form["content"] = "The message content"
-        self.form["receiver"] = self.contact.email
+        self.form["receiver"] = str(self.contact.uuid)
         upload_response = self.form.submit()
         self.assertEquals(
             upload_response.context["errors"], [_("Het verstuurde bestand is leeg.")]

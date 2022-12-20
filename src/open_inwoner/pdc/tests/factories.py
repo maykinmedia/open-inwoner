@@ -11,6 +11,7 @@ from ..models import (
     ProductCondition,
     ProductContact,
     ProductLocation,
+    Question,
     Tag,
 )
 
@@ -125,3 +126,11 @@ class ProductConditionFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = ProductCondition
+
+
+class QuestionFactory(factory.django.DjangoModelFactory):
+    question = factory.Faker("sentence")
+    answer = factory.Faker("text")
+
+    class Meta:
+        model = Question

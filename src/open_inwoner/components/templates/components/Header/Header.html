@@ -43,7 +43,7 @@
                     {% endrender_form %}
                 </nav>
 
-                {% primary_navigation categories=categories request=request has_general_faq_questions=has_general_faq_questions %}
+                {% primary_navigation categories=categories request=request has_general_faq_questions=has_general_faq_questions show_plans=config.show_plans %}
             </div>
         </div>
 
@@ -78,6 +78,6 @@
             {% endrender_form %}
         </nav>
 
-        {% primary_navigation categories=categories request=request has_general_faq_questions=has_general_faq_questions %}
+        {% primary_navigation categories=categories request=request has_general_faq_questions=has_general_faq_questions show_plans=config.show_plans %}
     </div>
 </header>

@@ -72,6 +72,7 @@ class TestPlans(WebTest):
         )
 
     def test_plan_goal_modified_is_logged(self):
+        self.plan.plan_contacts.add(self.user)
         form = self.app.get(
             reverse("plans:plan_edit_goal", kwargs={"uuid": self.plan.uuid}),
             user=self.user,
@@ -96,6 +97,7 @@ class TestPlans(WebTest):
 
     @temp_private_root()
     def test_plan_file_upload_is_logged(self):
+        self.plan.plan_contacts.add(self.user)
         form = self.app.get(
             reverse("plans:plan_add_file", kwargs={"uuid": self.plan.uuid}),
             user=self.user,
@@ -120,6 +122,7 @@ class TestPlans(WebTest):
         )
 
     def test_plan_action_created_is_logged(self):
+        self.plan.plan_contacts.add(self.user)
         action = ActionFactory.build(created_by=self.user)
         form = self.app.get(
             reverse("plans:plan_action_create", kwargs={"uuid": self.plan.uuid}),
@@ -145,6 +148,7 @@ class TestPlans(WebTest):
         )
 
     def test_plan_action_modified_is_logged(self):
+        self.plan.plan_contacts.add(self.user)
         action = ActionFactory(created_by=self.user)
         form = self.app.get(
             reverse(
@@ -173,6 +177,7 @@ class TestPlans(WebTest):
         )
 
     def test_plan_action_submitted_but_not_changed_not_logged(self):
+        self.plan.plan_contacts.add(self.user)
         action = ActionFactory(created_by=self.user)
         form = self.app.get(
             reverse(
@@ -186,6 +191,7 @@ class TestPlans(WebTest):
         self.assertEqual(action.logs.count(), 0)
 
     def test_plan_export_is_logged(self):
+        self.plan.plan_contacts.add(self.user)
         self.app.get(
             reverse("plans:plan_export", kwargs={"uuid": self.plan.uuid}),
             user=self.user,

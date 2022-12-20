@@ -1,15 +1,15 @@
-from django.db.models import Case, Exists, F, Max, OuterRef, Q, Subquery, Value, When
+from django.db.models import Case, F, Max, OuterRef, Q, Subquery, Value, When
 from django.db.models.query import QuerySet
 
 
 class MessageQuerySet(QuerySet):
-    def get_conversations_for_user(self, me: "User") -> "MessageQuerySet":
+    def get_conversations_for_user(self, user: "User") -> "MessageQuerySet":
         """
         I apologize;
 
         Summary:
 
-            Returns every conversation involving me, newest first.
+            Returns every conversation involving user, newest first.
 
         Details:
 
@@ -28,42 +28,38 @@ class MessageQuerySet(QuerySet):
 
         """
         filtered_messages = (
-            self.filter(Q(receiver=me) | Q(sender=me))
+            self.filter(Q(receiver=user) | Q(sender=user))
             .annotate(
-                other_user_id=Case(
-                    When(receiver=me, then=F("sender")), default=F("receiver")
+                other_user_uuid=Case(
+                    When(receiver=user, then=F("sender__uuid")),
+                    default=F("receiver__uuid"),
                 )
             )
             .order_by()
         )
         grouped_messages = (
-            filtered_messages.filter(other_user_id=OuterRef("other_user_id"))
-            .values("other_user_id")
+            filtered_messages.filter(other_user_uuid=OuterRef("other_user_uuid"))
+            .values("other_user_uuid")
             .annotate(max_id=Max("id"))
             .values("max_id")
         )
         result = (
             self.annotate(
-                other_user_id=Case(
-                    When(receiver=me, then=F("sender")), default=F("receiver")
+                other_user_uuid=Case(
+                    When(receiver=user, then=F("sender__uuid")),
+                    default=F("receiver__uuid"),
                 )
             )
             .filter(id=Subquery(grouped_messages))
             .annotate(
-                other_user_email=Case(
-                    When(receiver=me, then=F("sender__email")),
-                    default=F("receiver__email"),
-                )
-            )
-            .annotate(
                 other_user_first_name=Case(
-                    When(receiver=me, then=F("sender__first_name")),
+                    When(receiver=user, then=F("sender__first_name")),
                     default=F("receiver__first_name"),
                 )
             )
             .annotate(
                 other_user_last_name=Case(
-                    When(receiver=me, then=F("sender__last_name")),
+                    When(receiver=user, then=F("sender__last_name")),
                     default=F("receiver__last_name"),
                 )
             )
@@ -72,11 +68,12 @@ class MessageQuerySet(QuerySet):
 
         return result
 
-    def get_messages_between_users(self, me, other_user) -> "MessageQuerySet":
+    def get_messages_between_users(self, user, other_user) -> "MessageQuerySet":
         """grouped by date"""
         return (
             self.filter(
-                Q(sender=me, receiver=other_user) | Q(sender=other_user, receiver=me)
+                Q(sender=user, receiver=other_user)
+                | Q(sender=other_user, receiver=user)
             )
             .select_related(
                 "sender",
@@ -85,70 +82,21 @@ class MessageQuerySet(QuerySet):
             .order_by("-created_on")
         )
 
-    def mark_seen(self, me, other_user) -> int:
+    def mark_seen(self, user, other_user) -> int:
         """
         Mark messages as seen between two users.
         Returns the number of updated messages.
         """
-        return self.filter(receiver=me, sender=other_user, seen=False).update(seen=True)
-
-
-class ContactQuerySet(QuerySet):
-    def get_extended_contacts_for_user(self, me):
-        """
-        Returns both active contacts and active reversed contacts for the user.
-        The returned queryset is annotated with:
-        - reverse (bool)
-        - other_user_id
-        - other_user_first_name
-        - other_user_last_name
-        - other_user_email
-        - other_user_phonenumber (Null in case of reversed contacts)
-
-        If the user and other user have contacts with each other return both contacts
-        """
-
-        my_contacts_users = self.filter(created_by=me).values_list(
-            "contact_user", flat=True
+        return self.filter(receiver=user, sender=other_user, seen=False).update(
+            seen=True
         )
-        return (
-            self.filter(Q(created_by=me) | Q(contact_user=me))
-            .distinct()
-            .annotate(reverse=Case(When(created_by=me, then=False), default=True))
-            .annotate(
-                other_user_id=Case(
-                    When(created_by=me, then=F("contact_user")),
-                    default=F("created_by"),
-                )
-            )
-            .annotate(
-                other_user_first_name=Case(
-                    When(created_by=me, then=F("first_name")),
-                    default=F("created_by__first_name"),
-                )
-            )
-            .annotate(
-                other_user_last_name=Case(
-                    When(created_by=me, then=F("last_name")),
-                    default=F("created_by__last_name"),
-                )
-            )
-            .annotate(
-                other_user_type=Case(
-                    When(created_by=me, then=F("contact_user__contact_type")),
-                    default=F("created_by__contact_type"),
-                )
-            )
-            .annotate(
-                other_user_email=Case(
-                    When(created_by=me, then=F("contact_user__email")),
-                    default=F("created_by__email"),
-                )
-            )
-            .annotate(
-                other_user_phonenumber=Case(
-                    When(created_by=me, then=F("phonenumber")),
-                    default=Value(""),
-                )
-            )
-        )
+
+
+class InviteQuerySet(QuerySet):
+    def get_pending_invitations_for_user(self, user: "User") -> "InviteQuerySet":
+        return self.filter(inviter=user, accepted=False).order_by("-pk")
+
+
+class UserQuerySet(QuerySet):
+    def get_pending_approvals(self, user):
+        return self.filter(contacts_for_approval=user)

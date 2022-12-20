@@ -39,6 +39,14 @@ def capture(parser, token):
     return CaptureNode(nodelist, var_name)
 
 
+@register.filter()
+def multiply(value, times):
+    """
+    Multiplies value by times.
+    """
+    return value * times
+
+
 @register.simple_tag
 def placekitten(width=800, height=600):
     """

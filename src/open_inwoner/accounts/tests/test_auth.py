@@ -10,7 +10,7 @@ from open_inwoner.configurations.models import SiteConfiguration
 
 from ..choices import LoginTypeChoices
 from ..models import User
-from .factories import ContactFactory, InviteFactory, UserFactory
+from .factories import InviteFactory, UserFactory
 
 
 class TestRegistrationFunctionality(WebTest):
@@ -35,7 +35,7 @@ class TestRegistrationFunctionality(WebTest):
         form.submit()
         # Verify the registered user.
         registered_user = User.objects.get(email=self.user.email)
-        self.assertEquals(registered_user.email, self.user.email)
+        self.assertEqual(registered_user.email, self.user.email)
         self.assertTrue(registered_user.check_password(self.user.password))
 
     def test_registration_fails_without_filling_out_first_name(self):
@@ -48,7 +48,7 @@ class TestRegistrationFunctionality(WebTest):
         form.submit()
         # Verify that the user has not been registered
         user_query = User.objects.filter(email=self.user.email)
-        self.assertEquals(user_query.count(), 0)
+        self.assertEqual(user_query.count(), 0)
 
     def test_registration_fails_without_filling_out_last_name(self):
         register_page = self.app.get(reverse("django_registration_register"))
@@ -60,7 +60,66 @@ class TestRegistrationFunctionality(WebTest):
         form.submit()
         # Verify that the user has not been registered
         user_query = User.objects.filter(email=self.user.email)
-        self.assertEquals(user_query.count(), 0)
+        self.assertEqual(user_query.count(), 0)
+
+    def test_registration_fails_with_invalid_first_name_characters(self):
+        invalid_characters = "/\"\\,.:;'"
+
+        for char in invalid_characters:
+            with self.subTest(char=char):
+                register_page = self.app.get(reverse("django_registration_register"))
+                form = register_page.forms["registration-form"]
+                form["email"] = self.user.email
+                form["first_name"] = char
+                form["last_name"] = self.user.last_name
+                form["password1"] = self.user.password
+                form["password2"] = self.user.password
+                response = form.submit()
+                expected_errors = {
+                    "first_name": [
+                        _("Uw invoer bevat een ongeldig teken: {char}").format(
+                            char=char
+                        )
+                    ]
+                }
+                self.assertEqual(response.context["form"].errors, expected_errors)
+
+    def test_registration_fails_with_invalid_last_name_characters(self):
+        invalid_characters = "/\"\\,.:;'"
+
+        for char in invalid_characters:
+            with self.subTest(char=char):
+                register_page = self.app.get(reverse("django_registration_register"))
+                form = register_page.forms["registration-form"]
+                form["email"] = self.user.email
+                form["first_name"] = self.user.first_name
+                form["last_name"] = char
+                form["password1"] = self.user.password
+                form["password2"] = self.user.password
+                response = form.submit()
+                expected_errors = {
+                    "last_name": [
+                        _("Uw invoer bevat een ongeldig teken: {char}").format(
+                            char=char
+                        )
+                    ]
+                }
+                self.assertEqual(response.context["form"].errors, expected_errors)
+
+    def test_registration_fails_with_case_sensitive_email(self):
+        register_page = self.app.get(reverse("django_registration_register"))
+        form = register_page.forms["registration-form"]
+        user = UserFactory(email="user@example.com")
+        form["email"] = "User@example.com"
+        form["first_name"] = self.user.first_name
+        form["last_name"] = self.user.last_name
+        form["password1"] = self.user.password
+        form["password2"] = self.user.password
+        response = form.submit()
+        expected_errors = {"email": [_("The user with this email already exists")]}
+        user_query = User.objects.filter(email=self.user.email)
+        self.assertEqual(user_query.count(), 0)
+        self.assertEqual(response.context["form"].errors, expected_errors)
 
     def test_registration_inactive_user(self):
         inactive_user = UserFactory.create(is_active=False)
@@ -81,16 +140,21 @@ class TestRegistrationFunctionality(WebTest):
         )
 
     def test_registration_with_invite(self):
-        email = self.user.email
-        contact = ContactFactory.create(email=email, contact_user=None)
-        invite = InviteFactory.create(contact=contact, invitee=None)
-        self.assertFalse(User.objects.filter(email=email).exists())
+        user = UserFactory()
+        contact = UserFactory.build(email="test@testemail.com")
+        invite = InviteFactory.create(
+            inviter=user,
+            invitee_email=contact.email,
+            invitee_first_name=contact.first_name,
+            invitee_last_name=contact.last_name,
+        )
+        self.assertEqual(list(User.objects.filter(email=contact.email)), [])
 
         register_page = self.app.get(f"{self.url}?invite={invite.key}")
         form = register_page.forms["registration-form"]
 
         # check that fields are prefilled with invite data
-        self.assertEqual(form["email"].value, email)
+        self.assertEqual(form["email"].value, contact.email)
         self.assertEqual(form["first_name"].value, contact.first_name)
         self.assertEqual(form["last_name"].value, contact.last_name)
 
@@ -101,29 +165,28 @@ class TestRegistrationFunctionality(WebTest):
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("django_registration_complete"))
-        self.assertTrue(User.objects.filter(email=email).exists())
+        self.assertTrue(User.objects.filter(email=contact.email).exists())
 
-        user = User.objects.get(email=email)
-        contact.refresh_from_db()
+        new_user = User.objects.get(email=contact.email)
         invite.refresh_from_db()
 
-        self.assertEqual(user.first_name, contact.first_name)
-        self.assertEqual(user.last_name, contact.last_name)
-        self.assertEqual(contact.contact_user, user)
-        self.assertEqual(invite.invitee, user)
+        self.assertEqual(new_user.first_name, contact.first_name)
+        self.assertEqual(new_user.last_name, contact.last_name)
+        self.assertEqual(new_user.email, contact.email)
+        self.assertEqual(invite.invitee, new_user)
 
         # reverse contact checks
-        self.assertEqual(user.contacts.count(), 0)
+        self.assertEqual(list(user.user_contacts.all()), [new_user])
 
     def test_registration_active_user(self):
         """the user should be redirected to the registration complete page"""
 
         user = UserFactory.create()
 
-        get_response = self.app.get(self.url, user=user)
+        response = self.app.get(self.url, user=user)
 
-        self.assertEqual(get_response.status_code, 302)
-        self.assertEqual(get_response.url, reverse("django_registration_complete"))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("django_registration_complete"))
 
     def test_registration_non_unique_email_different_case(self):
         UserFactory.create(email="john@smith.com")
@@ -149,12 +212,12 @@ class TestRegistrationDigid(WebTest):
     url = reverse_lazy("django_registration_register")
 
     def test_registration_page_only_digid(self):
-        get_response = self.app.get(self.url)
+        response = self.app.get(self.url)
 
-        self.assertEqual(get_response.status_code, 200)
-        self.assertIsNone(get_response.html.find(id="registration-form"))
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNone(response.html.find(id="registration-form"))
 
-        digid_tag = get_response.html.find("a", title="Registreren met DigiD")
+        digid_tag = response.html.find("a", title="Registreren met DigiD")
         self.assertIsNotNone(digid_tag)
         self.assertEqual(
             digid_tag.attrs["href"],
@@ -166,12 +229,12 @@ class TestRegistrationDigid(WebTest):
     def test_registration_page_only_digid_with_invite(self):
         invite = InviteFactory.create()
 
-        get_response = self.app.get(f"{self.url}?invite={invite.key}")
+        response = self.app.get(f"{self.url}?invite={invite.key}")
 
-        self.assertEqual(get_response.status_code, 200)
-        self.assertIsNone(get_response.html.find(id="registration-form"))
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNone(response.html.find(id="registration-form"))
 
-        digid_tag = get_response.html.find("a", title="Registreren met DigiD")
+        digid_tag = response.html.find("a", title="Registreren met DigiD")
         self.assertIsNotNone(digid_tag)
         necessary_url = (
             furl(reverse("accounts:registration_necessary"))
@@ -198,7 +261,7 @@ class TestRegistrationNecessary(WebTest):
             reverse("pdc:category_list"),
             reverse("accounts:my_profile"),
             reverse("accounts:inbox"),
-            reverse("accounts:my_cases"),
+            reverse("accounts:my_open_cases"),
             reverse("plans:plan_list"),
             reverse("general_faq"),
         ]
@@ -219,8 +282,8 @@ class TestRegistrationNecessary(WebTest):
         )
         self.assertTrue(user.require_necessary_fields())
 
-        get_response = self.app.get(self.url, user=user)
-        form = get_response.forms["necessary-form"]
+        response = self.app.get(self.url, user=user)
+        form = response.forms["necessary-form"]
 
         form["email"] = "john@smith.com"
         form["first_name"] = "John"
@@ -239,18 +302,19 @@ class TestRegistrationNecessary(WebTest):
         self.assertEqual(user.last_name, "Smith")
 
     def test_submit_with_invite(self):
-        user = UserFactory(
-            first_name="",
-            last_name="",
-            login_type=LoginTypeChoices.digid,
+        user = UserFactory()
+        contact = UserFactory.build()
+        invite = InviteFactory.create(
+            inviter=user,
+            invitee_email=contact.email,
+            invitee_first_name=contact.first_name,
+            invitee_last_name=contact.last_name,
         )
-        contact = ContactFactory.create(contact_user=None)
-        invite = InviteFactory.create(contact=contact, invitee=None)
 
-        get_response = self.app.get(f"{self.url}?invite={invite.key}", user=user)
-        form = get_response.forms["necessary-form"]
+        response = self.app.get(f"{self.url}?invite={invite.key}", user=user)
+        form = response.forms["necessary-form"]
 
-        # assert initials are retrieved from invite.contact
+        # assert initials are retrieved from invite
         self.assertEqual(form["email"].value, contact.email)
         self.assertEqual(form["first_name"].value, contact.first_name)
         self.assertEqual(form["last_name"].value, contact.last_name)
@@ -260,18 +324,13 @@ class TestRegistrationNecessary(WebTest):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("django_registration_complete"))
 
-        user.refresh_from_db()
-        contact.refresh_from_db()
+        user_contact = User.objects.get(email=contact.email)
         invite.refresh_from_db()
 
-        self.assertEqual(user.first_name, contact.first_name)
-        self.assertEqual(user.last_name, contact.last_name)
-        self.assertEqual(user.email, contact.email)
-        self.assertEqual(contact.contact_user, user)
-        self.assertEqual(invite.invitee, user)
-
-        # reverse contact checks
-        self.assertEqual(user.contacts.count(), 0)
+        self.assertEqual(user_contact.first_name, contact.first_name)
+        self.assertEqual(user_contact.last_name, contact.last_name)
+        self.assertEqual(user_contact.email, contact.email)
+        self.assertEqual(list(user.user_contacts.all()), [user_contact])
 
     def test_submit_not_unique_email(self):
         UserFactory.create(email="john@smith.com")
@@ -281,8 +340,8 @@ class TestRegistrationNecessary(WebTest):
             login_type=LoginTypeChoices.digid,
         )
 
-        get_response = self.app.get(self.url, user=user)
-        form = get_response.forms["necessary-form"]
+        response = self.app.get(self.url, user=user)
+        form = response.forms["necessary-form"]
 
         form["email"] = "john@smith.com"
         form["first_name"] = "John"
@@ -296,6 +355,26 @@ class TestRegistrationNecessary(WebTest):
             "* Een gebruiker met dit e-mailadres bestaat al",
         )
 
+    def test_submit_with_case_sensitive_email_fails(self):
+        UserFactory.create(email="john@example.com")
+        user = UserFactory.create(
+            first_name="",
+            last_name="",
+            login_type=LoginTypeChoices.digid,
+        )
+
+        response = self.app.get(self.url, user=user)
+        form = response.forms["necessary-form"]
+
+        form["email"] = "John@example.com"
+        form["first_name"] = "John"
+        form["last_name"] = "Smith"
+
+        response = form.submit()
+        expected_errors = {"email": [_("The user with this email already exists")]}
+
+        self.assertEqual(response.context["form"].errors, expected_errors)
+
     def test_submit_not_unique_email_different_case(self):
         UserFactory.create(email="john@smith.com")
         user = UserFactory.create(
@@ -304,8 +383,8 @@ class TestRegistrationNecessary(WebTest):
             login_type=LoginTypeChoices.digid,
         )
 
-        get_response = self.app.get(self.url, user=user)
-        form = get_response.forms["necessary-form"]
+        response = self.app.get(self.url, user=user)
+        form = response.forms["necessary-form"]
 
         form["email"] = "John@smith.com"
         form["first_name"] = "John"
@@ -318,6 +397,58 @@ class TestRegistrationNecessary(WebTest):
             response.context["errors"].as_text(),
             "* Een gebruiker met dit e-mailadres bestaat al",
         )
+
+    def test_submit_invalid_first_name_chars_fails(self):
+        UserFactory.create(email="john@smith.com")
+        user = UserFactory.create(
+            first_name="",
+            last_name="",
+            login_type=LoginTypeChoices.digid,
+        )
+        invalid_characters = "/\"\\,.:;'"
+
+        for char in invalid_characters:
+            with self.subTest(char=char):
+                response = self.app.get(self.url, user=user)
+                form = response.forms["necessary-form"]
+                form["email"] = "user@example.com"
+                form["first_name"] = char
+                form["last_name"] = "Smith"
+                response = form.submit()
+                expected_errors = {
+                    "first_name": [
+                        _("Uw invoer bevat een ongeldig teken: {char}").format(
+                            char=char
+                        )
+                    ]
+                }
+                self.assertEqual(response.context["form"].errors, expected_errors)
+
+    def test_submit_invalid_last_name_chars_fails(self):
+        UserFactory.create(email="john@smith.com")
+        user = UserFactory.create(
+            first_name="",
+            last_name="",
+            login_type=LoginTypeChoices.digid,
+        )
+        invalid_characters = "/\"\\,.:;'"
+
+        for char in invalid_characters:
+            with self.subTest(char=char):
+                response = self.app.get(self.url, user=user)
+                form = response.forms["necessary-form"]
+                form["email"] = "user@example.com"
+                form["first_name"] = "John"
+                form["last_name"] = char
+                response = form.submit()
+                expected_errors = {
+                    "last_name": [
+                        _("Uw invoer bevat een ongeldig teken: {char}").format(
+                            char=char
+                        )
+                    ]
+                }
+                self.assertEqual(response.context["form"].errors, expected_errors)
 
 
 class TestLoginLogoutFunctionality(WebTest):
@@ -349,7 +480,7 @@ class TestLoginLogoutFunctionality(WebTest):
         form["password"] = "test"
         response = form.submit()
 
-        self.assertEquals(response.context["errors"], [_("Deze account is inactief.")])
+        self.assertEqual(response.context["errors"], [_("Deze account is inactief.")])
 
     def test_login_with_wrong_credentials_shows_appropriate_message(self):
         form = self.app.get(reverse("login")).forms["login-form"]
@@ -357,7 +488,7 @@ class TestLoginLogoutFunctionality(WebTest):
         form["password"] = "wrong_password"
         response = form.submit()
 
-        self.assertEquals(
+        self.assertEqual(
             response.context["errors"],
             [
                 _(

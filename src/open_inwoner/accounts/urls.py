@@ -9,13 +9,15 @@ from .views import (
     ActionListExportView,
     ActionListView,
     ActionPrivateMediaView,
+    ActionUpdateStatusTagView,
     ActionUpdateView,
-    CasesListView,
-    CasesStatusView,
+    CaseDetailView,
+    CaseDocumentDownloadView,
+    ClosedCaseListView,
+    ContactApprovalView,
     ContactCreateView,
     ContactDeleteView,
     ContactListView,
-    ContactUpdateView,
     DocumentCreateView,
     DocumentDeleteView,
     DocumentPrivateMediaView,
@@ -28,14 +30,17 @@ from .views import (
     MyProfileExportView,
     MyProfileView,
     NecessaryFieldsUserView,
+    OpenCaseListView,
 )
+from .views.actions import ActionDeleteView
 
 app_name = "accounts"
 urlpatterns = [
     path("inbox/", InboxView.as_view(), name="inbox"),
+    path("inbox/conversation/<str:uuid>/", InboxView.as_view(), name="inbox"),
     path("inbox/start/", InboxStartView.as_view(), name="inbox_start"),
     path(
-        "inbox/<str:uuid>/download/",
+        "inbox/files/<str:uuid>/download/",
         InboxPrivateMediaView.as_view(),
         name="inbox_download",
     ),
@@ -55,8 +60,13 @@ urlpatterns = [
     path("actions/export/", ActionListExportView.as_view(), name="action_list_export"),
     path("actions/<str:uuid>/edit/", ActionUpdateView.as_view(), name="action_edit"),
     path(
+        "actions/<str:uuid>/edit/status/",
+        ActionUpdateStatusTagView.as_view(),
+        name="action_edit_status",
+    ),
+    path(
         "actions/<str:uuid>/delete/",
-        ActionUpdateView.as_view(),
+        ActionDeleteView.as_view(),
         name="action_delete",
     ),
     path(
@@ -76,18 +86,28 @@ urlpatterns = [
     ),
     path("actions/", ActionListView.as_view(), name="action_list"),
     path("contacts/create/", ContactCreateView.as_view(), name="contact_create"),
-    path("contacts/<str:uuid>/edit/", ContactUpdateView.as_view(), name="contact_edit"),
     path(
         "contacts/<str:uuid>/delete/",
         ContactDeleteView.as_view(),
         name="contact_delete",
     ),
+    path(
+        "contacts/<str:uuid>/approval/",
+        ContactApprovalView.as_view(),
+        name="contact_approval",
+    ),
     path("contacts/", ContactListView.as_view(), name="contact_list"),
     path("themes/", MyCategoriesView.as_view(), name="my_themes"),
-    path("cases/", CasesListView.as_view(), name="my_cases"),
+    path("cases/open/", OpenCaseListView.as_view(), name="my_open_cases"),
+    path("cases/closed/", ClosedCaseListView.as_view(), name="my_closed_cases"),
+    path(
+        "cases/<str:object_id>/document/<str:info_id>/",
+        CaseDocumentDownloadView.as_view(),
+        name="case_document_download",
+    ),
     path(
         "cases/<str:object_id>/status/",
-        CasesStatusView.as_view(),
+        CaseDetailView.as_view(),
         name="case_status",
     ),
     path("edit/", EditProfileView.as_view(), name="edit_profile"),

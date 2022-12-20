@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n anchor_menu_tags card_tags dashboard_tags file_tags grid_tags status_tags %}
+{% load i18n anchor_menu_tags card_tags dashboard_tags file_tags grid_tags status_tags table_tags %}
 
 {% block sidebar_content %}
     {% if case %}
@@ -13,8 +13,9 @@
             {% render_column span=9 %}
 
                 {# Title/dashboard. #}
-<h1 class="h1" id="title">{{ case.description }}</h1>
+                <h1 class="h1" id="title">{{ case.description }}</h1>
                 {% case_dashboard case %}
+                {% case_table case %}
 
                 {#  Status history. #}
                 {% if case.statuses %}
@@ -26,8 +27,8 @@
                 {% if case.documents %}
                     <h2 class="h2" id="documents">{% trans 'Documenten' %}</h2>
                     {% case_document_list case.documents %}
-                    {% endif %}
-  		 <p class="p">{{ case.type_description }}</p>
+                {% endif %}
+
             {% endrender_column %}
         {% endrender_grid %}
     {% else %}

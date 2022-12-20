@@ -8,7 +8,12 @@
 
 
     <div class="messages__body">
-        <ol class="messages__days">
+        <ol
+            class="messages__days"
+            hx-get="{{ request.get_full_path }}"
+            hx-select=".messages__days"
+            hx-trigger="every 5s"
+        >
             {% for day in days %}
                 <li class="messages__day">
                     <header class="messages__day-header">
@@ -23,11 +28,11 @@
                                 {% endif %}
 
                                 {% if message.content %}
-                                    {% message message me=me %}
+                                    {% message message user=user %}
                                 {% endif %}
 
                                 {% if message.file %}
-                                    {% message message me=me file=True %}
+                                    {% message message user=user file=True %}
                                 {% endif %}
 
                             </li>
@@ -38,7 +43,8 @@
         </ol>
 
         {% if other_user.is_active %}
-            {% render_form id="message-form" form=form method="POST" enctype="multipart/form-data" %}
+            {% url 'accounts:inbox' as form_action %}
+            {% render_form id="message-form" form=form method="POST" form_action=form_action enctype="multipart/form-data" %}
                 {% csrf_token %}
                 {% hidden form.receiver %}
                 <div class="group-input">
