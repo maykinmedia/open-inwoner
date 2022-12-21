@@ -5,12 +5,12 @@
 
 .autoComplete_wrapper > ul {
   // position
-  position: relative;
+  position: absolute;
   top: 100%;
   left: 0;
   right: 0;
   padding: 0;
-  z-index: 1000;
+  z-index: 1005;
 
   // color
   background-color: var(--color-white);
@@ -21,7 +21,7 @@
 }
 
 .autoComplete_wrapper > ul > li {
-  padding: var(--spacing-small) 0;
+  padding: var(--spacing-small) var(--spacing-large);
   list-style: none;
   color: var(--color-gray-lighter);
 }
