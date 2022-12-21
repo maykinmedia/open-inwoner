@@ -6,9 +6,11 @@
         {% trans "Samenwerken" %}
         {% button href="plans:plan_create" text=_("Start nieuwe samenwerking") primary=True icon="group" icon_outlined=True %}
     </h1>
-    <p class="p">
-        {{configurable_text.plans_page.plans_intro|linebreaksbr}}
-    </p>
+    {% with configurable_text.plans_page.plans_intro as plans_intro %}
+        {% if plans_intro %}
+            <p class="p">{{plans_intro|linebreaksbr}}</p>
+        {% endif %}
+    {% endwith %}
 
     {% card_container plans=object_list columns=2 %}
 {% endblock %}

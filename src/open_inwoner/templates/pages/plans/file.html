@@ -3,9 +3,11 @@
 
 {% block content %}
     <h1 class="h1">{% trans "Samenwerken" %}</h1>
-    <p class="p">
-        {{configurable_text.plans_page.plans_intro|linebreaksbr}}
-    </p>
+    {% with configurable_text.plans_page.plans_intro as plans_intro %}
+        {% if plans_intro %}
+            <p class="p">{{plans_intro|linebreaksbr}}</p>
+        {% endif %}
+    {% endwith %}
 
     {% form id="document-create" form_object=form method="POST" enctype="multipart/form-data" %}
 {% endblock %}

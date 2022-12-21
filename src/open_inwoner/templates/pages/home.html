@@ -31,7 +31,11 @@
 
     {% if questionnaire_roots.exists %}
         <h2 class="h2">{{configurable_text.home_page.home_questionnaire_title}}</h2>
-        <p class="p">{{configurable_text.home_page.home_questionnaire_intro|linebreaksbr}}</p>
+        {% with configurable_text.home_page.home_questionnaire_intro as home_questionnaire_intro %}
+            {% if home_questionnaire_intro %}
+                <p class="p">{{home_questionnaire_intro|linebreaksbr}}</p>
+            {% endif %}
+        {% endwith %}
 
         {% questionnaire root_nodes=questionnaire_roots %}
     {% endif %}

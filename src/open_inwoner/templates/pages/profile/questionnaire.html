@@ -3,7 +3,11 @@
 
 {% block content %}
     <h1 class="h1">{{configurable_text.questionnaire_page.select_questionnaire_title}}</h1>
-    <p class="p">{{configurable_text.questionnaire_page.select_questionnaire_intro|linebreaksbr}}</p>
+    {% with configurable_text.questionnaire_page.select_questionnaire_intro as select_questionnaire_intro %}
+        {% if select_questionnaire_intro %}
+            <p class="p">{{select_questionnaire_intro|linebreaksbr}}</p>
+        {% endif %}
+    {% endwith %}
 
     {% questionnaire root_nodes=root_nodes %}
 {% endblock content %}
