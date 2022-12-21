@@ -1,4 +1,6 @@
-const radioButtons = document.querySelectorAll('.button-radio__input')
+const radioButtons = document.querySelectorAll(
+  '.feedback__options .button-radio__input'
+)
 
 ;[...radioButtons].forEach((radioButton) => {
   radioButton.addEventListener('click', (event) => {
