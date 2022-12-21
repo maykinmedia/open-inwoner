@@ -28,6 +28,10 @@
 
   &--compact {
     margin: var(--spacing-medium) 0;
+
+    p {
+      font-size: var(--font-size-body) !important;
+    }
   }
 
   &__icon {
