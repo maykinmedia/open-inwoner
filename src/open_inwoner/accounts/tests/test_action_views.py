@@ -321,7 +321,7 @@ class ActionsPlaywrightTests(PlaywrightSyncLiveServerTestCase):
         page = context.new_page()
         page.goto(self.live_reverse("accounts:action_list"))
 
-        # find action element and the dropdown
+        # find action element and the dropdown widget
         action_element = page.locator(f"#actions_{self.action.id}__status")
         dropdown_button = action_element.locator(".actions__status-selector")
         dropdown_content = action_element.locator(".dropdown__content")
@@ -330,12 +330,36 @@ class ActionsPlaywrightTests(PlaywrightSyncLiveServerTestCase):
         expect(dropdown_button).to_contain_text(
             str(StatusChoices.labels[StatusChoices.open])
         )
+
+        # grab buttonss
         status_closed_button = dropdown_content.get_by_role(
             "button", name=str(StatusChoices.labels[StatusChoices.closed])
         )
-        expect(status_closed_button).to_be_visible(visible=False)
+        status_approval_button = dropdown_content.get_by_role(
+            "button", name=str(StatusChoices.labels[StatusChoices.approval])
+        )
+        expect(status_approval_button).to_be_visible(visible=False)
 
-        # open dropdown
+        # open dropdown widget
+        dropdown_button.click()
+        expect(status_approval_button).to_be_visible()
+
+        # click on status-closed button
+        status_approval_button.click()
+
+        # status should change to approval
+        expect(dropdown_button).to_contain_text(
+            str(StatusChoices.labels[StatusChoices.approval])
+        )
+
+        # dropdown widget is closed
+        expect(status_approval_button).to_be_visible(visible=False)
+
+        # check database
+        self.action.refresh_from_db()
+        self.assertEqual(self.action.status, StatusChoices.approval)
+
+        # open dropdown again to see if the dropdown got re-hydrated
         dropdown_button.click()
         expect(status_closed_button).to_be_visible()
 
@@ -346,6 +370,9 @@ class ActionsPlaywrightTests(PlaywrightSyncLiveServerTestCase):
         expect(dropdown_button).to_contain_text(
             str(StatusChoices.labels[StatusChoices.closed])
         )
+
+        # dropdown widget is closed
+        expect(status_closed_button).to_be_visible(visible=False)
 
         # check database
         self.action.refresh_from_db()
