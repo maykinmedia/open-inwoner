@@ -1,14 +1,9 @@
 {% extends 'master.html' %}
-{% load i18n button_tags card_tags map_tags form_tags grid_tags icon_tags %}
+{% load i18n button_tags card_tags map_tags form_tags grid_tags icon_tags string_tags %}
 
 {% block content %}
     <h1 class="h1">{% trans "Samenwerken" %}</h1>
-    <p class="p">{{configurable_text.plans_page.plans_intro|linebreaksbr}}</p>
-    {% with configurable_text.plans_page.plans_intro as plans_intro %}
-        {% if plans_intro %}
-            <p class="p">{{plans_intro|linebreaksbr}}</p>
-        {% endif %}
-    {% endwith %}
+    {% optional_paragraph configurable_text.plans_page.plans_intro %}
 
     {% render_form id="plan-form" form=form method="POST" %}
         {% csrf_token %}

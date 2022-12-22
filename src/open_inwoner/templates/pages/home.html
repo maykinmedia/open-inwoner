@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n button_tags card_tags map_tags questionnaire_tags grid_tags product_tags utils %}
+{% load i18n button_tags card_tags map_tags questionnaire_tags grid_tags product_tags utils string_tags %}
 
 {% block header_image %}
 <aside aria-hidden="true">
@@ -31,12 +31,7 @@
 
     {% if questionnaire_roots.exists %}
         <h2 class="h2">{{configurable_text.home_page.home_questionnaire_title}}</h2>
-        {% with configurable_text.home_page.home_questionnaire_intro as home_questionnaire_intro %}
-            {% if home_questionnaire_intro %}
-                <p class="p">{{home_questionnaire_intro|linebreaksbr}}</p>
-            {% endif %}
-        {% endwith %}
-
+        {% optional_paragraph configurable_text.home_page.home_questionnaire_intro %}
         {% questionnaire root_nodes=questionnaire_roots %}
     {% endif %}
 
