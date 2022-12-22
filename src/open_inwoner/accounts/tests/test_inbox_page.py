@@ -1,10 +1,15 @@
+from unittest import skip
+
 from django.urls import reverse
 
 from django_webtest import WebTest
+from playwright.sync_api import expect
 from privates.test import temp_private_root
 
+from open_inwoner.utils.tests.playwright import PlaywrightSyncLiveServerTestCase
+
 from ..models import Message
-from .factories import MessageFactory, UserFactory
+from .factories import DigidUserFactory, MessageFactory, UserFactory
 
 
 class InboxPageTests(WebTest):
@@ -170,97 +175,67 @@ class InboxPageTests(WebTest):
         self.assertFalse(response.pyquery("form#message-form"))
 
 
-# class InboxPagePlaywrightTests(PlaywrightSyncLiveServerTestCase):
-#     @classmethod
-#     def setUpClass(cls):
-#         super().setUpClass()
-#
-#         cls.user = DigidUserFactory.create()
-#         # let's reuse the login storage_state
-#         cls.user_login_state = cls.get_user_bsn_login_state(cls.user)
-#
-#     def setUp(self):
-#         super().setUp()
-#
-#         self.user = UserFactory.create()
-#         self.contact_1 = UserFactory.create(
-#             first_name="user", last_name="1", email="user1@example.com"
-#         )
-#         self.contact_2 = UserFactory.create(
-#             first_name="user", last_name="2", email="user2@example.com"
-#         )
-#         self.user.user_contacts.add(self.contact_1)
-#         self.user.user_contacts.add(self.contact_2)
-#         MessageFactory.create(sender=self.user, receiver=self.contact_1)
-#         MessageFactory.create(receiver=self.user, sender=self.contact_2)
-#
-#     @skip("selenium no longer supported")
-#     def test_async_selector(self):
-#         self.given_i_am_logged_in()
-#         self.when_i_navigate_to_page()
-#
-#         # Send message.
-#         message_count = len(self.selenium.find_elements(By.CSS_SELECTOR, ".message"))
-#         content_textarea = self.selenium.find_element(By.NAME, "content")
-#         content_textarea.send_keys("Lorem ipsum dolor sit amet.")
-#         form = self.selenium.find_element(By.CSS_SELECTOR, "#message-form")
-#         form.submit()
-#
-#         # Assert message.
-#         selector = f".messages__list-item:nth-child({message_count + 1}) .message"
-#         message = self.selenium.find_element(By.CSS_SELECTOR, selector)
-#         self.assertIn("Lorem ipsum dolor sit amet.", message.text)
-#
-#         # assert async.
-#         url = f"{self.live_server_url}{reverse_lazy('accounts:inbox')}?redirected=True"
-#         self.assertEqual(url, self.selenium.current_url)
-#         self.assertNotIn("#messages-last", self.selenium.current_url)
-#
-#     def test_polling(self):
-#         context = self.browser.new_context(storage_state=self.user_login_state)
-#
-#         page = context.new_page()
-#         page.goto(self.live_reverse("accounts:inbox"))
-#
-#         # Create message.
-#         initial_message_count = len(
-#             self.selenium.find_elements(By.CSS_SELECTOR, ".message")
-#         )
-#         initial_selector = (
-#             f".messages__list-item:nth-child({initial_message_count}) .message"
-#         )
-#         initial_message = self.selenium.find_element(By.CSS_SELECTOR, initial_selector)
-#         initial_text = initial_message.text
-#
-#         Message.objects.create(
-#             receiver=self.user,
-#             sender=self.contact_2,
-#             content="Lorem ipsum dolor sit amet.",
-#         )
-#
-#         # Assert message.
-#         new_selector = (
-#             f".messages__list-item:nth-child({initial_message_count + 1}) .message"
-#         )
-#         new_message = self.selenium.find_element(By.CSS_SELECTOR, new_selector)
-#         self.assertIn("Lorem ipsum dolor sit amet.", new_message.text)
-#
-#         # Previous message.
-#         previous_selector = (
-#             f".messages__list-item:nth-child({initial_message_count}) .message"
-#         )
-#         previous_message = self.selenium.find_element(
-#             By.CSS_SELECTOR, previous_selector
-#         )
-#         self.assertEqual(initial_text, previous_message.text)
-#
-#         # assert async.
-#         url = f"{self.live_server_url}{reverse_lazy('accounts:inbox')}?redirected=True"
-#         self.assertEqual(url, self.selenium.current_url)
-#         self.assertNotIn("#messages-last", self.selenium.current_url)
-#
-#
-# class FirefoxInboxPagePlaywrightTests(InboxPagePlaywrightTests):
-#     @classmethod
-#     def launch_browser(cls, playwright):
-#         return playwright.firefox.launch()
+class InboxPagePlaywrightTests(PlaywrightSyncLiveServerTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.user = DigidUserFactory.create()
+        # let's reuse the login storage_state
+        cls.user_login_state = cls.get_user_bsn_login_state(cls.user)
+
+    def setUp(self):
+        super().setUp()
+
+        self.contact_1 = UserFactory.create(
+            first_name="user", last_name="1", email="user1@example.com"
+        )
+        self.contact_2 = UserFactory.create(
+            first_name="user", last_name="2", email="user2@example.com"
+        )
+        self.user.user_contacts.add(self.contact_1)
+        self.user.user_contacts.add(self.contact_2)
+        self.message_1 = MessageFactory.create(
+            content="Message#1 content", sender=self.user, receiver=self.contact_1
+        )
+        self.message_2 = MessageFactory.create(
+            content="Message#2 content",
+            receiver=self.user,
+            sender=self.contact_2,
+        )
+        self.contact_1_conversation_url = self.live_reverse(
+            "accounts:inbox",
+            kwargs={"uuid": self.contact_1.uuid},
+        )
+
+    @skip("re-implement on playwright after re-enabling")
+    def test_async_selector(self):
+        """
+        make sure to test re-hydration and if emoji and file components work after a submit
+        """
+
+    def test_polling(self):
+        context = self.browser.new_context(storage_state=self.user_login_state)
+
+        page = context.new_page()
+        page.goto(self.contact_1_conversation_url)
+
+        messages = page.locator(".messages__list-item")
+
+        # show conversation with contact_1
+        expect(messages.filter(has_text=self.message_1.content)).to_have_count(1)
+        expect(messages.filter(has_text=self.message_2.content)).to_have_count(0)
+
+        new_message = Message.objects.create(
+            receiver=self.user,
+            sender=self.contact_1,
+            content="Message#3 content",
+        )
+        # wait for poll to trigger
+        messages.filter(has_text=new_message.content).wait_for()
+
+
+class FirefoxInboxPagePlaywrightTests(InboxPagePlaywrightTests):
+    @classmethod
+    def launch_browser(cls, playwright):
+        return playwright.firefox.launch()
