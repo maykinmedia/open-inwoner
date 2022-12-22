@@ -12,16 +12,20 @@ def addstr(arg1, arg2):
 
 
 @register.simple_tag
-def optional_paragraph(field):
+def optional_paragraph(optional_text: str) -> str:
     """
     Renders the provided optional text, if it exists, or an empty string.
 
     Usage:
-        {% optional_paragraph field=field %}
+        {% optional_paragraph optional_text %}
 
     Variables:
-        + field: Field | This is the text field.
+        + optional_text: string | This is the optional text.
     """
-    if not field:
+    if not optional_text:
         return ""
-    return format_html('<p class="p">{field}</p>'.format(field=linebreaksbr(field)))
+    return format_html(
+        '<p class="p">{optional_text}</p>'.format(
+            optional_text=linebreaksbr(optional_text)
+        )
+    )
