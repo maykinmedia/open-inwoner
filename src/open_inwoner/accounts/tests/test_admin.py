@@ -1,10 +1,7 @@
-import os
-
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from django_webtest import WebTest
-from playwright.sync_api import Playwright, sync_playwright
 
 from ..models import User
 from .factories import UserFactory
@@ -77,36 +74,3 @@ class TestAdminUser(WebTest):
 
         self.assertContains(response, _("The user with this email already exists."))
         self.assertEqual(self.user.email, updated_user.email)
-
-
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-
-
-class MyViewTests(StaticLiveServerTestCase):
-    playwright: Playwright
-
-    @classmethod
-    def setUpClass(cls):
-        os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
-        super().setUpClass()
-        cls.playwright = sync_playwright().start()
-        cls.browser = cls.playwright.chromium.launch()
-
-        cls.user = UserFactory(email="foo@example.com", password="secret")
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.browser.close()
-        cls.playwright.stop()
-        super().tearDownClass()
-
-    def test_login(self):
-        page = self.browser.new_page()
-        page.goto("%s%s" % (self.live_server_url, "/accounts/login/"))
-        page.screenshot(path="screenshot.png")
-        page.wait_for_selector("text=Log in")
-        page.fill("[name='username']", "foo@example.com")
-        page.fill("[name='password']", "secret")
-        page.click("text=Log in")
-        self.assertEqual(page.url, "%s%s" % (self.live_server_url, "/profile/"))
-        page.close()
