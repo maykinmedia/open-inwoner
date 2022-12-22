@@ -1,9 +1,8 @@
 {% extends 'master.html' %}
-{% load i18n questionnaire_tags %}
+{% load i18n questionnaire_tags string_tags %}
 
 {% block content %}
     <h1 class="h1">{{configurable_text.questionnaire_page.select_questionnaire_title}}</h1>
-    <p class="p">{{configurable_text.questionnaire_page.select_questionnaire_intro|linebreaksbr}}</p>
-
+    {% optional_paragraph configurable_text.questionnaire_page.select_questionnaire_intro %}
     {% questionnaire root_nodes=root_nodes %}
 {% endblock content %}

@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n button_tags card_tags faq_tags grid_tags questionnaire_tags %}
+{% load i18n button_tags card_tags faq_tags grid_tags questionnaire_tags string_tags %}
 
 {% block header_image %}
 {% if object.image %}
@@ -39,7 +39,7 @@
             <div class="column column--start-1 column--span-6 ">
                 <aside class="questionnaire">
                     <h2 class="h2">{{configurable_text.questionnaire_page.select_questionnaire_title}}</h2>
-                    <p class="p">{{configurable_text.questionnaire_page.select_questionnaire_intro|linebreaksbr}}</p>
+                    {% optional_paragraph configurable_text.questionnaire_page.select_questionnaire_intro %}
                     {% questionnaire root_nodes=questionnaire_roots %}
                 </aside>
             </div>
