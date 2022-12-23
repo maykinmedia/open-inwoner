@@ -1,20 +1,15 @@
-from unittest import skip
-
 from django.contrib.messages import get_messages
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.core import mail
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from django_webtest import WebTest
-from privates.test import temp_private_root
 from webtest import Upload
 
 from open_inwoner.accounts.choices import StatusChoices
 from open_inwoner.accounts.models import Action
 from open_inwoner.accounts.tests.factories import ActionFactory, UserFactory
-from open_inwoner.accounts.tests.test_action_views import ActionStatusSeleniumBaseTests
-from open_inwoner.utils.tests.selenium import ChromeSeleniumMixin, FirefoxSeleniumMixin
+from open_inwoner.accounts.tests.test_action_views import ActionsPlaywrightTests
 
 from ..models import Plan
 from .factories import ActionTemplateFactory, PlanFactory, PlanTemplateFactory
@@ -571,22 +566,15 @@ class _PlanActionStatusSeleniumMixin:
         )
 
 
-@skip("skipped for now because of random CI failures, ref Taiga #963")
-class PlanActionStatusFirefoxSeleniumTests(
-    FirefoxSeleniumMixin,
-    _PlanActionStatusSeleniumMixin,
-    ActionStatusSeleniumBaseTests,
-    StaticLiveServerTestCase,
+class ChromePlanActionStatusPlaywrightTests(
+    _PlanActionStatusSeleniumMixin, ActionsPlaywrightTests
 ):
     pass
-    # note these use the same ActionStatusSeleniumBaseTests as the Actions without Plan
 
 
-@skip("skipped for now because of random CI failures, ref Taiga #963")
-class PlanActionStatusChromeSeleniumTests(
-    ChromeSeleniumMixin,
-    _PlanActionStatusSeleniumMixin,
-    ActionStatusSeleniumBaseTests,
-    StaticLiveServerTestCase,
+class FirefoxPlanActionStatusPlaywrightTests(
+    _PlanActionStatusSeleniumMixin, ActionsPlaywrightTests
 ):
-    pass
+    @classmethod
+    def launch_browser(cls, playwright):
+        return playwright.firefox.launch()

@@ -46,6 +46,7 @@ django-csp-reports
 mozilla-django-oidc-db
 django-open-forms-client
 django-htmx
+playwright
 
 # API libraries
 djangorestframework
