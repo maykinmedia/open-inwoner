@@ -67,6 +67,11 @@ class CustomRegistrationView(LogMixin, InviteMixin, RegistrationView):
         if invite:
             self.add_invitee(invite, user)
 
+        # Remove invite url from user's session
+        session = self.request.session
+        if "invite_url" in session.keys():
+            del session["invite_url"]
+
         self.request.user = user
         self.log_user_action(user, _("user was created"))
         return HttpResponseRedirect(self.get_success_url())

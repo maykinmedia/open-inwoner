@@ -23,6 +23,10 @@ class InviteAcceptView(LogMixin, UpdateView):
         self.object = form.save()
         url = furl(self.success_url).add({"invite": self.object.key}).url
 
+        # add invite url to the session
+        # this will be needed for redirection if digid login fails
+        self.request.session["invite_url"] = url
+
         self.log_system_action(_("invitation accepted"), self.object)
         return HttpResponseRedirect(url)
 
