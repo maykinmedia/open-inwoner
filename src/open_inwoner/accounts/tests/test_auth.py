@@ -246,20 +246,6 @@ class TestRegistrationDigid(WebTest):
             furl(reverse("digid:login")).add({"next": necessary_url}).url,
         )
 
-    def test_login_fail_redirects_to_invite_if_login_via_invite_url(self):
-        invite = InviteFactory()
-        url = invite.get_absolute_url()
-        invite_form = self.app.get(url).forms["invite-form"]
-        response = invite_form.submit()
-        invite_url = f"{reverse('django_registration_register')}?invite={invite.key}"
-
-        self.assertRedirects(response, invite_url)
-
-        redirected = response.follow()
-        self.assertEqual(redirected.client.session.get("invite_url"), invite_url)
-        digid_response = self.app.get(reverse("digid:login"))
-        breakpoint()
-
 
 class TestRegistrationNecessary(WebTest):
     url = reverse_lazy("accounts:registration_necessary")
