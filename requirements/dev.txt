@@ -16,20 +16,12 @@ astroid==2.8.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   pylint
-async-generator==1.10
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-    #   trio
-    #   trio-websocket
 attrs==21.2.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   glom
     #   jsonschema
-    #   outcome
-    #   trio
 babel==2.9.1
     # via sphinx
 bandit==1.7.4
@@ -62,7 +54,6 @@ certifi==2022.9.24
     #   elastic-apm
     #   elasticsearch
     #   requests
-    #   selenium
     #   sentry-sdk
 cffi==1.15.0
     # via
@@ -157,7 +148,6 @@ django==3.2.15
     #   django-relativedelta
     #   django-rich
     #   django-rosetta
-    #   django-selenium-login
     #   django-sendfile2
     #   django-simple-certmanager
     #   django-sniplates
@@ -334,10 +324,6 @@ django-rosetta==0.9.7
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-django-selenium-login==2.0.0
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
 django-sendfile2==0.7.0
     # via
     #   -c requirements/ci.txt
@@ -422,11 +408,6 @@ et-xmlfile==1.1.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   openpyxl
-exceptiongroup==1.0.4
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-    #   trio
 face==20.1.1
     # via
     #   -c requirements/ci.txt
@@ -485,11 +466,11 @@ glom==20.11.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   mozilla-django-oidc-db
-h11==0.14.0
+greenlet==2.0.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-    #   wsproto
+    #   playwright
 html5lib==1.1
     # via
     #   -c requirements/ci.txt
@@ -504,7 +485,6 @@ idna==3.2
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   requests
-    #   trio
 imagesize==1.2.0
     # via sphinx
 importlib-metadata==4.8.2
@@ -608,11 +588,6 @@ orderedmultidict==1.0.1
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   furl
-outcome==1.2.0
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-    #   trio
 packaging==21.0
     # via
     #   build
@@ -645,6 +620,10 @@ platformdirs==2.4.0
     #   -r requirements/ci.txt
     #   black
     #   pylint
+playwright==1.28.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 polib==1.1.1
     # via
     #   -c requirements/ci.txt
@@ -666,6 +645,11 @@ pydyf==0.1.2
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   weasyprint
+pyee==9.0.4
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   playwright
 pyflakes==2.3.1
     # via flake8
 pygments==2.12.0
@@ -707,11 +691,6 @@ pyrsistent==0.18.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   jsonschema
-pysocks==1.7.1
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-    #   urllib3
 python-dateutil==2.8.2
     # via
     #   -c requirements/ci.txt
@@ -787,10 +766,6 @@ rich==12.4.1
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-rich
-selenium==4.6.0
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
 sentry-sdk==1.4.3
     # via
     #   -c requirements/ci.txt
@@ -811,18 +786,8 @@ six==1.16.0
     #   requests-mock
 smmap==5.0.0
     # via gitdb
-sniffio==1.3.0
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-    #   trio
 snowballstemmer==2.1.0
     # via sphinx
-sortedcontainers==2.4.0
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-    #   trio
 soupsieve==2.3.1
     # via
     #   -c requirements/ci.txt
@@ -884,23 +849,13 @@ tomli==1.2.1
     #   black
     #   build
     #   pep517
-trio==0.22.0
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-    #   selenium
-    #   trio-websocket
-trio-websocket==0.9.2
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-    #   selenium
-typing-extensions==3.10.0.2
+typing-extensions==4.4.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   astroid
     #   black
+    #   pyee
     #   pylint
 unidecode==1.1.2
     # via
@@ -912,14 +867,13 @@ uritemplate==4.1.1
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   drf-spectacular
-urllib3[socks]==1.26.7
+urllib3==1.26.7
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   elastic-apm
     #   elasticsearch
     #   requests
-    #   selenium
     #   sentry-sdk
 uwsgi==2.0.19.1
     # via
@@ -958,11 +912,6 @@ wrapt==1.12.1
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   astroid
-wsproto==1.2.0
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-    #   trio-websocket
 xlrd==2.0.1
     # via
     #   -c requirements/ci.txt

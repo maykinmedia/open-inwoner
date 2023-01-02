@@ -15,6 +15,7 @@ def notifications(messages, **kwargs):
 
     Variables:
         + messages: list | A list of messages that need to be displayed.
+        - compact: boolean | Whether to use compact styling or not.
         - icon: string | The icon, can be false.
     """
     if kwargs.get("icon") is not None:
@@ -41,9 +42,21 @@ def notification(type, message, **kwargs):
         - action: string | The href of the button.
         - action_text: string | The text of the button.
         - closable: bool | If a close button should be shown.
+        - compact: boolean | Whether to use compact styling or not.
     """
+    message_types = {
+        "debug": "bug_report",
+        "error": "error",
+        "info": "info",
+        "success": "check_circle",
+        "warning": "warning",
+    }
+
+    if kwargs.get("icon") is not False:
+        kwargs["icon"] = message_types[type]
+
     return {
-        "icon": kwargs.get("icon", "change_history"),
+        "icon": kwargs.get("icon"),
         "type": type,
         "message": message,
         **kwargs,

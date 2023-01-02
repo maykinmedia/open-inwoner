@@ -238,6 +238,8 @@ glom==20.11.0
     # via
     #   -r requirements/base.in
     #   mozilla-django-oidc-db
+greenlet==2.0.1
+    # via playwright
 html5lib==1.1
     # via weasyprint
 humanfriendly==10.0
@@ -286,6 +288,8 @@ pillow==9.0.1
     #   -r requirements/base.in
     #   easy-thumbnails
     #   weasyprint
+playwright==1.28.0
+    # via -r requirements/base.in
 polib==1.1.1
     # via django-rosetta
 psycopg2==2.9.1
@@ -294,6 +298,8 @@ pycparser==2.20
     # via cffi
 pydyf==0.1.2
     # via weasyprint
+pyee==9.0.4
+    # via playwright
 pygments==2.12.0
     # via rich
 pyjwt==2.3.0
@@ -374,6 +380,8 @@ tinycss2==1.1.1
     # via
     #   cssselect2
     #   weasyprint
+typing-extensions==4.4.0
+    # via pyee
 unidecode==1.1.2
     # via django-filer
 uritemplate==4.1.1

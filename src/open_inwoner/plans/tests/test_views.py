@@ -1,20 +1,15 @@
-from unittest import skip
-
 from django.contrib.messages import get_messages
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.core import mail
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from django_webtest import WebTest
-from privates.test import temp_private_root
 from webtest import Upload
 
 from open_inwoner.accounts.choices import StatusChoices
 from open_inwoner.accounts.models import Action
 from open_inwoner.accounts.tests.factories import ActionFactory, UserFactory
-from open_inwoner.accounts.tests.test_action_views import ActionStatusSeleniumBaseTests
-from open_inwoner.utils.tests.selenium import ChromeSeleniumMixin, FirefoxSeleniumMixin
+from open_inwoner.accounts.tests.test_action_views import ActionsPlaywrightTests
 
 from ..models import Plan
 from .factories import ActionTemplateFactory, PlanFactory, PlanTemplateFactory
@@ -365,6 +360,17 @@ class PlanViewTests(WebTest):
         elem = response.pyquery(f"#id_plan_contacts_1")[0]
         self.assertEqual(elem.attrib.get("checked"), "checked")
 
+    def test_plan_create_contains_contact_create_link_when_no_contacts_exist(self):
+        self.user.user_contacts.remove(self.contact)
+        response = self.app.get(self.create_url, user=self.user)
+        self.assertContains(response, reverse("accounts:contact_create"))
+
+    def test_plan_create_does_not_contain_contact_create_link_when_contacts_exist(
+        self,
+    ):
+        response = self.app.get(self.create_url, user=self.user)
+        self.assertNotContains(response, reverse("accounts:contact_create"))
+
     def test_plan_edit_login_required(self):
         response = self.app.get(self.edit_url)
         self.assertRedirects(response, f"{self.login_url}?next={self.edit_url}")
@@ -555,7 +561,7 @@ class PlanViewTests(WebTest):
         self.assertEqual(response.status_code, 404)
 
 
-class _PlanActionStatusSeleniumMixin:
+class _PlanActionStatusPlaywrightMixin:
     def setUp(self) -> None:
         super().setUp()
 
@@ -571,22 +577,15 @@ class _PlanActionStatusSeleniumMixin:
         )
 
 
-@skip("skipped for now because of random CI failures, ref Taiga #963")
-class PlanActionStatusFirefoxSeleniumTests(
-    FirefoxSeleniumMixin,
-    _PlanActionStatusSeleniumMixin,
-    ActionStatusSeleniumBaseTests,
-    StaticLiveServerTestCase,
+class ChromePlanActionStatusPlaywrightTests(
+    _PlanActionStatusPlaywrightMixin, ActionsPlaywrightTests
 ):
     pass
-    # note these use the same ActionStatusSeleniumBaseTests as the Actions without Plan
 
 
-@skip("skipped for now because of random CI failures, ref Taiga #963")
-class PlanActionStatusChromeSeleniumTests(
-    ChromeSeleniumMixin,
-    _PlanActionStatusSeleniumMixin,
-    ActionStatusSeleniumBaseTests,
-    StaticLiveServerTestCase,
+class FirefoxPlanActionStatusPlaywrightTests(
+    _PlanActionStatusPlaywrightMixin, ActionsPlaywrightTests
 ):
-    pass
+    @classmethod
+    def launch_browser(cls, playwright):
+        return playwright.firefox.launch()

@@ -142,6 +142,7 @@ class SiteConfiguration(SingletonModel):
     home_questionnaire_intro = models.TextField(
         default=_("Test met een paar simpele vragen of u recht heeft op een product"),
         verbose_name=_("Home page questionaire intro"),
+        blank=True,
         help_text=_("Questionnaire intro text on the home page."),
     )
     home_product_finder_title = models.CharField(
@@ -169,6 +170,7 @@ class SiteConfiguration(SingletonModel):
             "Kies hieronder één van de volgende vragenlijsten om de zelfdiagnose te starten."
         ),
         verbose_name=_("Questionaire selector widget intro"),
+        blank=True,
         help_text=_("Questionaire selector intro on the theme and profile pages."),
     )
     plans_intro = models.TextField(
@@ -176,6 +178,7 @@ class SiteConfiguration(SingletonModel):
             "Hier werkt u aan uw doelen. Dit doet u samen met uw contactpersoon bij de gemeente. "
         ),
         verbose_name=_("Plan pages intro"),
+        blank=True,
         help_text=_("The sub-title for the plan page."),
     )
     plans_no_plans_message = models.CharField(

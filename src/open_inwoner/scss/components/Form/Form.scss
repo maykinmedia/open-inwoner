@@ -3,6 +3,7 @@
   display: grid;
   gap: var(--gutter-width);
   padding: var(--gutter-width) 0;
+  position: relative;
 
   @media (min-width: 768px) {
     gap: var(--gutter-width);
@@ -79,6 +80,10 @@
     width: 100%;
   }
 
+  &__control > .label .material-icons-outlined {
+    pointer-events: none;
+  }
+
   &__grid-box {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -153,7 +158,14 @@
       right: 5px;
       top: 50%;
       transform: translateY(-50%);
-      pointer-events: none;
+    }
+
+    .notification > *[class*='icon'],
+    .notification > *[class*='Icon'] {
+      width: auto !important;
+      position: absolute;
+      right: var(--spacing-small);
+      top: var(--spacing-large);
     }
   }
 }

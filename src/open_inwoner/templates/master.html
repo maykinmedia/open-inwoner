@@ -40,7 +40,11 @@
 
         {% block header_image %}{% endblock header_image %}
 
-        {% block notifications %}{% notifications messages %}{% endblock %}
+        {% block notifications %}
+            <div class="container container--no-margin">
+                {% notifications messages %}
+            </div>
+        {% endblock %}
 
         {% block main_outer %}
             <main class="container">

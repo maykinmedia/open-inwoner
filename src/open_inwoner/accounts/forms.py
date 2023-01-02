@@ -316,8 +316,8 @@ class InboxForm(forms.ModelForm):
         file = cleaned_data.get("file")
 
         if not file and not content:
-            raise ValidationError(
-                _("Either message content or file should be filled in")
+            self.add_error(
+                "content", _("Either message content or file should be filled in")
             )
 
         return cleaned_data

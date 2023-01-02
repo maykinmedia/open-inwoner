@@ -1,24 +1,18 @@
-import time
 from datetime import date
-from unittest import skip
 
 from django.contrib.messages import get_messages
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from django_webtest import WebTest
+from playwright.sync_api import expect
 from privates.test import temp_private_root
-from selenium.webdriver import ActionChains
-from selenium.webdriver.common.by import By
-from selenium.webdriver.remote.webdriver import WebDriver
 
-from open_inwoner.utils.tests.selenium import ChromeSeleniumMixin, FirefoxSeleniumMixin
-
-from ..choices import StatusChoices
+from ...utils.tests.playwright import PlaywrightSyncLiveServerTestCase
+from ..choices import LoginTypeChoices, StatusChoices
 from ..models import Action
-from .factories import ActionFactory, UserFactory
+from .factories import ActionFactory, DigidUserFactory, UserFactory
 
 
 @temp_private_root()
@@ -302,13 +296,18 @@ class ActionViewTests(WebTest):
         self.assertEqual(response.status_code, 404)
 
 
-class ActionStatusSeleniumBaseTests:
-    selenium: WebDriver
+class ActionsPlaywrightTests(PlaywrightSyncLiveServerTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.user = DigidUserFactory.create()
+        # let's reuse the login storage_state
+        cls.user_login_state = cls.get_user_bsn_login_state(cls.user)
 
     def setUp(self) -> None:
         super().setUp()
 
-        self.user = UserFactory.create()
         self.action = ActionFactory(
             name="my_action",
             created_by=self.user,
@@ -316,102 +315,71 @@ class ActionStatusSeleniumBaseTests:
         )
         self.action_list_url = reverse("accounts:action_list")
 
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.selenium.implicitly_wait(10)
-
     def test_action_status(self):
-        """
-        note: there are some issues with both selenium and the threading in StaticLiveServerTestCase
-          that make it seemingly impossible to get this to pass with either implicit or explicit wait conditions
+        context = self.browser.new_context(storage_state=self.user_login_state)
 
-        after trying everything in the docs and stackoverflow with inconsistent results on both the Firefox and Chrome
-          versions running both locally and on CI, the solution was to simply put time.sleep(1) after each async action
-        """
-        self.force_login(self.user)
+        page = context.new_page()
+        page.goto(self.live_reverse("accounts:action_list"))
 
-        # wait for user and session to be visible from the server thread (weirdly only a problem on CI)
-        time.sleep(2)
+        # find action element and the dropdown widget
+        action_element = page.locator(f"#actions_{self.action.id}__status")
+        dropdown_button = action_element.locator(".actions__status-selector")
+        dropdown_content = action_element.locator(".dropdown__content")
 
-        # use a big screen because scroll_into_view or JS scroll commands are problematic
-        self.selenium.set_window_size(1200, 1200)
-        self.selenium.get(self.live_server_url + self.action_list_url)
-
-        self.assertEqual(self.action.status, StatusChoices.open)
-
-        wrapper = self.selenium.find_element(
-            By.CSS_SELECTOR, f"#actions_{self.action.id}__status"
-        )
-        dropdown = wrapper.find_element(By.CSS_SELECTOR, ".dropdown")
-        dropdown_content = dropdown.find_element(By.CSS_SELECTOR, ".dropdown__content")
-
-        # grab and check our button is Open
-        button = wrapper.find_element(
-            By.CSS_SELECTOR,
-            f"#actions_{self.action.id}__status .actions__status-selector",
-        )
-        self.assertEqual(
-            button.get_dom_attribute("title"), StatusChoices.labels[StatusChoices.open]
-        )
-        self.assertIn(
-            f"actions__status-selector--{StatusChoices.open}",
-            button.get_attribute("class"),
+        # check state
+        expect(dropdown_button).to_contain_text(
+            str(StatusChoices.labels[StatusChoices.open])
         )
 
-        # scroll the dropdown into view and open it
-        ActionChains(self.selenium).scroll_to_element(wrapper).scroll_by_amount(
-            0, 200
-        ).click(button).perform()
-
-        # wait for htmx to return (neither implicit or explicit waits nor ActionChains.pause will help)
-        time.sleep(2)
-
-        self.assertIn(
-            f"dropdown--{StatusChoices.open}", dropdown.get_attribute("class")
+        # grab buttonss
+        status_closed_button = dropdown_content.get_by_role(
+            "button", name=str(StatusChoices.labels[StatusChoices.closed])
         )
-        self.assertTrue(dropdown_content.is_displayed())
-
-        # find and click the close-state button
-        status_closed_button = dropdown_content.find_element(
-            By.CSS_SELECTOR, f".actions__status-{StatusChoices.closed}"
+        status_approval_button = dropdown_content.get_by_role(
+            "button", name=str(StatusChoices.labels[StatusChoices.approval])
         )
-        self.assertTrue(status_closed_button.is_displayed())
+        expect(status_approval_button).to_be_visible(visible=False)
 
-        # click button and htmx should run
+        # open dropdown widget
+        dropdown_button.click()
+        expect(status_approval_button).to_be_visible()
+
+        # click on status-closed button
+        status_approval_button.click()
+
+        # status should change to approval
+        expect(dropdown_button).to_contain_text(
+            str(StatusChoices.labels[StatusChoices.approval])
+        )
+
+        # dropdown widget is closed
+        expect(status_approval_button).to_be_visible(visible=False)
+
+        # check database
+        self.action.refresh_from_db()
+        self.assertEqual(self.action.status, StatusChoices.approval)
+
+        # open dropdown again to see if the dropdown got re-hydrated
+        dropdown_button.click()
+        expect(status_closed_button).to_be_visible()
+
+        # click on status-closed button
         status_closed_button.click()
 
-        # wait for htmx to return
-        time.sleep(2)
-
-        # regrab and check our button is now Closed
-        button = self.selenium.find_element(
-            By.CSS_SELECTOR,
-            f"#actions_{self.action.id}__status .actions__status-selector",
-        )
-        self.assertEqual(
-            button.get_dom_attribute("title"),
-            StatusChoices.labels[StatusChoices.closed],
-        )
-        self.assertIn(
-            f"actions__status-selector--{StatusChoices.closed}",
-            button.get_attribute("class"),
+        # status should change
+        expect(dropdown_button).to_contain_text(
+            str(StatusChoices.labels[StatusChoices.closed])
         )
 
-        # check our action in the database is closed now
+        # dropdown widget is closed
+        expect(status_closed_button).to_be_visible(visible=False)
+
+        # check database
         self.action.refresh_from_db()
         self.assertEqual(self.action.status, StatusChoices.closed)
 
 
-@skip("skipped for now because of random CI failures, ref Taiga #963")
-class ActionStatusFirefoxSeleniumTests(
-    FirefoxSeleniumMixin, ActionStatusSeleniumBaseTests, StaticLiveServerTestCase
-):
-    pass
-
-
-@skip("skipped for now because of random CI failures, ref Taiga #963")
-class ActionStatusChromeSeleniumTests(
-    ChromeSeleniumMixin, ActionStatusSeleniumBaseTests, StaticLiveServerTestCase
-):
-    pass
+class FirefoxActionsPlaywrightTests(ActionsPlaywrightTests):
+    @classmethod
+    def launch_browser(cls, playwright):
+        return playwright.firefox.launch()

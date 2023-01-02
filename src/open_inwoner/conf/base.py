@@ -979,6 +979,7 @@ THUMBNAIL_ALIASES = {
         },
     }
 }
+THUMBNAIL_QUALITY = 100
 
 TEST_RUNNER = "django_rich.test.RichRunner"
 

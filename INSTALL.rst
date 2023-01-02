@@ -72,34 +72,44 @@ development machine.
        $ source env/bin/activate
        $ pip install -r requirements/dev.txt
 
-4. Install and build the frontend libraries:
+4. Run third-party install commands:
+
+   - Install the required browsers for `Playwright`_ end-to-end testing.
+
+   .. code-block:: bash
+
+       $ playwright install
+
+.. _Playwright: https://playwright.dev/python/
+
+5. Install and build the frontend libraries:
 
    .. code-block:: bash
 
        $ npm install
        $ npm run build
 
-5. Create the statics and database:
+6. Create the statics and database:
 
    .. code-block:: bash
 
        $ python src/manage.py collectstatic --link
        $ python src/manage.py migrate
 
-6. Create a superuser to access the management interface:
+7. Create a superuser to access the management interface:
 
    .. code-block:: bash
 
        $ python src/manage.py createsuperuser
 
-7. You can now run your installation and point your browser to the address
+8. You can now run your installation and point your browser to the address
    given by this command:
 
    .. code-block:: bash
 
        $ python src/manage.py runserver
 
-8. Create a .env file with database settings. See dotenv.example for an example.
+9. Create a .env file with database settings. See dotenv.example for an example.
 
         $ cp dotenv.example .env
 

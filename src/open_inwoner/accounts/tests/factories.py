@@ -5,8 +5,9 @@ from uuid import uuid4
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models.signals import post_save, pre_save
 
-import factory
 import factory.fuzzy
+
+from open_inwoner.accounts.choices import LoginTypeChoices
 
 
 @factory.django.mute_signals(pre_save, post_save)
@@ -21,6 +22,12 @@ class UserFactory(factory.django.DjangoModelFactory):
         lambda o: "%s%d@example.com" % (o.first_name, random.randint(0, 10000))
     )
     password = factory.PostGenerationMethodCall("set_password", "secret")
+
+
+class DigidUserFactory(UserFactory):
+    login_type = LoginTypeChoices.digid
+    bsn = "123456782"  # TODO ideally this should be random (but still valid)
+    is_prepopulated = True
 
 
 class TokenFactory(factory.django.DjangoModelFactory):
