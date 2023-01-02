@@ -9,7 +9,7 @@ from django_webtest import WebTest
 from playwright.sync_api import expect
 from privates.test import temp_private_root
 
-from ...utils.tests.playwright import PlaywrightSyncLiveServerTestCase
+from ...utils.tests.playwright import PlaywrightSyncLiveServerTestCase, multi_browser
 from ..choices import LoginTypeChoices, StatusChoices
 from ..models import Action
 from .factories import ActionFactory, DigidUserFactory, UserFactory
@@ -296,6 +296,7 @@ class ActionViewTests(WebTest):
         self.assertEqual(response.status_code, 404)
 
 
+@multi_browser()
 class ActionsPlaywrightTests(PlaywrightSyncLiveServerTestCase):
     @classmethod
     def setUpClass(cls):
@@ -377,9 +378,3 @@ class ActionsPlaywrightTests(PlaywrightSyncLiveServerTestCase):
         # check database
         self.action.refresh_from_db()
         self.assertEqual(self.action.status, StatusChoices.closed)
-
-
-class FirefoxActionsPlaywrightTests(ActionsPlaywrightTests):
-    @classmethod
-    def launch_browser(cls, playwright):
-        return playwright.firefox.launch()

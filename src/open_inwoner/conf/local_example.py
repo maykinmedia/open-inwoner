@@ -12,3 +12,9 @@ DATABASES = {
         "PORT": "",  # Set to empty string for default.
     }
 }
+
+# ignore multi-browser
+PLAYWRIGHT_MULTI_ONLY_DEFAULT = True
+
+# keep default browser if we're running multi-browser
+PLAYWRIGHT_MULTI_KEEP_DEFAULT = False
