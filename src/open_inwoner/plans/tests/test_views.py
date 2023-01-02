@@ -561,7 +561,7 @@ class PlanViewTests(WebTest):
         self.assertEqual(response.status_code, 404)
 
 
-class _PlanActionStatusSeleniumMixin:
+class _PlanActionStatusPlaywrightMixin:
     def setUp(self) -> None:
         super().setUp()
 
@@ -578,13 +578,13 @@ class _PlanActionStatusSeleniumMixin:
 
 
 class ChromePlanActionStatusPlaywrightTests(
-    _PlanActionStatusSeleniumMixin, ActionsPlaywrightTests
+    _PlanActionStatusPlaywrightMixin, ActionsPlaywrightTests
 ):
     pass
 
 
 class FirefoxPlanActionStatusPlaywrightTests(
-    _PlanActionStatusSeleniumMixin, ActionsPlaywrightTests
+    _PlanActionStatusPlaywrightMixin, ActionsPlaywrightTests
 ):
     @classmethod
     def launch_browser(cls, playwright):
