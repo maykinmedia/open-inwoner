@@ -134,9 +134,6 @@ CORS_ALLOWED_ORIGINS = [
 
 TWO_FACTOR_PATCH_ADMIN = False
 
-# django-selenium-login needs an arbitrary and fast page to grab cookies
-SELENIUM_LOGIN_START_PAGE = "/admin/password_reset/"
-
 # Override settings with local settings.
 try:
     from .local import *  # noqa
