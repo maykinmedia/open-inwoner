@@ -1,5 +1,6 @@
+from django.contrib import messages
 from django.http.response import Http404, HttpResponseRedirect
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
 from django.views.generic import UpdateView
 
@@ -32,7 +33,6 @@ class InviteAcceptView(LogMixin, UpdateView):
 
     def get_object(self, queryset=None):
         invite = super().get_object(queryset)
-        user = self.request.user
 
         if invite.expired():
             self.log_system_action(_("invitation expired"), invite)
@@ -42,11 +42,31 @@ class InviteAcceptView(LogMixin, UpdateView):
             self.log_system_action(_("invitation used"), invite)
             raise Http404(_("The invitation was already used"))
 
-        if user.is_authenticated:
-            if user.email != invite.invitee_email:
-                raise Http404(_("The invitation was not found"))
+        return invite
 
+    def dispatch(self, request, *args, **kwargs):
+        invite = self.get_object()
+        user = request.user
+
+        # mark invitation as accepted and add inviter to the user's contacts as well
+        if user.is_authenticated:
             invite.accepted = True
+            invite.invitee = user
             invite.save()
 
-        return invite
+            inviter = invite.inviter
+            user.user_contacts.add(inviter)
+            self.log_system_action(_("invitation automatically accepted"), invite)
+
+            messages.add_message(
+                self.request,
+                messages.SUCCESS,
+                _(
+                    "{inviter} is toegevoegd aan uw contactpersonen.".format(
+                        inviter=inviter.email
+                    )
+                ),
+            )
+            return HttpResponseRedirect(reverse("accounts:contact_list"))
+
+        return super().dispatch(request, *args, **kwargs)

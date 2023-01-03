@@ -41,6 +41,19 @@ class InvitePageTests(WebTest):
 
         self.assertEqual(response.status_code, 404)
 
+    def test_invite_not_automatically_accepted_when_not_loggedin(self):
+        user = UserFactory()
+        invite = InviteFactory.create(invitee=user, invitee_email=user.email)
+        url = invite.get_absolute_url()
+
+        self.assertFalse(invite.accepted)
+
+        response = self.app.get(url)
+
+        invite.refresh_from_db()
+
+        self.assertFalse(invite.accepted)
+
     def test_invite_automatically_accepted_when_loggedin(self):
         user = UserFactory()
         invite = InviteFactory.create(invitee=user, invitee_email=user.email)
@@ -50,26 +63,19 @@ class InvitePageTests(WebTest):
 
         response = self.app.get(url, user=user)
 
-        form = response.forms["invite-form"]
-        response = form.submit(status=404)
-
         invite.refresh_from_db()
 
         self.assertTrue(invite.accepted)
 
-    def test_invite_not_accepted_when_loggedin_with_different_account(self):
-        user = UserFactory()
-        other_user = UserFactory()
-        invite = InviteFactory.create(invitee=user, invitee_email=user.email)
+    def test_contact_relationship_is_automatically_added_when_logged_in(self):
+        inviter = UserFactory()
+        invitee = UserFactory()
+        invite = InviteFactory.create(inviter=inviter, invitee=invitee)
         url = invite.get_absolute_url()
+        response = self.app.get(url, user=invitee)
 
-        self.assertFalse(invite.accepted)
-
-        response = self.app.get(url, user=other_user, status=404)
-
-        invite.refresh_from_db()
-
-        self.assertFalse(invite.accepted)
+        self.assertEqual(inviter.user_contacts.get(), invitee)
+        self.assertEqual(invitee.user_contacts.get(), inviter)
 
     def test_invite_url_is_saved_to_session_after_acceptance(self):
         invite = InviteFactory()
