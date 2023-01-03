@@ -61,7 +61,11 @@ class CustomDigiDAssertionConsumerServiceMockView(
         invite_url = self.request.session.get("invite_url")
         next_url = self.request.GET.get("next")
 
-        if invite_url and reverse("accounts:registration_necessary") in next_url:
+        if (
+            invite_url
+            and next_url
+            and reverse("accounts:registration_necessary") in next_url
+        ):
             # If user logs in via the invitation flow redirect to the invitation
             # accept view if login fails
             absolute_invite_url = self.request.build_absolute_uri(invite_url)
@@ -103,7 +107,11 @@ class CustomDigiDAssertionConsumerServiceView(DigiDAssertionConsumerServiceView)
         invite_url = self.request.session.get("invite_url")
         next_url = self.request.GET.get("next")
 
-        if invite_url and reverse("accounts:registration_necessary") in next_url:
+        if (
+            invite_url
+            and next_url
+            and reverse("accounts:registration_necessary") in next_url
+        ):
             # If user logs in via the invitation flow redirect to the invitation
             # accept view if login fails
             absolute_invite_url = self.request.build_absolute_uri(invite_url)

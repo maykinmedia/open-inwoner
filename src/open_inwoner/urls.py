@@ -10,8 +10,8 @@ from mozilla_django_oidc_db.views import AdminLoginFailure
 
 from open_inwoner.accounts.forms import CustomRegistrationForm
 from open_inwoner.accounts.views import (
-    CustomDigiDAssertionConsumerServiceView,
     CustomDigiDAssertionConsumerServiceMockView,
+    CustomDigiDAssertionConsumerServiceView,
     CustomRegistrationView,
     LogPasswordChangeView,
     LogPasswordResetConfirmView,

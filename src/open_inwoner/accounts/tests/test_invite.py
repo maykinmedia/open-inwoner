@@ -40,3 +40,47 @@ class InvitePageTests(WebTest):
         response = self.app.get(url, status=404)
 
         self.assertEqual(response.status_code, 404)
+
+    def test_invite_automatically_accepted_when_loggedin(self):
+        user = UserFactory()
+        invite = InviteFactory.create(invitee=user, invitee_email=user.email)
+        url = invite.get_absolute_url()
+
+        self.assertFalse(invite.accepted)
+
+        response = self.app.get(url, user=user)
+
+        form = response.forms["invite-form"]
+        response = form.submit(status=404)
+
+        invite.refresh_from_db()
+
+        self.assertTrue(invite.accepted)
+
+    def test_invite_not_accepted_when_loggedin_with_different_account(self):
+        user = UserFactory()
+        other_user = UserFactory()
+        invite = InviteFactory.create(invitee=user, invitee_email=user.email)
+        url = invite.get_absolute_url()
+
+        self.assertFalse(invite.accepted)
+
+        response = self.app.get(url, user=other_user, status=404)
+
+        invite.refresh_from_db()
+
+        self.assertFalse(invite.accepted)
+
+    def test_invite_url_is_saved_to_session_after_acceptance(self):
+        invite = InviteFactory()
+        url = invite.get_absolute_url()
+
+        response = self.app.get(url)
+
+        form = response.forms["invite-form"]
+        response = form.submit()
+
+        self.assertEqual(
+            self.app.session["invite_url"],
+            f"{reverse('django_registration_register')}?invite={invite.key}",
+        )

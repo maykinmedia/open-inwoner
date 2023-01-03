@@ -32,9 +32,7 @@ class InviteAcceptView(LogMixin, UpdateView):
 
     def get_object(self, queryset=None):
         invite = super().get_object(queryset)
-
-        if self.request.user.is_authenticated:
-            raise Http404(_("U bent al ingelogd."))
+        user = self.request.user
 
         if invite.expired():
             self.log_system_action(_("invitation expired"), invite)
@@ -43,5 +41,12 @@ class InviteAcceptView(LogMixin, UpdateView):
         if invite.accepted:
             self.log_system_action(_("invitation used"), invite)
             raise Http404(_("The invitation was already used"))
+
+        if user.is_authenticated:
+            if user.email != invite.invitee_email:
+                raise Http404(_("The invitation was not found"))
+
+            invite.accepted = True
+            invite.save()
 
         return invite
