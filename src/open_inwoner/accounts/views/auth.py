@@ -105,7 +105,7 @@ class CustomDigiDAssertionConsumerServiceMockView(
 class CustomDigiDAssertionConsumerServiceView(DigiDAssertionConsumerServiceView):
     def get_login_url(self, **kwargs):
         invite_url = self.request.session.get("invite_url")
-        next_url = self.request.GET.get("next")
+        next_url = self.request.GET.get("RelayState")
 
         if (
             invite_url
