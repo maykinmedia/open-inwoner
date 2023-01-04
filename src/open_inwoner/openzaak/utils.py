@@ -123,12 +123,9 @@ def cache(key: str, alias: str = "default", **set_options):
     def decorator(func: callable):
         argspec = inspect.getfullargspec(func)
 
-        # argspec_args = [a for a in argspec.args if a not in ("self", "cls")]
-        argspec_args = argspec.args
-
         if argspec.defaults:
-            positional_count = len(argspec_args) - len(argspec.defaults)
-            defaults = dict(zip(argspec_args[positional_count:], argspec.defaults))
+            positional_count = len(argspec.args) - len(argspec.defaults)
+            defaults = dict(zip(argspec.args[positional_count:], argspec.defaults))
         else:
             defaults = {}
 
@@ -139,14 +136,14 @@ def cache(key: str, alias: str = "default", **set_options):
                 return func(*args, **kwargs)
 
             key_kwargs = defaults.copy()
-            named_args = dict(zip(argspec_args, args), **kwargs)
+            named_args = dict(zip(argspec.args, args), **kwargs)
             key_kwargs.update(**named_args)
 
             if argspec.varkw:
                 var_kwargs = {
                     key: value
                     for key, value in named_args.items()
-                    if key not in argspec_args
+                    if key not in argspec.args
                 }
                 key_kwargs[argspec.varkw] = var_kwargs
 
