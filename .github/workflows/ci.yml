@@ -70,7 +70,7 @@ jobs:
           python src/manage.py collectstatic --noinput --link
           coverage run src/manage.py test src
         env:
-          DJANGO_SETTINGS_MODULE: open_inwoner.conf.dev
+          DJANGO_SETTINGS_MODULE: open_inwoner.conf.ci
           SECRET_KEY: dummy
           DB_USER: postgres
           DB_PASSWORD: ''
