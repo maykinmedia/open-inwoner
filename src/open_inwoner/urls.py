@@ -90,6 +90,7 @@ urlpatterns = [
     ),
     path("oidc/", include("mozilla_django_oidc.urls")),
     path("faq/", FAQView.as_view(), name="general_faq"),
+    path("yubin/", include("django_yubin.urls")),
     path("", include("open_inwoner.pdc.urls", namespace="pdc")),
     path("", include("open_inwoner.search.urls", namespace="search")),
     path("", HomeView.as_view(), name="root"),

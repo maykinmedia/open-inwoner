@@ -197,6 +197,8 @@ django-treebeard==4.5.1
     # via -r requirements/base.in
 django-view-breadcrumbs==2.2.4
     # via -r requirements/base.in
+django-yubin==1.7.1
+    # via -r requirements/base.in
 djangorestframework==3.12.4
     # via
     #   -r requirements/base.in
@@ -256,6 +258,8 @@ josepy==1.13.0
     # via mozilla-django-oidc
 jsonschema==4.1.0
     # via drf-spectacular
+lockfile==0.12.2
+    # via django-yubin
 lxml==4.9.1
     # via
     #   django-digid-eherkenning
@@ -263,6 +267,8 @@ lxml==4.9.1
     #   xmlsec
 mail-editor @ git+https://github.com/maykinmedia/mail-editor.git@0b4621b5c7f434586115b8e722af8940cfa70195
     # via -r requirements/base.in
+mail-parser==3.15.0
+    # via django-yubin
 markdown==3.3.6
     # via -r requirements/base.in
 markuppy==1.14
@@ -330,6 +336,7 @@ pytz==2021.3
     # via
     #   -r requirements/base.in
     #   django
+    #   django-yubin
 pywatchman==1.4.1
     # via -r requirements/base.in
 pyyaml==6.0
@@ -356,6 +363,8 @@ rich==12.4.1
     # via django-rich
 sentry-sdk==1.4.3
     # via -r requirements/base.in
+simplejson==3.18.0
+    # via mail-parser
 six==1.16.0
     # via
     #   django-choices
@@ -364,6 +373,7 @@ six==1.16.0
     #   furl
     #   html5lib
     #   isodate
+    #   mail-parser
     #   orderedmultidict
     #   python-dateutil
     #   qrcode
