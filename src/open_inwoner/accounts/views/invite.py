@@ -49,7 +49,7 @@ class InviteAcceptView(LogMixin, UpdateView):
         user = request.user
 
         # mark invitation as accepted and add inviter to the user's contacts as well
-        if user.is_authenticated:
+        if user.is_authenticated and invite.accepted is False:
             invite.accepted = True
             invite.invitee = user
             invite.save()
