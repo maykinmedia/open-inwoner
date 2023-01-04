@@ -6,8 +6,8 @@ from django.urls import reverse
 
 from mozilla_django_oidc_db.models import OpenIDConnectConfig
 
-from .factories import UserFactory
 from ..choices import LoginTypeChoices
+from .factories import UserFactory
 
 User = get_user_model()
 
