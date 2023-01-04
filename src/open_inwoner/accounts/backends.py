@@ -44,7 +44,7 @@ class CustomOIDCBackend(OIDCAuthenticationBackend):
         if "email" in claims:
             email = claims["email"]
 
-        existing_user = self.UserModel.objects.filter(email=email).first()
+        existing_user = self.UserModel.objects.filter(email__iexact=email).first()
         if existing_user:
             logger.debug("Updating OIDC user: %s with email %s", unique_id, email)
             existing_user.oidc_id = unique_id
