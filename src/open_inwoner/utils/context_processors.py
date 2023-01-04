@@ -75,7 +75,7 @@ def settings(request):
         "show_plans": config.show_plans,
         "show_actions": config.show_actions,
         "menu_categories": Category.get_root_nodes().published(),
-        "search_form": SearchForm(),
+        "search_form": SearchForm(auto_id=False),
         "has_general_faq_questions": Question.objects.general().exists(),
         "settings": dict(
             [(k, getattr(django_settings, k, None)) for k in public_settings]
