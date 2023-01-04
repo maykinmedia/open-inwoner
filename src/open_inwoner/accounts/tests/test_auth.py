@@ -1,3 +1,5 @@
+from urllib.parse import urlencode
+
 from django.contrib.sites.models import Site
 from django.core import mail
 from django.urls import reverse, reverse_lazy
@@ -178,6 +180,35 @@ class TestRegistrationFunctionality(WebTest):
         # reverse contact checks
         self.assertEqual(list(user.user_contacts.all()), [new_user])
 
+    def test_invite_url_not_in_session_after_successful_registration(self):
+        user = UserFactory()
+        contact = UserFactory.build(email="test@testemail.com")
+        invite = InviteFactory.create(
+            inviter=user,
+            invitee_email=contact.email,
+            invitee_first_name=contact.first_name,
+            invitee_last_name=contact.last_name,
+        )
+        invite = InviteFactory.create()
+        url = invite.get_absolute_url()
+
+        response = self.app.get(url)
+
+        form = response.forms["invite-form"]
+        response = form.submit()
+
+        self.assertIn("invite_url", self.app.session.keys())
+
+        register_page = self.app.get(f"{self.url}?invite={invite.key}")
+        form = register_page.forms["registration-form"]
+
+        form["password1"] = "somepassword"
+        form["password2"] = "somepassword"
+
+        response = form.submit()
+
+        self.assertNotIn("invite_url", self.app.session.keys())
+
     def test_registration_active_user(self):
         """the user should be redirected to the registration complete page"""
 
@@ -209,6 +240,7 @@ class TestRegistrationFunctionality(WebTest):
 
 
 class TestRegistrationDigid(WebTest):
+    csrf_checks = False
     url = reverse_lazy("django_registration_register")
 
     def test_registration_page_only_digid(self):
@@ -245,6 +277,102 @@ class TestRegistrationDigid(WebTest):
             digid_tag.attrs["href"],
             furl(reverse("digid:login")).add({"next": necessary_url}).url,
         )
+
+    def test_digid_fail_without_invite_redirects_to_login_page(self):
+        self.assertNotIn("invite_url", self.client.session.keys())
+
+        url = reverse("digid-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": reverse("root"),
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": "w",
+            "auth_pass": "bar",
+        }
+        # post our password to the IDP
+        response = self.app.post(url, data).follow()
+
+        self.assertRedirects(response, f"http://testserver{reverse('login')}")
+
+    def test_digid_fail_without_invite_and_next_url_redirects_to_login_page(self):
+        self.assertNotIn("invite_url", self.client.session.keys())
+
+        url = reverse("digid-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": None,
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": "w",
+            "auth_pass": "bar",
+        }
+        # post our password to the IDP
+        response = self.app.post(url, data).follow()
+
+        self.assertRedirects(response, f"http://testserver{reverse('login')}")
+
+    def test_digid_fail_with_invite_redirects_to_register_page(self):
+        invite = InviteFactory()
+        session = self.client.session
+        session[
+            "invite_url"
+        ] = f"{reverse('django_registration_register')}?invite={invite.key}"
+        session.save()
+
+        url = reverse("digid-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": f"{reverse('accounts:registration_necessary')}?invite={invite.key}",
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": "w",
+            "auth_pass": "bar",
+        }
+        # post our password to the IDP
+        response = self.client.post(url, data, follow=True)
+
+        self.assertRedirects(
+            response,
+            f"http://testserver{reverse('django_registration_register')}?invite={invite.key}",
+        )
+
+    def test_invite_url_not_in_session_after_successful_login(self):
+        invite = InviteFactory()
+        session = self.client.session
+        session[
+            "invite_url"
+        ] = f"{reverse('django_registration_register')}?invite={invite.key}"
+        session.save()
+
+        url = reverse("digid-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": f"{reverse('accounts:registration_necessary')}?invite={invite.key}",
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": "123456789",
+            "auth_pass": "bar",
+        }
+
+        self.assertIn("invite_url", self.client.session.keys())
+
+        # post our password to the IDP
+        response = self.client.post(url, data, follow=True)
+
+        self.assertRedirects(
+            response,
+            f"{reverse('accounts:registration_necessary')}?invite={invite.key}",
+        )
+        self.assertNotIn("invite_url", self.client.session.keys())
 
 
 class TestRegistrationNecessary(WebTest):

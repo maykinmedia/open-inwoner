@@ -1,5 +1,6 @@
+from django.contrib import messages
 from django.http.response import Http404, HttpResponseRedirect
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
 from django.views.generic import UpdateView
 
@@ -23,14 +24,15 @@ class InviteAcceptView(LogMixin, UpdateView):
         self.object = form.save()
         url = furl(self.success_url).add({"invite": self.object.key}).url
 
+        # add invite url to the session
+        # this will be needed for redirection if digid login fails
+        self.request.session["invite_url"] = url
+
         self.log_system_action(_("invitation accepted"), self.object)
         return HttpResponseRedirect(url)
 
     def get_object(self, queryset=None):
         invite = super().get_object(queryset)
-
-        if self.request.user.is_authenticated:
-            raise Http404(_("U bent al ingelogd."))
 
         if invite.expired():
             self.log_system_action(_("invitation expired"), invite)
@@ -41,3 +43,30 @@ class InviteAcceptView(LogMixin, UpdateView):
             raise Http404(_("The invitation was already used"))
 
         return invite
+
+    def dispatch(self, request, *args, **kwargs):
+        invite = self.get_object()
+        user = request.user
+
+        # mark invitation as accepted and add inviter to the user's contacts as well
+        if user.is_authenticated and invite.accepted is False:
+            invite.accepted = True
+            invite.invitee = user
+            invite.save()
+
+            inviter = invite.inviter
+            user.user_contacts.add(inviter)
+            self.log_system_action(_("invitation automatically accepted"), invite)
+
+            messages.add_message(
+                self.request,
+                messages.SUCCESS,
+                _(
+                    "{inviter} is toegevoegd aan uw contactpersonen.".format(
+                        inviter=inviter.email
+                    )
+                ),
+            )
+            return HttpResponseRedirect(reverse("accounts:contact_list"))
+
+        return super().dispatch(request, *args, **kwargs)

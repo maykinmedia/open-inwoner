@@ -9,6 +9,8 @@ from .actions import (
     ActionUpdateView,
 )
 from .auth import (
+    CustomDigiDAssertionConsumerServiceMockView,
+    CustomDigiDAssertionConsumerServiceView,
     LogPasswordChangeView,
     LogPasswordResetConfirmView,
     LogPasswordResetView,
