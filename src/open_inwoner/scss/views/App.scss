@@ -148,7 +148,8 @@
   --color-font-accent: var(--color-gray-dark);
 
   --color-body: var(--color-gray-dark);
-  --color-mute: var(--color-gray);
+  // changed to #949494 to get the required 3:1 contrast ratio
+  --color-mute: #949494;
 
   /// Font.
 
