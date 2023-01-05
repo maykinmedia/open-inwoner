@@ -37,3 +37,7 @@
 .tag-list + .p {
   margin-top: var(--spacing-extra-large);
 }
+
+.p .link {
+  text-decoration: underline;
+}
