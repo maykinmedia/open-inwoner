@@ -191,11 +191,6 @@ class multi_browser:
         # ignore multi-browser (put in local.py for dev)
         return settings.PLAYWRIGHT_MULTI_ONLY_DEFAULT
 
-    @property
-    def keep_default(self):
-        # keep default browser if we're running multi-browser
-        return settings.PLAYWRIGHT_MULTI_KEEP_DEFAULT
-
     def get_browsers(self, cls) -> Iterable:
         if self.only_default:
             return []
@@ -242,9 +237,4 @@ class multi_browser:
             # NOTE we add it to module but the generated class's string is still located here
             setattr(module, new_name, new_type)
 
-        if self.keep_default:
-            # return unmodified base class
-            return cls
-        else:
-            # remove from module
-            return None
+        return cls

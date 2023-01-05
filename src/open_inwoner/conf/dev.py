@@ -136,7 +136,6 @@ TWO_FACTOR_PATCH_ADMIN = False
 
 # playwright multi browser
 PLAYWRIGHT_MULTI_ONLY_DEFAULT = True
-PLAYWRIGHT_MULTI_KEEP_DEFAULT = False
 
 # Override settings with local settings.
 try:
