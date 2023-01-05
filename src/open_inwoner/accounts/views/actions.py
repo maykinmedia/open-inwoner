@@ -20,7 +20,7 @@ from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.htmx.views import HtmxTemplateTagModelFormView
 from open_inwoner.utils.logentry import get_verbose_change_message
 from open_inwoner.utils.mixins import ExportMixin
-from open_inwoner.utils.views import LogMixin
+from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from ..forms import ActionForm, ActionListForm
 from ..models import Action
@@ -55,6 +55,7 @@ class BaseActionFilter:
 class ActionListView(
     ActionsEnabledMixin,
     LoginRequiredMixin,
+    CommonPageMixin,
     BaseBreadcrumbMixin,
     BaseActionFilter,
     ListView,
@@ -92,7 +93,12 @@ class ActionListView(
 
 
 class ActionUpdateView(
-    ActionsEnabledMixin, LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView
+    ActionsEnabledMixin,
+    LogMixin,
+    LoginRequiredMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    UpdateView,
 ):
     template_name = "pages/profile/actions/edit.html"
     model = Action
@@ -204,7 +210,12 @@ class ActionDeleteView(
 
 
 class ActionCreateView(
-    ActionsEnabledMixin, LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, CreateView
+    ActionsEnabledMixin,
+    LogMixin,
+    LoginRequiredMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    CreateView,
 ):
     template_name = "pages/profile/actions/edit.html"
     model = Action
@@ -291,7 +302,11 @@ class ActionPrivateMediaView(
 
 
 class ActionHistoryView(
-    ActionsEnabledMixin, LoginRequiredMixin, BaseBreadcrumbMixin, DetailView
+    ActionsEnabledMixin,
+    LoginRequiredMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    DetailView,
 ):
     template_name = "pages/history.html"
     model = Action

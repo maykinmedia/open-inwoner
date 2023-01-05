@@ -2,7 +2,6 @@ from datetime import date
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Q
 from django.forms.forms import Form
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
@@ -20,13 +19,15 @@ from open_inwoner.accounts.choices import (
 )
 from open_inwoner.questionnaire.models import QuestionnaireStep
 from open_inwoner.utils.mixins import ExportMixin
-from open_inwoner.utils.views import LogMixin
+from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from ..forms import ThemesForm, UserForm
 from ..models import Action, User
 
 
-class MyProfileView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormView):
+class MyProfileView(
+    LogMixin, LoginRequiredMixin, CommonPageMixin, BaseBreadcrumbMixin, FormView
+):
     template_name = "pages/profile/me.html"
     form_class = Form
 
@@ -98,7 +99,9 @@ class MyProfileView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormView)
             return redirect("accounts:my_profile")
 
 
-class EditProfileView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
+class EditProfileView(
+    LogMixin, LoginRequiredMixin, CommonPageMixin, BaseBreadcrumbMixin, UpdateView
+):
     template_name = "pages/profile/edit.html"
     model = User
     form_class = UserForm
@@ -121,7 +124,9 @@ class EditProfileView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateV
         return HttpResponseRedirect(self.get_success_url())
 
 
-class MyCategoriesView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
+class MyCategoriesView(
+    LogMixin, LoginRequiredMixin, CommonPageMixin, BaseBreadcrumbMixin, UpdateView
+):
     template_name = "pages/profile/categories.html"
     model = User
     form_class = ThemesForm

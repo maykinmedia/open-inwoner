@@ -8,11 +8,11 @@ from django.views.generic import DetailView, FormView, ListView, TemplateView
 from view_breadcrumbs import BaseBreadcrumbMixin, ListBreadcrumbMixin
 
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.pdc.forms import ProductFinderForm
 from open_inwoner.pdc.models.product import ProductCondition
 from open_inwoner.plans.models import Plan
 from open_inwoner.questionnaire.models import QuestionnaireStep
 
+from ..utils.views import CommonPageMixin
 from .choices import YesNo
 from .forms import ProductFinderForm
 from .models import Category, Product, ProductLocation, Question
@@ -51,8 +51,11 @@ class CategoryBreadcrumbMixin:
         ]
 
 
-class HomeView(TemplateView):
+class HomeView(CommonPageMixin, TemplateView):
     template_name = "pages/home.html"
+
+    def page_title(self):
+        return _("Home")
 
     def get_context_data(self, **kwargs):
         config = SiteConfiguration.get_solo()
@@ -103,15 +106,18 @@ class HomeView(TemplateView):
             return [self.template_name]
 
 
-class FAQView(TemplateView):
+class FAQView(CommonPageMixin, TemplateView):
     template_name = "pages/faq.html"
+
+    def page_title(self):
+        return _("Veelgestelde vragen")
 
     def get_context_data(self, **kwargs):
         kwargs.update(faqs=Question.objects.general())
         return super().get_context_data(**kwargs)
 
 
-class CategoryListView(ListBreadcrumbMixin, ListView):
+class CategoryListView(CommonPageMixin, ListBreadcrumbMixin, ListView):
     template_name = "pages/category/list.html"
     model = Category
 
@@ -120,10 +126,13 @@ class CategoryListView(ListBreadcrumbMixin, ListView):
 
     @cached_property
     def crumbs(self):
-        return [(_("Categories"), reverse("pdc:category_list"))]
+        config = SiteConfiguration.get_solo()
+        return [(config.theme_title, reverse("pdc:category_list"))]
 
 
-class CategoryDetailView(BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView):
+class CategoryDetailView(
+    CommonPageMixin, BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView
+):
     template_name = "pages/category/detail.html"
     model = Category
     breadcrumb_use_pk = False
@@ -163,7 +172,9 @@ class CategoryDetailView(BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailVie
         return self.object.name
 
 
-class ProductDetailView(BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView):
+class ProductDetailView(
+    CommonPageMixin, BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView
+):
     template_name = "pages/product/detail.html"
     model = Product
     breadcrumb_use_pk = False
@@ -202,11 +213,16 @@ class ProductDetailView(BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView
         return context
 
 
-class ProductFormView(BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView):
+class ProductFormView(
+    CommonPageMixin, BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView
+):
     template_name = "pages/product/form.html"
     model = Product
     breadcrumb_use_pk = False
     no_list = True
+
+    def page_title(self):
+        return " ".join(self.object.name, _("Formulier"))
 
     @cached_property
     def crumbs(self):
@@ -229,11 +245,14 @@ class ProductFormView(BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView):
         return context
 
 
-class ProductFinderView(FormView):
+class ProductFinderView(CommonPageMixin, FormView):
     template_name = "pages/product/finder.html"
     form_class = ProductFinderForm
     condition = None
     success_url = reverse_lazy("pdc:product_finder")
+
+    def page_title(self):
+        return _("Producten")
 
     def get(self, request, *args, **kwargs):
         self.condition = self.get_product_condition()

@@ -12,13 +12,13 @@ from django_registration.backends.one_step.views import RegistrationView
 from furl import furl
 
 from open_inwoner.utils.hash import generate_email_from_string
-from open_inwoner.utils.views import LogMixin
+from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from ..forms import CustomRegistrationForm, NecessaryUserForm
 from ..models import Invite, User
 
 
-class InviteMixin:
+class InviteMixin(CommonPageMixin):
     def get_initial(self):
         initial = super().get_initial()
 
@@ -60,6 +60,9 @@ class InviteMixin:
 class CustomRegistrationView(LogMixin, InviteMixin, RegistrationView):
     form_class = CustomRegistrationForm
 
+    def page_title(self):
+        return _("Registratie")
+
     def form_valid(self, form):
         user = form.save()
 
@@ -100,6 +103,9 @@ class NecessaryFieldsUserView(LogMixin, LoginRequiredMixin, InviteMixin, UpdateV
     form_class = NecessaryUserForm
     template_name = "accounts/registration_necessary.html"
     success_url = reverse_lazy("django_registration_complete")
+
+    def page_title(self):
+        return _("Registratie voltooien")
 
     def get_object(self, queryset=None):
         return self.request.user

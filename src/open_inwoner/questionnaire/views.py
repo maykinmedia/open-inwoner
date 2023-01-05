@@ -12,7 +12,7 @@ from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.accounts.models import Document
 from open_inwoner.utils.mixins import ExportMixin
-from open_inwoner.utils.views import LogMixin
+from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from .forms import QuestionnaireStepForm
 from .models import QuestionnaireStep
@@ -37,7 +37,7 @@ class QuestionnaireResetView(RedirectView):
         return super().get_redirect_url(*args, **kwargs)
 
 
-class QuestionnaireStepView(BaseBreadcrumbMixin, FormView):
+class QuestionnaireStepView(CommonPageMixin, BaseBreadcrumbMixin, FormView):
     """
     Shows a step in a questionnaire.
     """
@@ -136,7 +136,7 @@ class QuestionnaireExportView(LogMixin, ExportMixin, TemplateView):
         return context
 
 
-class QuestionnaireRootListView(BaseBreadcrumbMixin, ListView):
+class QuestionnaireRootListView(CommonPageMixin, BaseBreadcrumbMixin, ListView):
     template_name = "pages/profile/questionnaire.html"
     model = QuestionnaireStep
     context_object_name = "root_nodes"
