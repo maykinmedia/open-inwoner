@@ -222,7 +222,7 @@ class ProductFormView(
     no_list = True
 
     def page_title(self):
-        return " ".join(self.object.name, _("Formulier"))
+        return f"{self.object.name} {_('Formulier')}"
 
     @cached_property
     def crumbs(self):
