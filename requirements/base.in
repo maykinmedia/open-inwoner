@@ -46,6 +46,7 @@ mozilla-django-oidc-db
 django-open-forms-client
 django-htmx
 playwright
+django-yubin
 
 # API libraries
 djangorestframework
