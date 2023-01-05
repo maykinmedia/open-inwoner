@@ -981,8 +981,6 @@ THUMBNAIL_ALIASES = {
 }
 THUMBNAIL_QUALITY = 100
 
-TEST_RUNNER = "django_rich.test.RichRunner"
-
 OIDC_AUTHENTICATE_CLASS = "mozilla_django_oidc_db.views.OIDCAuthenticationRequestView"
 OIDC_CALLBACK_CLASS = "mozilla_django_oidc_db.views.OIDCCallbackView"
 MOZILLA_DJANGO_OIDC_DB_CACHE = "oidc"

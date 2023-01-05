@@ -40,7 +40,6 @@ humanfriendly
 git+https://github.com/maykinmedia/mail-editor.git@f99e5c4920a95cf9141a71230d7dfb9f03b84e36#egg=mail-editor
 fontawesomefree
 django-timeline-logger
-django-rich
 django-csp
 django-csp-reports
 mozilla-django-oidc-db
