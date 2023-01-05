@@ -20,6 +20,7 @@ from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.accounts.views.cases import SimpleFile
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 
+from ..clients import ZGWClients
 from ..documents import download_document
 from ..models import OpenZaakConfig
 from .factories import CertificateFactory, ServiceFactory
@@ -348,11 +349,11 @@ class TestDocumentDownloadView(ClearCachesMixin, WebTest):
         self.app.get(self.informatie_object_file.url, user=self.user, status=404)
 
     def test_document_download_request_uses_service_credentials(self, m):
-        server = CertificateFactory(label="server", cert_only=True)
-        client = CertificateFactory(label="client", key_pair=True)
+        server_cert = CertificateFactory(label="server", cert_only=True)
+        client_cert = CertificateFactory(label="client", key_pair=True)
 
-        self.document_service.server_certificate = server
-        self.document_service.client_certificate = client
+        self.document_service.server_certificate = server_cert
+        self.document_service.client_certificate = client_cert
 
         self.document_service.client_id = "abc123"
         self.document_service.secret = "secret"
@@ -361,10 +362,11 @@ class TestDocumentDownloadView(ClearCachesMixin, WebTest):
 
         m.get(self.informatie_object["inhoud"], content=self.informatie_object_content)
 
-        download_document(self.informatie_object["inhoud"])
+        zgw = ZGWClients()
+        download_document(zgw.document, self.informatie_object["inhoud"])
 
         req = m.request_history[0]
-        self.assertEqual(req.verify, server.public_certificate.path)
-        self.assertEqual(req.cert[0], client.public_certificate.path)
-        self.assertEqual(req.cert[1], client.private_key.path)
+        self.assertEqual(req.verify, server_cert.public_certificate.path)
+        self.assertEqual(req.cert[0], client_cert.public_certificate.path)
+        self.assertEqual(req.cert[1], client_cert.private_key.path)
         self.assertIn("Bearer ", req.headers["Authorization"])
