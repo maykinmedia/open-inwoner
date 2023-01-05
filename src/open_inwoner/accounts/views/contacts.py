@@ -11,13 +11,15 @@ from django.views.generic.edit import FormView
 from mail_editor.helpers import find_template
 from view_breadcrumbs import BaseBreadcrumbMixin
 
-from open_inwoner.utils.views import LogMixin
+from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from ..forms import ContactCreateForm, ContactFilterForm
 from ..models import Invite, User
 
 
-class ContactListView(LoginRequiredMixin, BaseBreadcrumbMixin, ListView):
+class ContactListView(
+    LoginRequiredMixin, CommonPageMixin, BaseBreadcrumbMixin, ListView
+):
     template_name = "pages/profile/contacts/list.html"
     model = User
     paginate_by = 10
@@ -49,7 +51,9 @@ class ContactListView(LoginRequiredMixin, BaseBreadcrumbMixin, ListView):
         return context
 
 
-class ContactCreateView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormView):
+class ContactCreateView(
+    LogMixin, LoginRequiredMixin, CommonPageMixin, BaseBreadcrumbMixin, FormView
+):
     template_name = "pages/profile/contacts/edit.html"
     form_class = ContactCreateForm
     success_url = reverse_lazy("accounts:contact_list")

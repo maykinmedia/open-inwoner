@@ -6,19 +6,22 @@ from django.views.generic import UpdateView
 
 from furl import furl
 
-from open_inwoner.utils.views import LogMixin
+from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from ..forms import InviteForm
 from ..models import Invite
 
 
-class InviteAcceptView(LogMixin, UpdateView):
+class InviteAcceptView(LogMixin, CommonPageMixin, UpdateView):
     template_name = "accounts/invite_accept.html"
     model = Invite
     slug_field = "key"
     slug_url_kwarg = "key"
     form_class = InviteForm
     success_url = reverse_lazy("django_registration_register")
+
+    def page_title(self):
+        return _("Accept an invitation")
 
     def form_valid(self, form):
         self.object = form.save()

@@ -39,7 +39,7 @@ from open_inwoner.openzaak.utils import (
     is_zaak_visible,
 )
 from open_inwoner.utils.mixins import PaginationMixin
-from open_inwoner.utils.views import LogMixin
+from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 
 class CaseLogMixin(LogMixin):
@@ -185,11 +185,14 @@ class CaseListMixin(CaseLogMixin, PaginationMixin):
 
 
 class OpenCaseListView(
-    BaseBreadcrumbMixin, CaseAccessMixin, CaseListMixin, TemplateView
+    CommonPageMixin, BaseBreadcrumbMixin, CaseAccessMixin, CaseListMixin, TemplateView
 ):
     @cached_property
     def crumbs(self):
         return [(_("Mijn aanvragen"), reverse("accounts:my_open_cases"))]
+
+    def page_title(self):
+        return _("Lopende aanvragen")
 
     def get_cases(self):
         all_cases = super().get_cases()
@@ -209,11 +212,14 @@ class OpenCaseListView(
 
 
 class ClosedCaseListView(
-    BaseBreadcrumbMixin, CaseAccessMixin, CaseListMixin, TemplateView
+    CommonPageMixin, BaseBreadcrumbMixin, CaseAccessMixin, CaseListMixin, TemplateView
 ):
     @cached_property
     def crumbs(self):
         return [(_("Mijn aanvragen"), reverse("accounts:my_closed_cases"))]
+
+    def page_title(self):
+        return _("Afgeronde aanvragen")
 
     def get_cases(self):
         all_cases = super().get_cases()
@@ -239,7 +245,9 @@ class SimpleFile:
     url: str
 
 
-class CaseDetailView(CaseLogMixin, BaseBreadcrumbMixin, CaseAccessMixin, TemplateView):
+class CaseDetailView(
+    CaseLogMixin, CommonPageMixin, BaseBreadcrumbMixin, CaseAccessMixin, TemplateView
+):
     template_name = "pages/cases/status.html"
 
     @cached_property
@@ -251,6 +259,12 @@ class CaseDetailView(CaseLogMixin, BaseBreadcrumbMixin, CaseAccessMixin, Templat
                 reverse("accounts:case_status", kwargs=self.kwargs),
             ),
         ]
+
+    def page_title(self):
+        if self.case:
+            return _("Status van {case}").format(case=self.case.omschrijving)
+        else:
+            return _("Status")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

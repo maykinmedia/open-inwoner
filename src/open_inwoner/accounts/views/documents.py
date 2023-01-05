@@ -4,17 +4,20 @@ from django.urls.base import reverse_lazy
 from django.utils.translation import gettext as _
 from django.views.generic import CreateView, DeleteView
 
-from open_inwoner.utils.views import LogMixin
+from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from ..forms import DocumentForm
 from ..models import Document
 
 
-class DocumentCreateView(LogMixin, LoginRequiredMixin, CreateView):
+class DocumentCreateView(LogMixin, LoginRequiredMixin, CommonPageMixin, CreateView):
     template_name = "pages/profile/documents/edit.html"
     model = Document
     form_class = DocumentForm
     success_url = reverse_lazy("accounts:my_profile")
+
+    def page_title(self):
+        return _("Voeg document toe")
 
     def get_queryset(self):
         base_qs = super().get_queryset()

@@ -19,7 +19,7 @@ from open_inwoner.accounts.views.actions import (
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.utils.logentry import get_change_message
 from open_inwoner.utils.mixins import ExportMixin
-from open_inwoner.utils.views import LogMixin
+from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from .forms import PlanForm, PlanGoalForm
 from .models import Plan
@@ -34,7 +34,11 @@ class PlansEnabledMixin:
 
 
 class PlanListView(
-    PlansEnabledMixin, LoginRequiredMixin, BaseBreadcrumbMixin, ListView
+    PlansEnabledMixin,
+    LoginRequiredMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    ListView,
 ):
     template_name = "pages/plans/list.html"
     model = Plan
@@ -42,7 +46,7 @@ class PlanListView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Samenwerkingsplannen"), reverse("plans:plan_list")),
+            (_("Samenwerken"), reverse("plans:plan_list")),
         ]
 
     def get_queryset(self):
@@ -54,6 +58,7 @@ class PlanListView(
 class PlanDetailView(
     PlansEnabledMixin,
     LoginRequiredMixin,
+    CommonPageMixin,
     BaseBreadcrumbMixin,
     BaseActionFilter,
     DetailView,
@@ -98,7 +103,12 @@ class PlanDetailView(
 
 
 class PlanCreateView(
-    PlansEnabledMixin, LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, CreateView
+    PlansEnabledMixin,
+    LogMixin,
+    LoginRequiredMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    CreateView,
 ):
     template_name = "pages/plans/create.html"
     model = Plan
@@ -130,7 +140,12 @@ class PlanCreateView(
 
 
 class PlanEditView(
-    PlansEnabledMixin, LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView
+    PlansEnabledMixin,
+    LogMixin,
+    LoginRequiredMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    UpdateView,
 ):
     template_name = "pages/plans/edit.html"
     model = Plan
@@ -169,7 +184,12 @@ class PlanEditView(
 
 
 class PlanGoalEditView(
-    PlansEnabledMixin, LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView
+    PlansEnabledMixin,
+    LogMixin,
+    LoginRequiredMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    UpdateView,
 ):
     template_name = "pages/plans/goal_edit.html"
     model = Plan
@@ -200,7 +220,12 @@ class PlanGoalEditView(
 
 
 class PlanFileUploadView(
-    PlansEnabledMixin, LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView
+    PlansEnabledMixin,
+    LogMixin,
+    LoginRequiredMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    UpdateView,
 ):
     template_name = "pages/plans/file.html"
     model = Plan
