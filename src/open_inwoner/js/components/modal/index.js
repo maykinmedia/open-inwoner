@@ -80,12 +80,18 @@ export default class Modal {
     this.modalClosedCallback = callback
   }
 
-  show() {
+  show(refocusOnClose) {
     this.node.classList.add('modal--open')
+    this.refocusOnClose = refocusOnClose
+    this.close.focus()
   }
 
   hide() {
     this.node.classList.remove('modal--open')
+    if (this.refocusOnClose) {
+      this.refocusOnClose.focus()
+      this.refocusOnClose = null
+    }
     if (this.modalClosedCallback) {
       this.modalClosedCallback()
     }
