@@ -47,7 +47,7 @@
         {% endblock %}
 
         {% block main_outer %}
-            <main class="container">
+            <main id="content" class="container">
                 {% block main_inner %}
                     <div class="grid{% block grid_class %}{% endblock %}">
                         {% spaceless %}<div class="grid__sidebar">{% block sidebar_content %}{% endblock sidebar_content %}</div>{% endspaceless %}

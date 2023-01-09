@@ -3,6 +3,11 @@
 <div class="accessibility-header">
     <ul class="accessibility-header__list" role="complementary" aria-label="{% trans "Toegangkelijkheids help" %}">
         <li class="accessibility-header__list-item">
+            {% trans "Doorgaan naar hoofdinhoud" as link_text %}
+            {% link href="#content" icon="south" text=link_text extra_classes="accessibility--skip" %}
+        </li>
+
+        <li class="accessibility-header__list-item">
             {% trans "Lees voor" as link_text %}
             {% link href="#" icon="volume_up" text=link_text extra_classes="accessibility--read" %}
         </li>
