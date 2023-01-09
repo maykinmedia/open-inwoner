@@ -46,11 +46,8 @@ export default class Modal {
         this.hide()
       })
     }
-
-    document.addEventListener('keydown', (event) => {
-      if (event.code === 'Escape') {
-        this.hide()
-      }
+    this.node.addEventListener('close', () => {
+      this.hide()
     })
   }
 
@@ -84,10 +81,12 @@ export default class Modal {
     this.node.classList.add('modal--open')
     this.refocusOnClose = refocusOnClose
     this.close.focus()
+    this.node.showModal()
   }
 
   hide() {
     this.node.classList.remove('modal--open')
+    this.node.close()
     if (this.refocusOnClose) {
       this.refocusOnClose.focus()
       this.refocusOnClose = null
