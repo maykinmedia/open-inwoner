@@ -19,6 +19,10 @@
   }
 
   .dropdown__item {
+    color: var(--font-color-body);
+    font-family: var(--font-family-body);
+    font-size: 0;
+    line-height: 1;
     padding: 0 var(--spacing-medium);
   }
 
