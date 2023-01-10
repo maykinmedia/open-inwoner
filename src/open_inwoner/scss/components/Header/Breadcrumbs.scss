@@ -1,3 +1,5 @@
+@import '~microscope-sass/lib/responsive';
+
 .breadcrumbs {
   background-color: rgba(255, 255, 255, 0.7);
   overflow-x: auto;
@@ -13,6 +15,8 @@
 
   &__list {
     display: flex;
+    flex-wrap: wrap;
+    column-gap: var(--spacing-medium);
     list-style: none;
     margin: 0;
     padding: 0;
@@ -25,11 +29,6 @@
   }
 
   .link {
-    line-height: var(--row-height);
-  }
-
-  &__list-item > *[class*='icon'],
-  &__list-item > *[class*='Icon'] {
-    margin: 0 var(--spacing-medium);
+    @include responsive(line-height, 2, var(--row-height), var(--row-height));
   }
 }
