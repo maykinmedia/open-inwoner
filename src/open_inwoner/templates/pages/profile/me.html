@@ -12,11 +12,11 @@
     {% button_row align="right" %}
         {% dropdown icon="settings" secondary=True %}
             <div class="dropdown__item">
-                {% button href="accounts:edit_profile" text=_("Bewerken") icon="edit" icon_outlined=True  transparent=True secondary=True %}
+                {% button href="accounts:edit_profile" text=_("Bewerken") icon="edit" transparent=True %}
             </div>
             {% if can_change_password %}
                 <div class="dropdown__item">
-                    {% button href="password_change" text=_("Wijzig wachtwoord") icon="key" icon_outlined=True  transparent=True secondary=True %}
+                    {% button href="password_change" text=_("Wijzig wachtwoord") icon="key" transparent=True %}
                 </div>
             {% endif %}
         {% enddropdown %}
