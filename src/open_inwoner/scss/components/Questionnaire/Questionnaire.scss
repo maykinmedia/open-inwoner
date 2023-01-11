@@ -1,4 +1,10 @@
 .questionnaire {
+  &__fieldset {
+    border: 0 solid transparent;
+    legend {
+      padding: 0;
+    }
+  }
   &__list {
     list-style: none;
     padding: var(--spacing-large) 0;
