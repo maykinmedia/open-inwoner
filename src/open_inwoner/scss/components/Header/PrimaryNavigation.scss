@@ -98,4 +98,9 @@
   &:not(#{&}--dismissed) > &__list > &__list-item:hover &__list {
     transform: scaleY(1);
   }
+
+  &__list--hide {
+    transform: scaleY(0);
+    position: absolute;
+  }
 }
