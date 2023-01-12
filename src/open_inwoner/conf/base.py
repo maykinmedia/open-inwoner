@@ -416,7 +416,7 @@ X_FRAME_OPTIONS = "DENY"
 # FIXTURES
 #
 
-FIXTURE_DIRS = (os.path.join(DJANGO_PROJECT_DIR, "fixtures"),)
+FIXTURE_DIRS = (os.path.join(DJANGO_PROJECT_DIR, "conf", "fixtures"),)
 
 #
 # Custom settings
