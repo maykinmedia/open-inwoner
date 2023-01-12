@@ -1,8 +1,9 @@
+import dataclasses
 from dataclasses import dataclass
 from datetime import date, datetime
-from typing import Optional, Union
+from typing import Dict, Optional, Union
 
-from zgw_consumers.api_models.base import ZGWModel
+from zgw_consumers.api_models.base import Model, ZGWModel
 from zgw_consumers.api_models.catalogi import (
     InformatieObjectType,
     ResultaatType,
@@ -144,3 +145,32 @@ class Status(ZGWModel):
     statustype: Union[str, StatusType]
     datum_status_gezet: Optional[datetime] = None
     statustoelichting: Optional[str] = ""
+
+
+@dataclasses.dataclass
+class Notification(Model):
+    """
+    note: not an API response but the data for the Notifications API (NRC) webhook
+
+    {
+      "kanaal": "zaken",
+      "hoofdObject": "https://test.openzaak.nl/zaken/api/v1/zaken/019a9093-03fe-4121-8423-6c9ab58946ec",
+      "resource": "zaak",
+      "resourceUrl": "https://test.openzaak.nl/zaken/api/v1/zaken/019a9093-03fe-4121-8423-6c9ab58946ec",
+      "actie": "partial_update",
+      "aanmaakdatum": "2023-01-11T15:09:59.116815Z",
+      "kenmerken": {
+        "bronorganisatie": "100000009",
+        "zaaktype": "https://test.openzaak.nl/catalogi/api/v1/zaaktypen/53340e34-7581-4b04-884f-8ff7e6a73c2c",
+        "vertrouwelijkheidaanduiding": "openbaar"
+      }
+    }
+    """
+
+    kanaal: str
+    resource: str
+    resource_url: str
+    hoofd_object: str
+    actie: str
+    aanmaakdatum: datetime
+    kenmerken: Dict = dataclasses.field(default_factory=dict)

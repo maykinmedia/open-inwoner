@@ -1,0 +1,2 @@
+class NotificationNotAcceptable(Exception):
+    pass

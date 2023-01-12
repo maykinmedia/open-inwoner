@@ -76,6 +76,10 @@ urlpatterns = [
     path("accounts/", include("django_registration.backends.one_step.urls")),
     path("accounts/", include("django.contrib.auth.urls")),
     path("api/", include("open_inwoner.api.urls", namespace="api")),
+    path(
+        "api/openzaak/",
+        include("open_inwoner.openzaak.api.urls", namespace="openzaak-api"),
+    ),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     # Views
     path("accounts/", include("open_inwoner.accounts.urls", namespace="accounts")),
