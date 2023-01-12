@@ -156,6 +156,7 @@ INSTALLED_APPS = [
     "django_better_admin_arrayfield",
     "simple_certmanager",
     "zgw_consumers",
+    "notifications_api_common",
     "mail_editor",
     "ckeditor",
     "privates",
@@ -936,7 +937,7 @@ TWO_FACTOR_PATCH_ADMIN = config("TWO_FACTOR_PATCH_ADMIN", default=True)
 
 # file upload limits
 MIN_UPLOAD_SIZE = 1  # in bytes
-MAX_UPLOAD_SIZE = 1024 ** 2 * 100  # 100MB
+MAX_UPLOAD_SIZE = 1024**2 * 100  # 100MB
 UPLOAD_FILE_TYPES = "application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/plain,application/vnd.oasis.opendocument.text,application/vnd.oasis.opendocument.formula,application/vnd.oasis.opendocument.spreadsheet,application/pdf,image/jpeg,image/png"
 
 # HaalCentraal BRP versions

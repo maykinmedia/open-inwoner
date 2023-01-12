@@ -70,3 +70,4 @@ django-sessionprofile
 
 # Common Ground integration
 zgw-consumers
+notifications-api-common
