@@ -7,13 +7,12 @@
   font-weight: var(--font-weight-heading-3);
   line-height: var(--font-line-height-heading-3);
   margin: 0;
-  word-break: break-all;
 
   @include mobile-only {
     word-break: break-all;
   }
 }
 
-.p + .h3 {
+.p+.h3 {
   margin-top: var(--spacing-large);
 }

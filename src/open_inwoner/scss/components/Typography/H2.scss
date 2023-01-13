@@ -23,13 +23,13 @@
 /// Contextual.
 ///
 
-.card + .h2,
-.dashboard + .h2,
-.status-list + .h2,
-.table + .h2 {
+.card+.h2,
+.dashboard+.h2,
+.status-list+.h2,
+.table+.h2 {
   margin-top: var(--row-height);
 }
 
-.p + .h2 {
+.p+.h2 {
   margin-top: var(--spacing-large);
 }
