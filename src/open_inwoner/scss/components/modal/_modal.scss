@@ -4,7 +4,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.3);
+  border: 0 solid transparent;
   z-index: 1000000;
   justify-content: center;
   align-items: center;
@@ -17,11 +17,11 @@
   &__container {
     max-width: 90%;
     max-height: 90vh;
-    background-color: #fff;
     border-radius: var(--border-radius);
     padding: var(--spacing-giant);
     overflow-y: auto;
     box-sizing: border-box;
+    background-color: #fff;
 
     @media (min-width: 768px) {
       max-width: 720px;
@@ -67,5 +67,9 @@
   *[class*='icon'],
   *[class*='Icon'] {
     font-size: var(--font-size-heading-2);
+  }
+
+  &::backdrop {
+    background: rgba(0, 0, 0, 0.25);
   }
 }

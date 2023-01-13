@@ -18,7 +18,7 @@ class HelpModal {
     modal.setModalClosedCallback(() => {
       this.helpButton.classList.remove('accessibility-header__modal--highlight')
     })
-    modal.show()
+    modal.show(this.helpButton)
   }
 }
 

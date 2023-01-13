@@ -19,7 +19,7 @@ class Confirmation {
         this.handleConfirm.bind(this),
         'button--danger'
       )
-      modal.show()
+      modal.show(this.form)
     }
   }
 
