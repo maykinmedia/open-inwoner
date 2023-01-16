@@ -23,10 +23,7 @@ from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 from ..documents import download_document
 from ..models import OpenZaakConfig
 from .factories import CertificateFactory, ServiceFactory
-
-ZAKEN_ROOT = "https://zaken.nl/api/v1/"
-CATALOGI_ROOT = "https://catalogi.nl/api/v1/"
-DOCUMENTEN_ROOT = "https://documenten.nl/api/v1/"
+from .shared import CATALOGI_ROOT, DOCUMENTEN_ROOT, ZAKEN_ROOT
 
 
 @temp_private_root()

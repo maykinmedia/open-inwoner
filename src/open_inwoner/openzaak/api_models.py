@@ -8,7 +8,6 @@ from zgw_consumers.api_models.catalogi import (
     InformatieObjectType,
     ResultaatType,
     RolType,
-    StatusType,
 )
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 
@@ -136,6 +135,19 @@ class Resultaat(ZGWModel):
     zaak: Union[str, Zaak]
     resultaattype: Union[str, ResultaatType]
     toelichting: Optional[str] = ""
+
+
+@dataclass
+class StatusType(ZGWModel):
+    url: str  # bug: not required according to OAS
+    zaaktype: str
+    omschrijving: str
+    volgnummer: int
+    omschrijving_generiek: str = ""
+    statustekst: str = ""
+    is_eindstatus: bool = False
+    # not in eSuite
+    informeren: Optional[bool] = False
 
 
 @dataclass

@@ -1,13 +1,13 @@
 from django.urls import path
 
-from open_inwoner.openzaak.api.views import NotificationsWebhookView
+from open_inwoner.openzaak.api.views import ZakenNotificationsWebhookView
 
 app_name = "openzaak"
 
 urlpatterns = [
     path(
-        "notifications/webhook/",
-        NotificationsWebhookView.as_view(),
-        name="notifications-webhook",
+        "notifications/webhook/zaken",
+        ZakenNotificationsWebhookView.as_view(),
+        name="notifications-webhook-zaken",
     ),
 ]
