@@ -1,3 +1,4 @@
+import logging
 from unittest.mock import Mock, patch
 
 from django.test import TestCase
@@ -27,12 +28,13 @@ from open_inwoner.openzaak.tests.factories import (
 )
 
 from ...utils.test import paginated_response
+from ...utils.tests.helpers import AssertTimelineLogMixin, Lookups
 from ..api_models import Status, StatusType, Zaak, ZaakType
 from ..models import OpenZaakConfig
 from .shared import CATALOGI_ROOT, DOCUMENTEN_ROOT, NOTIFICATIONS_ROOT, ZAKEN_ROOT
 
 
-class NotificationHandlerTestCase(TestCase):
+class NotificationHandlerTestCase(AssertTimelineLogMixin, TestCase):
     maxDiff = None
     config: OpenZaakConfig
     note_config: NotificationsConfig
@@ -159,6 +161,12 @@ class NotificationHandlerTestCase(TestCase):
         self.assertEqual(self.user_initiator, mock_handle.call_args.args[0])
         self.assertEqual(zaak, mock_handle.call_args.args[1])
         self.assertEqual(status_new, mock_handle.call_args.args[2])
+
+        self.assertTimelineLog(
+            "accepted notification: informing users ",
+            lookup=Lookups.startswith,
+            level=logging.INFO,
+        )
 
 
 class NotificationHandlerUtilsTestCase(TestCase):

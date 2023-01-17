@@ -1,3 +1,4 @@
+import logging
 from unittest.mock import patch
 
 from django.test import TestCase
@@ -10,10 +11,12 @@ from zds_client import ClientAuth
 from open_inwoner.openzaak.api_models import Notification
 from open_inwoner.openzaak.auth import get_valid_subscriptions_from_bearer
 from open_inwoner.openzaak.exceptions import (
-    NotificationAuthInvalid,
-    NotificationAuthInvalidForClientID,
+    InvalidAuth,
+    InvalidAuthForClientID,
+    NoSubscriptionForClientID,
 )
 from open_inwoner.openzaak.tests.factories import SubscriptionFactory
+from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin
 
 from .shared import CATALOGI_ROOT, ZAKEN_ROOT
 
@@ -53,20 +56,28 @@ class NotificationSubscriptionAuthTest(TestCase):
 
         auth_value = generate_auth_header_value("bar", "not_password")
 
-        with self.assertRaises(NotificationAuthInvalidForClientID):
+        with self.assertRaises(NoSubscriptionForClientID):
             get_valid_subscriptions_from_bearer(auth_value)
 
-    def test_invalid_header_auth_raises_exception(self):
+    def test_known_client_id_with_bad_secret_raises_exception(self):
+        SubscriptionFactory(client_id="foo", secret="password")
+
+        auth_value = generate_auth_header_value("foo", "not_password")
+
+        with self.assertRaises(InvalidAuthForClientID):
+            get_valid_subscriptions_from_bearer(auth_value)
+
+    def test_invalid_auth_header_raises_exception(self):
         SubscriptionFactory(client_id="foo", secret="password")
 
         auth_value = "not a valid bearer token"
 
-        with self.assertRaises(NotificationAuthInvalid):
+        with self.assertRaises(InvalidAuth):
             get_valid_subscriptions_from_bearer(auth_value)
 
 
 @patch("open_inwoner.openzaak.api.views.handle_zaken_notification")
-class NotificationAPITestCase(APITestCase):
+class NotificationWebhookAPITestCase(AssertTimelineLogMixin, APITestCase):
     """
     NOTE these tests run against the mounted zaken webhook (eg: ZakenNotificationsWebhookView),
         even though here we only test NotificationsWebhookBaseView functionality
@@ -110,6 +121,8 @@ class NotificationAPITestCase(APITestCase):
         self.assertIsInstance(notification, Notification)
         self.assertEqual(notification.hoofd_object, raw_notification["hoofdObject"])
 
+        self.assertTimelineLog("handled notification", level=logging.DEBUG)
+
     def test_api_returns_http_500_when_valid_but_handler_raises(self, mock_handle):
         mock_handle.side_effect = Exception("whoopsie")
 
@@ -128,12 +141,18 @@ class NotificationAPITestCase(APITestCase):
         self.assertIsInstance(notification, Notification)
         self.assertEqual(notification.hoofd_object, raw_notification["hoofdObject"])
 
+        self.assertTimelineLog(
+            "error handling notification: whoopsie", level=logging.ERROR
+        )
+
     def test_api_returns_http_401_without_valid_auth(self, mock_handle):
         raw_notification = self.get_raw_notification()
 
         response = self.client.post(self.url, raw_notification, format="json")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         mock_handle.assert_not_called()
+
+        self.assertTimelineLog("missing Authorization header", level=logging.ERROR)
 
     def test_api_returns_http_401_without_matching_subscription(self, mock_handle):
         SubscriptionFactory.create(client_id="foo", secret="password")
@@ -147,6 +166,10 @@ class NotificationAPITestCase(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         mock_handle.assert_not_called()
+
+        self.assertTimelineLog(
+            "no subscriptions for client_id 'not_foo'", level=logging.ERROR
+        )
 
     def test_api_returns_http_401_on_missing_notification_members(self, mock_handle):
         SubscriptionFactory.create(client_id="foo", secret="password")
@@ -163,19 +186,56 @@ class NotificationAPITestCase(APITestCase):
         self.assertEqual(response.json(), {"resource": ["Dit veld is vereist."]})
         mock_handle.assert_not_called()
 
-    def test_api_returns_http_401_on_invalid_notification_kanaal(self, mock_handle):
+        self.assertTimelineLog("cannot deserialize notification", level=logging.ERROR)
+
+    def test_api_returns_http_401_on_invalid_subscription_kanaal(self, mock_handle):
         SubscriptionFactory.create(client_id="foo", secret="password")
         headers = {"HTTP_AUTHORIZATION": generate_auth_header_value("foo", "password")}
         raw_notification = self.get_raw_notification()
 
         # bad kanaal
-        raw_notification["kanaal"] = "not_valid_kanaal"
+        raw_notification["kanaal"] = "not_subscribed_kanaal"
 
         response = self.client.post(
             self.url, raw_notification, **headers, format="json"
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(
-            response.json(), {"detail": "channel 'not_valid_kanaal' not acceptable"}
+            response.json(),
+            {
+                "detail": "notification channel 'not_subscribed_kanaal' not subscribed to"
+            },
         )
         mock_handle.assert_not_called()
+
+        self.assertTimelineLog(
+            "notification channel 'not_subscribed_kanaal' not subscribed to",
+            level=logging.ERROR,
+        )
+
+    def test_api_returns_http_401_on_invalid_webhook_kanaal(self, mock_handle):
+        SubscriptionFactory.create(
+            client_id="foo", secret="password", channels=["not_webhook_kanaal"]
+        )
+        headers = {"HTTP_AUTHORIZATION": generate_auth_header_value("foo", "password")}
+        raw_notification = self.get_raw_notification()
+
+        # bad kanaal
+        raw_notification["kanaal"] = "not_webhook_kanaal"
+
+        response = self.client.post(
+            self.url, raw_notification, **headers, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(
+            response.json(),
+            {
+                "detail": "notification channel 'not_webhook_kanaal' not acceptable by webhook"
+            },
+        )
+        mock_handle.assert_not_called()
+
+        self.assertTimelineLog(
+            "notification channel 'not_webhook_kanaal' not acceptable by webhook",
+            level=logging.ERROR,
+        )

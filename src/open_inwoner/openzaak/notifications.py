@@ -7,7 +7,6 @@ from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 
 from open_inwoner.accounts.models import User
-from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openzaak.api_models import Notification, Rol, Status, Zaak
 from open_inwoner.openzaak.cases import fetch_case_roles, fetch_specific_status
 from open_inwoner.openzaak.catalog import (
@@ -18,6 +17,7 @@ from open_inwoner.openzaak.clients import build_client
 from open_inwoner.openzaak.exceptions import NotificationNotAcceptable
 from open_inwoner.openzaak.models import OpenZaakConfig, UserCaseStatusNotification
 from open_inwoner.openzaak.utils import is_object_visible
+from open_inwoner.utils.logentry import system_action as log_system_action
 
 logger = logging.getLogger(__name__)
 
@@ -41,8 +41,9 @@ def handle_zaken_notification(notification: Notification):
 
     # were only interested in status updates
     if notification.resource != "status":
-        logger.debug(
-            f"ignored notification: resource is not 'status' but '{notification.resource}' for case {case_url}"
+        log_system_action(
+            f"ignored notification: resource is not 'status' but '{notification.resource}' for case {case_url}",
+            log_level=logging.INFO,
         )
         return
 
@@ -51,27 +52,35 @@ def handle_zaken_notification(notification: Notification):
     # check if we have users that need to be informed about this case
     roles = fetch_case_roles(case_url)
     if not roles:
-        logger.error(f"cannot retrieve rollen for case {case_url}")
+        log_system_action(
+            f"ignored notification: cannot retrieve rollen for case {case_url}",
+            log_level=logging.ERROR,
+        )
         return
 
     inform_users = get_emailable_initiator_users_from_roles(roles)
     if not inform_users:
-        logger.info(
-            f"ignored notification: no users with bsn and valid email for as (mede)initiators in case {case_url}"
+        log_system_action(
+            f"ignored notification: no users with bsn and valid email as (mede)initiators in case {case_url}",
+            log_level=logging.INFO,
         )
         return
 
     # check if this is a status we want to inform on
     status = fetch_specific_status(status_url)
     if not status:
-        logger.error(f"cannot retrieve status {status_url} for case {case_url}")
+        log_system_action(
+            f"ignored notification: cannot retrieve status {status_url} for case {case_url}",
+            log_level=logging.ERROR,
+        )
         return
 
     status_type = fetch_single_status_type(status.statustype)
     # TODO support non eSuite options
     if not status_type.informeren:
-        logger.info(
-            f"ignored notification: status_type.informeren is false for status {status.url} and case {case_url}"
+        log_system_action(
+            f"ignored notification: status_type.informeren is false for status {status.url} and case {case_url}",
+            log_level=logging.INFO,
         )
         return
 
@@ -80,12 +89,18 @@ def handle_zaken_notification(notification: Notification):
     # check if this case is visible
     case = fetch_case_by_url_no_cache(case_url)
     if not case:
-        logger.error(f"cannot retrieve case {case_url}")
+        log_system_action(
+            f"ignored notification: cannot retrieve case {case_url}",
+            log_level=logging.INFO,
+        )
         return
 
     case_type = fetch_single_case_type(case.zaaktype)
     if not case_type:
-        logger.error(f"cannot retrieve case_type {case.zaaktype} for case {case_url}")
+        log_system_action(
+            f"ignored notification: cannot retrieve case_type {case.zaaktype} for case {case_url}",
+            log_level=logging.ERROR,
+        )
         return
 
     case.zaaktype = case_type
@@ -93,21 +108,25 @@ def handle_zaken_notification(notification: Notification):
     config = OpenZaakConfig.get_solo()
     # TODO check if we don't want is_zaak_visible() to also check for intern/extern
     if not is_object_visible(case, config.zaak_max_confidentiality):
-        logger.info(
-            f"ignored notification: bad confidentiality {case.vertrouwelijkheidaanduiding} for case {case_url}"
+        log_system_action(
+            f"ignored notification: bad confidentiality {case.vertrouwelijkheidaanduiding} for case {case_url}",
+            log_level=logging.INFO,
         )
         return
 
     # reaching here means we're going to inform users
-    logger.info(
-        f"accepted notification: informing users {', '.join(map(str, inform_users))} for case {case_url}"
+    log_system_action(
+        f"accepted notification: informing users {', '.join(sorted(map(str, inform_users)))} for case {case_url}",
+        log_level=logging.INFO,
     )
-
     for user in inform_users:
+        # TODO run in try/except so it can't bail?
         handle_status_update(user, case, status)
 
 
 def handle_status_update(user: User, case: Zaak, status: Status):
+    raise NotImplementedError()
+
     note = UserCaseStatusNotification.objects.record_if_unique_notification(
         user, case.uuid, status.uuid
     )
