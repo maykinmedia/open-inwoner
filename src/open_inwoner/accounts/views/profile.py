@@ -1,5 +1,6 @@
 from datetime import date
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms.forms import Form
@@ -8,8 +9,9 @@ from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
-from django.views.generic import DetailView, FormView, UpdateView
+from django.views.generic import DetailView, FormView, TemplateView, UpdateView
 
+from glom import PathAccessError, glom
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.accounts.choices import (
@@ -17,6 +19,7 @@ from open_inwoner.accounts.choices import (
     LoginTypeChoices,
     StatusChoices,
 )
+from open_inwoner.haalcentraal.utils import fetch_brb_data
 from open_inwoner.questionnaire.models import QuestionnaireStep
 from open_inwoner.utils.mixins import ExportMixin
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
@@ -147,6 +150,62 @@ class MyCategoriesView(
 
         self.log_change(self.object, _("categories were modified"))
         return HttpResponseRedirect(self.get_success_url())
+
+
+class MyDataView(
+    LoginRequiredMixin, CommonPageMixin, BaseBreadcrumbMixin, TemplateView
+):
+    template_name = "pages/profile/mydata.html"
+
+    @cached_property
+    def crumbs(self):
+        return [
+            (_("Mijn profiel"), reverse("accounts:my_profile")),
+            (_("Mijn gegevens"), reverse("accounts:my_data")),
+        ]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["my_data"] = self.parse_brp_data()
+        return context
+
+    def parse_brp_data(self):
+        brp_version = settings.BRP_VERSION
+        user = self.request.user
+        my_data = {
+            "first_name": "naam.voornamen",
+            "initials": "naam.voorletters",
+            "last_name": "naam.geslachtsnaam",
+            "prefix": "naam.voorvoegsel",
+            "birthday": "geboorte.datum.datum",
+            "birthday_place": "geboorte.plaats.omschrijving",
+            "birthday_country": "geboorte.land.omschrijving",
+            "gender": "geslachtsaanduiding.omschrijving"
+            if brp_version == "2.0"
+            else "geslachtsaanduiding",
+            "street": "verblijfplaats.straat",
+            "house_number": "verblijfplaats.huisnummer",
+            "postcode": "verblijfplaats.postcode",
+            "place": "verblijfplaats.woonplaats",
+            "land": "verblijfplaats.land.omschrijving",
+        }
+
+        fetched_data = fetch_brb_data(user, brp_version)
+
+        # we have a different response depending on brp version
+        if brp_version == "2.0" and fetched_data.get("personen"):
+            fetched_data = glom(fetched_data, "personen")[0]
+
+        if not fetched_data:
+            return {}
+
+        for field in my_data:
+            try:
+                my_data[field] = glom(fetched_data, my_data[field])
+            except PathAccessError:
+                my_data[field] = None
+
+        return my_data
 
 
 class MyProfileExportView(LogMixin, LoginRequiredMixin, ExportMixin, DetailView):

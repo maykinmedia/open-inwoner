@@ -36,6 +36,7 @@ from .password_reset import PasswordResetView
 from .profile import (
     EditProfileView,
     MyCategoriesView,
+    MyDataView,
     MyProfileExportView,
     MyProfileView,
 )

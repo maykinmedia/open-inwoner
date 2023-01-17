@@ -27,6 +27,7 @@ from .views import (
     InboxView,
     InviteAcceptView,
     MyCategoriesView,
+    MyDataView,
     MyProfileExportView,
     MyProfileView,
     NecessaryFieldsUserView,
@@ -98,6 +99,7 @@ urlpatterns = [
     ),
     path("contacts/", ContactListView.as_view(), name="contact_list"),
     path("themes/", MyCategoriesView.as_view(), name="my_themes"),
+    path("mydata/", MyDataView.as_view(), name="my_data"),
     path("cases/open/", OpenCaseListView.as_view(), name="my_open_cases"),
     path("cases/closed/", ClosedCaseListView.as_view(), name="my_closed_cases"),
     path(
