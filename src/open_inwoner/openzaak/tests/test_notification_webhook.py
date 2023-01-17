@@ -8,7 +8,7 @@ from rest_framework.test import APITestCase
 from zds_client import ClientAuth
 
 from open_inwoner.openzaak.api_models import Notification
-from open_inwoner.openzaak.auth import get_valid_subscriptions_from_header
+from open_inwoner.openzaak.auth import get_valid_subscriptions_from_bearer
 from open_inwoner.openzaak.exceptions import (
     NotificationAuthInvalid,
     NotificationAuthInvalidForClientID,
@@ -45,7 +45,7 @@ class NotificationSubscriptionAuthTest(TestCase):
 
         auth_value = generate_auth_header_value("foo", "password")
 
-        actual = get_valid_subscriptions_from_header(auth_value)
+        actual = get_valid_subscriptions_from_bearer(auth_value)
         self.assertEqual(actual, subscription)
 
     def test_unknown_client_id_raises_exception(self):
@@ -54,7 +54,7 @@ class NotificationSubscriptionAuthTest(TestCase):
         auth_value = generate_auth_header_value("bar", "not_password")
 
         with self.assertRaises(NotificationAuthInvalidForClientID):
-            get_valid_subscriptions_from_header(auth_value)
+            get_valid_subscriptions_from_bearer(auth_value)
 
     def test_invalid_header_auth_raises_exception(self):
         SubscriptionFactory(client_id="foo", secret="password")
@@ -62,7 +62,7 @@ class NotificationSubscriptionAuthTest(TestCase):
         auth_value = "not a valid bearer token"
 
         with self.assertRaises(NotificationAuthInvalid):
-            get_valid_subscriptions_from_header(auth_value)
+            get_valid_subscriptions_from_bearer(auth_value)
 
 
 @patch("open_inwoner.openzaak.api.views.handle_zaken_notification")

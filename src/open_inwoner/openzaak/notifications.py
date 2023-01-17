@@ -16,7 +16,7 @@ from open_inwoner.openzaak.catalog import (
 )
 from open_inwoner.openzaak.clients import build_client
 from open_inwoner.openzaak.exceptions import NotificationNotAcceptable
-from open_inwoner.openzaak.models import UserCaseStatusNotification
+from open_inwoner.openzaak.models import OpenZaakConfig, UserCaseStatusNotification
 from open_inwoner.openzaak.utils import is_object_visible
 
 logger = logging.getLogger(__name__)
@@ -90,7 +90,7 @@ def handle_zaken_notification(notification: Notification):
 
     case.zaaktype = case_type
 
-    config = SiteConfiguration.get_solo()
+    config = OpenZaakConfig.get_solo()
     # TODO check if we don't want is_zaak_visible() to also check for intern/extern
     if not is_object_visible(case, config.zaak_max_confidentiality):
         logger.info(

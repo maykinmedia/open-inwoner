@@ -112,7 +112,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         )
         cls.status_new = generate_oas_component(
             "zrc",
-            "schemas/Zaak",
+            "schemas/Status",
             url=f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-beu760sle929",
             zaak=cls.zaak["url"],
             statustype=f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-777yu878km09",
@@ -121,7 +121,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         )
         cls.status_finish = generate_oas_component(
             "zrc",
-            "schemas/Zaak",
+            "schemas/Status",
             url=f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
             zaak=cls.zaak["url"],
             statustype=f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-744516671fe4",
