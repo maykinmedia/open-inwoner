@@ -56,6 +56,7 @@ class UserForm(forms.ModelForm):
         fields = (
             "first_name",
             "last_name",
+            "display_name",
             "email",
             "phonenumber",
             "birthday",
@@ -64,6 +65,18 @@ class UserForm(forms.ModelForm):
             "postcode",
             "city",
         )
+
+    def __init__(self, user, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if user.login_type == LoginTypeChoices.digid:
+            self.fields["first_name"].disabled = True
+            self.fields["last_name"].disabled = True
+            self.fields["birthday"].disabled = True
+            self.fields["street"].disabled = True
+            self.fields["housenumber"].disabled = True
+            self.fields["postcode"].disabled = True
+            self.fields["city"].disabled = True
 
 
 class NecessaryUserForm(forms.ModelForm):
