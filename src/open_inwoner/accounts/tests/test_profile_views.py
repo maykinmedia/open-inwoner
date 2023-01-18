@@ -4,10 +4,12 @@ from django.utils.translation import ugettext_lazy as _
 
 import requests_mock
 from django_webtest import WebTest
+from timeline_logger.models import TimelineLog
 
 from open_inwoner.accounts.choices import StatusChoices
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 from open_inwoner.pdc.tests.factories import CategoryFactory
+from open_inwoner.utils.logentry import LOG_ACTIONS
 
 from ...questionnaire.tests.factories import QuestionnaireStepFactory
 from ..choices import LoginTypeChoices
@@ -304,10 +306,19 @@ class MyDataTests(HaalCentraalMixin, WebTest):
         self._setUpService()
 
         response = self.app.get(self.url, user=self.user)
+        log_entry = TimelineLog.objects.last()
 
         self.assertEqual(
             response.context["my_data"],
             self.expected_response,
+        )
+        self.assertEqual(
+            log_entry.extra_data,
+            {
+                "message": _("user requests for brp data"),
+                "action_flag": list(LOG_ACTIONS[4]),
+                "content_object_repr": self.user.email,
+            },
         )
 
     @override_settings(BRP_VERSION="1.3")
@@ -316,10 +327,19 @@ class MyDataTests(HaalCentraalMixin, WebTest):
         self._setUpService()
 
         response = self.app.get(self.url, user=self.user)
+        log_entry = TimelineLog.objects.last()
 
         self.assertEqual(
             response.context["my_data"],
             self.expected_response,
+        )
+        self.assertEqual(
+            log_entry.extra_data,
+            {
+                "message": _("user requests for brp data"),
+                "action_flag": list(LOG_ACTIONS[4]),
+                "content_object_repr": self.user.email,
+            },
         )
 
 

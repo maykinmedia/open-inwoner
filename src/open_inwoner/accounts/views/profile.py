@@ -19,8 +19,9 @@ from open_inwoner.accounts.choices import (
     LoginTypeChoices,
     StatusChoices,
 )
-from open_inwoner.haalcentraal.utils import fetch_brb_data
+from open_inwoner.haalcentraal.utils import fetch_brp_data
 from open_inwoner.questionnaire.models import QuestionnaireStep
+from open_inwoner.utils.logentry import user_action
 from open_inwoner.utils.mixins import ExportMixin
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
@@ -153,7 +154,7 @@ class MyCategoriesView(
 
 
 class MyDataView(
-    LoginRequiredMixin, CommonPageMixin, BaseBreadcrumbMixin, TemplateView
+    LogMixin, LoginRequiredMixin, CommonPageMixin, BaseBreadcrumbMixin, TemplateView
 ):
     template_name = "pages/profile/mydata.html"
 
@@ -190,7 +191,9 @@ class MyDataView(
             "land": "verblijfplaats.land.omschrijving",
         }
 
-        fetched_data = fetch_brb_data(user, brp_version)
+        self.log_user_action(user, _("user requests for brp data"))
+
+        fetched_data = fetch_brp_data(user, brp_version)
 
         # we have a different response depending on brp version
         if brp_version == "2.0" and fetched_data.get("personen"):

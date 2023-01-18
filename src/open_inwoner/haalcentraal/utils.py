@@ -11,7 +11,7 @@ from open_inwoner.haalcentraal.models import HaalCentraalConfig
 logger = logging.getLogger(__name__)
 
 
-def fetch_brb_data(instance, brp_version):
+def fetch_brp_data(instance, brp_version):
     config = HaalCentraalConfig.get_solo()
 
     if not config.service:

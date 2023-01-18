@@ -11,7 +11,7 @@ from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.models import User
 from open_inwoner.utils.logentry import system_action
 
-from .utils import fetch_brb_data
+from .utils import fetch_brp_data
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +27,7 @@ def on_bsn_change(instance, **kwargs):
     ):
         system_action("Retrieving data from haal centraal based on BSN")
 
-        data = fetch_brb_data(instance, brp_version)
+        data = fetch_brp_data(instance, brp_version)
 
         # we have a different response depending on brp version
         if brp_version == "2.0" and data.get("personen"):
