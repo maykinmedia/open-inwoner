@@ -273,11 +273,12 @@ class EditProfileTests(WebTest):
         self.assertEqual(self.user.email, initial_email)
         self.assertEqual(self.user.first_name, "Testing")
 
-    def test_form_for_digid__user_saves_only_non_disabled_fields(self):
+    def test_form_for_digid_user_saves_only_non_disabled_fields(self):
         user = UserFactory(
             bsn="999993847",
             first_name="name",
             last_name="surname",
+            is_prepopulated=True,
             login_type=LoginTypeChoices.digid,
         )
         response = self.app.get(self.url, user=user)

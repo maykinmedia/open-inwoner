@@ -69,7 +69,7 @@ class UserForm(forms.ModelForm):
     def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        if user.login_type == LoginTypeChoices.digid:
+        if user.login_type == LoginTypeChoices.digid and user.is_prepopulated:
             disabled_fields = (
                 "first_name",
                 "last_name",
