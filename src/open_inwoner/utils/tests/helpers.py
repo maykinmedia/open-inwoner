@@ -21,7 +21,9 @@ class Lookups:
 
 
 class AssertTimelineLogMixin:
-    def assertTimelineLog(self, message, *, level=None, lookup=Lookups.exact):
+    def assertTimelineLog(
+        self, message, *, level=None, lookup=Lookups.exact
+    ) -> TimelineLog:
         kwargs = {
             f"extra_data__message__{lookup}": message,
         }
@@ -31,18 +33,21 @@ class AssertTimelineLogMixin:
         logs = list(TimelineLog.objects.filter(**kwargs))
         count = len(logs)
         if count == 0:
-            self.dumpTimelineLog()
-            self.fail(f"cannot find TimelineLog with {kwargs}")
+            self.fail(
+                f"cannot find TimelineLog with {kwargs}, got:\n{self.getTimelineLogDump()}"
+            )
         elif count > 1:
-            self.dumpTimelineLog()
-            self.fail(f"found {count} TimelineLogs with {kwargs}")
+            self.fail(
+                f"found {count} TimelineLogs with {kwargs}, got:\n{self.getTimelineLogDump()}"
+            )
 
         return logs[0]
 
-    def dumpTimelineLog(self):
+    def getTimelineLogDump(self) -> str:
+        ret = []
         qs = TimelineLog.objects.all()
         c = qs.count()
-        print(f"total {c} timelinelogs")
+        ret.append(f"total {c} timelinelogs")
         for log in qs:
             message = log.extra_data.get("message")
             log_level = log.extra_data.get("log_level")
@@ -51,4 +56,8 @@ class AssertTimelineLogMixin:
             else:
                 log_level = "NO_LEVEL"
             msg = f"{log_level}: {message}"
-            print(msg)
+            ret.append(msg)
+        return "\n".join(ret)
+
+    def dumpTimelineLog(self):
+        print(self.getTimelineLogDump())

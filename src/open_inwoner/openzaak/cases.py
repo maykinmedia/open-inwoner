@@ -137,10 +137,10 @@ def fetch_specific_status(status_url: str) -> Optional[Status]:
         response = client.retrieve("status", url=status_url)
     except RequestException as e:
         logger.exception("exception while making request", exc_info=e)
-        return []
+        return
     except ClientError as e:
         logger.exception("exception while making request", exc_info=e)
-        return []
+        return
 
     status = factory(Status, response)
 

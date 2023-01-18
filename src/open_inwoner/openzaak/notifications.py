@@ -14,7 +14,6 @@ from open_inwoner.openzaak.catalog import (
     fetch_single_status_type,
 )
 from open_inwoner.openzaak.clients import build_client
-from open_inwoner.openzaak.exceptions import NotificationNotAcceptable
 from open_inwoner.openzaak.models import OpenZaakConfig, UserCaseStatusNotification
 from open_inwoner.openzaak.utils import is_object_visible
 from open_inwoner.utils.logentry import system_action as log_system_action
@@ -24,17 +23,9 @@ logger = logging.getLogger(__name__)
 
 def handle_zaken_notification(notification: Notification):
     if notification.kanaal != "zaken":
-        raise NotificationNotAcceptable(f"kanaal '{notification.kanaal}' not accepted")
-
-    """
-    - Bij een zaak-wijziging wordt gekeken of het gaat om een zaak waarvan de (mede)initiator bekend is in OIP op basis van de BSN en een actief OIP account heeft waarbij het emailadres is ingevuld. Zo niet, dan kan de notificatie genegeerd worden.
-    - Gecontroleerd moet worden of het gaat om een zaak met een zaaktype die toegankelijk is vanuit OIP (controle vertrouwelijkheidsaanduiding).
-    - Daarna wordt gekeken naar of de zaak een nieuwe status heeft gekregen. Zo niet, dan kan de notificatie genegeerd worden.
-    - Bij een nieuwe status van een zaak wordt de statustype opgehaald vanuit de Catalogi API (  https://test.openzaak.nl/catalogi/api/v1/schema/#operation/statustype_read ). De gemeente stelt via de Catalogi API in of het wenselijk is om de initiator te informeren
-    - Als ‘informeren’ op de statustype op true staat dan zijn aan de voorwaarden voldaan: de inwoner krijgt een bericht op basis van een OIP mailsjabloon (door de gemeente zelf te beheren) van de statuswijziging. De gemeente kan dan aangeven of/hoeveel informatie ze in de mailnotificatie willen opnemen.
-    """
-
-    # TODO swap logger for TimelineLog
+        raise Exception(
+            f"handler expects kanaal 'zaken' but received '{notification.kanaal}'"
+        )
 
     # on the 'zaken' channel the hoofd_object is always the zaak
     case_url = notification.hoofd_object
@@ -77,7 +68,13 @@ def handle_zaken_notification(notification: Notification):
 
     status_type = fetch_single_status_type(status.statustype)
     # TODO support non eSuite options
-    if not status_type.informeren:
+    if not status_type:
+        log_system_action(
+            f"ignored notification: cannot retrieve status_type {status.statustype} for case {case_url}",
+            log_level=logging.ERROR,
+        )
+        return
+    elif not status_type.informeren:
         log_system_action(
             f"ignored notification: status_type.informeren is false for status {status.url} and case {case_url}",
             log_level=logging.INFO,
@@ -91,7 +88,7 @@ def handle_zaken_notification(notification: Notification):
     if not case:
         log_system_action(
             f"ignored notification: cannot retrieve case {case_url}",
-            log_level=logging.INFO,
+            log_level=logging.ERROR,
         )
         return
 
@@ -109,7 +106,7 @@ def handle_zaken_notification(notification: Notification):
     # TODO check if we don't want is_zaak_visible() to also check for intern/extern
     if not is_object_visible(case, config.zaak_max_confidentiality):
         log_system_action(
-            f"ignored notification: bad confidentiality {case.vertrouwelijkheidaanduiding} for case {case_url}",
+            f"ignored notification: bad confidentiality '{case.vertrouwelijkheidaanduiding}' for case {case_url}",
             log_level=logging.INFO,
         )
         return

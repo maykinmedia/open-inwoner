@@ -12,7 +12,3 @@ class InvalidAuthForClientID(InvalidAuth):
     def __init__(self, client_id):
         self.client_id = client_id
         super().__init__(f"secret invalid for subscription client_id'{client_id}'")
-
-
-class NotificationNotAcceptable(Exception):
-    pass
