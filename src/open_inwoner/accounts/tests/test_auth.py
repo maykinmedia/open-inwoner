@@ -390,6 +390,7 @@ class TestRegistrationNecessary(WebTest):
             reverse("accounts:my_profile"),
             reverse("accounts:inbox"),
             reverse("accounts:my_open_cases"),
+            reverse("accounts:my_data"),
             reverse("plans:plan_list"),
             reverse("general_faq"),
         ]

@@ -1,10 +1,15 @@
+from django.test import override_settings
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
+import requests_mock
 from django_webtest import WebTest
+from timeline_logger.models import TimelineLog
 
 from open_inwoner.accounts.choices import StatusChoices
+from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 from open_inwoner.pdc.tests.factories import CategoryFactory
+from open_inwoner.utils.logentry import LOG_ACTIONS
 
 from ...questionnaire.tests.factories import QuestionnaireStepFactory
 from ..choices import LoginTypeChoices
@@ -121,6 +126,17 @@ class ProfileViewTests(WebTest):
         self.assertEquals(len(file_tags), 2)
         self.assertTrue(doc_new.name in file_tags[0].prettify())
         self.assertTrue(doc_old.name in file_tags[1].prettify())
+
+    def test_mydata_shown_with_digid(self):
+        user = UserFactory.create(
+            login_type=LoginTypeChoices.digid, email="john@example.com"
+        )
+        response = self.app.get(self.url, user=user)
+        self.assertContains(response, _("Mijn gegevens"))
+
+    def test_mydata_not_shown_without_digid(self):
+        response = self.app.get(self.url, user=self.user)
+        self.assertNotContains(response, _("Mijn gegevens"))
 
 
 class EditProfileTests(WebTest):
@@ -256,6 +272,75 @@ class EditProfileTests(WebTest):
         self.assertEqual(response.url, self.return_url)
         self.assertEqual(self.user.email, initial_email)
         self.assertEqual(self.user.first_name, "Testing")
+
+
+@requests_mock.Mocker()
+class MyDataTests(HaalCentraalMixin, WebTest):
+    expected_response = {
+        "first_name": "Merel",
+        "initials": "M.",
+        "last_name": "Kooyman",
+        "prefix": None,
+        "birthday": "1982-04-10",
+        "birthday_place": "Leerdam",
+        "birthday_country": "Nederland",
+        "gender": "vrouw",
+        "street": "King Olivereiland",
+        "house_number": 64,
+        "postcode": "2551JV",
+        "place": "'s-Gravenhage",
+        "land": None,
+    }
+
+    def setUp(self):
+        self.user = UserFactory(
+            bsn="999993847",
+            first_name="",
+            last_name="",
+            login_type=LoginTypeChoices.digid,
+        )
+        self.url = reverse("accounts:my_data")
+
+    def test_expected_response_is_returned_brp_v_2(self, m):
+        self._setUpMocks_v_2(m)
+        self._setUpService()
+
+        response = self.app.get(self.url, user=self.user)
+        log_entry = TimelineLog.objects.last()
+
+        self.assertEqual(
+            response.context["my_data"],
+            self.expected_response,
+        )
+        self.assertEqual(
+            log_entry.extra_data,
+            {
+                "message": _("user requests for brp data"),
+                "action_flag": list(LOG_ACTIONS[4]),
+                "content_object_repr": self.user.email,
+            },
+        )
+
+    @override_settings(BRP_VERSION="1.3")
+    def test_expected_response_is_returned_brp_v_1_3(self, m):
+        self._setUpMocks_v_1_3(m)
+        self._setUpService()
+
+        response = self.app.get(self.url, user=self.user)
+        log_entry = TimelineLog.objects.last()
+
+        self.assertEqual(
+            response.context["my_data"],
+            self.expected_response,
+        )
+        self.assertEqual(
+            log_entry.extra_data,
+            {
+                "message": _("user requests for brp data"),
+                "action_flag": list(LOG_ACTIONS[4]),
+                "content_object_repr": self.user.email,
+            },
+        )
 
 
 class EditIntrestsTests(WebTest):
