@@ -127,12 +127,27 @@ class ProfileViewTests(WebTest):
         self.assertTrue(doc_new.name in file_tags[0].prettify())
         self.assertTrue(doc_old.name in file_tags[1].prettify())
 
-    def test_mydata_shown_with_digid(self):
-        user = UserFactory.create(
-            login_type=LoginTypeChoices.digid, email="john@example.com"
+    def test_mydata_shown_with_digid_and_brp(self):
+        user = UserFactory(
+            bsn="999993847",
+            first_name="name",
+            last_name="surname",
+            is_prepopulated=True,
+            login_type=LoginTypeChoices.digid,
         )
         response = self.app.get(self.url, user=user)
         self.assertContains(response, _("Mijn gegevens"))
+
+    def test_mydata_not_shown_with_digid_and_no_brp(self):
+        user = UserFactory(
+            bsn="999993847",
+            first_name="name",
+            last_name="surname",
+            is_prepopulated=False,
+            login_type=LoginTypeChoices.digid,
+        )
+        response = self.app.get(self.url, user=user)
+        self.assertNotContains(response, _("Mijn gegevens"))
 
     def test_mydata_not_shown_without_digid(self):
         response = self.app.get(self.url, user=self.user)
