@@ -273,6 +273,40 @@ class EditProfileTests(WebTest):
         self.assertEqual(self.user.email, initial_email)
         self.assertEqual(self.user.first_name, "Testing")
 
+    def test_form_for_digid__user_saves_only_non_disabled_fields(self):
+        user = UserFactory(
+            bsn="999993847",
+            first_name="name",
+            last_name="surname",
+            login_type=LoginTypeChoices.digid,
+        )
+        response = self.app.get(self.url, user=user)
+        form = response.forms["profile-edit"]
+
+        form["first_name"] = "First name"
+        form["last_name"] = "Last name"
+        form["email"] = "user@example.com"
+        form["phonenumber"] = "06987878787"
+        form["birthday"] = "21-01-1992"
+        form["street"] = "Keizersgracht"
+        form["housenumber"] = "17 d"
+        form["postcode"] = "1013 RM"
+        form["city"] = "Amsterdam"
+        response = form.submit()
+
+        self.assertEqual(response.url, self.return_url)
+
+        user.refresh_from_db()
+
+        self.assertEqual(user.first_name, "name")
+        self.assertEqual(user.last_name, "surname")
+        self.assertEqual(user.email, "user@example.com")
+        self.assertIsNone(user.birthday)
+        self.assertEqual(user.street, "")
+        self.assertEqual(user.housenumber, "")
+        self.assertIsNone(user.postcode, "")
+        self.assertEqual(user.city, "")
+
 
 @requests_mock.Mocker()
 class MyDataTests(HaalCentraalMixin, WebTest):

@@ -70,13 +70,17 @@ class UserForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         if user.login_type == LoginTypeChoices.digid:
-            self.fields["first_name"].disabled = True
-            self.fields["last_name"].disabled = True
-            self.fields["birthday"].disabled = True
-            self.fields["street"].disabled = True
-            self.fields["housenumber"].disabled = True
-            self.fields["postcode"].disabled = True
-            self.fields["city"].disabled = True
+            disabled_fields = (
+                "first_name",
+                "last_name",
+                "birthday",
+                "street",
+                "housenumber",
+                "postcode",
+                "city",
+            )
+            for field in disabled_fields:
+                self.fields[field].disabled = True
 
 
 class NecessaryUserForm(forms.ModelForm):
