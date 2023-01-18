@@ -31,7 +31,7 @@ def on_bsn_change(instance, **kwargs):
 
         # we have a different response depending on brp version
         if brp_version == "2.0" and data.get("personen"):
-            data = glom(data, "personen")[0]
+            data = data.get("personen", [])[0]
 
         try:
             instance.first_name = glom(data, "naam.voornamen")

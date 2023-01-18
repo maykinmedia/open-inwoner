@@ -181,9 +181,11 @@ class MyDataView(
             "birthday": "geboorte.datum.datum",
             "birthday_place": "geboorte.plaats.omschrijving",
             "birthday_country": "geboorte.land.omschrijving",
-            "gender": "geslachtsaanduiding.omschrijving"
-            if brp_version == "2.0"
-            else "geslachtsaanduiding",
+            "gender": (
+                "geslachtsaanduiding.omschrijving"
+                if brp_version == "2.0"
+                else "geslachtsaanduiding"
+            ),
             "street": "verblijfplaats.straat",
             "house_number": "verblijfplaats.huisnummer",
             "postcode": "verblijfplaats.postcode",
@@ -197,16 +199,13 @@ class MyDataView(
 
         # we have a different response depending on brp version
         if brp_version == "2.0" and fetched_data.get("personen"):
-            fetched_data = glom(fetched_data, "personen")[0]
+            fetched_data = fetched_data.get("personen", [])[0]
 
         if not fetched_data:
             return {}
 
         for field in my_data:
-            try:
-                my_data[field] = glom(fetched_data, my_data[field])
-            except PathAccessError:
-                my_data[field] = None
+            my_data[field] = glom(fetched_data, my_data[field], default=None)
 
         return my_data
 
