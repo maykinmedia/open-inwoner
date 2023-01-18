@@ -63,8 +63,10 @@ class ZaakType(ZGWModel):
     # roltypen: list
     # besluittypen: list
 
-    # begin_geldigheid: date
-    # versiedatum: date
+    begin_geldigheid: Optional[date] = None
+    einde_geldigheid: Optional[date] = None
+    versiedatum: Optional[date] = None
+    concept: Optional[bool] = None
 
 
 @dataclass

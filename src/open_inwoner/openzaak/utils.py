@@ -4,6 +4,7 @@ from functools import wraps
 
 from django.core.cache import caches
 
+from zds_client import get_operation_url
 from zgw_consumers.api_models.constants import RolTypes, VertrouwelijkheidsAanduidingen
 
 from open_inwoner.openzaak.api_models import InformatieObject, Rol, Zaak
@@ -166,3 +167,15 @@ def cache(key: str, alias: str = "default", **set_options):
         return wrapped
 
     return decorator
+
+
+def get_retrieve_resource_by_uuid_url(client, resource, uuid):
+    op_suffix = client.operation_suffix_mapping["retrieve"]
+    operation_id = f"{resource}{op_suffix}"
+    path_kwargs = {
+        "uuid": uuid,
+    }
+    url = get_operation_url(
+        client.schema, operation_id, base_url=client.base_url, **path_kwargs
+    )
+    return url

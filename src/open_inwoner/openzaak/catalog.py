@@ -4,13 +4,13 @@ from typing import List, Optional
 from django.conf import settings
 
 from requests import RequestException
-from zds_client import ClientError
+from zds_client import ClientError, get_operation_url
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.service import get_paginated_results
 
 from .api_models import StatusType, ZaakType
 from .clients import build_client
-from .utils import cache as cache_result
+from .utils import cache as cache_result, get_retrieve_resource_by_uuid_url
 
 logger = logging.getLogger(__name__)
 
@@ -64,6 +64,43 @@ def fetch_single_status_type(status_type_url: str) -> Optional[StatusType]:
     status_type = factory(StatusType, response)
 
     return status_type
+
+
+@cache_result("case_types_ui", timeout=settings.CACHE_ZGW_CATALOGI_UI_TIMEOUT)
+def fetch_case_types_admin_ui() -> List[ZaakType]:
+    """
+    list case types for use in admin
+    """
+    client = build_client("catalogi")
+
+    if client is None:
+        return []
+
+    try:
+        response = get_paginated_results(client, "zaaktype")
+    except RequestException as e:
+        logger.exception("exception while making request", exc_info=e)
+        return []
+    except ClientError as e:
+        logger.exception("exception while making request", exc_info=e)
+        return []
+
+    zaak_types = factory(ZaakType, response)
+
+    return zaak_types
+
+
+def fetch_single_case_type_uuid(uuid: str) -> Optional[ZaakType]:
+    """
+    this is suboptimal until we upgrade the client/cache situation
+    """
+    client = build_client("catalogi")
+
+    if client is None:
+        return None
+
+    url = get_retrieve_resource_by_uuid_url(client, "zaaktype", uuid)
+    return fetch_single_case_type(url)
 
 
 @cache_result("case_type:{case_type_url}", timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT)
