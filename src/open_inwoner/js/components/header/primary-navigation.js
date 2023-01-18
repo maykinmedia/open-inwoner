@@ -1,4 +1,4 @@
-import BEM from 'BEM.js';
+import BEM from 'bem.js';
 import {Component} from '../abstract/component';
 
 /** @type {string} The primary navibation block name. */
