@@ -1,15 +1,14 @@
-import BEM from 'bem.js';
-import {Component} from '../abstract/component';
+import BEM from 'bem.js'
+import { Component } from '../abstract/component'
 
 /** @type {string} The primary navibation block name. */
-const BLOCK_PRIMARY_NAVIGATION = 'primary-navigation';
+const BLOCK_PRIMARY_NAVIGATION = 'primary-navigation'
 
 /** @type {NodeList<HTMLElement>} The primary navigation block name. */
-const PRIMARY_NAVIGATIONS = BEM.getBEMNodes(BLOCK_PRIMARY_NAVIGATION);
+const PRIMARY_NAVIGATIONS = BEM.getBEMNodes(BLOCK_PRIMARY_NAVIGATION)
 
 /** @type {string} The dismissed modifier state, overrides focus/hover. */
-const MODIFIER_DISMISSED = 'dismissed';
-
+const MODIFIER_DISMISSED = 'dismissed'
 
 /**
  * Controls the primary navigation and dismissing it using the escape key.
@@ -20,9 +19,9 @@ class PrimaryNavigation extends Component {
    * Callbacks should trigger `setState` which in turn triggers `render`.
    */
   bindEvents() {
-    this.node.addEventListener('focus', this.onFocus.bind(this));
-    this.node.addEventListener('mouseenter', this.onHover.bind(this));
-    window.addEventListener('keyup', this.onKeyUp.bind(this));
+    this.node.addEventListener('focus', this.onFocus.bind(this))
+    this.node.addEventListener('mouseenter', this.onHover.bind(this))
+    window.addEventListener('keyup', this.onKeyUp.bind(this))
   }
 
   /**
@@ -30,7 +29,7 @@ class PrimaryNavigation extends Component {
    * Clears the dismissed state, (prevents overriding focus/hover).
    */
   onFocus() {
-      this.setState({dismissed: false})
+    this.setState({ dismissed: false })
   }
 
   /**
@@ -38,7 +37,7 @@ class PrimaryNavigation extends Component {
    * Clears the dismissed state, (prevents overriding focus/hover).
    */
   onHover() {
-      this.setState({dismissed: false})
+    this.setState({ dismissed: false })
   }
 
   /**
@@ -48,19 +47,18 @@ class PrimaryNavigation extends Component {
    */
   onKeyUp(event) {
     if (event.key === 'Escape') {
-
       if (this.getFocussedChild() || this.getHoveredChild()) {
-        this.setState({dismissed: true})
+        this.setState({ dismissed: true })
       }
     }
   }
 
   /**
-    * Returns the child node in focus (if any).
+   * Returns the child node in focus (if any).
    * @return {HTMLElement|null}
    */
   getFocussedChild() {
-    return this.node.querySelector(':focus') || null;
+    return this.node.querySelector(':focus') || null
   }
 
   /**
@@ -68,7 +66,7 @@ class PrimaryNavigation extends Component {
    * @return {HTMLElement|null}
    */
   getHoveredChild() {
-    return this.node.querySelector(':hover') || null;
+    return this.node.querySelector(':hover') || null
   }
 
   /**
@@ -77,7 +75,7 @@ class PrimaryNavigation extends Component {
    * @param {Object} state State to render.
    */
   render(state) {
-    BEM.toggleModifier(this.node, MODIFIER_DISMISSED, state.dismissed);
+    BEM.toggleModifier(this.node, MODIFIER_DISMISSED, state.dismissed)
 
     if (state.dismissed) {
       this.getFocussedChild().blur()
@@ -86,4 +84,6 @@ class PrimaryNavigation extends Component {
 }
 
 // Start!
-[...PRIMARY_NAVIGATIONS].forEach((node) => new PrimaryNavigation(node, {dismissed: false}));
+;[...PRIMARY_NAVIGATIONS].forEach(
+  (node) => new PrimaryNavigation(node, { dismissed: false })
+)

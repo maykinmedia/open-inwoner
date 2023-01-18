@@ -1,21 +1,20 @@
-import BEM from 'bem.js';
-import {Component} from '../abstract/component';
+import BEM from 'bem.js'
+import { Component } from '../abstract/component'
 
 /** @type {string} Header block name. */
-export const BLOCK_HEADER = 'header';
+export const BLOCK_HEADER = 'header'
 
 /** @type {string} Button element name. */
-export const ELEMENT_BUTTON = 'button';
+export const ELEMENT_BUTTON = 'button'
 
 /** @type {string} Menu element name. */
-export const ELEMENT_SUBMENU = 'submenu';
+export const ELEMENT_SUBMENU = 'submenu'
 
 /** @type {string} Modifier describing open state. */
-export const MODIFIER_OPEN = 'open';
+export const MODIFIER_OPEN = 'open'
 
 /** @type {NodeList<HTMLElement>} Button element name. */
-export const HEADERS = BEM.getBEMNodes(BLOCK_HEADER);
-
+export const HEADERS = BEM.getBEMNodes(BLOCK_HEADER)
 
 /**
  * Controls the main header and interaction with the mobile menu.
@@ -26,7 +25,9 @@ class Header extends Component {
    * Callbacks should trigger `setState` which in turn triggers `render`.
    */
   bindEvents() {
-    this.node.addEventListener('click', () => this.setState({open: !this.state.open}))
+    this.node.addEventListener('click', () =>
+      this.setState({ open: !this.state.open })
+    )
   }
 
   /**
@@ -34,14 +35,14 @@ class Header extends Component {
    * @returns {HTMLButtonElement}
    */
   getButton() {
-    return BEM.getChildBEMNode(this.node, BLOCK_HEADER, ELEMENT_BUTTON);
+    return BEM.getChildBEMNode(this.node, BLOCK_HEADER, ELEMENT_BUTTON)
   }
   /**
    * Returns the menu controlled by the button.
    * @returns {HTMLDialogElement}
    */
   getSubMenu() {
-    return BEM.getChildBEMNode(this.node, BLOCK_HEADER, ELEMENT_SUBMENU);
+    return BEM.getChildBEMNode(this.node, BLOCK_HEADER, ELEMENT_SUBMENU)
   }
 
   /**
@@ -50,17 +51,16 @@ class Header extends Component {
    * @param {Object} state State to render.
    */
   render(state) {
-    document.body.classList.add('body');
-    BEM.toggleModifier(document.body, MODIFIER_OPEN, state.open);
-    BEM.toggleModifier(this.getButton(), MODIFIER_OPEN, state.open);
-    (state.open) ? this.getSubMenu().showModal() : this.getSubMenu().close();
+    document.body.classList.add('body')
+    BEM.toggleModifier(document.body, MODIFIER_OPEN, state.open)
+    BEM.toggleModifier(this.getButton(), MODIFIER_OPEN, state.open)
+    state.open ? this.getSubMenu().showModal() : this.getSubMenu().close()
 
-    if(state.open) {
-      window.scrollTo({x: 0, y: 0});
+    if (state.open) {
+      window.scrollTo({ x: 0, y: 0 })
     }
   }
 }
 
-
 // Start!
-[...HEADERS].forEach((node) => new Header(node, {open: false}));
+;[...HEADERS].forEach((node) => new Header(node, { open: false }))

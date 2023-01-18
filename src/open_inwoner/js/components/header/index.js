@@ -1,2 +1,2 @@
-import './header';
-import './primary-navigation';
+import './header'
+import './primary-navigation'
