@@ -51,6 +51,13 @@ class User(AbstractBaseUser, PermissionsMixin):
         default="",
         validators=[validate_charfield_entry],
     )
+    display_name = models.CharField(
+        verbose_name=_("Display name"),
+        max_length=255,
+        blank=True,
+        default="",
+        validators=[validate_charfield_entry],
+    )
     email = models.EmailField(verbose_name=_("Email address"), unique=True)
     phonenumber = models.CharField(
         verbose_name=_("Phonenumber"),

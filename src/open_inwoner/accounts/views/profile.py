@@ -11,7 +11,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 from django.views.generic import DetailView, FormView, TemplateView, UpdateView
 
-from glom import PathAccessError, glom
+from glom import glom
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.accounts.choices import (
@@ -21,11 +21,10 @@ from open_inwoner.accounts.choices import (
 )
 from open_inwoner.haalcentraal.utils import fetch_brp_data
 from open_inwoner.questionnaire.models import QuestionnaireStep
-from open_inwoner.utils.logentry import user_action
 from open_inwoner.utils.mixins import ExportMixin
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
-from ..forms import ThemesForm, UserForm
+from ..forms import BrpUserForm, ThemesForm, UserForm
 from ..models import Action, User
 
 
@@ -126,6 +125,12 @@ class EditProfileView(
 
         self.log_change(self.get_object(), _("profile was modified"))
         return HttpResponseRedirect(self.get_success_url())
+
+    def get_form_class(self):
+        user = self.request.user
+        if user.login_type == LoginTypeChoices.digid and user.is_prepopulated:
+            return BrpUserForm
+        return super().get_form_class()
 
 
 class MyCategoriesView(

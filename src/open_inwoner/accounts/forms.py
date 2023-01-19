@@ -56,6 +56,7 @@ class UserForm(forms.ModelForm):
         fields = (
             "first_name",
             "last_name",
+            "display_name",
             "email",
             "phonenumber",
             "birthday",
@@ -63,6 +64,16 @@ class UserForm(forms.ModelForm):
             "housenumber",
             "postcode",
             "city",
+        )
+
+
+class BrpUserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = (
+            "display_name",
+            "email",
+            "phonenumber",
         )
 
 

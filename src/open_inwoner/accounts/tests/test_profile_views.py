@@ -13,6 +13,7 @@ from open_inwoner.utils.logentry import LOG_ACTIONS
 
 from ...questionnaire.tests.factories import QuestionnaireStepFactory
 from ..choices import LoginTypeChoices
+from ..forms import BrpUserForm, UserForm
 from .factories import ActionFactory, DocumentFactory, UserFactory
 
 
@@ -127,12 +128,27 @@ class ProfileViewTests(WebTest):
         self.assertTrue(doc_new.name in file_tags[0].prettify())
         self.assertTrue(doc_old.name in file_tags[1].prettify())
 
-    def test_mydata_shown_with_digid(self):
-        user = UserFactory.create(
-            login_type=LoginTypeChoices.digid, email="john@example.com"
+    def test_mydata_shown_with_digid_and_brp(self):
+        user = UserFactory(
+            bsn="999993847",
+            first_name="name",
+            last_name="surname",
+            is_prepopulated=True,
+            login_type=LoginTypeChoices.digid,
         )
         response = self.app.get(self.url, user=user)
         self.assertContains(response, _("Mijn gegevens"))
+
+    def test_mydata_not_shown_with_digid_and_no_brp(self):
+        user = UserFactory(
+            bsn="999993847",
+            first_name="name",
+            last_name="surname",
+            is_prepopulated=False,
+            login_type=LoginTypeChoices.digid,
+        )
+        response = self.app.get(self.url, user=user)
+        self.assertNotContains(response, _("Mijn gegevens"))
 
     def test_mydata_not_shown_without_digid(self):
         response = self.app.get(self.url, user=self.user)
@@ -164,6 +180,7 @@ class EditProfileTests(WebTest):
         form = response.forms["profile-edit"]
         form["first_name"] = ""
         form["last_name"] = ""
+        form["display_name"] = ""
         form["email"] = ""
         form["phonenumber"] = ""
         form["birthday"] = ""
@@ -180,6 +197,7 @@ class EditProfileTests(WebTest):
         form = response.forms["profile-edit"]
         form["first_name"] = "First name"
         form["last_name"] = "Last name"
+        form["display_name"] = "a nickname"
         form["email"] = "user@example.com"
         form["phonenumber"] = "06987878787"
         form["birthday"] = "21-01-1992"
@@ -194,6 +212,7 @@ class EditProfileTests(WebTest):
         self.user.refresh_from_db()
         self.assertEquals(self.user.first_name, "First name")
         self.assertEquals(self.user.last_name, "Last name")
+        self.assertEquals(self.user.display_name, "a nickname")
         self.assertEquals(self.user.email, "user@example.com")
         self.assertEquals(self.user.birthday.strftime("%d-%m-%Y"), "21-01-1992")
         self.assertEquals(self.user.street, "Keizersgracht")
@@ -210,6 +229,7 @@ class EditProfileTests(WebTest):
                 form = response.forms["profile-edit"]
                 form["first_name"] = char
                 form["last_name"] = "Last name"
+                form["display_name"] = "a nickname"
                 form["phonenumber"] = "06987878787"
                 form["birthday"] = "21-01-1992"
                 form["street"] = "Keizersgracht"
@@ -235,6 +255,7 @@ class EditProfileTests(WebTest):
                 form = response.forms["profile-edit"]
                 form["first_name"] = "John"
                 form["last_name"] = char
+                form["display_name"] = "a nickname"
                 form["phonenumber"] = "06987878787"
                 form["birthday"] = "21-01-1992"
                 form["street"] = "Keizersgracht"
@@ -272,6 +293,50 @@ class EditProfileTests(WebTest):
         self.assertEqual(response.url, self.return_url)
         self.assertEqual(self.user.email, initial_email)
         self.assertEqual(self.user.first_name, "Testing")
+
+    def test_form_for_digid_brp_user_saves_data(self):
+        user = UserFactory(
+            bsn="999993847",
+            first_name="name",
+            last_name="surname",
+            is_prepopulated=True,
+            login_type=LoginTypeChoices.digid,
+        )
+        response = self.app.get(self.url, user=user)
+        form = response.forms["profile-edit"]
+
+        form["display_name"] = "a nickname"
+        form["email"] = "user@example.com"
+        form["phonenumber"] = "06987878787"
+        response = form.submit()
+
+        self.assertEqual(response.url, self.return_url)
+
+        user.refresh_from_db()
+
+        self.assertEqual(user.display_name, "a nickname")
+        self.assertEqual(user.email, "user@example.com")
+        self.assertEqual(user.phonenumber, "06987878787")
+
+    def test_expected_form_is_rendered(self):
+        # regular user
+        response = self.app.get(self.url, user=self.user)
+        form = response.context["form"]
+
+        self.assertEqual(type(form), UserForm)
+
+        # digid-brp user
+        user = UserFactory(
+            bsn="999993847",
+            first_name="name",
+            last_name="surname",
+            is_prepopulated=True,
+            login_type=LoginTypeChoices.digid,
+        )
+        response = self.app.get(self.url, user=user)
+        form = response.context["form"]
+
+        self.assertEqual(type(form), BrpUserForm)
 
 
 @requests_mock.Mocker()
