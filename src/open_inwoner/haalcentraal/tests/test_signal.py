@@ -34,6 +34,9 @@ class TestPreSaveSignal(HaalCentraalMixin, TestCase):
         self.assertEqual(updated_user[0].first_name, "Merel")
         self.assertEqual(updated_user[0].last_name, "Kooyman")
         self.assertEqual(updated_user[0].birthday, date(1982, 4, 10))
+        self.assertEqual(updated_user[0].street, "King Olivereiland")
+        self.assertEqual(updated_user[0].housenumber, "64")
+        self.assertEqual(updated_user[0].city, "'s-Gravenhage")
         self.assertTrue(updated_user[0].is_prepopulated)
 
     @override_settings(BRP_VERSION="1.3")
@@ -52,6 +55,9 @@ class TestPreSaveSignal(HaalCentraalMixin, TestCase):
         self.assertEqual(updated_user[0].first_name, "Merel")
         self.assertEqual(updated_user[0].last_name, "Kooyman")
         self.assertEqual(updated_user[0].birthday, date(1982, 4, 10))
+        self.assertEqual(updated_user[0].street, "King Olivereiland")
+        self.assertEqual(updated_user[0].housenumber, "64")
+        self.assertEqual(updated_user[0].city, "'s-Gravenhage")
         self.assertTrue(updated_user[0].is_prepopulated)
 
     def test_user_is_not_updated_without_defining_service(self, m):
@@ -74,6 +80,9 @@ class TestPreSaveSignal(HaalCentraalMixin, TestCase):
         self.assertEqual(updated_user[0].first_name, "")
         self.assertEqual(updated_user[0].last_name, "")
         self.assertEqual(updated_user[0].birthday, None)
+        self.assertEqual(updated_user[0].street, "")
+        self.assertEqual(updated_user[0].housenumber, "")
+        self.assertEqual(updated_user[0].city, "")
         self.assertFalse(updated_user[0].is_prepopulated)
 
     def test_user_is_not_updated_when_not_logged_in_via_digid(self, m):
@@ -90,6 +99,9 @@ class TestPreSaveSignal(HaalCentraalMixin, TestCase):
         self.assertEqual(updated_user[0].first_name, "")
         self.assertEqual(updated_user[0].last_name, "")
         self.assertEqual(updated_user[0].birthday, None)
+        self.assertEqual(updated_user[0].street, "")
+        self.assertEqual(updated_user[0].housenumber, "")
+        self.assertEqual(updated_user[0].city, "")
         self.assertFalse(updated_user[0].is_prepopulated)
 
     def test_empty_response_from_haalcentraal(self, m):
@@ -116,6 +128,10 @@ class TestPreSaveSignal(HaalCentraalMixin, TestCase):
         self.assertEqual(updated_user[0].first_name, "")
         self.assertEqual(updated_user[0].last_name, "")
         self.assertEqual(updated_user[0].birthday, None)
+        self.assertEqual(updated_user[0].street, "")
+        self.assertEqual(updated_user[0].housenumber, "")
+        self.assertEqual(updated_user[0].city, "")
+        self.assertFalse(updated_user[0].is_prepopulated)
 
     def test_user_is_not_updated_when_http_404(self, m):
         self._setUpService()
@@ -141,6 +157,9 @@ class TestPreSaveSignal(HaalCentraalMixin, TestCase):
         self.assertEqual(updated_user[0].first_name, "")
         self.assertEqual(updated_user[0].last_name, "")
         self.assertEqual(updated_user[0].birthday, None)
+        self.assertEqual(updated_user[0].street, "")
+        self.assertEqual(updated_user[0].housenumber, "")
+        self.assertEqual(updated_user[0].city, "")
         self.assertFalse(updated_user[0].is_prepopulated)
 
     def test_user_is_not_updated_when_http_500(self, m):
@@ -167,6 +186,9 @@ class TestPreSaveSignal(HaalCentraalMixin, TestCase):
         self.assertEqual(updated_user[0].first_name, "")
         self.assertEqual(updated_user[0].last_name, "")
         self.assertEqual(updated_user[0].birthday, None)
+        self.assertEqual(updated_user[0].street, "")
+        self.assertEqual(updated_user[0].housenumber, "")
+        self.assertEqual(updated_user[0].city, "")
         self.assertFalse(updated_user[0].is_prepopulated)
 
 
