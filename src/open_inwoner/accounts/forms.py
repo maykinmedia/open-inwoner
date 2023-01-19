@@ -66,21 +66,15 @@ class UserForm(forms.ModelForm):
             "city",
         )
 
-    def __init__(self, user, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
-        if user.login_type == LoginTypeChoices.digid and user.is_prepopulated:
-            disabled_fields = (
-                "first_name",
-                "last_name",
-                "birthday",
-                "street",
-                "housenumber",
-                "postcode",
-                "city",
-            )
-            for field in disabled_fields:
-                self.fields[field].disabled = True
+class BrpUserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = (
+            "display_name",
+            "email",
+            "phonenumber",
+        )
 
 
 class NecessaryUserForm(forms.ModelForm):

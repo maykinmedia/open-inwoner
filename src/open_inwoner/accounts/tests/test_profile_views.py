@@ -13,6 +13,7 @@ from open_inwoner.utils.logentry import LOG_ACTIONS
 
 from ...questionnaire.tests.factories import QuestionnaireStepFactory
 from ..choices import LoginTypeChoices
+from ..forms import BrpUserForm, UserForm
 from .factories import ActionFactory, DocumentFactory, UserFactory
 
 
@@ -179,6 +180,7 @@ class EditProfileTests(WebTest):
         form = response.forms["profile-edit"]
         form["first_name"] = ""
         form["last_name"] = ""
+        form["display_name"] = ""
         form["email"] = ""
         form["phonenumber"] = ""
         form["birthday"] = ""
@@ -195,6 +197,7 @@ class EditProfileTests(WebTest):
         form = response.forms["profile-edit"]
         form["first_name"] = "First name"
         form["last_name"] = "Last name"
+        form["display_name"] = "a nickname"
         form["email"] = "user@example.com"
         form["phonenumber"] = "06987878787"
         form["birthday"] = "21-01-1992"
@@ -209,6 +212,7 @@ class EditProfileTests(WebTest):
         self.user.refresh_from_db()
         self.assertEquals(self.user.first_name, "First name")
         self.assertEquals(self.user.last_name, "Last name")
+        self.assertEquals(self.user.display_name, "a nickname")
         self.assertEquals(self.user.email, "user@example.com")
         self.assertEquals(self.user.birthday.strftime("%d-%m-%Y"), "21-01-1992")
         self.assertEquals(self.user.street, "Keizersgracht")
@@ -225,6 +229,7 @@ class EditProfileTests(WebTest):
                 form = response.forms["profile-edit"]
                 form["first_name"] = char
                 form["last_name"] = "Last name"
+                form["display_name"] = "a nickname"
                 form["phonenumber"] = "06987878787"
                 form["birthday"] = "21-01-1992"
                 form["street"] = "Keizersgracht"
@@ -250,6 +255,7 @@ class EditProfileTests(WebTest):
                 form = response.forms["profile-edit"]
                 form["first_name"] = "John"
                 form["last_name"] = char
+                form["display_name"] = "a nickname"
                 form["phonenumber"] = "06987878787"
                 form["birthday"] = "21-01-1992"
                 form["street"] = "Keizersgracht"
@@ -288,7 +294,7 @@ class EditProfileTests(WebTest):
         self.assertEqual(self.user.email, initial_email)
         self.assertEqual(self.user.first_name, "Testing")
 
-    def test_form_for_digid_user_saves_only_non_disabled_fields(self):
+    def test_form_for_digid_brp_user_saves_data(self):
         user = UserFactory(
             bsn="999993847",
             first_name="name",
@@ -299,29 +305,38 @@ class EditProfileTests(WebTest):
         response = self.app.get(self.url, user=user)
         form = response.forms["profile-edit"]
 
-        form["first_name"] = "First name"
-        form["last_name"] = "Last name"
+        form["display_name"] = "a nickname"
         form["email"] = "user@example.com"
         form["phonenumber"] = "06987878787"
-        form["birthday"] = "21-01-1992"
-        form["street"] = "Keizersgracht"
-        form["housenumber"] = "17 d"
-        form["postcode"] = "1013 RM"
-        form["city"] = "Amsterdam"
         response = form.submit()
 
         self.assertEqual(response.url, self.return_url)
 
         user.refresh_from_db()
 
-        self.assertEqual(user.first_name, "name")
-        self.assertEqual(user.last_name, "surname")
+        self.assertEqual(user.display_name, "a nickname")
         self.assertEqual(user.email, "user@example.com")
-        self.assertIsNone(user.birthday)
-        self.assertEqual(user.street, "")
-        self.assertEqual(user.housenumber, "")
-        self.assertIsNone(user.postcode, "")
-        self.assertEqual(user.city, "")
+        self.assertEqual(user.phonenumber, "06987878787")
+
+    def test_expected_form_is_rendered(self):
+        # regular user
+        response = self.app.get(self.url, user=self.user)
+        form = response.context["form"]
+
+        self.assertEqual(type(form), UserForm)
+
+        # digid-brp user
+        user = UserFactory(
+            bsn="999993847",
+            first_name="name",
+            last_name="surname",
+            is_prepopulated=True,
+            login_type=LoginTypeChoices.digid,
+        )
+        response = self.app.get(self.url, user=user)
+        form = response.context["form"]
+
+        self.assertEqual(type(form), BrpUserForm)
 
 
 @requests_mock.Mocker()
