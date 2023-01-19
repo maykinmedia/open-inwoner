@@ -17,7 +17,9 @@
   text-decoration: none;
   transition: transform 300ms, background-color 300ms;
   font-weight: normal;
-  outline: none;
+  // modified outline for accessibility focus
+  outline-width: 1px;
+  outline-offset: 1px;
   border: 0;
   white-space: nowrap;
 

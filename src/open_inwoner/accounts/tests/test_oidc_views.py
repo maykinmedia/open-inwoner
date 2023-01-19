@@ -1,12 +1,12 @@
 from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
-from django.db import IntegrityError
 from django.test import TestCase
 from django.urls import reverse
 
 from mozilla_django_oidc_db.models import OpenIDConnectConfig
 
+from ..choices import LoginTypeChoices
 from .factories import UserFactory
 
 User = get_user_model()
@@ -21,7 +21,7 @@ class OIDCFlowTests(TestCase):
         "mozilla_django_oidc_db.mixins.OpenIDConnectConfig.get_solo",
         return_value=OpenIDConnectConfig(enabled=True),
     )
-    def test_duplicate_email_unique_constraint_violated(
+    def test_existing_email_updates_user(
         self,
         mock_get_solo,
         mock_get_token,
@@ -29,15 +29,13 @@ class OIDCFlowTests(TestCase):
         mock_store_tokens,
         mock_get_userinfo,
     ):
-        """
-        Assert that duplicate email addresses result in usable user feedback.
-        """
         # set up a user with a colliding email address
+        # sub is the oidc_id field in our db
         mock_get_userinfo.return_value = {
-            "email": "collision@example.com",
+            "email": "existing_user@example.com",
             "sub": "some_username",
         }
-        user = UserFactory.create(email="collision@example.com")
+        user = UserFactory.create(email="existing_user@example.com")
         self.assertEqual(user.oidc_id, "")
         session = self.client.session
         session["oidc_states"] = {"mock": {"nonce": "nonce"}}
@@ -49,14 +47,18 @@ class OIDCFlowTests(TestCase):
             callback_url, {"code": "mock", "state": "mock"}
         )
 
+        user.refresh_from_db()
+
         self.assertRedirects(
             callback_response, reverse("root"), fetch_redirect_response=False
         )
         self.assertTrue(User.objects.filter(oidc_id="some_username").exists())
-        user.refresh_from_db()
         self.assertEqual(user.oidc_id, "some_username")
+
         db_user = User.objects.filter(oidc_id="some_username").first()
+
         self.assertEqual(db_user.id, user.id)
+        self.assertEqual(db_user.login_type, LoginTypeChoices.oidc)
 
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
@@ -66,7 +68,7 @@ class OIDCFlowTests(TestCase):
         "mozilla_django_oidc_db.mixins.OpenIDConnectConfig.get_solo",
         return_value=OpenIDConnectConfig(enabled=True),
     )
-    def test_happy_flow(
+    def test_existing_case_sensitive_email_updates_user(
         self,
         mock_get_solo,
         mock_get_token,
@@ -74,15 +76,16 @@ class OIDCFlowTests(TestCase):
         mock_store_tokens,
         mock_get_userinfo,
     ):
-        """
-        Assert that duplicate email addresses result in usable user feedback.
-        """
         # set up a user with a colliding email address
+        # sub is the oidc_id field in our db
         mock_get_userinfo.return_value = {
-            "email": "nocollision@example.com",
+            "email": "Existing_user@example.com",
             "sub": "some_username",
         }
-        UserFactory.create(email="collision@example.com")
+        user = UserFactory.create(
+            email="existing_user@example.com", login_type=LoginTypeChoices.default
+        )
+        self.assertEqual(user.oidc_id, "")
         session = self.client.session
         session["oidc_states"] = {"mock": {"nonce": "nonce"}}
         session.save()
@@ -93,10 +96,61 @@ class OIDCFlowTests(TestCase):
             callback_url, {"code": "mock", "state": "mock"}
         )
 
+        user.refresh_from_db()
+
         self.assertRedirects(
             callback_response, reverse("root"), fetch_redirect_response=False
         )
-        self.assertTrue(User.objects.filter(email="nocollision@example.com").exists())
+        self.assertTrue(User.objects.filter(oidc_id="some_username").exists())
+        self.assertEqual(user.oidc_id, "some_username")
+
+        db_user = User.objects.filter(oidc_id="some_username").first()
+
+        self.assertEqual(db_user.id, user.id)
+        self.assertEqual(db_user.login_type, LoginTypeChoices.oidc)
+
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
+    @patch(
+        "mozilla_django_oidc_db.mixins.OpenIDConnectConfig.get_solo",
+        return_value=OpenIDConnectConfig(enabled=True),
+    )
+    def test_new_user_is_created_when_new_email(
+        self,
+        mock_get_solo,
+        mock_get_token,
+        mock_verify_token,
+        mock_store_tokens,
+        mock_get_userinfo,
+    ):
+        # set up a user with a non existing email address
+        mock_get_userinfo.return_value = {
+            "email": "new_user@example.com",
+            "sub": "some_username",
+        }
+        UserFactory.create(email="existing_user@example.com")
+        session = self.client.session
+        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session.save()
+        callback_url = reverse("oidc_authentication_callback")
+
+        self.assertFalse(User.objects.filter(email="new_user@example.com").exists())
+
+        # enter the login flow
+        callback_response = self.client.get(
+            callback_url, {"code": "mock", "state": "mock"}
+        )
+
+        self.assertRedirects(
+            callback_response, reverse("root"), fetch_redirect_response=False
+        )
+        new_user = User.objects.filter(email="new_user@example.com")
+
+        self.assertTrue(new_user.exists())
+        self.assertEqual(new_user.get().oidc_id, "some_username")
+        self.assertEqual(new_user.get().login_type, LoginTypeChoices.oidc)
 
     def test_error_page_direct_access_forbidden(self):
         error_url = reverse("admin-oidc-error")

@@ -10,6 +10,8 @@ from mozilla_django_oidc_db.views import AdminLoginFailure
 
 from open_inwoner.accounts.forms import CustomRegistrationForm
 from open_inwoner.accounts.views import (
+    CustomDigiDAssertionConsumerServiceMockView,
+    CustomDigiDAssertionConsumerServiceView,
     CustomRegistrationView,
     LogPasswordChangeView,
     LogPasswordResetConfirmView,
@@ -90,6 +92,7 @@ urlpatterns = [
     ),
     path("oidc/", include("mozilla_django_oidc.urls")),
     path("faq/", FAQView.as_view(), name="general_faq"),
+    path("yubin/", include("django_yubin.urls")),
     path("", include("open_inwoner.pdc.urls", namespace="pdc")),
     path("", include("open_inwoner.search.urls", namespace="search")),
     path("", HomeView.as_view(), name="root"),
@@ -103,10 +106,20 @@ urlpatterns += staticfiles_urlpatterns() + static(
 
 if "digid_eherkenning.backends.DigiDBackend" in settings.AUTHENTICATION_BACKENDS:
     urlpatterns = [
+        path(
+            "digid/acs/",
+            CustomDigiDAssertionConsumerServiceView.as_view(),
+            name="acs",
+        ),
         path("digid/", include("digid_eherkenning.digid_urls")),
     ] + urlpatterns
 elif settings.DIGID_MOCK:
     urlpatterns = [
+        path(
+            "digid/acs/",
+            CustomDigiDAssertionConsumerServiceMockView.as_view(),
+            name="acs",
+        ),
         path("digid/", include("digid_eherkenning.mock.digid_urls")),
         path("digid/idp/", include("digid_eherkenning.mock.idp.digid_urls")),
     ] + urlpatterns

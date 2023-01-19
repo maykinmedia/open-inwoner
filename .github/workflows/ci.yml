@@ -59,6 +59,8 @@ jobs:
           sudo apt-get install -y libxml2-dev libxmlsec1-dev libxmlsec1-openssl
           pip install -r requirements/dev.txt codecov
           playwright install
+          playwright install msedge
+          playwright install-deps
 
       - name: Build frontend
         run: |
@@ -70,7 +72,7 @@ jobs:
           python src/manage.py collectstatic --noinput --link
           coverage run src/manage.py test src
         env:
-          DJANGO_SETTINGS_MODULE: open_inwoner.conf.dev
+          DJANGO_SETTINGS_MODULE: open_inwoner.conf.ci
           SECRET_KEY: dummy
           DB_USER: postgres
           DB_PASSWORD: ''

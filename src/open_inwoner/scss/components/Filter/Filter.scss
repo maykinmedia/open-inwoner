@@ -1,4 +1,6 @@
 .filter {
+  border: 0 solid transparent;
+
   &--open {
     .filter__list {
       display: grid;
@@ -6,7 +8,7 @@
   }
 
   &__title {
-    color: var(--color-gray-dark);
+    color: var(--font-color-heading-4);
     font-family: var(--font-family-heading);
     font-size: var(--font-size-heading-4);
     font-weight: bold;

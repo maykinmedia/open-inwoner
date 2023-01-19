@@ -1,16 +1,15 @@
 {% load i18n filter_tags icon_tags form_tags %}
 
 <div>
-    <aside class="filter filter--open" aria-label="{% trans "Filter" %}">
-        <h4 class="h4 filter__title">
+    <fieldset class="filter filter--open" aria-label="{% trans "Filter" %}">
+        <legend class="filter__title">
             {{ field.label }}
-            {% icon icon="expand_more" %}
-        </h4>
+        </legend>
         <div class="filter__list">
             {% for option in field.field.choices %}
                 {% choice_checkbox choice=option name=field.name data=field.data index=forloop.counter %}
             {% endfor %}
         </div>
-    </aside>
+    </fieldset>
     <hr class="divider divider--small">
 </div>

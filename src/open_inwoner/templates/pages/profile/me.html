@@ -12,11 +12,11 @@
     {% button_row align="right" %}
         {% dropdown icon="settings" secondary=True %}
             <div class="dropdown__item">
-                {% button href="accounts:edit_profile" text=_("Bewerken") icon="edit" icon_outlined=True  transparent=True secondary=True %}
+                {% button href="accounts:edit_profile" text=_("Bewerken") icon="edit" transparent=True %}
             </div>
             {% if can_change_password %}
                 <div class="dropdown__item">
-                    {% button href="password_change" text=_("Wijzig wachtwoord") icon="key" icon_outlined=True  transparent=True secondary=True %}
+                    {% button href="password_change" text=_("Wijzig wachtwoord") icon="key" transparent=True %}
                 </div>
             {% endif %}
         {% enddropdown %}
@@ -51,6 +51,13 @@
 <h1 class="h1" id="overview">{% trans "Persoonlijk overzicht" %}</h1>
 
 <div class="tabled tabled--flexible personal-overview">
+    {% if request.user.login_type == "digid" %}
+        <div class="tabled__row">
+            <div class="tabled__item tabled__item--bold">{% trans "Mijn gegevens" %}</div>
+            <div class="tabled__item">{{request.user.get_full_name}}{% if request.user.get_address %}, {{ request.user.get_address }}{% endif %}</div>
+            <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="accounts:my_data" text="Bekijken" icon="arrow_forward" icon_position="after" primary=True %}</div>
+        </div>
+    {% endif %}
     <div class="tabled__row">
         <div class="tabled__item tabled__item--bold">{% trans "Interessegebieden" %}</div>
         <div class="tabled__item">{{ theme_text }}</div>

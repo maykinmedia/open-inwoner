@@ -134,6 +134,9 @@ CORS_ALLOWED_ORIGINS = [
 
 TWO_FACTOR_PATCH_ADMIN = False
 
+# playwright multi browser
+PLAYWRIGHT_MULTI_ONLY_DEFAULT = True
+
 # Override settings with local settings.
 try:
     from .local import *  # noqa

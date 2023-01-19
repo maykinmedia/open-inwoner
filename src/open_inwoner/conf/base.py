@@ -161,6 +161,7 @@ INSTALLED_APPS = [
     "sessionprofile",
     "openformsclient",
     "django_htmx",
+    "django_yubin",
     # Project applications.
     "open_inwoner.accounts",
     "open_inwoner.components",
@@ -274,6 +275,8 @@ EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=False)
 EMAIL_TIMEOUT = 10
 
 DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="openinwoner@maykinmedia.nl")
+
+EMAIL_BACKEND = "django_yubin.smtp_queue.EmailBackend"
 
 #
 # LOGGING
@@ -980,8 +983,6 @@ THUMBNAIL_ALIASES = {
     }
 }
 THUMBNAIL_QUALITY = 100
-
-TEST_RUNNER = "django_rich.test.RichRunner"
 
 OIDC_AUTHENTICATE_CLASS = "mozilla_django_oidc_db.views.OIDCAuthenticationRequestView"
 OIDC_CALLBACK_CLASS = "mozilla_django_oidc_db.views.OIDCCallbackView"

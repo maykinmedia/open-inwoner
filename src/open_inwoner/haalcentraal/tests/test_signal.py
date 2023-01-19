@@ -1,5 +1,3 @@
-import json
-import os
 from datetime import date
 
 from django.test import TestCase, override_settings
@@ -16,55 +14,11 @@ from open_inwoner.utils.logentry import LOG_ACTIONS
 
 from ..models import HaalCentraalConfig
 from .factories import ServiceFactory
-
-
-def load_json_mock(name):
-    path = os.path.join(os.path.dirname(__file__), "files", name)
-    with open(path, "r") as f:
-        return json.load(f)
-
-
-def load_binary_mock(name):
-    path = os.path.join(os.path.dirname(__file__), "files", name)
-    with open(path, "rb") as f:
-        return f.read()
+from .mixins import HaalCentraalMixin
 
 
 @requests_mock.Mocker()
-class TestPreSaveSignal(TestCase):
-    def _setUpService(self):
-        config = HaalCentraalConfig.get_solo()
-        service = ServiceFactory(
-            api_root="https://personen/api/brp",
-            oas="https://personen/api/schema/openapi.yaml",
-        )
-        config.service = service
-        config.save()
-
-    def _setUpMocks_v_2(self, m):
-        m.get(
-            "https://personen/api/schema/openapi.yaml?v=3",
-            status_code=200,
-            content=load_binary_mock("personen_2.0.yaml"),
-        )
-        m.post(
-            "https://personen/api/brp/personen",
-            status_code=200,
-            json=load_json_mock("ingeschrevenpersonen.999993847_2.0.json"),
-        )
-
-    def _setUpMocks_v_1_3(self, m):
-        m.get(
-            "https://personen/api/schema/openapi.yaml?v=3",
-            status_code=200,
-            content=load_binary_mock("personen_1.3.yaml"),
-        )
-        m.get(
-            "https://personen/api/brp/ingeschrevenpersonen/999993847?fields=naam,geboorte.datum",
-            status_code=200,
-            json=load_json_mock("ingeschrevenpersonen.999993847_1.3.json"),
-        )
-
+class TestPreSaveSignal(HaalCentraalMixin, TestCase):
     def test_signal_updates_users_data_when_logged_in_via_digid_v_2(self, m):
         self._setUpMocks_v_2(m)
         self._setUpService()
@@ -144,7 +98,7 @@ class TestPreSaveSignal(TestCase):
         m.get(
             "https://personen/api/schema/openapi.yaml?v=3",
             status_code=200,
-            content=load_binary_mock("personen_2.0.yaml"),
+            content=self.load_binary_mock("personen_2.0.yaml"),
         )
         m.post(
             "https://personen/api/brp/personen",
@@ -169,7 +123,7 @@ class TestPreSaveSignal(TestCase):
         m.get(
             "https://personen/api/schema/openapi.yaml?v=3",
             status_code=200,
-            content=load_binary_mock("personen_2.0.yaml"),
+            content=self.load_binary_mock("personen_2.0.yaml"),
         )
         m.post(
             "https://personen/api/brp/personen",
@@ -195,7 +149,7 @@ class TestPreSaveSignal(TestCase):
         m.get(
             "https://personen/api/schema/openapi.yaml?v=3",
             status_code=200,
-            content=load_binary_mock("personen_2.0.yaml"),
+            content=self.load_binary_mock("personen_2.0.yaml"),
         )
         m.post(
             "https://personen/api/brp/personen",
@@ -216,19 +170,19 @@ class TestPreSaveSignal(TestCase):
         self.assertFalse(updated_user[0].is_prepopulated)
 
 
-class TestLogging(TestCase):
+class TestLogging(HaalCentraalMixin, TestCase):
     @freeze_time("2021-10-18 13:00:00")
     @requests_mock.Mocker()
     def test_signal_updates_logging(self, m):
         m.get(
             "https://personen/api/schema/openapi.yaml?v=3",
             status_code=200,
-            content=load_binary_mock("personen_2.0.yaml"),
+            content=self.load_binary_mock("personen_2.0.yaml"),
         )
         m.post(
             "https://personen/api/brp/personen",
             status_code=200,
-            json=load_json_mock("ingeschrevenpersonen.999993847_2.0.json"),
+            json=self.load_json_mock("ingeschrevenpersonen.999993847_2.0.json"),
         )
 
         config = HaalCentraalConfig.get_solo()
@@ -266,7 +220,7 @@ class TestLogging(TestCase):
         m.get(
             "https://personen/api/schema/openapi.yaml?v=3",
             status_code=200,
-            content=load_binary_mock("personen_2.0.yaml"),
+            content=self.load_binary_mock("personen_2.0.yaml"),
         )
         m.post(
             "https://personen/api/brp/personen",

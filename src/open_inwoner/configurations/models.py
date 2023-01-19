@@ -11,6 +11,7 @@ from solo.models import SingletonModel
 
 from open_inwoner.pdc.utils import PRODUCT_PATH_NAME
 
+from ..utils.colors import hex_to_hsl
 from .choices import ColorTypeChoices
 
 
@@ -381,15 +382,15 @@ class SiteConfiguration(SingletonModel):
 
     @property
     def get_primary_color(self):
-        return self.hex_to_hsl(self.primary_color)
+        return hex_to_hsl(self.primary_color)
 
     @property
     def get_secondary_color(self):
-        return self.hex_to_hsl(self.secondary_color)
+        return hex_to_hsl(self.secondary_color)
 
     @property
     def get_accent_color(self):
-        return self.hex_to_hsl(self.accent_color)
+        return hex_to_hsl(self.accent_color)
 
     @property
     def get_ordered_flatpages(self):
@@ -402,52 +403,6 @@ class SiteConfiguration(SingletonModel):
     @property
     def matomo_enabled(self):
         return self.matomo_url and self.matomo_site_id
-
-    def hex_to_hsl(self, color):
-        # Convert hex to RGB first
-        r = 0
-        g = 0
-        b = 0
-        if len(color) == 4:
-            r = "0x" + color[1] + color[1]
-            g = "0x" + color[2] + color[2]
-            b = "0x" + color[3] + color[3]
-        elif len(color) == 7:
-            r = "0x" + color[1] + color[2]
-            g = "0x" + color[3] + color[4]
-            b = "0x" + color[5] + color[6]
-
-        # Then to HSL
-        r = int(r, 16) / 255
-        g = int(g, 16) / 255
-        b = int(b, 16) / 255
-        cmin = min(r, g, b)
-        cmax = max(r, g, b)
-        delta = cmax - cmin
-        h = 0
-        s = 0
-        l = 0
-
-        if delta == 0:
-            h = 0
-        elif cmax == r:
-            h = ((g - b) / delta) % 6
-        elif cmax == g:
-            h = (b - r) / delta + 2
-        else:
-            h = (r - g) / delta + 4
-
-        h = round(h * 60)
-
-        if h < 0:
-            h += 360
-
-        l = (cmax + cmin) / 2
-        s = 0 if delta == 0 else delta / (1 - abs(2 * l - 1))
-        s = int((s * 100))
-        l = int((l * 100))
-
-        return h, s, l
 
     def get_help_text(self, request):
         current_path = request.get_full_path()

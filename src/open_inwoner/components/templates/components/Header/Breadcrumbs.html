@@ -5,7 +5,7 @@
         {% for url, name in breadcrumbs %}
             <li class="breadcrumbs__list-item">
                 {% if forloop.first %}
-                    <a class="link link--secondary" href="{{url}}">
+                    <a class="link link--secondary" href="{{url}}" title="{{ name }}" aria-label="{{ name }}">
                         {% icon icon="apps" %}
                     </a>
                 {% else %}

@@ -10,6 +10,7 @@ from open_inwoner.accounts.choices import StatusChoices
 from open_inwoner.accounts.models import Action
 from open_inwoner.accounts.tests.factories import ActionFactory, UserFactory
 from open_inwoner.accounts.tests.test_action_views import ActionsPlaywrightTests
+from open_inwoner.utils.tests.playwright import multi_browser
 
 from ..models import Plan
 from .factories import ActionTemplateFactory, PlanFactory, PlanTemplateFactory
@@ -561,7 +562,8 @@ class PlanViewTests(WebTest):
         self.assertEqual(response.status_code, 404)
 
 
-class _PlanActionStatusPlaywrightMixin:
+@multi_browser()
+class PlanActionStatusPlaywrightTests(ActionsPlaywrightTests):
     def setUp(self) -> None:
         super().setUp()
 
@@ -575,17 +577,3 @@ class _PlanActionStatusPlaywrightMixin:
         self.action_list_url = reverse(
             "plans:plan_detail", kwargs={"uuid": self.plan.uuid}
         )
-
-
-class ChromePlanActionStatusPlaywrightTests(
-    _PlanActionStatusPlaywrightMixin, ActionsPlaywrightTests
-):
-    pass
-
-
-class FirefoxPlanActionStatusPlaywrightTests(
-    _PlanActionStatusPlaywrightMixin, ActionsPlaywrightTests
-):
-    @classmethod
-    def launch_browser(cls, playwright):
-        return playwright.firefox.launch()

@@ -6,7 +6,10 @@ from django_webtest import WebTest
 from playwright.sync_api import expect
 from privates.test import temp_private_root
 
-from open_inwoner.utils.tests.playwright import PlaywrightSyncLiveServerTestCase
+from open_inwoner.utils.tests.playwright import (
+    PlaywrightSyncLiveServerTestCase,
+    multi_browser,
+)
 
 from ..models import Message
 from .factories import DigidUserFactory, MessageFactory, UserFactory
@@ -175,6 +178,7 @@ class InboxPageTests(WebTest):
         self.assertFalse(response.pyquery("form#message-form"))
 
 
+@multi_browser()
 class InboxPagePlaywrightTests(PlaywrightSyncLiveServerTestCase):
     @classmethod
     def setUpClass(cls):
@@ -233,9 +237,3 @@ class InboxPagePlaywrightTests(PlaywrightSyncLiveServerTestCase):
         )
         # wait for poll to trigger
         messages.filter(has_text=new_message.content).wait_for()
-
-
-class FirefoxInboxPagePlaywrightTests(InboxPagePlaywrightTests):
-    @classmethod
-    def launch_browser(cls, playwright):
-        return playwright.firefox.launch()

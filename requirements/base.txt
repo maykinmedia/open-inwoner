@@ -31,8 +31,6 @@ cffi==1.15.0
     #   weasyprint
 charset-normalizer==2.0.6
     # via requests
-commonmark==0.9.1
-    # via rich
 confusable-homoglyphs==3.2.0
     # via django-registration
 cryptography==38.0.4
@@ -76,7 +74,6 @@ django==3.2.15
     #   django-redis
     #   django-registration
     #   django-relativedelta
-    #   django-rich
     #   django-rosetta
     #   django-sendfile2
     #   django-simple-certmanager
@@ -171,8 +168,6 @@ django-registration==3.2
     # via -r requirements/base.in
 django-relativedelta==1.1.2
     # via zgw-consumers
-django-rich==1.3.0
-    # via -r requirements/base.in
 django-rosetta==0.9.7
     # via -r requirements/base.in
 django-sendfile2==0.7.0
@@ -196,6 +191,8 @@ django-timeline-logger==2.0.0
 django-treebeard==4.5.1
     # via -r requirements/base.in
 django-view-breadcrumbs==2.2.4
+    # via -r requirements/base.in
+django-yubin==1.7.1
     # via -r requirements/base.in
 djangorestframework==3.12.4
     # via
@@ -256,13 +253,17 @@ josepy==1.13.0
     # via mozilla-django-oidc
 jsonschema==4.1.0
     # via drf-spectacular
+lockfile==0.12.2
+    # via django-yubin
 lxml==4.9.1
     # via
     #   django-digid-eherkenning
     #   maykin-python3-saml
     #   xmlsec
-mail-editor @ git+https://github.com/maykinmedia/mail-editor.git@0b4621b5c7f434586115b8e722af8940cfa70195
+mail-editor @ git+https://github.com/maykinmedia/mail-editor.git@f99e5c4920a95cf9141a71230d7dfb9f03b84e36
     # via -r requirements/base.in
+mail-parser==3.15.0
+    # via django-yubin
 markdown==3.3.6
     # via -r requirements/base.in
 markuppy==1.14
@@ -300,8 +301,6 @@ pydyf==0.1.2
     # via weasyprint
 pyee==9.0.4
     # via playwright
-pygments==2.12.0
-    # via rich
 pyjwt==2.3.0
     # via gemma-zds-client
 pyopenssl==22.1.0
@@ -330,6 +329,7 @@ pytz==2021.3
     # via
     #   -r requirements/base.in
     #   django
+    #   django-yubin
 pywatchman==1.4.1
     # via -r requirements/base.in
 pyyaml==6.0
@@ -352,10 +352,10 @@ requests==2.26.0
     #   zgw-consumers
 requests-mock==1.9.3
     # via zgw-consumers
-rich==12.4.1
-    # via django-rich
 sentry-sdk==1.4.3
     # via -r requirements/base.in
+simplejson==3.18.0
+    # via mail-parser
 six==1.16.0
     # via
     #   django-choices
@@ -364,6 +364,7 @@ six==1.16.0
     #   furl
     #   html5lib
     #   isodate
+    #   mail-parser
     #   orderedmultidict
     #   python-dateutil
     #   qrcode
