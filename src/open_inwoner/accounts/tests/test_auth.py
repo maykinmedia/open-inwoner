@@ -445,7 +445,7 @@ class TestRegistrationDigid(HaalCentraalMixin, WebTest):
         # ensure user's first_name has been updated
         self.assertEqual(user.first_name, "Merel")
         self.assertEqual(user.last_name, "")
-        self.assertTrue(user.email.endswith("example.com"))
+        self.assertTrue(user.email.endswith("@example.com"))
 
         # only email can be modified
         form = response.follow().forms["necessary-form"]
