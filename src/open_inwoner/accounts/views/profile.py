@@ -128,7 +128,7 @@ class EditProfileView(
 
     def get_form_class(self):
         user = self.request.user
-        if user.login_type == LoginTypeChoices.digid and user.is_prepopulated:
+        if user.is_digid_and_brp():
             return BrpUserForm
         return super().get_form_class()
 

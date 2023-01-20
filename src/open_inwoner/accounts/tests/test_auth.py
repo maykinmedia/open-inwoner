@@ -5,10 +5,12 @@ from django.core import mail
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
 
+import requests_mock
 from django_webtest import WebTest
 from furl import furl
 
 from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 
 from ..choices import LoginTypeChoices
 from ..models import User
@@ -239,7 +241,7 @@ class TestRegistrationFunctionality(WebTest):
         )
 
 
-class TestRegistrationDigid(WebTest):
+class TestRegistrationDigid(HaalCentraalMixin, WebTest):
     csrf_checks = False
     url = reverse_lazy("django_registration_register")
 
@@ -373,6 +375,89 @@ class TestRegistrationDigid(WebTest):
             f"{reverse('accounts:registration_necessary')}?invite={invite.key}",
         )
         self.assertNotIn("invite_url", self.client.session.keys())
+
+    @requests_mock.Mocker()
+    def test_user_can_modify_only_email_when_digid_and_brp(self, m):
+        self._setUpMocks_v_2(m)
+        self._setUpService()
+
+        url = reverse("digid-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": reverse("accounts:registration_necessary"),
+        }
+        data = {
+            "auth_name": "123456789",
+            "auth_pass": "bar",
+        }
+        url = f"{url}?{urlencode(params)}"
+        response = self.app.post(url, data).follow()
+
+        form = response.follow().forms["necessary-form"]
+        form["email"] = "updated@example.com"
+        form["first_name"] = "JUpdated"
+        form["last_name"] = "SUpdated"
+        form.submit()
+
+        user = User.objects.get(id=self.app.session["_auth_user_id"])
+
+        self.assertTrue(user.is_prepopulated)
+        self.assertEqual(user.email, "updated@example.com")
+        self.assertEqual(user.first_name, "Merel")
+        self.assertEqual(user.last_name, "Kooyman")
+
+    @requests_mock.Mocker()
+    def test_partial_response_from_haalcentraal_when_digid_and_brp(self, m):
+        self._setUpService()
+
+        m.get(
+            "https://personen/api/schema/openapi.yaml?v=3",
+            status_code=200,
+            content=self.load_binary_mock("personen_2.0.yaml"),
+        )
+        m.post(
+            "https://personen/api/brp/personen",
+            status_code=200,
+            json={
+                "personen": [
+                    {
+                        "naam": {
+                            "voornamen": "Merel",
+                        },
+                    }
+                ],
+                "type": "RaadpleegMetBurgerservicenummer",
+            },
+        )
+        url = reverse("digid-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": reverse("accounts:registration_necessary"),
+        }
+        data = {
+            "auth_name": "123456789",
+            "auth_pass": "bar",
+        }
+        url = f"{url}?{urlencode(params)}"
+        response = self.app.post(url, data).follow()
+        user = User.objects.get(id=self.app.session["_auth_user_id"])
+
+        # ensure user's first_name has been updated
+        self.assertEqual(user.first_name, "Merel")
+        self.assertEqual(user.last_name, "")
+        self.assertTrue(user.email.endswith("example.com"))
+
+        # only email can be modified
+        form = response.follow().forms["necessary-form"]
+        form["email"] = "updated@example.com"
+        form["first_name"] = "JUpdated"
+        form.submit()
+
+        user.refresh_from_db()
+
+        self.assertEqual(user.first_name, "Merel")
+        self.assertEqual(user.last_name, "")
+        self.assertEqual(user.email, "updated@example.com")
 
 
 class TestRegistrationNecessary(WebTest):
