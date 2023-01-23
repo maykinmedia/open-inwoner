@@ -108,7 +108,7 @@ def fetch_catalog_case_type_by_identification(
     ret = list()
     for zt in zaak_types:
         if zt.identificatie == case_type_identification:
-            ret.append(ret)
+            ret.append(zt)
     return ret
 
 

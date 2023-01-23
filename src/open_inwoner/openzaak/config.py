@@ -27,30 +27,20 @@ def get_configurable_zaaktype_choices(
         return []
 
     known = set(catalog.zaaktypeconfig_set.values_list("identificatie", flat=True))
+    display = dict()
 
-    options = []
     for case_type in case_types:
+        if case_type.identificatie in display:
+            continue
+
         label = f"{case_type.identificatie} - {case_type.omschrijving}"
-        if case_type.concept:
-            label = f"{label} (concept)"
         if case_type.identificatie in known:
             label = f"{label} (*)"
 
-        if case_type.begin_geldigheid:
-            label = f"{label} (begin {date_format(case_type.begin_geldigheid)})"
-        if case_type.einde_geldigheid:
-            label = f"{label} (einde {date_format(case_type.einde_geldigheid)})"
+        display[case_type.identificatie] = label
 
-        options.append(
-            # use tuple to sort without i8n date format confusion
-            SortChoice(
-                sort=(label, case_type.begin_geldigheid, case_type.einde_geldigheid),
-                choice=(str(case_type.identificatie), label),
-            )
-        )
-
-    options.sort(key=lambda sc: sc.sort)
-    return [sc.choice for sc in options]
+    options = sorted(display.items(), key=lambda c: c[1])
+    return options
 
 
 def import_catalog_configs() -> List[CatalogusConfig]:
