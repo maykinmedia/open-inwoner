@@ -8,8 +8,6 @@ from solo.models import SingletonModel
 from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 from zgw_consumers.constants import APITypes
 
-from open_inwoner.openzaak.managers import UserCaseStatusNotificationManager
-
 
 def generate_default_file_extensions():
     return [
@@ -93,31 +91,3 @@ class OpenZaakConfig(SingletonModel):
 
     class Meta:
         verbose_name = _("Open Zaak configuration")
-
-
-class UserCaseStatusNotification(models.Model):
-    user = models.ForeignKey(
-        "accounts.User",
-        on_delete=models.CASCADE,
-    )
-    case_uuid = models.UUIDField(
-        verbose_name=_("Zaak UUID"),
-    )
-    status_uuid = models.UUIDField(
-        verbose_name=_("Status UUID"),
-    )
-    created = models.DateTimeField(verbose_name=_("Created"), default=timezone.now)
-
-    objects = UserCaseStatusNotificationManager()
-
-    class Meta:
-        # for development for now
-        abstract = True
-        verbose_name = _("Open Zaak notification user inform record")
-
-        constraints = [
-            UniqueConstraint(
-                name="unique_user_case_status",
-                fields=["user", "case_uuid", "status_uuid"],
-            )
-        ]

@@ -14,7 +14,7 @@ from open_inwoner.openzaak.catalog import (
     fetch_single_status_type,
 )
 from open_inwoner.openzaak.clients import build_client
-from open_inwoner.openzaak.models import OpenZaakConfig, UserCaseStatusNotification
+from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.utils import is_object_visible
 from open_inwoner.utils.logentry import system_action as log_system_action
 
@@ -122,16 +122,8 @@ def handle_zaken_notification(notification: Notification):
 
 
 def handle_status_update(user: User, case: Zaak, status: Status):
-    raise NotImplementedError()
-
-    note = UserCaseStatusNotification.objects.record_if_unique_notification(
-        user, case.uuid, status.uuid
-    )
-    if not note:
-        # multiple delivery
-        return
-
-    print("sending notification informer!")
+    logger.debug("sending notification informer!")
+    # TODO still need to de-duplicate
     send_status_update_email(user, case, status)
 
 
