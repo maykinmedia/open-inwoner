@@ -6,6 +6,7 @@ from django.conf import settings
 from requests import RequestException
 from zds_client import ClientError, get_operation_url
 from zgw_consumers.api_models.base import factory
+from zgw_consumers.api_models.catalogi import Catalogus
 from zgw_consumers.service import get_paginated_results
 
 from .api_models import StatusType, ZaakType
@@ -66,10 +67,10 @@ def fetch_single_status_type(status_type_url: str) -> Optional[StatusType]:
     return status_type
 
 
-@cache_result("case_types_ui", timeout=settings.CACHE_ZGW_CATALOGI_UI_TIMEOUT)
-def fetch_case_types_admin_ui() -> List[ZaakType]:
+@cache_result("case_types:{catalog_url}", timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT)
+def fetch_catalog_zaaktypes(catalog_url: str) -> List[ZaakType]:
     """
-    list case types for use in admin
+    list case types from catalog
     """
     client = build_client("catalogi")
 
@@ -77,7 +78,11 @@ def fetch_case_types_admin_ui() -> List[ZaakType]:
         return []
 
     try:
-        response = get_paginated_results(client, "zaaktype")
+        response = get_paginated_results(
+            client,
+            "zaaktype",
+            request_kwargs={"params": {"catalogus": catalog_url}},
+        )
     except RequestException as e:
         logger.exception("exception while making request", exc_info=e)
         return []
@@ -90,6 +95,23 @@ def fetch_case_types_admin_ui() -> List[ZaakType]:
     return zaak_types
 
 
+# implicitly uses cached data
+def fetch_catalog_case_type_by_identification(
+    catalog_url: str, case_type_identification: str
+) -> List[ZaakType]:
+    """
+    list case types from a catalogue for a given 'identificatie' field
+    """
+    # re-use cached list
+    zaak_types = fetch_catalog_zaaktypes(catalog_url)
+
+    ret = list()
+    for zt in zaak_types:
+        if zt.identificatie == case_type_identification:
+            ret.append(ret)
+    return ret
+
+
 def fetch_single_case_type_uuid(uuid: str) -> Optional[ZaakType]:
     """
     this is suboptimal until we upgrade the client/cache situation
@@ -99,6 +121,7 @@ def fetch_single_case_type_uuid(uuid: str) -> Optional[ZaakType]:
     if client is None:
         return None
 
+    # make url to use same cache
     url = get_retrieve_resource_by_uuid_url(client, "zaaktype", uuid)
     return fetch_single_case_type(url)
 
@@ -122,3 +145,27 @@ def fetch_single_case_type(case_type_url: str) -> Optional[ZaakType]:
     case_type = factory(ZaakType, response)
 
     return case_type
+
+
+@cache_result("catalogs", timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT)
+def fetch_catalogs() -> List[Catalogus]:
+    client = build_client("catalogi")
+
+    if client is None:
+        return []
+
+    try:
+        response = get_paginated_results(
+            client,
+            "catalogus",
+        )
+    except RequestException as e:
+        logger.exception("exception while making request", exc_info=e)
+        return []
+    except ClientError as e:
+        logger.exception("exception while making request", exc_info=e)
+        return []
+
+    catalogs = factory(Catalogus, response)
+
+    return catalogs

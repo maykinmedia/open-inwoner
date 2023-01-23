@@ -103,9 +103,6 @@ SOLO_CACHE = "local"  # Avoid Redis overhead
 CACHE_ZGW_CATALOGI_TIMEOUT = config("CACHE_ZGW_CATALOGI_TIMEOUT", default=60 * 60 * 24)
 CACHE_ZGW_ZAKEN_TIMEOUT = config("CACHE_ZGW_ZAKEN_TIMEOUT", default=60 * 3)
 
-# special value for catalog data used primarily in UI where new types might need to show up sooner than CACHE_ZGW_CATALOGI_TIMEOUT
-CACHE_ZGW_CATALOGI_UI_TIMEOUT = config("CACHE_ZGW_CATALOGI_UI_TIMEOUT", default=60 * 15)
-
 #
 # APPLICATIONS enabled for this project
 #

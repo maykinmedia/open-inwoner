@@ -101,17 +101,36 @@ class OpenZaakConfig(SingletonModel):
         verbose_name = _("Open Zaak configuration")
 
 
-class ZaakTypeConfig(models.Model):
-    uuid = models.UUIDField(
-        verbose_name=_("Zaaktype UUID"),
+class CatalogusConfig(models.Model):
+    url = models.URLField(
+        verbose_name=_("Catalogus URL"),
         unique=True,
     )
+    domein = models.CharField(
+        verbose_name=_("Domein"),
+        max_length=5,
+    )
+    rsin = models.CharField(
+        verbose_name=_("RSIN"),
+        max_length=9,
+    )
 
-    # copy of fields for display and search
+    class Meta:
+        ordering = ("domein", "rsin")
+
+    def __str__(self):
+        return f"{self.domein} - {self.rsin}"
+
+
+class ZaakTypeConfig(models.Model):
+    catalogus = models.ForeignKey(
+        "openzaak.CatalogusConfig",
+        on_delete=models.CASCADE,
+    )
+
     identificatie = models.CharField(
         verbose_name=_("Zaaktype identificatie"),
         max_length=50,
-        blank=True,
     )
     omschrijving = models.CharField(
         verbose_name=_("Zaaktype omschrijving"),
@@ -124,15 +143,19 @@ class ZaakTypeConfig(models.Model):
 
     class Meta:
         verbose_name = _("Zaaktype Configuration")
+        constraints = [
+            UniqueConstraint(
+                fields=["catalogus", "identificatie"],
+                name="unique_catalogus_identificatie",
+            )
+        ]
 
     def __str__(self):
-        if self.identificatie:
-            bits = (
-                self.identificatie,
-                self.omschrijving,
-            )
-            return f" - ".join(b for b in bits if b)
-        return str(self.uuid)
+        bits = (
+            self.identificatie,
+            self.omschrijving,
+        )
+        return f" - ".join(b for b in bits if b)
 
 
 class UserCaseStatusNotification(models.Model):
