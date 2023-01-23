@@ -52,13 +52,14 @@ class OpenZaakConfig(SingletonModel):
         help_text=_("Select confidentiality level of documents to display for cases"),
     )
     max_upload_size = models.PositiveIntegerField(
-        verbose_name=_("Max upload file size"),
+        verbose_name=_("Max upload file size (in MB)"),
         default=50,
         help_text=_("The max size of the file (in MB) which is uploaded."),
     )
     allowed_file_extensions = ArrayField(
-        models.TextField(
+        models.CharField(
             verbose_name=_("Allowed file extensions"),
+            max_length=255,
         ),
         default=[
             "pdf",
