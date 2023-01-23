@@ -59,7 +59,7 @@ class OpenZaakConfig(SingletonModel):
     allowed_file_extensions = ArrayField(
         models.CharField(
             verbose_name=_("Allowed file extensions"),
-            max_length=255,
+            max_length=8,
         ),
         default=[
             "pdf",
