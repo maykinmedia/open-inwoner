@@ -41,7 +41,10 @@ class NotificationsWebhookBaseView(APIView):
             subscription = get_valid_subscription_from_request(request)
         except InvalidAuth as e:
             log_system_action(str(e), log_level=logging.ERROR)
-            return Response({"detail": str(e)}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response(
+                {"detail": "cannot authenticate subscription"},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
 
         # deserialize
         serializer = NotificatieSerializer(data=request.data)
