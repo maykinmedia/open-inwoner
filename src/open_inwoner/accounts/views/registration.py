@@ -115,6 +115,11 @@ class NecessaryFieldsUserView(LogMixin, LoginRequiredMixin, InviteMixin, UpdateV
     def get_object(self, queryset=None):
         return self.request.user
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
+
     def form_valid(self, form):
         user = form.save()
 

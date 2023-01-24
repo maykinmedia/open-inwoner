@@ -56,6 +56,7 @@ class UserForm(forms.ModelForm):
         fields = (
             "first_name",
             "last_name",
+            "display_name",
             "email",
             "phonenumber",
             "birthday",
@@ -63,6 +64,16 @@ class UserForm(forms.ModelForm):
             "housenumber",
             "postcode",
             "city",
+        )
+
+
+class BrpUserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = (
+            "display_name",
+            "email",
+            "phonenumber",
         )
 
 
@@ -83,11 +94,21 @@ class NecessaryUserForm(forms.ModelForm):
             "invite",
         )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.fields["first_name"].required = True
         self.fields["last_name"].required = True
+
+        if user.is_digid_and_brp():
+            self.fields["first_name"].disabled = True
+            self.fields["last_name"].disabled = True
+
+            # this is for the rare case of retrieving partial data from haalcentraal
+            if not user.first_name:
+                del self.fields["first_name"]
+            if not user.last_name:
+                del self.fields["last_name"]
 
     def clean_email(self):
         email = self.cleaned_data["email"]

@@ -228,6 +228,27 @@ class SiteConfiguration(SingletonModel):
         blank=True,
         help_text=_("Mailing intro text on the footer section."),
     )
+    footer_logo = FilerImageField(
+        verbose_name=_("Footer logo"),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="footer_logo",
+        help_text=_("Footer logo"),
+    )
+    footer_logo_title = models.CharField(
+        max_length=255,
+        default="",
+        blank=True,
+        verbose_name=_("Footer logo title"),
+        help_text=_("The title - help text of the footer logo."),
+    )
+    footer_logo_url = models.URLField(
+        verbose_name=_("Footer logo link"),
+        blank=True,
+        default="",
+        help_text=_("The external link for the footer logo."),
+    )
     flatpages = models.ManyToManyField(
         FlatPage,
         verbose_name=_("Flatpages"),

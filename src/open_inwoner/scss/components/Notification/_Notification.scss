@@ -59,7 +59,7 @@
     color: var(--notification-color-text);
   }
 
-  .button {
+  .button:not(.button--transparent) {
     color: var(--color-white);
     background-color: var(--notification-color-text);
   }
