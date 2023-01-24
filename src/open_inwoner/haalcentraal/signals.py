@@ -25,7 +25,9 @@ def on_bsn_change(instance, **kwargs):
         and instance.is_prepopulated is False
         and instance.login_type == LoginTypeChoices.digid
     ):
-        system_action("Retrieving data from haal centraal based on BSN", user=instance)
+        system_action(
+            "Retrieving data from haal centraal based on BSN", content_object=instance
+        )
         data = fetch_brp_data(instance, brp_version)
 
         # we have a different response depending on brp version
@@ -46,4 +48,6 @@ def on_bsn_change(instance, **kwargs):
             instance.city = glom(data, "verblijfplaats.woonplaats", default="")
             instance.is_prepopulated = True
 
-            system_action(_("data was retrieved from haal centraal"), user=instance)
+            system_action(
+                _("data was retrieved from haal centraal"), content_object=instance
+            )
