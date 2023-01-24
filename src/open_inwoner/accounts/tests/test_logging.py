@@ -210,7 +210,8 @@ class TestProfile(WebTest):
         form["old_password"] = "test"
         form["new_password1"] = "newPassw0rd"
         form["new_password2"] = "newPassw0rd"
-        form.submit()
+        form.submit(status=302)
+
         log_entry = TimelineLog.objects.filter(
             extra_data__message=str(_("password was changed"))
         ).last()
