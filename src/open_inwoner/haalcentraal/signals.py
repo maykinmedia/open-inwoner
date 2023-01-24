@@ -26,8 +26,6 @@ def on_bsn_change(instance, **kwargs):
         and instance.login_type == LoginTypeChoices.digid
     ):
         system_action("Retrieving data from haal centraal based on BSN", user=instance)
-        data = fetch_data(instance, brp_version)
-
         data = fetch_brp_data(instance, brp_version)
 
         # we have a different response depending on brp version
