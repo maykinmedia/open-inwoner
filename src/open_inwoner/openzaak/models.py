@@ -1,7 +1,5 @@
 from django.db import models
 from django.db.models import UniqueConstraint
-from django.utils import timezone
-from django.utils.formats import date_format
 from django.utils.translation import gettext_lazy as _
 
 from django_better_admin_arrayfield.models.fields import ArrayField
@@ -156,31 +154,3 @@ class ZaakTypeConfig(models.Model):
             self.omschrijving,
         )
         return f" - ".join(b for b in bits if b)
-
-
-class UserCaseStatusNotification(models.Model):
-    user = models.ForeignKey(
-        "accounts.User",
-        on_delete=models.CASCADE,
-    )
-    case_uuid = models.UUIDField(
-        verbose_name=_("Zaak UUID"),
-    )
-    status_uuid = models.UUIDField(
-        verbose_name=_("Status UUID"),
-    )
-    created = models.DateTimeField(verbose_name=_("Created"), default=timezone.now)
-
-    objects = UserCaseStatusNotificationManager()
-
-    class Meta:
-        # for development for now
-        abstract = True
-        verbose_name = _("Open Zaak notification user inform record")
-
-        constraints = [
-            UniqueConstraint(
-                name="unique_user_case_status",
-                fields=["user", "case_uuid", "status_uuid"],
-            )
-        ]
