@@ -1,6 +1,8 @@
 import inspect
 import logging
 from functools import wraps
+from typing import Callable, TypeVar, Union
+from uuid import UUID
 
 from django.core.cache import caches
 
@@ -110,6 +112,9 @@ def get_role_name_display(rol: Rol) -> str:
         return display
 
 
+RT = TypeVar("RT")
+
+
 def cache(key: str, alias: str = "default", **set_options):
     """
     Function-decorator for updating the django low-level cache.
@@ -121,7 +126,7 @@ def cache(key: str, alias: str = "default", **set_options):
     seconds (timeout=60).
     """
 
-    def decorator(func: callable):
+    def decorator(func: Callable[..., RT]) -> Callable[..., RT]:
         argspec = inspect.getfullargspec(func)
 
         if argspec.defaults:
@@ -131,7 +136,7 @@ def cache(key: str, alias: str = "default", **set_options):
             defaults = {}
 
         @wraps(func)
-        def wrapped(*args, **kwargs):
+        def wrapped(*args, **kwargs) -> RT:
             skip_cache = kwargs.pop("skip_cache", False)
             if skip_cache:
                 return func(*args, **kwargs)
@@ -169,7 +174,9 @@ def cache(key: str, alias: str = "default", **set_options):
     return decorator
 
 
-def get_retrieve_resource_by_uuid_url(client, resource, uuid):
+def get_retrieve_resource_by_uuid_url(
+    client, resource: str, uuid: Union[str, UUID]
+) -> str:
     op_suffix = client.operation_suffix_mapping["retrieve"]
     operation_id = f"{resource}{op_suffix}"
     path_kwargs = {
