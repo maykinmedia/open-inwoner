@@ -910,6 +910,66 @@ MAIL_EDITOR_CONF = {
             },
         ],
     },
+    "case_notification": {
+        "name": _("Case status update notification"),
+        "description": _(
+            "This email is used to notify people a status update happened to their case"
+        ),
+        "subject_default": "Status update to your case at {{ site_name }}",
+        "body_default": """
+            <p>Beste</p>
+
+            <p>You are receiving this email because one of your cases received a status update.</p>
+
+            <table>
+                <tr>
+                    <th>Case identification</th>
+                    <td>{{ identification }}</td>
+                </tr>
+                <tr>
+                    <th>Case type</th>
+                    <td>{{ type_description }}</td>
+                </tr>
+                <tr>
+                    <th>Start date</th>
+                    <td>{{ start_date }}</td>
+                </tr>
+            </table>
+
+            <p><a href="{{ case_link }}">Go to your case</a> </p>
+
+            <p>Met vriendelijke groet,
+            {{ site_name }} </p>
+       """,
+        "subject": [
+            {
+                "name": "site_name",
+                "description": _("Name of the site."),
+            },
+        ],
+        "body": [
+            {
+                "name": "identification",
+                "description": _("The identification of the case"),
+            },
+            {
+                "name": "type_description",
+                "description": _("The description of the type of the case"),
+            },
+            {
+                "name": "start_date",
+                "description": _("The start date of the case"),
+            },
+            {
+                "name": "case_link",
+                "description": _("The link to your case details."),
+            },
+            {
+                "name": "site_name",
+                "description": _("Name of the site"),
+            },
+        ],
+    },
 }
 MAIL_EDITOR_BASE_CONTEXT = {"site_name": "Open Inwoner Platform"}
 CKEDITOR_CONFIGS = {

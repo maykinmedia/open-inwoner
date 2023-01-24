@@ -2,10 +2,14 @@ import logging
 from typing import List, Optional
 from unittest.mock import Mock, patch
 
+from django.core import mail
 from django.test import TestCase
+from django.urls import reverse
+from django.utils.formats import date_format
 
 import requests_mock
 from notifications_api_common.models import NotificationsConfig
+from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.constants import (
     RolOmschrijving,
     RolTypes,
@@ -19,6 +23,7 @@ from open_inwoner.openzaak.notifications import (
     get_emailable_initiator_users_from_roles,
     get_np_initiator_bsns_from_roles,
     handle_zaken_notification,
+    send_status_update_email,
 )
 from open_inwoner.openzaak.tests.factories import (
     NotificationFactory,
@@ -27,8 +32,10 @@ from open_inwoner.openzaak.tests.factories import (
     generate_rol,
 )
 
+from ...configurations.models import SiteConfiguration
 from ...utils.test import ClearCachesMixin, paginated_response
 from ...utils.tests.helpers import AssertTimelineLogMixin, Lookups
+from ..api_models import Status, StatusType, Zaak, ZaakType
 from ..models import OpenZaakConfig
 from .shared import CATALOGI_ROOT, DOCUMENTEN_ROOT, ZAKEN_ROOT
 
@@ -433,6 +440,36 @@ class NotificationHandlerTestCase(AssertTimelineLogMixin, ClearCachesMixin, Test
             level=logging.INFO,
         )
         mock_handle.assert_not_called()
+
+
+class NotificationHandlerEmailTestCase(TestCase):
+    def test_send_status_update_email(self):
+        config = SiteConfiguration.get_solo()
+        data = MockAPIData()
+
+        user = data.user_initiator
+
+        case = factory(Zaak, data.zaak)
+        case.zaaktype = factory(ZaakType, data.zaak_type)
+
+        status = factory(Status, data.status)
+        status.statustype = factory(StatusType, data.status_type)
+
+        case_url = reverse("accounts:case_status", kwargs={"object_id": str(case.uuid)})
+
+        send_status_update_email(user, case, status)
+
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertEqual(email.to, [user.email])
+        self.assertIn(config.name, email.subject)
+
+        body_html = email.alternatives[0][0]
+        self.assertIn(case.identificatie, body_html)
+        self.assertIn(case.zaaktype.omschrijving, body_html)
+        self.assertIn(date_format(case.startdatum), body_html)
+        self.assertIn(case_url, body_html)
+        self.assertIn(config.name, body_html)
 
 
 class NotificationHandlerUtilsTestCase(TestCase):

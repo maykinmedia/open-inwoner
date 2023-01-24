@@ -1,6 +1,9 @@
 import logging
 from typing import List, Optional
 
+from django.urls import reverse
+
+from mail_editor.helpers import find_template
 from requests import RequestException
 from zds_client import ClientError
 from zgw_consumers.api_models.base import factory
@@ -17,6 +20,7 @@ from open_inwoner.openzaak.clients import build_client
 from open_inwoner.openzaak.models import OpenZaakConfig, ZaakTypeConfig
 from open_inwoner.openzaak.utils import is_object_visible
 from open_inwoner.utils.logentry import system_action as log_system_action
+from open_inwoner.utils.url import build_absolute_url
 
 logger = logging.getLogger(__name__)
 
@@ -149,7 +153,18 @@ def send_status_update_email(user: User, case: Zaak, status: Status):
     """
     send the actual mail
     """
-    pass
+    case_detail_url = build_absolute_url(
+        reverse("accounts:case_status", kwargs={"object_id": str(case.uuid)})
+    )
+
+    template = find_template("case_notification")
+    context = {
+        "identification": case.identificatie,
+        "type_description": case.zaaktype.omschrijving,
+        "start_date": case.startdatum,
+        "case_link": case_detail_url,
+    }
+    template.send_email([user.email], context)
 
 
 # - - - - -
