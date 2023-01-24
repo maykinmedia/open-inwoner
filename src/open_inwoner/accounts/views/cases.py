@@ -156,7 +156,9 @@ class CaseListMixin(CaseLogMixin, PaginationMixin):
                     "end_date": getattr(case, "einddatum", None),
                     "description": case.omschrijving,
                     "zaaktype_description": case.zaaktype.omschrijving,
-                    "current_status": case.status.statustype.omschrijving if case.status else "",
+                    "current_status": case.status.statustype.omschrijving
+                    if case.status
+                    else "",
                 }
             )
         return updated_cases

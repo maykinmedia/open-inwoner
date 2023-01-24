@@ -90,14 +90,14 @@ CACHES = {
             "IGNORE_EXCEPTIONS": True,
         },
     },
-    'local': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    "local": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
     },
 }
 
 # Django solo caching
-SOLO_CACHE_TIMEOUT = 5 # 5 seconds
-SOLO_CACHE = 'local' # Avoid Redis overhead
+SOLO_CACHE_TIMEOUT = 5  # 5 seconds
+SOLO_CACHE = "local"  # Avoid Redis overhead
 
 # ZGW API caches
 CACHE_ZGW_CATALOGI_TIMEOUT = config("CACHE_ZGW_CATALOGI_TIMEOUT", default=60 * 60 * 24)

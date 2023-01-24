@@ -132,6 +132,9 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
 
+# Django solo caching (disabled for CI)
+SOLO_CACHE = None
+
 TWO_FACTOR_PATCH_ADMIN = False
 
 # playwright multi browser

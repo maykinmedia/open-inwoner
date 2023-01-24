@@ -46,6 +46,9 @@ ES_INDEX_PRODUCTS = "products_test"
 
 ENVIRONMENT = "CI"
 
+# Django solo caching (disabled for CI)
+SOLO_CACHE = None
+
 #
 # Django-axes
 #
