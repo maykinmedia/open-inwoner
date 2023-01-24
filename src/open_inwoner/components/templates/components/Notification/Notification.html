@@ -1,4 +1,4 @@
-{% load icon_tags button_tags icon_tags %}
+{% load i18n button_tags icon_tags button_tags icon_tags %}
 <div class="notification{% if contents %} notification--contents{% endif %}{% if type %} notification--{{ type }}{% endif %}{% if compact %} notification--compact{% endif %}">
     {% if not icon == False %}
         <div class="notification__icon">
@@ -18,6 +18,6 @@
     </div>
 
     {% if closable %}
-        {% icon icon="close" extra_classes="notification__close" %}
+        {% button extra_classes='notification__close' text=_('Sluit deze melding') hide_text=True transparent=True icon='close' %}
     {% endif %}
 </div>

@@ -70,17 +70,17 @@
                             <div class="feedback__options">
                                 {% spaceless %}
                                 <label class="button-radio" for="positive">
-                                    <input class="button-radio__input" type="radio" name="positive" id="positive" value="true" />
-                                    <span class="button-radio__button">{% icon icon="thumb_up" outlined=True %}</span>
+                                    <input class="button-radio__input" type="radio" name="positive" id="positive" value="true" aria-label="{{ _('Ik heb gevonden wat ik zocht.') }}"/>
+                                    <label class="button-radio__button" for="positive">{% icon icon="thumb_up" outlined=True %}</label>
                                 </label>
                                 <label class="button-radio" for="negative">
-                                    <input class="button-radio__input" type="radio" name="positive" id="negative" value="false" />
-                                    <span class="button-radio__button">{% icon icon="thumb_down" outlined=True %}</span>
+                                    <input class="button-radio__input" type="radio" name="positive" id="negative" value="false" aria-label="{{ _('Ik heb niet gevonden wat ik zocht.') }}" />
+                                    <label class="button-radio__button" for="negative">{% icon icon="thumb_down" outlined=True %}</label>
                                 </label>
                                 {% endspaceless %}
                             </div>
                             <div class="feedback__remark">
-                                {% textarea feedback_form.remark %}
+                                {% textarea feedback_form.remark label=_('Toelichting') %}
                             </div>
                             <div class="feedback__remark">
                                 {% form_actions primary_text="Feedback versturen" %}
