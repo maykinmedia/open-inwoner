@@ -87,13 +87,13 @@ class OpenZaakConfig(SingletonModel):
         help_text=_("A list of the allowed file extensions."),
     )
 
-    # skip_notication_statustype_informeren = models.BooleanField(
-    #     verbose_name=_("Use StatusType.informeren workaround"),
-    #     help_text=_(
-    #         "Enable when StatusType.informeren is not supported by the ZGW backend. This requires ZaakTypeConfig's to be configured to determine on which changes to notify."
-    #     ),
-    #     default=False,
-    # )
+    skip_notication_statustype_informeren = models.BooleanField(
+        verbose_name=_("Use StatusType.informeren workaround"),
+        help_text=_(
+            "Enable when StatusType.informeren is not supported by the ZGW backend. This requires ZaakTypeConfig's to be configured to determine on which changes to notify."
+        ),
+        default=False,
+    )
 
     class Meta:
         verbose_name = _("Open Zaak configuration")
@@ -129,6 +129,8 @@ class ZaakTypeConfig(models.Model):
     identificatie = models.CharField(
         verbose_name=_("Zaaktype identificatie"),
         max_length=50,
+        # TODO we probably want this index
+        # db_index=True
     )
     omschrijving = models.CharField(
         verbose_name=_("Zaaktype omschrijving"),

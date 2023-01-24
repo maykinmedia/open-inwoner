@@ -40,7 +40,8 @@ class Zaak(ZGWModel):
 @dataclass
 class ZaakType(ZGWModel):
     url: str
-    # catalogus: str
+    # catalogus may be risky on eSuite
+    catalogus: str
     identificatie: str
     omschrijving: str
     vertrouwelijkheidaanduiding: str

@@ -7,14 +7,14 @@ from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 
 from open_inwoner.accounts.models import User
-from open_inwoner.openzaak.api_models import Notification, Rol, Status, Zaak
+from open_inwoner.openzaak.api_models import Notification, Rol, Status, Zaak, ZaakType
 from open_inwoner.openzaak.cases import fetch_case_roles, fetch_specific_status
 from open_inwoner.openzaak.catalog import (
     fetch_single_case_type,
     fetch_single_status_type,
 )
 from open_inwoner.openzaak.clients import build_client
-from open_inwoner.openzaak.models import OpenZaakConfig
+from open_inwoner.openzaak.models import OpenZaakConfig, ZaakTypeConfig
 from open_inwoner.openzaak.utils import is_object_visible
 from open_inwoner.utils.logentry import system_action as log_system_action
 
@@ -29,6 +29,8 @@ def handle_zaken_notification(notification: Notification):
 
     # on the 'zaken' channel the hoofd_object is always the zaak
     case_url = notification.hoofd_object
+
+    oz_config = OpenZaakConfig.get_solo()
 
     # were only interested in status updates
     if notification.resource != "status":
@@ -74,12 +76,13 @@ def handle_zaken_notification(notification: Notification):
             log_level=logging.ERROR,
         )
         return
-    elif not status_type.informeren:
-        log_system_action(
-            f"ignored notification: status_type.informeren is false for status {status.url} and case {case_url}",
-            log_level=logging.INFO,
-        )
-        return
+    elif not oz_config.skip_notication_statustype_informeren:
+        if not status_type.informeren:
+            log_system_action(
+                f"ignored notification: status_type.informeren is false for status {status.url} and case {case_url}",
+                log_level=logging.INFO,
+            )
+            return
 
     status.statustype = status_type
 
@@ -102,9 +105,24 @@ def handle_zaken_notification(notification: Notification):
 
     case.zaaktype = case_type
 
-    config = OpenZaakConfig.get_solo()
+    # check the ZaakTypeConfig
+    if oz_config.skip_notication_statustype_informeren:
+        ztc = get_zaak_type_config(case_type)
+        if not ztc:
+            log_system_action(
+                f"ignored notification: 'skip_notication_statustype_informeren' is True but cannot retrieve case_type configuration '{case.zaaktype.identificatie}' for case {case_url}",
+                log_level=logging.INFO,
+            )
+            return
+        elif not ztc.notify_status_changes:
+            log_system_action(
+                f"ignored notification: case_type configuration '{case.zaaktype.identificatie}' found but 'notify_status_changes' is False for case {case_url}",
+                log_level=logging.INFO,
+            )
+            return
+
     # TODO check if we don't want is_zaak_visible() to also check for intern/extern
-    if not is_object_visible(case, config.zaak_max_confidentiality):
+    if not is_object_visible(case, oz_config.zaak_max_confidentiality):
         log_system_action(
             f"ignored notification: bad confidentiality '{case.vertrouwelijkheidaanduiding}' for case {case_url}",
             log_level=logging.INFO,
@@ -132,6 +150,18 @@ def send_status_update_email(user: User, case: Zaak, status: Status):
     send the actual mail
     """
     pass
+
+
+# - - - - -
+
+
+def get_zaak_type_config(case_type: ZaakType) -> Optional[ZaakTypeConfig]:
+    try:
+        return ZaakTypeConfig.objects.get(
+            catalogus__url=case_type.catalogus, identificatie=case_type.identificatie
+        )
+    except ZaakTypeConfig.DoesNotExist:
+        return None
 
 
 def fetch_case_by_url_no_cache(case_url: str) -> Optional[Zaak]:
