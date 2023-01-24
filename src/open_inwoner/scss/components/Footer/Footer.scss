@@ -10,6 +10,7 @@
   display: grid;
   gap: var(--gutter-width);
   grid-template-areas:
+    'lg-tx lg-tx lg-tx lg-tx'
     'lg   lg   lg   lg'
     'vstr vstr vstr vstr'
     'ml   ml   ml   ml'
@@ -21,6 +22,7 @@
 
   @media (min-width: 768px) {
     grid-template-areas:
+      'lg-tx lg-tx lg-tx lg-tx . . . . . . . . '
       'lg   lg   lg   lg   lg  lg  lg  lg  lg   lg   lg lg'
       'vstr vstr vstr vstr scl scl scl scl scl lnks lnks lnks'
       'ml   ml   ml   ml   nws nws nws nws nws lnks lnks lnks';
@@ -29,8 +31,12 @@
 
   /// Layout.
 
-  .logo {
+  &__logo {
     grid-area: lg;
+  }
+
+  &__logo-text {
+    grid-area: lg-tx;
   }
 
   &__visitor {

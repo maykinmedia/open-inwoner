@@ -14,5 +14,6 @@ def logo(src, alt, **kwargs):
     Variables:
         + src: string | the location of the logo.
         + alt: string | the alt text of the logo
+        - title: string | the title of the logo
     """
     return {**kwargs, "src": src, "alt": alt}
