@@ -1,11 +1,14 @@
 from django.db import models
 from django.db.models import UniqueConstraint
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from django_better_admin_arrayfield.models.fields import ArrayField
 from solo.models import SingletonModel
 from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 from zgw_consumers.constants import APITypes
+
+from open_inwoner.openzaak.managers import UserCaseStatusNotificationManager
 
 
 def generate_default_file_extensions():
@@ -156,3 +159,29 @@ class ZaakTypeConfig(models.Model):
             self.omschrijving,
         )
         return f" - ".join(b for b in bits if b)
+
+
+class UserCaseStatusNotification(models.Model):
+    user = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.CASCADE,
+    )
+    case_uuid = models.UUIDField(
+        verbose_name=_("Zaak UUID"),
+    )
+    status_uuid = models.UUIDField(
+        verbose_name=_("Status UUID"),
+    )
+    created = models.DateTimeField(verbose_name=_("Created"), default=timezone.now)
+
+    objects = UserCaseStatusNotificationManager()
+
+    class Meta:
+        verbose_name = _("Open Zaak notification user inform record")
+
+        constraints = [
+            UniqueConstraint(
+                name="unique_user_case_status",
+                fields=["user", "case_uuid", "status_uuid"],
+            )
+        ]

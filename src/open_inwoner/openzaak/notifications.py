@@ -17,7 +17,11 @@ from open_inwoner.openzaak.catalog import (
     fetch_single_status_type,
 )
 from open_inwoner.openzaak.clients import build_client
-from open_inwoner.openzaak.models import OpenZaakConfig, ZaakTypeConfig
+from open_inwoner.openzaak.models import (
+    OpenZaakConfig,
+    UserCaseStatusNotification,
+    ZaakTypeConfig,
+)
 from open_inwoner.openzaak.utils import is_object_visible
 from open_inwoner.utils.logentry import system_action as log_system_action
 from open_inwoner.utils.url import build_absolute_url
@@ -135,7 +139,7 @@ def handle_zaken_notification(notification: Notification):
 
     # reaching here means we're going to inform users
     log_system_action(
-        f"accepted notification: informing users {', '.join(sorted(map(str, inform_users)))} for case {case_url}",
+        f"accepted notification: attempt informing users {', '.join(sorted(map(str, inform_users)))} for case {case_url}",
         log_level=logging.INFO,
     )
     for user in inform_users:
@@ -144,9 +148,22 @@ def handle_zaken_notification(notification: Notification):
 
 
 def handle_status_update(user: User, case: Zaak, status: Status):
-    logger.debug("sending notification informer!")
-    # TODO still need to de-duplicate
+    note = UserCaseStatusNotification.objects.record_if_unique_notification(
+        user, case.uuid, status.uuid
+    )
+    if not note:
+        log_system_action(
+            f"ignored duplicate notification delivery for user '{user}' status {status.url} case {case.url}",
+            log_level=logging.INFO,
+        )
+        return
+
     send_status_update_email(user, case, status)
+
+    log_system_action(
+        f"send notification email for user '{user}' status {status.url} case {case.url}",
+        log_level=logging.INFO,
+    )
 
 
 def send_status_update_email(user: User, case: Zaak, status: Status):

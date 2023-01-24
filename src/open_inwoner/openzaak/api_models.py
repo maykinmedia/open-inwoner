@@ -40,8 +40,6 @@ class Zaak(ZGWModel):
 @dataclass
 class ZaakType(ZGWModel):
     url: str
-    # catalogus may be risky on eSuite
-    catalogus: str
     identificatie: str
     omschrijving: str
     vertrouwelijkheidaanduiding: str
@@ -64,6 +62,8 @@ class ZaakType(ZGWModel):
     # roltypen: list
     # besluittypen: list
 
+    # catalogus not on eSuite
+    catalogus: str = ""
     begin_geldigheid: Optional[date] = None
     einde_geldigheid: Optional[date] = None
     versiedatum: Optional[date] = None

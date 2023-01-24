@@ -22,6 +22,7 @@ from open_inwoner.accounts.tests.factories import DigidUserFactory, UserFactory
 from open_inwoner.openzaak.notifications import (
     get_emailable_initiator_users_from_roles,
     get_np_initiator_bsns_from_roles,
+    handle_status_update,
     handle_zaken_notification,
     send_status_update_email,
 )
@@ -190,8 +191,6 @@ class NotificationHandlerTestCase(AssertTimelineLogMixin, ClearCachesMixin, Test
 
         handle_zaken_notification(data.notification)
 
-        history = m.request_history
-
         mock_handle.assert_called_once()
 
         # check call arguments
@@ -201,7 +200,7 @@ class NotificationHandlerTestCase(AssertTimelineLogMixin, ClearCachesMixin, Test
         self.assertEqual(args[2].url, data.status["url"])
 
         self.assertTimelineLog(
-            "accepted notification: informing users ",
+            "accepted notification: attempt informing users ",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -375,8 +374,6 @@ class NotificationHandlerTestCase(AssertTimelineLogMixin, ClearCachesMixin, Test
 
         handle_zaken_notification(data.notification)
 
-        history = m.request_history
-
         mock_handle.assert_called_once()
 
         # check call arguments
@@ -386,7 +383,7 @@ class NotificationHandlerTestCase(AssertTimelineLogMixin, ClearCachesMixin, Test
         self.assertEqual(args[2].url, data.status["url"])
 
         self.assertTimelineLog(
-            "accepted notification: informing users ",
+            "accepted notification: attempt informing users ",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -443,6 +440,45 @@ class NotificationHandlerTestCase(AssertTimelineLogMixin, ClearCachesMixin, Test
 
 
 class NotificationHandlerEmailTestCase(TestCase):
+    @patch("open_inwoner.openzaak.notifications.send_status_update_email")
+    def test_handle_status_update(self, mock_send: Mock):
+        data = MockAPIData()
+        user = data.user_initiator
+
+        case = factory(Zaak, data.zaak)
+        case.zaaktype = factory(ZaakType, data.zaak_type)
+
+        status = factory(Status, data.status)
+        status.statustype = factory(StatusType, data.status_type)
+
+        # first call
+        handle_status_update(user, case, status)
+
+        mock_send.assert_called_once()
+
+        # check call arguments
+        args = mock_send.call_args.args
+        self.assertEqual(args[0], user)
+        self.assertEqual(args[1].url, case.url)
+        self.assertEqual(args[2].url, status.url)
+
+        mock_send.reset_mock()
+
+        # second call with same case/status
+        handle_status_update(user, case, status)
+
+        # no duplicate mail for this user/case/status
+        mock_send.assert_not_called()
+
+        # other user is fine
+        other_user = UserFactory.create()
+        handle_status_update(other_user, case, status)
+
+        mock_send.assert_called_once()
+
+        args = mock_send.call_args.args
+        self.assertEqual(args[0], other_user)
+
     def test_send_status_update_email(self):
         config = SiteConfiguration.get_solo()
         data = MockAPIData()

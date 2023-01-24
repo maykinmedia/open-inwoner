@@ -10,7 +10,12 @@ from solo.admin import SingletonModelAdmin
 
 from .catalog import fetch_catalog_case_type_by_identification
 from .config import get_configurable_zaaktype_choices, get_configurable_zaaktypes
-from .models import CatalogusConfig, OpenZaakConfig, ZaakTypeConfig
+from .models import (
+    CatalogusConfig,
+    OpenZaakConfig,
+    UserCaseStatusNotification,
+    ZaakTypeConfig,
+)
 
 
 @admin.register(OpenZaakConfig)
@@ -237,3 +242,16 @@ class ZaakTypeConfigAdmin(admin.ModelAdmin):
             % count,
             level=messages.SUCCESS,
         )
+
+
+@admin.register(UserCaseStatusNotification)
+class UserCaseStatusNotificationAdmin(admin.ModelAdmin):
+    raw_id_fields = ["user"]
+    search_fields = [
+        "user__first_name",
+        "user__last_name",
+        "user__email",
+        "user__id",
+        "case_uuid",
+        "status_uuid",
+    ]
