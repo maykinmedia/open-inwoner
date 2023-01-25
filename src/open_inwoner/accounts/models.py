@@ -206,7 +206,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_interests(self) -> str:
         if not self.selected_themes.exists():
-            return _("U heeft geen intressegebieden aangegeven.")
+            return _("U heeft geen interessegebieden aangegeven.")
 
         return ", ".join(list(self.selected_themes.values_list("name", flat=True)))
 

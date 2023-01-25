@@ -39,7 +39,7 @@ class ProfileViewTests(WebTest):
         response = self.app.get(self.url, user=self.user)
 
         self.assertEquals(response.status_code, 200)
-        self.assertContains(response, _("U heeft geen intressegebieden aangegeven."))
+        self.assertContains(response, _("U heeft geen interessegebieden aangegeven."))
         self.assertContains(response, _("U heeft nog geen contacten."))
         self.assertContains(response, "0 acties staan open.")
         self.assertNotContains(response, reverse("questionnaire:questionnaire_list"))

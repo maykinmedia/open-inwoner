@@ -324,8 +324,8 @@ msgid "Users"
 msgstr "Gebruikers"
 
 #: accounts/models.py:202 accounts/tests/test_profile_views.py:36
-msgid "U heeft geen intressegebieden aangegeven."
-msgstr "U heeft geen intressegebieden aangegeven."
+msgid "U heeft geen interessegebieden aangegeven."
+msgstr "U heeft geen interessegebieden aangegeven."
 
 #: accounts/models.py:264
 msgid "Used as a reference in the documents api."
