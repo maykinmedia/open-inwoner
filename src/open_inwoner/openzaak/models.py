@@ -7,6 +7,28 @@ from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 from zgw_consumers.constants import APITypes
 
 
+def generate_default_file_extensions():
+    return [
+        "pdf",
+        "doc",
+        "docx",
+        "xls",
+        "xlsx",
+        "ppt",
+        "pptx",
+        "vsd",
+        "png",
+        "gif",
+        "jpg",
+        "tiff",
+        "msg",
+        "txt",
+        "rtf",
+        "jpeg",
+        "bmp",
+    ]
+
+
 class OpenZaakConfig(SingletonModel):
     """
     Global configuration and defaults for zaken and catalogi services.
@@ -61,25 +83,7 @@ class OpenZaakConfig(SingletonModel):
             verbose_name=_("Allowed file extensions"),
             max_length=8,
         ),
-        default=[
-            "pdf",
-            "doc",
-            "docx",
-            "xls",
-            "xlsx",
-            "ppt",
-            "pptx",
-            "vsd",
-            "png",
-            "gif",
-            "jpg",
-            "tiff",
-            "msg",
-            "txt",
-            "rtf",
-            "jpeg",
-            "bmp",
-        ],
+        default=generate_default_file_extensions,
         help_text=_("A list of the allowed file extensions."),
     )
 
