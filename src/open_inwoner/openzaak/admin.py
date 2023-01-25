@@ -80,11 +80,6 @@ class ZaakTypeConfigCreateForm(forms.ModelForm):
                     label=_("Identificatie"),
                     choices=choices,
                 )
-                # self.fields[
-                #     "identificatie"
-                # ].widget.choices = get_configurable_zaaktype_choices(
-                #     self.instance.catalogus
-                # )
 
     def clean(self):
         cleaned_data = super().clean()

@@ -337,11 +337,11 @@ class NotificationHandlerTestCase(AssertTimelineLogMixin, ClearCachesMixin, Test
         )
         mock_handle.assert_not_called()
 
-    def test_bails_when_skip_notication_statustype_informeren_is_set_and_no_zaaktypeconfig_is_found(
+    def test_bails_when_skip_notification_statustype_informeren_is_set_and_no_zaaktypeconfig_is_found(
         self, m, mock_handle: Mock
     ):
         oz_config = OpenZaakConfig.get_solo()
-        oz_config.skip_notication_statustype_informeren = True
+        oz_config.skip_notification_statustype_informeren = True
         oz_config.save()
 
         data = MockAPIData()
@@ -350,17 +350,17 @@ class NotificationHandlerTestCase(AssertTimelineLogMixin, ClearCachesMixin, Test
         handle_zaken_notification(data.notification)
 
         self.assertTimelineLog(
-            f"ignored notification: 'skip_notication_statustype_informeren' is True but cannot retrieve case_type configuration '{data.zaak_type['identificatie']}' for case https://",
+            f"ignored notification: 'skip_notification_statustype_informeren' is True but cannot retrieve case_type configuration '{data.zaak_type['identificatie']}' for case https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
         mock_handle.assert_not_called()
 
-    def test_handle_notification_when_skip_notication_statustype_informeren_is_set_and_zaaktypeconfig_is_found(
+    def test_handle_notification_when_skip_notification_statustype_informeren_is_set_and_zaaktypeconfig_is_found(
         self, m, mock_handle: Mock
     ):
         oz_config = OpenZaakConfig.get_solo()
-        oz_config.skip_notication_statustype_informeren = True
+        oz_config.skip_notification_statustype_informeren = True
         oz_config.save()
 
         data = MockAPIData().install_mocks(m)
@@ -388,11 +388,11 @@ class NotificationHandlerTestCase(AssertTimelineLogMixin, ClearCachesMixin, Test
             level=logging.INFO,
         )
 
-    def test_bails_when_skip_notication_statustype_informeren_is_set_and_zaaktypeconfig_is_found_but_not_set(
+    def test_bails_when_skip_notification_statustype_informeren_is_set_and_zaaktypeconfig_is_found_but_not_set(
         self, m, mock_handle: Mock
     ):
         oz_config = OpenZaakConfig.get_solo()
-        oz_config.skip_notication_statustype_informeren = True
+        oz_config.skip_notification_statustype_informeren = True
         oz_config.save()
 
         data = MockAPIData()
@@ -413,11 +413,11 @@ class NotificationHandlerTestCase(AssertTimelineLogMixin, ClearCachesMixin, Test
         )
         mock_handle.assert_not_called()
 
-    def test_bails_when_skip_notication_statustype_informeren_is_set_and_zaaktypeconfig_is_not_found_because_different_catalog(
+    def test_bails_when_skip_notification_statustype_informeren_is_set_and_zaaktypeconfig_is_not_found_because_different_catalog(
         self, m, mock_handle: Mock
     ):
         oz_config = OpenZaakConfig.get_solo()
-        oz_config.skip_notication_statustype_informeren = True
+        oz_config.skip_notification_statustype_informeren = True
         oz_config.save()
 
         data = MockAPIData()
@@ -432,7 +432,7 @@ class NotificationHandlerTestCase(AssertTimelineLogMixin, ClearCachesMixin, Test
         handle_zaken_notification(data.notification)
 
         self.assertTimelineLog(
-            f"ignored notification: 'skip_notication_statustype_informeren' is True but cannot retrieve case_type configuration '{data.zaak_type['identificatie']}' for case https://",
+            f"ignored notification: 'skip_notification_statustype_informeren' is True but cannot retrieve case_type configuration '{data.zaak_type['identificatie']}' for case https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )

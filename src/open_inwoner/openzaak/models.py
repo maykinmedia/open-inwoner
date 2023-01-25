@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import UniqueConstraint
+from django.db.models import Q, UniqueConstraint
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -90,7 +90,7 @@ class OpenZaakConfig(SingletonModel):
         help_text=_("A list of the allowed file extensions."),
     )
 
-    skip_notication_statustype_informeren = models.BooleanField(
+    skip_notification_statustype_informeren = models.BooleanField(
         verbose_name=_("Use StatusType.informeren workaround"),
         help_text=_(
             "Enable when StatusType.informeren is not supported by the ZGW backend. This requires ZaakTypeConfig's to be configured to determine on which changes to notify."
@@ -127,6 +127,7 @@ class ZaakTypeConfig(models.Model):
     catalogus = models.ForeignKey(
         "openzaak.CatalogusConfig",
         on_delete=models.CASCADE,
+        # null=True,
     )
 
     identificatie = models.CharField(
@@ -150,7 +151,17 @@ class ZaakTypeConfig(models.Model):
             UniqueConstraint(
                 fields=["catalogus", "identificatie"],
                 name="unique_catalogus_identificatie",
-            )
+            ),
+            # UniqueConstraint(
+            #     name="unique_identificatie_in_catalogus",
+            #     fields=["catalogus", "identificatie"],
+            #     condition=Q(catalogus__isnull=False),
+            # ),
+            # UniqueConstraint(
+            #     name="unique_identificatie_without_catalogus",
+            #     fields=["identificatie"],
+            #     condition=Q(catalogus__isnull=True),
+            # ),
         ]
 
     def __str__(self):

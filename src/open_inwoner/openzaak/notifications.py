@@ -84,7 +84,7 @@ def handle_zaken_notification(notification: Notification):
             log_level=logging.ERROR,
         )
         return
-    elif not oz_config.skip_notication_statustype_informeren:
+    elif not oz_config.skip_notification_statustype_informeren:
         if not status_type.informeren:
             log_system_action(
                 f"ignored notification: status_type.informeren is false for status {status.url} and case {case_url}",
@@ -114,11 +114,11 @@ def handle_zaken_notification(notification: Notification):
     case.zaaktype = case_type
 
     # check the ZaakTypeConfig
-    if oz_config.skip_notication_statustype_informeren:
+    if oz_config.skip_notification_statustype_informeren:
         ztc = get_zaak_type_config(case_type)
         if not ztc:
             log_system_action(
-                f"ignored notification: 'skip_notication_statustype_informeren' is True but cannot retrieve case_type configuration '{case.zaaktype.identificatie}' for case {case_url}",
+                f"ignored notification: 'skip_notification_statustype_informeren' is True but cannot retrieve case_type configuration '{case.zaaktype.identificatie}' for case {case_url}",
                 log_level=logging.INFO,
             )
             return
@@ -189,9 +189,15 @@ def send_status_update_email(user: User, case: Zaak, status: Status):
 
 def get_zaak_type_config(case_type: ZaakType) -> Optional[ZaakTypeConfig]:
     try:
-        return ZaakTypeConfig.objects.get(
-            catalogus__url=case_type.catalogus, identificatie=case_type.identificatie
-        )
+        if case_type.catalogus:
+            return ZaakTypeConfig.objects.get(
+                catalogus__url=case_type.catalogus,
+                identificatie=case_type.identificatie,
+            )
+        else:
+            return ZaakTypeConfig.objects.get(
+                catalogus=None, identificatie=case_type.identificatie
+            )
     except ZaakTypeConfig.DoesNotExist:
         return None
 
