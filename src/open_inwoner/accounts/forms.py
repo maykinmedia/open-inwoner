@@ -8,6 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from django_registration.forms import RegistrationForm
 
+from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.pdc.models.category import Category
 from open_inwoner.utils.forms import LimitedUploadFileField, PrivateFileWidget
 from open_inwoner.utils.validators import validate_charfield_entry
@@ -402,3 +403,34 @@ class ActionListForm(forms.ModelForm):
     def __init__(self, users, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["is_for"].queryset = User.objects.filter(pk__in=users)
+
+
+class CaseUploadForm(forms.Form):
+    title = forms.CharField(max_length=255, validators=[validate_charfield_entry])
+    type = forms.ChoiceField(label=_("Type of document"), choices=())
+    file = forms.FileField()
+
+    def __init__(self, document_choices, **kwargs):
+        super().__init__(**kwargs)
+
+        self.fields["type"].choices = document_choices
+
+    def clean_file(self):
+        file = self.cleaned_data["file"]
+
+        config = OpenZaakConfig.get_solo()
+        max_allowed_size = 1024 ** 2 * config.max_upload_size
+        allowed_extensions = config.allowed_file_extensions
+        extension = file.name.split(".")[-1]
+
+        if file.size > max_allowed_size:
+            raise ValidationError(
+                f"Een aangeleverd bestand dient maximaal {config.max_upload_size} MB te zijn, uw bestand is te groot."
+            )
+
+        if extension not in allowed_extensions:
+            raise ValidationError(
+                f"Het type bestand dat u hebt geüpload is ongeldig. Geldige bestandstypen zijn: {', '.join(allowed_extensions)}"
+            )
+
+        return file

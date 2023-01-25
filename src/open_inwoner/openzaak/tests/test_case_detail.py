@@ -7,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 import requests_mock
 from django_webtest import WebTest
 from timeline_logger.models import TimelineLog
+from webtest import Upload
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.constants import (
     RolOmschrijving,
@@ -199,6 +200,18 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
             "ztc",
             "schemas/InformatieObjectType",
             url=f"{CATALOGI_ROOT}informatieobjecttype/014c38fe-b010-4412-881c-3000032fb321",
+            omschrijving="Some content",
+        )
+        cls.zaaktype_informatie_object_type = generate_oas_component(
+            "ztc",
+            "schemas/ZaakTypeInformatieObjectType",
+            uuid="3fb03882-f6f9-4e0d-ad92-f810e24b9abb",
+            url=f"{CATALOGI_ROOT}zaaktype-informatieobjecttypen/93250e6d-ef92-4474-acca-a6dbdcd61b7e",
+            zaaktype=cls.zaaktype["url"],
+            informatieobjecttype=cls.informatie_object_type["url"],
+            volgnummer=1,
+            richting="inkomend",
+            statustype=cls.status_type_finish,
         )
         cls.informatie_object = generate_oas_component(
             "drc",
@@ -264,6 +277,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
             self.informatie_object_type,
             self.informatie_object,
             self.informatie_object_invisible,
+            self.zaaktype_informatie_object_type,
         ]:
             m.get(resource["url"], json=resource)
 
@@ -289,6 +303,10 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         m.get(
             f"{CATALOGI_ROOT}statustypen?zaaktype={self.zaaktype['url']}",
             json=paginated_response([self.status_type_new, self.status_type_finish]),
+        )
+        m.get(
+            f"{CATALOGI_ROOT}zaaktype-informatieobjecttypen?zaaktype={self.zaaktype['url']}&richting=inkomend",
+            json=paginated_response([self.zaaktype_informatie_object_type]),
         )
         m.get(
             f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812/download",
@@ -465,3 +483,139 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
             user=self.user,
         )
         self.assertRedirects(response, reverse("root"))
+
+    def test_expected_information_object_types_are_available_in_upload_form(self, m):
+        self._setUpMocks(m)
+
+        response = self.app.get(
+            reverse(
+                "accounts:case_status",
+                kwargs={"object_id": self.zaak["uuid"]},
+            ),
+            user=self.user,
+        )
+        form = response.forms["document-upload"]
+        type_field = form["type"]
+        expected_choices = [("0", False, "Some content")]
+
+        self.assertEqual(type_field.options, expected_choices)
+
+    def test_upload_form_is_not_rendered_when_no_case_exists(self, m):
+        self._setUpMocks(m)
+
+        m.get(self.zaak["url"], status_code=500)
+        response = self.app.get(
+            reverse(
+                "accounts:case_status",
+                kwargs={"object_id": self.zaak["uuid"]},
+            ),
+            user=self.user,
+        )
+
+        self.assertNotIn("document-upload", response.forms)
+        self.assertContains(response, _("There is no available data at the moment."))
+
+    def test_upload_form_is_not_rendered_when_no_information_object_types_exist(
+        self, m
+    ):
+        self._setUpMocks(m)
+
+        m.get(
+            f"{CATALOGI_ROOT}zaaktype-informatieobjecttypen?zaaktype={self.zaaktype['url']}&richting=inkomend",
+            json=paginated_response([]),
+        )
+        response = self.app.get(
+            reverse(
+                "accounts:case_status",
+                kwargs={"object_id": self.zaak["uuid"]},
+            ),
+            user=self.user,
+        )
+
+        self.assertNotIn("document-upload", response.forms)
+
+    def test_upload_file_flow_succeeds(self, m):
+        self._setUpMocks(m)
+
+        response = self.app.get(
+            reverse(
+                "accounts:case_status",
+                kwargs={"object_id": self.zaak["uuid"]},
+            ),
+            user=self.user,
+        )
+        form = response.forms["document-upload"]
+        form["title"] = "readme"
+        form["type"] = 0
+        form["file"] = Upload("readme.xlsx", b"data", "application/vnd.ms-excel")
+        form_response = form.submit()
+
+        messages = list(form_response.follow().context["messages"])
+
+        self.assertRedirects(
+            form_response,
+            reverse(
+                "accounts:case_status",
+                kwargs={"object_id": self.zaak["uuid"]},
+            ),
+        )
+        self.assertEqual(
+            messages[0].message, _("readme.xlsx has been successfully uploaded.")
+        )
+
+    def test_upload_file_flow_fails_with_invalid_extension(self, m):
+        self._setUpMocks(m)
+
+        response = self.app.get(
+            reverse(
+                "accounts:case_status",
+                kwargs={"object_id": self.zaak["uuid"]},
+            ),
+            user=self.user,
+        )
+        form = response.forms["document-upload"]
+        form["title"] = "readme"
+        form["type"] = 0
+        form["file"] = Upload("readme.xml", b"data", "application/vnd.ms-excel")
+        form_response = form.submit()
+
+        self.assertEqual(
+            form_response.context["form"].errors,
+            {
+                "file": [
+                    f"Het type bestand dat u hebt geüpload is ongeldig. Geldige bestandstypen zijn: {', '.join(self.config.allowed_file_extensions)}"
+                ]
+            },
+        )
+
+    def test_upload_larger_file_fails(self, m):
+        self._setUpMocks(m)
+
+        # mock max file size to 10 bytes
+        self.config.max_upload_size = 10 / (1024 ** 2)
+        self.config.save()
+
+        response = self.app.get(
+            reverse(
+                "accounts:case_status",
+                kwargs={"object_id": self.zaak["uuid"]},
+            ),
+            user=self.user,
+        )
+        form = response.forms["document-upload"]
+
+        form["title"] = "readme"
+        form["type"] = 0
+        form["file"] = Upload("readme.xlsx", b"data", "application/vnd.ms-excel")
+        form_response = form.submit()
+
+        self.config.refresh_from_db()
+
+        self.assertEqual(
+            form_response.context["form"].errors,
+            {
+                "file": [
+                    f"Een aangeleverd bestand dient maximaal {self.config.max_upload_size} MB te zijn, uw bestand is te groot."
+                ]
+            },
+        )
