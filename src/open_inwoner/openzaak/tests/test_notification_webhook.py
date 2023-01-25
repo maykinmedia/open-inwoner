@@ -83,13 +83,12 @@ class NotificationWebhookAPITestCase(AssertTimelineLogMixin, APITestCase):
         even though here we only test NotificationsWebhookBaseView functionality
     """
 
-    url = reverse_lazy("openzaak-api:notifications-webhook-zaken")
+    url = reverse_lazy("openzaak_api:notifications_webhook_zaken")
 
     def get_raw_notification(
         self,
     ):
         raw_notification = {
-            # bad kanaal the view is not accepting
             "kanaal": "zaken",
             "hoofdObject": f"{ZAKEN_ROOT}/zaken/uuid-0001",
             "resource": "zaak",

@@ -78,7 +78,7 @@ urlpatterns = [
     path("api/", include("open_inwoner.api.urls", namespace="api")),
     path(
         "api/openzaak/",
-        include("open_inwoner.openzaak.api.urls", namespace="openzaak-api"),
+        include("open_inwoner.openzaak.api.urls", namespace="openzaak_api"),
     ),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     # Views

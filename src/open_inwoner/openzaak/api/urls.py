@@ -8,6 +8,6 @@ urlpatterns = [
     path(
         "notifications/webhook/zaken",
         ZakenNotificationsWebhookView.as_view(),
-        name="notifications-webhook-zaken",
+        name="notifications_webhook_zaken",
     ),
 ]

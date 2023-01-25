@@ -1,5 +1,4 @@
-import dataclasses
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date, datetime
 from typing import Dict, Optional, Union
 
@@ -159,7 +158,7 @@ class Status(ZGWModel):
     statustoelichting: Optional[str] = ""
 
 
-@dataclasses.dataclass
+@dataclass
 class Notification(Model):
     """
     note: not an API response but the data for the Notifications API (NRC) webhook
@@ -185,4 +184,4 @@ class Notification(Model):
     hoofd_object: str
     actie: str
     aanmaakdatum: datetime
-    kenmerken: Dict = dataclasses.field(default_factory=dict)
+    kenmerken: Dict = field(default_factory=dict)
