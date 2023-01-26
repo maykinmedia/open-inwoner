@@ -67,6 +67,29 @@ def fetch_single_status_type(status_type_url: str) -> Optional[StatusType]:
     return status_type
 
 
+def fetch_zaaktypes_no_cache() -> List[ZaakType]:
+    """
+    list case types
+    """
+    client = build_client("catalogi")
+
+    if client is None:
+        return []
+
+    try:
+        response = get_paginated_results(client, "zaaktype")
+    except RequestException as e:
+        logger.exception("exception while making request", exc_info=e)
+        return []
+    except ClientError as e:
+        logger.exception("exception while making request", exc_info=e)
+        return []
+
+    zaak_types = factory(ZaakType, response)
+
+    return zaak_types
+
+
 @cache_result("case_types:{catalog_url}", timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT)
 def fetch_catalog_zaaktypes(catalog_url: str) -> List[ZaakType]:
     """
@@ -147,8 +170,10 @@ def fetch_single_case_type(case_type_url: str) -> Optional[ZaakType]:
     return case_type
 
 
-@cache_result("catalogs", timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT)
-def fetch_catalogs() -> List[Catalogus]:
+def fetch_catalogs_no_cache() -> List[Catalogus]:
+    """
+    note the eSuite implementation returns status 500 for this call
+    """
     client = build_client("catalogi")
 
     if client is None:

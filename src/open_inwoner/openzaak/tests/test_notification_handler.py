@@ -63,7 +63,6 @@ class MockAPIData:
     """
 
     def __init__(self):
-        # users with bsn
         self.user_initiator = DigidUserFactory(
             bsn="100000001",
             email="initiator@example.com",
@@ -184,9 +183,10 @@ class NotificationHandlerTestCase(AssertTimelineLogMixin, ClearCachesMixin, Test
         cls.config.zaak_max_confidentiality = VertrouwelijkheidsAanduidingen.openbaar
         cls.config.save()
 
-    def test_handle_zaken_notification_calls_handle_status_update(
-        self, m, mock_handle: Mock
-    ):
+    def test_handle_zaken_notification(self, m, mock_handle: Mock):
+        """
+        happy-flow from valid data calls the (mocked) handle_status_update()
+        """
         data = MockAPIData().install_mocks(m)
 
         handle_zaken_notification(data.notification)
@@ -337,7 +337,7 @@ class NotificationHandlerTestCase(AssertTimelineLogMixin, ClearCachesMixin, Test
         )
         mock_handle.assert_not_called()
 
-    def test_bails_when_skip_notification_statustype_informeren_is_set_and_no_zaaktypeconfig_is_found(
+    def test_bails_when_skip_informeren_is_set_and_no_zaaktypeconfig_is_found(
         self, m, mock_handle: Mock
     ):
         oz_config = OpenZaakConfig.get_solo()
@@ -356,7 +356,27 @@ class NotificationHandlerTestCase(AssertTimelineLogMixin, ClearCachesMixin, Test
         )
         mock_handle.assert_not_called()
 
-    def test_handle_notification_when_skip_notification_statustype_informeren_is_set_and_zaaktypeconfig_is_found(
+    def test_bails_when_skip_informeren_is_set_and_no_zaaktypeconfig_is_found_from_zaaktype_none_catalog(
+        self, m, mock_handle: Mock
+    ):
+        oz_config = OpenZaakConfig.get_solo()
+        oz_config.skip_notification_statustype_informeren = True
+        oz_config.save()
+
+        data = MockAPIData()
+        data.zaak_type["catalogus"] = None
+        data.install_mocks(m)
+
+        handle_zaken_notification(data.notification)
+
+        self.assertTimelineLog(
+            f"ignored notification: 'skip_notification_statustype_informeren' is True but cannot retrieve case_type configuration '{data.zaak_type['identificatie']}' for case https://",
+            lookup=Lookups.startswith,
+            level=logging.INFO,
+        )
+        mock_handle.assert_not_called()
+
+    def test_handle_notification_when_skip_informeren_is_set_and_zaaktypeconfig_is_found(
         self, m, mock_handle: Mock
     ):
         oz_config = OpenZaakConfig.get_solo()
@@ -388,7 +408,41 @@ class NotificationHandlerTestCase(AssertTimelineLogMixin, ClearCachesMixin, Test
             level=logging.INFO,
         )
 
-    def test_bails_when_skip_notification_statustype_informeren_is_set_and_zaaktypeconfig_is_found_but_not_set(
+    def test_handle_notification_when_skip_informeren_is_set_and_zaaktypeconfig_is_found_from_zaaktype_none_catalog(
+        self, m, mock_handle: Mock
+    ):
+        oz_config = OpenZaakConfig.get_solo()
+        oz_config.skip_notification_statustype_informeren = True
+        oz_config.save()
+
+        data = MockAPIData()
+        data.zaak_type["catalogus"] = None
+        data.install_mocks(m)
+
+        ZaakTypeConfigFactory.create(
+            catalogus=None,
+            identificatie=data.zaak_type["identificatie"],
+            # set this to notify
+            notify_status_changes=True,
+        )
+
+        handle_zaken_notification(data.notification)
+
+        mock_handle.assert_called_once()
+
+        # check call arguments
+        args = mock_handle.call_args.args
+        self.assertEqual(args[0], data.user_initiator)
+        self.assertEqual(args[1].url, data.zaak["url"])
+        self.assertEqual(args[2].url, data.status["url"])
+
+        self.assertTimelineLog(
+            "accepted notification: attempt informing users ",
+            lookup=Lookups.startswith,
+            level=logging.INFO,
+        )
+
+    def test_bails_when_skip_informeren_is_set_and_zaaktypeconfig_is_found_but_not_set(
         self, m, mock_handle: Mock
     ):
         oz_config = OpenZaakConfig.get_solo()
@@ -413,7 +467,7 @@ class NotificationHandlerTestCase(AssertTimelineLogMixin, ClearCachesMixin, Test
         )
         mock_handle.assert_not_called()
 
-    def test_bails_when_skip_notification_statustype_informeren_is_set_and_zaaktypeconfig_is_not_found_because_different_catalog(
+    def test_bails_when_skip_informeren_is_set_and_zaaktypeconfig_is_not_found_because_different_catalog(
         self, m, mock_handle: Mock
     ):
         oz_config = OpenZaakConfig.get_solo()

@@ -127,14 +127,12 @@ class ZaakTypeConfig(models.Model):
     catalogus = models.ForeignKey(
         "openzaak.CatalogusConfig",
         on_delete=models.CASCADE,
-        # null=True,
+        null=True,
     )
 
     identificatie = models.CharField(
         verbose_name=_("Zaaktype identificatie"),
         max_length=50,
-        # TODO we probably want this index
-        # db_index=True
     )
     omschrijving = models.CharField(
         verbose_name=_("Zaaktype omschrijving"),
@@ -149,19 +147,15 @@ class ZaakTypeConfig(models.Model):
         verbose_name = _("Zaaktype Configuration")
         constraints = [
             UniqueConstraint(
+                name="unique_identificatie_in_catalogus",
                 fields=["catalogus", "identificatie"],
-                name="unique_catalogus_identificatie",
+                condition=Q(catalogus__isnull=False),
             ),
-            # UniqueConstraint(
-            #     name="unique_identificatie_in_catalogus",
-            #     fields=["catalogus", "identificatie"],
-            #     condition=Q(catalogus__isnull=False),
-            # ),
-            # UniqueConstraint(
-            #     name="unique_identificatie_without_catalogus",
-            #     fields=["identificatie"],
-            #     condition=Q(catalogus__isnull=True),
-            # ),
+            UniqueConstraint(
+                name="unique_identificatie_without_catalogus",
+                fields=["identificatie"],
+                condition=Q(catalogus__isnull=True),
+            ),
         ]
 
     def __str__(self):
