@@ -77,6 +77,22 @@ def fetch_single_case(case_uuid: str) -> Optional[Zaak]:
     return case
 
 
+def fetch_case_by_url_no_cache(case_url: str) -> Optional[Zaak]:
+    client = build_client("zaak")
+    try:
+        response = client.retrieve("zaak", url=case_url)
+    except RequestException as e:
+        logger.exception("exception while making request", exc_info=e)
+        return
+    except ClientError as e:
+        logger.exception("exception while making request", exc_info=e)
+        return
+
+    case = factory(Zaak, response)
+
+    return case
+
+
 @cache_result(
     "case_information_objects:{case_url}", timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT
 )

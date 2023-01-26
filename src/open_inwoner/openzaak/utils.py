@@ -1,7 +1,7 @@
 import inspect
 import logging
 from functools import wraps
-from typing import Callable, TypeVar, Union
+from typing import Callable, Optional, TypeVar, Union
 from uuid import UUID
 
 from django.core.cache import caches
@@ -9,9 +9,9 @@ from django.core.cache import caches
 from zds_client import get_operation_url
 from zgw_consumers.api_models.constants import RolTypes, VertrouwelijkheidsAanduidingen
 
-from open_inwoner.openzaak.api_models import InformatieObject, Rol, Zaak
+from open_inwoner.openzaak.api_models import InformatieObject, Rol, Zaak, ZaakType
 
-from .models import OpenZaakConfig
+from .models import OpenZaakConfig, ZaakTypeConfig
 
 logger = logging.getLogger(__name__)
 
@@ -186,3 +186,18 @@ def get_retrieve_resource_by_uuid_url(
         client.schema, operation_id, base_url=client.base_url, **path_kwargs
     )
     return url
+
+
+def get_zaak_type_config(case_type: ZaakType) -> Optional[ZaakTypeConfig]:
+    try:
+        if case_type.catalogus:
+            return ZaakTypeConfig.objects.get(
+                catalogus__url=case_type.catalogus,
+                identificatie=case_type.identificatie,
+            )
+        else:
+            return ZaakTypeConfig.objects.get(
+                catalogus=None, identificatie=case_type.identificatie
+            )
+    except ZaakTypeConfig.DoesNotExist:
+        return None

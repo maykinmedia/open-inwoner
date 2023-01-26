@@ -1,28 +1,24 @@
 import logging
-from typing import List, Optional
+from typing import List
 
 from django.urls import reverse
 
 from mail_editor.helpers import find_template
-from requests import RequestException
-from zds_client import ClientError
-from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 
 from open_inwoner.accounts.models import User
-from open_inwoner.openzaak.api_models import Notification, Rol, Status, Zaak, ZaakType
-from open_inwoner.openzaak.cases import fetch_case_roles, fetch_specific_status
+from open_inwoner.openzaak.api_models import Notification, Rol, Status, Zaak
+from open_inwoner.openzaak.cases import (
+    fetch_case_by_url_no_cache,
+    fetch_case_roles,
+    fetch_specific_status,
+)
 from open_inwoner.openzaak.catalog import (
     fetch_single_case_type,
     fetch_single_status_type,
 )
-from open_inwoner.openzaak.clients import build_client
-from open_inwoner.openzaak.models import (
-    OpenZaakConfig,
-    UserCaseStatusNotification,
-    ZaakTypeConfig,
-)
-from open_inwoner.openzaak.utils import is_object_visible
+from open_inwoner.openzaak.models import OpenZaakConfig, UserCaseStatusNotification
+from open_inwoner.openzaak.utils import get_zaak_type_config, is_zaak_visible
 from open_inwoner.utils.logentry import system_action as log_system_action
 from open_inwoner.utils.url import build_absolute_url
 
@@ -77,7 +73,6 @@ def handle_zaken_notification(notification: Notification):
         return
 
     status_type = fetch_single_status_type(status.statustype)
-    # TODO support non eSuite options
     if not status_type:
         log_system_action(
             f"ignored notification: cannot retrieve status_type {status.statustype} for case {case_url}",
@@ -129,10 +124,9 @@ def handle_zaken_notification(notification: Notification):
             )
             return
 
-    # TODO check if we don't want is_zaak_visible() to also check for intern/extern
-    if not is_object_visible(case, oz_config.zaak_max_confidentiality):
+    if not is_zaak_visible(case):
         log_system_action(
-            f"ignored notification: bad confidentiality '{case.vertrouwelijkheidaanduiding}' for case {case_url}",
+            f"ignored notification: case not visible after applying website visibility filter for case {case_url}",
             log_level=logging.INFO,
         )
         return
@@ -185,38 +179,6 @@ def send_status_update_email(user: User, case: Zaak, status: Status):
 
 
 # - - - - -
-
-
-def get_zaak_type_config(case_type: ZaakType) -> Optional[ZaakTypeConfig]:
-    try:
-        if case_type.catalogus:
-            return ZaakTypeConfig.objects.get(
-                catalogus__url=case_type.catalogus,
-                identificatie=case_type.identificatie,
-            )
-        else:
-            return ZaakTypeConfig.objects.get(
-                catalogus=None, identificatie=case_type.identificatie
-            )
-    except ZaakTypeConfig.DoesNotExist:
-        return None
-
-
-def fetch_case_by_url_no_cache(case_url: str) -> Optional[Zaak]:
-    # TODO decide how this interacts with the cache
-    client = build_client("zaak")
-    try:
-        response = client.retrieve("zaak", url=case_url)
-    except RequestException as e:
-        logger.exception("exception while making request", exc_info=e)
-        return
-    except ClientError as e:
-        logger.exception("exception while making request", exc_info=e)
-        return
-
-    case = factory(Zaak, response)
-
-    return case
 
 
 def get_np_initiator_bsns_from_roles(roles: List[Rol]) -> List[str]:

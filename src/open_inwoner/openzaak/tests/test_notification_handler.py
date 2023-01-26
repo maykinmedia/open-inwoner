@@ -73,6 +73,7 @@ class MockAPIData:
             url=f"{CATALOGI_ROOT}zaaktype/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             catalogus=f"{CATALOGI_ROOT}catalogussen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             identificatie="My Zaaktype",
+            indicatieInternOfExtern="extern",
         )
         self.status_type = generate_oas_component(
             "ztc",
@@ -323,7 +324,9 @@ class NotificationHandlerTestCase(AssertTimelineLogMixin, ClearCachesMixin, Test
         )
         mock_handle.assert_not_called()
 
-    def test_bails_when_case_not_visible_confidentiality(self, m, mock_handle: Mock):
+    def test_bails_when_case_not_visible_because_confidentiality(
+        self, m, mock_handle: Mock
+    ):
         data = MockAPIData()
         data.zaak["vertrouwelijkheidaanduiding"] = VertrouwelijkheidsAanduidingen.geheim
         data.install_mocks(m)
@@ -331,7 +334,23 @@ class NotificationHandlerTestCase(AssertTimelineLogMixin, ClearCachesMixin, Test
         handle_zaken_notification(data.notification)
 
         self.assertTimelineLog(
-            f"ignored notification: bad confidentiality 'geheim' for case https://",
+            f"ignored notification: case not visible after applying website visibility filter for case https://",
+            lookup=Lookups.startswith,
+            level=logging.INFO,
+        )
+        mock_handle.assert_not_called()
+
+    def test_bails_when_case_not_visible_because_internal_case(
+        self, m, mock_handle: Mock
+    ):
+        data = MockAPIData()
+        data.zaak_type["indicatieInternOfExtern"] = "intern"
+        data.install_mocks(m)
+
+        handle_zaken_notification(data.notification)
+
+        self.assertTimelineLog(
+            f"ignored notification: case not visible after applying website visibility filter for case https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
