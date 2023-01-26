@@ -49,7 +49,7 @@ def import_catalog_configs() -> List[CatalogusConfig]:
     return create
 
 
-def import_zaaktype_configs() -> List[ZaakType]:
+def import_zaaktype_configs() -> List[ZaakTypeConfig]:
     """
     generate a ZaakTypeConfig for every ZaakType.identificatie in the ZGW API
 
@@ -69,8 +69,15 @@ def import_zaaktype_configs() -> List[ZaakType]:
         )
 
         for zaak_type in zaak_types:
-            # deal with
-            catalog = catalog_lookup.get(zaak_type.catalogus)
+            catalog = None
+            if zaak_type.catalogus:
+                catalog = catalog_lookup.get(zaak_type.catalogus)
+                if not catalog:
+                    # weird edge-case: if the zaak_type has a catalogus-url but we don't have the object
+                    # TODO this is bad, log/raise something
+                    pass
+
+            # make key for de-duplication and collapsing related zaak-types on their 'identificatie'
             if catalog:
                 key = (catalog.id, zaak_type.identificatie)
             else:

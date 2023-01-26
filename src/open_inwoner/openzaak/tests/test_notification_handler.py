@@ -70,7 +70,7 @@ class MockAPIData:
         self.zaak_type = generate_oas_component(
             "ztc",
             "schemas/ZaakType",
-            url=f"{ZAKEN_ROOT}zaaktype/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            url=f"{CATALOGI_ROOT}zaaktype/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             catalogus=f"{CATALOGI_ROOT}catalogussen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             identificatie="My Zaaktype",
         )
