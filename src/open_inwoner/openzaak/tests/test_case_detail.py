@@ -1,7 +1,6 @@
 import datetime
 
 from django.contrib.auth.models import AnonymousUser
-from django.core.cache import cache
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -9,7 +8,6 @@ import requests_mock
 from django_webtest import WebTest
 from timeline_logger.models import TimelineLog
 from zgw_consumers.api_models.base import factory
-from zgw_consumers.api_models.catalogi import StatusType
 from zgw_consumers.api_models.constants import (
     RolOmschrijving,
     RolTypes,
@@ -23,13 +21,10 @@ from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.accounts.views.cases import SimpleFile
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 
-from ..api_models import Status
+from ..api_models import Status, StatusType
 from ..models import OpenZaakConfig
 from .factories import ServiceFactory
-
-ZAKEN_ROOT = "https://zaken.nl/api/v1/"
-CATALOGI_ROOT = "https://catalogi.nl/api/v1/"
-DOCUMENTEN_ROOT = "https://documenten.nl/api/v1/"
+from .shared import CATALOGI_ROOT, DOCUMENTEN_ROOT, ZAKEN_ROOT
 
 
 @requests_mock.Mocker()
@@ -117,7 +112,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         )
         cls.status_new = generate_oas_component(
             "zrc",
-            "schemas/Zaak",
+            "schemas/Status",
             url=f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-beu760sle929",
             zaak=cls.zaak["url"],
             statustype=f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-777yu878km09",
@@ -126,7 +121,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         )
         cls.status_finish = generate_oas_component(
             "zrc",
-            "schemas/Zaak",
+            "schemas/Status",
             url=f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
             zaak=cls.zaak["url"],
             statustype=f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-744516671fe4",

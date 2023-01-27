@@ -20,9 +20,7 @@ from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 
 from ..models import OpenZaakConfig
 from .factories import ServiceFactory
-
-ZAKEN_ROOT = "https://zaken.nl/api/v1/"
-CATALOGI_ROOT = "https://catalogi.nl/api/v1/"
+from .shared import CATALOGI_ROOT, ZAKEN_ROOT
 
 
 class CaseListAccessTests(ClearCachesMixin, WebTest):

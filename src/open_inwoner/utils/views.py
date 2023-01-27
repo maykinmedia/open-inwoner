@@ -104,4 +104,4 @@ class LogMixin(object):
         """
         Log system events not related to a specific user.
         """
-        system_action(message, instance)
+        system_action(message, content_object=instance)

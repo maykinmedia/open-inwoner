@@ -4,17 +4,16 @@ from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.constants import RolTypes, VertrouwelijkheidsAanduidingen
 from zgw_consumers.test import generate_oas_component
 
-from open_inwoner.openzaak.api_models import InformatieObject, Rol, Zaak, ZaakType
+from open_inwoner.openzaak.api_models import InformatieObject, Zaak, ZaakType
 from open_inwoner.openzaak.models import OpenZaakConfig
+from open_inwoner.openzaak.tests.factories import generate_rol
 from open_inwoner.openzaak.utils import (
     get_role_name_display,
     is_info_object_visible,
     is_zaak_visible,
 )
 
-ZAKEN_ROOT = "https://zaken.nl/api/v1/"
-CATALOGI_ROOT = "https://catalogi.nl/api/v1/"
-DOCUMENTEN_ROOT = "https://documenten.nl/api/v1/"
+from .shared import CATALOGI_ROOT, ZAKEN_ROOT
 
 
 class TestUtils(TestCase):
@@ -154,18 +153,8 @@ class TestUtils(TestCase):
             self.assertFalse(is_zaak_visible(zaak))
 
     def test_get_role_name_display(self):
-        def get_role(type_: str, identification: dict) -> Rol:
-            # helper for readability
-            component = generate_oas_component(
-                "zrc",
-                "schemas/Rol",
-                betrokkeneType=type_,
-                betrokkeneIdentificatie=identification,
-            )
-            return factory(Rol, component)
-
         with self.subTest("natuurlijk_persoon > all fields"):
-            role = get_role(
+            role = generate_rol(
                 RolTypes.natuurlijk_persoon,
                 {
                     "geslachtsnaam": "Bazz",
@@ -178,7 +167,7 @@ class TestUtils(TestCase):
             self.assertEqual(expected, get_role_name_display(role))
 
         with self.subTest("natuurlijk_persoon > some fields"):
-            role = get_role(
+            role = generate_rol(
                 RolTypes.natuurlijk_persoon,
                 {
                     "geslachtsnaam": "Bazz",
@@ -189,7 +178,7 @@ class TestUtils(TestCase):
             self.assertEqual(expected, get_role_name_display(role))
 
         with self.subTest("natuurlijk_persoon > bad data"):
-            role = get_role(
+            role = generate_rol(
                 RolTypes.natuurlijk_persoon,
                 {
                     "geslachtsnaam": "",
@@ -202,7 +191,7 @@ class TestUtils(TestCase):
             self.assertEqual(expected, get_role_name_display(role))
 
         with self.subTest("niet_natuurlijk_persoon"):
-            role = get_role(
+            role = generate_rol(
                 RolTypes.niet_natuurlijk_persoon,
                 {
                     "statutaireNaam": "Foo Bar",
@@ -212,7 +201,7 @@ class TestUtils(TestCase):
             self.assertEqual(expected, get_role_name_display(role))
 
         with self.subTest("vestiging"):
-            role = get_role(
+            role = generate_rol(
                 RolTypes.vestiging,
                 {
                     "handelsnaam": ["Foo Bar"],
@@ -222,7 +211,7 @@ class TestUtils(TestCase):
             self.assertEqual(expected, get_role_name_display(role))
 
         with self.subTest("organisatorische_eenheid"):
-            role = get_role(
+            role = generate_rol(
                 RolTypes.organisatorische_eenheid,
                 {
                     "naam": "Foo Bar",
@@ -232,7 +221,7 @@ class TestUtils(TestCase):
             self.assertEqual(expected, get_role_name_display(role))
 
         with self.subTest("medewerker > all fields"):
-            role = get_role(
+            role = generate_rol(
                 RolTypes.medewerker,
                 {
                     "achternaam": "Bazz",
@@ -244,7 +233,7 @@ class TestUtils(TestCase):
             self.assertEqual(expected, get_role_name_display(role))
 
         with self.subTest("medewerker > some fields"):
-            role = get_role(
+            role = generate_rol(
                 RolTypes.medewerker,
                 {
                     "achternaam": "Bazz",
@@ -256,7 +245,7 @@ class TestUtils(TestCase):
             self.assertEqual(expected, get_role_name_display(role))
 
         with self.subTest("medewerker > non-standard field name from Taiga #961"):
-            role = get_role(
+            role = generate_rol(
                 RolTypes.medewerker,
                 {
                     # this is not following spec

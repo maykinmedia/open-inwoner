@@ -6,10 +6,9 @@ from django.conf import settings
 from requests import RequestException
 from zds_client import ClientError
 from zgw_consumers.api_models.base import factory
-from zgw_consumers.api_models.catalogi import StatusType
 from zgw_consumers.service import get_paginated_results
 
-from .api_models import ZaakType
+from .api_models import StatusType, ZaakType
 from .clients import build_client
 from .utils import cache as cache_result
 

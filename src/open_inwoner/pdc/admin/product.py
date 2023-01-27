@@ -79,7 +79,7 @@ class ProductAdmin(ImportExportMixin, admin.ModelAdmin):
 
         if request.method == "POST":
             user = request.user
-            system_action(_("products were exported"), user)
+            system_action(_("products were exported"), user=user)
 
         return response
 

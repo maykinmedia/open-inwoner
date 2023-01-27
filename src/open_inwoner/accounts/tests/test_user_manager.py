@@ -1,6 +1,7 @@
 from django.test import TestCase
 
 from ..models import User
+from .factories import UserFactory
 
 
 class UserManagerTests(TestCase):
@@ -19,3 +20,18 @@ class UserManagerTests(TestCase):
         self.assertFalse(user.is_superuser)
         self.assertFalse(user.is_staff)
         self.assertFalse(user.has_usable_password())
+
+
+class UserQueryTests(TestCase):
+    def test_having_usable_email(self):
+        expected = [
+            UserFactory(first_name="usable_1", email="usable@example.com"),
+            UserFactory(first_name="usable_2", email="org-domain@prefix-example.org"),
+        ]
+
+        # bad
+        UserFactory(first_name="placeholder", email="placeholder@example.org"),
+        UserFactory(first_name="empty", email="")
+
+        actual = User.objects.having_usable_email()
+        self.assertEqual(list(actual), expected)

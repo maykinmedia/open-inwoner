@@ -1,3 +1,4 @@
+import logging
 from datetime import date
 
 from django.test import TestCase, override_settings
@@ -221,17 +222,17 @@ class TestLogging(HaalCentraalMixin, TestCase):
         user.bsn = "999993847"
         user.save()
 
-        log_entry = TimelineLog.objects.filter(object_id=user.id)[0]
+        log_entry = TimelineLog.objects.filter(object_id=user.id)[1]
 
         self.assertEquals(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEquals(log_entry.content_object.id, user.id)
+        self.assertEquals(log_entry.object_id, str(user.id))
         self.assertEquals(
             log_entry.extra_data,
             {
                 "message": _("data was retrieved from haal centraal"),
-                "log_level": None,
+                "log_level": logging.INFO,
                 "action_flag": list(LOG_ACTIONS[5]),
                 "content_object_repr": user.email,
             },

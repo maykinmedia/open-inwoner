@@ -141,22 +141,25 @@ def user_action(request, object, message):
     )
 
 
-def system_action(message, object=None, user=None, log_level=None):
+def system_action(
+    message, *, content_object=None, user=None, log_level=logging.INFO, exc_info=None
+):
     """
     Log a generic action done by business logic.
     """
-    object_text = object if object else "Anonymous user"
+    user_text = f"{user}: " if user else ""
+    object_text = force_str(content_object) if content_object else ""
 
-    logger.info(
-        ("System action: {object}, {message}. \n").format(
-            object=object_text, message=message
-        )
+    logger.log(
+        log_level,
+        f"System action: {user_text}{message}. \n",
+        exc_info=exc_info,
     )
     TimelineLog.objects.create(
-        content_object=object,
+        content_object=content_object,
         user=user,
         extra_data={
-            "content_object_repr": force_str(object) if object else "",
+            "content_object_repr": object_text,
             "action_flag": LOG_ACTIONS[5],
             "message": message,
             "log_level": log_level,
