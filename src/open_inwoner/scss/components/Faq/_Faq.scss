@@ -56,5 +56,6 @@
   &__answer:not(#{&}__answer--open) {
     opacity: 0;
     height: 0;
+    transition: all 0.3s, height 0s, opacity 0.01s;
   }
 }
