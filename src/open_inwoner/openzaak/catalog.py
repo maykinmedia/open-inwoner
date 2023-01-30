@@ -6,7 +6,7 @@ from django.conf import settings
 from requests import RequestException
 from zds_client import ClientError, get_operation_url
 from zgw_consumers.api_models.base import factory
-from zgw_consumers.api_models.catalogi import Catalogus
+from zgw_consumers.api_models.catalogi import Catalogus, ResultaatType
 from zgw_consumers.service import get_paginated_results
 
 from .api_models import StatusType, ZaakType
@@ -42,6 +42,34 @@ def fetch_status_types(case_type_url: str) -> List[StatusType]:
     status_types = factory(StatusType, response)
 
     return status_types
+
+
+@cache_result(
+    "result_types_for_case_type:{case_type_url}",
+    timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT,
+)
+def fetch_result_types(case_type_url: str) -> List[ResultaatType]:
+    client = build_client("catalogi")
+
+    if client is None:
+        return []
+
+    try:
+        response = get_paginated_results(
+            client,
+            "resultaattype",
+            request_kwargs={"params": {"zaaktype": case_type_url}},
+        )
+    except RequestException as e:
+        logger.exception("exception while making request", exc_info=e)
+        return []
+    except ClientError as e:
+        logger.exception("exception while making request", exc_info=e)
+        return []
+
+    result_types = factory(ResultaatType, response)
+
+    return result_types
 
 
 @cache_result(
