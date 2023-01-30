@@ -138,3 +138,12 @@ class UserCaseStatusNotificationAdmin(admin.ModelAdmin):
         "case_uuid",
         "status_uuid",
     ]
+    list_display = [
+        "user",
+        "case_uuid",
+        "status_uuid",
+        "created",
+    ]
+
+    def has_change_permission(self, request, obj=None):
+        return False
