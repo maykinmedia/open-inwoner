@@ -75,28 +75,48 @@ class MockAPIData:
             identificatie="My Zaaktype",
             indicatieInternOfExtern="extern",
         )
-        self.status_type = generate_oas_component(
+        self.status_type_initial = generate_oas_component(
             "ztc",
             "schemas/StatusType",
-            url=f"{CATALOGI_ROOT}statustypen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            url=f"{CATALOGI_ROOT}statustypen/aaaaaaaa-aaaa-aaaa-aaaa-111111111111",
             zaaktype=self.zaak_type["url"],
             informeren=True,
+            volgnummer=1,
+            omschrijving="initial",
+            isEindStatus=False,
+        )
+        self.status_type_final = generate_oas_component(
+            "ztc",
+            "schemas/StatusType",
+            url=f"{CATALOGI_ROOT}statustypen/aaaaaaaa-aaaa-aaaa-aaaa-222222222222",
+            zaaktype=self.zaak_type["url"],
+            informeren=True,
+            volgnummer=2,
+            omschrijving="final",
+            isEindStatus=True,
         )
         self.zaak = generate_oas_component(
             "zrc",
             "schemas/Zaak",
             url=f"{ZAKEN_ROOT}zaken/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             zaaktype=self.zaak_type["url"],
-            status=f"{ZAKEN_ROOT}statussen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            status=f"{ZAKEN_ROOT}statussen/aaaaaaaa-aaaa-aaaa-aaaa-222222222222",
             resultaat=f"{ZAKEN_ROOT}resultaten/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
         )
-        self.status = generate_oas_component(
+        self.status_initial = generate_oas_component(
             "zrc",
             "schemas/Status",
-            url=f"{ZAKEN_ROOT}statussen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            url=f"{ZAKEN_ROOT}statussen/aaaaaaaa-aaaa-aaaa-aaaa-111111111111",
             zaak=self.zaak["url"],
-            statustype=self.status_type["url"],
+            statustype=self.status_type_initial["url"],
+        )
+        self.status_final = generate_oas_component(
+            "zrc",
+            "schemas/Status",
+            url=f"{ZAKEN_ROOT}statussen/aaaaaaaa-aaaa-aaaa-aaaa-222222222222",
+            zaak=self.zaak["url"],
+            statustype=self.status_type_final["url"],
         )
 
         self.role_initiator = generate_oas_component(
@@ -111,11 +131,12 @@ class MockAPIData:
         )
 
         self.case_roles = [self.role_initiator]
+        self.status_history = [self.status_initial, self.status_final]
 
         self.notification = NotificationFactory(
             resource="status",
             actie="update",
-            resource_url=self.status["url"],
+            resource_url=self.status_final["url"],
             hoofd_object=self.zaak["url"],
         )
 
@@ -132,21 +153,28 @@ class MockAPIData:
                 raise Exception("configuration error")
 
         if "case_roles" in res404:
-            m.get(
-                f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}",
-                status_code=404,
-            )
+            m.get(f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}", status_code=404)
         else:
             m.get(
                 f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}",
                 json=paginated_response(self.case_roles),
             )
 
+        if "status_history" in res404:
+            m.get(f"{ZAKEN_ROOT}statussen?zaak={self.zaak['url']}", status_code=404)
+        else:
+            m.get(
+                f"{ZAKEN_ROOT}statussen?zaak={self.zaak['url']}",
+                json=paginated_response(self.status_history),
+            )
+
         for resource_attr in [
             "zaak",
             "zaak_type",
-            "status",
-            "status_type",
+            "status_initial",
+            "status_final",
+            "status_type_initial",
+            "status_type_final",
         ]:
             resource = getattr(self, resource_attr)
             if resource_attr in res404:
@@ -198,7 +226,7 @@ class NotificationHandlerTestCase(AssertTimelineLogMixin, ClearCachesMixin, Test
         args = mock_handle.call_args.args
         self.assertEqual(args[0], data.user_initiator)
         self.assertEqual(args[1].url, data.zaak["url"])
-        self.assertEqual(args[2].url, data.status["url"])
+        self.assertEqual(args[2].url, data.status_final["url"])
 
         self.assertTimelineLog(
             "accepted notification: attempt informing users ",
@@ -256,27 +284,43 @@ class NotificationHandlerTestCase(AssertTimelineLogMixin, ClearCachesMixin, Test
         )
         mock_handle.assert_not_called()
 
-    def test_bails_when_cannot_fetch_status(self, m, mock_handle: Mock):
+    def test_bails_when_cannot_fetch_status_history(self, m, mock_handle: Mock):
         data = MockAPIData()
-        data.install_mocks(m, res404=["status"])
+        data.install_mocks(m, res404=["status_history"])
 
         handle_zaken_notification(data.notification)
 
         self.assertTimelineLog(
-            f"ignored notification: cannot retrieve status {data.status['url']} for case https://",
+            f"ignored notification: cannot retrieve status_history for case https://",
             lookup=Lookups.startswith,
             level=logging.ERROR,
         )
         mock_handle.assert_not_called()
 
-    def test_bails_when_cannot_fetch_status_type(self, m, mock_handle: Mock):
+    def test_bails_when_status_history_is_single_initial_item(
+        self, m, mock_handle: Mock
+    ):
         data = MockAPIData()
-        data.install_mocks(m, res404=["status_type"])
+        data.status_history = [data.status_initial]
+        data.install_mocks(m)
 
         handle_zaken_notification(data.notification)
 
         self.assertTimelineLog(
-            f"ignored notification: cannot retrieve status_type {data.status_type['url']} for case https://",
+            f"ignored notification: skip initial status notification for case https://",
+            lookup=Lookups.startswith,
+            level=logging.INFO,
+        )
+        mock_handle.assert_not_called()
+
+    def test_bails_when_cannot_fetch_status_type(self, m, mock_handle: Mock):
+        data = MockAPIData()
+        data.install_mocks(m, res404=["status_type_final"])
+
+        handle_zaken_notification(data.notification)
+
+        self.assertTimelineLog(
+            f"ignored notification: cannot retrieve status_type {data.status_type_final['url']} for case https://",
             lookup=Lookups.startswith,
             level=logging.ERROR,
         )
@@ -286,13 +330,13 @@ class NotificationHandlerTestCase(AssertTimelineLogMixin, ClearCachesMixin, Test
         self, m, mock_handle: Mock
     ):
         data = MockAPIData()
-        data.status_type["informeren"] = False
+        data.status_type_final["informeren"] = False
         data.install_mocks(m)
 
         handle_zaken_notification(data.notification)
 
         self.assertTimelineLog(
-            f"ignored notification: status_type.informeren is false for status {data.status['url']} and case https://",
+            f"ignored notification: status_type.informeren is false for status {data.status_final['url']} and case https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -419,7 +463,7 @@ class NotificationHandlerTestCase(AssertTimelineLogMixin, ClearCachesMixin, Test
         args = mock_handle.call_args.args
         self.assertEqual(args[0], data.user_initiator)
         self.assertEqual(args[1].url, data.zaak["url"])
-        self.assertEqual(args[2].url, data.status["url"])
+        self.assertEqual(args[2].url, data.status_final["url"])
 
         self.assertTimelineLog(
             "accepted notification: attempt informing users ",
@@ -453,7 +497,7 @@ class NotificationHandlerTestCase(AssertTimelineLogMixin, ClearCachesMixin, Test
         args = mock_handle.call_args.args
         self.assertEqual(args[0], data.user_initiator)
         self.assertEqual(args[1].url, data.zaak["url"])
-        self.assertEqual(args[2].url, data.status["url"])
+        self.assertEqual(args[2].url, data.status_final["url"])
 
         self.assertTimelineLog(
             "accepted notification: attempt informing users ",
@@ -521,8 +565,8 @@ class NotificationHandlerEmailTestCase(TestCase):
         case = factory(Zaak, data.zaak)
         case.zaaktype = factory(ZaakType, data.zaak_type)
 
-        status = factory(Status, data.status)
-        status.statustype = factory(StatusType, data.status_type)
+        status = factory(Status, data.status_final)
+        status.statustype = factory(StatusType, data.status_type_final)
 
         # first call
         handle_status_update(user, case, status)
@@ -561,8 +605,8 @@ class NotificationHandlerEmailTestCase(TestCase):
         case = factory(Zaak, data.zaak)
         case.zaaktype = factory(ZaakType, data.zaak_type)
 
-        status = factory(Status, data.status)
-        status.statustype = factory(StatusType, data.status_type)
+        status = factory(Status, data.status_final)
+        status.statustype = factory(StatusType, data.status_type_final)
 
         case_url = reverse("accounts:case_status", kwargs={"object_id": str(case.uuid)})
 

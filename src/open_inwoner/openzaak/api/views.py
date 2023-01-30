@@ -57,6 +57,12 @@ class NotificationsWebhookBaseView(APIView):
         notification = factory(Notification, serializer.validated_data)
 
         # verify channel
+        if notification.kanaal == "test":
+            log_system_action(
+                "received notification on 'test' channel", log_level=logging.INFO
+            )
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
         if notification.kanaal not in subscription.channels:
             msg = f"notification channel '{notification.kanaal}' not subscribed to"
             log_system_action(msg, log_level=logging.ERROR)
@@ -80,7 +86,6 @@ class NotificationsWebhookBaseView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
         else:
-            log_system_action(f"handled notification", log_level=logging.DEBUG)
             # looks like we're good
             return Response(status=status.HTTP_204_NO_CONTENT)
 

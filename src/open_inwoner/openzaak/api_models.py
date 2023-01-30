@@ -56,8 +56,8 @@ class ZaakType(ZGWModel):
     # verlengingstermijn: Optional[relativedelta]
     # publicatie_indicatie: bool
     # producten_of_diensten: list
-    statustypen: list
-    # resultaattypen: list
+    statustypen: list = None
+    resultaattypen: list = None
     # informatieobjecttypen: list
     # roltypen: list
     # besluittypen: list

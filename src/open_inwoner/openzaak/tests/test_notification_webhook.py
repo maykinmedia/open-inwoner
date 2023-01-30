@@ -99,6 +99,26 @@ class NotificationWebhookAPITestCase(AssertTimelineLogMixin, APITestCase):
         }
         return raw_notification
 
+    def test_api_calls_handler_returns_http_204_when_test_notification_received(
+        self, mock_handle
+    ):
+        SubscriptionFactory.create(client_id="foo", secret="password")
+        headers = {"HTTP_AUTHORIZATION": generate_auth_header_value("foo", "password")}
+        raw_notification = self.get_raw_notification()
+
+        # set 'test' kanaal
+        raw_notification["kanaal"] = "test"
+
+        response = self.client.post(
+            self.url, raw_notification, **headers, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        mock_handle.assert_not_called()
+        self.assertTimelineLog(
+            "received notification on 'test' channel", level=logging.INFO
+        )
+
     def test_api_calls_handler_returns_http_204_when_valid(self, mock_handle):
         SubscriptionFactory.create(client_id="foo", secret="password")
         headers = {"HTTP_AUTHORIZATION": generate_auth_header_value("foo", "password")}

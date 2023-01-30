@@ -12,6 +12,7 @@ from open_inwoner.openzaak.cases import (
     fetch_case_by_url_no_cache,
     fetch_case_roles,
     fetch_specific_status,
+    fetch_status_history_no_cache,
 )
 from open_inwoner.openzaak.catalog import (
     fetch_single_case_type,
@@ -64,7 +65,29 @@ def handle_zaken_notification(notification: Notification):
         return
 
     # check if this is a status we want to inform on
-    status = fetch_specific_status(status_url)
+
+    status_history = fetch_status_history_no_cache(case_url)
+    if not status_history:
+        log_system_action(
+            f"ignored notification: cannot retrieve status_history for case {case_url}",
+            log_level=logging.ERROR,
+        )
+        return
+
+    if len(status_history) == 1:
+        log_system_action(
+            f"ignored notification: skip initial status notification for case {case_url}",
+            log_level=logging.INFO,
+        )
+        return
+
+    for s in status_history:
+        if s.url == status_url:
+            status = s
+            break
+    else:
+        status = fetch_specific_status(status_url)
+
     if not status:
         log_system_action(
             f"ignored notification: cannot retrieve status {status_url} for case {case_url}",
@@ -79,7 +102,8 @@ def handle_zaken_notification(notification: Notification):
             log_level=logging.ERROR,
         )
         return
-    elif not oz_config.skip_notification_statustype_informeren:
+
+    if not oz_config.skip_notification_statustype_informeren:
         if not status_type.informeren:
             log_system_action(
                 f"ignored notification: status_type.informeren is false for status {status.url} and case {case_url}",

@@ -123,6 +123,10 @@ def fetch_case_information_objects(case_url: str) -> List[ZaakInformatieObject]:
 
 @cache_result("status_history:{case_url}", timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT)
 def fetch_status_history(case_url: str) -> List[Status]:
+    return fetch_status_history_no_cache(case_url)
+
+
+def fetch_status_history_no_cache(case_url: str) -> List[Status]:
     client = build_client("zaak")
 
     if client is None:
