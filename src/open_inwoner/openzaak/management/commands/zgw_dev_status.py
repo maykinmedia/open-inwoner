@@ -25,6 +25,10 @@ logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
+    """
+    rough tool to mess with cases and statuses
+    """
+
     help = "Dev tools for ZGW status testing"
 
     def add_arguments(self, parser):
@@ -144,7 +148,7 @@ class Command(BaseCommand):
             client = build_client("zaak")
 
             if next_status_type.is_eindstatus and not case.resultaat:
-                next_result_type = random.choice(result_types)
+                next_result_type = random.choice(result_types)  # nosec
                 self.stdout.write(f"setting new result {next_result_type.omschrijving}")
                 client.create(
                     "resultaat",
