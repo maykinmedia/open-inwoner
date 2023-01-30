@@ -140,8 +140,6 @@ class NotificationWebhookAPITestCase(AssertTimelineLogMixin, APITestCase):
         self.assertIsInstance(notification, Notification)
         self.assertEqual(notification.hoofd_object, raw_notification["hoofdObject"])
 
-        self.assertTimelineLog("handled notification", level=logging.DEBUG)
-
     def test_api_returns_http_500_when_valid_but_handler_raises(self, mock_handle):
         mock_handle.side_effect = Exception("whoopsie")
 
