@@ -1,3 +1,5 @@
+import os
+
 from django import forms
 from django.conf import settings
 from django.contrib.auth.forms import PasswordResetForm
@@ -419,16 +421,16 @@ class CaseUploadForm(forms.Form):
         file = self.cleaned_data["file"]
 
         config = OpenZaakConfig.get_solo()
-        max_allowed_size = 1024 ** 2 * config.max_upload_size
+        max_allowed_size = 1024**2 * config.max_upload_size
         allowed_extensions = config.allowed_file_extensions
-        extension = file.name.split(".")[-1]
+        filename, file_extension = os.path.splitext(file.name)
 
         if file.size > max_allowed_size:
             raise ValidationError(
                 f"Een aangeleverd bestand dient maximaal {config.max_upload_size} MB te zijn, uw bestand is te groot."
             )
 
-        if extension not in allowed_extensions:
+        if file_extension not in allowed_extensions:
             raise ValidationError(
                 f"Het type bestand dat u hebt geüpload is ongeldig. Geldige bestandstypen zijn: {', '.join(allowed_extensions)}"
             )
