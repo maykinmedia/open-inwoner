@@ -65,6 +65,7 @@ class ZaakTypeMockData:
                 catalogus=f"{CATALOGI_ROOT}catalogussen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
                 identificatie="AAA",
                 omschrijving="zaaktype-aaa",
+                indicatieInternOfExtern="extern",
             ),
             generate_oas_component(
                 "ztc",
@@ -74,6 +75,7 @@ class ZaakTypeMockData:
                 catalogus=f"{CATALOGI_ROOT}catalogussen/bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
                 identificatie="BBB",
                 omschrijving="zaaktype-bbb",
+                indicatieInternOfExtern="extern",
             ),
             generate_oas_component(
                 "ztc",
@@ -83,15 +85,27 @@ class ZaakTypeMockData:
                 # re-use identificatie from above
                 identificatie="AAA",
                 omschrijving="zaaktype-aaa",
+                indicatieInternOfExtern="extern",
+            ),
+            generate_oas_component(
+                "ztc",
+                "schemas/ZaakType",
+                url=f"{CATALOGI_ROOT}zaaktype/aaaaaaaa-aaaa-aaaa-aaaa-444444444444",
+                catalogus=f"{CATALOGI_ROOT}catalogussen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+                identificatie="CCC",
+                omschrijving="zaaktype-ccc",
+                # internal case
+                indicatieInternOfExtern="intern",
             ),
         ]
         self.extra_zaaktype = generate_oas_component(
             "ztc",
             "schemas/ZaakType",
-            url=f"{CATALOGI_ROOT}zaaktype/aaaaaaaa-aaaa-aaaa-aaaa-444444444444",
+            url=f"{CATALOGI_ROOT}zaaktype/aaaaaaaa-aaaa-aaaa-aaaa-555555555555",
             catalogus=f"{CATALOGI_ROOT}catalogussen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
-            identificatie="CCC",
-            omschrijving="zaaktype-ccc",
+            identificatie="DDD",
+            omschrijving="zaaktype-ddd",
+            indicatieInternOfExtern="extern",
         )
 
     def setUpOASMocks(self, m):
@@ -171,7 +185,7 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
 
         res = import_zaaktype_configs()
 
-        # first two got added, third one has same identificatie
+        # first two got added, third one has same identificatie, fourth one is internal
         self.assertEqual(len(res), 2)
         self.assertEqual(ZaakTypeConfig.objects.count(), 2)
 
@@ -217,7 +231,7 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
 
         res = import_zaaktype_configs()
 
-        # first two got added, third one has same identificatie
+        # first two got added, third one has same identificatie, fourth one is internal
         self.assertEqual(len(res), 2)
         self.assertEqual(ZaakTypeConfig.objects.count(), 2)
 

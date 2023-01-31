@@ -12,9 +12,7 @@ from open_inwoner.openzaak.models import CatalogusConfig, ZaakTypeConfig
 
 def get_configurable_zaaktypes() -> List[ZaakType]:
     case_types = fetch_zaaktypes_no_cache()
-    # TODO filter zaaktypes we're never interested in?
-    #  like intern/extern, concept etc
-
+    case_types = [c for c in case_types if c.indicatie_intern_of_extern == "extern"]
     return case_types
 
 
@@ -49,7 +47,7 @@ def import_catalog_configs() -> List[CatalogusConfig]:
     return create
 
 
-def import_zaaktype_configs() -> List[ZaakTypeConfig]:
+def import_zaaktype_configs(*, update_all_info_objects=False) -> List[ZaakTypeConfig]:
     """
     generate a ZaakTypeConfig for every ZaakType.identificatie in the ZGW API
 
