@@ -592,7 +592,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         self._setUpMocks(m)
 
         # mock max file size to 10 bytes
-        self.config.max_upload_size = 10 / (1024 ** 2)
+        self.config.max_upload_size = 10 / (1024**2)
         self.config.save()
 
         response = self.app.get(
