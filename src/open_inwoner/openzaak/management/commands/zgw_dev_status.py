@@ -19,17 +19,23 @@ from open_inwoner.openzaak.catalog import (
     fetch_status_types,
 )
 from open_inwoner.openzaak.clients import build_client
-from open_inwoner.openzaak.utils import get_zaak_type_config
+from open_inwoner.openzaak.utils import get_zaak_type_config, is_zaak_visible
 
 logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
     """
-    rough tool to mess with cases and statuses
+    NOTE:
+
+    this is a hacky tool to mess with cases and statuses without access to a browser-based ZGW admin
+
+    primary use-case is to test notifications
+
+    so code is ugly, ad-hoc and undocumented, and should be deleted
     """
 
-    help = "Dev tools for ZGW status testing"
+    help = "Unsafe dev tools for ZGW status and notification testing"
 
     def add_arguments(self, parser):
         parser.add_argument("user")
@@ -61,19 +67,25 @@ class Command(BaseCommand):
 
         if not user.bsn:
             self.die(f"user '{user}' doesn't have a bsn set")
+        else:
+            self.stdout.write(f"found user '{user}' with BSN {user.bsn}")
 
-        case_ref: str = options.get("case")
-        if not case_ref:
+        case_uuid: str = options.get("case")
+        if not case_uuid:
+            # if no case_ref is supplied display list of cases and some information about each
+
             cases = fetch_cases(user.bsn)
-
             for case in cases:
                 case_type = fetch_single_case_type(case.zaaktype)
+                case.zaaktype = case_type
+
                 self.stdout.write(
-                    f"{case.identificatie} {case.uuid} {case.vertrouwelijkheidaanduiding} {case.omschrijving}"
+                    f'{case.identificatie} {case.uuid} {case.vertrouwelijkheidaanduiding} "{case.omschrijving}" (visible {is_zaak_visible(case)})'
                 )
                 self.stdout.write(
-                    f"  {case_type.identificatie} {case_type.uuid} {case_type.indicatie_intern_of_extern} {case_type.omschrijving} "
+                    f'  {case_type.identificatie} {case_type.uuid} {case_type.indicatie_intern_of_extern} "{case_type.omschrijving}" '
                 )
+
                 status = fetch_specific_status(case.status)
                 status_type = fetch_single_status_type(status.statustype)
                 self.stdout.write(
@@ -81,19 +93,24 @@ class Command(BaseCommand):
                 )
                 self.stdout.write("")
         else:
-            case = fetch_single_case(case_ref)
+            # dump a bunch of information about the case
+
+            case = fetch_single_case(case_uuid)
             case_type = fetch_single_case_type(case.zaaktype)
+            case.zaaktype = case_type
+
             self.stdout.write(
-                f"{case.identificatie} {case.uuid} {case.vertrouwelijkheidaanduiding} {case.omschrijving}"
+                f'{case.identificatie} {case.uuid} {case.vertrouwelijkheidaanduiding} "{case.omschrijving}" (visible {is_zaak_visible(case)})'
             )
             self.stdout.write(
-                f"  {case_type.identificatie} {case_type.uuid} {case_type.indicatie_intern_of_extern} {case_type.omschrijving} "
+                f'  {case_type.identificatie} {case_type.uuid} {case_type.indicatie_intern_of_extern} "{case_type.omschrijving}" '
             )
+
             ztc = get_zaak_type_config(case_type)
             if not ztc:
                 self.stdout.write(f"notify ZaakTypeConfig: {ztc.notify_status_changes}")
             else:
-                self.stdout.write(f"no ZaakTypeConfig found")
+                self.stdout.write("no ZaakTypeConfig found")
 
             status_types = fetch_status_types(case_type.url)
             status_type_map = {r.url: r for r in status_types}
@@ -110,10 +127,10 @@ class Command(BaseCommand):
 
                 self.stdout.write(f"  result: {result_type.omschrijving}")
             else:
-                self.stdout.write(f"  result: <none>")
+                self.stdout.write("  result: <none>")
 
             if status_type.is_eindstatus:
-                self.stdout.write(f"case reached end-status")
+                self.stdout.write("case reached end-status")
                 exit()
 
             self.stdout.write(f"statustypes {len(status_types)}")
@@ -125,6 +142,8 @@ class Command(BaseCommand):
             self.stdout.write(f"resultaattypes {len(result_types)}")
             for rt in result_types:
                 self.stdout.write(f"  {rt.omschrijving} {rt.uuid}")
+
+            # hacky grab a possible next status or re-use current
 
             index = 0
             for index, st in enumerate(status_types):
@@ -140,13 +159,16 @@ class Command(BaseCommand):
                 f"next status: {next_status_type.omschrijving} {next_status_type.is_eindstatus}"
             )
 
+            # optionally re-apply the current status or proceed to the next
+
             if not (options["apply"] or options["proceed"]):
                 return
 
-            self.stdout.write(f"...")
+            self.stdout.write("...")
 
             client = build_client("zaak")
 
+            # if next status is end-status we need to result, so random select one
             if next_status_type.is_eindstatus and not case.resultaat:
                 next_result_type = random.choice(result_types)  # nosec
                 self.stdout.write(f"setting new result {next_result_type.omschrijving}")
@@ -159,7 +181,7 @@ class Command(BaseCommand):
                     },
                 )
 
-            status = client.create(
+            client.create(
                 "status",
                 {
                     "zaak": case.url,
@@ -169,6 +191,7 @@ class Command(BaseCommand):
                 },
             )
 
+            # check if status was applied
             case = fetch_case_by_url_no_cache(case.url)
             status = fetch_specific_status(case.status)
             status_type = fetch_single_status_type(status.statustype)
