@@ -113,7 +113,12 @@ class _UserAdmin(UserAdmin):
     )
     search_fields = ("first_name", "last_name", "email")
     ordering = ("email",)
-    filter_horizontal = ("user_contacts", "contacts_for_approval")
+    filter_horizontal = (
+        "user_contacts",
+        "contacts_for_approval",
+        "groups",
+        "user_permissions",
+    )
 
 
 @admin.register(Action)

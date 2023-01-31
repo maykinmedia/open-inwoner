@@ -1,5 +1,7 @@
 import logging
 
+from django.utils.encoding import force_str
+
 from timeline_logger.models import TimelineLog
 
 
@@ -25,7 +27,7 @@ class AssertTimelineLogMixin:
         self, message, *, level=None, lookup=Lookups.exact
     ) -> TimelineLog:
         kwargs = {
-            f"extra_data__message__{lookup}": message,
+            f"extra_data__message__{lookup}": force_str(message),
         }
         if level is not None:
             kwargs["extra_data__log_level"] = level

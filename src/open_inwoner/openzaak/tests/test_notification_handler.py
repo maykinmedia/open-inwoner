@@ -2,10 +2,14 @@ import logging
 from typing import List, Optional
 from unittest.mock import Mock, patch
 
+from django.core import mail
 from django.test import TestCase
+from django.urls import reverse
+from django.utils.formats import date_format
 
 import requests_mock
 from notifications_api_common.models import NotificationsConfig
+from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.constants import (
     RolOmschrijving,
     RolTypes,
@@ -18,16 +22,21 @@ from open_inwoner.accounts.tests.factories import DigidUserFactory, UserFactory
 from open_inwoner.openzaak.notifications import (
     get_emailable_initiator_users_from_roles,
     get_np_initiator_bsns_from_roles,
+    handle_status_update,
     handle_zaken_notification,
+    send_status_update_email,
 )
 from open_inwoner.openzaak.tests.factories import (
     NotificationFactory,
     ServiceFactory,
+    ZaakTypeConfigFactory,
     generate_rol,
 )
 
+from ...configurations.models import SiteConfiguration
 from ...utils.test import ClearCachesMixin, paginated_response
 from ...utils.tests.helpers import AssertTimelineLogMixin, Lookups
+from ..api_models import Status, StatusType, Zaak, ZaakType
 from ..models import OpenZaakConfig
 from .shared import CATALOGI_ROOT, DOCUMENTEN_ROOT, ZAKEN_ROOT
 
@@ -54,7 +63,6 @@ class MockAPIData:
     """
 
     def __init__(self):
-        # users with bsn
         self.user_initiator = DigidUserFactory(
             bsn="100000001",
             email="initiator@example.com",
@@ -62,31 +70,53 @@ class MockAPIData:
         self.zaak_type = generate_oas_component(
             "ztc",
             "schemas/ZaakType",
-            url=f"{ZAKEN_ROOT}zaaktype/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            url=f"{CATALOGI_ROOT}zaaktype/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             catalogus=f"{CATALOGI_ROOT}catalogussen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            identificatie="My Zaaktype",
+            indicatieInternOfExtern="extern",
         )
-        self.status_type = generate_oas_component(
+        self.status_type_initial = generate_oas_component(
             "ztc",
             "schemas/StatusType",
-            url=f"{CATALOGI_ROOT}statustypen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            url=f"{CATALOGI_ROOT}statustypen/aaaaaaaa-aaaa-aaaa-aaaa-111111111111",
             zaaktype=self.zaak_type["url"],
             informeren=True,
+            volgnummer=1,
+            omschrijving="initial",
+            isEindStatus=False,
+        )
+        self.status_type_final = generate_oas_component(
+            "ztc",
+            "schemas/StatusType",
+            url=f"{CATALOGI_ROOT}statustypen/aaaaaaaa-aaaa-aaaa-aaaa-222222222222",
+            zaaktype=self.zaak_type["url"],
+            informeren=True,
+            volgnummer=2,
+            omschrijving="final",
+            isEindStatus=True,
         )
         self.zaak = generate_oas_component(
             "zrc",
             "schemas/Zaak",
             url=f"{ZAKEN_ROOT}zaken/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             zaaktype=self.zaak_type["url"],
-            status=f"{ZAKEN_ROOT}statussen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            status=f"{ZAKEN_ROOT}statussen/aaaaaaaa-aaaa-aaaa-aaaa-222222222222",
             resultaat=f"{ZAKEN_ROOT}resultaten/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
         )
-        self.status = generate_oas_component(
+        self.status_initial = generate_oas_component(
             "zrc",
             "schemas/Status",
-            url=f"{ZAKEN_ROOT}statussen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            url=f"{ZAKEN_ROOT}statussen/aaaaaaaa-aaaa-aaaa-aaaa-111111111111",
             zaak=self.zaak["url"],
-            statustype=self.status_type["url"],
+            statustype=self.status_type_initial["url"],
+        )
+        self.status_final = generate_oas_component(
+            "zrc",
+            "schemas/Status",
+            url=f"{ZAKEN_ROOT}statussen/aaaaaaaa-aaaa-aaaa-aaaa-222222222222",
+            zaak=self.zaak["url"],
+            statustype=self.status_type_final["url"],
         )
 
         self.role_initiator = generate_oas_component(
@@ -101,11 +131,12 @@ class MockAPIData:
         )
 
         self.case_roles = [self.role_initiator]
+        self.status_history = [self.status_initial, self.status_final]
 
         self.notification = NotificationFactory(
             resource="status",
             actie="update",
-            resource_url=self.status["url"],
+            resource_url=self.status_final["url"],
             hoofd_object=self.zaak["url"],
         )
 
@@ -122,21 +153,28 @@ class MockAPIData:
                 raise Exception("configuration error")
 
         if "case_roles" in res404:
-            m.get(
-                f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}",
-                status_code=404,
-            )
+            m.get(f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}", status_code=404)
         else:
             m.get(
                 f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}",
                 json=paginated_response(self.case_roles),
             )
 
+        if "status_history" in res404:
+            m.get(f"{ZAKEN_ROOT}statussen?zaak={self.zaak['url']}", status_code=404)
+        else:
+            m.get(
+                f"{ZAKEN_ROOT}statussen?zaak={self.zaak['url']}",
+                json=paginated_response(self.status_history),
+            )
+
         for resource_attr in [
             "zaak",
             "zaak_type",
-            "status",
-            "status_type",
+            "status_initial",
+            "status_final",
+            "status_type_initial",
+            "status_type_final",
         ]:
             resource = getattr(self, resource_attr)
             if resource_attr in res404:
@@ -174,14 +212,13 @@ class NotificationHandlerTestCase(AssertTimelineLogMixin, ClearCachesMixin, Test
         cls.config.zaak_max_confidentiality = VertrouwelijkheidsAanduidingen.openbaar
         cls.config.save()
 
-    def test_handle_zaken_notification_calls_handle_status_update(
-        self, m, mock_handle: Mock
-    ):
+    def test_handle_zaken_notification(self, m, mock_handle: Mock):
+        """
+        happy-flow from valid data calls the (mocked) handle_status_update()
+        """
         data = MockAPIData().install_mocks(m)
 
         handle_zaken_notification(data.notification)
-
-        history = m.request_history
 
         mock_handle.assert_called_once()
 
@@ -189,10 +226,10 @@ class NotificationHandlerTestCase(AssertTimelineLogMixin, ClearCachesMixin, Test
         args = mock_handle.call_args.args
         self.assertEqual(args[0], data.user_initiator)
         self.assertEqual(args[1].url, data.zaak["url"])
-        self.assertEqual(args[2].url, data.status["url"])
+        self.assertEqual(args[2].url, data.status_final["url"])
 
         self.assertTimelineLog(
-            "accepted notification: informing users ",
+            "accepted notification: attempt informing users ",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -247,27 +284,43 @@ class NotificationHandlerTestCase(AssertTimelineLogMixin, ClearCachesMixin, Test
         )
         mock_handle.assert_not_called()
 
-    def test_bails_when_cannot_fetch_status(self, m, mock_handle: Mock):
+    def test_bails_when_cannot_fetch_status_history(self, m, mock_handle: Mock):
         data = MockAPIData()
-        data.install_mocks(m, res404=["status"])
+        data.install_mocks(m, res404=["status_history"])
 
         handle_zaken_notification(data.notification)
 
         self.assertTimelineLog(
-            f"ignored notification: cannot retrieve status {data.status['url']} for case https://",
+            f"ignored notification: cannot retrieve status_history for case https://",
             lookup=Lookups.startswith,
             level=logging.ERROR,
         )
         mock_handle.assert_not_called()
 
-    def test_bails_when_cannot_fetch_status_type(self, m, mock_handle: Mock):
+    def test_bails_when_status_history_is_single_initial_item(
+        self, m, mock_handle: Mock
+    ):
         data = MockAPIData()
-        data.install_mocks(m, res404=["status_type"])
+        data.status_history = [data.status_initial]
+        data.install_mocks(m)
 
         handle_zaken_notification(data.notification)
 
         self.assertTimelineLog(
-            f"ignored notification: cannot retrieve status_type {data.status_type['url']} for case https://",
+            f"ignored notification: skip initial status notification for case https://",
+            lookup=Lookups.startswith,
+            level=logging.INFO,
+        )
+        mock_handle.assert_not_called()
+
+    def test_bails_when_cannot_fetch_status_type(self, m, mock_handle: Mock):
+        data = MockAPIData()
+        data.install_mocks(m, res404=["status_type_final"])
+
+        handle_zaken_notification(data.notification)
+
+        self.assertTimelineLog(
+            f"ignored notification: cannot retrieve status_type {data.status_type_final['url']} for case https://",
             lookup=Lookups.startswith,
             level=logging.ERROR,
         )
@@ -277,13 +330,13 @@ class NotificationHandlerTestCase(AssertTimelineLogMixin, ClearCachesMixin, Test
         self, m, mock_handle: Mock
     ):
         data = MockAPIData()
-        data.status_type["informeren"] = False
+        data.status_type_final["informeren"] = False
         data.install_mocks(m)
 
         handle_zaken_notification(data.notification)
-        # ignored notification: status_type.informeren is false for status https://zaken.nl/api/v1/statussen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa and case
+
         self.assertTimelineLog(
-            f"ignored notification: status_type.informeren is false for status {data.status['url']} and case https://",
+            f"ignored notification: status_type.informeren is false for status {data.status_final['url']} and case https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -315,7 +368,9 @@ class NotificationHandlerTestCase(AssertTimelineLogMixin, ClearCachesMixin, Test
         )
         mock_handle.assert_not_called()
 
-    def test_bails_when_case_not_visible_confidentiality(self, m, mock_handle: Mock):
+    def test_bails_when_case_not_visible_because_confidentiality(
+        self, m, mock_handle: Mock
+    ):
         data = MockAPIData()
         data.zaak["vertrouwelijkheidaanduiding"] = VertrouwelijkheidsAanduidingen.geheim
         data.install_mocks(m)
@@ -323,11 +378,251 @@ class NotificationHandlerTestCase(AssertTimelineLogMixin, ClearCachesMixin, Test
         handle_zaken_notification(data.notification)
 
         self.assertTimelineLog(
-            f"ignored notification: bad confidentiality 'geheim' for case https://",
+            f"ignored notification: case not visible after applying website visibility filter for case https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
         mock_handle.assert_not_called()
+
+    def test_bails_when_case_not_visible_because_internal_case(
+        self, m, mock_handle: Mock
+    ):
+        data = MockAPIData()
+        data.zaak_type["indicatieInternOfExtern"] = "intern"
+        data.install_mocks(m)
+
+        handle_zaken_notification(data.notification)
+
+        self.assertTimelineLog(
+            f"ignored notification: case not visible after applying website visibility filter for case https://",
+            lookup=Lookups.startswith,
+            level=logging.INFO,
+        )
+        mock_handle.assert_not_called()
+
+    def test_bails_when_skip_informeren_is_set_and_no_zaaktypeconfig_is_found(
+        self, m, mock_handle: Mock
+    ):
+        oz_config = OpenZaakConfig.get_solo()
+        oz_config.skip_notification_statustype_informeren = True
+        oz_config.save()
+
+        data = MockAPIData()
+        data.install_mocks(m)
+
+        handle_zaken_notification(data.notification)
+
+        self.assertTimelineLog(
+            f"ignored notification: 'skip_notification_statustype_informeren' is True but cannot retrieve case_type configuration '{data.zaak_type['identificatie']}' for case https://",
+            lookup=Lookups.startswith,
+            level=logging.INFO,
+        )
+        mock_handle.assert_not_called()
+
+    def test_bails_when_skip_informeren_is_set_and_no_zaaktypeconfig_is_found_from_zaaktype_none_catalog(
+        self, m, mock_handle: Mock
+    ):
+        oz_config = OpenZaakConfig.get_solo()
+        oz_config.skip_notification_statustype_informeren = True
+        oz_config.save()
+
+        data = MockAPIData()
+        data.zaak_type["catalogus"] = None
+        data.install_mocks(m)
+
+        handle_zaken_notification(data.notification)
+
+        self.assertTimelineLog(
+            f"ignored notification: 'skip_notification_statustype_informeren' is True but cannot retrieve case_type configuration '{data.zaak_type['identificatie']}' for case https://",
+            lookup=Lookups.startswith,
+            level=logging.INFO,
+        )
+        mock_handle.assert_not_called()
+
+    def test_handle_notification_when_skip_informeren_is_set_and_zaaktypeconfig_is_found(
+        self, m, mock_handle: Mock
+    ):
+        oz_config = OpenZaakConfig.get_solo()
+        oz_config.skip_notification_statustype_informeren = True
+        oz_config.save()
+
+        data = MockAPIData().install_mocks(m)
+
+        ZaakTypeConfigFactory.create(
+            catalogus__url=data.zaak_type["catalogus"],
+            identificatie=data.zaak_type["identificatie"],
+            # set this to notify
+            notify_status_changes=True,
+        )
+
+        handle_zaken_notification(data.notification)
+
+        mock_handle.assert_called_once()
+
+        # check call arguments
+        args = mock_handle.call_args.args
+        self.assertEqual(args[0], data.user_initiator)
+        self.assertEqual(args[1].url, data.zaak["url"])
+        self.assertEqual(args[2].url, data.status_final["url"])
+
+        self.assertTimelineLog(
+            "accepted notification: attempt informing users ",
+            lookup=Lookups.startswith,
+            level=logging.INFO,
+        )
+
+    def test_handle_notification_when_skip_informeren_is_set_and_zaaktypeconfig_is_found_from_zaaktype_none_catalog(
+        self, m, mock_handle: Mock
+    ):
+        oz_config = OpenZaakConfig.get_solo()
+        oz_config.skip_notification_statustype_informeren = True
+        oz_config.save()
+
+        data = MockAPIData()
+        data.zaak_type["catalogus"] = None
+        data.install_mocks(m)
+
+        ZaakTypeConfigFactory.create(
+            catalogus=None,
+            identificatie=data.zaak_type["identificatie"],
+            # set this to notify
+            notify_status_changes=True,
+        )
+
+        handle_zaken_notification(data.notification)
+
+        mock_handle.assert_called_once()
+
+        # check call arguments
+        args = mock_handle.call_args.args
+        self.assertEqual(args[0], data.user_initiator)
+        self.assertEqual(args[1].url, data.zaak["url"])
+        self.assertEqual(args[2].url, data.status_final["url"])
+
+        self.assertTimelineLog(
+            "accepted notification: attempt informing users ",
+            lookup=Lookups.startswith,
+            level=logging.INFO,
+        )
+
+    def test_bails_when_skip_informeren_is_set_and_zaaktypeconfig_is_found_but_not_set(
+        self, m, mock_handle: Mock
+    ):
+        oz_config = OpenZaakConfig.get_solo()
+        oz_config.skip_notification_statustype_informeren = True
+        oz_config.save()
+
+        data = MockAPIData()
+        data.install_mocks(m)
+
+        ZaakTypeConfigFactory.create(
+            catalogus__url=data.zaak_type["catalogus"],
+            identificatie=data.zaak_type["identificatie"],
+            notify_status_changes=False,
+        )
+
+        handle_zaken_notification(data.notification)
+
+        self.assertTimelineLog(
+            f"ignored notification: case_type configuration '{data.zaak_type['identificatie']}' found but 'notify_status_changes' is False for case https://",
+            lookup=Lookups.startswith,
+            level=logging.INFO,
+        )
+        mock_handle.assert_not_called()
+
+    def test_bails_when_skip_informeren_is_set_and_zaaktypeconfig_is_not_found_because_different_catalog(
+        self, m, mock_handle: Mock
+    ):
+        oz_config = OpenZaakConfig.get_solo()
+        oz_config.skip_notification_statustype_informeren = True
+        oz_config.save()
+
+        data = MockAPIData()
+        data.install_mocks(m)
+
+        ZaakTypeConfigFactory.create(
+            catalogus__url="http://not-the-catalogus.xyz",
+            identificatie=data.zaak_type["identificatie"],
+            notify_status_changes=False,
+        )
+
+        handle_zaken_notification(data.notification)
+
+        self.assertTimelineLog(
+            f"ignored notification: 'skip_notification_statustype_informeren' is True but cannot retrieve case_type configuration '{data.zaak_type['identificatie']}' for case https://",
+            lookup=Lookups.startswith,
+            level=logging.INFO,
+        )
+        mock_handle.assert_not_called()
+
+
+class NotificationHandlerEmailTestCase(TestCase):
+    @patch("open_inwoner.openzaak.notifications.send_status_update_email")
+    def test_handle_status_update(self, mock_send: Mock):
+        data = MockAPIData()
+        user = data.user_initiator
+
+        case = factory(Zaak, data.zaak)
+        case.zaaktype = factory(ZaakType, data.zaak_type)
+
+        status = factory(Status, data.status_final)
+        status.statustype = factory(StatusType, data.status_type_final)
+
+        # first call
+        handle_status_update(user, case, status)
+
+        mock_send.assert_called_once()
+
+        # check call arguments
+        args = mock_send.call_args.args
+        self.assertEqual(args[0], user)
+        self.assertEqual(args[1].url, case.url)
+        self.assertEqual(args[2].url, status.url)
+
+        mock_send.reset_mock()
+
+        # second call with same case/status
+        handle_status_update(user, case, status)
+
+        # no duplicate mail for this user/case/status
+        mock_send.assert_not_called()
+
+        # other user is fine
+        other_user = UserFactory.create()
+        handle_status_update(other_user, case, status)
+
+        mock_send.assert_called_once()
+
+        args = mock_send.call_args.args
+        self.assertEqual(args[0], other_user)
+
+    def test_send_status_update_email(self):
+        config = SiteConfiguration.get_solo()
+        data = MockAPIData()
+
+        user = data.user_initiator
+
+        case = factory(Zaak, data.zaak)
+        case.zaaktype = factory(ZaakType, data.zaak_type)
+
+        status = factory(Status, data.status_final)
+        status.statustype = factory(StatusType, data.status_type_final)
+
+        case_url = reverse("accounts:case_status", kwargs={"object_id": str(case.uuid)})
+
+        send_status_update_email(user, case, status)
+
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertEqual(email.to, [user.email])
+        self.assertIn(config.name, email.subject)
+
+        body_html = email.alternatives[0][0]
+        self.assertIn(case.identificatie, body_html)
+        self.assertIn(case.zaaktype.omschrijving, body_html)
+        self.assertIn(date_format(case.startdatum), body_html)
+        self.assertIn(case_url, body_html)
+        self.assertIn(config.name, body_html)
 
 
 class NotificationHandlerUtilsTestCase(TestCase):

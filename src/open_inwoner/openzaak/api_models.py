@@ -40,7 +40,6 @@ class Zaak(ZGWModel):
 @dataclass
 class ZaakType(ZGWModel):
     url: str
-    # catalogus: str
     identificatie: str
     omschrijving: str
     vertrouwelijkheidaanduiding: str
@@ -57,14 +56,18 @@ class ZaakType(ZGWModel):
     # verlengingstermijn: Optional[relativedelta]
     # publicatie_indicatie: bool
     # producten_of_diensten: list
-    statustypen: list
-    # resultaattypen: list
+    statustypen: list = None
+    resultaattypen: list = None
     # informatieobjecttypen: list
     # roltypen: list
     # besluittypen: list
 
-    # begin_geldigheid: date
-    # versiedatum: date
+    # catalogus not on eSuite
+    catalogus: str = ""
+    begin_geldigheid: Optional[date] = None
+    einde_geldigheid: Optional[date] = None
+    versiedatum: Optional[date] = None
+    concept: Optional[bool] = None
 
 
 @dataclass

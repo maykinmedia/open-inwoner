@@ -1,22 +1,27 @@
 import logging
-from typing import List, Optional
+from typing import List
 
-from requests import RequestException
-from zds_client import ClientError
-from zgw_consumers.api_models.base import factory
+from django.urls import reverse
+
+from mail_editor.helpers import find_template
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 
 from open_inwoner.accounts.models import User
 from open_inwoner.openzaak.api_models import Notification, Rol, Status, Zaak
-from open_inwoner.openzaak.cases import fetch_case_roles, fetch_specific_status
+from open_inwoner.openzaak.cases import (
+    fetch_case_by_url_no_cache,
+    fetch_case_roles,
+    fetch_specific_status,
+    fetch_status_history_no_cache,
+)
 from open_inwoner.openzaak.catalog import (
     fetch_single_case_type,
     fetch_single_status_type,
 )
-from open_inwoner.openzaak.clients import build_client
-from open_inwoner.openzaak.models import OpenZaakConfig
-from open_inwoner.openzaak.utils import is_object_visible
+from open_inwoner.openzaak.models import OpenZaakConfig, UserCaseStatusNotification
+from open_inwoner.openzaak.utils import get_zaak_type_config, is_zaak_visible
 from open_inwoner.utils.logentry import system_action as log_system_action
+from open_inwoner.utils.url import build_absolute_url
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +34,8 @@ def handle_zaken_notification(notification: Notification):
 
     # on the 'zaken' channel the hoofd_object is always the zaak
     case_url = notification.hoofd_object
+
+    oz_config = OpenZaakConfig.get_solo()
 
     # were only interested in status updates
     if notification.resource != "status":
@@ -58,7 +65,29 @@ def handle_zaken_notification(notification: Notification):
         return
 
     # check if this is a status we want to inform on
-    status = fetch_specific_status(status_url)
+
+    status_history = fetch_status_history_no_cache(case_url)
+    if not status_history:
+        log_system_action(
+            f"ignored notification: cannot retrieve status_history for case {case_url}",
+            log_level=logging.ERROR,
+        )
+        return
+
+    if len(status_history) == 1:
+        log_system_action(
+            f"ignored notification: skip initial status notification for case {case_url}",
+            log_level=logging.INFO,
+        )
+        return
+
+    for s in status_history:
+        if s.url == status_url:
+            status = s
+            break
+    else:
+        status = fetch_specific_status(status_url)
+
     if not status:
         log_system_action(
             f"ignored notification: cannot retrieve status {status_url} for case {case_url}",
@@ -67,19 +96,20 @@ def handle_zaken_notification(notification: Notification):
         return
 
     status_type = fetch_single_status_type(status.statustype)
-    # TODO support non eSuite options
     if not status_type:
         log_system_action(
             f"ignored notification: cannot retrieve status_type {status.statustype} for case {case_url}",
             log_level=logging.ERROR,
         )
         return
-    elif not status_type.informeren:
-        log_system_action(
-            f"ignored notification: status_type.informeren is false for status {status.url} and case {case_url}",
-            log_level=logging.INFO,
-        )
-        return
+
+    if not oz_config.skip_notification_statustype_informeren:
+        if not status_type.informeren:
+            log_system_action(
+                f"ignored notification: status_type.informeren is false for status {status.url} and case {case_url}",
+                log_level=logging.INFO,
+            )
+            return
 
     status.statustype = status_type
 
@@ -102,18 +132,32 @@ def handle_zaken_notification(notification: Notification):
 
     case.zaaktype = case_type
 
-    config = OpenZaakConfig.get_solo()
-    # TODO check if we don't want is_zaak_visible() to also check for intern/extern
-    if not is_object_visible(case, config.zaak_max_confidentiality):
+    # check the ZaakTypeConfig
+    if oz_config.skip_notification_statustype_informeren:
+        ztc = get_zaak_type_config(case_type)
+        if not ztc:
+            log_system_action(
+                f"ignored notification: 'skip_notification_statustype_informeren' is True but cannot retrieve case_type configuration '{case.zaaktype.identificatie}' for case {case_url}",
+                log_level=logging.INFO,
+            )
+            return
+        elif not ztc.notify_status_changes:
+            log_system_action(
+                f"ignored notification: case_type configuration '{case.zaaktype.identificatie}' found but 'notify_status_changes' is False for case {case_url}",
+                log_level=logging.INFO,
+            )
+            return
+
+    if not is_zaak_visible(case):
         log_system_action(
-            f"ignored notification: bad confidentiality '{case.vertrouwelijkheidaanduiding}' for case {case_url}",
+            f"ignored notification: case not visible after applying website visibility filter for case {case_url}",
             log_level=logging.INFO,
         )
         return
 
     # reaching here means we're going to inform users
     log_system_action(
-        f"accepted notification: informing users {', '.join(sorted(map(str, inform_users)))} for case {case_url}",
+        f"accepted notification: attempt informing users {', '.join(sorted(map(str, inform_users)))} for case {case_url}",
         log_level=logging.INFO,
     )
     for user in inform_users:
@@ -122,33 +166,43 @@ def handle_zaken_notification(notification: Notification):
 
 
 def handle_status_update(user: User, case: Zaak, status: Status):
-    logger.debug("sending notification informer!")
-    # TODO still need to de-duplicate
+    note = UserCaseStatusNotification.objects.record_if_unique_notification(
+        user, case.uuid, status.uuid
+    )
+    if not note:
+        log_system_action(
+            f"ignored duplicate notification delivery for user '{user}' status {status.url} case {case.url}",
+            log_level=logging.INFO,
+        )
+        return
+
     send_status_update_email(user, case, status)
+
+    log_system_action(
+        f"send notification email for user '{user}' status {status.url} case {case.url}",
+        log_level=logging.INFO,
+    )
 
 
 def send_status_update_email(user: User, case: Zaak, status: Status):
     """
     send the actual mail
     """
-    pass
+    case_detail_url = build_absolute_url(
+        reverse("accounts:case_status", kwargs={"object_id": str(case.uuid)})
+    )
+
+    template = find_template("case_notification")
+    context = {
+        "identification": case.identificatie,
+        "type_description": case.zaaktype.omschrijving,
+        "start_date": case.startdatum,
+        "case_link": case_detail_url,
+    }
+    template.send_email([user.email], context)
 
 
-def fetch_case_by_url_no_cache(case_url: str) -> Optional[Zaak]:
-    # TODO decide how this interacts with the cache
-    client = build_client("zaak")
-    try:
-        response = client.retrieve("zaak", url=case_url)
-    except RequestException as e:
-        logger.exception("exception while making request", exc_info=e)
-        return
-    except ClientError as e:
-        logger.exception("exception while making request", exc_info=e)
-        return
-
-    case = factory(Zaak, response)
-
-    return case
+# - - - - -
 
 
 def get_np_initiator_bsns_from_roles(roles: List[Rol]) -> List[str]:
