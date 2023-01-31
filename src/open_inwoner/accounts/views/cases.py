@@ -1,15 +1,16 @@
 import dataclasses
-from typing import Iterable, List, Optional
+from typing import List, Optional
 
+from django.contrib import messages
 from django.contrib.auth.mixins import AccessMixin
 from django.core.exceptions import PermissionDenied
-from django.http import Http404, StreamingHttpResponse
+from django.http import Http404, HttpResponseRedirect, StreamingHttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views import View
-from django.views.generic import TemplateView
+from django.views.generic import FormView, TemplateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin
 from zgw_consumers.api_models.constants import RolOmschrijving
@@ -26,7 +27,12 @@ from open_inwoner.openzaak.cases import (
     fetch_specific_status,
     fetch_status_history,
 )
-from open_inwoner.openzaak.catalog import fetch_single_case_type, fetch_status_types
+from open_inwoner.openzaak.catalog import (
+    fetch_case_type_information_object_types,
+    fetch_single_case_type,
+    fetch_single_information_object_type,
+    fetch_status_types,
+)
 from open_inwoner.openzaak.documents import (
     download_document,
     fetch_single_information_object_url,
@@ -40,6 +46,8 @@ from open_inwoner.openzaak.utils import (
 )
 from open_inwoner.utils.mixins import PaginationMixin
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
+
+from ..forms import CaseUploadForm
 
 
 class CaseLogMixin(LogMixin):
@@ -249,9 +257,10 @@ class SimpleFile:
 
 
 class CaseDetailView(
-    CaseLogMixin, CommonPageMixin, BaseBreadcrumbMixin, CaseAccessMixin, TemplateView
+    CaseLogMixin, CommonPageMixin, BaseBreadcrumbMixin, CaseAccessMixin, FormView
 ):
     template_name = "pages/cases/status.html"
+    form_class = CaseUploadForm
 
     @cached_property
     def crumbs(self):
@@ -370,6 +379,51 @@ class CaseDetailView(
                 )
             )
         return documents
+
+    def get_information_object_type_choices(self) -> List[str]:
+        if not self.case:
+            return []
+
+        case_type_information_object_types = fetch_case_type_information_object_types(
+            self.case.zaaktype.url
+        )
+
+        choices = []
+        for _type in case_type_information_object_types:
+            valid_option = fetch_single_information_object_type(
+                _type.informatieobjecttype
+            )
+            choices.append(valid_option.omschrijving)
+
+        return choices
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+
+        document_choices = [
+            (id, value)
+            for id, value in enumerate(self.get_information_object_type_choices())
+        ]
+        kwargs["document_choices"] = document_choices
+        return kwargs
+
+    def get_success_url(self) -> str:
+        return self.request.get_full_path()
+
+    def post(self, request, *args, **kwargs):
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        file = request.FILES["file"]
+
+        if form.is_valid():
+            messages.add_message(
+                self.request,
+                messages.SUCCESS,
+                _(f"{file.name} has been successfully uploaded."),
+            )
+            return HttpResponseRedirect(self.get_success_url())
+        else:
+            return self.form_invalid(form)
 
     def get_anchors(self, statuses, documents):
         anchors = [["#title", _("Gegevens")]]

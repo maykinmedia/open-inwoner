@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n anchor_menu_tags card_tags dashboard_tags file_tags grid_tags status_tags table_tags %}
+{% load i18n anchor_menu_tags card_tags dashboard_tags file_tags grid_tags status_tags table_tags solo_tags form_tags %}
 
 {% block sidebar_content %}
     {% if case %}
@@ -8,6 +8,8 @@
 {% endblock sidebar_content %}
 
 {% block content %}
+    {% get_solo 'openzaak.OpenZaakConfig' as openzaak_config %}
+    
     {% if case %}
         {% render_grid %}
             {% render_column span=9 %}
@@ -27,6 +29,17 @@
                 {% if case.documents %}
                     <h2 class="h2" id="documents">{% trans 'Documenten' %}</h2>
                     {% case_document_list case.documents %}
+                {% endif %}
+                
+                {# Upload documents. #}
+                {% if form.type.field.choices %}
+                    <h2 class="h2" id=>{% trans "Document toevoegen" %}</h2>
+                    <p class="p">
+                        {% blocktranslate with max_filesize=openzaak_config.max_upload_size allowed_extensions=openzaak_config.allowed_file_extensions|join:', ' %}
+                            Grootte max. {{ max_filesize }} MB, toegestane bestandsformaten {{ allowed_extensions }}. 
+                        {% endblocktranslate %}
+                    </p>
+                        {% form id="document-upload" form_object=form method="POST" submit_text=_("Bestand uploaden") enctype="multipart/form-data" %}
                 {% endif %}
 
             {% endrender_column %}

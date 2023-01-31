@@ -6,10 +6,14 @@ from django.conf import settings
 from requests import RequestException
 from zds_client import ClientError, get_operation_url
 from zgw_consumers.api_models.base import factory
-from zgw_consumers.api_models.catalogi import Catalogus, ResultaatType
+from zgw_consumers.api_models.catalogi import (
+    Catalogus,
+    InformatieObjectType,
+    ResultaatType,
+)
 from zgw_consumers.service import get_paginated_results
 
-from .api_models import StatusType, ZaakType
+from .api_models import StatusType, ZaakType, ZaakTypeInformatieObjectType
 from .clients import build_client
 from .utils import cache as cache_result, get_retrieve_resource_by_uuid_url
 
@@ -222,3 +226,63 @@ def fetch_catalogs_no_cache() -> List[Catalogus]:
     catalogs = factory(Catalogus, response)
 
     return catalogs
+
+
+@cache_result(
+    "case_type_information_object_types:{case_type_url}",
+    timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT,
+)
+def fetch_case_type_information_object_types(
+    case_type_url: str,
+) -> List[ZaakTypeInformatieObjectType]:
+    client = build_client("catalogi")
+
+    if client is None:
+        return []
+
+    try:
+        response = get_paginated_results(
+            client,
+            "zaakinformatieobjecttype",
+            request_kwargs={
+                "params": {"zaaktype": case_type_url, "richting": "inkomend"}
+            },
+        )
+    except RequestException as e:
+        logger.exception("exception while making request", exc_info=e)
+        return []
+    except ClientError as e:
+        logger.exception("exception while making request", exc_info=e)
+        return []
+
+    case_type_information_object_types = factory(ZaakTypeInformatieObjectType, response)
+
+    return case_type_information_object_types
+
+
+@cache_result(
+    "information_object_type:{information_object_type_url}",
+    timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT,
+)
+def fetch_single_information_object_type(
+    information_object_type_url: str,
+) -> Optional[InformatieObjectType]:
+    client = build_client("catalogi")
+
+    if client is None:
+        return
+
+    try:
+        response = client.retrieve(
+            "informatieobjecttype", url=information_object_type_url
+        )
+    except RequestException as e:
+        logger.exception("exception while making request", exc_info=e)
+        return
+    except ClientError as e:
+        logger.exception("exception while making request", exc_info=e)
+        return
+
+    information_object_type = factory(InformatieObjectType, response)
+
+    return information_object_type

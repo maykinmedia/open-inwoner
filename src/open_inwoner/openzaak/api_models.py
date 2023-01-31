@@ -58,7 +58,7 @@ class ZaakType(ZGWModel):
     # producten_of_diensten: list
     statustypen: list = None
     resultaattypen: list = None
-    # informatieobjecttypen: list
+    informatieobjecttypen: list = field(default_factory=list)
     # roltypen: list
     # besluittypen: list
 
@@ -108,6 +108,16 @@ class InformatieObject(ZGWModel):
     verzenddatum: Optional[str] = ""
     ondertekening: Optional[dict] = None  # {'soort': '', 'datum': None}
     integriteit: Optional[dict] = None  # {'algoritme': '', 'waarde': '', 'datum': None}
+
+
+@dataclass
+class ZaakTypeInformatieObjectType(ZGWModel):
+    url: str
+    zaaktype: str
+    informatieobjecttype: str
+    volgnummer: int
+    richting: str
+    statustype: Optional[str]
 
 
 @dataclass
