@@ -1,3 +1,4 @@
+from datetime import date
 from urllib.parse import urlencode
 
 from django.contrib.sites.models import Site
@@ -14,7 +15,7 @@ from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 
 from ..choices import LoginTypeChoices
 from ..models import User
-from .factories import InviteFactory, UserFactory
+from .factories import DigidUserFactory, InviteFactory, UserFactory
 
 
 class TestRegistrationFunctionality(WebTest):
@@ -241,7 +242,7 @@ class TestRegistrationFunctionality(WebTest):
         )
 
 
-class TestRegistrationDigid(HaalCentraalMixin, WebTest):
+class TestDigid(HaalCentraalMixin, WebTest):
     csrf_checks = False
     url = reverse_lazy("django_registration_register")
 
@@ -458,6 +459,149 @@ class TestRegistrationDigid(HaalCentraalMixin, WebTest):
         self.assertEqual(user.first_name, "Merel")
         self.assertEqual(user.last_name, "")
         self.assertEqual(user.email, "updated@example.org")
+
+    @requests_mock.Mocker()
+    def test_first_digid_login_updates_brp_fields(self, m):
+        self._setUpService()
+        self._setUpMocks_v_2(m)
+
+        url = reverse("digid-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": reverse("root"),
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": "123456782",
+            "auth_pass": "bar",
+        }
+        # post our password to the IDP
+        response = self.app.post(url, data).follow()
+
+        user = User.objects.get(id=self.app.session["_auth_user_id"])
+
+        self.assertEqual(user.first_name, "Merel")
+        self.assertEqual(user.last_name, "Kooyman")
+        self.assertEqual(user.birthday, date(1982, 4, 10))
+        self.assertEqual(user.street, "King Olivereiland")
+        self.assertEqual(user.housenumber, "64")
+        self.assertEqual(user.city, "'s-Gravenhage")
+        self.assertTrue(user.is_prepopulated)
+
+    @requests_mock.Mocker()
+    def test_existing_user_digid_login_updates_brp_fields(self, m):
+        self._setUpService()
+
+        user = DigidUserFactory()
+        m.get(
+            "https://personen/api/schema/openapi.yaml?v=3",
+            status_code=200,
+            content=self.load_binary_mock("personen_2.0.yaml"),
+        )
+        m.post(
+            "https://personen/api/brp/personen",
+            status_code=200,
+            json={
+                "personen": [
+                    {
+                        "naam": {
+                            "voornamen": "UpdatedName",
+                        },
+                    }
+                ],
+                "type": "RaadpleegMetBurgerservicenummer",
+            },
+        )
+        url = reverse("digid-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": reverse("root"),
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": user.bsn,
+            "auth_pass": "bar",
+        }
+        # post our password to the IDP
+        response = self.app.post(url, data).follow()
+
+        user.refresh_from_db()
+
+        self.assertEqual(user.first_name, "UpdatedName")
+
+    @requests_mock.Mocker()
+    def test_existing_user_digid_login_fails_brp_update_when_no_brp_service(self, m):
+        user = DigidUserFactory()
+        m.get(
+            "https://personen/api/schema/openapi.yaml?v=3",
+            status_code=200,
+            content=self.load_binary_mock("personen_2.0.yaml"),
+        )
+        m.post(
+            "https://personen/api/brp/personen",
+            status_code=200,
+            json={
+                "personen": [
+                    {
+                        "naam": {
+                            "voornamen": "UpdatedName",
+                        },
+                    }
+                ],
+                "type": "RaadpleegMetBurgerservicenummer",
+            },
+        )
+        url = reverse("digid-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": reverse("root"),
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": user.bsn,
+            "auth_pass": "bar",
+        }
+        # post our password to the IDP
+        response = self.app.post(url, data).follow()
+
+        user.refresh_from_db()
+
+        self.assertNotEqual(user.first_name, "UpdatedName")
+
+    @requests_mock.Mocker()
+    def test_existing_user_digid_login_fails_brp_update_when_brp_http_404(self, m):
+        self._setUpService()
+
+        user = DigidUserFactory()
+        m.get(
+            "https://personen/api/schema/openapi.yaml?v=3",
+            status_code=200,
+            content=self.load_binary_mock("personen_2.0.yaml"),
+        )
+        m.post(
+            "https://personen/api/brp/personen",
+            status_code=404,
+        )
+        url = reverse("digid-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": reverse("root"),
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": user.bsn,
+            "auth_pass": "bar",
+        }
+        # post our password to the IDP
+        response = self.app.post(url, data).follow()
+
+        user.refresh_from_db()
+
+        self.assertNotEqual(user.first_name, "UpdatedName")
 
 
 class TestRegistrationNecessary(WebTest):
