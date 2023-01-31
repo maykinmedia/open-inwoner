@@ -1,4 +1,5 @@
 from django.contrib import admin, messages
+from django.db.models import Count
 from django.utils.translation import gettext_lazy as _, ngettext
 
 from solo.admin import SingletonModelAdmin
@@ -8,6 +9,7 @@ from .models import (
     OpenZaakConfig,
     UserCaseStatusNotification,
     ZaakTypeConfig,
+    ZaakTypeInformatieObjectTypeConfig,
 )
 
 
@@ -57,8 +59,33 @@ class CatalogUsedListFilter(admin.SimpleListFilter):
         return queryset
 
 
+class ZaakTypeInformatieObjectTypeConfigInline(admin.TabularInline):
+    model = ZaakTypeInformatieObjectTypeConfig
+    fields = [
+        "omschrijving",
+        "document_upload_enabled",
+        "informatieobjecttype_url",
+        "zaaktype_uuids",
+    ]
+    readonly_fields = [
+        "omschrijving",
+        "informatieobjecttype_url",
+        "zaaktype_uuids",
+    ]
+    ordering = ("omschrijving",)
+
+    def has_add_permission(self, request, obj):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+
 @admin.register(ZaakTypeConfig)
 class ZaakTypeConfigAdmin(admin.ModelAdmin):
+    inlines = [
+        ZaakTypeInformatieObjectTypeConfigInline,
+    ]
     actions = [
         "mark_as_notify_status_changes",
         "mark_as_not_notify_status_changes",
@@ -68,17 +95,26 @@ class ZaakTypeConfigAdmin(admin.ModelAdmin):
         "identificatie",
         "omschrijving",
         "notify_status_changes",
+        "document_upload_enabled",
+        "external_document_upload_url",
     ]
     readonly_fields = [
         "catalogus",
         "identificatie",
         "omschrijving",
+        "num_infotypes",
     ]
     list_display = [
         "identificatie",
         "omschrijving",
         "catalogus",
         "notify_status_changes",
+        "document_upload_enabled",
+        "num_infotypes",
+    ]
+    list_display_links = [
+        "identificatie",
+        "omschrijving",
     ]
     list_filter = [
         "notify_status_changes",
@@ -97,6 +133,17 @@ class ZaakTypeConfigAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return request.user.is_superuser
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        qs = qs.annotate(num_infotypes=Count("zaaktypeinformatieobjecttypeconfig"))
+        return qs
+
+    def num_infotypes(self, obj=None):
+        if not obj or not obj.pk:
+            return "-"
+        else:
+            return getattr(obj, "num_infotypes", 0)
 
     @admin.action(description="Set selected Zaaktypes to notify on status changes")
     def mark_as_notify_status_changes(self, request, qs):

@@ -4,7 +4,7 @@ from typing import List, Optional
 from django.conf import settings
 
 from requests import RequestException
-from zds_client import ClientError, get_operation_url
+from zds_client import ClientError
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.catalogi import (
     Catalogus,
@@ -122,21 +122,29 @@ def fetch_zaaktypes_no_cache() -> List[ZaakType]:
     return zaak_types
 
 
-@cache_result("case_types:{catalog_url}", timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT)
-def fetch_catalog_zaaktypes(catalog_url: str) -> List[ZaakType]:
-    """
-    list case types from catalog
-    """
+@cache_result(
+    "case_types_by_identification:{case_type_identification}",
+    timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT,
+)
+def fetch_case_types_by_identification(
+    case_type_identification: str, catalog_url: Optional[str] = None
+) -> List[ZaakType]:
     client = build_client("catalogi")
 
     if client is None:
         return []
 
     try:
+        params = {
+            "identificatie": case_type_identification,
+        }
+        if catalog_url:
+            params["catalogus"] = catalog_url
+
         response = get_paginated_results(
             client,
             "zaaktype",
-            request_kwargs={"params": {"catalogus": catalog_url}},
+            request_kwargs={"params": params},
         )
     except RequestException as e:
         logger.exception("exception while making request", exc_info=e)
@@ -148,23 +156,6 @@ def fetch_catalog_zaaktypes(catalog_url: str) -> List[ZaakType]:
     zaak_types = factory(ZaakType, response)
 
     return zaak_types
-
-
-# implicitly uses cached data
-def fetch_catalog_case_type_by_identification(
-    catalog_url: str, case_type_identification: str
-) -> List[ZaakType]:
-    """
-    list case types from a catalogue for a given 'identificatie' field
-    """
-    # re-use cached list
-    zaak_types = fetch_catalog_zaaktypes(catalog_url)
-
-    ret = list()
-    for zt in zaak_types:
-        if zt.identificatie == case_type_identification:
-            ret.append(zt)
-    return ret
 
 
 def fetch_single_case_type_uuid(uuid: str) -> Optional[ZaakType]:

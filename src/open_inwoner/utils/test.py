@@ -23,6 +23,10 @@ def paginated_response(results: List[dict]) -> Dict[str, Any]:
 
 
 class ClearCachesMixin:
+    def clear_caches(self):
+        for cache in caches.all():
+            cache.clear()
+
     def setUp(self):
         super().setUp()
 

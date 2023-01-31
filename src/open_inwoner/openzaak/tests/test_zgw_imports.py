@@ -1,6 +1,3 @@
-from io import StringIO
-
-from django.core.management import call_command
 from django.test import TestCase
 
 import requests_mock
@@ -57,62 +54,84 @@ class CatalogMockData:
 
 class ZaakTypeMockData:
     def __init__(self):
+
+        self.zaaktype_aaa_1 = generate_oas_component(
+            "ztc",
+            "schemas/ZaakType",
+            uuid="aaaaaaaa-aaaa-aaaa-aaaa-111111111111",
+            url=f"{CATALOGI_ROOT}zaaktype/aaaaaaaa-aaaa-aaaa-aaaa-111111111111",
+            catalogus=f"{CATALOGI_ROOT}catalogussen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            identificatie="AAA",
+            omschrijving="zaaktype-aaa",
+            indicatieInternOfExtern="extern",
+        )
+        self.zaaktype_bbb = generate_oas_component(
+            "ztc",
+            "schemas/ZaakType",
+            uuid="aaaaaaaa-aaaa-aaaa-aaaa-222222222222",
+            url=f"{CATALOGI_ROOT}zaaktype/aaaaaaaa-aaaa-aaaa-aaaa-222222222222",
+            # different catalogus
+            catalogus=f"{CATALOGI_ROOT}catalogussen/bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+            identificatie="BBB",
+            omschrijving="zaaktype-bbb",
+            indicatieInternOfExtern="extern",
+        )
+        self.zaaktype_aaa_2 = generate_oas_component(
+            "ztc",
+            "schemas/ZaakType",
+            uuid="aaaaaaaa-aaaa-aaaa-aaaa-333333333333",
+            url=f"{CATALOGI_ROOT}zaaktype/aaaaaaaa-aaaa-aaaa-aaaa-333333333333",
+            catalogus=f"{CATALOGI_ROOT}catalogussen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            # re-use identificatie from above
+            identificatie="AAA",
+            omschrijving="zaaktype-aaa",
+            indicatieInternOfExtern="extern",
+        )
+        self.zaaktype_intern = generate_oas_component(
+            "ztc",
+            "schemas/ZaakType",
+            uuid="aaaaaaaa-aaaa-aaaa-aaaa-444444444444",
+            url=f"{CATALOGI_ROOT}zaaktype/aaaaaaaa-aaaa-aaaa-aaaa-444444444444",
+            catalogus=f"{CATALOGI_ROOT}catalogussen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            identificatie="CCC",
+            omschrijving="zaaktype-ccc",
+            # internal case
+            indicatieInternOfExtern="intern",
+        )
         self.zaak_types = [
-            generate_oas_component(
-                "ztc",
-                "schemas/ZaakType",
-                url=f"{CATALOGI_ROOT}zaaktype/aaaaaaaa-aaaa-aaaa-aaaa-111111111111",
-                catalogus=f"{CATALOGI_ROOT}catalogussen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
-                identificatie="AAA",
-                omschrijving="zaaktype-aaa",
-                indicatieInternOfExtern="extern",
-            ),
-            generate_oas_component(
-                "ztc",
-                "schemas/ZaakType",
-                url=f"{CATALOGI_ROOT}zaaktype/aaaaaaaa-aaaa-aaaa-aaaa-222222222222",
-                # different catalogus
-                catalogus=f"{CATALOGI_ROOT}catalogussen/bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
-                identificatie="BBB",
-                omschrijving="zaaktype-bbb",
-                indicatieInternOfExtern="extern",
-            ),
-            generate_oas_component(
-                "ztc",
-                "schemas/ZaakType",
-                url=f"{CATALOGI_ROOT}zaaktype/aaaaaaaa-aaaa-aaaa-aaaa-333333333333",
-                catalogus=f"{CATALOGI_ROOT}catalogussen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
-                # re-use identificatie from above
-                identificatie="AAA",
-                omschrijving="zaaktype-aaa",
-                indicatieInternOfExtern="extern",
-            ),
-            generate_oas_component(
-                "ztc",
-                "schemas/ZaakType",
-                url=f"{CATALOGI_ROOT}zaaktype/aaaaaaaa-aaaa-aaaa-aaaa-444444444444",
-                catalogus=f"{CATALOGI_ROOT}catalogussen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
-                identificatie="CCC",
-                omschrijving="zaaktype-ccc",
-                # internal case
-                indicatieInternOfExtern="intern",
-            ),
+            self.zaaktype_aaa_1,
+            self.zaaktype_bbb,
+            self.zaaktype_aaa_2,
+            self.zaaktype_intern,
         ]
         self.extra_zaaktype = generate_oas_component(
             "ztc",
             "schemas/ZaakType",
+            uuid="aaaaaaaa-aaaa-aaaa-aaaa-555555555555",
             url=f"{CATALOGI_ROOT}zaaktype/aaaaaaaa-aaaa-aaaa-aaaa-555555555555",
             catalogus=f"{CATALOGI_ROOT}catalogussen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             identificatie="DDD",
             omschrijving="zaaktype-ddd",
             indicatieInternOfExtern="extern",
         )
+        self.all_zaak_types = [
+            self.zaaktype_aaa_1,
+            self.zaaktype_bbb,
+            self.zaaktype_aaa_2,
+            self.zaaktype_intern,
+            self.extra_zaaktype,
+        ]
 
     def setUpOASMocks(self, m):
         mock_service_oas_get(m, CATALOGI_ROOT, "ztc")
 
-    def install_mocks(self, m) -> "ZaakTypeMockData":
+    def install_mocks(self, m, *, with_catalog=True) -> "ZaakTypeMockData":
         self.setUpOASMocks(m)
+
+        if not with_catalog:
+            for zt in self.all_zaak_types:
+                zt["catalogus"] = None
+
         m.get(
             f"{CATALOGI_ROOT}zaaktypen",
             json=paginated_response(self.zaak_types),
@@ -127,13 +146,11 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        # services
-        cls.catalogi_service = ServiceFactory(
+
+        cls.config = OpenZaakConfig.get_solo()
+        cls.config.catalogi_service = ServiceFactory(
             api_root=CATALOGI_ROOT, api_type=APITypes.ztc
         )
-        # openzaak config
-        cls.config = OpenZaakConfig.get_solo()
-        cls.config.catalogi_service = cls.catalogi_service
         cls.config.save()
 
     def test_import_catalogs(self, m):
@@ -224,10 +241,7 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
 
     def test_import_zaaktype_configs_without_catalogs(self, m):
         data = ZaakTypeMockData()
-        for zt in data.zaak_types:
-            zt["catalogus"] = None
-        data.extra_zaaktype["catalogus"] = None
-        data.install_mocks(m)
+        data.install_mocks(m, with_catalog=False)
 
         res = import_zaaktype_configs()
 
@@ -262,21 +276,3 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
         self.assertEqual(config.identificatie, data.extra_zaaktype["identificatie"])
         self.assertEqual(config.omschrijving, data.extra_zaaktype["omschrijving"])
         self.assertIsNone(config.catalogus)
-
-    def test_zgw_import_data_command(self, m):
-        CatalogMockData().install_mocks(m)
-        ZaakTypeMockData().install_mocks(m)
-
-        out = StringIO()
-        call_command("zgw_import_data", stdout=out)
-
-        self.assertEqual(CatalogusConfig.objects.count(), 2)
-        self.assertEqual(ZaakTypeConfig.objects.count(), 2)
-
-        stdout = out.getvalue()
-        self.assertIn("imported 2 new catalogi", stdout)
-        self.assertIn("aaaaa - 123456789", stdout)
-        self.assertIn("bbbbb - 123456789", stdout)
-        self.assertIn("imported 2 new zaaktypes", stdout)
-        self.assertIn("AAA - zaaktype-aaa", stdout)
-        self.assertIn("BBB - zaaktype-bbb", stdout)

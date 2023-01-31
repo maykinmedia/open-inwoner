@@ -8,7 +8,11 @@ from zgw_consumers.models import Service
 from zgw_consumers.test import generate_oas_component
 
 from open_inwoner.openzaak.api_models import Notification, Rol, ZaakType
-from open_inwoner.openzaak.models import CatalogusConfig, ZaakTypeConfig
+from open_inwoner.openzaak.models import (
+    CatalogusConfig,
+    ZaakTypeConfig,
+    ZaakTypeInformatieObjectTypeConfig,
+)
 
 
 class ServiceFactory(factory.django.DjangoModelFactory):
@@ -63,6 +67,15 @@ class ZaakTypeConfigFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = ZaakTypeConfig
+
+
+class ZaakTypeInformatieObjectTypeConfigFactory(factory.django.DjangoModelFactory):
+    zaaktype_config = factory.SubFactory(ZaakTypeConfigFactory)
+    informatieobjecttype_url = factory.Faker("url")
+    omschrijving = factory.Faker("pystr", max_chars=80)
+
+    class Meta:
+        model = ZaakTypeInformatieObjectTypeConfig
 
 
 class NotificationFactory(factory.Factory):
