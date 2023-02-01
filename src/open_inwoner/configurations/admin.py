@@ -136,7 +136,15 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
         ),
         (
             _("Analytics"),
-            {"fields": ("gtm_code", "ga_code", "matomo_url", "matomo_site_id")},
+            {
+                "fields": (
+                    "gtm_code",
+                    "ga_code",
+                    "matomo_url",
+                    "matomo_site_id",
+                    "siteimprove_id",
+                )
+            },
         ),
     )
     inlines = [SiteConfigurationPageInline]

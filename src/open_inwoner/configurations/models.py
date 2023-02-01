@@ -314,6 +314,8 @@ class SiteConfiguration(SingletonModel):
         default=True,
         help_text=_("Whether to send email about each new message the user receives"),
     )
+
+    # analytics
     gtm_code = models.CharField(
         verbose_name=_("Google Tag Manager code"),
         max_length=50,
@@ -342,6 +344,18 @@ class SiteConfiguration(SingletonModel):
         null=True,
         help_text=_("The 'idsite' of the website you're tracking in Matomo."),
     )
+    siteimprove_id = models.CharField(
+        _("SiteImprove ID"),
+        max_length=10,
+        default="",
+        blank=True,
+        help_text=_(
+            "SiteImprove ID - this can be found in the snippet example, "
+            "which should contain a URL like '//siteimproveanalytics.com/js/siteanalyze_xxxxx.js'. "
+            "The xxxxx part is the ID."
+        ),
+    )
+
     show_cases = models.BooleanField(
         verbose_name=_("Show cases"),
         default=False,
@@ -424,6 +438,10 @@ class SiteConfiguration(SingletonModel):
     @property
     def matomo_enabled(self):
         return self.matomo_url and self.matomo_site_id
+
+    @property
+    def siteimprove_enabled(self):
+        return True if self.siteimprove_id else False
 
     def get_help_text(self, request):
         current_path = request.get_full_path()
