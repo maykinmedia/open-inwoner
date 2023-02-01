@@ -141,7 +141,19 @@ class ZaakTypeConfig(models.Model):
     )
 
     # actual config
+
+    # notifications
     notify_status_changes = models.BooleanField(default=False)
+
+    # documents
+    external_document_upload_url = models.URLField(
+        verbose_name=_("Document upload URL"),
+        blank=True,
+    )
+    document_upload_enabled = models.BooleanField(
+        verbose_name=_("Enable document upload"),
+        default=False,
+    )
 
     class Meta:
         verbose_name = _("Zaaktype Configuration")
@@ -158,12 +170,60 @@ class ZaakTypeConfig(models.Model):
             ),
         ]
 
+    @property
+    def catalogus_url(self):
+        if self.catalogus_id:
+            return self.catalogus.url
+        else:
+            return None
+
     def __str__(self):
         bits = (
             self.identificatie,
             self.omschrijving,
         )
         return f" - ".join(b for b in bits if b)
+
+
+class ZaakTypeInformatieObjectTypeConfig(models.Model):
+    zaaktype_config = models.ForeignKey(
+        "openzaak.ZaakTypeConfig",
+        on_delete=models.CASCADE,
+    )
+    informatieobjecttype_url = models.URLField(
+        verbose_name=_("Information object URL"),
+        max_length=1000,
+    )
+    omschrijving = models.CharField(
+        verbose_name=_("Omschrijving"),
+        max_length=80,
+    )
+    zaaktype_uuids = ArrayField(
+        models.UUIDField(
+            verbose_name=_("Zaaktype UUID"),
+        ),
+        default=list,
+    )
+
+    # configuration
+
+    document_upload_enabled = models.BooleanField(
+        verbose_name=_("Enable document upload"),
+        default=False,
+    )
+
+    class Meta:
+        verbose_name = _("Zaaktype Information Object Configuration")
+
+        constraints = [
+            UniqueConstraint(
+                name="unique_zaaktype_config_informatieobjecttype_url",
+                fields=["zaaktype_config", "informatieobjecttype_url"],
+            )
+        ]
+
+    def __str__(self):
+        return self.omschrijving
 
 
 class UserCaseStatusNotification(models.Model):
