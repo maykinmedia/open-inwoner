@@ -19,6 +19,7 @@ from open_inwoner.accounts.views.cases import CaseListMixin
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 
 from ..models import OpenZaakConfig
+from ..utils import format_zaak_identificatie
 from .factories import ServiceFactory
 from .shared import CATALOGI_ROOT, ZAKEN_ROOT
 
@@ -357,6 +358,18 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
             },
         )
 
+    def test_list_open_cases_reformats_zaak_identificatie(self, m):
+        self._setUpMocks(m)
+
+        with patch(
+            "open_inwoner.accounts.views.cases.format_zaak_identificatie",
+            wraps=format_zaak_identificatie,
+        ) as spy_format:
+            self.app.get(self.url_open, user=self.user)
+
+        spy_format.assert_called()
+        self.assertEqual(spy_format.call_count, 2)
+
     def test_list_open_cases_logs_displayed_case_ids(self, m):
         self._setUpMocks(m)
 
@@ -425,6 +438,18 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
                 ],
             },
         )
+
+    def test_list_closed_cases_reformats_zaak_identificatie(self, m):
+        self._setUpMocks(m)
+
+        with patch(
+            "open_inwoner.accounts.views.cases.format_zaak_identificatie",
+            wraps=format_zaak_identificatie,
+        ) as spy_format:
+            self.app.get(self.url_closed, user=self.user)
+
+        spy_format.assert_called()
+        self.assertEqual(spy_format.call_count, 1)
 
     def test_list_closed_cases_logs_displayed_case_ids(self, m):
         self._setUpMocks(m)

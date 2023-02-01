@@ -1,4 +1,5 @@
 import datetime
+from unittest.mock import patch
 
 from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse
@@ -24,6 +25,7 @@ from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 
 from ..api_models import Status, StatusType
 from ..models import OpenZaakConfig
+from ..utils import format_zaak_identificatie
 from .factories import ServiceFactory
 from .shared import CATALOGI_ROOT, DOCUMENTEN_ROOT, ZAKEN_ROOT
 
@@ -354,6 +356,17 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         self.assertContains(response, "document")
         self.assertContains(response, "Foo Bar van der Bazz")
         self.assertContains(response, "resultaat toelichting")
+
+    def test_page_reformats_zaak_identificatie(self, m):
+        self._setUpMocks(m)
+
+        with patch(
+            "open_inwoner.accounts.views.cases.format_zaak_identificatie",
+            wraps=format_zaak_identificatie,
+        ) as spy_format:
+            self.app.get(self.case_detail_url, user=self.user)
+
+        spy_format.assert_called_once()
 
     def test_when_accessing_case_detail_a_timelinelog_is_created(self, m):
         self._setUpMocks(m)

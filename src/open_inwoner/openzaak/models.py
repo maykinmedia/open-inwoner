@@ -98,6 +98,14 @@ class OpenZaakConfig(SingletonModel):
         default=False,
     )
 
+    reformat_esuite_zaak_identificatie = models.BooleanField(
+        verbose_name=_("Reformat eSuite Zaak.identificatie"),
+        help_text=_(
+            "Enable to reformat user-facing Zaak.identificatie numbers from internal eSuite format (ex: '0014ESUITE66392022') to user friendly format ('6639-2022')."
+        ),
+        default=False,
+    )
+
     class Meta:
         verbose_name = _("Open Zaak configuration")
 

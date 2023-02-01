@@ -38,6 +38,7 @@ from ...utils.test import ClearCachesMixin, paginated_response
 from ...utils.tests.helpers import AssertTimelineLogMixin, Lookups
 from ..api_models import Status, StatusType, Zaak, ZaakType
 from ..models import OpenZaakConfig
+from ..utils import format_zaak_identificatie
 from .shared import CATALOGI_ROOT, DOCUMENTEN_ROOT, ZAKEN_ROOT
 
 
@@ -596,7 +597,11 @@ class NotificationHandlerEmailTestCase(TestCase):
         args = mock_send.call_args.args
         self.assertEqual(args[0], other_user)
 
-    def test_send_status_update_email(self):
+    @patch(
+        "open_inwoner.openzaak.notifications.format_zaak_identificatie",
+        wraps=format_zaak_identificatie,
+    )
+    def test_send_status_update_email(self, spy_format):
         config = SiteConfiguration.get_solo()
         data = MockAPIData()
 
@@ -611,6 +616,8 @@ class NotificationHandlerEmailTestCase(TestCase):
         case_url = reverse("accounts:case_status", kwargs={"object_id": str(case.uuid)})
 
         send_status_update_email(user, case, status)
+
+        spy_format.assert_called_once()
 
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
