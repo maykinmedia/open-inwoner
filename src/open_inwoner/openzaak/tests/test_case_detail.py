@@ -513,7 +513,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         )
         form = response.forms["document-upload"]
         type_field = form["type"]
-        expected_choices = [("0", True, zaak_type_iotc.omschrijving)]
+        expected_choices = [(str(zaak_type_iotc.id), True, zaak_type_iotc.omschrijving)]
 
         self.assertEqual(type_field.options, expected_choices)
 
@@ -553,7 +553,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         zaak_type_config = ZaakTypeConfigFactory(
             identificatie=self.zaaktype["identificatie"]
         )
-        ZaakTypeInformatieObjectTypeConfigFactory(
+        zaak_type_iotc = ZaakTypeInformatieObjectTypeConfigFactory(
             zaaktype_config=zaak_type_config,
             informatieobjecttype_url=self.informatie_object["url"],
             zaaktype_uuids=[self.zaaktype["uuid"]],
@@ -569,7 +569,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         )
         form = response.forms["document-upload"]
         form["title"] = "readme"
-        form["type"] = 0
+        form["type"] = zaak_type_iotc.id
         form["file"] = Upload("readme.xlsx", b"data", "application/vnd.ms-excel")
         form_response = form.submit()
 
@@ -592,7 +592,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         zaak_type_config = ZaakTypeConfigFactory(
             identificatie=self.zaaktype["identificatie"]
         )
-        ZaakTypeInformatieObjectTypeConfigFactory(
+        zaak_type_iotc = ZaakTypeInformatieObjectTypeConfigFactory(
             zaaktype_config=zaak_type_config,
             informatieobjecttype_url=self.informatie_object["url"],
             zaaktype_uuids=[self.zaaktype["uuid"]],
@@ -608,7 +608,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         )
         form = response.forms["document-upload"]
         form["title"] = "readme"
-        form["type"] = 0
+        form["type"] = zaak_type_iotc.id
         form["file"] = Upload("readme.xml", b"data", "application/vnd.ms-excel")
         form_response = form.submit()
 
@@ -627,7 +627,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         zaak_type_config = ZaakTypeConfigFactory(
             identificatie=self.zaaktype["identificatie"]
         )
-        ZaakTypeInformatieObjectTypeConfigFactory(
+        zaak_type_iotc = ZaakTypeInformatieObjectTypeConfigFactory(
             zaaktype_config=zaak_type_config,
             informatieobjecttype_url=self.informatie_object["url"],
             zaaktype_uuids=[self.zaaktype["uuid"]],
@@ -648,7 +648,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         form = response.forms["document-upload"]
 
         form["title"] = "readme"
-        form["type"] = 0
+        form["type"] = zaak_type_iotc.id
         form["file"] = Upload("readme.xlsx", b"data", "application/vnd.ms-excel")
         form_response = form.submit()
 

@@ -318,13 +318,9 @@ class CaseDetailView(
                 ),
                 "statuses": statuses,
                 "documents": documents,
-                "upload_enabled": (
-                    True
-                    if ZaakTypeInformatieObjectTypeConfig.objects.case_type_iotc_visible(
-                        self.case
-                    )
-                    else False
-                ),
+                "upload_enabled": ZaakTypeInformatieObjectTypeConfig.objects.get_visible_ztiot_configs_for_case(
+                    self.case
+                ).exists(),
             }
             context["anchors"] = self.get_anchors(statuses, documents)
         else:
@@ -385,29 +381,10 @@ class CaseDetailView(
             )
         return documents
 
-    def get_case_type_information_type_object_config_ids(self) -> List[str]:
-        if not self.case:
-            return []
-
-        case_type_iotc_visible = (
-            ZaakTypeInformatieObjectTypeConfig.objects.case_type_iotc_visible(self.case)
-        )
-        return [_type.id for _type in case_type_iotc_visible]
-
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
 
-        case_type_iotc_ids = self.get_case_type_information_type_object_config_ids()
-
-        document_choices = []
-        for index, id in enumerate(case_type_iotc_ids):
-            document_choices.append(
-                (
-                    index,
-                    ZaakTypeInformatieObjectTypeConfig.objects.get(id=id).omschrijving,
-                )
-            )
-        kwargs["document_choices"] = document_choices
+        kwargs["case"] = self.case
         return kwargs
 
     def get_success_url(self) -> str:

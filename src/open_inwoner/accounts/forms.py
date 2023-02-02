@@ -10,7 +10,10 @@ from django.utils.translation import ugettext_lazy as _
 
 from django_registration.forms import RegistrationForm
 
-from open_inwoner.openzaak.models import OpenZaakConfig
+from open_inwoner.openzaak.models import (
+    OpenZaakConfig,
+    ZaakTypeInformatieObjectTypeConfig,
+)
 from open_inwoner.pdc.models.category import Category
 from open_inwoner.utils.forms import LimitedUploadFileField, PrivateFileWidget
 from open_inwoner.utils.validators import validate_charfield_entry
@@ -409,17 +412,25 @@ class ActionListForm(forms.ModelForm):
 
 class CaseUploadForm(forms.Form):
     title = forms.CharField(max_length=255, validators=[validate_charfield_entry])
-    type = forms.ChoiceField(label=_("Type of document"), choices=())
+    type = forms.ModelChoiceField(
+        ZaakTypeInformatieObjectTypeConfig.objects.all(), empty_label=None
+    )
     file = forms.FileField()
 
-    def __init__(self, document_choices, **kwargs):
+    def __init__(self, case, **kwargs):
         super().__init__(**kwargs)
 
-        self.fields["type"].choices = document_choices
+        self.fields[
+            "type"
+        ].queryset = ZaakTypeInformatieObjectTypeConfig.objects.get_visible_ztiot_configs_for_case(
+            case
+        )
 
-        if len(document_choices) == 1:
+        choices = self.fields["type"].choices
+
+        if choices and len(choices) == 1:
             self.fields["type"].disabled = True
-            self.fields["type"].initial = document_choices[0][0]
+            self.fields["type"].initial = list(choices)[0][0].value
 
     def clean_file(self):
         file = self.cleaned_data["file"]

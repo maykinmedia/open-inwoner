@@ -10,7 +10,7 @@ from zgw_consumers.constants import APITypes
 
 from open_inwoner.openzaak.managers import (
     UserCaseStatusNotificationManager,
-    ZaakTypeIotcQueryset,
+    ZaakTypeInformatieObjectTypeConfigQueryset,
 )
 
 
@@ -215,7 +215,7 @@ class ZaakTypeInformatieObjectTypeConfig(models.Model):
         default=False,
     )
 
-    objects = ZaakTypeIotcQueryset.as_manager()
+    objects = ZaakTypeInformatieObjectTypeConfigQueryset.as_manager()
 
     class Meta:
         verbose_name = _("Zaaktype Information Object Configuration")
