@@ -16,10 +16,6 @@
             ],
             [
                 "accounts",
-                "contact"
-            ],
-            [
-                "accounts",
                 "document"
             ],
             [
@@ -196,7 +192,23 @@
             ],
             [
                 "openzaak",
+                "catalogusconfig"
+            ],
+            [
+                "openzaak",
                 "openzaakconfig"
+            ],
+            [
+                "openzaak",
+                "usercasestatusnotification"
+            ],
+            [
+                "openzaak",
+                "zaaktypeconfig"
+            ],
+            [
+                "openzaak",
+                "zaaktypeinformatieobjecttypeconfig"
             ],
             [
                 "sites",
