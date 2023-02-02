@@ -42,3 +42,11 @@ class UserCaseStatusNotificationManager(
                 return note
         except IntegrityError:
             return None
+
+
+class ZaakTypeIotcQueryset(models.QuerySet):
+    def case_type_iotc(self, case):
+        return self.filter(
+            zaaktype_uuids__contains=[case.zaaktype.uuid],
+            zaaktype_config__identificatie=case.zaaktype.identificatie,
+        )

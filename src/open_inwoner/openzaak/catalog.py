@@ -13,7 +13,7 @@ from zgw_consumers.api_models.catalogi import (
 )
 from zgw_consumers.service import get_paginated_results
 
-from .api_models import StatusType, ZaakType, ZaakTypeInformatieObjectType
+from .api_models import StatusType, ZaakType
 from .clients import build_client
 from .utils import cache as cache_result, get_retrieve_resource_by_uuid_url
 
@@ -217,38 +217,6 @@ def fetch_catalogs_no_cache() -> List[Catalogus]:
     catalogs = factory(Catalogus, response)
 
     return catalogs
-
-
-@cache_result(
-    "case_type_information_object_types:{case_type_url}",
-    timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT,
-)
-def fetch_case_type_information_object_types(
-    case_type_url: str,
-) -> List[ZaakTypeInformatieObjectType]:
-    client = build_client("catalogi")
-
-    if client is None:
-        return []
-
-    try:
-        response = get_paginated_results(
-            client,
-            "zaakinformatieobjecttype",
-            request_kwargs={
-                "params": {"zaaktype": case_type_url, "richting": "inkomend"}
-            },
-        )
-    except RequestException as e:
-        logger.exception("exception while making request", exc_info=e)
-        return []
-    except ClientError as e:
-        logger.exception("exception while making request", exc_info=e)
-        return []
-
-    case_type_information_object_types = factory(ZaakTypeInformatieObjectType, response)
-
-    return case_type_information_object_types
 
 
 @cache_result(

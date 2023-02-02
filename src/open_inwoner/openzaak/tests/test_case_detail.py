@@ -20,6 +20,10 @@ from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.accounts.views.cases import SimpleFile
+from open_inwoner.openzaak.tests.factories import (
+    ZaakTypeConfigFactory,
+    ZaakTypeInformatieObjectTypeConfigFactory,
+)
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 
 from ..api_models import Status, StatusType
@@ -69,7 +73,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
             "schemas/Zaak",
             uuid="d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
             url=f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
-            zaaktype=f"{CATALOGI_ROOT}zaaktypen/53340e34-7581-4b04-884f",
+            zaaktype=f"{CATALOGI_ROOT}zaaktypen/0caa29cb-0167-426f-8dc1-88bebd7c8804",
             identificatie="ZAAK-2022-0000000024",
             omschrijving="Zaak naar aanleiding van ingezonden formulier",
             startdatum="2022-01-02",
@@ -94,7 +98,9 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         cls.zaaktype = generate_oas_component(
             "ztc",
             "schemas/ZaakType",
+            uuid="0caa29cb-0167-426f-8dc1-88bebd7c8804",
             url=cls.zaak["zaaktype"],
+            identificatie="ZAAKTYPE-2020-0000000001",
             omschrijving="Coffee zaaktype",
             catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
@@ -339,6 +345,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
                 "documents": [self.informatie_object_file],
                 "initiator": "Foo Bar van der Bazz",
                 "result": "resultaat toelichting",
+                "upload_enabled": False,
             },
         )
 
@@ -487,6 +494,15 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
     def test_expected_information_object_types_are_available_in_upload_form(self, m):
         self._setUpMocks(m)
 
+        zaak_type_config = ZaakTypeConfigFactory(
+            identificatie=self.zaaktype["identificatie"]
+        )
+        zaak_type_iotc = ZaakTypeInformatieObjectTypeConfigFactory(
+            zaaktype_config=zaak_type_config,
+            informatieobjecttype_url=self.informatie_object["url"],
+            zaaktype_uuids=[self.zaaktype["uuid"]],
+        )
+
         response = self.app.get(
             reverse(
                 "accounts:case_status",
@@ -496,7 +512,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         )
         form = response.forms["document-upload"]
         type_field = form["type"]
-        expected_choices = [("0", False, "Some content")]
+        expected_choices = [("0", True, zaak_type_iotc.omschrijving)]
 
         self.assertEqual(type_field.options, expected_choices)
 
@@ -520,10 +536,6 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
     ):
         self._setUpMocks(m)
 
-        m.get(
-            f"{CATALOGI_ROOT}zaaktype-informatieobjecttypen?zaaktype={self.zaaktype['url']}&richting=inkomend",
-            json=paginated_response([]),
-        )
         response = self.app.get(
             reverse(
                 "accounts:case_status",
@@ -536,6 +548,15 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
 
     def test_upload_file_flow_succeeds(self, m):
         self._setUpMocks(m)
+
+        zaak_type_config = ZaakTypeConfigFactory(
+            identificatie=self.zaaktype["identificatie"]
+        )
+        ZaakTypeInformatieObjectTypeConfigFactory(
+            zaaktype_config=zaak_type_config,
+            informatieobjecttype_url=self.informatie_object["url"],
+            zaaktype_uuids=[self.zaaktype["uuid"]],
+        )
 
         response = self.app.get(
             reverse(
@@ -566,6 +587,15 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
     def test_upload_file_flow_fails_with_invalid_extension(self, m):
         self._setUpMocks(m)
 
+        zaak_type_config = ZaakTypeConfigFactory(
+            identificatie=self.zaaktype["identificatie"]
+        )
+        ZaakTypeInformatieObjectTypeConfigFactory(
+            zaaktype_config=zaak_type_config,
+            informatieobjecttype_url=self.informatie_object["url"],
+            zaaktype_uuids=[self.zaaktype["uuid"]],
+        )
+
         response = self.app.get(
             reverse(
                 "accounts:case_status",
@@ -590,6 +620,15 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
 
     def test_upload_larger_file_fails(self, m):
         self._setUpMocks(m)
+
+        zaak_type_config = ZaakTypeConfigFactory(
+            identificatie=self.zaaktype["identificatie"]
+        )
+        ZaakTypeInformatieObjectTypeConfigFactory(
+            zaaktype_config=zaak_type_config,
+            informatieobjecttype_url=self.informatie_object["url"],
+            zaaktype_uuids=[self.zaaktype["uuid"]],
+        )
 
         # mock max file size to 10 bytes
         self.config.max_upload_size = 10 / (1024**2)

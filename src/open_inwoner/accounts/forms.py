@@ -417,6 +417,10 @@ class CaseUploadForm(forms.Form):
 
         self.fields["type"].choices = document_choices
 
+        if len(document_choices) == 1:
+            self.fields["type"].disabled = True
+            self.fields["type"].initial = document_choices[0][0]
+
     def clean_file(self):
         file = self.cleaned_data["file"]
 
