@@ -111,16 +111,6 @@ class InformatieObject(ZGWModel):
 
 
 @dataclass
-class ZaakTypeInformatieObjectType(ZGWModel):
-    url: str
-    zaaktype: str
-    informatieobjecttype: str
-    volgnummer: int
-    richting: str
-    statustype: Optional[str]
-
-
-@dataclass
 class Rol(ZGWModel):
     url: str
     zaak: str

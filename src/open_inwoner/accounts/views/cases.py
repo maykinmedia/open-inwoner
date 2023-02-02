@@ -27,18 +27,16 @@ from open_inwoner.openzaak.cases import (
     fetch_specific_status,
     fetch_status_history,
 )
-from open_inwoner.openzaak.catalog import (
-    fetch_case_type_information_object_types,
-    fetch_single_case_type,
-    fetch_single_information_object_type,
-    fetch_status_types,
-)
+from open_inwoner.openzaak.catalog import fetch_single_case_type, fetch_status_types
 from open_inwoner.openzaak.documents import (
     download_document,
     fetch_single_information_object_url,
     fetch_single_information_object_uuid,
 )
-from open_inwoner.openzaak.models import OpenZaakConfig
+from open_inwoner.openzaak.models import (
+    OpenZaakConfig,
+    ZaakTypeInformatieObjectTypeConfig,
+)
 from open_inwoner.openzaak.utils import (
     get_role_name_display,
     is_info_object_visible,
@@ -320,6 +318,9 @@ class CaseDetailView(
                 ),
                 "statuses": statuses,
                 "documents": documents,
+                "upload_enabled": ZaakTypeInformatieObjectTypeConfig.objects.get_visible_ztiot_configs_for_case(
+                    self.case
+                ).exists(),
             }
             context["anchors"] = self.get_anchors(statuses, documents)
         else:
@@ -380,31 +381,10 @@ class CaseDetailView(
             )
         return documents
 
-    def get_information_object_type_choices(self) -> List[str]:
-        if not self.case:
-            return []
-
-        case_type_information_object_types = fetch_case_type_information_object_types(
-            self.case.zaaktype.url
-        )
-
-        choices = []
-        for _type in case_type_information_object_types:
-            valid_option = fetch_single_information_object_type(
-                _type.informatieobjecttype
-            )
-            choices.append(valid_option.omschrijving)
-
-        return choices
-
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
 
-        document_choices = [
-            (id, value)
-            for id, value in enumerate(self.get_information_object_type_choices())
-        ]
-        kwargs["document_choices"] = document_choices
+        kwargs["case"] = self.case
         return kwargs
 
     def get_success_url(self) -> str:

@@ -42,3 +42,19 @@ class UserCaseStatusNotificationManager(
                 return note
         except IntegrityError:
             return None
+
+
+class ZaakTypeInformatieObjectTypeConfigQueryset(models.QuerySet):
+    def get_visible_ztiot_configs_for_case(self, case):
+        """
+        Returns all ZaakTypeInformatieObjectTypeConfig instances which allow
+        documents upload and are based on a specific case and case type.
+        """
+        if not case:
+            return self.none()
+
+        return self.filter(
+            zaaktype_uuids__contains=[case.zaaktype.uuid],
+            zaaktype_config__identificatie=case.zaaktype.identificatie,
+            document_upload_enabled=True,
+        )

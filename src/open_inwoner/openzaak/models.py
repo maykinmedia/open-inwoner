@@ -8,7 +8,10 @@ from solo.models import SingletonModel
 from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 from zgw_consumers.constants import APITypes
 
-from open_inwoner.openzaak.managers import UserCaseStatusNotificationManager
+from open_inwoner.openzaak.managers import (
+    UserCaseStatusNotificationManager,
+    ZaakTypeInformatieObjectTypeConfigQueryset,
+)
 
 
 def generate_default_file_extensions():
@@ -211,6 +214,8 @@ class ZaakTypeInformatieObjectTypeConfig(models.Model):
         verbose_name=_("Enable document upload"),
         default=False,
     )
+
+    objects = ZaakTypeInformatieObjectTypeConfigQueryset.as_manager()
 
     class Meta:
         verbose_name = _("Zaaktype Information Object Configuration")

@@ -32,7 +32,7 @@
                 {% endif %}
                 
                 {# Upload documents. #}
-                {% if form.type.field.choices %}
+                {% if case.upload_enabled %}
                     <h2 class="h2" id=>{% trans "Document toevoegen" %}</h2>
                     <p class="p">
                         {% blocktranslate with max_filesize=openzaak_config.max_upload_size allowed_extensions=openzaak_config.allowed_file_extensions|join:', ' %}
