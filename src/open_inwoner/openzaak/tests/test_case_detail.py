@@ -501,6 +501,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
             zaaktype_config=zaak_type_config,
             informatieobjecttype_url=self.informatie_object["url"],
             zaaktype_uuids=[self.zaaktype["uuid"]],
+            document_upload_enabled=True,
         )
 
         response = self.app.get(
@@ -556,6 +557,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
             zaaktype_config=zaak_type_config,
             informatieobjecttype_url=self.informatie_object["url"],
             zaaktype_uuids=[self.zaaktype["uuid"]],
+            document_upload_enabled=True,
         )
 
         response = self.app.get(
@@ -594,6 +596,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
             zaaktype_config=zaak_type_config,
             informatieobjecttype_url=self.informatie_object["url"],
             zaaktype_uuids=[self.zaaktype["uuid"]],
+            document_upload_enabled=True,
         )
 
         response = self.app.get(
@@ -628,6 +631,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
             zaaktype_config=zaak_type_config,
             informatieobjecttype_url=self.informatie_object["url"],
             zaaktype_uuids=[self.zaaktype["uuid"]],
+            document_upload_enabled=True,
         )
 
         # mock max file size to 10 bytes

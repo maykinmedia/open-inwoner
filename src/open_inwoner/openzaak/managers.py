@@ -45,8 +45,9 @@ class UserCaseStatusNotificationManager(
 
 
 class ZaakTypeIotcQueryset(models.QuerySet):
-    def case_type_iotc(self, case):
+    def case_type_iotc_visible(self, case):
         return self.filter(
             zaaktype_uuids__contains=[case.zaaktype.uuid],
             zaaktype_config__identificatie=case.zaaktype.identificatie,
+            document_upload_enabled=True,
         )

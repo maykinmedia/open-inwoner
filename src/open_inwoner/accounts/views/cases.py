@@ -320,7 +320,7 @@ class CaseDetailView(
                 "documents": documents,
                 "upload_enabled": (
                     True
-                    if ZaakTypeInformatieObjectTypeConfig.objects.case_type_iotc(
+                    if ZaakTypeInformatieObjectTypeConfig.objects.case_type_iotc_visible(
                         self.case
                     )
                     else False
@@ -389,10 +389,10 @@ class CaseDetailView(
         if not self.case:
             return []
 
-        case_type_iotc = ZaakTypeInformatieObjectTypeConfig.objects.case_type_iotc(
-            self.case
+        case_type_iotc_visible = (
+            ZaakTypeInformatieObjectTypeConfig.objects.case_type_iotc_visible(self.case)
         )
-        return [_type.id for _type in case_type_iotc]
+        return [_type.id for _type in case_type_iotc_visible]
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
