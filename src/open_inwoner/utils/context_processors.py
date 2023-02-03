@@ -72,6 +72,8 @@ def settings(request):
         "matomo_url": config.matomo_url,
         "matomo_site_id": config.matomo_site_id,
         "matomo_enabled": config.matomo_enabled,
+        "siteimprove_id": config.siteimprove_id,
+        "siteimprove_enabled": config.siteimprove_enabled,
         "show_plans": config.show_plans,
         "show_actions": config.show_actions,
         "menu_categories": Category.get_root_nodes().published(),

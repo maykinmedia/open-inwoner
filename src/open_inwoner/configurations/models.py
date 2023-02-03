@@ -441,7 +441,7 @@ class SiteConfiguration(SingletonModel):
 
     @property
     def siteimprove_enabled(self):
-        return True if self.siteimprove_id else False
+        return bool(self.siteimprove_id)
 
     def get_help_text(self, request):
         current_path = request.get_full_path()
