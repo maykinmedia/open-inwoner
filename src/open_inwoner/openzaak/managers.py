@@ -58,3 +58,20 @@ class ZaakTypeInformatieObjectTypeConfigQueryset(models.QuerySet):
             zaaktype_config__identificatie=case.zaaktype.identificatie,
             document_upload_enabled=True,
         )
+
+
+class ZaakTypeConfigQueryset(models.QuerySet):
+    def get_visible_zt_configs_for_case_type_identification(
+        self, case_type_identification
+    ):
+        """
+        Returns all ZaakTypeConfig instances which allow external documents
+        upload, have a url set and are based on a specific case type identificatie.
+        """
+        if not case_type_identification:
+            return self.none()
+
+        return self.filter(
+            identificatie=case_type_identification,
+            document_upload_enabled=True,
+        ).exclude(external_document_upload_url="")

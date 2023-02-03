@@ -345,7 +345,9 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
                 "documents": [self.informatie_object_file],
                 "initiator": "Foo Bar van der Bazz",
                 "result": "resultaat toelichting",
-                "upload_enabled": False,
+                "internal_upload_enabled": False,
+                "external_upload_enabled": False,
+                "external_upload_url": "",
             },
         )
 
@@ -661,4 +663,90 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
                     f"Een aangeleverd bestand dient maximaal {self.config.max_upload_size} MB te zijn, uw bestand is te groot."
                 ]
             },
+        )
+
+    def test_external_upload_section_is_rendered(self, m):
+        self._setUpMocks(m)
+
+        zaak_type_config = ZaakTypeConfigFactory(
+            identificatie=self.zaaktype["identificatie"],
+            external_document_upload_url="https://test.example.com",
+            document_upload_enabled=True,
+        )
+
+        response = self.app.get(
+            reverse(
+                "accounts:case_status",
+                kwargs={"object_id": self.zaak["uuid"]},
+            ),
+            user=self.user,
+        )
+
+        self.assertContains(
+            response, _("You can click the link below in order to upload a document")
+        )
+        self.assertContains(response, zaak_type_config.external_document_upload_url)
+
+    def test_external_upload_section_is_not_rendered_when_upload_disabled(self, m):
+        self._setUpMocks(m)
+
+        zaak_type_config = ZaakTypeConfigFactory(
+            identificatie=self.zaaktype["identificatie"],
+            external_document_upload_url="https://test.example.com",
+        )
+
+        response = self.app.get(
+            reverse(
+                "accounts:case_status",
+                kwargs={"object_id": self.zaak["uuid"]},
+            ),
+            user=self.user,
+        )
+
+        self.assertNotContains(
+            response, _("You can click the link below in order to upload a document")
+        )
+        self.assertNotContains(response, zaak_type_config.external_document_upload_url)
+
+    def test_external_upload_section_is_not_rendered_when_no_url_specified(self, m):
+        self._setUpMocks(m)
+
+        ZaakTypeConfigFactory(
+            identificatie=self.zaaktype["identificatie"],
+            external_document_upload_url="",
+            document_upload_enabled=True,
+        )
+
+        response = self.app.get(
+            reverse(
+                "accounts:case_status",
+                kwargs={"object_id": self.zaak["uuid"]},
+            ),
+            user=self.user,
+        )
+
+        self.assertNotContains(
+            response, _("You can click the link below in order to upload a document")
+        )
+
+    def test_external_upload_section_is_not_rendered_when_upload_disabled_and_no_url_specified(
+        self, m
+    ):
+        self._setUpMocks(m)
+
+        ZaakTypeConfigFactory(
+            identificatie=self.zaaktype["identificatie"],
+            external_document_upload_url="",
+        )
+
+        response = self.app.get(
+            reverse(
+                "accounts:case_status",
+                kwargs={"object_id": self.zaak["uuid"]},
+            ),
+            user=self.user,
+        )
+
+        self.assertNotContains(
+            response, _("You can click the link below in order to upload a document")
         )

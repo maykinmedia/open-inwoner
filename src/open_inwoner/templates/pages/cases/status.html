@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n anchor_menu_tags card_tags dashboard_tags file_tags grid_tags status_tags table_tags solo_tags form_tags %}
+{% load i18n anchor_menu_tags card_tags dashboard_tags file_tags grid_tags status_tags table_tags solo_tags form_tags link_tags %}
 
 {% block sidebar_content %}
     {% if case %}
@@ -31,15 +31,22 @@
                     {% case_document_list case.documents %}
                 {% endif %}
                 
-                {# Upload documents. #}
-                {% if case.upload_enabled %}
-                    <h2 class="h2" id=>{% trans "Document toevoegen" %}</h2>
+                {# Internal upload. #}
+                {% if case.internal_upload_enabled %}
+                    <h2 class="h2" id="internal_upload">{% trans "Add a document (internal)" %}</h2>
                     <p class="p">
                         {% blocktranslate with max_filesize=openzaak_config.max_upload_size allowed_extensions=openzaak_config.allowed_file_extensions|join:', ' %}
                             Grootte max. {{ max_filesize }} MB, toegestane bestandsformaten {{ allowed_extensions }}. 
                         {% endblocktranslate %}
                     </p>
                         {% form id="document-upload" form_object=form method="POST" submit_text=_("Bestand uploaden") enctype="multipart/form-data" %}
+                {% endif %}
+
+                {# External Upload. #}
+                {% if case.external_upload_enabled %}
+                    <h2 class="h2" id="external_upload">{% trans "Add a document (external system)" %}</h2>
+                    <p class="p">{% trans "You can click the link below in order to upload a document. This is an external link and you will be redirected to a different system." %}</p>
+                    <p class="p">{% link href=case.external_upload_url text="Upload a document" primary=True %}</p>
                 {% endif %}
 
             {% endrender_column %}
