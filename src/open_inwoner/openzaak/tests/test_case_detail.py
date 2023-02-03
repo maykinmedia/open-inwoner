@@ -683,7 +683,8 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         )
 
         self.assertContains(
-            response, _("You can click the link below in order to upload a document")
+            response,
+            _("By clicking the button below you can upload a document."),
         )
         self.assertContains(response, zaak_type_config.external_document_upload_url)
 
@@ -704,7 +705,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         )
 
         self.assertNotContains(
-            response, _("You can click the link below in order to upload a document")
+            response, _("By clicking the button below you can upload a document.")
         )
         self.assertNotContains(response, zaak_type_config.external_document_upload_url)
 
@@ -726,7 +727,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         )
 
         self.assertNotContains(
-            response, _("You can click the link below in order to upload a document")
+            response, _("By clicking the button below you can upload a document.")
         )
 
     def test_external_upload_section_is_not_rendered_when_upload_disabled_and_no_url_specified(
@@ -748,5 +749,5 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         )
 
         self.assertNotContains(
-            response, _("You can click the link below in order to upload a document")
+            response, _("By clicking the button below you can upload a document.")
         )

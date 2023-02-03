@@ -1,5 +1,7 @@
 from django.contrib import admin, messages
+from django.core.exceptions import ValidationError
 from django.db.models import Count
+from django.forms.models import BaseInlineFormSet
 from django.utils.translation import gettext_lazy as _, ngettext
 
 from solo.admin import SingletonModelAdmin
@@ -59,7 +61,22 @@ class CatalogUsedListFilter(admin.SimpleListFilter):
         return queryset
 
 
+class ZaakTypeInformatieObjectTypeConfigFormset(BaseInlineFormSet):
+    def clean(self):
+        instance_doc_upload = self.instance.document_upload_enabled
+
+        for form in self.forms:
+            inline_doc_upload = form.cleaned_data["document_upload_enabled"]
+            if instance_doc_upload and inline_doc_upload:
+                raise ValidationError(
+                    _(
+                        "Enabling both zaaktype and zaaktypeinformatieobject upload is not allowed. Only one of them should be enabled."
+                    )
+                )
+
+
 class ZaakTypeInformatieObjectTypeConfigInline(admin.TabularInline):
+    formset = ZaakTypeInformatieObjectTypeConfigFormset
     model = ZaakTypeInformatieObjectTypeConfig
     fields = [
         "omschrijving",

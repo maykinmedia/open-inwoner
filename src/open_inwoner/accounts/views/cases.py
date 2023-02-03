@@ -342,9 +342,7 @@ class CaseDetailView(
                 "external_upload_enabled": external_upload_enabled,
                 "external_upload_url": external_upload_url,
             }
-            context["anchors"] = self.get_anchors(
-                statuses, documents, internal_upload_enabled, external_upload_enabled
-            )
+            context["anchors"] = self.get_anchors(statuses, documents)
         else:
             context["case"] = None
         return context
@@ -427,9 +425,7 @@ class CaseDetailView(
         else:
             return self.form_invalid(form)
 
-    def get_anchors(
-        self, statuses, documents, internal_upload_enabled, external_upload_enabled
-    ):
+    def get_anchors(self, statuses, documents):
         anchors = [["#title", _("Gegevens")]]
 
         if statuses:
@@ -437,12 +433,6 @@ class CaseDetailView(
 
         if documents:
             anchors.append(["#documents", _("Documenten")])
-
-        if internal_upload_enabled:
-            anchors.append(["#internal_upload", _("Add a document (internal)")])
-
-        if external_upload_enabled:
-            anchors.append(["#external_upload", _("Add a document (external system)")])
 
         return anchors
 
