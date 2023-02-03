@@ -280,3 +280,22 @@ def fetch_single_result(result_url: str) -> Optional[Resultaat]:
     result = factory(Resultaat, response)
 
     return result
+
+
+def connect_case_with_document(case_url: str, document_url: str) -> dict:
+    client = build_client("zaak")
+    if client is None:
+        return
+
+    try:
+        response = client.create(
+            "zaakinformatieobject", {"zaak": case_url, "informatieobject": document_url}
+        )
+    except RequestException as e:
+        logger.exception("exception while making request", exc_info=e)
+        return
+    except ClientError as e:
+        logger.exception("exception while making request", exc_info=e)
+        return
+
+    return response

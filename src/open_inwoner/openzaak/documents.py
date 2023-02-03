@@ -1,7 +1,10 @@
+import base64
 import logging
+from datetime import date
 from typing import Optional
 
 from django.conf import settings
+from django.core.files.uploadedfile import InMemoryUploadedFile
 
 import requests
 from requests import HTTPError, RequestException, Response
@@ -10,8 +13,12 @@ from zgw_consumers.api_models.base import factory
 
 from open_inwoner.openzaak.api_models import InformatieObject
 from open_inwoner.openzaak.clients import build_client
-from open_inwoner.openzaak.models import OpenZaakConfig
+from open_inwoner.openzaak.models import (
+    OpenZaakConfig,
+    ZaakTypeInformatieObjectTypeConfig,
+)
 
+from .api_models import Zaak
 from .utils import cache as cache_result
 
 logger = logging.getLogger(__name__)
@@ -87,3 +94,37 @@ def download_document(url: str) -> Optional[Response]:
         logger.exception("exception while making request", exc_info=e)
     else:
         return res
+
+
+def upload_document(
+    file: InMemoryUploadedFile, title: str, user_choice: int, source_organization: str
+) -> dict:
+
+    client = build_client("document")
+    if client is None:
+        return
+
+    document_body = {
+        "bronorganisatie": source_organization,
+        "creatiedatum": date.today().strftime("%Y-%m-%d"),
+        "titel": title,
+        "auteur": "Open Inwoner Platform",
+        "inhoud": base64.b64encode(file.read()).decode("utf-8"),
+        "bestandsomvang": file.size,
+        "bestandsnaam": file.name,
+        "taal": "nld",
+        "informatieobjecttype": ZaakTypeInformatieObjectTypeConfig.objects.get(
+            id=user_choice
+        ).informatieobjecttype_url,
+    }
+
+    try:
+        response = client.create("enkelvoudiginformatieobject", document_body)
+    except RequestException as e:
+        logger.exception("exception while making request", exc_info=e)
+        return
+    except ClientError as e:
+        logger.exception("exception while making request", exc_info=e)
+        return
+
+    return response

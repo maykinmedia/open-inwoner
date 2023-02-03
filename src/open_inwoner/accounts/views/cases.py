@@ -17,6 +17,7 @@ from zgw_consumers.api_models.constants import RolOmschrijving
 
 from open_inwoner.openzaak.api_models import Zaak
 from open_inwoner.openzaak.cases import (
+    connect_case_with_document,
     fetch_case_information_objects,
     fetch_case_information_objects_for_case_and_info,
     fetch_case_roles,
@@ -32,6 +33,7 @@ from open_inwoner.openzaak.documents import (
     download_document,
     fetch_single_information_object_url,
     fetch_single_information_object_uuid,
+    upload_document,
 )
 from open_inwoner.openzaak.models import (
     OpenZaakConfig,
@@ -387,21 +389,59 @@ class CaseDetailView(
         kwargs["case"] = self.case
         return kwargs
 
+    def handle_document_upload(self, request, form):
+        cleaned_data = form.cleaned_data
+
+        file = cleaned_data["file"]
+        title = cleaned_data["title"]
+        user_choice = cleaned_data["type"].id
+        source_organization = self.case.bronorganisatie
+
+        created_document = upload_document(
+            file, title, user_choice, source_organization
+        )
+
+        # we don't receive a status code like 201, so we try to validate upload
+        # by checking for the created url
+        if created_document and created_document.get("url"):
+            created_relationship = connect_case_with_document(
+                self.case.url, created_document["url"]
+            )
+
+            # successful upload and connection to zaak
+            if created_relationship and created_relationship.get("url"):
+                self.log_user_action(
+                    request.user,
+                    _("Document was uploaded for {case}: {filename}").format(
+                        case=self.case.identificatie,
+                        filename=file.name,
+                    ),
+                )
+
+                messages.add_message(
+                    request,
+                    messages.SUCCESS,
+                    _(f"{file.name} has been successfully uploaded"),
+                )
+                return HttpResponseRedirect(self.get_success_url())
+
+        # fail uploading the document or connecting it to the zaak
+        messages.add_message(
+            request,
+            messages.ERROR,
+            _(f"An error occured while uploading file {file.name}"),
+        )
+        return self.form_invalid(form)
+
     def get_success_url(self) -> str:
         return self.request.get_full_path()
 
     def post(self, request, *args, **kwargs):
         form_class = self.get_form_class()
         form = self.get_form(form_class)
-        file = request.FILES["file"]
 
         if form.is_valid():
-            messages.add_message(
-                self.request,
-                messages.SUCCESS,
-                _(f"{file.name} has been successfully uploaded."),
-            )
-            return HttpResponseRedirect(self.get_success_url())
+            return self.handle_document_upload(request, form)
         else:
             return self.form_invalid(form)
 
