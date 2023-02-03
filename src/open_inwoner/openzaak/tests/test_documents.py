@@ -416,7 +416,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
         title = "my_document"
 
         created_document = upload_document(
-            file, title, zaak_type_iotc.id, self.zaak["bronorganisatie"]
+            self.user, file, title, zaak_type_iotc.id, self.zaak["bronorganisatie"]
         )
 
         self.assertEqual(created_document, self.informatie_object)
@@ -438,7 +438,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
 
         m.post(f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten", status_code=404)
         created_document = upload_document(
-            file, title, zaak_type_iotc.id, self.zaak["bronorganisatie"]
+            self.user, file, title, zaak_type_iotc.id, self.zaak["bronorganisatie"]
         )
 
         self.assertIsNone(created_document)
@@ -460,7 +460,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
 
         m.post(f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten", status_code=500)
         created_document = upload_document(
-            file, title, zaak_type_iotc.id, self.zaak["bronorganisatie"]
+            self.user, file, title, zaak_type_iotc.id, self.zaak["bronorganisatie"]
         )
 
         self.assertIsNone(created_document)
@@ -484,7 +484,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
         title = "my_document"
 
         created_document = upload_document(
-            file, title, zaak_type_iotc.id, self.zaak["bronorganisatie"]
+            self.user, file, title, zaak_type_iotc.id, self.zaak["bronorganisatie"]
         )
 
         self.assertIsNone(created_document)

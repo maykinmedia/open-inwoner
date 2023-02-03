@@ -398,7 +398,7 @@ class CaseDetailView(
         source_organization = self.case.bronorganisatie
 
         created_document = upload_document(
-            file, title, user_choice, source_organization
+            request.user, file, title, user_choice, source_organization
         )
 
         # we don't receive a status code like 201, so we try to validate upload

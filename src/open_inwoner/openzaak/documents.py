@@ -5,6 +5,7 @@ from typing import Optional
 
 from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.utils.functional import SimpleLazyObject
 
 import requests
 from requests import HTTPError, RequestException, Response
@@ -97,7 +98,11 @@ def download_document(url: str) -> Optional[Response]:
 
 
 def upload_document(
-    file: InMemoryUploadedFile, title: str, user_choice: int, source_organization: str
+    user: SimpleLazyObject,
+    file: InMemoryUploadedFile,
+    title: str,
+    user_choice: int,
+    source_organization: str,
 ) -> dict:
 
     client = build_client("document")
@@ -108,7 +113,7 @@ def upload_document(
         "bronorganisatie": source_organization,
         "creatiedatum": date.today().strftime("%Y-%m-%d"),
         "titel": title,
-        "auteur": "Open Inwoner Platform",
+        "auteur": user.get_full_name(),
         "inhoud": base64.b64encode(file.read()).decode("utf-8"),
         "bestandsomvang": file.size,
         "bestandsnaam": file.name,
