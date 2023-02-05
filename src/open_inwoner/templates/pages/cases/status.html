@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n anchor_menu_tags card_tags dashboard_tags file_tags grid_tags status_tags table_tags solo_tags form_tags %}
+{% load i18n anchor_menu_tags card_tags dashboard_tags file_tags grid_tags status_tags table_tags solo_tags form_tags button_tags %}
 
 {% block sidebar_content %}
     {% if case %}
@@ -30,16 +30,20 @@
                     <h2 class="h2" id="documents">{% trans 'Documenten' %}</h2>
                     {% case_document_list case.documents %}
                 {% endif %}
-                
-                {# Upload documents. #}
-                {% if case.upload_enabled %}
+
+                {% if case.internal_upload_enabled %}
                     <h2 class="h2" id=>{% trans "Document toevoegen" %}</h2>
                     <p class="p">
                         {% blocktranslate with max_filesize=openzaak_config.max_upload_size allowed_extensions=openzaak_config.allowed_file_extensions|join:', ' %}
                             Grootte max. {{ max_filesize }} MB, toegestane bestandsformaten {{ allowed_extensions }}. 
                         {% endblocktranslate %}
                     </p>
-                        {% form id="document-upload" form_object=form method="POST" submit_text=_("Bestand uploaden") enctype="multipart/form-data" %}
+                    {% form id="document-upload" form_object=form method="POST" submit_text=_("Bestand uploaden") enctype="multipart/form-data" %}
+                {% elif case.external_upload_enabled %}
+                    <p class="p">{% trans "By clicking the button below you can upload a document. This is an external link and you will be redirected to a different system." %}</p>
+                    {% button_row %}
+                        {% button href=case.external_upload_url text=_("Document toevoegen") primary=True %}
+                    {% endbutton_row %}
                 {% endif %}
 
             {% endrender_column %}

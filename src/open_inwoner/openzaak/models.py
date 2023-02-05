@@ -10,6 +10,7 @@ from zgw_consumers.constants import APITypes
 
 from open_inwoner.openzaak.managers import (
     UserCaseStatusNotificationManager,
+    ZaakTypeConfigQueryset,
     ZaakTypeInformatieObjectTypeConfigQueryset,
 )
 
@@ -157,6 +158,8 @@ class ZaakTypeConfig(models.Model):
         verbose_name=_("Enable document upload"),
         default=False,
     )
+
+    objects = ZaakTypeConfigQueryset.as_manager()
 
     class Meta:
         verbose_name = _("Zaaktype Configuration")

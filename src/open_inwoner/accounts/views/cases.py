@@ -35,6 +35,7 @@ from open_inwoner.openzaak.documents import (
 )
 from open_inwoner.openzaak.models import (
     OpenZaakConfig,
+    ZaakTypeConfig,
     ZaakTypeInformatieObjectTypeConfig,
 )
 from open_inwoner.openzaak.utils import (
@@ -297,6 +298,25 @@ class CaseDetailView(
                 status_type = status_types_mapping[status.statustype]
                 status.statustype = status_type
 
+            # documents
+            internal_upload_enabled = ZaakTypeInformatieObjectTypeConfig.objects.get_visible_ztiot_configs_for_case(
+                self.case
+            ).exists()
+            external_upload_enabled = ZaakTypeConfig.objects.get_visible_zt_configs_for_case_type_identification(
+                self.case.zaaktype.identificatie
+            ).exists()
+
+            if external_upload_enabled:
+                external_upload_url = (
+                    ZaakTypeConfig.objects.get_visible_zt_configs_for_case_type_identification(
+                        self.case.zaaktype.identificatie
+                    )
+                    .get()
+                    .external_document_upload_url
+                )
+            else:
+                external_upload_url = ""
+
             context["case"] = {
                 "identification": self.case.identificatie,
                 "initiator": self.get_initiator_display(self.case),
@@ -318,9 +338,9 @@ class CaseDetailView(
                 ),
                 "statuses": statuses,
                 "documents": documents,
-                "upload_enabled": ZaakTypeInformatieObjectTypeConfig.objects.get_visible_ztiot_configs_for_case(
-                    self.case
-                ).exists(),
+                "internal_upload_enabled": internal_upload_enabled,
+                "external_upload_enabled": external_upload_enabled,
+                "external_upload_url": external_upload_url,
             }
             context["anchors"] = self.get_anchors(statuses, documents)
         else:
