@@ -9,7 +9,8 @@
   margin: 0;
 
   @include mobile-only {
-    word-break: break-all;
+    word-break: normal;
+    overflow-wrap: break-word;
   }
 }
 
