@@ -1,0 +1,9 @@
+{% load utils %}
+
+{% if siteimprove_enabled %}
+    <script
+        nonce="{{ request.csp_nonce }}"
+        type="text/javascript"
+        src="https://siteimproveanalytics.com/js/siteanalyze_{{ config.siteimprove_id|escapejs }}.js" async>
+    </script>
+{% endif %}
