@@ -1,5 +1,6 @@
 import inspect
 import logging
+import re
 from functools import wraps
 from typing import Callable, Optional, TypeVar, Union
 from uuid import UUID
@@ -201,3 +202,26 @@ def get_zaak_type_config(case_type: ZaakType) -> Optional[ZaakTypeConfig]:
             )
     except ZaakTypeConfig.DoesNotExist:
         return None
+
+
+def format_zaak_identificatie(
+    identificatie: str, config: Optional[OpenZaakConfig] = None
+):
+    config = config or OpenZaakConfig.get_solo()
+    if config.reformat_esuite_zaak_identificatie:
+        return reformat_esuite_zaak_identificatie(identificatie)
+    else:
+        return identificatie
+
+
+def reformat_esuite_zaak_identificatie(identificatie: str):
+    """
+    0014ESUITE66392022 -> 6639-2022
+    """
+    exp = r"^\d+ESUITE(?P<num>\d+?)(?P<year>\d{4})$"
+    m = re.match(exp, identificatie)
+    if not m:
+        return identificatie
+    num = m.group("num")
+    year = m.group("year")
+    return f"{num}-{year}"

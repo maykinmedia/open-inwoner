@@ -19,7 +19,11 @@ from open_inwoner.openzaak.catalog import (
     fetch_single_status_type,
 )
 from open_inwoner.openzaak.models import OpenZaakConfig, UserCaseStatusNotification
-from open_inwoner.openzaak.utils import get_zaak_type_config, is_zaak_visible
+from open_inwoner.openzaak.utils import (
+    format_zaak_identificatie,
+    get_zaak_type_config,
+    is_zaak_visible,
+)
 from open_inwoner.utils.logentry import system_action as log_system_action
 from open_inwoner.utils.url import build_absolute_url
 
@@ -194,7 +198,7 @@ def send_status_update_email(user: User, case: Zaak, status: Status):
 
     template = find_template("case_notification")
     context = {
-        "identification": case.identificatie,
+        "identification": format_zaak_identificatie(case.identificatie),
         "type_description": case.zaaktype.omschrijving,
         "start_date": case.startdatum,
         "case_link": case_detail_url,

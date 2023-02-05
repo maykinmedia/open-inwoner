@@ -41,6 +41,7 @@ from open_inwoner.openzaak.models import (
     ZaakTypeInformatieObjectTypeConfig,
 )
 from open_inwoner.openzaak.utils import (
+    format_zaak_identificatie,
     get_role_name_display,
     is_info_object_visible,
     is_zaak_visible,
@@ -155,11 +156,15 @@ class CaseListMixin(CaseLogMixin, PaginationMixin):
 
     def process_cases(self, cases: List[Zaak]) -> List[Zaak]:
         # Prepare data for frontend
+        config = OpenZaakConfig.get_solo()
+
         updated_cases = []
         for case in cases:
             updated_cases.append(
                 {
-                    "identificatie": str(case.identificatie),
+                    "identificatie": format_zaak_identificatie(
+                        case.identificatie, config
+                    ),
                     "uuid": str(case.uuid),
                     "start_date": case.startdatum,
                     "end_date": getattr(case, "einddatum", None),
@@ -284,6 +289,7 @@ class CaseDetailView(
 
         if self.case:
             self.log_case_access(self.case.identificatie)
+            config = OpenZaakConfig.get_solo()
 
             documents = self.get_case_document_files(self.case)
 
@@ -320,7 +326,9 @@ class CaseDetailView(
                 external_upload_url = ""
 
             context["case"] = {
-                "identification": self.case.identificatie,
+                "identification": format_zaak_identificatie(
+                    self.case.identificatie, config
+                ),
                 "initiator": self.get_initiator_display(self.case),
                 "result": self.get_result_display(self.case),
                 "start_date": self.case.startdatum,
