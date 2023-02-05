@@ -87,7 +87,8 @@ development machine.
    .. code-block:: bash
 
        $ npm install
-       $ npm ci --legacy-peer-deps
+       or as an alternative: npm ci --legacy-peer-deps
+       $ npm run build
 
 6. Create the statics and database:
 
@@ -144,7 +145,8 @@ When updating an existing installation:
        $ git pull
        $ pip install -r requirements/dev.txt
        $ npm install
-       $ npm ci --legacy-peer-deps
+       or as an alternative: npm ci --legacy-peer-deps
+       $ npm run build
 
 3. Update the statics and database:
 
