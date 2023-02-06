@@ -19,7 +19,6 @@ from open_inwoner.openzaak.models import (
     ZaakTypeInformatieObjectTypeConfig,
 )
 
-from .api_models import Zaak
 from .utils import cache as cache_result
 
 logger = logging.getLogger(__name__)
@@ -117,6 +116,7 @@ def upload_document(
         "inhoud": base64.b64encode(file.read()).decode("utf-8"),
         "bestandsomvang": file.size,
         "bestandsnaam": file.name,
+        "status": "definitief",
         "taal": "nld",
         "informatieobjecttype": ZaakTypeInformatieObjectTypeConfig.objects.get(
             id=user_choice

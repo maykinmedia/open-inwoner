@@ -30,6 +30,20 @@ from open_inwoner.utils.url import build_absolute_url
 logger = logging.getLogger(__name__)
 
 
+def wrap_join(iter, glue="") -> str:
+    parts = list(sorted(f"'{v}'" for v in iter))
+    if not parts:
+        return ""
+    elif len(parts) == 1:
+        return parts[0]
+    elif glue:
+        end = parts.pop()
+        lead = ", ".join(parts)
+        return f"{lead} {glue} {end}"
+    else:
+        return ", ".join(parts)
+
+
 def handle_zaken_notification(notification: Notification):
     if notification.kanaal != "zaken":
         raise Exception(
@@ -41,15 +55,14 @@ def handle_zaken_notification(notification: Notification):
 
     oz_config = OpenZaakConfig.get_solo()
 
-    # were only interested in status updates
-    if notification.resource != "status":
+    # we're only interested in some updates
+    resources = ("status", "zaakinformatieobject")
+    if notification.resource not in resources:
         log_system_action(
-            f"ignored notification: resource is not 'status' but '{notification.resource}' for case {case_url}",
+            f"ignored notification: resource is not {wrap_join(resources, 'or')} but '{notification.resource}' for case {case_url}",
             log_level=logging.INFO,
         )
         return
-
-    status_url = notification.resource_url
 
     # check if we have users that need to be informed about this case
     roles = fetch_case_roles(case_url)
@@ -67,55 +80,6 @@ def handle_zaken_notification(notification: Notification):
             log_level=logging.INFO,
         )
         return
-
-    # check if this is a status we want to inform on
-
-    status_history = fetch_status_history_no_cache(case_url)
-    if not status_history:
-        log_system_action(
-            f"ignored notification: cannot retrieve status_history for case {case_url}",
-            log_level=logging.ERROR,
-        )
-        return
-
-    if len(status_history) == 1:
-        log_system_action(
-            f"ignored notification: skip initial status notification for case {case_url}",
-            log_level=logging.INFO,
-        )
-        return
-
-    for s in status_history:
-        if s.url == status_url:
-            status = s
-            break
-    else:
-        status = fetch_specific_status(status_url)
-
-    if not status:
-        log_system_action(
-            f"ignored notification: cannot retrieve status {status_url} for case {case_url}",
-            log_level=logging.ERROR,
-        )
-        return
-
-    status_type = fetch_single_status_type(status.statustype)
-    if not status_type:
-        log_system_action(
-            f"ignored notification: cannot retrieve status_type {status.statustype} for case {case_url}",
-            log_level=logging.ERROR,
-        )
-        return
-
-    if not oz_config.skip_notification_statustype_informeren:
-        if not status_type.informeren:
-            log_system_action(
-                f"ignored notification: status_type.informeren is false for status {status.url} and case {case_url}",
-                log_level=logging.INFO,
-            )
-            return
-
-    status.statustype = status_type
 
     # check if this case is visible
     case = fetch_case_by_url_no_cache(case_url)
@@ -136,22 +100,6 @@ def handle_zaken_notification(notification: Notification):
 
     case.zaaktype = case_type
 
-    # check the ZaakTypeConfig
-    if oz_config.skip_notification_statustype_informeren:
-        ztc = get_zaak_type_config(case_type)
-        if not ztc:
-            log_system_action(
-                f"ignored notification: 'skip_notification_statustype_informeren' is True but cannot retrieve case_type configuration '{case.zaaktype.identificatie}' for case {case_url}",
-                log_level=logging.INFO,
-            )
-            return
-        elif not ztc.notify_status_changes:
-            log_system_action(
-                f"ignored notification: case_type configuration '{case.zaaktype.identificatie}' found but 'notify_status_changes' is False for case {case_url}",
-                log_level=logging.INFO,
-            )
-            return
-
     if not is_zaak_visible(case):
         log_system_action(
             f"ignored notification: case not visible after applying website visibility filter for case {case_url}",
@@ -159,9 +107,109 @@ def handle_zaken_notification(notification: Notification):
         )
         return
 
+    if notification.resource == "status":
+        _handle_status_notification(notification, case, inform_users)
+    elif notification.resource == "zaakinformatieobject":
+        _handle_zaakinformatieobject_notification(notification, case, inform_users)
+    else:
+        raise NotImplementedError("programmer error in earlier resource filter")
+
+
+def _handle_zaakinformatieobject_notification(
+    notification: Notification, case: Zaak, inform_users
+):
+
+    """
+    {
+    "kanaal": "zaken",
+    "hoofdObject": "https://test.openzaak.nl/zaken/api/v1/zaken/af715571-a542-4b68-9a46-3821b9589045",
+    "resource": "zaakinformatieobject",
+    "resourceUrl": "https://test.openzaak.nl/zaken/api/v1/zaakinformatieobjecten/348d0669-0145-48de-859f-29dafa8a885a",
+    "actie": "create",
+    "aanmaakdatum": "2023-02-06T09:33:17.402799Z",
+    "kenmerken": {
+        "bronorganisatie": "100000009",
+        "zaaktype": "https://test.openzaak.nl/catalogi/api/v1/zaaktypen/2c1feba6-3163-4e15-9afa-fa4f01dcb4f9",
+        "vertrouwelijkheidaanduiding": "openbaar"
+    }}
+    """
+
+    # check if this is a zaakinformatieobject we want to inform on
+    zaakinformatieobject_url = notification.resource_url
+
+
+def _handle_status_notification(notification: Notification, case: Zaak, inform_users):
+    oz_config = OpenZaakConfig.get_solo()
+
+    # check if this is a status we want to inform on
+    status_url = notification.resource_url
+
+    status_history = fetch_status_history_no_cache(case.url)
+    if not status_history:
+        log_system_action(
+            f"ignored notification: cannot retrieve status_history for case {case.url}",
+            log_level=logging.ERROR,
+        )
+        return
+
+    if len(status_history) == 1:
+        log_system_action(
+            f"ignored notification: skip initial status notification for case {case.url}",
+            log_level=logging.INFO,
+        )
+        return
+
+    for s in status_history:
+        if s.url == status_url:
+            status = s
+            break
+    else:
+        status = fetch_specific_status(status_url)
+
+    if not status:
+        log_system_action(
+            f"ignored notification: cannot retrieve status {status_url} for case {case.url}",
+            log_level=logging.ERROR,
+        )
+        return
+
+    status_type = fetch_single_status_type(status.statustype)
+    if not status_type:
+        log_system_action(
+            f"ignored notification: cannot retrieve status_type {status.statustype} for case {case.url}",
+            log_level=logging.ERROR,
+        )
+        return
+
+    if not oz_config.skip_notification_statustype_informeren:
+        if not status_type.informeren:
+            log_system_action(
+                f"ignored notification: status_type.informeren is false for status {status.url} and case {case.url}",
+                log_level=logging.INFO,
+            )
+            return
+
+    status.statustype = status_type
+
+    # check the ZaakTypeConfig
+    if oz_config.skip_notification_statustype_informeren:
+        ztc = get_zaak_type_config(case.zaaktype)
+        if not ztc:
+            log_system_action(
+                f"ignored notification: 'skip_notification_statustype_informeren' is True but cannot retrieve case_type configuration '{case.zaaktype.identificatie}' for case {case.url}",
+                log_level=logging.INFO,
+            )
+            return
+        elif not ztc.notify_status_changes:
+            log_system_action(
+                f"ignored notification: case_type configuration '{case.zaaktype.identificatie}' found but 'notify_status_changes' is False for case {case.url}",
+                log_level=logging.INFO,
+            )
+            return
+
     # reaching here means we're going to inform users
     log_system_action(
-        f"accepted notification: attempt informing users {', '.join(sorted(map(str, inform_users)))} for case {case_url}",
+        f"accepted notification: attempt informing users {wrap_join(inform_users)} for case {case.url}",
         log_level=logging.INFO,
     )
     for user in inform_users:

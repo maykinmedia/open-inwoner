@@ -250,7 +250,7 @@ class NotificationHandlerTestCase(AssertTimelineLogMixin, ClearCachesMixin, Test
         handle_zaken_notification(notification)
 
         self.assertTimelineLog(
-            "ignored notification: resource is not 'status' but 'not_status' for case https://",
+            "ignored notification: resource is not 'status' or 'zaakinformatieobject' but 'not_status' for case https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
