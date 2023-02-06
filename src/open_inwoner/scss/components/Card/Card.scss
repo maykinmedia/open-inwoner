@@ -72,7 +72,15 @@
     object-fit: contain;
   }
   &__body {
-    padding: var(--card-spacing);
+    padding: 0;
+    background-color: lavender;
+
+    .h3 a.link {
+      padding: var(--card-spacing);
+      background-color: yellow;
+      height: 100%;
+      width: calc(100% - var(--gutter-width));
+    }
   }
 
   &__body--grid {
