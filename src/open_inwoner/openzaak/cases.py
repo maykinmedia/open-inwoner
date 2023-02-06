@@ -93,9 +93,7 @@ def fetch_case_by_url_no_cache(case_url: str) -> Optional[Zaak]:
     return case
 
 
-@cache_result(
-    "case_information_objects:{case_url}", timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT
-)
+# not cached for quicker uploaded document visibility
 def fetch_case_information_objects(case_url: str) -> List[ZaakInformatieObject]:
     client = build_client("zaak")
 
