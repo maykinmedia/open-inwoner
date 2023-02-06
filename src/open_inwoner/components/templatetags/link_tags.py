@@ -7,7 +7,7 @@ register = template.Library()
 @register.inclusion_tag("components/Typography/Link.html")
 def link(href, text, **kwargs):
     """
-    Renders an hyperlink.
+    Renders a hyperlink.
 
     Usage:
         {% link 'http://www.example.com' text=_('Example.com') %}
