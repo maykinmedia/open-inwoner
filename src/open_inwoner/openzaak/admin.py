@@ -9,6 +9,7 @@ from solo.admin import SingletonModelAdmin
 from .models import (
     CatalogusConfig,
     OpenZaakConfig,
+    UserCaseInfoObjectNotification,
     UserCaseStatusNotification,
     ZaakTypeConfig,
     ZaakTypeInformatieObjectTypeConfig,
@@ -206,6 +207,28 @@ class UserCaseStatusNotificationAdmin(admin.ModelAdmin):
         "user",
         "case_uuid",
         "status_uuid",
+        "created",
+    ]
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(UserCaseInfoObjectNotification)
+class UserCaseInfoObjectNotificationAdmin(admin.ModelAdmin):
+    raw_id_fields = ["user"]
+    search_fields = [
+        "user__first_name",
+        "user__last_name",
+        "user__email",
+        "user__id",
+        "case_uuid",
+        "zaak_info_object_uuid",
+    ]
+    list_display = [
+        "user",
+        "case_uuid",
+        "zaak_info_object_uuid",
         "created",
     ]
 

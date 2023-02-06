@@ -9,6 +9,7 @@ from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 from zgw_consumers.constants import APITypes
 
 from open_inwoner.openzaak.managers import (
+    UserCaseInfoObjectNotificationManager,
     UserCaseStatusNotificationManager,
     ZaakTypeConfigQueryset,
     ZaakTypeInformatieObjectTypeConfigQueryset,
@@ -258,11 +259,37 @@ class UserCaseStatusNotification(models.Model):
     objects = UserCaseStatusNotificationManager()
 
     class Meta:
-        verbose_name = _("Open Zaak notification user inform record")
+        verbose_name = _("Open Zaak status notification record")
 
         constraints = [
             UniqueConstraint(
                 name="unique_user_case_status",
                 fields=["user", "case_uuid", "status_uuid"],
+            )
+        ]
+
+
+class UserCaseInfoObjectNotification(models.Model):
+    user = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.CASCADE,
+    )
+    case_uuid = models.UUIDField(
+        verbose_name=_("Zaak UUID"),
+    )
+    zaak_info_object_uuid = models.UUIDField(
+        verbose_name=_("InformatieObject UUID"),
+    )
+    created = models.DateTimeField(verbose_name=_("Created"), default=timezone.now)
+
+    objects = UserCaseInfoObjectNotificationManager()
+
+    class Meta:
+        verbose_name = _("Open Zaak info object notification record")
+
+        constraints = [
+            UniqueConstraint(
+                name="unique_user_case_info_object",
+                fields=["user", "case_uuid", "zaak_info_object_uuid"],
             )
         ]

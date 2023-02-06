@@ -911,15 +911,15 @@ MAIL_EDITOR_CONF = {
         ],
     },
     "case_notification": {
-        "name": _("Case status update notification"),
+        "name": _("Case update notification"),
         "description": _(
-            "This email is used to notify people a status update happened to their case"
+            "This email is used to notify people an update happened to their case"
         ),
-        "subject_default": "Status update to your case at {{ site_name }}",
+        "subject_default": "Update to your case at {{ site_name }}",
         "body_default": """
             <p>Beste</p>
 
-            <p>You are receiving this email because one of your cases received a status update.</p>
+            <p>You are receiving this email because one of your cases received a new status update or document attachment.</p>
 
             <table>
                 <tr>
@@ -962,7 +962,7 @@ MAIL_EDITOR_CONF = {
             },
             {
                 "name": "case_link",
-                "description": _("The link to your case details."),
+                "description": _("The link to the case details."),
             },
             {
                 "name": "site_name",
