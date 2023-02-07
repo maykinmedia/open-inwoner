@@ -1,9 +1,12 @@
+from datetime import date
+
 from django.contrib.messages import get_messages
 from django.core import mail
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from django_webtest import WebTest
+from freezegun import freeze_time
 from webtest import Upload
 
 from open_inwoner.accounts.choices import StatusChoices
@@ -560,6 +563,34 @@ class PlanViewTests(WebTest):
             HTTP_HX_REQUEST="true",
         )
         self.assertEqual(response.status_code, 404)
+
+    def test_plan_list_contains_contact(self):
+        response = self.app.get(self.list_url, user=self.user)
+        self.assertContains(response, self.contact.get_full_name())
+
+    def test_plan_list_contains_open_plan(self):
+        response = self.app.get(self.list_url, user=self.user)
+        self.assertContains(response, _("Open"))
+
+    @freeze_time("2022-01-10")
+    def test_plan_list_contains_closed_plan(self):
+        self.plan.end_date = date(2022, 1, 2)
+        self.plan.save()
+        response = self.app.get(self.list_url, user=self.user)
+        self.assertContains(response, _("Afgerond"))
+
+    def test_plan_list_contains_number_of_open_actions(self):
+        ActionFactory.create_batch(10, plan=self.plan, status=StatusChoices.open)
+        response = self.app.get(self.list_url, user=self.user)
+        self.assertContains(response, "11")
+        self.assertContains(response, _("Actie vereist"))
+
+    def test_deleted_action_is_not_shown_as_open(self):
+        self.action.is_deleted = True
+        self.action.save()
+        response = self.app.get(self.list_url, user=self.user)
+        self.assertContains(response, "0")
+        self.assertNotContains(response, _("Actie vereist"))
 
 
 @multi_browser()

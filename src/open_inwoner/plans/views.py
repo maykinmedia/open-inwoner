@@ -42,6 +42,7 @@ class PlanListView(
 ):
     template_name = "pages/plans/list.html"
     model = Plan
+    paginate_by = 10
 
     @cached_property
     def crumbs(self):

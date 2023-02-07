@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n button_tags card_tags map_tags utils string_tags %}
+{% load i18n button_tags string_tags pagination_tags helpers %}
 
 {% block content %}
     <h1 class="h1">
@@ -7,5 +7,42 @@
         {% button href="plans:plan_create" text=_("Start nieuwe samenwerking") primary=True icon="group" icon_outlined=True %}
     </h1>
     {% optional_paragraph configurable_text.plans_page.plans_intro %}
-    {% card_container plans=object_list columns=2 %}
+    
+    <table class="table">
+        <thead class="table__heading">
+            <tr>
+                <td class="table__item">{% trans "Samenwerking" %}</td>
+                <td class="table__item">{% trans "Contactpersoon" %}</td>
+                <td class="table__item">{% trans "Einddatum" %}</td>
+                <td class="table__item">{% trans "Status" %}</td>
+                <td class="table__item" colspan="2">{% trans "Openstaande acties" %}&nbsp;</td>
+                <td class="table__item">&nbsp;</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for plan in object_list %}
+                {% get_plan_participants plan=plan user=request.user as plan_participants %}
+
+                <tr>
+                    <th class="table__header">{{plan.title}}</th>
+                    <td class="table__item">{{plan_participants|truncatechars:30}}</td>
+                    <td class="table__item table__item--no-lb">{{plan.end_date|date:"d-m-Y"}}</td>
+                    <td class="table__item">{{plan.get_status}}</td>
+                    <td class="table__item">{{plan.open_actions.count}}</td>
+                    <td class="table__item">
+                        {% if plan.open_actions.exists %}
+                            <div class="table__item--notification-danger">{% trans "Actie vereist" %}</div>
+                        {% endif %}
+                    </td>
+                    <td class="table__item">{% button text="" href=plan.get_absolute_url icon="arrow_forward" icon_outlined=True transparent=True %}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td class="table__item" colspan="7" >{% trans "There are no plans yet." %}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% pagination page_obj=page_obj paginator=paginator request=request %}
 {% endblock %}

@@ -101,6 +101,14 @@
     &--top {
       vertical-align: top;
     }
+
+    &--notification-danger {
+      background-color: var(--color-danger-lightest);
+      color: var(--color-danger-darker);
+      text-align: center;
+      border-radius: var(--border-radius);
+      padding: var(--spacing-small) 0;
+    }
   }
 
   &__header {

@@ -1,5 +1,5 @@
 {% extends 'base_pdf.html' %}
-{% load i18n link_tags file_tags %}
+{% load i18n link_tags file_tags helpers %}
 
 {% block content %}
 
@@ -20,7 +20,9 @@
         </tr>
         <tr>
             <th class="table__header">{% trans "Contacts" %}</th>
-            <td class="table__item">{{ object.contactperson_list }}</td>
+            <td class="table__item">
+                {% get_plan_participants plan=object user=request.user %}
+            </td>
         </tr>
         <tr>
             <th class="table__header">{% trans "Created by" %}</th>

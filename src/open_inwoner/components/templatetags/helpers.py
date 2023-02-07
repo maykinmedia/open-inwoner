@@ -64,3 +64,22 @@ def as_attributes(attribute_dict):
     if not attribute_dict:
         return ""
     return format_html_join(" ", '{}="{}"', attribute_dict.items())
+
+
+@register.simple_tag
+def get_plan_participants(plan, user):
+    """
+    Returns the participants of the plan as a string (without the creator).
+
+    Usage:
+        {% get_plan_participants plan=plan user=request.user %}
+
+    Variables:
+        + plan: Plan | The plan we should generate the contacts-participants for.
+        + user: User | The logged in user.
+    """
+    if not plan:
+        return ""
+
+    plan_contacts = plan.get_other_users(user=user)
+    return ", ".join([contact.get_full_name() for contact in plan_contacts])

@@ -1,3 +1,4 @@
+from datetime import date
 from uuid import uuid4
 
 from django.db import models
@@ -7,7 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from filer.fields.file import FilerFileField
 
-from open_inwoner.accounts.choices import TypeChoices
+from open_inwoner.accounts.choices import StatusChoices, TypeChoices
 
 from .managers import PlanQuerySet
 
@@ -131,11 +132,6 @@ class Plan(models.Model):
     def get_absolute_url(self):
         return reverse("plans:plan_detail", kwargs={"uuid": self.uuid})
 
-    def contactperson_list(self):
-        return ", ".join(
-            [contact.get_full_name() for contact in self.plan_contacts.all()]
-        )
-
     def get_latest_file(self):
         file = self.documents.order_by("-created_on").first()
         if file:
@@ -158,3 +154,9 @@ class Plan(models.Model):
         from open_inwoner.accounts.models import User
 
         return User.objects.filter(id__in=user_ids)
+
+    def get_status(self):
+        return _("Open") if self.end_date > date.today() else _("Afgerond")
+
+    def open_actions(self):
+        return self.actions.filter(status=StatusChoices.open, is_deleted=False)
