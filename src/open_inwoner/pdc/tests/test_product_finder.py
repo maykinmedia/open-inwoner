@@ -5,6 +5,7 @@ from django_webtest import WebTest
 
 from open_inwoner.accounts.tests.factories import UserFactory
 
+from ..models import ProductCondition
 from .factories import ProductConditionFactory, ProductFactory
 
 
@@ -1547,3 +1548,21 @@ class ProductConditions(WebTest):
         self.assertIn(self.product11, possible_products)
         self.assertNotIn(self.product12, matched_products)
         self.assertIn(self.product12, possible_products)
+
+    def test_product_finder_is_reset_when_no_condition(self):
+        response = self.app.get(reverse("pdc:product_finder"))
+        form = response.forms["product-finder"]
+
+        ProductCondition.objects.all().delete()
+
+        form["answer"].value = "yes"
+        response = form.submit()
+
+        self.assertRedirects(response, reverse("pdc:product_finder"))
+
+        session = self.app.session
+        response.follow()
+
+        self.assertEqual(session["product_finder"], {})
+        self.assertIsNone(session["current_condition"])
+        self.assertFalse(session["conditions_done"])
