@@ -12,7 +12,7 @@
     var(--color-accent-darker),
     var(--color-accent-lighter)
   );
-  --border-width: 2px;
+  --border-width: 1px;
   --border-radius: 3px;
 
   // Color.
@@ -150,6 +150,8 @@
   --color-body: var(--color-gray-dark);
   // changed to #949494 to get the required 3:1 contrast ratio
   --color-mute: #949494;
+  // decorative, non-meaningful elements do not have contrast requirements
+  --color-mute-deco: #D2D2D2;
 
   /// Font.
 
