@@ -375,6 +375,13 @@ class ProductFinderView(CommonPageMixin, FormView):
         return context
 
     def form_valid(self, form):
+        # redirect user to reset product finder if no conditions exist
+        if not self.condition:
+            self.request.session["product_finder"] = {}
+            self.request.session["current_condition"] = None
+            self.request.session["conditions_done"] = False
+            return HttpResponseRedirect(self.get_success_url())
+
         self.set_product_condition_sessions(form.cleaned_data.get("answer"))
         next_condition = self.get_next_condition()
         if next_condition:
