@@ -9,7 +9,12 @@ from zgw_consumers.constants import APITypes
 from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 
 from open_inwoner.accounts.tests.factories import DigidUserFactory
-from open_inwoner.openzaak.tests.factories import NotificationFactory, ServiceFactory
+from open_inwoner.openzaak.tests.factories import (
+    NotificationFactory,
+    ServiceFactory,
+    ZaakTypeConfigFactory,
+    ZaakTypeInformatieObjectTypeConfigFactory,
+)
 from open_inwoner.utils.test import paginated_response
 
 from ..models import OpenZaakConfig
@@ -52,10 +57,12 @@ class MockAPIData:
         self.zaak_type = generate_oas_component(
             "ztc",
             "schemas/ZaakType",
+            uuid="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             url=f"{CATALOGI_ROOT}zaaktype/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             catalogus=f"{CATALOGI_ROOT}catalogussen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             identificatie="My Zaaktype",
             indicatieInternOfExtern="extern",
+            omschrijving="My Zaaktype omschrijving",
         )
         self.status_type_initial = generate_oas_component(
             "ztc",
@@ -105,6 +112,7 @@ class MockAPIData:
             "drc",
             "schemas/EnkelvoudigInformatieObject",
             url=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/aaaaaaaa-0001-bbbb-aaaa-aaaaaaaaaaaa",
+            informatieobjecttype=f"{CATALOGI_ROOT}informatieobjecttypen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             status="definitief",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
         )

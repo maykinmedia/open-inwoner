@@ -12,7 +12,7 @@ from zgw_consumers.api_models.constants import RolTypes, VertrouwelijkheidsAandu
 
 from open_inwoner.openzaak.api_models import InformatieObject, Rol, Zaak, ZaakType
 
-from .models import OpenZaakConfig, ZaakTypeConfig
+from .models import OpenZaakConfig, ZaakTypeConfig, ZaakTypeInformatieObjectTypeConfig
 
 logger = logging.getLogger(__name__)
 
@@ -191,16 +191,21 @@ def get_retrieve_resource_by_uuid_url(
 
 def get_zaak_type_config(case_type: ZaakType) -> Optional[ZaakTypeConfig]:
     try:
-        if case_type.catalogus:
-            return ZaakTypeConfig.objects.get(
-                catalogus__url=case_type.catalogus,
-                identificatie=case_type.identificatie,
-            )
-        else:
-            return ZaakTypeConfig.objects.get(
-                catalogus=None, identificatie=case_type.identificatie
-            )
+        return ZaakTypeConfig.objects.filter_case_type(case_type).get()
     except ZaakTypeConfig.DoesNotExist:
+        return None
+
+
+def get_zaak_type_info_object_type_config(
+    case_type: ZaakType,
+    info_object_type_url: str,
+) -> Optional[ZaakTypeInformatieObjectTypeConfig]:
+    assert isinstance(info_object_type_url, str)
+    try:
+        return ZaakTypeInformatieObjectTypeConfig.objects.get_for_case_and_info_type(
+            case_type, info_object_type_url
+        )
+    except ZaakTypeInformatieObjectTypeConfig.DoesNotExist:
         return None
 
 

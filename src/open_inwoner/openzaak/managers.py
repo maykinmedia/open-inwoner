@@ -4,6 +4,7 @@ from uuid import UUID
 from django.db import IntegrityError, models, transaction
 
 from open_inwoner.accounts.models import User
+from open_inwoner.openzaak.api_models import Zaak, ZaakType
 
 if TYPE_CHECKING:
     from open_inwoner.openzaak.models import (
@@ -59,11 +60,36 @@ class UserCaseInfoObjectNotificationManager(models.Manager):
 
 
 class ZaakTypeInformatieObjectTypeConfigQueryset(models.QuerySet):
-    def get_visible_ztiot_configs_for_case(self, case):
+    def filter_catalogus(self, case_type: ZaakType):
+        if case_type.catalogus:
+            # support both url and resolved dataclass
+            catalogus_url = (
+                case_type.catalogus
+                if isinstance(case_type.catalogus, str)
+                else case_type.catalogus.url
+            )
+            return self.filter(
+                zaaktype_config__catalogus__url=catalogus_url,
+            )
+        else:
+            return self.filter(
+                zaaktype_config__catalogus__isnull=True,
+            )
+
+    def filter_case_type(self, case_type: ZaakType):
+        return self.filter_catalogus(case_type).filter(
+            zaaktype_uuids__contains=[case_type.uuid],
+            zaaktype_config__identificatie=case_type.identificatie,
+        )
+
+    def get_visible_ztiot_configs_for_case(self, case: Zaak):
         """
         Returns all ZaakTypeInformatieObjectTypeConfig instances which allow
         documents upload and are based on a specific case and case type.
         """
+        # TODO rename to 'filter_visible_for_case'
+        # TODO change signature to accept case_type/ZaakType
+        # TODO refactor to use self.filter_case_type(case_type)
         if not case:
             return self.none()
 
@@ -73,8 +99,36 @@ class ZaakTypeInformatieObjectTypeConfigQueryset(models.QuerySet):
             document_upload_enabled=True,
         )
 
+    def get_for_case_and_info_type(
+        self, case_type: ZaakType, info_object_type_url: str
+    ):
+        return self.filter_case_type(case_type).get(
+            informatieobjecttype_url=info_object_type_url,
+        )
+
 
 class ZaakTypeConfigQueryset(models.QuerySet):
+    def filter_catalogus(self, case_type: ZaakType):
+        if case_type.catalogus:
+            # support both url and resolved dataclass
+            catalogus_url = (
+                case_type.catalogus
+                if isinstance(case_type.catalogus, str)
+                else case_type.catalogus.url
+            )
+            return self.filter(
+                catalogus__url=catalogus_url,
+            )
+        else:
+            return self.filter(
+                catalogus__isnull=True,
+            )
+
+    def filter_case_type(self, case_type: ZaakType):
+        return self.filter_catalogus(case_type).filter(
+            identificatie=case_type.identificatie,
+        )
+
     def get_visible_zt_configs_for_case_type_identification(
         self, case_type_identification
     ):
@@ -84,6 +138,10 @@ class ZaakTypeConfigQueryset(models.QuerySet):
         """
         if not case_type_identification:
             return self.none()
+
+        # TODO rename to 'filter_visible_for_case_type'
+        # TODO change signature to accept case_type
+        # TODO refactor to use self.filter_case_type(case_type)
 
         return self.filter(
             identificatie=case_type_identification,

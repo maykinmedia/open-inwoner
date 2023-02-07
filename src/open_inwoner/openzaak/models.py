@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from django_better_admin_arrayfield.models.fields import ArrayField
+from furl import furl
 from solo.models import SingletonModel
 from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 from zgw_consumers.constants import APITypes
@@ -226,7 +227,13 @@ class ZaakTypeInformatieObjectTypeConfig(models.Model):
         verbose_name=_("Enable document upload"),
         default=False,
     )
-
+    document_notification_enabled = models.BooleanField(
+        verbose_name=_("Enable document notifications"),
+        default=False,
+        help_text=_(
+            "When enabled the user will receive a notification when a visible document is added to the case"
+        ),
+    )
     objects = ZaakTypeInformatieObjectTypeConfigQueryset.as_manager()
 
     class Meta:
@@ -238,6 +245,15 @@ class ZaakTypeInformatieObjectTypeConfig(models.Model):
                 fields=["zaaktype_config", "informatieobjecttype_url"],
             )
         ]
+
+    def informatieobjecttype_uuid(self):
+        if self.informatieobjecttype_url:
+            s = furl(self.informatieobjecttype_url).path.segments
+            # handle trailing slash
+            return s[-1] or s[-2] or self.informatieobjecttype_url
+        return ""
+
+    informatieobjecttype_uuid.short_description = _("Information object UUID")
 
     def __str__(self):
         return self.omschrijving

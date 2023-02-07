@@ -34,6 +34,7 @@ from open_inwoner.openzaak.models import (
 from open_inwoner.openzaak.utils import (
     format_zaak_identificatie,
     get_zaak_type_config,
+    get_zaak_type_info_object_type_config,
     is_info_object_visible,
     is_zaak_visible,
 )
@@ -179,20 +180,21 @@ def _handle_zaakinformatieobject_notification(
         return
 
     # NOTE for documents we don't check the statustype.informeren
-    # TODO do we want any configuration here?
-    # ztc = get_zaak_type_config(case.zaaktype)
-    # if not ztc:
-    #     log_system_action(
-    #         f"ignored {r} notification: cannot retrieve case_type configuration '{case.zaaktype.identificatie}' for case {case.url}",
-    #         log_level=logging.INFO,
-    #     )
-    #     return
-    # elif not ztc.notify_status_changes:
-    #     log_system_action(
-    #         f"ignored {r} notification: case_type configuration '{case.zaaktype.identificatie}' found but 'notify_status_changes' is False for case {case.url}",
-    #         log_level=logging.INFO,
-    #     )
-    #     return
+    ztiotc = get_zaak_type_info_object_type_config(
+        case.zaaktype, info_object.informatieobjecttype
+    )
+    if not ztiotc:
+        log_system_action(
+            f"ignored {r} notification: cannot retrieve info_type configuration {info_object.informatieobjecttype} and case {case.url}",
+            log_level=logging.INFO,
+        )
+        return
+    elif not ztiotc.document_notification_enabled:
+        log_system_action(
+            f"ignored {r} notification: info_type configuration '{ztiotc.omschrijving}' {info_object.informatieobjecttype} found but 'document_notification_enabled' is False for case {case.url}",
+            log_level=logging.INFO,
+        )
+        return
 
     # reaching here means we're going to inform users
     log_system_action(

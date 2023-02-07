@@ -82,12 +82,14 @@ class ZaakTypeInformatieObjectTypeConfigInline(admin.TabularInline):
     fields = [
         "omschrijving",
         "document_upload_enabled",
-        "informatieobjecttype_url",
+        "document_notification_enabled",
+        "informatieobjecttype_uuid",
         "zaaktype_uuids",
     ]
     readonly_fields = [
         "omschrijving",
         "informatieobjecttype_url",
+        "informatieobjecttype_uuid",
         "zaaktype_uuids",
     ]
     ordering = ("omschrijving",)

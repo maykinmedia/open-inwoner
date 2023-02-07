@@ -3,6 +3,7 @@ from notifications_api_common.models import Subscription
 from simple_certmanager.constants import CertificateTypes
 from simple_certmanager.models import Certificate
 from zgw_consumers.api_models.base import factory as zwg_factory
+from zgw_consumers.api_models.catalogi import InformatieObjectType
 from zgw_consumers.api_models.constants import RolOmschrijving
 from zgw_consumers.models import Service
 from zgw_consumers.test import generate_oas_component
@@ -76,6 +77,34 @@ class ZaakTypeInformatieObjectTypeConfigFactory(factory.django.DjangoModelFactor
 
     class Meta:
         model = ZaakTypeInformatieObjectTypeConfig
+
+    @staticmethod
+    def from_case_type_info_object_dicts(
+        zaak_type: dict,
+        info_object: dict,
+        document_upload_enabled=False,
+        document_notification_enabled=False,
+        **extra_kwargs,
+    ):
+        kwargs = dict(
+            zaaktype_config__identificatie=zaak_type["identificatie"],
+            zaaktype_config__omschrijving=zaak_type["omschrijving"],
+            informatieobjecttype_url=info_object["informatieobjecttype"],
+            document_upload_enabled=document_upload_enabled,
+            document_notification_enabled=document_notification_enabled,
+            zaaktype_uuids=[zaak_type["uuid"]],
+        )
+        if zaak_type["catalogus"]:
+            kwargs.update(
+                zaaktype_config__catalogus__url=zaak_type["catalogus"],
+            )
+        else:
+            kwargs.update(
+                zaaktype_config__catalogus=None,
+            )
+        if extra_kwargs:
+            kwargs.update(extra_kwargs)
+        return ZaakTypeInformatieObjectTypeConfigFactory(**kwargs)
 
 
 class NotificationFactory(factory.Factory):

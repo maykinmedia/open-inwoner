@@ -13,12 +13,15 @@ from open_inwoner.openzaak.notifications import (
     handle_zaakinformatieobject_update,
     handle_zaken_notification,
 )
-from open_inwoner.openzaak.tests.factories import NotificationFactory
+from open_inwoner.openzaak.tests.factories import (
+    NotificationFactory,
+    ZaakTypeInformatieObjectTypeConfigFactory,
+)
 from open_inwoner.utils.test import ClearCachesMixin
 from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin, Lookups
 
 from ..api_models import InformatieObject, Zaak, ZaakInformatieObject, ZaakType
-from ..models import OpenZaakConfig
+from ..models import OpenZaakConfig, ZaakTypeInformatieObjectTypeConfig
 from .test_notification_data import MockAPIData
 
 
@@ -41,6 +44,10 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
         happy-flow from valid data calls the (mocked) handle_zaakinformatieobject()
         """
         data = MockAPIData().install_mocks(m)
+
+        ZaakTypeInformatieObjectTypeConfigFactory.from_case_type_info_object_dicts(
+            data.zaak_type, data.informatie_object, document_notification_enabled=True
+        )
 
         handle_zaken_notification(data.zio_notification)
 
@@ -232,6 +239,43 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
+
+    def test_zio_bails_when_zaak_type_info_object_type_config_is_not_found(
+        self, m, mock_handle: Mock
+    ):
+        data = MockAPIData().install_mocks(m)
+
+        handle_zaken_notification(data.zio_notification)
+
+        mock_handle.assert_not_called()
+        self.assertTimelineLog(
+            f"ignored zaakinformatieobject notification: cannot retrieve info_type configuration {data.informatie_object['informatieobjecttype']} and case https://",
+            lookup=Lookups.startswith,
+            level=logging.INFO,
+        )
+
+    def test_zio_bails_when_zaak_type_info_object_type_config_is_found_not_marked_for_notifications(
+        self, m, mock_handle: Mock
+    ):
+        data = MockAPIData().install_mocks(m)
+
+        ZaakTypeInformatieObjectTypeConfigFactory.from_case_type_info_object_dicts(
+            data.zaak_type,
+            data.informatie_object,
+            document_notification_enabled=False,
+            omschrijving="important document",
+        )
+
+        handle_zaken_notification(data.zio_notification)
+
+        mock_handle.assert_not_called()
+        self.assertTimelineLog(
+            f"ignored zaakinformatieobject notification: info_type configuration 'important documentl' {data.informatie_object['informatieobjecttype']} found but 'document_notification_enabled' is False for case https://",
+            lookup=Lookups.startswith,
+            level=logging.INFO,
+        )
+
+    # TODO add some no-catalog variations
 
 
 class NotificationHandlerEmailTestCase(TestCase):
