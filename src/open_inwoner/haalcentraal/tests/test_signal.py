@@ -13,13 +13,14 @@ from open_inwoner.accounts.models import User
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.utils.logentry import LOG_ACTIONS
 
+from ...utils.test import ClearCachesMixin
 from ..models import HaalCentraalConfig
 from .factories import ServiceFactory
 from .mixins import HaalCentraalMixin
 
 
 @requests_mock.Mocker()
-class TestPreSaveSignal(HaalCentraalMixin, TestCase):
+class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
     def test_signal_updates_users_data_when_logged_in_via_digid_v_2(self, m):
         self._setUpMocks_v_2(m)
         self._setUpService()
@@ -60,6 +61,26 @@ class TestPreSaveSignal(HaalCentraalMixin, TestCase):
         self.assertEqual(updated_user[0].housenumber, "64")
         self.assertEqual(updated_user[0].city, "'s-Gravenhage")
         self.assertTrue(updated_user[0].is_prepopulated)
+
+    @override_settings(BRP_VERSION="1.3")
+    def test_request_adds_configured_headers_when_calling_via_digid_v_1_3(self, m):
+        config = HaalCentraalConfig.get_solo()
+        config.api_origin_oin = "00000001234567890000"
+        config.api_doelbinding = "Huisvesting"
+        config.save()
+
+        self._setUpMocks_v_1_3(m)
+        self._setUpService()
+
+        user = UserFactory(
+            first_name="", last_name="", login_type=LoginTypeChoices.digid
+        )
+        user.bsn = "999993847"
+        user.save()
+
+        request = m.request_history[-1]
+        self.assertEqual(request.headers["x-origin-oin"], "00000001234567890000")
+        self.assertEqual(request.headers["x-doelbinding"], "Huisvesting")
 
     def test_user_is_not_updated_without_defining_service(self, m):
         self._setUpMocks_v_2(m)

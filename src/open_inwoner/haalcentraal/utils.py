@@ -48,15 +48,19 @@ def fetch_brp_data(instance, brp_version):
     elif brp_version == "1.3":
         url = urljoin(client.base_url, f"ingeschrevenpersonen/{instance.bsn}")
         try:
+            headers = {
+                "Accept": "application/hal+json",
+            }
+            if config.api_origin_oin:  # See Taiga #755
+                headers["x-origin-oin"] = config.api_origin_oin
+            if config.api_doelbinding:  # See Taiga #755
+                headers["x-doelbinding"] = config.api_doelbinding
+
             data = client.retrieve(
                 "ingeschrevenpersonen",
                 url=url,
                 request_kwargs=dict(
-                    headers={
-                        "Accept": "application/hal+json",
-                        "x-doelbinding": "Huisvesting",  # See Taiga #755
-                        "x-origin-oin": "00000003273229750000",
-                    },  # See Taiga #755
+                    headers=headers,
                     params={
                         "fields": "geslachtsaanduiding,naam,geboorte,verblijfplaats"
                     },
