@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
             name="api_doelbinding",
             field=models.CharField(
                 blank=True,
-                help_text="Value of the 'x-doelbinding' header for Haalcentraal BRP API requests.",
+                help_text="Value of the 'x-doelbinding' header for Haalcentraal BRP v1.3 API requests.",
                 max_length=64,
                 verbose_name="API 'doelbinding' header",
             ),
@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
             name="api_origin_oin",
             field=models.CharField(
                 blank=True,
-                help_text="Value of the 'x-origin-oin' header for Haalcentraal BRP API requests.",
+                help_text="Value of the 'x-origin-oin' header for Haalcentraal BRP v1.3 API requests.",
                 max_length=64,
                 verbose_name="API 'OIN' header",
             ),

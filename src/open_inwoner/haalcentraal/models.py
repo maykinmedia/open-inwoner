@@ -29,7 +29,7 @@ class HaalCentraalConfig(SingletonModel):
         max_length=64,
         blank=True,
         help_text=_(
-            "Value of the 'x-origin-oin' header for Haalcentraal BRP API requests."
+            "Value of the 'x-origin-oin' header for Haalcentraal BRP v1.3 API requests."
         ),
     )
     api_doelbinding = models.CharField(
@@ -37,7 +37,7 @@ class HaalCentraalConfig(SingletonModel):
         max_length=64,
         blank=True,
         help_text=_(
-            "Value of the 'x-doelbinding' header for Haalcentraal BRP API requests."
+            "Value of the 'x-doelbinding' header for Haalcentraal BRP v1.3 API requests."
         ),
     )
 
