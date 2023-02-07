@@ -61,9 +61,10 @@ def settings(request):
                 "flatpages": config.get_ordered_flatpages,
             },
         },
-        "hero_image_login": config.hero_image_login.file.url
-        if config.hero_image_login
-        else "",
+        "hero_image_login": (
+            config.hero_image_login.file.url if config.hero_image_login else ""
+        ),
+        "favicon": (config.favicon.file.url if config.favicon else ""),
         "login_allow_registration": config.login_allow_registration,
         "login_text": config.login_text,
         "gtm_code": config.gtm_code,

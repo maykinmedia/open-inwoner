@@ -12,6 +12,7 @@ from solo.models import SingletonModel
 from open_inwoner.pdc.utils import PRODUCT_PATH_NAME
 
 from ..utils.colors import hex_to_hsl
+from ..utils.validators import FilerExactImageSizeValidator
 from .choices import ColorTypeChoices
 
 
@@ -248,6 +249,15 @@ class SiteConfiguration(SingletonModel):
         blank=True,
         default="",
         help_text=_("The external link for the footer logo."),
+    )
+    favicon = FilerImageField(
+        verbose_name=_("Favicon image (16x16)"),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="favicon",
+        help_text=_("Image to use as favicon"),
+        validators=[FilerExactImageSizeValidator(16, 16)],
     )
     flatpages = models.ManyToManyField(
         FlatPage,
