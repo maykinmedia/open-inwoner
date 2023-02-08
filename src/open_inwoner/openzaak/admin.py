@@ -1,6 +1,6 @@
 from django.contrib import admin, messages
 from django.core.exceptions import ValidationError
-from django.db.models import Count
+from django.db.models import BooleanField, Count, Exists, ExpressionWrapper, Q
 from django.forms.models import BaseInlineFormSet
 from django.utils.translation import gettext_lazy as _, ngettext
 
@@ -40,6 +40,25 @@ class CatalogusConfigAdmin(admin.ModelAdmin):
         "url",
     ]
     ordering = ("domein", "rsin")
+
+
+class HasDocNotifyListFilter(admin.SimpleListFilter):
+    title = _("notify document attachment")
+    parameter_name = "doc_notify"
+
+    def lookups(self, request, model_admin):
+        return [
+            ("yes", _("Yes")),
+            ("no", _("No")),
+        ]
+
+    def queryset(self, request, queryset):
+        v = self.value()
+        if v == "yes":
+            queryset = queryset.filter(has_doc_notify=True)
+        elif v == "no":
+            queryset = queryset.filter(has_doc_notify=False)
+        return queryset
 
 
 class CatalogUsedListFilter(admin.SimpleListFilter):
@@ -129,6 +148,7 @@ class ZaakTypeConfigAdmin(admin.ModelAdmin):
         "omschrijving",
         "catalogus",
         "notify_status_changes",
+        "has_doc_notify",
         "document_upload_enabled",
         "num_infotypes",
     ]
@@ -138,6 +158,7 @@ class ZaakTypeConfigAdmin(admin.ModelAdmin):
     ]
     list_filter = [
         "notify_status_changes",
+        HasDocNotifyListFilter,
         CatalogUsedListFilter,
     ]
     search_fields = [
@@ -157,6 +178,19 @@ class ZaakTypeConfigAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         qs = qs.annotate(num_infotypes=Count("zaaktypeinformatieobjecttypeconfig"))
+        qs = qs.annotate(
+            num_doc_notify=Count(
+                "zaaktypeinformatieobjecttypeconfig",
+                filter=Q(
+                    zaaktypeinformatieobjecttypeconfig__document_notification_enabled=True
+                ),
+            )
+        )
+        qs = qs.annotate(
+            has_doc_notify=ExpressionWrapper(
+                Q(num_doc_notify__gt=0), output_field=BooleanField()
+            )
+        )
         return qs
 
     def num_infotypes(self, obj=None):
@@ -164,6 +198,17 @@ class ZaakTypeConfigAdmin(admin.ModelAdmin):
             return "-"
         else:
             return getattr(obj, "num_infotypes", 0)
+
+    num_infotypes.admin_order_field = "num_infotypes"
+
+    def has_doc_notify(self, obj=None):
+        if not obj or not obj.pk:
+            return False
+        else:
+            return getattr(obj, "has_doc_notify", False)
+
+    has_doc_notify.boolean = True
+    has_doc_notify.admin_order_field = "has_doc_notify"
 
     @admin.action(description="Set selected Zaaktypes to notify on status changes")
     def mark_as_notify_status_changes(self, request, qs):

@@ -16,13 +16,6 @@ from open_inwoner.openzaak.tests.factories import (
 from open_inwoner.openzaak.tests.shared import CATALOGI_ROOT
 
 
-class Reminder(TestCase):
-    def test_admin(self):
-        self.fail(
-            "check ticket and update admin list view with a column to indicate which ZaakTypeConfig has info object types with upload"
-        )
-
-
 class ZaakTypeConfigModelTestCase(TestCase):
     def test_queryset_filter_case_type_with_catalog(self):
         catalog = CatalogusConfigFactory(

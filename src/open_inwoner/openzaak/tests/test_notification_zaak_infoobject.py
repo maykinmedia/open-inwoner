@@ -270,7 +270,7 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            f"ignored zaakinformatieobject notification: info_type configuration 'important documentl' {data.informatie_object['informatieobjecttype']} found but 'document_notification_enabled' is False for case https://",
+            f"ignored zaakinformatieobject notification: info_type configuration 'important document' {data.informatie_object['informatieobjecttype']} found but 'document_notification_enabled' is False for case https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )

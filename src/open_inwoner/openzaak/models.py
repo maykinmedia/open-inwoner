@@ -248,9 +248,14 @@ class ZaakTypeInformatieObjectTypeConfig(models.Model):
 
     def informatieobjecttype_uuid(self):
         if self.informatieobjecttype_url:
-            s = furl(self.informatieobjecttype_url).path.segments
-            # handle trailing slash
-            return s[-1] or s[-2] or self.informatieobjecttype_url
+            segments = furl(self.informatieobjecttype_url).path.segments
+            # grab uuid as last bit of url,
+            # but handle trailing slash or weird urls from factories
+            while segments:
+                s = segments.pop()
+                if s:
+                    return s
+            return self.informatieobjecttype_url
         return ""
 
     informatieobjecttype_uuid.short_description = _("Information object UUID")
