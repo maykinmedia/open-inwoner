@@ -564,33 +564,80 @@ class PlanViewTests(WebTest):
         )
         self.assertEqual(response.status_code, 404)
 
-    def test_plan_list_contains_contact(self):
-        response = self.app.get(self.list_url, user=self.user)
-        self.assertContains(response, self.contact.get_full_name())
-
-    def test_plan_list_contains_open_plan(self):
-        response = self.app.get(self.list_url, user=self.user)
-        self.assertContains(response, _("Open"))
-
-    @freeze_time("2022-01-10")
-    def test_plan_list_contains_closed_plan(self):
-        self.plan.end_date = date(2022, 1, 2)
+    @freeze_time("2022-01-01")
+    def test_plan_list_renders_expected_data(self):
+        self.plan.end_date = date(2022, 1, 20)
         self.plan.save()
-        response = self.app.get(self.list_url, user=self.user)
-        self.assertContains(response, _("Afgerond"))
 
-    def test_plan_list_contains_number_of_open_actions(self):
-        ActionFactory.create_batch(10, plan=self.plan, status=StatusChoices.open)
         response = self.app.get(self.list_url, user=self.user)
-        self.assertContains(response, "11")
-        self.assertContains(response, _("Actie vereist"))
+        rendered_plan_title = response.pyquery("tbody .table__header")[0].text
+        rendered_contact = response.pyquery("tbody .table__item")[0].text
+        rendered_end_date = response.pyquery("tbody .table__item")[1].text
+        rendered_plan_status = response.pyquery("tbody .table__item")[2].text
+        rendered_actions_num = response.pyquery("tbody .table__item")[3].text
+        rendered_action_required = response.pyquery(
+            "tbody .table__item--notification-danger"
+        )[0].text
 
-    def test_deleted_action_is_not_shown_as_open(self):
+        self.assertEqual(rendered_plan_title, self.plan.title)
+        self.assertEqual(rendered_contact, self.contact.get_full_name())
+        self.assertEqual(rendered_end_date, "20-01-2022")
+        self.assertEqual(rendered_plan_status, _("Open"))
+        self.assertEqual(rendered_actions_num, "1")
+        self.assertEqual(rendered_action_required, _("Actie vereist"))
+
+    @freeze_time("2022-01-01")
+    def test_plan_list_renders_expected_data_for_expired_plan(self):
+        self.plan.end_date = date(2022, 1, 1)
+        self.plan.save()
+
+        response = self.app.get(self.list_url, user=self.user)
+        rendered_end_date = response.pyquery("tbody .table__item")[1].text
+        rendered_plan_status = response.pyquery("tbody .table__item")[2].text
+
+        self.assertEqual(rendered_end_date, "01-01-2022")
+        self.assertEqual(rendered_plan_status, _("Afgerond"))
+
+    @freeze_time("2022-01-01")
+    def test_plan_list_renders_expected_data_for_approval_actions(self):
+        self.action.status = StatusChoices.approval
+        self.action.save()
+
+        response = self.app.get(self.list_url, user=self.user)
+        rendered_actions_num = response.pyquery("tbody .table__item")[3].text
+        rendered_action_required = response.pyquery(
+            "tbody .table__item--notification-danger"
+        )[0].text
+
+        self.assertEqual(rendered_actions_num, "1")
+        self.assertEqual(rendered_action_required, _("Actie vereist"))
+
+    @freeze_time("2022-01-01")
+    def test_plan_list_renders_expected_data_for_closed_actions(self):
+        self.action.status = StatusChoices.closed
+        self.action.save()
+
+        response = self.app.get(self.list_url, user=self.user)
+        rendered_actions_num = response.pyquery("tbody .table__item")[3].text
+        rendered_action_required = response.pyquery(
+            "tbody .table__item--notification-danger"
+        )
+
+        self.assertEqual(rendered_actions_num, "0")
+        self.assertEqual(rendered_action_required, [])
+
+    def test_plan_list_doesnt_add_deleted_action_to_total(self):
         self.action.is_deleted = True
         self.action.save()
+
         response = self.app.get(self.list_url, user=self.user)
-        self.assertContains(response, "0")
-        self.assertNotContains(response, _("Actie vereist"))
+        rendered_actions_num = response.pyquery("tbody .table__item")[3].text
+        rendered_action_required = response.pyquery(
+            "tbody .table__item--notification-danger"
+        )
+
+        self.assertEqual(rendered_actions_num, "0")
+        self.assertEqual(rendered_action_required, [])
 
 
 @multi_browser()

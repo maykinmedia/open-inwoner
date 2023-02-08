@@ -2,6 +2,7 @@ from datetime import date
 from uuid import uuid4
 
 from django.db import models
+from django.db.models import Q
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
@@ -159,4 +160,7 @@ class Plan(models.Model):
         return _("Open") if self.end_date > date.today() else _("Afgerond")
 
     def open_actions(self):
-        return self.actions.filter(status=StatusChoices.open, is_deleted=False)
+        return self.actions.filter(
+            Q(status=StatusChoices.open) | Q(status=StatusChoices.approval),
+            is_deleted=False,
+        )
