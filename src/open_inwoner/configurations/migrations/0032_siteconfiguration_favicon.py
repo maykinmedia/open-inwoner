@@ -28,9 +28,9 @@ class Migration(migrations.Migration):
                 related_name="favicon",
                 to=settings.FILER_IMAGE_MODEL,
                 validators=[
-                    open_inwoner.utils.validators.FilerExactImageSizeValidator(16, 16)
+                    open_inwoner.utils.validators.FilerExactImageSizeValidator(32, 32)
                 ],
-                verbose_name="Favicon image (16x16)",
+                verbose_name="Favicon image (32x32)",
             ),
         ),
     ]

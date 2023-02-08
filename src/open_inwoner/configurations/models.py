@@ -251,13 +251,13 @@ class SiteConfiguration(SingletonModel):
         help_text=_("The external link for the footer logo."),
     )
     favicon = FilerImageField(
-        verbose_name=_("Favicon image (16x16)"),
+        verbose_name=_("Favicon image (32x32)"),
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
         related_name="favicon",
         help_text=_("Image to use as favicon"),
-        validators=[FilerExactImageSizeValidator(16, 16)],
+        validators=[FilerExactImageSizeValidator(32, 32)],
     )
     flatpages = models.ManyToManyField(
         FlatPage,
