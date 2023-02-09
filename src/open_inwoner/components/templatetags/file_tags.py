@@ -1,10 +1,10 @@
 import pathlib
 
 from django import template
-from django.utils.translation import gettext_lazy as _
 
 from filer.models.filemodels import File
-from zgw_consumers.api_models.zaken import ZaakInformatieObject
+
+from open_inwoner.openzaak.api_models import ZaakInformatieObject
 
 register = template.Library()
 
