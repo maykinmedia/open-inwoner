@@ -13,12 +13,12 @@
   }
 
   &__list-item {
-    border-bottom: var(--border-width) solid var(--color-mute);
+    border-bottom: var(--border-width) solid var(--color-mute-deco);
     padding: var(--spacing-large) var(--spacing-medium);
   }
 
   &__list-item:nth-child(1) {
-    border-top: var(--border-width) solid var(--color-mute);
+    border-top: var(--border-width) solid var(--color-mute-deco);
   }
 
   h2 {
@@ -34,7 +34,7 @@
     }
 
     &__list-item:nth-child(2) {
-      border-top: var(--border-width) solid var(--color-mute);
+      border-top: var(--border-width) solid var(--color-mute-deco);
     }
 
     &__list-item {
