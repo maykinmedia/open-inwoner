@@ -254,7 +254,7 @@ class UserCaseStatusNotificationAdmin(admin.ModelAdmin):
         "user",
         "case_uuid",
         "status_uuid",
-        "created",
+        "created_on",
     ]
 
     def has_change_permission(self, request, obj=None):
@@ -276,7 +276,7 @@ class UserCaseInfoObjectNotificationAdmin(admin.ModelAdmin):
         "user",
         "case_uuid",
         "zaak_info_object_uuid",
-        "created",
+        "created_on",
     ]
 
     def has_change_permission(self, request, obj=None):

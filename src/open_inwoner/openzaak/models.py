@@ -275,7 +275,9 @@ class UserCaseStatusNotification(models.Model):
     status_uuid = models.UUIDField(
         verbose_name=_("Status UUID"),
     )
-    created = models.DateTimeField(verbose_name=_("Created"), default=timezone.now)
+    created_on = models.DateTimeField(
+        verbose_name=_("Created on"), default=timezone.now
+    )
 
     objects = UserCaseStatusNotificationManager()
 
@@ -301,7 +303,9 @@ class UserCaseInfoObjectNotification(models.Model):
     zaak_info_object_uuid = models.UUIDField(
         verbose_name=_("InformatieObject UUID"),
     )
-    created = models.DateTimeField(verbose_name=_("Created"), default=timezone.now)
+    created_on = models.DateTimeField(
+        verbose_name=_("Created on"), default=timezone.now
+    )
 
     objects = UserCaseInfoObjectNotificationManager()
 
