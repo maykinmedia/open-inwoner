@@ -445,7 +445,7 @@ class CaseUploadForm(forms.Form):
                 f"Een aangeleverd bestand dient maximaal {config.max_upload_size} MB te zijn, uw bestand is te groot."
             )
 
-        if file_extension.replace(".", "") not in allowed_extensions:
+        if file_extension.lower().replace(".", "") not in allowed_extensions:
             raise ValidationError(
                 f"Het type bestand dat u hebt geüpload is ongeldig. Geldige bestandstypen zijn: {', '.join(allowed_extensions)}"
             )
