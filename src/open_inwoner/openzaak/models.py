@@ -4,11 +4,13 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from django_better_admin_arrayfield.models.fields import ArrayField
+from furl import furl
 from solo.models import SingletonModel
 from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 from zgw_consumers.constants import APITypes
 
 from open_inwoner.openzaak.managers import (
+    UserCaseInfoObjectNotificationManager,
     UserCaseStatusNotificationManager,
     ZaakTypeConfigQueryset,
     ZaakTypeInformatieObjectTypeConfigQueryset,
@@ -225,7 +227,13 @@ class ZaakTypeInformatieObjectTypeConfig(models.Model):
         verbose_name=_("Enable document upload"),
         default=False,
     )
-
+    document_notification_enabled = models.BooleanField(
+        verbose_name=_("Enable document notifications"),
+        default=False,
+        help_text=_(
+            "When enabled the user will receive a notification when a visible document is added to the case"
+        ),
+    )
     objects = ZaakTypeInformatieObjectTypeConfigQueryset.as_manager()
 
     class Meta:
@@ -237,6 +245,20 @@ class ZaakTypeInformatieObjectTypeConfig(models.Model):
                 fields=["zaaktype_config", "informatieobjecttype_url"],
             )
         ]
+
+    def informatieobjecttype_uuid(self):
+        if self.informatieobjecttype_url:
+            segments = furl(self.informatieobjecttype_url).path.segments
+            # grab uuid as last bit of url,
+            # but handle trailing slash or weird urls from factories
+            while segments:
+                s = segments.pop()
+                if s:
+                    return s
+            return self.informatieobjecttype_url
+        return ""
+
+    informatieobjecttype_uuid.short_description = _("Information object UUID")
 
     def __str__(self):
         return self.omschrijving
@@ -253,16 +275,46 @@ class UserCaseStatusNotification(models.Model):
     status_uuid = models.UUIDField(
         verbose_name=_("Status UUID"),
     )
-    created = models.DateTimeField(verbose_name=_("Created"), default=timezone.now)
+    created_on = models.DateTimeField(
+        verbose_name=_("Created on"), default=timezone.now
+    )
 
     objects = UserCaseStatusNotificationManager()
 
     class Meta:
-        verbose_name = _("Open Zaak notification user inform record")
+        verbose_name = _("Open Zaak status notification record")
 
         constraints = [
             UniqueConstraint(
                 name="unique_user_case_status",
                 fields=["user", "case_uuid", "status_uuid"],
+            )
+        ]
+
+
+class UserCaseInfoObjectNotification(models.Model):
+    user = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.CASCADE,
+    )
+    case_uuid = models.UUIDField(
+        verbose_name=_("Zaak UUID"),
+    )
+    zaak_info_object_uuid = models.UUIDField(
+        verbose_name=_("InformatieObject UUID"),
+    )
+    created_on = models.DateTimeField(
+        verbose_name=_("Created on"), default=timezone.now
+    )
+
+    objects = UserCaseInfoObjectNotificationManager()
+
+    class Meta:
+        verbose_name = _("Open Zaak info object notification record")
+
+        constraints = [
+            UniqueConstraint(
+                name="unique_user_case_info_object",
+                fields=["user", "case_uuid", "zaak_info_object_uuid"],
             )
         ]
