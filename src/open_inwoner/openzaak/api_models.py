@@ -2,12 +2,8 @@ from dataclasses import dataclass, field
 from datetime import date, datetime
 from typing import Dict, Optional, Union
 
+from dateutil.relativedelta import relativedelta
 from zgw_consumers.api_models.base import Model, ZGWModel
-from zgw_consumers.api_models.catalogi import (
-    InformatieObjectType,
-    ResultaatType,
-    RolType,
-)
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 
 """
@@ -82,6 +78,17 @@ class ZaakInformatieObject(ZGWModel):
 
 
 @dataclass
+class InformatieObjectType(ZGWModel):
+    url: str  # bug: not required according to OAS
+    catalogus: str
+    omschrijving: str
+    vertrouwelijkheidaanduiding: str
+    begin_geldigheid: Optional[date] = None
+    einde_geldigheid: Optional[date] = None
+    concept: bool = False
+
+
+@dataclass
 class InformatieObject(ZGWModel):
     url: str
     identificatie: str
@@ -111,6 +118,14 @@ class InformatieObject(ZGWModel):
 
 
 @dataclass
+class RolType(ZGWModel):
+    url: str  # bug: not required according to OAS
+    zaaktype: str
+    omschrijving: str
+    omschrijving_generiek: str = ""
+
+
+@dataclass
 class Rol(ZGWModel):
     url: str
     zaak: str
@@ -129,6 +144,21 @@ class Rol(ZGWModel):
 
     def get_omschrijving_generiek_display(self):
         return RolOmschrijving.values[self.omschrijving_generiek]
+
+
+@dataclass
+class ResultaatType(ZGWModel):
+    url: str  # bug: not required according to OAS
+    zaaktype: str
+    omschrijving: str
+    resultaattypeomschrijving: str
+    selectielijstklasse: str
+
+    omschrijving_generiek: str = ""
+    toelichting: str = ""
+    archiefnominatie: str = ""
+    archiefactietermijn: Optional[relativedelta] = None
+    brondatum_archiefprocedure: Optional[dict] = None
 
 
 @dataclass
