@@ -8,7 +8,7 @@
     </h1>
     {% optional_paragraph configurable_text.plans_page.plans_intro %}
     
-    {% if request.user.contact_type == "begeleider" %}
+    {% if extended_plans %}
         <table class="table plans-extended">
             <thead class="table__heading">
                 <tr>

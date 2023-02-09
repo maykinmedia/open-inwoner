@@ -16,6 +16,7 @@ from open_inwoner.accounts.views.actions import (
     ActionUpdateView,
     BaseActionFilter,
 )
+from open_inwoner.accounts.choices import ContactTypeChoices
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.utils.logentry import get_change_message
 from open_inwoner.utils.mixins import ExportMixin
@@ -57,12 +58,14 @@ class PlanListView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        user = self.request.user
 
-        plans = {}
-        for plan in self.get_queryset():
-            plans[plan] = plan.get_other_users_full_names(user=self.request.user)
+        if user.contact_type == ContactTypeChoices.begeleider:
+            plans = {}
+            for plan in self.get_queryset():
+                plans[plan] = plan.get_other_users_full_names(user=self.request.user)
 
-        context["extended_plans"] = plans
+            context["extended_plans"] = plans
         return context
 
 
