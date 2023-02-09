@@ -63,7 +63,7 @@ class PlanListView(
         if user.contact_type == ContactTypeChoices.begeleider:
             plans = {}
             for plan in self.get_queryset():
-                plans[plan] = plan.get_other_users_full_names(user=self.request.user)
+                plans[plan] = plan.get_other_users_full_names(user=user)
 
             context["extended_plans"] = plans
         return context
