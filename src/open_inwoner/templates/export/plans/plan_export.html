@@ -20,9 +20,7 @@
         </tr>
         <tr>
             <th class="table__header">{% trans "Contacts" %}</th>
-            <td class="table__item">
-                {% get_plan_participants plan=object user=request.user %}
-            </td>
+            <td class="table__item">{{ plan_contacts }}</td>
         </tr>
         <tr>
             <th class="table__header">{% trans "Created by" %}</th>

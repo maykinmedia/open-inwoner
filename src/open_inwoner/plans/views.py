@@ -55,6 +55,16 @@ class PlanListView(
             "plan_contacts"
         )
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        plans = {}
+        for plan in self.get_queryset():
+            plans[plan] = plan.get_other_users_full_names(user=self.request.user)
+
+        context["extended_plans"] = plans
+        return context
+
 
 class PlanDetailView(
     PlansEnabledMixin,
@@ -425,3 +435,10 @@ class PlanExportView(
 
     def get_queryset(self):
         return Plan.objects.connected(self.request.user).prefetch_related("actions")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        plan = self.get_object()
+
+        context["plan_contacts"] = plan.get_other_users_full_names(self.request.user)
+        return context

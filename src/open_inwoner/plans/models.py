@@ -156,8 +156,15 @@ class Plan(models.Model):
 
         return User.objects.filter(id__in=user_ids)
 
+    def get_other_users_full_names(self, user):
+        other_users = self.get_other_users(user)
+        return ", ".join([user.get_full_name() for user in other_users])
+
     def get_status(self):
-        return _("Open") if self.end_date > date.today() else _("Afgerond")
+        if self.end_date > date.today():
+            return _("Open")
+        else:
+            return _("Afgerond")
 
     def open_actions(self):
         return self.actions.filter(
