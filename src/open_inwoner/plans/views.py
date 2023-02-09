@@ -8,6 +8,7 @@ from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin
 
+from open_inwoner.accounts.choices import ContactTypeChoices
 from open_inwoner.accounts.forms import ActionListForm, DocumentForm
 from open_inwoner.accounts.views.actions import (
     ActionCreateView,
@@ -16,7 +17,6 @@ from open_inwoner.accounts.views.actions import (
     ActionUpdateView,
     BaseActionFilter,
 )
-from open_inwoner.accounts.choices import ContactTypeChoices
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.utils.logentry import get_change_message
 from open_inwoner.utils.mixins import ExportMixin
