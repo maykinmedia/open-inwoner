@@ -615,6 +615,35 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
             ),
         )
 
+    def test_successful_document_upload_flow_with_uppercase_extension(self, m):
+        self._setUpMocks(m)
+
+        zaak_type_config = ZaakTypeConfigFactory(
+            identificatie=self.zaaktype["identificatie"]
+        )
+        zaak_type_iotc = ZaakTypeInformatieObjectTypeConfigFactory(
+            zaaktype_config=zaak_type_config,
+            informatieobjecttype_url=self.informatie_object["url"],
+            zaaktype_uuids=[self.zaaktype["uuid"]],
+            document_upload_enabled=True,
+        )
+
+        response = self.app.get(self.case_detail_url, user=self.user)
+        form = response.forms["document-upload"]
+        form["title"] = "uploaded file"
+        form["type"] = zaak_type_iotc.id
+        form["file"] = Upload("upload.TXT", b"data", "text/plain")
+        form_response = form.submit()
+
+        redirect = form_response.follow()
+        redirect_messages = list(redirect.context["messages"])
+
+        self.assertRedirects(form_response, self.case_detail_url)
+        self.assertEqual(
+            redirect_messages[0].message,
+            _("upload.TXT has been successfully uploaded"),
+        )
+
     def test_upload_file_flow_fails_with_invalid_file_extension(self, m):
         self._setUpMocks(m)
 
