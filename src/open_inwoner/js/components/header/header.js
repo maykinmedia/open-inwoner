@@ -25,9 +25,16 @@ class Header extends Component {
    * Callbacks should trigger `setState` which in turn triggers `render`.
    */
   bindEvents() {
-    this.node.addEventListener('click', () =>
-      this.setState({ open: !this.state.open })
-    )
+    this.node.addEventListener('keyup', this.onKeyUp.bind(this))
+    this.node.addEventListener('click', (e) => {
+      console.log('click in bindEvents')
+      if (
+        e.target.matches('.header__button') ||
+        e.target.matches('.header__button *')
+      ) {
+        this.setState({ open: !this.state.open })
+      }
+    })
   }
 
   /**
@@ -35,6 +42,7 @@ class Header extends Component {
    * @returns {HTMLButtonElement}
    */
   getButton() {
+    console.log('getButton')
     return BEM.getChildBEMNode(this.node, BLOCK_HEADER, ELEMENT_BUTTON)
   }
   /**
@@ -42,7 +50,18 @@ class Header extends Component {
    * @returns {HTMLDialogElement}
    */
   getSubMenu() {
+    console.log('getSubMenu')
     return BEM.getChildBEMNode(this.node, BLOCK_HEADER, ELEMENT_SUBMENU)
+  }
+  /**
+   * Gets called when a key is released.
+   * If key is escape key, explicitly close the mobile menu.
+   * @param {KeyboardEvent} event
+   */
+  onKeyUp(event) {
+    if (event.key === 'Escape') {
+      this.setState({ open: false })
+    }
   }
 
   /**
@@ -51,10 +70,14 @@ class Header extends Component {
    * @param {Object} state State to render.
    */
   render(state) {
+    console.log('render', state)
     document.body.classList.add('body')
     BEM.toggleModifier(document.body, MODIFIER_OPEN, state.open)
     BEM.toggleModifier(this.getButton(), MODIFIER_OPEN, state.open)
-    state.open ? this.getSubMenu().showModal() : this.getSubMenu().close()
+
+    if (matchMedia('(max-width: 767px)').matches) {
+      state.open ? this.getSubMenu().show() : this.getSubMenu().close()
+    }
 
     if (state.open) {
       window.scrollTo({ x: 0, y: 0 })
