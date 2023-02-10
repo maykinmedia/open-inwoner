@@ -27,7 +27,6 @@ class Header extends Component {
   bindEvents() {
     this.node.addEventListener('keyup', this.onKeyUp.bind(this))
     this.node.addEventListener('click', (e) => {
-      console.log('click in bindEvents')
       if (
         e.target.matches('.header__button') ||
         e.target.matches('.header__button *')
@@ -42,7 +41,6 @@ class Header extends Component {
    * @returns {HTMLButtonElement}
    */
   getButton() {
-    console.log('getButton')
     return BEM.getChildBEMNode(this.node, BLOCK_HEADER, ELEMENT_BUTTON)
   }
   /**
@@ -50,7 +48,6 @@ class Header extends Component {
    * @returns {HTMLDialogElement}
    */
   getSubMenu() {
-    console.log('getSubMenu')
     return BEM.getChildBEMNode(this.node, BLOCK_HEADER, ELEMENT_SUBMENU)
   }
   /**
@@ -70,7 +67,6 @@ class Header extends Component {
    * @param {Object} state State to render.
    */
   render(state) {
-    console.log('render', state)
     document.body.classList.add('body')
     BEM.toggleModifier(document.body, MODIFIER_OPEN, state.open)
     BEM.toggleModifier(this.getButton(), MODIFIER_OPEN, state.open)

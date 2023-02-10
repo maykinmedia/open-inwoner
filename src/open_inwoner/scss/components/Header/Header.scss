@@ -121,7 +121,7 @@ $vm: var(--spacing-large);
     z-index: 2;
 
     @media (min-width: 768px) {
-      display: block;
+      display: none;
     }
   }
   &__submenu::backdrop {
