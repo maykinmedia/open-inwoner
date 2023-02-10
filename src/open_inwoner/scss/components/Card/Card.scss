@@ -72,41 +72,7 @@
     object-fit: contain;
   }
   &__body {
-    padding: 0;
-    // give space for padding of children to make entire content clickable
-    height: 100%;
-
-    p.h3 {
-      height: calc(100% - 2 * (var(--card-spacing)));
-      // make entire content clickable, without changing template too much
-    }
-
-    a:link.card--description {
-      display: block;
-      color: var(--font-color-body);
-      text-decoration: none;
-      height: calc(100% - var(--row-height) - var(--card-spacing));
-      // pushes the forward-arrow down to the bottom,
-      // so button needs to be positioned Absolute, since the height will increase if a product-title covers multiple lines
-
-      p {
-        margin: var(--spacing-small) 0 calc(3 * var(--spacing-large)) 0;
-      }
-    }
-
-    .h2 a.link {
-      width: 100%;
-      // make entire content clickable, without changing template too much
-    }
-
-    .h3 a.link {
-      display: flex;
-      flex-wrap: wrap;
-      align-content: start;
-      padding: var(--card-spacing);
-      height: 100%;
-      width: calc(100% - var(--gutter-width));
-    }
+    padding: var(--card-spacing);
   }
 
   &__body--grid {
@@ -117,15 +83,6 @@
 
     .card__content {
       padding: var(--card-spacing);
-
-      a:link.card--description {
-        display: block;
-        color: var(--font-color-body);
-        text-decoration: none;
-        height: calc(100% - var(--row-height) - var(--card-spacing));
-        // this part will push the forward-arrow down to the bottom,
-        // but button needs to be positioned Absolute, since the height will increase if a product-title wil cover multiple lines
-      }
 
       .p,
       .button {
@@ -203,10 +160,7 @@
 
   /// Arrow button on product cards.
   a.button:last-child {
-    //float: right; remove float IF designer agrees all arrows should always be at the bottom
-    position: absolute;
-    bottom: var(--card-spacing);
-    right: calc(var(--spacing-large));
+    float: right;
   }
 
   .link + .link {

@@ -12,10 +12,6 @@
     &--columns-#{$i} {
       --card-columns: 1;
 
-      .card .card__body {
-        padding: var(--card-spacing);
-      }
-
       @media (min-width: 768px) {
         --card-columns: #{$i};
       }
@@ -23,13 +19,6 @@
   }
 
   &--small {
-    .card__body {
-      padding: var(--card-spacing);
-    }
-    .card__body.card__body--grid {
-      padding: 0;
-    }
-
     @media (min-width: 768px) {
       --card-columns: 2;
     }
