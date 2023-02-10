@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404, HttpResponseRedirect
@@ -10,6 +12,7 @@ from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.accounts.choices import ContactTypeChoices
 from open_inwoner.accounts.forms import ActionListForm, DocumentForm
+from open_inwoner.accounts.models import User
 from open_inwoner.accounts.views.actions import (
     ActionCreateView,
     ActionDeleteView,
@@ -22,7 +25,7 @@ from open_inwoner.utils.logentry import get_change_message
 from open_inwoner.utils.mixins import ExportMixin
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
-from .forms import PlanForm, PlanGoalForm
+from .forms import PlanForm, PlanGoalForm, PlanListFilterForm
 from .models import Plan
 
 
@@ -34,11 +37,33 @@ class PlansEnabledMixin:
         return super().dispatch(request, *args, **kwargs)
 
 
+class BasePlanFilter:
+    """
+    This will filter the plans correctly.
+    """
+
+    def get_filtered_plans(self, plans):
+        plan_contacts = self.request.GET.get("plan_contacts")
+        status = self.request.GET.get("status")
+        today = date.today()
+
+        if plan_contacts:
+            plans = plans.filter(plan_contacts__uuid=plan_contacts)
+        if status:
+            if status == "open":
+                plans = plans.filter(end_date__gt=today)
+            elif status == "closed":
+                plans = plans.filter(end_date__lt=today)
+
+        return plans
+
+
 class PlanListView(
     PlansEnabledMixin,
     LoginRequiredMixin,
     CommonPageMixin,
     BaseBreadcrumbMixin,
+    BasePlanFilter,
     ListView,
 ):
     template_name = "pages/plans/list.html"
@@ -52,27 +77,57 @@ class PlanListView(
         ]
 
     def get_queryset(self):
-        return Plan.objects.connected(self.request.user).prefetch_related(
-            "plan_contacts"
+        return (
+            Plan.objects.connected(self.request.user)
+            .prefetch_related("plan_contacts")
+            .order_by("-end_date")
         )
+
+    def get_available_contacts_for_filtering(self, plans):
+        """
+        Return all available contacts for filtering for all the plans.
+        """
+        user_contacts_qs = []
+        for plan in plans:
+            user_contacts_qs.append(plan.get_other_users(user=self.request.user))
+
+        available_contacts = User.objects.none()
+        for qs in user_contacts_qs:
+            available_contacts |= qs
+
+        return available_contacts
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
+        plans = {"extended_plans": False}
 
-        plans = self.get_queryset()
-        paginator, page, queryset, is_paginated = self.paginate_queryset(plans, 10)
+        filtered_plans = self.get_filtered_plans(self.get_queryset())
+        paginator, page, queryset, is_paginated = self.paginate_queryset(
+            filtered_plans, 10
+        )
         context["paginator"] = paginator
         context["page_obj"] = page
         context["is_paginated"] = is_paginated
-        context["plans"] = queryset
+        plans["plan_list"] = queryset
 
+        # render the extended plan list view when a begeleider is logged in
         if user.contact_type == ContactTypeChoices.begeleider:
-            plans = {}
-            for plan in queryset:
-                plans[plan] = plan.get_other_users_full_names(user=user)
+            plans["extended_plans"] = True
+            available_contacts = self.get_available_contacts_for_filtering(
+                self.get_queryset()
+            )
+            context["plan_filter_form"] = PlanListFilterForm(
+                data=self.request.GET, available_contacts=available_contacts
+            )
 
-            context["extended_plans"] = plans
+            temp_plans = {}
+            for plan in queryset:
+                temp_plans[plan] = plan.get_other_users_full_names(user=user)
+
+            plans["plan_list"] = temp_plans
+
+        context["plans"] = plans
         return context
 
 
