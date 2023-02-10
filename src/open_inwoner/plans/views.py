@@ -8,6 +8,7 @@ from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin
 
+from open_inwoner.accounts.choices import ContactTypeChoices
 from open_inwoner.accounts.forms import ActionListForm, DocumentForm
 from open_inwoner.accounts.views.actions import (
     ActionCreateView,
@@ -42,6 +43,7 @@ class PlanListView(
 ):
     template_name = "pages/plans/list.html"
     model = Plan
+    paginate_by = 10
 
     @cached_property
     def crumbs(self):
@@ -53,6 +55,25 @@ class PlanListView(
         return Plan.objects.connected(self.request.user).prefetch_related(
             "plan_contacts"
         )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+
+        plans = self.get_queryset()
+        paginator, page, queryset, is_paginated = self.paginate_queryset(plans, 10)
+        context["paginator"] = paginator
+        context["page_obj"] = page
+        context["is_paginated"] = is_paginated
+        context["plans"] = queryset
+
+        if user.contact_type == ContactTypeChoices.begeleider:
+            plans = {}
+            for plan in queryset:
+                plans[plan] = plan.get_other_users_full_names(user=user)
+
+            context["extended_plans"] = plans
+        return context
 
 
 class PlanDetailView(
@@ -424,3 +445,10 @@ class PlanExportView(
 
     def get_queryset(self):
         return Plan.objects.connected(self.request.user).prefetch_related("actions")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        plan = self.get_object()
+
+        context["plan_contacts"] = plan.get_other_users_full_names(self.request.user)
+        return context

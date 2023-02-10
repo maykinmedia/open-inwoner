@@ -1,12 +1,15 @@
+from datetime import date
+
 from django.contrib.messages import get_messages
 from django.core import mail
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from django_webtest import WebTest
+from freezegun import freeze_time
 from webtest import Upload
 
-from open_inwoner.accounts.choices import StatusChoices
+from open_inwoner.accounts.choices import ContactTypeChoices, StatusChoices
 from open_inwoner.accounts.models import Action
 from open_inwoner.accounts.tests.factories import ActionFactory, UserFactory
 from open_inwoner.accounts.tests.test_action_views import ActionsPlaywrightTests
@@ -560,6 +563,113 @@ class PlanViewTests(WebTest):
             HTTP_HX_REQUEST="true",
         )
         self.assertEqual(response.status_code, 404)
+
+    @freeze_time("2022-01-01")
+    def test_plan_list_renders_expected_data_when_begeleider(self):
+        self.user.contact_type = ContactTypeChoices.begeleider
+        self.user.save()
+        self.plan.end_date = date(2022, 1, 20)
+        self.plan.save()
+
+        response = self.app.get(self.list_url, user=self.user)
+        rendered_plan_title = response.pyquery("tbody .table__header")[0].text
+        rendered_contact = response.pyquery("tbody .table__item")[0].text
+        rendered_end_date = response.pyquery("tbody .table__item")[1].text
+        rendered_plan_status = response.pyquery("tbody .table__item")[2].text
+        rendered_actions_num = response.pyquery("tbody .table__item")[3].text
+        rendered_action_required = response.pyquery(
+            "tbody .table__item--notification-danger"
+        )[0].text
+
+        self.assertEqual(rendered_plan_title, self.plan.title)
+        self.assertEqual(rendered_contact, self.contact.get_full_name())
+        self.assertEqual(rendered_end_date, "20-01-2022")
+        self.assertEqual(rendered_plan_status, _("Open"))
+        self.assertEqual(rendered_actions_num, "1")
+        self.assertEqual(rendered_action_required, _("Actie vereist"))
+
+    @freeze_time("2022-01-01")
+    def test_plan_list_renders_expected_data_for_expired_plan_when_begeleider(self):
+        self.user.contact_type = ContactTypeChoices.begeleider
+        self.user.save()
+        self.plan.end_date = date(2022, 1, 1)
+        self.plan.save()
+
+        response = self.app.get(self.list_url, user=self.user)
+        rendered_end_date = response.pyquery("tbody .table__item")[1].text
+        rendered_plan_status = response.pyquery("tbody .table__item")[2].text
+
+        self.assertEqual(rendered_end_date, "01-01-2022")
+        self.assertEqual(rendered_plan_status, _("Afgerond"))
+
+    @freeze_time("2022-01-01")
+    def test_plan_list_renders_expected_data_for_approval_actions_when_begeleider(self):
+        self.user.contact_type = ContactTypeChoices.begeleider
+        self.user.save()
+        self.action.status = StatusChoices.approval
+        self.action.save()
+
+        response = self.app.get(self.list_url, user=self.user)
+        rendered_actions_num = response.pyquery("tbody .table__item")[3].text
+        rendered_action_required = response.pyquery(
+            "tbody .table__item--notification-danger"
+        )[0].text
+
+        self.assertEqual(rendered_actions_num, "1")
+        self.assertEqual(rendered_action_required, _("Actie vereist"))
+
+    @freeze_time("2022-01-01")
+    def test_plan_list_renders_expected_data_for_closed_actions_when_begeleider(self):
+        self.user.contact_type = ContactTypeChoices.begeleider
+        self.user.save()
+        self.action.status = StatusChoices.closed
+        self.action.save()
+
+        response = self.app.get(self.list_url, user=self.user)
+        rendered_actions_num = response.pyquery("tbody .table__item")[3].text
+        rendered_action_required = response.pyquery(
+            "tbody .table__item--notification-danger"
+        )
+
+        self.assertEqual(rendered_actions_num, "0")
+        self.assertEqual(rendered_action_required, [])
+
+    def test_plan_list_doesnt_add_deleted_action_to_total_when_begeleider(self):
+        self.user.contact_type = ContactTypeChoices.begeleider
+        self.user.save()
+        self.action.is_deleted = True
+        self.action.save()
+
+        response = self.app.get(self.list_url, user=self.user)
+        rendered_actions_num = response.pyquery("tbody .table__item")[3].text
+        rendered_action_required = response.pyquery(
+            "tbody .table__item--notification-danger"
+        )
+
+        self.assertEqual(rendered_actions_num, "0")
+        self.assertEqual(rendered_action_required, [])
+
+    @freeze_time("2022-01-01")
+    def test_plan_list_renders_template_for_regular_user(self):
+        self.plan.end_date = date(2022, 1, 20)
+        self.plan.save()
+
+        response = self.app.get(self.list_url, user=self.user)
+        extended = response.pyquery(".plans-extended")
+
+        self.assertEqual(len(extended), 0)
+
+    @freeze_time("2022-01-01")
+    def test_plan_list_renders_template_for_begeleider(self):
+        self.user.contact_type = ContactTypeChoices.begeleider
+        self.user.save()
+        self.plan.end_date = date(2022, 1, 20)
+        self.plan.save()
+
+        response = self.app.get(self.list_url, user=self.user)
+        extended = response.pyquery(".plans-extended")
+
+        self.assertEqual(len(extended), 1)
 
 
 @multi_browser()
