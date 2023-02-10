@@ -60,9 +60,16 @@ class PlanListView(
         context = super().get_context_data(**kwargs)
         user = self.request.user
 
+        plans = self.get_queryset()
+        paginator, page, queryset, is_paginated = self.paginate_queryset(plans, 10)
+        context["paginator"] = paginator
+        context["page_obj"] = page
+        context["is_paginated"] = is_paginated
+        context["plans"] = queryset
+
         if user.contact_type == ContactTypeChoices.begeleider:
             plans = {}
-            for plan in self.get_queryset():
+            for plan in queryset:
                 plans[plan] = plan.get_other_users_full_names(user=user)
 
             context["extended_plans"] = plans

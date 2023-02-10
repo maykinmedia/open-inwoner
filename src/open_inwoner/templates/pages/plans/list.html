@@ -43,9 +43,9 @@
             </tbody>
         </table>
         
-        {% pagination page_obj=page_obj paginator=paginator request=request %}
     {% else %}
-        {% card_container plans=object_list columns=2 %}
+        {% card_container plans=plans columns=2 %}
     {% endif %}
-
+        
+    {% pagination page_obj=page_obj paginator=paginator request=request %}
 {% endblock %}
