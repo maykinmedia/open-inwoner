@@ -56,13 +56,22 @@ $vm: var(--spacing-large);
 
   .logo {
     height: 100%;
-    padding: 8px;
+    padding: 8px 8px 8px 0;
     box-sizing: border-box;
 
     @media (min-width: 768px) {
       height: auto;
+      grid-column: 1 / span 6;
+      margin: var(--spacing-large) var(--spacing-large) var(--spacing-large) 0;
+    }
+    @media (min-width: 768px) and (max-width: 844px) {
       grid-column: 1 / span 8;
-      margin: var(--spacing-large) 0;
+    }
+    @media (min-width: 845px) and (max-width: 955px) {
+      grid-column: 1 / span 7;
+    }
+    @media (max-width: 767px) {
+      padding: 8px;
     }
   }
 
