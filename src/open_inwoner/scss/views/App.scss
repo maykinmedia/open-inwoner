@@ -139,9 +139,9 @@
   --color-success-lighter: hsl(
     var(--color-success-h),
     var(--color-success-s),
-    // this was +50% but +57% is needed for 4.5:1 contrast
     calc(var(--color-success-l) + 57%)
   );
+  // color-success-l was +50% but +57% is needed for 4.5:1 contrast
 
   --color-font-primary: var(--color-white);
   --color-font-secondary: var(--color-white);
