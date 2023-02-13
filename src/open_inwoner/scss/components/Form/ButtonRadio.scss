@@ -12,16 +12,38 @@
       color: var(--color-primary);
       cursor: default;
     }
+    &#negative {
+      &:checked ~ .button-radio__button {
+        color: #cf1c08;
+        cursor: default;
+      }
+    }
+    &#positive {
+      &:checked ~ .button-radio__button {
+        color: var(--color-green-dark);
+        cursor: default;
+      }
+    }
   }
 
   &__button {
-    border: 1px solid #d2d2d2;
+    border: 1px solid var(--color-gray-light);
     border-left: 0;
     background-color: var(--color-gray-lightest);
     color: var(--color-gray-lighter);
     display: inline-block;
     padding: 12px;
     cursor: pointer;
+
+    &[for='negative'] {
+      border-top-right-radius: var(--border-radius);
+      border-bottom-right-radius: var(--border-radius);
+    }
+
+    &[for='positive'] {
+      border-top-left-radius: var(--border-radius);
+      border-bottom-left-radius: var(--border-radius);
+    }
   }
 
   &:first-child {
