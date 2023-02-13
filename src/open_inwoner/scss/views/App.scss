@@ -148,10 +148,8 @@
   --color-font-accent: var(--color-gray-dark);
 
   --color-body: var(--color-gray-dark);
-  // changed to #949494 to get the required 3:1 contrast ratio
+  // changed to #949494 to get the required 3:1 contrast ratio - in case of decorative border use var(--color-gray).
   --color-mute: #949494;
-  // decorative, non-meaningful elements do not have contrast requirements
-  --color-mute-deco: var(--color-gray);
 
   /// Font.
 
