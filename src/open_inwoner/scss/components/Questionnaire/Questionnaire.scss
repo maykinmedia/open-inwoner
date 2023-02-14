@@ -13,12 +13,12 @@
   }
 
   &__list-item {
-    border-bottom: var(--border-width) solid var(--color-gray);
+    border-bottom: var(--border-width-thin) solid var(--color-gray);
     padding: var(--spacing-large) var(--spacing-medium);
   }
 
   &__list-item:nth-child(1) {
-    border-top: var(--border-width) solid var(--color-gray);
+    border-top: var(--border-width-thin) solid var(--color-gray);
   }
 
   h2 {
