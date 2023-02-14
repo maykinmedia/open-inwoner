@@ -180,9 +180,13 @@ class ContactFilterForm(forms.Form):
 
 
 class ContactCreateForm(forms.Form):
-    first_name = forms.CharField(max_length=255, validators=[validate_charfield_entry])
-    last_name = forms.CharField(max_length=255, validators=[validate_charfield_entry])
-    email = forms.EmailField()
+    first_name = forms.CharField(
+        label=_("First name"), max_length=255, validators=[validate_charfield_entry]
+    )
+    last_name = forms.CharField(
+        label=_("Last name"), max_length=255, validators=[validate_charfield_entry]
+    )
+    email = forms.EmailField(label=_("Email"))
 
     def __init__(self, user, *args, **kwargs):
         self.user = user
