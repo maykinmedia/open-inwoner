@@ -14,7 +14,8 @@
   }
 
   &__list-item {
-    border: var(--border-width) solid var(--color-mute);
+    border: var(--border-width-thin) solid var(--color-gray);
+    border-radius: var(--border-radius);
     padding: var(--spacing-large);
   }
 
