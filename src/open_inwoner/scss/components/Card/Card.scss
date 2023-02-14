@@ -1,7 +1,7 @@
 .card {
   --card-color-background: white;
   --card-color-border: var(--color-gray);
-  --card-size-border: 1px;
+  --card-size-border: var(--border-width-thin);
   --card-size-dog-ear: var(--gutter-width);
   --card-spacing: var(--spacing-large);
 

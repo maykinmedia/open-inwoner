@@ -27,7 +27,7 @@
   }
 
   &__button {
-    border: 1px solid var(--color-gray-light);
+    border: var(--border-width-thin) solid var(--color-gray-light);
     border-left: 0;
     background-color: var(--color-gray-lightest);
     color: var(--color-gray-lighter);
