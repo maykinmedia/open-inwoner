@@ -65,7 +65,7 @@ msgstr[1] "acties zijn hersteld"
 #: accounts/admin.py:179
 #, python-brace-format
 msgid "<a href='{url}'>{text}</a>"
-msgstr ""
+msgstr "<a href='{url}'>{text}</a>"
 
 #: accounts/choices.py:7
 msgid "E-mail en Wachtwoord"
@@ -788,10 +788,8 @@ msgstr ""
 #: accounts/tests/test_contact_views.py:237
 #: accounts/tests/test_profile_views.py:242
 #: accounts/tests/test_profile_views.py:268
-#, fuzzy, python-brace-format
-#| msgid "Uw invoer bevat een ongeldig teken: %s"
 msgid "Uw invoer bevat een ongeldig teken: {char}"
-msgstr "Uw invoer bevat een ongeldig teken: %s"
+msgstr "Uw invoer bevat een ongeldig teken: {char}"
 
 #: accounts/tests/test_auth.py:841
 msgid "Deze account is inactief."
@@ -2121,36 +2119,28 @@ msgid "Footer logo"
 msgstr ""
 
 #: configurations/models.py:244
-#, fuzzy
-#| msgid "Footer mailing title"
 msgid "Footer logo title"
-msgstr "Kop postadres"
+msgstr "Footer logo title"
 
 #: configurations/models.py:245
-#, fuzzy
-#| msgid "The help text for the home page."
 msgid "The title - help text of the footer logo."
-msgstr "Helptekst in de popup op de voorpagina"
+msgstr "The title - help text of the footer logo."
 
 #: configurations/models.py:248
-#, fuzzy
-#| msgid "Footer mailing title"
 msgid "Footer logo link"
-msgstr "Kop postadres"
+msgstr "Footer logo link"
 
 #: configurations/models.py:251
-#, fuzzy
-#| msgid "The help text for the home page."
 msgid "The external link for the footer logo."
-msgstr "Helptekst in de popup op de voorpagina"
+msgstr "The external link for the footer logo."
 
 #: configurations/models.py:254
 msgid "Favicon image (32x32)"
-msgstr ""
+msgstr "Favicon image (32x32)"
 
 #: configurations/models.py:259
 msgid "Image to use as favicon"
-msgstr ""
+msgstr "Image to use as favicon"
 
 #: configurations/models.py:264
 msgid "Flatpages"
@@ -2325,7 +2315,7 @@ msgstr "De 'idsite' van de website in Matamo die getrackt dient te worden."
 
 #: configurations/models.py:358
 msgid "SiteImprove ID"
-msgstr ""
+msgstr "SiteImprove ID"
 
 #: configurations/models.py:363
 msgid ""
@@ -2333,6 +2323,8 @@ msgid ""
 "contain a URL like '//siteimproveanalytics.com/js/siteanalyze_xxxxx.js'. The "
 "xxxxx part is the ID."
 msgstr ""
+"SiteImprove ID - Dit nummer kan gevonden worden in de SiteImprove snippet, dit is onderdeel van een URL "
+" zoals '//siteimproveanalytics.com/js/siteanalyze_xxxxx.js' waarbij het xxxxx-deel de SiteImprove ID is die hier ingevuld moet worden."
 
 #: configurations/models.py:370
 msgid "Show cases"
@@ -2385,20 +2377,21 @@ msgstr ""
 
 #: configurations/models.py:399
 msgid "Openid Connect Logo"
-msgstr ""
+msgstr "OpenID Connect Logo"
 
 #: configurations/models.py:404
 msgid "Logo that can be used for the OpenId connect login method"
-msgstr ""
+msgstr "Het logo dat gebruikt wordt voor OpenID Connect (OIDC/Azure AD) als loginmethode is ingesteld"
 
 #: configurations/models.py:407
 msgid "Openid Connect login text"
-msgstr ""
+msgstr "OpenID Connect login tekst"
 
 #: configurations/models.py:411
 msgid ""
 "The text that should display when OpenId connect is set as a login method"
 msgstr ""
+"De tekst dat getoond wordt wanneer OpenID Connect (OIDC/Azure AD) als loginmethode is ingesteld"
 
 #: configurations/models.py:416 configurations/models.py:419
 msgid "Site Configuration"
@@ -2471,41 +2464,39 @@ msgid "data was retrieved from haal centraal"
 msgstr "data is opgehaald via Haal Centraal BRP"
 
 #: openzaak/admin.py:46
-#, fuzzy
-#| msgid "Voeg document toe"
 msgid "notify document attachment"
-msgstr "Voeg document toe"
+msgstr "notificeer bij nieuw document"
 
 #: openzaak/admin.py:52
 msgid "No"
 msgstr "Nee"
 
 #: openzaak/admin.py:65
-#, fuzzy
-#| msgid "Catalogi API"
 msgid "Catalogus"
-msgstr "Catalogi API"
+msgstr "Catalogus"
 
 #: openzaak/admin.py:93 openzaak/tests/test_admin.py:78
 msgid ""
 "Enabling both zaaktype and zaaktypeinformatieobject upload is not allowed. "
 "Only one of them should be enabled."
 msgstr ""
+"Het gebruiken van een link en een informatieobject tegelijkertijd wordt niet toegestaan. "
+"Gebruik of de link, of een informatieobject maar niet beiden."
 
 #: openzaak/admin.py:219
 #, python-format
 msgid "%d zaaktype was successfully set to notify on status changes."
 msgid_plural "%d zaaktypes were successfully set to notify on status changes."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d zaaktype is succesvol ingesteld om bij statusveranderingen een notificatie te sturen."
+msgstr[1] "%d zaaktypen zijn succesvol ingesteld om bij statusveranderingen een notificatie te sturen."
 
 #: openzaak/admin.py:233
 #, python-format
 msgid "%d zaaktype was successfully set to not notify on status changes."
 msgid_plural ""
 "%d zaaktypes were successfully set to not notify on status changes."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d zaaktype is succesvol ingesteld om bij statusveranderingen geen notificaties te sturen."
+msgstr[1] "%d zaaktypen zijn succesvol ingesteld om bij statusveranderingen geen notificaties te sturen."
 
 #: openzaak/models.py:49
 msgid "Open Zaak API"
@@ -2538,23 +2529,23 @@ msgstr ""
 
 #: openzaak/models.py:86
 msgid "Max upload file size (in MB)"
-msgstr ""
+msgstr "Maximale upload grootte (in MB)"
 
 #: openzaak/models.py:88
 msgid "The max size of the file (in MB) which is uploaded."
-msgstr ""
+msgstr "Documentuploads mogen maximaal dit aantal MB groot zijn, anders worden ze geweigerd."
 
 #: openzaak/models.py:92
 msgid "Allowed file extensions"
-msgstr ""
+msgstr "Toegestane bestandsextensies"
 
 #: openzaak/models.py:96
 msgid "A list of the allowed file extensions."
-msgstr ""
+msgstr "Een lijst van toegestande bestandsextensies, alleen documentuploads met een van deze extensies worden toegelaten."
 
 #: openzaak/models.py:100
 msgid "Use StatusType.informeren workaround"
-msgstr ""
+msgstr "Maak gebruik van StatusType.informeren workaround (eSuite)"
 
 #: openzaak/models.py:102
 msgid ""
@@ -2562,12 +2553,12 @@ msgid ""
 "requires ZaakTypeConfig's to be configured to determine on which changes to "
 "notify."
 msgstr ""
+"Schakel dit in wanneer StatusType.informeren niet wordt ondersteund door de ZGW API waar deze omgeving aan is gekoppeld (zoals de eSuite ZGW API)"
+"Hierdoor is het verplicht om per zaaktype aan te geven wanneer een inwoner hier een notificatie van dient te krijgen."
 
 #: openzaak/models.py:108
-#, fuzzy
-#| msgid "Identificatie"
 msgid "Reformat eSuite Zaak.identificatie"
-msgstr "Aanvraag"
+msgstr "Converteer eSuite zaaknummers"
 
 #: openzaak/models.py:110
 msgid ""
@@ -2575,56 +2566,49 @@ msgid ""
 "eSuite format (ex: '0014ESUITE66392022') to user friendly format "
 "('6639-2022')."
 msgstr ""
+"Schakel dit in om de zaaknummers van het interne "
+"eSuite format (ex: '0014ESUITE66392022') om te zetten naar een toegankelijkere notatie "
+"('6639-2022')."
 
 #: openzaak/models.py:116
 msgid "Open Zaak configuration"
 msgstr "Configuratie 'Open Zaak'"
 
 #: openzaak/models.py:121
-#, fuzzy
-#| msgid "Catalogi API"
 msgid "Catalogus URL"
-msgstr "Catalogi API"
+msgstr "Catalogus URL"
 
 #: openzaak/models.py:125
 msgid "Domein"
-msgstr ""
+msgstr "Domein"
 
 #: openzaak/models.py:129
 msgid "RSIN"
-msgstr ""
+msgstr "RSIN"
 
 #: openzaak/models.py:148
-#, fuzzy
-#| msgid "Identificatie"
 msgid "Zaaktype identificatie"
-msgstr "Aanvraag"
+msgstr "Zaaktype identificatie"
 
 #: openzaak/models.py:152
-#, fuzzy
-#| msgid "Omschrijving"
 msgid "Zaaktype omschrijving"
-msgstr "Omschrijving"
+msgstr "Zaaktype omschrijving"
 
 #: openzaak/models.py:164
 msgid "Document upload URL"
-msgstr ""
+msgstr "Document upload URL"
 
 #: openzaak/models.py:168 openzaak/models.py:227
-#, fuzzy
-#| msgid "Voeg document toe"
 msgid "Enable document upload"
-msgstr "Voeg document toe"
+msgstr "Activeer documentuploads"
 
 #: openzaak/models.py:175
-#, fuzzy
-#| msgid "Site Configuration"
 msgid "Zaaktype Configuration"
-msgstr "Algemene configuratie"
+msgstr "Zaaktype Configuratie"
 
 #: openzaak/models.py:210
 msgid "Information object URL"
-msgstr ""
+msgstr "Informatieobject URL"
 
 #: openzaak/models.py:214 templates/pages/cases/list.html:20
 #: templates/pages/plans/create.html:25
@@ -2633,53 +2617,46 @@ msgstr "Omschrijving"
 
 #: openzaak/models.py:219
 msgid "Zaaktype UUID"
-msgstr ""
+msgstr "Zaaktype UUID"
 
 #: openzaak/models.py:231
-#, fuzzy
-#| msgid "Voeg document toe"
 msgid "Enable document notifications"
-msgstr "Voeg document toe"
+msgstr "Activeer documentnotificiaties"
 
 #: openzaak/models.py:234
 msgid ""
 "When enabled the user will receive a notification when a visible document is "
 "added to the case"
 msgstr ""
+"Wanneer dit is ingeschakeld dan krijgen actieve gebruikers op deze omgeving een bericht wanneer er een nieuw zaakdocument voor hen beschikbaar is"
 
 #: openzaak/models.py:240
 msgid "Zaaktype Information Object Configuration"
-msgstr ""
+msgstr "Zaaktype Informatieobject configuratie"
 
 #: openzaak/models.py:261
 msgid "Information object UUID"
-msgstr ""
+msgstr "Informatieobject UUID"
 
 #: openzaak/models.py:273 openzaak/models.py:301
-#, fuzzy
-#| msgid "UUID"
 msgid "Zaak UUID"
-msgstr "UUID"
+msgstr "Zaak UUID"
 
 #: openzaak/models.py:276
-#, fuzzy
-#| msgid "Status"
 msgid "Status UUID"
-msgstr "Status"
+msgstr "Status UUID"
 
 #: openzaak/models.py:285
-#, fuzzy
-#| msgid "Open Zaak configuration"
 msgid "Open Zaak status notification record"
-msgstr "Configuratie 'Open Zaak'"
+msgstr "Open Zaak statusnotificatie record"
 
 #: openzaak/models.py:304
 msgid "InformatieObject UUID"
-msgstr ""
+msgstr "Informatieobject UUID"
 
 #: openzaak/models.py:313
 msgid "Open Zaak info object notification record"
-msgstr ""
+msgstr "Open Zaak informatieobject notificatie record"
 
 #: openzaak/tests/test_case_detail.py:500
 #: openzaak/tests/test_case_detail.py:510
@@ -2692,17 +2669,18 @@ msgid ""
 "{self.uploaded_informatie_object['bestandsnaam']} has been successfully "
 "uploaded"
 msgstr ""
+"{self.uploaded_informatie_object['bestandsnaam']} is succesvol geupload"
 
 #: openzaak/tests/test_case_detail.py:644
 msgid "upload.TXT has been successfully uploaded"
-msgstr ""
+msgstr "upload.TXT has been successfully uploaded"
 
 #: openzaak/tests/test_case_detail.py:743
 #: openzaak/tests/test_case_detail.py:764
 #: openzaak/tests/test_case_detail.py:786
 #: openzaak/tests/test_case_detail.py:808
 msgid "By clicking the button below you can upload a document."
-msgstr ""
+msgstr "Via onderstaande knop kunt u een bestand toevoegen."
 
 #: openzaak/tests/test_case_detail.py:837
 #: openzaak/tests/test_case_detail.py:867
@@ -3422,18 +3400,16 @@ msgid "Type:"
 msgstr "Type:"
 
 #: plans/templates/plans/preview.html:32
-#, fuzzy
-#| msgid "Einddatum"
 msgid "Eindigt"
-msgstr "Einddatum"
+msgstr "Eindigt"
 
 #: plans/templates/plans/preview.html:33
 msgid "Over"
-msgstr ""
+msgstr "Over"
 
 #: plans/templates/plans/preview.html:33
 msgid "dagen"
-msgstr ""
+msgstr "dagen"
 
 #: plans/tests/test_logging.py:47 plans/views.py:156
 msgid "plan was created"
@@ -3467,10 +3443,8 @@ msgstr "Dit veld is vereist."
 
 #: plans/tests/test_views.py:589 plans/tests/test_views.py:619
 #: templates/pages/plans/list.html:33
-#, fuzzy
-#| msgid "Actie voor"
 msgid "Actie vereist"
-msgstr "Actie voor"
+msgstr "Actie vereist"
 
 #: plans/views.py:96 plans/views.py:141 plans/views.py:180 plans/views.py:225
 #: plans/views.py:260 plans/views.py:294 plans/views.py:340
@@ -3880,22 +3854,16 @@ msgid "Hijack %(username)s"
 msgstr "Overname %(username)s"
 
 #: templates/pages/cases/list.html:19
-#, fuzzy
-#| msgid "Startdatum"
 msgid "Ontvangstdatum"
-msgstr "Startdatum"
+msgstr "Ontvangstdatum"
 
 #: templates/pages/cases/list.html:23
-#, fuzzy
-#| msgid "Mijn aanvragen"
 msgid "Bekijk aanvraag"
-msgstr "Mijn aanvragen"
+msgstr "Bekijk aanvraag"
 
 #: templates/pages/cases/status.html:35 templates/pages/cases/status.html:45
-#, fuzzy
-#| msgid "Documenten"
 msgid "Document toevoegen"
-msgstr "Documenten"
+msgstr "Document toevoegen"
 
 #: templates/pages/cases/status.html:37
 #, python-format
@@ -3907,16 +3875,15 @@ msgid ""
 msgstr ""
 
 #: templates/pages/cases/status.html:41
-#, fuzzy
-#| msgid "Nieuw bestand uploaden"
 msgid "Bestand uploaden"
-msgstr "Nieuw bestand uploaden"
+msgstr "Bestand uploaden"
 
 #: templates/pages/cases/status.html:43
 msgid ""
 "By clicking the button below you can upload a document. This is an external "
 "link and you will be redirected to a different system."
 msgstr ""
+"Via onderstaande knop kunt u een bestand toevoegen. U wordt doorgestuurd naar een ander systeem."
 
 #: templates/pages/category/detail.html:16
 msgid "Open in admin"
@@ -3985,20 +3952,16 @@ msgid "Start nieuwe samenwerking"
 msgstr "Start nieuwe samenwerking"
 
 #: templates/pages/plans/list.html:15
-#, fuzzy
-#| msgid "Samenwerken"
 msgid "Samenwerking"
-msgstr "Samenwerken"
+msgstr "Samenwerking"
 
 #: templates/pages/plans/list.html:19
-#, fuzzy
-#| msgid "Volgende actie"
 msgid "Openstaande acties"
-msgstr "Volgende actie"
+msgstr "Openstaande actie"
 
 #: templates/pages/plans/list.html:40
 msgid "There are no plans yet."
-msgstr ""
+msgstr "Er zijn nog geen samenwerkingsplannen."
 
 #: templates/pages/product/detail.html:16
 #: templates/pages/product/detail.html:20
@@ -4020,16 +3983,12 @@ msgid "U komt niet in aanmerking"
 msgstr "U komt niet in aanmerking"
 
 #: templates/pages/product/detail.html:97
-#, fuzzy
-#| msgid "link"
 msgid "links"
-msgstr "link"
+msgstr "links"
 
 #: templates/pages/product/detail.html:113
-#, fuzzy
-#| msgid "Gerelateerde producten"
 msgid "Gerelateerde links"
-msgstr "Gerelateerde producten"
+msgstr "Gerelateerde links"
 
 #: templates/pages/product/detail.html:141
 #: templates/pages/profile/contacts/list.html:64
@@ -4110,24 +4069,18 @@ msgstr ""
 "ingevuld) met deze persoon."
 
 #: templates/pages/profile/contacts/list.html:23
-#, fuzzy, python-format
-#| msgid "{contact} is toegevoegd aan uw contactpersonen."
 msgid "%(full_name)s wilt u toevoegen als contactpersoon."
-msgstr "{contact} is toegevoegd aan uw contactpersonen."
+msgstr "%(full_name)s wilt u toevoegen als contactpersoon."
 
 #: templates/pages/profile/contacts/list.html:29
 #: templates/pages/profile/contacts/list.html:44
-#, fuzzy
-#| msgid "Terugkerend"
 msgid "Weigeren"
-msgstr "Terugkerend"
+msgstr "Weigeren"
 
 #: templates/pages/profile/contacts/list.html:30
 #: templates/pages/profile/contacts/list.html:45
-#, fuzzy
-#| msgid "Accepted"
 msgid "Accepteren"
-msgstr "Geaccepteerd"
+msgstr "Accepteren"
 
 #: templates/pages/profile/contacts/list.html:61
 msgid "Naam"
@@ -4206,80 +4159,73 @@ msgid ""
 "Basisregistratie Personen (BRP). Al uw persoonlijke gegevens kunt u vinden "
 "op "
 msgstr ""
+"Hier ziet u een beperkte set van gegevens die van u zijn opgeslagen in de "
+"Basisregistratie Personen (BRP). Al uw persoonlijke gegevens kunt u vinden "
+"op "
 
 #: templates/pages/profile/mydata.html:18
 msgid "Mijn brp gegevens"
 msgstr ""
 
 #: templates/pages/profile/mydata.html:23
-#, fuzzy
-#| msgid "name"
 msgid "Voornamen"
-msgstr "Naam"
+msgstr "Voornamen"
 
 #: templates/pages/profile/mydata.html:27
 msgid "Voorletters"
-msgstr ""
+msgstr "Voorletters"
 
 #: templates/pages/profile/mydata.html:31
 msgid "Achternaam"
-msgstr ""
+msgstr "Achternaam"
 
 #: templates/pages/profile/mydata.html:35
 msgid "Voorvoegsel"
-msgstr ""
+msgstr "Voorvoegsel"
 
 #: templates/pages/profile/mydata.html:43
-#, fuzzy
-#| msgid "Geboortedatum"
 msgid "Geboorteplaats"
-msgstr "Geboortedatum"
+msgstr "Geboorteplaats"
 
 #: templates/pages/profile/mydata.html:47
 msgid "Burgerservicenummer (BSN)"
-msgstr ""
+msgstr "Burgerservicenummer (BSN)"
 
 #: templates/pages/profile/mydata.html:51
-#, fuzzy
-#| msgid "Geboortedatum"
 msgid "Geboorteland"
-msgstr "Geboortedatum"
+msgstr "Geboorteland"
 
 #: templates/pages/profile/mydata.html:55
 msgid "Geslacht"
-msgstr ""
+msgstr "Geslacht"
 
 #: templates/pages/profile/mydata.html:61
 msgid "Inschrijfadres"
-msgstr ""
+msgstr "Inschrijfadres"
 
 #: templates/pages/profile/mydata.html:65
 msgid "Straat"
-msgstr ""
+msgstr "Straat"
 
 #: templates/pages/profile/mydata.html:69
-#, fuzzy
-#| msgid "Zaaknummer"
 msgid "Huisnummer"
-msgstr "Zaaknummer"
+msgstr "Huisnummer"
 
 #: templates/pages/profile/mydata.html:77
 msgid "Plaats"
-msgstr ""
+msgstr "Plaats"
 
 #: templates/pages/profile/mydata.html:81
 msgid "Land"
-msgstr ""
+msgstr "Land"
 
 #: templates/pages/profile/mydata.html:88
-#, fuzzy
-#| msgid "Contacts"
 msgid "Contactgegevens"
-msgstr "Contacten"
+msgstr "Contactgegevens"
 
 #: templates/pages/profile/mydata.html:101
 msgid "Roepnaam"
-msgstr ""
+msgstr "Roepnaam"
 
 #: templates/pages/questionnaire/questionnaire-step.html:10
 msgid "Export pdf"
@@ -4307,30 +4253,24 @@ msgid "product"
 msgstr "product"
 
 #: templates/pages/search.html:64
-#, fuzzy
-#| msgid "Feedback"
 msgid "Pagina feedback"
-msgstr "Feedback"
+msgstr "Pagina feedback"
 
 #: templates/pages/search.html:66
 msgid "Heeft u gevonden wat u zocht?"
 msgstr "Heeft u gevonden wat u zocht?"
 
 #: templates/pages/search.html:73
-#, fuzzy
-#| msgid "Heeft u gevonden wat u zocht?"
 msgid "Ik heb gevonden wat ik zocht."
-msgstr "Heeft u gevonden wat u zocht?"
+msgstr "Ik heb gevonden wat ik zocht."
 
 #: templates/pages/search.html:77
-#, fuzzy
-#| msgid "Heeft u gevonden wat u zocht?"
 msgid "Ik heb niet gevonden wat ik zocht."
-msgstr "Heeft u gevonden wat u zocht?"
+msgstr "Ik heb niet gevonden wat ik zocht."
 
 #: templates/pages/search.html:83
 msgid "Toelichting"
-msgstr ""
+msgstr "Toelichting"
 
 #: templates/pages/user-home.html:13
 msgid "Naar samenwerken"
@@ -4345,6 +4285,8 @@ msgid ""
 "Voer omwille van beveiliging uw oude en twee keer uw nieuwe wachtwoord in, "
 "zodat we kunnen controleren of u geen typefouten hebt gemaakt."
 msgstr ""
+"Voer omwille van beveiliging uw oude en twee keer uw nieuwe wachtwoord in, "
+"zodat we kunnen controleren of u geen typefouten hebt gemaakt."
 
 #: templates/registration/password_reset_complete.html:5
 msgid "Wachtwoordherinitialisatie voltooid"
@@ -4367,6 +4309,8 @@ msgid ""
 "Voer het nieuwe wachtwoord twee keer in, zodat we kunnen controleren of er "
 "geen typefouten zijn gemaakt."
 msgstr ""
+"Voer het nieuwe wachtwoord twee keer in, zodat we kunnen controleren of er "
+"geen typefouten zijn gemaakt."
 
 #: templates/registration/password_reset_confirm.html:10
 msgid "Wachtwoordherinitialisatie mislukt"
@@ -4377,6 +4321,8 @@ msgid ""
 "De link voor het herstellen van het wachtwoord is ongeldig, waarschijnlijk "
 "omdat de link al eens is gebruikt. Vraag opnieuw een wachtwoord aan."
 msgstr ""
+"De link voor het herstellen van het wachtwoord is ongeldig, waarschijnlijk "
+"omdat de link al eens is gebruikt. Vraag opnieuw een wachtwoord aan."
 
 #: templates/registration/password_reset_done.html:5
 msgid "Wachtwoordherinitialisatie verstuurd"
@@ -4388,6 +4334,9 @@ msgid ""
 "er een account bestaat met het door u ingevoerde e-mailadres. U zou deze "
 "straks moeten ontvangen."
 msgstr ""
+"We hebben u instructies gestuurd voor het instellen van uw wachtwoord, als "
+"er een account bestaat met het door u ingevoerde e-mailadres. U zou deze "
+"straks moeten ontvangen."
 
 #: templates/registration/password_reset_done.html:7
 msgid ""
@@ -4442,6 +4391,8 @@ msgid ""
 "Let op: Onderstaand formulier werkt alleen als u geen DigiD gebruikt om in "
 "te loggen."
 msgstr ""
+"Let op: Onderstaand formulier werkt alleen als u geen DigiD gebruikt om in "
+"te loggen."
 
 #: utils/admin.py:44
 msgid "System - anonymous user"
