@@ -9,7 +9,7 @@
     {% optional_paragraph configurable_text.plans_page.plans_intro %}
     
     {% if plans.extended_plans %}
-        {% render_form form=form method="GET" spaceless=True autosubmit=True form_action=form_action %}
+        {% render_form form=plan_filter_form method="GET" spaceless=True autosubmit=True form_action=form_action %}
         <div class="plan-filter">
             <div class="plan-filter__button">
                 {% button text=_("Filter") type="button" bordered=True %}

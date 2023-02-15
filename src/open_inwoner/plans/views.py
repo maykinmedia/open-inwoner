@@ -39,7 +39,7 @@ class PlansEnabledMixin:
 
 class BasePlanFilter:
     """
-    This will filter the plans correctly.
+    This will filter the plans according to the user's selection.
     """
 
     def get_filtered_plans(self, plans):
@@ -53,7 +53,7 @@ class BasePlanFilter:
             if status == "open":
                 plans = plans.filter(end_date__gt=today)
             elif status == "closed":
-                plans = plans.filter(end_date__lt=today)
+                plans = plans.filter(end_date__lte=today)
 
         return plans
 
@@ -80,7 +80,7 @@ class PlanListView(
         return (
             Plan.objects.connected(self.request.user)
             .prefetch_related("plan_contacts")
-            .order_by("-end_date")
+            .order_by("end_date")
         )
 
     def get_available_contacts_for_filtering(self, plans):
@@ -100,33 +100,51 @@ class PlanListView(
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
+        initial_qs = self.get_queryset()
         plans = {"extended_plans": False}
-
-        filtered_plans = self.get_filtered_plans(self.get_queryset())
-        paginator, page, queryset, is_paginated = self.paginate_queryset(
-            filtered_plans, 10
-        )
-        context["paginator"] = paginator
-        context["page_obj"] = page
-        context["is_paginated"] = is_paginated
-        plans["plan_list"] = queryset
 
         # render the extended plan list view when a begeleider is logged in
         if user.contact_type == ContactTypeChoices.begeleider:
             plans["extended_plans"] = True
-            available_contacts = self.get_available_contacts_for_filtering(
-                self.get_queryset()
+
+            if self.request.GET:
+                filtered_plans = self.get_filtered_plans(initial_qs)
+            else:
+                filtered_plans = initial_qs
+
+            # sort the filtered plans based on if they are open or closed
+            open_plans = filtered_plans.filter(end_date__gt=date.today())
+            closed_plans = filtered_plans.filter(end_date__lte=date.today()).order_by(
+                "-end_date"
             )
+            sorted_plans = list(open_plans) + list(closed_plans)
+
+            # paginate results
+            paginator, page, queryset, is_paginated = self.paginate_queryset(
+                sorted_plans, 10
+            )
+
+            # instantiate filter form
+            available_contacts = self.get_available_contacts_for_filtering(initial_qs)
             context["plan_filter_form"] = PlanListFilterForm(
                 data=self.request.GET, available_contacts=available_contacts
             )
 
+            # prepare plans for frontend
             temp_plans = {}
             for plan in queryset:
                 temp_plans[plan] = plan.get_other_users_full_names(user=user)
 
             plans["plan_list"] = temp_plans
+        else:
+            paginator, page, queryset, is_paginated = self.paginate_queryset(
+                initial_qs, 10
+            )
+            plans["plan_list"] = queryset
 
+        context["paginator"] = paginator
+        context["page_obj"] = page
+        context["is_paginated"] = is_paginated
         context["plans"] = plans
         return context
 
