@@ -251,7 +251,7 @@ class SiteConfiguration(SingletonModel):
         help_text=_("The external link for the footer logo."),
     )
     favicon = FilerImageField(
-        verbose_name=_("Favicon image (32x32)"),
+        verbose_name=_("Favicon image (32x32, .png)"),
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
