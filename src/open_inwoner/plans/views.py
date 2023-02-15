@@ -107,7 +107,8 @@ class PlanListView(
         if user.contact_type == ContactTypeChoices.begeleider:
             plans["extended_plans"] = True
 
-            if self.request.GET:
+            # filter plans if necessary
+            if "plan_contacts" in self.request.GET or "status" in self.request.GET:
                 filtered_plans = self.get_filtered_plans(initial_qs)
             else:
                 filtered_plans = initial_qs
