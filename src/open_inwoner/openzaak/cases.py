@@ -78,8 +78,45 @@ def fetch_single_case(case_uuid: str) -> Optional[Zaak]:
 
 
 @cache_result(
-    "case_information_objects:{case_url}", timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT
+    "single_case_information_object:{url}", timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT
 )
+def fetch_single_case_information_object(url: str) -> Optional[ZaakInformatieObject]:
+    client = build_client("zaak")
+
+    if client is None:
+        return
+
+    try:
+        response = client.retrieve("zaakinformatieobject", url=url)
+    except RequestException as e:
+        logger.exception("exception while making request", exc_info=e)
+        return
+    except ClientError as e:
+        logger.exception("exception while making request", exc_info=e)
+        return
+
+    case = factory(ZaakInformatieObject, response)
+
+    return case
+
+
+def fetch_case_by_url_no_cache(case_url: str) -> Optional[Zaak]:
+    client = build_client("zaak")
+    try:
+        response = client.retrieve("zaak", url=case_url)
+    except RequestException as e:
+        logger.exception("exception while making request", exc_info=e)
+        return
+    except ClientError as e:
+        logger.exception("exception while making request", exc_info=e)
+        return
+
+    case = factory(Zaak, response)
+
+    return case
+
+
+# not cached for quicker uploaded document visibility
 def fetch_case_information_objects(case_url: str) -> List[ZaakInformatieObject]:
     client = build_client("zaak")
 
@@ -107,6 +144,10 @@ def fetch_case_information_objects(case_url: str) -> List[ZaakInformatieObject]:
 
 @cache_result("status_history:{case_url}", timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT)
 def fetch_status_history(case_url: str) -> List[Status]:
+    return fetch_status_history_no_cache(case_url)
+
+
+def fetch_status_history_no_cache(case_url: str) -> List[Status]:
     client = build_client("zaak")
 
     if client is None:
@@ -137,10 +178,10 @@ def fetch_specific_status(status_url: str) -> Optional[Status]:
         response = client.retrieve("status", url=status_url)
     except RequestException as e:
         logger.exception("exception while making request", exc_info=e)
-        return []
+        return
     except ClientError as e:
         logger.exception("exception while making request", exc_info=e)
-        return []
+        return
 
     status = factory(Status, response)
 
@@ -260,3 +301,22 @@ def fetch_single_result(result_url: str) -> Optional[Resultaat]:
     result = factory(Resultaat, response)
 
     return result
+
+
+def connect_case_with_document(case_url: str, document_url: str) -> dict:
+    client = build_client("zaak")
+    if client is None:
+        return
+
+    try:
+        response = client.create(
+            "zaakinformatieobject", {"zaak": case_url, "informatieobject": document_url}
+        )
+    except RequestException as e:
+        logger.exception("exception while making request", exc_info=e)
+        return
+    except ClientError as e:
+        logger.exception("exception while making request", exc_info=e)
+        return
+
+    return response

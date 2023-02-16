@@ -3,7 +3,15 @@
 {% get_solo "configurations.SiteConfiguration" as config %}
 
 <footer class='footer'>
-    {% logo src=config.logo.file|thumbnail_url:'logo' alt=config.logo.default_alt_text %}
+    {% firstof config.logo.default_alt_text config.name as logo_alt_text %}
+    
+    <div class="footer__logo-text">
+        <p class="p">{{ config.footer_logo_title|linebreaksbr }}</p>
+    </div>
+
+    <div class="footer__logo">
+        {% logo src=config.footer_logo.file|thumbnail_url:'logo' alt=logo_alt_text href=config.footer_logo_url %}
+    </div>
 
     <div class="footer__visitor">
         <h2 class="h2">{{footer_texts.footer_visiting_title}}</h2>

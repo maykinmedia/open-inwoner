@@ -1,4 +1,4 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib.flatpages.admin import FlatPageAdmin
 from django.contrib.flatpages.forms import FlatpageForm
 from django.contrib.flatpages.models import FlatPage
@@ -9,6 +9,7 @@ from solo.admin import SingletonModelAdmin
 
 from open_inwoner.ckeditor5.widgets import CKEditorWidget
 
+from ..utils.colors import ACCESSIBLE_CONTRAST_RATIO, get_contrast_ratio
 from .models import SiteConfiguration, SiteConfigurationPage
 
 
@@ -63,7 +64,11 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
             {
                 "fields": (
                     "logo",
+                    "footer_logo",
+                    "footer_logo_title",
+                    "footer_logo_url",
                     "hero_image_login",
+                    "favicon",
                 )
             },
         ),
@@ -132,10 +137,58 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
         ),
         (
             _("Analytics"),
-            {"fields": ("gtm_code", "ga_code", "matomo_url", "matomo_site_id")},
+            {
+                "fields": (
+                    "gtm_code",
+                    "ga_code",
+                    "matomo_url",
+                    "matomo_site_id",
+                    "siteimprove_id",
+                )
+            },
         ),
     )
     inlines = [SiteConfigurationPageInline]
+
+    def report_contrast_ratio(self, request, obj):
+        def check_contrast_ratio(label1, color1, label2, color2, expected_ratio):
+            ratio = get_contrast_ratio(color1, color2)
+            if ratio < expected_ratio:
+                message = "'{label1}' ({color1}) en '{label2}' ({color2}) hebben niet genoeg contrast: {ratio}:1 waar {expected}:1 wordt verwacht.".format(
+                    label1=label1,
+                    color1=color1,
+                    label2=label2,
+                    color2=color2,
+                    ratio=round(ratio, 1),
+                    expected=expected_ratio,
+                )
+                self.message_user(request, message, messages.WARNING)
+
+        check_contrast_ratio(
+            _("Primary color"),
+            obj.primary_color,
+            _("Primary font color"),
+            obj.primary_font_color,
+            ACCESSIBLE_CONTRAST_RATIO,
+        )
+        check_contrast_ratio(
+            _("Secondary color"),
+            obj.secondary_color,
+            _("Secondary font color"),
+            obj.secondary_font_color,
+            ACCESSIBLE_CONTRAST_RATIO,
+        )
+        check_contrast_ratio(
+            _("Accent color"),
+            obj.accent_color,
+            _("Accent font color"),
+            obj.accent_font_color,
+            ACCESSIBLE_CONTRAST_RATIO,
+        )
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        self.report_contrast_ratio(request, obj)
 
 
 class FlatPageAdminForm(FlatpageForm):

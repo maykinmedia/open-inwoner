@@ -51,4 +51,14 @@
       }
     }
   }
+
+  .skip-link {
+    position: absolute;
+    top: -50px;
+    transition: top 0.2s;
+    &:focus {
+      position: relative;
+      top: 0;
+    }
+  }
 }

@@ -4,20 +4,22 @@ from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.constants import RolTypes, VertrouwelijkheidsAanduidingen
 from zgw_consumers.test import generate_oas_component
 
-from open_inwoner.openzaak.api_models import InformatieObject, Rol, Zaak, ZaakType
+from open_inwoner.openzaak.api_models import InformatieObject, Zaak, ZaakType
 from open_inwoner.openzaak.models import OpenZaakConfig
+from open_inwoner.openzaak.tests.factories import generate_rol
 from open_inwoner.openzaak.utils import (
+    format_zaak_identificatie,
     get_role_name_display,
     is_info_object_visible,
     is_zaak_visible,
+    reformat_esuite_zaak_identificatie,
 )
 
-ZAKEN_ROOT = "https://zaken.nl/api/v1/"
-CATALOGI_ROOT = "https://catalogi.nl/api/v1/"
-DOCUMENTEN_ROOT = "https://documenten.nl/api/v1/"
+from ...utils.test import ClearCachesMixin
+from .shared import CATALOGI_ROOT, ZAKEN_ROOT
 
 
-class TestUtils(TestCase):
+class TestUtils(ClearCachesMixin, TestCase):
     def test_is_info_object_visible(self):
         """
         openbaar
@@ -154,18 +156,8 @@ class TestUtils(TestCase):
             self.assertFalse(is_zaak_visible(zaak))
 
     def test_get_role_name_display(self):
-        def get_role(type_: str, identification: dict) -> Rol:
-            # helper for readability
-            component = generate_oas_component(
-                "zrc",
-                "schemas/Rol",
-                betrokkeneType=type_,
-                betrokkeneIdentificatie=identification,
-            )
-            return factory(Rol, component)
-
         with self.subTest("natuurlijk_persoon > all fields"):
-            role = get_role(
+            role = generate_rol(
                 RolTypes.natuurlijk_persoon,
                 {
                     "geslachtsnaam": "Bazz",
@@ -178,7 +170,7 @@ class TestUtils(TestCase):
             self.assertEqual(expected, get_role_name_display(role))
 
         with self.subTest("natuurlijk_persoon > some fields"):
-            role = get_role(
+            role = generate_rol(
                 RolTypes.natuurlijk_persoon,
                 {
                     "geslachtsnaam": "Bazz",
@@ -189,7 +181,7 @@ class TestUtils(TestCase):
             self.assertEqual(expected, get_role_name_display(role))
 
         with self.subTest("natuurlijk_persoon > bad data"):
-            role = get_role(
+            role = generate_rol(
                 RolTypes.natuurlijk_persoon,
                 {
                     "geslachtsnaam": "",
@@ -202,7 +194,7 @@ class TestUtils(TestCase):
             self.assertEqual(expected, get_role_name_display(role))
 
         with self.subTest("niet_natuurlijk_persoon"):
-            role = get_role(
+            role = generate_rol(
                 RolTypes.niet_natuurlijk_persoon,
                 {
                     "statutaireNaam": "Foo Bar",
@@ -212,7 +204,7 @@ class TestUtils(TestCase):
             self.assertEqual(expected, get_role_name_display(role))
 
         with self.subTest("vestiging"):
-            role = get_role(
+            role = generate_rol(
                 RolTypes.vestiging,
                 {
                     "handelsnaam": ["Foo Bar"],
@@ -222,7 +214,7 @@ class TestUtils(TestCase):
             self.assertEqual(expected, get_role_name_display(role))
 
         with self.subTest("organisatorische_eenheid"):
-            role = get_role(
+            role = generate_rol(
                 RolTypes.organisatorische_eenheid,
                 {
                     "naam": "Foo Bar",
@@ -232,7 +224,7 @@ class TestUtils(TestCase):
             self.assertEqual(expected, get_role_name_display(role))
 
         with self.subTest("medewerker > all fields"):
-            role = get_role(
+            role = generate_rol(
                 RolTypes.medewerker,
                 {
                     "achternaam": "Bazz",
@@ -244,7 +236,7 @@ class TestUtils(TestCase):
             self.assertEqual(expected, get_role_name_display(role))
 
         with self.subTest("medewerker > some fields"):
-            role = get_role(
+            role = generate_rol(
                 RolTypes.medewerker,
                 {
                     "achternaam": "Bazz",
@@ -256,7 +248,7 @@ class TestUtils(TestCase):
             self.assertEqual(expected, get_role_name_display(role))
 
         with self.subTest("medewerker > non-standard field name from Taiga #961"):
-            role = get_role(
+            role = generate_rol(
                 RolTypes.medewerker,
                 {
                     # this is not following spec
@@ -265,3 +257,34 @@ class TestUtils(TestCase):
             )
             expected = "Bazz, Foo van der"
             self.assertEqual(expected, get_role_name_display(role))
+
+    def test_format_zaak_identificatie(self):
+        config = OpenZaakConfig.get_solo()
+        value = "0014ESUITE66392022"
+
+        with self.subTest("enabled"):
+            config.reformat_esuite_zaak_identificatie = True
+            config.save()
+            actual = format_zaak_identificatie(value, config)
+            self.assertEqual(actual, "6639-2022")
+
+        with self.subTest("disabled"):
+            config.reformat_esuite_zaak_identificatie = False
+            config.save()
+            actual = format_zaak_identificatie(value, config)
+            # no change
+            self.assertEqual(actual, value)
+
+    def test_reformat_esuite_zaak_identificatie(self):
+        tests = [
+            ("0014ESUITE66392022", "6639-2022"),
+            ("4321ESUITE00011991", "0001-1991"),
+            ("4321ESUITE123456781991", "12345678-1991"),
+            ("12345678", "12345678"),
+            ("aaaaaa1234", "aaaaaa1234"),
+        ]
+
+        for value, expected in tests:
+            with self.subTest(value=value, expected=expected):
+                actual = reformat_esuite_zaak_identificatie(value)
+                self.assertEqual(actual, expected)

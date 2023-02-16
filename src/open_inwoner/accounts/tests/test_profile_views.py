@@ -1,13 +1,19 @@
+from django.test import override_settings
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
+import requests_mock
 from django_webtest import WebTest
+from timeline_logger.models import TimelineLog
 
 from open_inwoner.accounts.choices import StatusChoices
+from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 from open_inwoner.pdc.tests.factories import CategoryFactory
+from open_inwoner.utils.logentry import LOG_ACTIONS
 
 from ...questionnaire.tests.factories import QuestionnaireStepFactory
 from ..choices import LoginTypeChoices
+from ..forms import BrpUserForm, UserForm
 from .factories import ActionFactory, DocumentFactory, UserFactory
 
 
@@ -33,7 +39,7 @@ class ProfileViewTests(WebTest):
         response = self.app.get(self.url, user=self.user)
 
         self.assertEquals(response.status_code, 200)
-        self.assertContains(response, _("U heeft geen intressegebieden aangegeven."))
+        self.assertContains(response, _("U heeft geen interessegebieden aangegeven."))
         self.assertContains(response, _("U heeft nog geen contacten."))
         self.assertContains(response, "0 acties staan open.")
         self.assertNotContains(response, reverse("questionnaire:questionnaire_list"))
@@ -122,6 +128,32 @@ class ProfileViewTests(WebTest):
         self.assertTrue(doc_new.name in file_tags[0].prettify())
         self.assertTrue(doc_old.name in file_tags[1].prettify())
 
+    def test_mydata_shown_with_digid_and_brp(self):
+        user = UserFactory(
+            bsn="999993847",
+            first_name="name",
+            last_name="surname",
+            is_prepopulated=True,
+            login_type=LoginTypeChoices.digid,
+        )
+        response = self.app.get(self.url, user=user)
+        self.assertContains(response, _("Mijn gegevens"))
+
+    def test_mydata_not_shown_with_digid_and_no_brp(self):
+        user = UserFactory(
+            bsn="999993847",
+            first_name="name",
+            last_name="surname",
+            is_prepopulated=False,
+            login_type=LoginTypeChoices.digid,
+        )
+        response = self.app.get(self.url, user=user)
+        self.assertNotContains(response, _("Mijn gegevens"))
+
+    def test_mydata_not_shown_without_digid(self):
+        response = self.app.get(self.url, user=self.user)
+        self.assertNotContains(response, _("Mijn gegevens"))
+
 
 class EditProfileTests(WebTest):
     def setUp(self):
@@ -148,6 +180,7 @@ class EditProfileTests(WebTest):
         form = response.forms["profile-edit"]
         form["first_name"] = ""
         form["last_name"] = ""
+        form["display_name"] = ""
         form["email"] = ""
         form["phonenumber"] = ""
         form["birthday"] = ""
@@ -164,6 +197,7 @@ class EditProfileTests(WebTest):
         form = response.forms["profile-edit"]
         form["first_name"] = "First name"
         form["last_name"] = "Last name"
+        form["display_name"] = "a nickname"
         form["email"] = "user@example.com"
         form["phonenumber"] = "06987878787"
         form["birthday"] = "21-01-1992"
@@ -178,6 +212,7 @@ class EditProfileTests(WebTest):
         self.user.refresh_from_db()
         self.assertEquals(self.user.first_name, "First name")
         self.assertEquals(self.user.last_name, "Last name")
+        self.assertEquals(self.user.display_name, "a nickname")
         self.assertEquals(self.user.email, "user@example.com")
         self.assertEquals(self.user.birthday.strftime("%d-%m-%Y"), "21-01-1992")
         self.assertEquals(self.user.street, "Keizersgracht")
@@ -194,6 +229,7 @@ class EditProfileTests(WebTest):
                 form = response.forms["profile-edit"]
                 form["first_name"] = char
                 form["last_name"] = "Last name"
+                form["display_name"] = "a nickname"
                 form["phonenumber"] = "06987878787"
                 form["birthday"] = "21-01-1992"
                 form["street"] = "Keizersgracht"
@@ -219,6 +255,7 @@ class EditProfileTests(WebTest):
                 form = response.forms["profile-edit"]
                 form["first_name"] = "John"
                 form["last_name"] = char
+                form["display_name"] = "a nickname"
                 form["phonenumber"] = "06987878787"
                 form["birthday"] = "21-01-1992"
                 form["street"] = "Keizersgracht"
@@ -256,6 +293,119 @@ class EditProfileTests(WebTest):
         self.assertEqual(response.url, self.return_url)
         self.assertEqual(self.user.email, initial_email)
         self.assertEqual(self.user.first_name, "Testing")
+
+    def test_form_for_digid_brp_user_saves_data(self):
+        user = UserFactory(
+            bsn="999993847",
+            first_name="name",
+            last_name="surname",
+            is_prepopulated=True,
+            login_type=LoginTypeChoices.digid,
+        )
+        response = self.app.get(self.url, user=user)
+        form = response.forms["profile-edit"]
+
+        form["display_name"] = "a nickname"
+        form["email"] = "user@example.com"
+        form["phonenumber"] = "06987878787"
+        response = form.submit()
+
+        self.assertEqual(response.url, self.return_url)
+
+        user.refresh_from_db()
+
+        self.assertEqual(user.display_name, "a nickname")
+        self.assertEqual(user.email, "user@example.com")
+        self.assertEqual(user.phonenumber, "06987878787")
+
+    def test_expected_form_is_rendered(self):
+        # regular user
+        response = self.app.get(self.url, user=self.user)
+        form = response.context["form"]
+
+        self.assertEqual(type(form), UserForm)
+
+        # digid-brp user
+        user = UserFactory(
+            bsn="999993847",
+            first_name="name",
+            last_name="surname",
+            is_prepopulated=True,
+            login_type=LoginTypeChoices.digid,
+        )
+        response = self.app.get(self.url, user=user)
+        form = response.context["form"]
+
+        self.assertEqual(type(form), BrpUserForm)
+
+
+@requests_mock.Mocker()
+class MyDataTests(HaalCentraalMixin, WebTest):
+    expected_response = {
+        "first_name": "Merel",
+        "initials": "M.",
+        "last_name": "Kooyman",
+        "prefix": None,
+        "birthday": "1982-04-10",
+        "birthday_place": "Leerdam",
+        "birthday_country": "Nederland",
+        "gender": "vrouw",
+        "street": "King Olivereiland",
+        "house_number": 64,
+        "postcode": "2551JV",
+        "place": "'s-Gravenhage",
+        "land": None,
+    }
+
+    def setUp(self):
+        self.user = UserFactory(
+            bsn="999993847",
+            first_name="",
+            last_name="",
+            login_type=LoginTypeChoices.digid,
+        )
+        self.url = reverse("accounts:my_data")
+
+    def test_expected_response_is_returned_brp_v_2(self, m):
+        self._setUpMocks_v_2(m)
+        self._setUpService()
+
+        response = self.app.get(self.url, user=self.user)
+        log_entry = TimelineLog.objects.last()
+
+        self.assertEqual(
+            response.context["my_data"],
+            self.expected_response,
+        )
+        self.assertEqual(
+            log_entry.extra_data,
+            {
+                "message": _("user requests for brp data"),
+                "action_flag": list(LOG_ACTIONS[4]),
+                "content_object_repr": self.user.email,
+            },
+        )
+
+    @override_settings(BRP_VERSION="1.3")
+    def test_expected_response_is_returned_brp_v_1_3(self, m):
+        self._setUpMocks_v_1_3(m)
+        self._setUpService()
+
+        response = self.app.get(self.url, user=self.user)
+        log_entry = TimelineLog.objects.last()
+
+        self.assertEqual(
+            response.context["my_data"],
+            self.expected_response,
+        )
+        self.assertEqual(
+            log_entry.extra_data,
+            {
+                "message": _("user requests for brp data"),
+                "action_flag": list(LOG_ACTIONS[4]),
+                "content_object_repr": self.user.email,
+            },
+        )
 
 
 class EditIntrestsTests(WebTest):

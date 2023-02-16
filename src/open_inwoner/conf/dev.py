@@ -132,10 +132,13 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
 
+# Django solo caching (disabled for CI)
+SOLO_CACHE = None
+
 TWO_FACTOR_PATCH_ADMIN = False
 
-# django-selenium-login needs an arbitrary and fast page to grab cookies
-SELENIUM_LOGIN_START_PAGE = "/admin/password_reset/"
+# playwright multi browser
+PLAYWRIGHT_MULTI_ONLY_DEFAULT = True
 
 # Override settings with local settings.
 try:

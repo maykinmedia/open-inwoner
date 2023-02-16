@@ -1,3 +1,4 @@
+import logging
 from datetime import timedelta
 
 from django.contrib.admin.models import ADDITION, CHANGE, DELETION
@@ -209,7 +210,8 @@ class TestProfile(WebTest):
         form["old_password"] = "test"
         form["new_password1"] = "newPassw0rd"
         form["new_password2"] = "newPassw0rd"
-        form.submit()
+        form.submit(status=302)
+
         log_entry = TimelineLog.objects.filter(
             extra_data__message=str(_("password was changed"))
         ).last()
@@ -240,7 +242,7 @@ class TestProfile(WebTest):
             log_entry.extra_data,
             {
                 "message": _("password reset was accessed"),
-                "log_level": None,
+                "log_level": logging.INFO,
                 "action_flag": list(LOG_ACTIONS[5]),
                 "content_object_repr": "",
             },
@@ -270,7 +272,7 @@ class TestProfile(WebTest):
             log_entry.extra_data,
             {
                 "message": _("password reset was completed"),
-                "log_level": None,
+                "log_level": logging.INFO,
                 "action_flag": list(LOG_ACTIONS[5]),
                 "content_object_repr": self.user.email,
             },
@@ -298,7 +300,7 @@ class TestInvites(WebTest):
             log_entry.extra_data,
             {
                 "message": _("invitation accepted"),
-                "log_level": None,
+                "log_level": logging.INFO,
                 "action_flag": list(LOG_ACTIONS[5]),
                 "content_object_repr": _("For: {invitee} (2021-10-18)").format(
                     invitee=self.invitee.email
@@ -324,7 +326,7 @@ class TestInvites(WebTest):
             log_entry.extra_data,
             {
                 "message": _("invitation expired"),
-                "log_level": None,
+                "log_level": logging.INFO,
                 "action_flag": list(LOG_ACTIONS[5]),
                 "content_object_repr": _("For: {invitee} (2021-09-18)").format(
                     invitee=self.invitee.email

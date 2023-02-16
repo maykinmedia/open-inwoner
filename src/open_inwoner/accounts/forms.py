@@ -1,11 +1,19 @@
+import os
+
 from django import forms
 from django.conf import settings
 from django.contrib.auth.forms import PasswordResetForm
 from django.core.exceptions import ValidationError
+from django.core.mail import EmailMultiAlternatives
+from django.template import loader
 from django.utils.translation import ugettext_lazy as _
 
 from django_registration.forms import RegistrationForm
 
+from open_inwoner.openzaak.models import (
+    OpenZaakConfig,
+    ZaakTypeInformatieObjectTypeConfig,
+)
 from open_inwoner.pdc.models.category import Category
 from open_inwoner.utils.forms import LimitedUploadFileField, PrivateFileWidget
 from open_inwoner.utils.validators import validate_charfield_entry
@@ -54,6 +62,7 @@ class UserForm(forms.ModelForm):
         fields = (
             "first_name",
             "last_name",
+            "display_name",
             "email",
             "phonenumber",
             "birthday",
@@ -61,6 +70,16 @@ class UserForm(forms.ModelForm):
             "housenumber",
             "postcode",
             "city",
+        )
+
+
+class BrpUserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = (
+            "display_name",
+            "email",
+            "phonenumber",
         )
 
 
@@ -81,11 +100,21 @@ class NecessaryUserForm(forms.ModelForm):
             "invite",
         )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.fields["first_name"].required = True
         self.fields["last_name"].required = True
+
+        if user.is_digid_and_brp():
+            self.fields["first_name"].disabled = True
+            self.fields["last_name"].disabled = True
+
+            # this is for the rare case of retrieving partial data from haalcentraal
+            if not user.first_name:
+                del self.fields["first_name"]
+            if not user.last_name:
+                del self.fields["last_name"]
 
     def clean_email(self):
         email = self.cleaned_data["email"]
@@ -98,12 +127,39 @@ class NecessaryUserForm(forms.ModelForm):
 
 
 class CustomPasswordResetForm(PasswordResetForm):
-    def send_mail(self, *args, **kwargs):
+    def send_mail(
+        self,
+        subject_template_name,
+        email_template_name,
+        context,
+        from_email,
+        to_email,
+        html_email_template_name=None,
+    ):
+        """
+        Send a django.core.mail.EmailMultiAlternatives to `to_email`.
+        """
         email = self.cleaned_data.get("email")
         user = User.objects.get(email=email)
 
         if user.login_type == LoginTypeChoices.default:
-            return super().send_mail(*args, **kwargs)
+            subject = loader.render_to_string(subject_template_name, context)
+            # Email subject *must not* contain newlines
+            subject = "".join(subject.splitlines())
+            body = loader.render_to_string(email_template_name, context)
+
+            email_message = EmailMultiAlternatives(
+                subject,
+                body,
+                from_email,
+                [to_email],
+                headers={"X-Mail-Queue-Priority": "now"},
+            )
+            if html_email_template_name is not None:
+                html_email = loader.render_to_string(html_email_template_name, context)
+                email_message.attach_alternative(html_email, "text/html")
+
+            email_message.send()
 
 
 class ThemesForm(forms.ModelForm):
@@ -124,9 +180,13 @@ class ContactFilterForm(forms.Form):
 
 
 class ContactCreateForm(forms.Form):
-    first_name = forms.CharField(max_length=255, validators=[validate_charfield_entry])
-    last_name = forms.CharField(max_length=255, validators=[validate_charfield_entry])
-    email = forms.EmailField()
+    first_name = forms.CharField(
+        label=_("First name"), max_length=255, validators=[validate_charfield_entry]
+    )
+    last_name = forms.CharField(
+        label=_("Last name"), max_length=255, validators=[validate_charfield_entry]
+    )
+    email = forms.EmailField(label=_("Email"))
 
     def __init__(self, user, *args, **kwargs):
         self.user = user
@@ -316,8 +376,8 @@ class InboxForm(forms.ModelForm):
         file = cleaned_data.get("file")
 
         if not file and not content:
-            raise ValidationError(
-                _("Either message content or file should be filled in")
+            self.add_error(
+                "content", _("Either message content or file should be filled in")
             )
 
         return cleaned_data
@@ -352,3 +412,46 @@ class ActionListForm(forms.ModelForm):
     def __init__(self, users, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["is_for"].queryset = User.objects.filter(pk__in=users)
+
+
+class CaseUploadForm(forms.Form):
+    title = forms.CharField(max_length=255, validators=[validate_charfield_entry])
+    type = forms.ModelChoiceField(
+        ZaakTypeInformatieObjectTypeConfig.objects.all(), empty_label=None
+    )
+    file = forms.FileField()
+
+    def __init__(self, case, **kwargs):
+        super().__init__(**kwargs)
+
+        self.fields[
+            "type"
+        ].queryset = ZaakTypeInformatieObjectTypeConfig.objects.get_visible_ztiot_configs_for_case(
+            case
+        )
+
+        choices = self.fields["type"].choices
+
+        if choices and len(choices) == 1:
+            self.fields["type"].disabled = True
+            self.fields["type"].initial = list(choices)[0][0].value
+
+    def clean_file(self):
+        file = self.cleaned_data["file"]
+
+        config = OpenZaakConfig.get_solo()
+        max_allowed_size = 1024**2 * config.max_upload_size
+        allowed_extensions = config.allowed_file_extensions
+        filename, file_extension = os.path.splitext(file.name)
+
+        if file.size > max_allowed_size:
+            raise ValidationError(
+                f"Een aangeleverd bestand dient maximaal {config.max_upload_size} MB te zijn, uw bestand is te groot."
+            )
+
+        if file_extension.lower().replace(".", "") not in allowed_extensions:
+            raise ValidationError(
+                f"Het type bestand dat u hebt geüpload is ongeldig. Geldige bestandstypen zijn: {', '.join(allowed_extensions)}"
+            )
+
+        return file

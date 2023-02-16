@@ -14,7 +14,8 @@
   }
 
   &__list-item {
-    border: var(--border-width) solid var(--color-mute);
+    border: var(--border-width-thin) solid var(--color-gray);
+    border-radius: var(--border-radius);
     padding: var(--spacing-large);
   }
 
@@ -56,5 +57,6 @@
   &__answer:not(#{&}__answer--open) {
     opacity: 0;
     height: 0;
+    transition: all 0.3s, height 0s, opacity 0.01s;
   }
 }

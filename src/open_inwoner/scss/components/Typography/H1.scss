@@ -22,3 +22,7 @@
     margin-bottom: calc(var(--row-height) / 2) !important;
   }
 }
+
+h1 + .card-container {
+  margin-top: var(--gutter-width);
+}

@@ -9,6 +9,7 @@
   gap: var(--spacing-extra-large);
   margin: var(--row-height) 0;
   padding: var(--spacing-extra-large);
+  box-sizing: border-box;
   position: relative;
 
   &--contents {
@@ -23,6 +24,14 @@
   &--success {
     --notification-color-background: var(--color-success-lighter);
     --notification-color-text: var(--color-success);
+  }
+
+  &--compact {
+    margin: var(--spacing-medium) 0;
+
+    p {
+      font-size: var(--font-size-body) !important;
+    }
   }
 
   &__icon {
@@ -50,7 +59,7 @@
     color: var(--notification-color-text);
   }
 
-  .button {
+  .button:not(.button--transparent) {
     color: var(--color-white);
     background-color: var(--notification-color-text);
   }

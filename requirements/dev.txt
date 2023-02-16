@@ -6,6 +6,11 @@
 #
 alabaster==0.7.12
     # via sphinx
+amqp==5.1.1
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   kombu
 asgiref==3.4.1
     # via
     #   -c requirements/ci.txt
@@ -16,20 +21,12 @@ astroid==2.8.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   pylint
-async-generator==1.10
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-    #   trio
-    #   trio-websocket
 attrs==21.2.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   glom
     #   jsonschema
-    #   outcome
-    #   trio
 babel==2.9.1
     # via sphinx
 bandit==1.7.4
@@ -39,7 +36,12 @@ beautifulsoup4==4.10.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   webtest
-black==21.9b0
+billiard==3.6.4.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   celery
+black==22.12.0
     # via -r requirements/dev.in
 boltons==21.0.0
     # via
@@ -54,6 +56,11 @@ brotli==1.0.9
     #   fonttools
 build==0.8.0
     # via pip-tools
+celery==5.2.7
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   notifications-api-common
 certifi==2022.9.24
     # via
     #   -c requirements/ci.txt
@@ -62,7 +69,6 @@ certifi==2022.9.24
     #   elastic-apm
     #   elasticsearch
     #   requests
-    #   selenium
     #   sentry-sdk
 cffi==1.15.0
     # via
@@ -75,15 +81,31 @@ charset-normalizer==2.0.6
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   requests
-click==8.0.1
-    # via
-    #   black
-    #   pip-tools
-commonmark==0.9.1
+click==8.1.3
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-    #   rich
+    #   black
+    #   celery
+    #   click-didyoumean
+    #   click-plugins
+    #   click-repl
+    #   pip-tools
+click-didyoumean==0.3.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   celery
+click-plugins==1.1.1
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   celery
+click-repl==0.2.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   celery
 confusable-homoglyphs==3.2.0
     # via
     #   -c requirements/ci.txt
@@ -155,9 +177,7 @@ django==3.2.15
     #   django-redis
     #   django-registration
     #   django-relativedelta
-    #   django-rich
     #   django-rosetta
-    #   django-selenium-login
     #   django-sendfile2
     #   django-simple-certmanager
     #   django-sniplates
@@ -171,6 +191,7 @@ django==3.2.15
     #   maykin-django-two-factor-auth
     #   mozilla-django-oidc
     #   mozilla-django-oidc-db
+    #   notifications-api-common
     #   zgw-consumers
 django-admin-index==1.5.0
     # via
@@ -326,15 +347,7 @@ django-relativedelta==1.1.2
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   zgw-consumers
-django-rich==1.3.0
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
 django-rosetta==0.9.7
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-django-selenium-login==2.0.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -363,6 +376,7 @@ django-solo==1.2.0
     #   -r requirements/ci.txt
     #   django-open-forms-client
     #   mozilla-django-oidc-db
+    #   notifications-api-common
     #   zgw-consumers
 django-timeline-logger==2.0.0
     # via
@@ -380,16 +394,22 @@ django-webtest==1.9.7
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+django-yubin==1.7.1
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 djangorestframework==3.12.4
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-extra-fields
     #   drf-spectacular
+    #   notifications-api-common
 djangorestframework-camel-case==1.2.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   notifications-api-common
 docutils==0.17.1
     # via
     #   sphinx
@@ -422,11 +442,6 @@ et-xmlfile==1.1.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   openpyxl
-exceptiongroup==1.0.4
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-    #   trio
 face==20.1.1
     # via
     #   -c requirements/ci.txt
@@ -466,6 +481,7 @@ gemma-zds-client==1.0.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   notifications-api-common
     #   zgw-consumers
 geographiclib==1.52
     # via
@@ -485,11 +501,11 @@ glom==20.11.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   mozilla-django-oidc-db
-h11==0.14.0
+greenlet==2.0.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-    #   wsproto
+    #   playwright
 html5lib==1.1
     # via
     #   -c requirements/ci.txt
@@ -504,7 +520,6 @@ idna==3.2
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   requests
-    #   trio
 imagesize==1.2.0
     # via sphinx
 importlib-metadata==4.8.2
@@ -540,11 +555,21 @@ jsonschema==4.1.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   drf-spectacular
+kombu==5.2.4
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   celery
 lazy-object-proxy==1.6.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   astroid
+lockfile==0.12.2
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   django-yubin
 lxml==4.9.1
     # via
     #   -c requirements/ci.txt
@@ -553,10 +578,15 @@ lxml==4.9.1
     #   maykin-python3-saml
     #   pyquery
     #   xmlsec
-mail-editor @ git+https://github.com/maykinmedia/mail-editor.git@0b4621b5c7f434586115b8e722af8940cfa70195
+mail-editor @ git+https://github.com/maykinmedia/mail-editor.git@f99e5c4920a95cf9141a71230d7dfb9f03b84e36
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+mail-parser==3.15.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   django-yubin
 markdown==3.3.6
     # via
     #   -c requirements/ci.txt
@@ -593,6 +623,10 @@ mozilla-django-oidc-db==0.10.0
     #   -r requirements/ci.txt
 mypy-extensions==0.4.3
     # via black
+notifications-api-common==0.2.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 odfpy==1.4.1
     # via
     #   -c requirements/ci.txt
@@ -608,11 +642,6 @@ orderedmultidict==1.0.1
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   furl
-outcome==1.2.0
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-    #   trio
 packaging==21.0
     # via
     #   build
@@ -645,11 +674,20 @@ platformdirs==2.4.0
     #   -r requirements/ci.txt
     #   black
     #   pylint
+playwright==1.28.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 polib==1.1.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-rosetta
+prompt-toolkit==3.0.36
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   click-repl
 psycopg2==2.9.1
     # via
     #   -c requirements/ci.txt
@@ -666,14 +704,15 @@ pydyf==0.1.2
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   weasyprint
-pyflakes==2.3.1
-    # via flake8
-pygments==2.12.0
+pyee==9.0.4
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-    #   rich
-    #   sphinx
+    #   playwright
+pyflakes==2.3.1
+    # via flake8
+pygments==2.12.0
+    # via sphinx
 pyjwt==2.3.0
     # via
     #   -c requirements/ci.txt
@@ -707,11 +746,6 @@ pyrsistent==0.18.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   jsonschema
-pysocks==1.7.1
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-    #   urllib3
 python-dateutil==2.8.2
     # via
     #   -c requirements/ci.txt
@@ -738,7 +772,9 @@ pytz==2021.3
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   babel
+    #   celery
     #   django
+    #   django-yubin
 pywatchman==1.4.1
     # via
     #   -c requirements/ci.txt
@@ -761,8 +797,6 @@ redis==3.5.3
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-redis
-regex==2021.9.30
-    # via black
 requests==2.26.0
     # via
     #   -c requirements/ci.txt
@@ -782,47 +816,35 @@ requests-mock==1.9.3
     #   -r requirements/ci.txt
     #   ddt-api-calls
     #   zgw-consumers
-rich==12.4.1
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-    #   django-rich
-selenium==4.6.0
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
 sentry-sdk==1.4.3
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+simplejson==3.18.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   mail-parser
 six==1.16.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   click-repl
     #   django-choices
     #   django-elasticsearch-dsl
     #   elasticsearch-dsl
     #   furl
     #   html5lib
     #   isodate
+    #   mail-parser
     #   orderedmultidict
     #   python-dateutil
     #   qrcode
     #   requests-mock
 smmap==5.0.0
     # via gitdb
-sniffio==1.3.0
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-    #   trio
 snowballstemmer==2.1.0
     # via sphinx
-sortedcontainers==2.4.0
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-    #   trio
 soupsieve==2.3.1
     # via
     #   -c requirements/ci.txt
@@ -884,23 +906,13 @@ tomli==1.2.1
     #   black
     #   build
     #   pep517
-trio==0.22.0
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-    #   selenium
-    #   trio-websocket
-trio-websocket==0.9.2
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-    #   selenium
-typing-extensions==3.10.0.2
+typing-extensions==4.4.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   astroid
     #   black
+    #   pyee
     #   pylint
 unidecode==1.1.2
     # via
@@ -912,24 +924,35 @@ uritemplate==4.1.1
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   drf-spectacular
-urllib3[socks]==1.26.7
+urllib3==1.26.7
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   elastic-apm
     #   elasticsearch
     #   requests
-    #   selenium
     #   sentry-sdk
 uwsgi==2.0.19.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+vine==5.0.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   amqp
+    #   celery
+    #   kombu
 waitress==2.1.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   webtest
+wcwidth==0.2.5
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   prompt-toolkit
 weasyprint==54.2
     # via
     #   -c requirements/ci.txt
@@ -958,11 +981,6 @@ wrapt==1.12.1
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   astroid
-wsproto==1.2.0
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-    #   trio-websocket
 xlrd==2.0.1
     # via
     #   -c requirements/ci.txt
@@ -982,6 +1000,7 @@ zgw-consumers==0.23.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   notifications-api-common
 zipp==3.6.0
     # via
     #   -c requirements/ci.txt

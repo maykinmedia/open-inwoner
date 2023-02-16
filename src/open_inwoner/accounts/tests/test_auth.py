@@ -1,16 +1,21 @@
+from datetime import date
+from urllib.parse import urlencode
+
 from django.contrib.sites.models import Site
 from django.core import mail
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
 
+import requests_mock
 from django_webtest import WebTest
 from furl import furl
 
 from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 
 from ..choices import LoginTypeChoices
 from ..models import User
-from .factories import InviteFactory, UserFactory
+from .factories import DigidUserFactory, InviteFactory, UserFactory
 
 
 class TestRegistrationFunctionality(WebTest):
@@ -178,6 +183,35 @@ class TestRegistrationFunctionality(WebTest):
         # reverse contact checks
         self.assertEqual(list(user.user_contacts.all()), [new_user])
 
+    def test_invite_url_not_in_session_after_successful_registration(self):
+        user = UserFactory()
+        contact = UserFactory.build(email="test@testemail.com")
+        invite = InviteFactory.create(
+            inviter=user,
+            invitee_email=contact.email,
+            invitee_first_name=contact.first_name,
+            invitee_last_name=contact.last_name,
+        )
+        invite = InviteFactory.create()
+        url = invite.get_absolute_url()
+
+        response = self.app.get(url)
+
+        form = response.forms["invite-form"]
+        response = form.submit()
+
+        self.assertIn("invite_url", self.app.session.keys())
+
+        register_page = self.app.get(f"{self.url}?invite={invite.key}")
+        form = register_page.forms["registration-form"]
+
+        form["password1"] = "somepassword"
+        form["password2"] = "somepassword"
+
+        response = form.submit()
+
+        self.assertNotIn("invite_url", self.app.session.keys())
+
     def test_registration_active_user(self):
         """the user should be redirected to the registration complete page"""
 
@@ -208,7 +242,8 @@ class TestRegistrationFunctionality(WebTest):
         )
 
 
-class TestRegistrationDigid(WebTest):
+class TestDigid(HaalCentraalMixin, WebTest):
+    csrf_checks = False
     url = reverse_lazy("django_registration_register")
 
     def test_registration_page_only_digid(self):
@@ -246,6 +281,328 @@ class TestRegistrationDigid(WebTest):
             furl(reverse("digid:login")).add({"next": necessary_url}).url,
         )
 
+    def test_digid_fail_without_invite_redirects_to_login_page(self):
+        self.assertNotIn("invite_url", self.client.session.keys())
+
+        url = reverse("digid-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": reverse("root"),
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": "w",
+            "auth_pass": "bar",
+        }
+        # post our password to the IDP
+        response = self.app.post(url, data).follow()
+
+        self.assertRedirects(response, f"http://testserver{reverse('login')}")
+
+    def test_digid_fail_without_invite_and_next_url_redirects_to_login_page(self):
+        self.assertNotIn("invite_url", self.client.session.keys())
+
+        url = reverse("digid-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": None,
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": "w",
+            "auth_pass": "bar",
+        }
+        # post our password to the IDP
+        response = self.app.post(url, data).follow()
+
+        self.assertRedirects(response, f"http://testserver{reverse('login')}")
+
+    def test_digid_fail_with_invite_redirects_to_register_page(self):
+        invite = InviteFactory()
+        session = self.client.session
+        session[
+            "invite_url"
+        ] = f"{reverse('django_registration_register')}?invite={invite.key}"
+        session.save()
+
+        url = reverse("digid-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": f"{reverse('accounts:registration_necessary')}?invite={invite.key}",
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": "w",
+            "auth_pass": "bar",
+        }
+        # post our password to the IDP
+        response = self.client.post(url, data, follow=True)
+
+        self.assertRedirects(
+            response,
+            f"http://testserver{reverse('django_registration_register')}?invite={invite.key}",
+        )
+
+    def test_invite_url_not_in_session_after_successful_login(self):
+        invite = InviteFactory()
+        session = self.client.session
+        session[
+            "invite_url"
+        ] = f"{reverse('django_registration_register')}?invite={invite.key}"
+        session.save()
+
+        url = reverse("digid-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": f"{reverse('accounts:registration_necessary')}?invite={invite.key}",
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": "123456789",
+            "auth_pass": "bar",
+        }
+
+        self.assertIn("invite_url", self.client.session.keys())
+
+        # post our password to the IDP
+        response = self.client.post(url, data, follow=True)
+
+        self.assertRedirects(
+            response,
+            f"{reverse('accounts:registration_necessary')}?invite={invite.key}",
+        )
+        self.assertNotIn("invite_url", self.client.session.keys())
+
+    @requests_mock.Mocker()
+    def test_user_can_modify_only_email_when_digid_and_brp(self, m):
+        self._setUpMocks_v_2(m)
+        self._setUpService()
+
+        url = reverse("digid-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": reverse("accounts:registration_necessary"),
+        }
+        data = {
+            "auth_name": "123456789",
+            "auth_pass": "bar",
+        }
+        url = f"{url}?{urlencode(params)}"
+        response = self.app.post(url, data).follow()
+
+        form = response.follow().forms["necessary-form"]
+        form["email"] = "updated@example.com"
+        form["first_name"] = "JUpdated"
+        form["last_name"] = "SUpdated"
+        form.submit()
+
+        user = User.objects.get(id=self.app.session["_auth_user_id"])
+
+        self.assertTrue(user.is_prepopulated)
+        self.assertEqual(user.email, "updated@example.com")
+        self.assertEqual(user.first_name, "Merel")
+        self.assertEqual(user.last_name, "Kooyman")
+
+    @requests_mock.Mocker()
+    def test_partial_response_from_haalcentraal_when_digid_and_brp(self, m):
+        self._setUpService()
+
+        m.get(
+            "https://personen/api/schema/openapi.yaml?v=3",
+            status_code=200,
+            content=self.load_binary_mock("personen_2.0.yaml"),
+        )
+        m.post(
+            "https://personen/api/brp/personen",
+            status_code=200,
+            json={
+                "personen": [
+                    {
+                        "naam": {
+                            "voornamen": "Merel",
+                        },
+                    }
+                ],
+                "type": "RaadpleegMetBurgerservicenummer",
+            },
+        )
+        url = reverse("digid-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": reverse("accounts:registration_necessary"),
+        }
+        data = {
+            "auth_name": "123456789",
+            "auth_pass": "bar",
+        }
+        url = f"{url}?{urlencode(params)}"
+        response = self.app.post(url, data).follow()
+        user = User.objects.get(id=self.app.session["_auth_user_id"])
+
+        # ensure user's first_name has been updated
+        self.assertEqual(user.first_name, "Merel")
+        self.assertEqual(user.last_name, "")
+        self.assertTrue(user.email.endswith("@example.org"))
+
+        # only email can be modified
+        form = response.follow().forms["necessary-form"]
+        form["email"] = "updated@example.org"
+        form["first_name"] = "JUpdated"
+        form.submit()
+
+        user.refresh_from_db()
+
+        self.assertEqual(user.first_name, "Merel")
+        self.assertEqual(user.last_name, "")
+        self.assertEqual(user.email, "updated@example.org")
+
+    @requests_mock.Mocker()
+    def test_first_digid_login_updates_brp_fields(self, m):
+        self._setUpService()
+        self._setUpMocks_v_2(m)
+
+        url = reverse("digid-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": reverse("root"),
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": "123456782",
+            "auth_pass": "bar",
+        }
+        # post our password to the IDP
+        response = self.app.post(url, data).follow()
+
+        user = User.objects.get(id=self.app.session["_auth_user_id"])
+
+        self.assertEqual(user.first_name, "Merel")
+        self.assertEqual(user.last_name, "Kooyman")
+        self.assertEqual(user.birthday, date(1982, 4, 10))
+        self.assertEqual(user.street, "King Olivereiland")
+        self.assertEqual(user.housenumber, "64")
+        self.assertEqual(user.city, "'s-Gravenhage")
+        self.assertTrue(user.is_prepopulated)
+
+    @requests_mock.Mocker()
+    def test_existing_user_digid_login_updates_brp_fields(self, m):
+        self._setUpService()
+
+        user = DigidUserFactory()
+        m.get(
+            "https://personen/api/schema/openapi.yaml?v=3",
+            status_code=200,
+            content=self.load_binary_mock("personen_2.0.yaml"),
+        )
+        m.post(
+            "https://personen/api/brp/personen",
+            status_code=200,
+            json={
+                "personen": [
+                    {
+                        "naam": {
+                            "voornamen": "UpdatedName",
+                        },
+                    }
+                ],
+                "type": "RaadpleegMetBurgerservicenummer",
+            },
+        )
+        url = reverse("digid-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": reverse("root"),
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": user.bsn,
+            "auth_pass": "bar",
+        }
+        # post our password to the IDP
+        response = self.app.post(url, data).follow()
+
+        user.refresh_from_db()
+
+        self.assertEqual(user.first_name, "UpdatedName")
+
+    @requests_mock.Mocker()
+    def test_existing_user_digid_login_fails_brp_update_when_no_brp_service(self, m):
+        user = DigidUserFactory()
+        m.get(
+            "https://personen/api/schema/openapi.yaml?v=3",
+            status_code=200,
+            content=self.load_binary_mock("personen_2.0.yaml"),
+        )
+        m.post(
+            "https://personen/api/brp/personen",
+            status_code=200,
+            json={
+                "personen": [
+                    {
+                        "naam": {
+                            "voornamen": "UpdatedName",
+                        },
+                    }
+                ],
+                "type": "RaadpleegMetBurgerservicenummer",
+            },
+        )
+        url = reverse("digid-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": reverse("root"),
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": user.bsn,
+            "auth_pass": "bar",
+        }
+        # post our password to the IDP
+        response = self.app.post(url, data).follow()
+
+        user.refresh_from_db()
+
+        self.assertNotEqual(user.first_name, "UpdatedName")
+
+    @requests_mock.Mocker()
+    def test_existing_user_digid_login_fails_brp_update_when_brp_http_404(self, m):
+        self._setUpService()
+
+        user = DigidUserFactory()
+        m.get(
+            "https://personen/api/schema/openapi.yaml?v=3",
+            status_code=200,
+            content=self.load_binary_mock("personen_2.0.yaml"),
+        )
+        m.post(
+            "https://personen/api/brp/personen",
+            status_code=404,
+        )
+        url = reverse("digid-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": reverse("root"),
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": user.bsn,
+            "auth_pass": "bar",
+        }
+        # post our password to the IDP
+        response = self.app.post(url, data).follow()
+
+        user.refresh_from_db()
+
+        self.assertNotEqual(user.first_name, "UpdatedName")
+
 
 class TestRegistrationNecessary(WebTest):
     url = reverse_lazy("accounts:registration_necessary")
@@ -262,6 +619,7 @@ class TestRegistrationNecessary(WebTest):
             reverse("accounts:my_profile"),
             reverse("accounts:inbox"),
             reverse("accounts:my_open_cases"),
+            reverse("accounts:my_data"),
             reverse("plans:plan_list"),
             reverse("general_faq"),
         ]

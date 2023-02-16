@@ -13,6 +13,7 @@
     var(--color-accent-lighter)
   );
   --border-width: 2px;
+  --border-width-thin: 1px;
   --border-radius: 3px;
 
   // Color.
@@ -139,7 +140,8 @@
   --color-success-lighter: hsl(
     var(--color-success-h),
     var(--color-success-s),
-    calc(var(--color-success-l) + 50%)
+    // this was +50% but +57% is needed for 4.5:1 contrast
+    calc(var(--color-success-l) + 57%)
   );
 
   --color-font-primary: var(--color-white);
@@ -147,7 +149,8 @@
   --color-font-accent: var(--color-gray-dark);
 
   --color-body: var(--color-gray-dark);
-  --color-mute: var(--color-gray);
+  // changed to #949494 to get the required 3:1 contrast ratio - in case of decorative border use var(--color-gray).
+  --color-mute: #949494;
 
   /// Font.
 

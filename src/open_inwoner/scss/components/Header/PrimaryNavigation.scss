@@ -93,9 +93,9 @@
 
   /// Interaction.
 
-  & > &__list > &__list-item:focus &__list,
-  & > &__list > &__list-item:focus-within &__list,
-  & > &__list > &__list-item:hover &__list {
+  &:not(#{&}--dismissed) > &__list > &__list-item:focus &__list,
+  &:not(#{&}--dismissed) > &__list > &__list-item:focus-within &__list,
+  &:not(#{&}--dismissed) > &__list > &__list-item:hover &__list {
     transform: scaleY(1);
   }
 }

@@ -1,16 +1,17 @@
 from datetime import date
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Q
 from django.forms.forms import Form
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
-from django.views.generic import DetailView, FormView, UpdateView
+from django.views.generic import DetailView, FormView, TemplateView, UpdateView
 
+from glom import glom
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.accounts.choices import (
@@ -18,15 +19,18 @@ from open_inwoner.accounts.choices import (
     LoginTypeChoices,
     StatusChoices,
 )
+from open_inwoner.haalcentraal.utils import fetch_brp_data
 from open_inwoner.questionnaire.models import QuestionnaireStep
 from open_inwoner.utils.mixins import ExportMixin
-from open_inwoner.utils.views import LogMixin
+from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
-from ..forms import ThemesForm, UserForm
+from ..forms import BrpUserForm, ThemesForm, UserForm
 from ..models import Action, User
 
 
-class MyProfileView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormView):
+class MyProfileView(
+    LogMixin, LoginRequiredMixin, CommonPageMixin, BaseBreadcrumbMixin, FormView
+):
     template_name = "pages/profile/me.html"
     form_class = Form
 
@@ -98,7 +102,9 @@ class MyProfileView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormView)
             return redirect("accounts:my_profile")
 
 
-class EditProfileView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
+class EditProfileView(
+    LogMixin, LoginRequiredMixin, CommonPageMixin, BaseBreadcrumbMixin, UpdateView
+):
     template_name = "pages/profile/edit.html"
     model = User
     form_class = UserForm
@@ -120,8 +126,16 @@ class EditProfileView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateV
         self.log_change(self.get_object(), _("profile was modified"))
         return HttpResponseRedirect(self.get_success_url())
 
+    def get_form_class(self):
+        user = self.request.user
+        if user.is_digid_and_brp():
+            return BrpUserForm
+        return super().get_form_class()
 
-class MyCategoriesView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView):
+
+class MyCategoriesView(
+    LogMixin, LoginRequiredMixin, CommonPageMixin, BaseBreadcrumbMixin, UpdateView
+):
     template_name = "pages/profile/categories.html"
     model = User
     form_class = ThemesForm
@@ -142,6 +156,63 @@ class MyCategoriesView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, Update
 
         self.log_change(self.object, _("categories were modified"))
         return HttpResponseRedirect(self.get_success_url())
+
+
+class MyDataView(
+    LogMixin, LoginRequiredMixin, CommonPageMixin, BaseBreadcrumbMixin, TemplateView
+):
+    template_name = "pages/profile/mydata.html"
+
+    @cached_property
+    def crumbs(self):
+        return [
+            (_("Mijn profiel"), reverse("accounts:my_profile")),
+            (_("Mijn gegevens"), reverse("accounts:my_data")),
+        ]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["my_data"] = self.parse_brp_data()
+        return context
+
+    def parse_brp_data(self):
+        brp_version = settings.BRP_VERSION
+        user = self.request.user
+        my_data = {
+            "first_name": "naam.voornamen",
+            "initials": "naam.voorletters",
+            "last_name": "naam.geslachtsnaam",
+            "prefix": "naam.voorvoegsel",
+            "birthday": "geboorte.datum.datum",
+            "birthday_place": "geboorte.plaats.omschrijving",
+            "birthday_country": "geboorte.land.omschrijving",
+            "gender": (
+                "geslachtsaanduiding.omschrijving"
+                if brp_version == "2.0"
+                else "geslachtsaanduiding"
+            ),
+            "street": "verblijfplaats.straat",
+            "house_number": "verblijfplaats.huisnummer",
+            "postcode": "verblijfplaats.postcode",
+            "place": "verblijfplaats.woonplaats",
+            "land": "verblijfplaats.land.omschrijving",
+        }
+
+        self.log_user_action(user, _("user requests for brp data"))
+
+        fetched_data = fetch_brp_data(user, brp_version)
+
+        # we have a different response depending on brp version
+        if brp_version == "2.0" and fetched_data.get("personen"):
+            fetched_data = fetched_data.get("personen", [])[0]
+
+        if not fetched_data:
+            return {}
+
+        for field in my_data:
+            my_data[field] = glom(fetched_data, my_data[field], default=None)
+
+        return my_data
 
 
 class MyProfileExportView(LogMixin, LoginRequiredMixin, ExportMixin, DetailView):

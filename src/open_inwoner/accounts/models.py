@@ -51,6 +51,13 @@ class User(AbstractBaseUser, PermissionsMixin):
         default="",
         validators=[validate_charfield_entry],
     )
+    display_name = models.CharField(
+        verbose_name=_("Display name"),
+        max_length=255,
+        blank=True,
+        default="",
+        validators=[validate_charfield_entry],
+    )
     email = models.EmailField(verbose_name=_("Email address"), unique=True)
     phonenumber = models.CharField(
         verbose_name=_("Phonenumber"),
@@ -199,13 +206,19 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_interests(self) -> str:
         if not self.selected_themes.exists():
-            return _("U heeft geen intressegebieden aangegeven.")
+            return _("U heeft geen interessegebieden aangegeven.")
 
         return ", ".join(list(self.selected_themes.values_list("name", flat=True)))
 
     def require_necessary_fields(self) -> bool:
         """returns whether user needs to fill in necessary fields"""
-        if self.login_type == LoginTypeChoices.digid:
+        if (
+            self.is_digid_and_brp()
+            and self.email
+            and not self.email.endswith("@example.org")
+        ):
+            return False
+        elif self.login_type == LoginTypeChoices.digid:
             return (
                 not self.first_name
                 or not self.last_name
@@ -254,6 +267,13 @@ class User(AbstractBaseUser, PermissionsMixin):
             self.user_contacts.filter(email=email).exists()
             or self.contacts_for_approval.filter(email=email).exists()
         )
+
+    def is_digid_and_brp(self) -> bool:
+        """
+        Returns whether user is logged in with digid and data has
+        been requested from haal centraal
+        """
+        return self.login_type == LoginTypeChoices.digid and self.is_prepopulated
 
 
 class Document(models.Model):

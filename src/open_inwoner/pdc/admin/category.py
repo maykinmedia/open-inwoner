@@ -81,7 +81,7 @@ class CategoryAdmin(ImportExportMixin, TreeAdmin):
 
         if request.method == "POST":
             user = request.user
-            system_action(_("categories were exported"), user)
+            system_action(_("categories were exported"), user=user)
 
         return response
 

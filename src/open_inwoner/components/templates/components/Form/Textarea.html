@@ -2,7 +2,7 @@
 
 <div class="form__control">
     <label class="label">
-        {{ field.label }}
+        {% firstof field.label label %}
         {{ field|addclass:"textarea" }}
         {% if field.help_text %}
             <p class="p">{{ field.help_text }}</p>

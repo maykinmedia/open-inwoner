@@ -5,13 +5,17 @@
 {% accessibility_header request=request %}
 <header class="header" aria-label="Navigatie header">
     <div class="header__container">
-        {% logo src=config.logo.file|thumbnail_url:'logo' alt=config.logo.default_alt_text %}
+        {% firstof config.logo.default_alt_text config.name as logo_alt_text %}
+        {% logo src=config.logo.file|thumbnail_url:'logo' alt=logo_alt_text %}
 
         <div class="header__menu">
-            <div class="header__menu-icon">
-                {% icon icon="menu" %}
-            </div>
-            <div class="header__submenu">
+            <button class="header__button">
+                <div class="header__menu-icon">
+                    {% icon icon="menu" %}
+                </div>
+            </button>
+
+            <dialog class="header__submenu">
                 <nav class="header__actions" aria-label="Zoek navigatie mobiel">
                     <div class="header__text-actions">
                         <p class="p">
@@ -44,7 +48,7 @@
                 </nav>
 
                 {% primary_navigation categories=categories request=request has_general_faq_questions=has_general_faq_questions show_plans=config.show_plans %}
-            </div>
+            </dialog>
         </div>
 
         <nav class="header__actions" aria-label="Zoek navigatie desktop">

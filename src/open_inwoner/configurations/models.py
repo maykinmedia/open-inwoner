@@ -11,6 +11,8 @@ from solo.models import SingletonModel
 
 from open_inwoner.pdc.utils import PRODUCT_PATH_NAME
 
+from ..utils.colors import hex_to_hsl
+from ..utils.validators import FilerExactImageSizeValidator
 from .choices import ColorTypeChoices
 
 
@@ -142,6 +144,7 @@ class SiteConfiguration(SingletonModel):
     home_questionnaire_intro = models.TextField(
         default=_("Test met een paar simpele vragen of u recht heeft op een product"),
         verbose_name=_("Home page questionaire intro"),
+        blank=True,
         help_text=_("Questionnaire intro text on the home page."),
     )
     home_product_finder_title = models.CharField(
@@ -169,6 +172,7 @@ class SiteConfiguration(SingletonModel):
             "Kies hieronder één van de volgende vragenlijsten om de zelfdiagnose te starten."
         ),
         verbose_name=_("Questionaire selector widget intro"),
+        blank=True,
         help_text=_("Questionaire selector intro on the theme and profile pages."),
     )
     plans_intro = models.TextField(
@@ -176,6 +180,7 @@ class SiteConfiguration(SingletonModel):
             "Hier werkt u aan uw doelen. Dit doet u samen met uw contactpersoon bij de gemeente. "
         ),
         verbose_name=_("Plan pages intro"),
+        blank=True,
         help_text=_("The sub-title for the plan page."),
     )
     plans_no_plans_message = models.CharField(
@@ -223,6 +228,36 @@ class SiteConfiguration(SingletonModel):
         default="",
         blank=True,
         help_text=_("Mailing intro text on the footer section."),
+    )
+    footer_logo = FilerImageField(
+        verbose_name=_("Footer logo"),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="footer_logo",
+        help_text=_("Footer logo"),
+    )
+    footer_logo_title = models.CharField(
+        max_length=255,
+        default="",
+        blank=True,
+        verbose_name=_("Footer logo title"),
+        help_text=_("The title - help text of the footer logo."),
+    )
+    footer_logo_url = models.URLField(
+        verbose_name=_("Footer logo link"),
+        blank=True,
+        default="",
+        help_text=_("The external link for the footer logo."),
+    )
+    favicon = FilerImageField(
+        verbose_name=_("Favicon image (32x32, .png)"),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="favicon",
+        help_text=_("Image to use as favicon"),
+        validators=[FilerExactImageSizeValidator(32, 32)],
     )
     flatpages = models.ManyToManyField(
         FlatPage,
@@ -289,6 +324,8 @@ class SiteConfiguration(SingletonModel):
         default=True,
         help_text=_("Whether to send email about each new message the user receives"),
     )
+
+    # analytics
     gtm_code = models.CharField(
         verbose_name=_("Google Tag Manager code"),
         max_length=50,
@@ -317,6 +354,18 @@ class SiteConfiguration(SingletonModel):
         null=True,
         help_text=_("The 'idsite' of the website you're tracking in Matomo."),
     )
+    siteimprove_id = models.CharField(
+        _("SiteImprove ID"),
+        max_length=10,
+        default="",
+        blank=True,
+        help_text=_(
+            "SiteImprove ID - this can be found in the snippet example, "
+            "which should contain a URL like '//siteimproveanalytics.com/js/siteanalyze_xxxxx.js'. "
+            "The xxxxx part is the ID."
+        ),
+    )
+
     show_cases = models.BooleanField(
         verbose_name=_("Show cases"),
         default=False,
@@ -378,15 +427,15 @@ class SiteConfiguration(SingletonModel):
 
     @property
     def get_primary_color(self):
-        return self.hex_to_hsl(self.primary_color)
+        return hex_to_hsl(self.primary_color)
 
     @property
     def get_secondary_color(self):
-        return self.hex_to_hsl(self.secondary_color)
+        return hex_to_hsl(self.secondary_color)
 
     @property
     def get_accent_color(self):
-        return self.hex_to_hsl(self.accent_color)
+        return hex_to_hsl(self.accent_color)
 
     @property
     def get_ordered_flatpages(self):
@@ -400,51 +449,9 @@ class SiteConfiguration(SingletonModel):
     def matomo_enabled(self):
         return self.matomo_url and self.matomo_site_id
 
-    def hex_to_hsl(self, color):
-        # Convert hex to RGB first
-        r = 0
-        g = 0
-        b = 0
-        if len(color) == 4:
-            r = "0x" + color[1] + color[1]
-            g = "0x" + color[2] + color[2]
-            b = "0x" + color[3] + color[3]
-        elif len(color) == 7:
-            r = "0x" + color[1] + color[2]
-            g = "0x" + color[3] + color[4]
-            b = "0x" + color[5] + color[6]
-
-        # Then to HSL
-        r = int(r, 16) / 255
-        g = int(g, 16) / 255
-        b = int(b, 16) / 255
-        cmin = min(r, g, b)
-        cmax = max(r, g, b)
-        delta = cmax - cmin
-        h = 0
-        s = 0
-        l = 0
-
-        if delta == 0:
-            h = 0
-        elif cmax == r:
-            h = ((g - b) / delta) % 6
-        elif cmax == g:
-            h = (b - r) / delta + 2
-        else:
-            h = (r - g) / delta + 4
-
-        h = round(h * 60)
-
-        if h < 0:
-            h += 360
-
-        l = (cmax + cmin) / 2
-        s = 0 if delta == 0 else delta / (1 - abs(2 * l - 1))
-        s = int((s * 100))
-        l = int((l * 100))
-
-        return h, s, l
+    @property
+    def siteimprove_enabled(self):
+        return bool(self.siteimprove_id)
 
     def get_help_text(self, request):
         current_path = request.get_full_path()

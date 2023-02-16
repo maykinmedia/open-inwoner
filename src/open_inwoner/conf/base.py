@@ -90,7 +90,14 @@ CACHES = {
             "IGNORE_EXCEPTIONS": True,
         },
     },
+    "local": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+    },
 }
+
+# Django solo caching
+SOLO_CACHE_TIMEOUT = 5  # 5 seconds
+SOLO_CACHE = "local"  # Avoid Redis overhead
 
 # ZGW API caches
 CACHE_ZGW_CATALOGI_TIMEOUT = config("CACHE_ZGW_CATALOGI_TIMEOUT", default=60 * 60 * 24)
@@ -149,6 +156,7 @@ INSTALLED_APPS = [
     "django_better_admin_arrayfield",
     "simple_certmanager",
     "zgw_consumers",
+    "notifications_api_common",
     "mail_editor",
     "ckeditor",
     "privates",
@@ -161,6 +169,7 @@ INSTALLED_APPS = [
     "sessionprofile",
     "openformsclient",
     "django_htmx",
+    "django_yubin",
     # Project applications.
     "open_inwoner.accounts",
     "open_inwoner.components",
@@ -274,6 +283,8 @@ EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=False)
 EMAIL_TIMEOUT = 10
 
 DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="openinwoner@maykinmedia.nl")
+
+EMAIL_BACKEND = "django_yubin.smtp_queue.EmailBackend"
 
 #
 # LOGGING
@@ -899,6 +910,66 @@ MAIL_EDITOR_CONF = {
             },
         ],
     },
+    "case_notification": {
+        "name": _("Case update notification"),
+        "description": _(
+            "This email is used to notify people an update happened to their case"
+        ),
+        "subject_default": "Update to your case at {{ site_name }}",
+        "body_default": """
+            <p>Beste</p>
+
+            <p>You are receiving this email because one of your cases received a new status update or document attachment.</p>
+
+            <table>
+                <tr>
+                    <th>Case identification</th>
+                    <td>{{ identification }}</td>
+                </tr>
+                <tr>
+                    <th>Case type</th>
+                    <td>{{ type_description }}</td>
+                </tr>
+                <tr>
+                    <th>Start date</th>
+                    <td>{{ start_date }}</td>
+                </tr>
+            </table>
+
+            <p><a href="{{ case_link }}">Go to your case</a> </p>
+
+            <p>Met vriendelijke groet,
+            {{ site_name }} </p>
+       """,
+        "subject": [
+            {
+                "name": "site_name",
+                "description": _("Name of the site."),
+            },
+        ],
+        "body": [
+            {
+                "name": "identification",
+                "description": _("The identification of the case"),
+            },
+            {
+                "name": "type_description",
+                "description": _("The description of the type of the case"),
+            },
+            {
+                "name": "start_date",
+                "description": _("The start date of the case"),
+            },
+            {
+                "name": "case_link",
+                "description": _("The link to the case details."),
+            },
+            {
+                "name": "site_name",
+                "description": _("Name of the site"),
+            },
+        ],
+    },
 }
 MAIL_EDITOR_BASE_CONTEXT = {"site_name": "Open Inwoner Platform"}
 CKEDITOR_CONFIGS = {
@@ -926,7 +997,7 @@ TWO_FACTOR_PATCH_ADMIN = config("TWO_FACTOR_PATCH_ADMIN", default=True)
 
 # file upload limits
 MIN_UPLOAD_SIZE = 1  # in bytes
-MAX_UPLOAD_SIZE = 1024 ** 2 * 100  # 100MB
+MAX_UPLOAD_SIZE = 1024**2 * 100  # 100MB
 UPLOAD_FILE_TYPES = "application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/plain,application/vnd.oasis.opendocument.text,application/vnd.oasis.opendocument.formula,application/vnd.oasis.opendocument.spreadsheet,application/pdf,image/jpeg,image/png"
 
 # HaalCentraal BRP versions
@@ -979,8 +1050,7 @@ THUMBNAIL_ALIASES = {
         },
     }
 }
-
-TEST_RUNNER = "django_rich.test.RichRunner"
+THUMBNAIL_QUALITY = 100
 
 OIDC_AUTHENTICATE_CLASS = "mozilla_django_oidc_db.views.OIDCAuthenticationRequestView"
 OIDC_CALLBACK_CLASS = "mozilla_django_oidc_db.views.OIDCCallbackView"

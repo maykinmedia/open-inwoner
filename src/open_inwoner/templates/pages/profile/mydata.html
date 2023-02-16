@@ -1,0 +1,117 @@
+{% extends 'master.html' %}
+{% load i18n l10n link_tags grid_tags dropdown_tags button_tags %}
+
+{% block content %}
+<h1 class="h1" id="title">
+    {% trans "Mijn gegevens" %}
+</h1>
+
+
+{% render_grid %}
+    {% render_column span=7 %}
+        <p class="p">
+            {% trans "Hier ziet u een beperkte set van gegevens die van u zijn opgeslagen in de Basisregistratie Personen (BRP). Al uw persoonlijke gegevens kunt u vinden op " %}
+            {% link href="https://mijn.overheid.nl" text="mijn.overheid.nl" primary=True %}
+        </p>
+
+        <!-- BRP personal data -->
+        <h2 class="h2">{% trans "Mijn brp gegevens" %}</h2>
+        
+        {% with request.user as user %}
+            <div class="tabled tabled--flexible">
+                <div class="tabled__row">
+                    <div class="tabled__item tabled__item--bold">{% trans "Voornamen" %}</div>
+                    <div class="tabled__item">{{my_data.first_name|default:"-"}}</div>
+                </div>
+                <div class="tabled__row">
+                    <div class="tabled__item tabled__item--bold">{% trans "Voorletters" %}</div>
+                    <div class="tabled__item">{{my_data.initials|default:"-"}}</div>
+                </div>
+                <div class="tabled__row">
+                    <div class="tabled__item tabled__item--bold">{% trans "Achternaam" %}</div>
+                    <div class="tabled__item">{{my_data.last_name|default:"-"}}</div>
+                </div>
+                <div class="tabled__row">
+                    <div class="tabled__item tabled__item--bold">{% trans "Voorvoegsel" %}</div>
+                    <div class="tabled__item">{{my_data.prefix|default:"-"}}</div>
+                </div>
+                <div class="tabled__row">
+                    <div class="tabled__item tabled__item--bold">{% trans "Geboortedatum" %}</div>
+                    <div class="tabled__item">{{my_data.birthday|default:"-"}}</div>
+                </div>
+                <div class="tabled__row">
+                    <div class="tabled__item tabled__item--bold">{% trans "Geboorteplaats" %}</div>
+                    <div class="tabled__item">{{my_data.birthday_place|default:"-"}}</div>
+                </div>
+                <div class="tabled__row">
+                    <div class="tabled__item tabled__item--bold">{% trans "Burgerservicenummer (BSN)" %}</div>
+                    <div class="tabled__item">{{user.bsn|default:"-"}}</div>
+                </div>
+                <div class="tabled__row">
+                    <div class="tabled__item tabled__item--bold">{% trans "Geboorteland" %}</div>
+                    <div class="tabled__item">{{my_data.birthday_country|default:"-"}}</div>
+                </div>
+                <div class="tabled__row">
+                    <div class="tabled__item tabled__item--bold">{% trans "Geslacht" %}</div>
+                    <div class="tabled__item">{{my_data.gender|default:"-"}}</div>
+                </div>
+            </div>
+            
+            <!-- BRP registration data -->
+            <h2 class="h2">{% trans "Inschrijfadres" %}</h2>
+            
+            <div class="tabled tabled--flexible">
+                <div class="tabled__row">
+                    <div class="tabled__item tabled__item--bold">{% trans "Straat" %}</div>
+                    <div class="tabled__item">{{my_data.street|default:"-"}}</div>
+                </div>
+                <div class="tabled__row">
+                    <div class="tabled__item tabled__item--bold">{% trans "Huisnummer" %}</div>
+                    <div class="tabled__item">{{my_data.house_number|default:"-"}}</div>
+                </div>
+                <div class="tabled__row">
+                    <div class="tabled__item tabled__item--bold">{% trans "Postcode" %}</div>
+                    <div class="tabled__item">{{my_data.postcode|default:"-"}}</div>
+                </div>
+                <div class="tabled__row">
+                    <div class="tabled__item tabled__item--bold">{% trans "Plaats" %}</div>
+                    <div class="tabled__item">{{my_data.place|default:"-"}}</div>
+                </div>
+                <div class="tabled__row">
+                    <div class="tabled__item tabled__item--bold">{% trans "Land" %}</div>
+                    <div class="tabled__item">{{my_data.land|default:"-"}}</div>
+                </div>
+            </div>
+
+            <!-- BRP contact data -->
+            <h2 class="h2">
+                {% trans "Contactgegevens" %}
+
+                {% button_row align="right" %}
+                    {% dropdown icon="settings" secondary=True %}
+                        <div class="dropdown__item">
+                            {% button href="accounts:edit_profile" text=_("Bewerken") icon="edit" transparent=True %}
+                        </div>
+                    {% enddropdown %}
+                {% endbutton_row %}
+            </h2>
+            
+            <div class="tabled tabled--flexible">
+                <div class="tabled__row">
+                    <div class="tabled__item tabled__item--bold">{% trans "Roepnaam" %}</div>
+                    <div class="tabled__item">{{user.display_name|default:"-"}}</div>
+                </div>
+                <div class="tabled__row">
+                    <div class="tabled__item tabled__item--bold">{% trans "Telefoonnummer" %}</div>
+                    <div class="tabled__item">{{user.phonenumber|default:"-"}}</div>
+                </div>
+                <div class="tabled__row">
+                    <div class="tabled__item tabled__item--bold">{% trans "E-mailadres" %}</div>
+                    <div class="tabled__item">{{user.email|default:"-"}}</div>
+                </div>
+            </div>
+        {% endwith %}
+    {% endrender_column %}
+{% endrender_grid %}
+
+{% endblock content %}

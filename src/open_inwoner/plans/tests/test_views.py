@@ -1,20 +1,19 @@
-from unittest import skip
+from datetime import date
 
 from django.contrib.messages import get_messages
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.core import mail
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from django_webtest import WebTest
-from privates.test import temp_private_root
+from freezegun import freeze_time
 from webtest import Upload
 
-from open_inwoner.accounts.choices import StatusChoices
+from open_inwoner.accounts.choices import ContactTypeChoices, StatusChoices
 from open_inwoner.accounts.models import Action
 from open_inwoner.accounts.tests.factories import ActionFactory, UserFactory
-from open_inwoner.accounts.tests.test_action_views import ActionStatusSeleniumBaseTests
-from open_inwoner.utils.tests.selenium import ChromeSeleniumMixin, FirefoxSeleniumMixin
+from open_inwoner.accounts.tests.test_action_views import ActionsPlaywrightTests
+from open_inwoner.utils.tests.playwright import multi_browser
 
 from ..models import Plan
 from .factories import ActionTemplateFactory, PlanFactory, PlanTemplateFactory
@@ -365,6 +364,17 @@ class PlanViewTests(WebTest):
         elem = response.pyquery(f"#id_plan_contacts_1")[0]
         self.assertEqual(elem.attrib.get("checked"), "checked")
 
+    def test_plan_create_contains_contact_create_link_when_no_contacts_exist(self):
+        self.user.user_contacts.remove(self.contact)
+        response = self.app.get(self.create_url, user=self.user)
+        self.assertContains(response, reverse("accounts:contact_create"))
+
+    def test_plan_create_does_not_contain_contact_create_link_when_contacts_exist(
+        self,
+    ):
+        response = self.app.get(self.create_url, user=self.user)
+        self.assertNotContains(response, reverse("accounts:contact_create"))
+
     def test_plan_edit_login_required(self):
         response = self.app.get(self.edit_url)
         self.assertRedirects(response, f"{self.login_url}?next={self.edit_url}")
@@ -554,8 +564,116 @@ class PlanViewTests(WebTest):
         )
         self.assertEqual(response.status_code, 404)
 
+    @freeze_time("2022-01-01")
+    def test_plan_list_renders_expected_data_when_begeleider(self):
+        self.user.contact_type = ContactTypeChoices.begeleider
+        self.user.save()
+        self.plan.end_date = date(2022, 1, 20)
+        self.plan.save()
 
-class _PlanActionStatusSeleniumMixin:
+        response = self.app.get(self.list_url, user=self.user)
+        rendered_plan_title = response.pyquery("tbody .table__header")[0].text
+        rendered_contact = response.pyquery("tbody .table__item")[0].text
+        rendered_end_date = response.pyquery("tbody .table__item")[1].text
+        rendered_plan_status = response.pyquery("tbody .table__item")[2].text
+        rendered_actions_num = response.pyquery("tbody .table__item")[3].text
+        rendered_action_required = response.pyquery(
+            "tbody .table__item--notification-danger"
+        )[0].text
+
+        self.assertEqual(rendered_plan_title, self.plan.title)
+        self.assertEqual(rendered_contact, self.contact.get_full_name())
+        self.assertEqual(rendered_end_date, "20-01-2022")
+        self.assertEqual(rendered_plan_status, _("Open"))
+        self.assertEqual(rendered_actions_num, "1")
+        self.assertEqual(rendered_action_required, _("Actie vereist"))
+
+    @freeze_time("2022-01-01")
+    def test_plan_list_renders_expected_data_for_expired_plan_when_begeleider(self):
+        self.user.contact_type = ContactTypeChoices.begeleider
+        self.user.save()
+        self.plan.end_date = date(2022, 1, 1)
+        self.plan.save()
+
+        response = self.app.get(self.list_url, user=self.user)
+        rendered_end_date = response.pyquery("tbody .table__item")[1].text
+        rendered_plan_status = response.pyquery("tbody .table__item")[2].text
+
+        self.assertEqual(rendered_end_date, "01-01-2022")
+        self.assertEqual(rendered_plan_status, _("Afgerond"))
+
+    @freeze_time("2022-01-01")
+    def test_plan_list_renders_expected_data_for_approval_actions_when_begeleider(self):
+        self.user.contact_type = ContactTypeChoices.begeleider
+        self.user.save()
+        self.action.status = StatusChoices.approval
+        self.action.save()
+
+        response = self.app.get(self.list_url, user=self.user)
+        rendered_actions_num = response.pyquery("tbody .table__item")[3].text
+        rendered_action_required = response.pyquery(
+            "tbody .table__item--notification-danger"
+        )[0].text
+
+        self.assertEqual(rendered_actions_num, "1")
+        self.assertEqual(rendered_action_required, _("Actie vereist"))
+
+    @freeze_time("2022-01-01")
+    def test_plan_list_renders_expected_data_for_closed_actions_when_begeleider(self):
+        self.user.contact_type = ContactTypeChoices.begeleider
+        self.user.save()
+        self.action.status = StatusChoices.closed
+        self.action.save()
+
+        response = self.app.get(self.list_url, user=self.user)
+        rendered_actions_num = response.pyquery("tbody .table__item")[3].text
+        rendered_action_required = response.pyquery(
+            "tbody .table__item--notification-danger"
+        )
+
+        self.assertEqual(rendered_actions_num, "0")
+        self.assertEqual(rendered_action_required, [])
+
+    def test_plan_list_doesnt_add_deleted_action_to_total_when_begeleider(self):
+        self.user.contact_type = ContactTypeChoices.begeleider
+        self.user.save()
+        self.action.is_deleted = True
+        self.action.save()
+
+        response = self.app.get(self.list_url, user=self.user)
+        rendered_actions_num = response.pyquery("tbody .table__item")[3].text
+        rendered_action_required = response.pyquery(
+            "tbody .table__item--notification-danger"
+        )
+
+        self.assertEqual(rendered_actions_num, "0")
+        self.assertEqual(rendered_action_required, [])
+
+    @freeze_time("2022-01-01")
+    def test_plan_list_renders_template_for_regular_user(self):
+        self.plan.end_date = date(2022, 1, 20)
+        self.plan.save()
+
+        response = self.app.get(self.list_url, user=self.user)
+        extended = response.pyquery(".plans-extended")
+
+        self.assertEqual(len(extended), 0)
+
+    @freeze_time("2022-01-01")
+    def test_plan_list_renders_template_for_begeleider(self):
+        self.user.contact_type = ContactTypeChoices.begeleider
+        self.user.save()
+        self.plan.end_date = date(2022, 1, 20)
+        self.plan.save()
+
+        response = self.app.get(self.list_url, user=self.user)
+        extended = response.pyquery(".plans-extended")
+
+        self.assertEqual(len(extended), 1)
+
+
+@multi_browser()
+class PlanActionStatusPlaywrightTests(ActionsPlaywrightTests):
     def setUp(self) -> None:
         super().setUp()
 
@@ -569,24 +687,3 @@ class _PlanActionStatusSeleniumMixin:
         self.action_list_url = reverse(
             "plans:plan_detail", kwargs={"uuid": self.plan.uuid}
         )
-
-
-@skip("skipped for now because of random CI failures, ref Taiga #963")
-class PlanActionStatusFirefoxSeleniumTests(
-    FirefoxSeleniumMixin,
-    _PlanActionStatusSeleniumMixin,
-    ActionStatusSeleniumBaseTests,
-    StaticLiveServerTestCase,
-):
-    pass
-    # note these use the same ActionStatusSeleniumBaseTests as the Actions without Plan
-
-
-@skip("skipped for now because of random CI failures, ref Taiga #963")
-class PlanActionStatusChromeSeleniumTests(
-    ChromeSeleniumMixin,
-    _PlanActionStatusSeleniumMixin,
-    ActionStatusSeleniumBaseTests,
-    StaticLiveServerTestCase,
-):
-    pass

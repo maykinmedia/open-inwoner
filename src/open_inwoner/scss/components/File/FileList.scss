@@ -22,6 +22,8 @@
 /// Contextual
 ///
 
-.h2 + .file-list {
+.h2 + .file-list,
+.file-list + .h2,
+.file-list + .p {
   margin-top: var(--spacing-large);
 }

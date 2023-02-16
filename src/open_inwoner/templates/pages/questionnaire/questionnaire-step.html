@@ -17,7 +17,8 @@
 
             {% step_indicator form.instance.depth form.instance.depth object_list=form.instance.get_tree_path object_list_str='question_subject' %}
 
-            <h4 class="h4" id="question">{{ form.instance.question }}</h4>
+            <fieldset class="questionnaire__fieldset">
+            <legend class="h4" id="question">{{ form.instance.question }}</legend>
 
             {% if form.instance.help_text %}
                 <p class="p p--compact">{{ form.instance.help_text }}</p>
@@ -36,7 +37,7 @@
                 {% url 'questionnaire:reset' as form_action %}
             {% endif %}
 
-            {% render_form id="questionnaire_step" form_action=form_action auto_render=True autosubmit=True extra_classes='form--compact' form=form method='POST' submit_text=submit_text secondary_href=secondary_href secondary_icon='arrow_backward' secondary_icon_position='before' secondary_text=_('Vorige') %}
+            {% render_form id="questionnaire_step" form_action=form_action auto_render=True extra_classes='form--compact' form=form method='POST' submit_text=submit_text secondary_href=secondary_href secondary_icon='arrow_backward' secondary_icon_position='before' secondary_text=_('Vorige') %}
                 {% csrf_token %}
 
                 {% if form.instance.content %}
@@ -53,7 +54,7 @@
                     {% card_container products=form.instance.related_products.published small=True %}
                 {% endif %}
             {% endrender_form %}
-
+            </fieldset>
         {% endrender_column %}
     {% endrender_grid %}
 {% endblock %}

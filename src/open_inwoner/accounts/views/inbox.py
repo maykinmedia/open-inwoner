@@ -14,7 +14,7 @@ from furl import furl
 from privates.views import PrivateMediaView
 
 from open_inwoner.utils.mixins import PaginationMixin
-from open_inwoner.utils.views import LogMixin
+from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from ..forms import InboxForm
 from ..models import Document, Message, User
@@ -23,11 +23,16 @@ from ..query import MessageQuerySet
 logger = logging.getLogger(__name__)
 
 
-class InboxView(LogMixin, LoginRequiredMixin, PaginationMixin, FormView):
+class InboxView(
+    LogMixin, LoginRequiredMixin, CommonPageMixin, PaginationMixin, FormView
+):
     template_name = "accounts/inbox.html"
     form_class = InboxForm
     paginate_by = 10
     slug_field = "uuid"
+
+    def page_title(self):
+        return _("Mijn berichten")
 
     def get_context_data(self, **kwargs):
         """
@@ -176,10 +181,13 @@ class InboxView(LogMixin, LoginRequiredMixin, PaginationMixin, FormView):
         return self.render_to_response(context)
 
 
-class InboxStartView(LogMixin, LoginRequiredMixin, FormView):
+class InboxStartView(LogMixin, LoginRequiredMixin, CommonPageMixin, FormView):
     template_name = "accounts/inbox_start.html"
     form_class = InboxForm
     success_url = reverse_lazy("accounts:inbox")
+
+    def page_title(self):
+        return _("Nieuw bericht")
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

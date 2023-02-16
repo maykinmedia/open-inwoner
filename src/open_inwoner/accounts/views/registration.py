@@ -12,13 +12,13 @@ from django_registration.backends.one_step.views import RegistrationView
 from furl import furl
 
 from open_inwoner.utils.hash import generate_email_from_string
-from open_inwoner.utils.views import LogMixin
+from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from ..forms import CustomRegistrationForm, NecessaryUserForm
 from ..models import Invite, User
 
 
-class InviteMixin:
+class InviteMixin(CommonPageMixin):
     def get_initial(self):
         initial = super().get_initial()
 
@@ -60,12 +60,20 @@ class InviteMixin:
 class CustomRegistrationView(LogMixin, InviteMixin, RegistrationView):
     form_class = CustomRegistrationForm
 
+    def page_title(self):
+        return _("Registratie")
+
     def form_valid(self, form):
         user = form.save()
 
         invite = form.cleaned_data["invite"]
         if invite:
             self.add_invitee(invite, user)
+
+        # Remove invite url from user's session
+        session = self.request.session
+        if "invite_url" in session.keys():
+            del session["invite_url"]
 
         self.request.user = user
         self.log_user_action(user, _("user was created"))
@@ -101,8 +109,16 @@ class NecessaryFieldsUserView(LogMixin, LoginRequiredMixin, InviteMixin, UpdateV
     template_name = "accounts/registration_necessary.html"
     success_url = reverse_lazy("django_registration_complete")
 
+    def page_title(self):
+        return _("Registratie voltooien")
+
     def get_object(self, queryset=None):
         return self.request.user
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
 
     def form_valid(self, form):
         user = form.save()

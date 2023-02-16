@@ -9,14 +9,9 @@ from django.urls import reverse
 from mail_editor.helpers import find_template
 
 from open_inwoner.accounts.models import Message, User
+from open_inwoner.utils.url import build_absolute_url
 
 logger = logging.getLogger(__name__)
-
-
-def build_absolute_url(path: str) -> str:
-    domain = Site.objects.get_current().domain
-    protocol = "https" if settings.IS_HTTPS else "http"
-    return f"{protocol}://{domain}{path}"
 
 
 class Command(BaseCommand):

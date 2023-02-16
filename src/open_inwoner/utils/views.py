@@ -8,6 +8,24 @@ from view_breadcrumbs import DetailBreadcrumbMixin
 from .logentry import addition, change, deletion, system_action, user_action
 
 
+class CommonPageMixin:
+    @property
+    def page_title(self):
+        page_title = ""
+        try:
+            # hook into breadcrumbs
+            page_title = self.crumbs[-1][0]
+        except (AttributeError, IndexError):
+            pass
+
+        return page_title
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["page_title"] = self.page_title
+        return context
+
+
 class CustomDetailBreadcrumbMixin(DetailBreadcrumbMixin):
     no_list = False
 
@@ -86,4 +104,4 @@ class LogMixin(object):
         """
         Log system events not related to a specific user.
         """
-        system_action(message, instance)
+        system_action(message, content_object=instance)

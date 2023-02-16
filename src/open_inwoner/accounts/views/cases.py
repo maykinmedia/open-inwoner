@@ -1,21 +1,23 @@
 import dataclasses
-from typing import Iterable, List, Optional
+from typing import List, Optional
 
+from django.contrib import messages
 from django.contrib.auth.mixins import AccessMixin
 from django.core.exceptions import PermissionDenied
-from django.http import Http404, StreamingHttpResponse
+from django.http import Http404, HttpResponseRedirect, StreamingHttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views import View
-from django.views.generic import TemplateView
+from django.views.generic import FormView, TemplateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin
 from zgw_consumers.api_models.constants import RolOmschrijving
 
 from open_inwoner.openzaak.api_models import Zaak
 from open_inwoner.openzaak.cases import (
+    connect_case_with_document,
     fetch_case_information_objects,
     fetch_case_information_objects_for_case_and_info,
     fetch_case_roles,
@@ -31,15 +33,23 @@ from open_inwoner.openzaak.documents import (
     download_document,
     fetch_single_information_object_url,
     fetch_single_information_object_uuid,
+    upload_document,
 )
-from open_inwoner.openzaak.models import OpenZaakConfig
+from open_inwoner.openzaak.models import (
+    OpenZaakConfig,
+    ZaakTypeConfig,
+    ZaakTypeInformatieObjectTypeConfig,
+)
 from open_inwoner.openzaak.utils import (
+    format_zaak_identificatie,
     get_role_name_display,
     is_info_object_visible,
     is_zaak_visible,
 )
 from open_inwoner.utils.mixins import PaginationMixin
-from open_inwoner.utils.views import LogMixin
+from open_inwoner.utils.views import CommonPageMixin, LogMixin
+
+from ..forms import CaseUploadForm
 
 
 class CaseLogMixin(LogMixin):
@@ -138,24 +148,31 @@ class CaseListMixin(CaseLogMixin, PaginationMixin):
         # fetch case status resources and attach resolved to case
         for case in cases:
             # todo parallel
-            case.status = fetch_specific_status(case.status)
-            case.status.statustype = status_types[case.status.statustype]
+            if case.status:
+                case.status = fetch_specific_status(case.status)
+                case.status.statustype = status_types[case.status.statustype]
 
         return cases
 
     def process_cases(self, cases: List[Zaak]) -> List[Zaak]:
         # Prepare data for frontend
+        config = OpenZaakConfig.get_solo()
+
         updated_cases = []
         for case in cases:
             updated_cases.append(
                 {
-                    "identificatie": str(case.identificatie),
+                    "identificatie": format_zaak_identificatie(
+                        case.identificatie, config
+                    ),
                     "uuid": str(case.uuid),
                     "start_date": case.startdatum,
                     "end_date": getattr(case, "einddatum", None),
                     "description": case.omschrijving,
                     "zaaktype_description": case.zaaktype.omschrijving,
-                    "current_status": case.status.statustype.omschrijving,
+                    "current_status": case.status.statustype.omschrijving
+                    if case.status
+                    else "",
                 }
             )
         return updated_cases
@@ -185,11 +202,14 @@ class CaseListMixin(CaseLogMixin, PaginationMixin):
 
 
 class OpenCaseListView(
-    BaseBreadcrumbMixin, CaseAccessMixin, CaseListMixin, TemplateView
+    CommonPageMixin, BaseBreadcrumbMixin, CaseAccessMixin, CaseListMixin, TemplateView
 ):
     @cached_property
     def crumbs(self):
         return [(_("Mijn aanvragen"), reverse("accounts:my_open_cases"))]
+
+    def page_title(self):
+        return _("Lopende aanvragen")
 
     def get_cases(self):
         all_cases = super().get_cases()
@@ -209,11 +229,14 @@ class OpenCaseListView(
 
 
 class ClosedCaseListView(
-    BaseBreadcrumbMixin, CaseAccessMixin, CaseListMixin, TemplateView
+    CommonPageMixin, BaseBreadcrumbMixin, CaseAccessMixin, CaseListMixin, TemplateView
 ):
     @cached_property
     def crumbs(self):
         return [(_("Mijn aanvragen"), reverse("accounts:my_closed_cases"))]
+
+    def page_title(self):
+        return _("Afgeronde aanvragen")
 
     def get_cases(self):
         all_cases = super().get_cases()
@@ -239,8 +262,11 @@ class SimpleFile:
     url: str
 
 
-class CaseDetailView(CaseLogMixin, BaseBreadcrumbMixin, CaseAccessMixin, TemplateView):
+class CaseDetailView(
+    CaseLogMixin, CommonPageMixin, BaseBreadcrumbMixin, CaseAccessMixin, FormView
+):
     template_name = "pages/cases/status.html"
+    form_class = CaseUploadForm
 
     @cached_property
     def crumbs(self):
@@ -252,11 +278,18 @@ class CaseDetailView(CaseLogMixin, BaseBreadcrumbMixin, CaseAccessMixin, Templat
             ),
         ]
 
+    def page_title(self):
+        if self.case:
+            return _("Status van {case}").format(case=self.case.omschrijving)
+        else:
+            return _("Status")
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         if self.case:
             self.log_case_access(self.case.identificatie)
+            config = OpenZaakConfig.get_solo()
 
             documents = self.get_case_document_files(self.case)
 
@@ -273,8 +306,29 @@ class CaseDetailView(CaseLogMixin, BaseBreadcrumbMixin, CaseAccessMixin, Templat
                 status_type = status_types_mapping[status.statustype]
                 status.statustype = status_type
 
+            # documents
+            internal_upload_enabled = ZaakTypeInformatieObjectTypeConfig.objects.get_visible_ztiot_configs_for_case(
+                self.case
+            ).exists()
+            external_upload_enabled = ZaakTypeConfig.objects.get_visible_zt_configs_for_case_type_identification(
+                self.case.zaaktype.identificatie
+            ).exists()
+
+            if external_upload_enabled:
+                external_upload_url = (
+                    ZaakTypeConfig.objects.get_visible_zt_configs_for_case_type_identification(
+                        self.case.zaaktype.identificatie
+                    )
+                    .get()
+                    .external_document_upload_url
+                )
+            else:
+                external_upload_url = ""
+
             context["case"] = {
-                "identification": self.case.identificatie,
+                "identification": format_zaak_identificatie(
+                    self.case.identificatie, config
+                ),
                 "initiator": self.get_initiator_display(self.case),
                 "result": self.get_result_display(self.case),
                 "start_date": self.case.startdatum,
@@ -294,6 +348,9 @@ class CaseDetailView(CaseLogMixin, BaseBreadcrumbMixin, CaseAccessMixin, Templat
                 ),
                 "statuses": statuses,
                 "documents": documents,
+                "internal_upload_enabled": internal_upload_enabled,
+                "external_upload_enabled": external_upload_enabled,
+                "external_upload_url": external_upload_url,
             }
             context["anchors"] = self.get_anchors(statuses, documents)
         else:
@@ -353,6 +410,68 @@ class CaseDetailView(CaseLogMixin, BaseBreadcrumbMixin, CaseAccessMixin, Templat
                 )
             )
         return documents
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+
+        kwargs["case"] = self.case
+        return kwargs
+
+    def handle_document_upload(self, request, form):
+        cleaned_data = form.cleaned_data
+
+        file = cleaned_data["file"]
+        title = cleaned_data["title"]
+        user_choice = cleaned_data["type"].id
+        source_organization = self.case.bronorganisatie
+
+        created_document = upload_document(
+            request.user, file, title, user_choice, source_organization
+        )
+
+        # we don't receive a status code like 201, so we try to validate upload
+        # by checking for the created url
+        if created_document and created_document.get("url"):
+            created_relationship = connect_case_with_document(
+                self.case.url, created_document["url"]
+            )
+
+            # successful upload and connection to zaak
+            if created_relationship and created_relationship.get("url"):
+                self.log_user_action(
+                    request.user,
+                    _("Document was uploaded for {case}: {filename}").format(
+                        case=self.case.identificatie,
+                        filename=file.name,
+                    ),
+                )
+
+                messages.add_message(
+                    request,
+                    messages.SUCCESS,
+                    _(f"{file.name} has been successfully uploaded"),
+                )
+                return HttpResponseRedirect(self.get_success_url())
+
+        # fail uploading the document or connecting it to the zaak
+        messages.add_message(
+            request,
+            messages.ERROR,
+            _(f"An error occured while uploading file {file.name}"),
+        )
+        return self.form_invalid(form)
+
+    def get_success_url(self) -> str:
+        return self.request.get_full_path()
+
+    def post(self, request, *args, **kwargs):
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+
+        if form.is_valid():
+            return self.handle_document_upload(request, form)
+        else:
+            return self.form_invalid(form)
 
     def get_anchors(self, statuses, documents):
         anchors = [["#title", _("Gegevens")]]

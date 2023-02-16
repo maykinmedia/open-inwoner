@@ -100,3 +100,6 @@ class InviteQuerySet(QuerySet):
 class UserQuerySet(QuerySet):
     def get_pending_approvals(self, user):
         return self.filter(contacts_for_approval=user)
+
+    def having_usable_email(self):
+        return self.exclude(Q(email="") | Q(email__endswith="@example.org"))

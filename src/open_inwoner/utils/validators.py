@@ -1,7 +1,11 @@
 from django.core.exceptions import ValidationError
+from django.core.files.images import get_image_dimensions
 from django.core.validators import RegexValidator
+from django.utils.deconstruct import deconstructible
 from django.utils.encoding import force_text
 from django.utils.translation import gettext_lazy as _
+
+from filer.models import Image
 
 
 def validate_charfield_entry(value, allow_apostrophe=False):
@@ -49,3 +53,26 @@ class CustomRegexValidator(RegexValidator):
 validate_postal_code = CustomRegexValidator(
     regex="^[1-9][0-9]{3} ?[a-zA-Z]{2}$", message=_("Ongeldige postcode")
 )
+
+
+@deconstructible
+class FilerExactImageSizeValidator:
+    def __init__(self, width, height):
+        if not width or not height:
+            raise ValueError("specify exact height and width")
+        self.width = width
+        self.height = height
+
+    def __call__(self, image_id):
+        image = Image.objects.get(pk=image_id)
+        width, height = get_image_dimensions(image.file)
+
+        if width != self.width or height != self.height:
+            raise ValidationError(
+                [
+                    f"Image size should be exactly {self.width}x{self.height} pixels (not {width}x{height}."
+                ]
+            )
+
+    def __eq__(self, other):
+        return self.width == other.width and self.height == other.height

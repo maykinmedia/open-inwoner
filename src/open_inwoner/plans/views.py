@@ -8,6 +8,7 @@ from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin
 
+from open_inwoner.accounts.choices import ContactTypeChoices
 from open_inwoner.accounts.forms import ActionListForm, DocumentForm
 from open_inwoner.accounts.views.actions import (
     ActionCreateView,
@@ -19,7 +20,7 @@ from open_inwoner.accounts.views.actions import (
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.utils.logentry import get_change_message
 from open_inwoner.utils.mixins import ExportMixin
-from open_inwoner.utils.views import LogMixin
+from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from .forms import PlanForm, PlanGoalForm
 from .models import Plan
@@ -34,15 +35,20 @@ class PlansEnabledMixin:
 
 
 class PlanListView(
-    PlansEnabledMixin, LoginRequiredMixin, BaseBreadcrumbMixin, ListView
+    PlansEnabledMixin,
+    LoginRequiredMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    ListView,
 ):
     template_name = "pages/plans/list.html"
     model = Plan
+    paginate_by = 10
 
     @cached_property
     def crumbs(self):
         return [
-            (_("Samenwerkingsplannen"), reverse("plans:plan_list")),
+            (_("Samenwerken"), reverse("plans:plan_list")),
         ]
 
     def get_queryset(self):
@@ -50,10 +56,30 @@ class PlanListView(
             "plan_contacts"
         )
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+
+        plans = self.get_queryset()
+        paginator, page, queryset, is_paginated = self.paginate_queryset(plans, 10)
+        context["paginator"] = paginator
+        context["page_obj"] = page
+        context["is_paginated"] = is_paginated
+        context["plans"] = queryset
+
+        if user.contact_type == ContactTypeChoices.begeleider:
+            plans = {}
+            for plan in queryset:
+                plans[plan] = plan.get_other_users_full_names(user=user)
+
+            context["extended_plans"] = plans
+        return context
+
 
 class PlanDetailView(
     PlansEnabledMixin,
     LoginRequiredMixin,
+    CommonPageMixin,
     BaseBreadcrumbMixin,
     BaseActionFilter,
     DetailView,
@@ -98,7 +124,12 @@ class PlanDetailView(
 
 
 class PlanCreateView(
-    PlansEnabledMixin, LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, CreateView
+    PlansEnabledMixin,
+    LogMixin,
+    LoginRequiredMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    CreateView,
 ):
     template_name = "pages/plans/create.html"
     model = Plan
@@ -130,7 +161,12 @@ class PlanCreateView(
 
 
 class PlanEditView(
-    PlansEnabledMixin, LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView
+    PlansEnabledMixin,
+    LogMixin,
+    LoginRequiredMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    UpdateView,
 ):
     template_name = "pages/plans/edit.html"
     model = Plan
@@ -169,7 +205,12 @@ class PlanEditView(
 
 
 class PlanGoalEditView(
-    PlansEnabledMixin, LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView
+    PlansEnabledMixin,
+    LogMixin,
+    LoginRequiredMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    UpdateView,
 ):
     template_name = "pages/plans/goal_edit.html"
     model = Plan
@@ -200,7 +241,12 @@ class PlanGoalEditView(
 
 
 class PlanFileUploadView(
-    PlansEnabledMixin, LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView
+    PlansEnabledMixin,
+    LogMixin,
+    LoginRequiredMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    UpdateView,
 ):
     template_name = "pages/plans/file.html"
     model = Plan
@@ -399,3 +445,10 @@ class PlanExportView(
 
     def get_queryset(self):
         return Plan.objects.connected(self.request.user).prefetch_related("actions")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        plan = self.get_object()
+
+        context["plan_contacts"] = plan.get_other_users_full_names(self.request.user)
+        return context
