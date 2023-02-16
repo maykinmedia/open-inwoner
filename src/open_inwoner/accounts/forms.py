@@ -415,11 +415,15 @@ class ActionListForm(forms.ModelForm):
 
 
 class CaseUploadForm(forms.Form):
-    title = forms.CharField(max_length=255, validators=[validate_charfield_entry])
-    type = forms.ModelChoiceField(
-        ZaakTypeInformatieObjectTypeConfig.objects.all(), empty_label=None
+    title = forms.CharField(
+        label=_("Titel"), max_length=255, validators=[validate_charfield_entry]
     )
-    file = forms.FileField()
+    type = forms.ModelChoiceField(
+        ZaakTypeInformatieObjectTypeConfig.objects.all(),
+        empty_label=None,
+        label=_("Bestand type"),
+    )
+    file = forms.FileField(label=_("Bestand"))
 
     def __init__(self, case, **kwargs):
         super().__init__(**kwargs)
