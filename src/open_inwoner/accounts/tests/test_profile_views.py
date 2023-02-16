@@ -346,7 +346,7 @@ class MyDataTests(HaalCentraalMixin, WebTest):
         "initials": "M.",
         "last_name": "Kooyman",
         "prefix": None,
-        "birthday": "1982-04-10",
+        "birthday": "10-04-1982",
         "birthday_place": "Leerdam",
         "birthday_country": "Nederland",
         "gender": "vrouw",
