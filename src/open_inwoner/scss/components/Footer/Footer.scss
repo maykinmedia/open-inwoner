@@ -33,6 +33,11 @@
 
   &__logo {
     grid-area: lg;
+
+    img {
+      width: auto;
+      max-height: 60px;
+    }
   }
 
   &__logo-text {

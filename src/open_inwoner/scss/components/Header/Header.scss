@@ -68,6 +68,10 @@ $vm: var(--spacing-large);
     @media (max-width: 767px) {
       padding: 8px;
     }
+
+    img {
+      max-height: 75px;
+    }
   }
 
   &__menu {
