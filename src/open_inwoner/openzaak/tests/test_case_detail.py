@@ -372,6 +372,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
                 "internal_upload_enabled": False,
                 "external_upload_enabled": False,
                 "external_upload_url": "",
+                "allowed_file_extensions": sorted(self.config.allowed_file_extensions),
             },
         )
 
@@ -674,7 +675,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
             form_response.context["form"].errors,
             {
                 "file": [
-                    f"Het type bestand dat u hebt geüpload is ongeldig. Geldige bestandstypen zijn: {', '.join(self.config.allowed_file_extensions)}"
+                    f"Het type bestand dat u hebt geüpload is ongeldig. Geldige bestandstypen zijn: {', '.join(sorted(self.config.allowed_file_extensions))}"
                 ]
             },
         )

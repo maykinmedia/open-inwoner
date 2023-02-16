@@ -351,6 +351,7 @@ class CaseDetailView(
                 "internal_upload_enabled": internal_upload_enabled,
                 "external_upload_enabled": external_upload_enabled,
                 "external_upload_url": external_upload_url,
+                "allowed_file_extensions": sorted(config.allowed_file_extensions),
             }
             context["anchors"] = self.get_anchors(statuses, documents)
         else:

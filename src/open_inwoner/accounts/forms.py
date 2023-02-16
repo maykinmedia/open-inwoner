@@ -441,7 +441,7 @@ class CaseUploadForm(forms.Form):
 
         config = OpenZaakConfig.get_solo()
         max_allowed_size = 1024**2 * config.max_upload_size
-        allowed_extensions = config.allowed_file_extensions
+        allowed_extensions = sorted(config.allowed_file_extensions)
         filename, file_extension = os.path.splitext(file.name)
 
         if file.size > max_allowed_size:
