@@ -58,7 +58,8 @@
 
   .actions__label {
     padding: var(--spacing-medium);
-    word-break: break-all;
+    word-break: normal;
+    overflow-wrap: break-word;
 
     &--big {
       grid-column: 1 / span 2;
