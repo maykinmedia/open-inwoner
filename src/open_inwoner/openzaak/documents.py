@@ -116,7 +116,7 @@ def upload_document(
         "inhoud": base64.b64encode(file.read()).decode("utf-8"),
         "bestandsomvang": file.size,
         "bestandsnaam": file.name,
-        # "status": "definitief",
+        "status": "definitief",
         "taal": "nld",
         "informatieobjecttype": ZaakTypeInformatieObjectTypeConfig.objects.get(
             id=user_choice
