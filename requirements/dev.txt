@@ -329,7 +329,7 @@ django-polymorphic==3.0.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-filer
-django-privates==1.2.2
+django-privates==1.5.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -361,7 +361,7 @@ django-sessionprofile==1.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-digid-eherkenning
-django-simple-certmanager==1.1.2
+django-simple-certmanager==1.2.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
