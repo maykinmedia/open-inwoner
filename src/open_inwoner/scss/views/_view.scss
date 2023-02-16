@@ -2,6 +2,18 @@
   &--accounts-contact_list {
     .form--horizontal {
       padding-top: var(--row-height);
+
+      &.form--columns-2 {
+        //grid-template-columns: repeat(2, 1fr);
+        background-color: lightyellow;
+
+        .form__control {
+          display: flex;
+          background-color: lavender;
+          justify-content: space-between;
+          width: 100%;
+        }
+      }
     }
   }
 

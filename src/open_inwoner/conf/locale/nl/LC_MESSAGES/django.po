@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-14 13:06+0100\n"
+"POT-Creation-Date: 2023-02-16 16:54+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -87,7 +87,7 @@ msgstr "OpenId connect"
 msgid "Alle"
 msgstr "Alle"
 
-#: accounts/choices.py:19 accounts/forms.py:336
+#: accounts/choices.py:19 accounts/forms.py:340
 #: templates/pages/plans/list.html:16
 msgid "Contactpersoon"
 msgstr "Contactpersoon"
@@ -131,12 +131,12 @@ msgstr "Eenmalig"
 msgid "Terugkerend"
 msgstr "Terugkerend"
 
-#: accounts/forms.py:26 accounts/forms.py:183 accounts/models.py:41
+#: accounts/forms.py:26 accounts/forms.py:184 accounts/models.py:41
 #: accounts/models.py:593 pdc/models/product.py:215
 msgid "First name"
 msgstr "Voornaam"
 
-#: accounts/forms.py:27 accounts/forms.py:184 accounts/models.py:48
+#: accounts/forms.py:27 accounts/forms.py:187 accounts/models.py:48
 #: accounts/models.py:599 pdc/models/product.py:220
 msgid "Last name"
 msgstr "Achternaam"
@@ -152,18 +152,18 @@ msgstr "Deze gebruiker is gedeactiveerd"
 
 #: accounts/forms.py:178
 msgid "Type contact"
-msgstr "Type contactpersoon"
+msgstr "Soort contactpersoon"
 
-#: accounts/forms.py:185 templates/export/include/contacts.html:8
+#: accounts/forms.py:189 templates/export/include/contacts.html:8
 #: templates/export/profile/profile_export.html:10
 msgid "Email"
 msgstr "E-mail"
 
-#: accounts/forms.py:198 accounts/tests/test_contact_views.py:184
+#: accounts/forms.py:202 accounts/tests/test_contact_views.py:184
 msgid "Please enter a valid email address of a contact."
 msgstr "Vul een geldig e-mailadres in van een contactpersoon."
 
-#: accounts/forms.py:204 accounts/tests/test_contact_views.py:168
+#: accounts/forms.py:208 accounts/tests/test_contact_views.py:168
 msgid ""
 "Het ingevoerde e-mailadres komt al voor in uw contactpersonen. Pas de "
 "gegevens aan en probeer het opnieuw."
@@ -171,35 +171,35 @@ msgstr ""
 "Het ingevoerde e-mailadres komt al voor in uw contactpersonen. Pas de "
 "gegevens aan en probeer het opnieuw."
 
-#: accounts/forms.py:211 accounts/tests/test_contact_views.py:199
+#: accounts/forms.py:215 accounts/tests/test_contact_views.py:199
 msgid "The user cannot be added, their account has been deleted."
 msgstr "De gebruiker kan niet worden toegevoegd, het account is verwijderd."
 
-#: accounts/forms.py:234
+#: accounts/forms.py:238
 msgid "Is voor"
 msgstr "Is voor"
 
-#: accounts/forms.py:236
+#: accounts/forms.py:240
 msgid "Myself"
 msgstr "Mezelf"
 
-#: accounts/forms.py:274
+#: accounts/forms.py:278
 msgid "The action can not end after the plan end date"
 msgstr "De actie kan niet later eindigen dan de einddatum van het plan"
 
-#: accounts/forms.py:340
+#: accounts/forms.py:344
 msgid "Voer de naam in van uw contactpersoon"
 msgstr "Voer de naam in van uw contactpersoon"
 
-#: accounts/forms.py:346
+#: accounts/forms.py:350
 msgid "Schrijf een bericht..."
 msgstr "Schrijf een bericht..."
 
-#: accounts/forms.py:376
+#: accounts/forms.py:380
 msgid "Either message content or file should be filled in"
 msgstr "Of een bericht of een bestand moet ingevuld zijn"
 
-#: accounts/forms.py:400
+#: accounts/forms.py:404
 msgid "Deadline"
 msgstr "Einddatum"
 
@@ -250,7 +250,7 @@ msgstr "Contact type"
 
 #: accounts/models.py:87
 msgid "The type of contact"
-msgstr "Type contactpersoon"
+msgstr "Soort contactpersoon"
 
 #: accounts/models.py:90
 msgid "Date joined"
@@ -788,6 +788,7 @@ msgstr ""
 #: accounts/tests/test_contact_views.py:237
 #: accounts/tests/test_profile_views.py:242
 #: accounts/tests/test_profile_views.py:268
+#, python-brace-format
 msgid "Uw invoer bevat een ongeldig teken: {char}"
 msgstr "Uw invoer bevat een ongeldig teken: {char}"
 
@@ -2135,7 +2136,9 @@ msgid "The external link for the footer logo."
 msgstr "The external link for the footer logo."
 
 #: configurations/models.py:254
-msgid "Favicon image (32x32)"
+#, fuzzy
+#| msgid "Favicon image (32x32)"
+msgid "Favicon image (32x32, .png)"
 msgstr "Favicon image (32x32)"
 
 #: configurations/models.py:259
@@ -2323,8 +2326,10 @@ msgid ""
 "contain a URL like '//siteimproveanalytics.com/js/siteanalyze_xxxxx.js'. The "
 "xxxxx part is the ID."
 msgstr ""
-"SiteImprove ID - Dit nummer kan gevonden worden in de SiteImprove snippet, dit is onderdeel van een URL "
-" zoals '//siteimproveanalytics.com/js/siteanalyze_xxxxx.js' waarbij het xxxxx-deel de SiteImprove ID is die hier ingevuld moet worden."
+"SiteImprove ID - Dit nummer kan gevonden worden in de SiteImprove snippet, "
+"dit is onderdeel van een URL  zoals '//siteimproveanalytics.com/js/"
+"siteanalyze_xxxxx.js' waarbij het xxxxx-deel de SiteImprove ID is die hier "
+"ingevuld moet worden."
 
 #: configurations/models.py:370
 msgid "Show cases"
@@ -2381,7 +2386,9 @@ msgstr "OpenID Connect Logo"
 
 #: configurations/models.py:404
 msgid "Logo that can be used for the OpenId connect login method"
-msgstr "Het logo dat gebruikt wordt voor OpenID Connect (OIDC/Azure AD) als loginmethode is ingesteld"
+msgstr ""
+"Het logo dat gebruikt wordt voor OpenID Connect (OIDC/Azure AD) als "
+"loginmethode is ingesteld"
 
 #: configurations/models.py:407
 msgid "Openid Connect login text"
@@ -2391,7 +2398,8 @@ msgstr "OpenID Connect login tekst"
 msgid ""
 "The text that should display when OpenId connect is set as a login method"
 msgstr ""
-"De tekst dat getoond wordt wanneer OpenID Connect (OIDC/Azure AD) als loginmethode is ingesteld"
+"De tekst dat getoond wordt wanneer OpenID Connect (OIDC/Azure AD) als "
+"loginmethode is ingesteld"
 
 #: configurations/models.py:416 configurations/models.py:419
 msgid "Site Configuration"
@@ -2480,23 +2488,31 @@ msgid ""
 "Enabling both zaaktype and zaaktypeinformatieobject upload is not allowed. "
 "Only one of them should be enabled."
 msgstr ""
-"Het gebruiken van een link en een informatieobject tegelijkertijd wordt niet toegestaan. "
-"Gebruik of de link, of een informatieobject maar niet beiden."
+"Het gebruiken van een link en een informatieobject tegelijkertijd wordt niet "
+"toegestaan. Gebruik of de link, of een informatieobject maar niet beiden."
 
 #: openzaak/admin.py:219
 #, python-format
 msgid "%d zaaktype was successfully set to notify on status changes."
 msgid_plural "%d zaaktypes were successfully set to notify on status changes."
-msgstr[0] "%d zaaktype is succesvol ingesteld om bij statusveranderingen een notificatie te sturen."
-msgstr[1] "%d zaaktypen zijn succesvol ingesteld om bij statusveranderingen een notificatie te sturen."
+msgstr[0] ""
+"%d zaaktype is succesvol ingesteld om bij statusveranderingen een "
+"notificatie te sturen."
+msgstr[1] ""
+"%d zaaktypen zijn succesvol ingesteld om bij statusveranderingen een "
+"notificatie te sturen."
 
 #: openzaak/admin.py:233
 #, python-format
 msgid "%d zaaktype was successfully set to not notify on status changes."
 msgid_plural ""
 "%d zaaktypes were successfully set to not notify on status changes."
-msgstr[0] "%d zaaktype is succesvol ingesteld om bij statusveranderingen geen notificaties te sturen."
-msgstr[1] "%d zaaktypen zijn succesvol ingesteld om bij statusveranderingen geen notificaties te sturen."
+msgstr[0] ""
+"%d zaaktype is succesvol ingesteld om bij statusveranderingen geen "
+"notificaties te sturen."
+msgstr[1] ""
+"%d zaaktypen zijn succesvol ingesteld om bij statusveranderingen geen "
+"notificaties te sturen."
 
 #: openzaak/models.py:49
 msgid "Open Zaak API"
@@ -2533,7 +2549,9 @@ msgstr "Maximale upload grootte (in MB)"
 
 #: openzaak/models.py:88
 msgid "The max size of the file (in MB) which is uploaded."
-msgstr "Documentuploads mogen maximaal dit aantal MB groot zijn, anders worden ze geweigerd."
+msgstr ""
+"Documentuploads mogen maximaal dit aantal MB groot zijn, anders worden ze "
+"geweigerd."
 
 #: openzaak/models.py:92
 msgid "Allowed file extensions"
@@ -2541,7 +2559,9 @@ msgstr "Toegestane bestandsextensies"
 
 #: openzaak/models.py:96
 msgid "A list of the allowed file extensions."
-msgstr "Een lijst van toegestande bestandsextensies, alleen documentuploads met een van deze extensies worden toegelaten."
+msgstr ""
+"Een lijst van toegestande bestandsextensies, alleen documentuploads met een "
+"van deze extensies worden toegelaten."
 
 #: openzaak/models.py:100
 msgid "Use StatusType.informeren workaround"
@@ -2553,8 +2573,10 @@ msgid ""
 "requires ZaakTypeConfig's to be configured to determine on which changes to "
 "notify."
 msgstr ""
-"Schakel dit in wanneer StatusType.informeren niet wordt ondersteund door de ZGW API waar deze omgeving aan is gekoppeld (zoals de eSuite ZGW API)"
-"Hierdoor is het verplicht om per zaaktype aan te geven wanneer een inwoner hier een notificatie van dient te krijgen."
+"Schakel dit in wanneer StatusType.informeren niet wordt ondersteund door de "
+"ZGW API waar deze omgeving aan is gekoppeld (zoals de eSuite ZGW "
+"API)Hierdoor is het verplicht om per zaaktype aan te geven wanneer een "
+"inwoner hier een notificatie van dient te krijgen."
 
 #: openzaak/models.py:108
 msgid "Reformat eSuite Zaak.identificatie"
@@ -2566,8 +2588,8 @@ msgid ""
 "eSuite format (ex: '0014ESUITE66392022') to user friendly format "
 "('6639-2022')."
 msgstr ""
-"Schakel dit in om de zaaknummers van het interne "
-"eSuite format (ex: '0014ESUITE66392022') om te zetten naar een toegankelijkere notatie "
+"Schakel dit in om de zaaknummers van het interne eSuite format (ex: "
+"'0014ESUITE66392022') om te zetten naar een toegankelijkere notatie "
 "('6639-2022')."
 
 #: openzaak/models.py:116
@@ -2628,7 +2650,8 @@ msgid ""
 "When enabled the user will receive a notification when a visible document is "
 "added to the case"
 msgstr ""
-"Wanneer dit is ingeschakeld dan krijgen actieve gebruikers op deze omgeving een bericht wanneer er een nieuw zaakdocument voor hen beschikbaar is"
+"Wanneer dit is ingeschakeld dan krijgen actieve gebruikers op deze omgeving "
+"een bericht wanneer er een nieuw zaakdocument voor hen beschikbaar is"
 
 #: openzaak/models.py:240
 msgid "Zaaktype Information Object Configuration"
@@ -3883,7 +3906,8 @@ msgid ""
 "By clicking the button below you can upload a document. This is an external "
 "link and you will be redirected to a different system."
 msgstr ""
-"Via onderstaande knop kunt u een bestand toevoegen. U wordt doorgestuurd naar een ander systeem."
+"Via onderstaande knop kunt u een bestand toevoegen. U wordt doorgestuurd "
+"naar een ander systeem."
 
 #: templates/pages/category/detail.html:16
 msgid "Open in admin"
@@ -4069,6 +4093,7 @@ msgstr ""
 "ingevuld) met deze persoon."
 
 #: templates/pages/profile/contacts/list.html:23
+#, python-format
 msgid "%(full_name)s wilt u toevoegen als contactpersoon."
 msgstr "%(full_name)s wilt u toevoegen als contactpersoon."
 
