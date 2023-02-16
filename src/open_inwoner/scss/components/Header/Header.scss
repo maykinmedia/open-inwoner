@@ -56,13 +56,17 @@ $vm: var(--spacing-large);
 
   .logo {
     height: 100%;
-    padding: 8px;
+    padding: 8px 8px 8px 0;
     box-sizing: border-box;
+    width: fit-content;
 
     @media (min-width: 768px) {
       height: auto;
-      grid-column: 1 / span 8;
-      margin: var(--spacing-large) 0;
+      grid-column: 1 / span 6;
+      margin: var(--spacing-large) var(--spacing-large) var(--spacing-large) 0;
+    }
+    @media (max-width: 767px) {
+      padding: 8px;
     }
   }
 
@@ -75,7 +79,7 @@ $vm: var(--spacing-large);
   &__menu &__button {
     appearance: none;
     background-color: transparent;
-    border: 1 px solid var(--color-gray-light);
+    border: 1px solid var(--color-gray-light);
     border-bottom: none;
     height: calc(2 * var(--row-height));
     width: calc(2 * var(--row-height));
