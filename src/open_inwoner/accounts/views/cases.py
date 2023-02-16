@@ -398,7 +398,7 @@ class CaseDetailView(
             # restructure into something understood by the FileList template tag
             documents.append(
                 SimpleFile(
-                    name=info_obj.bestandsnaam,
+                    name=info_obj.titel,
                     size=info_obj.bestandsomvang,
                     url=reverse(
                         "accounts:case_document_download",
