@@ -1843,8 +1843,8 @@ msgid "Logo"
 msgstr "Logo"
 
 #: configurations/models.py:65
-msgid "Logo of the municipality"
-msgstr "Logo van de gemeente"
+msgid "Logo of the municipality - For best presentation keep images in square or landscape mode and with a maximum file size of 1 MB"
+msgstr "Logo van de gemeente - Houd afbeeldingen in vierkant of landschapsformaat en met een maximale bestandsgrootte van 1 MB"
 
 #: configurations/models.py:68
 msgid "Hero image login"
@@ -2885,8 +2885,8 @@ msgid "Slug of the organization"
 msgstr "Slug van de organisatie"
 
 #: pdc/models/organization.py:27
-msgid "Logo of the orgaization"
-msgstr "Logo van de organisatie"
+msgid "Logo of the organization - For best presentation keep images in square or landscape mode and with a maximum file size of 2 MB"
+msgstr "Logo van de organisatie - Houd afbeeldingen in vierkant of landschapsformaat en met een maximale bestandsgrootte van 2 MB"
 
 #: pdc/models/organization.py:34 pdc/models/organization.py:71
 #: pdc/models/organization.py:75
