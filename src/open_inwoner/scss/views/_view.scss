@@ -3,35 +3,29 @@
     .form--horizontal {
       padding-top: var(--row-height);
 
-      &.form--columns-2 {
-        grid-template-columns: 1fr;
-        border-bottom: 1px solid var(--color-gray-light);
-        padding-bottom: 8px;
+      > .form__control {
+        //make select outline to the right if there is no reset-button
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        justify-content: space-between;
+        width: 100%;
+      }
+      @media (max-width: 767px) {
+        > .form__control {
+          display: block;
+          max-width: 90vw;
 
-        .form__control label.label {
-          display: grid;
-          grid-template-columns: 2fr 1fr;
-          justify-content: space-between;
-          width: 100%;
-        }
-        @media (max-width: 767px) {
-          .form__control label.label {
-            grid-template-columns: 1fr 1fr;
+          select {
+            min-width: 300px;
           }
         }
       }
     }
 
-    .contact__filter-container {
-      position: relative;
-
-      .contact__expand {
-        display: inline;
-        text-align: right;
-        position: absolute;
-        top: calc(var(--row-height) + 7px);
-        right: 5px;
-      }
+    #contact-filter {
+      // design addition
+      border-bottom: 1px solid var(--color-gray-light);
+      padding-bottom: 8px;
     }
   }
 

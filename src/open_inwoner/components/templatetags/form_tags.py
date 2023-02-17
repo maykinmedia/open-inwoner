@@ -53,7 +53,7 @@ def render_form(parser, token):
         - extra_classes: string | Extra css classes for the form.
         - form_action: string | where the form should go after submit.
         - enctype: string | set the encrypt when sending forms.
-        - id: string | set an id on the form. Usefull for testing.
+        - id: string | set an id on the form. Useful for testing.
         - data_confirm_title: string | If a confirm dialog is shown this will be the title.
         - data_confirm_cancel: string | If a confirm dialog is shown this will be the text on the cancel button.
         - data_confirm_default: string | If a confirm dialog is shown this will be the text on the confirm button.
@@ -107,13 +107,12 @@ def form(context, form_object, secondary=True, **kwargs):
         - extra_classes: string | Extra css classes for the form.
         - form_action: string | where the form should go after submit.
         - enctype: string | set the encrypt when sending forms.
-        - id: string | set an id on the form. Usefull for testing.
+        - id: string | set an id on the form. Useful for testing.
         - data_confirm_title: string | If a confirm dialog is shown this will be the title.
         - data_confirm_cancel: string | If a confirm dialog is shown this will be the text on the cancel button.
         - data_confirm_default: string | If a confirm dialog is shown this will be the text on the confirm button.
         - show_notifications: bool | Whether to show messages from Django messages framework.
         - submit_text: string | The text on the submit button when the form is auto rendered.
-        - primary_icon: string | The icon for the primary button.
         - secondary_href: string | The link for the secondary button when the form is auto rendered.
         - secondary_name: string | The name of the button when it is submitted. Should not be used with secondary_href
         - secondary_text: string | The text for the secondary button when the form is auto rendered.

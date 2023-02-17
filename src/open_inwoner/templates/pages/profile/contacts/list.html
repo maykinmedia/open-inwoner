@@ -53,10 +53,12 @@
     {% endwith %}
 {% endif %}
 
-<div class="contact__filter-container">
-    {% form id="contact-filter" form_object=form method="GET" columns=2 no_actions=True horizontal=True spaceless=True autosubmit=True form_action=form_action icon="expand_more" icon_outlined=True %}
-    <span class="contact__expand">{% icon icon="expand_more" icon_outlined=True %}</span>
-</div>
+{% render_form id="contact-filter" form=form method="GET" no_actions=True horizontal=True spaceless=True autosubmit=True form_action=form_action class="form form--columns-2 form--spaceless form--autosubmit form--horizontal" %}
+    <div class="form__control">
+        <label class="label label__label ">{% trans "Soort contactpersoon" %}</label>
+        {% input form.type no_label=True no_help=True icon="expand_more" class="label input" id="id_type" %}
+    </div>
+{% endrender_form %}
 
 <table class="table">
     <thead class="table__heading">
