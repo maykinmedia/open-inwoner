@@ -143,6 +143,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
             inhoud=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812/download",
             informatieobjecttype=f"{CATALOGI_ROOT}informatieobjecttype/014c38fe-b010-4412-881c-3000032fb321",
             status="definitief",
+            indicatieGebruiksrecht=False,
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
             formaat="text/plain",
             bestandsnaam="my_document.txt",

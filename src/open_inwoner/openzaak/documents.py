@@ -117,6 +117,7 @@ def upload_document(
         "bestandsomvang": file.size,
         "bestandsnaam": file.name,
         "status": "definitief",
+        "indicatieGebruiksrecht": False,
         "taal": "nld",
         "informatieobjecttype": ZaakTypeInformatieObjectTypeConfig.objects.get(
             id=user_choice
