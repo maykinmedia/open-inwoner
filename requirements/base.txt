@@ -124,7 +124,6 @@ django-choices==1.7.2
     # via
     #   -r requirements/base.in
     #   django-digid-eherkenning
-    #   django-simple-certmanager
     #   mail-editor
     #   zgw-consumers
 django-ckeditor==6.2.0
@@ -195,7 +194,7 @@ django-sessionprofile==1.0
     # via
     #   -r requirements/base.in
     #   django-digid-eherkenning
-django-simple-certmanager==1.2.0
+django-simple-certmanager==1.3.0
     # via zgw-consumers
 django-sniplates==0.7.0
     # via -r requirements/base.in
