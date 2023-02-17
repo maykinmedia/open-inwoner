@@ -37,9 +37,10 @@
 
   &__file .dropdown {
     padding-right: var(--spacing-large);
-     .dropdown__content {
-       margin-right: var(--spacing-large);
-     }
+
+    .dropdown__content {
+      margin-right: var(--spacing-large);
+    }
   }
 
   &__file + .p {
