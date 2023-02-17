@@ -53,7 +53,10 @@
     {% endwith %}
 {% endif %}
 
-{% form id="contact-filter" form_object=form method="GET" columns=2 no_actions=True horizontal=True spaceless=True autosubmit=True form_action=form_action %}
+<div class="contact__filter-container">
+    {% form id="contact-filter" form_object=form method="GET" columns=2 no_actions=True horizontal=True spaceless=True autosubmit=True form_action=form_action icon="expand_more" icon_outlined=True %}
+    <span class="contact__expand">{% icon icon="expand_more" icon_outlined=True %}</span>
+</div>
 
 <table class="table">
     <thead class="table__heading">
