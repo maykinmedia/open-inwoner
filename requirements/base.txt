@@ -124,7 +124,6 @@ django-choices==1.7.2
     # via
     #   -r requirements/base.in
     #   django-digid-eherkenning
-    #   django-simple-certmanager
     #   mail-editor
     #   zgw-consumers
 django-ckeditor==6.2.0
@@ -177,7 +176,7 @@ django-phonenumber-field==5.2.0
     # via maykin-django-two-factor-auth
 django-polymorphic==3.0.0
     # via django-filer
-django-privates==1.2.2
+django-privates==1.5.0
     # via
     #   -r requirements/base.in
     #   django-simple-certmanager
@@ -195,7 +194,7 @@ django-sessionprofile==1.0
     # via
     #   -r requirements/base.in
     #   django-digid-eherkenning
-django-simple-certmanager==1.1.2
+django-simple-certmanager==1.3.0
     # via zgw-consumers
 django-sniplates==0.7.0
     # via -r requirements/base.in
