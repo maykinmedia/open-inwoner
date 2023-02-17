@@ -18,25 +18,27 @@ from open_inwoner.openzaak.managers import (
 
 
 def generate_default_file_extensions():
-    return [
-        "pdf",
-        "doc",
-        "docx",
-        "xls",
-        "xlsx",
-        "ppt",
-        "pptx",
-        "vsd",
-        "png",
-        "gif",
-        "jpg",
-        "tiff",
-        "msg",
-        "txt",
-        "rtf",
-        "jpeg",
-        "bmp",
-    ]
+    return sorted(
+        [
+            "pdf",
+            "doc",
+            "docx",
+            "xls",
+            "xlsx",
+            "ppt",
+            "pptx",
+            "vsd",
+            "png",
+            "gif",
+            "jpg",
+            "tiff",
+            "msg",
+            "txt",
+            "rtf",
+            "jpeg",
+            "bmp",
+        ]
+    )
 
 
 class OpenZaakConfig(SingletonModel):

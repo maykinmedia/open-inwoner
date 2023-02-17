@@ -34,7 +34,7 @@
                 {% if case.internal_upload_enabled %}
                     <h2 class="h2" id=>{% trans "Document toevoegen" %}</h2>
                     <p class="p">
-                        {% blocktranslate with max_filesize=openzaak_config.max_upload_size allowed_extensions=openzaak_config.allowed_file_extensions|join:', ' %}
+                        {% blocktranslate with max_filesize=openzaak_config.max_upload_size allowed_extensions=case.allowed_file_extensions|join:', ' %}
                             Grootte max. {{ max_filesize }} MB, toegestane bestandsformaten {{ allowed_extensions }}. 
                         {% endblocktranslate %}
                     </p>
