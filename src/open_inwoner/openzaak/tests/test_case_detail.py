@@ -231,6 +231,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
             status="definitief",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
             bestandsnaam="document.txt",
+            titel="document_title.txt",
             bestandsomvang=123,
         )
         cls.uploaded_informatie_object = generate_oas_component(
@@ -271,7 +272,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         )
 
         cls.informatie_object_file = SimpleFile(
-            name="document.txt",
+            name="document_title.txt",
             size=123,
             url=reverse(
                 "accounts:case_document_download",
