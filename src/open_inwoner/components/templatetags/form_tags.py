@@ -113,6 +113,7 @@ def form(context, form_object, secondary=True, **kwargs):
         - data_confirm_default: string | If a confirm dialog is shown this will be the text on the confirm button.
         - show_notifications: bool | Whether to show messages from Django messages framework.
         - submit_text: string | The text on the submit button when the form is auto rendered.
+        - primary_icon: string | The icon for the primary button.
         - secondary_href: string | The link for the secondary button when the form is auto rendered.
         - secondary_name: string | The name of the button when it is submitted. Should not be used with secondary_href
         - secondary_text: string | The text for the secondary button when the form is auto rendered.

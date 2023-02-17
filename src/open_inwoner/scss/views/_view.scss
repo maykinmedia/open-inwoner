@@ -4,15 +4,33 @@
       padding-top: var(--row-height);
 
       &.form--columns-2 {
-        //grid-template-columns: repeat(2, 1fr);
-        background-color: lightyellow;
+        grid-template-columns: 1fr;
+        border-bottom: 1px solid var(--color-gray-light);
+        padding-bottom: 8px;
 
-        .form__control {
-          display: flex;
-          background-color: lavender;
+        .form__control label.label {
+          display: grid;
+          grid-template-columns: 2fr 1fr;
           justify-content: space-between;
           width: 100%;
         }
+        @media (max-width: 767px) {
+          .form__control label.label {
+            grid-template-columns: 1fr 1fr;
+          }
+        }
+      }
+    }
+
+    .contact__filter-container {
+      position: relative;
+
+      .contact__expand {
+        display: inline;
+        text-align: right;
+        position: absolute;
+        top: calc(var(--row-height) + 7px);
+        right: 5px;
       }
     }
   }
