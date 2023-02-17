@@ -169,3 +169,11 @@
     }
   }
 }
+
+/// Registration.
+
+#registration-form .form__control label.label ul {
+  padding-left: var(--card-spacing);
+  padding-right: var(--card-spacing);
+  width: fit-content;
+}
