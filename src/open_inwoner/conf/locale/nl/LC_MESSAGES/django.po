@@ -3957,7 +3957,7 @@ msgstr "Samenwerking"
 
 #: templates/pages/plans/list.html:19
 msgid "Openstaande acties"
-msgstr "Openstaande actie"
+msgstr "Openstaande acties"
 
 #: templates/pages/plans/list.html:40
 msgid "There are no plans yet."
