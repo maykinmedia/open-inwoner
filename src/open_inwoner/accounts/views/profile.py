@@ -214,9 +214,12 @@ class MyDataView(
 
         # change the format of birthday (we receive an str of YYYY-MM-DD)
         if my_data.get("birthday"):
-            my_data["birthday"] = datetime.strptime(
-                my_data["birthday"], "%Y-%m-%d"
-            ).strftime("%d-%m-%Y")
+            try:
+                my_data["birthday"] = datetime.strptime(
+                    my_data["birthday"], "%Y-%m-%d"
+                ).strftime("%d-%m-%Y")
+            except ValueError:
+                my_data["birthday"] = None
 
         return my_data
 

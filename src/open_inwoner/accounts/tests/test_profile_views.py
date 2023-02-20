@@ -1,3 +1,5 @@
+import json
+
 from django.test import override_settings
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
@@ -398,6 +400,39 @@ class MyDataTests(HaalCentraalMixin, WebTest):
             response.context["my_data"],
             self.expected_response,
         )
+        self.assertEqual(
+            log_entry.extra_data,
+            {
+                "message": _("user requests for brp data"),
+                "action_flag": list(LOG_ACTIONS[4]),
+                "content_object_repr": self.user.email,
+            },
+        )
+
+    @override_settings(BRP_VERSION="1.3")
+    def test_wrong_date_format_shows_birthday_none_brp_v_1_3(self, m):
+        self._setUpService()
+
+        m.get(
+            "https://personen/api/schema/openapi.yaml?v=3",
+            status_code=200,
+            content=self.load_binary_mock("personen_1.3.yaml"),
+        )
+        m.get(
+            "https://personen/api/brp/ingeschrevenpersonen/999993847?fields=geslachtsaanduiding,naam,geboorte,verblijfplaats",
+            status_code=200,
+            json={
+                "geboorte": {
+                    "datum": {
+                        "datum": "1982-04",
+                    },
+                }
+            },
+        )
+        response = self.app.get(self.url, user=self.user)
+        log_entry = TimelineLog.objects.last()
+
+        self.assertIsNone(response.context["my_data"]["birthday"])
         self.assertEqual(
             log_entry.extra_data,
             {
