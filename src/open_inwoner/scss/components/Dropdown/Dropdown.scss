@@ -11,7 +11,7 @@
     flex-direction: column;
     padding: var(--spacing-medium) 0;
     position: absolute;
-    left: 0;
+    right: 0;
     border-radius: var(--border-radius);
     background-color: var(--color-white);
     border: 1px solid var(--color-mute);
@@ -36,12 +36,5 @@
     color: var(--font-color-body);
     height: var(--font-line-height-body);
     padding: 0;
-  }
-
-  @media (max-width: 767px) {
-    .dropdown__content {
-      left: initial;
-      right: 0;
-    }
   }
 }
