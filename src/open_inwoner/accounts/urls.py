@@ -34,6 +34,7 @@ from .views import (
     OpenCaseListView,
 )
 from .views.actions import ActionDeleteView
+from .views.cases import OpenSubmissionListView
 
 app_name = "accounts"
 urlpatterns = [
@@ -102,6 +103,7 @@ urlpatterns = [
     path("mydata/", MyDataView.as_view(), name="my_data"),
     path("cases/open/", OpenCaseListView.as_view(), name="my_open_cases"),
     path("cases/closed/", ClosedCaseListView.as_view(), name="my_closed_cases"),
+    path("cases/forms/", OpenSubmissionListView.as_view(), name="open_submissions"),
     path(
         "cases/<str:object_id>/document/<str:info_id>/",
         CaseDocumentDownloadView.as_view(),
