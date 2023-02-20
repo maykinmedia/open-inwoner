@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 
 from django.conf import settings
 from django.contrib import messages
@@ -211,6 +211,15 @@ class MyDataView(
 
         for field in my_data:
             my_data[field] = glom(fetched_data, my_data[field], default=None)
+
+        # change the format of birthday (we receive an str of YYYY-MM-DD)
+        if my_data.get("birthday"):
+            try:
+                my_data["birthday"] = datetime.strptime(
+                    my_data["birthday"], "%Y-%m-%d"
+                ).strftime("%d-%m-%Y")
+            except ValueError:
+                my_data["birthday"] = None
 
         return my_data
 
