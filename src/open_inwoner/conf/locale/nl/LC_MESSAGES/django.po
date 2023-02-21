@@ -1402,7 +1402,7 @@ msgid "Zoeken"
 msgstr "Zoeken"
 
 #: components/templates/components/Header/AccessibilityHeader.html:4
-msgid "Toegangkelijkheids help"
+msgid "Toegankelijkheids help"
 msgstr ""
 
 #: components/templates/components/Header/AccessibilityHeader.html:6
