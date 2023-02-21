@@ -18,6 +18,10 @@
                 <p class="p">{% trans "Filter op:" %}</p>
                 {% input plan_filter_form.plan_contacts no_label=True no_help=True icon="person" %}
                 {% input plan_filter_form.status no_label=True no_help=True icon="expand_more" %}
+                <div class="plan-filter__search-container">
+                    {% input plan_filter_form.query no_label=True no_help=True %}
+                    {% form_actions primary_icon="search" single=True transparent=True %}
+                </div>
                 {% button text=_("Reset filters") href="plans:plan_list" icon="undo" transparent=True icon_position="before" %}
             </div>
         </div>

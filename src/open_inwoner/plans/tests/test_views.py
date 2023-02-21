@@ -922,6 +922,49 @@ class PlanBegeleiderListViewTests(WebTest):
         self.assertEqual(rendered_titles[1].text, closed_plan1.title)
         self.assertEqual(rendered_titles[2].text, closed_plan2.title)
 
+    def test_search_returns_expected_plans_when_matched_with_plan_contact(self):
+        self.begeleider.first_name = "expected_first_name"
+        self.begeleider.last_name = "expected_last_name"
+        self.begeleider.save()
+
+        another_contact = UserFactory(
+            first_name="expected_first_name", last_name="expected_last_name"
+        )
+        another_plan = PlanFactory(created_by=self.begeleider)
+        another_plan.plan_contacts.add(self.begeleider, another_contact)
+
+        response = self.app.get(
+            f"{self.list_url}?query=expected",
+            user=self.begeleider,
+        )
+
+        # response should not contain self.begeleider_plan because we don't search
+        # in plan_contacts=creator
+        self.assertEqual(
+            response.context["plans"]["plan_list"],
+            {another_plan: another_contact.get_full_name()},
+        )
+
+    def test_search_returns_expected_plans_when_matched_with_plan_title(self):
+        self.begeleider_plan.title = "expected_title"
+        self.begeleider_plan.save()
+
+        another_plan = PlanFactory(
+            created_by=self.begeleider, title="another_expected_title"
+        )
+        another_plan.plan_contacts.add(self.begeleider)
+
+        response = self.app.get(
+            f"{self.list_url}?query=expected",
+            user=self.begeleider,
+        )
+
+        # response should contain both plans
+        self.assertEqual(
+            response.context["plans"]["plan_list"],
+            {self.begeleider_plan: self.contact.get_full_name(), another_plan: ""},
+        )
+
 
 @multi_browser()
 class PlanActionStatusPlaywrightTests(ActionsPlaywrightTests):

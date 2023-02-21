@@ -27,7 +27,21 @@
     @media (min-width: 768px) {
       display: grid;
       gap: var(--spacing-giant);
-      grid-template-columns: 1fr 2fr 2fr 1fr;
+      grid-template-columns: 1fr 3fr 3fr 3fr 0.5fr 0.5fr;
+    }
+  }
+
+  &__search-container {
+    display: flex;
+    border: 1px solid var(--color-mute);
+    border-radius: var(--border-radius);
+
+    .input {
+      border: none;
+    }
+
+    .form__actions {
+      flex-grow: 1;
     }
   }
 }
