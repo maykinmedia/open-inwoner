@@ -6,13 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('pdc', '0047_alter_productlocation_uuid'),
+        ("pdc", "0047_alter_productlocation_uuid"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='product',
-            name='summary',
-            field=models.TextField(blank=True, default='', help_text='Short description of the product, limited to 300 characters.', verbose_name='Summary'),
+            model_name="product",
+            name="summary",
+            field=models.TextField(
+                blank=True,
+                default="",
+                help_text="Short description of the product, limited to 300 characters.",
+                verbose_name="Summary",
+            ),
         ),
     ]
