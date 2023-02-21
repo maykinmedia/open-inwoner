@@ -397,3 +397,27 @@ class ProductFinderView(CommonPageMixin, FormView):
             del form.errors["answer"]
             return HttpResponseRedirect(self.get_success_url())
         return super().form_invalid(form)
+
+
+class ProductLocationDetailView(
+    CommonPageMixin, BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView
+):
+    template_name = "pages/product/location_detail.html"
+    model = ProductLocation
+    slug_field = "uuid"
+    slug_url_kwarg = "uuid"
+
+    @cached_property
+    def crumbs(self):
+        return [
+            (
+                self.get_object().name,
+                reverse("pdc:location_detail", kwargs={"uuid": self.get_object().uuid}),
+            )
+        ]
+
+    def get_context_data(self, **kwargs):
+        location = self.get_object()
+        context = super().get_context_data(**kwargs)
+        context["products"] = location.products.published().order_by("name")
+        return context

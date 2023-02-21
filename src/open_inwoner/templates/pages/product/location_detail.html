@@ -1,0 +1,26 @@
+{% extends 'master.html' %}
+{% load i18n l10n card_tags grid_tags %}
+
+
+{% block content %}
+    <div class="location">
+        <h1 class="h1">{{ object.name }}</h1>
+
+        <div class="location__details">
+            <div class="location__address">
+                <p class="p">{{ object.address_line_1 }}</p>
+                <p class="p">{{ object.address_line_2 }}</p>
+            </div>
+            <div class="location__contact">
+                <p class="p">{{ object.phonenumber }}</p>
+                <p class="p">{{ object.email }}</p>
+            </div>
+        </div>
+    </div>
+        
+    {% if products %}
+        {% card_container products=products small=True %}
+    {% else %}
+        {% trans "There are no products available at this location." %}
+    {% endif %}
+{% endblock content %}

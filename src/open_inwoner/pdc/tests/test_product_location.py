@@ -227,3 +227,48 @@ class TestLocationFormInput(WebTest):
             ],
         )
         mock_geocoding.assert_called_once_with(" ,  ")
+
+
+class TestLocationDetailView(WebTest):
+    def test_published_product_is_rendered(self):
+        product = ProductFactory()
+        product_location = ProductLocationFactory()
+        product.locations.add(product_location)
+
+        response = self.app.get(
+            reverse("pdc:location_detail", kwargs={"uuid": product_location.uuid})
+        )
+
+        self.assertEqual(response.context["products"].get(), product)
+
+    def test_locations_details_are_rendered(self):
+        product = ProductFactory()
+        product_location = ProductLocationFactory(
+            email="example@example.com", phonenumber="+31666555555"
+        )
+        product.locations.add(product_location)
+
+        response = self.app.get(
+            reverse("pdc:location_detail", kwargs={"uuid": product_location.uuid})
+        )
+
+        self.assertContains(response, product_location.name)
+        self.assertContains(response, product_location.address_line_1)
+        self.assertContains(response, product_location.address_line_2)
+        self.assertContains(response, product_location.phonenumber)
+        self.assertContains(response, product_location.email)
+
+    def test_draft_product_is_not_rendered(self):
+        published_product = ProductFactory()
+        draft_product = ProductFactory(published=False)
+        product_location = ProductLocationFactory()
+        published_product.locations.add(product_location)
+        draft_product.locations.add(product_location)
+
+        response = self.app.get(
+            reverse("pdc:location_detail", kwargs={"uuid": product_location.uuid})
+        )
+        products = response.context["products"]
+
+        self.assertEqual(products.count(), 1)
+        self.assertEqual(products.get(), published_product)

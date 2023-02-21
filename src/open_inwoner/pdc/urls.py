@@ -4,6 +4,7 @@ from .utils import PRODUCT_PATH_NAME
 from .views import (
     CategoryDetailView,
     CategoryListView,
+    ProductLocationDetailView,
     ProductDetailView,
     ProductFinderView,
     ProductFormView,
@@ -39,4 +40,9 @@ urlpatterns = [
         name="product_form",
     ),
     path("finder/", ProductFinderView.as_view(), name="product_finder"),
+    path(
+        "locations/<str:uuid>",
+        ProductLocationDetailView.as_view(),
+        name="location_detail",
+    ),
 ]
