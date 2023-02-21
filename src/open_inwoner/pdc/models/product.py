@@ -1,5 +1,6 @@
 import json
 from typing import Union
+from uuid import uuid4
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
@@ -288,12 +289,26 @@ class ProductLink(models.Model):
 
 
 class ProductLocation(GeoModel):
+    uuid = models.UUIDField(verbose_name=_("UUID"), default=uuid4, unique=True)
     name = models.CharField(
         verbose_name=_("Name"),
         max_length=100,
         help_text=_("Location name"),
         blank=True,
         null=True,
+    )
+    email = models.EmailField(
+        verbose_name=_("Email address"),
+        blank=True,
+        help_text=_("The email address of the current location"),
+    )
+    phonenumber = models.CharField(
+        verbose_name=_("Phonenumber"),
+        blank=True,
+        default="",
+        max_length=15,
+        validators=[validate_phone_number],
+        help_text=_("The phonenumber of the current location"),
     )
 
     class Meta:
