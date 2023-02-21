@@ -4,10 +4,10 @@ from .utils import PRODUCT_PATH_NAME
 from .views import (
     CategoryDetailView,
     CategoryListView,
-    ProductLocationDetailView,
     ProductDetailView,
     ProductFinderView,
     ProductFormView,
+    ProductLocationDetailView,
 )
 
 app_name = "pdc"
