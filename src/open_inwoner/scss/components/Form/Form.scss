@@ -80,6 +80,19 @@
     width: 100%;
   }
 
+  /// Registration -start.
+
+  &__control > .label ul {
+    padding-left: var(--card-spacing);
+  }
+
+  &__control > .label ul *:not(.button) {
+    padding-right: var(--card-spacing);
+    width: fit-content;
+  }
+
+  /// Registration -end.
+
   &__control > .label .material-icons-outlined {
     pointer-events: none;
   }
