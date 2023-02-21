@@ -37,7 +37,7 @@ class Product(models.Model):
         verbose_name=_("Summary"),
         blank=True,
         default="",
-        help_text=_("Short description of the product"),
+        help_text=_("Short description of the product, limited to 300 characters."),
     )
     icon = FilerImageField(
         verbose_name=_("Icon"),
