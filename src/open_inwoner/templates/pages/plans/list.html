@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n button_tags string_tags pagination_tags helpers card_tags %}
+{% load i18n button_tags string_tags pagination_tags helpers card_tags form_tags %}
 
 {% block content %}
     <h1 class="h1">
@@ -8,7 +8,21 @@
     </h1>
     {% optional_paragraph configurable_text.plans_page.plans_intro %}
     
-    {% if extended_plans %}
+    {% if plans.extended_plans %}
+        {% render_form form=plan_filter_form method="GET" spaceless=True autosubmit=True form_action=form_action %}
+        <div class="plan-filter">
+            <div class="plan-filter__button">
+                {% button text=_("Filter") type="button" bordered=True %}
+            </div>
+            <div class="plan-filter__container">
+                <p class="p">{% trans "Filter op:" %}</p>
+                {% input plan_filter_form.plan_contacts no_label=True no_help=True icon="person" %}
+                {% input plan_filter_form.status no_label=True no_help=True icon="expand_more" %}
+                {% button text=_("Reset filters") href="plans:plan_list" icon="undo" transparent=True icon_position="before" %}
+            </div>
+        </div>
+        {% endrender_form %}
+        
         <table class="table plans-extended">
             <thead class="table__heading">
                 <tr>
@@ -21,7 +35,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for plan, plan_participants in extended_plans.items %}
+                {% for plan, plan_participants in plans.plan_list.items %}
                     <tr>
                         <th class="table__header">{{plan.title}}</th>
                         <td class="table__item">{{plan_participants|truncatechars:30}}</td>
@@ -37,15 +51,14 @@
                     </tr>
                 {% empty %}
                     <tr>
-                        <td class="table__item" colspan="7" >{% trans "There are no plans yet." %}</td>
+                        <td class="table__item" colspan="7" >{% trans "There are no plans with these filters." %}</td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
-        
     {% else %}
-        {% card_container plans=plans columns=2 %}
+        {% card_container plans=plans.plan_list columns=2 %}
     {% endif %}
-        
+    
     {% pagination page_obj=page_obj paginator=paginator request=request %}
 {% endblock %}

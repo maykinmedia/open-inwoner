@@ -8,6 +8,7 @@ from django.utils.translation import gettext as _
 
 from open_inwoner.accounts.models import Action, Document, User
 
+from .choices import PlanStatusChoices
 from .models import Plan, PlanTemplate
 
 
@@ -94,3 +95,27 @@ class PlanGoalForm(forms.ModelForm):
 
     def save(self, commit=True):
         return super().save(commit=commit)
+
+
+class PlanListFilterForm(forms.ModelForm):
+    plan_contacts = forms.ModelChoiceField(
+        queryset=Plan.objects.none(), required=False, to_field_name="uuid"
+    )
+    status = forms.ChoiceField(
+        label=_("Status"), choices=PlanStatusChoices.choices, required=False
+    )
+
+    class Meta:
+        model = Plan
+        fields = ("plan_contacts", "status")
+
+    def __init__(self, available_contacts, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["plan_contacts"].queryset = available_contacts
+        self.fields["plan_contacts"].choices = [
+            [str(c.uuid), c.get_full_name()] for c in available_contacts
+        ]
+
+        # we have to add the empty label since we defined choices above
+        self.fields["plan_contacts"].choices.insert(0, ("", _("Contactpersoon")))
