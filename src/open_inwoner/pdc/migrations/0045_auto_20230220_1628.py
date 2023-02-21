@@ -6,8 +6,9 @@ from django.db import migrations
 def truncate_product_summary(apps, schema_editor):
     MyModel = apps.get_model("pdc", "Product")
     for product in MyModel.objects.all():
-        product.summary = product.summary[:300]
-        product.save()
+        if len(product.summary) > 300:
+            product.summary = product.summary[:300]
+            product.save()
 
 
 class Migration(migrations.Migration):
