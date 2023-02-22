@@ -762,13 +762,11 @@ MAIL_EDITOR_CONF = {
             <table>
                 <tr>
                     <td>Action name</td>
-                    <td>Goal</td>
                     <td>End date</td>
                 </tr>
             {% for action in actions %}
                 <tr>
                     <td>{{ action.name }}</td>
-                    <td>{{ action.goal }}</td>
                     <td>{{ action.end_date|date:"d-m-Y" }}</td>
                 </tr>
             {% endfor %}

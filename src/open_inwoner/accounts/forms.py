@@ -253,7 +253,6 @@ class ActionForm(forms.ModelForm):
             "end_date",
             "is_for",
             "file",
-            "goal",
         )
 
     def __init__(self, user, plan=None, *args, **kwargs):

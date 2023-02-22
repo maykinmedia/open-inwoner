@@ -69,15 +69,6 @@ class ActionTemplate(models.Model):
             "The description that will be applied to the action if this template in chosen."
         ),
     )
-    goal = models.CharField(
-        verbose_name=_("goal"),
-        default="",
-        blank=True,
-        max_length=250,
-        help_text=_(
-            "The goal that will be applied to the action if this template in chosen."
-        ),
-    )
     type = models.CharField(
         verbose_name=_("Type"),
         default=TypeChoices.incidental,
