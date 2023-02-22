@@ -22,6 +22,7 @@ class UserFactory(factory.django.DjangoModelFactory):
         lambda o: "%s%d@example.com" % (o.first_name, random.randint(0, 10000))
     )
     password = factory.PostGenerationMethodCall("set_password", "secret")
+    phonenumber = factory.Faker("numerify", text="06########")
 
 
 class DigidUserFactory(UserFactory):
