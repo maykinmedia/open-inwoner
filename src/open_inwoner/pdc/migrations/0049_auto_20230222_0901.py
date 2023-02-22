@@ -8,7 +8,7 @@ def truncate_product_summary(apps, schema_editor):
     for product in MyModel.objects.all():
         if len(product.summary) > 300:
             product.summary = product.summary[:300]
-            product.save()
+            product.save(update_fields=["summary"])
 
 
 class Migration(migrations.Migration):
