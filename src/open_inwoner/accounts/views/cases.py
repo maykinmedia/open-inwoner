@@ -450,7 +450,9 @@ class CaseDetailView(
                 messages.add_message(
                     request,
                     messages.SUCCESS,
-                    _(f"{file.name} has been successfully uploaded"),
+                    _("{filename} has been successfully uploaded").format(
+                        filename=file.name
+                    ),
                 )
                 return HttpResponseRedirect(self.get_success_url())
 
@@ -458,7 +460,9 @@ class CaseDetailView(
         messages.add_message(
             request,
             messages.ERROR,
-            _(f"An error occured while uploading file {file.name}"),
+            _("An error occured while uploading file {filename}").format(
+                filename=file.name
+            ),
         )
         return self.form_invalid(form)
 
