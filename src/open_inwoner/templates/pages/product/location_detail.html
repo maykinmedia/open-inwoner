@@ -8,12 +8,18 @@
 
         <div class="location__details">
             <div class="location__address">
-                <p class="p">{{ object.address_line_1 }}</p>
+                {% if object.address_line_1 %}
+                    <p class="p">{{ object.address_line_1 }}</p>
+                {% endif %}
                 <p class="p">{{ object.address_line_2 }}</p>
             </div>
             <div class="location__contact">
-                <p class="p">{{ object.phonenumber }}</p>
-                <p class="p">{{ object.email }}</p>
+                {% if object.phonenumber %}
+                    <p class="p">{{ object.phonenumber }}</p>
+                {% endif %}
+                {% if object.email %}
+                    <p class="p">{{ object.email }}</p>
+                {% endif %}
             </div>
         </div>
     </div>
