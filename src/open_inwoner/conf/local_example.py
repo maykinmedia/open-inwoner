@@ -15,3 +15,9 @@ DATABASES = {
 
 # ignore multi-browser
 PLAYWRIGHT_MULTI_ONLY_DEFAULT = True
+
+# Enable django-debug-toolbar
+from .dev import INSTALLED_APPS, MIDDLEWARE
+
+INSTALLED_APPS += ["debug_toolbar"]
+MIDDLEWARE += ["debug_toolbar.middleware.DebugToolbarMiddleware"]
