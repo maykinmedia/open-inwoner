@@ -25,8 +25,8 @@ class ProductLocationUUIDMigrationTests(TestMigrations):
 
 class TruncateProductSummaryMigrationTests(TestMigrations):
     app = "pdc"
-    migrate_from = "0044_question_category_or_product_null"
-    migrate_to = "0046_alter_product_summary"
+    migrate_from = "0048_alter_product_summary"
+    migrate_to = "0050_alter_product_summary"
 
     def setUpBeforeMigration(self, apps):
         self.ProductModel = apps.get_model("pdc", "Product")
@@ -48,8 +48,8 @@ class TruncateProductSummaryMigrationTests(TestMigrations):
 
 class NotTruncateProductSummaryMigrationTests(TestMigrations):
     app = "pdc"
-    migrate_from = "0044_question_category_or_product_null"
-    migrate_to = "0046_alter_product_summary"
+    migrate_from = "0048_alter_product_summary"
+    migrate_to = "0050_alter_product_summary"
 
     def setUpBeforeMigration(self, apps):
         self.ProductModel = apps.get_model("pdc", "Product")
