@@ -5,6 +5,7 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import include, path
+from django.views.generic import RedirectView
 
 from mozilla_django_oidc_db.views import AdminLoginFailure
 
@@ -129,9 +130,15 @@ elif settings.DIGID_MOCK:
     ] + urlpatterns
 
 
-if settings.DEBUG and apps.is_installed("debug_toolbar"):
-    import debug_toolbar
-
+if settings.DEBUG:
     urlpatterns = [
-        path("__debug__/", include(debug_toolbar.urls)),
+        # fix annoying favicon http error
+        path("favicon.ico", RedirectView.as_view(url="/static/ico/favicon.png")),
     ] + urlpatterns
+
+    if apps.is_installed("debug_toolbar"):
+        import debug_toolbar
+
+        urlpatterns = [
+            path("__debug__/", include(debug_toolbar.urls)),
+        ] + urlpatterns
