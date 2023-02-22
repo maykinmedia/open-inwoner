@@ -67,6 +67,7 @@ class _UserAdmin(UserAdmin):
                     "housenumber",
                     "postcode",
                     "city",
+                    "phonenumber",
                     "selected_themes",
                 )
             },

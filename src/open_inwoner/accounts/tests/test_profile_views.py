@@ -21,7 +21,7 @@ class ProfileViewTests(WebTest):
     def setUp(self):
         self.url = reverse("accounts:my_profile")
         self.return_url = reverse("logout")
-        self.user = UserFactory()
+        self.user = UserFactory(street="MyStreet")
 
         self.action_deleted = ActionFactory(
             name="deleted action, should not show up",
@@ -34,6 +34,14 @@ class ProfileViewTests(WebTest):
         login_url = reverse("login")
         response = self.app.get(self.url)
         self.assertRedirects(response, f"{login_url}?next={self.url}")
+
+    def test_user_information_profile_page(self):
+        response = self.app.get(self.url, user=self.user)
+
+        self.assertContains(response, self.user.get_full_name())
+        self.assertContains(response, self.user.email)
+        self.assertContains(response, self.user.phonenumber)
+        self.assertContains(response, self.user.get_address())
 
     def test_get_empty_profile_page(self):
         response = self.app.get(self.url, user=self.user)
