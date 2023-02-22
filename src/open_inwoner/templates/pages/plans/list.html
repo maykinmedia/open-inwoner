@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n button_tags string_tags pagination_tags helpers card_tags form_tags %}
+{% load i18n button_tags string_tags pagination_tags helpers card_tags form_tags link_tags %}
 
 {% block content %}
     <h1 class="h1">
@@ -41,7 +41,7 @@
             <tbody>
                 {% for plan, plan_participants in plans.plan_list.items %}
                     <tr>
-                        <th class="table__header">{{plan.title}}</th>
+                        <th class="table__header">{% link href=plan.get_absolute_url text=plan.title %}</th>
                         <td class="table__item">{{plan_participants|truncatechars:30}}</td>
                         <td class="table__item table__item--no-lb">{{plan.end_date|date:"d-m-Y"}}</td>
                         <td class="table__item">{{plan.get_status}}</td>
@@ -51,7 +51,7 @@
                                 <div class="table__item--notification-danger">{% trans "Actie vereist" %}</div>
                             {% endif %}
                         </td>
-                        <td class="table__item">{% button text="" href=plan.get_absolute_url icon="arrow_forward" icon_outlined=True transparent=True %}</td>
+                        <td class="table__item">{% button text="plan_detail" hide_text=True href=plan.get_absolute_url icon="arrow_forward" icon_outlined=True transparent=True %}</td>
                     </tr>
                 {% empty %}
                     <tr>
