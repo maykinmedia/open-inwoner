@@ -170,9 +170,9 @@ class CaseListMixin(CaseLogMixin, PaginationMixin):
                     "end_date": getattr(case, "einddatum", None),
                     "description": case.omschrijving,
                     "zaaktype_description": case.zaaktype.omschrijving,
-                    "current_status": case.status.statustype.omschrijving
-                    if case.status
-                    else "",
+                    "current_status": (
+                        case.status.statustype.omschrijving if case.status else ""
+                    ),
                 }
             )
         return updated_cases
@@ -306,25 +306,6 @@ class CaseDetailView(
                 status_type = status_types_mapping[status.statustype]
                 status.statustype = status_type
 
-            # documents
-            internal_upload_enabled = ZaakTypeInformatieObjectTypeConfig.objects.get_visible_ztiot_configs_for_case(
-                self.case
-            ).exists()
-            external_upload_enabled = ZaakTypeConfig.objects.get_visible_zt_configs_for_case_type_identification(
-                self.case.zaaktype.identificatie
-            ).exists()
-
-            if external_upload_enabled:
-                external_upload_url = (
-                    ZaakTypeConfig.objects.get_visible_zt_configs_for_case_type_identification(
-                        self.case.zaaktype.identificatie
-                    )
-                    .get()
-                    .external_document_upload_url
-                )
-            else:
-                external_upload_url = ""
-
             context["case"] = {
                 "identification": format_zaak_identificatie(
                     self.case.identificatie, config
@@ -348,30 +329,56 @@ class CaseDetailView(
                 ),
                 "statuses": statuses,
                 "documents": documents,
-                "internal_upload_enabled": internal_upload_enabled,
-                "external_upload_enabled": external_upload_enabled,
-                "external_upload_url": external_upload_url,
                 "allowed_file_extensions": sorted(config.allowed_file_extensions),
             }
+            context["case"].update(self.get_upload_info_context(self.case))
             context["anchors"] = self.get_anchors(statuses, documents)
         else:
             context["case"] = None
         return context
 
-    def get_result_display(self, case) -> str:
+    def get_upload_info_context(self, case: Zaak):
+        internal_upload_enabled = ZaakTypeInformatieObjectTypeConfig.objects.get_visible_ztiot_configs_for_case(
+            case
+        ).exists()
+
+        external_upload_enabled = (
+            ZaakTypeConfig.objects.get_visible_zt_configs_for_case_type_identification(
+                case.zaaktype.identificatie
+            ).exists()
+        )
+
+        if external_upload_enabled:
+            external_upload_url = (
+                ZaakTypeConfig.objects.get_visible_zt_configs_for_case_type_identification(
+                    case.zaaktype.identificatie
+                )
+                .get()
+                .external_document_upload_url
+            )
+        else:
+            external_upload_url = ""
+
+        return {
+            "internal_upload_enabled": internal_upload_enabled,
+            "external_upload_enabled": external_upload_enabled,
+            "external_upload_url": external_upload_url,
+        }
+
+    def get_result_display(self, case: Zaak) -> str:
         if case.resultaat:
             result = fetch_single_result(case.resultaat)
             if result:
                 return result.toelichting
         return _("Onbekend")
 
-    def get_initiator_display(self, case) -> str:
+    def get_initiator_display(self, case: Zaak) -> str:
         roles = fetch_case_roles(case.url, RolOmschrijving.initiator)
         if not roles:
             return ""
         return ", ".join([get_role_name_display(r) for r in roles])
 
-    def get_case_document_files(self, case) -> List[SimpleFile]:
+    def get_case_document_files(self, case: Zaak) -> List[SimpleFile]:
         case_info_objects = fetch_case_information_objects(case.url)
 
         # get the information objects for the case objects
@@ -414,7 +421,6 @@ class CaseDetailView(
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-
         kwargs["case"] = self.case
         return kwargs
 
@@ -423,22 +429,21 @@ class CaseDetailView(
 
         file = cleaned_data["file"]
         title = cleaned_data["title"]
-        user_choice = cleaned_data["type"].id
+        document_type = cleaned_data["type"]
         source_organization = self.case.bronorganisatie
 
         created_document = upload_document(
-            request.user, file, title, user_choice, source_organization
+            request.user,
+            file,
+            title,
+            document_type.informatieobjecttype_url,
+            source_organization,
         )
-
-        # we don't receive a status code like 201, so we try to validate upload
-        # by checking for the created url
-        if created_document and created_document.get("url"):
+        if created_document:
             created_relationship = connect_case_with_document(
                 self.case.url, created_document["url"]
             )
-
-            # successful upload and connection to zaak
-            if created_relationship and created_relationship.get("url"):
+            if created_relationship:
                 self.log_user_action(
                     request.user,
                     _("Document was uploaded for {case}: {filename}").format(
@@ -446,7 +451,6 @@ class CaseDetailView(
                         filename=file.name,
                     ),
                 )
-
                 messages.add_message(
                     request,
                     messages.SUCCESS,
