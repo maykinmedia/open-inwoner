@@ -21,3 +21,49 @@ class ProductLocationUUIDMigrationTests(TestMigrations):
 
     def test_uuid_is_set(self):
         self.assertIsNotNone(self.product_location.uuid)
+
+
+class TruncateProductSummaryMigrationTests(TestMigrations):
+    app = "pdc"
+    migrate_from = "0048_alter_product_summary"
+    migrate_to = "0050_alter_product_summary"
+
+    def setUpBeforeMigration(self, apps):
+        self.ProductModel = apps.get_model("pdc", "Product")
+        self.product = self.ProductModel.objects.create(
+            name="product name",
+            summary="t" * 350,
+            content="some content",
+            published=True,
+        )
+
+    def test_product_is_truncated_when_above_max_length(self):
+
+        self.assertEqual(len(self.product.summary), 350)
+
+        self.product.refresh_from_db()
+
+        self.assertEqual(len(self.product.summary), 300)
+
+
+class NotTruncateProductSummaryMigrationTests(TestMigrations):
+    app = "pdc"
+    migrate_from = "0048_alter_product_summary"
+    migrate_to = "0050_alter_product_summary"
+
+    def setUpBeforeMigration(self, apps):
+        self.ProductModel = apps.get_model("pdc", "Product")
+        self.product = self.ProductModel.objects.create(
+            name="product name",
+            summary="t" * 300,
+            content="some content",
+            published=True,
+        )
+
+    def test_product_is_not_truncated_when_below_max_length(self):
+
+        self.assertEqual(len(self.product.summary), 300)
+
+        self.product.refresh_from_db()
+
+        self.assertEqual(len(self.product.summary), 300)
