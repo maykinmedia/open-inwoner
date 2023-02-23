@@ -29,6 +29,7 @@
 
 .leaflet-content-details {
   display: flex;
+  flex-direction: column;
   row-gap: var(--spacing-small);
   flex-wrap: wrap;
 }
