@@ -75,15 +75,21 @@ class Map {
   featureToHTML(feature) {
     const { name, ...properties } = feature.properties
     const displayName = name ? name : ''
+    let finalHTML = ``
+
+    Object.entries(properties).forEach((property) => {
+      finalHTML += `<p class="p">${property[1]}</p>`
+    })
+
     return `
-        <h4 class="h4">
-          ${displayName}
-        </h4>
-        <p class="p">
-          ${Object.entries(properties)
-            .map(([key, value]) => value)
-            .join(' ')}
-          </p>
+        <div class="leaflet-content-name">
+          <h4 class="h4">
+            ${displayName}
+          </h4>
+        </div>
+        <div class="leaflet-content-details p--no-margin">
+          ${finalHTML}
+        </div>
     `
   }
 }
