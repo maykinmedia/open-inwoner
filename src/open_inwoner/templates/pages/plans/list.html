@@ -51,7 +51,7 @@
                                 <div class="table__item--notification-danger">{% trans "Actie vereist" %}</div>
                             {% endif %}
                         </td>
-                        <td class="table__item">{% button text="plan_detail" hide_text=True href=plan.get_absolute_url icon="arrow_forward" icon_outlined=True transparent=True %}</td>
+                        <td class="table__item">{% button text=plan.title hide_text=True href=plan.get_absolute_url icon="arrow_forward" icon_outlined=True transparent=True %}</td>
                     </tr>
                 {% empty %}
                     <tr>
