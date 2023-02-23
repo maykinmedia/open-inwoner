@@ -82,7 +82,16 @@
         {% render_card_container columns=3 %}
             {% for location in object.locations.all %}
                 {% render_card title=location.name %}
-                    <p class="p">{{ location.address_line_1 }}<br>{{ location.address_line_2 }}</p>
+                    <div class="p--no-margin">
+                        <p class="p">{{ location.address_line_1 }}</p>
+                        <p class="p">{{ location.address_line_2 }}</p>
+                        {% if location.phonenumber %}
+                            <p class="p">{{ location.phonenumber }}</p>
+                        {% endif %}
+                        {% if location.email %}
+                            <p class="p">{{ location.email }}</p>
+                        {% endif %}
+                    </div>
                 {% endrender_card %}
             {% endfor %}
         {% endrender_card_container %}

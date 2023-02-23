@@ -145,16 +145,23 @@ class GeoModel(models.Model):
 
     def get_serialized_fields(self) -> dict:
         """
-        Returns fields listed in serializable_fields (see below) as dict if JSON serializable.
+        Returns fields (and combination of fields via method) listed in serializable_fields (see below)
+        as dict if JSON serializable.
         """
-        serializable_fields = ["name", "street", "housenumber", "postcode", "city"]
+        serializable_fields = [
+            "name",
+            "address_line_1",
+            "address_line_2",
+            "email",
+            "phonenumber",
+        ]
         serialized_fields = {}
 
         for name in serializable_fields:
-            if not self._meta.get_field(name):
+            try:
+                value = getattr(self, name)
+            except AttributeError:
                 continue
-
-            value = getattr(self, name)
 
             try:
                 json.dumps(value)  # Check if json serializable.

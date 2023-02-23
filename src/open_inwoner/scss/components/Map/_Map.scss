@@ -20,3 +20,15 @@
 .p + .map {
   margin-top: var(--spacing-large);
 }
+
+.leaflet-content-name {
+  & > h4 {
+    margin: 0 !important;
+  }
+}
+
+.leaflet-content-details {
+  display: flex;
+  row-gap: var(--spacing-small);
+  flex-wrap: wrap;
+}
