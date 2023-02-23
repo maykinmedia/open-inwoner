@@ -57,7 +57,13 @@
 
     <h2 class="h2" id="goals">{% trans "Doel" %}</h2>
     <p class="p">{{ object.goal|linebreaksbr }}</p>
-    {% button href="plans:plan_edit_goal" uuid=object.uuid text=_("Doel bewerken") primary=True %}
+
+    {% if object.description %}
+    <h2 class="h2" id="description">{% trans "Description" %}</h2>
+    <p class="p">{{ object.description|linebreaksbr }}</p>
+    {% endif %}
+
+    {% button href="plans:plan_edit_goal" uuid=object.uuid text=_("Doel en omschrijving bewerken") primary=True %}
 
     <h2 class="h2" id="files">{% trans "Bestanden" %}</h2>
     {% if object.get_latest_file %}

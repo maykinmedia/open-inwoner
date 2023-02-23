@@ -6,6 +6,11 @@
         <div>{{ plan_template.goal }}</div>
     {% endif %}
 
+    {% if plan_template.description %}
+        <div class='preview__title'>{% trans "Description:" %}</div>
+        <div>{{ plan_template.description }}</div>
+    {% endif %}
+
     {% if plan_template.file %}
         <div class='preview__title'>{% trans 'File:' %}</div>
         <div>{% link href=plan_template.file.url text=plan_template.file %}</div>

@@ -23,8 +23,9 @@ class PlanFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "plans.Plan"
 
-    title = factory.Faker("first_name")
-    goal = factory.Faker("last_name")
+    title = factory.Faker("sentence")
+    goal = factory.Faker("paragraph")
+    description = factory.Faker("paragraph")
     end_date = factory.Faker("date")
     created_by = factory.SubFactory(UserFactory)
 
@@ -45,6 +46,7 @@ class PlanTemplateFactory(factory.django.DjangoModelFactory):
     name = factory.Faker("word")
     file = factory.SubFactory(FilerFileFactory)
     goal = factory.Faker("paragraph")
+    description = factory.Faker("paragraph")
 
 
 class ActionTemplateFactory(factory.django.DjangoModelFactory):

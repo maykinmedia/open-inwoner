@@ -8,6 +8,8 @@
     {% render_form id="plan-form" form=form method="POST" %}
         {% csrf_token %}
         {% input form.title %}
+        {% input form.goal %}
+        {% input form.description %}
         {% render_grid %}
             {% checkboxes form.plan_contacts %}
             {% date_field form.end_date %}
