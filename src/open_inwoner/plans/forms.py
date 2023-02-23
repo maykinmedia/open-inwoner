@@ -104,6 +104,11 @@ class PlanListFilterForm(forms.ModelForm):
     status = forms.ChoiceField(
         label=_("Status"), choices=PlanStatusChoices.choices, required=False
     )
+    query = forms.CharField(
+        max_length=150,
+        required=False,
+        widget=forms.TextInput(attrs={"placeholder": _("Zoeken")}),
+    )
 
     class Meta:
         model = Plan

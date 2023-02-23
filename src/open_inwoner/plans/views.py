@@ -2,6 +2,7 @@ from datetime import date
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
 from django.http import Http404, HttpResponseRedirect
 from django.urls.base import reverse
 from django.utils.functional import cached_property
@@ -39,13 +40,17 @@ class PlansEnabledMixin:
 
 class BasePlanFilter:
     """
-    This will filter the plans according to the user's selection.
+    This will filter the plans according to the user's selection or query.
     """
 
-    def get_filtered_plans(self, plans):
+    def get_filtered_plans(self, plans, available_contacts):
         plan_contacts = self.request.GET.get("plan_contacts")
         status = self.request.GET.get("status")
+        query = self.request.GET.get("query")
         today = date.today()
+
+        if not (plan_contacts or status or query):
+            return plans
 
         if plan_contacts:
             plans = plans.filter(plan_contacts__uuid=plan_contacts)
@@ -54,8 +59,15 @@ class BasePlanFilter:
                 plans = plans.filter(end_date__gt=today)
             elif status == "closed":
                 plans = plans.filter(end_date__lte=today)
+        if query:
+            available_contacts = available_contacts.filter(
+                Q(first_name__icontains=query) | Q(last_name__icontains=query)
+            )
+            plans = plans.filter(
+                Q(title__icontains=query) | Q(plan_contacts__in=available_contacts)
+            )
 
-        return plans
+        return plans.distinct()
 
 
 class PlanListView(
@@ -106,12 +118,9 @@ class PlanListView(
         # render the extended plan list view when a begeleider is logged in
         if user.contact_type == ContactTypeChoices.begeleider:
             plans["extended_plans"] = True
+            available_contacts = self.get_available_contacts_for_filtering(initial_qs)
 
-            # filter plans if necessary
-            if "plan_contacts" in self.request.GET or "status" in self.request.GET:
-                filtered_plans = self.get_filtered_plans(initial_qs)
-            else:
-                filtered_plans = initial_qs
+            filtered_plans = self.get_filtered_plans(initial_qs, available_contacts)
 
             # sort the filtered plans based on if they are open or closed
             open_plans = filtered_plans.filter(end_date__gt=date.today())
@@ -126,7 +135,6 @@ class PlanListView(
             )
 
             # instantiate filter form
-            available_contacts = self.get_available_contacts_for_filtering(initial_qs)
             context["plan_filter_form"] = PlanListFilterForm(
                 data=self.request.GET, available_contacts=available_contacts
             )

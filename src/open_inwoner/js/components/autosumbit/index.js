@@ -1,12 +1,8 @@
 class Autosubmit {
   constructor(form) {
     this.form = form
-    inputs = form.querySelectorAll('input')
     selects = form.querySelectorAll('select')
 
-    inputs.forEach((input) => {
-      input.addEventListener('input', this.handle)
-    })
     selects.forEach((select) => {
       select.addEventListener('change', this.handle)
     })
