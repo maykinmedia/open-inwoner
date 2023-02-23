@@ -46,6 +46,12 @@
 
   &__visitor {
     grid-area: vstr;
+
+    &-phonenumber a {
+      display: block;
+      color: var(--color-secondary);
+      text-decoration: none;
+    }
   }
 
   &__mail {

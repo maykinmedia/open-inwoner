@@ -17,6 +17,8 @@
         <h2 class="h2">{{footer_texts.footer_visiting_title}}</h2>
         <p class="p">
             {{footer_texts.footer_visiting_intro|linebreaksbr}}
+            <span class="footer__visitor-phonenumber"><a href='tel:{{footer_texts.footer_visiting_phonenumber}}'
+            >{{footer_texts.footer_visiting_phonenumber}}</a></span>
         </p>
 	{% if footer_texts.footer_visiting_map %}
         {% button icon="arrow_forward" icon_position='before' transparent=True text=_("Bekijk op Google Maps") href=footer_texts.footer_visiting_map %}
