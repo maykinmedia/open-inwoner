@@ -1,13 +1,11 @@
 {% load card_tags icon_tags link_tags i18n grid_tags thumbnail %}
 
-{% render_card grid=image %}
+{% render_card href=url grid=image %}
     {% if image %}
-        <a href="{{ url }}" class="card__image-container">
-            <img class="card__image" src="{{ image|thumbnail_url:'card-image' }}" alt="{{ image.default_alt_text }}" />
-        </a>
+        <img class="card__image" src="{{ image|thumbnail_url:'card-image' }}" alt="{{ image.default_alt_text }}" />
         <div class="card__content">
     {% endif %}
-    <h2 class="h2">{% link url text=title %}</h2>
+    <h2 class="h2">{{ title }}</h2>
     <p class="p">{{ description }}</p>
     {% if object.end_date %}
         <div class="card__tabled">
@@ -17,7 +15,9 @@
             <div>{{ object.created_by.get_full_name }}</div>
         </div>
     {% endif %}
-    {% link url text=title hide_text=True icon='arrow_forward' button=True transparent=True %}
+{#    {% link url text=title hide_text=True icon='arrow_forward' button=True transparent=True %} #}
+{#    the button needs to be rebuilt here, perhaps with a fake link #}
+    {{ title }}
     {% if image %}
         </div>
     {% endif %}
