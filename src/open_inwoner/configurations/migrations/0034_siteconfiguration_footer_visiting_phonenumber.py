@@ -6,13 +6,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('configurations', '0033_alter_siteconfiguration_favicon'),
+        ("configurations", "0033_alter_siteconfiguration_favicon"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='siteconfiguration',
-            name='footer_visiting_phonenumber',
-            field=models.CharField(blank=True, default='', help_text='Visiting phonenumber on the footer section.', max_length=255, verbose_name='Footer visiting phonenumber'),
+            model_name="siteconfiguration",
+            name="footer_visiting_phonenumber",
+            field=models.CharField(
+                blank=True,
+                default="",
+                help_text="Visiting phonenumber on the footer section.",
+                max_length=255,
+                verbose_name="Footer visiting phonenumber",
+            ),
         ),
     ]
