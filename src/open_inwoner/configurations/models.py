@@ -217,6 +217,13 @@ class SiteConfiguration(SingletonModel):
         blank=True,
         help_text=_("Visiting intro text on the footer section."),
     )
+    footer_visiting_phonenumber = models.CharField(
+        max_length=255,
+        default="",
+        blank=True,
+        verbose_name=_("Footer visiting phonenumber"),
+        help_text=_("Visiting phonenumber on the footer section."),
+    )
     footer_visiting_map = models.CharField(
         max_length=255,
         verbose_name=_("Footer visiting map"),
