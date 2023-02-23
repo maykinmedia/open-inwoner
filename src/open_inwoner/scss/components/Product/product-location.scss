@@ -5,10 +5,10 @@
     display: flex;
     gap: var(--spacing-extra-large);
     margin-top: var(--spacing-small);
-  }
 
-  &__address p:nth-child(2),
-  &__contact p:nth-child(2) {
-    margin-top: 0;
+    & > .location__address > p,
+    .location__contact > p {
+      margin-top: 0;
+    }
   }
 }
