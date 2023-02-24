@@ -1,8 +1,13 @@
+import io
+
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from django_webtest import WebTest
+from PIL import Image
+from webtest import Upload
 
+from ..choices import ContactTypeChoices
 from ..models import User
 from .factories import UserFactory
 
@@ -85,3 +90,54 @@ class TestAdminUser(WebTest):
         response = form.submit("_save")
 
         self.assertContains(response, _("Voer een geldig e-mailadres in."))
+
+    def test_begeleider_can_add_a_photo(self):
+        self.user.contact_type = ContactTypeChoices.begeleider
+        self.user.save()
+
+        image = Image.new("RGB", (10, 10))
+        byteIO = io.BytesIO()
+        image.save(byteIO, format="png")
+        img_bytes = byteIO.getvalue()
+
+        response = self.app.get(
+            reverse("admin:accounts_user_change", kwargs={"object_id": self.user.pk}),
+            user=self.user,
+        )
+
+        form = response.forms["user_form"]
+        form["photo"] = Upload("test_image.png", img_bytes, "image/png")
+        response = form.submit("_save")
+
+        self.assertRedirects(response, reverse("admin:accounts_user_changelist"))
+        with self.assertRaises(ValueError):
+            self.user.photo.file
+
+        self.user.refresh_from_db()
+
+        self.assertIsNotNone(self.user.photo.file)
+
+    def test_non_begeleider_cannot_add_a_photo(self):
+        image = Image.new("RGB", (10, 10))
+        byteIO = io.BytesIO()
+        image.save(byteIO, format="png")
+        img_bytes = byteIO.getvalue()
+
+        response = self.app.get(
+            reverse("admin:accounts_user_change", kwargs={"object_id": self.user.pk}),
+            user=self.user,
+        )
+
+        form = response.forms["user_form"]
+        form["photo"] = Upload("test_image.png", img_bytes, "image/png")
+        response = form.submit("_save")
+
+        self.assertEqual(
+            response.context["errors"][0][0],
+            _("Only a 'begeleider' user can add a photo."),
+        )
+
+        self.user.refresh_from_db()
+
+        with self.assertRaises(ValueError):
+            self.user.photo.file
