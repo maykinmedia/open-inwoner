@@ -10,6 +10,7 @@ from privates.admin import PrivateMediaMixin
 
 from open_inwoner.utils.mixins import UUIDAdminFirstInOrder
 
+from .choices import ContactTypeChoices
 from .models import Action, Appointment, Document, Invite, Message, User
 
 
@@ -23,7 +24,14 @@ class _UserChangeForm(UserChangeForm):
     def clean(self, *args, **kwargs):
         cleaned_data = super().clean(*args, **kwargs)
 
+        if (
+            cleaned_data.get("photo")
+            and cleaned_data.get("contact_type") != ContactTypeChoices.begeleider
+        ):
+            raise ValidationError(_("Only a 'begeleider' user can add a photo."))
+
         if cleaned_data.get("email"):
+
             if (
                 User.objects.filter(email__iexact=cleaned_data["email"])
                 and self.instance.email != cleaned_data["email"]
@@ -65,6 +73,7 @@ class _UserAdmin(UserAdmin):
                     "rsin",
                     "oidc_id",
                     "birthday",
+                    "photo",
                     "street",
                     "housenumber",
                     "postcode",
