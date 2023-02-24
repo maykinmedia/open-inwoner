@@ -70,11 +70,11 @@ class User(AbstractBaseUser, PermissionsMixin):
         validators=[validate_phone_number],
     )
     photo = models.ImageField(
-        verbose_name=_("Begeleider photo"),
+        verbose_name=_("Photo"),
         null=True,
         blank=True,
         upload_to=generate_uuid_photo_name,
-        help_text=_("Photo of the begeleider"),
+        help_text=_("Photo"),
     )
     is_staff = models.BooleanField(
         verbose_name=_("Staff status"),
