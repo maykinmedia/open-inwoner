@@ -17,16 +17,20 @@
         <div class="plans-cards card-container card-container--columns-3">
             {% for plan in plans %}
                 {% render_card image_object_fit="cover" %}
-                    <h3 class="h3">{{ plan.title }}</h3>
-                    <p class="p">{{ plan.goal|truncatewords:20 }}</p>
-                    <p class="p">{{ plan.description|truncatewords:20 }}</p>
                     <a
-                        class="button button--icon-before button--transparent button--secondary"
-                        href="{{ plan.get_absolute_url }}"
-                        aria-label="{{ plan.title }}"
-                        aria-hidden="true"
-                    >
-                        {% icon icon="arrow_forward" %}
+                    class="card-home-link"
+                    href="{{ plan.get_absolute_url }}"
+                    aria-label="{{ plan.title }}"
+                >
+                        <h3 class="h3">{{ plan.title }}</h3>
+                        <p class="p">{{ plan.goal|truncatewords:20 }}</p>
+                        <p class="p">{{ plan.description|truncatewords:20 }}</p>
+                        <span
+                            class="button button--icon-before button--transparent button--secondary"
+                            aria-hidden="true"
+                        >
+                            {% icon icon="arrow_forward" %}
+                        </span>
                     </a>
                 {% endrender_card %}
             {% endfor %}

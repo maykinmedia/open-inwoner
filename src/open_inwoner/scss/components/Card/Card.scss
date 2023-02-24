@@ -159,8 +159,12 @@
   }
 
   /// Arrow button on product cards.
-  a.button:last-child {
+  a.button:last-child,
+  .button--icon-arrow-forward {
     float: right;
+  }
+  .button--icon-arrow-forward {
+    display: flex;
   }
 
   .link + .link {
@@ -184,6 +188,29 @@
   &--stretch .list + .link:first-of-type:last-of-type {
     bottom: var(--card-spacing);
     position: absolute;
+  }
+}
+
+/// home-page cards
+
+.plans-cards {
+  position: relative;
+  .card {
+    span.button:last-child {
+      float: right;
+    }
+    .card__body {
+      a.card-home-link {
+        display: block;
+        position: static;
+        height: 100%;
+        text-decoration: none;
+        > p:nth-child(2) {
+          // make space for exception
+          min-height: calc(2 * var(--spacing-large));
+        }
+      }
+    }
   }
 }
 

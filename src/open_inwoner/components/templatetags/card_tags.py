@@ -82,8 +82,8 @@ def description_card(title, description, url, **kwargs):
     Available options:
         + title: string | The title of the card that needs to be displayed.
         + description: string | The description that needs to be displayed.
-        + url: string | The url that the card should point to.
-        - object: any | The object that needs to render aditional data.
+        - url: string | The url that the card should point to. Cannot not be used if entire card is a link (invalid HTML)
+        - object: any | The object that needs to render additional data.
         - image: FilerImageField | an image that should be used.
     """
     kwargs.update(title=title, description=description, url=url)

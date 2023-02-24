@@ -1,10 +1,33 @@
-{% load card_tags icon_tags link_tags helpers %}
+{% load card_tags icon_tags link_tags helpers utils %}
 
-{% render_card title=category href=category.get_absolute_url %}
-    {% for product in category.products.published %}
-        {% with category as parent %}
-            {% get_product_url product as product_url %}
-            {% link href=product_url icon='arrow_forward' icon_position='before' secondary=True text=product.name %}
-        {% endwith %}
-    {% endfor %}
-{% endrender_card %}
+{# create tag for anchor around card - never use anchors within anchors for valid HTML. #}
+{% if category.products.published %}
+<div title="{{ category }}" aria-label="{{ category.name }}" class="card">
+    <div class="card__body">
+        {% if category %}
+            <p class="h3">
+                <a href="{{ category.slug }}" class="link link__text">{{ category }}</a>
+            </p>
+        {% endif %}
+        {% for product in category.products.published %}
+            {% with category as parent %}
+                <div class="card__categories">
+                    {% get_product_url product as product_url %}
+                    {% link href=product_url icon='arrow_forward' icon_position='before' secondary=True text=product.name %}
+                </div>
+            {% endwith %}
+        {% endfor %}
+    </div>
+</div>
+
+{% else %}
+    <a href="{{ category.slug }}" title="{{ category }}" class="card">
+        <div class="card__body">
+            {% if category %}
+                <p class="h3">
+                    <span class="link link__text">{{ category }}</span>
+                </p>
+            {% endif %}
+        </div>
+    </a>
+{% endif %}

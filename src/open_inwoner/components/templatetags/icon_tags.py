@@ -12,7 +12,7 @@ def icon(icon, **kwargs):
     Fontawesome Brands: https://fontawesome.com/v5.15/icons?d=gallery&p=2&s=brands
 
     Usage:
-        {% icon "arrow-forward" %}
+        {% icon icon="arrow-forward" %}
 
     Variables:
         + icon: string | what icon to display.

@@ -145,7 +145,7 @@ please adhere to the following:
 
 ### TODO: Nested tags might use refactoring/improvements.
 
-Some tags (not inclusion tags) provide a way to nest other contents and tags as children. By convenstion, we prefix the
+Some tags (not inclusion tags) provide a way to nest other contents and tags as children. By convention, we prefix the
 name of these tags with "render_"
 
 > A nested component is a child of the parent component that contains it. The child component is positioned and rendered

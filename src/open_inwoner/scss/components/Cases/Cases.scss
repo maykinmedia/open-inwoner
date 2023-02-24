@@ -1,3 +1,11 @@
 .cases {
   margin-top: var(--spacing-giant);
+
+  &__case {
+    text-decoration: none;
+
+    .h4 {
+      text-decoration: initial;
+    }
+  }
 }
