@@ -83,5 +83,5 @@ class TestAdminUser(WebTest):
         form = response.forms["user_form"]
         form["email"] = "John@example"
         response = form.submit("_save")
-        # breakpoint()
+
         self.assertContains(response, _("Voer een geldig e-mailadres in."))
