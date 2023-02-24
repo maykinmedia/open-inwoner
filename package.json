@@ -47,6 +47,7 @@
     "emojibase-data": "^7.0.1",
     "flatpickr": "^4.6.9",
     "gumshoejs": "^5.1.2",
+    "escape-html": "^1.0.3",
     "html-minifier": "^4.0.0",
     "htmx.org": "^1.8.4",
     "inline-css": "^3.0.0",
