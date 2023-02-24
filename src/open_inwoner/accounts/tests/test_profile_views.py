@@ -1,10 +1,14 @@
+import io
+
 from django.test import override_settings
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 import requests_mock
 from django_webtest import WebTest
+from PIL import Image
 from timeline_logger.models import TimelineLog
+from webtest import Upload
 
 from open_inwoner.accounts.choices import StatusChoices
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
@@ -12,7 +16,7 @@ from open_inwoner.pdc.tests.factories import CategoryFactory
 from open_inwoner.utils.logentry import LOG_ACTIONS
 
 from ...questionnaire.tests.factories import QuestionnaireStepFactory
-from ..choices import LoginTypeChoices
+from ..choices import ContactTypeChoices, LoginTypeChoices
 from ..forms import BrpUserForm, UserForm
 from .factories import ActionFactory, DocumentFactory, UserFactory
 
@@ -345,6 +349,86 @@ class EditProfileTests(WebTest):
         form = response.context["form"]
 
         self.assertEqual(type(form), BrpUserForm)
+
+    def test_photo_is_saved_when_begeleider_and_default_login(self):
+        self.user.contact_type = ContactTypeChoices.begeleider
+        self.user.save()
+
+        image = Image.new("RGB", (10, 10))
+        byteIO = io.BytesIO()
+        image.save(byteIO, format="png")
+        img_bytes = byteIO.getvalue()
+
+        response = self.app.get(self.url, user=self.user, status=200)
+        form = response.forms["profile-edit"]
+        form["photo"] = Upload("test_image.png", img_bytes, "image/png")
+        form_response = form.submit()
+
+        self.assertRedirects(form_response, reverse("accounts:my_profile"))
+        with self.assertRaises(ValueError):
+            self.user.photo.file
+
+        self.user.refresh_from_db()
+
+        self.assertIsNotNone(self.user.photo.file)
+
+    def test_photo_is_saved_when_begeleider_and_digid_login(self):
+        self.user.contact_type = ContactTypeChoices.begeleider
+        self.user.login_type = LoginTypeChoices.digid
+        self.user.save()
+
+        image = Image.new("RGB", (10, 10))
+        byteIO = io.BytesIO()
+        image.save(byteIO, format="png")
+        img_bytes = byteIO.getvalue()
+
+        response = self.app.get(self.url, user=self.user, status=200)
+        form = response.forms["profile-edit"]
+        form["photo"] = Upload("test_image.png", img_bytes, "image/png")
+        form_response = form.submit()
+
+        self.assertRedirects(form_response, reverse("accounts:my_profile"))
+        with self.assertRaises(ValueError):
+            self.user.photo.file
+
+        self.user.refresh_from_db()
+
+        self.assertIsNotNone(self.user.photo.file)
+
+    def test_photo_is_not_saved_when_no_begeleider_and_default_login(self):
+        image = Image.new("RGB", (10, 10))
+        byteIO = io.BytesIO()
+        image.save(byteIO, format="png")
+        img_bytes = byteIO.getvalue()
+
+        response = self.app.get(self.url, user=self.user, status=200)
+        form = response.forms["profile-edit"]
+        form["photo"] = Upload("test_image.png", img_bytes, "image/png")
+        form.submit()
+
+        self.user.refresh_from_db()
+
+        with self.assertRaises(ValueError):
+            self.user.photo.file
+
+    def test_photo_is_not_saved_when_no_begeleider_and_digid_login(self):
+        self.user.login_type = LoginTypeChoices.digid
+        self.user.save()
+
+        image = Image.new("RGB", (10, 10))
+        byteIO = io.BytesIO()
+        image.save(byteIO, format="png")
+        img_bytes = byteIO.getvalue()
+
+        response = self.app.get(self.url, user=self.user, status=200)
+        form = response.forms["profile-edit"]
+        form["photo"] = Upload("test_image.png", img_bytes, "image/png")
+        form.submit()
+
+        self.user.refresh_from_db()
+
+        with self.assertRaises(ValueError):
+            self.user.photo.file
 
 
 @requests_mock.Mocker()
