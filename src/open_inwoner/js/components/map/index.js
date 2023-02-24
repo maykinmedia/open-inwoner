@@ -73,12 +73,14 @@ class Map {
    * @return {string}
    */
   featureToHTML(feature) {
+    const escapeHtml = require('escape-html')
+
     const { name, ...properties } = feature.properties
-    const displayName = name ? name : ''
+    const displayName = name ? escapeHtml(name) : ''
     let finalHTML = ``
 
     Object.entries(properties).forEach((property) => {
-      finalHTML += `<p class="p">${property[1]}</p>`
+      finalHTML += `<p class="p">${escapeHtml(property[1])}</p>`
     })
 
     return `
