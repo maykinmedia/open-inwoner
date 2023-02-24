@@ -74,3 +74,14 @@ class TestAdminUser(WebTest):
 
         self.assertContains(response, _("The user with this email already exists."))
         self.assertEqual(self.user.email, updated_user.email)
+
+    def test_validation_error_is_raised_when_wrong_format_email(self):
+        response = self.app.get(
+            reverse("admin:accounts_user_change", kwargs={"object_id": self.user.pk}),
+            user=self.user,
+        )
+        form = response.forms["user_form"]
+        form["email"] = "John@example"
+        response = form.submit("_save")
+
+        self.assertContains(response, _("Voer een geldig e-mailadres in."))

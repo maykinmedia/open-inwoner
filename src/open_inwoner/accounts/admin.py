@@ -23,22 +23,24 @@ class _UserChangeForm(UserChangeForm):
     def clean(self, *args, **kwargs):
         cleaned_data = super().clean(*args, **kwargs)
 
-        if (
-            User.objects.filter(email__iexact=cleaned_data["email"])
-            and self.instance.email != cleaned_data["email"]
-        ):
-            raise ValidationError(_("The user with this email already exists."))
+        if cleaned_data.get("email"):
+            if (
+                User.objects.filter(email__iexact=cleaned_data["email"])
+                and self.instance.email != cleaned_data["email"]
+            ):
+                raise ValidationError(_("The user with this email already exists."))
 
 
 class _UserCreationForm(UserCreationForm):
     def clean(self, *args, **kwargs):
         cleaned_data = super().clean(*args, **kwargs)
 
-        # we use both queries in order to avoid the duplicate validation errors
-        if User.objects.filter(
-            email__iexact=cleaned_data["email"]
-        ) and not User.objects.filter(email=cleaned_data["email"]):
-            raise ValidationError(_("The user with this email already exists."))
+        if cleaned_data.get("email"):
+            # we use both queries in order to avoid the duplicate validation errors
+            if User.objects.filter(
+                email__iexact=cleaned_data["email"]
+            ) and not User.objects.filter(email=cleaned_data["email"]):
+                raise ValidationError(_("The user with this email already exists."))
 
 
 @admin.register(User)
