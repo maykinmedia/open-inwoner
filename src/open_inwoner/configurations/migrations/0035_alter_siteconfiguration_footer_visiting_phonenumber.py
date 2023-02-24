@@ -7,13 +7,20 @@ import open_inwoner.utils.validators
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('configurations', '0034_siteconfiguration_footer_visiting_phonenumber'),
+        ("configurations", "0034_siteconfiguration_footer_visiting_phonenumber"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='siteconfiguration',
-            name='footer_visiting_phonenumber',
-            field=models.CharField(blank=True, default='', help_text='Visiting phonenumber on the footer section.', max_length=15, validators=[open_inwoner.utils.validators.validate_phone_number], verbose_name='Footer visiting phonenumber'),
+            model_name="siteconfiguration",
+            name="footer_visiting_phonenumber",
+            field=models.CharField(
+                blank=True,
+                default="",
+                help_text="Visiting phonenumber on the footer section.",
+                max_length=15,
+                validators=[open_inwoner.utils.validators.validate_phone_number],
+                verbose_name="Footer visiting phonenumber",
+            ),
         ),
     ]
