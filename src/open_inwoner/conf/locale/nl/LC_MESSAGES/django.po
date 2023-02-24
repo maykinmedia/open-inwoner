@@ -2105,14 +2105,6 @@ msgstr "Kop bezoekadres"
 msgid "Visiting details"
 msgstr "Bezoekdetails"
 
-#: configurations/models.py:216
-msgid "Footer visiting phonenumber"
-msgstr "Telefoonnummer voor bezoekers"
-
-#: configurations/models.py:217
-msgid "Visiting phonenumber on the footer section."
-msgstr "Aanklikbaar telefoonnummer voor bezoekers"
-
 #: configurations/models.py:210
 msgid "Visiting intro text on the footer section."
 msgstr "Tekst over bezoek in de footer."
