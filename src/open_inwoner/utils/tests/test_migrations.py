@@ -23,6 +23,10 @@ class TestMigrations(TestCase):
         executor = MigrationExecutor(connection)
         old_apps = executor.loader.project_state(self.migrate_from).apps
 
+        # Force immediate constraint checks to stop error 'cannot ALTER TABLE "<..>" because it has pending trigger events' in the tests
+        with connection.cursor() as cursor:
+            cursor.execute("SET CONSTRAINTS ALL IMMEDIATE")
+
         # Reverse to the original migration
         executor.migrate(self.migrate_from)
 
@@ -32,6 +36,10 @@ class TestMigrations(TestCase):
         executor = MigrationExecutor(connection)
         executor.loader.build_graph()  # reload.
         executor.migrate(self.migrate_to)
+
+        # Restore constraint checks
+        with connection.cursor() as cursor:
+            cursor.execute("SET CONSTRAINTS ALL DEFERRED")
 
         self.apps = executor.loader.project_state(self.migrate_to).apps
 

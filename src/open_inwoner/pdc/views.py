@@ -162,7 +162,7 @@ class CategoryDetailView(
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["subcategories"] = self.object.get_children().published()
-        context["products"] = self.object.products.published().order_by("name")
+        context["products"] = self.object.products.published().order_in_category()
         context["questionnaire_roots"] = QuestionnaireStep.get_root_nodes().filter(
             category=self.object
         )

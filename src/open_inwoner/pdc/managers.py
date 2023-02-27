@@ -4,12 +4,15 @@ from ordered_model.models import OrderedModelQuerySet
 from treebeard.mp_tree import MP_NodeQuerySet
 
 
-class PublishedQueryset(models.QuerySet):
+class ProductQueryset(models.QuerySet):
     def published(self):
         return self.filter(published=True)
 
     def draft(self):
         return self.filter(published=False)
+
+    def order_in_category(self):
+        return self.order_by("categoryproduct__order")
 
 
 class CategoryPublishedQueryset(MP_NodeQuerySet):

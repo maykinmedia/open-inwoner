@@ -14,8 +14,26 @@ from ordered_model.models import OrderedModel
 
 from open_inwoner.utils.validators import validate_phone_number
 
-from ..managers import PublishedQueryset
+from ..managers import ProductQueryset
 from .mixins import GeoModel
+
+
+class CategoryProduct(OrderedModel):
+    """
+    explicit many2many through model
+    """
+
+    category = models.ForeignKey("pdc.Category", on_delete=models.CASCADE)
+    product = models.ForeignKey("pdc.Product", on_delete=models.CASCADE)
+    order_with_respect_to = "category"
+
+    class Meta:
+        ordering = ("category", "product")
+
+    def get_product_name(self):
+        return self.product.name
+
+    get_product_name.short_description = _("Name")
 
 
 class Product(models.Model):
@@ -78,6 +96,7 @@ class Product(models.Model):
         verbose_name=_("Categories"),
         related_name="products",
         help_text=_("Categories which the product relates to"),
+        through=CategoryProduct,
     )
     related_products = models.ManyToManyField(
         "pdc.Product",
@@ -155,7 +174,7 @@ class Product(models.Model):
         help_text=_("Conditions applicable for the product"),
     )
 
-    objects = PublishedQueryset.as_manager()
+    objects = ProductQueryset.as_manager()
 
     class Meta:
         verbose_name = _("Product")
