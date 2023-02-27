@@ -227,3 +227,37 @@ class TestLocationFormInput(WebTest):
             ],
         )
         mock_geocoding.assert_called_once_with(" ,  ")
+
+
+class TestLocationDetailView(WebTest):
+    def test_shown_products_in_location_detail(self):
+        published_product = ProductFactory()
+        product_location = ProductLocationFactory()
+        published_product.locations.add(product_location)
+
+        response = self.app.get(
+            reverse("pdc:location_detail", kwargs={"uuid": product_location.uuid})
+        )
+
+        # check the published product is shown
+        self.assertEqual(response.context["products"].get(), published_product)
+
+        # check location details
+        self.assertContains(response, product_location.name)
+        self.assertContains(response, product_location.address_line_1)
+        self.assertContains(response, product_location.address_line_2)
+        self.assertContains(response, product_location.phonenumber)
+        self.assertContains(response, product_location.email)
+
+        # adding a draft product
+        draft_product = ProductFactory(published=False)
+        draft_product.locations.add(product_location)
+
+        response = self.app.get(
+            reverse("pdc:location_detail", kwargs={"uuid": product_location.uuid})
+        )
+
+        products = response.context["products"]
+
+        # check the draft product is not shown
+        self.assertEqual(products.get(), published_product)

@@ -7,6 +7,7 @@ from .views import (
     ProductDetailView,
     ProductFinderView,
     ProductFormView,
+    ProductLocationDetailView,
 )
 
 app_name = "pdc"
@@ -39,4 +40,9 @@ urlpatterns = [
         name="product_form",
     ),
     path("finder/", ProductFinderView.as_view(), name="product_finder"),
+    path(
+        "locations/<str:uuid>",
+        ProductLocationDetailView.as_view(),
+        name="location_detail",
+    ),
 ]
