@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-16 16:54+0100\n"
+"POT-Creation-Date: 2023-02-27 13:34+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -152,7 +152,7 @@ msgstr "Deze gebruiker is gedeactiveerd"
 
 #: accounts/forms.py:178
 msgid "Type contact"
-msgstr "Soort contactpersoon"
+msgstr "Type contactpersoon"
 
 #: accounts/forms.py:189 templates/export/include/contacts.html:8
 #: templates/export/profile/profile_export.html:10
@@ -250,7 +250,7 @@ msgstr "Contact type"
 
 #: accounts/models.py:87
 msgid "The type of contact"
-msgstr "Soort contactpersoon"
+msgstr "Type contactpersoon"
 
 #: accounts/models.py:90
 msgid "Date joined"
@@ -850,7 +850,7 @@ msgid "Wijzig wachtwoord"
 msgstr "Wijzig wachtwoord"
 
 #: accounts/tests/test_contact_views.py:78
-#: templates/pages/profile/contacts/list.html:72
+#: templates/pages/profile/contacts/list.html:77
 msgid ""
 "Er zijn geen contacten gevonden met deze filter, of u heeft nog geen "
 "contacten."
@@ -1266,21 +1266,21 @@ msgstr "Weet je het zeker dat je deze actie wilt verwijderen?"
 
 #: components/templates/components/Action/Actions.html:33
 #: components/templates/components/File/File.html:35 pdc/choices.py:8
-#: templates/pages/profile/contacts/list.html:115
+#: templates/pages/profile/contacts/list.html:120
 #: templates/pages/profile/me.html:104
 msgid "Nee"
 msgstr "Nee"
 
 #: components/templates/components/Action/Actions.html:33
 #: components/templates/components/File/File.html:35 pdc/choices.py:7
-#: templates/pages/profile/contacts/list.html:115
+#: templates/pages/profile/contacts/list.html:120
 #: templates/pages/profile/me.html:104
 msgid "Ja"
 msgstr "Ja"
 
 #: components/templates/components/Action/Actions.html:35
 #: components/templates/components/File/File.html:37
-#: templates/pages/profile/contacts/list.html:117
+#: templates/pages/profile/contacts/list.html:122
 msgid "Verwijderen"
 msgstr "Verwijderen"
 
@@ -1844,8 +1844,10 @@ msgid "Logo"
 msgstr "Logo"
 
 #: configurations/models.py:65
+#, fuzzy
+#| msgid "The name of the municipality"
 msgid "Logo of the municipality"
-msgstr "Logo van de gemeente"
+msgstr "Naam van de gemeente"
 
 #: configurations/models.py:68
 msgid "Hero image login"
@@ -2908,8 +2910,10 @@ msgid "Slug of the organization"
 msgstr "Slug van de organisatie"
 
 #: pdc/models/organization.py:27
+#, fuzzy
+#| msgid "Slug of the organization"
 msgid "Logo of the orgaization"
-msgstr "Logo van de organisatie"
+msgstr "Slug van de organisatie"
 
 #: pdc/models/organization.py:34 pdc/models/organization.py:71
 #: pdc/models/organization.py:75
@@ -2959,8 +2963,10 @@ msgid "Summary"
 msgstr "Samenvatting"
 
 #: pdc/models/product.py:39
+#, fuzzy
+#| msgid "The description of the action"
 msgid "Short description of the product"
-msgstr "Korte omschrijving van het product"
+msgstr "Omschrijving van de actie"
 
 #: pdc/models/product.py:47
 msgid "Icon of the product"
@@ -3981,9 +3987,11 @@ msgstr "Samenwerking"
 
 #: templates/pages/plans/list.html:19
 msgid "Openstaande acties"
-msgstr "Openstaande actie"
+msgstr "Openstaande acties"
 
 #: templates/pages/plans/list.html:40
+#, fuzzy
+#| msgid "There are no plans yet."
 msgid "There are no plans yet."
 msgstr "Er zijn nog geen samenwerkingsplannen."
 
@@ -4015,7 +4023,7 @@ msgid "Gerelateerde links"
 msgstr "Gerelateerde links"
 
 #: templates/pages/product/detail.html:141
-#: templates/pages/profile/contacts/list.html:64
+#: templates/pages/profile/contacts/list.html:69
 #: templates/pages/profile/mydata.html:105
 msgid "Telefoonnummer"
 msgstr "Telefoonnummer"
@@ -4049,7 +4057,7 @@ msgid "Nieuwe actie toevoegen"
 msgstr "Nieuwe actie toevoegen"
 
 #: templates/pages/profile/actions/list.html:18
-#: templates/pages/profile/contacts/list.html:128
+#: templates/pages/profile/contacts/list.html:133
 msgid "Terug naar mijn profiel"
 msgstr "Terug naar mijn profiel"
 
@@ -4107,30 +4115,36 @@ msgstr "Weigeren"
 msgid "Accepteren"
 msgstr "Accepteren"
 
-#: templates/pages/profile/contacts/list.html:61
+#: templates/pages/profile/contacts/list.html:58
+#, fuzzy
+#| msgid "Soort contact"
+msgid "Soort contactpersoon"
+msgstr "Soort contact"
+
+#: templates/pages/profile/contacts/list.html:66
 msgid "Naam"
 msgstr "Naam"
 
-#: templates/pages/profile/contacts/list.html:62
+#: templates/pages/profile/contacts/list.html:67
 msgid "Soort contact"
 msgstr "Soort contact"
 
-#: templates/pages/profile/contacts/list.html:63
+#: templates/pages/profile/contacts/list.html:68
 #: templates/pages/profile/mydata.html:109
 msgid "E-mailadres"
 msgstr "E-mailadres"
 
-#: templates/pages/profile/contacts/list.html:65
+#: templates/pages/profile/contacts/list.html:70
 msgid "Actief"
 msgstr "Actief"
 
-#: templates/pages/profile/contacts/list.html:84
-#: templates/pages/profile/contacts/list.html:97
-#: templates/pages/profile/contacts/list.html:110
+#: templates/pages/profile/contacts/list.html:89
+#: templates/pages/profile/contacts/list.html:102
+#: templates/pages/profile/contacts/list.html:115
 msgid "Stuur bericht"
 msgstr "Stuur bericht"
 
-#: templates/pages/profile/contacts/list.html:115
+#: templates/pages/profile/contacts/list.html:120
 msgid "Are you sure you want to delete this contact?"
 msgstr "Weet je zeker dat je je contact wilt verwijderen?"
 
@@ -4495,6 +4509,38 @@ msgstr "Het opgegeven mobiele telefoonnummer is ongeldig."
 #: utils/validators.py:54
 msgid "Ongeldige postcode"
 msgstr "Ongeldige postcode"
+
+#, fuzzy
+#~| msgid "Bestanden"
+#~ msgid "Bestand type"
+#~ msgstr "Bestanden"
+
+#~ msgid "Short description of the product, limited to 300 characters."
+#~ msgstr "Korte omschrijving van het product, maximaal 300 karakters."
+
+#, fuzzy
+#~| msgid "The email address of the organization"
+#~ msgid "The email address of the current location"
+#~ msgstr "E-mailadres van de organisatie"
+
+#, fuzzy
+#~| msgid "The phone number of the organization"
+#~ msgid "The phonenumber of the current location"
+#~ msgstr "Telefoonnummer van de organisatie"
+
+#~ msgid ""
+#~ "Logo of the municipality - For best presentation keep images in square or "
+#~ "landscape mode and with a maximum file size of 1 MB"
+#~ msgstr ""
+#~ "Logo van de gemeente - Houd afbeeldingen in vierkant of landschapsformaat "
+#~ "en met een maximale bestandsgrootte van 1 MB"
+
+#~ msgid ""
+#~ "Logo of the organization - For best presentation keep images in square or "
+#~ "landscape mode and with a maximum file size of 2 MB"
+#~ msgstr ""
+#~ "Logo van de organisatie - Houd afbeeldingen in vierkant of "
+#~ "landschapsformaat en met een maximale bestandsgrootte van 2 MB"
 
 #, fuzzy
 #~| msgid "Created on"
