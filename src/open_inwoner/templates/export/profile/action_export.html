@@ -37,10 +37,6 @@
             <td class="table__item">{% if object.file %}{% link href=download_url text=object.file.name download=True %}{% endif %}</td>
         </tr>
         <tr>
-            <th class="table__header">{% trans "Goal" %}</th>
-            <td class="table__item">{{ object.goal }}</td>
-        </tr>
-        <tr>
             <th class="table__header">{% trans "Created on" %}</th>
             <td class="table__item">{{ object.created_on }}</td>
         </tr>

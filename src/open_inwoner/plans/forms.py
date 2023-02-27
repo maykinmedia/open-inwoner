@@ -78,7 +78,6 @@ class PlanForm(forms.ModelForm):
                 Action.objects.create(
                     name=action_template.name,
                     description=action_template.description,
-                    goal=action_template.goal,
                     type=action_template.type,
                     end_date=end_date.date(),
                     is_for=user,

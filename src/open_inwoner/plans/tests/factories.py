@@ -54,5 +54,4 @@ class ActionTemplateFactory(factory.django.DjangoModelFactory):
     plan_template = factory.SubFactory(PlanTemplateFactory)
     name = factory.Faker("word")
     description = factory.Faker("word")
-    goal = factory.Faker("paragraph")
     end_in_days = factory.Faker("pyint")

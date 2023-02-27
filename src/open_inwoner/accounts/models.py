@@ -390,13 +390,6 @@ class Action(models.Model):
         blank=True,
         help_text=_("The description of the action"),
     )
-    goal = models.CharField(
-        verbose_name=_("Goal"),
-        default="",
-        blank=True,
-        max_length=250,
-        help_text=_("The goal of the action"),
-    )
     status = models.CharField(
         verbose_name=_("Status"),
         default=StatusChoices.open,
