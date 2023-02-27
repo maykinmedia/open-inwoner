@@ -8,6 +8,8 @@
     {% render_form id="plan-form" form=form method="POST" %}
         {% csrf_token %}
         {% input form.title %}
+        {% input form.goal %}
+        {% input form.description %}
         {% render_grid %}
             {% if request.user.get_active_contacts %}
                 {% checkboxes form.plan_contacts %}
@@ -22,7 +24,7 @@
             <div class="plan-template">
                 <div class="plan-template__header">
                     <div>{% trans "Templates" %}</div>
-                    <div>{% trans "Omschrijving" %}</div>
+                    <div>{% trans "Doel" %}</div>
                     <div></div>
                 </div>
                 <label class="plan-template__row radio">

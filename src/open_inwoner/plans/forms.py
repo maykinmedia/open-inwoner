@@ -22,7 +22,14 @@ class PlanForm(forms.ModelForm):
 
     class Meta:
         model = Plan
-        fields = ("title", "end_date", "plan_contacts", "template")
+        fields = (
+            "title",
+            "goal",
+            "description",
+            "end_date",
+            "plan_contacts",
+            "template",
+        )
 
     def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -41,6 +48,18 @@ class PlanForm(forms.ModelForm):
 
         if self.instance.pk:
             del self.fields["template"]
+        else:
+            # not always required (if we have a template)
+            self.fields["goal"].required = False
+
+    def clean(self):
+        cleaned_data = super().clean()
+        goal = cleaned_data.get("goal")
+        template = cleaned_data.get("template")
+        if not template and not goal:
+            self.add_error(
+                "goal", _("This field is required when not using a template")
+            )
 
     def clean_plan_contacts(self):
         # Make sure current user exists in plan_contacts when editing form
@@ -57,7 +76,12 @@ class PlanForm(forms.ModelForm):
 
         template = self.cleaned_data.get("template")
         if template:
-            self.instance.goal = template.goal
+            # apply template fields if not already set on new instance
+            if not self.instance.goal:
+                self.instance.goal = template.goal
+            if not self.instance.description:
+                self.instance.description = template.description
+
             self.instance.save()
 
             if template.file:
@@ -90,7 +114,10 @@ class PlanForm(forms.ModelForm):
 class PlanGoalForm(forms.ModelForm):
     class Meta:
         model = Plan
-        fields = ("goal",)
+        fields = (
+            "goal",
+            "description",
+        )
 
     def save(self, commit=True):
         return super().save(commit=commit)
@@ -111,7 +138,10 @@ class PlanListFilterForm(forms.ModelForm):
 
     class Meta:
         model = Plan
-        fields = ("plan_contacts", "status")
+        fields = (
+            "plan_contacts",
+            "status",
+        )
 
     def __init__(self, available_contacts, *args, **kwargs):
         super().__init__(*args, **kwargs)

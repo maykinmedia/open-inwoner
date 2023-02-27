@@ -28,6 +28,7 @@ class TestPlans(WebTest):
             "plan-form"
         ]
         form["title"] = plan.title
+        form["goal"] = plan.goal
         form["end_date"] = plan.end_date
         form.submit()
 

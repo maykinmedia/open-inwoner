@@ -70,6 +70,7 @@ class PlanViewTests(WebTest):
         response = self.app.get(self.create_url, user=self.user)
         form = response.forms["plan-form"]
         form["title"] = plan.title
+        form["goal"] = plan.goal
         form["end_date"] = plan.end_date
         response = form.submit()
         created_plan = Plan.objects.get(title=plan.title)
@@ -168,13 +169,16 @@ class PlanViewTests(WebTest):
         response = self.app.get(self.goal_edit_url, user=self.user)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.plan.goal)
+        self.assertContains(response, self.plan.description)
         form = response.forms["goal-edit"]
         form["goal"] = "editted goal"
+        form["description"] = "editted description"
         response = form.submit(user=self.user)
         self.assertEqual(response.status_code, 302)
 
         self.plan.refresh_from_db()
         self.assertEqual(self.plan.goal, "editted goal")
+        self.assertEqual(self.plan.description, "editted description")
 
     def test_plan_goal_edit_contact_can_access(self):
         response = self.app.get(self.goal_edit_url, user=self.contact)
@@ -182,11 +186,13 @@ class PlanViewTests(WebTest):
         self.assertContains(response, self.plan.goal)
         form = response.forms["goal-edit"]
         form["goal"] = "editted goal"
+        form["description"] = "editted description"
         response = form.submit(user=self.user)
         self.assertEqual(response.status_code, 302)
 
         self.plan.refresh_from_db()
         self.assertEqual(self.plan.goal, "editted goal")
+        self.assertEqual(self.plan.description, "editted description")
 
     def test_plan_goal_edit_not_your_action(self):
         other_user = UserFactory()
@@ -266,6 +272,7 @@ class PlanViewTests(WebTest):
             {
                 "title": [_("This field is required.")],
                 "end_date": [_("This field is required.")],
+                "goal": [_("This field is required when not using a template")],
             },
         )
 
@@ -274,6 +281,8 @@ class PlanViewTests(WebTest):
         response = self.app.get(self.create_url, user=self.user)
         form = response.forms["plan-form"]
         form["title"] = "Plan"
+        form["goal"] = "Goal"
+        form["description"] = "Description"
         form["end_date"] = "2022-01-01"
         form["plan_contacts"] = [self.contact.pk]
         response = form.submit().follow()
@@ -281,7 +290,8 @@ class PlanViewTests(WebTest):
         self.assertEqual(Plan.objects.count(), 2)
         plan = Plan.objects.exclude(pk=self.plan.id).first()
         self.assertEqual(plan.title, "Plan")
-        self.assertEqual(plan.goal, "")
+        self.assertEqual(plan.goal, "Goal")
+        self.assertEqual(plan.description, "Description")
 
     def test_plan_create_plan_with_template(self):
         plan_template = PlanTemplateFactory(file=None)
@@ -298,6 +308,28 @@ class PlanViewTests(WebTest):
         plan = Plan.objects.exclude(pk=self.plan.id).first()
         self.assertEqual(plan.title, "Plan")
         self.assertEqual(plan.goal, plan_template.goal)
+        self.assertEqual(plan.description, plan_template.description)
+        self.assertEqual(plan.documents.count(), 0)
+        self.assertEqual(plan.actions.count(), 0)
+
+    def test_plan_create_plan_with_template_and_field_overrides(self):
+        plan_template = PlanTemplateFactory(file=None)
+        self.assertEqual(Plan.objects.count(), 1)
+        response = self.app.get(self.create_url, user=self.user)
+        form = response.forms["plan-form"]
+        form["title"] = "Plan"
+        form["goal"] = "Goal"
+        form["description"] = "Description"
+        form["end_date"] = "2022-01-01"
+        form["plan_contacts"] = [self.contact.pk]
+        form["template"] = plan_template.pk
+        response = form.submit().follow()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Plan.objects.count(), 2)
+        plan = Plan.objects.exclude(pk=self.plan.id).first()
+        self.assertEqual(plan.title, "Plan")
+        self.assertEqual(plan.goal, "Goal")
+        self.assertEqual(plan.description, "Description")
         self.assertEqual(plan.documents.count(), 0)
         self.assertEqual(plan.actions.count(), 0)
 
@@ -316,6 +348,7 @@ class PlanViewTests(WebTest):
         plan = Plan.objects.exclude(pk=self.plan.id).first()
         self.assertEqual(plan.title, "Plan")
         self.assertEqual(plan.goal, plan_template.goal)
+        self.assertEqual(plan.description, plan_template.description)
         self.assertEqual(plan.documents.count(), 1)
         self.assertEqual(plan.actions.count(), 0)
 
@@ -335,6 +368,7 @@ class PlanViewTests(WebTest):
         plan = Plan.objects.exclude(pk=self.plan.id).first()
         self.assertEqual(plan.title, "Plan")
         self.assertEqual(plan.goal, plan_template.goal)
+        self.assertEqual(plan.description, plan_template.description)
         self.assertEqual(plan.documents.count(), 0)
         self.assertEqual(plan.actions.count(), 1)
 
