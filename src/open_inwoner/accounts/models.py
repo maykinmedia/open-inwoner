@@ -1,3 +1,4 @@
+import os
 from datetime import date, timedelta
 from uuid import uuid4
 
@@ -25,8 +26,11 @@ from .managers import ActionQueryset, DigidManager, UserManager, eHerkenningMana
 from .query import InviteQuerySet, MessageQuerySet
 
 
-def generate_uuid_photo_name(instance, filename):
-    return "photo_{uuid}/{filename}".format(uuid=uuid4(), filename=filename)
+def generate_uuid_image_name(instance, filename):
+    filename, file_extension = os.path.splitext(filename)
+    return "profile/{uuid}/{file_extension}".format(
+        uuid=uuid4(), file_extension=file_extension.lower()
+    )
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -69,12 +73,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         max_length=15,
         validators=[validate_phone_number],
     )
-    photo = models.ImageField(
-        verbose_name=_("Photo"),
+    image = models.ImageField(
+        verbose_name=_("Image"),
         null=True,
         blank=True,
-        upload_to=generate_uuid_photo_name,
-        help_text=_("Photo"),
+        upload_to=generate_uuid_image_name,
+        help_text=_("Image"),
     )
     is_staff = models.BooleanField(
         verbose_name=_("Staff status"),
