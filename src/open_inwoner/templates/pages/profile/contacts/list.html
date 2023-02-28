@@ -1,5 +1,6 @@
 {% extends 'master.html' %}
 {% load i18n button_tags link_tags icon_tags pagination_tags form_tags dropdown_tags messages_tags thumbnail %}
+{% load i18n button_tags link_tags icon_tags pagination_tags form_tags dropdown_tags messages_tags thumbnail %}
 
 
 {% block content %}
@@ -12,53 +13,60 @@
     {% if pending_approvals %}
         {% with pending_approvals.count as approvals_count %}
             <div class="approval-container{% if approvals_count == 1 %}--solo{% endif %}">
+        <div class="approval-container{% if approvals_count == 1 %}--solo{% endif %}">
         <div class="approval">
-                    <div class="approval__header">
-                        <h2 class="h2">{% trans "U bent toegevoegd als contactpersoon" %}</h2>
-                        <p class="p">{% trans "By accepting you agree on sharing your personal data (first name, last name and phonenumber)." %}</p>
-                    </div>
-                    {% if approvals_count == 1 %}
-                        {% with pending_approvals.get as pending_approval %}
-                            <div class="approval__single">
-                                <p class="p">
-                                    {% blocktrans with full_name=pending_approval.get_full_name %}{{ full_name }} wilt u toevoegen als contactpersoon.{% endblocktrans %}
-                                </p>
-                                {% url 'accounts:contact_approval' uuid=pending_approval.uuid as approval_url %}
-                                {% render_form form=None method="POST" form_action=approval_url id="approval_form" spaceless=True show_notifications=True %}
-                                    {% csrf_token %}
-                                    {% button_row %}
-                                        {% button text=_("Weigeren") name="contact_reject" secondary=True bordered=True %}
-                                        {% button text=_("Accepteren") name="contact_approve" primary=True %}
-                                    {% endbutton_row %}
-                                {% endrender_form %}
-                            </div>
-                        {% endwith %}
-                    {% else %}
-                        <ul class="approval__list">
-                            {% for approval in pending_approvals %}
-                                <li class="approval__list-item">
-                                    <p class="p">{{ approval.get_full_name }}</p>
-                                    {% url 'accounts:contact_approval' uuid=approval.uuid as approval_url %}
+                        <div class="approval__header">
+                            <h2 class="h2">{% trans "U bent toegevoegd als contactpersoon" %}</h2>
+                            <p class="p">{% trans "By accepting you agree on sharing your personal data (first name, last name and phonenumber)." %}</p>
+                        </div>
+                        {% if approvals_count == 1 %}
+                            {% with pending_approvals.get as pending_approval %}
+                                <div class="approval__single">
+                                    <p class="p">
+                                        {% blocktrans with full_name=pending_approval.get_full_name %}{{ full_name }} wilt u toevoegen als contactpersoon.{% endblocktrans %}
+                                    </p>
+                                    {% url 'accounts:contact_approval' uuid=pending_approval.uuid as approval_url %}
                                     {% render_form form=None method="POST" form_action=approval_url id="approval_form" spaceless=True show_notifications=True %}
                                         {% csrf_token %}
                                         {% button_row %}
-                                            {% button text=_("Weigeren") name="contact_reject" value="reject" icon="close" icon_position="before" extra_classes="button--danger-borderless" %}
-                                            {% button text=_("Accepteren") name="contact_approve" value="approve" icon="check" icon_position="before" %}
+                                            {% button text=_("Weigeren") name="contact_reject" secondary=True bordered=True %}
+                                            {% button text=_("Accepteren") name="contact_approve" primary=True %}
                                         {% endbutton_row %}
                                     {% endrender_form %}
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
-                </div>
+                                </div>
+                            {% endwith %}
+                        {% else %}
+                            <ul class="approval__list">
+                                {% for approval in pending_approvals %}
+                                    <li class="approval__list-item">
+                                        <p class="p">{{ approval.get_full_name }}</p>
+                                        {% url 'accounts:contact_approval' uuid=approval.uuid as approval_url %}
+                                        {% render_form form=None method="POST" form_action=approval_url id="approval_form" spaceless=True show_notifications=True %}
+                                            {% csrf_token %}
+                                            {% button_row %}
+                                                {% button text=_("Weigeren") name="contact_reject" value="reject" icon="close" icon_position="before" extra_classes="button--danger-borderless" %}
+                                                {% button text=_("Accepteren") name="contact_approve" value="approve" icon="check" icon_position="before" %}
+                                            {% endbutton_row %}
+                                        {% endrender_form %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
         {% if approvals_count == 1 and request.user.image %}
             <div class="avatar">
                 <img src="{{ request.user.image|thumbnail_url:'avatar' }}" alt="{{ image.default_alt_text }}" />
             </div>
         {% endif %}
-        {% endwith %}
+            {% if approvals_count == 1 %}
+            <div class="avatar">
+                <img class="" src="{{ request.user.image|thumbnail_url:'avatar' }}" alt="{{ image.default_alt_text }}" />
+            </div>
+        {% endif %}
+    {% endwith %}
     </div>
-    {% endif %}
+        </div>
+{% endif %}
 
     <div class="contacts">
         {% render_form id="contact-filter" form=form method="GET" no_actions=True horizontal=True spaceless=True autosubmit=True form_action=form_action class="form form--columns-2 form--spaceless form--autosubmit form--horizontal" %}
