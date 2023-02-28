@@ -1,3 +1,4 @@
+import escapeHTML from 'escape-html'
 import 'leaflet'
 import { RD_CRS } from './rd'
 import { isMobile } from '../../lib/device/is-mobile'
@@ -73,14 +74,12 @@ class Map {
    * @return {string}
    */
   featureToHTML(feature) {
-    const escapeHtml = require('escape-html')
-
     const { name, ...properties } = feature.properties
-    const displayName = name ? escapeHtml(name) : ''
+    const displayName = name ? escapeHTML(name) : ''
     let finalHTML = ``
 
     Object.entries(properties).forEach((property) => {
-      finalHTML += `<p class="p">${escapeHtml(property[1])}</p>`
+      finalHTML += `<p class="p">${escapeHTML(property[1])}</p>`
     })
 
     return `
