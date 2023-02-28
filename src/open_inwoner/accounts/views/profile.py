@@ -185,7 +185,6 @@ class MyDataView(
             "prefix": "naam.voorvoegsel",
             "birthday": "geboorte.datum.datum",
             "birthday_place": "geboorte.plaats.omschrijving",
-            "birthday_country": "geboorte.land.omschrijving",
             "gender": (
                 "geslachtsaanduiding.omschrijving"
                 if brp_version == "2.0"
