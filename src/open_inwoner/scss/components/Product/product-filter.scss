@@ -4,10 +4,10 @@
 
   &__item {
     padding: var(--spacing-extra-large);
-    border-bottom: 1px solid vaR(--color-gray-light);
+    border-bottom: 1px solid var(--color-gray-light);
 
     &:first-child {
-      border-top: 1px solid vaR(--color-gray-light);
+      border-top: 1px solid var(--color-gray-light);
     }
   }
 }

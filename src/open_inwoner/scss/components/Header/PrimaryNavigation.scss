@@ -13,6 +13,7 @@
     grid-area: nav;
     display: flex;
     flex-direction: column;
+    gap: var(--spacing-medium);
     list-style: none;
     margin: 0;
     padding: 0;
@@ -37,6 +38,13 @@
 
       @media (min-width: 768px) {
         display: block;
+      }
+    }
+
+    .secondary-navigation {
+      padding-left: var(--spacing-extra-large);
+      .primary-navigation__list-item {
+        list-style-type: none;
       }
     }
 
