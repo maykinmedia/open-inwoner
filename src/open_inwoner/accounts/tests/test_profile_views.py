@@ -350,7 +350,7 @@ class EditProfileTests(WebTest):
 
         self.assertEqual(type(form), BrpUserForm)
 
-    def test_photo_is_saved_when_begeleider_and_default_login(self):
+    def test_image_is_saved_when_begeleider_and_default_login(self):
         self.user.contact_type = ContactTypeChoices.begeleider
         self.user.save()
 
@@ -361,18 +361,18 @@ class EditProfileTests(WebTest):
 
         response = self.app.get(self.url, user=self.user, status=200)
         form = response.forms["profile-edit"]
-        form["photo"] = Upload("test_image.png", img_bytes, "image/png")
+        form["image"] = Upload("test_image.png", img_bytes, "image/png")
         form_response = form.submit()
 
         self.assertRedirects(form_response, reverse("accounts:my_profile"))
         with self.assertRaises(ValueError):
-            self.user.photo.file
+            self.user.image.file
 
         self.user.refresh_from_db()
 
-        self.assertIsNotNone(self.user.photo.file)
+        self.assertIsNotNone(self.user.image.file)
 
-    def test_photo_is_saved_when_begeleider_and_digid_login(self):
+    def test_image_is_saved_when_begeleider_and_digid_login(self):
         self.user.contact_type = ContactTypeChoices.begeleider
         self.user.login_type = LoginTypeChoices.digid
         self.user.save()
@@ -384,18 +384,18 @@ class EditProfileTests(WebTest):
 
         response = self.app.get(self.url, user=self.user, status=200)
         form = response.forms["profile-edit"]
-        form["photo"] = Upload("test_image.png", img_bytes, "image/png")
+        form["image"] = Upload("test_image.png", img_bytes, "image/png")
         form_response = form.submit()
 
         self.assertRedirects(form_response, reverse("accounts:my_profile"))
         with self.assertRaises(ValueError):
-            self.user.photo.file
+            self.user.image.file
 
         self.user.refresh_from_db()
 
-        self.assertIsNotNone(self.user.photo.file)
+        self.assertIsNotNone(self.user.image.file)
 
-    def test_photo_is_not_saved_when_no_begeleider_and_default_login(self):
+    def test_image_is_not_saved_when_no_begeleider_and_default_login(self):
         image = Image.new("RGB", (10, 10))
         byteIO = io.BytesIO()
         image.save(byteIO, format="png")
@@ -403,15 +403,15 @@ class EditProfileTests(WebTest):
 
         response = self.app.get(self.url, user=self.user, status=200)
         form = response.forms["profile-edit"]
-        form["photo"] = Upload("test_image.png", img_bytes, "image/png")
+        form["image"] = Upload("test_image.png", img_bytes, "image/png")
         form.submit()
 
         self.user.refresh_from_db()
 
         with self.assertRaises(ValueError):
-            self.user.photo.file
+            self.user.image.file
 
-    def test_photo_is_not_saved_when_no_begeleider_and_digid_login(self):
+    def test_image_is_not_saved_when_no_begeleider_and_digid_login(self):
         self.user.login_type = LoginTypeChoices.digid
         self.user.save()
 
@@ -422,13 +422,13 @@ class EditProfileTests(WebTest):
 
         response = self.app.get(self.url, user=self.user, status=200)
         form = response.forms["profile-edit"]
-        form["photo"] = Upload("test_image.png", img_bytes, "image/png")
+        form["image"] = Upload("test_image.png", img_bytes, "image/png")
         form.submit()
 
         self.user.refresh_from_db()
 
         with self.assertRaises(ValueError):
-            self.user.photo.file
+            self.user.image.file
 
 
 @requests_mock.Mocker()
