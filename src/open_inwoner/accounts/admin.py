@@ -25,10 +25,10 @@ class _UserChangeForm(UserChangeForm):
         cleaned_data = super().clean(*args, **kwargs)
 
         if (
-            cleaned_data.get("photo")
+            cleaned_data.get("image")
             and cleaned_data.get("contact_type") != ContactTypeChoices.begeleider
         ):
-            raise ValidationError(_("Only a 'begeleider' user can add a photo."))
+            raise ValidationError(_("Only a 'begeleider' user can add an image."))
 
         if cleaned_data.get("email"):
 
@@ -73,7 +73,7 @@ class _UserAdmin(UserAdmin):
                     "rsin",
                     "oidc_id",
                     "birthday",
-                    "photo",
+                    "image",
                     "street",
                     "housenumber",
                     "postcode",
