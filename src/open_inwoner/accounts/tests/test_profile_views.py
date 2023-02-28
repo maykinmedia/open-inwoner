@@ -356,7 +356,6 @@ class MyDataTests(HaalCentraalMixin, WebTest):
         "prefix": None,
         "birthday": "10-04-1982",
         "birthday_place": "Leerdam",
-        "birthday_country": "Nederland",
         "gender": "vrouw",
         "street": "King Olivereiland",
         "house_number": 64,
