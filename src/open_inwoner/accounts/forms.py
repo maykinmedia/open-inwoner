@@ -68,15 +68,15 @@ class BaseUserForm(forms.ModelForm):
             "display_name",
             "email",
             "phonenumber",
-            "photo",
+            "image",
         )
 
     def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields["photo"].help_text = None
+        self.fields["image"].help_text = None
         if user.contact_type != ContactTypeChoices.begeleider:
-            self.fields["photo"].widget = forms.HiddenInput()
+            self.fields["image"].widget = forms.HiddenInput()
 
 
 class UserForm(BaseUserForm):
@@ -93,7 +93,7 @@ class UserForm(BaseUserForm):
             "housenumber",
             "postcode",
             "city",
-            "photo",
+            "image",
         )
 
 
