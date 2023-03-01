@@ -2,6 +2,12 @@
   &--solo {
     display: flex;
 
+    @media (min-width: 768px) {
+      > .approval {
+        width: 50%;
+      }
+    }
+
     .avatar {
       padding: 15px 15px 10px;
       margin-top: var(--gutter-width);
@@ -56,10 +62,6 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 0 var(--spacing-giant);
-    }
-
-    &--solo {
-      width: 50%;
     }
   }
 }

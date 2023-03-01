@@ -12,7 +12,7 @@
 {% if pending_approvals %}
     {% with pending_approvals.count as approvals_count %}
     <div class="approval-container{% if approvals_count == 1 %}--solo{% endif %}">
-        <div class="approval{% if approvals_count == 1 %} approval--solo{% endif %}">
+        <div class="approval">
             <div class="approval__header">
                 <h2 class="h2">{% trans "U bent toegevoegd als contactpersoon" %}</h2>
                 <p class="p">{% trans "By accepting you agree on sharing your personal data (first name, last name and phonenumber)." %}</p>
