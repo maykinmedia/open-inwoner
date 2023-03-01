@@ -28,7 +28,7 @@ from .query import InviteQuerySet, MessageQuerySet
 
 def generate_uuid_image_name(instance, filename):
     filename, file_extension = os.path.splitext(filename)
-    return "profile/{uuid}/{file_extension}".format(
+    return "profile/{uuid}{file_extension}".format(
         uuid=uuid4(), file_extension=file_extension.lower()
     )
 
