@@ -195,6 +195,14 @@ class SiteConfiguration(SingletonModel):
         verbose_name=_("Edit goal message"),
         help_text=_("The message when a user edits a goal."),
     )
+    plans_banner = FilerImageField(
+        verbose_name=_("Plans banner"),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="plans_banner",
+        help_text=_("Banner of the plans"),
+    )
 
     footer_visiting_title = models.CharField(
         max_length=255,
