@@ -1,46 +1,112 @@
 openapi: 3.0.0
 info:
   title: Zaken API
-  description: "Een API om een zaakregistratiecomponent (ZRC) te benaderen.\n\nDe\
-    \ ZAAK is het kernobject in deze API, waaraan verschillende andere\nresources\
-    \ gerelateerd zijn. De Zaken API werkt samen met andere API's voor\nZaakgericht\
-    \ werken om tot volledige functionaliteit te komen.\n\n**Afhankelijkheden**\n\n\
-    Deze API is afhankelijk van:\n\n* Catalogi API\n* Notificaties API\n* Documenten\
-    \ API *(optioneel)*\n* Besluiten API *(optioneel)*\n* Autorisaties API *(optioneel)*\n\
-    \n\n### Autorisatie\n\nDeze API vereist autorisatie.\n\n_Zelf een token genereren_\n\
-    \nDe tokens die gebruikt worden voor autorisatie zijn [jwt.io][JWT's] (JSON web\n\
-    token). In de API calls moeten deze gebruikt worden in de `Authorization`\nheader:\n\
-    \n```\nAuthorization: Bearer <token>\n```\n\nOm een JWT te genereren heb je een\
-    \ `client ID` en een `secret` nodig. Het JWT\nmoet gebouwd worden volgens het\
-    \ `HS256` algoritme. De vereiste payload is:\n\n```json\n{\n    \"iss\": \"<client\
-    \ ID>\",\n    \"iat\": 1572863906,\n    \"client_id\": \"<client ID>\",\n    \"\
-    user_id\": \"<user identifier>\",\n    \"user_representation\": \"<user representation>\"\
-    \n}\n```\n\nAls `issuer` gebruik je dus je eigen client ID. De `iat` timestamp\
-    \ is een\nUNIX-timestamp die aangeeft op welk moment het token gegenereerd is.\n\
-    \n`user_id` en `user_representation` zijn nodig voor de audit trails. Het zijn\n\
-    vrije velden met als enige beperking dat de lengte maximaal de lengte van\nde\
-    \ overeenkomstige velden in de audit trail resources is (zie rest API spec).\n\
-    \n\n### Notificaties\n\nDeze API publiceert notificaties op het kanaal `zaken`.\n\
-    \n**Main resource**\n\n`zaak`\n\n\n\n**Kenmerken**\n\n* `bronorganisatie`: Het\
-    \ RSIN van de Niet-natuurlijk persoon zijnde de organisatie die de zaak heeft\
-    \ gecreeerd. Dit moet een geldig RSIN zijn van 9 nummers en voldoen aan https://nl.wikipedia.org/wiki/Burgerservicenummer#11-proef\n\
-    * `zaaktype`: URL-referentie naar het ZAAKTYPE (in de Catalogi API).\n* `vertrouwelijkheidaanduiding`:\
-    \ Aanduiding van de mate waarin het zaakdossier van de ZAAK voor de openbaarheid\
-    \ bestemd is.\n\n**Resources en acties**\n- `zaak`: create, update, destroy\n\
-    - `status`: create\n- `zaakobject`: create\n- `zaakinformatieobject`: create\n\
-    - `zaakeigenschap`: create\n- `klantcontact`: create\n- `rol`: create, destroy\n\
-    - `resultaat`: create, update, destroy\n- `zaakbesluit`: create\n\n\n**Handige\
-    \ links**\n\n* [API-documentatie](https://vng-realisatie.github.io/gemma-zaken/standaard/)\n\
-    * [Open Zaak documentatie](https://open-zaak.readthedocs.io/en/latest/)\n* [Zaakgericht\
-    \ werken](https://www.vngrealisatie.nl/producten/api-standaarden-zaakgericht-werken)\n\
-    * [Open Zaak GitHub](https://github.com/open-zaak/open-zaak)\n"
+  description: 'Een API om een zaakregistratiecomponent (ZRC) te benaderen.
+
+
+    De ZAAK is het kernobject in deze API, waaraan verschillende andere
+
+    resources gerelateerd zijn. De Zaken API werkt samen met andere API''s voor
+
+    Zaakgericht werken om tot volledige functionaliteit te komen.
+
+
+    **Afhankelijkheden**
+
+
+    Deze API is afhankelijk van:
+
+
+    * Catalogi API
+
+    * Notificaties API
+
+    * Documenten API *(optioneel)*
+
+    * Besluiten API *(optioneel)*
+
+    * Autorisaties API *(optioneel)*
+
+
+    **Autorisatie**
+
+
+    Deze API vereist autorisatie. Je kan de
+
+    [token-tool](https://zaken-auth.vng.cloud/) gebruiken om JWT-tokens te
+
+    genereren.
+
+
+    ### Notificaties
+
+
+    Deze API publiceert notificaties op het kanaal `zaken`.
+
+
+    **Main resource**
+
+
+    `zaak`
+
+
+
+
+    **Kenmerken**
+
+
+    * `bronorganisatie`: Het RSIN van de Niet-natuurlijk persoon zijnde de organisatie
+    die de zaak heeft gecreeerd. Dit moet een geldig RSIN zijn van 9 nummers en voldoen
+    aan https://nl.wikipedia.org/wiki/Burgerservicenummer#11-proef
+
+    * `zaaktype`: URL-referentie naar het ZAAKTYPE (in de Catalogi API) in de CATALOGUS
+    waar deze voorkomt
+
+    * `vertrouwelijkheidaanduiding`: Aanduiding van de mate waarin het zaakdossier
+    van de ZAAK voor de openbaarheid bestemd is.
+
+
+    **Resources en acties**
+
+    - `zaak`: create, update, destroy
+
+    - `status`: create
+
+    - `zaakobject`: create, update, destroy
+
+    - `zaakinformatieobject`: create
+
+    - `zaakeigenschap`: create, update, destroy
+
+    - `klantcontact`: create
+
+    - `rol`: create, destroy
+
+    - `resultaat`: create, update, destroy
+
+    - `zaakbesluit`: create
+
+    - `zaakcontactmoment`: create
+
+    - `zaakverzoek`: create
+
+
+
+    **Handige links**
+
+
+    * [Documentatie](https://vng-realisatie.github.io/gemma-zaken/standaard)
+
+    * [Zaakgericht werken](https://vng-realisatie.github.io/gemma-zaken)
+
+    '
   contact:
-    url: https://www.maykinmedia.nl
-    email: support@maykinmedia.nl
+    url: https://vng-realisatie.github.io/gemma-zaken
+    email: standaarden.ondersteuning@vng.nl
   license:
     name: EUPL 1.2
     url: https://opensource.org/licenses/EUPL-1.2
-  version: 1.0.3
+  version: 1.2.0
 security:
 - JWT-Claims: []
 paths:
@@ -48,7 +114,10 @@ paths:
     get:
       operationId: klantcontact_list
       summary: Alle KLANTCONTACTen opvragen.
-      description: Alle KLANTCONTACTen opvragen.
+      description: 'Alle KLANTCONTACTen opvragen.
+
+
+        **DEPRECATED**: gebruik de contactmomenten API in plaats van deze endpoint.'
       parameters:
       - name: zaak
         in: query
@@ -72,6 +141,11 @@ paths:
                 type: string
               description: 'Geeft een specifieke API-versie aan in de context van
                 een specifieke aanroep. Voorbeeld: 1.2.1.'
+            Warning:
+              schema:
+                type: string
+              description: Geeft een endpoint-specifieke waarschuwing, zoals het uitfaseren
+                van functionaliteit.
           content:
             application/json:
               schema:
@@ -117,13 +191,25 @@ paths:
       security:
       - JWT-Claims:
         - zaken.lezen
+      deprecated: true
     post:
       operationId: klantcontact_create
       summary: Maak een KLANTCONTACT bij een ZAAK aan.
       description: 'Indien geen identificatie gegeven is, dan wordt deze automatisch
 
-        gegenereerd.'
+        gegenereerd.
+
+
+        **DEPRECATED**: gebruik de contactmomenten API in plaats van deze endpoint.'
       parameters:
+      - name: Content-Type
+        in: header
+        description: Content type van de verzoekinhoud.
+        required: true
+        schema:
+          type: string
+          enum:
+          - application/json
       - name: X-NLX-Logrecord-ID
         in: header
         description: Identifier of the request, traceable throughout the network
@@ -156,6 +242,11 @@ paths:
                 type: string
                 format: uri
               description: URL waar de resource leeft.
+            Warning:
+              schema:
+                type: string
+              description: Geeft een endpoint-specifieke waarschuwing, zoals het uitfaseren
+                van functionaliteit.
           content:
             application/json:
               schema:
@@ -183,21 +274,55 @@ paths:
       security:
       - JWT-Claims:
         - (zaken.bijwerken | zaken.geforceerd-bijwerken)
+      deprecated: true
     parameters: []
   /klantcontacten/{uuid}:
     get:
       operationId: klantcontact_read
       summary: Een specifiek KLANTCONTACT bij een ZAAK opvragen.
-      description: Een specifiek KLANTCONTACT bij een ZAAK opvragen.
+      description: 'Een specifiek KLANTCONTACT bij een ZAAK opvragen.
+
+
+        **DEPRECATED**: gebruik de contactmomenten API in plaats van deze endpoint.'
+      parameters:
+      - name: If-None-Match
+        in: header
+        description: "Voer een voorwaardelijk verzoek uit. Deze header moet \xE9\xE9\
+          n of meerdere ETag-waardes bevatten van resources die de consumer gecached\
+          \ heeft. Indien de waarde van de ETag van de huidige resource voorkomt in\
+          \ deze set, dan antwoordt de provider met een lege HTTP 304 request. Zie\
+          \ [MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match)\
+          \ voor meer informatie."
+        required: false
+        examples:
+          oneValue:
+            summary: "E\xE9n ETag-waarde"
+            value: '"79054025255fb1a26e4bc422aef54eb4"'
+          multipleValues:
+            summary: Meerdere ETag-waardes
+            value: '"79054025255fb1a26e4bc422aef54eb4", "e4d909c290d0fb1ca068ffaddf22cbd0"'
+        schema:
+          type: string
       responses:
         '200':
           description: OK
           headers:
+            ETag:
+              description: De ETag berekend op de response body JSON. Indien twee
+                resources exact dezelfde ETag hebben, dan zijn deze resources identiek
+                aan elkaar. Je kan de ETag gebruiken om caching te implementeren.
+              schema:
+                type: string
             API-version:
               schema:
                 type: string
               description: 'Geeft een specifieke API-versie aan in de context van
                 een specifieke aanroep. Voorbeeld: 1.2.1.'
+            Warning:
+              schema:
+                type: string
+              description: Geeft een endpoint-specifieke waarschuwing, zoals het uitfaseren
+                van functionaliteit.
           content:
             application/json:
               schema:
@@ -225,6 +350,7 @@ paths:
       security:
       - JWT-Claims:
         - zaken.lezen
+      deprecated: true
     parameters:
     - name: uuid
       in: path
@@ -322,6 +448,14 @@ paths:
 
         - geldigheid URL naar het RESULTAATTYPE'
       parameters:
+      - name: Content-Type
+        in: header
+        description: Content type van de verzoekinhoud.
+        required: true
+        schema:
+          type: string
+          enum:
+          - application/json
       - name: X-NLX-Logrecord-ID
         in: header
         description: Identifier of the request, traceable throughout the network
@@ -383,10 +517,35 @@ paths:
       operationId: resultaat_read
       summary: Een specifiek RESULTAAT opvragen.
       description: Een specifiek RESULTAAT opvragen.
+      parameters:
+      - name: If-None-Match
+        in: header
+        description: "Voer een voorwaardelijk verzoek uit. Deze header moet \xE9\xE9\
+          n of meerdere ETag-waardes bevatten van resources die de consumer gecached\
+          \ heeft. Indien de waarde van de ETag van de huidige resource voorkomt in\
+          \ deze set, dan antwoordt de provider met een lege HTTP 304 request. Zie\
+          \ [MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match)\
+          \ voor meer informatie."
+        required: false
+        examples:
+          oneValue:
+            summary: "E\xE9n ETag-waarde"
+            value: '"79054025255fb1a26e4bc422aef54eb4"'
+          multipleValues:
+            summary: Meerdere ETag-waardes
+            value: '"79054025255fb1a26e4bc422aef54eb4", "e4d909c290d0fb1ca068ffaddf22cbd0"'
+        schema:
+          type: string
       responses:
         '200':
           description: OK
           headers:
+            ETag:
+              description: De ETag berekend op de response body JSON. Indien twee
+                resources exact dezelfde ETag hebben, dan zijn deze resources identiek
+                aan elkaar. Je kan de ETag gebruiken om caching te implementeren.
+              schema:
+                type: string
             API-version:
               schema:
                 type: string
@@ -419,6 +578,49 @@ paths:
       security:
       - JWT-Claims:
         - zaken.lezen
+    head:
+      operationId: resultaat_headers
+      summary: De headers voor een specifiek(e) RESULTAAT opvragen
+      description: Vraag de headers op die je bij een GET request zou krijgen.
+      parameters:
+      - name: If-None-Match
+        in: header
+        description: "Voer een voorwaardelijk verzoek uit. Deze header moet \xE9\xE9\
+          n of meerdere ETag-waardes bevatten van resources die de consumer gecached\
+          \ heeft. Indien de waarde van de ETag van de huidige resource voorkomt in\
+          \ deze set, dan antwoordt de provider met een lege HTTP 304 request. Zie\
+          \ [MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match)\
+          \ voor meer informatie."
+        required: false
+        examples:
+          oneValue:
+            summary: "E\xE9n ETag-waarde"
+            value: '"79054025255fb1a26e4bc422aef54eb4"'
+          multipleValues:
+            summary: Meerdere ETag-waardes
+            value: '"79054025255fb1a26e4bc422aef54eb4", "e4d909c290d0fb1ca068ffaddf22cbd0"'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          headers:
+            ETag:
+              description: De ETag berekend op de response body JSON. Indien twee
+                resources exact dezelfde ETag hebben, dan zijn deze resources identiek
+                aan elkaar. Je kan de ETag gebruiken om caching te implementeren.
+              schema:
+                type: string
+            API-version:
+              schema:
+                type: string
+              description: 'Geeft een specifieke API-versie aan in de context van
+                een specifieke aanroep. Voorbeeld: 1.2.1.'
+      tags:
+      - resultaten
+      security:
+      - JWT-Claims:
+        - zaken.lezen
     put:
       operationId: resultaat_update
       summary: Werk een RESULTAAT in zijn geheel bij.
@@ -428,6 +630,14 @@ paths:
 
         - het RESULTAATTYPE mag niet gewijzigd worden'
       parameters:
+      - name: Content-Type
+        in: header
+        description: Content type van de verzoekinhoud.
+        required: true
+        schema:
+          type: string
+          enum:
+          - application/json
       - name: X-NLX-Logrecord-ID
         in: header
         description: Identifier of the request, traceable throughout the network
@@ -489,6 +699,14 @@ paths:
 
         - het RESULTAATTYPE mag niet gewijzigd worden'
       parameters:
+      - name: Content-Type
+        in: header
+        description: Content type van de verzoekinhoud.
+        required: true
+        schema:
+          type: string
+          enum:
+          - application/json
       - name: X-NLX-Logrecord-ID
         in: header
         description: Identifier of the request, traceable throughout the network
@@ -670,7 +888,7 @@ paths:
         required: false
         schema:
           type: string
-      - name: betrokkeneIdentificatie__organisatorischeeenheid__identificatie
+      - name: betrokkeneIdentificatie__organisatorischeEenheid__identificatie
         in: query
         description: Een korte identificatie van de organisatorische eenheid.
         required: false
@@ -776,6 +994,14 @@ paths:
       summary: Maak een ROL aan bij een ZAAK.
       description: Maak een ROL aan bij een ZAAK.
       parameters:
+      - name: Content-Type
+        in: header
+        description: Content type van de verzoekinhoud.
+        required: true
+        schema:
+          type: string
+          enum:
+          - application/json
       - name: X-NLX-Logrecord-ID
         in: header
         description: Identifier of the request, traceable throughout the network
@@ -841,10 +1067,35 @@ paths:
       operationId: rol_read
       summary: Een specifieke ROL bij een ZAAK opvragen.
       description: Een specifieke ROL bij een ZAAK opvragen.
+      parameters:
+      - name: If-None-Match
+        in: header
+        description: "Voer een voorwaardelijk verzoek uit. Deze header moet \xE9\xE9\
+          n of meerdere ETag-waardes bevatten van resources die de consumer gecached\
+          \ heeft. Indien de waarde van de ETag van de huidige resource voorkomt in\
+          \ deze set, dan antwoordt de provider met een lege HTTP 304 request. Zie\
+          \ [MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match)\
+          \ voor meer informatie."
+        required: false
+        examples:
+          oneValue:
+            summary: "E\xE9n ETag-waarde"
+            value: '"79054025255fb1a26e4bc422aef54eb4"'
+          multipleValues:
+            summary: Meerdere ETag-waardes
+            value: '"79054025255fb1a26e4bc422aef54eb4", "e4d909c290d0fb1ca068ffaddf22cbd0"'
+        schema:
+          type: string
       responses:
         '200':
           description: OK
           headers:
+            ETag:
+              description: De ETag berekend op de response body JSON. Indien twee
+                resources exact dezelfde ETag hebben, dan zijn deze resources identiek
+                aan elkaar. Je kan de ETag gebruiken om caching te implementeren.
+              schema:
+                type: string
             API-version:
               schema:
                 type: string
@@ -872,6 +1123,49 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
+      tags:
+      - rollen
+      security:
+      - JWT-Claims:
+        - zaken.lezen
+    head:
+      operationId: rol_headers
+      summary: De headers voor een specifiek(e) ROL opvragen
+      description: Vraag de headers op die je bij een GET request zou krijgen.
+      parameters:
+      - name: If-None-Match
+        in: header
+        description: "Voer een voorwaardelijk verzoek uit. Deze header moet \xE9\xE9\
+          n of meerdere ETag-waardes bevatten van resources die de consumer gecached\
+          \ heeft. Indien de waarde van de ETag van de huidige resource voorkomt in\
+          \ deze set, dan antwoordt de provider met een lege HTTP 304 request. Zie\
+          \ [MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match)\
+          \ voor meer informatie."
+        required: false
+        examples:
+          oneValue:
+            summary: "E\xE9n ETag-waarde"
+            value: '"79054025255fb1a26e4bc422aef54eb4"'
+          multipleValues:
+            summary: Meerdere ETag-waardes
+            value: '"79054025255fb1a26e4bc422aef54eb4", "e4d909c290d0fb1ca068ffaddf22cbd0"'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          headers:
+            ETag:
+              description: De ETag berekend op de response body JSON. Indien twee
+                resources exact dezelfde ETag hebben, dan zijn deze resources identiek
+                aan elkaar. Je kan de ETag gebruiken om caching te implementeren.
+              schema:
+                type: string
+            API-version:
+              schema:
+                type: string
+              description: 'Geeft een specifieke API-versie aan in de context van
+                een specifieke aanroep. Voorbeeld: 1.2.1.'
       tags:
       - rollen
       security:
@@ -1024,6 +1318,14 @@ paths:
         \ de eindstatus is (volgens het ZTC), dan wordt de\n  zaak afgesloten door\
         \ de einddatum te zetten."
       parameters:
+      - name: Content-Type
+        in: header
+        description: Content type van de verzoekinhoud.
+        required: true
+        schema:
+          type: string
+          enum:
+          - application/json
       - name: X-NLX-Logrecord-ID
         in: header
         description: Identifier of the request, traceable throughout the network
@@ -1089,10 +1391,35 @@ paths:
       operationId: status_read
       summary: Een specifieke STATUS van een ZAAK opvragen.
       description: Een specifieke STATUS van een ZAAK opvragen.
+      parameters:
+      - name: If-None-Match
+        in: header
+        description: "Voer een voorwaardelijk verzoek uit. Deze header moet \xE9\xE9\
+          n of meerdere ETag-waardes bevatten van resources die de consumer gecached\
+          \ heeft. Indien de waarde van de ETag van de huidige resource voorkomt in\
+          \ deze set, dan antwoordt de provider met een lege HTTP 304 request. Zie\
+          \ [MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match)\
+          \ voor meer informatie."
+        required: false
+        examples:
+          oneValue:
+            summary: "E\xE9n ETag-waarde"
+            value: '"79054025255fb1a26e4bc422aef54eb4"'
+          multipleValues:
+            summary: Meerdere ETag-waardes
+            value: '"79054025255fb1a26e4bc422aef54eb4", "e4d909c290d0fb1ca068ffaddf22cbd0"'
+        schema:
+          type: string
       responses:
         '200':
           description: OK
           headers:
+            ETag:
+              description: De ETag berekend op de response body JSON. Indien twee
+                resources exact dezelfde ETag hebben, dan zijn deze resources identiek
+                aan elkaar. Je kan de ETag gebruiken om caching te implementeren.
+              schema:
+                type: string
             API-version:
               schema:
                 type: string
@@ -1125,6 +1452,305 @@ paths:
       security:
       - JWT-Claims:
         - zaken.lezen
+    head:
+      operationId: status_headers
+      summary: De headers voor een specifiek(e) STATUS opvragen
+      description: Vraag de headers op die je bij een GET request zou krijgen.
+      parameters:
+      - name: If-None-Match
+        in: header
+        description: "Voer een voorwaardelijk verzoek uit. Deze header moet \xE9\xE9\
+          n of meerdere ETag-waardes bevatten van resources die de consumer gecached\
+          \ heeft. Indien de waarde van de ETag van de huidige resource voorkomt in\
+          \ deze set, dan antwoordt de provider met een lege HTTP 304 request. Zie\
+          \ [MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match)\
+          \ voor meer informatie."
+        required: false
+        examples:
+          oneValue:
+            summary: "E\xE9n ETag-waarde"
+            value: '"79054025255fb1a26e4bc422aef54eb4"'
+          multipleValues:
+            summary: Meerdere ETag-waardes
+            value: '"79054025255fb1a26e4bc422aef54eb4", "e4d909c290d0fb1ca068ffaddf22cbd0"'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          headers:
+            ETag:
+              description: De ETag berekend op de response body JSON. Indien twee
+                resources exact dezelfde ETag hebben, dan zijn deze resources identiek
+                aan elkaar. Je kan de ETag gebruiken om caching te implementeren.
+              schema:
+                type: string
+            API-version:
+              schema:
+                type: string
+              description: 'Geeft een specifieke API-versie aan in de context van
+                een specifieke aanroep. Voorbeeld: 1.2.1.'
+      tags:
+      - statussen
+      security:
+      - JWT-Claims:
+        - zaken.lezen
+    parameters:
+    - name: uuid
+      in: path
+      description: Unieke resource identifier (UUID4)
+      required: true
+      schema:
+        type: string
+        format: uuid
+  /zaakcontactmomenten:
+    get:
+      operationId: zaakcontactmoment_list
+      summary: Alle ZAAKCONTACTMOMENTen opvragen.
+      description: Alle ZAAKCONTACTMOMENTen opvragen.
+      parameters:
+      - name: zaak
+        in: query
+        description: URL-referentie naar de ZAAK.
+        required: false
+        schema:
+          type: string
+          format: uri
+      - name: contactmoment
+        in: query
+        description: URL-referentie naar het CONTACTMOMENT (in de Klantinteractie
+          API)
+        required: false
+        schema:
+          type: string
+          format: uri
+      responses:
+        '200':
+          description: OK
+          headers:
+            API-version:
+              schema:
+                type: string
+              description: 'Geeft een specifieke API-versie aan in de context van
+                een specifieke aanroep. Voorbeeld: 1.2.1.'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ZaakContactMoment'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '406':
+          $ref: '#/components/responses/406'
+        '409':
+          $ref: '#/components/responses/409'
+        '410':
+          $ref: '#/components/responses/410'
+        '415':
+          $ref: '#/components/responses/415'
+        '429':
+          $ref: '#/components/responses/429'
+        '500':
+          $ref: '#/components/responses/500'
+      tags:
+      - zaakcontactmomenten
+      security:
+      - JWT-Claims:
+        - zaken.lezen
+    post:
+      operationId: zaakcontactmoment_create
+      summary: Maak een ZAAKCONTACTMOMENT aan.
+      description: '**Er wordt gevalideerd op**
+
+        - geldigheid URL naar de CONTACTMOMENT'
+      parameters:
+      - name: Content-Type
+        in: header
+        description: Content type van de verzoekinhoud.
+        required: true
+        schema:
+          type: string
+          enum:
+          - application/json
+      - name: X-NLX-Logrecord-ID
+        in: header
+        description: Identifier of the request, traceable throughout the network
+        required: false
+        schema:
+          type: string
+      - name: X-Audit-Toelichting
+        in: header
+        description: Toelichting waarom een bepaald verzoek wordt gedaan
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ZaakContactMoment'
+        required: true
+      responses:
+        '201':
+          description: Created
+          headers:
+            API-version:
+              schema:
+                type: string
+              description: 'Geeft een specifieke API-versie aan in de context van
+                een specifieke aanroep. Voorbeeld: 1.2.1.'
+            Location:
+              schema:
+                type: string
+                format: uri
+              description: URL waar de resource leeft.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ZaakContactMoment'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '406':
+          $ref: '#/components/responses/406'
+        '409':
+          $ref: '#/components/responses/409'
+        '410':
+          $ref: '#/components/responses/410'
+        '415':
+          $ref: '#/components/responses/415'
+        '429':
+          $ref: '#/components/responses/429'
+        '500':
+          $ref: '#/components/responses/500'
+      tags:
+      - zaakcontactmomenten
+      security:
+      - JWT-Claims:
+        - zaken.bijwerken
+    parameters: []
+  /zaakcontactmomenten/{uuid}:
+    get:
+      operationId: zaakcontactmoment_read
+      summary: Een specifiek ZAAKCONTACTMOMENT opvragen.
+      description: Een specifiek ZAAKCONTACTMOMENT opvragen.
+      parameters:
+      - name: If-None-Match
+        in: header
+        description: "Voer een voorwaardelijk verzoek uit. Deze header moet \xE9\xE9\
+          n of meerdere ETag-waardes bevatten van resources die de consumer gecached\
+          \ heeft. Indien de waarde van de ETag van de huidige resource voorkomt in\
+          \ deze set, dan antwoordt de provider met een lege HTTP 304 request. Zie\
+          \ [MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match)\
+          \ voor meer informatie."
+        required: false
+        examples:
+          oneValue:
+            summary: "E\xE9n ETag-waarde"
+            value: '"79054025255fb1a26e4bc422aef54eb4"'
+          multipleValues:
+            summary: Meerdere ETag-waardes
+            value: '"79054025255fb1a26e4bc422aef54eb4", "e4d909c290d0fb1ca068ffaddf22cbd0"'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          headers:
+            ETag:
+              description: De ETag berekend op de response body JSON. Indien twee
+                resources exact dezelfde ETag hebben, dan zijn deze resources identiek
+                aan elkaar. Je kan de ETag gebruiken om caching te implementeren.
+              schema:
+                type: string
+            API-version:
+              schema:
+                type: string
+              description: 'Geeft een specifieke API-versie aan in de context van
+                een specifieke aanroep. Voorbeeld: 1.2.1.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ZaakContactMoment'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '406':
+          $ref: '#/components/responses/406'
+        '409':
+          $ref: '#/components/responses/409'
+        '410':
+          $ref: '#/components/responses/410'
+        '415':
+          $ref: '#/components/responses/415'
+        '429':
+          $ref: '#/components/responses/429'
+        '500':
+          $ref: '#/components/responses/500'
+      tags:
+      - zaakcontactmomenten
+      security:
+      - JWT-Claims:
+        - zaken.lezen
+    delete:
+      operationId: zaakcontactmoment_delete
+      description: Verwijder een ZAAKCONTACTMOMENT.
+      parameters:
+      - name: X-NLX-Logrecord-ID
+        in: header
+        description: Identifier of the request, traceable throughout the network
+        required: false
+        schema:
+          type: string
+      - name: X-Audit-Toelichting
+        in: header
+        description: Toelichting waarom een bepaald verzoek wordt gedaan
+        required: false
+        schema:
+          type: string
+      responses:
+        '204':
+          description: No content
+          headers:
+            API-version:
+              schema:
+                type: string
+              description: 'Geeft een specifieke API-versie aan in de context van
+                een specifieke aanroep. Voorbeeld: 1.2.1.'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '406':
+          $ref: '#/components/responses/406'
+        '409':
+          $ref: '#/components/responses/409'
+        '410':
+          $ref: '#/components/responses/410'
+        '415':
+          $ref: '#/components/responses/415'
+        '429':
+          $ref: '#/components/responses/429'
+        '500':
+          $ref: '#/components/responses/500'
+      tags:
+      - zaakcontactmomenten
+      security:
+      - JWT-Claims:
+        - zaken.bijwerken
     parameters:
     - name: uuid
       in: path
@@ -1204,6 +1830,14 @@ paths:
         \nRegistreer welk(e) INFORMATIEOBJECT(en) een ZAAK kent.\n\n**Er wordt gevalideerd\
         \ op**\n- geldigheid informatieobject URL\n- uniek zijn van relatie ZAAK-INFORMATIEOBJECT"
       parameters:
+      - name: Content-Type
+        in: header
+        description: Content type van de verzoekinhoud.
+        required: true
+        schema:
+          type: string
+          enum:
+          - application/json
       - name: X-NLX-Logrecord-ID
         in: header
         description: Identifier of the request, traceable throughout the network
@@ -1265,10 +1899,35 @@ paths:
       operationId: zaakinformatieobject_read
       summary: Een specifieke ZAAK-INFORMATIEOBJECT relatie opvragen.
       description: Een specifieke ZAAK-INFORMATIEOBJECT relatie opvragen.
+      parameters:
+      - name: If-None-Match
+        in: header
+        description: "Voer een voorwaardelijk verzoek uit. Deze header moet \xE9\xE9\
+          n of meerdere ETag-waardes bevatten van resources die de consumer gecached\
+          \ heeft. Indien de waarde van de ETag van de huidige resource voorkomt in\
+          \ deze set, dan antwoordt de provider met een lege HTTP 304 request. Zie\
+          \ [MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match)\
+          \ voor meer informatie."
+        required: false
+        examples:
+          oneValue:
+            summary: "E\xE9n ETag-waarde"
+            value: '"79054025255fb1a26e4bc422aef54eb4"'
+          multipleValues:
+            summary: Meerdere ETag-waardes
+            value: '"79054025255fb1a26e4bc422aef54eb4", "e4d909c290d0fb1ca068ffaddf22cbd0"'
+        schema:
+          type: string
       responses:
         '200':
           description: OK
           headers:
+            ETag:
+              description: De ETag berekend op de response body JSON. Indien twee
+                resources exact dezelfde ETag hebben, dan zijn deze resources identiek
+                aan elkaar. Je kan de ETag gebruiken om caching te implementeren.
+              schema:
+                type: string
             API-version:
               schema:
                 type: string
@@ -1301,6 +1960,49 @@ paths:
       security:
       - JWT-Claims:
         - zaken.lezen
+    head:
+      operationId: zaakinformatieobject_headers
+      summary: De headers voor een specifiek(e) ZAAKINFORMATIEOBJECT opvragen
+      description: Vraag de headers op die je bij een GET request zou krijgen.
+      parameters:
+      - name: If-None-Match
+        in: header
+        description: "Voer een voorwaardelijk verzoek uit. Deze header moet \xE9\xE9\
+          n of meerdere ETag-waardes bevatten van resources die de consumer gecached\
+          \ heeft. Indien de waarde van de ETag van de huidige resource voorkomt in\
+          \ deze set, dan antwoordt de provider met een lege HTTP 304 request. Zie\
+          \ [MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match)\
+          \ voor meer informatie."
+        required: false
+        examples:
+          oneValue:
+            summary: "E\xE9n ETag-waarde"
+            value: '"79054025255fb1a26e4bc422aef54eb4"'
+          multipleValues:
+            summary: Meerdere ETag-waardes
+            value: '"79054025255fb1a26e4bc422aef54eb4", "e4d909c290d0fb1ca068ffaddf22cbd0"'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          headers:
+            ETag:
+              description: De ETag berekend op de response body JSON. Indien twee
+                resources exact dezelfde ETag hebben, dan zijn deze resources identiek
+                aan elkaar. Je kan de ETag gebruiken om caching te implementeren.
+              schema:
+                type: string
+            API-version:
+              schema:
+                type: string
+              description: 'Geeft een specifieke API-versie aan in de context van
+                een specifieke aanroep. Voorbeeld: 1.2.1.'
+      tags:
+      - zaakinformatieobjecten
+      security:
+      - JWT-Claims:
+        - zaken.lezen
     put:
       operationId: zaakinformatieobject_update
       summary: Werk een ZAAK-INFORMATIEOBJECT relatie in zijn geheel bij.
@@ -1313,6 +2015,14 @@ paths:
 
         - informatieobject URL en zaak URL mogen niet veranderen'
       parameters:
+      - name: Content-Type
+        in: header
+        description: Content type van de verzoekinhoud.
+        required: true
+        schema:
+          type: string
+          enum:
+          - application/json
       - name: X-NLX-Logrecord-ID
         in: header
         description: Identifier of the request, traceable throughout the network
@@ -1377,6 +2087,14 @@ paths:
 
         - informatieobject URL en zaak URL mogen niet veranderen'
       parameters:
+      - name: Content-Type
+        in: header
+        description: Content type van de verzoekinhoud.
+        required: true
+        schema:
+          type: string
+          enum:
+          - application/json
       - name: X-NLX-Logrecord-ID
         in: header
         description: Identifier of the request, traceable throughout the network
@@ -1435,7 +2153,7 @@ paths:
       description: 'De gespiegelde relatie in de Documenten API wordt door de Zaken
         API
 
-        verwijderd. Consumers kunnen dit niet handmatig doen.'
+        verwijderd. Consumers kunnen dit niet handmatig doen..'
       parameters:
       - name: X-NLX-Logrecord-ID
         in: header
@@ -1611,8 +2329,19 @@ paths:
     post:
       operationId: zaakobject_create
       summary: Maak een ZAAKOBJECT aan.
-      description: Maak een ZAAKOBJECT aan.
+      description: "Maak een ZAAKOBJECT aan.\n\n**Er wordt gevalideerd op**\n\n- Indien\
+        \ de `object` URL opgegeveven is, dan moet deze een geldige response\n  (HTTP\
+        \ 200) geven.\n- Indien opgegeven, dan wordt `objectIdentificatie` gevalideerd\
+        \ tegen de\n  `objectType` discriminator."
       parameters:
+      - name: Content-Type
+        in: header
+        description: Content type van de verzoekinhoud.
+        required: true
+        schema:
+          type: string
+          enum:
+          - application/json
       - name: X-NLX-Logrecord-ID
         in: header
         description: Identifier of the request, traceable throughout the network
@@ -1626,11 +2355,7 @@ paths:
         schema:
           type: string
       requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ZaakObject'
-        required: true
+        $ref: '#/components/requestBodies/ZaakObject'
       responses:
         '201':
           description: Created
@@ -1678,10 +2403,35 @@ paths:
       operationId: zaakobject_read
       summary: Een specifiek ZAAKOBJECT opvragen.
       description: Een specifiek ZAAKOBJECT opvragen.
+      parameters:
+      - name: If-None-Match
+        in: header
+        description: "Voer een voorwaardelijk verzoek uit. Deze header moet \xE9\xE9\
+          n of meerdere ETag-waardes bevatten van resources die de consumer gecached\
+          \ heeft. Indien de waarde van de ETag van de huidige resource voorkomt in\
+          \ deze set, dan antwoordt de provider met een lege HTTP 304 request. Zie\
+          \ [MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match)\
+          \ voor meer informatie."
+        required: false
+        examples:
+          oneValue:
+            summary: "E\xE9n ETag-waarde"
+            value: '"79054025255fb1a26e4bc422aef54eb4"'
+          multipleValues:
+            summary: Meerdere ETag-waardes
+            value: '"79054025255fb1a26e4bc422aef54eb4", "e4d909c290d0fb1ca068ffaddf22cbd0"'
+        schema:
+          type: string
       responses:
         '200':
           description: OK
           headers:
+            ETag:
+              description: De ETag berekend op de response body JSON. Indien twee
+                resources exact dezelfde ETag hebben, dan zijn deze resources identiek
+                aan elkaar. Je kan de ETag gebruiken om caching te implementeren.
+              schema:
+                type: string
             API-version:
               schema:
                 type: string
@@ -1714,6 +2464,410 @@ paths:
       security:
       - JWT-Claims:
         - zaken.lezen
+    put:
+      operationId: zaakobject_update
+      summary: Werk een ZAAKOBJECT in zijn geheel bij.
+      description: "**Er wordt gevalideerd op**\n\n- De attributen `zaak`, `object`\
+        \ en `objectType` mogen niet gewijzigd worden.\n- Indien opgegeven, dan wordt\
+        \ `objectIdentificatie` gevalideerd tegen de\n  `objectType` discriminator."
+      parameters:
+      - name: Content-Type
+        in: header
+        description: Content type van de verzoekinhoud.
+        required: true
+        schema:
+          type: string
+          enum:
+          - application/json
+      requestBody:
+        $ref: '#/components/requestBodies/ZaakObject'
+      responses:
+        '200':
+          description: OK
+          headers:
+            API-version:
+              schema:
+                type: string
+              description: 'Geeft een specifieke API-versie aan in de context van
+                een specifieke aanroep. Voorbeeld: 1.2.1.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ZaakObject'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '406':
+          $ref: '#/components/responses/406'
+        '409':
+          $ref: '#/components/responses/409'
+        '410':
+          $ref: '#/components/responses/410'
+        '415':
+          $ref: '#/components/responses/415'
+        '429':
+          $ref: '#/components/responses/429'
+        '500':
+          $ref: '#/components/responses/500'
+      tags:
+      - zaakobjecten
+      security:
+      - JWT-Claims:
+        - (zaken.bijwerken | zaken.geforceerd-bijwerken)
+    patch:
+      operationId: zaakobject_partial_update
+      summary: Werk een ZAAKOBJECT deels bij.
+      description: "**Er wordt gevalideerd op**\n\n- De attributen `zaak`, `object`\
+        \ en `objectType` mogen niet gewijzigd worden.\n- Indien opgegeven, dan wordt\
+        \ `objectIdentificatie` gevalideerd tegen de\n  `objectType` discriminator."
+      parameters:
+      - name: Content-Type
+        in: header
+        description: Content type van de verzoekinhoud.
+        required: true
+        schema:
+          type: string
+          enum:
+          - application/json
+      requestBody:
+        $ref: '#/components/requestBodies/ZaakObject'
+      responses:
+        '200':
+          description: OK
+          headers:
+            API-version:
+              schema:
+                type: string
+              description: 'Geeft een specifieke API-versie aan in de context van
+                een specifieke aanroep. Voorbeeld: 1.2.1.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ZaakObject'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '406':
+          $ref: '#/components/responses/406'
+        '409':
+          $ref: '#/components/responses/409'
+        '410':
+          $ref: '#/components/responses/410'
+        '415':
+          $ref: '#/components/responses/415'
+        '429':
+          $ref: '#/components/responses/429'
+        '500':
+          $ref: '#/components/responses/500'
+      tags:
+      - zaakobjecten
+      security:
+      - JWT-Claims:
+        - (zaken.bijwerken | zaken.geforceerd-bijwerken)
+    delete:
+      operationId: zaakobject_delete
+      summary: Verwijder een ZAAKOBJECT.
+      description: 'Verbreek de relatie tussen een ZAAK en een OBJECT door de ZAAKOBJECT
+        resource te
+
+        verwijderen.'
+      responses:
+        '204':
+          description: No content
+          headers:
+            API-version:
+              schema:
+                type: string
+              description: 'Geeft een specifieke API-versie aan in de context van
+                een specifieke aanroep. Voorbeeld: 1.2.1.'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '406':
+          $ref: '#/components/responses/406'
+        '409':
+          $ref: '#/components/responses/409'
+        '410':
+          $ref: '#/components/responses/410'
+        '415':
+          $ref: '#/components/responses/415'
+        '429':
+          $ref: '#/components/responses/429'
+        '500':
+          $ref: '#/components/responses/500'
+      tags:
+      - zaakobjecten
+      security:
+      - JWT-Claims:
+        - (zaken.bijwerken | zaken.geforceerd-bijwerken | zaken.verwijderen)
+    parameters:
+    - name: uuid
+      in: path
+      description: Unieke resource identifier (UUID4)
+      required: true
+      schema:
+        type: string
+        format: uuid
+  /zaakverzoeken:
+    get:
+      operationId: zaakverzoek_list
+      summary: Alle ZAAK-VERZOEK opvragen.
+      description: Alle ZAAK-VERZOEK opvragen.
+      parameters:
+      - name: zaak
+        in: query
+        description: URL-referentie naar de ZAAK.
+        required: false
+        schema:
+          type: string
+          format: uri
+      - name: verzoek
+        in: query
+        description: URL-referentie naar het VERZOEK (in de Klantinteractie API)
+        required: false
+        schema:
+          type: string
+          format: uri
+      responses:
+        '200':
+          description: OK
+          headers:
+            API-version:
+              schema:
+                type: string
+              description: 'Geeft een specifieke API-versie aan in de context van
+                een specifieke aanroep. Voorbeeld: 1.2.1.'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ZaakVerzoek'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '406':
+          $ref: '#/components/responses/406'
+        '409':
+          $ref: '#/components/responses/409'
+        '410':
+          $ref: '#/components/responses/410'
+        '415':
+          $ref: '#/components/responses/415'
+        '429':
+          $ref: '#/components/responses/429'
+        '500':
+          $ref: '#/components/responses/500'
+      tags:
+      - zaakverzoeken
+      security:
+      - JWT-Claims:
+        - zaken.lezen
+    post:
+      operationId: zaakverzoek_create
+      summary: Maak een ZAAK-VERZOEK aan.
+      description: '**Er wordt gevalideerd op**
+
+        - geldigheid URL naar de VERZOEK'
+      parameters:
+      - name: Content-Type
+        in: header
+        description: Content type van de verzoekinhoud.
+        required: true
+        schema:
+          type: string
+          enum:
+          - application/json
+      - name: X-NLX-Logrecord-ID
+        in: header
+        description: Identifier of the request, traceable throughout the network
+        required: false
+        schema:
+          type: string
+      - name: X-Audit-Toelichting
+        in: header
+        description: Toelichting waarom een bepaald verzoek wordt gedaan
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ZaakVerzoek'
+        required: true
+      responses:
+        '201':
+          description: Created
+          headers:
+            API-version:
+              schema:
+                type: string
+              description: 'Geeft een specifieke API-versie aan in de context van
+                een specifieke aanroep. Voorbeeld: 1.2.1.'
+            Location:
+              schema:
+                type: string
+                format: uri
+              description: URL waar de resource leeft.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ZaakVerzoek'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '406':
+          $ref: '#/components/responses/406'
+        '409':
+          $ref: '#/components/responses/409'
+        '410':
+          $ref: '#/components/responses/410'
+        '415':
+          $ref: '#/components/responses/415'
+        '429':
+          $ref: '#/components/responses/429'
+        '500':
+          $ref: '#/components/responses/500'
+      tags:
+      - zaakverzoeken
+      security:
+      - JWT-Claims:
+        - zaken.bijwerken
+    parameters: []
+  /zaakverzoeken/{uuid}:
+    get:
+      operationId: zaakverzoek_read
+      summary: Een specifiek ZAAK-VERZOEK opvragen.
+      description: Een specifiek ZAAK-VERZOEK opvragen.
+      parameters:
+      - name: If-None-Match
+        in: header
+        description: "Voer een voorwaardelijk verzoek uit. Deze header moet \xE9\xE9\
+          n of meerdere ETag-waardes bevatten van resources die de consumer gecached\
+          \ heeft. Indien de waarde van de ETag van de huidige resource voorkomt in\
+          \ deze set, dan antwoordt de provider met een lege HTTP 304 request. Zie\
+          \ [MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match)\
+          \ voor meer informatie."
+        required: false
+        examples:
+          oneValue:
+            summary: "E\xE9n ETag-waarde"
+            value: '"79054025255fb1a26e4bc422aef54eb4"'
+          multipleValues:
+            summary: Meerdere ETag-waardes
+            value: '"79054025255fb1a26e4bc422aef54eb4", "e4d909c290d0fb1ca068ffaddf22cbd0"'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          headers:
+            ETag:
+              description: De ETag berekend op de response body JSON. Indien twee
+                resources exact dezelfde ETag hebben, dan zijn deze resources identiek
+                aan elkaar. Je kan de ETag gebruiken om caching te implementeren.
+              schema:
+                type: string
+            API-version:
+              schema:
+                type: string
+              description: 'Geeft een specifieke API-versie aan in de context van
+                een specifieke aanroep. Voorbeeld: 1.2.1.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ZaakVerzoek'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '406':
+          $ref: '#/components/responses/406'
+        '409':
+          $ref: '#/components/responses/409'
+        '410':
+          $ref: '#/components/responses/410'
+        '415':
+          $ref: '#/components/responses/415'
+        '429':
+          $ref: '#/components/responses/429'
+        '500':
+          $ref: '#/components/responses/500'
+      tags:
+      - zaakverzoeken
+      security:
+      - JWT-Claims:
+        - zaken.lezen
+    delete:
+      operationId: zaakverzoek_delete
+      description: Verwijder een ZAAK-VERZOEK.
+      parameters:
+      - name: X-NLX-Logrecord-ID
+        in: header
+        description: Identifier of the request, traceable throughout the network
+        required: false
+        schema:
+          type: string
+      - name: X-Audit-Toelichting
+        in: header
+        description: Toelichting waarom een bepaald verzoek wordt gedaan
+        required: false
+        schema:
+          type: string
+      responses:
+        '204':
+          description: No content
+          headers:
+            API-version:
+              schema:
+                type: string
+              description: 'Geeft een specifieke API-versie aan in de context van
+                een specifieke aanroep. Voorbeeld: 1.2.1.'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '406':
+          $ref: '#/components/responses/406'
+        '409':
+          $ref: '#/components/responses/409'
+        '410':
+          $ref: '#/components/responses/410'
+        '415':
+          $ref: '#/components/responses/415'
+        '429':
+          $ref: '#/components/responses/429'
+        '500':
+          $ref: '#/components/responses/500'
+      tags:
+      - zaakverzoeken
+      security:
+      - JWT-Claims:
+        - zaken.bijwerken
     parameters:
     - name: uuid
       in: path
@@ -1747,7 +2901,8 @@ paths:
           type: string
       - name: zaaktype
         in: query
-        description: URL-referentie naar het ZAAKTYPE (in de Catalogi API).
+        description: URL-referentie naar het ZAAKTYPE (in de Catalogi API) in de CATALOGUS
+          waar deze voorkomt
         required: false
         schema:
           type: string
@@ -1901,12 +3056,14 @@ paths:
         required: false
         schema:
           type: string
+          maxLength: 9
       - name: rol__betrokkeneIdentificatie__medewerker__identificatie
         in: query
         description: Een korte unieke aanduiding van de MEDEWERKER.
         required: false
         schema:
           type: string
+          maxLength: 24
       - name: rol__betrokkeneIdentificatie__organisatorischeEenheid__identificatie
         in: query
         description: Een korte identificatie van de organisatorische eenheid.
@@ -2014,17 +3171,26 @@ paths:
       summary: Maak een ZAAK aan.
       description: "Indien geen identificatie gegeven is, dan wordt deze automatisch\n\
         gegenereerd. De identificatie moet uniek zijn binnen de bronorganisatie.\n\
-        \n**Er wordt gevalideerd op**:\n- `zaaktype` moet een geldige URL zijn.\n\
-        - `zaaktype` is geen concept (`zaaktype.concept` = False)\n- `laatsteBetaaldatum`\
-        \ mag niet in de toekomst liggen.\n- `laatsteBetaaldatum` mag niet gezet worden\
-        \ als de betalingsindicatie\n  \"nvt\" is.\n- `archiefnominatie` moet een\
-        \ waarde hebben indien `archiefstatus` niet de\n  waarde \"nog_te_archiveren\"\
+        \n**Er wordt gevalideerd op**:\n- geldigheid `zaaktype` URL - de resource\
+        \ moet opgevraagd kunnen\n  worden uit de Catalogi API en de vorm van een\
+        \ ZAAKTYPE hebben.\n- `zaaktype` is geen concept (`zaaktype.concept` = False)\n\
+        - `laatsteBetaaldatum` mag niet in de toekomst liggen.\n- `laatsteBetaaldatum`\
+        \ mag niet gezet worden als de betalingsindicatie\n  \"nvt\" is.\n- `archiefnominatie`\
+        \ moet een waarde hebben indien `archiefstatus` niet de\n  waarde \"nog_te_archiveren\"\
         \ heeft.\n- `archiefactiedatum` moet een waarde hebben indien `archiefstatus`\
         \ niet de\n  waarde \"nog_te_archiveren\" heeft.\n- `archiefstatus` kan alleen\
         \ een waarde anders dan \"nog_te_archiveren\"\n  hebben indien van alle gerelateeerde\
         \ INFORMATIEOBJECTen het attribuut\n  `status` de waarde \"gearchiveerd\"\
         \ heeft."
       parameters:
+      - name: Content-Type
+        in: header
+        description: Content type van de verzoekinhoud.
+        required: true
+        schema:
+          type: string
+          enum:
+          - application/json
       - name: Accept-Crs
         in: header
         description: Het gewenste 'Coordinate Reference System' (CRS) van de geometrie
@@ -2111,6 +3277,14 @@ paths:
 
         niet geschikt voor geo-zoekopdrachten.'
       parameters:
+      - name: Content-Type
+        in: header
+        description: Content type van de verzoekinhoud.
+        required: true
+        schema:
+          type: string
+          enum:
+          - application/json
       - name: page
         in: query
         description: Een pagina binnen de gepagineerde set resultaten.
@@ -2234,6 +3408,24 @@ paths:
           type: string
           enum:
           - EPSG:4326
+      - name: If-None-Match
+        in: header
+        description: "Voer een voorwaardelijk verzoek uit. Deze header moet \xE9\xE9\
+          n of meerdere ETag-waardes bevatten van resources die de consumer gecached\
+          \ heeft. Indien de waarde van de ETag van de huidige resource voorkomt in\
+          \ deze set, dan antwoordt de provider met een lege HTTP 304 request. Zie\
+          \ [MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match)\
+          \ voor meer informatie."
+        required: false
+        examples:
+          oneValue:
+            summary: "E\xE9n ETag-waarde"
+            value: '"79054025255fb1a26e4bc422aef54eb4"'
+          multipleValues:
+            summary: Meerdere ETag-waardes
+            value: '"79054025255fb1a26e4bc422aef54eb4", "e4d909c290d0fb1ca068ffaddf22cbd0"'
+        schema:
+          type: string
       responses:
         '200':
           description: OK
@@ -2246,6 +3438,12 @@ paths:
                 type: string
                 enum:
                 - EPSG:4326
+            ETag:
+              description: De ETag berekend op de response body JSON. Indien twee
+                resources exact dezelfde ETag hebben, dan zijn deze resources identiek
+                aan elkaar. Je kan de ETag gebruiken om caching te implementeren.
+              schema:
+                type: string
             API-version:
               schema:
                 type: string
@@ -2280,24 +3478,102 @@ paths:
       security:
       - JWT-Claims:
         - zaken.lezen
+    head:
+      operationId: zaak_headers
+      summary: De headers voor een specifiek(e) ZAAK opvragen
+      description: Vraag de headers op die je bij een GET request zou krijgen.
+      parameters:
+      - name: Accept-Crs
+        in: header
+        description: Het gewenste 'Coordinate Reference System' (CRS) van de geometrie
+          in het antwoord (response body). Volgens de GeoJSON spec is WGS84 de default
+          (EPSG:4326 is hetzelfde als WGS84).
+        required: true
+        schema:
+          type: string
+          enum:
+          - EPSG:4326
+      - name: Content-Crs
+        in: header
+        description: Het 'Coordinate Reference System' (CRS) van de geometrie in de
+          vraag (request body). Volgens de GeoJSON spec is WGS84 de default (EPSG:4326
+          is hetzelfde als WGS84).
+        required: true
+        schema:
+          type: string
+          enum:
+          - EPSG:4326
+      - name: If-None-Match
+        in: header
+        description: "Voer een voorwaardelijk verzoek uit. Deze header moet \xE9\xE9\
+          n of meerdere ETag-waardes bevatten van resources die de consumer gecached\
+          \ heeft. Indien de waarde van de ETag van de huidige resource voorkomt in\
+          \ deze set, dan antwoordt de provider met een lege HTTP 304 request. Zie\
+          \ [MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match)\
+          \ voor meer informatie."
+        required: false
+        examples:
+          oneValue:
+            summary: "E\xE9n ETag-waarde"
+            value: '"79054025255fb1a26e4bc422aef54eb4"'
+          multipleValues:
+            summary: Meerdere ETag-waardes
+            value: '"79054025255fb1a26e4bc422aef54eb4", "e4d909c290d0fb1ca068ffaddf22cbd0"'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Crs:
+              description: Het 'Coordinate Reference System' (CRS) van de antwoorddata.
+                Volgens de GeoJSON spec is WGS84 de default (EPSG:4326 is hetzelfde
+                als WGS84).
+              schema:
+                type: string
+                enum:
+                - EPSG:4326
+            ETag:
+              description: De ETag berekend op de response body JSON. Indien twee
+                resources exact dezelfde ETag hebben, dan zijn deze resources identiek
+                aan elkaar. Je kan de ETag gebruiken om caching te implementeren.
+              schema:
+                type: string
+            API-version:
+              schema:
+                type: string
+              description: 'Geeft een specifieke API-versie aan in de context van
+                een specifieke aanroep. Voorbeeld: 1.2.1.'
+      tags:
+      - zaken
+      security:
+      - JWT-Claims:
+        - zaken.lezen
     put:
       operationId: zaak_update
       summary: Werk een ZAAK in zijn geheel bij.
       description: "**Er wordt gevalideerd op**\n- `zaaktype` mag niet gewijzigd worden.\n\
-        - `zaaktype` is geen concept (`zaaktype.concept` = False)\n- `identificatie`\
-        \ mag niet gewijzigd worden.\n- `laatsteBetaaldatum` mag niet in de toekomst\
-        \ liggen.\n- `laatsteBetaaldatum` mag niet gezet worden als de betalingsindicatie\n\
-        \  \"nvt\" is.\n- `archiefnominatie` moet een waarde hebben indien `archiefstatus`\
-        \ niet de\n  waarde \"nog_te_archiveren\" heeft.\n- `archiefactiedatum` moet\
-        \ een waarde hebben indien `archiefstatus` niet de\n  waarde \"nog_te_archiveren\"\
-        \ heeft.\n- `archiefstatus` kan alleen een waarde anders dan \"nog_te_archiveren\"\
-        \n  hebben indien van alle gerelateeerde INFORMATIEOBJECTen het attribuut\n\
-        \  `status` de waarde \"gearchiveerd\" heeft.\n\n**Opmerkingen**\n- er worden\
-        \ enkel zaken getoond van de zaaktypes waar u toe geautoriseerd\n  bent.\n\
-        - zaaktype zal in de toekomst niet-wijzigbaar gemaakt worden.\n- indien een\
-        \ zaak heropend moet worden, doe dit dan door een nieuwe status\n  toe te\
-        \ voegen die NIET de eindstatus is.\n  Zie de `Status` resource."
+        - `identificatie` mag niet gewijzigd worden.\n- `laatsteBetaaldatum` mag niet\
+        \ in de toekomst liggen.\n- `laatsteBetaaldatum` mag niet gezet worden als\
+        \ de betalingsindicatie\n  \"nvt\" is.\n- `archiefnominatie` moet een waarde\
+        \ hebben indien `archiefstatus` niet de\n  waarde \"nog_te_archiveren\" heeft.\n\
+        - `archiefactiedatum` moet een waarde hebben indien `archiefstatus` niet de\n\
+        \  waarde \"nog_te_archiveren\" heeft.\n- `archiefstatus` kan alleen een waarde\
+        \ anders dan \"nog_te_archiveren\"\n  hebben indien van alle gerelateeerde\
+        \ INFORMATIEOBJECTen het attribuut\n  `status` de waarde \"gearchiveerd\"\
+        \ heeft.\n\n**Opmerkingen**\n- er worden enkel zaken getoond van de zaaktypes\
+        \ waar u toe geautoriseerd\n  bent.\n- indien een zaak heropend moet worden,\
+        \ doe dit dan door een nieuwe status\n  toe te voegen die NIET de eindstatus\
+        \ is.\n  Zie de `Status` resource."
       parameters:
+      - name: Content-Type
+        in: header
+        description: Content type van de verzoekinhoud.
+        required: true
+        schema:
+          type: string
+          enum:
+          - application/json
       - name: Accept-Crs
         in: header
         description: Het gewenste 'Coordinate Reference System' (CRS) van de geometrie
@@ -2384,20 +3660,27 @@ paths:
       operationId: zaak_partial_update
       summary: Werk een ZAAK deels bij.
       description: "**Er wordt gevalideerd op**\n- `zaaktype` mag niet gewijzigd worden.\n\
-        - `zaaktype` is geen concept (`zaaktype.concept` = False)\n- `identificatie`\
-        \ mag niet gewijzigd worden.\n- `laatsteBetaaldatum` mag niet in de toekomst\
-        \ liggen.\n- `laatsteBetaaldatum` mag niet gezet worden als de betalingsindicatie\n\
-        \  \"nvt\" is.\n- `archiefnominatie` moet een waarde hebben indien `archiefstatus`\
-        \ niet de\n  waarde \"nog_te_archiveren\" heeft.\n- `archiefactiedatum` moet\
-        \ een waarde hebben indien `archiefstatus` niet de\n  waarde \"nog_te_archiveren\"\
-        \ heeft.\n- `archiefstatus` kan alleen een waarde anders dan \"nog_te_archiveren\"\
-        \n  hebben indien van alle gerelateeerde INFORMATIEOBJECTen het attribuut\n\
-        \  `status` de waarde \"gearchiveerd\" heeft.\n\n**Opmerkingen**\n- er worden\
-        \ enkel zaken getoond van de zaaktypes waar u toe geautoriseerd\n  bent.\n\
-        - zaaktype zal in de toekomst niet-wijzigbaar gemaakt worden.\n- indien een\
-        \ zaak heropend moet worden, doe dit dan door een nieuwe status\n  toe te\
-        \ voegen die NIET de eindstatus is. Zie de `Status` resource."
+        - `identificatie` mag niet gewijzigd worden.\n- `laatsteBetaaldatum` mag niet\
+        \ in de toekomst liggen.\n- `laatsteBetaaldatum` mag niet gezet worden als\
+        \ de betalingsindicatie\n  \"nvt\" is.\n- `archiefnominatie` moet een waarde\
+        \ hebben indien `archiefstatus` niet de\n  waarde \"nog_te_archiveren\" heeft.\n\
+        - `archiefactiedatum` moet een waarde hebben indien `archiefstatus` niet de\n\
+        \  waarde \"nog_te_archiveren\" heeft.\n- `archiefstatus` kan alleen een waarde\
+        \ anders dan \"nog_te_archiveren\"\n  hebben indien van alle gerelateeerde\
+        \ INFORMATIEOBJECTen het attribuut\n  `status` de waarde \"gearchiveerd\"\
+        \ heeft.\n\n**Opmerkingen**\n- er worden enkel zaken getoond van de zaaktypes\
+        \ waar u toe geautoriseerd\n  bent.\n- indien een zaak heropend moet worden,\
+        \ doe dit dan door een nieuwe status\n  toe te voegen die NIET de eindstatus\
+        \ is. Zie de `Status` resource."
       parameters:
+      - name: Content-Type
+        in: header
+        description: Content type van de verzoekinhoud.
+        required: true
+        schema:
+          type: string
+          enum:
+          - application/json
       - name: Accept-Crs
         in: header
         description: Het gewenste 'Coordinate Reference System' (CRS) van de geometrie
@@ -2600,10 +3883,35 @@ paths:
       operationId: audittrail_read
       summary: Een specifieke audit trail regel opvragen.
       description: Een specifieke audit trail regel opvragen.
+      parameters:
+      - name: If-None-Match
+        in: header
+        description: "Voer een voorwaardelijk verzoek uit. Deze header moet \xE9\xE9\
+          n of meerdere ETag-waardes bevatten van resources die de consumer gecached\
+          \ heeft. Indien de waarde van de ETag van de huidige resource voorkomt in\
+          \ deze set, dan antwoordt de provider met een lege HTTP 304 request. Zie\
+          \ [MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match)\
+          \ voor meer informatie."
+        required: false
+        examples:
+          oneValue:
+            summary: "E\xE9n ETag-waarde"
+            value: '"79054025255fb1a26e4bc422aef54eb4"'
+          multipleValues:
+            summary: Meerdere ETag-waardes
+            value: '"79054025255fb1a26e4bc422aef54eb4", "e4d909c290d0fb1ca068ffaddf22cbd0"'
+        schema:
+          type: string
       responses:
         '200':
           description: OK
           headers:
+            ETag:
+              description: De ETag berekend op de response body JSON. Indien twee
+                resources exact dezelfde ETag hebben, dan zijn deze resources identiek
+                aan elkaar. Je kan de ETag gebruiken om caching te implementeren.
+              schema:
+                type: string
             API-version:
               schema:
                 type: string
@@ -2707,6 +4015,14 @@ paths:
 
         - geldigheid URL naar de ZAAK'
       parameters:
+      - name: Content-Type
+        in: header
+        description: Content type van de verzoekinhoud.
+        required: true
+        schema:
+          type: string
+          enum:
+          - application/json
       - name: X-NLX-Logrecord-ID
         in: header
         description: Identifier of the request, traceable throughout the network
@@ -2779,10 +4095,35 @@ paths:
       operationId: zaakbesluit_read
       summary: Een specifiek ZAAKBESLUIT opvragen.
       description: Een specifiek ZAAKBESLUIT opvragen.
+      parameters:
+      - name: If-None-Match
+        in: header
+        description: "Voer een voorwaardelijk verzoek uit. Deze header moet \xE9\xE9\
+          n of meerdere ETag-waardes bevatten van resources die de consumer gecached\
+          \ heeft. Indien de waarde van de ETag van de huidige resource voorkomt in\
+          \ deze set, dan antwoordt de provider met een lege HTTP 304 request. Zie\
+          \ [MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match)\
+          \ voor meer informatie."
+        required: false
+        examples:
+          oneValue:
+            summary: "E\xE9n ETag-waarde"
+            value: '"79054025255fb1a26e4bc422aef54eb4"'
+          multipleValues:
+            summary: Meerdere ETag-waardes
+            value: '"79054025255fb1a26e4bc422aef54eb4", "e4d909c290d0fb1ca068ffaddf22cbd0"'
+        schema:
+          type: string
       responses:
         '200':
           description: OK
           headers:
+            ETag:
+              description: De ETag berekend op de response body JSON. Indien twee
+                resources exact dezelfde ETag hebben, dan zijn deze resources identiek
+                aan elkaar. Je kan de ETag gebruiken om caching te implementeren.
+              schema:
+                type: string
             API-version:
               schema:
                 type: string
@@ -2928,8 +4269,19 @@ paths:
     post:
       operationId: zaakeigenschap_create
       summary: Maak een ZAAKEIGENSCHAP aan.
-      description: Maak een ZAAKEIGENSCHAP aan.
+      description: "Maak een ZAAKEIGENSCHAP aan.\n\n**Er wordt gevalideerd op:**\n\
+        - geldigheid `eigenschap` URL - de resource moet opgevraagd kunnen\n  worden\
+        \ uit de Catalogi API en de vorm van een EIGENSCHAP hebben.\n- de `eigenschap`\
+        \ moet bij het `ZAAK.zaaktype` horen"
       parameters:
+      - name: Content-Type
+        in: header
+        description: Content type van de verzoekinhoud.
+        required: true
+        schema:
+          type: string
+          enum:
+          - application/json
       - name: X-NLX-Logrecord-ID
         in: header
         description: Identifier of the request, traceable throughout the network
@@ -2943,11 +4295,7 @@ paths:
         schema:
           type: string
       requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ZaakEigenschap'
-        required: true
+        $ref: '#/components/requestBodies/ZaakEigenschap'
       responses:
         '201':
           description: Created
@@ -3002,10 +4350,35 @@ paths:
       operationId: zaakeigenschap_read
       summary: Een specifieke ZAAKEIGENSCHAP opvragen.
       description: Een specifieke ZAAKEIGENSCHAP opvragen.
+      parameters:
+      - name: If-None-Match
+        in: header
+        description: "Voer een voorwaardelijk verzoek uit. Deze header moet \xE9\xE9\
+          n of meerdere ETag-waardes bevatten van resources die de consumer gecached\
+          \ heeft. Indien de waarde van de ETag van de huidige resource voorkomt in\
+          \ deze set, dan antwoordt de provider met een lege HTTP 304 request. Zie\
+          \ [MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match)\
+          \ voor meer informatie."
+        required: false
+        examples:
+          oneValue:
+            summary: "E\xE9n ETag-waarde"
+            value: '"79054025255fb1a26e4bc422aef54eb4"'
+          multipleValues:
+            summary: Meerdere ETag-waardes
+            value: '"79054025255fb1a26e4bc422aef54eb4", "e4d909c290d0fb1ca068ffaddf22cbd0"'
+        schema:
+          type: string
       responses:
         '200':
           description: OK
           headers:
+            ETag:
+              description: De ETag berekend op de response body JSON. Indien twee
+                resources exact dezelfde ETag hebben, dan zijn deze resources identiek
+                aan elkaar. Je kan de ETag gebruiken om caching te implementeren.
+              schema:
+                type: string
             API-version:
               schema:
                 type: string
@@ -3038,6 +4411,194 @@ paths:
       security:
       - JWT-Claims:
         - zaken.lezen
+    head:
+      operationId: zaakeigenschap_headers
+      summary: De headers voor een specifiek(e) ZAAKEIGENSCHAP opvragen
+      description: Vraag de headers op die je bij een GET request zou krijgen.
+      parameters:
+      - name: If-None-Match
+        in: header
+        description: "Voer een voorwaardelijk verzoek uit. Deze header moet \xE9\xE9\
+          n of meerdere ETag-waardes bevatten van resources die de consumer gecached\
+          \ heeft. Indien de waarde van de ETag van de huidige resource voorkomt in\
+          \ deze set, dan antwoordt de provider met een lege HTTP 304 request. Zie\
+          \ [MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match)\
+          \ voor meer informatie."
+        required: false
+        examples:
+          oneValue:
+            summary: "E\xE9n ETag-waarde"
+            value: '"79054025255fb1a26e4bc422aef54eb4"'
+          multipleValues:
+            summary: Meerdere ETag-waardes
+            value: '"79054025255fb1a26e4bc422aef54eb4", "e4d909c290d0fb1ca068ffaddf22cbd0"'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          headers:
+            ETag:
+              description: De ETag berekend op de response body JSON. Indien twee
+                resources exact dezelfde ETag hebben, dan zijn deze resources identiek
+                aan elkaar. Je kan de ETag gebruiken om caching te implementeren.
+              schema:
+                type: string
+            API-version:
+              schema:
+                type: string
+              description: 'Geeft een specifieke API-versie aan in de context van
+                een specifieke aanroep. Voorbeeld: 1.2.1.'
+      tags:
+      - zaken
+      security:
+      - JWT-Claims:
+        - zaken.lezen
+    put:
+      operationId: zaakeigenschap_update
+      summary: Werk een ZAAKEIGENSCHAP in zijn geheel bij.
+      description: '**Er wordt gevalideerd op**
+
+        - Alleen de WAARDE mag gewijzigd worden'
+      parameters:
+      - name: Content-Type
+        in: header
+        description: Content type van de verzoekinhoud.
+        required: true
+        schema:
+          type: string
+          enum:
+          - application/json
+      requestBody:
+        $ref: '#/components/requestBodies/ZaakEigenschap'
+      responses:
+        '200':
+          description: OK
+          headers:
+            API-version:
+              schema:
+                type: string
+              description: 'Geeft een specifieke API-versie aan in de context van
+                een specifieke aanroep. Voorbeeld: 1.2.1.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ZaakEigenschap'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '406':
+          $ref: '#/components/responses/406'
+        '409':
+          $ref: '#/components/responses/409'
+        '410':
+          $ref: '#/components/responses/410'
+        '415':
+          $ref: '#/components/responses/415'
+        '429':
+          $ref: '#/components/responses/429'
+        '500':
+          $ref: '#/components/responses/500'
+      tags:
+      - zaken
+      security:
+      - JWT-Claims:
+        - (zaken.bijwerken | zaken.geforceerd-bijwerken)
+    patch:
+      operationId: zaakeigenschap_partial_update
+      summary: Werk een ZAAKEIGENSCHAP deels bij.
+      description: '**Er wordt gevalideerd op**
+
+        - Alleen de WAARDE mag gewijzigd worden'
+      parameters:
+      - name: Content-Type
+        in: header
+        description: Content type van de verzoekinhoud.
+        required: true
+        schema:
+          type: string
+          enum:
+          - application/json
+      requestBody:
+        $ref: '#/components/requestBodies/ZaakEigenschap'
+      responses:
+        '200':
+          description: OK
+          headers:
+            API-version:
+              schema:
+                type: string
+              description: 'Geeft een specifieke API-versie aan in de context van
+                een specifieke aanroep. Voorbeeld: 1.2.1.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ZaakEigenschap'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '406':
+          $ref: '#/components/responses/406'
+        '409':
+          $ref: '#/components/responses/409'
+        '410':
+          $ref: '#/components/responses/410'
+        '415':
+          $ref: '#/components/responses/415'
+        '429':
+          $ref: '#/components/responses/429'
+        '500':
+          $ref: '#/components/responses/500'
+      tags:
+      - zaken
+      security:
+      - JWT-Claims:
+        - (zaken.bijwerken | zaken.geforceerd-bijwerken)
+    delete:
+      operationId: zaakeigenschap_delete
+      description: Verwijder een ZAAKEIGENSCHAP.
+      responses:
+        '204':
+          description: No content
+          headers:
+            API-version:
+              schema:
+                type: string
+              description: 'Geeft een specifieke API-versie aan in de context van
+                een specifieke aanroep. Voorbeeld: 1.2.1.'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '406':
+          $ref: '#/components/responses/406'
+        '409':
+          $ref: '#/components/responses/409'
+        '410':
+          $ref: '#/components/responses/410'
+        '415':
+          $ref: '#/components/responses/415'
+        '429':
+          $ref: '#/components/responses/429'
+        '500':
+          $ref: '#/components/responses/500'
+      tags:
+      - zaken
+      security:
+      - JWT-Claims:
+        - (zaken.bijwerken | zaken.geforceerd-bijwerken)
     parameters:
     - name: uuid
       in: path
@@ -3053,8 +4614,31 @@ paths:
       schema:
         type: string
         format: uuid
+tags:
+- name: klantcontacten
+  description: ''
+- name: resultaten
+  description: ''
+- name: rollen
+  description: ''
+- name: statussen
+  description: ''
+- name: zaakcontactmomenten
+  description: ''
+- name: zaakinformatieobjecten
+  description: ''
+- name: zaakobjecten
+  description: ''
+- name: zaakverzoeken
+  description: ''
+- name: zaken
+  description: 'Een zaak mag (in principe) niet meer gewijzigd worden als de
+
+    `archiefstatus` een andere status heeft dan "nog_te_archiveren". Voor
+
+    praktische redenen is er geen harde validatie regel aan de provider kant.'
 servers:
-- url: /zaken/api/v1
+- url: /api/v1
 components:
   responses:
     '400':
@@ -3202,11 +4786,23 @@ components:
           schema:
             $ref: '#/components/schemas/ZaakInformatieObject'
       required: true
+    ZaakObject:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ZaakObject'
+      required: true
     Zaak:
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Zaak'
+      required: true
+    ZaakEigenschap:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ZaakEigenschap'
       required: true
   securitySchemes:
     JWT-Claims:
@@ -3887,6 +5483,40 @@ components:
             de status van een zaak.
           type: string
           maxLength: 1000
+    ZaakContactMoment:
+      required:
+      - zaak
+      - contactmoment
+      type: object
+      properties:
+        url:
+          title: Url
+          description: URL-referentie naar dit object. Dit is de unieke identificatie
+            en locatie van dit object.
+          type: string
+          format: uri
+          readOnly: true
+          maxLength: 1000
+          minLength: 1
+        uuid:
+          title: Uuid
+          description: Unieke resource identifier (UUID4)
+          type: string
+          format: uuid
+          readOnly: true
+        zaak:
+          title: Zaak
+          description: URL-referentie naar de ZAAK.
+          type: string
+          format: uri
+        contactmoment:
+          title: Contactmoment
+          description: URL-referentie naar het CONTACTMOMENT (in de Klantinteractie
+            API)
+          type: string
+          format: uri
+          maxLength: 1000
+          minLength: 1
     ZaakInformatieObject:
       required:
       - informatieobject
@@ -3947,6 +5577,58 @@ components:
           type: string
           format: date-time
           readOnly: true
+    ObjectTypeOverigeDefinitie:
+      description: 'Verwijzing naar het schema van het type OBJECT als `objectType`
+        de waarde "overige" heeft.
+
+
+        * De URL referentie moet naar een JSON endpoint   wijzen waarin het objecttype
+        gedefinieerd is, inclusief het   [JSON-schema](https://json-schema.org/).
+
+        * Gebruik het `schema` attribuut om te verwijzen naar het schema binnen   de
+        objecttype resource (deze gebruikt het   [jq](http://stedolan.github.io/jq/)
+        formaat.
+
+        * Gebruik het `objectData` attribuut om te verwijzen naar de gegevens   binnen
+        het OBJECT. Deze gebruikt ook het   [jq](http://stedolan.github.io/jq/) formaat.
+
+
+        Indien je hier gebruikt van maakt, dan moet je een OBJECT url opgeven en is
+        het gebruik van objectIdentificatie niet mogelijk. De opgegeven OBJECT url
+        wordt gevalideerd tegen het schema van het opgegeven objecttype.'
+      required:
+      - url
+      - schema
+      - objectData
+      type: object
+      properties:
+        url:
+          title: Objecttype-URL
+          description: URL-referentie naar de objecttype resource in een API. Deze
+            resource moet de [JSON-schema](https://json-schema.org/)-definitie van
+            het objecttype bevatten.
+          type: string
+          format: uri
+          maxLength: 1000
+          minLength: 1
+        schema:
+          title: schema-pad
+          description: 'Een geldige [jq](http://stedolan.github.io/jq/) expressie.
+            Dit wordt gecombineerd met de resource uit het `url`-attribuut om het
+            schema van het objecttype uit te lezen. Bijvoorbeeld: `.jsonSchema`.'
+          type: string
+          maxLength: 100
+          minLength: 1
+        objectData:
+          title: objectgegevens-pad
+          description: 'Een geldige [jq](http://stedolan.github.io/jq/) expressie.
+            Dit wordt gecombineerd met de JSON data uit de OBJECT url om de objectgegevens
+            uit te lezen en de vorm van de gegevens tegen het schema te valideren.
+            Bijvoorbeeld: `.record.data`.'
+          type: string
+          maxLength: 100
+          minLength: 1
+      nullable: true
     ZaakObject:
       required:
       - zaak
@@ -4087,8 +5769,10 @@ components:
           description: Beschrijft het type OBJECT als `objectType` de waarde "overige"
             heeft.
           type: string
-          pattern: '[a-z_]+'
+          pattern: '[a-z\_]+'
           maxLength: 100
+        objectTypeOverigeDefinitie:
+          $ref: '#/components/schemas/ObjectTypeOverigeDefinitie'
         relatieomschrijving:
           title: Relatieomschrijving
           description: Omschrijving van de betrekking tussen de ZAAK en het OBJECT.
@@ -5053,6 +6737,39 @@ components:
       allOf:
       - $ref: '#/components/schemas/ZaakObject'
       - $ref: '#/components/schemas/object_identificatie_ObjectOverige'
+    ZaakVerzoek:
+      required:
+      - zaak
+      - verzoek
+      type: object
+      properties:
+        url:
+          title: Url
+          description: URL-referentie naar dit object. Dit is de unieke identificatie
+            en locatie van dit object.
+          type: string
+          format: uri
+          readOnly: true
+          maxLength: 1000
+          minLength: 1
+        uuid:
+          title: Uuid
+          description: Unieke resource identifier (UUID4)
+          type: string
+          format: uuid
+          readOnly: true
+        zaak:
+          title: Zaak
+          description: URL-referentie naar de ZAAK.
+          type: string
+          format: uri
+        verzoek:
+          title: Verzoek
+          description: URL-referentie naar het VERZOEK (in de Klantinteractie API)
+          type: string
+          format: uri
+          maxLength: 1000
+          minLength: 1
     Geometry:
       title: Geometry
       description: GeoJSON geometry
@@ -5258,8 +6975,7 @@ components:
       type: object
       properties:
         url:
-          title: Url
-          description: URL-referentie naar de ZAAK.
+          title: URL-referentie naar de ZAAK.
           type: string
           format: uri
           maxLength: 1000
@@ -5355,7 +7071,8 @@ components:
           maxLength: 1000
         zaaktype:
           title: Zaaktype
-          description: URL-referentie naar het ZAAKTYPE (in de Catalogi API).
+          description: URL-referentie naar het ZAAKTYPE (in de Catalogi API) in de
+            CATALOGUS waar deze voorkomt
           type: string
           format: uri
           maxLength: 1000
@@ -5597,18 +7314,30 @@ components:
           format: uri
           readOnly: true
           nullable: true
+        opdrachtgevendeOrganisatie:
+          title: Opdrachtgevende organisatie
+          description: De krachtens publiekrecht ingestelde rechtspersoon dan wel
+            ander niet-natuurlijk persoon waarbinnen het (bestuurs)orgaan zetelt dat
+            opdracht heeft gegeven om taken uit te voeren waaraan de zaak invulling
+            geeft.
+          type: string
+          maxLength: 9
     GeoWithin:
       type: object
       properties:
         within:
           $ref: '#/components/schemas/GeoJSONGeometry'
     ZaakZoek:
-      required:
-      - zaakgeometrie
       type: object
       properties:
         zaakgeometrie:
           $ref: '#/components/schemas/GeoWithin'
+        uuid__in:
+          description: Array of unieke resource identifiers (UUID4)
+          type: array
+          items:
+            type: string
+            format: uuid
         identificatie:
           title: Identificatie
           description: De unieke identificatie van de ZAAK binnen de organisatie die
@@ -5624,7 +7353,8 @@ components:
           minLength: 1
         zaaktype:
           title: Zaaktype
-          description: URL-referentie naar het ZAAKTYPE (in de Catalogi API).
+          description: URL-referentie naar het ZAAKTYPE (in de Catalogi API) in de
+            CATALOGUS waar deze voorkomt
           type: string
           minLength: 1
         archiefnominatie:
@@ -5880,7 +7610,11 @@ components:
 
             * `drc` - Documenten API
 
-            * `brc` - Besluiten API'
+            * `brc` - Besluiten API
+
+            * `cmc` - Contactmomenten API
+
+            * `kc` - Klanten API'
           type: string
           enum:
           - ac
@@ -5889,6 +7623,8 @@ components:
           - ztc
           - drc
           - brc
+          - cmc
+          - kc
         applicatieId:
           title: Applicatie id
           description: Unieke identificatie van de applicatie, binnen de organisatie.
@@ -6003,7 +7739,8 @@ components:
           readOnly: true
         besluit:
           title: Besluit
-          description: URL-referentie naar het BESLUIT (in de Besluiten API).
+          description: URL-referentie naar het BESLUIT (in de Besluiten API), waar
+            ook de relatieinformatie opgevraagd kan worden.
           type: string
           format: uri
           maxLength: 1000
