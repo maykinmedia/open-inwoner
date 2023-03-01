@@ -51,9 +51,9 @@
                 </ul>
             {% endif %}
         </div>
-        {% if approvals_count == 1 %}
+        {% if approvals_count == 1 and request.user.image %}
             <div class="avatar">
-                <img class="" src="{{ request.user.image|thumbnail_url:'avatar' }}" alt="{{ image.default_alt_text }}" />
+                <img src="{{ request.user.image|thumbnail_url:'avatar' }}" alt="{{ image.default_alt_text }}" />
             </div>
         {% endif %}
     {% endwith %}
