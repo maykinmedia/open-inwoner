@@ -63,7 +63,7 @@
     "@babel/preset-env": "latest",
     "@types/leaflet": "^1.7.6",
     "autoprefixer": "^9.0.0",
-    "babel-loader": "latest",
+    "babel-loader": "^8.2.5",
     "chai": "latest",
     "css-loader": "latest",
     "cssnano": "latest",
