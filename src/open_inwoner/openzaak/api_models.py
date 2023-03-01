@@ -140,10 +140,10 @@ class Rol(ZGWModel):
     betrokkene_identificatie: Optional[dict] = None
 
     def get_betrokkene_type_display(self):
-        return RolTypes.values[self.betrokkene_type]
+        return RolTypes[self.betrokkene_type].label
 
     def get_omschrijving_generiek_display(self):
-        return RolOmschrijving.values[self.omschrijving_generiek]
+        return RolOmschrijving[self.omschrijving_generiek].label
 
 
 @dataclass
