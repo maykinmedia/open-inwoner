@@ -32,8 +32,8 @@ from .models import Plan
 
 class PlansEnabledMixin:
     def dispatch(self, request, *args, **kwargs):
-        config = SiteConfiguration.get_solo()
-        if not config.show_plans:
+        self.config = SiteConfiguration.get_solo()
+        if not self.config.show_plans:
             raise Http404("plans not enabled")
         return super().dispatch(request, *args, **kwargs)
 
@@ -151,6 +151,9 @@ class PlanListView(
             )
             plans["plan_list"] = queryset
 
+        context["plans_banner"] = (
+            self.config.plans_banner.file.url if self.config.plans_banner else ""
+        )
         context["paginator"] = paginator
         context["page_obj"] = page
         context["is_paginated"] = is_paginated
