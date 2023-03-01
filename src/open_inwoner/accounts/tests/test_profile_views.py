@@ -173,6 +173,19 @@ class EditProfileTests(WebTest):
         self.return_url = reverse("accounts:my_profile")
         self.user = UserFactory()
 
+    def create_test_image_bytes(self):
+        image = Image.new("RGB", (10, 10))
+        byteIO = io.BytesIO()
+        image.save(byteIO, format="png")
+        return byteIO.getvalue()
+
+    def upload_test_image_to_profile_edit_page(self, img_bytes):
+        response = self.app.get(self.url, user=self.user, status=200)
+        form = response.forms["profile-edit"]
+        form["image"] = Upload("test_image.png", img_bytes, "image/png")
+        response = form.submit()
+        return response
+
     def test_login_required(self):
         login_url = reverse("login")
         response = self.app.get(self.url)
@@ -354,15 +367,8 @@ class EditProfileTests(WebTest):
         self.user.contact_type = ContactTypeChoices.begeleider
         self.user.save()
 
-        image = Image.new("RGB", (10, 10))
-        byteIO = io.BytesIO()
-        image.save(byteIO, format="png")
-        img_bytes = byteIO.getvalue()
-
-        response = self.app.get(self.url, user=self.user, status=200)
-        form = response.forms["profile-edit"]
-        form["image"] = Upload("test_image.png", img_bytes, "image/png")
-        form_response = form.submit()
+        img_bytes = self.create_test_image_bytes()
+        form_response = self.upload_test_image_to_profile_edit_page(img_bytes)
 
         self.assertRedirects(form_response, reverse("accounts:my_profile"))
         with self.assertRaises(ValueError):
@@ -377,15 +383,8 @@ class EditProfileTests(WebTest):
         self.user.login_type = LoginTypeChoices.digid
         self.user.save()
 
-        image = Image.new("RGB", (10, 10))
-        byteIO = io.BytesIO()
-        image.save(byteIO, format="png")
-        img_bytes = byteIO.getvalue()
-
-        response = self.app.get(self.url, user=self.user, status=200)
-        form = response.forms["profile-edit"]
-        form["image"] = Upload("test_image.png", img_bytes, "image/png")
-        form_response = form.submit()
+        img_bytes = self.create_test_image_bytes()
+        form_response = self.upload_test_image_to_profile_edit_page(img_bytes)
 
         self.assertRedirects(form_response, reverse("accounts:my_profile"))
         with self.assertRaises(ValueError):
@@ -396,18 +395,13 @@ class EditProfileTests(WebTest):
         self.assertIsNotNone(self.user.image.file)
 
     def test_image_is_not_saved_when_no_begeleider_and_default_login(self):
-        image = Image.new("RGB", (10, 10))
-        byteIO = io.BytesIO()
-        image.save(byteIO, format="png")
-        img_bytes = byteIO.getvalue()
-
-        response = self.app.get(self.url, user=self.user, status=200)
-        form = response.forms["profile-edit"]
-        form["image"] = Upload("test_image.png", img_bytes, "image/png")
-        form.submit()
+        img_bytes = self.create_test_image_bytes()
+        with self.assertRaises(AssertionError) as e:
+            self.upload_test_image_to_profile_edit_page(img_bytes)
 
         self.user.refresh_from_db()
 
+        self.assertIn("No field by the name 'image' found", e.exception.args[0])
         with self.assertRaises(ValueError):
             self.user.image.file
 
@@ -415,18 +409,14 @@ class EditProfileTests(WebTest):
         self.user.login_type = LoginTypeChoices.digid
         self.user.save()
 
-        image = Image.new("RGB", (10, 10))
-        byteIO = io.BytesIO()
-        image.save(byteIO, format="png")
-        img_bytes = byteIO.getvalue()
+        img_bytes = self.create_test_image_bytes()
 
-        response = self.app.get(self.url, user=self.user, status=200)
-        form = response.forms["profile-edit"]
-        form["image"] = Upload("test_image.png", img_bytes, "image/png")
-        form.submit()
+        with self.assertRaises(AssertionError) as e:
+            self.upload_test_image_to_profile_edit_page(img_bytes)
 
         self.user.refresh_from_db()
 
+        self.assertIn("No field by the name 'image' found", e.exception.args[0])
         with self.assertRaises(ValueError):
             self.user.image.file
 

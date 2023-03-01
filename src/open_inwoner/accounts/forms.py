@@ -74,9 +74,8 @@ class BaseUserForm(forms.ModelForm):
     def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields["image"].help_text = None
         if user.contact_type != ContactTypeChoices.begeleider:
-            self.fields["image"].widget = forms.HiddenInput()
+            del self.fields["image"]
 
 
 class UserForm(BaseUserForm):
