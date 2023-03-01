@@ -59,8 +59,45 @@
             </div>
         {% endif %}
             {% if approvals_count == 1 %}
+<<<<<<< HEAD
+=======
+                {% with pending_approvals.get as pending_approval %}
+                <div class="approval__single">
+                    <p class="p">
+                        {% blocktrans with full_name=pending_approval.get_full_name %}{{ full_name }} wilt u toevoegen als contactpersoon.{% endblocktrans %}
+                    </p>
+                    {% url 'accounts:contact_approval' uuid=pending_approval.uuid as approval_url %}
+                    {% render_form form=None method="POST" form_action=approval_url id="approval_form" spaceless=True show_notifications=True %}
+                        {% csrf_token %}
+                        {% button_row %}
+                            {% button text=_("Weigeren") name="contact_reject" secondary=True bordered=True %}
+                            {% button text=_("Accepteren") name="contact_approve" primary=True %}
+                        {% endbutton_row %}
+                    {% endrender_form %}
+                </div>
+                {% endwith %}
+            {% else %}
+                <ul class="approval__list">
+                    {% for approval in pending_approvals %}
+                        <li class="approval__list-item">
+                            <p class="p">{{approval.get_full_name}}</p>
+                            {% url 'accounts:contact_approval' uuid=approval.uuid as approval_url %}
+                            {% render_form form=None method="POST" form_action=approval_url id="approval_form" spaceless=True show_notifications=True %}
+                                {% csrf_token %}
+                                {% button_row %}
+                                    {% button text=_("Weigeren") name="contact_reject" value="reject" icon="close" icon_position="before" extra_classes="button--danger-borderless" %}
+                                    {% button text=_("Accepteren") name="contact_approve" value="approve" icon="check" icon_position="before" %}
+                                {% endbutton_row %}
+                            {% endrender_form %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        {% if approvals_count == 1 and request.user.image %}
+>>>>>>> dc87fc63 ([#1159] Removed unused code,render avatar div when there is an image)
             <div class="avatar">
-                <img class="" src="{{ request.user.image|thumbnail_url:'avatar' }}" alt="{{ image.default_alt_text }}" />
+                <img src="{{ request.user.image|thumbnail_url:'avatar' }}" alt="{{ image.default_alt_text }}" />
             </div>
         {% endif %}
     {% endwith %}
