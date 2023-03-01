@@ -65,7 +65,6 @@ def settings(request):
             config.hero_image_login.file.url if config.hero_image_login else ""
         ),
         "favicon": (config.favicon.file.url if config.favicon else ""),
-        "plans_banner": (config.plans_banner.file.url if config.plans_banner else ""),
         "login_allow_registration": config.login_allow_registration,
         "login_text": config.login_text,
         "gtm_code": config.gtm_code,
