@@ -90,6 +90,7 @@ class ProductLocationTestCase(TestCase):
                         "address_line_2": "1015CJ Amsterdam",
                         "email": "loc@example.com",
                         "phonenumber": "+31666767676",
+                        "location_url": product_location.get_absolute_url(),
                     },
                 }
             ),
@@ -170,6 +171,7 @@ class ProductLocationTestCase(TestCase):
                                 "address_line_2": "7411KT Deventer",
                                 "email": "loc1@example.com",
                                 "phonenumber": "+31999767676",
+                                "location_url": product_location_1.get_absolute_url(),
                             },
                         },
                         {
@@ -184,6 +186,7 @@ class ProductLocationTestCase(TestCase):
                                 "address_line_2": "1015KL Amsterdam",
                                 "email": "loc2@example.com",
                                 "phonenumber": "+31666767676",
+                                "location_url": product_location_2.get_absolute_url(),
                             },
                         },
                     ],
@@ -269,3 +272,31 @@ class TestLocationDetailView(WebTest):
 
         # check the draft product is not shown
         self.assertEqual(products.get(), published_product)
+
+
+class TestLocationViewThroughMap(WebTest):
+    def test_product_location_link_is_rendered_on_home_page(self):
+        product = ProductFactory()
+        product_location = ProductLocationFactory()
+        product.locations.add(product_location)
+
+        response = self.app.get(reverse("root"))
+
+        self.assertContains(
+            response,
+            reverse("pdc:location_detail", kwargs={"uuid": product_location.uuid}),
+        )
+
+    def test_product_location_link_is_rendered_on_product_page(self):
+        product = ProductFactory()
+        product_location = ProductLocationFactory()
+        product.locations.add(product_location)
+
+        response = self.app.get(
+            reverse("pdc:product_detail", kwargs={"slug": product.slug})
+        )
+
+        self.assertContains(
+            response,
+            reverse("pdc:location_detail", kwargs={"uuid": product_location.uuid}),
+        )
