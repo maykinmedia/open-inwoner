@@ -41,8 +41,10 @@
       }
     }
 
-    .secondary-navigation {
+    .subpage-navigation {
       padding-left: var(--spacing-extra-large);
+      padding-top: var(--spacing-large);
+      gap: var(--spacing-extra-large) !important;
       .primary-navigation__list-item {
         list-style-type: none;
       }
