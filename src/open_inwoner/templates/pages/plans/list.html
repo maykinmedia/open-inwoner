@@ -1,6 +1,14 @@
 {% extends 'master.html' %}
 {% load i18n button_tags string_tags pagination_tags helpers card_tags form_tags link_tags %}
 
+{% block header_image %}
+    {% if plans_banner %}
+        <aside aria-hidden="true">
+            <img class="main-image main-image--start-after" src="{{ plans_banner }}" alt="{{ plans_banner.default_alt_text|default:'Header afbeelding' }}">
+        </aside>
+    {% endif %}
+{% endblock header_image %}
+
 {% block content %}
     <h1 class="h1">
         {% trans "Samenwerken" %}

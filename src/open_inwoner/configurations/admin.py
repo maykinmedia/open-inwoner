@@ -69,6 +69,7 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                     "footer_logo_url",
                     "hero_image_login",
                     "favicon",
+                    "plans_banner",
                 )
             },
         ),
