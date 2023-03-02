@@ -18,7 +18,12 @@ from open_inwoner.pdc.models.category import Category
 from open_inwoner.utils.forms import LimitedUploadFileField, PrivateFileWidget
 from open_inwoner.utils.validators import validate_charfield_entry
 
-from .choices import EmptyContactTypeChoices, EmptyStatusChoices, LoginTypeChoices
+from .choices import (
+    ContactTypeChoices,
+    EmptyContactTypeChoices,
+    EmptyStatusChoices,
+    LoginTypeChoices,
+)
 from .models import Action, Document, Invite, Message, User
 
 
@@ -56,7 +61,24 @@ class CustomRegistrationForm(RegistrationForm):
         raise ValidationError(_("This user has been deactivated"))
 
 
-class UserForm(forms.ModelForm):
+class BaseUserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = (
+            "display_name",
+            "email",
+            "phonenumber",
+            "image",
+        )
+
+    def __init__(self, user, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if user.contact_type != ContactTypeChoices.begeleider:
+            del self.fields["image"]
+
+
+class UserForm(BaseUserForm):
     class Meta:
         model = User
         fields = (
@@ -70,17 +92,12 @@ class UserForm(forms.ModelForm):
             "housenumber",
             "postcode",
             "city",
+            "image",
         )
 
 
-class BrpUserForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = (
-            "display_name",
-            "email",
-            "phonenumber",
-        )
+class BrpUserForm(BaseUserForm):
+    pass
 
 
 class NecessaryUserForm(forms.ModelForm):
