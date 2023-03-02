@@ -125,7 +125,6 @@ django-choices==1.7.2
     #   -r requirements/base.in
     #   django-digid-eherkenning
     #   mail-editor
-    #   zgw-consumers
 django-ckeditor==6.2.0
     # via mail-editor
 django-colorfield==0.4.5
@@ -447,7 +446,7 @@ xlwt==1.3.0
     # via tablib
 xmlsec==1.3.12
     # via maykin-python3-saml
-zgw-consumers==0.23.2
+zgw-consumers==0.25.0
     # via
     #   -r requirements/base.in
     #   notifications-api-common
