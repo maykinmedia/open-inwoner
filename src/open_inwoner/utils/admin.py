@@ -10,6 +10,27 @@ from timeline_logger.admin import TimelineLogAdmin
 from timeline_logger.models import TimelineLog
 from timeline_logger.resources import TimelineLogResource
 
+from open_inwoner.utils.logentry import LOG_ACTIONS
+
+
+class LogActionListFilter(admin.SimpleListFilter):
+    title = _("Actie")
+    parameter_name = "log_action"
+
+    def lookups(self, request, model_admin):
+        return list(LOG_ACTIONS.values())
+
+    def queryset(self, request, queryset):
+        v = self.value()
+        if v:
+            try:
+                v = int(v)
+            except ValueError:
+                pass
+            else:
+                queryset = queryset.filter(extra_data__action_flag__0=v)
+        return queryset
+
 
 class CustomTimelineLogAdmin(ExportMixin, TimelineLogAdmin):
     show_full_result_count = False
@@ -23,7 +44,7 @@ class CustomTimelineLogAdmin(ExportMixin, TimelineLogAdmin):
         "get_action_flag",
         "message",
     ]
-    list_filter = ["timestamp", "content_type"]
+    list_filter = ["timestamp", LogActionListFilter, "content_type"]
     list_select_related = ["content_type"]
     search_fields = [
         "user__email",
