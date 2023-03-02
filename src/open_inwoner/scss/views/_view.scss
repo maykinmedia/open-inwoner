@@ -2,36 +2,6 @@
   &--accounts-contact_list {
     .form--horizontal {
       padding-top: var(--row-height);
-
-      > .form__control {
-        //make select outline to the right if there is no reset-button
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        justify-content: space-between;
-        width: 100%;
-      }
-      @media (max-width: 767px) {
-        > .form__control {
-          display: block;
-          max-width: 90vw;
-
-          .input {
-            min-width: 300px;
-          }
-        }
-      }
-    }
-
-    #contact-filter {
-      // design addition
-      border-bottom: 1px solid var(--color-gray-light);
-      padding-bottom: 8px;
-    }
-  }
-
-  &--pdc-product_finder {
-    .product-finder {
-      margin-top: 0;
     }
   }
 }
