@@ -371,7 +371,9 @@ class EditProfileTests(WebTest):
         form_response = self.upload_test_image_to_profile_edit_page(img_bytes)
 
         self.assertRedirects(form_response, reverse("accounts:my_profile"))
-        with self.assertRaises(ValueError):
+        with self.assertRaisesMessage(
+            ValueError, "The 'image' attribute has no file associated with it."
+        ):
             self.user.image.file
 
         self.user.refresh_from_db()
@@ -387,38 +389,31 @@ class EditProfileTests(WebTest):
         form_response = self.upload_test_image_to_profile_edit_page(img_bytes)
 
         self.assertRedirects(form_response, reverse("accounts:my_profile"))
-        with self.assertRaises(ValueError):
+        with self.assertRaisesMessage(
+            ValueError, "The 'image' attribute has no file associated with it."
+        ):
             self.user.image.file
 
         self.user.refresh_from_db()
 
         self.assertIsNotNone(self.user.image.file)
 
-    def test_image_is_not_saved_when_no_begeleider_and_default_login(self):
-        img_bytes = self.create_test_image_bytes()
-        with self.assertRaises(AssertionError) as e:
-            self.upload_test_image_to_profile_edit_page(img_bytes)
+    def test_image_field_is_not_rendered_when_begeleider_and_default_login(self):
+        response = self.app.get(self.url, user=self.user, status=200)
+        form = response.forms["profile-edit"]
 
-        self.user.refresh_from_db()
+        self.assertNotIn("image", form.fields.keys())
+        self.assertEqual(response.pyquery("#id_image"), [])
 
-        self.assertIn("No field by the name 'image' found", e.exception.args[0])
-        with self.assertRaises(ValueError):
-            self.user.image.file
-
-    def test_image_is_not_saved_when_no_begeleider_and_digid_login(self):
+    def test_image_field_is_not_rendered_when_begeleider_and_digid_login(self):
         self.user.login_type = LoginTypeChoices.digid
         self.user.save()
 
-        img_bytes = self.create_test_image_bytes()
+        response = self.app.get(self.url, user=self.user, status=200)
+        form = response.forms["profile-edit"]
 
-        with self.assertRaises(AssertionError) as e:
-            self.upload_test_image_to_profile_edit_page(img_bytes)
-
-        self.user.refresh_from_db()
-
-        self.assertIn("No field by the name 'image' found", e.exception.args[0])
-        with self.assertRaises(ValueError):
-            self.user.image.file
+        self.assertNotIn("image", form.fields.keys())
+        self.assertEqual(response.pyquery("#id_image"), [])
 
 
 @requests_mock.Mocker()
