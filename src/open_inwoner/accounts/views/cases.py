@@ -49,6 +49,7 @@ from open_inwoner.openzaak.utils import (
 from open_inwoner.utils.mixins import PaginationMixin
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
+from ...openzaak.formapi import fetch_open_submissions
 from ..forms import CaseUploadForm
 
 
@@ -191,14 +192,10 @@ class CaseListMixin(CaseLogMixin, PaginationMixin):
             self.log_case_access(case["identificatie"])
 
         context["anchors"] = self.get_anchors()
-        context["title"] = self.get_title()
         return context
 
     def get_anchors(self) -> list:
         return []
-
-    def get_title(self) -> str:
-        return ""
 
 
 class OpenCaseListView(
@@ -220,12 +217,10 @@ class OpenCaseListView(
 
     def get_anchors(self) -> list:
         return [
+            (reverse("accounts:open_submissions"), _("Openstaande formulieren")),
             ("#cases", _("Lopende aanvragen")),
             (reverse("accounts:my_closed_cases"), _("Afgeronde aanvragen")),
         ]
-
-    def get_title(self) -> str:
-        return _("Lopende aanvragen")
 
 
 class ClosedCaseListView(
@@ -247,12 +242,40 @@ class ClosedCaseListView(
 
     def get_anchors(self) -> list:
         return [
+            (reverse("accounts:open_submissions"), _("Openstaande formulieren")),
             (reverse("accounts:my_open_cases"), _("Lopende aanvragen")),
             ("#cases", _("Afgeronde aanvragen")),
         ]
 
-    def get_title(self) -> str:
-        return _("Afgeronde aanvragen")
+
+class OpenSubmissionListView(
+    CommonPageMixin, BaseBreadcrumbMixin, CaseAccessMixin, TemplateView
+):
+    template_name = "pages/cases/submissions.html"
+
+    @cached_property
+    def crumbs(self):
+        return [(_("Mijn aanvragen"), reverse("accounts:open_submissions"))]
+
+    def page_title(self):
+        return _("Openstaande formulieren")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["submissions"] = self.get_submissions()
+        context["anchors"] = self.get_anchors()
+        return context
+
+    def get_submissions(self):
+        submissions = fetch_open_submissions(self.request.user.bsn)
+        return submissions
+
+    def get_anchors(self) -> list:
+        return [
+            ("#submissions", _("Openstaande formulieren")),
+            (reverse("accounts:my_open_cases"), _("Lopende aanvragen")),
+            (reverse("accounts:my_closed_cases"), _("Afgeronde aanvragen")),
+        ]
 
 
 @dataclasses.dataclass

@@ -132,6 +132,11 @@ class EditProfileView(
             return BrpUserForm
         return super().get_form_class()
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
+
 
 class MyCategoriesView(
     LogMixin, LoginRequiredMixin, CommonPageMixin, BaseBreadcrumbMixin, UpdateView
