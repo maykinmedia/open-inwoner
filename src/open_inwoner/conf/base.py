@@ -1046,6 +1046,7 @@ THUMBNAIL_ALIASES = {
             "size": (256, 320),
             "crop": True,
         },
+        "avatar": {"size": (160, 160), "crop": True, "upscale": False},
     }
 }
 THUMBNAIL_QUALITY = 100
