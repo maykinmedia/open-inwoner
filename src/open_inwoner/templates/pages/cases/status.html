@@ -42,7 +42,7 @@
                 {% elif case.external_upload_enabled %}
                     <p class="p">{% trans "By clicking the button below you can upload a document. This is an external link and you will be redirected to a different system." %}</p>
                     {% button_row %}
-                        {% button href=case.external_upload_url text=_("Document toevoegen") primary=True %}
+                        {% button href=case.external_upload_url text=_("Document toevoegen") primary=True icon="open_in_new" icon_position="after" %}
                     {% endbutton_row %}
                 {% endif %}
 
