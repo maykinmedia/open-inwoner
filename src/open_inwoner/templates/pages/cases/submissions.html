@@ -23,7 +23,7 @@
             <tbody>
                 {% for submission in submissions %}
                     <tr>
-                        <th class="table__header">{% link href=submission.vervolg_link text=submission.naam %}</th>
+                        <th class="table__header">{% link href=submission.vervolg_link text=submission.naam blank=True %}</th>
                         <td class="table__item table__item--no-lb">{{submission.datum_laatste_wijziging|date:"d-m-Y"}}</td>
                         <td class="table__item table__item--no-lb">{{submission.eind_datum_geldigheid|date:"d-m-Y"}}</td>
                         <td class="table__item">{% button text=submission.naam hide_text=True href=submission.vervolg_link icon="arrow_forward" icon_outlined=True transparent=True %}</td>

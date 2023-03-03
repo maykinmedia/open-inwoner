@@ -42,6 +42,7 @@ def link(href, text, **kwargs):
         - uuid: str | if href is an url name, uuid for reverse can be passed.
         - title: string | The HTML title attribute if different than the text.
         - hide_external_icon: bool | If we want to hide the extra icon for an external link
+        - blank: bool | if we want the link to open in a new tab.
 
     Extra context:
         - base_class: string | If it is a button or a string.

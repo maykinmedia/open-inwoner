@@ -39,7 +39,13 @@
 }
 
 .p .link {
-  text-decoration: underline;
+  &:hover {
+    text-decoration: none;
+  }
+
+  strong {
+    text-decoration: underline;
+  }
 }
 
 .p--no-margin {
