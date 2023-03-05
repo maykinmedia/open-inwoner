@@ -4,4 +4,10 @@
       padding-top: var(--row-height);
     }
   }
+
+  &--pdc-product_finder {
+    .product-finder {
+      margin-top: 0;
+    }
+  }
 }
