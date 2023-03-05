@@ -31,15 +31,15 @@
                             {% url 'root' as link %}
                             {% link text=link_text href=link icon="apps" icon_position="before" %}
                         </li>
-                        <li class="primary-navigation__list-item navigation-subpage__toggle">
-                            <a href="#" class="link link--icon link--icon-position-before" aria-label="Thema's" title="Thema's">
+                        <li class="primary-navigation__list-item dropdown-nav__toggle">
+                            <a href="#" class="link link--toggle link--icon link--icon-position-before" aria-label="Thema's" title="Thema's">
                                 <span >{% trans "Themes" %}</span>
                                 <span aria-hidden="true" class="material-icons-outlined ">description</span>
                                 {% icon icon="expand_more" icon_position="after" icon_outlined=True %}
                             </a>
 
                             {% if categories %}
-                                <ul class="primary-navigation__list subpage-navigation">
+                                <ul class="primary-navigation__list subpage-list">
                                     {% for category in categories %}
                                         <li class="primary-navigation__list-item">
                                             {% url 'pdc:category_detail' slug=category.slug as category_href %}
@@ -49,6 +49,7 @@
                                 </ul>
                             {% endif %}
                         </li>
+
                         {% if request.user.is_authenticated %}
                             <li class="primary-navigation__list-item">
                                 {% link text=_("Mijn profiel") href='accounts:my_profile' icon="inventory_2" icon_position="before" icon_outlined=True %}
@@ -101,7 +102,7 @@
                                 <li class="header__list-item">
                                     {% url 'login' as login_url %}
                                     {% trans "Login" as login %}
-                                    {% link text=login href=login_url primary=True %}
+                                    {% link text=login href=login_url icon="arrow_forward" icon_position="before" primary=True %}
                                 </li>
                             </ul>
                         {% endif %}

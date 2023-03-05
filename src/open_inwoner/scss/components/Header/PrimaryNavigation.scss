@@ -45,6 +45,7 @@
       padding-left: var(--spacing-extra-large);
       padding-top: var(--spacing-large);
       gap: var(--spacing-extra-large) !important;
+
       .primary-navigation__list-item {
         list-style-type: none;
       }
@@ -74,6 +75,7 @@
     width: 100%;
     z-index: 100;
     padding-bottom: var(--spacing-medium);
+    margin-top: var(--spacing-medium);
     display: grid;
     grid-template-columns: repeat(1, 1fr);
     gap: var(--spacing-medium);
