@@ -6,7 +6,6 @@ class Subpage {
 
   toggleOpen(event) {
     event.preventDefault()
-    console.log('clicked')
     this.node.parentElement.classList.toggle('nav__list--open')
   }
 }
