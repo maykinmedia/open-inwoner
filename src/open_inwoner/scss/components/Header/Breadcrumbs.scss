@@ -1,15 +1,15 @@
 @import '~microscope-sass/lib/responsive';
 
 .breadcrumbs {
-  background-color: white;
-  overflow-x: auto;
-  $hm: max(calc((100vw - var(--container-width)) / 2), var(--spacing-large));
-  padding: 0 $hm;
-  display: block;
-  position: relative;
-  z-index: 1001;
+  display: none;
 
   @media (min-width: 768px) {
+    background-color: white;
+    overflow-x: auto;
+    $hm: max(calc((100vw - var(--container-width)) / 2), var(--spacing-large));
+    padding: 0 $hm;
+    display: block;
+    position: relative;
     z-index: 1002;
   }
 
