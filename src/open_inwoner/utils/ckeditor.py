@@ -28,6 +28,15 @@ def get_rendered_content(content):
         for element in soup.find_all(tag):
             element.attrs["class"] = class_name
             if element.name == "a" and element.attrs.get("href", "").startswith("http"):
-                element.attrs["target"] = "_blank"
+                icon = soup.new_tag("span")
+                icon.attrs.update(
+                    {
+                        "aria-hidden": "true",
+                        "aria-label": "Opens in new window",
+                        "class": "material-icons",
+                    }
+                )
+                icon.append("open_in_new")
+                element.append(icon)
 
     return soup
