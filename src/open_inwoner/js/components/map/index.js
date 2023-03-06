@@ -74,9 +74,17 @@ class Map {
    * @return {string}
    */
   featureToHTML(feature) {
-    const { name, ...properties } = feature.properties
+    const { name, location_url, ...properties } = feature.properties
     const displayName = name ? escapeHTML(name) : ''
+    const locationDetailView = location_url ? escapeHTML(location_url) : ''
+    let title = ''
     let finalHTML = ``
+
+    if (locationDetailView) {
+      title = `<a href="${locationDetailView}">${displayName}</a>`
+    } else {
+      title = displayName
+    }
 
     Object.entries(properties).forEach((property) => {
       finalHTML += `<p class="p">${escapeHTML(property[1])}</p>`
@@ -85,7 +93,7 @@ class Map {
     return `
         <div class="leaflet-content-name">
           <h4 class="h4">
-            ${displayName}
+            ${title}
           </h4>
         </div>
         <div class="leaflet-content-details p--no-margin">
