@@ -77,13 +77,13 @@ class Map {
     const { name, location_url, ...properties } = feature.properties
     const displayName = name ? escapeHTML(name) : ''
     const locationDetailView = location_url ? escapeHTML(location_url) : ''
-    let title = ``
+    let title = ''
     let finalHTML = ``
 
     if (locationDetailView) {
       title = `<a href="${locationDetailView}">${displayName}</a>`
     } else {
-      title = `${displayName}`
+      title = displayName
     }
 
     Object.entries(properties).forEach((property) => {
