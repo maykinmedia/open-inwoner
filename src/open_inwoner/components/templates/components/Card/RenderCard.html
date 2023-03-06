@@ -3,7 +3,7 @@
 {# Utilizes same template as Card. #}
 {% capture as tag %}{{ href|yesno:'a,div'}}{% endcapture %}
 {# create tag for anchor around card - never use anchors within anchors for valid HTML. #}
-<{{ tag }}{% if href %} href="{{ href }}"{% endif %} title="{{ title }}" aria-describedby="{{ title }}" class="card{% if compact %} card--compact{% endif %}{% if inline %} card--inline{% endif %}{% if stretch %} card--stretch{% endif %}{% if tinted %} card--tinted{% endif %}{% if type %} card--type-{{ type }}{% endif %}">
+<{{ tag }}{% if href %} href="{{ href }}"{% endif %} title="{{ title }}" aria-label="{{ title }}" class="card{% if compact %} card--compact{% endif %}{% if inline %} card--inline{% endif %}{% if stretch %} card--stretch{% endif %}{% if tinted %} card--tinted{% endif %}{% if type %} card--type-{{ type }}{% endif %}">
     {% if src %}
         <span class="card__header">
             <img class="card__img{% if image_object_fit %} card__img--{{ image_object_fit }}{% endif %}" src="{{ src }}" alt="{{ alt }}"/>
