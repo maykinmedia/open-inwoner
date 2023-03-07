@@ -7,9 +7,4 @@ if (anchors.length > 0) {
     navClass: 'anchor-menu__list-item--active',
     offset: 30,
   })
-
-  new Gumshoe('.anchor-menu--mobile a', {
-    navClass: 'anchor-menu__list-item--active',
-    offset: 130,
-  })
 }
