@@ -76,6 +76,7 @@ def settings(request):
         "siteimprove_id": config.siteimprove_id,
         "siteimprove_enabled": config.siteimprove_enabled,
         "show_plans": config.show_plans,
+        "show_cases": config.show_plans,
         "show_actions": config.show_actions,
         "menu_categories": Category.get_root_nodes().published(),
         "search_form": SearchForm(auto_id=False),
