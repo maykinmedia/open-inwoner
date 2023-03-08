@@ -184,6 +184,7 @@ INSTALLED_APPS = [
     "open_inwoner.questionnaire",
     "open_inwoner.extended_sessions",
     "open_inwoner.custom_csp",
+    "open_inwoner.external_api_logging",
 ]
 
 MIDDLEWARE = [
