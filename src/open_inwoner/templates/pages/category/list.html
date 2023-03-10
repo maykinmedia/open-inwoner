@@ -2,8 +2,10 @@
 {% load card_tags %}
 
 {% block content %}
-<h1 class="h1">{{configurable_text.theme_page.theme_title}}</h1>
-<p class="p">{{configurable_text.theme_page.theme_intro|linebreaksbr}}</p>
+<div class="categories__content">
+    <h1 class="h1">{{configurable_text.theme_page.theme_title}}</h1>
+    <p class="p">{{configurable_text.theme_page.theme_intro|linebreaksbr}}</p>
 
-{% card_container categories=object_list %}
+    {% card_container categories=object_list %}
+</div>
 {% endblock content %}

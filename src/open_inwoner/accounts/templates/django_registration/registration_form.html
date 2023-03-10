@@ -3,6 +3,7 @@
 
 {% block content %}
 
+<div class="registration-grid">
 {% render_grid %}
     {% render_column start=5 span=5 %}
         {% render_card direction='horizontal' tinted=True %}
@@ -23,5 +24,6 @@
     {% endif %}
 
 {% endrender_grid %}
+</div>
 
 {% endblock content %}

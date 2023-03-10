@@ -60,7 +60,7 @@ class HomeView(CommonPageMixin, TemplateView):
     def get_context_data(self, **kwargs):
         config = SiteConfiguration.get_solo()
 
-        limit = 3 if self.request.user.is_authenticated else 4
+        limit = 4
         kwargs.update(categories=Category.objects.published().order_by("name")[:limit])
         kwargs.update(product_locations=ProductLocation.objects.all()[:1000])
         kwargs.update(
@@ -86,7 +86,7 @@ class HomeView(CommonPageMixin, TemplateView):
             and self.request.user.selected_themes.exists()
         ):
             kwargs.update(
-                categories=self.request.user.selected_themes.order_by("name")[:3]
+                categories=self.request.user.selected_themes.order_by("name")[:limit]
             )
         elif highlighted_categories:
             kwargs.update(categories=highlighted_categories)

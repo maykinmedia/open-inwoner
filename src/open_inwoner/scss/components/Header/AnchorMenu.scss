@@ -17,7 +17,7 @@
   width: 100%;
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: var(--spacing-extra-large);
   z-index: 1002;
 
   &--desktop {
@@ -62,11 +62,13 @@
 
   .link {
     box-sizing: border-box;
-    padding: var(--spacing-large);
+    padding: var(--spacing-medium) var(--spacing-large) var(--spacing-medium)
+      var(--spacing-large);
 
     @media (min-width: 768px) {
       border-left: var(--border-width) solid;
       border-color: var(--color-gray-light);
+      padding: var(--spacing-large);
     }
   }
 
@@ -80,7 +82,8 @@
 
   &--mobile__title {
     box-sizing: border-box;
-    padding: var(--spacing-large);
+    padding: var(--spacing-large) var(--spacing-large) var(--spacing-medium)
+      var(--spacing-large);
 
     &.h4 {
       color: var(--color-primary);
