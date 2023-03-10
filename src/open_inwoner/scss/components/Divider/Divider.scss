@@ -1,8 +1,12 @@
 .divider {
   border: 1px var(--color-gray-light) solid;
-  margin: var(--spacing-giant) 0;
+  margin: var(--spacing-extra-large) 0;
 
   &--small {
     margin: var(--spacing-large) 0;
+  }
+
+  @media (min-width: 768px) {
+    margin: var(--spacing-giant) 0;
   }
 }

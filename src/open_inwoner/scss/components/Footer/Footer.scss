@@ -8,7 +8,7 @@
   background-color: var(--color-gray-lightest);
   box-sizing: border-box;
   display: grid;
-  gap: var(--gutter-width);
+  gap: var(--spacing-medium);
   grid-template-areas:
     'lg-tx lg-tx lg-tx lg-tx'
     'lg   lg   lg   lg'
@@ -21,6 +21,7 @@
   padding: $vm $hm;
 
   @media (min-width: 768px) {
+    gap: var(--gutter-width);
     grid-template-areas:
       'lg-tx lg-tx lg-tx lg-tx . . . . . . . . '
       'lg   lg   lg   lg   lg  lg  lg  lg  lg   lg   lg lg'
@@ -32,6 +33,7 @@
   /// Layout.
 
   &__logo {
+    display: flex;
     grid-area: lg;
 
     img {
