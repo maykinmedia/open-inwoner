@@ -15,7 +15,7 @@ from open_inwoner.accounts.tests.factories import ActionFactory, UserFactory
 from open_inwoner.accounts.tests.test_action_views import ActionsPlaywrightTests
 from open_inwoner.utils.tests.playwright import multi_browser
 
-from ..models import Plan
+from ..models import Plan, PlanContact
 from .factories import ActionTemplateFactory, PlanFactory, PlanTemplateFactory
 
 
@@ -76,6 +76,10 @@ class PlanViewTests(WebTest):
         created_plan = Plan.objects.get(title=plan.title)
         self.assertEqual(created_plan.plan_contacts.get(), self.user)
         self.assertEqual(created_plan.created_by, self.user)
+
+        contact = PlanContact.objects.get(plan=created_plan)
+        self.assertEqual(contact.user, self.user)
+        self.assertEqual(contact.notify_new, True)
 
     def test_plan_list_filled(self):
         response = self.app.get(self.list_url, user=self.user)

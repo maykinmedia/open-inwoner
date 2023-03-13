@@ -22,6 +22,7 @@ from open_inwoner.utils.validators import (
     validate_phone_number,
 )
 
+from ..plans.models import PlanContact
 from .choices import ContactTypeChoices, LoginTypeChoices, StatusChoices, TypeChoices
 from .managers import ActionQueryset, DigidManager, UserManager, eHerkenningManager
 from .query import InviteQuerySet, MessageQuerySet
@@ -283,6 +284,12 @@ class User(AbstractBaseUser, PermissionsMixin):
             self.user_contacts.filter(email=email).exists()
             or self.contacts_for_approval.filter(email=email).exists()
         )
+
+    def get_plan_contact_new_count(self):
+        return PlanContact.objects.filter(user=self, notify_new=True).count()
+
+    def clear_plan_contact_new_count(self):
+        PlanContact.objects.filter(user=self).update(notify_new=False)
 
     def is_digid_and_brp(self) -> bool:
         """

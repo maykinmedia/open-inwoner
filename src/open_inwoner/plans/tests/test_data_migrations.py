@@ -73,9 +73,10 @@ class PlanContactThroughModelMigrationTests(TestMigrations):
         # user real models for actual test
         from ..models import Plan, PlanContact
 
-        contacts = list(PlanContact.objects.all())
-        self.assertEqual(len(contacts), 1)
-
         plan = Plan.objects.get(id=self.plan.id)
         other_user = User.objects.get(id=self.other_user.id)
         self.assertEqual(list(plan.plan_contacts.all()), [other_user])
+
+        # check we don't notify existing contacts
+        contact = PlanContact.objects.get()
+        self.assertEqual(contact.notify_new, False)

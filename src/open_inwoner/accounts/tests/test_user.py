@@ -7,6 +7,7 @@ from freezegun import freeze_time
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.utils.hash import generate_email_from_string
 
+from ...plans.tests.factories import PlanFactory
 from ..models import User
 from .factories import UserFactory
 
@@ -73,3 +74,20 @@ class UserTests(TestCase):
             login_type=LoginTypeChoices.oidc, email="test@example.org", oidc_id="test"
         )
         self.assertTrue(user.require_necessary_fields())
+
+    def test_plan_contact_new_count_methods(self):
+        owner = UserFactory()
+        plan_1 = PlanFactory(created_by=owner)
+        plan_2 = PlanFactory(created_by=owner)
+
+        user = UserFactory()
+        self.assertEqual(0, user.get_plan_contact_new_count())
+
+        plan_1.plan_contacts.add(user)
+        self.assertEqual(1, user.get_plan_contact_new_count())
+
+        plan_2.plan_contacts.add(user)
+        self.assertEqual(2, user.get_plan_contact_new_count())
+
+        user.clear_plan_contact_new_count()
+        self.assertEqual(0, user.get_plan_contact_new_count())

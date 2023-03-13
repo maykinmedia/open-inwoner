@@ -97,7 +97,7 @@ class PlanContact(models.Model):
     user = models.ForeignKey(
         "accounts.User", verbose_name=_("Contact"), on_delete=models.CASCADE
     )
-    notify_new = models.BooleanField(verbose_name=_("Notify contact"), default=False)
+    notify_new = models.BooleanField(verbose_name=_("Notify contact"), default=True)
 
 
 class Plan(models.Model):
