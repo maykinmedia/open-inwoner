@@ -1004,6 +1004,47 @@ class PlanBegeleiderListViewTests(WebTest):
         )
 
 
+class NewPlanContactCounterTest(WebTest):
+    def test_plan_contact_new_count(self):
+        owner = UserFactory()
+        plan_1 = PlanFactory(created_by=owner)
+        plan_2 = PlanFactory(created_by=owner)
+
+        user = UserFactory()
+
+        root_url = reverse("root")
+        list_url = reverse("plans:plan_list")
+
+        # check no number shows by default
+        response = self.app.get(root_url, user=user)
+        links = response.pyquery(
+            f".header__container > .primary-navigation a[href='{list_url}']"
+        )
+        self.assertEqual(len(links), 1)
+        self.assertEqual(links.text(), _("Samenwerken") + " people")
+
+        # check if the number shows up in the menu
+        plan_1.plan_contacts.add(user)
+        plan_2.plan_contacts.add(user)
+        self.assertEqual(2, user.get_plan_contact_new_count())
+
+        response = self.app.get(root_url, user=user)
+        links = response.pyquery(
+            f".header__container > .primary-navigation a[href='{list_url}']"
+        )
+        # second link appears
+        self.assertEqual(len(links), 2)
+        self.assertIn("(2)", links.text())
+
+        # access the list page to reset
+        response = self.app.get(list_url, user=user)
+        links = response.pyquery(
+            f".header__container > .primary-navigation a[href='{list_url}']"
+        )
+        self.assertEqual(len(links), 1)
+        self.assertEqual(links.text(), _("Samenwerken") + " people")
+
+
 @multi_browser()
 class PlanActionStatusPlaywrightTests(ActionsPlaywrightTests):
     def setUp(self) -> None:
