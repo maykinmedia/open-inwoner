@@ -65,3 +65,54 @@
     }
   }
 }
+
+///
+/// Filters.
+///
+
+.contacts {
+  font-family: var(--font-family-body);
+
+  .contacts__filter {
+    display: flex;
+    flex-direction: column;
+    &--open {
+      .contacts__filter-container {
+        display: grid;
+        grid-auto-columns: 3fr 1fr;
+      }
+    }
+  }
+
+  .contacts__filter-button {
+    padding: 8px;
+
+    @media (min-width: 768px) {
+      display: none;
+    }
+  }
+
+  .contacts__filter-container {
+    align-items: center;
+    border-bottom: 1px solid var(--color-white);
+    display: none;
+    gap: var(--spacing-medium);
+    grid-template-columns: 1fr;
+    margin-bottom: var(--spacing-medium);
+    padding: 8px;
+
+    .form__control > .label {
+      flex-direction: column;
+    }
+
+    @media (min-width: 768px) {
+      display: grid;
+      grid-template-columns: 3fr 1fr;
+      gap: var(--spacing-giant);
+
+      .input {
+        min-width: 300px;
+      }
+    }
+  }
+}
