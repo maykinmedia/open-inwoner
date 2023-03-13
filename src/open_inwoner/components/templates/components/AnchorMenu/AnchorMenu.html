@@ -2,6 +2,7 @@
 
 <aside class="anchor-menu {% if desktop %}anchor-menu--desktop{% else %}anchor-menu--mobile{% endif %}" aria-label="{% trans "Secundaire paginanavigatie" %}">
     <ul class="anchor-menu__list">
+        {% if not desktop %}<h4 class="anchor-menu--mobile__title h4">{% trans "On this page:" %}</h4>{% endif %}
         {% for anchor in anchors %}
             <li class="anchor-menu__list-item">
                 <a class="link" href="{{ anchor.0 }}">{{ anchor.1 }}</a>
