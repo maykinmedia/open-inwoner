@@ -90,6 +90,16 @@ class ActionTemplate(models.Model):
     )
 
 
+class PlanContact(models.Model):
+    plan = models.ForeignKey(
+        "plans.Plan", verbose_name=_("Plan"), on_delete=models.CASCADE
+    )
+    user = models.ForeignKey(
+        "accounts.User", verbose_name=_("Contact"), on_delete=models.CASCADE
+    )
+    notify_new = models.BooleanField(verbose_name=_("Notify contact"), default=False)
+
+
 class Plan(models.Model):
     uuid = models.UUIDField(verbose_name=_("UUID"), default=uuid4, unique=True)
     title = models.CharField(
@@ -116,6 +126,7 @@ class Plan(models.Model):
         related_name="plans",
         blank=True,
         help_text=_("The contact that will help you with this plan."),
+        through=PlanContact,
     )
     created_by = models.ForeignKey(
         "accounts.User", verbose_name=_("Created by"), on_delete=models.CASCADE
