@@ -69,6 +69,7 @@ class BaseUserForm(forms.ModelForm):
             "email",
             "phonenumber",
             "image",
+            "cropping",
         )
 
     def __init__(self, user, *args, **kwargs):
@@ -76,6 +77,7 @@ class BaseUserForm(forms.ModelForm):
 
         if user.contact_type != ContactTypeChoices.begeleider:
             del self.fields["image"]
+            del self.fields["cropping"]
 
 
 class UserForm(BaseUserForm):
@@ -93,6 +95,7 @@ class UserForm(BaseUserForm):
             "postcode",
             "city",
             "image",
+            "cropping",
         )
 
 

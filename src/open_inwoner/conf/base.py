@@ -145,6 +145,7 @@ INSTALLED_APPS = [
     "localflavor",
     "treebeard",
     "easy_thumbnails",  # used by filer
+    "image_cropping",
     "filer",
     "mptt",
     "hijack.contrib.admin",
@@ -524,6 +525,15 @@ FILER_STORAGES = {
         },
     },
 }
+
+from easy_thumbnails.conf import Settings as thumbnail_settings
+
+THUMBNAIL_PROCESSORS = (
+    "image_cropping.thumbnail_processors.crop_corners",
+) + thumbnail_settings.THUMBNAIL_PROCESSORS
+
+IMAGE_CROPPING_BACKEND = "image_cropping.backends.easy_thumbs.EasyThumbnailsBackend"
+IMAGE_CROPPING_JQUERY_URL = "/static/admin/js/vendor/jquery/jquery.min.js"
 
 SENDFILE_ROOT = PRIVATE_MEDIA_ROOT
 SENDFILE_BACKEND = "django_sendfile.backends.simple"

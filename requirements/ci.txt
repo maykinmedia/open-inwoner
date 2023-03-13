@@ -176,6 +176,7 @@ django-appconf==1.0.5
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   django-image-cropping
     #   django-timeline-logger
 django-autoslug==1.9.8
     # via
@@ -247,6 +248,10 @@ django-hijack==3.0.4
     #   -c requirements/base.txt
     #   -r requirements/base.txt
 django-htmx==1.13.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+django-image-cropping==1.7
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt

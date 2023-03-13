@@ -11,6 +11,7 @@ from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.utils.translation import ugettext_lazy as _
 
+from image_cropping import ImageCropField, ImageRatioField
 from localflavor.nl.models import NLBSNField, NLZipCodeField
 from mail_editor.helpers import find_template
 from privates.storages import PrivateMediaFileSystemStorage
@@ -73,13 +74,14 @@ class User(AbstractBaseUser, PermissionsMixin):
         max_length=15,
         validators=[validate_phone_number],
     )
-    image = models.ImageField(
+    image = ImageCropField(
         verbose_name=_("Image"),
         null=True,
         blank=True,
         upload_to=generate_uuid_image_name,
         help_text=_("Image"),
     )
+    cropping = ImageRatioField("image", "150x150", size_warning=True)
     is_staff = models.BooleanField(
         verbose_name=_("Staff status"),
         default=False,
