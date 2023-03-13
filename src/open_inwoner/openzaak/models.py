@@ -175,7 +175,7 @@ class ZaakTypeConfig(models.Model):
         blank=True,
     )
     document_upload_enabled = models.BooleanField(
-        verbose_name=_("Enable document upload"),
+        verbose_name=_("Enable document upload via URL"),
         default=False,
     )
 
