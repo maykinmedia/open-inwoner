@@ -1,4 +1,4 @@
-{% load i18n logo_tags header_tags form_tags link_tags solo_tags icon_tags thumbnail string_tags %}
+{% load i18n logo_tags header_tags form_tags button_tags link_tags solo_tags icon_tags thumbnail string_tags %}
 
 {% get_solo "configurations.SiteConfiguration" as config %}
 
@@ -104,7 +104,7 @@
                                 <li class="header__list-item">
                                     {% url 'login' as login_url %}
                                     {% trans "Login" as login %}
-                                    {% link text=login href=login_url icon="arrow_forward" icon_position="before" primary=True %}
+                                    {% button text=login href=login_url icon="person" icon_position="before" primary=True icon_outlined=True transparent=True %}
                                 </li>
                             </ul>
                         {% endif %}
