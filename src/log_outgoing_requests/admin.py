@@ -1,10 +1,10 @@
 from django.contrib import admin
 
-from .models import ExternalAPILog
+from .models import OutgoingRequestsLog
 
 
-@admin.register(ExternalAPILog)
-class ExternalAPILogAdmin(admin.ModelAdmin):
+@admin.register(OutgoingRequestsLog)
+class OutgoingRequestsLogAdmin(admin.ModelAdmin):
     fields = (
         "hostname",
         "path",
@@ -14,7 +14,7 @@ class ExternalAPILogAdmin(admin.ModelAdmin):
         "method",
         "response_ms",
         "timestamp",
-        "user",
+        "trace",
     )
     readonly_fields = fields
     list_display = fields

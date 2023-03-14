@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
-class ExternalAPILog(models.Model):
+class OutgoingRequestsLog(models.Model):
     hostname = models.CharField(
         verbose_name=_("Hostname"),
         max_length=255,
@@ -31,7 +31,10 @@ class ExternalAPILog(models.Model):
         null=True, blank=True, help_text=_("The status code of the response.")
     )
     method = models.CharField(
-        max_length=10, default="", help_text=_("The type of request method.")
+        max_length=10,
+        default="",
+        blank=True,
+        help_text=_("The type of request method."),
     )
     response_ms = models.PositiveIntegerField(
         verbose_name=_("Response in ms"),
@@ -41,21 +44,18 @@ class ExternalAPILog(models.Model):
     )
     timestamp = models.DateTimeField(
         verbose_name=_("Timestamp"),
-        auto_now_add=True,
-        help_text=_("This is the date when the API call was made."),
+        help_text=_("This is the date and time the API call was made."),
     )
-    user = models.ForeignKey(
-        "accounts.User",
-        verbose_name=_("User"),
-        on_delete=models.SET_NULL,
+    trace = models.TextField(
+        verbose_name=_("Trace"),
         blank=True,
         null=True,
-        help_text=_("The user who made the request."),
+        help_text=_("Text providing information in case of request failure."),
     )
 
     class Meta:
-        verbose_name = _("External API Log")
-        verbose_name_plural = _("External API Logs")
+        verbose_name = _("Outgoing Requests Log")
+        verbose_name_plural = _("Outgoing Requests Logs")
 
     def __str__(self):
         return ("{hostname} at {date}").format(

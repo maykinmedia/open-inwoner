@@ -170,6 +170,7 @@ INSTALLED_APPS = [
     "openformsclient",
     "django_htmx",
     "django_yubin",
+    "log_outgoing_requests",
     # Project applications.
     "open_inwoner.accounts",
     "open_inwoner.components",
@@ -184,7 +185,6 @@ INSTALLED_APPS = [
     "open_inwoner.questionnaire",
     "open_inwoner.extended_sessions",
     "open_inwoner.custom_csp",
-    "open_inwoner.external_api_logging",
 ]
 
 MIDDLEWARE = [
@@ -373,6 +373,13 @@ LOGGING = {
         },
     },
 }
+
+#
+# LOG OUTGOING REQUESTS
+#
+LOG_OUTGOING_REQUESTS_ENABLED = config("LOG_OUTGOING_REQUESTS_ENABLED", default=False)
+LOG_OUTGOING_REQUESTS_DB_SAVE = config("LOG_OUTGOING_REQUESTS_DB_SAVE", default=False)
+
 
 #
 # AUTH settings - user accounts, passwords, backends...
