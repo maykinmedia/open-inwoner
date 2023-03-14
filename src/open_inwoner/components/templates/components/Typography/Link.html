@@ -20,7 +20,7 @@
     title="{% firstof title text %}"
 >
     {% if src %}
-        <img class="logo__image" src="{{src}}" alt="{{ text }}"/>
+        <img class="logo__image" src="{{src}}" alt="{{ text }}"{{ svg_height_attr }}/>
     {% endif %}
 
     {% if text and not hide_text %}<span class="link__text">{{ text }}</span>{% endif %}

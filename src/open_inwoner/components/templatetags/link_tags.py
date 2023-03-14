@@ -1,5 +1,6 @@
 from django import template
 from django.urls import NoReverseMatch, reverse
+from django.utils.html import format_html
 
 register = template.Library()
 
@@ -99,6 +100,12 @@ def link(href, text, **kwargs):
             classes.append(kwargs.get("extra_classes", ""))
 
         return " ".join(classes).strip()
+
+    src = kwargs.get("src")
+    if src and src.endswith(".svg"):
+        svg_height = kwargs.pop("svg_height", None)
+        if svg_height:
+            kwargs["svg_height_attr"] = format_html(' height="{}"', svg_height)
 
     kwargs["base_class"] = get_base_class()
     kwargs["classes"] = get_classes()
