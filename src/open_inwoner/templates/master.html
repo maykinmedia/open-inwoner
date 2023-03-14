@@ -35,18 +35,17 @@
 
     <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
         {% header categories=menu_categories request=request breadcrumbs=breadcrumbs search_form=search_form has_general_faq_questions=has_general_faq_questions %}
-        <div class="anchor-menu">
-            <div class="anchor-menu__scroll">
-                <div class="anchor-menu__scroll-link">
-                    {% button href="#top" text=_("Terug naar boven") icon="arrow_upward" pill=True %}
-                </div>
-            </div>
-        </div>
+
         {% if anchors %}
         {% anchor_menu anchors=anchors desktop=False %}
             {% block extra_mobile_anchor %}{% endblock extra_mobile_anchor %}
         {% endanchor_menu%}
         {% endif %}
+        <div class="anchor__scroll" id="scroll-anchor">
+            <div class="anchor__scroll-link">
+                {% button href="#top" text=_("Terug naar boven") icon="arrow_upward" pill=True %}
+            </div>
+        </div>
         {% render_breadcrumbs "components/Header/Breadcrumbs.html" %}
 
         {% block header_image %}{% endblock header_image %}
