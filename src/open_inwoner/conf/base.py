@@ -6,6 +6,8 @@ from django.utils.translation import gettext_lazy as _
 
 import sentry_sdk
 
+from log_outgoing_requests.formatters import HttpFormatter
+
 from .utils import config, get_sentry_integrations
 
 # Build paths inside the project, so further paths can be defined relative to
@@ -306,6 +308,7 @@ LOGGING = {
         "performance": {
             "format": "%(asctime)s %(process)d | %(thread)d | %(message)s",
         },
+        "outgoing_requests": {"()": HttpFormatter},
     },
     "filters": {
         "require_debug_false": {"()": "django.utils.log.RequireDebugFalse"},
@@ -349,6 +352,15 @@ LOGGING = {
             "maxBytes": 1024 * 1024 * 10,  # 10 MB
             "backupCount": 10,
         },
+        "log_outgoing_requests": {
+            "level": "DEBUG",
+            "formatter": "outgoing_requests",
+            "class": "logging.StreamHandler",
+        },
+        "save_outgoing_requests": {
+            "level": "DEBUG",
+            "class": "log_outgoing_requests.handlers.DatabaseOutgoingRequestsHandler",
+        },
     },
     "loggers": {
         "open_inwoner": {
@@ -371,8 +383,14 @@ LOGGING = {
             "level": "INFO",
             "propagate": True,
         },
+        "requests": {
+            "handlers": ["log_outgoing_requests", "save_outgoing_requests"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
     },
 }
+
 
 #
 # LOG OUTGOING REQUESTS

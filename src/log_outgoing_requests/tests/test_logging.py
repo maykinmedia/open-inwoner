@@ -1,4 +1,3 @@
-import os
 from unittest.mock import patch
 
 from django.test import TestCase, override_settings
@@ -7,7 +6,6 @@ import requests
 import requests_mock
 from freezegun import freeze_time
 
-from ..handlers import DatabaseOutgoingRequestsHandler
 from ..models import OutgoingRequestsLog
 
 
@@ -21,7 +19,10 @@ class OutgoingRequestsLoggingTests(TestCase):
             content=b"some content",
         )
 
-    def test_external_requests_are_logged(self, m):
+    @override_settings(
+        LOG_OUTGOING_REQUESTS_ENABLED=True, LOG_OUTGOING_REQUESTS_DB_SAVE=True
+    )
+    def test_external_requests_are_logged_when_tracking_and_save_enabled(self, m):
         self._setUpMocks(m)
 
         with self.assertLogs("requests", level="DEBUG") as logs:
@@ -32,6 +33,9 @@ class OutgoingRequestsLoggingTests(TestCase):
         self.assertEqual(logs.records[0].getMessage(), "External request")
         self.assertEqual(logs.records[0].levelname, "DEBUG")
 
+    @override_settings(
+        LOG_OUTGOING_REQUESTS_ENABLED=True, LOG_OUTGOING_REQUESTS_DB_SAVE=True
+    )
     def test_expected_data_is_saved_when_tracking_and_save_enabled(self, m):
         self._setUpMocks(m)
 
@@ -50,6 +54,7 @@ class OutgoingRequestsLoggingTests(TestCase):
                     status_code=200,
                     content=b"some content",
                 )
+
                 response = func("http://example.com/some-path?version=2.0")
 
                 request_log = OutgoingRequestsLog.objects.last()
@@ -67,36 +72,38 @@ class OutgoingRequestsLoggingTests(TestCase):
                 )
                 self.assertIsNone(request_log.trace)
 
-    def test_request_data_is_not_saved_when_tracking_disabled(self, m):
+    def test_data_is_not_saved_when_tracking_and_save_disabled(self, m):
         self._setUpMocks(m)
 
-        with patch.dict("os.environ", {"LOG_OUTGOING_REQUESTS_ENABLED": "False"}):
-            with self.assertLogs("requests", level="DEBUG") as logs:
-                requests.get("http://example.com/some-path?version=2.0")
+        with self.assertLogs("requests", level="DEBUG") as logs:
+            requests.get("http://example.com/some-path?version=2.0")
 
-            self.assertEqual(logs.output, ["DEBUG:requests:External request"])
-            self.assertEqual(logs.records[0].name, "requests")
-            self.assertEqual(logs.records[0].getMessage(), "External request")
-            self.assertEqual(logs.records[0].levelname, "DEBUG")
-            self.assertFalse(OutgoingRequestsLog.objects.exists())
+        self.assertEqual(logs.output, ["DEBUG:requests:External request"])
+        self.assertEqual(logs.records[0].name, "requests")
+        self.assertEqual(logs.records[0].getMessage(), "External request")
+        self.assertEqual(logs.records[0].levelname, "DEBUG")
+        self.assertFalse(OutgoingRequestsLog.objects.exists())
 
+    @override_settings(
+        LOG_OUTGOING_REQUESTS_ENABLED=True, LOG_OUTGOING_REQUESTS_DB_SAVE=False
+    )
     def test_external_requests_are_logged_when_saving_disabled(self, m):
         self._setUpMocks(m)
 
-        with patch.dict("os.environ", {"LOG_OUTGOING_REQUESTS_ENABLED": "False"}):
-            with self.assertLogs("requests", level="DEBUG") as logs:
-                requests.get("http://example.com/some-path?version=2.0")
+        with self.assertLogs("requests", level="DEBUG") as logs:
+            requests.get("http://example.com/some-path?version=2.0")
 
-            self.assertEqual(logs.output, ["DEBUG:requests:External request"])
-            self.assertEqual(logs.records[0].name, "requests")
-            self.assertEqual(logs.records[0].getMessage(), "External request")
-            self.assertEqual(logs.records[0].levelname, "DEBUG")
+        self.assertEqual(logs.output, ["DEBUG:requests:External request"])
+        self.assertEqual(logs.records[0].name, "requests")
+        self.assertEqual(logs.records[0].getMessage(), "External request")
+        self.assertEqual(logs.records[0].levelname, "DEBUG")
 
-    # @override_settings(ENV_VALUE="LOG_OUTGOING_REQUESTS_ENABLED", ENVIRONMENT="False")
-    # def test_request_data_is_not_saved_when_saving_disabled(self, m):
-    #     with patch.dict("os.environ", {"LOG_OUTGOING_REQUESTS_ENABLED": "False"}):
-    #         self._setUpMocks(m)
+    @override_settings(
+        LOG_OUTGOING_REQUESTS_ENABLED=True, LOG_OUTGOING_REQUESTS_DB_SAVE=False
+    )
+    def test_request_data_is_not_saved_when_saving_disabled(self, m):
+        self._setUpMocks(m)
 
-    #         requests.get("http://example.com/some-path?version=2.0")
+        requests.get("http://example.com/some-path?version=2.0")
 
-    #         self.assertFalse(OutgoingRequestsLog.objects.exists())
+        self.assertFalse(OutgoingRequestsLog.objects.exists())
