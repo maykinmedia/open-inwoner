@@ -18,7 +18,40 @@ from .models import (
 
 @admin.register(OpenZaakConfig)
 class OpenZaakConfigAdmin(SingletonModelAdmin):
-    pass
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": [
+                    "zaak_service",
+                    "catalogi_service",
+                    "document_service",
+                    "form_service",
+                ]
+            },
+        ),
+        (
+            "Advanced options",
+            {
+                "classes": ("collapse",),
+                "fields": [
+                    "zaak_max_confidentiality",
+                    "document_max_confidentiality",
+                    "max_upload_size",
+                    "allowed_file_extensions",
+                ],
+            },
+        ),
+        (
+            _("API behaviour override options"),
+            {
+                "fields": [
+                    "skip_notification_statustype_informeren",
+                    "reformat_esuite_zaak_identificatie",
+                ],
+            },
+        ),
+    )
 
 
 @admin.register(CatalogusConfig)

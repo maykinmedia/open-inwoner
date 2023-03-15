@@ -53,7 +53,6 @@ class Product(models.Model):
     )
     summary = models.TextField(
         verbose_name=_("Summary"),
-        blank=True,
         default="",
         max_length=300,
         help_text=_("Short description of the product, limited to 300 characters."),
@@ -341,9 +340,15 @@ class ProductLocation(GeoModel):
     def get_geojson_feature(self, stringify: bool = True) -> Union[str, dict]:
         feature = super().get_geojson_feature(False)
 
+        if feature.get("properties"):
+            feature["properties"]["location_url"] = self.get_absolute_url()
+
         if stringify:
             return json.dumps(feature)
         return feature
+
+    def get_absolute_url(self) -> str:
+        return reverse("pdc:location_detail", kwargs={"uuid": self.uuid})
 
 
 class ProductCondition(OrderedModel):

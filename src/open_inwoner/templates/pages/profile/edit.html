@@ -1,10 +1,45 @@
 {% extends 'master.html' %}
-{% load i18n l10n link_tags file_tags button_tags utils icon_tags form_tags %}
+{% load i18n l10n form_tags %}
+
+{% block extra_head %}
+    {{form.media}}
+{% endblock %}
 
 {% block content %}
-<h1 class="h1" id="title">
-    {% trans "Profiel bewerken" %}
-</h1>
+    <h1 class="h1" id="title">
+        {% trans "Profiel bewerken" %}
+    </h1>
 
-{% form form_object=form method="POST" id="profile-edit" submit_text=_("Opslaan") secondary_href='accounts:my_profile' secondary_text=_('Terug') secondary_icon='arrow_backward' secondary_icon_position="before" %}
+    {% render_form id="profile-edit" method="POST" form=form form_action=form_action enctype="multipart/form-data" %}
+        {% csrf_token %}
+
+        {% with request.user as user %}
+            {% if user.is_digid_and_brp %}
+                {% input form.display_name %}
+                {% input form.email %}
+                {% input form.phonenumber %}
+                {% if user.contact_type == "begeleider" %}
+                    {% input form.image no_help=True %}
+                    {% image_crop form.cropping %}
+                {% endif %}
+            {% else %}
+                {% input form.first_name %}
+                {% input form.last_name %}
+                {% input form.display_name %}
+                {% input form.email %}
+                {% input form.phonenumber %}
+                {% date_field form.birthday no_help=True %}
+                {% input form.street %}
+                {% input form.housenumber %}
+                {% input form.postcode %}
+                {% input form.city %}
+                {% if user.contact_type == "begeleider" %}
+                    {% input form.image no_help=True %}
+                    {% image_crop form.cropping %}
+                {% endif %}
+            {% endif %}
+        {% endwith %}
+        {% form_actions primary_text=_("Opslaan") primary_icon="arrow_forward" secondary_href='accounts:my_profile' secondary_text=_('Terug') secondary_icon='arrow_backward' secondary_icon_position="before" enctype="multipart/form-data" %}
+    {% endrender_form %}
+
 {% endblock content %}

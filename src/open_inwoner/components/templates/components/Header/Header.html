@@ -6,7 +6,7 @@
 <header class="header" aria-label="Navigatie header">
     <div class="header__container">
         {% firstof config.logo.default_alt_text config.name as logo_alt_text %}
-        {% logo src=config.logo.file.url alt=logo_alt_text %}
+        {% logo src=config.logo.file.url alt=logo_alt_text svg_height=75 %}
 
         <div class="header__menu">
             <button class="header__button">

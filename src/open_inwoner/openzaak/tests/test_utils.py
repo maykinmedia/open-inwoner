@@ -190,7 +190,7 @@ class TestUtils(ClearCachesMixin, TestCase):
                     "voornamen": "",
                 },
             )
-            expected = RolTypes.labels[RolTypes.natuurlijk_persoon]
+            expected = RolTypes.natuurlijk_persoon.label
             self.assertEqual(expected, get_role_name_display(role))
 
         with self.subTest("niet_natuurlijk_persoon"):

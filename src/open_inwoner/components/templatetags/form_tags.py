@@ -272,6 +272,11 @@ def date_field(field, **kwargs):
     return {**kwargs, "field": field}
 
 
+@register.inclusion_tag("components/Form/ImageCrop.html")
+def image_crop(field, **kwargs):
+    return {**kwargs, "field": field}
+
+
 @register.inclusion_tag("components/Form/Search.html")
 def search(field, **kwargs):
     """

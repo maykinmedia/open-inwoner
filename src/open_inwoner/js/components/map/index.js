@@ -1,3 +1,4 @@
+import escapeHTML from 'escape-html'
 import 'leaflet'
 import { RD_CRS } from './rd'
 import { isMobile } from '../../lib/device/is-mobile'
@@ -73,17 +74,31 @@ class Map {
    * @return {string}
    */
   featureToHTML(feature) {
-    const { name, ...properties } = feature.properties
-    const displayName = name ? name : ''
+    const { name, location_url, ...properties } = feature.properties
+    const displayName = name ? escapeHTML(name) : ''
+    const locationDetailView = location_url ? escapeHTML(location_url) : ''
+    let title = ''
+    let finalHTML = ``
+
+    if (locationDetailView) {
+      title = `<a href="${locationDetailView}">${displayName}</a>`
+    } else {
+      title = displayName
+    }
+
+    Object.entries(properties).forEach((property) => {
+      finalHTML += `<p class="p">${escapeHTML(property[1])}</p>`
+    })
+
     return `
-        <h4 class="h4">
-          ${displayName}
-        </h4>
-        <p class="p">
-          ${Object.entries(properties)
-            .map(([key, value]) => value)
-            .join(' ')}
-          </p>
+        <div class="leaflet-content-name">
+          <h4 class="h4">
+            ${title}
+          </h4>
+        </div>
+        <div class="leaflet-content-details p--no-margin">
+          ${finalHTML}
+        </div>
     `
   }
 }

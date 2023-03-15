@@ -112,6 +112,7 @@ cssselect2==0.4.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   svglib
     #   weasyprint
 defusedxml==0.7.1
     # via
@@ -176,6 +177,7 @@ django-appconf==1.0.5
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   django-image-cropping
     #   django-timeline-logger
 django-autoslug==1.9.8
     # via
@@ -196,7 +198,6 @@ django-choices==1.7.2
     #   -r requirements/base.txt
     #   django-digid-eherkenning
     #   mail-editor
-    #   zgw-consumers
 django-ckeditor==6.2.0
     # via
     #   -c requirements/base.txt
@@ -230,7 +231,7 @@ django-extra-fields==3.0.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-django-filer==2.0.2
+django-filer==2.2.4
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -248,6 +249,10 @@ django-hijack==3.0.4
     #   -c requirements/base.txt
     #   -r requirements/base.txt
 django-htmx==1.13.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+django-image-cropping==1.7
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -382,7 +387,7 @@ drf-spectacular==0.20.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-easy-thumbnails==2.7.1
+easy-thumbnails[svg]==2.8.5
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -520,6 +525,7 @@ lxml==4.9.1
     #   django-digid-eherkenning
     #   maykin-python3-saml
     #   pyquery
+    #   svglib
     #   xmlsec
 mail-editor @ git+https://github.com/maykinmedia/mail-editor.git@f99e5c4920a95cf9141a71230d7dfb9f03b84e36
     # via
@@ -588,6 +594,7 @@ pillow==9.0.1
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   easy-thumbnails
+    #   reportlab
     #   weasyprint
 platformdirs==2.4.0
     # via pylint
@@ -701,6 +708,12 @@ redis==3.5.3
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-redis
+reportlab==3.6.12
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   easy-thumbnails
+    #   svglib
 requests==2.26.0
     # via
     #   -c requirements/base.txt
@@ -753,6 +766,11 @@ sqlparse==0.4.2
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django
+svglib==1.5.1
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   easy-thumbnails
 tablib[html,ods,xls,xlsx,yaml]==3.1.0
     # via
     #   -c requirements/base.txt
@@ -770,6 +788,7 @@ tinycss2==1.1.1
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   cssselect2
+    #   svglib
     #   weasyprint
 toml==0.10.2
     # via pylint
@@ -848,7 +867,7 @@ xmlsec==1.3.12
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   maykin-python3-saml
-zgw-consumers==0.23.2
+zgw-consumers==0.25.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt

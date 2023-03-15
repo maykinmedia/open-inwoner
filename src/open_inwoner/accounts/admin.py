@@ -6,6 +6,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils.html import format_html
 from django.utils.translation import ngettext, ugettext_lazy as _
 
+from image_cropping import ImageCroppingMixin
 from privates.admin import PrivateMediaMixin
 
 from open_inwoner.utils.mixins import UUIDAdminFirstInOrder
@@ -52,7 +53,7 @@ class _UserCreationForm(UserCreationForm):
 
 
 @admin.register(User)
-class _UserAdmin(UserAdmin):
+class _UserAdmin(ImageCroppingMixin, UserAdmin):
     form = _UserChangeForm
     add_form = _UserCreationForm
     hijack_success_url = reverse_lazy("root")
@@ -74,6 +75,7 @@ class _UserAdmin(UserAdmin):
                     "oidc_id",
                     "birthday",
                     "image",
+                    "cropping",
                     "street",
                     "housenumber",
                     "postcode",

@@ -219,6 +219,10 @@
                 "zaaktypeconfig"
             ],
             [
+                "openzaak",
+                "zaaktypeinformatieobjecttypeconfig"
+            ],
+            [
                 "sites",
                 "site"
             ],

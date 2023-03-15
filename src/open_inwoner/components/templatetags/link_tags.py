@@ -1,5 +1,6 @@
 from django import template
 from django.urls import NoReverseMatch, reverse
+from django.utils.html import format_html
 
 register = template.Library()
 
@@ -42,6 +43,7 @@ def link(href, text, **kwargs):
         - uuid: str | if href is an url name, uuid for reverse can be passed.
         - title: string | The HTML title attribute if different than the text.
         - hide_external_icon: bool | If we want to hide the extra icon for an external link
+        - blank: bool | if we want the link to open in a new tab.
 
     Extra context:
         - base_class: string | If it is a button or a string.
@@ -98,6 +100,12 @@ def link(href, text, **kwargs):
             classes.append(kwargs.get("extra_classes", ""))
 
         return " ".join(classes).strip()
+
+    src = kwargs.get("src")
+    if src and src.endswith(".svg"):
+        svg_height = kwargs.pop("svg_height", None)
+        if svg_height:
+            kwargs["svg_height_attr"] = format_html(' height="{}"', svg_height)
 
     kwargs["base_class"] = get_base_class()
     kwargs["classes"] = get_classes()

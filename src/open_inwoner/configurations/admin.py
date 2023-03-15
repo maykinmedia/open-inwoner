@@ -120,6 +120,7 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                 "fields": (
                     "footer_visiting_title",
                     "footer_visiting_intro",
+                    "footer_visiting_phonenumber",
                     "footer_visiting_map",
                     "footer_mailing_title",
                     "footer_mailing_intro",
