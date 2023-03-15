@@ -41,16 +41,16 @@ class CTARequestButtonPlugin extends Plugin {
       button.on('execute', () => {
         const formId = document.getElementById('id_form')
         const linkId = document.getElementById('id_link')
-        let productSlug = ''
+        let productId = ''
 
         if (formId) {
-          productSlug = formId.dataset.productSlug
+          productId = formId.dataset.productId
         } else if (linkId) {
-          productSlug = linkId.dataset.productSlug
+          productId = linkId.dataset.productId
         }
 
         editor.model.change((writer) => {
-          const link = writer.createText(`[CTA/${productSlug}]`)
+          const link = writer.createText(`[CTA/${productId}]`)
 
           editor.model.insertContent(link, editor.model.document.selection)
         })

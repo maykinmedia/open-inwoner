@@ -41,6 +41,7 @@ def get_rendered_content(content):
                 icon.append("open_in_new")
                 element.append(icon)
             if element.text.startswith("[CTA/"):
+                breakpoint()
                 product_slug = element.text.split("/")[1][:-1]
                 try:
                     product = Product.objects.get(slug=product_slug)
