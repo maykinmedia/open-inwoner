@@ -34,7 +34,7 @@
     </head>
 
     <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
-        {% header categories=menu_categories request=request breadcrumbs=breadcrumbs search_form=search_form has_general_faq_questions=has_general_faq_questions %}
+        {% header categories=menu_categories request=request breadcrumbs=breadcrumbs search_form=search_form has_general_faq_questions=has_general_faq_questions show_plans=show_plans %}
 
         {% if anchors %}
         {% anchor_menu anchors=anchors desktop=False %}

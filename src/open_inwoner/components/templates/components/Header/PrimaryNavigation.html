@@ -12,7 +12,7 @@
             {% icon icon="expand_more" %}
 
             {% if categories %}
-                <ul class="primary-navigation__list">
+                <ul class="primary-navigation__list subpage-list">
                     {% for category in categories %}
                         <li class="primary-navigation__list-item">
                             {% url 'pdc:category_detail' slug=category.slug as category_href %}
@@ -28,11 +28,13 @@
             </li>
             <li class="primary-navigation__list-item">
                 {% link text=_('Mijn berichten') href='accounts:inbox' icon="inbox" icon_position="before" %}
-                {% if request.user.get_new_messages_total %}
-                    {% with "("|addstr:request.user.get_new_messages_total|addstr:")" as message_total %}
-                        {% link text=message_total href='accounts:inbox' secondary=True %}
-                    {% endwith %}
-                {% endif %}
+                {% with request.user.get_new_messages_total as total_messages %}
+                    {% if total_messages %}
+                        {% with "("|addstr:total_messages|addstr:")" as message_total %}
+                            {% link text=message_total href='accounts:inbox' secondary=True %}
+                        {% endwith %}
+                    {% endif %}
+                {% endwith %}
             </li>
 
             {% get_solo 'configurations.SiteConfiguration' as config %}
