@@ -93,6 +93,18 @@ class ProductAdmin(ImportExportMixin, admin.ModelAdmin):
 
     display_categories.short_description = "categories"
 
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+
+        if obj:
+            form.base_fields["link"].widget.attrs.update(
+                {"data-product-slug": obj.slug}
+            )
+            form.base_fields["form"].widget.attrs.update(
+                {"data-product-slug": obj.slug}
+            )
+        return form
+
 
 @admin.register(ProductContact)
 class ProductContactAdmin(admin.ModelAdmin):
