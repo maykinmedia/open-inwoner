@@ -1,8 +1,17 @@
+from urllib.parse import urlparse
+
 from django.db import models
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 
 class OutgoingRequestsLog(models.Model):
+    url = models.URLField(
+        verbose_name=_("URL"),
+        blank=True,
+        default="",
+        help_text=_("The url of the outgoing request."),
+    )
     hostname = models.CharField(
         verbose_name=_("Hostname"),
         max_length=255,
@@ -10,31 +19,37 @@ class OutgoingRequestsLog(models.Model):
         blank=True,
         help_text=_("The hostname part of the url."),
     )
-    path = models.CharField(
-        verbose_name=_("Path"),
-        max_length=255,
-        default="",
-        blank=True,
-        help_text=_("The path part of the url."),
-    )
     params = models.TextField(
         verbose_name=_("Parameters"),
         blank=True,
         help_text=_("The parameters (if they exist)."),
     )
-    query_params = models.TextField(
-        verbose_name=_("Query parameters"),
-        blank=True,
-        help_text=_("The query parameters part of the url (if they exist)."),
-    )
     status_code = models.PositiveIntegerField(
-        null=True, blank=True, help_text=_("The status code of the response.")
+        verbose_name=_("Status code"),
+        null=True,
+        blank=True,
+        help_text=_("The status code of the response."),
     )
     method = models.CharField(
+        verbose_name=_("Method"),
         max_length=10,
         default="",
         blank=True,
         help_text=_("The type of request method."),
+    )
+    req_content_type = models.CharField(
+        verbose_name=_("Request content type"),
+        max_length=50,
+        default="",
+        blank=True,
+        help_text=_("The content type of the request."),
+    )
+    res_content_type = models.CharField(
+        verbose_name=_("Response content type"),
+        max_length=50,
+        default="",
+        blank=True,
+        help_text=_("The content type of the response."),
     )
     response_ms = models.PositiveIntegerField(
         verbose_name=_("Response in ms"),
@@ -61,3 +76,8 @@ class OutgoingRequestsLog(models.Model):
         return ("{hostname} at {date}").format(
             hostname=self.hostname, date=self.timestamp
         )
+
+    @cached_property
+    def query_params(self):
+        parsed_url = urlparse(self.url)
+        return parsed_url.query

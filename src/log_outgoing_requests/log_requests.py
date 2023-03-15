@@ -13,12 +13,12 @@ def hook_requests_logging(response, *args, **kwargs):
     A hook for requests library in order to add extra data to the logs
     """
     extra = {"requested_at": timezone.now(), "req": response.request, "res": response}
-    logger.debug("External request", extra=extra)
+    logger.debug("Outgoing request", extra=extra)
 
 
 def install_outgoing_requests_logging():
     """
-    Log all external requests which are made by the library requests during a session.
+    Log all outgoing requests which are made by the library requests during a session.
     """
 
     if hasattr(Session, "_original_request"):
