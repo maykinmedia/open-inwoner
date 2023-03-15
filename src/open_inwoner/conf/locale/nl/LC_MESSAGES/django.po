@@ -3484,7 +3484,7 @@ msgstr "actie is aangemaakt voor plan"
 
 #: plans/tests/test_logging.py:173
 msgid "Changed: Naam."
-msgstr ""
+msgstr "Gewijzigd: Naam."
 
 #: plans/tests/test_logging.py:208
 #, python-brace-format
@@ -4502,7 +4502,7 @@ msgstr ""
 #: utils/logentry.py:32
 #, python-brace-format
 msgid "Changed: {changed_fields}."
-msgstr "Changed: {changed_fields}."
+msgstr "Gewijzigd: {changed_fields}."
 
 #: utils/logentry.py:33
 msgid "and"
