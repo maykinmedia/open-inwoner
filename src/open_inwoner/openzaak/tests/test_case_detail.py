@@ -299,6 +299,8 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
             self.informatie_object,
             self.informatie_object_invisible,
             self.zaaktype_informatie_object_type,
+            self.status_type_new,
+            self.status_type_finish,
         ]:
             m.get(resource["url"], json=resource)
 
@@ -325,10 +327,6 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
             # Taiga #961 this is not an accurate OpenZaak response as it has a 'behandelaar' even when we filter on 'initiator'
             # but eSuite doesn't filter the response in the API, so we use filtering in Python to remove the not-initiator
             json=paginated_response([self.user_role, self.not_initiator_role]),
-        )
-        m.get(
-            f"{CATALOGI_ROOT}statustypen?zaaktype={self.zaaktype['url']}",
-            json=paginated_response([self.status_type_new, self.status_type_finish]),
         )
         m.post(
             f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten",

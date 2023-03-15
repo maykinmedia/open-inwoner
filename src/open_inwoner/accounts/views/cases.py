@@ -1,4 +1,5 @@
 import dataclasses
+from collections import defaultdict
 from typing import List, Optional
 
 from django.contrib import messages
@@ -12,6 +13,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import FormView, TemplateView
 
+from glom import glom
 from view_breadcrumbs import BaseBreadcrumbMixin
 from zgw_consumers.api_models.constants import RolOmschrijving
 
@@ -25,10 +27,13 @@ from open_inwoner.openzaak.cases import (
     fetch_roles_for_case_and_bsn,
     fetch_single_case,
     fetch_single_result,
-    fetch_specific_status,
+    fetch_single_status,
     fetch_status_history,
 )
-from open_inwoner.openzaak.catalog import fetch_single_case_type, fetch_status_types
+from open_inwoner.openzaak.catalog import (
+    fetch_single_case_type,
+    fetch_single_status_type,
+)
 from open_inwoner.openzaak.documents import (
     download_document,
     fetch_single_information_object_url,
@@ -122,7 +127,6 @@ class CaseListMixin(CaseLogMixin, PaginationMixin):
         cases = fetch_cases(self.request.user.bsn)
 
         case_types = {}
-        status_types = {}
         case_types_set = {case.zaaktype for case in cases}
 
         # fetch unique case types
@@ -137,45 +141,40 @@ class CaseListMixin(CaseLogMixin, PaginationMixin):
         # filter visibility
         cases = [case for case in cases if is_zaak_visible(case)]
 
-        # grab types of remaining cases
-        case_types_set = {case.zaaktype.url for case in cases}
-
-        # fetch status types for case types
-        for case_type_url in case_types_set:
-            # todo parallel
-            for st in fetch_status_types(case_type_url):
-                status_types[st.url] = st
-
         # fetch case status resources and attach resolved to case
+        status_types = defaultdict(list)
         for case in cases:
-            # todo parallel
             if case.status:
-                case.status = fetch_specific_status(case.status)
-                case.status.statustype = status_types[case.status.statustype]
+                # todo parallel
+                case.status = fetch_single_status(case.status)
+                status_types[case.status.statustype].append(case)
+
+        for status_type_url, _cases in status_types.items():
+            # todo parallel
+            status_type = fetch_single_status_type(status_type_url)
+            for case in _cases:
+                case.status.statustype = status_type
 
         return cases
 
-    def process_cases(self, cases: List[Zaak]) -> List[Zaak]:
+    def process_cases(self, cases: List[Zaak]) -> List[dict]:
         # Prepare data for frontend
         config = OpenZaakConfig.get_solo()
 
         updated_cases = []
         for case in cases:
-            updated_cases.append(
-                {
-                    "identificatie": format_zaak_identificatie(
-                        case.identificatie, config
-                    ),
-                    "uuid": str(case.uuid),
-                    "start_date": case.startdatum,
-                    "end_date": getattr(case, "einddatum", None),
-                    "description": case.omschrijving,
-                    "zaaktype_description": case.zaaktype.omschrijving,
-                    "current_status": (
-                        case.status.statustype.omschrijving if case.status else ""
-                    ),
-                }
-            )
+            case_dict = {
+                "identificatie": format_zaak_identificatie(case.identificatie, config),
+                "uuid": str(case.uuid),
+                "start_date": case.startdatum,
+                "end_date": getattr(case, "einddatum", None),
+                "description": case.omschrijving,
+                "zaaktype_description": case.zaaktype.omschrijving,
+                "current_status": glom(
+                    case, "status.statustype.omschrijving", default=""
+                ),
+            }
+            updated_cases.append(case_dict)
         return updated_cases
 
     def get_context_data(self, **kwargs):
@@ -317,17 +316,24 @@ class CaseDetailView(
             documents = self.get_case_document_files(self.case)
 
             statuses = fetch_status_history(self.case.url)
+
             # NOTE we cannot sort on the Status.datum_status_gezet (datetime) because eSuite returns zeros as the time component of the datetime,
             # so we're going with the observation that on both OpenZaak and eSuite the returned list is ordered 'oldest-last'
             # here we want it 'oldest-first' so we reverse() it instead of sort()-ing
             statuses.reverse()
 
-            status_types = fetch_status_types(self.case.zaaktype.url)
-
-            status_types_mapping = {st.url: st for st in status_types}
+            status_types = defaultdict(list)
             for status in statuses:
-                status_type = status_types_mapping[status.statustype]
-                status.statustype = status_type
+                status_types[status.statustype].append(status)
+                if self.case.status == status.url:
+                    self.case.status = status
+
+            for status_type_url, _statuses in list(status_types.items()):
+                # todo parallel
+                status_type = fetch_single_status_type(status_type_url)
+                status_types[status_type_url] = status_type
+                for status in _statuses:
+                    status.statustype = status_type
 
             context["case"] = {
                 "identification": format_zaak_identificatie(
@@ -343,12 +349,10 @@ class CaseDetailView(
                 ),
                 "description": self.case.omschrijving,
                 "type_description": self.case.zaaktype.omschrijving,
-                "current_status": (
-                    statuses[-1].statustype.omschrijving
-                    if statuses
-                    and statuses[-1].statustype.omschrijving
-                    in [st.omschrijving for st in status_types]
-                    else _("No data available")
+                "current_status": glom(
+                    self.case,
+                    "status.statustype.omschrijving",
+                    default=_("No data available"),
                 ),
                 "statuses": statuses,
                 "documents": documents,
