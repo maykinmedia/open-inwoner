@@ -69,7 +69,8 @@ class OutgoingRequestsLoggingTests(TestCase):
                 )
                 self.assertIsNone(request_log.trace)
 
-    def test_d(self, m):
+    @override_settings(LOG_OUTGOING_REQUESTS_DB_SAVE=True)
+    def test_authorization_header_is_not_saved(self, m):
         self._setUpMocks(m)
 
         requests.get(
