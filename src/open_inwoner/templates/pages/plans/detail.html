@@ -43,7 +43,7 @@
         </div>
         <div class="plan-contact__container">
             {% icon "person" outlined=True %}
-            <p class="plan-contact__title">{% trans "Contactpersonen" %}</p>
+            <p class="plan-contact__title">{% trans "Deelnemers" %}</p>
             <div class="plan-contact__grid plan-contact__grid--columns-{% if object.plan_contacts.count > 1 %}2{% else %}1{% endif %}">
                 {% for user in contact_users %}
                     <div class="plan-contact__information">
