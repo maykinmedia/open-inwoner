@@ -4,7 +4,7 @@
 {% block content %}
 
 {% render_grid %}
-    {% render_column start=1 span=6 %}
+    {% render_column start=5 span=5 %}
         {% render_card direction='horizontal' tinted=True %}
             <a href="{% url 'digid:login' %}" class="link digid-logo" aria-describedby="Digid logo" title="Digid logo">
                 <img class="digid-logo__image" src="{% static 'accounts/digid_logo.svg' %}" alt="Digid logo">
@@ -14,7 +14,7 @@
     {% endrender_column %}
 
     {% if login_allow_registration %}
-        {% render_column start=7 span=13 %}
+        {% render_column start=5 span=5 %}
             {% render_card tinted=True  %}
                 <h1 class="h3">{% trans "Registreren met E-mail" %}</h1><br>
                 {% form form_object=form method="POST" id="registration-form" submit_text=_('Registreren') extra_classes="form__registration" %}
