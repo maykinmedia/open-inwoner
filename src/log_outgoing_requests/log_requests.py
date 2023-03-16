@@ -12,7 +12,6 @@ def hook_requests_logging(response, *args, **kwargs):
     """
     A hook for requests library in order to add extra data to the logs
     """
-    response.request.headers.pop("Authorization", None)
     extra = {"requested_at": timezone.now(), "req": response.request, "res": response}
     logger.debug("Outgoing request", extra=extra)
 

@@ -72,13 +72,13 @@ class OutgoingRequestsLoggingTests(TestCase):
     def test_d(self, m):
         self._setUpMocks(m)
 
-        with self.assertLogs("requests", level="DEBUG") as logs:
-            requests.get(
-                "http://example.com/some-path?version=2.0",
-                headers={"Authorization": "test"},
-            )
+        requests.get(
+            "http://example.com/some-path?version=2.0",
+            headers={"Authorization": "test"},
+        )
+        log = OutgoingRequestsLog.objects.get()
 
-        self.assertNotIn("Authorization", logs.records[0].req.headers)
+        self.assertNotIn("Authorization", eval(log.req_headers))
 
     def test_data_is_not_saved_when_saving_disabled(self, m):
         self._setUpMocks(m)

@@ -14,6 +14,8 @@ class DatabaseOutgoingRequestsHandler(logging.Handler):
 
             # save only the requests coming from the library requests
             if record and record.getMessage() == "Outgoing request":
+                record.req.headers.pop("Authorization", None)
+
                 if record.exc_info:
                     trace = traceback.format_exc()
 
