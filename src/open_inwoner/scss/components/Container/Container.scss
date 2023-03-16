@@ -16,5 +16,11 @@
   @media (min-width: 768px) {
     $hm: max(calc((100vw - var(--container-width)) / 2), var(--spacing-large));
     margin: var(--row-height) $hm calc(var(--row-height) * 2);
+
+    &--no-margin {
+      min-height: 0;
+      margin-top: 0;
+      margin-bottom: 0;
+    }
   }
 }
