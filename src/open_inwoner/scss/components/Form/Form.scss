@@ -82,6 +82,20 @@
     max-width: 100%;
   }
 
+  @media (min-width: 360px) {
+    &__control > .label .input,
+    &__control > .label .input[type='file'] {
+      max-width: 360px;
+    }
+  }
+
+  .filter__container &__control > .label .input,
+  .filter__container &__control > .label .input[type='file'],
+  .form--search &__control > .label .input {
+    width: 100%;
+    max-width: 100%;
+  }
+
   /// Registration -start.
 
   &__control > .label ul {

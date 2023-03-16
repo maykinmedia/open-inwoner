@@ -15,14 +15,14 @@
         {% button href="plans:plan_create" text=_("Start nieuwe samenwerking") primary=True icon="group" icon_outlined=True %}
     </h1>
     {% optional_paragraph configurable_text.plans_page.plans_intro %}
-    
+
     {% if plans.extended_plans %}
         {% render_form form=plan_filter_form method="GET" spaceless=True autosubmit=True form_action=form_action %}
         <div class="plan-filter">
             <div class="plan-filter__button">
                 {% button text=_("Filter") type="button" bordered=True %}
             </div>
-            <div class="plan-filter__container">
+            <div class="plan-filter__container filter__container">
                 <p class="p">{% trans "Filter op:" %}</p>
                 {% input plan_filter_form.plan_contacts no_label=True no_help=True icon="person" %}
                 {% input plan_filter_form.status no_label=True no_help=True icon="expand_more" %}
@@ -34,7 +34,7 @@
             </div>
         </div>
         {% endrender_form %}
-        
+
         <table class="table plans-extended">
             <thead class="table__heading">
                 <tr>
@@ -71,6 +71,6 @@
     {% else %}
         {% card_container plans=plans.plan_list columns=2 %}
     {% endif %}
-    
+
     {% pagination page_obj=page_obj paginator=paginator request=request %}
 {% endblock %}
