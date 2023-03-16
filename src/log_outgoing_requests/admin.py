@@ -17,6 +17,8 @@ class OutgoingRequestsLogAdmin(admin.ModelAdmin):
         "timestamp",
         "req_content_type",
         "res_content_type",
+        "req_headers",
+        "res_headers",
         "trace",
     )
     readonly_fields = fields
@@ -30,7 +32,7 @@ class OutgoingRequestsLogAdmin(admin.ModelAdmin):
         "timestamp",
     )
     list_filter = ("method", "status_code", "hostname")
-    search_fields = ("params", "query_params", "hostname")
+    search_fields = ("url", "params", "hostname")
     date_hierarchy = "timestamp"
     show_full_result_count = False
 

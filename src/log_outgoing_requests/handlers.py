@@ -29,6 +29,8 @@ class DatabaseOutgoingRequestsHandler(logging.Handler):
                     "res_content_type": record.res.headers.get("Content-Type", ""),
                     "timestamp": record.requested_at,
                     "response_ms": int(record.res.elapsed.total_seconds() * 1000),
+                    "req_headers": record.req.headers,
+                    "res_headers": record.res.headers,
                     "trace": trace,
                 }
 

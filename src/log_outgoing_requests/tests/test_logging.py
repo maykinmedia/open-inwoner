@@ -69,6 +69,17 @@ class OutgoingRequestsLoggingTests(TestCase):
                 )
                 self.assertIsNone(request_log.trace)
 
+    def test_d(self, m):
+        self._setUpMocks(m)
+
+        with self.assertLogs("requests", level="DEBUG") as logs:
+            requests.get(
+                "http://example.com/some-path?version=2.0",
+                headers={"Authorization": "test"},
+            )
+
+        self.assertNotIn("Authorization", logs.records[0].req.headers)
+
     def test_data_is_not_saved_when_saving_disabled(self, m):
         self._setUpMocks(m)
 
