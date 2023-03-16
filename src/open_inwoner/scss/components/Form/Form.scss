@@ -91,7 +91,8 @@
 
   .filter__container &__control > .label .input,
   .filter__container &__control > .label .input[type='file'],
-  .form--search &__control > .label .input {
+  .form--search &__control > .label .input,
+  &.form__registration .form__control .label .input{
     width: 100%;
     max-width: 100%;
   }

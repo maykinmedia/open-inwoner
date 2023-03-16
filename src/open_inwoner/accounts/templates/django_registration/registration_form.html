@@ -17,7 +17,7 @@
         {% render_column start=7 span=13 %}
             {% render_card tinted=True  %}
                 <h1 class="h3">{% trans "Registreren met E-mail" %}</h1><br>
-                {% form form_object=form method="POST" id="registration-form" submit_text=_('Registreren') %}
+                {% form form_object=form method="POST" id="registration-form" submit_text=_('Registreren') extra_classes="form__registration" %}
             {% endrender_card %}
         {% endrender_column %}
     {% endif %}
