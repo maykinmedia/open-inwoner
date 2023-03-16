@@ -34,23 +34,17 @@ class CTARequestButtonPlugin extends Plugin {
 
       button.set({
         label: 'Add request button',
+        class: 'cta_button_request',
         withText: true,
       })
 
       //Execute a callback function when the button is clicked
       button.on('execute', () => {
-        const formId = document.getElementById('id_form')
-        const linkId = document.getElementById('id_link')
-        let productId = ''
-
-        if (formId) {
-          productId = formId.dataset.productId
-        } else if (linkId) {
-          productId = linkId.dataset.productId
-        }
-
         editor.model.change((writer) => {
-          const link = writer.createText(`[CTA/${productId}]`)
+          const link = writer.createText('[CTAREQUESTBUTTON]', {
+            //Temporary url for creating a link tag
+            linkHref: '/',
+          })
 
           editor.model.insertContent(link, editor.model.document.selection)
         })
