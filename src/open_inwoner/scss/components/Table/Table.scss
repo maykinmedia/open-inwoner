@@ -105,8 +105,9 @@
     &--notification-danger {
       background-color: var(--color-danger-lightest);
       color: var(--color-danger-darker);
+      font-size: var(--font-size-body);
       text-align: center;
-      border-radius: var(--border-radius);
+      border-radius: var(--border-radius-large);
       padding: var(--spacing-small) 0;
     }
   }
