@@ -1,4 +1,4 @@
-{% load i18n icon_tags button_tags %}
+{% load i18n icon_tags link_tags button_tags %}
 
 <aside class="anchor-menu {% if desktop %}anchor-menu--desktop{% else %}anchor-menu--mobile{% endif %}" aria-label="{% trans "Secundaire paginanavigatie" %}">
     <ul class="anchor-menu__list">
@@ -9,5 +9,17 @@
             </li>
         {% endfor %}
         {{ contents }}
+    <div>A0</div>
+        {% if product.form %}
+            {% button_row mobile=True %}
+                a1
+                {% button href=product.form_link text=_("Aanvraag starten") primary=True icon="arrow_forward" icon_position="before" %}
+            {% endbutton_row %}
+        {% elif product.link %}
+            {% button_row mobile=True %}
+                a2
+                {% button href=product.link text=_("Aanvraag starten") primary=True icon="arrow_forward" icon_position="before" %}
+            {% endbutton_row %}
+        {% endif %}
     </ul>
 </aside>
