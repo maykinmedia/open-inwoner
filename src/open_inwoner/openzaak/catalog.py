@@ -16,11 +16,9 @@ from .utils import cache as cache_result, get_retrieve_resource_by_uuid_url
 logger = logging.getLogger(__name__)
 
 
-@cache_result(
-    "status_types_for_case_type:{case_type_url}",
-    timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT,
-)
-def fetch_status_types(case_type_url: str) -> List[StatusType]:
+# not cached because only used by tools,
+# and because caching (stale) listings can break lookups
+def fetch_status_types_no_cache(case_type_url: str) -> List[StatusType]:
     client = build_client("catalogi")
 
     if client is None:
@@ -44,11 +42,9 @@ def fetch_status_types(case_type_url: str) -> List[StatusType]:
     return status_types
 
 
-@cache_result(
-    "result_types_for_case_type:{case_type_url}",
-    timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT,
-)
-def fetch_result_types(case_type_url: str) -> List[ResultaatType]:
+# not cached because only used by tools,
+# and because caching (stale) listings can break lookups
+def fetch_result_types_no_cache(case_type_url: str) -> List[ResultaatType]:
     client = build_client("catalogi")
 
     if client is None:
@@ -95,6 +91,8 @@ def fetch_single_status_type(status_type_url: str) -> Optional[StatusType]:
     return status_type
 
 
+# not cached because only used by tools,
+# and because caching (stale) listings can break lookups
 def fetch_zaaktypes_no_cache() -> List[ZaakType]:
     """
     list case types
@@ -118,11 +116,9 @@ def fetch_zaaktypes_no_cache() -> List[ZaakType]:
     return zaak_types
 
 
-@cache_result(
-    "case_types_by_identification:{case_type_identification}",
-    timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT,
-)
-def fetch_case_types_by_identification(
+# not cached because only used by cronjob
+# and because caching (stale) listings can break lookups
+def fetch_case_types_by_identification_no_cache(
     case_type_identification: str, catalog_url: Optional[str] = None
 ) -> List[ZaakType]:
     client = build_client("catalogi")
@@ -154,6 +150,7 @@ def fetch_case_types_by_identification(
     return zaak_types
 
 
+# cached implicitly by fetch_single_case_type()
 def fetch_single_case_type_uuid(uuid: str) -> Optional[ZaakType]:
     """
     this is suboptimal until we upgrade the client/cache situation

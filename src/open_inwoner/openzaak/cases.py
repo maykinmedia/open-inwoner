@@ -168,7 +168,7 @@ def fetch_status_history_no_cache(case_url: str) -> List[Status]:
 
 
 @cache_result("status:{status_url}", timeout=60 * 60)
-def fetch_specific_status(status_url: str) -> Optional[Status]:
+def fetch_single_status(status_url: str) -> Optional[Status]:
     client = build_client("zaak")
 
     if client is None:
