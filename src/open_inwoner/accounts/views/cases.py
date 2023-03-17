@@ -216,7 +216,7 @@ class OpenCaseListView(
 
     def get_anchors(self) -> list:
         return [
-            (reverse("accounts:open_submissions"), _("Openstaande formulieren")),
+            (reverse("accounts:open_submissions"), _("Open aanvragen")),
             ("#cases", _("Lopende aanvragen")),
             (reverse("accounts:my_closed_cases"), _("Afgeronde aanvragen")),
         ]
@@ -241,7 +241,7 @@ class ClosedCaseListView(
 
     def get_anchors(self) -> list:
         return [
-            (reverse("accounts:open_submissions"), _("Openstaande formulieren")),
+            (reverse("accounts:open_submissions"), _("Open aanvragen")),
             (reverse("accounts:my_open_cases"), _("Lopende aanvragen")),
             ("#cases", _("Afgeronde aanvragen")),
         ]
@@ -257,7 +257,7 @@ class OpenSubmissionListView(
         return [(_("Mijn aanvragen"), reverse("accounts:open_submissions"))]
 
     def page_title(self):
-        return _("Openstaande formulieren")
+        return _("Open aanvragen")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -271,7 +271,7 @@ class OpenSubmissionListView(
 
     def get_anchors(self) -> list:
         return [
-            ("#submissions", _("Openstaande formulieren")),
+            ("#submissions", _("Open aanvragen")),
             (reverse("accounts:my_open_cases"), _("Lopende aanvragen")),
             (reverse("accounts:my_closed_cases"), _("Afgeronde aanvragen")),
         ]
