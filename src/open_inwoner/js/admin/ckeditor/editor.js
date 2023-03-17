@@ -19,41 +19,7 @@ import Table from '@ckeditor/ckeditor5-table/src/table'
 import TableToolbar from '@ckeditor/ckeditor5-table/src/tabletoolbar'
 import FilerImageAdapterPlugin from './plugins/filer/plugin'
 
-import Plugin from '@ckeditor/ckeditor5-core/src/plugin'
-import ButtonView from '@ckeditor/ckeditor5-ui/src/button/buttonview'
-
 export default class ClassicEditor extends ClassicEditorBase {}
-
-class CTARequestButtonPlugin extends Plugin {
-  init() {
-    const editor = this.editor
-
-    editor.ui.componentFactory.add('addRequest', () => {
-      // The button will be an instance of ButtonView.
-      const button = new ButtonView()
-
-      button.set({
-        label: 'Add request button',
-        class: 'cta_button_request',
-        withText: true,
-      })
-
-      //Execute a callback function when the button is clicked
-      button.on('execute', () => {
-        editor.model.change((writer) => {
-          const link = writer.createText('[CTAREQUESTBUTTON]', {
-            //Temporary url for creating a link tag
-            linkHref: '/',
-          })
-
-          editor.model.insertContent(link, editor.model.document.selection)
-        })
-      })
-
-      return button
-    })
-  }
-}
 
 // Plugins to include in the build.
 ClassicEditor.builtinPlugins = [
@@ -76,7 +42,6 @@ ClassicEditor.builtinPlugins = [
   FilerImageAdapterPlugin,
   Table,
   TableToolbar,
-  CTARequestButtonPlugin,
 ]
 
 // Editor configuration.
@@ -101,8 +66,6 @@ ClassicEditor.defaultConfig = {
       '|',
       'undo',
       'redo',
-      '|',
-      'addRequest',
     ],
   },
   image: {

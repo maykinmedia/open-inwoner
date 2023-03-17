@@ -1,7 +1,21 @@
 import markdown
 from bs4 import BeautifulSoup
 
-from open_inwoner.pdc.models.product import Product
+CLASS_ADDERS = [
+    ("h1", "h1"),
+    ("h2", "h2"),
+    ("h3", "h3"),
+    ("h4", "h4"),
+    ("h5", "h5"),
+    ("h6", "h6"),
+    ("img", "image"),
+    ("li", "li"),
+    ("p", "p"),
+    ("a", "link link--secondary"),
+    ("table", "table table--content"),
+    ("th", "table__header"),
+    ("td", "table__item"),
+]
 
 
 def get_rendered_content(content):
@@ -11,22 +25,8 @@ def get_rendered_content(content):
     md = markdown.Markdown(extensions=["tables"])
     html = md.convert(content)
     soup = BeautifulSoup(html, "html.parser")
-    class_adders = [
-        ("h1", "h1"),
-        ("h2", "h2"),
-        ("h3", "h3"),
-        ("h4", "h4"),
-        ("h5", "h5"),
-        ("h6", "h6"),
-        ("img", "image"),
-        ("li", "li"),
-        ("p", "p"),
-        ("a", "link link--secondary"),
-        ("table", "table table--content"),
-        ("th", "table__header"),
-        ("td", "table__item"),
-    ]
-    for tag, class_name in class_adders:
+
+    for tag, class_name in CLASS_ADDERS:
         for element in soup.find_all(tag):
             element.attrs["class"] = class_name
             if element.name == "a" and element.attrs.get("href", "").startswith("http"):
@@ -42,65 +42,57 @@ def get_product_rendered_content(product):
     md = markdown.Markdown(extensions=["tables"])
     html = md.convert(product.content)
     soup = BeautifulSoup(html, "html.parser")
-    class_adders = [
-        ("h1", "h1"),
-        ("h2", "h2"),
-        ("h3", "h3"),
-        ("h4", "h4"),
-        ("h5", "h5"),
-        ("h6", "h6"),
-        ("img", "image"),
-        ("li", "li"),
-        ("p", "p"),
-        ("a", "link link--secondary"),
-        ("table", "table table--content"),
-        ("th", "table__header"),
-        ("td", "table__item"),
-    ]
-    for tag, class_name in class_adders:
+
+    for tag, class_name in CLASS_ADDERS:
         for element in soup.find_all(tag):
+            if element.attrs.get("class") and "cta-button" in element.attrs["class"]:
+                continue
+
             element.attrs["class"] = class_name
-            if element.name == "a":
-                if "[CTAREQUESTBUTTON]" in element.text:
-                    # decompose the element when product doesn't have either a link or a form
-                    if not (product.link or product.form):
-                        element.decompose()
-                        continue
 
-                    # icon
-                    icon = soup.new_tag("span")
-                    icon.attrs.update(
-                        {"aria-label": "Aanvraag starten", "class": "material-icons"}
-                    )
-                    icon.append("arrow_forward")
+            if "[CTABUTTON]" in element.text:
+                # decompose the element when product doesn't have either a link or a form
+                if not (product.link or product.form):
+                    element.decompose()
+                    continue
 
-                    # button
-                    element.string.replace_with("Aanvraag starten")
-                    element.attrs.update(
-                        {
-                            "class": "start_request button button--textless button--icon button--icon-before button--primary",
-                            "href": (
-                                product.link
-                                if product.link
-                                else f"{product.get_absolute_url()}formulier"
-                            ),
-                            "title": "Aanvraag starten",
-                        }
-                    )
-                    element.append(icon)
-                    if product.link:
-                        element.attrs.update({"target": "_blank"})
+                # icon
+                icon = soup.new_tag("span")
+                icon.attrs.update(
+                    {"aria-label": "Aanvraag starten", "class": "material-icons"}
+                )
+                icon.append("arrow_forward")
 
-                elif element.attrs.get("href", "").startswith("http"):
-                    icon = soup.new_tag("span")
-                    icon.attrs.update(
-                        {
-                            "aria-hidden": "true",
-                            "aria-label": "Opens in new window",
-                            "class": "material-icons",
-                        }
-                    )
-                    icon.append("open_in_new")
-                    element.append(icon)
+                # button
+                element.name = "a"
+
+                element.string.replace_with("Aanvraag starten")
+                element.attrs.update(
+                    {
+                        "class": "button button--textless button--icon button--icon-before button--primary cta-button",
+                        "href": (
+                            product.link
+                            if product.link
+                            else f"{product.get_absolute_url()}formulier"
+                        ),
+                        "title": "Aanvraag starten",
+                    }
+                )
+                element.append(icon)
+
+                if product.link:
+                    element.attrs.update({"target": "_blank"})
+
+            if element.name == "a" and element.attrs.get("href", "").startswith("http"):
+                icon = soup.new_tag("span")
+                icon.attrs.update(
+                    {
+                        "aria-hidden": "true",
+                        "aria-label": "Opens in new window",
+                        "class": "material-icons",
+                    }
+                )
+                icon.append("open_in_new")
+                element.append(icon)
 
     return soup
