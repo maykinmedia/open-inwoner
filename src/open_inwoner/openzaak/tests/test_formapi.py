@@ -97,7 +97,7 @@ class FormAPITest(ClearCachesMixin, WebTest):
 
         response = self.app.get(self.submissions_url, user=self.user)
 
-        self.assertContains(response, _("Er zijn geen openstaande formulieren."))
+        self.assertContains(response, _("Er zijn geen open aanvragen."))
 
     def test_requires_auth(self, m):
         response = self.app.get(self.submissions_url)
