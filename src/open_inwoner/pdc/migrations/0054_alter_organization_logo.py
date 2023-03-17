@@ -10,13 +10,21 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.FILER_IMAGE_MODEL),
-        ('pdc', '0053_alter_product_summary'),
+        ("pdc", "0053_alter_product_summary"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='organization',
-            name='logo',
-            field=filer.fields.image.FilerImageField(blank=True, help_text='Logo of the organization', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='organization_logos', to=settings.FILER_IMAGE_MODEL, verbose_name='Logo'),
+            model_name="organization",
+            name="logo",
+            field=filer.fields.image.FilerImageField(
+                blank=True,
+                help_text="Logo of the organization",
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="organization_logos",
+                to=settings.FILER_IMAGE_MODEL,
+                verbose_name="Logo",
+            ),
         ),
     ]
