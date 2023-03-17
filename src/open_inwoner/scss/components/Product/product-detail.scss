@@ -1,0 +1,8 @@
+.product-info > aside,
+.product-info > div {
+  margin: var(--spacing-extra-large) 0;
+
+  @media (min-width: 768px) {
+    margin: var(--spacing-giant) 0;
+  }
+}

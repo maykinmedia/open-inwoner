@@ -24,6 +24,8 @@
 {% endblock sidebar_content %}
 
 {% block content %}
+    {% with question_set=object.question_set.exists files=object.files.exists conditions=object.conditions.exists locations=object.locations.exists product_links_exist=product_links.exists published_related_products=object.related_products.published.exists contacts=object.contacts.exists %}
+    
     <h1 class="h1" id="title">
         {{ object.name }}
         {% if request.user.is_staff %}
@@ -33,6 +35,10 @@
     {% tag tags=object.tags.all %}
     <p class="p">{{ object.summary }}</p>
     {{ object.content|ckeditor_content|safe }}
+
+    {% if question_set or files or conditions or locations or product_links or published_related_products or contacts %}
+        <hr class="divider">
+    {% endif %}
 
     {% if product.form %}
         {% button_row mobile=True %}
@@ -44,130 +50,125 @@
         {% endbutton_row %}
     {% endif %}
 
-    {% if object.question_set.exists %}
-        <hr class="divider">
-        {% faq object.question_set.all %}
-    {% endif %}
+    <div class="product-info">
+        {% if question_set %}
+            {% faq object.question_set.all %}
+        {% endif %}
 
-    {% if object.files.exists %}
-        <hr class="divider">
-        {% file_list files=object.files.all title=_("Bestanden") %}
-    {% endif %}
+        {% if files %}
+            {% file_list files=object.files.all title=_("Bestanden") %}
+        {% endif %}
 
-    {# Conditions #}
-    {% if object.conditions.exists %}
-        <hr class="divider">
+        {# Conditions #}
+        {% if conditions %}
+            {% render_grid %}
+                {% render_column span=6 compact=True %}
+                    <h3 class="h3">{% trans "U komt in aanmerking" %}</h3>
+                    {% condition_list conditions=object.conditions.all %}
+                {% endrender_column %}
+
+                {% render_column start=7 span=6 compact=True %}
+                    <h3 class="h3">{% trans "U komt niet in aanmerking" %}</h3>
+                    {% condition_list conditions=object.conditions.all negative=True %}
+                {% endrender_column %}
+            {% endrender_grid %}
+        {% endif %}
+
+        {# Locations #}
+        {% if locations %}
+            {% with centroid=object.locations.get_centroid %}
+                {% map centroid.lat centroid.lng id="locations" title=_('Locaties') geojson_feature_collection=object.locations.get_geojson_feature_collection %}
+            {% endwith %}
+
+            {% render_card_container columns=3 %}
+                {% for location in object.locations.all %}
+                    {% render_card title=location.name %}
+                        <div class="p--no-margin">
+                            <p class="p">{{ location.address_line_1 }}</p>
+                            <p class="p">{{ location.address_line_2 }}</p>
+                            {% if location.phonenumber %}
+                                <p class="p">{{ location.phonenumber }}</p>
+                            {% endif %}
+                            {% if location.email %}
+                                <p class="p">{{ location.email }}</p>
+                            {% endif %}
+                        </div>
+                    {% endrender_card %}
+                {% endfor %}
+            {% endrender_card_container %}
+        {% endif %}
 
         {% render_grid %}
-            {% render_column span=6 compact=True %}
-                <h3 class="h3">{% trans "U komt in aanmerking" %}</h3>
-                {% condition_list conditions=object.conditions.all %}
+            {% render_column span=5 %}
+                {# Links. #}
+                {% if product_links_exist %}
+                    <nav class="link-list" aria-label="{% trans "links" %}">
+                        <h3 class="h3" id="links">{% trans "Links" %}</h3>
+                        <ul class="link-list__list">
+                            {% for link in product_links %}
+                                <li class="link-list__list-item link-list__list-item--wrap">
+                                    {% link href=link.url secondary=True text=link.name %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </nav>
+                {% endif %}
             {% endrender_column %}
 
-            {% render_column start=7 span=6 compact=True %}
-                <h3 class="h3">{% trans "U komt niet in aanmerking" %}</h3>
-                {% condition_list conditions=object.conditions.all negative=True %}
+            {% render_column start=related_products_start span=4 compact=True %}
+                {# Related products. #}
+                {% if published_related_products %}
+                    <nav class="link-list" aria-label="{% trans "Gerelateerde links" %}">
+                        <h3 class="h3" id="see">{% trans "Zie ook" %}</h3>
+                        <ul class="link-list__list">
+                            {% for related in object.related_products.published %}
+                                <li class="link-list__list-item link-list__list-item--wrap">
+                                    {% url 'pdc:product_detail' slug=related.slug as product_url %}
+                                    {% link href=product_url text=related.name secondary=True %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% endrender_column %}
+
+
+            {% render_column span=9 %}
+                {% if contacts %}
+                    {% render_notification type='success' icon=False %}
+                        <h3 class="h3" id="contact">{% trans 'Contact' %}</h3>
+
+                        {% for contact in object.contacts.all %}
+                            {% render_grid compact=True %}
+                                {% render_column span=12 %}
+                                    <h4 class="h4">{{ contact.first_name }} {{ contact.last_name }}</h4>
+                                {% endrender_column %}
+
+                    {% if contact.phonenumber %}
+                                {% render_column span=6 %}
+                                    <span class="p">{{ contact.role|default:_('Telefoonnummer') }}</span>
+                                {% endrender_column %}
+
+                                {% render_column start=7 span=6 %}
+                                    {% link href='tel:'|add:contact.phonenumber text=contact.phonenumber primary=True %}
+                                {% endrender_column %}
+                    {% endif %}
+
+                    {% if contact.email %}
+                                {% render_column span=6 %}
+                                    <p class="p">{{ contact.organization|default:_('E-mail')}}</p>
+                                {% endrender_column %}
+
+                                {% render_column start=7 span=6 %}
+                                    {% link href='mailto:'|add:contact.email text=contact.email primary=True %}
+                    {% endrender_column %}
+                    {% endif %}
+                            {% endrender_grid %}
+                        {% endfor %}
+                    {% endrender_notification %}
+                {% endif %}
             {% endrender_column %}
         {% endrender_grid %}
-    {% endif %}
-
-    {# Locations #}
-    {% if object.locations.exists %}
-        <hr class="divider">
-
-        {% with centroid=object.locations.get_centroid %}
-            {% map centroid.lat centroid.lng id="locations" title=_('Locaties') geojson_feature_collection=object.locations.get_geojson_feature_collection %}
-        {% endwith %}
-
-        {% render_card_container columns=3 %}
-            {% for location in object.locations.all %}
-                {% render_card title=location.name %}
-                    <div class="p--no-margin">
-                        <p class="p">{{ location.address_line_1 }}</p>
-                        <p class="p">{{ location.address_line_2 }}</p>
-                        {% if location.phonenumber %}
-                            <p class="p">{{ location.phonenumber }}</p>
-                        {% endif %}
-                        {% if location.email %}
-                            <p class="p">{{ location.email }}</p>
-                        {% endif %}
-                    </div>
-                {% endrender_card %}
-            {% endfor %}
-        {% endrender_card_container %}
-    {% endif %}
-
-    <hr class="divider">
-
-    {% render_grid %}
-        {% render_column span=5 %}
-            {# Links. #}
-            {% if product_links.exists %}
-                <nav class="link-list" aria-label="{% trans "links" %}">
-                    <h3 class="h3" id="links">{% trans "Links" %}</h3>
-                    <ul class="link-list__list">
-                        {% for link in product_links %}
-                            <li class="link-list__list-item link-list__list-item--wrap">
-                                {% link href=link.url secondary=True text=link.name %}
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </nav>
-            {% endif %}
-        {% endrender_column %}
-
-        {% render_column start=related_products_start span=4 compact=True %}
-            {# Related products. #}
-            {% if object.related_products.published.exists %}
-                <nav class="link-list" aria-label="{% trans "Gerelateerde links" %}">
-                    <h3 class="h3" id="see">{% trans "Zie ook" %}</h3>
-                    <ul class="link-list__list">
-                        {% for related in object.related_products.published %}
-                            <li class="link-list__list-item link-list__list-item--wrap">
-                                {% url 'pdc:product_detail' slug=related.slug as product_url %}
-                                {% link href=product_url text=related.name secondary=True %}
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </nav>
-            {% endif %}
-        {% endrender_column %}
-
-
-        {% render_column span=9 %}
-            {% if object.contacts.exists %}
-                {% render_notification type='success' icon=False %}
-                    <h3 class="h3" id="contact">{% trans 'Contact' %}</h3>
-
-                    {% for contact in object.contacts.all %}
-                        {% render_grid compact=True %}
-                            {% render_column span=12 %}
-                                <h4 class="h4">{{ contact.first_name }} {{ contact.last_name }}</h4>
-                            {% endrender_column %}
-
-			    {% if contact.phonenumber %}
-                            {% render_column span=6 %}
-                                <span class="p">{{ contact.role|default:_('Telefoonnummer') }}</span>
-                            {% endrender_column %}
-
-                            {% render_column start=7 span=6 %}
-                                {% link href='tel:'|add:contact.phonenumber text=contact.phonenumber primary=True %}
-                            {% endrender_column %}
-			    {% endif %}
-
-			    {% if contact.email %}
-                            {% render_column span=6 %}
-                                <p class="p">{{ contact.organization|default:_('E-mail')}}</p>
-                            {% endrender_column %}
-
-                            {% render_column start=7 span=6 %}
-                                {% link href='mailto:'|add:contact.email text=contact.email primary=True %}
-			    {% endrender_column %}
-			    {% endif %}
-                        {% endrender_grid %}
-                    {% endfor %}
-                {% endrender_notification %}
-            {% endif %}
-        {% endrender_column %}
-    {% endrender_grid %}
+    </div>
+    {% endwith %}
 {% endblock content %}
