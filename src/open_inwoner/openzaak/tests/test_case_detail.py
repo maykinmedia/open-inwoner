@@ -611,7 +611,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         self.assertEqual(
             redirect_messages[0].message,
             _(
-                f"{self.uploaded_informatie_object['bestandsnaam']} has been successfully uploaded"
+                f"{self.uploaded_informatie_object['bestandsnaam']} is succesvol geüpload"
             ),
         )
 
@@ -641,7 +641,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         self.assertRedirects(form_response, self.case_detail_url)
         self.assertEqual(
             redirect_messages[0].message,
-            _("upload.TXT has been successfully uploaded"),
+            _("upload.TXT is succesvol geüpload"),
         )
 
     def test_upload_file_flow_fails_with_invalid_file_extension(self, m):
@@ -834,7 +834,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         self.assertEqual(
             form_response_messages[0].message,
             _(
-                f"An error occured while uploading file {self.uploaded_informatie_object['bestandsnaam']}"
+                f"Een fout is opgetreden bij het uploaden van {self.uploaded_informatie_object['bestandsnaam']}"
             ),
         )
 
@@ -864,6 +864,6 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         self.assertEqual(
             form_response_messages[0].message,
             _(
-                f"An error occured while uploading file {self.uploaded_informatie_object['bestandsnaam']}"
+                f"Een fout is opgetreden bij het uploaden van {self.uploaded_informatie_object['bestandsnaam']}"
             ),
         )
