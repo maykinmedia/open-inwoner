@@ -22,7 +22,7 @@
             <div class="plan-filter__button">
                 {% button text=_("Filter") type="button" bordered=True %}
             </div>
-            <div class="plan-filter__container">
+            <div class="plan-filter__container filter__container">
                 <p class="p">{% trans "Filter op:" %}</p>
                 {% input plan_filter_form.plan_contacts no_label=True no_help=True icon="person" %}
                 {% input plan_filter_form.status no_label=True no_help=True icon="expand_more" %}
