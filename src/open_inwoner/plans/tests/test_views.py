@@ -470,7 +470,7 @@ class PlanViewTests(WebTest):
         plan_url = f"http://testserver{self.detail_url}"
         body = email.alternatives[0][0]  # html version of the email body
         self.assertIn(plan_url, body)
-        self.assertIn("Changed: Naam.", body)
+        self.assertIn("Gewijzigd: Naam.", body)
 
     def test_plan_action_edit_not_changed(self):
         response = self.app.get(self.action_edit_url, user=self.user)

@@ -24,7 +24,7 @@ class Organization(GeoModel):
         verbose_name=_("Logo"),
         on_delete=models.SET_NULL,
         related_name="organization_logos",
-        help_text=_("Logo of the orgaization"),
+        help_text=_("Logo of the organization"),
     )
     type = models.ForeignKey(
         "pdc.OrganizationType",
