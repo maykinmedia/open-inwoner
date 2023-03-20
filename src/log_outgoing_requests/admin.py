@@ -22,7 +22,7 @@ class OutgoingRequestsLogAdmin(admin.ModelAdmin):
     readonly_fields = fields
     list_display = (
         "hostname",
-        "query_params",
+        "url",
         "params",
         "status_code",
         "method",
