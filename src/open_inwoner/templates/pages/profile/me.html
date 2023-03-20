@@ -28,7 +28,8 @@
     <div class="personal-information__block personal-information__block--bold">
         {% icon icon="person_outline" %}<br>
         {{ request.user.get_full_name }}<br>
-	{{ request.user.email }}<br>
+	    {{ request.user.email }}<br>
+	    {% if request.user.phonenumber %}{{ request.user.phonenumber }}<br>{% endif %}
         {% if request.user.get_address %}{{ request.user.get_address }}{% else %}-{% endif %}
     </div>
     <div class="personal-information__block">

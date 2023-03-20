@@ -10,9 +10,7 @@
             </div>{% endspaceless %}
             <div class="grid__main">
                 <h1 class="h1">Zoeken</h1>
-                <p class="p">Hier vindt u hoe wonen, zorg, welzijn, werk en geldzaken in uw gemeente geregeld zijn en wijzen we u de weg naar organisaties, activiteiten, hulp en initiatieven in uw eigen buurt.</p>
-
-                <div class="form form--columns-2 form--inline form--align-end">
+                <div class="form form--columns-2 form--inline form--align-end form--search">
                     {% input form.query %}
                     {% form_actions primary_text="Zoeken" primary_icon="arrow_forward" %}
                 </div>
@@ -41,7 +39,6 @@
                                     <h3 class="search-results__item-title">{{ hit.name }}</h3>
                                     <div class="search-results__item-info-container">
                                         <p class="search-results__item-intro">{{ hit.summary }}</p>
-                                        <p class="search-results__item-type">{% trans "product" %}</p>
                                     </div>
                                 </a>
                             {% endfor %}

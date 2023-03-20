@@ -1,11 +1,14 @@
 import logging
+from typing import Optional
+
+from zgw_consumers.client import ZGWClient
 
 from .models import OpenZaakConfig
 
 logger = logging.getLogger(__name__)
 
 
-def build_client(type_):
+def build_client(type_) -> Optional[ZGWClient]:
     config = OpenZaakConfig.get_solo()
 
     if type_ == "zaak":
@@ -28,5 +31,12 @@ def build_client(type_):
             return
 
         client = config.document_service.build_client()
+
+    elif type_ == "form":
+        if not config.form_service:
+            logger.warning("no service defined for Form")
+            return
+
+        client = config.form_service.build_client()
 
     return client

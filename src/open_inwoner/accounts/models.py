@@ -1,3 +1,4 @@
+import os
 from datetime import date, timedelta
 from uuid import uuid4
 
@@ -10,7 +11,7 @@ from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.utils.translation import ugettext_lazy as _
 
-from furl import furl
+from image_cropping import ImageCropField, ImageRatioField
 from localflavor.nl.models import NLBSNField, NLZipCodeField
 from mail_editor.helpers import find_template
 from privates.storages import PrivateMediaFileSystemStorage
@@ -23,7 +24,14 @@ from open_inwoner.utils.validators import (
 
 from .choices import ContactTypeChoices, LoginTypeChoices, StatusChoices, TypeChoices
 from .managers import ActionQueryset, DigidManager, UserManager, eHerkenningManager
-from .query import InviteQuerySet, MessageQuerySet, UserQuerySet
+from .query import InviteQuerySet, MessageQuerySet
+
+
+def generate_uuid_image_name(instance, filename):
+    filename, file_extension = os.path.splitext(filename)
+    return "profile/{uuid}{file_extension}".format(
+        uuid=uuid4(), file_extension=file_extension.lower()
+    )
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -66,6 +74,14 @@ class User(AbstractBaseUser, PermissionsMixin):
         max_length=15,
         validators=[validate_phone_number],
     )
+    image = ImageCropField(
+        verbose_name=_("Image"),
+        null=True,
+        blank=True,
+        upload_to=generate_uuid_image_name,
+        help_text=_("Image"),
+    )
+    cropping = ImageRatioField("image", "150x150", size_warning=True)
     is_staff = models.BooleanField(
         verbose_name=_("Staff status"),
         default=False,
@@ -389,13 +405,6 @@ class Action(models.Model):
         default="",
         blank=True,
         help_text=_("The description of the action"),
-    )
-    goal = models.CharField(
-        verbose_name=_("Goal"),
-        default="",
-        blank=True,
-        max_length=250,
-        help_text=_("The goal of the action"),
     )
     status = models.CharField(
         verbose_name=_("Status"),

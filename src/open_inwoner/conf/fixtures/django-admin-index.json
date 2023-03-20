@@ -103,6 +103,10 @@
                 "cspreport"
             ],
             [
+                "log_outgoing_requests",
+                "outgoingrequestslog"
+            ],
+            [
                 "otp_totp",
                 "totpdevice"
             ],
@@ -171,6 +175,10 @@
                 "siteconfigurationpage"
             ],
             [
+                "custom_csp",
+                "cspsetting"
+            ],
+            [
                 "flatpages",
                 "flatpage"
             ],
@@ -183,12 +191,20 @@
                 "mailtemplate"
             ],
             [
+                "mozilla_django_oidc_db",
+                "openidconnectconfig"
+            ],
+            [
                 "notifications_api_common",
                 "notificationsconfig"
             ],
             [
                 "notifications_api_common",
                 "subscription"
+            ],
+            [
+                "openformsclient",
+                "configuration"
             ],
             [
                 "openzaak",

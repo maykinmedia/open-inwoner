@@ -6,7 +6,7 @@
         <div class="actions__filter-button">
             {% button text=_("Filter") type="button" bordered=True %}
         </div>
-        <div class="actions__filter-container">
+        <div class="actions__filter-container filter__container">
             <p class="p">{% trans "Filter op:" %}</p>
             {% date_field action_form.end_date no_label=True no_help=True icon="today" %}
             {% input action_form.is_for no_label=True no_help=True icon="person" %}
@@ -84,7 +84,7 @@
                 </div>
             </div>
         {% empty %}
-            <div class="table__item" colspan="4"><p class="p">{% trans "er zijn geen acties gevonden met de huidige filter of er zijn geen acties" %}</p></div>
+            <div class="table__item" colspan="4"><p class="p">{% trans "er zijn geen acties gevonden met de huidige filters of er zijn geen acties" %}</p></div>
         {% endfor %}
     </div>
 </div>

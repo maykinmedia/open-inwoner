@@ -76,9 +76,39 @@
     font-size: var(--font-size-body-small);
   }
 
-  &__control > .label *:not(.button) {
+  &__control > .label .input,
+  &__control > .label .input[type='file'] {
     width: 100%;
+    max-width: 100%;
   }
+
+  @media (min-width: 360px) {
+    &__control > .label .input,
+    &__control > .label .input[type='file'] {
+      max-width: 500px;
+    }
+  }
+
+  .filter__container &__control > .label .input,
+  .filter__container &__control > .label .input[type='file'],
+  .form--search &__control > .label .input,
+  &.form__registration .form__control .label .input {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /// Registration -start.
+
+  &__control > .label ul {
+    padding-left: var(--card-spacing);
+  }
+
+  &__control > .label ul *:not(.button) {
+    padding-right: var(--card-spacing);
+    width: fit-content;
+  }
+
+  /// Registration -end.
 
   &__control > .label .material-icons-outlined {
     pointer-events: none;

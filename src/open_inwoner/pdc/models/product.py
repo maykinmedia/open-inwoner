@@ -1,5 +1,6 @@
 import json
 from typing import Union
+from uuid import uuid4
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
@@ -13,8 +14,26 @@ from ordered_model.models import OrderedModel
 
 from open_inwoner.utils.validators import validate_phone_number
 
-from ..managers import PublishedQueryset
+from ..managers import ProductQueryset
 from .mixins import GeoModel
+
+
+class CategoryProduct(OrderedModel):
+    """
+    explicit many2many through model
+    """
+
+    category = models.ForeignKey("pdc.Category", on_delete=models.CASCADE)
+    product = models.ForeignKey("pdc.Product", on_delete=models.CASCADE)
+    order_with_respect_to = "category"
+
+    class Meta:
+        ordering = ("category", "product")
+
+    def get_product_name(self):
+        return self.product.name
+
+    get_product_name.short_description = _("Name")
 
 
 class Product(models.Model):
@@ -34,9 +53,9 @@ class Product(models.Model):
     )
     summary = models.TextField(
         verbose_name=_("Summary"),
-        blank=True,
         default="",
-        help_text=_("Short description of the product"),
+        max_length=300,
+        help_text=_("Short description of the product, limited to 300 characters."),
     )
     icon = FilerImageField(
         verbose_name=_("Icon"),
@@ -76,6 +95,7 @@ class Product(models.Model):
         verbose_name=_("Categories"),
         related_name="products",
         help_text=_("Categories which the product relates to"),
+        through=CategoryProduct,
     )
     related_products = models.ManyToManyField(
         "pdc.Product",
@@ -153,7 +173,7 @@ class Product(models.Model):
         help_text=_("Conditions applicable for the product"),
     )
 
-    objects = PublishedQueryset.as_manager()
+    objects = ProductQueryset.as_manager()
 
     class Meta:
         verbose_name = _("Product")
@@ -288,12 +308,26 @@ class ProductLink(models.Model):
 
 
 class ProductLocation(GeoModel):
+    uuid = models.UUIDField(verbose_name=_("UUID"), default=uuid4, unique=True)
     name = models.CharField(
         verbose_name=_("Name"),
         max_length=100,
         help_text=_("Location name"),
         blank=True,
         null=True,
+    )
+    email = models.EmailField(
+        verbose_name=_("Email address"),
+        blank=True,
+        help_text=_("The email address of the current location"),
+    )
+    phonenumber = models.CharField(
+        verbose_name=_("Phonenumber"),
+        blank=True,
+        default="",
+        max_length=15,
+        validators=[validate_phone_number],
+        help_text=_("The phonenumber of the current location"),
     )
 
     class Meta:
@@ -306,9 +340,15 @@ class ProductLocation(GeoModel):
     def get_geojson_feature(self, stringify: bool = True) -> Union[str, dict]:
         feature = super().get_geojson_feature(False)
 
+        if feature.get("properties"):
+            feature["properties"]["location_url"] = self.get_absolute_url()
+
         if stringify:
             return json.dumps(feature)
         return feature
+
+    def get_absolute_url(self) -> str:
+        return reverse("pdc:location_detail", kwargs={"uuid": self.uuid})
 
 
 class ProductCondition(OrderedModel):

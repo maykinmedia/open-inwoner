@@ -1,0 +1,14 @@
+.location {
+  padding: 0 0 var(--spacing-giant) 0;
+
+  &__details {
+    display: flex;
+    gap: var(--spacing-extra-large);
+    margin-top: var(--spacing-small);
+
+    & > .location__address > p,
+    .location__contact > p {
+      margin-top: 0;
+    }
+  }
+}

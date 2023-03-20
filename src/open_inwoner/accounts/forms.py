@@ -18,7 +18,12 @@ from open_inwoner.pdc.models.category import Category
 from open_inwoner.utils.forms import LimitedUploadFileField, PrivateFileWidget
 from open_inwoner.utils.validators import validate_charfield_entry
 
-from .choices import EmptyContactTypeChoices, EmptyStatusChoices, LoginTypeChoices
+from .choices import (
+    ContactTypeChoices,
+    EmptyContactTypeChoices,
+    EmptyStatusChoices,
+    LoginTypeChoices,
+)
 from .models import Action, Document, Invite, Message, User
 
 
@@ -56,7 +61,26 @@ class CustomRegistrationForm(RegistrationForm):
         raise ValidationError(_("This user has been deactivated"))
 
 
-class UserForm(forms.ModelForm):
+class BaseUserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = (
+            "display_name",
+            "email",
+            "phonenumber",
+            "image",
+            "cropping",
+        )
+
+    def __init__(self, user, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if user.contact_type != ContactTypeChoices.begeleider:
+            del self.fields["image"]
+            del self.fields["cropping"]
+
+
+class UserForm(BaseUserForm):
     class Meta:
         model = User
         fields = (
@@ -70,17 +94,13 @@ class UserForm(forms.ModelForm):
             "housenumber",
             "postcode",
             "city",
+            "image",
+            "cropping",
         )
 
 
-class BrpUserForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = (
-            "display_name",
-            "email",
-            "phonenumber",
-        )
+class BrpUserForm(BaseUserForm):
+    pass
 
 
 class NecessaryUserForm(forms.ModelForm):
@@ -253,7 +273,6 @@ class ActionForm(forms.ModelForm):
             "end_date",
             "is_for",
             "file",
-            "goal",
         )
 
     def __init__(self, user, plan=None, *args, **kwargs):
@@ -415,11 +434,15 @@ class ActionListForm(forms.ModelForm):
 
 
 class CaseUploadForm(forms.Form):
-    title = forms.CharField(max_length=255, validators=[validate_charfield_entry])
-    type = forms.ModelChoiceField(
-        ZaakTypeInformatieObjectTypeConfig.objects.all(), empty_label=None
+    title = forms.CharField(
+        label=_("Titel"), max_length=255, validators=[validate_charfield_entry]
     )
-    file = forms.FileField()
+    type = forms.ModelChoiceField(
+        ZaakTypeInformatieObjectTypeConfig.objects.all(),
+        empty_label=None,
+        label=_("Bestand type"),
+    )
+    file = forms.FileField(label=_("Bestand"))
 
     def __init__(self, case, **kwargs):
         super().__init__(**kwargs)
@@ -441,7 +464,7 @@ class CaseUploadForm(forms.Form):
 
         config = OpenZaakConfig.get_solo()
         max_allowed_size = 1024**2 * config.max_upload_size
-        allowed_extensions = config.allowed_file_extensions
+        allowed_extensions = sorted(config.allowed_file_extensions)
         filename, file_extension = os.path.splitext(file.name)
 
         if file.size > max_allowed_size:

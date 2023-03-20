@@ -18,25 +18,27 @@ from open_inwoner.openzaak.managers import (
 
 
 def generate_default_file_extensions():
-    return [
-        "pdf",
-        "doc",
-        "docx",
-        "xls",
-        "xlsx",
-        "ppt",
-        "pptx",
-        "vsd",
-        "png",
-        "gif",
-        "jpg",
-        "tiff",
-        "msg",
-        "txt",
-        "rtf",
-        "jpeg",
-        "bmp",
-    ]
+    return sorted(
+        [
+            "pdf",
+            "doc",
+            "docx",
+            "xls",
+            "xlsx",
+            "ppt",
+            "pptx",
+            "vsd",
+            "png",
+            "gif",
+            "jpg",
+            "tiff",
+            "msg",
+            "txt",
+            "rtf",
+            "jpeg",
+            "bmp",
+        ]
+    )
 
 
 class OpenZaakConfig(SingletonModel):
@@ -94,6 +96,14 @@ class OpenZaakConfig(SingletonModel):
         ),
         default=generate_default_file_extensions,
         help_text=_("A list of the allowed file extensions."),
+    )
+    form_service = models.OneToOneField(
+        "zgw_consumers.Service",
+        verbose_name=_("Form API"),
+        on_delete=models.PROTECT,
+        limit_choices_to={"api_type": APITypes.orc},
+        related_name="+",
+        null=True,
     )
 
     skip_notification_statustype_informeren = models.BooleanField(
@@ -165,7 +175,7 @@ class ZaakTypeConfig(models.Model):
         blank=True,
     )
     document_upload_enabled = models.BooleanField(
-        verbose_name=_("Enable document upload"),
+        verbose_name=_("Enable document upload via URL"),
         default=False,
     )
 

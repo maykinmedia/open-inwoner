@@ -288,10 +288,6 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
                 [self.zaak1, self.zaak2, self.zaak3, self.zaak_intern]
             ),
         )
-        m.get(
-            f"{CATALOGI_ROOT}statustypen",
-            json=paginated_response([self.status_type1, self.status_type2]),
-        )
         for resource in [
             self.zaaktype,
             self.status_type1,

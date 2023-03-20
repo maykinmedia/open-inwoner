@@ -6,6 +6,8 @@ from django.utils.translation import gettext_lazy as _
 
 import sentry_sdk
 
+from log_outgoing_requests.formatters import HttpFormatter
+
 from .utils import config, get_sentry_integrations
 
 # Build paths inside the project, so further paths can be defined relative to
@@ -100,8 +102,8 @@ SOLO_CACHE_TIMEOUT = 5  # 5 seconds
 SOLO_CACHE = "local"  # Avoid Redis overhead
 
 # ZGW API caches
-CACHE_ZGW_CATALOGI_TIMEOUT = config("CACHE_ZGW_CATALOGI_TIMEOUT", default=60 * 60 * 24)
-CACHE_ZGW_ZAKEN_TIMEOUT = config("CACHE_ZGW_ZAKEN_TIMEOUT", default=60 * 3)
+CACHE_ZGW_CATALOGI_TIMEOUT = config("CACHE_ZGW_CATALOGI_TIMEOUT", default=60 * 15)
+CACHE_ZGW_ZAKEN_TIMEOUT = config("CACHE_ZGW_ZAKEN_TIMEOUT", default=60 * 1)
 
 #
 # APPLICATIONS enabled for this project
@@ -145,6 +147,7 @@ INSTALLED_APPS = [
     "localflavor",
     "treebeard",
     "easy_thumbnails",  # used by filer
+    "image_cropping",
     "filer",
     "mptt",
     "hijack.contrib.admin",
@@ -170,6 +173,7 @@ INSTALLED_APPS = [
     "openformsclient",
     "django_htmx",
     "django_yubin",
+    "log_outgoing_requests",
     # Project applications.
     "open_inwoner.accounts",
     "open_inwoner.components",
@@ -305,6 +309,7 @@ LOGGING = {
         "performance": {
             "format": "%(asctime)s %(process)d | %(thread)d | %(message)s",
         },
+        "outgoing_requests": {"()": HttpFormatter},
     },
     "filters": {
         "require_debug_false": {"()": "django.utils.log.RequireDebugFalse"},
@@ -348,6 +353,15 @@ LOGGING = {
             "maxBytes": 1024 * 1024 * 10,  # 10 MB
             "backupCount": 10,
         },
+        "log_outgoing_requests": {
+            "level": "DEBUG",
+            "formatter": "outgoing_requests",
+            "class": "logging.StreamHandler",
+        },
+        "save_outgoing_requests": {
+            "level": "DEBUG",
+            "class": "log_outgoing_requests.handlers.DatabaseOutgoingRequestsHandler",
+        },
     },
     "loggers": {
         "open_inwoner": {
@@ -370,8 +384,20 @@ LOGGING = {
             "level": "INFO",
             "propagate": True,
         },
+        "requests": {
+            "handlers": ["log_outgoing_requests", "save_outgoing_requests"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
     },
 }
+
+
+#
+# LOG OUTGOING REQUESTS
+#
+LOG_OUTGOING_REQUESTS_DB_SAVE = config("LOG_OUTGOING_REQUESTS_DB_SAVE", default=True)
+
 
 #
 # AUTH settings - user accounts, passwords, backends...
@@ -424,7 +450,7 @@ X_FRAME_OPTIONS = "DENY"
 # FIXTURES
 #
 
-FIXTURE_DIRS = (os.path.join(DJANGO_PROJECT_DIR, "fixtures"),)
+FIXTURE_DIRS = (os.path.join(DJANGO_PROJECT_DIR, "conf", "fixtures"),)
 
 #
 # Custom settings
@@ -498,7 +524,7 @@ HIJACK_ALLOW_GET_REQUESTS = True
 # SENTRY - error monitoring
 #
 SENTRY_DSN = config("SENTRY_DSN", None)
-RELEASE = "v1.0"  # get_current_version()
+RELEASE = "v1.4"  # get_current_version()
 
 PRIVATE_MEDIA_ROOT = os.path.join(BASE_DIR, "private_media")
 FILER_ROOT = os.path.join(BASE_DIR, "media", "filer")
@@ -524,6 +550,15 @@ FILER_STORAGES = {
         },
     },
 }
+
+from easy_thumbnails.conf import Settings as thumbnail_settings
+
+THUMBNAIL_PROCESSORS = (
+    "image_cropping.thumbnail_processors.crop_corners",
+) + thumbnail_settings.THUMBNAIL_PROCESSORS
+
+IMAGE_CROPPING_BACKEND = "image_cropping.backends.easy_thumbs.EasyThumbnailsBackend"
+IMAGE_CROPPING_JQUERY_URL = "/static/admin/js/vendor/jquery/jquery.min.js"
 
 SENDFILE_ROOT = PRIVATE_MEDIA_ROOT
 SENDFILE_BACKEND = "django_sendfile.backends.simple"
@@ -762,13 +797,11 @@ MAIL_EDITOR_CONF = {
             <table>
                 <tr>
                     <td>Action name</td>
-                    <td>Goal</td>
                     <td>End date</td>
                 </tr>
             {% for action in actions %}
                 <tr>
                     <td>{{ action.name }}</td>
-                    <td>{{ action.goal }}</td>
                     <td>{{ action.end_date|date:"d-m-Y" }}</td>
                 </tr>
             {% endfor %}
@@ -1048,12 +1081,14 @@ THUMBNAIL_ALIASES = {
             "size": (256, 320),
             "crop": True,
         },
+        "avatar": {"size": (160, 160), "crop": True, "upscale": False},
     }
 }
 THUMBNAIL_QUALITY = 100
 
 OIDC_AUTHENTICATE_CLASS = "mozilla_django_oidc_db.views.OIDCAuthenticationRequestView"
 OIDC_CALLBACK_CLASS = "mozilla_django_oidc_db.views.OIDCCallbackView"
+OIDC_AUTHENTICATION_CALLBACK_URL = "oidc_authentication_callback"
 MOZILLA_DJANGO_OIDC_DB_CACHE = "oidc"
 MOZILLA_DJANGO_OIDC_DB_CACHE_TIMEOUT = 1
 

@@ -7,7 +7,7 @@ from zgw_consumers.api_models.catalogi import InformatieObjectType
 
 from open_inwoner.openzaak.api_models import ZaakType
 from open_inwoner.openzaak.catalog import (
-    fetch_case_types_by_identification,
+    fetch_case_types_by_identification_no_cache,
     fetch_catalogs_no_cache,
     fetch_single_information_object_type,
     fetch_zaaktypes_no_cache,
@@ -32,7 +32,9 @@ def get_configurable_zaaktypes() -> List[ZaakType]:
 def get_configurable_zaaktypes_by_identification(
     identificatie, catalogus_url
 ) -> List[ZaakType]:
-    case_types = fetch_case_types_by_identification(identificatie, catalogus_url)
+    case_types = fetch_case_types_by_identification_no_cache(
+        identificatie, catalogus_url
+    )
     case_types = filter_zaaktypes(case_types)
     return case_types
 

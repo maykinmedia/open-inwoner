@@ -70,6 +70,7 @@ class PlanViewTests(WebTest):
         response = self.app.get(self.create_url, user=self.user)
         form = response.forms["plan-form"]
         form["title"] = plan.title
+        form["goal"] = plan.goal
         form["end_date"] = plan.end_date
         response = form.submit()
         created_plan = Plan.objects.get(title=plan.title)
@@ -168,13 +169,16 @@ class PlanViewTests(WebTest):
         response = self.app.get(self.goal_edit_url, user=self.user)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.plan.goal)
+        self.assertContains(response, self.plan.description)
         form = response.forms["goal-edit"]
         form["goal"] = "editted goal"
+        form["description"] = "editted description"
         response = form.submit(user=self.user)
         self.assertEqual(response.status_code, 302)
 
         self.plan.refresh_from_db()
         self.assertEqual(self.plan.goal, "editted goal")
+        self.assertEqual(self.plan.description, "editted description")
 
     def test_plan_goal_edit_contact_can_access(self):
         response = self.app.get(self.goal_edit_url, user=self.contact)
@@ -182,11 +186,13 @@ class PlanViewTests(WebTest):
         self.assertContains(response, self.plan.goal)
         form = response.forms["goal-edit"]
         form["goal"] = "editted goal"
+        form["description"] = "editted description"
         response = form.submit(user=self.user)
         self.assertEqual(response.status_code, 302)
 
         self.plan.refresh_from_db()
         self.assertEqual(self.plan.goal, "editted goal")
+        self.assertEqual(self.plan.description, "editted description")
 
     def test_plan_goal_edit_not_your_action(self):
         other_user = UserFactory()
@@ -266,6 +272,7 @@ class PlanViewTests(WebTest):
             {
                 "title": [_("This field is required.")],
                 "end_date": [_("This field is required.")],
+                "goal": [_("This field is required when not using a template")],
             },
         )
 
@@ -274,6 +281,8 @@ class PlanViewTests(WebTest):
         response = self.app.get(self.create_url, user=self.user)
         form = response.forms["plan-form"]
         form["title"] = "Plan"
+        form["goal"] = "Goal"
+        form["description"] = "Description"
         form["end_date"] = "2022-01-01"
         form["plan_contacts"] = [self.contact.pk]
         response = form.submit().follow()
@@ -281,7 +290,8 @@ class PlanViewTests(WebTest):
         self.assertEqual(Plan.objects.count(), 2)
         plan = Plan.objects.exclude(pk=self.plan.id).first()
         self.assertEqual(plan.title, "Plan")
-        self.assertEqual(plan.goal, "")
+        self.assertEqual(plan.goal, "Goal")
+        self.assertEqual(plan.description, "Description")
 
     def test_plan_create_plan_with_template(self):
         plan_template = PlanTemplateFactory(file=None)
@@ -298,6 +308,28 @@ class PlanViewTests(WebTest):
         plan = Plan.objects.exclude(pk=self.plan.id).first()
         self.assertEqual(plan.title, "Plan")
         self.assertEqual(plan.goal, plan_template.goal)
+        self.assertEqual(plan.description, plan_template.description)
+        self.assertEqual(plan.documents.count(), 0)
+        self.assertEqual(plan.actions.count(), 0)
+
+    def test_plan_create_plan_with_template_and_field_overrides(self):
+        plan_template = PlanTemplateFactory(file=None)
+        self.assertEqual(Plan.objects.count(), 1)
+        response = self.app.get(self.create_url, user=self.user)
+        form = response.forms["plan-form"]
+        form["title"] = "Plan"
+        form["goal"] = "Goal"
+        form["description"] = "Description"
+        form["end_date"] = "2022-01-01"
+        form["plan_contacts"] = [self.contact.pk]
+        form["template"] = plan_template.pk
+        response = form.submit().follow()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Plan.objects.count(), 2)
+        plan = Plan.objects.exclude(pk=self.plan.id).first()
+        self.assertEqual(plan.title, "Plan")
+        self.assertEqual(plan.goal, "Goal")
+        self.assertEqual(plan.description, "Description")
         self.assertEqual(plan.documents.count(), 0)
         self.assertEqual(plan.actions.count(), 0)
 
@@ -316,6 +348,7 @@ class PlanViewTests(WebTest):
         plan = Plan.objects.exclude(pk=self.plan.id).first()
         self.assertEqual(plan.title, "Plan")
         self.assertEqual(plan.goal, plan_template.goal)
+        self.assertEqual(plan.description, plan_template.description)
         self.assertEqual(plan.documents.count(), 1)
         self.assertEqual(plan.actions.count(), 0)
 
@@ -335,6 +368,7 @@ class PlanViewTests(WebTest):
         plan = Plan.objects.exclude(pk=self.plan.id).first()
         self.assertEqual(plan.title, "Plan")
         self.assertEqual(plan.goal, plan_template.goal)
+        self.assertEqual(plan.description, plan_template.description)
         self.assertEqual(plan.documents.count(), 0)
         self.assertEqual(plan.actions.count(), 1)
 
@@ -436,7 +470,7 @@ class PlanViewTests(WebTest):
         plan_url = f"http://testserver{self.detail_url}"
         body = email.alternatives[0][0]  # html version of the email body
         self.assertIn(plan_url, body)
-        self.assertIn("Changed: Naam.", body)
+        self.assertIn("Gewijzigd: Naam.", body)
 
     def test_plan_action_edit_not_changed(self):
         response = self.app.get(self.action_edit_url, user=self.user)
@@ -564,24 +598,50 @@ class PlanViewTests(WebTest):
         )
         self.assertEqual(response.status_code, 404)
 
-    @freeze_time("2022-01-01")
-    def test_plan_list_renders_expected_data_when_begeleider(self):
-        self.user.contact_type = ContactTypeChoices.begeleider
-        self.user.save()
-        self.plan.end_date = date(2022, 1, 20)
-        self.plan.save()
 
-        response = self.app.get(self.list_url, user=self.user)
-        rendered_plan_title = response.pyquery("tbody .table__header")[0].text
-        rendered_contact = response.pyquery("tbody .table__item")[0].text
-        rendered_end_date = response.pyquery("tbody .table__item")[1].text
-        rendered_plan_status = response.pyquery("tbody .table__item")[2].text
-        rendered_actions_num = response.pyquery("tbody .table__item")[3].text
+class PlanBegeleiderListViewTests(WebTest):
+    def setUp(self):
+        self.contact = UserFactory()
+        self.begeleider = UserFactory(contact_type=ContactTypeChoices.begeleider)
+        self.begeleider.user_contacts.add(self.contact)
+        self.begeleider_plan = PlanFactory(
+            title="begeleider plan_that_should_be_found", created_by=self.begeleider
+        )
+        self.begeleider_plan.plan_contacts.add(self.begeleider)
+        self.begeleider_plan.plan_contacts.add(self.contact)
+        self.begeleider_action = ActionFactory(
+            plan=self.begeleider_plan, created_by=self.begeleider
+        )
+        self.login_url = reverse("login")
+        self.list_url = reverse("plans:plan_list")
+
+    @freeze_time("2022-01-01")
+    def test_plan_list_renders_template_for_begeleider(self):
+        self.begeleider_plan.end_date = date(2022, 1, 20)
+        self.begeleider_plan.save()
+
+        response = self.app.get(self.list_url, user=self.begeleider)
+        extended = response.pyquery(".plans-extended")
+
+        self.assertEqual(len(extended), 1)
+
+    @freeze_time("2022-01-01")
+    def test_plan_list_renders_expected_data(self):
+        self.begeleider_plan.end_date = date(2022, 1, 20)
+        self.begeleider_plan.save()
+
+        response = self.app.get(self.list_url, user=self.begeleider)
+        rendered_plan_title = response.pyquery("tbody .table__header")[0].text_content()
+        items = response.pyquery("tbody .table__item")
+        rendered_contact = items[0].text
+        rendered_end_date = items[1].text
+        rendered_plan_status = items[2].text
+        rendered_actions_num = items[3].text
         rendered_action_required = response.pyquery(
             "tbody .table__item--notification-danger"
         )[0].text
 
-        self.assertEqual(rendered_plan_title, self.plan.title)
+        self.assertIn(self.begeleider_plan.title, rendered_plan_title)
         self.assertEqual(rendered_contact, self.contact.get_full_name())
         self.assertEqual(rendered_end_date, "20-01-2022")
         self.assertEqual(rendered_plan_status, _("Open"))
@@ -589,27 +649,24 @@ class PlanViewTests(WebTest):
         self.assertEqual(rendered_action_required, _("Actie vereist"))
 
     @freeze_time("2022-01-01")
-    def test_plan_list_renders_expected_data_for_expired_plan_when_begeleider(self):
-        self.user.contact_type = ContactTypeChoices.begeleider
-        self.user.save()
-        self.plan.end_date = date(2022, 1, 1)
-        self.plan.save()
+    def test_plan_list_renders_expected_data_for_expired_plan(self):
+        self.begeleider_plan.end_date = date(2022, 1, 1)
+        self.begeleider_plan.save()
 
-        response = self.app.get(self.list_url, user=self.user)
-        rendered_end_date = response.pyquery("tbody .table__item")[1].text
-        rendered_plan_status = response.pyquery("tbody .table__item")[2].text
+        response = self.app.get(self.list_url, user=self.begeleider)
+        items = response.pyquery("tbody .table__item")
+        rendered_end_date = items[1].text
+        rendered_plan_status = items[2].text
 
         self.assertEqual(rendered_end_date, "01-01-2022")
         self.assertEqual(rendered_plan_status, _("Afgerond"))
 
     @freeze_time("2022-01-01")
-    def test_plan_list_renders_expected_data_for_approval_actions_when_begeleider(self):
-        self.user.contact_type = ContactTypeChoices.begeleider
-        self.user.save()
-        self.action.status = StatusChoices.approval
-        self.action.save()
+    def test_plan_list_renders_expected_data_for_approval_actions(self):
+        self.begeleider_action.status = StatusChoices.approval
+        self.begeleider_action.save()
 
-        response = self.app.get(self.list_url, user=self.user)
+        response = self.app.get(self.list_url, user=self.begeleider)
         rendered_actions_num = response.pyquery("tbody .table__item")[3].text
         rendered_action_required = response.pyquery(
             "tbody .table__item--notification-danger"
@@ -619,13 +676,11 @@ class PlanViewTests(WebTest):
         self.assertEqual(rendered_action_required, _("Actie vereist"))
 
     @freeze_time("2022-01-01")
-    def test_plan_list_renders_expected_data_for_closed_actions_when_begeleider(self):
-        self.user.contact_type = ContactTypeChoices.begeleider
-        self.user.save()
-        self.action.status = StatusChoices.closed
-        self.action.save()
+    def test_plan_list_renders_expected_data_for_closed_actions(self):
+        self.begeleider_action.status = StatusChoices.closed
+        self.begeleider_action.save()
 
-        response = self.app.get(self.list_url, user=self.user)
+        response = self.app.get(self.list_url, user=self.begeleider)
         rendered_actions_num = response.pyquery("tbody .table__item")[3].text
         rendered_action_required = response.pyquery(
             "tbody .table__item--notification-danger"
@@ -634,13 +689,11 @@ class PlanViewTests(WebTest):
         self.assertEqual(rendered_actions_num, "0")
         self.assertEqual(rendered_action_required, [])
 
-    def test_plan_list_doesnt_add_deleted_action_to_total_when_begeleider(self):
-        self.user.contact_type = ContactTypeChoices.begeleider
-        self.user.save()
-        self.action.is_deleted = True
-        self.action.save()
+    def test_plan_list_doesnt_add_deleted_action_to_total(self):
+        self.begeleider_action.is_deleted = True
+        self.begeleider_action.save()
 
-        response = self.app.get(self.list_url, user=self.user)
+        response = self.app.get(self.list_url, user=self.begeleider)
         rendered_actions_num = response.pyquery("tbody .table__item")[3].text
         rendered_action_required = response.pyquery(
             "tbody .table__item--notification-danger"
@@ -649,27 +702,302 @@ class PlanViewTests(WebTest):
         self.assertEqual(rendered_actions_num, "0")
         self.assertEqual(rendered_action_required, [])
 
+    def test_plan_list_filters_contacts(self):
+        another_plan = PlanFactory(
+            title="begeleider_plan_that_should_not_be_found", created_by=self.begeleider
+        )
+        response = self.app.get(
+            f"{self.list_url}?plan_contacts={self.contact.uuid}",
+            user=self.begeleider,
+        )
+        rows = response.pyquery("tbody tr")
+        contact_name = response.pyquery("tbody .table__item")[0].text
+
+        self.assertEqual(
+            response.context["plans"]["plan_list"],
+            {self.begeleider_plan: self.contact.get_full_name()},
+        )
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(contact_name, self.contact.get_full_name())
+
+    def test_plan_list_filters_contacts_in_multiple_plans(self):
+        another_plan = PlanFactory(
+            title="begeleider_plan_that_should_not_be_found", created_by=self.begeleider
+        )
+        another_plan.plan_contacts.add(self.begeleider, self.contact)
+        response = self.app.get(
+            f"{self.list_url}?plan_contacts={self.contact.uuid}",
+            user=self.begeleider,
+        )
+        rows = response.pyquery("tbody tr")
+        contact_name = response.pyquery("tbody .table__item")[0].text
+
+        self.assertEqual(
+            response.context["plans"]["plan_list"],
+            {
+                self.begeleider_plan: self.contact.get_full_name(),
+                another_plan: self.contact.get_full_name(),
+            },
+        )
+        self.assertEqual(len(rows), 2)
+        self.assertEqual(contact_name, self.contact.get_full_name())
+
+    def test_plan_list_filters_only_plan_contacts_no_user_contacts(self):
+        self.begeleider_plan.plan_contacts.set([])
+        response = self.app.get(
+            f"{self.list_url}?plan_contacts={self.contact.uuid}",
+            user=self.begeleider,
+        )
+        rows = response.pyquery("tbody tr")
+
+        self.assertEqual(response.context["plans"]["plan_list"], {})
+        self.assertEqual(len(rows), 1)
+        self.assertIn(
+            _("There are no plans with these filters."), rows[0].text_content()
+        )
+
     @freeze_time("2022-01-01")
-    def test_plan_list_renders_template_for_regular_user(self):
-        self.plan.end_date = date(2022, 1, 20)
-        self.plan.save()
+    def test_plan_list_filters_status_open(self):
+        another_plan = PlanFactory(
+            title="begeleider_plan_that_should_not_be_found",
+            created_by=self.begeleider,
+            end_date=date(2021, 1, 1),
+        )
+        self.begeleider_plan.end_date = date(2022, 1, 10)
+        self.begeleider_plan.save()
+        response = self.app.get(
+            f"{self.list_url}?status=open",
+            user=self.begeleider,
+        )
+        rows = response.pyquery("tbody tr")
+        rendered_plan_title = response.pyquery("tbody .table__header")[0].text_content()
+        contact_name = response.pyquery("tbody .table__item")[0].text
 
-        response = self.app.get(self.list_url, user=self.user)
-        extended = response.pyquery(".plans-extended")
-
-        self.assertEqual(len(extended), 0)
+        self.assertEqual(
+            response.context["plans"]["plan_list"],
+            {self.begeleider_plan: self.contact.get_full_name()},
+        )
+        self.assertEqual(len(rows), 1)
+        self.assertIn(self.begeleider_plan.title, rendered_plan_title)
+        self.assertEqual(contact_name, self.contact.get_full_name())
 
     @freeze_time("2022-01-01")
-    def test_plan_list_renders_template_for_begeleider(self):
-        self.user.contact_type = ContactTypeChoices.begeleider
-        self.user.save()
-        self.plan.end_date = date(2022, 1, 20)
-        self.plan.save()
+    def test_plan_list_filters_status_closed(self):
+        open_plan = PlanFactory(
+            title="begeleider_plan_that_should_not_be_found",
+            created_by=self.begeleider,
+            end_date=date(2022, 1, 10),
+        )
+        self.begeleider_plan.end_date = date(2022, 1, 1)
+        self.begeleider_plan.save()
+        response = self.app.get(
+            f"{self.list_url}?status=closed",
+            user=self.begeleider,
+        )
+        rows = response.pyquery("tbody tr")
+        rendered_plan_title = response.pyquery("tbody .table__header")[0].text_content()
+        contact_name = response.pyquery("tbody .table__item")[0].text
 
-        response = self.app.get(self.list_url, user=self.user)
-        extended = response.pyquery(".plans-extended")
+        self.assertEqual(
+            response.context["plans"]["plan_list"],
+            {self.begeleider_plan: self.contact.get_full_name()},
+        )
+        self.assertEqual(len(rows), 1)
+        self.assertIn(self.begeleider_plan.title, rendered_plan_title)
+        self.assertEqual(contact_name, self.contact.get_full_name())
 
-        self.assertEqual(len(extended), 1)
+    @freeze_time("2022-01-01")
+    def test_plans_sorting(self):
+        self.begeleider_plan.delete()
+
+        open_plan1 = PlanFactory(
+            title="open - should be first",
+            created_by=self.begeleider,
+            end_date=date(2022, 1, 10),
+            plan_contacts=[self.begeleider],
+        )
+        open_plan2 = PlanFactory(
+            title="open - should be second",
+            created_by=self.begeleider,
+            end_date=date(2022, 1, 15),
+            plan_contacts=[self.begeleider],
+        )
+        closed_plan1 = PlanFactory(
+            title="closed - should be third",
+            created_by=self.begeleider,
+            end_date=date(2021, 12, 6),
+            plan_contacts=[self.begeleider],
+        )
+        closed_plan2 = PlanFactory(
+            title="closed - should be fourth",
+            created_by=self.begeleider,
+            end_date=date(2021, 11, 1),
+            plan_contacts=[self.begeleider],
+        )
+        response = self.app.get(self.list_url, user=self.begeleider)
+        rows = response.pyquery("tbody tr")
+        rendered_titles = response.pyquery("tbody .table__header")
+
+        self.assertEqual(len(rows), 4)
+        self.assertIn(open_plan1.title, rendered_titles[0].text_content())
+        self.assertIn(open_plan2.title, rendered_titles[1].text_content())
+        self.assertIn(closed_plan1.title, rendered_titles[2].text_content())
+        self.assertIn(closed_plan2.title, rendered_titles[3].text_content())
+
+    @freeze_time("2022-01-01")
+    def test_plans_sorting_with_filtering_status_open(self):
+        self.begeleider_plan.delete()
+
+        open_plan1 = PlanFactory(
+            title="open - should be first",
+            created_by=self.begeleider,
+            end_date=date(2022, 1, 10),
+            plan_contacts=[self.begeleider],
+        )
+        open_plan2 = PlanFactory(
+            title="open - should be second",
+            created_by=self.begeleider,
+            end_date=date(2022, 1, 15),
+            plan_contacts=[self.begeleider],
+        )
+        closed_plan1 = PlanFactory(
+            title="closed - should be third",
+            created_by=self.begeleider,
+            end_date=date(2021, 12, 6),
+            plan_contacts=[self.begeleider],
+        )
+        closed_plan2 = PlanFactory(
+            title="closed - should be fourth",
+            created_by=self.begeleider,
+            end_date=date(2021, 11, 1),
+            plan_contacts=[self.begeleider],
+        )
+        response = self.app.get(
+            f"{self.list_url}?status=open",
+            user=self.begeleider,
+        )
+        rows = response.pyquery("tbody tr")
+        rendered_titles = response.pyquery("tbody .table__header")
+
+        self.assertEqual(len(rows), 2)
+        self.assertIn(open_plan1.title, rendered_titles[0].text_content())
+        self.assertIn(open_plan2.title, rendered_titles[1].text_content())
+
+    @freeze_time("2022-01-01")
+    def test_plans_sorting_with_filtering_status_closed(self):
+        self.begeleider_plan.delete()
+
+        open_plan1 = PlanFactory(
+            title="open - should not be rendered",
+            created_by=self.begeleider,
+            end_date=date(2022, 1, 10),
+            plan_contacts=[self.begeleider],
+        )
+        closed_plan1 = PlanFactory(
+            title="closed - should be first",
+            created_by=self.begeleider,
+            end_date=date(2021, 12, 6),
+            plan_contacts=[self.begeleider],
+        )
+        closed_plan2 = PlanFactory(
+            title="closed - should be second",
+            created_by=self.begeleider,
+            end_date=date(2021, 11, 1),
+            plan_contacts=[self.begeleider],
+        )
+        response = self.app.get(
+            f"{self.list_url}?status=closed",
+            user=self.begeleider,
+        )
+        rows = response.pyquery("tbody tr")
+        rendered_titles = response.pyquery("tbody .table__header")
+
+        self.assertEqual(len(rows), 2)
+        self.assertIn(closed_plan1.title, rendered_titles[0].text_content())
+        self.assertIn(closed_plan2.title, rendered_titles[1].text_content())
+
+    def test_plans_sorting_with_filtering_contacts(self):
+        self.begeleider_plan.delete()
+        another_contact = UserFactory()
+
+        open_plan1 = PlanFactory(
+            title="open - should be first",
+            created_by=self.begeleider,
+            end_date=date(2022, 1, 10),
+            plan_contacts=[self.begeleider, self.contact],
+        )
+        open_plan2 = PlanFactory(
+            title="open - should not be rendered",
+            created_by=self.begeleider,
+            end_date=date(2022, 1, 10),
+            plan_contacts=[self.begeleider, another_contact],
+        )
+        closed_plan1 = PlanFactory(
+            title="closed - should be second",
+            created_by=self.begeleider,
+            end_date=date(2021, 12, 6),
+            plan_contacts=[self.begeleider, self.contact],
+        )
+        closed_plan2 = PlanFactory(
+            title="closed - should be third",
+            created_by=self.begeleider,
+            end_date=date(2021, 11, 1),
+            plan_contacts=[self.begeleider, self.contact],
+        )
+        response = self.app.get(
+            f"{self.list_url}?plan_contacts={self.contact.uuid}",
+            user=self.begeleider,
+        )
+        rows = response.pyquery("tbody tr")
+        rendered_titles = response.pyquery("tbody .table__header")
+
+        self.assertEqual(len(rows), 3)
+        self.assertIn(open_plan1.title, rendered_titles[0].text_content())
+        self.assertIn(closed_plan1.title, rendered_titles[1].text_content())
+        self.assertIn(closed_plan2.title, rendered_titles[2].text_content())
+
+    def test_search_returns_expected_plans_when_matched_with_plan_contact(self):
+        self.begeleider.first_name = "expected_first_name"
+        self.begeleider.last_name = "expected_last_name"
+        self.begeleider.save()
+
+        another_contact = UserFactory(
+            first_name="expected_first_name", last_name="expected_last_name"
+        )
+        another_plan = PlanFactory(created_by=self.begeleider)
+        another_plan.plan_contacts.add(self.begeleider, another_contact)
+
+        response = self.app.get(
+            f"{self.list_url}?query=expected",
+            user=self.begeleider,
+        )
+
+        # response should not contain self.begeleider_plan because we don't search
+        # in plan_contacts=creator
+        self.assertEqual(
+            response.context["plans"]["plan_list"],
+            {another_plan: another_contact.get_full_name()},
+        )
+
+    def test_search_returns_expected_plans_when_matched_with_plan_title(self):
+        self.begeleider_plan.title = "expected_title"
+        self.begeleider_plan.save()
+
+        another_plan = PlanFactory(
+            created_by=self.begeleider, title="another_expected_title"
+        )
+        another_plan.plan_contacts.add(self.begeleider)
+
+        response = self.app.get(
+            f"{self.list_url}?query=expected",
+            user=self.begeleider,
+        )
+
+        # response should contain both plans
+        self.assertEqual(
+            response.context["plans"]["plan_list"],
+            {self.begeleider_plan: self.contact.get_full_name(), another_plan: ""},
+        )
 
 
 @multi_browser()

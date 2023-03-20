@@ -1,4 +1,5 @@
 import dataclasses
+from collections import defaultdict
 from typing import List, Optional
 
 from django.contrib import messages
@@ -12,6 +13,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import FormView, TemplateView
 
+from glom import glom
 from view_breadcrumbs import BaseBreadcrumbMixin
 from zgw_consumers.api_models.constants import RolOmschrijving
 
@@ -25,10 +27,13 @@ from open_inwoner.openzaak.cases import (
     fetch_roles_for_case_and_bsn,
     fetch_single_case,
     fetch_single_result,
-    fetch_specific_status,
+    fetch_single_status,
     fetch_status_history,
 )
-from open_inwoner.openzaak.catalog import fetch_single_case_type, fetch_status_types
+from open_inwoner.openzaak.catalog import (
+    fetch_single_case_type,
+    fetch_single_status_type,
+)
 from open_inwoner.openzaak.documents import (
     download_document,
     fetch_single_information_object_url,
@@ -49,6 +54,7 @@ from open_inwoner.openzaak.utils import (
 from open_inwoner.utils.mixins import PaginationMixin
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
+from ...openzaak.formapi import fetch_open_submissions
 from ..forms import CaseUploadForm
 
 
@@ -121,7 +127,6 @@ class CaseListMixin(CaseLogMixin, PaginationMixin):
         cases = fetch_cases(self.request.user.bsn)
 
         case_types = {}
-        status_types = {}
         case_types_set = {case.zaaktype for case in cases}
 
         # fetch unique case types
@@ -136,45 +141,40 @@ class CaseListMixin(CaseLogMixin, PaginationMixin):
         # filter visibility
         cases = [case for case in cases if is_zaak_visible(case)]
 
-        # grab types of remaining cases
-        case_types_set = {case.zaaktype.url for case in cases}
-
-        # fetch status types for case types
-        for case_type_url in case_types_set:
-            # todo parallel
-            for st in fetch_status_types(case_type_url):
-                status_types[st.url] = st
-
         # fetch case status resources and attach resolved to case
+        status_types = defaultdict(list)
         for case in cases:
-            # todo parallel
             if case.status:
-                case.status = fetch_specific_status(case.status)
-                case.status.statustype = status_types[case.status.statustype]
+                # todo parallel
+                case.status = fetch_single_status(case.status)
+                status_types[case.status.statustype].append(case)
+
+        for status_type_url, _cases in status_types.items():
+            # todo parallel
+            status_type = fetch_single_status_type(status_type_url)
+            for case in _cases:
+                case.status.statustype = status_type
 
         return cases
 
-    def process_cases(self, cases: List[Zaak]) -> List[Zaak]:
+    def process_cases(self, cases: List[Zaak]) -> List[dict]:
         # Prepare data for frontend
         config = OpenZaakConfig.get_solo()
 
         updated_cases = []
         for case in cases:
-            updated_cases.append(
-                {
-                    "identificatie": format_zaak_identificatie(
-                        case.identificatie, config
-                    ),
-                    "uuid": str(case.uuid),
-                    "start_date": case.startdatum,
-                    "end_date": getattr(case, "einddatum", None),
-                    "description": case.omschrijving,
-                    "zaaktype_description": case.zaaktype.omschrijving,
-                    "current_status": case.status.statustype.omschrijving
-                    if case.status
-                    else "",
-                }
-            )
+            case_dict = {
+                "identificatie": format_zaak_identificatie(case.identificatie, config),
+                "uuid": str(case.uuid),
+                "start_date": case.startdatum,
+                "end_date": getattr(case, "einddatum", None),
+                "description": case.omschrijving,
+                "zaaktype_description": case.zaaktype.omschrijving,
+                "current_status": glom(
+                    case, "status.statustype.omschrijving", default=""
+                ),
+            }
+            updated_cases.append(case_dict)
         return updated_cases
 
     def get_context_data(self, **kwargs):
@@ -191,14 +191,10 @@ class CaseListMixin(CaseLogMixin, PaginationMixin):
             self.log_case_access(case["identificatie"])
 
         context["anchors"] = self.get_anchors()
-        context["title"] = self.get_title()
         return context
 
     def get_anchors(self) -> list:
         return []
-
-    def get_title(self) -> str:
-        return ""
 
 
 class OpenCaseListView(
@@ -220,12 +216,10 @@ class OpenCaseListView(
 
     def get_anchors(self) -> list:
         return [
+            (reverse("accounts:open_submissions"), _("Open aanvragen")),
             ("#cases", _("Lopende aanvragen")),
             (reverse("accounts:my_closed_cases"), _("Afgeronde aanvragen")),
         ]
-
-    def get_title(self) -> str:
-        return _("Lopende aanvragen")
 
 
 class ClosedCaseListView(
@@ -247,12 +241,40 @@ class ClosedCaseListView(
 
     def get_anchors(self) -> list:
         return [
+            (reverse("accounts:open_submissions"), _("Open aanvragen")),
             (reverse("accounts:my_open_cases"), _("Lopende aanvragen")),
             ("#cases", _("Afgeronde aanvragen")),
         ]
 
-    def get_title(self) -> str:
-        return _("Afgeronde aanvragen")
+
+class OpenSubmissionListView(
+    CommonPageMixin, BaseBreadcrumbMixin, CaseAccessMixin, TemplateView
+):
+    template_name = "pages/cases/submissions.html"
+
+    @cached_property
+    def crumbs(self):
+        return [(_("Mijn aanvragen"), reverse("accounts:open_submissions"))]
+
+    def page_title(self):
+        return _("Open aanvragen")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["submissions"] = self.get_submissions()
+        context["anchors"] = self.get_anchors()
+        return context
+
+    def get_submissions(self):
+        submissions = fetch_open_submissions(self.request.user.bsn)
+        return submissions
+
+    def get_anchors(self) -> list:
+        return [
+            ("#submissions", _("Open aanvragen")),
+            (reverse("accounts:my_open_cases"), _("Lopende aanvragen")),
+            (reverse("accounts:my_closed_cases"), _("Afgeronde aanvragen")),
+        ]
 
 
 @dataclasses.dataclass
@@ -294,36 +316,24 @@ class CaseDetailView(
             documents = self.get_case_document_files(self.case)
 
             statuses = fetch_status_history(self.case.url)
+
             # NOTE we cannot sort on the Status.datum_status_gezet (datetime) because eSuite returns zeros as the time component of the datetime,
             # so we're going with the observation that on both OpenZaak and eSuite the returned list is ordered 'oldest-last'
             # here we want it 'oldest-first' so we reverse() it instead of sort()-ing
             statuses.reverse()
 
-            status_types = fetch_status_types(self.case.zaaktype.url)
-
-            status_types_mapping = {st.url: st for st in status_types}
+            status_types = defaultdict(list)
             for status in statuses:
-                status_type = status_types_mapping[status.statustype]
-                status.statustype = status_type
+                status_types[status.statustype].append(status)
+                if self.case.status == status.url:
+                    self.case.status = status
 
-            # documents
-            internal_upload_enabled = ZaakTypeInformatieObjectTypeConfig.objects.get_visible_ztiot_configs_for_case(
-                self.case
-            ).exists()
-            external_upload_enabled = ZaakTypeConfig.objects.get_visible_zt_configs_for_case_type_identification(
-                self.case.zaaktype.identificatie
-            ).exists()
-
-            if external_upload_enabled:
-                external_upload_url = (
-                    ZaakTypeConfig.objects.get_visible_zt_configs_for_case_type_identification(
-                        self.case.zaaktype.identificatie
-                    )
-                    .get()
-                    .external_document_upload_url
-                )
-            else:
-                external_upload_url = ""
+            for status_type_url, _statuses in list(status_types.items()):
+                # todo parallel
+                status_type = fetch_single_status_type(status_type_url)
+                status_types[status_type_url] = status_type
+                for status in _statuses:
+                    status.statustype = status_type
 
             context["case"] = {
                 "identification": format_zaak_identificatie(
@@ -339,38 +349,63 @@ class CaseDetailView(
                 ),
                 "description": self.case.omschrijving,
                 "type_description": self.case.zaaktype.omschrijving,
-                "current_status": (
-                    statuses[-1].statustype.omschrijving
-                    if statuses
-                    and statuses[-1].statustype.omschrijving
-                    in [st.omschrijving for st in status_types]
-                    else _("No data available")
+                "current_status": glom(
+                    self.case,
+                    "status.statustype.omschrijving",
+                    default=_("No data available"),
                 ),
                 "statuses": statuses,
                 "documents": documents,
-                "internal_upload_enabled": internal_upload_enabled,
-                "external_upload_enabled": external_upload_enabled,
-                "external_upload_url": external_upload_url,
+                "allowed_file_extensions": sorted(config.allowed_file_extensions),
             }
+            context["case"].update(self.get_upload_info_context(self.case))
             context["anchors"] = self.get_anchors(statuses, documents)
         else:
             context["case"] = None
         return context
 
-    def get_result_display(self, case) -> str:
+    def get_upload_info_context(self, case: Zaak):
+        internal_upload_enabled = ZaakTypeInformatieObjectTypeConfig.objects.get_visible_ztiot_configs_for_case(
+            case
+        ).exists()
+
+        external_upload_enabled = (
+            ZaakTypeConfig.objects.get_visible_zt_configs_for_case_type_identification(
+                case.zaaktype.identificatie
+            ).exists()
+        )
+
+        if external_upload_enabled:
+            external_upload_url = (
+                ZaakTypeConfig.objects.get_visible_zt_configs_for_case_type_identification(
+                    case.zaaktype.identificatie
+                )
+                .get()
+                .external_document_upload_url
+            )
+        else:
+            external_upload_url = ""
+
+        return {
+            "internal_upload_enabled": internal_upload_enabled,
+            "external_upload_enabled": external_upload_enabled,
+            "external_upload_url": external_upload_url,
+        }
+
+    def get_result_display(self, case: Zaak) -> str:
         if case.resultaat:
             result = fetch_single_result(case.resultaat)
             if result:
                 return result.toelichting
         return _("Onbekend")
 
-    def get_initiator_display(self, case) -> str:
+    def get_initiator_display(self, case: Zaak) -> str:
         roles = fetch_case_roles(case.url, RolOmschrijving.initiator)
         if not roles:
             return ""
         return ", ".join([get_role_name_display(r) for r in roles])
 
-    def get_case_document_files(self, case) -> List[SimpleFile]:
+    def get_case_document_files(self, case: Zaak) -> List[SimpleFile]:
         case_info_objects = fetch_case_information_objects(case.url)
 
         # get the information objects for the case objects
@@ -398,7 +433,7 @@ class CaseDetailView(
             # restructure into something understood by the FileList template tag
             documents.append(
                 SimpleFile(
-                    name=info_obj.bestandsnaam,
+                    name=info_obj.titel,
                     size=info_obj.bestandsomvang,
                     url=reverse(
                         "accounts:case_document_download",
@@ -413,7 +448,6 @@ class CaseDetailView(
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-
         kwargs["case"] = self.case
         return kwargs
 
@@ -422,22 +456,21 @@ class CaseDetailView(
 
         file = cleaned_data["file"]
         title = cleaned_data["title"]
-        user_choice = cleaned_data["type"].id
+        document_type = cleaned_data["type"]
         source_organization = self.case.bronorganisatie
 
         created_document = upload_document(
-            request.user, file, title, user_choice, source_organization
+            request.user,
+            file,
+            title,
+            document_type.informatieobjecttype_url,
+            source_organization,
         )
-
-        # we don't receive a status code like 201, so we try to validate upload
-        # by checking for the created url
-        if created_document and created_document.get("url"):
+        if created_document:
             created_relationship = connect_case_with_document(
                 self.case.url, created_document["url"]
             )
-
-            # successful upload and connection to zaak
-            if created_relationship and created_relationship.get("url"):
+            if created_relationship:
                 self.log_user_action(
                     request.user,
                     _("Document was uploaded for {case}: {filename}").format(
@@ -445,11 +478,12 @@ class CaseDetailView(
                         filename=file.name,
                     ),
                 )
-
                 messages.add_message(
                     request,
                     messages.SUCCESS,
-                    _(f"{file.name} has been successfully uploaded"),
+                    _("{filename} has been successfully uploaded").format(
+                        filename=file.name
+                    ),
                 )
                 return HttpResponseRedirect(self.get_success_url())
 
@@ -457,7 +491,9 @@ class CaseDetailView(
         messages.add_message(
             request,
             messages.ERROR,
-            _(f"An error occured while uploading file {file.name}"),
+            _("An error occured while uploading file {filename}").format(
+                filename=file.name
+            ),
         )
         return self.form_invalid(form)
 

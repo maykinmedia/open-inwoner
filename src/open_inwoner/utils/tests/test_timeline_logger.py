@@ -9,7 +9,6 @@ from timeline_logger.models import TimelineLog
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.plans.models import Plan
 from open_inwoner.plans.tests.factories import PlanFactory
-from open_inwoner.utils.logentry import LOG_ACTIONS
 
 from ..admin import CustomTimelineLogAdmin
 from ..logentry import LOG_ACTIONS
@@ -27,6 +26,7 @@ class TestAdminTimelineLogging(WebTest):
         form = self.app.get(url, user=self.user).forms.get("plan_form")
         form["title"] = self.plan.title
         form["goal"] = self.plan.goal
+        form["description"] = self.plan.description
         form["end_date"] = self.plan.end_date
         form["created_by"] = self.user.id
         form.submit()
@@ -109,6 +109,7 @@ class TestAdminTimelineLogging(WebTest):
         add_form = self.app.get(add_url, user=self.user).forms.get("plan_form")
         add_form["title"] = self.plan.title
         add_form["goal"] = self.plan.goal
+        add_form["description"] = self.plan.description
         add_form["end_date"] = self.plan.end_date
         add_form["created_by"] = self.user.id
         add_form.submit()
@@ -125,6 +126,7 @@ class TestAdminTimelineLogging(WebTest):
         add_form = self.app.get(add_url, user=self.user).forms.get("plan_form")
         add_form["title"] = self.plan.title
         add_form["goal"] = self.plan.goal
+        add_form["description"] = self.plan.description
         add_form["end_date"] = self.plan.end_date
         add_form["created_by"] = self.user.id
         add_form.submit()
@@ -141,6 +143,7 @@ class TestAdminTimelineLogging(WebTest):
         form = self.app.get(url, user=self.user).forms.get("plan_form")
         form["title"] = self.plan.title
         form["goal"] = self.plan.goal
+        form["description"] = self.plan.description
         form["end_date"] = self.plan.end_date
         form["created_by"] = self.user.id
         form.submit()

@@ -6,10 +6,12 @@ from django.urls import reverse, reverse_lazy
 from django.utils.html import format_html
 from django.utils.translation import ngettext, ugettext_lazy as _
 
+from image_cropping import ImageCroppingMixin
 from privates.admin import PrivateMediaMixin
 
 from open_inwoner.utils.mixins import UUIDAdminFirstInOrder
 
+from .choices import ContactTypeChoices
 from .models import Action, Appointment, Document, Invite, Message, User
 
 
@@ -24,25 +26,34 @@ class _UserChangeForm(UserChangeForm):
         cleaned_data = super().clean(*args, **kwargs)
 
         if (
-            User.objects.filter(email__iexact=cleaned_data["email"])
-            and self.instance.email != cleaned_data["email"]
+            cleaned_data.get("image")
+            and cleaned_data.get("contact_type") != ContactTypeChoices.begeleider
         ):
-            raise ValidationError(_("The user with this email already exists."))
+            raise ValidationError(_("Only a 'begeleider' user can add an image."))
+
+        if cleaned_data.get("email"):
+
+            if (
+                User.objects.filter(email__iexact=cleaned_data["email"])
+                and self.instance.email != cleaned_data["email"]
+            ):
+                raise ValidationError(_("The user with this email already exists."))
 
 
 class _UserCreationForm(UserCreationForm):
     def clean(self, *args, **kwargs):
         cleaned_data = super().clean(*args, **kwargs)
 
-        # we use both queries in order to avoid the duplicate validation errors
-        if User.objects.filter(
-            email__iexact=cleaned_data["email"]
-        ) and not User.objects.filter(email=cleaned_data["email"]):
-            raise ValidationError(_("The user with this email already exists."))
+        if cleaned_data.get("email"):
+            # we use both queries in order to avoid the duplicate validation errors
+            if User.objects.filter(
+                email__iexact=cleaned_data["email"]
+            ) and not User.objects.filter(email=cleaned_data["email"]):
+                raise ValidationError(_("The user with this email already exists."))
 
 
 @admin.register(User)
-class _UserAdmin(UserAdmin):
+class _UserAdmin(ImageCroppingMixin, UserAdmin):
     form = _UserChangeForm
     add_form = _UserCreationForm
     hijack_success_url = reverse_lazy("root")
@@ -63,10 +74,13 @@ class _UserAdmin(UserAdmin):
                     "rsin",
                     "oidc_id",
                     "birthday",
+                    "image",
+                    "cropping",
                     "street",
                     "housenumber",
                     "postcode",
                     "city",
+                    "phonenumber",
                     "selected_themes",
                 )
             },

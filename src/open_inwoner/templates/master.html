@@ -26,6 +26,7 @@
             }
         </style>
         {% block extra_css %}{% endblock %}
+        {% block extra_head %}{% endblock %}
 
         {% include "analytics/google.html" %}
         {% include "analytics/matomo.html" %}
@@ -33,12 +34,18 @@
     </head>
 
     <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
-        {% header categories=menu_categories request=request breadcrumbs=breadcrumbs search_form=search_form has_general_faq_questions=has_general_faq_questions %}
+        {% header categories=menu_categories request=request breadcrumbs=breadcrumbs search_form=search_form has_general_faq_questions=has_general_faq_questions show_plans=show_plans %}
+
         {% if anchors %}
         {% anchor_menu anchors=anchors desktop=False %}
             {% block extra_mobile_anchor %}{% endblock extra_mobile_anchor %}
         {% endanchor_menu%}
         {% endif %}
+        <div class="anchor__scroll" id="scroll-anchor">
+            <div class="anchor__scroll-link">
+                {% button href="#top" text=_("Terug naar boven") icon="arrow_upward" pill=True %}
+            </div>
+        </div>
         {% render_breadcrumbs "components/Header/Breadcrumbs.html" %}
 
         {% block header_image %}{% endblock header_image %}
@@ -82,6 +89,5 @@
         </dialog>
 
         <script nonce="{{ request.csp_nonce }}" src="{% static 'bundles/open_inwoner-js.js' %}" type="text/javascript"></script>
-        {% django_htmx_script %}
     </body>
 </html>

@@ -10,6 +10,7 @@ from ordered_model.models import OrderedModel, OrderedModelManager
 from solo.models import SingletonModel
 
 from open_inwoner.pdc.utils import PRODUCT_PATH_NAME
+from open_inwoner.utils.validators import validate_phone_number
 
 from ..utils.colors import hex_to_hsl
 from ..utils.validators import FilerExactImageSizeValidator
@@ -195,6 +196,14 @@ class SiteConfiguration(SingletonModel):
         verbose_name=_("Edit goal message"),
         help_text=_("The message when a user edits a goal."),
     )
+    plans_banner = FilerImageField(
+        verbose_name=_("Plans banner"),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="plans_banner",
+        help_text=_("Banner of the plans"),
+    )
 
     footer_visiting_title = models.CharField(
         max_length=255,
@@ -208,6 +217,14 @@ class SiteConfiguration(SingletonModel):
         default="",
         blank=True,
         help_text=_("Visiting intro text on the footer section."),
+    )
+    footer_visiting_phonenumber = models.CharField(
+        max_length=15,
+        default="",
+        blank=True,
+        validators=[validate_phone_number],
+        verbose_name=_("Footer visiting phonenumber"),
+        help_text=_("Visiting phonenumber on the footer section."),
     )
     footer_visiting_map = models.CharField(
         max_length=255,

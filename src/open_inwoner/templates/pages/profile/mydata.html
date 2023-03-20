@@ -15,7 +15,7 @@
         </p>
 
         <!-- BRP personal data -->
-        <h2 class="h2">{% trans "Mijn brp gegevens" %}</h2>
+        <h2 class="h2">{% trans "Mijn BRP gegevens" %}</h2>
         
         {% with request.user as user %}
             <div class="tabled tabled--flexible">
@@ -46,10 +46,6 @@
                 <div class="tabled__row">
                     <div class="tabled__item tabled__item--bold">{% trans "Burgerservicenummer (BSN)" %}</div>
                     <div class="tabled__item">{{user.bsn|default:"-"}}</div>
-                </div>
-                <div class="tabled__row">
-                    <div class="tabled__item tabled__item--bold">{% trans "Geboorteland" %}</div>
-                    <div class="tabled__item">{{my_data.birthday_country|default:"-"}}</div>
                 </div>
                 <div class="tabled__row">
                     <div class="tabled__item tabled__item--bold">{% trans "Geslacht" %}</div>

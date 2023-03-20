@@ -155,6 +155,42 @@ class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
         self.assertEqual(updated_user[0].city, "")
         self.assertFalse(updated_user[0].is_prepopulated)
 
+    @override_settings(BRP_VERSION="1.3")
+    def test_wrong_date_format_saves_birthday_none_brp_v_1_3(self, m):
+        self._setUpService()
+
+        m.get(
+            "https://personen/api/schema/openapi.yaml?v=3",
+            status_code=200,
+            content=self.load_binary_mock("personen_1.3.yaml"),
+        )
+        m.get(
+            "https://personen/api/brp/ingeschrevenpersonen/999993847?fields=geslachtsaanduiding,naam,geboorte,verblijfplaats",
+            status_code=200,
+            json={
+                "geboorte": {
+                    "datum": {
+                        "datum": "1982-04",
+                    },
+                }
+            },
+        )
+        user = UserFactory(
+            first_name="", last_name="", login_type=LoginTypeChoices.digid
+        )
+        user.bsn = "999993847"
+        user.save()
+
+        user.refresh_from_db()
+
+        self.assertEqual(user.first_name, "")
+        self.assertEqual(user.last_name, "")
+        self.assertEqual(user.birthday, None)
+        self.assertEqual(user.street, "")
+        self.assertEqual(user.housenumber, "")
+        self.assertEqual(user.city, "")
+        self.assertTrue(user.is_prepopulated)
+
     def test_user_is_not_updated_when_http_404(self, m):
         self._setUpService()
 

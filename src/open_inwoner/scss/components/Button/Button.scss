@@ -82,6 +82,7 @@
     &:focus,
     &:hover {
       background-color: var(--color-secondary-darker);
+      color: var(--color-font-primary);
     }
   }
 
@@ -128,7 +129,7 @@
       left: 0;
       right: 0;
       background-color: var(--color-primary);
-      opacity: 0.4;
+      opacity: 0.2;
     }
   }
 

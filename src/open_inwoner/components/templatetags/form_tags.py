@@ -53,7 +53,7 @@ def render_form(parser, token):
         - extra_classes: string | Extra css classes for the form.
         - form_action: string | where the form should go after submit.
         - enctype: string | set the encrypt when sending forms.
-        - id: string | set an id on the form. Usefull for testing.
+        - id: string | set an id on the form. Useful for testing.
         - data_confirm_title: string | If a confirm dialog is shown this will be the title.
         - data_confirm_cancel: string | If a confirm dialog is shown this will be the text on the cancel button.
         - data_confirm_default: string | If a confirm dialog is shown this will be the text on the confirm button.
@@ -107,7 +107,7 @@ def form(context, form_object, secondary=True, **kwargs):
         - extra_classes: string | Extra css classes for the form.
         - form_action: string | where the form should go after submit.
         - enctype: string | set the encrypt when sending forms.
-        - id: string | set an id on the form. Usefull for testing.
+        - id: string | set an id on the form. Useful for testing.
         - data_confirm_title: string | If a confirm dialog is shown this will be the title.
         - data_confirm_cancel: string | If a confirm dialog is shown this will be the text on the cancel button.
         - data_confirm_default: string | If a confirm dialog is shown this will be the text on the confirm button.
@@ -142,7 +142,7 @@ def form(context, form_object, secondary=True, **kwargs):
 @register.simple_tag()
 def autorender_field(form_object, field_name, **kwargs):
     """
-    Detecting what type of field sould be rendered.
+    Detecting what type of field should be rendered.
     TODO: Keep updating with new fields.
 
     Usage:
@@ -269,6 +269,11 @@ def input(field, **kwargs):
 
 @register.inclusion_tag("components/Form/DateField.html")
 def date_field(field, **kwargs):
+    return {**kwargs, "field": field}
+
+
+@register.inclusion_tag("components/Form/ImageCrop.html")
+def image_crop(field, **kwargs):
     return {**kwargs, "field": field}
 
 

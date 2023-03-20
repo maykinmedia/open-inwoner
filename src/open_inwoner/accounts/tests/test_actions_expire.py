@@ -24,7 +24,6 @@ class NotifyComandTests(TestCase):
         )
         self.assertEqual(sent_mail.to, [user.email])
         self.assertIn(action.name, html_body)
-        self.assertIn(action.goal, html_body)
         self.assertIn(reverse("accounts:action_list"), html_body)
 
     def test_action_does_not_expire_yet(self):

@@ -5,14 +5,26 @@ from django.utils.translation import gettext as _
 
 from import_export.admin import ImportExportMixin
 from import_export.formats import base_formats
+from ordered_model.admin import OrderedInlineModelAdminMixin, OrderedTabularInline
 from treebeard.admin import TreeAdmin
 from treebeard.forms import movenodeform_factory
 
 from open_inwoner.utils.logentry import system_action
 
-from ..models import Category
+from ..models import Category, CategoryProduct
 from ..resources import CategoryExportResource, CategoryImportResource
 from .faq import QuestionInline
+
+
+class CategoryProductInline(OrderedTabularInline):
+    model = CategoryProduct
+    fields = (
+        "move_up_down_links",
+        "product",
+    )
+    readonly_fields = ("move_up_down_links",)
+    ordering = ("order",)
+    extra = 1
 
 
 class CategoryAdminForm(movenodeform_factory(Category)):
@@ -57,10 +69,13 @@ class CategoryAdminFormSet(BaseModelFormSet):
 
 
 @admin.register(Category)
-class CategoryAdmin(ImportExportMixin, TreeAdmin):
+class CategoryAdmin(OrderedInlineModelAdminMixin, ImportExportMixin, TreeAdmin):
     change_list_template = "admin/category_change_list.html"
     form = CategoryAdminForm
-    inlines = (QuestionInline,)
+    inlines = (
+        CategoryProductInline,
+        QuestionInline,
+    )
     prepopulated_fields = {"slug": ("name",)}
     search_fields = ("name",)
     ordering = ("path",)

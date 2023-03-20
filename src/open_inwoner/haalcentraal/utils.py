@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 from urllib.parse import urljoin
 
 from django.utils.translation import gettext as _
@@ -89,9 +90,16 @@ def update_brp_data_in_db(user, brp_version, initial=True):
     if not data:
         logger.warning("no data retrieved from Haal Centraal")
     else:
+        birthday = glom(data, "geboorte.datum.datum", default=None)
+        if birthday:
+            try:
+                birthday = datetime.strptime(birthday, "%Y-%m-%d")
+            except ValueError:
+                birthday = None
+
+        user.birthday = birthday
         user.first_name = glom(data, "naam.voornamen", default="")
         user.last_name = glom(data, "naam.geslachtsnaam", default="")
-        user.birthday = glom(data, "geboorte.datum.datum", default=None)
         user.street = glom(data, "verblijfplaats.straat", default="")
         user.housenumber = glom(data, "verblijfplaats.huisnummer", default="")
         user.city = glom(data, "verblijfplaats.woonplaats", default="")

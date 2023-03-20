@@ -55,6 +55,7 @@ def settings(request):
             "footer": {
                 "footer_visiting_title": config.footer_visiting_title,
                 "footer_visiting_intro": config.footer_visiting_intro,
+                "footer_visiting_phonenumber": config.footer_visiting_phonenumber,
                 "footer_visiting_map": config.footer_visiting_map,
                 "footer_mailing_title": config.footer_mailing_title,
                 "footer_mailing_intro": config.footer_mailing_intro,
@@ -76,6 +77,7 @@ def settings(request):
         "siteimprove_id": config.siteimprove_id,
         "siteimprove_enabled": config.siteimprove_enabled,
         "show_plans": config.show_plans,
+        "show_cases": config.show_cases,
         "show_actions": config.show_actions,
         "menu_categories": Category.get_root_nodes().published(),
         "search_form": SearchForm(auto_id=False),

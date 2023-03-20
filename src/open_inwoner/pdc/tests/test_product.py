@@ -5,6 +5,7 @@ from django_webtest import WebTest
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.questionnaire.tests.factories import QuestionnaireStepFactory
 
+from ..models import CategoryProduct
 from .factories import CategoryFactory, ProductFactory, QuestionFactory
 
 
@@ -93,6 +94,25 @@ class TestPublishedProducts(WebTest):
         self.assertEqual(len(possible_products), 1)
         self.assertIn(product1, possible_products)
         self.assertNotIn(product2, possible_products)
+
+    def test_products_are_ordered(self):
+        category = CategoryFactory(path="0001", name="First one", slug="first-one")
+        product1 = ProductFactory(categories=(category,))
+        product2 = ProductFactory(categories=(category,))
+
+        response = self.app.get(
+            reverse("pdc:category_detail", kwargs={"slug": category.slug})
+        )
+        self.assertEqual(list(response.context["products"]), [product1, product2])
+
+        # grab the ordered many-2-many and move ordering
+        prodcat = CategoryProduct.objects.get(category=category, product=product1)
+        prodcat.down()
+
+        response = self.app.get(
+            reverse("pdc:category_detail", kwargs={"slug": category.slug})
+        )
+        self.assertEqual(list(response.context["products"]), [product2, product1])
 
 
 class TestProductFAQ(WebTest):

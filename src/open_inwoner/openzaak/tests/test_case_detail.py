@@ -231,6 +231,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
             status="definitief",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
             bestandsnaam="document.txt",
+            titel="document_title.txt",
             bestandsomvang=123,
         )
         cls.uploaded_informatie_object = generate_oas_component(
@@ -271,7 +272,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         )
 
         cls.informatie_object_file = SimpleFile(
-            name="document.txt",
+            name="document_title.txt",
             size=123,
             url=reverse(
                 "accounts:case_document_download",
@@ -298,6 +299,8 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
             self.informatie_object,
             self.informatie_object_invisible,
             self.zaaktype_informatie_object_type,
+            self.status_type_new,
+            self.status_type_finish,
         ]:
             m.get(resource["url"], json=resource)
 
@@ -324,10 +327,6 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
             # Taiga #961 this is not an accurate OpenZaak response as it has a 'behandelaar' even when we filter on 'initiator'
             # but eSuite doesn't filter the response in the API, so we use filtering in Python to remove the not-initiator
             json=paginated_response([self.user_role, self.not_initiator_role]),
-        )
-        m.get(
-            f"{CATALOGI_ROOT}statustypen?zaaktype={self.zaaktype['url']}",
-            json=paginated_response([self.status_type_new, self.status_type_finish]),
         )
         m.post(
             f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten",
@@ -372,6 +371,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
                 "internal_upload_enabled": False,
                 "external_upload_enabled": False,
                 "external_upload_url": "",
+                "allowed_file_extensions": sorted(self.config.allowed_file_extensions),
             },
         )
 
@@ -611,7 +611,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         self.assertEqual(
             redirect_messages[0].message,
             _(
-                f"{self.uploaded_informatie_object['bestandsnaam']} has been successfully uploaded"
+                f"{self.uploaded_informatie_object['bestandsnaam']} is succesvol geüpload"
             ),
         )
 
@@ -641,7 +641,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         self.assertRedirects(form_response, self.case_detail_url)
         self.assertEqual(
             redirect_messages[0].message,
-            _("upload.TXT has been successfully uploaded"),
+            _("upload.TXT is succesvol geüpload"),
         )
 
     def test_upload_file_flow_fails_with_invalid_file_extension(self, m):
@@ -674,7 +674,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
             form_response.context["form"].errors,
             {
                 "file": [
-                    f"Het type bestand dat u hebt geüpload is ongeldig. Geldige bestandstypen zijn: {', '.join(self.config.allowed_file_extensions)}"
+                    f"Het type bestand dat u hebt geüpload is ongeldig. Geldige bestandstypen zijn: {', '.join(sorted(self.config.allowed_file_extensions))}"
                 ]
             },
         )
@@ -834,7 +834,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         self.assertEqual(
             form_response_messages[0].message,
             _(
-                f"An error occured while uploading file {self.uploaded_informatie_object['bestandsnaam']}"
+                f"Een fout is opgetreden bij het uploaden van {self.uploaded_informatie_object['bestandsnaam']}"
             ),
         )
 
@@ -864,6 +864,6 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         self.assertEqual(
             form_response_messages[0].message,
             _(
-                f"An error occured while uploading file {self.uploaded_informatie_object['bestandsnaam']}"
+                f"Een fout is opgetreden bij het uploaden van {self.uploaded_informatie_object['bestandsnaam']}"
             ),
         )

@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 
 from django.conf import settings
 from django.contrib import messages
@@ -132,6 +132,11 @@ class EditProfileView(
             return BrpUserForm
         return super().get_form_class()
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
+
 
 class MyCategoriesView(
     LogMixin, LoginRequiredMixin, CommonPageMixin, BaseBreadcrumbMixin, UpdateView
@@ -185,7 +190,6 @@ class MyDataView(
             "prefix": "naam.voorvoegsel",
             "birthday": "geboorte.datum.datum",
             "birthday_place": "geboorte.plaats.omschrijving",
-            "birthday_country": "geboorte.land.omschrijving",
             "gender": (
                 "geslachtsaanduiding.omschrijving"
                 if brp_version == "2.0"
@@ -211,6 +215,15 @@ class MyDataView(
 
         for field in my_data:
             my_data[field] = glom(fetched_data, my_data[field], default=None)
+
+        # change the format of birthday (we receive an str of YYYY-MM-DD)
+        if my_data.get("birthday"):
+            try:
+                my_data["birthday"] = datetime.strptime(
+                    my_data["birthday"], "%Y-%m-%d"
+                ).strftime("%d-%m-%Y")
+            except ValueError:
+                my_data["birthday"] = None
 
         return my_data
 

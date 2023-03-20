@@ -72,6 +72,7 @@ def download_document(url: str) -> Optional[Response]:
 
     req_args = {}
 
+    # copy/emulate auth and certs from ZGW Consumers / ZDS Client
     if client.auth:
         req_args["headers"] = client.auth.credentials()
 
@@ -100,9 +101,9 @@ def upload_document(
     user: SimpleLazyObject,
     file: InMemoryUploadedFile,
     title: str,
-    user_choice: int,
+    informatieobjecttype_url: str,
     source_organization: str,
-) -> dict:
+) -> Optional[dict]:
 
     client = build_client("document")
     if client is None:
@@ -116,11 +117,10 @@ def upload_document(
         "inhoud": base64.b64encode(file.read()).decode("utf-8"),
         "bestandsomvang": file.size,
         "bestandsnaam": file.name,
-        # "status": "definitief",
-        "taal": "nld",
-        "informatieobjecttype": ZaakTypeInformatieObjectTypeConfig.objects.get(
-            id=user_choice
-        ).informatieobjecttype_url,
+        "status": "definitief",
+        "indicatieGebruiksrecht": False,
+        "taal": "dut",
+        "informatieobjecttype": informatieobjecttype_url,
     }
 
     try:

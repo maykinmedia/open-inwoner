@@ -168,7 +168,7 @@ def fetch_status_history_no_cache(case_url: str) -> List[Status]:
 
 
 @cache_result("status:{status_url}", timeout=60 * 60)
-def fetch_specific_status(status_url: str) -> Optional[Status]:
+def fetch_single_status(status_url: str) -> Optional[Status]:
     client = build_client("zaak")
 
     if client is None:
@@ -303,8 +303,9 @@ def fetch_single_result(result_url: str) -> Optional[Resultaat]:
     return result
 
 
-def connect_case_with_document(case_url: str, document_url: str) -> dict:
+def connect_case_with_document(case_url: str, document_url: str) -> Optional[dict]:
     client = build_client("zaak")
+
     if client is None:
         return
 

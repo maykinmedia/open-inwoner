@@ -10,13 +10,13 @@ from open_inwoner.openzaak.cases import (
     fetch_cases,
     fetch_single_case,
     fetch_single_result,
-    fetch_specific_status,
+    fetch_single_status,
 )
 from open_inwoner.openzaak.catalog import (
-    fetch_result_types,
+    fetch_result_types_no_cache,
     fetch_single_case_type,
     fetch_single_status_type,
-    fetch_status_types,
+    fetch_status_types_no_cache,
 )
 from open_inwoner.openzaak.clients import build_client
 from open_inwoner.openzaak.utils import get_zaak_type_config, is_zaak_visible
@@ -86,7 +86,7 @@ class Command(BaseCommand):
                     f'  {case_type.identificatie} {case_type.uuid} {case_type.indicatie_intern_of_extern} "{case_type.omschrijving}" '
                 )
 
-                status = fetch_specific_status(case.status)
+                status = fetch_single_status(case.status)
                 status_type = fetch_single_status_type(status.statustype)
                 self.stdout.write(
                     f"  {status_type.omschrijving} (end {status_type.is_eindstatus}, inform {status_type.informeren}) {status_type.uuid}"
@@ -112,12 +112,12 @@ class Command(BaseCommand):
             else:
                 self.stdout.write("no ZaakTypeConfig found")
 
-            status_types = fetch_status_types(case_type.url)
+            status_types = fetch_status_types_no_cache(case_type.url)
             status_type_map = {r.url: r for r in status_types}
-            result_types = fetch_result_types(case_type.url)
+            result_types = fetch_result_types_no_cache(case_type.url)
             result_types_map = {r.url: r for r in result_types}
 
-            status = fetch_specific_status(case.status)
+            status = fetch_single_status(case.status)
             status_type = status_type_map[status.statustype]
             self.stdout.write(f"  status: {status_type.omschrijving}")
 
@@ -193,6 +193,6 @@ class Command(BaseCommand):
 
             # check if status was applied
             case = fetch_case_by_url_no_cache(case.url)
-            status = fetch_specific_status(case.status)
+            status = fetch_single_status(case.status)
             status_type = fetch_single_status_type(status.statustype)
             self.stdout.write(f"  {status_type.omschrijving}")

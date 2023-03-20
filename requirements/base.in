@@ -47,6 +47,7 @@ django-open-forms-client
 django-htmx
 playwright
 django-yubin
+django-image-cropping
 
 # API libraries
 djangorestframework

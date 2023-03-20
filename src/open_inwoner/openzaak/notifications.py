@@ -18,7 +18,7 @@ from open_inwoner.openzaak.cases import (
     fetch_case_by_url_no_cache,
     fetch_case_roles,
     fetch_single_case_information_object,
-    fetch_specific_status,
+    fetch_single_status,
     fetch_status_history_no_cache,
 )
 from open_inwoner.openzaak.catalog import (
@@ -256,7 +256,7 @@ def _handle_status_notification(notification: Notification, case: Zaak, inform_u
             status = s
             break
     else:
-        status = fetch_specific_status(status_url)
+        status = fetch_single_status(status_url)
 
     if not status:
         log_system_action(

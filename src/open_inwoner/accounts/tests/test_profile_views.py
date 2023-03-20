@@ -1,10 +1,14 @@
+import io
+
 from django.test import override_settings
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 import requests_mock
 from django_webtest import WebTest
+from PIL import Image
 from timeline_logger.models import TimelineLog
+from webtest import Upload
 
 from open_inwoner.accounts.choices import StatusChoices
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
@@ -12,7 +16,7 @@ from open_inwoner.pdc.tests.factories import CategoryFactory
 from open_inwoner.utils.logentry import LOG_ACTIONS
 
 from ...questionnaire.tests.factories import QuestionnaireStepFactory
-from ..choices import LoginTypeChoices
+from ..choices import ContactTypeChoices, LoginTypeChoices
 from ..forms import BrpUserForm, UserForm
 from .factories import ActionFactory, DocumentFactory, UserFactory
 
@@ -21,7 +25,7 @@ class ProfileViewTests(WebTest):
     def setUp(self):
         self.url = reverse("accounts:my_profile")
         self.return_url = reverse("logout")
-        self.user = UserFactory()
+        self.user = UserFactory(street="MyStreet")
 
         self.action_deleted = ActionFactory(
             name="deleted action, should not show up",
@@ -34,6 +38,14 @@ class ProfileViewTests(WebTest):
         login_url = reverse("login")
         response = self.app.get(self.url)
         self.assertRedirects(response, f"{login_url}?next={self.url}")
+
+    def test_user_information_profile_page(self):
+        response = self.app.get(self.url, user=self.user)
+
+        self.assertContains(response, self.user.get_full_name())
+        self.assertContains(response, self.user.email)
+        self.assertContains(response, self.user.phonenumber)
+        self.assertContains(response, self.user.get_address())
 
     def test_get_empty_profile_page(self):
         response = self.app.get(self.url, user=self.user)
@@ -160,6 +172,19 @@ class EditProfileTests(WebTest):
         self.url = reverse("accounts:edit_profile")
         self.return_url = reverse("accounts:my_profile")
         self.user = UserFactory()
+
+    def create_test_image_bytes(self):
+        image = Image.new("RGB", (10, 10))
+        byteIO = io.BytesIO()
+        image.save(byteIO, format="png")
+        return byteIO.getvalue()
+
+    def upload_test_image_to_profile_edit_page(self, img_bytes):
+        response = self.app.get(self.url, user=self.user, status=200)
+        form = response.forms["profile-edit"]
+        form["image"] = Upload("test_image.png", img_bytes, "image/png")
+        response = form.submit()
+        return response
 
     def test_login_required(self):
         login_url = reverse("login")
@@ -338,6 +363,58 @@ class EditProfileTests(WebTest):
 
         self.assertEqual(type(form), BrpUserForm)
 
+    def test_image_is_saved_when_begeleider_and_default_login(self):
+        self.user.contact_type = ContactTypeChoices.begeleider
+        self.user.save()
+
+        img_bytes = self.create_test_image_bytes()
+        form_response = self.upload_test_image_to_profile_edit_page(img_bytes)
+
+        self.assertRedirects(form_response, reverse("accounts:my_profile"))
+        with self.assertRaisesMessage(
+            ValueError, "The 'image' attribute has no file associated with it."
+        ):
+            self.user.image.file
+
+        self.user.refresh_from_db()
+
+        self.assertIsNotNone(self.user.image.file)
+
+    def test_image_is_saved_when_begeleider_and_digid_login(self):
+        self.user.contact_type = ContactTypeChoices.begeleider
+        self.user.login_type = LoginTypeChoices.digid
+        self.user.save()
+
+        img_bytes = self.create_test_image_bytes()
+        form_response = self.upload_test_image_to_profile_edit_page(img_bytes)
+
+        self.assertRedirects(form_response, reverse("accounts:my_profile"))
+        with self.assertRaisesMessage(
+            ValueError, "The 'image' attribute has no file associated with it."
+        ):
+            self.user.image.file
+
+        self.user.refresh_from_db()
+
+        self.assertIsNotNone(self.user.image.file)
+
+    def test_image_field_is_not_rendered_when_begeleider_and_default_login(self):
+        response = self.app.get(self.url, user=self.user, status=200)
+        form = response.forms["profile-edit"]
+
+        self.assertNotIn("image", form.fields.keys())
+        self.assertEqual(response.pyquery("#id_image"), [])
+
+    def test_image_field_is_not_rendered_when_begeleider_and_digid_login(self):
+        self.user.login_type = LoginTypeChoices.digid
+        self.user.save()
+
+        response = self.app.get(self.url, user=self.user, status=200)
+        form = response.forms["profile-edit"]
+
+        self.assertNotIn("image", form.fields.keys())
+        self.assertEqual(response.pyquery("#id_image"), [])
+
 
 @requests_mock.Mocker()
 class MyDataTests(HaalCentraalMixin, WebTest):
@@ -346,9 +423,8 @@ class MyDataTests(HaalCentraalMixin, WebTest):
         "initials": "M.",
         "last_name": "Kooyman",
         "prefix": None,
-        "birthday": "1982-04-10",
+        "birthday": "10-04-1982",
         "birthday_place": "Leerdam",
-        "birthday_country": "Nederland",
         "gender": "vrouw",
         "street": "King Olivereiland",
         "house_number": 64,
@@ -398,6 +474,39 @@ class MyDataTests(HaalCentraalMixin, WebTest):
             response.context["my_data"],
             self.expected_response,
         )
+        self.assertEqual(
+            log_entry.extra_data,
+            {
+                "message": _("user requests for brp data"),
+                "action_flag": list(LOG_ACTIONS[4]),
+                "content_object_repr": self.user.email,
+            },
+        )
+
+    @override_settings(BRP_VERSION="1.3")
+    def test_wrong_date_format_shows_birthday_none_brp_v_1_3(self, m):
+        self._setUpService()
+
+        m.get(
+            "https://personen/api/schema/openapi.yaml?v=3",
+            status_code=200,
+            content=self.load_binary_mock("personen_1.3.yaml"),
+        )
+        m.get(
+            "https://personen/api/brp/ingeschrevenpersonen/999993847?fields=geslachtsaanduiding,naam,geboorte,verblijfplaats",
+            status_code=200,
+            json={
+                "geboorte": {
+                    "datum": {
+                        "datum": "1982-04",
+                    },
+                }
+            },
+        )
+        response = self.app.get(self.url, user=self.user)
+        log_entry = TimelineLog.objects.last()
+
+        self.assertIsNone(response.context["my_data"]["birthday"])
         self.assertEqual(
             log_entry.extra_data,
             {

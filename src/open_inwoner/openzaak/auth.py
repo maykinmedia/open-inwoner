@@ -22,7 +22,7 @@ def get_valid_subscription_from_request(request) -> Subscription:
 def get_valid_subscriptions_from_bearer(header_value: str) -> Subscription:
     jwt_string = re.sub(r"^Bearer ", "", header_value)
     if not jwt_string:
-        raise InvalidAuth("cannot locate Bearer token in header")
+        raise InvalidAuth(f"cannot locate Bearer token in header: {header_value}")
     return get_valid_subscription_from_jwt(jwt_string)
 
 
@@ -38,10 +38,10 @@ def get_valid_subscription_from_jwt(jwt_string: str) -> Subscription:
         )
         client_id = decoded_unverified.get("client_id")
     except InvalidTokenError:
-        raise InvalidAuth("cannot decode token")
+        raise InvalidAuth(f"cannot decode token: {jwt_string}")
 
     if not client_id:
-        raise InvalidAuth("missing 'client_id' in token")
+        raise InvalidAuth(f"missing 'client_id' in token: {jwt_string}")
 
     subscriptions_for_client_id = list(Subscription.objects.filter(client_id=client_id))
     if not subscriptions_for_client_id:

@@ -37,6 +37,12 @@ class PlanTemplate(models.Model):
             "The goal for the plan. So that you and the contact knows what the goal is."
         ),
     )
+    description = models.TextField(
+        verbose_name=_("description"),
+        default="",
+        blank=True,
+        help_text=_("The description of the plan."),
+    )
 
     def __str__(self):
         return self.name
@@ -69,15 +75,6 @@ class ActionTemplate(models.Model):
             "The description that will be applied to the action if this template in chosen."
         ),
     )
-    goal = models.CharField(
-        verbose_name=_("goal"),
-        default="",
-        blank=True,
-        max_length=250,
-        help_text=_(
-            "The goal that will be applied to the action if this template in chosen."
-        ),
-    )
     type = models.CharField(
         verbose_name=_("Type"),
         default=TypeChoices.incidental,
@@ -103,6 +100,12 @@ class Plan(models.Model):
         help_text=_(
             "The goal for the plan. So that you and the contact knows what the goal is."
         ),
+    )
+    description = models.TextField(
+        verbose_name=_("description"),
+        default="",
+        blank=True,
+        help_text=_("The description of the plan."),
     )
     end_date = models.DateField(
         verbose_name=_("End date"), help_text=_("When the plan should be archived.")
