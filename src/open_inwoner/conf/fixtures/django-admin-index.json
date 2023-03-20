@@ -103,6 +103,10 @@
                 "cspreport"
             ],
             [
+                "log_outgoing_requests",
+                "outgoingrequestslog"
+            ],
+            [
                 "otp_totp",
                 "totpdevice"
             ],
