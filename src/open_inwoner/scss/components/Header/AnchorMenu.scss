@@ -60,6 +60,10 @@
     }
   }
 
+  &__start-inquiry {
+    margin-left: var(--spacing-large);
+  }
+
   .link {
     box-sizing: border-box;
     padding: var(--spacing-large);
