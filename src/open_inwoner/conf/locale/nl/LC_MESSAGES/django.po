@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-17 11:22+0100\n"
+"POT-Creation-Date: 2023-03-20 10:59+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,7 +19,7 @@ msgstr ""
 
 #: accounts/admin.py:32 accounts/tests/test_admin.py:137
 msgid "Only a 'begeleider' user can add an image."
-msgstr ""
+msgstr "Alleen een begeleider mag een afbeelding toevoegen."
 
 #: accounts/admin.py:40 accounts/admin.py:52 accounts/tests/test_admin.py:66
 #: accounts/tests/test_admin.py:80
@@ -794,11 +794,11 @@ msgstr "Registreer"
 #: plans/tests/test_views.py:509 plans/views.py:517
 #, python-brace-format
 msgid "Actie '{action}' is verwijdered."
-msgstr ""
+msgstr "Actie '{action}' is verwijdered."
 
 #: accounts/tests/test_admin.py:92
 msgid "Voer een geldig e-mailadres in."
-msgstr ""
+msgstr "Voer een geldig e-mailadres in."
 
 #: accounts/tests/test_auth.py:85 accounts/tests/test_auth.py:107
 #: accounts/tests/test_auth.py:778 accounts/tests/test_auth.py:804
@@ -823,8 +823,10 @@ msgstr ""
 "hoofdlettergevoelig zijn."
 
 #: accounts/tests/test_auth.py:874
-msgid "Mijn wachtwoord opnieuw instellen"
-msgstr "Mijn wachtwoord opnieuw instellen"
+#: templates/registration/password_reset_form.html:5
+#: templates/registration/password_reset_form.html:12
+msgid "Wachtwoord opnieuw instellen"
+msgstr "Wachtwoord opnieuw instellen"
 
 #: accounts/tests/test_auth.py:884
 #, python-brace-format
@@ -881,6 +883,8 @@ msgid ""
 "Het type bestand dat u hebt geüpload is ongeldig. Geldige bestandstypen "
 "zijn: pdf, docx, doc, xlsx, xls, jpeg, jpg, png, txt, odt, odf, ods"
 msgstr ""
+"Het type bestand dat u hebt geüpload is ongeldig. Geldige bestandstypen "
+"zijn: pdf, docx, doc, xlsx, xls, jpeg, jpg, png, txt, odt, odf, ods"
 
 #: accounts/tests/test_file_upload.py:57 accounts/tests/test_file_upload.py:126
 #: accounts/tests/test_file_upload.py:204
@@ -889,6 +893,8 @@ msgid ""
 "Een aangeleverd bestand dient maximaal {size} te zijn, uw bestand is te "
 "groot."
 msgstr ""
+"Een aangeleverd bestand dient maximaal {size} te zijn, uw bestand is te "
+"groot."
 
 #: accounts/tests/test_file_upload.py:72 accounts/tests/test_file_upload.py:141
 #: accounts/tests/test_file_upload.py:220
@@ -897,11 +903,13 @@ msgid ""
 "Een aangeleverd bestand dient minimaal {size} te zijn, uw bestand is te "
 "klein."
 msgstr ""
+"Een aangeleverd bestand dient minimaal {size} te zijn, uw bestand is te "
+"klein."
 
 #: accounts/tests/test_file_upload.py:83 accounts/tests/test_file_upload.py:152
 #: accounts/tests/test_file_upload.py:232
 msgid "Het verstuurde bestand is leeg."
-msgstr ""
+msgstr "Het verstuurde bestand is leeg."
 
 #: accounts/tests/test_logging.py:65 accounts/views/registration.py:79
 msgid "user was created"
@@ -1087,7 +1095,7 @@ msgstr "Geschiedenis van {}"
 #: accounts/views/cases.py:65
 #, python-brace-format
 msgid "Zaak bekeken: {case}"
-msgstr ""
+msgstr "Zaak bekeken: {case}"
 
 #: accounts/views/cases.py:205 accounts/views/cases.py:230
 #: accounts/views/cases.py:257 accounts/views/cases.py:296
@@ -1136,10 +1144,12 @@ msgid "Document was uploaded for {case}: {filename}"
 msgstr "Document {filename} is geupload voor {case}"
 
 #: accounts/views/cases.py:484
+#, python-brace-format
 msgid "{filename} has been successfully uploaded"
 msgstr "{filename} is succesvol geüpload"
 
 #: accounts/views/cases.py:494
+#, python-brace-format
 msgid "An error occured while uploading file {filename}"
 msgstr "Een fout is opgetreden bij het uploaden van {filename}"
 
@@ -1337,11 +1347,11 @@ msgstr ""
 
 #: components/templates/components/AnchorMenu/AnchorMenu.html:3
 msgid "Secundaire paginanavigatie"
-msgstr ""
+msgstr "Secundaire paginanavigatie"
 
 #: components/templates/components/AnchorMenu/AnchorMenu.html:5
 msgid "On this page:"
-msgstr ""
+msgstr "Op deze pagina:"
 
 #: components/templates/components/Card/DescriptionCard.html:14
 #: components/templatetags/table_tags.py:63
@@ -1351,7 +1361,7 @@ msgstr "Einddatum"
 
 #: components/templates/components/Dashboard/Dashboard.html:3
 msgid "Dashboard"
-msgstr ""
+msgstr "Dashboard"
 
 #: components/templates/components/Faq/Faq.html:3
 #: components/templatetags/faq_tags.py:24 pdc/views.py:113 pdc/views.py:197
@@ -1425,12 +1435,12 @@ msgid "Zoeken"
 msgstr "Zoeken"
 
 #: components/templates/components/Header/AccessibilityHeader.html:4
-msgid "Toegankelijkheids help"
-msgstr ""
+msgid "Toegankelijkheidshulp"
+msgstr "Toegankelijkheidshulp"
 
 #: components/templates/components/Header/AccessibilityHeader.html:6
 msgid "Doorgaan naar hoofdinhoud"
-msgstr ""
+msgstr "Doorgaan naar hoofdinhoud"
 
 #: components/templates/components/Header/AccessibilityHeader.html:11
 msgid "Lees voor"
@@ -1471,7 +1481,7 @@ msgstr "Sluiten"
 
 #: components/templates/components/Header/Breadcrumbs.html:3
 msgid "breadcrumbs"
-msgstr ""
+msgstr "broodkruimels"
 
 #: components/templates/components/Header/Header.html:30
 #: components/templates/components/Header/PrimaryNavigation.html:6
@@ -1542,7 +1552,7 @@ msgstr "De gebruiker is inactief. Het is niet mogelijk een bericht te sturen."
 
 #: components/templates/components/Notification/Notification.html:21
 msgid "Sluit deze melding"
-msgstr ""
+msgstr "Sluit deze melding"
 
 #: components/templates/components/Product/finder.html:15
 #: templates/pages/questionnaire/questionnaire-step.html:40
@@ -1559,16 +1569,16 @@ msgstr "Begin opnieuw"
 
 #: components/templates/components/Step/StepIndicator.html:4
 msgid "Stappen indicator"
-msgstr ""
+msgstr "Stappen indicator"
 
 #: components/templates/components/Tag/Tag.html:3
 msgid "Tag lijst"
-msgstr ""
+msgstr "Tag lijst"
 
 #: components/templates/components/Testing/InclusionTag.html:3
 #: openzaak/admin.py:84
 msgid "Yes"
-msgstr ""
+msgstr "Ja"
 
 #: components/templates/components/status/status_list.html:3
 msgid "Status lijst"
@@ -1884,13 +1894,15 @@ msgstr "Hoofdafbeelding op de inlogpagina"
 
 #: configurations/models.py:77
 msgid "Toon inlogknop rechts bovenin"
-msgstr ""
+msgstr "Toon inlogknop rechts bovenin"
 
 #: configurations/models.py:80
 msgid ""
 "Wanneer deze optie uit staat dan kan nog wel worden ingelogd via /accounts/"
 "login/ , echter het inloggen is verborgen"
 msgstr ""
+"Wanneer deze optie uit staat dan kan nog wel worden ingelogd via /accounts/"
+"login/ , echter het inloggen is verborgen"
 
 #: configurations/models.py:84
 msgid "Sta lokale registratie toe"
@@ -2000,7 +2012,7 @@ msgstr "Vragenlijst titel op de homepage."
 
 #: configurations/models.py:146
 msgid "Test met een paar simpele vragen of u recht heeft op een product"
-msgstr ""
+msgstr "Test met een paar simpele vragen of u recht heeft op een product"
 
 #: configurations/models.py:147
 msgid "Home page questionaire intro"
@@ -2026,6 +2038,7 @@ msgstr "Titel van de productzoeker op de homepage."
 msgid ""
 "Met een paar simpele vragen ziet u welke producten passen bij uw situatie"
 msgstr ""
+"Met een paar simpele vragen ziet u welke producten passen bij uw situatie"
 
 #: configurations/models.py:161
 msgid "Home product finder intro"
@@ -2160,7 +2173,7 @@ msgstr "Contactdetails tekst in de footer."
 
 #: configurations/models.py:250 configurations/models.py:255
 msgid "Footer logo"
-msgstr ""
+msgstr "Footer logo"
 
 #: configurations/models.py:261
 msgid "Footer logo title"
@@ -2448,7 +2461,7 @@ msgstr "Algemene configuratie"
 
 #: configurations/models.py:442
 msgid "Als Samenwerken actief is moeten Acties ook actief zijn"
-msgstr ""
+msgstr "Als Samenwerken actief is moeten Acties ook actief zijn"
 
 #: configurations/models.py:500
 msgid "Configuration"
@@ -2468,19 +2481,19 @@ msgstr "Platte pagina's in footer"
 
 #: custom_csp/models.py:19
 msgid "directive"
-msgstr ""
+msgstr "directive"
 
 #: custom_csp/models.py:21
 msgid "CSP header directive"
-msgstr ""
+msgstr "CSP header directive"
 
 #: custom_csp/models.py:25
 msgid "value"
-msgstr ""
+msgstr "value"
 
 #: custom_csp/models.py:27
 msgid "CSP header value"
-msgstr ""
+msgstr "CSP header value"
 
 #: haalcentraal/models.py:20
 msgid "Haal Centraal API"
@@ -2488,21 +2501,23 @@ msgstr "Haal Centraal API"
 
 #: haalcentraal/models.py:28
 msgid "API 'OIN' header"
-msgstr ""
+msgstr "API 'OIN' header"
 
 #: haalcentraal/models.py:32
 msgid ""
 "Value of the 'x-origin-oin' header for Haalcentraal BRP v1.3 API requests."
 msgstr ""
+"Waarde van de 'x-origin-oin' header voor Haalcentraal BRP v1.3 API requests."
 
 #: haalcentraal/models.py:36
 msgid "API 'doelbinding' header"
-msgstr ""
+msgstr "API 'doelbinding' header"
 
 #: haalcentraal/models.py:40
 msgid ""
 "Value of the 'x-doelbinding' header for Haalcentraal BRP v1.3 API requests."
 msgstr ""
+"Waarde van de 'x-doelbinding' header voor Haalcentraal BRP v1.3 API requests."
 
 #: haalcentraal/models.py:47
 msgid "Haal Centraal configuration"
@@ -2514,7 +2529,7 @@ msgstr "data is opgehaald via Haal Centraal BRP"
 
 #: openzaak/admin.py:46
 msgid "API behaviour override options"
-msgstr ""
+msgstr "eSuite-specifieke ZGW API opties"
 
 #: openzaak/admin.py:79
 msgid "notify document attachment"
@@ -2610,7 +2625,7 @@ msgstr ""
 
 #: openzaak/models.py:102
 msgid "Form API"
-msgstr ""
+msgstr "Formulieren API (open aanvragen)"
 
 #: openzaak/models.py:110
 msgid "Use StatusType.informeren workaround"
@@ -2740,14 +2755,18 @@ msgid "There is no available data at the moment."
 msgstr "Op dit moment zijn er geen aanvragen beschikbaar."
 
 #: openzaak/tests/test_case_detail.py:614
-msgid ""
-"{self.uploaded_informatie_object['bestandsnaam']} has been successfully "
-"uploaded"
+#, fuzzy
+#| msgid ""
+#| "{self.uploaded_informatie_object['bestandsnaam']} has been successfully "
+#| "uploaded"
+msgid "{self.uploaded_informatie_object['bestandsnaam']} is succesvol geüpload"
 msgstr ""
 "{self.uploaded_informatie_object['bestandsnaam']} is succesvol geupload"
 
 #: openzaak/tests/test_case_detail.py:644
-msgid "upload.TXT has been successfully uploaded"
+#, fuzzy
+#| msgid "upload.TXT has been successfully uploaded"
+msgid "upload.TXT is succesvol geüpload"
 msgstr "upload.TXT has been successfully uploaded"
 
 #: openzaak/tests/test_case_detail.py:743
@@ -2760,13 +2779,11 @@ msgstr "Via onderstaande knop kunt u een bestand toevoegen."
 #: openzaak/tests/test_case_detail.py:837
 #: openzaak/tests/test_case_detail.py:867
 msgid ""
-"An error occured while uploading file {self."
+"Een fout is opgetreden bij het uploaden van {self."
 "uploaded_informatie_object['bestandsnaam']}"
 msgstr ""
 
 #: openzaak/tests/test_formapi.py:100 templates/pages/cases/submissions.html:33
-#, fuzzy
-#| msgid "Er zijn geen openstaande formulieren."
 msgid "Er zijn geen open aanvragen."
 msgstr "Er zijn geen open aanvragen."
 
@@ -3340,7 +3357,7 @@ msgstr "Zie ook"
 
 #: pdc/views.py:233 templates/pages/cases/submissions.html:17
 msgid "Formulier"
-msgstr ""
+msgstr "Formulier"
 
 #: pdc/views.py:255 templates/pages/product/finder.html:10
 msgid "Producten"
@@ -3620,7 +3637,7 @@ msgstr ""
 
 #: questionnaire/models.py:52
 msgid "Code voor intern gebruik"
-msgstr ""
+msgstr "Code voor intern gebruik"
 
 #: questionnaire/models.py:53
 msgid "URL vriendelijke naam"
@@ -3651,22 +3668,28 @@ msgid ""
 "Alleen relevant voor vraag op het hoofdniveau. Indien aangevinkt dan wordt "
 "deze vraag getoond op de homepage."
 msgstr ""
+"Alleen relevant voor vraag op het hoofdniveau. Indien aangevinkt dan wordt "
+"deze vraag getoond op de homepage."
 
 #: questionnaire/models.py:78
 msgid ""
 "Alleen relevant voor vraag op het hoofdniveau. Indien uitgevinkt dan kunnen "
 "alleen beheerders de vragenlijst zien & doorlopen."
 msgstr ""
+"Alleen relevant voor vraag op het hoofdniveau. Indien uitgevinkt dan kunnen "
+"alleen beheerders de vragenlijst zien & doorlopen."
 
 #: questionnaire/models.py:84
 msgid "Doorsturen naar andere stap (experimenteel)"
-msgstr ""
+msgstr "Doorsturen naar andere stap (experimenteel)"
 
 #: questionnaire/models.py:88
 msgid ""
 "Indien ingesteld dan wordt de gebruiker na het kiezen van het antwoord "
 "doorgestuurd naar een andere vragenlijststap (eventueel in een andere boom)"
 msgstr ""
+"Indien ingesteld dan wordt de gebruiker na het kiezen van het antwoord "
+"doorgestuurd naar een andere vragenlijststap (eventueel in een andere boom)"
 
 #: questionnaire/models.py:93
 msgid "Gerelateerde producten"
@@ -4016,7 +4039,7 @@ msgstr "Start"
 
 #: templates/pages/plans/create.html:18
 msgid "Maak je eerste contact aan voordat je een samenwerking start"
-msgstr ""
+msgstr "Maak je eerste contact aan voordat je een samenwerking start"
 
 #: templates/pages/plans/create.html:26
 msgid "Templates"
@@ -4034,7 +4057,7 @@ msgstr "Exporteer naar PDF"
 
 #: templates/pages/plans/detail.html:46 templates/pages/plans/list.html:42
 msgid "Deelnemers"
-msgstr ""
+msgstr "Deelnemers"
 
 #: templates/pages/plans/detail.html:66
 msgid "Doel en omschrijving bewerken"
@@ -4058,7 +4081,7 @@ msgstr "Start nieuwe samenwerking"
 
 #: templates/pages/plans/list.html:33
 msgid "Reset filters"
-msgstr ""
+msgstr "Reset filters"
 
 #: templates/pages/plans/list.html:41
 msgid "Samenwerking"
@@ -4352,7 +4375,7 @@ msgstr "Naar home"
 
 #: templates/pages/search.html:23
 msgid "Zoekfilters"
-msgstr ""
+msgstr "Zoekfilters"
 
 #: templates/pages/search.html:61
 msgid "Pagina feedback"
@@ -4476,11 +4499,6 @@ msgstr "Uw gebruikersnaam, mocht u deze vergeten zijn: "
 msgid "Met vriendelijke groet"
 msgstr "Met vriendelijke groet"
 
-#: templates/registration/password_reset_form.html:5
-#: templates/registration/password_reset_form.html:12
-msgid "Wachtwoord opnieuw instellen"
-msgstr "Wachtwoord opnieuw instellen"
-
 #: templates/registration/password_reset_form.html:6
 msgid ""
 "Wachtwoord vergeten? Vul hieronder je e-mailadres in. Je krijgt dan een mail "
@@ -4574,6 +4592,9 @@ msgstr "Het opgegeven mobiele telefoonnummer is ongeldig."
 msgid "Ongeldige postcode"
 msgstr "Ongeldige postcode"
 
+#~ msgid "Mijn wachtwoord opnieuw instellen"
+#~ msgstr "Mijn wachtwoord opnieuw instellen"
+
 #~ msgid "The goal of the action"
 #~ msgstr "Het doel van de actie"
 
@@ -4610,11 +4631,6 @@ msgstr "Ongeldige postcode"
 #~ msgstr ""
 #~ "Logo van de organisatie - Houd afbeeldingen in vierkant of "
 #~ "landschapsformaat en met een maximale bestandsgrootte van 2 MB"
-
-#, fuzzy
-#~| msgid "Created on"
-#~ msgid "Created"
-#~ msgstr "Aangemaakt op"
 
 #~ msgid "U bent al ingelogd."
 #~ msgstr "U bent al ingelogd."
