@@ -861,7 +861,7 @@ class TestLoginLogoutFunctionality(WebTest):
             response.context["errors"],
             [
                 _(
-                    "Voer een juiste E-mailadres en wachtwoord in. Let op dat beide velden hoofdlettergevoelig zijn."
+                    "Voer een juist E-mailadres en wachtwoord in. Let op dat beide velden hoofdlettergevoelig zijn."
                 )
             ],
         )

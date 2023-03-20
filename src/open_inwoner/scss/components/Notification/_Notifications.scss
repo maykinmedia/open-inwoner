@@ -4,5 +4,18 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-extra-large);
-  z-index: 1004;
+  z-index: 1002;
+
+  /// Multiple errors.
+
+  &__errors {
+    box-sizing: border-box;
+    top: 0;
+    gap: 0;
+    width: 100%;
+    max-width: 500px;
+    margin: -6px var(--spacing-small) 0 0;
+    padding: 0 0 var(--spacing-small) 0;
+    border: none;
+  }
 }

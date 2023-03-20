@@ -1,15 +1,4 @@
-.cases {
-  margin-top: var(--spacing-giant);
-
-  /// cards on cases page
-  .card {
-    .cases__link {
-      text-decoration: none;
-    }
-  }
-}
-
-#document-upload {
+#document-create {
   /// Make required asterisk visible for this component
   .label__label--required {
     color: var(--color-red);

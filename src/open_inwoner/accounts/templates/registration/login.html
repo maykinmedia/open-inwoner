@@ -49,7 +49,7 @@
 
                 {% if login_allow_registration %}
                     {% render_card tinted=True %}
-                        {% render_form id="login-form" method="POST" form=form %}
+                        {% render_form id="login-form" method="POST" form=form show_required=True %}
                             {% csrf_token %}
                             <input type="hidden" name="next" value="{{next}}" />
                             {% input form.username %}

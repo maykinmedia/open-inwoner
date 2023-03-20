@@ -87,9 +87,9 @@
     calc(var(--color-accent-l) + 10%)
   );
 
-  --color-danger-h: 0;
+  --color-danger-h: 34;
   --color-danger-s: 100%;
-  --color-danger-l: 40%;
+  --color-danger-l: 27%;
   --color-danger: hsl(
     var(--color-danger-h),
     var(--color-danger-s),
@@ -98,7 +98,7 @@
   --color-danger-darker: hsl(
     var(--color-danger-h),
     var(--color-danger-s),
-    calc(var(--color-danger-l) - 27%)
+    calc(var(--color-danger-l) - 5%)
   );
   --color-danger-lighter: hsl(
     var(--color-danger-h),
@@ -108,7 +108,31 @@
   --color-danger-lightest: hsl(
     var(--color-danger-h),
     var(--color-danger-s),
-    calc(var(--color-danger-l) + 53%)
+    calc(var(--color-danger-l) + 57%)
+  );
+
+  --color-error-h: 350;
+  --color-error-s: 100%;
+  --color-error-l: 45%;
+  --color-error: hsl(
+    var(--color-error-h),
+    var(--color-error-s),
+    var(--color-error-l)
+  );
+  --color-error-darker: hsl(
+    var(--color-error-h),
+    var(--color-error-s),
+    calc(var(--color-error-l) - 27%)
+  );
+  --color-error-lighter: hsl(
+    var(--color-error-h),
+    var(--color-error-s),
+    calc(var(--color-error-l) + 48%)
+  );
+  --color-error-lightest: hsl(
+    var(--color-error-h),
+    var(--color-error-s),
+    calc(var(--color-error-l) + 50%)
   );
 
   --color-info-h: 2010;
