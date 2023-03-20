@@ -8,6 +8,7 @@ from django.utils.translation import gettext_lazy as _
 class OutgoingRequestsLog(models.Model):
     url = models.URLField(
         verbose_name=_("URL"),
+        max_length=1000,
         blank=True,
         default="",
         help_text=_("The url of the outgoing request."),
