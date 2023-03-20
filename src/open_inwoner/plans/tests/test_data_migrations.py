@@ -1,4 +1,3 @@
-from open_inwoner.accounts.models import User
 from open_inwoner.utils.tests.test_migrations import TestMigrations
 
 
@@ -52,6 +51,8 @@ class PlanContactThroughModelMigrationTests(TestMigrations):
     migrate_from = "0013_auto_20230223_1115"
     migrate_to = "0015_plancontact_notify_new"
 
+    extra_migrate_from = [("accounts", "0055_user_image")]
+
     def setUpBeforeMigration(self, apps):
         UserModel = apps.get_model("accounts", "User")
         self.user = UserModel.objects.create(
@@ -70,11 +71,12 @@ class PlanContactThroughModelMigrationTests(TestMigrations):
         self.plan.plan_contacts.add(self.other_user)
 
     def test_plan_contacts_still_exist(self):
-        # user real models for actual test
-        from ..models import Plan, PlanContact
+        UserModel = self.apps.get_model("accounts", "User")
+        PlanModel = self.apps.get_model("plans", "Plan")
+        PlanContact = self.apps.get_model("plans", "PlanContact")
 
-        plan = Plan.objects.get(id=self.plan.id)
-        other_user = User.objects.get(id=self.other_user.id)
+        other_user = UserModel.objects.get(id=self.other_user.id)
+        plan = PlanModel.objects.get(id=self.plan.id)
         self.assertEqual(list(plan.plan_contacts.all()), [other_user])
 
         # check we don't notify existing contacts

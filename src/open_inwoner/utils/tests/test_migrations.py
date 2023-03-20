@@ -1,3 +1,5 @@
+from typing import List, Tuple
+
 from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
 from django.test import TestCase
@@ -13,12 +15,19 @@ class TestMigrations(TestCase):
     migrate_from = None
     migrate_to = None
 
+    extra_migrate_from: List[Tuple[str, str]] = None
+
     def setUp(self):
         assert self.migrate_from and self.migrate_to and self.app, (
             "TestCase '%s' must define migrate_from, migrate_to and app properties"
             % type(self).__name__
         )
         self.migrate_from = [(self.app, self.migrate_from)]
+
+        # hack to fix issues where related models aren't in the correct state
+        if self.extra_migrate_from:
+            self.migrate_from += self.extra_migrate_from
+
         self.migrate_to = [(self.app, self.migrate_to)]
         executor = MigrationExecutor(connection)
         old_apps = executor.loader.project_state(self.migrate_from).apps
