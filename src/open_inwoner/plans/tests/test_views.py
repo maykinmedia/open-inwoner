@@ -1044,6 +1044,13 @@ class NewPlanContactCounterTest(WebTest):
         self.assertEqual(len(links), 1)
         self.assertEqual(links.text(), _("Samenwerken") + " people")
 
+        # check this doesn't appear for owner
+        response = self.app.get(root_url, user=owner)
+        links = response.pyquery(
+            f".header__container > .primary-navigation a[href='{list_url}']"
+        )
+        self.assertEqual(len(links), 1)
+
 
 @multi_browser()
 class PlanActionStatusPlaywrightTests(ActionsPlaywrightTests):

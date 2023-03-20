@@ -286,7 +286,11 @@ class User(AbstractBaseUser, PermissionsMixin):
         )
 
     def get_plan_contact_new_count(self):
-        return PlanContact.objects.filter(user=self, notify_new=True).count()
+        return (
+            PlanContact.objects.filter(user=self, notify_new=True)
+            .exclude(plan__created_by=self)
+            .count()
+        )
 
     def clear_plan_contact_new_count(self):
         PlanContact.objects.filter(user=self).update(notify_new=False)
