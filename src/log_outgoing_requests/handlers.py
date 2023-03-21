@@ -14,13 +14,17 @@ class DatabaseOutgoingRequestsHandler(logging.Handler):
 
             # save only the requests coming from the library requests
             if record and record.getMessage() == "Outgoing request":
-                record.req.headers.pop("Authorization", None)
+                exclude_headers = ["Authorization"]
+                safe_req_headers = {
+                    k: v
+                    for k, v in record.req.headers.items()
+                    if k not in exclude_headers
+                }
 
                 if record.exc_info:
                     trace = traceback.format_exc()
 
                 parsed_url = urlparse(record.req.url)
-
                 kwargs = {
                     "url": record.req.url,
                     "hostname": parsed_url.hostname,
@@ -31,7 +35,7 @@ class DatabaseOutgoingRequestsHandler(logging.Handler):
                     "res_content_type": record.res.headers.get("Content-Type", ""),
                     "timestamp": record.requested_at,
                     "response_ms": int(record.res.elapsed.total_seconds() * 1000),
-                    "req_headers": record.req.headers,
+                    "req_headers": safe_req_headers,
                     "res_headers": record.res.headers,
                     "trace": trace,
                 }
