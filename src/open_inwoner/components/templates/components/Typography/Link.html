@@ -1,7 +1,7 @@
 {% load i18n helpers icon_tags %}
 
 <a
-    href="{{href}}"
+    href="{{href}}{% if next %}?next={{next}}{% endif %}"
     {% if id %}{{ id }}{% endif %}
     {% if download %}download{% endif %}
     {% if blank is True %}target="_blank"{% endif %}
