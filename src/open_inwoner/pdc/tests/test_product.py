@@ -161,7 +161,7 @@ class TestProductContent(WebTest):
         cta_button = response.pyquery(".grid__main")[0].find_class("cta-button")
 
         self.assertTrue(cta_button)
-        self.assertIn("http://www.example.com", cta_button[0].values())
+        self.assertIn(product.link, cta_button[0].values())
 
     def test_button_is_rendered_inside_content_when_form_and_cta_exist(self):
         product = ProductFactory(content="Some content [CTABUTTON]", form=2)
@@ -173,7 +173,7 @@ class TestProductContent(WebTest):
         cta_button = response.pyquery(".grid__main")[0].find_class("cta-button")
 
         self.assertTrue(cta_button)
-        self.assertIn(f"{url}formulier", cta_button[0].values())
+        self.assertIn(product.form_link, cta_button[0].values())
 
     def test_button_is_rendered_inside_content_when_form_and_link_and_cta_exist(self):
         product = ProductFactory(
@@ -186,7 +186,7 @@ class TestProductContent(WebTest):
         cta_button = response.pyquery(".grid__main")[0].find_class("cta-button")
 
         self.assertTrue(cta_button)
-        self.assertIn("http://www.example.com", cta_button[0].values())
+        self.assertIn(product.link, cta_button[0].values())
 
     def test_button_is_not_rendered_inside_content_when_no_cta(self):
         product = ProductFactory(content="Some content", link="http://www.example.com")
