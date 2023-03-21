@@ -30,8 +30,6 @@ class OutgoingRequestsLoggingTests(TestCase):
 
     @override_settings(LOG_OUTGOING_REQUESTS_DB_SAVE=True)
     def test_expected_data_is_saved_when_saving_enabled(self, m):
-        self._setUpMocks(m)
-
         methods = [
             ("POST", requests.post, m.post),
             ("PUT", requests.put, m.put),
@@ -64,6 +62,15 @@ class OutgoingRequestsLoggingTests(TestCase):
                 self.assertEqual(request_log.res_content_type, "")
                 self.assertEqual(request_log.response_ms, 0)
                 self.assertEqual(
+                    request_log.req_headers,
+                    (
+                        "{'User-Agent': 'python-requests/2.26.0', 'Accept-Encoding': 'gzip, deflate, br', 'Accept': '*/*', 'Connection': 'keep-alive'}"
+                        if method == "HEAD"
+                        else "{'User-Agent': 'python-requests/2.26.0', 'Accept-Encoding': 'gzip, deflate, br', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Length': '0'}"
+                    ),
+                )
+                self.assertEqual(request_log.res_headers, "{}")
+                self.assertEqual(
                     request_log.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
                     "2021-10-18 13:00:00",
                 )
@@ -79,7 +86,7 @@ class OutgoingRequestsLoggingTests(TestCase):
         )
         log = OutgoingRequestsLog.objects.get()
 
-        self.assertNotIn("Authorization", eval(log.req_headers))
+        self.assertNotIn("Authorization", log.req_headers)
 
     def test_data_is_not_saved_when_saving_disabled(self, m):
         self._setUpMocks(m)
