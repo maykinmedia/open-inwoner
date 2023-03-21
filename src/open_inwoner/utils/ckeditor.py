@@ -65,25 +65,23 @@ def get_product_rendered_content(product):
 
                 # button
                 element.name = "a"
-
-                element.string.replace_with("Aanvraag starten")
+                element.string = ""
                 element.attrs.update(
                     {
                         "class": "button button--textless button--icon button--icon-before button--primary cta-button",
-                        "href": (
-                            product.link
-                            if product.link
-                            else f"{product.get_absolute_url()}formulier"
-                        ),
+                        "href": product.link if product.link else product.form_link,
                         "title": "Aanvraag starten",
                     }
                 )
                 element.append(icon)
+                element.append("Aanvraag starten")
 
                 if product.link:
                     element.attrs.update({"target": "_blank"})
 
-            if element.name == "a" and element.attrs.get("href", "").startswith("http"):
+            elif element.name == "a" and element.attrs.get("href", "").startswith(
+                "http"
+            ):
                 icon = soup.new_tag("span")
                 icon.attrs.update(
                     {
