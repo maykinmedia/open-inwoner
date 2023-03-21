@@ -1,3 +1,5 @@
+from django.utils.translation import gettext as _
+
 import markdown
 from bs4 import BeautifulSoup
 
@@ -59,7 +61,7 @@ def get_product_rendered_content(product):
                 # icon
                 icon = soup.new_tag("span")
                 icon.attrs.update(
-                    {"aria-label": "Aanvraag starten", "class": "material-icons"}
+                    {"aria-label": _("Aanvraag starten"), "class": "material-icons"}
                 )
                 icon.append("arrow_forward")
 
@@ -69,12 +71,12 @@ def get_product_rendered_content(product):
                 element.attrs.update(
                     {
                         "class": "button button--textless button--icon button--icon-before button--primary cta-button",
-                        "href": product.link if product.link else product.form_link,
-                        "title": "Aanvraag starten",
+                        "href": (product.link if product.link else product.form_link),
+                        "title": _("Aanvraag starten"),
                     }
                 )
                 element.append(icon)
-                element.append("Aanvraag starten")
+                element.append(_("Aanvraag starten"))
 
                 if product.link:
                     element.attrs.update({"target": "_blank"})
@@ -86,7 +88,7 @@ def get_product_rendered_content(product):
                 icon.attrs.update(
                     {
                         "aria-hidden": "true",
-                        "aria-label": "Opens in new window",
+                        "aria-label": _("Opens in new window"),
                         "class": "material-icons",
                     }
                 )

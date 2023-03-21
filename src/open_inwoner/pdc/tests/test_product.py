@@ -164,8 +164,7 @@ class TestProductContent(WebTest):
         self.assertIn(product.link, cta_button[0].values())
 
     def test_button_is_rendered_inside_content_when_form_and_cta_exist(self):
-        product = ProductFactory(content="Some content [CTABUTTON]", form=2)
-        url = reverse("pdc:product_detail", kwargs={"slug": product.slug})
+        product = ProductFactory(content="Some content [CTABUTTON]", form="demo")
 
         response = self.app.get(
             reverse("pdc:product_detail", kwargs={"slug": product.slug})
@@ -177,7 +176,9 @@ class TestProductContent(WebTest):
 
     def test_button_is_rendered_inside_content_when_form_and_link_and_cta_exist(self):
         product = ProductFactory(
-            content="Some content [CTABUTTON]", link="http://www.example.com", form=2
+            content="Some content [CTABUTTON]",
+            link="http://www.example.com",
+            form="demo",
         )
 
         response = self.app.get(
