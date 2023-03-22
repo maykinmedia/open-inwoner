@@ -17,6 +17,7 @@ class OutgoingRequestsLoggingTests(TestCase):
             content=b"some content",
         )
 
+    @override_settings(LOG_OUTGOING_REQUESTS_DB_SAVE=True)
     def test_outgoing_requests_are_logged(self, m):
         self._setUpMocks(m)
 
@@ -31,6 +32,7 @@ class OutgoingRequestsLoggingTests(TestCase):
     @override_settings(LOG_OUTGOING_REQUESTS_DB_SAVE=True)
     def test_expected_data_is_saved_when_saving_enabled(self, m):
         methods = [
+            ("GET", requests.get, m.get),
             ("POST", requests.post, m.post),
             ("PUT", requests.put, m.put),
             ("PATCH", requests.patch, m.patch),
@@ -43,10 +45,21 @@ class OutgoingRequestsLoggingTests(TestCase):
                 mocked(
                     "http://example.com/some-path?version=2.0",
                     status_code=200,
-                    content=b"some content",
+                    json={"test": "data"},
+                    request_headers={
+                        "Authorization": "test",
+                        "Content-Type": "text/html",
+                    },
+                    headers={
+                        "Date": "Tue, 21 Mar 2023 15:24:08 GMT",
+                        "Content-Type": "application/json",
+                    },
                 )
 
-                response = func("http://example.com/some-path?version=2.0")
+                response = func(
+                    "http://example.com/some-path?version=2.0",
+                    headers={"Authorization": "test", "Content-Type": "text/html"},
+                )
 
                 request_log = OutgoingRequestsLog.objects.last()
 
@@ -58,18 +71,32 @@ class OutgoingRequestsLoggingTests(TestCase):
                 self.assertEqual(request_log.query_params, "version=2.0")
                 self.assertEqual(response.status_code, 200)
                 self.assertEqual(request_log.method, method)
-                self.assertEqual(request_log.req_content_type, "")
-                self.assertEqual(request_log.res_content_type, "")
+                self.assertEqual(request_log.req_content_type, "text/html")
+                self.assertEqual(request_log.res_content_type, "application/json")
                 self.assertEqual(request_log.response_ms, 0)
                 self.assertEqual(
                     request_log.req_headers,
                     (
-                        "{'User-Agent': 'python-requests/2.26.0', 'Accept-Encoding': 'gzip, deflate, br', 'Accept': '*/*', 'Connection': 'keep-alive'}"
-                        if method == "HEAD"
-                        else "{'User-Agent': 'python-requests/2.26.0', 'Accept-Encoding': 'gzip, deflate, br', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Length': '0'}"
+                        "User-Agent: python-requests/2.26.0\n"
+                        "Accept-Encoding: gzip, deflate, br\n"
+                        "Accept: */*"
+                        "\nConnection: keep-alive\n"
+                        "Authorization: ***hidden***\n"
+                        "Content-Type: text/html"
+                        if method in ["HEAD", "GET"]
+                        else "User-Agent: python-requests/2.26.0\n"
+                        "Accept-Encoding: gzip, deflate, br\n"
+                        "Accept: */*\n"
+                        "Connection: keep-alive\n"
+                        "Authorization: ***hidden***\n"
+                        "Content-Type: text/html\n"
+                        "Content-Length: 0"
                     ),
                 )
-                self.assertEqual(request_log.res_headers, "{}")
+                self.assertEqual(
+                    request_log.res_headers,
+                    "Date: Tue, 21 Mar 2023 15:24:08 GMT\nContent-Type: application/json",
+                )
                 self.assertEqual(
                     request_log.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
                     "2021-10-18 13:00:00",
@@ -77,7 +104,7 @@ class OutgoingRequestsLoggingTests(TestCase):
                 self.assertIsNone(request_log.trace)
 
     @override_settings(LOG_OUTGOING_REQUESTS_DB_SAVE=True)
-    def test_authorization_header_is_not_saved(self, m):
+    def test_authorization_header_is_hidden(self, m):
         self._setUpMocks(m)
 
         requests.get(
@@ -86,8 +113,9 @@ class OutgoingRequestsLoggingTests(TestCase):
         )
         log = OutgoingRequestsLog.objects.get()
 
-        self.assertNotIn("Authorization", log.req_headers)
+        self.assertIn("Authorization: ***hidden***", log.req_headers)
 
+    @override_settings(LOG_OUTGOING_REQUESTS_DB_SAVE=False)
     def test_data_is_not_saved_when_saving_disabled(self, m):
         self._setUpMocks(m)
 

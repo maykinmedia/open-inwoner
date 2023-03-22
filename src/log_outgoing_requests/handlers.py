@@ -1,4 +1,5 @@
 import logging
+import textwrap
 import traceback
 from urllib.parse import urlparse
 
@@ -14,12 +15,10 @@ class DatabaseOutgoingRequestsHandler(logging.Handler):
 
             # save only the requests coming from the library requests
             if record and record.getMessage() == "Outgoing request":
-                exclude_headers = ["Authorization"]
-                safe_req_headers = {
-                    k: v
-                    for k, v in record.req.headers.items()
-                    if k not in exclude_headers
-                }
+                safe_req_headers = record.req.headers.copy()
+
+                if "Authorization" in safe_req_headers:
+                    safe_req_headers["Authorization"] = "***hidden***"
 
                 if record.exc_info:
                     trace = traceback.format_exc()
@@ -35,9 +34,13 @@ class DatabaseOutgoingRequestsHandler(logging.Handler):
                     "res_content_type": record.res.headers.get("Content-Type", ""),
                     "timestamp": record.requested_at,
                     "response_ms": int(record.res.elapsed.total_seconds() * 1000),
-                    "req_headers": safe_req_headers,
-                    "res_headers": record.res.headers,
+                    "req_headers": self.format_headers(safe_req_headers),
+                    "res_headers": self.format_headers(record.res.headers),
                     "trace": trace,
                 }
 
                 OutgoingRequestsLog.objects.create(**kwargs)
+
+    def format_headers(self, headers):
+        result = textwrap.dedent("\n".join(f"{k}: {v}" for k, v in headers.items()))
+        return result
