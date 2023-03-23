@@ -21,7 +21,10 @@
                         <a href="{% url 'digid:login' %}" class="link digid-logo" aria-describedby="Digid logo" title="Digid logo">
                             <img class="digid-logo__image" src="{% static 'accounts/digid_logo.svg' %}" alt="Digid logo">
                         </a>
-                        {% link href='digid:login' next=next text=_('Inloggen met DigiD') secondary=True icon='arrow_forward' extra_classes="link--digid" %}
+                        {% url 'digid:login' as href %}
+                        {% with href|addnexturl:next as href_with_next %}
+                            {% link href=href_with_next text=_('Inloggen met DigiD') secondary=True icon='arrow_forward' extra_classes="link--digid" %}
+                        {% endwith %}
                     {% endrender_card %}
 		{% endif %}
 			
@@ -36,7 +39,10 @@
                     {% else %}
                         <div></div>
                     {% endif %}
-                        {% link text=site_config.openid_connect_login_text href='oidc_authentication_init' next=next secondary=True icon='arrow_forward' icon_position="after" %}
+                        {% url 'oidc_authentication_init' as href %}
+                        {% with href|addnexturl:next as href_with_next %}
+                            {% link text=site_config.openid_connect_login_text href=href_with_next secondary=True icon='arrow_forward' icon_position="after" %}
+                        {% endwith %}
                     {% endrender_card %}
                 {% endif %}
 
@@ -44,9 +50,10 @@
                     {% render_card tinted=True %}
                         {% render_form id="login-form" method="POST" form=form %}
                             {% csrf_token %}
+                            <input type="hidden" name="next" value="{{next}}" />
                             {% input form.username %}
                             {% input form.password %}
-                            {% button text=_('Wachtwoord vergeten?') href='password_reset' next=next secondary=True transparent=True align='right' %}
+                            {% button text=_('Wachtwoord vergeten?') href='password_reset' secondary=True transparent=True align='right' %}
                             {% form_actions primary_text=_("Inloggen") primary_icon="arrow_forward" secondary_href='django_registration_register' secondary_text=_('Registreer') secondary_icon='arrow_forward' single=True %}
                         {% endrender_form %}
                     {% endrender_card %}

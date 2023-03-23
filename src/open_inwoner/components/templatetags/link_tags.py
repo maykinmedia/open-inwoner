@@ -112,3 +112,15 @@ def link(href, text, **kwargs):
     kwargs["href"] = get_href()
     kwargs["text"] = text
     return kwargs
+
+
+@register.filter
+def addnexturl(href, next_url):
+    """
+    Concatenates href & next_url.
+    """
+    if "?" in href:
+        href += f"&next={next_url}"
+        return href
+
+    return href + f"?next={next_url}"

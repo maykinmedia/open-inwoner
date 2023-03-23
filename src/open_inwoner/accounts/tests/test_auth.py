@@ -820,10 +820,11 @@ class TestLoginLogoutFunctionality(WebTest):
         self.config.save()
 
     def test_login_page_has_next_url(self):
-        response = self.app.get(
-            f"{reverse('login')}?next={reverse('accounts:contact_list')}"
+        response = self.app.get(reverse("accounts:contact_list"))
+        self.assertRedirects(
+            response, f"{reverse('login')}?next={reverse('accounts:contact_list')}"
         )
-        self.assertIn(f"?next={reverse('accounts:contact_list')}", response)
+        self.assertIn(f"?next={reverse('accounts:contact_list')}", response.follow())
 
     def test_login(self):
         """Test that a user is successfully logged in."""
