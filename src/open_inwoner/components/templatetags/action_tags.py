@@ -138,6 +138,24 @@ def get_action_delete_url(action, plan=None):
     return reverse("accounts:action_delete", kwargs={"uuid": action.uuid})
 
 
+@register.simple_tag()
+def get_action_history_url(action, plan):
+    """
+    Generates the correct action history url for plans.
+
+    Usage:
+        {% get_action_history_url action=action plan=plan %}
+
+    Variables:
+        + action: Action | The action the url should be generated from.
+        + plan: Plan | The plan the action history url should be generated for.
+    """
+    return reverse(
+        "plans:plan_action_history",
+        kwargs={"plan_uuid": plan.uuid, "uuid": action.uuid},
+    )
+
+
 @register.filter()
 def is_connected(action, user):
     """

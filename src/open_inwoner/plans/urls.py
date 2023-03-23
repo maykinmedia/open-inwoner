@@ -5,6 +5,7 @@ from .views import (
     PlanActionDeleteView,
     PlanActionEditStatusTagView,
     PlanActionEditView,
+    PlanActionHistoryView,
     PlanCreateView,
     PlanDetailView,
     PlanEditView,
@@ -41,6 +42,11 @@ urlpatterns = [
         "<uuid:plan_uuid>/actions/<uuid:uuid>/delete/",
         PlanActionDeleteView.as_view(),
         name="plan_action_delete",
+    ),
+    path(
+        "<uuid:plan_uuid>/actions/<str:uuid>/history/",
+        PlanActionHistoryView.as_view(),
+        name="plan_action_history",
     ),
     path("<uuid:uuid>/export/", PlanExportView.as_view(), name="plan_export"),
 ]
