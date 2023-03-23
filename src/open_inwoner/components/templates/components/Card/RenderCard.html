@@ -12,9 +12,11 @@
 
     <div class="card__body{% if direction %} card__body--direction-{{ direction }}{% endif %}{% if grid %} card__body--grid{% endif %}">
         {% if title %}
-            <p class="{% if compact %}h4{% else %}h3{% endif %}">
+            {% if compact %}
+            <p class="h4">
                 <span class="link link__text">{{ title }}</span>
             </p>
+            {% endif %}
         {% endif %}
         {{ contents }}
     </div>

@@ -15,9 +15,11 @@
                 {% render_column start=forloop.counter_0|multiply:4 span=4 %}
                     {% render_card compact=True stretch=True title=case.identificatie %}
                         {% render_list %}
+                            <a href="/accounts/cases/{{ case.uuid }}/status/" class="case-list">
                             {% list_item case.current_status caption=_("Status") compact=True strong=False %}
                             {% list_item case.start_date caption=_("Ontvangstdatum") compact=True strong=False %}
                             {% list_item case.description caption=_("Omschrijving") compact=True strong=False %}
+                            </a>
                         {% endrender_list %}
 
                         {% link href="accounts:case_status" object_id=case.uuid icon="arrow_forward" primary=True text=_("Bekijk aanvraag") %}
