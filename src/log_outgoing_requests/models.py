@@ -13,6 +13,8 @@ class OutgoingRequestsLog(models.Model):
         default="",
         help_text=_("The url of the outgoing request."),
     )
+
+    # hostname is added so we can filter on it in the admin page
     hostname = models.CharField(
         verbose_name=_("Hostname"),
         max_length=255,
@@ -52,6 +54,18 @@ class OutgoingRequestsLog(models.Model):
         blank=True,
         help_text=_("The content type of the response."),
     )
+    req_headers = models.TextField(
+        verbose_name=_("Request headers"),
+        blank=True,
+        null=True,
+        help_text=_("The request headers."),
+    )
+    res_headers = models.TextField(
+        verbose_name=_("Response headers"),
+        blank=True,
+        null=True,
+        help_text=_("The response headers."),
+    )
     response_ms = models.PositiveIntegerField(
         verbose_name=_("Response in ms"),
         default=0,
@@ -79,6 +93,9 @@ class OutgoingRequestsLog(models.Model):
         )
 
     @cached_property
+    def url_parsed(self):
+        return urlparse(self.url)
+
+    @property
     def query_params(self):
-        parsed_url = urlparse(self.url)
-        return parsed_url.query
+        return self.url_parsed.query

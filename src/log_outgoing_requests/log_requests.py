@@ -30,7 +30,7 @@ def install_outgoing_requests_logging():
     Session._original_request = Session.request
 
     def new_request(self, *args, **kwargs):
-        kwargs.setdefault("hooks", {"response": hook_requests_logging})
+        self.hooks["response"].append(hook_requests_logging)
         return self._original_request(*args, **kwargs)
 
     Session.request = new_request
