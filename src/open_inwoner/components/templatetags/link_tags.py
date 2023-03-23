@@ -2,6 +2,8 @@ from django import template
 from django.urls import NoReverseMatch, reverse
 from django.utils.html import format_html
 
+from furl import furl
+
 register = template.Library()
 
 
@@ -119,8 +121,6 @@ def addnexturl(href, next_url):
     """
     Concatenates href & next_url.
     """
-    if "?" in href:
-        href += f"&next={next_url}"
-        return href
-
-    return href + f"?next={next_url}"
+    f = furl(href)
+    f.args["next"] = next_url
+    return f.url
