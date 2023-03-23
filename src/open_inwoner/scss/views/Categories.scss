@@ -1,0 +1,24 @@
+.categories {
+  &__content {
+    .card-container {
+      grid-template-columns: repeat(auto-fit, 228px);
+
+      .card {
+        max-width: 360px;
+      }
+    }
+  }
+
+  &__products {
+    margin-top: var(--gutter-width);
+
+    .card-container {
+      margin-top: var(--gutter-width);
+      grid-template-columns: repeat(var(--card-columns), 1fr);
+
+      .card {
+        max-width: 100%;
+      }
+    }
+  }
+}

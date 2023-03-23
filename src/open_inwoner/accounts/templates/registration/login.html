@@ -10,6 +10,7 @@
 
 
 {% block content %}
+    <div class="login-grid">
     {% render_grid %}
         {% render_column start=5 span=5 %}
             {% render_card %}
@@ -24,7 +25,7 @@
                         {% link href='digid:login' text=_('Inloggen met DigiD') secondary=True icon='arrow_forward' extra_classes="link--digid" %}
                     {% endrender_card %}
 		{% endif %}
-			
+
                 {% get_solo 'mozilla_django_oidc_db.OpenIDConnectConfig' as oidc_config %}
                 {% get_solo 'configurations.SiteConfiguration' as site_config %}
                 {% if oidc_config.enabled %}
@@ -54,4 +55,5 @@
             {% endrender_card %}
         {% endrender_column %}
     {% endrender_grid %}
+    </div>
 {% endblock content %}

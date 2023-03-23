@@ -31,3 +31,12 @@
 .card-container + h2 {
   margin-top: var(--gutter-width);
 }
+
+/// Exceptions for forms inside cards
+
+.registration-grid,
+.login-grid {
+  .card {
+    max-width: 100%;
+  }
+}

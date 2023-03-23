@@ -8,6 +8,7 @@
 {% endblock header_image %}
 
 {% block content %}
+    <div class="home">
     {% block user_content %}
         <div class="grid__welcome">
             <h1 class="h1">{{configurable_text.home_page.home_welcome_title}}</h1>
@@ -24,7 +25,7 @@
     <p class="p">{{configurable_text.home_page.home_theme_intro|linebreaksbr}}</p>
 
     {% if request.user.is_authenticated %}
-        {% card_container categories=categories columns=3 image_object_fit="cover" %}
+        {% card_container categories=categories columns=4 image_object_fit="cover" %}
     {% else %}
         {% card_container categories=categories image_object_fit="cover" %}
     {% endif %}
@@ -45,4 +46,5 @@
     {% with centroid=product_locations.get_centroid %}
         {% map centroid.lat centroid.lng geojson_feature_collection=product_locations.get_geojson_feature_collection %}
     {% endwith %}
+    </div>
 {% endblock %}
