@@ -88,7 +88,9 @@ class Product(models.Model):
     )
     content = models.TextField(
         verbose_name=_("Content"),
-        help_text=_("Product content with build-in WYSIWYG editor"),
+        help_text=_(
+            "Product content with build-in WYSIWYG editor. By adding '[CTABUTTON]' you can embed a cta-button for linking to the defined form or link"
+        ),
     )
     categories = models.ManyToManyField(
         "pdc.Category",

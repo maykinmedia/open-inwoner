@@ -147,3 +147,64 @@ class TestProductFAQ(WebTest):
         self.assertTrue(response.pyquery('.anchor-menu a[href="#faq"]'))
         # check if the menu link target
         self.assertTrue(response.pyquery("#faq"))
+
+
+class TestProductContent(WebTest):
+    def test_button_is_rendered_inside_content_when_link_and_cta_exist(self):
+        product = ProductFactory(
+            content="Some content [CTABUTTON]", link="http://www.example.com"
+        )
+
+        response = self.app.get(
+            reverse("pdc:product_detail", kwargs={"slug": product.slug})
+        )
+        cta_button = response.pyquery(".grid__main")[0].find_class("cta-button")
+
+        self.assertTrue(cta_button)
+        self.assertIn(product.link, cta_button[0].values())
+
+    def test_button_is_rendered_inside_content_when_form_and_cta_exist(self):
+        product = ProductFactory(content="Some content [CTABUTTON]", form="demo")
+
+        response = self.app.get(
+            reverse("pdc:product_detail", kwargs={"slug": product.slug})
+        )
+        cta_button = response.pyquery(".grid__main")[0].find_class("cta-button")
+
+        self.assertTrue(cta_button)
+        self.assertIn(product.form_link, cta_button[0].values())
+
+    def test_button_is_rendered_inside_content_when_form_and_link_and_cta_exist(self):
+        product = ProductFactory(
+            content="Some content [CTABUTTON]",
+            link="http://www.example.com",
+            form="demo",
+        )
+
+        response = self.app.get(
+            reverse("pdc:product_detail", kwargs={"slug": product.slug})
+        )
+        cta_button = response.pyquery(".grid__main")[0].find_class("cta-button")
+
+        self.assertTrue(cta_button)
+        self.assertIn(product.link, cta_button[0].values())
+
+    def test_button_is_not_rendered_inside_content_when_no_cta(self):
+        product = ProductFactory(content="Some content", link="http://www.example.com")
+
+        response = self.app.get(
+            reverse("pdc:product_detail", kwargs={"slug": product.slug})
+        )
+        cta_button = response.pyquery(".grid__main")[0].find_class("cta-button")
+
+        self.assertFalse(cta_button)
+
+    def test_button_is_not_rendered_inside_content_when_no_form_or_link(self):
+        product = ProductFactory(content="Some content [CTABUTTON]")
+
+        response = self.app.get(
+            reverse("pdc:product_detail", kwargs={"slug": product.slug})
+        )
+        cta_button = response.pyquery(".grid__main")[0].find_class("cta-button")
+
+        self.assertFalse(cta_button)
