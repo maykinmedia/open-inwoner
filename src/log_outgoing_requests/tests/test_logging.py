@@ -55,6 +55,16 @@ class OutgoingRequestsLoggingTests(TestCase):
                         "Content-Type": "application/json",
                     },
                 )
+                expected_req_headers = (
+                    "User-Agent: python-requests/2.26.0\n"
+                    "Accept-Encoding: gzip, deflate, br\n"
+                    "Accept: */*\n"
+                    "Connection: keep-alive\n"
+                    "Authorization: ***hidden***\n"
+                    "Content-Type: text/html"
+                )
+                if method not in ["HEAD", "GET"]:
+                    expected_req_headers += "\nContent-Length: 0"
 
                 response = func(
                     "http://example.com/some-path?version=2.0",
@@ -74,25 +84,7 @@ class OutgoingRequestsLoggingTests(TestCase):
                 self.assertEqual(request_log.req_content_type, "text/html")
                 self.assertEqual(request_log.res_content_type, "application/json")
                 self.assertEqual(request_log.response_ms, 0)
-                self.assertEqual(
-                    request_log.req_headers,
-                    (
-                        "User-Agent: python-requests/2.26.0\n"
-                        "Accept-Encoding: gzip, deflate, br\n"
-                        "Accept: */*"
-                        "\nConnection: keep-alive\n"
-                        "Authorization: ***hidden***\n"
-                        "Content-Type: text/html"
-                        if method in ["HEAD", "GET"]
-                        else "User-Agent: python-requests/2.26.0\n"
-                        "Accept-Encoding: gzip, deflate, br\n"
-                        "Accept: */*\n"
-                        "Connection: keep-alive\n"
-                        "Authorization: ***hidden***\n"
-                        "Content-Type: text/html\n"
-                        "Content-Length: 0"
-                    ),
-                )
+                self.assertEqual(request_log.req_headers, expected_req_headers)
                 self.assertEqual(
                     request_log.res_headers,
                     "Date: Tue, 21 Mar 2023 15:24:08 GMT\nContent-Type: application/json",

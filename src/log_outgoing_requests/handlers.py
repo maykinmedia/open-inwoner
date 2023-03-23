@@ -1,5 +1,4 @@
 import logging
-import textwrap
 import traceback
 from urllib.parse import urlparse
 
@@ -42,5 +41,4 @@ class DatabaseOutgoingRequestsHandler(logging.Handler):
                 OutgoingRequestsLog.objects.create(**kwargs)
 
     def format_headers(self, headers):
-        result = textwrap.dedent("\n".join(f"{k}: {v}" for k, v in headers.items()))
-        return result
+        return "\n".join(f"{k}: {v}" for k, v in headers.items())
