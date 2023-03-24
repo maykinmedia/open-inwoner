@@ -1027,6 +1027,9 @@ ZGW_CONSUMERS_TEST_SCHEMA_DIRS = [
 #
 TWO_FACTOR_FORCE_OTP_ADMIN = config("TWO_FACTOR_FORCE_OTP_ADMIN", default=not DEBUG)
 TWO_FACTOR_PATCH_ADMIN = config("TWO_FACTOR_PATCH_ADMIN", default=True)
+ADMIN_INDEX_DISPLAY_DROP_DOWN_MENU_CONDITION_FUNCTION = (
+    "open_inwoner.utils.django_two_factor_auth.should_display_dropdown_menu"
+)
 
 # file upload limits
 MIN_UPLOAD_SIZE = 1  # in bytes
