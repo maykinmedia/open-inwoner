@@ -74,31 +74,50 @@ class Map {
    * @return {string}
    */
   featureToHTML(feature) {
-    const { name, location_url, ...properties } = feature.properties
+    const {
+      name,
+      location_url,
+      address_line_1,
+      address_line_2,
+      phonenumber,
+      email,
+      ...properties
+    } = feature.properties
+
     const displayName = name ? escapeHTML(name) : ''
     const locationDetailView = location_url ? escapeHTML(location_url) : ''
+    const displayAddress1 = address_line_1 ? escapeHTML(address_line_1) : ''
+    const displayAddress2 = address_line_2 ? escapeHTML(address_line_2) : ''
+    const displayPhonenumber = phonenumber ? escapeHTML(phonenumber) : ''
+    const displayEmail = email ? escapeHTML(email) : ''
     let title = ''
-    let finalHTML = ``
 
     if (locationDetailView) {
-      title = `<a href="${locationDetailView}">${displayName}</a>`
+      title = `
+        <a href="${locationDetailView}" class="link link--primary" aria-label=${displayName} title=${displayName}>
+          ${displayName}
+        </a>
+      `
     } else {
       title = displayName
     }
 
-    Object.entries(properties).forEach((property) => {
-      finalHTML += `<p class="p">${escapeHTML(property[1])}</p>`
-    })
-
     return `
-        <div class="leaflet-content-name">
-          <h4 class="h4">
-            ${title}
-          </h4>
-        </div>
-        <div class="leaflet-content-details p--no-margin">
-          ${finalHTML}
-        </div>
+      <div class="leaflet-content-name">
+        <h4 class="h4">
+          ${title}
+        </h4>
+      </div>
+      <div class="leaflet-content-details p--no-margin">
+        <p class="p">${displayAddress1}</p>
+        <p class="p">${displayAddress2}</p>
+        <a href="tel:${displayPhonenumber}" class="link link--primary" aria-label=${displayPhonenumber} title=${displayPhonenumber}>
+          <span class="link__text">${displayPhonenumber}</span>
+        </a>
+        <a href="mailto:${displayEmail}" class="link link--primary" aria-label=${displayEmail} title=${displayEmail}>
+          <span class="link__text">${displayEmail}</span>
+        </a>
+      </div>
     `
   }
 }
