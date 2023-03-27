@@ -83,7 +83,8 @@ def handle_zaken_notification(notification: Notification):
     if not roles:
         log_system_action(
             f"ignored {r} notification: cannot retrieve rollen for case {case_url}",
-            log_level=logging.ERROR,
+            # NOTE this used to be logging.ERROR, but as this is also our first call we get a lot of 403 "Niet geautoriseerd voor zaaktype"
+            log_level=logging.INFO,
         )
         return
 
