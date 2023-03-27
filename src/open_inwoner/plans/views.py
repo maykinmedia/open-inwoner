@@ -96,6 +96,10 @@ class PlanListView(
             .order_by("end_date")
         )
 
+    def get(self, request, *args, **kwargs):
+        self.request.user.clear_plan_contact_new_count()
+        return super().get(request, *args, **kwargs)
+
     def get_available_contacts_for_filtering(self, plans):
         """
         Return all available contacts for filtering for all the plans.

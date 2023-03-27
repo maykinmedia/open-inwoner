@@ -46,7 +46,14 @@
             {% endif %}
             {% if show_plans %}
             <li class="primary-navigation__list-item">
-                {% link text=_('Samenwerken') href='plans:plan_list' icon="people" icon_outlined=True icon_position="before" %}
+            {% link text=_('Samenwerken') href='plans:plan_list' icon="people" icon_outlined=True icon_position="before" %}
+            {% with request.user.get_plan_contact_new_count as plan_count %}
+                {% if plan_count %}
+                    {% with "("|addstr:plan_count|addstr:")" as plan_count %}
+                        {% link text=plan_count href='plans:plan_list' secondary=True %}
+                    {% endwith %}
+                {% endif %}
+            {% endwith %}
             </li>
             {% endif %}
         {% endif %}

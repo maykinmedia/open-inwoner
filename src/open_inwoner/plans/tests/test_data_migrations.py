@@ -44,3 +44,41 @@ class RemoveContactMigrationTests(TestMigrations):
     def test_plan_contacts_is_updated_with_existing_contact(self):
         self.plan.refresh_from_db()
         self.assertEqual(list(self.plan.plan_contacts.all()), [self.contact_user])
+
+
+class PlanContactThroughModelMigrationTests(TestMigrations):
+    app = "plans"
+    migrate_from = "0013_auto_20230223_1115"
+    migrate_to = "0015_plancontact_notify_new"
+
+    extra_migrate_from = [("accounts", "0055_user_image")]
+
+    def setUpBeforeMigration(self, apps):
+        UserModel = apps.get_model("accounts", "User")
+        self.user = UserModel.objects.create(
+            email="user@example.com",
+        )
+        self.other_user = UserModel.objects.create(
+            email="other_user@example.com",
+        )
+
+        PlanModel = apps.get_model("plans", "Plan")
+        self.plan = PlanModel.objects.create(
+            title="A title",
+            end_date="2021-01-10",
+            created_by=self.user,
+        )
+        self.plan.plan_contacts.add(self.other_user)
+
+    def test_plan_contacts_still_exist(self):
+        UserModel = self.apps.get_model("accounts", "User")
+        PlanModel = self.apps.get_model("plans", "Plan")
+        PlanContact = self.apps.get_model("plans", "PlanContact")
+
+        other_user = UserModel.objects.get(id=self.other_user.id)
+        plan = PlanModel.objects.get(id=self.plan.id)
+        self.assertEqual(list(plan.plan_contacts.all()), [other_user])
+
+        # check we don't notify existing contacts
+        contact = PlanContact.objects.get()
+        self.assertEqual(contact.notify_new, False)
