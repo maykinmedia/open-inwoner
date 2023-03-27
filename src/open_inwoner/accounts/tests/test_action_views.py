@@ -227,6 +227,12 @@ class ActionViewTests(WebTest):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.action.name)
 
+    def test_action_history_breadcrumbs(self):
+        response = self.app.get(self.history_url, user=self.user)
+        crumbs = response.pyquery(".breadcrumbs__list-item")
+        self.assertIn(_("Mijn profiel"), crumbs[1].text_content())
+        self.assertIn(_("Mijn acties"), crumbs[2].text_content())
+
     def test_action_history_not_your_action(self):
         other_user = UserFactory()
         self.app.get(self.history_url, user=other_user, status=404)
