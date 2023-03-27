@@ -98,7 +98,7 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
         self.assertTimelineLog(
             "ignored zaakinformatieobject notification: cannot retrieve rollen for case https://",
             lookup=Lookups.startswith,
-            level=logging.ERROR,
+            level=logging.INFO,
         )
 
     def test_zio_bails_when_no_emailable_users_are_found_for_roles(
