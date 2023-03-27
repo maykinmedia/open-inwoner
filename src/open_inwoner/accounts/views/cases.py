@@ -397,7 +397,7 @@ class CaseDetailView(
             result = fetch_single_result(case.resultaat)
             if result:
                 return result.toelichting
-        return _("Onbekend")
+        return None
 
     def get_initiator_display(self, case: Zaak) -> str:
         roles = fetch_case_roles(case.url, RolOmschrijving.initiator)
