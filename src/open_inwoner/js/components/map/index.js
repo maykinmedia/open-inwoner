@@ -100,7 +100,7 @@ class Map {
     const displayName = escapeVariableText(name)
     const locationDetailView = escapeVariableText(location_url)
     const displayAddress1 = escapeVariableText(address_line_1)
-    const displayAddress2 = escapeVariableText(address_line_1)
+    const displayAddress2 = escapeVariableText(address_line_2)
     const displayPhonenumber = escapeVariableText(phonenumber)
     const displayEmail = escapeVariableText(email)
     let title = ''
