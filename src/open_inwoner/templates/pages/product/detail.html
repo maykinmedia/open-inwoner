@@ -86,10 +86,10 @@
                         <p class="p">{{ location.address_line_1 }}</p>
                         <p class="p">{{ location.address_line_2 }}</p>
                         {% if location.phonenumber %}
-                            <p class="p">{{ location.phonenumber }}</p>
+                            {% link href='tel:{{location.phonenumber}}' primary=True text=location.phonenumber %}
                         {% endif %}
                         {% if location.email %}
-                            <p class="p">{{ location.email }}</p>
+                            {% link href='mailto:{{location.email}}' primary=True text=location.email %}
                         {% endif %}
                     </div>
                 {% endrender_card %}
