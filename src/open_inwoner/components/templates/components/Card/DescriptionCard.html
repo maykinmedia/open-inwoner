@@ -1,20 +1,26 @@
-{% load card_tags icon_tags link_tags button_tags i18n grid_tags thumbnail %}
+{% load card_tags icon_tags link_tags i18n grid_tags thumbnail %}
 
-{# template for plans cards without any images #}
-{% render_card href=url grid=image title=title%}
-    <h2 class="h2"><span class="link link__text">{{ title }}</span></h2>
-    <p class="p">{{ description }}</p>
-    {% if object.end_date %}
-        <div class="card__tabled">
-            <div>{% trans "Einddatum" %}:</div>
-            <div>{{ object.end_date }}</div>
-            <div>{% trans "Created by" %}:</div>
-            <div>{{ object.created_by.get_full_name }}</div>
-        </div>
-    {% endif %}
+{# template for plans cards and product cards without any images #}
+<a href="{{ url }}" title="{{ title }}" aria-label="{{ title }}" class="card">
+    <div class="card__body">
+        {% if title %}
+            <p class="h4">
+                <span class="link link__text">{{ title }}</span>
+            </p>
+        {% endif %}
+        <p class="p">{{ description }}</p>
+        {% if object.end_date %}
+            <div class="card__tabled">
+                <div>{% trans "Einddatum" %}:</div>
+                <div>{{ object.end_date }}</div>
+                <div>{% trans "Created by" %}:</div>
+                <div>{{ object.created_by.get_full_name }}</div>
+            </div>
+        {% endif %}
 
-    <span class="button button--icon-before button--transparent button--secondary">
-    {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
-    </span>
+        <span class="button button--icon-before button--transparent button--secondary">
+        {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
+        </span>
 
-{% endrender_card %}
+    </div>
+</a>

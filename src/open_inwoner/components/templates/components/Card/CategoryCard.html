@@ -1,12 +1,13 @@
 {% load card_tags icon_tags link_tags helpers utils %}
 
+{# template for subcategory cards #}
 {# create tag for anchor around card - never use anchors within anchors for valid HTML. #}
 {% if category.products.published %}
 <div title="{{ category }}" aria-label="{{ category.name }}" class="card">
     <div class="card__body">
         {% if category %}
             <p class="h3">
-                <a href="{{ category.slug }}" class="link link__text">{{ category }}</a>
+                <a href="{{ category.slug }}" class="link link__text">{{ category }} cat1</a>
             </p>
         {% endif %}
         {% for product in category.products.published %}
@@ -25,7 +26,7 @@
         <div class="card__body">
             {% if category %}
                 <p class="h3">
-                    <span class="link link__text">{{ category }}</span>
+                    <span class="link link__text">{{ category }} cat2</span>
                 </p>
             {% endif %}
         </div>
