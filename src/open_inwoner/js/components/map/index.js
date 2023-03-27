@@ -3,6 +3,19 @@ import 'leaflet'
 import { RD_CRS } from './rd'
 import { isMobile } from '../../lib/device/is-mobile'
 
+/**
+ * Returns an escaped variable.
+ * @param {string} textVariable
+ * @return {string}
+ */
+function escapeVariableText(textVariable) {
+  if (textVariable) {
+    return escapeHTML(textVariable)
+  } else {
+    return ''
+  }
+}
+
 /** @type {NodeListOf<Element>} All the leaflet maps. */
 const LEAFLET_MAPS = document.querySelectorAll('.map__leaflet')
 
@@ -84,12 +97,12 @@ class Map {
       ...properties
     } = feature.properties
 
-    const displayName = name ? escapeHTML(name) : ''
-    const locationDetailView = location_url ? escapeHTML(location_url) : ''
-    const displayAddress1 = address_line_1 ? escapeHTML(address_line_1) : ''
-    const displayAddress2 = address_line_2 ? escapeHTML(address_line_2) : ''
-    const displayPhonenumber = phonenumber ? escapeHTML(phonenumber) : ''
-    const displayEmail = email ? escapeHTML(email) : ''
+    const displayName = escapeVariableText(name)
+    const locationDetailView = escapeVariableText(location_url)
+    const displayAddress1 = escapeVariableText(address_line_1)
+    const displayAddress2 = escapeVariableText(address_line_1)
+    const displayPhonenumber = escapeVariableText(phonenumber)
+    const displayEmail = escapeVariableText(email)
     let title = ''
 
     if (locationDetailView) {
