@@ -52,6 +52,10 @@
 
   &__answer--open {
     margin-top: var(--spacing-large) !important;
+
+    .link {
+      text-decoration: underline;
+    }
   }
 
   &__answer:not(#{&}__answer--open) {
