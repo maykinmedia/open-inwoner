@@ -1,4 +1,4 @@
-{% load card_tags icon_tags link_tags i18n grid_tags thumbnail %}
+{% load icon_tags link_tags i18n grid_tags thumbnail %}
 
 {# template for plans cards and product cards without any images #}
 <a href="{{ url }}" title="{{ title }}" aria-label="{{ title }}" class="card">
@@ -21,6 +21,5 @@
         <span class="button button--icon-before button--transparent button--secondary">
         {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
         </span>
-
     </div>
 </a>

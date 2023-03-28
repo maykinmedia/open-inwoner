@@ -1,3 +1,10 @@
 .cases {
   margin-top: var(--spacing-giant);
+
+  /// cards on cases page
+  .card {
+    .cases__link {
+      text-decoration: none;
+    }
+  }
 }
