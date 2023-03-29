@@ -36,7 +36,7 @@ def fetch_brp_data(instance, brp_version):
                     "burgerservicenummer": [instance.bsn],
                 },
                 request_kwargs=dict(
-                    headers={"Accept": "application/hal+json"}, verify=False
+                    headers={"Accept": "application/json"}, verify=False
                 ),
             )
         except RequestException as e:
