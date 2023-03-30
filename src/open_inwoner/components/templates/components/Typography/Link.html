@@ -29,5 +29,5 @@
         {% icon icon=icon outlined=icon_outlined %}
     {% endif %}
 
-    {% if href|startswith:"http" and not hide_external_icon %}<strong>{% icon icon="open_in_new" %}</strong>{% endif %}
+    {% if href|startswith:"http" and not hide_external_icon %}a{% icon icon="open_in_new" %}b{% endif %}
 </a>
