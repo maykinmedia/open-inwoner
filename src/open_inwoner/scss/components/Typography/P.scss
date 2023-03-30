@@ -39,12 +39,15 @@
 }
 
 .p .link {
+  text-decoration: underline;
   &:hover {
     text-decoration: none;
   }
-
-  strong {
-    text-decoration: underline;
+  .material-icons {
+    text-decoration: none;
+    &:hover {
+      text-decoration: none;
+    }
   }
 }
 
