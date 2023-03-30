@@ -38,10 +38,7 @@ def fetch_open_submissions(bsn: str) -> List[OpenSubmission]:
             "opensubmission",
             request_kwargs={"params": {"bsn": bsn}},
         )
-    except RequestException as e:
-        logger.exception("exception while making request", exc_info=e)
-        return []
-    except ClientError as e:
+    except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return []
 

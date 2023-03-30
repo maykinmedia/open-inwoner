@@ -44,10 +44,7 @@ def fetch_cases(user_bsn: str, max_cases: Optional[int] = 100) -> List[Zaak]:
                 },
             },
         )
-    except RequestException as e:
-        logger.exception("exception while making request", exc_info=e)
-        return []
-    except ClientError as e:
+    except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return []
 
@@ -65,10 +62,7 @@ def fetch_single_case(case_uuid: str) -> Optional[Zaak]:
 
     try:
         response = client.retrieve("zaak", uuid=case_uuid)
-    except RequestException as e:
-        logger.exception("exception while making request", exc_info=e)
-        return
-    except ClientError as e:
+    except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
 
@@ -88,10 +82,7 @@ def fetch_single_case_information_object(url: str) -> Optional[ZaakInformatieObj
 
     try:
         response = client.retrieve("zaakinformatieobject", url=url)
-    except RequestException as e:
-        logger.exception("exception while making request", exc_info=e)
-        return
-    except ClientError as e:
+    except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
 
@@ -104,10 +95,7 @@ def fetch_case_by_url_no_cache(case_url: str) -> Optional[Zaak]:
     client = build_client("zaak")
     try:
         response = client.retrieve("zaak", url=case_url)
-    except RequestException as e:
-        logger.exception("exception while making request", exc_info=e)
-        return
-    except ClientError as e:
+    except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
 
@@ -130,10 +118,7 @@ def fetch_case_information_objects(case_url: str) -> List[ZaakInformatieObject]:
                 "params": {"zaak": case_url},
             },
         )
-    except RequestException as e:
-        logger.exception("exception while making request", exc_info=e)
-        return []
-    except ClientError as e:
+    except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return []
 
@@ -155,10 +140,7 @@ def fetch_status_history_no_cache(case_url: str) -> List[Status]:
 
     try:
         response = client.list("status", request_kwargs={"params": {"zaak": case_url}})
-    except RequestException as e:
-        logger.exception("exception while making request", exc_info=e)
-        return []
-    except ClientError as e:
+    except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return []
 
@@ -176,10 +158,7 @@ def fetch_single_status(status_url: str) -> Optional[Status]:
 
     try:
         response = client.retrieve("status", url=status_url)
-    except RequestException as e:
-        logger.exception("exception while making request", exc_info=e)
-        return
-    except ClientError as e:
+    except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
 
@@ -213,10 +192,7 @@ def fetch_case_roles(
             "rol",
             request_kwargs={"params": params},
         )
-    except RequestException as e:
-        logger.exception("exception while making request", exc_info=e)
-        return []
-    except ClientError as e:
+    except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return []
 
@@ -270,10 +246,7 @@ def fetch_case_information_objects_for_case_and_info(
                 },
             },
         )
-    except RequestException as e:
-        logger.exception("exception while making request", exc_info=e)
-        return []
-    except ClientError as e:
+    except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return []
 
@@ -291,10 +264,7 @@ def fetch_single_result(result_url: str) -> Optional[Resultaat]:
 
     try:
         response = client.retrieve("result", url=result_url)
-    except RequestException as e:
-        logger.exception("exception while making request", exc_info=e)
-        return
-    except ClientError as e:
+    except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
 
@@ -313,10 +283,7 @@ def connect_case_with_document(case_url: str, document_url: str) -> Optional[dic
         response = client.create(
             "zaakinformatieobject", {"zaak": case_url, "informatieobject": document_url}
         )
-    except RequestException as e:
-        logger.exception("exception while making request", exc_info=e)
-        return
-    except ClientError as e:
+    except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
 
