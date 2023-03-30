@@ -39,7 +39,10 @@
 }
 
 .p .link {
-  text-decoration: underline;
+  //text-decoration: underline;
+  .content {
+    text-decoration: underline;
+  }
   &:hover {
     text-decoration: none;
   }
@@ -61,5 +64,6 @@
   /// leaflet reset
   .link {
     margin-left: 0;
+    text-decoration: underline;
   }
 }
