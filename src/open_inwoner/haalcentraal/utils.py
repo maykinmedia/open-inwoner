@@ -39,10 +39,7 @@ def fetch_brp_data(instance, brp_version):
                     headers={"Accept": "application/json"}, verify=False
                 ),
             )
-        except RequestException as e:
-            logger.exception("exception while making request", exc_info=e)
-            return {}
-        except ClientError as e:
+        except (RequestException, ClientError) as e:
             logger.exception("exception while making request", exc_info=e)
             return {}
 
@@ -68,10 +65,7 @@ def fetch_brp_data(instance, brp_version):
                     verify=False,
                 ),
             )
-        except RequestException as e:
-            logger.exception("exception while making request", exc_info=e)
-            return {}
-        except ClientError as e:
+        except (RequestException, ClientError) as e:
             logger.exception("exception while making request", exc_info=e)
             return {}
 
