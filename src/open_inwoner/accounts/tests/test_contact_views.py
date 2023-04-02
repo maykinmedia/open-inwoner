@@ -1,9 +1,12 @@
+import io
+
 from django.core import mail
+from django.core.files.images import ImageFile
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from django_webtest import WebTest
-from furl import furl
+from PIL import Image
 
 from open_inwoner.accounts.models import User
 
@@ -429,3 +432,43 @@ class ContactViewTests(WebTest):
 
         # Email should be the one for registration, not for approval
         self.assertEqual(email.subject, "Uitnodiging voor Open Inwoner Platform")
+
+    def test_contacts_image_is_shown_in_contact_approval_section(self):
+        # prepare image
+        image = Image.new("RGB", (10, 10))
+        byteIO = io.BytesIO()
+        image.save(byteIO, format="png")
+        img_bytes = byteIO.getvalue()
+        image = ImageFile(io.BytesIO(img_bytes), name="foo.jpg")
+
+        # update user's type and image
+        existing_user = UserFactory(
+            email="ex@example.com",
+            contact_type=ContactTypeChoices.begeleider,
+            image=image,
+        )
+        self.user.contact_type = ContactTypeChoices.begeleider
+        self.user.image = image
+        self.user.save()
+        self.user.contacts_for_approval.add(existing_user)
+
+        # Receiver contact list page
+        response = self.app.get(self.list_url, user=existing_user)
+        avatar_class = response.pyquery(".avatar")
+
+        self.assertIn(self.user.image.name, avatar_class[0].getchildren()[0].get("src"))
+
+    def test_no_image_is_shown_in_contact_approval_section_when_no_image_set(self):
+        # update user's type
+        existing_user = UserFactory(
+            email="ex@example.com", contact_type=ContactTypeChoices.begeleider
+        )
+        self.user.contact_type = ContactTypeChoices.begeleider
+        self.user.save()
+        self.user.contacts_for_approval.add(existing_user)
+
+        # Receiver contact list page
+        response = self.app.get(self.list_url, user=existing_user)
+        avatar_class = response.pyquery(".avatar")
+
+        self.assertFalse(avatar_class)

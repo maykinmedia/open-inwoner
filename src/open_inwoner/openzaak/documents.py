@@ -14,10 +14,7 @@ from zgw_consumers.api_models.base import factory
 
 from open_inwoner.openzaak.api_models import InformatieObject
 from open_inwoner.openzaak.clients import build_client
-from open_inwoner.openzaak.models import (
-    OpenZaakConfig,
-    ZaakTypeInformatieObjectTypeConfig,
-)
+from open_inwoner.openzaak.models import OpenZaakConfig
 
 from .utils import cache as cache_result
 
@@ -50,10 +47,7 @@ def _fetch_single_information_object(
             response = client.retrieve("enkelvoudiginformatieobject", url=url)
         else:
             response = client.retrieve("enkelvoudiginformatieobject", uuid=uuid)
-    except RequestException as e:
-        logger.exception("exception while making request", exc_info=e)
-        return
-    except ClientError as e:
+    except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
 
@@ -125,10 +119,7 @@ def upload_document(
 
     try:
         response = client.create("enkelvoudiginformatieobject", document_body)
-    except RequestException as e:
-        logger.exception("exception while making request", exc_info=e)
-        return
-    except ClientError as e:
+    except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
 

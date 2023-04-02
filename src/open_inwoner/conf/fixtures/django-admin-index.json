@@ -120,7 +120,7 @@
 {
     "model": "admin_index.appgroup",
     "fields": {
-        "order": 7,
+        "order": 9,
         "name": "Overige / Diverse",
         "slug": "overige-diverse",
         "models": [
@@ -162,7 +162,7 @@
 {
     "model": "admin_index.appgroup",
     "fields": {
-        "order": 6,
+        "order": 7,
         "name": "Configuratie",
         "slug": "configuratie",
         "models": [
@@ -183,60 +183,12 @@
                 "flatpage"
             ],
             [
-                "haalcentraal",
-                "haalcentraalconfig"
-            ],
-            [
                 "mail_editor",
                 "mailtemplate"
             ],
             [
-                "mozilla_django_oidc_db",
-                "openidconnectconfig"
-            ],
-            [
-                "notifications_api_common",
-                "notificationsconfig"
-            ],
-            [
-                "notifications_api_common",
-                "subscription"
-            ],
-            [
-                "openformsclient",
-                "configuration"
-            ],
-            [
-                "openzaak",
-                "catalogusconfig"
-            ],
-            [
-                "openzaak",
-                "openzaakconfig"
-            ],
-            [
-                "openzaak",
-                "usercasestatusnotification"
-            ],
-            [
-                "openzaak",
-                "zaaktypeconfig"
-            ],
-            [
-                "openzaak",
-                "zaaktypeinformatieobjecttypeconfig"
-            ],
-            [
                 "sites",
                 "site"
-            ],
-            [
-                "zgw_consumers",
-                "nlxconfig"
-            ],
-            [
-                "zgw_consumers",
-                "service"
             ]
         ]
     }
@@ -329,6 +281,72 @@
             [
                 "django_yubin",
                 "queuedmessage"
+            ]
+        ]
+    }
+},
+{
+    "model": "admin_index.appgroup",
+    "fields": {
+        "order": 6,
+        "name": "Koppelingen",
+        "slug": "koppelingen",
+        "models": [
+            [
+                "haalcentraal",
+                "haalcentraalconfig"
+            ],
+            [
+                "mozilla_django_oidc_db",
+                "openidconnectconfig"
+            ],
+            [
+                "notifications_api_common",
+                "notificationsconfig"
+            ],
+            [
+                "notifications_api_common",
+                "subscription"
+            ],
+            [
+                "openformsclient",
+                "configuration"
+            ],
+            [
+                "openzaak",
+                "catalogusconfig"
+            ],
+            [
+                "openzaak",
+                "openzaakconfig"
+            ],
+            [
+                "openzaak",
+                "usercaseinfoobjectnotification"
+            ],
+            [
+                "openzaak",
+                "usercasestatusnotification"
+            ],
+            [
+                "openzaak",
+                "zaaktypeconfig"
+            ],
+            [
+                "openzaak",
+                "zaaktypeinformatieobjecttypeconfig"
+            ],
+            [
+                "zgw_consumers",
+                "certificate"
+            ],
+            [
+                "zgw_consumers",
+                "nlxconfig"
+            ],
+            [
+                "zgw_consumers",
+                "service"
             ]
         ]
     }

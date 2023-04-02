@@ -1,0 +1,11 @@
+/// Cards on Home Page and Theme page
+
+.home {
+  .card-container {
+    grid-template-columns: repeat(auto-fit, 228px);
+
+    .card {
+      max-width: 360px;
+    }
+  }
+}

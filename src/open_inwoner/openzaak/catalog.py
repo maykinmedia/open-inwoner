@@ -30,10 +30,7 @@ def fetch_status_types_no_cache(case_type_url: str) -> List[StatusType]:
             "statustype",
             request_kwargs={"params": {"zaaktype": case_type_url}},
         )
-    except RequestException as e:
-        logger.exception("exception while making request", exc_info=e)
-        return []
-    except ClientError as e:
+    except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return []
 
@@ -56,10 +53,7 @@ def fetch_result_types_no_cache(case_type_url: str) -> List[ResultaatType]:
             "resultaattype",
             request_kwargs={"params": {"zaaktype": case_type_url}},
         )
-    except RequestException as e:
-        logger.exception("exception while making request", exc_info=e)
-        return []
-    except ClientError as e:
+    except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return []
 
@@ -79,10 +73,7 @@ def fetch_single_status_type(status_type_url: str) -> Optional[StatusType]:
 
     try:
         response = client.retrieve("statustype", url=status_type_url)
-    except RequestException as e:
-        logger.exception("exception while making request", exc_info=e)
-        return
-    except ClientError as e:
+    except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
 
@@ -104,10 +95,7 @@ def fetch_zaaktypes_no_cache() -> List[ZaakType]:
 
     try:
         response = get_paginated_results(client, "zaaktype")
-    except RequestException as e:
-        logger.exception("exception while making request", exc_info=e)
-        return []
-    except ClientError as e:
+    except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return []
 
@@ -138,10 +126,7 @@ def fetch_case_types_by_identification_no_cache(
             "zaaktype",
             request_kwargs={"params": params},
         )
-    except RequestException as e:
-        logger.exception("exception while making request", exc_info=e)
-        return []
-    except ClientError as e:
+    except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return []
 
@@ -174,10 +159,7 @@ def fetch_single_case_type(case_type_url: str) -> Optional[ZaakType]:
 
     try:
         response = client.retrieve("zaaktype", url=case_type_url)
-    except RequestException as e:
-        logger.exception("exception while making request", exc_info=e)
-        return
-    except ClientError as e:
+    except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
 
@@ -200,10 +182,7 @@ def fetch_catalogs_no_cache() -> List[Catalogus]:
             client,
             "catalogus",
         )
-    except RequestException as e:
-        logger.exception("exception while making request", exc_info=e)
-        return []
-    except ClientError as e:
+    except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return []
 
@@ -228,10 +207,7 @@ def fetch_single_information_object_type(
         response = client.retrieve(
             "informatieobjecttype", url=information_object_type_url
         )
-    except RequestException as e:
-        logger.exception("exception while making request", exc_info=e)
-        return
-    except ClientError as e:
+    except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
 

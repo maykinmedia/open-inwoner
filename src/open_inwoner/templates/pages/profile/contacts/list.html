@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n button_tags link_tags icon_tags pagination_tags form_tags dropdown_tags messages_tags thumbnail %}
+{% load i18n button_tags link_tags icon_tags pagination_tags form_tags dropdown_tags messages_tags thumbnail cropping %}
 
 
 {% block content %}
@@ -51,10 +51,14 @@
                 </ul>
             {% endif %}
         </div>
-        {% if approvals_count == 1 and request.user.image %}
-            <div class="avatar">
-                <img src="{{ request.user.image|thumbnail_url:'avatar' }}" alt="{{ image.default_alt_text }}" />
-            </div>
+        {% if approvals_count == 1 %}
+            {% with pending_approvals.get as pending_approval %}
+                {% if pending_approval.image %}
+                    <div class="avatar">
+                        <img src="{% cropped_thumbnail pending_approval "cropping" %}">
+                    </div>
+                {% endif %}
+            {% endwith %}
         {% endif %}
     {% endwith %}
     </div>

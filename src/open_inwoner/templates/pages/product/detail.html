@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n l10n button_tags card_tags faq_tags file_tags grid_tags icon_tags link_tags map_tags notification_tags tag_tags utils condition_tags render_tags anchor_menu_tags %}
+{% load i18n l10n button_tags card_tags faq_tags file_tags grid_tags icon_tags link_tags map_tags notification_tags tag_tags utils condition_tags render_tags anchor_menu_tags product_tags %}
 
 {% block header_image %}
 {% if object.image %}
@@ -32,7 +32,7 @@
     </h1>
     {% tag tags=object.tags.all %}
     <p class="p">{{ object.summary }}</p>
-    {{ object.content|ckeditor_content|safe }}
+    {{ object|product_ckeditor_content|safe }}
 
     {% if product.form %}
         {% button_row mobile=True %}
@@ -86,10 +86,10 @@
                         <p class="p">{{ location.address_line_1 }}</p>
                         <p class="p">{{ location.address_line_2 }}</p>
                         {% if location.phonenumber %}
-                            <p class="p">{{ location.phonenumber }}</p>
+                            {% link href='tel:{{location.phonenumber}}' primary=True text=location.phonenumber %}
                         {% endif %}
                         {% if location.email %}
-                            <p class="p">{{ location.email }}</p>
+                            {% link href='mailto:{{location.email}}' primary=True text=location.email %}
                         {% endif %}
                     </div>
                 {% endrender_card %}

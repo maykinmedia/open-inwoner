@@ -34,4 +34,4 @@ class UserQueryTests(TestCase):
         UserFactory(first_name="empty", email="")
 
         actual = User.objects.having_usable_email()
-        self.assertEqual(list(actual), expected)
+        self.assertEqual(set(list(actual)), set(expected))

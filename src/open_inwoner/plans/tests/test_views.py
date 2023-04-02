@@ -15,7 +15,7 @@ from open_inwoner.accounts.tests.factories import ActionFactory, UserFactory
 from open_inwoner.accounts.tests.test_action_views import ActionsPlaywrightTests
 from open_inwoner.utils.tests.playwright import multi_browser
 
-from ..models import Plan
+from ..models import Plan, PlanContact
 from .factories import ActionTemplateFactory, PlanFactory, PlanTemplateFactory
 
 
@@ -51,6 +51,10 @@ class PlanViewTests(WebTest):
             "plans:plan_action_edit",
             kwargs={"plan_uuid": self.plan.uuid, "uuid": self.action.uuid},
         )
+        self.action_history_url = reverse(
+            "plans:plan_action_history",
+            kwargs={"plan_uuid": self.plan.uuid, "uuid": self.action.uuid},
+        )
         self.action_edit_status_url = reverse(
             "plans:plan_action_edit_status",
             kwargs={"plan_uuid": self.plan.uuid, "uuid": self.action.uuid},
@@ -76,6 +80,10 @@ class PlanViewTests(WebTest):
         created_plan = Plan.objects.get(title=plan.title)
         self.assertEqual(created_plan.plan_contacts.get(), self.user)
         self.assertEqual(created_plan.created_by, self.user)
+
+        contact = PlanContact.objects.get(plan=created_plan)
+        self.assertEqual(contact.user, self.user)
+        self.assertEqual(contact.notify_new, True)
 
     def test_plan_list_filled(self):
         response = self.app.get(self.list_url, user=self.user)
@@ -483,6 +491,13 @@ class PlanViewTests(WebTest):
 
         # no notification is sent
         self.assertEqual(len(mail.outbox), 0)
+
+    def test_plan_actions_history_breadcrumbs(self):
+        response = self.app.get(self.action_history_url, user=self.user)
+        crumbs = response.pyquery(".breadcrumbs__list-item")
+        self.assertIn(_("Samenwerking"), crumbs[1].text_content())
+        self.assertIn(self.plan.title, crumbs[2].text_content())
+        self.assertIn(self.action.name, crumbs[3].text_content())
 
     def test_plan_action_delete_login_required_http_403(self):
         response = self.client.post(self.action_delete_url)
@@ -998,6 +1013,54 @@ class PlanBegeleiderListViewTests(WebTest):
             response.context["plans"]["plan_list"],
             {self.begeleider_plan: self.contact.get_full_name(), another_plan: ""},
         )
+
+
+class NewPlanContactCounterTest(WebTest):
+    def test_plan_contact_new_count(self):
+        owner = UserFactory()
+        plan_1 = PlanFactory(created_by=owner)
+        plan_2 = PlanFactory(created_by=owner)
+
+        user = UserFactory()
+
+        root_url = reverse("root")
+        list_url = reverse("plans:plan_list")
+
+        # check no number shows by default
+        response = self.app.get(root_url, user=user)
+        links = response.pyquery(
+            f".header__container > .primary-navigation a[href='{list_url}']"
+        )
+        self.assertEqual(len(links), 1)
+        self.assertEqual(links.text(), _("Samenwerken") + " people")
+
+        # check if the number shows up in the menu
+        plan_1.plan_contacts.add(user)
+        plan_2.plan_contacts.add(user)
+        self.assertEqual(2, user.get_plan_contact_new_count())
+
+        response = self.app.get(root_url, user=user)
+        links = response.pyquery(
+            f".header__container > .primary-navigation a[href='{list_url}']"
+        )
+        # second link appears
+        self.assertEqual(len(links), 2)
+        self.assertIn("(2)", links.text())
+
+        # access the list page to reset
+        response = self.app.get(list_url, user=user)
+        links = response.pyquery(
+            f".header__container > .primary-navigation a[href='{list_url}']"
+        )
+        self.assertEqual(len(links), 1)
+        self.assertEqual(links.text(), _("Samenwerken") + " people")
+
+        # check this doesn't appear for owner
+        response = self.app.get(root_url, user=owner)
+        links = response.pyquery(
+            f".header__container > .primary-navigation a[href='{list_url}']"
+        )
+        self.assertEqual(len(links), 1)
 
 
 @multi_browser()

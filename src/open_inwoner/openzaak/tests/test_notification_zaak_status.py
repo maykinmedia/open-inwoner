@@ -94,7 +94,7 @@ class StatusNotificationHandlerTestCase(
         self.assertTimelineLog(
             "ignored status notification: cannot retrieve rollen for case https://",
             lookup=Lookups.startswith,
-            level=logging.ERROR,
+            level=logging.INFO,
         )
 
     def test_status_bails_when_no_emailable_users_are_found_for_roles(

@@ -10,6 +10,7 @@
 
 
 {% block content %}
+    <div class="login-grid">
     {% render_grid %}
         {% render_column start=5 span=5 %}
             {% render_card %}
@@ -21,10 +22,13 @@
                         <a href="{% url 'digid:login' %}" class="link digid-logo" aria-describedby="Digid logo" title="Digid logo">
                             <img class="digid-logo__image" src="{% static 'accounts/digid_logo.svg' %}" alt="Digid logo">
                         </a>
-                        {% link href='digid:login' text=_('Inloggen met DigiD') secondary=True icon='arrow_forward' extra_classes="link--digid" %}
+                        {% url 'digid:login' as href %}
+                        {% with href|addnexturl:next as href_with_next %}
+                            {% link href=href_with_next text=_('Inloggen met DigiD') secondary=True icon='arrow_forward' extra_classes="link--digid" %}
+                        {% endwith %}
                     {% endrender_card %}
 		{% endif %}
-			
+
                 {% get_solo 'mozilla_django_oidc_db.OpenIDConnectConfig' as oidc_config %}
                 {% get_solo 'configurations.SiteConfiguration' as site_config %}
                 {% if oidc_config.enabled %}
@@ -36,7 +40,10 @@
                     {% else %}
                         <div></div>
                     {% endif %}
-                        {% link text=site_config.openid_connect_login_text href='oidc_authentication_init' secondary=True icon='arrow_forward' icon_position="after" %}
+                        {% url 'oidc_authentication_init' as href %}
+                        {% with href|addnexturl:next as href_with_next %}
+                            {% link text=site_config.openid_connect_login_text href=href_with_next secondary=True icon='arrow_forward' icon_position="after" %}
+                        {% endwith %}
                     {% endrender_card %}
                 {% endif %}
 
@@ -44,6 +51,7 @@
                     {% render_card tinted=True %}
                         {% render_form id="login-form" method="POST" form=form %}
                             {% csrf_token %}
+                            <input type="hidden" name="next" value="{{next}}" />
                             {% input form.username %}
                             {% input form.password %}
                             {% button text=_('Wachtwoord vergeten?') href='password_reset' secondary=True transparent=True align='right' %}
@@ -54,4 +62,5 @@
             {% endrender_card %}
         {% endrender_column %}
     {% endrender_grid %}
+    </div>
 {% endblock content %}

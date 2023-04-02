@@ -9,6 +9,9 @@
     }
 
     .avatar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
       padding: 15px 15px 10px;
       margin-top: var(--gutter-width);
       border: var(--border-width) solid var(--color-success-lighter);

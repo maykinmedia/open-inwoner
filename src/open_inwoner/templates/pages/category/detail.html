@@ -10,39 +10,43 @@
 {% endblock header_image %}
 
 {% block content %}
-    <h1 class="h1">
-        {{ object.name }}
-        {% if request.user.is_staff %}
-            {% button icon="edit" text=_("Open in admin") hide_text=True href="admin:pdc_category_change" object_id=object.pk %}
+    <div class="categories__content">
+        <h1 class="h1">
+            {{ object.name }}
+            {% if request.user.is_staff %}
+                {% button icon="edit" text=_("Open in admin") hide_text=True href="admin:pdc_category_change" object_id=object.pk %}
+            {% endif %}
+        </h1>
+        <p class="p">{{ object.description|linebreaksbr }}</p>
+
+        {% if subcategories %}
+            {% card_container subcategories=subcategories parent_category=object %}
         {% endif %}
-    </h1>
-    <p class="p">{{ object.description|linebreaksbr }}</p>
 
-    {% if subcategories %}
-        {% card_container subcategories=subcategories parent_category=object %}
-    {% endif %}
-
-    {% if products %}
-        {% card_container products=products small=True parent=object %}
-    {% endif %}
-
-    {% if category.question_set.all %}
-        {% render_grid %}
-            {% render_column span=6 %}
-                {% faq category.question_set.all %}
-            {% endrender_column %}
-        {% endrender_grid %}
-    {% endif %}
-
-    {% if questionnaire_roots %}
-        <div class="grid">
-            <div class="column column--start-1 column--span-6 ">
-                <aside class="questionnaire">
-                    <h2 class="h2">{{configurable_text.questionnaire_page.select_questionnaire_title}}</h2>
-                    {% optional_paragraph configurable_text.questionnaire_page.select_questionnaire_intro %}
-                    {% questionnaire root_nodes=questionnaire_roots %}
-                </aside>
+        {% if products %}
+            <div class="categories__products">
+            {% card_container products=products small=True parent=object %}
             </div>
-        </div>
-    {% endif %}
+        {% endif %}
+
+        {% if category.question_set.all %}
+            {% render_grid %}
+                {% render_column span=6 %}
+                    {% faq category.question_set.all %}
+                {% endrender_column %}
+            {% endrender_grid %}
+        {% endif %}
+
+        {% if questionnaire_roots %}
+            <div class="grid">
+                <div class="column column--start-1 column--span-6 ">
+                    <aside class="questionnaire">
+                        <h2 class="h2">{{configurable_text.questionnaire_page.select_questionnaire_title}}</h2>
+                        {% optional_paragraph configurable_text.questionnaire_page.select_questionnaire_intro %}
+                        {% questionnaire root_nodes=questionnaire_roots %}
+                    </aside>
+                </div>
+            </div>
+        {% endif %}
+    </div>
 {% endblock content %}

@@ -1,3 +1,17 @@
 .cases {
   margin-top: var(--spacing-giant);
+
+  /// cards on cases page
+  .card {
+    .cases__link {
+      text-decoration: none;
+    }
+  }
+}
+
+#document-upload .button[type='submit']:disabled {
+  border-color: var(--color-gray) !important;
+  color: var(--color-gray-light);
+  pointer-events: none;
+  cursor: default;
 }

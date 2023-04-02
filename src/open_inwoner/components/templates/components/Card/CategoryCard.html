@@ -1,5 +1,6 @@
-{% load card_tags icon_tags link_tags helpers utils %}
+{% load icon_tags link_tags helpers utils %}
 
+{# template for subcategory cards with or without product-links #}
 {# create tag for anchor around card - never use anchors within anchors for valid HTML. #}
 {% if category.products.published %}
 <div title="{{ category }}" aria-label="{{ category.name }}" class="card">

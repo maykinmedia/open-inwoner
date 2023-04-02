@@ -17,6 +17,7 @@ from open_inwoner.accounts.models import User
 from open_inwoner.accounts.views.actions import (
     ActionCreateView,
     ActionDeleteView,
+    ActionHistoryView,
     ActionUpdateStatusTagView,
     ActionUpdateView,
     BaseActionFilter,
@@ -94,6 +95,10 @@ class PlanListView(
             .prefetch_related("plan_contacts")
             .order_by("end_date")
         )
+
+    def get(self, request, *args, **kwargs):
+        self.request.user.clear_plan_contact_new_count()
+        return super().get(request, *args, **kwargs)
 
     def get_available_contacts_for_filtering(self, plans):
         """
@@ -178,7 +183,7 @@ class PlanDetailView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Samenwerkingsplannen"), reverse("plans:plan_list")),
+            (_("Samenwerken"), reverse("plans:plan_list")),
             (self.get_object().title, reverse("plans:plan_detail", kwargs=self.kwargs)),
         ]
 
@@ -223,8 +228,8 @@ class PlanCreateView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Samenwerkingsplannen"), reverse("plans:plan_list")),
-            (_("Maak samenwerkingsplan aan"), reverse("plans:plan_create")),
+            (_("Samenwerken"), reverse("plans:plan_list")),
+            (_("Start nieuwe samenwerking"), reverse("plans:plan_create")),
         ]
 
     def get_form_kwargs(self):
@@ -518,6 +523,30 @@ class PlanActionDeleteView(PlansEnabledMixin, ActionDeleteView):
                 receivers=other_users,
                 request=self.request,
             )
+
+
+class PlanActionHistoryView(ActionHistoryView):
+    @cached_property
+    def crumbs(self):
+        return [
+            (_("Samenwerking"), reverse("plans:plan_list")),
+            (
+                self.get_plan().title,
+                reverse("plans:plan_detail", kwargs={"uuid": self.get_plan().uuid}),
+            ),
+            (
+                _("History of {}").format(self.object.name),
+                reverse("plans:plan_action_history", kwargs=self.kwargs),
+            ),
+        ]
+
+    def get_plan(self):
+        try:
+            return Plan.objects.connected(self.request.user).get(
+                uuid=self.kwargs.get("plan_uuid")
+            )
+        except ObjectDoesNotExist as e:
+            raise Http404
 
 
 class PlanExportView(
