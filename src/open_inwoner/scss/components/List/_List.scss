@@ -4,6 +4,10 @@
   padding: 0;
   width: 100%;
   overflow-y: auto;
+
+  .case-list {
+    text-decoration: none;
+  }
 }
 
 .search + .list {

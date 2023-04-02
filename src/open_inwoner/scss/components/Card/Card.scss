@@ -73,6 +73,11 @@
   }
   &__body {
     padding: var(--card-spacing);
+
+    /// clickable plans on home page after authenticated
+    .plan-list {
+      text-decoration: none;
+    }
   }
 
   &__body--grid {
@@ -159,7 +164,8 @@
   }
 
   /// Arrow button on product cards.
-  a.button:last-child {
+  a.button:last-child,
+  span.button:last-child {
     float: right;
   }
 

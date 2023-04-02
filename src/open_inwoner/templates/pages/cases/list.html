@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n anchor_menu_tags card_tags grid_tags icon_tags link_tags list_tags pagination_tags utils %}
+{% load i18n anchor_menu_tags grid_tags icon_tags link_tags list_tags pagination_tags utils %}
 
 {% block sidebar_content %}
     {% anchor_menu anchors=anchors desktop=True %}
@@ -13,15 +13,27 @@
         {% render_grid %}
             {% for case in cases %}
                 {% render_column start=forloop.counter_0|multiply:4 span=4 %}
-                    {% render_card compact=True stretch=True title=case.identificatie %}
-                        {% render_list %}
-                            {% list_item case.current_status caption=_("Status") compact=True strong=False %}
-                            {% list_item case.start_date caption=_("Ontvangstdatum") compact=True strong=False %}
-                            {% list_item case.description caption=_("Omschrijving") compact=True strong=False %}
-                        {% endrender_list %}
+                <div class="card card--compact card--stretch">
+                    <div class="card__body">
+                    <a href="{% url 'accounts:case_status' object_id=case.uuid %}" class="cases__link">
+                            <p class="h4">
+                                <span class="link link__text">{{ case.identificatie }}</span>
+                            </p>
+                            {% render_list %}
+                                <span class="case-list">
+                                {% list_item case.current_status caption=_("Status") compact=True strong=False %}
+                                {% list_item case.start_date caption=_("Ontvangstdatum") compact=True strong=False %}
+                                {% list_item case.description caption=_("Omschrijving") compact=True strong=False %}
+                                </span>
+                            {% endrender_list %}
 
-                        {% link href="accounts:case_status" object_id=case.uuid icon="arrow_forward" primary=True text=_("Bekijk aanvraag") %}
-                    {% endrender_card %}
+                            <span class="link link--icon link--primary" aria-label="{% trans "Bekijk aanvraag" %}" title="{% trans "Bekijk aanvraag" %}">
+                                <span class="link__text">{% trans "Bekijk aanvraag" %}</span>
+                                {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
+                            </span>
+                    </a>
+                    </div>
+                </div>
                 {% endrender_column %}
             {% endfor %}
         {% endrender_grid %}

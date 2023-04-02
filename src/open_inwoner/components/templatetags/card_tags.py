@@ -90,6 +90,25 @@ def description_card(title, description, url, **kwargs):
     return kwargs
 
 
+@register.inclusion_tag("components/Card/ProductCard.html")
+def product_card(description, url, **kwargs):
+    """
+    Renders a card with or without an image prepopulated based on `product`.
+
+    Usage:
+        {% product_card title=product.title description=product.intro url=product.get_absolute_url %}
+
+    Available options:
+        + description: string | The description that needs to be displayed.
+        + url: string | The url that the card should point to.
+        - title: string | The title of the card that may be displayed if there is no image.
+        - object: any | The object that needs to render aditional data.
+        - image: FilerImageField | an image that should be used.
+    """
+    kwargs.update(description=description, url=url)
+    return kwargs
+
+
 @register.inclusion_tag("components/Card/CardContainer.html")
 def card_container(categories=[], subcategories=[], products=[], plans=[], **kwargs):
     """
