@@ -22,7 +22,7 @@ class TestHelpContext(WebTest):
         self.assertEquals(
             help_text,
             _(
-                "Welkom! Op dit scherm vindt u een overzicht van de verschillende thema's en producten & diensten."
+                "Welkom! Op dit scherm vindt u een overzicht van de verschillende onderwerpen en producten & diensten."
             ),
         )
 
@@ -41,7 +41,7 @@ class TestHelpContext(WebTest):
         self.assertEquals(
             help_text,
             _(
-                "Op dit scherm vindt u de verschillende thema's waarvoor wij producten en diensten aanbieden."
+                "Op dit scherm vindt u de verschillende onderwerpen waarvoor wij producten en diensten aanbieden."
             ),
         )
 

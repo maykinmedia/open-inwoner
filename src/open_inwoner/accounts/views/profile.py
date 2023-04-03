@@ -150,7 +150,7 @@ class MyCategoriesView(
     def crumbs(self):
         return [
             (_("Mijn profiel"), reverse("accounts:my_profile")),
-            (_("Mijn thema's"), reverse("accounts:my_themes")),
+            (_("Mijn onderwerpen"), reverse("accounts:my_themes")),
         ]
 
     def get_object(self):
