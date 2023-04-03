@@ -3,18 +3,16 @@ from typing import Optional
 
 from zgw_consumers.client import ZGWClient
 
-from .models import OpenZaakConfig
+from .models import OpenKlantConfig
 
 logger = logging.getLogger(__name__)
 
 
 def build_client(type_) -> Optional[ZGWClient]:
-    config = OpenZaakConfig.get_solo()
+    config = OpenKlantConfig.get_solo()
     services = {
-        "zaak",
-        "catalogi",
-        "document",
-        "form",
+        "klanten",
+        "contactmomenten",
     }
     if type_ in services:
         service = getattr(config, f"{type_}_service")

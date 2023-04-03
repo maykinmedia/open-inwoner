@@ -43,7 +43,7 @@ class ESuiteData:
         }
 
     def setUpOASMocks(self, m):
-        mock_service_oas_get(m, FORMS_ROOT, "esuite-submissions")
+        mock_service_oas_get(m, FORMS_ROOT, "submissions-esuite")
 
     def install_mocks(self, m):
         self.setUpOASMocks(m)

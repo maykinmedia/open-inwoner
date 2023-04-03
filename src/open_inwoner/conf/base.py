@@ -201,6 +201,7 @@ INSTALLED_APPS = [
     "open_inwoner.configurations",
     "open_inwoner.haalcentraal",
     "open_inwoner.openzaak",
+    "open_inwoner.openklant",
     "open_inwoner.questionnaire",
     "open_inwoner.extended_sessions",
     "open_inwoner.custom_csp",
@@ -743,6 +744,7 @@ INVITE_EXPIRY = 14
 # zgw-consumers
 ZGW_CONSUMERS_TEST_SCHEMA_DIRS = [
     os.path.join(DJANGO_PROJECT_DIR, "openzaak", "tests", "files"),
+    os.path.join(DJANGO_PROJECT_DIR, "openklant", "tests", "files"),
 ]
 
 #

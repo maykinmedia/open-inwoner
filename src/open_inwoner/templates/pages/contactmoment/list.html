@@ -1,0 +1,30 @@
+{% extends 'master.html' %}
+{% load i18n anchor_menu_tags card_tags grid_tags icon_tags link_tags list_tags pagination_tags utils %}
+
+{% block sidebar_content %}
+    {% anchor_menu anchors=anchors desktop=True %}
+{% endblock sidebar_content %}
+
+{% block content %}
+    <h1 class="h1" id="title">{% trans "Mijn vragen" %}</h1>
+
+    <div class="contactmomenten">
+        <h2 class="h2" id="contactmomenten">{{ page_title }} ({{ contactmomenten|length }})</h2>
+        {% render_grid %}
+            {% for contactmoment in contactmomenten %}
+                {% render_column start=forloop.counter_0|multiply:4 span=4 %}
+                    {% render_card compact=True stretch=True title=case.identificatie %}
+                        {% render_list %}
+                            {% list_item contactmoment.registered_date caption=_("Ontvangstdatum") compact=True strong=False %}
+                            {% list_item contactmoment.channel caption=_("Kanaal") compact=True strong=False %}
+                            {% list_item contactmoment.text|truncatechars:25 caption=_("Omschrijving") compact=True strong=False %}
+                        {% endrender_list %}
+
+                        {% link href=contactmoment.url icon="arrow_forward" primary=True text=_("Bekijk vraag") %}
+                    {% endrender_card %}
+                {% endrender_column %}
+            {% endfor %}
+        {% endrender_grid %}
+    </div>
+
+{% endblock content %}
