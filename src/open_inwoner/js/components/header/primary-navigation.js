@@ -20,7 +20,7 @@ class PrimaryNavigation extends Component {
    */
   bindEvents() {
     this.node.addEventListener('focus', this.onFocus.bind(this))
-    this.node.addEventListener('mouseenter', this.onHover.bind(this))
+    // this.node.addEventListener('mouseenter', this.onHover.bind(this))
     window.addEventListener('keyup', this.onKeyUp.bind(this))
   }
 
@@ -36,9 +36,9 @@ class PrimaryNavigation extends Component {
    * Gets called when `node` receives focus.
    * Clears the dismissed state, (prevents overriding focus/hover).
    */
-  onHover() {
-    this.setState({ dismissed: false })
-  }
+  // onHover() {
+  //   this.setState({ dismissed: false })
+  // }
 
   /**
    * Gets called when a key is released.
@@ -47,7 +47,7 @@ class PrimaryNavigation extends Component {
    */
   onKeyUp(event) {
     if (event.key === 'Escape') {
-      if (this.getFocussedChild() || this.getHoveredChild()) {
+      if (this.getFocussedChild()) {
         this.setState({ dismissed: true })
       }
     }
@@ -65,9 +65,9 @@ class PrimaryNavigation extends Component {
    * Returns the hovered child node (if any).
    * @return {HTMLElement|null}
    */
-  getHoveredChild() {
-    return this.node.querySelector(':hover') || null
-  }
+  // getHoveredChild() {
+  //   return this.node.querySelector(':hover') || null
+  // }
 
   /**
    * Persists state to DOM.
