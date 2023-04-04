@@ -94,21 +94,6 @@
         <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="accounts:action_list" text="Aanpassen" icon="arrow_forward" icon_position="after" primary=True %}</div>
     </div>
     {% endif %}
-    {% comment %} <div class="tabled__row">
-        <div class="tabled__item tabled__item--bold">{% trans "Afspraken" %}</div>
-        <div class="tabled__item">4 afspraken, eerstvolgende voor 6 september</div>
-        <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="#" text="Aanpassen" icon="arrow_forward" icon_position="after" primary=True %}</div>
-    </div> {% endcomment %}
 </div>
 
-{% render_form form=form method="POST" id="deactivate-form" extra_classes="confirm" spaceless=True data_confirm_title=_("Weet je het zeker dat je je account wilt deactiveren?") data_confirm_cancel=_("Nee") data_confirm_default=_("Ja") %}
-    {% csrf_token %}
-    {% form_actions primary_text=_("Profiel deactiveren") primary_icon="close" transparent=True %}
-{% endrender_form %}
-
-{% file_list h1=True files=files allow_delete=True title=_("Bestanden") download_view="accounts:documents_download" %}
-
-{% button_row align="right" %}
-    {% button href="accounts:documents_create" text=_("Bestand toevoegen") primary=True %}
-{% endbutton_row %}
 {% endblock content %}
