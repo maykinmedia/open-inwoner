@@ -361,7 +361,6 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
                 "end_date_planned": datetime.date(2022, 1, 4),
                 "end_date_legal": datetime.date(2022, 1, 5),
                 "description": "Zaak naar aanleiding van ingezonden formulier",
-                "type_description": "Coffee zaaktype",
                 "current_status": "Finish",
                 "statuses": [status_new_obj, status_finish_obj],
                 # only one visible information object
@@ -382,7 +381,6 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
 
         self.assertContains(response, "ZAAK-2022-0000000024")
         self.assertContains(response, "Zaak naar aanleiding van ingezonden formulier")
-        self.assertContains(response, "Coffee zaaktype")
         self.assertContains(response, "Finish")
         self.assertContains(response, "document")
         self.assertContains(response, "Foo Bar van der Bazz")

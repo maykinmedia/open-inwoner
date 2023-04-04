@@ -355,9 +355,6 @@ class CaseDetailView(
                     if self.case.omschrijving
                     else self.case.zaaktype.omschrijving
                 ),
-                "type_description": (
-                    self.case.zaaktype.omschrijving if self.case.omschrijving else ""
-                ),
                 "current_status": glom(
                     self.case,
                     "status.statustype.omschrijving",
