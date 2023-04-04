@@ -6,18 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('pdc', '0055_alter_product_content'),
-        ('accounts', '0056_auto_20230307_0852'),
+        ("pdc", "0055_alter_product_content"),
+        ("accounts", "0056_auto_20230307_0852"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='user',
-            name='selected_themes',
+            model_name="user",
+            name="selected_themes",
         ),
         migrations.AddField(
-            model_name='user',
-            name='selected_categories',
-            field=models.ManyToManyField(blank=True, related_name='selected_by', to='pdc.Category', verbose_name='Selected categories'),
+            model_name="user",
+            name="selected_categories",
+            field=models.ManyToManyField(
+                blank=True,
+                related_name="selected_by",
+                to="pdc.Category",
+                verbose_name="Selected categories",
+            ),
         ),
     ]

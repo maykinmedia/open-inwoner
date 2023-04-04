@@ -86,7 +86,9 @@ class HomeView(CommonPageMixin, TemplateView):
             and self.request.user.selected_categories.exists()
         ):
             kwargs.update(
-                categories=self.request.user.selected_categories.order_by("name")[:limit]
+                categories=self.request.user.selected_categories.order_by("name")[
+                    :limit
+                ]
             )
         elif highlighted_categories:
             kwargs.update(categories=highlighted_categories)
