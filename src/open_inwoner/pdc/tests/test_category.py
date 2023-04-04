@@ -53,7 +53,7 @@ class TestHighlightedCategories(WebTest):
             name="This should be second", highlighted=True
         )
         selected_category = CategoryFactory(name="This should the only one")
-        user.selected_themes.add(selected_category)
+        user.selected_categories.add(selected_category)
         response = self.app.get(reverse("root"), user=user)
         self.assertEqual(
             list(response.context["categories"]),
@@ -143,8 +143,8 @@ class TestPublishedCategories(WebTest):
         )
         self.assertEqual(list(response.context["subcategories"]), [descendent1])
 
-    def test_only_published_categories_exist_in_my_themes_page(self):
-        response = self.app.get(reverse("accounts:my_themes"), user=self.user)
+    def test_only_published_categories_exist_in_my_categories_page(self):
+        response = self.app.get(reverse("accounts:my_categories"), user=self.user)
         self.assertEqual(
             list(response.context["categories"]),
             [self.published1, self.published2],

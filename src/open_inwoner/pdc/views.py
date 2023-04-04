@@ -83,10 +83,10 @@ class HomeView(CommonPageMixin, TemplateView):
         )
         if (
             self.request.user.is_authenticated
-            and self.request.user.selected_themes.exists()
+            and self.request.user.selected_categories.exists()
         ):
             kwargs.update(
-                categories=self.request.user.selected_themes.order_by("name")[:limit]
+                categories=self.request.user.selected_categories.order_by("name")[:limit]
             )
         elif highlighted_categories:
             kwargs.update(categories=highlighted_categories)

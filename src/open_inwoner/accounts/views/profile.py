@@ -24,7 +24,7 @@ from open_inwoner.questionnaire.models import QuestionnaireStep
 from open_inwoner.utils.mixins import ExportMixin
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
-from ..forms import BrpUserForm, ThemesForm, UserForm
+from ..forms import BrpUserForm, CategoriesForm, UserForm
 from ..models import Action, User
 
 
@@ -143,14 +143,14 @@ class MyCategoriesView(
 ):
     template_name = "pages/profile/categories.html"
     model = User
-    form_class = ThemesForm
+    form_class = CategoriesForm
     success_url = reverse_lazy("accounts:my_profile")
 
     @cached_property
     def crumbs(self):
         return [
             (_("Mijn profiel"), reverse("accounts:my_profile")),
-            (_("Mijn onderwerpen"), reverse("accounts:my_themes")),
+            (_("Mijn onderwerpen"), reverse("accounts:my_categories")),
         ]
 
     def get_object(self):

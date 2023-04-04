@@ -10,7 +10,7 @@ from .factories import CategoryFactory, ProductFactory, QuestionFactory
 
 
 class TestPublishedProducts(WebTest):
-    def test_only_published_products_exist_on_themes_page_when_anonymous(self):
+    def test_only_published_products_exist_on_categories_page_when_anonymous(self):
         category = CategoryFactory(path="0001", name="First one", slug="first-one")
         product1 = ProductFactory(categories=(category,))
         product2 = ProductFactory(categories=(category,), published=False)
@@ -19,7 +19,7 @@ class TestPublishedProducts(WebTest):
         )
         self.assertEqual(list(response.context["products"]), [product1])
 
-    def test_only_published_products_exist_on_themes_page_when_logged_in(self):
+    def test_only_published_products_exist_on_categories_page_when_logged_in(self):
         user = UserFactory()
         category = CategoryFactory(path="0001", name="First one", slug="first-one")
         product1 = ProductFactory(categories=(category,))
