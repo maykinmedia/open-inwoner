@@ -65,9 +65,7 @@
                                 {% endwith %}
                             </li>
 
-                            {% get_solo 'configurations.SiteConfiguration' as config %}
-
-                            {% if request.user.bsn and show_cases %}
+                            {% if request.user.bsn and config.show_cases %}
                                 <li class="primary-navigation__list-item">
                                     {% link text=_('Mijn aanvragen') href='accounts:my_open_cases' icon="inventory_2" icon_position="before" icon_outlined=True %}
                                 </li>
