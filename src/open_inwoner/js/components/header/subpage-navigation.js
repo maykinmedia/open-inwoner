@@ -1,10 +1,10 @@
 class Subpage {
   constructor(node) {
     this.node = node
-    this.node.addEventListener('click', this.toggleOpen.bind(this))
+    this.node.addEventListener('click', this.toggleNavOpen.bind(this))
   }
 
-  toggleOpen(event) {
+  toggleNavOpen(event) {
     event.preventDefault()
     this.node.parentElement.classList.toggle('nav__list--open')
   }
@@ -13,7 +13,7 @@ class Subpage {
 /**
  * Controls the toggling of subpages if there are any
  */
-const filterButtons = document.querySelectorAll(
+const toggleSubitems = document.querySelectorAll(
   '.dropdown-nav__toggle .link--toggle'
 )
-;[...filterButtons].forEach((filterButton) => new Subpage(filterButton))
+;[...toggleSubitems].forEach((toggleSubitem) => new Subpage(toggleSubitem))

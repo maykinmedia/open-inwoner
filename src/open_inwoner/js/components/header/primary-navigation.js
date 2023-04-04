@@ -20,7 +20,8 @@ class PrimaryNavigation extends Component {
    */
   bindEvents() {
     this.node.addEventListener('focus', this.onFocus.bind(this))
-    this.node.addEventListener('mouseenter', this.onHover.bind(this))
+    // this.node.addEventListener('mouseenter', this.onHover.bind(this))
+    this.node.addEventListener('click', this.onHover.bind(this))
     window.addEventListener('keyup', this.onKeyUp.bind(this))
   }
 
@@ -66,7 +67,7 @@ class PrimaryNavigation extends Component {
    * @return {HTMLElement|null}
    */
   getHoveredChild() {
-    return this.node.querySelector(':hover') || null
+    return this.node.querySelector('nav__list--open') || null
   }
 
   /**

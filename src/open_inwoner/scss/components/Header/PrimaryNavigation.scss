@@ -69,7 +69,8 @@
 
   /// Nested list.
 
-  & > &__list > &__list-item > &__list {
+  & > &__list > &__list-item > &__list,
+  & > &__list > &__list-item &dropdown-nav__toggle &__list {
     box-sizing: border-box;
     margin: 0;
     width: 100%;
@@ -107,7 +108,7 @@
 
   &:not(#{&}--dismissed) > &__list > &__list-item:focus &__list,
   &:not(#{&}--dismissed) > &__list > &__list-item:focus-within &__list,
-  &:not(#{&}--dismissed) > &__list > &__list-item:hover &__list {
+  &:not(#{&}--dismissed) > &__list > &__list-item &nav__list--open &__list {
     transform: scaleY(1);
   }
 
