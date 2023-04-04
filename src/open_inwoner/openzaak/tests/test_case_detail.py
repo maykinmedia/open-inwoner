@@ -9,6 +9,7 @@ import requests_mock
 from django_webtest import WebTest
 from timeline_logger.models import TimelineLog
 from webtest import Upload
+from webtest.forms import Hidden
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.constants import (
     RolOmschrijving,
@@ -528,7 +529,9 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         )
         self.assertRedirects(response, reverse("root"))
 
-    def test_expected_information_object_types_are_available_in_upload_form(self, m):
+    def test_single_expected_information_object_type_is_available_in_upload_form(
+        self, m
+    ):
         self._setUpMocks(m)
 
         zaak_type_config = ZaakTypeConfigFactory(
@@ -550,7 +553,43 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         )
         form = response.forms["document-upload"]
         type_field = form["type"]
-        expected_choices = [(str(zaak_type_iotc.id), True, zaak_type_iotc.omschrijving)]
+        expected_choice = zaak_type_iotc.id
+
+        self.assertEqual(type(type_field), Hidden)
+        self.assertEqual(type_field.value, str(expected_choice))
+
+    def test_expected_information_object_types_are_available_in_upload_form(self, m):
+        self._setUpMocks(m)
+
+        zaak_type_config = ZaakTypeConfigFactory(
+            identificatie=self.zaaktype["identificatie"]
+        )
+        zaak_type_iotc1 = ZaakTypeInformatieObjectTypeConfigFactory(
+            zaaktype_config=zaak_type_config,
+            informatieobjecttype_url=self.informatie_object["url"],
+            zaaktype_uuids=[self.zaaktype["uuid"]],
+            document_upload_enabled=True,
+        )
+        zaak_type_iotc2 = ZaakTypeInformatieObjectTypeConfigFactory(
+            zaaktype_config=zaak_type_config,
+            informatieobjecttype_url=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/705364ff-385a-4d60-b0da-a8cf5d18e6bb",
+            zaaktype_uuids=[self.zaaktype["uuid"]],
+            document_upload_enabled=True,
+        )
+
+        response = self.app.get(
+            reverse(
+                "accounts:case_status",
+                kwargs={"object_id": self.zaak["uuid"]},
+            ),
+            user=self.user,
+        )
+        form = response.forms["document-upload"]
+        type_field = form["type"]
+        expected_choices = [
+            (str(zaak_type_iotc1.id), False, zaak_type_iotc1.omschrijving),
+            (str(zaak_type_iotc2.id), False, zaak_type_iotc2.omschrijving),
+        ]
 
         self.assertEqual(type_field.options, expected_choices)
 
