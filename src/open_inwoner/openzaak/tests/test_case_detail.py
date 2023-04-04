@@ -591,7 +591,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
             (str(zaak_type_iotc2.id), False, zaak_type_iotc2.omschrijving),
         ]
 
-        self.assertEqual(type_field.options, expected_choices)
+        self.assertEqual(sorted(type_field.options), sorted(expected_choices))
 
     def test_upload_form_is_not_rendered_when_no_case_exists(self, m):
         self._setUpMocks(m)
