@@ -65,7 +65,7 @@
         <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="accounts:my_themes" text="Aanpassen" icon="arrow_forward" icon_position="after" primary=True %}</div>
     </div>
     <div class="tabled__row">
-        <div class="tabled__item tabled__item--bold">{% trans "Begeleider van de gemeente" %}</div>
+        <div class="tabled__item tabled__item--bold">{% trans "Begeleider(s)" %}</div>
         {% if mentor_contacts %}
             <div class="tabled__item">{{ mentor_contacts|join:", " }}</div>
             {% url 'accounts:contact_list' as mentor_url %}
