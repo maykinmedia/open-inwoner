@@ -368,6 +368,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
                 "documents": [self.informatie_object_file],
                 "initiator": "Foo Bar van der Bazz",
                 "result": "resultaat toelichting",
+                "case_type_config_description": None,
                 "internal_upload_enabled": False,
                 "external_upload_enabled": False,
                 "external_upload_url": "",
