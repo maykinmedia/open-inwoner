@@ -12,7 +12,7 @@
     
     <!-- dynamic anchor item for products -->
     <div class="anchor-menu__start-inquiry">
-        {% if '[CTABUTTON\]' not in product.content %}
+        {% if '\[CTABUTTON\]' not in product.content %}
             {% if product.form %}
                 {% button_row mobile=True %}
                     {% button href=product.form_link text=_("Aanvraag starten") primary=True icon="arrow_forward" icon_position="before" %}
