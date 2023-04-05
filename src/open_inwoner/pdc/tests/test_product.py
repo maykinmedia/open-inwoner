@@ -208,3 +208,30 @@ class TestProductContent(WebTest):
         cta_button = response.pyquery(".grid__main")[0].find_class("cta-button")
 
         self.assertFalse(cta_button)
+
+    def test_sidemenu_button_is_not_rendered_when_cta_inside_product_content(self):
+        product = ProductFactory(
+            content="Some content \[CTABUTTON\]", link="http://www.example.com"
+        )
+
+        response = self.app.get(
+            reverse("pdc:product_detail", kwargs={"slug": product.slug})
+        )
+        sidemenu_cta_button = response.pyquery(
+            '.anchor-menu__list-item a[href="http://www.example.com"]'
+        )
+
+        self.assertFalse(sidemenu_cta_button)
+
+    def test_sidemenu_button_is_rendered_when_no_cta_inside_product_content(self):
+        product = ProductFactory(content="Some content", link="http://www.example.com")
+
+        response = self.app.get(
+            reverse("pdc:product_detail", kwargs={"slug": product.slug})
+        )
+        sidemenu_cta_button = response.pyquery(
+            '.anchor-menu__list-item a[href="http://www.example.com"]'
+        )
+
+        self.assertTrue(sidemenu_cta_button)
+        self.assertIn(product.link, sidemenu_cta_button[0].values())
