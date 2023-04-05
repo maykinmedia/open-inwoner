@@ -4,7 +4,7 @@ from typing import List, Optional
 
 from django.contrib import messages
 from django.contrib.auth.mixins import AccessMixin
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.http import Http404, HttpResponseRedirect, StreamingHttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -392,7 +392,18 @@ class CaseDetailView(
         else:
             external_upload_url = ""
 
+        try:
+            case_type_config = ZaakTypeConfig.objects.get(
+                identificatie=case.zaaktype.identificatie,
+                catalogus__url=case.zaaktype.catalogus,
+            )
+        except ObjectDoesNotExist:
+            case_type_config_description = None
+        else:
+            case_type_config_description = case_type_config.description
+
         return {
+            "case_type_config_description": case_type_config_description,
             "internal_upload_enabled": internal_upload_enabled,
             "external_upload_enabled": external_upload_enabled,
             "external_upload_url": external_upload_url,

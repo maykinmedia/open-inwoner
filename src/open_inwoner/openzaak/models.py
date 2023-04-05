@@ -174,6 +174,14 @@ class ZaakTypeConfig(models.Model):
     notify_status_changes = models.BooleanField(default=False)
 
     # documents
+    description = models.TextField(
+        verbose_name=_("Description"),
+        blank=True,
+        default="",
+        help_text=_(
+            "Description - clarification of why a user should upload a document for this case type"
+        ),
+    )
     external_document_upload_url = models.URLField(
         verbose_name=_("Document upload URL"),
         blank=True,
