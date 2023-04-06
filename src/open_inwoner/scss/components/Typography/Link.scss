@@ -75,6 +75,8 @@
   }
 }
 
-.link + .link {
+.link
+  + .link
+  :not(.card__body--flex > a > span, .leaflet-content-details > a > span) {
   margin-left: var(--spacing-small);
 }
