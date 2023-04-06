@@ -185,7 +185,7 @@ class ProductDetailView(
     @cached_property
     def crumbs(self):
         base_list = [(_("Onderwerpen"), reverse("pdc:category_list"))]
-        base_list += self.get_categories_breadcrumbs(slug_name="theme_slug")
+        base_list += self.get_categories_breadcrumbs(slug_name="category_slug")
         return base_list + [(self.get_object().name, self.request.path)]
 
     def get_context_data(self, **kwargs):
@@ -229,7 +229,7 @@ class ProductFormView(
     @cached_property
     def crumbs(self):
         base_list = [(_("Onderwerpen"), reverse("pdc:category_list"))]
-        base_list += self.get_categories_breadcrumbs(slug_name="theme_slug")
+        base_list += self.get_categories_breadcrumbs(slug_name="category_slug")
         return base_list + [
             (self.get_object().name, self.get_object().get_absolute_url()),
             (_("Formulier"), self.request.path),

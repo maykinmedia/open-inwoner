@@ -14,7 +14,7 @@ app_name = "pdc"
 urlpatterns = [
     path("onderwerpen/", CategoryListView.as_view(), name="category_list"),
     re_path(
-        r"^onderwerpen/(?P<theme_slug>[\w\-\/]+)/products/(?P<slug>[\w\-]+)/$",
+        r"^onderwerpen/(?P<category_slug>[\w\-\/]+)/products/(?P<slug>[\w\-]+)/$",
         ProductDetailView.as_view(),
         name="category_product_detail",
     ),
