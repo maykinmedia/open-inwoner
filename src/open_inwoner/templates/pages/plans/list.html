@@ -3,7 +3,7 @@
 
 {% block header_image %}
     {% if plans_banner %}
-        <aside aria-hidden="true">
+        <aside class="banner" aria-hidden="true">
             <img class="main-image main-image--start-after" src="{{ plans_banner }}" alt="{{ plans_banner.default_alt_text|default:'Header afbeelding' }}">
         </aside>
     {% endif %}
