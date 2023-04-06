@@ -438,7 +438,7 @@ class CaseUploadForm(forms.Form):
         label=_("Titel"), max_length=255, validators=[validate_charfield_entry]
     )
     type = forms.ModelChoiceField(
-        ZaakTypeInformatieObjectTypeConfig.objects.all(),
+        ZaakTypeInformatieObjectTypeConfig.objects.none(),
         empty_label=None,
         label=_("Bestand type"),
     )
@@ -447,11 +447,12 @@ class CaseUploadForm(forms.Form):
     def __init__(self, case, **kwargs):
         super().__init__(**kwargs)
 
-        self.fields[
-            "type"
-        ].queryset = ZaakTypeInformatieObjectTypeConfig.objects.get_visible_ztiot_configs_for_case(
-            case
-        )
+        if case:
+            self.fields[
+                "type"
+            ].queryset = ZaakTypeInformatieObjectTypeConfig.objects.filter_enabled_for_case_type(
+                case.zaaktype
+            )
 
         choices = self.fields["type"].choices
 

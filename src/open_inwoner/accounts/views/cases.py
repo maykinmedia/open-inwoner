@@ -371,36 +371,27 @@ class CaseDetailView(
         return context
 
     def get_upload_info_context(self, case: Zaak):
-        internal_upload_enabled = ZaakTypeInformatieObjectTypeConfig.objects.get_visible_ztiot_configs_for_case(
-            case
-        ).exists()
+        if not case:
+            return {}
 
-        external_upload_enabled = (
-            ZaakTypeConfig.objects.get_visible_zt_configs_for_case_type_identification(
-                case.zaaktype.identificatie
+        internal_upload_enabled = (
+            ZaakTypeInformatieObjectTypeConfig.objects.filter_enabled_for_case_type(
+                case.zaaktype
             ).exists()
         )
 
-        if external_upload_enabled:
-            external_upload_url = (
-                ZaakTypeConfig.objects.get_visible_zt_configs_for_case_type_identification(
-                    case.zaaktype.identificatie
-                )
-                .get()
-                .external_document_upload_url
-            )
-        else:
-            external_upload_url = ""
-
         try:
-            case_type_config = ZaakTypeConfig.objects.get(
-                identificatie=case.zaaktype.identificatie,
-                catalogus__url=case.zaaktype.catalogus,
-            )
+            ztc = ZaakTypeConfig.objects.filter_enabled_for_case_type(
+                case.zaaktype
+            ).get()
         except ObjectDoesNotExist:
-            case_type_config_description = None
+            external_upload_enabled = False
+            external_upload_url = ""
+            case_type_config_description = ""
         else:
-            case_type_config_description = case_type_config.description
+            external_upload_enabled = True
+            external_upload_url = ztc.external_document_upload_url
+            case_type_config_description = ztc.description
 
         return {
             "case_type_config_description": case_type_config_description,
