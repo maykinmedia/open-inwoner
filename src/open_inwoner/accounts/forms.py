@@ -456,8 +456,8 @@ class CaseUploadForm(forms.Form):
         choices = self.fields["type"].choices
 
         if choices and len(choices) == 1:
-            self.fields["type"].disabled = True
             self.fields["type"].initial = list(choices)[0][0].value
+            self.fields["type"].widget = forms.HiddenInput()
 
     def clean_file(self):
         file = self.cleaned_data["file"]
