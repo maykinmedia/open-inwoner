@@ -17,13 +17,13 @@
                     <div class="card__body">
                     <a href="{% url 'accounts:case_status' object_id=case.uuid %}" class="cases__link">
                             <p class="h4">
-                                <span class="link link__text">{{ case.identificatie }}</span>
+                                <span class="link link__text">{{ case.description }}</span>
                             </p>
                             {% render_list %}
                                 <span class="case-list">
                                 {% list_item case.current_status caption=_("Status") compact=True strong=False %}
                                 {% list_item case.start_date caption=_("Ontvangstdatum") compact=True strong=False %}
-                                {% list_item case.description caption=_("Omschrijving") compact=True strong=False %}
+                                {% list_item case.identificatie caption=_("Zaaknummer") compact=True strong=False %}
                                 </span>
                             {% endrender_list %}
 

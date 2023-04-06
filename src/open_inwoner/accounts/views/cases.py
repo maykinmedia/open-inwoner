@@ -168,8 +168,11 @@ class CaseListMixin(CaseLogMixin, PaginationMixin):
                 "uuid": str(case.uuid),
                 "start_date": case.startdatum,
                 "end_date": getattr(case, "einddatum", None),
-                "description": case.omschrijving,
-                "zaaktype_description": case.zaaktype.omschrijving,
+                "description": (
+                    case.omschrijving
+                    if case.omschrijving
+                    else case.zaaktype.omschrijving
+                ),
                 "current_status": glom(
                     case, "status.statustype.omschrijving", default=""
                 ),
@@ -347,8 +350,11 @@ class CaseDetailView(
                 "end_date_legal": getattr(
                     self.case, "uiterlijke_einddatum_afdoening", None
                 ),
-                "description": self.case.omschrijving,
-                "type_description": self.case.zaaktype.omschrijving,
+                "description": (
+                    self.case.omschrijving
+                    if self.case.omschrijving
+                    else self.case.zaaktype.omschrijving
+                ),
                 "current_status": glom(
                     self.case,
                     "status.statustype.omschrijving",
