@@ -6,14 +6,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('pdc', '0055_alter_product_content'),
-        ('accounts', '0057_rename_selected_themes_user_selected_categories'),
+        ("pdc", "0055_alter_product_content"),
+        ("accounts", "0057_rename_selected_themes_user_selected_categories"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='user',
-            name='selected_categories',
-            field=models.ManyToManyField(blank=True, related_name='selected_by', to='pdc.Category', verbose_name='Selected categories'),
+            model_name="user",
+            name="selected_categories",
+            field=models.ManyToManyField(
+                blank=True,
+                related_name="selected_by",
+                to="pdc.Category",
+                verbose_name="Selected categories",
+            ),
         ),
     ]

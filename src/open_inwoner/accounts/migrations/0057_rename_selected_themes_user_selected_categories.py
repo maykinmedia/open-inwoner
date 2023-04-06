@@ -6,13 +6,13 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0056_auto_20230307_0852'),
+        ("accounts", "0056_auto_20230307_0852"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='user',
-            old_name='selected_themes',
-            new_name='selected_categories',
+            model_name="user",
+            old_name="selected_themes",
+            new_name="selected_categories",
         ),
     ]
