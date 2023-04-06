@@ -198,6 +198,9 @@ class Product(models.Model):
             kwargs={"slug": self.slug, "theme_slug": category_slug},
         )
 
+    def has_cta_tag(self):
+        return "\[CTABUTTON\]" in self.content
+
 
 class ProductFile(models.Model):
     product = models.ForeignKey(
