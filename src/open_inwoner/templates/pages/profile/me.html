@@ -96,4 +96,9 @@
     {% endif %}
 </div>
 
+{% render_form form=form method="POST" id="deactivate-form" extra_classes="confirm" spaceless=True data_confirm_title=_("Weet je het zeker dat je je account wilt deactiveren?") data_confirm_cancel=_("Nee") data_confirm_default=_("Ja") %}
+    {% csrf_token %}
+    {% form_actions primary_text=_("Profiel deactiveren") primary_icon="close" transparent=True %}
+{% endrender_form %}
+
 {% endblock content %}
