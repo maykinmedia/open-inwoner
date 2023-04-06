@@ -65,7 +65,7 @@ class MyProfileView(
             .first()
         )
         context["files"] = user.get_all_files()
-        context["theme_text"] = user.get_interests()
+        context["category_text"] = user.get_interests()
         context["action_text"] = _(
             f"{Action.objects.visible().connected(self.request.user).filter(status=StatusChoices.open).count()} acties staan open."
         )
