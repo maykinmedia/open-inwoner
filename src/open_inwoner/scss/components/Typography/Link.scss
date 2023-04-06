@@ -74,9 +74,3 @@
     transform: scale(0.75);
   }
 }
-
-.link
-  + .link
-  :not(.card__body--flex > a > span, .leaflet-content-details > a > span) {
-  margin-left: var(--spacing-small);
-}

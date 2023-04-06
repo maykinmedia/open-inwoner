@@ -7,6 +7,10 @@
   box-sizing: border-box;
   position: relative;
 
+  &__list-item .link.link--secondary {
+    margin-left: var(--spacing-small);
+  }
+
   /// Top list.
 
   & > &__list {
