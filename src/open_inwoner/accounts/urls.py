@@ -99,7 +99,7 @@ urlpatterns = [
         name="contact_approval",
     ),
     path("contacts/", ContactListView.as_view(), name="contact_list"),
-    path("categories/", MyCategoriesView.as_view(), name="my_categories"),
+    path("onderwerpen/", MyCategoriesView.as_view(), name="my_categories"),
     path("mydata/", MyDataView.as_view(), name="my_data"),
     path("cases/open/", OpenCaseListView.as_view(), name="my_open_cases"),
     path("cases/closed/", ClosedCaseListView.as_view(), name="my_closed_cases"),
