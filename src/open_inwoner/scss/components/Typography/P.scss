@@ -16,6 +16,10 @@
     line-height: var(--font-line-height-body-small);
   }
 
+  &--muted {
+    color: var(--color-mute);
+  }
+
   &:empty {
     margin: 0 !important;
   }

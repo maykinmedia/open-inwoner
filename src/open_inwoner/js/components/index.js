@@ -21,6 +21,7 @@ import './preview'
 import './questionnaire'
 import './search'
 import './toggle'
+import './upload-document'
 import './session'
 
 const htmx = (window.htmx = require('htmx.org'))

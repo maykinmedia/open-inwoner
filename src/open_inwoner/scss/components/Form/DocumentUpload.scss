@@ -1,8 +1,188 @@
 #document-upload {
+  gap: var(--spacing-tiny);
+
   .button[type='submit']:disabled {
+    background-color: var(--color-gray) !important;
     border-color: var(--color-gray) !important;
     color: var(--color-gray-light);
     pointer-events: none;
     cursor: default;
+  }
+
+  .form__control.upload .form__submit {
+    *[class*='icon'],
+    .button {
+      position: initial;
+      margin-top: 2em;
+    }
+  }
+
+  input[type='text'] {
+    max-width: var(--mobile-xs-width);
+  }
+
+  .inputfile-group {
+    display: block;
+
+    .label,
+    .close {
+      display: block;
+    }
+  }
+}
+
+/// File-input site wide
+input[type='file'] {
+  background-color: var(--color-white);
+  color: var(--color-primary-lighter);
+  border: 1px solid var(--color-mute);
+  border-radius: var(--border-radius);
+  display: flex;
+  flex-direction: column;
+  min-width: var(--mobile-xs-width);
+  max-width: 500px;
+  padding: 0;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+/// File-input button site wide
+input[type='file']::file-selector-button {
+  color: var(--color-white);
+  background-color: var(--color-primary);
+  text-transform: uppercase;
+  border: 1px;
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-body);
+  line-height: var(--font-line-height-body);
+  height: var(--row-height);
+  font-weight: normal;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  white-space: nowrap;
+  padding: 0 12px 0 12px;
+  margin: 0 12px 0 0;
+  width: 200px;
+}
+
+.button-row .upload-button--disabled {
+  background-color: var(--color-gray) !important;
+  border-color: var(--color-gray) !important;
+}
+
+.form__open-upload {
+  .file-type__select {
+    max-width: var(--mobile-xs-width);
+  }
+  .form__control > .label *[class*='icon'] {
+    top: 69%;
+  }
+
+  .input-file {
+    position: relative;
+    max-width: var(--mobile-xs-width);
+
+    *[class*='icons'] {
+      position: absolute;
+      top: 18px;
+      left: 12px;
+      color: orange;
+    }
+
+    /// Hidden file-input for cases
+    .inputfile {
+      display: inline-block;
+      margin-top: var(--spacing-large);
+      width: var(--mobile-xs-width);
+      height: var(--row-height);
+      opacity: 0;
+      overflow: hidden;
+      z-index: 200;
+    }
+
+    .inputfile + label {
+      display: inline-block;
+      position: absolute;
+      top: -6px;
+      left: 0;
+      padding: var(--spacing-medium) var(--spacing-large) var(--spacing-medium)
+        calc(2 * (var(--spacing-extra-large)));
+      font-size: var(--font-size-body);
+      color: var(--color-font-primary);
+      background-color: var(--color-primary);
+      border: 1px solid var(--color-primary);
+      border-radius: var(--border-radius);
+      width: 200px;
+      z-index: -1;
+    }
+
+    .inputfile:focus + label,
+    .inputfile.has-focus + label,
+    .inputfile:hover + label,
+    .inputfile + label:hover {
+      background-color: var(--color-primary-darker);
+      top: -5px;
+      transition: all 0.3s, background-color 0.3s;
+    }
+
+    .inputfile + label *[class*='icons'] {
+      width: 1.3em;
+      height: 1em;
+      vertical-align: middle;
+      color: white;
+      margin-top: -0.15em;
+    }
+
+    .inputfile + label {
+      cursor: pointer; /* "hand" cursor */
+    }
+
+    .inputfile:focus + label {
+      outline: 2px solid orange;
+      outline: -webkit-focus-ring-color auto 5px;
+    }
+  }
+
+  .close .button--transparent {
+    color: var(--color-red);
+  }
+
+  .info-container {
+    display: none;
+  }
+
+  .fieldset-container {
+    display: flex;
+    box-sizing: border-box;
+    flex-direction: row;
+    justify-content: space-around;
+    border: 1px solid lightgray;
+    border-radius: 4px;
+    max-width: var(--mobile-xs-width);
+    height: 80px;
+    padding-top: var(--spacing-large);
+    margin-bottom: 20px;
+
+    .fieldset__content {
+      color: var(--color-mute);
+      width: 200px;
+
+      .upload-info {
+        display: inline-block;
+        font-family: var(--font-family-body);
+        font-size: var(--font-size-body);
+        color: var(--color-mute);
+        width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+        &__name {
+          color: var(--font-color-body);
+          font-weight: bold;
+        }
+      }
+    }
   }
 }

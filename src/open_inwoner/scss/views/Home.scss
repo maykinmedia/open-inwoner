@@ -5,7 +5,7 @@
     grid-template-columns: repeat(auto-fit, 228px);
 
     .card {
-      max-width: 360px;
+      max-width: var(--mobile-xs-width);
     }
   }
 }

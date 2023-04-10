@@ -77,6 +77,14 @@
       }
     }
   }
+  &__control
+    .label
+    .notifications__errors
+    .notification--warning
+    *[class*='icon'] {
+    position: static;
+    transform: translateY(-5px);
+  }
 
   &__control > .label .p:last-child {
     font-size: var(--font-size-body-small);
