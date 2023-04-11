@@ -380,18 +380,19 @@ class CaseDetailView(
             ).exists()
         )
 
+        case_type_config_description = ""
+        external_upload_enabled = False
+        external_upload_url = ""
+
         try:
-            ztc = ZaakTypeConfig.objects.filter_enabled_for_case_type(
-                case.zaaktype
-            ).get()
+            ztc = ZaakTypeConfig.objects.filter_case_type(case.zaaktype).get()
         except ObjectDoesNotExist:
-            external_upload_enabled = False
-            external_upload_url = ""
-            case_type_config_description = ""
+            pass
         else:
-            external_upload_enabled = True
-            external_upload_url = ztc.external_document_upload_url
             case_type_config_description = ztc.description
+            if ztc.document_upload_enabled and ztc.external_document_upload_url != "":
+                external_upload_url = ztc.external_document_upload_url
+                external_upload_enabled = True
 
         return {
             "case_type_config_description": case_type_config_description,
