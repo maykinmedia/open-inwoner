@@ -123,6 +123,23 @@ class ProfileViewTests(WebTest):
         self.assertEquals(response.status_code, 302)
         self.assertEquals(response.url, reverse("digid:logout"))
 
+    def test_get_documents_sorted(self):
+        """
+        check that the new document is shown first
+        """
+        doc_old = DocumentFactory.create(name="some-old", owner=self.user)
+        doc_new = DocumentFactory.create(name="some-new", owner=self.user)
+
+        response = self.app.get(self.url, user=self.user)
+        self.assertEquals(response.status_code, 200)
+
+        file_tags = response.html.find(class_="file-list").find_all(
+            class_="file-list__list-item"
+        )
+        self.assertEquals(len(file_tags), 2)
+        self.assertTrue(doc_new.name in file_tags[0].prettify())
+        self.assertTrue(doc_old.name in file_tags[1].prettify())
+
     def test_mydata_shown_with_digid_and_brp(self):
         user = UserFactory(
             bsn="999993847",
