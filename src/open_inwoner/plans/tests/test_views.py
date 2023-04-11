@@ -83,10 +83,12 @@ class PlanViewTests(WebTest):
         form["plan_contacts"] = [self.contact]
         response = form.submit()
         created_plan = Plan.objects.last()
+
         self.assertIn(self.user, created_plan.plan_contacts.all())
         self.assertEqual(created_plan.created_by, self.user)
 
         contact = PlanContact.objects.filter(plan=created_plan)[0]
+
         self.assertEqual(contact.user, self.user)
         self.assertEqual(contact.notify_new, True)
 
