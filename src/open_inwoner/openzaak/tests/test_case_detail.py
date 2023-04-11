@@ -601,12 +601,21 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
     def test_case_type_config_description_is_rendered_when_internal_upload(self, m):
         self._setUpMocks(m)
 
+        catalogus = CatalogusConfigFactory(
+            url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+        )
         zaak_type_config = ZaakTypeConfigFactory(
-            catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            catalogus=catalogus,
             identificatie=self.zaaktype["identificatie"],
-            external_document_upload_url="https://test.example.com",
-            document_upload_enabled=True,
+            document_upload_enabled=False,
             description="some description content",
+        )
+
+        zaak_type_iot_config = ZaakTypeInformatieObjectTypeConfigFactory(
+            zaaktype_config=zaak_type_config,
+            informatieobjecttype_url=self.informatie_object_type["url"],
+            document_upload_enabled=True,
+            zaaktype_uuids=[self.zaaktype["uuid"]],
         )
 
         response = self.app.get(
