@@ -20,7 +20,11 @@ class DocumentPrivateMediaView(LogMixin, PrivateMediaView):
         if not self.request.user.is_authenticated:
             return False  # If user is not authenticated, the file is not visible
 
-        if self.request.user == object.owner or self.request.user.is_superuser:
+        if (
+            self.request.user == object.owner
+            or self.request.user.is_superuser
+            or (object.plan and self.request.user in object.plan.plan_contacts.all())
+        ):
             self.log_user_action(object, _("file was downloaded"))
             return True
 

@@ -5,19 +5,15 @@
     <h1 class="h1">{% trans "Samenwerken" %}</h1>
     {% optional_paragraph configurable_text.plans_page.plans_intro %}
 
-    {% render_form id="plan-form" form=form method="POST" %}
+    {% if request.user.get_active_contacts %}
+        {% render_form id="plan-form" form=form method="POST" %}
         {% csrf_token %}
         {% input form.title %}
         {% input form.goal %}
         {% input form.description %}
         {% render_grid %}
-            {% if request.user.get_active_contacts %}
-                {% checkboxes form.plan_contacts %}
-            {% else %}
-                {% url 'accounts:contact_create' as contact_create %}
-                {% link href=contact_create text=_("Maak je eerste contact aan voordat je een samenwerking start") icon="arrow_forward" icon_position="after" primary=True %}
-            {% endif %}
-            {% date_field form.end_date %}
+        {% checkboxes form.plan_contacts %}    
+        {% date_field form.end_date %}
         {% endrender_grid %}
 
         <div class="">
@@ -73,4 +69,10 @@
         </div>
         {% form_actions primary_text=_("Verzenden") primary_icon="arrow_forward" %}
     {% endrender_form %}
+    {% else %}
+        <div class="p">
+            {% url 'accounts:contact_create' as contact_create %}
+            {% link href=contact_create text=_("Maak je eerste contact aan voordat je een samenwerking start") icon="arrow_forward" icon_position="after" primary=True %}
+        </div>
+    {% endif %}
 {% endblock %}

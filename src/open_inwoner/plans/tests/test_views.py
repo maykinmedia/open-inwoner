@@ -11,7 +11,11 @@ from webtest import Upload
 
 from open_inwoner.accounts.choices import ContactTypeChoices, StatusChoices
 from open_inwoner.accounts.models import Action
-from open_inwoner.accounts.tests.factories import ActionFactory, UserFactory
+from open_inwoner.accounts.tests.factories import (
+    ActionFactory,
+    DocumentFactory,
+    UserFactory,
+)
 from open_inwoner.accounts.tests.test_action_views import ActionsPlaywrightTests
 from open_inwoner.utils.tests.playwright import multi_browser
 
@@ -76,12 +80,13 @@ class PlanViewTests(WebTest):
         form["title"] = plan.title
         form["goal"] = plan.goal
         form["end_date"] = plan.end_date
+        form["plan_contacts"] = [self.contact]
         response = form.submit()
-        created_plan = Plan.objects.get(title=plan.title)
-        self.assertEqual(created_plan.plan_contacts.get(), self.user)
+        created_plan = Plan.objects.last()
+        self.assertIn(self.user, created_plan.plan_contacts.all())
         self.assertEqual(created_plan.created_by, self.user)
 
-        contact = PlanContact.objects.get(plan=created_plan)
+        contact = PlanContact.objects.filter(plan=created_plan)[0]
         self.assertEqual(contact.user, self.user)
         self.assertEqual(contact.notify_new, True)
 
@@ -221,6 +226,23 @@ class PlanViewTests(WebTest):
 
         self.assertEqual(self.plan.documents.count(), 1)
 
+    def test_plan_file_can_be_downloaded_by_contact(self):
+        doc = DocumentFactory(owner=self.user, plan=self.plan)
+        response = self.app.get(
+            reverse("accounts:documents_download", kwargs={"uuid": doc.uuid}),
+            user=self.contact,
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_plan_file_cannot_be_downloaded_by_non_contact(self):
+        doc = DocumentFactory(owner=self.user, plan=self.plan)
+        new_user = UserFactory()
+        self.app.get(
+            reverse("accounts:documents_download", kwargs={"uuid": doc.uuid}),
+            user=new_user,
+            status=403,
+        )
+
     def test_plan_file_add_contact_can_access(self):
         response = self.app.get(self.file_add_url, user=self.contact)
         self.assertEqual(response.status_code, 200)
@@ -280,9 +302,37 @@ class PlanViewTests(WebTest):
             {
                 "title": [_("This field is required.")],
                 "end_date": [_("This field is required.")],
-                "goal": [_("This field is required when not using a template")],
+                "__all__": [_("At least one collaborator is required for a plan.")],
             },
         )
+
+    def test_plan_create_fails_with_no_collaborators(self):
+        response = self.app.get(self.create_url, user=self.user)
+        form = response.forms["plan-form"]
+        form["title"] = "Plan"
+        form["goal"] = "Goal"
+        form["description"] = "Description"
+        form["end_date"] = "2022-01-01"
+        response = form.submit()
+
+        self.assertEqual(Plan.objects.count(), 1)
+        self.assertEqual(
+            response.context["form"].errors,
+            {"__all__": [_("At least one collaborator is required for a plan.")]},
+        )
+
+    def test_plan_create_contains_expected_contacts(self):
+        another_contact = UserFactory()
+        self.user.user_contacts.add(another_contact)
+        response = self.app.get(self.create_url, user=self.user)
+
+        rendered_contacts = response.pyquery("#plan-form .grid .form__grid-box")[
+            0
+        ].text_content()
+
+        self.assertNotIn(self.user.get_full_name(), rendered_contacts)
+        self.assertIn(self.contact.get_full_name(), rendered_contacts)
+        self.assertIn(another_contact.get_full_name(), rendered_contacts)
 
     def test_plan_create_plan(self):
         self.assertEqual(Plan.objects.count(), 1)
