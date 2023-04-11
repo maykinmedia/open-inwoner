@@ -37,7 +37,7 @@ django-view-breadcrumbs
 markdown
 django_better_admin_arrayfield
 humanfriendly
-git+https://github.com/maykinmedia/mail-editor.git@f99e5c4920a95cf9141a71230d7dfb9f03b84e36#egg=mail-editor
+git+https://github.com/maykinmedia/mail-editor.git@a5743ff0f997a91d8202015b79966533f014f5bd#egg=mail-editor
 fontawesomefree
 django-timeline-logger
 django-csp
@@ -48,6 +48,17 @@ django-htmx
 playwright
 django-yubin
 django-image-cropping
+
+# django cms
+django-cms
+djangocms-text-ckeditor
+djangocms-link
+djangocms-file
+djangocms-picture
+# djangocms-video
+# djangocms-googlemap
+# djangocms-snippet
+# djangocms-style
 
 # API libraries
 djangorestframework

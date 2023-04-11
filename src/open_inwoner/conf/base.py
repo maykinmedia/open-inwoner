@@ -1,7 +1,7 @@
 import os
 
-# Django-hijack (and Django-hijack-admin)
 from django.urls import reverse_lazy
+from django.utils.translation import ugettext_lazy as _
 
 import sentry_sdk
 
@@ -40,7 +40,11 @@ IS_HTTPS = config("IS_HTTPS", default=not DEBUG)
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
-LANGUAGE_CODE = "nl-nl"
+LANGUAGE_CODE = "nl"
+LANGUAGES = [
+    ("nl", _("Dutch")),
+]
+
 
 TIME_ZONE = "Europe/Amsterdam"  # note: this *may* affect the output of DRF datetimes
 
@@ -120,6 +124,22 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.flatpages",
     "django.forms",
+    # load user model before CMS
+    "open_inwoner.accounts",
+    # Django-CMS
+    "cms",
+    "menus",
+    "treebeard",
+    "sekizai",
+    "djangocms_admin_style",
+    "djangocms_text_ckeditor",
+    "djangocms_link",
+    "djangocms_file",
+    "djangocms_picture",
+    # 'djangocms_video',
+    # 'djangocms_googlemap',
+    # "djangocms_snippet",
+    # "djangocms_style",
     # Admin auth
     "django_otp",
     "django_otp.plugins.otp_static",
@@ -127,7 +147,7 @@ INSTALLED_APPS = [
     "two_factor",
     # Optional applications.
     "ordered_model",
-    "django_admin_index",
+    # "django_admin_index",
     "django.contrib.admin",
     "django.contrib.gis",
     # 'django.contrib.admindocs',
@@ -144,7 +164,6 @@ INSTALLED_APPS = [
     # "hijack.contrib.admin", # This should be imported but it causes an error. So now there are
     "hijack",
     "localflavor",
-    "treebeard",
     "easy_thumbnails",  # used by filer
     "image_cropping",
     "filer",
@@ -174,7 +193,6 @@ INSTALLED_APPS = [
     "django_yubin",
     "log_outgoing_requests",
     # Project applications.
-    "open_inwoner.accounts",
     "open_inwoner.components",
     "open_inwoner.ckeditor5",
     "open_inwoner.pdc",
@@ -207,6 +225,12 @@ MIDDLEWARE = [
     "axes.middleware.AxesMiddleware",
     "hijack.middleware.HijackUserMiddleware",
     "django_otp.middleware.OTPMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
+    "cms.middleware.user.CurrentUserMiddleware",
+    "cms.middleware.page.CurrentPageMiddleware",
+    "cms.middleware.toolbar.ToolbarMiddleware",
+    "cms.middleware.language.LanguageCookieMiddleware",
+    "cms.middleware.utils.ApphookReloadMiddleware",
     "django.contrib.flatpages.middleware.FlatpageFallbackMiddleware",
     "open_inwoner.extended_sessions.middleware.SessionTimeoutMiddleware",
     "open_inwoner.accounts.middleware.NecessaryFieldsMiddleware",
@@ -233,6 +257,9 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "open_inwoner.utils.context_processors.settings",
+                "sekizai.context_processors.sekizai",
+                "cms.context_processors.cms_settings",
+                "django.template.context_processors.i18n",
             ],
             "loaders": TEMPLATE_LOADERS,
         },
@@ -443,7 +470,8 @@ CSRF_FAILURE_VIEW = "open_inwoner.accounts.views.csrf_failure"
 if IS_HTTPS:
     SECURE_HSTS_SECONDS = 63072000
 
-X_FRAME_OPTIONS = "DENY"
+# X_FRAME_OPTIONS = "DENY"
+X_FRAME_OPTIONS = "SAMEORIGIN"
 
 #
 # FIXTURES
@@ -463,6 +491,44 @@ SHOW_ALERT = True
 # 3RD PARTY LIBRARY SETTINGS #
 #                            #
 ##############################
+
+#
+# Django CMS
+#
+CMS_TEMPLATES = [
+    ("cms/fullwidth.html", "Home page template"),
+]
+CMS_PLACEHOLDER_CONF = {
+    # TODO properly configure this based on actual available plugins
+    None: {
+        "plugins": ["TextPlugin"],
+        "excluded_plugins": ["InheritPlugin"],
+    },
+    "content": {
+        "plugins": ["TextPlugin", "PicturePlugin"],
+        "text_only_plugins": ["LinkPlugin"],
+        "name": _("Content"),
+        "language_fallback": True,
+        "default_plugins": [
+            {
+                "plugin_type": "TextPlugin",
+                "values": {
+                    "body": "<p>Lorem ipsum dolor sit amet...</p>",
+                },
+            },
+        ],
+        # "child_classes": {
+        #     "TextPlugin": ["PicturePlugin", "LinkPlugin"],
+        # },
+        # "parent_classes": {
+        #     "LinkPlugin": ["TextPlugin"],
+        # },
+    },
+    "fullwidth.html content": {
+        "plugins": ["TextPlugin", "PicturePlugin", "TeaserPlugin"],
+        "inherit": "content",
+    },
+}
 
 #
 # Django-Admin-Index
@@ -553,8 +619,11 @@ FILER_STORAGES = {
 from easy_thumbnails.conf import Settings as thumbnail_settings
 
 THUMBNAIL_PROCESSORS = (
+    "filer.thumbnail_processors.scale_and_crop_with_subject_location",
     "image_cropping.thumbnail_processors.crop_corners",
 ) + thumbnail_settings.THUMBNAIL_PROCESSORS
+
+THUMBNAIL_HIGH_RESOLUTION = True
 
 IMAGE_CROPPING_BACKEND = "image_cropping.backends.easy_thumbs.EasyThumbnailsBackend"
 IMAGE_CROPPING_JQUERY_URL = "/static/admin/js/vendor/jquery/jquery.min.js"

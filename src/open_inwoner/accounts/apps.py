@@ -1,12 +1,17 @@
 from io import StringIO
 
 from django.apps import AppConfig, apps
+from django.conf import settings
 from django.contrib.contenttypes.management import create_contenttypes
 from django.core.management import call_command
 from django.db.models.signals import post_migrate
 
 
 def update_admin_index(sender, **kwargs):
+    if "django_admin_index" not in settings.INSTALLED_APPS:
+        print("django_admin_index not installed, skipping update_admin_index()")
+        return
+
     from django_admin_index.models import AppGroup
 
     AppGroup.objects.all().delete()
