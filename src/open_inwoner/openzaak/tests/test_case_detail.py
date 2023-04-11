@@ -628,6 +628,38 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
 
         self.assertContains(response, _("some description content"))
 
+    def test_fixed_text_is_rendered_when_no_description_in_internal_upload(self, m):
+        self._setUpMocks(m)
+
+        catalogus = CatalogusConfigFactory(
+            url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+        )
+        zaak_type_config = ZaakTypeConfigFactory(
+            catalogus=catalogus,
+            identificatie=self.zaaktype["identificatie"],
+            document_upload_enabled=False,
+            description="",
+        )
+
+        zaak_type_iot_config = ZaakTypeInformatieObjectTypeConfigFactory(
+            zaaktype_config=zaak_type_config,
+            informatieobjecttype_url=self.informatie_object_type["url"],
+            document_upload_enabled=True,
+            zaaktype_uuids=[self.zaaktype["uuid"]],
+        )
+
+        response = self.app.get(
+            reverse(
+                "accounts:case_status",
+                kwargs={"object_id": self.zaak["uuid"]},
+            ),
+            user=self.user,
+        )
+
+        self.assertContains(
+            response, _("Grootte max. 50 MB, toegestane bestandsformaten")
+        )
+
     def test_upload_form_is_not_rendered_when_no_case_exists(self, m):
         self._setUpMocks(m)
 
@@ -843,6 +875,32 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         )
 
         self.assertContains(response, _("some description content"))
+
+    def test_fixed_text_is_rendered_when_no_description_in_external_upload(self, m):
+        self._setUpMocks(m)
+
+        zaak_type_config = ZaakTypeConfigFactory(
+            catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            identificatie=self.zaaktype["identificatie"],
+            external_document_upload_url="https://test.example.com",
+            document_upload_enabled=True,
+            description="",
+        )
+
+        response = self.app.get(
+            reverse(
+                "accounts:case_status",
+                kwargs={"object_id": self.zaak["uuid"]},
+            ),
+            user=self.user,
+        )
+
+        self.assertContains(
+            response,
+            _(
+                "By clicking the button below you can upload a document. This is an external link and you will be redirected to a different system."
+            ),
+        )
 
     def test_external_upload_section_is_not_rendered_when_upload_disabled(self, m):
         self._setUpMocks(m)
