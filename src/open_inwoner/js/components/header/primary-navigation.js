@@ -20,8 +20,8 @@ class PrimaryNavigation extends Component {
    */
   bindEvents() {
     this.node.addEventListener('focus', this.onFocus.bind(this))
-    // this.node.addEventListener('mouseenter', this.onHover.bind(this))
-    this.node.addEventListener('click', this.onHover.bind(this))
+    this.node.addEventListener('click', this.toggleDesktopNavOpen.bind(this))
+    // this.node.addEventListener('click', this.onHover.bind(this))
     window.addEventListener('keyup', this.onKeyUp.bind(this))
   }
 
@@ -37,8 +37,14 @@ class PrimaryNavigation extends Component {
    * Gets called when `node` receives focus.
    * Clears the dismissed state, (prevents overriding focus/hover).
    */
-  onHover() {
-    this.setState({ dismissed: false })
+  // onHover() {
+  //   this.setState({ dismissed: false })
+  // }
+  // + toggle nav
+  toggleDesktopNavOpen(event) {
+    event.preventDefault()
+    console.log("toggel navopen primary")
+    this.node.parentElement.classList.toggle('nav__list--open')
   }
 
   /**
@@ -48,7 +54,7 @@ class PrimaryNavigation extends Component {
    */
   onKeyUp(event) {
     if (event.key === 'Escape') {
-      if (this.getFocussedChild() || this.getHoveredChild()) {
+      if (this.getFocussedChild()) {
         this.setState({ dismissed: true })
       }
     }
@@ -66,9 +72,9 @@ class PrimaryNavigation extends Component {
    * Returns the hovered child node (if any).
    * @return {HTMLElement|null}
    */
-  getHoveredChild() {
-    return this.node.querySelector('nav__list--open') || null
-  }
+  // getHoveredChild() {
+  //   return this.node.querySelector('nav__list--open') || null
+  // }
 
   /**
    * Persists state to DOM.
@@ -80,6 +86,7 @@ class PrimaryNavigation extends Component {
 
     if (state.dismissed) {
       this.getFocussedChild().blur()
+      return this.node.querySelector('nav__list--open') || null
     }
   }
 }
