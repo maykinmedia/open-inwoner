@@ -42,14 +42,6 @@
 
   &--secondary {
     color: var(--color-secondary);
-    display: inline-block;
-
-    &:after {
-      content: '';
-      border-bottom: 1px solid var(--color-secondary);
-      width: 100%;
-      display: block;
-    }
   }
 
   &--active {
