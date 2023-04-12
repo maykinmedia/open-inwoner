@@ -166,6 +166,18 @@ class ProfileViewTests(WebTest):
         response = self.app.get(self.url, user=self.user)
         self.assertNotContains(response, _("Mijn gegevens"))
 
+    def test_active_user_notifications_are_shown(self):
+        response = self.app.get(self.url, user=self.user)
+        self.assertContains(response, _("messages, plans"))
+
+    def test_expected_message_is_shown_when_all_notifications_disabled(self):
+        self.user.cases_notifications = False
+        self.user.messages_notifications = False
+        self.user.plans_notifications = False
+        self.user.save()
+        response = self.app.get(self.url, user=self.user)
+        self.assertContains(response, _("You do not have any notifications enabled."))
+
 
 class EditProfileTests(WebTest):
     def setUp(self):
@@ -537,6 +549,48 @@ class EditIntrestsTests(WebTest):
         self.assertTrue(form.get("selected_categories", index=0).checked)
         self.assertFalse(form.get("selected_categories", index=1).checked)
         self.assertFalse(form.get("selected_categories", index=2).checked)
+
+
+class EditNotificationsTests(WebTest):
+    def setUp(self):
+        self.url = reverse("accounts:my_notifications")
+        self.user = UserFactory()
+
+    def test_login_required(self):
+        login_url = reverse("login")
+        response = self.app.get(self.url)
+
+        self.assertRedirects(response, f"{login_url}?next={self.url}")
+
+    def test_default_values_for_regular_user(self):
+        response = self.app.get(self.url, user=self.user)
+        form = response.forms["change-notifications"]
+
+        self.assertTrue(form.get("messages_notifications").checked)
+        self.assertTrue(form.get("plans_notifications").checked)
+        self.assertNotIn("cases_notifications", form.fields)
+
+    def test_disabling_notification_is_saved(self):
+        self.assertTrue(self.user.messages_notifications)
+
+        response = self.app.get(self.url, user=self.user)
+        form = response.forms["change-notifications"]
+        form["messages_notifications"] = False
+        form.submit()
+
+        self.user.refresh_from_db()
+
+        self.assertTrue(self.user.cases_notifications)
+        self.assertFalse(self.user.messages_notifications)
+        self.assertTrue(self.user.plans_notifications)
+
+    def test_cases_notifications_is_accessible_when_digid_user(self):
+        self.user.login_type = LoginTypeChoices.digid
+        self.user.save()
+        response = self.app.get(self.url, user=self.user)
+        form = response.forms["change-notifications"]
+
+        self.assertIn("cases_notifications", form.fields)
 
 
 class ExportProfileTests(WebTest):

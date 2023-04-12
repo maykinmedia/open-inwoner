@@ -91,7 +91,7 @@ def handle_zaken_notification(notification: Notification):
     inform_users = get_emailable_initiator_users_from_roles(roles)
     if not inform_users:
         log_system_action(
-            f"ignored {r} notification: no users with bsn and valid email as (mede)initiators in case {case_url}",
+            f"ignored {r} notification: no users with bsn, valid email or with enabled notifications as (mede)initiators in case {case_url}",
             log_level=logging.INFO,
         )
         return
@@ -384,6 +384,8 @@ def get_emailable_initiator_users_from_roles(roles: List[Rol]) -> List[User]:
     if not bsn_list:
         return []
     users = list(
-        User.objects.filter(bsn__in=bsn_list, is_active=True).having_usable_email()
+        User.objects.filter(
+            bsn__in=bsn_list, is_active=True, cases_notifications=True
+        ).having_usable_email()
     )
     return users

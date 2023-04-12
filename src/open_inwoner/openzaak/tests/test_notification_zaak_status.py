@@ -108,7 +108,22 @@ class StatusNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            "ignored status notification: no users with bsn and valid email as (mede)initiators in case https://",
+            "ignored status notification: no users with bsn, valid email or with enabled notifications as (mede)initiators in case https://",
+            lookup=Lookups.startswith,
+            level=logging.INFO,
+        )
+
+    def test_zio_bails_when_user_notifications_disabled(self, m, mock_handle: Mock):
+        data = MockAPIData()
+        data.user_initiator.cases_notifications = False
+        data.user_initiator.save()
+        data.install_mocks(m)
+
+        handle_zaken_notification(data.zio_notification)
+
+        mock_handle.assert_not_called()
+        self.assertTimelineLog(
+            "ignored zaakinformatieobject notification: no users with bsn, valid email or with enabled notifications as (mede)initiators in case https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )

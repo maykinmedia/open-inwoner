@@ -113,6 +113,27 @@ class TestProfile(WebTest):
             },
         )
 
+    def test_user_notifications_update_is_logged(self):
+        form = self.app.get(reverse("accounts:my_notifications"), user=self.user).forms[
+            "change-notifications"
+        ]
+        form["messages_notifications"] = False
+        form.submit()
+        log_entry = TimelineLog.objects.last()
+
+        self.assertEqual(
+            log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
+        )
+        self.assertEqual(log_entry.content_object.id, self.user.id)
+        self.assertEqual(
+            log_entry.extra_data,
+            {
+                "message": _("users notifications were modified"),
+                "action_flag": list(LOG_ACTIONS[CHANGE]),
+                "content_object_repr": self.user.email,
+            },
+        )
+
     def test_login_via_admin_is_logged(self):
         self.app.post(reverse("admin:login"), user=self.user)
         log_entry = TimelineLog.objects.get()

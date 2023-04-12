@@ -24,7 +24,7 @@ from open_inwoner.questionnaire.models import QuestionnaireStep
 from open_inwoner.utils.mixins import ExportMixin
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
-from ..forms import BrpUserForm, CategoriesForm, UserForm
+from ..forms import BrpUserForm, CategoriesForm, UserForm, UserNotificationsForm
 from ..models import Action, User
 
 
@@ -226,6 +226,36 @@ class MyDataView(
                 my_data["birthday"] = None
 
         return my_data
+
+
+class MyNotificationsView(
+    LogMixin, LoginRequiredMixin, CommonPageMixin, BaseBreadcrumbMixin, UpdateView
+):
+    template_name = "pages/profile/notifications.html"
+    model = User
+    form_class = UserNotificationsForm
+    success_url = reverse_lazy("accounts:my_profile")
+
+    @cached_property
+    def crumbs(self):
+        return [
+            (_("Mijn profiel"), reverse("accounts:my_profile")),
+            (_("Mijn notificaties"), reverse("accounts:my_notifications")),
+        ]
+
+    def get_object(self):
+        return self.request.user
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
+
+    def form_valid(self, form):
+        form.save()
+
+        self.log_change(self.object, _("users notifications were modified"))
+        return HttpResponseRedirect(self.get_success_url())
 
 
 class MyProfileExportView(LogMixin, LoginRequiredMixin, ExportMixin, DetailView):

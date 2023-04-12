@@ -101,6 +101,17 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
             },
         ),
         (
+            _("Notifications"),
+            {
+                "classes": ("collapse",),
+                "fields": (
+                    "cases_notifications",
+                    "messages_notifications",
+                    "plans_notifications",
+                ),
+            },
+        ),
+        (
             _("Contacts - invites"),
             {"fields": ("user_contacts", "contacts_for_approval")},
         ),

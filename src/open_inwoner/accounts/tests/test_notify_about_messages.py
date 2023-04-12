@@ -31,6 +31,21 @@ class NotifyComandTests(TestCase):
             message.refresh_from_db()
             self.assertTrue(message.sent)
 
+    def test_no_notification_about_received_message_when_disabled_by_user(self):
+        user = UserFactory(messages_notifications=False)
+        sender = UserFactory()
+        message = MessageFactory.create(receiver=user, sender=sender)
+
+        self.assertFalse(message.sent)
+
+        call_command("notify_about_messages")
+
+        self.assertEqual(len(mail.outbox), 0)
+
+        message.refresh_from_db()
+
+        self.assertFalse(message.sent)
+
     def test_seen_message(self):
         user = UserFactory.create()
 

@@ -1,0 +1,14 @@
+{% extends 'master.html' %}
+{% load i18n l10n form_tags %}
+
+{% block content %}
+<h1 class="h1" id="title">
+    {% trans "Mijn notificaties" %}
+</h1>
+<p class="p">
+    {% trans "Select for which categories you would like to receive notifications" %}
+</p>
+
+{% form form_object=form method="POST" id="change-notifications" submit_text=_("Opslaan") secondary_href='accounts:my_profile' secondary_text=_('Terug') secondary_icon='arrow_backward' secondary_icon_position="before" %}
+
+{% endblock content %}

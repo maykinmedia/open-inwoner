@@ -193,6 +193,22 @@ class CategoriesForm(forms.ModelForm):
         self.fields["selected_categories"].queryset = Category.objects.published()
 
 
+class UserNotificationsForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = (
+            "cases_notifications",
+            "messages_notifications",
+            "plans_notifications",
+        )
+
+    def __init__(self, user, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+        if not user.login_type == LoginTypeChoices.digid:
+            del self.fields["cases_notifications"]
+
+
 class ContactFilterForm(forms.Form):
     type = forms.ChoiceField(
         label=_("Type contact"), choices=EmptyContactTypeChoices.choices, required=False
