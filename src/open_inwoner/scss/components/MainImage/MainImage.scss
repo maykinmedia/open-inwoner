@@ -12,7 +12,7 @@ $image-height: 261px;
   @media (min-width: 768px) {
     aspect-ratio: 64 / 13;
     position: relative;
-    top: calc(-1 * var(--row-height));
+    top: 0;
   }
 
   &.main-image--start-after ~ .container {

@@ -83,10 +83,12 @@ class HomeView(CommonPageMixin, TemplateView):
         )
         if (
             self.request.user.is_authenticated
-            and self.request.user.selected_themes.exists()
+            and self.request.user.selected_categories.exists()
         ):
             kwargs.update(
-                categories=self.request.user.selected_themes.order_by("name")[:limit]
+                categories=self.request.user.selected_categories.order_by("name")[
+                    :limit
+                ]
             )
         elif highlighted_categories:
             kwargs.update(categories=highlighted_categories)
@@ -139,7 +141,7 @@ class CategoryDetailView(
 
     @cached_property
     def crumbs(self):
-        base_list = [(_("Thema's"), reverse("pdc:category_list"))]
+        base_list = [(_("Onderwerpen"), reverse("pdc:category_list"))]
         return base_list + self.get_categories_breadcrumbs()
 
     def get_object(self, queryset=None):
@@ -182,8 +184,8 @@ class ProductDetailView(
 
     @cached_property
     def crumbs(self):
-        base_list = [(_("Thema's"), reverse("pdc:category_list"))]
-        base_list += self.get_categories_breadcrumbs(slug_name="theme_slug")
+        base_list = [(_("Onderwerpen"), reverse("pdc:category_list"))]
+        base_list += self.get_categories_breadcrumbs(slug_name="category_slug")
         return base_list + [(self.get_object().name, self.request.path)]
 
     def get_context_data(self, **kwargs):
@@ -226,8 +228,8 @@ class ProductFormView(
 
     @cached_property
     def crumbs(self):
-        base_list = [(_("Thema's"), reverse("pdc:category_list"))]
-        base_list += self.get_categories_breadcrumbs(slug_name="theme_slug")
+        base_list = [(_("Onderwerpen"), reverse("pdc:category_list"))]
+        base_list += self.get_categories_breadcrumbs(slug_name="category_slug")
         return base_list + [
             (self.get_object().name, self.get_object().get_absolute_url()),
             (_("Formulier"), self.request.path),

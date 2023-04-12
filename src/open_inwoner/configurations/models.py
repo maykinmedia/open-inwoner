@@ -105,25 +105,25 @@ class SiteConfiguration(SingletonModel):
     )
     home_theme_title = models.CharField(
         max_length=255,
-        default=_("Thema's"),
+        default=_("Onderwerpen"),
         verbose_name=_("Home theme's title"),
-        help_text=_("Theme's title on the home page."),
+        help_text=_("Category's title on the home page."),
     )
     home_theme_intro = models.TextField(
         verbose_name=_("Home theme's intro"),
         blank=True,
-        help_text=_("Theme's intro text on the home page."),
+        help_text=_("Category's intro text on the home page."),
     )
     theme_title = models.CharField(
         max_length=255,
-        default=_("Thema's"),
-        verbose_name=_("Theme's title"),
-        help_text=_("Theme's title on the theme's page."),
+        default=_("Onderwerpen"),
+        verbose_name=_("Category's title"),
+        help_text=_("Category's title on the theme's page."),
     )
     theme_intro = models.TextField(
-        verbose_name=_("Theme's intro"),
+        verbose_name=_("Category's intro"),
         blank=True,
-        help_text=_("Theme's intro text on the theme's page."),
+        help_text=_("Category's intro text on the theme's page."),
     )
     home_map_title = models.CharField(
         max_length=255,
@@ -285,7 +285,7 @@ class SiteConfiguration(SingletonModel):
     home_help_text = models.TextField(
         blank=True,
         default=_(
-            "Welkom! Op dit scherm vindt u een overzicht van de verschillende thema's en producten & diensten."
+            "Welkom! Op dit scherm vindt u een overzicht van de verschillende onderwerpen en producten & diensten."
         ),
         verbose_name=_("Home help"),
         help_text=_("The help text for the home page."),
@@ -293,9 +293,9 @@ class SiteConfiguration(SingletonModel):
     theme_help_text = models.TextField(
         blank=True,
         default=_(
-            "Op dit scherm vindt u de verschillende thema's waarvoor wij producten en diensten aanbieden."
+            "Op dit scherm vindt u de verschillende onderwerpen waarvoor wij producten en diensten aanbieden."
         ),
-        verbose_name=_("Theme help"),
+        verbose_name=_("Category help"),
         help_text=_("The help text for the theme page."),
     )
     product_help_text = models.TextField(

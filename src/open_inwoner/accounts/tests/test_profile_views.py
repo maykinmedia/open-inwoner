@@ -61,7 +61,7 @@ class ProfileViewTests(WebTest):
         contact = UserFactory()
         self.user.user_contacts.add(contact)
         category = CategoryFactory()
-        self.user.selected_themes.add(category)
+        self.user.selected_categories.add(category)
         QuestionnaireStepFactory(published=True)
 
         response = self.app.get(self.url, user=self.user)
@@ -519,7 +519,7 @@ class MyDataTests(HaalCentraalMixin, WebTest):
 
 class EditIntrestsTests(WebTest):
     def setUp(self):
-        self.url = reverse("accounts:my_themes")
+        self.url = reverse("accounts:my_categories")
         self.user = UserFactory()
 
     def test_login_required(self):
@@ -531,12 +531,12 @@ class EditIntrestsTests(WebTest):
         category = CategoryFactory(name="a")
         CategoryFactory(name="b")
         CategoryFactory(name="c")
-        self.user.selected_themes.add(category)
+        self.user.selected_categories.add(category)
         response = self.app.get(self.url, user=self.user)
-        form = response.forms["change-themes"]
-        self.assertTrue(form.get("selected_themes", index=0).checked)
-        self.assertFalse(form.get("selected_themes", index=1).checked)
-        self.assertFalse(form.get("selected_themes", index=2).checked)
+        form = response.forms["change-categories"]
+        self.assertTrue(form.get("selected_categories", index=0).checked)
+        self.assertFalse(form.get("selected_categories", index=1).checked)
+        self.assertFalse(form.get("selected_categories", index=2).checked)
 
 
 class ExportProfileTests(WebTest):

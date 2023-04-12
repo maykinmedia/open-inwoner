@@ -101,7 +101,6 @@ class TestCaseTable(InclusionTagWebTest):
     args = {
         "case": {
             "initiator": "Case initiator",
-            "type_description": "Case description",
             "result": "Case result",
             "end_date": "Case end date",
             "end_date_planned": "Case end date planned",
@@ -118,36 +117,29 @@ class TestCaseTable(InclusionTagWebTest):
         )
 
         self.assertTextContent(
-            ".table__row:nth-child(2) .table__header", "Type", self.args
+            ".table__row:nth-child(2) .table__header", "Resultaat", self.args
         )
         self.assertTextContent(
-            ".table__row:nth-child(2) .table__item", "Case description", self.args
-        )
-
-        self.assertTextContent(
-            ".table__row:nth-child(3) .table__header", "Resultaat", self.args
-        )
-        self.assertTextContent(
-            ".table__row:nth-child(3) .table__item", "Case result", self.args
+            ".table__row:nth-child(2) .table__item", "Case result", self.args
         )
 
         self.assertTextContent(
-            ".table__row:nth-child(4) .table__header", "Einddatum", self.args
+            ".table__row:nth-child(3) .table__header", "Einddatum", self.args
         )
         self.assertTextContent(
-            ".table__row:nth-child(4) .table__item", "Case end date", self.args
-        )
-
-        self.assertTextContent(
-            ".table__row:nth-child(5) .table__header", "Verwachte einddatum", self.args
-        )
-        self.assertTextContent(
-            ".table__row:nth-child(5) .table__item", "Case end date planned", self.args
+            ".table__row:nth-child(3) .table__item", "Case end date", self.args
         )
 
         self.assertTextContent(
-            ".table__row:nth-child(6) .table__header", "Wettelijke termijn", self.args
+            ".table__row:nth-child(4) .table__header", "Verwachte einddatum", self.args
         )
         self.assertTextContent(
-            ".table__row:nth-child(6) .table__item", "Case end date legal", self.args
+            ".table__row:nth-child(4) .table__item", "Case end date planned", self.args
+        )
+
+        self.assertTextContent(
+            ".table__row:nth-child(5) .table__header", "Wettelijke termijn", self.args
+        )
+        self.assertTextContent(
+            ".table__row:nth-child(5) .table__item", "Case end date legal", self.args
         )

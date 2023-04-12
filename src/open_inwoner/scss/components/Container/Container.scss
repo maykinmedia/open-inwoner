@@ -1,5 +1,5 @@
 .container {
-  margin: var(--row-height) var(--spacing-large) var(--row-height)
+  margin: var(--spacing-extra-large) var(--spacing-large) var(--row-height)
     var(--spacing-large);
   min-height: calc(
     100vh - var(--header-height) - calc(var(--row-height) * 3) - 400px
@@ -15,7 +15,7 @@
 
   @media (min-width: 768px) {
     $hm: max(calc((100vw - var(--container-width)) / 2), var(--spacing-large));
-    margin: var(--row-height) $hm calc(var(--row-height) * 2);
+    margin: var(--spacing-extra-large) $hm calc(var(--row-height) * 2);
 
     &--no-margin {
       min-height: 0;

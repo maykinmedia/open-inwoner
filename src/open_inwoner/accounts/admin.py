@@ -81,7 +81,7 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
                     "postcode",
                     "city",
                     "phonenumber",
-                    "selected_themes",
+                    "selected_categories",
                 )
             },
         ),

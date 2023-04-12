@@ -31,7 +31,7 @@ from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 from ..api_models import Status, StatusType
 from ..models import OpenZaakConfig
 from ..utils import format_zaak_identificatie
-from .factories import ServiceFactory
+from .factories import CatalogusConfigFactory, ServiceFactory
 from .shared import CATALOGI_ROOT, DOCUMENTEN_ROOT, ZAKEN_ROOT
 
 
@@ -143,6 +143,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
             "schemas/StatusType",
             url=cls.status_new["statustype"],
             zaaktype=cls.zaaktype["url"],
+            catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             omschrijving="Initial request",
             omschrijvingGeneriek="some content",
             statustekst="",
@@ -154,6 +155,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
             "schemas/StatusType",
             url=cls.status_finish["statustype"],
             zaaktype=cls.zaaktype["url"],
+            catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             omschrijving="Finish",
             omschrijvingGeneriek="some content",
             statustekst="",
@@ -209,6 +211,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
             "ztc",
             "schemas/InformatieObjectType",
             url=f"{CATALOGI_ROOT}informatieobjecttype/014c38fe-b010-4412-881c-3000032fb321",
+            catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             omschrijving="Some content",
         )
         cls.zaaktype_informatie_object_type = generate_oas_component(
@@ -216,6 +219,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
             "schemas/ZaakTypeInformatieObjectType",
             uuid="3fb03882-f6f9-4e0d-ad92-f810e24b9abb",
             url=f"{CATALOGI_ROOT}zaaktype-informatieobjecttypen/93250e6d-ef92-4474-acca-a6dbdcd61b7e",
+            catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             zaaktype=cls.zaaktype["url"],
             informatieobjecttype=cls.informatie_object_type["url"],
             volgnummer=1,
@@ -362,13 +366,13 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
                 "end_date_planned": datetime.date(2022, 1, 4),
                 "end_date_legal": datetime.date(2022, 1, 5),
                 "description": "Zaak naar aanleiding van ingezonden formulier",
-                "type_description": "Coffee zaaktype",
                 "current_status": "Finish",
                 "statuses": [status_new_obj, status_finish_obj],
                 # only one visible information object
                 "documents": [self.informatie_object_file],
                 "initiator": "Foo Bar van der Bazz",
                 "result": "resultaat toelichting",
+                "case_type_config_description": "",
                 "internal_upload_enabled": False,
                 "external_upload_enabled": False,
                 "external_upload_url": "",
@@ -383,7 +387,6 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
 
         self.assertContains(response, "ZAAK-2022-0000000024")
         self.assertContains(response, "Zaak naar aanleiding van ingezonden formulier")
-        self.assertContains(response, "Coffee zaaktype")
         self.assertContains(response, "Finish")
         self.assertContains(response, "document")
         self.assertContains(response, "Foo Bar van der Bazz")
@@ -535,7 +538,8 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         self._setUpMocks(m)
 
         zaak_type_config = ZaakTypeConfigFactory(
-            identificatie=self.zaaktype["identificatie"]
+            catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            identificatie=self.zaaktype["identificatie"],
         )
         zaak_type_iotc = ZaakTypeInformatieObjectTypeConfigFactory(
             zaaktype_config=zaak_type_config,
@@ -562,7 +566,8 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         self._setUpMocks(m)
 
         zaak_type_config = ZaakTypeConfigFactory(
-            identificatie=self.zaaktype["identificatie"]
+            catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            identificatie=self.zaaktype["identificatie"],
         )
         zaak_type_iotc1 = ZaakTypeInformatieObjectTypeConfigFactory(
             zaaktype_config=zaak_type_config,
@@ -592,6 +597,68 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         ]
 
         self.assertEqual(sorted(type_field.options), sorted(expected_choices))
+
+    def test_case_type_config_description_is_rendered_when_internal_upload(self, m):
+        self._setUpMocks(m)
+
+        catalogus = CatalogusConfigFactory(
+            url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+        )
+        zaak_type_config = ZaakTypeConfigFactory(
+            catalogus=catalogus,
+            identificatie=self.zaaktype["identificatie"],
+            document_upload_enabled=False,
+            description="some description content",
+        )
+
+        zaak_type_iot_config = ZaakTypeInformatieObjectTypeConfigFactory(
+            zaaktype_config=zaak_type_config,
+            informatieobjecttype_url=self.informatie_object_type["url"],
+            document_upload_enabled=True,
+            zaaktype_uuids=[self.zaaktype["uuid"]],
+        )
+
+        response = self.app.get(
+            reverse(
+                "accounts:case_status",
+                kwargs={"object_id": self.zaak["uuid"]},
+            ),
+            user=self.user,
+        )
+
+        self.assertContains(response, _("some description content"))
+
+    def test_fixed_text_is_rendered_when_no_description_in_internal_upload(self, m):
+        self._setUpMocks(m)
+
+        catalogus = CatalogusConfigFactory(
+            url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+        )
+        zaak_type_config = ZaakTypeConfigFactory(
+            catalogus=catalogus,
+            identificatie=self.zaaktype["identificatie"],
+            document_upload_enabled=False,
+            description="",
+        )
+
+        zaak_type_iot_config = ZaakTypeInformatieObjectTypeConfigFactory(
+            zaaktype_config=zaak_type_config,
+            informatieobjecttype_url=self.informatie_object_type["url"],
+            document_upload_enabled=True,
+            zaaktype_uuids=[self.zaaktype["uuid"]],
+        )
+
+        response = self.app.get(
+            reverse(
+                "accounts:case_status",
+                kwargs={"object_id": self.zaak["uuid"]},
+            ),
+            user=self.user,
+        )
+
+        self.assertContains(
+            response, _("Grootte max. 50 MB, toegestane bestandsformaten")
+        )
 
     def test_upload_form_is_not_rendered_when_no_case_exists(self, m):
         self._setUpMocks(m)
@@ -627,7 +694,8 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         self._setUpMocks(m)
 
         zaak_type_config = ZaakTypeConfigFactory(
-            identificatie=self.zaaktype["identificatie"]
+            catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            identificatie=self.zaaktype["identificatie"],
         )
         zaak_type_iotc = ZaakTypeInformatieObjectTypeConfigFactory(
             zaaktype_config=zaak_type_config,
@@ -658,7 +726,8 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         self._setUpMocks(m)
 
         zaak_type_config = ZaakTypeConfigFactory(
-            identificatie=self.zaaktype["identificatie"]
+            catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            identificatie=self.zaaktype["identificatie"],
         )
         zaak_type_iotc = ZaakTypeInformatieObjectTypeConfigFactory(
             zaaktype_config=zaak_type_config,
@@ -687,7 +756,8 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         self._setUpMocks(m)
 
         zaak_type_config = ZaakTypeConfigFactory(
-            identificatie=self.zaaktype["identificatie"]
+            catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            identificatie=self.zaaktype["identificatie"],
         )
         zaak_type_iotc = ZaakTypeInformatieObjectTypeConfigFactory(
             zaaktype_config=zaak_type_config,
@@ -722,7 +792,8 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         self._setUpMocks(m)
 
         zaak_type_config = ZaakTypeConfigFactory(
-            identificatie=self.zaaktype["identificatie"]
+            catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            identificatie=self.zaaktype["identificatie"],
         )
         zaak_type_iotc = ZaakTypeInformatieObjectTypeConfigFactory(
             zaaktype_config=zaak_type_config,
@@ -764,6 +835,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         self._setUpMocks(m)
 
         zaak_type_config = ZaakTypeConfigFactory(
+            catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             identificatie=self.zaaktype["identificatie"],
             external_document_upload_url="https://test.example.com",
             document_upload_enabled=True,
@@ -783,10 +855,58 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         )
         self.assertContains(response, zaak_type_config.external_document_upload_url)
 
+    def test_case_type_config_description_is_rendered_when_external_upload(self, m):
+        self._setUpMocks(m)
+
+        zaak_type_config = ZaakTypeConfigFactory(
+            catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            identificatie=self.zaaktype["identificatie"],
+            external_document_upload_url="https://test.example.com",
+            document_upload_enabled=True,
+            description="some description content",
+        )
+
+        response = self.app.get(
+            reverse(
+                "accounts:case_status",
+                kwargs={"object_id": self.zaak["uuid"]},
+            ),
+            user=self.user,
+        )
+
+        self.assertContains(response, _("some description content"))
+
+    def test_fixed_text_is_rendered_when_no_description_in_external_upload(self, m):
+        self._setUpMocks(m)
+
+        zaak_type_config = ZaakTypeConfigFactory(
+            catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            identificatie=self.zaaktype["identificatie"],
+            external_document_upload_url="https://test.example.com",
+            document_upload_enabled=True,
+            description="",
+        )
+
+        response = self.app.get(
+            reverse(
+                "accounts:case_status",
+                kwargs={"object_id": self.zaak["uuid"]},
+            ),
+            user=self.user,
+        )
+
+        self.assertContains(
+            response,
+            _(
+                "By clicking the button below you can upload a document. This is an external link and you will be redirected to a different system."
+            ),
+        )
+
     def test_external_upload_section_is_not_rendered_when_upload_disabled(self, m):
         self._setUpMocks(m)
 
         zaak_type_config = ZaakTypeConfigFactory(
+            catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             identificatie=self.zaaktype["identificatie"],
             external_document_upload_url="https://test.example.com",
         )
@@ -808,6 +928,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         self._setUpMocks(m)
 
         ZaakTypeConfigFactory(
+            catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             identificatie=self.zaaktype["identificatie"],
             external_document_upload_url="",
             document_upload_enabled=True,
@@ -831,6 +952,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         self._setUpMocks(m)
 
         ZaakTypeConfigFactory(
+            catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             identificatie=self.zaaktype["identificatie"],
             external_document_upload_url="",
         )
@@ -851,7 +973,8 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         self._setUpMocks(m)
 
         zaak_type_config = ZaakTypeConfigFactory(
-            identificatie=self.zaaktype["identificatie"]
+            catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            identificatie=self.zaaktype["identificatie"],
         )
         ZaakTypeInformatieObjectTypeConfigFactory(
             zaaktype_config=zaak_type_config,
@@ -881,7 +1004,8 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         self._setUpMocks(m)
 
         zaak_type_config = ZaakTypeConfigFactory(
-            identificatie=self.zaaktype["identificatie"]
+            catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            identificatie=self.zaaktype["identificatie"],
         )
         ZaakTypeInformatieObjectTypeConfigFactory(
             zaaktype_config=zaak_type_config,

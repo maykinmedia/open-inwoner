@@ -4,7 +4,7 @@ from typing import List, Optional
 
 from django.contrib import messages
 from django.contrib.auth.mixins import AccessMixin
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.http import Http404, HttpResponseRedirect, StreamingHttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -168,8 +168,11 @@ class CaseListMixin(CaseLogMixin, PaginationMixin):
                 "uuid": str(case.uuid),
                 "start_date": case.startdatum,
                 "end_date": getattr(case, "einddatum", None),
-                "description": case.omschrijving,
-                "zaaktype_description": case.zaaktype.omschrijving,
+                "description": (
+                    case.omschrijving
+                    if case.omschrijving
+                    else case.zaaktype.omschrijving
+                ),
                 "current_status": glom(
                     case, "status.statustype.omschrijving", default=""
                 ),
@@ -347,8 +350,11 @@ class CaseDetailView(
                 "end_date_legal": getattr(
                     self.case, "uiterlijke_einddatum_afdoening", None
                 ),
-                "description": self.case.omschrijving,
-                "type_description": self.case.zaaktype.omschrijving,
+                "description": (
+                    self.case.omschrijving
+                    if self.case.omschrijving
+                    else self.case.zaaktype.omschrijving
+                ),
                 "current_status": glom(
                     self.case,
                     "status.statustype.omschrijving",
@@ -365,28 +371,31 @@ class CaseDetailView(
         return context
 
     def get_upload_info_context(self, case: Zaak):
-        internal_upload_enabled = ZaakTypeInformatieObjectTypeConfig.objects.get_visible_ztiot_configs_for_case(
-            case
-        ).exists()
+        if not case:
+            return {}
 
-        external_upload_enabled = (
-            ZaakTypeConfig.objects.get_visible_zt_configs_for_case_type_identification(
-                case.zaaktype.identificatie
+        internal_upload_enabled = (
+            ZaakTypeInformatieObjectTypeConfig.objects.filter_enabled_for_case_type(
+                case.zaaktype
             ).exists()
         )
 
-        if external_upload_enabled:
-            external_upload_url = (
-                ZaakTypeConfig.objects.get_visible_zt_configs_for_case_type_identification(
-                    case.zaaktype.identificatie
-                )
-                .get()
-                .external_document_upload_url
-            )
+        case_type_config_description = ""
+        external_upload_enabled = False
+        external_upload_url = ""
+
+        try:
+            ztc = ZaakTypeConfig.objects.filter_case_type(case.zaaktype).get()
+        except ObjectDoesNotExist:
+            pass
         else:
-            external_upload_url = ""
+            case_type_config_description = ztc.description
+            if ztc.document_upload_enabled and ztc.external_document_upload_url != "":
+                external_upload_url = ztc.external_document_upload_url
+                external_upload_enabled = True
 
         return {
+            "case_type_config_description": case_type_config_description,
             "internal_upload_enabled": internal_upload_enabled,
             "external_upload_enabled": external_upload_enabled,
             "external_upload_url": external_upload_url,

@@ -195,8 +195,11 @@ class Product(models.Model):
         category_slug = category.get_build_slug()
         return reverse(
             "pdc:category_product_detail",
-            kwargs={"slug": self.slug, "theme_slug": category_slug},
+            kwargs={"slug": self.slug, "category_slug": category_slug},
         )
+
+    def has_cta_tag(self):
+        return "\[CTABUTTON\]" in self.content
 
 
 class ProductFile(models.Model):

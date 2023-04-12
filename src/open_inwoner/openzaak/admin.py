@@ -169,6 +169,7 @@ class ZaakTypeConfigAdmin(admin.ModelAdmin):
         "notify_status_changes",
         "document_upload_enabled",
         "external_document_upload_url",
+        "description",
     ]
     readonly_fields = [
         "catalogus",

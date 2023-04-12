@@ -12,14 +12,14 @@ from .views import (
 
 app_name = "pdc"
 urlpatterns = [
-    path("themas/", CategoryListView.as_view(), name="category_list"),
+    path("onderwerpen/", CategoryListView.as_view(), name="category_list"),
     re_path(
-        r"^themas/(?P<theme_slug>[\w\-\/]+)/products/(?P<slug>[\w\-]+)/$",
+        r"^onderwerpen/(?P<category_slug>[\w\-\/]+)/products/(?P<slug>[\w\-]+)/$",
         ProductDetailView.as_view(),
         name="category_product_detail",
     ),
     re_path(
-        r"^themas/(?P<slug>[\w\-\/]+)/$",
+        r"^onderwerpen/(?P<slug>[\w\-\/]+)/$",
         CategoryDetailView.as_view(),
         name="category_detail",
     ),

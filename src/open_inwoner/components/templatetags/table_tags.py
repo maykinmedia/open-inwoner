@@ -58,7 +58,6 @@ def case_table(case: dict, **kwargs) -> dict:
         rows.append(row)
 
     add_row_if_not_empty("initiator", _("Aanvrager"))
-    add_row_if_not_empty("type_description", _("Type"))
     add_row_if_not_empty("result", _("Resultaat"))
     add_row_if_not_empty("end_date", _("Einddatum"))
     add_row_if_not_empty("end_date_planned", _("Verwachte einddatum"))

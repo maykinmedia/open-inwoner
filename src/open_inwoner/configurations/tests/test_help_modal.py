@@ -22,7 +22,7 @@ class TestHelpContext(WebTest):
         self.assertEquals(
             help_text,
             _(
-                "Welkom! Op dit scherm vindt u een overzicht van de verschillende thema's en producten & diensten."
+                "Welkom! Op dit scherm vindt u een overzicht van de verschillende onderwerpen en producten & diensten."
             ),
         )
 
@@ -34,18 +34,18 @@ class TestHelpContext(WebTest):
 
         self.assertEquals(help_text, config.home_help_text)
 
-    def test_default_help_text_on_themes_page(self):
+    def test_default_help_text_on_categories_page(self):
         response = self.app.get(reverse("pdc:category_list"))
         help_text = response.context.get("help_text")
 
         self.assertEquals(
             help_text,
             _(
-                "Op dit scherm vindt u de verschillende thema's waarvoor wij producten en diensten aanbieden."
+                "Op dit scherm vindt u de verschillende onderwerpen waarvoor wij producten en diensten aanbieden."
             ),
         )
 
-    def test_custom_help_text_on_themes_page(self):
+    def test_custom_help_text_on_categories_page(self):
         SiteConfigurationFactory()
         config = SiteConfiguration.get_solo()
         response = self.app.get(reverse("pdc:category_list"))

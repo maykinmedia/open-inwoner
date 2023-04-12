@@ -10,7 +10,7 @@ from .factories import CategoryFactory, ProductFactory, QuestionFactory
 
 
 class TestPublishedProducts(WebTest):
-    def test_only_published_products_exist_on_themes_page_when_anonymous(self):
+    def test_only_published_products_exist_on_categories_page_when_anonymous(self):
         category = CategoryFactory(path="0001", name="First one", slug="first-one")
         product1 = ProductFactory(categories=(category,))
         product2 = ProductFactory(categories=(category,), published=False)
@@ -19,7 +19,7 @@ class TestPublishedProducts(WebTest):
         )
         self.assertEqual(list(response.context["products"]), [product1])
 
-    def test_only_published_products_exist_on_themes_page_when_logged_in(self):
+    def test_only_published_products_exist_on_categories_page_when_logged_in(self):
         user = UserFactory()
         category = CategoryFactory(path="0001", name="First one", slug="first-one")
         product1 = ProductFactory(categories=(category,))
@@ -208,3 +208,30 @@ class TestProductContent(WebTest):
         cta_button = response.pyquery(".grid__main")[0].find_class("cta-button")
 
         self.assertFalse(cta_button)
+
+    def test_sidemenu_button_is_not_rendered_when_cta_inside_product_content(self):
+        product = ProductFactory(
+            content="Some content \[CTABUTTON\]", link="http://www.example.com"
+        )
+
+        response = self.app.get(
+            reverse("pdc:product_detail", kwargs={"slug": product.slug})
+        )
+        sidemenu_cta_button = response.pyquery(
+            '.anchor-menu__list-item a[href="http://www.example.com"]'
+        )
+
+        self.assertFalse(sidemenu_cta_button)
+
+    def test_sidemenu_button_is_rendered_when_no_cta_inside_product_content(self):
+        product = ProductFactory(content="Some content", link="http://www.example.com")
+
+        response = self.app.get(
+            reverse("pdc:product_detail", kwargs={"slug": product.slug})
+        )
+        sidemenu_cta_button = response.pyquery(
+            '.anchor-menu__list-item a[href="http://www.example.com"]'
+        )
+
+        self.assertTrue(sidemenu_cta_button)
+        self.assertIn(product.link, sidemenu_cta_button[0].values())
