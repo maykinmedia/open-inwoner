@@ -92,11 +92,11 @@ class TestProfile(WebTest):
     def test_categories_modification_is_logged(self):
         CategoryFactory()
         CategoryFactory()
-        form = self.app.get(reverse("accounts:my_themes"), user=self.user).forms[
-            "change-themes"
+        form = self.app.get(reverse("accounts:my_categories"), user=self.user).forms[
+            "change-categories"
         ]
 
-        form.get("selected_themes", index=1).checked = True
+        form.get("selected_categories", index=1).checked = True
         form.submit()
         log_entry = TimelineLog.objects.last()
 

@@ -138,9 +138,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         default=False,
         help_text=_("Indicates if fields have been prepopulated by Haal Central API."),
     )
-    selected_themes = models.ManyToManyField(
+    selected_categories = models.ManyToManyField(
         "pdc.Category",
-        verbose_name=_("Selected themes"),
+        verbose_name=_("Selected categories"),
         related_name="selected_by",
         blank=True,
     )
@@ -222,10 +222,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.documents.order_by("-created_on")
 
     def get_interests(self) -> str:
-        if not self.selected_themes.exists():
+        if not self.selected_categories.exists():
             return _("U heeft geen interessegebieden aangegeven.")
 
-        return ", ".join(list(self.selected_themes.values_list("name", flat=True)))
+        return ", ".join(list(self.selected_categories.values_list("name", flat=True)))
 
     def require_necessary_fields(self) -> bool:
         """returns whether user needs to fill in necessary fields"""
