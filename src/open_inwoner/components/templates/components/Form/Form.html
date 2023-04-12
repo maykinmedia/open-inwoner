@@ -1,4 +1,4 @@
-{% load form_tags link_tags notification_tags %}
+{% load i18n form_tags link_tags notification_tags %}
 {# Shared between Form and RenderForm. #}
 <form
     class="{{ classes }}"
@@ -21,6 +21,10 @@
 
     {% if show_notifications %}
         {% notifications messages icon=False %}
+    {% endif %}
+
+    {% if show_required %}
+        <span class="caption__content" id="caption">{% trans "Velden gemarkeerd met een" %}<span class="label__label--required"> * </span>{% trans "zijn verplicht" %}</span>
     {% endif %}
 
     {% if auto_render %}

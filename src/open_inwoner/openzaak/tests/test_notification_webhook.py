@@ -200,7 +200,10 @@ class NotificationWebhookAPITestCase(AssertTimelineLogMixin, APITestCase):
             self.url, raw_notification, **headers, format="json"
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.json(), {"resource": ["Dit veld is vereist."]})
+        self.assertEqual(
+            response.json(),
+            {"resource": ["Dit veld is vereist."]},
+        )
         mock_handle.assert_not_called()
 
         self.assertTimelineLog("cannot deserialize notification", level=logging.ERROR)

@@ -1,10 +1,11 @@
-{% load form_tags icon_tags %}
+{% load i18n form_tags icon_tags %}
 
 <div class="form__control {{ extra_classes|default:"" }}">
     <label class="label {% if no_label %}label--gapless{% endif %}">
         {% if icon %}{% icon icon outlined=True %}{% endif %}
         <label class="label__label {% if no_label %}label__label--hidden{% endif %}">
             {{ field.label }}
+            {% if field.field.required %}<span class="label__label--required"> * </span>{% endif %}
         </label>
         {{ field|addclass:"input" }}
         {% if field.help_text and not no_help %}

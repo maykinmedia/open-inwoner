@@ -95,8 +95,10 @@ def form(context, form_object, secondary=True, **kwargs):
     """
     Renders a form including all fields.
 
-    Usage:
+    Usages:
         {% form form_object=form method="GET" %}
+
+        {% form form_object=form method="POST" show_required=True submit_text=_("Bestand uploaden") enctype="multipart/form-data" %}
 
     Variables:
         + form_object: Form | This is the django form that should be rendered.
@@ -126,11 +128,15 @@ def form(context, form_object, secondary=True, **kwargs):
     Extra context:
         - auto_render: True | Telling the template that the form should be rendered.
         - classes: string | The classes that should be generated according to the options.
+        - show_required: boolean  | Show required field caption
     """
     _context = context.flatten()
     kwargs["submit_text"] = kwargs.get("submit_text", _("Verzenden"))
     kwargs["secondary"] = secondary
     kwargs["auto_render"] = True
+    kwargs["show_required"] = kwargs.get("show_required", False) and any(
+        f.required for f in form_object.fields.values()
+    )
     kwargs["form"] = form_object
     kwargs["classes"] = get_form_classes(**kwargs)
     return {

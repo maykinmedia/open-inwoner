@@ -9,7 +9,8 @@
 
 {% block content %}
     {% get_solo 'openzaak.OpenZaakConfig' as openzaak_config %}
-    
+
+    <div class="cases__detail">
     {% if case %}
         {% render_grid %}
             {% render_column span=9 %}
@@ -32,17 +33,17 @@
                 {% endif %}
 
                 {% if case.internal_upload_enabled %}
-                    <h2 class="h2">{% trans "Document toevoegen" %}</h2>
+                    <h2 class="h2" id=>{% trans "Document toevoegen" %}</h2>
                     {% if case.case_type_config_description %}
                         <p class="p">{{case.case_type_config_description}}</p>
                     {% else %}
-                        <p class="p">
-                            {% blocktranslate with max_filesize=openzaak_config.max_upload_size allowed_extensions=case.allowed_file_extensions|join:', ' %}
-                                Grootte max. {{ max_filesize }} MB, toegestane bestandsformaten {{ allowed_extensions }}. 
-                            {% endblocktranslate %}
-                        </p>
+                    <p class="p">
+                        {% blocktranslate with max_filesize=openzaak_config.max_upload_size allowed_extensions=case.allowed_file_extensions|join:', ' %}
+                            Grootte max. {{ max_filesize }} MB, toegestane bestandsformaten {{ allowed_extensions }}.
+                        {% endblocktranslate %}
+                    </p>
                     {% endif %}
-                    {% form id="document-upload" form_object=form method="POST" submit_text=_("Bestand uploaden") enctype="multipart/form-data" %}
+                    {% form id="document-upload" form_object=form method="POST" submit_text=_("Bestand uploaden") enctype="multipart/form-data" show_required=True %}
                 {% elif case.external_upload_enabled %}
                     <h2 class="h2">{% trans "Document toevoegen" %}</h2>
                     {% if case.case_type_config_description %}
@@ -60,4 +61,5 @@
     {% else %}
         <h2 class="h2">{% trans 'There is no available data at the moment.' %}</h2>
     {% endif %}
+    </div>
 {% endblock content %}
