@@ -4,7 +4,6 @@ import os
 from django.urls import reverse_lazy
 
 import sentry_sdk
-
 from log_outgoing_requests.formatters import HttpFormatter
 
 from .utils import config, get_sentry_integrations
