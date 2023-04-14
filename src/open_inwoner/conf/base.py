@@ -209,6 +209,7 @@ INSTALLED_APPS = [
     "open_inwoner.cms.cases",
     "open_inwoner.cms.inbox",
     "open_inwoner.cms.products",
+    "open_inwoner.cms.collaborate",
 ]
 
 MIDDLEWARE = [

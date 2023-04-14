@@ -623,7 +623,7 @@ class TestRegistrationNecessary(WebTest):
             reverse("cases:open_cases"),
             reverse("profile:detail"),
             reverse("profile:data"),
-            reverse("plans:plan_list"),
+            reverse("collaborate:plan_list"),
             reverse("general_faq"),
         ]
 

@@ -145,7 +145,7 @@ class Plan(models.Model):
         return self.title
 
     def get_absolute_url(self):
-        return reverse("plans:plan_detail", kwargs={"uuid": self.uuid})
+        return reverse("collaborate:plan_detail", kwargs={"uuid": self.uuid})
 
     def get_latest_file(self):
         file = self.documents.order_by("-created_on").first()

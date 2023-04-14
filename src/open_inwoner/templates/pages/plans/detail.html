@@ -14,11 +14,11 @@
 	    {% if is_creator %}
               {% dropdown icon="settings" secondary=True %}
                   <div class="dropdown__item">
-                      {% button icon="edit" text=_("Bewerken") href="plans:plan_edit" uuid=object.uuid icon_outlined=True transparent=True %}
+                      {% button icon="edit" text=_("Bewerken") href="collaborate:plan_edit" uuid=object.uuid icon_outlined=True transparent=True %}
                   </div>
 	      {% enddropdown %}
             {% endif %}
-            {% button href="plans:plan_export" uuid=object.uuid icon="file-pdf" text=_("Exporteer naar PDF") hide_text=True icon_outlined=True transparent=True secondary=True %}
+            {% button href="collaborate:plan_export" uuid=object.uuid icon="file-pdf" text=_("Exporteer naar PDF") hide_text=True icon_outlined=True transparent=True secondary=True %}
         {% endbutton_row %}
 
     </h1>
@@ -63,7 +63,7 @@
     <p class="p">{{ object.description|linebreaksbr }}</p>
     {% endif %}
 
-    {% button href="plans:plan_edit_goal" uuid=object.uuid text=_("Doel en omschrijving bewerken") primary=True %}
+    {% button href="collaborate:plan_edit_goal" uuid=object.uuid text=_("Doel en omschrijving bewerken") primary=True %}
 
     <h2 class="h2" id="files">{% trans "Bestanden" %}</h2>
     {% if object.get_latest_file %}
@@ -74,10 +74,10 @@
             {% file_table files=object.get_other_files download_view="profile:documents_download" %}
         {% endif %}
     {% endif %}
-    {% button href="plans:plan_add_file" uuid=object.uuid text=_("Upload nieuwe versie") primary=True %}
+    {% button href="collaborate:plan_add_file" uuid=object.uuid text=_("Upload nieuwe versie") primary=True %}
 
     <h2 class="h2" id="actions">{% trans "Acties" %}</h2>
     {% actions actions=actions request=request action_form=action_form form_action=request.path|add:"#actions" plan=plan %}
-    {% button href="plans:plan_action_create" uuid=object.uuid text=_("Nieuw actie toevoegen") icon="date_range" primary=True %}
+    {% button href="collaborate:plan_action_create" uuid=object.uuid text=_("Nieuw actie toevoegen") icon="date_range" primary=True %}
 </div>
 {% endblock %}

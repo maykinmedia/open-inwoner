@@ -486,7 +486,7 @@ class SiteConfiguration(SingletonModel):
             "search:search": "search_help_text",
             "profile:detail": "account_help_text",
             "questionnaire:questionnaire_list": "questionnaire_help_text",
-            "plans:plan_list": "plan_help_text",
+            "collaborate:plan_list": "plan_help_text",
         }
 
         attr = lookup.get(match.view_name, "")
