@@ -3,6 +3,7 @@ from urllib.parse import urlencode
 
 from django.contrib.sites.models import Site
 from django.core import mail
+from django.test import override_settings
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
 
@@ -604,6 +605,7 @@ class TestDigid(HaalCentraalMixin, WebTest):
         self.assertNotEqual(user.first_name, "UpdatedName")
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cmsapps.tests.urls")
 class TestRegistrationNecessary(WebTest):
     url = reverse_lazy("accounts:registration_necessary")
 
