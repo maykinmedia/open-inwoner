@@ -48,7 +48,7 @@ class Command(BaseCommand):
             )
 
     def send_email(self, receiver: User, total_senders: int, total_messages: int):
-        inbox_url = build_absolute_url(reverse("accounts:inbox"))
+        inbox_url = build_absolute_url(reverse("inbox:index"))
         template = find_template("new_messages")
         context = {
             "total_messages": total_messages,

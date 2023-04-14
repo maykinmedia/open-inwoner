@@ -617,6 +617,7 @@ class TestActions(WebTest):
 
 
 @freeze_time("2021-10-18 13:00:00")
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestMessages(WebTest):
     def setUp(self):
         self.user = UserFactory()
@@ -625,7 +626,7 @@ class TestMessages(WebTest):
 
     def test_created_message_action_from_contacts_is_logged(self):
         response = self.app.get(
-            reverse("accounts:inbox", kwargs={"uuid": self.other_user.uuid}),
+            reverse("inbox:index", kwargs={"uuid": self.other_user.uuid}),
             user=self.user,
             auto_follow=True,
         )
@@ -651,7 +652,7 @@ class TestMessages(WebTest):
 
     def test_created_message_action_from_start_is_logged(self):
         response = self.app.get(
-            reverse("accounts:inbox_start"),
+            reverse("inbox:start"),
             user=self.user,
         )
         form = response.forms["start-message-form"]
@@ -679,7 +680,7 @@ class TestMessages(WebTest):
         message = MessageFactory(
             file=SimpleUploadedFile("file.txt", b"test content"),
         )
-        download_url = reverse("accounts:inbox_download", args=[message.uuid])
+        download_url = reverse("inbox:download", args=[message.uuid])
         self.app.get(download_url, user=message.receiver)
         log_entry = TimelineLog.objects.last()
 

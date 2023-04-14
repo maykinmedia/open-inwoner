@@ -7,4 +7,5 @@ urlpatterns = [
     path("cases/", include("open_inwoner.cms.cases.urls")),
     path("profile/", include("open_inwoner.cms.profile.urls")),
     path("products/", include("open_inwoner.cms.products.urls")),
+    path(r"inbox/", include("open_inwoner.cms.inbox.urls")),
 ] + root_urlpatterns

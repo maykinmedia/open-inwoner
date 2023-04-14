@@ -1,4 +1,5 @@
-from django.urls import reverse, reverse_lazy
+from django.test import override_settings
+from django.urls import reverse
 
 from django_webtest import WebTest
 from furl import furl
@@ -8,6 +9,7 @@ from ..models import Message
 from .factories import DocumentFactory, UserFactory
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class InboxPageTests(WebTest):
     def setUp(self) -> None:
         super().setUp()
@@ -15,7 +17,7 @@ class InboxPageTests(WebTest):
         self.user = UserFactory.create()
         self.app.set_user(self.user)
 
-        self.url = reverse("accounts:inbox_start")
+        self.url = reverse("inbox:start")
 
     def test_contact_choices_include_only_active_contacts(self):
         active_contact = UserFactory()
@@ -53,7 +55,7 @@ class InboxPageTests(WebTest):
         response = form.submit()
 
         self.assertEqual(response.status_code, 302)
-        url = reverse("accounts:inbox", kwargs={"uuid": contact.uuid})
+        url = reverse("inbox:index", kwargs={"uuid": contact.uuid})
         self.assertEqual(response.url, url + "#messages-last")
         self.assertEqual(Message.objects.count(), 1)
 
@@ -80,7 +82,7 @@ class InboxPageTests(WebTest):
         response = form.submit()
 
         self.assertEqual(response.status_code, 302)
-        url = reverse("accounts:inbox", kwargs={"uuid": contact.uuid})
+        url = reverse("inbox:index", kwargs={"uuid": contact.uuid})
         self.assertEqual(response.url, url + "#messages-last")
         self.assertEqual(Message.objects.count(), 1)
 
@@ -131,7 +133,7 @@ class InboxPageTests(WebTest):
         response = form.submit()
 
         self.assertEqual(response.status_code, 302)
-        url = reverse("accounts:inbox", kwargs={"uuid": contact.uuid})
+        url = reverse("inbox:index", kwargs={"uuid": contact.uuid})
         self.assertEqual(response.url, url + "#messages-last")
         self.assertEqual(Message.objects.count(), 1)
 
