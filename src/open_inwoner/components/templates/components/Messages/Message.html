@@ -4,7 +4,7 @@
 <aside class="message{% if ours %} message--ours{% else %} message--theirs{% endif %}" id="message-{{ message.pk }}" title="{% trans 'Bericht van:' %} {{ message.sender }}" aria-label="{% trans "Bericht" %}">
     <div class="message__body">
         {% if file %}
-            {% url "accounts:inbox_download" uuid=message.uuid as download_url %}
+            {% url "inbox:download" uuid=message.uuid as download_url %}
             {% link href=download_url text=message.file secondary=True download=True %}
         {% else %}
             <p class="p">{{ message.content|linebreaksbr }}</p>

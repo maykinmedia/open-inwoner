@@ -27,11 +27,11 @@
                 {% link text=_("Mijn profiel") href='profile:detail' icon="inventory_2" icon_position="before" icon_outlined=True %}
             </li>
             <li class="primary-navigation__list-item">
-                {% link text=_('Mijn berichten') href='accounts:inbox' icon="inbox" icon_position="before" %}
+                {% link text=_('Mijn berichten') href='inbox:index' icon="inbox" icon_position="before" %}
                 {% with request.user.get_new_messages_total as total_messages %}
                     {% if total_messages %}
                         {% with "("|addstr:total_messages|addstr:")" as message_total %}
-                            {% link text=message_total href='accounts:inbox' secondary=True %}
+                            {% link text=message_total href='inbox:index' secondary=True %}
                         {% endwith %}
                     {% endif %}
                 {% endwith %}
