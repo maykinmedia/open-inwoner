@@ -53,7 +53,7 @@ def get_product_url(context, product):
     category = context.get("parent")
     if category:
         return reverse(
-            "pdc:category_product_detail",
+            "products:category_product_detail",
             kwargs={"category_slug": category.get_build_slug(), "slug": product.slug},
         )
     return product.get_absolute_url()

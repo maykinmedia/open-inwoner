@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
+from django.test import override_settings
 from django.urls import reverse
 
 from django_webtest import WebTest
@@ -8,6 +9,7 @@ from ..models import Question
 from .factories import CategoryFactory, ProductFactory, QuestionFactory
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestGeneralFAQ(WebTest):
     def test_model_constraints_disallows_both_product_and_category(self):
         product = ProductFactory()

@@ -619,9 +619,9 @@ class TestRegistrationNecessary(WebTest):
         )
         urls = [
             reverse("root"),
-            reverse("pdc:category_list"),
+            reverse("products:category_list"),
+            reverse("accounts:my_profile"),
             reverse("profile:detail"),
-            reverse("accounts:inbox"),
             reverse("profile:data"),
             reverse("plans:plan_list"),
             reverse("general_faq"),

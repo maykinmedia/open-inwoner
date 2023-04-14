@@ -35,7 +35,7 @@
                         </h2>
                         <div class="search-results__list">
                             {% for hit in page_obj %}
-                                <a class="search-results__item" href="{% url 'pdc:product_detail' hit.slug %}">
+                                <a class="search-results__item" href="{% url 'products:product_detail' hit.slug %}">
                                     <h3 class="search-results__item-title">{{ hit.name }}</h3>
                                     <div class="search-results__item-info-container">
                                         <p class="search-results__item-intro">{{ hit.summary }}</p>
