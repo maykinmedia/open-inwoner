@@ -11,9 +11,6 @@ from .views import (
     ActionPrivateMediaView,
     ActionUpdateStatusTagView,
     ActionUpdateView,
-    CaseDetailView,
-    CaseDocumentDownloadView,
-    ClosedCaseListView,
     ContactApprovalView,
     ContactCreateView,
     ContactDeleteView,
@@ -31,10 +28,8 @@ from .views import (
     MyProfileExportView,
     MyProfileView,
     NecessaryFieldsUserView,
-    OpenCaseListView,
 )
 from .views.actions import ActionDeleteView
-from .views.cases import OpenSubmissionListView
 
 app_name = "accounts"
 urlpatterns = [
@@ -101,19 +96,6 @@ urlpatterns = [
     path("contacts/", ContactListView.as_view(), name="contact_list"),
     path("onderwerpen/", MyCategoriesView.as_view(), name="my_categories"),
     path("mydata/", MyDataView.as_view(), name="my_data"),
-    path("cases/open/", OpenCaseListView.as_view(), name="my_open_cases"),
-    path("cases/closed/", ClosedCaseListView.as_view(), name="my_closed_cases"),
-    path("cases/forms/", OpenSubmissionListView.as_view(), name="open_submissions"),
-    path(
-        "cases/<str:object_id>/document/<str:info_id>/",
-        CaseDocumentDownloadView.as_view(),
-        name="case_document_download",
-    ),
-    path(
-        "cases/<str:object_id>/status/",
-        CaseDetailView.as_view(),
-        name="case_status",
-    ),
     path("edit/", EditProfileView.as_view(), name="edit_profile"),
     path("invite/<str:key>/accept/", InviteAcceptView.as_view(), name="invite_accept"),
     path("export/", MyProfileExportView.as_view(), name="profile_export"),

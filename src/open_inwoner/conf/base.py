@@ -205,6 +205,7 @@ INSTALLED_APPS = [
     "open_inwoner.questionnaire",
     "open_inwoner.extended_sessions",
     "open_inwoner.custom_csp",
+    "open_inwoner.cms.cases",
 ]
 
 MIDDLEWARE = [

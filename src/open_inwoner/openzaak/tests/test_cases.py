@@ -2,7 +2,7 @@ import datetime
 from unittest.mock import patch
 
 from django.contrib.auth.models import AnonymousUser
-from django.core.cache import cache
+from django.test.utils import override_settings
 from django.urls import reverse, reverse_lazy
 
 import requests_mock
@@ -24,10 +24,11 @@ from .factories import ServiceFactory
 from .shared import CATALOGI_ROOT, ZAKEN_ROOT
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class CaseListAccessTests(ClearCachesMixin, WebTest):
     urls = [
-        reverse_lazy("accounts:my_open_cases"),
-        reverse_lazy("accounts:my_closed_cases"),
+        reverse_lazy("cases:open_cases"),
+        reverse_lazy("cases:closed_cases"),
     ]
 
     @classmethod
@@ -119,9 +120,10 @@ class CaseListAccessTests(ClearCachesMixin, WebTest):
 
 
 @requests_mock.Mocker()
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class CaseListViewTests(ClearCachesMixin, WebTest):
-    url_open = reverse_lazy("accounts:my_open_cases")
-    url_closed = reverse_lazy("accounts:my_closed_cases")
+    url_open = reverse_lazy("cases:open_cases")
+    url_closed = reverse_lazy("cases:closed_cases")
 
     @classmethod
     def setUpTestData(cls):

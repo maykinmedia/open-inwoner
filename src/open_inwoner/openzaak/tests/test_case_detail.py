@@ -2,6 +2,7 @@ import datetime
 from unittest.mock import patch
 
 from django.contrib.auth.models import AnonymousUser
+from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -36,6 +37,7 @@ from .shared import CATALOGI_ROOT, DOCUMENTEN_ROOT, ZAKEN_ROOT
 
 
 @requests_mock.Mocker()
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestCaseDetailView(ClearCachesMixin, WebTest):
     @classmethod
     def setUpTestData(cls):
@@ -66,7 +68,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         cls.config.save()
 
         cls.case_detail_url = reverse(
-            "accounts:case_status",
+            "cases:case_detail",
             kwargs={"object_id": "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d"},
         )
 
@@ -280,7 +282,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
             name="document_title.txt",
             size=123,
             url=reverse(
-                "accounts:case_document_download",
+                "cases:document_download",
                 kwargs={
                     "object_id": cls.zaak["uuid"],
                     "info_id": cls.informatie_object["uuid"],
@@ -451,7 +453,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
 
         self.assertRedirects(
             response,
-            f"{reverse('login')}?next={reverse('accounts:case_status', kwargs={'object_id': 'd8bbdeb7-770f-4ca9-b1ea-77b4730bf67d'})}",
+            f"{reverse('login')}?next={reverse('cases:case_detail', kwargs={'object_id': 'd8bbdeb7-770f-4ca9-b1ea-77b4730bf67d'})}",
         )
 
     def test_no_access_when_no_roles_are_found_for_user_bsn(self, m):
@@ -525,7 +527,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
 
         response = self.app.get(
             reverse(
-                "accounts:case_status",
+                "cases:case_detail",
                 kwargs={"object_id": self.zaak_invisible["uuid"]},
             ),
             user=self.user,
@@ -550,7 +552,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
 
         response = self.app.get(
             reverse(
-                "accounts:case_status",
+                "cases:case_detail",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
             user=self.user,
@@ -584,7 +586,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
 
         response = self.app.get(
             reverse(
-                "accounts:case_status",
+                "cases:case_detail",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
             user=self.user,
@@ -620,7 +622,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
 
         response = self.app.get(
             reverse(
-                "accounts:case_status",
+                "cases:case_detail",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
             user=self.user,
@@ -650,7 +652,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
 
         response = self.app.get(
             reverse(
-                "accounts:case_status",
+                "cases:case_detail",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
             user=self.user,
@@ -666,7 +668,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         m.get(self.zaak["url"], status_code=500)
         response = self.app.get(
             reverse(
-                "accounts:case_status",
+                "cases:case_detail",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
             user=self.user,
@@ -682,7 +684,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
 
         response = self.app.get(
             reverse(
-                "accounts:case_status",
+                "cases:case_detail",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
             user=self.user,
@@ -768,7 +770,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
 
         response = self.app.get(
             reverse(
-                "accounts:case_status",
+                "cases:case_detail",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
             user=self.user,
@@ -808,7 +810,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
 
         response = self.app.get(
             reverse(
-                "accounts:case_status",
+                "cases:case_detail",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
             user=self.user,
@@ -843,7 +845,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
 
         response = self.app.get(
             reverse(
-                "accounts:case_status",
+                "cases:case_detail",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
             user=self.user,
@@ -868,7 +870,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
 
         response = self.app.get(
             reverse(
-                "accounts:case_status",
+                "cases:case_detail",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
             user=self.user,
@@ -889,7 +891,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
 
         response = self.app.get(
             reverse(
-                "accounts:case_status",
+                "cases:case_detail",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
             user=self.user,
@@ -913,7 +915,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
 
         response = self.app.get(
             reverse(
-                "accounts:case_status",
+                "cases:case_detail",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
             user=self.user,
@@ -936,7 +938,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
 
         response = self.app.get(
             reverse(
-                "accounts:case_status",
+                "cases:case_detail",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
             user=self.user,
@@ -959,7 +961,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
 
         response = self.app.get(
             reverse(
-                "accounts:case_status",
+                "cases:case_detail",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
             user=self.user,
