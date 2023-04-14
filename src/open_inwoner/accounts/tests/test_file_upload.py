@@ -16,7 +16,7 @@ from .factories import UserFactory
 class TestActionFileUploadLimits(WebTest):
     def setUp(self):
         self.user = UserFactory()
-        self.response = self.app.get(reverse("accounts:action_create"), user=self.user)
+        self.response = self.app.get(reverse("profile:action_create"), user=self.user)
         self.form = self.response.forms["action-create"]
 
     @temp_private_root()
@@ -26,7 +26,7 @@ class TestActionFileUploadLimits(WebTest):
         self.form["name"] = "Action name"
         upload_response = self.form.submit()
         self.assertEquals(Action.objects.first().file.name, "readme.xlsx")
-        self.assertRedirects(upload_response, reverse("accounts:action_list"))
+        self.assertRedirects(upload_response, reverse("profile:action_list"))
 
     @temp_private_root()
     def test_invalid_type_of_file_is_not_uploaded(self):

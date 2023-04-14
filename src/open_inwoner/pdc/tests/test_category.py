@@ -1,3 +1,4 @@
+from django.test import override_settings
 from django.urls import reverse
 
 from django_webtest import WebTest
@@ -143,8 +144,9 @@ class TestPublishedCategories(WebTest):
         )
         self.assertEqual(list(response.context["subcategories"]), [descendent1])
 
+    @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
     def test_only_published_categories_exist_in_my_categories_page(self):
-        response = self.app.get(reverse("accounts:my_categories"), user=self.user)
+        response = self.app.get(reverse("profile:categories"), user=self.user)
         self.assertEqual(
             list(response.context["categories"]),
             [self.published1, self.published2],

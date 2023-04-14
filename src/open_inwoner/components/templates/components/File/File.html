@@ -31,7 +31,7 @@
                 </div>
             {% endif %}
             <div class="dropdown__item">
-                {% url 'accounts:documents_delete' uuid=uuid as delete_url %}
+                {% url 'profile:documents_delete' uuid=uuid as delete_url %}
                 {% render_form form=None form_action=delete_url method="POST" spaceless=True id="deactivate-form" extra_classes="confirm" data_confirm_title=_("Weet je het zeker dat je dit bestand wilt verwijderen?") data_confirm_cancel=_("Nee") data_confirm_default=_("Ja") %}
                     {% csrf_token %}
                     {% button icon="delete" text=_("Verwijderen") transparent=True %}

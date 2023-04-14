@@ -1,5 +1,9 @@
+import logging
+
 from django.http import HttpResponseRedirect
-from django.urls import reverse
+from django.urls import NoReverseMatch, reverse
+
+logger = logging.getLogger(__name__)
 
 
 class NecessaryFieldsMiddleware:
@@ -11,9 +15,16 @@ class NecessaryFieldsMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
+        try:
+            necessary_fields_url = reverse("profile:registration_necessary")
+        except NoReverseMatch:
+            logger.warning(
+                "cannot reverse 'profile:registration_necessary' URL: apphook not active"
+            )
+            return self.get_response(request)
+
         user = request.user
         if user.is_authenticated:
-            necessary_fields_url = reverse("accounts:registration_necessary")
 
             # If the user is currently not editing their information, but it is required
             # redirect to that view.

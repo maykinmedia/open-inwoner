@@ -25,7 +25,7 @@ class QuestionnaireResetView(RedirectView):
     Clears the questionnaire session, then redirects to the account's profile page.
     """
 
-    pattern_name = "accounts:my_profile"
+    pattern_name = "profile:detail"
 
     def get(self, request, *args, **kwargs) -> HttpResponseRedirect:
         request.session[QUESTIONNAIRE_SESSION_KEY] = None
@@ -49,7 +49,7 @@ class QuestionnaireStepView(CommonPageMixin, BaseBreadcrumbMixin, FormView):
     def crumbs(self):
         if self.request.user.is_authenticated:
             return [
-                (_("Mijn profiel"), reverse("accounts:my_profile")),
+                (_("Mijn profiel"), reverse("profile:detail")),
                 (_("Zelfdiagnose"), reverse("questionnaire:questionnaire_list")),
             ]
         return [
@@ -145,7 +145,7 @@ class QuestionnaireRootListView(CommonPageMixin, BaseBreadcrumbMixin, ListView):
     def crumbs(self):
         if self.request.user.is_authenticated:
             return [
-                (_("Mijn profiel"), reverse("accounts:my_profile")),
+                (_("Mijn profiel"), reverse("profile:detail")),
                 (_("Zelfdiagnose"), reverse("questionnaire:questionnaire_list")),
             ]
         return [

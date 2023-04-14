@@ -38,7 +38,7 @@ class Command(BaseCommand):
             )
 
     def send_email(self, receiver: User, actions: List[Action]):
-        actions_link = build_absolute_url(reverse("accounts:action_list"))
+        actions_link = build_absolute_url(reverse("profile:action_list"))
         template = find_template("expiring_action")
         context = {
             "actions": actions,

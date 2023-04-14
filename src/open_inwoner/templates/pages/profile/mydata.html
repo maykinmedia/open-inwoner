@@ -16,7 +16,7 @@
 
         <!-- BRP personal data -->
         <h2 class="h2">{% trans "Mijn BRP gegevens" %}</h2>
-        
+
         {% with request.user as user %}
             <div class="tabled tabled--flexible">
                 <div class="tabled__row">
@@ -52,10 +52,10 @@
                     <div class="tabled__item">{{my_data.gender|default:"-"}}</div>
                 </div>
             </div>
-            
+
             <!-- BRP registration data -->
             <h2 class="h2">{% trans "Inschrijfadres" %}</h2>
-            
+
             <div class="tabled tabled--flexible">
                 <div class="tabled__row">
                     <div class="tabled__item tabled__item--bold">{% trans "Straat" %}</div>
@@ -86,12 +86,12 @@
                 {% button_row align="right" %}
                     {% dropdown icon="settings" secondary=True %}
                         <div class="dropdown__item">
-                            {% button href="accounts:edit_profile" text=_("Bewerken") icon="edit" transparent=True %}
+                            {% button href="profile:edit" text=_("Bewerken") icon="edit" transparent=True %}
                         </div>
                     {% enddropdown %}
                 {% endbutton_row %}
             </h2>
-            
+
             <div class="tabled tabled--flexible">
                 <div class="tabled__row">
                     <div class="tabled__item tabled__item--bold">{% trans "Roepnaam" %}</div>
