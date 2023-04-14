@@ -2,7 +2,7 @@ from datetime import date, timedelta
 
 from django.core import mail
 from django.core.management import call_command
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from open_inwoner.accounts.tests.factories import UserFactory
@@ -11,6 +11,7 @@ from open_inwoner.plans.models import Plan
 from .factories import PlanFactory
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class NotifyComandTests(TestCase):
     def test_notify_about_expiring_plan(self):
         user = UserFactory()
@@ -28,7 +29,7 @@ class NotifyComandTests(TestCase):
         self.assertEqual(sent_mail.to, [user.email])
         self.assertIn(plan.title, html_body)
         self.assertIn(plan.goal, html_body)
-        self.assertIn(reverse("plans:plan_list"), html_body)
+        self.assertIn(reverse("collaborate:plan_list"), html_body)
 
     def test_plan_does_not_expire_yet(self):
         user = UserFactory()
@@ -67,7 +68,7 @@ class NotifyComandTests(TestCase):
         self.assertEqual(sent_mail.to, [user.email])
         self.assertIn(plan.title, html_body)
         self.assertIn(plan.goal, html_body)
-        self.assertIn(reverse("plans:plan_list"), html_body)
+        self.assertIn(reverse("collaborate:plan_list"), html_body)
 
         sent_mail2 = mail.outbox[1]
         html_body2 = sent_mail.alternatives[0][0]
@@ -78,4 +79,4 @@ class NotifyComandTests(TestCase):
         self.assertEqual(sent_mail2.to, [contact.email])
         self.assertIn(plan.title, html_body2)
         self.assertIn(plan.goal, html_body2)
-        self.assertIn(reverse("plans:plan_list"), html_body2)
+        self.assertIn(reverse("collaborate:plan_list"), html_body2)

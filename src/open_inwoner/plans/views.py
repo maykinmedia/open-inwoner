@@ -86,7 +86,7 @@ class PlanListView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Samenwerken"), reverse("plans:plan_list")),
+            (_("Samenwerken"), reverse("collaborate:plan_list")),
         ]
 
     def get_queryset(self):
@@ -183,8 +183,11 @@ class PlanDetailView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Samenwerken"), reverse("plans:plan_list")),
-            (self.get_object().title, reverse("plans:plan_detail", kwargs=self.kwargs)),
+            (_("Samenwerken"), reverse("collaborate:plan_list")),
+            (
+                self.get_object().title,
+                reverse("collaborate:plan_detail", kwargs=self.kwargs),
+            ),
         ]
 
     def get_queryset(self):
@@ -228,8 +231,8 @@ class PlanCreateView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Samenwerken"), reverse("plans:plan_list")),
-            (_("Start nieuwe samenwerking"), reverse("plans:plan_create")),
+            (_("Samenwerken"), reverse("collaborate:plan_list")),
+            (_("Start nieuwe samenwerking"), reverse("collaborate:plan_create")),
         ]
 
     def get_form_kwargs(self):
@@ -267,9 +270,12 @@ class PlanEditView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Samenwerkingsplannen"), reverse("plans:plan_list")),
-            (self.get_object().title, reverse("plans:plan_detail", kwargs=self.kwargs)),
-            (_("Bewerken"), reverse("plans:plan_edit", kwargs=self.kwargs)),
+            (_("Samenwerkingsplannen"), reverse("collaborate:plan_list")),
+            (
+                self.get_object().title,
+                reverse("collaborate:plan_detail", kwargs=self.kwargs),
+            ),
+            (_("Bewerken"), reverse("collaborate:plan_edit", kwargs=self.kwargs)),
         ]
 
     def get_queryset(self):
@@ -312,9 +318,15 @@ class PlanGoalEditView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Samenwerkingsplannen"), reverse("plans:plan_list")),
-            (self.get_object().title, reverse("plans:plan_detail", kwargs=self.kwargs)),
-            (_("Doel bewerken"), reverse("plans:plan_edit_goal", kwargs=self.kwargs)),
+            (_("Samenwerkingsplannen"), reverse("collaborate:plan_list")),
+            (
+                self.get_object().title,
+                reverse("collaborate:plan_detail", kwargs=self.kwargs),
+            ),
+            (
+                _("Doel bewerken"),
+                reverse("collaborate:plan_edit_goal", kwargs=self.kwargs),
+            ),
         ]
 
     def get_queryset(self):
@@ -347,11 +359,14 @@ class PlanFileUploadView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Samenwerkingsplannen"), reverse("plans:plan_list")),
-            (self.get_object().title, reverse("plans:plan_detail", kwargs=self.kwargs)),
+            (_("Samenwerkingsplannen"), reverse("collaborate:plan_list")),
+            (
+                self.get_object().title,
+                reverse("collaborate:plan_detail", kwargs=self.kwargs),
+            ),
             (
                 _("Nieuw bestand uploaden"),
-                reverse("plans:plan_add_file", kwargs=self.kwargs),
+                reverse("collaborate:plan_add_file", kwargs=self.kwargs),
             ),
         ]
 
@@ -381,11 +396,14 @@ class PlanActionCreateView(PlansEnabledMixin, ActionCreateView):
     @cached_property
     def crumbs(self):
         return [
-            (_("Samenwerkingsplannen"), reverse("plans:plan_list")),
-            (self.get_object().title, reverse("plans:plan_detail", kwargs=self.kwargs)),
+            (_("Samenwerkingsplannen"), reverse("collaborate:plan_list")),
+            (
+                self.get_object().title,
+                reverse("collaborate:plan_detail", kwargs=self.kwargs),
+            ),
             (
                 _("Maak actie aan"),
-                reverse("plans:plan_action_create", kwargs=self.kwargs),
+                reverse("collaborate:plan_action_create", kwargs=self.kwargs),
             ),
         ]
 
@@ -427,14 +445,16 @@ class PlanActionEditView(PlansEnabledMixin, ActionUpdateView):
     @cached_property
     def crumbs(self):
         return [
-            (_("Samenwerkingsplannen"), reverse("plans:plan_list")),
+            (_("Samenwerkingsplannen"), reverse("collaborate:plan_list")),
             (
                 self.get_plan().title,
-                reverse("plans:plan_detail", kwargs={"uuid": self.get_plan().uuid}),
+                reverse(
+                    "collaborate:plan_detail", kwargs={"uuid": self.get_plan().uuid}
+                ),
             ),
             (
                 _("Bewerk {}").format(self.object.name),
-                reverse("plans:plan_action_edit", kwargs=self.kwargs),
+                reverse("collaborate:plan_action_edit", kwargs=self.kwargs),
             ),
         ]
 
@@ -529,14 +549,16 @@ class PlanActionHistoryView(ActionHistoryView):
     @cached_property
     def crumbs(self):
         return [
-            (_("Samenwerking"), reverse("plans:plan_list")),
+            (_("Samenwerking"), reverse("collaborate:plan_list")),
             (
                 self.get_plan().title,
-                reverse("plans:plan_detail", kwargs={"uuid": self.get_plan().uuid}),
+                reverse(
+                    "collaborate:plan_detail", kwargs={"uuid": self.get_plan().uuid}
+                ),
             ),
             (
                 _("History of {}").format(self.object.name),
-                reverse("plans:plan_action_history", kwargs=self.kwargs),
+                reverse("collaborate:plan_action_history", kwargs=self.kwargs),
             ),
         ]
 

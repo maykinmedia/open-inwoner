@@ -9,6 +9,7 @@ from ...plans.tests.factories import PlanFactory
 from ..models import SiteConfiguration
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestShowPlans(WebTest):
     def setUp(self):
         self.user = UserFactory()
@@ -17,9 +18,9 @@ class TestShowPlans(WebTest):
         self.plan = PlanFactory(plan_contacts=[self.user])
         self.action = ActionFactory(created_by=self.user, plan=self.plan)
 
-        self.plan_list_url = reverse("plans:plan_list")
+        self.plan_list_url = reverse("collaborate:plan_list")
         self.plan_detail_url = reverse(
-            "plans:plan_detail", kwargs={"uuid": self.plan.uuid}
+            "collaborate:plan_detail", kwargs={"uuid": self.plan.uuid}
         )
 
     def test_default_enabled(self):
@@ -79,20 +80,20 @@ class TestShowPlans(WebTest):
 
     def test_plan_pages_show_404_when_disabled(self):
         urls = [
-            reverse("plans:plan_list"),
-            reverse("plans:plan_create"),
-            reverse("plans:plan_detail", kwargs={"uuid": self.plan.uuid}),
-            reverse("plans:plan_edit", kwargs={"uuid": self.plan.uuid}),
-            reverse("plans:plan_edit_goal", kwargs={"uuid": self.plan.uuid}),
-            reverse("plans:plan_add_file", kwargs={"uuid": self.plan.uuid}),
-            reverse("plans:plan_export", kwargs={"uuid": self.plan.uuid}),
-            reverse("plans:plan_action_create", kwargs={"uuid": self.plan.uuid}),
+            reverse("collaborate:plan_list"),
+            reverse("collaborate:plan_create"),
+            reverse("collaborate:plan_detail", kwargs={"uuid": self.plan.uuid}),
+            reverse("collaborate:plan_edit", kwargs={"uuid": self.plan.uuid}),
+            reverse("collaborate:plan_edit_goal", kwargs={"uuid": self.plan.uuid}),
+            reverse("collaborate:plan_add_file", kwargs={"uuid": self.plan.uuid}),
+            reverse("collaborate:plan_export", kwargs={"uuid": self.plan.uuid}),
+            reverse("collaborate:plan_action_create", kwargs={"uuid": self.plan.uuid}),
             reverse(
-                "plans:plan_action_edit",
+                "collaborate:plan_action_edit",
                 kwargs={"plan_uuid": self.plan.uuid, "uuid": self.action.uuid},
             ),
             reverse(
-                "plans:plan_action_delete",
+                "collaborate:plan_action_delete",
                 kwargs={"plan_uuid": self.plan.uuid, "uuid": self.action.uuid},
             ),
         ]

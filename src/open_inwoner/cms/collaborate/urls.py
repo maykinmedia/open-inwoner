@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import (
+from open_inwoner.plans.views import (
     PlanActionCreateView,
     PlanActionDeleteView,
     PlanActionEditStatusTagView,
@@ -15,7 +15,8 @@ from .views import (
     PlanListView,
 )
 
-app_name = "plans"
+app_name = "collaborate"
+
 urlpatterns = [
     path("", PlanListView.as_view(), name="plan_list"),
     path("create/", PlanCreateView.as_view(), name="plan_create"),

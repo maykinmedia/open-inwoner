@@ -27,7 +27,7 @@
                             </div>
                             <div class="dropdown__item">
                                 {% if plan %}
-                                    {% url 'plans:plan_action_history' plan_uuid=plan.uuid uuid=action.uuid as action_history_url %}
+                                    {% url 'collaborate:plan_action_history' plan_uuid=plan.uuid uuid=action.uuid as action_history_url %}
                                     {% button icon="history" text=_("History") href=action_history_url uuid=action.uuid icon_outlined=True transparent=True %}
                                 {% else %}
                                     {% button icon="history" text=_("History") href="profile:action_history" uuid=action.uuid icon_outlined=True transparent=True %}

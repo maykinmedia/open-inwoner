@@ -55,7 +55,7 @@ def action_status_button(action, request, plan=None, **kwargs):
     """
     if plan:
         action_url = reverse(
-            "plans:plan_action_edit_status",
+            "collaborate:plan_action_edit_status",
             kwargs={"plan_uuid": plan.uuid, "uuid": action.uuid},
         )
     else:
@@ -109,7 +109,7 @@ def get_action_edit_url(action, plan=None):
     """
     if plan:
         return reverse(
-            "plans:plan_action_edit",
+            "collaborate:plan_action_edit",
             kwargs={"plan_uuid": plan.uuid, "uuid": action.uuid},
         )
     return reverse("profile:action_edit", kwargs={"uuid": action.uuid})
@@ -130,7 +130,7 @@ def get_action_delete_url(action, plan=None):
     """
     if plan:
         return reverse(
-            "plans:plan_action_delete",
+            "collaborate:plan_action_delete",
             kwargs={"plan_uuid": plan.uuid, "uuid": action.uuid},
         )
     return reverse("profile:action_delete", kwargs={"uuid": action.uuid})

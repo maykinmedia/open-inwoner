@@ -49,7 +49,7 @@ class Command(BaseCommand):
             )
 
     def send_email(self, receiver: User, plans: List[Plan]):
-        plan_list_link = build_absolute_url(reverse("plans:plan_list"))
+        plan_list_link = build_absolute_url(reverse("collaborate:plan_list"))
         template = find_template("expiring_plan")
         context = {
             "plans": plans,

@@ -86,7 +86,6 @@ urlpatterns = [
     path("accounts/", include("open_inwoner.accounts.urls", namespace="accounts")),
     path("pages/", include("django.contrib.flatpages.urls"), name="flatpages"),
     path("mail-editor/", include("mail_editor.urls", namespace="mail_editor")),
-    path("plans/", include("open_inwoner.plans.urls", namespace="plans")),
     path(
         "questionnaire/",
         include("open_inwoner.questionnaire.urls", namespace="questionnaire"),
