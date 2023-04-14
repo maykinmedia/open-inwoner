@@ -1,6 +1,7 @@
 import datetime
 
 from django.core.cache import cache
+from django.test.utils import override_settings
 from django.urls import reverse_lazy
 
 import requests_mock
@@ -21,8 +22,9 @@ from .shared import CATALOGI_ROOT, ZAKEN_ROOT
 
 
 @requests_mock.Mocker()
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
-    url = reverse_lazy("accounts:my_open_cases")
+    url = reverse_lazy("cases:open_cases")
 
     @classmethod
     def setUpTestData(cls):
@@ -306,7 +308,7 @@ class ClosedCaseListCacheTests(OpenCaseListCacheTests):
     run the same tests as for open cases
     """
 
-    url = reverse_lazy("accounts:my_closed_cases")
+    url = reverse_lazy("cases:closed_cases")
 
     @classmethod
     def setUpTestData(cls):

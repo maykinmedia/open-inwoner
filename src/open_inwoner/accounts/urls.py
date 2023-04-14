@@ -11,9 +11,6 @@ from .views import (
     ActionPrivateMediaView,
     ActionUpdateStatusTagView,
     ActionUpdateView,
-    CaseDetailView,
-    CaseDocumentDownloadView,
-    ClosedCaseListView,
     ContactApprovalView,
     ContactCreateView,
     ContactDeleteView,
@@ -21,9 +18,6 @@ from .views import (
     DocumentDeleteView,
     DocumentPrivateMediaView,
     EditProfileView,
-    InboxPrivateMediaView,
-    InboxStartView,
-    InboxView,
     InviteAcceptView,
     MyCategoriesView,
     MyDataView,
@@ -31,10 +25,8 @@ from .views import (
     MyProfileExportView,
     MyProfileView,
     NecessaryFieldsUserView,
-    OpenCaseListView,
 )
 from .views.actions import ActionDeleteView
-from .views.cases import OpenSubmissionListView
 
 app_name = "accounts"
 urlpatterns = [

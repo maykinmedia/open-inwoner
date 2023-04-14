@@ -1,3 +1,4 @@
+from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -54,6 +55,7 @@ class ESuiteData:
 
 
 @requests_mock.Mocker()
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class FormAPITest(ClearCachesMixin, WebTest):
     config: OpenZaakConfig
 
@@ -68,7 +70,7 @@ class FormAPITest(ClearCachesMixin, WebTest):
         cls.config.save()
 
         cls.user = UserFactory(bsn="900222086")
-        cls.submissions_url = reverse("accounts:open_submissions")
+        cls.submissions_url = reverse("cases:open_submissions")
 
     def test_api_fetch(self, m):
         data = ESuiteData().install_mocks(m)
