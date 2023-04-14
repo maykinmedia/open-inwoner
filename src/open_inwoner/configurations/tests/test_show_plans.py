@@ -1,3 +1,4 @@
+from django.test import override_settings
 from django.urls import reverse
 
 from django_webtest import WebTest
@@ -108,12 +109,13 @@ class TestShowPlans(WebTest):
             with self.subTest(f"authenticated {url}"):
                 self.app.get(url, status=404, user=self.user)
 
+    @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
     def test_user_action_page_doesnt_link_to_plan_when_show_plans_disabled(self):
         with self.subTest("check"):
             self.config.show_plans = False
             self.config.save()
 
-            response = self.app.get(reverse("accounts:action_list"), user=self.user)
+            response = self.app.get(reverse("profile:action_list"), user=self.user)
 
             # no link to plan
             self.assertEqual([], response.pyquery(f'a[href="{self.plan_detail_url}"]'))
@@ -123,7 +125,7 @@ class TestShowPlans(WebTest):
             self.config.show_plans = True
             self.config.save()
 
-            response = self.app.get(reverse("accounts:action_list"), user=self.user)
+            response = self.app.get(reverse("profile:action_list"), user=self.user)
 
             # got the link to plan
             self.assertNotEqual(

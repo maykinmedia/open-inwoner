@@ -1,4 +1,5 @@
 from django.core.exceptions import ValidationError
+from django.test import override_settings
 from django.urls import reverse
 
 from django_webtest import WebTest
@@ -8,6 +9,7 @@ from open_inwoner.accounts.tests.factories import ActionFactory, UserFactory
 from ..models import SiteConfiguration
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestShowActions(WebTest):
     def setUp(self):
         self.user = UserFactory()
@@ -15,8 +17,8 @@ class TestShowActions(WebTest):
 
         self.action = ActionFactory(created_by=self.user)
 
-        self.profile_url = reverse("accounts:my_profile")
-        self.actions_list_url = reverse("accounts:action_list")
+        self.profile_url = reverse("profile:detail")
+        self.actions_list_url = reverse("profile:action_list")
 
     def test_default_enabled(self):
         self.assertTrue(self.config.show_actions)
@@ -67,14 +69,14 @@ class TestShowActions(WebTest):
 
     def test_action_pages_show_404_when_disabled(self):
         urls = [
-            reverse("accounts:action_list"),
-            reverse("accounts:action_create"),
-            reverse("accounts:action_list_export"),
-            reverse("accounts:action_edit", kwargs={"uuid": self.action.uuid}),
-            reverse("accounts:action_delete", kwargs={"uuid": self.action.uuid}),
-            reverse("accounts:action_export", kwargs={"uuid": self.action.uuid}),
-            reverse("accounts:action_download", kwargs={"uuid": self.action.uuid}),
-            reverse("accounts:action_history", kwargs={"uuid": self.action.uuid}),
+            reverse("profile:action_list"),
+            reverse("profile:action_create"),
+            reverse("profile:action_list_export"),
+            reverse("profile:action_edit", kwargs={"uuid": self.action.uuid}),
+            reverse("profile:action_delete", kwargs={"uuid": self.action.uuid}),
+            reverse("profile:action_export", kwargs={"uuid": self.action.uuid}),
+            reverse("profile:action_download", kwargs={"uuid": self.action.uuid}),
+            reverse("profile:action_history", kwargs={"uuid": self.action.uuid}),
         ]
 
         # test disabled raises http 404

@@ -1,9 +1,8 @@
 from unittest.mock import patch
 
-from django.contrib.auth.models import AnonymousUser
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.http import Http404
-from django.test import RequestFactory, TestCase
+from django.test import RequestFactory, TestCase, override_settings
 from django.urls import reverse
 from django.views.generic import FormView
 
@@ -24,12 +23,13 @@ class QuestionnaireResetViewTestCase(WebTest):
         self.app.get(path)
         self.assertIsNone(self.app.session[QUESTIONNAIRE_SESSION_KEY])
 
+    @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
     def test_authenticated_user_redirects(self):
         user = UserFactory()
         path = reverse("questionnaire:reset")
         response = self.app.get(path, user=user)
         self.assertEqual(302, response.status_code)
-        self.assertEqual(reverse("accounts:my_profile"), response.url)
+        self.assertEqual(reverse("profile:detail"), response.url)
 
     def test_anonymous_user_redirects(self):
         path = reverse("questionnaire:reset")
@@ -145,6 +145,7 @@ class QuestionnaireStepViewTestCase(TestCase):
         response = self.client.get(path)
         self.assertContains(response, root.get_absolute_url())
 
+    @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
     def test_render_profile(self):
         root = QuestionnaireStepFactory.create(code="foo", slug="foo")
         root.add_child(code="bar", slug="bar")
@@ -152,7 +153,7 @@ class QuestionnaireStepViewTestCase(TestCase):
             "questionnaire:descendent_step", kwargs={"root_slug": "foo", "slug": "bar"}
         )
         response = self.client.get(path)
-        self.assertContains(response, reverse("accounts:my_profile"))
+        self.assertContains(response, reverse("questionnaire:reset"))
 
     def test_form_view(self):
         view = QuestionnaireStepView()
@@ -254,6 +255,7 @@ class QuestionnaireStepViewTestCase(TestCase):
         self.assertEqual(response.url, descendent.get_absolute_url())
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class QuestionnaireStepListViewTestCase(WebTest):
     def setUp(self):
         self.user = UserFactory()
@@ -280,13 +282,14 @@ class QuestionnaireStepListViewTestCase(WebTest):
         )
         self.assertContains(response, questionnaire.slug)
 
+    @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
     def test_zelfdiagnose_button_is_shown_when_there_are_questionnaires(self):
         QuestionnaireStepFactory()
-        path = reverse("accounts:my_profile")
+        path = reverse("profile:detail")
         response = self.app.get(path, user=self.user)
         self.assertContains(response, "Start zelftest")
 
     def test_zelfdiagnose_button_is_not_shown_when_there_are_no_questionnaires(self):
-        path = reverse("accounts:my_profile")
+        path = reverse("profile:detail")
         response = self.app.get(path, user=self.user)
         self.assertNotContains(response, "Start zelftest")

@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 
@@ -8,6 +9,7 @@ from django_webtest import WebTest
 from .factories import InviteFactory, UserFactory
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class InvitePageTests(WebTest):
     def setUp(self):
         super().setUp()

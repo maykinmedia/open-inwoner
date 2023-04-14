@@ -14,7 +14,7 @@ class DocumentCreateView(LogMixin, LoginRequiredMixin, CommonPageMixin, CreateVi
     template_name = "pages/profile/documents/edit.html"
     model = Document
     form_class = DocumentForm
-    success_url = reverse_lazy("accounts:my_profile")
+    success_url = reverse_lazy("profile:detail")
 
     def page_title(self):
         return _("Voeg document toe")
@@ -35,7 +35,7 @@ class DocumentDeleteView(LogMixin, LoginRequiredMixin, DeleteView):
     model = Document
     slug_field = "uuid"
     slug_url_kwarg = "uuid"
-    success_url = reverse_lazy("accounts:my_profile")
+    success_url = reverse_lazy("profile:detail")
 
     def get_queryset(self):
         base_qs = super().get_queryset()
