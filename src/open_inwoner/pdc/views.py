@@ -44,7 +44,8 @@ class CategoryBreadcrumbMixin:
             (
                 category.get("category").name,
                 reverse(
-                    "pdc:category_detail", kwargs={"slug": category.get("build_slug")}
+                    "products:category_detail",
+                    kwargs={"slug": category.get("build_slug")},
                 ),
             )
             for category in self.get_orderd_categories(slug_name=slug_name)
@@ -129,7 +130,7 @@ class CategoryListView(CommonPageMixin, ListBreadcrumbMixin, ListView):
     @cached_property
     def crumbs(self):
         config = SiteConfiguration.get_solo()
-        return [(config.theme_title, reverse("pdc:category_list"))]
+        return [(config.theme_title, reverse("products:category_list"))]
 
 
 class CategoryDetailView(
@@ -141,7 +142,7 @@ class CategoryDetailView(
 
     @cached_property
     def crumbs(self):
-        base_list = [(_("Onderwerpen"), reverse("pdc:category_list"))]
+        base_list = [(_("Onderwerpen"), reverse("products:category_list"))]
         return base_list + self.get_categories_breadcrumbs()
 
     def get_object(self, queryset=None):
@@ -184,7 +185,7 @@ class ProductDetailView(
 
     @cached_property
     def crumbs(self):
-        base_list = [(_("Onderwerpen"), reverse("pdc:category_list"))]
+        base_list = [(_("Onderwerpen"), reverse("products:category_list"))]
         base_list += self.get_categories_breadcrumbs(slug_name="category_slug")
         return base_list + [(self.get_object().name, self.request.path)]
 
@@ -228,7 +229,7 @@ class ProductFormView(
 
     @cached_property
     def crumbs(self):
-        base_list = [(_("Onderwerpen"), reverse("pdc:category_list"))]
+        base_list = [(_("Onderwerpen"), reverse("products:category_list"))]
         base_list += self.get_categories_breadcrumbs(slug_name="category_slug")
         return base_list + [
             (self.get_object().name, self.get_object().get_absolute_url()),
@@ -251,7 +252,7 @@ class ProductFinderView(CommonPageMixin, FormView):
     template_name = "pages/product/finder.html"
     form_class = ProductFinderForm
     condition = None
-    success_url = reverse_lazy("pdc:product_finder")
+    success_url = reverse_lazy("products:product_finder")
 
     def page_title(self):
         return _("Producten")
@@ -414,7 +415,9 @@ class ProductLocationDetailView(
         return [
             (
                 self.get_object().name,
-                reverse("pdc:location_detail", kwargs={"uuid": self.get_object().uuid}),
+                reverse(
+                    "products:location_detail", kwargs={"uuid": self.get_object().uuid}
+                ),
             )
         ]
 

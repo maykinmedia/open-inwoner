@@ -17,7 +17,7 @@ class TestPublishedProducts(WebTest):
         product1 = ProductFactory(categories=(category,))
         product2 = ProductFactory(categories=(category,), published=False)
         response = self.app.get(
-            reverse("pdc:category_detail", kwargs={"slug": category.slug})
+            reverse("products:category_detail", kwargs={"slug": category.slug})
         )
         self.assertEqual(list(response.context["products"]), [product1])
 
@@ -27,7 +27,8 @@ class TestPublishedProducts(WebTest):
         product1 = ProductFactory(categories=(category,))
         product2 = ProductFactory(categories=(category,), published=False)
         response = self.app.get(
-            reverse("pdc:category_detail", kwargs={"slug": category.slug}), user=user
+            reverse("products:category_detail", kwargs={"slug": category.slug}),
+            user=user,
         )
         self.assertEqual(list(response.context["products"]), [product1])
 
@@ -36,7 +37,7 @@ class TestPublishedProducts(WebTest):
         product2 = ProductFactory(published=False)
         product3 = ProductFactory(related_products=(product1, product2))
         response = self.app.get(
-            reverse("pdc:product_detail", kwargs={"slug": product1.slug})
+            reverse("products:product_detail", kwargs={"slug": product1.slug})
         )
         self.assertContains(response, product1.name)
         self.assertNotContains(response, product2.name)
@@ -47,7 +48,8 @@ class TestPublishedProducts(WebTest):
         product2 = ProductFactory(published=False)
         product3 = ProductFactory(related_products=(product1, product2))
         response = self.app.get(
-            reverse("pdc:product_detail", kwargs={"slug": product1.slug}), user=user
+            reverse("products:product_detail", kwargs={"slug": product1.slug}),
+            user=user,
         )
         self.assertContains(response, product1.name)
         self.assertNotContains(response, product2.name)
@@ -77,7 +79,7 @@ class TestPublishedProducts(WebTest):
     def test_only_published_products_exist_on_product_finder_page_when_anonymous(self):
         product1 = ProductFactory()
         product2 = ProductFactory(published=False)
-        response = self.app.get(reverse("pdc:product_finder"))
+        response = self.app.get(reverse("products:product_finder"))
         matched_products = list(response.context["matched_products"])
         possible_products = list(response.context["possible_products"])
         self.assertEqual(len(matched_products), 0)
@@ -89,7 +91,7 @@ class TestPublishedProducts(WebTest):
         user = UserFactory()
         product1 = ProductFactory()
         product2 = ProductFactory(published=False)
-        response = self.app.get(reverse("pdc:product_finder"), user=user)
+        response = self.app.get(reverse("products:product_finder"), user=user)
         matched_products = list(response.context["matched_products"])
         possible_products = list(response.context["possible_products"])
         self.assertEqual(len(matched_products), 0)
@@ -103,7 +105,7 @@ class TestPublishedProducts(WebTest):
         product2 = ProductFactory(categories=(category,))
 
         response = self.app.get(
-            reverse("pdc:category_detail", kwargs={"slug": category.slug})
+            reverse("products:category_detail", kwargs={"slug": category.slug})
         )
         self.assertEqual(list(response.context["products"]), [product1, product2])
 
@@ -112,11 +114,12 @@ class TestPublishedProducts(WebTest):
         prodcat.down()
 
         response = self.app.get(
-            reverse("pdc:category_detail", kwargs={"slug": category.slug})
+            reverse("products:category_detail", kwargs={"slug": category.slug})
         )
         self.assertEqual(list(response.context["products"]), [product2, product1])
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestProductFAQ(WebTest):
     def test_product_detail_shows_product_faq(self):
         product = ProductFactory()
@@ -131,7 +134,7 @@ class TestProductFAQ(WebTest):
         other_question = QuestionFactory(product=other_product)
 
         response = self.app.get(
-            reverse("pdc:product_detail", kwargs={"slug": product.slug})
+            reverse("products:product_detail", kwargs={"slug": product.slug})
         )
         self.assertEqual(response.context["product"], product)
 
@@ -151,6 +154,7 @@ class TestProductFAQ(WebTest):
         self.assertTrue(response.pyquery("#faq"))
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestProductContent(WebTest):
     def test_button_is_rendered_inside_content_when_link_and_cta_exist(self):
         product = ProductFactory(
@@ -158,7 +162,7 @@ class TestProductContent(WebTest):
         )
 
         response = self.app.get(
-            reverse("pdc:product_detail", kwargs={"slug": product.slug})
+            reverse("products:product_detail", kwargs={"slug": product.slug})
         )
         cta_button = response.pyquery(".grid__main")[0].find_class("cta-button")
 
@@ -169,7 +173,7 @@ class TestProductContent(WebTest):
         product = ProductFactory(content="Some content [CTABUTTON]", form="demo")
 
         response = self.app.get(
-            reverse("pdc:product_detail", kwargs={"slug": product.slug})
+            reverse("products:product_detail", kwargs={"slug": product.slug})
         )
         cta_button = response.pyquery(".grid__main")[0].find_class("cta-button")
 
@@ -184,7 +188,7 @@ class TestProductContent(WebTest):
         )
 
         response = self.app.get(
-            reverse("pdc:product_detail", kwargs={"slug": product.slug})
+            reverse("products:product_detail", kwargs={"slug": product.slug})
         )
         cta_button = response.pyquery(".grid__main")[0].find_class("cta-button")
 
@@ -195,7 +199,7 @@ class TestProductContent(WebTest):
         product = ProductFactory(content="Some content", link="http://www.example.com")
 
         response = self.app.get(
-            reverse("pdc:product_detail", kwargs={"slug": product.slug})
+            reverse("products:product_detail", kwargs={"slug": product.slug})
         )
         cta_button = response.pyquery(".grid__main")[0].find_class("cta-button")
 
@@ -205,7 +209,7 @@ class TestProductContent(WebTest):
         product = ProductFactory(content="Some content [CTABUTTON]")
 
         response = self.app.get(
-            reverse("pdc:product_detail", kwargs={"slug": product.slug})
+            reverse("products:product_detail", kwargs={"slug": product.slug})
         )
         cta_button = response.pyquery(".grid__main")[0].find_class("cta-button")
 
@@ -217,7 +221,7 @@ class TestProductContent(WebTest):
         )
 
         response = self.app.get(
-            reverse("pdc:product_detail", kwargs={"slug": product.slug})
+            reverse("products:product_detail", kwargs={"slug": product.slug})
         )
         sidemenu_cta_button = response.pyquery(
             '.anchor-menu__list-item a[href="http://www.example.com"]'
@@ -229,7 +233,7 @@ class TestProductContent(WebTest):
         product = ProductFactory(content="Some content", link="http://www.example.com")
 
         response = self.app.get(
-            reverse("pdc:product_detail", kwargs={"slug": product.slug})
+            reverse("products:product_detail", kwargs={"slug": product.slug})
         )
         sidemenu_cta_button = response.pyquery(
             '.anchor-menu__list-item a[href="http://www.example.com"]'

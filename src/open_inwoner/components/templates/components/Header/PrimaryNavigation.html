@@ -8,14 +8,14 @@
             {% link text=link_text href=link icon="apps" icon_position="before" %}
         </li>
         <li class="primary-navigation__list-item">
-            {% link text=_("Onderwerpen") href='pdc:category_list' icon="description" icon_position="before" icon_outlined=True %}
+            {% link text=_("Onderwerpen") href='products:category_list' icon="description" icon_position="before" icon_outlined=True %}
             {% icon icon="expand_more" %}
 
             {% if categories %}
                 <ul class="primary-navigation__list subpage-list">
                     {% for category in categories %}
                         <li class="primary-navigation__list-item">
-                            {% url 'pdc:category_detail' slug=category.slug as category_href %}
+                            {% url 'products:category_detail' slug=category.slug as category_href %}
                             {% link text=category.name href=category_href %}
                         </li>
                     {% endfor %}

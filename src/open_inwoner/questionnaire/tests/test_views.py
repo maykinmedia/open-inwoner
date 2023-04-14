@@ -125,6 +125,7 @@ class QuestionnaireStepViewTestCase(TestCase):
         response = self.client.get(path)
         self.assertIn('<aside class="file"', str(response.content))
 
+    @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
     def test_render_products(self):
         ProductFactory.create(name="fooz")
         ProductFactory.create(name="barz")

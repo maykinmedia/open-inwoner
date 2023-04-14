@@ -9,6 +9,7 @@ from open_inwoner.questionnaire.tests.factories import QuestionnaireStepFactory
 from .factories import CategoryFactory
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestHighlightedCategories(WebTest):
     def test_only_highlighted_categories_exist_in_context_when_they_exist(self):
         CategoryFactory(name="Should be first")
@@ -62,6 +63,7 @@ class TestHighlightedCategories(WebTest):
         )
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestPublishedCategories(WebTest):
     def setUp(self):
         self.user = UserFactory()
@@ -105,13 +107,13 @@ class TestPublishedCategories(WebTest):
         )
 
     def test_only_published_categories_exist_in_list_page_when_anonymous(self):
-        response = self.app.get(reverse("pdc:category_list"))
+        response = self.app.get(reverse("products:category_list"))
         self.assertEqual(
             list(response.context["categories"]), [self.published1, self.published2]
         )
 
     def test_only_published_categories_exist_in_list_page_when_logged_in(self):
-        response = self.app.get(reverse("pdc:category_list"), user=self.user)
+        response = self.app.get(reverse("products:category_list"), user=self.user)
         self.assertEqual(
             list(response.context["categories"]), [self.published1, self.published2]
         )
@@ -124,7 +126,7 @@ class TestPublishedCategories(WebTest):
             path="00010002", name="second-child", slug="second-child", published=False
         )
         response = self.app.get(
-            reverse("pdc:category_detail", kwargs={"slug": self.published1.slug})
+            reverse("products:category_detail", kwargs={"slug": self.published1.slug})
         )
         self.assertEqual(list(response.context["subcategories"]), [descendent1])
 
@@ -139,7 +141,7 @@ class TestPublishedCategories(WebTest):
             published=False,
         )
         response = self.app.get(
-            reverse("pdc:category_detail", kwargs={"slug": self.published1.slug}),
+            reverse("products:category_detail", kwargs={"slug": self.published1.slug}),
             user=self.user,
         )
         self.assertEqual(list(response.context["subcategories"]), [descendent1])
@@ -153,6 +155,7 @@ class TestPublishedCategories(WebTest):
         )
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestHighlightedQuestionnaire(WebTest):
     def setUp(self):
         self.category = CategoryFactory()
@@ -194,7 +197,7 @@ class TestHighlightedQuestionnaire(WebTest):
 
     def test_all_questionnaires_are_shown_on_anonymous_category_detailed_page(self):
         response = self.app.get(
-            reverse("pdc:category_detail", kwargs={"slug": self.category.slug})
+            reverse("products:category_detail", kwargs={"slug": self.category.slug})
         )
         self.assertEqual(
             list(response.context["questionnaire_roots"]),
@@ -209,7 +212,7 @@ class TestHighlightedQuestionnaire(WebTest):
     def test_all_questionnaires_are_shown_on_user_category_detailed_page(self):
         user = UserFactory()
         response = self.app.get(
-            reverse("pdc:category_detail", kwargs={"slug": self.category.slug}),
+            reverse("products:category_detail", kwargs={"slug": self.category.slug}),
             user=user,
         )
         self.assertEqual(
