@@ -442,30 +442,6 @@ class TestDocuments(WebTest):
         )
 
     @temp_private_root()
-    def test_document_upload_is_logged(self):
-        form = self.app.get(
-            reverse("accounts:documents_create"),
-            user=self.user,
-        ).forms["document-create"]
-        form["name"] = "readme"
-        form["file"] = Upload("readme.png", b"data", "image/png")
-        form.submit()
-        log_entry = TimelineLog.objects.last()
-
-        self.assertEqual(
-            log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
-        )
-        self.assertEqual(log_entry.content_object.id, Document.objects.all()[1].id)
-        self.assertEqual(
-            log_entry.extra_data,
-            {
-                "message": _("file was uploaded"),
-                "action_flag": list(LOG_ACTIONS[4]),
-                "content_object_repr": "readme",
-            },
-        )
-
-    @temp_private_root()
     def test_document_deletion_is_logged(self):
         self.app.post(
             reverse("accounts:documents_delete", kwargs={"uuid": self.document.uuid}),

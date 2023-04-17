@@ -2,6 +2,7 @@ from datetime import timedelta
 from io import BytesIO
 
 from django import forms
+from django.core.exceptions import ValidationError
 from django.core.files.base import File
 from django.utils import timezone
 from django.utils.translation import gettext as _
@@ -54,8 +55,17 @@ class PlanForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
+
         goal = cleaned_data.get("goal")
         template = cleaned_data.get("template")
+        plan_contacts = cleaned_data.get("plan_contacts")
+
+        if not plan_contacts or (
+            plan_contacts and not plan_contacts.exclude(pk=self.user.pk)
+        ):
+            raise ValidationError(
+                _("At least one collaborator is required for a plan.")
+            )
         if not template and not goal:
             self.add_error(
                 "goal", _("This field is required when not using a template")

@@ -18,7 +18,6 @@ from .views import (
     ContactCreateView,
     ContactDeleteView,
     ContactListView,
-    DocumentCreateView,
     DocumentDeleteView,
     DocumentPrivateMediaView,
     EditProfileView,
@@ -47,7 +46,6 @@ urlpatterns = [
         name="inbox_download",
     ),
     path("setup/", HomeView.as_view(), name="setup_1"),
-    path("documents/create/", DocumentCreateView.as_view(), name="documents_create"),
     path(
         "documents/<str:uuid>/delete/",
         DocumentDeleteView.as_view(),
