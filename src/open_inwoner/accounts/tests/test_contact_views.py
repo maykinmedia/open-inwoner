@@ -85,7 +85,7 @@ class ContactViewTests(WebTest):
         )
 
     def test_contact_list_show_link_to_messages(self):
-        message_link = reverse("accounts:inbox", kwargs={"uuid": self.contact.uuid})
+        message_link = reverse("inbox:index", kwargs={"uuid": self.contact.uuid})
         response = self.app.get(self.list_url, user=self.user)
         self.assertContains(response, message_link)
 
@@ -366,7 +366,7 @@ class ContactViewTests(WebTest):
         self.assertContains(response, self.user.first_name)
         self.assertContains(response, self.user.last_name)
         self.assertContains(
-            response, reverse("accounts:inbox", kwargs={"uuid": self.user.uuid})
+            response, reverse("inbox:index", kwargs={"uuid": self.user.uuid})
         )
 
         # Sender contact list page
@@ -376,7 +376,7 @@ class ContactViewTests(WebTest):
         self.assertContains(response, existing_user.last_name)
         self.assertContains(
             response,
-            reverse("accounts:inbox", kwargs={"uuid": existing_user.uuid}),
+            reverse("inbox:index", kwargs={"uuid": existing_user.uuid}),
         )
 
     def test_post_with_no_params_in_contact_approval_returns_bad_request(self):

@@ -1,5 +1,6 @@
 from unittest import skip
 
+from django.test import override_settings
 from django.urls import reverse
 
 from django_webtest import WebTest
@@ -15,6 +16,7 @@ from ..models import Message
 from .factories import DigidUserFactory, MessageFactory, UserFactory
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class InboxPageTests(WebTest):
     def setUp(self) -> None:
         super().setUp()
@@ -39,10 +41,8 @@ class InboxPageTests(WebTest):
 
         self.app.set_user(self.user)
 
-        self.url = reverse("accounts:inbox")
-        self.contact1_url = reverse(
-            "accounts:inbox", kwargs={"uuid": self.contact1.uuid}
-        )
+        self.url = reverse("inbox:index")
+        self.contact1_url = reverse("inbox:index", kwargs={"uuid": self.contact1.uuid})
 
     def test_user_contacts_are_symetrical(self):
         self.assertIn(self.contact1, self.user.user_contacts.all())
@@ -129,7 +129,7 @@ class InboxPageTests(WebTest):
             self.assertFalse(message.seen)
 
         response = self.app.get(
-            reverse("accounts:inbox", kwargs={"uuid": other_user.uuid}),
+            reverse("inbox:index", kwargs={"uuid": other_user.uuid}),
             auto_follow=True,
         )
         self.assertEqual(response.status_code, 200)
@@ -179,6 +179,7 @@ class InboxPageTests(WebTest):
 
 
 @multi_browser()
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class InboxPagePlaywrightTests(PlaywrightSyncLiveServerTestCase):
     @classmethod
     def setUpClass(cls):
@@ -208,7 +209,7 @@ class InboxPagePlaywrightTests(PlaywrightSyncLiveServerTestCase):
             sender=self.contact_2,
         )
         self.contact_1_conversation_url = self.live_reverse(
-            "accounts:inbox",
+            "inbox:index",
             kwargs={"uuid": self.contact_1.uuid},
         )
 

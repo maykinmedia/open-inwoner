@@ -206,8 +206,9 @@ INSTALLED_APPS = [
     "open_inwoner.extended_sessions",
     "open_inwoner.custom_csp",
     "open_inwoner.cms.profile",
-    "open_inwoner.cms.products",
     "open_inwoner.cms.cases",
+    "open_inwoner.cms.inbox",
+    "open_inwoner.cms.products",
 ]
 
 MIDDLEWARE = [

@@ -96,7 +96,7 @@ Given an example of a hyperlink with an icon:
 
 ```html
 {% load i18n %}
-<a class="button button--primary" href="{% url 'accounts:inbox' %}">
+<a class="button button--primary" href="{% url 'inbox:index' %}">
     <span class="material-icon">arrow_forward</span>
     {% trans 'My messages' %}
 </a>
@@ -117,7 +117,7 @@ Replacing this link with a simple:
 
 ```django
 {% load i18n %}
-{% link href='accounts:inbox' text=_('My messages') button=True primary=True icon='arrow_forward' %}
+{% link href='inbox:index' text=_('My messages') button=True primary=True icon='arrow_forward' %}
 ```
 
 Gives us the ability to alter (upgrade) the implementation anytime without worrying about the existing usages. As a
