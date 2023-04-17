@@ -131,7 +131,7 @@ INSTALLED_APPS = [
     "menus",
     "treebeard",
     "sekizai",
-    "djangocms_admin_style",
+    # "djangocms_admin_style",
     "djangocms_text_ckeditor",
     "djangocms_link",
     "djangocms_file",
@@ -147,7 +147,7 @@ INSTALLED_APPS = [
     "two_factor",
     # Optional applications.
     "ordered_model",
-    # "django_admin_index",
+    "django_admin_index",
     "django.contrib.admin",
     "django.contrib.gis",
     # 'django.contrib.admindocs',
