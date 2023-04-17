@@ -605,7 +605,7 @@ class TestDigid(HaalCentraalMixin, WebTest):
         self.assertNotEqual(user.first_name, "UpdatedName")
 
 
-@override_settings(ROOT_URLCONF="open_inwoner.cmsapps.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestRegistrationNecessary(WebTest):
     url = reverse_lazy("accounts:registration_necessary")
 
