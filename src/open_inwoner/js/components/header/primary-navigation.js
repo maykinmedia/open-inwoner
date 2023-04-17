@@ -35,22 +35,16 @@ class PrimaryNavigation extends Component {
 
   /**
    * Gets called when `node` receives focus.
-   * Clears the dismissed state, (prevents overriding focus/hover).
+   * Clears the dismissed state, (prevents overriding focus/toggle).
    */
-  // onHover() {
-  //   this.setState({ dismissed: false })
-  // }
-  // + toggle nav
   toggleDesktopNavOpen(event) {
-    event.preventDefault()
-    console.log("toggel navopen primary")
-    this.node.parentElement.classList.toggle('nav__list--open')
+     this.setState({ dismissed: false })
   }
 
   /**
    * Gets called when a key is released.
    * If key is escape key, explicitly dismiss the menu (overriding focus/hover).
-   * @param {KeyboardEvent} event
+   // * @param {KeyboardEvent} event
    */
   onKeyUp(event) {
     if (event.key === 'Escape') {
@@ -62,31 +56,23 @@ class PrimaryNavigation extends Component {
 
   /**
    * Returns the child node in focus (if any).
-   * @return {HTMLElement|null}
+   // * @return {HTMLElement|null}
    */
   getFocussedChild() {
     return this.node.querySelector(':focus') || null
   }
 
   /**
-   * Returns the hovered child node (if any).
-   * @return {HTMLElement|null}
-   */
-  // getHoveredChild() {
-  //   return this.node.querySelector('nav__list--open') || null
-  // }
-
-  /**
    * Persists state to DOM.
    * Rendering should be one-way traffic and not inspect any current values in DOM.
-   * @param {Object} state State to render.
+   // * @param {Object} state State to render.
    */
   render(state) {
     BEM.toggleModifier(this.node, MODIFIER_DISMISSED, state.dismissed)
 
     if (state.dismissed) {
       this.getFocussedChild().blur()
-      return this.node.querySelector('nav__list--open') || null
+      return this.node.querySelector('.dropdown-nav__toggle .desktop-link--toggle') || null
     }
   }
 }
