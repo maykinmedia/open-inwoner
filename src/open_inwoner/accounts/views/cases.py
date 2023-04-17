@@ -205,7 +205,7 @@ class OpenCaseListView(
 ):
     @cached_property
     def crumbs(self):
-        return [(_("Mijn aanvragen"), reverse("accounts:my_open_cases"))]
+        return [(_("Mijn aanvragen"), reverse("cases:open_cases"))]
 
     def page_title(self):
         return _("Lopende aanvragen")
@@ -219,9 +219,9 @@ class OpenCaseListView(
 
     def get_anchors(self) -> list:
         return [
-            (reverse("accounts:open_submissions"), _("Open aanvragen")),
+            (reverse("cases:open_submissions"), _("Open aanvragen")),
             ("#cases", _("Lopende aanvragen")),
-            (reverse("accounts:my_closed_cases"), _("Afgeronde aanvragen")),
+            (reverse("cases:closed_cases"), _("Afgeronde aanvragen")),
         ]
 
 
@@ -230,7 +230,7 @@ class ClosedCaseListView(
 ):
     @cached_property
     def crumbs(self):
-        return [(_("Mijn aanvragen"), reverse("accounts:my_closed_cases"))]
+        return [(_("Mijn aanvragen"), reverse("cases:closed_cases"))]
 
     def page_title(self):
         return _("Afgeronde aanvragen")
@@ -244,8 +244,8 @@ class ClosedCaseListView(
 
     def get_anchors(self) -> list:
         return [
-            (reverse("accounts:open_submissions"), _("Open aanvragen")),
-            (reverse("accounts:my_open_cases"), _("Lopende aanvragen")),
+            (reverse("cases:open_submissions"), _("Open aanvragen")),
+            (reverse("cases:open_cases"), _("Lopende aanvragen")),
             ("#cases", _("Afgeronde aanvragen")),
         ]
 
@@ -257,7 +257,7 @@ class OpenSubmissionListView(
 
     @cached_property
     def crumbs(self):
-        return [(_("Mijn aanvragen"), reverse("accounts:open_submissions"))]
+        return [(_("Mijn aanvragen"), reverse("cases:open_submissions"))]
 
     def page_title(self):
         return _("Open aanvragen")
@@ -275,8 +275,8 @@ class OpenSubmissionListView(
     def get_anchors(self) -> list:
         return [
             ("#submissions", _("Open aanvragen")),
-            (reverse("accounts:my_open_cases"), _("Lopende aanvragen")),
-            (reverse("accounts:my_closed_cases"), _("Afgeronde aanvragen")),
+            (reverse("cases:open_cases"), _("Lopende aanvragen")),
+            (reverse("cases:closed_cases"), _("Afgeronde aanvragen")),
         ]
 
 
@@ -296,10 +296,10 @@ class CaseDetailView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn aanvragen"), reverse("accounts:my_open_cases")),
+            (_("Mijn aanvragen"), reverse("cases:open_cases")),
             (
                 _("Status"),
-                reverse("accounts:case_status", kwargs=self.kwargs),
+                reverse("cases:case_detail", kwargs=self.kwargs),
             ),
         ]
 
@@ -445,7 +445,7 @@ class CaseDetailView(
                     name=info_obj.titel,
                     size=info_obj.bestandsomvang,
                     url=reverse(
-                        "accounts:case_document_download",
+                        "cases:document_download",
                         kwargs={
                             "object_id": case.uuid,
                             "info_id": info_obj.uuid,

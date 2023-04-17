@@ -3,6 +3,7 @@ from io import BytesIO
 
 from django.contrib.auth.models import AnonymousUser
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -46,6 +47,7 @@ def get_temporary_text_file():
 
 @temp_private_root()
 @requests_mock.Mocker()
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
     @classmethod
     def setUpTestData(cls):
@@ -157,7 +159,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
             name="my_document.txt",
             size=len(cls.informatie_object_content),
             url=reverse(
-                "accounts:case_document_download",
+                "cases:document_download",
                 kwargs={
                     "object_id": cls.zaak["uuid"],
                     "info_id": cls.informatie_object["uuid"],
@@ -203,7 +205,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
     def test_document_content_is_retrieved_when_user_logged_in_via_digid(self, m):
         self._setUpMocks(m)
         url = reverse(
-            "accounts:case_document_download",
+            "cases:document_download",
             kwargs={
                 "object_id": self.zaak["uuid"],
                 "info_id": self.informatie_object["uuid"],
@@ -227,7 +229,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
     def test_document_retrieval_logs_case_identification_and_file(self, m):
         self._setUpMocks(m)
         url = reverse(
-            "accounts:case_document_download",
+            "cases:document_download",
             kwargs={
                 "object_id": self.zaak["uuid"],
                 "info_id": self.informatie_object["uuid"],
@@ -259,7 +261,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
         )
         m.get(info_object["url"], json=info_object)
         url = reverse(
-            "accounts:case_document_download",
+            "cases:document_download",
             kwargs={
                 "object_id": self.zaak["uuid"],
                 "info_id": info_object["uuid"],
@@ -282,7 +284,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
         )
         m.get(info_object["url"], json=info_object)
         url = reverse(
-            "accounts:case_document_download",
+            "cases:document_download",
             kwargs={
                 "object_id": self.zaak["uuid"],
                 "info_id": info_object["uuid"],
