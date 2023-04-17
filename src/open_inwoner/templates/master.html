@@ -37,11 +37,6 @@
     <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
         {% cms_toolbar %}
         {% header categories=menu_categories request=request breadcrumbs=breadcrumbs search_form=search_form has_general_faq_questions=has_general_faq_questions show_plans=show_plans %}
-        <div class="debug-cms-block">
-        <ul class="nav">
-        {% show_menu 0 100 100 100 %}
-        </ul>
-        </div>
 
         {% if anchors %}
         {% anchor_menu anchors=anchors desktop=False %}
