@@ -205,6 +205,8 @@ INSTALLED_APPS = [
     "open_inwoner.questionnaire",
     "open_inwoner.extended_sessions",
     "open_inwoner.custom_csp",
+    "open_inwoner.cms.profile",
+    "open_inwoner.cms.products",
     "open_inwoner.cms.cases",
 ]
 
@@ -506,7 +508,11 @@ CMS_PLACEHOLDER_CONF = {
         "excluded_plugins": ["InheritPlugin"],
     },
     "content": {
-        "plugins": ["TextPlugin", "PicturePlugin"],
+        "plugins": [
+            "TextPlugin",
+            "PicturePlugin",
+            "CategoriesPlugin",
+        ],
         "text_only_plugins": ["LinkPlugin"],
         "name": _("Content"),
         "language_fallback": True,
@@ -524,10 +530,6 @@ CMS_PLACEHOLDER_CONF = {
         # "parent_classes": {
         #     "LinkPlugin": ["TextPlugin"],
         # },
-    },
-    "fullwidth.html content": {
-        "plugins": ["TextPlugin", "PicturePlugin", "TeaserPlugin"],
-        "inherit": "content",
     },
 }
 

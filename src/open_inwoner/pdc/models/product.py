@@ -186,15 +186,15 @@ class Product(models.Model):
 
     @property
     def form_link(self):
-        return reverse("pdc:product_form", kwargs={"slug": self.slug})
+        return reverse("products:product_form", kwargs={"slug": self.slug})
 
     def get_absolute_url(self, category=None):
         if not category:
-            return reverse("pdc:product_detail", kwargs={"slug": self.slug})
+            return reverse("products:product_detail", kwargs={"slug": self.slug})
 
         category_slug = category.get_build_slug()
         return reverse(
-            "pdc:category_product_detail",
+            "products:category_product_detail",
             kwargs={"slug": self.slug, "category_slug": category_slug},
         )
 
@@ -353,7 +353,7 @@ class ProductLocation(GeoModel):
         return feature
 
     def get_absolute_url(self) -> str:
-        return reverse("pdc:location_detail", kwargs={"uuid": self.uuid})
+        return reverse("products:location_detail", kwargs={"uuid": self.uuid})
 
 
 class ProductCondition(OrderedModel):

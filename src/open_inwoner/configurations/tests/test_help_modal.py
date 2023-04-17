@@ -37,7 +37,7 @@ class TestHelpContext(WebTest):
         self.assertEquals(help_text, config.home_help_text)
 
     def test_default_help_text_on_categories_page(self):
-        response = self.app.get(reverse("pdc:category_list"))
+        response = self.app.get(reverse("products:category_list"))
         help_text = response.context.get("help_text")
 
         self.assertEquals(
@@ -50,14 +50,14 @@ class TestHelpContext(WebTest):
     def test_custom_help_text_on_categories_page(self):
         SiteConfigurationFactory()
         config = SiteConfiguration.get_solo()
-        response = self.app.get(reverse("pdc:category_list"))
+        response = self.app.get(reverse("products:category_list"))
         help_text = response.context.get("help_text")
 
         self.assertEquals(help_text, config.theme_help_text)
 
     def test_default_help_text_on_products_page(self):
         response = self.app.get(
-            reverse("pdc:product_detail", kwargs={"slug": self.product.slug})
+            reverse("products:product_detail", kwargs={"slug": self.product.slug})
         )
         help_text = response.context.get("help_text")
 
@@ -72,7 +72,7 @@ class TestHelpContext(WebTest):
         SiteConfigurationFactory()
         config = SiteConfiguration.get_solo()
         response = self.app.get(
-            reverse("pdc:product_detail", kwargs={"slug": self.product.slug})
+            reverse("products:product_detail", kwargs={"slug": self.product.slug})
         )
         help_text = response.context.get("help_text")
 

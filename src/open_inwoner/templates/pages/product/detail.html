@@ -121,7 +121,7 @@
                     <ul class="link-list__list">
                         {% for related in object.related_products.published %}
                             <li class="link-list__list-item link-list__list-item--wrap">
-                                {% url 'pdc:product_detail' slug=related.slug as product_url %}
+                                {% url 'products:product_detail' slug=related.slug as product_url %}
                                 {% link href=product_url text=related.name secondary=True %}
                             </li>
                         {% endfor %}

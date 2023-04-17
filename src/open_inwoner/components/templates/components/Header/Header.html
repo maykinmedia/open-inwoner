@@ -42,7 +42,7 @@
                                 <ul class="primary-navigation__list subpage-list">
                                     {% for category in categories %}
                                         <li class="primary-navigation__list-item">
-                                            {% url 'pdc:category_detail' slug=category.slug as category_href %}
+                                            {% url 'products:category_detail' slug=category.slug as category_href %}
                                             {% link text=category.name href=category_href %}
                                         </li>
                                     {% endfor %}
