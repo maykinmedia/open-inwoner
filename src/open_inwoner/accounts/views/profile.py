@@ -36,7 +36,7 @@ class MyProfileView(
 
     @cached_property
     def crumbs(self):
-        return [(_("Mijn profiel"), reverse("accounts:my_profile"))]
+        return [(_("Mijn profiel"), reverse("profile:detail"))]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -99,7 +99,7 @@ class MyProfileView(
             return redirect(instance.get_logout_url())
         else:
             messages.warning(request, _("Uw account kon niet worden gedeactiveerd"))
-            return redirect("accounts:my_profile")
+            return redirect("profile:detail")
 
 
 class EditProfileView(
@@ -108,13 +108,13 @@ class EditProfileView(
     template_name = "pages/profile/edit.html"
     model = User
     form_class = UserForm
-    success_url = reverse_lazy("accounts:my_profile")
+    success_url = reverse_lazy("profile:detail")
 
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn profiel"), reverse("accounts:my_profile")),
-            (_("Bewerk profiel"), reverse("accounts:edit_profile", kwargs=self.kwargs)),
+            (_("Mijn profiel"), reverse("profile:detail")),
+            (_("Bewerk profiel"), reverse("profile:edit", kwargs=self.kwargs)),
         ]
 
     def get_object(self):
@@ -144,13 +144,13 @@ class MyCategoriesView(
     template_name = "pages/profile/categories.html"
     model = User
     form_class = CategoriesForm
-    success_url = reverse_lazy("accounts:my_profile")
+    success_url = reverse_lazy("profile:detail")
 
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn profiel"), reverse("accounts:my_profile")),
-            (_("Mijn onderwerpen"), reverse("accounts:my_categories")),
+            (_("Mijn profiel"), reverse("profile:detail")),
+            (_("Mijn onderwerpen"), reverse("profile:categories")),
         ]
 
     def get_object(self):
@@ -171,8 +171,8 @@ class MyDataView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn profiel"), reverse("accounts:my_profile")),
-            (_("Mijn gegevens"), reverse("accounts:my_data")),
+            (_("Mijn profiel"), reverse("profile:detail")),
+            (_("Mijn gegevens"), reverse("profile:data")),
         ]
 
     def get_context_data(self, **kwargs):

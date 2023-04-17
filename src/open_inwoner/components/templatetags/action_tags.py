@@ -59,9 +59,7 @@ def action_status_button(action, request, plan=None, **kwargs):
             kwargs={"plan_uuid": plan.uuid, "uuid": action.uuid},
         )
     else:
-        action_url = reverse(
-            "accounts:action_edit_status", kwargs={"uuid": action.uuid}
-        )
+        action_url = reverse("profile:action_edit_status", kwargs={"uuid": action.uuid})
 
     swap_target_id = f"actions_{action.pk}__status"
     choices = [
@@ -114,7 +112,7 @@ def get_action_edit_url(action, plan=None):
             "plans:plan_action_edit",
             kwargs={"plan_uuid": plan.uuid, "uuid": action.uuid},
         )
-    return reverse("accounts:action_edit", kwargs={"uuid": action.uuid})
+    return reverse("profile:action_edit", kwargs={"uuid": action.uuid})
 
 
 @register.simple_tag()
@@ -135,7 +133,7 @@ def get_action_delete_url(action, plan=None):
             "plans:plan_action_delete",
             kwargs={"plan_uuid": plan.uuid, "uuid": action.uuid},
         )
-    return reverse("accounts:action_delete", kwargs={"uuid": action.uuid})
+    return reverse("profile:action_delete", kwargs={"uuid": action.uuid})
 
 
 @register.filter()

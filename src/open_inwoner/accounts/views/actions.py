@@ -66,8 +66,8 @@ class ActionListView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn profiel"), reverse("accounts:my_profile")),
-            (_("Mijn acties"), reverse("accounts:action_list")),
+            (_("Mijn profiel"), reverse("profile:detail")),
+            (_("Mijn acties"), reverse("profile:action_list")),
         ]
 
     def get_queryset(self):
@@ -105,16 +105,16 @@ class ActionUpdateView(
     slug_field = "uuid"
     slug_url_kwarg = "uuid"
     form_class = ActionForm
-    success_url = reverse_lazy("accounts:action_list")
+    success_url = reverse_lazy("profile:action_list")
 
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn profiel"), reverse("accounts:my_profile")),
-            (_("Mijn acties"), reverse("accounts:action_list")),
+            (_("Mijn profiel"), reverse("profile:detail")),
+            (_("Mijn acties"), reverse("profile:action_list")),
             (
                 _("Bewerk {}").format(self.object.name),
-                reverse("accounts:action_edit", kwargs=self.kwargs),
+                reverse("profile:action_edit", kwargs=self.kwargs),
             ),
         ]
 
@@ -180,7 +180,7 @@ class ActionDeleteView(
     model = Action
     slug_field = "uuid"
     slug_url_kwarg = "uuid"
-    success_url = reverse_lazy("accounts:action_list")
+    success_url = reverse_lazy("profile:action_list")
     raise_exception = True
 
     def get_queryset(self):
@@ -220,16 +220,16 @@ class ActionCreateView(
     template_name = "pages/profile/actions/edit.html"
     model = Action
     form_class = ActionForm
-    success_url = reverse_lazy("accounts:action_list")
+    success_url = reverse_lazy("profile:action_list")
 
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn profiel"), reverse("accounts:my_profile")),
-            (_("Mijn acties"), reverse("accounts:action_list")),
+            (_("Mijn profiel"), reverse("profile:detail")),
+            (_("Mijn acties"), reverse("profile:action_list")),
             (
                 _("Maak actie aan"),
-                reverse("accounts:action_create"),
+                reverse("profile:action_create"),
             ),
         ]
 
@@ -316,11 +316,11 @@ class ActionHistoryView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn profiel"), reverse("accounts:my_profile")),
-            (_("Mijn acties"), reverse("accounts:action_list")),
+            (_("Mijn profiel"), reverse("profile:detail")),
+            (_("Mijn acties"), reverse("profile:action_list")),
             (
                 _("History of {}").format(self.object.name),
-                reverse("accounts:action_history", kwargs=self.kwargs),
+                reverse("profile:action_history", kwargs=self.kwargs),
             ),
         ]
 

@@ -12,7 +12,7 @@
     {% button_row align="right" %}
         {% dropdown icon="settings" secondary=True %}
             <div class="dropdown__item">
-                {% button href="accounts:edit_profile" text=_("Bewerken") icon="edit" transparent=True %}
+                {% button href="profile:edit" text=_("Bewerken") icon="edit" transparent=True %}
             </div>
             {% if can_change_password %}
                 <div class="dropdown__item">
@@ -20,7 +20,7 @@
                 </div>
             {% endif %}
         {% enddropdown %}
-        {% button href="accounts:profile_export" icon="file-pdf" text=_("Exporteer naar PDF") hide_text=True icon_outlined=True transparent=True secondary=True %}
+        {% button href="profile:export" icon="file-pdf" text=_("Exporteer naar PDF") hide_text=True icon_outlined=True transparent=True secondary=True %}
     {% endbutton_row %}
 </h1>
 
@@ -56,19 +56,19 @@
         <div class="tabled__row">
             <div class="tabled__item tabled__item--bold">{% trans "Mijn gegevens" %}</div>
             <div class="tabled__item">{{request.user.get_full_name}}{% if request.user.get_address %}, {{ request.user.get_address }}{% endif %}</div>
-            <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="accounts:my_data" text="Bekijken" icon="arrow_forward" icon_position="after" primary=True %}</div>
+            <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="profile:data" text="Bekijken" icon="arrow_forward" icon_position="after" primary=True %}</div>
         </div>
     {% endif %}
     <div class="tabled__row">
         <div class="tabled__item tabled__item--bold">{% trans "Interessegebieden" %}</div>
         <div class="tabled__item">{{ category_text }}</div>
-        <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="accounts:my_categories" text="Aanpassen" icon="arrow_forward" icon_position="after" primary=True %}</div>
+        <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="profile:categories" text="Aanpassen" icon="arrow_forward" icon_position="after" primary=True %}</div>
     </div>
     <div class="tabled__row">
         <div class="tabled__item tabled__item--bold">{% trans "Begeleider(s)" %}</div>
         {% if mentor_contacts %}
             <div class="tabled__item">{{ mentor_contacts|join:", " }}</div>
-            {% url 'accounts:contact_list' as mentor_url %}
+            {% url 'profile:contact_list' as mentor_url %}
             <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href=mentor_url|add:"?type=begeleider" text="Stuur een bericht" icon="arrow_forward" icon_position="after" primary=True %}</div>
         {% else %}
             <div class="tabled__item">{% trans "U heeft (nog) geen gemeentelijke begeleider." %}</div>
@@ -78,7 +78,7 @@
     <div class="tabled__row">
         <div class="tabled__item tabled__item--bold">{% trans "Mijn netwerkcontacten" %}</div>
         <div class="tabled__item">{{ contact_text }}</div>
-        <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="accounts:contact_list" text=_("Beheer contacten") icon="arrow_forward" icon_position="after" primary=True %}</div>
+        <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="profile:contact_list" text=_("Beheer contacten") icon="arrow_forward" icon_position="after" primary=True %}</div>
     </div>
     {% if questionnaire_exists %}
         <div class="tabled__row">
@@ -91,7 +91,7 @@
     <div class="personal-overview__actions tabled__row">
         <div class="tabled__item tabled__item--bold">{% trans "Acties" %}</div>
         <div class="tabled__item">{{ action_text }}</div>
-        <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="accounts:action_list" text="Aanpassen" icon="arrow_forward" icon_position="after" primary=True %}</div>
+        <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="profile:action_list" text="Aanpassen" icon="arrow_forward" icon_position="after" primary=True %}</div>
     </div>
     {% endif %}
     {% comment %} <div class="tabled__row">
@@ -106,9 +106,9 @@
     {% form_actions primary_text=_("Profiel deactiveren") primary_icon="close" transparent=True %}
 {% endrender_form %}
 
-{% file_list h1=True files=files allow_delete=True title=_("Bestanden") download_view="accounts:documents_download" %}
+{% file_list h1=True files=files allow_delete=True title=_("Bestanden") download_view="profile:documents_download" %}
 
 {% button_row align="right" %}
-    {% button href="accounts:documents_create" text=_("Bestand toevoegen") primary=True %}
+    {% button href="profile:documents_create" text=_("Bestand toevoegen") primary=True %}
 {% endbutton_row %}
 {% endblock content %}

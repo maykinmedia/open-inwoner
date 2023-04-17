@@ -18,7 +18,7 @@
         {% for action in actions %}
             <div class="actions__action">
                 <div class="actions__actions">
-                    {% button icon="file-pdf" text=_("Export to PDF") hide_text=True href="accounts:action_export" uuid=action.uuid icon_outlined=True transparent=True %}
+                    {% button icon="file-pdf" text=_("Export to PDF") hide_text=True href="profile:action_export" uuid=action.uuid icon_outlined=True transparent=True %}
                     {% if action|is_connected:request.user %}
                         {% dropdown icon="settings" %}
                             <div class="dropdown__item">
@@ -30,7 +30,7 @@
                                     {% url 'plans:plan_action_history' plan_uuid=plan.uuid uuid=action.uuid as action_history_url %}
                                     {% button icon="history" text=_("History") href=action_history_url uuid=action.uuid icon_outlined=True transparent=True %}
                                 {% else %}
-                                    {% button icon="history" text=_("History") href="accounts:action_history" uuid=action.uuid icon_outlined=True transparent=True %}
+                                    {% button icon="history" text=_("History") href="profile:action_history" uuid=action.uuid icon_outlined=True transparent=True %}
                                 {% endif %}
                             </div>
                             <div class="dropdown__item">
@@ -66,7 +66,7 @@
                 <div class="actions__label">
                     {% if action.file %}
                         <div class="table__explain">{% trans "Document" %}</div>
-                        {% link href="accounts:action_download" text=action.file.name uuid=action.uuid %}
+                        {% link href="profile:action_download" text=action.file.name uuid=action.uuid %}
                     {% endif %}
                 </div>
                 <div class="actions__label">

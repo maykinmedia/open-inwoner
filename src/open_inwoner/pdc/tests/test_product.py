@@ -1,3 +1,4 @@
+from django.test import override_settings
 from django.urls import reverse
 
 from django_webtest import WebTest
@@ -9,6 +10,7 @@ from ..models import CategoryProduct
 from .factories import CategoryFactory, ProductFactory, QuestionFactory
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestPublishedProducts(WebTest):
     def test_only_published_products_exist_on_categories_page_when_anonymous(self):
         category = CategoryFactory(path="0001", name="First one", slug="first-one")

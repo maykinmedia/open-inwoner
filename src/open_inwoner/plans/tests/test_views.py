@@ -2,6 +2,7 @@ from datetime import date
 
 from django.contrib.messages import get_messages
 from django.core import mail
+from django.test import override_settings
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
@@ -406,16 +407,18 @@ class PlanViewTests(WebTest):
         elem = response.pyquery(f"#id_plan_contacts_1")[0]
         self.assertEqual(elem.attrib.get("checked"), "checked")
 
+    @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
     def test_plan_create_contains_contact_create_link_when_no_contacts_exist(self):
         self.user.user_contacts.remove(self.contact)
         response = self.app.get(self.create_url, user=self.user)
-        self.assertContains(response, reverse("accounts:contact_create"))
+        self.assertContains(response, reverse("profile:contact_create"))
 
+    @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
     def test_plan_create_does_not_contain_contact_create_link_when_contacts_exist(
         self,
     ):
         response = self.app.get(self.create_url, user=self.user)
-        self.assertNotContains(response, reverse("accounts:contact_create"))
+        self.assertNotContains(response, reverse("profile:contact_create"))
 
     def test_plan_edit_login_required(self):
         response = self.app.get(self.edit_url)

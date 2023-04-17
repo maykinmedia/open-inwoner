@@ -24,7 +24,7 @@
         </li>
         {% if request.user.is_authenticated %}
             <li class="primary-navigation__list-item">
-                {% link text=_("Mijn profiel") href='accounts:my_profile' icon="inventory_2" icon_position="before" icon_outlined=True %}
+                {% link text=_("Mijn profiel") href='profile:detail' icon="inventory_2" icon_position="before" icon_outlined=True %}
             </li>
             <li class="primary-navigation__list-item">
                 {% link text=_('Mijn berichten') href='accounts:inbox' icon="inbox" icon_position="before" %}

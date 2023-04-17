@@ -70,6 +70,6 @@ class InviteAcceptView(LogMixin, CommonPageMixin, UpdateView):
                     )
                 ),
             )
-            return HttpResponseRedirect(reverse("accounts:contact_list"))
+            return HttpResponseRedirect(reverse("profile:contact_list"))
 
         return super().dispatch(request, *args, **kwargs)

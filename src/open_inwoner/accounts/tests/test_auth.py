@@ -19,6 +19,7 @@ from ..models import User
 from .factories import DigidUserFactory, InviteFactory, UserFactory
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestRegistrationFunctionality(WebTest):
     url = reverse_lazy("django_registration_register")
 
@@ -243,6 +244,7 @@ class TestRegistrationFunctionality(WebTest):
         )
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestDigid(HaalCentraalMixin, WebTest):
     csrf_checks = False
     url = reverse_lazy("django_registration_register")
@@ -258,7 +260,7 @@ class TestDigid(HaalCentraalMixin, WebTest):
         self.assertEqual(
             digid_tag.attrs["href"],
             furl(reverse("digid:login"))
-            .add({"next": reverse("accounts:registration_necessary")})
+            .add({"next": reverse("profile:registration_necessary")})
             .url,
         )
 
@@ -273,7 +275,7 @@ class TestDigid(HaalCentraalMixin, WebTest):
         digid_tag = response.html.find("a", title="Registreren met DigiD")
         self.assertIsNotNone(digid_tag)
         necessary_url = (
-            furl(reverse("accounts:registration_necessary"))
+            furl(reverse("profile:registration_necessary"))
             .add({"invite": invite.key})
             .url
         )
@@ -331,7 +333,7 @@ class TestDigid(HaalCentraalMixin, WebTest):
         url = reverse("digid-mock:password")
         params = {
             "acs": reverse("acs"),
-            "next": f"{reverse('accounts:registration_necessary')}?invite={invite.key}",
+            "next": f"{reverse('profile:registration_necessary')}?invite={invite.key}",
         }
         url = f"{url}?{urlencode(params)}"
 
@@ -358,7 +360,7 @@ class TestDigid(HaalCentraalMixin, WebTest):
         url = reverse("digid-mock:password")
         params = {
             "acs": reverse("acs"),
-            "next": f"{reverse('accounts:registration_necessary')}?invite={invite.key}",
+            "next": f"{reverse('profile:registration_necessary')}?invite={invite.key}",
         }
         url = f"{url}?{urlencode(params)}"
 
@@ -374,7 +376,7 @@ class TestDigid(HaalCentraalMixin, WebTest):
 
         self.assertRedirects(
             response,
-            f"{reverse('accounts:registration_necessary')}?invite={invite.key}",
+            f"{reverse('profile:registration_necessary')}?invite={invite.key}",
         )
         self.assertNotIn("invite_url", self.client.session.keys())
 
@@ -386,7 +388,7 @@ class TestDigid(HaalCentraalMixin, WebTest):
         url = reverse("digid-mock:password")
         params = {
             "acs": reverse("acs"),
-            "next": reverse("accounts:registration_necessary"),
+            "next": reverse("profile:registration_necessary"),
         }
         data = {
             "auth_name": "123456789",
@@ -434,7 +436,7 @@ class TestDigid(HaalCentraalMixin, WebTest):
         url = reverse("digid-mock:password")
         params = {
             "acs": reverse("acs"),
-            "next": reverse("accounts:registration_necessary"),
+            "next": reverse("profile:registration_necessary"),
         }
         data = {
             "auth_name": "123456789",
@@ -607,7 +609,7 @@ class TestDigid(HaalCentraalMixin, WebTest):
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestRegistrationNecessary(WebTest):
-    url = reverse_lazy("accounts:registration_necessary")
+    url = reverse_lazy("profile:registration_necessary")
 
     def test_any_page_for_digid_user_redirect_to_necessary_fields(self):
         user = UserFactory(
@@ -618,9 +620,9 @@ class TestRegistrationNecessary(WebTest):
         urls = [
             reverse("root"),
             reverse("pdc:category_list"),
-            reverse("accounts:my_profile"),
+            reverse("profile:detail"),
             reverse("accounts:inbox"),
-            reverse("accounts:my_data"),
+            reverse("profile:data"),
             reverse("plans:plan_list"),
             reverse("general_faq"),
         ]
@@ -630,7 +632,7 @@ class TestRegistrationNecessary(WebTest):
                 response = self.app.get(url, user=user)
 
                 self.assertRedirects(
-                    response, reverse("accounts:registration_necessary")
+                    response, reverse("profile:registration_necessary")
                 )
 
     def test_submit_without_invite(self):
@@ -810,6 +812,7 @@ class TestRegistrationNecessary(WebTest):
                 self.assertEqual(response.context["form"].errors, expected_errors)
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestLoginLogoutFunctionality(WebTest):
     def setUp(self):
         # Create a user. We need to reset their password
@@ -821,13 +824,13 @@ class TestLoginLogoutFunctionality(WebTest):
         self.config.save()
 
     def test_login_page_has_next_url(self):
-        response = self.app.get(reverse("accounts:contact_list"))
+        response = self.app.get(reverse("profile:contact_list"))
         self.assertRedirects(
             response,
-            furl(reverse("login")).add({"next": reverse("accounts:contact_list")}).url,
+            furl(reverse("login")).add({"next": reverse("profile:contact_list")}).url,
         )
         self.assertIn(
-            furl("").add({"next": reverse("accounts:contact_list")}).url,
+            furl("").add({"next": reverse("profile:contact_list")}).url,
             response.follow(),
         )
 
@@ -875,6 +878,7 @@ class TestLoginLogoutFunctionality(WebTest):
         self.assertFalse(logout_response.follow().context["user"].is_authenticated)
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestPasswordResetFunctionality(WebTest):
     csrf_checks = False
 
@@ -932,6 +936,7 @@ class TestPasswordResetFunctionality(WebTest):
         self.assertEqual(len(mail.outbox), 0)
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestPasswordChange(WebTest):
     def setUp(self):
         self.user = UserFactory()
@@ -945,14 +950,14 @@ class TestPasswordChange(WebTest):
         self.assertContains(response, _("Uw wachtwoord is gewijzigd."))
 
     def test_password_change_button_is_rendered_with_default_login_type(self):
-        response = self.app.get(reverse("accounts:my_profile"), user=self.user)
+        response = self.app.get(reverse("profile:detail"), user=self.user)
         self.assertContains(response, _("Wijzig wachtwoord"))
 
     def test_password_change_button_is_not_rendered_with_digid_login_type(self):
         digid_user = UserFactory(
             login_type=LoginTypeChoices.digid, email="john@smith.nl"
         )
-        response = self.app.get(reverse("accounts:my_profile"), user=digid_user)
+        response = self.app.get(reverse("profile:detail"), user=digid_user)
         self.assertNotContains(response, _("Wijzig wachtwoord"))
 
     def test_anonymous_user_is_redirected_to_login_page_if_password_change_is_accessed(

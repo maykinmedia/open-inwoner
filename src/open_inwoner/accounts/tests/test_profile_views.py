@@ -21,9 +21,10 @@ from ..forms import BrpUserForm, UserForm
 from .factories import ActionFactory, DocumentFactory, UserFactory
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class ProfileViewTests(WebTest):
     def setUp(self):
-        self.url = reverse("accounts:my_profile")
+        self.url = reverse("profile:detail")
         self.return_url = reverse("logout")
         self.user = UserFactory(street="MyStreet")
 
@@ -167,10 +168,11 @@ class ProfileViewTests(WebTest):
         self.assertNotContains(response, _("Mijn gegevens"))
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class EditProfileTests(WebTest):
     def setUp(self):
-        self.url = reverse("accounts:edit_profile")
-        self.return_url = reverse("accounts:my_profile")
+        self.url = reverse("profile:edit")
+        self.return_url = reverse("profile:detail")
         self.user = UserFactory()
 
     def create_test_image_bytes(self):
@@ -370,7 +372,7 @@ class EditProfileTests(WebTest):
         img_bytes = self.create_test_image_bytes()
         form_response = self.upload_test_image_to_profile_edit_page(img_bytes)
 
-        self.assertRedirects(form_response, reverse("accounts:my_profile"))
+        self.assertRedirects(form_response, reverse("profile:detail"))
         with self.assertRaisesMessage(
             ValueError, "The 'image' attribute has no file associated with it."
         ):
@@ -388,7 +390,7 @@ class EditProfileTests(WebTest):
         img_bytes = self.create_test_image_bytes()
         form_response = self.upload_test_image_to_profile_edit_page(img_bytes)
 
-        self.assertRedirects(form_response, reverse("accounts:my_profile"))
+        self.assertRedirects(form_response, reverse("profile:detail"))
         with self.assertRaisesMessage(
             ValueError, "The 'image' attribute has no file associated with it."
         ):
@@ -417,6 +419,7 @@ class EditProfileTests(WebTest):
 
 
 @requests_mock.Mocker()
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class MyDataTests(HaalCentraalMixin, WebTest):
     expected_response = {
         "first_name": "Merel",
@@ -440,7 +443,7 @@ class MyDataTests(HaalCentraalMixin, WebTest):
             last_name="",
             login_type=LoginTypeChoices.digid,
         )
-        self.url = reverse("accounts:my_data")
+        self.url = reverse("profile:data")
 
     def test_expected_response_is_returned_brp_v_2(self, m):
         self._setUpMocks_v_2(m)
@@ -517,9 +520,10 @@ class MyDataTests(HaalCentraalMixin, WebTest):
         )
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class EditIntrestsTests(WebTest):
     def setUp(self):
-        self.url = reverse("accounts:my_categories")
+        self.url = reverse("profile:categories")
         self.user = UserFactory()
 
     def test_login_required(self):
@@ -539,9 +543,10 @@ class EditIntrestsTests(WebTest):
         self.assertFalse(form.get("selected_categories", index=2).checked)
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class ExportProfileTests(WebTest):
     def setUp(self):
-        self.url = reverse("accounts:profile_export")
+        self.url = reverse("profile:export")
         self.user = UserFactory()
 
     def test_login_required(self):
