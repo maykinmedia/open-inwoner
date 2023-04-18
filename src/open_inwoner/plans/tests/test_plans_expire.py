@@ -30,6 +30,12 @@ class NotifyComandTests(TestCase):
         self.assertIn(plan.goal, html_body)
         self.assertIn(reverse("plans:plan_list"), html_body)
 
+    def test_no_notification_about_expiring_plan_when_disabled(self):
+        user = UserFactory(plans_notifications=False)
+        plan = PlanFactory(end_date=date.today(), created_by=user)
+        call_command("plans_expire")
+        self.assertEqual(len(mail.outbox), 0)
+
     def test_plan_does_not_expire_yet(self):
         user = UserFactory()
         PlanFactory(end_date=date.today() + timedelta(days=1), created_by=user)
@@ -79,3 +85,24 @@ class NotifyComandTests(TestCase):
         self.assertIn(plan.title, html_body2)
         self.assertIn(plan.goal, html_body2)
         self.assertIn(reverse("plans:plan_list"), html_body2)
+
+    def test_notify_only_user_with_active_notifications(self):
+        user = UserFactory()
+        contact = UserFactory(plans_notifications=False)
+        plan = PlanFactory(end_date=date.today(), created_by=user)
+        plan.plan_contacts.add(contact)
+
+        call_command("plans_expire")
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(Plan.objects.count(), 1)
+
+        sent_mail = mail.outbox[0]
+        html_body = sent_mail.alternatives[0][0]
+
+        self.assertEqual(
+            sent_mail.subject, "Plans about to end today at Open Inwoner Platform"
+        )
+        self.assertEqual(sent_mail.to, [user.email])
+        self.assertIn(plan.title, html_body)
+        self.assertIn(plan.goal, html_body)
+        self.assertIn(reverse("plans:plan_list"), html_body)

@@ -26,6 +26,12 @@ class NotifyComandTests(TestCase):
         self.assertIn(action.name, html_body)
         self.assertIn(reverse("accounts:action_list"), html_body)
 
+    def test_no_notification_about_expiring_action_when_disabled(self):
+        user = UserFactory(plans_notifications=False)
+        action = ActionFactory(end_date=date.today(), created_by=user)
+        call_command("actions_expire")
+        self.assertEqual(len(mail.outbox), 0)
+
     def test_action_does_not_expire_yet(self):
         user = UserFactory()
         ActionFactory(end_date=date.today() + timedelta(days=1), created_by=user)

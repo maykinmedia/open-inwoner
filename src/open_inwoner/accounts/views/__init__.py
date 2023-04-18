@@ -37,6 +37,7 @@ from .profile import (
     EditProfileView,
     MyCategoriesView,
     MyDataView,
+    MyNotificationsView,
     MyProfileExportView,
     MyProfileView,
 )

@@ -151,6 +151,27 @@ class User(AbstractBaseUser, PermissionsMixin):
         blank=True,
         help_text="This field indicates if a user signed up with OpenId Connect or not.",
     )
+    cases_notifications = models.BooleanField(
+        verbose_name=_("Cases notifications"),
+        default=True,
+        help_text=_(
+            "Indicates if the user wants to receive notifications for updates concerning cases."
+        ),
+    )
+    messages_notifications = models.BooleanField(
+        verbose_name=_("Messages notifications"),
+        default=True,
+        help_text=_(
+            "Indicates if the user wants to receive notifications for new messages."
+        ),
+    )
+    plans_notifications = models.BooleanField(
+        verbose_name=_("Plans notifications"),
+        default=True,
+        help_text=_(
+            "Indicates if the user wants to receive notifications for updates concerning plans and actions."
+        ),
+    )
     user_contacts = models.ManyToManyField(
         "self",
         verbose_name=_("Contacts"),
@@ -226,6 +247,19 @@ class User(AbstractBaseUser, PermissionsMixin):
             return _("U heeft geen interessegebieden aangegeven.")
 
         return ", ".join(list(self.selected_categories.values_list("name", flat=True)))
+
+    def get_active_notifications(self) -> str:
+        enabled = []
+        if self.cases_notifications and self.login_type == LoginTypeChoices.digid:
+            enabled.append(_("cases"))
+        if self.messages_notifications:
+            enabled.append(_("messages"))
+        if self.plans_notifications:
+            enabled.append(_("plans"))
+        if not enabled:
+            return _("You do not have any notifications enabled.")
+
+        return ", ".join(str(notification) for notification in enabled)
 
     def require_necessary_fields(self) -> bool:
         """returns whether user needs to fill in necessary fields"""

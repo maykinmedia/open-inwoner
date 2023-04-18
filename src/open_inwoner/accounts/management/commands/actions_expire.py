@@ -14,14 +14,16 @@ logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
-    help = "Send emails about new messages to the users"
+    help = "Send emails about expiring actions to the users"
 
     def handle(self, *args, **options):
         today = date.today()
         user_ids = Action.objects.filter(end_date=today).values_list(
             "is_for_id", flat=True
         )
-        receivers = User.objects.filter(is_active=True, pk__in=user_ids).distinct()
+        receivers = User.objects.filter(
+            is_active=True, pk__in=user_ids, plans_notifications=True
+        ).distinct()
 
         for receiver in receivers:
             """send email to each user"""
@@ -32,7 +34,7 @@ class Command(BaseCommand):
             )
 
             logger.info(
-                f"The email was send to the user {receiver} about {actions.count()} expiring actions"
+                f"The email was sent to the user {receiver} about {actions.count()} expiring actions"
             )
 
     def send_email(self, receiver: User, actions: List[Action]):
