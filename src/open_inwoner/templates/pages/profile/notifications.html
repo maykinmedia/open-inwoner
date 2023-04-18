@@ -3,10 +3,10 @@
 
 {% block content %}
 <h1 class="h1" id="title">
-    {% trans "Mijn notificaties" %}
+    {% trans "Communicatievoorkeuren" %}
 </h1>
 <p class="p">
-    {% trans "Kies voor welke categorie je notificaties wil ontvangen" %}
+    {% trans "Kies voor welke categorie je communicatievoorkeuren wil ontvangen" %}
 </p>
 
 {% form form_object=form method="POST" id="change-notifications" submit_text=_("Opslaan") secondary_href='accounts:my_profile' secondary_text=_('Terug') secondary_icon='arrow_backward' secondary_icon_position="before" %}
