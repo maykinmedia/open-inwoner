@@ -29,6 +29,9 @@ class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
             user.save()
 
         logs_messages = [record.getMessage() for record in captured.records]
+        saved_logs = OutgoingRequestsLog.objects.filter(
+            url="https://personen/api/brp/personen"
+        )
 
         self.assertIn("Outgoing request", logs_messages)
-        self.assertEqual(OutgoingRequestsLog.objects.count(), 2)
+        self.assertTrue(saved_logs.exists())

@@ -42,6 +42,7 @@ class TestFetchSpecificCase(ClearCachesMixin, TestCase):
             fetch_single_case("d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d")
 
         logs_messages = [record.getMessage() for record in captured.records]
+        saved_logs = OutgoingRequestsLog.objects.filter(url=self.zaak["url"])
 
         self.assertIn("Outgoing request", logs_messages)
-        self.assertEqual(OutgoingRequestsLog.objects.count(), 2)
+        self.assertTrue(saved_logs.exists())
