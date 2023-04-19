@@ -210,6 +210,7 @@ INSTALLED_APPS = [
     "open_inwoner.cms.inbox",
     "open_inwoner.cms.products",
     "open_inwoner.cms.collaborate",
+    "open_inwoner.cms.questionnaire_set",
 ]
 
 MIDDLEWARE = [
@@ -515,6 +516,7 @@ CMS_PLACEHOLDER_CONF = {
             "PicturePlugin",
             "CategoriesPlugin",
             "ActivePlansPlugin",
+            "QuestionnairePlugin",
         ],
         "text_only_plugins": ["LinkPlugin"],
         "name": _("Content"),

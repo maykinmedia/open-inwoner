@@ -88,7 +88,9 @@ urlpatterns = [
     path("mail-editor/", include("mail_editor.urls", namespace="mail_editor")),
     path(
         "questionnaire/",
-        include("open_inwoner.questionnaire.urls", namespace="questionnaire"),
+        include(
+            "open_inwoner.cms.questionnaire_set.urls", namespace="questionnaire_set"
+        ),
     ),
     path(
         "sessions/",

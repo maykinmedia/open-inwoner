@@ -7,7 +7,7 @@
             <h1 class="h1" data-title="{{ form.instance.get_title }}" data-code="{{ form.instance.code }}">
                 <span>{{ form.instance.get_title }}</span>
                 {% if not form.instance.get_children %}
-                    {% button href="questionnaire:questionnaire_export" text=_("Export pdf") primary=True icon="file-pdf" icon_position="after" title=_("Your results are also saved to your profile if you are logged in.") %}
+                    {% button href="questionnaire_set:questionnaire_export" text=_("Export pdf") primary=True icon="file-pdf" icon_position="after" title=_("Your results are also saved to your profile if you are logged in.") %}
                 {% endif %}
             </h1>
 

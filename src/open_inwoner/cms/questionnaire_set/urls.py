@@ -7,7 +7,7 @@ from open_inwoner.questionnaire.views import (
     QuestionnaireStepView,
 )
 
-app_name = "questionnaire"
+app_name = "questionnaire_set"
 
 urlpatterns = [
     path("reset", QuestionnaireResetView.as_view(), name="reset"),

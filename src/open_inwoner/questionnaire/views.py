@@ -50,10 +50,10 @@ class QuestionnaireStepView(CommonPageMixin, BaseBreadcrumbMixin, FormView):
         if self.request.user.is_authenticated:
             return [
                 (_("Mijn profiel"), reverse("profile:detail")),
-                (_("Zelfdiagnose"), reverse("questionnaire:questionnaire_list")),
+                (_("Zelfdiagnose"), reverse("questionnaire_set:questionnaire_list")),
             ]
         return [
-            (_("Zelfdiagnose"), reverse("questionnaire:questionnaire_list")),
+            (_("Zelfdiagnose"), reverse("questionnaire_set:questionnaire_list")),
         ]
 
     def get_object(self) -> QuestionnaireStep:
@@ -146,10 +146,10 @@ class QuestionnaireRootListView(CommonPageMixin, BaseBreadcrumbMixin, ListView):
         if self.request.user.is_authenticated:
             return [
                 (_("Mijn profiel"), reverse("profile:detail")),
-                (_("Zelfdiagnose"), reverse("questionnaire:questionnaire_list")),
+                (_("Zelfdiagnose"), reverse("questionnaire_set:questionnaire_list")),
             ]
         return [
-            (_("Zelfdiagnose"), reverse("questionnaire:questionnaire_list")),
+            (_("Zelfdiagnose"), reverse("questionnaire_set:questionnaire_list")),
         ]
 
     def get_queryset(self):

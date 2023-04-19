@@ -18,7 +18,7 @@ class QuestionnaireExportTests(TestCase):
     def setUp(self) -> None:
         self.client = Client()
         self.user = UserFactory()
-        self.export_url = reverse("questionnaire:questionnaire_export")
+        self.export_url = reverse("questionnaire_set:questionnaire_export")
         self.questionnaire = QuestionnaireStepFactory(path="0001")
         self.session = self.client.session
         self.session[QUESTIONNAIRE_SESSION_KEY] = self.questionnaire.slug
@@ -28,7 +28,7 @@ class QuestionnaireExportTests(TestCase):
 
     def test_anonymous_user_exports_file_without_being_saved(self):
         filename = _("questionnaire_{slug}.pdf").format(slug=self.questionnaire.slug)
-        response = self.client.get(reverse("questionnaire:questionnaire_export"))
+        response = self.client.get(reverse("questionnaire_set:questionnaire_export"))
         self.assertEquals(response.status_code, 200)
         self.assertEquals(response.headers["Content-Type"], "application/pdf")
         self.assertEquals(
@@ -40,7 +40,7 @@ class QuestionnaireExportTests(TestCase):
     def test_logged_in_user_exports_file_and_it_is_automatically_saved(self):
         self.client.force_login(self.user)
         filename = _("questionnaire_{slug}.pdf").format(slug=self.questionnaire.slug)
-        response = self.client.get(reverse("questionnaire:questionnaire_export"))
+        response = self.client.get(reverse("questionnaire_set:questionnaire_export"))
         self.assertEquals(response.status_code, 200)
         self.assertEquals(response.headers["Content-Type"], "application/pdf")
         self.assertEquals(
@@ -58,7 +58,7 @@ class QuestionnaireExportTests(TestCase):
         self.session.save()
         self.session_cookie_name = settings.SESSION_COOKIE_NAME
         self.client.cookies[self.session_cookie_name] = self.session.session_key
-        response = self.client.get(reverse("questionnaire:questionnaire_export"))
+        response = self.client.get(reverse("questionnaire_set:questionnaire_export"))
         self.assertEquals(response.context["root_title"], self.questionnaire.title)
         self.assertListEqual(
             response.context["steps"],

@@ -19,20 +19,20 @@ from .factories import QuestionnaireStepFactory, QuestionnaireStepFileFactory
 
 class QuestionnaireResetViewTestCase(WebTest):
     def test_clears_session(self):
-        path = reverse("questionnaire:reset")
+        path = reverse("questionnaire_set:reset")
         self.app.get(path)
         self.assertIsNone(self.app.session[QUESTIONNAIRE_SESSION_KEY])
 
     @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
     def test_authenticated_user_redirects(self):
         user = UserFactory()
-        path = reverse("questionnaire:reset")
+        path = reverse("questionnaire_set:reset")
         response = self.app.get(path, user=user)
         self.assertEqual(302, response.status_code)
         self.assertEqual(reverse("profile:detail"), response.url)
 
     def test_anonymous_user_redirects(self):
-        path = reverse("questionnaire:reset")
+        path = reverse("questionnaire_set:reset")
         response = self.app.get(path)
         self.assertEqual(302, response.status_code)
         self.assertEqual(reverse("root"), response.url)
@@ -40,14 +40,14 @@ class QuestionnaireResetViewTestCase(WebTest):
 
 class QuestionnaireStepViewTestCase(TestCase):
     def test_root_step_404(self):
-        path = reverse("questionnaire:root_step", kwargs={"slug": "doesnotexist"})
+        path = reverse("questionnaire_set:root_step", kwargs={"slug": "doesnotexist"})
         self.assertEqual(path, "/questionnaire/doesnotexist")
         response = self.client.get(path)
         self.assertEqual(404, response.status_code)
 
     def test_root_step_200(self):
         root = QuestionnaireStepFactory.create(code="foo", slug="foo")
-        path = reverse("questionnaire:root_step", kwargs={"slug": "foo"})
+        path = reverse("questionnaire_set:root_step", kwargs={"slug": "foo"})
         self.assertEqual(path, "/questionnaire/foo")
         response = self.client.get(path)
         self.assertEqual(200, response.status_code)
@@ -55,7 +55,7 @@ class QuestionnaireStepViewTestCase(TestCase):
 
     def test_descendent_step_404(self):
         path = reverse(
-            "questionnaire:descendent_step",
+            "questionnaire_set:descendent_step",
             kwargs={"root_slug": "doesnotexist", "slug": "doesnotexist"},
         )
         self.assertEqual(path, "/questionnaire/doesnotexist/doesnotexist")
@@ -66,7 +66,8 @@ class QuestionnaireStepViewTestCase(TestCase):
         root = QuestionnaireStepFactory.create(code="foo", slug="foo")
         descendent = root.add_child(code="bar", slug="bar")
         path = reverse(
-            "questionnaire:descendent_step", kwargs={"root_slug": "foo", "slug": "bar"}
+            "questionnaire_set:descendent_step",
+            kwargs={"root_slug": "foo", "slug": "bar"},
         )
         self.assertEqual(path, "/questionnaire/foo/bar")
         response = self.client.get(path)
@@ -79,7 +80,7 @@ class QuestionnaireStepViewTestCase(TestCase):
     )
     def test_render_get_title(self, mock):
         QuestionnaireStepFactory.create(code="bar", slug="bar")
-        path = reverse("questionnaire:root_step", kwargs={"slug": "bar"})
+        path = reverse("questionnaire_set:root_step", kwargs={"slug": "bar"})
         response = self.client.get(path)
         self.assertContains(response, "foo")
 
@@ -89,39 +90,39 @@ class QuestionnaireStepViewTestCase(TestCase):
     )
     def test_render_get_description(self, mock):
         QuestionnaireStepFactory.create(code="bar", slug="bar")
-        path = reverse("questionnaire:root_step", kwargs={"slug": "bar"})
+        path = reverse("questionnaire_set:root_step", kwargs={"slug": "bar"})
         response = self.client.get(path)
         self.assertContains(response, "foo")
 
     def test_render_question(self):
         QuestionnaireStepFactory.create(code="bar", slug="bar", question="foo")
-        path = reverse("questionnaire:root_step", kwargs={"slug": "bar"})
+        path = reverse("questionnaire_set:root_step", kwargs={"slug": "bar"})
         response = self.client.get(path)
         self.assertContains(response, "foo")
 
     def test_render_help_text(self):
         QuestionnaireStepFactory.create(code="bar", slug="bar", help_text="foo")
-        path = reverse("questionnaire:root_step", kwargs={"slug": "bar"})
+        path = reverse("questionnaire_set:root_step", kwargs={"slug": "bar"})
         response = self.client.get(path)
         self.assertContains(response, "foo")
 
     def test_render_answers(self):
         root = QuestionnaireStepFactory.create(code="foo", slug="foo")
         root.add_child(parent_answer="bar")
-        path = reverse("questionnaire:root_step", kwargs={"slug": "foo"})
+        path = reverse("questionnaire_set:root_step", kwargs={"slug": "foo"})
         response = self.client.get(path)
         self.assertContains(response, "bar")
 
     def test_render_content(self):
         QuestionnaireStepFactory.create(code="bar", slug="bar", content="foo")
-        path = reverse("questionnaire:root_step", kwargs={"slug": "bar"})
+        path = reverse("questionnaire_set:root_step", kwargs={"slug": "bar"})
         response = self.client.get(path)
         self.assertContains(response, "foo")
 
     def test_render_file(self):
         root = QuestionnaireStepFactory.create(code="foo", slug="foo")
         QuestionnaireStepFileFactory.create(questionnaire_step=root)
-        path = reverse("questionnaire:root_step", kwargs={"slug": "foo"})
+        path = reverse("questionnaire_set:root_step", kwargs={"slug": "foo"})
         response = self.client.get(path)
         self.assertIn('<aside class="file"', str(response.content))
 
@@ -131,7 +132,7 @@ class QuestionnaireStepViewTestCase(TestCase):
         ProductFactory.create(name="barz")
         root = QuestionnaireStepFactory.create(code="foo", slug="foo")
         root.related_products.set(Product.objects.all())
-        path = reverse("questionnaire:root_step", kwargs={"slug": "foo"})
+        path = reverse("questionnaire_set:root_step", kwargs={"slug": "foo"})
         response = self.client.get(path)
         self.assertContains(response, "fooz")
         self.assertContains(response, "barz")
@@ -141,7 +142,8 @@ class QuestionnaireStepViewTestCase(TestCase):
         parent = root.add_child(code="baz", slug="baz")
         parent.add_child(code="bar", slug="bar")
         path = reverse(
-            "questionnaire:descendent_step", kwargs={"root_slug": "foo", "slug": "baz"}
+            "questionnaire_set:descendent_step",
+            kwargs={"root_slug": "foo", "slug": "baz"},
         )
         response = self.client.get(path)
         self.assertContains(response, root.get_absolute_url())
@@ -151,10 +153,11 @@ class QuestionnaireStepViewTestCase(TestCase):
         root = QuestionnaireStepFactory.create(code="foo", slug="foo")
         root.add_child(code="bar", slug="bar")
         path = reverse(
-            "questionnaire:descendent_step", kwargs={"root_slug": "foo", "slug": "bar"}
+            "questionnaire_set:descendent_step",
+            kwargs={"root_slug": "foo", "slug": "bar"},
         )
         response = self.client.get(path)
-        self.assertContains(response, reverse("questionnaire:reset"))
+        self.assertContains(response, reverse("questionnaire_set:reset"))
 
     def test_form_view(self):
         view = QuestionnaireStepView()
@@ -263,7 +266,7 @@ class QuestionnaireStepListViewTestCase(WebTest):
 
     def test_render_root_nodes_when_user_is_logged_in(self):
         questionnaire = QuestionnaireStepFactory(code="foo", slug="foo")
-        path = reverse("questionnaire:questionnaire_list")
+        path = reverse("questionnaire_set:questionnaire_list")
         response = self.app.get(path, user=self.user)
         self.assertTrue(
             response.context["root_nodes"]
@@ -274,7 +277,7 @@ class QuestionnaireStepListViewTestCase(WebTest):
 
     def test_render_root_nodes_when_user_is_anonymous(self):
         questionnaire = QuestionnaireStepFactory(code="foo", slug="foo")
-        path = reverse("questionnaire:questionnaire_list")
+        path = reverse("questionnaire_set:questionnaire_list")
         response = self.app.get(path)
         self.assertTrue(
             response.context["root_nodes"]
