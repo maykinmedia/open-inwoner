@@ -515,6 +515,7 @@ CMS_PLACEHOLDER_CONF = {
             "PicturePlugin",
             "CategoriesPlugin",
             "ActivePlansPlugin",
+            "ProductLocationPlugin",
         ],
         "text_only_plugins": ["LinkPlugin"],
         "name": _("Content"),
