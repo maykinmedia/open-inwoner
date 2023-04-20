@@ -214,8 +214,10 @@
   --font-size-body: 16px;
   --font-line-height-body: 21px;
 
-  --font-size-body-small: 12px;
+  --font-size-body-small: 14px;
+  --font-size-body-large: 20px;
   --font-line-height-body-small: 20px;
+  --font-line-height-body-large: 28px;
 
   /// Spacing.
 
@@ -303,5 +305,7 @@ html {
 }
 
 body {
+  // default CMS style
   margin: 0;
+  font-family: var(--font-family-body);
 }

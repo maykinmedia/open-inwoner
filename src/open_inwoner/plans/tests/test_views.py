@@ -113,7 +113,7 @@ class PlanViewTests(WebTest):
 
         response = self.app.get(self.detail_url, user=self.contact)
         self.assertContains(response, self.user.get_full_name())
-        self.assertContains(response, self.contact.get_full_name())
+        self.assertContains(response, self.contact.first_name)
 
         # Contact for one user, but not the other
         # Check if all users can see eachother in the plan
@@ -128,12 +128,12 @@ class PlanViewTests(WebTest):
 
         response = self.app.get(self.detail_url, user=self.contact)
         self.assertContains(response, self.user.get_full_name())
-        self.assertContains(response, self.contact.get_full_name())
+        self.assertContains(response, self.contact.first_name)
         self.assertContains(response, new_contact.get_full_name())
 
         response = self.app.get(self.detail_url, user=new_contact)
         self.assertContains(response, self.user.get_full_name())
-        self.assertContains(response, new_contact.get_full_name())
+        self.assertContains(response, new_contact.first_name)
         self.assertContains(response, self.contact.get_full_name())
 
         new_contact.delete()

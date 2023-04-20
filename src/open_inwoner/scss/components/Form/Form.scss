@@ -237,3 +237,17 @@
     }
   }
 }
+
+/// Specific forms
+
+.search__mobile,
+.header__submenu {
+  .form {
+    // tablet sizes
+    @media screen and (min-width: 360px) and (max-width: 768px) {
+      &__control > .label .input {
+        max-width: 100%;
+      }
+    }
+  }
+}
