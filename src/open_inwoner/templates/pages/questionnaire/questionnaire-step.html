@@ -31,10 +31,10 @@
                 {% trans 'Volgende' as submit_text %}
             {% elif request.user.is_authenticated %}
                 {% trans 'Naar profiel' as submit_text %}
-                {% url 'questionnaire:reset' as form_action %}
+                {% url 'questionnaire_set:reset' as form_action %}
             {% else %}
                 {% trans 'Naar home' as submit_text %}
-                {% url 'questionnaire:reset' as form_action %}
+                {% url 'questionnaire_set:reset' as form_action %}
             {% endif %}
 
             {% render_form id="questionnaire_step" form_action=form_action auto_render=True extra_classes='form--compact' form=form method='POST' submit_text=submit_text secondary_href=secondary_href secondary_icon='arrow_backward' secondary_icon_position='before' secondary_text=_('Vorige') %}
