@@ -1,7 +1,5 @@
 .logo {
   &__image {
-    max-width: 100%;
-
     @media (min-width: 768px) {
       display: block;
     }
