@@ -23,7 +23,10 @@ def update_admin_index(sender, **kwargs):
         if app_config.name.startswith(project_name):
             create_contenttypes(app_config, verbosity=0)
 
-    call_command("loaddata", "django-admin-index", verbosity=0, stdout=StringIO())
+    try:
+        call_command("loaddata", "django-admin-index", verbosity=0, stdout=StringIO())
+    except:
+        print("Error: Unable to load django-admin-index fixture!")
 
 
 class AccountsConfig(AppConfig):
