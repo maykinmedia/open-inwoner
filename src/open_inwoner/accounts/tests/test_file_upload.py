@@ -13,10 +13,11 @@ from open_inwoner.accounts.models import Action, Message
 from .factories import UserFactory
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestActionFileUploadLimits(WebTest):
     def setUp(self):
         self.user = UserFactory()
-        self.response = self.app.get(reverse("accounts:action_create"), user=self.user)
+        self.response = self.app.get(reverse("profile:action_create"), user=self.user)
         self.form = self.response.forms["action-create"]
 
     @temp_private_root()
@@ -26,7 +27,7 @@ class TestActionFileUploadLimits(WebTest):
         self.form["name"] = "Action name"
         upload_response = self.form.submit()
         self.assertEquals(Action.objects.first().file.name, "readme.xlsx")
-        self.assertRedirects(upload_response, reverse("accounts:action_list"))
+        self.assertRedirects(upload_response, reverse("profile:action_list"))
 
     @temp_private_root()
     def test_invalid_type_of_file_is_not_uploaded(self):
@@ -82,12 +83,13 @@ class TestActionFileUploadLimits(WebTest):
         )
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestMessageFileUploadLimits(WebTest):
     def setUp(self):
         self.me = UserFactory()
         self.contact = UserFactory()
         self.me.user_contacts.add(self.contact)
-        self.response = self.app.get(reverse("accounts:inbox_start"), user=self.me)
+        self.response = self.app.get(reverse("inbox:start"), user=self.me)
         self.form = self.response.forms["start-message-form"]
 
     @temp_private_root()
@@ -99,7 +101,7 @@ class TestMessageFileUploadLimits(WebTest):
         self.assertEquals(Message.objects.first().file.name, "readme.xlsx")
         self.assertRedirects(
             upload_response,
-            reverse("accounts:inbox", kwargs={"uuid": self.contact.uuid})
+            reverse("inbox:index", kwargs={"uuid": self.contact.uuid})
             + "#messages-last",
             fetch_redirect_response=False,
         )

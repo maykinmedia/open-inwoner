@@ -4,7 +4,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-from django.urls import include, path
+from django.urls import include, path, re_path
 from django.views.generic import RedirectView
 
 from mozilla_django_oidc_db.views import AdminLoginFailure
@@ -86,7 +86,6 @@ urlpatterns = [
     path("accounts/", include("open_inwoner.accounts.urls", namespace="accounts")),
     path("pages/", include("django.contrib.flatpages.urls"), name="flatpages"),
     path("mail-editor/", include("mail_editor.urls", namespace="mail_editor")),
-    path("plans/", include("open_inwoner.plans.urls", namespace="plans")),
     path(
         "questionnaire/",
         include("open_inwoner.questionnaire.urls", namespace="questionnaire"),
@@ -98,9 +97,10 @@ urlpatterns = [
     path("oidc/", include("mozilla_django_oidc.urls")),
     path("faq/", FAQView.as_view(), name="general_faq"),
     path("yubin/", include("django_yubin.urls")),
-    path("", include("open_inwoner.pdc.urls", namespace="pdc")),
+    # TODO move search to products cms app?
     path("", include("open_inwoner.search.urls", namespace="search")),
-    path("", HomeView.as_view(), name="root"),
+    path("oldhome/", HomeView.as_view(), name="root"),
+    re_path(r"^", include("cms.urls")),
 ]
 
 # NOTE: The staticfiles_urlpatterns also discovers static files (ie. no need to run collectstatic). Both the static

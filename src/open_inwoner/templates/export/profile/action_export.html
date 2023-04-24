@@ -5,7 +5,7 @@
 
     <h1 class="h1">{% trans "Action" %} {{ object }}</h1>
 
-    {% url "accounts:action_download" uuid=object.uuid as download_url %}
+    {% url "profile:action_download" uuid=object.uuid as download_url %}
 
     <table class="table">
         <tr>

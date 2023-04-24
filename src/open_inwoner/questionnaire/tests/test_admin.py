@@ -23,7 +23,7 @@ class TestQuestionnaireStepForm(WebTest):
         form["slug"] = "a-question"
         form["code"] = "some code text"
         form["_position"] = "first-child"
-        form["_ref_node_id"] = ""
+        form["_ref_node_id"] = 0
         form["highlighted"] = True
         form.submit()
         questionnaire = QuestionnaireStep.objects.first()

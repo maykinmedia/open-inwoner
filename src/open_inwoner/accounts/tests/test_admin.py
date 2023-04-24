@@ -17,6 +17,7 @@ class TestAdminUser(WebTest):
         self.user = UserFactory(
             is_superuser=True, is_staff=True, email="john@example.com"
         )
+        self.assertEqual(User.objects.count(), 1)
 
     def test_user_is_created_without_case_sensitive_email(self):
         response = self.app.get(reverse("admin:accounts_user_add"), user=self.user)

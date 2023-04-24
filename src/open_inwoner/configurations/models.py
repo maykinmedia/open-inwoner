@@ -1,7 +1,8 @@
+from typing import Optional
+
 from django.contrib.flatpages.models import FlatPage
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from colorfield.fields import ColorField
@@ -9,7 +10,6 @@ from filer.fields.image import FilerImageField
 from ordered_model.models import OrderedModel, OrderedModelManager
 from solo.models import SingletonModel
 
-from open_inwoner.pdc.utils import PRODUCT_PATH_NAME
 from open_inwoner.utils.validators import validate_phone_number
 
 from ..utils.colors import hex_to_hsl
@@ -470,28 +470,32 @@ class SiteConfiguration(SingletonModel):
     def siteimprove_enabled(self):
         return bool(self.siteimprove_id)
 
-    def get_help_text(self, request):
-        current_path = request.get_full_path()
+    def get_help_text(self, request) -> Optional[str]:
+        match = request.resolver_match
+        path = request.get_full_path()
+        if not match:
+            return ""
 
-        if current_path == reverse("root"):
+        lookup = {
+            # TODO remove 'root' after CMS migration
+            "root": "home_help_text",
+            "products:category_list": "theme_help_text",
+            "products:category_product_detail": "product_help_text",
+            "products:product_detail": "product_help_text",
+            "products:product_form": "product_help_text",
+            "search:search": "search_help_text",
+            "profile:detail": "account_help_text",
+            "questionnaire:questionnaire_list": "questionnaire_help_text",
+            "collaborate:plan_list": "plan_help_text",
+        }
+
+        attr = lookup.get(match.view_name, "")
+        if attr:
+            return getattr(self, attr)
+        elif path in ("", "/"):
             return self.home_help_text
-        if (
-            current_path.startswith(reverse("pdc:category_list"))
-            and f"/{PRODUCT_PATH_NAME}/" in current_path
-        ):
-            return self.product_help_text
-        if current_path.startswith(f"/{PRODUCT_PATH_NAME}/"):
-            return self.product_help_text
-        if current_path.startswith(reverse("pdc:category_list")):
-            return self.theme_help_text
-        if current_path.startswith(reverse("search:search")):
-            return self.search_help_text
-        if current_path.startswith(reverse("accounts:my_profile")):
-            return self.account_help_text
-        if current_path.startswith(reverse("questionnaire:questionnaire_list")):
-            return self.questionnaire_help_text
-        if current_path.startswith(reverse("plans:plan_list")):
-            return self.plan_help_text
+        else:
+            return ""
 
 
 class SiteConfigurationPage(OrderedModel):

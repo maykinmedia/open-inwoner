@@ -2,6 +2,7 @@ from datetime import date
 
 from django.contrib.messages import get_messages
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import override_settings
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
@@ -16,6 +17,7 @@ from .factories import ActionFactory, DigidUserFactory, UserFactory
 
 
 @temp_private_root()
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class ActionViewTests(WebTest):
     def setUp(self) -> None:
         self.user = UserFactory()
@@ -31,26 +33,26 @@ class ActionViewTests(WebTest):
         )
 
         self.login_url = reverse("login")
-        self.list_url = reverse("accounts:action_list")
+        self.list_url = reverse("profile:action_list")
         self.edit_url = reverse(
-            "accounts:action_edit", kwargs={"uuid": self.action.uuid}
+            "profile:action_edit", kwargs={"uuid": self.action.uuid}
         )
         self.edit_status_url = reverse(
-            "accounts:action_edit_status", kwargs={"uuid": self.action.uuid}
+            "profile:action_edit_status", kwargs={"uuid": self.action.uuid}
         )
         self.delete_url = reverse(
-            "accounts:action_delete", kwargs={"uuid": self.action.uuid}
+            "profile:action_delete", kwargs={"uuid": self.action.uuid}
         )
-        self.create_url = reverse("accounts:action_create")
+        self.create_url = reverse("profile:action_create")
         self.export_url = reverse(
-            "accounts:action_export", kwargs={"uuid": self.action.uuid}
+            "profile:action_export", kwargs={"uuid": self.action.uuid}
         )
-        self.export_list_url = reverse("accounts:action_list_export")
+        self.export_list_url = reverse("profile:action_list_export")
         self.download_url = reverse(
-            "accounts:action_download", kwargs={"uuid": self.action.uuid}
+            "profile:action_download", kwargs={"uuid": self.action.uuid}
         )
         self.history_url = reverse(
-            "accounts:action_history", kwargs={"uuid": self.action.uuid}
+            "profile:action_history", kwargs={"uuid": self.action.uuid}
         )
 
     def test_queryset_visible(self):
@@ -129,7 +131,7 @@ class ActionViewTests(WebTest):
         self.app.get(self.edit_url, user=other_user, status=404)
 
     def test_action_edit_deleted_action(self):
-        url = reverse("accounts:action_edit", kwargs={"uuid": self.action_deleted.uuid})
+        url = reverse("profile:action_edit", kwargs={"uuid": self.action_deleted.uuid})
         self.app.get(url, user=self.user, status=404)
 
     def test_action_delete_login_required(self):
@@ -185,7 +187,7 @@ class ActionViewTests(WebTest):
 
     def test_action_export_deleted_action(self):
         url = reverse(
-            "accounts:action_export", kwargs={"uuid": self.action_deleted.uuid}
+            "profile:action_export", kwargs={"uuid": self.action_deleted.uuid}
         )
         self.app.get(url, user=self.user, status=404)
 
@@ -218,7 +220,7 @@ class ActionViewTests(WebTest):
 
     def test_action_download_deleted_action(self):
         url = reverse(
-            "accounts:action_download", kwargs={"uuid": self.action_deleted.uuid}
+            "profile:action_download", kwargs={"uuid": self.action_deleted.uuid}
         )
         self.app.get(url, user=self.user, status=404)
 
@@ -243,7 +245,7 @@ class ActionViewTests(WebTest):
 
     def test_action_history_deleted_action(self):
         url = reverse(
-            "accounts:action_history", kwargs={"uuid": self.action_deleted.uuid}
+            "profile:action_history", kwargs={"uuid": self.action_deleted.uuid}
         )
         self.app.get(url, user=self.user, status=404)
 
@@ -303,6 +305,7 @@ class ActionViewTests(WebTest):
 
 
 @multi_browser()
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class ActionsPlaywrightTests(PlaywrightSyncLiveServerTestCase):
     @classmethod
     def setUpClass(cls):
@@ -320,13 +323,13 @@ class ActionsPlaywrightTests(PlaywrightSyncLiveServerTestCase):
             created_by=self.user,
             status=StatusChoices.open,
         )
-        self.action_list_url = reverse("accounts:action_list")
+        self.action_list_url = reverse("profile:action_list")
 
     def test_action_status(self):
         context = self.browser.new_context(storage_state=self.user_login_state)
 
         page = context.new_page()
-        page.goto(self.live_reverse("accounts:action_list"))
+        page.goto(self.live_reverse("profile:action_list"))
 
         # find action element and the dropdown widget
         action_element = page.locator(f"#actions_{self.action.id}__status")

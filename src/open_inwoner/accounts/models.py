@@ -288,10 +288,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         )
 
     def get_contact_update_url(self):
-        return reverse("accounts:contact_edit", kwargs={"uuid": self.uuid})
+        return reverse("profile:contact_edit", kwargs={"uuid": self.uuid})
 
     def get_contact_message_url(self) -> str:
-        url = reverse("accounts:inbox", kwargs={"uuid": self.uuid})
+        url = reverse("inbox:index", kwargs={"uuid": self.uuid})
         return f"{url}#messages-last"
 
     def get_contact_type_display(self) -> str:
@@ -708,7 +708,7 @@ class Invite(models.Model):
         return template.send_email([self.invitee_email], context)
 
     def get_absolute_url(self) -> str:
-        return reverse("accounts:invite_accept", kwargs={"key": self.key})
+        return reverse("profile:invite_accept", kwargs={"key": self.key})
 
     def expired(self) -> bool:
         expiration_date = self.created_on + timedelta(days=settings.INVITE_EXPIRY)

@@ -277,7 +277,7 @@ class ActionForm(forms.ModelForm):
         required=False,
     )
     file = LimitedUploadFileField(
-        required=False, widget=PrivateFileWidget(url_name="accounts:action_download")
+        required=False, widget=PrivateFileWidget(url_name="profile:action_download")
     )
 
     class Meta:

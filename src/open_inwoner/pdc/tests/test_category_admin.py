@@ -20,7 +20,7 @@ class TestAdminCategoryForm(WebTest):
         form["slug"] = "foo1"
         form["published"] = True
         form["_position"] = "sorted-child"
-        form["_ref_node_id"] = ""
+        form["_ref_node_id"] = 0
         form.submit()
         category = Category.objects.first()
         self.assertEqual(category.slug, "foo1")

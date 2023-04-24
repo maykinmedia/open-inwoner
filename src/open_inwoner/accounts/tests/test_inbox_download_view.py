@@ -1,4 +1,5 @@
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import override_settings
 from django.urls import reverse
 
 from django_webtest import WebTest
@@ -8,12 +9,13 @@ from .factories import MessageFactory, UserFactory
 
 
 @temp_private_root()
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class InboxDownloadTests(WebTest):
     def setUp(self) -> None:
         self.message = MessageFactory(
             file=SimpleUploadedFile("file.txt", b"test content"),
         )
-        self.download_url = reverse("accounts:inbox_download", args=[self.message.uuid])
+        self.download_url = reverse("inbox:download", args=[self.message.uuid])
 
     def test_download_file_receiver(self):
         response = self.app.get(self.download_url, user=self.message.receiver)

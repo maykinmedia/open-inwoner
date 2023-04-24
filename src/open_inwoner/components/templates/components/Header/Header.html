@@ -1,4 +1,4 @@
-{% load i18n logo_tags header_tags form_tags button_tags link_tags solo_tags icon_tags thumbnail string_tags %}
+{% load i18n logo_tags header_tags form_tags button_tags link_tags solo_tags icon_tags thumbnail string_tags menu_tags %}
 
 {% get_solo "configurations.SiteConfiguration" as config %}
 
@@ -26,56 +26,58 @@
 
                 <nav class="primary-navigation" aria-label="Hoofd navigatie">
                     <ul class="primary-navigation__list">
-                        <li class="primary-navigation__list-item">
-                            {% trans "Home" as link_text %}
-                            {% url 'root' as link %}
-                            {% link text=link_text href=link icon="apps" icon_position="before" %}
-                        </li>
-                        <li class="primary-navigation__list-item dropdown-nav__toggle">
-                            <a href="#" class="link link--toggle link--icon link--icon-position-before" aria-label="{% trans "Onderwerpen" %}" title="{% trans "Onderwerpen" %}">
-                                <span >{% trans "Onderwerpen" %}</span>
-                                <span aria-hidden="true" class="material-icons-outlined ">description</span>
-                                {% icon icon="expand_more" icon_position="after" icon_outlined=True %}
-                            </a>
+                        {% show_menu 0 100 100 100 "cms/menu/primary.html" %}
 
-                            {% if categories %}
-                                <ul class="primary-navigation__list subpage-list">
-                                    {% for category in categories %}
-                                        <li class="primary-navigation__list-item">
-                                            {% url 'pdc:category_detail' slug=category.slug as category_href %}
-                                            {% link text=category.name href=category_href %}
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            {% endif %}
-                        </li>
-
-                        {% if request.user.is_authenticated %}
-                            <li class="primary-navigation__list-item">
-                                {% link text=_("Mijn profiel") href='accounts:my_profile' icon="inventory_2" icon_position="before" icon_outlined=True %}
-                            </li>
-                            <li class="primary-navigation__list-item">
-                                {% link text=_('Mijn berichten') href='accounts:inbox' icon="inbox" icon_position="before" %}
-                                {% with request.user.get_new_messages_total as total_messages %}
-                                    {% if total_messages %}
-                                        {% with "("|addstr:total_messages|addstr:")" as message_total %}
-                                            {% link text=message_total href='accounts:inbox' secondary=True %}
-                                        {% endwith %}
-                                    {% endif %}
-                                {% endwith %}
-                            </li>
-
-                            {% if request.user.bsn and config.show_cases %}
-                                <li class="primary-navigation__list-item">
-                                    {% link text=_('Mijn aanvragen') href='accounts:my_open_cases' icon="inventory_2" icon_position="before" icon_outlined=True %}
-                                </li>
-                            {% endif %}
-                            {% if show_plans %}
-                                <li class="primary-navigation__list-item">
-                                    {% link text=_('Samenwerken') href='plans:plan_list' icon="people" icon_outlined=True icon_position="before" %}
-                                </li>
-                            {% endif %}
-                        {% endif %}
+{#                        <li class="primary-navigation__list-item">#}
+{#                            {% trans "Home" as link_text %}#}
+{#                            {% url 'root' as link %}#}
+{#                            {% link text=link_text href=link icon="apps" icon_position="before" %}#}
+{#                        </li>#}
+{#                        <li class="primary-navigation__list-item dropdown-nav__toggle">#}
+{#                            <a href="#" class="link link--toggle link--icon link--icon-position-before" aria-label="{% trans "Onderwerpen" %}" title="{% trans "Onderwerpen" %}">#}
+{#                                <span >{% trans "Onderwerpen" %}</span>#}
+{#                                <span aria-hidden="true" class="material-icons-outlined ">description</span>#}
+{#                                {% icon icon="expand_more" icon_position="after" icon_outlined=True %}#}
+{#                            </a>#}
+{##}
+{#                            {% if categories %}#}
+{#                                <ul class="primary-navigation__list subpage-list">#}
+{#                                    {% for category in categories %}#}
+{#                                        <li class="primary-navigation__list-item">#}
+{#                                            {% url 'products:category_detail' slug=category.slug as category_href %}#}
+{#                                            {% link text=category.name href=category_href %}#}
+{#                                        </li>#}
+{#                                    {% endfor %}#}
+{#                                </ul>#}
+{#                            {% endif %}#}
+{#                        </li>#}
+{##}
+{#                        {% if request.user.is_authenticated %}#}
+{#                            <li class="primary-navigation__list-item">#}
+{#                                {% link text=_("Mijn profiel") href='profile:detail' icon="inventory_2" icon_position="before" icon_outlined=True %}#}
+{#                            </li>#}
+{#                            <li class="primary-navigation__list-item">#}
+{#                                {% link text=_('Mijn berichten') href='inbox:index' icon="inbox" icon_position="before" %}#}
+{#                                {% with request.user.get_new_messages_total as total_messages %}#}
+{#                                    {% if total_messages %}#}
+{#                                        {% with "("|addstr:total_messages|addstr:")" as message_total %}#}
+{#                                            {% link text=message_total href='inbox:index' secondary=True %}#}
+{#                                        {% endwith %}#}
+{#                                    {% endif %}#}
+{#                                {% endwith %}#}
+{#                            </li>#}
+{##}
+{#                            {% if request.user.bsn and config.show_cases %}#}
+{#                                <li class="primary-navigation__list-item">#}
+{#                                    {% link text=_('Mijn aanvragen') href='cases:open_cases' icon="inventory_2" icon_position="before" icon_outlined=True %}#}
+{#                                </li>#}
+{#                            {% endif %}#}
+{#                            {% if show_plans %}#}
+{#                                <li class="primary-navigation__list-item">#}
+{#                                    {% link text=_('Samenwerken') href='collaborate:plan_list' icon="people" icon_outlined=True icon_position="before" %}#}
+{#                                </li>#}
+{#                            {% endif %}#}
+{#                        {% endif %}#}
                         {% if has_general_faq_questions %}
                             <li class="primary-navigation__list-item">
                                 {% link text=_('FAQ') href='general_faq' icon="help_outline" icon_position="before" icon_outlined=True %}

@@ -82,7 +82,9 @@ class Category(MP_Node):
         return build_slug
 
     def get_absolute_url(self):
-        return reverse("pdc:category_detail", kwargs={"slug": self.get_build_slug()})
+        return reverse(
+            "products:category_detail", kwargs={"slug": self.get_build_slug()}
+        )
 
     def move(self, target, pos=None):
         return PublishedMoveHandler(self, target, pos).process()

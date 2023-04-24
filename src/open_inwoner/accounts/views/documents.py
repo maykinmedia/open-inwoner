@@ -14,7 +14,7 @@ class DocumentDeleteView(LogMixin, LoginRequiredMixin, DeleteView):
     model = Document
     slug_field = "uuid"
     slug_url_kwarg = "uuid"
-    success_url = reverse_lazy("accounts:my_profile")
+    success_url = reverse_lazy("profile:detail")
 
     def get_queryset(self):
         base_qs = super().get_queryset()

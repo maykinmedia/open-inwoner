@@ -47,7 +47,7 @@ class InboxView(
 
         if other_user:
             conversation_url = reverse(
-                "accounts:inbox", kwargs={self.slug_field: other_user.uuid}
+                "inbox:index", kwargs={self.slug_field: other_user.uuid}
             )
         else:
             conversation_url = ""
@@ -76,7 +76,7 @@ class InboxView(
     def annotate_conversations(self, conversations):
         for c in conversations:
             c.thread_url = reverse(
-                "accounts:inbox", kwargs={self.slug_field: c.other_user_uuid}
+                "inbox:index", kwargs={self.slug_field: c.other_user_uuid}
             )
             # note these are annotations (not models)
             c.other_user_full_name = " ".join(
@@ -153,7 +153,7 @@ class InboxView(
         object = form.save()
 
         url = reverse(
-            "accounts:inbox",
+            "inbox:index",
             kwargs={self.slug_field: form.cleaned_data["receiver"].uuid},
         )
 
@@ -184,7 +184,7 @@ class InboxView(
 class InboxStartView(LogMixin, LoginRequiredMixin, CommonPageMixin, FormView):
     template_name = "accounts/inbox_start.html"
     form_class = InboxForm
-    success_url = reverse_lazy("accounts:inbox")
+    success_url = reverse_lazy("inbox:index")
 
     def page_title(self):
         return _("Nieuw bericht")
@@ -199,7 +199,7 @@ class InboxStartView(LogMixin, LoginRequiredMixin, CommonPageMixin, FormView):
         object = form.save()
         # build redirect url based on form hidden data
         url = reverse(
-            "accounts:inbox", kwargs={InboxView.slug_field: form.data["receiver"]}
+            "inbox:index", kwargs={InboxView.slug_field: form.data["receiver"]}
         )
         self.log_addition(object, _("message was created"))
         return HttpResponseRedirect(f"{url}#messages-last")

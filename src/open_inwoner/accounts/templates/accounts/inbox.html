@@ -9,7 +9,7 @@
         {% endrender_column %}
 
         {% render_column start=10 span=3 extra_classes="fix__align-right" %}
-            {% button primary=True href='accounts:inbox_start' text=_('Nieuw bericht versturen') %}
+            {% button primary=True href='inbox:start' text=_('Nieuw bericht versturen') %}
         {% endrender_column %}
     {% endrender_grid %}
     {{ block.super }}

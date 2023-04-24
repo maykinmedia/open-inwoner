@@ -99,6 +99,8 @@ div.breadcrumbs {
 
 /* hack to get changelist_view with search styled properly */
 #content {
+  /*
+  // disabled for interfering with django-cms + django-admin-index
   #changelist {
     display: grid;
     grid-template-columns: 1fr 360px;
@@ -108,7 +110,7 @@ div.breadcrumbs {
   #toolbar,
   .xfull {
     grid-column: 1/ 3;
-  }
+  } */
 }
 
 .form-row {

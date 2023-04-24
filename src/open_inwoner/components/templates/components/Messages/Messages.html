@@ -43,7 +43,7 @@
         </ol>
 
         {% if other_user.is_active %}
-            {% url 'accounts:inbox' as form_action %}
+            {% url 'inbox:index' as form_action %}
             {% render_form id="message-form" form=form method="POST" form_action=form_action enctype="multipart/form-data" %}
                 {% csrf_token %}
                 {% hidden form.receiver %}

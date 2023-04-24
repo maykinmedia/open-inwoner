@@ -12,7 +12,7 @@
 {% block content %}
     <h1 class="h1">
         {% trans "Samenwerken" %}
-        {% button href="plans:plan_create" text=_("Start nieuwe samenwerking") primary=True icon="group" icon_outlined=True %}
+        {% button href="collaborate:plan_create" text=_("Start nieuwe samenwerking") primary=True icon="group" icon_outlined=True %}
     </h1>
     {% optional_paragraph configurable_text.plans_page.plans_intro %}
 
@@ -30,7 +30,7 @@
                     {% input plan_filter_form.query no_label=True no_help=True %}
                     {% form_actions primary_icon="search" single=True transparent=True %}
                 </div>
-                {% button text=_("Reset filters") href="plans:plan_list" icon="undo" transparent=True icon_position="before" %}
+                {% button text=_("Reset filters") href="collaborate:plan_list" icon="undo" transparent=True icon_position="before" %}
             </div>
         </div>
         {% endrender_form %}
