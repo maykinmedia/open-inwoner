@@ -519,14 +519,6 @@ CMS_PLACEHOLDER_CONF = {
         "text_only_plugins": ["LinkPlugin"],
         "name": _("Content"),
         "language_fallback": True,
-        "default_plugins": [
-            {
-                "plugin_type": "TextPlugin",
-                "values": {
-                    "body": "<p>Lorem ipsum dolor sit amet...</p>",
-                },
-            },
-        ],
         # "child_classes": {
         #     "TextPlugin": ["PicturePlugin", "LinkPlugin"],
         # },
