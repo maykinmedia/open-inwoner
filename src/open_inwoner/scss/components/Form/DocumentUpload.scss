@@ -4,7 +4,7 @@
   .button[type='submit']:disabled {
     background-color: var(--color-gray) !important;
     border-color: var(--color-gray) !important;
-    color: var(--color-gray-light);
+    color: var(--color-white);
     pointer-events: none;
     cursor: default;
   }
@@ -80,8 +80,13 @@ input[type='file']::file-selector-button {
   }
 
   .input-file {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 7px;
     position: relative;
-    max-width: var(--mobile-xs-width);
+    //width: 200px;
 
     *[class*='icons'] {
       position: absolute;
@@ -93,8 +98,8 @@ input[type='file']::file-selector-button {
     /// Hidden file-input for cases
     .inputfile {
       display: inline-block;
-      margin-top: var(--spacing-large);
-      width: var(--mobile-xs-width);
+      margin-top: var(--spacing-medium);
+      min-width: 200px;
       height: var(--row-height);
       opacity: 0;
       overflow: hidden;
@@ -104,16 +109,16 @@ input[type='file']::file-selector-button {
     .inputfile + label {
       display: inline-block;
       position: absolute;
-      top: -6px;
+      top: 5px;
       left: 0;
       padding: var(--spacing-medium) var(--spacing-large) var(--spacing-medium)
-        calc(2 * (var(--spacing-extra-large)));
+        calc(3 * (var(--spacing-extra-large)));
       font-size: var(--font-size-body);
       color: var(--color-font-primary);
       background-color: var(--color-primary);
       border: 1px solid var(--color-primary);
       border-radius: var(--border-radius);
-      width: 200px;
+      min-width: 202px;
       z-index: -1;
     }
 
@@ -122,16 +127,15 @@ input[type='file']::file-selector-button {
     .inputfile:hover + label,
     .inputfile + label:hover {
       background-color: var(--color-primary-darker);
-      top: -5px;
+      top: 4px;
       transition: all 0.3s, background-color 0.3s;
     }
 
     .inputfile + label *[class*='icons'] {
       width: 1.3em;
-      height: 1em;
       vertical-align: middle;
       color: white;
-      margin-top: -0.15em;
+      margin-left: var(--spacing-medium);
     }
 
     .inputfile + label {

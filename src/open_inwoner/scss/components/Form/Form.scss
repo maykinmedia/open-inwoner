@@ -156,9 +156,10 @@
 
   .caption__content {
     display: block;
-    color: var(--font-color-body);
+    color: var(--color-mute);
     font-family: var(--font-family-body);
     font-size: var(--font-size-body);
+    font-style: italic;
     .label__label--required {
       vertical-align: sub;
     }

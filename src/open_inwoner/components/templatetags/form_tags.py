@@ -285,8 +285,7 @@ def file_input(file, text, **kwargs):
         + field: Field | The field that needs to be rendered.
         - extra_classes: string| classes which should be added to the top-level container
     """
-    kwargs["text"] = text
-    return {**kwargs, "field": file}
+    return {**kwargs, "field": file, "text": text}
 
 
 @register.inclusion_tag("components/Form/DateField.html")

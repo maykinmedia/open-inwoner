@@ -113,7 +113,7 @@
     position: fixed;
     bottom: var(--spacing-large);
     right: var(--spacing-large);
-    z-index: 401;
+    z-index: 1005;
 
     @media (min-width: 768px) {
       position: static;

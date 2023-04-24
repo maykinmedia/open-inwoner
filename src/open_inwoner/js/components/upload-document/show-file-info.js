@@ -1,8 +1,8 @@
 const fileUploadInput = document.getElementById('id_file')
-const sizeInfo = document.getElementById('uploadSize')
-const nameInfo = document.getElementById('uploadName')
-const closeButton = document.getElementById('closeUpload')
-const submitUpload = document.getElementById('submitUpload')
+const sizeInfo = document.getElementById('upload_size')
+const nameInfo = document.getElementById('upload_name')
+const closeButton = document.getElementById('close_upload')
+const submit_upload = document.getElementById('submit_upload')
 // show info
 const formControlInfo = document.querySelectorAll('.form__control--info')
 
@@ -14,60 +14,38 @@ if (fileUploadInput) {
     return `${(bytes / Math.pow(1024, i)).toFixed(2)} ${suffixes[i]}`
   }
   // initial values
-  submitUpload.style.cssText = `
-  opacity: 0.5;
-  filter: grayscale(100%);
-  cursor: default;
-`
-  sizeInfo.style.display = 'none'
-  nameInfo.style.display = 'none'
-  for (let i = 0, max = formControlInfo.length; i < max; i++) {
-    formControlInfo[i].style.display = 'none'
-  }
+  submit_upload.disabled = true
+  formControlInfo.forEach((elem) => {
+    elem.style.display = 'none'
+  })
 
   fileUploadInput.addEventListener('change', function (e) {
     const files = e.target.files
 
     if ((files.length === 0) | (files === null) | (files === undefined)) {
-      submitUpload.style.cssText = `
-      opacity: 0.5;
-      filter: grayscale(100%);
-      cursor: default;
-    `
+      submit_upload.disabled = true
       // Hide the size element if user doesn't choose any file
-      sizeInfo.style.display = 'none'
-      nameInfo.style.display = 'none'
-      for (let i = 0, max = formControlInfo.length; i < max; i++) {
-        formControlInfo[i].style.display = 'none'
-      }
+      formControlInfo.forEach((elem) => {
+        elem.style.display = 'none'
+      })
     } else {
-      submitUpload.style.cssText = `
-      opacity: 1;
-      filter: none;
-      cursor: pointer;
-    `
+      submit_upload.disabled = false
       // Display info
       sizeInfo.textContent = formatFileSize(files[0].size)
       nameInfo.textContent = `${files[0].name}`
       // Display in DOM
-      sizeInfo.style.display = 'inline-block'
-      nameInfo.style.display = 'inline-block'
-      for (let i = 0, max = formControlInfo.length; i < max; i++) {
-        formControlInfo[i].style.display = 'block'
-      }
+      formControlInfo.forEach((elem) => {
+        elem.style.display = 'block'
+      })
     }
   })
 
   if (closeButton) {
     closeButton.addEventListener('click', (event) => {
-      submitUpload.style.cssText = `
-        opacity: 0.5;
-        filter: grayscale(100%);
-        cursor: default;
-      `
-      for (let i = 0, max = formControlInfo.length; i < max; i++) {
-        formControlInfo[i].style.display = 'none'
-      }
+      submit_upload.disabled = true
+      formControlInfo.forEach((elem) => {
+        elem.style.display = 'none'
+      })
     })
   }
 
@@ -75,7 +53,6 @@ if (fileUploadInput) {
   document
     .querySelectorAll('.file-type__select')
     .forEach(function (selectType) {
-      console.log(selectType)
       if (selectType.querySelector('input[type="hidden"]')) {
         selectType.style.display = 'none'
       }
