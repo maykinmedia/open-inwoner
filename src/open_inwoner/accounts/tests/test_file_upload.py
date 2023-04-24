@@ -13,6 +13,7 @@ from open_inwoner.accounts.models import Action, Message
 from .factories import UserFactory
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestActionFileUploadLimits(WebTest):
     def setUp(self):
         self.user = UserFactory()

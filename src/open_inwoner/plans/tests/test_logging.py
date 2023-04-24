@@ -137,7 +137,7 @@ class TestPlans(WebTest):
     def test_plan_file_download_is_logged(self):
         doc = DocumentFactory(owner=self.user, plan=self.plan)
         self.app.get(
-            reverse("accounts:documents_download", kwargs={"uuid": doc.uuid}),
+            reverse("profile:documents_download", kwargs={"uuid": doc.uuid}),
             user=self.user,
         )
 

@@ -71,7 +71,7 @@
     {% endrender_form %}
     {% else %}
         <div class="p">
-            {% url 'accounts:contact_create' as contact_create %}
+            {% url 'profile:contact_create' as contact_create %}
             {% link href=contact_create text=_("Maak je eerste contact aan voordat je een samenwerking start") icon="arrow_forward" icon_position="after" primary=True %}
         </div>
     {% endif %}

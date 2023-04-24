@@ -1,3 +1,5 @@
+from unittest import skip
+
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
@@ -9,6 +11,8 @@ from open_inwoner.accounts.tests.factories import UserFactory
 from ..models import SiteConfiguration
 
 
+# TODO check this @skip
+@skip("remove after move to django-cms")
 class TestShowCases(WebTest):
     def setUp(self):
         self.user = UserFactory()

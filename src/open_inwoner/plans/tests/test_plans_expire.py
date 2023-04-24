@@ -106,4 +106,4 @@ class NotifyComandTests(TestCase):
         self.assertEqual(sent_mail.to, [user.email])
         self.assertIn(plan.title, html_body)
         self.assertIn(plan.goal, html_body)
-        self.assertIn(reverse("plans:plan_list"), html_body)
+        self.assertIn(reverse("collaborate:plan_list"), html_body)

@@ -234,12 +234,12 @@ class MyNotificationsView(
     template_name = "pages/profile/notifications.html"
     model = User
     form_class = UserNotificationsForm
-    success_url = reverse_lazy("accounts:my_profile")
+    success_url = reverse_lazy("profile:detail")
 
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn profiel"), reverse("accounts:my_profile")),
+            (_("Mijn profiel"), reverse("profile:detail")),
             (_("Communicatievoorkeuren"), reverse("profile:notifications")),
         ]
 
