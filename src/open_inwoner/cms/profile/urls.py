@@ -13,13 +13,13 @@ from open_inwoner.accounts.views import (
     ContactCreateView,
     ContactDeleteView,
     ContactListView,
-    DocumentCreateView,
     DocumentDeleteView,
     DocumentPrivateMediaView,
     EditProfileView,
     InviteAcceptView,
     MyCategoriesView,
     MyDataView,
+    MyNotificationsView,
     MyProfileExportView,
     MyProfileView,
     NecessaryFieldsUserView,
@@ -76,7 +76,6 @@ contact_patterns = [
 ]
 
 documents_patterns = [
-    path("create/", DocumentCreateView.as_view(), name="documents_create"),
     path(
         "<str:uuid>/delete/",
         DocumentDeleteView.as_view(),
@@ -92,9 +91,9 @@ documents_patterns = [
 urlpatterns = [
     path("actions/", include(action_patterns)),
     path("contacts/", include(contact_patterns)),
-    path("documents/", include(documents_patterns)),
-    # path("setup/", HomeView.as_view(), name="setup_1"),
+    path("documenten/", include(documents_patterns)),
     path("onderwerpen/", MyCategoriesView.as_view(), name="categories"),
+    path("notificaties/", MyNotificationsView.as_view(), name="notifications"),
     path("mydata/", MyDataView.as_view(), name="data"),
     path("edit/", EditProfileView.as_view(), name="edit"),
     path("invite/<str:key>/accept/", InviteAcceptView.as_view(), name="invite_accept"),

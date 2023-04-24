@@ -558,7 +558,7 @@ class EditIntrestsTests(WebTest):
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class EditNotificationsTests(WebTest):
     def setUp(self):
-        self.url = reverse("accounts:my_notifications")
+        self.url = reverse("profile:notifications")
         self.user = UserFactory()
 
     def test_login_required(self):

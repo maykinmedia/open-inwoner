@@ -116,7 +116,7 @@ class TestProfile(WebTest):
         )
 
     def test_user_notifications_update_is_logged(self):
-        form = self.app.get(reverse("accounts:my_notifications"), user=self.user).forms[
+        form = self.app.get(reverse("profile:notifications"), user=self.user).forms[
             "change-notifications"
         ]
         form["messages_notifications"] = False

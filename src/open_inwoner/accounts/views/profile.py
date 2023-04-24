@@ -240,7 +240,7 @@ class MyNotificationsView(
     def crumbs(self):
         return [
             (_("Mijn profiel"), reverse("accounts:my_profile")),
-            (_("Communicatievoorkeuren"), reverse("accounts:my_notifications")),
+            (_("Communicatievoorkeuren"), reverse("profile:notifications")),
         ]
 
     def get_object(self):
