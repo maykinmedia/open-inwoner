@@ -1,0 +1,7 @@
+{% load i18n sekizai_tags %}
+
+{% if not request.user.is_authenticated %}
+    <aside class="banner" aria-hidden="true">
+        <img class="main-image" src="{{ instance.image.file.url }}" alt={{ instance.title|default:_("Header image") }}>
+    </aside>
+{% endif %}

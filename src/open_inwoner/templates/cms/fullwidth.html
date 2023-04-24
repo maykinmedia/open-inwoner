@@ -1,6 +1,10 @@
 {% extends 'master.html' %}
 {% load i18n cms_tags sekizai_tags static %}
 
+{% block header_image %}
+    {% placeholder 'banner' %}
+{% endblock header_image %}
+
 {% block content %}
     <div class="debug-cms-block">
     {% placeholder 'content' or %}{% trans "There is no content." %}{% endplaceholder %}
