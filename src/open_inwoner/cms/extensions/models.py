@@ -4,6 +4,8 @@ from django.utils.translation import gettext_lazy as _
 from cms.extensions import PageExtension
 from cms.extensions.extension_pool import extension_pool
 
+from open_inwoner.cms.extensions.constants import IndicatorChoices
+
 
 class CommonExtension(PageExtension):
     requires_auth = models.BooleanField(
@@ -15,6 +17,13 @@ class CommonExtension(PageExtension):
         _("Requires BSN authentication"),
         default=False,
         help_text=_("Deze pagina vereist een account met een Digid BSN"),
+    )
+    menu_indicator = models.CharField(
+        _("Indicator"),
+        max_length=32,
+        choices=IndicatorChoices.choices,
+        blank=True,
+        help_text=_("Toon een counter naast het label"),
     )
 
     def save(self, *args, **kwargs):
