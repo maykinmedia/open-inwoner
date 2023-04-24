@@ -314,7 +314,7 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
                     "start_date": datetime.date.fromisoformat(self.zaak2["startdatum"]),
                     "end_date": None,
                     "identificatie": self.zaak2["identificatie"],
-                    "description": self.zaak2["omschrijving"],
+                    "description": self.zaaktype["omschrijving"],
                     "current_status": self.status_type1["omschrijving"],
                 },
                 {
@@ -322,7 +322,7 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
                     "start_date": datetime.date.fromisoformat(self.zaak1["startdatum"]),
                     "end_date": None,
                     "identificatie": self.zaak1["identificatie"],
-                    "description": self.zaak1["omschrijving"],
+                    "description": self.zaaktype["omschrijving"],
                     "current_status": self.status_type1["omschrijving"],
                 },
             ],
@@ -403,7 +403,7 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
                     "start_date": datetime.date.fromisoformat(self.zaak3["startdatum"]),
                     "end_date": datetime.date.fromisoformat(self.zaak3["einddatum"]),
                     "identificatie": self.zaak3["identificatie"],
-                    "description": self.zaak3["omschrijving"],
+                    "description": self.zaaktype["omschrijving"],
                     "current_status": self.status_type2["omschrijving"],
                 },
             ],
@@ -482,13 +482,12 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
                     "start_date": datetime.date.fromisoformat(self.zaak2["startdatum"]),
                     "end_date": None,
                     "identificatie": self.zaak2["identificatie"],
-                    "description": self.zaak2["omschrijving"],
+                    "description": self.zaaktype["omschrijving"],
                     "current_status": self.status_type1["omschrijving"],
                 },
             ],
         )
         self.assertNotContains(response_1, self.zaak1["identificatie"])
-        self.assertNotContains(response_1, self.zaak1["omschrijving"])
         self.assertContains(response_1, "?page=2")
 
         # 2. test next page
@@ -503,13 +502,12 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
                     "start_date": datetime.date.fromisoformat(self.zaak1["startdatum"]),
                     "end_date": None,
                     "identificatie": self.zaak1["identificatie"],
-                    "description": self.zaak1["omschrijving"],
+                    "description": self.zaaktype["omschrijving"],
                     "current_status": self.status_type1["omschrijving"],
                 },
             ],
         )
         self.assertNotContains(response_2, self.zaak2["identificatie"])
-        self.assertNotContains(response_2, self.zaak2["omschrijving"])
         self.assertContains(response_2, "?page=1")
 
     @patch.object(CaseListMixin, "paginate_by", 1)
