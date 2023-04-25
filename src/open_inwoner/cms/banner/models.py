@@ -11,7 +11,7 @@ class Banner(CMSPlugin):
         verbose_name=_("Banner image"),
         null=True,
         blank=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
         help_text=_("Banner image"),
     )
 

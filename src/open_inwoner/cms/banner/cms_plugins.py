@@ -11,7 +11,3 @@ class BannerPlugin(CMSPluginBase):
     model = Banner
     name = _("Banner Plugin")
     render_template = "cms/banner/banner_plugin.html"
-
-    def render(self, context, instance, placeholder):
-        context = super().render(context, instance, placeholder)
-        return context
