@@ -17,13 +17,13 @@ from ..views import QUESTIONNAIRE_SESSION_KEY, QuestionnaireStepView
 from .factories import QuestionnaireStepFactory, QuestionnaireStepFileFactory
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class QuestionnaireResetViewTestCase(WebTest):
     def test_clears_session(self):
         path = reverse("products:reset")
         self.app.get(path)
         self.assertIsNone(self.app.session[QUESTIONNAIRE_SESSION_KEY])
 
-    @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
     def test_authenticated_user_redirects(self):
         user = UserFactory()
         path = reverse("products:reset")
@@ -38,17 +38,18 @@ class QuestionnaireResetViewTestCase(WebTest):
         self.assertEqual(reverse("root"), response.url)
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class QuestionnaireStepViewTestCase(TestCase):
     def test_root_step_404(self):
         path = reverse("products:root_step", kwargs={"slug": "doesnotexist"})
-        self.assertEqual(path, "/questionnaire/doesnotexist")
+        self.assertEqual(path, "/products/questionnaire/doesnotexist")
         response = self.client.get(path)
         self.assertEqual(404, response.status_code)
 
     def test_root_step_200(self):
         root = QuestionnaireStepFactory.create(code="foo", slug="foo")
         path = reverse("products:root_step", kwargs={"slug": "foo"})
-        self.assertEqual(path, "/questionnaire/foo")
+        self.assertEqual(path, "/products/questionnaire/foo")
         response = self.client.get(path)
         self.assertEqual(200, response.status_code)
         self.assertEqual(root, response.context["form"].instance)
@@ -58,7 +59,7 @@ class QuestionnaireStepViewTestCase(TestCase):
             "products:descendent_step",
             kwargs={"root_slug": "doesnotexist", "slug": "doesnotexist"},
         )
-        self.assertEqual(path, "/questionnaire/doesnotexist/doesnotexist")
+        self.assertEqual(path, "/products/questionnaire/doesnotexist/doesnotexist")
         response = self.client.get(path)
         self.assertEqual(404, response.status_code)
 
@@ -69,7 +70,7 @@ class QuestionnaireStepViewTestCase(TestCase):
             "products:descendent_step",
             kwargs={"root_slug": "foo", "slug": "bar"},
         )
-        self.assertEqual(path, "/questionnaire/foo/bar")
+        self.assertEqual(path, "/products/questionnaire/foo/bar")
         response = self.client.get(path)
         self.assertEqual(200, response.status_code)
         self.assertEqual(descendent, response.context["form"].instance)
@@ -126,7 +127,6 @@ class QuestionnaireStepViewTestCase(TestCase):
         response = self.client.get(path)
         self.assertIn('<aside class="file"', str(response.content))
 
-    @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
     def test_render_products(self):
         ProductFactory.create(name="fooz")
         ProductFactory.create(name="barz")
@@ -148,7 +148,6 @@ class QuestionnaireStepViewTestCase(TestCase):
         response = self.client.get(path)
         self.assertContains(response, root.get_absolute_url())
 
-    @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
     def test_render_profile(self):
         root = QuestionnaireStepFactory.create(code="foo", slug="foo")
         root.add_child(code="bar", slug="bar")
@@ -286,7 +285,6 @@ class QuestionnaireStepListViewTestCase(WebTest):
         )
         self.assertContains(response, questionnaire.slug)
 
-    @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
     def test_zelfdiagnose_button_is_shown_when_there_are_questionnaires(self):
         QuestionnaireStepFactory()
         path = reverse("profile:detail")

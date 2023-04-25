@@ -1,3 +1,4 @@
+from django.test import override_settings
 from django.urls import reverse
 
 from django_webtest import WebTest
@@ -7,6 +8,7 @@ from open_inwoner.questionnaire.models import QuestionnaireStep
 from open_inwoner.questionnaire.tests.factories import QuestionnaireStepFactory
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class QuestionnaireTestCase(WebTest):
     def setUp(self):
         QuestionnaireStepFactory(code="foo", slug="foo", path="0001", highlighted=True)

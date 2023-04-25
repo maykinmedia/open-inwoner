@@ -1,5 +1,5 @@
 from django.db import IntegrityError
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.utils.translation import gettext as _
 
 from ..models import QuestionnaireStep
@@ -25,14 +25,18 @@ class QuestionnaireStepTestCase(TestCase):
         root = QuestionnaireStepFactory.create(question="foo")
         self.assertTrue("foo" in str(root))
 
+    @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
     def test_get_absolute_url_root(self):
         root = QuestionnaireStepFactory.create(code="foo", slug="foo")
-        self.assertEqual("/questionnaire/foo", root.get_absolute_url())
+        self.assertEqual("/products/questionnaire/foo", root.get_absolute_url())
 
+    @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
     def test_get_absolute_url_descendent(self):
         root = QuestionnaireStepFactory.create(code="foo", slug="foo")
         descendent = root.add_child(code="bar", slug="bar")
-        self.assertEqual("/questionnaire/foo/bar", descendent.get_absolute_url())
+        self.assertEqual(
+            "/products/questionnaire/foo/bar", descendent.get_absolute_url()
+        )
 
     def test_get_title_root(self):
         root = QuestionnaireStepFactory.create(code="foo", slug="foo", title="foo")

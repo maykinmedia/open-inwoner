@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -14,6 +14,7 @@ from .factories import QuestionnaireStepFactory
 
 
 @temp_private_root()
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class QuestionnaireExportTests(TestCase):
     def setUp(self) -> None:
         self.client = Client()
