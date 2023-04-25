@@ -55,6 +55,13 @@ class ContactMoment(ZGWModel):
     tekst: str = ""
     medewerker_identificatie: Optional[dict] = None
 
+    # modification to API for eSuite usefulness *AFWIJKING*
+    identificatie: str = ""
+    type: str = ""
+    onderwerp: str = ""
+    status: str = ""
+    antwoord: str = ""
+
     # open-klant OAS
     voorkeurskanaal: str = ""
     voorkeurstaal: str = ""

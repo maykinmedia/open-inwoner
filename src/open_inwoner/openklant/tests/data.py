@@ -2,6 +2,7 @@ from zgw_consumers.constants import APITypes
 from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 
 from open_inwoner.accounts.tests.factories import DigidUserFactory
+from open_inwoner.openklant.constants import Status
 from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.openzaak.tests.factories import ServiceFactory
 from open_inwoner.utils.test import paginated_response
@@ -27,6 +28,11 @@ class MockAPIData:
             "schemas/ContactMoment",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
             url=f"{CONTACTMOMENTEN_ROOT}contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
+            identificatie="AB123",
+            type="SomeType",
+            kanaal="MAIL",
+            status=Status.afgehandeld,
+            antwoord="",
         )
         self.klant_contactmoment = generate_oas_component(
             "cmc",

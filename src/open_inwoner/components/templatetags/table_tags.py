@@ -3,7 +3,7 @@ from typing import List, TypedDict
 from django import template
 from django.utils.translation import gettext as _
 
-from open_inwoner.components.utils import ContentsNode, parse_component_with_args
+from open_inwoner.accounts.views.contactmoments import KCMDict
 
 register = template.Library()
 
@@ -71,100 +71,42 @@ def case_table(case: dict, **kwargs) -> dict:
     }
 
 
-@register.tag()
-def render_table(parser, token):
+@register.inclusion_tag("components/table/table.html")
+def contactmoment_table(kcm: KCMDict, **kwargs) -> dict:
     """
-    Renders a table.
+    Renders a table below the dashboard for additional values related to a Zaak (case).
 
     Usage:
-        {% render_table %}
-        {% endrender_table %}
+        {% contactmoment_table kcm %}
+
+    Variables:
+        + kcm: KCMDict | The contactmoment to be able to build the table.
 
     Extra context:
-        - contents: string (HTML) | this is the context between the render_table and endrender_table tags
+        + table: TableConfig | The configuration of the table.
     """
-    bits = token.split_contents()
-    context_kwargs = parse_component_with_args(parser, bits, "render_table")
-    nodelist = parser.parse(("endrender_table",))
-    parser.delete_first_token()
-    return ContentsNode(
-        nodelist, "components/table/render_table.html", **context_kwargs
-    )
 
+    # build rows for data we actually have
+    rows: List[TableRowConfig] = []
 
-@register.tag()
-def render_table_body(parser, token):
-    """
-    Renders a table body.
+    def add_row_if_not_empty(key, label):
+        value = kcm.get(key)
+        if not value:
+            return
 
-    Usage:
-        {% render_table_body %}
-        {% endrender_table_body %}
+        row = {"headers": [{"text": label}], "cells": [{"text": value}]}
 
-    Extra context:
-        - contents: string (HTML) | this is the context between the render_table_body and endrender_table_body tags
-    """
-    bits = token.split_contents()
-    context_kwargs = parse_component_with_args(parser, bits, "render_table_body")
-    nodelist = parser.parse(("endrender_table_body",))
-    parser.delete_first_token()
-    return ContentsNode(nodelist, "components/table/table_body.html", **context_kwargs)
+        rows.append(row)
 
+    add_row_if_not_empty("identificatie", _("Identificatie"))
+    add_row_if_not_empty("type", _("Type"))
+    add_row_if_not_empty("onderwerp", _("Onderwerp"))
+    add_row_if_not_empty("text", _("Vraag"))
+    add_row_if_not_empty("antwoord", _("Antwoord"))
 
-@register.tag()
-def render_table_row(parser, token):
-    """
-    Renders a table row.
+    table_config: TableConfig = {"body": rows}
 
-    Usage:
-        {% render_table_row %}
-        {% endrender_table_row %}
-
-    Extra context:
-        - contents: string (HTML) | this is the context between the render_table_row and endrender_table_row tags
-    """
-    bits = token.split_contents()
-    context_kwargs = parse_component_with_args(parser, bits, "render_table_row")
-    nodelist = parser.parse(("endrender_table_row",))
-    parser.delete_first_token()
-    return ContentsNode(nodelist, "components/table/table_row.html", **context_kwargs)
-
-
-@register.tag()
-def render_table_header(parser, token):
-    """
-    Renders a table row.
-
-    Usage:
-        {% render_table_header %}
-        {% endrender_table_header %}
-
-    Extra context:
-        - contents: string (HTML) | this is the context between the render_table_header and endrender_table_header tags
-    """
-    bits = token.split_contents()
-    context_kwargs = parse_component_with_args(parser, bits, "render_table_header")
-    nodelist = parser.parse(("endrender_table_header",))
-    parser.delete_first_token()
-    return ContentsNode(
-        nodelist, "components/table/table_header.html", **context_kwargs
-    )
-
-
-@register.tag()
-def render_table_cell(parser, token):
-    """
-    Renders a table row.
-
-    Usage:
-        {% render_table_cell %}
-        {% endrender_table_cell %}
-
-    Extra context:
-        - contents: string (HTML) | this is the context between the render_table_cell and endrender_table_cell tags
-    """
-    bits = token.split_contents()
-    context_kwargs = parse_component_with_args(parser, bits, "render_table_cell")
-    nodelist = parser.parse(("endrender_table_cell",))
-    parser.delete_first_token()
-    return ContentsNode(nodelist, "components/table/table_cell.html", **context_kwargs)
+    return {
+        **kwargs,
+        "table": table_config,
+    }

@@ -16,10 +16,13 @@
                     {% render_card compact=True stretch=True title=case.identificatie %}
                         {% render_list %}
                             {% list_item contactmoment.registered_date caption=_("Ontvangstdatum") compact=True strong=False %}
-                            {% list_item contactmoment.channel caption=_("Kanaal") compact=True strong=False %}
-                            {% list_item contactmoment.text|truncatechars:25 caption=_("Omschrijving") compact=True strong=False %}
+                            {% list_item contactmoment.channel caption=_("Contactwijze") compact=True strong=False %}
+                            {% if contactmoment.onderwerp %}
+                                {% list_item contactmoment.onderwerp|truncatechars:25 caption=_("Onderwerp") compact=True strong=False %}
+                            {% else %}
+                                {% list_item contactmoment.text|truncatechars:25 caption=_("Bericht") compact=True strong=False %}
+                            {% endif %}
                         {% endrender_list %}
-
                         {% link href=contactmoment.url icon="arrow_forward" primary=True text=_("Bekijk vraag") %}
                     {% endrender_card %}
                 {% endrender_column %}

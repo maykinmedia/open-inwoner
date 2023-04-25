@@ -12,6 +12,7 @@ from django.views.generic import TemplateView
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.openklant.api_models import KlantContactMoment
+from open_inwoner.openklant.constants import Status
 from open_inwoner.openklant.wrap import (
     fetch_klantcontactmoment_for_bsn,
     fetch_klantcontactmomenten_for_bsn,
@@ -55,6 +56,11 @@ class KCMDict(TypedDict):
     channel: str
     text: str
     url: str
+    identificatie: str
+    type: str
+    onderwerp: str
+    status: str
+    antwoord: str
 
 
 class KlantContactMomentBaseView(
@@ -63,11 +69,15 @@ class KlantContactMomentBaseView(
     def get_kcm_data(self, kcm: KlantContactMoment) -> KCMDict:
         data = {
             "registered_date": kcm.contactmoment.registratiedatum,
-            "channel": kcm.contactmoment.kanaal,
+            "channel": kcm.contactmoment.kanaal.title(),
             "text": kcm.contactmoment.tekst,
-            "url": reverse(
-                "accounts:contactmoment_detail", kwargs={"kcm_uuid": kcm.uuid}
-            ),
+            "url": reverse("cases:contactmoment_detail", kwargs={"kcm_uuid": kcm.uuid}),
+            # eSuite extra
+            "identificatie": kcm.contactmoment.identificatie,
+            "type": kcm.contactmoment.type,
+            "onderwerp": kcm.contactmoment.onderwerp,
+            "status": Status.safe_label(kcm.contactmoment.status, _("Onbekend")),
+            "antwoord": kcm.contactmoment.antwoord,
         }
         return data
 
@@ -82,7 +92,7 @@ class KlantContactMomentListView(KlantContactMomentBaseView):
 
     @cached_property
     def crumbs(self):
-        return [(_("Mijn vragen"), reverse("accounts:contactmoment_list"))]
+        return [(_("Mijn vragen"), reverse("cases:contactmoment_list"))]
 
     def page_title(self):
         return _("Mijn vragen")
@@ -104,7 +114,7 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
 
     @cached_property
     def crumbs(self):
-        return [(_("Mijn vragen"), reverse("accounts:contactmoment_list"))]
+        return [(_("Mijn vragen"), reverse("cases:contactmoment_list"))]
 
     def page_title(self):
         return _("Mijn vraag")

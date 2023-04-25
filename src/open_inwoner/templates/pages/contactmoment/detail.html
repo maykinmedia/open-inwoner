@@ -11,9 +11,8 @@
     {% if contactmoment %}
         {% render_grid %}
             {% render_column span=9 %}
-                <h1 class="h1" id="contactmomenten">{{ contactmoment.channel }}</h1>
-                <p class="p">{{ contactmoment.registered_date }}</p>
-                <p class="p">{{ contactmoment.text|linebreaksbr }}</p>
+                {% contactmoment_dashboard contactmoment %}
+                {% contactmoment_table contactmoment %}
             {% endrender_column %}
         {% endrender_grid %}
     {% else %}
