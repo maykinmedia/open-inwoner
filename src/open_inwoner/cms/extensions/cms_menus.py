@@ -1,6 +1,3 @@
-import random
-from typing import Optional
-
 from django.core.exceptions import ObjectDoesNotExist
 
 from cms.models import Page
@@ -14,13 +11,13 @@ from open_inwoner.cms.extensions.models import CommonExtension
 
 def lookup_plan_contacts(request, namespace) -> int:
     if request.user.is_authenticated:
-        return request.user.get_plan_contact_new_count() or 123
+        return request.user.get_plan_contact_new_count()
     return 0
 
 
 def lookup_inbox_messages(request, namespace) -> int:
     if request.user.is_authenticated:
-        return request.user.get_new_messages_total() or 123
+        return request.user.get_new_messages_total()
     return 0
 
 
