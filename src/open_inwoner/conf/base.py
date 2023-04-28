@@ -4,7 +4,6 @@ from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
 import sentry_sdk
-
 from log_outgoing_requests.formatters import HttpFormatter
 
 from .utils import config, get_sentry_integrations
