@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from cms.extensions import PageExtension
 from cms.extensions.extension_pool import extension_pool
 
-from open_inwoner.cms.extensions.constants import IndicatorChoices
+from open_inwoner.cms.extensions.constants import Icons, IndicatorChoices
 
 
 class CommonExtension(PageExtension):
@@ -24,6 +24,13 @@ class CommonExtension(PageExtension):
         choices=IndicatorChoices.choices,
         blank=True,
         help_text=_("Toon een counter naast het label"),
+    )
+    menu_icon = models.CharField(
+        _("Icon"),
+        max_length=32,
+        choices=Icons.choices,
+        blank=True,
+        help_text=_("Icon in het menu"),
     )
 
     def save(self, *args, **kwargs):

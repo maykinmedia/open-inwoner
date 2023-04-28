@@ -1,8 +1,8 @@
-{% load menu_tags %}
+{% load menu_tags link_tags %}
 {% for child in children %}
 {% with url=child.attr.redirect_url|default:child.get_absolute_url %}
     <li class="primary-navigation__list-item child{% if child.selected %} selected{% endif %}{% if child.ancestor %} ancestor{% endif %}{% if child.sibling %} sibling{% endif %}{% if child.descendant %} descendant{% endif %}">
-        <a class="link" href="{{ url }}" aria-label="{{ child.get_menu_title }}"><span class="link__text">{{ child.get_menu_title }}</span></a>
+        {% link text=child.get_menu_title href=url icon=child.common.menu_icon icon_position="before" %}
         {% if child.indicator %}
         <a class="link secondary" href="{{ url }}">({{ child.indicator }})</a>
         {% endif %}
