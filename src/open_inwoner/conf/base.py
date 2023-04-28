@@ -216,6 +216,7 @@ MIDDLEWARE = [
     "sessionprofile.middleware.SessionProfileMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     # 'django.middleware.locale.LocaleMiddleware',
+    "open_inwoner.cms.csp.middleware.DjangoCMSCSPMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -526,6 +527,7 @@ CMS_PLACEHOLDER_CONF = {
         # },
     },
 }
+CMS_TOOLBAR_ANONYMOUS_ON = False
 
 #
 # Django-Admin-Index
