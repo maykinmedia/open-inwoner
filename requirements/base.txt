@@ -4,6 +4,8 @@
 #
 #    ./bin/compile_dependencies.sh
 #
+aldryn-apphooks-config==0.6.0
+    # via -r requirements/base.in
 amqp==5.1.1
     # via kombu
 asgiref==3.4.1
@@ -72,6 +74,7 @@ django==3.2.15
     # via
     #   -r requirements/base.in
     #   django-appconf
+    #   django-appdata
     #   django-axes
     #   django-choices
     #   django-classy-tags
@@ -120,6 +123,8 @@ django-appconf==1.0.5
     # via
     #   django-image-cropping
     #   django-timeline-logger
+django-appdata==0.3.2
+    # via aldryn-apphooks-config
 django-autoslug==1.9.8
     # via -r requirements/base.in
 django-axes==5.25.0
@@ -142,6 +147,7 @@ django-classy-tags==4.0.0
 django-cms==3.11.1
     # via
     #   -r requirements/base.in
+    #   aldryn-apphooks-config
     #   djangocms-attributes-field
     #   djangocms-file
     #   djangocms-link
@@ -453,6 +459,7 @@ simplejson==3.18.0
 six==1.16.0
     # via
     #   click-repl
+    #   django-appdata
     #   django-choices
     #   django-elasticsearch-dsl
     #   elasticsearch-dsl

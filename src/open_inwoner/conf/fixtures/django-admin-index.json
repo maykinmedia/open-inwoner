@@ -1,123 +1,57 @@
 [
-{
+  {
     "model": "admin_index.appgroup",
     "fields": {
-        "order": 0,
-        "name": "Gebruikersprofielen",
-        "slug": "accounts",
-        "models": [
-            [
-                "accounts",
-                "action"
-            ],
-            [
-                "accounts",
-                "appointment"
-            ],
-            [
-                "accounts",
-                "document"
-            ],
-            [
-                "accounts",
-                "invite"
-            ],
-            [
-                "accounts",
-                "message"
-            ],
-            [
-                "accounts",
-                "user"
-            ]
-        ]
+      "order": 0,
+      "name": "Gebruikersprofielen",
+      "slug": "accounts",
+      "models": [
+        ["accounts", "action"],
+        ["accounts", "appointment"],
+        ["accounts", "document"],
+        ["accounts", "invite"],
+        ["accounts", "message"],
+        ["accounts", "user"]
+      ]
     }
-},
-{
+  },
+  {
     "model": "admin_index.appgroup",
     "fields": {
-        "order": 2,
-        "name": "PDC",
-        "slug": "pdc",
-        "models": [
-            [
-                "pdc",
-                "category"
-            ],
-            [
-                "pdc",
-                "organization"
-            ],
-            [
-                "pdc",
-                "organizationtype"
-            ],
-            [
-                "pdc",
-                "product"
-            ],
-            [
-                "pdc",
-                "productcondition"
-            ],
-            [
-                "pdc",
-                "productcontact"
-            ],
-            [
-                "pdc",
-                "productlocation"
-            ],
-            [
-                "pdc",
-                "tag"
-            ],
-            [
-                "pdc",
-                "tagtype"
-            ]
-        ]
+      "order": 2,
+      "name": "PDC",
+      "slug": "pdc",
+      "models": [
+        ["pdc", "category"],
+        ["pdc", "organization"],
+        ["pdc", "organizationtype"],
+        ["pdc", "product"],
+        ["pdc", "productcondition"],
+        ["pdc", "productcontact"],
+        ["pdc", "productlocation"],
+        ["pdc", "tag"],
+        ["pdc", "tagtype"]
+      ]
     }
-},
-{
+  },
+  {
     "model": "admin_index.appgroup",
     "fields": {
-        "order": 5,
-        "name": "Permissies, 2FA en logging",
-        "slug": "permissies-2fa-en-logging",
-        "models": [
-            [
-                "auth",
-                "group"
-            ],
-            [
-                "axes",
-                "accessattempt"
-            ],
-            [
-                "axes",
-                "accesslog"
-            ],
-            [
-                "cspreports",
-                "cspreport"
-            ],
-            [
-                "log_outgoing_requests",
-                "outgoingrequestslog"
-            ],
-            [
-                "otp_totp",
-                "totpdevice"
-            ],
-            [
-                "timeline_logger",
-                "timelinelog"
-            ]
-        ]
+      "order": 5,
+      "name": "Permissies, 2FA en logging",
+      "slug": "permissies-2fa-en-logging",
+      "models": [
+        ["auth", "group"],
+        ["axes", "accessattempt"],
+        ["axes", "accesslog"],
+        ["cspreports", "cspreport"],
+        ["log_outgoing_requests", "outgoingrequestslog"],
+        ["otp_totp", "totpdevice"],
+        ["timeline_logger", "timelinelog"]
+      ]
     }
-},
-{
+  },
+  {
     "model": "admin_index.appgroup",
     "fields": {
         "order": 10,
@@ -158,8 +92,8 @@
             ]
         ]
     }
-},
-{
+  },
+  {
     "model": "admin_index.appgroup",
     "fields": {
         "order": 8,
@@ -192,74 +126,47 @@
             ]
         ]
     }
-},
-{
+  },
+  {
     "model": "admin_index.appgroup",
     "fields": {
-        "order": 3,
-        "name": "Vragen en antwoorden",
-        "slug": "vraag-antwoord",
-        "models": [
-            [
-                "pdc",
-                "question"
-            ],
-            [
-                "questionnaire",
-                "questionnairestep"
-            ],
-            [
-                "questionnaire",
-                "questionnairestepfile"
-            ]
-        ]
+      "order": 3,
+      "name": "Vragen en antwoorden",
+      "slug": "vraag-antwoord",
+      "models": [
+        ["pdc", "question"],
+        ["questionnaire", "questionnairestep"],
+        ["questionnaire", "questionnairestepfile"]
+      ]
     }
-},
-{
+  },
+  {
     "model": "admin_index.appgroup",
     "fields": {
-        "order": 4,
-        "name": "Zoeken",
-        "slug": "zoeken",
-        "models": [
-            [
-                "search",
-                "feedback"
-            ],
-            [
-                "search",
-                "fieldboost"
-            ],
-            [
-                "search",
-                "synonym"
-            ]
-        ]
+      "order": 4,
+      "name": "Zoeken",
+      "slug": "zoeken",
+      "models": [
+        ["search", "feedback"],
+        ["search", "fieldboost"],
+        ["search", "synonym"]
+      ]
     }
-},
-{
+  },
+  {
     "model": "admin_index.appgroup",
     "fields": {
-        "order": 1,
-        "name": "Plannen",
-        "slug": "plannen",
-        "models": [
-            [
-                "plans",
-                "actiontemplate"
-            ],
-            [
-                "plans",
-                "plan"
-            ],
-            [
-                "plans",
-                "plantemplate"
-            ]
-        ]
+      "order": 1,
+      "name": "Plannen",
+      "slug": "plannen",
+      "models": [
+        ["plans", "actiontemplate"],
+        ["plans", "plan"],
+        ["plans", "plantemplate"]
+      ]
     }
-},
-{
+  },
+  {
     "model": "admin_index.appgroup",
     "fields": {
         "order": 9,
@@ -284,71 +191,29 @@
             ]
         ]
     }
-},
-{
+  },
+  {
     "model": "admin_index.appgroup",
     "fields": {
-        "order": 6,
-        "name": "Koppelingen",
-        "slug": "koppelingen",
-        "models": [
-            [
-                "haalcentraal",
-                "haalcentraalconfig"
-            ],
-            [
-                "mozilla_django_oidc_db",
-                "openidconnectconfig"
-            ],
-            [
-                "notifications_api_common",
-                "notificationsconfig"
-            ],
-            [
-                "notifications_api_common",
-                "subscription"
-            ],
-            [
-                "openformsclient",
-                "configuration"
-            ],
-            [
-                "openzaak",
-                "catalogusconfig"
-            ],
-            [
-                "openzaak",
-                "openzaakconfig"
-            ],
-            [
-                "openzaak",
-                "usercaseinfoobjectnotification"
-            ],
-            [
-                "openzaak",
-                "usercasestatusnotification"
-            ],
-            [
-                "openzaak",
-                "zaaktypeconfig"
-            ],
-            [
-                "openzaak",
-                "zaaktypeinformatieobjecttypeconfig"
-            ],
-            [
-                "zgw_consumers",
-                "certificate"
-            ],
-            [
-                "zgw_consumers",
-                "nlxconfig"
-            ],
-            [
-                "zgw_consumers",
-                "service"
-            ]
-        ]
+      "order": 6,
+      "name": "Koppelingen",
+      "slug": "koppelingen",
+      "models": [
+        ["haalcentraal", "haalcentraalconfig"],
+        ["mozilla_django_oidc_db", "openidconnectconfig"],
+        ["notifications_api_common", "notificationsconfig"],
+        ["notifications_api_common", "subscription"],
+        ["openformsclient", "configuration"],
+        ["openzaak", "catalogusconfig"],
+        ["openzaak", "openzaakconfig"],
+        ["openzaak", "usercaseinfoobjectnotification"],
+        ["openzaak", "usercasestatusnotification"],
+        ["openzaak", "zaaktypeconfig"],
+        ["openzaak", "zaaktypeinformatieobjecttypeconfig"],
+        ["zgw_consumers", "certificate"],
+        ["zgw_consumers", "nlxconfig"],
+        ["zgw_consumers", "service"]
+      ]
     }
 },
 {
@@ -397,6 +262,10 @@
             [
                 "cms",
                 "placeholderreference"
+            ],
+            [
+                "profile",
+                "profileconfig"
             ]
         ]
     }
@@ -404,34 +273,28 @@
 {
     "model": "admin_index.applink",
     "fields": {
-        "order": 0,
-        "app_group": [
-            "overige-diverse"
-        ],
-        "name": "Link naar Documentatie",
-        "link": "https://taiga.maykinmedia.nl/project/open-inwoner/wiki/home"
+      "order": 0,
+      "app_group": ["overige-diverse"],
+      "name": "Link naar Documentatie",
+      "link": "https://taiga.maykinmedia.nl/project/open-inwoner/wiki/home"
     }
-},
-{
+  },
+  {
     "model": "admin_index.applink",
     "fields": {
-        "order": 1,
-        "app_group": [
-            "overige-diverse"
-        ],
-        "name": "Link naar Github",
-        "link": "https://github.com/maykinmedia/open-inwoner"
+      "order": 1,
+      "app_group": ["overige-diverse"],
+      "name": "Link naar Github",
+      "link": "https://github.com/maykinmedia/open-inwoner"
     }
-},
-{
+  },
+  {
     "model": "admin_index.applink",
     "fields": {
-        "order": 2,
-        "app_group": [
-            "overige-diverse"
-        ],
-        "name": "Link naar Maykin",
-        "link": "https://www.maykinmedia.nl/nl/"
+      "order": 2,
+      "app_group": ["overige-diverse"],
+      "name": "Link naar Maykin",
+      "link": "https://www.maykinmedia.nl/nl/"
     }
-}
+  }
 ]

@@ -11,6 +11,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 from django.views.generic import DetailView, FormView, TemplateView, UpdateView
 
+from aldryn_apphooks_config.mixins import AppConfigMixin
 from glom import glom
 from view_breadcrumbs import BaseBreadcrumbMixin
 
@@ -29,7 +30,12 @@ from ..models import Action, User
 
 
 class MyProfileView(
-    LogMixin, LoginRequiredMixin, CommonPageMixin, BaseBreadcrumbMixin, FormView
+    LogMixin,
+    LoginRequiredMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    AppConfigMixin,
+    FormView,
 ):
     template_name = "pages/profile/me.html"
     form_class = Form
