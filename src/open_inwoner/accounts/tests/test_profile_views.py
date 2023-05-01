@@ -55,7 +55,7 @@ class ProfileViewTests(WebTest):
         self.assertContains(response, _("U heeft geen interessegebieden aangegeven."))
         self.assertContains(response, _("U heeft nog geen contacten."))
         self.assertContains(response, "0 acties staan open.")
-        self.assertNotContains(response, reverse("questionnaire:questionnaire_list"))
+        self.assertNotContains(response, reverse("products:questionnaire_list"))
 
     def test_get_filled_profile_page(self):
         ActionFactory(created_by=self.user)
@@ -73,7 +73,7 @@ class ProfileViewTests(WebTest):
             f"{contact.first_name} ({contact.get_contact_type_display()})",
         )
         self.assertContains(response, "1 acties staan open.")
-        self.assertContains(response, reverse("questionnaire:questionnaire_list"))
+        self.assertContains(response, reverse("products:questionnaire_list"))
 
     def test_only_open_actions(self):
         action = ActionFactory(created_by=self.user, status=StatusChoices.closed)

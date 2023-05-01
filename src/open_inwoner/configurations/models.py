@@ -485,7 +485,7 @@ class SiteConfiguration(SingletonModel):
             "products:product_form": "product_help_text",
             "search:search": "search_help_text",
             "profile:detail": "account_help_text",
-            "questionnaire:questionnaire_list": "questionnaire_help_text",
+            "products:questionnaire_list": "questionnaire_help_text",
             "collaborate:plan_list": "plan_help_text",
         }
 

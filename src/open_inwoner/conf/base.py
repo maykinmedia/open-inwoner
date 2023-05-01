@@ -516,6 +516,7 @@ CMS_PLACEHOLDER_CONF = {
             "PicturePlugin",
             "CategoriesPlugin",
             "ActivePlansPlugin",
+            "QuestionnairePlugin",
             "ProductFinderPlugin",
             "ProductLocationPlugin",
         ],

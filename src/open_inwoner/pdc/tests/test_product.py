@@ -59,7 +59,7 @@ class TestPublishedProducts(WebTest):
         product2 = ProductFactory(published=False)
         questionnaire = QuestionnaireStepFactory(related_products=(product1, product2))
         response = self.app.get(
-            reverse("questionnaire:root_step", kwargs={"slug": questionnaire.slug})
+            reverse("products:root_step", kwargs={"slug": questionnaire.slug})
         )
         self.assertContains(response, product1.name)
         self.assertNotContains(response, product2.name)
@@ -70,7 +70,7 @@ class TestPublishedProducts(WebTest):
         product2 = ProductFactory(published=False)
         questionnaire = QuestionnaireStepFactory(related_products=(product1, product2))
         response = self.app.get(
-            reverse("questionnaire:root_step", kwargs={"slug": questionnaire.slug}),
+            reverse("products:root_step", kwargs={"slug": questionnaire.slug}),
             user=user,
         )
         self.assertContains(response, product1.name)

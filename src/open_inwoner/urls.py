@@ -87,10 +87,6 @@ urlpatterns = [
     path("pages/", include("django.contrib.flatpages.urls"), name="flatpages"),
     path("mail-editor/", include("mail_editor.urls", namespace="mail_editor")),
     path(
-        "questionnaire/",
-        include("open_inwoner.questionnaire.urls", namespace="questionnaire"),
-    ),
-    path(
         "sessions/",
         include("open_inwoner.extended_sessions.urls", namespace="sessions"),
     ),

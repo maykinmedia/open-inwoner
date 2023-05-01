@@ -115,7 +115,7 @@ class TestHelpContext(WebTest):
         self.assertEquals(help_text, config.account_help_text)
 
     def test_default_help_text_on_questionnaire_page(self):
-        response = self.app.get(reverse("questionnaire:questionnaire_list"))
+        response = self.app.get(reverse("products:questionnaire_list"))
         help_text = response.context.get("help_text")
 
         self.assertEquals(
@@ -128,7 +128,7 @@ class TestHelpContext(WebTest):
     def test_custom_help_text_on_questionnaire_page(self):
         SiteConfigurationFactory()
         config = SiteConfiguration.get_solo()
-        response = self.app.get(reverse("questionnaire:questionnaire_list"))
+        response = self.app.get(reverse("products:questionnaire_list"))
         help_text = response.context.get("help_text")
 
         self.assertEquals(help_text, config.questionnaire_help_text)
