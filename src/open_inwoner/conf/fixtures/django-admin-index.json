@@ -120,7 +120,7 @@
 {
     "model": "admin_index.appgroup",
     "fields": {
-        "order": 9,
+        "order": 10,
         "name": "Overige / Diverse",
         "slug": "overige-diverse",
         "models": [
@@ -162,7 +162,7 @@
 {
     "model": "admin_index.appgroup",
     "fields": {
-        "order": 7,
+        "order": 8,
         "name": "Configuratie",
         "slug": "configuratie",
         "models": [
@@ -262,7 +262,7 @@
 {
     "model": "admin_index.appgroup",
     "fields": {
-        "order": 8,
+        "order": 9,
         "name": "Emails",
         "slug": "emails",
         "models": [
@@ -347,6 +347,56 @@
             [
                 "zgw_consumers",
                 "service"
+            ]
+        ]
+    }
+},
+{
+    "model": "admin_index.appgroup",
+    "fields": {
+        "order": 7,
+        "name": "CMS",
+        "slug": "cms",
+        "models": [
+            [
+                "cms",
+                "aliaspluginmodel"
+            ],
+            [
+                "cms",
+                "cmsplugin"
+            ],
+            [
+                "cms",
+                "globalpagepermission"
+            ],
+            [
+                "cms",
+                "page"
+            ],
+            [
+                "cms",
+                "pagepermission"
+            ],
+            [
+                "cms",
+                "pagetype"
+            ],
+            [
+                "cms",
+                "pageuser"
+            ],
+            [
+                "cms",
+                "pageusergroup"
+            ],
+            [
+                "cms",
+                "placeholder"
+            ],
+            [
+                "cms",
+                "placeholderreference"
             ]
         ]
     }
