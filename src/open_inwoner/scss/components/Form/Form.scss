@@ -77,6 +77,14 @@
       }
     }
   }
+  &__control
+    .label
+    .notifications__errors
+    .notification--warning
+    *[class*='icon'] {
+    position: static;
+    transform: translateY(-5px);
+  }
 
   &__control > .label .p:last-child {
     font-size: var(--font-size-body-small);
@@ -148,9 +156,10 @@
 
   .caption__content {
     display: block;
-    color: var(--font-color-body);
+    color: var(--color-mute);
     font-family: var(--font-family-body);
     font-size: var(--font-size-body);
+    font-style: italic;
     .label__label--required {
       vertical-align: sub;
     }

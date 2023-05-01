@@ -273,6 +273,21 @@ def input(field, **kwargs):
     return {**kwargs, "field": field}
 
 
+@register.inclusion_tag("components/Form/FileInput.html")
+def file_input(file, text, **kwargs):
+    """
+    Displaying a file upload interface.
+
+    Usage:
+        {% file_input form.field text="Bestanden uploaden" %}
+
+    Variables:
+        + field: Field | The field that needs to be rendered.
+        - extra_classes: string| classes which should be added to the top-level container
+    """
+    return {**kwargs, "field": file, "text": text}
+
+
 @register.inclusion_tag("components/Form/DateField.html")
 def date_field(field, **kwargs):
     return {**kwargs, "field": field}
