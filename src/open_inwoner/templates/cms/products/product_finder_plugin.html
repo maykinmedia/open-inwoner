@@ -1,0 +1,5 @@
+{% load i18n product_tags %}
+
+{% if condition %}
+    {% product_finder condition=condition form=condition_form form_action="products:product_finder" primary_text=_("Start") %}
+{% endif %}
