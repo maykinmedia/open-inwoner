@@ -1,0 +1,8 @@
+{% load i18n map_tags %}
+
+<h2 class="h2">{{configurable_text.home_page.home_map_title}}</h2>
+<p class="p">{{configurable_text.home_page.home_map_intro|linebreaksbr}}</p>
+
+{% with centroid=product_locations.get_centroid %}
+    {% map centroid.lat centroid.lng geojson_feature_collection=product_locations.get_geojson_feature_collection %}
+{% endwith %}
