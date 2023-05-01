@@ -1,11 +1,16 @@
-{% load menu_tags %}
+{% load menu_tags link_tags %}
 {% for child in children %}
-<li class="primary-navigation__list-item child{% if child.selected %} selected{% endif %}{% if child.ancestor %} ancestor{% endif %}{% if child.sibling %} sibling{% endif %}{% if child.descendant %} descendant{% endif %}">
-	<a class="link" href="{{ child.attr.redirect_url|default:child.get_absolute_url }}" aria-label="{{ child.get_menu_title }}"><span class="link__text">{{ child.get_menu_title }}</span></a>
-	{% if child.children %}
-	<ul class="primary-navigation__list subpage-list">
-		{% show_menu from_level to_level extra_inactive extra_active template "" "" child %}
-	</ul>
-	{% endif %}
-</li>
+{% with url=child.attr.redirect_url|default:child.get_absolute_url %}
+    <li class="primary-navigation__list-item child{% if child.selected %} selected{% endif %}{% if child.ancestor %} ancestor{% endif %}{% if child.sibling %} sibling{% endif %}{% if child.descendant %} descendant{% endif %}">
+        {% link text=child.get_menu_title href=url icon=child.common.menu_icon icon_position="before" %}
+        {% if child.indicator %}
+        <a class="link secondary" href="{{ url }}">({{ child.indicator }})</a>
+        {% endif %}
+        {% if child.children %}
+        <ul class="primary-navigation__list subpage-list">
+            {% show_menu from_level to_level extra_inactive extra_active template "" "" child %}
+        </ul>
+        {% endif %}
+    </li>
+{% endwith %}
 {% endfor %}

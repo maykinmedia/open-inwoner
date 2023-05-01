@@ -61,13 +61,13 @@ urlpatterns = [
         RedirectView.as_view(pattern_name="products:category_list"),
         name="product_detail",
     ),
-    path(
-        r"<str:category_slug>/<str:slug>/",
+    re_path(
+        r"^(?P<category_slug>[\w\-\/]+)/producten/(?P<slug>[\w\-]+)/$",
         ProductDetailView.as_view(),
         name="category_product_detail",
     ),
-    path(
-        r"<str:slug>/",
+    re_path(
+        r"^(?P<slug>[\w\-\/]+)/$",
         CategoryDetailView.as_view(),
         name="category_detail",
     ),

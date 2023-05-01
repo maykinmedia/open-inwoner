@@ -4,7 +4,6 @@ from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
 import sentry_sdk
-
 from log_outgoing_requests.formatters import HttpFormatter
 
 from .utils import config, get_sentry_integrations
@@ -210,6 +209,8 @@ INSTALLED_APPS = [
     "open_inwoner.cms.inbox",
     "open_inwoner.cms.products",
     "open_inwoner.cms.collaborate",
+    "open_inwoner.cms.banner",
+    "open_inwoner.cms.extensions",
 ]
 
 MIDDLEWARE = [
@@ -511,11 +512,13 @@ CMS_PLACEHOLDER_CONF = {
     },
     "content": {
         "plugins": [
-            "TextPlugin",
+            # "TextPlugin",
             "PicturePlugin",
             "CategoriesPlugin",
             "ActivePlansPlugin",
             "QuestionnairePlugin",
+            "ProductFinderPlugin",
+            "ProductLocationPlugin",
         ],
         "text_only_plugins": ["LinkPlugin"],
         "name": _("Content"),
@@ -527,6 +530,7 @@ CMS_PLACEHOLDER_CONF = {
         #     "LinkPlugin": ["TextPlugin"],
         # },
     },
+    "banner": {"plugins": ["BannerPlugin"], "name": _("Banner")},
 }
 
 #
