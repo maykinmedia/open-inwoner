@@ -9,7 +9,6 @@ from .cms_appconfig import ProfileConfig
 class ProfileConfigAdmin(BaseAppHookConfig, admin.ModelAdmin):
     def get_config_fields(self):
         return (
-            "config.title",
             "my_data",
             "selected_categories",
             "mentors",

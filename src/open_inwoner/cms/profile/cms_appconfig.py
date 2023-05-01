@@ -1,10 +1,7 @@
-from django import forms
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from aldryn_apphooks_config.models import AppHookConfig
-from aldryn_apphooks_config.utils import setup_config
-from app_data import AppDataForm
 
 
 class ProfileConfig(AppHookConfig):
@@ -47,10 +44,3 @@ class ProfileConfig(AppHookConfig):
         default=True,
         help_text=_("Designates whether 'notifications' section is rendered or not."),
     )
-
-
-class ProfileConfigForm(AppDataForm):
-    title = forms.CharField()
-
-
-setup_config(ProfileConfigForm, ProfileConfig)
