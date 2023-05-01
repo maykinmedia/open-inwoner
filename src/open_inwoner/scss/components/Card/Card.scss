@@ -171,9 +171,7 @@
   /// Arrow button on product cards.
   a.button:last-child,
   span.button:last-child {
-    position: absolute;
-    right: 1em;
-    bottom: 1em;
+    float: initial;
   }
 
   .link + .link {
