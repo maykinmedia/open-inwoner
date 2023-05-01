@@ -3,6 +3,7 @@
     <h2 class="h2">
         {{configurable_text.home_page.home_theme_title}}
         {% trans "Alle onderwerpen" as button_text %}
+        <span class="spacer"></span>
         {% button href='products:category_list' text=button_text icon="arrow_forward" icon_position="after" %}
     </h2>
     <p class="p">{{configurable_text.home_page.home_theme_intro|linebreaksbr}}</p>
@@ -10,6 +11,6 @@
     {% if request.user.is_authenticated %}
         {% card_container categories=categories columns=4 image_object_fit="cover" %}
     {% else %}
-        {% card_container categories=categories image_object_fit="cover" %}
+        {% card_container categories=categories columns=4 image_object_fit="cover" %}
     {% endif %}
 {% endif %}

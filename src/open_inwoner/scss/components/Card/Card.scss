@@ -11,6 +11,7 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  min-height: 150px;
   position: relative;
   text-decoration: none;
 
@@ -25,7 +26,7 @@
   &--type-info {
     --card-color-background: var(--color-info-lighter);
     --card-color-border: transparent;
-    --card-spacing: var(--spacing-extra-large);
+    --card-spacing: var(--spacing-large);
     clip-path: polygon(
       0% 0%,
       calc(100% - var(--card-size-dog-ear)) 0%,
@@ -74,6 +75,18 @@
   &__body {
     padding: var(--card-spacing);
 
+    &--tabled {
+      display: flex;
+      flex-direction: column;
+      flex-wrap: wrap;
+    }
+
+    .spacer {
+      display: inline-block;
+      width: 100%;
+      height: var(--row-height);
+    }
+
     /// clickable plans on home page after authenticated
     .plan-list {
       text-decoration: none;
@@ -88,11 +101,27 @@
 
     .card__content {
       padding: var(--card-spacing);
+    }
+  }
 
-      .p,
-      .button {
-        margin-top: 4px;
-      }
+  .card__content {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: space-between;
+
+    .p {
+      margin-top: 4px;
+    }
+    .button {
+      bottom: 0;
+      right: 0;
+      padding: var(--card-spacing);
+      position: absolute;
+    }
+
+    &--tabled {
+      padding: 0;
     }
   }
 
@@ -171,7 +200,10 @@
   /// Arrow button on product cards.
   a.button:last-child,
   span.button:last-child {
-    float: right;
+    bottom: 0;
+    right: 0;
+    padding-bottom: var(--card-spacing);
+    position: absolute;
   }
 
   .link + .link {
