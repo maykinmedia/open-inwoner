@@ -71,7 +71,7 @@ class SiteConfiguration(SingletonModel):
         blank=True,
         on_delete=models.SET_NULL,
         related_name="hero_image_login",
-        help_text=_("Hero image on the login page"),
+        help_text=_("Deprecated. CMS banner plugin should be used instead."),
     )
     login_show = models.BooleanField(
         verbose_name=_("Toon inlogknop rechts bovenin"),
