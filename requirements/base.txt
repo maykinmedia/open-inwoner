@@ -88,6 +88,7 @@ django==3.2.15
     #   django-htmx
     #   django-import-export
     #   django-localflavor
+    #   django-log-outgoing-requests
     #   django-open-forms-client
     #   django-otp
     #   django-phonenumber-field
@@ -187,6 +188,8 @@ django-js-asset==1.2.2
     #   django-ckeditor
     #   django-mptt
 django-localflavor==3.1
+    # via -r requirements/base.in
+django-log-outgoing-requests==0.1.0
     # via -r requirements/base.in
 django-mptt==0.13.4
     # via django-filer
@@ -433,6 +436,7 @@ reportlab==3.6.12
     #   svglib
 requests==2.26.0
     # via
+    #   django-log-outgoing-requests
     #   django-open-forms-client
     #   django-rosetta
     #   gemma-zds-client

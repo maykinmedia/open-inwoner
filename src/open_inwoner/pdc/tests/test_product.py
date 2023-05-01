@@ -118,6 +118,19 @@ class TestPublishedProducts(WebTest):
         )
         self.assertEqual(list(response.context["products"]), [product2, product1])
 
+    def test_product_in_nested_category(self):
+        # regression test for Taiga #1402
+        category1 = CategoryFactory(path="0001", name="First one", slug="first-one")
+        category2 = category1.add_child(
+            path="0002", name="Second one", slug="second-one"
+        )
+        # add product to category2 and access it through that (so category1 is a parent)
+        product1 = ProductFactory(categories=(category2,))
+        response = self.app.get(
+            reverse("products:category_detail", kwargs={"slug": category2.slug})
+        )
+        self.assertEqual(list(response.context["products"]), [product1])
+
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestProductFAQ(WebTest):
