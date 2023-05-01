@@ -225,6 +225,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "csp.contrib.rate_limiting.RateLimitedCSPMiddleware",
     "csp.middleware.CSPMiddleware",
+    "open_inwoner.custom_csp.middleware.SkipStaffCSPMiddleware",
     "open_inwoner.custom_csp.middleware.UpdateCSPMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
