@@ -12,7 +12,6 @@ from open_inwoner.accounts.views.cases import (
 app_name = "cases"
 
 urlpatterns = [
-    path("open/", OpenCaseListView.as_view(), name="open_cases"),
     path("closed/", ClosedCaseListView.as_view(), name="closed_cases"),
     path("forms/", OpenSubmissionListView.as_view(), name="open_submissions"),
     path(
@@ -25,5 +24,6 @@ urlpatterns = [
         CaseDetailView.as_view(),
         name="case_detail",
     ),
-    path("", RedirectView.as_view(pattern_name="cases:open_cases"), name="index"),
+    path("open/", RedirectView.as_view(pattern_name="cases:open_cases"), name="index"),
+    path("", OpenCaseListView.as_view(), name="open_cases"),
 ]

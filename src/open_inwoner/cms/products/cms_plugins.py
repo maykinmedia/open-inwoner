@@ -4,7 +4,7 @@ from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 
 from open_inwoner.pdc.forms import ProductFinderForm
-from open_inwoner.pdc.models import Category, ProductCondition
+from open_inwoner.pdc.models import Category, ProductCondition, ProductLocation
 
 
 @plugin_pool.register_plugin
@@ -32,4 +32,14 @@ class ProductFinderPlugin(CMSPluginBase):
     def render(self, context, instance, placeholder):
         context["condition"] = ProductCondition.objects.first()
         context["condition_form"] = ProductFinderForm()
+        return context
+
+
+class ProductLocationPlugin(CMSPluginBase):
+    module = _("PDC")
+    name = _("Product Location Plugin")
+    render_template = "cms/products/product_location_plugin.html"
+
+    def render(self, context, instance, placeholder):
+        context["product_locations"] = ProductLocation.objects.all()[:1000]
         return context
