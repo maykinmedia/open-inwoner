@@ -3,7 +3,6 @@ from django.utils.translation import ugettext_lazy as _
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 
-from open_inwoner.pdc.models import Category
 from open_inwoner.pdc.forms import ProductFinderForm
 from open_inwoner.pdc.models import Category, ProductCondition, ProductLocation
 from open_inwoner.questionnaire.models import QuestionnaireStep
