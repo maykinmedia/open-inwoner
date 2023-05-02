@@ -367,7 +367,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
                 "end_date": datetime.date(2022, 1, 3),
                 "end_date_planned": datetime.date(2022, 1, 4),
                 "end_date_legal": datetime.date(2022, 1, 5),
-                "description": "Zaak naar aanleiding van ingezonden formulier",
+                "description": "Coffee zaaktype",
                 "current_status": "Finish",
                 "statuses": [status_new_obj, status_finish_obj],
                 # only one visible information object
