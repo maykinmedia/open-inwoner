@@ -7,12 +7,15 @@ from open_inwoner.pdc.forms import ProductFinderForm
 from open_inwoner.pdc.models import Category, ProductCondition, ProductLocation
 from open_inwoner.questionnaire.models import QuestionnaireStep
 
+from ..utils.plugin_mixins import CMSActiveAppMixin
+
 
 @plugin_pool.register_plugin
-class CategoriesPlugin(CMSPluginBase):
+class CategoriesPlugin(CMSActiveAppMixin, CMSPluginBase):
     module = _("PDC")
     name = _("Categories Plugin")
     render_template = "cms/products/categories_plugin.html"
+    app_hook = "ProductsApphook"
 
     # own variables
     limit = 4
@@ -29,6 +32,7 @@ class QuestionnairePlugin(CMSPluginBase):
     module = _("PDC")
     name = _("Questionnaire Plugin")
     render_template = "cms/questionnaire/questionnaire_plugin.html"
+    app_hook = "ProductsApphook"
 
     def render(self, context, instance, placeholder):
         context["questionnaire_roots"] = QuestionnaireStep.get_root_nodes().filter(
@@ -38,10 +42,11 @@ class QuestionnairePlugin(CMSPluginBase):
 
 
 @plugin_pool.register_plugin
-class ProductFinderPlugin(CMSPluginBase):
+class ProductFinderPlugin(CMSActiveAppMixin, CMSPluginBase):
     module = _("PDC")
     name = _("Product Finder Plugin")
     render_template = "cms/products/product_finder_plugin.html"
+    app_hook = "ProductsApphook"
 
     def render(self, context, instance, placeholder):
         context["condition"] = ProductCondition.objects.first()
@@ -50,10 +55,11 @@ class ProductFinderPlugin(CMSPluginBase):
 
 
 @plugin_pool.register_plugin
-class ProductLocationPlugin(CMSPluginBase):
+class ProductLocationPlugin(CMSActiveAppMixin, CMSPluginBase):
     module = _("PDC")
     name = _("Product Location Plugin")
     render_template = "cms/products/product_location_plugin.html"
+    app_hook = "ProductsApphook"
 
     def render(self, context, instance, placeholder):
         context["product_locations"] = ProductLocation.objects.all()[:1000]
