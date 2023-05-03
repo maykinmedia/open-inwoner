@@ -26,7 +26,7 @@ class CategoriesPlugin(CMSPluginBase):
 
 @plugin_pool.register_plugin
 class QuestionnairePlugin(CMSPluginBase):
-    module = _("Questionnaire")
+    module = _("PDC")
     name = _("Questionnaire Plugin")
     render_template = "cms/questionnaire/questionnaire_plugin.html"
 
@@ -37,6 +37,7 @@ class QuestionnairePlugin(CMSPluginBase):
         return context
 
 
+@plugin_pool.register_plugin
 class ProductFinderPlugin(CMSPluginBase):
     module = _("PDC")
     name = _("Product Finder Plugin")
@@ -48,6 +49,7 @@ class ProductFinderPlugin(CMSPluginBase):
         return context
 
 
+@plugin_pool.register_plugin
 class ProductLocationPlugin(CMSPluginBase):
     module = _("PDC")
     name = _("Product Location Plugin")
