@@ -14,6 +14,16 @@ class Banner(CMSPlugin):
         on_delete=models.PROTECT,
         help_text=_("Banner image"),
     )
+    image_height = models.PositiveIntegerField(
+        verbose_name=_("Custom image height"),
+        blank=True,
+        null=True,
+        help_text=_(
+            "The image custom height as number in pixels. "
+            'Example: "720" and not "720px".'
+            "Leave this field empty if you want the original height of the image to be applied."
+        ),
+    )
 
     def __str__(self):
         return self.title
