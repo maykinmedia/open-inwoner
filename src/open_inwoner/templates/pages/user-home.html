@@ -17,7 +17,7 @@
         <div class="plans-cards card-container card-container--columns-4">
             {% for plan in plans %}
                 {% render_card image_object_fit="cover" %}
-                    <a href="{{ plan.get_absolute_url }}" class="plan-list"><h4 class="h4">{{ plan.title }}</h4>
+                    <a href="{{ plan.get_absolute_url }}" class="plan-list"><p class="h4">{{ plan.title }}</p>
                     <p class="p">{{ plan.goal|truncatewords:20 }}</p>
                     <p class="p">{{ plan.description|truncatewords:20 }}</p></a>
                     <a
