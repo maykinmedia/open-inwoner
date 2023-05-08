@@ -37,7 +37,10 @@ class ProfileConfig(AppHookConfig):
     actions = models.BooleanField(
         verbose_name=_("Acties"),
         default=True,
-        help_text=_("Designates whether 'actions' section is rendered or not."),
+        help_text=_(
+            "Designates whether 'actions' section is rendered or not."
+            "If this is disabled, plans (page and menu) should be disabled as well."
+        ),
     )
     notifications = models.BooleanField(
         verbose_name=_("Communicatievoorkeuren"),
