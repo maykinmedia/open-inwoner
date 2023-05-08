@@ -39,10 +39,6 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                     "name",
                     "login_show",
                     "login_allow_registration",
-                    "show_cases",
-                    "show_product_finder",
-                    "show_plans",
-                    "show_actions",
                 )
             },
         ),
@@ -69,7 +65,6 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                     "footer_logo_url",
                     "hero_image_login",
                     "favicon",
-                    "plans_banner",
                 )
             },
         ),
