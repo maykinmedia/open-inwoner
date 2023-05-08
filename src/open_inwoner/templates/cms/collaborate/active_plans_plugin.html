@@ -11,6 +11,7 @@
             <a href="{{ plan.get_absolute_url }}" class="plan-list"><h3 class="h3">{{ plan.title }}</h3>
             <p class="p">{{ plan.goal|truncatewords:20 }}</p>
             <p class="p">{{ plan.description|truncatewords:20 }}</p></a>
+            <span class="spacer"></span>
             <a
                 class="button button--icon-before button--transparent button--secondary"
                 href="{{ plan.get_absolute_url }}"
