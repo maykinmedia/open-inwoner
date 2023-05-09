@@ -6,7 +6,20 @@ from filer.fields.image import FilerImageField
 
 
 class Banner(CMSPlugin):
-    title = models.CharField(_("title"), max_length=250, default="")
+    name = models.CharField(_("Name"), max_length=250, default="")
+    title = models.CharField(
+        _("Title"),
+        null=True,
+        blank=True,
+        max_length=250,
+        help_text=_("Title to be shown along with the banner."),
+    )
+    description = models.TextField(
+        verbose_name=_("Description"),
+        null=True,
+        blank=True,
+        help_text=_("Description to be shown along with the banner."),
+    )
     image = FilerImageField(
         verbose_name=_("Banner image"),
         null=True,
@@ -26,4 +39,4 @@ class Banner(CMSPlugin):
     )
 
     def __str__(self):
-        return self.title
+        return self.name

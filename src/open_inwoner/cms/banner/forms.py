@@ -6,7 +6,7 @@ from .models import Banner
 class BannerForm(forms.ModelForm):
     class Meta:
         model = Banner
-        fields = ("title", "image", "image_height")
+        fields = ("name", "title", "description", "image", "image_height")
 
     def clean(self):
         cleaned_data = super().clean()

@@ -2,8 +2,10 @@
 
 {% url 'collaborate:plan_list' as plans %}
 
-{% if request.get_full_path == "/" and not request.user.is_authenticated or request.get_full_path == plans and request.user.is_authenticated %}
-    <aside class="banner" aria-hidden="true">
-        <img class="main-image" src="{{ instance.image.file.url }}" alt={{ instance.title|default:_("Header image") }} height="{{instance.image_height}}">
-    </aside>
+{% if instance.image and %}
+    {% if request.get_full_path == "/" and not request.user.is_authenticated or request.get_full_path == plans and request.user.is_authenticated %}
+        <aside class="banner" aria-hidden="true">
+            <img class="main-image" src="{{ instance.image.file.url }}" alt={{ instance.title|default:_("Header image") }} height="{{instance.image_height}}">
+        </aside>
+    {% endif %}
 {% endif %}
