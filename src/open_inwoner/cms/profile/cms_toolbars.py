@@ -15,19 +15,20 @@ class ProfileApphookConfigToolbar(ExtensionToolbar):
 
     def populate(self):
         current_page_menu = self._setup_extension_toolbar()
-        self.namespace, self.config = get_app_instance(self.request)
-        self.request.current_app = self.namespace
+        if current_page_menu:
+            self.namespace, self.config = get_app_instance(self.request)
+            self.request.current_app = self.namespace
 
-        if not self.config:
-            url = reverse("admin:profile_profileconfig_changelist")
-        else:
-            url = reverse(
-                "admin:profile_profileconfig_change",
-                kwargs={"object_id": self.config.id},
+            if not self.config:
+                url = reverse("admin:profile_profileconfig_changelist")
+            else:
+                url = reverse(
+                    "admin:profile_profileconfig_change",
+                    kwargs={"object_id": self.config.id},
+                )
+
+            current_page_menu.add_modal_item(
+                _("Profile apphook configurations"),
+                url=url,
+                disabled=(not self.page.application_urls == "ProfileApphook"),
             )
-
-        current_page_menu.add_modal_item(
-            _("Profile apphook configurations"),
-            url=url,
-            disabled=(not self.page.application_urls == "ProfileApphook"),
-        )
