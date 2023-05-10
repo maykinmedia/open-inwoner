@@ -532,7 +532,8 @@ CMS_PLACEHOLDER_CONF = {
         #     "LinkPlugin": ["TextPlugin"],
         # },
     },
-    "banner": {"plugins": ["BannerPlugin"], "name": _("Banner")},
+    "banner_image": {"plugins": ["BannerImagePlugin"], "name": _("Banner Image")},
+    "banner_text": {"plugins": ["BannerTextPlugin"], "name": _("Banner Text")},
 }
 
 #
