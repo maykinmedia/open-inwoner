@@ -6,7 +6,5 @@
 {% endblock header_image %}
 
 {% block content %}
-    <div class="debug-cms-block">
     {% placeholder 'content' or %}{% trans "There is no content." %}{% endplaceholder %}
-    </div>
 {% endblock content %}
