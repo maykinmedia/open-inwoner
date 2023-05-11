@@ -389,6 +389,17 @@ class SiteConfiguration(SingletonModel):
             "The text that should display when OpenId connect is set as a login method"
         ),
     )
+    redirect_to = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        verbose_name=_("Redirect anonymous user to"),
+        help_text=_(
+            "Provide a url or a path where the user should be redirected to from the anonymous page. "
+            "Path example: '/accounts/login/', "
+            "Url example: 'https://www.example.com'"
+        ),
+    )
 
     class Meta:
         verbose_name = _("Site Configuration")
