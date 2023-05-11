@@ -5,7 +5,6 @@
 {% accessibility_header request=request %}
 <header class="header" aria-label="Navigatie header">
     <div class="header__container">
-
         <div class="header__menu">
             <button class="header__button">
                 <div class="header__menu-icon">
@@ -28,6 +27,7 @@
 
             <dialog class="header__submenu">
 
+            {% if cms_apps.products %}
             <nav class="header__actions" aria-label="Zoek navigatie mobiel">
                 {% url 'search:search' as search_url %}
                 {% render_form form=search_form method="GET" form_action=search_url inline=True spaceless=False %}
@@ -35,54 +35,17 @@
                     {% form_actions primary_icon="search" primary_text=_("Zoeken") hide_primary_text=True %}
                 {% endrender_form %}
             </nav>
-
-{#         * * *     Start DISABLED * * * Django CMS dynamic mobile menu#}
-{#                <nav class="primary-navigation" aria-label="Hoofd navigatie">#}
-{#                    <ul class="primary-navigation__list">#}
-{#                        {% show_menu 0 100 100 100 "cms/menu/primary.html" %}#}
-{##}
-{#                        {% if has_general_faq_questions %}#}
-{#                            <li class="primary-navigation__list-item">#}
-{#                                {% link text=_('FAQ') href='general_faq' icon="help_outline" icon_position="before" icon_outlined=True %}#}
-{#                            </li>#}
-{#                        {% endif %}#}
-{#                    </ul>#}
-{##}
-{#                <section class="header__actions" aria-label="Navigatie mobiel voor inloggen en uitloggen">#}
-{#                    <div class="header__text-actions">#}
-{#                        <p class="p">#}
-{#                            {% if request.user.is_authenticated %}{% icon icon="person" icon_position="before" icon_outlined=True %}{% trans "Ingelogd als" %} {{ request.user.get_short_name }}{% endif %}#}
-{#                        </p>#}
-{##}
-{#                        {% if request.user.is_authenticated %}#}
-{#                            <ul class="header__list">#}
-{#                                <li class="header__list-item">#}
-{#                                    {% trans "Logout" as logout %}#}
-{#                                    {% link text=logout href=request.user.get_logout_url icon="arrow_forward" icon_position="before" primary=True %}#}
-{#                                </li>#}
-{#                            </ul>#}
-{#                        {% elif config.login_show %}#}
-{#                            <ul class="header__list">#}
-{#                                <li class="header__list-item">#}
-{#                                    {% url 'login' as login_url %}#}
-{#                                    {% trans "Inloggen" as login %}#}
-{#                                    {% button text="Inloggen" href=login_url icon="person" icon_position="before" primary=True icon_outlined=True transparent=True %}#}
-{#                                </li>#}
-{#                            </ul>#}
-{#                        {% endif %}#}
-{#                    </div>#}
-{#                </section>#}
-{#                </nav>#}
-{#         * * *     End of DISABLED * * * Django CMS dynamic mobile menu#}
+            {% endif %}
 
                 <nav class="primary-navigation" aria-label="Hoofd navigatie">
                     <ul class="primary-navigation__list">
 
                         <li class="primary-navigation__list-item">
                             {% trans "Overzicht" as link_text %}
-                            {% url 'root' as link %}
-                            {% link text=link_text href=link icon="grid_view" icon_position="before" %}
+                            {% link text=link_text href="/" icon="grid_view" icon_position="before" %}
                         </li>
+
+                        {% if cms_apps.products and categories %}
                         <li class="primary-navigation__list-item dropdown-nav__toggle">
                             <a href="#" class="link link--toggle link--icon link--icon-position-before" aria-label="{% trans "Onderwerpen" %}" title="{% trans "Onderwerpen" %}">
                                 <span >{% trans "Onderwerpen" %}</span>
@@ -90,7 +53,6 @@
                                 {% icon icon="expand_more" icon_position="after" icon_outlined=True %}
                             </a>
 
-                            {% if categories %}
                                 <ul class="primary-navigation__list subpage-list">
                                     {% for category in categories %}
                                         <li class="primary-navigation__list-item">
@@ -99,42 +61,11 @@
                                         </li>
                                     {% endfor %}
                                 </ul>
-                            {% endif %}
                         </li>
-
-                        {% if request.user.is_authenticated %}
-                            <li class="primary-navigation__list-item">
-                                {% link text=_("Mijn profiel") href='profile:detail' icon="inventory_2" icon_position="before" icon_outlined=True %}
-                            </li>
-                            <li class="primary-navigation__list-item">
-                                {% link text=_('Mijn berichten') href='inbox:index' icon="inbox" icon_position="before" %}
-                                {% with request.user.get_new_messages_total as total_messages %}
-                                    {% if total_messages %}
-                                        {% with ""|addstr:total_messages|addstr:"" as message_total %}
-                                            <span class="indicator">{% link text=message_total href='inbox:index' secondary=True extra_classes="indicator__link" %}<span class="indicator__dot"></span></span>
-                                        {% endwith %}
-                                    {% endif %}
-                                {% endwith %}
-                            </li>
-
-                            {% if request.user.bsn and config.show_cases %}
-                                <li class="primary-navigation__list-item">
-                                    {% link text=_('Mijn aanvragen') href='cases:open_cases' icon="inventory_2" icon_position="before" icon_outlined=True %}
-                                </li>
-                            {% endif %}
-                            {% if show_plans %}
-                            <li class="primary-navigation__list-item">
-                            {% link text=_('Samenwerken') href='collaborate:plan_list' icon="people" icon_outlined=True icon_position="before" %}
-                            {% with request.user.get_plan_contact_new_count as plan_count %}
-                                {% if plan_count %}
-                                    {% with ""|addstr:plan_count|addstr:"" as plan_count %}
-                                        <span class="indicator">{% link text=plan_count href='collaborate:plan_list' secondary=True %}<span class="indicator__dot"></span></span>
-                                    {% endwith %}
-                                {% endif %}
-                            {% endwith %}
-                            </li>
-                            {% endif %}
                         {% endif %}
+
+                        {% show_menu_below_id "home" 0 100 100 100 "cms/menu/primary.html" %}
+
                         {% if has_general_faq_questions %}
                             <li class="primary-navigation__list-item">
                                 {% link text=_('FAQ') href='general_faq' icon="help_outline" icon_position="before" icon_outlined=True %}
@@ -170,8 +101,9 @@
     {% firstof config.logo.default_alt_text config.name as logo_alt_text %}
         <div class="logo__desktop">{% logo src=config.logo.file.url alt=logo_alt_text svg_height=75 %}</div>
 
-        {% primary_navigation categories=categories request=request has_general_faq_questions=has_general_faq_questions show_plans=show_plans %}
+        {% primary_navigation categories=categories request=request has_general_faq_questions=has_general_faq_questions cms_apps=cms_apps show_plans=show_plans %}
 
+        {% if cms_apps.products %}
         <nav class="header__actions" aria-label="Zoek navigatie desktop">
             {% url 'search:search' as search_url %}
             {% render_form form=search_form method="GET" form_action=search_url inline=True spaceless=True %}
@@ -179,11 +111,14 @@
                 {% form_actions primary_icon="search" primary_text=_("Zoeken") hide_primary_text=True %}
             {% endrender_form %}
         </nav>
+        {% endif %}
 
         {% navigation_authenticated categories=categories request=request has_general_faq_questions=has_general_faq_questions %}
 
     </div>
 </header>
+
+{% if cms_apps.products %}
 <section class="search search__mobile">
     <nav class="search__actions " aria-label="Zoek navigatie mobiel">
         {% url 'search:search' as search_url %}
@@ -193,3 +128,4 @@
         {% endrender_form %}
     </nav>
 </section>
+{% endif %}

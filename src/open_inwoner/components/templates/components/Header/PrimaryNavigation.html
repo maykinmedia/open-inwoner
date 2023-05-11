@@ -1,24 +1,10 @@
 {% load i18n header_tags form_tags icon_tags link_tags string_tags solo_tags menu_tags button_tags %}
 
-{#     * * *   Start of DISABLED * * * Django CMS dynamic Desktop menu#}
-{#<nav class="primary-navigation" aria-label="Hoofd navigatie">#}
-{#    <ul class="primary-navigation__list">#}
-{#        {% show_menu 0 100 100 100 "cms/menu/primary.html" %}#}
-{##}
-{#        {% if has_general_faq_questions %}#}
-{#            <li class="primary-navigation__list-item">#}
-{#                {% link text=_('FAQ') href='general_faq' icon="help_outline" icon_position="before" icon_outlined=True %}#}
-{#            </li>#}
-{#        {% endif %}#}
-{#    </ul>#}
-{#</nav>#}
-{#     * * *   End of DISABLED * * * Django CMS dynamic Desktop menu#}
-
 {% get_solo "configurations.SiteConfiguration" as config %}
 
 <nav class="primary-navigation primary-navigation__main" aria-label="Hoofd navigatie">
     <ul class="primary-navigation__list">
-
+        {% if cms_apps.products and categories %}
         <li class="primary-navigation__list-item">
             {% button text=_('Onderwerpen') type="button" icon="expand_more" icon_position="after" icon_outlined=True transparent=True extra_classes="primary-navigation--toggle" %}
 
@@ -33,6 +19,6 @@
                 </ul>
             {% endif %}
         </li>
-
+        {% endif %}
     </ul>
 </nav>
