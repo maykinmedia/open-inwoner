@@ -54,77 +54,35 @@
   {
     "model": "admin_index.appgroup",
     "fields": {
-        "order": 10,
-        "name": "Overige / Diverse",
-        "slug": "overige-diverse",
-        "models": [
-            [
-                "admin_index",
-                "appgroup"
-            ],
-            [
-                "admin_index",
-                "applink"
-            ],
-            [
-                "admin_index",
-                "contenttypeproxy"
-            ],
-            [
-                "easy_thumbnails",
-                "source"
-            ],
-            [
-                "easy_thumbnails",
-                "thumbnail"
-            ],
-            [
-                "easy_thumbnails",
-                "thumbnaildimensions"
-            ],
-            [
-                "filer",
-                "folder"
-            ],
-            [
-                "filer",
-                "folderpermission"
-            ]
-        ]
+      "order": 10,
+      "name": "Overige / Diverse",
+      "slug": "overige-diverse",
+      "models": [
+        ["admin_index", "appgroup"],
+        ["admin_index", "applink"],
+        ["admin_index", "contenttypeproxy"],
+        ["easy_thumbnails", "source"],
+        ["easy_thumbnails", "thumbnail"],
+        ["easy_thumbnails", "thumbnaildimensions"],
+        ["filer", "folder"],
+        ["filer", "folderpermission"]
+      ]
     }
   },
   {
     "model": "admin_index.appgroup",
     "fields": {
-        "order": 8,
-        "name": "Configuratie",
-        "slug": "configuratie",
-        "models": [
-            [
-                "configurations",
-                "siteconfiguration"
-            ],
-            [
-                "configurations",
-                "siteconfigurationpage"
-            ],
-            [
-                "custom_csp",
-                "cspsetting"
-            ],
-            [
-                "flatpages",
-                "flatpage"
-            ],
-            [
-                "mail_editor",
-                "mailtemplate"
-            ],
-            [
-                "sites",
-                "site"
-            ]
-        ]
+      "order": 8,
+      "name": "Configuratie",
+      "slug": "configuratie",
+      "models": [
+        ["configurations", "siteconfiguration"],
+        ["configurations", "siteconfigurationpage"],
+        ["custom_csp", "cspsetting"],
+        ["flatpages", "flatpage"],
+        ["mail_editor", "mailtemplate"],
+        ["sites", "site"]
+      ]
     }
   },
   {
@@ -169,27 +127,15 @@
   {
     "model": "admin_index.appgroup",
     "fields": {
-        "order": 9,
-        "name": "Emails",
-        "slug": "emails",
-        "models": [
-            [
-                "django_yubin",
-                "blacklist"
-            ],
-            [
-                "django_yubin",
-                "log"
-            ],
-            [
-                "django_yubin",
-                "message"
-            ],
-            [
-                "django_yubin",
-                "queuedmessage"
-            ]
-        ]
+      "order": 9,
+      "name": "Emails",
+      "slug": "emails",
+      "models": [
+        ["django_yubin", "blacklist"],
+        ["django_yubin", "log"],
+        ["django_yubin", "message"],
+        ["django_yubin", "queuedmessage"]
+      ]
     }
   },
   {
@@ -215,62 +161,29 @@
         ["zgw_consumers", "service"]
       ]
     }
-},
-{
+  },
+  {
     "model": "admin_index.appgroup",
     "fields": {
-        "order": 7,
-        "name": "CMS",
-        "slug": "cms",
-        "models": [
-            [
-                "cms",
-                "aliaspluginmodel"
-            ],
-            [
-                "cms",
-                "cmsplugin"
-            ],
-            [
-                "cms",
-                "globalpagepermission"
-            ],
-            [
-                "cms",
-                "page"
-            ],
-            [
-                "cms",
-                "pagepermission"
-            ],
-            [
-                "cms",
-                "pagetype"
-            ],
-            [
-                "cms",
-                "pageuser"
-            ],
-            [
-                "cms",
-                "pageusergroup"
-            ],
-            [
-                "cms",
-                "placeholder"
-            ],
-            [
-                "cms",
-                "placeholderreference"
-            ],
-            [
-                "profile",
-                "profileconfig"
-            ]
-        ]
+      "order": 7,
+      "name": "CMS",
+      "slug": "cms",
+      "models": [
+        ["cms", "aliaspluginmodel"],
+        ["cms", "cmsplugin"],
+        ["cms", "globalpagepermission"],
+        ["cms", "page"],
+        ["cms", "pagepermission"],
+        ["cms", "pagetype"],
+        ["cms", "pageuser"],
+        ["cms", "pageusergroup"],
+        ["cms", "placeholder"],
+        ["cms", "placeholderreference"],
+        ["profile", "profileconfig"]
+      ]
     }
-},
-{
+  },
+  {
     "model": "admin_index.applink",
     "fields": {
       "order": 0,
