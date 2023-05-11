@@ -6,9 +6,11 @@ from django.test import RequestFactory, TestCase, override_settings
 from django.urls import reverse
 from django.views.generic import FormView
 
+from cms import api
 from django_webtest import WebTest
 
 from ...accounts.tests.factories import UserFactory
+from ...cms.profile.cms_appconfig import ProfileConfig
 from ...pdc.models import Product
 from ...pdc.tests.factories import ProductFactory
 from ..forms import QuestionnaireStepForm
@@ -286,6 +288,16 @@ class QuestionnaireStepListViewTestCase(WebTest):
         self.assertContains(response, questionnaire.slug)
 
     def test_zelfdiagnose_button_is_shown_when_there_are_questionnaires(self):
+        # cms profile apphook configuration
+        profile_app = ProfileConfig.objects.create(namespace="profile")
+        api.create_page(
+            "profile",
+            "INHERIT",
+            "nl",
+            published=True,
+            apphook="ProfileApphook",
+            apphook_namespace=profile_app.namespace,
+        )
         QuestionnaireStepFactory()
         path = reverse("profile:detail")
         response = self.app.get(path, user=self.user)

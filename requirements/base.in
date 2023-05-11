@@ -60,6 +60,7 @@ djangocms-picture
 # djangocms-googlemap
 # djangocms-snippet
 # djangocms-style
+aldryn-apphooks-config
 
 # API libraries
 djangorestframework

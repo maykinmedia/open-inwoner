@@ -2,9 +2,11 @@ from django.core.exceptions import ValidationError
 from django.test import override_settings
 from django.urls import reverse
 
+from cms import api
 from django_webtest import WebTest
 
 from open_inwoner.accounts.tests.factories import ActionFactory, UserFactory
+from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
 
 from ..models import SiteConfiguration
 
@@ -52,6 +54,16 @@ class TestShowActions(WebTest):
         )
 
     def test_when_enabled_and_user_is_logged_in(self):
+        # cms profile apphook configuration
+        profile_app = ProfileConfig.objects.create(namespace="profile")
+        api.create_page(
+            "profile",
+            "INHERIT",
+            "nl",
+            published=True,
+            apphook="ProfileApphook",
+            apphook_namespace=profile_app.namespace,
+        )
         response = self.app.get(self.profile_url, user=self.user)
 
         links = response.pyquery(".personal-overview")

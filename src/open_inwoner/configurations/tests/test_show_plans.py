@@ -114,7 +114,6 @@ class TestShowPlans(WebTest):
             with self.subTest(f"authenticated {url}"):
                 self.app.get(url, status=404, user=self.user)
 
-    @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
     def test_user_action_page_doesnt_link_to_plan_when_show_plans_disabled(self):
         with self.subTest("check"):
             self.config.show_plans = False

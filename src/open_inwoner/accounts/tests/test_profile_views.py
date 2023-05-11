@@ -5,12 +5,14 @@ from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 import requests_mock
+from cms import api
 from django_webtest import WebTest
 from PIL import Image
 from timeline_logger.models import TimelineLog
 from webtest import Upload
 
 from open_inwoner.accounts.choices import StatusChoices
+from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 from open_inwoner.pdc.tests.factories import CategoryFactory
 from open_inwoner.utils.logentry import LOG_ACTIONS
@@ -35,6 +37,17 @@ class ProfileViewTests(WebTest):
             status=StatusChoices.open,
         )
 
+        # cms profile apphook configuration
+        self.profile_app = ProfileConfig.objects.create(namespace="profile")
+        api.create_page(
+            "profile",
+            "INHERIT",
+            "nl",
+            published=True,
+            apphook="ProfileApphook",
+            apphook_namespace=self.profile_app.namespace,
+        )
+
     def test_login_required(self):
         login_url = reverse("login")
         response = self.app.get(self.url)
@@ -56,6 +69,7 @@ class ProfileViewTests(WebTest):
         self.assertContains(response, _("U heeft nog geen contacten."))
         self.assertContains(response, "0 acties staan open.")
         self.assertNotContains(response, reverse("products:questionnaire_list"))
+        self.assertContains(response, _("messages, plans"))
 
     def test_get_filled_profile_page(self):
         ActionFactory(created_by=self.user)
