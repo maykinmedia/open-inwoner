@@ -4,8 +4,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from django.http import Http404, HttpResponseRedirect
-from django.urls import resolve
+from django.urls import NoReverseMatch, resolve
 from django.urls.base import reverse
+from django.urls.exceptions import Resolver404
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
@@ -39,7 +40,12 @@ class PlanActionsEnabledMixin:
 
             # retrieve namespace of ProfileConfig instance that's being used,
             # in order to get the current value of actions
-            profile_namespace = resolve(reverse("profile:action_list")).namespace
+            try:
+                actions_resolver = resolve(reverse("profile:action_list"))
+            except (NoReverseMatch, Resolver404):
+                raise Http404("profile application is not active or invalid path")
+
+            profile_namespace = actions_resolver.namespace
             config = profile_app.get_config(profile_namespace)
             if config and not config.actions:
                 raise Http404("actions not enabled")
