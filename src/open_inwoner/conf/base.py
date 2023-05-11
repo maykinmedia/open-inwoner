@@ -537,6 +537,7 @@ CMS_PLACEHOLDER_CONF = {
     },
     "banner_image": {"plugins": ["BannerImagePlugin"], "name": _("Banner Image")},
     "banner_text": {"plugins": ["BannerTextPlugin"], "name": _("Banner Text")},
+    "login_banner": {"plugins": ["BannerPlugin"], "name": _("Login Banner")},
 }
 
 CMS_TOOLBAR_ANONYMOUS_ON = False

@@ -1,11 +1,9 @@
 {% extends 'master.html' %}
-{% load i18n static logo_tags grid_tags card_tags form_tags link_tags button_tags solo_tags %}
+{% load i18n static logo_tags grid_tags card_tags form_tags link_tags button_tags solo_tags cms_tags %}
 
 
 {% block header_image %}
-<aside class="banner" aria-hidden="true">
-    <img class="main-image" src="{{ hero_image_login }}" alt="Header afbeelding">
-</aside>
+    {% static_placeholder 'login_banner' %}
 {% endblock header_image %}
 
 
