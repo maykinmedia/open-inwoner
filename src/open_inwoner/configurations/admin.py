@@ -40,9 +40,8 @@ class SiteConfigurarionAdminForm(forms.ModelForm):
         model = SiteConfiguration
         fields = "__all__"
 
-    def clean(self):
-        cleaned_data = super().clean()
-        redirect_to = cleaned_data.get("redirect_to")
+    def clean_redirect_to(self):
+        redirect_to = self.cleaned_data["redirect_to"]
 
         if redirect_to:
             if redirect_to.startswith("/"):
@@ -56,6 +55,8 @@ class SiteConfigurarionAdminForm(forms.ModelForm):
                     validate_url(redirect_to)
                 except exceptions.ValidationError:
                     raise ValidationError(_("The entered url is invalid."))
+
+        return redirect_to
 
 
 @admin.register(SiteConfiguration)
