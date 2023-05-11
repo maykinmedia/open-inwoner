@@ -6,7 +6,6 @@ from django.db.models import Q
 from django.http import Http404, HttpResponseRedirect
 from django.urls import NoReverseMatch, resolve
 from django.urls.base import reverse
-from django.urls.exceptions import Resolver404
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
@@ -42,8 +41,8 @@ class PlanActionsEnabledMixin:
             # in order to get the current value of actions
             try:
                 actions_resolver = resolve(reverse("profile:action_list"))
-            except (NoReverseMatch, Resolver404):
-                raise Http404("profile application is not active or invalid path")
+            except NoReverseMatch:
+                raise Http404("profile application is not active")
 
             profile_namespace = actions_resolver.namespace
             config = profile_app.get_config(profile_namespace)
