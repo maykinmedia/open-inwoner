@@ -1,12 +1,8 @@
 {% extends 'master.html' %}
-{% load i18n button_tags string_tags pagination_tags helpers card_tags form_tags link_tags %}
+{% load i18n button_tags string_tags pagination_tags helpers card_tags form_tags link_tags cms_tags %}
 
 {% block header_image %}
-    {% if plans_banner %}
-        <aside class="banner" aria-hidden="true">
-            <img class="main-image main-image--start-after" src="{{ plans_banner }}" alt="{{ plans_banner.default_alt_text|default:'Header afbeelding' }}">
-        </aside>
-    {% endif %}
+    {% placeholder 'banner' %}
 {% endblock header_image %}
 
 {% block content %}

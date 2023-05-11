@@ -1,4 +1,3 @@
-from django.core.exceptions import ValidationError
 from django.test import override_settings
 from django.urls import reverse
 
@@ -8,62 +7,30 @@ from django_webtest import WebTest
 from open_inwoner.accounts.tests.factories import ActionFactory, UserFactory
 from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
 
-from ..models import SiteConfiguration
-
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestShowActions(WebTest):
     def setUp(self):
         self.user = UserFactory()
-        self.config = SiteConfiguration.get_solo()
-
         self.action = ActionFactory(created_by=self.user)
-
         self.profile_url = reverse("profile:detail")
         self.actions_list_url = reverse("profile:action_list")
 
-    def test_default_enabled(self):
-        self.assertTrue(self.config.show_actions)
-
-    def test_show_plans_requires_show_actions(self):
-        config = SiteConfiguration.get_solo()
-
-        # fine
-        config.show_plans = False
-        config.show_actions = False
-        config.clean()
-
-        # fine
-        config.show_plans = True
-        config.show_actions = True
-        config.clean()
-
-        # fine
-        config.show_plans = False
-        config.show_actions = True
-        config.clean()
-
-        # not fine
-        config.show_plans = True
-        config.show_actions = False
-        with self.assertRaises(ValidationError) as e:
-            config.clean()
-
-        self.assertEqual(
-            set(e.exception.error_dict.keys()), {"show_actions", "show_plans"}
-        )
-
-    def test_when_enabled_and_user_is_logged_in(self):
         # cms profile apphook configuration
-        profile_app = ProfileConfig.objects.create(namespace="profile")
+        self.profile_config = ProfileConfig.objects.create(namespace="profile")
         api.create_page(
             "profile",
             "INHERIT",
             "nl",
             published=True,
             apphook="ProfileApphook",
-            apphook_namespace=profile_app.namespace,
+            apphook_namespace=self.profile_config.namespace,
         )
+
+    def test_default_enabled(self):
+        self.assertTrue(self.profile_config.actions)
+
+    def test_when_enabled_and_user_is_logged_in(self):
         response = self.app.get(self.profile_url, user=self.user)
 
         links = response.pyquery(".personal-overview")
@@ -71,8 +38,8 @@ class TestShowActions(WebTest):
         self.assertNotEqual(links.find(f'a[href="{self.actions_list_url}"]'), [])
 
     def test_when_disabled_and_user_is_logged_in(self):
-        self.config.show_actions = False
-        self.config.save()
+        self.profile_config.actions = False
+        self.profile_config.save()
         response = self.app.get(self.profile_url, user=self.user)
 
         links = response.pyquery(".personal-overview")
@@ -92,8 +59,8 @@ class TestShowActions(WebTest):
         ]
 
         # test disabled raises http 404
-        self.config.show_actions = False
-        self.config.save()
+        self.profile_config.actions = False
+        self.profile_config.save()
 
         for url in urls:
             with self.subTest(f"{url}"):

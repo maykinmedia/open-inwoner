@@ -69,8 +69,6 @@ class HomeView(CommonPageMixin, TemplateView):
                 highlighted=True, published=True
             )
         )
-        if self.request.user.is_authenticated and config.show_plans:
-            kwargs.update(plans=Plan.objects.connected(self.request.user)[:limit])
 
         # Show the categories if the user has selected them, otherwise
         # Show the highlighted published categories if they have been specified, otherwise
@@ -94,12 +92,6 @@ class HomeView(CommonPageMixin, TemplateView):
         elif highlighted_categories:
             kwargs.update(categories=highlighted_categories)
 
-        # Product finder:
-        if config.show_product_finder:
-            kwargs.update(
-                condition=ProductCondition.objects.first(),
-                condition_form=ProductFinderForm(),
-            )
         return super().get_context_data(**kwargs)
 
     def get_template_names(self):

@@ -196,15 +196,6 @@ class SiteConfiguration(SingletonModel):
         verbose_name=_("Edit goal message"),
         help_text=_("The message when a user edits a goal."),
     )
-    plans_banner = FilerImageField(
-        verbose_name=_("Plans banner"),
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name="plans_banner",
-        help_text=_("Banner of the plans"),
-    )
-
     footer_visiting_title = models.CharField(
         max_length=255,
         default="",
@@ -382,36 +373,6 @@ class SiteConfiguration(SingletonModel):
             "The xxxxx part is the ID."
         ),
     )
-
-    show_cases = models.BooleanField(
-        verbose_name=_("Show cases"),
-        default=False,
-        help_text=_(
-            "By default the cases are not shown. If the OpenZaak integration is configured this needs to be set to True."
-        ),
-    )
-    show_product_finder = models.BooleanField(
-        verbose_name=_("Laat productzoeker zien op de homepagina."),
-        blank=True,
-        default=False,
-        help_text=_(
-            "Als dit is aangevinkt en er zijn product condities gemaakt, dan wordt op de homepagina de productzoeker weergegeven."
-        ),
-    )
-    show_plans = models.BooleanField(
-        verbose_name=_("Laat samenwerken zien op de homepage en menu"),
-        default=True,
-        help_text=_(
-            "Als dit is aangevinkt, dan wordt op de homepagina en het gebruikers profiel de samenwerken feature weergegeven."
-        ),
-    )
-    show_actions = models.BooleanField(
-        verbose_name=_("Laat acties zien op de profiel pagina"),
-        default=True,
-        help_text=_(
-            "Als dit is aangevinkt, dan worded op de gebruikers profiel pagina de acties weergegeven."
-        ),
-    )
     openid_connect_logo = FilerImageField(
         verbose_name=_("Openid Connect Logo"),
         null=True,
@@ -434,13 +395,6 @@ class SiteConfiguration(SingletonModel):
 
     def __str__(self):
         return str(_("Site Configuration"))
-
-    def clean(self):
-        super().clean()
-
-        if self.show_plans and not self.show_actions:
-            msg = _("Als Samenwerken actief is moeten Acties ook actief zijn")
-            raise ValidationError({"show_actions": msg, "show_plans": msg})
 
     @property
     def get_primary_color(self):

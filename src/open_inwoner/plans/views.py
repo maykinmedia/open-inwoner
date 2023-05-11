@@ -4,11 +4,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from django.http import Http404, HttpResponseRedirect
+from django.urls import NoReverseMatch, resolve
 from django.urls.base import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
+from cms.apphook_pool import apphook_pool
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.accounts.choices import ContactTypeChoices
@@ -22,7 +24,6 @@ from open_inwoner.accounts.views.actions import (
     ActionUpdateView,
     BaseActionFilter,
 )
-from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.utils.logentry import get_change_message
 from open_inwoner.utils.mixins import ExportMixin
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
@@ -31,11 +32,23 @@ from .forms import PlanForm, PlanGoalForm, PlanListFilterForm
 from .models import Plan
 
 
-class PlansEnabledMixin:
+class PlanActionsEnabledMixin:
     def dispatch(self, request, *args, **kwargs):
-        self.config = SiteConfiguration.get_solo()
-        if not self.config.show_plans:
-            raise Http404("plans not enabled")
+        if request.resolver_match.namespace == "collaborate":
+            profile_app = apphook_pool.get_apphook("ProfileApphook")
+
+            # retrieve namespace of ProfileConfig instance that's being used,
+            # in order to get the current value of actions
+            try:
+                actions_resolver = resolve(reverse("profile:action_list"))
+            except NoReverseMatch:
+                raise Http404("profile application is not active")
+
+            profile_namespace = actions_resolver.namespace
+            config = profile_app.get_config(profile_namespace)
+            if config and not config.actions:
+                raise Http404("actions not enabled")
+
         return super().dispatch(request, *args, **kwargs)
 
 
@@ -72,7 +85,7 @@ class BasePlanFilter:
 
 
 class PlanListView(
-    PlansEnabledMixin,
+    PlanActionsEnabledMixin,
     LoginRequiredMixin,
     CommonPageMixin,
     BaseBreadcrumbMixin,
@@ -156,9 +169,6 @@ class PlanListView(
             )
             plans["plan_list"] = queryset
 
-        context["plans_banner"] = (
-            self.config.plans_banner.file.url if self.config.plans_banner else ""
-        )
         context["paginator"] = paginator
         context["page_obj"] = page
         context["is_paginated"] = is_paginated
@@ -167,7 +177,7 @@ class PlanListView(
 
 
 class PlanDetailView(
-    PlansEnabledMixin,
+    PlanActionsEnabledMixin,
     LoginRequiredMixin,
     CommonPageMixin,
     BaseBreadcrumbMixin,
@@ -217,7 +227,7 @@ class PlanDetailView(
 
 
 class PlanCreateView(
-    PlansEnabledMixin,
+    PlanActionsEnabledMixin,
     LogMixin,
     LoginRequiredMixin,
     CommonPageMixin,
@@ -254,7 +264,7 @@ class PlanCreateView(
 
 
 class PlanEditView(
-    PlansEnabledMixin,
+    PlanActionsEnabledMixin,
     LogMixin,
     LoginRequiredMixin,
     CommonPageMixin,
@@ -301,7 +311,7 @@ class PlanEditView(
 
 
 class PlanGoalEditView(
-    PlansEnabledMixin,
+    PlanActionsEnabledMixin,
     LogMixin,
     LoginRequiredMixin,
     CommonPageMixin,
@@ -343,7 +353,7 @@ class PlanGoalEditView(
 
 
 class PlanFileUploadView(
-    PlansEnabledMixin,
+    PlanActionsEnabledMixin,
     LogMixin,
     LoginRequiredMixin,
     CommonPageMixin,
@@ -390,7 +400,7 @@ class PlanFileUploadView(
         return self.object.get_absolute_url()
 
 
-class PlanActionCreateView(PlansEnabledMixin, ActionCreateView):
+class PlanActionCreateView(PlanActionsEnabledMixin, ActionCreateView):
     model = Plan
 
     @cached_property
@@ -441,7 +451,7 @@ class PlanActionCreateView(PlansEnabledMixin, ActionCreateView):
         return self.object.get_absolute_url()
 
 
-class PlanActionEditView(PlansEnabledMixin, ActionUpdateView):
+class PlanActionEditView(PlanActionsEnabledMixin, ActionUpdateView):
     @cached_property
     def crumbs(self):
         return [
@@ -503,7 +513,7 @@ class PlanActionEditView(PlansEnabledMixin, ActionUpdateView):
         return self.object.get_absolute_url()
 
 
-class PlanActionEditStatusTagView(PlansEnabledMixin, ActionUpdateStatusTagView):
+class PlanActionEditStatusTagView(PlanActionsEnabledMixin, ActionUpdateStatusTagView):
     def get_plan(self):
         try:
             return Plan.objects.connected(self.request.user).get(
@@ -518,7 +528,7 @@ class PlanActionEditStatusTagView(PlansEnabledMixin, ActionUpdateStatusTagView):
         return args
 
 
-class PlanActionDeleteView(PlansEnabledMixin, ActionDeleteView):
+class PlanActionDeleteView(PlanActionsEnabledMixin, ActionDeleteView):
     def get_plan(self):
         try:
             return Plan.objects.connected(self.request.user).get(
@@ -545,7 +555,7 @@ class PlanActionDeleteView(PlansEnabledMixin, ActionDeleteView):
             )
 
 
-class PlanActionHistoryView(ActionHistoryView):
+class PlanActionHistoryView(PlanActionsEnabledMixin, ActionHistoryView):
     @cached_property
     def crumbs(self):
         return [
@@ -572,7 +582,7 @@ class PlanActionHistoryView(ActionHistoryView):
 
 
 class PlanExportView(
-    PlansEnabledMixin, LogMixin, LoginRequiredMixin, ExportMixin, DetailView
+    PlanActionsEnabledMixin, LogMixin, LoginRequiredMixin, ExportMixin, DetailView
 ):
     template_name = "export/plans/plan_export.html"
     model = Plan
