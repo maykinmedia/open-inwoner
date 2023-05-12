@@ -17,6 +17,7 @@ from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 from open_inwoner.pdc.tests.factories import CategoryFactory
 from open_inwoner.utils.logentry import LOG_ACTIONS
 
+from ...cms.profile.cms_apps import ProfileApphook
 from ...cms.tests import cms_tools
 from ...questionnaire.tests.factories import QuestionnaireStepFactory
 from ..choices import ContactTypeChoices, LoginTypeChoices
@@ -40,17 +41,10 @@ class ProfileViewTests(WebTest):
 
         cms_tools.create_homepage()
 
-        # cms profile apphook configuration
-        self.profile_app = ProfileConfig.objects.create(namespace="profile")
-
-        api.create_page(
-            "profile",
-            "INHERIT",
-            "nl",
-            published=True,
-            apphook="ProfileApphook",
-            apphook_namespace=self.profile_app.namespace,
+        self.profile_app = ProfileConfig.objects.create(
+            namespace=ProfileApphook.app_name
         )
+        cms_tools.create_apphook_page(ProfileApphook)
 
     def test_login_required(self):
         login_url = reverse("login")

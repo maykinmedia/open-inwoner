@@ -7,6 +7,7 @@ from django_webtest import WebTest
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.pdc.tests.factories import ProductFactory
 
+from ...cms.tests import cms_tools
 from ..models import SiteConfiguration
 from .factories import SiteConfigurationFactory
 
@@ -17,8 +18,10 @@ class TestHelpContext(WebTest):
         self.user = UserFactory()
         self.product = ProductFactory()
 
+        cms_tools.create_homepage()
+
     def test_default_help_text_on_home_page(self):
-        response = self.app.get(reverse("root"))
+        response = self.app.get(reverse("pages-root"))
         help_text = response.context.get("help_text")
 
         self.assertEquals(
@@ -31,7 +34,7 @@ class TestHelpContext(WebTest):
     def test_custom_help_text_on_home_page(self):
         SiteConfigurationFactory()
         config = SiteConfiguration.get_solo()
-        response = self.app.get(reverse("root"))
+        response = self.app.get(reverse("pages-root"))
         help_text = response.context.get("help_text")
 
         self.assertEquals(help_text, config.home_help_text)

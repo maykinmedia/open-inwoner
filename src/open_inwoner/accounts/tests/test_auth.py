@@ -14,6 +14,7 @@ from furl import furl
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 
+from ...cms.tests import cms_tools
 from ...utils.tests.helpers import AssertRedirectsMixin
 from ..choices import LoginTypeChoices
 from ..models import User
@@ -250,6 +251,10 @@ class TestDigid(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
     csrf_checks = False
     url = reverse_lazy("django_registration_register")
 
+    @classmethod
+    def setUpTestData(cls):
+        cms_tools.create_homepage()
+
     def test_registration_page_only_digid(self):
         response = self.app.get(self.url)
 
@@ -291,7 +296,7 @@ class TestDigid(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
         url = reverse("digid-mock:password")
         params = {
             "acs": reverse("acs"),
-            "next": reverse("root"),
+            "next": reverse("pages-root"),
         }
         url = f"{url}?{urlencode(params)}"
 
@@ -472,7 +477,7 @@ class TestDigid(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
         url = reverse("digid-mock:password")
         params = {
             "acs": reverse("acs"),
-            "next": reverse("root"),
+            "next": reverse("pages-root"),
         }
         url = f"{url}?{urlencode(params)}"
 
@@ -520,7 +525,7 @@ class TestDigid(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
         url = reverse("digid-mock:password")
         params = {
             "acs": reverse("acs"),
-            "next": reverse("root"),
+            "next": reverse("pages-root"),
         }
         url = f"{url}?{urlencode(params)}"
 
@@ -560,7 +565,7 @@ class TestDigid(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
         url = reverse("digid-mock:password")
         params = {
             "acs": reverse("acs"),
-            "next": reverse("root"),
+            "next": reverse("pages-root"),
         }
         url = f"{url}?{urlencode(params)}"
 
@@ -592,7 +597,7 @@ class TestDigid(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
         url = reverse("digid-mock:password")
         params = {
             "acs": reverse("acs"),
-            "next": reverse("root"),
+            "next": reverse("pages-root"),
         }
         url = f"{url}?{urlencode(params)}"
 
@@ -612,6 +617,10 @@ class TestDigid(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
 class TestRegistrationNecessary(WebTest):
     url = reverse_lazy("profile:registration_necessary")
 
+    @classmethod
+    def setUpTestData(cls):
+        cms_tools.create_homepage()
+
     def test_any_page_for_digid_user_redirect_to_necessary_fields(self):
         user = UserFactory(
             first_name="",
@@ -619,7 +628,7 @@ class TestRegistrationNecessary(WebTest):
             login_type=LoginTypeChoices.digid,
         )
         urls = [
-            reverse("root"),
+            reverse("pages-root"),
             reverse("products:category_list"),
             reverse("cases:open_cases"),
             reverse("profile:detail"),

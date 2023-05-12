@@ -21,6 +21,9 @@ from open_inwoner.accounts.tests.factories import (
 from open_inwoner.accounts.tests.test_action_views import ActionsPlaywrightTests
 from open_inwoner.utils.tests.playwright import multi_browser
 
+from ...cms.collaborate.cms_apps import CollaborateApphook
+from ...cms.extensions.constants import Icons, IndicatorChoices
+from ...cms.tests import cms_tools
 from ..models import Plan, PlanContact
 from .factories import ActionTemplateFactory, PlanFactory, PlanTemplateFactory
 
@@ -1077,22 +1080,32 @@ class PlanBegeleiderListViewTests(WebTest):
         )
 
 
-# TODO check this skip
-@skip("disabled until CMS lands")
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class NewPlanContactCounterTest(WebTest):
     def test_plan_contact_new_count(self):
+        cms_tools.create_homepage()
+        cms_tools.create_apphook_page(
+            CollaborateApphook,
+            title=_("Samenwerken"),
+            extension_args={
+                "menu_indicator": IndicatorChoices.plan_new_contacts,
+                "menu_icon": Icons.people,
+            },
+        )
+
         owner = UserFactory()
         plan_1 = PlanFactory(created_by=owner)
         plan_2 = PlanFactory(created_by=owner)
 
         user = UserFactory()
 
-        root_url = reverse("root")
+        root_url = reverse("pages-root")
         list_url = reverse("collaborate:plan_list")
 
         # check no number shows by default
         response = self.app.get(root_url, user=user)
+        response.showbrowser()
+
         links = response.pyquery(
             f".header__container > .primary-navigation a[href='{list_url}']"
         )

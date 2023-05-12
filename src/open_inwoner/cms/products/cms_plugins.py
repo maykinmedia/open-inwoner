@@ -16,19 +16,35 @@ class CategoriesPlugin(CMSActiveAppMixin, CMSPluginBase):
     name = _("Categories Plugin")
     render_template = "cms/products/categories_plugin.html"
     app_hook = "ProductsApphook"
+    cache = False
 
     # own variables
     limit = 4
 
     def render(self, context, instance, placeholder):
-        context["categories"] = Category.objects.published().order_by("name")[
-            0 : self.limit
-        ]
+        request = context["request"]
+        # Show the categories if the user has selected them, otherwise
+        # Show the highlighted published categories if they have been specified, otherwise
+        # Show the first X published categories
+
+        # Highlighted categories
+        highlighted_categories = (
+            Category.objects.published().filter(highlighted=True).order_by("name")
+        )
+        if request.user.is_authenticated and request.user.selected_categories.exists():
+            categories = request.user.selected_categories.order_by("name")[: self.limit]
+        elif highlighted_categories.exists():
+            categories = highlighted_categories[: self.limit]
+        else:
+            categories = Category.objects.published().order_by("name")[: self.limit]
+
+        context["categories"] = categories
+
         return context
 
 
 @plugin_pool.register_plugin
-class QuestionnairePlugin(CMSPluginBase):
+class QuestionnairePlugin(CMSActiveAppMixin, CMSPluginBase):
     module = _("PDC")
     name = _("Questionnaire Plugin")
     render_template = "cms/questionnaire/questionnaire_plugin.html"
