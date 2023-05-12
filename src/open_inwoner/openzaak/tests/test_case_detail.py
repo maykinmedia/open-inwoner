@@ -29,6 +29,7 @@ from open_inwoner.openzaak.tests.factories import (
 )
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 
+from ...utils.tests.helpers import AssertRedirectsMixin
 from ..api_models import Status, StatusType
 from ..models import OpenZaakConfig
 from ..utils import format_zaak_identificatie
@@ -38,7 +39,7 @@ from .shared import CATALOGI_ROOT, DOCUMENTEN_ROOT, ZAKEN_ROOT
 
 @requests_mock.Mocker()
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class TestCaseDetailView(ClearCachesMixin, WebTest):
+class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -444,7 +445,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         )
         response = self.app.get(self.case_detail_url, user=user)
 
-        self.assertRedirects(response, reverse("root"))
+        self.assertRedirects(response, reverse("pages-root"))
 
     def test_anonymous_user_has_no_access_to_status_page(self, m):
         self._setUpMocks(m)
@@ -475,7 +476,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
         #     json=paginated_response([self.status_finish, self.status_new]),
         # )
         response = self.app.get(self.case_detail_url, user=self.user)
-        self.assertRedirects(response, reverse("root"))
+        self.assertRedirects(response, reverse("pages-root"))
 
     def test_no_data_is_retrieved_when_zaaktype_is_internal(self, m):
         self._setUpOASMocks(m)
@@ -532,7 +533,7 @@ class TestCaseDetailView(ClearCachesMixin, WebTest):
             ),
             user=self.user,
         )
-        self.assertRedirects(response, reverse("root"))
+        self.assertRedirects(response, reverse("pages-root"))
 
     def test_single_expected_information_object_type_is_available_in_upload_form(
         self, m

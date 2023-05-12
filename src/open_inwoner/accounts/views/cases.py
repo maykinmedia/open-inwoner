@@ -107,7 +107,7 @@ class CaseAccessMixin(AccessMixin):
 
     def handle_no_permission(self):
         if self.request.user.is_authenticated:
-            return redirect(reverse("root"))
+            return redirect("/")
 
         return super().handle_no_permission()
 

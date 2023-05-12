@@ -13,6 +13,7 @@ from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.tests.factories import ServiceFactory
 from open_inwoner.openzaak.tests.shared import FORMS_ROOT
 from open_inwoner.utils.test import ClearCachesMixin
+from open_inwoner.utils.tests.helpers import AssertRedirectsMixin
 
 
 class ESuiteData:
@@ -56,7 +57,7 @@ class ESuiteData:
 
 @requests_mock.Mocker()
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class FormAPITest(ClearCachesMixin, WebTest):
+class FormAPITest(AssertRedirectsMixin, ClearCachesMixin, WebTest):
     config: OpenZaakConfig
 
     @classmethod
@@ -103,10 +104,8 @@ class FormAPITest(ClearCachesMixin, WebTest):
 
     def test_requires_auth(self, m):
         response = self.app.get(self.submissions_url)
-        self.assertRedirects(
-            response, f"{reverse('login')}?next={self.submissions_url}"
-        )
+        self.assertRedirectsLogin(response, next=self.submissions_url)
 
     def test_requires_bsn(self, m):
         response = self.app.get(self.submissions_url, user=UserFactory(bsn=""))
-        self.assertRedirects(response, reverse("root"))
+        self.assertRedirects(response, reverse("pages-root"))

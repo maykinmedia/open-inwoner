@@ -95,7 +95,6 @@ urlpatterns = [
     path("yubin/", include("django_yubin.urls")),
     # TODO move search to products cms app?
     path("", include("open_inwoner.search.urls", namespace="search")),
-    path("oldhome/", HomeView.as_view(), name="root"),
     re_path(r"^", include("cms.urls")),
 ]
 

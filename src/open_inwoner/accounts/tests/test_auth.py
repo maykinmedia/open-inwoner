@@ -14,6 +14,7 @@ from furl import furl
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 
+from ...utils.tests.helpers import AssertRedirectsMixin
 from ..choices import LoginTypeChoices
 from ..models import User
 from .factories import DigidUserFactory, InviteFactory, UserFactory
@@ -245,7 +246,7 @@ class TestRegistrationFunctionality(WebTest):
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class TestDigid(HaalCentraalMixin, WebTest):
+class TestDigid(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
     csrf_checks = False
     url = reverse_lazy("django_registration_register")
 
@@ -301,7 +302,7 @@ class TestDigid(HaalCentraalMixin, WebTest):
         # post our password to the IDP
         response = self.app.post(url, data).follow()
 
-        self.assertRedirects(response, f"http://testserver{reverse('login')}")
+        self.assertRedirectsLogin(response, with_host=True)
 
     def test_digid_fail_without_invite_and_next_url_redirects_to_login_page(self):
         self.assertNotIn("invite_url", self.client.session.keys())
@@ -320,7 +321,7 @@ class TestDigid(HaalCentraalMixin, WebTest):
         # post our password to the IDP
         response = self.app.post(url, data).follow()
 
-        self.assertRedirects(response, f"http://testserver{reverse('login')}")
+        self.assertRedirectsLogin(response, with_host=True)
 
     def test_digid_fail_with_invite_redirects_to_register_page(self):
         invite = InviteFactory()
@@ -813,7 +814,7 @@ class TestRegistrationNecessary(WebTest):
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class TestLoginLogoutFunctionality(WebTest):
+class TestLoginLogoutFunctionality(AssertRedirectsMixin, WebTest):
     def setUp(self):
         # Create a user. We need to reset their password
         # because otherwise we do not have access to the raw one associated.
@@ -874,7 +875,7 @@ class TestLoginLogoutFunctionality(WebTest):
         """Test that a user is able to log out and page redirects to root endpoint."""
         # Log out user and redirection
         logout_response = self.app.get(reverse("logout"), user=self.user)
-        self.assertRedirects(logout_response, reverse("root"))
+        self.assertRedirects(logout_response, reverse("pages-root"))
         self.assertFalse(logout_response.follow().context["user"].is_authenticated)
 
 
