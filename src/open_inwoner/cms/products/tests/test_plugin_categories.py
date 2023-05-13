@@ -3,6 +3,7 @@ from django.test import TestCase, override_settings
 from django_webtest import WebTest
 
 from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.cms.products.cms_apps import ProductsApphook
 from open_inwoner.pdc.tests.factories import CategoryFactory
 
 from ...tests import cms_tools
@@ -17,6 +18,9 @@ class TestPluginBasics(TestCase):
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestHighlightedCategories(WebTest):
+    def setUp(self):
+        cms_tools.create_apphook_page(ProductsApphook)
+
     def test_only_highlighted_categories_exist_in_context_when_they_exist(self):
         CategoryFactory(name="Should be first")
         highlighted_category = CategoryFactory(
@@ -88,6 +92,7 @@ class TestPublishedCategories(WebTest):
         self.draft2 = CategoryFactory(
             path="0004", name="Wourth one", slug="wourth-one", published=False
         )
+        cms_tools.create_apphook_page(ProductsApphook)
 
     def test_only_published_categories_exist_in_home_page_when_anonymous(self):
         html, context = cms_tools.render_plugin(CategoriesPlugin)
