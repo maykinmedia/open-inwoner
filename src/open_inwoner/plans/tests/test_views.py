@@ -1104,11 +1104,9 @@ class NewPlanContactCounterTest(WebTest):
 
         # check no number shows by default
         response = self.app.get(root_url, user=user)
-        response.showbrowser()
+        # response.showbrowser()
 
-        links = response.pyquery(
-            f"header.header .primary-navigation a[href='{list_url}']"
-        )
+        links = response.pyquery(f".primary-navigation a[href='{list_url}']")
         self.assertEqual(len(links), 2)  # Duplicate due to mobile
         self.assertTrue(_("Samenwerken") + " people" in links.text())
 
