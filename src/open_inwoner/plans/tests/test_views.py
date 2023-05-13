@@ -1107,10 +1107,10 @@ class NewPlanContactCounterTest(WebTest):
         response.showbrowser()
 
         links = response.pyquery(
-            f".header__container > .primary-navigation a[href='{list_url}']"
+            f"header.header .primary-navigation a[href='{list_url}']"
         )
-        self.assertEqual(len(links), 1)
-        self.assertEqual(links.text(), _("Samenwerken") + " people")
+        self.assertEqual(len(links), 2)  # Duplicate due to mobile
+        self.assertTrue(_("Samenwerken") + " people" in links.text())
 
         # check if the number shows up in the menu
         plan_1.plan_contacts.add(user)
