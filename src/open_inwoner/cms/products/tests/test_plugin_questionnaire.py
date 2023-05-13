@@ -33,6 +33,7 @@ class TestHighlightedQuestionnaire(WebTest):
         self.highlighted_questionnaire_3 = QuestionnaireStepFactory(
             path="0005", category=self.category, highlighted=True
         )
+        cms_tools.create_apphook_page(ProductsApphook)
 
     def test_only_highlighted_questionnaires_are_shown_on_anonymous_plugin(self):
         html, context = cms_tools.render_plugin(QuestionnairePlugin)
