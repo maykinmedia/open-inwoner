@@ -53,6 +53,7 @@
                                 {% icon icon="expand_more" icon_position="after" icon_outlined=True %}
                             </a>
 
+                            {% if categories %}
                                 <ul class="primary-navigation__list subpage-list">
                                     {% for category in categories %}
                                         <li class="primary-navigation__list-item">
@@ -61,6 +62,7 @@
                                         </li>
                                     {% endfor %}
                                 </ul>
+                            {% endif %}
                         </li>
                         {% endif %}
 
@@ -114,7 +116,6 @@
         {% endif %}
 
         {% navigation_authenticated categories=categories request=request has_general_faq_questions=has_general_faq_questions %}
-
     </div>
 </header>
 

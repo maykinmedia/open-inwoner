@@ -16,9 +16,9 @@
                 <div class="card card--compact card--stretch">
                     <div class="card__body">
                     <a href="{% url 'cases:case_detail' object_id=case.uuid %}" class="cases__link">
-                            <p class="h4">
+                            <h3 class="h3">
                                 <span class="link link__text">{{ case.description }}</span>
-                            </p>
+                            </h3>
                             {% render_list %}
                                 <span class="case-list">
                                 {% list_item case.current_status caption=_("Status") compact=True strong=False %}

@@ -1,7 +1,13 @@
+from django import forms
 from django.contrib import admin, messages
 from django.contrib.flatpages.admin import FlatPageAdmin
 from django.contrib.flatpages.forms import FlatpageForm
 from django.contrib.flatpages.models import FlatPage
+from django.core import exceptions
+from django.core.validators import URLValidator
+from django.forms import ValidationError
+from django.urls import resolve
+from django.urls.exceptions import Resolver404
 from django.utils.translation import ugettext_lazy as _
 
 from ordered_model.admin import OrderedInlineModelAdminMixin, OrderedTabularInline
@@ -29,6 +35,30 @@ class SiteConfigurationPageInline(OrderedTabularInline):
     autocomplete_fields = ("flatpage",)
 
 
+class SiteConfigurarionAdminForm(forms.ModelForm):
+    class Meta:
+        model = SiteConfiguration
+        fields = "__all__"
+
+    def clean_redirect_to(self):
+        redirect_to = self.cleaned_data["redirect_to"]
+
+        if redirect_to:
+            if redirect_to.startswith("/"):
+                try:
+                    resolve(redirect_to)
+                except Resolver404:
+                    raise ValidationError(_("The entered path is invalid."))
+            else:
+                validate_url = URLValidator()
+                try:
+                    validate_url(redirect_to)
+                except exceptions.ValidationError:
+                    raise ValidationError(_("The entered url is invalid."))
+
+        return redirect_to
+
+
 @admin.register(SiteConfiguration)
 class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
     fieldsets = (
@@ -39,6 +69,7 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                     "name",
                     "login_show",
                     "login_allow_registration",
+                    "redirect_to",
                 )
             },
         ),
@@ -146,6 +177,7 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
         ),
     )
     inlines = [SiteConfigurationPageInline]
+    form = SiteConfigurarionAdminForm
 
     def report_contrast_ratio(self, request, obj):
         def check_contrast_ratio(label1, color1, label2, color2, expected_ratio):

@@ -4,9 +4,9 @@
 <a href="{{ url }}" title="{{ title }}" aria-label="{{ title }}" class="card">
     <div class="card__body card__body--tabled">
         {% if title %}
-            <p class="h4">
+            <h2 class="h2">
                 <span class="link link__text">{{ title }}</span>
-            </p>
+            </h2>
         {% endif %}
         <p class="p">{{ description }}</p>
         {% if object.end_date %}
