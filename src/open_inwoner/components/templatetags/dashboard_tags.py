@@ -1,7 +1,9 @@
-from typing import TypedDict
+from typing import Optional, TypedDict
 
 from django import template
 from django.utils.translation import gettext as _
+
+from open_inwoner.accounts.views.contactmoments import KCMDict
 
 register = template.Library()
 
@@ -9,7 +11,7 @@ register = template.Library()
 class Metric(TypedDict):
     icon: str
     label: str
-    value: str
+    value: Optional[str]
 
 
 class DashboardConfig(TypedDict):
@@ -51,6 +53,46 @@ def case_dashboard(case: dict, **kwargs) -> dict:
                 "icon": "description",
                 "label": _("Documenten"),
                 "value": len(case.get("documents")),
+            },
+        ]
+    }
+
+    return {
+        **kwargs,
+        "config": config,
+    }
+
+
+@register.inclusion_tag("components/Dashboard/Dashboard.html")
+def contactmoment_dashboard(kcm: KCMDict, **kwargs) -> dict:
+    """
+    Renders a dashboard for values related to a Zaak (case).
+
+    Usage:
+        {% contactmoment_dashboard kcm %}
+
+    Variables:
+        + kcm: KCMDict | The contactmoment to be able to build the dashboard.
+
+    Extra context:
+        + config: DashboardConfig | The configuration of the dashboard.
+    """
+    config: DashboardConfig = {
+        "metrics": [
+            {
+                "icon": "calendar_today",
+                "label": _("Ontvangstdatum"),
+                "value": kcm.get("registered_date"),
+            },
+            {
+                "icon": "inventory_2",
+                "label": _("Contactwijze"),
+                "value": kcm.get("channel"),
+            },
+            {
+                "icon": "task_alt",
+                "label": _("Status"),
+                "value": kcm.get("status"),
             },
         ]
     }
