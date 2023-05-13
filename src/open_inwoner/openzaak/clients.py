@@ -21,6 +21,6 @@ def build_client(type_) -> Optional[ZGWClient]:
         if service:
             client = service.build_client()
             return client
-
-    logger.warning(f"no service defined for {type_}")
+        else:
+            logger.warning(f"no service defined for {type_}")
     return None
