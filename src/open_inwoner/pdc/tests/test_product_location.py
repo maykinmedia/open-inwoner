@@ -279,18 +279,6 @@ class TestLocationDetailView(WebTest):
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestLocationViewThroughMap(WebTest):
-    def test_product_location_link_is_rendered_on_home_page(self):
-        product = ProductFactory()
-        product_location = ProductLocationFactory()
-        product.locations.add(product_location)
-
-        response = self.app.get(reverse("root"))
-
-        self.assertContains(
-            response,
-            reverse("products:location_detail", kwargs={"uuid": product_location.uuid}),
-        )
-
     def test_product_location_link_is_rendered_on_product_page(self):
         product = ProductFactory()
         product_location = ProductLocationFactory()

@@ -442,8 +442,7 @@ class SiteConfiguration(SingletonModel):
             return ""
 
         lookup = {
-            # TODO remove 'root' after CMS migration
-            "root": "home_help_text",
+            "pages-root": "home_help_text",
             "products:category_list": "theme_help_text",
             "products:category_product_detail": "product_help_text",
             "products:product_detail": "product_help_text",

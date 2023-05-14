@@ -14,6 +14,8 @@ from furl import furl
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 
+from ...cms.tests import cms_tools
+from ...utils.tests.helpers import AssertRedirectsMixin
 from ..choices import LoginTypeChoices
 from ..models import User
 from .factories import DigidUserFactory, InviteFactory, UserFactory
@@ -245,9 +247,13 @@ class TestRegistrationFunctionality(WebTest):
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class TestDigid(HaalCentraalMixin, WebTest):
+class TestDigid(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
     csrf_checks = False
     url = reverse_lazy("django_registration_register")
+
+    @classmethod
+    def setUpTestData(cls):
+        cms_tools.create_homepage()
 
     def test_registration_page_only_digid(self):
         response = self.app.get(self.url)
@@ -290,7 +296,7 @@ class TestDigid(HaalCentraalMixin, WebTest):
         url = reverse("digid-mock:password")
         params = {
             "acs": reverse("acs"),
-            "next": reverse("root"),
+            "next": reverse("pages-root"),
         }
         url = f"{url}?{urlencode(params)}"
 
@@ -301,7 +307,7 @@ class TestDigid(HaalCentraalMixin, WebTest):
         # post our password to the IDP
         response = self.app.post(url, data).follow()
 
-        self.assertRedirects(response, f"http://testserver{reverse('login')}")
+        self.assertRedirectsLogin(response, with_host=True)
 
     def test_digid_fail_without_invite_and_next_url_redirects_to_login_page(self):
         self.assertNotIn("invite_url", self.client.session.keys())
@@ -320,7 +326,7 @@ class TestDigid(HaalCentraalMixin, WebTest):
         # post our password to the IDP
         response = self.app.post(url, data).follow()
 
-        self.assertRedirects(response, f"http://testserver{reverse('login')}")
+        self.assertRedirectsLogin(response, with_host=True)
 
     def test_digid_fail_with_invite_redirects_to_register_page(self):
         invite = InviteFactory()
@@ -471,7 +477,7 @@ class TestDigid(HaalCentraalMixin, WebTest):
         url = reverse("digid-mock:password")
         params = {
             "acs": reverse("acs"),
-            "next": reverse("root"),
+            "next": reverse("pages-root"),
         }
         url = f"{url}?{urlencode(params)}"
 
@@ -519,7 +525,7 @@ class TestDigid(HaalCentraalMixin, WebTest):
         url = reverse("digid-mock:password")
         params = {
             "acs": reverse("acs"),
-            "next": reverse("root"),
+            "next": reverse("pages-root"),
         }
         url = f"{url}?{urlencode(params)}"
 
@@ -559,7 +565,7 @@ class TestDigid(HaalCentraalMixin, WebTest):
         url = reverse("digid-mock:password")
         params = {
             "acs": reverse("acs"),
-            "next": reverse("root"),
+            "next": reverse("pages-root"),
         }
         url = f"{url}?{urlencode(params)}"
 
@@ -591,7 +597,7 @@ class TestDigid(HaalCentraalMixin, WebTest):
         url = reverse("digid-mock:password")
         params = {
             "acs": reverse("acs"),
-            "next": reverse("root"),
+            "next": reverse("pages-root"),
         }
         url = f"{url}?{urlencode(params)}"
 
@@ -611,6 +617,10 @@ class TestDigid(HaalCentraalMixin, WebTest):
 class TestRegistrationNecessary(WebTest):
     url = reverse_lazy("profile:registration_necessary")
 
+    @classmethod
+    def setUpTestData(cls):
+        cms_tools.create_homepage()
+
     def test_any_page_for_digid_user_redirect_to_necessary_fields(self):
         user = UserFactory(
             first_name="",
@@ -618,7 +628,7 @@ class TestRegistrationNecessary(WebTest):
             login_type=LoginTypeChoices.digid,
         )
         urls = [
-            reverse("root"),
+            reverse("pages-root"),
             reverse("products:category_list"),
             reverse("cases:open_cases"),
             reverse("profile:detail"),
@@ -813,7 +823,7 @@ class TestRegistrationNecessary(WebTest):
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class TestLoginLogoutFunctionality(WebTest):
+class TestLoginLogoutFunctionality(AssertRedirectsMixin, WebTest):
     def setUp(self):
         # Create a user. We need to reset their password
         # because otherwise we do not have access to the raw one associated.
@@ -874,7 +884,7 @@ class TestLoginLogoutFunctionality(WebTest):
         """Test that a user is able to log out and page redirects to root endpoint."""
         # Log out user and redirection
         logout_response = self.app.get(reverse("logout"), user=self.user)
-        self.assertRedirects(logout_response, reverse("root"))
+        self.assertRedirects(logout_response, reverse("pages-root"))
         self.assertFalse(logout_response.follow().context["user"].is_authenticated)
 
 

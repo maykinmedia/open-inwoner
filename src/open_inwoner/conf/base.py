@@ -465,8 +465,8 @@ ADMIN_SESSION_COOKIE_AGE = 86400
 SESSION_WARN_DELTA = 60  # Warn 1 minute before end of session.
 SESSION_COOKIE_AGE = 900  # Set to 15 minutes
 
-LOGIN_REDIRECT_URL = reverse_lazy("root")
-LOGOUT_REDIRECT_URL = reverse_lazy("root")
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/"
 
 #
 # SECURITY settings

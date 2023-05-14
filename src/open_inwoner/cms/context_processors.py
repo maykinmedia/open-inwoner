@@ -25,5 +25,4 @@ def active_apphooks(request):
         lookup[namespace] = True
 
     context = {"cms_apps": lookup}
-
     return context

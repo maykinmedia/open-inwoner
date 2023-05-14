@@ -11,6 +11,8 @@ from django_webtest import WebTest
 
 from ...accounts.tests.factories import UserFactory
 from ...cms.profile.cms_appconfig import ProfileConfig
+from ...cms.profile.cms_apps import ProfileApphook
+from ...cms.tests import cms_tools
 from ...pdc.models import Product
 from ...pdc.tests.factories import ProductFactory
 from ..forms import QuestionnaireStepForm
@@ -37,7 +39,7 @@ class QuestionnaireResetViewTestCase(WebTest):
         path = reverse("products:reset")
         response = self.app.get(path)
         self.assertEqual(302, response.status_code)
-        self.assertEqual(reverse("root"), response.url)
+        self.assertEqual(reverse("pages-root"), response.url)
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
@@ -289,15 +291,9 @@ class QuestionnaireStepListViewTestCase(WebTest):
 
     def test_zelfdiagnose_button_is_shown_when_there_are_questionnaires(self):
         # cms profile apphook configuration
-        profile_app = ProfileConfig.objects.create(namespace="profile")
-        api.create_page(
-            "profile",
-            "INHERIT",
-            "nl",
-            published=True,
-            apphook="ProfileApphook",
-            apphook_namespace=profile_app.namespace,
-        )
+        ProfileConfig.objects.create(namespace=ProfileApphook.app_name)
+        cms_tools.create_apphook_page(ProfileApphook)
+
         QuestionnaireStepFactory()
         path = reverse("profile:detail")
         response = self.app.get(path, user=self.user)
