@@ -19,10 +19,7 @@ def create_homepage():
     helper to create an empty, published homepage
     """
     p = api.create_page(
-        "Home",
-        "cms/fullwidth.html",
-        "nl",
-        in_navigation=True,
+        "Home", "cms/fullwidth.html", "nl", in_navigation=True, reverse_id="home"
     )
     p.set_as_homepage()
 
@@ -100,6 +97,7 @@ def create_apphook_page(
     title=None,
     extension_args: dict = None,
     config_args: dict = None,
+    parent_page=None,
 ):
     p = api.create_page(
         (title or hook_class.name),
@@ -109,6 +107,7 @@ def create_apphook_page(
         apphook=hook_class.__name__,
         apphook_namespace=hook_class.app_name,
         in_navigation=True,
+        parent=parent_page,
     )
     # create common extension
     if extension_args:

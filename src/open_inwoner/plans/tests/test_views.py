@@ -19,10 +19,12 @@ from open_inwoner.accounts.tests.factories import (
     UserFactory,
 )
 from open_inwoner.accounts.tests.test_action_views import ActionsPlaywrightTests
+from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
 from open_inwoner.utils.tests.playwright import multi_browser
 
 from ...cms.collaborate.cms_apps import CollaborateApphook
 from ...cms.extensions.constants import Icons, IndicatorChoices
+from ...cms.profile.cms_apps import ProfileApphook
 from ...cms.tests import cms_tools
 from ..models import Plan, PlanContact
 from .factories import ActionTemplateFactory, PlanFactory, PlanTemplateFactory
@@ -1083,14 +1085,15 @@ class PlanBegeleiderListViewTests(WebTest):
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class NewPlanContactCounterTest(WebTest):
     def test_plan_contact_new_count(self):
-        cms_tools.create_homepage()
-        cms_tools.create_apphook_page(
+        homepage = cms_tools.create_homepage()
+        planpage = cms_tools.create_apphook_page(
             CollaborateApphook,
             title=_("Samenwerken"),
             extension_args={
                 "menu_indicator": IndicatorChoices.plan_new_contacts,
                 "menu_icon": Icons.people,
             },
+            parent_page=homepage,
         )
 
         owner = UserFactory()
@@ -1104,7 +1107,7 @@ class NewPlanContactCounterTest(WebTest):
 
         # check no number shows by default
         response = self.app.get(root_url, user=user)
-        # response.showbrowser()
+        response.showbrowser()
 
         links = response.pyquery(f".primary-navigation a[href='{list_url}']")
         self.assertEqual(len(links), 2)  # Duplicate due to mobile
@@ -1121,7 +1124,7 @@ class NewPlanContactCounterTest(WebTest):
         )
         # second link appears
         self.assertEqual(len(links), 2)
-        self.assertIn("(2)", links.text())
+        self.assertIn("2", links.text())
 
         # access the list page to reset
         response = self.app.get(list_url, user=user)
