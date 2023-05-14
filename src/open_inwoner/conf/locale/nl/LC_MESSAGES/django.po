@@ -337,7 +337,7 @@ msgstr "Geselecteerde onderwerpen"
 
 #: accounts/models.py:148
 msgid "OpenId Connect id"
-msgstr ""
+msgstr "OpenID Connect ID"
 
 #: accounts/models.py:155
 msgid "Cases notifications"
@@ -1126,7 +1126,7 @@ msgstr "Dit veld is vereist."
 #: accounts/tests/test_profile_views.py:509
 #: accounts/tests/test_profile_views.py:542 accounts/views/profile.py:211
 msgid "user requests for brp data"
-msgstr ""
+msgstr "gebruiker vraagt BRP data op"
 
 #: accounts/views/actions.py:128 plans/views.py:466
 msgid "Bewerk {}"
@@ -1216,10 +1216,8 @@ msgstr "Onbekend"
 #: accounts/views/contactmoments.py:95 accounts/views/contactmoments.py:98
 #: accounts/views/contactmoments.py:102 accounts/views/contactmoments.py:117
 #: templates/pages/contactmoment/list.html:9
-#, fuzzy
-#| msgid "Mijn aanvragen"
 msgid "Mijn vragen"
-msgstr "Mijn aanvragen"
+msgstr "Mijn vragen"
 
 #: accounts/views/contactmoments.py:120
 msgid "Mijn vraag"
@@ -1714,7 +1712,7 @@ msgstr "LinkedIn"
 
 #: components/templates/components/Form/Form.html:30
 msgid "Velden gemarkeerd met een"
-msgstr ""
+msgstr "Velden gemarkeerd met een"
 
 #: components/templates/components/Form/Form.html:30
 msgid "zijn verplicht"
@@ -1776,7 +1774,7 @@ msgstr "broodkruimels"
 
 #: components/templates/components/Header/Header.html:11
 msgid "Menu"
-msgstr ""
+msgstr "Menu"
 
 #: components/templates/components/Header/Header.html:44
 msgid "Overzicht"
@@ -2012,7 +2010,7 @@ msgstr "Aantal nieuwe berichten"
 
 #: conf/parts/maileditor.py:121
 msgid "Number of the senders"
-msgstr "Naam van het thema"
+msgstr "Aantal contacten die een bericht hebben gestuurd"
 
 #: conf/parts/maileditor.py:129
 msgid "Link to see the conversation."
@@ -2109,11 +2107,11 @@ msgstr "De link naar je zaakdetail pagina"
 
 #: configurations/admin.py:51 configurations/tests/test_admin.py:47
 msgid "The entered path is invalid."
-msgstr ""
+msgstr "Het ingevoerde pad is ongeldig."
 
 #: configurations/admin.py:57 configurations/tests/test_admin.py:72
 msgid "The entered url is invalid."
-msgstr ""
+msgstr "De ingevoerde URL is ongeldig"
 
 #: configurations/admin.py:77
 msgid "Color"
@@ -2141,7 +2139,7 @@ msgstr "E-mails"
 
 #: configurations/admin.py:158
 msgid "Openid Connect"
-msgstr ""
+msgstr "OpenID Connect"
 
 #: configurations/admin.py:167
 msgid "Analytics"
@@ -2392,7 +2390,7 @@ msgstr "Vragenlijst widget titel"
 
 #: configurations/models.py:169
 msgid "Questionaire selector title on the theme and profile pages."
-msgstr "Vragenlijst keuzetitel op de thema en profielpagina's."
+msgstr "Vragenlijst keuzetitel op de onderwerpen en profielpagina's."
 
 #: configurations/models.py:173
 msgid ""
@@ -2407,7 +2405,7 @@ msgstr "Vragenlijst widget introductie"
 
 #: configurations/models.py:177
 msgid "Questionaire selector intro on the theme and profile pages."
-msgstr "Vragenlijst introductietekst op de thema en profielpagina's."
+msgstr "Vragenlijst introductietekst op de onderwerpen en profielpagina's."
 
 #: configurations/models.py:181
 msgid ""
@@ -2530,16 +2528,12 @@ msgid "Flatpages"
 msgstr "Pagina's"
 
 #: configurations/models.py:279 configurations/tests/test_help_modal.py:27
-#, fuzzy
-#| msgid ""
-#| "Welkom! Op dit scherm vindt u een overzicht van de verschillende thema's "
-#| "en producten & diensten."
 msgid ""
 "Welkom! Op dit scherm vindt u een overzicht van de verschillende onderwerpen "
 "en producten & diensten."
 msgstr ""
-"Welkom! Op dit scherm vindt u een overzicht van de verschillende thema's en "
-"producten & diensten."
+"Welkom! Op dit scherm vindt u een overzicht van de verschillende onderwerpen "
+"en producten & diensten."
 
 #: configurations/models.py:281
 msgid "Home help"
@@ -2550,15 +2544,11 @@ msgid "The help text for the home page."
 msgstr "Helptekst in de popup op de voorpagina"
 
 #: configurations/models.py:287 configurations/tests/test_help_modal.py:46
-#, fuzzy
-#| msgid ""
-#| "Op dit scherm vindt u de verschillende thema's waarvoor wij producten en "
-#| "diensten aanbieden."
 msgid ""
 "Op dit scherm vindt u de verschillende onderwerpen waarvoor wij producten en "
 "diensten aanbieden."
 msgstr ""
-"Op dit scherm vindt u de verschillende thema's waarvoor wij producten en "
+"Op dit scherm vindt u de verschillende onderwerpen waarvoor wij producten en "
 "diensten aanbieden."
 
 #: configurations/models.py:289
@@ -2567,7 +2557,7 @@ msgstr "Onderwerpen help"
 
 #: configurations/models.py:290
 msgid "The help text for the theme page."
-msgstr "Helptekst in de popup op de themapagina"
+msgstr "Helptekst in de popup op de onderwerpenpagina"
 
 #: configurations/models.py:295 configurations/tests/test_help_modal.py:67
 msgid ""
@@ -2741,10 +2731,8 @@ msgstr ""
 "loginmethode is ingesteld"
 
 #: configurations/models.py:396
-#, fuzzy
-#| msgid "System - anonymous user"
 msgid "Redirect anonymous user to"
-msgstr "System - anonieme gebruiker"
+msgstr "Stuur niet-ingelogde gebruiker door naar"
 
 #: configurations/models.py:398
 msgid ""
@@ -2752,6 +2740,8 @@ msgid ""
 "anonymous page. Path example: '/accounts/login/', Url example: 'https://www."
 "example.com'"
 msgstr ""
+"Geef een URL of pad op waar de niet-ingelogde gebruiker naar toe doorgestuurd moet worden vanuit de niet-ingelogde homepagina."
+"Pad voorbeeld: '/accounts/login', URL voorbeeld: 'https://gemeente.groningen.nl'"
 
 #: configurations/models.py:405 configurations/models.py:408
 msgid "Site Configuration"
@@ -2823,34 +2813,28 @@ msgstr "data is opgehaald via Haal Centraal BRP"
 
 #: openklant/constants.py:7
 msgid "Nieuw"
-msgstr ""
+msgstr "Nieuw"
 
 #: openklant/constants.py:8
 msgid "In behandeling"
-msgstr ""
+msgstr "In behandeling"
 
 #: openklant/constants.py:9 openklant/tests/test_views.py:51
 #: openklant/tests/test_views.py:78
-#, fuzzy
-#| msgid "Afgerond"
 msgid "Afgehandeld"
-msgstr "Afgerond"
+msgstr "Afgehandeld"
 
 #: openklant/models.py:15
 msgid "Klanten API"
-msgstr ""
+msgstr "Klanten API"
 
 #: openklant/models.py:23
-#, fuzzy
-#| msgid "Contactpersonen"
 msgid "Contactmomenten API"
-msgstr "Contactpersonen"
+msgstr "Contactmomenten API"
 
 #: openklant/models.py:31
-#, fuzzy
-#| msgid "Open Zaak configuration"
 msgid "Open Klant configuration"
-msgstr "Configuratie 'Open Zaak'"
+msgstr "Configuratie 'Open Klant'"
 
 #: openzaak/admin.py:46
 msgid "API behaviour override options"
@@ -3010,6 +2994,7 @@ msgid ""
 "Description - clarification of why a user should upload a document for this "
 "case type"
 msgstr ""
+"Omschrijving - verduidelijking waarom een gebruiker documenten zou moeten uploaden voor deze zaaktype"
 
 #: openzaak/models.py:186
 msgid "Document upload URL"
@@ -3088,29 +3073,21 @@ msgstr "Op dit moment zijn er geen aanvragen beschikbaar."
 
 #: openzaak/tests/test_case_detail.py:631
 #: openzaak/tests/test_case_detail.py:879
-#, fuzzy
-#| msgid "The description of the plan."
 msgid "some description content"
-msgstr "Omschrijving van het plan"
+msgstr "some description content"
 
 #: openzaak/tests/test_case_detail.py:662
 msgid "Grootte max. 50 MB, toegestane bestandsformaten"
-msgstr ""
+msgstr "Grootte max. 50 MB, toegestane bestandsformaten"
 
 #: openzaak/tests/test_case_detail.py:723
-#, fuzzy
-#| msgid ""
-#| "{self.uploaded_informatie_object['bestandsnaam']} has been successfully "
-#| "uploaded"
 msgid "{self.uploaded_informatie_object['bestandsnaam']} is succesvol geüpload"
 msgstr ""
-"{self.uploaded_informatie_object['bestandsnaam']} is succesvol geupload"
+"{self.uploaded_informatie_object['bestandsnaam']} is succesvol geüpload"
 
 #: openzaak/tests/test_case_detail.py:754
-#, fuzzy
-#| msgid "upload.TXT has been successfully uploaded"
 msgid "upload.TXT is succesvol geüpload"
-msgstr "upload.TXT has been successfully uploaded"
+msgstr "upload.TXT is succesvol geüpload"
 
 #: openzaak/tests/test_case_detail.py:856
 #: openzaak/tests/test_case_detail.py:925
@@ -3133,6 +3110,8 @@ msgid ""
 "Een fout is opgetreden bij het uploaden van {self."
 "uploaded_informatie_object['bestandsnaam']}"
 msgstr ""
+"Een fout is opgetreden bij het uploaden van {self."
+"uploaded_informatie_object['bestandsnaam']}"
 
 #: openzaak/tests/test_formapi.py:102 templates/pages/cases/submissions.html:33
 msgid "Er zijn geen open aanvragen."
@@ -3141,14 +3120,14 @@ msgstr "Er zijn geen open aanvragen."
 #: pdc/admin/category.py:44 pdc/admin/category.py:66
 msgid "Parent nodes have to be published in order to publish a child."
 msgstr ""
-"Bovenliggende thema's dienen gepubliceerd te zijn om een onderliggende thema "
+"Bovenliggende onderwerpen dienen gepubliceerd te zijn om een onderliggend onderwerp "
 "te kunnen publiceren."
 
 #: pdc/admin/category.py:57
 msgid "Parent nodes cannot be unpublished if they have published children."
 msgstr ""
-"Bovenliggende thema's kunnen niet op ongepubliceerd worden gezet zolang er "
-"onderliggende gepubliceerde thema's zijn."
+"Bovenliggende onderwerpen kunnen niet op ongepubliceerd worden gezet zolang er "
+"onderliggende gepubliceerde onderwerpen zijn."
 
 #: pdc/admin/category.py:99 pdc/tests/test_logging.py:281
 msgid "categories were exported"
@@ -3170,12 +3149,12 @@ msgstr "producten zijn geexporteerd"
 #: pdc/models/category.py:16
 msgid "Published nodes cannot be moved to unpublished ones."
 msgstr ""
-"Gepubliceerde thema's kunnen niet worden verplaatst onder ongepubliceerde "
-"thema's"
+"Gepubliceerde onderwerpen's kunnen niet worden verplaatst onder ongepubliceerde "
+"onderwerpen's"
 
 #: pdc/models/category.py:23
 msgid "Name of the category"
-msgstr "Naam van het thema"
+msgstr "Naam van het onderwerp"
 
 #: pdc/models/category.py:26 pdc/models/organization.py:16
 #: pdc/models/product.py:44 pdc/models/tag.py:12
@@ -3184,7 +3163,7 @@ msgstr "Slug"
 
 #: pdc/models/category.py:29
 msgid "Slug of the category"
-msgstr "Slug van het thema"
+msgstr "Slug van het onderwerp"
 
 #: pdc/models/category.py:32 pdc/models/product.py:50
 #: questionnaire/models.py:75
@@ -3193,7 +3172,7 @@ msgstr "Gepubliceerd"
 
 #: pdc/models/category.py:34
 msgid "Whether the category should be published or not."
-msgstr "Of de thema publiekelijk zichtbaar dient te zijn of niet."
+msgstr "Of het onderwerp publiekelijk zichtbaar dient te zijn of niet."
 
 #: pdc/models/category.py:37 questionnaire/models.py:68
 msgid "Highlighted"
@@ -3201,11 +3180,11 @@ msgstr "Uitgelicht"
 
 #: pdc/models/category.py:39
 msgid "Whether the category should be highlighted or not"
-msgstr "Of de thema uitgelicht moet worden op de homepage of niet."
+msgstr "Of het onderwerp uitgelicht moet worden op de homepage of niet."
 
 #: pdc/models/category.py:45
 msgid "Description of the category"
-msgstr "Omschrijving van het thema"
+msgstr "Omschrijving van het onderwerp"
 
 #: pdc/models/category.py:53
 msgid "Icon of the category"
@@ -3236,7 +3215,7 @@ msgstr "Veelgestelde vragen"
 
 #: pdc/models/faq.py:47
 msgid "A question cannot have both a category and a product"
-msgstr "Een vraag kan niet gekoppeld zijn aan een thema en een product"
+msgstr "Een vraag kan niet gekoppeld zijn aan een onderwerp en een product"
 
 #: pdc/models/mixins.py:61
 msgid "street"
@@ -3404,6 +3383,8 @@ msgid ""
 "Product content with build-in WYSIWYG editor. By adding '[CTABUTTON]' you "
 "can embed a cta-button for linking to the defined form or link"
 msgstr ""
+"Productcontent met een ingebouwde WYSIWYG editor. Door '[CTABUTTON]' in de lopende tekst toe te voegen "
+"wordt op die plek een productaanvraagknop getoond"
 
 #: pdc/models/product.py:99
 msgid "Categories which the product relates to"
@@ -3702,7 +3683,7 @@ msgstr "Geen sjabloon"
 #: plans/forms.py:67 plans/tests/test_views.py:316
 #: plans/tests/test_views.py:332
 msgid "At least one collaborator is required for a plan."
-msgstr ""
+msgstr "U dient in ieder geval 1 contactpersoon toe te voegen voor een plan."
 
 #: plans/forms.py:71
 msgid "This field is required when not using a template"
@@ -3776,10 +3757,8 @@ msgstr ""
 "sjabloon."
 
 #: plans/models.py:100
-#, fuzzy
-#| msgid "Soort contact"
 msgid "Notify contact"
-msgstr "Soort contact"
+msgstr "Notificeer contact"
 
 #: plans/models.py:106 templates/export/plans/plan_export.html:10
 msgid "Title"
@@ -4059,7 +4038,7 @@ msgstr "Deze producten worden weergegeven in deze stap."
 
 #: questionnaire/models.py:102
 msgid "Related category"
-msgstr "Gerelateerde thema"
+msgstr "Gerelateerd onderwerp"
 
 #: questionnaire/models.py:108
 msgid "Questionnaire step"
@@ -4096,10 +4075,8 @@ msgstr ""
 "contact op met uw beheerders voor uitleg."
 
 #: search/constants.py:7
-#, fuzzy
-#| msgid "Filter op thema"
 msgid "Filter op onderwerp"
-msgstr "Filter op thema"
+msgstr "Filter op onderwerp"
 
 #: search/constants.py:8
 msgid "Filter op tags"
@@ -4264,10 +4241,8 @@ msgid "Log out"
 msgstr "Uitloggen"
 
 #: templates/cms/banner/banner_plugin.html:7
-#, fuzzy
-#| msgid "Hero image login"
 msgid "Header image"
-msgstr "Hoofdafbeelding op de inlogpagina"
+msgstr "Hoofdafbeelding"
 
 #: templates/cms/collaborate/active_plans_plugin.html:5
 #: templates/pages/user-home.html:13
@@ -4275,14 +4250,12 @@ msgid "Naar samenwerken"
 msgstr "Naar samenwerken"
 
 #: templates/cms/fullwidth.html:9
-#, fuzzy
-#| msgid "The type of contact"
 msgid "There is no content."
-msgstr "Soort contactpersoon"
+msgstr "Deze pagina is nog leeg."
 
 #: templates/cms/products/categories_plugin.html:5 templates/pages/home.html:22
 msgid "Alle onderwerpen"
-msgstr ""
+msgstr "Alle onderwerpen"
 
 #: templates/cms/products/product_finder_plugin.html:4
 #: templates/pages/home.html:40
@@ -4340,10 +4313,8 @@ msgid "Terug naar boven"
 msgstr "Terug naar boven"
 
 #: templates/pages/cases/list.html:26
-#, fuzzy
-#| msgid "Huisnummer"
 msgid "Zaaknummer"
-msgstr "Huisnummer"
+msgstr "Zaaknummer"
 
 #: templates/pages/cases/list.html:30 templates/pages/cases/list.html:31
 msgid "Bekijk aanvraag"
@@ -4369,19 +4340,15 @@ msgstr "Bestand uploaden"
 
 #: templates/pages/cases/status.html:57
 msgid "(Titel bestand)"
-msgstr ""
+msgstr "(Titel bestand)"
 
 #: templates/pages/cases/status.html:58
-#, fuzzy
-#| msgid "Bestand type"
 msgid "(Bestandsgrootte)"
-msgstr "Bestand type"
+msgstr "(Bestandsgrootte)"
 
 #: templates/pages/cases/status.html:71
-#, fuzzy
-#| msgid "Bestand uploaden"
 msgid "Bestanden uploaden"
-msgstr "Bestand uploaden"
+msgstr "Bestanden uploaden"
 
 #: templates/pages/cases/status.html:91
 msgid "Opens new window"
@@ -4400,10 +4367,8 @@ msgid "Open in admin"
 msgstr "Bekijk in beheeromgeving"
 
 #: templates/pages/contactmoment/list.html:26
-#, fuzzy
-#| msgid "Bekijk aanvraag"
 msgid "Bekijk vraag"
-msgstr "Bekijk aanvraag"
+msgstr "Bekijk vraag"
 
 #: templates/pages/history.html:7
 msgid "History of changes"
@@ -4527,21 +4492,15 @@ msgid "Terug naar mijn profiel"
 msgstr "Terug naar mijn profiel"
 
 #: templates/pages/profile/categories.html:6
-#, fuzzy
-#| msgid "Mijn netwerkcontacten"
 msgid "Mijn Onderwerpen"
-msgstr "Mijn contacten"
+msgstr "Mijn Onderwerpen"
 
 #: templates/pages/profile/categories.html:9
-#, fuzzy
-#| msgid ""
-#| "Selecteer hier uw thema’s om op maat gemaakte content voorgeschoteld te "
-#| "krijgen en nog beter te kunnen zoeken en vinden"
 msgid ""
 "Selecteer hier uw interessegebieden om op maat gemaakte content "
 "voorgeschoteld te krijgen en nog beter te kunnen zoeken en vinden"
 msgstr ""
-"Selecteer zelf thema’s. Zo krijgt u alleen inhoud te zien die voor u "
+"Selecteer zelf onderwerpen. Zo krijgt u alleen inhoud te zien die voor u "
 "interessant is."
 
 #: templates/pages/profile/categories.html:12
@@ -4631,10 +4590,8 @@ msgid "Volgende actie"
 msgstr "Volgende actie"
 
 #: templates/pages/profile/me.html:73
-#, fuzzy
-#| msgid "Begeleider"
 msgid "Begeleider(s)"
-msgstr "Begeleider"
+msgstr "Begeleider(s)"
 
 #: templates/pages/profile/me.html:79
 msgid "U heeft (nog) geen gemeentelijke begeleider."
@@ -4728,7 +4685,7 @@ msgstr "Roepnaam"
 
 #: templates/pages/profile/notifications.html:9
 msgid "Kies voor welke categorie je communicatievoorkeuren wil ontvangen"
-msgstr ""
+msgstr "Kies voor welke categorie je notificaties wilt ontvangen"
 
 #: templates/pages/questionnaire/questionnaire-step.html:10
 msgid "Export pdf"
@@ -4914,10 +4871,8 @@ msgid "Object"
 msgstr "Object"
 
 #: utils/ckeditor.py:91
-#, fuzzy
-#| msgid "Opens new window"
 msgid "Opens in new window"
-msgstr "Opent nieuw venster"
+msgstr "Opent in nieuw venster"
 
 #: utils/forms.py:32
 #, python-format
@@ -4968,309 +4923,3 @@ msgstr "Het opgegeven mobiele telefoonnummer is ongeldig."
 msgid "Ongeldige postcode"
 msgstr "Ongeldige postcode"
 
-#~ msgid "Mijn thema's"
-#~ msgstr "Mijn thema's"
-
-#~ msgid "On this page:"
-#~ msgstr "Op deze pagina:"
-
-#~ msgid "Thema's"
-#~ msgstr "Thema's"
-
-#~ msgid "Login"
-#~ msgstr "Login"
-
-#~ msgid "Hero image on the login page"
-#~ msgstr "Hoofdafbeelding op de inlogpagina"
-
-#~ msgid "Theme's title on the home page."
-#~ msgstr "Thema titel op de homepage"
-
-#~ msgid "Theme's intro text on the home page."
-#~ msgstr "Thema introductietekst op de homepage"
-
-#~ msgid "Theme's title"
-#~ msgstr "Paginatitel themapagina"
-
-#~ msgid "Theme's intro"
-#~ msgstr "Introductietekst themapagina"
-
-#~ msgid "Plans banner"
-#~ msgstr "Plannen banner"
-
-#~ msgid "Banner of the plans"
-#~ msgstr "Banner van het plan"
-
-#~ msgid "Theme help"
-#~ msgstr "Thema help"
-
-#~ msgid ""
-#~ "By default the cases are not shown. If the OpenZaak integration is "
-#~ "configured this needs to be set to True."
-#~ msgstr ""
-#~ "Staat standaard uit. Indien de Open Zaak integratie en DigiD is "
-#~ "geconfigureerd dan worden na het inschakelen de zaken van de gebruiker "
-#~ "inzichtelijk via 'Mijn Aanvragen'."
-
-#~ msgid "Laat productzoeker zien op de homepagina."
-#~ msgstr "Laat productzoeker zien op de homepagina."
-
-#~ msgid ""
-#~ "Als dit is aangevinkt en er zijn product condities gemaakt, dan wordt op "
-#~ "de homepagina de productzoeker weergegeven."
-#~ msgstr ""
-#~ "Als dit is aangevinkt en er zijn product condities gemaakt, dan wordt op "
-#~ "de homepagina de productzoeker weergegeven."
-
-#~ msgid "Laat samenwerken zien op de homepage en menu"
-#~ msgstr "Laat samenwerken zien op de homepage en menu"
-
-#~ msgid ""
-#~ "Als dit is aangevinkt, dan wordt op de homepagina en het gebruikers "
-#~ "profiel de samenwerken feature weergegeven."
-#~ msgstr ""
-#~ "Als dit is aangevinkt, dan wordt op de homepagina en het gebruikers "
-#~ "profiel de samenwerken feature weergegeven."
-
-#~ msgid "Laat acties zien op de profiel pagina"
-#~ msgstr "Laat acties zien op de homepagina."
-
-#~ msgid ""
-#~ "Als dit is aangevinkt, dan worded op de gebruikers profiel pagina de "
-#~ "acties weergegeven."
-#~ msgstr ""
-#~ "Als dit is aangevinkt, dan worden op de gebruikers profiel pagina de "
-#~ "acties weergegeven."
-
-#~ msgid "Als Samenwerken actief is moeten Acties ook actief zijn"
-#~ msgstr "Als Samenwerken actief is moeten Acties ook actief zijn"
-
-#~ msgid "Product content with build-in WYSIWYG editor"
-#~ msgstr "Product content met ingebouwde WYSIWYG editor"
-
-#~ msgid "Omschrijving gewijzigd."
-#~ msgstr "Omschrijving gewijzigd."
-
-#~ msgid "Maak samenwerkingsplan aan"
-#~ msgstr "Maak samenwerkingsplan aan"
-
-#~ msgid "Alle thema's"
-#~ msgstr "Alle thema's"
-
-#~ msgid "Mijn Thema's"
-#~ msgstr "Mijn Thema's"
-
-#~ msgid "Begeleider van de gemeente"
-#~ msgstr "Begeleider van de gemeente"
-
-#~ msgid "Bestand toevoegen"
-#~ msgstr "Bestand toevoegen"
-
-#~ msgid "Mijn wachtwoord opnieuw instellen"
-#~ msgstr "Mijn wachtwoord opnieuw instellen"
-
-#~ msgid "The goal of the action"
-#~ msgstr "Het doel van de actie"
-
-#~ msgid ""
-#~ "The goal that will be applied to the action if this template in chosen."
-#~ msgstr ""
-#~ "Het doel van de actie, wordt ingesteld bij het kiezen van dit sjabloon."
-
-#~ msgid "Goal:"
-#~ msgstr "Doel:"
-
-#~ msgid "Geboorteland"
-#~ msgstr "Geboorteland"
-
-#~ msgid "product"
-#~ msgstr "product"
-
-#~ msgid "Wachtwoordherinitialisatie"
-#~ msgstr "Wachtwoordherinitialisatie"
-
-#~ msgid ""
-#~ "Logo of the municipality - For best presentation keep images in square or "
-#~ "landscape mode and with a maximum file size of 1 MB"
-#~ msgstr ""
-#~ "Logo van de gemeente - Houd afbeeldingen in vierkant of landschapsformaat "
-#~ "en met een maximale bestandsgrootte van 1 MB"
-
-#~ msgid ""
-#~ "Logo of the organization - For best presentation keep images in square or "
-#~ "landscape mode and with a maximum file size of 2 MB"
-#~ msgstr ""
-#~ "Logo van de organisatie - Houd afbeeldingen in vierkant of "
-#~ "landschapsformaat en met een maximale bestandsgrootte van 2 MB"
-
-#~ msgid "U bent al ingelogd."
-#~ msgstr "U bent al ingelogd."
-
-#~ msgid "Used as a reference in the contacts api."
-#~ msgstr "Wordt gebruikt als referentie via de contacten API"
-
-#~ msgid "The last name of the contact person"
-#~ msgstr "Achternaam van de contactpersoon"
-
-#~ msgid ""
-#~ "The email address of the contact person. This field can be left empty."
-#~ msgstr "E-mailadres van de contactpersoon. Dit veld mag leeggelaten worden."
-
-#~ msgid "The phonenumber of the contact person. This field can be left empty."
-#~ msgstr ""
-#~ "De telefoonnummer van de contactpersoon. Dit veld mag leeggelaten worden."
-
-#~ msgid ""
-#~ "This is the date the contact was created. This field is automatically set."
-#~ msgstr ""
-#~ "Datum dat de contactpersoon is aangemaakt. Dit veld wordt automatisch "
-#~ "gevuld."
-
-#~ msgid ""
-#~ "This is the date when the contact was last changed. This field is "
-#~ "automatically set."
-#~ msgstr ""
-#~ "Datum wanneer de contactpersoon voor het laatst is aangepast. Dit veld "
-#~ "wordt automatisch gevuld."
-
-#~ msgid "This is the person that entered the contact person."
-#~ msgstr "Door deze gebruiker is de contactpersoon aangemaakt"
-
-#~ msgid "Contact user"
-#~ msgstr "Contact gebruiker"
-
-#~ msgid "The user from the contact, who was added based on the contact email."
-#~ msgstr ""
-#~ "De gebruikersaccount van dit contactpersoon, dit wordt bepaald op basis "
-#~ "van het e-mailadres."
-
-#~ msgid "Function"
-#~ msgstr "Functie"
-
-#~ msgid "The function of the contact within an organization."
-#~ msgstr "De functie van de contactpersoon binnen een organisatie"
-
-#~ msgid "The contact the creation of which triggered sending the invite"
-#~ msgstr "Contact waardoor de uitnodiging is aangemaakt"
-
-#~ msgid "contact was modified"
-#~ msgstr "contact is gewijzigd"
-
-#~ msgid "contact was deleted"
-#~ msgstr "contact is verwijderd"
-
-#~ msgid "status"
-#~ msgstr "status"
-
-#~ msgid "documenten"
-#~ msgstr "documenten"
-
-#~ msgid "Geen titel"
-#~ msgstr "Geen titel"
-
-#~ msgid "Whether the questionnaire should be highlighted or not."
-#~ msgstr "Of de thema uitgelicht moet worden op de homepage of niet."
-
-#~ msgid "Wij helpen u graag op weg."
-#~ msgstr "Test met een paar simpele vragen of u recht heeft op een product"
-
-#~ msgid "Wijzig contact"
-#~ msgstr "Wijzig contact"
-
-#~ msgid "Keuze zelfdiagnose"
-#~ msgstr "Keuze zelftest"
-
-#~ msgid "Aangemaakt door"
-#~ msgstr "Aangemaakt door"
-
-#~ msgid "Ends in x days:"
-#~ msgstr "Eindigt in x dagen"
-
-#~ msgid "Bekijk status"
-#~ msgstr "Bekijk status"
-
-#~ msgid "Afspraken"
-#~ msgstr "Afspraken"
-
-#~ msgid "action was modified"
-#~ msgstr "actie is gewijzigd"
-
-#~ msgid "Door"
-#~ msgstr "Door"
-
-#~ msgid "admin"
-#~ msgstr "beheer"
-
-#~ msgid "administration"
-#~ msgstr "beheer"
-
-#~ msgid "Linkedin"
-#~ msgstr "Linkedin"
-
-#~ msgid ""
-#~ "Geeft aan dat dit de standaard zelfdiagnose is, slechts een item mag deze "
-#~ "waarde hebben.."
-#~ msgstr ""
-#~ "Geeft aan dat dit de standaard zelfdiagnose is, slechts een item mag deze "
-#~ "waarde hebben.."
-
-#~ msgid "first name"
-#~ msgstr "voornaam"
-
-#~ msgid "email address"
-#~ msgstr "e-mailadres"
-
-#~ msgid "user"
-#~ msgstr "gebruiker"
-
-#~ msgid "icon"
-#~ msgstr "icoon"
-
-#~ msgid "image"
-#~ msgstr "afbeelding"
-
-#~ msgid "categories"
-#~ msgstr "thema's"
-
-#~ msgid "content"
-#~ msgstr "content"
-
-#~ msgid "tag"
-#~ msgstr "tag"
-
-#~ msgid "organization types"
-#~ msgstr "organisatietypes"
-
-#~| msgid "Contact"
-#~ msgid "contacts"
-#~ msgstr "contacten"
-
-#~ msgid "created by"
-#~ msgstr "aangemaakt door"
-
-#~ msgid "term"
-#~ msgstr "term"
-
-#~ msgid "Bijgewerkt op"
-#~ msgstr "Bijgewerkt op"
-
-#~ msgid "afspraak"
-#~ msgstr "afspraak"
-
-#~ msgid "afspraken"
-#~ msgstr "afspraken"
-
-#~ msgid "-------"
-#~ msgstr "-------"
-
-#~ msgid "A user is already registered with this e-mail address."
-#~ msgstr "Een gebruiker is al geregistreerd met dit e-mailadres."
-
-#~ msgid "The two password fields didn't match."
-#~ msgstr "De wachtwoordvelden komen niet overeen"
-
-#~ msgid "Previous"
-#~ msgstr "Vorige"
-
-#~ msgid "Next"
-#~ msgstr "Volgende"
