@@ -1,10 +1,10 @@
 {% load menu_tags link_tags %}
 {% for child in children %}
 {% with url=child.attr.redirect_url|default:child.get_absolute_url %}
-    <li class="primary-navigation__list-item child{% if child.selected %} selected{% endif %}{% if child.ancestor %} ancestor{% endif %}{% if child.sibling %} sibling{% endif %}{% if child.descendant %} descendant{% endif %}">
+    <li class="primary-navigation__list-item">
         {% link text=child.get_menu_title href=url icon=child.common.menu_icon icon_position="before" %}
         {% if child.indicator %}
-        <a class="link secondary" href="{{ url }}">({{ child.indicator }})</a>
+            <span class="indicator"><a class="link secondary indicator__link" href="{{ url }}">{{ child.indicator }}<span class="indicator__dot"></span></a></span>
         {% endif %}
         {% if child.children %}
         <ul class="primary-navigation__list subpage-list">
@@ -14,3 +14,4 @@
     </li>
 {% endwith %}
 {% endfor %}
+lhg

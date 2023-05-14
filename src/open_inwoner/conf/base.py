@@ -201,6 +201,7 @@ INSTALLED_APPS = [
     "open_inwoner.configurations",
     "open_inwoner.haalcentraal",
     "open_inwoner.openzaak",
+    "open_inwoner.openklant",
     "open_inwoner.questionnaire",
     "open_inwoner.extended_sessions",
     "open_inwoner.custom_csp",
@@ -265,6 +266,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "open_inwoner.utils.context_processors.settings",
+                "open_inwoner.cms.context_processors.active_apphooks",
                 "sekizai.context_processors.sekizai",
                 "cms.context_processors.cms_settings",
                 "django.template.context_processors.i18n",
@@ -744,6 +746,7 @@ INVITE_EXPIRY = 14
 # zgw-consumers
 ZGW_CONSUMERS_TEST_SCHEMA_DIRS = [
     os.path.join(DJANGO_PROJECT_DIR, "openzaak", "tests", "files"),
+    os.path.join(DJANGO_PROJECT_DIR, "openklant", "tests", "files"),
 ]
 
 #

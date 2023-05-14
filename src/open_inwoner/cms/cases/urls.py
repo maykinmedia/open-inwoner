@@ -8,12 +8,26 @@ from open_inwoner.accounts.views.cases import (
     OpenCaseListView,
     OpenSubmissionListView,
 )
+from open_inwoner.accounts.views.contactmoments import (
+    KlantContactMomentDetailView,
+    KlantContactMomentListView,
+)
 
 app_name = "cases"
 
 urlpatterns = [
     path("closed/", ClosedCaseListView.as_view(), name="closed_cases"),
     path("forms/", OpenSubmissionListView.as_view(), name="open_submissions"),
+    path(
+        "contactmomenten/",
+        KlantContactMomentListView.as_view(),
+        name="contactmoment_list",
+    ),
+    path(
+        "contactmomenten/<str:kcm_uuid>/",
+        KlantContactMomentDetailView.as_view(),
+        name="contactmoment_detail",
+    ),
     path(
         "<str:object_id>/document/<str:info_id>/",
         CaseDocumentDownloadView.as_view(),
