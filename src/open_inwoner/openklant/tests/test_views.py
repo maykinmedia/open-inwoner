@@ -84,7 +84,7 @@ class FetchKlantDataTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
         user = UserFactory()
         list_url = reverse("cases:contactmoment_list")
         response = self.app.get(list_url, user=user)
-        self.assertRedirects(response, reverse("root"))
+        self.assertRedirects(response, reverse("pages-root"))
 
     def test_list_requires_login(self, m):
         list_url = reverse("cases:contactmoment_list")
@@ -95,7 +95,7 @@ class FetchKlantDataTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
         user = UserFactory()
         url = reverse("cases:contactmoment_detail", kwargs={"kcm_uuid": uuid4()})
         response = self.app.get(url, user=user)
-        self.assertRedirects(response, reverse("root"))
+        self.assertRedirects(response, reverse("pages-root"))
 
     def test_detail_requires_login(self, m):
         url = reverse("cases:contactmoment_detail", kwargs={"kcm_uuid": uuid4()})

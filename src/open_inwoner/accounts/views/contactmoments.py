@@ -46,7 +46,7 @@ class KlantContactMomentAccessMixin(AccessMixin):
 
     def handle_no_permission(self):
         if self.request.user.is_authenticated:
-            return redirect(reverse("root"))
+            return redirect(reverse("pages-root"))
         else:
             return super().handle_no_permission()
 
