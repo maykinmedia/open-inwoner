@@ -239,6 +239,7 @@ MIDDLEWARE = [
     "cms.middleware.page.CurrentPageMiddleware",
     "cms.middleware.toolbar.ToolbarMiddleware",
     "cms.middleware.language.LanguageCookieMiddleware",
+    "open_inwoner.cms.utils.middleware.DropToolbarMiddleware",
     "django.contrib.flatpages.middleware.FlatpageFallbackMiddleware",
     "open_inwoner.extended_sessions.middleware.SessionTimeoutMiddleware",
     "open_inwoner.accounts.middleware.NecessaryFieldsMiddleware",
@@ -534,8 +535,11 @@ CMS_PLACEHOLDER_CONF = {
         #     "LinkPlugin": ["TextPlugin"],
         # },
     },
-    "banner": {"plugins": ["BannerPlugin"], "name": _("Banner")},
+    "banner_image": {"plugins": ["BannerImagePlugin"], "name": _("Banner Image")},
+    "banner_text": {"plugins": ["BannerTextPlugin"], "name": _("Banner Text")},
 }
+
+CMS_TOOLBAR_ANONYMOUS_ON = False
 
 #
 # Django-Admin-Index

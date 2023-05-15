@@ -313,6 +313,10 @@
                 "configuration"
             ],
             [
+                "openklant",
+                "openklantconfig"
+            ],
+            [
                 "openzaak",
                 "catalogusconfig"
             ],
