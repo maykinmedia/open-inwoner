@@ -23,9 +23,9 @@ $vm: var(--spacing-large);
     margin-left: var(--spacing-medium);
     text-align: center;
     @media (min-width: 768px) {
-	top: -6px;
+      top: -6px;
     }
-    
+
     .link,
     &__link {
       font-size: var(--font-size-body-small);
