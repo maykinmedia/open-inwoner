@@ -313,6 +313,10 @@
                 "configuration"
             ],
             [
+                "openklant",
+                "openklantconfig"
+            ],
+            [
                 "openzaak",
                 "catalogusconfig"
             ],
@@ -397,10 +401,6 @@
             [
                 "cms",
                 "placeholderreference"
-            ],
-            [
-                "profile",
-                "profileconfig"
             ]
         ]
     }
