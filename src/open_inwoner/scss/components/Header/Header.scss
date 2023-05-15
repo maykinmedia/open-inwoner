@@ -22,17 +22,18 @@ $vm: var(--spacing-large);
     position: relative;
     margin-left: var(--spacing-medium);
     text-align: center;
-
+    top: -6px;
+    
     .link,
     &__link {
       font-size: var(--font-size-body-small);
       color: var(--color-black);
-      // display: inline-block;
+      //display: inline-block;
       position: relative;
       background-color: var(--color-gray);
       border-radius: var(--border-radius);
       padding: var(--spacing-small);
-      // min-width: var(--spacing-large);
+      //min-width: var(--spacing-large);
       height: var(--spacing-large);
 
       .link__text {
