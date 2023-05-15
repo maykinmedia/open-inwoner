@@ -244,11 +244,11 @@
     &:focus-visible,
     &:focus-within {
       transform: translateY(0);
-      border: 1px solid orange;
+      //border: 1px solid var(--color-primary);
       // orange focus
-      box-shadow: 0 3px 6px rgba(255, 165, 0, 0.9);
-      border-radius: 4px;
-      outline: -webkit-focus-ring-color auto 5px;
+      // box-shadow: 0 3px 6px var(--color-primary);
+      //border-radius: 4px;
+      // outline: -webkit-focus-ring-color auto 5px;
     }
   }
 

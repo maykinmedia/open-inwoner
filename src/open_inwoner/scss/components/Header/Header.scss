@@ -27,12 +27,12 @@ $vm: var(--spacing-large);
     &__link {
       font-size: var(--font-size-body-small);
       color: var(--color-black);
-      display: inline-block;
+      // display: inline-block;
       position: relative;
       background-color: var(--color-gray);
       border-radius: var(--border-radius);
       padding: var(--spacing-small);
-      min-width: var(--spacing-large);
+      // min-width: var(--spacing-large);
       height: var(--spacing-large);
 
       .link__text {
@@ -42,8 +42,8 @@ $vm: var(--spacing-large);
 
     &__dot {
       position: absolute;
-      top: 1px;
-      right: -2px;
+      top: 0px;
+      right: 0px;
       background-color: var(--color-red);
       height: 6px;
       width: 6px;
