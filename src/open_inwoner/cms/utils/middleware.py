@@ -1,5 +1,7 @@
 from django.http import HttpResponseRedirect
 
+from cms.toolbar.utils import get_toolbar_from_request
+
 from open_inwoner.configurations.models import SiteConfiguration
 
 
@@ -24,3 +26,25 @@ class AnonymousHomePageRedirectMiddleware:
                 return HttpResponseRedirect(config.redirect_to)
 
         return response
+
+
+class DropToolbarMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        if not self.use_toolbar(request):
+            request.session["cms_edit"] = False
+            request.session["cms_preview"] = False
+            request.session["cms_toolbar_disabled"] = True
+
+            toolbar = get_toolbar_from_request(request)
+            toolbar.show_toolbar = False
+
+        response = self.get_response(request)
+        return response
+
+    def use_toolbar(self, request):
+        if request.user.is_staff and request.user.is_verified():
+            return True
+        return False
