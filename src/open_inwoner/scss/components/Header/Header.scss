@@ -22,7 +22,9 @@ $vm: var(--spacing-large);
     position: relative;
     margin-left: var(--spacing-medium);
     text-align: center;
-    top: -6px;
+    @media (min-width: 768px) {
+	top: -6px;
+    }
     
     .link,
     &__link {
