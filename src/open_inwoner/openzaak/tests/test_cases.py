@@ -18,6 +18,7 @@ from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.accounts.views.cases import CaseListMixin
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 
+from ...utils.tests.helpers import AssertRedirectsMixin
 from ..models import OpenZaakConfig
 from ..utils import format_zaak_identificatie
 from .factories import ServiceFactory
@@ -25,7 +26,7 @@ from .shared import CATALOGI_ROOT, ZAKEN_ROOT
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class CaseListAccessTests(ClearCachesMixin, WebTest):
+class CaseListAccessTests(AssertRedirectsMixin, ClearCachesMixin, WebTest):
     urls = [
         reverse_lazy("cases:open_cases"),
         reverse_lazy("cases:closed_cases"),
@@ -57,7 +58,7 @@ class CaseListAccessTests(ClearCachesMixin, WebTest):
             with self.subTest(url):
                 response = self.app.get(url, user=user)
 
-                self.assertRedirects(response, reverse("root"))
+                self.assertRedirects(response, reverse("pages-root"))
 
     def test_anonymous_user_has_no_access_to_cases_page(self):
         user = AnonymousUser()
@@ -66,7 +67,7 @@ class CaseListAccessTests(ClearCachesMixin, WebTest):
             with self.subTest(url):
                 response = self.app.get(url, user=user)
 
-                self.assertRedirects(response, f"{reverse('login')}?next={url}")
+                self.assertRedirectsLogin(response, next=url)
 
     def test_missing_zaak_client_returns_empty_list(self):
         user = UserFactory(

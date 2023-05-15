@@ -56,7 +56,7 @@ class _UserCreationForm(UserCreationForm):
 class _UserAdmin(ImageCroppingMixin, UserAdmin):
     form = _UserChangeForm
     add_form = _UserCreationForm
-    hijack_success_url = reverse_lazy("root")
+    hijack_success_url = "/"
     list_display_links = (
         "email",
         "first_name",

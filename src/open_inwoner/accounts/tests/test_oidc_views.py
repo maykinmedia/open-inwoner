@@ -50,7 +50,7 @@ class OIDCFlowTests(TestCase):
         user.refresh_from_db()
 
         self.assertRedirects(
-            callback_response, reverse("root"), fetch_redirect_response=False
+            callback_response, reverse("pages-root"), fetch_redirect_response=False
         )
         self.assertTrue(User.objects.filter(oidc_id="some_username").exists())
         self.assertEqual(user.oidc_id, "some_username")
@@ -99,7 +99,7 @@ class OIDCFlowTests(TestCase):
         user.refresh_from_db()
 
         self.assertRedirects(
-            callback_response, reverse("root"), fetch_redirect_response=False
+            callback_response, reverse("pages-root"), fetch_redirect_response=False
         )
         self.assertTrue(User.objects.filter(oidc_id="some_username").exists())
         self.assertEqual(user.oidc_id, "some_username")
@@ -144,7 +144,7 @@ class OIDCFlowTests(TestCase):
         )
 
         self.assertRedirects(
-            callback_response, reverse("root"), fetch_redirect_response=False
+            callback_response, reverse("pages-root"), fetch_redirect_response=False
         )
         new_user = User.objects.filter(email="new_user@example.com")
 
@@ -200,7 +200,7 @@ class OIDCFlowTests(TestCase):
             )
 
             self.assertRedirects(
-                callback_response, reverse("root"), fetch_redirect_response=False
+                callback_response, reverse("pages-root"), fetch_redirect_response=False
             )
 
             with self.subTest("check error page again"):

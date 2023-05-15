@@ -19,8 +19,13 @@ from open_inwoner.accounts.tests.factories import (
     UserFactory,
 )
 from open_inwoner.accounts.tests.test_action_views import ActionsPlaywrightTests
+from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
 from open_inwoner.utils.tests.playwright import multi_browser
 
+from ...cms.collaborate.cms_apps import CollaborateApphook
+from ...cms.extensions.constants import Icons, IndicatorChoices
+from ...cms.profile.cms_apps import ProfileApphook
+from ...cms.tests import cms_tools
 from ..models import Plan, PlanContact
 from .factories import ActionTemplateFactory, PlanFactory, PlanTemplateFactory
 
@@ -1077,27 +1082,36 @@ class PlanBegeleiderListViewTests(WebTest):
         )
 
 
-# TODO check this skip
-@skip("disabled until CMS lands")
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class NewPlanContactCounterTest(WebTest):
     def test_plan_contact_new_count(self):
+        homepage = cms_tools.create_homepage()
+        planpage = cms_tools.create_apphook_page(
+            CollaborateApphook,
+            title=_("Samenwerken"),
+            extension_args={
+                "menu_indicator": IndicatorChoices.plan_new_contacts,
+                "menu_icon": Icons.people,
+            },
+            parent_page=homepage,
+        )
+
         owner = UserFactory()
         plan_1 = PlanFactory(created_by=owner)
         plan_2 = PlanFactory(created_by=owner)
 
         user = UserFactory()
 
-        root_url = reverse("root")
+        root_url = reverse("pages-root")
         list_url = reverse("collaborate:plan_list")
 
         # check no number shows by default
         response = self.app.get(root_url, user=user)
-        links = response.pyquery(
-            f".header__container > .primary-navigation a[href='{list_url}']"
-        )
-        self.assertEqual(len(links), 1)
-        self.assertEqual(links.text(), _("Samenwerken") + " people")
+        response.showbrowser()
+
+        links = response.pyquery(f".primary-navigation a[href='{list_url}']")
+        self.assertEqual(len(links), 2)  # Duplicate due to mobile
+        self.assertTrue(_("Samenwerken") + " people" in links.text())
 
         # check if the number shows up in the menu
         plan_1.plan_contacts.add(user)
@@ -1110,7 +1124,7 @@ class NewPlanContactCounterTest(WebTest):
         )
         # second link appears
         self.assertEqual(len(links), 2)
-        self.assertIn("(2)", links.text())
+        self.assertIn("2", links.text())
 
         # access the list page to reset
         response = self.app.get(list_url, user=user)

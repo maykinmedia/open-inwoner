@@ -33,7 +33,7 @@ class QuestionnaireResetView(RedirectView):
 
     def get_redirect_url(self, *args, **kwargs) -> Optional[str]:
         if not self.request.user.is_authenticated:
-            return reverse("root")
+            return reverse("pages-root")
         return super().get_redirect_url(*args, **kwargs)
 
 

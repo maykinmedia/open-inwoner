@@ -1,7 +1,10 @@
 import logging
 
+from django.conf import settings
+from django.urls import reverse
 from django.utils.encoding import force_str
 
+from furl import furl
 from timeline_logger.models import TimelineLog
 
 
@@ -63,3 +66,25 @@ class AssertTimelineLogMixin:
 
     def dumpTimelineLog(self):
         print(self.getTimelineLogDump())
+
+
+class AssertRedirectsMixin:
+    def assertRedirectsLogin(
+        self, response, *, next: str = None, with_host: bool = False
+    ):
+        url = reverse("login")
+        if next is not None:
+            url = furl(url).set(args={"next": str(next)}).url
+        if with_host:
+            url = furl(url).set(scheme="http", host="testserver").url
+        self.assertRedirects(response, url)
+
+    def assertRedirectsLogout(
+        self, response, *, next: str = None, with_host: bool = False
+    ):
+        url = reverse("logout")
+        if next is not None:
+            url = furl(url).set(args={"next": str(next)}).url
+        if with_host:
+            url = furl(url).set(scheme="http", host="testserver").url
+        self.assertRedirects(response, url)
