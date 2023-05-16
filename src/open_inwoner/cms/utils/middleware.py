@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.http import HttpResponseRedirect
 
 from cms.toolbar.utils import get_toolbar_from_request
@@ -29,11 +30,18 @@ class AnonymousHomePageRedirectMiddleware:
 
 
 class DropToolbarMiddleware:
+    """
+    Hide the django-cms toolbar if the staff user is not 2FA verified
+
+    Needed because only the admin has forced OTP,
+      so the inline editing iframes of django-cms could be accessed but then show a confusing 2FA flow
+    """
+
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
-        if not self.use_toolbar(request):
+        if self.force_disable_toolbar(request):
             request.session["cms_edit"] = False
             request.session["cms_preview"] = False
             request.session["cms_toolbar_disabled"] = True
@@ -44,7 +52,10 @@ class DropToolbarMiddleware:
         response = self.get_response(request)
         return response
 
-    def use_toolbar(self, request):
-        if request.user.is_staff and request.user.is_verified():
+    def force_disable_toolbar(self, request):
+        if settings.TWO_FACTOR_FORCE_OTP_ADMIN and (
+            not request.user.is_staff or not request.user.is_verified()
+        ):
             return True
-        return False
+        else:
+            return False
