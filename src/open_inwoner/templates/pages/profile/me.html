@@ -125,6 +125,8 @@
     {% form_actions primary_text=_("Profiel deactiveren") primary_icon="close" transparent=True %}
 {% endrender_form %}
 
+{% if files %}
 {% file_list h1=True files=files allow_delete=True title=_("Bestanden") download_view="profile:documents_download" %}
+{% endif %}
 
 {% endblock content %}
