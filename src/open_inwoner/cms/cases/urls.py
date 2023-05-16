@@ -4,9 +4,11 @@ from django.views.generic import RedirectView
 from open_inwoner.accounts.views.cases import (
     CaseDetailView,
     CaseDocumentDownloadView,
-    ClosedCaseListView,
-    OpenCaseListView,
+    InnerClosedCaseListView,
+    InnerOpenCaseListView,
     OpenSubmissionListView,
+    OuterClosedCaseListView,
+    OuterOpenCaseListView,
 )
 from open_inwoner.accounts.views.contactmoments import (
     KlantContactMomentDetailView,
@@ -16,7 +18,10 @@ from open_inwoner.accounts.views.contactmoments import (
 app_name = "cases"
 
 urlpatterns = [
-    path("closed/", ClosedCaseListView.as_view(), name="closed_cases"),
+    path(
+        "closed/content", InnerClosedCaseListView.as_view(), name="closed_cases_content"
+    ),
+    path("closed/", OuterClosedCaseListView.as_view(), name="closed_cases"),
     path("forms/", OpenSubmissionListView.as_view(), name="open_submissions"),
     path(
         "contactmomenten/",
@@ -39,5 +44,6 @@ urlpatterns = [
         name="case_detail",
     ),
     path("open/", RedirectView.as_view(pattern_name="cases:open_cases"), name="index"),
-    path("", OpenCaseListView.as_view(), name="open_cases"),
+    path("content/", InnerOpenCaseListView.as_view(), name="open_cases_content"),
+    path("", OuterOpenCaseListView.as_view(), name="open_cases"),
 ]

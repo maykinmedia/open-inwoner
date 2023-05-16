@@ -1,0 +1,35 @@
+{% load i18n grid_tags icon_tags list_tags pagination_tags utils %}
+
+
+    <h1 class="h1" id="title">{% trans "Mijn aanvragen" %}</h1>
+    <h2 class="h2" id="cases">{{ page_title }} ({{ paginator.count }})</h2>
+    {% render_grid %}
+        {% for case in cases %}
+            {% render_column start=forloop.counter_0|multiply:4 span=4 %}
+            <div class="card card--compact card--stretch">
+                <div class="card__body">
+                <a href="{% url 'cases:case_detail' object_id=case.uuid %}" class="cases__link">
+                        <p class="h4">
+                            <span class="link link__text">{{ case.description }}</span>
+                        </p>
+                        {% render_list %}
+                            <span class="case-list">
+                            {% list_item case.current_status caption=_("Status") compact=True strong=False %}
+                            {% list_item case.start_date caption=_("Ontvangstdatum") compact=True strong=False %}
+                            {% list_item case.identificatie caption=_("Zaaknummer") compact=True strong=False %}
+                            </span>
+                        {% endrender_list %}
+
+                        <span class="link link--icon link--primary" aria-label="{% trans "Bekijk aanvraag" %}" title="{% trans "Bekijk aanvraag" %}">
+                            <span class="link__text">{% trans "Bekijk aanvraag" %}</span>
+                            {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
+                        </span>
+                </a>
+                </div>
+            </div>
+            {% endrender_column %}
+        {% endfor %}
+    {% endrender_grid %}
+    
+    {% pagination page_obj=page_obj paginator=paginator request=request hxget=hxget hxtarget='#cases-content' %}
+

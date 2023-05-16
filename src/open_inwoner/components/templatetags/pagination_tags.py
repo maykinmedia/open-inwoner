@@ -9,7 +9,7 @@ def pagination(page_obj, paginator, request, lookaround=3, **kwargs):
     Describing information
 
     Usage:
-        {% pagination page_obj=page_obj paginator=paginator request=request %}
+        {% pagination page_obj=page_obj paginator=paginator request=request hxget="cases:open_cases" hxtarget="#cases_id" %}
 
     Variables:
         + page_obj: Default django page object
@@ -19,6 +19,8 @@ def pagination(page_obj, paginator, request, lookaround=3, **kwargs):
 
     Extra context:
         - page_numbers: int | The number of pages to show before showing the dots.
+        - hxget: str | The reversible url to which we want to perform an htmx request
+        - hxtarget: str | The target element we want to swap
     """
     page_numbers = [
         page_obj.number - lookaround + i
