@@ -69,6 +69,7 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                     "name",
                     "login_show",
                     "login_allow_registration",
+                    "login_2fa_sms",
                     "redirect_to",
                 )
             },
