@@ -1,9 +1,18 @@
 import dataclasses
 from dataclasses import dataclass
 from datetime import datetime
-from typing import List, Optional, Union
+from typing import List, Optional, TypedDict, Union
 
 from zgw_consumers.api_models.base import ZGWModel
+
+
+class KlantCreateData(TypedDict):
+    bronorganisatie: str
+    voornaam: str
+    voorvoegsel_achternaam: str
+    achternaam: str
+    telefoonnummer: str
+    emailadres: str
 
 
 @dataclass
@@ -39,6 +48,13 @@ class Klant(ZGWModel):
         return " ".join(
             filter(bool, (self.voornaam, self.voorvoegsel_achternaam, self.achternaam))
         )
+
+
+class ContactMomentCreateData(TypedDict):
+    bronorganisatie: str
+    tekst: str
+    onderwerp: str
+    type: str
 
 
 @dataclass
