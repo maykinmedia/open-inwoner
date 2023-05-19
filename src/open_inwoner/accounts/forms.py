@@ -55,7 +55,7 @@ class CustomRegistrationForm(RegistrationForm):
 
         # make phonenumber required when 2fa-sms login is enabled
         config = SiteConfiguration.get_solo()
-        if config.login_2fa_sms is False:
+        if not config.login_2fa_sms:
             del self.fields["phonenumber"]
         else:
             self.fields["phonenumber"].required = True
