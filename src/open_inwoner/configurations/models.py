@@ -87,6 +87,13 @@ class SiteConfiguration(SingletonModel):
             "Wanneer deze optie uit staat is het enkel toegestaan om met DigiD in te loggen. Zet deze instelling aan om ook het inloggen met gebruikersnaam/wachtwoord en het aanmelden zonder DigiD toe te staan."
         ),
     )
+    login_2fa_sms = models.BooleanField(
+        verbose_name=_("Login with 2FA-with-SMS"),
+        default=False,
+        help_text=_(
+            "Whether we want the users to be able to log in with 2FA authentication by using an SMS workflow."
+        ),
+    )
     login_text = models.TextField(
         blank=True,
         verbose_name=_("Login tekst"),
