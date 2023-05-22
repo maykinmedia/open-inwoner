@@ -65,7 +65,7 @@
 
   .link {
     box-sizing: border-box;
-    padding: var(--spacing-large);
+    padding: var(--spacing-large) var(--spacing-medium);
 
     @media (min-width: 768px) {
       border-left: var(--border-width) solid;
@@ -111,7 +111,7 @@
         font-size: var(--font-size-heading-3);
         color: var(--font-color-body);
         justify-content: space-between;
-        padding: var(--spacing-extra-large) var(--spacing-large);
+        padding: var(--spacing-extra-large) var(--spacing-medium);
         width: 100%;
       }
     }

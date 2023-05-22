@@ -5,12 +5,10 @@ $hm: max(calc((100vw - var(--container-width)) / 2), var(--spacing-large));
 $vm: var(--spacing-large);
 
 .header {
-  z-index: 1003;
   position: static;
-  top: 0;
   min-height: 100px;
   background-color: var(--color-white);
-  width: calc(100% - var(--spacing-large));
+  width: 100%;
 
   @media (min-width: 768px) {
     position: relative;
@@ -239,11 +237,12 @@ $vm: var(--spacing-large);
     display: none;
   }
   .header__button .header__menu-icon .closed {
-    height: 15px;
+    height: var(--font-size-body);
     width: 100%;
     color: var(--color-white);
     display: inline-block;
     font-size: var(--font-size-body);
+    line-height: var(--font-size-body);
   }
 
   .primary-navigation {
@@ -365,7 +364,7 @@ $vm: var(--spacing-large);
   .form {
     @media (max-width: 767px) {
       width: 100%;
-      gap: var(--spacing-medium);
+      gap: var(--spacing-small);
     }
 
     .form__actions {
@@ -388,6 +387,7 @@ $vm: var(--spacing-large);
 
   .form {
     padding: 0 0 var(--spacing-medium) 0;
+    gap: var(--spacing-small);
   }
 
   @media (min-width: 768px) {
@@ -432,10 +432,12 @@ $vm: var(--spacing-large);
             .header__menu-icon .open {
               //height: var(--row-height);
               width: 100%;
+              height: var(--font-size-body);
               background-color: var(--color-white);
               color: var(--color-primary);
               display: inline-block;
               font-size: var(--font-size-body);
+              line-height: var(--font-size-body);
             }
 
             .header__menu-icon .closed {
