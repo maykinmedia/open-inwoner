@@ -16,4 +16,5 @@ class ProfileConfigAdmin(BaseAppHookConfig, admin.ModelAdmin):
             "selfdiagnose",
             "actions",
             "notifications",
+            "my_questions",
         )
