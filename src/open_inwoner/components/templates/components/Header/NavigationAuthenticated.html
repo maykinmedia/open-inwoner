@@ -8,6 +8,9 @@
         <ul class="primary-navigation__list">
             <li class="primary-navigation__list-item">
             {% button text=_('Welkom ')|addstr:request.user.get_short_name type="button" icon="expand_more" icon_position="after" icon_outlined=True transparent=True extra_classes="primary-navigation--toggle" %}
+            {% if indicator %}
+                <span class="indicator"><span class="indicator__dot">indicator</span></span>
+            {% endif %}
 
                 <ul class="primary-navigation__list subpage-list">
                     {% show_menu_below_id "home" 0 100 100 100 "cms/menu/primary.html" %}
