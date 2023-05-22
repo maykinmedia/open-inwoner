@@ -9,6 +9,7 @@ $vm: var(--spacing-large);
   min-height: 100px;
   background-color: var(--color-white);
   width: 100%;
+  z-index: 1003;
 
   @media (min-width: 768px) {
     position: relative;
