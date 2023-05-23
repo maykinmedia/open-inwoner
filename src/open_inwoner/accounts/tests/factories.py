@@ -16,6 +16,7 @@ class UserFactory(factory.django.DjangoModelFactory):
         model = "accounts.User"
 
     first_name = factory.Faker("first_name")
+    infix = factory.fuzzy.FuzzyChoice(["de", "van", "van de"])
     last_name = factory.Faker("last_name")
     # Note that 'example.org' addresses are always redirected to the registration_necessary view
     email = factory.LazyAttribute(

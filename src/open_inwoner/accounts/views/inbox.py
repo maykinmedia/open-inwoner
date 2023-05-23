@@ -79,9 +79,12 @@ class InboxView(
                 "inbox:index", kwargs={self.slug_field: c.other_user_uuid}
             )
             # note these are annotations (not models)
-            c.other_user_full_name = " ".join(
-                (c.other_user_first_name, c.other_user_last_name)
+            parts = (
+                c.other_user_first_name,
+                c.other_user_infix,
+                c.other_user_last_name,
             )
+            c.other_user_full_name = " ".join(p for p in parts if p)
         return conversations
 
     def get_other_user(self, conversations: dict) -> Optional[User]:

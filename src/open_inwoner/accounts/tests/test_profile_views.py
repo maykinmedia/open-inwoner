@@ -449,7 +449,7 @@ class MyDataTests(HaalCentraalMixin, WebTest):
         "first_name": "Merel",
         "initials": "M.",
         "last_name": "Kooyman",
-        "prefix": None,
+        "prefix": "de",
         "birthday": "10-04-1982",
         "birthday_place": "Leerdam",
         "gender": "vrouw",

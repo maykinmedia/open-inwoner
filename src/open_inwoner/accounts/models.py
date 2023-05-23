@@ -53,6 +53,13 @@ class User(AbstractBaseUser, PermissionsMixin):
         default="",
         validators=[validate_charfield_entry],
     )
+    infix = models.CharField(
+        verbose_name=_("Infix"),
+        max_length=64,
+        blank=True,
+        default="",
+        validators=[validate_charfield_entry],
+    )
     last_name = models.CharField(
         verbose_name=_("Last name"),
         max_length=255,
@@ -204,11 +211,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         self._old_bsn = self.bsn
 
     def get_full_name(self):
-        """
-        Returns the first_name plus the last_name, with a space in between.
-        """
-        full_name = "%s %s" % (self.first_name, self.last_name)
-        return full_name.strip()
+        parts = (self.first_name, self.infix, self.last_name)
+        return " ".join(p for p in parts if p)
 
     def get_short_name(self):
         "Returns the short name for the user."

@@ -30,6 +30,7 @@ from .models import Action, Document, Invite, Message, User
 
 class CustomRegistrationForm(RegistrationForm):
     first_name = forms.CharField(label=_("First name"), max_length=255, required=True)
+    infix = forms.CharField(label=_("Infix"), max_length=64, required=False)
     last_name = forms.CharField(label=_("Last name"), max_length=255, required=True)
     invite = forms.ModelChoiceField(
         queryset=Invite.objects.all(),
@@ -43,6 +44,7 @@ class CustomRegistrationForm(RegistrationForm):
         fields = (
             "email",
             "first_name",
+            "infix",
             "last_name",
             "phonenumber",
             "password1",
@@ -97,6 +99,7 @@ class UserForm(BaseUserForm):
         model = User
         fields = (
             "first_name",
+            "infix",
             "last_name",
             "display_name",
             "email",
@@ -127,6 +130,7 @@ class NecessaryUserForm(forms.ModelForm):
         model = User
         fields = (
             "first_name",
+            "infix",
             "last_name",
             "email",
             "invite",
@@ -136,10 +140,12 @@ class NecessaryUserForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         self.fields["first_name"].required = True
+        self.fields["infix"].required = False
         self.fields["last_name"].required = True
 
         if user.is_digid_and_brp():
             self.fields["first_name"].disabled = True
+            self.fields["infix"].disabled = True
             self.fields["last_name"].disabled = True
 
             # this is for the rare case of retrieving partial data from haalcentraal
@@ -147,6 +153,8 @@ class NecessaryUserForm(forms.ModelForm):
                 del self.fields["first_name"]
             if not user.last_name:
                 del self.fields["last_name"]
+            if not user.infix:
+                del self.fields["infix"]
 
     def clean_email(self):
         email = self.cleaned_data["email"]

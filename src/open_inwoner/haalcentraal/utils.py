@@ -93,6 +93,7 @@ def update_brp_data_in_db(user, brp_version, initial=True):
 
         user.birthday = birthday
         user.first_name = glom(data, "naam.voornamen", default="")
+        user.infix = glom(data, "naam.voorvoegsel", default="")
         user.last_name = glom(data, "naam.geslachtsnaam", default="")
         user.street = glom(data, "verblijfplaats.straat", default="")
         user.housenumber = glom(data, "verblijfplaats.huisnummer", default="")
