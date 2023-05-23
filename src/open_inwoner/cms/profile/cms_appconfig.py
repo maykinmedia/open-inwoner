@@ -47,7 +47,7 @@ class ProfileConfig(AppHookConfig):
         default=True,
         help_text=_("Designates whether 'notifications' section is rendered or not."),
     )
-    my_questions = models.BooleanField(
+    questions = models.BooleanField(
         verbose_name=_("Mijn vragen"),
         default=True,
         help_text=_("Designates whether 'questions' section is rendered or not."),
