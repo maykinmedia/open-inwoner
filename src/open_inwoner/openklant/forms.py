@@ -12,9 +12,19 @@ class ContactForm(Form):
         required=True,
         queryset=ContactFormSubject.objects.none(),
     )
-    name = forms.CharField(
-        label=_("Naam"),
+    first_name = forms.CharField(
+        label=_("Voornaam"),
+        max_length=255,
+        required=True,
+    )
+    infix = forms.CharField(
+        label=_("Tussenvoegsel"),
         max_length=64,
+        required=False,
+    )
+    last_name = forms.CharField(
+        label=_("Achternaam"),
+        max_length=255,
         required=True,
     )
     email = forms.EmailField(

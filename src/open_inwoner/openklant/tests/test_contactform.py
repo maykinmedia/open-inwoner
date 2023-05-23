@@ -75,7 +75,8 @@ class ContactFormTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
         response = self.app.get(self.url)
         form = response.forms["contact-form"]
         form["subject"].select(text=subject.subject)
-        form["name"] = "Foo Bar"
+        form["first_name"] = "Foo"
+        form["last_name"] = "Bar"
         form["email"] = ""
         form["phonenumber"] = ""
         form["question"] = "hey!\n\nwaddup?"
@@ -94,7 +95,9 @@ class ContactFormTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
         response = self.app.get(self.url)
         form = response.forms["contact-form"]
         form["subject"].select(text=subject.subject)
-        form["name"] = "Foo Bar"
+        form["first_name"] = "Foo"
+        form["infix"] = "de"
+        form["last_name"] = "Bar"
         form["email"] = "foo@example.com"
         form["phonenumber"] = "0612345678"
         form["question"] = "hey!\n\nwaddup?"
@@ -113,7 +116,7 @@ class ContactFormTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
             email.subject, "Contact formulier inzending vanaf Open Inwoner Platform"
         )
         self.assertEqual(email.recipients(), ["example@example.com"])
-        self.assertIn("Foo Bar", email.body)
+        self.assertIn("Foo de Bar", email.body)
         self.assertIn("foo@example.com", email.body)
         self.assertIn("0612345678", email.body)
         self.assertIn("hey!\n\nwaddup?", email.body)
@@ -134,7 +137,9 @@ class ContactFormTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
         response = self.app.get(self.url)
         form = response.forms["contact-form"]
         form["subject"].select(text=subject.subject)
-        form["name"] = "Foo Bar"
+        form["first_name"] = "Foo"
+        form["infix"] = "de"
+        form["last_name"] = "Bar"
         form["email"] = "foo@example.com"
         form["phonenumber"] = "0612345678"
         form["question"] = "hey!\n\nwaddup?"
@@ -150,6 +155,37 @@ class ContactFormTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
 
         for m in data.matchers:
             self.assertTrue(m.called_once, str(m))
+
+        klant_create_data = data.matchers[0].request_history[0].json()
+        self.assertEqual(
+            klant_create_data,
+            {
+                "bronorganisatie": "123456789",
+                "voornaam": "Foo",
+                "voorvoegselAchternaam": "de",
+                "achternaam": "Bar",
+                "emailadres": "foo@example.com",
+                "telefoonnummer": "0612345678",
+            },
+        )
+        contactmoment_create_data = data.matchers[1].request_history[0].json()
+        self.assertEqual(
+            contactmoment_create_data,
+            {
+                "bronorganisatie": "123456789",
+                "onderwerp": subject.subject,
+                "tekst": "hey!\n\nwaddup?",
+                "type": "contact-formulier",
+            },
+        )
+        kcm_create_data = data.matchers[2].request_history[0].json()
+        self.assertEqual(
+            kcm_create_data,
+            {
+                "contactmoment": "https://contactmomenten.nl/api/v1/contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
+                "klant": "https://klanten.nl/api/v1/klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            },
+        )
 
     def test_submit_and_register_bsn_user_via_api(self, m):
         MockAPICreateData.setUpServices()
@@ -167,7 +203,9 @@ class ContactFormTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
         response = self.app.get(self.url, user=data.user)
         form = response.forms["contact-form"]
         form["subject"].select(text=subject.subject)
-        form["name"] = "Foo Bar"
+        form["first_name"] = "Foo"
+        form["infix"] = "de"
+        form["last_name"] = "Bar"
         form["email"] = "foo@example.com"
         form["phonenumber"] = "0612345678"
         form["question"] = "hey!\n\nwaddup?"
@@ -183,3 +221,22 @@ class ContactFormTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
 
         for m in data.matchers:
             self.assertTrue(m.called_once, str(m))
+
+        contactmoment_create_data = data.matchers[1].request_history[0].json()
+        self.assertEqual(
+            contactmoment_create_data,
+            {
+                "bronorganisatie": "123456789",
+                "onderwerp": subject.subject,
+                "tekst": "hey!\n\nwaddup?",
+                "type": "contact-formulier",
+            },
+        )
+        kcm_create_data = data.matchers[2].request_history[0].json()
+        self.assertEqual(
+            kcm_create_data,
+            {
+                "contactmoment": "https://contactmomenten.nl/api/v1/contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
+                "klant": "https://klanten.nl/api/v1/klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            },
+        )

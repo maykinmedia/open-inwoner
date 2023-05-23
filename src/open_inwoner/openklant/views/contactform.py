@@ -19,13 +19,6 @@ from open_inwoner.openklant.wrap import (
 from open_inwoner.utils.views import CommonPageMixin
 
 
-def split_full_name(full_name: str) -> Tuple[str, str, str]:
-    # best effort to split a name (this is absolutely not correct)
-    full_name = re.sub(r"\s+", " ", full_name.strip())
-    firstname, lastname = full_name.split(" ", maxsplit=1)
-    return firstname, "", lastname
-
-
 class ContactFormView(CommonPageMixin, BaseBreadcrumbMixin, FormView):
     form_class = ContactForm
     template_name = "pages/contactform/form.html"
@@ -48,7 +41,9 @@ class ContactFormView(CommonPageMixin, BaseBreadcrumbMixin, FormView):
         if self.request.user.is_authenticated:
             initial.update(
                 {
-                    "name": self.request.user.get_full_name(),
+                    "first_name": self.request.user.first_name,
+                    "infix": self.request.user.infix,
+                    "last_name": self.request.user.last_name,
                     "email": self.request.user.email,
                     "phonenumber": self.request.user.phonenumber,
                 }
@@ -71,16 +66,20 @@ class ContactFormView(CommonPageMixin, BaseBreadcrumbMixin, FormView):
 
     def register_by_email(self, form, recipient_email):
         template = find_template("contactform_registration")
+
         context = {
             k: form.cleaned_data[k]
             for k in (
-                "name",
                 "subject",
                 "email",
                 "phonenumber",
                 "question",
             )
         }
+
+        parts = [form.cleaned_data[k] for k in ("first_name", "infix", "last_name")]
+        context["name"] = " ".join(p for p in parts if p)
+
         success = template.send_email([recipient_email], context)
 
         if success:
@@ -98,13 +97,11 @@ class ContactFormView(CommonPageMixin, BaseBreadcrumbMixin, FormView):
 
             # TODO update klant?
         else:
-            # TODO it is impossible to accurately split a single name into first/middle/last
-            firstname, _, lastname = split_full_name(form.cleaned_data["name"])
             data = {
                 "bronorganisatie": config.register_bronorganisatie_rsin,
-                "voornaam": firstname,
-                "achternaam": lastname,
-                "voorvoegselAchternaam": "",
+                "voornaam": form.cleaned_data["first_name"],
+                "voorvoegselAchternaam": form.cleaned_data["infix"],
+                "achternaam": form.cleaned_data["last_name"],
                 "emailadres": form.cleaned_data["email"],
                 "telefoonnummer": form.cleaned_data["phonenumber"],
             }
