@@ -90,9 +90,12 @@ class CustomRegistrationView(LogMixin, InviteMixin, RegistrationView):
             if invite_key
             else reverse("accounts:registration_necessary")
         )
-        context["digit_url"] = (
-            furl(reverse("digid:login")).add({"next": necessary_fields_url}).url
-        )
+        try:
+            context["digit_url"] = (
+                furl(reverse("digid:login")).add({"next": necessary_fields_url}).url
+            )
+        except:
+            context["digit_url"] = ""
         return context
 
     def get(self, request, *args, **kwargs):
