@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 
+from django.core.exceptions import PermissionDenied
 from django.http import Http404, JsonResponse
 from django.views import View
 
@@ -27,6 +28,7 @@ class APIMockView(View):
 
         endpoint = endpoint.rstrip("/")
 
+        # grab source dir
         base_dir = Path(__file__).parent.resolve()
         base_dir /= "apis"
 
@@ -34,7 +36,11 @@ class APIMockView(View):
         if not api_dir.exists():
             raise Http404("bad api_dir")
 
-        file_path = api_dir / (endpoint + ".json")
+        file_path = (api_dir / (endpoint + ".json")).resolve()
+
+        if base_dir not in file_path.parents:
+            raise PermissionDenied("bad traversal")
+
         if not file_path.exists():
             raise Http404("bad endpoint")
 
