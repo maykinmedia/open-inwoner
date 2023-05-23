@@ -4,7 +4,8 @@
 {% block content %}
 
 <div class="registration-grid">
-{% render_grid %}
+  {% render_grid %}
+   {% if digit_url %}
     {% render_column start=5 span=5 %}
         {% render_card direction='horizontal' tinted=True %}
             <a href="{% url 'digid:login' %}" class="link digid-logo" aria-describedby="Digid logo" title="Digid logo">
@@ -13,8 +14,9 @@
             {% link bold=True href=digit_url text=_('Registreren met DigiD') secondary=True icon='arrow_forward' %}
         {% endrender_card %}
     {% endrender_column %}
+  {% endif %}
 
-    {% if login_allow_registration %}
+  {% if login_allow_registration %}
         {% render_column start=5 span=5 %}
             {% render_card tinted=True  %}
                 <h1 class="h3">{% trans "Registreren met E-mail" %}</h1><br>
