@@ -1,0 +1,27 @@
+{
+    "uuid": "aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbb2",
+    "url": "https://contactmomenten.nl/api/v1/contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbb2",
+    "identificatie": "BA321",
+    "type": "OIP Contact Formulier",
+    "kanaal": "Contact Formulier",
+    "status": "afgehandeld",
+    "antwoord": "Hier is een vergunning voor nodig vanwege het bestemmingsplan. Deze kan je aanvragen bij loket woonzaken.",
+    "vorigContactmoment": null,
+    "volgendContactmoment": null,
+    "bronorganisatie": "WwXGZrg",
+    "registratiedatum": "2022-05-15T23:12:13+00:00",
+    "voorkeurskanaal": "xyz",
+    "voorkeurstaal": "vzT",
+    "tekst": "Mag ik mijn garage veranderen in een kantoor?\n\n",
+    "onderwerpLinks": [
+    ],
+    "initiatiefnemer": "gemeente",
+    "medewerker": "",
+    "medewerkerIdentificatie": null,
+    "klantcontactmomenten": [
+
+    ],
+    "objectcontactmomenten": [
+    ],
+    "onderwerp": "Verbouwing garage"
+}
