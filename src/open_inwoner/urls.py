@@ -93,6 +93,7 @@ urlpatterns = [
     path("oidc/", include("mozilla_django_oidc.urls")),
     path("faq/", FAQView.as_view(), name="general_faq"),
     path("yubin/", include("django_yubin.urls")),
+    path("apimock/", include("open_inwoner.apimock.urls")),
     # TODO move search to products cms app?
     path("", include("open_inwoner.search.urls", namespace="search")),
     re_path(r"^", include("cms.urls")),
