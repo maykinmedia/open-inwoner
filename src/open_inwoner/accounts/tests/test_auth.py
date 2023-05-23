@@ -245,6 +245,42 @@ class TestRegistrationFunctionality(WebTest):
             "* Een gebruiker met dit e-mailadres bestaat al",
         )
 
+    def test_registration_succeeds_with_2fa_sms_and_phonenumber(self):
+        self.config.login_2fa_sms = True
+        self.config.save()
+
+        register_page = self.app.get(reverse("django_registration_register"))
+        form = register_page.forms["registration-form"]
+        form["email"] = self.user.email
+        form["first_name"] = self.user.first_name
+        form["last_name"] = self.user.last_name
+        form["phonenumber"] = self.user.phonenumber
+        form["password1"] = self.user.password
+        form["password2"] = self.user.password
+        form.submit()
+        # Verify the registered user.
+        registered_user = User.objects.get(email=self.user.email)
+        self.assertEqual(registered_user.email, self.user.email)
+        self.assertTrue(registered_user.check_password(self.user.password))
+
+    def test_registration_fails_with_2fa_sms_and_no_phonenumber(self):
+        self.config.login_2fa_sms = True
+        self.config.save()
+
+        register_page = self.app.get(reverse("django_registration_register"))
+        form = register_page.forms["registration-form"]
+        form["email"] = self.user.email
+        form["first_name"] = self.user.first_name
+        form["last_name"] = self.user.last_name
+        form["password1"] = self.user.password
+        form["password2"] = self.user.password
+        response = form.submit()
+
+        self.assertEqual(
+            response.context["form"].errors,
+            {"phonenumber": [_("Dit veld is vereist.")]},
+        )
+
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestDigid(AssertRedirectsMixin, HaalCentraalMixin, WebTest):

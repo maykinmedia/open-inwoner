@@ -10,6 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from django_registration.forms import RegistrationForm
 
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openzaak.models import (
     OpenZaakConfig,
     ZaakTypeInformatieObjectTypeConfig,
@@ -43,10 +44,21 @@ class CustomRegistrationForm(RegistrationForm):
             "email",
             "first_name",
             "last_name",
+            "phonenumber",
             "password1",
             "password2",
             "invite",
         )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # make phonenumber required when 2fa-sms login is enabled
+        config = SiteConfiguration.get_solo()
+        if not config.login_2fa_sms:
+            del self.fields["phonenumber"]
+        else:
+            self.fields["phonenumber"].required = True
 
     def clean_email(self):
         email = self.cleaned_data["email"]
