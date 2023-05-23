@@ -1,8 +1,11 @@
 const fileUploadInput = document.getElementById('id_file')
 const sizeInfo = document.getElementById('upload_size')
 const nameInfo = document.getElementById('upload_name')
+const validationInfo = document.getElementById('upload_error')
 const closeButton = document.getElementById('close_upload')
 const submit_upload = document.getElementById('submit_upload')
+// show/hide after validation
+const iconDrive = document.querySelectorAll('.drive')
 // show info
 const formControlInfo = document.querySelectorAll('.form__control--info')
 
@@ -15,6 +18,12 @@ if (fileUploadInput) {
   }
   // initial values
   submit_upload.disabled = true
+  validationInfo.classList.add('error')
+  closeButton.classList.add('error')
+  iconDrive.forEach((elem) => {
+    elem.classList.add('error')
+  })
+
   formControlInfo.forEach((elem) => {
     elem.style.display = 'none'
   })
@@ -24,12 +33,24 @@ if (fileUploadInput) {
 
     if ((files.length === 0) | (files === null) | (files === undefined)) {
       submit_upload.disabled = true
+      validationInfo.classList.add('error')
+      closeButton.classList.add('error')
+      iconDrive.forEach((elem) => {
+        elem.classList.add('error')
+      })
+
       // Hide the size element if user doesn't choose any file
       formControlInfo.forEach((elem) => {
         elem.style.display = 'none'
       })
     } else {
       submit_upload.disabled = false
+      validationInfo.classList.remove('error')
+      closeButton.classList.remove('error')
+      iconDrive.forEach((elem) => {
+        elem.classList.remove('error')
+      })
+
       // Display info
       sizeInfo.textContent = formatFileSize(files[0].size)
       nameInfo.textContent = `${files[0].name}`
@@ -43,6 +64,12 @@ if (fileUploadInput) {
   if (closeButton) {
     closeButton.addEventListener('click', (event) => {
       submit_upload.disabled = true
+      validationInfo.classList.remove('error')
+      closeButton.classList.remove('error')
+      iconDrive.forEach((elem) => {
+        elem.classList.remove('error')
+      })
+
       formControlInfo.forEach((elem) => {
         elem.style.display = 'none'
       })

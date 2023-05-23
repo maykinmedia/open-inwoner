@@ -148,8 +148,20 @@ input[type='file']::file-selector-button {
     }
   }
 
+  .drive {
+    display: block;
+
+    &.error {
+      display: none;
+    }
+  }
+
   .close .button--transparent {
     color: var(--color-red);
+
+    &.error {
+      display: none;
+    }
   }
 
   .info-container {
@@ -185,6 +197,28 @@ input[type='file']::file-selector-button {
         &__name {
           color: var(--font-color-body);
           font-weight: bold;
+        }
+
+        &__error {
+          display: none;
+          position: relative;
+
+          & *[class*='icon'] {
+            position: absolute;
+            top: var(--spacing-small);
+            right: -100px;
+            color: var(--color-primary);
+          }
+
+          &.error {
+            color: var(--font-color-body);
+            font-weight: bold;
+            font-size: 19px;
+            line-height: var(--spacing-giant);
+            display: block;
+            margin-left: calc(-1 * (var(--spacing-large)));
+            overflow: initial;
+          }
         }
       }
     }

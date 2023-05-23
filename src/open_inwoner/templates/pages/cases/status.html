@@ -50,12 +50,14 @@
                         {% render_form id="document-upload" form=form method="POST" submit_text=_("Bestand uploaden") enctype="multipart/form-data" show_required=True %}
                             {% csrf_token %}
                             <div id="info_container" class="info-container form__control--info">
-                                <div class="drive">
+                                <div class="upload-interface__info">
                                     <fieldset class="fieldset-container">
                                         <div class="drive">{% icon icon="insert_drive_file" outlined=True icon_position="before" %}</div>
                                         <div class="fieldset__content">
-                                            <div id="upload_name" class="upload-info upload-info__name"><span>{% trans "(Titel bestand)" %}</span></div>
-                                            <div id="upload_size" class="upload-info upload-info__size"><span>{% trans "(Bestandsgrootte)" %}</span></div>
+                                            <div id="upload_error" class="upload-info upload-info__error">
+                                                <span>{% trans "Selecteer uw bestand opnieuw" %} {% icon icon="arrow_downward" outlined=True icon_position="before" %}</span></div>
+                                            <div id="upload_name" class="upload-info upload-info__name"></div>
+                                            <div id="upload_size" class="upload-info upload-info__size"></div>
                                         </div>
                                         <div class="close">{% button id="close_upload" icon="cancel" type='reset' text='' transparent=True icon_outlined=True icon_position="before" %}</div>
                                     </fieldset>
