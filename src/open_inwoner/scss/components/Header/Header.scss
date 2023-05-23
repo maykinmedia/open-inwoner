@@ -19,12 +19,9 @@ $vm: var(--spacing-large);
   .indicator {
     display: inline-block;
     position: relative;
-    margin-left: var(--spacing-medium);
+    margin-left: var(--spacing-large);
     overflow: visible;
     text-align: center;
-    @media (min-width: 768px) {
-      top: -6px;
-    }
 
     .link,
     &__link {
@@ -277,10 +274,6 @@ $vm: var(--spacing-large);
           overflow-x: visible;
           justify-content: flex-end;
           position: relative;
-
-          &-item > .indicator > .indicator__dot {
-            right: var(--spacing-large);
-          }
         }
       }
     }
