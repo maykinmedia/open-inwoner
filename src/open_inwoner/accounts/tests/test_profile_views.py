@@ -1,3 +1,5 @@
+from dataclasses import asdict
+from datetime import date
 from unittest.mock import patch
 
 from django.test import override_settings
@@ -21,6 +23,7 @@ from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin, create_imag
 from ...cms.profile.cms_apps import ProfileApphook
 from ...cms.tests import cms_tools
 from ...openklant.tests.data import MockAPIReadPatchData
+from ...haalcentraal.api_models import BRPData
 from ...questionnaire.tests.factories import QuestionnaireStepFactory
 from ..choices import ContactTypeChoices, LoginTypeChoices
 from ..forms import BrpUserForm, UserForm
@@ -610,20 +613,22 @@ class ProfileDeleteTest(WebTest):
 @requests_mock.Mocker()
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class MyDataTests(HaalCentraalMixin, WebTest):
-    expected_response = {
-        "first_name": "Merel",
-        "initials": "M.",
-        "last_name": "Kooyman",
-        "prefix": "de",
-        "birthday": "10-04-1982",
-        "birthday_place": "Leerdam",
-        "gender": "vrouw",
-        "street": "King Olivereiland",
-        "house_number": 64,
-        "postcode": "2551JV",
-        "place": "'s-Gravenhage",
-        "land": None,
-    }
+    maxDiff = None
+
+    expected_response = BRPData(
+        first_name="Merel",
+        initials="M.",
+        last_name="Kooyman",
+        infix="de",
+        birthday=date(1982, 4, 10),
+        birthday_city="Leerdam",
+        gender="vrouw",
+        street="King Olivereiland",
+        housenumber="64",
+        postcode="2551JV",
+        city="'s-Gravenhage",
+        country="",
+    )
 
     def setUp(self):
         self.user = UserFactory(
@@ -642,8 +647,8 @@ class MyDataTests(HaalCentraalMixin, WebTest):
         log_entry = TimelineLog.objects.last()
 
         self.assertEqual(
-            response.context["my_data"],
-            self.expected_response,
+            asdict(response.context["my_data"]),
+            asdict(self.expected_response),
         )
         self.assertEqual(
             log_entry.extra_data,
@@ -663,8 +668,8 @@ class MyDataTests(HaalCentraalMixin, WebTest):
         log_entry = TimelineLog.objects.last()
 
         self.assertEqual(
-            response.context["my_data"],
-            self.expected_response,
+            asdict(response.context["my_data"]),
+            asdict(self.expected_response),
         )
         self.assertEqual(
             log_entry.extra_data,
@@ -698,7 +703,7 @@ class MyDataTests(HaalCentraalMixin, WebTest):
         response = self.app.get(self.url, user=self.user)
         log_entry = TimelineLog.objects.last()
 
-        self.assertIsNone(response.context["my_data"]["birthday"])
+        self.assertIsNone(response.context["my_data"].birthday)
         self.assertEqual(
             log_entry.extra_data,
             {
