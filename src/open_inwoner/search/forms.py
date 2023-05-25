@@ -15,6 +15,10 @@ class MultipleChoiceNoValidationField(forms.MultipleChoiceField):
 
 
 class SearchForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["query"].widget.attrs["placeholder"] = _("Zoeken...")
+
     query = forms.CharField(
         label=_("Zoek op trefwoord"), max_length=400, required=False
     )

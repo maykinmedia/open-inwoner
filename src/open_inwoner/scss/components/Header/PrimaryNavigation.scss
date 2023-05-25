@@ -71,6 +71,11 @@
         flex-direction: row;
         justify-content: flex-start;
         align-items: center;
+        margin-bottom: var(--spacing-medium);
+
+        @media (min-width: 768px) {
+          margin-bottom: 0;
+        }
       }
 
       @media (min-width: 768px) {
@@ -97,6 +102,8 @@
   /// Dropdown triangles
 
   &.primary-navigation__main .subpage-list {
+    left: -11px;
+
     @media (min-width: 768px) {
       &::before {
         box-sizing: border-box;
@@ -210,11 +217,6 @@
 
   /// Categories and authenticated nested list
 
-  &__main > &__list > &__list-item &__list {
-    @media (min-width: 768px) {
-      left: -11px;
-    }
-  }
   &__authenticated > &__list > &__list-item &__list {
     @media (min-width: 768px) {
       right: 0;
@@ -283,6 +285,7 @@
   @media (max-width: 767px) {
     & > &__list > &__list-item > &__list.subpage-list {
       margin-bottom: var(--spacing-medium);
+      margin-left: 2em;
     }
   }
 }

@@ -16,12 +16,12 @@
         {% logo src=config.logo.file.url alt=logo_alt_text svg_height=75 %}
 
         {% if request.user.is_authenticated %}
-            <span class="nav-login--icon">{% icon icon="how_to_reg" icon_position="before" icon_outlined=True %}</span>
+            <span class="nav-login--icon">{% icon icon="how_to_reg" icon_position="before" outlined=True %}</span>
         {% elif config.login_show %}
             <span class="nav-login--icon">
                 {% url 'login' as login_url %}
                 {% trans "Inloggen" as login %}
-                {% button text="Inloggen" href=login_url icon="person" icon_position="before" primary=True icon_outlined=True transparent=True %}
+                {% button text="" title="Inloggen" href=login_url icon="person" icon_position="before" primary=True icon_outlined=True transparent=True %}
             </span>
         {% endif %}
 
