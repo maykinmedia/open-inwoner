@@ -36,6 +36,14 @@ def validate_phone_number(value):
     return value
 
 
+def format_phone_number(value):
+    if value[0:2] == "00":
+        value = "+{val}".format(val=value[2:])
+    elif value[0] == "0":
+        value = "+31{val}".format(val=value[1:])
+    return value.strip().replace("-", "").replace(" ", "")
+
+
 class CustomRegexValidator(RegexValidator):
     """
     CustomRegexValidator because the validated value is append to the message.

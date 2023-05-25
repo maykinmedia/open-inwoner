@@ -3,7 +3,7 @@
 <form
     class="{{ classes }}"
     method="{{ method }}"
-    action="{% firstof form_action request.path %}"
+    {% if no_action %}action=""{% else %}action="{% firstof form_action request.path %}"{% endif %}
     {% if enctype %}enctype="{{enctype}}"{% endif %}
     {% if id %}id="{{id}}"{% endif %}
     {% if data_confirm_title %}data-confirm-title="{{ data_confirm_title }}"{% endif %}

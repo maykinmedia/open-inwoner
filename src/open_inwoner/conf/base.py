@@ -191,6 +191,7 @@ INSTALLED_APPS = [
     "django_htmx",
     "django_yubin",
     "log_outgoing_requests",
+    "formtools",
     # Project applications.
     "open_inwoner.components",
     "open_inwoner.ckeditor5",
@@ -825,6 +826,21 @@ OIDC_CALLBACK_CLASS = "mozilla_django_oidc_db.views.OIDCCallbackView"
 OIDC_AUTHENTICATION_CALLBACK_URL = "oidc_authentication_callback"
 MOZILLA_DJANGO_OIDC_DB_CACHE = "oidc"
 MOZILLA_DJANGO_OIDC_DB_CACHE_TIMEOUT = 1
+
+#
+# 2FA SMS Verification
+#
+
+MESSAGE_BIRD_ACCESS_KEY = os.getenv("MESSAGE_BIRD_ACCESS_KEY")
+ACCOUNTS_USER_TOKEN_EXPIRE_TIME = 300
+ACCOUNTS_SMS_MESSAGE = "Open Inwoner Platform Bevestigingscode: {token} (deze code is geldig voor 5 minuten)"
+ACCOUNTS_SMS_GATEWAY = {
+    "BACKEND": config(
+        "ACCOUNTS_SMS_GATEWAY_BACKEND", "open_inwoner.accounts.gateways.Dummy"
+    ),
+    "API_KEY": config("ACCOUNTS_SMS_GATEWAY_API_KEY", "openinwoner"),
+    "ORIGINATOR": config("ACCOUNTS_SMS_GATEWAY_ORIGINATOR", "openinwoner"),
+}
 
 from .app.csp import *  # noqa
 

@@ -25,6 +25,12 @@ from .csrf import csrf_failure
 from .document import DocumentPrivateMediaView
 from .documents import DocumentDeleteView
 from .invite import InviteAcceptView
+from .login import (
+    AddPhoneNumberWizardView,
+    CustomLoginView,
+    ResendTokenView,
+    VerifyTokenView,
+)
 from .password_reset import PasswordResetView
 from .profile import (
     EditProfileView,

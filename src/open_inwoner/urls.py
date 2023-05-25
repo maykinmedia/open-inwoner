@@ -11,13 +11,17 @@ from mozilla_django_oidc_db.views import AdminLoginFailure
 
 from open_inwoner.accounts.forms import CustomRegistrationForm
 from open_inwoner.accounts.views import (
+    AddPhoneNumberWizardView,
     CustomDigiDAssertionConsumerServiceMockView,
     CustomDigiDAssertionConsumerServiceView,
+    CustomLoginView,
     CustomRegistrationView,
     LogPasswordChangeView,
     LogPasswordResetConfirmView,
     LogPasswordResetView,
     PasswordResetView,
+    ResendTokenView,
+    VerifyTokenView,
 )
 from open_inwoner.pdc.views import FAQView, HomeView
 
@@ -73,6 +77,14 @@ urlpatterns = [
         "accounts/reset/<uidb64>/<token>/",
         LogPasswordResetConfirmView.as_view(),
         name="password_reset_confirm",
+    ),
+    path("accounts/login/", CustomLoginView.as_view(), name="login"),
+    path("accounts/verify/", VerifyTokenView.as_view(), name="verify_token"),
+    path("accounts/resend-token/", ResendTokenView.as_view(), name="resend_token"),
+    path(
+        "accounts/add_phone_number/",
+        AddPhoneNumberWizardView.as_view(),
+        name="add_phone_number",
     ),
     path("accounts/", include("django_registration.backends.one_step.urls")),
     path("accounts/", include("django.contrib.auth.urls")),
