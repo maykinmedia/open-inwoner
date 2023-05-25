@@ -19,22 +19,19 @@ $vm: var(--spacing-large);
   .indicator {
     display: inline-block;
     position: relative;
-    margin-left: var(--spacing-medium);
+    margin-left: var(--spacing-large);
+    overflow: visible;
     text-align: center;
-    @media (min-width: 768px) {
-      top: -6px;
-    }
 
     .link,
     &__link {
       font-size: var(--font-size-body-small);
       color: var(--color-black);
-      //display: inline-block;
       position: relative;
-      background-color: var(--color-gray);
+      background-color: var(--color-gray-lightest);
       border-radius: var(--border-radius);
-      padding: var(--spacing-small);
-      //min-width: var(--spacing-large);
+      padding: var(--spacing-small) var(--spacing-medium);
+      overflow: initial !important;
       height: var(--spacing-large);
 
       .link__text {
@@ -44,12 +41,13 @@ $vm: var(--spacing-large);
 
     &__dot {
       position: absolute;
-      top: 0px;
-      right: 0px;
-      background-color: var(--color-red);
+      top: -4px;
+      right: -4px;
+      background-color: var(--color-red-notification);
       height: 6px;
       width: 6px;
       display: inline-block;
+      border: 2px solid white;
       border-radius: 100px; // This is big to make sure the corners are rounded properly.
     }
   }
@@ -275,6 +273,7 @@ $vm: var(--spacing-large);
         .primary-navigation__list {
           overflow-x: visible;
           justify-content: flex-end;
+          position: relative;
         }
       }
     }
@@ -414,6 +413,7 @@ $vm: var(--spacing-large);
         > .primary-navigation__list-item {
         display: flex;
         flex-direction: row;
+        overflow: initial;
 
         &.dropdown-nav__toggle {
           flex-direction: column;
