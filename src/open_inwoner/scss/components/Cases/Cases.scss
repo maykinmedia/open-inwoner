@@ -13,6 +13,12 @@
   }
 }
 
+.loader-container {
+  &--hide {
+    display: none;
+  }
+}
+
 #document-upload {
   /// Make required asterisk visible for this component
   .label__label--required {

@@ -1,16 +1,11 @@
-class DisableSpinner {
-  constructor(node) {
-    this.node = node
-    this.node.addEventListener('htmx:afterSwap', this.hideSpinner.bind(this))
-  }
+const htmx = (window.htmx = require('htmx.org'))
 
-  hideSpinner() {
-    const spinner = document.getElementById('spinner-id')
-    spinner.classList.add('loader-container--hide')
-  }
-}
-
-const spinnerLoaders = document.querySelectorAll('loader-container')
-;[...spinnerLoaders].forEach(
-  (spinnerLoader) => new DisableSpinner(spinnerLoader)
-)
+htmx.on('htmx:afterSwap', (e) => {
+  if (
+    e.detail.target.id === 'cases-content' ||
+    e.detail.target.id === 'submissions-content'
+  )
+    document
+      .getElementById('spinner-container')
+      .classList.add('loader-container--hide')
+})

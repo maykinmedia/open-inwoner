@@ -1,0 +1,18 @@
+{% extends 'master.html' %}
+{% load i18n anchor_menu_tags %}
+
+{% block sidebar_content %}
+    {% if case %}
+        {% anchor_menu anchors desktop=True %}
+    {% endif %}
+{% endblock sidebar_content %}
+
+{% block content %}
+    <div class="cases__detail" id="cases-detail-content"><div>
+    
+    <div class="loader-container" id="spinner-container">
+        <div class="spinner" id="spinner-id" hx-get="{{ hxget }}" hx-trigger="load" hx-target="#cases-detail-content">
+            <i class="fas fa-spinner fa-spin fa-lg"></i>
+        </div>
+    </div>
+{% endblock content %}

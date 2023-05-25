@@ -1,5 +1,3 @@
-import os
-
 from django import forms
 from django.conf import settings
 from django.contrib.auth.forms import PasswordResetForm
@@ -11,10 +9,6 @@ from django.utils.translation import ugettext_lazy as _
 from django_registration.forms import RegistrationForm
 
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.openzaak.models import (
-    OpenZaakConfig,
-    ZaakTypeInformatieObjectTypeConfig,
-)
 from open_inwoner.pdc.models.category import Category
 from open_inwoner.utils.forms import LimitedUploadFileField, PrivateFileWidget
 from open_inwoner.utils.validators import validate_charfield_entry
@@ -467,51 +461,3 @@ class ActionListForm(forms.ModelForm):
     def __init__(self, users, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["is_for"].queryset = User.objects.filter(pk__in=users)
-
-
-class CaseUploadForm(forms.Form):
-    title = forms.CharField(
-        label=_("Titel document"), max_length=255, validators=[validate_charfield_entry]
-    )
-    type = forms.ModelChoiceField(
-        ZaakTypeInformatieObjectTypeConfig.objects.none(),
-        empty_label=None,
-        label=_("Bestand type"),
-    )
-    file = forms.FileField(label=_("Bestand"))
-
-    def __init__(self, case, **kwargs):
-        super().__init__(**kwargs)
-
-        if case:
-            self.fields[
-                "type"
-            ].queryset = ZaakTypeInformatieObjectTypeConfig.objects.filter_enabled_for_case_type(
-                case.zaaktype
-            )
-
-        choices = self.fields["type"].choices
-
-        if choices and len(choices) == 1:
-            self.fields["type"].initial = list(choices)[0][0].value
-            self.fields["type"].widget = forms.HiddenInput()
-
-    def clean_file(self):
-        file = self.cleaned_data["file"]
-
-        config = OpenZaakConfig.get_solo()
-        max_allowed_size = 1024**2 * config.max_upload_size
-        allowed_extensions = sorted(config.allowed_file_extensions)
-        filename, file_extension = os.path.splitext(file.name)
-
-        if file.size > max_allowed_size:
-            raise ValidationError(
-                f"Een aangeleverd bestand dient maximaal {config.max_upload_size} MB te zijn, uw bestand is te groot."
-            )
-
-        if file_extension.lower().replace(".", "") not in allowed_extensions:
-            raise ValidationError(
-                f"Het type bestand dat u hebt geüpload is ongeldig. Geldige bestandstypen zijn: {', '.join(allowed_extensions)}"
-            )
-
-        return file

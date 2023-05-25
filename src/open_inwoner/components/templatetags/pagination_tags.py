@@ -19,7 +19,7 @@ def pagination(page_obj, paginator, request, lookaround=3, **kwargs):
 
     Extra context:
         - page_numbers: int | The number of pages to show before showing the dots.
-        - hxget: str | The reversible url to which we want to perform an htmx request
+        - hxget: str | The url we want to perform an htmx request to
         - hxtarget: str | The target element we want to swap
     """
     page_numbers = [

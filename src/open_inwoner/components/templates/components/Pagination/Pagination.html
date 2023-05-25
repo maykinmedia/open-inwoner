@@ -9,7 +9,7 @@
         {% if page_obj.has_previous %}
             <a class="pagination__link" 
                 {% if hxget %}
-                    hx-get="{% url hxget %}?{% querystring key='page' value=page_obj.previous_page_number %}" hx-trigger="click" hx-target="{{ hxtarget }}"
+                    hx-get="{{ hxget }}?{% querystring key='page' value=page_obj.previous_page_number %}" hx-trigger="click" hx-target="{{ hxtarget }}"
                 {% else %}
                     href="?{% querystring key='page' value=page_obj.previous_page_number %}"
                 {% endif %}>
@@ -26,7 +26,7 @@
                 {% if i in page_numbers %}
                     <a class="pagination__link" 
                         {% if hxget %}
-                            hx-get="{% url hxget %}?{% querystring key='page' value=i %}" hx-trigger="click" hx-target="{{ hxtarget }}"
+                            hx-get="{{ hxget }}?{% querystring key='page' value=i %}" hx-trigger="click" hx-target="{{ hxtarget }}"
                         {% else %}
                             href="?{% querystring key='page' value=i %}"
                         {% endif %}
@@ -37,7 +37,7 @@
                     {% if i == 1 %}
                         <a class="pagination__link" 
                             {% if hxget %}
-                                hx-get="{% url hxget %}?{% querystring key='page' value=i %}" hx-trigger="click" hx-target="{{ hxtarget }}"
+                                hx-get="{{ hxget }}?{% querystring key='page' value=i %}" hx-trigger="click" hx-target="{{ hxtarget }}"
                             {% else %}
                                 href="?{% querystring key='page' value=i %}"
                             {% endif %}
@@ -57,7 +57,7 @@
 
                         <a class="pagination__link" 
                             {% if hxget %}
-                                hx-get="{% url hxget %}?{% querystring key='page' value=i %}" hx-trigger="click" hx-target="{{ hxtarget }}"
+                                hx-get="{{ hxget }}?{% querystring key='page' value=i %}" hx-trigger="click" hx-target="{{ hxtarget }}"
                             {% else %}
                                 href="?{% querystring key='page' value=i %}"
                             {% endif %}
@@ -72,7 +72,7 @@
         {% if page_obj.has_next %}
             <a class="pagination__link" 
                 {% if hxget %}
-                    hx-get="{% url hxget %}?{% querystring key='page' value=page_obj.next_page_number %}" hx-trigger="click" hx-target="{{ hxtarget }}"
+                    hx-get="{{ hxget }}?{% querystring key='page' value=page_obj.next_page_number %}" hx-trigger="click" hx-target="{{ hxtarget }}"
                 {% else %}
                     href="?{% querystring key='page' value=page_obj.next_page_number %}"
                 {% endif %}

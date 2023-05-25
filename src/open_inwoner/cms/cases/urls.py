@@ -1,18 +1,21 @@
 from django.urls import path
 from django.views.generic import RedirectView
 
-from open_inwoner.accounts.views.cases import (
-    CaseDetailView,
-    CaseDocumentDownloadView,
-    InnerClosedCaseListView,
-    InnerOpenCaseListView,
-    OpenSubmissionListView,
-    OuterClosedCaseListView,
-    OuterOpenCaseListView,
-)
 from open_inwoner.accounts.views.contactmoments import (
     KlantContactMomentDetailView,
     KlantContactMomentListView,
+)
+
+from .views import (
+    CaseDocumentDownloadView,
+    InnerCaseDetailView,
+    InnerClosedCaseListView,
+    InnerOpenCaseListView,
+    InnerOpenSubmissionListView,
+    OuterCaseDetailView,
+    OuterClosedCaseListView,
+    OuterOpenCaseListView,
+    OuterOpenSubmissionListView,
 )
 
 app_name = "cases"
@@ -22,7 +25,12 @@ urlpatterns = [
         "closed/content", InnerClosedCaseListView.as_view(), name="closed_cases_content"
     ),
     path("closed/", OuterClosedCaseListView.as_view(), name="closed_cases"),
-    path("forms/", OpenSubmissionListView.as_view(), name="open_submissions"),
+    path("forms/", OuterOpenSubmissionListView.as_view(), name="open_submissions"),
+    path(
+        "forms/content",
+        InnerOpenSubmissionListView.as_view(),
+        name="open_submissions_content",
+    ),
     path(
         "contactmomenten/",
         KlantContactMomentListView.as_view(),
@@ -39,8 +47,13 @@ urlpatterns = [
         name="document_download",
     ),
     path(
+        "<str:object_id>/status/content/",
+        InnerCaseDetailView.as_view(),
+        name="case_detail_content",
+    ),
+    path(
         "<str:object_id>/status/",
-        CaseDetailView.as_view(),
+        OuterCaseDetailView.as_view(),
         name="case_detail",
     ),
     path("open/", RedirectView.as_view(pattern_name="cases:open_cases"), name="index"),

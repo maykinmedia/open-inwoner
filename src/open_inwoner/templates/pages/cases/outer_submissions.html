@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n anchor_menu_tags grid_tags icon_tags link_tags list_tags pagination_tags utils %}
+{% load i18n button_tags anchor_menu_tags card_tags grid_tags icon_tags link_tags list_tags pagination_tags utils %}
 
 {% block sidebar_content %}
     {% anchor_menu anchors=anchors desktop=True %}
@@ -8,10 +8,10 @@
 {% block content %}
     <h1 class="h1" id="title">{% trans "Mijn aanvragen" %}</h1>
     
-    <div class="cases" id="cases-content"></div>
+    <div class="cases" id="submissions-content"></div>
     
     <div class="loader-container" id="spinner-container">
-        <div class="spinner" id="spinner-id" hx-get="{{ hxget }}" hx-trigger="load" hx-target="#cases-content">
+        <div class="spinner" id="spinner-id" hx-get="{{ hxget }}" hx-trigger="load" hx-target="#submissions-content">
             <i class="fas fa-spinner fa-spin fa-lg"></i>
         </div>
     </div>
