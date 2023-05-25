@@ -13,7 +13,7 @@ $vm: var(--spacing-large);
 
   @media (min-width: 768px) {
     position: relative;
-    margin-bottom: var(--spacing-medium);
+    margin-bottom: var(--spacing-tiny);
   }
 
   .indicator {
@@ -91,8 +91,13 @@ $vm: var(--spacing-large);
     // Tablet search bar
     @media screen and (min-width: 768px) and (max-width: 910px) {
       > .header__actions {
-        grid-column: 4 / span 8;
+        grid-column: 1 / span 12;
         grid-row: 2;
+        margin-bottom: var(--spacing-medium);
+
+        .form__control > .label .input {
+          max-width: 100%;
+        }
       }
     }
 
@@ -118,7 +123,7 @@ $vm: var(--spacing-large);
       }
 
       @media screen and (min-width: 768px) and (max-width: 910px) {
-        grid-column: 9 / span 3;
+        grid-column: 10 / span 3;
       }
     }
   }
@@ -131,27 +136,28 @@ $vm: var(--spacing-large);
     box-sizing: border-box;
     width: fit-content;
 
+    @media screen and (max-width: 360px) {
+      margin-left: var(--spacing-tiny);
+    }
     @media (min-width: 768px) {
       height: auto;
       grid-column: 1 / span 6;
       margin: 0;
     }
-    @media (max-width: 767px) {
+    @media screen and (min-width: 361px) and (max-width: 767px) {
       padding: 8px;
       margin-right: auto;
-      margin-left: 1em;
+      margin-left: var(--spacing-large);
     }
 
     img {
-      max-height: 75px;
-      width: 100%;
-      max-width: fit-content;
+      max-height: 50px;
+      max-width: 100%;
     }
   }
 
   &__menu {
     display: flex;
-    justify-content: space-between;
     margin: 0 var(--spacing-large) 0 var(--spacing-large);
 
     @media (min-width: 768px) {
@@ -266,8 +272,9 @@ $vm: var(--spacing-large);
         grid-row: 1;
         grid-column: 11 / span 2;
 
+        // Tablet menu
         @media screen and (min-width: 768px) and (max-width: 910px) {
-          grid-column: 9 / span 3;
+          grid-column: 10 / span 3;
         }
 
         .primary-navigation__list {
@@ -415,6 +422,10 @@ $vm: var(--spacing-large);
         flex-direction: row;
         overflow: initial;
 
+        .link--icon {
+          gap: var(--spacing-large);
+        }
+
         &.dropdown-nav__toggle {
           flex-direction: column;
         }
@@ -473,7 +484,7 @@ $vm: var(--spacing-large);
           }
 
           .form--inline {
-            padding: var(--spacing-extra-large) 0 var(--spacing-extra-large);
+            padding: 19px 0 var(--spacing-extra-large);
             margin: 0;
           }
         }
@@ -485,6 +496,7 @@ $vm: var(--spacing-large);
 
           .primary-navigation {
             border-bottom: 1px solid var(--color-gray-light);
+            padding-bottom: var(--spacing-medium);
           }
 
           > .primary-navigation
