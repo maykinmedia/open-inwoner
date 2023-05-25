@@ -660,7 +660,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         )
 
         self.assertContains(
-            response, _("Grootte max. 50 MB, toegestane bestandsformaten")
+            response, _("Grootte max. 50 MB, toegestane document formaten:")
         )
 
     def test_upload_form_is_not_rendered_when_no_case_exists(self, m):

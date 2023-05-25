@@ -28,6 +28,12 @@
     .close {
       display: block;
     }
+
+    .input-file {
+      .label__label--required {
+        display: none;
+      }
+    }
   }
 }
 
