@@ -24,16 +24,18 @@ def log_user_login(sender, user, request, *args, **kwargs):
     current_path = request.path
 
     try:
-        if current_path == reverse("admin:login"):
-            user_action(request, user, MESSAGE_TYPE["admin"])
-        elif current_path == reverse("digid:acs"):
-            user_action(request, user, MESSAGE_TYPE["frontend_digid"])
-        elif current_path == reverse("oidc_authentication_callback"):
-            user_action(request, user, MESSAGE_TYPE["frontend_oidc"])
-        else:
-            user_action(request, user, MESSAGE_TYPE["frontend_email"])
+        digid_path = reverse("digid:acs")
     except:
-        pass
+        digid_path = ""
+
+    if current_path == reverse("admin:login"):
+        user_action(request, user, MESSAGE_TYPE["admin"])
+    elif digid_path and current_path == digid_path:
+        user_action(request, user, MESSAGE_TYPE["frontend_digid"])
+    elif current_path == reverse("oidc_authentication_callback"):
+        user_action(request, user, MESSAGE_TYPE["frontend_oidc"])
+    else:
+        user_action(request, user, MESSAGE_TYPE["frontend_email"])
 
     # update brp fields when login with digid and brp is configured
     brp_config = HaalCentraalConfig.get_solo()
