@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.contrib.auth import REDIRECT_FIELD_NAME, get_user_model, login as auth_login
 from django.contrib.auth.views import LoginView
 from django.core.signing import BadSignature, SignatureExpired, TimestampSigner
-from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.http import is_safe_url, urlencode
@@ -14,6 +14,7 @@ from django.views.decorators.cache import never_cache
 from django.views.generic import FormView, View
 
 from formtools.wizard.views import SessionWizardView
+from furl import furl
 from oath import totp
 
 from open_inwoner.configurations.models import SiteConfiguration
@@ -22,6 +23,7 @@ from open_inwoner.utils.views import LogMixin
 
 from ..forms import PhoneNumberForm, VerifyTokenForm
 from ..gateways import GatewayError, gateway
+from ..models import User
 
 signer = TimestampSigner()
 
@@ -51,8 +53,8 @@ class CustomLoginView(LogMixin, LoginView):
 
         if not user.phonenumber:
             # Redirect to add mobile phone number view
-            return HttpResponseRedirect(
-                reverse("add_phone_number") + "?" + urlencode(params)
+            return redirect(
+                furl(reverse("add_phone_number")).add(urlencode(params)).url
             )
 
         # Two factor: Send SMS
@@ -77,7 +79,7 @@ class CustomLoginView(LogMixin, LoginView):
                 user,
                 f"Het versturen van een SMS-bericht aan {user.phonenumber} is mislukt. Inloggen afgebroken.",
             )
-            return HttpResponseRedirect(reverse("pages-root"))
+            return redirect(reverse("pages-root"))
         else:
             self.log_user_action(
                 user,
@@ -86,7 +88,7 @@ class CustomLoginView(LogMixin, LoginView):
 
             messages.debug(self.request, gateway.get_message(token))
 
-        return HttpResponseRedirect(reverse("verify_token") + "?" + urlencode(params))
+        return redirect(furl(reverse("verify_token")).add(urlencode(params)).url)
 
 
 class VerifyTokenView(ThrottleMixin, FormView):
@@ -120,14 +122,13 @@ class VerifyTokenView(ThrottleMixin, FormView):
 
     @method_decorator(never_cache)
     def dispatch(self, request, *args, **kwargs):
-        UserModel = get_user_model()
         try:
             max_age = getattr(settings, "ACCOUNTS_USER_TOKEN_EXPIRE_TIME", 300)
-            self.user_cache = UserModel.objects.get(
+            self.user_cache = User.objects.get(
                 pk=signer.unsign(request.GET.get("user"), max_age=max_age)
             )
-        except (UserModel.DoesNotExist, BadSignature, SignatureExpired):
-            return HttpResponseRedirect(reverse("login"))
+        except (User.DoesNotExist, BadSignature, SignatureExpired):
+            return redirect(reverse("login"))
 
         if (
             self.should_be_throttled()
@@ -165,7 +166,7 @@ class VerifyTokenView(ThrottleMixin, FormView):
 
     def get(self, request, *args, **kwargs):
         if not request.user.is_anonymous:
-            return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
+            return redirect(settings.LOGIN_REDIRECT_URL)
 
         return super().get(request, *args, **kwargs)
 
@@ -222,24 +223,20 @@ class ResendTokenView(ThrottleMixin, LogMixin, View):
         else:
             self.user_cache = request.user
         if not self.user_cache:
-            return HttpResponseRedirect(reverse("login"))
+            return redirect(reverse("login"))
 
         return super().dispatch(request, *args, **kwargs)
 
     def get_verification_location(self, request, user):
         url_part = reverse(self.url_name)
-        location = request.META.get("HTTP_REFERER", url_part)
-
-        if "user=" not in location:
-            params = {"user": signer.sign(user.pk)}
-            location = location + "?" + urlencode(params)
-
-        return HttpResponseRedirect(location)
+        params = {"user": signer.sign(user.pk)}
+        location = furl(url_part).add(urlencode(params)).url
+        return redirect(location)
 
     def post(self, request):
         user = self.user_cache
         if user.is_anonymous:
-            return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
+            return redirect(settings.LOGIN_REDIRECT_URL)
 
         # Two factor: Send SMS
         token = totp(
@@ -296,7 +293,7 @@ class AddPhoneNumberWizardView(LogMixin, SessionWizardView):
                 pk=signer.unsign(request.GET.get("user"), max_age=max_age)
             )
         except (UserModel.DoesNotExist, BadSignature, SignatureExpired):
-            return HttpResponseRedirect(reverse("login"))
+            return redirect(reverse("login"))
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -335,7 +332,7 @@ class AddPhoneNumberWizardView(LogMixin, SessionWizardView):
                     self.user_cache,
                     f"Het versturen van een SMS-bericht aan {phonenumber} is mislukt. Inloggen afgebroken.",
                 )
-                return HttpResponseRedirect(reverse("pages-root"))
+                return redirect(reverse("pages-root"))
             else:
                 messages.debug(self.request, gateway.get_message(token))
 
@@ -366,4 +363,4 @@ class AddPhoneNumberWizardView(LogMixin, SessionWizardView):
         else:
             redirect_to = settings.LOGIN_REDIRECT_URL
 
-        return HttpResponseRedirect(redirect_to)
+        return redirect(redirect_to)

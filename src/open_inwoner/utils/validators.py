@@ -38,9 +38,9 @@ def validate_phone_number(value):
 
 def format_phone_number(value):
     if value[0:2] == "00":
-        value = "+{val}".format(val=value[2:])
+        value = f"+{value[2:]}"
     elif value[0] == "0":
-        value = "+31{val}".format(val=value[1:])
+        value = f"+31{value[1:]}"
     return value.strip().replace("-", "").replace(" ", "")
 
 

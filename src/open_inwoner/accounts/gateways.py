@@ -1,8 +1,8 @@
 import logging
-from importlib import import_module
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.module_loading import import_string
 
 import messagebird
 
@@ -77,17 +77,10 @@ class MessageBird(Gateway):
             return True
 
 
-def load_gateway(path):
-    module, attr = path.rsplit(".", 1)
-    mod = import_module(module)
-    cls = getattr(mod, attr)
-    return cls()
-
-
-gateway = load_gateway(
+gateway = import_string(
     getattr(
         settings,
         "ACCOUNTS_SMS_GATEWAY",
         {"BACKEND": "accounts.gateways.Dummy"},
     )["BACKEND"]
-)
+)()

@@ -1,6 +1,6 @@
 import datetime
 import time
-from unittest.mock import patch
+from unittest.mock import ANY, patch
 
 from django.conf import settings
 from django.core.signing import TimestampSigner
@@ -40,7 +40,7 @@ class TestSMSVerificationLogin(TestCase):
         self.config.save()
 
         response = self.client.get(reverse("login"))
-        self.assertFalse(mock_gateway_send.called)
+        mock_gateway_send.assert_not_called()
 
         response = self.client.post(
             reverse("login"),
@@ -53,14 +53,13 @@ class TestSMSVerificationLogin(TestCase):
         )
 
         self.assertNotContains(response, "Account verificatie")
-        self.assertFalse(mock_gateway_send.called)
-        self.assertEqual(mock_gateway_send.call_count, 0)
         self.assertRedirects(response, reverse("pages-root"))
+        mock_gateway_send.assert_not_called()
 
     @patch("open_inwoner.accounts.gateways.gateway.send")
     def test_login_with_valid_token_succeeds(self, mock_gateway_send):
         response = self.client.get(reverse("login"))
-        self.assertFalse(mock_gateway_send.called)
+        mock_gateway_send.assert_not_called()
 
         response = self.client.post(
             reverse("login"),
@@ -72,10 +71,8 @@ class TestSMSVerificationLogin(TestCase):
             follow=True,
         )
 
-        self.assertContains(response, "Account verificatie")
-        self.assertTrue(mock_gateway_send.called)
-        self.assertEqual(mock_gateway_send.call_count, 1)
-        self.assertEqual(mock_gateway_send.call_args[1]["to"], self.user.phonenumber)
+        self.assertContains(response, _("Account verificatie"))
+        mock_gateway_send.assert_called_once_with(to=self.user.phonenumber, token=ANY)
 
         sent_token = mock_gateway_send.call_args[1]["token"]
 
@@ -92,7 +89,7 @@ class TestSMSVerificationLogin(TestCase):
     @patch("open_inwoner.accounts.gateways.gateway.send")
     def test_login_with_invalid_token_fails(self, mock_gateway_send):
         response = self.client.get(reverse("login"))
-        self.assertFalse(mock_gateway_send.called)
+        mock_gateway_send.assert_not_called()
 
         response = self.client.post(
             reverse("login"),
@@ -105,9 +102,7 @@ class TestSMSVerificationLogin(TestCase):
         )
 
         self.assertContains(response, _("Account verificatie"))
-        self.assertTrue(mock_gateway_send.called)
-        self.assertEqual(mock_gateway_send.call_count, 1)
-        self.assertEqual(mock_gateway_send.call_args[1]["to"], self.user.phonenumber)
+        mock_gateway_send.assert_called_once_with(to=self.user.phonenumber, token=ANY)
 
         response = self.client.post(
             response._request.get_full_path(),
@@ -124,13 +119,10 @@ class TestSMSVerificationLogin(TestCase):
 
     @patch("open_inwoner.accounts.gateways.gateway.send")
     def test_login_fails_with_sms_failure(self, mock_gateway_send):
-        def send_failure(to, token, **kwargs):
-            raise GatewayError()
-
-        mock_gateway_send.side_effect = send_failure
+        mock_gateway_send.side_effect = GatewayError
 
         response = self.client.get(reverse("login"))
-        self.assertFalse(mock_gateway_send.called)
+        mock_gateway_send.assert_not_called()
 
         response = self.client.post(
             reverse("login"),
@@ -149,8 +141,10 @@ class TestSMSVerificationLogin(TestCase):
         self.assertEqual(
             [str(m) for m in response.context["messages"]],
             [
-                "Het is vanwege een storing tijdelijk niet mogelijk om in te loggen, probeer het over 15 minuten nogmaals. "
-                "Mocht het inloggen na meerdere pogingen niet werken, neem dan contact op met de Open Inwoner Platform."
+                _(
+                    "Het is vanwege een storing tijdelijk niet mogelijk om in te loggen, probeer het over 15 minuten nogmaals. "
+                    "Mocht het inloggen na meerdere pogingen niet werken, neem dan contact op met de Open Inwoner Platform."
+                )
             ],
         )
 
@@ -173,8 +167,7 @@ class TestSMSVerificationLogin(TestCase):
     def test_login_fails_with_token_timeout(self, mock_gateway_send):
         with freeze_time("2023-05-22 11:00:00"):
             response = self.client.get(reverse("login"))
-
-            self.assertFalse(mock_gateway_send.called)
+            mock_gateway_send.assert_not_called()
 
             response = self.client.post(
                 reverse("login"),
@@ -185,11 +178,10 @@ class TestSMSVerificationLogin(TestCase):
                 },
                 follow=True,
             )
-            self.assertContains(response, "Account verificatie")
-            self.assertTrue(mock_gateway_send.called)
-            self.assertEqual(mock_gateway_send.call_count, 1)
-            self.assertEqual(
-                mock_gateway_send.call_args[1]["to"], self.user.phonenumber
+
+            self.assertContains(response, _("Account verificatie"))
+            mock_gateway_send.assert_called_once_with(
+                to=self.user.phonenumber, token=ANY
             )
 
             sent_token = mock_gateway_send.call_args[1]["token"]
@@ -208,8 +200,7 @@ class TestSMSVerificationLogin(TestCase):
     def test_login_token_with_max_attempts(self, mock_gateway_send):
         with freeze_time("2023-05-22 12:00:00"):
             response = self.client.get(reverse("login"))
-
-            self.assertFalse(mock_gateway_send.called)
+            mock_gateway_send.assert_not_called()
 
             response = self.client.post(
                 reverse("login"),
@@ -221,7 +212,7 @@ class TestSMSVerificationLogin(TestCase):
                 follow=True,
             )
 
-            self.assertContains(response, "Account verificatie")
+            self.assertContains(response, _("Account verificatie"))
 
             user_1_token_post_path = response._request.get_full_path()
             user_1_sent_token = mock_gateway_send.call_args[1]["token"]
@@ -254,8 +245,9 @@ class TestSMSVerificationLogin(TestCase):
                 },
                 follow=True,
             )
-            self.assertContains(response, "Account verificatie")
-            self.assertTrue(mock_gateway_send.called)
+
+            self.assertContains(response, _("Account verificatie"))
+            mock_gateway_send.assert_called()
             self.assertEqual(mock_gateway_send.call_count, 2)
             self.assertEqual(
                 mock_gateway_send.call_args[1]["to"], other_user.phonenumber
@@ -289,8 +281,7 @@ class TestSMSVerificationLogin(TestCase):
     @freeze_time("2023-05-22 12:00:00")
     def test_login_when_resending_sms(self, mock_gateway_send):
         response = self.client.get(reverse("login"))
-
-        self.assertFalse(mock_gateway_send.called)
+        mock_gateway_send.assert_not_called()
 
         response = self.client.post(
             reverse("login"),
@@ -307,13 +298,11 @@ class TestSMSVerificationLogin(TestCase):
             "user": signer.sign(self.user.pk),
         }
 
+        mock_gateway_send.assert_called_once_with(to=self.user.phonenumber, token=ANY)
         self.assertRedirects(
             response, reverse("verify_token") + "?" + urlencode(params)
         )
-        self.assertContains(response, "Account verificatie")
-        self.assertTrue(mock_gateway_send.called)
-        self.assertEqual(mock_gateway_send.call_count, 1)
-        self.assertEqual(mock_gateway_send.call_args[1]["to"], self.user.phonenumber)
+        self.assertContains(response, _("Account verificatie"))
 
         location = reverse("verify_token") + "?" + urlencode(params)
         response = self.client.post(
@@ -322,8 +311,8 @@ class TestSMSVerificationLogin(TestCase):
             HTTP_REFERER=location,
         )
 
+        mock_gateway_send.assert_called_with(to=self.user.phonenumber, token=ANY)
         self.assertEqual(mock_gateway_send.call_count, 2)
-        self.assertEqual(mock_gateway_send.call_args[1]["to"], self.user.phonenumber)
         self.assertRedirects(
             response, reverse("verify_token") + "?" + urlencode(params)
         )
@@ -339,12 +328,17 @@ class TestSMSVerificationLogin(TestCase):
         )
         self.assertRedirects(response, reverse("pages-root"))
 
+    @patch(
+        "open_inwoner.accounts.views.login.ResendTokenView.throttle_visits",
+        new_callable=lambda: 2,
+    )
     @patch("open_inwoner.accounts.gateways.gateway.send")
-    def test_login_resend_sms_max_attempts(self, mock_gateway_send):
+    def test_login_resend_sms_max_attempts(
+        self, mock_gateway_send, mock_login_throttle_visits
+    ):
         with freeze_time("2023-05-22 12:00:00"):
             response = self.client.get(reverse("login"))
-
-            self.assertFalse(mock_gateway_send.called)
+            mock_gateway_send.assert_not_called()
 
             response = self.client.post(
                 reverse("login"),
@@ -360,20 +354,20 @@ class TestSMSVerificationLogin(TestCase):
                 "next": "",
                 "user": signer.sign(self.user.pk),
             }
+
+            mock_gateway_send.assert_called_once_with(
+                to=self.user.phonenumber, token=ANY
+            )
             self.assertRedirects(
                 response, f"{reverse('verify_token')}?{urlencode(params)}"
             )
-            self.assertContains(response, "Account verificatie")
-            self.assertTrue(mock_gateway_send.called)
-            self.assertEqual(mock_gateway_send.call_count, 1)
-            self.assertEqual(
-                mock_gateway_send.call_args[1]["to"], self.user.phonenumber
-            )
+            self.assertContains(response, _("Account verificatie"))
 
             location = reverse("verify_token") + "?" + urlencode(params)
 
             # we have a limit of 25 visit times per 5 minutes
-            for login_attempt in range(1, 26):
+            # here we have limited this to 2 times for testing purposes
+            for login_attempt in range(1, 3):
                 with self.subTest(login_attempt=login_attempt):
                     response = self.client.post(
                         path=f"{reverse('resend_token')}?{urlencode(params)}",
@@ -381,10 +375,10 @@ class TestSMSVerificationLogin(TestCase):
                         HTTP_REFERER=location,
                     )
 
-                    self.assertEqual(mock_gateway_send.call_count, login_attempt + 1)
-                    self.assertEqual(
-                        mock_gateway_send.call_args[1]["to"], self.user.phonenumber
+                    mock_gateway_send.assert_called_with(
+                        to=self.user.phonenumber, token=ANY
                     )
+                    self.assertEqual(mock_gateway_send.call_count, login_attempt + 1)
                     self.assertRedirects(
                         response, f"{reverse('verify_token')}?{urlencode(params)}"
                     )
@@ -396,7 +390,7 @@ class TestSMSVerificationLogin(TestCase):
             )
 
             self.assertEqual(response.status_code, 403)
-            self.assertEqual(mock_gateway_send.call_count, 26)
+            self.assertEqual(mock_gateway_send.call_count, 3)
 
         # new attempt 5 minutes later
         with freeze_time("2023-05-22 12:05:01"):
@@ -414,15 +408,13 @@ class TestSMSVerificationLogin(TestCase):
                 "next": "",
                 "user": signer.sign(self.user.pk),
             }
+
             self.assertRedirects(
                 response, f"{reverse('verify_token')}?{urlencode(params)}"
             )
-            self.assertContains(response, "Account verificatie")
-            self.assertTrue(mock_gateway_send.called)
-            self.assertEqual(mock_gateway_send.call_count, 27)
-            self.assertEqual(
-                mock_gateway_send.call_args[1]["to"], self.user.phonenumber
-            )
+            self.assertContains(response, _("Account verificatie"))
+            self.assertEqual(mock_gateway_send.call_count, 4)
+            mock_gateway_send.assert_called_with(to=self.user.phonenumber, token=ANY)
 
             # Unblocked attempt.
             location = f"{reverse('verify_token')}?{urlencode(params)}"
@@ -431,13 +423,12 @@ class TestSMSVerificationLogin(TestCase):
                 follow=True,
                 HTTP_REFERER=location,
             )
-            self.assertEqual(mock_gateway_send.call_count, 28)
-            self.assertEqual(
-                mock_gateway_send.call_args[1]["to"], self.user.phonenumber
-            )
+
+            self.assertEqual(mock_gateway_send.call_count, 5)
             self.assertRedirects(
                 response, f"{reverse('verify_token')}?{urlencode(params)}"
             )
+            mock_gateway_send.assert_called_with(to=self.user.phonenumber, token=ANY)
 
     @override_settings(ACCOUNTS_USER_TOKEN_EXPIRE_TIME=150)
     @patch("open_inwoner.accounts.gateways.gateway.send")
@@ -457,8 +448,9 @@ class TestSMSVerificationLogin(TestCase):
             follow=True,
             HTTP_REFERER=location,
         )
-        self.assertEqual(mock_gateway_send.call_count, 0)
+
         self.assertRedirects(response, str(settings.LOGIN_URL))
+        mock_gateway_send.assert_not_called()
 
     @patch("open_inwoner.accounts.gateways.gateway.send")
     def test_login_by_adding_phone_number_succeeds(self, mock_gateway_send):
@@ -474,8 +466,9 @@ class TestSMSVerificationLogin(TestCase):
             },
             follow=True,
         )
+
         self.assertContains(response, "Account verificatie (stap 1 van 2)")
-        self.assertFalse(mock_gateway_send.called)
+        mock_gateway_send.assert_not_called()
 
         response = self.client.post(
             response._request.get_full_path(),
@@ -488,10 +481,8 @@ class TestSMSVerificationLogin(TestCase):
         )
 
         self.assertContains(response, "Account verificatie (stap 2 van 2)")
-        self.assertTrue(mock_gateway_send.called)
-        self.assertEqual(mock_gateway_send.call_count, 1)
-        self.assertEqual(
-            mock_gateway_send.call_args[1]["to"], format_phone_number("0643465651")
+        mock_gateway_send.assert_called_with(
+            to=format_phone_number("0643465651"), token=ANY
         )
 
         sent_token = mock_gateway_send.call_args[1]["token"]
@@ -524,7 +515,7 @@ class TestSMSVerificationLogin(TestCase):
             follow=True,
         )
         self.assertContains(response, "Account verificatie (stap 1 van 2)")
-        self.assertFalse(mock_gateway_send.called)
+        mock_gateway_send.assert_not_called()
 
         response = self.client.post(
             response._request.get_full_path(),

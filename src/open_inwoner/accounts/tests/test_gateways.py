@@ -23,12 +23,9 @@ class MessageBirdSMSTestCase(TestCase):
         token = "123456"
         result = gateway.send(to=phone_number, token=token)
 
-        self.assertTrue(result)
-        self.assertTrue(mock_message_create.called)
-        self.assertEqual(mock_message_create.call_count, 1)
-        self.assertEqual(mock_message_create.call_args[0][0], "OIP")
-        self.assertEqual(mock_message_create.call_args[0][1], "0123456789")
-        self.assertEqual(
-            mock_message_create.call_args[0][2],
+        mock_message_create.assert_called_once_with(
+            "OIP",
+            "0123456789",
             "Open Inwoner Platform Bevestigingscode: 123456 (deze code is geldig voor 5 minuten)",
         )
+        self.assertTrue(result)
