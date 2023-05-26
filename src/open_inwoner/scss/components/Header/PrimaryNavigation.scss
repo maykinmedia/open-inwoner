@@ -135,7 +135,7 @@
   }
 
   &.primary-navigation__authenticated {
-    button.button--transparent.primary-navigation--toggle {
+    .button.button--transparent.primary-navigation--toggle {
       display: inline-block;
       padding-right: var(--spacing-giant);
       width: 165px;
@@ -215,6 +215,13 @@
     }
   }
 
+  &--dismissed > &__list &__list-item &__list,
+  &__main--dismissed > &__list &__list-item &__list {
+    @media (min-width: 768px) {
+      transform: scaleY(0);
+    }
+  }
+
   /// Categories and authenticated nested list
 
   &__authenticated > &__list > &__list-item &__list {
@@ -233,20 +240,19 @@
 
   /// Interaction.
 
-  &:not(#{&}--dismissed) &__list-item:focus &__list,
-  &:not(#{&}--dismissed) &__list-item:focus-within &__list,
+  &:not(#{&}--dismissed) &__list-item &__list:focus-within,
   &:not(#{&}--dismissed)[class*='--open'] &__list-item &__list {
     transform: scaleY(1);
   }
-  &:not(#{&}--dismissed) &__list-item:focus,
-  &:not(#{&}--dismissed) &__list-item:focus-within {
+
+  &:not(#{&}--dismissed)[class*='--open'] &__list-item {
     // Open subpages
-    .button--transparent.primary-navigation--toggle {
+    .button.primary-navigation--toggle {
       color: var(--color-primary);
     }
   }
 
-  button.button--transparent.primary-navigation--toggle {
+  .button.button--transparent.primary-navigation--toggle {
     font-family: var(--font-family-body);
     font-size: var(--font-size-body);
     color: var(--font-color-body);
@@ -263,12 +269,13 @@
     &:focus,
     &:focus-visible,
     &:focus-within {
+      border: 2px solid orange;
       transform: translateY(0);
     }
   }
 
   &:not(#{&}--dismissed) &__list &__list-item:focus,
-  &:not(#{&}--dismissed) &__list &__list-item:focus-within {
+  &:not(#{&}--dismissed)[class*='--open'] &__list-item {
     // animate primary navigation dropdown icons
 
     .primary-navigation--toggle > [class*='icons'] {
