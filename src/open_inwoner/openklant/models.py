@@ -38,23 +38,44 @@ class OpenKlantConfig(SingletonModel):
         default=False,
     )
     register_bronorganisatie_rsin = models.CharField(
-        verbose_name=_("RSIN"),
+        verbose_name=_("Organisatie RSIN"),
         max_length=9,
         default="",
         blank=True,
+    )
+    register_type = models.CharField(
+        verbose_name=_("Contactmoment type"),
+        max_length=50,
+        default="Melding",  # 'Melding' is the default
+        blank=True,
+        help_text=_("Naam van 'contacttype' uit e-Suite"),
+    )
+    register_employee_id = models.CharField(
+        verbose_name=_("Medewerker identificatie"),
+        max_length=24,
+        default="",
+        blank=True,
+        help_text=_("Gebruikersnaam van actieve medewerker uit e-Suite"),
+    )
+
+    register_api_required_fields = (
+        "register_contact_moment",
+        "contactmomenten_service",
+        "klanten_service",
+        "register_bronorganisatie_rsin",
+        "register_type",
+        "register_employee_id",
     )
 
     class Meta:
         verbose_name = _("Open Klant configuration")
 
-    def has_form_configuration(self):
-        has_register = self.register_email or (
-            self.register_contact_moment
-            and self.contactmomenten_service
-            and self.klanten_service
-            and self.register_bronorganisatie_rsin
-        )
+    def has_form_configuration(self) -> bool:
+        has_register = self.register_email or self.has_api_configuration()
         return has_register and self.contactformsubject_set.exists()
+
+    def has_api_configuration(self):
+        return all(getattr(self, f, "") for f in self.register_api_required_fields)
 
 
 class ContactFormSubject(models.Model):
@@ -70,6 +91,7 @@ class ContactFormSubject(models.Model):
 
     class Meta:
         verbose_name = _("Contact formulier onderwerp")
+        verbose_name_plural = _("Contact formulier onderwerpen")
         ordering = ("subject",)
 
     def __str__(self):

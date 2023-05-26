@@ -91,12 +91,13 @@ class ContactFormView(CommonPageMixin, BaseBreadcrumbMixin, FormView):
         assert config.has_form_configuration()
 
         # fetch/update/create klant
-        klant = None
         if self.request.user.is_authenticated and self.request.user.bsn:
             klant = fetch_klant_for_bsn(self.request.user.bsn)
 
-            # TODO update klant?
+            # TODO update klant phone/email? (other ticket)
         else:
+            # TODO according to taiga #1437 we should disable Klanten/Contacten API if Digid is not enabled
+            # TODO registering klanten won't work in e-Suite as it always pulls from BRP
             data = {
                 "bronorganisatie": config.register_bronorganisatie_rsin,
                 "voornaam": form.cleaned_data["first_name"],
@@ -108,13 +109,17 @@ class ContactFormView(CommonPageMixin, BaseBreadcrumbMixin, FormView):
             klant = create_klant(data)
 
         # create contact moment
+        subject = form.cleaned_data["subject"].subject
+        body = form.cleaned_data["question"]
+
         data = {
-            # TODO other fields ?
             "bronorganisatie": config.register_bronorganisatie_rsin,
-            "onderwerp": form.cleaned_data["subject"].subject,
-            "tekst": form.cleaned_data["question"],
-            "type": "contact-formulier",
-            # "initiatiefnemer": "klant",
+            "tekst": f"{subject}\n\n{body}",
+            "type": config.register_type,
+            "kanaal": "Internet",
+            "medewerkerIdentificatie": {
+                "identificatie": config.register_employee_id,
+            },
         }
         contactmoment = create_contactmoment(data, klant=klant)
 

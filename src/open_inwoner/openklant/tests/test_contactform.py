@@ -24,7 +24,6 @@ class ContactFormTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
 
     def setUp(self):
         super().setUp()
-
         # clear config
         config = OpenKlantConfig.get_solo()
         config.klanten_service = None
@@ -32,7 +31,11 @@ class ContactFormTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
         config.register_email = ""
         config.register_contact_moment = False
         config.register_bronorganisatie_rsin = ""
+        config.register_type = ""
+        config.register_employee_id = ""
         config.save()
+
+    # def setupAPIRegister(self, config):
 
     def test_singleton_has_configuration_method(self, m):
         # use cleared (from setUp()
@@ -54,7 +57,8 @@ class ContactFormTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
         config.register_bronorganisatie_rsin = "0123456789"
         config.klanten_service = ServiceFactory()
         config.contactmomenten_service = ServiceFactory()
-
+        config.register_type = "Melding"
+        config.register_employee_id = "FooVonBar"
         self.assertTrue(config.has_form_configuration())
 
     def test_no_form_shown_if_not_has_configuration(self, m):
@@ -127,12 +131,14 @@ class ContactFormTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
         config = OpenKlantConfig.get_solo()
         config.register_contact_moment = True
         config.register_bronorganisatie_rsin = "123456789"
+        config.register_type = "Melding"
+        config.register_employee_id = "FooVonBar"
         config.save()
 
         data = MockAPICreateData()
         data.install_mocks_anon(m)
 
-        subject = ContactFormSubjectFactory(config=config)
+        subject = ContactFormSubjectFactory(config=config, subject="Vraag")
 
         response = self.app.get(self.url)
         form = response.forms["contact-form"]
@@ -172,10 +178,11 @@ class ContactFormTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
         self.assertEqual(
             contactmoment_create_data,
             {
+                "medewerkerIdentificatie": {"identificatie": "FooVonBar"},
                 "bronorganisatie": "123456789",
-                "onderwerp": subject.subject,
-                "tekst": "hey!\n\nwaddup?",
-                "type": "contact-formulier",
+                "tekst": f"Vraag\n\nhey!\n\nwaddup?",
+                "type": "Melding",
+                "kanaal": "Internet",
             },
         )
         kcm_create_data = data.matchers[2].request_history[0].json()
@@ -193,12 +200,14 @@ class ContactFormTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
         config = OpenKlantConfig.get_solo()
         config.register_contact_moment = True
         config.register_bronorganisatie_rsin = "123456789"
+        config.register_type = "Melding"
+        config.register_employee_id = "FooVonBar"
         config.save()
 
         data = MockAPICreateData()
         data.install_mocks_digid(m)
 
-        subject = ContactFormSubjectFactory(config=config)
+        subject = ContactFormSubjectFactory(config=config, subject="Vraag")
 
         response = self.app.get(self.url, user=data.user)
         form = response.forms["contact-form"]
@@ -226,10 +235,11 @@ class ContactFormTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
         self.assertEqual(
             contactmoment_create_data,
             {
+                "medewerkerIdentificatie": {"identificatie": "FooVonBar"},
                 "bronorganisatie": "123456789",
-                "onderwerp": subject.subject,
-                "tekst": "hey!\n\nwaddup?",
-                "type": "contact-formulier",
+                "tekst": f"Vraag\n\nhey!\n\nwaddup?",
+                "type": "Melding",
+                "kanaal": "Internet",
             },
         )
         kcm_create_data = data.matchers[2].request_history[0].json()

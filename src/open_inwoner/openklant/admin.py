@@ -23,27 +23,13 @@ class OpenKlantConfigAdminForm(forms.ModelForm):
     def clean(self, *args, **kwargs):
         cleaned_data = super().clean(*args, **kwargs)
 
-        register_contact_moment = cleaned_data["register_contact_moment"]
-        klanten_service = cleaned_data["klanten_service"]
-        contactmomenten_service = cleaned_data["contactmomenten_service"]
-        register_bronorganisatie_rsin = cleaned_data["register_bronorganisatie_rsin"]
-
-        if register_contact_moment:
-            if not klanten_service or not contactmomenten_service:
-                msg = _(
-                    "Voor registratie in de Klanten en Contactmomenten API zijn services vereist."
-                )
-                self.add_error("register_contact_moment", msg)
-                if not klanten_service:
-                    self.add_error("klanten_service", msg)
-                if not contactmomenten_service:
-                    self.add_error("contactmomenten_service", msg)
-
-            if not register_bronorganisatie_rsin:
-                msg = _(
-                    "Voor registratie in de Klanten en Contactmomenten API is een bronorganisatie RSIN vereist."
-                )
-                self.add_error("register_bronorganisatie_rsin", msg)
+        if cleaned_data["register_contact_moment"]:
+            msg = _(
+                "Voor registratie in de Klanten en Contactmomenten API is dit veld vereist."
+            )
+            for field_name in OpenKlantConfig.register_api_required_fields:
+                if not cleaned_data[field_name]:
+                    self.add_error(field_name, msg)
 
 
 @admin.register(OpenKlantConfig)
@@ -54,12 +40,21 @@ class OpenKlantConfigAdmin(SingletonModelAdmin):
     ]
     fieldsets = [
         (
-            _("Registratie"),
+            _("Email registratie"),
             {
                 "fields": [
                     "register_email",
+                ],
+            },
+        ),
+        (
+            _("Klanten en Contacten API registratie"),
+            {
+                "fields": [
                     "register_contact_moment",
                     "register_bronorganisatie_rsin",
+                    "register_type",
+                    "register_employee_id",
                 ],
             },
         ),

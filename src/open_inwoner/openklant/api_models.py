@@ -9,7 +9,7 @@ from zgw_consumers.api_models.base import ZGWModel
 class KlantCreateData(TypedDict):
     bronorganisatie: str
     voornaam: str
-    voorvoegsel_achternaam: str
+    voorvoegselAchternaam: str
     achternaam: str
     telefoonnummer: str
     emailadres: str
@@ -50,11 +50,17 @@ class Klant(ZGWModel):
         )
 
 
+class MedewerkerIdentificatie(TypedDict):
+    identificatie: str
+    achternaam: str = ""
+
+
 class ContactMomentCreateData(TypedDict):
     bronorganisatie: str
     tekst: str
     onderwerp: str
     type: str
+    medewerkerIdentificatie: MedewerkerIdentificatie
 
 
 @dataclass
@@ -69,6 +75,7 @@ class ContactMoment(ZGWModel):
     registratiedatum: Optional[datetime] = None
     kanaal: str = ""
     tekst: str = ""
+    # NOTE annoyingly we can't put MedewerkerIdentificatie here as type because of
     medewerker_identificatie: Optional[dict] = None
 
     # modification to API for eSuite usefulness *AFWIJKING*
