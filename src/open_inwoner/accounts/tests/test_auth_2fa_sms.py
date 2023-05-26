@@ -436,6 +436,8 @@ class TestSMSVerificationLogin(TestCase):
         now = timezone.now()
         some_time_ago = now - datetime.timedelta(seconds=151)
 
+        # freezegun's freeze_time does not work well with time.time,
+        # so we are using django's decorator instead.
         with dj_freeze_time(time.mktime(some_time_ago.timetuple())):
             params = {
                 "next": "",
