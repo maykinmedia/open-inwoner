@@ -350,5 +350,69 @@ MAIL_EDITOR_CONF = {
             },
         ],
     },
+    "contactform_registration": {
+        "name": _("Contact form registration notification"),
+        "description": _("This email is used to register a contact form submission"),
+        "subject_default": "Contact formulier inzending vanaf {{ site_name }}",
+        "body_default": """
+            <p>Beste</p>
+
+            <table>
+                <tr>
+                    <th>Onderwerp:</th>
+                    <td>{{ subject }}</td>
+                </tr>
+                <tr>
+                    <th>Naam:</th>
+                    <td>{{ name }}</td>
+                </tr>
+                <tr>
+                    <th>Email:</th>
+                    <td>{{ email }}</td>
+                </tr>
+                <tr>
+                    <th>Telefoonnummer:</th>
+                    <td>{{ phonenumber }}</td>
+                </tr>
+                <tr>
+                    <th colspan="2">Vraag:</th>
+                </tr>
+                <tr>
+                    <td colspan="2">{{ question }}</th>
+                </tr>
+            </table>
+
+            <p>Met vriendelijke groet,
+            {{ site_name }} </p>
+       """,
+        "subject": [
+            {
+                "name": "site_name",
+                "description": _("Name of the site."),
+            },
+        ],
+        "body": [
+            {
+                "name": "subject",
+                "description": _("Onderwerp"),
+            },
+            {
+                "name": "name",
+                "description": _("Naam"),
+            },
+            {
+                "name": "email",
+                "description": _("E-mailadres"),
+            },
+            {
+                "name": "phonenumber",
+                "description": _("Telefoonnummer"),
+            },
+            {
+                "name": "question",
+                "description": _("Vraag"),
+            },
+        ],
+    },
 }
 MAIL_EDITOR_BASE_CONTEXT = {"site_name": "Open Inwoner Platform"}

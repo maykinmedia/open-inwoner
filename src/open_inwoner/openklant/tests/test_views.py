@@ -9,7 +9,7 @@ import requests_mock
 from django_webtest import WebTest
 
 from open_inwoner.accounts.tests.factories import UserFactory
-from open_inwoner.openklant.tests.data import MockAPIData
+from open_inwoner.openklant.tests.data import MockAPIReadData
 from open_inwoner.utils.test import ClearCachesMixin, DisableRequestLogMixin
 
 
@@ -21,10 +21,10 @@ class FetchKlantDataTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        MockAPIData.setUpServices()
+        MockAPIReadData.setUpServices()
 
     def test_list_for_bsn(self, m):
-        data = MockAPIData().install_mocks(m)
+        data = MockAPIReadData().install_mocks(m)
 
         detail_url = reverse(
             "cases:contactmoment_detail",
@@ -54,7 +54,7 @@ class FetchKlantDataTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
         )
 
     def test_show_detail_for_bsn(self, m):
-        data = MockAPIData().install_mocks(m)
+        data = MockAPIReadData().install_mocks(m)
 
         detail_url = reverse(
             "cases:contactmoment_detail",

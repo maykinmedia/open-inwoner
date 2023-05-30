@@ -6,7 +6,13 @@ from zds_client import ClientError
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.service import get_paginated_results
 
-from open_inwoner.openklant.api_models import ContactMoment, Klant, KlantContactMoment
+from open_inwoner.openklant.api_models import (
+    ContactMoment,
+    ContactMomentCreateData,
+    Klant,
+    KlantContactMoment,
+    KlantCreateData,
+)
 from open_inwoner.openklant.clients import build_client
 
 logger = logging.getLogger(__name__)
@@ -36,6 +42,8 @@ def fetch_klantcontactmoment_for_bsn(
 
     cm_client = build_client("contactmomenten")
     k_client = build_client("klanten")
+    if cm_client is None or k_client is None:
+        return
 
     try:
         response = cm_client.retrieve("klantcontactmoment", uuid=kcm_uuid)
@@ -83,10 +91,22 @@ def _fetch_klanten_for_bsn(user_bsn: str, *, client=None) -> List[Klant]:
     return klanten
 
 
+def fetch_klant_for_bsn(user_bsn: str) -> Optional[Klant]:
+    # this is technically a search operation and could return multiple records
+    klanten = _fetch_klanten_for_bsn(user_bsn)
+    if klanten:
+        # let's use the first one
+        return klanten[0]
+    else:
+        return
+
+
 def _fetch_klantcontactmomenten_for_klant(
     klant: Klant, *, client=None
 ) -> List[KlantContactMoment]:
     client = client or build_client("contactmomenten")
+    if client is None:
+        return []
 
     try:
         response = get_paginated_results(
@@ -111,6 +131,9 @@ def _fetch_klantcontactmomenten_for_klant(
 
 def _fetch_contactmoment(url, *, client=None) -> Optional[ContactMoment]:
     client = client or build_client("contactmomenten")
+    if client is None:
+        return
+
     try:
         response = client.retrieve("contactmoment", url=url)
     except (RequestException, ClientError) as e:
@@ -120,3 +143,59 @@ def _fetch_contactmoment(url, *, client=None) -> Optional[ContactMoment]:
     contact_moment = factory(ContactMoment, response)
 
     return contact_moment
+
+
+def create_klant(data: KlantCreateData):
+    client = build_client("klanten")
+    if client is None:
+        return
+
+    try:
+        response = client.create("klant", data=data)
+    except (RequestException, ClientError) as e:
+        logger.exception("exception while making request", exc_info=e)
+        return
+
+    klant = factory(Klant, response)
+
+    return klant
+
+
+def create_contactmoment(
+    data: ContactMomentCreateData, *, klant: Optional[Klant] = None
+) -> Optional[ContactMoment]:
+    client = build_client("contactmomenten")
+    if client is None:
+        return
+
+    try:
+        response = client.create("contactmoment", data=data)
+    except (RequestException, ClientError) as e:
+        logger.exception("exception while making request", exc_info=e)
+        return
+
+    contactmoment = factory(ContactMoment, response)
+
+    if klant:
+        # relate contact to klant though a klantcontactmoment
+        try:
+            response = client.create(
+                "klantcontactmoment",
+                data={
+                    "klant": klant.url,
+                    "contactmoment": contactmoment.url,
+                },
+            )
+        except (RequestException, ClientError) as e:
+            logger.exception("exception while making request", exc_info=e)
+            return
+
+        # build some more complete result data
+        # kcm = factory(KlantContactMoment, response)
+        # kcm.klant = klant
+        # kcm.contactmoment = contactmoment
+    #     contactmoment.klantcontactmomenten = [kcm]
+    # else:
+    #     contactmoment.klantcontactmomenten = []
+
+    return contactmoment

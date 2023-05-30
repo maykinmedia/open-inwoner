@@ -12,6 +12,23 @@ CONTACTMOMENTEN_ROOT = "https://contactmomenten.nl/api/v1/"
 
 
 class MockAPIData:
+    @classmethod
+    def setUpServices(cls):
+        config = OpenKlantConfig.get_solo()
+        config.klanten_service = ServiceFactory(
+            api_root=KLANTEN_ROOT, api_type=APITypes.kc
+        )
+        config.contactmomenten_service = ServiceFactory(
+            api_root=CONTACTMOMENTEN_ROOT, api_type=APITypes.cmc
+        )
+        config.save()
+
+    def setUpOASMocks(self, m):
+        mock_service_oas_get(m, KLANTEN_ROOT, "kc")
+        mock_service_oas_get(m, CONTACTMOMENTEN_ROOT, "cmc")
+
+
+class MockAPIReadData(MockAPIData):
     def __init__(self):
         self.user = DigidUserFactory(
             bsn="100000001",
@@ -43,22 +60,7 @@ class MockAPIData:
             contactmoment=self.contactmoment["url"],
         )
 
-    @classmethod
-    def setUpServices(cls):
-        config = OpenKlantConfig.get_solo()
-        config.klanten_service = ServiceFactory(
-            api_root=KLANTEN_ROOT, api_type=APITypes.kc
-        )
-        config.contactmomenten_service = ServiceFactory(
-            api_root=CONTACTMOMENTEN_ROOT, api_type=APITypes.cmc
-        )
-        config.save()
-
-    def setUpOASMocks(self, m):
-        mock_service_oas_get(m, KLANTEN_ROOT, "kc")
-        mock_service_oas_get(m, CONTACTMOMENTEN_ROOT, "cmc")
-
-    def install_mocks(self, m) -> "MockAPIData":
+    def install_mocks(self, m) -> "MockAPIReadData":
         self.setUpOASMocks(m)
 
         for resource_attr in [
@@ -79,4 +81,83 @@ class MockAPIData:
             json=paginated_response([self.klant_contactmoment]),
         )
 
+        return self
+
+
+class MockAPICreateData(MockAPIData):
+    def __init__(self):
+        self.user = DigidUserFactory(
+            bsn="100000001",
+        )
+        self.klant = generate_oas_component(
+            "kc",
+            "schemas/Klant",
+            uuid="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            bronorganisatie="123456789",
+            voornaam="Foo",
+            achternaam="Bar",
+            emailadres="foo@example.com",
+            telefoonnummer="0612345678",
+        )
+        self.contactmoment = generate_oas_component(
+            "cmc",
+            "schemas/ContactMoment",
+            uuid="aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
+            url=f"{CONTACTMOMENTEN_ROOT}contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
+            # identificatie="AB123",
+            # type="SomeType",
+            # kanaal="MAIL",
+            status=Status.nieuw,
+            antwoord="",
+            text="hey!\n\nwaddup?",
+        )
+        self.klant_contactmoment = generate_oas_component(
+            "cmc",
+            "schemas/KlantContactMoment",
+            uuid="aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
+            url=f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten/aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
+            klant=self.klant["url"],
+            contactmoment=self.contactmoment["url"],
+        )
+
+        self.matchers = []
+
+    def install_mocks_anon(self, m) -> "MockAPICreateData":
+        self.setUpOASMocks(m)
+
+        self.matchers = [
+            m.post(f"{KLANTEN_ROOT}klanten", json=self.klant, status_code=201),
+            m.post(
+                f"{CONTACTMOMENTEN_ROOT}contactmomenten",
+                json=self.contactmoment,
+                status_code=201,
+            ),
+            m.post(
+                f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten",
+                json=self.klant_contactmoment,
+                status_code=201,
+            ),
+        ]
+        return self
+
+    def install_mocks_digid(self, m) -> "MockAPICreateData":
+        self.setUpOASMocks(m)
+
+        self.matchers = [
+            m.get(
+                f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn={self.user.bsn}",
+                json=paginated_response([self.klant]),
+            ),
+            m.post(
+                f"{CONTACTMOMENTEN_ROOT}contactmomenten",
+                json=self.contactmoment,
+                status_code=201,
+            ),
+            m.post(
+                f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten",
+                json=self.klant_contactmoment,
+                status_code=201,
+            ),
+        ]
         return self
