@@ -27,7 +27,11 @@
     {% endif %}
 
     {% if show_required %}
-        <span class="caption__content" id="caption">{% trans "Velden gemarkeerd met een" %}<span class="label__label--required"> * </span>{% trans "zijn verplicht" %}</span>
+        <span class="caption__content" id="caption">
+        {% blocktrans trimmed with star='(<span class="label__label--required">*</span>)'|safe %}
+            Velden gemarkeerd met een sterretje {{star}} zijn verplicht
+        {% endblocktrans%}
+        </span>
     {% endif %}
 
     {% if auto_render %}
