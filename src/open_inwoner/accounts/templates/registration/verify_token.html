@@ -3,16 +3,23 @@
 
 {% block content %}
     <h2 class="h2">{% trans 'Account verificatie' %}</h2>
-    <p class="p">{{ message|safe }}</p>
+    <p class="p">
+        {% blocktrans trimmed %}
+            U ontvangt binnen 1 minuut een sms-bericht op uw mobiele telefoon.
+            Vul de code die in het bericht staat hieronder in en klik op
+            <em>Inloggen</em>. De code is maximaal 5 minuten geldig.
+            Mocht het niet lukken om de code binnen deze tijd in te voeren, klik
+            dan op <em>Verstuur nieuwe SMS</em>.
+        {% endblocktrans %}
+    </p>
 
     {% render_form id="verify-token-form" form=form no_action=True method="POST" %}
         {% csrf_token %}
 
         {% input form.token %}
-        {% url 'resend_token' as href %}
-        {% with href|addstr:"?user="|addstr:user_cache_key as href_with_params %}
-            {% link href=href_with_params text=sms_button_text secondary=True icon='arrow_forward' extra_classes="resend-token-post-request" %}
-            {% form_actions primary_text=_("Inloggen") %}
-        {% endwith %}
+        {% if resend_token_url %}
+            {% link href=resend_token_url text=_("Verstuur nieuwe SMS") secondary=True icon='arrow_forward' id="resend-token-anchor" extra_classes="resend-token-post-request" %}
+        {% endif %}
+        {% form_actions primary_text=_("Inloggen") %}
     {% endrender_form %}
 {% endblock %}

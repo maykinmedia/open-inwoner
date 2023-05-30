@@ -7,6 +7,8 @@
 
 {% block content %}
     <h2 class="h2">
-        {% trans 'Account verificatie' %} ({% trans 'stap' %} {{ wizard.steps.step1 }} {% trans 'van' %} {{ wizard.steps.count }})
+        {% blocktranslate with step=wizard.steps.step1 count=wizard.steps.count %}
+            Account verificatie (stap {{ step }} van {{ count }})
+        {% endblocktranslate %}
     </h2>
 {% endblock %}

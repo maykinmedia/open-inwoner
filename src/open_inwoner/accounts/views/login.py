@@ -70,16 +70,18 @@ class CustomLoginView(LogMixin, LoginView):
         except GatewayError:
             messages.error(
                 self.request,
-                "Het is vanwege een storing tijdelijk niet mogelijk om "
-                "in te loggen, probeer het over 15 minuten nogmaals. "
-                "Mocht het inloggen na meerdere pogingen niet werken, "
-                "neem dan contact op met de Open Inwoner Platform.",
+                _(
+                    "Het is vanwege een storing tijdelijk niet mogelijk om "
+                    "in te loggen, probeer het over 15 minuten nogmaals. "
+                    "Mocht het inloggen na meerdere pogingen niet werken, "
+                    "neem dan contact op met de Open Inwoner Platform."
+                ),
             )
             self.log_user_action(
                 user,
                 f"Het versturen van een SMS-bericht aan {user.phonenumber} is mislukt. Inloggen afgebroken.",
             )
-            return redirect(reverse("pages-root"))
+            return redirect("pages-root")
         else:
             self.log_user_action(
                 user,
@@ -100,15 +102,6 @@ class VerifyTokenView(ThrottleMixin, FormView):
     template_name = "registration/verify_token.html"
     form_class = VerifyTokenForm
     redirect_field_name = REDIRECT_FIELD_NAME
-    sms_button_text = _("Verstuur SMS")
-    message = _(
-        "U ontvangt binnen 1 minuut een sms-bericht op uw mobiele telefoon. "
-        "Vul de code die in het bericht staat hieronder in en klik op "
-        "<em>Inloggen</em>. De code is maximaal 5 minuten geldig. "
-        "Mocht het niet lukken om de code binnen deze tijd in te voeren, klik "
-        "dan op <em>Verstuur nieuwe SMS</em>."
-    )
-    sms_button_text = _("Verstuur nieuwe SMS")
 
     def log_in(self):
         """
@@ -128,7 +121,7 @@ class VerifyTokenView(ThrottleMixin, FormView):
                 pk=signer.unsign(request.GET.get("user"), max_age=max_age)
             )
         except (User.DoesNotExist, BadSignature, SignatureExpired):
-            return redirect(reverse("login"))
+            return redirect("login")
 
         if (
             self.should_be_throttled()
@@ -136,7 +129,9 @@ class VerifyTokenView(ThrottleMixin, FormView):
         ):
             messages.error(
                 request,
-                message="Maximaal 3 pogingen. Probeer het over 1 minuut opnieuw",
+                message=_(
+                    "Maximaal {visits} pogingen. Probeer het over 1 minuut opnieuw"
+                ).format(visits=self.throttle_visits),
             )
             # Hide the form validation message to avoid hints of a correct code if trying with
             # no attempts left.
@@ -164,12 +159,6 @@ class VerifyTokenView(ThrottleMixin, FormView):
 
         return redirect_to
 
-    def get(self, request, *args, **kwargs):
-        if not request.user.is_anonymous:
-            return redirect(settings.LOGIN_REDIRECT_URL)
-
-        return super().get(request, *args, **kwargs)
-
     def get_form_kwargs(self):
         form_kwargs = super().get_form_kwargs()
         form_kwargs.update(
@@ -184,16 +173,20 @@ class VerifyTokenView(ThrottleMixin, FormView):
         self.log_in()
         return super().form_valid(form)
 
+    def build_resend_token_url(self):
+        user_key = self.request.GET.get("user")
+        max_age = getattr(settings, "ACCOUNTS_USER_TOKEN_EXPIRE_TIME", 300)
+
+        try:
+            self.user_cache = signer.unsign(user_key, max_age=max_age)
+        except (BadSignature, SignatureExpired):
+            return None
+
+        return furl(reverse("resend_token")).add({"user": user_key}).url
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        context.update(
-            {
-                "user_cache_key": self.request.GET.get("user"),
-                "message": self.message,
-                "sms_button_text": self.sms_button_text,
-            }
-        )
+        context["resend_token_url"] = self.build_resend_token_url()
 
         if getattr(self, "reset_form", None):
             context["form"] = VerifyTokenForm(user=self.user_cache)
@@ -223,7 +216,7 @@ class ResendTokenView(ThrottleMixin, LogMixin, View):
         else:
             self.user_cache = request.user
         if not self.user_cache:
-            return redirect(reverse("login"))
+            return redirect("login")
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -251,9 +244,11 @@ class ResendTokenView(ThrottleMixin, LogMixin, View):
         except GatewayError:
             messages.error(
                 self.request,
-                "Door een technische storing is het versturen van het SMS-bericht mislukt. "
-                "Probeer het nogmaals. Mocht het inloggen na meerdere pogingen niet werken, "
-                "neem dan contact op met de Open Inwoner Platform.",
+                _(
+                    "Door een technische storing is het versturen van het SMS-bericht mislukt. "
+                    "Probeer het nogmaals. Mocht het inloggen na meerdere pogingen niet werken, "
+                    "neem dan contact op met de Open Inwoner Platform."
+                ),
             )
             self.log_user_action(
                 user,
@@ -293,7 +288,7 @@ class AddPhoneNumberWizardView(LogMixin, SessionWizardView):
                 pk=signer.unsign(request.GET.get("user"), max_age=max_age)
             )
         except (UserModel.DoesNotExist, BadSignature, SignatureExpired):
-            return redirect(reverse("login"))
+            return redirect("login")
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -323,16 +318,18 @@ class AddPhoneNumberWizardView(LogMixin, SessionWizardView):
             except GatewayError:
                 messages.error(
                     self.request,
-                    "Het is vanwege een storing tijdelijk niet mogelijk om "
-                    "in te loggen, probeer het over 15 minuten nogmaals. "
-                    "Mocht het inloggen na meerdere pogingen niet werken, "
-                    "neem dan contact op met de Open Inwoner Platform.",
+                    _(
+                        "Het is vanwege een storing tijdelijk niet mogelijk om "
+                        "in te loggen, probeer het over 15 minuten nogmaals. "
+                        "Mocht het inloggen na meerdere pogingen niet werken, "
+                        "neem dan contact op met de Open Inwoner Platform."
+                    ),
                 )
                 self.log_user_action(
                     self.user_cache,
                     f"Het versturen van een SMS-bericht aan {phonenumber} is mislukt. Inloggen afgebroken.",
                 )
-                return redirect(reverse("pages-root"))
+                return redirect("pages-root")
             else:
                 messages.debug(self.request, gateway.get_message(token))
 

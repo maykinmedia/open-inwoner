@@ -107,5 +107,6 @@ class ValidatorsTestCase(TestCase):
         for num in samples:
             self.assertEqual(format_phone_number(num), expected_result)
 
+        # testing some non dutch numbers
         self.assertEqual(format_phone_number("+32 12 345 67 89"), "+32123456789")
         self.assertEqual(format_phone_number("0032 12 345 67 89"), "+32123456789")

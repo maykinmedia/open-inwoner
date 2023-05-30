@@ -37,7 +37,7 @@ class UserModelEmailBackend(ModelBackend):
                 return None
 
         # 2FA with sms verification
-        if user and token:
+        if config.login_2fa_sms and user and token:
             accepted, drift = accept_totp(
                 key=user.seed,
                 response=token,
