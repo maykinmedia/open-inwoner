@@ -35,8 +35,6 @@ class ContactFormTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
         config.register_employee_id = ""
         config.save()
 
-    # def setupAPIRegister(self, config):
-
     def test_singleton_has_configuration_method(self, m):
         # use cleared (from setUp()
         config = OpenKlantConfig.get_solo()
@@ -68,7 +66,7 @@ class ContactFormTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
 
         response = self.app.get(self.url)
         self.assertContains(response, _("Contact formulier niet geconfigureerd."))
-        self.assertEqual(0, len(response.pyquery("#contact-form")))
+        self.assertEqual(0, len(response.pyquery("#contactmoment-form")))
 
     def test_form_requires_either_email_or_phonenumber(self, m):
         config = OpenKlantConfig.get_solo()
@@ -77,7 +75,7 @@ class ContactFormTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
         subject = ContactFormSubjectFactory(config=config)
 
         response = self.app.get(self.url)
-        form = response.forms["contact-form"]
+        form = response.forms["contactmoment-form"]
         form["subject"].select(text=subject.subject)
         form["first_name"] = "Foo"
         form["last_name"] = "Bar"
@@ -97,7 +95,7 @@ class ContactFormTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
         subject = ContactFormSubjectFactory(config=config)
 
         response = self.app.get(self.url)
-        form = response.forms["contact-form"]
+        form = response.forms["contactmoment-form"]
         form["subject"].select(text=subject.subject)
         form["first_name"] = "Foo"
         form["infix"] = "de"
@@ -141,7 +139,7 @@ class ContactFormTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
         subject = ContactFormSubjectFactory(config=config, subject="Vraag")
 
         response = self.app.get(self.url)
-        form = response.forms["contact-form"]
+        form = response.forms["contactmoment-form"]
         form["subject"].select(text=subject.subject)
         form["first_name"] = "Foo"
         form["infix"] = "de"
@@ -210,7 +208,7 @@ class ContactFormTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
         subject = ContactFormSubjectFactory(config=config, subject="Vraag")
 
         response = self.app.get(self.url, user=data.user)
-        form = response.forms["contact-form"]
+        form = response.forms["contactmoment-form"]
         form["subject"].select(text=subject.subject)
         form["first_name"] = "Foo"
         form["infix"] = "de"

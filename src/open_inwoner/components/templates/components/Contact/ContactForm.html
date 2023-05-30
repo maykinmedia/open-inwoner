@@ -2,7 +2,7 @@
 
 <div class="contactform__content">
     {% if has_form_configuration %}
-        {% form form_object=form_object method="POST" id="contact-form" submit_text=_('Verzenden') %}
+        {% form form_object=form_object method="POST" id="contactmoment-form" submit_text=_('Verzenden') %}
     {% else %}
         <p class="p">{% trans "Contact formulier niet geconfigureerd." %}</p>
     {% endif %}
