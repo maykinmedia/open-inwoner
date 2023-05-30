@@ -15,10 +15,6 @@ class MultipleChoiceNoValidationField(forms.MultipleChoiceField):
 
 
 class SearchForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["query"].widget.attrs["placeholder"] = _("Zoeken...")
-
     query = forms.CharField(
         label=_("Zoek op trefwoord"), max_length=400, required=False
     )
@@ -31,6 +27,10 @@ class SearchForm(forms.Form):
     organizations = MultipleChoiceNoValidationField(
         label=_("Organizations"), required=False, widget=forms.CheckboxSelectMultiple
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["query"].widget.attrs["placeholder"] = _("Zoeken...")
 
 
 class FeedbackForm(forms.ModelForm):
