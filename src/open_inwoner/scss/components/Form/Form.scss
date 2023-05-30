@@ -1,12 +1,12 @@
 .form {
   box-sizing: border-box;
   display: grid;
-  gap: var(--gutter-width);
+  gap: var(--spacing-small);
   padding: var(--gutter-width) 0;
   position: relative;
 
   @media (min-width: 768px) {
-    gap: var(--gutter-width);
+    gap: var(--spacing-large);
   }
 
   &#{&}--align-end {

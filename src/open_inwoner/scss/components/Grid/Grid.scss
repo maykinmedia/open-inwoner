@@ -56,8 +56,9 @@
 
   &__welcome {
     margin-bottom: var(--row-height);
+    margin-top: -80px;
     background-color: var(--color-white);
-    box-shadow: 0 0 var(--row-height) 0 var(--color-mute);
+    box-shadow: 0 0 var(--row-height) 0 var(--color-gray);
     padding: var(--spacing-large);
     box-sizing: border-box;
     width: 100%;

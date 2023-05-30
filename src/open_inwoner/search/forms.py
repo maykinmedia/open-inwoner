@@ -28,6 +28,10 @@ class SearchForm(forms.Form):
         label=_("Organizations"), required=False, widget=forms.CheckboxSelectMultiple
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["query"].widget.attrs["placeholder"] = _("Zoeken...")
+
 
 class FeedbackForm(forms.ModelForm):
     class Meta:
