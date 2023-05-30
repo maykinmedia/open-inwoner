@@ -9,7 +9,6 @@ from freezegun import freeze_time
 from timeline_logger.models import TimelineLog
 
 from open_inwoner.accounts.choices import LoginTypeChoices
-from open_inwoner.accounts.models import User
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.utils.logentry import LOG_ACTIONS
 
@@ -31,15 +30,16 @@ class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
         user.bsn = "999993847"
         user.save()
 
-        updated_user = User.objects.filter(email=user.email)
+        user.refresh_from_db()
 
-        self.assertEqual(updated_user[0].first_name, "Merel")
-        self.assertEqual(updated_user[0].last_name, "Kooyman")
-        self.assertEqual(updated_user[0].birthday, date(1982, 4, 10))
-        self.assertEqual(updated_user[0].street, "King Olivereiland")
-        self.assertEqual(updated_user[0].housenumber, "64")
-        self.assertEqual(updated_user[0].city, "'s-Gravenhage")
-        self.assertTrue(updated_user[0].is_prepopulated)
+        self.assertEqual(user.first_name, "Merel")
+        self.assertEqual(user.infix, "de")
+        self.assertEqual(user.last_name, "Kooyman")
+        self.assertEqual(user.birthday, date(1982, 4, 10))
+        self.assertEqual(user.street, "King Olivereiland")
+        self.assertEqual(user.housenumber, "64")
+        self.assertEqual(user.city, "'s-Gravenhage")
+        self.assertTrue(user.is_prepopulated)
 
     @override_settings(BRP_VERSION="1.3")
     def test_signal_updates_users_data_when_logged_in_via_digid_v_1_3(self, m):
@@ -52,15 +52,16 @@ class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
         user.bsn = "999993847"
         user.save()
 
-        updated_user = User.objects.filter(email=user.email)
+        user.refresh_from_db()
 
-        self.assertEqual(updated_user[0].first_name, "Merel")
-        self.assertEqual(updated_user[0].last_name, "Kooyman")
-        self.assertEqual(updated_user[0].birthday, date(1982, 4, 10))
-        self.assertEqual(updated_user[0].street, "King Olivereiland")
-        self.assertEqual(updated_user[0].housenumber, "64")
-        self.assertEqual(updated_user[0].city, "'s-Gravenhage")
-        self.assertTrue(updated_user[0].is_prepopulated)
+        self.assertEqual(user.first_name, "Merel")
+        self.assertEqual(user.infix, "de")
+        self.assertEqual(user.last_name, "Kooyman")
+        self.assertEqual(user.birthday, date(1982, 4, 10))
+        self.assertEqual(user.street, "King Olivereiland")
+        self.assertEqual(user.housenumber, "64")
+        self.assertEqual(user.city, "'s-Gravenhage")
+        self.assertTrue(user.is_prepopulated)
 
     @override_settings(BRP_VERSION="1.3")
     def test_request_adds_configured_headers_when_calling_via_digid_v_1_3(self, m):
@@ -86,45 +87,47 @@ class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
         self._setUpMocks_v_2(m)
 
         user = UserFactory(
-            first_name="", last_name="", login_type=LoginTypeChoices.digid
+            first_name="", infix="", last_name="", login_type=LoginTypeChoices.digid
         )
         user.bsn = "999993847"
 
         with self.assertLogs() as captured:
             user.save()
 
-        updated_user = User.objects.filter(email=user.email)
+        user.refresh_from_db()
 
         self.assertEqual(
             captured.records[1].getMessage(),
             "no service defined for Haal Centraal",
         )
-        self.assertEqual(updated_user[0].first_name, "")
-        self.assertEqual(updated_user[0].last_name, "")
-        self.assertEqual(updated_user[0].birthday, None)
-        self.assertEqual(updated_user[0].street, "")
-        self.assertEqual(updated_user[0].housenumber, "")
-        self.assertEqual(updated_user[0].city, "")
-        self.assertFalse(updated_user[0].is_prepopulated)
+        self.assertEqual(user.first_name, "")
+        self.assertEqual(user.infix, "")
+        self.assertEqual(user.last_name, "")
+        self.assertEqual(user.birthday, None)
+        self.assertEqual(user.street, "")
+        self.assertEqual(user.housenumber, "")
+        self.assertEqual(user.city, "")
+        self.assertFalse(user.is_prepopulated)
 
     def test_user_is_not_updated_when_not_logged_in_via_digid(self, m):
         self._setUpMocks_v_2(m)
 
         user = UserFactory(
-            first_name="", last_name="", login_type=LoginTypeChoices.default
+            first_name="", infix="", last_name="", login_type=LoginTypeChoices.default
         )
         user.bsn = "999993847"
         user.save()
 
-        updated_user = User.objects.filter(email=user.email)
+        user.refresh_from_db()
 
-        self.assertEqual(updated_user[0].first_name, "")
-        self.assertEqual(updated_user[0].last_name, "")
-        self.assertEqual(updated_user[0].birthday, None)
-        self.assertEqual(updated_user[0].street, "")
-        self.assertEqual(updated_user[0].housenumber, "")
-        self.assertEqual(updated_user[0].city, "")
-        self.assertFalse(updated_user[0].is_prepopulated)
+        self.assertEqual(user.first_name, "")
+        self.assertEqual(user.infix, "")
+        self.assertEqual(user.last_name, "")
+        self.assertEqual(user.birthday, None)
+        self.assertEqual(user.street, "")
+        self.assertEqual(user.housenumber, "")
+        self.assertEqual(user.city, "")
+        self.assertFalse(user.is_prepopulated)
 
     def test_empty_response_from_haalcentraal(self, m):
         self._setUpService()
@@ -140,20 +143,21 @@ class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
             json={"personen": [], "type": "RaadpleegMetBurgerservicenummer"},
         )
         user = UserFactory(
-            first_name="", last_name="", login_type=LoginTypeChoices.digid
+            first_name="", infix="", last_name="", login_type=LoginTypeChoices.digid
         )
         user.bsn = "999993847"
         user.save()
 
-        updated_user = User.objects.filter(email=user.email)
+        user.refresh_from_db()
 
-        self.assertEqual(updated_user[0].first_name, "")
-        self.assertEqual(updated_user[0].last_name, "")
-        self.assertEqual(updated_user[0].birthday, None)
-        self.assertEqual(updated_user[0].street, "")
-        self.assertEqual(updated_user[0].housenumber, "")
-        self.assertEqual(updated_user[0].city, "")
-        self.assertFalse(updated_user[0].is_prepopulated)
+        self.assertEqual(user.first_name, "")
+        self.assertEqual(user.infix, "")
+        self.assertEqual(user.last_name, "")
+        self.assertEqual(user.birthday, None)
+        self.assertEqual(user.street, "")
+        self.assertEqual(user.housenumber, "")
+        self.assertEqual(user.city, "")
+        self.assertFalse(user.is_prepopulated)
 
     @override_settings(BRP_VERSION="1.3")
     def test_wrong_date_format_saves_birthday_none_brp_v_1_3(self, m):
@@ -184,6 +188,7 @@ class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
         user.refresh_from_db()
 
         self.assertEqual(user.first_name, "")
+        self.assertEqual(user.infix, "")
         self.assertEqual(user.last_name, "")
         self.assertEqual(user.birthday, None)
         self.assertEqual(user.street, "")
@@ -205,20 +210,21 @@ class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
         )
 
         user = UserFactory(
-            first_name="", last_name="", login_type=LoginTypeChoices.digid
+            first_name="", infix="", last_name="", login_type=LoginTypeChoices.digid
         )
         user.bsn = "999993847"
         user.save()
 
-        updated_user = User.objects.filter(email=user.email)
+        user.refresh_from_db()
 
-        self.assertEqual(updated_user[0].first_name, "")
-        self.assertEqual(updated_user[0].last_name, "")
-        self.assertEqual(updated_user[0].birthday, None)
-        self.assertEqual(updated_user[0].street, "")
-        self.assertEqual(updated_user[0].housenumber, "")
-        self.assertEqual(updated_user[0].city, "")
-        self.assertFalse(updated_user[0].is_prepopulated)
+        self.assertEqual(user.first_name, "")
+        self.assertEqual(user.infix, "")
+        self.assertEqual(user.last_name, "")
+        self.assertEqual(user.birthday, None)
+        self.assertEqual(user.street, "")
+        self.assertEqual(user.housenumber, "")
+        self.assertEqual(user.city, "")
+        self.assertFalse(user.is_prepopulated)
 
     def test_user_is_not_updated_when_http_500(self, m):
         self._setUpService()
@@ -234,20 +240,21 @@ class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
         )
 
         user = UserFactory(
-            first_name="", last_name="", login_type=LoginTypeChoices.digid
+            first_name="", infix="", last_name="", login_type=LoginTypeChoices.digid
         )
         user.bsn = "999993847"
         user.save()
 
-        updated_user = User.objects.filter(email=user.email)
+        user.refresh_from_db()
 
-        self.assertEqual(updated_user[0].first_name, "")
-        self.assertEqual(updated_user[0].last_name, "")
-        self.assertEqual(updated_user[0].birthday, None)
-        self.assertEqual(updated_user[0].street, "")
-        self.assertEqual(updated_user[0].housenumber, "")
-        self.assertEqual(updated_user[0].city, "")
-        self.assertFalse(updated_user[0].is_prepopulated)
+        self.assertEqual(user.first_name, "")
+        self.assertEqual(user.infix, "")
+        self.assertEqual(user.last_name, "")
+        self.assertEqual(user.birthday, None)
+        self.assertEqual(user.street, "")
+        self.assertEqual(user.housenumber, "")
+        self.assertEqual(user.city, "")
+        self.assertFalse(user.is_prepopulated)
 
 
 class TestLogging(HaalCentraalMixin, TestCase):

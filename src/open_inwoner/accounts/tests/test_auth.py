@@ -38,6 +38,7 @@ class TestRegistrationFunctionality(WebTest):
         form = register_page.forms["registration-form"]
         form["email"] = self.user.email
         form["first_name"] = self.user.first_name
+        form["infix"] = ""
         form["last_name"] = self.user.last_name
         form["password1"] = self.user.password
         form["password2"] = self.user.password

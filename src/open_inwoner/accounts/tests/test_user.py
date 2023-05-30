@@ -13,6 +13,19 @@ from .factories import UserFactory
 
 
 class UserTests(TestCase):
+    def test_get_full_name(self):
+        user = User(first_name="Foo", infix="de", last_name="Bar")
+        self.assertEqual(user.get_full_name(), "Foo de Bar")
+
+        user = User(first_name="Foo", infix="", last_name="Bar")
+        self.assertEqual(user.get_full_name(), "Foo Bar")
+
+        user = User(first_name="", infix="de", last_name="Bar")
+        self.assertEqual(user.get_full_name(), "de Bar")
+
+        user = User(first_name="", infix="", last_name="Bar")
+        self.assertEqual(user.get_full_name(), "Bar")
+
     @freeze_time("2021-07-07 12:00:00")
     def test_get_age_same_day(self):
         with freeze_time("1990-07-07"):

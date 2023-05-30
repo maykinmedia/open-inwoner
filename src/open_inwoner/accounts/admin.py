@@ -68,6 +68,7 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
             {
                 "fields": (
                     "first_name",
+                    "infix",
                     "last_name",
                     "contact_type",
                     "bsn",
@@ -130,13 +131,14 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
     list_display = (
         "email",
         "first_name",
+        "infix",
         "last_name",
         "login_type",
         "is_staff",
         "is_active",
         "contact_type",
     )
-    search_fields = ("first_name", "last_name", "email")
+    search_fields = ("first_name", "infix", "last_name", "email")
     ordering = ("email",)
     filter_horizontal = (
         "user_contacts",

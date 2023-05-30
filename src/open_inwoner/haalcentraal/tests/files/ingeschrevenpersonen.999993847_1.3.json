@@ -7,11 +7,12 @@
   "geslachtsaanduiding": "vrouw",
   "naam": {
     "aanhef": "Geachte mevrouw Kooyman",
-    "aanschrijfwijze": "M. Kooyman",
-    "gebruikInLopendeTekst": "mevrouw Kooyman",
+    "aanschrijfwijze": "M. de Kooyman",
+    "gebruikInLopendeTekst": "mevrouw de Kooyman",
     "aanduidingNaamgebruik": "eigen",
     "voornamen": "Merel",
     "voorletters": "M.",
+    "voorvoegsel": "de",
     "geslachtsnaam": "Kooyman"
   },
   "verblijfplaats": {
