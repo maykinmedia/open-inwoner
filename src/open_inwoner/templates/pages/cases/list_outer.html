@@ -1,9 +1,12 @@
 {% extends 'master.html' %}
-{% load i18n anchor_menu_tags grid_tags icon_tags link_tags list_tags pagination_tags utils %}
+{% load i18n icon_tags %}
+
+<div id="cases-list-anchors-oob-mobile"></div>
 
 {% block sidebar_content %}
-    {% anchor_menu anchors=anchors desktop=True %}
+    <div id="cases-list-anchors-oob-desktop"></div>
 {% endblock sidebar_content %}
+
 
 {% block content %}
     <h1 class="h1" id="title">{% trans "Mijn aanvragen" %}</h1>
@@ -12,7 +15,7 @@
     
     <div class="loader-container" id="spinner-container">
         <div class="spinner" id="spinner-id" hx-get="{{ hxget }}" hx-trigger="load" hx-target="#cases-content">
-            <i class="fas fa-spinner fa-spin fa-lg"></i>
+            {% icon icon="cached" extra_classes="spinner-icon rotate" %}
         </div>
     </div>
 {% endblock content %}

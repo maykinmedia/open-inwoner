@@ -3,10 +3,12 @@ import 'htmx.org'
 import './accessibility'
 import './actions'
 import './anchor-menu'
+import { CreateGumshoe } from './anchor-menu/anchor-menu'
 import './autocomplete-search'
 import './autocomplete'
 import './autosumbit'
 import './cases'
+import { DisableSubmitButton } from './cases/document_upload'
 import './confirmation'
 import './contacts'
 import './datepicker'
@@ -35,6 +37,8 @@ htmx.config.includeIndicatorStyles = false
 // define selectors and callables to apply after we loaded a html fragment
 const elementWrappers = [
   [Dropdown.selector, (elt) => new Dropdown(elt)],
+  [CreateGumshoe.selector, (elt) => new CreateGumshoe(elt)],
+  [DisableSubmitButton.selector, (elt) => new DisableSubmitButton(elt)],
   // add more when needed
 ]
 

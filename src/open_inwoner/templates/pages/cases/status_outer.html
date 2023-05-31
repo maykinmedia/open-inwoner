@@ -1,10 +1,14 @@
 {% extends 'master.html' %}
-{% load i18n anchor_menu_tags %}
+{% load i18n icon_tags %}
+
+<div id="cases-status-anchors-oob-mobile"></div>
+
+{% block notifications %}
+    <div id="cases-status-messages-oob"></div>
+{% endblock notifications %}
 
 {% block sidebar_content %}
-    {% if case %}
-        {% anchor_menu anchors desktop=True %}
-    {% endif %}
+    <div id="cases-status-anchors-oob"></div>
 {% endblock sidebar_content %}
 
 {% block content %}
@@ -12,7 +16,7 @@
     
     <div class="loader-container" id="spinner-container">
         <div class="spinner" id="spinner-id" hx-get="{{ hxget }}" hx-trigger="load" hx-target="#cases-detail-content">
-            <i class="fas fa-spinner fa-spin fa-lg"></i>
+            {% icon icon="cached" extra_classes="spinner-icon rotate" %}
         </div>
     </div>
 {% endblock content %}

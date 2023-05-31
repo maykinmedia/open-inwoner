@@ -7,7 +7,7 @@
 
     <div class="pagination__pages">
         {% if page_obj.has_previous %}
-            <a class="pagination__link" 
+            <a class="pagination__link"
                 {% if hxget %}
                     hx-get="{{ hxget }}?{% querystring key='page' value=page_obj.previous_page_number %}" hx-trigger="click" hx-target="{{ hxtarget }}"
                 {% else %}

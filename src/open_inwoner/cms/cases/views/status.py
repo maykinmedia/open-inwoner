@@ -15,7 +15,6 @@ from glom import glom
 from view_breadcrumbs import BaseBreadcrumbMixin
 from zgw_consumers.api_models.constants import RolOmschrijving
 
-from open_inwoner.htmx.mixins import RequiresHtmxMixin
 from open_inwoner.openzaak.api_models import Zaak
 from open_inwoner.openzaak.cases import (
     connect_case_with_document,
@@ -32,7 +31,6 @@ from open_inwoner.openzaak.documents import (
     fetch_single_information_object_uuid,
     upload_document,
 )
-from open_inwoner.openzaak.formapi import fetch_open_submissions
 from open_inwoner.openzaak.models import (
     OpenZaakConfig,
     ZaakTypeConfig,
@@ -45,148 +43,8 @@ from open_inwoner.openzaak.utils import (
 )
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
-from .forms import CaseUploadForm
-from .mixins import CaseAccessMixin, CaseListMixin, CaseLogMixin
-
-
-class OuterOpenCaseListView(CommonPageMixin, BaseBreadcrumbMixin, TemplateView):
-    template_name = "pages/cases/outer_list.html"
-
-    @cached_property
-    def crumbs(self):
-        return [(_("Mijn aanvragen"), reverse("cases:open_cases"))]
-
-    def page_title(self):
-        return _("Lopende aanvragen")
-
-    def get_anchors(self) -> list:
-        return [
-            (reverse("cases:open_submissions"), _("Open aanvragen")),
-            ("#cases", _("Lopende aanvragen")),
-            (reverse("cases:closed_cases"), _("Afgeronde aanvragen")),
-        ]
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["anchors"] = self.get_anchors()
-        context["hxget"] = reverse("cases:open_cases_content")
-        return context
-
-
-class InnerOpenCaseListView(
-    RequiresHtmxMixin, CommonPageMixin, CaseAccessMixin, CaseListMixin, TemplateView
-):
-    template_name = "pages/cases/inner_list.html"
-
-    def page_title(self):
-        return _("Lopende aanvragen")
-
-    def get_cases(self):
-        all_cases = super().get_cases()
-
-        cases = [case for case in all_cases if not case.einddatum]
-        cases.sort(key=lambda case: case.startdatum, reverse=True)
-        return cases
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["hxget"] = reverse("cases:open_cases_content")
-        return context
-
-
-class OuterClosedCaseListView(CommonPageMixin, BaseBreadcrumbMixin, TemplateView):
-    template_name = "pages/cases/outer_list.html"
-
-    @cached_property
-    def crumbs(self):
-        return [(_("Mijn aanvragen"), reverse("cases:closed_cases"))]
-
-    def page_title(self):
-        return _("Afgeronde aanvragen")
-
-    def get_anchors(self) -> list:
-        return [
-            (reverse("cases:open_submissions"), _("Open aanvragen")),
-            (reverse("cases:open_cases"), _("Lopende aanvragen")),
-            ("#cases", _("Afgeronde aanvragen")),
-        ]
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["anchors"] = self.get_anchors()
-        context["hxget"] = reverse("cases:closed_cases_content")
-        return context
-
-
-class InnerClosedCaseListView(
-    RequiresHtmxMixin, CommonPageMixin, CaseAccessMixin, CaseListMixin, TemplateView
-):
-    template_name = "pages/cases/inner_list.html"
-
-    def page_title(self):
-        return _("Afgeronde aanvragen")
-
-    def get_cases(self):
-        all_cases = super().get_cases()
-
-        cases = [case for case in all_cases if case.einddatum]
-        cases.sort(key=lambda case: case.einddatum, reverse=True)
-        return cases
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["hxget"] = reverse("cases:closed_cases_content")
-        return context
-
-
-class OuterOpenSubmissionListView(CommonPageMixin, BaseBreadcrumbMixin, TemplateView):
-    template_name = "pages/cases/outer_submissions.html"
-
-    @cached_property
-    def crumbs(self):
-        return [(_("Mijn aanvragen"), reverse("cases:open_submissions"))]
-
-    def page_title(self):
-        return _("Open aanvragen")
-
-    def get_anchors(self) -> list:
-        return [
-            ("#submissions", _("Open aanvragen")),
-            (reverse("cases:open_cases"), _("Lopende aanvragen")),
-            (reverse("cases:closed_cases"), _("Afgeronde aanvragen")),
-        ]
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["anchors"] = self.get_anchors()
-        context["hxget"] = reverse("cases:open_submissions_content")
-        return context
-
-
-class InnerOpenSubmissionListView(
-    RequiresHtmxMixin,
-    CommonPageMixin,
-    BaseBreadcrumbMixin,
-    CaseAccessMixin,
-    TemplateView,
-):
-    template_name = "pages/cases/inner_submissions.html"
-
-    @cached_property
-    def crumbs(self):
-        return [(_("Mijn aanvragen"), reverse("cases:open_submissions"))]
-
-    def page_title(self):
-        return _("Open aanvragen")
-
-    def get_submissions(self):
-        submissions = fetch_open_submissions(self.request.user.bsn)
-        return submissions
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["submissions"] = self.get_submissions()
-        return context
+from .mixins import CaseAccessMixin, OuterCaseAccessMixin, CaseLogMixin
+from ..forms import CaseUploadForm
 
 
 @dataclasses.dataclass
@@ -196,8 +54,10 @@ class SimpleFile:
     url: str
 
 
-class OuterCaseDetailView(CommonPageMixin, BaseBreadcrumbMixin, TemplateView):
-    template_name = "pages/cases/outer_status.html"
+class OuterCaseDetailView(
+    OuterCaseAccessMixin, CommonPageMixin, BaseBreadcrumbMixin, TemplateView
+):
+    template_name = "pages/cases/status_outer.html"
 
     @cached_property
     def crumbs(self):
@@ -209,16 +69,23 @@ class OuterCaseDetailView(CommonPageMixin, BaseBreadcrumbMixin, TemplateView):
             ),
         ]
 
+    def get_anchors(self):
+        anchors = [["#title", _("Gegevens")]]
+        anchors.append(["#statuses", _("Status")])
+        anchors.append(["#documents", _("Documenten")])
+        return anchors
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["hxget"] = reverse("cases:case_detail_content", kwargs=self.kwargs)
+        context["anchors"] = self.get_anchors()
         return context
 
 
 class InnerCaseDetailView(
     CaseLogMixin, CommonPageMixin, BaseBreadcrumbMixin, CaseAccessMixin, FormView
 ):
-    template_name = "pages/cases/inner_status.html"
+    template_name = "pages/cases/status_inner.html"
     form_class = CaseUploadForm
 
     @cached_property
@@ -290,6 +157,7 @@ class InnerCaseDetailView(
             }
             context["case"].update(self.get_upload_info_context(self.case))
             context["anchors"] = self.get_anchors(statuses, documents)
+            context["hxpost"] = reverse("cases:case_detail_content", kwargs=self.kwargs)
         else:
             context["case"] = None
         return context

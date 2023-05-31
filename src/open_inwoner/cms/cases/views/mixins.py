@@ -1,9 +1,10 @@
 from collections import defaultdict
 from typing import List, Optional
 
-from django.contrib.auth.mixins import AccessMixin
+from django.contrib.auth.mixins import AccessMixin, LoginRequiredMixin
 from django.shortcuts import redirect
 from django.utils.translation import gettext_lazy as _
+from django.urls import reverse
 
 from glom import glom
 
@@ -159,3 +160,10 @@ class CaseListMixin(CaseLogMixin, PaginationMixin):
 
     def get_anchors(self) -> list:
         return []
+
+
+class OuterCaseAccessMixin(LoginRequiredMixin):
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated and not request.user.bsn:
+            return self.handle_no_permission()
+        return super().dispatch(request, *args, **kwargs)

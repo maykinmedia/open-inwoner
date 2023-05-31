@@ -1,4 +1,6 @@
-class DisableSubmitButton {
+export class DisableSubmitButton {
+  static selector = '#document-upload'
+
   constructor(form) {
     this.form = form
     this.form.addEventListener('submit', this.disableButton.bind(this))
@@ -10,7 +12,9 @@ class DisableSubmitButton {
   }
 }
 
-const caseDocumentForms = document.querySelectorAll('#document-upload')
+const caseDocumentForms = document.querySelectorAll(
+  DisableSubmitButton.selector
+)
 ;[...caseDocumentForms].forEach(
   (caseDocumentForm) => new DisableSubmitButton(caseDocumentForm)
 )

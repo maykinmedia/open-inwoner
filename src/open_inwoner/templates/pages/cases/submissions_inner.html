@@ -1,4 +1,12 @@
-{% load i18n button_tags link_tags %}
+{% load i18n anchor_menu_tags button_tags link_tags %}
+
+<div id="cases-submissions-anchors-oob-mobile" hx-swap-oob="true">
+    {% anchor_menu anchors=anchors desktop=False %}
+</div>
+
+<div id="cases-submissions-anchors-oob" hx-swap-oob="true">
+    {% anchor_menu anchors desktop=True %}
+</div>
 
 <h2 class="h2" id="submissions">{{ page_title }} ({{ submissions|length }})</h2>
 

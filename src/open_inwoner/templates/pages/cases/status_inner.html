@@ -1,4 +1,18 @@
-{% load i18n anchor_menu_tags card_tags dashboard_tags file_tags grid_tags status_tags table_tags solo_tags form_tags button_tags icon_tags %}
+{% load i18n anchor_menu_tags card_tags dashboard_tags file_tags grid_tags status_tags table_tags solo_tags form_tags button_tags icon_tags notification_tags %}
+
+<div id="cases-status-anchors-oob-mobile" hx-swap-oob="true">
+    {% anchor_menu anchors=anchors desktop=False %}
+</div>
+
+{# Messages #}
+<div class="container container--no-margin" id="cases-status-messages-oob" hx-swap-oob="true">
+    {% notifications messages %}
+</div>
+
+{# Anchor menu #}
+<div id="cases-status-anchors-oob" hx-swap-oob="true">
+    {% anchor_menu anchors desktop=True %}
+</div>
 
 {% get_solo 'openzaak.OpenZaakConfig' as openzaak_config %}
 
@@ -24,13 +38,13 @@
             {% endif %}
 
             {% if case.internal_upload_enabled %}
-                <h2 class="h2" id=>{% trans "Document toevoegen" %}</h2>
+                <h2 class="h2" id=>{% trans "Document uploaden" %}</h2>
                 {% if case.case_type_config_description %}
                     <p class="p">{{ case.case_type_config_description }}</p>
                 {% else %}
-                    <p class="p p--muted">
+                    <p class="p">
                         {% blocktranslate with max_filesize=openzaak_config.max_upload_size allowed_extensions=case.allowed_file_extensions|join:', ' %}
-                            Grootte max. {{ max_filesize }} MB, toegestane bestandsformaten {{ allowed_extensions }}.
+                            Grootte max. {{ max_filesize }} MB, toegestane document formaten: {{ allowed_extensions }}.
                         {% endblocktranslate %}
                     </p>
                 {% endif %}
@@ -38,15 +52,17 @@
                 <section id="form_upload" class="form__open-upload">
                     <div class="upload-interface">
                     {#  if local upload is enabled #}
-                    {% render_form id="document-upload" form=form method="POST" submit_text=_("Bestand uploaden") enctype="multipart/form-data" show_required=True %}
+                    {% render_form id="document-upload" form=form method="POST" hxencoding="multipart/form-data" hxpost=hxpost hxtarget="#cases-detail-content" submit_text=_("Bestand uploaden") show_required=True %}
                         {% csrf_token %}
                         <div id="info_container" class="info-container form__control--info">
-                            <div class="drive">
+                            <div class="upload-interface__info">
                                 <fieldset class="fieldset-container">
                                     <div class="drive">{% icon icon="insert_drive_file" outlined=True icon_position="before" %}</div>
                                     <div class="fieldset__content">
-                                        <div id="upload_name" class="upload-info upload-info__name"><span>{% trans "(Titel bestand)" %}</span></div>
-                                        <div id="upload_size" class="upload-info upload-info__size"><span>{% trans "(Bestandsgrootte)" %}</span></div>
+                                        <div id="upload_error" class="upload-info upload-info__error">
+                                            <span>{% trans "Selecteer uw bestand opnieuw" %} {% icon icon="arrow_downward" outlined=True icon_position="before" %}</span></div>
+                                        <div id="upload_name" class="upload-info upload-info__name"></div>
+                                        <div id="upload_size" class="upload-info upload-info__size"></div>
                                     </div>
                                     <div class="close">{% button id="close_upload" icon="cancel" type='reset' text='' transparent=True icon_outlined=True icon_position="before" %}</div>
                                 </fieldset>
@@ -59,10 +75,10 @@
 
                         <div class="form__control upload">
                             <div class="upload__container">
-                                {% file_input form.file text=_("Bestanden uploaden") no_label=False no_help=True extra_classes="file-upload" %}
+                                {% file_input form.file text=_("Document selecteren") no_label=False no_help=True extra_classes="file-upload" %}
                                 <div class="form__submit">
                                     {% button_row %}
-                                        {% button type="submit" text=_("Document toevoegen") id="submit_upload" primary=True %}
+                                        {% button type="submit" text=_("Document uploaden") id="submit_upload" primary=True %}
                                     {% endbutton_row %}
                                 </div>
                             </div>
@@ -79,7 +95,7 @@
                     <p class="p">{% trans "By clicking the button below you can upload a document. This is an external link and you will be redirected to a different system." %}</p>
                 {% endif %}
                 {% button_row %}
-                    {% button href=case.external_upload_url text=_("Document toevoegen") title=_("Opens new window") primary=True icon="open_in_new" icon_position="after" %}
+                    {% button href=case.external_upload_url text=_("Document uploaden") title=_("Opens new window") primary=True icon="open_in_new" icon_position="after" %}
                 {% endbutton_row %}
             {% endif %}
 

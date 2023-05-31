@@ -14,6 +14,9 @@
         hx-select="{{ async_selector }}"
         hx-target="{{ async_selector }}"
     {% endif %}
+    {% if hxencoding %}hx-encoding="{{ hxencoding }}"{% endif %}
+    {% if hxpost %}hx-post="{{ hxpost }}"{% endif %}
+    {% if hxtarget %}hx-target="{{ hxtarget }}"{% endif %}
 
 {#    HTML attribute to bypass browser defaults and show validation #}
     novalidate

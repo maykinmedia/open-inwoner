@@ -15,7 +15,7 @@ from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
-from open_inwoner.cms.cases.mixins import CaseListMixin
+from open_inwoner.cms.cases.views.mixins import CaseListMixin
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 
 from ...utils.tests.helpers import AssertRedirectsMixin

@@ -1,11 +1,21 @@
 import Gumshoe from 'gumshoejs'
 
-setTimeout(() => {
-  const anchors = document.querySelectorAll('.anchor-menu')
-  if (anchors.length > 0) {
+const htmx = (window.htmx = require('htmx.org'))
+
+export class CreateGumshoe {
+  static selector = '.anchor-menu'
+
+  constructor() {
     new Gumshoe('.anchor-menu--desktop a', {
       navClass: 'anchor-menu__list-item--active',
       offset: 30,
     })
   }
-}, 100)
+}
+
+htmx.onLoad(() => {
+  document.body.addEventListener('htmx:afterSwap', (event) => {
+    const anchors = document.querySelectorAll(CreateGumshoe.selector)
+    ;[...anchors].forEach((anchor) => new CreateGumshoe(anchor))
+  })
+})

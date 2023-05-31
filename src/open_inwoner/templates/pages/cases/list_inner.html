@@ -1,4 +1,12 @@
-{% load i18n grid_tags icon_tags list_tags pagination_tags utils %}
+{% load i18n anchor_menu_tags grid_tags icon_tags list_tags pagination_tags utils %}
+
+<div id="cases-list-anchors-oob-mobile" hx-swap-oob="true">
+    {% anchor_menu anchors=anchors desktop=False %}
+</div>
+
+<div id="cases-list-anchors-oob-desktop" hx-swap-oob="true">
+    {% anchor_menu anchors desktop=True %}
+</div>
 
 <h2 class="h2" id="cases">{{ page_title }} ({{ paginator.count }})</h2>
 {% render_grid %}
