@@ -26,7 +26,6 @@ class PrimaryNavigation extends Component {
    */
   bindEvents() {
     this.node.addEventListener('click', this.toggleDesktopNavOpen.bind(this))
-    this.node.addEventListener('focusin', this.onFocusIn.bind(this))
     this.node.addEventListener('focusout', this.onFocusOut.bind(this))
     window.addEventListener('keyup', this.onKeyUp.bind(this))
   }
@@ -36,13 +35,7 @@ class PrimaryNavigation extends Component {
    * Clears the dismissed state, (prevents overriding focus/hover).
    * Focusin and Focusout are used instead of Focus for Safari
    */
-  onFocusIn() {
-    this.setState({ dismissed: false })
-    this.node.classList.add('primary-navigation--open')
-  }
   onFocusOut() {
-    this.setState({ dismissed: true })
-    this.node.blur()
     this.node.classList.remove('primary-navigation--open')
   }
 
@@ -50,10 +43,11 @@ class PrimaryNavigation extends Component {
    * Gets called when `node` is clicked.
    * Clears the dismissed state, (prevents overriding focus/toggle).
    */
-  toggleDesktopNavOpen(event) {
-    event.stopPropagation()
-    this.setState({ dismissed: false })
-    this.node.classList.add('primary-navigation--open')
+  toggleDesktopNavOpen() {
+    this.node.classList.toggle('primary-navigation--open')
+    // Safari specific
+    this.node.classList.remove('primary-navigation--dismissed')
+    this.node.classList.remove('primary-navigation__main--dismissed')
   }
 
   /**
@@ -83,10 +77,6 @@ class PrimaryNavigation extends Component {
 
     if (state.dismissed) {
       this.node.blur()
-      // Safari specific
-      navigationToggle.forEach((elem) => {
-        elem.blur()
-      })
 
       return this.node.querySelector('.primary-navigation--toggle')
     }

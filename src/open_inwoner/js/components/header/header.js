@@ -33,7 +33,7 @@ class Header extends Component {
       ) {
         this.setState({ open: !this.state.open })
         /**
-         * Remove focus from search in order to prevent keyboard on mobile
+         * Remove focus from search in order to prevent native keyboard on mobile
          */
         const blurInput = document.querySelectorAll(
           '.header__submenu .form .input'
