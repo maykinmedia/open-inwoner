@@ -42,18 +42,29 @@ const elementWrappers = [
   // add more when needed
 ]
 
+// harden against multiple events
+// should not be needed but protects against unforeseen issues
+let activeElements = []
+
 function wrapComponentsOf(targetElement) {
+  console.debug(['wrapComponentsOf', targetElement])
   // apply the javascript component wrappers
   for (const [selector, callable] of elementWrappers) {
     for (const elt of htmx.findAll(targetElement, selector)) {
-      callable(elt)
-      console.debug(['htmx re-activated component on: ' + selector, elt])
+      if (activeElements.indexOf(elt) < 0) {
+        callable(elt)
+        activeElements.push(elt)
+        console.log(['htmx re-activated component on: ' + selector, elt])
+      } else {
+        console.debug([
+          'htmx skipped duplicate re-activation of component: ' + selector,
+          elt,
+        ])
+      }
     }
   }
+  // clean-up removed elements
+  activeElements = activeElements.filter((elt) => elt.isConnected)
 }
 
-htmx.onLoad(() => {
-  document.body.addEventListener('htmx:afterSwap', (event) => {
-    wrapComponentsOf(event.target)
-  })
-})
+htmx.onLoad(wrapComponentsOf)
