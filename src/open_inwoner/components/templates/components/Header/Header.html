@@ -81,7 +81,7 @@
 
                         {% if request.user.is_authenticated %}
                             <p class="p">
-                                {% icon icon="person" icon_position="before" icon_outlined=True %}{% trans "Ingelogd als" %} {{ request.user.get_short_name }}
+                                {% icon icon="person" icon_position="before" outlined=True %}{% trans "Ingelogd als" %} {{ request.user.get_short_name }}
                             </p>
                             <ul class="header__list">
                                 <li class="header__list-item">

@@ -9,9 +9,9 @@ class IndicatorChoices(DjangoChoices):
 
 
 class Icons(DjangoChoices):
-    apps = ChoiceItem("apps", _("Home"))
+    person = ChoiceItem("person", _("Home"))
     description = ChoiceItem("description", _("Products"))
     inbox = ChoiceItem("inbox", _("Inbox"))
     inventory_2 = ChoiceItem("inventory_2", _("Cases"))
-    people = ChoiceItem("people", _("Collaborate"))
+    group = ChoiceItem("group", _("Collaborate"))
     help_outline = ChoiceItem("help_outline", _("Help"))
