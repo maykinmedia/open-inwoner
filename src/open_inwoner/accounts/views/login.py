@@ -8,7 +8,7 @@ from django.core.signing import BadSignature, SignatureExpired, TimestampSigner
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.utils.http import is_safe_url, urlencode
+from django.utils.http import is_safe_url
 from django.utils.translation import gettext as _
 from django.views.decorators.cache import never_cache
 from django.views.generic import FormView, View
@@ -53,9 +53,7 @@ class CustomLoginView(LogMixin, LoginView):
 
         if not user.phonenumber:
             # Redirect to add mobile phone number view
-            return redirect(
-                furl(reverse("add_phone_number")).add(urlencode(params)).url
-            )
+            return redirect(furl(reverse("add_phone_number")).add(params).url)
 
         # Two factor: Send SMS
         # period between changes of the OTP value is in seconds
@@ -90,7 +88,7 @@ class CustomLoginView(LogMixin, LoginView):
 
             messages.debug(self.request, gateway.get_message(token))
 
-        return redirect(furl(reverse("verify_token")).add(urlencode(params)).url)
+        return redirect(furl(reverse("verify_token")).add(params).url)
 
 
 class VerifyTokenView(ThrottleMixin, FormView):
@@ -223,7 +221,7 @@ class ResendTokenView(ThrottleMixin, LogMixin, View):
     def get_verification_location(self, request, user):
         url_part = reverse(self.url_name)
         params = {"user": signer.sign(user.pk)}
-        location = furl(url_part).add(urlencode(params)).url
+        location = furl(url_part).add(params).url
         return redirect(location)
 
     def post(self, request):

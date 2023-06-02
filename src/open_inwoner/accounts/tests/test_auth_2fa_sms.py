@@ -8,7 +8,6 @@ from django.test import override_settings
 from django.test.utils import freeze_time as dj_freeze_time
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.http import urlencode
 from django.utils.translation import gettext as _
 
 from django_webtest import WebTest
@@ -48,10 +47,11 @@ class TestSMSVerificationLogin(WebTest):
         login_form["username"] = self.user.email
         login_form["password"] = "secret"
         login_form_response = login_form.submit()
+        login_form_response_redirect = login_form_response.follow()
 
         mock_gateway_send.assert_not_called()
         self.assertRedirects(login_form_response, reverse("pages-root"))
-        self.assertNotContains(login_form_response.follow(), "Account verificatie")
+        self.assertNotContains(login_form_response_redirect, "Account verificatie")
 
     @patch("open_inwoner.accounts.gateways.gateway.send")
     def test_login_with_valid_token_succeeds(self, mock_gateway_send):
@@ -61,14 +61,15 @@ class TestSMSVerificationLogin(WebTest):
         login_form = response.forms["login-form"]
         login_form["username"] = self.user.email
         login_form["password"] = "secret"
-        response = login_form.submit().follow()
+        response = login_form.submit()
+        response_redirect = response.follow()
 
-        self.assertContains(response, _("Account verificatie"))
+        self.assertContains(response_redirect, _("Account verificatie"))
         mock_gateway_send.assert_called_once_with(to=self.user.phonenumber, token=ANY)
 
         sent_token = mock_gateway_send.call_args[1]["token"]
 
-        verify_token_form = response.forms["verify-token-form"]
+        verify_token_form = response_redirect.forms["verify-token-form"]
         verify_token_form["token"] = sent_token
         response = verify_token_form.submit()
 
@@ -82,12 +83,13 @@ class TestSMSVerificationLogin(WebTest):
         login_form = response.forms["login-form"]
         login_form["username"] = self.user.email
         login_form["password"] = "secret"
-        response = login_form.submit().follow()
+        response = login_form.submit()
+        response_redirect = response.follow()
 
-        self.assertContains(response, _("Account verificatie"))
+        self.assertContains(response_redirect, _("Account verificatie"))
         mock_gateway_send.assert_called_once_with(to=self.user.phonenumber, token=ANY)
 
-        verify_token_form = response.forms["verify-token-form"]
+        verify_token_form = response_redirect.forms["verify-token-form"]
         verify_token_form["token"] = "wrongt"
         response = verify_token_form.submit()
 
@@ -106,10 +108,11 @@ class TestSMSVerificationLogin(WebTest):
         login_form = response.forms["login-form"]
         login_form["username"] = self.user.email
         login_form["password"] = "secret"
-        response = login_form.submit().follow()
+        response = login_form.submit()
+        response_redirect = response.follow()
 
         self.assertEqual(
-            [str(m) for m in response.context["messages"]],
+            [str(m) for m in response_redirect.context["messages"]],
             [
                 _(
                     "Het is vanwege een storing tijdelijk niet mogelijk om in te loggen, probeer het over 15 minuten nogmaals. "
@@ -142,9 +145,10 @@ class TestSMSVerificationLogin(WebTest):
             login_form = response.forms["login-form"]
             login_form["username"] = self.user.email
             login_form["password"] = "secret"
-            response = login_form.submit().follow()
+            response = login_form.submit()
+            response_redirect = response.follow()
 
-            self.assertContains(response, _("Account verificatie"))
+            self.assertContains(response_redirect, _("Account verificatie"))
             mock_gateway_send.assert_called_once_with(
                 to=self.user.phonenumber, token=ANY
             )
@@ -152,7 +156,7 @@ class TestSMSVerificationLogin(WebTest):
             sent_token = mock_gateway_send.call_args[1]["token"]
 
         with freeze_time("2023-05-22 11:05:01"):
-            verify_token_form = response.forms["verify-token-form"]
+            verify_token_form = response_redirect.forms["verify-token-form"]
             verify_token_form["token"] = sent_token
             response = verify_token_form.submit()
 
@@ -160,17 +164,16 @@ class TestSMSVerificationLogin(WebTest):
 
     @patch("open_inwoner.accounts.gateways.gateway.send")
     def test_login_token_with_max_attempts(self, mock_gateway_send):
-        with freeze_time("2023-05-22 12:00:00"):
+        with freeze_time("2023-05-22 12:00:00") as frozen_time:
             response = self.app.get(reverse("login"))
             mock_gateway_send.assert_not_called()
 
+            # login form
             login_form = response.forms["login-form"]
             login_form["username"] = self.user.email
             login_form["password"] = "secret"
-
             user1_login_response = login_form.submit()
 
-            user1_verify_token_url = user1_login_response.url
             user1_verify_token_response = user1_login_response.follow()
 
             self.assertContains(user1_verify_token_response, _("Account verificatie"))
@@ -184,25 +187,32 @@ class TestSMSVerificationLogin(WebTest):
                     "verify-token-form"
                 ]
                 user1_verify_token_form["token"] = "wrongt"
-                user1_verify_response = user1_verify_token_form.submit()
+                user1_verify_response = user1_verify_token_form.submit(status=200)
 
-                self.assertEqual(user1_verify_response.status_code, 200)
-
-            self.assertEqual(user1_verify_response.status_code, 200)
             self.assertContains(
                 user1_verify_response,
                 "Maximaal 3 pogingen. Probeer het over 1 minuut opnieuw",
             )
 
-            # check with a new user
+            # try again after 1 minute
+            frozen_time.tick(delta=datetime.timedelta(minutes=1))
+            user1_verify_token_form["token"] = user1_sent_token
+            user1_verify_response5 = user1_verify_token_form.submit()
+
+            self.assertRedirects(user1_verify_response5, reverse("pages-root"))
+
+            # check a new user can log in
+            frozen_time.tick(delta=datetime.timedelta(minutes=-1))
             other_user = UserFactory(email="ex2@example.com", password="secret2")
+
             response = self.app.get(reverse("login"))
             login_form = response.forms["login-form"]
             login_form["username"] = other_user.email
             login_form["password"] = "secret2"
-            response = login_form.submit().follow()
+            response = login_form.submit()
+            response_redirect = response.follow()
 
-            self.assertContains(response, _("Account verificatie"))
+            self.assertContains(response_redirect, _("Account verificatie"))
             mock_gateway_send.assert_called()
             self.assertEqual(mock_gateway_send.call_count, 2)
             self.assertEqual(
@@ -211,22 +221,10 @@ class TestSMSVerificationLogin(WebTest):
 
             sent_token = mock_gateway_send.call_args[1]["token"]
 
-            verify_token_form = response.forms["verify-token-form"]
+            verify_token_form = response_redirect.forms["verify-token-form"]
             verify_token_form["token"] = sent_token
             response = verify_token_form.submit()
 
-            self.assertRedirects(response, reverse("pages-root"))
-
-        # make sure the first user can login after a minute has passed
-        with freeze_time("2023-05-22 12:01:01"):
-            response = self.client.post(
-                user1_verify_token_url,
-                follow=True,
-                data={
-                    "token": user1_sent_token,
-                },
-            )
-            self.assertEqual(response.status_code, 200)
             self.assertRedirects(response, reverse("pages-root"))
 
     @patch("open_inwoner.accounts.gateways.gateway.send")
@@ -239,32 +237,31 @@ class TestSMSVerificationLogin(WebTest):
         login_form["username"] = self.user.email
         login_form["password"] = "secret"
         login_response = login_form.submit()
+        login_response_redirect = login_response.follow()
 
         params = {
             "next": "",
             "user": signer.sign(self.user.pk),
         }
-        verify_token_url = furl(reverse("verify_token")).add(urlencode(params)).url
+        verify_token_url = furl(reverse("verify_token")).add(params).url
 
         mock_gateway_send.assert_called_once_with(to=self.user.phonenumber, token=ANY)
         self.assertRedirects(login_response, verify_token_url)
-        self.assertContains(login_response.follow(), _("Account verificatie"))
+        self.assertContains(login_response_redirect, _("Account verificatie"))
 
         response = self.client.post(
-            reverse("resend_token") + "?" + urlencode(params),
+            furl(reverse("resend_token")).add(params).url,
             follow=True,
             HTTP_REFERER=verify_token_url,
         )
 
         mock_gateway_send.assert_called_with(to=self.user.phonenumber, token=ANY)
         self.assertEqual(mock_gateway_send.call_count, 2)
-        self.assertRedirects(
-            response, reverse("verify_token") + "?" + urlencode(params)
-        )
+        self.assertRedirects(response, furl(reverse("verify_token")).add(params).url)
 
         sent_token = mock_gateway_send.call_args[1]["token"]
 
-        verify_token_form = login_response.follow().forms["verify-token-form"]
+        verify_token_form = login_response_redirect.forms["verify-token-form"]
         verify_token_form["token"] = sent_token
         response = verify_token_form.submit()
 
@@ -286,6 +283,7 @@ class TestSMSVerificationLogin(WebTest):
             login_form["username"] = self.user.email
             login_form["password"] = "secret"
             login_response = login_form.submit()
+            login_response_redirect = login_response.follow()
 
             params = {
                 "next": "",
@@ -295,12 +293,12 @@ class TestSMSVerificationLogin(WebTest):
             mock_gateway_send.assert_called_once_with(
                 to=self.user.phonenumber, token=ANY
             )
-            verify_token_url = furl(reverse("verify_token")).add(urlencode(params)).url
+            verify_token_url = furl(reverse("verify_token")).add(params).url
 
             self.assertRedirects(login_response, verify_token_url)
-            self.assertContains(login_response.follow(), _("Account verificatie"))
+            self.assertContains(login_response_redirect, _("Account verificatie"))
 
-            resend_token_url = furl(reverse("resend_token")).add(urlencode(params)).url
+            resend_token_url = furl(reverse("resend_token")).add(params).url
             # we have a limit of 25 visit times per 5 minutes
             # here we have limited this to 2 times for testing purposes
             for login_attempt in range(1, 3):
@@ -333,20 +331,21 @@ class TestSMSVerificationLogin(WebTest):
             login_form["username"] = self.user.email
             login_form["password"] = "secret"
             login_response = login_form.submit()
+            login_response_redirect = login_response.follow()
 
             params = {
                 "next": "",
                 "user": signer.sign(self.user.pk),
             }
 
-            verify_token_url = furl(reverse("verify_token")).add(urlencode(params)).url
+            verify_token_url = furl(reverse("verify_token")).add(params).url
 
             self.assertRedirects(login_response, verify_token_url)
-            self.assertContains(login_response.follow(), _("Account verificatie"))
+            self.assertContains(login_response_redirect, _("Account verificatie"))
             self.assertEqual(mock_gateway_send.call_count, 4)
             mock_gateway_send.assert_called_with(to=self.user.phonenumber, token=ANY)
 
-            resend_token_url = furl(reverse("resend_token")).add(urlencode(params)).url
+            resend_token_url = furl(reverse("resend_token")).add(params).url
 
             # Unblocked attempt.
             response = self.client.post(
@@ -373,9 +372,9 @@ class TestSMSVerificationLogin(WebTest):
                 "user": signer.sign(self.user.pk),
             }
 
-        verify_token_url = furl(reverse("verify_token")).add(urlencode(params)).url
+        verify_token_url = furl(reverse("verify_token")).add(params).url
         response = self.client.post(
-            reverse("resend_token") + "?" + urlencode(params),
+            furl(reverse("resend_token")).add(params).url,
             follow=True,
             HTTP_REFERER=verify_token_url,
         )
@@ -395,13 +394,14 @@ class TestSMSVerificationLogin(WebTest):
         form["username"] = self.user.email
         form["password"] = "secret"
         login_response = form.submit()
+        login_response_redirect = login_response.follow()
 
         self.assertContains(
-            login_response.follow(), _("Account verificatie (stap 1 van 2)")
+            login_response_redirect, _("Account verificatie (stap 1 van 2)")
         )
         mock_gateway_send.assert_not_called()
 
-        phonenumber1_form = login_response.follow().forms["add-phonenumber-1-form"]
+        phonenumber1_form = login_response_redirect.forms["add-phonenumber-1-form"]
         phonenumber1_form["phonenumber-phonenumber_1"] = "0643465651"
         phonenumber1_form["phonenumber-phonenumber_2"] = "0643465651"
         phonenumber1_response = phonenumber1_form.submit()
@@ -433,14 +433,14 @@ class TestSMSVerificationLogin(WebTest):
         form = response.forms["login-form"]
         form["username"] = self.user.email
         form["password"] = "secret"
-        login_response = form.submit()
+        login_response_redirect = form.submit().follow()
 
         self.assertContains(
-            login_response.follow(), _("Account verificatie (stap 1 van 2)")
+            login_response_redirect, _("Account verificatie (stap 1 van 2)")
         )
         mock_gateway_send.assert_not_called()
 
-        phonenumber_form = login_response.follow().forms["add-phonenumber-1-form"]
+        phonenumber_form = login_response_redirect.forms["add-phonenumber-1-form"]
         phonenumber_form["phonenumber-phonenumber_1"] = "0643465651"
         phonenumber_form["phonenumber-phonenumber_2"] = "0643775651"
         phonenumber_response = phonenumber_form.submit()
