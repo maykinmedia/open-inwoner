@@ -630,6 +630,10 @@ maykin-python3-saml==1.14.0.post0
     #   -r requirements/base.txt
 mccabe==0.6.1
     # via pylint
+messagebird==2.1.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
 mozilla-django-oidc==2.0.0
     # via
     #   -c requirements/base.txt
@@ -640,6 +644,10 @@ mozilla-django-oidc-db==0.10.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
 notifications-api-common==0.2.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+oath==1.4.4
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -717,6 +725,7 @@ pyjwt==2.3.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   gemma-zds-client
+    #   messagebird
 pylint==2.11.1
     # via -r requirements/test-tools.in
 pyopenssl==22.1.0
@@ -748,6 +757,7 @@ python-dateutil==2.8.2
     #   elasticsearch-dsl
     #   faker
     #   freezegun
+    #   messagebird
 python-decouple==3.5
     # via
     #   -c requirements/base.txt
@@ -804,6 +814,7 @@ requests==2.26.0
     #   django-rosetta
     #   gemma-zds-client
     #   maykin-python3-saml
+    #   messagebird
     #   mozilla-django-oidc
     #   requests-mock
     #   zgw-consumers

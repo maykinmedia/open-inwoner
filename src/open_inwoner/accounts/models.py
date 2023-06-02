@@ -17,6 +17,7 @@ from mail_editor.helpers import find_template
 from privates.storages import PrivateMediaFileSystemStorage
 from timeline_logger.models import TimelineLog
 
+from open_inwoner.utils.hash import create_sha256_hash
 from open_inwoner.utils.validators import (
     validate_charfield_entry,
     validate_phone_number,
@@ -205,6 +206,15 @@ class User(AbstractBaseUser, PermissionsMixin):
     class Meta:
         verbose_name = _("User")
         verbose_name_plural = _("Users")
+
+    @property
+    def seed(self):
+        if not hasattr(self, "_seed"):
+            self._seed = create_sha256_hash(
+                str(self.date_joined) + str(self.uuid), salt=settings.SECRET_KEY
+            )
+
+        return self._seed
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
