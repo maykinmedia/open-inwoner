@@ -1,6 +1,7 @@
 from typing import Optional
 from urllib.parse import unquote
 
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
@@ -63,6 +64,10 @@ class CustomRegistrationView(LogMixin, InviteMixin, RegistrationView):
     def page_title(self):
         return _("Registratie")
 
+    def get_success_url(self):
+        messages.add_message(self.request, messages.SUCCESS, "Registratie is voltooid")
+        return reverse("pages-root")
+
     def form_valid(self, form):
         user = form.save()
 
@@ -110,13 +115,16 @@ class NecessaryFieldsUserView(LogMixin, LoginRequiredMixin, InviteMixin, UpdateV
     model = User
     form_class = NecessaryUserForm
     template_name = "accounts/registration_necessary.html"
-    success_url = reverse_lazy("django_registration_complete")
 
     def page_title(self):
         return _("Registratie voltooien")
 
     def get_object(self, queryset=None):
         return self.request.user
+
+    def get_success_url(self):
+        messages.add_message(self.request, messages.SUCCESS, "Registratie is voltooid")
+        return reverse("pages-root")
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
