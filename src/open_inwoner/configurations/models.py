@@ -407,6 +407,11 @@ class SiteConfiguration(SingletonModel):
             "Url example: 'https://www.example.com'"
         ),
     )
+    allow_messages_file_sharing = models.BooleanField(
+        verbose_name=_("Allow messages file sharing"),
+        default=True,
+        help_text=_("Whether file sharing via the messages is allowed or not"),
+    )
 
     class Meta:
         verbose_name = _("Site Configuration")

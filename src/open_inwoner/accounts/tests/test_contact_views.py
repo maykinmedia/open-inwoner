@@ -10,6 +10,7 @@ from django_webtest import WebTest
 from PIL import Image
 
 from open_inwoner.accounts.models import User
+from open_inwoner.utils.tests.helpers import create_image_bytes
 
 from ..choices import ContactTypeChoices
 from .factories import UserFactory
@@ -437,10 +438,7 @@ class ContactViewTests(WebTest):
 
     def test_contacts_image_is_shown_in_contact_approval_section(self):
         # prepare image
-        image = Image.new("RGB", (10, 10))
-        byteIO = io.BytesIO()
-        image.save(byteIO, format="png")
-        img_bytes = byteIO.getvalue()
+        img_bytes = create_image_bytes()
         image = ImageFile(io.BytesIO(img_bytes), name="foo.jpg")
 
         # update user's type and image
