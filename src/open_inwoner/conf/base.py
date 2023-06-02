@@ -839,7 +839,7 @@ ACCOUNTS_SMS_GATEWAY = {
         "ACCOUNTS_SMS_GATEWAY_BACKEND", "open_inwoner.accounts.gateways.Dummy"
     ),
     "API_KEY": config("ACCOUNTS_SMS_GATEWAY_API_KEY", "openinwoner"),
-    "ORIGINATOR": config("ACCOUNTS_SMS_GATEWAY_ORIGINATOR", "MijnGemeente"),
+    "ORIGINATOR": config("ACCOUNTS_SMS_GATEWAY_ORIGINATOR", "Gemeente"),
 }
 
 from .app.csp import *  # noqa
