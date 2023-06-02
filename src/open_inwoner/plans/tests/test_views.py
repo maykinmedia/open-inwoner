@@ -1090,7 +1090,7 @@ class NewPlanContactCounterTest(WebTest):
             title=_("Samenwerken"),
             extension_args={
                 "menu_indicator": IndicatorChoices.plan_new_contacts,
-                "menu_icon": Icons.people,
+                "menu_icon": Icons.group,
             },
             parent_page=homepage,
         )
@@ -1109,7 +1109,7 @@ class NewPlanContactCounterTest(WebTest):
 
         links = response.pyquery(f".primary-navigation a[href='{list_url}']")
         self.assertEqual(len(links), 2)  # Duplicate due to mobile
-        self.assertTrue(_("Samenwerken") + " people" in links.text())
+        self.assertTrue(_("Samenwerken") + " group" in links.text())
 
         # check if the number shows up in the menu
         plan_1.plan_contacts.add(user)
@@ -1130,7 +1130,7 @@ class NewPlanContactCounterTest(WebTest):
             f".header__container > .primary-navigation a[href='{list_url}']"
         )
         self.assertEqual(len(links), 1)
-        self.assertEqual(links.text(), _("Samenwerken") + " people")
+        self.assertEqual(links.text(), _("Samenwerken") + " group")
 
         # check this doesn't appear for owner
         response = self.app.get(root_url, user=owner)

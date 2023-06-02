@@ -2,7 +2,7 @@
 {% for child in children %}
 {% with url=child.attr.redirect_url|default:child.get_absolute_url %}
     <li class="primary-navigation__list-item">
-        {% link text=child.get_menu_title href=url icon=child.common.menu_icon icon_position="before" %}
+        {% link text=child.get_menu_title href=url icon=child.common.menu_icon icon_outlined=True icon_position="before" %}
         {% if child.indicator %}
             <span class="indicator"><a class="link secondary indicator__link" href="{{ url }}">{{ child.indicator }}<span class="indicator__dot"></span></a></span>
         {% endif %}
