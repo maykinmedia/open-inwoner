@@ -55,6 +55,7 @@ def render_form(parser, token):
         - enctype: string | set the encrypt when sending forms.
         - id: string | set an id on the form. Useful for testing.
         - data_confirm_title: string | If a confirm dialog is shown this will be the title.
+        - data_confirm_text: string | If a confirm dialog is shown this will be the description.
         - data_confirm_cancel: string | If a confirm dialog is shown this will be the text on the cancel button.
         - data_confirm_default: string | If a confirm dialog is shown this will be the text on the confirm button.
         - submit_text: string | The text on the submit button when the form is auto rendered.
@@ -111,6 +112,7 @@ def form(context, form_object, secondary=True, **kwargs):
         - enctype: string | set the encrypt when sending forms.
         - id: string | set an id on the form. Useful for testing.
         - data_confirm_title: string | If a confirm dialog is shown this will be the title.
+        - data_confirm_text: string | If a confirm dialog is shown this will be the description.
         - data_confirm_cancel: string | If a confirm dialog is shown this will be the text on the cancel button.
         - data_confirm_default: string | If a confirm dialog is shown this will be the text on the confirm button.
         - show_notifications: bool | Whether to show messages from Django messages framework.
