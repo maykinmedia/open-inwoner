@@ -50,7 +50,9 @@
                 <div class="group-input">
                     {% textarea form.content %}
                     <div class="group-input__toolbar">
-                        {% input form.file icon="attach_file" no_label=True no_help=True extra_classes="message-file" %}
+                        {% if allow_file_sharing %}
+                            {% input form.file icon="attach_file" no_label=True no_help=True extra_classes="message-file" %}
+                        {% endif %}
                         <div class="emoji">
                             {% button class="emoji__button" icon="tag_faces" text=_('Selecteer emoji') hide_text=True type="button" %}
                             <div class="emoji__popup">

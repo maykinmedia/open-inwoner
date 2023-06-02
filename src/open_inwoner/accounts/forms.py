@@ -492,6 +492,7 @@ class InboxForm(forms.ModelForm):
 
     def __init__(self, user, **kwargs):
         self.user = user
+        self.config = SiteConfiguration.get_solo()
 
         super().__init__(**kwargs)
 
@@ -500,16 +501,23 @@ class InboxForm(forms.ModelForm):
         self.fields["receiver"].choices = choices
         self.fields["receiver"].queryset = contact_users
 
+        if not self.config.allow_messages_file_sharing:
+            del self.fields["file"]
+
     def clean(self):
         cleaned_data = super().clean()
 
         content = cleaned_data.get("content")
         file = cleaned_data.get("file")
 
-        if not file and not content:
-            self.add_error(
-                "content", _("Either message content or file should be filled in")
-            )
+        if self.config.allow_messages_file_sharing:
+            if not content and not file:
+                self.add_error(
+                    "content", _("Either message content or file should be filled in")
+                )
+        else:
+            if not content:
+                self.add_error("content", _("Content should be filled in"))
 
         return cleaned_data
 

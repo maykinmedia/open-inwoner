@@ -1,3 +1,4 @@
+import io
 import logging
 
 from django.conf import settings
@@ -8,6 +9,7 @@ from django.utils.encoding import force_str
 
 from django_otp import DEVICE_ID_SESSION_KEY
 from furl import furl
+from PIL import Image
 from timeline_logger.models import TimelineLog
 from two_factor.utils import default_device
 
@@ -136,3 +138,15 @@ class TwoFactorUserTestMixin:
         if user is None:
             user = list(self._passwords.keys())[0]
         return user.totpdevice_set.create(name="default")
+
+
+def create_image_bytes(img_file=None):
+    if img_file:
+        img = Image.open(img_file)
+    else:
+        img = Image.new("RGB", (10, 10))
+    image_io = io.BytesIO()
+    img.save(image_io, format="JPEG")
+    img_bytes = image_io.getvalue()
+
+    return img_bytes

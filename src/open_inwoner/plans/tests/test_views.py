@@ -505,7 +505,6 @@ class PlanViewTests(WebTest):
         response = self.app.get(self.edit_url, user=self.user)
         form = response.forms["plan-form"]
         form["title"] = "Plan title"
-        # breakpoint()
         response = form.submit().follow()
         self.assertEqual(response.status_code, 200)
         self.plan.refresh_from_db()
@@ -1107,7 +1106,6 @@ class NewPlanContactCounterTest(WebTest):
 
         # check no number shows by default
         response = self.app.get(root_url, user=user)
-        response.showbrowser()
 
         links = response.pyquery(f".primary-navigation a[href='{list_url}']")
         self.assertEqual(len(links), 2)  # Duplicate due to mobile

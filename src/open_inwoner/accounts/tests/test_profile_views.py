@@ -5,7 +5,6 @@ from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 import requests_mock
-from cms import api
 from django_webtest import WebTest
 from PIL import Image
 from timeline_logger.models import TimelineLog
@@ -16,6 +15,7 @@ from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 from open_inwoner.pdc.tests.factories import CategoryFactory
 from open_inwoner.utils.logentry import LOG_ACTIONS
+from open_inwoner.utils.tests.helpers import create_image_bytes
 
 from ...cms.profile.cms_apps import ProfileApphook
 from ...cms.tests import cms_tools
@@ -198,12 +198,6 @@ class EditProfileTests(WebTest):
         self.url = reverse("profile:edit")
         self.return_url = reverse("profile:detail")
         self.user = UserFactory()
-
-    def create_test_image_bytes(self):
-        image = Image.new("RGB", (10, 10))
-        byteIO = io.BytesIO()
-        image.save(byteIO, format="png")
-        return byteIO.getvalue()
 
     def upload_test_image_to_profile_edit_page(self, img_bytes):
         response = self.app.get(self.url, user=self.user, status=200)
@@ -393,7 +387,7 @@ class EditProfileTests(WebTest):
         self.user.contact_type = ContactTypeChoices.begeleider
         self.user.save()
 
-        img_bytes = self.create_test_image_bytes()
+        img_bytes = create_image_bytes()
         form_response = self.upload_test_image_to_profile_edit_page(img_bytes)
 
         self.assertRedirects(form_response, reverse("profile:detail"))
@@ -411,7 +405,7 @@ class EditProfileTests(WebTest):
         self.user.login_type = LoginTypeChoices.digid
         self.user.save()
 
-        img_bytes = self.create_test_image_bytes()
+        img_bytes = create_image_bytes()
         form_response = self.upload_test_image_to_profile_edit_page(img_bytes)
 
         self.assertRedirects(form_response, reverse("profile:detail"))
