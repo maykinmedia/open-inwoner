@@ -26,6 +26,6 @@ class MessageBirdSMSTestCase(TestCase):
         mock_message_create.assert_called_once_with(
             "OIP",
             "0123456789",
-            "Open Inwoner Platform Bevestigingscode: 123456 (deze code is geldig voor 5 minuten)",
+            "Inlogcode: 123456 (deze code is geldig voor 5 minuten)",
         )
         self.assertTrue(result)
