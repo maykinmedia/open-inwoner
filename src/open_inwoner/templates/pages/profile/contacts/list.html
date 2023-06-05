@@ -84,7 +84,7 @@
                 <td class="table__item">{% trans "Soort contact" %}</td>
                 <td class="table__item">{% trans "E-mailadres" %}</td>
                 <td class="table__item">{% trans "Telefoonnummer" %}</td>
-                <td class="table__item" colspan="2">{% trans "Actief" %}&nbsp;</td>
+		<td class="table__item" {% if inbox_page_is_published %}colspan="2" {% else %}colspan="1"{% endif %}{% trans "Actief" %}&nbsp;</td>
                 <td class="table__item">&nbsp;</td>
             </tr>
         </thead>
@@ -103,8 +103,10 @@
                         <td class="table__item">{{invite.invitee_email}}</td>
                         <td class="table__item"></td>
                         <td class="table__item">{% icon "close" extra_classes="icon icon--danger" %}</td>
-                        <td class="table__item">{% button text=_('Stuur bericht') icon="message" icon_position="before" icon_outlined=True transparent=True disabled=True %}</td>
-                        <td class="table__item">{% button icon="settings" icon_position="before" text="" hide_text=True transparent=True disabled=True %}<td>
+			{% if inbox_page_is_published %}
+			    <td class="table__item">{% button text=_('Stuur bericht') icon="message" icon_position="before" icon_outlined=True transparent=True disabled=True %}</td>
+			{% endif %}
+			<td class="table__item">{% button icon="settings" icon_position="before" text="" hide_text=True transparent=True disabled=True %}<td>
                     </tr>
                 {% endfor %}
 
@@ -116,7 +118,9 @@
                         <td class="table__item">{{contact.email}}</td>
                         <td class="table__item"></td>
                         <td class="table__item">{% icon "close" extra_classes="icon icon--danger" %}</td>
-                        <td class="table__item">{% button text=_('Stuur bericht') icon="message" icon_position="before" icon_outlined=True transparent=True disabled=True %}</td>
+			{% if inbox_page_is_published %}
+			    <td class="table__item">{% button text=_('Stuur bericht') icon="message" icon_position="before" icon_outlined=True transparent=True disabled=True %}</td>
+			{% endif %}
                         <td class="table__item">{% button icon="settings" icon_position="before" text="" hide_text=True transparent=True disabled=True %}<td>
                     </tr>
                 {% endfor %}
@@ -126,10 +130,13 @@
                     <tr>
                         <th class="table__header">{{ contact.get_full_name }}</th>
                         <td class="table__item">{% if contact.contact_type == "contact" %}Contactpersoon{% elif contact.contact_type == "begeleider" %}Begeleider{% elif contact.contact_type == "organization" %}Organisatie{% endif %}</td>
+
                         <td class="table__item">{{ contact.get_contact_email|default:"" }}</td>
                         <td class="table__item">{{ contact.phonenumber }}</td>
                         <td class="table__item">{% if contact.is_not_active %}{% icon "close" extra_classes="icon icon--danger" %}{% else %}{% icon "check" %}{% endif %}</td>
-                        <td class="table__item">{% button text=_('Stuur bericht') icon="message" icon_position="before" href=contact.get_contact_message_url icon_outlined=True transparent=True disabled=contact.is_not_active %}</td>
+			{% if inbox_page_is_published %}
+                            <td class="table__item">{% button text=_('Stuur bericht') icon="message" icon_position="before" href=contact.get_contact_message_url icon_outlined=True transparent=True disabled=contact.is_not_active %}</td>
+			{% endif %}
                         <td class="table__item">
                             {% dropdown icon="settings" disabled=contact.is_not_active %}
                                 <div class="dropdown__item">

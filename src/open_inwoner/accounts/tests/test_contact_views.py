@@ -6,8 +6,8 @@ from django.test import override_settings
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
+from cms import api
 from django_webtest import WebTest
-from PIL import Image
 
 from open_inwoner.accounts.models import User
 from open_inwoner.utils.tests.helpers import create_image_bytes
@@ -85,10 +85,40 @@ class ContactViewTests(WebTest):
             ),
         )
 
-    def test_contact_list_show_link_to_messages(self):
-        message_link = reverse("inbox:index", kwargs={"uuid": self.contact.uuid})
+    def test_messages_enabled_disabled(self):
+        """Assert that `Stuur Bericht` is displayed if and only if the message page is published"""
+
+        # case 1: no message page
         response = self.app.get(self.list_url, user=self.user)
-        self.assertContains(response, message_link)
+
+        # self.assertNotIn(_("Stuur bericht"), response)
+        self.assertNotContains(response, _("Stuur bericht"))
+
+        # case 2: unpublished message page
+        page = api.create_page(
+            "Mijn Berichten",
+            "cms/fullwidth.html",
+            "nl",
+            slug="berichten",
+        )
+        page.application_namespace = "inbox"
+        page.save()
+
+        response = self.app.get(self.list_url, user=self.user)
+
+        self.assertNotContains(response, _("Stuur bericht"))
+
+        # case 3: published message page
+        page.publish("nl")
+        page.save()
+
+        response = self.app.get(self.list_url, user=self.user)
+
+        icons = response.pyquery(".material-icons-outlined")
+        message_icon = next((icon for icon in icons if icon.text == "message"), None)
+        message_button_text = message_icon.tail.strip()
+
+        self.assertEqual(_("Stuur bericht"), message_button_text)
 
     def test_contact_list_show_reversed(self):
         other_contact = UserFactory(first_name="reverse_contact_user_should_be_found")
@@ -366,19 +396,12 @@ class ContactViewTests(WebTest):
 
         self.assertContains(response, self.user.first_name)
         self.assertContains(response, self.user.last_name)
-        self.assertContains(
-            response, reverse("inbox:index", kwargs={"uuid": self.user.uuid})
-        )
 
         # Sender contact list page
         response = self.app.get(self.list_url, user=self.user)
 
         self.assertContains(response, existing_user.first_name)
         self.assertContains(response, existing_user.last_name)
-        self.assertContains(
-            response,
-            reverse("inbox:index", kwargs={"uuid": existing_user.uuid}),
-        )
 
     def test_post_with_no_params_in_contact_approval_returns_bad_request(self):
         existing_user = UserFactory(email="ex@example.com")
