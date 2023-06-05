@@ -156,7 +156,7 @@ class MockAPIData:
         mock_service_oas_get(m, CATALOGI_ROOT, "ztc")
         mock_service_oas_get(m, DOCUMENTEN_ROOT, "drc")
 
-    def install_mocks(self, m, *, res404: Optional[List[str]] = None) -> "MockData":
+    def install_mocks(self, m, *, res404: Optional[List[str]] = None) -> "MockAPIData":
         self.setUpOASMocks(m)
         if res404 is None:
             res404 = []

@@ -91,7 +91,7 @@ def handle_zaken_notification(notification: Notification):
     inform_users = get_emailable_initiator_users_from_roles(roles)
     if not inform_users:
         log_system_action(
-            f"ignored {r} notification: no users with bsn and valid email as (mede)initiators in case {case_url}",
+            f"ignored {r} notification: no users with bsn, valid email or with enabled notifications as (mede)initiators in case {case_url}",
             log_level=logging.INFO,
         )
         return
@@ -336,7 +336,7 @@ def send_case_update_email(user: User, case: Zaak):
     send the actual mail
     """
     case_detail_url = build_absolute_url(
-        reverse("accounts:case_status", kwargs={"object_id": str(case.uuid)})
+        reverse("cases:case_detail", kwargs={"object_id": str(case.uuid)})
     )
 
     template = find_template("case_notification")
@@ -384,6 +384,8 @@ def get_emailable_initiator_users_from_roles(roles: List[Rol]) -> List[User]:
     if not bsn_list:
         return []
     users = list(
-        User.objects.filter(bsn__in=bsn_list, is_active=True).having_usable_email()
+        User.objects.filter(
+            bsn__in=bsn_list, is_active=True, cases_notifications=True
+        ).having_usable_email()
     )
     return users

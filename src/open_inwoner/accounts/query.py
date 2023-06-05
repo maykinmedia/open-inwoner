@@ -17,6 +17,7 @@ class MessageQuerySet(QuerySet):
                 - other_user_id
                 - other_user_email
                 - other_user_first_name
+                - other_user_infix
                 - other_user_last_name
 
             other_user_id matches the value of either sender or receiver field,
@@ -55,6 +56,12 @@ class MessageQuerySet(QuerySet):
                 other_user_first_name=Case(
                     When(receiver=user, then=F("sender__first_name")),
                     default=F("receiver__first_name"),
+                )
+            )
+            .annotate(
+                other_user_infix=Case(
+                    When(receiver=user, then=F("sender__infix")),
+                    default=F("receiver__infix"),
                 )
             )
             .annotate(

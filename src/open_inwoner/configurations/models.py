@@ -1,7 +1,8 @@
+from typing import Optional
+
 from django.contrib.flatpages.models import FlatPage
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from colorfield.fields import ColorField
@@ -9,7 +10,6 @@ from filer.fields.image import FilerImageField
 from ordered_model.models import OrderedModel, OrderedModelManager
 from solo.models import SingletonModel
 
-from open_inwoner.pdc.utils import PRODUCT_PATH_NAME
 from open_inwoner.utils.validators import validate_phone_number
 
 from ..utils.colors import hex_to_hsl
@@ -71,7 +71,7 @@ class SiteConfiguration(SingletonModel):
         blank=True,
         on_delete=models.SET_NULL,
         related_name="hero_image_login",
-        help_text=_("Hero image on the login page"),
+        help_text=_("Deprecated. CMS banner plugin should be used instead."),
     )
     login_show = models.BooleanField(
         verbose_name=_("Toon inlogknop rechts bovenin"),
@@ -85,6 +85,13 @@ class SiteConfiguration(SingletonModel):
         default=False,
         help_text=_(
             "Wanneer deze optie uit staat is het enkel toegestaan om met DigiD in te loggen. Zet deze instelling aan om ook het inloggen met gebruikersnaam/wachtwoord en het aanmelden zonder DigiD toe te staan."
+        ),
+    )
+    login_2fa_sms = models.BooleanField(
+        verbose_name=_("Login with 2FA-with-SMS"),
+        default=False,
+        help_text=_(
+            "Whether we want the users to be able to log in with 2FA authentication by using an SMS workflow."
         ),
     )
     login_text = models.TextField(
@@ -105,25 +112,25 @@ class SiteConfiguration(SingletonModel):
     )
     home_theme_title = models.CharField(
         max_length=255,
-        default=_("Thema's"),
+        default=_("Onderwerpen"),
         verbose_name=_("Home theme's title"),
-        help_text=_("Theme's title on the home page."),
+        help_text=_("Category's title on the home page."),
     )
     home_theme_intro = models.TextField(
         verbose_name=_("Home theme's intro"),
         blank=True,
-        help_text=_("Theme's intro text on the home page."),
+        help_text=_("Category's intro text on the home page."),
     )
     theme_title = models.CharField(
         max_length=255,
-        default=_("Thema's"),
-        verbose_name=_("Theme's title"),
-        help_text=_("Theme's title on the theme's page."),
+        default=_("Onderwerpen"),
+        verbose_name=_("Category's title"),
+        help_text=_("Category's title on the theme's page."),
     )
     theme_intro = models.TextField(
-        verbose_name=_("Theme's intro"),
+        verbose_name=_("Category's intro"),
         blank=True,
-        help_text=_("Theme's intro text on the theme's page."),
+        help_text=_("Category's intro text on the theme's page."),
     )
     home_map_title = models.CharField(
         max_length=255,
@@ -196,15 +203,6 @@ class SiteConfiguration(SingletonModel):
         verbose_name=_("Edit goal message"),
         help_text=_("The message when a user edits a goal."),
     )
-    plans_banner = FilerImageField(
-        verbose_name=_("Plans banner"),
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name="plans_banner",
-        help_text=_("Banner of the plans"),
-    )
-
     footer_visiting_title = models.CharField(
         max_length=255,
         default="",
@@ -285,7 +283,7 @@ class SiteConfiguration(SingletonModel):
     home_help_text = models.TextField(
         blank=True,
         default=_(
-            "Welkom! Op dit scherm vindt u een overzicht van de verschillende thema's en producten & diensten."
+            "Welkom! Op dit scherm vindt u een overzicht van de verschillende onderwerpen en producten & diensten."
         ),
         verbose_name=_("Home help"),
         help_text=_("The help text for the home page."),
@@ -293,9 +291,9 @@ class SiteConfiguration(SingletonModel):
     theme_help_text = models.TextField(
         blank=True,
         default=_(
-            "Op dit scherm vindt u de verschillende thema's waarvoor wij producten en diensten aanbieden."
+            "Op dit scherm vindt u de verschillende onderwerpen waarvoor wij producten en diensten aanbieden."
         ),
-        verbose_name=_("Theme help"),
+        verbose_name=_("Category help"),
         help_text=_("The help text for the theme page."),
     )
     product_help_text = models.TextField(
@@ -382,36 +380,6 @@ class SiteConfiguration(SingletonModel):
             "The xxxxx part is the ID."
         ),
     )
-
-    show_cases = models.BooleanField(
-        verbose_name=_("Show cases"),
-        default=False,
-        help_text=_(
-            "By default the cases are not shown. If the OpenZaak integration is configured this needs to be set to True."
-        ),
-    )
-    show_product_finder = models.BooleanField(
-        verbose_name=_("Laat productzoeker zien op de homepagina."),
-        blank=True,
-        default=False,
-        help_text=_(
-            "Als dit is aangevinkt en er zijn product condities gemaakt, dan wordt op de homepagina de productzoeker weergegeven."
-        ),
-    )
-    show_plans = models.BooleanField(
-        verbose_name=_("Laat samenwerken zien op de homepage en menu"),
-        default=True,
-        help_text=_(
-            "Als dit is aangevinkt, dan wordt op de homepagina en het gebruikers profiel de samenwerken feature weergegeven."
-        ),
-    )
-    show_actions = models.BooleanField(
-        verbose_name=_("Laat acties zien op de profiel pagina"),
-        default=True,
-        help_text=_(
-            "Als dit is aangevinkt, dan worded op de gebruikers profiel pagina de acties weergegeven."
-        ),
-    )
     openid_connect_logo = FilerImageField(
         verbose_name=_("Openid Connect Logo"),
         null=True,
@@ -428,19 +396,28 @@ class SiteConfiguration(SingletonModel):
             "The text that should display when OpenId connect is set as a login method"
         ),
     )
+    redirect_to = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        verbose_name=_("Redirect anonymous user to"),
+        help_text=_(
+            "Provide a url or a path where the user should be redirected to from the anonymous page. "
+            "Path example: '/accounts/login/', "
+            "Url example: 'https://www.example.com'"
+        ),
+    )
+    allow_messages_file_sharing = models.BooleanField(
+        verbose_name=_("Allow messages file sharing"),
+        default=True,
+        help_text=_("Whether file sharing via the messages is allowed or not"),
+    )
 
     class Meta:
         verbose_name = _("Site Configuration")
 
     def __str__(self):
         return str(_("Site Configuration"))
-
-    def clean(self):
-        super().clean()
-
-        if self.show_plans and not self.show_actions:
-            msg = _("Als Samenwerken actief is moeten Acties ook actief zijn")
-            raise ValidationError({"show_actions": msg, "show_plans": msg})
 
     @property
     def get_primary_color(self):
@@ -470,28 +447,31 @@ class SiteConfiguration(SingletonModel):
     def siteimprove_enabled(self):
         return bool(self.siteimprove_id)
 
-    def get_help_text(self, request):
-        current_path = request.get_full_path()
+    def get_help_text(self, request) -> Optional[str]:
+        match = request.resolver_match
+        path = request.get_full_path()
+        if not match:
+            return ""
 
-        if current_path == reverse("root"):
+        lookup = {
+            "pages-root": "home_help_text",
+            "products:category_list": "theme_help_text",
+            "products:category_product_detail": "product_help_text",
+            "products:product_detail": "product_help_text",
+            "products:product_form": "product_help_text",
+            "search:search": "search_help_text",
+            "profile:detail": "account_help_text",
+            "products:questionnaire_list": "questionnaire_help_text",
+            "collaborate:plan_list": "plan_help_text",
+        }
+
+        attr = lookup.get(match.view_name, "")
+        if attr:
+            return getattr(self, attr)
+        elif path in ("", "/"):
             return self.home_help_text
-        if (
-            current_path.startswith(reverse("pdc:category_list"))
-            and f"/{PRODUCT_PATH_NAME}/" in current_path
-        ):
-            return self.product_help_text
-        if current_path.startswith(f"/{PRODUCT_PATH_NAME}/"):
-            return self.product_help_text
-        if current_path.startswith(reverse("pdc:category_list")):
-            return self.theme_help_text
-        if current_path.startswith(reverse("search:search")):
-            return self.search_help_text
-        if current_path.startswith(reverse("accounts:my_profile")):
-            return self.account_help_text
-        if current_path.startswith(reverse("questionnaire:questionnaire_list")):
-            return self.questionnaire_help_text
-        if current_path.startswith(reverse("plans:plan_list")):
-            return self.plan_help_text
+        else:
+            return ""
 
 
 class SiteConfigurationPage(OrderedModel):

@@ -1,0 +1,15 @@
+[
+  {
+    "model": "profile.Profileconfig",
+    "fields": {
+      "namespace": "profile-apphook-config",
+      "my_data": true,
+      "selected_categories": true,
+      "mentors": true,
+      "my_contacts": true,
+      "selfdiagnose": true,
+      "actions": true,
+      "notifications": true
+    }
+  }
+]

@@ -2,6 +2,7 @@ import io
 
 from django.core import mail
 from django.core.files.images import ImageFile
+from django.test import override_settings
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
@@ -9,11 +10,13 @@ from django_webtest import WebTest
 from PIL import Image
 
 from open_inwoner.accounts.models import User
+from open_inwoner.utils.tests.helpers import create_image_bytes
 
 from ..choices import ContactTypeChoices
 from .factories import UserFactory
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class ContactViewTests(WebTest):
     csrf_checks = False
 
@@ -23,10 +26,10 @@ class ContactViewTests(WebTest):
         self.contact = UserFactory()
         self.user.user_contacts.add(self.contact)
         self.login_url = reverse("login")
-        self.list_url = reverse("accounts:contact_list")
-        self.create_url = reverse("accounts:contact_create")
+        self.list_url = reverse("profile:contact_list")
+        self.create_url = reverse("profile:contact_create")
         self.delete_url = reverse(
-            "accounts:contact_delete", kwargs={"uuid": self.contact.uuid}
+            "profile:contact_delete", kwargs={"uuid": self.contact.uuid}
         )
 
     def test_contact_list_login_required(self):
@@ -83,7 +86,7 @@ class ContactViewTests(WebTest):
         )
 
     def test_contact_list_show_link_to_messages(self):
-        message_link = reverse("accounts:inbox", kwargs={"uuid": self.contact.uuid})
+        message_link = reverse("inbox:index", kwargs={"uuid": self.contact.uuid})
         response = self.app.get(self.list_url, user=self.user)
         self.assertContains(response, message_link)
 
@@ -271,7 +274,7 @@ class ContactViewTests(WebTest):
 
     def test_delete_action_redirects_to_contact_list_page(self):
         response = self.app.post(self.delete_url, user=self.user)
-        self.assertRedirects(response, reverse("accounts:contact_list"))
+        self.assertRedirects(response, reverse("profile:contact_list"))
 
     def test_user_cannot_delete_other_users_contact(self):
         other_user = UserFactory()
@@ -330,13 +333,13 @@ class ContactViewTests(WebTest):
         response = self.app.get(self.list_url, user=existing_user)
         form = response.forms["approval_form"]
         response = form.submit("contact_approve")
-        self.assertRedirects(response, reverse("accounts:contact_list"))
+        self.assertRedirects(response, reverse("profile:contact_list"))
 
     def test_user_cannot_approve_other_users_contact(self):
         other_user = UserFactory()
         contact = UserFactory()
         self.user.contacts_for_approval.add(contact)
-        url = reverse("accounts:contact_approval", kwargs={"uuid": contact.uuid})
+        url = reverse("profile:contact_approval", kwargs={"uuid": contact.uuid})
         response = self.app.post(url, user=other_user, status=404)
 
     def test_pending_approval_shows_only_email_in_creator_page(self):
@@ -364,7 +367,7 @@ class ContactViewTests(WebTest):
         self.assertContains(response, self.user.first_name)
         self.assertContains(response, self.user.last_name)
         self.assertContains(
-            response, reverse("accounts:inbox", kwargs={"uuid": self.user.uuid})
+            response, reverse("inbox:index", kwargs={"uuid": self.user.uuid})
         )
 
         # Sender contact list page
@@ -374,13 +377,13 @@ class ContactViewTests(WebTest):
         self.assertContains(response, existing_user.last_name)
         self.assertContains(
             response,
-            reverse("accounts:inbox", kwargs={"uuid": existing_user.uuid}),
+            reverse("inbox:index", kwargs={"uuid": existing_user.uuid}),
         )
 
     def test_post_with_no_params_in_contact_approval_returns_bad_request(self):
         existing_user = UserFactory(email="ex@example.com")
         self.user.contacts_for_approval.add(existing_user)
-        url = reverse("accounts:contact_approval", kwargs={"uuid": self.user.uuid})
+        url = reverse("profile:contact_approval", kwargs={"uuid": self.user.uuid})
         response = self.app.post(url, user=existing_user, status=400)
         self.assertEqual(
             response.text, "contact_approve or contact_reject must be provided"
@@ -406,7 +409,7 @@ class ContactViewTests(WebTest):
             f"Goedkeuring geven op Open Inwoner Platform: {self.user.get_full_name()} wilt u toevoegen als contactpersoon",
         )
         self.assertEqual(email.to, [existing_user.email])
-        invite_url = f"http://testserver{reverse('accounts:contact_list')}"
+        invite_url = f"http://testserver{reverse('profile:contact_list')}"
         body = email.alternatives[0][0]  # html version of the email body
         self.assertIn(invite_url, body)
 
@@ -426,7 +429,7 @@ class ContactViewTests(WebTest):
             f"Goedkeuring geven op Open Inwoner Platform: {self.user.get_full_name()} wilt u toevoegen als contactpersoon",
         )
         self.assertNotEqual(email.to, ["john@example.com"])
-        invite_url = f"http://testserver{reverse('accounts:contact_list')}"
+        invite_url = f"http://testserver{reverse('profile:contact_list')}"
         body = email.alternatives[0][0]  # html version of the email body
         self.assertNotIn(invite_url, body)
 
@@ -435,10 +438,7 @@ class ContactViewTests(WebTest):
 
     def test_contacts_image_is_shown_in_contact_approval_section(self):
         # prepare image
-        image = Image.new("RGB", (10, 10))
-        byteIO = io.BytesIO()
-        image.save(byteIO, format="png")
-        img_bytes = byteIO.getvalue()
+        img_bytes = create_image_bytes()
         image = ImageFile(io.BytesIO(img_bytes), name="foo.jpg")
 
         # update user's type and image

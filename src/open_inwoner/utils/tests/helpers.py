@@ -1,8 +1,17 @@
+import io
 import logging
 
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.shortcuts import resolve_url
+from django.urls import reverse
 from django.utils.encoding import force_str
 
+from django_otp import DEVICE_ID_SESSION_KEY
+from furl import furl
+from PIL import Image
 from timeline_logger.models import TimelineLog
+from two_factor.utils import default_device
 
 
 class Lookups:
@@ -63,3 +72,81 @@ class AssertTimelineLogMixin:
 
     def dumpTimelineLog(self):
         print(self.getTimelineLogDump())
+
+
+class AssertRedirectsMixin:
+    def assertRedirectsLogin(
+        self, response, *, next: str = None, with_host: bool = False
+    ):
+        url = reverse("login")
+        if next is not None:
+            url = furl(url).set(args={"next": str(next)}).url
+        if with_host:
+            url = furl(url).set(scheme="http", host="testserver").url
+        self.assertRedirects(response, url)
+
+    def assertRedirectsLogout(
+        self, response, *, next: str = None, with_host: bool = False
+    ):
+        url = reverse("logout")
+        if next is not None:
+            url = furl(url).set(args={"next": str(next)}).url
+        if with_host:
+            url = furl(url).set(scheme="http", host="testserver").url
+        self.assertRedirects(response, url)
+
+
+class TwoFactorUserTestMixin:
+    """
+    mixin to setup two-factor verified users
+
+    copied from: https://github.com/jazzband/django-two-factor-auth/blob/21962acf9717985a1b2bb019de4c6f2f982767a1/tests/utils.py#LL12C17-L12C17
+
+    usage examples: https://github.com/jazzband/django-two-factor-auth/blob/21962acf9717985a1b2bb019de4c6f2f982767a1/tests/test_views_mixins.py#L12
+
+    verified user:
+        self.create_user()
+        self.enable_otp()  # create OTP before login, so verified
+        self.login_user()
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.login_url = resolve_url(settings.LOGIN_URL)
+        cls.User = get_user_model()
+
+    def setUp(self):
+        super().setUp()
+        self._passwords = {}
+
+    def create_user(self, email="bouke@example.com", password="secret", **kwargs):
+        user = self.User.objects.create_user(email=email, password=password, **kwargs)
+        self._passwords[user] = password
+        return user
+
+    def login_user(self):
+        user = list(self._passwords.keys())[0]
+        username = user.get_username()
+        assert self.client.login(username=username, password=self._passwords[user])
+        if default_device(user):
+            session = self.client.session
+            session[DEVICE_ID_SESSION_KEY] = default_device(user).persistent_id
+            session.save()
+
+    def enable_otp(self, user=None):
+        if user is None:
+            user = list(self._passwords.keys())[0]
+        return user.totpdevice_set.create(name="default")
+
+
+def create_image_bytes(img_file=None):
+    if img_file:
+        img = Image.open(img_file)
+    else:
+        img = Image.new("RGB", (10, 10))
+    image_io = io.BytesIO()
+    img.save(image_io, format="JPEG")
+    img_bytes = image_io.getvalue()
+
+    return img_bytes

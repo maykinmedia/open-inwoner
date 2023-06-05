@@ -7,6 +7,8 @@ from django_webtest import WebTest
 from PIL import Image
 from webtest import Upload
 
+from open_inwoner.utils.tests.helpers import create_image_bytes
+
 from ..choices import ContactTypeChoices
 from ..models import User
 from .factories import UserFactory
@@ -17,6 +19,7 @@ class TestAdminUser(WebTest):
         self.user = UserFactory(
             is_superuser=True, is_staff=True, email="john@example.com"
         )
+        self.assertEqual(User.objects.count(), 1)
 
     def test_user_is_created_without_case_sensitive_email(self):
         response = self.app.get(reverse("admin:accounts_user_add"), user=self.user)
@@ -95,10 +98,7 @@ class TestAdminUser(WebTest):
         self.user.contact_type = ContactTypeChoices.begeleider
         self.user.save()
 
-        image = Image.new("RGB", (10, 10))
-        byteIO = io.BytesIO()
-        image.save(byteIO, format="png")
-        img_bytes = byteIO.getvalue()
+        img_bytes = create_image_bytes()
 
         response = self.app.get(
             reverse("admin:accounts_user_change", kwargs={"object_id": self.user.pk}),
@@ -118,10 +118,7 @@ class TestAdminUser(WebTest):
         self.assertIsNotNone(self.user.image.file)
 
     def test_non_begeleider_cannot_add_an_image(self):
-        image = Image.new("RGB", (10, 10))
-        byteIO = io.BytesIO()
-        image.save(byteIO, format="png")
-        img_bytes = byteIO.getvalue()
+        img_bytes = create_image_bytes()
 
         response = self.app.get(
             reverse("admin:accounts_user_change", kwargs={"object_id": self.user.pk}),

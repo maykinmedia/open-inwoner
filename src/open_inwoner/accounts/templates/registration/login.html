@@ -1,11 +1,9 @@
 {% extends 'master.html' %}
-{% load i18n static logo_tags grid_tags card_tags form_tags link_tags button_tags solo_tags %}
+{% load i18n static logo_tags grid_tags card_tags form_tags link_tags button_tags solo_tags cms_tags %}
 
 
 {% block header_image %}
-<aside aria-hidden="true">
-    <img class="main-image" src="{{ hero_image_login }}" alt="Header afbeelding">
-</aside>
+    {% static_placeholder 'login_banner' %}
 {% endblock header_image %}
 
 
@@ -49,7 +47,7 @@
 
                 {% if login_allow_registration %}
                     {% render_card tinted=True %}
-                        {% render_form id="login-form" method="POST" form=form %}
+                        {% render_form id="login-form" method="POST" form=form show_required=True %}
                             {% csrf_token %}
                             <input type="hidden" name="next" value="{{next}}" />
                             {% input form.username %}

@@ -11,6 +11,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 from django.views.generic import DetailView, FormView, TemplateView, UpdateView
 
+from aldryn_apphooks_config.mixins import AppConfigMixin
 from glom import glom
 from view_breadcrumbs import BaseBreadcrumbMixin
 
@@ -24,19 +25,24 @@ from open_inwoner.questionnaire.models import QuestionnaireStep
 from open_inwoner.utils.mixins import ExportMixin
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
-from ..forms import BrpUserForm, ThemesForm, UserForm
+from ..forms import BrpUserForm, CategoriesForm, UserForm, UserNotificationsForm
 from ..models import Action, User
 
 
 class MyProfileView(
-    LogMixin, LoginRequiredMixin, CommonPageMixin, BaseBreadcrumbMixin, FormView
+    LogMixin,
+    LoginRequiredMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    AppConfigMixin,
+    FormView,
 ):
     template_name = "pages/profile/me.html"
     form_class = Form
 
     @cached_property
     def crumbs(self):
-        return [(_("Mijn profiel"), reverse("accounts:my_profile"))]
+        return [(_("Mijn profiel"), reverse("profile:detail"))]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -65,7 +71,7 @@ class MyProfileView(
             .first()
         )
         context["files"] = user.get_all_files()
-        context["theme_text"] = user.get_interests()
+        context["category_text"] = user.get_interests()
         context["action_text"] = _(
             f"{Action.objects.visible().connected(self.request.user).filter(status=StatusChoices.open).count()} acties staan open."
         )
@@ -99,7 +105,7 @@ class MyProfileView(
             return redirect(instance.get_logout_url())
         else:
             messages.warning(request, _("Uw account kon niet worden gedeactiveerd"))
-            return redirect("accounts:my_profile")
+            return redirect("profile:detail")
 
 
 class EditProfileView(
@@ -108,13 +114,13 @@ class EditProfileView(
     template_name = "pages/profile/edit.html"
     model = User
     form_class = UserForm
-    success_url = reverse_lazy("accounts:my_profile")
+    success_url = reverse_lazy("profile:detail")
 
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn profiel"), reverse("accounts:my_profile")),
-            (_("Bewerk profiel"), reverse("accounts:edit_profile", kwargs=self.kwargs)),
+            (_("Mijn profiel"), reverse("profile:detail")),
+            (_("Bewerk profiel"), reverse("profile:edit", kwargs=self.kwargs)),
         ]
 
     def get_object(self):
@@ -143,14 +149,14 @@ class MyCategoriesView(
 ):
     template_name = "pages/profile/categories.html"
     model = User
-    form_class = ThemesForm
-    success_url = reverse_lazy("accounts:my_profile")
+    form_class = CategoriesForm
+    success_url = reverse_lazy("profile:detail")
 
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn profiel"), reverse("accounts:my_profile")),
-            (_("Mijn thema's"), reverse("accounts:my_themes")),
+            (_("Mijn profiel"), reverse("profile:detail")),
+            (_("Mijn onderwerpen"), reverse("profile:categories")),
         ]
 
     def get_object(self):
@@ -171,8 +177,8 @@ class MyDataView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn profiel"), reverse("accounts:my_profile")),
-            (_("Mijn gegevens"), reverse("accounts:my_data")),
+            (_("Mijn profiel"), reverse("profile:detail")),
+            (_("Mijn gegevens"), reverse("profile:data")),
         ]
 
     def get_context_data(self, **kwargs):
@@ -226,6 +232,36 @@ class MyDataView(
                 my_data["birthday"] = None
 
         return my_data
+
+
+class MyNotificationsView(
+    LogMixin, LoginRequiredMixin, CommonPageMixin, BaseBreadcrumbMixin, UpdateView
+):
+    template_name = "pages/profile/notifications.html"
+    model = User
+    form_class = UserNotificationsForm
+    success_url = reverse_lazy("profile:detail")
+
+    @cached_property
+    def crumbs(self):
+        return [
+            (_("Mijn profiel"), reverse("profile:detail")),
+            (_("Communicatievoorkeuren"), reverse("profile:notifications")),
+        ]
+
+    def get_object(self):
+        return self.request.user
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
+
+    def form_valid(self, form):
+        form.save()
+
+        self.log_change(self.object, _("users notifications were modified"))
+        return HttpResponseRedirect(self.get_success_url())
 
 
 class MyProfileExportView(LogMixin, LoginRequiredMixin, ExportMixin, DetailView):

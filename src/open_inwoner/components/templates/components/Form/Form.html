@@ -1,12 +1,13 @@
-{% load form_tags link_tags notification_tags %}
+{% load i18n form_tags link_tags notification_tags %}
 {# Shared between Form and RenderForm. #}
 <form
     class="{{ classes }}"
     method="{{ method }}"
-    action="{% firstof form_action request.path %}"
+    {% if no_action %}action=""{% else %}action="{% firstof form_action request.path %}"{% endif %}
     {% if enctype %}enctype="{{enctype}}"{% endif %}
     {% if id %}id="{{id}}"{% endif %}
     {% if data_confirm_title %}data-confirm-title="{{ data_confirm_title }}"{% endif %}
+    {% if data_confirm_text %}data-confirm-text="{{ data_confirm_text }}"{% endif %}
     {% if data_confirm_cancel %}data-confirm-cancel="{{ data_confirm_cancel }}"{% endif %}
     {% if data_confirm_default %}data-confirm-default="{{ data_confirm_default }}"{% endif %}
     {% if async_selector %}
@@ -14,6 +15,9 @@
         hx-select="{{ async_selector }}"
         hx-target="{{ async_selector }}"
     {% endif %}
+
+{#    HTML attribute to bypass browser defaults and show validation #}
+    novalidate
 >
     {% if form.non_field_errors %}
         {% errors errors=form.non_field_errors %}
@@ -21,6 +25,14 @@
 
     {% if show_notifications %}
         {% notifications messages icon=False %}
+    {% endif %}
+
+    {% if show_required %}
+        <span class="caption__content" id="caption">
+        {% blocktrans trimmed with star='(<span class="label__label--required">*</span>)'|safe %}
+            Velden gemarkeerd met een sterretje {{star}} zijn verplicht
+        {% endblocktrans%}
+        </span>
     {% endif %}
 
     {% if auto_render %}

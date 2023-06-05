@@ -2,6 +2,7 @@ from unittest.mock import patch
 
 from django.core import mail
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.formats import date_format
 
@@ -22,6 +23,7 @@ from ..utils import format_zaak_identificatie
 from .test_notification_data import MockAPIData
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class NotificationHandlerUtilsTestCase(TestCase):
     @patch(
         "open_inwoner.openzaak.notifications.format_zaak_identificatie",
@@ -36,7 +38,7 @@ class NotificationHandlerUtilsTestCase(TestCase):
         case = factory(Zaak, data.zaak)
         case.zaaktype = factory(ZaakType, data.zaak_type)
 
-        case_url = reverse("accounts:case_status", kwargs={"object_id": str(case.uuid)})
+        case_url = reverse("cases:case_detail", kwargs={"object_id": str(case.uuid)})
 
         send_case_update_email(user, case)
 

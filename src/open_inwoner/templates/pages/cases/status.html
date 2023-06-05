@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n anchor_menu_tags card_tags dashboard_tags file_tags grid_tags status_tags table_tags solo_tags form_tags button_tags %}
+{% load i18n anchor_menu_tags card_tags dashboard_tags file_tags grid_tags status_tags table_tags solo_tags form_tags button_tags icon_tags %}
 
 {% block sidebar_content %}
     {% if case %}
@@ -9,7 +9,8 @@
 
 {% block content %}
     {% get_solo 'openzaak.OpenZaakConfig' as openzaak_config %}
-    
+
+    <div class="cases__detail">
     {% if case %}
         {% render_grid %}
             {% render_column span=9 %}
@@ -32,23 +33,72 @@
                 {% endif %}
 
                 {% if case.internal_upload_enabled %}
-                    <h2 class="h2" id=>{% trans "Document toevoegen" %}</h2>
-                    <p class="p">
-                        {% blocktranslate with max_filesize=openzaak_config.max_upload_size allowed_extensions=case.allowed_file_extensions|join:', ' %}
-                            Grootte max. {{ max_filesize }} MB, toegestane bestandsformaten {{ allowed_extensions }}. 
-                        {% endblocktranslate %}
-                    </p>
-                    {% form id="document-upload" form_object=form method="POST" submit_text=_("Bestand uploaden") enctype="multipart/form-data" %}
+                    <h2 class="h2" id=>{% trans "Document uploaden" %}</h2>
+                    {% if case.case_type_config_description %}
+                        <p class="p">{{ case.case_type_config_description }}</p>
+                    {% else %}
+                        <p class="p">
+                            {% blocktranslate with max_filesize=openzaak_config.max_upload_size allowed_extensions=case.allowed_file_extensions|join:', ' %}
+                                Grootte max. {{ max_filesize }} MB, toegestane document formaten: {{ allowed_extensions }}.
+                            {% endblocktranslate %}
+                        </p>
+                    {% endif %}
+
+                    <section id="form_upload" class="form__open-upload">
+                        <div class="upload-interface">
+                        {#  if local upload is enabled #}
+                        {% render_form id="document-upload" form=form method="POST" submit_text=_("Bestand uploaden") enctype="multipart/form-data" show_required=True %}
+                            {% csrf_token %}
+                            <div id="info_container" class="info-container form__control--info">
+                                <div class="upload-interface__info">
+                                    <fieldset class="fieldset-container">
+                                        <div class="drive">{% icon icon="insert_drive_file" outlined=True icon_position="before" %}</div>
+                                        <div class="fieldset__content">
+                                            <div id="upload_error" class="upload-info upload-info__error">
+                                                <span>{% trans "Selecteer uw bestand opnieuw" %} {% icon icon="arrow_downward" outlined=True icon_position="before" %}</span></div>
+                                            <div id="upload_name" class="upload-info upload-info__name"></div>
+                                            <div id="upload_size" class="upload-info upload-info__size"></div>
+                                        </div>
+                                        <div class="close">{% button id="close_upload" icon="cancel" type='reset' text='' transparent=True icon_outlined=True icon_position="before" %}</div>
+                                    </fieldset>
+                                </div>
+                            </div>
+
+                            <div class="form__control--info">{% input form.title no_label=False no_help=True id="id_title" %}</div>
+
+                            <div class="form__control--info">{% input form.type no_label=False no_help=True icon="expand_more" icon_position="after" class="label input" id="id_type" extra_classes="file-type__select" %}</div>
+
+                            <div class="form__control upload">
+                                <div class="upload__container">
+                                    {% file_input form.file text=_("Document selecteren") no_label=False no_help=True extra_classes="file-upload" %}
+                                    <div class="form__submit">
+                                        {% button_row %}
+                                            {% button type="submit" text=_("Document uploaden") id="submit_upload" primary=True %}
+                                        {% endbutton_row %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endrender_form %}
+                        </div>
+                    </section>
+
                 {% elif case.external_upload_enabled %}
-                    <p class="p">{% trans "By clicking the button below you can upload a document. This is an external link and you will be redirected to a different system." %}</p>
+                    <h2 class="h2">{% trans "Document toevoegen" %}</h2>
+                    {% if case.case_type_config_description %}
+                        <p class="p">{{ case.case_type_config_description }}</p>
+                    {% else %}
+                        <p class="p">{% trans "By clicking the button below you can upload a document. This is an external link and you will be redirected to a different system." %}</p>
+                    {% endif %}
                     {% button_row %}
-                        {% button href=case.external_upload_url text=_("Document toevoegen") title=_("Opens new window") primary=True icon="open_in_new" icon_position="after" %}
+                        {% button href=case.external_upload_url text=_("Document uploaden") title=_("Opens new window") primary=True icon="open_in_new" icon_position="after" %}
                     {% endbutton_row %}
                 {% endif %}
+
 
             {% endrender_column %}
         {% endrender_grid %}
     {% else %}
         <h2 class="h2">{% trans 'There is no available data at the moment.' %}</h2>
     {% endif %}
+    </div>
 {% endblock content %}

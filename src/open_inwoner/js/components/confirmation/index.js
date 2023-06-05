@@ -13,6 +13,7 @@ class Confirmation {
       const modalId = document.getElementById('modal')
       const modal = new Modal(modalId)
       modal.setTitle(this.form.dataset.confirmTitle)
+      modal.setText(this.form.dataset.confirmText)
       modal.setClose(this.form.dataset.confirmCancel)
       modal.setConfirm(
         this.form.dataset.confirmDefault,

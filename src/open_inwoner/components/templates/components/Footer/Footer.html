@@ -35,6 +35,9 @@
 
     <nav class="footer__links" aria-label="Footer navigatie">
         <ul class="footer__list">
+            <li class="footer__list-item">
+                {% link text=_("Contact formulier") secondary=True href="contactform" %}
+            </li>
             {% for flatpage in footer_texts.flatpages.all %}
                 <li class="footer__list-item">
                     {% link text=flatpage.title secondary=True href=flatpage.get_absolute_url %}

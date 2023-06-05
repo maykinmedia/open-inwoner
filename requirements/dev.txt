@@ -6,6 +6,10 @@
 #
 alabaster==0.7.12
     # via sphinx
+aldryn-apphooks-config==0.6.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 amqp==5.1.1
     # via
     #   -c requirements/ci.txt
@@ -154,8 +158,11 @@ django==3.2.15
     #   -r requirements/ci.txt
     #   ddt-api-calls
     #   django-appconf
+    #   django-appdata
     #   django-axes
     #   django-choices
+    #   django-classy-tags
+    #   django-cms
     #   django-cors-headers
     #   django-csp
     #   django-csp-reports
@@ -170,6 +177,7 @@ django==3.2.15
     #   django-htmx
     #   django-import-export
     #   django-localflavor
+    #   django-log-outgoing-requests
     #   django-open-forms-client
     #   django-otp
     #   django-phonenumber-field
@@ -179,6 +187,7 @@ django==3.2.15
     #   django-registration
     #   django-relativedelta
     #   django-rosetta
+    #   django-sekizai
     #   django-sendfile2
     #   django-simple-certmanager
     #   django-sniplates
@@ -204,6 +213,11 @@ django-appconf==1.0.5
     #   -r requirements/ci.txt
     #   django-image-cropping
     #   django-timeline-logger
+django-appdata==0.3.2
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   aldryn-apphooks-config
 django-autoslug==1.9.8
     # via
     #   -c requirements/ci.txt
@@ -228,6 +242,22 @@ django-ckeditor==6.2.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   mail-editor
+django-classy-tags==4.0.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   django-cms
+    #   django-sekizai
+django-cms==3.11.1
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   aldryn-apphooks-config
+    #   djangocms-attributes-field
+    #   djangocms-file
+    #   djangocms-link
+    #   djangocms-picture
+    #   djangocms-text-ckeditor
 django-colorfield==0.4.5
     # via
     #   -c requirements/ci.txt
@@ -264,6 +294,9 @@ django-filer==2.2.4
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   djangocms-file
+    #   djangocms-link
+    #   djangocms-picture
 django-filter==21.1
     # via
     #   -c requirements/ci.txt
@@ -272,6 +305,7 @@ django-formtools==2.3
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   django-cms
     #   maykin-django-two-factor-auth
 django-hijack==3.0.4
     # via
@@ -301,6 +335,10 @@ django-js-asset==1.2.2
     #   django-ckeditor
     #   django-mptt
 django-localflavor==3.1
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+django-log-outgoing-requests==0.1.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -355,6 +393,11 @@ django-rosetta==0.9.7
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+django-sekizai==4.0.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   django-cms
 django-sendfile2==0.7.0
     # via
     #   -c requirements/ci.txt
@@ -386,10 +429,12 @@ django-timeline-logger==2.0.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-django-treebeard==4.5.1
+django-treebeard==4.4
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   django-cms
+    #   djangocms-attributes-field
 django-view-breadcrumbs==2.2.4
     # via
     #   -c requirements/ci.txt
@@ -399,6 +444,34 @@ django-webtest==1.9.7
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
 django-yubin==1.7.1
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+djangocms-admin-style==3.2.3
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   django-cms
+djangocms-attributes-field==2.1.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   djangocms-file
+    #   djangocms-link
+    #   djangocms-picture
+djangocms-file==3.0.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+djangocms-link==3.1.1
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+djangocms-picture==4.0.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+djangocms-text-ckeditor==5.1.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -427,6 +500,7 @@ easy-thumbnails[svg]==2.8.5
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-filer
+    #   djangocms-picture
 elastic-apm==6.4.0
     # via
     #   -c requirements/ci.txt
@@ -514,6 +588,7 @@ html5lib==1.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   djangocms-text-ckeditor
     #   weasyprint
 humanfriendly==10.0
     # via
@@ -583,7 +658,7 @@ lxml==4.9.1
     #   pyquery
     #   svglib
     #   xmlsec
-mail-editor @ git+https://github.com/maykinmedia/mail-editor.git@f99e5c4920a95cf9141a71230d7dfb9f03b84e36
+mail-editor @ git+https://github.com/maykinmedia/mail-editor.git@a5743ff0f997a91d8202015b79966533f014f5bd
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -617,6 +692,10 @@ mccabe==0.6.1
     #   -r requirements/ci.txt
     #   flake8
     #   pylint
+messagebird==2.1.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 mozilla-django-oidc==2.0.0
     # via
     #   -c requirements/ci.txt
@@ -629,6 +708,10 @@ mozilla-django-oidc-db==0.10.0
 mypy-extensions==0.4.3
     # via black
 notifications-api-common==0.2.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+oath==1.4.4
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -647,9 +730,12 @@ orderedmultidict==1.0.1
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   furl
-packaging==21.0
+packaging==23.0
     # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
     #   build
+    #   djangocms-text-ckeditor
     #   sphinx
 pathspec==0.9.0
     # via black
@@ -669,6 +755,7 @@ pillow==9.0.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   djangocms-text-ckeditor
     #   easy-thumbnails
     #   reportlab
     #   weasyprint
@@ -724,6 +811,7 @@ pyjwt==2.3.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   gemma-zds-client
+    #   messagebird
 pylint==2.11.1
     # via
     #   -c requirements/ci.txt
@@ -736,8 +824,6 @@ pyopenssl==22.1.0
     #   josepy
     #   maykin-python3-saml
     #   zgw-consumers
-pyparsing==2.4.7
-    # via packaging
 pyphen==0.12.0
     # via
     #   -c requirements/ci.txt
@@ -760,6 +846,7 @@ python-dateutil==2.8.2
     #   elasticsearch-dsl
     #   faker
     #   freezegun
+    #   messagebird
 python-decouple==3.5
     # via
     #   -c requirements/ci.txt
@@ -814,10 +901,12 @@ requests==2.26.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   ddt-api-calls
+    #   django-log-outgoing-requests
     #   django-open-forms-client
     #   django-rosetta
     #   gemma-zds-client
     #   maykin-python3-saml
+    #   messagebird
     #   mozilla-django-oidc
     #   requests-mock
     #   sphinx
@@ -842,6 +931,7 @@ six==1.16.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   click-repl
+    #   django-appdata
     #   django-choices
     #   django-elasticsearch-dsl
     #   elasticsearch-dsl

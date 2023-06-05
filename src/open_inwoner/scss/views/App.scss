@@ -2,6 +2,8 @@
   // Layout.
 
   --container-width: 1024px;
+  --mobile-s-width: 768px;
+  --mobile-xs-width: 360px;
   --header-height: 187px;
 
   // Border.
@@ -29,6 +31,7 @@
   --color-green: #d5e7d4;
   --color-green-dark: #248641;
   --color-red: #e50026;
+  --color-red-notification: #d94100;
   --color-white: #fff;
   --color-yellow: #f8d62d;
   --color-yellow-dark: #cca000;
@@ -87,9 +90,9 @@
     calc(var(--color-accent-l) + 10%)
   );
 
-  --color-danger-h: 0;
+  --color-danger-h: 34;
   --color-danger-s: 100%;
-  --color-danger-l: 40%;
+  --color-danger-l: 27%;
   --color-danger: hsl(
     var(--color-danger-h),
     var(--color-danger-s),
@@ -98,7 +101,7 @@
   --color-danger-darker: hsl(
     var(--color-danger-h),
     var(--color-danger-s),
-    calc(var(--color-danger-l) - 27%)
+    calc(var(--color-danger-l) - 5%)
   );
   --color-danger-lighter: hsl(
     var(--color-danger-h),
@@ -108,7 +111,31 @@
   --color-danger-lightest: hsl(
     var(--color-danger-h),
     var(--color-danger-s),
-    calc(var(--color-danger-l) + 53%)
+    calc(var(--color-danger-l) + 57%)
+  );
+
+  --color-error-h: 350;
+  --color-error-s: 100%;
+  --color-error-l: 45%;
+  --color-error: hsl(
+    var(--color-error-h),
+    var(--color-error-s),
+    var(--color-error-l)
+  );
+  --color-error-darker: hsl(
+    var(--color-error-h),
+    var(--color-error-s),
+    calc(var(--color-error-l) - 27%)
+  );
+  --color-error-lighter: hsl(
+    var(--color-error-h),
+    var(--color-error-s),
+    calc(var(--color-error-l) + 48%)
+  );
+  --color-error-lightest: hsl(
+    var(--color-error-h),
+    var(--color-error-s),
+    calc(var(--color-error-l) + 50%)
   );
 
   --color-info-h: 2010;
@@ -183,13 +210,17 @@
   --font-size-heading-4: 16px;
   --font-weight-heading-4: var(--font-weight-heading);
 
+  --font-size-heading-card: 18px;
+
   --font-family-body: 'TheSans C5';
   --font-color-body: var(--color-gray-dark);
   --font-size-body: 16px;
   --font-line-height-body: 21px;
 
-  --font-size-body-small: 12px;
+  --font-size-body-small: 14px;
+  --font-size-body-large: 20px;
   --font-line-height-body-small: 20px;
+  --font-line-height-body-large: 28px;
 
   /// Spacing.
 
@@ -277,5 +308,7 @@ html {
 }
 
 body {
+  // default CMS style
   margin: 0;
+  font-family: var(--font-family-body);
 }

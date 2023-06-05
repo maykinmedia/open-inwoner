@@ -24,6 +24,7 @@
                 {% endif %}
             {% else %}
                 {% input form.first_name %}
+                {% input form.infix %}
                 {% input form.last_name %}
                 {% input form.display_name %}
                 {% input form.email %}
@@ -39,7 +40,7 @@
                 {% endif %}
             {% endif %}
         {% endwith %}
-        {% form_actions primary_text=_("Opslaan") primary_icon="arrow_forward" secondary_href='accounts:my_profile' secondary_text=_('Terug') secondary_icon='arrow_backward' secondary_icon_position="before" enctype="multipart/form-data" %}
+        {% form_actions primary_text=_("Opslaan") primary_icon="arrow_forward" secondary_href='profile:detail' secondary_text=_('Terug') secondary_icon='arrow_backward' secondary_icon_position="before" enctype="multipart/form-data" %}
     {% endrender_form %}
 
 {% endblock content %}

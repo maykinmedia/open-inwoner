@@ -1,11 +1,17 @@
 from unittest import skip
 
+from django.test import override_settings
 from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _
 
 from django_webtest import WebTest
+from PIL import Image
 from playwright.sync_api import expect
 from privates.test import temp_private_root
+from webtest import Upload
 
+from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.utils.tests.helpers import create_image_bytes
 from open_inwoner.utils.tests.playwright import (
     PlaywrightSyncLiveServerTestCase,
     multi_browser,
@@ -15,6 +21,7 @@ from ..models import Message
 from .factories import DigidUserFactory, MessageFactory, UserFactory
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class InboxPageTests(WebTest):
     def setUp(self) -> None:
         super().setUp()
@@ -39,10 +46,8 @@ class InboxPageTests(WebTest):
 
         self.app.set_user(self.user)
 
-        self.url = reverse("accounts:inbox")
-        self.contact1_url = reverse(
-            "accounts:inbox", kwargs={"uuid": self.contact1.uuid}
-        )
+        self.url = reverse("inbox:index")
+        self.contact1_url = reverse("inbox:index", kwargs={"uuid": self.contact1.uuid})
 
     def test_user_contacts_are_symetrical(self):
         self.assertIn(self.contact1, self.user.user_contacts.all())
@@ -120,6 +125,20 @@ class InboxPageTests(WebTest):
             "Of een bericht of een bestand moet ingevuld zijn",
         )
 
+    def test_send_empty_message_with_sharing_disabled(self):
+        config = SiteConfiguration.get_solo()
+        config.allow_messages_file_sharing = False
+        config.save()
+
+        response = self.app.get(self.contact1_url)
+
+        form = response.forms["message-form"]
+        response = form.submit()
+
+        expected_error = {"content": [_("Content should be filled in")]}
+
+        self.assertEqual(response.context["form"].errors, expected_error)
+
     def test_mark_messages_as_seen(self):
         other_user = UserFactory.create()
         message_received = MessageFactory.create(receiver=self.user, sender=other_user)
@@ -129,7 +148,7 @@ class InboxPageTests(WebTest):
             self.assertFalse(message.seen)
 
         response = self.app.get(
-            reverse("accounts:inbox", kwargs={"uuid": other_user.uuid}),
+            reverse("inbox:index", kwargs={"uuid": other_user.uuid}),
             auto_follow=True,
         )
         self.assertEqual(response.status_code, 200)
@@ -177,8 +196,46 @@ class InboxPageTests(WebTest):
         # no form
         self.assertFalse(response.pyquery("form#message-form"))
 
+    def test_file_is_not_rendered_when_sharing_not_allowed(self):
+        config = SiteConfiguration.get_solo()
+        config.allow_messages_file_sharing = False
+        config.save()
+
+        response = self.app.get(self.url)
+        emoji = response.pyquery(".emoji")
+        file = response.pyquery(".message-file")
+
+        self.assertNotEqual(emoji, [])
+        self.assertEqual(file, [])
+
+    def test_file_field_doesnt_exist_when_sharing_not_allowed(self):
+        config = SiteConfiguration.get_solo()
+        config.allow_messages_file_sharing = False
+        config.save()
+
+        response = self.app.get(self.url)
+        form = response.forms["message-form"]
+
+        self.assertNotIn("file", form.fields.keys())
+
+    def test_file_cannot_be_uploaded_when_sharing_disabled(self):
+        config = SiteConfiguration.get_solo()
+        config.allow_messages_file_sharing = False
+        config.save()
+
+        contact = UserFactory()
+        self.user.user_contacts.add(contact)
+
+        img_bytes = create_image_bytes()
+        file = Upload("test_image.png", img_bytes, "image/png")
+
+        self.app.post(
+            self.url, {"receiver": str(contact.uuid), "file": file}, status=403
+        )
+
 
 @multi_browser()
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class InboxPagePlaywrightTests(PlaywrightSyncLiveServerTestCase):
     @classmethod
     def setUpClass(cls):
@@ -208,7 +265,7 @@ class InboxPagePlaywrightTests(PlaywrightSyncLiveServerTestCase):
             sender=self.contact_2,
         )
         self.contact_1_conversation_url = self.live_reverse(
-            "accounts:inbox",
+            "inbox:index",
             kwargs={"uuid": self.contact_1.uuid},
         )
 

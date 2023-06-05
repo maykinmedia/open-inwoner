@@ -1,7 +1,9 @@
 from datetime import date
+from unittest import skip
 
 from django.contrib.messages import get_messages
 from django.core import mail
+from django.test import override_settings
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
@@ -11,14 +13,24 @@ from webtest import Upload
 
 from open_inwoner.accounts.choices import ContactTypeChoices, StatusChoices
 from open_inwoner.accounts.models import Action
-from open_inwoner.accounts.tests.factories import ActionFactory, UserFactory
+from open_inwoner.accounts.tests.factories import (
+    ActionFactory,
+    DocumentFactory,
+    UserFactory,
+)
 from open_inwoner.accounts.tests.test_action_views import ActionsPlaywrightTests
+from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
 from open_inwoner.utils.tests.playwright import multi_browser
 
+from ...cms.collaborate.cms_apps import CollaborateApphook
+from ...cms.extensions.constants import Icons, IndicatorChoices
+from ...cms.profile.cms_apps import ProfileApphook
+from ...cms.tests import cms_tools
 from ..models import Plan, PlanContact
 from .factories import ActionTemplateFactory, PlanFactory, PlanTemplateFactory
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class PlanViewTests(WebTest):
     def setUp(self) -> None:
         self.user = UserFactory()
@@ -34,36 +46,42 @@ class PlanViewTests(WebTest):
         )
 
         self.login_url = reverse("login")
-        self.list_url = reverse("plans:plan_list")
-        self.create_url = reverse("plans:plan_create")
-        self.detail_url = reverse("plans:plan_detail", kwargs={"uuid": self.plan.uuid})
-        self.edit_url = reverse("plans:plan_edit", kwargs={"uuid": self.plan.uuid})
+        self.list_url = reverse("collaborate:plan_list")
+        self.create_url = reverse("collaborate:plan_create")
+        self.detail_url = reverse(
+            "collaborate:plan_detail", kwargs={"uuid": self.plan.uuid}
+        )
+        self.edit_url = reverse(
+            "collaborate:plan_edit", kwargs={"uuid": self.plan.uuid}
+        )
         self.goal_edit_url = reverse(
-            "plans:plan_edit_goal", kwargs={"uuid": self.plan.uuid}
+            "collaborate:plan_edit_goal", kwargs={"uuid": self.plan.uuid}
         )
         self.file_add_url = reverse(
-            "plans:plan_add_file", kwargs={"uuid": self.plan.uuid}
+            "collaborate:plan_add_file", kwargs={"uuid": self.plan.uuid}
         )
         self.action_add_url = reverse(
-            "plans:plan_action_create", kwargs={"uuid": self.plan.uuid}
+            "collaborate:plan_action_create", kwargs={"uuid": self.plan.uuid}
         )
         self.action_edit_url = reverse(
-            "plans:plan_action_edit",
+            "collaborate:plan_action_edit",
             kwargs={"plan_uuid": self.plan.uuid, "uuid": self.action.uuid},
         )
         self.action_history_url = reverse(
-            "plans:plan_action_history",
+            "collaborate:plan_action_history",
             kwargs={"plan_uuid": self.plan.uuid, "uuid": self.action.uuid},
         )
         self.action_edit_status_url = reverse(
-            "plans:plan_action_edit_status",
+            "collaborate:plan_action_edit_status",
             kwargs={"plan_uuid": self.plan.uuid, "uuid": self.action.uuid},
         )
         self.action_delete_url = reverse(
-            "plans:plan_action_delete",
+            "collaborate:plan_action_delete",
             kwargs={"plan_uuid": self.plan.uuid, "uuid": self.action.uuid},
         )
-        self.export_url = reverse("plans:plan_export", kwargs={"uuid": self.plan.uuid})
+        self.export_url = reverse(
+            "collaborate:plan_export", kwargs={"uuid": self.plan.uuid}
+        )
 
     def test_plan_list_login_required(self):
         response = self.app.get(self.list_url)
@@ -76,12 +94,15 @@ class PlanViewTests(WebTest):
         form["title"] = plan.title
         form["goal"] = plan.goal
         form["end_date"] = plan.end_date
+        form["plan_contacts"] = [self.contact.pk]
         response = form.submit()
+
         created_plan = Plan.objects.get(title=plan.title)
-        self.assertEqual(created_plan.plan_contacts.get(), self.user)
+
+        self.assertIn(self.user, created_plan.plan_contacts.all())
         self.assertEqual(created_plan.created_by, self.user)
 
-        contact = PlanContact.objects.get(plan=created_plan)
+        contact = PlanContact.objects.last()
         self.assertEqual(contact.user, self.user)
         self.assertEqual(contact.notify_new, True)
 
@@ -97,7 +118,7 @@ class PlanViewTests(WebTest):
 
         response = self.app.get(self.detail_url, user=self.contact)
         self.assertContains(response, self.user.get_full_name())
-        self.assertContains(response, self.contact.get_full_name())
+        self.assertContains(response, self.contact.first_name)
 
         # Contact for one user, but not the other
         # Check if all users can see eachother in the plan
@@ -112,12 +133,12 @@ class PlanViewTests(WebTest):
 
         response = self.app.get(self.detail_url, user=self.contact)
         self.assertContains(response, self.user.get_full_name())
-        self.assertContains(response, self.contact.get_full_name())
+        self.assertContains(response, self.contact.first_name)
         self.assertContains(response, new_contact.get_full_name())
 
         response = self.app.get(self.detail_url, user=new_contact)
         self.assertContains(response, self.user.get_full_name())
-        self.assertContains(response, new_contact.get_full_name())
+        self.assertContains(response, new_contact.first_name)
         self.assertContains(response, self.contact.get_full_name())
 
         new_contact.delete()
@@ -221,6 +242,23 @@ class PlanViewTests(WebTest):
 
         self.assertEqual(self.plan.documents.count(), 1)
 
+    def test_plan_file_can_be_downloaded_by_contact(self):
+        doc = DocumentFactory(owner=self.user, plan=self.plan)
+        response = self.app.get(
+            reverse("profile:documents_download", kwargs={"uuid": doc.uuid}),
+            user=self.contact,
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_plan_file_cannot_be_downloaded_by_non_contact(self):
+        doc = DocumentFactory(owner=self.user, plan=self.plan)
+        new_user = UserFactory()
+        self.app.get(
+            reverse("profile:documents_download", kwargs={"uuid": doc.uuid}),
+            user=new_user,
+            status=403,
+        )
+
     def test_plan_file_add_contact_can_access(self):
         response = self.app.get(self.file_add_url, user=self.contact)
         self.assertEqual(response.status_code, 200)
@@ -280,9 +318,37 @@ class PlanViewTests(WebTest):
             {
                 "title": [_("This field is required.")],
                 "end_date": [_("This field is required.")],
-                "goal": [_("This field is required when not using a template")],
+                "__all__": [_("At least one collaborator is required for a plan.")],
             },
         )
+
+    def test_plan_create_fails_with_no_collaborators(self):
+        response = self.app.get(self.create_url, user=self.user)
+        form = response.forms["plan-form"]
+        form["title"] = "Plan"
+        form["goal"] = "Goal"
+        form["description"] = "Description"
+        form["end_date"] = "2022-01-01"
+        response = form.submit()
+
+        self.assertEqual(Plan.objects.count(), 1)
+        self.assertEqual(
+            response.context["form"].errors,
+            {"__all__": [_("At least one collaborator is required for a plan.")]},
+        )
+
+    def test_plan_create_contains_expected_contacts(self):
+        another_contact = UserFactory()
+        self.user.user_contacts.add(another_contact)
+        response = self.app.get(self.create_url, user=self.user)
+
+        rendered_contacts = response.pyquery("#plan-form .grid .form__grid-box")[
+            0
+        ].text_content()
+
+        self.assertNotIn(self.user.get_full_name(), rendered_contacts)
+        self.assertIn(self.contact.get_full_name(), rendered_contacts)
+        self.assertIn(another_contact.get_full_name(), rendered_contacts)
 
     def test_plan_create_plan(self):
         self.assertEqual(Plan.objects.count(), 1)
@@ -409,13 +475,13 @@ class PlanViewTests(WebTest):
     def test_plan_create_contains_contact_create_link_when_no_contacts_exist(self):
         self.user.user_contacts.remove(self.contact)
         response = self.app.get(self.create_url, user=self.user)
-        self.assertContains(response, reverse("accounts:contact_create"))
+        self.assertContains(response, reverse("profile:contact_create"))
 
     def test_plan_create_does_not_contain_contact_create_link_when_contacts_exist(
         self,
     ):
         response = self.app.get(self.create_url, user=self.user)
-        self.assertNotContains(response, reverse("accounts:contact_create"))
+        self.assertNotContains(response, reverse("profile:contact_create"))
 
     def test_plan_edit_login_required(self):
         response = self.app.get(self.edit_url)
@@ -439,7 +505,6 @@ class PlanViewTests(WebTest):
         response = self.app.get(self.edit_url, user=self.user)
         form = response.forms["plan-form"]
         form["title"] = "Plan title"
-        # breakpoint()
         response = form.submit().follow()
         self.assertEqual(response.status_code, 200)
         self.plan.refresh_from_db()
@@ -451,7 +516,7 @@ class PlanViewTests(WebTest):
 
     def test_plan_action_edit_deleted_action(self):
         url = reverse(
-            "plans:plan_action_edit",
+            "collaborate:plan_action_edit",
             kwargs={"plan_uuid": self.plan.uuid, "uuid": self.action_deleted.uuid},
         )
         self.app.get(url, user=self.user, status=404)
@@ -614,6 +679,7 @@ class PlanViewTests(WebTest):
         self.assertEqual(response.status_code, 404)
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class PlanBegeleiderListViewTests(WebTest):
     def setUp(self):
         self.contact = UserFactory()
@@ -628,7 +694,7 @@ class PlanBegeleiderListViewTests(WebTest):
             plan=self.begeleider_plan, created_by=self.begeleider
         )
         self.login_url = reverse("login")
-        self.list_url = reverse("plans:plan_list")
+        self.list_url = reverse("collaborate:plan_list")
 
     @freeze_time("2022-01-01")
     def test_plan_list_renders_template_for_begeleider(self):
@@ -1015,24 +1081,35 @@ class PlanBegeleiderListViewTests(WebTest):
         )
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class NewPlanContactCounterTest(WebTest):
     def test_plan_contact_new_count(self):
+        homepage = cms_tools.create_homepage()
+        planpage = cms_tools.create_apphook_page(
+            CollaborateApphook,
+            title=_("Samenwerken"),
+            extension_args={
+                "menu_indicator": IndicatorChoices.plan_new_contacts,
+                "menu_icon": Icons.group,
+            },
+            parent_page=homepage,
+        )
+
         owner = UserFactory()
         plan_1 = PlanFactory(created_by=owner)
         plan_2 = PlanFactory(created_by=owner)
 
         user = UserFactory()
 
-        root_url = reverse("root")
-        list_url = reverse("plans:plan_list")
+        root_url = reverse("pages-root")
+        list_url = reverse("collaborate:plan_list")
 
         # check no number shows by default
         response = self.app.get(root_url, user=user)
-        links = response.pyquery(
-            f".header__container > .primary-navigation a[href='{list_url}']"
-        )
-        self.assertEqual(len(links), 1)
-        self.assertEqual(links.text(), _("Samenwerken") + " people")
+
+        links = response.pyquery(f".primary-navigation a[href='{list_url}']")
+        self.assertEqual(len(links), 2)  # Duplicate due to mobile
+        self.assertTrue(_("Samenwerken") + " group" in links.text())
 
         # check if the number shows up in the menu
         plan_1.plan_contacts.add(user)
@@ -1045,7 +1122,7 @@ class NewPlanContactCounterTest(WebTest):
         )
         # second link appears
         self.assertEqual(len(links), 2)
-        self.assertIn("(2)", links.text())
+        self.assertIn("2", links.text())
 
         # access the list page to reset
         response = self.app.get(list_url, user=user)
@@ -1053,7 +1130,7 @@ class NewPlanContactCounterTest(WebTest):
             f".header__container > .primary-navigation a[href='{list_url}']"
         )
         self.assertEqual(len(links), 1)
-        self.assertEqual(links.text(), _("Samenwerken") + " people")
+        self.assertEqual(links.text(), _("Samenwerken") + " group")
 
         # check this doesn't appear for owner
         response = self.app.get(root_url, user=owner)
@@ -1064,6 +1141,7 @@ class NewPlanContactCounterTest(WebTest):
 
 
 @multi_browser()
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class PlanActionStatusPlaywrightTests(ActionsPlaywrightTests):
     def setUp(self) -> None:
         super().setUp()
@@ -1076,5 +1154,5 @@ class PlanActionStatusPlaywrightTests(ActionsPlaywrightTests):
 
         # override the url to show plan detail page
         self.action_list_url = reverse(
-            "plans:plan_detail", kwargs={"uuid": self.plan.uuid}
+            "collaborate:plan_detail", kwargs={"uuid": self.plan.uuid}
         )

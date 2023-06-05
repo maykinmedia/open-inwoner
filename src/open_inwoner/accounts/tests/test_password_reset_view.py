@@ -1,17 +1,16 @@
-from django.core.cache import cache
-from django.test import TestCase
 from django.urls import reverse
 
+from django_webtest import WebTest
 
-class PasswordResetViewTests(TestCase):
+from open_inwoner.utils.test import ClearCachesMixin
+
+
+class PasswordResetViewTests(ClearCachesMixin, WebTest):
     def test_user_cant_access_the_password_reset_view_more_than_5_times(self):
         url = reverse("admin_password_reset")
-        cache.clear()
-
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        self.app.get(url, status=200)
 
         for i in range(10):
-            response = self.client.get(url)
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 403)
+            self.app.get(url, status=(200, 403))
+
+        self.app.get(url, status=403)

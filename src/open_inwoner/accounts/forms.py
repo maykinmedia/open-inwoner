@@ -2,6 +2,7 @@ import os
 
 from django import forms
 from django.conf import settings
+from django.contrib.auth import authenticate
 from django.contrib.auth.forms import PasswordResetForm
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
@@ -10,13 +11,18 @@ from django.utils.translation import ugettext_lazy as _
 
 from django_registration.forms import RegistrationForm
 
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openzaak.models import (
     OpenZaakConfig,
     ZaakTypeInformatieObjectTypeConfig,
 )
 from open_inwoner.pdc.models.category import Category
 from open_inwoner.utils.forms import LimitedUploadFileField, PrivateFileWidget
-from open_inwoner.utils.validators import validate_charfield_entry
+from open_inwoner.utils.validators import (
+    format_phone_number,
+    validate_charfield_entry,
+    validate_phone_number,
+)
 
 from .choices import (
     ContactTypeChoices,
@@ -27,8 +33,77 @@ from .choices import (
 from .models import Action, Document, Invite, Message, User
 
 
+class VerifyTokenForm(forms.Form):
+    token = forms.CharField(
+        label=_("Code"), max_length=6, widget=forms.TextInput(attrs={"autofocus": True})
+    )
+
+    def __init__(self, user=None, request=None, **kwargs):
+        self.user_cache = user
+        self.request = request
+
+        super().__init__(**kwargs)
+
+    def clean_token(self):
+        token = self.cleaned_data.get("token")
+
+        if token:
+            user = authenticate(request=self.request, user=self.user_cache, token=token)
+            if not user or user != self.user_cache:
+                raise forms.ValidationError(
+                    _("De opgegeven code is ongeldig of is verlopen.")
+                )
+
+        return token
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        if not self.user_cache.is_active:
+            raise forms.ValidationError(_("This account is inactive."))
+
+        return cleaned_data
+
+
+class PhoneNumberForm(forms.Form):
+    phonenumber_1 = forms.CharField(
+        label=_("Mobiele telefoonnummer"),
+        max_length=16,
+        help_text=_(
+            "Vermeld bij niet-nederlandse telefoonnummers de landcode (bijvoorbeeld: +32 1234567890)"
+        ),
+        validators=[
+            validate_phone_number,
+        ],
+    )
+    phonenumber_2 = forms.CharField(
+        label=_("Mobiele telefoonnummer bevestigen"),
+        max_length=16,
+        validators=[
+            validate_phone_number,
+        ],
+    )
+
+    def clean_phonenumber_1(self):
+        return format_phone_number(self.cleaned_data["phonenumber_1"])
+
+    def clean_phonenumber_2(self):
+        return format_phone_number(self.cleaned_data["phonenumber_2"])
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        if cleaned_data.get("phonenumber_1", "") != cleaned_data.get(
+            "phonenumber_2", ""
+        ):
+            raise forms.ValidationError(_("De telefoonnummers komen niet overeen."))
+
+        return cleaned_data
+
+
 class CustomRegistrationForm(RegistrationForm):
     first_name = forms.CharField(label=_("First name"), max_length=255, required=True)
+    infix = forms.CharField(label=_("Infix"), max_length=64, required=False)
     last_name = forms.CharField(label=_("Last name"), max_length=255, required=True)
     invite = forms.ModelChoiceField(
         queryset=Invite.objects.all(),
@@ -42,11 +117,26 @@ class CustomRegistrationForm(RegistrationForm):
         fields = (
             "email",
             "first_name",
+            "infix",
             "last_name",
+            "phonenumber",
             "password1",
             "password2",
             "invite",
         )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # make phonenumber required when 2fa-sms login is enabled
+        config = SiteConfiguration.get_solo()
+        if not config.login_2fa_sms:
+            del self.fields["phonenumber"]
+        else:
+            self.fields["phonenumber"].required = True
+
+    def clean_phonenumber(self):
+        return format_phone_number(self.cleaned_data["phonenumber"])
 
     def clean_email(self):
         email = self.cleaned_data["email"]
@@ -85,6 +175,7 @@ class UserForm(BaseUserForm):
         model = User
         fields = (
             "first_name",
+            "infix",
             "last_name",
             "display_name",
             "email",
@@ -115,6 +206,7 @@ class NecessaryUserForm(forms.ModelForm):
         model = User
         fields = (
             "first_name",
+            "infix",
             "last_name",
             "email",
             "invite",
@@ -124,10 +216,12 @@ class NecessaryUserForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         self.fields["first_name"].required = True
+        self.fields["infix"].required = False
         self.fields["last_name"].required = True
 
         if user.is_digid_and_brp():
             self.fields["first_name"].disabled = True
+            self.fields["infix"].disabled = True
             self.fields["last_name"].disabled = True
 
             # this is for the rare case of retrieving partial data from haalcentraal
@@ -135,6 +229,8 @@ class NecessaryUserForm(forms.ModelForm):
                 del self.fields["first_name"]
             if not user.last_name:
                 del self.fields["last_name"]
+            if not user.infix:
+                del self.fields["infix"]
 
     def clean_email(self):
         email = self.cleaned_data["email"]
@@ -182,15 +278,31 @@ class CustomPasswordResetForm(PasswordResetForm):
             email_message.send()
 
 
-class ThemesForm(forms.ModelForm):
+class CategoriesForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ("selected_themes",)
-        widgets = {"selected_themes": forms.widgets.CheckboxSelectMultiple}
+        fields = ("selected_categories",)
+        widgets = {"selected_categories": forms.widgets.CheckboxSelectMultiple}
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self.fields["selected_themes"].queryset = Category.objects.published()
+        self.fields["selected_categories"].queryset = Category.objects.published()
+
+
+class UserNotificationsForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = (
+            "cases_notifications",
+            "messages_notifications",
+            "plans_notifications",
+        )
+
+    def __init__(self, user, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+        if not user.login_type == LoginTypeChoices.digid:
+            del self.fields["cases_notifications"]
 
 
 class ContactFilterForm(forms.Form):
@@ -261,7 +373,7 @@ class ActionForm(forms.ModelForm):
         required=False,
     )
     file = LimitedUploadFileField(
-        required=False, widget=PrivateFileWidget(url_name="accounts:action_download")
+        required=False, widget=PrivateFileWidget(url_name="profile:action_download")
     )
 
     class Meta:
@@ -380,6 +492,7 @@ class InboxForm(forms.ModelForm):
 
     def __init__(self, user, **kwargs):
         self.user = user
+        self.config = SiteConfiguration.get_solo()
 
         super().__init__(**kwargs)
 
@@ -388,16 +501,23 @@ class InboxForm(forms.ModelForm):
         self.fields["receiver"].choices = choices
         self.fields["receiver"].queryset = contact_users
 
+        if not self.config.allow_messages_file_sharing:
+            del self.fields["file"]
+
     def clean(self):
         cleaned_data = super().clean()
 
         content = cleaned_data.get("content")
         file = cleaned_data.get("file")
 
-        if not file and not content:
-            self.add_error(
-                "content", _("Either message content or file should be filled in")
-            )
+        if self.config.allow_messages_file_sharing:
+            if not content and not file:
+                self.add_error(
+                    "content", _("Either message content or file should be filled in")
+                )
+        else:
+            if not content:
+                self.add_error("content", _("Content should be filled in"))
 
         return cleaned_data
 
@@ -435,10 +555,10 @@ class ActionListForm(forms.ModelForm):
 
 class CaseUploadForm(forms.Form):
     title = forms.CharField(
-        label=_("Titel"), max_length=255, validators=[validate_charfield_entry]
+        label=_("Titel document"), max_length=255, validators=[validate_charfield_entry]
     )
     type = forms.ModelChoiceField(
-        ZaakTypeInformatieObjectTypeConfig.objects.all(),
+        ZaakTypeInformatieObjectTypeConfig.objects.none(),
         empty_label=None,
         label=_("Bestand type"),
     )
@@ -447,17 +567,18 @@ class CaseUploadForm(forms.Form):
     def __init__(self, case, **kwargs):
         super().__init__(**kwargs)
 
-        self.fields[
-            "type"
-        ].queryset = ZaakTypeInformatieObjectTypeConfig.objects.get_visible_ztiot_configs_for_case(
-            case
-        )
+        if case:
+            self.fields[
+                "type"
+            ].queryset = ZaakTypeInformatieObjectTypeConfig.objects.filter_enabled_for_case_type(
+                case.zaaktype
+            )
 
         choices = self.fields["type"].choices
 
         if choices and len(choices) == 1:
-            self.fields["type"].disabled = True
             self.fields["type"].initial = list(choices)[0][0].value
+            self.fields["type"].widget = forms.HiddenInput()
 
     def clean_file(self):
         file = self.cleaned_data["file"]

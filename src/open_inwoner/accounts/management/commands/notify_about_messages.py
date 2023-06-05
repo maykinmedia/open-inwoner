@@ -1,7 +1,5 @@
 import logging
 
-from django.conf import settings
-from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
 from django.db.models import Count
 from django.urls import reverse
@@ -22,6 +20,7 @@ class Command(BaseCommand):
             received_messages__seen=False,
             received_messages__sent=False,
             is_active=True,
+            messages_notifications=True,
         ).distinct()
 
         for receiver in receivers:
@@ -45,11 +44,11 @@ class Command(BaseCommand):
             messages_to_update.update(sent=True)
 
             logger.info(
-                f"The email was send to the user {receiver} about {total_messages} new messages"
+                f"The email was sent to the user {receiver} about {total_messages} new messages"
             )
 
     def send_email(self, receiver: User, total_senders: int, total_messages: int):
-        inbox_url = build_absolute_url(reverse("accounts:inbox"))
+        inbox_url = build_absolute_url(reverse("inbox:index"))
         template = find_template("new_messages")
         context = {
             "total_messages": total_messages,

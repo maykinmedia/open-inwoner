@@ -36,8 +36,16 @@
     transform-origin: center;
   }
 
+  .link[aria-expanded='false'] {
+    color: var(--font-color-body);
+    font-weight: normal;
+  }
+  .link[aria-expanded='true'] {
+    color: var(--color-secondary);
+  }
+
   .link[aria-expanded='true'] [class*='icon'] {
-    transform: rotate(90deg);
+    transform: rotate(180deg);
   }
 
   .faq__answer {
@@ -52,6 +60,10 @@
 
   &__answer--open {
     margin-top: var(--spacing-large) !important;
+
+    .link {
+      text-decoration: underline;
+    }
   }
 
   &__answer:not(#{&}__answer--open) {

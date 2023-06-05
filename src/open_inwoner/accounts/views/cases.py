@@ -4,7 +4,7 @@ from typing import List, Optional
 
 from django.contrib import messages
 from django.contrib.auth.mixins import AccessMixin
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.http import Http404, HttpResponseRedirect, StreamingHttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -107,7 +107,7 @@ class CaseAccessMixin(AccessMixin):
 
     def handle_no_permission(self):
         if self.request.user.is_authenticated:
-            return redirect(reverse("root"))
+            return redirect("/")
 
         return super().handle_no_permission()
 
@@ -168,8 +168,7 @@ class CaseListMixin(CaseLogMixin, PaginationMixin):
                 "uuid": str(case.uuid),
                 "start_date": case.startdatum,
                 "end_date": getattr(case, "einddatum", None),
-                "description": case.omschrijving,
-                "zaaktype_description": case.zaaktype.omschrijving,
+                "description": case.zaaktype.omschrijving,
                 "current_status": glom(
                     case, "status.statustype.omschrijving", default=""
                 ),
@@ -202,7 +201,7 @@ class OpenCaseListView(
 ):
     @cached_property
     def crumbs(self):
-        return [(_("Mijn aanvragen"), reverse("accounts:my_open_cases"))]
+        return [(_("Mijn aanvragen"), reverse("cases:open_cases"))]
 
     def page_title(self):
         return _("Lopende aanvragen")
@@ -216,9 +215,9 @@ class OpenCaseListView(
 
     def get_anchors(self) -> list:
         return [
-            (reverse("accounts:open_submissions"), _("Open aanvragen")),
+            (reverse("cases:open_submissions"), _("Open aanvragen")),
             ("#cases", _("Lopende aanvragen")),
-            (reverse("accounts:my_closed_cases"), _("Afgeronde aanvragen")),
+            (reverse("cases:closed_cases"), _("Afgeronde aanvragen")),
         ]
 
 
@@ -227,7 +226,7 @@ class ClosedCaseListView(
 ):
     @cached_property
     def crumbs(self):
-        return [(_("Mijn aanvragen"), reverse("accounts:my_closed_cases"))]
+        return [(_("Mijn aanvragen"), reverse("cases:closed_cases"))]
 
     def page_title(self):
         return _("Afgeronde aanvragen")
@@ -241,8 +240,8 @@ class ClosedCaseListView(
 
     def get_anchors(self) -> list:
         return [
-            (reverse("accounts:open_submissions"), _("Open aanvragen")),
-            (reverse("accounts:my_open_cases"), _("Lopende aanvragen")),
+            (reverse("cases:open_submissions"), _("Open aanvragen")),
+            (reverse("cases:open_cases"), _("Lopende aanvragen")),
             ("#cases", _("Afgeronde aanvragen")),
         ]
 
@@ -254,7 +253,7 @@ class OpenSubmissionListView(
 
     @cached_property
     def crumbs(self):
-        return [(_("Mijn aanvragen"), reverse("accounts:open_submissions"))]
+        return [(_("Mijn aanvragen"), reverse("cases:open_submissions"))]
 
     def page_title(self):
         return _("Open aanvragen")
@@ -272,8 +271,8 @@ class OpenSubmissionListView(
     def get_anchors(self) -> list:
         return [
             ("#submissions", _("Open aanvragen")),
-            (reverse("accounts:my_open_cases"), _("Lopende aanvragen")),
-            (reverse("accounts:my_closed_cases"), _("Afgeronde aanvragen")),
+            (reverse("cases:open_cases"), _("Lopende aanvragen")),
+            (reverse("cases:closed_cases"), _("Afgeronde aanvragen")),
         ]
 
 
@@ -293,10 +292,10 @@ class CaseDetailView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn aanvragen"), reverse("accounts:my_open_cases")),
+            (_("Mijn aanvragen"), reverse("cases:open_cases")),
             (
                 _("Status"),
-                reverse("accounts:case_status", kwargs=self.kwargs),
+                reverse("cases:case_detail", kwargs=self.kwargs),
             ),
         ]
 
@@ -347,8 +346,7 @@ class CaseDetailView(
                 "end_date_legal": getattr(
                     self.case, "uiterlijke_einddatum_afdoening", None
                 ),
-                "description": self.case.omschrijving,
-                "type_description": self.case.zaaktype.omschrijving,
+                "description": self.case.zaaktype.omschrijving,
                 "current_status": glom(
                     self.case,
                     "status.statustype.omschrijving",
@@ -365,28 +363,31 @@ class CaseDetailView(
         return context
 
     def get_upload_info_context(self, case: Zaak):
-        internal_upload_enabled = ZaakTypeInformatieObjectTypeConfig.objects.get_visible_ztiot_configs_for_case(
-            case
-        ).exists()
+        if not case:
+            return {}
 
-        external_upload_enabled = (
-            ZaakTypeConfig.objects.get_visible_zt_configs_for_case_type_identification(
-                case.zaaktype.identificatie
+        internal_upload_enabled = (
+            ZaakTypeInformatieObjectTypeConfig.objects.filter_enabled_for_case_type(
+                case.zaaktype
             ).exists()
         )
 
-        if external_upload_enabled:
-            external_upload_url = (
-                ZaakTypeConfig.objects.get_visible_zt_configs_for_case_type_identification(
-                    case.zaaktype.identificatie
-                )
-                .get()
-                .external_document_upload_url
-            )
+        case_type_config_description = ""
+        external_upload_enabled = False
+        external_upload_url = ""
+
+        try:
+            ztc = ZaakTypeConfig.objects.filter_case_type(case.zaaktype).get()
+        except ObjectDoesNotExist:
+            pass
         else:
-            external_upload_url = ""
+            case_type_config_description = ztc.description
+            if ztc.document_upload_enabled and ztc.external_document_upload_url != "":
+                external_upload_url = ztc.external_document_upload_url
+                external_upload_enabled = True
 
         return {
+            "case_type_config_description": case_type_config_description,
             "internal_upload_enabled": internal_upload_enabled,
             "external_upload_enabled": external_upload_enabled,
             "external_upload_url": external_upload_url,
@@ -436,7 +437,7 @@ class CaseDetailView(
                     name=info_obj.titel,
                     size=info_obj.bestandsomvang,
                     url=reverse(
-                        "accounts:case_document_download",
+                        "cases:document_download",
                         kwargs={
                             "object_id": case.uuid,
                             "info_id": info_obj.uuid,

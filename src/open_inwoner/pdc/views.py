@@ -44,7 +44,8 @@ class CategoryBreadcrumbMixin:
             (
                 category.get("category").name,
                 reverse(
-                    "pdc:category_detail", kwargs={"slug": category.get("build_slug")}
+                    "products:category_detail",
+                    kwargs={"slug": category.get("build_slug")},
                 ),
             )
             for category in self.get_orderd_categories(slug_name=slug_name)
@@ -68,8 +69,6 @@ class HomeView(CommonPageMixin, TemplateView):
                 highlighted=True, published=True
             )
         )
-        if self.request.user.is_authenticated and config.show_plans:
-            kwargs.update(plans=Plan.objects.connected(self.request.user)[:limit])
 
         # Show the categories if the user has selected them, otherwise
         # Show the highlighted published categories if they have been specified, otherwise
@@ -83,20 +82,16 @@ class HomeView(CommonPageMixin, TemplateView):
         )
         if (
             self.request.user.is_authenticated
-            and self.request.user.selected_themes.exists()
+            and self.request.user.selected_categories.exists()
         ):
             kwargs.update(
-                categories=self.request.user.selected_themes.order_by("name")[:limit]
+                categories=self.request.user.selected_categories.order_by("name")[
+                    :limit
+                ]
             )
         elif highlighted_categories:
             kwargs.update(categories=highlighted_categories)
 
-        # Product finder:
-        if config.show_product_finder:
-            kwargs.update(
-                condition=ProductCondition.objects.first(),
-                condition_form=ProductFinderForm(),
-            )
         return super().get_context_data(**kwargs)
 
     def get_template_names(self):
@@ -127,7 +122,7 @@ class CategoryListView(CommonPageMixin, ListBreadcrumbMixin, ListView):
     @cached_property
     def crumbs(self):
         config = SiteConfiguration.get_solo()
-        return [(config.theme_title, reverse("pdc:category_list"))]
+        return [(config.theme_title, reverse("products:category_list"))]
 
 
 class CategoryDetailView(
@@ -139,7 +134,7 @@ class CategoryDetailView(
 
     @cached_property
     def crumbs(self):
-        base_list = [(_("Thema's"), reverse("pdc:category_list"))]
+        base_list = [(_("Onderwerpen"), reverse("products:category_list"))]
         return base_list + self.get_categories_breadcrumbs()
 
     def get_object(self, queryset=None):
@@ -182,8 +177,8 @@ class ProductDetailView(
 
     @cached_property
     def crumbs(self):
-        base_list = [(_("Thema's"), reverse("pdc:category_list"))]
-        base_list += self.get_categories_breadcrumbs(slug_name="theme_slug")
+        base_list = [(_("Onderwerpen"), reverse("products:category_list"))]
+        base_list += self.get_categories_breadcrumbs(slug_name="category_slug")
         return base_list + [(self.get_object().name, self.request.path)]
 
     def get_context_data(self, **kwargs):
@@ -226,8 +221,8 @@ class ProductFormView(
 
     @cached_property
     def crumbs(self):
-        base_list = [(_("Thema's"), reverse("pdc:category_list"))]
-        base_list += self.get_categories_breadcrumbs(slug_name="theme_slug")
+        base_list = [(_("Onderwerpen"), reverse("products:category_list"))]
+        base_list += self.get_categories_breadcrumbs(slug_name="category_slug")
         return base_list + [
             (self.get_object().name, self.get_object().get_absolute_url()),
             (_("Formulier"), self.request.path),
@@ -249,7 +244,7 @@ class ProductFinderView(CommonPageMixin, FormView):
     template_name = "pages/product/finder.html"
     form_class = ProductFinderForm
     condition = None
-    success_url = reverse_lazy("pdc:product_finder")
+    success_url = reverse_lazy("products:product_finder")
 
     def page_title(self):
         return _("Producten")
@@ -412,7 +407,9 @@ class ProductLocationDetailView(
         return [
             (
                 self.get_object().name,
-                reverse("pdc:location_detail", kwargs={"uuid": self.get_object().uuid}),
+                reverse(
+                    "products:location_detail", kwargs={"uuid": self.get_object().uuid}
+                ),
             )
         ]
 

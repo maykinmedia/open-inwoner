@@ -17,6 +17,7 @@ from mail_editor.helpers import find_template
 from privates.storages import PrivateMediaFileSystemStorage
 from timeline_logger.models import TimelineLog
 
+from open_inwoner.utils.hash import create_sha256_hash
 from open_inwoner.utils.validators import (
     validate_charfield_entry,
     validate_phone_number,
@@ -49,6 +50,13 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(
         verbose_name=_("First name"),
         max_length=255,
+        blank=True,
+        default="",
+        validators=[validate_charfield_entry],
+    )
+    infix = models.CharField(
+        verbose_name=_("Infix"),
+        max_length=64,
         blank=True,
         default="",
         validators=[validate_charfield_entry],
@@ -138,9 +146,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         default=False,
         help_text=_("Indicates if fields have been prepopulated by Haal Central API."),
     )
-    selected_themes = models.ManyToManyField(
+    selected_categories = models.ManyToManyField(
         "pdc.Category",
-        verbose_name=_("Selected themes"),
+        verbose_name=_("Selected categories"),
         related_name="selected_by",
         blank=True,
     )
@@ -150,6 +158,27 @@ class User(AbstractBaseUser, PermissionsMixin):
         default="",
         blank=True,
         help_text="This field indicates if a user signed up with OpenId Connect or not.",
+    )
+    cases_notifications = models.BooleanField(
+        verbose_name=_("Cases notifications"),
+        default=True,
+        help_text=_(
+            "Indicates if the user wants to receive notifications for updates concerning cases."
+        ),
+    )
+    messages_notifications = models.BooleanField(
+        verbose_name=_("Messages notifications"),
+        default=True,
+        help_text=_(
+            "Indicates if the user wants to receive notifications for new messages."
+        ),
+    )
+    plans_notifications = models.BooleanField(
+        verbose_name=_("Plans notifications"),
+        default=True,
+        help_text=_(
+            "Indicates if the user wants to receive notifications for updates concerning plans and actions."
+        ),
     )
     user_contacts = models.ManyToManyField(
         "self",
@@ -178,16 +207,22 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name = _("User")
         verbose_name_plural = _("Users")
 
+    @property
+    def seed(self):
+        if not hasattr(self, "_seed"):
+            self._seed = create_sha256_hash(
+                str(self.date_joined) + str(self.uuid), salt=settings.SECRET_KEY
+            )
+
+        return self._seed
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._old_bsn = self.bsn
 
     def get_full_name(self):
-        """
-        Returns the first_name plus the last_name, with a space in between.
-        """
-        full_name = "%s %s" % (self.first_name, self.last_name)
-        return full_name.strip()
+        parts = (self.first_name, self.infix, self.last_name)
+        return " ".join(p for p in parts if p)
 
     def get_short_name(self):
         "Returns the short name for the user."
@@ -222,10 +257,23 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.documents.order_by("-created_on")
 
     def get_interests(self) -> str:
-        if not self.selected_themes.exists():
+        if not self.selected_categories.exists():
             return _("U heeft geen interessegebieden aangegeven.")
 
-        return ", ".join(list(self.selected_themes.values_list("name", flat=True)))
+        return ", ".join(list(self.selected_categories.values_list("name", flat=True)))
+
+    def get_active_notifications(self) -> str:
+        enabled = []
+        if self.cases_notifications and self.login_type == LoginTypeChoices.digid:
+            enabled.append(_("cases"))
+        if self.messages_notifications:
+            enabled.append(_("messages"))
+        if self.plans_notifications:
+            enabled.append(_("plans"))
+        if not enabled:
+            return _("You do not have any notifications enabled.")
+
+        return ", ".join(str(notification) for notification in enabled)
 
     def require_necessary_fields(self) -> bool:
         """returns whether user needs to fill in necessary fields"""
@@ -254,10 +302,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         )
 
     def get_contact_update_url(self):
-        return reverse("accounts:contact_edit", kwargs={"uuid": self.uuid})
+        return reverse("profile:contact_edit", kwargs={"uuid": self.uuid})
 
     def get_contact_message_url(self) -> str:
-        url = reverse("accounts:inbox", kwargs={"uuid": self.uuid})
+        url = reverse("inbox:index", kwargs={"uuid": self.uuid})
         return f"{url}#messages-last"
 
     def get_contact_type_display(self) -> str:
@@ -674,7 +722,7 @@ class Invite(models.Model):
         return template.send_email([self.invitee_email], context)
 
     def get_absolute_url(self) -> str:
-        return reverse("accounts:invite_accept", kwargs={"key": self.key})
+        return reverse("profile:invite_accept", kwargs={"key": self.key})
 
     def expired(self) -> bool:
         expiration_date = self.created_on + timedelta(days=settings.INVITE_EXPIRY)

@@ -1,0 +1,24 @@
+{% extends "registration/add_phone_number_base.html" %}
+{% load i18n form_tags %}
+
+{% block content %}
+    {{ block.super }}
+
+    <p class="p">
+        {% blocktrans trimmed %}
+            Het nummer van uw mobiele telefoon is nog niet bij de Open Inwoner Platform bekend
+            en is nodig voor toegang tot deze website.
+        {% endblocktrans %}
+        {% trans 'Vul alstublieft het nummer van uw mobiele telefoon in. ' %}
+        {% trans 'U ontvangt nadat u op <em>bevestigen</em> klikt een SMS bericht met daarin een code.' %}
+    </p>
+
+    {% render_form id="add-phonenumber-1-form" form=wizard.form no_action=True method="POST" %}
+        {% csrf_token %}
+
+        {{ wizard.management_form }}
+        {% input form.phonenumber_1 %}
+        {% input form.phonenumber_2 %}
+        {% form_actions primary_text=_("Confirm") primary_icon="arrow_forward" %}
+    {% endrender_form %}
+{% endblock %}

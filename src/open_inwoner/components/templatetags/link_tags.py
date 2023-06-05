@@ -14,7 +14,7 @@ def link(href, text, **kwargs):
 
     Usage:
         {% link 'http://www.example.com' text=_('Example.com') %}
-        {% link href='accounts:inbox' text=_('Mijn berichten') %}
+        {% link href='inbox:index' text=_('Mijn berichten') %}
 
     Variables:
         + href: str | where the link links to (can be url name to resolve).

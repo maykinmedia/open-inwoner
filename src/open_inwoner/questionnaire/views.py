@@ -25,7 +25,7 @@ class QuestionnaireResetView(RedirectView):
     Clears the questionnaire session, then redirects to the account's profile page.
     """
 
-    pattern_name = "accounts:my_profile"
+    pattern_name = "profile:detail"
 
     def get(self, request, *args, **kwargs) -> HttpResponseRedirect:
         request.session[QUESTIONNAIRE_SESSION_KEY] = None
@@ -33,7 +33,7 @@ class QuestionnaireResetView(RedirectView):
 
     def get_redirect_url(self, *args, **kwargs) -> Optional[str]:
         if not self.request.user.is_authenticated:
-            return reverse("root")
+            return reverse("pages-root")
         return super().get_redirect_url(*args, **kwargs)
 
 
@@ -49,11 +49,11 @@ class QuestionnaireStepView(CommonPageMixin, BaseBreadcrumbMixin, FormView):
     def crumbs(self):
         if self.request.user.is_authenticated:
             return [
-                (_("Mijn profiel"), reverse("accounts:my_profile")),
-                (_("Zelfdiagnose"), reverse("questionnaire:questionnaire_list")),
+                (_("Mijn profiel"), reverse("profile:detail")),
+                (_("Zelfdiagnose"), reverse("products:questionnaire_list")),
             ]
         return [
-            (_("Zelfdiagnose"), reverse("questionnaire:questionnaire_list")),
+            (_("Zelfdiagnose"), reverse("products:questionnaire_list")),
         ]
 
     def get_object(self) -> QuestionnaireStep:
@@ -145,11 +145,11 @@ class QuestionnaireRootListView(CommonPageMixin, BaseBreadcrumbMixin, ListView):
     def crumbs(self):
         if self.request.user.is_authenticated:
             return [
-                (_("Mijn profiel"), reverse("accounts:my_profile")),
-                (_("Zelfdiagnose"), reverse("questionnaire:questionnaire_list")),
+                (_("Mijn profiel"), reverse("profile:detail")),
+                (_("Zelfdiagnose"), reverse("products:questionnaire_list")),
             ]
         return [
-            (_("Zelfdiagnose"), reverse("questionnaire:questionnaire_list")),
+            (_("Zelfdiagnose"), reverse("products:questionnaire_list")),
         ]
 
     def get_queryset(self):

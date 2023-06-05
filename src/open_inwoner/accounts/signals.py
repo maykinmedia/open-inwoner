@@ -23,9 +23,14 @@ MESSAGE_TYPE = {
 def log_user_login(sender, user, request, *args, **kwargs):
     current_path = request.path
 
+    try:
+        digid_path = reverse("digid:acs")
+    except:
+        digid_path = ""
+
     if current_path == reverse("admin:login"):
         user_action(request, user, MESSAGE_TYPE["admin"])
-    elif current_path == reverse("digid:acs"):
+    elif digid_path and current_path == digid_path:
         user_action(request, user, MESSAGE_TYPE["frontend_digid"])
     elif current_path == reverse("oidc_authentication_callback"):
         user_action(request, user, MESSAGE_TYPE["frontend_oidc"])

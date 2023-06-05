@@ -32,6 +32,15 @@ class Header extends Component {
         e.target.matches('.header__button *')
       ) {
         this.setState({ open: !this.state.open })
+        /**
+         * Remove focus from search in order to prevent native keyboard on mobile
+         */
+        const blurInput = document.querySelectorAll(
+          '.header__submenu .form .input'
+        )
+        blurInput.forEach((elem) => {
+          elem.blur()
+        })
       }
     })
   }

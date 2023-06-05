@@ -56,7 +56,7 @@ class _UserCreationForm(UserCreationForm):
 class _UserAdmin(ImageCroppingMixin, UserAdmin):
     form = _UserChangeForm
     add_form = _UserCreationForm
-    hijack_success_url = reverse_lazy("root")
+    hijack_success_url = "/"
     list_display_links = (
         "email",
         "first_name",
@@ -68,6 +68,7 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
             {
                 "fields": (
                     "first_name",
+                    "infix",
                     "last_name",
                     "contact_type",
                     "bsn",
@@ -81,7 +82,7 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
                     "postcode",
                     "city",
                     "phonenumber",
-                    "selected_themes",
+                    "selected_categories",
                 )
             },
         ),
@@ -97,6 +98,17 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
                     "is_prepopulated",
                     "groups",
                     "user_permissions",
+                ),
+            },
+        ),
+        (
+            _("Notifications"),
+            {
+                "classes": ("collapse",),
+                "fields": (
+                    "cases_notifications",
+                    "messages_notifications",
+                    "plans_notifications",
                 ),
             },
         ),
@@ -119,13 +131,14 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
     list_display = (
         "email",
         "first_name",
+        "infix",
         "last_name",
         "login_type",
         "is_staff",
         "is_active",
         "contact_type",
     )
-    search_fields = ("first_name", "last_name", "email")
+    search_fields = ("first_name", "infix", "last_name", "email")
     ordering = ("email",)
     filter_horizontal = (
         "user_contacts",

@@ -2,8 +2,6 @@ import logging
 from datetime import date
 from typing import List
 
-from django.conf import settings
-from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
 from django.db.models import Q
 from django.urls import reverse
@@ -18,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
-    help = "Send emails about new messages to the users"
+    help = "Send emails about expiring plans to the users"
 
     def handle(self, *args, **options):
         today = date.today()
@@ -32,7 +30,9 @@ class Command(BaseCommand):
         )
 
         user_ids = created_by_ids + contact_ids
-        receivers = User.objects.filter(is_active=True, pk__in=user_ids).distinct()
+        receivers = User.objects.filter(
+            is_active=True, pk__in=user_ids, plans_notifications=True
+        ).distinct()
 
         for receiver in receivers:
             """send email to each user"""
@@ -45,11 +45,11 @@ class Command(BaseCommand):
             )
 
             logger.info(
-                f"The email was send to the user {receiver} about {plans.count()} expiring plans"
+                f"The email was sent to the user {receiver} about {plans.count()} expiring plans"
             )
 
     def send_email(self, receiver: User, plans: List[Plan]):
-        plan_list_link = build_absolute_url(reverse("plans:plan_list"))
+        plan_list_link = build_absolute_url(reverse("collaborate:plan_list"))
         template = find_template("expiring_plan")
         context = {
             "plans": plans,

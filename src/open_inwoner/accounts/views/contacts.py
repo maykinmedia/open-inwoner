@@ -27,8 +27,8 @@ class ContactListView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn profiel"), reverse("accounts:my_profile")),
-            (_("Mijn contacten"), reverse("accounts:contact_list")),
+            (_("Mijn profiel"), reverse("profile:detail")),
+            (_("Mijn contacten"), reverse("profile:contact_list")),
         ]
 
     def get_queryset(self):
@@ -56,16 +56,16 @@ class ContactCreateView(
 ):
     template_name = "pages/profile/contacts/edit.html"
     form_class = ContactCreateForm
-    success_url = reverse_lazy("accounts:contact_list")
+    success_url = reverse_lazy("profile:contact_list")
 
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn profiel"), reverse("accounts:my_profile")),
-            (_("Mijn contacten"), reverse("accounts:contact_list")),
+            (_("Mijn profiel"), reverse("profile:detail")),
+            (_("Mijn contacten"), reverse("profile:contact_list")),
             (
                 _("Maak contact aan"),
-                reverse("accounts:contact_create", kwargs=self.kwargs),
+                reverse("profile:contact_create", kwargs=self.kwargs),
             ),
         ]
 
@@ -112,7 +112,7 @@ class ContactCreateView(
 
     def send_email_to_existing_user(self, receiver: User, sender: User, request=None):
         login_url = reverse("login")
-        contacts_url = reverse("accounts:contact_list")
+        contacts_url = reverse("profile:contact_list")
         if request:
             url = request.build_absolute_uri(contacts_url)
 
@@ -130,7 +130,7 @@ class ContactDeleteView(LogMixin, LoginRequiredMixin, SingleObjectMixin, View):
     model = User
     slug_field = "uuid"
     slug_url_kwarg = "uuid"
-    success_url = reverse_lazy("accounts:contact_list")
+    success_url = reverse_lazy("profile:contact_list")
 
     def get_queryset(self):
         base_qs = super().get_queryset()
@@ -154,7 +154,7 @@ class ContactApprovalView(LogMixin, LoginRequiredMixin, SingleObjectMixin, View)
     model = User
     slug_field = "uuid"
     slug_url_kwarg = "uuid"
-    success_url = reverse_lazy("accounts:contact_list")
+    success_url = reverse_lazy("profile:contact_list")
 
     def get_queryset(self):
         base_qs = super().get_queryset()

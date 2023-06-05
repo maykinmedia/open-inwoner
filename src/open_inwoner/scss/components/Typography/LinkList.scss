@@ -15,6 +15,10 @@
     white-space: nowrap;
     margin-bottom: var(--spacing-small);
 
+    .material-icons {
+      vertical-align: middle;
+    }
+
     &--wrap {
       white-space: normal;
     }

@@ -1,0 +1,17 @@
+{% load menu_tags link_tags %}
+{% for child in children %}
+{% with url=child.attr.redirect_url|default:child.get_absolute_url %}
+    <li class="primary-navigation__list-item">
+        {% link text=child.get_menu_title href=url icon=child.common.menu_icon icon_outlined=True icon_position="before" %}
+        {% if child.indicator %}
+            <span class="indicator"><a class="link secondary indicator__link" href="{{ url }}">{{ child.indicator }}<span class="indicator__dot"></span></a></span>
+        {% endif %}
+        {% if child.children %}
+        <ul class="primary-navigation__list subpage-list">
+            {% show_menu from_level to_level extra_inactive extra_active template "" "" child %}
+        </ul>
+        {% endif %}
+    </li>
+{% endwith %}
+{% endfor %}
+

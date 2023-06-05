@@ -1,4 +1,5 @@
 from django.contrib.admin.models import ADDITION, CHANGE, DELETION
+from django.test import override_settings
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
@@ -14,6 +15,7 @@ from ..admin import CustomTimelineLogAdmin
 from ..logentry import LOG_ACTIONS
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestAdminTimelineLogging(WebTest):
     csrf_checks = False
 

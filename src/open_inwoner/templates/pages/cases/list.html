@@ -15,15 +15,15 @@
                 {% render_column start=forloop.counter_0|multiply:4 span=4 %}
                 <div class="card card--compact card--stretch">
                     <div class="card__body">
-                    <a href="{% url 'accounts:case_status' object_id=case.uuid %}" class="cases__link">
-                            <p class="h4">
-                                <span class="link link__text">{{ case.identificatie }}</span>
-                            </p>
+                    <a href="{% url 'cases:case_detail' object_id=case.uuid %}" class="cases__link">
+                            <h3 class="h3">
+                                <span class="link link__text">{{ case.description }}</span>
+                            </h3>
                             {% render_list %}
                                 <span class="case-list">
                                 {% list_item case.current_status caption=_("Status") compact=True strong=False %}
                                 {% list_item case.start_date caption=_("Ontvangstdatum") compact=True strong=False %}
-                                {% list_item case.description caption=_("Omschrijving") compact=True strong=False %}
+                                {% list_item case.identificatie caption=_("Zaaknummer") compact=True strong=False %}
                                 </span>
                             {% endrender_list %}
 

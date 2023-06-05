@@ -52,6 +52,7 @@ class OpenZaakConfig(SingletonModel):
         on_delete=models.PROTECT,
         limit_choices_to={"api_type": APITypes.zrc},
         related_name="+",
+        blank=True,
         null=True,
     )
     zaak_max_confidentiality = models.CharField(
@@ -67,6 +68,7 @@ class OpenZaakConfig(SingletonModel):
         on_delete=models.PROTECT,
         limit_choices_to={"api_type": APITypes.ztc},
         related_name="+",
+        blank=True,
         null=True,
     )
     document_service = models.OneToOneField(
@@ -75,6 +77,7 @@ class OpenZaakConfig(SingletonModel):
         on_delete=models.PROTECT,
         limit_choices_to={"api_type": APITypes.drc},
         related_name="+",
+        blank=True,
         null=True,
     )
     document_max_confidentiality = models.CharField(
@@ -103,6 +106,7 @@ class OpenZaakConfig(SingletonModel):
         on_delete=models.PROTECT,
         limit_choices_to={"api_type": APITypes.orc},
         related_name="+",
+        blank=True,
         null=True,
     )
 
@@ -170,6 +174,14 @@ class ZaakTypeConfig(models.Model):
     notify_status_changes = models.BooleanField(default=False)
 
     # documents
+    description = models.TextField(
+        verbose_name=_("Description"),
+        blank=True,
+        default="",
+        help_text=_(
+            "Description - clarification of why a user should upload a document for this case type"
+        ),
+    )
     external_document_upload_url = models.URLField(
         verbose_name=_("Document upload URL"),
         blank=True,

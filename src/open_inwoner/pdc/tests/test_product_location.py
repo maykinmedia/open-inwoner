@@ -2,7 +2,7 @@ import json
 from unittest.mock import patch
 
 from django.contrib.gis.geos import Point
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
@@ -14,6 +14,7 @@ from ..models import ProductLocation
 from .factories import ProductFactory, ProductLocationFactory
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class ProductLocationTestCase(TestCase):
     @patch(
         "open_inwoner.pdc.models.mixins.geocode_address",
@@ -218,6 +219,7 @@ class ProductLocationTestCase(TestCase):
         )
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestLocationFormInput(WebTest):
     @patch("open_inwoner.pdc.models.mixins.geocode_address", side_effect=IndexError)
     def test_exception_is_handled_when_city_and_postcode_are_not_provided(
@@ -240,6 +242,7 @@ class TestLocationFormInput(WebTest):
         mock_geocoding.assert_called_once_with(" ,  ")
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestLocationDetailView(WebTest):
     def test_shown_products_in_location_detail(self):
         published_product = ProductFactory()
@@ -247,7 +250,7 @@ class TestLocationDetailView(WebTest):
         published_product.locations.add(product_location)
 
         response = self.app.get(
-            reverse("pdc:location_detail", kwargs={"uuid": product_location.uuid})
+            reverse("products:location_detail", kwargs={"uuid": product_location.uuid})
         )
 
         # check the published product is shown
@@ -265,7 +268,7 @@ class TestLocationDetailView(WebTest):
         draft_product.locations.add(product_location)
 
         response = self.app.get(
-            reverse("pdc:location_detail", kwargs={"uuid": product_location.uuid})
+            reverse("products:location_detail", kwargs={"uuid": product_location.uuid})
         )
 
         products = response.context["products"]
@@ -274,29 +277,18 @@ class TestLocationDetailView(WebTest):
         self.assertEqual(products.get(), published_product)
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestLocationViewThroughMap(WebTest):
-    def test_product_location_link_is_rendered_on_home_page(self):
-        product = ProductFactory()
-        product_location = ProductLocationFactory()
-        product.locations.add(product_location)
-
-        response = self.app.get(reverse("root"))
-
-        self.assertContains(
-            response,
-            reverse("pdc:location_detail", kwargs={"uuid": product_location.uuid}),
-        )
-
     def test_product_location_link_is_rendered_on_product_page(self):
         product = ProductFactory()
         product_location = ProductLocationFactory()
         product.locations.add(product_location)
 
         response = self.app.get(
-            reverse("pdc:product_detail", kwargs={"slug": product.slug})
+            reverse("products:product_detail", kwargs={"slug": product.slug})
         )
 
         self.assertContains(
             response,
-            reverse("pdc:location_detail", kwargs={"uuid": product_location.uuid}),
+            reverse("products:location_detail", kwargs={"uuid": product_location.uuid}),
         )

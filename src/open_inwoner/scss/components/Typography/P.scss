@@ -16,6 +16,10 @@
     line-height: var(--font-line-height-body-small);
   }
 
+  &--muted {
+    color: var(--color-mute);
+  }
+
   &:empty {
     margin: 0 !important;
   }
@@ -39,12 +43,18 @@
 }
 
 .p .link {
+  //text-decoration: underline;
+  .content {
+    text-decoration: underline;
+  }
   &:hover {
     text-decoration: none;
   }
-
-  strong {
-    text-decoration: underline;
+  .material-icons {
+    text-decoration: none;
+    &:hover {
+      text-decoration: none;
+    }
   }
 }
 
@@ -53,5 +63,10 @@
 
   & > .p {
     margin: 0 !important;
+  }
+
+  /// leaflet reset
+  .link {
+    text-decoration: underline;
   }
 }

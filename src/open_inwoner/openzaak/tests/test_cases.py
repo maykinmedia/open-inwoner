@@ -2,7 +2,7 @@ import datetime
 from unittest.mock import patch
 
 from django.contrib.auth.models import AnonymousUser
-from django.core.cache import cache
+from django.test.utils import override_settings
 from django.urls import reverse, reverse_lazy
 
 import requests_mock
@@ -18,16 +18,18 @@ from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.accounts.views.cases import CaseListMixin
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 
+from ...utils.tests.helpers import AssertRedirectsMixin
 from ..models import OpenZaakConfig
 from ..utils import format_zaak_identificatie
 from .factories import ServiceFactory
 from .shared import CATALOGI_ROOT, ZAKEN_ROOT
 
 
-class CaseListAccessTests(ClearCachesMixin, WebTest):
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+class CaseListAccessTests(AssertRedirectsMixin, ClearCachesMixin, WebTest):
     urls = [
-        reverse_lazy("accounts:my_open_cases"),
-        reverse_lazy("accounts:my_closed_cases"),
+        reverse_lazy("cases:open_cases"),
+        reverse_lazy("cases:closed_cases"),
     ]
 
     @classmethod
@@ -56,7 +58,7 @@ class CaseListAccessTests(ClearCachesMixin, WebTest):
             with self.subTest(url):
                 response = self.app.get(url, user=user)
 
-                self.assertRedirects(response, reverse("root"))
+                self.assertRedirects(response, reverse("pages-root"))
 
     def test_anonymous_user_has_no_access_to_cases_page(self):
         user = AnonymousUser()
@@ -65,7 +67,7 @@ class CaseListAccessTests(ClearCachesMixin, WebTest):
             with self.subTest(url):
                 response = self.app.get(url, user=user)
 
-                self.assertRedirects(response, f"{reverse('login')}?next={url}")
+                self.assertRedirectsLogin(response, next=url)
 
     def test_missing_zaak_client_returns_empty_list(self):
         user = UserFactory(
@@ -119,9 +121,10 @@ class CaseListAccessTests(ClearCachesMixin, WebTest):
 
 
 @requests_mock.Mocker()
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class CaseListViewTests(ClearCachesMixin, WebTest):
-    url_open = reverse_lazy("accounts:my_open_cases")
-    url_closed = reverse_lazy("accounts:my_closed_cases")
+    url_open = reverse_lazy("cases:open_cases")
+    url_closed = reverse_lazy("cases:closed_cases")
 
     @classmethod
     def setUpTestData(cls):
@@ -314,8 +317,7 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
                     "start_date": datetime.date.fromisoformat(self.zaak2["startdatum"]),
                     "end_date": None,
                     "identificatie": self.zaak2["identificatie"],
-                    "description": self.zaak2["omschrijving"],
-                    "zaaktype_description": self.zaaktype["omschrijving"],
+                    "description": self.zaaktype["omschrijving"],
                     "current_status": self.status_type1["omschrijving"],
                 },
                 {
@@ -323,8 +325,7 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
                     "start_date": datetime.date.fromisoformat(self.zaak1["startdatum"]),
                     "end_date": None,
                     "identificatie": self.zaak1["identificatie"],
-                    "description": self.zaak1["omschrijving"],
-                    "zaaktype_description": self.zaaktype["omschrijving"],
+                    "description": self.zaaktype["omschrijving"],
                     "current_status": self.status_type1["omschrijving"],
                 },
             ],
@@ -405,8 +406,7 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
                     "start_date": datetime.date.fromisoformat(self.zaak3["startdatum"]),
                     "end_date": datetime.date.fromisoformat(self.zaak3["einddatum"]),
                     "identificatie": self.zaak3["identificatie"],
-                    "description": self.zaak3["omschrijving"],
-                    "zaaktype_description": self.zaaktype["omschrijving"],
+                    "description": self.zaaktype["omschrijving"],
                     "current_status": self.status_type2["omschrijving"],
                 },
             ],
@@ -485,14 +485,12 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
                     "start_date": datetime.date.fromisoformat(self.zaak2["startdatum"]),
                     "end_date": None,
                     "identificatie": self.zaak2["identificatie"],
-                    "description": self.zaak2["omschrijving"],
-                    "zaaktype_description": self.zaaktype["omschrijving"],
+                    "description": self.zaaktype["omschrijving"],
                     "current_status": self.status_type1["omschrijving"],
                 },
             ],
         )
         self.assertNotContains(response_1, self.zaak1["identificatie"])
-        self.assertNotContains(response_1, self.zaak1["omschrijving"])
         self.assertContains(response_1, "?page=2")
 
         # 2. test next page
@@ -507,14 +505,12 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
                     "start_date": datetime.date.fromisoformat(self.zaak1["startdatum"]),
                     "end_date": None,
                     "identificatie": self.zaak1["identificatie"],
-                    "description": self.zaak1["omschrijving"],
-                    "zaaktype_description": self.zaaktype["omschrijving"],
+                    "description": self.zaaktype["omschrijving"],
                     "current_status": self.status_type1["omschrijving"],
                 },
             ],
         )
         self.assertNotContains(response_2, self.zaak2["identificatie"])
-        self.assertNotContains(response_2, self.zaak2["omschrijving"])
         self.assertContains(response_2, "?page=1")
 
     @patch.object(CaseListMixin, "paginate_by", 1)

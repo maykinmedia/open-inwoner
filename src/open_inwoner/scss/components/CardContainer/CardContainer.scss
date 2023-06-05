@@ -16,6 +16,10 @@
         --card-columns: #{$i};
       }
     }
+
+    &--columns-4 {
+      grid-template-columns: repeat(auto-fit, 228px);
+    }
   }
 
   &--small {
@@ -38,5 +42,15 @@
 .login-grid {
   .card {
     max-width: 100%;
+
+    .form {
+      /// Make required asterisk visible for this component
+      .label__label--required {
+        color: var(--color-red);
+        padding-left: var(--spacing-tiny);
+        //make asterisks invisible by default, only make them visible if component has the caption
+        display: inline;
+      }
+    }
   }
 }

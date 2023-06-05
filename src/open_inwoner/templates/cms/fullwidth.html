@@ -1,0 +1,25 @@
+{% extends 'master.html' %}
+{% load i18n cms_tags sekizai_tags static %}
+
+{% block header_image %}
+    {% if request.user.is_authenticated %}
+        {% placeholder 'banner_image' %}
+    {% else %}
+        <aside class="banner" aria-hidden="true">
+            <img class="main-image" src="{{ hero_image_login }}" alt="Header image">
+        </aside>
+    {% endif %}
+{% endblock header_image %}
+
+{% block content %}
+    {% if not request.user.is_authenticated %}
+        <div class="grid__welcome">
+            <h1 class="h1">{{configurable_text.home_page.home_welcome_title}}</h1>
+            <p class="p">{{configurable_text.home_page.home_welcome_intro|linebreaksbr}}</p>
+        </div>
+    {% else %}
+        {% placeholder 'banner_text' %}
+    {% endif %}
+
+    {% placeholder 'content' or %}{% trans "There is no content." %}{% endplaceholder %}
+{% endblock content %}

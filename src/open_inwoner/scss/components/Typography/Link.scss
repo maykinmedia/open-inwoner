@@ -27,8 +27,8 @@
 
   *[class*='icon'],
   *[class*='Icon'] {
-    font-size: 20px;
-    width: 20px;
+    font-size: 24px;
+    width: 24px;
   }
 
   &--icon-position-before {
@@ -71,10 +71,6 @@
 
   *[class*='icon']:first-child,
   *[class*='Icon']:first-child {
-    transform: scale(0.75);
+    transform: scale(1);
   }
-}
-
-.link + .link {
-  margin-left: var(--spacing-small);
 }

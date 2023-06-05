@@ -2,12 +2,13 @@ from datetime import date, timedelta
 
 from django.core import mail
 from django.core.management import call_command
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from open_inwoner.accounts.tests.factories import ActionFactory, UserFactory
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class NotifyComandTests(TestCase):
     def test_notify_about_expiring_action(self):
         user = UserFactory()
@@ -24,7 +25,13 @@ class NotifyComandTests(TestCase):
         )
         self.assertEqual(sent_mail.to, [user.email])
         self.assertIn(action.name, html_body)
-        self.assertIn(reverse("accounts:action_list"), html_body)
+        self.assertIn(reverse("profile:action_list"), html_body)
+
+    def test_no_notification_about_expiring_action_when_disabled(self):
+        user = UserFactory(plans_notifications=False)
+        action = ActionFactory(end_date=date.today(), created_by=user)
+        call_command("actions_expire")
+        self.assertEqual(len(mail.outbox), 0)
 
     def test_action_does_not_expire_yet(self):
         user = UserFactory()

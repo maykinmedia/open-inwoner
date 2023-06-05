@@ -82,20 +82,15 @@ class ZaakTypeInformatieObjectTypeConfigQueryset(models.QuerySet):
             zaaktype_config__identificatie=case_type.identificatie,
         )
 
-    def get_visible_ztiot_configs_for_case(self, case: Zaak):
+    def filter_enabled_for_case_type(self, case_type: ZaakType):
         """
         Returns all ZaakTypeInformatieObjectTypeConfig instances which allow
         documents upload and are based on a specific case and case type.
         """
-        # TODO rename to 'filter_visible_for_case'
-        # TODO change signature to accept case_type/ZaakType
-        # TODO refactor to use self.filter_case_type(case_type)
-        if not case:
+        if not case_type:
             return self.none()
 
-        return self.filter(
-            zaaktype_uuids__contains=[case.zaaktype.uuid],
-            zaaktype_config__identificatie=case.zaaktype.identificatie,
+        return self.filter_case_type(case_type).filter(
             document_upload_enabled=True,
         )
 
@@ -129,21 +124,18 @@ class ZaakTypeConfigQueryset(models.QuerySet):
             identificatie=case_type.identificatie,
         )
 
-    def get_visible_zt_configs_for_case_type_identification(
-        self, case_type_identification
-    ):
+    def filter_enabled_for_case_type(self, case_type: ZaakType):
         """
         Returns all ZaakTypeConfig instances which allow external documents
         upload, have a url set and are based on a specific case type identificatie.
         """
-        if not case_type_identification:
+        if not case_type:
             return self.none()
 
-        # TODO rename to 'filter_visible_for_case_type'
-        # TODO change signature to accept case_type
-        # TODO refactor to use self.filter_case_type(case_type)
-
-        return self.filter(
-            identificatie=case_type_identification,
-            document_upload_enabled=True,
-        ).exclude(external_document_upload_url="")
+        return (
+            self.filter_case_type(case_type)
+            .filter(
+                document_upload_enabled=True,
+            )
+            .exclude(external_document_upload_url="")
+        )

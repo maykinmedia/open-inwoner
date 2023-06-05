@@ -99,7 +99,8 @@ div.breadcrumbs {
 
 /* hack to get changelist_view with search styled properly */
 #content {
-  #changelist {
+  /* adjusting for django-cms page */
+  #changelist:not([class~='cms-pagetree-root']) {
     display: grid;
     grid-template-columns: 1fr 360px;
     gap: 16px;

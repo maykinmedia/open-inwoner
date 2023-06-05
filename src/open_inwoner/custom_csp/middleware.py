@@ -65,3 +65,19 @@ def _append_dict_list_values(target, source):
                 target[k] = [v]
             else:
                 target[k] = list(set(v))
+
+
+class SkipStaffCSPMiddleware:
+    """
+    middleware to skip CSP if authenticated and staff by simulating the django-csp '@csp_exempt' decorator
+    https://django-csp.readthedocs.io/en/latest/decorators.html#csp-exempt
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        if request.user.is_authenticated and request.user.is_staff:
+            response._csp_exempt = True
+        return response

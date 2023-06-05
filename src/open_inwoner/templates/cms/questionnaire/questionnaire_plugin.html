@@ -1,0 +1,7 @@
+{% load i18n string_tags questionnaire_tags %}
+
+{% if questionnaire_roots.exists %}
+    <h2 class="h2">{{configurable_text.home_page.home_questionnaire_title}}</h2>
+    {% optional_paragraph configurable_text.home_page.home_questionnaire_intro %}
+    {% questionnaire root_nodes=questionnaire_roots %}
+{% endif %}

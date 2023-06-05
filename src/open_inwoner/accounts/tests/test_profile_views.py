@@ -11,19 +11,24 @@ from timeline_logger.models import TimelineLog
 from webtest import Upload
 
 from open_inwoner.accounts.choices import StatusChoices
+from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 from open_inwoner.pdc.tests.factories import CategoryFactory
 from open_inwoner.utils.logentry import LOG_ACTIONS
+from open_inwoner.utils.tests.helpers import create_image_bytes
 
+from ...cms.profile.cms_apps import ProfileApphook
+from ...cms.tests import cms_tools
 from ...questionnaire.tests.factories import QuestionnaireStepFactory
 from ..choices import ContactTypeChoices, LoginTypeChoices
 from ..forms import BrpUserForm, UserForm
 from .factories import ActionFactory, DocumentFactory, UserFactory
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class ProfileViewTests(WebTest):
     def setUp(self):
-        self.url = reverse("accounts:my_profile")
+        self.url = reverse("profile:detail")
         self.return_url = reverse("logout")
         self.user = UserFactory(street="MyStreet")
 
@@ -33,6 +38,13 @@ class ProfileViewTests(WebTest):
             is_deleted=True,
             status=StatusChoices.open,
         )
+
+        cms_tools.create_homepage()
+
+        self.profile_app = ProfileConfig.objects.create(
+            namespace=ProfileApphook.app_name
+        )
+        cms_tools.create_apphook_page(ProfileApphook)
 
     def test_login_required(self):
         login_url = reverse("login")
@@ -54,14 +66,15 @@ class ProfileViewTests(WebTest):
         self.assertContains(response, _("U heeft geen interessegebieden aangegeven."))
         self.assertContains(response, _("U heeft nog geen contacten."))
         self.assertContains(response, "0 acties staan open.")
-        self.assertNotContains(response, reverse("questionnaire:questionnaire_list"))
+        self.assertNotContains(response, reverse("products:questionnaire_list"))
+        self.assertContains(response, _("messages, plans"))
 
     def test_get_filled_profile_page(self):
         ActionFactory(created_by=self.user)
         contact = UserFactory()
         self.user.user_contacts.add(contact)
         category = CategoryFactory()
-        self.user.selected_themes.add(category)
+        self.user.selected_categories.add(category)
         QuestionnaireStepFactory(published=True)
 
         response = self.app.get(self.url, user=self.user)
@@ -72,7 +85,7 @@ class ProfileViewTests(WebTest):
             f"{contact.first_name} ({contact.get_contact_type_display()})",
         )
         self.assertContains(response, "1 acties staan open.")
-        self.assertContains(response, reverse("questionnaire:questionnaire_list"))
+        self.assertContains(response, reverse("products:questionnaire_list"))
 
     def test_only_open_actions(self):
         action = ActionFactory(created_by=self.user, status=StatusChoices.closed)
@@ -166,18 +179,25 @@ class ProfileViewTests(WebTest):
         response = self.app.get(self.url, user=self.user)
         self.assertNotContains(response, _("Mijn gegevens"))
 
+    def test_active_user_notifications_are_shown(self):
+        response = self.app.get(self.url, user=self.user)
+        self.assertContains(response, _("messages, plans"))
 
+    def test_expected_message_is_shown_when_all_notifications_disabled(self):
+        self.user.cases_notifications = False
+        self.user.messages_notifications = False
+        self.user.plans_notifications = False
+        self.user.save()
+        response = self.app.get(self.url, user=self.user)
+        self.assertContains(response, _("You do not have any notifications enabled."))
+
+
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class EditProfileTests(WebTest):
     def setUp(self):
-        self.url = reverse("accounts:edit_profile")
-        self.return_url = reverse("accounts:my_profile")
+        self.url = reverse("profile:edit")
+        self.return_url = reverse("profile:detail")
         self.user = UserFactory()
-
-    def create_test_image_bytes(self):
-        image = Image.new("RGB", (10, 10))
-        byteIO = io.BytesIO()
-        image.save(byteIO, format="png")
-        return byteIO.getvalue()
 
     def upload_test_image_to_profile_edit_page(self, img_bytes):
         response = self.app.get(self.url, user=self.user, status=200)
@@ -367,10 +387,10 @@ class EditProfileTests(WebTest):
         self.user.contact_type = ContactTypeChoices.begeleider
         self.user.save()
 
-        img_bytes = self.create_test_image_bytes()
+        img_bytes = create_image_bytes()
         form_response = self.upload_test_image_to_profile_edit_page(img_bytes)
 
-        self.assertRedirects(form_response, reverse("accounts:my_profile"))
+        self.assertRedirects(form_response, reverse("profile:detail"))
         with self.assertRaisesMessage(
             ValueError, "The 'image' attribute has no file associated with it."
         ):
@@ -385,10 +405,10 @@ class EditProfileTests(WebTest):
         self.user.login_type = LoginTypeChoices.digid
         self.user.save()
 
-        img_bytes = self.create_test_image_bytes()
+        img_bytes = create_image_bytes()
         form_response = self.upload_test_image_to_profile_edit_page(img_bytes)
 
-        self.assertRedirects(form_response, reverse("accounts:my_profile"))
+        self.assertRedirects(form_response, reverse("profile:detail"))
         with self.assertRaisesMessage(
             ValueError, "The 'image' attribute has no file associated with it."
         ):
@@ -417,12 +437,13 @@ class EditProfileTests(WebTest):
 
 
 @requests_mock.Mocker()
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class MyDataTests(HaalCentraalMixin, WebTest):
     expected_response = {
         "first_name": "Merel",
         "initials": "M.",
         "last_name": "Kooyman",
-        "prefix": None,
+        "prefix": "de",
         "birthday": "10-04-1982",
         "birthday_place": "Leerdam",
         "gender": "vrouw",
@@ -440,7 +461,7 @@ class MyDataTests(HaalCentraalMixin, WebTest):
             last_name="",
             login_type=LoginTypeChoices.digid,
         )
-        self.url = reverse("accounts:my_data")
+        self.url = reverse("profile:data")
 
     def test_expected_response_is_returned_brp_v_2(self, m):
         self._setUpMocks_v_2(m)
@@ -517,9 +538,10 @@ class MyDataTests(HaalCentraalMixin, WebTest):
         )
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class EditIntrestsTests(WebTest):
     def setUp(self):
-        self.url = reverse("accounts:my_themes")
+        self.url = reverse("profile:categories")
         self.user = UserFactory()
 
     def test_login_required(self):
@@ -531,17 +553,61 @@ class EditIntrestsTests(WebTest):
         category = CategoryFactory(name="a")
         CategoryFactory(name="b")
         CategoryFactory(name="c")
-        self.user.selected_themes.add(category)
+        self.user.selected_categories.add(category)
         response = self.app.get(self.url, user=self.user)
-        form = response.forms["change-themes"]
-        self.assertTrue(form.get("selected_themes", index=0).checked)
-        self.assertFalse(form.get("selected_themes", index=1).checked)
-        self.assertFalse(form.get("selected_themes", index=2).checked)
+        form = response.forms["change-categories"]
+        self.assertTrue(form.get("selected_categories", index=0).checked)
+        self.assertFalse(form.get("selected_categories", index=1).checked)
+        self.assertFalse(form.get("selected_categories", index=2).checked)
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+class EditNotificationsTests(WebTest):
+    def setUp(self):
+        self.url = reverse("profile:notifications")
+        self.user = UserFactory()
+
+    def test_login_required(self):
+        login_url = reverse("login")
+        response = self.app.get(self.url)
+
+        self.assertRedirects(response, f"{login_url}?next={self.url}")
+
+    def test_default_values_for_regular_user(self):
+        response = self.app.get(self.url, user=self.user)
+        form = response.forms["change-notifications"]
+
+        self.assertTrue(form.get("messages_notifications").checked)
+        self.assertTrue(form.get("plans_notifications").checked)
+        self.assertNotIn("cases_notifications", form.fields)
+
+    def test_disabling_notification_is_saved(self):
+        self.assertTrue(self.user.messages_notifications)
+
+        response = self.app.get(self.url, user=self.user)
+        form = response.forms["change-notifications"]
+        form["messages_notifications"] = False
+        form.submit()
+
+        self.user.refresh_from_db()
+
+        self.assertTrue(self.user.cases_notifications)
+        self.assertFalse(self.user.messages_notifications)
+        self.assertTrue(self.user.plans_notifications)
+
+    def test_cases_notifications_is_accessible_when_digid_user(self):
+        self.user.login_type = LoginTypeChoices.digid
+        self.user.save()
+        response = self.app.get(self.url, user=self.user)
+        form = response.forms["change-notifications"]
+
+        self.assertIn("cases_notifications", form.fields)
+
+
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class ExportProfileTests(WebTest):
     def setUp(self):
-        self.url = reverse("accounts:profile_export")
+        self.url = reverse("profile:export")
         self.user = UserFactory()
 
     def test_login_required(self):

@@ -1,3 +1,4 @@
+from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -12,6 +13,7 @@ from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.tests.factories import ServiceFactory
 from open_inwoner.openzaak.tests.shared import FORMS_ROOT
 from open_inwoner.utils.test import ClearCachesMixin
+from open_inwoner.utils.tests.helpers import AssertRedirectsMixin
 
 
 class ESuiteData:
@@ -42,7 +44,7 @@ class ESuiteData:
         }
 
     def setUpOASMocks(self, m):
-        mock_service_oas_get(m, FORMS_ROOT, "esuite-submissions")
+        mock_service_oas_get(m, FORMS_ROOT, "submissions-esuite")
 
     def install_mocks(self, m):
         self.setUpOASMocks(m)
@@ -54,7 +56,8 @@ class ESuiteData:
 
 
 @requests_mock.Mocker()
-class FormAPITest(ClearCachesMixin, WebTest):
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+class FormAPITest(AssertRedirectsMixin, ClearCachesMixin, WebTest):
     config: OpenZaakConfig
 
     @classmethod
@@ -68,7 +71,7 @@ class FormAPITest(ClearCachesMixin, WebTest):
         cls.config.save()
 
         cls.user = UserFactory(bsn="900222086")
-        cls.submissions_url = reverse("accounts:open_submissions")
+        cls.submissions_url = reverse("cases:open_submissions")
 
     def test_api_fetch(self, m):
         data = ESuiteData().install_mocks(m)
@@ -101,10 +104,8 @@ class FormAPITest(ClearCachesMixin, WebTest):
 
     def test_requires_auth(self, m):
         response = self.app.get(self.submissions_url)
-        self.assertRedirects(
-            response, f"{reverse('login')}?next={self.submissions_url}"
-        )
+        self.assertRedirectsLogin(response, next=self.submissions_url)
 
     def test_requires_bsn(self, m):
         response = self.app.get(self.submissions_url, user=UserFactory(bsn=""))
-        self.assertRedirects(response, reverse("root"))
+        self.assertRedirects(response, reverse("pages-root"))

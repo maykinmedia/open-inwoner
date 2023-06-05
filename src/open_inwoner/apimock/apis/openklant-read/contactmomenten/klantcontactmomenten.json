@@ -1,0 +1,23 @@
+{
+    "count": 1,
+    "previous": null,
+    "next": null,
+    "results": [
+        {
+            "uuid": "aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
+            "url": "https://contactmomenten.nl/api/v1/klantcontactmomenten/aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
+            "klant": "https://klanten.nl/api/v1/klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            "contactmoment": "https://contactmomenten.nl/api/v1/contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
+            "rol": "gesprekspartner",
+            "gelezen": true
+        },
+        {
+            "uuid": "aaaaaaaa-aaaa-aaaa-aaaa-ccccccccccc2",
+            "url": "https://contactmomenten.nl/api/v1/klantcontactmomenten/aaaaaaaa-aaaa-aaaa-aaaa-ccccccccccc2",
+            "klant": "https://klanten.nl/api/v1/klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            "contactmoment": "https://contactmomenten.nl/api/v1/contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbb2",
+            "rol": "gesprekspartner",
+            "gelezen": true
+        }
+    ]
+}

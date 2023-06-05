@@ -1,0 +1,9 @@
+{% load i18n sekizai_tags %}
+
+{% url 'collaborate:plan_list' as plans %}
+
+{% if instance.image %}
+    <aside class="banner" aria-hidden="true">
+        <img class="main-image" src="{{ instance.image.file.url }}" alt={{ instance.title|default:_("Header image") }} height="{{instance.image_height}}">
+    </aside>
+{% endif %}

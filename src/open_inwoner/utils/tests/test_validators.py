@@ -2,6 +2,7 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from ..validators import (
+    format_phone_number,
     validate_charfield_entry,
     validate_phone_number,
     validate_postal_code,
@@ -91,3 +92,21 @@ class ValidatorsTestCase(TestCase):
         self.assertEqual(validate_phone_number("00695959595"), "00695959595")
         self.assertEqual(validate_phone_number("00-69-59-59-59-5"), "00-69-59-59-59-5")
         self.assertEqual(validate_phone_number("00 69 59 59 59 5"), "00 69 59 59 59 5")
+
+    def test_format_phone_number(self):
+        samples = [
+            "0031123456789",
+            "+31123456789",
+            "0123456789",
+            "012-3456789",
+            "012 345 67 89",
+            "+31 12 345 67 89",
+        ]
+        expected_result = "+31123456789"
+
+        for num in samples:
+            self.assertEqual(format_phone_number(num), expected_result)
+
+        # testing some non dutch numbers
+        self.assertEqual(format_phone_number("+32 12 345 67 89"), "+32123456789")
+        self.assertEqual(format_phone_number("0032 12 345 67 89"), "+32123456789")

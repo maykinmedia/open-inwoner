@@ -147,7 +147,7 @@ class PlaywrightSyncLiveServerTestCase(StaticLiveServerTestCase):
         ):
             page.get_by_text("Met gebruikersnaam en wachtwoord").click()
 
-        with page.expect_navigation(url=cls.live_reverse("root")):
+        with page.expect_navigation(url=cls.live_reverse("pages-root")):
             page.get_by_text("DigiD gebruikersnaam", exact=True).fill(user.bsn)
             page.get_by_text("Wachtwoord", exact=True).fill("whatever")
             page.get_by_role("button", name="Inloggen").click()

@@ -9,7 +9,7 @@
     <h1 class="h1">{% trans "Creëer contact" %}</h1>
     {% render_grid %}
         {% render_column span=9 %}
-            {% form columns=2 id="contact-form" form_object=form method="POST" show_notifications=True submit_text=_("Opslaan") secondary_href='accounts:contact_list' secondary_text=_('Terug') secondary_icon='arrow_backward' secondary_icon_position="before" %}
+            {% form columns=2 id="contact-form" form_object=form method="POST" show_notifications=True submit_text=_("Opslaan") secondary_href='profile:contact_list' secondary_text=_('Terug') secondary_icon='arrow_backward' secondary_icon_position="before" %}
         {% endrender_column %}
     {% endrender_grid %}
 {% endblock content %}

@@ -2,7 +2,7 @@
 {% load i18n button_tags card_tags map_tags questionnaire_tags grid_tags product_tags utils string_tags %}
 
 {% block header_image %}
-<aside aria-hidden="true">
+<aside class="banner" aria-hidden="true">
     <img class="main-image" src="{{ hero_image_login }}" alt="Header image">
 </aside>
 {% endblock header_image %}
@@ -19,8 +19,8 @@
 
     <h2 class="h2">
         {{configurable_text.home_page.home_theme_title}}
-        {% trans "Alle thema's" as button_text %}
-        {% button href='pdc:category_list' text=button_text icon="arrow_forward" icon_position="after" %}
+        {% trans "Alle onderwerpen" as button_text %}
+        {% button href='products:category_list' text=button_text icon="arrow_forward" icon_position="after" %}
     </h2>
     <p class="p">{{configurable_text.home_page.home_theme_intro|linebreaksbr}}</p>
 
@@ -37,7 +37,7 @@
     {% endif %}
 
     {% if condition %}
-        {% product_finder condition=condition form=condition_form form_action="pdc:product_finder" primary_text=_("Start") %}
+        {% product_finder condition=condition form=condition_form form_action="products:product_finder" primary_text=_("Start") %}
     {% endif %}
 
     <h2 class="h2">{{configurable_text.home_page.home_map_title}}</h2>

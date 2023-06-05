@@ -3,6 +3,7 @@ from typing import Optional
 from urllib.parse import unquote
 
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
@@ -10,9 +11,9 @@ from django.utils import formats
 from django.utils.translation import gettext as _
 from django.views.generic import FormView
 
-from furl import furl
 from privates.views import PrivateMediaView
 
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.utils.mixins import PaginationMixin
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
@@ -40,6 +41,8 @@ class InboxView(
         """
         context = super().get_context_data()
 
+        config = SiteConfiguration.get_solo()
+
         conversations = self.get_conversations()
         other_user = self.get_other_user(conversations)
         messages = self.get_messages(other_user)
@@ -47,7 +50,7 @@ class InboxView(
 
         if other_user:
             conversation_url = reverse(
-                "accounts:inbox", kwargs={self.slug_field: other_user.uuid}
+                "inbox:index", kwargs={self.slug_field: other_user.uuid}
             )
         else:
             conversation_url = ""
@@ -59,6 +62,7 @@ class InboxView(
                 "conversation_url": conversation_url,
                 "other_user": other_user,
                 "status": status,
+                "allow_file_sharing": config.allow_messages_file_sharing,
             }
         )
 
@@ -76,12 +80,15 @@ class InboxView(
     def annotate_conversations(self, conversations):
         for c in conversations:
             c.thread_url = reverse(
-                "accounts:inbox", kwargs={self.slug_field: c.other_user_uuid}
+                "inbox:index", kwargs={self.slug_field: c.other_user_uuid}
             )
             # note these are annotations (not models)
-            c.other_user_full_name = " ".join(
-                (c.other_user_first_name, c.other_user_last_name)
+            parts = (
+                c.other_user_first_name,
+                c.other_user_infix,
+                c.other_user_last_name,
             )
+            c.other_user_full_name = " ".join(p for p in parts if p)
         return conversations
 
     def get_other_user(self, conversations: dict) -> Optional[User]:
@@ -153,7 +160,7 @@ class InboxView(
         object = form.save()
 
         url = reverse(
-            "accounts:inbox",
+            "inbox:index",
             kwargs={self.slug_field: form.cleaned_data["receiver"].uuid},
         )
 
@@ -180,11 +187,18 @@ class InboxView(
         self.mark_messages_seen(other_user=context["other_user"])
         return self.render_to_response(context)
 
+    def post(self, request, *args, **kwargs):
+        config = SiteConfiguration.get_solo()
+        if not config.allow_messages_file_sharing and request.FILES:
+            raise PermissionDenied()
+
+        return super().post(request, *args, **kwargs)
+
 
 class InboxStartView(LogMixin, LoginRequiredMixin, CommonPageMixin, FormView):
     template_name = "accounts/inbox_start.html"
     form_class = InboxForm
-    success_url = reverse_lazy("accounts:inbox")
+    success_url = reverse_lazy("inbox:index")
 
     def page_title(self):
         return _("Nieuw bericht")
@@ -199,7 +213,7 @@ class InboxStartView(LogMixin, LoginRequiredMixin, CommonPageMixin, FormView):
         object = form.save()
         # build redirect url based on form hidden data
         url = reverse(
-            "accounts:inbox", kwargs={InboxView.slug_field: form.data["receiver"]}
+            "inbox:index", kwargs={InboxView.slug_field: form.data["receiver"]}
         )
         self.log_addition(object, _("message was created"))
         return HttpResponseRedirect(f"{url}#messages-last")
@@ -221,6 +235,19 @@ class InboxStartView(LogMixin, LoginRequiredMixin, CommonPageMixin, FormView):
         document = get_object_or_404(Document, uuid=document_uuid)
 
         return document.file
+
+    def post(self, request, *args, **kwargs):
+        config = SiteConfiguration.get_solo()
+        if not config.allow_messages_file_sharing and request.FILES:
+            raise PermissionDenied()
+
+        return super().post(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        config = SiteConfiguration.get_solo()
+        context["allow_file_sharing"] = config.allow_messages_file_sharing
+        return context
 
 
 class InboxPrivateMediaView(LogMixin, PrivateMediaView):
