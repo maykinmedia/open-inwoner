@@ -129,6 +129,7 @@ class EditProfileView(
     def form_valid(self, form):
         form.save()
 
+        messages.success(request, _("Uw wijzigingen zijn opgeslagen"))
         self.log_change(self.get_object(), _("profile was modified"))
         return HttpResponseRedirect(self.get_success_url())
 
@@ -164,7 +165,7 @@ class MyCategoriesView(
 
     def form_valid(self, form):
         form.save()
-
+        messages.success(request, _("Uw wijzigingen zijn opgeslagen"))
         self.log_change(self.object, _("categories were modified"))
         return HttpResponseRedirect(self.get_success_url())
 
@@ -259,7 +260,7 @@ class MyNotificationsView(
 
     def form_valid(self, form):
         form.save()
-
+        messages.success(request, _("Uw wijzigingen zijn opgeslagen"))
         self.log_change(self.object, _("users notifications were modified"))
         return HttpResponseRedirect(self.get_success_url())
 
