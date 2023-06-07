@@ -263,55 +263,33 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         self.assertEquals(self.user.postcode, "1013 RM")
         self.assertEquals(self.user.city, "Amsterdam")
 
-    def test_save_with_invalid_first_name_chars_fails(self):
-        invalid_characters = "/\"\\,.:;'"
+    def test_name_validation(self):
+        invalid_characters = '<>#/"\\,.:;'
 
         for char in invalid_characters:
             with self.subTest(char=char):
                 response = self.app.get(self.url, user=self.user, status=200)
                 form = response.forms["profile-edit"]
-                form["first_name"] = char
-                form["last_name"] = "Last name"
-                form["display_name"] = "a nickname"
-                form["phonenumber"] = "06987878787"
-                form["birthday"] = "21-01-1992"
-                form["street"] = "Keizersgracht"
-                form["housenumber"] = "17 d"
-                form["postcode"] = "1013 RM"
-                form["city"] = "Amsterdam"
-                response = form.submit()
-                expected_errors = {
-                    "first_name": [
-                        _("Uw invoer bevat een ongeldig teken: {char}").format(
-                            char=char
-                        )
-                    ]
-                }
-                self.assertEqual(response.context["form"].errors, expected_errors)
+                form["first_name"] = "test" + char
+                form["infix"] = char + "test"
+                form["last_name"] = "te" + char + "st"
+                form["display_name"] = "te" + char + "st"
+                form["city"] = "te" + char + "st"
+                form["street"] = "te" + char + "st"
 
-    def test_save_with_invalid_last_name_chars_fails(self):
-        invalid_characters = "/\"\\,.:;'"
-
-        for char in invalid_characters:
-            with self.subTest(char=char):
-                response = self.app.get(self.url, user=self.user, status=200)
-                form = response.forms["profile-edit"]
-                form["first_name"] = "John"
-                form["last_name"] = char
-                form["display_name"] = "a nickname"
-                form["phonenumber"] = "06987878787"
-                form["birthday"] = "21-01-1992"
-                form["street"] = "Keizersgracht"
-                form["housenumber"] = "17 d"
-                form["postcode"] = "1013 RM"
-                form["city"] = "Amsterdam"
                 response = form.submit()
+
+                error_msg = _(
+                    "Please make sure your input contains only valid characters "
+                    "(letters, numbers, apostrophe, space)."
+                )
                 expected_errors = {
-                    "last_name": [
-                        _("Uw invoer bevat een ongeldig teken: {char}").format(
-                            char=char
-                        )
-                    ]
+                    "first_name": [error_msg],
+                    "infix": [error_msg],
+                    "last_name": [error_msg],
+                    "display_name": [error_msg],
+                    "city": [error_msg],
+                    "street": [error_msg],
                 }
                 self.assertEqual(response.context["form"].errors, expected_errors)
 
