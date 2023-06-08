@@ -52,8 +52,12 @@ class MyProfileView(
         context["anchors"] = [
             ("#title", _("Persoonlijke gegevens")),
             ("#overview", _("Persoonlijk overzicht")),
-            ("#files", _("Bestanden")),
         ]
+
+        user_files = user.get_all_files()
+        if user_files:
+            context["anchors"].append(("#files", _("Bestanden")))
+
         # List of names of 'mentor' users that are a contact of me
         mentor_contacts = [
             c.get_full_name()
@@ -70,7 +74,7 @@ class MyProfileView(
             .order_by("end_date")
             .first()
         )
-        context["files"] = user.get_all_files()
+        context["files"] = user_files
         context["category_text"] = user.get_interests()
         context["action_text"] = _(
             f"{Action.objects.visible().connected(self.request.user).filter(status=StatusChoices.open).count()} acties staan open."
