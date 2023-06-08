@@ -161,13 +161,13 @@ INSTALLED_APPS = [
     "sniplates",
     "digid_eherkenning",
     # "hijack.contrib.admin", # This should be imported but it causes an error. So now there are
-    "hijack",
+    # "hijack",
     "localflavor",
     "easy_thumbnails",  # used by filer
     "image_cropping",
     "filer",
     "mptt",
-    "hijack.contrib.admin",
+    # "hijack.contrib.admin",
     "django_elasticsearch_dsl",
     "import_export",
     "solo",
