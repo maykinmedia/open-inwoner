@@ -35,9 +35,16 @@
     flex-direction: row-reverse;
   }
 
-  &--primary,
-  .leaflet-container &--primary {
+  &--primary {
     color: var(--color-primary);
+  }
+
+  .leaflet-container &--secondary {
+    color: var(--color-secondary);
+  }
+
+  .leaflet-container .h4 &--primary {
+    color: var(--color-black);
   }
 
   &--secondary {

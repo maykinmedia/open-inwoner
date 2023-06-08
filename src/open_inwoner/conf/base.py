@@ -191,6 +191,7 @@ INSTALLED_APPS = [
     "django_htmx",
     "django_yubin",
     "log_outgoing_requests",
+    "formtools",
     # Project applications.
     "open_inwoner.components",
     "open_inwoner.ckeditor5",
@@ -601,7 +602,7 @@ HIJACK_ALLOW_GET_REQUESTS = True
 # SENTRY - error monitoring
 #
 SENTRY_DSN = config("SENTRY_DSN", None)
-RELEASE = "v1.6"  # get_current_version()
+RELEASE = "v1.7"  # get_current_version()
 
 PRIVATE_MEDIA_ROOT = os.path.join(BASE_DIR, "private_media")
 FILER_ROOT = os.path.join(BASE_DIR, "media", "filer")
@@ -826,6 +827,20 @@ OIDC_CALLBACK_CLASS = "mozilla_django_oidc_db.views.OIDCCallbackView"
 OIDC_AUTHENTICATION_CALLBACK_URL = "oidc_authentication_callback"
 MOZILLA_DJANGO_OIDC_DB_CACHE = "oidc"
 MOZILLA_DJANGO_OIDC_DB_CACHE_TIMEOUT = 1
+
+#
+# 2FA SMS Verification
+#
+
+ACCOUNTS_USER_TOKEN_EXPIRE_TIME = 300
+ACCOUNTS_SMS_MESSAGE = _("Inlogcode: {token} (deze code is geldig voor 5 minuten)")
+ACCOUNTS_SMS_GATEWAY = {
+    "BACKEND": config(
+        "ACCOUNTS_SMS_GATEWAY_BACKEND", "open_inwoner.accounts.gateways.Dummy"
+    ),
+    "API_KEY": config("ACCOUNTS_SMS_GATEWAY_API_KEY", "openinwoner"),
+    "ORIGINATOR": config("ACCOUNTS_SMS_GATEWAY_ORIGINATOR", "Gemeente"),
+}
 
 from .app.csp import *  # noqa
 

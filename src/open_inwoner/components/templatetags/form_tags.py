@@ -55,6 +55,7 @@ def render_form(parser, token):
         - enctype: string | set the encrypt when sending forms.
         - id: string | set an id on the form. Useful for testing.
         - data_confirm_title: string | If a confirm dialog is shown this will be the title.
+        - data_confirm_text: string | If a confirm dialog is shown this will be the description.
         - data_confirm_cancel: string | If a confirm dialog is shown this will be the text on the cancel button.
         - data_confirm_default: string | If a confirm dialog is shown this will be the text on the confirm button.
         - submit_text: string | The text on the submit button when the form is auto rendered.
@@ -108,9 +109,11 @@ def form(context, form_object, secondary=True, **kwargs):
         - inline: bool | If the form actions should be displayed on the same line as a field.
         - extra_classes: string | Extra css classes for the form.
         - form_action: string | where the form should go after submit.
+        - no_action: bool | If we don't want any action to take place.
         - enctype: string | set the encrypt when sending forms.
         - id: string | set an id on the form. Useful for testing.
         - data_confirm_title: string | If a confirm dialog is shown this will be the title.
+        - data_confirm_text: string | If a confirm dialog is shown this will be the description.
         - data_confirm_cancel: string | If a confirm dialog is shown this will be the text on the cancel button.
         - data_confirm_default: string | If a confirm dialog is shown this will be the text on the confirm button.
         - show_notifications: bool | Whether to show messages from Django messages framework.
@@ -372,6 +375,7 @@ def form_actions(primary_text="", primary_icon=None, secondary=True, **kwargs):
         - secondary_text: string | What the text for the secondary button should be.
         - secondary_icon: string | What the icon for the secondary button should be.
         - secondary_icon_position: string | What the icon position for the secondary button should be.
+        - secondary_value: string | If we want to provide a value for the secondary button.
         - transparent: bool | If the button should be transparent.
 
     Extra context:

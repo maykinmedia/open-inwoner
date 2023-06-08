@@ -85,3 +85,7 @@ django-sessionprofile
 # Common Ground integration
 zgw-consumers
 notifications-api-common
+
+# 2FA SMS verification
+oath
+messagebird

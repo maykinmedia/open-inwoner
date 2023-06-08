@@ -505,7 +505,6 @@ class PlanViewTests(WebTest):
         response = self.app.get(self.edit_url, user=self.user)
         form = response.forms["plan-form"]
         form["title"] = "Plan title"
-        # breakpoint()
         response = form.submit().follow()
         self.assertEqual(response.status_code, 200)
         self.plan.refresh_from_db()
@@ -1091,7 +1090,7 @@ class NewPlanContactCounterTest(WebTest):
             title=_("Samenwerken"),
             extension_args={
                 "menu_indicator": IndicatorChoices.plan_new_contacts,
-                "menu_icon": Icons.people,
+                "menu_icon": Icons.group,
             },
             parent_page=homepage,
         )
@@ -1107,11 +1106,10 @@ class NewPlanContactCounterTest(WebTest):
 
         # check no number shows by default
         response = self.app.get(root_url, user=user)
-        response.showbrowser()
 
         links = response.pyquery(f".primary-navigation a[href='{list_url}']")
         self.assertEqual(len(links), 2)  # Duplicate due to mobile
-        self.assertTrue(_("Samenwerken") + " people" in links.text())
+        self.assertTrue(_("Samenwerken") + " group" in links.text())
 
         # check if the number shows up in the menu
         plan_1.plan_contacts.add(user)
@@ -1132,7 +1130,7 @@ class NewPlanContactCounterTest(WebTest):
             f".header__container > .primary-navigation a[href='{list_url}']"
         )
         self.assertEqual(len(links), 1)
-        self.assertEqual(links.text(), _("Samenwerken") + " people")
+        self.assertEqual(links.text(), _("Samenwerken") + " group")
 
         # check this doesn't appear for owner
         response = self.app.get(root_url, user=owner)

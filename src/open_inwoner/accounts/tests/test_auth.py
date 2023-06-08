@@ -174,7 +174,7 @@ class TestRegistrationFunctionality(WebTest):
         response = form.submit()
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("django_registration_complete"))
+        self.assertEqual(response.url, reverse("pages-root"))
         self.assertTrue(User.objects.filter(email=contact.email).exists())
 
         new_user = User.objects.get(email=contact.email)
@@ -218,14 +218,14 @@ class TestRegistrationFunctionality(WebTest):
         self.assertNotIn("invite_url", self.app.session.keys())
 
     def test_registration_active_user(self):
-        """the user should be redirected to the registration complete page"""
+        """the user should be redirected to the homepage"""
 
         user = UserFactory.create()
 
         response = self.app.get(self.url, user=user)
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("django_registration_complete"))
+        self.assertEqual(response.url, reverse("pages-root"))
 
     def test_registration_non_unique_email_different_case(self):
         UserFactory.create(email="john@smith.com")
@@ -700,7 +700,7 @@ class TestRegistrationNecessary(WebTest):
         response = form.submit()
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("django_registration_complete"))
+        self.assertEqual(response.url, reverse("pages-root"))
 
         user.refresh_from_db()
 
@@ -730,7 +730,7 @@ class TestRegistrationNecessary(WebTest):
         response = form.submit()
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("django_registration_complete"))
+        self.assertEqual(response.url, reverse("pages-root"))
 
         user_contact = User.objects.get(email=contact.email)
         invite.refresh_from_db()

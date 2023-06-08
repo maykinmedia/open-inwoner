@@ -52,8 +52,12 @@ class MyProfileView(
         context["anchors"] = [
             ("#title", _("Persoonlijke gegevens")),
             ("#overview", _("Persoonlijk overzicht")),
-            ("#files", _("Bestanden")),
         ]
+
+        user_files = user.get_all_files()
+        if user_files:
+            context["anchors"].append(("#files", _("Bestanden")))
+
         # List of names of 'mentor' users that are a contact of me
         mentor_contacts = [
             c.get_full_name()
@@ -70,7 +74,7 @@ class MyProfileView(
             .order_by("end_date")
             .first()
         )
-        context["files"] = user.get_all_files()
+        context["files"] = user_files
         context["category_text"] = user.get_interests()
         context["action_text"] = _(
             f"{Action.objects.visible().connected(self.request.user).filter(status=StatusChoices.open).count()} acties staan open."
@@ -129,6 +133,7 @@ class EditProfileView(
     def form_valid(self, form):
         form.save()
 
+        messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
         self.log_change(self.get_object(), _("profile was modified"))
         return HttpResponseRedirect(self.get_success_url())
 
@@ -164,7 +169,7 @@ class MyCategoriesView(
 
     def form_valid(self, form):
         form.save()
-
+        messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
         self.log_change(self.object, _("categories were modified"))
         return HttpResponseRedirect(self.get_success_url())
 
@@ -259,7 +264,7 @@ class MyNotificationsView(
 
     def form_valid(self, form):
         form.save()
-
+        messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
         self.log_change(self.object, _("users notifications were modified"))
         return HttpResponseRedirect(self.get_success_url())
 

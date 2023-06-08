@@ -61,6 +61,7 @@ class SiteConfigurarionAdminForm(forms.ModelForm):
 
 @admin.register(SiteConfiguration)
 class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
+    save_on_top = True
     fieldsets = (
         (
             None,
@@ -70,6 +71,7 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                     "login_show",
                     "login_allow_registration",
                     "login_2fa_sms",
+                    "allow_messages_file_sharing",
                     "redirect_to",
                 )
             },

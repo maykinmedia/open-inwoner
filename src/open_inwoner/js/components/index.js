@@ -23,6 +23,7 @@ import './search'
 import './toggle'
 import './upload-document'
 import './session'
+import './twofactor-sms'
 
 const htmx = (window.htmx = require('htmx.org'))
 
