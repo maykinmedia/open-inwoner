@@ -1,3 +1,5 @@
+import inspect
+
 from django.contrib import messages
 from django.core import mail
 from django.urls import reverse
@@ -6,16 +8,23 @@ from django.utils.translation import gettext_lazy as _
 import requests_mock
 from django_webtest import WebTest
 
-from open_inwoner.accounts.tests.factories import DigidUserFactory
-from open_inwoner.openklant.models import ContactFormSubject, OpenKlantConfig
+from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.openklant.tests.data import MockAPICreateData
 from open_inwoner.openklant.tests.factories import ContactFormSubjectFactory
 from open_inwoner.openzaak.tests.factories import ServiceFactory
 from open_inwoner.utils.test import ClearCachesMixin, DisableRequestLogMixin
+from open_inwoner.utils.tests.helpers import AssertFormMixin, AssertTimelineLogMixin
 
 
 @requests_mock.Mocker()
-class ContactFormTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
+class ContactFormTestCase(
+    ClearCachesMixin,
+    AssertTimelineLogMixin,
+    AssertFormMixin,
+    DisableRequestLogMixin,
+    WebTest,
+):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -68,7 +77,7 @@ class ContactFormTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
         self.assertContains(response, _("Contact formulier niet geconfigureerd."))
         self.assertEqual(0, len(response.pyquery("#contactmoment-form")))
 
-    def test_form_requires_either_email_or_phonenumber(self, m):
+    def test_anon_form_requires_either_email_or_phonenumber(self, m):
         config = OpenKlantConfig.get_solo()
         config.register_email = "example@example.com"
         config.save()
@@ -76,6 +85,18 @@ class ContactFormTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
 
         response = self.app.get(self.url)
         form = response.forms["contactmoment-form"]
+        self.assertFormExactFields(
+            form,
+            (
+                "subject",
+                "first_name",
+                "infix",
+                "last_name",
+                "email",
+                "phonenumber",
+                "question",
+            ),
+        )
         form["subject"].select(text=subject.subject)
         form["first_name"] = "Foo"
         form["last_name"] = "Bar"
@@ -87,6 +108,28 @@ class ContactFormTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
         self.assertEqual(
             response.context["errors"], [_("Vul een e-mailadres of telefoonnummer in.")]
         )
+
+    def test_regular_auth_form_fills_email_and_phonenumber(self, m):
+        config = OpenKlantConfig.get_solo()
+        config.register_email = "example@example.com"
+        config.save()
+        subject = ContactFormSubjectFactory(config=config)
+
+        user = UserFactory()
+
+        response = self.app.get(self.url, user=user)
+        form = response.forms["contactmoment-form"]
+        self.assertFormExactFields(
+            form,
+            (
+                "subject",
+                "question",
+            ),
+        )
+        form["subject"].select(text=subject.subject)
+        form["question"] = "hey!\n\nwaddup?"
+
+        response = form.submit(status=302)
 
     def test_submit_and_register_via_email(self, m):
         config = OpenKlantConfig.get_solo()
@@ -123,7 +166,9 @@ class ContactFormTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
         self.assertIn("0612345678", email.body)
         self.assertIn("hey!\n\nwaddup?", email.body)
 
-    def test_submit_and_register_anon_via_api(self, m):
+        self.assertTimelineLog("registered contactmoment by email")
+
+    def test_submit_and_register_anon_via_api_with_klant(self, m):
         MockAPICreateData.setUpServices()
 
         config = OpenKlantConfig.get_solo()
@@ -134,9 +179,9 @@ class ContactFormTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
         config.save()
 
         data = MockAPICreateData()
-        data.install_mocks_anon(m)
+        data.install_mocks_anon_with_klant(m)
 
-        subject = ContactFormSubjectFactory(config=config, subject="Vraag")
+        subject = ContactFormSubjectFactory(config=config, subject="Aanvraag document")
 
         response = self.app.get(self.url)
         form = response.forms["contactmoment-form"]
@@ -178,7 +223,7 @@ class ContactFormTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
             {
                 "medewerkerIdentificatie": {"identificatie": "FooVonBar"},
                 "bronorganisatie": "123456789",
-                "tekst": f"Vraag\n\nhey!\n\nwaddup?",
+                "tekst": f"Aanvraag document\n\nhey!\n\nwaddup?",
                 "type": "Melding",
                 "kanaal": "Internet",
             },
@@ -191,8 +236,10 @@ class ContactFormTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
                 "klant": "https://klanten.nl/api/v1/klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             },
         )
+        self.assertTimelineLog("created klant for anonymous user")
+        self.assertTimelineLog("registered contactmoment by API")
 
-    def test_submit_and_register_bsn_user_via_api(self, m):
+    def test_submit_and_register_anon_via_api_without_klant(self, m):
         MockAPICreateData.setUpServices()
 
         config = OpenKlantConfig.get_solo()
@@ -203,11 +250,11 @@ class ContactFormTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
         config.save()
 
         data = MockAPICreateData()
-        data.install_mocks_digid(m)
+        data.install_mocks_anon_without_klant(m)
 
-        subject = ContactFormSubjectFactory(config=config, subject="Vraag")
+        subject = ContactFormSubjectFactory(config=config, subject="Aanvraag document")
 
-        response = self.app.get(self.url, user=data.user)
+        response = self.app.get(self.url)
         form = response.forms["contactmoment-form"]
         form["subject"].select(text=subject.subject)
         form["first_name"] = "Foo"
@@ -230,12 +277,82 @@ class ContactFormTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
             self.assertTrue(m.called_once, str(m))
 
         contactmoment_create_data = data.matchers[1].request_history[0].json()
+
+        text = inspect.cleandoc(
+            """
+        Aanvraag document
+
+        hey!
+
+        waddup?
+
+        Naam: Foo de Bar
+        Email: foo@example.com
+        Telefoonnummer: 0612345678
+        """
+        )
+
         self.assertEqual(
             contactmoment_create_data,
             {
                 "medewerkerIdentificatie": {"identificatie": "FooVonBar"},
                 "bronorganisatie": "123456789",
-                "tekst": f"Vraag\n\nhey!\n\nwaddup?",
+                "tekst": text,
+                "type": "Melding",
+                "kanaal": "Internet",
+            },
+        )
+        self.assertTimelineLog(
+            "could not retrieve or create klant for user, appended info to message"
+        )
+        self.assertTimelineLog("registered contactmoment by API")
+
+    def test_submit_and_register_bsn_user_via_api(self, m):
+        MockAPICreateData.setUpServices()
+
+        config = OpenKlantConfig.get_solo()
+        config.register_contact_moment = True
+        config.register_bronorganisatie_rsin = "123456789"
+        config.register_type = "Melding"
+        config.register_employee_id = "FooVonBar"
+        config.save()
+
+        data = MockAPICreateData()
+        data.install_mocks_digid(m)
+
+        subject = ContactFormSubjectFactory(config=config, subject="Aanvraag document")
+
+        response = self.app.get(self.url, user=data.user)
+        form = response.forms["contactmoment-form"]
+        self.assertFormExactFields(
+            form,
+            (
+                "subject",
+                "question",
+            ),
+        )
+        form["subject"].select(text=subject.subject)
+        form["question"] = "hey!\n\nwaddup?"
+
+        response = form.submit().follow()
+
+        msgs = list(response.context["messages"])
+        self.assertEqual(len(msgs), 1)
+        self.assertEqual(str(msgs[0]), _("Vraag verstuurd!"))
+        self.assertEqual(msgs[0].level, messages.SUCCESS)
+
+        self.assertEqual(len(mail.outbox), 0)
+
+        for m in data.matchers:
+            self.assertTrue(m.called_once, str(m))
+
+        contactmoment_create_data = data.matchers[1].request_history[0].json()
+        self.assertEqual(
+            contactmoment_create_data,
+            {
+                "medewerkerIdentificatie": {"identificatie": "FooVonBar"},
+                "bronorganisatie": "123456789",
+                "tekst": f"Aanvraag document\n\nhey!\n\nwaddup?",
                 "type": "Melding",
                 "kanaal": "Internet",
             },
@@ -248,3 +365,74 @@ class ContactFormTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
                 "klant": "https://klanten.nl/api/v1/klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             },
         )
+
+        self.assertTimelineLog("retrieved klant for BSN-user")
+        self.assertTimelineLog("registered contactmoment by API")
+
+    def test_submit_and_register_bsn_user_via_api_and_update_klant(self, m):
+        MockAPICreateData.setUpServices()
+
+        config = OpenKlantConfig.get_solo()
+        config.register_contact_moment = True
+        config.register_bronorganisatie_rsin = "123456789"
+        config.register_type = "Melding"
+        config.register_employee_id = "FooVonBar"
+        config.save()
+
+        data = MockAPICreateData()
+        data.install_mocks_digid_missing_contact_info(m)
+
+        subject = ContactFormSubjectFactory(config=config, subject="Aanvraag document")
+
+        response = self.app.get(self.url, user=data.user)
+        form = response.forms["contactmoment-form"]
+        self.assertFormExactFields(
+            form,
+            (
+                "subject",
+                "question",
+            ),
+        )
+        form["subject"].select(text=subject.subject)
+        form["question"] = "hey!\n\nwaddup?"
+
+        form.submit().follow()
+        # response tested in other cases
+
+        for m in data.matchers:
+            self.assertTrue(m.called_once, str(m))
+
+        klant_patch_data = data.matchers[1].request_history[0].json()
+        self.assertEqual(
+            klant_patch_data,
+            {
+                "emailadres": data.user.email,
+                "telefoonnummer": data.user.phonenumber,
+            },
+        )
+
+        contactmoment_create_data = data.matchers[2].request_history[0].json()
+        self.assertEqual(
+            contactmoment_create_data,
+            {
+                "medewerkerIdentificatie": {"identificatie": "FooVonBar"},
+                "bronorganisatie": "123456789",
+                "tekst": f"Aanvraag document\n\nhey!\n\nwaddup?",
+                "type": "Melding",
+                "kanaal": "Internet",
+            },
+        )
+        kcm_create_data = data.matchers[3].request_history[0].json()
+        self.assertEqual(
+            kcm_create_data,
+            {
+                "contactmoment": "https://contactmomenten.nl/api/v1/contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
+                "klant": "https://klanten.nl/api/v1/klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            },
+        )
+
+        self.assertTimelineLog("retrieved klant for BSN-user")
+        self.assertTimelineLog(
+            "patched klant from user with missing fields: emailadres, telefoonnummer"
+        )
+        self.assertTimelineLog("registered contactmoment by API")

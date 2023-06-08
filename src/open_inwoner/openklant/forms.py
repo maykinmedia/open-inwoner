@@ -2,6 +2,7 @@ from django import forms
 from django.forms import Form
 from django.utils.translation import gettext_lazy as _
 
+from open_inwoner.accounts.models import User
 from open_inwoner.openklant.models import ContactFormSubject, OpenKlantConfig
 from open_inwoner.utils.validators import validate_phone_number
 
@@ -44,21 +45,47 @@ class ContactForm(Form):
         required=True,
     )
 
-    def __init__(self, *args, **kwargs):
+    user: User
+
+    def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.user = user
 
         config = OpenKlantConfig.get_solo()
         self.fields["subject"].queryset = config.contactformsubject_set.order_by(
             "subject"
         )
 
+        if self.user.is_authenticated:
+            del self.fields["first_name"]
+            del self.fields["last_name"]
+            del self.fields["infix"]
+            if self.user.email:
+                del self.fields["email"]
+            if self.user.phonenumber:
+                del self.fields["phonenumber"]
+
     def clean(self, *args, **kwargs):
         cleaned_data = super().clean(*args, **kwargs)
 
-        email = cleaned_data["email"]
-        phonenumber = cleaned_data["phonenumber"]
+        email = cleaned_data.get("email", "")
+        phonenumber = cleaned_data.get("phonenumber", "")
 
-        if not email and not phonenumber:
+        if ("email" in self.fields and not email) and (
+            "phonenumber" in self.fields and not phonenumber
+        ):
             msg = _("Vul een e-mailadres of telefoonnummer in.")
             self.add_error("email", msg)
             self.add_error("phonenumber", msg)
+
+        if self.user.is_authenticated:
+            if not email and self.user.get_contact_email():
+                cleaned_data["email"] = self.user.get_contact_email()
+            if not phonenumber and self.user.phonenumber:
+                cleaned_data["phonenumber"] = self.user.phonenumber
+
+            cleaned_data["first_name"] = self.user.first_name
+            cleaned_data["infix"] = self.user.infix
+            cleaned_data["last_name"] = self.user.last_name
+
+        return cleaned_data

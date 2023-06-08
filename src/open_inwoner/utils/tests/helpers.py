@@ -58,7 +58,11 @@ class AssertTimelineLogMixin:
         ret = []
         qs = TimelineLog.objects.all()
         c = qs.count()
-        ret.append(f"total {c} timelinelogs")
+        if c:
+            ret.append(f"total {c} timelinelogs:")
+        else:
+            ret.append(f"total {c} timelinelogs")
+
         for log in qs:
             message = log.extra_data.get("message")
             log_level = log.extra_data.get("log_level")
@@ -66,12 +70,37 @@ class AssertTimelineLogMixin:
                 log_level = logging.getLevelName(log_level)
             else:
                 log_level = "NO_LEVEL"
-            msg = f"{log_level}: {message}"
+            msg = f"  {log_level}: {message}"
             ret.append(msg)
         return "\n".join(ret)
 
     def dumpTimelineLog(self):
         print(self.getTimelineLogDump())
+
+
+class AssertFormMixin:
+    def assertFormExactFields(
+        self, form, field_names, *, with_csrf=True, drop_no_name=True
+    ):
+        """
+        check if a form has expected fields, usually from WebTest
+
+        - with_csrf: auto-adds adds the csrfmiddlewaretoken
+        - drop_no_name: ignore the empty field created by the submit button
+        """
+        expect_names = set(field_names)
+        if with_csrf:
+            expect_names.add("csrfmiddlewaretoken")
+
+        have_names = set(form.fields.keys())
+        if drop_no_name:
+            have_names.discard("")
+
+        self.assertEqual(
+            have_names,
+            expect_names,
+            "-> first set is actual in form, second set is expected",
+        )
 
 
 class AssertRedirectsMixin:

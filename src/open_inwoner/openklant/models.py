@@ -5,6 +5,12 @@ from solo.models import SingletonModel
 from zgw_consumers.constants import APITypes
 
 
+class OpenKlantConfigManager(models.Manager):
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.select_related("klanten_service", "contactmomenten_service")
+
+
 class OpenKlantConfig(SingletonModel):
     """
     Global configuration and defaults for Klant & Contactmomenten APIs
@@ -66,6 +72,8 @@ class OpenKlantConfig(SingletonModel):
         "register_type",
         "register_employee_id",
     )
+
+    objects = OpenKlantConfigManager()
 
     class Meta:
         verbose_name = _("Open Klant configuration")

@@ -145,13 +145,33 @@ def _fetch_contactmoment(url, *, client=None) -> Optional[ContactMoment]:
     return contact_moment
 
 
-def create_klant(data: KlantCreateData):
+def create_klant(data: KlantCreateData) -> Optional[Klant]:
     client = build_client("klanten")
     if client is None:
         return
 
     try:
         response = client.create("klant", data=data)
+    except (RequestException, ClientError) as e:
+        logger.exception("exception while making request", exc_info=e)
+        return
+    except ValueError as e:
+        # raised when 'Operation klant_create not found
+        # TODO make this optional?
+        return
+
+    klant = factory(Klant, response)
+
+    return klant
+
+
+def patch_klant(klant: Klant, update_data) -> Optional[Klant]:
+    client = build_client("klanten")
+    if client is None:
+        return
+
+    try:
+        response = client.partial_update("klant", url=klant.url, data=update_data)
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
