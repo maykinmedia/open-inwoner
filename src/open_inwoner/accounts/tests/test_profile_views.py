@@ -526,7 +526,7 @@ class ProfileDeleteTest(WebTest):
         # check redirect
         self.assertRedirects(
             self.app.get(response.url),
-            reverse("pages-root"),
+            reverse("login"),
             status_code=302,
             target_status_code=200,
             fetch_redirect_response=True,
@@ -545,7 +545,7 @@ class ProfileDeleteTest(WebTest):
         # check redirect
         self.assertRedirects(
             self.app.get(response.url),
-            reverse("pages-root"),
+            reverse("login"),
             status_code=302,
             target_status_code=200,
             fetch_redirect_response=True,
