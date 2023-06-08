@@ -33,6 +33,9 @@ class CommonExtension(PageExtension):
         help_text=_("Icon in het menu"),
     )
 
+    def __str__(self):
+        return str(self.get_page())
+
     def save(self, *args, **kwargs):
         if self.requires_auth_bsn:
             self.requires_auth = True
