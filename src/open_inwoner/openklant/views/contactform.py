@@ -52,6 +52,7 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
                     "first_name": self.request.user.first_name,
                     "infix": self.request.user.infix,
                     "last_name": self.request.user.last_name,
+                    # we need to use get_contact_email() because we use dummy email for BSN users
                     "email": self.request.user.get_contact_email(),
                     "phonenumber": self.request.user.phonenumber,
                 }
@@ -113,7 +114,6 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
                 if not klant.telefoonnummer and form.cleaned_data["phonenumber"]:
                     update_data["telefoonnummer"] = form.cleaned_data["phonenumber"]
                 if update_data:
-                    # TODO add audit log
                     patch_klant(klant, update_data)
                     self.log_system_action(
                         f"patched klant from user with missing fields: {', '.join(sorted(update_data.keys()))}"
@@ -146,8 +146,6 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
         text = f"{subject}\n\n{question}"
 
         if not klant:
-            # TODO add audit log to note we didn't have a Klant and appended the info to the message
-
             # if we don't have a BSN and can't create a Klant we'll add contact info to the tekst
             parts = [form.cleaned_data[k] for k in ("first_name", "infix", "last_name")]
             full_name = " ".join(p for p in parts if p)
