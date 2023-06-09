@@ -1,10 +1,15 @@
 import Gumshoe from 'gumshoejs'
 
-const anchors = document.querySelectorAll('.anchor-menu')
+export class CreateGumshoe {
+  static selector = '.anchor-menu--desktop a'
 
-if (anchors.length > 0) {
-  new Gumshoe('.anchor-menu--desktop a', {
-    navClass: 'anchor-menu__list-item--active',
-    offset: 30,
-  })
+  constructor(node) {
+    new Gumshoe(CreateGumshoe.selector, {
+      navClass: 'anchor-menu__list-item--active',
+      offset: 30,
+    })
+  }
 }
+
+const anchors = document.querySelectorAll(CreateGumshoe.selector)
+;[...anchors].forEach((anchor) => new CreateGumshoe(anchor))

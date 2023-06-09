@@ -71,7 +71,8 @@ class FormAPITest(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         cls.config.save()
 
         cls.user = UserFactory(bsn="900222086")
-        cls.submissions_url = reverse("cases:open_submissions")
+        cls.outer_submissions_url = reverse("cases:open_submissions")
+        cls.inner_submissions_url = reverse("cases:open_submissions_content")
 
     def test_api_fetch(self, m):
         data = ESuiteData().install_mocks(m)
@@ -84,7 +85,9 @@ class FormAPITest(AssertRedirectsMixin, ClearCachesMixin, WebTest):
     def test_page_shows_open_submissions(self, m):
         data = ESuiteData().install_mocks(m)
 
-        response = self.app.get(self.submissions_url, user=self.user)
+        response = self.app.get(
+            self.inner_submissions_url, user=self.user, headers={"HX-Request": "true"}
+        )
 
         self.assertContains(response, data.submission_1["naam"])
         self.assertContains(response, data.submission_1["vervolgLink"])
@@ -98,14 +101,15 @@ class FormAPITest(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         data.response["count"] = 0
         data.install_mocks(m)
 
-        response = self.app.get(self.submissions_url, user=self.user)
+        response = self.app.get(
+            self.inner_submissions_url, user=self.user, headers={"HX-Request": "true"}
+        )
 
         self.assertContains(response, _("Er zijn geen open aanvragen."))
 
     def test_requires_auth(self, m):
-        response = self.app.get(self.submissions_url)
-        self.assertRedirectsLogin(response, next=self.submissions_url)
+        response = self.app.get(self.outer_submissions_url)
+        self.assertRedirectsLogin(response, next=self.outer_submissions_url)
 
     def test_requires_bsn(self, m):
-        response = self.app.get(self.submissions_url, user=UserFactory(bsn=""))
-        self.assertRedirects(response, reverse("pages-root"))
+        self.app.get(self.outer_submissions_url, user=UserFactory(bsn=""), status=403)

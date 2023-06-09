@@ -336,7 +336,7 @@ def send_case_update_email(user: User, case: Zaak):
     send the actual mail
     """
     case_detail_url = build_absolute_url(
-        reverse("cases:case_detail", kwargs={"object_id": str(case.uuid)})
+        reverse("cases:case_detail_content", kwargs={"object_id": str(case.uuid)})
     )
 
     template = find_template("case_notification")

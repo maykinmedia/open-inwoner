@@ -1,11 +1,10 @@
-/** @type {NodeListOf<Element>} */
-const NOTIFICATIONS = document.querySelectorAll('.notification')
-
 /**
  * Notification class.
  * @class
  */
-class Notification {
+export class Notification {
+  static selector = '.notification'
+
   /**
    * Constructor method.
    * @param {HTMLElement} node
@@ -44,4 +43,7 @@ class Notification {
 }
 
 // Start!
+
+/** @type {NodeListOf<Element>} */
+const NOTIFICATIONS = document.querySelectorAll(Notification.selector)
 ;[...NOTIFICATIONS].forEach((node) => new Notification(node))

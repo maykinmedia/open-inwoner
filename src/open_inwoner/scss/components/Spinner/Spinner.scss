@@ -1,0 +1,31 @@
+@keyframes spinner {
+  0% {
+    transform: translate3d(-50%, -50%, 0) rotate(0deg);
+  }
+  100% {
+    transform: translate3d(-50%, -50%, 0) rotate(360deg);
+  }
+}
+
+.loader-container {
+  &--hide {
+    display: none;
+  }
+
+  .rotate {
+    animation: rotate 2.5s linear infinite;
+  }
+  @keyframes rotate {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .spinner-icon {
+    display: inline-block;
+    font-size: 50px;
+    color: var(--color-primary);
+    width: 50px;
+    height: 50px;
+  }
+}
