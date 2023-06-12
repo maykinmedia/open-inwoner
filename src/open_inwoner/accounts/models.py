@@ -18,10 +18,7 @@ from privates.storages import PrivateMediaFileSystemStorage
 from timeline_logger.models import TimelineLog
 
 from open_inwoner.utils.hash import create_sha256_hash
-from open_inwoner.utils.validators import (
-    NameValidator,
-    validate_phone_number,
-)
+from open_inwoner.utils.validators import NameValidator, validate_phone_number
 
 from ..plans.models import PlanContact
 from .choices import ContactTypeChoices, LoginTypeChoices, StatusChoices, TypeChoices

@@ -220,8 +220,9 @@ class ContactViewTests(WebTest):
                 response = form.submit()
                 expected_errors = {
                     "first_name": [
-                        _("Please make sure your input contains only valid characters "
-                          "(letters, numbers, apostrophe, space)."
+                        _(
+                            "Please make sure your input contains only valid characters "
+                            "(letters, numbers, apostrophe, space)."
                         )
                     ]
                 }
@@ -240,8 +241,9 @@ class ContactViewTests(WebTest):
                 response = form.submit()
                 expected_errors = {
                     "last_name": [
-                        _("Please make sure your input contains only valid characters "
-                          "(letters, numbers, apostrophe, space)."
+                        _(
+                            "Please make sure your input contains only valid characters "
+                            "(letters, numbers, apostrophe, space)."
                         )
                     ]
                 }

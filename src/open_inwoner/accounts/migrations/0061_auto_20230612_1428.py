@@ -7,48 +7,94 @@ import open_inwoner.utils.validators
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0060_user_infix'),
+        ("accounts", "0060_user_infix"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='invite',
-            name='invitee_first_name',
-            field=models.CharField(help_text='The first name of the invitee.', max_length=250, validators=[open_inwoner.utils.validators.NameValidator()], verbose_name='First name'),
+            model_name="invite",
+            name="invitee_first_name",
+            field=models.CharField(
+                help_text="The first name of the invitee.",
+                max_length=250,
+                validators=[open_inwoner.utils.validators.NameValidator()],
+                verbose_name="First name",
+            ),
         ),
         migrations.AlterField(
-            model_name='invite',
-            name='invitee_last_name',
-            field=models.CharField(help_text='The last name of the invitee', max_length=250, validators=[open_inwoner.utils.validators.NameValidator()], verbose_name='Last name'),
+            model_name="invite",
+            name="invitee_last_name",
+            field=models.CharField(
+                help_text="The last name of the invitee",
+                max_length=250,
+                validators=[open_inwoner.utils.validators.NameValidator()],
+                verbose_name="Last name",
+            ),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='city',
-            field=models.CharField(blank=True, default='', max_length=250, validators=[open_inwoner.utils.validators.NameValidator()], verbose_name='City'),
+            model_name="user",
+            name="city",
+            field=models.CharField(
+                blank=True,
+                default="",
+                max_length=250,
+                validators=[open_inwoner.utils.validators.NameValidator()],
+                verbose_name="City",
+            ),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='display_name',
-            field=models.CharField(blank=True, default='', max_length=255, validators=[open_inwoner.utils.validators.NameValidator()], verbose_name='Display name'),
+            model_name="user",
+            name="display_name",
+            field=models.CharField(
+                blank=True,
+                default="",
+                max_length=255,
+                validators=[open_inwoner.utils.validators.NameValidator()],
+                verbose_name="Display name",
+            ),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='first_name',
-            field=models.CharField(blank=True, default='', max_length=255, validators=[open_inwoner.utils.validators.NameValidator()], verbose_name='First name'),
+            model_name="user",
+            name="first_name",
+            field=models.CharField(
+                blank=True,
+                default="",
+                max_length=255,
+                validators=[open_inwoner.utils.validators.NameValidator()],
+                verbose_name="First name",
+            ),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='infix',
-            field=models.CharField(blank=True, default='', max_length=64, validators=[open_inwoner.utils.validators.NameValidator()], verbose_name='Infix'),
+            model_name="user",
+            name="infix",
+            field=models.CharField(
+                blank=True,
+                default="",
+                max_length=64,
+                validators=[open_inwoner.utils.validators.NameValidator()],
+                verbose_name="Infix",
+            ),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='last_name',
-            field=models.CharField(blank=True, default='', max_length=255, validators=[open_inwoner.utils.validators.NameValidator()], verbose_name='Last name'),
+            model_name="user",
+            name="last_name",
+            field=models.CharField(
+                blank=True,
+                default="",
+                max_length=255,
+                validators=[open_inwoner.utils.validators.NameValidator()],
+                verbose_name="Last name",
+            ),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='street',
-            field=models.CharField(blank=True, default='', max_length=250, validators=[open_inwoner.utils.validators.NameValidator()], verbose_name='Street'),
+            model_name="user",
+            name="street",
+            field=models.CharField(
+                blank=True,
+                default="",
+                max_length=250,
+                validators=[open_inwoner.utils.validators.NameValidator()],
+                verbose_name="Street",
+            ),
         ),
     ]

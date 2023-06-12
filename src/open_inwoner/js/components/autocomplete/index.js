@@ -2,8 +2,14 @@ import autoComplete from '@tarekraafat/autocomplete.js/dist/autoComplete'
 
 const autocompleteField = (node) => {
   const choices = JSON.parse(
-    node.dataset.autocompleteChoices.replace(/'/g, '"')
+    node.dataset.autocompleteChoices
+      .replace(/'/g, '"')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
   )
+  console.log('node', node)
+  console.log('dataset', node.dataset)
   const choiceLabels = choices.map((choice) => choice[1])
   const fieldId = node.dataset.fieldId
   const hidden = node.querySelector(`#${fieldId}`)
