@@ -3,7 +3,6 @@ from django.test import TestCase
 
 from ..validators import (
     format_phone_number,
-    validate_charfield_entry,
     validate_phone_number,
     validate_postal_code,
 )
@@ -13,27 +12,6 @@ class ValidatorsTestCase(TestCase):
     """
     Validates the functions defined in ``utils.validators`` module.
     """
-
-    def test_validate_charfield_entry_apostrophe_not_allowed(self):
-        """
-        Tests the ``validate_charfield_entry`` function when not explicitly
-        allowing apostrophe character.
-        """
-        self.assertRaisesMessage(
-            ValidationError,
-            "Uw invoer bevat een ongeldig teken: '",
-            validate_charfield_entry,
-            "let's fail",
-        )
-
-    def test_validate_charfield_entry_apostrophe_allowed(self):
-        """
-        Tests the ``validate_charfield_entry`` function when explicitly
-        allowing apostrophe character.
-        """
-        self.assertEqual(
-            validate_charfield_entry("let's pass", allow_apostrophe=True), "let's pass"
-        )
 
     def test_validate_postal_code(self):
         """
