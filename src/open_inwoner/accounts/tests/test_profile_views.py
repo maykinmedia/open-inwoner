@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.test import override_settings
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
@@ -731,10 +733,21 @@ class EditIntrestsTests(WebTest):
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@patch("open_inwoner.cms.utils.page_display.case_page_is_published", side_effect=True)
 class EditNotificationsTests(WebTest):
     def setUp(self):
         self.url = reverse("profile:notifications")
         self.user = UserFactory()
+
+        page = api.create_page(
+        "Mijn Aanvragen",
+        "cms/fullwidth.html",
+        "nl",
+        slug="aanvragen",
+        )
+        page.application_namespace = "cases"
+        page.publish("nl")
+        page.save()
 
     def test_login_required(self):
         login_url = reverse("login")
@@ -764,13 +777,15 @@ class EditNotificationsTests(WebTest):
         self.assertFalse(self.user.messages_notifications)
         self.assertTrue(self.user.plans_notifications)
 
-    def test_cases_notifications_is_accessible_when_digid_user(self):
+    def test_cases_notifications_is_accessible_when_digid_user(self, mock_display):
         self.user.login_type = LoginTypeChoices.digid
         self.user.save()
         response = self.app.get(self.url, user=self.user)
         form = response.forms["change-notifications"]
 
         self.assertIn("cases_notifications", form.fields)
+
+    # def test_notification_display(self):
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
