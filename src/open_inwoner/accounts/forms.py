@@ -15,6 +15,7 @@ from open_inwoner.utils.forms import LimitedUploadFileField, PrivateFileWidget
 from open_inwoner.utils.validators import (
     format_phone_number,
     validate_charfield_entry,
+    NameValidator,
     validate_phone_number,
 )
 
@@ -307,10 +308,10 @@ class ContactFilterForm(forms.Form):
 
 class ContactCreateForm(forms.Form):
     first_name = forms.CharField(
-        label=_("First name"), max_length=255, validators=[validate_charfield_entry]
+        label=_("First name"), max_length=255, validators=[NameValidator()]
     )
     last_name = forms.CharField(
-        label=_("Last name"), max_length=255, validators=[validate_charfield_entry]
+        label=_("Last name"), max_length=255, validators=[NameValidator()]
     )
     email = forms.EmailField(label=_("Email"))
 
