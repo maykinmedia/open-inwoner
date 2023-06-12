@@ -2,7 +2,7 @@
   .form__control {
     .label {
       position: relative;
-      max-width: 500px;
+      max-width: var(--form-width);
     }
 
     [class*='icon'] {

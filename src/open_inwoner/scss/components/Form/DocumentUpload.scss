@@ -45,7 +45,7 @@ input[type='file'] {
   border-radius: var(--border-radius);
   display: inline-block;
   min-width: 100%;
-  max-width: 500px;
+  max-width: var(--form-width);
   padding: 0;
   overflow: hidden;
   cursor: pointer;
@@ -53,7 +53,7 @@ input[type='file'] {
   @media (min-width: 768px) {
     display: flex;
     flex-direction: column;
-    min-width: 500px;
+    min-width: var(--form-width);
   }
 }
 

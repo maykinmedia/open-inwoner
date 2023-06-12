@@ -1,6 +1,6 @@
 .plan-edit {
   .form {
-    max-width: 500px;
+    max-width: var(--form-width);
     .form__control [class*='icon'] {
       transform: initial;
     }
@@ -14,7 +14,7 @@
           min-width: 100%;
         }
         .input {
-          max-width: 500px;
+          max-width: var(--form-width);
         }
       }
     }
