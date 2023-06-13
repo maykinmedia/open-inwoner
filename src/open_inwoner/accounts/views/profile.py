@@ -25,6 +25,7 @@ from open_inwoner.questionnaire.models import QuestionnaireStep
 from open_inwoner.utils.mixins import ExportMixin
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
+from ...openklant.wrap import fetch_klant_for_bsn, patch_klant
 from ..forms import BrpUserForm, CategoriesForm, UserForm, UserNotificationsForm
 from ..models import Action, User
 
@@ -133,9 +134,35 @@ class EditProfileView(
     def form_valid(self, form):
         form.save()
 
+        self.update_klant_api({k: form.cleaned_data[k] for k in form.changed_data})
+
         messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
         self.log_change(self.get_object(), _("profile was modified"))
         return HttpResponseRedirect(self.get_success_url())
+
+    def update_klant_api(self, user_form_data: dict):
+        user: User = self.request.user
+        if not user.bsn or user.login_type != LoginTypeChoices.digid:
+            return
+        field_mapping = {
+            "emailadres": "email",
+            "telefoonnummer": "phonenumber",
+        }
+        update_data = {
+            api_name: user_form_data[local_name]
+            for api_name, local_name in field_mapping.items()
+            if user_form_data.get(local_name)
+        }
+        if update_data:
+            klant = fetch_klant_for_bsn(user.bsn)
+            if klant:
+                self.log_system_action("retrieved klant for BSN-user")
+
+                klant = patch_klant(klant, update_data)
+                if klant:
+                    self.log_system_action(
+                        f"patched klant from user profile edit with fields: {', '.join(sorted(update_data.keys()))}"
+                    )
 
     def get_form_class(self):
         user = self.request.user

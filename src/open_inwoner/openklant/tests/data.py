@@ -28,6 +28,46 @@ class MockAPIData:
         mock_service_oas_get(m, CONTACTMOMENTEN_ROOT, "cmc")
 
 
+class MockAPIReadPatchData(MockAPIData):
+    def __init__(self):
+        self.user = DigidUserFactory(
+            email="old@example.com",
+            phonenumber="0100000000",
+        )
+
+        self.klant_old = generate_oas_component(
+            "kc",
+            "schemas/Klant",
+            uuid="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            emailadres="bad@example.com",
+            telefoonnummer="",
+        )
+        self.klant_updated = generate_oas_component(
+            "kc",
+            "schemas/Klant",
+            uuid="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            emailadres="good@example.com",
+            telefoonnummer="0123456789",
+        )
+
+    def install_mocks(self, m) -> "MockAPIReadPatchData":
+        self.setUpOASMocks(m)
+        self.matchers = [
+            m.get(
+                f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn={self.user.bsn}",
+                json=paginated_response([self.klant_old]),
+            ),
+            m.patch(
+                f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+                json=self.klant_updated,
+                status_code=200,
+            ),
+        ]
+        return self
+
+
 class MockAPIReadData(MockAPIData):
     def __init__(self):
         self.user = DigidUserFactory(
