@@ -18,6 +18,11 @@
     word-break: normal;
     overflow-wrap: break-word;
   }
+
+  // when CMS is in edit mode
+  &.cms-plugin {
+    margin-top: var(--gutter-width);
+  }
 }
 
 ///
