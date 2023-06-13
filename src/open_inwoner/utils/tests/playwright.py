@@ -94,7 +94,7 @@ class PlaywrightSyncLiveServerTestCase(StaticLiveServerTestCase):
     def live_url(cls, path="/", star=False):
         """
         prepend self.live_server_url to path
-        optionally append '*' wildcard matcher (useful for page.expect_navigation() etc)
+        optionally append '*' wildcard matcher (useful for page.wait_for_url() etc)
         """
         url = f"{cls.live_server_url}{path}"
         if star:
@@ -106,7 +106,7 @@ class PlaywrightSyncLiveServerTestCase(StaticLiveServerTestCase):
         """
         do a reverse() url, prepend self.live_server_url
         optionally add query params to url
-        optionally append '*' wildcard matcher (useful for page.expect_navigation() etc)
+        optionally append '*' wildcard matcher (useful for page.wait_for_url() etc)
         """
         path = reverse(viewname, args=args, kwargs=kwargs)
         assert not (params and star), "cannot combine params and star arguments (yet)"
@@ -137,20 +137,17 @@ class PlaywrightSyncLiveServerTestCase(StaticLiveServerTestCase):
         context = cls.browser.new_context()
         page = context.new_page()
 
-        with page.expect_navigation(
-            url=cls.live_reverse("digid-mock:login", star=True)
-        ):
-            page.goto(cls.live_reverse("digid:login"))
+        page.goto(cls.live_reverse("digid:login"))
 
-        with page.expect_navigation(
-            url=cls.live_reverse("digid-mock:password", star=True)
-        ):
-            page.get_by_text("Met gebruikersnaam en wachtwoord").click()
+        page.get_by_text("Met gebruikersnaam en wachtwoord").click()
 
-        with page.expect_navigation(url=cls.live_reverse("pages-root")):
-            page.get_by_text("DigiD gebruikersnaam", exact=True).fill(user.bsn)
-            page.get_by_text("Wachtwoord", exact=True).fill("whatever")
-            page.get_by_role("button", name="Inloggen").click()
+        page.wait_for_url(cls.live_reverse("digid-mock:password", star=True))
+
+        page.get_by_text("DigiD gebruikersnaam", exact=True).fill(user.bsn)
+        page.get_by_text("Wachtwoord", exact=True).fill("whatever")
+        page.get_by_role("button", name="Inloggen").click()
+
+        page.wait_for_url(cls.live_reverse("pages-root"))
 
         page.close()
         login_state = context.storage_state()

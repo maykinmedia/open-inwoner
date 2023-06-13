@@ -38,11 +38,15 @@
         {% cms_toolbar %}
         {% header categories=menu_categories request=request breadcrumbs=breadcrumbs search_form=search_form has_general_faq_questions=has_general_faq_questions cms_apps=cms_apps %}
 
-        {% if anchors %}
-        {% anchor_menu anchors=anchors desktop=False %}
-            {% block extra_mobile_anchor %}{% endblock extra_mobile_anchor %}
-        {% endanchor_menu%}
+        {% if anchors and not custom_anchors %}
+            {% anchor_menu anchors=anchors desktop=False %}
+                {% block extra_mobile_anchor %}{% endblock extra_mobile_anchor %}
+            {% endanchor_menu%}
+        {% elif custom_anchors%}
+            {% block mobile_anchors %}
+            {% endblock mobile_anchors %}
         {% endif %}
+
         <div class="anchor__scroll" id="scroll-anchor">
             <div class="anchor__scroll-link">
                 {% button href="#top" text=_("Terug naar boven") icon="arrow_upward" pill=True %}

@@ -1,0 +1,20 @@
+{% extends 'master.html' %}
+{% load i18n icon_tags %}
+
+<div id="cases-submissions-anchors-oob-mobile"></div>
+
+{% block sidebar_content %}
+    <div id="cases-submissions-anchors-oob"></div>
+{% endblock sidebar_content %}
+
+{% block content %}
+    <h1 class="h1" id="title">{% trans "Mijn aanvragen" %}</h1>
+    
+    <div class="cases" id="submissions-content"></div>
+    
+    <div class="loader-container" id="spinner-container">
+        <div class="spinner" id="spinner-id" hx-get="{{ hxget }}" hx-trigger="load" hx-target="#submissions-content">
+            {% icon icon="autorenew" extra_classes="spinner-icon rotate" %}
+        </div>
+    </div>
+{% endblock content %}

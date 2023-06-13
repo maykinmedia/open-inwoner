@@ -1,4 +1,6 @@
-class AnchorMobile {
+export class AnchorMobile {
+  static selector = '.anchor-menu__toggle'
+
   constructor(node) {
     this.node = node
     this.node.addEventListener('click', this.toggleOpen.bind(this))
@@ -20,5 +22,5 @@ class AnchorMobile {
 /**
  * Controls the toggling of anchor list
  */
-const anchorToggles = document.querySelectorAll('.anchor-menu__toggle')
+const anchorToggles = document.querySelectorAll(AnchorMobile.selector)
 ;[...anchorToggles].forEach((anchorToggle) => new AnchorMobile(anchorToggle))
