@@ -88,10 +88,15 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
 
         if success:
             messages.add_message(self.request, messages.SUCCESS, self.message_success)
-            self.log_system_action(f"registered contactmoment by email")
+            self.log_system_action(
+                "registered contactmoment by email", user=self.request.user
+            )
         else:
             messages.add_message(self.request, messages.ERROR, self.message_failure)
-            self.log_system_action(f"error while registering contactmoment by email")
+            self.log_system_action(
+                "error while registering contactmoment by email",
+                user=self.request.user,
+            )
 
     def register_by_api(self, form, config: OpenKlantConfig):
         assert config.has_api_configuration()
@@ -100,7 +105,9 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
         if self.request.user.is_authenticated and self.request.user.bsn:
             klant = fetch_klant_for_bsn(self.request.user.bsn)
             if klant:
-                self.log_system_action("retrieved klant for BSN-user")
+                self.log_system_action(
+                    "retrieved klant for BSN-user", user=self.request.user
+                )
 
                 # check if we have some data missing from the Klant
                 update_data = {}
@@ -111,10 +118,13 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
                 if update_data:
                     patch_klant(klant, update_data)
                     self.log_system_action(
-                        f"patched klant from user with missing fields: {', '.join(sorted(update_data.keys()))}"
+                        f"patched klant from user with missing fields: {', '.join(sorted(update_data.keys()))}",
+                        user=self.request.user,
                     )
             else:
-                self.log_system_action(f"could not retrieve klant for BSN-user")
+                self.log_system_action(
+                    "could not retrieve klant for BSN-user", user=self.request.user
+                )
 
         else:
             data = {
@@ -130,10 +140,11 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
             if klant:
                 if self.request.user.is_authenticated:
                     self.log_system_action(
-                        f"created klant for basic authenticated user"
+                        "created klant for basic authenticated user",
+                        user=self.request.user,
                     )
                 else:
-                    self.log_system_action(f"created klant for anonymous user")
+                    self.log_system_action("created klant for anonymous user")
 
         # create contact moment
         subject = form.cleaned_data["subject"].subject
@@ -153,7 +164,8 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
                 text = f"{text}\nTelefoonnummer: {form.cleaned_data['phonenumber']}"
 
             self.log_system_action(
-                f"could not retrieve or create klant for user, appended info to message"
+                "could not retrieve or create klant for user, appended info to message",
+                user=self.request.user,
             )
 
         data = {
@@ -169,7 +181,11 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
 
         if contactmoment:
             messages.add_message(self.request, messages.SUCCESS, self.message_success)
-            self.log_system_action(f"registered contactmoment by API")
+            self.log_system_action(
+                "registered contactmoment by API", user=self.request.user
+            )
         else:
             messages.add_message(self.request, messages.ERROR, self.message_failure)
-            self.log_system_action(f"error while registering contactmoment by API")
+            self.log_system_action(
+                "error while registering contactmoment by API", user=self.request.user
+            )

@@ -323,6 +323,11 @@ class ContactFormTestCase(
         subject = ContactFormSubjectFactory(config=config, subject="Aanvraag document")
 
         response = self.app.get(self.url, user=data.user)
+
+        # reset interference from signals
+        self.resetTimelineLogs()
+        m.reset_mock()
+
         form = response.forms["contactmoment-form"]
         self.assertFormExactFields(
             form,
@@ -344,7 +349,7 @@ class ContactFormTestCase(
         self.assertEqual(len(mail.outbox), 0)
 
         for m in data.matchers:
-            self.assertTrue(m.called_once, str(m))
+            self.assertTrue(m.called_once, str(m._url))
 
         contactmoment_create_data = data.matchers[1].request_history[0].json()
         self.assertEqual(
@@ -385,6 +390,11 @@ class ContactFormTestCase(
         subject = ContactFormSubjectFactory(config=config, subject="Aanvraag document")
 
         response = self.app.get(self.url, user=data.user)
+
+        # reset interference from signals
+        self.resetTimelineLogs()
+        m.reset_mock()
+
         form = response.forms["contactmoment-form"]
         self.assertFormExactFields(
             form,
@@ -400,7 +410,7 @@ class ContactFormTestCase(
         # response tested in other cases
 
         for m in data.matchers:
-            self.assertTrue(m.called_once, str(m))
+            self.assertTrue(m.called_once, str(m._url))
 
         klant_patch_data = data.matchers[1].request_history[0].json()
         self.assertEqual(

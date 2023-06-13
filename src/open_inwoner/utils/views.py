@@ -100,8 +100,8 @@ class LogMixin(object):
         """
         user_action(self.request, instance, message)
 
-    def log_system_action(self, message, instance=None):
+    def log_system_action(self, message, instance=None, user=None):
         """
         Log system events not related to a specific user.
         """
-        system_action(message, content_object=instance)
+        system_action(message, content_object=instance, user=user)
