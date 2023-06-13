@@ -37,11 +37,7 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs.update(
-            {
-                "user": self.request.user,
-            }
-        )
+        kwargs["user"] = self.request.user
         return kwargs
 
     def get_initial(self):
@@ -52,8 +48,7 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
                     "first_name": self.request.user.first_name,
                     "infix": self.request.user.infix,
                     "last_name": self.request.user.last_name,
-                    # we need to use get_contact_email() because we use dummy email for BSN users
-                    "email": self.request.user.get_contact_email(),
+                    "email": self.request.user.email,
                     "phonenumber": self.request.user.phonenumber,
                 }
             )
@@ -105,7 +100,7 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
         if self.request.user.is_authenticated and self.request.user.bsn:
             klant = fetch_klant_for_bsn(self.request.user.bsn)
             if klant:
-                self.log_system_action(f"retrieved klant for BSN-user")
+                self.log_system_action("retrieved klant for BSN-user")
 
                 # check if we have some data missing from the Klant
                 update_data = {}

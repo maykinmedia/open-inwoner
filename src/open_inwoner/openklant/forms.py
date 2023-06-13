@@ -79,9 +79,8 @@ class ContactForm(Form):
             self.add_error("phonenumber", msg)
 
         if self.user.is_authenticated:
-            # we need to use get_contact_email() because we use dummy email for BSN users
-            if not email and self.user.get_contact_email():
-                cleaned_data["email"] = self.user.get_contact_email()
+            if not email and self.user.email:
+                cleaned_data["email"] = self.user.email
             if not phonenumber and self.user.phonenumber:
                 cleaned_data["phonenumber"] = self.user.phonenumber
 
