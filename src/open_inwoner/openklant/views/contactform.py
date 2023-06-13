@@ -1,6 +1,3 @@
-import re
-from typing import Tuple
-
 from django.contrib import messages
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -8,6 +5,7 @@ from django.views.generic import FormView
 
 from mail_editor.helpers import find_template
 from view_breadcrumbs import BaseBreadcrumbMixin
+from zds_client import ClientError
 
 from open_inwoner.openklant.forms import ContactForm
 from open_inwoner.openklant.models import OpenKlantConfig
@@ -15,11 +13,12 @@ from open_inwoner.openklant.wrap import (
     create_contactmoment,
     create_klant,
     fetch_klant_for_bsn,
+    patch_klant,
 )
-from open_inwoner.utils.views import CommonPageMixin
+from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 
-class ContactFormView(CommonPageMixin, BaseBreadcrumbMixin, FormView):
+class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
     form_class = ContactForm
     template_name = "pages/contactform/form.html"
 
@@ -35,6 +34,11 @@ class ContactFormView(CommonPageMixin, BaseBreadcrumbMixin, FormView):
 
     def get_success_url(self):
         return self.request.path
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
 
     def get_initial(self):
         initial = super().get_initial()
@@ -84,20 +88,35 @@ class ContactFormView(CommonPageMixin, BaseBreadcrumbMixin, FormView):
 
         if success:
             messages.add_message(self.request, messages.SUCCESS, self.message_success)
+            self.log_system_action(f"registered contactmoment by email")
         else:
             messages.add_message(self.request, messages.ERROR, self.message_failure)
+            self.log_system_action(f"error while registering contactmoment by email")
 
     def register_by_api(self, form, config: OpenKlantConfig):
-        assert config.has_form_configuration()
+        assert config.has_api_configuration()
 
         # fetch/update/create klant
         if self.request.user.is_authenticated and self.request.user.bsn:
             klant = fetch_klant_for_bsn(self.request.user.bsn)
+            if klant:
+                self.log_system_action("retrieved klant for BSN-user")
 
-            # TODO update klant phone/email? (other ticket)
+                # check if we have some data missing from the Klant
+                update_data = {}
+                if not klant.emailadres and form.cleaned_data["email"]:
+                    update_data["emailadres"] = form.cleaned_data["email"]
+                if not klant.telefoonnummer and form.cleaned_data["phonenumber"]:
+                    update_data["telefoonnummer"] = form.cleaned_data["phonenumber"]
+                if update_data:
+                    patch_klant(klant, update_data)
+                    self.log_system_action(
+                        f"patched klant from user with missing fields: {', '.join(sorted(update_data.keys()))}"
+                    )
+            else:
+                self.log_system_action(f"could not retrieve klant for BSN-user")
+
         else:
-            # TODO according to taiga #1437 we should disable Klanten/Contacten API if Digid is not enabled
-            # TODO registering klanten won't work in e-Suite as it always pulls from BRP
             data = {
                 "bronorganisatie": config.register_bronorganisatie_rsin,
                 "voornaam": form.cleaned_data["first_name"],
@@ -106,15 +125,40 @@ class ContactFormView(CommonPageMixin, BaseBreadcrumbMixin, FormView):
                 "emailadres": form.cleaned_data["email"],
                 "telefoonnummer": form.cleaned_data["phonenumber"],
             }
+            # registering klanten won't work in e-Suite as it always pulls from BRP (but try anyway and fallback to appending details to tekst if fails)
             klant = create_klant(data)
+            if klant:
+                if self.request.user.is_authenticated:
+                    self.log_system_action(
+                        f"created klant for basic authenticated user"
+                    )
+                else:
+                    self.log_system_action(f"created klant for anonymous user")
 
         # create contact moment
         subject = form.cleaned_data["subject"].subject
-        body = form.cleaned_data["question"]
+        question = form.cleaned_data["question"]
+        text = f"{subject}\n\n{question}"
+
+        if not klant:
+            # if we don't have a BSN and can't create a Klant we'll add contact info to the tekst
+            parts = [form.cleaned_data[k] for k in ("first_name", "infix", "last_name")]
+            full_name = " ".join(p for p in parts if p)
+            text = f"{text}\n\nNaam: {full_name}"
+
+            if form.cleaned_data["email"]:
+                text = f"{text}\nEmail: {form.cleaned_data['email']}"
+
+            if form.cleaned_data["phonenumber"]:
+                text = f"{text}\nTelefoonnummer: {form.cleaned_data['phonenumber']}"
+
+            self.log_system_action(
+                f"could not retrieve or create klant for user, appended info to message"
+            )
 
         data = {
             "bronorganisatie": config.register_bronorganisatie_rsin,
-            "tekst": f"{subject}\n\n{body}",
+            "tekst": text,
             "type": config.register_type,
             "kanaal": "Internet",
             "medewerkerIdentificatie": {
@@ -125,5 +169,7 @@ class ContactFormView(CommonPageMixin, BaseBreadcrumbMixin, FormView):
 
         if contactmoment:
             messages.add_message(self.request, messages.SUCCESS, self.message_success)
+            self.log_system_action(f"registered contactmoment by API")
         else:
             messages.add_message(self.request, messages.ERROR, self.message_failure)
+            self.log_system_action(f"error while registering contactmoment by API")
