@@ -222,7 +222,7 @@ class ContactViewTests(WebTest):
                     "first_name": [
                         _(
                             "Please make sure your input contains only valid characters "
-                            "(letters, numbers, apostrophe, space)."
+                            "(letters, numbers, apostrophe, dash, space)."
                         )
                     ]
                 }
@@ -243,7 +243,7 @@ class ContactViewTests(WebTest):
                     "last_name": [
                         _(
                             "Please make sure your input contains only valid characters "
-                            "(letters, numbers, apostrophe, space)."
+                            "(letters, numbers, apostrophe, dash, space)."
                         )
                     ]
                 }

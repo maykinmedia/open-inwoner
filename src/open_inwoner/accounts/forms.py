@@ -13,8 +13,8 @@ from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.pdc.models.category import Category
 from open_inwoner.utils.forms import LimitedUploadFileField, PrivateFileWidget
 from open_inwoner.utils.validators import (
+    CharFieldValidator,
     format_phone_number,
-    validate_charfield_entry,
     validate_phone_number,
 )
 
@@ -307,10 +307,10 @@ class ContactFilterForm(forms.Form):
 
 class ContactCreateForm(forms.Form):
     first_name = forms.CharField(
-        label=_("First name"), max_length=255, validators=[validate_charfield_entry]
+        label=_("First name"), max_length=255, validators=[CharFieldValidator()]
     )
     last_name = forms.CharField(
-        label=_("Last name"), max_length=255, validators=[validate_charfield_entry]
+        label=_("Last name"), max_length=255, validators=[CharFieldValidator()]
     )
     email = forms.EmailField(label=_("Email"))
 

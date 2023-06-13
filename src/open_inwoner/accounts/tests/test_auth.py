@@ -89,7 +89,7 @@ class TestRegistrationFunctionality(WebTest):
                     "first_name": [
                         _(
                             "Please make sure your input contains only valid characters "
-                            "(letters, numbers, apostrophe, space)."
+                            "(letters, numbers, apostrophe, dash, space)."
                         )
                     ]
                 }
@@ -112,7 +112,7 @@ class TestRegistrationFunctionality(WebTest):
                     "last_name": [
                         _(
                             "Please make sure your input contains only valid characters "
-                            "(letters, numbers, apostrophe, space)."
+                            "(letters, numbers, apostrophe, dash, space)."
                         )
                     ]
                 }
@@ -829,7 +829,7 @@ class TestRegistrationNecessary(WebTest):
                     "first_name": [
                         _(
                             "Please make sure your input contains only valid characters "
-                            "(letters, numbers, apostrophe, space)."
+                            "(letters, numbers, apostrophe, dash, space)."
                         )
                     ]
                 }
@@ -856,7 +856,7 @@ class TestRegistrationNecessary(WebTest):
                     "last_name": [
                         _(
                             "Please make sure your input contains only valid characters "
-                            "(letters, numbers, apostrophe, space)."
+                            "(letters, numbers, apostrophe, dash, space)."
                         )
                     ]
                 }

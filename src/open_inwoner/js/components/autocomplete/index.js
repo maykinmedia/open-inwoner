@@ -1,15 +1,14 @@
 import autoComplete from '@tarekraafat/autocomplete.js/dist/autoComplete'
+import escapeHTML from 'escape-html'
 
 const autocompleteField = (node) => {
-  const choices = JSON.parse(
-    node.dataset.autocompleteChoices
-      .replace(/'/g, '"')
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
+  let choices = JSON.parse(
+    document.getElementById(node.dataset.choicesId).textContent
   )
-  console.log('node', node)
-  console.log('dataset', node.dataset)
+
+  // choices is an array of arrays of key/value pairs: two mappings needed to escape elements
+  choices = choices.map((choice) => choice.map((item) => escapeHTML(item)))
+
   const choiceLabels = choices.map((choice) => choice[1])
   const fieldId = node.dataset.fieldId
   const hidden = node.querySelector(`#${fieldId}`)

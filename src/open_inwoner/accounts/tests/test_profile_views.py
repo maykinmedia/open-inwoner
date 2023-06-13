@@ -281,7 +281,7 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
 
                 error_msg = _(
                     "Please make sure your input contains only valid characters "
-                    "(letters, numbers, apostrophe, space)."
+                    "(letters, numbers, apostrophe, dash, space)."
                 )
                 expected_errors = {
                     "first_name": [error_msg],
