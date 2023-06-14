@@ -1,12 +1,9 @@
-import io
-
 from django.test import override_settings
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 import requests_mock
 from django_webtest import WebTest
-from PIL import Image
 from timeline_logger.models import TimelineLog
 from webtest import Upload
 
@@ -15,14 +12,15 @@ from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 from open_inwoner.pdc.tests.factories import CategoryFactory
 from open_inwoner.utils.logentry import LOG_ACTIONS
-from open_inwoner.utils.tests.helpers import create_image_bytes
+from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin, create_image_bytes
 
 from ...cms.profile.cms_apps import ProfileApphook
 from ...cms.tests import cms_tools
+from ...openklant.tests.data import MockAPIReadPatchData
 from ...questionnaire.tests.factories import QuestionnaireStepFactory
 from ..choices import ContactTypeChoices, LoginTypeChoices
 from ..forms import BrpUserForm, UserForm
-from .factories import ActionFactory, DocumentFactory, UserFactory
+from .factories import ActionFactory, DigidUserFactory, DocumentFactory, UserFactory
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
@@ -193,7 +191,7 @@ class ProfileViewTests(WebTest):
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class EditProfileTests(WebTest):
+class EditProfileTests(AssertTimelineLogMixin, WebTest):
     def setUp(self):
         self.url = reverse("profile:edit")
         self.return_url = reverse("profile:detail")
@@ -434,6 +432,97 @@ class EditProfileTests(WebTest):
 
         self.assertNotIn("image", form.fields.keys())
         self.assertEqual(response.pyquery("#id_image"), [])
+
+    @requests_mock.Mocker()
+    def test_modify_phone_and_email_updates_klant_api(self, m):
+        MockAPIReadPatchData.setUpServices()
+        data = MockAPIReadPatchData().install_mocks(m)
+
+        response = self.app.get(self.url, user=data.user)
+        form = response.forms["profile-edit"]
+        form["email"] = "new@example.com"
+        form["phonenumber"] = "01234456789"
+        form.submit()
+
+        # user data tested in other cases
+
+        self.assertTrue(data.matchers[0].called)
+        klant_patch_data = data.matchers[1].request_history[0].json()
+        self.assertEqual(
+            klant_patch_data,
+            {
+                "emailadres": "new@example.com",
+                "telefoonnummer": "01234456789",
+            },
+        )
+        self.assertTimelineLog("retrieved klant for BSN-user")
+        self.assertTimelineLog(
+            "patched klant from user profile edit with fields: emailadres, telefoonnummer"
+        )
+
+    @requests_mock.Mocker()
+    def test_modify_phone_updates_klant_api_but_skips_unchanged(self, m):
+        MockAPIReadPatchData.setUpServices()
+        data = MockAPIReadPatchData().install_mocks(m)
+
+        response = self.app.get(self.url, user=data.user)
+        form = response.forms["profile-edit"]
+        form.submit()
+
+        # user data tested in other cases
+
+        self.assertFalse(data.matchers[0].called)
+        self.assertFalse(data.matchers[1].called)
+
+    @requests_mock.Mocker()
+    def test_modify_phone_updates_klant_api_but_skip_unchanged_email(self, m):
+        MockAPIReadPatchData.setUpServices()
+        data = MockAPIReadPatchData().install_mocks(m)
+
+        response = self.app.get(self.url, user=data.user)
+        form = response.forms["profile-edit"]
+        form["phonenumber"] = "01234456789"
+        form.submit()
+
+        # user data tested in other cases
+
+        self.assertTrue(data.matchers[0].called)
+        klant_patch_data = data.matchers[1].request_history[0].json()
+        self.assertEqual(
+            klant_patch_data,
+            {
+                "telefoonnummer": "01234456789",
+            },
+        )
+        self.assertTimelineLog("retrieved klant for BSN-user")
+        self.assertTimelineLog(
+            "patched klant from user profile edit with fields: telefoonnummer"
+        )
+
+    @requests_mock.Mocker()
+    def test_modify_phone_updates_klant_api_but_skip_unchanged_phone(self, m):
+        MockAPIReadPatchData.setUpServices()
+        data = MockAPIReadPatchData().install_mocks(m)
+
+        response = self.app.get(self.url, user=data.user)
+        form = response.forms["profile-edit"]
+        form["email"] = "new@example.com"
+        form.submit()
+
+        # user data tested in other cases
+
+        self.assertTrue(data.matchers[0].called)
+        klant_patch_data = data.matchers[1].request_history[0].json()
+        self.assertEqual(
+            klant_patch_data,
+            {
+                "emailadres": "new@example.com",
+            },
+        )
+        self.assertTimelineLog("retrieved klant for BSN-user")
+        self.assertTimelineLog(
+            "patched klant from user profile edit with fields: emailadres"
+        )
 
 
 @requests_mock.Mocker()
