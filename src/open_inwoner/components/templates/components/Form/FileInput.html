@@ -6,7 +6,7 @@
             <span class="input-file">
             {{ field|addclass:"inputfile" }}
 
-            <label class="label__label">
+            <label class="label__label" for="{{ field.auto_id }}">
             {% icon icon="cloud_upload" icon_position="before" outlined=True %}
                 {{ text }}
 

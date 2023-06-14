@@ -35,6 +35,14 @@
       }
     }
   }
+
+  .form__control__info {
+    display: none;
+
+    &--active {
+      display: block;
+    }
+  }
 }
 
 /// File-input site wide

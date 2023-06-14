@@ -3,10 +3,13 @@ import 'htmx.org'
 import './accessibility'
 import './actions'
 import './anchor-menu'
+import { AnchorMobile } from './anchor-menu/anchor-menu-mobile'
+import { CreateGumshoe } from './anchor-menu/anchor-menu'
 import './autocomplete-search'
 import './autocomplete'
 import './autosumbit'
 import './cases'
+import { DisableSubmitButton } from './cases/document_upload'
 import './confirmation'
 import './contacts'
 import './datepicker'
@@ -16,12 +19,15 @@ import './header'
 import './map'
 import './message-file'
 import './notifications'
+import { Notification } from './notifications'
 import './plans'
 import './preview'
 import './questionnaire'
 import './search'
 import './toggle'
 import './upload-document'
+import { ShowInfo } from './upload-document/show-file-info'
+import { FileInputError } from './upload-document/file-input-errors'
 import './session'
 import './twofactor-sms'
 
@@ -36,21 +42,38 @@ htmx.config.includeIndicatorStyles = false
 // define selectors and callables to apply after we loaded a html fragment
 const elementWrappers = [
   [Dropdown.selector, (elt) => new Dropdown(elt)],
+  [CreateGumshoe.selector, (elt) => new CreateGumshoe(elt)],
+  [DisableSubmitButton.selector, (elt) => new DisableSubmitButton(elt)],
+  [ShowInfo.selector, (elt) => new ShowInfo(elt)],
+  [FileInputError.selector, (elt) => new FileInputError(elt)],
+  [Notification.selector, (elt) => new Notification(elt)],
+  [AnchorMobile.selector, (elt) => new AnchorMobile(elt)],
   // add more when needed
 ]
 
+// harden against multiple events
+// should not be needed but protects against unforeseen issues
+let activeElements = []
+
 function wrapComponentsOf(targetElement) {
+  console.debug(['wrapComponentsOf', targetElement])
   // apply the javascript component wrappers
   for (const [selector, callable] of elementWrappers) {
     for (const elt of htmx.findAll(targetElement, selector)) {
-      callable(elt)
-      console.debug(['htmx re-activated component on: ' + selector, elt])
+      if (activeElements.indexOf(elt) < 0) {
+        callable(elt)
+        activeElements.push(elt)
+        console.log(['htmx re-activated component on: ' + selector, elt])
+      } else {
+        console.debug([
+          'htmx skipped duplicate re-activation of component: ' + selector,
+          elt,
+        ])
+      }
     }
   }
+  // clean-up removed elements
+  activeElements = activeElements.filter((elt) => elt.isConnected)
 }
 
-htmx.onLoad(() => {
-  document.body.addEventListener('htmx:afterSwap', (event) => {
-    wrapComponentsOf(event.target)
-  })
-})
+htmx.onLoad(wrapComponentsOf)

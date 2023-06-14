@@ -22,7 +22,7 @@ from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
-from open_inwoner.accounts.views.cases import SimpleFile
+from open_inwoner.cms.cases.views.status import SimpleFile
 from open_inwoner.openzaak.tests.factories import (
     ZaakTypeConfigFactory,
     ZaakTypeInformatieObjectTypeConfigFactory,
@@ -69,7 +69,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         cls.config.save()
 
         cls.case_detail_url = reverse(
-            "cases:case_detail",
+            "cases:case_detail_content",
             kwargs={"object_id": "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d"},
         )
 
@@ -238,8 +238,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             informatieobjecttype=cls.informatie_object_type["url"],
             status="definitief",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
-            bestandsnaam="document.txt",
-            titel="document_title.txt",
+            bestandsnaam="uploaded_document.txt",
+            titel="uploaded_document_title.txt",
             bestandsomvang=123,
         )
         cls.uploaded_informatie_object = generate_oas_component(
@@ -280,7 +280,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         )
 
         cls.informatie_object_file = SimpleFile(
-            name="document_title.txt",
+            name="uploaded_document_title.txt",
             size=123,
             url=reverse(
                 "cases:document_download",
@@ -389,9 +389,9 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         response = self.app.get(self.case_detail_url, user=self.user)
 
         self.assertContains(response, "ZAAK-2022-0000000024")
-        self.assertContains(response, "Zaak naar aanleiding van ingezonden formulier")
+        self.assertContains(response, "Coffee zaaktype")
         self.assertContains(response, "Finish")
-        self.assertContains(response, "document")
+        self.assertContains(response, "uploaded_document_title")
         self.assertContains(response, "Foo Bar van der Bazz")
         self.assertContains(response, "resultaat toelichting")
 
@@ -399,7 +399,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self._setUpMocks(m)
 
         with patch(
-            "open_inwoner.accounts.views.cases.format_zaak_identificatie",
+            "open_inwoner.cms.cases.views.status.format_zaak_identificatie",
             wraps=format_zaak_identificatie,
         ) as spy_format:
             self.app.get(self.case_detail_url, user=self.user)
@@ -445,7 +445,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         )
         response = self.app.get(self.case_detail_url, user=user)
 
-        self.assertRedirects(response, reverse("pages-root"))
+        self.assertTemplateUsed("pages/cases/403.html")
+        self.assertContains(
+            response, _("Sorry, you don't have access to this page (403)")
+        )
 
     def test_anonymous_user_has_no_access_to_status_page(self, m):
         self._setUpMocks(m)
@@ -454,7 +457,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
         self.assertRedirects(
             response,
-            f"{reverse('login')}?next={reverse('cases:case_detail', kwargs={'object_id': 'd8bbdeb7-770f-4ca9-b1ea-77b4730bf67d'})}",
+            f"{reverse('login')}?next={reverse('cases:case_detail_content', kwargs={'object_id': 'd8bbdeb7-770f-4ca9-b1ea-77b4730bf67d'})}",
         )
 
     def test_no_access_when_no_roles_are_found_for_user_bsn(self, m):
@@ -476,7 +479,11 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         #     json=paginated_response([self.status_finish, self.status_new]),
         # )
         response = self.app.get(self.case_detail_url, user=self.user)
-        self.assertRedirects(response, reverse("pages-root"))
+
+        self.assertTemplateUsed("pages/cases/403.html")
+        self.assertContains(
+            response, _("Sorry, you don't have access to this page (403)")
+        )
 
     def test_no_data_is_retrieved_when_zaaktype_is_internal(self, m):
         self._setUpOASMocks(m)
@@ -528,12 +535,16 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
         response = self.app.get(
             reverse(
-                "cases:case_detail",
+                "cases:case_detail_content",
                 kwargs={"object_id": self.zaak_invisible["uuid"]},
             ),
             user=self.user,
         )
-        self.assertRedirects(response, reverse("pages-root"))
+
+        self.assertTemplateUsed("pages/cases/403.html")
+        self.assertContains(
+            response, _("Sorry, you don't have access to this page (403)")
+        )
 
     def test_single_expected_information_object_type_is_available_in_upload_form(
         self, m
@@ -553,7 +564,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
         response = self.app.get(
             reverse(
-                "cases:case_detail",
+                "cases:case_detail_content",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
             user=self.user,
@@ -587,7 +598,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
         response = self.app.get(
             reverse(
-                "cases:case_detail",
+                "cases:case_detail_content",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
             user=self.user,
@@ -623,7 +634,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
         response = self.app.get(
             reverse(
-                "cases:case_detail",
+                "cases:case_detail_content",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
             user=self.user,
@@ -653,7 +664,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
         response = self.app.get(
             reverse(
-                "cases:case_detail",
+                "cases:case_detail_content",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
             user=self.user,
@@ -669,7 +680,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         m.get(self.zaak["url"], status_code=500)
         response = self.app.get(
             reverse(
-                "cases:case_detail",
+                "cases:case_detail_content",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
             user=self.user,
@@ -685,7 +696,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
         response = self.app.get(
             reverse(
-                "cases:case_detail",
+                "cases:case_detail_content",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
             user=self.user,
@@ -771,7 +782,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
         response = self.app.get(
             reverse(
-                "cases:case_detail",
+                "cases:case_detail_content",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
             user=self.user,
@@ -811,7 +822,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
         response = self.app.get(
             reverse(
-                "cases:case_detail",
+                "cases:case_detail_content",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
             user=self.user,
@@ -846,7 +857,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
         response = self.app.get(
             reverse(
-                "cases:case_detail",
+                "cases:case_detail_content",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
             user=self.user,
@@ -871,7 +882,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
         response = self.app.get(
             reverse(
-                "cases:case_detail",
+                "cases:case_detail_content",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
             user=self.user,
@@ -892,7 +903,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
         response = self.app.get(
             reverse(
-                "cases:case_detail",
+                "cases:case_detail_content",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
             user=self.user,
@@ -916,7 +927,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
         response = self.app.get(
             reverse(
-                "cases:case_detail",
+                "cases:case_detail_content",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
             user=self.user,
@@ -939,7 +950,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
         response = self.app.get(
             reverse(
-                "cases:case_detail",
+                "cases:case_detail_content",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
             user=self.user,
@@ -962,7 +973,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
         response = self.app.get(
             reverse(
-                "cases:case_detail",
+                "cases:case_detail_content",
                 kwargs={"object_id": self.zaak["uuid"]},
             ),
             user=self.user,
