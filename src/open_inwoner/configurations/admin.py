@@ -163,6 +163,7 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                 "fields": (
                     "openid_connect_logo",
                     "openid_connect_login_text",
+                    "openid_admin_only",
                 )
             },
         ),
