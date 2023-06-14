@@ -13,7 +13,7 @@
     top: 0;
     gap: 0;
     width: 100%;
-    max-width: 500px;
+    max-width: var(--form-width);
     margin: -2px var(--spacing-small) 0 0;
     padding: 0 0 var(--spacing-small) 0;
     border: none;

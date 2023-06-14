@@ -3,27 +3,29 @@
 
 
 {% block content %}
-<h1 class="h1">
-    {% if object.pk %}
-        {% trans "Wijzig actie" %}
-    {% else %}
-        {% trans "Creeer actie" %}
-    {% endif %}
-</h1>
+    <div class="plan-edit">
+        <h1 class="h1">
+            {% if object.pk %}
+                {% trans "Wijzig actie" %}
+            {% else %}
+                {% trans "Creeer actie" %}
+            {% endif %}
+        </h1>
 
-{% render_form id="action-create" form=form method="POST" enctype="multipart/form-data" %}
-    {% csrf_token %}
-    {% input form.name no_help=True %}
-    {% input form.description no_help=True %}
-    {% render_grid %}
-        {% input form.status no_help=True %}
-        {% date_field form.end_date no_help=True %}
-    {% endrender_grid %}
-    {% render_grid %}
-        {% input form.is_for no_help=True %}
-        {% input form.file no_help=True %}
-    {% endrender_grid %}
+        {% render_form id="action-create" form=form method="POST" enctype="multipart/form-data" %}
+            {% csrf_token %}
+            {% input form.name no_help=True %}
+            {% input form.description no_help=True %}
+            {% render_grid %}
+                {% input form.status no_help=True icon="expand_more" icon_position="after" %}
+                {% date_field form.end_date no_help=True icon="today" icon_position="after" %}
+            {% endrender_grid %}
+            {% render_grid %}
+                {% input form.is_for no_help=True icon="person" icon_position="after" %}
+                {% input form.file no_help=True icon="file_upload" outlined=True icon_position="after" %}
+            {% endrender_grid %}
 
-    {% form_actions primary_text=_("Actie opslaan") %}
-{% endrender_form %}
+            {% form_actions primary_text=_("Actie opslaan") %}
+        {% endrender_form %}
+    </div>
 {% endblock content %}
