@@ -7,15 +7,20 @@ export class ShowInfo {
   }
 
   showData() {
-    const sizeInfo = document.getElementById('upload_size')
-    const nameInfo = document.getElementById('upload_name')
-    const validationInfo = document.getElementById('upload_error')
-    const closeButton = document.getElementById('close_upload')
-    const submit_upload = document.getElementById('submit_upload')
+    // get the closest parent element (the form section element)
+    const documentUpload = this.fileUploadInput.closest('#form_upload')
+
+    const sizeInfo = documentUpload.querySelector('#upload_size')
+    const nameInfo = documentUpload.querySelector('#upload_name')
+    const validationInfo = documentUpload.querySelector('#upload_error')
+    const closeButton = documentUpload.querySelector('#close_upload')
+    const submit_upload = documentUpload.querySelector('#submit_upload')
     // show/hide after validation
-    const iconDrive = document.querySelectorAll('.drive')
+    const iconDrive = documentUpload.querySelectorAll('.drive')
     // show info
-    const formControlInfo = document.querySelectorAll('.form__control__info')
+    const formControlInfo = documentUpload.querySelectorAll(
+      '.form__control__info'
+    )
 
     // Convert the file size to a readable format
     const formatFileSize = function (bytes) {
