@@ -130,7 +130,6 @@ INSTALLED_APPS = [
     "menus",
     "treebeard",
     "sekizai",
-    "django_timed_tests",
     # "djangocms_admin_style",
     "djangocms_text_ckeditor",
     "djangocms_link",
