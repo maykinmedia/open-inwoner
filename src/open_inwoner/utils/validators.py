@@ -8,6 +8,16 @@ from django.utils.translation import gettext_lazy as _
 from filer.models import Image
 
 
+@deconstructible
+class CharFieldValidator(RegexValidator):
+    regex = r"^[\w'’\- ]+\Z"
+    message = _(
+        "Please make sure your input contains only valid characters "
+        "(letters, numbers, apostrophe, dash, space)."
+    )
+
+
+# deprecated
 def validate_charfield_entry(value, allow_apostrophe=False):
     """
     Validates a charfield entry according with requirements.

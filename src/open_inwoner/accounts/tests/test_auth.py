@@ -73,7 +73,7 @@ class TestRegistrationFunctionality(WebTest):
         self.assertEqual(user_query.count(), 0)
 
     def test_registration_fails_with_invalid_first_name_characters(self):
-        invalid_characters = "/\"\\,.:;'"
+        invalid_characters = '<>#/"\\,.:;'
 
         for char in invalid_characters:
             with self.subTest(char=char):
@@ -87,15 +87,16 @@ class TestRegistrationFunctionality(WebTest):
                 response = form.submit()
                 expected_errors = {
                     "first_name": [
-                        _("Uw invoer bevat een ongeldig teken: {char}").format(
-                            char=char
+                        _(
+                            "Please make sure your input contains only valid characters "
+                            "(letters, numbers, apostrophe, dash, space)."
                         )
                     ]
                 }
                 self.assertEqual(response.context["form"].errors, expected_errors)
 
     def test_registration_fails_with_invalid_last_name_characters(self):
-        invalid_characters = "/\"\\,.:;'"
+        invalid_characters = '<>#/"\\,.:;'
 
         for char in invalid_characters:
             with self.subTest(char=char):
@@ -109,8 +110,9 @@ class TestRegistrationFunctionality(WebTest):
                 response = form.submit()
                 expected_errors = {
                     "last_name": [
-                        _("Uw invoer bevat een ongeldig teken: {char}").format(
-                            char=char
+                        _(
+                            "Please make sure your input contains only valid characters "
+                            "(letters, numbers, apostrophe, dash, space)."
                         )
                     ]
                 }
@@ -813,7 +815,7 @@ class TestRegistrationNecessary(WebTest):
             last_name="",
             login_type=LoginTypeChoices.digid,
         )
-        invalid_characters = "/\"\\,.:;'"
+        invalid_characters = '<>#/"\\,.:;'
 
         for char in invalid_characters:
             with self.subTest(char=char):
@@ -825,8 +827,9 @@ class TestRegistrationNecessary(WebTest):
                 response = form.submit()
                 expected_errors = {
                     "first_name": [
-                        _("Uw invoer bevat een ongeldig teken: {char}").format(
-                            char=char
+                        _(
+                            "Please make sure your input contains only valid characters "
+                            "(letters, numbers, apostrophe, dash, space)."
                         )
                     ]
                 }
@@ -839,7 +842,7 @@ class TestRegistrationNecessary(WebTest):
             last_name="",
             login_type=LoginTypeChoices.digid,
         )
-        invalid_characters = "/\"\\,.:;'"
+        invalid_characters = '<>#/"\\,.:;'
 
         for char in invalid_characters:
             with self.subTest(char=char):
@@ -851,8 +854,9 @@ class TestRegistrationNecessary(WebTest):
                 response = form.submit()
                 expected_errors = {
                     "last_name": [
-                        _("Uw invoer bevat een ongeldig teken: {char}").format(
-                            char=char
+                        _(
+                            "Please make sure your input contains only valid characters "
+                            "(letters, numbers, apostrophe, dash, space)."
                         )
                     ]
                 }

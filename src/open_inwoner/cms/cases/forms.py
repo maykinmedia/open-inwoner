@@ -8,12 +8,12 @@ from open_inwoner.openzaak.models import (
     OpenZaakConfig,
     ZaakTypeInformatieObjectTypeConfig,
 )
-from open_inwoner.utils.validators import validate_charfield_entry
+from open_inwoner.utils.validators import CharFieldValidator
 
 
 class CaseUploadForm(forms.Form):
     title = forms.CharField(
-        label=_("Titel bestand"), max_length=255, validators=[validate_charfield_entry]
+        label=_("Titel bestand"), max_length=255, validators=[CharFieldValidator()]
     )
     type = forms.ModelChoiceField(
         ZaakTypeInformatieObjectTypeConfig.objects.none(),

@@ -208,7 +208,7 @@ class ContactViewTests(WebTest):
         self.assertEqual(response.context["form"].errors, expected_errors)
 
     def test_adding_contact_with_invalid_first_name_chars_fails(self):
-        invalid_characters = "/\"\\,.:;'"
+        invalid_characters = '<>#/"\\,.:;'
 
         for char in invalid_characters:
             with self.subTest(char=char):
@@ -220,15 +220,16 @@ class ContactViewTests(WebTest):
                 response = form.submit()
                 expected_errors = {
                     "first_name": [
-                        _("Uw invoer bevat een ongeldig teken: {char}").format(
-                            char=char
+                        _(
+                            "Please make sure your input contains only valid characters "
+                            "(letters, numbers, apostrophe, dash, space)."
                         )
                     ]
                 }
                 self.assertEqual(response.context["form"].errors, expected_errors)
 
     def test_adding_contact_with_invalid_last_name_chars_fails(self):
-        invalid_characters = "/\"\\,.:;'"
+        invalid_characters = '<>#/"\\,.:;'
 
         for char in invalid_characters:
             with self.subTest(char=char):
@@ -240,8 +241,9 @@ class ContactViewTests(WebTest):
                 response = form.submit()
                 expected_errors = {
                     "last_name": [
-                        _("Uw invoer bevat een ongeldig teken: {char}").format(
-                            char=char
+                        _(
+                            "Please make sure your input contains only valid characters "
+                            "(letters, numbers, apostrophe, dash, space)."
                         )
                     ]
                 }

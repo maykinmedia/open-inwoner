@@ -1,6 +1,9 @@
-{% load form_tags %}
+{% load form_tags string_tags %}
 
-<div class="form__control autocomplete__input" data-autocomplete-choices="{{ field.field.choices }}" data-field-id="{{ field.auto_id }}">
+{% with field.auto_id|addstr:"_choices" as choices_id %}
+<div class="form__control autocomplete__input" data-choices-id={{ choices_id }} data-field-id="{{ field.auto_id }}">
+
+    {{ field.field.choices|json_script:choices_id }}
     <label class="label">
         {% if not no_label %}{{ field.label }}{% endif %}
 
@@ -17,3 +20,4 @@
 
     <input id="{{ field.auto_id }}" name="{{ field.name }}" type="hidden">
 </div>
+{% endwith %}

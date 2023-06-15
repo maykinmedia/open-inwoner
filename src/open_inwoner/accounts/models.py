@@ -18,10 +18,7 @@ from privates.storages import PrivateMediaFileSystemStorage
 from timeline_logger.models import TimelineLog
 
 from open_inwoner.utils.hash import create_sha256_hash
-from open_inwoner.utils.validators import (
-    validate_charfield_entry,
-    validate_phone_number,
-)
+from open_inwoner.utils.validators import CharFieldValidator, validate_phone_number
 
 from ..plans.models import PlanContact
 from .choices import ContactTypeChoices, LoginTypeChoices, StatusChoices, TypeChoices
@@ -52,28 +49,28 @@ class User(AbstractBaseUser, PermissionsMixin):
         max_length=255,
         blank=True,
         default="",
-        validators=[validate_charfield_entry],
+        validators=[CharFieldValidator()],
     )
     infix = models.CharField(
         verbose_name=_("Infix"),
         max_length=64,
         blank=True,
         default="",
-        validators=[validate_charfield_entry],
+        validators=[CharFieldValidator()],
     )
     last_name = models.CharField(
         verbose_name=_("Last name"),
         max_length=255,
         blank=True,
         default="",
-        validators=[validate_charfield_entry],
+        validators=[CharFieldValidator()],
     )
     display_name = models.CharField(
         verbose_name=_("Display name"),
         max_length=255,
         blank=True,
         default="",
-        validators=[validate_charfield_entry],
+        validators=[CharFieldValidator()],
     )
     email = models.EmailField(verbose_name=_("Email address"), unique=True)
     phonenumber = models.CharField(
@@ -124,7 +121,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
     birthday = models.DateField(verbose_name=_("Birthday"), null=True, blank=True)
     street = models.CharField(
-        verbose_name=_("Street"), default="", blank=True, max_length=250
+        verbose_name=_("Street"),
+        default="",
+        blank=True,
+        max_length=250,
+        validators=[CharFieldValidator()],
     )
     housenumber = models.CharField(
         verbose_name=_("House number"), default="", blank=True, max_length=250
@@ -133,7 +134,11 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name=_("Postcode"), null=True, blank=True, max_length=250
     )
     city = models.CharField(
-        verbose_name=_("City"), default="", blank=True, max_length=250
+        verbose_name=_("City"),
+        default="",
+        blank=True,
+        max_length=250,
+        validators=[CharFieldValidator()],
     )
     deactivated_on = models.DateField(
         verbose_name=_("Deactivated on"),
@@ -661,13 +666,13 @@ class Invite(models.Model):
         verbose_name=_("First name"),
         max_length=250,
         help_text=_("The first name of the invitee."),
-        validators=[validate_charfield_entry],
+        validators=[CharFieldValidator()],
     )
     invitee_last_name = models.CharField(
         verbose_name=_("Last name"),
         max_length=250,
         help_text=_("The last name of the invitee"),
-        validators=[validate_charfield_entry],
+        validators=[CharFieldValidator()],
     )
     invitee_email = models.EmailField(
         verbose_name=_("Invitee email"),
