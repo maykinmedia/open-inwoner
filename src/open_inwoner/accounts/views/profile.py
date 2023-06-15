@@ -156,12 +156,14 @@ class EditProfileView(
         if update_data:
             klant = fetch_klant_for_bsn(user.bsn)
             if klant:
-                self.log_system_action("retrieved klant for BSN-user")
-
+                self.log_system_action(
+                    "retrieved klant for BSN-user", user=self.request.user
+                )
                 klant = patch_klant(klant, update_data)
                 if klant:
                     self.log_system_action(
-                        f"patched klant from user profile edit with fields: {', '.join(sorted(update_data.keys()))}"
+                        f"patched klant from user profile edit with fields: {', '.join(sorted(update_data.keys()))}",
+                        user=self.request.user,
                     )
 
     def get_form_class(self):

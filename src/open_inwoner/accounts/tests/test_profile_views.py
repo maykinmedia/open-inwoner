@@ -439,6 +439,11 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         data = MockAPIReadPatchData().install_mocks(m)
 
         response = self.app.get(self.url, user=data.user)
+
+        # reset noise from signals
+        m.reset_mock()
+        self.resetTimelineLogs()
+
         form = response.forms["profile-edit"]
         form["email"] = "new@example.com"
         form["phonenumber"] = "01234456789"
@@ -466,6 +471,11 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         data = MockAPIReadPatchData().install_mocks(m)
 
         response = self.app.get(self.url, user=data.user)
+
+        # reset noise from signals
+        m.reset_mock()
+        self.resetTimelineLogs()
+
         form = response.forms["profile-edit"]
         form.submit()
 
@@ -480,6 +490,11 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         data = MockAPIReadPatchData().install_mocks(m)
 
         response = self.app.get(self.url, user=data.user)
+
+        # reset noise from signals
+        m.reset_mock()
+        self.resetTimelineLogs()
+
         form = response.forms["profile-edit"]
         form["phonenumber"] = "01234456789"
         form.submit()
@@ -505,6 +520,11 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         data = MockAPIReadPatchData().install_mocks(m)
 
         response = self.app.get(self.url, user=data.user)
+
+        # reset noise from signals
+        m.reset_mock()
+        self.resetTimelineLogs()
+
         form = response.forms["profile-edit"]
         form["email"] = "new@example.com"
         form.submit()

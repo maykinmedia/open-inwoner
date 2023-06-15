@@ -33,8 +33,13 @@ class Lookups:
 
 class AssertTimelineLogMixin:
     def assertTimelineLog(
-        self, message, *, level=None, lookup=Lookups.exact
+        self,
+        message,
+        *,
+        level=None,
+        lookup=Lookups.exact,
     ) -> TimelineLog:
+
         kwargs = {
             f"extra_data__message__{lookup}": force_str(message),
         }
@@ -49,7 +54,7 @@ class AssertTimelineLogMixin:
             )
         elif count > 1:
             self.fail(
-                f"found {count} TimelineLogs with {kwargs}, got:\n{self.getTimelineLogDump()}"
+                f"expected 1 but found {count} TimelineLogs with {kwargs}, got:\n{self.getTimelineLogDump()}"
             )
 
         return logs[0]
@@ -76,6 +81,9 @@ class AssertTimelineLogMixin:
 
     def dumpTimelineLog(self):
         print(self.getTimelineLogDump())
+
+    def resetTimelineLogs(self):
+        TimelineLog.objects.all().delete()
 
 
 class AssertFormMixin:

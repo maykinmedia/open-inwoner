@@ -23,6 +23,7 @@ class MockAPIData:
         )
         config.save()
 
+    @classmethod
     def setUpOASMocks(self, m):
         mock_service_oas_get(m, KLANTEN_ROOT, "kc")
         mock_service_oas_get(m, CONTACTMOMENTEN_ROOT, "cmc")
@@ -79,6 +80,8 @@ class MockAPIReadData(MockAPIData):
             "schemas/Klant",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            emailadres="foo@example.com",
+            telefoonnummer="0612345678",
         )
         self.contactmoment = generate_oas_component(
             "cmc",

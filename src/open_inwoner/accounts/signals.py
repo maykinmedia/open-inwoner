@@ -8,6 +8,8 @@ from open_inwoner.haalcentraal.models import HaalCentraalConfig
 from open_inwoner.haalcentraal.utils import update_brp_data_in_db
 from open_inwoner.utils.logentry import user_action
 
+from ..openklant.models import OpenKlantConfig
+from ..openklant.services import update_user_from_klant
 from .choices import LoginTypeChoices
 
 MESSAGE_TYPE = {
@@ -39,10 +41,15 @@ def log_user_login(sender, user, request, *args, **kwargs):
 
     # update brp fields when login with digid and brp is configured
     brp_config = HaalCentraalConfig.get_solo()
-    brp_version = settings.BRP_VERSION
 
-    if user.login_type == LoginTypeChoices.digid and brp_config.service:
-        update_brp_data_in_db(user, brp_version, initial=False)
+    oc_config = OpenKlantConfig.get_solo()
+
+    if user.login_type == LoginTypeChoices.digid:
+        if brp_config.service:
+            update_brp_data_in_db(user, settings.BRP_VERSION, initial=False)
+
+        if oc_config.klanten_service:
+            update_user_from_klant(user)
 
 
 @receiver(user_logged_out)
