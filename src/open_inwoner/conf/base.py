@@ -130,6 +130,7 @@ INSTALLED_APPS = [
     "menus",
     "treebeard",
     "sekizai",
+    "django_timed_tests",
     # "djangocms_admin_style",
     "djangocms_text_ckeditor",
     "djangocms_link",
@@ -507,6 +508,11 @@ SHOW_ALERT = True
 #
 # Django CMS
 #
+
+CMS_PAGE_CACHE = False
+CMS_PLACEHOLDER_CACHE = False
+CMS_PLUGIN_CACHE = False
+
 CMS_TEMPLATES = [
     ("cms/fullwidth.html", "Home page template"),
 ]

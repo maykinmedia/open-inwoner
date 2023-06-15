@@ -13,6 +13,7 @@ class BannerImagePlugin(CMSPluginBase):
     form = BannerImageForm
     name = _("Banner Image Plugin")
     render_template = "cms/banner/banner_image_plugin.html"
+    cache = False
 
 
 @plugin_pool.register_plugin
@@ -21,3 +22,4 @@ class BannerTextPlugin(CMSPluginBase):
     form = BannerTextForm
     name = _("Banner Text Plugin")
     render_template = "cms/banner/banner_text_plugin.html"
+    cache = False
