@@ -3,8 +3,12 @@ from unittest.mock import patch
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 from mozilla_django_oidc_db.models import OpenIDConnectConfig
+from pyquery import PyQuery
+
+from open_inwoner.configurations.models import SiteConfiguration
 
 from ..choices import LoginTypeChoices
 from .factories import UserFactory
@@ -207,3 +211,51 @@ class OIDCFlowTests(TestCase):
                 response = self.client.get(error_url)
 
                 self.assertEqual(response.status_code, 403)
+
+
+@patch(
+    "mozilla_django_oidc_db.mixins.OpenIDConnectConfig.get_solo",
+    return_value=OpenIDConnectConfig(enabled=True),
+)
+class OIDCConfigTest(TestCase):
+    def test_admin_only_enabled(self, mock_oidc_config):
+        """Assert that the OIDC login option is only displayed for login via admin"""
+
+        config = SiteConfiguration.get_solo()
+        config.openid_admin_only = True
+        config.save()
+
+        # regular site
+        response = self.client.get(reverse("login"))
+
+        self.assertNotContains(response, _("Login with Azure AD"))
+
+        # admin login
+        response = self.client.get(reverse("admin:login"))
+
+        doc = PyQuery(response.content)
+        oidc_login_option = doc.find(".admin-login-option")
+
+        self.assertEqual(oidc_login_option.text(), "Login with organization account")
+
+    def test_admin_only_disabled(self, mock_oidc_config):
+        """Assert that the OIDC login option is only displayed for regular"""
+
+        # regular site
+        response = self.client.get(reverse("login"))
+
+        doc = PyQuery(response.content)
+        link = doc.find("[title='Login with Azure AD']")
+        link_text = link.find(".link__text").text()
+
+        self.assertEqual(link_text, "Login with Azure AD")
+
+        # admin login
+        response = self.client.get(reverse("admin:login"))
+
+        self.assertNotContains(response, _("Login with organization account"))
+
+        # doc = PyQuery(response.content)
+        # oidc_login_option = doc.find(".admin-login-option")
+
+        # self.assertEqual(oidc_login_option.text(), "Login with organization account")

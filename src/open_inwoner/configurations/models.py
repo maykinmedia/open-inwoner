@@ -399,9 +399,7 @@ class SiteConfiguration(SingletonModel):
     openid_admin_only = models.BooleanField(
         verbose_name=_("Restrict OpenId Connect to admin users"),
         default=False,
-        help_text=_(
-            "If checked, only admin users will be able to login via OpenId."
-        )
+        help_text=_("If checked, only admin users will be able to login via OpenId."),
     )
     redirect_to = models.CharField(
         max_length=255,
