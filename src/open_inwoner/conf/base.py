@@ -507,6 +507,11 @@ SHOW_ALERT = True
 #
 # Django CMS
 #
+
+CMS_PAGE_CACHE = False
+CMS_PLACEHOLDER_CACHE = False
+CMS_PLUGIN_CACHE = False
+
 CMS_TEMPLATES = [
     ("cms/fullwidth.html", "Home page template"),
 ]

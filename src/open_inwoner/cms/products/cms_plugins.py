@@ -49,6 +49,7 @@ class QuestionnairePlugin(CMSActiveAppMixin, CMSPluginBase):
     name = _("Questionnaire Plugin")
     render_template = "cms/questionnaire/questionnaire_plugin.html"
     app_hook = "ProductsApphook"
+    cache = False
 
     def render(self, context, instance, placeholder):
         context["questionnaire_roots"] = QuestionnaireStep.get_root_nodes().filter(
@@ -63,6 +64,7 @@ class ProductFinderPlugin(CMSActiveAppMixin, CMSPluginBase):
     name = _("Product Finder Plugin")
     render_template = "cms/products/product_finder_plugin.html"
     app_hook = "ProductsApphook"
+    cache = False
 
     def render(self, context, instance, placeholder):
         context["condition"] = ProductCondition.objects.first()
@@ -76,6 +78,7 @@ class ProductLocationPlugin(CMSActiveAppMixin, CMSPluginBase):
     name = _("Product Location Plugin")
     render_template = "cms/products/product_location_plugin.html"
     app_hook = "ProductsApphook"
+    cache = False
 
     def render(self, context, instance, placeholder):
         context["product_locations"] = ProductLocation.objects.all()[:1000]
