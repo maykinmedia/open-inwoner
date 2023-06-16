@@ -1,4 +1,4 @@
-export class AnchorMobile {
+class AnchorMobile {
   static selector = '.anchor-menu__toggle'
 
   constructor(node) {
@@ -24,3 +24,13 @@ export class AnchorMobile {
  */
 const anchorToggles = document.querySelectorAll(AnchorMobile.selector)
 ;[...anchorToggles].forEach((anchorToggle) => new AnchorMobile(anchorToggle))
+
+/**
+ * Controls the toggling of anchor list specifically for the cases-detail page
+ */
+export class AnchorMobileOOB extends AnchorMobile {}
+
+const anchorTogglesOob = document.querySelectorAll(AnchorMobileOOB.selector)
+;[...anchorTogglesOob].forEach(
+  (anchorToggleOob) => new AnchorMobileOOB(anchorToggleOob)
+)

@@ -3,8 +3,8 @@ import 'htmx.org'
 import './accessibility'
 import './actions'
 import './anchor-menu'
-import { AnchorMobile } from './anchor-menu/anchor-menu-mobile'
 import { CreateGumshoe } from './anchor-menu/anchor-menu'
+import { AnchorMobileOOB } from './anchor-menu/anchor-menu-mobile'
 import './autocomplete-search'
 import './autocomplete'
 import './autosumbit'
@@ -47,7 +47,7 @@ const elementWrappers = [
   [ShowInfo.selector, (elt) => new ShowInfo(elt)],
   [FileInputError.selector, (elt) => new FileInputError(elt)],
   [Notification.selector, (elt) => new Notification(elt)],
-  [AnchorMobile.selector, (elt) => new AnchorMobile(elt)],
+  [AnchorMobileOOB.selector, (elt) => new AnchorMobileOOB(elt)],
   // add more when needed
 ]
 
