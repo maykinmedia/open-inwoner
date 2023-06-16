@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 import requests_mock
+from cms import api
 from django_webtest import WebTest
 from timeline_logger.models import TimelineLog
 from webtest import Upload
@@ -188,6 +189,42 @@ class ProfileViewTests(WebTest):
         self.user.save()
         response = self.app.get(self.url, user=self.user)
         self.assertContains(response, _("You do not have any notifications enabled."))
+
+    def test_messages_enabled_disabled(self):
+        """Assert that `Stuur een bericht` is displayed if and only if the message page is published"""
+
+        begeleider = UserFactory(contact_type=ContactTypeChoices.begeleider)
+        self.user.user_contacts.add(begeleider)
+
+        # case 1: no message page
+        response = self.app.get(self.url, user=self.user)
+
+        self.assertNotContains(response, _("Stuur een bericht"))
+
+        # case 2: unpublished message page
+        page = api.create_page(
+            "Mijn Berichten",
+            "cms/fullwidth.html",
+            "nl",
+            slug="berichten",
+        )
+        page.application_namespace = "inbox"
+        page.save()
+
+        response = self.app.get(self.url, user=self.user)
+
+        self.assertNotContains(response, _("Stuur een bericht"))
+
+        # case 3: published message page
+        page.publish("nl")
+        page.save()
+
+        response = self.app.get(self.url, user=self.user)
+
+        message_link = response.pyquery("[title='Stuur een bericht']")
+        link_text = message_link.find(".link__text").text
+
+        self.assertEqual(link_text(), _("Stuur een bericht"))
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")

@@ -20,6 +20,7 @@ from open_inwoner.accounts.choices import (
     LoginTypeChoices,
     StatusChoices,
 )
+from open_inwoner.cms.utils.page_display import inbox_page_is_published
 from open_inwoner.haalcentraal.utils import fetch_brp_data
 from open_inwoner.questionnaire.models import QuestionnaireStep
 from open_inwoner.utils.mixins import ExportMixin
@@ -98,6 +99,7 @@ class MyProfileView(
             published=True
         ).exists()
         context["can_change_password"] = user.login_type != LoginTypeChoices.digid
+        context["inbox_page_is_published"] = inbox_page_is_published()
 
         return context
 
