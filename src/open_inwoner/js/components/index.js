@@ -57,6 +57,13 @@ let activeElements = []
 
 function wrapComponentsOf(targetElement) {
   console.debug(['wrapComponentsOf', targetElement])
+  if (targetElement === document.body) {
+    // htmx:load also triggers for regular window onload (although the language in the document doesn't mention it)
+    // so components get multiple initialisations if they also self-initialize in their own file, and
+    // this is not caught by the activeElements check because the initial initialisation is not visible here
+    // taiga #1511 and #1544 should clean this up
+    return
+  }
   // apply the javascript component wrappers
   for (const [selector, callable] of elementWrappers) {
     for (const elt of htmx.findAll(targetElement, selector)) {
