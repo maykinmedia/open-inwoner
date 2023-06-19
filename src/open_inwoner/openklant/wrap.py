@@ -45,28 +45,16 @@ def fetch_klantcontactmoment_for_bsn(
     if cm_client is None or k_client is None:
         return
 
-    try:
-        response = cm_client.retrieve("klantcontactmoment", uuid=kcm_uuid)
-    except (RequestException, ClientError) as e:
-        logger.exception("exception while making request", exc_info=e)
-        return
+    # use the list query because eSuite doesn't have all proper resources
+    # see git history before this change for the original single resource version
+    kcms = fetch_klantcontactmomenten_for_bsn(user_bsn)
 
-    kcm = factory(KlantContactMoment, response)
-
-    # let's make sure our BSN has access to this
-    klanten = _fetch_klanten_for_bsn(user_bsn, client=k_client)
-    if not klanten:
-        return
-
-    klanten_url_map = {k.url: k for k in klanten}
-    if kcm.klant not in klanten_url_map:
-        # this was not a klantcontactmoment for our BSN
-        return
-
-    kcm.klant = klanten_url_map[kcm.klant]
-
-    # resolve
-    kcm.contactmoment = _fetch_contactmoment(kcm.contactmoment, client=cm_client)
+    kcm = None
+    # try to grab the specific KCM
+    for k in kcms:
+        if kcm_uuid == str(k.uuid):
+            kcm = k
+            break
 
     return kcm
 
