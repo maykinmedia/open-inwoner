@@ -106,10 +106,13 @@ class MyProfileView(
     def post(self, request, *args, **kwargs):
         if request.user.is_authenticated and not request.user.is_staff:
             instance = User.objects.get(id=request.user.id)
-            self.request.user.deactivate()
 
             self.log_user_action(instance, _("user was deactivated via frontend"))
-            return redirect(instance.get_logout_url())
+
+            instance.delete()
+            request.session.flush()
+
+            return redirect(reverse("logout"))
         else:
             messages.warning(request, _("Uw account kon niet worden gedeactiveerd"))
             return redirect("profile:detail")
