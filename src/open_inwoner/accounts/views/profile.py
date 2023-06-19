@@ -22,6 +22,7 @@ from open_inwoner.accounts.choices import (
 )
 from open_inwoner.cms.utils.page_display import inbox_page_is_published
 from open_inwoner.haalcentraal.utils import fetch_brp_data
+from open_inwoner.plans.models import Plan
 from open_inwoner.questionnaire.models import QuestionnaireStep
 from open_inwoner.utils.mixins import ExportMixin
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
@@ -107,8 +108,19 @@ class MyProfileView(
         if request.user.is_authenticated and not request.user.is_staff:
             instance = User.objects.get(id=request.user.id)
 
-            self.log_user_action(instance, _("user was deactivated via frontend"))
+            # check if there are still plans associated witht the user
+            if Plan.objects.filter(created_by=instance).exists():
+                messages.warning(
+                    request,
+                    _(
+                        "You still have plans associated with your profile. "
+                        "Please delete those plans before deleting your profile."
+                    ),
+                )
+                return redirect("profile:detail")
 
+            # continue with delete
+            self.log_user_action(instance, _("user was deactivated via frontend"))
             instance.delete()
             request.session.flush()
 
