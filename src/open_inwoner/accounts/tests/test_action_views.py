@@ -327,9 +327,18 @@ class ActionsPlaywrightTests(PlaywrightSyncLiveServerTestCase):
 
     def test_action_status(self):
         context = self.browser.new_context(storage_state=self.user_login_state)
+        self.cookiebanner_enabled = True
 
         page = context.new_page()
         page.goto(self.live_reverse("profile:action_list"))
+
+        # find the decline button inside the cookie-banner
+        cookiebanner_banner = page.locator(".cookie-banner")
+        cookiebanner_rejectbutton = page.locator(".reject-button")
+        # close cookie-banner
+        cookiebanner_rejectbutton.click()
+        # check cookie-banner state
+        expect(cookiebanner_banner).to_be_hidden()
 
         # find action element and the dropdown widget
         action_element = page.locator(f"#actions_{self.action.id}__status")

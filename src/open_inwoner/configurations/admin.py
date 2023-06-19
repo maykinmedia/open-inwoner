@@ -179,6 +179,16 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                 )
             },
         ),
+        (
+            _("Cookie consent"),
+            {
+                "fields": (
+                    "cookie_info_text",
+                    "cookie_link_text",
+                    "cookie_link_url",
+                ),
+            },
+        ),
     )
     inlines = [SiteConfigurationPageInline]
     form = SiteConfigurarionAdminForm
