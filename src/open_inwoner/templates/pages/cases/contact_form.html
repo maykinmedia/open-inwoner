@@ -1,0 +1,20 @@
+{% load i18n form_tags button_tags icon_tags %}
+
+<h2 class="h2" id="contact">{% trans 'Contact' %}</h2>
+<p class="p">
+    {% blocktrans trimmed %}
+    Door middel van dit formulier kunt u een vraag stellen over deze zaak.
+    U dient ten minste uw telefoonnummer of uw e-mailadres in te vullen.
+    Indien u uw e-mailadres invult krijgt u een bevestiging per mail.
+    {% endblocktrans %}
+</p>
+
+{% render_form form=contact_form method="POST" id="contact-form" hxpost=hxpost_contact_form hxtarget="#cases-contact-form" %}
+    {% csrf_token %}
+    {% textarea contact_form.contact_moment %}
+    <div class="form__submit">
+        {% button_row %}
+            {% button text=_("Vraag versturen") id="submit_contact" type="submit" primary=True name="contact_form_submit" %}
+        {% endbutton_row %}
+    </div>
+{% endrender_form %}

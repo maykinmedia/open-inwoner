@@ -363,6 +363,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.assertEqual(
             response.context.get("case"),
             {
+                "id": self.zaak["uuid"],
                 "identification": "ZAAK-2022-0000000024",
                 "start_date": datetime.date(2022, 1, 2),
                 "end_date": datetime.date(2022, 1, 3),
@@ -380,6 +381,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 "external_upload_enabled": False,
                 "external_upload_url": "",
                 "allowed_file_extensions": sorted(self.config.allowed_file_extensions),
+                "contact_moments_enabled": False,
             },
         )
 
@@ -720,15 +722,23 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
         response = self.app.get(self.case_detail_url, user=self.user)
         form = response.forms["document-upload"]
+        form.action = reverse(
+            "cases:case_detail_document_form", kwargs={"object_id": self.zaak["uuid"]}
+        )
         form["title"] = "uploaded file"
         form["type"] = zaak_type_iotc.id
         form["file"] = Upload("upload.txt", b"data", "text/plain")
         form_response = form.submit()
 
-        redirect = form_response.follow()
+        # make sure the client-side-redirect is done with the expected url
+        self.assertEqual(
+            form_response.headers["HX-Redirect"],
+            reverse("cases:case_detail", kwargs={"object_id": str(self.zaak["uuid"])}),
+        )
+
+        redirect = self.app.get(form_response.headers["HX-Redirect"])
         redirect_messages = list(redirect.context["messages"])
 
-        self.assertRedirects(form_response, self.case_detail_url)
         self.assertEqual(
             redirect_messages[0].message,
             _(
@@ -752,15 +762,23 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
         response = self.app.get(self.case_detail_url, user=self.user)
         form = response.forms["document-upload"]
+        form.action = reverse(
+            "cases:case_detail_document_form", kwargs={"object_id": self.zaak["uuid"]}
+        )
         form["title"] = "uploaded file"
         form["type"] = zaak_type_iotc.id
         form["file"] = Upload("upload.TXT", b"data", "text/plain")
         form_response = form.submit()
 
-        redirect = form_response.follow()
+        # make sure the client-side-redirect is done with the expected url
+        self.assertEqual(
+            form_response.headers["HX-Redirect"],
+            reverse("cases:case_detail", kwargs={"object_id": str(self.zaak["uuid"])}),
+        )
+
+        redirect = self.app.get(form_response.headers["HX-Redirect"])
         redirect_messages = list(redirect.context["messages"])
 
-        self.assertRedirects(form_response, self.case_detail_url)
         self.assertEqual(
             redirect_messages[0].message,
             _("upload.TXT is succesvol geüpload"),
@@ -1001,11 +1019,21 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
         response = self.app.get(self.case_detail_url, user=self.user)
         form = response.forms["document-upload"]
+        form.action = reverse(
+            "cases:case_detail_document_form", kwargs={"object_id": self.zaak["uuid"]}
+        )
         form["title"] = "uploaded file"
         form["file"] = Upload("upload.txt", b"data", "text/plain")
         form_response = form.submit()
 
-        form_response_messages = list(form_response.context["messages"])
+        # make sure the client-side-redirect is done with the expected url
+        self.assertEqual(
+            form_response.headers["HX-Redirect"],
+            reverse("cases:case_detail", kwargs={"object_id": str(self.zaak["uuid"])}),
+        )
+
+        redirect = self.app.get(form_response.headers["HX-Redirect"])
+        form_response_messages = list(redirect.context["messages"])
 
         self.assertEqual(
             form_response_messages[0].message,
@@ -1032,11 +1060,15 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
         response = self.app.get(self.case_detail_url, user=self.user)
         form = response.forms["document-upload"]
+        form.action = reverse(
+            "cases:case_detail_document_form", kwargs={"object_id": self.zaak["uuid"]}
+        )
         form["title"] = "A title"
         form["file"] = Upload("upload.txt", b"data", "text/plain")
         form_response = form.submit()
 
-        form_response_messages = list(form_response.context["messages"])
+        redirect = self.app.get(form_response.headers["HX-Redirect"])
+        form_response_messages = list(redirect.context["messages"])
 
         self.assertEqual(
             form_response_messages[0].message,

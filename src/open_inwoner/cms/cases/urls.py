@@ -7,7 +7,9 @@ from open_inwoner.accounts.views.contactmoments import (
 )
 
 from .views import (
+    CaseContactFormView,
     CaseDocumentDownloadView,
+    CaseDocumentUploadFormView,
     InnerCaseDetailView,
     InnerClosedCaseListView,
     InnerOpenCaseListView,
@@ -57,6 +59,16 @@ urlpatterns = [
         "<str:object_id>/status/",
         OuterCaseDetailView.as_view(),
         name="case_detail",
+    ),
+    path(
+        "<str:object_id>/status/contact-form/",
+        CaseContactFormView.as_view(),
+        name="case_detail_contact_form",
+    ),
+    path(
+        "<str:object_id>/status/document-form/",
+        CaseDocumentUploadFormView.as_view(),
+        name="case_detail_document_form",
     ),
     path("open/", RedirectView.as_view(pattern_name="cases:open_cases"), name="index"),
     path("content/", InnerOpenCaseListView.as_view(), name="open_cases_content"),
