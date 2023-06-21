@@ -2,13 +2,15 @@ import inspect
 
 from django.contrib import messages
 from django.core import mail
+from django.test import override_settings
 from django.urls import reverse
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _
 
 import requests_mock
 from django_webtest import WebTest
 
 from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.cms.tests import cms_tools
 from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.openklant.tests.data import MockAPICreateData
 from open_inwoner.openklant.tests.factories import ContactFormSubjectFactory
@@ -76,6 +78,38 @@ class ContactFormTestCase(
         response = self.app.get(self.url)
         self.assertContains(response, _("Contact formulier niet geconfigureerd."))
         self.assertEqual(0, len(response.pyquery("#contactmoment-form")))
+
+    @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+    def test_no_form_link_shown_in_footer_if_not_has_configuration(self, m):
+        # set nothing
+        config = OpenKlantConfig.get_solo()
+        self.assertFalse(config.has_form_configuration())
+
+        cms_tools.create_homepage()
+
+        response = self.app.get(reverse("pages-root"))
+        links = response.pyquery(".footer__list-item")
+
+        self.assertEqual(len(links), 0)
+
+    @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+    def test_form_link_is_shown_in_footer_when_has_configuration(self, m):
+        ok_config = OpenKlantConfig.get_solo()
+        self.assertFalse(ok_config.has_form_configuration())
+
+        ContactFormSubjectFactory(config=ok_config)
+
+        ok_config.register_email = "example@example.com"
+        ok_config.save()
+
+        self.assertTrue(ok_config.has_form_configuration())
+
+        cms_tools.create_homepage()
+
+        response = self.app.get(reverse("pages-root"))
+        links = response.pyquery(".footer__list-item")
+
+        self.assertIn(_("Contact formulier"), links[0].text_content())
 
     def test_anon_form_requires_either_email_or_phonenumber(self, m):
         config = OpenKlantConfig.get_solo()
