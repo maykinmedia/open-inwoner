@@ -14,7 +14,7 @@ def contact_form(form_object, **kwargs):
         {% contact_form form_object %}
 
     Variables:
-        + form_object: Form | the form that need to be rendered.
+        + form_object: Form | the form that needs to be rendered.
     """
     config = OpenKlantConfig.get_solo()
     return {

@@ -12,6 +12,7 @@ class ContactForm(Form):
         label=_("Onderwerp"),
         required=True,
         queryset=ContactFormSubject.objects.none(),
+        empty_label=_("Selecteren"),
     )
     first_name = forms.CharField(
         label=_("Voornaam"),

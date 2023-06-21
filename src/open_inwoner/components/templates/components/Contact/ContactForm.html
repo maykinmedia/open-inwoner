@@ -1,9 +1,35 @@
-{% load i18n form_tags %}
+{% load i18n form_tags grid_tags %}
 
-<div class="contactform__content">
-    {% if has_form_configuration %}
-        {% form form_object=form_object method="POST" id="contactmoment-form" submit_text=_('Verzenden') %}
-    {% else %}
-        <p class="p">{% trans "Contact formulier niet geconfigureerd." %}</p>
-    {% endif %}
-</div>
+{% render_grid %}
+    {% render_column start=1 span=6 %}
+        <div class="contactform__content">
+        {% if has_form_configuration %}
+
+            {% render_form form=form_object method="POST" id="contactmoment-form" show_required=True submit_text=_('Verzenden') %}
+                {% csrf_token %}
+                {% input form_object.subject icon="expand_more" icon_position="after" icon_outlined=True %}
+                {% if form_object.first_name %}
+                    {% input form_object.first_name %}
+                {% endif %}
+                {% if form_object.infix %}
+                    {% input form_object.infix %}
+                {% endif %}
+                {% if form_object.last_name %}
+                    {% input form_object.last_name %}
+                {% endif %}
+                {% if form_object.email %}
+                    {% input form_object.email %}
+                {% endif %}
+                {% if form_object.phonenumber %}
+                    {% input form_object.phonenumber %}
+                {% endif %}
+                {% input form_object.question %}
+                {% form_actions primary_text=_("Verzenden") primary_icon="arrow_forward" %}
+            {% endrender_form %}
+
+        {% else %}
+            <p class="p">{% trans "Contact formulier niet geconfigureerd." %}</p>
+        {% endif %}
+        </div>
+    {% endrender_column %}
+{% endrender_grid %}
