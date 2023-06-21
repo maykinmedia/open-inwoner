@@ -734,8 +734,6 @@ ES_INDEX_PRODUCTS = config("ES_INDEX_PRODUCTS", "products")
 ES_MAX_SIZE = 10000
 ES_SUGGEST_SIZE = 5
 
-# Delete user after x days of inactivity
-DELETE_USER_AFTER_X_DAYS_INACTIVE = 14
 
 # django import-export
 IMPORT_EXPORT_USE_TRANSACTIONS = True

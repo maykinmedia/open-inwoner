@@ -205,9 +205,9 @@ class TestProfile(WebTest):
             },
         )
 
-    def test_users_deactivation_is_logged(self):
+    def test_users_deletion_is_logged(self):
         form = self.app.get(reverse("profile:detail"), user=self.user).forms[
-            "deactivate-form"
+            "delete-form"
         ]
         form.submit()
         log_entry = TimelineLog.objects.last()
@@ -218,7 +218,7 @@ class TestProfile(WebTest):
         self.assertEqual(
             log_entry.extra_data,
             {
-                "message": _("user was deactivated via frontend"),
+                "message": _("user was deleted via frontend"),
                 "action_flag": list(LOG_ACTIONS[4]),
                 "content_object_repr": self.user.email,
             },

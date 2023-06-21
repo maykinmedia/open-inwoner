@@ -3,6 +3,7 @@ from datetime import date, datetime
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q
 from django.forms.forms import Form
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
@@ -108,25 +109,25 @@ class MyProfileView(
         if request.user.is_authenticated and not request.user.is_staff:
             instance = User.objects.get(id=request.user.id)
 
-            # check if there are still plans associated witht the user
-            if Plan.objects.filter(created_by=instance).exists():
+            # check if there are still plans created by or associated witht the user
+            if Plan.objects.connected(instance):
                 messages.warning(
                     request,
                     _(
-                        "You still have plans associated with your profile. "
-                        "Please delete those plans before deleting your profile."
+                        "Your profile could not be deleted because you still "
+                        "have plans associated with it."
                     ),
                 )
                 return redirect("profile:detail")
 
             # continue with delete
-            self.log_user_action(instance, _("user was deactivated via frontend"))
+            self.log_user_action(instance, _("user was deleted via frontend"))
             instance.delete()
             request.session.flush()
 
             return redirect(reverse("logout"))
         else:
-            messages.warning(request, _("Uw account kon niet worden gedeactiveerd"))
+            messages.warning(request, _("Uw account kon niet worden verwijderd"))
             return redirect("profile:detail")
 
 

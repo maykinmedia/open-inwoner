@@ -532,10 +532,9 @@ class ProfileDeleteTest(WebTest):
 
         # get profile page
         response = self.app.get(self.url, user=user)
-        self.assertEqual(response.status_code, 200)
 
         # check delete
-        response = response.forms["deactivate-form"].submit()
+        response = response.forms["delete-form"].submit()
         self.assertIsNone(User.objects.first())
 
         # check redirect
@@ -552,10 +551,9 @@ class ProfileDeleteTest(WebTest):
 
         # get profile page
         response = self.app.get(self.url, user=user)
-        self.assertEqual(response.status_code, 200)
 
         # check user deleted
-        response = response.forms["deactivate-form"].submit()
+        response = response.forms["delete-form"].submit()
         self.assertIsNone(User.objects.first())
 
         # check redirect
@@ -567,16 +565,15 @@ class ProfileDeleteTest(WebTest):
             fetch_redirect_response=True,
         )
 
-    def test_delete_regular_with_existing_plans_fail(self):
+    def test_delete_regular_user_as_plan_contact_fail(self):
         user = UserFactory()
-        PlanFactory.create(created_by=user)
+        PlanFactory.create(plan_contacts=[user])
 
         # get profile page
         response = self.app.get(self.url, user=user)
-        self.assertEqual(response.status_code, 200)
 
         # check user not deleted
-        response = response.forms["deactivate-form"].submit()
+        response = response.forms["delete-form"].submit()
         self.assertEqual(User.objects.first(), user)
 
         # check redirect
@@ -593,10 +590,9 @@ class ProfileDeleteTest(WebTest):
 
         # get profile page
         response = self.app.get(self.url, user=user)
-        self.assertEqual(response.status_code, 200)
 
         # check staff user not deleted
-        response = response.forms["deactivate-form"].submit()
+        response = response.forms["delete-form"].submit()
         self.assertEqual(User.objects.first(), user)
 
         # check redirect

@@ -144,7 +144,11 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name=_("Deactivated on"),
         null=True,
         blank=True,
-        help_text=_("This is the date the user decided to deactivate their account."),
+        help_text=_(
+            "This is the date the user decided to deactivate their account. "
+            "This field is deprecated since user profiles are now immediately "
+            "deleted."
+        ),
     )
     is_prepopulated = models.BooleanField(
         verbose_name=_("Prepopulated"),
