@@ -4,5 +4,11 @@ from .cases import (
     OuterClosedCaseListView,
     OuterOpenCaseListView,
 )
-from .status import CaseDocumentDownloadView, InnerCaseDetailView, OuterCaseDetailView
+from .status import (
+    CaseContactFormView,
+    CaseDocumentDownloadView,
+    CaseDocumentUploadFormView,
+    InnerCaseDetailView,
+    OuterCaseDetailView,
+)
 from .submissions import InnerOpenSubmissionListView, OuterOpenSubmissionListView

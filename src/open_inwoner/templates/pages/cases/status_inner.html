@@ -1,4 +1,4 @@
-{% load i18n anchor_menu_tags card_tags dashboard_tags file_tags grid_tags status_tags table_tags solo_tags form_tags button_tags icon_tags notification_tags %}
+{% load i18n anchor_menu_tags card_tags dashboard_tags file_tags grid_tags status_tags table_tags solo_tags button_tags icon_tags notification_tags %}
 
 {# Anchor menu-mobile #}
 <div id="cases-status-anchors-oob-mobile" hx-swap-oob="true">
@@ -49,43 +49,10 @@
                         {% endblocktranslate %}
                     </p>
                 {% endif %}
-
+                
+                {#  Upload document form. #}
                 <section id="form_upload" class="form__open-upload">
-                    <div class="upload-interface">
-                    {#  if local upload is enabled #}
-                    {% render_form id="document-upload" form=form method="POST" hxencoding="multipart/form-data" hxpost=hxpost hxtarget="#cases-detail-content" submit_text=_("Bestand uploaden") show_required=True %}
-                        {% csrf_token %}
-                        <div id="info_container" class="info-container form__control__info">
-                            <div class="upload-interface__info">
-                                <fieldset class="fieldset-container">
-                                    <div class="drive">{% icon icon="insert_drive_file" outlined=True icon_position="before" %}</div>
-                                    <div class="fieldset__content">
-                                        <div id="upload_error" class="upload-info upload-info__error">
-                                            <span>{% trans "Selecteer uw bestand opnieuw" %} {% icon icon="arrow_downward" outlined=True icon_position="before" %}</span></div>
-                                        <div id="upload_name" class="upload-info upload-info__name"></div>
-                                        <div id="upload_size" class="upload-info upload-info__size"></div>
-                                    </div>
-                                    <div class="close">{% button id="close_upload" icon="cancel" type='reset' text='' transparent=True icon_outlined=True icon_position="before" %}</div>
-                                </fieldset>
-                            </div>
-                        </div>
-
-                        <div class="form__control__info">{% input form.title no_label=False no_help=True id="id_title" %}</div>
-
-                        <div class="form__control__info">{% input form.type no_label=False no_help=True icon="expand_more" icon_position="after" class="label input" id="id_type" extra_classes="file-type__select" %}</div>
-
-                        <div class="form__control upload">
-                            <div class="upload__container">
-                                {% file_input form.file text=_("Document selecteren") no_label=False no_help=True extra_classes="file-upload" %}
-                                <div class="form__submit">
-                                    {% button_row %}
-                                        {% button type="submit" text=_("Document uploaden") id="submit_upload" primary=True %}
-                                    {% endbutton_row %}
-                                </div>
-                            </div>
-                        </div>
-                    {% endrender_form %}
-                    </div>
+                    {% include 'pages/cases/document_form.html' %}
                 </section>
 
             {% elif case.external_upload_enabled %}
@@ -98,8 +65,16 @@
                 {% button_row %}
                     {% button href=case.external_upload_url text=_("Document uploaden") title=_("Opens new window") primary=True icon="open_in_new" icon_position="after" %}
                 {% endbutton_row %}
-            {% endif %}
+            {% endif %}            
 
+            {#  Contact moment form #}
+            {% if case.contact_moments_enabled %}
+                <section id="cases-contact-form" class="form_contact">
+                    <div id="cases-contact-form-content">
+                        {% include 'pages/cases/contact_form.html' %}
+                    </div>
+                </section>
+            {% endif %}
 
         {% endrender_column %}
     {% endrender_grid %}

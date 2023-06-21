@@ -4,17 +4,25 @@ from typing import List
 
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
-from django.http import Http404, HttpResponseRedirect, StreamingHttpResponse
-from django.urls import reverse
+from django.http import Http404, StreamingHttpResponse
+from django.shortcuts import redirect
+from django.urls import reverse, reverse_lazy
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import FormView, TemplateView
 
+from django_htmx.http import HttpResponseClientRedirect
 from glom import glom
 from view_breadcrumbs import BaseBreadcrumbMixin
 from zgw_consumers.api_models.constants import RolOmschrijving
 
+from open_inwoner.openklant.models import OpenKlantConfig
+from open_inwoner.openklant.wrap import (
+    create_contactmoment,
+    create_klant,
+    fetch_klant_for_bsn,
+)
 from open_inwoner.openzaak.api_models import Zaak
 from open_inwoner.openzaak.cases import (
     connect_case_with_document,
@@ -43,7 +51,7 @@ from open_inwoner.openzaak.utils import (
 )
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
-from ..forms import CaseUploadForm
+from ..forms import CaseContactForm, CaseUploadForm
 from .mixins import CaseAccessMixin, CaseLogMixin, OuterCaseAccessMixin
 
 
@@ -81,6 +89,7 @@ class InnerCaseDetailView(
 ):
     template_name = "pages/cases/status_inner.html"
     form_class = CaseUploadForm
+    contact_form_class = CaseContactForm
 
     @cached_property
     def crumbs(self):
@@ -128,6 +137,7 @@ class InnerCaseDetailView(
                     status.statustype = status_type
 
             context["case"] = {
+                "id": str(self.case.uuid),
                 "identification": format_zaak_identificatie(
                     self.case.identificatie, config
                 ),
@@ -151,7 +161,13 @@ class InnerCaseDetailView(
             }
             context["case"].update(self.get_upload_info_context(self.case))
             context["anchors"] = self.get_anchors(statuses, documents)
-            context["hxpost"] = reverse("cases:case_detail_content", kwargs=self.kwargs)
+            context["contact_form"] = self.contact_form_class()
+            context["hxpost_contact_form"] = reverse(
+                "cases:case_detail_contact_form", kwargs=self.kwargs
+            )
+            context["hxpost_document_form"] = reverse(
+                "cases:case_detail_document_form", kwargs=self.kwargs
+            )
         else:
             context["case"] = None
         return context
@@ -159,6 +175,8 @@ class InnerCaseDetailView(
     def get_upload_info_context(self, case: Zaak):
         if not case:
             return {}
+
+        open_klant_config = OpenKlantConfig.get_solo()
 
         internal_upload_enabled = (
             ZaakTypeInformatieObjectTypeConfig.objects.filter_enabled_for_case_type(
@@ -169,6 +187,7 @@ class InnerCaseDetailView(
         case_type_config_description = ""
         external_upload_enabled = False
         external_upload_url = ""
+        contact_moments_enabled = False
 
         try:
             ztc = ZaakTypeConfig.objects.filter_case_type(case.zaaktype).get()
@@ -176,6 +195,7 @@ class InnerCaseDetailView(
             pass
         else:
             case_type_config_description = ztc.description
+            contact_moments_enabled = ztc.contact_moments_enabled
             if ztc.document_upload_enabled and ztc.external_document_upload_url != "":
                 external_upload_url = ztc.external_document_upload_url
                 external_upload_enabled = True
@@ -185,6 +205,9 @@ class InnerCaseDetailView(
             "internal_upload_enabled": internal_upload_enabled,
             "external_upload_enabled": external_upload_enabled,
             "external_upload_url": external_upload_url,
+            "contact_moments_enabled": (
+                contact_moments_enabled and open_klant_config.has_api_configuration()
+            ),
         }
 
     def get_result_display(self, case: Zaak) -> str:
@@ -246,64 +269,6 @@ class InnerCaseDetailView(
         kwargs["case"] = self.case
         return kwargs
 
-    def handle_document_upload(self, request, form):
-        cleaned_data = form.cleaned_data
-
-        file = cleaned_data["file"]
-        title = cleaned_data["title"]
-        document_type = cleaned_data["type"]
-        source_organization = self.case.bronorganisatie
-
-        created_document = upload_document(
-            request.user,
-            file,
-            title,
-            document_type.informatieobjecttype_url,
-            source_organization,
-        )
-        if created_document:
-            created_relationship = connect_case_with_document(
-                self.case.url, created_document["url"]
-            )
-            if created_relationship:
-                self.log_user_action(
-                    request.user,
-                    _("Document was uploaded for {case}: {filename}").format(
-                        case=self.case.identificatie,
-                        filename=file.name,
-                    ),
-                )
-                messages.add_message(
-                    request,
-                    messages.SUCCESS,
-                    _("{filename} has been successfully uploaded").format(
-                        filename=file.name
-                    ),
-                )
-                return HttpResponseRedirect(self.get_success_url())
-
-        # fail uploading the document or connecting it to the zaak
-        messages.add_message(
-            request,
-            messages.ERROR,
-            _("An error occured while uploading file {filename}").format(
-                filename=file.name
-            ),
-        )
-        return self.form_invalid(form)
-
-    def get_success_url(self) -> str:
-        return self.request.get_full_path()
-
-    def post(self, request, *args, **kwargs):
-        form_class = self.get_form_class()
-        form = self.get_form(form_class)
-
-        if form.is_valid():
-            return self.handle_document_upload(request, form)
-        else:
-            return self.form_invalid(form)
-
     def get_anchors(self, statuses, documents):
         anchors = [["#title", _("Gegevens")]]
 
@@ -361,3 +326,174 @@ class CaseDocumentDownloadView(LogMixin, CaseAccessMixin, View):
     def handle_no_permission(self):
         # plain error and no redirect
         raise PermissionDenied()
+
+
+class CaseDocumentUploadFormView(CaseAccessMixin, CaseLogMixin, FormView):
+    template_name = "pages/cases/document_form.html"
+    form_class = CaseUploadForm
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+
+        if form.is_valid():
+            return self.handle_document_upload(request, form)
+        return self.form_invalid(form)
+
+    def handle_document_upload(self, request, form):
+        cleaned_data = form.cleaned_data
+
+        file = cleaned_data["file"]
+        title = cleaned_data["title"]
+        document_type = cleaned_data["type"]
+        source_organization = self.case.bronorganisatie
+
+        created_document = upload_document(
+            request.user,
+            file,
+            title,
+            document_type.informatieobjecttype_url,
+            source_organization,
+        )
+        if created_document:
+            created_relationship = connect_case_with_document(
+                self.case.url, created_document["url"]
+            )
+            if created_relationship:
+                self.log_user_action(
+                    request.user,
+                    _("Document was uploaded for {case}: {filename}").format(
+                        case=self.case.identificatie,
+                        filename=file.name,
+                    ),
+                )
+                messages.add_message(
+                    request,
+                    messages.SUCCESS,
+                    _("{filename} has been successfully uploaded").format(
+                        filename=file.name
+                    ),
+                )
+
+                return HttpResponseClientRedirect(
+                    reverse(
+                        "cases:case_detail", kwargs={"object_id": str(self.case.uuid)}
+                    )
+                )
+
+        # fail uploading the document or connecting it to the zaak
+        messages.add_message(
+            request,
+            messages.ERROR,
+            _("An error occured while uploading file {filename}").format(
+                filename=file.name
+            ),
+        )
+
+        return HttpResponseClientRedirect(
+            reverse("cases:case_detail", kwargs={"object_id": str(self.case.uuid)})
+        )
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["case"] = self.case
+        return kwargs
+
+    def get_success_url(self):
+        return reverse(
+            "cases:case_detail_document_form", kwargs={"object_id": str(self.case.uuid)}
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["hxpost_document_form"] = reverse(
+            "cases:case_detail_document_form", kwargs=self.kwargs
+        )
+        return context
+
+
+class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
+    template_name = "pages/cases/contact_form.html"
+    form_class = CaseContactForm
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            form.cleaned_data[
+                "contact_moment"
+            ] += f"\n\nCase number: {self.case.identificatie}"
+            return self.register_by_api(form)
+        else:
+            return self.form_invalid(form)
+
+    def get_success_url(self):
+        return reverse(
+            "cases:case_detail_contact_form", kwargs={"object_id": str(self.case.uuid)}
+        )
+
+    def register_by_api(self, form):
+        config = OpenKlantConfig.get_solo()
+        assert config.has_api_configuration()
+
+        klant = fetch_klant_for_bsn(self.request.user.bsn)
+        if klant:
+            self.log_system_action(
+                "retrieved klant for BSN-user", user=self.request.user
+            )
+        else:
+            self.log_system_action(
+                "could not retrieve klant for BSN-user", user=self.request.user
+            )
+            data = {
+                "bronorganisatie": config.register_bronorganisatie_rsin,
+                "voornaam": self.request.user.first_name,
+                "voorvoegselAchternaam": self.request.user.infix,
+                "achternaam": self.request.user.last_name,
+                "emailadres": self.request.user.email,
+                "telefoonnummer": self.request.user.phonenumber,
+            }
+            # registering klanten won't work in e-Suite as it always pulls from BRP (but try anyway and fallback to appending details to tekst if fails)
+            klant = create_klant(data)
+            if klant:
+                self.log_system_action(
+                    "created klant for basic authenticated user",
+                    user=self.request.user,
+                )
+            else:
+                self.log_system_action(
+                    "could not create klant for BSN-user", user=self.request.user
+                )
+
+        # create contact moment
+        contact_moment = form.cleaned_data["contact_moment"]
+        data = {
+            "bronorganisatie": config.register_bronorganisatie_rsin,
+            "tekst": contact_moment,
+            "type": config.register_type,
+            "kanaal": "Internet",
+            "medewerkerIdentificatie": {
+                "identificatie": config.register_employee_id,
+            },
+        }
+
+        contactmoment = create_contactmoment(data, klant=klant)
+
+        if contactmoment:
+            messages.add_message(self.request, messages.SUCCESS, _("Vraag verstuurd!"))
+            self.log_system_action(f"registered contactmoment by API")
+        else:
+            messages.add_message(
+                self.request, messages.ERROR, _("Probleem bij versturen van de vraag.")
+            )
+            self.log_system_action(f"error while registering contactmoment by API")
+
+        return HttpResponseClientRedirect(
+            reverse("cases:case_detail", kwargs={"object_id": str(self.case.uuid)})
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["contact_form"] = self.get_form()
+        context["hxpost_contact_form"] = reverse(
+            "cases:case_detail_contact_form", kwargs=self.kwargs
+        )
+        return context

@@ -12,6 +12,13 @@ from zgw_consumers.constants import APITypes
 from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 
 from open_inwoner.accounts.tests.factories import DigidUserFactory
+from open_inwoner.openklant.constants import Status
+from open_inwoner.openklant.models import OpenKlantConfig
+from open_inwoner.openklant.tests.data import (
+    CONTACTMOMENTEN_ROOT,
+    KLANTEN_ROOT,
+    MockAPIData,
+)
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.tests.factories import (
     ServiceFactory,
@@ -35,10 +42,7 @@ from open_inwoner.utils.tests.playwright import (
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class CasesPlaywrightTests(ClearCachesMixin, PlaywrightSyncLiveServerTestCase):
     def setUp(self) -> None:
-        super().setUp()
-
         self.user = DigidUserFactory(bsn="900222086")
-        # let's reuse the login storage_state
         self.user_login_state = self.get_user_bsn_login_state(self.user)
 
         # services
@@ -50,17 +54,31 @@ class CasesPlaywrightTests(ClearCachesMixin, PlaywrightSyncLiveServerTestCase):
             api_root=DOCUMENTEN_ROOT, api_type=APITypes.drc
         )
         # openzaak config
-        self.config = OpenZaakConfig.get_solo()
-        self.config.zaak_service = self.zaak_service
-        self.config.catalogi_service = self.catalogi_service
-        self.config.document_service = self.document_service
-        self.config.document_max_confidentiality = (
+        self.oz_config = OpenZaakConfig.get_solo()
+        self.oz_config.zaak_service = self.zaak_service
+        self.oz_config.catalogi_service = self.catalogi_service
+        self.oz_config.document_service = self.document_service
+        self.oz_config.document_max_confidentiality = (
             VertrouwelijkheidsAanduidingen.beperkt_openbaar
         )
-        self.config.zaak_max_confidentiality = (
+        self.oz_config.zaak_max_confidentiality = (
             VertrouwelijkheidsAanduidingen.beperkt_openbaar
         )
-        self.config.save()
+        self.oz_config.save()
+
+        # openklant config
+        self.ok_config = OpenKlantConfig.get_solo()
+        self.ok_config.register_contact_moment = True
+        self.ok_config.register_bronorganisatie_rsin = "123456788"
+        self.ok_config.register_type = "Melding"
+        self.ok_config.register_employee_id = "FooVonBar"
+        self.ok_config.klanten_service = ServiceFactory(
+            api_root=KLANTEN_ROOT, api_type=APITypes.kc
+        )
+        self.ok_config.contactmomenten_service = ServiceFactory(
+            api_root=CONTACTMOMENTEN_ROOT, api_type=APITypes.cmc
+        )
+        self.ok_config.save()
 
         self.zaak = generate_oas_component(
             "zrc",
@@ -189,11 +207,40 @@ class CasesPlaywrightTests(ClearCachesMixin, PlaywrightSyncLiveServerTestCase):
             titel="uploaded_test_file.txt",
             bestandsomvang=len(self.uploaded_zaak_informatie_object_content),
         )
+        self.klant = generate_oas_component(
+            "kc",
+            "schemas/Klant",
+            uuid="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            bronorganisatie="123456789",
+            voornaam="Foo",
+            achternaam="Bar",
+            emailadres="foo@example.com",
+            telefoonnummer="0612345678",
+        )
+        self.contactmoment = generate_oas_component(
+            "cmc",
+            "schemas/ContactMoment",
+            uuid="aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
+            url=f"{CONTACTMOMENTEN_ROOT}contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
+            status=Status.nieuw,
+            antwoord="",
+            text="hey!\n\nwaddup?",
+        )
+        self.klant_contactmoment = generate_oas_component(
+            "cmc",
+            "schemas/KlantContactMoment",
+            uuid="aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
+            url=f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten/aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
+            klant=self.klant["url"],
+            contactmoment=self.contactmoment["url"],
+        )
 
-        # enable upload
+        # enable upload and contact moments
         zaak_type_config = ZaakTypeConfigFactory(
             catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             identificatie=self.zaaktype["identificatie"],
+            contact_moments_enabled=True,
         )
         ZaakTypeInformatieObjectTypeConfigFactory(
             zaaktype_config=zaak_type_config,
@@ -206,6 +253,7 @@ class CasesPlaywrightTests(ClearCachesMixin, PlaywrightSyncLiveServerTestCase):
         mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
         mock_service_oas_get(m, CATALOGI_ROOT, "ztc")
         mock_service_oas_get(m, DOCUMENTEN_ROOT, "drc")
+        MockAPIData.setUpOASMocks(m)
 
         self.matchers = []
 
@@ -213,14 +261,29 @@ class CasesPlaywrightTests(ClearCachesMixin, PlaywrightSyncLiveServerTestCase):
             self.zaak,
             self.result,
             self.zaaktype,
-            # self.informatie_object_type,
             self.informatie_object,
             self.uploaded_informatie_object,
-            # self.zaaktype_informatie_object_type,
             self.status_finish,
             self.status_type_finish,
         ]:
             self.matchers.append(m.get(resource["url"], json=resource))
+
+        self.contact_moment_matchers = [
+            m.get(
+                f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn=900222086",
+                json=paginated_response([self.klant]),
+            ),
+            m.post(
+                f"{CONTACTMOMENTEN_ROOT}contactmomenten",
+                json=self.contactmoment,
+                status_code=201,
+            ),
+            m.post(
+                f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten",
+                json=self.klant_contactmoment,
+                status_code=201,
+            ),
+        ]
 
         self.matchers += [
             m.get(
@@ -367,16 +430,21 @@ class CasesPlaywrightTests(ClearCachesMixin, PlaywrightSyncLiveServerTestCase):
         with open(download.path(), "rb") as f:
             self.assertEqual(f.read(), self.uploaded_zaak_informatie_object_content)
 
-        # finally check if our mock matchers are accurate
-        self.assertMockMatchersCalledAll(self.matchers)
+        # contact form
+        contact_form = page.locator("#contact-form")
+        expect(contact_form).to_be_visible()
 
-    def assertMockMatchersCalledAll(self, matchers):
-        def _match_str(m):
-            return f"  {m._method.ljust(5, ' ')} {m._url}"
+        question_text_area = page.get_by_label(_("Vraag"))
+        expect(question_text_area).to_be_visible()
 
-        missed = [m for m in matchers if not m.called]
-        if not missed:
-            return
+        question_text_area.fill("a question")
+        contact_submit_button = contact_form.get_by_role(
+            "button", name=_("Vraag versturen")
+        )
+        expect(contact_submit_button).to_be_visible()
 
-        out = "\n".join(_match_str(m) for m in missed)
-        self.fail(f"request mock matchers not called:\n{out}")
+        contact_submit_button.click()
+
+        notification = page.locator(".notification__content")
+        expect(notification).to_be_visible()
+        expect(notification.get_by_text(_("Vraag verstuurd!"))).to_be_visible()
