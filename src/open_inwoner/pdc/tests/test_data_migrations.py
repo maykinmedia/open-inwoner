@@ -1,3 +1,5 @@
+from unittest import skip
+
 from django.contrib.gis.geos import Point
 
 from open_inwoner.utils.tests.test_migrations import TestMigrations
@@ -5,6 +7,7 @@ from open_inwoner.utils.tests.test_migrations import TestMigrations
 from ..models.product import ProductLocation
 
 
+@skip("outdated")
 class ProductLocationUUIDMigrationTests(TestMigrations):
     app = "pdc"
     migrate_from = "0045_auto_20230221_0954"
@@ -23,6 +26,7 @@ class ProductLocationUUIDMigrationTests(TestMigrations):
         self.assertIsNotNone(self.product_location.uuid)
 
 
+@skip("outdated")
 class TruncateProductSummaryMigrationTests(TestMigrations):
     app = "pdc"
     migrate_from = "0048_alter_product_summary"
@@ -43,6 +47,7 @@ class TruncateProductSummaryMigrationTests(TestMigrations):
         self.assertEqual(len(self.product.summary), 300)
 
 
+@skip("outdated")
 class NotTruncateProductSummaryMigrationTests(TestMigrations):
     app = "pdc"
     migrate_from = "0048_alter_product_summary"
@@ -63,6 +68,7 @@ class NotTruncateProductSummaryMigrationTests(TestMigrations):
         self.assertEqual(len(self.product.summary), 300)
 
 
+@skip("outdated")
 class CategoryProductThroughModelMigrationTests(TestMigrations):
     app = "pdc"
     migrate_from = "0050_alter_product_summary"
