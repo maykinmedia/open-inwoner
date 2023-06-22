@@ -102,10 +102,7 @@ class InnerCaseDetailView(
         ]
 
     def page_title(self):
-        if self.case:
-            return _("Status van {case}").format(case=self.case.omschrijving)
-        else:
-            return _("Status")
+        return _("Status")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
