@@ -2,16 +2,17 @@ from django import forms
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
+from ordered_model.admin import OrderedInlineModelAdminMixin, OrderedTabularInline
 from solo.admin import SingletonModelAdmin
 
 from .models import ContactFormSubject, OpenKlantConfig
 
 
-class ContactFormSubjectInlineAdmin(admin.TabularInline):
+class ContactFormSubjectInlineAdmin(OrderedTabularInline):
     model = ContactFormSubject
-    fields = [
-        "subject",
-    ]
+    fields = ("subject", "order", "move_up_down_links")
+    readonly_fields = ("order", "move_up_down_links")
+    ordering = ("order",)
     extra = 0
 
 
@@ -33,7 +34,7 @@ class OpenKlantConfigAdminForm(forms.ModelForm):
 
 
 @admin.register(OpenKlantConfig)
-class OpenKlantConfigAdmin(SingletonModelAdmin):
+class OpenKlantConfigAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
     form = OpenKlantConfigAdminForm
     inlines = [
         ContactFormSubjectInlineAdmin,

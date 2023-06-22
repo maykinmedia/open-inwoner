@@ -53,9 +53,7 @@ class ContactForm(Form):
         self.user = user
 
         config = OpenKlantConfig.get_solo()
-        self.fields["subject"].queryset = config.contactformsubject_set.order_by(
-            "subject"
-        )
+        self.fields["subject"].queryset = config.contactformsubject_set.all()
 
         if self.user.is_authenticated:
             del self.fields["first_name"]

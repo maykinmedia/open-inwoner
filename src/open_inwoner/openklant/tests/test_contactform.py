@@ -165,6 +165,42 @@ class ContactFormTestCase(
 
         response = form.submit(status=302)
 
+    def test_expected_ordered_subjects_are_shown(self, m):
+        config = OpenKlantConfig.get_solo()
+        config.register_email = "example@example.com"
+        config.save()
+        subject_1 = ContactFormSubjectFactory(config=config)
+        subject_2 = ContactFormSubjectFactory(config=config)
+
+        response = self.app.get(self.url)
+        form = response.forms["contactmoment-form"]
+        sub_options = form["subject"].options
+
+        self.assertEqual(
+            sub_options,
+            [
+                ("", True, "---------"),
+                (str(subject_1.pk), False, subject_1.subject),
+                (str(subject_2.pk), False, subject_2.subject),
+            ],
+        )
+
+        # swap positions and test the updated order
+        subject_1.swap(subject_2)
+
+        response = self.app.get(self.url)
+        form = response.forms["contactmoment-form"]
+        sub_options = form["subject"].options
+
+        self.assertEqual(
+            sub_options,
+            [
+                ("", True, "---------"),
+                (str(subject_2.pk), False, subject_2.subject),
+                (str(subject_1.pk), False, subject_1.subject),
+            ],
+        )
+
     def test_submit_and_register_via_email(self, m):
         config = OpenKlantConfig.get_solo()
         config.register_email = "example@example.com"
