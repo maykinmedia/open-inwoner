@@ -23,6 +23,7 @@ jobs:
         image: postgis/postgis:10-2.5
         env:
           POSTGRES_HOST_AUTH_METHOD: trust
+          POSTGRES_INITDB_ARGS: --no-sync
         ports:
           - 5432:5432
         # needed because the postgres container does not provide a healthcheck
@@ -38,8 +39,8 @@ jobs:
           - 9300:9300
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
         with:
           python-version: '3.9'
       - uses: actions/setup-node@v2-beta
@@ -70,7 +71,10 @@ jobs:
       - name: Run tests
         run: |
           python src/manage.py collectstatic --noinput --link
-          coverage run --concurrency=multiprocessing src/manage.py test src \
+          coverage run \
+            --concurrency=multiprocessing \
+            --parallel-mode \
+            src/manage.py test src \
             --parallel \
             --exclude-tag no-parallel
           coverage run src/manage.py test src --tag no-parallel
@@ -84,7 +88,7 @@ jobs:
           DB_PASSWORD: ''
 
       - name: Publish coverage report
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
