@@ -5,7 +5,6 @@ from django.views.generic import FormView
 
 from mail_editor.helpers import find_template
 from view_breadcrumbs import BaseBreadcrumbMixin
-from zds_client import ClientError
 
 from open_inwoner.openklant.forms import ContactForm
 from open_inwoner.openklant.models import OpenKlantConfig
@@ -21,9 +20,6 @@ from open_inwoner.utils.views import CommonPageMixin, LogMixin
 class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
     form_class = ContactForm
     template_name = "pages/contactform/form.html"
-
-    message_success = _("Vraag verstuurd!")
-    message_failure = _("Probleem bij versturen van de vraag.")
 
     @cached_property
     def crumbs(self):
@@ -60,12 +56,29 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
         context["has_configuration"] = config.has_form_configuration()
         return context
 
+    def get_result_message(self, success=False):
+        if success:
+            return messages.add_message(
+                self.request, messages.SUCCESS, _("Vraag verstuurd!")
+            )
+        else:
+            return messages.add_message(
+                self.request,
+                messages.ERROR,
+                _("Probleem bij versturen van de vraag."),
+            )
+
     def form_valid(self, form):
         config = OpenKlantConfig.get_solo()
+
+        success = True
         if config.register_email:
-            self.register_by_email(form, config.register_email)
+            success = self.register_by_email(form, config.register_email) and success
         if config.register_contact_moment:
-            self.register_by_api(form, config)
+            success = self.register_by_api(form, config) and success
+
+        self.get_result_message(success=success)
+
         return super().form_valid(form)
 
     def register_by_email(self, form, recipient_email):
@@ -87,16 +100,16 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
         success = template.send_email([recipient_email], context)
 
         if success:
-            messages.add_message(self.request, messages.SUCCESS, self.message_success)
             self.log_system_action(
                 "registered contactmoment by email", user=self.request.user
             )
+            return True
         else:
-            messages.add_message(self.request, messages.ERROR, self.message_failure)
             self.log_system_action(
                 "error while registering contactmoment by email",
                 user=self.request.user,
             )
+            return False
 
     def register_by_api(self, form, config: OpenKlantConfig):
         assert config.has_api_configuration()
@@ -180,12 +193,12 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
         contactmoment = create_contactmoment(data, klant=klant)
 
         if contactmoment:
-            messages.add_message(self.request, messages.SUCCESS, self.message_success)
             self.log_system_action(
                 "registered contactmoment by API", user=self.request.user
             )
+            return True
         else:
-            messages.add_message(self.request, messages.ERROR, self.message_failure)
             self.log_system_action(
                 "error while registering contactmoment by API", user=self.request.user
             )
+            return False
