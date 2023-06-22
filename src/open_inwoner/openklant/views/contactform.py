@@ -61,39 +61,23 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
             return messages.add_message(
                 self.request, messages.SUCCESS, _("Vraag verstuurd!")
             )
-        return messages.add_message(
-            self.request,
-            messages.ERROR,
-            _("Probleem bij versturen van de vraag."),
-        )
+        else:
+            return messages.add_message(
+                self.request,
+                messages.ERROR,
+                _("Probleem bij versturen van de vraag."),
+            )
 
     def form_valid(self, form):
         config = OpenKlantConfig.get_solo()
+
+        success = True
         if config.register_email:
-            registered_by_email = self.register_by_email(form, config.register_email)
+            success = self.register_by_email(form, config.register_email) and success
         if config.register_contact_moment:
-            registered_by_api = self.register_by_api(form, config)
+            success = self.register_by_api(form, config) and success
 
-        # email setup
-        if config.register_email and not config.register_contact_moment:
-            if registered_by_email:
-                self.get_result_message(success=True)
-            else:
-                self.get_result_message(success=False)
-
-        # api setup
-        elif config.register_contact_moment and not config.register_email:
-            if registered_by_api:
-                self.get_result_message(success=True)
-            else:
-                self.get_result_message(success=False)
-
-        # both
-        elif config.register_email and config.register_contact_moment:
-            if registered_by_email and registered_by_api:
-                self.get_result_message(success=True)
-            else:
-                self.get_result_message(success=False)
+        self.get_result_message(success=success)
 
         return super().form_valid(form)
 
