@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import TestCase, tag
 
 from open_inwoner.pdc.tests.factories import ProductFactory
 
@@ -7,6 +7,7 @@ from ..searches import search_products
 from .utils import ESMixin
 
 
+@tag("no-parallel")
 class SearchBoostTests(ESMixin, TestCase):
     def setUp(self):
         super().setUp()

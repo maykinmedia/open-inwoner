@@ -70,7 +70,13 @@ jobs:
       - name: Run tests
         run: |
           python src/manage.py collectstatic --noinput --link
-          coverage run src/manage.py test src
+          coverage run --concurrency=multiprocessing src/manage.py test src \
+            --parallel \
+            --exclude-tag no-parallel
+          coverage run src/manage.py test src --tag no-parallel
+          coverage combine
+          coverage report
+
         env:
           DJANGO_SETTINGS_MODULE: open_inwoner.conf.ci
           SECRET_KEY: dummy
