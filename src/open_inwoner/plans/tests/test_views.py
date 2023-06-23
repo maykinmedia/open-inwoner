@@ -1,9 +1,8 @@
 from datetime import date
-from unittest import skip
 
 from django.contrib.messages import get_messages
 from django.core import mail
-from django.test import override_settings
+from django.test import override_settings, tag
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
@@ -19,12 +18,9 @@ from open_inwoner.accounts.tests.factories import (
     UserFactory,
 )
 from open_inwoner.accounts.tests.test_action_views import ActionsPlaywrightTests
-from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
-from open_inwoner.utils.tests.playwright import multi_browser
 
 from ...cms.collaborate.cms_apps import CollaborateApphook
 from ...cms.extensions.constants import Icons, IndicatorChoices
-from ...cms.profile.cms_apps import ProfileApphook
 from ...cms.tests import cms_tools
 from ..models import Plan, PlanContact
 from .factories import ActionTemplateFactory, PlanFactory, PlanTemplateFactory
@@ -1140,7 +1136,7 @@ class NewPlanContactCounterTest(WebTest):
         self.assertEqual(len(links), 1)
 
 
-@multi_browser()
+@tag("e2e")
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class PlanActionStatusPlaywrightTests(ActionsPlaywrightTests):
     def setUp(self) -> None:

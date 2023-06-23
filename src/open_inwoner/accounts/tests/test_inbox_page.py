@@ -1,21 +1,17 @@
 from unittest import skip
 
-from django.test import override_settings
+from django.test import override_settings, tag
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from django_webtest import WebTest
-from PIL import Image
 from playwright.sync_api import expect
 from privates.test import temp_private_root
 from webtest import Upload
 
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.utils.tests.helpers import create_image_bytes
-from open_inwoner.utils.tests.playwright import (
-    PlaywrightSyncLiveServerTestCase,
-    multi_browser,
-)
+from open_inwoner.utils.tests.playwright import PlaywrightSyncLiveServerTestCase
 
 from ..models import Message
 from .factories import DigidUserFactory, MessageFactory, UserFactory
@@ -234,7 +230,7 @@ class InboxPageTests(WebTest):
         )
 
 
-@multi_browser()
+@tag("e2e")
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class InboxPagePlaywrightTests(PlaywrightSyncLiveServerTestCase):
     @classmethod
