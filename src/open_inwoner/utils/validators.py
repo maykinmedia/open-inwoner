@@ -94,3 +94,25 @@ class FilerExactImageSizeValidator:
 
     def __eq__(self, other):
         return self.width == other.width and self.height == other.height
+
+
+class DiversityValidator:
+    def validate(self, password, user=None):
+        if (
+            password.isupper()
+            or password.islower()
+            or password.isalpha()
+            or password.isdigit()
+        ):
+            raise ValidationError(
+                _(
+                    "Your password must contain at least 1 upper-case letter, "
+                    "1 lower-case letter, 1 digit."
+                )
+            )
+
+    def get_help_text(self):
+        return _(
+            "Your password must contain at least 1 upper-case letter, "
+            "1 lower-case letter, 1 digit."
+        )
