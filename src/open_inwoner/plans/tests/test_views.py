@@ -2,7 +2,7 @@ from datetime import date
 
 from django.contrib.messages import get_messages
 from django.core import mail
-from django.test import override_settings
+from django.test import override_settings, tag
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
@@ -675,6 +675,7 @@ class PlanViewTests(WebTest):
         self.assertEqual(response.status_code, 404)
 
 
+@tag("e2e")
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class PlanBegeleiderListViewTests(WebTest):
     def setUp(self):
@@ -1136,10 +1137,7 @@ class NewPlanContactCounterTest(WebTest):
         self.assertEqual(len(links), 1)
 
 
-<<<<<<< HEAD
 @tag("e2e")
-=======
->>>>>>> 3cf095c4 ([#1570] remove multi-browser support for playwright tests)
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class PlanActionStatusPlaywrightTests(ActionsPlaywrightTests):
     def setUp(self) -> None:

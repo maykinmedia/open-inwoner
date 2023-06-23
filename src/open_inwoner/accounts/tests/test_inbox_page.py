@@ -1,6 +1,6 @@
 from unittest import skip
 
-from django.test import override_settings
+from django.test import override_settings, tag
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
@@ -230,10 +230,7 @@ class InboxPageTests(WebTest):
         )
 
 
-<<<<<<< HEAD
 @tag("e2e")
-=======
->>>>>>> 3cf095c4 ([#1570] remove multi-browser support for playwright tests)
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class InboxPagePlaywrightTests(PlaywrightSyncLiveServerTestCase):
     @classmethod

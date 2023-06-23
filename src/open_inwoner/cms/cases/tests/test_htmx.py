@@ -32,7 +32,6 @@ from open_inwoner.openzaak.tests.shared import (
     DOCUMENTEN_ROOT,
     ZAKEN_ROOT,
 )
-<<<<<<< HEAD
 from open_inwoner.utils.test import (
     ClearCachesMixin,
     DisableRequestLogMixin,
@@ -43,12 +42,6 @@ from open_inwoner.utils.tests.playwright import PlaywrightSyncLiveServerTestCase
 
 
 @tag("e2e")
-=======
-from open_inwoner.utils.test import ClearCachesMixin, paginated_response
-from open_inwoner.utils.tests.playwright import PlaywrightSyncLiveServerTestCase
-
-
->>>>>>> 3cf095c4 ([#1570] remove multi-browser support for playwright tests)
 @requests_mock.Mocker()
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class CasesPlaywrightTests(
