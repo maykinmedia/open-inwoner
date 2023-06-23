@@ -236,11 +236,11 @@ class CasesPlaywrightTests(ClearCachesMixin, PlaywrightSyncLiveServerTestCase):
             contactmoment=self.contactmoment["url"],
         )
 
-        # enable upload and contact moments
+        # enable upload and contact form
         zaak_type_config = ZaakTypeConfigFactory(
             catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             identificatie=self.zaaktype["identificatie"],
-            contact_moments_enabled=True,
+            contact_form_enabled=True,
         )
         ZaakTypeInformatieObjectTypeConfigFactory(
             zaaktype_config=zaak_type_config,
@@ -267,23 +267,6 @@ class CasesPlaywrightTests(ClearCachesMixin, PlaywrightSyncLiveServerTestCase):
             self.status_type_finish,
         ]:
             self.matchers.append(m.get(resource["url"], json=resource))
-
-        self.contact_moment_matchers = [
-            m.get(
-                f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn=900222086",
-                json=paginated_response([self.klant]),
-            ),
-            m.post(
-                f"{CONTACTMOMENTEN_ROOT}contactmomenten",
-                json=self.contactmoment,
-                status_code=201,
-            ),
-            m.post(
-                f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten",
-                json=self.klant_contactmoment,
-                status_code=201,
-            ),
-        ]
 
         self.matchers += [
             m.get(
@@ -335,6 +318,20 @@ class CasesPlaywrightTests(ClearCachesMixin, PlaywrightSyncLiveServerTestCase):
             m.get(
                 self.uploaded_informatie_object["inhoud"],
                 content=self.uploaded_zaak_informatie_object_content,
+            ),
+            m.get(
+                f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn=900222086",
+                json=paginated_response([self.klant]),
+            ),
+            m.post(
+                f"{CONTACTMOMENTEN_ROOT}contactmomenten",
+                json=self.contactmoment,
+                status_code=201,
+            ),
+            m.post(
+                f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten",
+                json=self.klant_contactmoment,
+                status_code=201,
             ),
         ]
 

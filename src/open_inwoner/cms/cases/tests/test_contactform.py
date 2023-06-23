@@ -20,12 +20,8 @@ from open_inwoner.openklant.tests.data import (
     KLANTEN_ROOT,
     MockAPIData,
 )
-from open_inwoner.openzaak.models import OpenZaakConfig
-from open_inwoner.openzaak.tests.factories import (
-    ServiceFactory,
-    ZaakTypeConfigFactory,
-    ZaakTypeInformatieObjectTypeConfigFactory,
-)
+from open_inwoner.openzaak.models import CatalogusConfig, OpenZaakConfig
+from open_inwoner.openzaak.tests.factories import ServiceFactory, ZaakTypeConfigFactory
 from open_inwoner.openzaak.tests.shared import (
     CATALOGI_ROOT,
     DOCUMENTEN_ROOT,
@@ -36,7 +32,7 @@ from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 
 @requests_mock.Mocker()
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class ContactFormTestCase(ClearCachesMixin, WebTest):
+class CasesContactFormTestCase(ClearCachesMixin, WebTest):
     def setUp(self):
         super().setUp()
 
@@ -115,40 +111,6 @@ class ContactFormTestCase(ClearCachesMixin, WebTest):
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
             indicatieInternOfExtern="extern",
         )
-        self.zaak_informatie_object = generate_oas_component(
-            "zrc",
-            "schemas/ZaakInformatieObject",
-            url=f"{ZAKEN_ROOT}zaakinformatieobjecten/e55153aa-ad2c-4a07-ae75-15add57d6",
-            informatieobject=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812",
-            zaak=self.zaak["url"],
-        )
-        self.uploaded_zaak_informatie_object = generate_oas_component(
-            "zrc",
-            "schemas/ZaakInformatieObject",
-            url=f"{ZAKEN_ROOT}zaakinformatieobjecten/48599f76-b524-48e8-be5a-6fc47288c9bf",
-            informatieobject=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/48599f76-b524-48e8-be5a-6fc47288c9bf",
-            zaak=self.zaak["url"],
-        )
-        self.informatie_object_type = generate_oas_component(
-            "ztc",
-            "schemas/InformatieObjectType",
-            url=f"{CATALOGI_ROOT}informatieobjecttype/014c38fe-b010-4412-881c-3000032fb321",
-            catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
-            omschrijving="Some content",
-        )
-        self.informatie_object = generate_oas_component(
-            "drc",
-            "schemas/EnkelvoudigInformatieObject",
-            uuid="014c38fe-b010-4412-881c-3000032fb812",
-            url=self.zaak_informatie_object["informatieobject"],
-            inhoud=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812/download",
-            informatieobjecttype=self.informatie_object_type["url"],
-            status="definitief",
-            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
-            bestandsnaam="uploaded_document.txt",
-            titel="uploaded_document_title.txt",
-            bestandsomvang=123,
-        )
         self.status_finish = generate_oas_component(
             "zrc",
             "schemas/Status",
@@ -188,17 +150,11 @@ class ContactFormTestCase(ClearCachesMixin, WebTest):
             telefoonnummer="0612345678",
         )
 
-        # enable upload and contact moments
-        zaak_type_config = ZaakTypeConfigFactory(
+        # contact form
+        self.zaak_type_config = ZaakTypeConfigFactory(
             catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             identificatie=self.zaaktype["identificatie"],
-            contact_moments_enabled=True,
-        )
-        ZaakTypeInformatieObjectTypeConfigFactory(
-            zaaktype_config=zaak_type_config,
-            informatieobjecttype_url=self.informatie_object["url"],
-            zaaktype_uuids=[self.zaaktype["uuid"]],
-            document_upload_enabled=True,
+            contact_form_enabled=True,
         )
 
         self.case_detail_url = reverse(
@@ -217,7 +173,6 @@ class ContactFormTestCase(ClearCachesMixin, WebTest):
             self.zaak,
             self.result,
             self.zaaktype,
-            self.informatie_object,
             self.status_finish,
             self.status_type_finish,
         ]:
@@ -230,20 +185,7 @@ class ContactFormTestCase(ClearCachesMixin, WebTest):
             ),
             m.get(
                 f"{ZAKEN_ROOT}zaakinformatieobjecten?zaak={self.zaak['url']}",
-                [
-                    {
-                        "json": [
-                            self.zaak_informatie_object,
-                        ]
-                    },
-                    # after upload
-                    {
-                        "json": [
-                            self.zaak_informatie_object,
-                            self.uploaded_zaak_informatie_object,
-                        ]
-                    },
-                ],
+                [{"json": []}],
             ),
             m.get(
                 f"{ZAKEN_ROOT}statussen?zaak={self.zaak['url']}",
@@ -263,7 +205,7 @@ class ContactFormTestCase(ClearCachesMixin, WebTest):
         response = self.app.get(self.case_detail_url, user=self.user)
         contact_form = response.pyquery("#contact-form")
 
-        self.assertTrue(response.context["case"]["contact_moments_enabled"])
+        self.assertTrue(response.context["case"]["contact_form_enabled"])
         self.assertTrue(contact_form)
 
     def test_no_form_shown_if_open_klant_not_configured(self, m):
@@ -283,5 +225,23 @@ class ContactFormTestCase(ClearCachesMixin, WebTest):
         response = self.app.get(self.case_detail_url, user=self.user)
         contact_form = response.pyquery("#contact-form")
 
-        self.assertFalse(response.context["case"]["contact_moments_enabled"])
+        self.assertFalse(response.context["case"]["contact_form_enabled"])
+        self.assertFalse(contact_form)
+
+    def test_no_form_shown_if_contact_form_disabled(self, m):
+        self._setUpMocks(m)
+
+        CatalogusConfig.objects.all().delete()
+        self.zaak_type_config.delete()
+
+        ZaakTypeConfigFactory(
+            catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            identificatie=self.zaaktype["identificatie"],
+            contact_form_enabled=False,
+        )
+
+        response = self.app.get(self.case_detail_url, user=self.user)
+        contact_form = response.pyquery("#contact-form")
+
+        self.assertFalse(response.context["case"]["contact_form_enabled"])
         self.assertFalse(contact_form)

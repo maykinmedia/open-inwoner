@@ -159,10 +159,10 @@ class InnerCaseDetailView(
             context["case"].update(self.get_upload_info_context(self.case))
             context["anchors"] = self.get_anchors(statuses, documents)
             context["contact_form"] = self.contact_form_class()
-            context["hxpost_contact_form"] = reverse(
+            context["hxpost_contact_action"] = reverse(
                 "cases:case_detail_contact_form", kwargs=self.kwargs
             )
-            context["hxpost_document_form"] = reverse(
+            context["hxpost_document_action"] = reverse(
                 "cases:case_detail_document_form", kwargs=self.kwargs
             )
         else:
@@ -184,7 +184,7 @@ class InnerCaseDetailView(
         case_type_config_description = ""
         external_upload_enabled = False
         external_upload_url = ""
-        contact_moments_enabled = False
+        contact_form_enabled = False
 
         try:
             ztc = ZaakTypeConfig.objects.filter_case_type(case.zaaktype).get()
@@ -192,7 +192,7 @@ class InnerCaseDetailView(
             pass
         else:
             case_type_config_description = ztc.description
-            contact_moments_enabled = ztc.contact_moments_enabled
+            contact_form_enabled = ztc.contact_form_enabled
             if ztc.document_upload_enabled and ztc.external_document_upload_url != "":
                 external_upload_url = ztc.external_document_upload_url
                 external_upload_enabled = True
@@ -202,8 +202,8 @@ class InnerCaseDetailView(
             "internal_upload_enabled": internal_upload_enabled,
             "external_upload_enabled": external_upload_enabled,
             "external_upload_url": external_upload_url,
-            "contact_moments_enabled": (
-                contact_moments_enabled and open_klant_config.has_api_configuration()
+            "contact_form_enabled": (
+                contact_form_enabled and open_klant_config.has_api_configuration()
             ),
         }
 
@@ -402,13 +402,13 @@ class CaseDocumentUploadFormView(CaseAccessMixin, CaseLogMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["hxpost_document_form"] = reverse(
+        context["hxpost_document_action"] = reverse(
             "cases:case_detail_document_form", kwargs=self.kwargs
         )
         return context
 
 
-class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
+class CaseContactFormView(CaseAccessMixin, CaseLogMixin, FormView):
     template_name = "pages/cases/contact_form.html"
     form_class = CaseContactForm
 
@@ -416,7 +416,7 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
         form = self.get_form()
         if form.is_valid():
             form.cleaned_data[
-                "contact_moment"
+                "question"
             ] += f"\n\nCase number: {self.case.identificatie}"
             return self.register_by_api(form)
         else:
@@ -461,10 +461,10 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
                 )
 
         # create contact moment
-        contact_moment = form.cleaned_data["contact_moment"]
+        question = form.cleaned_data["question"]
         data = {
             "bronorganisatie": config.register_bronorganisatie_rsin,
-            "tekst": contact_moment,
+            "tekst": question,
             "type": config.register_type,
             "kanaal": "Internet",
             "medewerkerIdentificatie": {
@@ -490,7 +490,7 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["contact_form"] = self.get_form()
-        context["hxpost_contact_form"] = reverse(
+        context["hxpost_contact_action"] = reverse(
             "cases:case_detail_contact_form", kwargs=self.kwargs
         )
         return context

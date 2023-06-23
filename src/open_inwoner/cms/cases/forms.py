@@ -60,7 +60,7 @@ class CaseUploadForm(forms.Form):
 
 
 class CaseContactForm(forms.Form):
-    contact_moment = forms.CharField(
+    question = forms.CharField(
         label=_("Vraag"),
         max_length=1024,
         widget=forms.Textarea(attrs={"rows": "5"}),
