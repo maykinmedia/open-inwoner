@@ -139,3 +139,12 @@ class ZaakTypeConfigQueryset(models.QuerySet):
             )
             .exclude(external_document_upload_url="")
         )
+
+    def filter_questions_enabled_for_case_type(self, case_type: ZaakType):
+        """
+        Returns all ZaakTypeConfig instances which allow questions via OpenKlant API.
+        """
+        if not case_type:
+            return self.none()
+
+        return self.filter_case_type(case_type).filter(questions_enabled=True)

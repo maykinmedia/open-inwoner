@@ -124,10 +124,10 @@ class Map {
       <div class="leaflet-content-details p--no-margin">
         <p class="p">${displayAddress1}</p>
         <p class="p">${displayAddress2}</p>
-        <a href="tel:${displayPhonenumber}" class="link link--primary" aria-label=${displayPhonenumber} title=${displayPhonenumber}>
+        <a href="tel:${displayPhonenumber}" class="link link--secondary" aria-label=${displayPhonenumber} title=${displayPhonenumber}>
           <span class="link__text">${displayPhonenumber}</span>
         </a>
-        <a href="mailto:${displayEmail}" class="link link--primary" aria-label=${displayEmail} title=${displayEmail}>
+        <a href="mailto:${displayEmail}" class="link link--secondary" aria-label=${displayEmail} title=${displayEmail}>
           <span class="link__text">${displayEmail}</span>
         </a>
       </div>

@@ -11,6 +11,7 @@ from django.views.generic.edit import FormView
 from mail_editor.helpers import find_template
 from view_breadcrumbs import BaseBreadcrumbMixin
 
+from open_inwoner.cms.utils.page_display import inbox_page_is_published
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from ..forms import ContactCreateForm, ContactFilterForm
@@ -48,6 +49,7 @@ class ContactListView(
         context["contacts_for_approval"] = user.get_contacts_for_approval()
         context["pending_invitations"] = user.get_pending_invitations()
         context["form"] = ContactFilterForm(data=self.request.GET)
+        context["inbox_page_is_published"] = inbox_page_is_published()
         return context
 
 

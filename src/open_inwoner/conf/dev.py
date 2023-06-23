@@ -30,6 +30,10 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 # This is commented out because it causes tests in the CI to fail. It can be enabled in the local.py settings.
 # SESSION_COOKIE_DOMAIN = ".localhost"
 
+ADMIN_SESSION_COOKIE_AGE = (
+    86400  # Avoid having to relogin when in the admin in dev-environments
+)
+
 LOGGING["loggers"].update(
     {
         "open_inwoner": {

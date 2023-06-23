@@ -74,7 +74,9 @@
             {% if mentor_contacts %}
                 <div class="tabled__item">{{ mentor_contacts|join:", " }}</div>
                 {% url 'profile:contact_list' as mentor_url %}
-                <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href=mentor_url|add:"?type=begeleider" text="Stuur een bericht" icon="arrow_forward" icon_position="after" primary=True %}</div>
+		{% if inbox_page_is_published %}
+		    <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href=mentor_url|add:"?type=begeleider" text="Stuur een bericht" icon="arrow_forward" icon_position="after" primary=True %}</div>
+		{% endif %}
             {% else %}
                 <div class="tabled__item">{% trans "U heeft (nog) geen gemeentelijke begeleider." %}</div>
                 <div class="tabled__item tabled__item--force-right tabled__item--mobile-big"></div>
@@ -127,9 +129,9 @@
     </div> {% endcomment %}
 </div>
 
-{% render_form form=form method="POST" id="deactivate-form" extra_classes="confirm" spaceless=True data_confirm_title=_("Weet u zeker dat u uw account wilt verwijderen?") data_confirm_text=_("Hiermee worden alleen uw persoonlijke voorkeuren verwijderd. U krijgt dan bijvoorbeeld geen e-mail meer van ons over wijzigingen van uw lopende zaken. Uw persoonsgegevens en uw lopende zaken zelf worden hiermee niet verwijderd.") data_confirm_cancel=_("Nee") data_confirm_default=_("Ja") %}
+{% render_form form=form method="POST" id="delete-form" extra_classes="confirm" spaceless=True data_confirm_title=_("Weet u zeker dat u uw account wilt verwijderen?") data_confirm_text=_("Hiermee worden alleen uw persoonlijke voorkeuren verwijderd. U krijgt dan bijvoorbeeld geen e-mail meer van ons over wijzigingen van uw lopende zaken. Uw persoonsgegevens en uw lopende zaken zelf worden hiermee niet verwijderd.") data_confirm_cancel=_("Nee") data_confirm_default=_("Ja") %}
     {% csrf_token %}
-    {% form_actions primary_text=_("Profiel deactiveren") primary_icon="close" transparent=True %}
+    {% form_actions primary_text=_("Profiel verwijderen") primary_icon="close" transparent=True %}
 {% endrender_form %}
 
 {% if files %}

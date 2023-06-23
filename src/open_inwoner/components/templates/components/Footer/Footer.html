@@ -1,6 +1,7 @@
 {% load i18n link_tags button_tags logo_tags footer_tags solo_tags thumbnail %}
 
 {% get_solo "configurations.SiteConfiguration" as config %}
+{% get_solo "openklant.OpenKlantConfig" as ok_config %}
 
 <footer class='footer'>
     {% firstof config.logo.default_alt_text config.name as logo_alt_text %}
@@ -35,9 +36,11 @@
 
     <nav class="footer__links" aria-label="Footer navigatie">
         <ul class="footer__list">
-            <li class="footer__list-item">
-                {% link text=_("Contact formulier") secondary=True href="contactform" %}
-            </li>
+            {% if ok_config.has_form_configuration %}
+                <li class="footer__list-item">
+                    {% link text=_("Contact formulier") secondary=True href="contactform" %}
+                </li>
+            {% endif %}
             {% for flatpage in footer_texts.flatpages.all %}
                 <li class="footer__list-item">
                     {% link text=flatpage.title secondary=True href=flatpage.get_absolute_url %}

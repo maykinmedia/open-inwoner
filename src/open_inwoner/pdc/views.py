@@ -228,17 +228,6 @@ class ProductFormView(
             (_("Formulier"), self.request.path),
         ]
 
-    def get_context_data(self, **kwargs):
-        product = self.get_object()
-        context = super().get_context_data(**kwargs)
-
-        anchors = [
-            ("#title", product.name),
-        ]
-
-        context["anchors"] = anchors
-        return context
-
 
 class ProductFinderView(CommonPageMixin, FormView):
     template_name = "pages/product/finder.html"

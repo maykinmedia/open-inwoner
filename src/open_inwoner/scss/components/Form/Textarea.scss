@@ -18,4 +18,17 @@
   color: var(--font-color-body);
   font-family: var(--font-family-body);
   font-size: var(--font-size-body);
+
+  &.input {
+    height: auto;
+  }
+}
+
+// add defaults
+textarea {
+  &.input {
+    max-width: var(--form-width);
+    width: 100%;
+    height: auto;
+  }
 }

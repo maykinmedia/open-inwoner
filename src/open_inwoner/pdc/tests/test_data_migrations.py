@@ -101,5 +101,5 @@ class CategoryProductThroughModelMigrationTests(TestMigrations):
 
         self.assertEqual(
             list(product.categories.all()),
-            [category_initial, category_extra],
+            [category_extra, category_initial],
         )

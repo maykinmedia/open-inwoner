@@ -82,10 +82,10 @@
                             <p class="p">{{ location.address_line_1 }}</p>
                             <p class="p">{{ location.address_line_2 }}</p>
                             {% if phonenumber %}
-                                {% link href='tel:'|addstr:phonenumber primary=True text=phonenumber %}
+                                {% link href='tel:'|addstr:phonenumber secondary=True text=phonenumber %}
                             {% endif %}
                             {% if email %}
-                                {% link href='mailto:'|addstr:email primary=True text=email %}
+                                {% link href='mailto:'|addstr:email secondary=True text=email %}
                             {% endif %}
                         </div>
                     </div>

@@ -24,7 +24,7 @@ from .shared import CATALOGI_ROOT, ZAKEN_ROOT
 @requests_mock.Mocker()
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
-    url = reverse_lazy("cases:open_cases")
+    inner_url = reverse_lazy("cases:open_cases_content")
 
     @classmethod
     def setUpTestData(cls):
@@ -201,7 +201,7 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
         # Cache is empty before the request
         self.assertIsNone(cache.get(f"case_type:{self.zaaktype['url']}"))
 
-        self.app.get(self.url, user=self.user)
+        self.app.get(self.inner_url, user=self.user, headers={"HX-Request": "true"})
 
         # Case type is cached after the request
         self.assertIsNotNone(cache.get(f"case_type:{self.zaaktype['url']}"))
@@ -210,7 +210,7 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
         self._setUpMocks(m)
 
         with freeze_time("2022-01-01 12:00") as frozen_time:
-            self.app.get(self.url, user=self.user)
+            self.app.get(self.inner_url, user=self.user, headers={"HX-Request": "true"})
 
             # After one day the results should be deleted
             frozen_time.tick(delta=datetime.timedelta(days=1))
@@ -223,7 +223,7 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
             # First attempt
             self.assertIsNone(cache.get(f"case_type:{self.zaaktype['url']}"))
 
-            self.app.get(self.url, user=self.user)
+            self.app.get(self.inner_url, user=self.user, headers={"HX-Request": "true"})
 
             self.assertIsNotNone(cache.get(f"case_type:{self.zaaktype['url']}"))
 
@@ -233,7 +233,7 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
             frozen_time.tick(delta=datetime.timedelta(minutes=3))
             self.assertIsNone(cache.get(f"case_type:{self.new_zaaktype['url']}"))
 
-            self.app.get(self.url, user=self.user)
+            self.app.get(self.inner_url, user=self.user, headers={"HX-Request": "true"})
 
             self.assertIsNotNone(cache.get(f"case_type:{self.zaaktype['url']}"))
             self.assertIsNotNone(cache.get(f"case_type:{self.new_zaaktype['url']}"))
@@ -242,7 +242,7 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
         self._setUpMocks(m)
 
         with freeze_time("2022-01-01 12:00") as frozen_time:
-            self.app.get(self.url, user=self.user)
+            self.app.get(self.inner_url, user=self.user, headers={"HX-Request": "true"})
 
             # After one day the results should be deleted
             frozen_time.tick(delta=datetime.timedelta(hours=24))
@@ -260,7 +260,7 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
         self.assertIsNone(cache.get(f"status:{self.status1['url']}"))
         self.assertIsNone(cache.get(f"status:{self.status2['url']}"))
 
-        self.app.get(self.url, user=self.user)
+        self.app.get(self.inner_url, user=self.user, headers={"HX-Request": "true"})
 
         # Status is cached after the request
         self.assertIsNotNone(cache.get(f"status:{self.status1['url']}"))
@@ -270,7 +270,7 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
         self._setUpMocks(m)
 
         with freeze_time("2022-01-01 12:00") as frozen_time:
-            self.app.get(self.url, user=self.user)
+            self.app.get(self.inner_url, user=self.user, headers={"HX-Request": "true"})
 
             # After one hour the results should be deleted
             frozen_time.tick(delta=datetime.timedelta(hours=1))
@@ -285,7 +285,7 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
             self.assertIsNone(cache.get(f"status:{self.status1['url']}"))
             self.assertIsNone(cache.get(f"status:{self.status2['url']}"))
 
-            self.app.get(self.url, user=self.user)
+            self.app.get(self.inner_url, user=self.user, headers={"HX-Request": "true"})
 
             self.assertIsNotNone(cache.get(f"status:{self.status1['url']}"))
             self.assertIsNotNone(cache.get(f"status:{self.status2['url']}"))
@@ -296,7 +296,7 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
             frozen_time.tick(delta=datetime.timedelta(minutes=3))
             self.assertIsNone(cache.get(f"status:{self.new_status['url']}"))
 
-            self.app.get(self.url, user=self.user)
+            self.app.get(self.inner_url, user=self.user, headers={"HX-Request": "true"})
 
             self.assertIsNotNone(cache.get(f"status:{self.new_status['url']}"))
             self.assertIsNotNone(cache.get(f"status:{self.status1['url']}"))
@@ -308,7 +308,7 @@ class ClosedCaseListCacheTests(OpenCaseListCacheTests):
     run the same tests as for open cases
     """
 
-    url = reverse_lazy("cases:closed_cases")
+    inner_url = reverse_lazy("cases:closed_cases_content")
 
     @classmethod
     def setUpTestData(cls):

@@ -1,0 +1,12 @@
+.plan-create {
+  .form__control {
+    .label {
+      position: relative;
+      max-width: var(--form-width);
+    }
+
+    [class*='icon'] {
+      right: 10px;
+    }
+  }
+}

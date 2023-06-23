@@ -13,18 +13,28 @@
         {% render_grid %}
             {% for contactmoment in contactmomenten %}
                 {% render_column start=forloop.counter_0|multiply:4 span=4 %}
-                    {% render_card compact=True stretch=True title=case.identificatie %}
-                        {% render_list %}
-                            {% list_item contactmoment.registered_date caption=_("Ontvangstdatum") compact=True strong=False %}
-                            {% list_item contactmoment.channel caption=_("Contactwijze") compact=True strong=False %}
-                            {% if contactmoment.onderwerp %}
-                                {% list_item contactmoment.onderwerp|truncatechars:25 caption=_("Onderwerp") compact=True strong=False %}
-                            {% else %}
-                                {% list_item contactmoment.text|truncatechars:25 caption=_("Bericht") compact=True strong=False %}
-                            {% endif %}
-                        {% endrender_list %}
-                        {% link href=contactmoment.url icon="arrow_forward" primary=True text=_("Bekijk vraag") %}
-                    {% endrender_card %}
+                <div class="card card--compact card--stretch">
+                    <div class="card__body">
+                        <a href="{{ contactmoment.url }}" class="contactmomenten__link">
+                            {% render_list %}
+                                <span class="contactmomenten-list">
+                                {% list_item contactmoment.registered_date caption=_("Ontvangstdatum") compact=True strong=False %}
+                                {% list_item contactmoment.channel caption=_("Contactwijze") compact=True strong=False %}
+                                {% if contactmoment.onderwerp %}
+                                    {% list_item contactmoment.onderwerp|truncatechars:25 caption=_("Onderwerp") compact=True strong=False %}
+                                {% else %}
+                                    {% list_item contactmoment.text|truncatechars:25 caption=_("Bericht") compact=True strong=False %}
+                                {% endif %}
+                                </span>
+                            {% endrender_list %}
+
+                            <span class="link link--icon link--primary" aria-label="{% trans "Bekijk vraag" %}" title="{% trans "Bekijk vraag" %}">
+                                <span class="link__text">{% trans "Bekijk vraag" %}</span>
+                                {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
+                            </span>
+                        </a>
+                    </div>
+                </div>
                 {% endrender_column %}
             {% endfor %}
         {% endrender_grid %}

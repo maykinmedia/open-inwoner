@@ -29,14 +29,14 @@ class CategoriesPlugin(CMSActiveAppMixin, CMSPluginBase):
 
         # Highlighted categories
         highlighted_categories = (
-            Category.objects.published().filter(highlighted=True).order_by("name")
+            Category.objects.published().filter(highlighted=True).order_by("path")
         )
         if request.user.is_authenticated and request.user.selected_categories.exists():
             categories = request.user.selected_categories.order_by("name")[: self.limit]
         elif highlighted_categories.exists():
             categories = highlighted_categories[: self.limit]
         else:
-            categories = Category.objects.published().order_by("name")[: self.limit]
+            categories = Category.objects.published().order_by("path")[: self.limit]
 
         context["categories"] = categories
 
@@ -49,6 +49,7 @@ class QuestionnairePlugin(CMSActiveAppMixin, CMSPluginBase):
     name = _("Questionnaire Plugin")
     render_template = "cms/questionnaire/questionnaire_plugin.html"
     app_hook = "ProductsApphook"
+    cache = False
 
     def render(self, context, instance, placeholder):
         context["questionnaire_roots"] = QuestionnaireStep.get_root_nodes().filter(
@@ -63,6 +64,7 @@ class ProductFinderPlugin(CMSActiveAppMixin, CMSPluginBase):
     name = _("Product Finder Plugin")
     render_template = "cms/products/product_finder_plugin.html"
     app_hook = "ProductsApphook"
+    cache = False
 
     def render(self, context, instance, placeholder):
         context["condition"] = ProductCondition.objects.first()
@@ -76,6 +78,7 @@ class ProductLocationPlugin(CMSActiveAppMixin, CMSPluginBase):
     name = _("Product Location Plugin")
     render_template = "cms/products/product_location_plugin.html"
     app_hook = "ProductsApphook"
+    cache = False
 
     def render(self, context, instance, placeholder):
         context["product_locations"] = ProductLocation.objects.all()[:1000]

@@ -161,13 +161,13 @@ INSTALLED_APPS = [
     "sniplates",
     "digid_eherkenning",
     # "hijack.contrib.admin", # This should be imported but it causes an error. So now there are
-    "hijack",
+    # "hijack",
     "localflavor",
     "easy_thumbnails",  # used by filer
     "image_cropping",
     "filer",
     "mptt",
-    "hijack.contrib.admin",
+    # "hijack.contrib.admin",
     "django_elasticsearch_dsl",
     "import_export",
     "solo",
@@ -448,7 +448,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
-    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+    {"NAME": "open_inwoner.utils.validators.DiversityValidator"},
 ]
 
 
@@ -463,7 +463,8 @@ AUTHENTICATION_BACKENDS = [
 
 SESSION_COOKIE_NAME = "open_inwoner_sessionid"
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-ADMIN_SESSION_COOKIE_AGE = 86400
+
+ADMIN_SESSION_COOKIE_AGE = 3600  # Set to 1 hour max session duration for admins
 SESSION_WARN_DELTA = 60  # Warn 1 minute before end of session.
 SESSION_COOKIE_AGE = 900  # Set to 15 minutes
 
@@ -507,6 +508,11 @@ SHOW_ALERT = True
 #
 # Django CMS
 #
+
+CMS_PAGE_CACHE = False
+CMS_PLACEHOLDER_CACHE = False
+CMS_PLUGIN_CACHE = False
+
 CMS_TEMPLATES = [
     ("cms/fullwidth.html", "Home page template"),
 ]
@@ -602,7 +608,7 @@ HIJACK_ALLOW_GET_REQUESTS = True
 # SENTRY - error monitoring
 #
 SENTRY_DSN = config("SENTRY_DSN", None)
-RELEASE = "v1.7"  # get_current_version()
+RELEASE = "v1.8"  # get_current_version()
 
 PRIVATE_MEDIA_ROOT = os.path.join(BASE_DIR, "private_media")
 FILER_ROOT = os.path.join(BASE_DIR, "media", "filer")
@@ -728,8 +734,6 @@ ES_INDEX_PRODUCTS = config("ES_INDEX_PRODUCTS", "products")
 ES_MAX_SIZE = 10000
 ES_SUGGEST_SIZE = 5
 
-# Delete user after x days of inactivity
-DELETE_USER_AFTER_X_DAYS_INACTIVE = 14
 
 # django import-export
 IMPORT_EXPORT_USE_TRANSACTIONS = True

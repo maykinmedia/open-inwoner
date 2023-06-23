@@ -34,5 +34,7 @@ class AssertTimelineLogMixinTest(AssertTimelineLogMixin, TestCase):
                 self.assertTimelineLog("foo bar", level=logging.INFO)
 
         with self.subTest("multiple"):
-            with self.assertRaisesRegex(AssertionError, r"^found 2 TimelineLogs with"):
+            with self.assertRaisesRegex(
+                AssertionError, r"^expected 1 but found 2 TimelineLogs with"
+            ):
                 self.assertTimelineLog("bazz buzz")

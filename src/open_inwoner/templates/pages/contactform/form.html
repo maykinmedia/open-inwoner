@@ -1,6 +1,9 @@
 {% extends 'master.html' %}
-{% load contact_tags %}
+{% load i18n contact_tags %}
 
 {% block content %}
+    <h1 class="h1">
+        {% trans "Contactformulier" %}
+    </h1>
 {% contact_form form_object=form %}
 {% endblock content %}

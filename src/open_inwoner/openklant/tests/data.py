@@ -23,9 +23,50 @@ class MockAPIData:
         )
         config.save()
 
+    @classmethod
     def setUpOASMocks(self, m):
         mock_service_oas_get(m, KLANTEN_ROOT, "kc")
         mock_service_oas_get(m, CONTACTMOMENTEN_ROOT, "cmc")
+
+
+class MockAPIReadPatchData(MockAPIData):
+    def __init__(self):
+        self.user = DigidUserFactory(
+            email="old@example.com",
+            phonenumber="0100000000",
+        )
+
+        self.klant_old = generate_oas_component(
+            "kc",
+            "schemas/Klant",
+            uuid="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            emailadres="bad@example.com",
+            telefoonnummer="",
+        )
+        self.klant_updated = generate_oas_component(
+            "kc",
+            "schemas/Klant",
+            uuid="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            emailadres="good@example.com",
+            telefoonnummer="0123456789",
+        )
+
+    def install_mocks(self, m) -> "MockAPIReadPatchData":
+        self.setUpOASMocks(m)
+        self.matchers = [
+            m.get(
+                f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn={self.user.bsn}",
+                json=paginated_response([self.klant_old]),
+            ),
+            m.patch(
+                f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+                json=self.klant_updated,
+                status_code=200,
+            ),
+        ]
+        return self
 
 
 class MockAPIReadData(MockAPIData):
@@ -39,6 +80,8 @@ class MockAPIReadData(MockAPIData):
             "schemas/Klant",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            emailadres="foo@example.com",
+            telefoonnummer="0612345678",
         )
         self.contactmoment = generate_oas_component(
             "cmc",
@@ -100,6 +143,17 @@ class MockAPICreateData(MockAPIData):
             emailadres="foo@example.com",
             telefoonnummer="0612345678",
         )
+        self.klant_no_contact_info = generate_oas_component(
+            "kc",
+            "schemas/Klant",
+            uuid="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            bronorganisatie="123456789",
+            voornaam="Foo",
+            achternaam="Bar",
+            emailadres="",
+            telefoonnummer="",
+        )
         self.contactmoment = generate_oas_component(
             "cmc",
             "schemas/ContactMoment",
@@ -123,7 +177,7 @@ class MockAPICreateData(MockAPIData):
 
         self.matchers = []
 
-    def install_mocks_anon(self, m) -> "MockAPICreateData":
+    def install_mocks_anon_with_klant(self, m) -> "MockAPICreateData":
         self.setUpOASMocks(m)
 
         self.matchers = [
@@ -141,6 +195,19 @@ class MockAPICreateData(MockAPIData):
         ]
         return self
 
+    def install_mocks_anon_without_klant(self, m) -> "MockAPICreateData":
+        self.setUpOASMocks(m)
+
+        self.matchers = [
+            m.post(f"{KLANTEN_ROOT}klanten", json=self.klant, status_code=500),
+            m.post(
+                f"{CONTACTMOMENTEN_ROOT}contactmomenten",
+                json=self.contactmoment,
+                status_code=201,
+            ),
+        ]
+        return self
+
     def install_mocks_digid(self, m) -> "MockAPICreateData":
         self.setUpOASMocks(m)
 
@@ -148,6 +215,31 @@ class MockAPICreateData(MockAPIData):
             m.get(
                 f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn={self.user.bsn}",
                 json=paginated_response([self.klant]),
+            ),
+            m.post(
+                f"{CONTACTMOMENTEN_ROOT}contactmomenten",
+                json=self.contactmoment,
+                status_code=201,
+            ),
+            m.post(
+                f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten",
+                json=self.klant_contactmoment,
+                status_code=201,
+            ),
+        ]
+        return self
+
+    def install_mocks_digid_missing_contact_info(self, m) -> "MockAPICreateData":
+        self.setUpOASMocks(m)
+        self.matchers = [
+            m.get(
+                f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn={self.user.bsn}",
+                json=paginated_response([self.klant_no_contact_info]),
+            ),
+            m.patch(
+                f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+                json=self.klant,
+                status_code=200,
             ),
             m.post(
                 f"{CONTACTMOMENTEN_ROOT}contactmomenten",

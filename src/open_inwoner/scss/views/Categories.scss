@@ -1,10 +1,20 @@
 .categories {
   &__content {
     .card-container {
-      grid-template-columns: repeat(auto-fit, 228px);
+      grid-template-columns: repeat(
+        auto-fit,
+        calc(230px - var(--spacing-small))
+      );
+
+      @media (min-width: 1600px) {
+        grid-template-columns: repeat(
+          auto-fit,
+          calc(25% - var(--gutter-width))
+        );
+      }
 
       .card {
-        max-width: 360px;
+        max-width: var(--mobile-xs-width);
       }
     }
   }

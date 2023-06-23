@@ -191,6 +191,12 @@ class ZaakTypeConfig(models.Model):
         default=False,
     )
 
+    # contact moments
+    contact_form_enabled = models.BooleanField(
+        verbose_name=_("Enable sending questions via OpenKlant API"),
+        default=False,
+    )
+
     objects = ZaakTypeConfigQueryset.as_manager()
 
     class Meta:

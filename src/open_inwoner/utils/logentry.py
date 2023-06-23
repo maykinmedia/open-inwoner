@@ -157,7 +157,7 @@ def system_action(
     )
     TimelineLog.objects.create(
         content_object=content_object,
-        user=user,
+        user=(None if not user or user.is_anonymous else user),
         extra_data={
             "content_object_repr": object_text,
             "action_flag": LOG_ACTIONS[5],

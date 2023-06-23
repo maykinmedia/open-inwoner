@@ -73,12 +73,12 @@ class TestRegistrationFunctionality(WebTest):
         self.assertEqual(user_query.count(), 0)
 
     def test_registration_fails_with_invalid_first_name_characters(self):
-        invalid_characters = "/\"\\,.:;'"
+        invalid_characters = '<>#/"\\,.:;'
+        register_page = self.app.get(reverse("django_registration_register"))
+        form = register_page.forms["registration-form"]
 
         for char in invalid_characters:
             with self.subTest(char=char):
-                register_page = self.app.get(reverse("django_registration_register"))
-                form = register_page.forms["registration-form"]
                 form["email"] = self.user.email
                 form["first_name"] = char
                 form["last_name"] = self.user.last_name
@@ -87,20 +87,21 @@ class TestRegistrationFunctionality(WebTest):
                 response = form.submit()
                 expected_errors = {
                     "first_name": [
-                        _("Uw invoer bevat een ongeldig teken: {char}").format(
-                            char=char
+                        _(
+                            "Please make sure your input contains only valid characters "
+                            "(letters, numbers, apostrophe, dash, space)."
                         )
                     ]
                 }
                 self.assertEqual(response.context["form"].errors, expected_errors)
 
     def test_registration_fails_with_invalid_last_name_characters(self):
-        invalid_characters = "/\"\\,.:;'"
+        invalid_characters = '<>#/"\\,.:;'
+        register_page = self.app.get(reverse("django_registration_register"))
+        form = register_page.forms["registration-form"]
 
         for char in invalid_characters:
             with self.subTest(char=char):
-                register_page = self.app.get(reverse("django_registration_register"))
-                form = register_page.forms["registration-form"]
                 form["email"] = self.user.email
                 form["first_name"] = self.user.first_name
                 form["last_name"] = char
@@ -109,8 +110,68 @@ class TestRegistrationFunctionality(WebTest):
                 response = form.submit()
                 expected_errors = {
                     "last_name": [
-                        _("Uw invoer bevat een ongeldig teken: {char}").format(
-                            char=char
+                        _(
+                            "Please make sure your input contains only valid characters "
+                            "(letters, numbers, apostrophe, dash, space)."
+                        )
+                    ]
+                }
+                self.assertEqual(response.context["form"].errors, expected_errors)
+
+    def test_registration_fails_uniform_password(self):
+        passwords = [
+            "lowercase123",
+            "UPPERCASE123",
+            "NODIGITS",
+            "nodigits",
+            "NoDigits",
+            "1238327879",
+        ]
+        register_page = self.app.get(reverse("django_registration_register"))
+        form = register_page.forms["registration-form"]
+
+        for password in passwords:
+            with self.subTest(password=password):
+                form["email"] = self.user.email
+                form["first_name"] = self.user.first_name
+                form["last_name"] = self.user.last_name
+                form["password1"] = password
+                form["password2"] = password
+                response = form.submit()
+                expected_errors = {
+                    "password2": [
+                        _(
+                            "Your password must contain at least 1 upper-case letter, "
+                            "1 lower-case letter, 1 digit."
+                        ),
+                    ]
+                }
+                self.assertEqual(response.context["form"].errors, expected_errors)
+
+    def test_registration_fails_with_non_diverse_password(self):
+        passwords = [
+            "pass_word-123",
+            "PASS_WORD-123",
+            "NoDigits",
+            "UPPERCASE123",
+            "lowercase123",
+        ]
+        register_page = self.app.get(reverse("django_registration_register"))
+        form = register_page.forms["registration-form"]
+
+        for password in passwords:
+            with self.subTest(password=password):
+                form["email"] = self.user.email
+                form["first_name"] = self.user.first_name
+                form["last_name"] = self.user.last_name
+                form["password1"] = password
+                form["password2"] = password
+                response = form.submit()
+                expected_errors = {
+                    "password2": [
+                        _(
+                            "Your password must contain at least 1 upper-case letter, "
+                            "1 lower-case letter, 1 digit."
                         )
                     ]
                 }
@@ -139,8 +200,8 @@ class TestRegistrationFunctionality(WebTest):
         form["email"] = inactive_user.email
         form["first_name"] = "John"
         form["last_name"] = "Smith"
-        form["password1"] = "somepassword"
-        form["password2"] = "somepassword"
+        form["password1"] = "SomePassword123"
+        form["password2"] = "SomePassword123"
 
         response = form.submit()
 
@@ -168,8 +229,8 @@ class TestRegistrationFunctionality(WebTest):
         self.assertEqual(form["first_name"].value, contact.first_name)
         self.assertEqual(form["last_name"].value, contact.last_name)
 
-        form["password1"] = "somepassword"
-        form["password2"] = "somepassword"
+        form["password1"] = "SomePassword123"
+        form["password2"] = "SomePassword123"
 
         response = form.submit()
 
@@ -210,8 +271,8 @@ class TestRegistrationFunctionality(WebTest):
         register_page = self.app.get(f"{self.url}?invite={invite.key}")
         form = register_page.forms["registration-form"]
 
-        form["password1"] = "somepassword"
-        form["password2"] = "somepassword"
+        form["password1"] = "SomePassword123"
+        form["password2"] = "SomePassword123"
 
         response = form.submit()
 
@@ -235,8 +296,8 @@ class TestRegistrationFunctionality(WebTest):
         form["email"] = "John@smith.com"
         form["first_name"] = "John"
         form["last_name"] = "Smith"
-        form["password1"] = "somepassword"
-        form["password2"] = "somepassword"
+        form["password1"] = "SomePassword123"
+        form["password2"] = "SomePassword123"
 
         response = form.submit()
 
@@ -813,7 +874,7 @@ class TestRegistrationNecessary(WebTest):
             last_name="",
             login_type=LoginTypeChoices.digid,
         )
-        invalid_characters = "/\"\\,.:;'"
+        invalid_characters = '<>#/"\\,.:;'
 
         for char in invalid_characters:
             with self.subTest(char=char):
@@ -825,8 +886,9 @@ class TestRegistrationNecessary(WebTest):
                 response = form.submit()
                 expected_errors = {
                     "first_name": [
-                        _("Uw invoer bevat een ongeldig teken: {char}").format(
-                            char=char
+                        _(
+                            "Please make sure your input contains only valid characters "
+                            "(letters, numbers, apostrophe, dash, space)."
                         )
                     ]
                 }
@@ -839,7 +901,7 @@ class TestRegistrationNecessary(WebTest):
             last_name="",
             login_type=LoginTypeChoices.digid,
         )
-        invalid_characters = "/\"\\,.:;'"
+        invalid_characters = '<>#/"\\,.:;'
 
         for char in invalid_characters:
             with self.subTest(char=char):
@@ -851,8 +913,9 @@ class TestRegistrationNecessary(WebTest):
                 response = form.submit()
                 expected_errors = {
                     "last_name": [
-                        _("Uw invoer bevat een ongeldig teken: {char}").format(
-                            char=char
+                        _(
+                            "Please make sure your input contains only valid characters "
+                            "(letters, numbers, apostrophe, dash, space)."
                         )
                     ]
                 }

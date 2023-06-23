@@ -166,6 +166,7 @@ class ZaakTypeConfigAdmin(admin.ModelAdmin):
         "catalogus",
         "identificatie",
         "omschrijving",
+        "contact_form_enabled",
         "notify_status_changes",
         "document_upload_enabled",
         "external_document_upload_url",

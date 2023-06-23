@@ -55,7 +55,7 @@
   --color-primary-lighter: hsl(
     var(--color-primary-h),
     var(--color-primary-s),
-    calc(var(--color-primary-l) + 10%)
+    calc(var(--color-primary-l) + 30%)
   );
   --color-secondary-h: 207;
   --color-secondary-s: 80%;
@@ -235,6 +235,9 @@
   --spacing-large: 16px;
   --spacing-extra-large: 24px;
   --spacing-giant: 32px;
+
+  /// Common widths
+  --form-width: 500px;
 }
 
 @font-face {

@@ -19,7 +19,7 @@ class TestAdminCategoryForm(WebTest):
         form["name"] = "foo1"
         form["slug"] = "foo1"
         form["published"] = True
-        form["_position"] = "sorted-child"
+        form["_position"] = "first-child"
         form["_ref_node_id"] = 0
         form.submit()
         category = Category.objects.first()
@@ -34,7 +34,7 @@ class TestAdminCategoryForm(WebTest):
         form["name"] = "bar1"
         form["slug"] = "bar1"
         form["published"] = True
-        form["_position"] = "sorted-child"
+        form["_position"] = "first-child"
         form["_ref_node_id"] = root.id
         form.submit()
         updated_category = Category.objects.get(slug="bar1")
@@ -51,7 +51,7 @@ class TestAdminCategoryForm(WebTest):
         form["name"] = "bar2"
         form["slug"] = "bar2"
         form["published"] = True
-        form["_position"] = "sorted-child"
+        form["_position"] = "first-child"
         form["_ref_node_id"] = category.id
         form.submit()
         categories = Category.objects.filter(slug="bar2")

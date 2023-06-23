@@ -1,12 +1,10 @@
-import io
-
 from django.test import override_settings
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 import requests_mock
+from cms import api
 from django_webtest import WebTest
-from PIL import Image
 from timeline_logger.models import TimelineLog
 from webtest import Upload
 
@@ -14,15 +12,18 @@ from open_inwoner.accounts.choices import StatusChoices
 from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 from open_inwoner.pdc.tests.factories import CategoryFactory
+from open_inwoner.plans.tests.factories import PlanFactory
 from open_inwoner.utils.logentry import LOG_ACTIONS
-from open_inwoner.utils.tests.helpers import create_image_bytes
+from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin, create_image_bytes
 
 from ...cms.profile.cms_apps import ProfileApphook
 from ...cms.tests import cms_tools
+from ...openklant.tests.data import MockAPIReadPatchData
 from ...questionnaire.tests.factories import QuestionnaireStepFactory
 from ..choices import ContactTypeChoices, LoginTypeChoices
 from ..forms import BrpUserForm, UserForm
-from .factories import ActionFactory, DocumentFactory, UserFactory
+from ..models import User
+from .factories import ActionFactory, DigidUserFactory, DocumentFactory, UserFactory
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
@@ -93,49 +94,6 @@ class ProfileViewTests(WebTest):
         self.assertEquals(response.status_code, 200)
         self.assertContains(response, "0 acties staan open.")
 
-    def test_deactivate_account(self):
-        response = self.app.get(self.url, user=self.user)
-        self.assertEquals(response.status_code, 200)
-        form = response.forms["deactivate-form"]
-        base_response = form.submit()
-        self.assertEquals(base_response.url, self.return_url)
-        followed_response = base_response.follow().follow()
-        self.assertEquals(followed_response.status_code, 200)
-        self.user.refresh_from_db()
-        self.assertFalse(self.user.is_active)
-        self.assertIsNotNone(self.user.deactivated_on)
-
-    def test_deactivate_account_staff(self):
-        self.user.is_staff = True
-        self.user.save()
-        response = self.app.get(self.url, user=self.user)
-        self.assertEquals(response.status_code, 200)
-        form = response.forms["deactivate-form"]
-        base_response = form.submit()
-        self.assertEquals(base_response.url, self.url)
-        followed_response = base_response.follow()
-        self.assertEquals(followed_response.status_code, 200)
-        self.user.refresh_from_db()
-        self.assertTrue(self.user.is_active)
-        self.assertIsNone(self.user.deactivated_on)
-
-    def test_deactivate_account_digid(self):
-        """
-        check that user is redirected to digid:logout
-        """
-        user = UserFactory.create(
-            login_type=LoginTypeChoices.digid, email="john@smith.nl"
-        )
-
-        response = self.app.get(self.url, user=user)
-        self.assertEquals(response.status_code, 200)
-        form = response.forms["deactivate-form"]
-
-        response = form.submit()
-
-        self.assertEquals(response.status_code, 302)
-        self.assertEquals(response.url, reverse("digid:logout"))
-
     def test_get_documents_sorted(self):
         """
         check that the new document is shown first
@@ -191,9 +149,45 @@ class ProfileViewTests(WebTest):
         response = self.app.get(self.url, user=self.user)
         self.assertContains(response, _("You do not have any notifications enabled."))
 
+    def test_messages_enabled_disabled(self):
+        """Assert that `Stuur een bericht` is displayed if and only if the message page is published"""
+
+        begeleider = UserFactory(contact_type=ContactTypeChoices.begeleider)
+        self.user.user_contacts.add(begeleider)
+
+        # case 1: no message page
+        response = self.app.get(self.url, user=self.user)
+
+        self.assertNotContains(response, _("Stuur een bericht"))
+
+        # case 2: unpublished message page
+        page = api.create_page(
+            "Mijn Berichten",
+            "cms/fullwidth.html",
+            "nl",
+            slug="berichten",
+        )
+        page.application_namespace = "inbox"
+        page.save()
+
+        response = self.app.get(self.url, user=self.user)
+
+        self.assertNotContains(response, _("Stuur een bericht"))
+
+        # case 3: published message page
+        page.publish("nl")
+        page.save()
+
+        response = self.app.get(self.url, user=self.user)
+
+        message_link = response.pyquery("[title='Stuur een bericht']")
+        link_text = message_link.find(".link__text").text
+
+        self.assertEqual(link_text(), _("Stuur een bericht"))
+
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class EditProfileTests(WebTest):
+class EditProfileTests(AssertTimelineLogMixin, WebTest):
     def setUp(self):
         self.url = reverse("profile:edit")
         self.return_url = reverse("profile:detail")
@@ -265,55 +259,33 @@ class EditProfileTests(WebTest):
         self.assertEquals(self.user.postcode, "1013 RM")
         self.assertEquals(self.user.city, "Amsterdam")
 
-    def test_save_with_invalid_first_name_chars_fails(self):
-        invalid_characters = "/\"\\,.:;'"
+    def test_name_validation(self):
+        invalid_characters = '<>#/"\\,.:;'
 
         for char in invalid_characters:
             with self.subTest(char=char):
                 response = self.app.get(self.url, user=self.user, status=200)
                 form = response.forms["profile-edit"]
-                form["first_name"] = char
-                form["last_name"] = "Last name"
-                form["display_name"] = "a nickname"
-                form["phonenumber"] = "06987878787"
-                form["birthday"] = "21-01-1992"
-                form["street"] = "Keizersgracht"
-                form["housenumber"] = "17 d"
-                form["postcode"] = "1013 RM"
-                form["city"] = "Amsterdam"
-                response = form.submit()
-                expected_errors = {
-                    "first_name": [
-                        _("Uw invoer bevat een ongeldig teken: {char}").format(
-                            char=char
-                        )
-                    ]
-                }
-                self.assertEqual(response.context["form"].errors, expected_errors)
+                form["first_name"] = "test" + char
+                form["infix"] = char + "test"
+                form["last_name"] = "te" + char + "st"
+                form["display_name"] = "te" + char + "st"
+                form["city"] = "te" + char + "st"
+                form["street"] = "te" + char + "st"
 
-    def test_save_with_invalid_last_name_chars_fails(self):
-        invalid_characters = "/\"\\,.:;'"
-
-        for char in invalid_characters:
-            with self.subTest(char=char):
-                response = self.app.get(self.url, user=self.user, status=200)
-                form = response.forms["profile-edit"]
-                form["first_name"] = "John"
-                form["last_name"] = char
-                form["display_name"] = "a nickname"
-                form["phonenumber"] = "06987878787"
-                form["birthday"] = "21-01-1992"
-                form["street"] = "Keizersgracht"
-                form["housenumber"] = "17 d"
-                form["postcode"] = "1013 RM"
-                form["city"] = "Amsterdam"
                 response = form.submit()
+
+                error_msg = _(
+                    "Please make sure your input contains only valid characters "
+                    "(letters, numbers, apostrophe, dash, space)."
+                )
                 expected_errors = {
-                    "last_name": [
-                        _("Uw invoer bevat een ongeldig teken: {char}").format(
-                            char=char
-                        )
-                    ]
+                    "first_name": [error_msg],
+                    "infix": [error_msg],
+                    "last_name": [error_msg],
+                    "display_name": [error_msg],
+                    "city": [error_msg],
+                    "street": [error_msg],
                 }
                 self.assertEqual(response.context["form"].errors, expected_errors)
 
@@ -434,6 +406,203 @@ class EditProfileTests(WebTest):
 
         self.assertNotIn("image", form.fields.keys())
         self.assertEqual(response.pyquery("#id_image"), [])
+
+    @requests_mock.Mocker()
+    def test_modify_phone_and_email_updates_klant_api(self, m):
+        MockAPIReadPatchData.setUpServices()
+        data = MockAPIReadPatchData().install_mocks(m)
+
+        response = self.app.get(self.url, user=data.user)
+
+        # reset noise from signals
+        m.reset_mock()
+        self.resetTimelineLogs()
+
+        form = response.forms["profile-edit"]
+        form["email"] = "new@example.com"
+        form["phonenumber"] = "01234456789"
+        form.submit()
+
+        # user data tested in other cases
+
+        self.assertTrue(data.matchers[0].called)
+        klant_patch_data = data.matchers[1].request_history[0].json()
+        self.assertEqual(
+            klant_patch_data,
+            {
+                "emailadres": "new@example.com",
+                "telefoonnummer": "01234456789",
+            },
+        )
+        self.assertTimelineLog("retrieved klant for BSN-user")
+        self.assertTimelineLog(
+            "patched klant from user profile edit with fields: emailadres, telefoonnummer"
+        )
+
+    @requests_mock.Mocker()
+    def test_modify_phone_updates_klant_api_but_skips_unchanged(self, m):
+        MockAPIReadPatchData.setUpServices()
+        data = MockAPIReadPatchData().install_mocks(m)
+
+        response = self.app.get(self.url, user=data.user)
+
+        # reset noise from signals
+        m.reset_mock()
+        self.resetTimelineLogs()
+
+        form = response.forms["profile-edit"]
+        form.submit()
+
+        # user data tested in other cases
+
+        self.assertFalse(data.matchers[0].called)
+        self.assertFalse(data.matchers[1].called)
+
+    @requests_mock.Mocker()
+    def test_modify_phone_updates_klant_api_but_skip_unchanged_email(self, m):
+        MockAPIReadPatchData.setUpServices()
+        data = MockAPIReadPatchData().install_mocks(m)
+
+        response = self.app.get(self.url, user=data.user)
+
+        # reset noise from signals
+        m.reset_mock()
+        self.resetTimelineLogs()
+
+        form = response.forms["profile-edit"]
+        form["phonenumber"] = "01234456789"
+        form.submit()
+
+        # user data tested in other cases
+
+        self.assertTrue(data.matchers[0].called)
+        klant_patch_data = data.matchers[1].request_history[0].json()
+        self.assertEqual(
+            klant_patch_data,
+            {
+                "telefoonnummer": "01234456789",
+            },
+        )
+        self.assertTimelineLog("retrieved klant for BSN-user")
+        self.assertTimelineLog(
+            "patched klant from user profile edit with fields: telefoonnummer"
+        )
+
+    @requests_mock.Mocker()
+    def test_modify_phone_updates_klant_api_but_skip_unchanged_phone(self, m):
+        MockAPIReadPatchData.setUpServices()
+        data = MockAPIReadPatchData().install_mocks(m)
+
+        response = self.app.get(self.url, user=data.user)
+
+        # reset noise from signals
+        m.reset_mock()
+        self.resetTimelineLogs()
+
+        form = response.forms["profile-edit"]
+        form["email"] = "new@example.com"
+        form.submit()
+
+        # user data tested in other cases
+
+        self.assertTrue(data.matchers[0].called)
+        klant_patch_data = data.matchers[1].request_history[0].json()
+        self.assertEqual(
+            klant_patch_data,
+            {
+                "emailadres": "new@example.com",
+            },
+        )
+        self.assertTimelineLog("retrieved klant for BSN-user")
+        self.assertTimelineLog(
+            "patched klant from user profile edit with fields: emailadres"
+        )
+
+
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+class ProfileDeleteTest(WebTest):
+    csrf_checks = False
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.url = reverse("profile:detail")
+
+    def test_delete_regular_user_success(self):
+        user = UserFactory()
+
+        # get profile page
+        response = self.app.get(self.url, user=user)
+
+        # check delete
+        response = response.forms["delete-form"].submit()
+        self.assertIsNone(User.objects.first())
+
+        # check redirect
+        self.assertRedirects(
+            self.app.get(response.url),
+            reverse("pages-root"),
+            status_code=302,
+            target_status_code=200,
+            fetch_redirect_response=True,
+        )
+
+    def test_delete_user_with_digid_login_success(self):
+        user = DigidUserFactory()
+
+        # get profile page
+        response = self.app.get(self.url, user=user)
+
+        # check user deleted
+        response = response.forms["delete-form"].submit()
+        self.assertIsNone(User.objects.first())
+
+        # check redirect
+        self.assertRedirects(
+            self.app.get(response.url),
+            reverse("pages-root"),
+            status_code=302,
+            target_status_code=200,
+            fetch_redirect_response=True,
+        )
+
+    def test_delete_regular_user_as_plan_contact_fail(self):
+        user = UserFactory()
+        PlanFactory.create(plan_contacts=[user])
+
+        # get profile page
+        response = self.app.get(self.url, user=user)
+
+        # check user not deleted
+        response = response.forms["delete-form"].submit()
+        self.assertEqual(User.objects.first(), user)
+
+        # check redirect
+        self.assertRedirects(
+            response,
+            reverse("profile:detail"),
+            status_code=302,
+            target_status_code=200,
+            fetch_redirect_response=True,
+        )
+
+    def test_delete_staff_user_via_frontend_does_not_work(self):
+        user = UserFactory(is_staff=True)
+
+        # get profile page
+        response = self.app.get(self.url, user=user)
+
+        # check staff user not deleted
+        response = response.forms["delete-form"].submit()
+        self.assertEqual(User.objects.first(), user)
+
+        # check redirect
+        self.assertRedirects(
+            response,
+            reverse("profile:detail"),
+            status_code=302,
+            target_status_code=200,
+            fetch_redirect_response=True,
+        )
 
 
 @requests_mock.Mocker()

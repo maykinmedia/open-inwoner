@@ -35,6 +35,14 @@
       }
     }
   }
+
+  .form__control__info {
+    display: none;
+
+    &--active {
+      display: block;
+    }
+  }
 }
 
 /// File-input site wide
@@ -43,13 +51,18 @@ input[type='file'] {
   color: var(--color-primary-lighter);
   border: 1px solid var(--color-mute);
   border-radius: var(--border-radius);
-  display: flex;
-  flex-direction: column;
-  min-width: var(--mobile-xs-width);
-  max-width: 500px;
+  display: inline-block;
+  min-width: 100%;
+  max-width: var(--form-width);
   padding: 0;
   overflow: hidden;
   cursor: pointer;
+
+  @media (min-width: 768px) {
+    display: flex;
+    flex-direction: column;
+    min-width: var(--form-width);
+  }
 }
 
 /// File-input button site wide
@@ -69,7 +82,11 @@ input[type='file']::file-selector-button {
   white-space: nowrap;
   padding: 0 12px 0 12px;
   margin: 0 12px 0 0;
-  width: 200px;
+  width: 150px;
+
+  @media (min-width: 768px) {
+    width: 200px;
+  }
 }
 
 .button-row .upload-button--disabled {

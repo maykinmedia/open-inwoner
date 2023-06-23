@@ -35,7 +35,7 @@
     display: flex;
     align-items: center;
     flex-direction: column;
-    justify-content: start;
+    justify-content: flex-start;
     min-height: var(--row-height);
     overflow: hidden;
     padding: 0;
@@ -266,9 +266,12 @@
     &:hover {
       transform: translateY(0);
     }
+
     &:focus,
     &:focus-visible,
     &:focus-within {
+      border-radius: var(--border-radius-large);
+      margin: 0 3px 0 0;
       transform: translateY(0);
     }
   }

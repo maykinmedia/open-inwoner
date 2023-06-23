@@ -1,8 +1,15 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from ordered_model.models import OrderedModel, OrderedModelManager
 from solo.models import SingletonModel
 from zgw_consumers.constants import APITypes
+
+
+class OpenKlantConfigManager(models.Manager):
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.select_related("klanten_service", "contactmomenten_service")
 
 
 class OpenKlantConfig(SingletonModel):
@@ -67,6 +74,8 @@ class OpenKlantConfig(SingletonModel):
         "register_employee_id",
     )
 
+    objects = OpenKlantConfigManager()
+
     class Meta:
         verbose_name = _("Open Klant configuration")
 
@@ -78,7 +87,7 @@ class OpenKlantConfig(SingletonModel):
         return all(getattr(self, f, "") for f in self.register_api_required_fields)
 
 
-class ContactFormSubject(models.Model):
+class ContactFormSubject(OrderedModel):
     subject = models.CharField(
         verbose_name=_("Onderwerp"),
         max_length=255,
@@ -89,10 +98,14 @@ class ContactFormSubject(models.Model):
         on_delete=models.CASCADE,
     )
 
-    class Meta:
+    order_with_respect_to = "config"
+
+    objects = OrderedModelManager()
+
+    class Meta(OrderedModel.Meta):
         verbose_name = _("Contact formulier onderwerp")
         verbose_name_plural = _("Contact formulier onderwerpen")
-        ordering = ("subject",)
+        ordering = ("order",)
 
     def __str__(self):
         return self.subject

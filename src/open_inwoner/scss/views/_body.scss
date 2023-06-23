@@ -1,5 +1,6 @@
 .body--open {
   overflow: hidden;
+  position: fixed;
 
   @media (min-width: 768px) {
     height: auto;

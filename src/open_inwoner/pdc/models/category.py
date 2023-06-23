@@ -61,12 +61,12 @@ class Category(MP_Node):
         help_text=_("Image of the category"),
     )
 
-    node_order_by = ["slug"]
     objects = CategoryPublishedQueryset.as_manager()
 
     class Meta:
         verbose_name = _("Category")
         verbose_name_plural = _("Categories")
+        ordering = ("path",)
 
     def __str__(self):
         return self.name

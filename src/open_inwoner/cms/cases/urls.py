@@ -1,23 +1,40 @@
 from django.urls import path
 from django.views.generic import RedirectView
 
-from open_inwoner.accounts.views.cases import (
-    CaseDetailView,
-    CaseDocumentDownloadView,
-    ClosedCaseListView,
-    OpenCaseListView,
-    OpenSubmissionListView,
-)
 from open_inwoner.accounts.views.contactmoments import (
     KlantContactMomentDetailView,
     KlantContactMomentListView,
 )
 
+from .views import (
+    CaseContactFormView,
+    CaseDocumentDownloadView,
+    CaseDocumentUploadFormView,
+    InnerCaseDetailView,
+    InnerClosedCaseListView,
+    InnerOpenCaseListView,
+    InnerOpenSubmissionListView,
+    OuterCaseDetailView,
+    OuterClosedCaseListView,
+    OuterOpenCaseListView,
+    OuterOpenSubmissionListView,
+)
+
 app_name = "cases"
 
 urlpatterns = [
-    path("closed/", ClosedCaseListView.as_view(), name="closed_cases"),
-    path("forms/", OpenSubmissionListView.as_view(), name="open_submissions"),
+    path(
+        "closed/content/",
+        InnerClosedCaseListView.as_view(),
+        name="closed_cases_content",
+    ),
+    path("closed/", OuterClosedCaseListView.as_view(), name="closed_cases"),
+    path("forms/", OuterOpenSubmissionListView.as_view(), name="open_submissions"),
+    path(
+        "forms/content/",
+        InnerOpenSubmissionListView.as_view(),
+        name="open_submissions_content",
+    ),
     path(
         "contactmomenten/",
         KlantContactMomentListView.as_view(),
@@ -34,10 +51,26 @@ urlpatterns = [
         name="document_download",
     ),
     path(
+        "<str:object_id>/status/content/",
+        InnerCaseDetailView.as_view(),
+        name="case_detail_content",
+    ),
+    path(
         "<str:object_id>/status/",
-        CaseDetailView.as_view(),
+        OuterCaseDetailView.as_view(),
         name="case_detail",
     ),
+    path(
+        "<str:object_id>/status/contact-form/",
+        CaseContactFormView.as_view(),
+        name="case_detail_contact_form",
+    ),
+    path(
+        "<str:object_id>/status/document-form/",
+        CaseDocumentUploadFormView.as_view(),
+        name="case_detail_document_form",
+    ),
     path("open/", RedirectView.as_view(pattern_name="cases:open_cases"), name="index"),
-    path("", OpenCaseListView.as_view(), name="open_cases"),
+    path("content/", InnerOpenCaseListView.as_view(), name="open_cases_content"),
+    path("", OuterOpenCaseListView.as_view(), name="open_cases"),
 ]
