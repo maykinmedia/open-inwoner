@@ -127,6 +127,7 @@ if "digid_eherkenning.backends.DigiDBackend" in settings.AUTHENTICATION_BACKENDS
             name="acs",
         ),
         path("digid/", include("digid_eherkenning.digid_urls")),
+        path("metadata/", include("digid_eherkenning.metadata_urls")),
     ] + urlpatterns
 elif settings.DIGID_MOCK:
     urlpatterns = [
