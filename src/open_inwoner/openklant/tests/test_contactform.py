@@ -179,7 +179,7 @@ class ContactFormTestCase(
         self.assertEqual(
             sub_options,
             [
-                ("", True, "---------"),
+                ("", True, _("Selecteren")),
                 (str(subject_1.pk), False, subject_1.subject),
                 (str(subject_2.pk), False, subject_2.subject),
             ],
@@ -195,7 +195,7 @@ class ContactFormTestCase(
         self.assertEqual(
             sub_options,
             [
-                ("", True, "---------"),
+                ("", True, _("Selecteren")),
                 (str(subject_2.pk), False, subject_2.subject),
                 (str(subject_1.pk), False, subject_1.subject),
             ],
