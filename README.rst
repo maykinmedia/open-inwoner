@@ -3,7 +3,7 @@ Open Inwoner
 ==================
 
 
-:Version: 1.7
+:Version: 1.8
 :Source: https://github.com/maykinmedia/open-inwoner
 :Keywords: inwoner
 :PythonVersion: 3.9
