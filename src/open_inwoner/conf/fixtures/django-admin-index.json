@@ -293,6 +293,10 @@
         "slug": "koppelingen",
         "models": [
             [
+                "digid_eherkenning",
+                "digidconfiguration"
+            ],
+            [
                 "haalcentraal",
                 "haalcentraalconfig"
             ],
