@@ -144,7 +144,11 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name=_("Deactivated on"),
         null=True,
         blank=True,
-        help_text=_("This is the date the user decided to deactivate their account."),
+        help_text=_(
+            "This is the date the user decided to deactivate their account. "
+            "This field is deprecated since user profiles are now immediately "
+            "deleted."
+        ),
     )
     is_prepopulated = models.BooleanField(
         verbose_name=_("Prepopulated"),
@@ -249,11 +253,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         if self.street:
             return f"{self.street} {self.housenumber}, {self.city}"
         return ""
-
-    def deactivate(self):
-        self.is_active = False
-        self.deactivated_on = date.today()
-        self.save()
 
     def get_new_messages_total(self) -> int:
         return self.received_messages.filter(seen=False).count()

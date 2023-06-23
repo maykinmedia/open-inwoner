@@ -12,6 +12,7 @@ from open_inwoner.accounts.choices import StatusChoices
 from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 from open_inwoner.pdc.tests.factories import CategoryFactory
+from open_inwoner.plans.tests.factories import PlanFactory
 from open_inwoner.utils.logentry import LOG_ACTIONS
 from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin, create_image_bytes
 
@@ -21,6 +22,7 @@ from ...openklant.tests.data import MockAPIReadPatchData
 from ...questionnaire.tests.factories import QuestionnaireStepFactory
 from ..choices import ContactTypeChoices, LoginTypeChoices
 from ..forms import BrpUserForm, UserForm
+from ..models import User
 from .factories import ActionFactory, DigidUserFactory, DocumentFactory, UserFactory
 
 
@@ -91,49 +93,6 @@ class ProfileViewTests(WebTest):
         response = self.app.get(self.url, user=self.user)
         self.assertEquals(response.status_code, 200)
         self.assertContains(response, "0 acties staan open.")
-
-    def test_deactivate_account(self):
-        response = self.app.get(self.url, user=self.user)
-        self.assertEquals(response.status_code, 200)
-        form = response.forms["deactivate-form"]
-        base_response = form.submit()
-        self.assertEquals(base_response.url, self.return_url)
-        followed_response = base_response.follow().follow()
-        self.assertEquals(followed_response.status_code, 200)
-        self.user.refresh_from_db()
-        self.assertFalse(self.user.is_active)
-        self.assertIsNotNone(self.user.deactivated_on)
-
-    def test_deactivate_account_staff(self):
-        self.user.is_staff = True
-        self.user.save()
-        response = self.app.get(self.url, user=self.user)
-        self.assertEquals(response.status_code, 200)
-        form = response.forms["deactivate-form"]
-        base_response = form.submit()
-        self.assertEquals(base_response.url, self.url)
-        followed_response = base_response.follow()
-        self.assertEquals(followed_response.status_code, 200)
-        self.user.refresh_from_db()
-        self.assertTrue(self.user.is_active)
-        self.assertIsNone(self.user.deactivated_on)
-
-    def test_deactivate_account_digid(self):
-        """
-        check that user is redirected to digid:logout
-        """
-        user = UserFactory.create(
-            login_type=LoginTypeChoices.digid, email="john@smith.nl"
-        )
-
-        response = self.app.get(self.url, user=user)
-        self.assertEquals(response.status_code, 200)
-        form = response.forms["deactivate-form"]
-
-        response = form.submit()
-
-        self.assertEquals(response.status_code, 302)
-        self.assertEquals(response.url, reverse("digid:logout"))
 
     def test_get_documents_sorted(self):
         """
@@ -557,6 +516,92 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         self.assertTimelineLog("retrieved klant for BSN-user")
         self.assertTimelineLog(
             "patched klant from user profile edit with fields: emailadres"
+        )
+
+
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+class ProfileDeleteTest(WebTest):
+    csrf_checks = False
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.url = reverse("profile:detail")
+
+    def test_delete_regular_user_success(self):
+        user = UserFactory()
+
+        # get profile page
+        response = self.app.get(self.url, user=user)
+
+        # check delete
+        response = response.forms["delete-form"].submit()
+        self.assertIsNone(User.objects.first())
+
+        # check redirect
+        self.assertRedirects(
+            self.app.get(response.url),
+            reverse("pages-root"),
+            status_code=302,
+            target_status_code=200,
+            fetch_redirect_response=True,
+        )
+
+    def test_delete_user_with_digid_login_success(self):
+        user = DigidUserFactory()
+
+        # get profile page
+        response = self.app.get(self.url, user=user)
+
+        # check user deleted
+        response = response.forms["delete-form"].submit()
+        self.assertIsNone(User.objects.first())
+
+        # check redirect
+        self.assertRedirects(
+            self.app.get(response.url),
+            reverse("pages-root"),
+            status_code=302,
+            target_status_code=200,
+            fetch_redirect_response=True,
+        )
+
+    def test_delete_regular_user_as_plan_contact_fail(self):
+        user = UserFactory()
+        PlanFactory.create(plan_contacts=[user])
+
+        # get profile page
+        response = self.app.get(self.url, user=user)
+
+        # check user not deleted
+        response = response.forms["delete-form"].submit()
+        self.assertEqual(User.objects.first(), user)
+
+        # check redirect
+        self.assertRedirects(
+            response,
+            reverse("profile:detail"),
+            status_code=302,
+            target_status_code=200,
+            fetch_redirect_response=True,
+        )
+
+    def test_delete_staff_user_via_frontend_does_not_work(self):
+        user = UserFactory(is_staff=True)
+
+        # get profile page
+        response = self.app.get(self.url, user=user)
+
+        # check staff user not deleted
+        response = response.forms["delete-form"].submit()
+        self.assertEqual(User.objects.first(), user)
+
+        # check redirect
+        self.assertRedirects(
+            response,
+            reverse("profile:detail"),
+            status_code=302,
+            target_status_code=200,
+            fetch_redirect_response=True,
         )
 
 
