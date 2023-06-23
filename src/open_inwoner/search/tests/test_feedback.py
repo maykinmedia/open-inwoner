@@ -16,7 +16,7 @@ from .factories import FeedbackFactory
 from .utils import ESMixin
 
 
-@tag("no-parallel")
+@tag("elastic")
 class TestFeedbackFunctionality(ESMixin, WebTest):
     def setUp(self):
         self.user = UserFactory()

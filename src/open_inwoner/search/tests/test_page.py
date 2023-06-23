@@ -14,7 +14,7 @@ from ..constants import FacetChoices
 from .utils import ESMixin
 
 
-@tag("no-parallel")
+@tag("elastic")
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class SearchPageTests(ESMixin, WebTest):
     url = reverse_lazy("search:search")

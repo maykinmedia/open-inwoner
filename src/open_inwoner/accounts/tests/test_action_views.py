@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 from django.contrib.messages import get_messages
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import override_settings, tag
+from django.test import override_settings
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
@@ -314,7 +314,10 @@ class ActionViewTests(WebTest):
         self.assertEqual(response.status_code, 404)
 
 
+<<<<<<< HEAD
 @tag("e2e")
+=======
+>>>>>>> 3cf095c4 ([#1570] remove multi-browser support for playwright tests)
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 @patch("open_inwoner.configurations.models.SiteConfiguration.get_solo")
 class ActionsPlaywrightTests(PlaywrightSyncLiveServerTestCase):

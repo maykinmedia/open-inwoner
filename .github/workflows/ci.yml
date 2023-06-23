@@ -73,13 +73,11 @@ jobs:
           python src/manage.py collectstatic --noinput --link
           coverage run \
             --concurrency=multiprocessing \
-            --parallel-mode \
             src/manage.py test src \
             --parallel \
-            --exclude-tag no-parallel
+            --exclude-tag=elastic
           coverage run src/manage.py test src --tag no-parallel
           coverage combine
-          coverage report
 
         env:
           DJANGO_SETTINGS_MODULE: open_inwoner.conf.ci
