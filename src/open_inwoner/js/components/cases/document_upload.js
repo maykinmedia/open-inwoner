@@ -1,6 +1,5 @@
 export class DisableSubmitButton {
-  static documentSelector = '#document-upload'
-  static contactSelector = '#contact-form'
+  static selector = '.case-detail-form'
 
   constructor(form) {
     this.form = form
@@ -13,16 +12,7 @@ export class DisableSubmitButton {
   }
 }
 
-const caseDocumentForms = document.querySelectorAll(
-  DisableSubmitButton.documentSelector
-)
-;[...caseDocumentForms].forEach(
-  (caseDocumentForm) => new DisableSubmitButton(caseDocumentForm)
-)
-
-const caseContactForms = document.querySelectorAll(
-  DisableSubmitButton.contactSelector
-)
-;[...caseContactForms].forEach(
-  (caseContactForm) => new DisableSubmitButton(caseContactForm)
+const caseDetailForms = document.querySelectorAll(DisableSubmitButton.selector)
+;[...caseDetailForms].forEach(
+  (caseDetailForm) => new DisableSubmitButton(caseDetailForm)
 )

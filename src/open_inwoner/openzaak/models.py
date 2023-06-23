@@ -192,7 +192,7 @@ class ZaakTypeConfig(models.Model):
     )
 
     # contact moments
-    contact_moments_enabled = models.BooleanField(
+    contact_form_enabled = models.BooleanField(
         verbose_name=_("Enable sending questions via OpenKlant API"),
         default=False,
     )

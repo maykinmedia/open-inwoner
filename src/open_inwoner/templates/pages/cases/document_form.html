@@ -2,7 +2,7 @@
 
 <div class="upload-interface">
     {#  if local upload is enabled #}
-    {% render_form id="document-upload" form=form method="POST" hxencoding="multipart/form-data" hxpost=hxpost_document_form hxtarget="#form_upload" submit_text=_("Bestand uploaden") show_required=True %}
+    {% render_form id="document-upload" form=form method="POST" hxencoding="multipart/form-data" hxpost=hxpost_document_action hxtarget="#form_upload" submit_text=_("Bestand uploaden") show_required=True extra_classes="case-detail-form" %}
         {% csrf_token %}
         <div id="info_container" class="info-container form__control__info">
             <div class="upload-interface__info">

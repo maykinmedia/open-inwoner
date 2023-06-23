@@ -381,7 +381,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 "external_upload_enabled": False,
                 "external_upload_url": "",
                 "allowed_file_extensions": sorted(self.config.allowed_file_extensions),
-                "contact_moments_enabled": False,
+                "contact_form_enabled": False,
             },
         )
 
