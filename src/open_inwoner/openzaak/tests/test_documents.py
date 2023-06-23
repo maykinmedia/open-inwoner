@@ -1,5 +1,9 @@
+from datetime import date
+from io import BytesIO
+
 from django.contrib.auth.models import AnonymousUser
-from django.core.cache import cache
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -17,21 +21,34 @@ from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
-from open_inwoner.accounts.views.cases import SimpleFile
+from open_inwoner.cms.cases.views.status import SimpleFile
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 
-from ..documents import download_document
+from ..cases import connect_case_with_document
+from ..documents import download_document, upload_document
 from ..models import OpenZaakConfig
-from .factories import CertificateFactory, ServiceFactory
+from .factories import (
+    CertificateFactory,
+    ServiceFactory,
+    ZaakTypeConfigFactory,
+    ZaakTypeInformatieObjectTypeConfigFactory,
+)
+from .shared import CATALOGI_ROOT, DOCUMENTEN_ROOT, ZAKEN_ROOT
 
-ZAKEN_ROOT = "https://zaken.nl/api/v1/"
-CATALOGI_ROOT = "https://catalogi.nl/api/v1/"
-DOCUMENTEN_ROOT = "https://documenten.nl/api/v1/"
+
+def get_temporary_text_file():
+    io = BytesIO(b"some content")
+    text_file = InMemoryUploadedFile(
+        io, None, "foo.txt", "plain/text", len(io.getvalue()), None
+    )
+    text_file.seek(0)
+    return text_file
 
 
 @temp_private_root()
 @requests_mock.Mocker()
-class TestDocumentDownloadView(ClearCachesMixin, WebTest):
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -63,18 +80,20 @@ class TestDocumentDownloadView(ClearCachesMixin, WebTest):
             "schemas/Zaak",
             uuid="d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
             url=f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
-            zaaktype=f"{CATALOGI_ROOT}zaaktypen/53340e34-7581-4b04-884f",
+            zaaktype=f"{CATALOGI_ROOT}zaaktypen/0caa29cb-0167-426f-8dc1-88bebd7c8804",
             identificatie="ZAAK-2022-0000000024",
             omschrijving="Zaak naar aanleiding van ingezonden formulier",
             startdatum="2022-01-02",
             einddatum=None,
             status=f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+            bronorganisatie="123456782",
         )
         cls.zaaktype = generate_oas_component(
             "ztc",
             "schemas/ZaakType",
             url=cls.zaak["zaaktype"],
+            uuid="0caa29cb-0167-426f-8dc1-88bebd7c8804",
             omschrijving="Coffee zaaktype",
             catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             # openbaar and extern
@@ -126,16 +145,21 @@ class TestDocumentDownloadView(ClearCachesMixin, WebTest):
             inhoud=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812/download",
             informatieobjecttype=f"{CATALOGI_ROOT}informatieobjecttype/014c38fe-b010-4412-881c-3000032fb321",
             status="definitief",
+            indicatieGebruiksrecht=False,
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
             formaat="text/plain",
             bestandsnaam="my_document.txt",
             bestandsomvang=len(cls.informatie_object_content),
+            bronorganisatie="1233456782",
+            creatiedatum=date.today().strftime("%Y-%m-%d"),
+            titel="",
+            auteur="Open Inwoner Platform",
         )
         cls.informatie_object_file = SimpleFile(
             name="my_document.txt",
             size=len(cls.informatie_object_content),
             url=reverse(
-                "accounts:case_document_download",
+                "cases:document_download",
                 kwargs={
                     "object_id": cls.zaak["uuid"],
                     "info_id": cls.informatie_object["uuid"],
@@ -167,11 +191,21 @@ class TestDocumentDownloadView(ClearCachesMixin, WebTest):
         self._setUpAccessMocks(m)
         m.get(self.informatie_object["url"], json=self.informatie_object)
         m.get(self.informatie_object["inhoud"], content=self.informatie_object_content)
+        m.post(
+            f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten",
+            status_code=201,
+            json=self.informatie_object,
+        )
+        m.post(
+            f"{ZAKEN_ROOT}zaakinformatieobjecten",
+            status_code=201,
+            json=self.zaak_informatie_object,
+        )
 
     def test_document_content_is_retrieved_when_user_logged_in_via_digid(self, m):
         self._setUpMocks(m)
         url = reverse(
-            "accounts:case_document_download",
+            "cases:document_download",
             kwargs={
                 "object_id": self.zaak["uuid"],
                 "info_id": self.informatie_object["uuid"],
@@ -195,7 +229,7 @@ class TestDocumentDownloadView(ClearCachesMixin, WebTest):
     def test_document_retrieval_logs_case_identification_and_file(self, m):
         self._setUpMocks(m)
         url = reverse(
-            "accounts:case_document_download",
+            "cases:document_download",
             kwargs={
                 "object_id": self.zaak["uuid"],
                 "info_id": self.informatie_object["uuid"],
@@ -227,7 +261,7 @@ class TestDocumentDownloadView(ClearCachesMixin, WebTest):
         )
         m.get(info_object["url"], json=info_object)
         url = reverse(
-            "accounts:case_document_download",
+            "cases:document_download",
             kwargs={
                 "object_id": self.zaak["uuid"],
                 "info_id": info_object["uuid"],
@@ -250,7 +284,7 @@ class TestDocumentDownloadView(ClearCachesMixin, WebTest):
         )
         m.get(info_object["url"], json=info_object)
         url = reverse(
-            "accounts:case_document_download",
+            "cases:document_download",
             kwargs={
                 "object_id": self.zaak["uuid"],
                 "info_id": info_object["uuid"],
@@ -368,3 +402,141 @@ class TestDocumentDownloadView(ClearCachesMixin, WebTest):
         self.assertEqual(req.cert[0], client.public_certificate.path)
         self.assertEqual(req.cert[1], client.private_key.path)
         self.assertIn("Bearer ", req.headers["Authorization"])
+
+    def test_document_is_uploaded(self, m):
+        self._setUpMocks(m)
+
+        zaak_type_config = ZaakTypeConfigFactory(
+            identificatie=self.zaaktype["identificatie"]
+        )
+        zaak_type_iotc = ZaakTypeInformatieObjectTypeConfigFactory(
+            zaaktype_config=zaak_type_config,
+            informatieobjecttype_url=self.informatie_object["url"],
+            zaaktype_uuids=[self.zaaktype["uuid"]],
+            document_upload_enabled=True,
+        )
+        file = get_temporary_text_file()
+        title = "my_document"
+
+        created_document = upload_document(
+            self.user, file, title, zaak_type_iotc.id, self.zaak["bronorganisatie"]
+        )
+
+        self.assertEqual(created_document, self.informatie_object)
+
+    def test_document_response_is_none_when_http_404(self, m):
+        self._setUpMocks(m)
+
+        zaak_type_config = ZaakTypeConfigFactory(
+            identificatie=self.zaaktype["identificatie"]
+        )
+        zaak_type_iotc = ZaakTypeInformatieObjectTypeConfigFactory(
+            zaaktype_config=zaak_type_config,
+            informatieobjecttype_url=self.informatie_object["url"],
+            zaaktype_uuids=[self.zaaktype["uuid"]],
+            document_upload_enabled=True,
+        )
+        file = get_temporary_text_file()
+        title = "my_document"
+
+        m.post(f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten", status_code=404)
+        created_document = upload_document(
+            self.user, file, title, zaak_type_iotc.id, self.zaak["bronorganisatie"]
+        )
+
+        self.assertIsNone(created_document)
+
+    def test_document_response_is_none_when_http_500(self, m):
+        self._setUpMocks(m)
+
+        zaak_type_config = ZaakTypeConfigFactory(
+            identificatie=self.zaaktype["identificatie"]
+        )
+        zaak_type_iotc = ZaakTypeInformatieObjectTypeConfigFactory(
+            zaaktype_config=zaak_type_config,
+            informatieobjecttype_url=self.informatie_object["url"],
+            zaaktype_uuids=[self.zaaktype["uuid"]],
+            document_upload_enabled=True,
+        )
+        file = get_temporary_text_file()
+        title = "my_document"
+
+        m.post(f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten", status_code=500)
+        created_document = upload_document(
+            self.user, file, title, zaak_type_iotc.id, self.zaak["bronorganisatie"]
+        )
+
+        self.assertIsNone(created_document)
+
+    def test_document_response_is_none_when_no_client_is_configured(self, m):
+        self._setUpMocks(m)
+
+        zaak_type_config = ZaakTypeConfigFactory(
+            identificatie=self.zaaktype["identificatie"]
+        )
+        zaak_type_iotc = ZaakTypeInformatieObjectTypeConfigFactory(
+            zaaktype_config=zaak_type_config,
+            informatieobjecttype_url=self.informatie_object["url"],
+            zaaktype_uuids=[self.zaaktype["uuid"]],
+            document_upload_enabled=True,
+        )
+        self.config.document_service = None
+        self.config.save()
+
+        file = get_temporary_text_file()
+        title = "my_document"
+
+        created_document = upload_document(
+            self.user, file, title, zaak_type_iotc.id, self.zaak["bronorganisatie"]
+        )
+
+        self.assertIsNone(created_document)
+
+    def test_document_case_relationship_is_created(self, m):
+        self._setUpMocks(m)
+
+        created_relationship = connect_case_with_document(
+            self.zaak["url"], self.informatie_object["url"]
+        )
+
+        self.assertEqual(created_relationship, self.zaak_informatie_object)
+
+    def test_document_case_relationship_is_not_created_when_http_400(self, m):
+        self._setUpMocks(m)
+
+        m.post(
+            f"{ZAKEN_ROOT}zaakinformatieobjecten",
+            status_code=400,
+        )
+        created_relationship = connect_case_with_document(
+            self.zaak["url"], self.informatie_object["url"]
+        )
+
+        self.assertIsNone(created_relationship)
+
+    def test_document_case_relationship_is_not_created_when_http_500(self, m):
+        self._setUpMocks(m)
+
+        m.post(
+            f"{ZAKEN_ROOT}zaakinformatieobjecten",
+            status_code=500,
+        )
+        created_relationship = connect_case_with_document(
+            self.zaak["url"], self.informatie_object["url"]
+        )
+
+        self.assertIsNone(created_relationship)
+
+    def test_document_case_relationship_is_not_created_when_no_client_is_configured(
+        self, m
+    ):
+        self._setUpMocks(m)
+
+        self.config.zaak_service = None
+        self.config.save()
+
+        created_relationship = connect_case_with_document(
+            self.zaak["url"], self.informatie_object["url"]
+        )
+
+        self.assertIsNone(created_relationship)

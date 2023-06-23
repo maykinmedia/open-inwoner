@@ -16,7 +16,9 @@
                 {% autocomplete form.receiver %}
                 <div class="group-input">
                     {% textarea form.content %}
-                    {% input form.file icon="attach_file" no_label=True no_help=True extra_classes="message-file" %}
+                    {% if allow_file_sharing %}
+                        {% input form.file icon="attach_file" no_label=True no_help=True extra_classes="message-file" %}
+                    {% endif %}
                 </div>
                 {% form_actions primary_text=_("Versturen") %}
             {% endrender_form %}

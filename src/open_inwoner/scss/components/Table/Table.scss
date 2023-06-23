@@ -1,9 +1,16 @@
 .table {
+  display: block;
+  box-sizing: border-box;
+  white-space: nowrap;
   margin-top: var(--row-height);
   width: 100%;
   font-family: var(--font-family-body);
   border-collapse: collapse;
   border-spacing: 0;
+  overflow-x: scroll;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-secondary) var(--color-gray-lightest);
+  -webkit-overflow-scrolling: touch;
 
   &--space-medium {
     margin-top: var(--spacing-medium);
@@ -101,6 +108,15 @@
     &--top {
       vertical-align: top;
     }
+
+    &--notification-danger {
+      background-color: var(--color-danger-lightest);
+      color: var(--color-danger-darker);
+      font-size: var(--font-size-body);
+      text-align: center;
+      border-radius: var(--border-radius-large);
+      padding: var(--spacing-small) 0;
+    }
   }
 
   &__header {
@@ -138,4 +154,25 @@
       font-size: var(--font-size-body);
     }
   }
+
+  @media (min-width: 768px) {
+    display: table;
+  }
+}
+
+/// Scrollbar style for tables on mobile
+
+.table::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.table::-webkit-scrollbar-track {
+  background: var(--color-gray-lightest);
+}
+
+.table::-webkit-scrollbar-thumb {
+  background-color: var(--color-secondary);
+  border-radius: 6px;
+  border: 2px solid var(--color-secondary);
 }

@@ -3,6 +3,7 @@
 
 {% block content %}
 
+<div class="registration-grid">
 {% render_grid %}
     {% render_column span=9 %}
         {% render_card tinted=True  %}
@@ -11,5 +12,6 @@
         {% endrender_card %}
     {% endrender_column %}
 {% endrender_grid %}
+</div>
 
 {% endblock content %}

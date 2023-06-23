@@ -8,6 +8,7 @@ from ordered_model.admin import OrderedModelAdmin
 
 from open_inwoner.ckeditor5.widgets import CKEditorWidget
 from open_inwoner.utils.logentry import system_action
+from open_inwoner.utils.mixins import UUIDAdminFirstInOrder
 
 from ..models import (
     Product,
@@ -79,7 +80,7 @@ class ProductAdmin(ImportExportMixin, admin.ModelAdmin):
 
         if request.method == "POST":
             user = request.user
-            system_action(_("products were exported"), user)
+            system_action(_("products were exported"), user=user)
 
         return response
 
@@ -112,10 +113,11 @@ class ProductLinkAdmin(admin.ModelAdmin):
 
 
 @admin.register(ProductLocation)
-class ProductLocationAdmin(GeoAdminMixin, admin.ModelAdmin):
+class ProductLocationAdmin(GeoAdminMixin, UUIDAdminFirstInOrder, admin.ModelAdmin):
     list_display = ("name", "city", "postcode", "street", "housenumber")
     list_filter = ("city",)
     search_fields = ("name", "city")
+    readonly_fields = ("uuid",)
 
 
 @admin.register(ProductCondition)

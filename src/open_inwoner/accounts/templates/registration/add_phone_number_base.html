@@ -1,0 +1,14 @@
+{% extends "master.html" %}
+{% load i18n %}
+
+{% block extra_head %}
+    {{ wizard.form.media }}
+{% endblock %}
+
+{% block content %}
+    <h2 class="h2">
+        {% blocktranslate with step=wizard.steps.step1 count=wizard.steps.count %}
+            Account verificatie (stap {{ step }} van {{ count }})
+        {% endblocktranslate %}
+    </h2>
+{% endblock %}

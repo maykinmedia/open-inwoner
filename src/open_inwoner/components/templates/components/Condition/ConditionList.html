@@ -3,7 +3,7 @@
 <ul class="condition-list">
     {% for condition in conditions %}
         {% if negative %}
-            <li class="condition">{% icon "check" extra_classes="condition__mark condition__mark--negative" %}{{ condition.negative_text }}</li>
+            <li class="condition">{% icon "close" extra_classes="condition__mark condition__mark--negative" %}{{ condition.negative_text }}</li>
         {% else %}
             <li class="condition">{% icon "check" extra_classes="condition__mark condition__mark--positive" %}{{ condition.positive_text }}</li>
         {% endif %}

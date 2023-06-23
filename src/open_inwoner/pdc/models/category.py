@@ -61,12 +61,12 @@ class Category(MP_Node):
         help_text=_("Image of the category"),
     )
 
-    node_order_by = ["slug"]
     objects = CategoryPublishedQueryset.as_manager()
 
     class Meta:
         verbose_name = _("Category")
         verbose_name_plural = _("Categories")
+        ordering = ("path",)
 
     def __str__(self):
         return self.name
@@ -82,7 +82,9 @@ class Category(MP_Node):
         return build_slug
 
     def get_absolute_url(self):
-        return reverse("pdc:category_detail", kwargs={"slug": self.get_build_slug()})
+        return reverse(
+            "products:category_detail", kwargs={"slug": self.get_build_slug()}
+        )
 
     def move(self, target, pos=None):
         return PublishedMoveHandler(self, target, pos).process()

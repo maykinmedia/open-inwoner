@@ -12,15 +12,15 @@
     {% button_row align="right" %}
         {% dropdown icon="settings" secondary=True %}
             <div class="dropdown__item">
-                {% button href="accounts:edit_profile" text=_("Bewerken") icon="edit" icon_outlined=True  transparent=True secondary=True %}
+                {% button href="profile:edit" text=_("Bewerken") icon="edit" transparent=True %}
             </div>
             {% if can_change_password %}
                 <div class="dropdown__item">
-                    {% button href="password_change" text=_("Wijzig wachtwoord") icon="key" icon_outlined=True  transparent=True secondary=True %}
+                    {% button href="password_change" text=_("Wijzig wachtwoord") icon="key" transparent=True %}
                 </div>
             {% endif %}
         {% enddropdown %}
-        {% button href="accounts:profile_export" icon="file-pdf" text=_("Exporteer naar PDF") hide_text=True icon_outlined=True transparent=True secondary=True %}
+        {% button href="profile:export" icon="file-pdf" text=_("Exporteer naar PDF") hide_text=True icon_outlined=True transparent=True secondary=True %}
     {% endbutton_row %}
 </h1>
 
@@ -28,7 +28,8 @@
     <div class="personal-information__block personal-information__block--bold">
         {% icon icon="person_outline" %}<br>
         {{ request.user.get_full_name }}<br>
-	{{ request.user.email }}<br>
+	    {{ request.user.email }}<br>
+	    {% if request.user.phonenumber %}{{ request.user.phonenumber }}<br>{% endif %}
         {% if request.user.get_address %}{{ request.user.get_address }}{% else %}-{% endif %}
     </div>
     <div class="personal-information__block">
@@ -51,40 +52,75 @@
 <h1 class="h1" id="overview">{% trans "Persoonlijk overzicht" %}</h1>
 
 <div class="tabled tabled--flexible personal-overview">
-    <div class="tabled__row">
-        <div class="tabled__item tabled__item--bold">{% trans "Interessegebieden" %}</div>
-        <div class="tabled__item">{{ theme_text }}</div>
-        <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="accounts:my_themes" text="Aanpassen" icon="arrow_forward" icon_position="after" primary=True %}</div>
-    </div>
-    <div class="tabled__row">
-        <div class="tabled__item tabled__item--bold">{% trans "Begeleider van de gemeente" %}</div>
-        {% if mentor_contacts %}
-            <div class="tabled__item">{{ mentor_contacts|join:", " }}</div>
-            {% url 'accounts:contact_list' as mentor_url %}
-            <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href=mentor_url|add:"?type=begeleider" text="Stuur een bericht" icon="arrow_forward" icon_position="after" primary=True %}</div>
-        {% else %}
-            <div class="tabled__item">{% trans "U heeft (nog) geen gemeentelijke begeleider." %}</div>
-            <div class="tabled__item tabled__item--force-right tabled__item--mobile-big"></div>
-        {% endif %}
-    </div>
-    <div class="tabled__row">
-        <div class="tabled__item tabled__item--bold">{% trans "Mijn netwerkcontacten" %}</div>
-        <div class="tabled__item">{{ contact_text }}</div>
-        <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="accounts:contact_list" text=_("Beheer contacten") icon="arrow_forward" icon_position="after" primary=True %}</div>
-    </div>
-    {% if questionnaire_exists %}
+    {% if request.user.is_digid_and_brp and view.config.my_data %}
+        <div class="tabled__row">
+            <div class="tabled__item tabled__item--bold">{% trans "Mijn gegevens" %}</div>
+            <div class="tabled__item">{{request.user.get_full_name}}{% if request.user.get_address %}, {{ request.user.get_address }}{% endif %}</div>
+            <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="profile:data" text="Bekijken" icon="arrow_forward" icon_position="after" primary=True %}</div>
+        </div>
+    {% endif %}
+
+    {% if view.config.selected_categories %}
+        <div class="tabled__row">
+            <div class="tabled__item tabled__item--bold">{% trans "Interessegebieden" %}</div>
+            <div class="tabled__item">{{ category_text }}</div>
+            <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="profile:categories" text="Aanpassen" icon="arrow_forward" icon_position="after" primary=True %}</div>
+        </div>
+    {% endif %}
+
+    {% if view.config.mentors %}
+        <div class="tabled__row">
+            <div class="tabled__item tabled__item--bold">{% trans "Begeleider(s)" %}</div>
+            {% if mentor_contacts %}
+                <div class="tabled__item">{{ mentor_contacts|join:", " }}</div>
+                {% url 'profile:contact_list' as mentor_url %}
+		{% if inbox_page_is_published %}
+		    <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href=mentor_url|add:"?type=begeleider" text="Stuur een bericht" icon="arrow_forward" icon_position="after" primary=True %}</div>
+		{% endif %}
+            {% else %}
+                <div class="tabled__item">{% trans "U heeft (nog) geen gemeentelijke begeleider." %}</div>
+                <div class="tabled__item tabled__item--force-right tabled__item--mobile-big"></div>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {% if view.config.my_contacts %}
+        <div class="tabled__row">
+            <div class="tabled__item tabled__item--bold">{% trans "Mijn netwerkcontacten" %}</div>
+            <div class="tabled__item">{{ contact_text }}</div>
+            <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="profile:contact_list" text=_("Beheer contacten") icon="arrow_forward" icon_position="after" primary=True %}</div>
+        </div>
+    {% endif %}
+
+    {% if questionnaire_exists and view.config.selfdiagnose %}
         <div class="tabled__row">
             <div class="tabled__item tabled__item--bold">{% trans "Zelfdiagnose" %}</div>
             <div class="tabled__item"></div>
-            <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href='questionnaire:questionnaire_list' text=_('Start zelfdiagnose') icon="arrow_forward" icon_position="after" primary=True %}</div>
+            <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href='products:questionnaire_list' text=_('Start zelfdiagnose') icon="arrow_forward" icon_position="after" primary=True %}</div>
         </div>
     {% endif %}
-    {% if show_actions %}
-    <div class="personal-overview__actions tabled__row">
-        <div class="tabled__item tabled__item--bold">{% trans "Acties" %}</div>
-        <div class="tabled__item">{{ action_text }}</div>
-        <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="accounts:action_list" text="Aanpassen" icon="arrow_forward" icon_position="after" primary=True %}</div>
-    </div>
+
+    {% if view.config.actions %}
+        <div class="personal-overview__actions tabled__row">
+            <div class="tabled__item tabled__item--bold">{% trans "Acties" %}</div>
+            <div class="tabled__item">{{ action_text }}</div>
+            <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="profile:action_list" text="Aanpassen" icon="arrow_forward" icon_position="after" primary=True %}</div>
+        </div>
+    {% endif %}
+
+    {% if view.config.notifications %}
+        <div class="tabled__row">
+            <div class="tabled__item tabled__item--bold">{% trans "Communicatievoorkeuren" %}</div>
+            <div class="tabled__item">{{ request.user.get_active_notifications }}</div>
+            <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="profile:notifications" text="Aanpassen" icon="arrow_forward" icon_position="after" primary=True %}</div>
+        </div>
+    {% endif %}
+    {% if view.config.questions %}
+        <div class="tabled__row">
+            <div class="tabled__item tabled__item--bold">{% trans "Mijn vragen" %}</div>
+            <div class="tabled__item"></div>
+            <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="cases:contactmoment_list" text=_('Bekijken') icon="arrow_forward" icon_position="after" primary=True %}</div>
+        </div>
     {% endif %}
     {% comment %} <div class="tabled__row">
         <div class="tabled__item tabled__item--bold">{% trans "Afspraken" %}</div>
@@ -93,14 +129,13 @@
     </div> {% endcomment %}
 </div>
 
-{% render_form form=form method="POST" id="deactivate-form" extra_classes="confirm" spaceless=True data_confirm_title=_("Weet je het zeker dat je je account wilt deactiveren?") data_confirm_cancel=_("Nee") data_confirm_default=_("Ja") %}
+{% render_form form=form method="POST" id="delete-form" extra_classes="confirm" spaceless=True data_confirm_title=_("Weet u zeker dat u uw account wilt verwijderen?") data_confirm_text=_("Hiermee worden alleen uw persoonlijke voorkeuren verwijderd. U krijgt dan bijvoorbeeld geen e-mail meer van ons over wijzigingen van uw lopende zaken. Uw persoonsgegevens en uw lopende zaken zelf worden hiermee niet verwijderd.") data_confirm_cancel=_("Nee") data_confirm_default=_("Ja") %}
     {% csrf_token %}
-    {% form_actions primary_text=_("Profiel deactiveren") primary_icon="close" transparent=True %}
+    {% form_actions primary_text=_("Profiel verwijderen") primary_icon="close" transparent=True %}
 {% endrender_form %}
 
-{% file_list h1=True files=files allow_delete=True title=_("Bestanden") download_view="accounts:documents_download" %}
+{% if files %}
+{% file_list h1=True files=files allow_delete=True title=_("Bestanden") download_view="profile:documents_download" %}
+{% endif %}
 
-{% button_row align="right" %}
-    {% button href="accounts:documents_create" text=_("Bestand toevoegen") primary=True %}
-{% endbutton_row %}
 {% endblock content %}

@@ -1,13 +1,15 @@
+from datetime import date
 from uuid import uuid4
 
 from django.db import models
+from django.db.models import Q
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from filer.fields.file import FilerFileField
 
-from open_inwoner.accounts.choices import TypeChoices
+from open_inwoner.accounts.choices import StatusChoices, TypeChoices
 
 from .managers import PlanQuerySet
 
@@ -34,6 +36,12 @@ class PlanTemplate(models.Model):
         help_text=_(
             "The goal for the plan. So that you and the contact knows what the goal is."
         ),
+    )
+    description = models.TextField(
+        verbose_name=_("description"),
+        default="",
+        blank=True,
+        help_text=_("The description of the plan."),
     )
 
     def __str__(self):
@@ -67,15 +75,6 @@ class ActionTemplate(models.Model):
             "The description that will be applied to the action if this template in chosen."
         ),
     )
-    goal = models.CharField(
-        verbose_name=_("goal"),
-        default="",
-        blank=True,
-        max_length=250,
-        help_text=_(
-            "The goal that will be applied to the action if this template in chosen."
-        ),
-    )
     type = models.CharField(
         verbose_name=_("Type"),
         default=TypeChoices.incidental,
@@ -91,6 +90,16 @@ class ActionTemplate(models.Model):
     )
 
 
+class PlanContact(models.Model):
+    plan = models.ForeignKey(
+        "plans.Plan", verbose_name=_("Plan"), on_delete=models.CASCADE
+    )
+    user = models.ForeignKey(
+        "accounts.User", verbose_name=_("Contact"), on_delete=models.CASCADE
+    )
+    notify_new = models.BooleanField(verbose_name=_("Notify contact"), default=True)
+
+
 class Plan(models.Model):
     uuid = models.UUIDField(verbose_name=_("UUID"), default=uuid4, unique=True)
     title = models.CharField(
@@ -102,6 +111,12 @@ class Plan(models.Model):
             "The goal for the plan. So that you and the contact knows what the goal is."
         ),
     )
+    description = models.TextField(
+        verbose_name=_("description"),
+        default="",
+        blank=True,
+        help_text=_("The description of the plan."),
+    )
     end_date = models.DateField(
         verbose_name=_("End date"), help_text=_("When the plan should be archived.")
     )
@@ -111,6 +126,7 @@ class Plan(models.Model):
         related_name="plans",
         blank=True,
         help_text=_("The contact that will help you with this plan."),
+        through=PlanContact,
     )
     created_by = models.ForeignKey(
         "accounts.User", verbose_name=_("Created by"), on_delete=models.CASCADE
@@ -129,12 +145,7 @@ class Plan(models.Model):
         return self.title
 
     def get_absolute_url(self):
-        return reverse("plans:plan_detail", kwargs={"uuid": self.uuid})
-
-    def contactperson_list(self):
-        return ", ".join(
-            [contact.get_full_name() for contact in self.plan_contacts.all()]
-        )
+        return reverse("collaborate:plan_detail", kwargs={"uuid": self.uuid})
 
     def get_latest_file(self):
         file = self.documents.order_by("-created_on").first()
@@ -158,3 +169,19 @@ class Plan(models.Model):
         from open_inwoner.accounts.models import User
 
         return User.objects.filter(id__in=user_ids)
+
+    def get_other_users_full_names(self, user):
+        other_users = self.get_other_users(user)
+        return ", ".join([user.get_full_name() for user in other_users])
+
+    def get_status(self):
+        if self.end_date > date.today():
+            return _("Open")
+        else:
+            return _("Afgerond")
+
+    def open_actions(self):
+        return self.actions.filter(
+            Q(status=StatusChoices.open) | Q(status=StatusChoices.approval),
+            is_deleted=False,
+        )

@@ -1,3 +1,5 @@
+import logging
+
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
@@ -28,7 +30,7 @@ class TestProductLogging(WebTest):
         form["name"] = self.product.name
         form["slug"] = self.product.slug
         form["content"] = self.product.content
-        form["categories"].force_value(self.category.id)
+        form["summary"] = self.product.summary
         form["costs"] = 0.0
         form.submit()
         product = Product.objects.filter(slug=self.product.slug).first()
@@ -147,14 +149,14 @@ class TestProductLogging(WebTest):
         self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEqual(log_entry.content_object.id, self.user.id)
+        self.assertEqual(log_entry.user.id, self.user.id)
         self.assertEqual(
             log_entry.extra_data,
             {
                 "message": _("products were exported"),
-                "log_level": None,
+                "log_level": logging.INFO,
                 "action_flag": list(LOG_ACTIONS[5]),
-                "content_object_repr": self.user.email,
+                "content_object_repr": "",
             },
         )
 
@@ -206,7 +208,7 @@ class TestCategoryLogging(WebTest):
         self.assertEqual(
             log_entry.extra_data,
             {
-                "message": _("Omschrijving gewijzigd."),
+                "message": "Omschrijving and Ten opzichte van gewijzigd.",
                 "action_flag": [2, "Change"],
                 "content_object_repr": category.name,
             },
@@ -272,13 +274,13 @@ class TestCategoryLogging(WebTest):
         self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEqual(log_entry.content_object.id, self.user.id)
+        self.assertEqual(log_entry.user.id, self.user.id)
         self.assertEqual(
             log_entry.extra_data,
             {
                 "message": _("categories were exported"),
-                "log_level": None,
+                "log_level": logging.INFO,
                 "action_flag": list(LOG_ACTIONS[5]),
-                "content_object_repr": self.user.email,
+                "content_object_repr": "",
             },
         )

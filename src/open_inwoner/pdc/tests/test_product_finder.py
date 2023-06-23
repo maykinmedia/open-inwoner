@@ -1,13 +1,13 @@
-from django.core import mail
+from django.test import override_settings
 from django.urls import reverse
 
 from django_webtest import WebTest
 
-from open_inwoner.accounts.tests.factories import UserFactory
-
+from ..models import ProductCondition
 from .factories import ProductConditionFactory, ProductFactory
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class ProductConditions(WebTest):
     def setUp(self):
         self.product1 = ProductFactory(name="Product A")
@@ -42,7 +42,7 @@ class ProductConditions(WebTest):
         self.product10.conditions.add(self.condition4)
 
     def test_no_filter(self):
-        response = self.app.get(reverse("pdc:product_finder"))
+        response = self.app.get(reverse("products:product_finder"))
         matched_products = list(response.context["matched_products"])
         possible_products = list(response.context["possible_products"])
         self.assertEqual(len(matched_products), 0)
@@ -73,7 +73,7 @@ class ProductConditions(WebTest):
         self.assertIn(self.product12, possible_products)
 
     def test_q1_yes(self):
-        response = self.app.get(reverse("pdc:product_finder"))
+        response = self.app.get(reverse("products:product_finder"))
         form = response.forms["product-finder"]
         form["answer"].value = "yes"
         response = form.submit().follow()
@@ -108,7 +108,7 @@ class ProductConditions(WebTest):
         self.assertIn(self.product12, possible_products)
 
     def test_q1_no(self):
-        response = self.app.get(reverse("pdc:product_finder"))
+        response = self.app.get(reverse("products:product_finder"))
         form = response.forms["product-finder"]
         form["answer"].value = "no"
         response = form.submit().follow()
@@ -143,7 +143,7 @@ class ProductConditions(WebTest):
         self.assertIn(self.product12, possible_products)
 
     def test_q1_yes_q2_yes(self):
-        response = self.app.get(reverse("pdc:product_finder"))
+        response = self.app.get(reverse("products:product_finder"))
 
         # Answering q1
         form = response.forms["product-finder"]
@@ -188,7 +188,7 @@ class ProductConditions(WebTest):
         self.assertIn(self.product12, possible_products)
 
     def test_q1_yes_q2_no(self):
-        response = self.app.get(reverse("pdc:product_finder"))
+        response = self.app.get(reverse("products:product_finder"))
 
         # Answering q1
         form = response.forms["product-finder"]
@@ -231,7 +231,7 @@ class ProductConditions(WebTest):
         self.assertIn(self.product12, possible_products)
 
     def test_q1_no_q2_yes(self):
-        response = self.app.get(reverse("pdc:product_finder"))
+        response = self.app.get(reverse("products:product_finder"))
 
         # Answering q1
         form = response.forms["product-finder"]
@@ -274,7 +274,7 @@ class ProductConditions(WebTest):
         self.assertIn(self.product12, possible_products)
 
     def test_q1_no_q2_no(self):
-        response = self.app.get(reverse("pdc:product_finder"))
+        response = self.app.get(reverse("products:product_finder"))
 
         # Answering q1
         form = response.forms["product-finder"]
@@ -317,7 +317,7 @@ class ProductConditions(WebTest):
         self.assertIn(self.product12, possible_products)
 
     def test_q1_yes_q2_yes_q3_yes(self):
-        response = self.app.get(reverse("pdc:product_finder"))
+        response = self.app.get(reverse("products:product_finder"))
 
         # Answering q1
         form = response.forms["product-finder"]
@@ -365,7 +365,7 @@ class ProductConditions(WebTest):
         self.assertIn(self.product12, possible_products)
 
     def test_q1_yes_q2_yes_q3_no(self):
-        response = self.app.get(reverse("pdc:product_finder"))
+        response = self.app.get(reverse("products:product_finder"))
 
         # Answering q1
         form = response.forms["product-finder"]
@@ -413,7 +413,7 @@ class ProductConditions(WebTest):
         self.assertIn(self.product12, possible_products)
 
     def test_q1_yes_q2_no_q3_yes(self):
-        response = self.app.get(reverse("pdc:product_finder"))
+        response = self.app.get(reverse("products:product_finder"))
 
         # Answering q1
         form = response.forms["product-finder"]
@@ -461,7 +461,7 @@ class ProductConditions(WebTest):
         self.assertIn(self.product12, possible_products)
 
     def test_q1_yes_q2_no_q3_no(self):
-        response = self.app.get(reverse("pdc:product_finder"))
+        response = self.app.get(reverse("products:product_finder"))
 
         # Answering q1
         form = response.forms["product-finder"]
@@ -509,7 +509,7 @@ class ProductConditions(WebTest):
         self.assertIn(self.product12, possible_products)
 
     def test_q1_no_q2_yes_q3_yes(self):
-        response = self.app.get(reverse("pdc:product_finder"))
+        response = self.app.get(reverse("products:product_finder"))
 
         # Answering q1
         form = response.forms["product-finder"]
@@ -557,7 +557,7 @@ class ProductConditions(WebTest):
         self.assertIn(self.product12, possible_products)
 
     def test_q1_no_q2_yes_q3_no(self):
-        response = self.app.get(reverse("pdc:product_finder"))
+        response = self.app.get(reverse("products:product_finder"))
 
         # Answering q1
         form = response.forms["product-finder"]
@@ -605,7 +605,7 @@ class ProductConditions(WebTest):
         self.assertIn(self.product12, possible_products)
 
     def test_q1_no_q2_no_q3_yes(self):
-        response = self.app.get(reverse("pdc:product_finder"))
+        response = self.app.get(reverse("products:product_finder"))
 
         # Answering q1
         form = response.forms["product-finder"]
@@ -653,7 +653,7 @@ class ProductConditions(WebTest):
         self.assertIn(self.product12, possible_products)
 
     def test_q1_no_q2_no_q3_no(self):
-        response = self.app.get(reverse("pdc:product_finder"))
+        response = self.app.get(reverse("products:product_finder"))
 
         # Answering q1
         form = response.forms["product-finder"]
@@ -701,7 +701,7 @@ class ProductConditions(WebTest):
         self.assertIn(self.product12, possible_products)
 
     def test_q1_yes_q2_yes_q3_yes_q4_yes(self):
-        response = self.app.get(reverse("pdc:product_finder"))
+        response = self.app.get(reverse("products:product_finder"))
 
         # Answering q1
         form = response.forms["product-finder"]
@@ -754,7 +754,7 @@ class ProductConditions(WebTest):
         self.assertIn(self.product12, possible_products)
 
     def test_q1_yes_q2_yes_q3_yes_q4_no(self):
-        response = self.app.get(reverse("pdc:product_finder"))
+        response = self.app.get(reverse("products:product_finder"))
 
         # Answering q1
         form = response.forms["product-finder"]
@@ -807,7 +807,7 @@ class ProductConditions(WebTest):
         self.assertIn(self.product12, possible_products)
 
     def test_q1_yes_q2_yes_q3_no_q4_yes(self):
-        response = self.app.get(reverse("pdc:product_finder"))
+        response = self.app.get(reverse("products:product_finder"))
 
         # Answering q1
         form = response.forms["product-finder"]
@@ -860,7 +860,7 @@ class ProductConditions(WebTest):
         self.assertIn(self.product12, possible_products)
 
     def test_q1_yes_q2_yes_q3_no_q4_no(self):
-        response = self.app.get(reverse("pdc:product_finder"))
+        response = self.app.get(reverse("products:product_finder"))
 
         # Answering q1
         form = response.forms["product-finder"]
@@ -913,7 +913,7 @@ class ProductConditions(WebTest):
         self.assertIn(self.product12, possible_products)
 
     def test_q1_yes_q2_no_q3_yes_q4_yes(self):
-        response = self.app.get(reverse("pdc:product_finder"))
+        response = self.app.get(reverse("products:product_finder"))
 
         # Answering q1
         form = response.forms["product-finder"]
@@ -966,7 +966,7 @@ class ProductConditions(WebTest):
         self.assertIn(self.product12, possible_products)
 
     def test_q1_yes_q2_no_q3_yes_q4_no(self):
-        response = self.app.get(reverse("pdc:product_finder"))
+        response = self.app.get(reverse("products:product_finder"))
 
         # Answering q1
         form = response.forms["product-finder"]
@@ -1019,7 +1019,7 @@ class ProductConditions(WebTest):
         self.assertIn(self.product12, possible_products)
 
     def test_q1_yes_q2_no_q3_no_q4_yes(self):
-        response = self.app.get(reverse("pdc:product_finder"))
+        response = self.app.get(reverse("products:product_finder"))
 
         # Answering q1
         form = response.forms["product-finder"]
@@ -1072,7 +1072,7 @@ class ProductConditions(WebTest):
         self.assertIn(self.product12, possible_products)
 
     def test_q1_yes_q2_no_q3_no_q4_no(self):
-        response = self.app.get(reverse("pdc:product_finder"))
+        response = self.app.get(reverse("products:product_finder"))
 
         # Answering q1
         form = response.forms["product-finder"]
@@ -1125,7 +1125,7 @@ class ProductConditions(WebTest):
         self.assertIn(self.product12, possible_products)
 
     def test_q1_no_q2_yes_q3_yes_q4_yes(self):
-        response = self.app.get(reverse("pdc:product_finder"))
+        response = self.app.get(reverse("products:product_finder"))
 
         # Answering q1
         form = response.forms["product-finder"]
@@ -1178,7 +1178,7 @@ class ProductConditions(WebTest):
         self.assertIn(self.product12, possible_products)
 
     def test_q1_no_q2_yes_q3_yes_q4_no(self):
-        response = self.app.get(reverse("pdc:product_finder"))
+        response = self.app.get(reverse("products:product_finder"))
 
         # Answering q1
         form = response.forms["product-finder"]
@@ -1231,7 +1231,7 @@ class ProductConditions(WebTest):
         self.assertIn(self.product12, possible_products)
 
     def test_q1_no_q2_yes_q3_no_q4_yes(self):
-        response = self.app.get(reverse("pdc:product_finder"))
+        response = self.app.get(reverse("products:product_finder"))
 
         # Answering q1
         form = response.forms["product-finder"]
@@ -1284,7 +1284,7 @@ class ProductConditions(WebTest):
         self.assertIn(self.product12, possible_products)
 
     def test_q1_no_q2_yes_q3_no_q4_no(self):
-        response = self.app.get(reverse("pdc:product_finder"))
+        response = self.app.get(reverse("products:product_finder"))
 
         # Answering q1
         form = response.forms["product-finder"]
@@ -1337,7 +1337,7 @@ class ProductConditions(WebTest):
         self.assertIn(self.product12, possible_products)
 
     def test_q1_no_q2_no_q3_yes_q4_yes(self):
-        response = self.app.get(reverse("pdc:product_finder"))
+        response = self.app.get(reverse("products:product_finder"))
 
         # Answering q1
         form = response.forms["product-finder"]
@@ -1390,7 +1390,7 @@ class ProductConditions(WebTest):
         self.assertIn(self.product12, possible_products)
 
     def test_q1_no_q2_no_q3_yes_q4_no(self):
-        response = self.app.get(reverse("pdc:product_finder"))
+        response = self.app.get(reverse("products:product_finder"))
 
         # Answering q1
         form = response.forms["product-finder"]
@@ -1443,7 +1443,7 @@ class ProductConditions(WebTest):
         self.assertIn(self.product12, possible_products)
 
     def test_q1_no_q2_no_q3_no_q4_yes(self):
-        response = self.app.get(reverse("pdc:product_finder"))
+        response = self.app.get(reverse("products:product_finder"))
 
         # Answering q1
         form = response.forms["product-finder"]
@@ -1496,7 +1496,7 @@ class ProductConditions(WebTest):
         self.assertIn(self.product12, possible_products)
 
     def test_q1_no_q2_no_q3_no_q4_no(self):
-        response = self.app.get(reverse("pdc:product_finder"))
+        response = self.app.get(reverse("products:product_finder"))
 
         # Answering q1
         form = response.forms["product-finder"]
@@ -1547,3 +1547,21 @@ class ProductConditions(WebTest):
         self.assertIn(self.product11, possible_products)
         self.assertNotIn(self.product12, matched_products)
         self.assertIn(self.product12, possible_products)
+
+    def test_product_finder_is_reset_when_no_condition(self):
+        response = self.app.get(reverse("products:product_finder"))
+        form = response.forms["product-finder"]
+
+        ProductCondition.objects.all().delete()
+
+        form["answer"].value = "yes"
+        response = form.submit()
+
+        self.assertRedirects(response, reverse("products:product_finder"))
+
+        session = self.app.session
+        response.follow()
+
+        self.assertEqual(session["product_finder"], {})
+        self.assertIsNone(session["current_condition"])
+        self.assertFalse(session["conditions_done"])

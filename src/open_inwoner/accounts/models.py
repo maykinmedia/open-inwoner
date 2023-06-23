@@ -1,3 +1,4 @@
+import os
 from datetime import date, timedelta
 from uuid import uuid4
 
@@ -10,20 +11,26 @@ from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.utils.translation import ugettext_lazy as _
 
-from furl import furl
+from image_cropping import ImageCropField, ImageRatioField
 from localflavor.nl.models import NLBSNField, NLZipCodeField
 from mail_editor.helpers import find_template
 from privates.storages import PrivateMediaFileSystemStorage
 from timeline_logger.models import TimelineLog
 
-from open_inwoner.utils.validators import (
-    validate_charfield_entry,
-    validate_phone_number,
-)
+from open_inwoner.utils.hash import create_sha256_hash
+from open_inwoner.utils.validators import CharFieldValidator, validate_phone_number
 
+from ..plans.models import PlanContact
 from .choices import ContactTypeChoices, LoginTypeChoices, StatusChoices, TypeChoices
 from .managers import ActionQueryset, DigidManager, UserManager, eHerkenningManager
-from .query import InviteQuerySet, MessageQuerySet, UserQuerySet
+from .query import InviteQuerySet, MessageQuerySet
+
+
+def generate_uuid_image_name(instance, filename):
+    filename, file_extension = os.path.splitext(filename)
+    return "profile/{uuid}{file_extension}".format(
+        uuid=uuid4(), file_extension=file_extension.lower()
+    )
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -42,14 +49,28 @@ class User(AbstractBaseUser, PermissionsMixin):
         max_length=255,
         blank=True,
         default="",
-        validators=[validate_charfield_entry],
+        validators=[CharFieldValidator()],
+    )
+    infix = models.CharField(
+        verbose_name=_("Infix"),
+        max_length=64,
+        blank=True,
+        default="",
+        validators=[CharFieldValidator()],
     )
     last_name = models.CharField(
         verbose_name=_("Last name"),
         max_length=255,
         blank=True,
         default="",
-        validators=[validate_charfield_entry],
+        validators=[CharFieldValidator()],
+    )
+    display_name = models.CharField(
+        verbose_name=_("Display name"),
+        max_length=255,
+        blank=True,
+        default="",
+        validators=[CharFieldValidator()],
     )
     email = models.EmailField(verbose_name=_("Email address"), unique=True)
     phonenumber = models.CharField(
@@ -59,6 +80,14 @@ class User(AbstractBaseUser, PermissionsMixin):
         max_length=15,
         validators=[validate_phone_number],
     )
+    image = ImageCropField(
+        verbose_name=_("Image"),
+        null=True,
+        blank=True,
+        upload_to=generate_uuid_image_name,
+        help_text=_("Image"),
+    )
+    cropping = ImageRatioField("image", "150x150", size_warning=True)
     is_staff = models.BooleanField(
         verbose_name=_("Staff status"),
         default=False,
@@ -92,7 +121,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
     birthday = models.DateField(verbose_name=_("Birthday"), null=True, blank=True)
     street = models.CharField(
-        verbose_name=_("Street"), default="", blank=True, max_length=250
+        verbose_name=_("Street"),
+        default="",
+        blank=True,
+        max_length=250,
+        validators=[CharFieldValidator()],
     )
     housenumber = models.CharField(
         verbose_name=_("House number"), default="", blank=True, max_length=250
@@ -101,22 +134,30 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name=_("Postcode"), null=True, blank=True, max_length=250
     )
     city = models.CharField(
-        verbose_name=_("City"), default="", blank=True, max_length=250
+        verbose_name=_("City"),
+        default="",
+        blank=True,
+        max_length=250,
+        validators=[CharFieldValidator()],
     )
     deactivated_on = models.DateField(
         verbose_name=_("Deactivated on"),
         null=True,
         blank=True,
-        help_text=_("This is the date the user decided to deactivate their account."),
+        help_text=_(
+            "This is the date the user decided to deactivate their account. "
+            "This field is deprecated since user profiles are now immediately "
+            "deleted."
+        ),
     )
     is_prepopulated = models.BooleanField(
         verbose_name=_("Prepopulated"),
         default=False,
         help_text=_("Indicates if fields have been prepopulated by Haal Central API."),
     )
-    selected_themes = models.ManyToManyField(
+    selected_categories = models.ManyToManyField(
         "pdc.Category",
-        verbose_name=_("Selected themes"),
+        verbose_name=_("Selected categories"),
         related_name="selected_by",
         blank=True,
     )
@@ -126,6 +167,27 @@ class User(AbstractBaseUser, PermissionsMixin):
         default="",
         blank=True,
         help_text="This field indicates if a user signed up with OpenId Connect or not.",
+    )
+    cases_notifications = models.BooleanField(
+        verbose_name=_("Cases notifications"),
+        default=True,
+        help_text=_(
+            "Indicates if the user wants to receive notifications for updates concerning cases."
+        ),
+    )
+    messages_notifications = models.BooleanField(
+        verbose_name=_("Messages notifications"),
+        default=True,
+        help_text=_(
+            "Indicates if the user wants to receive notifications for new messages."
+        ),
+    )
+    plans_notifications = models.BooleanField(
+        verbose_name=_("Plans notifications"),
+        default=True,
+        help_text=_(
+            "Indicates if the user wants to receive notifications for updates concerning plans and actions."
+        ),
     )
     user_contacts = models.ManyToManyField(
         "self",
@@ -154,16 +216,22 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name = _("User")
         verbose_name_plural = _("Users")
 
+    @property
+    def seed(self):
+        if not hasattr(self, "_seed"):
+            self._seed = create_sha256_hash(
+                str(self.date_joined) + str(self.uuid), salt=settings.SECRET_KEY
+            )
+
+        return self._seed
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._old_bsn = self.bsn
 
     def get_full_name(self):
-        """
-        Returns the first_name plus the last_name, with a space in between.
-        """
-        full_name = "%s %s" % (self.first_name, self.last_name)
-        return full_name.strip()
+        parts = (self.first_name, self.infix, self.last_name)
+        return " ".join(p for p in parts if p)
 
     def get_short_name(self):
         "Returns the short name for the user."
@@ -186,11 +254,6 @@ class User(AbstractBaseUser, PermissionsMixin):
             return f"{self.street} {self.housenumber}, {self.city}"
         return ""
 
-    def deactivate(self):
-        self.is_active = False
-        self.deactivated_on = date.today()
-        self.save()
-
     def get_new_messages_total(self) -> int:
         return self.received_messages.filter(seen=False).count()
 
@@ -198,14 +261,33 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.documents.order_by("-created_on")
 
     def get_interests(self) -> str:
-        if not self.selected_themes.exists():
-            return _("U heeft geen intressegebieden aangegeven.")
+        if not self.selected_categories.exists():
+            return _("U heeft geen interessegebieden aangegeven.")
 
-        return ", ".join(list(self.selected_themes.values_list("name", flat=True)))
+        return ", ".join(list(self.selected_categories.values_list("name", flat=True)))
+
+    def get_active_notifications(self) -> str:
+        enabled = []
+        if self.cases_notifications and self.login_type == LoginTypeChoices.digid:
+            enabled.append(_("cases"))
+        if self.messages_notifications:
+            enabled.append(_("messages"))
+        if self.plans_notifications:
+            enabled.append(_("plans"))
+        if not enabled:
+            return _("You do not have any notifications enabled.")
+
+        return ", ".join(str(notification) for notification in enabled)
 
     def require_necessary_fields(self) -> bool:
         """returns whether user needs to fill in necessary fields"""
-        if self.login_type == LoginTypeChoices.digid:
+        if (
+            self.is_digid_and_brp()
+            and self.email
+            and not self.email.endswith("@example.org")
+        ):
+            return False
+        elif self.login_type == LoginTypeChoices.digid:
             return (
                 not self.first_name
                 or not self.last_name
@@ -224,10 +306,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         )
 
     def get_contact_update_url(self):
-        return reverse("accounts:contact_edit", kwargs={"uuid": self.uuid})
+        return reverse("profile:contact_edit", kwargs={"uuid": self.uuid})
 
     def get_contact_message_url(self) -> str:
-        url = reverse("accounts:inbox", kwargs={"uuid": self.uuid})
+        url = reverse("inbox:index", kwargs={"uuid": self.uuid})
         return f"{url}#messages-last"
 
     def get_contact_type_display(self) -> str:
@@ -254,6 +336,23 @@ class User(AbstractBaseUser, PermissionsMixin):
             self.user_contacts.filter(email=email).exists()
             or self.contacts_for_approval.filter(email=email).exists()
         )
+
+    def get_plan_contact_new_count(self):
+        return (
+            PlanContact.objects.filter(user=self, notify_new=True)
+            .exclude(plan__created_by=self)
+            .count()
+        )
+
+    def clear_plan_contact_new_count(self):
+        PlanContact.objects.filter(user=self).update(notify_new=False)
+
+    def is_digid_and_brp(self) -> bool:
+        """
+        Returns whether user is logged in with digid and data has
+        been requested from haal centraal
+        """
+        return self.login_type == LoginTypeChoices.digid and self.is_prepopulated
 
 
 class Document(models.Model):
@@ -369,13 +468,6 @@ class Action(models.Model):
         default="",
         blank=True,
         help_text=_("The description of the action"),
-    )
-    goal = models.CharField(
-        verbose_name=_("Goal"),
-        default="",
-        blank=True,
-        max_length=250,
-        help_text=_("The goal of the action"),
     )
     status = models.CharField(
         verbose_name=_("Status"),
@@ -573,13 +665,13 @@ class Invite(models.Model):
         verbose_name=_("First name"),
         max_length=250,
         help_text=_("The first name of the invitee."),
-        validators=[validate_charfield_entry],
+        validators=[CharFieldValidator()],
     )
     invitee_last_name = models.CharField(
         verbose_name=_("Last name"),
         max_length=250,
         help_text=_("The last name of the invitee"),
-        validators=[validate_charfield_entry],
+        validators=[CharFieldValidator()],
     )
     invitee_email = models.EmailField(
         verbose_name=_("Invitee email"),
@@ -634,7 +726,7 @@ class Invite(models.Model):
         return template.send_email([self.invitee_email], context)
 
     def get_absolute_url(self) -> str:
-        return reverse("accounts:invite_accept", kwargs={"key": self.key})
+        return reverse("profile:invite_accept", kwargs={"key": self.key})
 
     def expired(self) -> bool:
         expiration_date = self.created_on + timedelta(days=settings.INVITE_EXPIRY)

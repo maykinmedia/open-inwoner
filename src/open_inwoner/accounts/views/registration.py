@@ -1,6 +1,7 @@
 from typing import Optional
 from urllib.parse import unquote
 
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
@@ -12,13 +13,13 @@ from django_registration.backends.one_step.views import RegistrationView
 from furl import furl
 
 from open_inwoner.utils.hash import generate_email_from_string
-from open_inwoner.utils.views import LogMixin
+from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from ..forms import CustomRegistrationForm, NecessaryUserForm
 from ..models import Invite, User
 
 
-class InviteMixin:
+class InviteMixin(CommonPageMixin):
     def get_initial(self):
         initial = super().get_initial()
 
@@ -60,12 +61,24 @@ class InviteMixin:
 class CustomRegistrationView(LogMixin, InviteMixin, RegistrationView):
     form_class = CustomRegistrationForm
 
+    def page_title(self):
+        return _("Registratie")
+
+    def get_success_url(self):
+        messages.add_message(self.request, messages.SUCCESS, "Registratie is voltooid")
+        return reverse("pages-root")
+
     def form_valid(self, form):
         user = form.save()
 
         invite = form.cleaned_data["invite"]
         if invite:
             self.add_invitee(invite, user)
+
+        # Remove invite url from user's session
+        session = self.request.session
+        if "invite_url" in session.keys():
+            del session["invite_url"]
 
         self.request.user = user
         self.log_user_action(user, _("user was created"))
@@ -76,15 +89,18 @@ class CustomRegistrationView(LogMixin, InviteMixin, RegistrationView):
 
         invite_key = self.request.GET.get("invite")
         necessary_fields_url = (
-            furl(reverse("accounts:registration_necessary"))
+            furl(reverse("profile:registration_necessary"))
             .add({"invite": invite_key})
             .url
             if invite_key
-            else reverse("accounts:registration_necessary")
+            else reverse("profile:registration_necessary")
         )
-        context["digit_url"] = (
-            furl(reverse("digid:login")).add({"next": necessary_fields_url}).url
-        )
+        try:
+            context["digit_url"] = (
+                furl(reverse("digid:login")).add({"next": necessary_fields_url}).url
+            )
+        except:
+            context["digit_url"] = ""
         return context
 
     def get(self, request, *args, **kwargs):
@@ -99,10 +115,21 @@ class NecessaryFieldsUserView(LogMixin, LoginRequiredMixin, InviteMixin, UpdateV
     model = User
     form_class = NecessaryUserForm
     template_name = "accounts/registration_necessary.html"
-    success_url = reverse_lazy("django_registration_complete")
+
+    def page_title(self):
+        return _("Registratie voltooien")
 
     def get_object(self, queryset=None):
         return self.request.user
+
+    def get_success_url(self):
+        messages.add_message(self.request, messages.SUCCESS, "Registratie is voltooid")
+        return reverse("pages-root")
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
 
     def form_valid(self, form):
         user = form.save()

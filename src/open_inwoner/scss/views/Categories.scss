@@ -1,0 +1,34 @@
+.categories {
+  &__content {
+    .card-container {
+      grid-template-columns: repeat(
+        auto-fit,
+        calc(230px - var(--spacing-small))
+      );
+
+      @media (min-width: 1600px) {
+        grid-template-columns: repeat(
+          auto-fit,
+          calc(25% - var(--gutter-width))
+        );
+      }
+
+      .card {
+        max-width: var(--mobile-xs-width);
+      }
+    }
+  }
+
+  &__products {
+    margin-top: var(--gutter-width);
+
+    .card-container {
+      margin-top: var(--gutter-width);
+      grid-template-columns: repeat(var(--card-columns), 1fr);
+
+      .card {
+        max-width: 100%;
+      }
+    }
+  }
+}

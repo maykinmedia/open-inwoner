@@ -6,7 +6,7 @@
         <div class="actions__filter-button">
             {% button text=_("Filter") type="button" bordered=True %}
         </div>
-        <div class="actions__filter-container">
+        <div class="actions__filter-container filter__container">
             <p class="p">{% trans "Filter op:" %}</p>
             {% date_field action_form.end_date no_label=True no_help=True icon="today" %}
             {% input action_form.is_for no_label=True no_help=True icon="person" %}
@@ -18,7 +18,7 @@
         {% for action in actions %}
             <div class="actions__action">
                 <div class="actions__actions">
-                    {% button icon="file-pdf" text=_("Export to PDF") hide_text=True href="accounts:action_export" uuid=action.uuid icon_outlined=True transparent=True %}
+                    {% button icon="file-pdf" text=_("Export to PDF") hide_text=True href="profile:action_export" uuid=action.uuid icon_outlined=True transparent=True %}
                     {% if action|is_connected:request.user %}
                         {% dropdown icon="settings" %}
                             <div class="dropdown__item">
@@ -26,7 +26,12 @@
                                 {% button icon="edit" text=_("Bewerken") href=action_url icon_outlined=True transparent=True %}
                             </div>
                             <div class="dropdown__item">
-                                {% button icon="history" text=_("History") href="accounts:action_history" uuid=action.uuid icon_outlined=True transparent=True %}
+                                {% if plan %}
+                                    {% url 'collaborate:plan_action_history' plan_uuid=plan.uuid uuid=action.uuid as action_history_url %}
+                                    {% button icon="history" text=_("History") href=action_history_url uuid=action.uuid icon_outlined=True transparent=True %}
+                                {% else %}
+                                    {% button icon="history" text=_("History") href="profile:action_history" uuid=action.uuid icon_outlined=True transparent=True %}
+                                {% endif %}
                             </div>
                             <div class="dropdown__item">
                                 {% get_action_delete_url action=action plan=plan as action_url %}
@@ -61,7 +66,7 @@
                 <div class="actions__label">
                     {% if action.file %}
                         <div class="table__explain">{% trans "Document" %}</div>
-                        {% link href="accounts:action_download" text=action.file.name uuid=action.uuid %}
+                        {% link href="profile:action_download" text=action.file.name uuid=action.uuid %}
                     {% endif %}
                 </div>
                 <div class="actions__label">
@@ -84,7 +89,7 @@
                 </div>
             </div>
         {% empty %}
-            <div class="table__item" colspan="4"><p class="p">{% trans "er zijn geen acties gevonden met de huidige filter of er zijn geen acties" %}</p></div>
+            <div class="table__item" colspan="4"><p class="p">{% trans "er zijn geen acties gevonden met de huidige filters of er zijn geen acties" %}</p></div>
         {% endfor %}
     </div>
 </div>

@@ -1,4 +1,3 @@
-from django.core.cache import cache
 from django.test import TestCase
 
 import requests_mock
@@ -10,9 +9,7 @@ from open_inwoner.openzaak.cases import fetch_single_case
 from ...utils.test import ClearCachesMixin
 from ..models import OpenZaakConfig
 from .factories import ServiceFactory
-
-ZAKEN_ROOT = "https://zaken.nl/api/v1/"
-CATALOGI_ROOT = "https://catalogi.nl/api/v1/"
+from .shared import ZAKEN_ROOT
 
 
 @requests_mock.Mocker()

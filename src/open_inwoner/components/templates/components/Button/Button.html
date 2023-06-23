@@ -28,6 +28,7 @@
         title="{% firstof title text %}"
         aria-label="{% firstof title text %}"
         {% as_attributes extra_attributes %}
+        {% if id %} id="{{ id }}" {% endif %}
     >
         {% if icon %}{% icon icon=icon outlined=icon_outlined %}{% endif %}
         {% if text_icon %}

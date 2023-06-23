@@ -20,6 +20,10 @@
     }
   }
 
+  &.tabled--flexible + h2 {
+    margin: var(--row-height) 0 0 0;
+  }
+
   .tabled__header {
     display: grid;
     grid-template-columns: 1fr 1fr;

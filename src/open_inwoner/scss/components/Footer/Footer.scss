@@ -8,8 +8,9 @@
   background-color: var(--color-gray-lightest);
   box-sizing: border-box;
   display: grid;
-  gap: var(--gutter-width);
+  gap: var(--spacing-medium);
   grid-template-areas:
+    'lg-tx lg-tx lg-tx lg-tx'
     'lg   lg   lg   lg'
     'vstr vstr vstr vstr'
     'ml   ml   ml   ml'
@@ -20,7 +21,9 @@
   padding: $vm $hm;
 
   @media (min-width: 768px) {
+    gap: var(--gutter-width);
     grid-template-areas:
+      'lg-tx lg-tx lg-tx lg-tx . . . . . . . . '
       'lg   lg   lg   lg   lg  lg  lg  lg  lg   lg   lg lg'
       'vstr vstr vstr vstr scl scl scl scl scl lnks lnks lnks'
       'ml   ml   ml   ml   nws nws nws nws nws lnks lnks lnks';
@@ -29,12 +32,28 @@
 
   /// Layout.
 
-  .logo {
+  &__logo {
+    display: flex;
     grid-area: lg;
+
+    img {
+      width: auto;
+      max-height: 60px;
+    }
+  }
+
+  &__logo-text {
+    grid-area: lg-tx;
   }
 
   &__visitor {
     grid-area: vstr;
+
+    &-phonenumber a {
+      display: block;
+      color: var(--color-secondary);
+      text-decoration: none;
+    }
   }
 
   &__mail {

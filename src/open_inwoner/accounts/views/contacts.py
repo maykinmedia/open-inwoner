@@ -11,13 +11,16 @@ from django.views.generic.edit import FormView
 from mail_editor.helpers import find_template
 from view_breadcrumbs import BaseBreadcrumbMixin
 
-from open_inwoner.utils.views import LogMixin
+from open_inwoner.cms.utils.page_display import inbox_page_is_published
+from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from ..forms import ContactCreateForm, ContactFilterForm
 from ..models import Invite, User
 
 
-class ContactListView(LoginRequiredMixin, BaseBreadcrumbMixin, ListView):
+class ContactListView(
+    LoginRequiredMixin, CommonPageMixin, BaseBreadcrumbMixin, ListView
+):
     template_name = "pages/profile/contacts/list.html"
     model = User
     paginate_by = 10
@@ -25,8 +28,8 @@ class ContactListView(LoginRequiredMixin, BaseBreadcrumbMixin, ListView):
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn profiel"), reverse("accounts:my_profile")),
-            (_("Mijn contacten"), reverse("accounts:contact_list")),
+            (_("Mijn profiel"), reverse("profile:detail")),
+            (_("Mijn contacten"), reverse("profile:contact_list")),
         ]
 
     def get_queryset(self):
@@ -46,22 +49,25 @@ class ContactListView(LoginRequiredMixin, BaseBreadcrumbMixin, ListView):
         context["contacts_for_approval"] = user.get_contacts_for_approval()
         context["pending_invitations"] = user.get_pending_invitations()
         context["form"] = ContactFilterForm(data=self.request.GET)
+        context["inbox_page_is_published"] = inbox_page_is_published()
         return context
 
 
-class ContactCreateView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormView):
+class ContactCreateView(
+    LogMixin, LoginRequiredMixin, CommonPageMixin, BaseBreadcrumbMixin, FormView
+):
     template_name = "pages/profile/contacts/edit.html"
     form_class = ContactCreateForm
-    success_url = reverse_lazy("accounts:contact_list")
+    success_url = reverse_lazy("profile:contact_list")
 
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn profiel"), reverse("accounts:my_profile")),
-            (_("Mijn contacten"), reverse("accounts:contact_list")),
+            (_("Mijn profiel"), reverse("profile:detail")),
+            (_("Mijn contacten"), reverse("profile:contact_list")),
             (
                 _("Maak contact aan"),
-                reverse("accounts:contact_create", kwargs=self.kwargs),
+                reverse("profile:contact_create", kwargs=self.kwargs),
             ),
         ]
 
@@ -108,7 +114,7 @@ class ContactCreateView(LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, FormV
 
     def send_email_to_existing_user(self, receiver: User, sender: User, request=None):
         login_url = reverse("login")
-        contacts_url = reverse("accounts:contact_list")
+        contacts_url = reverse("profile:contact_list")
         if request:
             url = request.build_absolute_uri(contacts_url)
 
@@ -126,7 +132,7 @@ class ContactDeleteView(LogMixin, LoginRequiredMixin, SingleObjectMixin, View):
     model = User
     slug_field = "uuid"
     slug_url_kwarg = "uuid"
-    success_url = reverse_lazy("accounts:contact_list")
+    success_url = reverse_lazy("profile:contact_list")
 
     def get_queryset(self):
         base_qs = super().get_queryset()
@@ -150,7 +156,7 @@ class ContactApprovalView(LogMixin, LoginRequiredMixin, SingleObjectMixin, View)
     model = User
     slug_field = "uuid"
     slug_url_kwarg = "uuid"
-    success_url = reverse_lazy("accounts:contact_list")
+    success_url = reverse_lazy("profile:contact_list")
 
     def get_queryset(self):
         base_qs = super().get_queryset()

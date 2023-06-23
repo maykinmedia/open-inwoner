@@ -1,6 +1,21 @@
 {% load i18n icon_tags button_tags %}
 
 <aside class="anchor-menu {% if desktop %}anchor-menu--desktop{% else %}anchor-menu--mobile{% endif %}" aria-label="{% trans "Secundaire paginanavigatie" %}">
+    {% if not desktop %}
+    <div class="anchor-menu--container">
+        {% button href="#" icon="expand_more" icon_position="after" extra_classes="anchor-menu--mobile__title anchor-menu__toggle" bordered=False text=_("Op deze pagina") %}
+        <ul class="anchor-menu__list">
+            {% for anchor in anchors %}
+                <li class="anchor-menu__list-item">
+                    <a class="link" href="{{ anchor.0 }}">{{ anchor.1 }}</a>
+                </li>
+            {% endfor %}
+            {{ contents }}
+        </ul>
+    </div>
+
+    {% else %}
+
     <ul class="anchor-menu__list">
         {% for anchor in anchors %}
             <li class="anchor-menu__list-item">
@@ -8,8 +23,22 @@
             </li>
         {% endfor %}
         {{ contents }}
-        <li class="anchor-menu__list-item anchor-menu__list-item--top">
-            {% button href="#top" text=_("Terug naar boven") icon="arrow_upward" pill=True %}
-        </li>
     </ul>
+
+    {% endif %}
+
+<!-- dynamic anchor item for products -->
+    <div class="anchor-menu__start-inquiry">
+        {% if not product.has_cta_tag %}
+            {% if product.form %}
+                {% button_row mobile=True %}
+                    {% button href=product.form_link text=_("Aanvraag starten") primary=True icon="arrow_forward" icon_position="before" %}
+                {% endbutton_row %}
+            {% elif product.link %}
+                {% button_row mobile=True %}
+                    {% button href=product.link text=_("Aanvraag starten") primary=True icon="arrow_forward" icon_position="before" %}
+                {% endbutton_row %}
+            {% endif %}
+        {% endif %}
+    </div>
 </aside>

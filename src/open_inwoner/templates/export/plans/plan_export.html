@@ -1,5 +1,5 @@
 {% extends 'base_pdf.html' %}
-{% load i18n link_tags file_tags %}
+{% load i18n link_tags file_tags helpers %}
 
 {% block content %}
 
@@ -10,9 +10,13 @@
             <th class="table__header">{% trans "Title" %}</th>
             <td class="table__item">{{ object.title }}</td>
         </tr>
-                <tr>
+        <tr>
             <th class="table__header">{% trans "Goal" %}</th>
             <td class="table__item">{{ object.goal }}</td>
+        </tr>
+        <tr>
+            <th class="table__header">{% trans "Description" %}</th>
+            <td class="table__item">{{ object.description }}</td>
         </tr>
         <tr>
             <th class="table__header">{% trans "End date" %}</th>
@@ -20,7 +24,7 @@
         </tr>
         <tr>
             <th class="table__header">{% trans "Contacts" %}</th>
-            <td class="table__item">{{ object.contactperson_list }}</td>
+            <td class="table__item">{{ plan_contacts }}</td>
         </tr>
         <tr>
             <th class="table__header">{% trans "Created by" %}</th>
@@ -39,7 +43,7 @@
 
     <h2 class="h2 h2--extra">{% trans "Bestanden" %}</h2>
     {% if object.get_all_files %}
-        {% file_table files=object.get_all_files download_view="accounts:documents_download" %}
+        {% file_table files=object.get_all_files download_view="profile:documents_download" %}
     {% endif %}
 
     <h2 class="h2 h2--extra">{% trans "Acties" %}</h2>

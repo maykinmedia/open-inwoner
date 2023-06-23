@@ -80,5 +80,22 @@
 
   .message--ours {
     align-self: flex-end;
+    position: relative;
+
+    .message__body {
+      border: 1px solid transparent;
+
+      .p::before {
+        background-color: var(--color-primary);
+        border-radius: var(--border-radius);
+        bottom: 21px;
+        content: ' ';
+        left: 0;
+        opacity: 0.1;
+        position: absolute;
+        right: 0;
+        top: 0;
+      }
+    }
   }
 }

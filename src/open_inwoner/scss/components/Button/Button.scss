@@ -17,7 +17,9 @@
   text-decoration: none;
   transition: transform 300ms, background-color 300ms;
   font-weight: normal;
-  outline: none;
+  // modified outline for accessibility focus
+  outline-width: 1px;
+  outline-offset: 1px;
   border: 0;
   white-space: nowrap;
 
@@ -80,6 +82,7 @@
     &:focus,
     &:hover {
       background-color: var(--color-secondary-darker);
+      color: var(--color-font-primary);
     }
   }
 
@@ -126,7 +129,7 @@
       left: 0;
       right: 0;
       background-color: var(--color-primary);
-      opacity: 0.4;
+      opacity: 0.2;
     }
   }
 
@@ -164,4 +167,8 @@
 .h4 + .button,
 .p + .button {
   margin-top: var(--spacing-large);
+}
+
+.cta-button {
+  margin-bottom: var(--spacing-large);
 }

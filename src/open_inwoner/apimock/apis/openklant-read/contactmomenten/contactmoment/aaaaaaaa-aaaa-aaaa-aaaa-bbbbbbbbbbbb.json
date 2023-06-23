@@ -1,0 +1,27 @@
+{
+    "uuid": "aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
+    "url": "https://contactmomenten.nl/api/v1/contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
+    "identificatie": "AB123",
+    "type": "OIP Contact Formulier",
+    "kanaal": "MAIL",
+    "status": "in_behandeling",
+    "antwoord": "",
+    "vorigContactmoment": null,
+    "volgendContactmoment": null,
+    "bronorganisatie": "WwXGZrg",
+    "registratiedatum": "2022-05-21T23:11:50+00:00",
+    "voorkeurskanaal": "xyz",
+    "voorkeurstaal": "vzT",
+    "tekst": "Hoeveel uren les heb ik nodig voor een rijbewijs?",
+    "onderwerpLinks": [
+    ],
+    "initiatiefnemer": "gemeente",
+    "medewerker": "",
+    "medewerkerIdentificatie": null,
+    "klantcontactmomenten": [
+
+    ],
+    "objectcontactmomenten": [
+    ],
+    "onderwerp": "Aanvraag rijbewijs"
+}

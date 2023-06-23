@@ -1,14 +1,9 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date, datetime
-from typing import Optional, Union
+from typing import Dict, Optional, Union
 
-from zgw_consumers.api_models.base import ZGWModel
-from zgw_consumers.api_models.catalogi import (
-    InformatieObjectType,
-    ResultaatType,
-    RolType,
-    StatusType,
-)
+from dateutil.relativedelta import relativedelta
+from zgw_consumers.api_models.base import Model, ZGWModel
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 
 """
@@ -41,7 +36,6 @@ class Zaak(ZGWModel):
 @dataclass
 class ZaakType(ZGWModel):
     url: str
-    # catalogus: str
     identificatie: str
     omschrijving: str
     vertrouwelijkheidaanduiding: str
@@ -58,14 +52,18 @@ class ZaakType(ZGWModel):
     # verlengingstermijn: Optional[relativedelta]
     # publicatie_indicatie: bool
     # producten_of_diensten: list
-    statustypen: list
-    # resultaattypen: list
-    # informatieobjecttypen: list
+    statustypen: list = None
+    resultaattypen: list = None
+    informatieobjecttypen: list = field(default_factory=list)
     # roltypen: list
     # besluittypen: list
 
-    # begin_geldigheid: date
-    # versiedatum: date
+    # catalogus not on eSuite
+    catalogus: str = ""
+    begin_geldigheid: Optional[date] = None
+    einde_geldigheid: Optional[date] = None
+    versiedatum: Optional[date] = None
+    concept: Optional[bool] = None
 
 
 @dataclass
@@ -77,6 +75,17 @@ class ZaakInformatieObject(ZGWModel):
     titel: str
     # beschrijving: str
     registratiedatum: datetime
+
+
+@dataclass
+class InformatieObjectType(ZGWModel):
+    url: str  # bug: not required according to OAS
+    catalogus: str
+    omschrijving: str
+    vertrouwelijkheidaanduiding: str
+    begin_geldigheid: Optional[date] = None
+    einde_geldigheid: Optional[date] = None
+    concept: bool = False
 
 
 @dataclass
@@ -109,6 +118,14 @@ class InformatieObject(ZGWModel):
 
 
 @dataclass
+class RolType(ZGWModel):
+    url: str  # bug: not required according to OAS
+    zaaktype: str
+    omschrijving: str
+    omschrijving_generiek: str = ""
+
+
+@dataclass
 class Rol(ZGWModel):
     url: str
     zaak: str
@@ -123,10 +140,25 @@ class Rol(ZGWModel):
     betrokkene_identificatie: Optional[dict] = None
 
     def get_betrokkene_type_display(self):
-        return RolTypes.values[self.betrokkene_type]
+        return RolTypes[self.betrokkene_type].label
 
     def get_omschrijving_generiek_display(self):
-        return RolOmschrijving.values[self.omschrijving_generiek]
+        return RolOmschrijving[self.omschrijving_generiek].label
+
+
+@dataclass
+class ResultaatType(ZGWModel):
+    url: str  # bug: not required according to OAS
+    zaaktype: str
+    omschrijving: str
+    resultaattypeomschrijving: str
+    selectielijstklasse: str
+
+    omschrijving_generiek: str = ""
+    toelichting: str = ""
+    archiefnominatie: str = ""
+    archiefactietermijn: Optional[relativedelta] = None
+    brondatum_archiefprocedure: Optional[dict] = None
 
 
 @dataclass
@@ -138,9 +170,51 @@ class Resultaat(ZGWModel):
 
 
 @dataclass
+class StatusType(ZGWModel):
+    url: str  # bug: not required according to OAS
+    zaaktype: str
+    omschrijving: str
+    volgnummer: int
+    omschrijving_generiek: str = ""
+    statustekst: str = ""
+    is_eindstatus: bool = False
+    # not in eSuite
+    informeren: Optional[bool] = False
+
+
+@dataclass
 class Status(ZGWModel):
     url: str
     zaak: Union[str, Zaak]
     statustype: Union[str, StatusType]
     datum_status_gezet: Optional[datetime] = None
     statustoelichting: Optional[str] = ""
+
+
+@dataclass
+class Notification(Model):
+    """
+    note: not an API response but the data for the Notifications API (NRC) webhook
+
+    {
+      "kanaal": "zaken",
+      "hoofdObject": "https://test.openzaak.nl/zaken/api/v1/zaken/019a9093-03fe-4121-8423-6c9ab58946ec",
+      "resource": "zaak",
+      "resourceUrl": "https://test.openzaak.nl/zaken/api/v1/zaken/019a9093-03fe-4121-8423-6c9ab58946ec",
+      "actie": "partial_update",
+      "aanmaakdatum": "2023-01-11T15:09:59.116815Z",
+      "kenmerken": {
+        "bronorganisatie": "100000009",
+        "zaaktype": "https://test.openzaak.nl/catalogi/api/v1/zaaktypen/53340e34-7581-4b04-884f-8ff7e6a73c2c",
+        "vertrouwelijkheidaanduiding": "openbaar"
+      }
+    }
+    """
+
+    kanaal: str
+    resource: str
+    resource_url: str
+    hoofd_object: str
+    actie: str
+    aanmaakdatum: datetime
+    kenmerken: Dict = field(default_factory=dict)

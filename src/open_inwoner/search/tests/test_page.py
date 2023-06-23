@@ -1,5 +1,4 @@
-from re import search
-
+from django.test import override_settings
 from django.urls import reverse_lazy
 
 from django_webtest import WebTest
@@ -15,6 +14,7 @@ from ..constants import FacetChoices
 from .utils import ESMixin
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class SearchPageTests(ESMixin, WebTest):
     url = reverse_lazy("search:search")
 

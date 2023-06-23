@@ -34,6 +34,10 @@
             <th class="table__header">{% trans "Interessegebieden" %}</th>
             <td class="table__item">{{ object.get_interests }}</td>
         </tr>
+        <tr>
+            <th class="table__header">{% trans "Communicatievoorkeuren" %}</th>
+            <td class="table__item">{{ request.user.get_active_notifications }}</td>
+        </tr>
     </table>
 
 
@@ -47,7 +51,7 @@
 
     <h2 class="h2 h2--extra">{% trans "Bestanden" %}</h2>
     {% if object.get_all_files %}
-        {% file_table files=object.get_all_files download_view="accounts:documents_download" %}
+        {% file_table files=object.get_all_files download_view="profile:documents_download" %}
     {% endif %}
 
 {% endblock %}

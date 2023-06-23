@@ -99,7 +99,8 @@ div.breadcrumbs {
 
 /* hack to get changelist_view with search styled properly */
 #content {
-  #changelist {
+  /* adjusting for django-cms page */
+  #changelist:not([class~='cms-pagetree-root']) {
     display: grid;
     grid-template-columns: 1fr 360px;
     gap: 16px;
@@ -300,42 +301,20 @@ input[type='submit'].default:hover {
 }
 
 /**
- * Help text mouseover
+ * Help text
  */
-div.help:hover {
-  text-indent: inherit;
-  width: auto;
-  background-image: none;
-  background-color: $color-tooltip-background;
-  border: 1px solid $color-tooltip-border;
-  color: $color-tooltip-text;
-  padding: 5px 5px 3px 5px !important;
-  max-width: 300px;
-  height: auto !important;
-  margin-top: 2px !important;
-  z-index: 10;
-}
 
 div.help {
-  cursor: help;
-  width: 16px;
-  height: 16px;
-  background-image: url(../admin/img/icon-unknown.svg);
-  display: inline-block;
-  background-repeat: no-repeat;
-  background-size: 14px;
-  margin-left: 8px !important;
-  margin-top: 6px !important;
-  position: absolute;
-  text-indent: -9999px;
+  display: block;
+  text-indent: inherit;
+  width: auto;
+  height: auto;
+  color: $color-tooltip-text;
 }
 
-.related-widget-wrapper ~ div.help {
-  margin-top: 8px !important;
-
-  &:hover {
-    margin-top: 4px !important;
-  }
+div.help,
+form div.help {
+  font-size: 12px;
 }
 
 /* Overrides default Django CSS */
@@ -343,9 +322,6 @@ div.help {
 .aligned label + div.readonly {
   display: inline-block;
   margin-left: inherit !important;
-}
-.aligned label + div.help {
-  margin-left: 2px !important;
 }
 
 /* Additional components seem to need the same behaviour */

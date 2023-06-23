@@ -1,0 +1,26 @@
+{% load i18n button_tags card_tags utils icon_tags %}
+{% if request.user.is_authenticated %}
+<h2 class="h2">
+    {% trans 'Samenwerken' %}
+    {% button href="collaborate:plan_list" text=_("Naar samenwerken") icon="arrow_forward" icon_position="after" %}
+</h2>
+{% if plans %}
+<div class="plans-cards card-container card-container--columns-4">
+    {% for plan in plans %}
+        {% render_card image_object_fit="cover" href=plan.get_absolute_url %}
+            <div class="card__content">
+                <h3 class="h3 plan-list">{{ plan.title }}</h3>
+                <p class="p">{{ plan.goal|truncatewords:20 }}</p>
+                <p class="p">{{ plan.description|truncatewords:20 }}</p>
+                <span class="spacer"></span>
+                <span class="button button--icon-before button--transparent button--secondary">
+                    {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
+                </span>
+            </div>
+        {% endrender_card %}
+    {% endfor %}
+</div>
+{% else %}
+    <p class="p">{{configurable_text.plans_page.plans_no_plans_message}}</p>
+{% endif %}
+{% endif %}

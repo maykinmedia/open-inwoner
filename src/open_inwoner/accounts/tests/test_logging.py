@@ -1,7 +1,9 @@
+import logging
 from datetime import timedelta
 
 from django.contrib.admin.models import ADDITION, CHANGE, DELETION
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -30,6 +32,7 @@ from .factories import (
 
 
 @freeze_time("2021-10-18 13:00:00")
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestProfile(WebTest):
     csrf_checks = False
 
@@ -68,7 +71,7 @@ class TestProfile(WebTest):
         )
 
     def test_users_modification_is_logged(self):
-        form = self.app.get(reverse("accounts:edit_profile"), user=self.user).forms[
+        form = self.app.get(reverse("profile:edit"), user=self.user).forms[
             "profile-edit"
         ]
         form["first_name"] = "Updated name"
@@ -91,11 +94,11 @@ class TestProfile(WebTest):
     def test_categories_modification_is_logged(self):
         CategoryFactory()
         CategoryFactory()
-        form = self.app.get(reverse("accounts:my_themes"), user=self.user).forms[
-            "change-themes"
+        form = self.app.get(reverse("profile:categories"), user=self.user).forms[
+            "change-categories"
         ]
 
-        form.get("selected_themes", index=1).checked = True
+        form.get("selected_categories", index=1).checked = True
         form.submit()
         log_entry = TimelineLog.objects.last()
 
@@ -107,6 +110,27 @@ class TestProfile(WebTest):
             log_entry.extra_data,
             {
                 "message": _("categories were modified"),
+                "action_flag": list(LOG_ACTIONS[CHANGE]),
+                "content_object_repr": self.user.email,
+            },
+        )
+
+    def test_user_notifications_update_is_logged(self):
+        form = self.app.get(reverse("profile:notifications"), user=self.user).forms[
+            "change-notifications"
+        ]
+        form["messages_notifications"] = False
+        form.submit()
+        log_entry = TimelineLog.objects.last()
+
+        self.assertEqual(
+            log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
+        )
+        self.assertEqual(log_entry.content_object.id, self.user.id)
+        self.assertEqual(
+            log_entry.extra_data,
+            {
+                "message": _("users notifications were modified"),
                 "action_flag": list(LOG_ACTIONS[CHANGE]),
                 "content_object_repr": self.user.email,
             },
@@ -181,9 +205,9 @@ class TestProfile(WebTest):
             },
         )
 
-    def test_users_deactivation_is_logged(self):
-        form = self.app.get(reverse("accounts:my_profile"), user=self.user).forms[
-            "deactivate-form"
+    def test_users_deletion_is_logged(self):
+        form = self.app.get(reverse("profile:detail"), user=self.user).forms[
+            "delete-form"
         ]
         form.submit()
         log_entry = TimelineLog.objects.last()
@@ -191,11 +215,10 @@ class TestProfile(WebTest):
         self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
-        self.assertEqual(log_entry.content_object.id, self.user.id)
         self.assertEqual(
             log_entry.extra_data,
             {
-                "message": _("user was deactivated via frontend"),
+                "message": _("user was deleted via frontend"),
                 "action_flag": list(LOG_ACTIONS[4]),
                 "content_object_repr": self.user.email,
             },
@@ -209,7 +232,8 @@ class TestProfile(WebTest):
         form["old_password"] = "test"
         form["new_password1"] = "newPassw0rd"
         form["new_password2"] = "newPassw0rd"
-        form.submit()
+        form.submit(status=302)
+
         log_entry = TimelineLog.objects.filter(
             extra_data__message=str(_("password was changed"))
         ).last()
@@ -240,7 +264,7 @@ class TestProfile(WebTest):
             log_entry.extra_data,
             {
                 "message": _("password reset was accessed"),
-                "log_level": None,
+                "log_level": logging.INFO,
                 "action_flag": list(LOG_ACTIONS[5]),
                 "content_object_repr": "",
             },
@@ -270,7 +294,7 @@ class TestProfile(WebTest):
             log_entry.extra_data,
             {
                 "message": _("password reset was completed"),
-                "log_level": None,
+                "log_level": logging.INFO,
                 "action_flag": list(LOG_ACTIONS[5]),
                 "content_object_repr": self.user.email,
             },
@@ -278,6 +302,7 @@ class TestProfile(WebTest):
 
 
 @freeze_time("2021-10-18 13:00:00")
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestInvites(WebTest):
     def setUp(self):
         self.invitee = UserFactory(is_active=False)
@@ -298,7 +323,7 @@ class TestInvites(WebTest):
             log_entry.extra_data,
             {
                 "message": _("invitation accepted"),
-                "log_level": None,
+                "log_level": logging.INFO,
                 "action_flag": list(LOG_ACTIONS[5]),
                 "content_object_repr": _("For: {invitee} (2021-10-18)").format(
                     invitee=self.invitee.email
@@ -324,7 +349,7 @@ class TestInvites(WebTest):
             log_entry.extra_data,
             {
                 "message": _("invitation expired"),
-                "log_level": None,
+                "log_level": logging.INFO,
                 "action_flag": list(LOG_ACTIONS[5]),
                 "content_object_repr": _("For: {invitee} (2021-09-18)").format(
                     invitee=self.invitee.email
@@ -334,6 +359,7 @@ class TestInvites(WebTest):
 
 
 @freeze_time("2021-10-18 13:00:00")
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestContacts(WebTest):
     csrf_checks = False
 
@@ -343,7 +369,7 @@ class TestContacts(WebTest):
         self.user.user_contacts.add(self.contact)
 
     def test_new_contact_invite_is_logged(self):
-        form = self.app.get(reverse("accounts:contact_create"), user=self.user).forms[
+        form = self.app.get(reverse("profile:contact_create"), user=self.user).forms[
             "contact-form"
         ]
         form["email"] = "user@example.com"
@@ -368,7 +394,7 @@ class TestContacts(WebTest):
 
     def test_existing_user_contact_approval_is_logged(self):
         existing_user = UserFactory()
-        form = self.app.get(reverse("accounts:contact_create"), user=self.user).forms[
+        form = self.app.get(reverse("profile:contact_create"), user=self.user).forms[
             "contact-form"
         ]
         form["email"] = existing_user.email
@@ -392,7 +418,7 @@ class TestContacts(WebTest):
 
     def test_contact_removal_is_logged(self):
         self.app.post(
-            reverse("accounts:contact_delete", kwargs={"uuid": self.contact.uuid}),
+            reverse("profile:contact_delete", kwargs={"uuid": self.contact.uuid}),
             user=self.user,
         )
         log_entry = TimelineLog.objects.last()
@@ -412,6 +438,7 @@ class TestContacts(WebTest):
 
 
 @freeze_time("2021-10-18 13:00:00")
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestDocuments(WebTest):
     csrf_checks = False
 
@@ -421,7 +448,7 @@ class TestDocuments(WebTest):
 
     def test_document_download_is_logged(self):
         self.app.get(
-            reverse("accounts:documents_download", kwargs={"uuid": self.document.uuid}),
+            reverse("profile:documents_download", kwargs={"uuid": self.document.uuid}),
             user=self.user,
         )
         log_entry = TimelineLog.objects.last()
@@ -440,33 +467,9 @@ class TestDocuments(WebTest):
         )
 
     @temp_private_root()
-    def test_document_upload_is_logged(self):
-        form = self.app.get(
-            reverse("accounts:documents_create"),
-            user=self.user,
-        ).forms["document-create"]
-        form["name"] = "readme"
-        form["file"] = Upload("readme.png", b"data", "image/png")
-        form.submit()
-        log_entry = TimelineLog.objects.last()
-
-        self.assertEqual(
-            log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
-        )
-        self.assertEqual(log_entry.content_object.id, Document.objects.all()[1].id)
-        self.assertEqual(
-            log_entry.extra_data,
-            {
-                "message": _("file was uploaded"),
-                "action_flag": list(LOG_ACTIONS[4]),
-                "content_object_repr": "readme",
-            },
-        )
-
-    @temp_private_root()
     def test_document_deletion_is_logged(self):
         self.app.post(
-            reverse("accounts:documents_delete", kwargs={"uuid": self.document.uuid}),
+            reverse("profile:documents_delete", kwargs={"uuid": self.document.uuid}),
             user=self.user,
         )
         log_entry = TimelineLog.objects.last()
@@ -486,6 +489,7 @@ class TestDocuments(WebTest):
 
 
 @freeze_time("2021-10-18 13:00:00")
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestActions(WebTest):
     def setUp(self):
         self.user = UserFactory()
@@ -493,7 +497,7 @@ class TestActions(WebTest):
 
     def test_action_addition_is_logged(self):
         action = ActionFactory.build(created_by=self.user)
-        form = self.app.get(reverse("accounts:action_create"), user=self.user).forms[
+        form = self.app.get(reverse("profile:action_create"), user=self.user).forms[
             "action-create"
         ]
         form["name"] = action.name
@@ -515,7 +519,7 @@ class TestActions(WebTest):
 
     def test_action_single_field_update_is_logged(self):
         form = self.app.get(
-            reverse("accounts:action_edit", kwargs={"uuid": self.action.uuid}),
+            reverse("profile:action_edit", kwargs={"uuid": self.action.uuid}),
             user=self.user,
         ).forms["action-create"]
         form["name"] = "Updated name"
@@ -544,7 +548,7 @@ class TestActions(WebTest):
 
     def test_action_multiple_fields_update_is_logged(self):
         form = self.app.get(
-            reverse("accounts:action_edit", kwargs={"uuid": self.action.uuid}),
+            reverse("profile:action_edit", kwargs={"uuid": self.action.uuid}),
             user=self.user,
         ).forms["action-create"]
         form["name"] = "Updated name"
@@ -579,7 +583,7 @@ class TestActions(WebTest):
 
     def test_action_status_toggle_is_logged(self):
         edit_status_url = reverse(
-            "accounts:action_edit_status", kwargs={"uuid": self.action.uuid}
+            "profile:action_edit_status", kwargs={"uuid": self.action.uuid}
         )
         self.client.force_login(self.user)
         response = self.client.post(
@@ -612,6 +616,7 @@ class TestActions(WebTest):
 
 
 @freeze_time("2021-10-18 13:00:00")
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestMessages(WebTest):
     def setUp(self):
         self.user = UserFactory()
@@ -620,7 +625,7 @@ class TestMessages(WebTest):
 
     def test_created_message_action_from_contacts_is_logged(self):
         response = self.app.get(
-            reverse("accounts:inbox", kwargs={"uuid": self.other_user.uuid}),
+            reverse("inbox:index", kwargs={"uuid": self.other_user.uuid}),
             user=self.user,
             auto_follow=True,
         )
@@ -646,7 +651,7 @@ class TestMessages(WebTest):
 
     def test_created_message_action_from_start_is_logged(self):
         response = self.app.get(
-            reverse("accounts:inbox_start"),
+            reverse("inbox:start"),
             user=self.user,
         )
         form = response.forms["start-message-form"]
@@ -674,7 +679,7 @@ class TestMessages(WebTest):
         message = MessageFactory(
             file=SimpleUploadedFile("file.txt", b"test content"),
         )
-        download_url = reverse("accounts:inbox_download", args=[message.uuid])
+        download_url = reverse("inbox:download", args=[message.uuid])
         self.app.get(download_url, user=message.receiver)
         log_entry = TimelineLog.objects.last()
 
@@ -695,6 +700,7 @@ class TestMessages(WebTest):
 
 
 @freeze_time("2021-10-18 13:00:00")
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestExport(WebTest):
     def setUp(self):
         self.user = UserFactory()
@@ -702,7 +708,7 @@ class TestExport(WebTest):
         self.action2 = ActionFactory(created_by=self.user)
 
     def test_profile_export_is_logged(self):
-        self.app.get(reverse("accounts:profile_export"), user=self.user)
+        self.app.get(reverse("profile:export"), user=self.user)
         log_entry = TimelineLog.objects.last()
 
         self.assertEqual(
@@ -720,7 +726,7 @@ class TestExport(WebTest):
 
     def test_action_export_is_logged(self):
         self.app.get(
-            reverse("accounts:action_export", kwargs={"uuid": self.action1.uuid}),
+            reverse("profile:action_export", kwargs={"uuid": self.action1.uuid}),
             user=self.user,
         )
         log_entry = TimelineLog.objects.last()
@@ -742,7 +748,7 @@ class TestExport(WebTest):
 
     def test_action_list_export_is_logged(self):
         self.app.get(
-            reverse("accounts:action_list_export"),
+            reverse("profile:action_list_export"),
             user=self.user,
         )
         log_entry = TimelineLog.objects.last()

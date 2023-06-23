@@ -1,18 +1,27 @@
 from unittest import skip
 
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-from django.urls import reverse, reverse_lazy
+from django.test import override_settings
+from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _
 
 from django_webtest import WebTest
+from PIL import Image
+from playwright.sync_api import expect
 from privates.test import temp_private_root
-from selenium.webdriver.common.by import By
+from webtest import Upload
 
-from open_inwoner.utils.tests.selenium import ChromeSeleniumMixin, FirefoxSeleniumMixin
+from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.utils.tests.helpers import create_image_bytes
+from open_inwoner.utils.tests.playwright import (
+    PlaywrightSyncLiveServerTestCase,
+    multi_browser,
+)
 
 from ..models import Message
-from .factories import MessageFactory, UserFactory
+from .factories import DigidUserFactory, MessageFactory, UserFactory
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class InboxPageTests(WebTest):
     def setUp(self) -> None:
         super().setUp()
@@ -37,10 +46,8 @@ class InboxPageTests(WebTest):
 
         self.app.set_user(self.user)
 
-        self.url = reverse("accounts:inbox")
-        self.contact1_url = reverse(
-            "accounts:inbox", kwargs={"uuid": self.contact1.uuid}
-        )
+        self.url = reverse("inbox:index")
+        self.contact1_url = reverse("inbox:index", kwargs={"uuid": self.contact1.uuid})
 
     def test_user_contacts_are_symetrical(self):
         self.assertIn(self.contact1, self.user.user_contacts.all())
@@ -118,6 +125,20 @@ class InboxPageTests(WebTest):
             "Of een bericht of een bestand moet ingevuld zijn",
         )
 
+    def test_send_empty_message_with_sharing_disabled(self):
+        config = SiteConfiguration.get_solo()
+        config.allow_messages_file_sharing = False
+        config.save()
+
+        response = self.app.get(self.contact1_url)
+
+        form = response.forms["message-form"]
+        response = form.submit()
+
+        expected_error = {"content": [_("Content should be filled in")]}
+
+        self.assertEqual(response.context["form"].errors, expected_error)
+
     def test_mark_messages_as_seen(self):
         other_user = UserFactory.create()
         message_received = MessageFactory.create(receiver=self.user, sender=other_user)
@@ -127,7 +148,7 @@ class InboxPageTests(WebTest):
             self.assertFalse(message.seen)
 
         response = self.app.get(
-            reverse("accounts:inbox", kwargs={"uuid": other_user.uuid}),
+            reverse("inbox:index", kwargs={"uuid": other_user.uuid}),
             auto_follow=True,
         )
         self.assertEqual(response.status_code, 200)
@@ -175,19 +196,58 @@ class InboxPageTests(WebTest):
         # no form
         self.assertFalse(response.pyquery("form#message-form"))
 
+    def test_file_is_not_rendered_when_sharing_not_allowed(self):
+        config = SiteConfiguration.get_solo()
+        config.allow_messages_file_sharing = False
+        config.save()
 
-class BaseInboxPageSeleniumTests:
-    options = None
-    driver = None
-    selenium = None
+        response = self.app.get(self.url)
+        emoji = response.pyquery(".emoji")
+        file = response.pyquery(".message-file")
 
+        self.assertNotEqual(emoji, [])
+        self.assertEqual(file, [])
+
+    def test_file_field_doesnt_exist_when_sharing_not_allowed(self):
+        config = SiteConfiguration.get_solo()
+        config.allow_messages_file_sharing = False
+        config.save()
+
+        response = self.app.get(self.url)
+        form = response.forms["message-form"]
+
+        self.assertNotIn("file", form.fields.keys())
+
+    def test_file_cannot_be_uploaded_when_sharing_disabled(self):
+        config = SiteConfiguration.get_solo()
+        config.allow_messages_file_sharing = False
+        config.save()
+
+        contact = UserFactory()
+        self.user.user_contacts.add(contact)
+
+        img_bytes = create_image_bytes()
+        file = Upload("test_image.png", img_bytes, "image/png")
+
+        self.app.post(
+            self.url, {"receiver": str(contact.uuid), "file": file}, status=403
+        )
+
+
+@multi_browser()
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+class InboxPagePlaywrightTests(PlaywrightSyncLiveServerTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.selenium.implicitly_wait(10)
+
+        cls.user = DigidUserFactory.create()
+        # let's reuse the login storage_state
+        cls.user_login_state = cls.get_user_bsn_login_state(cls.user)
 
     def setUp(self):
-        self.user = UserFactory.create()
+        super().setUp()
+
         self.contact_1 = UserFactory.create(
             first_name="user", last_name="1", email="user1@example.com"
         )
@@ -196,89 +256,41 @@ class BaseInboxPageSeleniumTests:
         )
         self.user.user_contacts.add(self.contact_1)
         self.user.user_contacts.add(self.contact_2)
-        MessageFactory.create(sender=self.user, receiver=self.contact_1)
-        MessageFactory.create(receiver=self.user, sender=self.contact_2)
-
-    def test_async_selector(self):
-        self.given_i_am_logged_in()
-        self.when_i_navigate_to_page()
-
-        # Send message.
-        message_count = len(self.selenium.find_elements(By.CSS_SELECTOR, ".message"))
-        content_textarea = self.selenium.find_element(By.NAME, "content")
-        content_textarea.send_keys("Lorem ipsum dolor sit amet.")
-        form = self.selenium.find_element(By.CSS_SELECTOR, "#message-form")
-        form.submit()
-
-        # Assert message.
-        selector = f".messages__list-item:nth-child({message_count + 1}) .message"
-        message = self.selenium.find_element(By.CSS_SELECTOR, selector)
-        self.assertIn("Lorem ipsum dolor sit amet.", message.text)
-
-        # assert async.
-        url = f"{self.live_server_url}{reverse_lazy('accounts:inbox')}?redirected=True"
-        self.assertEqual(url, self.selenium.current_url)
-        self.assertNotIn("#messages-last", self.selenium.current_url)
-
-    def test_polling(self):
-        self.given_i_am_logged_in()
-        self.when_i_navigate_to_page()
-
-        # Create message.
-        initial_message_count = len(
-            self.selenium.find_elements(By.CSS_SELECTOR, ".message")
+        self.message_1 = MessageFactory.create(
+            content="Message#1 content", sender=self.user, receiver=self.contact_1
         )
-        initial_selector = (
-            f".messages__list-item:nth-child({initial_message_count}) .message"
-        )
-        initial_message = self.selenium.find_element(By.CSS_SELECTOR, initial_selector)
-        initial_text = initial_message.text
-
-        Message.objects.create(
+        self.message_2 = MessageFactory.create(
+            content="Message#2 content",
             receiver=self.user,
             sender=self.contact_2,
-            content="Lorem ipsum dolor sit amet.",
+        )
+        self.contact_1_conversation_url = self.live_reverse(
+            "inbox:index",
+            kwargs={"uuid": self.contact_1.uuid},
         )
 
-        # Assert message.
-        new_selector = (
-            f".messages__list-item:nth-child({initial_message_count + 1}) .message"
+    @skip("re-implement on playwright after re-enabling")
+    def test_async_selector(self):
+        """
+        make sure to test re-hydration and if emoji and file components work after a submit
+        """
+
+    def test_polling(self):
+        context = self.browser.new_context(storage_state=self.user_login_state)
+
+        page = context.new_page()
+        page.goto(self.contact_1_conversation_url)
+
+        messages = page.locator(".messages__list-item")
+
+        # show conversation with contact_1
+        expect(messages.filter(has_text=self.message_1.content)).to_have_count(1)
+        expect(messages.filter(has_text=self.message_2.content)).to_have_count(0)
+
+        new_message = Message.objects.create(
+            receiver=self.user,
+            sender=self.contact_1,
+            content="Message#3 content",
         )
-        new_message = self.selenium.find_element(By.CSS_SELECTOR, new_selector)
-        self.assertIn("Lorem ipsum dolor sit amet.", new_message.text)
-
-        # Previous message.
-        previous_selector = (
-            f".messages__list-item:nth-child({initial_message_count}) .message"
-        )
-        previous_message = self.selenium.find_element(
-            By.CSS_SELECTOR, previous_selector
-        )
-        self.assertEqual(initial_text, previous_message.text)
-
-        # assert async.
-        url = f"{self.live_server_url}{reverse_lazy('accounts:inbox')}?redirected=True"
-        self.assertEqual(url, self.selenium.current_url)
-        self.assertNotIn("#messages-last", self.selenium.current_url)
-
-    def given_i_am_logged_in(self):
-        self.force_login(self.user)
-
-    def when_i_navigate_to_page(self):
-        self.selenium.get(
-            "%s%s" % (self.live_server_url, reverse_lazy("accounts:inbox"))
-        )
-
-
-@skip("skipped for now because of random CI failures, ref Taiga #963")
-class InboxPageFirefoxSeleniumTests(
-    FirefoxSeleniumMixin, BaseInboxPageSeleniumTests, StaticLiveServerTestCase
-):
-    pass
-
-
-@skip("skipped for now because of random CI failures, ref Taiga #963")
-class InboxPageChromeSeleniumTests(
-    ChromeSeleniumMixin, BaseInboxPageSeleniumTests, StaticLiveServerTestCase
-):
-    pass
+        # wait for poll to trigger
+        messages.filter(has_text=new_message.content).wait_for()

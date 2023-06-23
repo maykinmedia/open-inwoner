@@ -1,71 +1,80 @@
 {% extends 'master.html' %}
-{% load i18n button_tags card_tags map_tags form_tags grid_tags icon_tags %}
+{% load i18n button_tags card_tags map_tags form_tags grid_tags icon_tags string_tags link_tags %}
 
 {% block content %}
-    <h1 class="h1">{% trans "Samenwerken" %}</h1>
-    <p class="p">
-        {{configurable_text.plans_page.plans_intro|linebreaksbr}}
-    </p>
+    <div class="plan-create">
+        <h1 class="h1">{% trans "Start nieuwe samenwerking" %}</h1>
+        {% optional_paragraph configurable_text.plans_page.plans_intro %}
 
-    {% render_form id="plan-form" form=form method="POST" %}
-        {% csrf_token %}
-        {% input form.title %}
-        {% render_grid %}
+        {% if request.user.get_active_contacts %}
+            {% render_form id="plan-form" form=form method="POST" %}
+            {% csrf_token %}
+            {% input form.title %}
+            {% input form.goal %}
+            {% input form.description %}
+            {% render_grid %}
             {% checkboxes form.plan_contacts %}
-            {% date_field form.end_date %}
-        {% endrender_grid %}
+            {% date_field form.end_date icon="today" icon_position="after" %}
+            {% endrender_grid %}
 
-        <div class="">
-            <div class="plan-template">
-                <div class="plan-template__header">
-                    <div>{% trans "Templates" %}</div>
-                    <div>{% trans "Omschrijving" %}</div>
-                    <div></div>
-                </div>
-                <label class="plan-template__row radio">
-                    <div>
-                        <input class="radio__input" type="radio" name="template" value="" id="id_template_0" {% if not form.data.template %}checked{% endif %}>
-                        <label class="radio__label" for="id_template_0">Geen template</label>
+            <div class="">
+                <div class="plan-template">
+                    <div class="plan-template__header">
+                        <div>{% trans "Templates" %}</div>
+                        <div>{% trans "Doel" %}</div>
+                        <div></div>
                     </div>
-                    <div></div>
-                    <div></div>
-                </label>
-                {% for tpl_id, plan_template in form.template.field.choices %}
                     <label class="plan-template__row radio">
                         <div>
-                            <input class="radio__input" type="radio" name="template" value="{{ plan_template.id }}" id="id_template_{{ plan_template.id }}"
-                                   {% if tpl_id == form.data.template %}checked{% endif %}>
-                            <label class="radio__label" for="id_template_{{ plan_template.id }}">{{ plan_template.name }}</label>
+                            <input class="radio__input" type="radio" name="template" value="" id="id_template_0" {% if not form.data.template %}checked{% endif %}>
+                            <label class="radio__label" for="id_template_0">Geen template</label>
                         </div>
-                        <div>
-                            {{ plan_template.goal|truncatewords:8 }}
-                        </div>
-                        <div class="plan-template__icon">
-                            <div class="show-preview" data-id="template-{{ plan_template.id }}">
-                                {% icon icon="visibility" outlined=True %}
+                        <div></div>
+                        <div></div>
+                    </label>
+                    {% for tpl_id, plan_template in form.template.field.choices %}
+                        <label class="plan-template__row radio">
+                            <div>
+                                <input class="radio__input" type="radio" name="template" value="{{ plan_template.id }}" id="id_template_{{ plan_template.id }}"
+                                       {% if tpl_id == form.data.template %}checked{% endif %}>
+                                <label class="radio__label" for="id_template_{{ plan_template.id }}">{{ plan_template.name }}</label>
                             </div>
-                        </div>
-                        <div class="modal modal--no-reset" id="template-{{ plan_template.id }}">
-                            <div class="modal__container">
-                                <h2 class="h2 modal__title" id="modal__title">{{ plan_template.name }}
-                                    {% button text=_("Sluiten") hide_text=True icon="close" extra_classes="modal__button modal__close-title" %}
-                                </h2>
-                                <div class="modal__text" id="modal__text">{{ plan_template.string_preview }}</div>
-                                <div class="modal__actions modal__actions--align-right" id="modal__actions">
-                                    {% spaceless %}
-                                        {% button text=_("Sluiten") extra_classes="modal__button modal__close" primary=True %}
-                                    {% endspaceless %}
+                            <div>
+                                {{ plan_template.goal|truncatewords:8 }}
+                            </div>
+                            <div class="plan-template__icon">
+                                <div class="show-preview" data-id="template-{{ plan_template.id }}">
+                                    {% icon icon="visibility" outlined=True %}
                                 </div>
                             </div>
-                        </div>
-                    </label>
-                {% endfor %}
-            </div>
+                            <div class="modal modal--no-reset" id="template-{{ plan_template.id }}">
+                                <div class="modal__container">
+                                    <h2 class="h2 modal__title" id="modal__title">{{ plan_template.name }}
+                                        {% button text=_("Sluiten") hide_text=True icon="close" extra_classes="modal__button modal__close-title" %}
+                                    </h2>
+                                    <div class="modal__text" id="modal__text">{{ plan_template.string_preview }}</div>
+                                    <div class="modal__actions modal__actions--align-right" id="modal__actions">
+                                        {% spaceless %}
+                                            {% button text=_("Sluiten") extra_classes="modal__button modal__close" primary=True %}
+                                        {% endspaceless %}
+                                    </div>
+                                </div>
+                            </div>
+                        </label>
+                    {% endfor %}
+                </div>
 
-            {% if form.template.errors %}
-                {% errors errors=form.template.errors %}
-            {% endif %}
-        </div>
-        {% form_actions primary_text=_("Verzenden") primary_icon="arrow_forward" %}
-    {% endrender_form %}
+                {% if form.template.errors %}
+                    {% errors errors=form.template.errors %}
+                {% endif %}
+            </div>
+            {% form_actions primary_text=_("Verzenden") primary_icon="arrow_forward" %}
+        {% endrender_form %}
+        {% else %}
+            <div class="p">
+                {% url 'profile:contact_create' as contact_create %}
+                {% link href=contact_create text=_("Maak je eerste contact aan voordat je een samenwerking start") icon="arrow_forward" icon_position="after" primary=True %}
+            </div>
+        {% endif %}
+    </div>
 {% endblock %}

@@ -1,3 +1,24 @@
 .cases {
   margin-top: var(--spacing-giant);
+
+  /// cards on cases page
+  .card {
+    .cases__link {
+      text-decoration: none;
+    }
+  }
+
+  a:hover {
+    cursor: pointer;
+  }
+}
+
+#document-upload {
+  /// Make required asterisk visible for this component
+  .label__label--required {
+    color: var(--color-red);
+    padding-left: var(--spacing-tiny);
+    //make asterisks invisible by default, only make them visible if component has the caption
+    display: inline;
+  }
 }

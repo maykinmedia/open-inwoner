@@ -1,6 +1,7 @@
 .autoComplete_wrapper {
   display: inline-block;
   position: relative;
+  width: 100%;
 }
 
 .autoComplete_wrapper > ul {
@@ -10,7 +11,7 @@
   left: 0;
   right: 0;
   padding: 0;
-  z-index: 1000;
+  z-index: 1005;
 
   // color
   background-color: var(--color-white);

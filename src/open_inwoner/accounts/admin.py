@@ -6,10 +6,12 @@ from django.urls import reverse, reverse_lazy
 from django.utils.html import format_html
 from django.utils.translation import ngettext, ugettext_lazy as _
 
+from image_cropping import ImageCroppingMixin
 from privates.admin import PrivateMediaMixin
 
 from open_inwoner.utils.mixins import UUIDAdminFirstInOrder
 
+from .choices import ContactTypeChoices
 from .models import Action, Appointment, Document, Invite, Message, User
 
 
@@ -24,28 +26,37 @@ class _UserChangeForm(UserChangeForm):
         cleaned_data = super().clean(*args, **kwargs)
 
         if (
-            User.objects.filter(email__iexact=cleaned_data["email"])
-            and self.instance.email != cleaned_data["email"]
+            cleaned_data.get("image")
+            and cleaned_data.get("contact_type") != ContactTypeChoices.begeleider
         ):
-            raise ValidationError(_("The user with this email already exists."))
+            raise ValidationError(_("Only a 'begeleider' user can add an image."))
+
+        if cleaned_data.get("email"):
+
+            if (
+                User.objects.filter(email__iexact=cleaned_data["email"])
+                and self.instance.email != cleaned_data["email"]
+            ):
+                raise ValidationError(_("The user with this email already exists."))
 
 
 class _UserCreationForm(UserCreationForm):
     def clean(self, *args, **kwargs):
         cleaned_data = super().clean(*args, **kwargs)
 
-        # we use both queries in order to avoid the duplicate validation errors
-        if User.objects.filter(
-            email__iexact=cleaned_data["email"]
-        ) and not User.objects.filter(email=cleaned_data["email"]):
-            raise ValidationError(_("The user with this email already exists."))
+        if cleaned_data.get("email"):
+            # we use both queries in order to avoid the duplicate validation errors
+            if User.objects.filter(
+                email__iexact=cleaned_data["email"]
+            ) and not User.objects.filter(email=cleaned_data["email"]):
+                raise ValidationError(_("The user with this email already exists."))
 
 
 @admin.register(User)
-class _UserAdmin(UserAdmin):
+class _UserAdmin(ImageCroppingMixin, UserAdmin):
     form = _UserChangeForm
     add_form = _UserCreationForm
-    hijack_success_url = reverse_lazy("root")
+    hijack_success_url = "/"
     list_display_links = (
         "email",
         "first_name",
@@ -57,17 +68,14 @@ class _UserAdmin(UserAdmin):
             {
                 "fields": (
                     "first_name",
+                    "infix",
                     "last_name",
                     "contact_type",
-                    "bsn",
-                    "rsin",
                     "oidc_id",
-                    "birthday",
-                    "street",
-                    "housenumber",
-                    "postcode",
-                    "city",
-                    "selected_themes",
+                    "image",
+                    "cropping",
+                    "phonenumber",
+                    "selected_categories",
                 )
             },
         ),
@@ -83,6 +91,17 @@ class _UserAdmin(UserAdmin):
                     "is_prepopulated",
                     "groups",
                     "user_permissions",
+                ),
+            },
+        ),
+        (
+            _("Notifications"),
+            {
+                "classes": ("collapse",),
+                "fields": (
+                    "cases_notifications",
+                    "messages_notifications",
+                    "plans_notifications",
                 ),
             },
         ),
@@ -105,15 +124,21 @@ class _UserAdmin(UserAdmin):
     list_display = (
         "email",
         "first_name",
+        "infix",
         "last_name",
         "login_type",
         "is_staff",
         "is_active",
         "contact_type",
     )
-    search_fields = ("first_name", "last_name", "email")
+    search_fields = ("first_name", "infix", "last_name", "email")
     ordering = ("email",)
-    filter_horizontal = ("user_contacts", "contacts_for_approval")
+    filter_horizontal = (
+        "user_contacts",
+        "contacts_for_approval",
+        "groups",
+        "user_permissions",
+    )
 
 
 @admin.register(Action)

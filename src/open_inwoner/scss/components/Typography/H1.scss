@@ -11,7 +11,10 @@
   justify-content: space-between;
 
   @include mobile-only {
-    word-break: break-all;
+    flex-direction: column;
+    align-items: flex-start;
+    word-break: normal;
+    overflow-wrap: break-word;
   }
 
   &:first-of-type {
@@ -21,4 +24,8 @@
   &--bottom {
     margin-bottom: calc(var(--row-height) / 2) !important;
   }
+}
+
+h1 + .card-container {
+  margin-top: var(--gutter-width);
 }

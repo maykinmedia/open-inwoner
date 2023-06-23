@@ -270,8 +270,12 @@ svg.leaflet-image-layer.leaflet-interactive path {
   background: #ddd;
   outline: 0;
 }
-.leaflet-container a {
-  color: #0078a8;
+.leaflet-container a,
+.leaflet-container .link--secondary {
+  color: var(--color-secondary);
+}
+.leaflet-container h4 .link--primary {
+  color: var(--color-black);
 }
 .leaflet-container a.leaflet-active {
   outline: 2px solid orange;

@@ -37,15 +37,30 @@ django-view-breadcrumbs
 markdown
 django_better_admin_arrayfield
 humanfriendly
-git+https://github.com/maykinmedia/mail-editor.git@0b4621b5c7f434586115b8e722af8940cfa70195#egg=mail-editor
+git+https://github.com/maykinmedia/mail-editor.git@a5743ff0f997a91d8202015b79966533f014f5bd#egg=mail-editor
 fontawesomefree
 django-timeline-logger
-django-rich
 django-csp
 django-csp-reports
 mozilla-django-oidc-db
 django-open-forms-client
 django-htmx
+playwright
+django-yubin
+django-image-cropping
+django-log-outgoing-requests
+
+# django cms
+django-cms
+djangocms-text-ckeditor
+djangocms-link
+djangocms-file
+djangocms-picture
+# djangocms-video
+# djangocms-googlemap
+# djangocms-snippet
+# djangocms-style
+aldryn-apphooks-config
 
 # API libraries
 djangorestframework
@@ -69,3 +84,8 @@ django-sessionprofile
 
 # Common Ground integration
 zgw-consumers
+notifications-api-common
+
+# 2FA SMS verification
+oath
+messagebird

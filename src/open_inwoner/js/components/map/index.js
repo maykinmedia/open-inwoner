@@ -1,6 +1,20 @@
+import escapeHTML from 'escape-html'
 import 'leaflet'
 import { RD_CRS } from './rd'
 import { isMobile } from '../../lib/device/is-mobile'
+
+/**
+ * Returns an escaped variable.
+ * @param {string} textVariable
+ * @return {string}
+ */
+function escapeVariableText(textVariable) {
+  if (textVariable) {
+    return escapeHTML(textVariable)
+  } else {
+    return ''
+  }
+}
 
 /** @type {NodeListOf<Element>} All the leaflet maps. */
 const LEAFLET_MAPS = document.querySelectorAll('.map__leaflet')
@@ -73,17 +87,50 @@ class Map {
    * @return {string}
    */
   featureToHTML(feature) {
-    const { name, ...properties } = feature.properties
-    const displayName = name ? name : ''
-    return `
-        <h4 class="h4">
+    const {
+      name,
+      location_url,
+      address_line_1,
+      address_line_2,
+      phonenumber,
+      email,
+      ...properties
+    } = feature.properties
+
+    const displayName = escapeVariableText(name)
+    const locationDetailView = escapeVariableText(location_url)
+    const displayAddress1 = escapeVariableText(address_line_1)
+    const displayAddress2 = escapeVariableText(address_line_2)
+    const displayPhonenumber = escapeVariableText(phonenumber)
+    const displayEmail = escapeVariableText(email)
+    let title = ''
+
+    if (locationDetailView) {
+      title = `
+        <a href="${locationDetailView}" class="link link--primary" aria-label=${displayName} title=${displayName}>
           ${displayName}
+        </a>
+      `
+    } else {
+      title = displayName
+    }
+
+    return `
+      <div class="leaflet-content-name">
+        <h4 class="h4">
+          ${title}
         </h4>
-        <p class="p">
-          ${Object.entries(properties)
-            .map(([key, value]) => value)
-            .join(' ')}
-          </p>
+      </div>
+      <div class="leaflet-content-details p--no-margin">
+        <p class="p">${displayAddress1}</p>
+        <p class="p">${displayAddress2}</p>
+        <a href="tel:${displayPhonenumber}" class="link link--secondary" aria-label=${displayPhonenumber} title=${displayPhonenumber}>
+          <span class="link__text">${displayPhonenumber}</span>
+        </a>
+        <a href="mailto:${displayEmail}" class="link link--secondary" aria-label=${displayEmail} title=${displayEmail}>
+          <span class="link__text">${displayEmail}</span>
+        </a>
+      </div>
     `
   }
 }

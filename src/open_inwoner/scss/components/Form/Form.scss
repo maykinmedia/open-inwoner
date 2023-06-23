@@ -1,11 +1,12 @@
 .form {
   box-sizing: border-box;
   display: grid;
-  gap: var(--gutter-width);
+  gap: var(--spacing-small);
   padding: var(--gutter-width) 0;
+  position: relative;
 
   @media (min-width: 768px) {
-    gap: var(--gutter-width);
+    gap: var(--spacing-large);
   }
 
   &#{&}--align-end {
@@ -68,15 +69,67 @@
     display: flex;
     flex-direction: column;
     gap: var(--spacing-medium);
+
+    .notifications {
+      &__errors .notification *[class*='icon'] {
+        position: static;
+        transform: translateY(-5px);
+      }
+    }
+  }
+  &__control
+    .label
+    .notifications__errors
+    .notification--warning
+    *[class*='icon'] {
+    position: static;
+    transform: translateY(-5px);
   }
 
   &__control > .label .p:last-child {
-    //color: var(--color-mute);
     font-size: var(--font-size-body-small);
   }
 
-  &__control > .label *:not(.button) {
+  &__control > .label .p.p--compact {
+    font-size: var(--font-size-body);
+  }
+
+  &__control > .label .input,
+  &__control > .label .input[type='file'] {
     width: 100%;
+    max-width: 100%;
+  }
+
+  @media (min-width: 360px) {
+    &__control > .label .input,
+    &__control > .label .input[type='file'] {
+      max-width: var(--form-width);
+    }
+  }
+
+  .filter__container &__control > .label .input,
+  .filter__container &__control > .label .input[type='file'],
+  .form--search &__control > .label .input,
+  &.form__registration .form__control .label .input {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /// Registration -start.
+
+  &__control > .label ul {
+    padding-left: var(--card-spacing);
+  }
+
+  &__control > .label ul *:not(.button) {
+    padding-right: var(--card-spacing);
+    width: fit-content;
+  }
+
+  /// Registration -end.
+
+  &__control > .label .material-icons-outlined {
+    pointer-events: none;
   }
 
   &__grid-box {
@@ -97,6 +150,28 @@
       opacity: 0;
       height: 0;
     }
+  }
+
+  /// Required fields
+
+  .caption__content {
+    display: block;
+    color: var(--color-mute);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body);
+    font-style: italic;
+    .label__label--required {
+      vertical-align: sub;
+    }
+  }
+
+  .label__label--required {
+    font-size: var(--font-size-body-large);
+    color: var(--color-red);
+    padding-left: var(--spacing-tiny);
+    vertical-align: sub;
+    //make asterisks invisible by default, only make them visible if component has the caption
+    display: none;
   }
 
   /// Actions.
@@ -153,7 +228,28 @@
       right: 5px;
       top: 50%;
       transform: translateY(-50%);
-      pointer-events: none;
+    }
+
+    .notification > *[class*='icon'],
+    .notification > *[class*='Icon'] {
+      width: auto !important;
+      position: absolute;
+      right: var(--spacing-small);
+      top: var(--spacing-large);
+    }
+  }
+}
+
+/// Specific forms
+
+.search__mobile,
+.header__submenu {
+  .form {
+    // tablet sizes
+    @media screen and (min-width: 360px) and (max-width: 768px) {
+      &__control > .label .input {
+        max-width: 100%;
+      }
     }
   }
 }

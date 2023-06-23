@@ -1,0 +1,20 @@
+{% extends "registration/add_phone_number_base.html" %}
+{% load i18n form_tags button_tags %}
+
+{% block content %}
+    {{ block.super }}
+
+    <p class="p">
+        {% trans 'U ontvangt een SMS bericht op uw mobiele telefoon nummer met daarin een code. ' %}
+        {% trans 'Vul hieronder de code in. Geen bericht ontvangen? ' %}
+        {% trans 'Kies <em>Vorige</em> om uw telefoon nummer te controleren en eventueel aan te passen.' %}
+    </p>
+
+    {% render_form id="add-phonenumber-2-form" form=wizard.form no_action=True method="POST" %}
+        {% csrf_token %}
+
+        {{ wizard.management_form }}
+        {% input form.token %}
+        {% form_actions primary_text=_("Inloggen") primary_icon="arrow_forward" secondary_name="wizard_goto_step" secondary_text=_("Vorige") secondary_icon="arrow_backward" secondary_icon_position="before" secondary_value=wizard.steps.first %}
+    {% endrender_form %}
+{% endblock %}

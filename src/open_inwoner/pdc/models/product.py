@@ -1,5 +1,6 @@
 import json
 from typing import Union
+from uuid import uuid4
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
@@ -13,8 +14,26 @@ from ordered_model.models import OrderedModel
 
 from open_inwoner.utils.validators import validate_phone_number
 
-from ..managers import PublishedQueryset
+from ..managers import ProductQueryset
 from .mixins import GeoModel
+
+
+class CategoryProduct(OrderedModel):
+    """
+    explicit many2many through model
+    """
+
+    category = models.ForeignKey("pdc.Category", on_delete=models.CASCADE)
+    product = models.ForeignKey("pdc.Product", on_delete=models.CASCADE)
+    order_with_respect_to = "category"
+
+    class Meta:
+        ordering = ("category", "product")
+
+    def get_product_name(self):
+        return self.product.name
+
+    get_product_name.short_description = _("Name")
 
 
 class Product(models.Model):
@@ -34,9 +53,9 @@ class Product(models.Model):
     )
     summary = models.TextField(
         verbose_name=_("Summary"),
-        blank=True,
         default="",
-        help_text=_("Short description of the product"),
+        max_length=300,
+        help_text=_("Short description of the product, limited to 300 characters."),
     )
     icon = FilerImageField(
         verbose_name=_("Icon"),
@@ -69,13 +88,16 @@ class Product(models.Model):
     )
     content = models.TextField(
         verbose_name=_("Content"),
-        help_text=_("Product content with build-in WYSIWYG editor"),
+        help_text=_(
+            "Product content with build-in WYSIWYG editor. By adding '[CTABUTTON]' you can embed a cta-button for linking to the defined form or link"
+        ),
     )
     categories = models.ManyToManyField(
         "pdc.Category",
         verbose_name=_("Categories"),
         related_name="products",
         help_text=_("Categories which the product relates to"),
+        through=CategoryProduct,
     )
     related_products = models.ManyToManyField(
         "pdc.Product",
@@ -153,7 +175,7 @@ class Product(models.Model):
         help_text=_("Conditions applicable for the product"),
     )
 
-    objects = PublishedQueryset.as_manager()
+    objects = ProductQueryset.as_manager()
 
     class Meta:
         verbose_name = _("Product")
@@ -164,17 +186,20 @@ class Product(models.Model):
 
     @property
     def form_link(self):
-        return reverse("pdc:product_form", kwargs={"slug": self.slug})
+        return reverse("products:product_form", kwargs={"slug": self.slug})
 
     def get_absolute_url(self, category=None):
         if not category:
-            return reverse("pdc:product_detail", kwargs={"slug": self.slug})
+            return reverse("products:product_detail", kwargs={"slug": self.slug})
 
         category_slug = category.get_build_slug()
         return reverse(
-            "pdc:category_product_detail",
-            kwargs={"slug": self.slug, "theme_slug": category_slug},
+            "products:category_product_detail",
+            kwargs={"slug": self.slug, "category_slug": category_slug},
         )
+
+    def has_cta_tag(self):
+        return "\[CTABUTTON\]" in self.content
 
 
 class ProductFile(models.Model):
@@ -288,12 +313,26 @@ class ProductLink(models.Model):
 
 
 class ProductLocation(GeoModel):
+    uuid = models.UUIDField(verbose_name=_("UUID"), default=uuid4, unique=True)
     name = models.CharField(
         verbose_name=_("Name"),
         max_length=100,
         help_text=_("Location name"),
         blank=True,
         null=True,
+    )
+    email = models.EmailField(
+        verbose_name=_("Email address"),
+        blank=True,
+        help_text=_("The email address of the current location"),
+    )
+    phonenumber = models.CharField(
+        verbose_name=_("Phonenumber"),
+        blank=True,
+        default="",
+        max_length=15,
+        validators=[validate_phone_number],
+        help_text=_("The phonenumber of the current location"),
     )
 
     class Meta:
@@ -306,9 +345,15 @@ class ProductLocation(GeoModel):
     def get_geojson_feature(self, stringify: bool = True) -> Union[str, dict]:
         feature = super().get_geojson_feature(False)
 
+        if feature.get("properties"):
+            feature["properties"]["location_url"] = self.get_absolute_url()
+
         if stringify:
             return json.dumps(feature)
         return feature
+
+    def get_absolute_url(self) -> str:
+        return reverse("products:location_detail", kwargs={"uuid": self.uuid})
 
 
 class ProductCondition(OrderedModel):

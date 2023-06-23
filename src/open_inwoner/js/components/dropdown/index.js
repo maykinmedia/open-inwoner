@@ -6,6 +6,7 @@ export class Dropdown {
     this.button = node.querySelector('.button')
     this.button.addEventListener('click', this.toggleOpen.bind(this))
     document.addEventListener('click', this.doClosing.bind(this), false)
+    document.addEventListener('keydown', this.doClosing.bind(this), false)
   }
 
   toggleOpen(event) {
@@ -17,7 +18,12 @@ export class Dropdown {
   }
 
   doClosing(event) {
-    this.node.classList.remove('dropdown--open')
+    if (
+      event.type === 'click' ||
+      (event.type === 'keydown' && event.key === 'Escape')
+    ) {
+      this.node.classList.remove('dropdown--open')
+    }
   }
 }
 

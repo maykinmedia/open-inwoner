@@ -1,24 +1,26 @@
-{% load card_tags icon_tags link_tags i18n grid_tags thumbnail %}
+{% load icon_tags link_tags i18n grid_tags thumbnail %}
 
-{% render_card grid=image %}
-    {% if image %}
-        <a href="{{ url }}" class="card__image-container">
-            <img class="card__image" src="{{ image|thumbnail_url:'card-image' }}" alt="{{ image.default_alt_text }}" />
-        </a>
-        <div class="card__content">
-    {% endif %}
-    <h2 class="h2">{% link url text=title %}</h2>
-    <p class="p">{{ description }}</p>
-    {% if object.end_date %}
-        <div class="card__tabled">
-            <div>{% trans "Einddatum" %}:</div>
-            <div>{{ object.end_date }}</div>
-            <div>{% trans "Created by" %}:</div>
-            <div>{{ object.created_by.get_full_name }}</div>
-        </div>
-    {% endif %}
-    {% link url text=title hide_text=True icon='arrow_forward' button=True transparent=True %}
-    {% if image %}
-        </div>
-    {% endif %}
-{% endrender_card %}
+{# template for plans cards and product cards without any images #}
+<a href="{{ url }}" title="{{ title }}" aria-label="{{ title }}" class="card">
+    <div class="card__body card__body--tabled">
+        {% if title %}
+            <h2 class="h2">
+                <span class="link link__text">{{ title }}</span>
+            </h2>
+        {% endif %}
+        <p class="p">{{ description }}</p>
+        {% if object.end_date %}
+            <div class="card__tabled">
+                <div>{% trans "Einddatum" %}:</div>
+                <div>{{ object.end_date }}</div>
+                <div>{% trans "Created by" %}:</div>
+                <div>{{ object.created_by.get_full_name }}</div>
+            </div>
+        {% endif %}
+
+        <span class="spacer"></span>
+        <span class="button button--icon-before button--transparent button--secondary">
+        {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
+        </span>
+    </div>
+</a>

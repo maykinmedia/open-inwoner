@@ -27,17 +27,24 @@
 
   *[class*='icon'],
   *[class*='Icon'] {
-    font-size: 20px;
-    width: 20px;
+    font-size: 24px;
+    width: 24px;
   }
 
   &--icon-position-before {
     flex-direction: row-reverse;
   }
 
-  &--primary,
-  .leaflet-container &--primary {
+  &--primary {
     color: var(--color-primary);
+  }
+
+  .leaflet-container &--secondary {
+    color: var(--color-secondary);
+  }
+
+  .leaflet-container .h4 &--primary {
+    color: var(--color-black);
   }
 
   &--secondary {
@@ -71,10 +78,6 @@
 
   *[class*='icon']:first-child,
   *[class*='Icon']:first-child {
-    transform: scale(0.75);
+    transform: scale(1);
   }
-}
-
-.link + .link {
-  margin-left: var(--spacing-small);
 }

@@ -1,7 +1,11 @@
+import base64
 import logging
+from datetime import date
 from typing import Optional
 
 from django.conf import settings
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.utils.functional import SimpleLazyObject
 
 import requests
 from requests import HTTPError, RequestException, Response
@@ -43,10 +47,7 @@ def _fetch_single_information_object(
             response = client.retrieve("enkelvoudiginformatieobject", url=url)
         else:
             response = client.retrieve("enkelvoudiginformatieobject", uuid=uuid)
-    except RequestException as e:
-        logger.exception("exception while making request", exc_info=e)
-        return
-    except ClientError as e:
+    except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
 
@@ -65,6 +66,7 @@ def download_document(url: str) -> Optional[Response]:
 
     req_args = {}
 
+    # copy/emulate auth and certs from ZGW Consumers / ZDS Client
     if client.auth:
         req_args["headers"] = client.auth.credentials()
 
@@ -87,3 +89,38 @@ def download_document(url: str) -> Optional[Response]:
         logger.exception("exception while making request", exc_info=e)
     else:
         return res
+
+
+def upload_document(
+    user: SimpleLazyObject,
+    file: InMemoryUploadedFile,
+    title: str,
+    informatieobjecttype_url: str,
+    source_organization: str,
+) -> Optional[dict]:
+
+    client = build_client("document")
+    if client is None:
+        return
+
+    document_body = {
+        "bronorganisatie": source_organization,
+        "creatiedatum": date.today().strftime("%Y-%m-%d"),
+        "titel": title,
+        "auteur": user.get_full_name(),
+        "inhoud": base64.b64encode(file.read()).decode("utf-8"),
+        "bestandsomvang": file.size,
+        "bestandsnaam": file.name,
+        "status": "definitief",
+        "indicatieGebruiksrecht": False,
+        "taal": "dut",
+        "informatieobjecttype": informatieobjecttype_url,
+    }
+
+    try:
+        response = client.create("enkelvoudiginformatieobject", document_body)
+    except (RequestException, ClientError) as e:
+        logger.exception("exception while making request", exc_info=e)
+        return
+
+    return response

@@ -4,11 +4,11 @@ This *should* be nearly identical to production.
 """
 import os
 
-from .production import *  # noqa isort:skip
-
 os.environ.setdefault("ENVIRONMENT", "test")
 # NOTE: watch out for multiple projects using the same cache!
 os.environ.setdefault("CACHE_DEFAULT", "127.0.0.1:6379/0")
+
+from .production import *  # noqa isort:skip
 
 # Allow logging in with both username+password and email+password
 AUTHENTICATION_BACKENDS = [
@@ -20,6 +20,3 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 CSP_REPORTS_SAVE = True
-
-for db_alias in DATABASES.keys():
-    del DATABASES[db_alias]["CONN_MAX_AGE"]

@@ -1,2 +1,12 @@
-{% load notification_tags %}
-{% notifications messages=messages %}
+{% load i18n button_tags icon_tags button_tags icon_tags notification_tags %}
+
+{% for message in messages %}
+    <div class="notifications notifications__errors">
+        <div class="notification notification--warning">
+            {% icon icon="warning_amber" icon_position="before" outlined=True %}
+            <div class="notification__content">
+                <p class="p p--compact">{{ message.message }}</p>
+            </div>
+        </div>
+    </div>
+{% endfor %}

@@ -1,0 +1,21 @@
+{% extends 'master.html' %}
+{% load i18n anchor_menu_tags card_tags dashboard_tags file_tags grid_tags status_tags table_tags solo_tags form_tags button_tags %}
+
+{% block sidebar_content %}
+    {% if contactmoment %}
+        {% anchor_menu anchors desktop=True %}
+    {% endif %}
+{% endblock sidebar_content %}
+
+{% block content %}
+    {% if contactmoment %}
+        {% render_grid %}
+            {% render_column span=9 %}
+                {% contactmoment_dashboard contactmoment %}
+                {% contactmoment_table contactmoment %}
+            {% endrender_column %}
+        {% endrender_grid %}
+    {% else %}
+        <h2 class="h2">{% trans 'There is no available data at the moment.' %}</h2>
+    {% endif %}
+{% endblock content %}

@@ -1,18 +1,27 @@
+from datetime import date
+from urllib.parse import urlencode
+
 from django.contrib.sites.models import Site
 from django.core import mail
+from django.test import override_settings
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
 
+import requests_mock
 from django_webtest import WebTest
 from furl import furl
 
 from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 
+from ...cms.tests import cms_tools
+from ...utils.tests.helpers import AssertRedirectsMixin
 from ..choices import LoginTypeChoices
 from ..models import User
-from .factories import InviteFactory, UserFactory
+from .factories import DigidUserFactory, InviteFactory, UserFactory
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestRegistrationFunctionality(WebTest):
     url = reverse_lazy("django_registration_register")
 
@@ -29,6 +38,7 @@ class TestRegistrationFunctionality(WebTest):
         form = register_page.forms["registration-form"]
         form["email"] = self.user.email
         form["first_name"] = self.user.first_name
+        form["infix"] = ""
         form["last_name"] = self.user.last_name
         form["password1"] = self.user.password
         form["password2"] = self.user.password
@@ -63,12 +73,12 @@ class TestRegistrationFunctionality(WebTest):
         self.assertEqual(user_query.count(), 0)
 
     def test_registration_fails_with_invalid_first_name_characters(self):
-        invalid_characters = "/\"\\,.:;'"
+        invalid_characters = '<>#/"\\,.:;'
+        register_page = self.app.get(reverse("django_registration_register"))
+        form = register_page.forms["registration-form"]
 
         for char in invalid_characters:
             with self.subTest(char=char):
-                register_page = self.app.get(reverse("django_registration_register"))
-                form = register_page.forms["registration-form"]
                 form["email"] = self.user.email
                 form["first_name"] = char
                 form["last_name"] = self.user.last_name
@@ -77,20 +87,21 @@ class TestRegistrationFunctionality(WebTest):
                 response = form.submit()
                 expected_errors = {
                     "first_name": [
-                        _("Uw invoer bevat een ongeldig teken: {char}").format(
-                            char=char
+                        _(
+                            "Please make sure your input contains only valid characters "
+                            "(letters, numbers, apostrophe, dash, space)."
                         )
                     ]
                 }
                 self.assertEqual(response.context["form"].errors, expected_errors)
 
     def test_registration_fails_with_invalid_last_name_characters(self):
-        invalid_characters = "/\"\\,.:;'"
+        invalid_characters = '<>#/"\\,.:;'
+        register_page = self.app.get(reverse("django_registration_register"))
+        form = register_page.forms["registration-form"]
 
         for char in invalid_characters:
             with self.subTest(char=char):
-                register_page = self.app.get(reverse("django_registration_register"))
-                form = register_page.forms["registration-form"]
                 form["email"] = self.user.email
                 form["first_name"] = self.user.first_name
                 form["last_name"] = char
@@ -99,8 +110,68 @@ class TestRegistrationFunctionality(WebTest):
                 response = form.submit()
                 expected_errors = {
                     "last_name": [
-                        _("Uw invoer bevat een ongeldig teken: {char}").format(
-                            char=char
+                        _(
+                            "Please make sure your input contains only valid characters "
+                            "(letters, numbers, apostrophe, dash, space)."
+                        )
+                    ]
+                }
+                self.assertEqual(response.context["form"].errors, expected_errors)
+
+    def test_registration_fails_uniform_password(self):
+        passwords = [
+            "lowercase123",
+            "UPPERCASE123",
+            "NODIGITS",
+            "nodigits",
+            "NoDigits",
+            "1238327879",
+        ]
+        register_page = self.app.get(reverse("django_registration_register"))
+        form = register_page.forms["registration-form"]
+
+        for password in passwords:
+            with self.subTest(password=password):
+                form["email"] = self.user.email
+                form["first_name"] = self.user.first_name
+                form["last_name"] = self.user.last_name
+                form["password1"] = password
+                form["password2"] = password
+                response = form.submit()
+                expected_errors = {
+                    "password2": [
+                        _(
+                            "Your password must contain at least 1 upper-case letter, "
+                            "1 lower-case letter, 1 digit."
+                        ),
+                    ]
+                }
+                self.assertEqual(response.context["form"].errors, expected_errors)
+
+    def test_registration_fails_with_non_diverse_password(self):
+        passwords = [
+            "pass_word-123",
+            "PASS_WORD-123",
+            "NoDigits",
+            "UPPERCASE123",
+            "lowercase123",
+        ]
+        register_page = self.app.get(reverse("django_registration_register"))
+        form = register_page.forms["registration-form"]
+
+        for password in passwords:
+            with self.subTest(password=password):
+                form["email"] = self.user.email
+                form["first_name"] = self.user.first_name
+                form["last_name"] = self.user.last_name
+                form["password1"] = password
+                form["password2"] = password
+                response = form.submit()
+                expected_errors = {
+                    "password2": [
+                        _(
+                            "Your password must contain at least 1 upper-case letter, "
+                            "1 lower-case letter, 1 digit."
                         )
                     ]
                 }
@@ -129,8 +200,8 @@ class TestRegistrationFunctionality(WebTest):
         form["email"] = inactive_user.email
         form["first_name"] = "John"
         form["last_name"] = "Smith"
-        form["password1"] = "somepassword"
-        form["password2"] = "somepassword"
+        form["password1"] = "SomePassword123"
+        form["password2"] = "SomePassword123"
 
         response = form.submit()
 
@@ -158,13 +229,13 @@ class TestRegistrationFunctionality(WebTest):
         self.assertEqual(form["first_name"].value, contact.first_name)
         self.assertEqual(form["last_name"].value, contact.last_name)
 
-        form["password1"] = "somepassword"
-        form["password2"] = "somepassword"
+        form["password1"] = "SomePassword123"
+        form["password2"] = "SomePassword123"
 
         response = form.submit()
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("django_registration_complete"))
+        self.assertEqual(response.url, reverse("pages-root"))
         self.assertTrue(User.objects.filter(email=contact.email).exists())
 
         new_user = User.objects.get(email=contact.email)
@@ -178,15 +249,44 @@ class TestRegistrationFunctionality(WebTest):
         # reverse contact checks
         self.assertEqual(list(user.user_contacts.all()), [new_user])
 
+    def test_invite_url_not_in_session_after_successful_registration(self):
+        user = UserFactory()
+        contact = UserFactory.build(email="test@testemail.com")
+        invite = InviteFactory.create(
+            inviter=user,
+            invitee_email=contact.email,
+            invitee_first_name=contact.first_name,
+            invitee_last_name=contact.last_name,
+        )
+        invite = InviteFactory.create()
+        url = invite.get_absolute_url()
+
+        response = self.app.get(url)
+
+        form = response.forms["invite-form"]
+        response = form.submit()
+
+        self.assertIn("invite_url", self.app.session.keys())
+
+        register_page = self.app.get(f"{self.url}?invite={invite.key}")
+        form = register_page.forms["registration-form"]
+
+        form["password1"] = "SomePassword123"
+        form["password2"] = "SomePassword123"
+
+        response = form.submit()
+
+        self.assertNotIn("invite_url", self.app.session.keys())
+
     def test_registration_active_user(self):
-        """the user should be redirected to the registration complete page"""
+        """the user should be redirected to the homepage"""
 
         user = UserFactory.create()
 
         response = self.app.get(self.url, user=user)
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("django_registration_complete"))
+        self.assertEqual(response.url, reverse("pages-root"))
 
     def test_registration_non_unique_email_different_case(self):
         UserFactory.create(email="john@smith.com")
@@ -196,8 +296,8 @@ class TestRegistrationFunctionality(WebTest):
         form["email"] = "John@smith.com"
         form["first_name"] = "John"
         form["last_name"] = "Smith"
-        form["password1"] = "somepassword"
-        form["password2"] = "somepassword"
+        form["password1"] = "SomePassword123"
+        form["password2"] = "SomePassword123"
 
         response = form.submit()
 
@@ -207,9 +307,51 @@ class TestRegistrationFunctionality(WebTest):
             "* Een gebruiker met dit e-mailadres bestaat al",
         )
 
+    def test_registration_succeeds_with_2fa_sms_and_phonenumber(self):
+        self.config.login_2fa_sms = True
+        self.config.save()
 
-class TestRegistrationDigid(WebTest):
+        register_page = self.app.get(reverse("django_registration_register"))
+        form = register_page.forms["registration-form"]
+        form["email"] = self.user.email
+        form["first_name"] = self.user.first_name
+        form["last_name"] = self.user.last_name
+        form["phonenumber"] = self.user.phonenumber
+        form["password1"] = self.user.password
+        form["password2"] = self.user.password
+        form.submit()
+        # Verify the registered user.
+        registered_user = User.objects.get(email=self.user.email)
+        self.assertEqual(registered_user.email, self.user.email)
+        self.assertTrue(registered_user.check_password(self.user.password))
+
+    def test_registration_fails_with_2fa_sms_and_no_phonenumber(self):
+        self.config.login_2fa_sms = True
+        self.config.save()
+
+        register_page = self.app.get(reverse("django_registration_register"))
+        form = register_page.forms["registration-form"]
+        form["email"] = self.user.email
+        form["first_name"] = self.user.first_name
+        form["last_name"] = self.user.last_name
+        form["password1"] = self.user.password
+        form["password2"] = self.user.password
+        response = form.submit()
+
+        self.assertEqual(
+            response.context["form"].errors,
+            {"phonenumber": [_("Dit veld is vereist.")]},
+        )
+
+
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+class TestDigid(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
+    csrf_checks = False
     url = reverse_lazy("django_registration_register")
+
+    @classmethod
+    def setUpTestData(cls):
+        cms_tools.create_homepage()
 
     def test_registration_page_only_digid(self):
         response = self.app.get(self.url)
@@ -222,7 +364,7 @@ class TestRegistrationDigid(WebTest):
         self.assertEqual(
             digid_tag.attrs["href"],
             furl(reverse("digid:login"))
-            .add({"next": reverse("accounts:registration_necessary")})
+            .add({"next": reverse("profile:registration_necessary")})
             .url,
         )
 
@@ -237,7 +379,7 @@ class TestRegistrationDigid(WebTest):
         digid_tag = response.html.find("a", title="Registreren met DigiD")
         self.assertIsNotNone(digid_tag)
         necessary_url = (
-            furl(reverse("accounts:registration_necessary"))
+            furl(reverse("profile:registration_necessary"))
             .add({"invite": invite.key})
             .url
         )
@@ -246,9 +388,336 @@ class TestRegistrationDigid(WebTest):
             furl(reverse("digid:login")).add({"next": necessary_url}).url,
         )
 
+    def test_digid_fail_without_invite_redirects_to_login_page(self):
+        self.assertNotIn("invite_url", self.client.session.keys())
 
+        url = reverse("digid-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": reverse("pages-root"),
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": "w",
+            "auth_pass": "bar",
+        }
+        # post our password to the IDP
+        response = self.app.post(url, data).follow()
+
+        self.assertRedirectsLogin(response, with_host=True)
+
+    def test_digid_fail_without_invite_and_next_url_redirects_to_login_page(self):
+        self.assertNotIn("invite_url", self.client.session.keys())
+
+        url = reverse("digid-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": None,
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": "w",
+            "auth_pass": "bar",
+        }
+        # post our password to the IDP
+        response = self.app.post(url, data).follow()
+
+        self.assertRedirectsLogin(response, with_host=True)
+
+    def test_digid_fail_with_invite_redirects_to_register_page(self):
+        invite = InviteFactory()
+        session = self.client.session
+        session[
+            "invite_url"
+        ] = f"{reverse('django_registration_register')}?invite={invite.key}"
+        session.save()
+
+        url = reverse("digid-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": f"{reverse('profile:registration_necessary')}?invite={invite.key}",
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": "w",
+            "auth_pass": "bar",
+        }
+        # post our password to the IDP
+        response = self.client.post(url, data, follow=True)
+
+        self.assertRedirects(
+            response,
+            f"http://testserver{reverse('django_registration_register')}?invite={invite.key}",
+        )
+
+    def test_invite_url_not_in_session_after_successful_login(self):
+        invite = InviteFactory()
+        session = self.client.session
+        session[
+            "invite_url"
+        ] = f"{reverse('django_registration_register')}?invite={invite.key}"
+        session.save()
+
+        url = reverse("digid-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": f"{reverse('profile:registration_necessary')}?invite={invite.key}",
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": "123456789",
+            "auth_pass": "bar",
+        }
+
+        self.assertIn("invite_url", self.client.session.keys())
+
+        # post our password to the IDP
+        response = self.client.post(url, data, follow=True)
+
+        self.assertRedirects(
+            response,
+            f"{reverse('profile:registration_necessary')}?invite={invite.key}",
+        )
+        self.assertNotIn("invite_url", self.client.session.keys())
+
+    @requests_mock.Mocker()
+    def test_user_can_modify_only_email_when_digid_and_brp(self, m):
+        self._setUpMocks_v_2(m)
+        self._setUpService()
+
+        url = reverse("digid-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": reverse("profile:registration_necessary"),
+        }
+        data = {
+            "auth_name": "123456789",
+            "auth_pass": "bar",
+        }
+        url = f"{url}?{urlencode(params)}"
+        response = self.app.post(url, data).follow()
+
+        form = response.follow().forms["necessary-form"]
+        form["email"] = "updated@example.com"
+        form["first_name"] = "JUpdated"
+        form["last_name"] = "SUpdated"
+        form.submit()
+
+        user = User.objects.get(id=self.app.session["_auth_user_id"])
+
+        self.assertTrue(user.is_prepopulated)
+        self.assertEqual(user.email, "updated@example.com")
+        self.assertEqual(user.first_name, "Merel")
+        self.assertEqual(user.last_name, "Kooyman")
+
+    @requests_mock.Mocker()
+    def test_partial_response_from_haalcentraal_when_digid_and_brp(self, m):
+        self._setUpService()
+
+        m.get(
+            "https://personen/api/schema/openapi.yaml?v=3",
+            status_code=200,
+            content=self.load_binary_mock("personen_2.0.yaml"),
+        )
+        m.post(
+            "https://personen/api/brp/personen",
+            status_code=200,
+            json={
+                "personen": [
+                    {
+                        "naam": {
+                            "voornamen": "Merel",
+                        },
+                    }
+                ],
+                "type": "RaadpleegMetBurgerservicenummer",
+            },
+        )
+        url = reverse("digid-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": reverse("profile:registration_necessary"),
+        }
+        data = {
+            "auth_name": "123456789",
+            "auth_pass": "bar",
+        }
+        url = f"{url}?{urlencode(params)}"
+        response = self.app.post(url, data).follow()
+        user = User.objects.get(id=self.app.session["_auth_user_id"])
+
+        # ensure user's first_name has been updated
+        self.assertEqual(user.first_name, "Merel")
+        self.assertEqual(user.last_name, "")
+        self.assertTrue(user.email.endswith("@example.org"))
+
+        # only email can be modified
+        form = response.follow().forms["necessary-form"]
+        form["email"] = "updated@example.org"
+        form["first_name"] = "JUpdated"
+        form.submit()
+
+        user.refresh_from_db()
+
+        self.assertEqual(user.first_name, "Merel")
+        self.assertEqual(user.last_name, "")
+        self.assertEqual(user.email, "updated@example.org")
+
+    @requests_mock.Mocker()
+    def test_first_digid_login_updates_brp_fields(self, m):
+        self._setUpService()
+        self._setUpMocks_v_2(m)
+
+        url = reverse("digid-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": reverse("pages-root"),
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": "123456782",
+            "auth_pass": "bar",
+        }
+        # post our password to the IDP
+        response = self.app.post(url, data).follow()
+
+        user = User.objects.get(id=self.app.session["_auth_user_id"])
+
+        self.assertEqual(user.first_name, "Merel")
+        self.assertEqual(user.last_name, "Kooyman")
+        self.assertEqual(user.birthday, date(1982, 4, 10))
+        self.assertEqual(user.street, "King Olivereiland")
+        self.assertEqual(user.housenumber, "64")
+        self.assertEqual(user.city, "'s-Gravenhage")
+        self.assertTrue(user.is_prepopulated)
+
+    @requests_mock.Mocker()
+    def test_existing_user_digid_login_updates_brp_fields(self, m):
+        self._setUpService()
+
+        user = DigidUserFactory()
+        m.get(
+            "https://personen/api/schema/openapi.yaml?v=3",
+            status_code=200,
+            content=self.load_binary_mock("personen_2.0.yaml"),
+        )
+        m.post(
+            "https://personen/api/brp/personen",
+            status_code=200,
+            json={
+                "personen": [
+                    {
+                        "naam": {
+                            "voornamen": "UpdatedName",
+                        },
+                    }
+                ],
+                "type": "RaadpleegMetBurgerservicenummer",
+            },
+        )
+        url = reverse("digid-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": reverse("pages-root"),
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": user.bsn,
+            "auth_pass": "bar",
+        }
+        # post our password to the IDP
+        response = self.app.post(url, data).follow()
+
+        user.refresh_from_db()
+
+        self.assertEqual(user.first_name, "UpdatedName")
+
+    @requests_mock.Mocker()
+    def test_existing_user_digid_login_fails_brp_update_when_no_brp_service(self, m):
+        user = DigidUserFactory()
+        m.get(
+            "https://personen/api/schema/openapi.yaml?v=3",
+            status_code=200,
+            content=self.load_binary_mock("personen_2.0.yaml"),
+        )
+        m.post(
+            "https://personen/api/brp/personen",
+            status_code=200,
+            json={
+                "personen": [
+                    {
+                        "naam": {
+                            "voornamen": "UpdatedName",
+                        },
+                    }
+                ],
+                "type": "RaadpleegMetBurgerservicenummer",
+            },
+        )
+        url = reverse("digid-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": reverse("pages-root"),
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": user.bsn,
+            "auth_pass": "bar",
+        }
+        # post our password to the IDP
+        response = self.app.post(url, data).follow()
+
+        user.refresh_from_db()
+
+        self.assertNotEqual(user.first_name, "UpdatedName")
+
+    @requests_mock.Mocker()
+    def test_existing_user_digid_login_fails_brp_update_when_brp_http_404(self, m):
+        self._setUpService()
+
+        user = DigidUserFactory()
+        m.get(
+            "https://personen/api/schema/openapi.yaml?v=3",
+            status_code=200,
+            content=self.load_binary_mock("personen_2.0.yaml"),
+        )
+        m.post(
+            "https://personen/api/brp/personen",
+            status_code=404,
+        )
+        url = reverse("digid-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": reverse("pages-root"),
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": user.bsn,
+            "auth_pass": "bar",
+        }
+        # post our password to the IDP
+        response = self.app.post(url, data).follow()
+
+        user.refresh_from_db()
+
+        self.assertNotEqual(user.first_name, "UpdatedName")
+
+
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestRegistrationNecessary(WebTest):
-    url = reverse_lazy("accounts:registration_necessary")
+    url = reverse_lazy("profile:registration_necessary")
+
+    @classmethod
+    def setUpTestData(cls):
+        cms_tools.create_homepage()
 
     def test_any_page_for_digid_user_redirect_to_necessary_fields(self):
         user = UserFactory(
@@ -257,12 +726,12 @@ class TestRegistrationNecessary(WebTest):
             login_type=LoginTypeChoices.digid,
         )
         urls = [
-            reverse("root"),
-            reverse("pdc:category_list"),
-            reverse("accounts:my_profile"),
-            reverse("accounts:inbox"),
-            reverse("accounts:my_open_cases"),
-            reverse("plans:plan_list"),
+            reverse("pages-root"),
+            reverse("products:category_list"),
+            reverse("cases:open_cases"),
+            reverse("profile:detail"),
+            reverse("profile:data"),
+            reverse("collaborate:plan_list"),
             reverse("general_faq"),
         ]
 
@@ -271,7 +740,7 @@ class TestRegistrationNecessary(WebTest):
                 response = self.app.get(url, user=user)
 
                 self.assertRedirects(
-                    response, reverse("accounts:registration_necessary")
+                    response, reverse("profile:registration_necessary")
                 )
 
     def test_submit_without_invite(self):
@@ -292,7 +761,7 @@ class TestRegistrationNecessary(WebTest):
         response = form.submit()
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("django_registration_complete"))
+        self.assertEqual(response.url, reverse("pages-root"))
 
         user.refresh_from_db()
 
@@ -322,7 +791,7 @@ class TestRegistrationNecessary(WebTest):
         response = form.submit()
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("django_registration_complete"))
+        self.assertEqual(response.url, reverse("pages-root"))
 
         user_contact = User.objects.get(email=contact.email)
         invite.refresh_from_db()
@@ -405,7 +874,7 @@ class TestRegistrationNecessary(WebTest):
             last_name="",
             login_type=LoginTypeChoices.digid,
         )
-        invalid_characters = "/\"\\,.:;'"
+        invalid_characters = '<>#/"\\,.:;'
 
         for char in invalid_characters:
             with self.subTest(char=char):
@@ -417,8 +886,9 @@ class TestRegistrationNecessary(WebTest):
                 response = form.submit()
                 expected_errors = {
                     "first_name": [
-                        _("Uw invoer bevat een ongeldig teken: {char}").format(
-                            char=char
+                        _(
+                            "Please make sure your input contains only valid characters "
+                            "(letters, numbers, apostrophe, dash, space)."
                         )
                     ]
                 }
@@ -431,7 +901,7 @@ class TestRegistrationNecessary(WebTest):
             last_name="",
             login_type=LoginTypeChoices.digid,
         )
-        invalid_characters = "/\"\\,.:;'"
+        invalid_characters = '<>#/"\\,.:;'
 
         for char in invalid_characters:
             with self.subTest(char=char):
@@ -443,15 +913,17 @@ class TestRegistrationNecessary(WebTest):
                 response = form.submit()
                 expected_errors = {
                     "last_name": [
-                        _("Uw invoer bevat een ongeldig teken: {char}").format(
-                            char=char
+                        _(
+                            "Please make sure your input contains only valid characters "
+                            "(letters, numbers, apostrophe, dash, space)."
                         )
                     ]
                 }
                 self.assertEqual(response.context["form"].errors, expected_errors)
 
 
-class TestLoginLogoutFunctionality(WebTest):
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+class TestLoginLogoutFunctionality(AssertRedirectsMixin, WebTest):
     def setUp(self):
         # Create a user. We need to reset their password
         # because otherwise we do not have access to the raw one associated.
@@ -460,6 +932,17 @@ class TestLoginLogoutFunctionality(WebTest):
         self.config = SiteConfiguration.get_solo()
         self.config.login_allow_registration = True
         self.config.save()
+
+    def test_login_page_has_next_url(self):
+        response = self.app.get(reverse("profile:contact_list"))
+        self.assertRedirects(
+            response,
+            furl(reverse("login")).add({"next": reverse("profile:contact_list")}).url,
+        )
+        self.assertIn(
+            furl("").add({"next": reverse("profile:contact_list")}).url,
+            response.follow(),
+        )
 
     def test_login(self):
         """Test that a user is successfully logged in."""
@@ -501,10 +984,11 @@ class TestLoginLogoutFunctionality(WebTest):
         """Test that a user is able to log out and page redirects to root endpoint."""
         # Log out user and redirection
         logout_response = self.app.get(reverse("logout"), user=self.user)
-        self.assertRedirects(logout_response, reverse("root"))
+        self.assertRedirects(logout_response, reverse("pages-root"))
         self.assertFalse(logout_response.follow().context["user"].is_authenticated)
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestPasswordResetFunctionality(WebTest):
     csrf_checks = False
 
@@ -513,7 +997,7 @@ class TestPasswordResetFunctionality(WebTest):
 
     def test_password_reset_form_custom_template_is_rendered(self):
         response = self.app.get(reverse("password_reset"))
-        self.assertContains(response, _("Mijn wachtwoord opnieuw instellen"))
+        self.assertContains(response, _("Wachtwoord opnieuw instellen"))
 
     def test_password_reset_email_contains_proper_data(self):
         current_site = Site.objects.get_current()
@@ -562,6 +1046,7 @@ class TestPasswordResetFunctionality(WebTest):
         self.assertEqual(len(mail.outbox), 0)
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestPasswordChange(WebTest):
     def setUp(self):
         self.user = UserFactory()
@@ -575,14 +1060,14 @@ class TestPasswordChange(WebTest):
         self.assertContains(response, _("Uw wachtwoord is gewijzigd."))
 
     def test_password_change_button_is_rendered_with_default_login_type(self):
-        response = self.app.get(reverse("accounts:my_profile"), user=self.user)
+        response = self.app.get(reverse("profile:detail"), user=self.user)
         self.assertContains(response, _("Wijzig wachtwoord"))
 
     def test_password_change_button_is_not_rendered_with_digid_login_type(self):
         digid_user = UserFactory(
             login_type=LoginTypeChoices.digid, email="john@smith.nl"
         )
-        response = self.app.get(reverse("accounts:my_profile"), user=digid_user)
+        response = self.app.get(reverse("profile:detail"), user=digid_user)
         self.assertNotContains(response, _("Wijzig wachtwoord"))
 
     def test_anonymous_user_is_redirected_to_login_page_if_password_change_is_accessed(

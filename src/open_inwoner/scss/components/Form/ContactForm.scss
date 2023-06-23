@@ -1,0 +1,9 @@
+#contact-form {
+  .button[type='submit']:disabled {
+    background-color: var(--color-gray) !important;
+    border-color: var(--color-gray) !important;
+    color: var(--color-white);
+    pointer-events: none;
+    cursor: default;
+  }
+}

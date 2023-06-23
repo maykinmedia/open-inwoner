@@ -1,20 +1,19 @@
 {% load table_tags %}
 {% spaceless %}
     {% if table.body %}
-        {% render_table %}
-            {% render_table_body %}
-                {% for row in table.body %}
-                    {% render_table_row %}
-                        {% for header in row.headers %}
-                            {% render_table_header %}{{ header.text }}{% endrender_table_header %}
-                        {% endfor %}
-
-                        {% for cell in row.cells %}
-                            {% render_table_cell %}{{ cell.text }}{% endrender_table_cell %}
-                        {% endfor %}
-                    {% endrender_table_row %}
+    <table class="table">
+    <tbody class="table__body">
+        {% for row in table.body %}
+            <tr class="table__row">
+                {% for header in row.headers %}
+                    <th class="table__header table__header--status">{{ header.text }}</th>
                 {% endfor %}
-            {% endrender_table_body %}
-        {% endrender_table %}
+                {% for cell in row.cells %}
+                    <td class="table__item table__item--status">{{ cell.text|linebreaksbr }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </tbody>
+    </table>
     {% endif %}
 {% endspaceless %}

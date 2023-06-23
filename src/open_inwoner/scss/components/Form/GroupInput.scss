@@ -7,9 +7,14 @@
     display: flex;
   }
 
+  &__toolbar > .emoji:first-child {
+    padding-left: var(--spacing-medium);
+  }
+
   textarea {
     border: none;
     resize: none;
+    width: 100%;
   }
 
   input {

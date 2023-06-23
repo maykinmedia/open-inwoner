@@ -17,6 +17,7 @@ class MessageQuerySet(QuerySet):
                 - other_user_id
                 - other_user_email
                 - other_user_first_name
+                - other_user_infix
                 - other_user_last_name
 
             other_user_id matches the value of either sender or receiver field,
@@ -55,6 +56,12 @@ class MessageQuerySet(QuerySet):
                 other_user_first_name=Case(
                     When(receiver=user, then=F("sender__first_name")),
                     default=F("receiver__first_name"),
+                )
+            )
+            .annotate(
+                other_user_infix=Case(
+                    When(receiver=user, then=F("sender__infix")),
+                    default=F("receiver__infix"),
                 )
             )
             .annotate(
@@ -100,3 +107,6 @@ class InviteQuerySet(QuerySet):
 class UserQuerySet(QuerySet):
     def get_pending_approvals(self, user):
         return self.filter(contacts_for_approval=user)
+
+    def having_usable_email(self):
+        return self.exclude(Q(email="") | Q(email__endswith="@example.org"))

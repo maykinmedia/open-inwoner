@@ -1,14 +1,18 @@
 import inspect
 import logging
+import re
 from functools import wraps
+from typing import Callable, Optional, TypeVar, Union
+from uuid import UUID
 
 from django.core.cache import caches
 
+from zds_client import get_operation_url
 from zgw_consumers.api_models.constants import RolTypes, VertrouwelijkheidsAanduidingen
 
-from open_inwoner.openzaak.api_models import InformatieObject, Rol, Zaak
+from open_inwoner.openzaak.api_models import InformatieObject, Rol, Zaak, ZaakType
 
-from .models import OpenZaakConfig
+from .models import OpenZaakConfig, ZaakTypeConfig, ZaakTypeInformatieObjectTypeConfig
 
 logger = logging.getLogger(__name__)
 
@@ -109,6 +113,9 @@ def get_role_name_display(rol: Rol) -> str:
         return display
 
 
+RT = TypeVar("RT")
+
+
 def cache(key: str, alias: str = "default", **set_options):
     """
     Function-decorator for updating the django low-level cache.
@@ -120,7 +127,7 @@ def cache(key: str, alias: str = "default", **set_options):
     seconds (timeout=60).
     """
 
-    def decorator(func: callable):
+    def decorator(func: Callable[..., RT]) -> Callable[..., RT]:
         argspec = inspect.getfullargspec(func)
 
         if argspec.defaults:
@@ -130,7 +137,7 @@ def cache(key: str, alias: str = "default", **set_options):
             defaults = {}
 
         @wraps(func)
-        def wrapped(*args, **kwargs):
+        def wrapped(*args, **kwargs) -> RT:
             skip_cache = kwargs.pop("skip_cache", False)
             if skip_cache:
                 return func(*args, **kwargs)
@@ -166,3 +173,60 @@ def cache(key: str, alias: str = "default", **set_options):
         return wrapped
 
     return decorator
+
+
+def get_retrieve_resource_by_uuid_url(
+    client, resource: str, uuid: Union[str, UUID]
+) -> str:
+    op_suffix = client.operation_suffix_mapping["retrieve"]
+    operation_id = f"{resource}{op_suffix}"
+    path_kwargs = {
+        "uuid": uuid,
+    }
+    url = get_operation_url(
+        client.schema, operation_id, base_url=client.base_url, **path_kwargs
+    )
+    return url
+
+
+def get_zaak_type_config(case_type: ZaakType) -> Optional[ZaakTypeConfig]:
+    try:
+        return ZaakTypeConfig.objects.filter_case_type(case_type).get()
+    except ZaakTypeConfig.DoesNotExist:
+        return None
+
+
+def get_zaak_type_info_object_type_config(
+    case_type: ZaakType,
+    info_object_type_url: str,
+) -> Optional[ZaakTypeInformatieObjectTypeConfig]:
+    assert isinstance(info_object_type_url, str)
+    try:
+        return ZaakTypeInformatieObjectTypeConfig.objects.get_for_case_and_info_type(
+            case_type, info_object_type_url
+        )
+    except ZaakTypeInformatieObjectTypeConfig.DoesNotExist:
+        return None
+
+
+def format_zaak_identificatie(
+    identificatie: str, config: Optional[OpenZaakConfig] = None
+):
+    config = config or OpenZaakConfig.get_solo()
+    if config.reformat_esuite_zaak_identificatie:
+        return reformat_esuite_zaak_identificatie(identificatie)
+    else:
+        return identificatie
+
+
+def reformat_esuite_zaak_identificatie(identificatie: str):
+    """
+    0014ESUITE66392022 -> 6639-2022
+    """
+    exp = r"^\d+ESUITE(?P<num>\d+?)(?P<year>\d{4})$"
+    m = re.match(exp, identificatie)
+    if not m:
+        return identificatie
+    num = m.group("num")
+    year = m.group("year")
+    return f"{num}-{year}"

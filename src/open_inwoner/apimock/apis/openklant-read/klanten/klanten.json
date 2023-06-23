@@ -1,0 +1,26 @@
+{
+    "count": 1,
+    "previous": null,
+    "next": null,
+    "results": [
+        {
+            "uuid": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            "url": "https://klanten.nl/api/v1/klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            "bronorganisatie": "123456789",
+            "klantnummer": "123456",
+            "bedrijfsnaam": "Mijn Bedrijf",
+            "functie": "Functie",
+            "websiteUrl": "https://www.maykin.nl/",
+            "voornaam": "Piet",
+            "voorvoegselAchternaam": "van der",
+            "achternaam": "Test",
+            "telefoonnummer": "0123456789",
+            "emailadres": null,
+            "adres": null,
+            "subject": "",
+            "subjectType": null,
+            "aanmaakkanaal": "",
+            "geverifieerd": false
+        }
+    ]
+}

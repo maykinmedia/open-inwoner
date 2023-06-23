@@ -10,8 +10,6 @@ pylint
 pyquery  # integrates with webtest
 requests-mock
 tblib
-selenium
-django-selenium-login
 
 # DigidLocal
 pyopenssl

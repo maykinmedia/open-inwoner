@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from ..validators import (
-    validate_charfield_entry,
+    format_phone_number,
     validate_phone_number,
     validate_postal_code,
 )
@@ -12,27 +12,6 @@ class ValidatorsTestCase(TestCase):
     """
     Validates the functions defined in ``utils.validators`` module.
     """
-
-    def test_validate_charfield_entry_apostrophe_not_allowed(self):
-        """
-        Tests the ``validate_charfield_entry`` function when not explicitly
-        allowing apostrophe character.
-        """
-        self.assertRaisesMessage(
-            ValidationError,
-            "Uw invoer bevat een ongeldig teken: '",
-            validate_charfield_entry,
-            "let's fail",
-        )
-
-    def test_validate_charfield_entry_apostrophe_allowed(self):
-        """
-        Tests the ``validate_charfield_entry`` function when explicitly
-        allowing apostrophe character.
-        """
-        self.assertEqual(
-            validate_charfield_entry("let's pass", allow_apostrophe=True), "let's pass"
-        )
 
     def test_validate_postal_code(self):
         """
@@ -91,3 +70,21 @@ class ValidatorsTestCase(TestCase):
         self.assertEqual(validate_phone_number("00695959595"), "00695959595")
         self.assertEqual(validate_phone_number("00-69-59-59-59-5"), "00-69-59-59-59-5")
         self.assertEqual(validate_phone_number("00 69 59 59 59 5"), "00 69 59 59 59 5")
+
+    def test_format_phone_number(self):
+        samples = [
+            "0031123456789",
+            "+31123456789",
+            "0123456789",
+            "012-3456789",
+            "012 345 67 89",
+            "+31 12 345 67 89",
+        ]
+        expected_result = "+31123456789"
+
+        for num in samples:
+            self.assertEqual(format_phone_number(num), expected_result)
+
+        # testing some non dutch numbers
+        self.assertEqual(format_phone_number("+32 12 345 67 89"), "+32123456789")
+        self.assertEqual(format_phone_number("0032 12 345 67 89"), "+32123456789")

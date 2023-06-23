@@ -13,13 +13,15 @@ class Confirmation {
       const modalId = document.getElementById('modal')
       const modal = new Modal(modalId)
       modal.setTitle(this.form.dataset.confirmTitle)
+      // Only show confirmation if text is set
+      modal.setText(this.form.dataset.confirmText || '')
       modal.setClose(this.form.dataset.confirmCancel)
       modal.setConfirm(
         this.form.dataset.confirmDefault,
         this.handleConfirm.bind(this),
         'button--danger'
       )
-      modal.show()
+      modal.show(this.form)
     }
   }
 

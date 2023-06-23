@@ -2,9 +2,9 @@
 
 <a
     href="{{href}}"
-    {% if id %}{{ id }}{% endif %}
+    {% if id %}id="{{ id }}"{% endif %}
     {% if download %}download{% endif %}
-    {% if href|startswith:"http" %}target="_blank"{% endif %}
+    {% if blank is True %}target="_blank"{% endif %}
     class="{{ classes }}{% if extra_classes %} {{ extra_classes }}{% endif %}"
     {% if data_text %}data-text="{{ data_text }}"{% endif %}
     {% if data_alt_text %}data-alt-text="{{ data_alt_text }}"{% endif %}
@@ -20,7 +20,7 @@
     title="{% firstof title text %}"
 >
     {% if src %}
-        <img class="logo__image" src="{{src}}" alt="{{ text }}"/>
+        <img class="logo__image" src="{{src}}" alt="{{ text }}"{{ svg_height_attr }}/>
     {% endif %}
 
     {% if text and not hide_text %}<span class="link__text">{{ text }}</span>{% endif %}
@@ -29,5 +29,5 @@
         {% icon icon=icon outlined=icon_outlined %}
     {% endif %}
 
-    {% if href|startswith:"http" %}{% icon icon="open_in_new" %}{% endif %}
+    {% if href|startswith:"http" and not hide_external_icon %}{% icon icon="open_in_new" %}{% endif %}
 </a>

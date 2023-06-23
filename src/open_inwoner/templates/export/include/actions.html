@@ -13,7 +13,7 @@
     </thead>
     <tbody>
         {% for action in actions %}
-            {% url "accounts:action_download" uuid=action.uuid as download_url %}
+            {% url "profile:action_download" uuid=action.uuid as download_url %}
             <tr>
                 <td class="table__item">{{ action.name }}</td>
                 <td class="table__item">{{ action.get_status_display }}</td>

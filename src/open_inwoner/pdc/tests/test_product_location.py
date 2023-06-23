@@ -2,7 +2,7 @@ import json
 from unittest.mock import patch
 
 from django.contrib.gis.geos import Point
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
@@ -14,6 +14,7 @@ from ..models import ProductLocation
 from .factories import ProductFactory, ProductLocationFactory
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class ProductLocationTestCase(TestCase):
     @patch(
         "open_inwoner.pdc.models.mixins.geocode_address",
@@ -70,6 +71,8 @@ class ProductLocationTestCase(TestCase):
             housenumber="117",
             postcode="1015 CJ",
             city="Amsterdam",
+            email="loc@example.com",
+            phonenumber="+31666767676",
             geometry=Point(4.8876515, 52.3775941),
         )
         product = ProductFactory.create(locations=(product_location,))
@@ -84,10 +87,11 @@ class ProductLocationTestCase(TestCase):
                     },
                     "properties": {
                         "name": "Maykin Media",
-                        "street": "Keizersgracht",
-                        "housenumber": "117",
-                        "postcode": "1015 CJ",
-                        "city": "Amsterdam",
+                        "address_line_1": "Keizersgracht 117",
+                        "address_line_2": "1015CJ Amsterdam",
+                        "email": "loc@example.com",
+                        "phonenumber": "+31666767676",
+                        "location_url": product_location.get_absolute_url(),
                     },
                 }
             ),
@@ -114,14 +118,16 @@ class ProductLocationTestCase(TestCase):
             housenumber="117",
             postcode="1015 CJ",
             city="Amsterdam",
+            email="loc@example.com",
+            phonenumber="+31666767676",
         )
         self.assertEqual(
             {
-                "city": "Amsterdam",
-                "housenumber": "117",
                 "name": "Maykin Media",
-                "postcode": "1015 CJ",
-                "street": "Keizersgracht",
+                "address_line_1": "Keizersgracht 117",
+                "address_line_2": "1015CJ Amsterdam",
+                "email": "loc@example.com",
+                "phonenumber": "+31666767676",
             },
             product_location.get_serialized_fields(),
         )
@@ -133,6 +139,8 @@ class ProductLocationTestCase(TestCase):
             housenumber="4",
             postcode="7411 KT",
             city="Deventer",
+            email="loc1@example.com",
+            phonenumber="+31999767676",
             geometry=Point(6.155650, 52.251550),
         )
         product_location_2 = ProductLocationFactory.create(
@@ -141,6 +149,8 @@ class ProductLocationTestCase(TestCase):
             housenumber="204",
             postcode="1015 KL",
             city="Amsterdam",
+            email="loc2@example.com",
+            phonenumber="+31666767676",
             geometry=Point(4.883400, 52.380260),
         )
         product_1 = ProductFactory(locations=(product_location_1,))
@@ -158,10 +168,11 @@ class ProductLocationTestCase(TestCase):
                             },
                             "properties": {
                                 "name": "Gemeente Deventer",
-                                "street": "Grote Kerkhof",
-                                "housenumber": "4",
-                                "postcode": "7411 KT",
-                                "city": "Deventer",
+                                "address_line_1": "Grote Kerkhof 4",
+                                "address_line_2": "7411KT Deventer",
+                                "email": "loc1@example.com",
+                                "phonenumber": "+31999767676",
+                                "location_url": product_location_1.get_absolute_url(),
                             },
                         },
                         {
@@ -172,10 +183,11 @@ class ProductLocationTestCase(TestCase):
                             },
                             "properties": {
                                 "name": "Gemeente Amsterdam",
-                                "street": "Lindengracht",
-                                "housenumber": "204",
-                                "postcode": "1015 KL",
-                                "city": "Amsterdam",
+                                "address_line_1": "Lindengracht 204",
+                                "address_line_2": "1015KL Amsterdam",
+                                "email": "loc2@example.com",
+                                "phonenumber": "+31666767676",
+                                "location_url": product_location_2.get_absolute_url(),
                             },
                         },
                     ],
@@ -207,6 +219,7 @@ class ProductLocationTestCase(TestCase):
         )
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestLocationFormInput(WebTest):
     @patch("open_inwoner.pdc.models.mixins.geocode_address", side_effect=IndexError)
     def test_exception_is_handled_when_city_and_postcode_are_not_provided(
@@ -227,3 +240,55 @@ class TestLocationFormInput(WebTest):
             ],
         )
         mock_geocoding.assert_called_once_with(" ,  ")
+
+
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+class TestLocationDetailView(WebTest):
+    def test_shown_products_in_location_detail(self):
+        published_product = ProductFactory()
+        product_location = ProductLocationFactory()
+        published_product.locations.add(product_location)
+
+        response = self.app.get(
+            reverse("products:location_detail", kwargs={"uuid": product_location.uuid})
+        )
+
+        # check the published product is shown
+        self.assertEqual(response.context["products"].get(), published_product)
+
+        # check location details
+        self.assertContains(response, product_location.name)
+        self.assertContains(response, product_location.address_line_1)
+        self.assertContains(response, product_location.address_line_2)
+        self.assertContains(response, product_location.phonenumber)
+        self.assertContains(response, product_location.email)
+
+        # adding a draft product
+        draft_product = ProductFactory(published=False)
+        draft_product.locations.add(product_location)
+
+        response = self.app.get(
+            reverse("products:location_detail", kwargs={"uuid": product_location.uuid})
+        )
+
+        products = response.context["products"]
+
+        # check the draft product is not shown
+        self.assertEqual(products.get(), published_product)
+
+
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+class TestLocationViewThroughMap(WebTest):
+    def test_product_location_link_is_rendered_on_product_page(self):
+        product = ProductFactory()
+        product_location = ProductLocationFactory()
+        product.locations.add(product_location)
+
+        response = self.app.get(
+            reverse("products:product_detail", kwargs={"slug": product.slug})
+        )
+
+        self.assertContains(
+            response,
+            reverse("products:location_detail", kwargs={"uuid": product_location.uuid}),
+        )

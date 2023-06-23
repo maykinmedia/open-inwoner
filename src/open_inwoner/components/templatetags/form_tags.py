@@ -53,8 +53,9 @@ def render_form(parser, token):
         - extra_classes: string | Extra css classes for the form.
         - form_action: string | where the form should go after submit.
         - enctype: string | set the encrypt when sending forms.
-        - id: string | set an id on the form. Usefull for testing.
+        - id: string | set an id on the form. Useful for testing.
         - data_confirm_title: string | If a confirm dialog is shown this will be the title.
+        - data_confirm_text: string | If a confirm dialog is shown this will be the description.
         - data_confirm_cancel: string | If a confirm dialog is shown this will be the text on the cancel button.
         - data_confirm_default: string | If a confirm dialog is shown this will be the text on the confirm button.
         - submit_text: string | The text on the submit button when the form is auto rendered.
@@ -95,8 +96,10 @@ def form(context, form_object, secondary=True, **kwargs):
     """
     Renders a form including all fields.
 
-    Usage:
+    Usages:
         {% form form_object=form method="GET" %}
+
+        {% form form_object=form method="POST" show_required=True submit_text=_("Bestand uploaden") enctype="multipart/form-data" %}
 
     Variables:
         + form_object: Form | This is the django form that should be rendered.
@@ -106,9 +109,11 @@ def form(context, form_object, secondary=True, **kwargs):
         - inline: bool | If the form actions should be displayed on the same line as a field.
         - extra_classes: string | Extra css classes for the form.
         - form_action: string | where the form should go after submit.
+        - no_action: bool | If we don't want any action to take place.
         - enctype: string | set the encrypt when sending forms.
-        - id: string | set an id on the form. Usefull for testing.
+        - id: string | set an id on the form. Useful for testing.
         - data_confirm_title: string | If a confirm dialog is shown this will be the title.
+        - data_confirm_text: string | If a confirm dialog is shown this will be the description.
         - data_confirm_cancel: string | If a confirm dialog is shown this will be the text on the cancel button.
         - data_confirm_default: string | If a confirm dialog is shown this will be the text on the confirm button.
         - show_notifications: bool | Whether to show messages from Django messages framework.
@@ -126,11 +131,15 @@ def form(context, form_object, secondary=True, **kwargs):
     Extra context:
         - auto_render: True | Telling the template that the form should be rendered.
         - classes: string | The classes that should be generated according to the options.
+        - show_required: boolean  | Show required field caption
     """
     _context = context.flatten()
     kwargs["submit_text"] = kwargs.get("submit_text", _("Verzenden"))
     kwargs["secondary"] = secondary
     kwargs["auto_render"] = True
+    kwargs["show_required"] = kwargs.get("show_required", False) and any(
+        f.required for f in form_object.fields.values()
+    )
     kwargs["form"] = form_object
     kwargs["classes"] = get_form_classes(**kwargs)
     return {
@@ -142,7 +151,7 @@ def form(context, form_object, secondary=True, **kwargs):
 @register.simple_tag()
 def autorender_field(form_object, field_name, **kwargs):
     """
-    Detecting what type of field sould be rendered.
+    Detecting what type of field should be rendered.
     TODO: Keep updating with new fields.
 
     Usage:
@@ -267,8 +276,28 @@ def input(field, **kwargs):
     return {**kwargs, "field": field}
 
 
+@register.inclusion_tag("components/Form/FileInput.html")
+def file_input(file, text, **kwargs):
+    """
+    Displaying a file upload interface.
+
+    Usage:
+        {% file_input form.field text=_('Document selecteren') %}
+
+    Variables:
+        + field: Field | The field that needs to be rendered.
+        - extra_classes: string| classes which should be added to the top-level container
+    """
+    return {**kwargs, "field": file, "text": text}
+
+
 @register.inclusion_tag("components/Form/DateField.html")
 def date_field(field, **kwargs):
+    return {**kwargs, "field": field}
+
+
+@register.inclusion_tag("components/Form/ImageCrop.html")
+def image_crop(field, **kwargs):
     return {**kwargs, "field": field}
 
 
@@ -346,6 +375,7 @@ def form_actions(primary_text="", primary_icon=None, secondary=True, **kwargs):
         - secondary_text: string | What the text for the secondary button should be.
         - secondary_icon: string | What the icon for the secondary button should be.
         - secondary_icon_position: string | What the icon position for the secondary button should be.
+        - secondary_value: string | If we want to provide a value for the secondary button.
         - transparent: bool | If the button should be transparent.
 
     Extra context:

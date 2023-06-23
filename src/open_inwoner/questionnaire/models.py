@@ -114,10 +114,10 @@ class QuestionnaireStep(MP_Node):
 
     def get_absolute_url(self) -> str:
         if self.is_root():
-            return reverse("questionnaire:root_step", kwargs={"slug": self.slug})
+            return reverse("products:root_step", kwargs={"slug": self.slug})
         root = self.get_root()
         return reverse(
-            "questionnaire:descendent_step",
+            "products:descendent_step",
             kwargs={"root_slug": root.slug, "slug": self.slug},
         )
 

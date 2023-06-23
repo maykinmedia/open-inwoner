@@ -1,5 +1,8 @@
 from django import template
 from django.urls import NoReverseMatch, reverse
+from django.utils.html import format_html
+
+from furl import furl
 
 register = template.Library()
 
@@ -11,7 +14,7 @@ def link(href, text, **kwargs):
 
     Usage:
         {% link 'http://www.example.com' text=_('Example.com') %}
-        {% link href='accounts:inbox' text=_('Mijn berichten') %}
+        {% link href='inbox:index' text=_('Mijn berichten') %}
 
     Variables:
         + href: str | where the link links to (can be url name to resolve).
@@ -41,6 +44,8 @@ def link(href, text, **kwargs):
         - object_id: str | if href is an url name, object_id for reverse can be passed.
         - uuid: str | if href is an url name, uuid for reverse can be passed.
         - title: string | The HTML title attribute if different than the text.
+        - hide_external_icon: bool | If we want to hide the extra icon for an external link
+        - blank: bool | if we want the link to open in a new tab.
 
     Extra context:
         - base_class: string | If it is a button or a string.
@@ -98,8 +103,24 @@ def link(href, text, **kwargs):
 
         return " ".join(classes).strip()
 
+    src = kwargs.get("src")
+    if src and src.endswith(".svg"):
+        svg_height = kwargs.pop("svg_height", None)
+        if svg_height:
+            kwargs["svg_height_attr"] = format_html(' height="{}"', svg_height)
+
     kwargs["base_class"] = get_base_class()
     kwargs["classes"] = get_classes()
     kwargs["href"] = get_href()
     kwargs["text"] = text
     return kwargs
+
+
+@register.filter
+def addnexturl(href, next_url):
+    """
+    Concatenates href & next_url.
+    """
+    f = furl(href)
+    f.args["next"] = next_url
+    return f.url

@@ -1,16 +1,22 @@
+import io
+
 from django.core import mail
+from django.core.files.images import ImageFile
+from django.test import override_settings
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
+from cms import api
 from django_webtest import WebTest
-from furl import furl
 
 from open_inwoner.accounts.models import User
+from open_inwoner.utils.tests.helpers import create_image_bytes
 
 from ..choices import ContactTypeChoices
 from .factories import UserFactory
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class ContactViewTests(WebTest):
     csrf_checks = False
 
@@ -20,10 +26,10 @@ class ContactViewTests(WebTest):
         self.contact = UserFactory()
         self.user.user_contacts.add(self.contact)
         self.login_url = reverse("login")
-        self.list_url = reverse("accounts:contact_list")
-        self.create_url = reverse("accounts:contact_create")
+        self.list_url = reverse("profile:contact_list")
+        self.create_url = reverse("profile:contact_create")
         self.delete_url = reverse(
-            "accounts:contact_delete", kwargs={"uuid": self.contact.uuid}
+            "profile:contact_delete", kwargs={"uuid": self.contact.uuid}
         )
 
     def test_contact_list_login_required(self):
@@ -79,10 +85,40 @@ class ContactViewTests(WebTest):
             ),
         )
 
-    def test_contact_list_show_link_to_messages(self):
-        message_link = reverse("accounts:inbox", kwargs={"uuid": self.contact.uuid})
+    def test_messages_enabled_disabled(self):
+        """Assert that `Stuur Bericht` is displayed if and only if the message page is published"""
+
+        # case 1: no message page
         response = self.app.get(self.list_url, user=self.user)
-        self.assertContains(response, message_link)
+
+        # self.assertNotIn(_("Stuur bericht"), response)
+        self.assertNotContains(response, _("Stuur bericht"))
+
+        # case 2: unpublished message page
+        page = api.create_page(
+            "Mijn Berichten",
+            "cms/fullwidth.html",
+            "nl",
+            slug="berichten",
+        )
+        page.application_namespace = "inbox"
+        page.save()
+
+        response = self.app.get(self.list_url, user=self.user)
+
+        self.assertNotContains(response, _("Stuur bericht"))
+
+        # case 3: published message page
+        page.publish("nl")
+        page.save()
+
+        response = self.app.get(self.list_url, user=self.user)
+
+        icons = response.pyquery(".material-icons-outlined")
+        message_icon = next((icon for icon in icons if icon.text == "message"), None)
+        message_button_text = message_icon.tail.strip()
+
+        self.assertEqual(_("Stuur bericht"), message_button_text)
 
     def test_contact_list_show_reversed(self):
         other_contact = UserFactory(first_name="reverse_contact_user_should_be_found")
@@ -202,7 +238,7 @@ class ContactViewTests(WebTest):
         self.assertEqual(response.context["form"].errors, expected_errors)
 
     def test_adding_contact_with_invalid_first_name_chars_fails(self):
-        invalid_characters = "/\"\\,.:;'"
+        invalid_characters = '<>#/"\\,.:;'
 
         for char in invalid_characters:
             with self.subTest(char=char):
@@ -214,15 +250,16 @@ class ContactViewTests(WebTest):
                 response = form.submit()
                 expected_errors = {
                     "first_name": [
-                        _("Uw invoer bevat een ongeldig teken: {char}").format(
-                            char=char
+                        _(
+                            "Please make sure your input contains only valid characters "
+                            "(letters, numbers, apostrophe, dash, space)."
                         )
                     ]
                 }
                 self.assertEqual(response.context["form"].errors, expected_errors)
 
     def test_adding_contact_with_invalid_last_name_chars_fails(self):
-        invalid_characters = "/\"\\,.:;'"
+        invalid_characters = '<>#/"\\,.:;'
 
         for char in invalid_characters:
             with self.subTest(char=char):
@@ -234,8 +271,9 @@ class ContactViewTests(WebTest):
                 response = form.submit()
                 expected_errors = {
                     "last_name": [
-                        _("Uw invoer bevat een ongeldig teken: {char}").format(
-                            char=char
+                        _(
+                            "Please make sure your input contains only valid characters "
+                            "(letters, numbers, apostrophe, dash, space)."
                         )
                     ]
                 }
@@ -268,7 +306,7 @@ class ContactViewTests(WebTest):
 
     def test_delete_action_redirects_to_contact_list_page(self):
         response = self.app.post(self.delete_url, user=self.user)
-        self.assertRedirects(response, reverse("accounts:contact_list"))
+        self.assertRedirects(response, reverse("profile:contact_list"))
 
     def test_user_cannot_delete_other_users_contact(self):
         other_user = UserFactory()
@@ -327,13 +365,13 @@ class ContactViewTests(WebTest):
         response = self.app.get(self.list_url, user=existing_user)
         form = response.forms["approval_form"]
         response = form.submit("contact_approve")
-        self.assertRedirects(response, reverse("accounts:contact_list"))
+        self.assertRedirects(response, reverse("profile:contact_list"))
 
     def test_user_cannot_approve_other_users_contact(self):
         other_user = UserFactory()
         contact = UserFactory()
         self.user.contacts_for_approval.add(contact)
-        url = reverse("accounts:contact_approval", kwargs={"uuid": contact.uuid})
+        url = reverse("profile:contact_approval", kwargs={"uuid": contact.uuid})
         response = self.app.post(url, user=other_user, status=404)
 
     def test_pending_approval_shows_only_email_in_creator_page(self):
@@ -360,24 +398,17 @@ class ContactViewTests(WebTest):
 
         self.assertContains(response, self.user.first_name)
         self.assertContains(response, self.user.last_name)
-        self.assertContains(
-            response, reverse("accounts:inbox", kwargs={"uuid": self.user.uuid})
-        )
 
         # Sender contact list page
         response = self.app.get(self.list_url, user=self.user)
 
         self.assertContains(response, existing_user.first_name)
         self.assertContains(response, existing_user.last_name)
-        self.assertContains(
-            response,
-            reverse("accounts:inbox", kwargs={"uuid": existing_user.uuid}),
-        )
 
     def test_post_with_no_params_in_contact_approval_returns_bad_request(self):
         existing_user = UserFactory(email="ex@example.com")
         self.user.contacts_for_approval.add(existing_user)
-        url = reverse("accounts:contact_approval", kwargs={"uuid": self.user.uuid})
+        url = reverse("profile:contact_approval", kwargs={"uuid": self.user.uuid})
         response = self.app.post(url, user=existing_user, status=400)
         self.assertEqual(
             response.text, "contact_approve or contact_reject must be provided"
@@ -403,7 +434,7 @@ class ContactViewTests(WebTest):
             f"Goedkeuring geven op Open Inwoner Platform: {self.user.get_full_name()} wilt u toevoegen als contactpersoon",
         )
         self.assertEqual(email.to, [existing_user.email])
-        invite_url = f"http://testserver{reverse('accounts:contact_list')}"
+        invite_url = f"http://testserver{reverse('profile:contact_list')}"
         body = email.alternatives[0][0]  # html version of the email body
         self.assertIn(invite_url, body)
 
@@ -423,9 +454,46 @@ class ContactViewTests(WebTest):
             f"Goedkeuring geven op Open Inwoner Platform: {self.user.get_full_name()} wilt u toevoegen als contactpersoon",
         )
         self.assertNotEqual(email.to, ["john@example.com"])
-        invite_url = f"http://testserver{reverse('accounts:contact_list')}"
+        invite_url = f"http://testserver{reverse('profile:contact_list')}"
         body = email.alternatives[0][0]  # html version of the email body
         self.assertNotIn(invite_url, body)
 
         # Email should be the one for registration, not for approval
         self.assertEqual(email.subject, "Uitnodiging voor Open Inwoner Platform")
+
+    def test_contacts_image_is_shown_in_contact_approval_section(self):
+        # prepare image
+        img_bytes = create_image_bytes()
+        image = ImageFile(io.BytesIO(img_bytes), name="foo.jpg")
+
+        # update user's type and image
+        existing_user = UserFactory(
+            email="ex@example.com",
+            contact_type=ContactTypeChoices.begeleider,
+            image=image,
+        )
+        self.user.contact_type = ContactTypeChoices.begeleider
+        self.user.image = image
+        self.user.save()
+        self.user.contacts_for_approval.add(existing_user)
+
+        # Receiver contact list page
+        response = self.app.get(self.list_url, user=existing_user)
+        avatar_class = response.pyquery(".avatar")
+
+        self.assertIn(self.user.image.name, avatar_class[0].getchildren()[0].get("src"))
+
+    def test_no_image_is_shown_in_contact_approval_section_when_no_image_set(self):
+        # update user's type
+        existing_user = UserFactory(
+            email="ex@example.com", contact_type=ContactTypeChoices.begeleider
+        )
+        self.user.contact_type = ContactTypeChoices.begeleider
+        self.user.save()
+        self.user.contacts_for_approval.add(existing_user)
+
+        # Receiver contact list page
+        response = self.app.get(self.list_url, user=existing_user)
+        avatar_class = response.pyquery(".avatar")
+
+        self.assertFalse(avatar_class)

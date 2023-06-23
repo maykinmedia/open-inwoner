@@ -55,15 +55,17 @@ def settings(request):
             "footer": {
                 "footer_visiting_title": config.footer_visiting_title,
                 "footer_visiting_intro": config.footer_visiting_intro,
+                "footer_visiting_phonenumber": config.footer_visiting_phonenumber,
                 "footer_visiting_map": config.footer_visiting_map,
                 "footer_mailing_title": config.footer_mailing_title,
                 "footer_mailing_intro": config.footer_mailing_intro,
                 "flatpages": config.get_ordered_flatpages,
             },
         },
-        "hero_image_login": config.hero_image_login.file.url
-        if config.hero_image_login
-        else "",
+        "hero_image_login": (
+            config.hero_image_login.file.url if config.hero_image_login else ""
+        ),
+        "favicon": (config.favicon.file.url if config.favicon else ""),
         "login_allow_registration": config.login_allow_registration,
         "login_text": config.login_text,
         "gtm_code": config.gtm_code,
@@ -72,10 +74,10 @@ def settings(request):
         "matomo_url": config.matomo_url,
         "matomo_site_id": config.matomo_site_id,
         "matomo_enabled": config.matomo_enabled,
-        "show_plans": config.show_plans,
-        "show_actions": config.show_actions,
+        "siteimprove_id": config.siteimprove_id,
+        "siteimprove_enabled": config.siteimprove_enabled,
         "menu_categories": Category.get_root_nodes().published(),
-        "search_form": SearchForm(),
+        "search_form": SearchForm(auto_id=False),
         "has_general_faq_questions": Question.objects.general().exists(),
         "settings": dict(
             [(k, getattr(django_settings, k, None)) for k in public_settings]

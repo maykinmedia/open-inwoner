@@ -7,19 +7,22 @@ from django.utils.translation import gettext as _
 from django.views.generic import FormView
 
 from open_inwoner.utils.mixins import PaginationMixin
-from open_inwoner.utils.views import LogMixin
+from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from .forms import FeedbackForm, SearchForm
 from .searches import search_products
 
 
-class SearchView(LogMixin, PaginationMixin, FormView):
+class SearchView(LogMixin, CommonPageMixin, PaginationMixin, FormView):
     form_class = SearchForm
     template_name = "pages/search.html"
     paginate_by = 20
     paginator_class = Paginator
     page_kwarg = "page"
     success_url = reverse_lazy("search:search")
+
+    def page_title(self):
+        return _("Zoeken")
 
     def get(self, request, *args, **kwargs):
         form = self.get_form()

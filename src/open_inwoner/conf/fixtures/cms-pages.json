@@ -1,0 +1,1238 @@
+[
+{
+    "model": "cms.treenode",
+    "pk": 1,
+    "fields": {
+        "path": "0001",
+        "depth": 1,
+        "numchild": 4,
+        "parent": null,
+        "site": 1
+    }
+},
+{
+    "model": "cms.treenode",
+    "pk": 2,
+    "fields": {
+        "path": "0003",
+        "depth": 1,
+        "numchild": 0,
+        "parent": null,
+        "site": 1
+    }
+},
+{
+    "model": "cms.treenode",
+    "pk": 3,
+    "fields": {
+        "path": "00010001",
+        "depth": 2,
+        "numchild": 0,
+        "parent": 1,
+        "site": 1
+    }
+},
+{
+    "model": "cms.treenode",
+    "pk": 4,
+    "fields": {
+        "path": "00010004",
+        "depth": 2,
+        "numchild": 0,
+        "parent": 1,
+        "site": 1
+    }
+},
+{
+    "model": "cms.treenode",
+    "pk": 5,
+    "fields": {
+        "path": "00010003",
+        "depth": 2,
+        "numchild": 0,
+        "parent": 1,
+        "site": 1
+    }
+},
+{
+    "model": "cms.treenode",
+    "pk": 6,
+    "fields": {
+        "path": "00010002",
+        "depth": 2,
+        "numchild": 0,
+        "parent": 1,
+        "site": 1
+    }
+},
+{
+    "model": "cms.placeholder",
+    "pk": 1,
+    "fields": {
+        "slot": "clipboard",
+        "default_width": null
+    }
+},
+{
+    "model": "cms.placeholder",
+    "pk": 2,
+    "fields": {
+        "slot": "content",
+        "default_width": null
+    }
+},
+{
+    "model": "cms.placeholder",
+    "pk": 3,
+    "fields": {
+        "slot": "content",
+        "default_width": null
+    }
+},
+{
+    "model": "cms.placeholder",
+    "pk": 4,
+    "fields": {
+        "slot": "content",
+        "default_width": null
+    }
+},
+{
+    "model": "cms.placeholder",
+    "pk": 5,
+    "fields": {
+        "slot": "content",
+        "default_width": null
+    }
+},
+{
+    "model": "cms.placeholder",
+    "pk": 6,
+    "fields": {
+        "slot": "content",
+        "default_width": null
+    }
+},
+{
+    "model": "cms.placeholder",
+    "pk": 7,
+    "fields": {
+        "slot": "content",
+        "default_width": null
+    }
+},
+{
+    "model": "cms.placeholder",
+    "pk": 8,
+    "fields": {
+        "slot": "content",
+        "default_width": null
+    }
+},
+{
+    "model": "cms.placeholder",
+    "pk": 9,
+    "fields": {
+        "slot": "content",
+        "default_width": null
+    }
+},
+{
+    "model": "cms.placeholder",
+    "pk": 10,
+    "fields": {
+        "slot": "content",
+        "default_width": null
+    }
+},
+{
+    "model": "cms.placeholder",
+    "pk": 11,
+    "fields": {
+        "slot": "content",
+        "default_width": null
+    }
+},
+{
+    "model": "cms.placeholder",
+    "pk": 12,
+    "fields": {
+        "slot": "content",
+        "default_width": null
+    }
+},
+{
+    "model": "cms.placeholder",
+    "pk": 13,
+    "fields": {
+        "slot": "content",
+        "default_width": null
+    }
+},
+{
+    "model": "cms.placeholder",
+    "pk": 14,
+    "fields": {
+        "slot": "clipboard",
+        "default_width": null
+    }
+},
+{
+    "model": "cms.placeholder",
+    "pk": 15,
+    "fields": {
+        "slot": "clipboard",
+        "default_width": null
+    }
+},
+{
+    "model": "cms.placeholder",
+    "pk": 16,
+    "fields": {
+        "slot": "clipboard",
+        "default_width": null
+    }
+},
+{
+    "model": "cms.placeholder",
+    "pk": 17,
+    "fields": {
+        "slot": "banner",
+        "default_width": null
+    }
+},
+{
+    "model": "cms.placeholder",
+    "pk": 18,
+    "fields": {
+        "slot": "banner",
+        "default_width": null
+    }
+},
+{
+    "model": "cms.placeholder",
+    "pk": 23,
+    "fields": {
+        "slot": "clipboard",
+        "default_width": null
+    }
+},
+{
+    "model": "cms.placeholder",
+    "pk": 24,
+    "fields": {
+        "slot": "banner",
+        "default_width": null
+    }
+},
+{
+    "model": "cms.placeholder",
+    "pk": 25,
+    "fields": {
+        "slot": "banner",
+        "default_width": null
+    }
+},
+{
+    "model": "cms.placeholder",
+    "pk": 26,
+    "fields": {
+        "slot": "banner",
+        "default_width": null
+    }
+},
+{
+    "model": "cms.placeholder",
+    "pk": 27,
+    "fields": {
+        "slot": "banner",
+        "default_width": null
+    }
+},
+{
+    "model": "cms.placeholder",
+    "pk": 28,
+    "fields": {
+        "slot": "banner_image",
+        "default_width": null
+    }
+},
+{
+    "model": "cms.placeholder",
+    "pk": 29,
+    "fields": {
+        "slot": "banner_text",
+        "default_width": null
+    }
+},
+{
+    "model": "cms.placeholder",
+    "pk": 30,
+    "fields": {
+        "slot": "banner_image",
+        "default_width": null
+    }
+},
+{
+    "model": "cms.placeholder",
+    "pk": 31,
+    "fields": {
+        "slot": "banner_text",
+        "default_width": null
+    }
+},
+{
+    "model": "cms.page",
+    "pk": 1,
+    "fields": {
+        "created_by": "alex@maykinmedia.nl",
+        "changed_by": "bart@maykinmedia.nl",
+        "creation_date": "2023-04-24T15:40:54.507Z",
+        "changed_date": "2023-05-14T22:26:54.757Z",
+        "publication_date": "2023-04-24T15:40:54.545Z",
+        "publication_end_date": null,
+        "in_navigation": true,
+        "soft_root": false,
+        "reverse_id": "home",
+        "navigation_extenders": null,
+        "template": "INHERIT",
+        "login_required": false,
+        "limit_visibility_in_menu": null,
+        "is_home": true,
+        "application_urls": "",
+        "application_namespace": null,
+        "publisher_is_draft": true,
+        "publisher_public": 2,
+        "languages": "nl",
+        "xframe_options": 0,
+        "is_page_type": false,
+        "node": 1,
+        "placeholders": [
+            2,
+            18,
+            30,
+            31
+        ]
+    }
+},
+{
+    "model": "cms.page",
+    "pk": 2,
+    "fields": {
+        "created_by": "alex@maykinmedia.nl",
+        "changed_by": "bart@maykinmedia.nl",
+        "creation_date": "2023-04-24T15:40:54.549Z",
+        "changed_date": "2023-05-15T12:44:57.605Z",
+        "publication_date": "2023-04-24T15:40:54.545Z",
+        "publication_end_date": null,
+        "in_navigation": true,
+        "soft_root": false,
+        "reverse_id": "home",
+        "navigation_extenders": null,
+        "template": "INHERIT",
+        "login_required": false,
+        "limit_visibility_in_menu": null,
+        "is_home": true,
+        "application_urls": "",
+        "application_namespace": null,
+        "publisher_is_draft": false,
+        "publisher_public": 1,
+        "languages": "nl",
+        "xframe_options": 0,
+        "is_page_type": false,
+        "node": 1,
+        "placeholders": [
+            3,
+            17,
+            28,
+            29
+        ]
+    }
+},
+{
+    "model": "cms.page",
+    "pk": 3,
+    "fields": {
+        "created_by": "alex@maykinmedia.nl",
+        "changed_by": "alex@maykinmedia.nl",
+        "creation_date": "2023-04-24T15:41:15.918Z",
+        "changed_date": "2023-05-04T13:55:16.482Z",
+        "publication_date": "2023-04-24T15:42:49.596Z",
+        "publication_end_date": null,
+        "in_navigation": true,
+        "soft_root": false,
+        "reverse_id": null,
+        "navigation_extenders": null,
+        "template": "cms/fullwidth.html",
+        "login_required": false,
+        "limit_visibility_in_menu": null,
+        "is_home": false,
+        "application_urls": "ProductsApphook",
+        "application_namespace": "products",
+        "publisher_is_draft": true,
+        "publisher_public": 8,
+        "languages": "nl",
+        "xframe_options": 0,
+        "is_page_type": false,
+        "node": 2,
+        "placeholders": [
+            4,
+            24
+        ]
+    }
+},
+{
+    "model": "cms.page",
+    "pk": 4,
+    "fields": {
+        "created_by": "alex@maykinmedia.nl",
+        "changed_by": "alex@maykinmedia.nl",
+        "creation_date": "2023-04-24T15:41:24.106Z",
+        "changed_date": "2023-04-24T15:42:18.581Z",
+        "publication_date": "2023-04-24T15:42:54.197Z",
+        "publication_end_date": null,
+        "in_navigation": true,
+        "soft_root": false,
+        "reverse_id": null,
+        "navigation_extenders": null,
+        "template": "cms/fullwidth.html",
+        "login_required": false,
+        "limit_visibility_in_menu": null,
+        "is_home": false,
+        "application_urls": "ProfileApphook",
+        "application_namespace": "profile",
+        "publisher_is_draft": true,
+        "publisher_public": 9,
+        "languages": "nl",
+        "xframe_options": 0,
+        "is_page_type": false,
+        "node": 3,
+        "placeholders": [
+            5
+        ]
+    }
+},
+{
+    "model": "cms.page",
+    "pk": 5,
+    "fields": {
+        "created_by": "alex@maykinmedia.nl",
+        "changed_by": "alex@maykinmedia.nl",
+        "creation_date": "2023-04-24T15:41:30.046Z",
+        "changed_date": "2023-05-01T14:13:00.638Z",
+        "publication_date": "2023-04-24T15:42:58.704Z",
+        "publication_end_date": null,
+        "in_navigation": true,
+        "soft_root": false,
+        "reverse_id": null,
+        "navigation_extenders": null,
+        "template": "cms/fullwidth.html",
+        "login_required": false,
+        "limit_visibility_in_menu": null,
+        "is_home": false,
+        "application_urls": "CasesApphook",
+        "application_namespace": "cases",
+        "publisher_is_draft": true,
+        "publisher_public": 10,
+        "languages": "nl",
+        "xframe_options": 0,
+        "is_page_type": false,
+        "node": 4,
+        "placeholders": [
+            6
+        ]
+    }
+},
+{
+    "model": "cms.page",
+    "pk": 6,
+    "fields": {
+        "created_by": "alex@maykinmedia.nl",
+        "changed_by": "alex@maykinmedia.nl",
+        "creation_date": "2023-04-24T15:41:35.195Z",
+        "changed_date": "2023-05-01T14:14:30.147Z",
+        "publication_date": "2023-04-24T15:43:02.922Z",
+        "publication_end_date": null,
+        "in_navigation": true,
+        "soft_root": false,
+        "reverse_id": null,
+        "navigation_extenders": null,
+        "template": "cms/fullwidth.html",
+        "login_required": false,
+        "limit_visibility_in_menu": null,
+        "is_home": false,
+        "application_urls": "InboxApphook",
+        "application_namespace": "inbox",
+        "publisher_is_draft": true,
+        "publisher_public": 11,
+        "languages": "nl",
+        "xframe_options": 0,
+        "is_page_type": false,
+        "node": 5,
+        "placeholders": [
+            7
+        ]
+    }
+},
+{
+    "model": "cms.page",
+    "pk": 7,
+    "fields": {
+        "created_by": "alex@maykinmedia.nl",
+        "changed_by": "alex@maykinmedia.nl",
+        "creation_date": "2023-04-24T15:41:41.335Z",
+        "changed_date": "2023-04-24T15:42:45.208Z",
+        "publication_date": "2023-04-24T15:43:07.327Z",
+        "publication_end_date": null,
+        "in_navigation": true,
+        "soft_root": false,
+        "reverse_id": null,
+        "navigation_extenders": null,
+        "template": "cms/fullwidth.html",
+        "login_required": false,
+        "limit_visibility_in_menu": null,
+        "is_home": false,
+        "application_urls": "CollaborateApphook",
+        "application_namespace": "collaborate",
+        "publisher_is_draft": true,
+        "publisher_public": 12,
+        "languages": "nl",
+        "xframe_options": 0,
+        "is_page_type": false,
+        "node": 6,
+        "placeholders": [
+            8,
+            26
+        ]
+    }
+},
+{
+    "model": "cms.page",
+    "pk": 8,
+    "fields": {
+        "created_by": "alex@maykinmedia.nl",
+        "changed_by": "alex@maykinmedia.nl",
+        "creation_date": "2023-04-24T15:42:49.600Z",
+        "changed_date": "2023-05-04T13:55:20.129Z",
+        "publication_date": "2023-04-24T15:42:49.596Z",
+        "publication_end_date": null,
+        "in_navigation": true,
+        "soft_root": false,
+        "reverse_id": null,
+        "navigation_extenders": null,
+        "template": "cms/fullwidth.html",
+        "login_required": false,
+        "limit_visibility_in_menu": null,
+        "is_home": false,
+        "application_urls": "ProductsApphook",
+        "application_namespace": "products",
+        "publisher_is_draft": false,
+        "publisher_public": 3,
+        "languages": "nl",
+        "xframe_options": 0,
+        "is_page_type": false,
+        "node": 2,
+        "placeholders": [
+            9,
+            25
+        ]
+    }
+},
+{
+    "model": "cms.page",
+    "pk": 9,
+    "fields": {
+        "created_by": "alex@maykinmedia.nl",
+        "changed_by": "alex@maykinmedia.nl",
+        "creation_date": "2023-04-24T15:42:54.200Z",
+        "changed_date": "2023-05-14T22:28:37.092Z",
+        "publication_date": "2023-04-24T15:42:54.197Z",
+        "publication_end_date": null,
+        "in_navigation": true,
+        "soft_root": false,
+        "reverse_id": null,
+        "navigation_extenders": null,
+        "template": "cms/fullwidth.html",
+        "login_required": false,
+        "limit_visibility_in_menu": null,
+        "is_home": false,
+        "application_urls": "ProfileApphook",
+        "application_namespace": "profile",
+        "publisher_is_draft": false,
+        "publisher_public": 4,
+        "languages": "nl",
+        "xframe_options": 0,
+        "is_page_type": false,
+        "node": 3,
+        "placeholders": [
+            10
+        ]
+    }
+},
+{
+    "model": "cms.page",
+    "pk": 10,
+    "fields": {
+        "created_by": "alex@maykinmedia.nl",
+        "changed_by": "alex@maykinmedia.nl",
+        "creation_date": "2023-04-24T15:42:58.706Z",
+        "changed_date": "2023-05-15T12:43:14.558Z",
+        "publication_date": "2023-04-24T15:42:58.704Z",
+        "publication_end_date": null,
+        "in_navigation": true,
+        "soft_root": false,
+        "reverse_id": null,
+        "navigation_extenders": null,
+        "template": "cms/fullwidth.html",
+        "login_required": false,
+        "limit_visibility_in_menu": null,
+        "is_home": false,
+        "application_urls": "CasesApphook",
+        "application_namespace": "cases",
+        "publisher_is_draft": false,
+        "publisher_public": 5,
+        "languages": "nl",
+        "xframe_options": 0,
+        "is_page_type": false,
+        "node": 4,
+        "placeholders": [
+            11
+        ]
+    }
+},
+{
+    "model": "cms.page",
+    "pk": 11,
+    "fields": {
+        "created_by": "alex@maykinmedia.nl",
+        "changed_by": "alex@maykinmedia.nl",
+        "creation_date": "2023-04-24T15:43:02.924Z",
+        "changed_date": "2023-05-14T22:29:20.761Z",
+        "publication_date": "2023-04-24T15:43:02.922Z",
+        "publication_end_date": null,
+        "in_navigation": true,
+        "soft_root": false,
+        "reverse_id": null,
+        "navigation_extenders": null,
+        "template": "cms/fullwidth.html",
+        "login_required": false,
+        "limit_visibility_in_menu": null,
+        "is_home": false,
+        "application_urls": "InboxApphook",
+        "application_namespace": "inbox",
+        "publisher_is_draft": false,
+        "publisher_public": 6,
+        "languages": "nl",
+        "xframe_options": 0,
+        "is_page_type": false,
+        "node": 5,
+        "placeholders": [
+            12
+        ]
+    }
+},
+{
+    "model": "cms.page",
+    "pk": 12,
+    "fields": {
+        "created_by": "alex@maykinmedia.nl",
+        "changed_by": "alex@maykinmedia.nl",
+        "creation_date": "2023-04-24T15:43:07.329Z",
+        "changed_date": "2023-05-14T22:29:00.263Z",
+        "publication_date": "2023-04-24T15:43:07.327Z",
+        "publication_end_date": null,
+        "in_navigation": true,
+        "soft_root": false,
+        "reverse_id": null,
+        "navigation_extenders": null,
+        "template": "cms/fullwidth.html",
+        "login_required": false,
+        "limit_visibility_in_menu": null,
+        "is_home": false,
+        "application_urls": "CollaborateApphook",
+        "application_namespace": "collaborate",
+        "publisher_is_draft": false,
+        "publisher_public": 7,
+        "languages": "nl",
+        "xframe_options": 0,
+        "is_page_type": false,
+        "node": 6,
+        "placeholders": [
+            13,
+            27
+        ]
+    }
+},
+{
+    "model": "cms.title",
+    "pk": 1,
+    "fields": {
+        "language": "nl",
+        "title": "Home",
+        "page_title": "",
+        "menu_title": "",
+        "meta_description": "",
+        "slug": "home",
+        "path": "",
+        "has_url_overwrite": false,
+        "redirect": null,
+        "page": 1,
+        "creation_date": "2023-04-24T15:40:54.514Z",
+        "published": true,
+        "publisher_is_draft": true,
+        "publisher_public": 2,
+        "publisher_state": 0
+    }
+},
+{
+    "model": "cms.title",
+    "pk": 2,
+    "fields": {
+        "language": "nl",
+        "title": "Home",
+        "page_title": "",
+        "menu_title": "",
+        "meta_description": "",
+        "slug": "home",
+        "path": "",
+        "has_url_overwrite": false,
+        "redirect": null,
+        "page": 2,
+        "creation_date": "2023-04-24T15:40:54.514Z",
+        "published": true,
+        "publisher_is_draft": false,
+        "publisher_public": 1,
+        "publisher_state": 0
+    }
+},
+{
+    "model": "cms.title",
+    "pk": 3,
+    "fields": {
+        "language": "nl",
+        "title": "Onderwerpen",
+        "page_title": "",
+        "menu_title": "",
+        "meta_description": "",
+        "slug": "onderwerpen",
+        "path": "onderwerpen",
+        "has_url_overwrite": false,
+        "redirect": null,
+        "page": 3,
+        "creation_date": "2023-04-24T15:41:15.924Z",
+        "published": true,
+        "publisher_is_draft": true,
+        "publisher_public": 8,
+        "publisher_state": 0
+    }
+},
+{
+    "model": "cms.title",
+    "pk": 4,
+    "fields": {
+        "language": "nl",
+        "title": "Mijn Profiel",
+        "page_title": "",
+        "menu_title": "",
+        "meta_description": "",
+        "slug": "mijn-profiel",
+        "path": "mijn-profiel",
+        "has_url_overwrite": false,
+        "redirect": null,
+        "page": 4,
+        "creation_date": "2023-04-24T15:41:24.112Z",
+        "published": true,
+        "publisher_is_draft": true,
+        "publisher_public": 9,
+        "publisher_state": 0
+    }
+},
+{
+    "model": "cms.title",
+    "pk": 5,
+    "fields": {
+        "language": "nl",
+        "title": "Mijn Aanvragen",
+        "page_title": "",
+        "menu_title": "",
+        "meta_description": "",
+        "slug": "mijn-aanvragen",
+        "path": "mijn-aanvragen",
+        "has_url_overwrite": false,
+        "redirect": null,
+        "page": 5,
+        "creation_date": "2023-04-24T15:41:30.052Z",
+        "published": true,
+        "publisher_is_draft": true,
+        "publisher_public": 10,
+        "publisher_state": 0
+    }
+},
+{
+    "model": "cms.title",
+    "pk": 6,
+    "fields": {
+        "language": "nl",
+        "title": "Mijn Berichten",
+        "page_title": "",
+        "menu_title": "",
+        "meta_description": "",
+        "slug": "mijn-berichten",
+        "path": "mijn-berichten",
+        "has_url_overwrite": false,
+        "redirect": null,
+        "page": 6,
+        "creation_date": "2023-04-24T15:41:35.202Z",
+        "published": true,
+        "publisher_is_draft": true,
+        "publisher_public": 11,
+        "publisher_state": 0
+    }
+},
+{
+    "model": "cms.title",
+    "pk": 7,
+    "fields": {
+        "language": "nl",
+        "title": "Samenwerken",
+        "page_title": "",
+        "menu_title": "",
+        "meta_description": "",
+        "slug": "samenwerken",
+        "path": "samenwerken",
+        "has_url_overwrite": false,
+        "redirect": null,
+        "page": 7,
+        "creation_date": "2023-04-24T15:41:41.344Z",
+        "published": true,
+        "publisher_is_draft": true,
+        "publisher_public": 12,
+        "publisher_state": 0
+    }
+},
+{
+    "model": "cms.title",
+    "pk": 8,
+    "fields": {
+        "language": "nl",
+        "title": "Onderwerpen",
+        "page_title": "",
+        "menu_title": "",
+        "meta_description": "",
+        "slug": "onderwerpen",
+        "path": "onderwerpen",
+        "has_url_overwrite": false,
+        "redirect": null,
+        "page": 8,
+        "creation_date": "2023-04-24T15:41:15.924Z",
+        "published": true,
+        "publisher_is_draft": false,
+        "publisher_public": 3,
+        "publisher_state": 0
+    }
+},
+{
+    "model": "cms.title",
+    "pk": 9,
+    "fields": {
+        "language": "nl",
+        "title": "Mijn Profiel",
+        "page_title": "",
+        "menu_title": "",
+        "meta_description": "",
+        "slug": "mijn-profiel",
+        "path": "mijn-profiel",
+        "has_url_overwrite": false,
+        "redirect": null,
+        "page": 9,
+        "creation_date": "2023-04-24T15:41:24.112Z",
+        "published": true,
+        "publisher_is_draft": false,
+        "publisher_public": 4,
+        "publisher_state": 0
+    }
+},
+{
+    "model": "cms.title",
+    "pk": 10,
+    "fields": {
+        "language": "nl",
+        "title": "Mijn Aanvragen",
+        "page_title": "",
+        "menu_title": "",
+        "meta_description": "",
+        "slug": "mijn-aanvragen",
+        "path": "mijn-aanvragen",
+        "has_url_overwrite": false,
+        "redirect": null,
+        "page": 10,
+        "creation_date": "2023-04-24T15:41:30.052Z",
+        "published": true,
+        "publisher_is_draft": false,
+        "publisher_public": 5,
+        "publisher_state": 0
+    }
+},
+{
+    "model": "cms.title",
+    "pk": 11,
+    "fields": {
+        "language": "nl",
+        "title": "Mijn Berichten",
+        "page_title": "",
+        "menu_title": "",
+        "meta_description": "",
+        "slug": "mijn-berichten",
+        "path": "mijn-berichten",
+        "has_url_overwrite": false,
+        "redirect": null,
+        "page": 11,
+        "creation_date": "2023-04-24T15:41:35.202Z",
+        "published": true,
+        "publisher_is_draft": false,
+        "publisher_public": 6,
+        "publisher_state": 0
+    }
+},
+{
+    "model": "cms.title",
+    "pk": 12,
+    "fields": {
+        "language": "nl",
+        "title": "Samenwerken",
+        "page_title": "",
+        "menu_title": "",
+        "meta_description": "",
+        "slug": "samenwerken",
+        "path": "samenwerken",
+        "has_url_overwrite": false,
+        "redirect": null,
+        "page": 12,
+        "creation_date": "2023-04-24T15:41:41.344Z",
+        "published": true,
+        "publisher_is_draft": false,
+        "publisher_public": 7,
+        "publisher_state": 0
+    }
+},
+{
+    "model": "cms.cmsplugin",
+    "pk": 1,
+    "fields": {
+        "path": "0001",
+        "depth": 1,
+        "numchild": 0,
+        "placeholder": 2,
+        "parent": null,
+        "position": 1,
+        "language": "nl",
+        "plugin_type": "CategoriesPlugin",
+        "creation_date": "2023-05-04T13:36:29.412Z",
+        "changed_date": "2023-05-04T13:36:29.419Z"
+    }
+},
+{
+    "model": "cms.cmsplugin",
+    "pk": 2,
+    "fields": {
+        "path": "0009",
+        "depth": 1,
+        "numchild": 0,
+        "placeholder": 2,
+        "parent": null,
+        "position": 0,
+        "language": "nl",
+        "plugin_type": "ActivePlansPlugin",
+        "creation_date": "2023-05-04T13:36:52.831Z",
+        "changed_date": "2023-05-04T13:36:52.837Z"
+    }
+},
+{
+    "model": "cms.cmsplugin",
+    "pk": 9,
+    "fields": {
+        "path": "000A",
+        "depth": 1,
+        "numchild": 0,
+        "placeholder": 2,
+        "parent": null,
+        "position": 2,
+        "language": "nl",
+        "plugin_type": "QuestionnairePlugin",
+        "creation_date": "2023-05-08T08:55:50.177Z",
+        "changed_date": "2023-05-08T08:55:50.185Z"
+    }
+},
+{
+    "model": "cms.cmsplugin",
+    "pk": 18,
+    "fields": {
+        "path": "000F",
+        "depth": 1,
+        "numchild": 0,
+        "placeholder": 2,
+        "parent": null,
+        "position": 3,
+        "language": "nl",
+        "plugin_type": "ProductFinderPlugin",
+        "creation_date": "2023-05-14T22:30:23.854Z",
+        "changed_date": "2023-05-14T22:30:23.864Z"
+    }
+},
+{
+    "model": "cms.cmsplugin",
+    "pk": 24,
+    "fields": {
+        "path": "000L",
+        "depth": 1,
+        "numchild": 0,
+        "placeholder": 2,
+        "parent": null,
+        "position": 4,
+        "language": "nl",
+        "plugin_type": "ProductLocationPlugin",
+        "creation_date": "2023-05-14T22:38:30.259Z",
+        "changed_date": "2023-05-14T22:38:30.267Z"
+    }
+},
+{
+    "model": "cms.cmsplugin",
+    "pk": 31,
+    "fields": {
+        "path": "000S",
+        "depth": 1,
+        "numchild": 0,
+        "placeholder": 30,
+        "parent": null,
+        "position": 0,
+        "language": "nl",
+        "plugin_type": "BannerImagePlugin",
+        "creation_date": "2023-05-15T12:38:06.353Z",
+        "changed_date": "2023-05-15T12:38:16.770Z"
+    }
+},
+{
+    "model": "cms.cmsplugin",
+    "pk": 32,
+    "fields": {
+        "path": "000T",
+        "depth": 1,
+        "numchild": 0,
+        "placeholder": 31,
+        "parent": null,
+        "position": 0,
+        "language": "nl",
+        "plugin_type": "BannerTextPlugin",
+        "creation_date": "2023-05-15T12:38:42.948Z",
+        "changed_date": "2023-05-15T12:43:39.660Z"
+    }
+},
+{
+    "model": "cms.cmsplugin",
+    "pk": 55,
+    "fields": {
+        "path": "000U",
+        "depth": 1,
+        "numchild": 0,
+        "placeholder": 3,
+        "parent": null,
+        "position": 1,
+        "language": "nl",
+        "plugin_type": "CategoriesPlugin",
+        "creation_date": "2023-05-15T12:44:57.699Z",
+        "changed_date": "2023-05-15T12:44:57.702Z"
+    }
+},
+{
+    "model": "cms.cmsplugin",
+    "pk": 56,
+    "fields": {
+        "path": "000V",
+        "depth": 1,
+        "numchild": 0,
+        "placeholder": 3,
+        "parent": null,
+        "position": 0,
+        "language": "nl",
+        "plugin_type": "ActivePlansPlugin",
+        "creation_date": "2023-05-15T12:44:57.703Z",
+        "changed_date": "2023-05-15T12:44:57.706Z"
+    }
+},
+{
+    "model": "cms.cmsplugin",
+    "pk": 57,
+    "fields": {
+        "path": "000W",
+        "depth": 1,
+        "numchild": 0,
+        "placeholder": 3,
+        "parent": null,
+        "position": 2,
+        "language": "nl",
+        "plugin_type": "QuestionnairePlugin",
+        "creation_date": "2023-05-15T12:44:57.707Z",
+        "changed_date": "2023-05-15T12:44:57.710Z"
+    }
+},
+{
+    "model": "cms.cmsplugin",
+    "pk": 58,
+    "fields": {
+        "path": "000X",
+        "depth": 1,
+        "numchild": 0,
+        "placeholder": 3,
+        "parent": null,
+        "position": 3,
+        "language": "nl",
+        "plugin_type": "ProductFinderPlugin",
+        "creation_date": "2023-05-15T12:44:57.712Z",
+        "changed_date": "2023-05-15T12:44:57.714Z"
+    }
+},
+{
+    "model": "cms.cmsplugin",
+    "pk": 59,
+    "fields": {
+        "path": "000Y",
+        "depth": 1,
+        "numchild": 0,
+        "placeholder": 3,
+        "parent": null,
+        "position": 4,
+        "language": "nl",
+        "plugin_type": "ProductLocationPlugin",
+        "creation_date": "2023-05-15T12:44:57.716Z",
+        "changed_date": "2023-05-15T12:44:57.718Z"
+    }
+},
+{
+    "model": "cms.cmsplugin",
+    "pk": 60,
+    "fields": {
+        "path": "000Z",
+        "depth": 1,
+        "numchild": 0,
+        "placeholder": 28,
+        "parent": null,
+        "position": 0,
+        "language": "nl",
+        "plugin_type": "BannerImagePlugin",
+        "creation_date": "2023-05-15T12:38:06.353Z",
+        "changed_date": "2023-05-15T12:44:57.732Z"
+    }
+},
+{
+    "model": "cms.cmsplugin",
+    "pk": 61,
+    "fields": {
+        "path": "0010",
+        "depth": 1,
+        "numchild": 0,
+        "placeholder": 29,
+        "parent": null,
+        "position": 0,
+        "language": "nl",
+        "plugin_type": "BannerTextPlugin",
+        "creation_date": "2023-05-15T12:38:42.948Z",
+        "changed_date": "2023-05-15T12:44:57.744Z"
+    }
+},
+{
+    "model": "extensions.commonextension",
+    "pk": 1,
+    "fields": {
+        "public_extension": 2,
+        "extended_object": 4,
+        "requires_auth": true,
+        "requires_auth_bsn": false,
+        "menu_indicator": "",
+        "menu_icon": "apps"
+    }
+},
+{
+    "model": "extensions.commonextension",
+    "pk": 2,
+    "fields": {
+        "public_extension": null,
+        "extended_object": 9,
+        "requires_auth": true,
+        "requires_auth_bsn": false,
+        "menu_indicator": "",
+        "menu_icon": "apps"
+    }
+},
+{
+    "model": "extensions.commonextension",
+    "pk": 3,
+    "fields": {
+        "public_extension": 4,
+        "extended_object": 7,
+        "requires_auth": true,
+        "requires_auth_bsn": false,
+        "menu_indicator": "plan_new_contacts",
+        "menu_icon": "people"
+    }
+},
+{
+    "model": "extensions.commonextension",
+    "pk": 4,
+    "fields": {
+        "public_extension": null,
+        "extended_object": 12,
+        "requires_auth": true,
+        "requires_auth_bsn": false,
+        "menu_indicator": "plan_new_contacts",
+        "menu_icon": "people"
+    }
+},
+{
+    "model": "extensions.commonextension",
+    "pk": 5,
+    "fields": {
+        "public_extension": 6,
+        "extended_object": 6,
+        "requires_auth": true,
+        "requires_auth_bsn": false,
+        "menu_indicator": "inbox_new_messages",
+        "menu_icon": "inbox"
+    }
+},
+{
+    "model": "extensions.commonextension",
+    "pk": 6,
+    "fields": {
+        "public_extension": null,
+        "extended_object": 11,
+        "requires_auth": true,
+        "requires_auth_bsn": false,
+        "menu_indicator": "inbox_new_messages",
+        "menu_icon": "inbox"
+    }
+},
+{
+    "model": "extensions.commonextension",
+    "pk": 7,
+    "fields": {
+        "public_extension": 8,
+        "extended_object": 5,
+        "requires_auth": true,
+        "requires_auth_bsn": true,
+        "menu_indicator": "",
+        "menu_icon": "inventory_2"
+    }
+},
+{
+    "model": "extensions.commonextension",
+    "pk": 8,
+    "fields": {
+        "public_extension": null,
+        "extended_object": 10,
+        "requires_auth": true,
+        "requires_auth_bsn": true,
+        "menu_indicator": "",
+        "menu_icon": "inventory_2"
+    }
+}
+]

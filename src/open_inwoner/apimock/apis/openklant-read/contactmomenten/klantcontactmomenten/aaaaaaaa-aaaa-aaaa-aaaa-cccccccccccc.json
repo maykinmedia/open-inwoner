@@ -1,0 +1,8 @@
+{
+    "uuid": "aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
+    "url": "https://contactmomenten.nl/api/v1/klantcontactmomenten/aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
+    "klant": "https://klanten.nl/api/v1/klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+    "contactmoment": "https://contactmomenten.nl/api/v1/contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
+    "rol": "belanghebbende",
+    "gelezen": false
+}

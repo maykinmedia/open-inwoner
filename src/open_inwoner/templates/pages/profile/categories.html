@@ -3,11 +3,11 @@
 
 {% block content %}
 <h1 class="h1" id="title">
-    {% trans "Mijn Thema's" %}
+    {% trans "Mijn Onderwerpen" %}
 </h1>
 <p class="p">
-    {% trans "Selecteer hier uw thema’s om op maat gemaakte content voorgeschoteld te krijgen en nog beter te kunnen zoeken en vinden" %}
+    {% trans "Selecteer hier uw interessegebieden om op maat gemaakte content voorgeschoteld te krijgen en nog beter te kunnen zoeken en vinden" %}
 </p>
 
-{% form form_object=form method="POST" id="change-themes" submit_text=_("Opslaan") secondary_href='accounts:contact_list' secondary_text=_('Terug') secondary_icon='arrow_backward' secondary_icon_position="before" %}
+{% form form_object=form method="POST" id="change-categories" submit_text=_("Opslaan") secondary_href='profile:contact_list' secondary_text=_('Terug') secondary_icon='arrow_backward' secondary_icon_position="before" %}
 {% endblock content %}

@@ -12,7 +12,7 @@ from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.accounts.models import Document
 from open_inwoner.utils.mixins import ExportMixin
-from open_inwoner.utils.views import LogMixin
+from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from .forms import QuestionnaireStepForm
 from .models import QuestionnaireStep
@@ -25,7 +25,7 @@ class QuestionnaireResetView(RedirectView):
     Clears the questionnaire session, then redirects to the account's profile page.
     """
 
-    pattern_name = "accounts:my_profile"
+    pattern_name = "profile:detail"
 
     def get(self, request, *args, **kwargs) -> HttpResponseRedirect:
         request.session[QUESTIONNAIRE_SESSION_KEY] = None
@@ -33,11 +33,11 @@ class QuestionnaireResetView(RedirectView):
 
     def get_redirect_url(self, *args, **kwargs) -> Optional[str]:
         if not self.request.user.is_authenticated:
-            return reverse("root")
+            return reverse("pages-root")
         return super().get_redirect_url(*args, **kwargs)
 
 
-class QuestionnaireStepView(BaseBreadcrumbMixin, FormView):
+class QuestionnaireStepView(CommonPageMixin, BaseBreadcrumbMixin, FormView):
     """
     Shows a step in a questionnaire.
     """
@@ -49,11 +49,11 @@ class QuestionnaireStepView(BaseBreadcrumbMixin, FormView):
     def crumbs(self):
         if self.request.user.is_authenticated:
             return [
-                (_("Mijn profiel"), reverse("accounts:my_profile")),
-                (_("Zelfdiagnose"), reverse("questionnaire:questionnaire_list")),
+                (_("Mijn profiel"), reverse("profile:detail")),
+                (_("Zelfdiagnose"), reverse("products:questionnaire_list")),
             ]
         return [
-            (_("Zelfdiagnose"), reverse("questionnaire:questionnaire_list")),
+            (_("Zelfdiagnose"), reverse("products:questionnaire_list")),
         ]
 
     def get_object(self) -> QuestionnaireStep:
@@ -136,7 +136,7 @@ class QuestionnaireExportView(LogMixin, ExportMixin, TemplateView):
         return context
 
 
-class QuestionnaireRootListView(BaseBreadcrumbMixin, ListView):
+class QuestionnaireRootListView(CommonPageMixin, BaseBreadcrumbMixin, ListView):
     template_name = "pages/profile/questionnaire.html"
     model = QuestionnaireStep
     context_object_name = "root_nodes"
@@ -145,11 +145,11 @@ class QuestionnaireRootListView(BaseBreadcrumbMixin, ListView):
     def crumbs(self):
         if self.request.user.is_authenticated:
             return [
-                (_("Mijn profiel"), reverse("accounts:my_profile")),
-                (_("Zelfdiagnose"), reverse("questionnaire:questionnaire_list")),
+                (_("Mijn profiel"), reverse("profile:detail")),
+                (_("Zelfdiagnose"), reverse("products:questionnaire_list")),
             ]
         return [
-            (_("Zelfdiagnose"), reverse("questionnaire:questionnaire_list")),
+            (_("Zelfdiagnose"), reverse("products:questionnaire_list")),
         ]
 
     def get_queryset(self):

@@ -1,59 +1,185 @@
+from datetime import date
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
 from django.http import Http404, HttpResponseRedirect
+from django.urls import NoReverseMatch, resolve
 from django.urls.base import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
+from cms.apphook_pool import apphook_pool
 from view_breadcrumbs import BaseBreadcrumbMixin
 
+from open_inwoner.accounts.choices import ContactTypeChoices
 from open_inwoner.accounts.forms import ActionListForm, DocumentForm
+from open_inwoner.accounts.models import User
 from open_inwoner.accounts.views.actions import (
     ActionCreateView,
     ActionDeleteView,
+    ActionHistoryView,
     ActionUpdateStatusTagView,
     ActionUpdateView,
     BaseActionFilter,
 )
-from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.utils.logentry import get_change_message
 from open_inwoner.utils.mixins import ExportMixin
-from open_inwoner.utils.views import LogMixin
+from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
-from .forms import PlanForm, PlanGoalForm
+from .forms import PlanForm, PlanGoalForm, PlanListFilterForm
 from .models import Plan
 
 
-class PlansEnabledMixin:
+class PlanActionsEnabledMixin:
     def dispatch(self, request, *args, **kwargs):
-        config = SiteConfiguration.get_solo()
-        if not config.show_plans:
-            raise Http404("plans not enabled")
+        if request.resolver_match.namespace == "collaborate":
+            profile_app = apphook_pool.get_apphook("ProfileApphook")
+
+            # retrieve namespace of ProfileConfig instance that's being used,
+            # in order to get the current value of actions
+            try:
+                actions_resolver = resolve(reverse("profile:action_list"))
+            except NoReverseMatch:
+                raise Http404("profile application is not active")
+
+            profile_namespace = actions_resolver.namespace
+            config = profile_app.get_config(profile_namespace)
+            if config and not config.actions:
+                raise Http404("actions not enabled")
+
         return super().dispatch(request, *args, **kwargs)
 
 
+class BasePlanFilter:
+    """
+    This will filter the plans according to the user's selection or query.
+    """
+
+    def get_filtered_plans(self, plans, available_contacts):
+        plan_contacts = self.request.GET.get("plan_contacts")
+        status = self.request.GET.get("status")
+        query = self.request.GET.get("query")
+        today = date.today()
+
+        if not (plan_contacts or status or query):
+            return plans
+
+        if plan_contacts:
+            plans = plans.filter(plan_contacts__uuid=plan_contacts)
+        if status:
+            if status == "open":
+                plans = plans.filter(end_date__gt=today)
+            elif status == "closed":
+                plans = plans.filter(end_date__lte=today)
+        if query:
+            available_contacts = available_contacts.filter(
+                Q(first_name__icontains=query) | Q(last_name__icontains=query)
+            )
+            plans = plans.filter(
+                Q(title__icontains=query) | Q(plan_contacts__in=available_contacts)
+            )
+
+        return plans.distinct()
+
+
 class PlanListView(
-    PlansEnabledMixin, LoginRequiredMixin, BaseBreadcrumbMixin, ListView
+    PlanActionsEnabledMixin,
+    LoginRequiredMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    BasePlanFilter,
+    ListView,
 ):
     template_name = "pages/plans/list.html"
     model = Plan
+    paginate_by = 10
 
     @cached_property
     def crumbs(self):
         return [
-            (_("Samenwerkingsplannen"), reverse("plans:plan_list")),
+            (_("Samenwerken"), reverse("collaborate:plan_list")),
         ]
 
     def get_queryset(self):
-        return Plan.objects.connected(self.request.user).prefetch_related(
-            "plan_contacts"
+        return (
+            Plan.objects.connected(self.request.user)
+            .prefetch_related("plan_contacts")
+            .order_by("end_date")
         )
+
+    def get(self, request, *args, **kwargs):
+        self.request.user.clear_plan_contact_new_count()
+        return super().get(request, *args, **kwargs)
+
+    def get_available_contacts_for_filtering(self, plans):
+        """
+        Return all available contacts for filtering for all the plans.
+        """
+        user_contacts_qs = []
+        for plan in plans:
+            user_contacts_qs.append(plan.get_other_users(user=self.request.user))
+
+        available_contacts = User.objects.none()
+        for qs in user_contacts_qs:
+            available_contacts |= qs
+
+        return available_contacts
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        initial_qs = self.get_queryset()
+        plans = {"extended_plans": False}
+
+        # render the extended plan list view when a begeleider is logged in
+        if user.contact_type == ContactTypeChoices.begeleider:
+            plans["extended_plans"] = True
+            available_contacts = self.get_available_contacts_for_filtering(initial_qs)
+
+            filtered_plans = self.get_filtered_plans(initial_qs, available_contacts)
+
+            # sort the filtered plans based on if they are open or closed
+            open_plans = filtered_plans.filter(end_date__gt=date.today())
+            closed_plans = filtered_plans.filter(end_date__lte=date.today()).order_by(
+                "-end_date"
+            )
+            sorted_plans = list(open_plans) + list(closed_plans)
+
+            # paginate results
+            paginator, page, queryset, is_paginated = self.paginate_queryset(
+                sorted_plans, 10
+            )
+
+            # instantiate filter form
+            context["plan_filter_form"] = PlanListFilterForm(
+                data=self.request.GET, available_contacts=available_contacts
+            )
+
+            # prepare plans for frontend
+            temp_plans = {}
+            for plan in queryset:
+                temp_plans[plan] = plan.get_other_users_full_names(user=user)
+
+            plans["plan_list"] = temp_plans
+        else:
+            paginator, page, queryset, is_paginated = self.paginate_queryset(
+                initial_qs, 10
+            )
+            plans["plan_list"] = queryset
+
+        context["paginator"] = paginator
+        context["page_obj"] = page
+        context["is_paginated"] = is_paginated
+        context["plans"] = plans
+        return context
 
 
 class PlanDetailView(
-    PlansEnabledMixin,
+    PlanActionsEnabledMixin,
     LoginRequiredMixin,
+    CommonPageMixin,
     BaseBreadcrumbMixin,
     BaseActionFilter,
     DetailView,
@@ -67,8 +193,11 @@ class PlanDetailView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Samenwerkingsplannen"), reverse("plans:plan_list")),
-            (self.get_object().title, reverse("plans:plan_detail", kwargs=self.kwargs)),
+            (_("Samenwerken"), reverse("collaborate:plan_list")),
+            (
+                self.get_object().title,
+                reverse("collaborate:plan_detail", kwargs=self.kwargs),
+            ),
         ]
 
     def get_queryset(self):
@@ -98,7 +227,12 @@ class PlanDetailView(
 
 
 class PlanCreateView(
-    PlansEnabledMixin, LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, CreateView
+    PlanActionsEnabledMixin,
+    LogMixin,
+    LoginRequiredMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    CreateView,
 ):
     template_name = "pages/plans/create.html"
     model = Plan
@@ -107,8 +241,8 @@ class PlanCreateView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Samenwerkingsplannen"), reverse("plans:plan_list")),
-            (_("Maak samenwerkingsplan aan"), reverse("plans:plan_create")),
+            (_("Samenwerken"), reverse("collaborate:plan_list")),
+            (_("Start nieuwe samenwerking"), reverse("collaborate:plan_create")),
         ]
 
     def get_form_kwargs(self):
@@ -130,7 +264,12 @@ class PlanCreateView(
 
 
 class PlanEditView(
-    PlansEnabledMixin, LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView
+    PlanActionsEnabledMixin,
+    LogMixin,
+    LoginRequiredMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    UpdateView,
 ):
     template_name = "pages/plans/edit.html"
     model = Plan
@@ -141,9 +280,12 @@ class PlanEditView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Samenwerkingsplannen"), reverse("plans:plan_list")),
-            (self.get_object().title, reverse("plans:plan_detail", kwargs=self.kwargs)),
-            (_("Bewerken"), reverse("plans:plan_edit", kwargs=self.kwargs)),
+            (_("Samenwerkingsplannen"), reverse("collaborate:plan_list")),
+            (
+                self.get_object().title,
+                reverse("collaborate:plan_detail", kwargs=self.kwargs),
+            ),
+            (_("Bewerken"), reverse("collaborate:plan_edit", kwargs=self.kwargs)),
         ]
 
     def get_queryset(self):
@@ -169,7 +311,12 @@ class PlanEditView(
 
 
 class PlanGoalEditView(
-    PlansEnabledMixin, LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView
+    PlanActionsEnabledMixin,
+    LogMixin,
+    LoginRequiredMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    UpdateView,
 ):
     template_name = "pages/plans/goal_edit.html"
     model = Plan
@@ -181,9 +328,15 @@ class PlanGoalEditView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Samenwerkingsplannen"), reverse("plans:plan_list")),
-            (self.get_object().title, reverse("plans:plan_detail", kwargs=self.kwargs)),
-            (_("Doel bewerken"), reverse("plans:plan_edit_goal", kwargs=self.kwargs)),
+            (_("Samenwerkingsplannen"), reverse("collaborate:plan_list")),
+            (
+                self.get_object().title,
+                reverse("collaborate:plan_detail", kwargs=self.kwargs),
+            ),
+            (
+                _("Doel bewerken"),
+                reverse("collaborate:plan_edit_goal", kwargs=self.kwargs),
+            ),
         ]
 
     def get_queryset(self):
@@ -200,7 +353,12 @@ class PlanGoalEditView(
 
 
 class PlanFileUploadView(
-    PlansEnabledMixin, LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView
+    PlanActionsEnabledMixin,
+    LogMixin,
+    LoginRequiredMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    UpdateView,
 ):
     template_name = "pages/plans/file.html"
     model = Plan
@@ -211,11 +369,14 @@ class PlanFileUploadView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Samenwerkingsplannen"), reverse("plans:plan_list")),
-            (self.get_object().title, reverse("plans:plan_detail", kwargs=self.kwargs)),
+            (_("Samenwerkingsplannen"), reverse("collaborate:plan_list")),
+            (
+                self.get_object().title,
+                reverse("collaborate:plan_detail", kwargs=self.kwargs),
+            ),
             (
                 _("Nieuw bestand uploaden"),
-                reverse("plans:plan_add_file", kwargs=self.kwargs),
+                reverse("collaborate:plan_add_file", kwargs=self.kwargs),
             ),
         ]
 
@@ -239,17 +400,20 @@ class PlanFileUploadView(
         return self.object.get_absolute_url()
 
 
-class PlanActionCreateView(PlansEnabledMixin, ActionCreateView):
+class PlanActionCreateView(PlanActionsEnabledMixin, ActionCreateView):
     model = Plan
 
     @cached_property
     def crumbs(self):
         return [
-            (_("Samenwerkingsplannen"), reverse("plans:plan_list")),
-            (self.get_object().title, reverse("plans:plan_detail", kwargs=self.kwargs)),
+            (_("Samenwerkingsplannen"), reverse("collaborate:plan_list")),
+            (
+                self.get_object().title,
+                reverse("collaborate:plan_detail", kwargs=self.kwargs),
+            ),
             (
                 _("Maak actie aan"),
-                reverse("plans:plan_action_create", kwargs=self.kwargs),
+                reverse("collaborate:plan_action_create", kwargs=self.kwargs),
             ),
         ]
 
@@ -287,18 +451,20 @@ class PlanActionCreateView(PlansEnabledMixin, ActionCreateView):
         return self.object.get_absolute_url()
 
 
-class PlanActionEditView(PlansEnabledMixin, ActionUpdateView):
+class PlanActionEditView(PlanActionsEnabledMixin, ActionUpdateView):
     @cached_property
     def crumbs(self):
         return [
-            (_("Samenwerkingsplannen"), reverse("plans:plan_list")),
+            (_("Samenwerkingsplannen"), reverse("collaborate:plan_list")),
             (
                 self.get_plan().title,
-                reverse("plans:plan_detail", kwargs={"uuid": self.get_plan().uuid}),
+                reverse(
+                    "collaborate:plan_detail", kwargs={"uuid": self.get_plan().uuid}
+                ),
             ),
             (
                 _("Bewerk {}").format(self.object.name),
-                reverse("plans:plan_action_edit", kwargs=self.kwargs),
+                reverse("collaborate:plan_action_edit", kwargs=self.kwargs),
             ),
         ]
 
@@ -347,7 +513,7 @@ class PlanActionEditView(PlansEnabledMixin, ActionUpdateView):
         return self.object.get_absolute_url()
 
 
-class PlanActionEditStatusTagView(PlansEnabledMixin, ActionUpdateStatusTagView):
+class PlanActionEditStatusTagView(PlanActionsEnabledMixin, ActionUpdateStatusTagView):
     def get_plan(self):
         try:
             return Plan.objects.connected(self.request.user).get(
@@ -362,7 +528,7 @@ class PlanActionEditStatusTagView(PlansEnabledMixin, ActionUpdateStatusTagView):
         return args
 
 
-class PlanActionDeleteView(PlansEnabledMixin, ActionDeleteView):
+class PlanActionDeleteView(PlanActionsEnabledMixin, ActionDeleteView):
     def get_plan(self):
         try:
             return Plan.objects.connected(self.request.user).get(
@@ -389,8 +555,34 @@ class PlanActionDeleteView(PlansEnabledMixin, ActionDeleteView):
             )
 
 
+class PlanActionHistoryView(PlanActionsEnabledMixin, ActionHistoryView):
+    @cached_property
+    def crumbs(self):
+        return [
+            (_("Samenwerking"), reverse("collaborate:plan_list")),
+            (
+                self.get_plan().title,
+                reverse(
+                    "collaborate:plan_detail", kwargs={"uuid": self.get_plan().uuid}
+                ),
+            ),
+            (
+                _("History of {}").format(self.object.name),
+                reverse("collaborate:plan_action_history", kwargs=self.kwargs),
+            ),
+        ]
+
+    def get_plan(self):
+        try:
+            return Plan.objects.connected(self.request.user).get(
+                uuid=self.kwargs.get("plan_uuid")
+            )
+        except ObjectDoesNotExist as e:
+            raise Http404
+
+
 class PlanExportView(
-    PlansEnabledMixin, LogMixin, LoginRequiredMixin, ExportMixin, DetailView
+    PlanActionsEnabledMixin, LogMixin, LoginRequiredMixin, ExportMixin, DetailView
 ):
     template_name = "export/plans/plan_export.html"
     model = Plan
@@ -399,3 +591,10 @@ class PlanExportView(
 
     def get_queryset(self):
         return Plan.objects.connected(self.request.user).prefetch_related("actions")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        plan = self.get_object()
+
+        context["plan_contacts"] = plan.get_other_users_full_names(self.request.user)
+        return context

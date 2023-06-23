@@ -1,0 +1,21 @@
+{% load i18n form_tags icon_tags %}
+
+<div class="form__control {{ extra_classes|default:"upload" }}">
+    <div class="inputfile-group">
+        <label class="label">
+            <span class="input-file">
+            {{ field|addclass:"inputfile" }}
+
+            <label class="label__label" for="{{ field.auto_id }}">
+            {% icon icon="cloud_upload" icon_position="before" outlined=True %}
+                {{ text }}
+
+            </label>{% if field.field.required %}<span class="label__label--required"> * </span>{% endif %}
+            </span>
+
+            {% if field.errors %}
+                {% errors errors=field.errors %}
+            {% endif %}
+        </label>
+    </div>
+</div>

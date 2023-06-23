@@ -1,4 +1,5 @@
 from django.contrib.admin.models import ADDITION, CHANGE
+from django.test import override_settings
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
@@ -9,7 +10,11 @@ from timeline_logger.models import TimelineLog
 from webtest import Upload
 
 from open_inwoner.accounts.models import Action
-from open_inwoner.accounts.tests.factories import ActionFactory, UserFactory
+from open_inwoner.accounts.tests.factories import (
+    ActionFactory,
+    DocumentFactory,
+    UserFactory,
+)
 from open_inwoner.utils.logentry import LOG_ACTIONS
 
 from ..models import Plan
@@ -17,18 +22,23 @@ from .factories import PlanFactory
 
 
 @freeze_time("2021-10-18 13:00:00")
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestPlans(WebTest):
     def setUp(self):
         self.user = UserFactory()
+        self.contact = UserFactory()
+        self.user.user_contacts.add(self.contact)
         self.plan = PlanFactory(created_by=self.user)
 
     def test_created_plan_is_logged(self):
         plan = PlanFactory.build(created_by=self.user)
-        form = self.app.get(reverse("plans:plan_create"), user=self.user).forms[
+        form = self.app.get(reverse("collaborate:plan_create"), user=self.user).forms[
             "plan-form"
         ]
         form["title"] = plan.title
+        form["goal"] = plan.goal
         form["end_date"] = plan.end_date
+        form["plan_contacts"] = [self.contact.pk]
         form.submit()
 
         log_entry = TimelineLog.objects.filter(
@@ -52,9 +62,11 @@ class TestPlans(WebTest):
 
     def test_modified_plan_is_logged(self):
         form = self.app.get(
-            reverse("plans:plan_edit", kwargs={"uuid": self.plan.uuid}), user=self.user
+            reverse("collaborate:plan_edit", kwargs={"uuid": self.plan.uuid}),
+            user=self.user,
         ).forms["plan-form"]
         form["title"] = "Updated title"
+        form["plan_contacts"] = [self.contact.pk]
         form.submit()
         log_entry = TimelineLog.objects.filter(object_id=self.plan.id).last()
 
@@ -74,7 +86,7 @@ class TestPlans(WebTest):
     def test_plan_goal_modified_is_logged(self):
         self.plan.plan_contacts.add(self.user)
         form = self.app.get(
-            reverse("plans:plan_edit_goal", kwargs={"uuid": self.plan.uuid}),
+            reverse("collaborate:plan_edit_goal", kwargs={"uuid": self.plan.uuid}),
             user=self.user,
         ).forms["goal-edit"]
 
@@ -99,7 +111,7 @@ class TestPlans(WebTest):
     def test_plan_file_upload_is_logged(self):
         self.plan.plan_contacts.add(self.user)
         form = self.app.get(
-            reverse("plans:plan_add_file", kwargs={"uuid": self.plan.uuid}),
+            reverse("collaborate:plan_add_file", kwargs={"uuid": self.plan.uuid}),
             user=self.user,
         ).forms["document-create"]
 
@@ -121,11 +133,34 @@ class TestPlans(WebTest):
             },
         )
 
+    @temp_private_root()
+    def test_plan_file_download_is_logged(self):
+        doc = DocumentFactory(owner=self.user, plan=self.plan)
+        self.app.get(
+            reverse("profile:documents_download", kwargs={"uuid": doc.uuid}),
+            user=self.user,
+        )
+
+        log_entry = TimelineLog.objects.filter(object_id=doc.id).last()
+
+        self.assertEquals(
+            log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
+        )
+        self.assertEquals(log_entry.content_object.id, doc.id)
+        self.assertEquals(
+            log_entry.extra_data,
+            {
+                "message": _("file was downloaded"),
+                "action_flag": list(LOG_ACTIONS[4]),
+                "content_object_repr": doc.name,
+            },
+        )
+
     def test_plan_action_created_is_logged(self):
         self.plan.plan_contacts.add(self.user)
         action = ActionFactory.build(created_by=self.user)
         form = self.app.get(
-            reverse("plans:plan_action_create", kwargs={"uuid": self.plan.uuid}),
+            reverse("collaborate:plan_action_create", kwargs={"uuid": self.plan.uuid}),
             user=self.user,
         ).forms["action-create"]
         form["name"] = action.name
@@ -152,7 +187,7 @@ class TestPlans(WebTest):
         action = ActionFactory(created_by=self.user)
         form = self.app.get(
             reverse(
-                "plans:plan_action_edit",
+                "collaborate:plan_action_edit",
                 kwargs={"plan_uuid": self.plan.uuid, "uuid": action.uuid},
             ),
             user=self.user,
@@ -181,7 +216,7 @@ class TestPlans(WebTest):
         action = ActionFactory(created_by=self.user)
         form = self.app.get(
             reverse(
-                "plans:plan_action_edit",
+                "collaborate:plan_action_edit",
                 kwargs={"plan_uuid": self.plan.uuid, "uuid": action.uuid},
             ),
             user=self.user,
@@ -193,7 +228,7 @@ class TestPlans(WebTest):
     def test_plan_export_is_logged(self):
         self.plan.plan_contacts.add(self.user)
         self.app.get(
-            reverse("plans:plan_export", kwargs={"uuid": self.plan.uuid}),
+            reverse("collaborate:plan_export", kwargs={"uuid": self.plan.uuid}),
             user=self.user,
         )
         log_entry = TimelineLog.objects.filter(object_id=self.user.id).last()

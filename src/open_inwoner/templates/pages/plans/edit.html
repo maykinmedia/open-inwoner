@@ -1,15 +1,15 @@
 {% extends 'master.html' %}
-{% load i18n button_tags card_tags map_tags form_tags grid_tags %}
+{% load i18n button_tags card_tags map_tags form_tags grid_tags string_tags %}
 
 {% block content %}
     <h1 class="h1">{% trans "Samenwerken" %}</h1>
-    <p class="p">
-        {{configurable_text.plans_page.plans_intro|linebreaksbr}}
-    </p>
+    {% optional_paragraph configurable_text.plans_page.plans_intro %}
 
     {% render_form id="plan-form" form=form method="POST" %}
         {% csrf_token %}
         {% input form.title %}
+        {% input form.goal %}
+        {% input form.description %}
         {% render_grid %}
             {% checkboxes form.plan_contacts %}
             {% date_field form.end_date %}

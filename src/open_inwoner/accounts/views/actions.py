@@ -12,25 +12,31 @@ from django.views.generic import CreateView, DetailView, ListView
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import DeletionMixin, UpdateView
 
+from aldryn_apphooks_config.mixins import AppConfigMixin
+from aldryn_apphooks_config.utils import get_app_instance
+from cms.models import Page
 from privates.views import PrivateMediaView
 from view_breadcrumbs import BaseBreadcrumbMixin
 
+from open_inwoner.cms.collaborate.cms_apps import CollaborateApphook
 from open_inwoner.components.utils import RenderableTag
-from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.htmx.views import HtmxTemplateTagModelFormView
 from open_inwoner.utils.logentry import get_verbose_change_message
 from open_inwoner.utils.mixins import ExportMixin
-from open_inwoner.utils.views import LogMixin
+from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from ..forms import ActionForm, ActionListForm
 from ..models import Action
 
 
-class ActionsEnabledMixin:
+class ActionsEnabledMixin(AppConfigMixin):
     def dispatch(self, request, *args, **kwargs):
-        config = SiteConfiguration.get_solo()
-        if not config.show_actions:
+        self.namespace, self.config = get_app_instance(request)
+        request.current_app = self.namespace
+
+        if self.config and not self.config.actions:
             raise Http404("actions not enabled")
+
         return super().dispatch(request, *args, **kwargs)
 
 
@@ -55,6 +61,7 @@ class BaseActionFilter:
 class ActionListView(
     ActionsEnabledMixin,
     LoginRequiredMixin,
+    CommonPageMixin,
     BaseBreadcrumbMixin,
     BaseActionFilter,
     ListView,
@@ -65,8 +72,8 @@ class ActionListView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn profiel"), reverse("accounts:my_profile")),
-            (_("Mijn acties"), reverse("accounts:action_list")),
+            (_("Mijn profiel"), reverse("profile:detail")),
+            (_("Mijn acties"), reverse("profile:action_list")),
         ]
 
     def get_queryset(self):
@@ -88,27 +95,38 @@ class ActionListView(
         context["page_obj"] = page
         context["is_paginated"] = is_paginated
         context["actions"] = queryset
+        context["show_plans"] = (
+            Page.objects.published()
+            .filter(application_namespace=CollaborateApphook.app_name)
+            .exists()
+        )
+
         return context
 
 
 class ActionUpdateView(
-    ActionsEnabledMixin, LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, UpdateView
+    ActionsEnabledMixin,
+    LogMixin,
+    LoginRequiredMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    UpdateView,
 ):
     template_name = "pages/profile/actions/edit.html"
     model = Action
     slug_field = "uuid"
     slug_url_kwarg = "uuid"
     form_class = ActionForm
-    success_url = reverse_lazy("accounts:action_list")
+    success_url = reverse_lazy("profile:action_list")
 
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn profiel"), reverse("accounts:my_profile")),
-            (_("Mijn acties"), reverse("accounts:action_list")),
+            (_("Mijn profiel"), reverse("profile:detail")),
+            (_("Mijn acties"), reverse("profile:action_list")),
             (
                 _("Bewerk {}").format(self.object.name),
-                reverse("accounts:action_edit", kwargs=self.kwargs),
+                reverse("profile:action_edit", kwargs=self.kwargs),
             ),
         ]
 
@@ -174,7 +192,7 @@ class ActionDeleteView(
     model = Action
     slug_field = "uuid"
     slug_url_kwarg = "uuid"
-    success_url = reverse_lazy("accounts:action_list")
+    success_url = reverse_lazy("profile:action_list")
     raise_exception = True
 
     def get_queryset(self):
@@ -204,21 +222,26 @@ class ActionDeleteView(
 
 
 class ActionCreateView(
-    ActionsEnabledMixin, LogMixin, LoginRequiredMixin, BaseBreadcrumbMixin, CreateView
+    ActionsEnabledMixin,
+    LogMixin,
+    LoginRequiredMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    CreateView,
 ):
     template_name = "pages/profile/actions/edit.html"
     model = Action
     form_class = ActionForm
-    success_url = reverse_lazy("accounts:action_list")
+    success_url = reverse_lazy("profile:action_list")
 
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn profiel"), reverse("accounts:my_profile")),
-            (_("Mijn acties"), reverse("accounts:action_list")),
+            (_("Mijn profiel"), reverse("profile:detail")),
+            (_("Mijn acties"), reverse("profile:action_list")),
             (
                 _("Maak actie aan"),
-                reverse("accounts:action_create"),
+                reverse("profile:action_create"),
             ),
         ]
 
@@ -291,7 +314,11 @@ class ActionPrivateMediaView(
 
 
 class ActionHistoryView(
-    ActionsEnabledMixin, LoginRequiredMixin, BaseBreadcrumbMixin, DetailView
+    ActionsEnabledMixin,
+    LoginRequiredMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    DetailView,
 ):
     template_name = "pages/history.html"
     model = Action
@@ -301,11 +328,11 @@ class ActionHistoryView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn profiel"), reverse("accounts:my_profile")),
-            (_("Mijn acties"), reverse("accounts:action_list")),
+            (_("Mijn profiel"), reverse("profile:detail")),
+            (_("Mijn acties"), reverse("profile:action_list")),
             (
                 _("History of {}").format(self.object.name),
-                reverse("accounts:action_history", kwargs=self.kwargs),
+                reverse("profile:action_history", kwargs=self.kwargs),
             ),
         ]
 

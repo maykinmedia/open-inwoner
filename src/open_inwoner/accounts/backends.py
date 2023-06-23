@@ -1,12 +1,15 @@
 import logging
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.hashers import check_password
 
 from axes.backends import AxesBackend
 from mozilla_django_oidc_db.backends import OIDCAuthenticationBackend
+from oath import accept_totp
 
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.utils.hash import generate_email_from_string
 
 from .choices import LoginTypeChoices
@@ -19,14 +22,31 @@ class UserModelEmailBackend(ModelBackend):
     Authentication backend for login with email address.
     """
 
-    def authenticate(self, request, username=None, password=None, **kwargs):
-        try:
-            user = get_user_model().objects.get(email__iexact=username)
-            if check_password(password, user.password):
-                return user
-        except get_user_model().DoesNotExist:
-            # No user was found, return None - triggers default login failed
-            return None
+    def authenticate(
+        self, request, username=None, password=None, user=None, token=None, **kwargs
+    ):
+        config = SiteConfiguration.get_solo()
+
+        if username and password and not config.login_2fa_sms:
+            try:
+                user = get_user_model().objects.get(email__iexact=username)
+                if check_password(password, user.password):
+                    return user
+            except get_user_model().DoesNotExist:
+                # No user was found, return None - triggers default login failed
+                return None
+
+        # 2FA with sms verification
+        if config.login_2fa_sms and user and token:
+            accepted, drift = accept_totp(
+                key=user.seed,
+                response=token,
+                period=getattr(settings, "ACCOUNTS_USER_TOKEN_EXPIRE_TIME", 300),
+            )
+            if not accepted:
+                return None
+
+            return user
 
 
 class CustomAxesBackend(AxesBackend):
@@ -44,7 +64,7 @@ class CustomOIDCBackend(OIDCAuthenticationBackend):
         if "email" in claims:
             email = claims["email"]
 
-        existing_user = self.UserModel.objects.filter(email=email).first()
+        existing_user = self.UserModel.objects.filter(email__iexact=email).first()
         if existing_user:
             logger.debug("Updating OIDC user: %s with email %s", unique_id, email)
             existing_user.oidc_id = unique_id

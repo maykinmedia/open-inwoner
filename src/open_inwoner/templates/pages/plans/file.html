@@ -1,11 +1,9 @@
 {% extends 'master.html' %}
-{% load i18n button_tags card_tags map_tags form_tags %}
+{% load i18n button_tags card_tags map_tags form_tags string_tags %}
 
 {% block content %}
     <h1 class="h1">{% trans "Samenwerken" %}</h1>
-    <p class="p">
-        {{configurable_text.plans_page.plans_intro|linebreaksbr}}
-    </p>
+    {% optional_paragraph configurable_text.plans_page.plans_intro %}
 
-    {% form id="document-create" form_object=form method="POST" enctype="multipart/form-data" %}
+    {% form id="document-create" form_object=form method="POST" enctype="multipart/form-data" show_required=True %}
 {% endblock %}

@@ -2,10 +2,15 @@
 {% load i18n button_tags card_tags map_tags form_tags %}
 
 {% block content %}
-    <h1 class="h1">{% trans "Doel aanpassen" %}</h1>
+    <h1 class="h1">{% trans "Doel en omschrijving aanpassen" %}</h1>
     <p class="p">
         {{configurable_text.plans_page.plans_edit_message}}
     </p>
 
-    {% form id="goal-edit" form_object=form method="POST" %}
+    {% render_form id="goal-edit" form=form method="POST" %}
+        {% csrf_token %}
+        {% input form.goal  %}
+        {% input form.description %}
+        {% form_actions primary_text=_("Verzenden") %}
+    {% endrender_form %}
 {% endblock %}

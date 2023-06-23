@@ -14,7 +14,8 @@
   }
 
   &__list-item {
-    border: var(--border-width) solid var(--color-mute);
+    border: var(--border-width-thin) solid var(--color-gray);
+    border-radius: var(--border-radius);
     padding: var(--spacing-large);
   }
 
@@ -35,8 +36,16 @@
     transform-origin: center;
   }
 
+  .link[aria-expanded='false'] {
+    color: var(--font-color-body);
+    font-weight: normal;
+  }
+  .link[aria-expanded='true'] {
+    color: var(--color-secondary);
+  }
+
   .link[aria-expanded='true'] [class*='icon'] {
-    transform: rotate(90deg);
+    transform: rotate(180deg);
   }
 
   .faq__answer {
@@ -51,10 +60,15 @@
 
   &__answer--open {
     margin-top: var(--spacing-large) !important;
+
+    .link {
+      text-decoration: underline;
+    }
   }
 
   &__answer:not(#{&}__answer--open) {
     opacity: 0;
     height: 0;
+    transition: all 0.3s, height 0s, opacity 0.01s;
   }
 }

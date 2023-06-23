@@ -1,7 +1,7 @@
 .card {
   --card-color-background: white;
-  --card-color-border: var(--color-mute);
-  --card-size-border: var(--border-width);
+  --card-color-border: var(--color-gray);
+  --card-size-border: var(--border-width-thin);
   --card-size-dog-ear: var(--gutter-width);
   --card-spacing: var(--spacing-large);
 
@@ -11,6 +11,7 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  min-height: 70px;
   position: relative;
   text-decoration: none;
 
@@ -25,7 +26,7 @@
   &--type-info {
     --card-color-background: var(--color-info-lighter);
     --card-color-border: transparent;
-    --card-spacing: var(--spacing-extra-large);
+    --card-spacing: var(--spacing-large);
     clip-path: polygon(
       0% 0%,
       calc(100% - var(--card-size-dog-ear)) 0%,
@@ -73,6 +74,23 @@
   }
   &__body {
     padding: var(--card-spacing);
+
+    &--tabled {
+      display: flex;
+      flex-direction: column;
+      flex-wrap: wrap;
+    }
+
+    .spacer {
+      display: inline-block;
+      width: 100%;
+      height: var(--row-height);
+    }
+
+    /// clickable plans on home page after authenticated
+    .plan-list {
+      text-decoration: none;
+    }
   }
 
   &__body--grid {
@@ -83,17 +101,38 @@
 
     .card__content {
       padding: var(--card-spacing);
+    }
+  }
 
-      .p,
-      .button {
-        margin-top: 4px;
-      }
+  .card__content {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: space-between;
+
+    .p {
+      margin-top: 4px;
+    }
+    .button {
+      bottom: 0;
+      right: 0;
+      padding: var(--card-spacing);
+      position: absolute;
+    }
+
+    &--tabled {
+      padding: 0;
     }
   }
 
   &__body--direction-horizontal {
     display: flex;
     justify-content: space-between;
+  }
+
+  &__body--flex {
+    display: flex;
+    flex-direction: column;
   }
 
   &__image {
@@ -113,15 +152,17 @@
     margin-top: var(--spacing-extra-large);
   }
 
+  .h2,
   .h4 {
     margin: 0 0 var(--card-spacing);
   }
 
-  &--compact .h4 {
+  &--compact .h3 {
     padding: 0 0 var(--card-spacing);
+    margin: 0 0 var(--card-spacing);
     position: relative;
 
-    &:before {
+    &::before {
       bottom: 0;
       content: '';
       border-bottom: var(--card-size-border) solid var(--card-color-border);
@@ -129,6 +170,18 @@
       position: absolute;
       left: calc(-1 * var(--card-spacing));
     }
+  }
+
+  /// Headings in cards
+
+  .h2,
+  .h3,
+  .h4,
+  .h2 .link,
+  .h3 .link,
+  .h4 .link {
+    color: var(--font-color-body);
+    font-size: var(--font-size-heading-card);
   }
 
   &--product {
@@ -159,8 +212,12 @@
   }
 
   /// Arrow button on product cards.
-  a.button:last-child {
-    float: right;
+  a.button:last-child,
+  span.button:last-child {
+    bottom: 0;
+    right: 0;
+    padding-bottom: var(--card-spacing);
+    position: absolute;
   }
 
   .link + .link {

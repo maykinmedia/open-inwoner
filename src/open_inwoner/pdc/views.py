@@ -8,11 +8,11 @@ from django.views.generic import DetailView, FormView, ListView, TemplateView
 from view_breadcrumbs import BaseBreadcrumbMixin, ListBreadcrumbMixin
 
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.pdc.forms import ProductFinderForm
 from open_inwoner.pdc.models.product import ProductCondition
 from open_inwoner.plans.models import Plan
 from open_inwoner.questionnaire.models import QuestionnaireStep
 
+from ..utils.views import CommonPageMixin
 from .choices import YesNo
 from .forms import ProductFinderForm
 from .models import Category, Product, ProductLocation, Question
@@ -44,20 +44,24 @@ class CategoryBreadcrumbMixin:
             (
                 category.get("category").name,
                 reverse(
-                    "pdc:category_detail", kwargs={"slug": category.get("build_slug")}
+                    "products:category_detail",
+                    kwargs={"slug": category.get("build_slug")},
                 ),
             )
             for category in self.get_orderd_categories(slug_name=slug_name)
         ]
 
 
-class HomeView(TemplateView):
+class HomeView(CommonPageMixin, TemplateView):
     template_name = "pages/home.html"
+
+    def page_title(self):
+        return _("Home")
 
     def get_context_data(self, **kwargs):
         config = SiteConfiguration.get_solo()
 
-        limit = 3 if self.request.user.is_authenticated else 4
+        limit = 4
         kwargs.update(categories=Category.objects.published().order_by("name")[:limit])
         kwargs.update(product_locations=ProductLocation.objects.all()[:1000])
         kwargs.update(
@@ -65,8 +69,6 @@ class HomeView(TemplateView):
                 highlighted=True, published=True
             )
         )
-        if self.request.user.is_authenticated and config.show_plans:
-            kwargs.update(plans=Plan.objects.connected(self.request.user)[:limit])
 
         # Show the categories if the user has selected them, otherwise
         # Show the highlighted published categories if they have been specified, otherwise
@@ -80,20 +82,16 @@ class HomeView(TemplateView):
         )
         if (
             self.request.user.is_authenticated
-            and self.request.user.selected_themes.exists()
+            and self.request.user.selected_categories.exists()
         ):
             kwargs.update(
-                categories=self.request.user.selected_themes.order_by("name")[:3]
+                categories=self.request.user.selected_categories.order_by("name")[
+                    :limit
+                ]
             )
         elif highlighted_categories:
             kwargs.update(categories=highlighted_categories)
 
-        # Product finder:
-        if config.show_product_finder:
-            kwargs.update(
-                condition=ProductCondition.objects.first(),
-                condition_form=ProductFinderForm(),
-            )
         return super().get_context_data(**kwargs)
 
     def get_template_names(self):
@@ -103,15 +101,18 @@ class HomeView(TemplateView):
             return [self.template_name]
 
 
-class FAQView(TemplateView):
+class FAQView(CommonPageMixin, TemplateView):
     template_name = "pages/faq.html"
+
+    def page_title(self):
+        return _("Veelgestelde vragen")
 
     def get_context_data(self, **kwargs):
         kwargs.update(faqs=Question.objects.general())
         return super().get_context_data(**kwargs)
 
 
-class CategoryListView(ListBreadcrumbMixin, ListView):
+class CategoryListView(CommonPageMixin, ListBreadcrumbMixin, ListView):
     template_name = "pages/category/list.html"
     model = Category
 
@@ -120,17 +121,20 @@ class CategoryListView(ListBreadcrumbMixin, ListView):
 
     @cached_property
     def crumbs(self):
-        return [(_("Categories"), reverse("pdc:category_list"))]
+        config = SiteConfiguration.get_solo()
+        return [(config.theme_title, reverse("products:category_list"))]
 
 
-class CategoryDetailView(BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView):
+class CategoryDetailView(
+    CommonPageMixin, BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView
+):
     template_name = "pages/category/detail.html"
     model = Category
     breadcrumb_use_pk = False
 
     @cached_property
     def crumbs(self):
-        base_list = [(_("Thema's"), reverse("pdc:category_list"))]
+        base_list = [(_("Onderwerpen"), reverse("products:category_list"))]
         return base_list + self.get_categories_breadcrumbs()
 
     def get_object(self, queryset=None):
@@ -153,7 +157,7 @@ class CategoryDetailView(BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailVie
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["subcategories"] = self.object.get_children().published()
-        context["products"] = self.object.products.published().order_by("name")
+        context["products"] = self.object.products.published().order_in_category()
         context["questionnaire_roots"] = QuestionnaireStep.get_root_nodes().filter(
             category=self.object
         )
@@ -163,7 +167,9 @@ class CategoryDetailView(BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailVie
         return self.object.name
 
 
-class ProductDetailView(BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView):
+class ProductDetailView(
+    CommonPageMixin, BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView
+):
     template_name = "pages/product/detail.html"
     model = Product
     breadcrumb_use_pk = False
@@ -171,8 +177,8 @@ class ProductDetailView(BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView
 
     @cached_property
     def crumbs(self):
-        base_list = [(_("Thema's"), reverse("pdc:category_list"))]
-        base_list += self.get_categories_breadcrumbs(slug_name="theme_slug")
+        base_list = [(_("Onderwerpen"), reverse("products:category_list"))]
+        base_list += self.get_categories_breadcrumbs(slug_name="category_slug")
         return base_list + [(self.get_object().name, self.request.path)]
 
     def get_context_data(self, **kwargs):
@@ -202,38 +208,35 @@ class ProductDetailView(BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView
         return context
 
 
-class ProductFormView(BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView):
+class ProductFormView(
+    CommonPageMixin, BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView
+):
     template_name = "pages/product/form.html"
     model = Product
     breadcrumb_use_pk = False
     no_list = True
 
+    def page_title(self):
+        return f"{self.object.name} {_('Formulier')}"
+
     @cached_property
     def crumbs(self):
-        base_list = [(_("Thema's"), reverse("pdc:category_list"))]
-        base_list += self.get_categories_breadcrumbs(slug_name="theme_slug")
+        base_list = [(_("Onderwerpen"), reverse("products:category_list"))]
+        base_list += self.get_categories_breadcrumbs(slug_name="category_slug")
         return base_list + [
             (self.get_object().name, self.get_object().get_absolute_url()),
             (_("Formulier"), self.request.path),
         ]
 
-    def get_context_data(self, **kwargs):
-        product = self.get_object()
-        context = super().get_context_data(**kwargs)
 
-        anchors = [
-            ("#title", product.name),
-        ]
-
-        context["anchors"] = anchors
-        return context
-
-
-class ProductFinderView(FormView):
+class ProductFinderView(CommonPageMixin, FormView):
     template_name = "pages/product/finder.html"
     form_class = ProductFinderForm
     condition = None
-    success_url = reverse_lazy("pdc:product_finder")
+    success_url = reverse_lazy("products:product_finder")
+
+    def page_title(self):
+        return _("Producten")
 
     def get(self, request, *args, **kwargs):
         self.condition = self.get_product_condition()
@@ -356,6 +359,13 @@ class ProductFinderView(FormView):
         return context
 
     def form_valid(self, form):
+        # redirect user to reset product finder if no conditions exist
+        if not self.condition:
+            self.request.session["product_finder"] = {}
+            self.request.session["current_condition"] = None
+            self.request.session["conditions_done"] = False
+            return HttpResponseRedirect(self.get_success_url())
+
         self.set_product_condition_sessions(form.cleaned_data.get("answer"))
         next_condition = self.get_next_condition()
         if next_condition:
@@ -371,3 +381,29 @@ class ProductFinderView(FormView):
             del form.errors["answer"]
             return HttpResponseRedirect(self.get_success_url())
         return super().form_invalid(form)
+
+
+class ProductLocationDetailView(
+    CommonPageMixin, BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView
+):
+    template_name = "pages/product/location_detail.html"
+    model = ProductLocation
+    slug_field = "uuid"
+    slug_url_kwarg = "uuid"
+
+    @cached_property
+    def crumbs(self):
+        return [
+            (
+                self.get_object().name,
+                reverse(
+                    "products:location_detail", kwargs={"uuid": self.get_object().uuid}
+                ),
+            )
+        ]
+
+    def get_context_data(self, **kwargs):
+        location = self.get_object()
+        context = super().get_context_data(**kwargs)
+        context["products"] = location.products.published().order_by("name")
+        return context
