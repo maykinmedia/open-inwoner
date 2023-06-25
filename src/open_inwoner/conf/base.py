@@ -153,6 +153,7 @@ INSTALLED_APPS = [
     # 'django.contrib.humanize',
     # 'django.contrib.sitemaps',
     # External applications.
+    "cookie_consent",
     "corsheaders",
     "rest_framework",
     "rest_framework.authtoken",

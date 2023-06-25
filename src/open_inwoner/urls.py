@@ -103,6 +103,7 @@ urlpatterns = [
         "sessions/",
         include("open_inwoner.extended_sessions.urls", namespace="sessions"),
     ),
+    path("cookies/", include("cookie_consent.urls")),
     path("contactformulier/", ContactFormView.as_view(), name="contactform"),
     path("oidc/", include("mozilla_django_oidc.urls")),
     path("faq/", FAQView.as_view(), name="general_faq"),
