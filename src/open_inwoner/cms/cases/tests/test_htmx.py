@@ -35,6 +35,7 @@ from open_inwoner.utils.test import (
     DisableRequestLogMixin,
     paginated_response,
 )
+from open_inwoner.utils.tests.helpers import AssertMockMatchersMixin
 from open_inwoner.utils.tests.playwright import PlaywrightSyncLiveServerTestCase
 
 
@@ -42,7 +43,10 @@ from open_inwoner.utils.tests.playwright import PlaywrightSyncLiveServerTestCase
 @requests_mock.Mocker()
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class CasesPlaywrightTests(
-    ClearCachesMixin, DisableRequestLogMixin, PlaywrightSyncLiveServerTestCase
+    AssertMockMatchersMixin,
+    ClearCachesMixin,
+    DisableRequestLogMixin,
+    PlaywrightSyncLiveServerTestCase,
 ):
     def setUp(self) -> None:
         super().setUp()
@@ -432,9 +436,6 @@ class CasesPlaywrightTests(
         with open(download.path(), "rb") as f:
             self.assertEqual(f.read(), self.uploaded_zaak_informatie_object_content)
 
-        # finally check if our mock matchers are accurate
-        self.assertMockMatchersCalledAll(self.matchers)
-
         # contact form
         contact_form = page.locator("#contact-form")
         expect(contact_form).to_be_visible()
@@ -455,15 +456,4 @@ class CasesPlaywrightTests(
         expect(notification.get_by_text(_("Vraag verstuurd!"))).to_be_visible()
 
         # finally check if our mock matchers are accurate
-        self.assertMockMatchersCalledAll(self.contact_moment_matchers)
-
-    def assertMockMatchersCalledAll(self, matchers):
-        def _match_str(m):
-            return f"  {m._method.ljust(5, ' ')} {m._url}"
-
-        missed = [m for m in matchers if not m.called]
-        if not missed:
-            return
-
-        out = "\n".join(_match_str(m) for m in missed)
-        self.fail(f"request mock matchers not called:\n{out}")
+        self.assertMockMatchersCalled(self.matchers)
