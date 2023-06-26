@@ -52,3 +52,7 @@ class ProfileConfig(AppHookConfig):
         default=True,
         help_text=_("Designates whether 'questions' section is rendered or not."),
     )
+    ssd = models.BooleanField(
+        verbose_name=_("Mijn uitkeringen"),
+        default=True,
+    )
