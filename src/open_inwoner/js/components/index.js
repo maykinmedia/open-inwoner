@@ -24,6 +24,7 @@ import './plans'
 import './preview'
 import './questionnaire'
 import './search'
+import { TabPanel } from './tab-panels'
 import './toggle'
 import './upload-document'
 import { ShowInfo } from './upload-document/show-file-info'
@@ -48,6 +49,7 @@ const elementWrappers = [
   [FileInputError.selector, (elt) => new FileInputError(elt)],
   [Notification.selector, (elt) => new Notification(elt)],
   [AnchorMobile.selector, (elt) => new AnchorMobile(elt)],
+  [TabPanel.selector, (elt) => new TabPanel(elt)],
   // add more when needed
 ]
 

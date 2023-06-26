@@ -1,0 +1,39 @@
+{% load i18n %}
+
+{#    *** STATIC tab panel template Start - copy this if you just need two tabs/panels  ***   #}
+{#<div class="tab--container">#}
+{#    <div class="tabs">#}
+{#        <ul class="list tabs__headers">#}
+{#            <li class="list-item tab__header--item"><a href="#uitkeringsspecificaties" class="link tab__header">Uitkeringsspecificaties</a></li>#}
+{#            <li class="list-item tab__header--item"><a href="#jaaropgaven" class="link tab__header">Jaaropgaven</a></li>#}
+{#        </ul>#}
+{##}
+{#        <div class="tabs__body">#}
+{#            <div id="uitkeringsspecificaties" class="tab__content">#}
+{#                <p>Selecteer de maand die u wilt downloaden. Let op: de huidige maand is pas vanaf de 25ste zichtbaar. Deze uitkeringsspecificatie is een momentopname van de aan u uitbetaalde uitkering. Aan deze specificatie kunt u geen rechten ontlenen.</p>#}
+{#            </div>#}
+{#            <div id="jaaropgaven" class="tab__content">#}
+{#                <p>Dolor sit amet consectetur adipisicing elit. Recusandae sint nostrum laborum voluptatem est quod fugiat dolor odio aspernatur error, aperiam quibusdam distinctio, blanditiis eum sed natus, sequi ipsam modi panel.</p>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{#</div>#}
+{#    *** STATIC tab panel template End ***   #}
+
+<div class="tab--container">
+    <div class="tabs">
+        <ul class="list tabs__headers">
+            {% for tab in get_tabs %}
+                <li class="list-item tab__header--item"><a href="#{{ tab.id }}" class="link tab__header">{{ tab.title }}</a></li>
+            {% endfor %}
+        </ul>
+
+        <div class="tabs__body">
+            {% for tab in get_tabs %}
+                <div id="{{ tab.id }}" class="tab__content">
+                    <p>{{ tab.content }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
