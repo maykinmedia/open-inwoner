@@ -197,10 +197,70 @@ class CasesContactFormTestCase(ClearCachesMixin, WebTest):
             ),
         ]
 
-    def test_form_is_shown_if_open_klant_configured(self, m):
+    def _setUpExtraMocks(self, m):
+        self.contactmoment = generate_oas_component(
+            "cmc",
+            "schemas/ContactMoment",
+            uuid="aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
+            url=f"{CONTACTMOMENTEN_ROOT}contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
+            status=Status.nieuw,
+            antwoord="",
+            text="hey!\n\nwaddup?",
+        )
+        self.klant_contactmoment = generate_oas_component(
+            "cmc",
+            "schemas/KlantContactMoment",
+            uuid="aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
+            url=f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten/aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
+            klant=self.klant["url"],
+            contactmoment=self.contactmoment["url"],
+        )
+        m.post(
+            f"{CONTACTMOMENTEN_ROOT}contactmomenten",
+            json=self.contactmoment,
+            status_code=201,
+        ),
+        m.post(
+            f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten",
+            json=self.klant_contactmoment,
+            status_code=201,
+        ),
+
+    def test_form_is_shown_if_open_klant_api_configured(self, m):
         self._setUpMocks(m)
 
         self.assertTrue(self.ok_config.has_api_configuration())
+
+        response = self.app.get(self.case_detail_url, user=self.user)
+        contact_form = response.pyquery("#contact-form")
+
+        self.assertTrue(response.context["case"]["contact_form_enabled"])
+        self.assertTrue(contact_form)
+
+    def test_form_is_shown_if_open_klant_email_configured(self, m):
+        self._setUpMocks(m)
+
+        self.ok_config.register_email = "example@example.com"
+        self.ok_config.register_contact_moment = False
+        self.ok_config.save()
+
+        self.assertFalse(self.ok_config.has_api_configuration())
+        self.assertTrue(self.ok_config.has_register())
+
+        response = self.app.get(self.case_detail_url, user=self.user)
+        contact_form = response.pyquery("#contact-form")
+
+        self.assertTrue(response.context["case"]["contact_form_enabled"])
+        self.assertTrue(contact_form)
+
+    def test_form_is_shown_if_open_klant_email_and_api_configured(self, m):
+        self._setUpMocks(m)
+
+        self.ok_config.register_email = "example@example.com"
+        self.ok_config.save()
+
+        self.assertTrue(self.ok_config.has_api_configuration())
+        self.assertTrue(self.ok_config.has_register())
 
         response = self.app.get(self.case_detail_url, user=self.user)
         contact_form = response.pyquery("#contact-form")
@@ -245,3 +305,76 @@ class CasesContactFormTestCase(ClearCachesMixin, WebTest):
 
         self.assertFalse(response.context["case"]["contact_form_enabled"])
         self.assertFalse(contact_form)
+
+    def test_form_success_with_api(self, m):
+        self._setUpMocks(m)
+        self._setUpExtraMocks(m)
+
+        response = self.app.get(self.case_detail_url, user=self.user)
+        form = response.forms["contact-form"]
+        form.action = reverse(
+            "cases:case_detail_contact_form", kwargs={"object_id": self.zaak["uuid"]}
+        )
+        form["question"] = "Sample text"
+        response = form.submit()
+
+        self.assertEqual(
+            response.headers["HX-Redirect"],
+            reverse("cases:case_detail", kwargs={"object_id": str(self.zaak["uuid"])}),
+        )
+
+        redirect = self.app.get(response.headers["HX-Redirect"])
+        redirect_messages = list(redirect.context["messages"])
+
+        self.assertEqual(redirect_messages[0].message, _("Vraag verstuurd!"))
+
+    def test_form_success_with_email(self, m):
+        self._setUpMocks(m)
+        self._setUpExtraMocks(m)
+
+        self.ok_config.register_email = "example@example.com"
+        self.ok_config.register_contact_moment = False
+        self.ok_config.save()
+
+        response = self.app.get(self.case_detail_url, user=self.user)
+        form = response.forms["contact-form"]
+        form.action = reverse(
+            "cases:case_detail_contact_form", kwargs={"object_id": self.zaak["uuid"]}
+        )
+        form["question"] = "Sample text"
+        response = form.submit()
+
+        self.assertEqual(
+            response.headers["HX-Redirect"],
+            reverse("cases:case_detail", kwargs={"object_id": str(self.zaak["uuid"])}),
+        )
+
+        redirect = self.app.get(response.headers["HX-Redirect"])
+        redirect_messages = list(redirect.context["messages"])
+
+        self.assertEqual(redirect_messages[0].message, _("Vraag verstuurd!"))
+
+    def test_form_success_with_both_email_and_api(self, m):
+        self._setUpMocks(m)
+        self._setUpExtraMocks(m)
+
+        self.ok_config.register_email = "example@example.com"
+        self.ok_config.save()
+
+        response = self.app.get(self.case_detail_url, user=self.user)
+        form = response.forms["contact-form"]
+        form.action = reverse(
+            "cases:case_detail_contact_form", kwargs={"object_id": self.zaak["uuid"]}
+        )
+        form["question"] = "Sample text"
+        response = form.submit()
+
+        self.assertEqual(
+            response.headers["HX-Redirect"],
+            reverse("cases:case_detail", kwargs={"object_id": str(self.zaak["uuid"])}),
+        )
+
+        redirect = self.app.get(response.headers["HX-Redirect"])
+        redirect_messages = list(redirect.context["messages"])
+
+        self.assertEqual(redirect_messages[0].message, _("Vraag verstuurd!"))
