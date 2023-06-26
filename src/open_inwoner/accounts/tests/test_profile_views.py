@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.test import override_settings
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
@@ -731,18 +733,19 @@ class EditIntrestsTests(WebTest):
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@patch("open_inwoner.cms.utils.page_display._is_published", return_value=True)
 class EditNotificationsTests(WebTest):
     def setUp(self):
         self.url = reverse("profile:notifications")
         self.user = UserFactory()
 
-    def test_login_required(self):
+    def test_login_required(self, mock_page_display):
         login_url = reverse("login")
         response = self.app.get(self.url)
 
         self.assertRedirects(response, f"{login_url}?next={self.url}")
 
-    def test_default_values_for_regular_user(self):
+    def test_default_values_for_regular_user(self, mock_page_display):
         response = self.app.get(self.url, user=self.user)
         form = response.forms["change-notifications"]
 
@@ -750,7 +753,7 @@ class EditNotificationsTests(WebTest):
         self.assertTrue(form.get("plans_notifications").checked)
         self.assertNotIn("cases_notifications", form.fields)
 
-    def test_disabling_notification_is_saved(self):
+    def test_disabling_notification_is_saved(self, mock_page_display):
         self.assertTrue(self.user.messages_notifications)
 
         response = self.app.get(self.url, user=self.user)
@@ -764,13 +767,112 @@ class EditNotificationsTests(WebTest):
         self.assertFalse(self.user.messages_notifications)
         self.assertTrue(self.user.plans_notifications)
 
-    def test_cases_notifications_is_accessible_when_digid_user(self):
+    def test_cases_notifications_is_accessible_when_digid_user(self, mock_page_display):
         self.user.login_type = LoginTypeChoices.digid
         self.user.save()
         response = self.app.get(self.url, user=self.user)
         form = response.forms["change-notifications"]
 
         self.assertIn("cases_notifications", form.fields)
+
+
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+class NotificationsDisplayTests(WebTest):
+    """Integration tests for display of notifications and publication of CMS pages"""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.url = reverse("profile:notifications")
+        cls.user = UserFactory()
+
+    def test_inbox_notifications_display(self):
+        # inbox page not created
+        response = self.app.get(self.url, user=self.user)
+        form = response.forms["change-notifications"]
+
+        self.assertNotIn("messages_notifications", form.fields)
+
+        # inbox page created but not published
+        page = api.create_page(
+            "Mijn Berichten",
+            "cms/fullwidth.html",
+            "nl",
+            slug="berichten",
+        )
+        page.application_namespace = "inbox"
+        page.save()
+
+        response = self.app.get(self.url, user=self.user)
+        form = response.forms["change-notifications"]
+
+        self.assertNotIn("messages_notifications", form.fields)
+
+        # inbox page published
+        page.publish("nl")
+        response = self.app.get(self.url, user=self.user)
+        form = response.forms["change-notifications"]
+
+        self.assertIn("messages_notifications", form.fields)
+
+    def test_cases_notifications_display(self):
+        # cases page not created
+        self.user.login_type = LoginTypeChoices.digid
+        self.user.save()
+        response = self.app.get(self.url, user=self.user)
+        form = response.forms["change-notifications"]
+
+        self.assertNotIn("cases_notifications", form.fields)
+
+        # cases page created but not published
+        page = api.create_page(
+            "Mijn Aanvragen",
+            "cms/fullwidth.html",
+            "nl",
+            slug="aanvragen",
+        )
+        page.application_namespace = "cases"
+        page.save()
+
+        response = self.app.get(self.url, user=self.user)
+        form = response.forms["change-notifications"]
+
+        self.assertNotIn("cases_notifications", form.fields)
+
+        # cases page published
+        page.publish("nl")
+        response = self.app.get(self.url, user=self.user)
+        form = response.forms["change-notifications"]
+
+        self.assertIn("cases_notifications", form.fields)
+
+    def test_collaborate_notifications_display(self):
+        # collaborate page not created
+        response = self.app.get(self.url, user=self.user)
+        form = response.forms["change-notifications"]
+
+        self.assertNotIn("plans_notifications", form.fields)
+
+        # collaborate page created but not published
+        page = api.create_page(
+            "Samenwerken",
+            "cms/fullwidth.html",
+            "nl",
+            slug="samenwerken",
+        )
+        page.application_namespace = "collaborate"
+        page.save()
+
+        response = self.app.get(self.url, user=self.user)
+        form = response.forms["change-notifications"]
+
+        self.assertNotIn("plans_notifications", form.fields)
+
+        # collaborate page published
+        page.publish("nl")
+        response = self.app.get(self.url, user=self.user)
+        form = response.forms["change-notifications"]
+
+        self.assertIn("plans_notifications", form.fields)
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")

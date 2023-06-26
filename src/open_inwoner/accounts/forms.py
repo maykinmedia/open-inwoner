@@ -9,6 +9,11 @@ from django.utils.translation import ugettext_lazy as _
 
 from django_registration.forms import RegistrationForm
 
+from open_inwoner.cms.utils.page_display import (
+    case_page_is_published,
+    collaborate_page_is_published,
+    inbox_page_is_published,
+)
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.pdc.models.category import Category
 from open_inwoner.utils.forms import LimitedUploadFileField, PrivateFileWidget
@@ -295,8 +300,17 @@ class UserNotificationsForm(forms.ModelForm):
     def __init__(self, user, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
-        if not user.login_type == LoginTypeChoices.digid:
+        if (
+            not case_page_is_published()
+            or not user.login_type == LoginTypeChoices.digid
+        ):
             del self.fields["cases_notifications"]
+
+        if not inbox_page_is_published():
+            del self.fields["messages_notifications"]
+
+        if not collaborate_page_is_published():
+            del self.fields["plans_notifications"]
 
 
 class ContactFilterForm(forms.Form):

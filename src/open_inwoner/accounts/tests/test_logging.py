@@ -1,5 +1,6 @@
 import logging
 from datetime import timedelta
+from unittest.mock import patch
 
 from django.contrib.admin.models import ADDITION, CHANGE, DELETION
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -115,7 +116,8 @@ class TestProfile(WebTest):
             },
         )
 
-    def test_user_notifications_update_is_logged(self):
+    @patch("open_inwoner.cms.utils.page_display._is_published", return_value=True)
+    def test_user_notifications_update_is_logged(self, mock_cms_page_display):
         form = self.app.get(reverse("profile:notifications"), user=self.user).forms[
             "change-notifications"
         ]
