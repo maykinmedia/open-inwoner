@@ -25,6 +25,7 @@ from open_inwoner.accounts.views import (
 )
 from open_inwoner.openklant.views.contactform import ContactFormView
 from open_inwoner.pdc.views import FAQView, HomeView
+from open_inwoner.ssd.views.dev import XSLTDevView
 
 handler500 = "open_inwoner.utils.views.server_error"
 admin.site.site_header = "Open Inwoner beheeromgeving"
@@ -145,6 +146,11 @@ if settings.DEBUG:
     urlpatterns = [
         # fix annoying favicon http error
         path("favicon.ico", RedirectView.as_view(url="/static/ico/favicon.png")),
+    ] + urlpatterns
+
+    # TODO remove after dev
+    urlpatterns = [
+        path("ssd/dev/", XSLTDevView.as_view()),
     ] + urlpatterns
 
     if apps.is_installed("debug_toolbar"):

@@ -7,6 +7,10 @@ from django.utils.translation import gettext_lazy as _
 
 from filer.models import Image
 
+validate_digits = RegexValidator(
+    regex="^[0-9]+$", message=_("Expected a numerical value.")
+)
+
 
 @deconstructible
 class CharFieldValidator(RegexValidator):
