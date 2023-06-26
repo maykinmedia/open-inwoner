@@ -203,6 +203,8 @@ INSTALLED_APPS = [
     "open_inwoner.haalcentraal",
     "open_inwoner.openzaak",
     "open_inwoner.openklant",
+    "open_inwoner.soap",
+    "open_inwoner.ssd",
     "open_inwoner.questionnaire",
     "open_inwoner.extended_sessions",
     "open_inwoner.custom_csp",

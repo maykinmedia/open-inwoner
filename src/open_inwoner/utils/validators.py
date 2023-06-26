@@ -10,6 +10,7 @@ from django.utils.translation import gettext_lazy as _
 import phonenumbers
 from filer.models import Image
 
+
 if TYPE_CHECKING:
     from phonenumbers.phonenumber import PhoneNumber
 
@@ -67,6 +68,11 @@ class DutchPhoneNumberValidator:
                 _("The phone number cannot contain spaces or dashes"),
                 code="invalid",
             )
+
+
+validate_digits = RegexValidator(
+    regex="^[0-9]+$", message=_("Expected a numerical value.")
+)
 
 
 @deconstructible
