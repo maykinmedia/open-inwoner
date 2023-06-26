@@ -29,7 +29,7 @@
 
                 {% get_solo 'mozilla_django_oidc_db.OpenIDConnectConfig' as oidc_config %}
                 {% get_solo 'configurations.SiteConfiguration' as site_config %}
-                {% if oidc_config.enabled %}
+                {% if oidc_config.enabled and site_config.openid_enabled_for_regular_users %}
                     {% render_card tinted=True direction='horizontal' %}
                     {% if site_config.openid_connect_logo %}
                         <a href="{% url 'oidc_authentication_init' %}" class="link digid-logo" aria-describedby="{{ site_config.openid_connect_logo.default_alt_text }}" title="{{ site_config.openid_connect_logo.default_alt_text }}">

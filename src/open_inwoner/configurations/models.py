@@ -1,7 +1,6 @@
 from typing import Optional
 
 from django.contrib.flatpages.models import FlatPage
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -14,7 +13,8 @@ from open_inwoner.utils.validators import validate_phone_number
 
 from ..utils.colors import hex_to_hsl
 from ..utils.validators import FilerExactImageSizeValidator
-from .choices import ColorTypeChoices
+from .choices import ColorTypeChoices, OpenIDDisplayChoices
+from .validators import validate_oidc_config
 
 
 class SiteConfiguration(SingletonModel):
@@ -396,6 +396,14 @@ class SiteConfiguration(SingletonModel):
             "The text that should display when OpenId connect is set as a login method"
         ),
     )
+    openid_display = models.CharField(
+        verbose_name=_("Show option to login via OpenId"),
+        max_length=24,
+        choices=OpenIDDisplayChoices,
+        default=OpenIDDisplayChoices.admin,
+        validators=[validate_oidc_config],
+        help_text=_("Only selected groups will see the option to login via OpenId."),
+    )
     redirect_to = models.CharField(
         max_length=255,
         null=True,
@@ -446,6 +454,14 @@ class SiteConfiguration(SingletonModel):
     @property
     def siteimprove_enabled(self):
         return bool(self.siteimprove_id)
+
+    @property
+    def openid_enabled_for_admin(self):
+        return self.openid_display == OpenIDDisplayChoices.admin
+
+    @property
+    def openid_enabled_for_regular_users(self):
+        return self.openid_display == OpenIDDisplayChoices.regular
 
     def get_help_text(self, request) -> Optional[str]:
         match = request.resolver_match
