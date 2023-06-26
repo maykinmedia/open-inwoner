@@ -25,6 +25,7 @@ from open_inwoner.accounts.views import (
 )
 from open_inwoner.openklant.views.contactform import ContactFormView
 from open_inwoner.pdc.views import FAQView, HomeView
+from open_inwoner.ssd.views.dev import XSLTDevView
 
 handler500 = "open_inwoner.utils.views.server_error"
 admin.site.site_header = "Open Inwoner beheeromgeving"
