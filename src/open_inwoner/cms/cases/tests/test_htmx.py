@@ -1,4 +1,4 @@
-from django.test import override_settings
+from django.test import override_settings, tag
 from django.utils.translation import gettext as _
 
 import requests_mock
@@ -30,18 +30,23 @@ from open_inwoner.openzaak.tests.shared import (
     DOCUMENTEN_ROOT,
     ZAKEN_ROOT,
 )
-from open_inwoner.utils.test import ClearCachesMixin, paginated_response
-from open_inwoner.utils.tests.playwright import (
-    PlaywrightSyncLiveServerTestCase,
-    multi_browser,
+from open_inwoner.utils.test import (
+    ClearCachesMixin,
+    DisableRequestLogMixin,
+    paginated_response,
 )
+from open_inwoner.utils.tests.playwright import PlaywrightSyncLiveServerTestCase
 
 
+@tag("e2e")
 @requests_mock.Mocker()
-@multi_browser()
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class CasesPlaywrightTests(ClearCachesMixin, PlaywrightSyncLiveServerTestCase):
+class CasesPlaywrightTests(
+    ClearCachesMixin, DisableRequestLogMixin, PlaywrightSyncLiveServerTestCase
+):
     def setUp(self) -> None:
+        super().setUp()
+
         self.user = DigidUserFactory(bsn="900222086")
         self.user_login_state = self.get_user_bsn_login_state(self.user)
 
@@ -427,6 +432,9 @@ class CasesPlaywrightTests(ClearCachesMixin, PlaywrightSyncLiveServerTestCase):
         with open(download.path(), "rb") as f:
             self.assertEqual(f.read(), self.uploaded_zaak_informatie_object_content)
 
+        # finally check if our mock matchers are accurate
+        self.assertMockMatchersCalledAll(self.matchers)
+
         # contact form
         contact_form = page.locator("#contact-form")
         expect(contact_form).to_be_visible()
@@ -445,3 +453,17 @@ class CasesPlaywrightTests(ClearCachesMixin, PlaywrightSyncLiveServerTestCase):
         notification = page.locator(".notification__content")
         expect(notification).to_be_visible()
         expect(notification.get_by_text(_("Vraag verstuurd!"))).to_be_visible()
+
+        # finally check if our mock matchers are accurate
+        self.assertMockMatchersCalledAll(self.contact_moment_matchers)
+
+    def assertMockMatchersCalledAll(self, matchers):
+        def _match_str(m):
+            return f"  {m._method.ljust(5, ' ')} {m._url}"
+
+        missed = [m for m in matchers if not m.called]
+        if not missed:
+            return
+
+        out = "\n".join(_match_str(m) for m in missed)
+        self.fail(f"request mock matchers not called:\n{out}")

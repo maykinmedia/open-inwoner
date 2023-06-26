@@ -2,7 +2,7 @@ from datetime import date
 
 from django.contrib.messages import get_messages
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import override_settings
+from django.test import override_settings, tag
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
@@ -10,8 +10,8 @@ from django_webtest import WebTest
 from playwright.sync_api import expect
 from privates.test import temp_private_root
 
-from ...utils.tests.playwright import PlaywrightSyncLiveServerTestCase, multi_browser
-from ..choices import LoginTypeChoices, StatusChoices
+from ...utils.tests.playwright import PlaywrightSyncLiveServerTestCase
+from ..choices import StatusChoices
 from ..models import Action
 from .factories import ActionFactory, DigidUserFactory, UserFactory
 
@@ -304,7 +304,7 @@ class ActionViewTests(WebTest):
         self.assertEqual(response.status_code, 404)
 
 
-@multi_browser()
+@tag("e2e")
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class ActionsPlaywrightTests(PlaywrightSyncLiveServerTestCase):
     @classmethod
