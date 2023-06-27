@@ -214,7 +214,7 @@ class ContactFormTestCase(
         form["infix"] = "de"
         form["last_name"] = "Bar"
         form["email"] = "foo@example.com"
-        form["phonenumber"] = "0612345678"
+        form["phonenumber"] = "+31612345678"
         form["question"] = "hey!\n\nwaddup?"
 
         response = form.submit().follow()
@@ -233,7 +233,7 @@ class ContactFormTestCase(
         self.assertEqual(email.recipients(), ["example@example.com"])
         self.assertIn("Foo de Bar", email.body)
         self.assertIn("foo@example.com", email.body)
-        self.assertIn("0612345678", email.body)
+        self.assertIn("+31612345678", email.body)
         self.assertIn("hey!\n\nwaddup?", email.body)
 
         self.assertTimelineLog("registered contactmoment by email")
@@ -260,7 +260,7 @@ class ContactFormTestCase(
         form["infix"] = "de"
         form["last_name"] = "Bar"
         form["email"] = "foo@example.com"
-        form["phonenumber"] = "0612345678"
+        form["phonenumber"] = "+31612345678"
         form["question"] = "hey!\n\nwaddup?"
 
         response = form.submit().follow()
@@ -284,7 +284,7 @@ class ContactFormTestCase(
                 "voorvoegselAchternaam": "de",
                 "achternaam": "Bar",
                 "emailadres": "foo@example.com",
-                "telefoonnummer": "0612345678",
+                "telefoonnummer": "+31612345678",
             },
         )
         contactmoment_create_data = data.matchers[1].request_history[0].json()
@@ -331,7 +331,7 @@ class ContactFormTestCase(
         form["infix"] = "de"
         form["last_name"] = "Bar"
         form["email"] = "foo@example.com"
-        form["phonenumber"] = "0612345678"
+        form["phonenumber"] = "+31612345678"
         form["question"] = "hey!\n\nwaddup?"
 
         response = form.submit().follow()
@@ -358,7 +358,7 @@ class ContactFormTestCase(
 
         Naam: Foo de Bar
         Email: foo@example.com
-        Telefoonnummer: 0612345678
+        Telefoonnummer: +31612345678
         """
         )
 

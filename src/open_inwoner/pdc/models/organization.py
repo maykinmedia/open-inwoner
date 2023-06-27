@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from filer.fields.image import FilerImageField
 
-from open_inwoner.utils.validators import validate_phone_number
+from open_inwoner.utils.validators import DutchPhoneNumberValidator
 
 from .mixins import GeoModel
 
@@ -42,7 +42,7 @@ class Organization(GeoModel):
         verbose_name=_("Phonenumber"),
         blank=True,
         max_length=15,
-        validators=[validate_phone_number],
+        validators=[DutchPhoneNumberValidator()],
         help_text=_("The phone number of the organization"),
     )
     neighbourhood = models.ForeignKey(

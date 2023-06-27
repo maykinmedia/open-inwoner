@@ -1,7 +1,9 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+from django.utils.translation import ugettext as _
 
 from ..validators import (
+    DutchPhoneNumberValidator,
     format_phone_number,
     validate_phone_number,
     validate_postal_code,
@@ -88,3 +90,37 @@ class ValidatorsTestCase(TestCase):
         # testing some non dutch numbers
         self.assertEqual(format_phone_number("+32 12 345 67 89"), "+32123456789")
         self.assertEqual(format_phone_number("0032 12 345 67 89"), "+32123456789")
+
+    def test_dutch_phonenumber_validator(self):
+        valid_samples = [
+            "0612345678",
+            "+31612345678",
+            "0201234567",
+            "+31201234567",
+        ]
+        invalid_samples = [
+            "1123456789",
+            "+31123456789",
+            "0123456789",
+            "012-3456789",
+            "012 345 67 89",
+            "+31 12 345 67 89",
+            "0695azerty",
+            "azerty0545",
+            "@4566544++8",
+            "onetwothreefour",
+        ]
+
+        for valid_num in valid_samples:
+            errors = DutchPhoneNumberValidator()(valid_num)
+            self.assertIsNone(errors)
+
+        for invalid_num in invalid_samples:
+            self.assertRaisesMessage(
+                ValidationError,
+                _(
+                    "Not a valid dutch phone number. An example of a valid dutch phone number is 0612345678"
+                ),
+                DutchPhoneNumberValidator(),
+                invalid_num,
+            )
