@@ -21,15 +21,15 @@ class ParsePhoneNumber(Protocol):
 
 @deconstructible
 class DutchPhoneNumberValidator:
-    country = "NL"
-    country_name = _("Dutch")
+    language = "NL"
+    country_name = _("Netherlands")
     error_message = _(
         "Not a valid dutch phone number. An example of a valid dutch phone number is 0612345678"
     )
     _parse_phonenumber: ParsePhoneNumber
 
     def __call__(self, value):
-        self.check_for_invalid_chars(value)
+        self._check_for_invalid_chars(value)
 
         parsed_value = self._parse_phonenumber(value)
 
@@ -45,30 +45,28 @@ class DutchPhoneNumberValidator:
         # this additional check is needed because while .parse() does some checks on country
         #   is_possible_number() and is_valid_number() do not
         #   eg: country=NL would accept "+442083661177"
-        if self.country:
-            if not phonenumbers.is_valid_number_for_region(parsed_value, self.country):
-                raise ValidationError(
-                    self.error_message,
-                    params={"country": self.country_name},
-                    code="invalid",
-                )
+        if not phonenumbers.is_valid_number_for_region(parsed_value, self.language):
+            raise ValidationError(
+                self.error_message,
+                params={"country": self.country_name},
+                code="invalid",
+            )
 
     def _parse_phonenumber(self, value: str) -> "PhoneNumber":
         try:
-            return phonenumbers.parse(value, self.country)
+            return phonenumbers.parse(value, self.language)
         except phonenumbers.NumberParseException:
             raise ValidationError(
                 self.error_message,
                 code="invalid",
             )
 
-    def check_for_invalid_chars(self, value):
+    def _check_for_invalid_chars(self, value: str) -> None:
         if " " in value or "-" in value:
             raise ValidationError(
-                self.error_message,
+                _("The phone number cannot contain spaces or dashes"),
                 code="invalid",
             )
-        return value
 
 
 @deconstructible

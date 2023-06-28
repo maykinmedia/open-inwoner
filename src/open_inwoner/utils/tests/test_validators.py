@@ -102,18 +102,19 @@ class ValidatorsTestCase(TestCase):
             "1123456789",
             "+31123456789",
             "0123456789",
-            "012-3456789",
-            "012 345 67 89",
-            "+31 12 345 67 89",
             "0695azerty",
             "azerty0545",
             "@4566544++8",
             "onetwothreefour",
         ]
+        invalid_samples_2 = [
+            "012-3456789",
+            "012 345 67 89",
+            "+31 12 345 67 89",
+        ]
 
         for valid_num in valid_samples:
-            errors = DutchPhoneNumberValidator()(valid_num)
-            self.assertIsNone(errors)
+            self.assertIsNone(DutchPhoneNumberValidator()(valid_num))
 
         for invalid_num in invalid_samples:
             self.assertRaisesMessage(
@@ -121,6 +122,14 @@ class ValidatorsTestCase(TestCase):
                 _(
                     "Not a valid dutch phone number. An example of a valid dutch phone number is 0612345678"
                 ),
+                DutchPhoneNumberValidator(),
+                invalid_num,
+            )
+
+        for invalid_num in invalid_samples_2:
+            self.assertRaisesMessage(
+                ValidationError,
+                _("The phone number cannot contain spaces or dashes"),
                 DutchPhoneNumberValidator(),
                 invalid_num,
             )
