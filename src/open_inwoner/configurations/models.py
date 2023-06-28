@@ -9,7 +9,7 @@ from filer.fields.image import FilerImageField
 from ordered_model.models import OrderedModel, OrderedModelManager
 from solo.models import SingletonModel
 
-from open_inwoner.utils.validators import validate_phone_number
+from open_inwoner.utils.validators import DutchPhoneNumberValidator
 
 from ..utils.colors import hex_to_hsl
 from ..utils.validators import FilerExactImageSizeValidator
@@ -220,7 +220,7 @@ class SiteConfiguration(SingletonModel):
         max_length=15,
         default="",
         blank=True,
-        validators=[validate_phone_number],
+        validators=[DutchPhoneNumberValidator()],
         verbose_name=_("Footer visiting phonenumber"),
         help_text=_("Visiting phonenumber on the footer section."),
     )
