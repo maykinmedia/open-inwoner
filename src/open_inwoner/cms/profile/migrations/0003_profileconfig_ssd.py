@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('profile', '0002_profileconfig_questions'),
+        ("profile", "0002_profileconfig_questions"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='profileconfig',
-            name='ssd',
-            field=models.BooleanField(default=True, verbose_name='Mijn uitkeringen'),
+            model_name="profileconfig",
+            name="ssd",
+            field=models.BooleanField(default=True, verbose_name="Mijn uitkeringen"),
         ),
     ]

@@ -5,5 +5,21 @@
     Mijn uitkeringen
   </h1>
 
-  <p>Nothing to see yet...</p>
+	<h2 id="yearly">Jaaropgaven</h2>
+  <ul>
+  {% for report in yearly_benefits %}
+    <li>
+      <a href="{% url 'ssd:download_yearly_benefits' file_name=report %}" target="_blank" rel="noopener noreferrer">{{ report }}</a>
+    </li>
+  {% endfor %}
+  </ul>
+
+	<h2 id="monthly">Maandspecificaties</h2>
+  <ul>
+  {% for report in monthly_benefits %}
+    <li>
+      <a href="{% url 'ssd:download_monthly_benefits' file_name=report %}">{{ report }}</a>
+    </li>
+  {% endfor %}
+  </ul>
 {% endblock content %}
