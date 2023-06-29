@@ -2,7 +2,6 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from solo.models import SingletonModel
-from zgw_consumers.constants import APITypes
 
 from open_inwoner.utils.validators import CharFieldValidator, validate_digits
 
@@ -30,13 +29,6 @@ class SSDConfig(SingletonModel):
         validators=[CharFieldValidator],
         blank=True,
     )
-    # applicatie_informatie = models.CharField(
-    #     _("Application information"),
-    #     max_length=32,
-    #     help_text=_("Information about the application"),
-    #     validators=[CharFieldValidator],
-    #     blank=True,
-    # )
     bedrijfs_naam = models.CharField(
         _("Company name"),
         max_length=32,

@@ -4,6 +4,7 @@ from uuid import uuid4
 from django.template import loader
 from django.utils import timezone
 
+import dateutil
 import requests
 from requests import Response
 
@@ -66,6 +67,10 @@ class SSDBaseClient:
             **auth_kwargs,
         )
         return response
+
+    def file_name_to_period(self, file_name):
+        dt = dateutil.parser.parse(file_name)
+        return dt.strftime("%Y%m")
 
     def templated_request(self, **kwargs) -> Response:
         """Perform SOAP request with XML request template"""
@@ -142,15 +147,10 @@ class UitkeringClient(SSDBaseClient):
         # maandspecificatie = self._get_maandspecificatie(bsn, period)
 
         # TODO: remove when done testing
-        xml_response = "src/open_inwoner/ssd/tests/files/uitkering_response.xml"
+        xml_response = "src/open_inwoner/ssd/tests/files/uitkering_testresponse.xml"
         with open(xml_response, "r") as file:
             maandspecificatie = file.read()
 
         data = get_uitkering_dict(maandspecificatie)
         pdf_content = render_pdf(self.html_template, context={**data})
-        # return pdf_content
-
-        # TODO: remove when done testing
-        pdf_path = "src/open_inwoner/ssd/tests/files/test.pdf"
-        with open(pdf_path, "bw") as file:
-            file.write(pdf_content)
+        return pdf_content
