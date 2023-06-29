@@ -64,6 +64,31 @@
     &--big {
       grid-column: 1 / span 2;
     }
+
+    .button {
+      border: 1px solid;
+
+      &.actions__status-selector {
+        &--approval {
+          border-color: var(--color-danger);
+          color: var(--color-danger);
+        }
+
+        &--open {
+          border-color: var(--color-info-darker);
+          color: var(--color-info-darker);
+        }
+
+        &--closed {
+          border-color: var(--color-success);
+          color: var(--color-success);
+        }
+      }
+    }
+
+    .dropdown__content .button {
+      border: none;
+    }
   }
 
   .actions__actions {

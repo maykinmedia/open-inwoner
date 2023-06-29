@@ -238,6 +238,24 @@
       top: var(--spacing-large);
     }
   }
+
+  /// specific inner forms
+
+  &.select-grid > .form__control > .form__grid-box {
+    grid-template-columns: 1fr;
+
+    @media screen and (min-width: 500px) and (max-width: 768px) {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    @media screen and (min-width: 769px) and (max-width: 904px) {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    @media (min-width: 905px) {
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
+  }
 }
 
 /// Specific forms
