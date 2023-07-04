@@ -2,6 +2,12 @@
   overflow: hidden;
   position: fixed;
 
+  // Hide focus for accessibility
+  .container,
+  .footer {
+    display: none;
+  }
+
   @media (min-width: 768px) {
     height: auto;
     overflow: auto;
