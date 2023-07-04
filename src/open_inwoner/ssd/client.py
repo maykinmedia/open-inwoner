@@ -134,3 +134,22 @@ class JaaropgaveClient(SSDBaseClient):
             }
         )
         return self.execute_request(data)
+
+
+class UitkeringClient(SSDBaseClient):
+    soap_action = "http://www.centric.nl/GWS/Diensten/UitkeringsSpecificatieClient-v0600/UitkeringsSpecificatieInfo"
+    request_tpl_path = BASE_DIR / "uitkeringsspecificatie/Request.xslt"
+    # this is the root node for the selectors in the XSLT
+    data_node_name = "Uitkeringsspecificatie"
+
+    def get_uitkering(self, bsn, period):
+        # these keys match with the selectors in the XSLT
+        data = self.get_request_base_data()
+        data.update(
+            {
+                "BSN": bsn,
+                "Periode": period,
+                "ApplicatieInformatie": "e-suite",
+            }
+        )
+        return self.execute_request(data)

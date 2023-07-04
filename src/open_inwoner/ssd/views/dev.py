@@ -5,7 +5,9 @@ from django.views import View
 
 from lxml import etree
 
-from open_inwoner.ssd.rendering import XSLT_DIR
+from ..xml import get_jaaropgave_dict, get_uitkering_dict
+
+# from open_inwoner.ssd.rendering import XSLT_DIR
 
 TEST_FILES_DIR = Path(__file__).resolve().parent.parent / "tests/files"
 
@@ -40,14 +42,8 @@ class XSLTDevView(View):
     """
 
     examples = {
-        "jaaropgave": (
-            TEST_FILES_DIR / "jaaropgave-testresponse.xml",
-            XSLT_DIR / "Jaaropgave/Response2018_patched.xslt",
-        ),
-        "uitkering": (
-            TEST_FILES_DIR / "UitkeringsSpecificatieClient_v0500.xml",
-            XSLT_DIR / "Uitkeringsspecificatie/Response.xslt",
-        ),
+        "jaaropgave": TEST_FILES_DIR / "jaaropgave-testresponse.xml",
+        "uitkering": TEST_FILES_DIR / "UitkeringsSpecificatie-testresponse.xml",
     }
 
     def index_reponse(self, request):
@@ -58,6 +54,12 @@ class XSLTDevView(View):
         example = request.GET.get("example")
         if not example in self.examples:
             return self.index_reponse(request)
+
+        with open(self.examples["uitkering"], "rb") as f:
+            uitkering_dict = get_uitkering_dict(f)
+
+        with open(self.examples["jaaropgave"], "rb") as f:
+            jaaropgave_dict = get_jaaropgave_dict(f)
 
         soap_path, xslt_path = self.examples[example]
 
