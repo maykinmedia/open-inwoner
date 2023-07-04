@@ -1,5 +1,6 @@
 #document-upload {
   gap: var(--spacing-tiny);
+  max-width: var(--mobile-xs-width);
 
   .button[type='submit']:disabled {
     background-color: var(--color-gray) !important;
@@ -15,10 +16,6 @@
       position: initial;
       margin-top: 2em;
     }
-  }
-
-  input[type='text'] {
-    max-width: var(--mobile-xs-width);
   }
 
   .inputfile-group {
@@ -48,10 +45,11 @@
 /// File-input site wide
 input[type='file'] {
   background-color: var(--color-white);
-  color: var(--color-primary-lighter);
+  color: var(--color-primary);
   border: 1px solid var(--color-mute);
   border-radius: var(--border-radius);
   display: inline-block;
+  filter: saturate(70%);
   min-width: 100%;
   max-width: var(--form-width);
   padding: 0;
@@ -129,7 +127,8 @@ input[type='file']::file-selector-button {
       z-index: 200;
     }
 
-    .inputfile + label {
+    .inputfile + .label,
+    .inputfile + .label__label {
       display: inline-block;
       position: absolute;
       top: 5px;
@@ -145,28 +144,36 @@ input[type='file']::file-selector-button {
       z-index: -1;
     }
 
-    .inputfile:focus + label,
-    .inputfile.has-focus + label,
-    .inputfile:hover + label,
-    .inputfile + label:hover {
+    .inputfile:focus + .label__label,
+    .inputfile.has-focus + .label__label,
+    .inputfile:hover + .label__label,
+    .inputfile + .label__label:hover,
+    .inputfile:focus + .label,
+    .inputfile.has-focus + .label,
+    .inputfile:hover + .label,
+    .inputfile + .label:hover {
       background-color: var(--color-primary-darker);
       top: 4px;
       transition: all 0.3s, background-color 0.3s;
     }
 
-    .inputfile + label *[class*='icons'] {
+    .inputfile + .label__label *[class*='icons'],
+    .inputfile + .label *[class*='icons'] {
       width: 1.3em;
       vertical-align: middle;
       color: white;
       margin-left: var(--spacing-medium);
     }
 
-    .inputfile + label {
+    .inputfile + .label__label {
       cursor: pointer; /* "hand" cursor */
     }
 
-    .inputfile:focus + label {
-      outline: 2px solid orange;
+    .inputfile:focus + .label,
+    .inputfile:focus-visible + .label,
+    .inputfile:focus + .label__label,
+    .inputfile:focus-visible + .label__label {
+      outline: var(--border-width) solid var(--color-secondary);
       outline: -webkit-focus-ring-color auto 5px;
     }
   }
@@ -198,7 +205,6 @@ input[type='file']::file-selector-button {
     justify-content: space-around;
     border: 1px solid lightgray;
     border-radius: 4px;
-    max-width: var(--mobile-xs-width);
     height: 80px;
     padding-top: var(--spacing-large);
     margin-bottom: 20px;

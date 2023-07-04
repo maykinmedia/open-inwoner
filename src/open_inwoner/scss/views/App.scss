@@ -179,6 +179,8 @@
   --color-body: var(--color-gray-dark);
   // changed to #949494 to get the required 3:1 contrast ratio - in case of decorative border use var(--color-gray).
   --color-mute: #949494;
+  // text-color for muted text inside tinted cards
+  --color-tinted-mute: #696969;
 
   /// Font.
 
