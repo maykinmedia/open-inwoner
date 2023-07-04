@@ -1,3 +1,5 @@
+from typing import Optional, Union
+
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -42,8 +44,7 @@ class SoapService(models.Model):
     def __str__(self):
         return self.label
 
-    # -> None | str | tuple[str, str]
-    def get_cert(self):
+    def get_cert(self) -> Optional[Union[str, tuple[str, str]]]:
         certificate = self.client_certificate
         if not certificate:
             return None
@@ -54,8 +55,7 @@ class SoapService(models.Model):
         if certificate.public_certificate:
             return certificate.public_certificate.path
 
-    # -> bool | str
-    def get_verify(self):
+    def get_verify(self) -> Union[bool, str]:
         certificate = self.server_certificate
         if certificate:
             return certificate.public_certificate.path
