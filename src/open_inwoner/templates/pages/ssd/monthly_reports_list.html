@@ -1,0 +1,36 @@
+{% extends 'master.html' %}
+{% load i18n grid_tags %}
+
+{% block content %}
+    {% render_grid %}
+        {% render_column span=9 %}
+            <h1 class="h1" id="title">
+                {% trans "Mijn uitkeringen" %}
+            </h1>
+            <p>{% trans "Bekijk en download hier uw maandelijkse/jaarlijkse uitkeringsspecificaties om direct inzicht te krijgen in uw financiële situatie." %}</p>
+
+            <div class="tab--container">
+                <div class="tabs">
+                    <ul class="list tabs__headers">
+                        <li class="list-item tab__header--item"><a href="#" id="monthly" class="link tab__header active">{% trans "Maandspecificaties" %}</a></li>
+                        <li class="list-item tab__header--item"><a href="{% url 'profile:yearly_benefits_index' %}" id="yearly" class="link tab__header">{% trans "Jaaropgaven" %}</a></li>
+                    </ul>
+
+                    <div class="tabs__body">
+                        <div id="maandspecificaties" class="tab__content active">
+                            <p>{% trans "Selecteer de maand die u wilt downloaden. Let op: de huidige maand is pas vanaf de 25ste zichtbaar. Deze uitkeringsspecificatie is een momentopname van de aan u uitbetaalde uitkering. Aan deze specificatie kunt u geen rechten ontlenen." %}</p>
+                            <ul>
+                            {% for report in monthly_benefits %}
+                                <li>
+                                    <a href="{% url 'profile:download_monthly_benefits' file_name=report %}">{{ report }}</a>
+                                </li>
+                            {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        {% endrender_column %}
+    {% endrender_grid %}
+{% endblock content %}

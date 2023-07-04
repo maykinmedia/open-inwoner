@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n grid_tags %}
+{% load i18n grid_tags icon_tags %}
 
 {% block content %}
     {% render_grid %}
@@ -7,21 +7,22 @@
             <h1 class="h1" id="title">
                 {% trans "Mijn uitkeringen" %}
             </h1>
+            <p>{% trans "Bekijk en download hier uw maandelijkse/jaarlijkse uitkeringsspecificaties om direct inzicht te krijgen in uw financiële situatie." %}</p>
 
-            {#    *** STATIC tab panel template Start for all content on 1 page - contains two tabs/panels ***   #}
             <div class="tab--container">
                 <div class="tabs">
                     <ul class="list tabs__headers">
-                        <li class="list-item tab__header--item"><a href="#jaaropgaven" id="yearly" class="link tab__header">Jaaropgaven</a></li>
+                        <li class="list-item tab__header--item"><a href="{% url 'profile:monthly_benefits_index' %}" id="yearly" class="link tab__header">{% trans "Maandspecificaties" %}</a></li>
+                        <li class="list-item tab__header--item"><a href="#" id="yearly" class="link tab__header active">{% trans "Jaaropgaven" %}</a></li>
                     </ul>
 
                     <div class="tabs__body">
                         <div id="jaaropgaven" class="tab__content active">
-                            <p>Dolor sit amet consectetur adipisicing elit. Recusandae sint nostrum laborum voluptatem est quod fugiat dolor odio aspernatur error, aperiam quibusdam distinctio, blanditiis eum sed natus, sequi ipsam modi panel.</p>
+                            <p>{% trans "Selecteer het jaar dat u wilt downloaden. Aan deze jaaropgaven kunt u geen rechten ontlenen." %}</p>
                             <ul>
                             {% for report in yearly_benefits %}
                                 <li>
-                                    <a href="{% url 'ssd:download_yearly_benefits' file_name=report %}" target="_blank" rel="noopener noreferrer">{{ report }}</a>
+                                    <a href="{% url 'profile:download_yearly_benefits' file_name=report %}" target="_blank" rel="noopener noreferrer">{{ report }}</a>
                                 </li>
                             {% endfor %}
                             </ul>
@@ -29,7 +30,6 @@
                     </div>
                 </div>
             </div>
-            {#    *** STATIC tab panel template End ***   #}
 
         {% endrender_column %}
     {% endrender_grid %}
