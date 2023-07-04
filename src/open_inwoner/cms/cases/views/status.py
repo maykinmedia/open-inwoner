@@ -196,11 +196,12 @@ class InnerCaseDetailView(
             if ztc.document_upload_enabled and ztc.external_document_upload_url != "":
                 external_upload_url = ztc.external_document_upload_url
                 external_upload_enabled = True
-
         return {
             "case_type_config_description": case_type_config_description,
-            "internal_upload_enabled": internal_upload_enabled,
-            "external_upload_enabled": external_upload_enabled,
+            "internal_upload_enabled": internal_upload_enabled
+            and not getattr(self.case, "einddatum", None),
+            "external_upload_enabled": external_upload_enabled
+            and not getattr(self.case, "einddatum", None),
             "external_upload_url": external_upload_url,
             "contact_form_enabled": (
                 contact_form_enabled and open_klant_config.has_register()
@@ -332,7 +333,7 @@ class CaseDocumentUploadFormView(CaseAccessMixin, CaseLogMixin, FormView):
     def post(self, request, *args, **kwargs):
         form = self.get_form()
 
-        if form.is_valid():
+        if form.is_valid() and not getattr(self.case, "einddatum", None):
             return self.handle_document_upload(request, form)
         return self.form_invalid(form)
 
