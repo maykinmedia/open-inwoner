@@ -167,7 +167,6 @@ INSTALLED_APPS = [
     "image_cropping",
     "filer",
     "mptt",
-    # "hijack.contrib.admin",
     "django_elasticsearch_dsl",
     "import_export",
     "solo",

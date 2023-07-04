@@ -1,155 +1,114 @@
-import decimal
-from datetime import datetime
-from functools import cached_property
-from io import BytesIO
 from pathlib import Path
-from typing import Callable
 from uuid import uuid4
 
+from django.template import loader
 from django.utils import timezone
 
 import requests
-from lxml import etree
 from requests import Response
 
 from open_inwoner.ssd.models import SSDConfig
 
-BASE_DIR = Path(__file__).absolute().parent / "api"
+BASE_DIR = Path(__file__).absolute().parent.parent
 
 
 class SSDBaseClient:
-    """
-    base class for SSD soap client
-    """
+    """Base class for SSD soap client"""
 
+    request_template: Path
     soap_action: str
-    request_tpl_path: Path
-    data_node_name: str
 
     def __init__(self):
         self.config = SSDConfig.get_solo()
 
-    def get_headers(self):
+    def _get_headers(self) -> dict[str, str]:
         return {
             "Content-type": "text/xml",
         }
 
-    def get_auth_kwargs(self):
+    def _get_auth_kwargs(self) -> dict:
         cert = self.config.service.get_cert()
-        # auth = self.config.service.get_auth()
         verify = self.config.service.get_verify()
         return {
             "cert": cert,
-            # "auth": auth,
             "verify": verify,
         }
 
-    def get_request_base_data(self):
+    def _format_time(self):
+        local_time = timezone.localtime(timezone.now())
+        formatted_time = local_time.strftime("%Y-%m-%dT%H:%M:%S%z")
+        return formatted_time
+
+    def _get_base_context(self) -> dict:
         data = {
-            "MessageId": uuid4(),
-            "SoapAction": self.soap_action,
-            "Bedrijfsnaam": self.config.bedrijfs_naam,
-            "Applicatienaam": self.config.applicatie_naam,
-            "Gemeentecode": self.config.gemeentecode,
-            "Aanmaakdatum": timezone.now(),
-            "ApplicatieInformatie": "",
+            "message_id": uuid4().urn,
+            "soap_action": self.soap_action,
+            "applicatie_naam": self.config.applicatie_naam,
+            "bedrijfs_naam": self.config.bedrijfs_naam,
+            "gemeentecode": self.config.gemeentecode,
+            "dat_tijd_request": self._format_time(),
         }
         return data
 
-    def get_request_body(self, data) -> bytes:
-        data_tree = self.get_data_tree(self.data_node_name, data)
-        request_tree = self.generate_request(data_tree)
+    def _request(self, body: str) -> Response:
+        auth_kwargs = self._get_auth_kwargs()
+        headers = self._get_headers()
 
-        out = BytesIO()
-        request_tree.write_output(out)
-        data = out.getvalue()
-        return data
-
-    @cached_property
-    def generate_request(self) -> Callable:
-        parser = etree.XMLParser(resolve_entities=False)
-        tree = etree.parse(self.request_tpl_path, parser=parser)
-        transform = etree.XSLT(tree)
-        return transform
-
-    def get_data_tree(self, root_name, data_dict) -> etree.Element:
-        """Convert a dictionary into XML"""
-        root = etree.Element(root_name)
-
-        for name, value in data_dict.items():
-            elem = etree.SubElement(root, name)
-            elem.text = self.get_xml_text(value)
-
-        return root
-
-    def get_xml_text(self, value) -> str:
-        if isinstance(value, bool):
-            return "true" if value else "false"
-        elif isinstance(value, (int, float, decimal.Decimal)):
-            return str(value)
-        elif isinstance(value, datetime):
-            return value.isoformat(timespec="seconds")
-        else:
-            return str(value)
-
-    def execute_request(self, data) -> Response:
-        headers = self.get_headers()
-        body = self.get_request_body(data)
-        auth_kwargs = self.get_auth_kwargs()
-
-        res = requests.post(
-            self.config.service.url,
-            data=body,
+        response = requests.post(
+            url=self.config.service.url,
+            body=body.encode("utf-8"),
             headers=headers,
             **auth_kwargs,
         )
+        return response
 
-        # soap can give usable error response as http 500
-        if res.status_code not in (200, 500):
-            res.raise_for_status()
+    def templated_request(self, **kwargs) -> str:
+        context = {**self._get_base_context(), **kwargs}
 
-        # TODO try/except parse errors
-        parser = etree.XMLParser(resolve_entities=False)
-        xml_tree = etree.parse(BytesIO(res.content), parser=parser)
+        body = loader.render_to_string(self.request_template, context)
 
-        # TODO find nicer way to return response/error
-        # for now just attach the xml to the response
-        res.xml_tree = xml_tree
-        return res
+        return self._request(body)
 
 
 class JaaropgaveClient(SSDBaseClient):
-    soap_action = "http://www.centric.nl/GWS/Diensten/JaarOpgaveClient-v0300/Aanvraag"
-    request_tpl_path = BASE_DIR / "jaaropgave/Request.xslt"
-    # this is the root node for the selectors in the XSLT
-    data_node_name = "Jaaropgave"
+    """
+    SSD client for retrieving yearly reports
 
-    def get_jaaropgave(self, bsn, year):
-        # these keys match with the selectors in the XSLT
-        data = self.get_request_base_data()
-        data.update(
-            {
-                "BSN": bsn,
-                "Dienstjaar": year,
-            }
-        )
-        return self.execute_request(data)
+    Values for `bsn` and `dienst_jaar` in the main function are
+    retrieved and supplied from the call site (the view)
+    """
+
+    request_template = BASE_DIR / "soap/templates/ssd/jaaropgave.xml"
+    soap_action = (
+        "http://www.centric.nl/GWS/Diensten/JaarOpgaveClient-v0400/JaarOpgaveInfo"
+    )
+
+    # TODO: remove hard-coded values for params
+    def get_jaaropgave(self, bsn: str, year: str) -> str:
+        extra_context = {
+            "bsn": bsn,
+            "dienst_jaar": year,
+        }
+        response = self.templated_request(**extra_context)
+        return response.text
 
 
 class UitkeringClient(SSDBaseClient):
-    soap_action = "http://www.centric.nl/GWS/Diensten/UitkeringsSpecificatieClient-v0600/UitkeringsSpecificatieInfo"
-    request_tpl_path = BASE_DIR / "uitkeringsspecificatie/Request.xslt"
-    # this is the root node for the selectors in the XSLT
-    data_node_name = "Uitkeringsspecificatie"
+    """
+    SSD client for retrieving monthly reports
 
-    def get_uitkering(self, bsn, period):
-        # these keys match with the selectors in the XSLT
-        data = self.get_request_base_data()
-        data.update(
-            {
-                "BSN": bsn,
-                "Periode": period,
-                "ApplicatieInformatie": "e-suite",
-            }
-        )
-        return self.execute_request(data)
+    Values for `bsn` and `period` (= year + month) in the main function are
+    retrieved and supplied from the call site (the view)
+    """
+
+    request_template = BASE_DIR / "soap/templates/ssd/maandspecificaties.xml"
+    soap_action = "http://www.centric.nl/GWS/Diensten/UitkeringsSpecificatieClient-v0600/UitkeringsSpecificatieInfo"
+
+    # TODO: remove hard-coded values for params
+    def get_maandspecificatie(self, bsn: str, period: str) -> str:
+        extra_context = {
+            "bsn": bsn,
+            "period": period,
+        }
+        response = self.templated_request(**extra_context)
+        return response.text

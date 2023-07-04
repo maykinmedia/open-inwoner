@@ -16,13 +16,34 @@ class SSDConfigManager(models.Manager):
 class SSDConfig(SingletonModel):
     service = models.ForeignKey(
         "soap.SoapService",
-        verbose_name=_("SOAP Service"),
+        verbose_name=_("SOAP service"),
         on_delete=models.PROTECT,
         related_name="+",
         null=True,
         blank=True,
     )
 
+    applicatie_naam = models.CharField(
+        _("Application name"),
+        max_length=32,
+        help_text=_("Name of the application"),
+        validators=[CharFieldValidator],
+        blank=True,
+    )
+    # applicatie_informatie = models.CharField(
+    #     _("Application information"),
+    #     max_length=32,
+    #     help_text=_("Information about the application"),
+    #     validators=[CharFieldValidator],
+    #     blank=True,
+    # )
+    bedrijfs_naam = models.CharField(
+        _("Company name"),
+        max_length=32,
+        help_text=_("Name of the supplier"),
+        validators=[CharFieldValidator],
+        blank=True,
+    )
     gemeentecode = models.CharField(
         _("Municipality code"),
         max_length=4,
@@ -31,18 +52,5 @@ class SSDConfig(SingletonModel):
         blank=True,
     )
 
-    bedrijfs_naam = models.CharField(
-        _("Company Name"),
-        max_length=32,
-        help_text=_("Name of the supplier"),
-        validators=[CharFieldValidator()],
-        blank=True,
-    )
-
-    applicatie_naam = models.CharField(
-        _("Application Name"),
-        max_length=32,
-        help_text=_("Name of the application"),
-        validators=[CharFieldValidator()],
-        blank=True,
-    )
+    class Meta:
+        verbose_name = _("SSD")
