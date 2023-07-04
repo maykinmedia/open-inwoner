@@ -42,7 +42,8 @@ class SoapService(models.Model):
     def __str__(self):
         return self.label
 
-    def get_cert(self) -> None | str | tuple[str, str]:
+    # -> None | str | tuple[str, str]
+    def get_cert(self):
         certificate = self.client_certificate
         if not certificate:
             return None
@@ -53,7 +54,8 @@ class SoapService(models.Model):
         if certificate.public_certificate:
             return certificate.public_certificate.path
 
-    def get_verify(self) -> bool | str:
+    # -> bool | str
+    def get_verify(self):
         certificate = self.server_certificate
         if certificate:
             return certificate.public_certificate.path

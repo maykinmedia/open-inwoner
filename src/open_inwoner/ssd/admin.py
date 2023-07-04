@@ -9,4 +9,7 @@ from open_inwoner.ssd.models import SSDConfig
 class SSDConfigAdmin(SingletonModelAdmin):
     fields = [
         "service",
+        "gemeentecode",
+        "bedrijfs_naam",
+        "applicatie_naam",
     ]
