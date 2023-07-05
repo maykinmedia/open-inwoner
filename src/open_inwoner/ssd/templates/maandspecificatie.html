@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Maandspecificatie</title>
+  </head>
+  <body>
+    <div>
+      <h1>Uitkeringsinstantie</h1>
+      <ul>
+        {% for key, value in uitkeringsinstantie.items %}
+        <li>{{ key }}: {{ value }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div>
+      <h1>Client</h1>
+      <ul>
+        {% for key, value in client.items %}
+          <li>{{ key }}: {{ value }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div>
+      <h1>Uitkeringsspecificatie</h1>
+      <ul>
+        {% for key, value in uitkeringsspecificatie.items %}
+          <li>{{ key }}: {{ value }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div>
+      <h1>Details</h1>
+      <ul>
+        {% for key, value in details.items %}
+          <li>{{ key }}: {{ value.bedrag }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div>
+      <h1>Inkomstenkorting</h1>
+      <ul>
+        {% for key, value in inkomstenkorting.items %}
+          <li>{{ key }}: {{ value.bedrag }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </body>
+</html>

@@ -7,14 +7,17 @@ from django.utils import timezone
 import requests
 from requests import Response
 
-from open_inwoner.ssd.models import SSDConfig
+from ..utils.export import render_pdf
+from .models import SSDConfig
+from .xml import get_jaaropgave_dict, get_uitkering_dict
 
 BASE_DIR = Path(__file__).absolute().parent.parent
 
 
 class SSDBaseClient:
-    """Base class for SSD soap client"""
+    """Base class for SSD SOAP client"""
 
+    html_template: Path
     request_template: Path
     soap_action: str
 
@@ -51,6 +54,8 @@ class SSDBaseClient:
         return data
 
     def _request(self, body: str) -> Response:
+        """Wrap around `requests.post` with headers and auth details"""
+
         auth_kwargs = self._get_auth_kwargs()
         headers = self._get_headers()
 
@@ -63,6 +68,8 @@ class SSDBaseClient:
         return response
 
     def templated_request(self, **kwargs) -> str:
+        """Perform SOAP request with XML request template"""
+
         context = {**self._get_base_context(), **kwargs}
 
         body = loader.render_to_string(self.request_template, context)
@@ -78,19 +85,31 @@ class JaaropgaveClient(SSDBaseClient):
     retrieved and supplied from the call site (the view)
     """
 
+    html_template = BASE_DIR / "ssd/templates/jaaropgave.html"
     request_template = BASE_DIR / "soap/templates/ssd/jaaropgave.xml"
     soap_action = (
         "http://www.centric.nl/GWS/Diensten/JaarOpgaveClient-v0400/JaarOpgaveInfo"
     )
 
-    # TODO: remove hard-coded values for params
-    def get_jaaropgave(self, bsn: str, year: str) -> str:
+    def _get_jaaropgave(self, bsn: str, year: str) -> str:
+        """
+        :returns: XML containing the yearly benefits report
+        """
         extra_context = {
             "bsn": bsn,
             "dienst_jaar": year,
         }
         response = self.templated_request(**extra_context)
         return response.text
+
+    def get_yearly_report(self, bsn: str, dienst_jaar: str) -> bytes:
+        """
+        :returns: the yearly benefits report PDF as bytes
+        """
+        jaaropgave = self._get_jaaropgave(bsn, dienst_jaar)
+        data = get_jaaropgave_dict(jaaropgave)
+        pdf_content = render_pdf(self.html_template, context={**data})
+        return pdf_content
 
 
 class UitkeringClient(SSDBaseClient):
@@ -101,14 +120,37 @@ class UitkeringClient(SSDBaseClient):
     retrieved and supplied from the call site (the view)
     """
 
+    html_template = BASE_DIR / "ssd/templates/maandspecificatie.html"
     request_template = BASE_DIR / "soap/templates/ssd/maandspecificaties.xml"
     soap_action = "http://www.centric.nl/GWS/Diensten/UitkeringsSpecificatieClient-v0600/UitkeringsSpecificatieInfo"
 
-    # TODO: remove hard-coded values for params
-    def get_maandspecificatie(self, bsn: str, period: str) -> str:
+    def _get_maandspecificatie(self, bsn: str, period: str) -> str:
+        """
+        :returns: XML containing the monthly benefits report
+        """
         extra_context = {
             "bsn": bsn,
             "period": period,
         }
         response = self.templated_request(**extra_context)
         return response.text
+
+    def get_monthly_report(self, bsn: str, period: str) -> bytes:
+        """
+        :returns: the monthly benefits report PDF as bytes
+        """
+        # maandspecificatie = self._get_maandspecificatie(bsn, period)
+
+        # TODO: remove
+        xml_response = "src/open_inwoner/ssd/tests/files/uitkering_response.xml"
+        with open(xml_response, "r") as file:
+            maandspecificatie = file.read()
+
+        data = get_uitkering_dict(maandspecificatie)
+        pdf_content = render_pdf(self.html_template, context={**data})
+        # return pdf_content
+
+        # TODO: remove
+        pdf_path = "src/open_inwoner/ssd/tests/files/test.pdf"
+        with open(pdf_path, "bw") as file:
+            file.write(pdf_content)
