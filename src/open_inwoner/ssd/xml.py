@@ -1,8 +1,10 @@
-import datetime
+import calendar
+from datetime import datetime
 from xml.parsers.expat import ExpatError
 
 from django.utils.translation import gettext_lazy as _
 
+import dateutil
 import xmltodict
 from glom import glom
 
@@ -10,21 +12,60 @@ from glom import glom
 #
 # utils
 #
-def convert_to_float(base_path: str, target: str) -> float:
-    res = glom(base_path, target, default=0)
-
-    if res == 0:
-        return res
-
-    return float(res) / 100
+def format_float_repr(value: str) -> str:
+    return "{:.2f}".format(float(value) / 100).replace(".", ",")
 
 
-def format_date(date_str):
-    return datetime.datetime.strptime(date_str, "%Y%m%d").strftime("%d-%m-%Y")
+def format_address(street_name: str, housse_nr: str, house_letter: str) -> str:
+    return f"{street_name} {housse_nr} {house_letter}"
+
+
+def format_date(date_str) -> str:
+    return datetime.strptime(date_str, "%Y%m%d").strftime("%d-%m-%Y")
+
+
+def format_date_month_name(date_str) -> str:
+    """Transform '204805' into 'May 2048'"""
+
+    patched = date_str + "01"
+    date = datetime.strptime(patched, "%Y%m%d")
+    month_name = calendar.month_name[date.month]
+
+    formatted_date = _("{month_name} {year}").format(
+        month_name=month_name, year=date.year
+    )
+
+    return formatted_date
+
+
+def format_name(first_name: str, voorvoegsel: str, last_name: str):
+    first_names = first_name.split(" ")
+    first_name_initials = [name[0] + "." for name in first_names]
+    first_name_formatted = " ".join(first_name_initials)
+
+    return f"{first_name_formatted} {voorvoegsel} {last_name}"
 
 
 def get_sign(base_path: str, target: str) -> str:
     return "-" if glom(base_path, target) == "-" else ""
+
+
+def get_column(col_index: str) -> str:
+    """Remap magic numbers to meaningful names"""
+
+    if col_index == "1":
+        return "plus"
+    if col_index == "2":
+        return "minus"
+    return "base"
+
+
+def sanitize_date_repr(date_str: str) -> str:
+    """
+    Transform `date_str` into ISO 8601 compliant format
+    """
+    patched = date_str + "01"
+    return datetime.strptime(patched, "%Y%m%d").strftime("%Y-%m-%d")
 
 
 def xml_to_dict(xml_data):
@@ -54,10 +95,22 @@ def get_uitkering_dict(xml_data):
     #
     uitkeringsinstatie_spec = glom(uitkering_specificatie, "Uitkeringsinstantie")
     uitkeringsinstantie = {
-        "gemeentenaam": glom(uitkeringsinstatie_spec, "Gemeentenaam"),
-        "bezoekadres": glom(uitkeringsinstatie_spec, "Bezoekadres"),
-        "postcode": glom(uitkeringsinstatie_spec, "Postcode"),
-        "woonplaatsnaam": glom(uitkeringsinstatie_spec, "Woonplaatsnaam"),
+        "gemeente": {
+            "key": "Gemeente",
+            "value": glom(uitkeringsinstatie_spec, "Gemeentenaam"),
+        },
+        "bezoekadres": {
+            "key": "Bezoekadres",
+            "value": glom(uitkeringsinstatie_spec, "Bezoekadres"),
+        },
+        "postcode": {
+            "key": "Postcode",
+            "value": glom(uitkeringsinstatie_spec, "Postcode"),
+        },
+        "woonplaatsnaam": {
+            "key": "Plaats",
+            "value": glom(uitkeringsinstatie_spec, "Woonplaatsnaam"),
+        },
     }
 
     #
@@ -67,13 +120,34 @@ def get_uitkering_dict(xml_data):
     client_address_spec = glom(client_spec, "Adres")
 
     client = {
-        "burgerservicenr": glom(client_spec, "BurgerServiceNr"),
-        "voornamen": glom(client_spec, "Voornamen"),
-        "voorvoegsel": glom(client_spec, "Voorvoegsel"),
-        "achternaam": glom(client_spec, "Achternaam"),
-        "straatnaam": glom(client_address_spec, "Straatnaam"),
-        "client_postcode": glom(client_address_spec, "Postcode"),
-        "client_woonplaatsnaam": glom(client_address_spec, "Woonplaatsnaam"),
+        "bsn": {
+            "key": "Burgerservicenummer (BSN)",
+            "value": glom(client_spec, "BurgerServiceNr"),
+        },
+        "naam": {
+            "key": "Naam",
+            "value": format_name(
+                glom(client_spec, "Voornamen"),
+                glom(client_spec, "Voorvoegsel"),
+                glom(client_spec, "Achternaam"),
+            ),
+        },
+        "adres": {
+            "key": "Adres",
+            "value": format_address(
+                glom(client_address_spec, "Straatnaam"),
+                glom(client_address_spec, "Huisnummer"),
+                glom(client_address_spec, "Huisletter"),
+            ),
+        },
+        "postcode": {
+            "key": "Postcode",
+            "value": glom(client_address_spec, "Postcode"),
+        },
+        "woonplats": {
+            "key": "Woonplaats",
+            "value": glom(client_address_spec, "Woonplaatsnaam"),
+        },
     }
 
     # dossier needed for the rest of the report
@@ -83,10 +157,19 @@ def get_uitkering_dict(xml_data):
     #
     # Uitkeringsspeciﬁcatie
     #
-    uitkeringsspeciﬁcatie = {
-        "dossiernummer": glom(dossier_dict, "Dossiernummer"),
-        "periode": glom(dossier_dict, "Periodenummer"),
-        "regeling": glom(dossier_dict, "Regeling"),
+    uitkeringsspecificatie = {
+        "dossiernummer": {
+            "key": "Dossiernummer",
+            "value": glom(dossier_dict, "Dossiernummer"),
+        },
+        "periode": {
+            "key": "Periode",
+            "value": format_date_month_name(glom(dossier_dict, "Periodenummer")),
+        },
+        "regeling": {
+            "key": "Regeling",
+            "value": glom(dossier_dict, "Regeling"),
+        },
     }
 
     #
@@ -97,42 +180,50 @@ def get_uitkering_dict(xml_data):
 
     for detail_row in details_list:
         details[detail_row["Omschrijving"]] = {
+            "key": detail_row["Omschrijving"],
             "sign": glom(detail_row, "Bedrag.CdPositiefNegatief"),
-            "bedrag": convert_to_float(detail_row, "Bedrag.WaardeBedrag"),
-            "column": glom(detail_row, "IndicatieKolom"),
+            "value": format_float_repr(glom(detail_row, "Bedrag.WaardeBedrag")),
+            "column": get_column(glom(detail_row, "IndicatieKolom")),
         }
 
     #
     # Speciﬁcatie inkomstenkorting
     #
     inkomstenkorting = {
-        "OpgegevenInkomsten": {
+        "opgegeven_inkomsten": {
+            "key": "Opgegeven inkomsten",
             "sign": get_sign(dossier_dict, "OpgegevenInkomsten.CdPositiefNegatief"),
-            "bedrag": convert_to_float(dossier_dict, "OpgegevenInkomsten.WaardeBedrag"),
-        },
-        "InkomstenVrijlating": {
-            "sign": get_sign(dossier_dict, "InkomstenVrijlating.CdPositiefNegatief"),
-            "bedrag": convert_to_float(
-                dossier_dict, "InkomstenVrijlating.WaardeBedrag"
+            "value": format_float_repr(
+                glom(dossier_dict, "OpgegevenInkomsten.WaardeBedrag")
             ),
         },
-        "InkomstenNaVrijlating": {
+        "inkomsten_vrijlating": {
+            "key": "Inkomsten vrijlating",
+            "sign": glom(dossier_dict, "InkomstenVrijlating.CdPositiefNegatief"),
+            "value": format_float_repr(
+                glom(dossier_dict, "InkomstenVrijlating.WaardeBedrag")
+            ),
+        },
+        "inkomsten_na_vrijlating": {
+            "key": "Inkomsten na vrijlating",
             "sign": get_sign(dossier_dict, "InkomstenNaVrijlating.CdPositiefNegatief"),
-            "bedrag": convert_to_float(
-                dossier_dict, "InkomstenNaVrijlating.WaardeBedrag"
+            "value": format_float_repr(
+                glom(dossier_dict, "InkomstenNaVrijlating.WaardeBedrag")
             ),
         },
-        "VakantiegeldOverInkomsten": {
-            "sign": get_sign(
-                dossier_dict, "VakantiegeldOverInkomsten.CdPositiefNegatief"
-            ),
-            "bedrag": convert_to_float(
-                dossier_dict, "VakantiegeldOverInkomsten.WaardeBedrag"
+        "vakantiegeld_over_inkomsten": {
+            "key": "Vakantiegeld inkomsten",
+            "sign": glom(dossier_dict, "VakantiegeldOverInkomsten.CdPositiefNegatief"),
+            "value": format_float_repr(
+                glom(dossier_dict, "VakantiegeldOverInkomsten.WaardeBedrag")
             ),
         },
-        "GekorteInkomsten": {
+        "gekorte_inkomsten": {
+            "key": "Totaal gekorte inkomsten",
             "sign": get_sign(dossier_dict, "GekorteInkomsten.CdPositiefNegatief"),
-            "bedrag": convert_to_float(dossier_dict, "GekorteInkomsten.WaardeBedrag"),
+            "value": format_float_repr(
+                glom(dossier_dict, "GekorteInkomsten.WaardeBedrag")
+            ),
         },
     }
 
@@ -196,16 +287,16 @@ def get_jaaropgave_dict(xml_data):
             "sign": get_sign(
                 specificatiejaaropgave_spec, "Fiscaalloon.CdPositiefNegatief"
             ),
-            "bedrag": convert_to_float(
-                specificatiejaaropgave_spec, "Fiscaalloon.WaardeBedrag"
+            "bedrag": format_float_repr(
+                glom(specificatiejaaropgave_spec, "Fiscaalloon.WaardeBedrag")
             ),
         },
         "loonheffing": {
             "sign": get_sign(
                 specificatiejaaropgave_spec, "Loonheffing.CdPositiefNegatief"
             ),
-            "bedrag": convert_to_float(
-                specificatiejaaropgave_spec, "Loonheffing.WaardeBedrag"
+            "bedrag": format_float_repr(
+                glom(specificatiejaaropgave_spec, "Loonheffing.WaardeBedrag")
             ),
         },
         "premie_volksverzekering": glom(
@@ -216,24 +307,24 @@ def get_jaaropgave_dict(xml_data):
             "sign": get_sign(
                 specificatiejaaropgave_spec, "IngehoudenPremieZVW.CdPositiefNegatief"
             ),
-            "bedrag": convert_to_float(
-                specificatiejaaropgave_spec, "IngehoudenPremieZVW.WaardeBedrag"
+            "bedrag": format_float_repr(
+                glom(specificatiejaaropgave_spec, "IngehoudenPremieZVW.WaardeBedrag")
             ),
         },
         "vergoeding_premie_zvw": {
             "sign": get_sign(
                 specificatiejaaropgave_spec, "VergoedingPremieZVW.CdPositiefNegatief"
             ),
-            "bedrag": convert_to_float(
-                specificatiejaaropgave_spec, "VergoedingPremieZVW.WaardeBedrag"
+            "bedrag": format_float_repr(
+                glom(specificatiejaaropgave_spec, "VergoedingPremieZVW.WaardeBedrag")
             ),
         },
         "ontvangsten_fiscaalloon": {
             "sign": get_sign(
                 specificatiejaaropgave_spec, "OntvangstenFiscaalloon.CdPositiefNegatief"
             ),
-            "bedrag": convert_to_float(
-                specificatiejaaropgave_spec, "OntvangstenFiscaalloon.WaardeBedrag"
+            "bedrag": format_float_repr(
+                glom(specificatiejaaropgave_spec, "OntvangstenFiscaalloon.WaardeBedrag")
             ),
         },
         "ontvangsten_ingehouden_premie_zvw": {
@@ -241,7 +332,7 @@ def get_jaaropgave_dict(xml_data):
                 specificatiejaaropgave_spec,
                 "OntvangstenIngehoudenPremieZVW.CdPositiefNegatief",
             ),
-            "bedrag": convert_to_float(
+            "bedrag": format_float_repr(
                 specificatiejaaropgave_spec,
                 "OntvangstenIngehoudenPremieZVW.WaardeBedrag",
             ),
@@ -251,17 +342,19 @@ def get_jaaropgave_dict(xml_data):
                 specificatiejaaropgave_spec,
                 "OntvangstenVergoedingPremieZVW.CdPositiefNegatief",
             ),
-            "bedrag": convert_to_float(
-                specificatiejaaropgave_spec,
-                "OntvangstenVergoedingPremieZVW.WaardeBedrag",
+            "bedrag": format_float_repr(
+                glom(
+                    specificatiejaaropgave_spec,
+                    "OntvangstenVergoedingPremieZVW.WaardeBedrag",
+                )
             ),
         },
         "ontvangsten_premieloon": {
             "sign": get_sign(
                 specificatiejaaropgave_spec, "OntvangstenPremieloon.CdPositiefNegatief"
             ),
-            "bedrag": convert_to_float(
-                specificatiejaaropgave_spec, "OntvangstenPremieloon.WaardeBedrag"
+            "bedrag": format_float_repr(
+                glom(specificatiejaaropgave_spec, "OntvangstenPremieloon.WaardeBedrag")
             ),
         },
         "werkgevers_heffing_premie_zvw": {
@@ -269,8 +362,11 @@ def get_jaaropgave_dict(xml_data):
                 specificatiejaaropgave_spec,
                 "WerkgeversheffingPremieZVW.CdPositiefNegatief",
             ),
-            "bedrag": convert_to_float(
-                specificatiejaaropgave_spec, "WerkgeversheffingPremieZVW.WaardeBedrag"
+            "bedrag": format_float_repr(
+                glom(
+                    specificatiejaaropgave_spec,
+                    "WerkgeversheffingPremieZVW.WaardeBedrag",
+                )
             ),
         },
         "ontvangsten_werkgevers_heffing_premie_zvw": {
@@ -278,9 +374,11 @@ def get_jaaropgave_dict(xml_data):
                 specificatiejaaropgave_spec,
                 "OntvangstenWerkgeversheffingPremieZVW.CdPositiefNegatief",
             ),
-            "bedrag": convert_to_float(
-                specificatiejaaropgave_spec,
-                "OntvangstenWerkgeversheffingPremieZVW.WaardeBedrag",
+            "bedrag": format_float_repr(
+                glom(
+                    specificatiejaaropgave_spec,
+                    "OntvangstenWerkgeversheffingPremieZVW.WaardeBedrag",
+                )
             ),
         },
         "loon_heffings_korting": {
@@ -288,7 +386,10 @@ def get_jaaropgave_dict(xml_data):
                 glom(specificatiejaaropgave_spec, "Loonheffingskorting.Ingangsdatum")
             ),
             "cdloonheffingskorting": glom(
-                specificatiejaaropgave_spec, "Loonheffingskorting.CdLoonheffingskorting"
+                glom(
+                    specificatiejaaropgave_spec,
+                    "Loonheffingskorting.CdLoonheffingskorting",
+                )
             ),
         },
         "belaste_alimentatie": {

@@ -61,13 +61,13 @@ class SSDBaseClient:
 
         response = requests.post(
             url=self.config.service.url,
-            body=body.encode("utf-8"),
+            data=body.encode("utf-8"),
             headers=headers,
             **auth_kwargs,
         )
         return response
 
-    def templated_request(self, **kwargs) -> str:
+    def templated_request(self, **kwargs) -> Response:
         """Perform SOAP request with XML request template"""
 
         context = {**self._get_base_context(), **kwargs}
@@ -135,13 +135,13 @@ class UitkeringClient(SSDBaseClient):
         response = self.templated_request(**extra_context)
         return response.text
 
-    def get_monthly_report(self, bsn: str, period: str) -> bytes:
+    def get_monthly_report(self, bsn: str = None, period: str = None) -> bytes:
         """
         :returns: the monthly benefits report PDF as bytes
         """
         # maandspecificatie = self._get_maandspecificatie(bsn, period)
 
-        # TODO: remove
+        # TODO: remove when done testing
         xml_response = "src/open_inwoner/ssd/tests/files/uitkering_response.xml"
         with open(xml_response, "r") as file:
             maandspecificatie = file.read()
@@ -150,7 +150,7 @@ class UitkeringClient(SSDBaseClient):
         pdf_content = render_pdf(self.html_template, context={**data})
         # return pdf_content
 
-        # TODO: remove
+        # TODO: remove when done testing
         pdf_path = "src/open_inwoner/ssd/tests/files/test.pdf"
         with open(pdf_path, "bw") as file:
             file.write(pdf_content)
