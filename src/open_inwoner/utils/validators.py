@@ -10,7 +10,6 @@ from django.utils.translation import gettext_lazy as _
 import phonenumbers
 from filer.models import Image
 
-
 if TYPE_CHECKING:
     from phonenumbers.phonenumber import PhoneNumber
 

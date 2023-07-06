@@ -1,51 +1,102 @@
-<!DOCTYPE html>
-<html lang="en">
+{% load ssd_tags %}
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Maandspecificatie</title>
-  </head>
-  <body>
-    <div>
-      <h1>Uitkeringsinstantie</h1>
-      <ul>
-        {% for key, value in uitkeringsinstantie.items %}
-        <li>{{ key }}: {{ value }}</li>
-        {% endfor %}
-      </ul>
+  <title>Maandspecificatie {{ uitkeringsspecificatie.periode.value}}</title>
+</head>
+<body>
+  <!-- HEADER -->
+  <div class="header">
+    <div class=" left">
+      <h3>Maandspecificatie {{ uitkeringsspecificatie.periode.value }}</h3>
     </div>
-    <div>
-      <h1>Client</h1>
-      <ul>
-        {% for key, value in client.items %}
-          <li>{{ key }}: {{ value }}</li>
-        {% endfor %}
-      </ul>
+    <div class=" right">
+      <h3>Gemeente {{ uitkeringsinstantie.gemeente.value }}</h3>
     </div>
-    <div>
-      <h1>Uitkeringsspecificatie</h1>
-      <ul>
-        {% for key, value in uitkeringsspecificatie.items %}
-          <li>{{ key }}: {{ value }}</li>
-        {% endfor %}
-      </ul>
-    </div>
-    <div>
-      <h1>Details</h1>
-      <ul>
-        {% for key, value in details.items %}
-          <li>{{ key }}: {{ value.bedrag }}</li>
-        {% endfor %}
-      </ul>
-    </div>
-    <div>
-      <h1>Inkomstenkorting</h1>
-      <ul>
-        {% for key, value in inkomstenkorting.items %}
-          <li>{{ key }}: {{ value.bedrag }}</li>
-        {% endfor %}
-      </ul>
-    </div>
-  </body>
-</html>
+  </div>
+  <!-- Uitkeringsinstantie -->
+  <br>
+  <div class="section-title">Uitkeringsinstantie</div>
+  <div class="section">
+    <table>
+      {% for key, detail in uitkeringsinstantie.items %}
+        <tr>
+          <td>{{ detail.key }}</td>
+          <td>{{ detail.value }}</td>
+        </tr>
+      {% endfor %}
+    </table>
+  </div>
+  <!-- Client -->
+  <div class="section-title">Client</div>
+  <div class="section">
+    <table>
+      {% for key, detail in client.items %}
+        <tr>
+          <td>{{ detail.key }}</td>
+          <td>{{ detail.value }}</td>
+        </tr>
+      {% endfor %}
+    </table>
+  </div>
+  <!-- Uitkeringsspecificatie -->
+  <div class="section-title">Uitkeringsspecificatie</div>
+  <div class="section">
+    <table>
+      {% for key, detail in uitkeringsspecificatie.items %}
+        <tr>
+          <td>{{ detail.key }}</td>
+          <td>{{ detail.value }}</td>
+        </tr>
+      {% endfor %}
+    </table>
+  </div>
+  <!-- Details -->
+  <div class="section-title">Details</div>
+  <div class="section">
+    <table>
+      <col style="width: 28%;"/>
+      <col style="width: 24%;"/>
+      <col style="width: 24%;"/>
+      <col style="width: 24%;"/>
+      <tr>
+        <td>Omschrijving</td>
+        <td>Basis (€)</td>
+        <td>Plus (€)</td>
+        <td>Min (€)</td>
+      </tr>
+      {% for key, detail in details.items %}
+        <tr>
+          <td>{{ detail.key }}</td>
+          <td>{% get_detail_value_for_column detail "base" %}</td>
+          <td>{% get_detail_value_for_column detail "plus" %}</td>
+          <td>{% get_detail_value_for_column detail "minus" %}</td>
+        </tr>
+      {% endfor %}
+    </table>
+  </div>
+  <!-- Inkomstenkorting -->
+  <div class="section-title">Inkomstenkorting</div>
+  <div class="section">
+    <table class="padded-cols">
+      <col style="width: 28%;"/>
+      <col style="width: 4%;"/>
+      <col style="width: 10%;"/>
+      {% for key, detail in inkomstenkorting.items %}
+        <tr>
+          <td>{{ detail.key }}</td>
+          <td>€</td>
+          <td>{{ detail.value }}</td>
+          <td>{{ detail.sign }}</td>
+        </tr>
+        {% if forloop.counter|divisibleby:2 %}
+        <tr style="">
+          <td style="height:15px;"></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        {% endif %}
+      {% endfor %}
+    </table>
+  </div>
+</body>

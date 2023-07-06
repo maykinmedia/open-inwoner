@@ -1,0 +1,34 @@
+table {
+  width: 100%;
+}
+tr:last-child {
+  border-bottom: none;
+}
+tr:nth-child(even) {
+  background-color: #f5f4f3;
+}
+tr:nth-child(odd) {
+  background-color: #efeeed;
+}
+td:first-child {
+  width: 17em;
+}
+
+.header {
+  display: inline-block;
+}
+.left {
+  float: left;
+}
+.right {
+  float: right;
+}
+
+.section {
+  font-size: 12px;
+}
+.section-title {
+  font-size: 13px;
+  font-weight: bold;
+  padding: 15px 0 5px 0;
+}

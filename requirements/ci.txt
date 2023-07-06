@@ -963,6 +963,10 @@ xmlsec==1.3.12
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   maykin-python3-saml
+xmltodict==0.13.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
 zgw-consumers==0.25.0
     # via
     #   -c requirements/base.txt
