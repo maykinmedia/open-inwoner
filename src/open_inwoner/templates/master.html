@@ -97,7 +97,8 @@
         </dialog>
 
         {% if cookiebanner_enabled %}
-        <div class="cookie-banner cookie-banner--open" id="cookie-banner" aria-labelledby="cookie-banner__title" aria-describedby="cookie-banner__text">
+        <!-- cookiebanner -->
+        <div class="cookie-banner" id="cookie-banner" aria-labelledby="cookie-banner__title" aria-describedby="cookie-banner__text">
             <div class="cookie-banner__container">
                 <div class="cookie-banner__text" id="cookie-banner__text">
                     {{cookie_info_text}} <span class="cookie-banner__link" id="cookie-banner__link">{% link href=cookie_link_url text=cookie_link_text secondary=True extra_classes="link--cookie" %}</span></div>
@@ -109,6 +110,7 @@
                 </div>
             </div>
         </div>
+        <!-- End cookiebanner code -->
         {% endif %}
 
         {% render_block "js" %}

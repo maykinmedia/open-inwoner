@@ -348,18 +348,9 @@ class CasesPlaywrightTests(
         self._setUpMocks(m)
 
         context = self.browser.new_context(storage_state=self.user_login_state)
-        self.cookiebanner_enabled = True
 
         page = context.new_page()
         page.goto(self.live_reverse("cases:open_cases"))
-
-        # find the decline button inside the cookie-banner
-        cookiebanner_banner = page.locator(".cookie-banner")
-        cookiebanner_rejectbutton = page.locator(".reject-button")
-        # close cookie-banner
-        cookiebanner_rejectbutton.click()
-        # check cookie-banner state
-        expect(cookiebanner_banner).to_be_hidden()
 
         # expected anchors
         menu_items = page.get_by_role(
