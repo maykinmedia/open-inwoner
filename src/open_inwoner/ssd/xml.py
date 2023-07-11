@@ -2,6 +2,7 @@ import calendar
 from datetime import datetime
 from xml.parsers.expat import ExpatError
 
+from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
 import dateutil
@@ -149,7 +150,7 @@ def get_uitkering_dict(xml_data):
             "key": "Postcode",
             "value": glom(client_address_spec, "Postcode"),
         },
-        "woonplats": {
+        "woonplaats": {
             "key": "Woonplaats",
             "value": glom(client_address_spec, "Woonplaatsnaam"),
         },
@@ -184,7 +185,8 @@ def get_uitkering_dict(xml_data):
     details_list = glom(dossier_dict, "Componenthistorie")
 
     for detail_row in details_list:
-        details[detail_row["Omschrijving"]] = {
+        # dict keys are slugified to facilitate access in tests
+        details[slugify(detail_row["Omschrijving"])] = {
             "key": detail_row["Omschrijving"],
             "sign": glom(detail_row, "Bedrag.CdPositiefNegatief"),
             "value": format_float_repr(glom(detail_row, "Bedrag.WaardeBedrag")),
@@ -265,9 +267,9 @@ def get_jaaropgave_dict(xml_data):
             glom(client_spec, "Voorvoegsel"),
             glom(client_spec, "Achternaam"),
         ),
-        "straatnaam": glom(client_address_spec, "Straatnaam"),
-        "huisnummer": glom(client_address_spec, "Huisnummer"),
-        "huisletter": glom(client_address_spec, "Huisletter"),
+        "adres": f"{glom(client_address_spec, 'Straatnaam')} "
+        f"{glom(client_address_spec, 'Huisnummer')} "
+        f"{glom(client_address_spec, 'Huisletter')}",
         "postcode": glom(client_address_spec, "Postcode"),
         "woonplaatsnaam": glom(client_address_spec, "Woonplaatsnaam"),
         "gemeentenaam": glom(client_address_spec, "Gemeentenaam"),
@@ -334,7 +336,7 @@ def get_jaaropgave_dict(xml_data):
             "sign": get_sign(
                 specificatiejaaropgave_spec, "VergoedingPremieZVW.CdPositiefNegatief"
             ),
-            "bedrag": glom(
+            "value": glom(
                 specificatiejaaropgave_spec, "VergoedingPremieZVW.WaardeBedrag"
             ),
         },
