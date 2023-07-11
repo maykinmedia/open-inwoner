@@ -13,7 +13,7 @@
                 </div>
             </button>
         {% firstof config.logo.default_alt_text config.name as logo_alt_text %}
-        {% logo src=config.logo.file.url alt=logo_alt_text svg_height=75 %}
+        {% logo src=config.logo.file.url alt="Homepage "|add:logo_alt_text svg_height=75 %}
 
         {% if request.user.is_authenticated %}
             <span class="nav-login--icon">{% icon icon="how_to_reg" icon_position="before" outlined=True %}</span>
@@ -101,7 +101,7 @@
 {#end of mobile menu#}
 
     {% firstof config.logo.default_alt_text config.name as logo_alt_text %}
-        <div class="logo__desktop">{% logo src=config.logo.file.url alt=logo_alt_text svg_height=75 %}</div>
+        <div class="logo__desktop">{% logo src=config.logo.file.url alt="Homepage "|add:logo_alt_text svg_height=75 %}</div>
 
         {% primary_navigation categories=categories request=request has_general_faq_questions=has_general_faq_questions cms_apps=cms_apps show_plans=show_plans %}
 
