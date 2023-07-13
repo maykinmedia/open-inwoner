@@ -9,11 +9,11 @@
         <ns3:Header xmlns="" xmlns:ns3="http://www.centric.nl/GWS/Header/v0201">
             <RouteInformatie>
                 <Bron>
-		    <Gemeentecode>{{ gemeente_code }}</Gemeentecode>
+		    <Gemeentecode>{{ gemeentecode }}</Gemeentecode>
 		    <ApplicatieNaam>{{ applicatie_naam }}</ApplicatieNaam>
                 </Bron>
                 <Bestemming>
-		    <Gemeentecode>{{ gemeente_code }}</Gemeentecode>
+		    <Gemeentecode>{{ gemeentecode }}</Gemeentecode>
                 </Bestemming>
             </RouteInformatie>
             <BerichtIdentificatie>
@@ -27,7 +27,7 @@
             xmlns:ns2="http://www.centric.nl/GWS/FWI/v0200"
             xmlns:ns3="http://www.centric.nl/GWS/Header/v0300" xmlns:ns4="http://www.centric.nl/GWS/Diensten/JaarOpgaveClient/v0400">
 	    <BurgerServiceNr>{{ bsn }}</BurgerServiceNr>
-	    <Dienstjaar>{{ dienst_jaar }}</Dienstjaar>
+	    <Dienstjaar>{{ dienstjaar }}</Dienstjaar>
         </ns4:JaarOpgaveInfo>
     </soap:Body>
 </soap:Envelope>

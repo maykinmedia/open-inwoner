@@ -42,6 +42,17 @@ class DownloadYearlyBenefitsView(DownloadBenefitsView):
     ssd_client = JaaropgaveClient()
 
     # TODO: implement yearly reports download
+    def get(self, request, *args, **kwargs):
+        file_name = kwargs["file_name"]
+        file_name_stem = get_filename_stem(file_name)
+
+        bsn = request.user.bsn
+
+        pdf_file = self.ssd_client.get_yearly_report(bsn, file_name)
+
+        response = HttpResponse(pdf_file, content_type="application/pdf")
+        response["Content-Disposition"] = f"attachment; filename={file_name_stem}.pdf"
+        return response
 
 
 class DownloadMonthlyBenefitsView(DownloadBenefitsView):

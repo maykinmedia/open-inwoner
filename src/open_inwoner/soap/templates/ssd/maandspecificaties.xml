@@ -7,19 +7,19 @@
             <Address>http://www.w3.org/2005/08/addressing/anonymous</Address>
         </ReplyTo>
         <ns3:Header xmlns="" xmlns:ns3="http://www.centric.nl/GWS/Header/v0201">
-            <RouteInformatie>
-                <Bron>
-		    <Gemeentecode>{{ gemeente_code }}</Gemeentecode>
-		    <ApplicatieNaam>{{ applicatie_naam }}</ApplicatieNaam>
-                </Bron>
-                <Bestemming>
-		    <Gemeentecode>{{ gemeente_code }}</Gemeentecode>
-                </Bestemming>
-            </RouteInformatie>
-            <BerichtIdentificatie>
-		<DatTijdAanmaakRequest>{{ dat_tijd_request }}</DatTijdAanmaakRequest>
-		<ApplicatieInformatie>{{ applicatie_naam }}</ApplicatieInformatie>
-            </BerichtIdentificatie>
+          <RouteInformatie>
+            <Bron>
+		          <Gemeentecode>{{ gemeentecode }}</Gemeentecode>
+		          <ApplicatieNaam>{{ applicatie_naam }}</ApplicatieNaam>
+            </Bron>
+            <Bestemming>
+              <Gemeentecode>{{ gemeentecode }}</Gemeentecode>
+            </Bestemming>
+          </RouteInformatie>
+          <BerichtIdentificatie>
+            <DatTijdAanmaakRequest>{{ dat_tijd_request }}</DatTijdAanmaakRequest>
+            <ApplicatieInformatie>{{ applicatie_naam }}</ApplicatieInformatie>
+          </BerichtIdentificatie>
         </ns3:Header>
     </soap:Header>
     <soap:Body>

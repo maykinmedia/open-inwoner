@@ -1,0 +1,151 @@
+{% load ssd_tags %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jaaropgave {{ jaaropgave.dienstjaar }}</title>
+  </head>
+  <body>
+  <!-- HEADER -->
+  <!-- Title -->
+  <div class="flex-container extra-margin-top">
+    <div class="flex-box heading" >
+      <span><h1>Jaaropgave {{ jaaropgave.dienstjaar }}</h1></span>
+    </div>
+    <div class="flex-box heading">
+      <span><h1>Gemeente {{ inhoudingsplichtige.gemeentenaam }}</h1></span>
+    </div>
+  </div>
+  <!-- Addresses -->
+  <div class="flex-container address">
+    <div class="flex-box heading address">
+      <p>{{ client.naam }}</p>
+      <p>{{ client.straatnaam }} {{ client.huisnummer }} {{ client.huisletter }}</p>
+      <p>{{ client.postcode }} {{ client.woonplaatsnaam }}</p>
+    </div>
+    <div class="flex-box heading address">
+      <div>
+        <p>{{ inhoudingsplichtige.key }}</p>
+        <p>Gemeente {{ inhoudingsplichtige.gemeentenaam }}</p>
+        <p>{{ inhoudingsplichtige.bezoekadres }}</p>
+        <p>{{ inhoudingsplichtige.postcode }} {{ inhoudingsplichtige.woonplaatsnaam }}</p>
+      </div>
+    </div>
+  </div>
+  <!-- PARTICIPATIEWET -->
+  <div class="section">
+    <div class="heading">
+      <span>PARTICIPATIEWET</span>
+    </div>
+    <!-- row 1 -->
+    <div class="subsection">
+      <table class="table-jaar table-extra-col">
+          <tr>
+            <th>{{ jaaropgave.fiscaalloon.key }}</th>
+            <th>{{ jaaropgave.loonheffing.key }}</th>
+            <th>{{ jaaropgave.arbeidskorting.key }}</th>
+            <th>{{ jaaropgave.loon_heffings_korting.key }}</th>
+            <th>{{ jaaropgave.loon_heffings_korting.code_label }}</th>
+          </tr>
+          <tr>
+            <td>{{ jaaropgave.fiscaalloon.sign }} {{ jaaropgave.fiscaalloon.value }}</td>
+            <td>{{ jaaropgave.loonheffing.sign }} {{ jaaropgave.loonheffing.value }}</td>
+            <!-- TODO: check if this needs to be changed; hard-coded for now. -->
+            <td>0.00</td>
+            <!-- Display first date -->
+            <td>{{ jaaropgave.loon_heffings_korting.dates.0.ingangsdatum }}</td>
+            <td>{{ jaaropgave.loon_heffings_korting.dates.0.code }}</td>
+          </tr>
+          <!-- Display additional dates if present -->
+          {% for date in jaaropgave.loon_heffings_korting.dates|slice:"1:" %}
+            {% if date %}
+              <tr>
+                <td colspan="3"></td>
+                <td>{{ date.ingangsdatum }}</td>
+                <td>{{ date.code }}</td>
+              </tr>
+            {% endif %}
+          {% endfor %}
+      </table>
+    </div>
+    <!-- row 2 -->
+    <div class="subsection">
+      <table class="table-jaar table-fixed">
+        <tr>
+          <th>{{ client.bsn_label }}</th>
+          <th>{{ jaaropgave.loon_zorgverzekeringswet.key }}</th>
+          <th>{{ jaaropgave.ingehouden_bijdrage.key }}</th>
+          <th>{{ jaaropgave.periode.key }}</th>
+        </tr>
+        <tr>
+          <td>{{ client.bsn }}</td>
+          <!-- `loon_zvw` is calculated based on `fiscaalloon` - `vergoeding_premie` -->
+          <td>{{ jaaropgave.loon_zorgverzekeringswet.value }}</td>
+          <td>{{ jaaropgave.ingehouden_bijdrage.sign}} {{ jaaropgave.ingehouden_bijdrage.value }}</td>
+          <td>{{ jaaropgave.periode.van }} t/m {{ jaaropgave.periode.tot }}</td>
+        </tr>
+      </table>
+    </div>
+    <!-- row 3 -->
+    <div class="subsection">
+      <table class="table-jaar table-fixed">
+        <tr>
+          <!-- Hard-coded for now; see below -->
+          <th>Verrekende levensloopverlofkorting</th>
+          <th>Totaal premies werknemer-verzekeringen</th>
+          <th>{{ jaaropgave.werkgevers_heffing_premie.key }}</th>
+          <th>{{ jaaropgave.code_loonbelastingtabel.key }}</th>
+        </tr>
+        <tr>
+          <!-- Hard-coded to 0 for now as different values don't make sense for the current purpose -->
+          <!-- Cf. the Response2018.xslt template provided in the Taiga files --> 
+          <td>0,00</td>
+          <td>0.00</td>
+          <td>{{ jaaropgave.werkgevers_heffing_premie.value }}</td>
+          <td>{{ jaaropgave.code_loonbelastingtabel.value }}</td>
+        </tr>
+      </table>
+  </div>
+  <!-- TOELICHTING -->
+  <div class="section">
+    <div class="heading">
+      <span>TOELICHTING</span>
+    </div>
+    <div class="subsection extra-margin">
+      <span class="subsection-heading">Code loonbelastingtabel</span>
+      <div>
+        <ol>
+          <li>
+            <span>Voor uitkeringen op grond van de Participatiewet is code 250 van toepassing. Dit betekent dat uw netto uitkering is verhoogd met het
+bijstandspercentage. De hoogte van dit tarief is afhankelijk van:</span>
+            <ul class="dashed">
+              <li>uw leeftijd: boven of beneden AOW-gerechtigde leeftijd.</li>
+              <li>uw persoonlijke situatie: echtpaar of alleenstaand.</li>
+            </ul>
+          </li>
+          <li>Voor uitkeringen op grond van de IOAW en de IOAZ is code 022 van toepassing. Dit betekent dat is ingehouden volgens de groene
+maandbelastingtabel zonder herleidingsregel.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="subsection extra-margin">
+      <span class="subsection-heading">Code loonheffingskorting</span>
+      <p>Code 0 = er is geen rekening gehouden met de loonheffingskorting.</p>
+      <p>Code 1 = er is wel rekening gehouden met de loonheffingskorting.</p>
+    </div>
+    <div class="subsection extra-margin">
+      <span class="subsection-heading">Ingehouden bijdrage Zorgverzekeringswet</span>
+      <p>In deze rubriek is het totale bedrag premie zorgverzekeringswet vermeld dat over/van uw uitkering door de inhoudingsplichtige wordt
+afgedragen aan de belastingdienst
+      </p> 
+    </div>
+    <div class="subsection extra-margin">
+      <span class="subsection-heading">Totaal premies werknemersverzekering en Werkgeversheffing zorgverzekeringswet</span>
+      <p>Hierin staat de premie en de werkgeversheffing die de inhoudingsplichtige voor u heeft betaald</p>
+    </div>
+  </body>
+</html>
+
+

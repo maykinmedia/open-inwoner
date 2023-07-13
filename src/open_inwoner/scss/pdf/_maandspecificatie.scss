@@ -1,16 +1,17 @@
 table {
   width: 100%;
+  empty-cells: hide;
 }
-tr:last-child {
+.maand-table tr:last-child {
   border-bottom: none;
 }
-tr:nth-child(even) {
+.maand-table tr:nth-child(even) {
   background-color: #f5f4f3;
 }
-tr:nth-child(odd) {
+.maand-table tr:nth-child(odd) {
   background-color: #efeeed;
 }
-td:first-child {
+.maand-table td:first-child {
   width: 17em;
 }
 

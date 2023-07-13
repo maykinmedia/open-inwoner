@@ -10,8 +10,12 @@ from glom import glom
 
 
 #
-# utils
+# utility functions
 #
+def calculate_loon_zvw(fiscalloon: str, vergoeding_premie_zvw: str) -> str:
+    return str(int(fiscalloon) - int(vergoeding_premie_zvw))
+
+
 def format_float_repr(value: str) -> str:
     return "{:.2f}".format(float(value) / 100).replace(".", ",")
 
@@ -46,8 +50,8 @@ def format_name(first_name: str, voorvoegsel: str, last_name: str):
     return f"{first_name_formatted} {voorvoegsel} {last_name}"
 
 
-def get_sign(base_path: str, target: str) -> str:
-    return "-" if glom(base_path, target) == "-" else ""
+def get_sign(base, target) -> str:
+    return "-" if glom(base, target) == "-" else ""
 
 
 def get_column(col_index: str) -> str:
@@ -93,6 +97,7 @@ def get_uitkering_dict(xml_data):
     #
     # Uitkeringsinstatie
     #
+
     uitkeringsinstatie_spec = glom(uitkering_specificatie, "Uitkeringsinstantie")
     uitkeringsinstantie = {
         "gemeente": {
@@ -253,10 +258,13 @@ def get_jaaropgave_dict(xml_data):
     client_spec = glom(xml_data_dict, BASE + ".JaarOpgaveClient.Client")
     client_address_spec = glom(xml_data_dict, BASE + ".JaarOpgaveClient.Client.Adres")
     client = {
+        "bsn_label": "BSN",
         "bsn": glom(client_spec, "BurgerServiceNr"),
-        "voornamen": glom(client_spec, "Voornamen"),
-        "voorvoegsel": glom(client_spec, "Voorvoegsel"),
-        "achternaam": glom(client_spec, "Achternaam"),
+        "naam": format_name(
+            glom(client_spec, "Voornamen"),
+            glom(client_spec, "Voorvoegsel"),
+            glom(client_spec, "Achternaam"),
+        ),
         "straatnaam": glom(client_address_spec, "Straatnaam"),
         "huisnummer": glom(client_address_spec, "Huisnummer"),
         "huisletter": glom(client_address_spec, "Huisletter"),
@@ -273,6 +281,7 @@ def get_jaaropgave_dict(xml_data):
     # Inhoudingsplichtige
     inhoudingsplichtige_spec = glom(jaaropgave_spec, "Inhoudingsplichtige")
     inhoudingsplichtige = {
+        "key": "Inhoudingsplichtige",
         "gemeentenaam": glom(inhoudingsplichtige_spec, "Gemeentenaam"),
         "bezoekadres": glom(inhoudingsplichtige_spec, "Bezoekadres"),
         "postcode": glom(inhoudingsplichtige_spec, "Postcode"),
@@ -283,31 +292,41 @@ def get_jaaropgave_dict(xml_data):
     specificatiejaaropgave_spec = glom(jaaropgave_spec, "SpecificatieJaarOpgave")
     jaaropgave = {
         "regeling": glom(specificatiejaaropgave_spec, "Regeling"),
+        "dienstjaar": glom(specificatiejaaropgave_spec, "Dienstjaar"),
+        "periode": {
+            "key": "Tijdvak",
+            "van": format_date(glom(specificatiejaaropgave_spec, "AangiftePeriodeVan")),
+            "tot": format_date(glom(specificatiejaaropgave_spec, "AangiftePeriodeTot")),
+        },
         "fiscaalloon": {
+            "key": "Loon loonbelasting / volksverzekeringen",
             "sign": get_sign(
                 specificatiejaaropgave_spec, "Fiscaalloon.CdPositiefNegatief"
             ),
-            "bedrag": format_float_repr(
-                glom(specificatiejaaropgave_spec, "Fiscaalloon.WaardeBedrag")
-            ),
+            "value": glom(specificatiejaaropgave_spec, "Fiscaalloon.WaardeBedrag"),
         },
         "loonheffing": {
+            "key": "Ingehouden Loonbelasting / Premie volksverzekeringen (loonheffing)",
             "sign": get_sign(
                 specificatiejaaropgave_spec, "Loonheffing.CdPositiefNegatief"
             ),
-            "bedrag": format_float_repr(
-                glom(specificatiejaaropgave_spec, "Loonheffing.WaardeBedrag")
-            ),
+            "value": glom(specificatiejaaropgave_spec, "Loonheffing.WaardeBedrag"),
         },
-        "premie_volksverzekering": glom(
-            specificatiejaaropgave_spec, "CdPremieVolksverzekering"
-        ),
-        "indicatie_zvw": glom(specificatiejaaropgave_spec, "IndicatieZVW"),
-        "ingehouden_premie_zvw": {
+        # TODO: figure out if this is needed; see below
+        "arbeidskorting": {
+            "key": "Verrekende arbeidskorting",
+            "value": "MYSTERY",
+        },
+        "code_loonbelastingtabel": {
+            "key": "Code loonbelastingtabel",
+            "value": glom(specificatiejaaropgave_spec, "CdPremieVolksverzekering"),
+        },
+        "ingehouden_bijdrage": {
+            "key": "Ingehouden bijdrage Zorgverzekeringswet",
             "sign": get_sign(
                 specificatiejaaropgave_spec, "IngehoudenPremieZVW.CdPositiefNegatief"
             ),
-            "bedrag": format_float_repr(
+            "value": format_float_repr(
                 glom(specificatiejaaropgave_spec, "IngehoudenPremieZVW.WaardeBedrag")
             ),
         },
@@ -315,144 +334,71 @@ def get_jaaropgave_dict(xml_data):
             "sign": get_sign(
                 specificatiejaaropgave_spec, "VergoedingPremieZVW.CdPositiefNegatief"
             ),
-            "bedrag": format_float_repr(
-                glom(specificatiejaaropgave_spec, "VergoedingPremieZVW.WaardeBedrag")
+            "bedrag": glom(
+                specificatiejaaropgave_spec, "VergoedingPremieZVW.WaardeBedrag"
             ),
         },
-        "ontvangsten_fiscaalloon": {
-            "sign": get_sign(
-                specificatiejaaropgave_spec, "OntvangstenFiscaalloon.CdPositiefNegatief"
-            ),
-            "bedrag": format_float_repr(
-                glom(specificatiejaaropgave_spec, "OntvangstenFiscaalloon.WaardeBedrag")
-            ),
-        },
-        "ontvangsten_ingehouden_premie_zvw": {
-            "sign": get_sign(
-                specificatiejaaropgave_spec,
-                "OntvangstenIngehoudenPremieZVW.CdPositiefNegatief",
-            ),
-            "bedrag": format_float_repr(
-                specificatiejaaropgave_spec,
-                "OntvangstenIngehoudenPremieZVW.WaardeBedrag",
+        "loon_zorgverzekeringswet": {
+            "key": "Loon Zorgverzekeringswet",
+            "value": calculate_loon_zvw(
+                glom(specificatiejaaropgave_spec, "Fiscaalloon.WaardeBedrag"),
+                glom(specificatiejaaropgave_spec, "VergoedingPremieZVW.WaardeBedrag"),
             ),
         },
-        "ontvangsten_vergoeding_premie_zvw": {
-            "sign": get_sign(
-                specificatiejaaropgave_spec,
-                "OntvangstenVergoedingPremieZVW.CdPositiefNegatief",
-            ),
-            "bedrag": format_float_repr(
-                glom(
-                    specificatiejaaropgave_spec,
-                    "OntvangstenVergoedingPremieZVW.WaardeBedrag",
-                )
-            ),
-        },
-        "ontvangsten_premieloon": {
-            "sign": get_sign(
-                specificatiejaaropgave_spec, "OntvangstenPremieloon.CdPositiefNegatief"
-            ),
-            "bedrag": format_float_repr(
-                glom(specificatiejaaropgave_spec, "OntvangstenPremieloon.WaardeBedrag")
-            ),
-        },
-        "werkgevers_heffing_premie_zvw": {
+        "werkgevers_heffing_premie": {
+            "key": "Werkgeversheffing Zorgverzekeringswet",
             "sign": get_sign(
                 specificatiejaaropgave_spec,
                 "WerkgeversheffingPremieZVW.CdPositiefNegatief",
             ),
-            "bedrag": format_float_repr(
-                glom(
-                    specificatiejaaropgave_spec,
-                    "WerkgeversheffingPremieZVW.WaardeBedrag",
-                )
-            ),
-        },
-        "ontvangsten_werkgevers_heffing_premie_zvw": {
-            "sign": get_sign(
+            "value": glom(
                 specificatiejaaropgave_spec,
-                "OntvangstenWerkgeversheffingPremieZVW.CdPositiefNegatief",
-            ),
-            "bedrag": format_float_repr(
-                glom(
-                    specificatiejaaropgave_spec,
-                    "OntvangstenWerkgeversheffingPremieZVW.WaardeBedrag",
-                )
+                "WerkgeversheffingPremieZVW.WaardeBedrag",
             ),
         },
-        "loon_heffings_korting": {
-            "ingangsdatum": format_date(
-                glom(specificatiejaaropgave_spec, "Loonheffingskorting.Ingangsdatum")
-            ),
-            "cdloonheffingskorting": glom(
-                glom(
-                    specificatiejaaropgave_spec,
-                    "Loonheffingskorting.CdLoonheffingskorting",
-                )
-            ),
-        },
-        "belaste_alimentatie": {
-            "sign": get_sign(
-                specificatiejaaropgave_spec, "BelasteAlimentatie.CdPositiefNegatief"
-            ),
-            "bedrag": (
-                float(
-                    glom(
-                        specificatiejaaropgave_spec,
-                        "BelasteAlimentatie.WaardeBedrag",
-                        default=0,
-                    )
-                )
-                / 100
-                if glom(
-                    specificatiejaaropgave_spec,
-                    "BelasteAlimentatie.WaardeBedrag",
-                    default=0,
-                )
-                else 0
-            ),
-        },
+        # TODO: figure out where this is used; relation to `arbeitskorting`?
+        # "belaste_alimentatie": {
+        #     "sign": get_sign(
+        #         specificatiejaaropgave_spec, "BelasteAlimentatie.CdPositiefNegatief"
+        #     ),
+        #     "bedrag": (
+        #         float(
+        #             glom(
+        #                 specificatiejaaropgave_spec,
+        #                 "BelasteAlimentatie.WaardeBedrag",
+        #                 default=0,
+        #             )
+        #         )
+        #         / 100
+        #         if glom(
+        #             specificatiejaaropgave_spec,
+        #             "BelasteAlimentatie.WaardeBedrag",
+        #             default=0,
+        #         )
+        #         else 0
+        #     ),
+        # },
     }
 
-    # In case we have multiple rows
-    if glom(specificatiejaaropgave_spec, "Loonheffingskorting[2]", default=""):
-        loon_heffings_korting_2 = {
-            "Loonheffingskorting[2]": {
-                "ingangsdatum_2": format_date(
-                    glom(
-                        specificatiejaaropgave_spec,
-                        "Loonheffingskorting[2].Ingangsdatum",
-                        default="",
-                    )
-                ),
-                "cdloonheffingskorting_2": glom(
-                    specificatiejaaropgave_spec,
-                    "Loonheffingskorting[2].CdLoonheffingskorting",
-                    default="",
-                ),
-            },
-        }
-        jaaropgave.update(loon_heffings_korting_2)
+    #
+    # update jaaropgave with loon_heffings_korting (list with potentially only one element)
+    #
+    date_list = glom(specificatiejaaropgave_spec, "Loonheffingskorting")
 
-    if glom(specificatiejaaropgave_spec, "Loonheffingskorting[3]", default=""):
-        loon_heffings_korting_3 = {
-            "Loonheffingskorting[3]": {
-                "ingangsdatum_3": format_date(
-                    glom(
-                        specificatiejaaropgave_spec,
-                        "Loonheffingskorting[3].Ingangsdatum",
-                        default="",
-                    )
-                ),
-                "cdloonheffingskorting_3": glom(
-                    specificatiejaaropgave_spec,
-                    "Loonheffingskorting[3].CdLoonheffingskorting",
-                    default="",
-                ),
-            },
+    # replace dict keys with our own for consistency
+    for date in date_list:
+        date["ingangsdatum"] = date.pop("Ingangsdatum")
+        date["code"] = date.pop("CdLoonheffingskorting")
+
+    loon_heffings_korting = {
+        "loon_heffings_korting": {
+            "key": "Loonheffingskorting Met ingang van",
+            "code_label": "Code",
+            "dates": date_list,
         }
-        jaaropgave.update(loon_heffings_korting_3)
+    }
+
+    jaaropgave.update(**loon_heffings_korting)
 
     return {
         "client": client,

@@ -25,6 +25,11 @@ class SSDBaseClient:
     def __init__(self):
         self.config = SSDConfig.get_solo()
 
+    def _format_time(self):
+        local_time = timezone.localtime(timezone.now())
+        formatted_time = local_time.strftime("%Y-%m-%dT%H:%M:%S%z")
+        return formatted_time
+
     def _get_headers(self) -> dict[str, str]:
         return {
             "Content-type": "text/xml",
@@ -38,11 +43,6 @@ class SSDBaseClient:
             "verify": verify,
         }
 
-    def _format_time(self):
-        local_time = timezone.localtime(timezone.now())
-        formatted_time = local_time.strftime("%Y-%m-%dT%H:%M:%S%z")
-        return formatted_time
-
     def _get_base_context(self) -> dict:
         data = {
             "message_id": uuid4().urn,
@@ -54,11 +54,16 @@ class SSDBaseClient:
         }
         return data
 
-    def _request(self, body: str) -> Response:
-        """Wrap around `requests.post` with headers and auth details"""
+    def _make_request_body(self, **kwargs) -> str:
+        context = {**self._get_base_context(), **kwargs}
+        return loader.render_to_string(self.request_template, context)
+
+    def templated_request(self, **kwargs) -> Response:
+        """Wrap around `requests.post` with headers, auth details, request body"""
 
         auth_kwargs = self._get_auth_kwargs()
         headers = self._get_headers()
+        body = self._make_request_body(**kwargs)
 
         response = requests.post(
             url=self.config.service.url,
@@ -72,22 +77,10 @@ class SSDBaseClient:
         dt = dateutil.parser.parse(file_name)
         return dt.strftime("%Y%m")
 
-    def templated_request(self, **kwargs) -> Response:
-        """Perform SOAP request with XML request template"""
-
-        context = {**self._get_base_context(), **kwargs}
-
-        body = loader.render_to_string(self.request_template, context)
-
-        return self._request(body)
-
 
 class JaaropgaveClient(SSDBaseClient):
     """
     SSD client for retrieving yearly reports
-
-    Values for `bsn` and `dienst_jaar` in the main function are
-    retrieved and supplied from the call site (the view)
     """
 
     html_template = BASE_DIR / "ssd/templates/jaaropgave.html"
@@ -107,22 +100,29 @@ class JaaropgaveClient(SSDBaseClient):
         response = self.templated_request(**extra_context)
         return response.text
 
-    def get_yearly_report(self, bsn: str, dienst_jaar: str) -> bytes:
+    def get_yearly_report(self, bsn: str = None, dienst_jaar: str = None) -> bytes:
         """
         :returns: the yearly benefits report PDF as bytes
         """
-        jaaropgave = self._get_jaaropgave(bsn, dienst_jaar)
+        # jaaropgave = self._get_jaaropgave(bsn, dienst_jaar)
+
+        # TODO: remove when done testing
+        xml_response = "src/open_inwoner/ssd/tests/files/jaaropgave_response.xml"
+        with open(xml_response, "r") as file:
+            jaaropgave = file.read()
+
         data = get_jaaropgave_dict(jaaropgave)
         pdf_content = render_pdf(self.html_template, context={**data})
+
+        with open("src/open_inwoner/ssd/tests/files/test.pdf", "bw") as file:
+            file.write(pdf_content)
+
         return pdf_content
 
 
 class UitkeringClient(SSDBaseClient):
     """
     SSD client for retrieving monthly reports
-
-    Values for `bsn` and `period` (= year + month) in the main function are
-    retrieved and supplied from the call site (the view)
     """
 
     html_template = BASE_DIR / "ssd/templates/maandspecificatie.html"
@@ -147,10 +147,15 @@ class UitkeringClient(SSDBaseClient):
         # maandspecificatie = self._get_maandspecificatie(bsn, period)
 
         # TODO: remove when done testing
-        xml_response = "src/open_inwoner/ssd/tests/files/uitkering_testresponse.xml"
+        xml_response = "src/open_inwoner/ssd/tests/files/uitkering_response.xml"
         with open(xml_response, "r") as file:
             maandspecificatie = file.read()
 
         data = get_uitkering_dict(maandspecificatie)
         pdf_content = render_pdf(self.html_template, context={**data})
+
+        # TODO: remove when done testing
+        with open("src/open_inwoner/ssd/tests/files/test.pdf", "wb") as file:
+            file.write(pdf_content)
+
         return pdf_content

@@ -1,0 +1,71 @@
+// global
+ul.dashed {
+  list-style-type: '- ';
+}
+
+// containers
+.flex-container {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  text-align: left;
+}
+.flex-box.heading {
+  width: 35%;
+  line-height: 5px;
+  font-size: 11px;
+  text-align: left;
+}
+.flex-container.extra-margin-top {
+  margin-top: 3em;
+}
+
+// heading/title
+.address {
+  margin-top: 1.5em;
+}
+
+// tables
+.table-fixed {
+  table-layout: fixed;
+}
+.table-jaar tr:last-child {
+  border-bottom: none;
+}
+.table-jaar th {
+  text-align: center;
+  font-size: 11px;
+  padding-top: 1.5em;
+  padding-bottom: 0.5em;
+}
+.table-jaar td {
+  border: 1px solid black;
+  text-align: center;
+}
+
+// styling for table rows with uneven col width
+.table-extra-col td:not(:nth-child(5)) {
+  width: 23%;
+}
+.table-extra-col td:last-child {
+  width: 8%;
+}
+
+// section + subsection
+.section .heading {
+  font-size: 14px;
+  padding-top: 2em;
+  padding-bottom: 0.5em;
+}
+
+.subsection-heading {
+  font-size: 12px;
+}
+.subsection > p {
+  margin-top: 0.5em;
+  font-size: 11px;
+}
+
+.extra-margin {
+  margin-top: 1.5em;
+}
