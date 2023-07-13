@@ -20,7 +20,7 @@
                 <div class="actions__actions">
                     {% button icon="file-pdf" text=_("Export to PDF") hide_text=True href="profile:action_export" uuid=action.uuid icon_outlined=True transparent=True %}
                     {% if action|is_connected:request.user %}
-                        {% dropdown icon="settings" %}
+                        {% dropdown icon="more_horiz" %}
                             <div class="dropdown__item">
                                 {% get_action_edit_url action=action plan=plan as action_url %}
                                 {% button icon="edit" text=_("Bewerken") href=action_url icon_outlined=True transparent=True %}
