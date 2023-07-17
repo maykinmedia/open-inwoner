@@ -4,7 +4,7 @@
     <aside class="step-indicator" aria-label="{% trans "Stappen indicator" %}">
         <ol class="step-indicator__list">
             {% for step in steps %}
-                <li class="step-indicator__list-item{% if step.is_current %} step-indicator__list-item--active{% elif step.is_completed %} step-indicator__list-item--completed{% endif %} P" data-step={{ step.step }} {% if step.is_current %}aria-current="step"{% endif %} aria-label="{{ step.is_completed|yesno:_("afgerond,huidige stap") }}">
+                <li class="step-indicator__list-item{% if step.is_current %} step-indicator__list-item--active{% elif step.is_completed %} step-indicator__list-item--completed{% endif %}" data-step={{ step.step }} {% if step.is_current %}aria-current="step"{% endif %} aria-label="{{ step.is_completed|yesno:_("afgerond,huidige stap") }}">
                     {% if step.object %}
                         {% link href=step.object.get_absolute_url secondary=True bold=True text=step.object_display %}
                     {% endif %}
