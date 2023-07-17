@@ -1,17 +1,13 @@
 table {
   width: 100%;
-  empty-cells: hide;
 }
-.maand-table tr:last-child {
-  border-bottom: none;
-}
-.maand-table tr:nth-child(even) {
+table.monthly-report tr:nth-child(even) {
   background-color: #f5f4f3;
 }
-.maand-table tr:nth-child(odd) {
+table.monthly-report tr:nth-child(odd) {
   background-color: #efeeed;
 }
-.maand-table td:first-child {
+table.monthly-report td:first-child {
   width: 17em;
 }
 

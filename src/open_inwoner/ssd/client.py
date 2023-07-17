@@ -104,18 +104,18 @@ class JaaropgaveClient(SSDBaseClient):
         """
         :returns: the yearly benefits report PDF as bytes
         """
-        jaaropgave = self._get_jaaropgave(bsn, dienstjaar)
+        # jaaropgave = self._get_jaaropgave(bsn, dienstjaar)
 
         # TODO: remove when done testing
-        # xml_response = "src/open_inwoner/ssd/tests/files/jaaropgave_response.xml"
-        # with open(xml_response, "r") as file:
-        #     jaaropgave = file.read()
+        xml_response = "src/open_inwoner/ssd/tests/files/jaaropgave_response.xml"
+        with open(xml_response, "r") as file:
+            jaaropgave = file.read()
 
         data = get_jaaropgave_dict(jaaropgave)
         pdf_content = render_pdf(self.html_template, context={**data})
 
-        # with open("src/open_inwoner/ssd/tests/files/test.pdf", "bw") as file:
-        #     file.write(pdf_content)
+        with open("src/open_inwoner/ssd/tests/files/test.pdf", "bw") as file:
+            file.write(pdf_content)
 
         return pdf_content
 
@@ -144,18 +144,18 @@ class UitkeringClient(SSDBaseClient):
         """
         :returns: the monthly benefits report PDF as bytes
         """
-        maandspecificatie = self._get_maandspecificatie(bsn, period)
+        # maandspecificatie = self._get_maandspecificatie(bsn, period)
 
         # TODO: remove when done testing
-        # xml_response = "src/open_inwoner/ssd/tests/files/uitkering_response.xml"
-        # with open(xml_response, "r") as file:
-        #     maandspecificatie = file.read()
+        xml_response = "src/open_inwoner/ssd/tests/files/uitkering_response.xml"
+        with open(xml_response, "r") as file:
+            maandspecificatie = file.read()
 
         data = get_uitkering_dict(maandspecificatie)
         pdf_content = render_pdf(self.html_template, context={**data})
 
         # TODO: remove when done testing
-        # with open("src/open_inwoner/ssd/tests/files/test.pdf", "wb") as file:
-        #     file.write(pdf_content)
+        with open("src/open_inwoner/ssd/tests/files/test.pdf", "wb") as file:
+            file.write(pdf_content)
 
         return pdf_content

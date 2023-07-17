@@ -328,8 +328,8 @@ def get_jaaropgave_dict(xml_data):
             "sign": get_sign(
                 specificatiejaaropgave_spec, "IngehoudenPremieZVW.CdPositiefNegatief"
             ),
-            "value": format_float_repr(
-                glom(specificatiejaaropgave_spec, "IngehoudenPremieZVW.WaardeBedrag")
+            "value": glom(
+                specificatiejaaropgave_spec, "IngehoudenPremieZVW.WaardeBedrag"
             ),
         },
         "vergoeding_premie_zvw": {

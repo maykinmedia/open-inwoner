@@ -10,7 +10,7 @@ def generate_pdf(file_url: str) -> bytes:
         return pdf_file
 
 
-def get_filename_stem(filename: str) -> str:
+def strip_extension(filename: str) -> str:
     """Return filename minus the extension"""
 
     parts = os.path.splitext(filename)

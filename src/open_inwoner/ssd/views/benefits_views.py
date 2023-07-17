@@ -3,11 +3,11 @@ from django.http import HttpResponse
 from django.views.generic import DetailView, TemplateView
 
 from ..client import JaaropgaveClient, UitkeringClient
-from ..utils import get_filename_stem
+from ..utils import strip_extension
 
 
 class MonthlyBenefitsListView(LoginRequiredMixin, TemplateView):
-    template_name = "pages/ssd/monthly_benefits_list.html"
+    template_name = "pages/ssd/monthly_reports_list.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -20,7 +20,7 @@ class MonthlyBenefitsListView(LoginRequiredMixin, TemplateView):
 
 
 class YearlyBenefitsListView(LoginRequiredMixin, TemplateView):
-    template_name = "pages/ssd/yearly_benefits_list.html"
+    template_name = "pages/ssd/yearly_reports_list.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -41,17 +41,16 @@ class DownloadYearlyBenefitsView(DownloadBenefitsView):
 
     ssd_client = JaaropgaveClient()
 
-    # TODO: implement yearly reports download
     def get(self, request, *args, **kwargs):
         file_name = kwargs["file_name"]
-        file_name_stem = get_filename_stem(file_name)
+        file_name = strip_extension(file_name)
 
         bsn = request.user.bsn
 
         pdf_file = self.ssd_client.get_yearly_report(bsn, file_name)
 
         response = HttpResponse(pdf_file, content_type="application/pdf")
-        response["Content-Disposition"] = f"attachment; filename={file_name_stem}.pdf"
+        response["Content-Disposition"] = f"attachment; filename={file_name}.pdf"
         return response
 
 
@@ -62,7 +61,7 @@ class DownloadMonthlyBenefitsView(DownloadBenefitsView):
 
     def get(self, request, *args, **kwargs):
         file_name = kwargs["file_name"]
-        file_name_stem = get_filename_stem(file_name)
+        file_name_stem = strip_extension(file_name)
 
         bsn = request.user.bsn
         period = self.ssd_client.file_name_to_period(file_name)

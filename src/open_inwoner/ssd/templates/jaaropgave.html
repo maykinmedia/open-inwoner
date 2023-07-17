@@ -11,11 +11,11 @@
   <!-- HEADER -->
   <!-- Title -->
   <div class="flex-container extra-margin-top">
-    <div class="flex-box heading" >
-      <span><h1>Jaaropgave {{ jaaropgave.dienstjaar }}</h1></span>
+    <div class="flex-box heading">
+      <h1>Jaaropgave {{ jaaropgave.dienstjaar }}</h1>
     </div>
     <div class="flex-box heading">
-      <span><h1>Gemeente {{ inhoudingsplichtige.gemeentenaam }}</h1></span>
+      <h1>Gemeente {{ inhoudingsplichtige.gemeentenaam }}</h1>
     </div>
   </div>
   <!-- Addresses -->
@@ -41,7 +41,7 @@
     </div>
     <!-- row 1 -->
     <div class="subsection">
-      <table class="table-jaar table-extra-col">
+      <table class="yearly-report table-extra-col">
           <tr>
             <th>{{ jaaropgave.fiscaalloon.key }}</th>
             <th>{{ jaaropgave.loonheffing.key }}</th>
@@ -72,7 +72,7 @@
     </div>
     <!-- row 2 -->
     <div class="subsection">
-      <table class="table-jaar table-fixed">
+      <table class="yearly-report table-fixed">
         <tr>
           <th>{{ client.bsn_label }}</th>
           <th>{{ jaaropgave.loon_zorgverzekeringswet.key }}</th>
@@ -90,7 +90,7 @@
     </div>
     <!-- row 3 -->
     <div class="subsection">
-      <table class="table-jaar table-fixed">
+      <table class="yearly-report table-fixed">
         <tr>
           <!-- Hard-coded for now; see below -->
           <th>Verrekende levensloopverlofkorting</th>
@@ -101,8 +101,8 @@
         <tr>
           <!-- Hard-coded to 0 for now as different values don't make sense for the current purpose -->
           <!-- Cf. the Response2018.xslt template provided in the Taiga files --> 
-          <td>0,00</td>
-          <td>0.00</td>
+          <td>0</td>
+          <td>0</td>
           <td>{{ jaaropgave.werkgevers_heffing_premie.value }}</td>
           <td>{{ jaaropgave.code_loonbelastingtabel.value }}</td>
         </tr>

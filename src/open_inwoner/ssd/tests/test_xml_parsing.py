@@ -185,7 +185,7 @@ class XMLParsingTests(TestCase):
             data["jaaropgave"]["ingehouden_bijdrage"]["key"],
             "Ingehouden bijdrage Zorgverzekeringswet",
         )
-        self.assertEqual(data["jaaropgave"]["ingehouden_bijdrage"]["value"], "0,00")
+        self.assertEqual(data["jaaropgave"]["ingehouden_bijdrage"]["value"], "0")
         self.assertEqual(
             data["jaaropgave"]["loon_heffings_korting"]["key"],
             "Loonheffingskorting Met ingang van",
