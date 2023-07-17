@@ -14,7 +14,7 @@ export class Dropdown {
     event.preventDefault()
     setTimeout(() => {
       this.node.classList.add('dropdown--open')
-      this.node.setAttribute('aria-expanded', 'true')
+      this.button.setAttribute('aria-expanded', 'true')
     }, 5)
   }
 
@@ -24,7 +24,7 @@ export class Dropdown {
       (event.type === 'keydown' && event.key === 'Escape')
     ) {
       this.node.classList.remove('dropdown--open')
-      this.node.setAttribute('aria-expanded', 'false')
+      this.button.setAttribute('aria-expanded', 'false')
     }
   }
 }
