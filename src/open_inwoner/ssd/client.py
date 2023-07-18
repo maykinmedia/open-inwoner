@@ -1,16 +1,20 @@
+import logging
 from pathlib import Path
+from typing import Optional
 from uuid import uuid4
 
 from django.template import loader
 from django.utils import timezone
 
-import dateutil
 import requests
 from requests import Response
 
 from ..utils.export import render_pdf
 from .models import SSDConfig
+from .utils import convert_file_name_to_period
 from .xml import get_jaaropgave_dict, get_uitkering_dict
+
+logger = logging.getLogger(__name__)
 
 BASE_DIR = Path(__file__).absolute().parent.parent
 
@@ -65,17 +69,21 @@ class SSDBaseClient:
         headers = self._get_headers()
         body = self._make_request_body(**kwargs)
 
-        response = requests.post(
-            url=self.config.service.url,
-            data=body.encode("utf-8"),
-            headers=headers,
-            **auth_kwargs,
-        )
+        try:
+            response = requests.post(
+                url=self.config.service.url,
+                data=body.encode("utf-8"),
+                headers=headers,
+                **auth_kwargs,
+            )
+        except requests.exceptions.RequestException:
+            logger.exception("Requests exception")
+            raise
+
         return response
 
-    def file_name_to_period(self, file_name):
-        dt = dateutil.parser.parse(file_name)
-        return dt.strftime("%Y%m")
+    def get_report(self, bsn: str, dienstjaar: str) -> Optional[bytes]:
+        return NotImplemented
 
 
 class JaaropgaveClient(SSDBaseClient):
@@ -89,22 +97,18 @@ class JaaropgaveClient(SSDBaseClient):
         "http://www.centric.nl/GWS/Diensten/JaarOpgaveClient-v0400/JaarOpgaveInfo"
     )
 
-    def _get_jaaropgave(self, bsn: str, year: str) -> str:
+    def get_report(self, bsn: str, file_name: str) -> Optional[bytes]:
         """
-        :returns: XML containing the yearly benefits report
+        :returns: the yearly benefits report PDF (bytes) if the request to the
+        SOAP service is successfull, `None` otherwise
         """
-        extra_context = {
-            "bsn": bsn,
-            "dienstjaar": year,
-        }
-        response = self.templated_request(**extra_context)
-        return response.text
 
-    def get_yearly_report(self, bsn: str = None, dienstjaar: str = None) -> bytes:
-        """
-        :returns: the yearly benefits report PDF as bytes
-        """
-        # jaaropgave = self._get_jaaropgave(bsn, dienstjaar)
+        # response = self.templated_request(bsn=bsn, dienstjaar=file_name)
+
+        # if response.status_code >= 300:
+        #     return None
+
+        # jaaropgave = response.text
 
         # TODO: remove when done testing
         xml_response = "src/open_inwoner/ssd/tests/files/jaaropgave_response.xml"
@@ -114,6 +118,7 @@ class JaaropgaveClient(SSDBaseClient):
         data = get_jaaropgave_dict(jaaropgave)
         pdf_content = render_pdf(self.html_template, context={**data})
 
+        # TODO: remove when done testing
         with open("src/open_inwoner/ssd/tests/files/test.pdf", "bw") as file:
             file.write(pdf_content)
 
@@ -129,22 +134,20 @@ class UitkeringClient(SSDBaseClient):
     request_template = BASE_DIR / "soap/templates/ssd/maandspecificatie.xml"
     soap_action = "http://www.centric.nl/GWS/Diensten/UitkeringsSpecificatieClient-v0600/UitkeringsSpecificatieInfo"
 
-    def _get_maandspecificatie(self, bsn: str, period: str) -> str:
+    def get_report(self, bsn: str, file_name: str) -> Optional[bytes]:
         """
-        :returns: XML containing the monthly benefits report
+        :returns: the monthly benefits report PDF (bytes) if the request to the
+        SOAP service is successfull, `None` otherwise
         """
-        extra_context = {
-            "bsn": bsn,
-            "period": period,
-        }
-        response = self.templated_request(**extra_context)
-        return response.text
 
-    def get_monthly_report(self, bsn: str = None, period: str = None) -> bytes:
-        """
-        :returns: the monthly benefits report PDF as bytes
-        """
-        # maandspecificatie = self._get_maandspecificatie(bsn, period)
+        # response = self.templated_request(
+        #     bsn=bsn, period=convert_file_name_to_period(file_name)
+        # )
+
+        # if response.status_code >= 300:
+        #     return None
+
+        # maandspecificatie = response.text
 
         # TODO: remove when done testing
         xml_response = "src/open_inwoner/ssd/tests/files/uitkering_response.xml"

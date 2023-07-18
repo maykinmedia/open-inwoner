@@ -1,5 +1,6 @@
 import os
 
+import dateutil
 from weasyprint import HTML
 
 
@@ -15,3 +16,8 @@ def strip_extension(filename: str) -> str:
 
     parts = os.path.splitext(filename)
     return parts[0]
+
+
+def convert_file_name_to_period(file_name):
+    dt = dateutil.parser.parse(file_name)
+    return dt.strftime("%Y%m")

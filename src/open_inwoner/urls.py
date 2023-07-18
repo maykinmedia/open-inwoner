@@ -111,7 +111,6 @@ urlpatterns = [
     # TODO move search to products cms app?
     path("", include("open_inwoner.search.urls", namespace="search")),
     re_path(r"^", include("cms.urls")),
-    # path("uitkeringen/", include("open_inwoner.ssd.urls")),
 ]
 
 # NOTE: The staticfiles_urlpatterns also discovers static files (ie. no need to run collectstatic). Both the static

@@ -1,73 +1,79 @@
+from typing import Union
+
+from django import forms
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
-from django.views.generic import DetailView, TemplateView
+from django.shortcuts import redirect
+from django.urls import reverse, reverse_lazy
+from django.views.generic import DetailView
+from django.views.generic.edit import FormView
 
 from ..client import JaaropgaveClient, UitkeringClient
+from ..forms import MonthlyReportsForm, YearlyReportsForm
 from ..utils import strip_extension
 
 
-class MonthlyBenefitsListView(LoginRequiredMixin, TemplateView):
+#
+# Benefits reports form views
+#
+class BenefitsFormView(LoginRequiredMixin, FormView):
+    template_name: str
+    form_class: forms.Form
+    success_url: str
+    success_reverse: str
+
+    def get_success_url(self):
+        form = self.get_form()
+
+        return reverse_lazy(
+            self.success_reverse,
+            kwargs={
+                "file_name": form.data["report"],
+            },
+        )
+
+
+class MonthlyBenefitsFormView(BenefitsFormView):
     template_name = "pages/ssd/monthly_reports_list.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        # TODO: make this configurable in admin
-        monthly_benefits = ["May 2023", "June 2023"]
-        context["monthly_benefits"] = monthly_benefits
-
-        return context
+    form_class = MonthlyReportsForm
+    success_reverse = "profile:download_monthly_benefits"
 
 
-class YearlyBenefitsListView(LoginRequiredMixin, TemplateView):
+class YearlyBenefitsFormView(BenefitsFormView):
     template_name = "pages/ssd/yearly_reports_list.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        # TODO: make this configurable in admin
-        yearly_benefits = ["2022", "2023"]
-        context["yearly_benefits"] = yearly_benefits
-
-        return context
+    form_class = YearlyReportsForm
+    success_reverse = "profile:download_yearly_benefits"
 
 
+#
+# Download views
+#
 class DownloadBenefitsView(LoginRequiredMixin, DetailView):
     """Base class for the download views"""
 
-
-class DownloadYearlyBenefitsView(DownloadBenefitsView):
-    """Download yearly benefits reports ('Jaaropgaven')"""
-
-    ssd_client = JaaropgaveClient()
+    ssd_client: Union[JaaropgaveClient, UitkeringClient]
+    fail_reverse: str
 
     def get(self, request, *args, **kwargs):
-        file_name = kwargs["file_name"]
-        file_name = strip_extension(file_name)
-
+        file_name = strip_extension(kwargs["file_name"])
         bsn = request.user.bsn
 
-        pdf_file = self.ssd_client.get_yearly_report(bsn, file_name)
+        pdf_file = self.ssd_client.get_report(bsn, file_name)
+
+        # no report found: redirect back to index view
+        if pdf_file is None:
+            return redirect(reverse(self.fail_reverse) + f"?report={file_name}")
 
         response = HttpResponse(pdf_file, content_type="application/pdf")
         response["Content-Disposition"] = f"attachment; filename={file_name}.pdf"
         return response
 
 
+class DownloadYearlyBenefitsView(DownloadBenefitsView):
+    ssd_client = JaaropgaveClient()
+    fail_reverse = "profile:yearly_benefits_index"
+
+
 class DownloadMonthlyBenefitsView(DownloadBenefitsView):
-    """Download monthly benefits reports ('Maandspecificaties')"""
-
     ssd_client = UitkeringClient()
-
-    def get(self, request, *args, **kwargs):
-        file_name = kwargs["file_name"]
-        file_name_stem = strip_extension(file_name)
-
-        bsn = request.user.bsn
-        period = self.ssd_client.file_name_to_period(file_name)
-
-        pdf_file = self.ssd_client.get_monthly_report(bsn, period)
-
-        response = HttpResponse(pdf_file, content_type="application/pdf")
-        response["Content-Disposition"] = f"attachment; filename={file_name_stem}.pdf"
-        return response
+    fail_reverse = "profile:monthly_benefits_index"

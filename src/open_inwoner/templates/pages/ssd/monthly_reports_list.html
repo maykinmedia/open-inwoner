@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n grid_tags %}
+{% load i18n grid_tags dropdown_tags button_tags %}
 
 {% block content %}
     {% render_grid %}
@@ -19,13 +19,20 @@
                     <div class="tabs__body">
                         <div id="maandspecificaties" class="tab__content active">
                             <p>{% trans "Selecteer de maand die u wilt downloaden. Let op: de huidige maand is pas vanaf de 25ste zichtbaar. Deze uitkeringsspecificatie is een momentopname van de aan u uitbetaalde uitkering. Aan deze specificatie kunt u geen rechten ontlenen." %}</p>
-                            <ul>
-                            {% for report in monthly_benefits %}
-                                <li>
-                                    <a href="{% url 'profile:download_monthly_benefits' file_name=report %}">{{ report }}</a>
-                                </li>
-                            {% endfor %}
-                            </ul>
+
+                            <form method="post">
+                              {% csrf_token %}
+                              {{ form }}
+                              <input type="submit" value="{% trans 'Get report' %}" class="button">
+                            </form>
+
+                            <br>
+
+                            {% if request.GET.status == "not_found" %}
+                              {% blocktrans with time_period=request.GET.report %}
+                                The report for {{ time_period }} could not be found
+                              {% endblocktrans %}
+                            {% endif %}
                         </div>
                     </div>
                 </div>

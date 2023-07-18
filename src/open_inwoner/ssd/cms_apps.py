@@ -11,3 +11,4 @@ class SSDApphook(CMSApp):
 
     def get_urls(self, page=None, language=None, **kwargs):
         return ["open_inwoner.cms.ssd.urls"]
+        # return ["open_inwoner.profile.urls"]

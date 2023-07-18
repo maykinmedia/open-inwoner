@@ -28,8 +28,8 @@ from open_inwoner.accounts.views.actions import ActionDeleteView
 from open_inwoner.ssd.views.benefits_views import (  # BenefitsOverview,
     DownloadMonthlyBenefitsView,
     DownloadYearlyBenefitsView,
-    MonthlyBenefitsListView,
-    YearlyBenefitsListView,
+    MonthlyBenefitsFormView,
+    YearlyBenefitsFormView,
 )
 
 app_name = "profile"
@@ -69,11 +69,11 @@ action_patterns = [
 benefits_patterns = [
     path(
         "maandspecificaties/",
-        MonthlyBenefitsListView.as_view(),
+        MonthlyBenefitsFormView.as_view(),
         name="monthly_benefits_index",
     ),
     path(
-        "jaaropgaven/", YearlyBenefitsListView.as_view(), name="yearly_benefits_index"
+        "jaaropgaven/", YearlyBenefitsFormView.as_view(), name="yearly_benefits_index"
     ),
     path(
         "jaaropgaven/<str:file_name>/download",

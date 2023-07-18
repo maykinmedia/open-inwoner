@@ -15,7 +15,7 @@
       <h1>Jaaropgave {{ jaaropgave.dienstjaar }}</h1>
     </div>
     <div class="flex-box heading">
-      <h1>Gemeente {{ inhoudingsplichtige.gemeentenaam }}</h1>
+      <h1><span class="logo">Gemeente {{ inhoudingsplichtige.gemeentenaam }}</span></h1>
     </div>
   </div>
   <!-- Addresses -->
@@ -53,7 +53,7 @@
             <td>{{ jaaropgave.fiscaalloon.sign }} {{ jaaropgave.fiscaalloon.value }}</td>
             <td>{{ jaaropgave.loonheffing.sign }} {{ jaaropgave.loonheffing.value }}</td>
             <!-- TODO: check if this needs to be changed; hard-coded for now. -->
-            <td>0.00</td>
+            <td>0</td>
             <!-- Display first date -->
             <td>{{ jaaropgave.loon_heffings_korting.dates.0.ingangsdatum }}</td>
             <td>{{ jaaropgave.loon_heffings_korting.dates.0.code }}</td>

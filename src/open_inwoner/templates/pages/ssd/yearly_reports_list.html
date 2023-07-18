@@ -19,13 +19,20 @@
                     <div class="tabs__body">
                         <div id="jaaropgaven" class="tab__content active">
                             <p>{% trans "Selecteer het jaar dat u wilt downloaden. Aan deze jaaropgaven kunt u geen rechten ontlenen." %}</p>
-                            <ul>
-                            {% for report in yearly_benefits %}
-                                <li>
-                                    <a href="{% url 'profile:download_yearly_benefits' file_name=report %}" target="_blank" rel="noopener noreferrer">{{ report }}</a>
-                                </li>
-                            {% endfor %}
-                            </ul>
+
+                            <form method="post">
+                              {% csrf_token %}
+                              {{ form }}
+                              <input type="submit" value="{% trans 'Get report' %}" class="button">
+                            </form>
+
+                            <br>
+
+                            {% if request.GET.report %}
+                              {% blocktrans with time_period=request.GET.report %}
+                                The report for {{ time_period }} could not be found
+                              {% endblocktrans %}
+                            {% endif %}
                         </div>
                     </div>
                 </div>

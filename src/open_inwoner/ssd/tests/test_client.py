@@ -138,8 +138,21 @@ class SSDClientRequestInterfaceTest(TestCase):
         )
 
 
-@patch("django.utils.timezone.localtime", return_value=datetime(2023, 7, 12, 11, 0))
 class UitkeringClientTest(TestCase):
+    @requests_mock.Mocker()
+    def test_request_status_not_ok(self, mock_request):
+        client = UitkeringClient()
+        client.config = SSDConfigFactory.build(
+            service__url="https://example.com/soap-service",
+        )
+
+        for code in [300, 400, 500]:
+            with self.subTest(code=code):
+                mock_request.post("https://example.com/soap-service", status_code=code)
+                res = client.get_report(bsn="12345", file_name="July 1985")
+                self.assertIsNone(res)
+
+    @patch("django.utils.timezone.localtime", return_value=datetime(2023, 7, 12, 11, 0))
     @requests_mock.Mocker()
     def test_request_body(self, mock_datetime, mock_request):
         client = UitkeringClient()
@@ -149,7 +162,7 @@ class UitkeringClientTest(TestCase):
 
         mock_request.post("https://example.com/soap-service")
 
-        client.get_monthly_report(bsn="12345", period="198507")
+        client.get_report(bsn="12345", file_name="July 1985")
 
         # get request body and parse XML
         body = mock_request.last_request.body
@@ -171,8 +184,21 @@ class UitkeringClientTest(TestCase):
         self.assertEqual(root.findtext(".//Periodenummer"), "198507")
 
 
-@patch("django.utils.timezone.localtime", return_value=datetime(2023, 7, 12, 11, 0))
 class JaaropgaveClientTest(TestCase):
+    @requests_mock.Mocker()
+    def test_request_status_not_ok(self, mock_request):
+        client = JaaropgaveClient()
+        client.config = SSDConfigFactory.build(
+            service__url="https://example.com/soap-service",
+        )
+
+        for code in [300, 400, 500]:
+            with self.subTest(code=code):
+                mock_request.post("https://example.com/soap-service", status_code=code)
+                res = client.get_report(bsn="12345", file_name="1985")
+                self.assertIsNone(res)
+
+    @patch("django.utils.timezone.localtime", return_value=datetime(2023, 7, 12, 11, 0))
     @requests_mock.Mocker()
     def test_request_body(self, mock_datetime, mock_request):
         client = JaaropgaveClient()
@@ -182,7 +208,7 @@ class JaaropgaveClientTest(TestCase):
 
         mock_request.post("https://example.com/soap-service")
 
-        client.get_yearly_report(bsn="12345", dienstjaar="1985")
+        client.get_report(bsn="12345", file_name="1985")
 
         # get request body and parse XML
         body = mock_request.last_request.body
