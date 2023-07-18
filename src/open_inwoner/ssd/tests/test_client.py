@@ -149,7 +149,7 @@ class UitkeringClientTest(TestCase):
         for code in [300, 400, 500]:
             with self.subTest(code=code):
                 mock_request.post("https://example.com/soap-service", status_code=code)
-                res = client.get_report(bsn="12345", file_name="July 1985")
+                res = client.get_report(bsn="12345", report_date_iso="1985-07-25")
                 self.assertIsNone(res)
 
     @patch("django.utils.timezone.localtime", return_value=datetime(2023, 7, 12, 11, 0))
@@ -162,7 +162,7 @@ class UitkeringClientTest(TestCase):
 
         mock_request.post("https://example.com/soap-service")
 
-        client.get_report(bsn="12345", file_name="July 1985")
+        client.get_report(bsn="12345", report_date_iso="1985-07-25")
 
         # get request body and parse XML
         body = mock_request.last_request.body
@@ -195,7 +195,7 @@ class JaaropgaveClientTest(TestCase):
         for code in [300, 400, 500]:
             with self.subTest(code=code):
                 mock_request.post("https://example.com/soap-service", status_code=code)
-                res = client.get_report(bsn="12345", file_name="1985")
+                res = client.get_report(bsn="12345", report_date_iso="1985-12-24")
                 self.assertIsNone(res)
 
     @patch("django.utils.timezone.localtime", return_value=datetime(2023, 7, 12, 11, 0))
@@ -208,7 +208,7 @@ class JaaropgaveClientTest(TestCase):
 
         mock_request.post("https://example.com/soap-service")
 
-        client.get_report(bsn="12345", file_name="1985")
+        client.get_report(bsn="12345", report_date_iso="1985-12-12")
 
         # get request body and parse XML
         body = mock_request.last_request.body

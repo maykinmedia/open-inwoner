@@ -1,23 +1,17 @@
-import os
+from datetime import date
 
 import dateutil
-from weasyprint import HTML
 
 
-def generate_pdf(file_url: str) -> bytes:
-    with open(file_url, "r") as html_template:
-        html_content = html_template.read()
-        pdf_file = HTML(string=html_content).write_pdf()
-        return pdf_file
+# TODO delete
+def format_report_name(report_name: str) -> str:
+    if report_name.isdigit():
+        return f"{report_name}"
+    parts = report_name.split("-")
+    return f"{parts[0].capitalize()} {parts[1]}"
 
 
-def strip_extension(filename: str) -> str:
-    """Return filename minus the extension"""
-
-    parts = os.path.splitext(filename)
-    return parts[0]
-
-
-def convert_file_name_to_period(file_name):
-    dt = dateutil.parser.parse(file_name)
+# TODO: delete
+def convert_report_to_period(report_date: str) -> str:
+    dt = dateutil.parser.parse(report_date)
     return dt.strftime("%Y%m")

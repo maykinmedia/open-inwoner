@@ -25,9 +25,7 @@ from open_inwoner.accounts.views import (
     NecessaryFieldsUserView,
 )
 from open_inwoner.accounts.views.actions import ActionDeleteView
-from open_inwoner.ssd.views.benefits_views import (  # BenefitsOverview,
-    DownloadMonthlyBenefitsView,
-    DownloadYearlyBenefitsView,
+from open_inwoner.ssd.views.benefits_views import (
     MonthlyBenefitsFormView,
     YearlyBenefitsFormView,
 )
@@ -74,16 +72,6 @@ benefits_patterns = [
     ),
     path(
         "jaaropgaven/", YearlyBenefitsFormView.as_view(), name="yearly_benefits_index"
-    ),
-    path(
-        "jaaropgaven/<str:file_name>/download",
-        DownloadYearlyBenefitsView.as_view(),
-        name="download_yearly_benefits",
-    ),
-    path(
-        "maandspecificaties/<str:file_name>/download",
-        DownloadMonthlyBenefitsView.as_view(),
-        name="download_monthly_benefits",
     ),
 ]
 

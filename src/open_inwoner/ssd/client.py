@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 from pathlib import Path
 from typing import Optional
 from uuid import uuid4
@@ -11,7 +12,6 @@ from requests import Response
 
 from ..utils.export import render_pdf
 from .models import SSDConfig
-from .utils import convert_file_name_to_period
 from .xml import get_jaaropgave_dict, get_uitkering_dict
 
 logger = logging.getLogger(__name__)
@@ -82,8 +82,15 @@ class SSDBaseClient:
 
         return response
 
+    def format_report_date(self, report_date_iso: str) -> str:
+        """:returns: formatted date string for SOAP request"""
+
+    def format_file_name(self, report_date_iso: str) -> str:
+        """:returns: formatted string for PDF name"""
+
     def get_report(self, bsn: str, dienstjaar: str) -> Optional[bytes]:
-        return NotImplemented
+        """:returns: the yearly/monthly benefits report PDF (bytes) if the
+        request to the SOAP service is successfull, `None` otherwise"""
 
 
 class JaaropgaveClient(SSDBaseClient):
@@ -97,30 +104,30 @@ class JaaropgaveClient(SSDBaseClient):
         "http://www.centric.nl/GWS/Diensten/JaarOpgaveClient-v0400/JaarOpgaveInfo"
     )
 
-    def get_report(self, bsn: str, file_name: str) -> Optional[bytes]:
-        """
-        :returns: the yearly benefits report PDF (bytes) if the request to the
-        SOAP service is successfull, `None` otherwise
-        """
+    def format_report_date(self, report_date_iso: str):
+        return datetime.strptime(report_date_iso, "%Y-%m-%d").strftime("%Y")
 
-        # response = self.templated_request(bsn=bsn, dienstjaar=file_name)
+    def format_file_name(self, report_date_iso: str):
+        dt = datetime.strptime(report_date_iso, "%Y-%m-%d")
+        return f"Jaaropgave {dt.strftime('%Y')}"
 
-        # if response.status_code >= 300:
-        #     return None
+    def get_report(self, bsn: str, report_date_iso: str) -> Optional[bytes]:
+        response = self.templated_request(
+            bsn=bsn, dienstjaar=self.format_report_date(report_date_iso)
+        )
 
-        # jaaropgave = response.text
+        if response.status_code >= 300:
+            return None
+
+        jaaropgave = response.text
 
         # TODO: remove when done testing
-        xml_response = "src/open_inwoner/ssd/tests/files/jaaropgave_response.xml"
-        with open(xml_response, "r") as file:
-            jaaropgave = file.read()
+        # xml_response = "src/open_inwoner/ssd/tests/files/jaaropgave_response.xml"
+        # with open(xml_response, "r") as file:
+        #     jaaropgave = file.read()
 
         data = get_jaaropgave_dict(jaaropgave)
         pdf_content = render_pdf(self.html_template, context={**data})
-
-        # TODO: remove when done testing
-        with open("src/open_inwoner/ssd/tests/files/test.pdf", "bw") as file:
-            file.write(pdf_content)
 
         return pdf_content
 
@@ -134,31 +141,29 @@ class UitkeringClient(SSDBaseClient):
     request_template = BASE_DIR / "soap/templates/ssd/maandspecificatie.xml"
     soap_action = "http://www.centric.nl/GWS/Diensten/UitkeringsSpecificatieClient-v0600/UitkeringsSpecificatieInfo"
 
-    def get_report(self, bsn: str, file_name: str) -> Optional[bytes]:
-        """
-        :returns: the monthly benefits report PDF (bytes) if the request to the
-        SOAP service is successfull, `None` otherwise
-        """
+    def format_report_date(self, report_date_iso: str):
+        return datetime.strptime(report_date_iso, "%Y-%m-%d").strftime("%Y%m")
 
-        # response = self.templated_request(
-        #     bsn=bsn, period=convert_file_name_to_period(file_name)
-        # )
+    def format_file_name(self, report_date_iso: str):
+        dt = datetime.strptime(report_date_iso, "%Y-%m-%d")
+        return f"Maandspecificatie {dt.strftime('%B %Y')}"
 
-        # if response.status_code >= 300:
-        #     return None
+    def get_report(self, bsn: str, report_date_iso: str) -> Optional[bytes]:
+        response = self.templated_request(
+            bsn=bsn, period=self.format_report_date(report_date_iso)
+        )
 
-        # maandspecificatie = response.text
+        if response.status_code >= 300:
+            return None
+
+        maandspecificatie = response.text
 
         # TODO: remove when done testing
-        xml_response = "src/open_inwoner/ssd/tests/files/uitkering_response.xml"
-        with open(xml_response, "r") as file:
-            maandspecificatie = file.read()
+        # xml_response = "src/open_inwoner/ssd/tests/files/uitkering_response.xml"
+        # with open(xml_response, "r") as file:
+        #     maandspecificatie = file.read()
 
         data = get_uitkering_dict(maandspecificatie)
         pdf_content = render_pdf(self.html_template, context={**data})
-
-        # TODO: remove when done testing
-        with open("src/open_inwoner/ssd/tests/files/test.pdf", "wb") as file:
-            file.write(pdf_content)
 
         return pdf_content

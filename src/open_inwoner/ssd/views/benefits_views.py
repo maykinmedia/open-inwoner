@@ -1,16 +1,14 @@
+from datetime import datetime
 from typing import Union
 
 from django import forms
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.shortcuts import redirect
-from django.urls import reverse, reverse_lazy
-from django.views.generic import DetailView
 from django.views.generic.edit import FormView
 
 from ..client import JaaropgaveClient, UitkeringClient
 from ..forms import MonthlyReportsForm, YearlyReportsForm
-from ..utils import strip_extension
 
 
 #
@@ -19,61 +17,47 @@ from ..utils import strip_extension
 class BenefitsFormView(LoginRequiredMixin, FormView):
     template_name: str
     form_class: forms.Form
-    success_url: str
-    success_reverse: str
+    ssd_client: Union[JaaropgaveClient, UitkeringClient]
 
-    def get_success_url(self):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        if "report" in self.request.GET:
+            dt = datetime.strptime(self.request.GET["report"], "%Y-%m-%d")
+            context["report_date"] = dt
+
+        return context
+
+    def post(self, request, *args, **kwargs):
         form = self.get_form()
 
-        return reverse_lazy(
-            self.success_reverse,
-            kwargs={
-                "file_name": form.data["report"],
-            },
-        )
+        if form.is_valid():
+            client = self.ssd_client()
+
+            bsn = request.user.bsn
+            report_date_iso = form.data["report_date"]
+
+            pdf_content = client.get_report(bsn, report_date_iso)
+
+            if pdf_content is None:
+                return redirect(
+                    self.request.get_full_path() + f"?report={report_date_iso}"
+                )
+
+            pdf_name = client.format_file_name(report_date_iso)
+
+            response = HttpResponse(pdf_content, content_type="application/pdf")
+            response["Content-Disposition"] = f"attachment; filename={pdf_name}.pdf"
+            return response
 
 
 class MonthlyBenefitsFormView(BenefitsFormView):
     template_name = "pages/ssd/monthly_reports_list.html"
     form_class = MonthlyReportsForm
-    success_reverse = "profile:download_monthly_benefits"
+    ssd_client = UitkeringClient
 
 
 class YearlyBenefitsFormView(BenefitsFormView):
     template_name = "pages/ssd/yearly_reports_list.html"
     form_class = YearlyReportsForm
-    success_reverse = "profile:download_yearly_benefits"
-
-
-#
-# Download views
-#
-class DownloadBenefitsView(LoginRequiredMixin, DetailView):
-    """Base class for the download views"""
-
-    ssd_client: Union[JaaropgaveClient, UitkeringClient]
-    fail_reverse: str
-
-    def get(self, request, *args, **kwargs):
-        file_name = strip_extension(kwargs["file_name"])
-        bsn = request.user.bsn
-
-        pdf_file = self.ssd_client.get_report(bsn, file_name)
-
-        # no report found: redirect back to index view
-        if pdf_file is None:
-            return redirect(reverse(self.fail_reverse) + f"?report={file_name}")
-
-        response = HttpResponse(pdf_file, content_type="application/pdf")
-        response["Content-Disposition"] = f"attachment; filename={file_name}.pdf"
-        return response
-
-
-class DownloadYearlyBenefitsView(DownloadBenefitsView):
-    ssd_client = JaaropgaveClient()
-    fail_reverse = "profile:yearly_benefits_index"
-
-
-class DownloadMonthlyBenefitsView(DownloadBenefitsView):
-    ssd_client = UitkeringClient()
-    fail_reverse = "profile:monthly_benefits_index"
+    ssd_client = JaaropgaveClient

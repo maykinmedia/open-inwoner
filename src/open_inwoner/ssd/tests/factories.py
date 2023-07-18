@@ -11,5 +11,13 @@ class SSDConfigFactory(factory.django.DjangoModelFactory):
     bedrijfs_naam = "Maykin"
     gemeentecode = "12345"
 
+    # report options
+    jaaropgave_enabled = True
+    jaaropgave_range = 3
+    jaaropgave_available_from = "29-01"
+    maandspecificatie_enabled = True
+    maandspecificatie_range = 3
+    maandspecificatie_available_from = 25
+
     class Meta:
         model = SSDConfig
