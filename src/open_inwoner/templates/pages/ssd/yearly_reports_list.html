@@ -1,0 +1,36 @@
+{% extends 'master.html' %}
+{% load i18n grid_tags icon_tags %}
+
+{% block content %}
+    {% render_grid %}
+        {% render_column span=9 %}
+            <h1 class="h1" id="title">
+                {% trans "Mijn uitkeringen" %}
+            </h1>
+            <p>{% trans "Bekijk en download hier uw maandelijkse/jaarlijkse uitkeringsspecificaties om direct inzicht te krijgen in uw financiële situatie." %}</p>
+
+            <div class="tab--container">
+                <div class="tabs">
+                    <ul class="list tabs__headers">
+                        <li class="list-item tab__header--item"><a href="{% url 'profile:monthly_benefits_index' %}" id="yearly" class="link tab__header">{% trans "Maandspecificaties" %}</a></li>
+                        <li class="list-item tab__header--item"><span id="yearly" class="link tab__header active">{% trans "Jaaropgaven" %}</span></li>
+                    </ul>
+
+                    <div class="tabs__body">
+                        <div id="jaaropgaven" class="tab__content active">
+                            <p>{% trans "Selecteer het jaar dat u wilt downloaden. Aan deze jaaropgaven kunt u geen rechten ontlenen." %}</p>
+                            <ul>
+                            {% for report in yearly_benefits %}
+                                <li>
+                                    <a href="{% url 'profile:download_yearly_benefits' file_name=report %}" target="_blank" rel="noopener noreferrer">{{ report }}</a>
+                                </li>
+                            {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        {% endrender_column %}
+    {% endrender_grid %}
+{% endblock content %}
