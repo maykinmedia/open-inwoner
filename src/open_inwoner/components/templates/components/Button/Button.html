@@ -3,9 +3,9 @@
 {% if href %}
     <a
         class="{{ classes }}"
-        href="{{href}}"
-        title="{% firstof title text %}"
-        aria-label="{% firstof title text %}"
+        href="{{ href }}"
+        title="{{ title }}"
+        {% if hide_text %}aria-label="{% firstof title text %}"{% endif %}
         {% if href|startswith:"http" %}target="_blank"{% endif %}
         {% as_attributes extra_attributes %}
     >
@@ -13,20 +13,20 @@
         {% if text_icon %}
             <span class="button__text-wrapper">
             {% icon icon=text_icon outlined=icon_outlined %}
-            {% if not hide_text %}{{text}}{% endif %}
+            {% if not hide_text %}{{ text }}{% endif %}
             </span>
         {% else %}
-            {% if not hide_text %}{{text}}{% endif %}
+            {% if not hide_text %}{{ text }}{% endif %}
         {% endif %}
     </a>
 {% else %}
     <button
         class="{{ classes }}"
-        type="{{type}}"
+        type="{{ type }}"
         name="{{ name }}"
         value="{{ value }}"
-        title="{% firstof title text %}"
-        aria-label="{% firstof title text %}"
+        title="{{ title }}"
+        {% if hide_text %}aria-label="{% firstof title text %}"{% endif %}
         {% as_attributes extra_attributes %}
         {% if id %} id="{{ id }}" {% endif %}
     >
@@ -34,10 +34,10 @@
         {% if text_icon %}
             <span class="button__text-wrapper">
             {% icon icon=text_icon outlined=icon_outlined %}
-            {% if not hide_text %}{{text}}{% endif %}
+            {% if not hide_text %}{{ text }}{% endif %}
             </span>
         {% else %}
-            {% if not hide_text %}{{text}}{% endif %}
+            {% if not hide_text %}{{ text }}{% endif %}
         {% endif %}
     </button>
 {% endif %}
