@@ -24,7 +24,6 @@ class CertificateFactory(factory.django.DjangoModelFactory):
 class SoapServiceFactory(factory.django.DjangoModelFactory):
     label = "Test SOAP service"
     url = "https://www.soap-example.com"
-    # client_certificate = CertificateFactory()
 
     class Meta:
         model = SoapService

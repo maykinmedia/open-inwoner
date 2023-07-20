@@ -21,8 +21,6 @@ class SSDConfig(SingletonModel):
         null=True,
         blank=True,
     )
-
-    # basic configuration
     applicatie_naam = models.CharField(
         _("Application name"),
         max_length=32,
@@ -44,14 +42,30 @@ class SSDConfig(SingletonModel):
         validators=[validate_digits],
         blank=True,
     )
+    mijn_uitkeringen_text = models.TextField(
+        _("Overview text"),
+        max_length=704,
+        blank=True,
+        help_text=_("The text displayed as overview of the 'Mijn Uikeringen' section."),
+    )
 
-    # report options
+    class Meta:
+        verbose_name = _("SSD")
+
+
+class JaaropgaveConfig(SingletonModel):
+    client_config = models.OneToOneField(
+        "SSDConfig",
+        on_delete=models.CASCADE,
+        null=True,
+        related_name="jaaropgave",
+    )
     jaaropgave_enabled = models.BooleanField(
-        _("Enable download of yearly reports"),
+        _("Enable download"),
         default=True,
     )
-    jaaropgave_range = models.SmallIntegerField(
-        _("Show yearly reports for the last # years"),
+    jaaropgave_delta = models.SmallIntegerField(
+        _("Show reports for the last # years"),
         default=3,
     )
     jaaropgave_available_from = models.CharField(
@@ -59,24 +73,47 @@ class SSDConfig(SingletonModel):
         max_length=5,
         default="29-01",
         help_text=_(
-            "Month from when the report for the preceding year is available for download"
+            "Day and month from when the report for the preceding year is available for download"
         ),
     )
+    display_text = models.TextField(
+        _("Display text"),
+        max_length=704,
+        blank=True,
+        help_text=_("The text displayed as overview of the 'Jaaropgave' tab"),
+    )
+    jaaropgave_comments = models.TextField(
+        _("PDF help text"),
+        blank=True,
+        help_text=_("Help text for the columns in the Jaaropgave PDF"),
+    )
+
+
+class MaandspecificatieConfig(SingletonModel):
+    client_config = models.OneToOneField(
+        "SSDConfig",
+        on_delete=models.CASCADE,
+        null=True,
+        related_name="maandspecificatie",
+    )
     maandspecificatie_enabled = models.BooleanField(
-        _("Enable download of monthly reports"),
+        _("Enable download"),
         default=True,
     )
-    maandspecificatie_range = models.SmallIntegerField(
-        _("Show yearly reports for the last # months"),
+    maandspecificatie_delta = models.SmallIntegerField(
+        _("Show reports for the last # months"),
         default=12,
     )
     maandspecificatie_available_from = models.SmallIntegerField(
-        _("Monthly report available from the # day of the month"),
+        _("Report available from the # day of the month"),
         default=25,
         help_text=_(
             "Day of the month from when the report for the preceding month is available for download"
         ),
     )
-
-    class Meta:
-        verbose_name = _("SSD")
+    display_text = models.TextField(
+        _("Display text"),
+        max_length=704,
+        blank=True,
+        help_text=_("The text displayed as overview of the 'Maandspecificatie' tab"),
+    )

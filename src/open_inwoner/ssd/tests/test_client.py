@@ -8,13 +8,19 @@ import requests_mock
 from lxml import etree
 
 from ..client import JaaropgaveClient, SSDBaseClient, UitkeringClient
-from .factories import SSDConfigFactory
+from .factories import JaaropgaveConfigFactory, SSDConfigFactory
 
 FILES_DIR = Path(__file__).parent.resolve() / "files"
 
 
 @patch("open_inwoner.ssd.client.SSDBaseClient._make_request_body", return_value="")
 class SSDClientRequestInterfaceTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        # facilitate testing the request interface through abstract SSDBaseClient
+        SSDBaseClient.__abstractmethods__ = []
+        super().setUpTestData()
+
     @requests_mock.Mocker()
     def test_tsl_with_server_cert(self, mock_request_body, mock_request):
         """Assert that TSL server certs are correctly passed to the request"""
@@ -205,6 +211,7 @@ class JaaropgaveClientTest(TestCase):
         client.config = SSDConfigFactory.build(
             service__url="https://example.com/soap-service",
         )
+        client.config.jaaropgave = JaaropgaveConfigFactory.build()
 
         mock_request.post("https://example.com/soap-service")
 

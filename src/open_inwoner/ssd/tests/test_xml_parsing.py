@@ -192,11 +192,11 @@ class XMLParsingTests(TestCase):
         )
         self.assertEqual(
             data["jaaropgave"]["loon_heffings_korting"]["dates"][0]["ingangsdatum"],
-            "19840101",
+            "01-01-1984",
         )
         self.assertEqual(
             data["jaaropgave"]["loon_heffings_korting"]["dates"][1]["ingangsdatum"],
-            "19850101",
+            "01-01-1985",
         )
         self.assertEqual(
             data["jaaropgave"]["loon_zorgverzekeringswet"]["key"],

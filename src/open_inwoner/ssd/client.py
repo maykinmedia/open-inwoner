@@ -127,6 +127,7 @@ class JaaropgaveClient(SSDBaseClient):
             jaaropgave = file.read()
 
         data = get_jaaropgave_dict(jaaropgave)
+        data.update({"jaaropgave_comments": self.config.jaaropgave.jaaropgave_comments})
         pdf_content = render_pdf(self.html_template, context={**data})
 
         return pdf_content

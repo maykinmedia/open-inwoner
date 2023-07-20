@@ -4,7 +4,7 @@ from django import forms
 
 from dateutil.relativedelta import relativedelta
 
-from .models import SSDConfig
+from .models import JaaropgaveConfig, MaandspecificatieConfig
 
 
 #
@@ -13,13 +13,13 @@ from .models import SSDConfig
 def get_monthly_report_dates() -> list[tuple[date, str]]:
     """Return choices of months for which reports are available for download"""
 
-    config = SSDConfig.get_solo()
+    config = MaandspecificatieConfig.get_solo()
 
     if config.maandspecificatie_enabled is not True:
         return []
 
     today = datetime.today()
-    month_range = config.maandspecificatie_range
+    month_range = config.maandspecificatie_delta
 
     dates = [today - relativedelta(months=i) for i in range(month_range)]
 
@@ -40,13 +40,13 @@ def get_monthly_report_dates() -> list[tuple[date, str]]:
 def get_yearly_report_dates() -> list[tuple[date, str]]:
     """Return choices of years for which reports are available for download"""
 
-    config = SSDConfig.get_solo()
+    config = JaaropgaveConfig.get_solo()
 
     if config.jaaropgave_enabled is not True:
         return []
 
     today = datetime.today()
-    year_range = config.jaaropgave_range
+    year_range = config.jaaropgave_delta
 
     # `years=i+1` as the preceding year should be the first available
     dates = [today - relativedelta(years=i + 1) for i in range(year_range)]
@@ -76,10 +76,14 @@ class MonthlyReportsForm(forms.Form):
 
         self.fields["report_date"] = forms.DateTimeField(
             widget=forms.Select(choices=get_monthly_report_dates()),
+            label="Toon uitkeringsspecificatie:",
         )
 
     def is_valid(self):
-        dt = datetime.strptime(self.data["report_date"], "%Y-%m-%d").date()
+        try:
+            dt = datetime.strptime(self.data["report_date"], "%Y-%m-%d").date()
+        except ValueError:
+            return False
         return any(dt in choice for choice in self.fields["report_date"].widget.choices)
 
 
@@ -89,10 +93,14 @@ class YearlyReportsForm(forms.Form):
 
         self.fields["report_date"] = forms.DateTimeField(
             widget=forms.Select(choices=get_yearly_report_dates()),
+            label="Toon uitkeringsspecificatie:",
         )
 
     def is_valid(self):
-        dt = datetime.strptime(self.data["report_date"], "%Y-%m-%d").date()
+        try:
+            dt = datetime.strptime(self.data["report_date"], "%Y-%m-%d").date()
+        except ValueError:
+            return False
         return any(
             str(dt.year) in choice
             for choice in self.fields["report_date"].widget.choices

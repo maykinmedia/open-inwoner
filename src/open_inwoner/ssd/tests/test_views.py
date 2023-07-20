@@ -18,7 +18,6 @@ from freezegun import freeze_time
 
 from open_inwoner.accounts.tests.factories import UserFactory
 
-from .factories import SSDConfigFactory
 from .mocks import mock_report
 
 FILES_DIR = Path(__file__).parent.resolve() / "files"
@@ -86,9 +85,22 @@ class TestMonthlyBenefitsFormView(TestCase):
             response, "Geen uitkeringsspecificatie gevonden voor Dec 1985"
         )
 
-    @patch("open_inwoner.ssd.forms.SSDConfig.get_solo")
+    @patch(
+        "open_inwoner.ssd.client.UitkeringClient.get_report",
+        return_value=None,
+    )
+    @freeze_time("1985-12-25")
+    def test_post_bad_input(self, mock_report):
+        url = reverse("profile:monthly_benefits_index")
+        self.client.login(email=self.user.email, password="12345")
+
+        with self.assertRaises(ValueError):
+            self.client.post(url, data={"report_date": "bad-user-input"})
+
+    @patch("open_inwoner.ssd.forms.MaandspecificatieConfig.get_solo")
     def test_get_report_not_enabled(self, mock_solo):
-        mock_solo.return_value = SSDConfigFactory.build(maandspecificatie_enabled=False)
+        mock_solo.return_value.maandspecificatie_enabled = False
+
         url = reverse("profile:monthly_benefits_index")
 
         self.client.login(email=self.user.email, password="12345")
@@ -142,8 +154,9 @@ class TestYearlyBenefitsFormView(TestCase):
         "open_inwoner.ssd.client.JaaropgaveClient.get_report",
         return_value=None,
     )
+    @patch("open_inwoner.ssd.models.SSDConfig.get_solo")
     @freeze_time("1985-12-25")
-    def test_post_fail(self, mock_report):
+    def test_post_fail(self, mock_report, mock_solo):
         url = reverse("profile:yearly_benefits_index")
         self.client.login(email=self.user.email, password="12345")
 
@@ -157,9 +170,10 @@ class TestYearlyBenefitsFormView(TestCase):
 
         self.assertContains(response, "Geen uitkeringsspecificatie gevonden voor 1984")
 
-    @patch("open_inwoner.ssd.forms.SSDConfig.get_solo")
+    @patch("open_inwoner.ssd.forms.JaaropgaveConfig.get_solo")
     def test_get_report_not_enabled(self, mock_solo):
-        mock_solo.return_value = SSDConfigFactory.build(jaaropgave_enabled=False)
+        mock_solo.return_value.jaaropgave_enabled = False
+
         url = reverse("profile:yearly_benefits_index")
 
         self.client.login(email=self.user.email, password="12345")

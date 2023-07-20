@@ -5,7 +5,6 @@ from xml.parsers.expat import ExpatError
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
-import dateutil
 import xmltodict
 from glom import glom
 
@@ -389,7 +388,7 @@ def get_jaaropgave_dict(xml_data):
 
     # replace dict keys with our own for consistency
     for date in date_list:
-        date["ingangsdatum"] = date.pop("Ingangsdatum")
+        date["ingangsdatum"] = format_date(date.pop("Ingangsdatum"))
         date["code"] = date.pop("CdLoonheffingskorting")
 
     loon_heffings_korting = {

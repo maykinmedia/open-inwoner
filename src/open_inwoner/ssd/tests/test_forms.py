@@ -8,16 +8,16 @@ from unittest.mock import patch
 from freezegun import freeze_time
 
 from ..forms import get_monthly_report_dates, get_yearly_report_dates
-from .factories import SSDConfigFactory
+from .factories import JaaropgaveConfigFactory, MaandspecificatieConfigFactory
 
 
 class MonthlyChoicesTest(TestCase):
     @freeze_time("1985-01-25")
-    @patch("open_inwoner.ssd.forms.SSDConfig.get_solo")
+    @patch("open_inwoner.ssd.forms.MaandspecificatieConfig.get_solo")
     def test_get_monthly_choices(self, mock_solo):
-        mock_solo.return_value = SSDConfigFactory.build(
+        mock_solo.return_value = MaandspecificatieConfigFactory.build(
+            maandspecificatie_delta=3,
             maandspecificatie_available_from=25,
-            maandspecificatie_range=3,
         )
 
         choices = get_monthly_report_dates()
@@ -32,11 +32,11 @@ class MonthlyChoicesTest(TestCase):
         self.assertEqual(date_repr, "January 1985")
 
     @freeze_time("1985-01-25")
-    @patch("open_inwoner.ssd.forms.SSDConfig.get_solo")
+    @patch("open_inwoner.ssd.forms.MaandspecificatieConfig.get_solo")
     def test_current_month_not_yet_available(self, m):
-        m.return_value = SSDConfigFactory.build(
+        m.return_value = MaandspecificatieConfigFactory.build(
+            maandspecificatie_delta=3,
             maandspecificatie_available_from=29,
-            maandspecificatie_range=3,
         )
 
         choices = get_monthly_report_dates()
@@ -52,9 +52,9 @@ class MonthlyChoicesTest(TestCase):
         date_repr = choices[0][1]
         self.assertEqual(date_repr, "December 1984")
 
-    @patch("open_inwoner.ssd.forms.SSDConfig.get_solo")
+    @patch("open_inwoner.ssd.forms.MaandspecificatieConfig.get_solo")
     def test_monthly_reports_not_enabled(self, mock_solo):
-        mock_solo.return_value = SSDConfigFactory.build(
+        mock_solo.return_value = MaandspecificatieConfigFactory.build(
             maandspecificatie_enabled=False,
         )
 
@@ -64,11 +64,11 @@ class MonthlyChoicesTest(TestCase):
 
 class YearlyChoicesTest(TestCase):
     @freeze_time("1985-01-25")
-    @patch("open_inwoner.ssd.forms.SSDConfig.get_solo")
+    @patch("open_inwoner.ssd.forms.JaaropgaveConfig.get_solo")
     def test_get_yearly_choices(self, mock_solo):
-        mock_solo.return_value = SSDConfigFactory.build(
+        mock_solo.return_value = JaaropgaveConfigFactory.build(
+            jaaropgave_delta=3,
             jaaropgave_available_from="25-01",
-            jaaropgave_range=3,
         )
 
         choices = get_yearly_report_dates()
@@ -83,11 +83,11 @@ class YearlyChoicesTest(TestCase):
         self.assertEqual(date_repr, "1984")
 
     @freeze_time("1985-01-25")
-    @patch("open_inwoner.ssd.forms.SSDConfig.get_solo")
+    @patch("open_inwoner.ssd.forms.JaaropgaveConfig.get_solo")
     def test_preceding_year_not_yet_available(self, m):
-        m.return_value = SSDConfigFactory.build(
+        m.return_value = JaaropgaveConfigFactory.build(
+            jaaropgave_delta=3,
             jaaropgave_available_from="29-01",
-            jaaropgave_range=3,
         )
 
         choices = get_yearly_report_dates()
@@ -103,9 +103,9 @@ class YearlyChoicesTest(TestCase):
         date_repr = choices[0][1]
         self.assertEqual(date_repr, "1983")
 
-    @patch("open_inwoner.ssd.forms.SSDConfig.get_solo")
+    @patch("open_inwoner.ssd.forms.JaaropgaveConfig.get_solo")
     def test_monthly_reports_not_enabled(self, mock_solo):
-        mock_solo.return_value = SSDConfigFactory.build(
+        mock_solo.return_value = JaaropgaveConfigFactory.build(
             jaaropgave_enabled=False,
         )
 

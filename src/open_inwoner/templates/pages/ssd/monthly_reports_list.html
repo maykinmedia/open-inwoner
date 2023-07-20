@@ -7,7 +7,7 @@
             <h1 class="h1" id="title">
                 {% trans "Mijn uitkeringen" %}
             </h1>
-            <p>{% trans "Bekijk en download hier uw maandelijkse/jaarlijkse uitkeringsspecificaties om direct inzicht te krijgen in uw financiële situatie." %}</p>
+						<p>{% blocktrans %}{{ mijn_uitkeringen_text }}{% endblocktrans %}</p>
 
             <div class="tab--container">
                 <div class="tabs">
@@ -20,7 +20,7 @@
 										{% if enabled %}
 											<div class="tabs__body">
 													<div id="maandspecificaties" class="tab__content active">
-															<p>{% trans "Selecteer de maand die u wilt downloaden. Let op: de huidige maand is pas vanaf de 25ste zichtbaar. Deze uitkeringsspecificatie is een momentopname van de aan u uitbetaalde uitkering. Aan deze specificatie kunt u geen rechten ontlenen." %}</p>
+															<p>{% blocktrans %}{{ report_display_text }}{% endblocktrans %}</p>
 
 															{% render_form form=form method="POST" id="monthlyreports-form" show_required=False submit_text=_('Download') %}
 																	{% csrf_token %}

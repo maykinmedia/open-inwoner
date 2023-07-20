@@ -8,6 +8,7 @@
                 {% trans "Mijn uitkeringen" %}
             </h1>
             <p>{% trans "Bekijk en download hier uw maandelijkse/jaarlijkse uitkeringsspecificaties om direct inzicht te krijgen in uw financiële situatie." %}</p>
+						<p>{% blocktrans %}{{ jaaropgave_text }}{% endblocktrans %}</p>
 
             <div class="tab--container">
                 <div class="tabs">
@@ -20,7 +21,7 @@
 										{% if enabled %}
                     <div class="tabs__body">
                         <div id="jaaropgaven" class="tab__content active">
-                            <p>{% trans "Selecteer het jaar dat u wilt downloaden. Aan deze jaaropgaven kunt u geen rechten ontlenen." %}</p>
+														<p>{% blocktrans %}{{ report_display_text }}{% endblocktrans %}</p>
 
                             {% render_form form=form method="POST" id="yearlyreports-form" show_required=False submit_text=_('Download') %}
                                 {% csrf_token %}

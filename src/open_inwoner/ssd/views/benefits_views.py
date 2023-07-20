@@ -9,18 +9,24 @@ from django.views.generic.edit import FormView
 
 from ..client import JaaropgaveClient, UitkeringClient
 from ..forms import MonthlyReportsForm, YearlyReportsForm
+from ..models import JaaropgaveConfig, MaandspecificatieConfig
 
 
-#
-# Benefits reports form views
-#
 class BenefitsFormView(LoginRequiredMixin, FormView):
     template_name: str
     form_class: forms.Form
     ssd_client: Union[JaaropgaveClient, UitkeringClient]
+    report_config: Union[JaaropgaveConfig, MaandspecificatieConfig]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        client = self.ssd_client()
+        report_config = self.report_config.get_solo()
+
+        context["client"] = client
+        context["mijn_uitkeringen_text"] = client.config.mijn_uitkeringen_text
+        context["report_display_text"] = report_config.display_text
 
         if "report" in self.request.GET:
             dt = datetime.strptime(self.request.GET["report"], "%Y-%m-%d")
@@ -32,7 +38,7 @@ class BenefitsFormView(LoginRequiredMixin, FormView):
         form = self.get_form()
 
         if form.is_valid():
-            client = self.ssd_client()
+            client = self.get_context_data()["client"]
 
             bsn = request.user.bsn
             report_date_iso = form.data["report_date"]
@@ -55,9 +61,11 @@ class MonthlyBenefitsFormView(BenefitsFormView):
     template_name = "pages/ssd/monthly_reports_list.html"
     form_class = MonthlyReportsForm
     ssd_client = UitkeringClient
+    report_config = MaandspecificatieConfig
 
 
 class YearlyBenefitsFormView(BenefitsFormView):
     template_name = "pages/ssd/yearly_reports_list.html"
     form_class = YearlyReportsForm
     ssd_client = JaaropgaveClient
+    report_config = JaaropgaveConfig
