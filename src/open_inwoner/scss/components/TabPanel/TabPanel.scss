@@ -87,6 +87,19 @@
 
 .tabs__body {
   padding: 0;
+
+  // Styling for Benefits reports/Mijn uitkeringen
+  .form {
+    max-width: var(--mobile-ms-width);
+
+    .form__actions {
+      margin-top: 0;
+    }
+
+    .form__control [class*='icon'] {
+      transform: none;
+    }
+  }
 }
 
 .tab__content,

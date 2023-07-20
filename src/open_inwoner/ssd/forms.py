@@ -1,4 +1,5 @@
 from django import forms
+from django.utils.translation import gettext_lazy as _
 
 # TODO: make configurable via admin
 MONTHLY_CHOICES = [
@@ -16,8 +17,14 @@ YEARLY_CHOICES = [
 
 
 class MonthlyReportsForm(forms.Form):
-    report = forms.CharField(widget=forms.Select(choices=MONTHLY_CHOICES), label=False)
+    report = forms.CharField(
+        widget=forms.Select(choices=MONTHLY_CHOICES),
+        label=_("Toon uitkeringsspecificatie:"),
+    )
 
 
 class YearlyReportsForm(forms.Form):
-    report = forms.CharField(widget=forms.Select(choices=YEARLY_CHOICES), label=False)
+    report = forms.CharField(
+        widget=forms.Select(choices=YEARLY_CHOICES),
+        label=_("Toon uitkeringsspecificatie:"),
+    )

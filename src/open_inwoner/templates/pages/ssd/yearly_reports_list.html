@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n grid_tags icon_tags %}
+{% load i18n grid_tags form_tags button_tags icon_tags %}
 
 {% block content %}
     {% render_grid %}
@@ -20,19 +20,19 @@
                         <div id="jaaropgaven" class="tab__content active">
                             <p>{% trans "Selecteer het jaar dat u wilt downloaden. Aan deze jaaropgaven kunt u geen rechten ontlenen." %}</p>
 
-                            <form method="post">
-                              {% csrf_token %}
-                              {{ form }}
-                              <input type="submit" value="{% trans 'Get report' %}" class="button">
-                            </form>
+                            {% render_form form=form method="POST" id="yearlyreports-form" show_required=False submit_text=_('Download') %}
+                                {% csrf_token %}
+                                {% input form.report icon="expand_more" icon_position="after" icon_outlined=True %}
+                                {% form_actions primary_text=_("Download") primary_icon="file_download" icon_position="before" extra_classes="ssd" %}
+                            {% endrender_form %}
 
-                            <br>
-
+                            <div>
                             {% if request.GET.report %}
                               {% blocktrans with time_period=request.GET.report %}
-                                The report for {{ time_period }} could not be found
+                                Geen uitkeringsspecificatie gevonden voor {{ time_period }}.
                               {% endblocktrans %}
                             {% endif %}
+                            </div>
                         </div>
                     </div>
                 </div>
