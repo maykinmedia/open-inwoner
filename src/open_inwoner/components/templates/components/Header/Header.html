@@ -6,7 +6,7 @@
 <header class="header" aria-label="Navigatie header">
     <div class="header__container">
         <div class="header__menu">
-            <button class="header__button">
+            <button class="header__button" aria-expanded="false">
                 <div class="header__menu-icon">
                     <span class="closed">{% trans "Menu" %}</span>
                     <span class="open">{% trans "Sluiten" %}</span>
@@ -47,7 +47,7 @@
 
                         {% if cms_apps.products and categories %}
                         <li class="primary-navigation__list-item dropdown-nav__toggle">
-                            <a href="#" class="link link--toggle link--icon link--icon-position-before" aria-label="{% trans "Onderwerpen" %}" title="{% trans "Onderwerpen" %}">
+                            <a href="#" class="link link--toggle link--icon link--icon-position-before" aria-label="{% trans "Onderwerpen" %}" title="{% trans "Onderwerpen" %}" aria-expanded="false">
                                 <span >{% trans "Onderwerpen" %}</span>
                                 <span aria-hidden="true" class="material-icons-outlined ">description</span>
                                 {% icon icon="expand_more" icon_position="after" icon_outlined=True %}
