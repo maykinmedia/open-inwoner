@@ -10,13 +10,13 @@
 
 {% block title %}{% page_attribute "title" as title %}{% page_attribute "page_title" as page_title %}{% if page_title %}{{ page_title }}{% else %}{{ title }}{% endif %} - {{ site_name }}{% endblock title %}
 
-	
+
 {% block header_image %}
     {% if request.user.is_authenticated %}
         {% placeholder 'banner_image' %}
     {% else %}
         <aside class="banner" aria-hidden="true">
-            <img class="main-image" src="{{ hero_image_login }}" alt="Header image">
+            <img class="main-image" src="{{ hero_image_login }}" alt="{% trans "Welkom op de hoofdpagina" %}" >
         </aside>
     {% endif %}
 {% endblock header_image %}

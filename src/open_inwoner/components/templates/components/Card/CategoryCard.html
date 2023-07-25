@@ -3,7 +3,7 @@
 {# template for subcategory cards with or without product-links #}
 {# create tag for anchor around card - never use anchors within anchors for valid HTML. #}
 {% if category.products.published %}
-<div title="{{ category }}" aria-label="{{ category.name }}" class="card">
+<div class="card">
     <div class="card__body">
         {% if category %}
             <p class="h3">
@@ -22,7 +22,7 @@
 </div>
 
 {% else %}
-    <a href="{{ category.slug }}" title="{{ category }}" class="card">
+    <a href="{{ category.slug }}" class="card">
         <div class="card__body">
             {% if category %}
                 <p class="h3">
