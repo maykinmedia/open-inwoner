@@ -10,7 +10,8 @@
   margin: 0;
   gap: 18px;
 
-  label {
+  label,
+  .label {
     display: flex;
     flex-direction: row;
     gap: 10px;
