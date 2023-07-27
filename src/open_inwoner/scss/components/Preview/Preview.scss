@@ -1,5 +1,9 @@
 .show-preview {
   cursor: pointer;
+
+  & *[class*='icon'] {
+    font-size: var(--font-size-body-large);
+  }
 }
 
 .preview {

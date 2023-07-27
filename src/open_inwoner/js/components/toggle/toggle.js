@@ -7,7 +7,7 @@ export const BLOCK_TOGGLE = 'toggle'
 const TOGGLES = BEM.getBEMNodes(BLOCK_TOGGLE)
 
 /**
- * Class for generic toggles.
+ * Class for generic toggles (like FAQ accordion).
  *
  * Toggle should have BLOCK_TOGGLE present in classList for detection.
  * Toggle should have data-toggle-target set to query selector for target.

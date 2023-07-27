@@ -4653,8 +4653,8 @@ msgid "Log out"
 msgstr "Uitloggen"
 
 #: templates/cms/banner/banner_image_plugin.html:7
-msgid "Header image"
-msgstr "Hoofdafbeelding"
+msgid "Welcome to the home page"
+msgstr "Welkom op de hoofdpagina"
 
 #: templates/cms/collaborate/active_plans_plugin.html:5
 #: templates/pages/user-home.html:13

@@ -464,7 +464,9 @@ AUTHENTICATION_BACKENDS = [
 SESSION_COOKIE_NAME = "open_inwoner_sessionid"
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 
-ADMIN_SESSION_COOKIE_AGE = 3600  # Set to 1 hour max session duration for admins
+ADMIN_SESSION_COOKIE_AGE = config(
+    "ADMIN_SESSION_COOKIE_AGE", 3600
+)  # Default 1 hour max session duration for admins
 SESSION_WARN_DELTA = 60  # Warn 1 minute before end of session.
 SESSION_COOKIE_AGE = 900  # Set to 15 minutes
 

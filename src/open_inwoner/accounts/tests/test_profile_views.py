@@ -240,7 +240,7 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         form["last_name"] = "Last name"
         form["display_name"] = "a nickname"
         form["email"] = "user@example.com"
-        form["phonenumber"] = "06987878787"
+        form["phonenumber"] = "0612345678"
         form["birthday"] = "21-01-1992"
         form["street"] = "Keizersgracht"
         form["housenumber"] = "17 d"
@@ -326,7 +326,7 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
 
         form["display_name"] = "a nickname"
         form["email"] = "user@example.com"
-        form["phonenumber"] = "06987878787"
+        form["phonenumber"] = "0612345678"
         response = form.submit()
 
         self.assertEqual(response.url, self.return_url)
@@ -335,7 +335,7 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
 
         self.assertEqual(user.display_name, "a nickname")
         self.assertEqual(user.email, "user@example.com")
-        self.assertEqual(user.phonenumber, "06987878787")
+        self.assertEqual(user.phonenumber, "0612345678")
 
     def test_expected_form_is_rendered(self):
         # regular user
@@ -422,7 +422,7 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
 
         form = response.forms["profile-edit"]
         form["email"] = "new@example.com"
-        form["phonenumber"] = "01234456789"
+        form["phonenumber"] = "0612345678"
         form.submit()
 
         # user data tested in other cases
@@ -433,7 +433,7 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
             klant_patch_data,
             {
                 "emailadres": "new@example.com",
-                "telefoonnummer": "01234456789",
+                "telefoonnummer": "0612345678",
             },
         )
         self.assertTimelineLog("retrieved klant for BSN-user")
@@ -472,7 +472,7 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         self.resetTimelineLogs()
 
         form = response.forms["profile-edit"]
-        form["phonenumber"] = "01234456789"
+        form["phonenumber"] = "0612345678"
         form.submit()
 
         # user data tested in other cases
@@ -482,7 +482,7 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         self.assertEqual(
             klant_patch_data,
             {
-                "telefoonnummer": "01234456789",
+                "telefoonnummer": "0612345678",
             },
         )
         self.assertTimelineLog("retrieved klant for BSN-user")

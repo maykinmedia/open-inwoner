@@ -13,6 +13,9 @@ export const HEADERS = BEM.getBEMNodes(BLOCK_HEADER)
 /** Handler to bypass Safari bug */
 export const themesToggle = document.querySelectorAll('.dropdown-nav__toggle')
 
+/** Controls aria-expanded state for accessibility */
+export const interactiveButton = document.querySelectorAll('.header__button')
+
 /**
  * Controls the main header and interaction with the mobile menu and dismissing it using the escape key.
  */
@@ -53,11 +56,17 @@ class Header extends Component {
    * Gets called when `node` is clicked.
    * Clears the dismissed state, (prevents overriding focus/toggle).
    */
-  toggleMobileNavOpen(event) {
+  toggleMobileNavOpen() {
     document.body.classList.toggle('body--open')
     // Safari specific - close all when main menu closes
     themesToggle.forEach((elem) => {
       elem.classList.remove('nav__list--open')
+    })
+    interactiveButton.forEach((elem) => {
+      elem.setAttribute(
+        'aria-expanded',
+        elem.getAttribute('aria-expanded') === 'true' ? 'false' : 'true'
+      )
     })
     window.scrollTo(0, 0)
   }

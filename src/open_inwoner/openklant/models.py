@@ -79,9 +79,11 @@ class OpenKlantConfig(SingletonModel):
     class Meta:
         verbose_name = _("Open Klant configuration")
 
+    def has_register(self) -> bool:
+        return self.register_email or self.has_api_configuration()
+
     def has_form_configuration(self) -> bool:
-        has_register = self.register_email or self.has_api_configuration()
-        return has_register and self.contactformsubject_set.exists()
+        return self.has_register() and self.contactformsubject_set.exists()
 
     def has_api_configuration(self):
         return all(getattr(self, f, "") for f in self.register_api_required_fields)

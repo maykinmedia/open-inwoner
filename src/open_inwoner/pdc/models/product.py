@@ -12,7 +12,7 @@ from filer.fields.image import FilerImageField
 from openformsclient.models import OpenFormsSlugField
 from ordered_model.models import OrderedModel
 
-from open_inwoner.utils.validators import validate_phone_number
+from open_inwoner.utils.validators import DutchPhoneNumberValidator
 
 from ..managers import ProductQueryset
 from .mixins import GeoModel
@@ -255,7 +255,7 @@ class ProductContact(models.Model):
         verbose_name=_("Phonenumber"),
         blank=True,
         max_length=15,
-        validators=[validate_phone_number],
+        validators=[DutchPhoneNumberValidator()],
         help_text=_("The phone number of the product contact"),
     )
     role = models.CharField(
@@ -331,7 +331,7 @@ class ProductLocation(GeoModel):
         blank=True,
         default="",
         max_length=15,
-        validators=[validate_phone_number],
+        validators=[DutchPhoneNumberValidator()],
         help_text=_("The phonenumber of the current location"),
     )
 

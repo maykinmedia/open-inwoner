@@ -4,7 +4,7 @@
 {% block header_image %}
 {% if object.image %}
     <aside class="banner" aria-hidden="true">
-        <img class="main-image main-image--start-after" src="{{ object.image.url }}" alt="{{ object.image.default_alt_text|default:'Header afbeelding' }}">
+        <img class="main-image main-image--start-after" src="{{ object.image.url }}" alt="{{ object.image.default_alt_text|default:'' }}">
     </aside>
 {% endif %}
 {% endblock header_image %}
