@@ -1,98 +1,100 @@
 {% load ssd_tags %}
 
 <head>
-  <title>Maandspecificatie {{ uitkeringsspecificatie.periode.value}}</title>
+    <title>Maandspecificatie {{ uitkeringsspecificatie.periode.value }}</title>
 </head>
 <body>
-  <!-- HEADER -->
-  <div class="header">
-    <h3 class="left">Maandspecificatie {{ uitkeringsspecificatie.periode.value }}</h3>
-    <h3 class="right"><span class="logo">Gemeente {{ uitkeringsinstantie.gemeente.value }}</span></h3>
-  </div>
-  <!-- Uitkeringsinstantie -->
-  <br>
-  <div class="section-title">Uitkeringsinstantie</div>
-  <div class="section">
-    <table class="monthly-report">
-      {% for key, detail in uitkeringsinstantie.items %}
-        <tr>
-          <td>{{ detail.key }}</td>
-          <td>{{ detail.value }}</td>
-        </tr>
-      {% endfor %}
-    </table>
-  </div>
-  <!-- Client -->
-  <div class="section-title">Client</div>
-  <div class="section">
-    <table class="monthly-report">
-      {% for key, detail in client.items %}
-        <tr>
-          <td>{{ detail.key }}</td>
-          <td>{{ detail.value }}</td>
-        </tr>
-      {% endfor %}
-    </table>
-  </div>
-  <!-- Uitkeringsspecificatie -->
-  <div class="section-title">Uitkeringsspecificatie</div>
-  <div class="section">
-    <table class="monthly-report">
-      {% for key, detail in uitkeringsspecificatie.items %}
-        <tr>
-          <td>{{ detail.key }}</td>
-          <td>{{ detail.value }}</td>
-        </tr>
-      {% endfor %}
-    </table>
-  </div>
-  <!-- Details -->
-  <div class="section-title">Details</div>
-  <div class="section">
-    <table class="monthly-report">
-      <col style="width: 28%;"/>
-      <col style="width: 24%;"/>
-      <col style="width: 24%;"/>
-      <col style="width: 24%;"/>
-      <tr>
-        <td>Omschrijving</td>
-        <td>Basis (€)</td>
-        <td>Plus (€)</td>
-        <td>Min (€)</td>
-      </tr>
-      {% for key, detail in details.items %}
-        <tr>
-          <td>{{ detail.key }}</td>
-          <td>{% get_detail_value_for_column detail "base" %}</td>
-          <td>{% get_detail_value_for_column detail "plus" %}</td>
-          <td>{% get_detail_value_for_column detail "minus" %}</td>
-        </tr>
-      {% endfor %}
-    </table>
-  </div>
-  <!-- Inkomstenkorting -->
-  <div class="section-title">Inkomstenkorting</div>
-  <div class="section">
-    <table class="monthly-report">
-      <col style="width: 28%;"/>
-      <col style="width: 4%;"/>
-      <col style="width: 10%;"/>
-      {% for key, detail in inkomstenkorting.items %}
-        <tr>
-          <td>{{ detail.key }}</td>
-          <td>€</td>
-          <td>{{ detail.value }}</td>
-          <td>{{ detail.sign }}</td>
-        </tr>
-        {% if forloop.counter|divisibleby:2 %}
-        <tr style="">
-          <td style="height:15px;"></td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
-        {% endif %}
-      {% endfor %}
-    </table>
-  </div>
+<div class="monthly-report">
+    <!-- HEADER -->
+    <header class="header">
+        <h1 class="h1 left">Maandspecificatie {{ uitkeringsspecificatie.periode.value }}</h1>
+        <h2 class="h2 right"><span class="logo">Gemeente {{ uitkeringsinstantie.gemeente.value }}</span></h2>
+    </header>
+    <!-- Uitkeringsinstantie -->
+    <br>
+    <div class="section-title">Uitkeringsinstantie</div>
+    <div class="section">
+        <table class="monthly-report__table">
+            {% for key, detail in uitkeringsinstantie.items %}
+                <tr>
+                    <td>{{ detail.key }}</td>
+                    <td>{{ detail.value }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <!-- Client -->
+    <div class="section-title">Client</div>
+    <div class="section">
+        <table class="monthly-report__table">
+            {% for key, detail in client.items %}
+                <tr>
+                    <td>{{ detail.key }}</td>
+                    <td>{{ detail.value }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <!-- Uitkeringsspecificatie -->
+    <div class="section-title">Uitkeringsspecificatie</div>
+    <div class="section">
+        <table class="monthly-report__table">
+            {% for key, detail in uitkeringsspecificatie.items %}
+                <tr>
+                    <td>{{ detail.key }}</td>
+                    <td>{{ detail.value }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <!-- Details -->
+    <div class="section-title">Details</div>
+    <div class="section">
+        <table class="monthly-report__table">
+            <col style="width: 28%;"/>
+            <col style="width: 24%;"/>
+            <col style="width: 24%;"/>
+            <col style="width: 24%;"/>
+            <tr>
+                <td>Omschrijving</td>
+                <td>Basis (€)</td>
+                <td>Plus (€)</td>
+                <td>Min (€)</td>
+            </tr>
+            {% for key, detail in details.items %}
+                <tr>
+                    <td>{{ detail.key }}</td>
+                    <td>{% get_detail_value_for_column detail "base" %}</td>
+                    <td>{% get_detail_value_for_column detail "plus" %}</td>
+                    <td>{% get_detail_value_for_column detail "minus" %}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <!-- Inkomstenkorting -->
+    <div class="section-title">Inkomstenkorting</div>
+    <div class="section">
+        <table class="monthly-report__table">
+            <col style="width: 28%;"/>
+            <col style="width: 4%;"/>
+            <col style="width: 10%;"/>
+            {% for key, detail in inkomstenkorting.items %}
+                <tr>
+                    <td>{{ detail.key }}</td>
+                    <td>€</td>
+                    <td>{{ detail.value }}</td>
+                    <td>{{ detail.sign }}</td>
+                </tr>
+                {% if forloop.counter|divisibleby:2 %}
+                    <tr style="">
+                        <td style="height:15px;"></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+        </table>
+    </div>
+</div>
 </body>

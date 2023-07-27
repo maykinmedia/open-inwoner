@@ -1,18 +1,29 @@
-table {
+.monthly-report {
+  p {
+    font-size: 12px;
+  }
+}
+
+.monthly-report__table {
   width: 100%;
 }
-table.monthly-report tr:nth-child(even) {
+.monthly-report__table tr:nth-child(even) {
   background-color: #f5f4f3;
 }
-table.monthly-report tr:nth-child(odd) {
+.monthly-report__table tr:nth-child(odd) {
   background-color: #efeeed;
 }
-table.monthly-report td:first-child {
+.monthly-report__table td:first-child {
   width: 17em;
 }
 
 .header {
   display: inline-block;
+
+  h1,
+  h2 {
+    font-size: 20px !important;
+  }
 }
 .left {
   float: left;

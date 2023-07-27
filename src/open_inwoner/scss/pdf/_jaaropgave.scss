@@ -1,5 +1,16 @@
 // global
-ul.dashed {
+.yearly-report {
+  p {
+    font-size: 12px;
+  }
+
+  h1,
+  h2 {
+    font-size: 20px !important;
+  }
+}
+
+.dashed {
   list-style-type: '- ';
 }
 
@@ -34,16 +45,16 @@ ul.dashed {
 .table-fixed {
   table-layout: fixed;
 }
-table.yearly-report tr:last-child {
+.yearly-report__table tr:last-child {
   border-bottom: none;
 }
-table.yearly-report th {
+.yearly-report__table th {
   text-align: center;
   font-size: 11px;
   padding-top: 1.5em;
   padding-bottom: 0.5em;
 }
-table.yearly-report td {
+.yearly-report__table td {
   border: 1px solid black;
   text-align: center;
 }

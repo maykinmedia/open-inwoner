@@ -112,19 +112,19 @@ class JaaropgaveClient(SSDBaseClient):
         return f"Jaaropgave {dt.strftime('%Y')}"
 
     def get_report(self, bsn: str, report_date_iso: str) -> Optional[bytes]:
-        response = self.templated_request(
-            bsn=bsn, dienstjaar=self.format_report_date(report_date_iso)
-        )
-
-        if response.status_code >= 300:
-            return None
-
-        jaaropgave = response.text
+        # response = self.templated_request(
+        #     bsn=bsn, dienstjaar=self.format_report_date(report_date_iso)
+        # )
+        #
+        # if response.status_code >= 300:
+        #     return None
+        #
+        # jaaropgave = response.text
 
         # TODO: remove when done testing
-        # xml_response = "src/open_inwoner/ssd/tests/files/jaaropgave_response.xml"
-        # with open(xml_response, "r") as file:
-        #     jaaropgave = file.read()
+        xml_response = "src/open_inwoner/ssd/tests/files/jaaropgave_response.xml"
+        with open(xml_response, "r") as file:
+            jaaropgave = file.read()
 
         data = get_jaaropgave_dict(jaaropgave)
         pdf_content = render_pdf(self.html_template, context={**data})
@@ -149,19 +149,19 @@ class UitkeringClient(SSDBaseClient):
         return f"Maandspecificatie {dt.strftime('%B %Y')}"
 
     def get_report(self, bsn: str, report_date_iso: str) -> Optional[bytes]:
-        response = self.templated_request(
-            bsn=bsn, period=self.format_report_date(report_date_iso)
-        )
-
-        if response.status_code >= 300:
-            return None
-
-        maandspecificatie = response.text
+        # response = self.templated_request(
+        #     bsn=bsn, period=self.format_report_date(report_date_iso)
+        # )
+        #
+        # if response.status_code >= 300:
+        #     return None
+        #
+        # maandspecificatie = response.text
 
         # TODO: remove when done testing
-        # xml_response = "src/open_inwoner/ssd/tests/files/uitkering_response.xml"
-        # with open(xml_response, "r") as file:
-        #     maandspecificatie = file.read()
+        xml_response = "src/open_inwoner/ssd/tests/files/uitkering_response.xml"
+        with open(xml_response, "r") as file:
+            maandspecificatie = file.read()
 
         data = get_uitkering_dict(maandspecificatie)
         pdf_content = render_pdf(self.html_template, context={**data})
