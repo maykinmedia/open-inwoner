@@ -3,7 +3,8 @@ from django.utils.translation import gettext_lazy as _
 
 from solo.models import SingletonModel
 
-from open_inwoner.utils.validators import CharFieldValidator, validate_digits
+from ..configurations.models import SiteConfiguration
+from ..utils.validators import CharFieldValidator, validate_digits
 
 
 class SSDConfigManager(models.Manager):
@@ -48,18 +49,7 @@ class SSDConfig(SingletonModel):
         blank=True,
         help_text=_("The text displayed as overview of the 'Mijn Uikeringen' section."),
     )
-
-    class Meta:
-        verbose_name = _("SSD")
-
-
-class JaaropgaveConfig(SingletonModel):
-    client_config = models.OneToOneField(
-        "SSDConfig",
-        on_delete=models.CASCADE,
-        null=True,
-        related_name="jaaropgave",
-    )
+    # report options (jaaropgave)
     jaaropgave_enabled = models.BooleanField(
         _("Enable download"),
         default=True,
@@ -76,7 +66,7 @@ class JaaropgaveConfig(SingletonModel):
             "Day and month from when the report for the preceding year is available for download"
         ),
     )
-    display_text = models.TextField(
+    jaaropgave_display_text = models.TextField(
         _("Display text"),
         max_length=704,
         blank=True,
@@ -87,15 +77,7 @@ class JaaropgaveConfig(SingletonModel):
         blank=True,
         help_text=_("Help text for the columns in the Jaaropgave PDF"),
     )
-
-
-class MaandspecificatieConfig(SingletonModel):
-    client_config = models.OneToOneField(
-        "SSDConfig",
-        on_delete=models.CASCADE,
-        null=True,
-        related_name="maandspecificatie",
-    )
+    # report options (maandspecificatie)
     maandspecificatie_enabled = models.BooleanField(
         _("Enable download"),
         default=True,
@@ -111,9 +93,16 @@ class MaandspecificatieConfig(SingletonModel):
             "Day of the month from when the report for the preceding month is available for download"
         ),
     )
-    display_text = models.TextField(
+    maandspecificatie_display_text = models.TextField(
         _("Display text"),
         max_length=704,
         blank=True,
         help_text=_("The text displayed as overview of the 'Maandspecificatie' tab"),
     )
+
+    @property
+    def logo(self):
+        return SiteConfiguration.get_solo().logo
+
+    class Meta:
+        verbose_name = _("SSD")

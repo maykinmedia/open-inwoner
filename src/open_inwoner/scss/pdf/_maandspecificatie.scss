@@ -1,6 +1,11 @@
 .monthly-report {
   p {
-    font-size: 12px;
+    font-size: 11px;
+  }
+
+  & &__logo {
+    max-width: 175px;
+    padding-left: 5em;
   }
 }
 

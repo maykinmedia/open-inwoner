@@ -1,4 +1,5 @@
 import logging
+from abc import ABC, abstractmethod
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
@@ -19,7 +20,7 @@ logger = logging.getLogger(__name__)
 BASE_DIR = Path(__file__).absolute().parent.parent
 
 
-class SSDBaseClient:
+class SSDBaseClient(ABC):
     """Base class for SSD SOAP client"""
 
     html_template: Path
@@ -82,15 +83,30 @@ class SSDBaseClient:
 
         return response
 
+    @abstractmethod
     def format_report_date(self, report_date_iso: str) -> str:
-        """:returns: formatted date string for SOAP request"""
+        """
+        :returns: formatted date string for SOAP request
+        """
 
+    @abstractmethod
     def format_file_name(self, report_date_iso: str) -> str:
-        """:returns: formatted string for PDF name"""
+        """
+        :returns: formatted string for PDF name
+        """
 
-    def get_report(self, bsn: str, dienstjaar: str) -> Optional[bytes]:
-        """:returns: the yearly/monthly benefits report PDF (bytes) if the
-        request to the SOAP service is successfull, `None` otherwise"""
+    @abstractmethod
+    def get_report(
+        self, bsn: str, report_date_iso: str, base_url: str
+    ) -> Optional[bytes]:
+        """
+        :param bsn: the BSN number of the client making the request
+        :param report_date_iso: the date of the requested report in ISO 8601 format
+        :param base_url: the absolute URI of the request, allows the use of
+        relative URLs in templates used to generate PDFs
+        :returns: a yearly/monthly benefits report PDF (bytes) if the request to
+        the client's SOAP service is successful, `None` otherwise
+        """
 
 
 class JaaropgaveClient(SSDBaseClient):
@@ -104,31 +120,42 @@ class JaaropgaveClient(SSDBaseClient):
         "http://www.centric.nl/GWS/Diensten/JaarOpgaveClient-v0400/JaarOpgaveInfo"
     )
 
-    def format_report_date(self, report_date_iso: str):
+    def format_report_date(self, report_date_iso: str) -> str:
         return datetime.strptime(report_date_iso, "%Y-%m-%d").strftime("%Y")
 
-    def format_file_name(self, report_date_iso: str):
+    def format_file_name(self, report_date_iso: str) -> str:
         dt = datetime.strptime(report_date_iso, "%Y-%m-%d")
         return f"Jaaropgave {dt.strftime('%Y')}"
 
-    def get_report(self, bsn: str, report_date_iso: str) -> Optional[bytes]:
-        # response = self.templated_request(
-        #     bsn=bsn, dienstjaar=self.format_report_date(report_date_iso)
-        # )
-        #
-        # if response.status_code >= 300:
-        #     return None
-        #
-        # jaaropgave = response.text
+    def get_report(
+        self, bsn: str, report_date_iso: str, base_url: str
+    ) -> Optional[bytes]:
+        response = self.templated_request(
+            bsn=bsn, dienstjaar=self.format_report_date(report_date_iso)
+        )
+
+        if response.status_code >= 300:
+            return None
+
+        jaaropgave = response.text
 
         # TODO: remove when done testing
-        xml_response = "src/open_inwoner/ssd/tests/files/jaaropgave_response.xml"
-        with open(xml_response, "r") as file:
-            jaaropgave = file.read()
+        # xml_response = "src/open_inwoner/ssd/tests/files/jaaropgave_response.xml"
+        # with open(xml_response, "r") as file:
+        #     jaaropgave = file.read()
 
         data = get_jaaropgave_dict(jaaropgave)
-        data.update({"jaaropgave_comments": self.config.jaaropgave.jaaropgave_comments})
-        pdf_content = render_pdf(self.html_template, context={**data})
+        data.update(
+            {
+                "logo": self.config.logo,
+                "jaaropgave_comments": self.config.jaaropgave_comments,
+            }
+        )
+        pdf_content = render_pdf(
+            self.html_template,
+            context={**data},
+            base_url=base_url,
+        )
 
         return pdf_content
 
@@ -142,29 +169,40 @@ class UitkeringClient(SSDBaseClient):
     request_template = BASE_DIR / "soap/templates/ssd/maandspecificatie.xml"
     soap_action = "http://www.centric.nl/GWS/Diensten/UitkeringsSpecificatieClient-v0600/UitkeringsSpecificatieInfo"
 
-    def format_report_date(self, report_date_iso: str):
+    def format_report_date(self, report_date_iso: str) -> str:
         return datetime.strptime(report_date_iso, "%Y-%m-%d").strftime("%Y%m")
 
-    def format_file_name(self, report_date_iso: str):
+    def format_file_name(self, report_date_iso: str) -> str:
         dt = datetime.strptime(report_date_iso, "%Y-%m-%d")
         return f"Maandspecificatie {dt.strftime('%B %Y')}"
 
-    def get_report(self, bsn: str, report_date_iso: str) -> Optional[bytes]:
-        # response = self.templated_request(
-        #     bsn=bsn, period=self.format_report_date(report_date_iso)
-        # )
-        #
-        # if response.status_code >= 300:
-        #     return None
-        #
-        # maandspecificatie = response.text
+    def get_report(
+        self, bsn: str, report_date_iso: str, base_url: str
+    ) -> Optional[bytes]:
+        response = self.templated_request(
+            bsn=bsn, period=self.format_report_date(report_date_iso)
+        )
+
+        if response.status_code >= 300:
+            return None
+
+        maandspecificatie = response.text
 
         # TODO: remove when done testing
-        xml_response = "src/open_inwoner/ssd/tests/files/uitkering_response.xml"
-        with open(xml_response, "r") as file:
-            maandspecificatie = file.read()
+        # xml_response = "src/open_inwoner/ssd/tests/files/uitkering_response.xml"
+        # with open(xml_response, "r") as file:
+        #     maandspecificatie = file.read()
 
         data = get_uitkering_dict(maandspecificatie)
-        pdf_content = render_pdf(self.html_template, context={**data})
+        data.update(
+            {
+                "logo": self.config.logo,
+            }
+        )
+        pdf_content = render_pdf(
+            self.html_template,
+            context={**data},
+            base_url=base_url,
+        )
 
         return pdf_content

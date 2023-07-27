@@ -32,7 +32,7 @@ class TestMonthlyBenefitsFormView(TestCase):
         self.user.save()
 
     def test_get(self):
-        url = reverse("profile:monthly_benefits_index")
+        url = reverse("ssd:monthly_benefits_index")
 
         # request with anonymous user
         response = self.client.get(url)
@@ -40,7 +40,7 @@ class TestMonthlyBenefitsFormView(TestCase):
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
         self.assertEqual(
             response.url,
-            "/accounts/login/?next=/profile/uitkeringen/maandspecificaties/",
+            "/accounts/login/?next=/uitkeringen/maandspecificaties/",
         )
 
         # request with user logged in
@@ -56,7 +56,7 @@ class TestMonthlyBenefitsFormView(TestCase):
     )
     @freeze_time("1985-12-25")
     def test_post_success(self, mock_report):
-        url = reverse("profile:monthly_benefits_index")
+        url = reverse("ssd:monthly_benefits_index")
         self.client.login(email=self.user.email, password="12345")
 
         response = self.client.post(url, data={"report_date": "1985-12-25"})
@@ -70,7 +70,7 @@ class TestMonthlyBenefitsFormView(TestCase):
     )
     @freeze_time("1985-12-25")
     def test_post_fail(self, mock_report):
-        url = reverse("profile:monthly_benefits_index")
+        url = reverse("ssd:monthly_benefits_index")
         self.client.login(email=self.user.email, password="12345")
 
         response = self.client.post(url, data={"report_date": "1985-12-25"})
@@ -91,17 +91,17 @@ class TestMonthlyBenefitsFormView(TestCase):
     )
     @freeze_time("1985-12-25")
     def test_post_bad_input(self, mock_report):
-        url = reverse("profile:monthly_benefits_index")
+        url = reverse("ssd:monthly_benefits_index")
         self.client.login(email=self.user.email, password="12345")
 
         with self.assertRaises(ValueError):
             self.client.post(url, data={"report_date": "bad-user-input"})
 
-    @patch("open_inwoner.ssd.forms.MaandspecificatieConfig.get_solo")
+    @patch("open_inwoner.ssd.models.SSDConfig.get_solo")
     def test_get_report_not_enabled(self, mock_solo):
         mock_solo.return_value.maandspecificatie_enabled = False
 
-        url = reverse("profile:monthly_benefits_index")
+        url = reverse("ssd:monthly_benefits_index")
 
         self.client.login(email=self.user.email, password="12345")
 
@@ -119,14 +119,14 @@ class TestYearlyBenefitsFormView(TestCase):
         self.user.save()
 
     def test_get(self):
-        url = reverse("profile:yearly_benefits_index")
+        url = reverse("ssd:yearly_benefits_index")
 
         # request with anonymous user
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
         self.assertEqual(
-            response.url, "/accounts/login/?next=/profile/uitkeringen/jaaropgaven/"
+            response.url, "/accounts/login/?next=/uitkeringen/jaaropgaven/"
         )
 
         # request with user logged in
@@ -142,7 +142,7 @@ class TestYearlyBenefitsFormView(TestCase):
     )
     @freeze_time("1985-12-25")
     def test_post_success(self, mock_report):
-        url = reverse("profile:yearly_benefits_index")
+        url = reverse("ssd:yearly_benefits_index")
         self.client.login(email=self.user.email, password="12345")
 
         response = self.client.post(url, data={"report_date": "1984-12-1"})
@@ -154,10 +154,9 @@ class TestYearlyBenefitsFormView(TestCase):
         "open_inwoner.ssd.client.JaaropgaveClient.get_report",
         return_value=None,
     )
-    @patch("open_inwoner.ssd.models.SSDConfig.get_solo")
     @freeze_time("1985-12-25")
-    def test_post_fail(self, mock_report, mock_solo):
-        url = reverse("profile:yearly_benefits_index")
+    def test_post_fail(self, mock_report):
+        url = reverse("ssd:yearly_benefits_index")
         self.client.login(email=self.user.email, password="12345")
 
         response = self.client.post(url, data={"report_date": "1984-12-25"})
@@ -170,11 +169,11 @@ class TestYearlyBenefitsFormView(TestCase):
 
         self.assertContains(response, "Geen uitkeringsspecificatie gevonden voor 1984")
 
-    @patch("open_inwoner.ssd.forms.JaaropgaveConfig.get_solo")
+    @patch("open_inwoner.ssd.forms.SSDConfig.get_solo")
     def test_get_report_not_enabled(self, mock_solo):
         mock_solo.return_value.jaaropgave_enabled = False
 
-        url = reverse("profile:yearly_benefits_index")
+        url = reverse("ssd:yearly_benefits_index")
 
         self.client.login(email=self.user.email, password="12345")
 

@@ -8,7 +8,7 @@ import requests_mock
 from lxml import etree
 
 from ..client import JaaropgaveClient, SSDBaseClient, UitkeringClient
-from .factories import JaaropgaveConfigFactory, SSDConfigFactory
+from .factories import SSDConfigFactory
 
 FILES_DIR = Path(__file__).parent.resolve() / "files"
 
@@ -17,14 +17,12 @@ FILES_DIR = Path(__file__).parent.resolve() / "files"
 class SSDClientRequestInterfaceTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        # facilitate testing the request interface through abstract SSDBaseClient
+        # enable testing of the request interface through abstract SSDBaseClient
         SSDBaseClient.__abstractmethods__ = []
         super().setUpTestData()
 
     @requests_mock.Mocker()
     def test_tsl_with_server_cert(self, mock_request_body, mock_request):
-        """Assert that TSL server certs are correctly passed to the request"""
-
         client = SSDBaseClient()
         client.config = SSDConfigFactory.build(
             service__url="https://example.com/soap-service",
@@ -43,8 +41,6 @@ class SSDClientRequestInterfaceTest(TestCase):
 
     @requests_mock.Mocker()
     def test_tsl_without_server_cert(self, mock_request_body, mock_request):
-        """Assert that requests work without TSL server certs"""
-
         client = SSDBaseClient()
         client.config = SSDConfigFactory.build(
             service__url="https://example.com/soap-service",
@@ -61,8 +57,6 @@ class SSDClientRequestInterfaceTest(TestCase):
 
     @requests_mock.Mocker()
     def test_tls_no_client_cert(self, mock_request_body, mock_request):
-        """Assert that requests work without tsl client certificates"""
-
         client = SSDBaseClient()
         client.config = SSDConfigFactory.build(
             service__url="https://example.com/soap-service",
@@ -79,8 +73,6 @@ class SSDClientRequestInterfaceTest(TestCase):
 
     @requests_mock.Mocker()
     def test_tsl_client_public_cert_missing(self, mock_request_body, mock_request):
-        """Assert that requests work without tsl public certificate"""
-
         client = SSDBaseClient()
         client.config = SSDConfigFactory.build(
             service__url="https://example.com/soap-service",
@@ -98,8 +90,6 @@ class SSDClientRequestInterfaceTest(TestCase):
 
     @requests_mock.Mocker()
     def test_tsl_client_public_cert_only(self, mock_request_body, mock_request):
-        """Assert that tsl client certs are correctly passed to the request"""
-
         client = SSDBaseClient()
         client.config = SSDConfigFactory.build(
             service__url="https://example.com/soap-service",
@@ -120,8 +110,6 @@ class SSDClientRequestInterfaceTest(TestCase):
 
     @requests_mock.Mocker()
     def test_tsl_client_cert_and_private_key(self, mock_request_body, mock_request):
-        """Assert that tsl client certs and private keys are correctly passed to the request"""
-
         client = SSDBaseClient()
         client.config = SSDConfigFactory.build(
             service__url="https://example.com/soap-service",
@@ -154,8 +142,15 @@ class UitkeringClientTest(TestCase):
 
         for code in [300, 400, 500]:
             with self.subTest(code=code):
-                mock_request.post("https://example.com/soap-service", status_code=code)
-                res = client.get_report(bsn="12345", report_date_iso="1985-07-25")
+                mock_request.post(
+                    "https://example.com/soap-service",
+                    status_code=code,
+                )
+                res = client.get_report(
+                    bsn="12345",
+                    report_date_iso="1985-07-25",
+                    base_url="https://dummy.com",
+                )
                 self.assertIsNone(res)
 
     @patch("django.utils.timezone.localtime", return_value=datetime(2023, 7, 12, 11, 0))
@@ -168,7 +163,9 @@ class UitkeringClientTest(TestCase):
 
         mock_request.post("https://example.com/soap-service")
 
-        client.get_report(bsn="12345", report_date_iso="1985-07-25")
+        client.get_report(
+            bsn="12345", report_date_iso="1985-07-25", base_url="https://dummy.com"
+        )
 
         # get request body and parse XML
         body = mock_request.last_request.body
@@ -200,8 +197,15 @@ class JaaropgaveClientTest(TestCase):
 
         for code in [300, 400, 500]:
             with self.subTest(code=code):
-                mock_request.post("https://example.com/soap-service", status_code=code)
-                res = client.get_report(bsn="12345", report_date_iso="1985-12-24")
+                mock_request.post(
+                    "https://example.com/soap-service",
+                    status_code=code,
+                )
+                res = client.get_report(
+                    bsn="12345",
+                    report_date_iso="1985-12-24",
+                    base_url="https://dummy.com",
+                )
                 self.assertIsNone(res)
 
     @patch("django.utils.timezone.localtime", return_value=datetime(2023, 7, 12, 11, 0))
@@ -211,11 +215,14 @@ class JaaropgaveClientTest(TestCase):
         client.config = SSDConfigFactory.build(
             service__url="https://example.com/soap-service",
         )
-        client.config.jaaropgave = JaaropgaveConfigFactory.build()
 
         mock_request.post("https://example.com/soap-service")
 
-        client.get_report(bsn="12345", report_date_iso="1985-12-12")
+        client.get_report(
+            bsn="12345",
+            report_date_iso="1985-12-12",
+            base_url="https://dummy.com",
+        )
 
         # get request body and parse XML
         body = mock_request.last_request.body

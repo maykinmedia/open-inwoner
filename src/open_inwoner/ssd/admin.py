@@ -3,28 +3,11 @@ from django.utils.translation import gettext_lazy as _
 
 from solo.admin import SingletonModelAdmin
 
-from .models import JaaropgaveConfig, MaandspecificatieConfig, SSDConfig
-
-
-class JaaropgaveConfigInline(admin.StackedInline):
-    model = JaaropgaveConfig
-    min_num = 1
-    max_num = 1
-    can_delete = False
-    verbose_name = _("Jaaropgave report configuration")
-
-
-class MaandspecificatieConfigInline(admin.StackedInline):
-    model = MaandspecificatieConfig
-    min_num = 1
-    max_num = 1
-    can_delete = False
-    verbose_name = _("Maandspecificatie report configuration")
+from .models import SSDConfig
 
 
 @admin.register(SSDConfig)
 class SSDConfigAdmin(SingletonModelAdmin):
-    inlines = [MaandspecificatieConfigInline, JaaropgaveConfigInline]
     fieldsets = (
         (
             _("SSD client"),
@@ -38,6 +21,29 @@ class SSDConfigAdmin(SingletonModelAdmin):
             },
         ),
         (_("Mijn Uitkeringen"), {"fields": ("mijn_uitkeringen_text",)}),
+        (
+            _("Maandspecificatie"),
+            {
+                "fields": (
+                    "maandspecificatie_enabled",
+                    "maandspecificatie_delta",
+                    "maandspecificatie_available_from",
+                    "maandspecificatie_display_text",
+                )
+            },
+        ),
+        (
+            _("Jaaropgave"),
+            {
+                "fields": (
+                    "jaaropgave_enabled",
+                    "jaaropgave_delta",
+                    "jaaropgave_available_from",
+                    "jaaropgave_display_text",
+                    "jaaropgave_comments",
+                )
+            },
+        ),
     )
 
     class Meta:

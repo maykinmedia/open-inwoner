@@ -1,24 +1,22 @@
-# from django.urls import path
+from django.urls import path
 
-# from open_inwoner.ssd.views.benefits_views import (
-#     MonthlyBenefitsFormView,
-#     YearlyBenefitsFormView,
-#     DownloadMonthlyBenefitsView,
-#     DownloadYearlyBenefitsView,
-# )
+from open_inwoner.ssd.views import MonthlyBenefitsFormView, YearlyBenefitsFormView
 
 app_name = "ssd"
 
 
 urlpatterns = [
-    # path(
-    #     "jaaropgaven/<str:file_name>/download",
-    #     DownloadYearlyBenefitsView.as_view(),
-    #     name="download_yearly_benefits",
-    # ),
-    # path(
-    #     "maandspecificaties/<str:file_name>/download",
-    #     DownloadMonthlyBenefitsView.as_view(),
-    #     name="download_monthly_benefits",
-    # ),
+    path(
+        "",
+        MonthlyBenefitsFormView.as_view(),
+        name="uitkeringen",
+    ),
+    path(
+        "maandspecificaties/",
+        MonthlyBenefitsFormView.as_view(),
+        name="monthly_benefits_index",
+    ),
+    path(
+        "jaaropgaven/", YearlyBenefitsFormView.as_view(), name="yearly_benefits_index"
+    ),
 ]

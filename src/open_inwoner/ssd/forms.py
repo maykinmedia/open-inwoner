@@ -4,7 +4,7 @@ from django import forms
 
 from dateutil.relativedelta import relativedelta
 
-from .models import JaaropgaveConfig, MaandspecificatieConfig
+from .models import SSDConfig
 
 
 #
@@ -13,7 +13,7 @@ from .models import JaaropgaveConfig, MaandspecificatieConfig
 def get_monthly_report_dates() -> list[tuple[date, str]]:
     """Return choices of months for which reports are available for download"""
 
-    config = MaandspecificatieConfig.get_solo()
+    config = SSDConfig.get_solo()
 
     if config.maandspecificatie_enabled is not True:
         return []
@@ -40,7 +40,7 @@ def get_monthly_report_dates() -> list[tuple[date, str]]:
 def get_yearly_report_dates() -> list[tuple[date, str]]:
     """Return choices of years for which reports are available for download"""
 
-    config = JaaropgaveConfig.get_solo()
+    config = SSDConfig.get_solo()
 
     if config.jaaropgave_enabled is not True:
         return []

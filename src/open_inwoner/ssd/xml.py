@@ -185,7 +185,8 @@ def get_uitkering_dict(xml_data):
 
     for detail_row in details_list:
         # dict keys are slugified to facilitate access in tests
-        details[slugify(detail_row["Omschrijving"])] = {
+        internal_key = slugify(detail_row["Omschrijving"]).replace("-", "_")
+        details[internal_key] = {
             "key": detail_row["Omschrijving"],
             "sign": glom(detail_row, "Bedrag.CdPositiefNegatief"),
             "value": format_float_repr(glom(detail_row, "Bedrag.WaardeBedrag")),

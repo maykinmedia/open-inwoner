@@ -7,26 +7,21 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.views.generic.edit import FormView
 
-from ..client import JaaropgaveClient, UitkeringClient
-from ..forms import MonthlyReportsForm, YearlyReportsForm
-from ..models import JaaropgaveConfig, MaandspecificatieConfig
+from .client import JaaropgaveClient, UitkeringClient
+from .forms import MonthlyReportsForm, YearlyReportsForm
 
 
 class BenefitsFormView(LoginRequiredMixin, FormView):
     template_name: str
     form_class: forms.Form
     ssd_client: Union[JaaropgaveClient, UitkeringClient]
-    report_config: Union[JaaropgaveConfig, MaandspecificatieConfig]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         client = self.ssd_client()
-        report_config = self.report_config.get_solo()
 
         context["client"] = client
-        context["mijn_uitkeringen_text"] = client.config.mijn_uitkeringen_text
-        context["report_display_text"] = report_config.display_text
 
         if "report" in self.request.GET:
             dt = datetime.strptime(self.request.GET["report"], "%Y-%m-%d")
@@ -42,8 +37,9 @@ class BenefitsFormView(LoginRequiredMixin, FormView):
 
             bsn = request.user.bsn
             report_date_iso = form.data["report_date"]
+            base_url = request.build_absolute_uri()
 
-            pdf_content = client.get_report(bsn, report_date_iso)
+            pdf_content = client.get_report(bsn, report_date_iso, base_url)
 
             if pdf_content is None:
                 return redirect(
@@ -61,11 +57,9 @@ class MonthlyBenefitsFormView(BenefitsFormView):
     template_name = "pages/ssd/monthly_reports_list.html"
     form_class = MonthlyReportsForm
     ssd_client = UitkeringClient
-    report_config = MaandspecificatieConfig
 
 
 class YearlyBenefitsFormView(BenefitsFormView):
     template_name = "pages/ssd/yearly_reports_list.html"
     form_class = YearlyReportsForm
     ssd_client = JaaropgaveClient
-    report_config = JaaropgaveConfig

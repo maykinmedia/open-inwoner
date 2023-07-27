@@ -110,6 +110,7 @@ urlpatterns = [
     path("apimock/", include("open_inwoner.apimock.urls")),
     # TODO move search to products cms app?
     path("", include("open_inwoner.search.urls", namespace="search")),
+    # path("uitkeringen/", include("open_inwoner.ssd.urls", namespace="ssd")),
     re_path(r"^", include("cms.urls")),
 ]
 

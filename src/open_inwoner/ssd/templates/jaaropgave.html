@@ -1,7 +1,7 @@
-{% load ssd_tags %}
+{% load ssd_tags static %}
 
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,10 +13,10 @@
     <!-- Title -->
     <header class="flex-container extra-margin-top">
         <div class="flex-box heading">
-            <h1 class="h1">Jaaropgave {{ jaaropgave.dienstjaar }}</h1>
+          <h1 class="h1">Jaaropgave {{ jaaropgave.dienstjaar }}</h1>
         </div>
         <div class="flex-box heading">
-            <h2 class="h2"><span class="logo">Gemeente {{ inhoudingsplichtige.gemeentenaam }}</span></h2>
+					<img class="logo" src="{{ logo.url }}">
         </div>
     </header>
     <!-- Addresses -->
@@ -35,105 +35,90 @@
             </div>
         </div>
     </div>
-    <div class="flex-box heading">
-      <h1><span class="logo">Gemeente {{ inhoudingsplichtige.gemeentenaam }}</span></h1>
-    </div>
-  </div>
-  <!-- Addresses -->
-  <div class="flex-container address">
-    <div class="flex-box heading address">
-      <p>{{ client.naam }}</p>
-      <p>{{ client.adres }}</p>
-      <p>{{ client.postcode }} {{ client.woonplaatsnaam }}</p>
-    </div>
-    <div class="flex-box heading address">
-      <div>
-        <p>{{ inhoudingsplichtige.key }}</p>
-        <p>Gemeente {{ inhoudingsplichtige.gemeentenaam }}</p>
-        <p>{{ inhoudingsplichtige.bezoekadres }}</p>
-        <p>{{ inhoudingsplichtige.postcode }} {{ inhoudingsplichtige.woonplaatsnaam }}</p>
-      </div>
-    </div>
-  </div>
-  <!-- PARTICIPATIEWET -->
-  <div class="section">
-    <div class="heading">
-      <span>PARTICIPATIEWET</span>
-    </div>
-    <!-- row 1 -->
-    <div class="subsection">
-      <table class="yearly-report table-extra-col">
-          <tr>
-            <th>{{ jaaropgave.fiscaalloon.key }}</th>
-            <th>{{ jaaropgave.loonheffing.key }}</th>
-            <th>{{ jaaropgave.arbeidskorting.key }}</th>
-            <th>{{ jaaropgave.loon_heffings_korting.key }}</th>
-            <th>{{ jaaropgave.loon_heffings_korting.code_label }}</th>
-          </tr>
-          <tr>
-            <td>{{ jaaropgave.fiscaalloon.sign }} {{ jaaropgave.fiscaalloon.value }}</td>
-            <td>{{ jaaropgave.loonheffing.sign }} {{ jaaropgave.loonheffing.value }}</td>
-            <!-- TODO: check if this needs to be changed; hard-coded for now. -->
-            <td>0</td>
-            <!-- Display first date -->
-            <td>{{ jaaropgave.loon_heffings_korting.dates.0.ingangsdatum }}</td>
-            <td>{{ jaaropgave.loon_heffings_korting.dates.0.code }}</td>
-          </tr>
-          <!-- Display additional dates if present -->
-          {% for date in jaaropgave.loon_heffings_korting.dates|slice:"1:" %}
-            {% if date %}
-              <tr>
-                <td colspan="3"></td>
-                <td>{{ date.ingangsdatum }}</td>
-                <td>{{ date.code }}</td>
-              </tr>
-            {% endif %}
-          {% endfor %}
-      </table>
-    </div>
-    <!-- row 2 -->
-    <div class="subsection">
-      <table class="yearly-report table-fixed">
-        <tr>
-          <th>{{ client.bsn_label }}</th>
-          <th>{{ jaaropgave.loon_zorgverzekeringswet.key }}</th>
-          <th>{{ jaaropgave.ingehouden_bijdrage.key }}</th>
-          <th>{{ jaaropgave.periode.key }}</th>
-        </tr>
-        <tr>
-          <td>{{ client.bsn }}</td>
-          <!-- `loon_zvw` is calculated based on `fiscaalloon` - `vergoeding_premie` -->
-          <td>{{ jaaropgave.loon_zorgverzekeringswet.value }}</td>
-          <td>{{ jaaropgave.ingehouden_bijdrage.sign}} {{ jaaropgave.ingehouden_bijdrage.value }}</td>
-          <td>{{ jaaropgave.periode.van }} t/m {{ jaaropgave.periode.tot }}</td>
-        </tr>
-      </table>
-    </div>
-    <!-- row 3 -->
-    <div class="subsection">
-      <table class="yearly-report table-fixed">
-        <tr>
-          <!-- Hard-coded for now; see below -->
-          <th>Verrekende levensloopverlofkorting</th>
-          <th>Totaal premies werknemer-verzekeringen</th>
-          <th>{{ jaaropgave.werkgevers_heffing_premie.key }}</th>
-          <th>{{ jaaropgave.code_loonbelastingtabel.key }}</th>
-        </tr>
-        <tr>
-          <!-- Hard-coded to 0 for now as different values don't make sense for the current purpose -->
-          <!-- Cf. the Response2018.xslt template provided in the Taiga files --> 
-          <td>0</td>
-          <td>0</td>
-          <td>{{ jaaropgave.werkgevers_heffing_premie.value }}</td>
-          <td>{{ jaaropgave.code_loonbelastingtabel.value }}</td>
-        </tr>
-      </table>
-  </div>
-  <!-- TOELICHTING -->
-  <div class="section">
-    <div class="heading">
-      <span>TOELICHTING</span>
-    </div>
-		{{ jaaropgave_comments|markdown|safe }}
-  </body>
+    <!-- PARTICIPATIEWET -->
+    <section class="section">
+        <div class="heading">
+            <span>PARTICIPATIEWET</span>
+        </div>
+        <!-- row 1 -->
+        <div class="subsection">
+            <table class="yearly-report__table table-extra-col">
+                <tr>
+                    <th>{{ jaaropgave.fiscaalloon.key }}</th>
+                    <th>{{ jaaropgave.loonheffing.key }}</th>
+                    <th>{{ jaaropgave.arbeidskorting.key }}</th>
+                    <th>{{ jaaropgave.loon_heffings_korting.key }}</th>
+                    <th>{{ jaaropgave.loon_heffings_korting.code_label }}</th>
+                </tr>
+                <tr>
+                    <td>{{ jaaropgave.fiscaalloon.sign }} {{ jaaropgave.fiscaalloon.value }}</td>
+                    <td>{{ jaaropgave.loonheffing.sign }} {{ jaaropgave.loonheffing.value }}</td>
+                    <!-- TODO: check if this needs to be changed; hard-coded for now. -->
+                    <td>0</td>
+                    <!-- Display first date -->
+                    <td>{{ jaaropgave.loon_heffings_korting.dates.0.ingangsdatum }}</td>
+                    <td>{{ jaaropgave.loon_heffings_korting.dates.0.code }}</td>
+                </tr>
+                <!-- Display additional dates if present -->
+                {% for date in jaaropgave.loon_heffings_korting.dates|slice:"1:" %}
+                    {% if date %}
+                        <tr>
+                            <td colspan="3"></td>
+                            <td>{{ date.ingangsdatum }}</td>
+                            <td>{{ date.code }}</td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </table>
+        </div>
+        <!-- row 2 -->
+        <div class="subsection">
+            <table class="yearly-report__table table-fixed">
+                <tr>
+                    <th>{{ client.bsn_label }}</th>
+                    <th>{{ jaaropgave.loon_zorgverzekeringswet.key }}</th>
+                    <th>{{ jaaropgave.ingehouden_bijdrage.key }}</th>
+                    <th>{{ jaaropgave.periode.key }}</th>
+                </tr>
+                <tr>
+                    <td>{{ client.bsn }}</td>
+                    <!-- `loon_zvw` is calculated based on `fiscaalloon` - `vergoeding_premie` -->
+                    <td>{{ jaaropgave.loon_zorgverzekeringswet.value }}</td>
+                    <td>{{ jaaropgave.ingehouden_bijdrage.sign }} {{ jaaropgave.ingehouden_bijdrage.value }}</td>
+                    <td>{{ jaaropgave.periode.van }} t/m {{ jaaropgave.periode.tot }}</td>
+                </tr>
+            </table>
+        </div>
+        <!-- row 3 -->
+        <div class="subsection">
+            <table class="yearly-report__table table-fixed">
+                <tr>
+                    <!-- Hard-coded for now; see below -->
+                    <th>Verrekende levensloopverlofkorting</th>
+                    <th>Totaal premies werknemer-verzekeringen</th>
+                    <th>{{ jaaropgave.werkgevers_heffing_premie.key }}</th>
+                    <th>{{ jaaropgave.code_loonbelastingtabel.key }}</th>
+                </tr>
+                <tr>
+                    <!-- Hard-coded to 0 for now as different values don't make sense for the current purpose -->
+                    <!-- Cf. the Response2018.xslt template provided in the Taiga files -->
+                    <td>0</td>
+                    <td>0</td>
+                    <td>{{ jaaropgave.werkgevers_heffing_premie.value }}</td>
+                    <td>{{ jaaropgave.code_loonbelastingtabel.value }}</td>
+                </tr>
+            </table>
+        </div>
+    </section>
+    <!-- TOELICHTING -->
+    <section class="section">
+        <div class="heading">
+            <span>TOELICHTING</span>
+        </div>
+        <div class="subsection extra-margin">
+					{{ jaaropgave_comments|markdown|safe }}
+				</div>
+    </section>
+</div>
+</body>
 </html>

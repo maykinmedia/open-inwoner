@@ -59,50 +59,50 @@ class XMLParsingTests(TestCase):
 
         # details
         self.assertEqual(
-            data["details"]["5-aflossing-vordering"]["key"], "5% Aflossing vordering"
+            data["details"]["5_aflossing_vordering"]["key"], "5% Aflossing vordering"
         )
-        self.assertEqual(data["details"]["5-aflossing-vordering"]["value"], "37,01")
-        self.assertEqual(data["details"]["5-aflossing-vordering"]["column"], "minus")
+        self.assertEqual(data["details"]["5_aflossing_vordering"]["value"], "37,01")
+        self.assertEqual(data["details"]["5_aflossing_vordering"]["column"], "minus")
 
         self.assertEqual(
-            data["details"]["ink-pensioenvut-65-geen-vt"]["key"],
+            data["details"]["ink_pensioenvut_65_geen_vt"]["key"],
             "Ink pensioen/VUT (65-)geen vt",
         )
         self.assertEqual(
-            data["details"]["ink-pensioenvut-65-geen-vt"]["value"], "36,44"
+            data["details"]["ink_pensioenvut_65_geen_vt"]["value"], "36,44"
         )
         self.assertEqual(
-            data["details"]["ink-pensioenvut-65-geen-vt"]["column"], "base"
+            data["details"]["ink_pensioenvut_65_geen_vt"]["column"], "base"
         )
 
-        self.assertEqual(data["details"]["kd-norm-tot-aow"]["key"], "KD norm tot AOW")
-        self.assertEqual(data["details"]["kd-norm-tot-aow"]["value"], "740,17")
-        self.assertEqual(data["details"]["kd-norm-tot-aow"]["column"], "plus")
+        self.assertEqual(data["details"]["kd_norm_tot_aow"]["key"], "KD norm tot AOW")
+        self.assertEqual(data["details"]["kd_norm_tot_aow"]["value"], "740,17")
+        self.assertEqual(data["details"]["kd_norm_tot_aow"]["column"], "plus")
 
         self.assertEqual(
-            data["details"]["reservering-vakantiegeld"]["key"],
+            data["details"]["reservering_vakantiegeld"]["key"],
             "RESERVERING VAKANTIEGELD",
         )
-        self.assertEqual(data["details"]["reservering-vakantiegeld"]["value"], "37,01")
+        self.assertEqual(data["details"]["reservering_vakantiegeld"]["value"], "37,01")
 
         self.assertEqual(
-            data["details"]["totaal-gekorte-inkomsten"]["key"],
+            data["details"]["totaal_gekorte_inkomsten"]["key"],
             "TOTAAL GEKORTE INKOMSTEN",
         )
-        self.assertEqual(data["details"]["totaal-gekorte-inkomsten"]["value"], "36,44")
-        self.assertEqual(data["details"]["totaal-gekorte-inkomsten"]["column"], "minus")
+        self.assertEqual(data["details"]["totaal_gekorte_inkomsten"]["value"], "36,44")
+        self.assertEqual(data["details"]["totaal_gekorte_inkomsten"]["column"], "minus")
 
         self.assertEqual(
-            data["details"]["totaal-netto-bijstand"]["key"], "TOTAAL NETTO BIJSTAND"
+            data["details"]["totaal_netto_bijstand"]["key"], "TOTAAL NETTO BIJSTAND"
         )
-        self.assertEqual(data["details"]["totaal-netto-bijstand"]["value"], "666,72")
-        self.assertEqual(data["details"]["totaal-netto-bijstand"]["column"], "plus")
+        self.assertEqual(data["details"]["totaal_netto_bijstand"]["value"], "666,72")
+        self.assertEqual(data["details"]["totaal_netto_bijstand"]["column"], "plus")
 
         self.assertEqual(
-            data["details"]["uit-te-betalen-bedrag"]["key"], "UIT TE BETALEN BEDRAG"
+            data["details"]["uit_te_betalen_bedrag"]["key"], "UIT TE BETALEN BEDRAG"
         )
-        self.assertEqual(data["details"]["uit-te-betalen-bedrag"]["value"], "629,71")
-        self.assertEqual(data["details"]["uit-te-betalen-bedrag"]["column"], "plus")
+        self.assertEqual(data["details"]["uit_te_betalen_bedrag"]["value"], "629,71")
+        self.assertEqual(data["details"]["uit_te_betalen_bedrag"]["column"], "plus")
 
         # inkomstenkorting
         self.assertEqual(

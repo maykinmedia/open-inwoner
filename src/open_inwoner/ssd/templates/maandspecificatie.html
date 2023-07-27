@@ -1,14 +1,20 @@
 {% load ssd_tags %}
 
+<!DOCTYPE html>
+<html>
 <head>
     <title>Maandspecificatie {{ uitkeringsspecificatie.periode.value }}</title>
 </head>
 <body>
 <div class="monthly-report">
     <!-- HEADER -->
-    <header class="header">
-        <h1 class="h1 left">Maandspecificatie {{ uitkeringsspecificatie.periode.value }}</h1>
-        <h2 class="h2 right"><span class="logo">Gemeente {{ uitkeringsinstantie.gemeente.value }}</span></h2>
+    <header class="flex-container extra-margin-top">
+			<div class="flex-box heading">
+        <h1 class="h3">Maandspecificatie {{ uitkeringsspecificatie.periode.value }}</h1>
+			</div>
+			<div class="flex-box heading">
+				<img class="monthly-report__logo" src="{{ logo.url }}">
+      </div>
     </header>
     <!-- Uitkeringsinstantie -->
     <br>
@@ -96,5 +102,10 @@
             {% endfor %}
         </table>
     </div>
+		<br>
+		<div class="section">
+			Op de 25e van de maand krijgt u het bedrag ad. € {{ details.uit_te_betalen_bedrag.value }} uitbetaald.
+		</div>
 </div>
 </body>
+</html>

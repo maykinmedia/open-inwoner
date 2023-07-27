@@ -25,10 +25,7 @@ from open_inwoner.accounts.views import (
     NecessaryFieldsUserView,
 )
 from open_inwoner.accounts.views.actions import ActionDeleteView
-from open_inwoner.ssd.views.benefits_views import (
-    MonthlyBenefitsFormView,
-    YearlyBenefitsFormView,
-)
+from open_inwoner.ssd.views import MonthlyBenefitsFormView, YearlyBenefitsFormView
 
 app_name = "profile"
 
