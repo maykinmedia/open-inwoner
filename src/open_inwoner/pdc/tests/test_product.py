@@ -277,6 +277,20 @@ class TestProductContent(WebTest):
         self.assertTrue(sidemenu_cta_button)
         self.assertIn(product.link, sidemenu_cta_button[0].values())
 
+    def test_content_html_escape(self):
+        product = ProductFactory()
+
+        product.content = "\\<b>hello world\\</b> **test**"
+        product.save()
+
+        response = self.app.get(
+            reverse("products:product_detail", kwargs={"slug": product.slug})
+        )
+
+        self.assertNotContains(response, "<b>hello world</b>")
+        self.assertContains(response, "&lt;b&gt;hello world&lt;/b&gt;")
+        self.assertContains(response, "<strong>test</strong>")
+
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestProductDetailView(WebTest):

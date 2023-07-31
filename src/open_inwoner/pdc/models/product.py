@@ -1,3 +1,4 @@
+import html
 import json
 from typing import Union
 from uuid import uuid4
@@ -207,6 +208,10 @@ class Product(models.Model):
 
     def has_cta_tag(self):
         return "\[CTABUTTON\]" in self.content
+
+    def save(self, *args, **kwargs):
+        self.content = html.escape(self.content).replace("\\&", "&")
+        super().save()
 
 
 class ProductFile(models.Model):

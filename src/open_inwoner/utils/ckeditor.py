@@ -1,3 +1,5 @@
+import html
+
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
 
@@ -26,8 +28,8 @@ def get_rendered_content(content):
     Takes object's content as an input and returns the rendered one.
     """
     md = markdown.Markdown(extensions=["tables"])
-    html = md.convert(content)
-    soup = BeautifulSoup(html, "html.parser")
+    html_string = md.convert(html.escape(content))
+    soup = BeautifulSoup(html_string, "html.parser")
 
     for tag, class_name in CLASS_ADDERS:
         for element in soup.find_all(tag):
@@ -43,8 +45,8 @@ def get_product_rendered_content(product):
     Takes product's content as an input and returns the rendered one.
     """
     md = markdown.Markdown(extensions=["tables"])
-    html = md.convert(product.content)
-    soup = BeautifulSoup(html, "html.parser")
+    html_string = md.convert(product.content)
+    soup = BeautifulSoup(html_string, "html.parser")
 
     for tag, class_name in CLASS_ADDERS:
         for element in soup.find_all(tag):
