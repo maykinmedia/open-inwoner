@@ -1,7 +1,7 @@
 {% load ssd_tags static %}
 
 <!DOCTYPE html>
-<html>
+<html lang="nl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,61 +11,68 @@
 <div class="yearly-report">
     <!-- HEADER -->
     <!-- Title -->
-    <header class="flex-container extra-margin-top">
+    <header class="header flex-container extra-margin-top">
         <div class="flex-box heading">
-          <h1 class="h1">Jaaropgave {{ jaaropgave.dienstjaar }}</h1>
+            <h1 class="h1">Jaaropgave {{ jaaropgave.dienstjaar }}</h1>
         </div>
-        <div class="flex-box heading">
-					<img class="logo" src="{{ logo.url }}">
+        <div class="flex-box heading__logo right">
+            <img class="yearly-report__logo" src="{{ logo.url }}" alt="">
         </div>
     </header>
     <!-- Addresses -->
-    <div class="flex-container address">
-        <div class="flex-box heading address">
-            <p>{{ client.naam }}</p>
-            <p>{{ client.adres }}</p>
-            <p>{{ client.postcode }} {{ client.woonplaatsnaam }}</p>
+    <div class="flex-container__address address">
+        <div class="flex-box heading personalia">
+            <p class="yearly-report__p">{{ client.naam }}</p>
+            <p class="yearly-report__p">{{ client.adres }}</p>
+            <p class="yearly-report__p">{{ client.postcode }} {{ client.woonplaatsnaam }}</p>
         </div>
         <div class="flex-box heading address">
             <div>
-                <p>{{ inhoudingsplichtige.key }}</p>
-                <p>Gemeente {{ inhoudingsplichtige.gemeentenaam }}</p>
-                <p>{{ inhoudingsplichtige.bezoekadres }}</p>
-                <p>{{ inhoudingsplichtige.postcode }} {{ inhoudingsplichtige.woonplaatsnaam }}</p>
+                <p class="yearly-report__p inhoudingsplichtige">{{ inhoudingsplichtige.key }}</p>
+                <p class="yearly-report__p">Gemeente {{ inhoudingsplichtige.gemeentenaam }}</p>
+                <p class="yearly-report__p">{{ inhoudingsplichtige.bezoekadres }}</p>
+                <p class="yearly-report__p">{{ inhoudingsplichtige.postcode }} {{ inhoudingsplichtige.woonplaatsnaam }}</p>
             </div>
         </div>
     </div>
     <!-- PARTICIPATIEWET -->
-    <section class="section">
+    <section class="section section__participatiewet">
         <div class="heading">
-            <span>PARTICIPATIEWET</span>
+            <h2 class="h2">Participatiewet</h2>
         </div>
         <!-- row 1 -->
         <div class="subsection">
             <table class="yearly-report__table table-extra-col">
-                <tr>
-                    <th>{{ jaaropgave.fiscaalloon.key }}</th>
-                    <th>{{ jaaropgave.loonheffing.key }}</th>
-                    <th>{{ jaaropgave.arbeidskorting.key }}</th>
-                    <th>{{ jaaropgave.loon_heffings_korting.key }}</th>
-                    <th>{{ jaaropgave.loon_heffings_korting.code_label }}</th>
+                <colgroup>
+                    <col style="width: 23%;"/>
+                    <col style="width: 23%;"/>
+                    <col style="width: 23%;"/>
+                    <col style="width: 23%;"/>
+                    <col style="width: 8%;"/>
+                </colgroup>
+                <tr class="yearly-report__tr">
+                    <th class="yearly-report__th">{{ jaaropgave.fiscaalloon.key }}</th>
+                    <th class="yearly-report__th">{{ jaaropgave.loonheffing.key }}</th>
+                    <th class="yearly-report__th">{{ jaaropgave.arbeidskorting.key }}</th>
+                    <th class="yearly-report__th">{{ jaaropgave.loon_heffings_korting.key }}</th>
+                    <th class="yearly-report__th">{{ jaaropgave.loon_heffings_korting.code_label }}</th>
                 </tr>
-                <tr>
-                    <td>{{ jaaropgave.fiscaalloon.sign }} {{ jaaropgave.fiscaalloon.value }}</td>
-                    <td>{{ jaaropgave.loonheffing.sign }} {{ jaaropgave.loonheffing.value }}</td>
+                <tr class="yearly-report__tr">
+                    <td class="yearly-report__td">{{ jaaropgave.fiscaalloon.sign }} {{ jaaropgave.fiscaalloon.value }}</td>
+                    <td class="yearly-report__td">{{ jaaropgave.loonheffing.sign }} {{ jaaropgave.loonheffing.value }}</td>
                     <!-- TODO: check if this needs to be changed; hard-coded for now. -->
-                    <td>0</td>
+                    <td class="yearly-report__td">0</td>
                     <!-- Display first date -->
-                    <td>{{ jaaropgave.loon_heffings_korting.dates.0.ingangsdatum }}</td>
-                    <td>{{ jaaropgave.loon_heffings_korting.dates.0.code }}</td>
+                    <td class="yearly-report__td">{{ jaaropgave.loon_heffings_korting.dates.0.ingangsdatum }}</td>
+                    <td class="yearly-report__td">{{ jaaropgave.loon_heffings_korting.dates.0.code }}</td>
                 </tr>
                 <!-- Display additional dates if present -->
                 {% for date in jaaropgave.loon_heffings_korting.dates|slice:"1:" %}
                     {% if date %}
-                        <tr>
+                        <tr class="yearly-report__tr">
                             <td colspan="3"></td>
-                            <td>{{ date.ingangsdatum }}</td>
-                            <td>{{ date.code }}</td>
+                            <td class="yearly-report__td">{{ date.ingangsdatum }}</td>
+                            <td class="yearly-report__td">{{ date.code }}</td>
                         </tr>
                     {% endif %}
                 {% endfor %}
@@ -74,50 +81,63 @@
         <!-- row 2 -->
         <div class="subsection">
             <table class="yearly-report__table table-fixed">
-                <tr>
-                    <th>{{ client.bsn_label }}</th>
-                    <th>{{ jaaropgave.loon_zorgverzekeringswet.key }}</th>
-                    <th>{{ jaaropgave.ingehouden_bijdrage.key }}</th>
-                    <th>{{ jaaropgave.periode.key }}</th>
+                <colgroup>
+                    <col style="width: 23%;"/>
+                    <col style="width: 23%;"/>
+                    <col style="width: 23%;"/>
+                    <col style="width: 31%;"/>
+                </colgroup>
+                <tr class="yearly-report__tr">
+                    <th class="yearly-report__th">{{ client.bsn_label }}</th>
+                    <th class="yearly-report__th">{{ jaaropgave.loon_zorgverzekeringswet.key }}</th>
+                    <th class="yearly-report__th">{{ jaaropgave.ingehouden_bijdrage.key }}</th>
+                    <th class="yearly-report__th">{{ jaaropgave.periode.key }}</th>
                 </tr>
-                <tr>
-                    <td>{{ client.bsn }}</td>
+                <tr class="yearly-report__tr">
+                    <td class="yearly-report__td">{{ client.bsn }}</td>
                     <!-- `loon_zvw` is calculated based on `fiscaalloon` - `vergoeding_premie` -->
-                    <td>{{ jaaropgave.loon_zorgverzekeringswet.value }}</td>
-                    <td>{{ jaaropgave.ingehouden_bijdrage.sign }} {{ jaaropgave.ingehouden_bijdrage.value }}</td>
-                    <td>{{ jaaropgave.periode.van }} t/m {{ jaaropgave.periode.tot }}</td>
+                    <td class="yearly-report__td">{{ jaaropgave.loon_zorgverzekeringswet.value }}</td>
+                    <td class="yearly-report__td">{{ jaaropgave.ingehouden_bijdrage.sign }} {{ jaaropgave.ingehouden_bijdrage.value }}</td>
+                    <td class="yearly-report__td">{{ jaaropgave.periode.van }} t/m {{ jaaropgave.periode.tot }}</td>
                 </tr>
             </table>
         </div>
         <!-- row 3 -->
         <div class="subsection">
             <table class="yearly-report__table table-fixed">
-                <tr>
+                <colgroup>
+                    <col style="width: 23%;"/>
+                    <col style="width: 23%;"/>
+                    <col style="width: 23%;"/>
+                    <col style="width: 31%;"/>
+                </colgroup>
+                <tr class="yearly-report__tr">
                     <!-- Hard-coded for now; see below -->
-                    <th>Verrekende levensloopverlofkorting</th>
-                    <th>Totaal premies werknemer-verzekeringen</th>
-                    <th>{{ jaaropgave.werkgevers_heffing_premie.key }}</th>
-                    <th>{{ jaaropgave.code_loonbelastingtabel.key }}</th>
+                    <th class="yearly-report__th">Verrekende levensloopverlofkorting</th>
+                    <th class="yearly-report__th">Totaal premies werknemer-verzekeringen</th>
+                    <th class="yearly-report__th">{{ jaaropgave.werkgevers_heffing_premie.key }}</th>
+                    <th class="yearly-report__th">{{ jaaropgave.code_loonbelastingtabel.key }}</th>
                 </tr>
-                <tr>
+                <tr class="yearly-report__tr">
                     <!-- Hard-coded to 0 for now as different values don't make sense for the current purpose -->
                     <!-- Cf. the Response2018.xslt template provided in the Taiga files -->
-                    <td>0</td>
-                    <td>0</td>
-                    <td>{{ jaaropgave.werkgevers_heffing_premie.value }}</td>
-                    <td>{{ jaaropgave.code_loonbelastingtabel.value }}</td>
+                    <td class="yearly-report__td">0</td>
+                    <td class="yearly-report__td">0</td>
+                    <td class="yearly-report__td">{{ jaaropgave.werkgevers_heffing_premie.value }}</td>
+                    <td class="yearly-report__td">{{ jaaropgave.code_loonbelastingtabel.value }}</td>
                 </tr>
             </table>
         </div>
     </section>
+    <br/>
     <!-- TOELICHTING -->
-    <section class="section">
+    <section class="section section__toelichting extra-margin">
         <div class="heading">
-            <span>TOELICHTING</span>
+            <h3 class="h3">Toelichting</h3>
         </div>
         <div class="subsection extra-margin">
-					{{ jaaropgave_comments|markdown|safe }}
-				</div>
+            <p class="yearly-report__p">{{ jaaropgave_comments|markdown|safe }}</p>
+        </div>
     </section>
 </div>
 </body>
