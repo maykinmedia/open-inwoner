@@ -276,3 +276,33 @@ class TestProductContent(WebTest):
 
         self.assertTrue(sidemenu_cta_button)
         self.assertIn(product.link, sidemenu_cta_button[0].values())
+
+
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+class TestProductDetailView(WebTest):
+    def test_subheadings_in_sidebar(self):
+        product = ProductFactory(
+            content="##First subheading\rlorem ipsum...\r##Second subheading",
+            link="http://www.example.com",
+        )
+
+        response = self.app.get(
+            reverse("products:product_detail", kwargs={"slug": product.slug})
+        )
+
+        links = response.pyquery(".anchor-menu__sublist a")
+
+        # 2 x 2 links (mobile + desktop)
+        self.assertEqual(len(links), 4)
+
+        self.assertEqual(links[0].text, "First subheading")
+        self.assertEqual(links[0].attrib["href"], "#first-subheading")
+
+        self.assertEqual(links[1].text, "Second subheading")
+        self.assertEqual(links[1].attrib["href"], "#second-subheading")
+
+        self.assertEqual(links[2].text, "First subheading")
+        self.assertEqual(links[2].attrib["href"], "#first-subheading")
+
+        self.assertEqual(links[3].text, "Second subheading")
+        self.assertEqual(links[3].attrib["href"], "#second-subheading")

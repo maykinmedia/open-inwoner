@@ -5,7 +5,7 @@ export class CreateGumshoe {
 
   constructor(node) {
     new Gumshoe(CreateGumshoe.selector, {
-      navClass: 'anchor-menu__list-item--active',
+      navClass: 'anchor-menu__list__item--active',
       offset: 30,
     })
   }
