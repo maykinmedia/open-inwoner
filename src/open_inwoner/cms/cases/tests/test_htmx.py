@@ -12,6 +12,8 @@ from zgw_consumers.constants import APITypes
 from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 
 from open_inwoner.accounts.tests.factories import DigidUserFactory
+from open_inwoner.cms.tests import cms_tools
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openklant.constants import Status
 from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.openklant.tests.data import (
@@ -53,6 +55,12 @@ class CasesPlaywrightTests(
 
         self.user = DigidUserFactory(bsn="900222086")
         self.user_login_state = self.get_user_bsn_login_state(self.user)
+
+        # cookiebanner
+        self.config = SiteConfiguration.get_solo()
+        cms_tools.create_homepage()
+        self.config.cookie_info_text = ""
+        self.config.save()
 
         # services
         self.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
