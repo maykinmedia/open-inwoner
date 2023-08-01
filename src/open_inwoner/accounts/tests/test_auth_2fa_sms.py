@@ -407,9 +407,7 @@ class TestSMSVerificationLogin(WebTest):
         phonenumber1_response = phonenumber1_form.submit()
 
         self.assertContains(phonenumber1_response, "Account verificatie (stap 2 van 2)")
-        mock_gateway_send.assert_called_with(
-            to=format_phone_number("0643465651"), token=ANY
-        )
+        mock_gateway_send.assert_called_with(to="0643465651", token=ANY)
 
         sent_token = mock_gateway_send.call_args[1]["token"]
 
@@ -419,7 +417,7 @@ class TestSMSVerificationLogin(WebTest):
 
         self.user.refresh_from_db()
 
-        self.assertEqual(self.user.phonenumber, "+31643465651")
+        self.assertEqual(self.user.phonenumber, "0643465651")
         self.assertRedirects(phonenumber2_response, str(settings.LOGIN_REDIRECT_URL))
 
     @patch("open_inwoner.accounts.gateways.gateway.send")

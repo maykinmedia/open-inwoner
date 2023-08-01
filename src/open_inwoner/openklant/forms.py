@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 from open_inwoner.accounts.models import User
 from open_inwoner.openklant.models import ContactFormSubject, OpenKlantConfig
-from open_inwoner.utils.validators import validate_phone_number
+from open_inwoner.utils.validators import DutchPhoneNumberValidator
 
 
 class ContactForm(Form):
@@ -36,7 +36,7 @@ class ContactForm(Form):
     phonenumber = forms.CharField(
         label=_("Telefoonnummer"),
         max_length=15,
-        validators=[validate_phone_number],
+        validators=[DutchPhoneNumberValidator()],
         required=False,
     )
     question = forms.CharField(

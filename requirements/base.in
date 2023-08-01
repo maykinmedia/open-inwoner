@@ -49,6 +49,7 @@ playwright
 django-yubin
 django-image-cropping
 django-log-outgoing-requests
+xmltodict
 
 # django cms
 django-cms

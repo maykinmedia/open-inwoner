@@ -9,14 +9,15 @@ from django.utils.translation import ugettext_lazy as _
 
 from django_registration.forms import RegistrationForm
 
+from open_inwoner.cms.utils.page_display import (
+    case_page_is_published,
+    collaborate_page_is_published,
+    inbox_page_is_published,
+)
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.pdc.models.category import Category
 from open_inwoner.utils.forms import LimitedUploadFileField, PrivateFileWidget
-from open_inwoner.utils.validators import (
-    CharFieldValidator,
-    format_phone_number,
-    validate_phone_number,
-)
+from open_inwoner.utils.validators import CharFieldValidator, DutchPhoneNumberValidator
 
 from .choices import (
     ContactTypeChoices,
@@ -66,23 +67,13 @@ class PhoneNumberForm(forms.Form):
         help_text=_(
             "Vermeld bij niet-nederlandse telefoonnummers de landcode (bijvoorbeeld: +32 1234567890)"
         ),
-        validators=[
-            validate_phone_number,
-        ],
+        validators=[DutchPhoneNumberValidator()],
     )
     phonenumber_2 = forms.CharField(
         label=_("Mobiele telefoonnummer bevestigen"),
         max_length=16,
-        validators=[
-            validate_phone_number,
-        ],
+        validators=[DutchPhoneNumberValidator()],
     )
-
-    def clean_phonenumber_1(self):
-        return format_phone_number(self.cleaned_data["phonenumber_1"])
-
-    def clean_phonenumber_2(self):
-        return format_phone_number(self.cleaned_data["phonenumber_2"])
 
     def clean(self):
         cleaned_data = super().clean()
@@ -128,9 +119,6 @@ class CustomRegistrationForm(RegistrationForm):
             del self.fields["phonenumber"]
         else:
             self.fields["phonenumber"].required = True
-
-    def clean_phonenumber(self):
-        return format_phone_number(self.cleaned_data["phonenumber"])
 
     def clean_email(self):
         email = self.cleaned_data["email"]
@@ -295,8 +283,17 @@ class UserNotificationsForm(forms.ModelForm):
     def __init__(self, user, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
-        if not user.login_type == LoginTypeChoices.digid:
+        if (
+            not case_page_is_published()
+            or not user.login_type == LoginTypeChoices.digid
+        ):
             del self.fields["cases_notifications"]
+
+        if not inbox_page_is_published():
+            del self.fields["messages_notifications"]
+
+        if not collaborate_page_is_published():
+            del self.fields["plans_notifications"]
 
 
 class ContactFilterForm(forms.Form):

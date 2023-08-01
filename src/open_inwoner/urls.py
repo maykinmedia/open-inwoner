@@ -24,7 +24,7 @@ from open_inwoner.accounts.views import (
     VerifyTokenView,
 )
 from open_inwoner.openklant.views.contactform import ContactFormView
-from open_inwoner.pdc.views import FAQView, HomeView
+from open_inwoner.pdc.views import FAQView
 
 handler500 = "open_inwoner.utils.views.server_error"
 admin.site.site_header = "Open Inwoner beheeromgeving"
@@ -110,6 +110,7 @@ urlpatterns = [
     path("apimock/", include("open_inwoner.apimock.urls")),
     # TODO move search to products cms app?
     path("", include("open_inwoner.search.urls", namespace="search")),
+    # path("uitkeringen/", include("open_inwoner.ssd.urls", namespace="ssd")),
     re_path(r"^", include("cms.urls")),
 ]
 
@@ -138,6 +139,7 @@ elif settings.DIGID_MOCK:
         ),
         path("digid/", include("digid_eherkenning.mock.digid_urls")),
         path("digid/idp/", include("digid_eherkenning.mock.idp.digid_urls")),
+        path("metadata/", include("digid_eherkenning.metadata_urls")),
     ] + urlpatterns
 
 

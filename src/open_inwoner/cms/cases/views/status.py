@@ -5,8 +5,7 @@ from typing import List
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.http import Http404, StreamingHttpResponse
-from django.shortcuts import redirect
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views import View
@@ -14,6 +13,7 @@ from django.views.generic import FormView, TemplateView
 
 from django_htmx.http import HttpResponseClientRedirect
 from glom import glom
+from mail_editor.helpers import find_template
 from view_breadcrumbs import BaseBreadcrumbMixin
 from zgw_consumers.api_models.constants import RolOmschrijving
 
@@ -196,14 +196,15 @@ class InnerCaseDetailView(
             if ztc.document_upload_enabled and ztc.external_document_upload_url != "":
                 external_upload_url = ztc.external_document_upload_url
                 external_upload_enabled = True
-
         return {
             "case_type_config_description": case_type_config_description,
-            "internal_upload_enabled": internal_upload_enabled,
-            "external_upload_enabled": external_upload_enabled,
+            "internal_upload_enabled": internal_upload_enabled
+            and not getattr(self.case, "einddatum", None),
+            "external_upload_enabled": external_upload_enabled
+            and not getattr(self.case, "einddatum", None),
             "external_upload_url": external_upload_url,
             "contact_form_enabled": (
-                contact_form_enabled and open_klant_config.has_api_configuration()
+                contact_form_enabled and open_klant_config.has_register()
             ),
         }
 
@@ -332,7 +333,7 @@ class CaseDocumentUploadFormView(CaseAccessMixin, CaseLogMixin, FormView):
     def post(self, request, *args, **kwargs):
         form = self.get_form()
 
-        if form.is_valid():
+        if form.is_valid() and not getattr(self.case, "einddatum", None):
             return self.handle_document_upload(request, form)
         return self.form_invalid(form)
 
@@ -414,11 +415,26 @@ class CaseContactFormView(CaseAccessMixin, CaseLogMixin, FormView):
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
+
         if form.is_valid():
-            form.cleaned_data[
-                "question"
-            ] += f"\n\nCase number: {self.case.identificatie}"
-            return self.register_by_api(form)
+            config = OpenKlantConfig.get_solo()
+
+            success = True
+            if config.register_email:
+                form.cleaned_data[
+                    "question"
+                ] += f"\n\nCase number: {self.case.identificatie}"
+                success = (
+                    self.register_by_email(form, config.register_email) and success
+                )
+            if config.register_contact_moment:
+                success = self.register_by_api(form, config) and success
+
+            self.get_result_message(success=success)
+
+            return HttpResponseClientRedirect(
+                reverse("cases:case_detail", kwargs={"object_id": str(self.case.uuid)})
+            )
         else:
             return self.form_invalid(form)
 
@@ -427,8 +443,52 @@ class CaseContactFormView(CaseAccessMixin, CaseLogMixin, FormView):
             "cases:case_detail_contact_form", kwargs={"object_id": str(self.case.uuid)}
         )
 
-    def register_by_api(self, form):
-        config = OpenKlantConfig.get_solo()
+    def get_result_message(self, success=False):
+        if success:
+            return messages.add_message(
+                self.request, messages.SUCCESS, _("Vraag verstuurd!")
+            )
+        else:
+            return messages.add_message(
+                self.request,
+                messages.ERROR,
+                _("Probleem bij versturen van de vraag."),
+            )
+
+    def register_by_email(self, form, recipient_email):
+        template = find_template("contactform_registration")
+
+        context = {
+            "subject": _("Case: {case_identification}").format(
+                case_identification=self.case.identificatie
+            ),
+            "email": self.request.user.email,
+            "phonenumber": self.request.user.phonenumber,
+            "question": form.cleaned_data["question"],
+        }
+
+        parts = [
+            self.request.user.first_name,
+            self.request.user.infix if self.request.user.infix else "",
+            self.request.user.last_name,
+        ]
+        context["name"] = " ".join(p for p in parts)
+
+        success = template.send_email([recipient_email], context)
+
+        if success:
+            self.log_system_action(
+                "registered contactmoment by email", user=self.request.user
+            )
+            return True
+        else:
+            self.log_system_action(
+                "error while registering contactmoment by email",
+                user=self.request.user,
+            )
+            return False
+
+    def register_by_api(self, form, config: OpenKlantConfig):
         assert config.has_api_configuration()
 
         klant = fetch_klant_for_bsn(self.request.user.bsn)
@@ -475,17 +535,15 @@ class CaseContactFormView(CaseAccessMixin, CaseLogMixin, FormView):
         contactmoment = create_contactmoment(data, klant=klant)
 
         if contactmoment:
-            messages.add_message(self.request, messages.SUCCESS, _("Vraag verstuurd!"))
-            self.log_system_action(f"registered contactmoment by API")
-        else:
-            messages.add_message(
-                self.request, messages.ERROR, _("Probleem bij versturen van de vraag.")
+            self.log_system_action(
+                "registered contactmoment by API", user=self.request.user
             )
-            self.log_system_action(f"error while registering contactmoment by API")
-
-        return HttpResponseClientRedirect(
-            reverse("cases:case_detail", kwargs={"object_id": str(self.case.uuid)})
-        )
+            return True
+        else:
+            self.log_system_action(
+                "error while registering contactmoment by API", user=self.request.user
+            )
+            return False
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

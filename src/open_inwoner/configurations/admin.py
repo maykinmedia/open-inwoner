@@ -163,6 +163,7 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                 "fields": (
                     "openid_connect_logo",
                     "openid_connect_login_text",
+                    "openid_display",
                 )
             },
         ),
@@ -176,6 +177,16 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                     "matomo_site_id",
                     "siteimprove_id",
                 )
+            },
+        ),
+        (
+            _("Cookie consent"),
+            {
+                "fields": (
+                    "cookie_info_text",
+                    "cookie_link_text",
+                    "cookie_link_url",
+                ),
             },
         ),
     )

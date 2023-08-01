@@ -18,7 +18,7 @@ from privates.storages import PrivateMediaFileSystemStorage
 from timeline_logger.models import TimelineLog
 
 from open_inwoner.utils.hash import create_sha256_hash
-from open_inwoner.utils.validators import CharFieldValidator, validate_phone_number
+from open_inwoner.utils.validators import CharFieldValidator, DutchPhoneNumberValidator
 
 from ..plans.models import PlanContact
 from .choices import ContactTypeChoices, LoginTypeChoices, StatusChoices, TypeChoices
@@ -78,7 +78,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         blank=True,
         default="",
         max_length=15,
-        validators=[validate_phone_number],
+        validators=[DutchPhoneNumberValidator()],
     )
     image = ImageCropField(
         verbose_name=_("Image"),

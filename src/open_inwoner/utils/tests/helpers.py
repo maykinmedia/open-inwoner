@@ -86,6 +86,31 @@ class AssertTimelineLogMixin:
         TimelineLog.objects.all().delete()
 
 
+class AssertMockMatchersMixin:
+    def assertMockMatchersCalled(self, matchers):
+        """
+        check if all matchers are called
+
+        matchers = [
+            m.get(url1, res1),
+            m.get(url2, res2),
+            m.post(url3, res3),
+        ]
+        // do tests
+        self.assertMockMatchersCalled(matchers)
+        """
+
+        def _match_str(m):
+            return f"  {m._method.ljust(5, ' ')} {m._url}"
+
+        missed = [m for m in matchers if not m.called]
+        if not missed:
+            return
+
+        out = "\n".join(_match_str(m) for m in missed)
+        self.fail(f"request mock matchers not called:\n{out}")
+
+
 class AssertFormMixin:
     def assertFormExactFields(
         self, form, field_names, *, with_csrf=True, drop_no_name=True

@@ -1,7 +1,6 @@
 from typing import Optional
 
 from django.contrib.flatpages.models import FlatPage
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -10,11 +9,12 @@ from filer.fields.image import FilerImageField
 from ordered_model.models import OrderedModel, OrderedModelManager
 from solo.models import SingletonModel
 
-from open_inwoner.utils.validators import validate_phone_number
+from open_inwoner.utils.validators import DutchPhoneNumberValidator
 
 from ..utils.colors import hex_to_hsl
 from ..utils.validators import FilerExactImageSizeValidator
-from .choices import ColorTypeChoices
+from .choices import ColorTypeChoices, OpenIDDisplayChoices
+from .validators import validate_oidc_config
 
 
 class SiteConfiguration(SingletonModel):
@@ -220,7 +220,7 @@ class SiteConfiguration(SingletonModel):
         max_length=15,
         default="",
         blank=True,
-        validators=[validate_phone_number],
+        validators=[DutchPhoneNumberValidator()],
         verbose_name=_("Footer visiting phonenumber"),
         help_text=_("Visiting phonenumber on the footer section."),
     )
@@ -380,6 +380,31 @@ class SiteConfiguration(SingletonModel):
             "The xxxxx part is the ID."
         ),
     )
+    cookie_info_text = models.CharField(
+        max_length=255,
+        default=_(
+            "Wij gebruiken cookies om onze website en dienstverlening te verbeteren."
+        ),
+        blank=True,
+        verbose_name=_("Cookie info text"),
+        help_text=_(
+            "The text that displays inside the cookie banner. Supplying this makes the cookie banner visible."
+        ),
+    )
+    cookie_link_text = models.CharField(
+        max_length=255,
+        default=_("Lees meer over ons cookiebeleid."),
+        blank=True,
+        verbose_name=_("Cookie link text"),
+        help_text=_("The text that is displayed as the link to the cookie policy."),
+    )
+    cookie_link_url = models.CharField(
+        max_length=255,
+        default="/pages/privacyverklaring/",
+        blank=True,
+        verbose_name=_("Privacy page link"),
+        help_text=_("The link to the cookie policy page."),
+    )
     openid_connect_logo = FilerImageField(
         verbose_name=_("Openid Connect Logo"),
         null=True,
@@ -395,6 +420,14 @@ class SiteConfiguration(SingletonModel):
         help_text=_(
             "The text that should display when OpenId connect is set as a login method"
         ),
+    )
+    openid_display = models.CharField(
+        verbose_name=_("Show option to login via OpenId"),
+        max_length=24,
+        choices=OpenIDDisplayChoices,
+        default=OpenIDDisplayChoices.admin,
+        validators=[validate_oidc_config],
+        help_text=_("Only selected groups will see the option to login via OpenId."),
     )
     redirect_to = models.CharField(
         max_length=255,
@@ -447,6 +480,18 @@ class SiteConfiguration(SingletonModel):
     def siteimprove_enabled(self):
         return bool(self.siteimprove_id)
 
+    @property
+    def cookiebanner_enabled(self):
+        return bool(self.cookie_info_text)
+
+    @property
+    def openid_enabled_for_admin(self):
+        return self.openid_display == OpenIDDisplayChoices.admin
+
+    @property
+    def openid_enabled_for_regular_users(self):
+        return self.openid_display == OpenIDDisplayChoices.regular
+
     def get_help_text(self, request) -> Optional[str]:
         match = request.resolver_match
         path = request.get_full_path()
@@ -463,6 +508,8 @@ class SiteConfiguration(SingletonModel):
             "profile:detail": "account_help_text",
             "products:questionnaire_list": "questionnaire_help_text",
             "collaborate:plan_list": "plan_help_text",
+            "pages-cookieroot": "cookie_info_text",
+            "pages-cookie": "cookie_link_text",
         }
 
         attr = lookup.get(match.view_name, "")

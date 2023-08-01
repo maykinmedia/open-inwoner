@@ -1,4 +1,4 @@
-from django.test import override_settings
+from django.test import override_settings, tag
 from django.utils.translation import gettext as _
 
 import requests_mock
@@ -12,6 +12,8 @@ from zgw_consumers.constants import APITypes
 from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 
 from open_inwoner.accounts.tests.factories import DigidUserFactory
+from open_inwoner.cms.tests import cms_tools
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openklant.constants import Status
 from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.openklant.tests.data import (
@@ -30,20 +32,35 @@ from open_inwoner.openzaak.tests.shared import (
     DOCUMENTEN_ROOT,
     ZAKEN_ROOT,
 )
-from open_inwoner.utils.test import ClearCachesMixin, paginated_response
-from open_inwoner.utils.tests.playwright import (
-    PlaywrightSyncLiveServerTestCase,
-    multi_browser,
+from open_inwoner.utils.test import (
+    ClearCachesMixin,
+    DisableRequestLogMixin,
+    paginated_response,
 )
+from open_inwoner.utils.tests.helpers import AssertMockMatchersMixin
+from open_inwoner.utils.tests.playwright import PlaywrightSyncLiveServerTestCase
 
 
+@tag("e2e")
 @requests_mock.Mocker()
-@multi_browser()
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class CasesPlaywrightTests(ClearCachesMixin, PlaywrightSyncLiveServerTestCase):
+class CasesPlaywrightTests(
+    AssertMockMatchersMixin,
+    ClearCachesMixin,
+    DisableRequestLogMixin,
+    PlaywrightSyncLiveServerTestCase,
+):
     def setUp(self) -> None:
+        super().setUp()
+
         self.user = DigidUserFactory(bsn="900222086")
         self.user_login_state = self.get_user_bsn_login_state(self.user)
+
+        # cookiebanner
+        self.config = SiteConfiguration.get_solo()
+        cms_tools.create_homepage()
+        self.config.cookie_info_text = ""
+        self.config.save()
 
         # services
         self.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
@@ -348,7 +365,9 @@ class CasesPlaywrightTests(ClearCachesMixin, PlaywrightSyncLiveServerTestCase):
             "complementary", name=_("Secundaire paginanavigatie")
         ).get_by_role("listitem")
 
-        expect(menu_items.get_by_role("link", name=_("Open aanvragen"))).to_be_visible()
+        expect(
+            menu_items.get_by_role("link", name=_("Openstaande aanvragen"))
+        ).to_be_visible()
         expect(
             menu_items.get_by_role("link", name=_("Lopende aanvragen"))
         ).to_be_visible()
@@ -445,3 +464,6 @@ class CasesPlaywrightTests(ClearCachesMixin, PlaywrightSyncLiveServerTestCase):
         notification = page.locator(".notification__content")
         expect(notification).to_be_visible()
         expect(notification.get_by_text(_("Vraag verstuurd!"))).to_be_visible()
+
+        # finally check if our mock matchers are accurate
+        self.assertMockMatchersCalled(self.matchers)

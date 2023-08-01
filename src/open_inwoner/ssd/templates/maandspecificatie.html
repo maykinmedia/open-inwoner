@@ -1,0 +1,111 @@
+{% load ssd_tags %}
+
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <title>Maandspecificatie {{ uitkeringsspecificatie.periode.value }}</title>
+</head>
+<body>
+<div class="monthly-report">
+    <!-- HEADER -->
+    <header class="header flex-container">
+        <div class="flex-box heading left">
+            <h1 class="h1">Maandspecificatie {{ uitkeringsspecificatie.periode.value }}</h1>
+        </div>
+        <div class="flex-box heading__logo right">
+            <img class="monthly-report__logo" src="{{ logo.url }}" alt="">
+        </div>
+    </header>
+    <!-- Uitkeringsinstantie -->
+    <h2 class="h2 section-title">Uitkeringsinstantie</h2>
+    <section class="section section__uitkeringsinstantie">
+        <table class="monthly-report__table">
+            {% for key, detail in uitkeringsinstantie.items %}
+                <tr class="monthly-report__tr">
+                    <td class="monthly-report__td">{{ detail.key }}</td>
+                    <td class="monthly-report__td">{{ detail.value }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </section>
+    <!-- Client -->
+    <h2 class="h2 section-title">Client</h2>
+    <section class="section section__client">
+        <table class="monthly-report__table">
+            {% for key, detail in client.items %}
+                <tr class="monthly-report__tr">
+                    <td class="monthly-report__td">{{ detail.key }}</td>
+                    <td class="monthly-report__td">{{ detail.value }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </section>
+    <!-- Uitkeringsspecificatie -->
+    <h2 class="h2 section-title">Uitkeringsspecificatie</h2>
+    <section class="section section__uitkeringsspecificatie">
+        <table class="monthly-report__table">
+            {% for key, detail in uitkeringsspecificatie.items %}
+                <tr class="monthly-report__tr">
+                    <td class="monthly-report__td">{{ detail.key }}</td>
+                    <td class="monthly-report__td">{{ detail.value }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </section>
+    <!-- Details -->
+    <h2 class="h2 section-title">Details</h2>
+    <section class="section section__benefitdetails">
+        <table class="monthly-report__table">
+            <colgroup>
+                <col style="width: 28%;"/>
+                <col style="width: 24%;"/>
+                <col style="width: 24%;"/>
+                <col style="width: 24%;"/>
+            </colgroup>
+            <tr class="monthly-report__tr">
+                <td class="monthly-report__td">Omschrijving</td>
+                <td class="monthly-report__td">Basis (&euro;)</td>
+                <td class="monthly-report__td">Plus (&euro;)</td>
+                <td class="monthly-report__td">Min (&euro;)</td>
+            </tr>
+            {% for key, detail in details.items %}
+                <tr class="monthly-report__tr">
+                    <td class="monthly-report__td">{{ detail.key }}</td>
+                    <td class="monthly-report__td">{% get_detail_value_for_column detail "base" %}</td>
+                    <td class="monthly-report__td">{% get_detail_value_for_column detail "plus" %}</td>
+                    <td class="monthly-report__td">{% get_detail_value_for_column detail "minus" %}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </section>
+    <!-- Inkomstenkorting -->
+    <h2 class="h2 section-title">Inkomstenkorting</h2>
+    <section class="section section__inkomstenkorting">
+        <table class="monthly-report__table">
+            <col style="width: 28%;"/>
+            <col style="width: 4%;"/>
+            <col style="width: 10%;"/>
+            {% for key, detail in inkomstenkorting.items %}
+                <tr class="monthly-report__tr">
+                    <td class="monthly-report__td">{{ detail.key }}</td>
+                    <td class="monthly-report__td">&euro;</td>
+                    <td class="monthly-report__td">{{ detail.value }}</td>
+                    <td class="monthly-report__td">{{ detail.sign }}</td>
+                </tr>
+                {% if forloop.counter|divisibleby:2 %}
+                    <tr class="monthly-report__tr">
+                        <td class="monthly-report__td"></td>
+                        <td class="monthly-report__td"></td>
+                        <td class="monthly-report__td">----------</td>
+                        <td class="monthly-report__td"></td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+        </table>
+    </section>
+    <div class="section extra-margin">
+        <p class="monthly-report__p extra-margin">Op de 25e van de maand krijgt u het bedrag ad. &euro; {{ details.uit_te_betalen_bedrag.value }} uitbetaald.</p>
+    </div>
+</div>
+</body>
+</html>

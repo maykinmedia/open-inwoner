@@ -1,0 +1,53 @@
+{% extends 'master.html' %}
+{% load i18n grid_tags form_tags button_tags icon_tags ssd_tags %}
+
+{% block content %}
+    {% render_grid %}
+        {% render_column span=9 %}
+            <h1 class="h1" id="title">
+                {% trans "Mijn uitkeringen" %}
+            </h1>
+            <p>
+                {% blocktrans with mijn_uitkeringen_text=client.config.mijn_uitkeringen_text %}
+                    {{ mijn_uitkeringen_text }}
+                {% endblocktrans %}
+            </p>
+            <div class="tab--container">
+                <div class="tabs">
+                    <ul class="list tabs__headers">
+                        <li class="list-item tab__header--item"><a href="{% url 'ssd:monthly_benefits_index' %}" id="yearly" class="link tab__header">{% trans "Maandspecificaties" %}</a></li>
+                        <li class="list-item tab__header--item"><span id="yearly" class="link tab__header active">{% trans "Jaaropgaven" %}</span></li>
+                    </ul>
+
+                    {% if client.config.jaaropgave_enabled is True %}
+                    <div class="tabs__body">
+                        <div id="jaaropgaven" class="tab__content active">
+                            <p>
+                                {% blocktrans with jaaropgave_text=client.config.jaaropgave_display_text %}
+                                    {{ jaaropgave_text }}
+                                {% endblocktrans %}
+                            </p>
+                            {% render_form form=form method="POST" id="yearlyreports-form" show_required=False submit_text=_('Download') %}
+                                {% csrf_token %}
+                                {% input form.report_date icon="expand_more" icon_position="after" icon_outlined=True %}
+                                {% form_actions primary_text=_("Download") primary_icon="file_download" icon_position="before" extra_classes="ssd" %}
+                            {% endrender_form %}
+
+                            <div>
+                            {% if report_date %}
+                              {% blocktrans with time_period=report_date|date:"Y" %}
+                                Geen uitkeringsspecificatie gevonden voor {{ time_period }}.
+                              {% endblocktrans %}
+                            {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                        <div>{% trans "Download of yearly reports not supported." %}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+        {% endrender_column %}
+    {% endrender_grid %}
+{% endblock content %}

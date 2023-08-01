@@ -118,6 +118,7 @@
     background-color: #fff;
     position: relative;
     color: var(--color-primary);
+    filter: saturate(50%);
     border-radius: 100px; // This is big to make sure the corners are rounded properly.
 
     &:before {
@@ -129,7 +130,7 @@
       left: 0;
       right: 0;
       background-color: var(--color-primary);
-      opacity: 0.2;
+      opacity: 0.15;
     }
   }
 

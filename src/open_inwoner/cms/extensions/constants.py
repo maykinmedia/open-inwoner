@@ -15,3 +15,4 @@ class Icons(DjangoChoices):
     inventory_2 = ChoiceItem("inventory_2", _("Cases"))
     group = ChoiceItem("group", _("Collaborate"))
     help_outline = ChoiceItem("help_outline", _("Help"))
+    euro_outline = ChoiceItem("euro_outline", _("Benefits"))
