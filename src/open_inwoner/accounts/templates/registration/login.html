@@ -17,8 +17,8 @@
                 <br>
 		{% if settings.DIGID_ENABLED %}
                     {% render_card direction='horizontal' tinted=True %}
-                        <a href="{% url 'digid:login' %}" class="link digid-logo" aria-describedby="Digid logo" title="Digid logo">
-                            <img class="digid-logo__image" src="{% static 'accounts/digid_logo.svg' %}" alt="Digid logo">
+                        <a href="{% url 'digid:login' %}" class="link digid-logo">
+                            <img class="digid-logo__image" src="{% static 'accounts/digid_logo.svg' %}" alt="DigiD inlogpagina">
                         </a>
                         {% url 'digid:login' as href %}
                         {% with href|addnexturl:next as href_with_next %}
@@ -32,7 +32,7 @@
                 {% if oidc_config.enabled and site_config.openid_enabled_for_regular_users %}
                     {% render_card tinted=True direction='horizontal' %}
                     {% if site_config.openid_connect_logo %}
-                        <a href="{% url 'oidc_authentication_init' %}" class="link digid-logo" aria-describedby="{{ site_config.openid_connect_logo.default_alt_text }}" title="{{ site_config.openid_connect_logo.default_alt_text }}">
+                        <a href="{% url 'oidc_authentication_init' %}" class="link digid-logo">
                             <img class="digid-logo__image" src="{{ site_config.openid_connect_logo.url }}" alt="{{ site_config.openid_connect_logo.default_alt_text }}">
                         </a>
                     {% else %}

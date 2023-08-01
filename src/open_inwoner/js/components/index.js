@@ -12,6 +12,7 @@ import './cases'
 import { DisableSubmitButton } from './cases/document_upload'
 import './confirmation'
 import './contacts'
+import { CookieBanner } from './cookie-consent'
 import './datepicker'
 import { Dropdown } from './dropdown'
 import './emoji-button'
@@ -41,6 +42,7 @@ htmx.config.includeIndicatorStyles = false
 
 // define selectors and callables to apply after we loaded a html fragment
 const elementWrappers = [
+  [CookieBanner.selector, (elt) => new CookieBanner(elt)],
   [Dropdown.selector, (elt) => new Dropdown(elt)],
   [CreateGumshoe.selector, (elt) => new CreateGumshoe(elt)],
   [DisableSubmitButton.selector, (elt) => new DisableSubmitButton(elt)],

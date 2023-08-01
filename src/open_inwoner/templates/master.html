@@ -1,4 +1,4 @@
-{% load static i18n header_tags card_tags footer_tags button_tags notification_tags anchor_menu_tags view_breadcrumbs utils session_tags django_htmx cms_tags menu_tags sekizai_tags %}<!DOCTYPE html>
+{% load static i18n header_tags card_tags footer_tags button_tags link_tags notification_tags anchor_menu_tags view_breadcrumbs utils session_tags django_htmx cms_tags menu_tags sekizai_tags %}<!DOCTYPE html>
 <html lang="nl" class="view {% block view_class %}view--{{ request.resolver_match.namespaces|join:'-' }}-{{ request.resolver_match.url_name }}{% endblock %}">
     <head>
         <meta charset="utf-8">
@@ -29,9 +29,11 @@
         {% block extra_css %}{% endblock %}
         {% block extra_head %}{% endblock %}
 
-        {% include "analytics/google.html" %}
-        {% include "analytics/matomo.html" %}
-        {% include "analytics/siteimprove.html" %}
+	{% if request|cookies_accepted %}
+	  {% include "analytics/google.html" %}
+	  {% include "analytics/matomo.html" %}
+	  {% include "analytics/siteimprove.html" %}
+	{% endif %}
     </head>
 
     <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
@@ -93,6 +95,23 @@
                 </div>
             </div>
         </dialog>
+
+        {% if cookiebanner_enabled %}
+        <!-- cookiebanner -->
+        <div class="cookie-banner" id="cookie-banner" aria-labelledby="cookie-banner__title" aria-describedby="cookie-banner__text">
+            <div class="cookie-banner__container">
+                <div class="cookie-banner__text" id="cookie-banner__text">
+                    {{cookie_info_text}} <span class="cookie-banner__link" id="cookie-banner__link">{% link href=cookie_link_url text=cookie_link_text secondary=True extra_classes="link--cookie" %}</span></div>
+                <div class="cookie-banner__actions" id="cookie-banner__actions">
+                    {% button_row %}
+                        {% button text=_("Alles weigeren") name="cookie_reject" secondary=True bordered=True id="reject-button" extra_classes="cookie-banner__reject reject-button" %}
+                        {% button text=_("Alles toestaan") name="cookie_approve" primary=True id="accept-button" extra_classes="cookie-banner__confirm accept-button" %}
+                    {% endbutton_row %}
+                </div>
+            </div>
+        </div>
+        <!-- End cookiebanner code -->
+        {% endif %}
 
         {% render_block "js" %}
         {% block extra_js %}{% endblock %}

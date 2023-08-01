@@ -3,6 +3,7 @@
 
   --container-width: 1024px;
   --mobile-s-width: 768px;
+  --mobile-ms-width: 500px;
   --mobile-xs-width: 360px;
   --header-height: 187px;
 
@@ -179,6 +180,8 @@
   --color-body: var(--color-gray-dark);
   // changed to #949494 to get the required 3:1 contrast ratio - in case of decorative border use var(--color-gray).
   --color-mute: #949494;
+  // text-color for muted text inside tinted cards
+  --color-tinted-mute: #696969;
 
   /// Font.
 
@@ -312,6 +315,7 @@ html {
 }
 
 body {
+  box-sizing: border-box;
   // default CMS style
   margin: 0;
   font-family: var(--font-family-body);

@@ -61,6 +61,11 @@
 
   &--tinted {
     --card-color-background: var(--color-gray-lightest);
+
+    // contrast for accessibility
+    .form .caption__content {
+      color: var(--color-tinted-mute);
+    }
   }
 
   &__img {
