@@ -22,11 +22,11 @@ class OuterOpenSubmissionListView(
         return [(_("Mijn aanvragen"), reverse("cases:open_submissions"))]
 
     def page_title(self):
-        return _("Open aanvragen")
+        return _("Openstaande aanvragen")
 
     def get_anchors(self) -> list:
         return [
-            ("#submissions", _("Open aanvragen")),
+            ("#submissions", _("Openstaande aanvragen")),
             (reverse("cases:open_cases"), _("Lopende aanvragen")),
             (reverse("cases:closed_cases"), _("Afgeronde aanvragen")),
         ]
@@ -52,7 +52,7 @@ class InnerOpenSubmissionListView(
         return [(_("Mijn aanvragen"), reverse("cases:open_submissions"))]
 
     def page_title(self):
-        return _("Open aanvragen")
+        return _("Openstaande aanvragen")
 
     def get_submissions(self):
         submissions = fetch_open_submissions(self.request.user.bsn)
@@ -60,7 +60,7 @@ class InnerOpenSubmissionListView(
 
     def get_anchors(self) -> list:
         return [
-            ("#submissions", _("Open aanvragen")),
+            ("#submissions", _("Openstaande aanvragen")),
             (reverse("cases:open_cases"), _("Lopende aanvragen")),
             (reverse("cases:closed_cases"), _("Afgeronde aanvragen")),
         ]

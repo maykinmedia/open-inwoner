@@ -357,7 +357,9 @@ class CasesPlaywrightTests(
             "complementary", name=_("Secundaire paginanavigatie")
         ).get_by_role("listitem")
 
-        expect(menu_items.get_by_role("link", name=_("Open aanvragen"))).to_be_visible()
+        expect(
+            menu_items.get_by_role("link", name=_("Openstaande aanvragen"))
+        ).to_be_visible()
         expect(
             menu_items.get_by_role("link", name=_("Lopende aanvragen"))
         ).to_be_visible()
