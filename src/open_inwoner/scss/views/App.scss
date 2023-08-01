@@ -3,6 +3,7 @@
 
   --container-width: 1024px;
   --mobile-s-width: 768px;
+  --mobile-ms-width: 500px;
   --mobile-xs-width: 360px;
   --header-height: 187px;
 
@@ -314,6 +315,7 @@ html {
 }
 
 body {
+  box-sizing: border-box;
   // default CMS style
   margin: 0;
   font-family: var(--font-family-body);

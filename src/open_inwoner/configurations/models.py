@@ -380,6 +380,31 @@ class SiteConfiguration(SingletonModel):
             "The xxxxx part is the ID."
         ),
     )
+    cookie_info_text = models.CharField(
+        max_length=255,
+        default=_(
+            "Wij gebruiken cookies om onze website en dienstverlening te verbeteren."
+        ),
+        blank=True,
+        verbose_name=_("Cookie info text"),
+        help_text=_(
+            "The text that displays inside the cookie banner. Supplying this makes the cookie banner visible."
+        ),
+    )
+    cookie_link_text = models.CharField(
+        max_length=255,
+        default=_("Lees meer over ons cookiebeleid."),
+        blank=True,
+        verbose_name=_("Cookie link text"),
+        help_text=_("The text that is displayed as the link to the cookie policy."),
+    )
+    cookie_link_url = models.CharField(
+        max_length=255,
+        default="/pages/privacyverklaring/",
+        blank=True,
+        verbose_name=_("Privacy page link"),
+        help_text=_("The link to the cookie policy page."),
+    )
     openid_connect_logo = FilerImageField(
         verbose_name=_("Openid Connect Logo"),
         null=True,
@@ -456,6 +481,10 @@ class SiteConfiguration(SingletonModel):
         return bool(self.siteimprove_id)
 
     @property
+    def cookiebanner_enabled(self):
+        return bool(self.cookie_info_text)
+
+    @property
     def openid_enabled_for_admin(self):
         return self.openid_display == OpenIDDisplayChoices.admin
 
@@ -479,6 +508,8 @@ class SiteConfiguration(SingletonModel):
             "profile:detail": "account_help_text",
             "products:questionnaire_list": "questionnaire_help_text",
             "collaborate:plan_list": "plan_help_text",
+            "pages-cookieroot": "cookie_info_text",
+            "pages-cookie": "cookie_link_text",
         }
 
         attr = lookup.get(match.view_name, "")

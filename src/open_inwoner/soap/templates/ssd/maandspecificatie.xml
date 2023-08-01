@@ -1,0 +1,33 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    <soap:Header>
+	<Action xmlns="http://www.w3.org/2005/08/addressing">{{ soap_action }}</Action>
+	<MessageID xmlns="http://www.w3.org/2005/08/addressing">{{ message_id }}</MessageID>
+        <To xmlns="http://www.w3.org/2005/08/addressing">https://rfor-2securet1.rfor.local:8443/ENSC/Intern/SSD/UitkeringsSpecificatieClient-v0600</To>
+        <ReplyTo xmlns="http://www.w3.org/2005/08/addressing">
+            <Address>http://www.w3.org/2005/08/addressing/anonymous</Address>
+        </ReplyTo>
+        <ns3:Header xmlns="" xmlns:ns3="http://www.centric.nl/GWS/Header/v0201">
+          <RouteInformatie>
+            <Bron>
+		          <Gemeentecode>{{ gemeentecode }}</Gemeentecode>
+		          <ApplicatieNaam>{{ applicatie_naam }}</ApplicatieNaam>
+            </Bron>
+            <Bestemming>
+              <Gemeentecode>{{ gemeentecode }}</Gemeentecode>
+            </Bestemming>
+          </RouteInformatie>
+          <BerichtIdentificatie>
+            <DatTijdAanmaakRequest>{{ dat_tijd_request }}</DatTijdAanmaakRequest>
+            <ApplicatieInformatie>{{ applicatie_naam }}</ApplicatieInformatie>
+          </BerichtIdentificatie>
+        </ns3:Header>
+    </soap:Header>
+    <soap:Body>
+        <ns4:UitkeringsSpecificatieInfo
+            xmlns:ns2="http://www.centric.nl/GWS/FWI/v0200"
+            xmlns:ns3="http://www.centric.nl/GWS/Header/v0300" xmlns:ns4="http://www.centric.nl/GWS/Diensten/UitkeringsSpecificatieClient/v0600">
+	    <BurgerServiceNr>{{ bsn }}</BurgerServiceNr>
+	    <Periodenummer>{{ period }}</Periodenummer>
+        </ns4:UitkeringsSpecificatieInfo>
+    </soap:Body>
+</soap:Envelope>

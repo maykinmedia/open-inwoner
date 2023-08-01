@@ -80,7 +80,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libgdk-pixbuf2.0-0 \
         libffi-dev \
         shared-mime-info \
-        mime-support \ 
+        mime-support \
+        curl \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

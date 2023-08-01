@@ -8,4 +8,5 @@ urlpatterns = [
     path("products/", include("open_inwoner.cms.products.urls")),
     path("inbox/", include("open_inwoner.cms.inbox.urls")),
     path("collaborate/", include("open_inwoner.cms.collaborate.urls")),
+    path("uitkeringen/", include("open_inwoner.cms.ssd.urls")),
 ] + root_urlpatterns

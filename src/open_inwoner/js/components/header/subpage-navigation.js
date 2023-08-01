@@ -4,8 +4,12 @@ class Subpage {
     this.node.addEventListener('click', this.toggleNavOpen.bind(this))
   }
 
-  toggleNavOpen(event) {
+  toggleNavOpen() {
     this.node.parentElement.classList.toggle('nav__list--open')
+    this.node.setAttribute(
+      'aria-expanded',
+      this.node.getAttribute('aria-expanded') === 'true' ? 'false' : 'true'
+    )
   }
 }
 

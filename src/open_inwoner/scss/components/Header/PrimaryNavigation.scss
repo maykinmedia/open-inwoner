@@ -271,7 +271,7 @@
     &:focus-visible,
     &:focus-within {
       border-radius: var(--border-radius-large);
-      margin: 0 3px 0 0;
+      margin: 0;
       transform: translateY(0);
     }
   }

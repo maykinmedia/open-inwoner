@@ -1,9 +1,11 @@
 {% load utils %}
 
 {% if siteimprove_enabled %}
+    <!-- SiteImprove -->
     <script
         nonce="{{ request.csp_nonce }}"
         type="text/javascript"
         src="https://siteimproveanalytics.com/js/siteanalyze_{{ siteimprove_id|escapejs }}.js" async>
     </script>
+    <!-- End SiteImprove code -->
 {% endif %}

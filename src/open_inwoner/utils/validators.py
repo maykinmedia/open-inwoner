@@ -69,6 +69,11 @@ class DutchPhoneNumberValidator:
             )
 
 
+validate_digits = RegexValidator(
+    regex="^[0-9]+$", message=_("Expected a numerical value.")
+)
+
+
 @deconstructible
 class CharFieldValidator(RegexValidator):
     regex = r"^[\w'’\- ]+\Z"

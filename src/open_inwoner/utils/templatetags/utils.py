@@ -1,5 +1,6 @@
 from django import template
 from django.conf import settings
+from django.http import HttpRequest
 from django.utils.html import format_html
 
 from humanfriendly import format_size
@@ -92,3 +93,8 @@ def template_dir(value):
 @register.filter
 def readable_size(value):
     return format_size(value)
+
+
+@register.filter
+def cookies_accepted(request: HttpRequest) -> bool:
+    return request.COOKIES.get("cookieBannerAccepted") == "true"

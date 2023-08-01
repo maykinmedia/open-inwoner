@@ -25,7 +25,7 @@ class OuterOpenCaseListView(
 
     def get_anchors(self) -> list:
         return [
-            (reverse("cases:open_submissions"), _("Open aanvragen")),
+            (reverse("cases:open_submissions"), _("Openstaande aanvragen")),
             ("#cases", _("Lopende aanvragen")),
             (reverse("cases:closed_cases"), _("Afgeronde aanvragen")),
         ]
@@ -56,7 +56,7 @@ class InnerOpenCaseListView(
 
     def get_anchors(self) -> list:
         return [
-            (reverse("cases:open_submissions"), _("Open aanvragen")),
+            (reverse("cases:open_submissions"), _("Openstaande aanvragen")),
             ("#cases", _("Lopende aanvragen")),
             (reverse("cases:closed_cases"), _("Afgeronde aanvragen")),
         ]
@@ -81,7 +81,7 @@ class OuterClosedCaseListView(
 
     def get_anchors(self) -> list:
         return [
-            (reverse("cases:open_submissions"), _("Open aanvragen")),
+            (reverse("cases:open_submissions"), _("Openstaande aanvragen")),
             (reverse("cases:open_cases"), _("Lopende aanvragen")),
             ("#cases", _("Afgeronde aanvragen")),
         ]
@@ -110,7 +110,7 @@ class InnerClosedCaseListView(
 
     def get_anchors(self) -> list:
         return [
-            (reverse("cases:open_submissions"), _("Open aanvragen")),
+            (reverse("cases:open_submissions"), _("Openstaande aanvragen")),
             (reverse("cases:open_cases"), _("Lopende aanvragen")),
             ("#cases", _("Afgeronde aanvragen")),
         ]
