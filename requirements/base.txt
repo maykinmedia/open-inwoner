@@ -53,7 +53,7 @@ click-repl==0.2.0
     # via celery
 confusable-homoglyphs==3.2.0
     # via django-registration
-cryptography==38.0.4
+cryptography==41.0.2
     # via
     #   django-simple-certmanager
     #   josepy
@@ -382,7 +382,7 @@ packaging==23.0
     # via djangocms-text-ckeditor
 phonenumbers==8.12.33
     # via -r requirements/base.in
-pillow==9.0.1
+pillow==9.2.0
     # via
     #   -r requirements/base.in
     #   djangocms-text-ckeditor
@@ -464,7 +464,7 @@ requests==2.26.0
     #   zgw-consumers
 requests-mock==1.9.3
     # via zgw-consumers
-sentry-sdk==1.4.3
+sentry-sdk==1.14.0
     # via -r requirements/base.in
 simplejson==3.18.0
     # via mail-parser
