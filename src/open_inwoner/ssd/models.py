@@ -22,6 +22,18 @@ class SSDConfig(SingletonModel):
         null=True,
         blank=True,
     )
+    maandspecificatie_endpoint = models.CharField(
+        _("Maandspecificatie endpoint"),
+        max_length=32,
+        blank=True,
+        help_text=_("Endpoint for the maandspecificatie request"),
+    )
+    jaaropgave_endpoint = models.CharField(
+        _("Jaaropgave endpoint"),
+        max_length=32,
+        blank=True,
+        help_text=_("Endpoint for the jaaropgave request"),
+    )
     applicatie_naam = models.CharField(
         _("Application name"),
         max_length=32,
