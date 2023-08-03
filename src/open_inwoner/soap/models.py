@@ -15,7 +15,7 @@ class SoapService(models.Model):
     url = models.URLField(
         _("URL"),
         blank=True,
-        help_text=_("URL of the service to connect to."),
+        help_text=_("Base URL of the service to connect to."),
     )
 
     client_certificate = models.ForeignKey(

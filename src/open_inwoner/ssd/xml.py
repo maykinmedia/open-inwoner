@@ -1,5 +1,6 @@
 import calendar
 from datetime import datetime
+from typing import Optional
 from xml.parsers.expat import ExpatError
 
 from django.utils.text import slugify
@@ -7,6 +8,7 @@ from django.utils.translation import gettext_lazy as _
 
 import xmltodict
 from glom import glom
+from glom.core import PathAccessError
 
 
 #
@@ -20,8 +22,8 @@ def format_float_repr(value: str) -> str:
     return "{:.2f}".format(float(value) / 100).replace(".", ",")
 
 
-def format_address(street_name: str, housse_nr: str, house_letter: str) -> str:
-    return f"{street_name} {housse_nr} {house_letter}"
+def format_address(street_name: str, house_nr: str, house_letter: str) -> str:
+    return f"{street_name} {house_nr} {house_letter}"
 
 
 def format_date(date_str) -> str:
@@ -82,22 +84,24 @@ def xml_to_dict(xml_data):
 #
 # Maandspecificatie
 #
-def get_uitkering_dict(xml_data):
+def get_uitkering_dict(xml_data) -> Optional[dict]:
     xml_data_dict = xml_to_dict(xml_data)
 
     if not xml_data_dict:
-        return {}
+        return None
 
     BASE = "SOAP-ENV:Envelope.SOAP-ENV:Body.gwsd:UitkeringsSpecificatieInfoResponse"
 
-    uitkering_specificatie = glom(
-        xml_data_dict, BASE + ".UitkeringsSpecificatieClient.Uitkeringsspecificatie"
-    )
+    try:
+        uitkering_specificatie = glom(
+            xml_data_dict, BASE + ".UitkeringsSpecificatieClient.Uitkeringsspecificatie"
+        )
+    except PathAccessError:
+        return None
 
     #
     # Uitkeringsinstatie
     #
-
     uitkeringsinstatie_spec = glom(uitkering_specificatie, "Uitkeringsinstantie")
     uitkeringsinstantie = {
         "gemeente": {
@@ -246,18 +250,22 @@ def get_uitkering_dict(xml_data):
 #
 # jaaropgave
 #
-def get_jaaropgave_dict(xml_data):
+def get_jaaropgave_dict(xml_data) -> Optional[dict]:
     xml_data_dict = xml_to_dict(xml_data)
 
     if not xml_data_dict:
-        return {}
+        return None
 
     BASE = "SOAP-ENV:Envelope.SOAP-ENV:Body.gwsd:JaarOpgaveInfoResponse"
 
     #
     # Client
     #
-    client_spec = glom(xml_data_dict, BASE + ".JaarOpgaveClient.Client")
+    try:
+        client_spec = glom(xml_data_dict, BASE + ".JaarOpgaveClient.Client")
+    except PathAccessError:
+        return None
+
     client_address_spec = glom(xml_data_dict, BASE + ".JaarOpgaveClient.Client.Adres")
     client = {
         "bsn_label": "BSN",
@@ -385,10 +393,14 @@ def get_jaaropgave_dict(xml_data):
     #
     # update jaaropgave with loon_heffings_korting (list with potentially only one element)
     #
-    date_list = glom(specificatiejaaropgave_spec, "Loonheffingskorting")
+    dates = glom(specificatiejaaropgave_spec, "Loonheffingskorting")
+
+    # normalize `dates`: xmltodict returns a dict or list here, depending on the number of results
+    if not isinstance(dates, list):
+        dates = [dates]
 
     # replace dict keys with our own for consistency
-    for date in date_list:
+    for date in dates:
         date["ingangsdatum"] = format_date(date.pop("Ingangsdatum"))
         date["code"] = date.pop("CdLoonheffingskorting")
 
@@ -396,7 +408,7 @@ def get_jaaropgave_dict(xml_data):
         "loon_heffings_korting": {
             "key": "Loonheffingskorting Met ingang van",
             "code_label": "Code",
-            "dates": date_list,
+            "dates": dates,
         }
     }
 
