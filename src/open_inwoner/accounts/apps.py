@@ -27,6 +27,7 @@ def update_admin_index(sender, **kwargs):
         call_command("loaddata", "django-admin-index", verbosity=0, stdout=StringIO())
     except:
         print("Error: Unable to load django-admin-index fixture!")
+    print("Loaded django-admin-index fixture")
 
 
 class AccountsConfig(AppConfig):
