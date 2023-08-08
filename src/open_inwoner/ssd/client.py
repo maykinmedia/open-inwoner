@@ -20,12 +20,6 @@ logger = logging.getLogger(__name__)
 BASE_DIR = Path(__file__).absolute().parent.parent
 
 
-# Endpoints for maand/jaarspecificatie
-# https://2secure-test.enschede.nl/ENSC/Intern/SSD/UitkeringsSpecificatieClient-v0600
-# https://2secure-test.enschede.nl/ENSC/Intern/SSD/JaarOpgaveClient-v0400
-# Test with 900038937
-
-
 class SSDBaseClient(ABC):
     """Base class for SSD SOAP client"""
 
