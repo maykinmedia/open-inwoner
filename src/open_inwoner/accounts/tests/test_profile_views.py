@@ -22,8 +22,8 @@ from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin, create_imag
 
 from ...cms.profile.cms_apps import ProfileApphook
 from ...cms.tests import cms_tools
-from ...openklant.tests.data import MockAPIReadPatchData
 from ...haalcentraal.api_models import BRPData
+from ...openklant.tests.data import MockAPIReadPatchData
 from ...questionnaire.tests.factories import QuestionnaireStepFactory
 from ..choices import ContactTypeChoices, LoginTypeChoices
 from ..forms import BrpUserForm, UserForm

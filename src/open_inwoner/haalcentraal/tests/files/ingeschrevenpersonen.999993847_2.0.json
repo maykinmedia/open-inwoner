@@ -1,7 +1,7 @@
 {
   "personen": [
     {
-      "geslachtsaanduiding": { "code": "V", "omschrijving": "vrouw" },
+      "geslacht": { "code": "V", "omschrijving": "vrouw" },
       "naam": {
         "aanhef": "Geachte mevrouw Kooyman",
         "aanschrijfwijze": { "naam": "M. Kooyman" },

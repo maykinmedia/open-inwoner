@@ -34,7 +34,7 @@ def _fetch_brp_data(user_bsn: str, brp_version):
                 operation_id="GetPersonen",
                 url=url,
                 data={
-                    "fields": "geslachtsaanduiding,naam,geboorte,verblijfplaats",
+                    "fields": ["geslacht", "naam", "geboorte", "verblijfplaats"],
                     "type": "RaadpleegMetBurgerservicenummer",
                     "burgerservicenummer": [user_bsn],
                 },
@@ -101,9 +101,7 @@ def fetch_brp(user_bsn: str) -> Optional[BRPData]:
             birthday = None
 
     gender_glom = (
-        "geslachtsaanduiding.omschrijving"
-        if brp_version == "2.0"
-        else "geslachtsaanduiding"
+        "geslacht.omschrijving" if brp_version == "2.0" else "geslachtsaanduiding"
     )
 
     brp = BRPData(
