@@ -2,7 +2,7 @@ import logging
 from abc import ABC, abstractmethod
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, get_type_hints
+from typing import Optional
 from uuid import uuid4
 
 from django.template import loader

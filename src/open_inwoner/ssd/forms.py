@@ -1,6 +1,7 @@
 from datetime import date, datetime
 
 from django import forms
+from django.template.defaultfilters import date as django_date
 
 from dateutil.relativedelta import relativedelta
 
@@ -31,7 +32,7 @@ def get_monthly_report_dates() -> list[tuple[date, str]]:
 
     choices = []
     for report_date in dates:
-        formatted = report_date.strftime("%B %Y")
+        formatted = django_date(report_date, "M Y")
         choices.append((report_date.date(), formatted))
 
     return choices
