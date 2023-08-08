@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
             name="highlighted",
             field=models.BooleanField(
                 default=False,
-                help_text="Wether the category should be highlighted or not",
+                help_text="Whether the category should be highlighted or not",
                 verbose_name="Highlighted",
             ),
         ),

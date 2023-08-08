@@ -5,6 +5,8 @@ from django.utils.html import format_html
 
 from humanfriendly import format_size
 
+from open_inwoner.configurations.models import SiteConfiguration
+
 register = template.Library()
 
 
