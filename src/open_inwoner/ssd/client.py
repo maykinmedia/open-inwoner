@@ -6,6 +6,7 @@ from typing import Optional
 from uuid import uuid4
 
 from django.template import loader
+from django.template.defaultfilters import date as django_date
 from django.utils import timezone
 
 import requests
@@ -144,11 +145,6 @@ class JaaropgaveClient(SSDBaseClient):
 
         jaaropgave = response.text
 
-        # TODO: remove when done testing
-        # xml_response = "src/open_inwoner/ssd/tests/files/jaaropgave_response.xml"
-        # with open(xml_response, "r") as file:
-        #     jaaropgave = file.read()
-
         if (data := get_jaaropgave_dict(jaaropgave)) is None:
             return None
 
@@ -185,7 +181,7 @@ class UitkeringClient(SSDBaseClient):
 
     def format_file_name(self, report_date_iso: str) -> str:
         dt = datetime.strptime(report_date_iso, "%Y-%m-%d")
-        return f"Maandspecificatie {dt.strftime('%m %Y')}"
+        return f"Maandspecificatie {django_date(dt, 'M Y')}"
 
     def get_report(
         self, bsn: str, report_date_iso: str, request_base_url: str
@@ -198,11 +194,6 @@ class UitkeringClient(SSDBaseClient):
             return None
 
         maandspecificatie = response.text
-
-        # TODO: remove when done testing
-        # xml_response = "src/open_inwoner/ssd/tests/files/uitkering_response.xml"
-        # with open(xml_response, "r") as file:
-        #     maandspecificatie = file.read()
 
         if (data := get_uitkering_dict(maandspecificatie)) is None:
             return None

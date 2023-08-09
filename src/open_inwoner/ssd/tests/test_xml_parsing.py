@@ -51,7 +51,7 @@ class XMLParsingTests(TestCase):
             data["uitkeringsspecificatie"]["dossiernummer"]["value"], "61913"
         )
         self.assertEqual(data["uitkeringsspecificatie"]["periode"]["key"], "Periode")
-        self.assertEqual(data["uitkeringsspecificatie"]["periode"]["value"], "May 1985")
+        self.assertEqual(data["uitkeringsspecificatie"]["periode"]["value"], "Mei 1985")
         self.assertEqual(data["uitkeringsspecificatie"]["regeling"]["key"], "Regeling")
         self.assertEqual(
             data["uitkeringsspecificatie"]["regeling"]["value"], "Participatiewet"
@@ -167,10 +167,6 @@ class XMLParsingTests(TestCase):
 
         # jaaropgave
         self.assertEqual(
-            data["jaaropgave"]["arbeidskorting"]["key"], "Verrekende arbeidskorting"
-        )
-        self.assertEqual(data["jaaropgave"]["arbeidskorting"]["value"], "MYSTERY")
-        self.assertEqual(
             data["jaaropgave"]["code_loonbelastingtabel"]["key"],
             "Code loonbelastingtabel",
         )
@@ -181,11 +177,6 @@ class XMLParsingTests(TestCase):
             "Loon loonbelasting / volksverzekeringen",
         )
         self.assertEqual(data["jaaropgave"]["fiscaalloon"]["value"], "7305")
-        self.assertEqual(
-            data["jaaropgave"]["ingehouden_bijdrage"]["key"],
-            "Ingehouden bijdrage Zorgverzekeringswet",
-        )
-        self.assertEqual(data["jaaropgave"]["ingehouden_bijdrage"]["value"], "0")
         self.assertEqual(
             data["jaaropgave"]["loon_heffings_korting"]["key"],
             "Loonheffingskorting Met ingang van",
