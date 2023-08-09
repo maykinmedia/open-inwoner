@@ -32,6 +32,11 @@ class CommonExtension(PageExtension):
         blank=True,
         help_text=_("Icon in het menu"),
     )
+    help_text = models.TextField(
+        _("Help text"),
+        blank=True,
+        help_text=_("Help text for the page"),
+    )
 
     def __str__(self):
         return str(self.get_page())

@@ -265,7 +265,8 @@ class SiteConfiguration(SingletonModel):
     home_help_text = models.TextField(
         blank=True,
         default=_(
-            "Welkom! Op dit scherm vindt u een overzicht van de verschillende onderwerpen en producten & diensten."
+            "Welkom! Op dit scherm vindt u een overzicht van de verschillende onderwerpen "
+            "en producten & diensten."
         ),
         verbose_name=_("Home help"),
         help_text=_("The help text for the home page."),
@@ -273,7 +274,8 @@ class SiteConfiguration(SingletonModel):
     theme_help_text = models.TextField(
         blank=True,
         default=_(
-            "Op dit scherm vindt u de verschillende onderwerpen waarvoor wij producten en diensten aanbieden."
+            "Op dit scherm vindt u de verschillende onderwerpen waarvoor wij producten en "
+            "diensten aanbieden."
         ),
         verbose_name=_("Category help"),
         help_text=_("The help text for the theme page."),
@@ -281,7 +283,8 @@ class SiteConfiguration(SingletonModel):
     product_help_text = models.TextField(
         blank=True,
         default=_(
-            "Op dit scherm kunt u de details vinden over het gekozen product of dienst. Afhankelijk van het product kunt u deze direct aanvragen of meer informatie opvragen."
+            "Op dit scherm kunt u de details vinden over het gekozen product of dienst. "
+            "Afhankelijk van het product kunt u deze direct aanvragen of meer informatie opvragen."
         ),
         verbose_name=_("Product help"),
         help_text=_("The help text for the product page."),
@@ -303,7 +306,10 @@ class SiteConfiguration(SingletonModel):
     questionnaire_help_text = models.TextField(
         blank=True,
         default=_(
-            "Het onderdeel Zelfdiagnose stelt u in staat om met het beantwoorden van enkele vragen een advies te krijgen van de gemeente, met concrete vervolgstappen en producten en diensten. U kunt tevens uw antwoorden en het advies bewaren om met een begeleider van de gemeente te bespreken."
+            "Het onderdeel Zelfdiagnose stelt u in staat om met het beantwoorden van enkele vragen "
+            "een advies te krijgen van de gemeente, met concrete vervolgstappen en producten en "
+            "diensten. U kunt tevens uw antwoorden en het advies bewaren om met een begeleider van "
+            "de gemeente te bespreken."
         ),
         verbose_name=_("Questionnaire help"),
         help_text=_("The help text for the questionnaire page."),
@@ -311,7 +317,10 @@ class SiteConfiguration(SingletonModel):
     plan_help_text = models.TextField(
         blank=True,
         default=_(
-            "Met het onderdeel Samenwerken kunt u samen met uw contactpersonen of begeleider van de gemeente aan de slag om met een samenwerkingsplan uw persoonlijke situatie te verbeteren. Door samen aan uw doelen te werken en acties te omschrijven kunnen we elkaar helpen."
+            "Met het onderdeel Samenwerken kunt u samen met uw contactpersonen of begeleider "
+            "van de gemeente aan de slag om met een samenwerkingsplan uw persoonlijke situatie "
+            "te verbeteren. Door samen aan uw doelen te werken en acties te omschrijven kunnen "
+            "we elkaar helpen."
         ),
         verbose_name=_("Plan help"),
         help_text=_("The help text for the plan page."),
@@ -533,15 +542,8 @@ class SiteConfiguration(SingletonModel):
             return ""
 
         lookup = {
-            "pages-root": "home_help_text",
-            "products:category_list": "theme_help_text",
-            "products:category_product_detail": "product_help_text",
-            "products:product_detail": "product_help_text",
-            "products:product_form": "product_help_text",
             "search:search": "search_help_text",
-            "profile:detail": "account_help_text",
             "products:questionnaire_list": "questionnaire_help_text",
-            "collaborate:plan_list": "plan_help_text",
             "pages-cookieroot": "cookie_info_text",
             "pages-cookie": "cookie_link_text",
         }

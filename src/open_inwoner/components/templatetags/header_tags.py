@@ -1,4 +1,7 @@
 from django import template
+from django.db.models import Q
+
+from cms.models import Page
 
 from open_inwoner.configurations.models import SiteConfiguration
 
@@ -19,6 +22,30 @@ def accessibility_header(request, **kwargs):
     Extra context:
         - help_text: str | The help text depending on the current path.
     """
-    config = SiteConfiguration.get_solo()
-    kwargs["help_text"] = config.get_help_text(request)
+
+    # help texts for cms pages with extension
+    cms_pages = Page.objects.filter(
+        Q(publisher_is_draft=False) and Q(commonextension__isnull=False)
+    ).select_related("commonextension")
+
+    for page in cms_pages:
+        if page.application_namespace in (
+            "collaborate",
+            "home",
+            "inbox",
+            "products",
+            "profile",
+            "ssd",
+        ):
+            kwargs["help_text"] = page.commonextension.help_text
+        elif page.get_absolute_url() in ("", "/"):
+            kwargs["help_text"] = page.commonextension.help_text
+
+    # help texts for cms pages without extension
+    cms_pages = Page.objects.filter(
+        Q(publisher_is_draft=False) and Q(commonextension__isnull=True)
+    )
+    for page in cms_pages:
+        kwargs["help_text"] = SiteConfiguration.get_solo().get_help_text(request)
+
     return {**kwargs, "request": request}

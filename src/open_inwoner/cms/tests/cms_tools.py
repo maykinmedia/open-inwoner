@@ -14,13 +14,19 @@ from cms.plugin_rendering import ContentRenderer
 from open_inwoner.cms.extensions.models import CommonExtension
 
 
-def create_homepage():
+def create_homepage(extension_args: dict = None):
     """
     helper to create an empty, published homepage
     """
     p = api.create_page(
         "Home", "cms/fullwidth.html", "nl", in_navigation=True, reverse_id="home"
     )
+
+    # create common extension
+    if extension_args:
+        extension_args["extended_object"] = p
+        CommonExtension.objects.create(**extension_args)
+
     p.set_as_homepage()
 
     if not p.publish("nl"):
