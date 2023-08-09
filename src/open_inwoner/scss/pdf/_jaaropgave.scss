@@ -132,5 +132,14 @@
 
   .section__toelichting .subsection {
     line-height: 1.6;
+    font-size: 11px;
+
+    h1,
+    h2 {
+      font-size: 12px;
+    }
+    h1 {
+      text-transform: uppercase;
+    }
   }
 }
