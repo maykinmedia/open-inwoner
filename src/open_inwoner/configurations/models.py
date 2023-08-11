@@ -203,6 +203,8 @@ class SiteConfiguration(SingletonModel):
         verbose_name=_("Edit goal message"),
         help_text=_("The message when a user edits a goal."),
     )
+
+    # TODO remove these fields
     footer_visiting_title = models.CharField(
         max_length=255,
         default="",
@@ -244,6 +246,8 @@ class SiteConfiguration(SingletonModel):
         blank=True,
         help_text=_("Mailing intro text on the footer section."),
     )
+    # TODO ^^^^ remove above fields ^^^^
+
     footer_logo = FilerImageField(
         verbose_name=_("Footer logo"),
         null=True,
