@@ -2,7 +2,6 @@ from django.contrib.gis.geos import Point
 
 from open_inwoner.utils.tests.test_migrations import TestMigrations
 
-from ..models import Category, Product
 from ..models.product import ProductLocation
 
 
@@ -92,14 +91,16 @@ class CategoryProductThroughModelMigrationTests(TestMigrations):
         self.product.categories.add(self.category_initial)
 
     def test_products_still_have_category(self):
-        # swap our migration models for real objects
-        product = Product.objects.get(id=self.product.id)
+        Product = self.apps.get_model("pdc", "Product")
+        Category = self.apps.get_model("pdc", "Category")
+
         category_initial = Category.objects.get(id=self.category_initial.id)
         category_extra = Category.objects.get(id=self.category_extra.id)
 
-        product.categories.add(category_extra)
+        product = Product.objects.get(id=self.product.id)
+        product.categories.add(category_extra, through_defaults={"order": 1})
 
         self.assertEqual(
             list(product.categories.all()),
-            [category_extra, category_initial],
+            [category_initial, category_extra],
         )
