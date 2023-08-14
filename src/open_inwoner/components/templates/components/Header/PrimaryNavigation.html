@@ -4,22 +4,21 @@
 
 <nav class="primary-navigation primary-navigation__main" aria-label="Hoofd navigatie">
     <ul class="primary-navigation__list">
-
         {% if cms_apps.products and categories %}
-        <li class="primary-navigation__list-item">
-            {% button text=_('Onderwerpen') type="button" icon="expand_more" icon_position="after" icon_outlined=True transparent=True extra_classes="primary-navigation--toggle" %}
+            {% if request.user.is_authenticated or not config.hide_categories_from_anonymous_users %}
+                <li class="primary-navigation__list-item">
+                    {% button text=_('Onderwerpen') type="button" icon="expand_more" icon_position="after" icon_outlined=True transparent=True extra_classes="primary-navigation--toggle" %}
 
-            {% if categories %}
-                <ul class="primary-navigation__list subpage-list">
-                    {% for category in categories %}
-                        <li class="primary-navigation__list-item">
-                            {% url 'products:category_detail' slug=category.slug as category_href %}
-                            {% link text=category.name href=category_href %}
-                        </li>
-                    {% endfor %}
-                </ul>
+                    <ul class="primary-navigation__list subpage-list">
+                        {% for category in categories %}
+                            <li class="primary-navigation__list-item">
+                                {% url 'products:category_detail' slug=category.slug as category_href %}
+                                {% link text=category.name href=category_href %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
             {% endif %}
-        </li>
         {% endif %}
     </ul>
 </nav>
