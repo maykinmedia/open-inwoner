@@ -54,3 +54,30 @@ class HeaderTest(TestCase):
         self.assertEqual(len(categories), 2)
         self.assertEqual(categories[0].tag, "a")
         self.assertEqual(categories[1].tag, "button")
+
+    def test_search_bar_hidden_from_anonymous_users(self):
+        config = SiteConfiguration.get_solo()
+        config.hide_search_from_anonymous_users = True
+        config.save()
+
+        response = self.client.get("/")
+
+        doc = PyQuery(response.content)
+
+        search_buttons = doc.find("[title='Zoeken']")
+
+        self.assertEqual(len(search_buttons), 0)
+
+    def test_search_bar_not_hidden_from_anonymous_users(self):
+        config = SiteConfiguration.get_solo()
+        config.hide_search_from_anonymous_users = False
+        config.save()
+
+        response = self.client.get("/")
+
+        doc = PyQuery(response.content)
+
+        search_buttons = doc.find("[title='Zoeken']")
+
+        for button in search_buttons:
+            self.assertEqual(button.tag, "button")

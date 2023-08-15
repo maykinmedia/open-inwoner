@@ -191,7 +191,12 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
         ),
         (
             _("Display options for anonymous users"),
-            {"fields": ("hide_categories_from_anonymous_users",)},
+            {
+                "fields": (
+                    "hide_categories_from_anonymous_users",
+                    "hide_search_from_anonymous_users",
+                )
+            },
         ),
     )
     inlines = [SiteConfigurationPageInline]

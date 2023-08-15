@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             field=models.BooleanField(
                 default=False,
                 help_text="If checked, categories will be hidden from users who are not logged in.",
-                verbose_name="Hide categories from anonymouns users",
+                verbose_name="Hide categories from anonymous users",
             ),
         ),
     ]
