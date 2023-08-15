@@ -730,7 +730,7 @@ pyjwt==2.3.0
     #   messagebird
 pylint==2.11.1
     # via -r requirements/test-tools.in
-pyopenssl==22.1.0
+pyopenssl==23.2.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt

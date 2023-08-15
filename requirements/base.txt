@@ -407,7 +407,7 @@ pyjwt==2.3.0
     # via
     #   gemma-zds-client
     #   messagebird
-pyopenssl==22.1.0
+pyopenssl==23.2.0
     # via
     #   -r requirements/base.in
     #   django-simple-certmanager

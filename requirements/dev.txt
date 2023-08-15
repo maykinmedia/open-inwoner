@@ -818,7 +818,7 @@ pylint==2.11.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-pyopenssl==22.1.0
+pyopenssl==23.2.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
