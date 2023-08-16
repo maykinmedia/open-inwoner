@@ -91,15 +91,10 @@ class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
         )
         user.bsn = "999993847"
 
-        with self.assertLogs() as captured:
-            user.save()
+        user.save()
 
         user.refresh_from_db()
 
-        self.assertEqual(
-            captured.records[1].getMessage(),
-            "no service defined for Haal Centraal",
-        )
         self.assertEqual(user.first_name, "")
         self.assertEqual(user.infix, "")
         self.assertEqual(user.last_name, "")

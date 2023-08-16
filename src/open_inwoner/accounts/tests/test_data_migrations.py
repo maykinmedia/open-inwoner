@@ -1,9 +1,6 @@
-from unittest import skip
-
 from open_inwoner.utils.tests.test_migrations import TestMigrations
 
 
-@skip("outdated")
 class RemoveContactMigrationTests(TestMigrations):
     app = "accounts"
     migrate_from = "0048_auto_20221205_0921"
