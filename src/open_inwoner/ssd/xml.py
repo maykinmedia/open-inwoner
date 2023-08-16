@@ -1,10 +1,9 @@
-import calendar
 from datetime import datetime
 from typing import Optional
 from xml.parsers.expat import ExpatError
 
+from django.template.defaultfilters import date as django_date
 from django.utils.text import slugify
-from django.utils.translation import gettext_lazy as _
 
 import xmltodict
 from glom import glom
@@ -31,15 +30,12 @@ def format_date(date_str) -> str:
 
 
 def format_date_month_name(date_str) -> str:
-    """Transform '204805' into 'May 2048'"""
+    """Transform '204805' into 'Mei 2048'"""
 
     patched = date_str + "01"
-    date = datetime.strptime(patched, "%Y%m%d")
-    month_name = calendar.month_name[date.month]
+    dt = datetime.strptime(patched, "%Y%m%d")
 
-    formatted_date = _("{month_name} {year}").format(
-        month_name=month_name, year=date.year
-    )
+    formatted_date = django_date(dt, "M Y")
 
     return formatted_date
 
@@ -322,23 +318,13 @@ def get_jaaropgave_dict(xml_data) -> Optional[dict]:
             ),
             "value": glom(specificatiejaaropgave_spec, "Loonheffing.WaardeBedrag"),
         },
-        # TODO: figure out if this is needed; see below
         "arbeidskorting": {
             "key": "Verrekende arbeidskorting",
-            "value": "MYSTERY",
+            "value": "0",
         },
         "code_loonbelastingtabel": {
             "key": "Code loonbelastingtabel",
             "value": glom(specificatiejaaropgave_spec, "CdPremieVolksverzekering"),
-        },
-        "ingehouden_bijdrage": {
-            "key": "Ingehouden bijdrage Zorgverzekeringswet",
-            "sign": get_sign(
-                specificatiejaaropgave_spec, "IngehoudenPremieZVW.CdPositiefNegatief"
-            ),
-            "value": glom(
-                specificatiejaaropgave_spec, "IngehoudenPremieZVW.WaardeBedrag"
-            ),
         },
         "vergoeding_premie_zvw": {
             "sign": get_sign(
@@ -366,28 +352,6 @@ def get_jaaropgave_dict(xml_data) -> Optional[dict]:
                 "WerkgeversheffingPremieZVW.WaardeBedrag",
             ),
         },
-        # TODO: figure out where this is used; relation to `arbeitskorting`?
-        # "belaste_alimentatie": {
-        #     "sign": get_sign(
-        #         specificatiejaaropgave_spec, "BelasteAlimentatie.CdPositiefNegatief"
-        #     ),
-        #     "bedrag": (
-        #         float(
-        #             glom(
-        #                 specificatiejaaropgave_spec,
-        #                 "BelasteAlimentatie.WaardeBedrag",
-        #                 default=0,
-        #             )
-        #         )
-        #         / 100
-        #         if glom(
-        #             specificatiejaaropgave_spec,
-        #             "BelasteAlimentatie.WaardeBedrag",
-        #             default=0,
-        #         )
-        #         else 0
-        #     ),
-        # },
     }
 
     #
