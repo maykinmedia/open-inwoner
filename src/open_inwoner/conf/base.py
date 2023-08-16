@@ -423,7 +423,7 @@ LOGGING = {
             "level": "INFO",
             "propagate": True,
         },
-        "requests": {
+        "log_outgoing_requests": {
             "handlers": ["log_outgoing_requests", "save_outgoing_requests"],
             "level": "DEBUG",
             "propagate": True,
@@ -436,6 +436,7 @@ LOGGING = {
 # LOG OUTGOING REQUESTS
 #
 LOG_OUTGOING_REQUESTS_DB_SAVE = config("LOG_OUTGOING_REQUESTS_DB_SAVE", default=True)
+LOG_OUTGOING_REQUESTS_RESET_DB_SAVE_AFTER = None  # reset config after $ minutes
 
 
 #
