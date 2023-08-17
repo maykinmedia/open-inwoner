@@ -3,6 +3,7 @@
 {% get_solo "configurations.SiteConfiguration" as config %}
 
 {% accessibility_header request=request %}
+
 <header class="header" aria-label="Navigatie header">
     <div class="header__container">
         <div class="header__menu">
@@ -28,13 +29,15 @@
             <div class="header__submenu">
 
             {% if cms_apps.products %}
-            <nav class="header__actions" aria-label="Zoek navigatie mobiel">
-                {% url 'search:search' as search_url %}
-                {% render_form form=search_form method="GET" form_action=search_url inline=True spaceless=False %}
-                    {% input search_form.query no_label=True %}
-                    {% form_actions primary_icon="search" primary_text=_("Zoeken") hide_primary_text=True %}
-                {% endrender_form %}
-            </nav>
+            {% if request.user.is_authenticated or not config.hide_search_from_anonymous_users %}
+              <nav class="header__actions" aria-label="Zoek navigatie mobiel">
+                  {% url 'search:search' as search_url %}
+                  {% render_form form=search_form method="GET" form_action=search_url inline=True spaceless=False %}
+                      {% input search_form.query no_label=True %}
+                      {% form_actions primary_icon="search" primary_text=_("Zoeken") hide_primary_text=True %}
+                  {% endrender_form %}
+              </nav>
+            {% endif %}
             {% endif %}
 
                 <nav class="primary-navigation" aria-label="Hoofd navigatie">
@@ -45,25 +48,27 @@
                             {% link text=link_text href="/" icon="grid_view" icon_position="before" %}
                         </li>
 
-                        {% if cms_apps.products and categories %}
-                        <li class="primary-navigation__list-item dropdown-nav__toggle">
-                            <a href="#" class="link link--toggle link--icon link--icon-position-before" aria-label="{% trans "Onderwerpen" %}" title="{% trans "Onderwerpen" %}" aria-expanded="false">
-                                <span >{% trans "Onderwerpen" %}</span>
-                                <span aria-hidden="true" class="material-icons-outlined ">description</span>
-                                {% icon icon="expand_more" icon_position="after" icon_outlined=True %}
-                            </a>
+                        {% if cms_apps.products %}
+                            {% if request.user.is_authenticated or not config.hide_categories_from_anonymous_users %}
+                                <li class="primary-navigation__list-item dropdown-nav__toggle">
+                                    <a href="#" class="link link--toggle link--icon link--icon-position-before" aria-label="{% trans "Onderwerpen" %}" title="{% trans "Onderwerpen" %}" aria-expanded="false">
+                                        <span >{% trans "Onderwerpen" %}</span>
+                                        <span aria-hidden="true" class="material-icons-outlined ">description</span>
+                                        {% icon icon="expand_more" icon_position="after" icon_outlined=True %}
+                                    </a>
 
-                            {% if categories %}
-                                <ul class="primary-navigation__list subpage-list">
-                                    {% for category in categories %}
-                                        <li class="primary-navigation__list-item">
-                                            {% url 'products:category_detail' slug=category.slug as category_href %}
-                                            {% link text=category.name href=category_href %}
-                                        </li>
-                                    {% endfor %}
-                                </ul>
+                                    {% if menu_categories %}
+                                        <ul class="primary-navigation__list subpage-list">
+                                            {% for category in menu_categories %}
+                                                <li class="primary-navigation__list-item">
+                                                    {% url 'products:category_detail' slug=category.slug as category_href %}
+                                                    {% link text=category.name href=category_href %}
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                </li>
                             {% endif %}
-                        </li>
                         {% endif %}
 
                         {% show_menu_below_id "home" 0 100 100 100 "cms/menu/primary.html" %}
@@ -103,30 +108,34 @@
     {% firstof config.logo.default_alt_text config.name as logo_alt_text %}
         <div class="logo__desktop">{% logo src=config.logo.file.url alt="Homepage "|add:logo_alt_text svg_height=75 %}</div>
 
-        {% primary_navigation categories=categories request=request has_general_faq_questions=has_general_faq_questions cms_apps=cms_apps show_plans=show_plans %}
+				{% include "components/Header/PrimaryNavigation.html" %}
 
         {% if cms_apps.products %}
-        <nav class="header__actions" aria-label="Zoek navigatie desktop">
-            {% url 'search:search' as search_url %}
-            {% render_form form=search_form method="GET" form_action=search_url inline=True spaceless=True %}
-                {% input search_form.query no_label=True %}
-                {% form_actions primary_icon="search" primary_text=_("Zoeken") hide_primary_text=True %}
-            {% endrender_form %}
-        </nav>
+          {% if request.user.is_authenticated or not config.hide_search_from_anonymous_users %}
+          <nav class="header__actions" aria-label="Zoek navigatie desktop">
+              {% url 'search:search' as search_url %}
+              {% render_form form=search_form method="GET" form_action=search_url inline=True spaceless=True %}
+                  {% input search_form.query no_label=True %}
+                  {% form_actions primary_icon="search" primary_text=_("Zoeken") hide_primary_text=True %}
+              {% endrender_form %}
+          </nav>
+          {% endif %}
         {% endif %}
 
-        {% navigation_authenticated categories=categories request=request has_general_faq_questions=has_general_faq_questions %}
+        {% include "components/Header/NavigationAuthenticated.html" %}
     </div>
 </header>
 
 {% if cms_apps.products %}
-<section class="search search__mobile">
-    <nav class="search__actions " aria-label="Zoek navigatie mobiel">
-        {% url 'search:search' as search_url %}
-        {% render_form form=search_form method="GET" form_action=search_url inline=True spaceless=False %}
-            {% input search_form.query no_label=True %}
-            {% form_actions primary_icon="search" primary_text=_("Zoeken") hide_primary_text=True %}
-        {% endrender_form %}
-    </nav>
-</section>
+    {% if request.user.is_authenticated or not config.hide_search_from_anonymous_users %}
+        <section class="search search__mobile">
+            <nav class="search__actions " aria-label="Zoek navigatie mobiel">
+                {% url 'search:search' as search_url %}
+                {% render_form form=search_form method="GET" form_action=search_url inline=True spaceless=False %}
+                    {% input search_form.query no_label=True %}
+                    {% form_actions primary_icon="search" primary_text=_("Zoeken") hide_primary_text=True %}
+                {% endrender_form %}
+            </nav>
+        </section>
+    {% endif %}
 {% endif %}

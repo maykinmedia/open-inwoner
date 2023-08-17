@@ -6,14 +6,17 @@ from django.urls import reverse_lazy
 from django.utils.translation import gettext as _
 from django.views.generic import FormView
 
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.utils.mixins import PaginationMixin
-from open_inwoner.utils.views import CommonPageMixin, LogMixin
+from open_inwoner.utils.views import CommonPageMixin, LoginMaybeRequiredMixin, LogMixin
 
 from .forms import FeedbackForm, SearchForm
 from .searches import search_products
 
 
-class SearchView(LogMixin, CommonPageMixin, PaginationMixin, FormView):
+class SearchView(
+    LoginMaybeRequiredMixin, LogMixin, CommonPageMixin, PaginationMixin, FormView
+):
     form_class = SearchForm
     template_name = "pages/search.html"
     paginate_by = 20
@@ -135,3 +138,8 @@ class SearchView(LogMixin, CommonPageMixin, PaginationMixin, FormView):
             ),
         )
         return HttpResponseRedirect(http_referer)
+
+    @property
+    def display_restricted(self):
+        config = SiteConfiguration.get_solo()
+        return config.hide_categories_from_anonymous_users is True

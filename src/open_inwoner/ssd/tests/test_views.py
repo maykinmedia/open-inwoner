@@ -119,9 +119,9 @@ class TestYearlyBenefitsFormView(TestCase):
         self.user.save()
 
     def test_get(self):
-        url = reverse("ssd:yearly_benefits_index")
 
         # request with anonymous user
+        url = reverse("ssd:yearly_benefits_index")
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, HTTPStatus.FOUND)

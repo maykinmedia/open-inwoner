@@ -445,6 +445,20 @@ class SiteConfiguration(SingletonModel):
         default=True,
         help_text=_("Whether file sharing via the messages is allowed or not"),
     )
+    hide_categories_from_anonymous_users = models.BooleanField(
+        verbose_name=_("Hide categories from anonymous users"),
+        default=False,
+        help_text=_(
+            "If checked, categories will be hidden from users who are not logged in."
+        ),
+    )
+    hide_search_from_anonymous_users = models.BooleanField(
+        verbose_name=_("Hide search from anonymous users"),
+        default=False,
+        help_text=_(
+            "If checked, only authenticated users will be able to search the page."
+        ),
+    )
 
     class Meta:
         verbose_name = _("Site Configuration")

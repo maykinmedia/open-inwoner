@@ -86,6 +86,7 @@ def settings(request):
         "settings": dict(
             [(k, getattr(django_settings, k, None)) for k in public_settings]
         ),
+        "hide_categories_from_anonymous_users": config.hide_categories_from_anonymous_users,
     }
 
     if hasattr(django_settings, "SENTRY_CONFIG"):

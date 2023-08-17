@@ -9,8 +9,8 @@ from view_breadcrumbs import BaseBreadcrumbMixin, ListBreadcrumbMixin
 
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.pdc.models.product import ProductCondition
-from open_inwoner.plans.models import Plan
 from open_inwoner.questionnaire.models import QuestionnaireStep
+from open_inwoner.utils.views import LoginMaybeRequiredMixin
 
 from ..utils.views import CommonPageMixin
 from .choices import YesNo
@@ -112,7 +112,9 @@ class FAQView(CommonPageMixin, TemplateView):
         return super().get_context_data(**kwargs)
 
 
-class CategoryListView(CommonPageMixin, ListBreadcrumbMixin, ListView):
+class CategoryListView(
+    LoginMaybeRequiredMixin, CommonPageMixin, ListBreadcrumbMixin, ListView
+):
     template_name = "pages/category/list.html"
     model = Category
 
@@ -124,9 +126,18 @@ class CategoryListView(CommonPageMixin, ListBreadcrumbMixin, ListView):
         config = SiteConfiguration.get_solo()
         return [(config.theme_title, reverse("products:category_list"))]
 
+    @property
+    def display_restricted(self):
+        config = SiteConfiguration.get_solo()
+        return config.hide_categories_from_anonymous_users is True
+
 
 class CategoryDetailView(
-    CommonPageMixin, BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView
+    LoginMaybeRequiredMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    CategoryBreadcrumbMixin,
+    DetailView,
 ):
     template_name = "pages/category/detail.html"
     model = Category
@@ -165,6 +176,11 @@ class CategoryDetailView(
 
     def get_breadcrumb_name(self):
         return self.object.name
+
+    @property
+    def display_restricted(self):
+        config = SiteConfiguration.get_solo()
+        return config.hide_categories_from_anonymous_users is True
 
 
 class ProductDetailView(
