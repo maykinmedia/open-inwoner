@@ -157,6 +157,11 @@ def get_uitkering_dict(xml_data) -> Optional[dict]:
 
     # dossier needed for the rest of the report
     dossierhistorie_spec = glom(uitkering_specificatie, "Dossierhistorie")
+
+    # normalize
+    if not isinstance(dossierhistorie_spec, list):
+        dossierhistorie_spec = [dossierhistorie_spec]
+
     dossier_dict = dossierhistorie_spec[0]
 
     #
@@ -194,7 +199,7 @@ def get_uitkering_dict(xml_data) -> Optional[dict]:
         }
 
     #
-    # Speciﬁcatie inkomstenkorting
+    # Specificatie inkomstenkorting
     #
     inkomstenkorting = {
         "opgegeven_inkomsten": {

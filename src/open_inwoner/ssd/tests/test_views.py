@@ -52,7 +52,7 @@ class TestMonthlyBenefitsFormView(TestCase):
 
     @patch(
         "open_inwoner.ssd.client.UitkeringClient.get_report",
-        return_value=mock_report(str(FILES_DIR / "uitkering_response.xml")),
+        return_value=mock_report(str(FILES_DIR / "uitkering_response_basic.xml")),
     )
     @freeze_time("1985-12-25")
     def test_post_success(self, mock_report):
