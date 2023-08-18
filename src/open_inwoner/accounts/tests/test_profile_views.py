@@ -267,10 +267,11 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
     def test_name_validation(self):
         invalid_characters = '<>#/"\\,.:;'
 
+        response = self.app.get(self.url, user=self.user, status=200)
+        form = response.forms["profile-edit"]
+
         for char in invalid_characters:
             with self.subTest(char=char):
-                response = self.app.get(self.url, user=self.user, status=200)
-                form = response.forms["profile-edit"]
                 form["first_name"] = "test" + char
                 form["infix"] = char + "test"
                 form["last_name"] = "te" + char + "st"

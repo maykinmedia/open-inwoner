@@ -5,6 +5,7 @@ from uuid import uuid4
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.contrib.contenttypes.fields import GenericRelation
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
@@ -72,7 +73,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         default="",
         validators=[CharFieldValidator()],
     )
-    email = models.EmailField(verbose_name=_("Email address"), unique=True)
+    email = models.EmailField(
+        verbose_name=_("Email address"),
+    )
     phonenumber = models.CharField(
         verbose_name=_("Phonenumber"),
         blank=True,
@@ -216,6 +219,52 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name = _("User")
         verbose_name_plural = _("Users")
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._old_bsn = self.bsn
+
+    def clean(self, *args, **kwargs):
+        """Reject non-unique emails, except for users with login_type DigiD"""
+
+        existing_users = self.__class__.objects.filter(email__iexact=self.email)
+
+        # no duplicates
+        if not existing_users:
+            return
+
+        # the curent user is editing their profile
+        if self in existing_users:
+            return
+
+        # no active user with duplicate email
+        if not any((user.is_active for user in existing_users)):
+            raise ValidationError(
+                {
+                    "email": ValidationError(
+                        _("All accounts with this email have been deactivated")
+                    )
+                }
+            )
+
+        # all accounts with duplicate emails have login_type digid
+        if self.login_type == LoginTypeChoices.digid and all(
+            (user.login_type == LoginTypeChoices.digid for user in existing_users)
+        ):
+            return
+
+        # some account does not have login_type digid
+        raise ValidationError(
+            {
+                "email": ValidationError(
+                    _(
+                        "A user with this Email already exists. If you need to register "
+                        "with an Email addresss that is already in use, both users of the "
+                        "address need to be registered with login type DigiD."
+                    )
+                )
+            }
+        )
+
     @property
     def seed(self):
         if not hasattr(self, "_seed"):
@@ -224,10 +273,6 @@ class User(AbstractBaseUser, PermissionsMixin):
             )
 
         return self._seed
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._old_bsn = self.bsn
 
     def get_full_name(self):
         parts = (self.first_name, self.infix, self.last_name)
@@ -316,6 +361,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         choice = ContactTypeChoices.get_choice(self.contact_type)
         return choice.label
 
+    @property
     def is_not_active(self):
         return not self.is_active
 

@@ -120,18 +120,6 @@ class CustomRegistrationForm(RegistrationForm):
         else:
             self.fields["phonenumber"].required = True
 
-    def clean_email(self):
-        email = self.cleaned_data["email"]
-
-        existing_user = User.objects.filter(email__iexact=email).first()
-        if not existing_user:
-            return email
-
-        if existing_user.is_active:
-            raise ValidationError(_("The user with this email already exists"))
-
-        raise ValidationError(_("This user has been deactivated"))
-
 
 class BaseUserForm(forms.ModelForm):
     class Meta:
@@ -153,6 +141,10 @@ class BaseUserForm(forms.ModelForm):
 
 
 class UserForm(BaseUserForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = kwargs.pop("user")
+
     class Meta:
         model = User
         fields = (
@@ -213,15 +205,6 @@ class NecessaryUserForm(forms.ModelForm):
                 del self.fields["last_name"]
             if not user.infix:
                 del self.fields["infix"]
-
-    def clean_email(self):
-        email = self.cleaned_data["email"]
-
-        is_existing_user = User.objects.filter(email__iexact=email).exists()
-        if is_existing_user:
-            raise ValidationError(_("The user with this email already exists"))
-
-        return email
 
 
 class CustomPasswordResetForm(PasswordResetForm):
@@ -333,7 +316,7 @@ class ContactCreateForm(forms.Form):
                 )
 
             existing_user = User.objects.filter(email__iexact=email)
-            if existing_user and existing_user.get().is_not_active():
+            if existing_user and existing_user.get().is_not_active:
                 raise ValidationError(
                     _("The user cannot be added, their account has been deleted.")
                 )

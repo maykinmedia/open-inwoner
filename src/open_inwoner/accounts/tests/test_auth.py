@@ -177,18 +177,29 @@ class TestRegistrationFunctionality(WebTest):
                 }
                 self.assertEqual(response.context["form"].errors, expected_errors)
 
-    def test_registration_fails_with_case_sensitive_email(self):
+    def test_non_unique_email_case_sensitive_fails(self):
         register_page = self.app.get(reverse("django_registration_register"))
         form = register_page.forms["registration-form"]
-        user = UserFactory(email="user@example.com")
+        UserFactory(email="user@example.com")
+
         form["email"] = "User@example.com"
         form["first_name"] = self.user.first_name
         form["last_name"] = self.user.last_name
         form["password1"] = self.user.password
         form["password2"] = self.user.password
         response = form.submit()
-        expected_errors = {"email": [_("The user with this email already exists")]}
+
+        expected_errors = {
+            "email": [
+                _(
+                    "A user with this Email already exists. If you need to register "
+                    "with an Email addresss that is already in use, both users of the "
+                    "address need to be registered with login type DigiD."
+                )
+            ]
+        }
         user_query = User.objects.filter(email=self.user.email)
+
         self.assertEqual(user_query.count(), 0)
         self.assertEqual(response.context["form"].errors, expected_errors)
 
@@ -205,10 +216,12 @@ class TestRegistrationFunctionality(WebTest):
 
         response = form.submit()
 
+        expected_errors = {
+            "email": [_("All accounts with this email have been deactivated")]
+        }
+
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            response.context["errors"].as_text(), "* Deze gebruiker is gedeactiveerd"
-        )
+        self.assertEqual(response.context["form"].errors, expected_errors)
 
     def test_registration_with_invite(self):
         user = UserFactory()
@@ -287,25 +300,6 @@ class TestRegistrationFunctionality(WebTest):
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("pages-root"))
-
-    def test_registration_non_unique_email_different_case(self):
-        UserFactory.create(email="john@smith.com")
-
-        register_page = self.app.get(self.url)
-        form = register_page.forms["registration-form"]
-        form["email"] = "John@smith.com"
-        form["first_name"] = "John"
-        form["last_name"] = "Smith"
-        form["password1"] = "SomePassword123"
-        form["password2"] = "SomePassword123"
-
-        response = form.submit()
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            response.context["errors"].as_text(),
-            "* Een gebruiker met dit e-mailadres bestaat al",
-        )
 
     def test_registration_succeeds_with_2fa_sms_and_phonenumber(self):
         self.config.login_2fa_sms = True
@@ -513,6 +507,83 @@ class TestDigid(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
         self.assertEqual(user.email, "updated@example.com")
         self.assertEqual(user.first_name, "Merel")
         self.assertEqual(user.last_name, "Kooyman")
+
+    @requests_mock.Mocker()
+    def test_non_unique_email_without_digid_login(self, m):
+        test_user = User.objects.create(email="test@example.com")
+
+        self._setUpService()
+        self._setUpMocks_v_2(m)
+
+        url = reverse("digid-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": reverse("profile:registration_necessary"),
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": "123456782",
+            "auth_pass": "bar",
+        }
+        # post our password to the IDP
+        response = self.app.post(url, data).follow()
+
+        form = response.follow().forms["necessary-form"]
+        form["email"] = "test@example.com"
+        form["first_name"] = "JUpdated"
+        form["last_name"] = "SUpdated"
+        response = form.submit()
+
+        expected_errors = {
+            "email": [
+                _(
+                    "A user with this Email already exists. If you need to register "
+                    "with an Email addresss that is already in use, both users of the "
+                    "address need to be registered with login type DigiD."
+                )
+            ]
+        }
+
+        self.assertEqual(response.context["form"].errors, expected_errors)
+
+        users = User.objects.filter(email=test_user.email)
+
+        self.assertEqual(users.count(), 1)
+
+    @requests_mock.Mocker()
+    def test_non_unique_email_with_digid_login(self, m):
+        test_user = User.objects.create(
+            email="test@example.com",
+            login_type=LoginTypeChoices.digid,
+        )
+
+        self._setUpService()
+        self._setUpMocks_v_2(m)
+
+        url = reverse("digid-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": reverse("profile:registration_necessary"),
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": "123456782",
+            "auth_pass": "bar",
+        }
+        # post our password to the IDP
+        response = self.app.post(url, data).follow()
+
+        form = response.follow().forms["necessary-form"]
+        form["email"] = "test@example.com"
+        form["first_name"] = "JUpdated"
+        form["last_name"] = "SUpdated"
+        response = form.submit().follow()
+
+        users = User.objects.filter(email__iexact=test_user.email)
+
+        self.assertEqual(users.count(), 2)
 
     @requests_mock.Mocker()
     def test_partial_response_from_haalcentraal_when_digid_and_brp(self, m):
@@ -801,7 +872,7 @@ class TestRegistrationNecessary(WebTest):
         self.assertEqual(user_contact.email, contact.email)
         self.assertEqual(list(user.user_contacts.all()), [user_contact])
 
-    def test_submit_not_unique_email(self):
+    def test_non_unique_email_fails(self):
         UserFactory.create(email="john@smith.com")
         user = UserFactory.create(
             first_name="",
@@ -819,12 +890,19 @@ class TestRegistrationNecessary(WebTest):
         response = form.submit()
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            response.context["errors"].as_text(),
-            "* Een gebruiker met dit e-mailadres bestaat al",
-        )
 
-    def test_submit_with_case_sensitive_email_fails(self):
+        expected_errors = {
+            "email": [
+                _(
+                    "A user with this Email already exists. If you need to register "
+                    "with an Email addresss that is already in use, both users of the "
+                    "address need to be registered with login type DigiD."
+                )
+            ]
+        }
+        self.assertEqual(response.context["form"].errors, expected_errors)
+
+    def test_non_unique_email_case_sensitive_fails(self):
         UserFactory.create(email="john@example.com")
         user = UserFactory.create(
             first_name="",
@@ -840,32 +918,19 @@ class TestRegistrationNecessary(WebTest):
         form["last_name"] = "Smith"
 
         response = form.submit()
-        expected_errors = {"email": [_("The user with this email already exists")]}
-
-        self.assertEqual(response.context["form"].errors, expected_errors)
-
-    def test_submit_not_unique_email_different_case(self):
-        UserFactory.create(email="john@smith.com")
-        user = UserFactory.create(
-            first_name="",
-            last_name="",
-            login_type=LoginTypeChoices.digid,
-        )
-
-        response = self.app.get(self.url, user=user)
-        form = response.forms["necessary-form"]
-
-        form["email"] = "John@smith.com"
-        form["first_name"] = "John"
-        form["last_name"] = "Smith"
-
-        response = form.submit()
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            response.context["errors"].as_text(),
-            "* Een gebruiker met dit e-mailadres bestaat al",
-        )
+
+        expected_errors = {
+            "email": [
+                _(
+                    "A user with this Email already exists. If you need to register "
+                    "with an Email addresss that is already in use, both users of the "
+                    "address need to be registered with login type DigiD."
+                )
+            ]
+        }
+        self.assertEqual(response.context["form"].errors, expected_errors)
 
     def test_submit_invalid_first_name_chars_fails(self):
         UserFactory.create(email="john@smith.com")
@@ -876,10 +941,11 @@ class TestRegistrationNecessary(WebTest):
         )
         invalid_characters = '<>#/"\\,.:;'
 
+        response = self.app.get(self.url, user=user)
+        form = response.forms["necessary-form"]
+
         for char in invalid_characters:
             with self.subTest(char=char):
-                response = self.app.get(self.url, user=user)
-                form = response.forms["necessary-form"]
                 form["email"] = "user@example.com"
                 form["first_name"] = char
                 form["last_name"] = "Smith"
@@ -903,10 +969,11 @@ class TestRegistrationNecessary(WebTest):
         )
         invalid_characters = '<>#/"\\,.:;'
 
+        response = self.app.get(self.url, user=user)
+        form = response.forms["necessary-form"]
+
         for char in invalid_characters:
             with self.subTest(char=char):
-                response = self.app.get(self.url, user=user)
-                form = response.forms["necessary-form"]
                 form["email"] = "user@example.com"
                 form["first_name"] = "John"
                 form["last_name"] = char
