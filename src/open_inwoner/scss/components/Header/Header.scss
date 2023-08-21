@@ -22,9 +22,10 @@ $vm: var(--spacing-large);
   .indicator {
     display: inline-block;
     position: relative;
-    margin-left: var(--spacing-large);
     overflow: visible;
     text-align: center;
+    right: 15px;
+    top: -5px;
 
     .link,
     &__link {
@@ -239,6 +240,7 @@ $vm: var(--spacing-large);
       display: none;
     }
   }
+
   &__submenu::backdrop {
     display: none;
   }
@@ -289,6 +291,16 @@ $vm: var(--spacing-large);
           overflow-x: visible;
           justify-content: flex-end;
           position: relative;
+
+          .primary-navigation__list-item
+            .subpage-list
+            .primary-navigation__list-item {
+            .indicator {
+              margin-left: var(--spacing-large);
+              right: 0;
+              top: 0;
+            }
+          }
         }
       }
     }
@@ -554,6 +566,14 @@ $vm: var(--spacing-large);
               transform: rotate(0deg);
               top: 8px;
               right: var(--spacing-large);
+            }
+          }
+
+          .primary-navigation__list .primary-navigation__list-item {
+            .indicator {
+              margin-left: var(--spacing-large);
+              right: 0;
+              top: 0;
             }
           }
         }

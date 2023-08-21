@@ -9,6 +9,12 @@
             <li class="primary-navigation__list-item">
             {% button text=_('Welkom ')|addstr:request.user.get_short_name type="button" icon="expand_more" icon_position="after" icon_outlined=True transparent=True extra_classes="primary-navigation--toggle" %}
 
+            {% with messages_notification=request.user.get_new_messages_total plans_notification=request.user.get_plan_contact_new_count %}
+                {% if messages_notification or plans_notification %}
+                    <span class="indicator"><span class="indicator__dot"></span></span>
+                {% endif %}
+            {% endwith %}
+
                 <ul class="primary-navigation__list subpage-list">
                     {% show_menu_below_id "home" 0 100 100 100 "cms/menu/primary.html" %}
 
