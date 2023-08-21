@@ -575,6 +575,10 @@ CMS_PLACEHOLDER_CONF = {
 
 CMS_TOOLBAR_ANONYMOUS_ON = False
 
+DJANGOCMS_LINK_TEMPLATES = [
+    ("arrow", _("Arrow")),
+]
+
 #
 # Django-Admin-Index
 #

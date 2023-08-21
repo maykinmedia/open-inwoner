@@ -1,0 +1,4 @@
+{% load cms_tags button_tags icon_tags i18n %}{% spaceless %}
+{# copied and modified from 'default' #}
+{# this needs to be in one line for rendering purpose #}
+{% endspaceless %}<a class="button button--textless button--icon button--icon-before button--transparent"  href="{{ link }}"{% if instance.target %} target="{{ instance.target }}"{% endif %}{% if instance.attributes %} {{ instance.attributes_str }}{% endif %}>{% icon icon="arrow_forward" %}{% for plugin in instance.child_plugin_instances %}{% render_plugin plugin %}{% empty %}{{ instance.name }}{% endfor %}</a>
