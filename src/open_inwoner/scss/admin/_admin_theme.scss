@@ -330,3 +330,9 @@ form div.help {
   display: inline-block;
   margin-left: inherit !important;
 }
+
+.textfield {
+  &--code {
+    font-family: monospace;
+  }
+}

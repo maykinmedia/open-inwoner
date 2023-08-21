@@ -12,6 +12,7 @@ from solo.models import SingletonModel
 from open_inwoner.utils.validators import DutchPhoneNumberValidator
 
 from ..utils.colors import hex_to_hsl
+from ..utils.fields import CSSField
 from ..utils.validators import FilerExactImageSizeValidator
 from .choices import ColorTypeChoices, OpenIDDisplayChoices
 from .validators import validate_oidc_config
@@ -458,6 +459,12 @@ class SiteConfiguration(SingletonModel):
         help_text=_(
             "If checked, only authenticated users will be able to search the page."
         ),
+    )
+
+    extra_css = CSSField(
+        blank=True,
+        verbose_name=_("Extra CSS"),
+        help_text=_("Additional CSS added to the page"),
     )
 
     class Meta:

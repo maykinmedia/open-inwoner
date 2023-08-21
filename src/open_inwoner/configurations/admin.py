@@ -16,6 +16,7 @@ from solo.admin import SingletonModelAdmin
 from open_inwoner.ckeditor5.widgets import CKEditorWidget
 
 from ..utils.colors import ACCESSIBLE_CONTRAST_RATIO, get_contrast_ratio
+from ..utils.fields import CSSEditorWidget
 from .models import SiteConfiguration, SiteConfigurationPage
 
 
@@ -39,6 +40,9 @@ class SiteConfigurarionAdminForm(forms.ModelForm):
     class Meta:
         model = SiteConfiguration
         fields = "__all__"
+        widgets = {
+            "extra_css": CSSEditorWidget,
+        }
 
     def clean_redirect_to(self):
         redirect_to = self.cleaned_data["redirect_to"]
@@ -196,6 +200,13 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                     "hide_categories_from_anonymous_users",
                     "hide_search_from_anonymous_users",
                 )
+            },
+        ),
+        (
+            _("Advanced display options"),
+            {
+                "classes": ["collapse"],
+                "fields": ("extra_css",),
             },
         ),
     )
