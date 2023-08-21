@@ -66,6 +66,11 @@
     .form .caption__content {
       color: var(--color-tinted-mute);
     }
+
+    .card__body--direction-horizontal .link .link__text {
+      text-align: right;
+      padding-left: var(--spacing-small);
+    }
   }
 
   &__img {

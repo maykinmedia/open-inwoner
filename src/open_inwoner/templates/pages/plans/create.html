@@ -24,16 +24,16 @@
                         <div>{% trans "Doel" %}</div>
                         <div></div>
                     </div>
-                    <label class="plan-template__row radio">
+                    <div class="label plan-template__row radio">
                         <div>
                             <input class="radio__input" type="radio" name="template" value="" id="id_template_0" {% if not form.data.template %}checked{% endif %}>
                             <label class="radio__label" for="id_template_0">Geen template</label>
                         </div>
                         <div></div>
                         <div></div>
-                    </label>
+                    </div>
                     {% for tpl_id, plan_template in form.template.field.choices %}
-                        <label class="plan-template__row radio">
+                        <div class="label plan-template__row radio">
                             <div>
                                 <input class="radio__input" type="radio" name="template" value="{{ plan_template.id }}" id="id_template_{{ plan_template.id }}"
                                        {% if tpl_id == form.data.template %}checked{% endif %}>
@@ -60,7 +60,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </label>
+                        </div>
                     {% endfor %}
                 </div>
 
