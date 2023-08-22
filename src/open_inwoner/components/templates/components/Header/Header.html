@@ -57,9 +57,9 @@
                                         {% icon icon="expand_more" icon_position="after" icon_outlined=True %}
                                     </a>
 
-                                    {% if menu_categories %}
+                                    {% if categories %}
                                         <ul class="primary-navigation__list subpage-list">
-                                            {% for category in menu_categories %}
+                                            {% for category in categories %}
                                                 <li class="primary-navigation__list-item">
                                                     {% url 'products:category_detail' slug=category.slug as category_href %}
                                                     {% link text=category.name href=category_href %}
