@@ -15,11 +15,11 @@
 
 {% block content %}
     <div class="cases__detail" id="cases-detail-content"><div>
-    
+
     <div class="loader-container" id="spinner-container">
-        <h1 class="h1" id="title">{% trans "Status" %}</h1>
         <div class="spinner" id="spinner-id" hx-get="{{ hxget }}" hx-trigger="load" hx-target="#cases-detail-content">
-            {% icon icon="autorenew" extra_classes="spinner-icon rotate" %}
+            {% icon icon="rotate_right" extra_classes="spinner-icon rotate" %}
+            <div class="spinner__content">{% trans "Gegevens laden..." %}</div>
         </div>
     </div>
 {% endblock content %}

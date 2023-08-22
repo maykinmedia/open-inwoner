@@ -7,13 +7,12 @@
 
 
 {% block content %}
-    <h1 class="h1" id="title">{% trans "Mijn aanvragen" %}</h1>
-    
     <div class="cases" id="cases-content"></div>
-    
+
     <div class="loader-container" id="spinner-container">
         <div class="spinner" id="spinner-id" hx-get="{{ hxget }}" hx-trigger="load" hx-target="#cases-content">
-            {% icon icon="autorenew" extra_classes="spinner-icon rotate" %}
+            {% icon icon="rotate_right" extra_classes="spinner-icon rotate" %}
+            <div class="spinner__content">{% trans "Gegevens laden..." %}</div>
         </div>
     </div>
 {% endblock content %}

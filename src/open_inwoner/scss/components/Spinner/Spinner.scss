@@ -8,6 +8,32 @@
 }
 
 .loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 65vh;
+  margin: 0;
+  text-align: center;
+
+  @media (min-width: 500px) {
+    justify-content: flex-start;
+    align-items: flex-start;
+    height: 70vh;
+    margin: 100px 0 0 200px;
+  }
+
+  .spinner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--font-color-body);
+    font-size: var(--font-size-body);
+
+    &__content {
+      margin-top: var(--spacing-large);
+    }
+  }
+
   &--hide {
     display: none;
   }
@@ -24,7 +50,7 @@
   .spinner-icon {
     display: inline-block;
     font-size: 50px;
-    color: var(--color-primary);
+    color: var(--color-gray-dark);
     width: 50px;
     height: 50px;
   }
