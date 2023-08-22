@@ -21,13 +21,6 @@ class UserManagerTests(TestCase):
         self.assertFalse(user.is_staff)
         self.assertFalse(user.has_usable_password())
 
-    def test_create_user_with_non_unique_email_and_digid_login(self):
-        user1 = User.objects.create_user("test@example.com", password="12345")
-        user2 = User.objects.create_user("test@example.com", password="12345")
-        user1.first_name = "@#$"
-        # user1 = User.objects.create("test@example.com")
-        # user2 = User.objects.create("test@example.com")
-
 
 class UserQueryTests(TestCase):
     def test_having_usable_email(self):

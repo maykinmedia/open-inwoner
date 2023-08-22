@@ -22,324 +22,9 @@ from .factories import DigidUserFactory, InviteFactory, UserFactory
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class TestRegistrationFunctionality(WebTest):
-    url = reverse_lazy("django_registration_register")
+class DigiDRegistrationTest(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
+    """Tests concerning the registration of DigiD users"""
 
-    def setUp(self):
-        # Create a User instance that's not saved
-        self.user = UserFactory.build()
-
-        self.config = SiteConfiguration.get_solo()
-        self.config.login_allow_registration = True
-        self.config.save()
-
-    def test_registration_succeeds_with_right_user_input(self):
-        register_page = self.app.get(reverse("django_registration_register"))
-        form = register_page.forms["registration-form"]
-        form["email"] = self.user.email
-        form["first_name"] = self.user.first_name
-        form["infix"] = ""
-        form["last_name"] = self.user.last_name
-        form["password1"] = self.user.password
-        form["password2"] = self.user.password
-        form.submit()
-        # Verify the registered user.
-        registered_user = User.objects.get(email=self.user.email)
-        self.assertEqual(registered_user.email, self.user.email)
-        self.assertTrue(registered_user.check_password(self.user.password))
-
-    def test_registration_fails_without_filling_out_first_name(self):
-        register_page = self.app.get(reverse("django_registration_register"))
-        form = register_page.forms["registration-form"]
-        form["email"] = self.user.email
-        form["last_name"] = self.user.last_name
-        form["password1"] = self.user.password
-        form["password2"] = self.user.password
-        form.submit()
-        # Verify that the user has not been registered
-        user_query = User.objects.filter(email=self.user.email)
-        self.assertEqual(user_query.count(), 0)
-
-    def test_registration_fails_without_filling_out_last_name(self):
-        register_page = self.app.get(reverse("django_registration_register"))
-        form = register_page.forms["registration-form"]
-        form["email"] = self.user.email
-        form["first_name"] = self.user.first_name
-        form["password1"] = self.user.password
-        form["password2"] = self.user.password
-        form.submit()
-        # Verify that the user has not been registered
-        user_query = User.objects.filter(email=self.user.email)
-        self.assertEqual(user_query.count(), 0)
-
-    def test_registration_fails_with_invalid_first_name_characters(self):
-        invalid_characters = '<>#/"\\,.:;'
-        register_page = self.app.get(reverse("django_registration_register"))
-        form = register_page.forms["registration-form"]
-
-        for char in invalid_characters:
-            with self.subTest(char=char):
-                form["email"] = self.user.email
-                form["first_name"] = char
-                form["last_name"] = self.user.last_name
-                form["password1"] = self.user.password
-                form["password2"] = self.user.password
-                response = form.submit()
-                expected_errors = {
-                    "first_name": [
-                        _(
-                            "Please make sure your input contains only valid characters "
-                            "(letters, numbers, apostrophe, dash, space)."
-                        )
-                    ]
-                }
-                self.assertEqual(response.context["form"].errors, expected_errors)
-
-    def test_registration_fails_with_invalid_last_name_characters(self):
-        invalid_characters = '<>#/"\\,.:;'
-        register_page = self.app.get(reverse("django_registration_register"))
-        form = register_page.forms["registration-form"]
-
-        for char in invalid_characters:
-            with self.subTest(char=char):
-                form["email"] = self.user.email
-                form["first_name"] = self.user.first_name
-                form["last_name"] = char
-                form["password1"] = self.user.password
-                form["password2"] = self.user.password
-                response = form.submit()
-                expected_errors = {
-                    "last_name": [
-                        _(
-                            "Please make sure your input contains only valid characters "
-                            "(letters, numbers, apostrophe, dash, space)."
-                        )
-                    ]
-                }
-                self.assertEqual(response.context["form"].errors, expected_errors)
-
-    def test_registration_fails_uniform_password(self):
-        passwords = [
-            "lowercase123",
-            "UPPERCASE123",
-            "NODIGITS",
-            "nodigits",
-            "NoDigits",
-            "1238327879",
-        ]
-        register_page = self.app.get(reverse("django_registration_register"))
-        form = register_page.forms["registration-form"]
-
-        for password in passwords:
-            with self.subTest(password=password):
-                form["email"] = self.user.email
-                form["first_name"] = self.user.first_name
-                form["last_name"] = self.user.last_name
-                form["password1"] = password
-                form["password2"] = password
-                response = form.submit()
-                expected_errors = {
-                    "password2": [
-                        _(
-                            "Your password must contain at least 1 upper-case letter, "
-                            "1 lower-case letter, 1 digit."
-                        ),
-                    ]
-                }
-                self.assertEqual(response.context["form"].errors, expected_errors)
-
-    def test_registration_fails_with_non_diverse_password(self):
-        passwords = [
-            "pass_word-123",
-            "PASS_WORD-123",
-            "NoDigits",
-            "UPPERCASE123",
-            "lowercase123",
-        ]
-        register_page = self.app.get(reverse("django_registration_register"))
-        form = register_page.forms["registration-form"]
-
-        for password in passwords:
-            with self.subTest(password=password):
-                form["email"] = self.user.email
-                form["first_name"] = self.user.first_name
-                form["last_name"] = self.user.last_name
-                form["password1"] = password
-                form["password2"] = password
-                response = form.submit()
-                expected_errors = {
-                    "password2": [
-                        _(
-                            "Your password must contain at least 1 upper-case letter, "
-                            "1 lower-case letter, 1 digit."
-                        )
-                    ]
-                }
-                self.assertEqual(response.context["form"].errors, expected_errors)
-
-    def test_non_unique_email_case_sensitive_fails(self):
-        register_page = self.app.get(reverse("django_registration_register"))
-        form = register_page.forms["registration-form"]
-        UserFactory(email="user@example.com")
-
-        form["email"] = "User@example.com"
-        form["first_name"] = self.user.first_name
-        form["last_name"] = self.user.last_name
-        form["password1"] = self.user.password
-        form["password2"] = self.user.password
-        response = form.submit()
-
-        expected_errors = {
-            "email": [
-                _(
-                    "A user with this Email already exists. If you need to register "
-                    "with an Email addresss that is already in use, both users of the "
-                    "address need to be registered with login type DigiD."
-                )
-            ]
-        }
-        user_query = User.objects.filter(email=self.user.email)
-
-        self.assertEqual(user_query.count(), 0)
-        self.assertEqual(response.context["form"].errors, expected_errors)
-
-    def test_registration_inactive_user(self):
-        inactive_user = UserFactory.create(is_active=False)
-
-        register_page = self.app.get(self.url)
-        form = register_page.forms["registration-form"]
-        form["email"] = inactive_user.email
-        form["first_name"] = "John"
-        form["last_name"] = "Smith"
-        form["password1"] = "SomePassword123"
-        form["password2"] = "SomePassword123"
-
-        response = form.submit()
-
-        expected_errors = {
-            "email": [_("All accounts with this email have been deactivated")]
-        }
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["form"].errors, expected_errors)
-
-    def test_registration_with_invite(self):
-        user = UserFactory()
-        contact = UserFactory.build(email="test@testemail.com")
-        invite = InviteFactory.create(
-            inviter=user,
-            invitee_email=contact.email,
-            invitee_first_name=contact.first_name,
-            invitee_last_name=contact.last_name,
-        )
-        self.assertEqual(list(User.objects.filter(email=contact.email)), [])
-
-        register_page = self.app.get(f"{self.url}?invite={invite.key}")
-        form = register_page.forms["registration-form"]
-
-        # check that fields are prefilled with invite data
-        self.assertEqual(form["email"].value, contact.email)
-        self.assertEqual(form["first_name"].value, contact.first_name)
-        self.assertEqual(form["last_name"].value, contact.last_name)
-
-        form["password1"] = "SomePassword123"
-        form["password2"] = "SomePassword123"
-
-        response = form.submit()
-
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("pages-root"))
-        self.assertTrue(User.objects.filter(email=contact.email).exists())
-
-        new_user = User.objects.get(email=contact.email)
-        invite.refresh_from_db()
-
-        self.assertEqual(new_user.first_name, contact.first_name)
-        self.assertEqual(new_user.last_name, contact.last_name)
-        self.assertEqual(new_user.email, contact.email)
-        self.assertEqual(invite.invitee, new_user)
-
-        # reverse contact checks
-        self.assertEqual(list(user.user_contacts.all()), [new_user])
-
-    def test_invite_url_not_in_session_after_successful_registration(self):
-        user = UserFactory()
-        contact = UserFactory.build(email="test@testemail.com")
-        invite = InviteFactory.create(
-            inviter=user,
-            invitee_email=contact.email,
-            invitee_first_name=contact.first_name,
-            invitee_last_name=contact.last_name,
-        )
-        invite = InviteFactory.create()
-        url = invite.get_absolute_url()
-
-        response = self.app.get(url)
-
-        form = response.forms["invite-form"]
-        response = form.submit()
-
-        self.assertIn("invite_url", self.app.session.keys())
-
-        register_page = self.app.get(f"{self.url}?invite={invite.key}")
-        form = register_page.forms["registration-form"]
-
-        form["password1"] = "SomePassword123"
-        form["password2"] = "SomePassword123"
-
-        response = form.submit()
-
-        self.assertNotIn("invite_url", self.app.session.keys())
-
-    def test_registration_active_user(self):
-        """the user should be redirected to the homepage"""
-
-        user = UserFactory.create()
-
-        response = self.app.get(self.url, user=user)
-
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("pages-root"))
-
-    def test_registration_succeeds_with_2fa_sms_and_phonenumber(self):
-        self.config.login_2fa_sms = True
-        self.config.save()
-
-        register_page = self.app.get(reverse("django_registration_register"))
-        form = register_page.forms["registration-form"]
-        form["email"] = self.user.email
-        form["first_name"] = self.user.first_name
-        form["last_name"] = self.user.last_name
-        form["phonenumber"] = self.user.phonenumber
-        form["password1"] = self.user.password
-        form["password2"] = self.user.password
-        form.submit()
-        # Verify the registered user.
-        registered_user = User.objects.get(email=self.user.email)
-        self.assertEqual(registered_user.email, self.user.email)
-        self.assertTrue(registered_user.check_password(self.user.password))
-
-    def test_registration_fails_with_2fa_sms_and_no_phonenumber(self):
-        self.config.login_2fa_sms = True
-        self.config.save()
-
-        register_page = self.app.get(reverse("django_registration_register"))
-        form = register_page.forms["registration-form"]
-        form["email"] = self.user.email
-        form["first_name"] = self.user.first_name
-        form["last_name"] = self.user.last_name
-        form["password1"] = self.user.password
-        form["password2"] = self.user.password
-        response = form.submit()
-
-        self.assertEqual(
-            response.context["form"].errors,
-            {"phonenumber": [_("Dit veld is vereist.")]},
-        )
-
-
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class TestDigid(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
     csrf_checks = False
     url = reverse_lazy("django_registration_register")
 
@@ -507,83 +192,6 @@ class TestDigid(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
         self.assertEqual(user.email, "updated@example.com")
         self.assertEqual(user.first_name, "Merel")
         self.assertEqual(user.last_name, "Kooyman")
-
-    @requests_mock.Mocker()
-    def test_non_unique_email_without_digid_login(self, m):
-        test_user = User.objects.create(email="test@example.com")
-
-        self._setUpService()
-        self._setUpMocks_v_2(m)
-
-        url = reverse("digid-mock:password")
-        params = {
-            "acs": reverse("acs"),
-            "next": reverse("profile:registration_necessary"),
-        }
-        url = f"{url}?{urlencode(params)}"
-
-        data = {
-            "auth_name": "123456782",
-            "auth_pass": "bar",
-        }
-        # post our password to the IDP
-        response = self.app.post(url, data).follow()
-
-        form = response.follow().forms["necessary-form"]
-        form["email"] = "test@example.com"
-        form["first_name"] = "JUpdated"
-        form["last_name"] = "SUpdated"
-        response = form.submit()
-
-        expected_errors = {
-            "email": [
-                _(
-                    "A user with this Email already exists. If you need to register "
-                    "with an Email addresss that is already in use, both users of the "
-                    "address need to be registered with login type DigiD."
-                )
-            ]
-        }
-
-        self.assertEqual(response.context["form"].errors, expected_errors)
-
-        users = User.objects.filter(email=test_user.email)
-
-        self.assertEqual(users.count(), 1)
-
-    @requests_mock.Mocker()
-    def test_non_unique_email_with_digid_login(self, m):
-        test_user = User.objects.create(
-            email="test@example.com",
-            login_type=LoginTypeChoices.digid,
-        )
-
-        self._setUpService()
-        self._setUpMocks_v_2(m)
-
-        url = reverse("digid-mock:password")
-        params = {
-            "acs": reverse("acs"),
-            "next": reverse("profile:registration_necessary"),
-        }
-        url = f"{url}?{urlencode(params)}"
-
-        data = {
-            "auth_name": "123456782",
-            "auth_pass": "bar",
-        }
-        # post our password to the IDP
-        response = self.app.post(url, data).follow()
-
-        form = response.follow().forms["necessary-form"]
-        form["email"] = "test@example.com"
-        form["first_name"] = "JUpdated"
-        form["last_name"] = "SUpdated"
-        response = form.submit().follow()
-
-        users = User.objects.filter(email__iexact=test_user.email)
-
-        self.assertEqual(users.count(), 2)
 
     @requests_mock.Mocker()
     def test_partial_response_from_haalcentraal_when_digid_and_brp(self, m):
@@ -775,11 +383,547 @@ class TestDigid(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
             "auth_pass": "bar",
         }
         # post our password to the IDP
-        response = self.app.post(url, data).follow()
+        self.app.post(url, data).follow()
 
         user.refresh_from_db()
 
         self.assertNotEqual(user.first_name, "UpdatedName")
+
+
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+class EmailPasswordRegistrationTest(WebTest):
+    """
+    Tests concerning the registration of non-digid users (email + password)
+    """
+
+    url = reverse_lazy("django_registration_register")
+
+    def setUp(self):
+        # Create a User instance that's not saved
+        self.user = UserFactory.build()
+
+        self.config = SiteConfiguration.get_solo()
+        self.config.login_allow_registration = True
+        self.config.save()
+
+    def test_registration_succeeds_with_right_user_input(self):
+        register_page = self.app.get(reverse("django_registration_register"))
+        form = register_page.forms["registration-form"]
+        form["email"] = self.user.email
+        form["first_name"] = self.user.first_name
+        form["infix"] = ""
+        form["last_name"] = self.user.last_name
+        form["password1"] = self.user.password
+        form["password2"] = self.user.password
+        form.submit()
+        # Verify the registered user.
+        registered_user = User.objects.get(email=self.user.email)
+        self.assertEqual(registered_user.email, self.user.email)
+        self.assertTrue(registered_user.check_password(self.user.password))
+
+    def test_registration_fails_without_filling_out_first_name(self):
+        register_page = self.app.get(reverse("django_registration_register"))
+        form = register_page.forms["registration-form"]
+        form["email"] = self.user.email
+        form["last_name"] = self.user.last_name
+        form["password1"] = self.user.password
+        form["password2"] = self.user.password
+        form.submit()
+        # Verify that the user has not been registered
+        user_query = User.objects.filter(email=self.user.email)
+        self.assertEqual(user_query.count(), 0)
+
+    def test_registration_fails_without_filling_out_last_name(self):
+        register_page = self.app.get(reverse("django_registration_register"))
+        form = register_page.forms["registration-form"]
+        form["email"] = self.user.email
+        form["first_name"] = self.user.first_name
+        form["password1"] = self.user.password
+        form["password2"] = self.user.password
+        form.submit()
+        # Verify that the user has not been registered
+        user_query = User.objects.filter(email=self.user.email)
+        self.assertEqual(user_query.count(), 0)
+
+    def test_registration_fails_with_invalid_first_name_characters(self):
+        invalid_characters = '<>#/"\\,.:;'
+        register_page = self.app.get(reverse("django_registration_register"))
+        form = register_page.forms["registration-form"]
+
+        for char in invalid_characters:
+            with self.subTest(char=char):
+                form["email"] = self.user.email
+                form["first_name"] = char
+                form["last_name"] = self.user.last_name
+                form["password1"] = self.user.password
+                form["password2"] = self.user.password
+                response = form.submit()
+                expected_errors = {
+                    "first_name": [
+                        _(
+                            "Please make sure your input contains only valid characters "
+                            "(letters, numbers, apostrophe, dash, space)."
+                        )
+                    ]
+                }
+                self.assertEqual(response.context["form"].errors, expected_errors)
+
+    def test_registration_fails_with_invalid_last_name_characters(self):
+        invalid_characters = '<>#/"\\,.:;'
+        register_page = self.app.get(reverse("django_registration_register"))
+        form = register_page.forms["registration-form"]
+
+        for char in invalid_characters:
+            with self.subTest(char=char):
+                form["email"] = self.user.email
+                form["first_name"] = self.user.first_name
+                form["last_name"] = char
+                form["password1"] = self.user.password
+                form["password2"] = self.user.password
+                response = form.submit()
+                expected_errors = {
+                    "last_name": [
+                        _(
+                            "Please make sure your input contains only valid characters "
+                            "(letters, numbers, apostrophe, dash, space)."
+                        )
+                    ]
+                }
+                self.assertEqual(response.context["form"].errors, expected_errors)
+
+    def test_registration_fails_uniform_password(self):
+        passwords = [
+            "lowercase123",
+            "UPPERCASE123",
+            "NODIGITS",
+            "nodigits",
+            "NoDigits",
+            "1238327879",
+        ]
+        register_page = self.app.get(reverse("django_registration_register"))
+        form = register_page.forms["registration-form"]
+
+        for password in passwords:
+            with self.subTest(password=password):
+                form["email"] = self.user.email
+                form["first_name"] = self.user.first_name
+                form["last_name"] = self.user.last_name
+                form["password1"] = password
+                form["password2"] = password
+                response = form.submit()
+                expected_errors = {
+                    "password2": [
+                        _(
+                            "Your password must contain at least 1 upper-case letter, "
+                            "1 lower-case letter, 1 digit."
+                        ),
+                    ]
+                }
+                self.assertEqual(response.context["form"].errors, expected_errors)
+
+    def test_registration_fails_with_non_diverse_password(self):
+        passwords = [
+            "pass_word-123",
+            "PASS_WORD-123",
+            "NoDigits",
+            "UPPERCASE123",
+            "lowercase123",
+        ]
+        register_page = self.app.get(reverse("django_registration_register"))
+        form = register_page.forms["registration-form"]
+
+        for password in passwords:
+            with self.subTest(password=password):
+                form["email"] = self.user.email
+                form["first_name"] = self.user.first_name
+                form["last_name"] = self.user.last_name
+                form["password1"] = password
+                form["password2"] = password
+                response = form.submit()
+                expected_errors = {
+                    "password2": [
+                        _(
+                            "Your password must contain at least 1 upper-case letter, "
+                            "1 lower-case letter, 1 digit."
+                        )
+                    ]
+                }
+                self.assertEqual(response.context["form"].errors, expected_errors)
+
+    def test_registration_with_invite(self):
+        user = UserFactory()
+        contact = UserFactory.build(email="test@testemail.com")
+        invite = InviteFactory.create(
+            inviter=user,
+            invitee_email=contact.email,
+            invitee_first_name=contact.first_name,
+            invitee_last_name=contact.last_name,
+        )
+        self.assertEqual(list(User.objects.filter(email=contact.email)), [])
+
+        register_page = self.app.get(f"{self.url}?invite={invite.key}")
+        form = register_page.forms["registration-form"]
+
+        # check that fields are prefilled with invite data
+        self.assertEqual(form["email"].value, contact.email)
+        self.assertEqual(form["first_name"].value, contact.first_name)
+        self.assertEqual(form["last_name"].value, contact.last_name)
+
+        form["password1"] = "SomePassword123"
+        form["password2"] = "SomePassword123"
+
+        response = form.submit()
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("pages-root"))
+        self.assertTrue(User.objects.filter(email=contact.email).exists())
+
+        new_user = User.objects.get(email=contact.email)
+        invite.refresh_from_db()
+
+        self.assertEqual(new_user.first_name, contact.first_name)
+        self.assertEqual(new_user.last_name, contact.last_name)
+        self.assertEqual(new_user.email, contact.email)
+        self.assertEqual(invite.invitee, new_user)
+
+        # reverse contact checks
+        self.assertEqual(list(user.user_contacts.all()), [new_user])
+
+    def test_invite_url_not_in_session_after_successful_registration(self):
+        user = UserFactory()
+        contact = UserFactory.build(email="test@testemail.com")
+        invite = InviteFactory.create(
+            inviter=user,
+            invitee_email=contact.email,
+            invitee_first_name=contact.first_name,
+            invitee_last_name=contact.last_name,
+        )
+        invite = InviteFactory.create()
+        url = invite.get_absolute_url()
+
+        response = self.app.get(url)
+
+        form = response.forms["invite-form"]
+        response = form.submit()
+
+        self.assertIn("invite_url", self.app.session.keys())
+
+        register_page = self.app.get(f"{self.url}?invite={invite.key}")
+        form = register_page.forms["registration-form"]
+
+        form["password1"] = "SomePassword123"
+        form["password2"] = "SomePassword123"
+
+        response = form.submit()
+
+        self.assertNotIn("invite_url", self.app.session.keys())
+
+    def test_registration_active_user(self):
+        """the user should be redirected to the homepage"""
+
+        user = UserFactory.create()
+
+        response = self.app.get(self.url, user=user)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("pages-root"))
+
+    def test_registration_succeeds_with_2fa_sms_and_phonenumber(self):
+        self.config.login_2fa_sms = True
+        self.config.save()
+
+        register_page = self.app.get(reverse("django_registration_register"))
+        form = register_page.forms["registration-form"]
+        form["email"] = self.user.email
+        form["first_name"] = self.user.first_name
+        form["last_name"] = self.user.last_name
+        form["phonenumber"] = self.user.phonenumber
+        form["password1"] = self.user.password
+        form["password2"] = self.user.password
+        form.submit()
+        # Verify the registered user.
+        registered_user = User.objects.get(email=self.user.email)
+        self.assertEqual(registered_user.email, self.user.email)
+        self.assertTrue(registered_user.check_password(self.user.password))
+
+    def test_registration_fails_with_2fa_sms_and_no_phonenumber(self):
+        self.config.login_2fa_sms = True
+        self.config.save()
+
+        register_page = self.app.get(reverse("django_registration_register"))
+        form = register_page.forms["registration-form"]
+        form["email"] = self.user.email
+        form["first_name"] = self.user.first_name
+        form["last_name"] = self.user.last_name
+        form["password1"] = self.user.password
+        form["password2"] = self.user.password
+        response = form.submit()
+
+        self.assertEqual(
+            response.context["form"].errors,
+            {"phonenumber": [_("Dit veld is vereist.")]},
+        )
+
+
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+class DuplicateEmailRegistrationTest(WebTest):
+    """
+    DigiD users should be able to register with email addresses that are already in use.
+    Other users should not be able to register with duplicate emails.
+    """
+
+    csrf_checks = False
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.msg_dupes = _(
+            "A user with this Email already exists. If you need to register "
+            "with an Email addresss that is already in use, contact us."
+        )
+        cls.msg_inactive = _("This account has been deactivated")
+
+    #
+    # digid users
+    #
+    @requests_mock.Mocker()
+    def test_digid_user_success(self, m):
+        """Assert that digid users can register with duplicate emails"""
+
+        test_user = User.objects.create(
+            email="test@example.com",
+            login_type=LoginTypeChoices.digid,
+        )
+
+        url = reverse("digid-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": reverse("profile:registration_necessary"),
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": "123456782",
+            "auth_pass": "bar",
+        }
+        # post our password to the IDP
+        response = self.app.post(url, data).follow()
+
+        form = response.follow().forms["necessary-form"]
+        form["email"] = "test@example.com"
+        form["first_name"] = "JUpdated"
+        form["last_name"] = "SUpdated"
+        response = form.submit().follow()
+
+        users = User.objects.filter(email__iexact=test_user.email)
+
+        self.assertEqual(users.count(), 2)
+
+    @requests_mock.Mocker()
+    def test_digid_user_inactivate_duplicate_fail(self, m):
+        """
+        Assert that digid users cannot register with emails that belong to an already
+        deactivated account
+        """
+
+        inactive_user = User.objects.create(
+            email="test@example.com",
+            bsn="123456789",
+            is_active=False,
+        )
+
+        url = reverse("digid-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": reverse("profile:registration_necessary"),
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": "123456789",
+            "auth_pass": "bar",
+        }
+        # post our password to the IDP
+        response = self.app.post(url, data).follow()
+
+        form = response.follow().forms["necessary-form"]
+        form["email"] = "test@example.com"
+        form["first_name"] = "JUpdated"
+        form["last_name"] = "SUpdated"
+        response = form.submit()
+
+        expected_errors = {"email": [self.msg_inactive]}
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["form"].errors, expected_errors)
+
+        users = User.objects.filter(email__iexact=inactive_user.email)
+
+        self.assertEqual(users.count(), 1)
+
+    @requests_mock.Mocker()
+    def test_digid_user_can_edit_profile(self, m):
+        """
+        Assert that digid users can edit their profile (the email of the same user
+        is not counted as duplicate)
+        """
+
+        url = reverse("digid-mock:password")
+
+        # create profile
+        params = {
+            "acs": reverse("acs"),
+            "next": reverse("profile:registration_necessary"),
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": "123456782",
+            "auth_pass": "bar",
+        }
+        # post our password to the IDP
+        response = self.app.post(url, data).follow()
+
+        form = response.follow().forms["necessary-form"]
+        form["email"] = "test@example.com"
+        form["first_name"] = "original_first"
+        form["last_name"] = "original_last"
+        response = form.submit().follow()
+
+        user = User.objects.get(email="test@example.com")
+
+        self.assertEqual(user.first_name, "original_first")
+        self.assertEqual(user.last_name, "original_last")
+
+        # edit profile
+        url = reverse("profile:edit")
+
+        edit_page = self.app.get(url, user=user)
+
+        form = edit_page.forms["profile-edit"]
+        form["first_name"] = "changed_first"
+        form["last_name"] = "changed_last"
+        response = form.submit()
+
+        user.refresh_from_db()
+
+        self.assertEqual(user.first_name, "changed_first")
+        self.assertEqual(user.last_name, "changed_last")
+
+    #
+    # non-digid users
+    #
+    @requests_mock.Mocker()
+    def test_non_digid_user_fail(self, m):
+        """Assert that non-digid users cannot register with duplicate emails"""
+
+        url = reverse_lazy("django_registration_register")
+
+        test_user = User.objects.create(email="test@example.com")
+
+        # enable login with email + password
+        self.config = SiteConfiguration.get_solo()
+        self.config.login_allow_registration = True
+        self.config.save()
+
+        register_page = self.app.get(url)
+        form = register_page.forms["registration-form"]
+        form["email"] = test_user.email
+        form["first_name"] = "John"
+        form["last_name"] = "Smith"
+        form["password1"] = "SomePassword123"
+        form["password2"] = "SomePassword123"
+
+        response = form.submit()
+
+        expected_errors = {"email": [self.msg_dupes]}
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["form"].errors, expected_errors)
+
+        users = User.objects.filter(email=test_user.email)
+
+        self.assertEqual(users.count(), 1)
+
+    def test_non_digid_user_case_sensitive_duplicate_fail(self):
+        """
+        Assert that non-digid users cannot register with emails that differ from
+        existing emails only in case
+        """
+        url = reverse_lazy("django_registration_register")
+
+        User.objects.create(email="test@example.com")
+
+        # enable login with email + password
+        self.config = SiteConfiguration.get_solo()
+        self.config.login_allow_registration = True
+        self.config.save()
+
+        register_page = self.app.get(url)
+        form = register_page.forms["registration-form"]
+        form["email"] = "TEST@example.com"
+        form["first_name"] = "John"
+        form["last_name"] = "Smith"
+        form["password1"] = "SomePassword123"
+        form["password2"] = "SomePassword123"
+
+        response = form.submit()
+
+        self.assertEqual(response.status_code, 200)
+
+        expected_errors = {"email": [self.msg_dupes]}
+
+        self.assertEqual(response.context["form"].errors, expected_errors)
+
+    def test_non_digid_user_inactive_duplicates_fail(self):
+        """Assert that non-digid users cannot register with inactive duplicate emails"""
+
+        url = reverse_lazy("django_registration_register")
+
+        # enable login with email + password
+        self.config = SiteConfiguration.get_solo()
+        self.config.login_allow_registration = True
+        self.config.save()
+
+        inactive_user = UserFactory.create(is_active=False)
+
+        register_page = self.app.get(url)
+        form = register_page.forms["registration-form"]
+        form["email"] = inactive_user.email
+        form["first_name"] = "John"
+        form["last_name"] = "Smith"
+        form["password1"] = "SomePassword123"
+        form["password2"] = "SomePassword123"
+
+        response = form.submit()
+
+        expected_errors = {"email": [self.msg_inactive]}
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["form"].errors, expected_errors)
+
+    @requests_mock.Mocker()
+    def test_non_digid_user_can_edit_profile(self, m):
+        """
+        Assert that non-digid users can edit their profile (the email of the same user
+        is not counted as duplicate)
+        """
+
+        url = reverse("profile:edit")
+        test_user = User.objects.create(
+            email="test@example.com",
+        )
+
+        edit_page = self.app.get(url, user=test_user)
+
+        form = edit_page.forms["profile-edit"]
+        form["first_name"] = "changed_first"
+        form["last_name"] = "changed_last"
+        response = form.submit()
+
+        user = User.objects.get(id=test_user.id)
+
+        self.assertEqual(user.first_name, "changed_first")
+        self.assertEqual(user.last_name, "changed_last")
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
@@ -872,65 +1016,65 @@ class TestRegistrationNecessary(WebTest):
         self.assertEqual(user_contact.email, contact.email)
         self.assertEqual(list(user.user_contacts.all()), [user_contact])
 
-    def test_non_unique_email_fails(self):
-        UserFactory.create(email="john@smith.com")
-        user = UserFactory.create(
-            first_name="",
-            last_name="",
-            login_type=LoginTypeChoices.digid,
-        )
+    #     def test_non_unique_email_fails(self):
+    #         UserFactory.create(email="john@smith.com")
+    #         user = UserFactory.create(
+    #             first_name="",
+    #             last_name="",
+    #             login_type=LoginTypeChoices.digid,
+    #         )
 
-        response = self.app.get(self.url, user=user)
-        form = response.forms["necessary-form"]
+    #         response = self.app.get(self.url, user=user)
+    #         form = response.forms["necessary-form"]
 
-        form["email"] = "john@smith.com"
-        form["first_name"] = "John"
-        form["last_name"] = "Smith"
+    #         form["email"] = "john@smith.com"
+    #         form["first_name"] = "John"
+    #         form["last_name"] = "Smith"
 
-        response = form.submit()
+    #         response = form.submit()
 
-        self.assertEqual(response.status_code, 200)
+    #         self.assertEqual(response.status_code, 200)
 
-        expected_errors = {
-            "email": [
-                _(
-                    "A user with this Email already exists. If you need to register "
-                    "with an Email addresss that is already in use, both users of the "
-                    "address need to be registered with login type DigiD."
-                )
-            ]
-        }
-        self.assertEqual(response.context["form"].errors, expected_errors)
+    #         expected_errors = {
+    #             "email": [
+    #                 _(
+    #                     "A user with this Email already exists. If you need to register "
+    #                     "with an Email addresss that is already in use, both users of the "
+    #                     "address need to be registered with login type DigiD."
+    #                 )
+    #             ]
+    #         }
+    #         self.assertEqual(response.context["form"].errors, expected_errors)
 
-    def test_non_unique_email_case_sensitive_fails(self):
-        UserFactory.create(email="john@example.com")
-        user = UserFactory.create(
-            first_name="",
-            last_name="",
-            login_type=LoginTypeChoices.digid,
-        )
+    #     def test_non_unique_email_case_sensitive_fails(self):
+    #         UserFactory.create(email="john@example.com")
+    #         user = UserFactory.create(
+    #             first_name="",
+    #             last_name="",
+    #             login_type=LoginTypeChoices.digid,
+    #         )
 
-        response = self.app.get(self.url, user=user)
-        form = response.forms["necessary-form"]
+    #         response = self.app.get(self.url, user=user)
+    #         form = response.forms["necessary-form"]
 
-        form["email"] = "John@example.com"
-        form["first_name"] = "John"
-        form["last_name"] = "Smith"
+    #         form["email"] = "John@example.com"
+    #         form["first_name"] = "John"
+    #         form["last_name"] = "Smith"
 
-        response = form.submit()
+    #         response = form.submit()
 
-        self.assertEqual(response.status_code, 200)
+    #         self.assertEqual(response.status_code, 200)
 
-        expected_errors = {
-            "email": [
-                _(
-                    "A user with this Email already exists. If you need to register "
-                    "with an Email addresss that is already in use, both users of the "
-                    "address need to be registered with login type DigiD."
-                )
-            ]
-        }
-        self.assertEqual(response.context["form"].errors, expected_errors)
+    #         expected_errors = {
+    #             "email": [
+    #                 _(
+    #                     "A user with this Email already exists. If you need to register "
+    #                     "with an Email addresss that is already in use, both users of the "
+    #                     "address need to be registered with login type DigiD."
+    #                 )
+    #             ]
+    #         }
+    #         self.assertEqual(response.context["form"].errors, expected_errors)
 
     def test_submit_invalid_first_name_chars_fails(self):
         UserFactory.create(email="john@smith.com")

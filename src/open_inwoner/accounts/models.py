@@ -236,14 +236,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         if self in existing_users:
             return
 
-        # no active user with duplicate email
-        if not any((user.is_active for user in existing_users)):
+        # account has been deactivated
+        if any(user.bsn == self.bsn and user.is_not_active for user in existing_users):
             raise ValidationError(
-                {
-                    "email": ValidationError(
-                        _("All accounts with this email have been deactivated")
-                    )
-                }
+                {"email": ValidationError(_("This account has been deactivated"))}
             )
 
         # all accounts with duplicate emails have login_type digid
@@ -258,8 +254,7 @@ class User(AbstractBaseUser, PermissionsMixin):
                 "email": ValidationError(
                     _(
                         "A user with this Email already exists. If you need to register "
-                        "with an Email addresss that is already in use, both users of the "
-                        "address need to be registered with login type DigiD."
+                        "with an Email addresss that is already in use, contact us."
                     )
                 )
             }
