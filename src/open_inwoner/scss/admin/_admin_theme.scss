@@ -331,8 +331,19 @@ form div.help {
   margin-left: inherit !important;
 }
 
+/* Custom code fields */
 .textfield {
   &--code {
     font-family: monospace;
+    font-size: 95%;
+  }
+}
+.css-properties-table {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-column-gap: 2em;
+  &__column {
+    font-family: monospace;
+    font-size: 95%;
   }
 }

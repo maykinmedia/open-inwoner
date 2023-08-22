@@ -12,6 +12,7 @@ from solo.models import SingletonModel
 from open_inwoner.utils.validators import DutchPhoneNumberValidator
 
 from ..utils.colors import hex_to_hsl
+from ..utils.css import clean_stylesheet
 from ..utils.fields import CSSField
 from ..utils.validators import FilerExactImageSizeValidator
 from .choices import ColorTypeChoices, OpenIDDisplayChoices
@@ -464,7 +465,9 @@ class SiteConfiguration(SingletonModel):
     extra_css = CSSField(
         blank=True,
         verbose_name=_("Extra CSS"),
-        help_text=_("Additional CSS added to the page"),
+        help_text=_(
+            "Additional CSS added to the page. Note only a (safe) subset of CSS properties is supported."
+        ),
     )
 
     class Meta:
@@ -472,6 +475,11 @@ class SiteConfiguration(SingletonModel):
 
     def __str__(self):
         return str(_("Site Configuration"))
+
+    def save(self, *args, **kwargs):
+        if self.extra_css:
+            self.extra_css = clean_stylesheet(self.extra_css)
+        super().save(*args, **kwargs)
 
     @property
     def get_primary_color(self):

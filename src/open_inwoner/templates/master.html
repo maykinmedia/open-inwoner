@@ -29,7 +29,7 @@
         {% block extra_css %}{% endblock %}
         {% block extra_head %}{% endblock %}
         {% if extra_css %}
-            <style nonce="{{ request.csp_nonce }}">
+            <style id="extra-css" nonce="{{ request.csp_nonce }}">
                 {{ extra_css }}
             </style>
         {% endif %}
