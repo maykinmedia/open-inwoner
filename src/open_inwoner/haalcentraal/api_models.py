@@ -17,13 +17,10 @@ class BRPData:
     birthday: Optional[date] = None
 
     # extra fields
-    # TODO rename birthday_city
     initials: str = ""
-    birthday_city: str = ""
+    birth_place: str = ""
     gender: str = ""
-    # TODO rename postcode to postal_code
-    postcode: str = ""
-    # TODO rename land to country
+    postal_code: str = ""
     country: str = ""
 
     def copy_to_user(self, user: User):

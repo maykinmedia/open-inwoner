@@ -114,9 +114,9 @@ def fetch_brp(user_bsn: str) -> Optional[BRPData]:
         birthday=birthday,
         # extra fields
         initials=glom(data, "naam.voorletters", default=""),
-        birthday_city=glom(data, "geboorte.plaats.omschrijving", default=""),
+        birth_place=glom(data, "geboorte.plaats.omschrijving", default=""),
         gender=glom(data, gender_glom, default=""),
-        postcode=glom(data, "verblijfplaats.postcode", default=""),
+        postal_code=glom(data, "verblijfplaats.postcode", default=""),
         country=glom(data, "verblijfplaats.land.omschrijving", default=""),
     )
 

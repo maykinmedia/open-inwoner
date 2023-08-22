@@ -621,7 +621,7 @@ class MyDataTests(HaalCentraalMixin, WebTest):
         last_name="Kooyman",
         infix="de",
         birthday=date(1982, 4, 10),
-        birthday_city="Leerdam",
+        birth_place="Leerdam",
         gender="vrouw",
         street="King Olivereiland",
         housenumber="64",
