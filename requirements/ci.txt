@@ -36,6 +36,10 @@ billiard==3.6.4.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   celery
+bleach[css]==6.0.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
 boltons==21.0.0
     # via
     #   -c requirements/base.txt
@@ -841,6 +845,7 @@ six==1.16.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   bleach
     #   click-repl
     #   django-appdata
     #   django-choices
@@ -885,6 +890,7 @@ tinycss2==1.1.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   bleach
     #   cssselect2
     #   svglib
     #   weasyprint
@@ -941,6 +947,7 @@ webencodings==0.5.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   bleach
     #   cssselect2
     #   html5lib
     #   tinycss2

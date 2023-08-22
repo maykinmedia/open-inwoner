@@ -47,6 +47,10 @@ billiard==3.6.4.0
     #   celery
 black==22.12.0
     # via -r requirements/dev.in
+bleach[css]==6.0.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 boltons==21.0.0
     # via
     #   -c requirements/ci.txt
@@ -934,6 +938,7 @@ six==1.16.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   bleach
     #   click-repl
     #   django-appdata
     #   django-choices
@@ -1005,6 +1010,7 @@ tinycss2==1.1.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   bleach
     #   cssselect2
     #   svglib
     #   weasyprint
@@ -1073,6 +1079,7 @@ webencodings==0.5.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   bleach
     #   cssselect2
     #   html5lib
     #   tinycss2
