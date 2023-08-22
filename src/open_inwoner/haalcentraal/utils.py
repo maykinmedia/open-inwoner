@@ -1,20 +1,23 @@
 import logging
 from datetime import datetime
+from typing import Optional
 from urllib.parse import urljoin
 
+from django.conf import settings
 from django.utils.translation import gettext as _
 
 from glom import glom
 from requests import RequestException
 from zds_client import ClientError
 
+from open_inwoner.haalcentraal.api_models import BRPData
 from open_inwoner.haalcentraal.models import HaalCentraalConfig
 from open_inwoner.utils.logentry import system_action
 
 logger = logging.getLogger(__name__)
 
 
-def fetch_brp_data(instance, brp_version):
+def _fetch_brp_data(user_bsn: str, brp_version):
     config = HaalCentraalConfig.get_solo()
 
     if not config.service:
@@ -31,9 +34,9 @@ def fetch_brp_data(instance, brp_version):
                 operation_id="GetPersonen",
                 url=url,
                 data={
-                    "fields": "geslachtsaanduiding,naam,geboorte,verblijfplaats",
+                    "fields": ["geslacht", "naam", "geboorte", "verblijfplaats"],
                     "type": "RaadpleegMetBurgerservicenummer",
-                    "burgerservicenummer": [instance.bsn],
+                    "burgerservicenummer": [user_bsn],
                 },
                 request_kwargs=dict(
                     headers={"Accept": "application/json"}, verify=False
@@ -44,7 +47,7 @@ def fetch_brp_data(instance, brp_version):
             return {}
 
     elif brp_version == "1.3":
-        url = urljoin(client.base_url, f"ingeschrevenpersonen/{instance.bsn}")
+        url = urljoin(client.base_url, f"ingeschrevenpersonen/{user_bsn}")
         try:
             headers = {
                 "Accept": "application/hal+json",
@@ -72,35 +75,64 @@ def fetch_brp_data(instance, brp_version):
     return data
 
 
-def update_brp_data_in_db(user, brp_version, initial=True):
-    data = fetch_brp_data(user, brp_version)
+def fetch_brp(user_bsn: str) -> Optional[BRPData]:
+    if not user_bsn:
+        return
+
+    # TODO move BRP_VERSION to haalcentraal singleton
+    brp_version = settings.BRP_VERSION
+    data = _fetch_brp_data(user_bsn, brp_version)
 
     if brp_version == "2.0":
-        if data.get("personen"):
-            data = data.get("personen", [])[0]
-        else:
-            data = []
+        # in brp 2.0  the data is a list of personen, so let's grab the first one
+        if data := data.get("personen"):
+            data = data[0]
 
     if not data:
         logger.warning("no data retrieved from Haal Centraal")
-    else:
-        birthday = glom(data, "geboorte.datum.datum", default=None)
-        if birthday:
-            try:
-                birthday = datetime.strptime(birthday, "%Y-%m-%d")
-            except ValueError:
-                birthday = None
+        return
 
-        user.birthday = birthday
-        user.first_name = glom(data, "naam.voornamen", default="")
-        user.infix = glom(data, "naam.voorvoegsel", default="")
-        user.last_name = glom(data, "naam.geslachtsnaam", default="")
-        user.street = glom(data, "verblijfplaats.straat", default="")
-        user.housenumber = glom(data, "verblijfplaats.huisnummer", default="")
-        user.city = glom(data, "verblijfplaats.woonplaats", default="")
-        user.is_prepopulated = True
+    birthday = glom(data, "geboorte.datum.datum", default=None)
+    if birthday:
+        try:
+            birthday = datetime.strptime(birthday, "%Y-%m-%d").date()
+        except ValueError:
+            birthday = None
 
-        if initial is False:
-            user.save()
+    gender_glom = (
+        "geslacht.omschrijving" if brp_version == "2.0" else "geslachtsaanduiding"
+    )
 
-        system_action(_("data was retrieved from haal centraal"), content_object=user)
+    brp = BRPData(
+        first_name=glom(data, "naam.voornamen", default=""),
+        infix=glom(data, "naam.voorvoegsel", default=""),
+        last_name=glom(data, "naam.geslachtsnaam", default=""),
+        street=glom(data, "verblijfplaats.straat", default=""),
+        housenumber=str(glom(data, "verblijfplaats.huisnummer", default="")),
+        city=glom(data, "verblijfplaats.woonplaats", default=""),
+        birthday=birthday,
+        # extra fields
+        initials=glom(data, "naam.voorletters", default=""),
+        birth_place=glom(data, "geboorte.plaats.omschrijving", default=""),
+        gender=glom(data, gender_glom, default=""),
+        postal_code=glom(data, "verblijfplaats.postcode", default=""),
+        country=glom(data, "verblijfplaats.land.omschrijving", default=""),
+    )
+
+    return brp
+
+
+def update_brp_data_in_db(user, initial=True):
+    data = fetch_brp(user.bsn)
+
+    if not data:
+        logger.warning("no data retrieved from Haal Centraal")
+        return
+
+    data.copy_to_user(user)
+    user.is_prepopulated = True
+
+    if initial is False:
+        user.save()
+
+    system_action(_("data was retrieved from haal centraal"), content_object=user)

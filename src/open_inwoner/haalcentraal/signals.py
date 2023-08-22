@@ -1,9 +1,7 @@
 import logging
 
-from django.conf import settings
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
-from django.utils.translation import gettext as _
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.models import User
@@ -16,8 +14,6 @@ logger = logging.getLogger(__name__)
 
 @receiver(pre_save, sender=User)
 def on_bsn_change(instance, **kwargs):
-    brp_version = settings.BRP_VERSION
-
     if (
         instance.bsn
         and instance.is_prepopulated is False
@@ -27,4 +23,4 @@ def on_bsn_change(instance, **kwargs):
             "Retrieving data from haal centraal based on BSN", content_object=instance
         )
 
-        update_brp_data_in_db(instance, brp_version)
+        update_brp_data_in_db(instance)

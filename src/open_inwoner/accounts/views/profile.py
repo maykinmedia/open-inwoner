@@ -22,7 +22,7 @@ from open_inwoner.accounts.choices import (
     StatusChoices,
 )
 from open_inwoner.cms.utils.page_display import inbox_page_is_published
-from open_inwoner.haalcentraal.utils import fetch_brp_data
+from open_inwoner.haalcentraal.utils import fetch_brp
 from open_inwoner.plans.models import Plan
 from open_inwoner.questionnaire.models import QuestionnaireStep
 from open_inwoner.utils.mixins import ExportMixin
@@ -235,55 +235,13 @@ class MyDataView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["my_data"] = self.parse_brp_data()
+        context["my_data"] = self.get_brp_data()
         return context
 
-    def parse_brp_data(self):
-        brp_version = settings.BRP_VERSION
-        user = self.request.user
-        my_data = {
-            "first_name": "naam.voornamen",
-            "initials": "naam.voorletters",
-            "last_name": "naam.geslachtsnaam",
-            "prefix": "naam.voorvoegsel",
-            "birthday": "geboorte.datum.datum",
-            "birthday_place": "geboorte.plaats.omschrijving",
-            "gender": (
-                "geslachtsaanduiding.omschrijving"
-                if brp_version == "2.0"
-                else "geslachtsaanduiding"
-            ),
-            "street": "verblijfplaats.straat",
-            "house_number": "verblijfplaats.huisnummer",
-            "postcode": "verblijfplaats.postcode",
-            "place": "verblijfplaats.woonplaats",
-            "land": "verblijfplaats.land.omschrijving",
-        }
-
-        self.log_user_action(user, _("user requests for brp data"))
-
-        fetched_data = fetch_brp_data(user, brp_version)
-
-        # we have a different response depending on brp version
-        if brp_version == "2.0" and fetched_data.get("personen"):
-            fetched_data = fetched_data.get("personen", [])[0]
-
-        if not fetched_data:
-            return {}
-
-        for field in my_data:
-            my_data[field] = glom(fetched_data, my_data[field], default=None)
-
-        # change the format of birthday (we receive an str of YYYY-MM-DD)
-        if my_data.get("birthday"):
-            try:
-                my_data["birthday"] = datetime.strptime(
-                    my_data["birthday"], "%Y-%m-%d"
-                ).strftime("%d-%m-%Y")
-            except ValueError:
-                my_data["birthday"] = None
-
-        return my_data
+    def get_brp_data(self):
+        self.log_user_action(self.request.user, _("user requests for brp data"))
+        data = fetch_brp(self.request.user.bsn)
+        return data
 
 
 class MyNotificationsView(
