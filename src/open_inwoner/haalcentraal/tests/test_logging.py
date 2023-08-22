@@ -14,7 +14,6 @@ from .mixins import HaalCentraalMixin
 @freeze_time("2021-10-18 13:00:00")
 @requests_mock.Mocker()
 @override_settings(
-    LOG_OUTGOING_REQUESTS_ENABLED=True,
     LOG_OUTGOING_REQUESTS_DB_SAVE=True,
 )
 class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):

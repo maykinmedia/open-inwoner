@@ -84,10 +84,9 @@ def fetch_brp(user_bsn: str) -> Optional[BRPData]:
     data = _fetch_brp_data(user_bsn, brp_version)
 
     if brp_version == "2.0":
-        if data.get("personen"):
-            data = data.get("personen", [])[0]
-        else:
-            data = []
+        # in brp 2.0  the data is a list of personen, so let's grab the first one
+        if data := data.get("personen"):
+            data = data[0]
 
     if not data:
         logger.warning("no data retrieved from Haal Centraal")
