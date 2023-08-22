@@ -61,7 +61,7 @@ def get_product_rendered_content(product):
                 # icon
                 icon = soup.new_tag("span")
                 icon.attrs.update(
-                    {"aria-label": _("Aanvraag starten"), "class": "material-icons"}
+                    {"aria-label": product.button_text, "class": "material-icons"}
                 )
                 icon.append("arrow_forward")
 
@@ -72,11 +72,12 @@ def get_product_rendered_content(product):
                     {
                         "class": "button button--textless button--icon button--icon-before button--primary cta-button",
                         "href": (product.link if product.link else product.form_link),
-                        "title": _("Aanvraag starten"),
+                        "title": product.button_text,
+                        "aria-label": product.button_text,
                     }
                 )
                 element.append(icon)
-                element.append(_("Aanvraag starten"))
+                element.append(product.button_text)
 
                 if product.link:
                     element.attrs.update({"target": "_blank"})

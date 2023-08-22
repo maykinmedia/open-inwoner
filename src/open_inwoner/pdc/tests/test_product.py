@@ -228,6 +228,28 @@ class TestProductContent(WebTest):
 
         self.assertFalse(cta_button)
 
+    def test_button_text_change(self):
+        """
+        Assert that button text can be modified + aria-labels are changed accordingly
+        """
+        product = ProductFactory(
+            content="Some content [CTABUTTON]",
+            link="http://www.example.com",
+            button_text="click me!",
+        )
+
+        response = self.app.get(
+            reverse("products:product_detail", kwargs={"slug": product.slug})
+        )
+
+        cta_button = response.pyquery(".grid__main")[0].find_class("cta-button")[0]
+        cta_button_span = cta_button.getchildren()[0]
+
+        self.assertEqual(cta_button.tag, "a")
+        self.assertEqual(cta_button.attrib["title"], "click me!")
+        self.assertEqual(cta_button.attrib["aria-label"], "click me!")
+        self.assertEqual(cta_button_span.attrib["aria-label"], "click me!")
+
     def test_sidemenu_button_is_not_rendered_when_cta_inside_product_content(self):
         product = ProductFactory(
             content="Some content \[CTABUTTON\]", link="http://www.example.com"
