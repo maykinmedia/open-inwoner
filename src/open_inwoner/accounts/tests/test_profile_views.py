@@ -625,7 +625,7 @@ class MyDataTests(HaalCentraalMixin, WebTest):
         gender="vrouw",
         street="King Olivereiland",
         housenumber="64",
-        postcode="2551JV",
+        postal_code="2551JV",
         city="'s-Gravenhage",
         country="",
     )
