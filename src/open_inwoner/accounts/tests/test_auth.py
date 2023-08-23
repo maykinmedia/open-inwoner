@@ -676,10 +676,7 @@ class DuplicateEmailRegistrationTest(WebTest):
 
     @classmethod
     def setUpTestData(cls):
-        cls.msg_dupes = _(
-            "A user with this Email already exists. If you need to register "
-            "with an Email addresss that is already in use, contact us."
-        )
+        cls.msg_dupes = _("The user cannot be added. Please contact us for help.")
         cls.msg_inactive = _("This account has been deactivated")
 
     #
@@ -721,7 +718,7 @@ class DuplicateEmailRegistrationTest(WebTest):
     @requests_mock.Mocker()
     def test_digid_user_inactivate_duplicate_fail(self, m):
         """
-        Assert that digid users cannot register with emails that belong to an already
+        Assert that digid user cannot register with email that belong to an already
         deactivated account
         """
 
@@ -761,9 +758,50 @@ class DuplicateEmailRegistrationTest(WebTest):
         self.assertEqual(users.count(), 1)
 
     @requests_mock.Mocker()
+    def test_digid_user_non_digid_duplicate_fail(self, m):
+        """
+        Assert that digid user cannot register with email that belongs to a non-digid
+        user
+        """
+
+        existing_user = User.objects.create(
+            email="test@example.com",
+            login_type=LoginTypeChoices.default,
+        )
+
+        url = reverse("digid-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": reverse("profile:registration_necessary"),
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": "123456789",
+            "auth_pass": "bar",
+        }
+        # post our password to the IDP
+        response = self.app.post(url, data).follow()
+
+        form = response.follow().forms["necessary-form"]
+        form["email"] = "test@example.com"
+        form["first_name"] = "JUpdated"
+        form["last_name"] = "SUpdated"
+        response = form.submit()
+
+        expected_errors = {"email": [self.msg_dupes]}
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["form"].errors, expected_errors)
+
+        users = User.objects.filter(email__iexact=existing_user.email)
+
+        self.assertEqual(users.count(), 1)
+
+    @requests_mock.Mocker()
     def test_digid_user_can_edit_profile(self, m):
         """
-        Assert that digid users can edit their profile (the email of the same user
+        Assert that digid user can edit their profile (the email of the same user
         is not counted as duplicate)
         """
 

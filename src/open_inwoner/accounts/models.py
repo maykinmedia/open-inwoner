@@ -223,6 +223,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         super().__init__(*args, **kwargs)
         self._old_bsn = self.bsn
 
+    def __str__(self):
+        return f"{self.first_name} {self.last_name} ({self.email})"
+
     def clean(self, *args, **kwargs):
         """Reject non-unique emails, except for users with login_type DigiD"""
 
@@ -232,7 +235,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         if not existing_users:
             return
 
-        # the curent user is editing their profile
+        # the current user is editing their profile
         if self in existing_users:
             return
 
@@ -252,10 +255,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         raise ValidationError(
             {
                 "email": ValidationError(
-                    _(
-                        "A user with this Email already exists. If you need to register "
-                        "with an Email addresss that is already in use, contact us."
-                    )
+                    _("The user cannot be added. Please contact us for help.")
                 )
             }
         )
@@ -372,11 +372,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_pending_invitations(self):
         return Invite.objects.get_pending_invitations_for_user(self)
 
-    def is_email_of_contact(self, email):
-        return (
-            self.user_contacts.filter(email=email).exists()
-            or self.contacts_for_approval.filter(email=email).exists()
-        )
+    def has_contact(self, user):
+        """
+        :returns: `True` if the subject has `user` as contact, `False` otherwise
+        """
+        return user in self.user_contacts.all()
 
     def get_plan_contact_new_count(self):
         return (

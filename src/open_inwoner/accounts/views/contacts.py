@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q
 from django.http.response import HttpResponseBadRequest, HttpResponseRedirect
 from django.urls.base import reverse, reverse_lazy
 from django.utils.functional import cached_property
@@ -76,21 +77,19 @@ class ContactCreateView(
 
     def form_valid(self, form):
         cleaned_data = form.cleaned_data
-        email = cleaned_data["email"]
-        user = self.request.user
-        contact_user = User.objects.filter(email__iexact=email)
 
-        # Adding a contact-user which already exists in the platform
-        if contact_user.exists():
-            contact_user = contact_user.get()
+        user = self.request.user
+
+        # Add existing user as contact
+        if contact_user := cleaned_data["contact_user"]:
             user.contacts_for_approval.add(contact_user)
             self.send_email_to_existing_user(contact_user, user, self.request)
             self.log_addition(contact_user, _("contact was added, pending approval"))
-        # New contact-user which triggers an invite
+        # Send invitation to new user
         else:
             invite = Invite.objects.create(
                 inviter=self.request.user,
-                invitee_email=email,
+                invitee_email=cleaned_data["email"],
                 invitee_first_name=cleaned_data["first_name"],
                 invitee_last_name=cleaned_data["last_name"],
             )
@@ -100,7 +99,6 @@ class ContactCreateView(
                 _("invite was created"),
             )
 
-        # FIXME type off message
         messages.add_message(
             self.request,
             messages.SUCCESS,
@@ -113,7 +111,6 @@ class ContactCreateView(
         return HttpResponseRedirect(self.get_success_url())
 
     def send_email_to_existing_user(self, receiver: User, sender: User, request=None):
-        login_url = reverse("login")
         contacts_url = reverse("profile:contact_list")
         if request:
             url = request.build_absolute_uri(contacts_url)

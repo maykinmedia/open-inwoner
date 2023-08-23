@@ -1,4 +1,5 @@
 import io
+from unittest.mock import patch
 
 from django.core import mail
 from django.core.files.images import ImageFile
@@ -13,7 +14,7 @@ from open_inwoner.accounts.models import User
 from open_inwoner.utils.tests.helpers import create_image_bytes
 
 from ..choices import ContactTypeChoices
-from .factories import UserFactory
+from .factories import DigidUserFactory, UserFactory
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
@@ -22,6 +23,7 @@ class ContactViewTests(WebTest):
 
     def setUp(self) -> None:
         self.user = UserFactory()
+        self.digid_user = DigidUserFactory()
 
         self.contact = UserFactory()
         self.user.user_contacts.add(self.contact)
@@ -51,7 +53,9 @@ class ContactViewTests(WebTest):
         existing_user = UserFactory()
         self.user.contacts_for_approval.add(existing_user)
         response = self.app.get(self.list_url, user=self.user)
-        self.assertContains(response, existing_user.first_name)
+
+        self.assertNotContains(response, existing_user.first_name)
+        self.assertContains(response, existing_user.email)
 
     def test_contact_filter(self):
         begeleider = UserFactory(contact_type=ContactTypeChoices.begeleider)
@@ -173,11 +177,14 @@ class ContactViewTests(WebTest):
         pending_invitation = self.user.contacts_for_approval.first()
 
         self.assertEqual(response.status_code, 302)
-        self.assertContains(response.follow(), existing_user.first_name)
+
+        response = response.follow()
+        self.assertContains(response, existing_user.email)
+        self.assertNotContains(response, existing_user.first_name)
         self.assertEqual(existing_user, pending_invitation)
 
     def test_existing_user_contact_with_case_sensitive_email(self):
-        existing_user = UserFactory(email="user@example.com")
+        existing_user = UserFactory(email="user@example.com", bsn="111111111")
         response = self.app.get(self.create_url, user=self.user)
         form = response.forms["contact-form"]
 
@@ -185,9 +192,11 @@ class ContactViewTests(WebTest):
         form["last_name"] = existing_user.last_name
         form["email"] = "User@example.com"
         response = form.submit()
-        pending_invitation = self.user.contacts_for_approval.get()
 
         self.assertEqual(response.status_code, 302)
+
+        pending_invitation = self.user.contacts_for_approval.get()
+
         self.assertEqual(existing_user, pending_invitation)
 
     def test_adding_same_contact_fails(self):
@@ -201,23 +210,9 @@ class ContactViewTests(WebTest):
         expected_errors = {
             "__all__": [
                 _(
-                    "Het ingevoerde e-mailadres komt al voor in uw contactpersonen. Pas de gegevens aan en probeer het opnieuw."
+                    "Het ingevoerde contact komt al voor in uw contactpersonen. Pas de gegevens aan en probeer het opnieuw."
                 )
             ]
-        }
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["form"].errors, expected_errors)
-
-    def test_adding_contact_with_users_email_fails(self):
-        response = self.app.get(self.create_url, user=self.user)
-        form = response.forms["contact-form"]
-
-        form["first_name"] = self.contact.first_name
-        form["last_name"] = self.contact.last_name
-        form["email"] = self.user.email
-        response = form.submit(user=self.user)
-        expected_errors = {
-            "__all__": [_("Please enter a valid email address of a contact.")]
         }
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["form"].errors, expected_errors)
@@ -234,16 +229,35 @@ class ContactViewTests(WebTest):
         expected_errors = {
             "__all__": [_("The user cannot be added, their account has been deleted.")]
         }
+
+        response = form.submit()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["form"].errors, expected_errors)
+
+    def test_user_cannot_add_themselves(self):
+        response = self.app.get(self.create_url, user=self.user)
+        form = response.forms["contact-form"]
+
+        form["first_name"] = (self.user.first_name,)
+        form["last_name"] = (self.user.last_name,)
+        form["email"] = (self.user.email,)
+        response = form.submit(user=self.user)
+        expected_errors = {"__all__": [_("You cannot add yourself as a contact.")]}
+
+        response = form.submit()
+
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["form"].errors, expected_errors)
 
     def test_adding_contact_with_invalid_first_name_chars_fails(self):
         invalid_characters = '<>#/"\\,.:;'
 
+        response = self.app.get(self.create_url, user=self.user)
+        form = response.forms["contact-form"]
+
         for char in invalid_characters:
             with self.subTest(char=char):
-                response = self.app.get(self.create_url, user=self.user)
-                form = response.forms["contact-form"]
                 form["first_name"] = char
                 form["last_name"] = "Smith"
                 form["email"] = "john@smith.nl"
@@ -254,17 +268,18 @@ class ContactViewTests(WebTest):
                             "Please make sure your input contains only valid characters "
                             "(letters, numbers, apostrophe, dash, space)."
                         )
-                    ]
+                    ],
                 }
                 self.assertEqual(response.context["form"].errors, expected_errors)
 
     def test_adding_contact_with_invalid_last_name_chars_fails(self):
         invalid_characters = '<>#/"\\,.:;'
 
+        response = self.app.get(self.create_url, user=self.user)
+        form = response.forms["contact-form"]
+
         for char in invalid_characters:
             with self.subTest(char=char):
-                response = self.app.get(self.create_url, user=self.user)
-                form = response.forms["contact-form"]
                 form["first_name"] = "John"
                 form["last_name"] = char
                 form["email"] = "john@smith.nl"
@@ -275,9 +290,68 @@ class ContactViewTests(WebTest):
                             "Please make sure your input contains only valid characters "
                             "(letters, numbers, apostrophe, dash, space)."
                         )
-                    ]
+                    ],
                 }
                 self.assertEqual(response.context["form"].errors, expected_errors)
+
+    #
+    # Contacts with duplicate emails
+    #
+    @override_settings(
+        AUTHENTICATION_BACKENDS=["digid_eherkenning.backends.DigiDBackend"],
+    )
+    @patch("digid_eherkenning.backends.DigiDBackend.authenticate")
+    def test_digid_contact_with_duplicate_email_success(self, m):
+        m.return_value = self.digid_user
+
+        existing_user = DigidUserFactory(
+            first_name="Luke",
+            last_name="Skywalker",
+            bsn="111111111",
+            email=self.digid_user.email,
+        )
+
+        response = self.app.get(self.create_url, user=self.user)
+
+        form = response.forms["contact-form"]
+        form["first_name"] = existing_user.first_name
+        form["last_name"] = existing_user.last_name
+        form["email"] = existing_user.email
+
+        response = form.submit(user=self.digid_user)
+        pending_invitation = self.digid_user.contacts_for_approval.first()
+
+        self.assertEqual(response.status_code, 302)
+        self.assertContains(response.follow(), existing_user.email)
+        self.assertEqual(existing_user, pending_invitation)
+
+    @override_settings(
+        AUTHENTICATION_BACKENDS=["digid_eherkenning.backends.DigiDBackend"],
+    )
+    @patch("digid_eherkenning.backends.DigiDBackend.authenticate")
+    def test_digid_contact_duplicate_email_case_insensitive_success(self, m):
+        m.return_value = self.digid_user
+
+        existing_user = DigidUserFactory(
+            first_name="Luke",
+            last_name="Skywalker",
+            bsn="111111111",
+            email=self.digid_user.email,
+        )
+
+        response = self.app.get(self.create_url, user=self.user)
+
+        form = response.forms["contact-form"]
+        form["first_name"] = "lUke"
+        form["last_name"] = "SkYWalKeR"
+        form["email"] = existing_user.email.upper()
+
+        response = form.submit(user=self.digid_user)
+        pending_invitation = self.digid_user.contacts_for_approval.first()
+
+        self.assertEqual(response.status_code, 302)
+        self.assertContains(response.follow(), existing_user.email)
+        self.assertEqual(existing_user, pending_invitation)
 
     def test_email_required(self):
         response = self.app.get(self.create_url, user=self.user)
@@ -310,12 +384,12 @@ class ContactViewTests(WebTest):
 
     def test_user_cannot_delete_other_users_contact(self):
         other_user = UserFactory()
-        response = self.app.post(self.delete_url, user=other_user, status=404)
+        self.app.post(self.delete_url, user=other_user, status=404)
 
     def test_approve_with_existing_user(self):
         existing_user = UserFactory(email="ex@example.com")
 
-        # Create a contact which addresses an existing user
+        # Create contact from existing user
         create_form = self.app.get(self.create_url, user=self.user).forms[
             "contact-form"
         ]
@@ -414,6 +488,7 @@ class ContactViewTests(WebTest):
             response.text, "contact_approve or contact_reject must be provided"
         )
 
+    # TODO: fix
     def test_notification_email_for_approval_is_sent(self):
         existing_user = UserFactory(email="ex@example.com")
 

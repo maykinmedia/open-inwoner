@@ -1,9 +1,12 @@
+from typing import Optional
+
 from django import forms
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth.forms import PasswordResetForm
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
+from django.db.models import Q
 from django.template import loader
 from django.utils.translation import ugettext_lazy as _
 
@@ -300,26 +303,71 @@ class ContactCreateForm(forms.Form):
 
     def clean(self):
         cleaned_data = super().clean()
+        first_name = cleaned_data.get("first_name")
+        last_name = cleaned_data.get("last_name")
         email = cleaned_data.get("email")
 
-        if email:
-            if email == self.user.email:
-                raise ValidationError(
-                    _("Please enter a valid email address of a contact.")
-                )
+        try:
+            contact_user = self.find_user(email)
+        except (ValidationError, User.MultipleObjectsReturned):
+            contact_user = self.find_user(email, first_name, last_name)
 
-            if self.user.is_email_of_contact(email):
-                raise ValidationError(
-                    _(
-                        "Het ingevoerde e-mailadres komt al voor in uw contactpersonen. Pas de gegevens aan en probeer het opnieuw."
-                    )
-                )
+        cleaned_data["contact_user"] = contact_user
 
-            existing_user = User.objects.filter(email__iexact=email)
-            if existing_user and existing_user.get().is_not_active:
-                raise ValidationError(
-                    _("The user cannot be added, their account has been deleted.")
+    def find_user(
+        self,
+        email: str,
+        first_name: Optional[str] = None,
+        last_name: Optional[str] = None,
+    ):
+        """Try to find a user by email alone, or email + first_name + last_name"""
+
+        existing_users = User.objects.filter(email__iexact=email)
+
+        # no user found: return, then send invitation (no ValidationError raised)
+        if not existing_users:
+            return
+
+        if first_name and last_name:
+            existing_users = User.objects.filter(
+                Q(first_name__iexact=first_name) & Q(last_name__iexact=last_name)
+            )
+
+        # no active users with the given specs
+        if not (existing_users := existing_users.filter(is_active=True)):
+            raise ValidationError(
+                _("The user cannot be added, their account has been deleted.")
+            )
+
+        # multiple users with the given specs
+        if existing_users.count() > 1:
+            raise ValidationError(
+                _(
+                    "We're having trouble finding an account with this information."
+                    "Please contact us for help."
                 )
+            )
+
+        # exactly 1 user
+        existing_user = existing_users.get()
+
+        # contact already exists
+        if self.user.has_contact(existing_user):
+            raise ValidationError(
+                _(
+                    "Het ingevoerde contact komt al voor in uw contactpersonen. "
+                    "Pas de gegevens aan en probeer het opnieuw."
+                )
+            )
+
+        # user attempts to add themselves as contact
+        if (
+            self.user.first_name == existing_user.first_name
+            and self.user.last_name == existing_user.last_name
+        ):
+            raise ValidationError(_("You cannot add yourself as a contact."))
+
+        return existing_user
 
 
 class UserField(forms.ModelChoiceField):
