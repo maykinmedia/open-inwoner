@@ -22,7 +22,9 @@ def format_float_repr(value: str) -> str:
 
 
 def format_address(street_name: str, house_nr: str, house_letter: str) -> str:
-    return f"{street_name} {house_nr} {house_letter}"
+    if house_letter:
+        return f"{street_name} {house_nr} {house_letter}"
+    return f"{street_name} {house_nr}"
 
 
 def format_date(date_str) -> str:
@@ -45,11 +47,13 @@ def format_name(first_name: str, voorvoegsel: str, last_name: str):
     first_name_initials = [name[0] + "." for name in first_names]
     first_name_formatted = " ".join(first_name_initials)
 
-    return f"{first_name_formatted} {voorvoegsel} {last_name}"
+    if voorvoegsel:
+        return f"{first_name_formatted} {voorvoegsel} {last_name}"
+    return f"{first_name_formatted} {last_name}"
 
 
 def get_sign(base, target) -> str:
-    return "-" if glom(base, target) == "-" else ""
+    return "-" if glom(base, target, default="") == "-" else ""
 
 
 def get_column(col_index: str) -> str:
@@ -132,31 +136,31 @@ def get_uitkering_dict(xml_data) -> Optional[dict]:
         "naam": {
             "key": "Naam",
             "value": format_name(
-                glom(client_spec, "Voornamen"),
-                glom(client_spec, "Voorvoegsel"),
-                glom(client_spec, "Achternaam"),
+                glom(client_spec, "Voornamen", default=""),
+                glom(client_spec, "Voorvoegsel", default=""),
+                glom(client_spec, "Achternaam", default=""),
             ),
         },
         "adres": {
             "key": "Adres",
             "value": format_address(
-                glom(client_address_spec, "Straatnaam"),
-                glom(client_address_spec, "Huisnummer"),
-                glom(client_address_spec, "Huisletter"),
+                glom(client_address_spec, "Straatnaam", default=""),
+                glom(client_address_spec, "Huisnummer", default=""),
+                glom(client_address_spec, "Huisletter", default=""),
             ),
         },
         "postcode": {
             "key": "Postcode",
-            "value": glom(client_address_spec, "Postcode"),
+            "value": glom(client_address_spec, "Postcode", default=""),
         },
         "woonplaats": {
             "key": "Woonplaats",
-            "value": glom(client_address_spec, "Woonplaatsnaam"),
+            "value": glom(client_address_spec, "Woonplaatsnaam", default=""),
         },
     }
 
     # dossier needed for the rest of the report
-    dossierhistorie_spec = glom(uitkering_specificatie, "Dossierhistorie")
+    dossierhistorie_spec = glom(uitkering_specificatie, "Dossierhistorie", default="")
 
     # normalize
     if not isinstance(dossierhistorie_spec, list):
@@ -170,15 +174,17 @@ def get_uitkering_dict(xml_data) -> Optional[dict]:
     uitkeringsspecificatie = {
         "dossiernummer": {
             "key": "Dossiernummer",
-            "value": glom(dossier_dict, "Dossiernummer"),
+            "value": glom(dossier_dict, "Dossiernummer", default=""),
         },
         "periode": {
             "key": "Periode",
-            "value": format_date_month_name(glom(dossier_dict, "Periodenummer")),
+            "value": format_date_month_name(
+                glom(dossier_dict, "Periodenummer", default="")
+            ),
         },
         "regeling": {
             "key": "Regeling",
-            "value": glom(dossier_dict, "Regeling"),
+            "value": glom(dossier_dict, "Regeling", default=""),
         },
     }
 
@@ -186,16 +192,18 @@ def get_uitkering_dict(xml_data) -> Optional[dict]:
     # Details
     #
     details = {}
-    details_list = glom(dossier_dict, "Componenthistorie")
+    details_list = glom(dossier_dict, "Componenthistorie", default="")
 
     for detail_row in details_list:
         # dict keys are slugified to facilitate access in tests
         internal_key = slugify(detail_row["Omschrijving"]).replace("-", "_")
         details[internal_key] = {
             "key": detail_row["Omschrijving"],
-            "sign": glom(detail_row, "Bedrag.CdPositiefNegatief"),
-            "value": format_float_repr(glom(detail_row, "Bedrag.WaardeBedrag")),
-            "column": get_column(glom(detail_row, "IndicatieKolom")),
+            "sign": glom(detail_row, "Bedrag.CdPositiefNegatief", default=""),
+            "value": format_float_repr(
+                glom(detail_row, "Bedrag.WaardeBedrag", default="")
+            ),
+            "column": get_column(glom(detail_row, "IndicatieKolom", default="")),
         }
 
     #
@@ -206,35 +214,39 @@ def get_uitkering_dict(xml_data) -> Optional[dict]:
             "key": "Opgegeven inkomsten",
             "sign": get_sign(dossier_dict, "OpgegevenInkomsten.CdPositiefNegatief"),
             "value": format_float_repr(
-                glom(dossier_dict, "OpgegevenInkomsten.WaardeBedrag")
+                glom(dossier_dict, "OpgegevenInkomsten.WaardeBedrag", default="")
             ),
         },
         "inkomsten_vrijlating": {
             "key": "Inkomsten vrijlating",
-            "sign": glom(dossier_dict, "InkomstenVrijlating.CdPositiefNegatief"),
+            "sign": glom(
+                dossier_dict, "InkomstenVrijlating.CdPositiefNegatief", default=""
+            ),
             "value": format_float_repr(
-                glom(dossier_dict, "InkomstenVrijlating.WaardeBedrag")
+                glom(dossier_dict, "InkomstenVrijlating.WaardeBedrag", default="")
             ),
         },
         "inkomsten_na_vrijlating": {
             "key": "Inkomsten na vrijlating",
             "sign": get_sign(dossier_dict, "InkomstenNaVrijlating.CdPositiefNegatief"),
             "value": format_float_repr(
-                glom(dossier_dict, "InkomstenNaVrijlating.WaardeBedrag")
+                glom(dossier_dict, "InkomstenNaVrijlating.WaardeBedrag", default="")
             ),
         },
         "vakantiegeld_over_inkomsten": {
             "key": "Vakantiegeld inkomsten",
-            "sign": glom(dossier_dict, "VakantiegeldOverInkomsten.CdPositiefNegatief"),
+            "sign": glom(
+                dossier_dict, "VakantiegeldOverInkomsten.CdPositiefNegatief", default=""
+            ),
             "value": format_float_repr(
-                glom(dossier_dict, "VakantiegeldOverInkomsten.WaardeBedrag")
+                glom(dossier_dict, "VakantiegeldOverInkomsten.WaardeBedrag", default="")
             ),
         },
         "gekorte_inkomsten": {
             "key": "Totaal gekorte inkomsten",
             "sign": get_sign(dossier_dict, "GekorteInkomsten.CdPositiefNegatief"),
             "value": format_float_repr(
-                glom(dossier_dict, "GekorteInkomsten.WaardeBedrag")
+                glom(dossier_dict, "GekorteInkomsten.WaardeBedrag", default="")
             ),
         },
     }
@@ -263,65 +275,84 @@ def get_jaaropgave_dict(xml_data) -> Optional[dict]:
     # Client
     #
     try:
-        client_spec = glom(xml_data_dict, BASE + ".JaarOpgaveClient.Client")
+        client_spec = glom(xml_data_dict, BASE + ".JaarOpgaveClient.Client", default="")
     except PathAccessError:
         return None
 
-    client_address_spec = glom(xml_data_dict, BASE + ".JaarOpgaveClient.Client.Adres")
+    client_address_spec = glom(
+        xml_data_dict, BASE + ".JaarOpgaveClient.Client.Adres", default=""
+    )
     client = {
         "bsn_label": "BSN",
         "bsn": glom(client_spec, "BurgerServiceNr"),
         "naam": format_name(
-            glom(client_spec, "Voornamen"),
-            glom(client_spec, "Voorvoegsel"),
-            glom(client_spec, "Achternaam"),
+            glom(client_spec, "Voornamen", default=""),
+            glom(client_spec, "Voorvoegsel", default=""),
+            glom(client_spec, "Achternaam", default=""),
         ),
-        "adres": f"{glom(client_address_spec, 'Straatnaam')} "
-        f"{glom(client_address_spec, 'Huisnummer')} "
-        f"{glom(client_address_spec, 'Huisletter')}",
-        "postcode": glom(client_address_spec, "Postcode"),
-        "woonplaatsnaam": glom(client_address_spec, "Woonplaatsnaam"),
-        "gemeentenaam": glom(client_address_spec, "Gemeentenaam"),
+        "adres": format_address(
+            street_name=glom(client_address_spec, "Straatnaam", default=""),
+            house_nr=glom(client_address_spec, "Huisnummer", default=""),
+            house_letter=glom(client_address_spec, "Huisletter", default=""),
+        ),
+        "postcode": glom(client_address_spec, "Postcode", default=""),
+        "woonplaatsnaam": glom(client_address_spec, "Woonplaatsnaam", default=""),
+        "gemeentenaam": glom(client_address_spec, "Gemeentenaam", default=""),
     }
 
     #
     # JaarOpgave
     #
-    jaaropgave_spec = glom(xml_data_dict, BASE + ".JaarOpgaveClient.JaarOpgave")
+    try:
+        jaaropgave_spec = glom(
+            xml_data_dict, BASE + ".JaarOpgaveClient.JaarOpgave", default=""
+        )
+    except PathAccessError:
+        return None
 
     # Inhoudingsplichtige
-    inhoudingsplichtige_spec = glom(jaaropgave_spec, "Inhoudingsplichtige")
+    inhoudingsplichtige_spec = glom(jaaropgave_spec, "Inhoudingsplichtige", default="")
     inhoudingsplichtige = {
         "key": "Inhoudingsplichtige",
-        "gemeentenaam": glom(inhoudingsplichtige_spec, "Gemeentenaam"),
-        "bezoekadres": glom(inhoudingsplichtige_spec, "Bezoekadres"),
-        "postcode": glom(inhoudingsplichtige_spec, "Postcode"),
-        "woonplaatsnaam": glom(inhoudingsplichtige_spec, "Woonplaatsnaam"),
+        "gemeentenaam": glom(inhoudingsplichtige_spec, "Gemeentenaam", default=""),
+        "bezoekadres": glom(inhoudingsplichtige_spec, "Bezoekadres", default=""),
+        "postcode": glom(inhoudingsplichtige_spec, "Postcode", default=""),
+        "woonplaatsnaam": glom(inhoudingsplichtige_spec, "Woonplaatsnaam", default=""),
     }
 
     # SpecificatieJaarOpgave
-    specificatiejaaropgave_spec = glom(jaaropgave_spec, "SpecificatieJaarOpgave")
+    specificatiejaaropgave_spec = glom(
+        jaaropgave_spec, "SpecificatieJaarOpgave", default=""
+    )
     jaaropgave = {
-        "regeling": glom(specificatiejaaropgave_spec, "Regeling"),
-        "dienstjaar": glom(specificatiejaaropgave_spec, "Dienstjaar"),
+        "regeling": glom(specificatiejaaropgave_spec, "Regeling", default=""),
+        "dienstjaar": glom(specificatiejaaropgave_spec, "Dienstjaar", default=""),
         "periode": {
             "key": "Tijdvak",
-            "van": format_date(glom(specificatiejaaropgave_spec, "AangiftePeriodeVan")),
-            "tot": format_date(glom(specificatiejaaropgave_spec, "AangiftePeriodeTot")),
+            "van": format_date(
+                glom(specificatiejaaropgave_spec, "AangiftePeriodeVan", default="")
+            ),
+            "tot": format_date(
+                glom(specificatiejaaropgave_spec, "AangiftePeriodeTot", default="")
+            ),
         },
         "fiscaalloon": {
             "key": "Loon loonbelasting / volksverzekeringen",
             "sign": get_sign(
                 specificatiejaaropgave_spec, "Fiscaalloon.CdPositiefNegatief"
             ),
-            "value": glom(specificatiejaaropgave_spec, "Fiscaalloon.WaardeBedrag"),
+            "value": glom(
+                specificatiejaaropgave_spec, "Fiscaalloon.WaardeBedrag", default=""
+            ),
         },
         "loonheffing": {
             "key": "Ingehouden Loonbelasting / Premie volksverzekeringen (loonheffing)",
             "sign": get_sign(
                 specificatiejaaropgave_spec, "Loonheffing.CdPositiefNegatief"
             ),
-            "value": glom(specificatiejaaropgave_spec, "Loonheffing.WaardeBedrag"),
+            "value": glom(
+                specificatiejaaropgave_spec, "Loonheffing.WaardeBedrag", default=""
+            ),
         },
         "arbeidskorting": {
             "key": "Verrekende arbeidskorting",
@@ -329,21 +360,31 @@ def get_jaaropgave_dict(xml_data) -> Optional[dict]:
         },
         "code_loonbelastingtabel": {
             "key": "Code loonbelastingtabel",
-            "value": glom(specificatiejaaropgave_spec, "CdPremieVolksverzekering"),
+            "value": glom(
+                specificatiejaaropgave_spec, "CdPremieVolksverzekering", default=""
+            ),
         },
         "vergoeding_premie_zvw": {
             "sign": get_sign(
                 specificatiejaaropgave_spec, "VergoedingPremieZVW.CdPositiefNegatief"
             ),
             "value": glom(
-                specificatiejaaropgave_spec, "VergoedingPremieZVW.WaardeBedrag"
+                specificatiejaaropgave_spec,
+                "VergoedingPremieZVW.WaardeBedrag",
+                default="",
             ),
         },
         "loon_zorgverzekeringswet": {
             "key": "Loon Zorgverzekeringswet",
             "value": calculate_loon_zvw(
-                glom(specificatiejaaropgave_spec, "Fiscaalloon.WaardeBedrag"),
-                glom(specificatiejaaropgave_spec, "VergoedingPremieZVW.WaardeBedrag"),
+                glom(
+                    specificatiejaaropgave_spec, "Fiscaalloon.WaardeBedrag", default=""
+                ),
+                glom(
+                    specificatiejaaropgave_spec,
+                    "VergoedingPremieZVW.WaardeBedrag",
+                    default="",
+                ),
             ),
         },
         "werkgevers_heffing_premie": {
@@ -355,6 +396,7 @@ def get_jaaropgave_dict(xml_data) -> Optional[dict]:
             "value": glom(
                 specificatiejaaropgave_spec,
                 "WerkgeversheffingPremieZVW.WaardeBedrag",
+                default="",
             ),
         },
     }

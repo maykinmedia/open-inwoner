@@ -154,8 +154,8 @@ class XMLParsingTests(TestCase):
         # client
         self.assertEqual(data["client"]["bsn_label"], "BSN")
         self.assertEqual(data["client"]["bsn"], "900038937")
-        self.assertEqual(data["client"]["naam"], "F. M. C. E. van der Achterhuüskamp")
-        self.assertEqual(data["client"]["adres"], "Robinson Crusoëstraat 21 a")
+        self.assertEqual(data["client"]["naam"], "F. M. C. E. Achterhuüskamp")
+        self.assertEqual(data["client"]["adres"], "Robinson Crusoëstraat 21")
         self.assertEqual(data["client"]["woonplaatsnaam"], "Enschede")
 
         # inhoudingsplichtige
