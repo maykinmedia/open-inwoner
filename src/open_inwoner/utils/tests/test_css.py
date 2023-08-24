@@ -15,8 +15,8 @@ class CSSUtilsTestCase(TestCase):
                 "p {color: #fff; }",
             ),
             (
-                "p {color: #fff; \n width: 0%; \n font-size: 10px;}",
-                "p {color: #fff; \n width: 0%; \n font-size: 10px;}",
+                "p {color: #fff; \n cursor: hand; \n font-size: 10px;}",
+                "p {color: #fff; \n cursor: hand; \n font-size: 10px;}",
             ),
             # props not allowed
             ("p { unknown-prop: 0%;}", ""),
@@ -40,12 +40,12 @@ class CSSUtilsTestCase(TestCase):
         expected = "body {width:10px; }"
 
         self.assertEqual(
-            expected, clean_stylesheet(css, allowed_css_properties=allowed_props)
+            expected, clean_stylesheet(css, allowed_properties=allowed_props)
         )
 
     def test_clean_stylesheet_allows_any_string(self):
         """
-        proofs we need to escape this if we print in html
+        proves we need to escape this if we print in html
         """
         css = 'body {color: "/style><script>evil();</script><style ";}'
         expected = css

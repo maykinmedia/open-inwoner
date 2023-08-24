@@ -1,6 +1,6 @@
 from django.test import SimpleTestCase
 
-from open_inwoner.utils.itertools import batched, split
+from open_inwoner.utils.iteration import batched, split
 
 
 class ItertoolTestCase(SimpleTestCase):

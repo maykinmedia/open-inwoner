@@ -28,8 +28,9 @@ class ExtraCSSTest(ClearCachesMixin, WebTest):
         response = self.app.get(reverse("pages-root"))
         extra_css = response.context.get("extra_css")
 
-        self.assertEquals(extra_css, self.config.extra_css)
-        self.assertContains(response, "body {color: red;}")
+        expected = "body {color: red;}"
+        actual = response.pyquery("#extra-css")[0].text.strip()
+        self.assertEquals(expected, actual)
 
     def test_extra_css_rendered_in_homepage_is_escaped(self):
         cms_tools.create_homepage()

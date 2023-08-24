@@ -17,9 +17,9 @@ from solo.admin import SingletonModelAdmin
 from open_inwoner.ckeditor5.widgets import CKEditorWidget
 
 from ..utils.colors import ACCESSIBLE_CONTRAST_RATIO, get_contrast_ratio
-from ..utils.css import allowed_properties
+from ..utils.css import ALLOWED_PROPERTIES
 from ..utils.fields import CSSEditorWidget
-from ..utils.itertools import split
+from ..utils.iteration import split
 from .models import SiteConfiguration, SiteConfigurationPage
 
 
@@ -224,10 +224,10 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
     ]
 
     @admin.display(
-        description="",
+        description=_("Allowed CSS properties"),
     )
     def extra_css_allowed(self, obj):
-        columns = split(allowed_properties(), 4)
+        columns = split(ALLOWED_PROPERTIES, 4)
 
         def _get_column(props):
             return format_html_join("", "{}<br>", ((p,) for p in props))
