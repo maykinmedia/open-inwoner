@@ -1,4 +1,4 @@
-{% load i18n anchor_menu_tags card_tags dashboard_tags file_tags grid_tags status_tags table_tags solo_tags button_tags icon_tags notification_tags %}
+{% load i18n anchor_menu_tags card_tags dashboard_tags file_tags grid_tags table_tags solo_tags button_tags icon_tags notification_tags %}
 
 {# Anchor menu-mobile #}
 <div id="cases-status-anchors-oob-mobile" hx-swap-oob="true">
@@ -29,7 +29,19 @@
             {#  Status history. #}
             {% if case.statuses %}
                 <h2 class="h2" id="statuses">{% trans 'Status' %}</h2>
-                {% status_list case.statuses %}
+
+                <aside class="status-list" aria-label="{% trans "Status lijst" %}">
+                    <ul class="status-list__list">
+                        {% for status in case.statuses %}
+                        <li class="status-list__list-item">
+                            {% icon icon="task_alt" %}
+                            <p class="p p--compact">{{ status.datum_status_gezet|date }}</p>
+                            <p class="p p--compact">{{ status.statustype.omschrijving }}</p>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </aside>
+
             {% endif %}
 
             {#  Documents. #}
@@ -49,7 +61,7 @@
                         {% endblocktranslate %}
                     </p>
                 {% endif %}
-                
+
                 {#  Upload document form. #}
                 <section id="form_upload" class="form__open-upload">
                     {% include 'pages/cases/document_form.html' %}
@@ -65,7 +77,7 @@
                 {% button_row %}
                     {% button href=case.external_upload_url text=_("Document uploaden") title=_("Opens new window") primary=True icon="open_in_new" icon_position="after" %}
                 {% endbutton_row %}
-            {% endif %}            
+            {% endif %}
 
             {#  Contact moment form #}
             {% if case.contact_form_enabled %}
