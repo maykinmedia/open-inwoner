@@ -86,7 +86,7 @@ class TestPublishedCategories(WebTest):
     def test_only_published_categories_exist_in_my_categories_page(self):
         response = self.app.get(reverse("profile:categories"), user=self.user)
         self.assertEqual(
-            list(response.context["categories"]),
+            list(response.context["menu_categories"]),
             [self.published1, self.published2],
         )
 
