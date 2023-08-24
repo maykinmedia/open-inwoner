@@ -186,17 +186,14 @@ class UitkeringClient(SSDBaseClient):
     def get_report(
         self, bsn: str, report_date_iso: str, request_base_url: str
     ) -> Optional[bytes]:
-        # response = self.templated_request(
-        #     bsn=bsn, period=self.format_report_date(report_date_iso)
-        # )
+        response = self.templated_request(
+            bsn=bsn, period=self.format_report_date(report_date_iso)
+        )
 
-        # if response.status_code >= 300:
-        #     return None
+        if response.status_code >= 300:
+            return None
 
-        # maandspecificatie = response.text
-
-        with open(BASE_DIR / "ssd/tests/files/uitkering_response_basic.xml") as file:
-            maandspecificatie = file.read()
+        maandspecificatie = response.text
 
         if (data := get_uitkering_dict(maandspecificatie)) is None:
             return None

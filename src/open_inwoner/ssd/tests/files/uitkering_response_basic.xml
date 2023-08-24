@@ -57,8 +57,8 @@
      <Dossierhistorie>
       <Regeling>Participatiewet</Regeling>
       <Dossiernummer>61913</Dossiernummer>
-      <Periodenummer>202301</Periodenummer>
-      <Betrekkingsperiode>202301</Betrekkingsperiode>
+      <Periodenummer>202306</Periodenummer>
+      <Betrekkingsperiode>202306</Betrekkingsperiode>
       <UitbetaaldBedragClient>
        <CdPositiefNegatief>+</CdPositiefNegatief>
        <WaardeBedrag>63343</WaardeBedrag>
@@ -93,7 +93,7 @@
        <CdPositiefNegatief>+</CdPositiefNegatief>
        <WaardeBedrag>63343</WaardeBedrag>
       </UitbetaaldBedragDossier>
-      <DatumBetaald>20230123</DatumBetaald>
+      <DatumBetaald>20230523</DatumBetaald>
       <Componenthistorie>
        <Omschrijving>KD norm tot AOW</Omschrijving>
        <Bedrag>

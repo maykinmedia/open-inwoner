@@ -53,7 +53,9 @@ class XMLParsingTests(TestCase):
             data["uitkeringsspecificatie"]["dossiernummer"]["value"], "61913"
         )
         self.assertEqual(data["uitkeringsspecificatie"]["periode"]["key"], "Periode")
-        self.assertEqual(data["uitkeringsspecificatie"]["periode"]["value"], "Jan 2023")
+        self.assertEqual(
+            data["uitkeringsspecificatie"]["periode"]["value"], "Juni 2023"
+        )
         self.assertEqual(data["uitkeringsspecificatie"]["regeling"]["key"], "Regeling")
         self.assertEqual(
             data["uitkeringsspecificatie"]["regeling"]["value"], "Participatiewet"

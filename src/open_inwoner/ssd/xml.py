@@ -37,7 +37,7 @@ def format_date_month_name(date_str) -> str:
     patched = date_str + "01"
     dt = datetime.strptime(patched, "%Y%m%d")
 
-    formatted_date = django_date(dt, "M Y")
+    formatted_date = django_date(dt, "F Y").capitalize()
 
     return formatted_date
 
