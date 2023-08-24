@@ -41,9 +41,7 @@
 
         {# render de cms menu and save for display in both mobile and desktop #}
         {% capture as rendered_cms_menu__home %}
-            {% with menu_categories as categories %}
-                {% show_menu_below_id "home" 0 100 100 100 "cms/menu/primary.html" %}
-            {% endwith %}
+            {% show_menu_below_id "home" 0 100 100 100 "cms/menu/primary.html" %}
         {% endcapture %}
         {% include "components/Header/Header.html" %}
 

@@ -57,9 +57,9 @@
                                         {% icon icon="expand_more" icon_position="after" icon_outlined=True %}
                                     </a>
 
-                                    {% if categories %}
+                                    {% if menu_categories %}
                                         <ul class="primary-navigation__list subpage-list">
-                                            {% for category in categories %}
+                                            {% for category in menu_categories %}
                                                 <li class="primary-navigation__list-item">
                                                     {% url 'products:category_detail' slug=category.slug as category_href %}
                                                     {% link text=category.name href=category_href %}
@@ -108,7 +108,7 @@
     {% firstof config.logo.default_alt_text config.name as logo_alt_text %}
         <div class="logo__desktop">{% logo src=config.logo.file.url alt="Homepage "|add:logo_alt_text svg_height=75 %}</div>
 
-				{% include "components/Header/PrimaryNavigation.html" %}
+        {% include "components/Header/PrimaryNavigation.html" %}
 
         {% if cms_apps.products %}
           {% if request.user.is_authenticated or not config.hide_search_from_anonymous_users %}
