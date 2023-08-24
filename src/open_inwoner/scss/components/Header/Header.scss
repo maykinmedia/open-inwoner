@@ -5,14 +5,13 @@ $hm: max(calc((100vw - var(--container-width)) / 2), var(--spacing-large));
 $vm: var(--spacing-large);
 
 .header {
-  position: static;
+  position: relative;
   min-height: 81px;
   background-color: var(--color-white);
   width: 100%;
   z-index: 1003;
 
   @media (min-width: 768px) {
-    position: relative;
     display: flex;
     align-items: center;
     min-height: 90px;
@@ -267,11 +266,11 @@ $vm: var(--spacing-large);
       left: 0;
       bottom: 0;
       padding: 0;
-      min-width: 150px;
 
       &__main {
         grid-row: 1;
         grid-column: 4 / span 2;
+        width: 170px;
       }
 
       &__authenticated {
