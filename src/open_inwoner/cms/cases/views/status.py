@@ -23,7 +23,7 @@ from open_inwoner.openklant.wrap import (
     create_klant,
     fetch_klant_for_bsn,
 )
-from open_inwoner.openzaak.api_models import Zaak
+from open_inwoner.openzaak.api_models import Status, Zaak
 from open_inwoner.openzaak.cases import (
     connect_case_with_document,
     fetch_case_information_objects,
@@ -41,6 +41,7 @@ from open_inwoner.openzaak.documents import (
 )
 from open_inwoner.openzaak.models import (
     OpenZaakConfig,
+    StatusTranslation,
     ZaakTypeConfig,
     ZaakTypeInformatieObjectTypeConfig,
 )
@@ -49,6 +50,7 @@ from open_inwoner.openzaak.utils import (
     get_role_name_display,
     is_info_object_visible,
 )
+from open_inwoner.utils.translate import TranslationLookup
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from ..forms import CaseContactForm, CaseUploadForm
@@ -110,6 +112,7 @@ class InnerCaseDetailView(
         if self.case:
             self.log_case_access(self.case.identificatie)
             config = OpenZaakConfig.get_solo()
+            status_translate = StatusTranslation.objects.get_lookup()
 
             documents = self.get_case_document_files(self.case)
 
@@ -147,12 +150,12 @@ class InnerCaseDetailView(
                     self.case, "uiterlijke_einddatum_afdoening", None
                 ),
                 "description": self.case.zaaktype.omschrijving,
-                "current_status": glom(
+                "current_status": status_translate.from_glom(
                     self.case,
                     "status.statustype.omschrijving",
                     default=_("No data available"),
                 ),
-                "statuses": statuses,
+                "statuses": self.get_statuses_data(statuses, status_translate),
                 "documents": documents,
                 "allowed_file_extensions": sorted(config.allowed_file_extensions),
             }
@@ -220,6 +223,19 @@ class InnerCaseDetailView(
         if not roles:
             return ""
         return ", ".join([get_role_name_display(r) for r in roles])
+
+    def get_statuses_data(
+        self, statuses: List[Status], lookup: TranslationLookup
+    ) -> List[dict]:
+        return [
+            {
+                "date": s.datum_status_gezet,
+                "label": lookup.from_glom(
+                    s, "statustype.omschrijving", default=_("No data available")
+                ),
+            }
+            for s in statuses
+        ]
 
     def get_case_document_files(self, case: Zaak) -> List[SimpleFile]:
         case_info_objects = fetch_case_information_objects(case.url)

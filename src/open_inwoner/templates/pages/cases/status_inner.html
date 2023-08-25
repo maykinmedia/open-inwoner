@@ -35,8 +35,8 @@
                         {% for status in case.statuses %}
                         <li class="status-list__list-item">
                             {% icon icon="task_alt" %}
-                            <p class="p p--compact">{{ status.datum_status_gezet|date }}</p>
-                            <p class="p p--compact">{{ status.statustype.omschrijving }}</p>
+                            <p class="p p--compact">{{ status.date|date }}</p>
+                            <p class="p p--compact">{{ status.label }}</p>
                         </li>
                         {% endfor %}
                     </ul>
