@@ -22,17 +22,21 @@ def format_float_repr(value: str) -> str:
 
 
 def format_address(street_name: str, house_nr: str, house_letter: str) -> str:
-    if house_letter:
-        return f"{street_name} {house_nr} {house_letter}"
-    return f"{street_name} {house_nr}"
+    elements = (street_name, house_nr, house_letter)
+    return " ".join((item.strip() for item in elements if item != ""))
 
 
-def format_date(date_str) -> str:
+def format_date(date_str: str) -> str:
+    if not date_str:
+        return date_str
     return datetime.strptime(date_str, "%Y%m%d").strftime("%d-%m-%Y")
 
 
 def format_date_month_name(date_str) -> str:
     """Transform '204805' into 'Mei 2048'"""
+
+    if not date_str:
+        return date_str
 
     patched = date_str + "01"
     dt = datetime.strptime(patched, "%Y%m%d")
@@ -43,17 +47,17 @@ def format_date_month_name(date_str) -> str:
 
 
 def format_name(first_name: str, voorvoegsel: str, last_name: str):
-    first_names = first_name.split(" ")
-    first_name_initials = [name[0] + "." for name in first_names]
+    first_names = first_name.strip().split(" ")
+    first_name_initials = (name[0] + "." for name in first_names)
     first_name_formatted = " ".join(first_name_initials)
 
-    if voorvoegsel:
-        return f"{first_name_formatted} {voorvoegsel} {last_name}"
-    return f"{first_name_formatted} {last_name}"
+    elements = (first_name_formatted, voorvoegsel, last_name)
+
+    return " ".join((item.strip() for item in elements if item))
 
 
-def get_sign(base, target) -> str:
-    return "-" if glom(base, target, default="") == "-" else ""
+def get_sign(target, spec) -> str:
+    return "-" if glom(target, spec, default="") == "-" else ""
 
 
 def get_column(col_index: str) -> str:
@@ -64,14 +68,6 @@ def get_column(col_index: str) -> str:
     if col_index == "2":
         return "minus"
     return "base"
-
-
-def sanitize_date_repr(date_str: str) -> str:
-    """
-    Transform `date_str` into ISO 8601 compliant format
-    """
-    patched = date_str + "01"
-    return datetime.strptime(patched, "%Y%m%d").strftime("%Y-%m-%d")
 
 
 def xml_to_dict(xml_data):
