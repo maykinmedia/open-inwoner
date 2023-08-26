@@ -14,21 +14,27 @@ from glom.core import PathAccessError
 # utility functions
 #
 def calculate_loon_zvw(fiscalloon: str, vergoeding_premie_zvw: str) -> str:
-    return str(int(fiscalloon) - int(vergoeding_premie_zvw))
+    try:
+        return str(int(fiscalloon) - int(vergoeding_premie_zvw))
+    except ValueError:
+        return ""
 
 
 def format_float_repr(value: str) -> str:
-    return "{:.2f}".format(float(value) / 100).replace(".", ",")
+    try:
+        return "{:.2f}".format(float(value) / 100).replace(".", ",")
+    except ValueError:
+        return ""
 
 
 def format_address(street_name: str, house_nr: str, house_letter: str) -> str:
-    elements = (street_name, house_nr, house_letter)
-    return " ".join((item.strip() for item in elements if item != ""))
+    elements = (street_name.strip(), house_nr.strip(), house_letter.strip())
+    return " ".join((item for item in elements if item != ""))
 
 
 def format_date(date_str: str) -> str:
     if not date_str:
-        return date_str
+        return ""
     return datetime.strptime(date_str, "%Y%m%d").strftime("%d-%m-%Y")
 
 
@@ -51,9 +57,9 @@ def format_name(first_name: str, voorvoegsel: str, last_name: str):
     first_name_initials = (name[0] + "." for name in first_names)
     first_name_formatted = " ".join(first_name_initials)
 
-    elements = (first_name_formatted, voorvoegsel, last_name)
+    elements = (first_name_formatted.strip(), voorvoegsel.strip(), last_name.strip())
 
-    return " ".join((item.strip() for item in elements if item))
+    return " ".join((item for item in elements if item))
 
 
 def get_sign(target, spec) -> str:
@@ -188,7 +194,7 @@ def get_uitkering_dict(xml_data) -> Optional[dict]:
     # Details
     #
     details = {}
-    details_list = glom(dossier_dict, "Componenthistorie", default="")
+    details_list = glom(dossier_dict, "Componenthistorie", default=[])
 
     for detail_row in details_list:
         # dict keys are slugified to facilitate access in tests
