@@ -1,8 +1,43 @@
 .product-info > .aside,
-.product-info > div {
-  margin: var(--spacing-extra-large) 0;
+.product-info {
+  & > div {
+    margin: var(--spacing-extra-large) 0;
 
-  @media (min-width: 768px) {
-    margin: var(--spacing-giant) 0;
+    @media (min-width: 768px) {
+      margin: var(--spacing-giant) 0;
+    }
+  }
+
+  .contact-block {
+    display: block;
+    border-radius: var(--border-radius);
+    box-sizing: border-box;
+    margin: var(--spacing-medium) 0;
+    padding: var(--spacing-extra-large);
+    position: relative;
+
+    @media (min-width: 768px) {
+      margin: var(--spacing-tiny) 0;
+    }
+
+    .link.link--secondary .link__text {
+      color: var(--color-secondary-darker);
+      // increasing accessibility
+      filter: grayscale(10%);
+    }
+
+    &::before {
+      background-color: var(--color-secondary);
+      border-radius: var(--border-radius);
+      bottom: 0px;
+      content: '';
+      height: 100%;
+      left: 0px;
+      opacity: 0.1;
+      pointer-events: none;
+      position: absolute;
+      right: 0px;
+      top: 0px;
+    }
   }
 }

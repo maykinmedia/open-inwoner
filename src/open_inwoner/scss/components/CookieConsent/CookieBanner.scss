@@ -86,7 +86,22 @@
     justify-content: center;
   }
 
-  .link--cookie {
-    font-size: inherit;
+  .link.link--cookie.link--secondary {
+    &:hover {
+      text-decoration: none;
+    }
+
+    .link__text {
+      font-size: large;
+      text-decoration: underline;
+
+      &:hover {
+        text-decoration: none;
+      }
+
+      @media (min-width: 500px) {
+        font-size: x-large;
+      }
+    }
   }
 }
