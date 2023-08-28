@@ -9,6 +9,8 @@ glom # processing nested data
 furl # processing urls
 weasyprint # export to pdf
 pywatchman
+tinycss2
+
 
 # Framework libraries
 Django>=3.2.11<4.0
