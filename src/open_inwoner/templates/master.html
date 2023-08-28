@@ -42,7 +42,12 @@
 
     <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
         {% cms_toolbar %}
-        {% header categories=menu_categories request=request breadcrumbs=breadcrumbs search_form=search_form has_general_faq_questions=has_general_faq_questions cms_apps=cms_apps %}
+
+        {# render the cms menu and save for display in both mobile and desktop #}
+        {% capture as rendered_cms_menu__home %}
+            {% show_menu_below_id "home" 0 100 100 100 "cms/menu/primary.html" %}
+        {% endcapture %}
+        {% include "components/Header/Header.html" %}
 
         {% if anchors and not custom_anchors %}
             {% anchor_menu anchors=anchors desktop=False %}
