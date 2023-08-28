@@ -280,15 +280,16 @@ class TestProductContent(WebTest):
     def test_content_html_escape(self):
         product = ProductFactory()
 
-        product.content = "\\<b>hello world\\</b> **test**"
+        product.content = "hello \\<b>world\\</b> **test**"
         product.save()
 
         response = self.app.get(
             reverse("products:product_detail", kwargs={"slug": product.slug})
         )
 
-        self.assertNotContains(response, "<b>hello world</b>")
-        self.assertContains(response, "&lt;b&gt;hello world&lt;/b&gt;")
+        self.assertNotContains(response, "<b>world</b>")
+        self.assertNotContains(response, "&lt;b&gt;world&lt;/b&gt;")
+        self.assertContains(response, "hello world")
         self.assertContains(response, "<strong>test</strong>")
 
 
