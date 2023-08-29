@@ -634,8 +634,8 @@ class MyDataTests(HaalCentraalMixin, WebTest):
     def setUp(self):
         self.user = UserFactory(
             bsn="999993847",
-            first_name="",
-            last_name="",
+            first_name="Merel",
+            last_name="Kooyman",
             login_type=LoginTypeChoices.digid,
         )
         self.url = reverse("profile:data")
@@ -656,7 +656,7 @@ class MyDataTests(HaalCentraalMixin, WebTest):
             {
                 "message": _("user requests for brp data"),
                 "action_flag": list(LOG_ACTIONS[4]),
-                "content_object_repr": self.user.email,
+                "content_object_repr": f"{self.user.first_name} {self.user.last_name} ({self.user.email})",
             },
         )
 
@@ -677,7 +677,7 @@ class MyDataTests(HaalCentraalMixin, WebTest):
             {
                 "message": _("user requests for brp data"),
                 "action_flag": list(LOG_ACTIONS[4]),
-                "content_object_repr": self.user.email,
+                "content_object_repr": f"{self.user.first_name} {self.user.last_name} ({self.user.email})",
             },
         )
 
@@ -710,7 +710,7 @@ class MyDataTests(HaalCentraalMixin, WebTest):
             {
                 "message": _("user requests for brp data"),
                 "action_flag": list(LOG_ACTIONS[4]),
-                "content_object_repr": self.user.email,
+                "content_object_repr": f"({self.user.email})",
             },
         )
 

@@ -676,7 +676,7 @@ class DuplicateEmailRegistrationTest(WebTest):
 
     @classmethod
     def setUpTestData(cls):
-        cls.msg_dupes = _("The user cannot be added. Please contact us for help.")
+        cls.msg_dupes = _("This email is already taken.")
         cls.msg_inactive = _("This account has been deactivated")
 
     #

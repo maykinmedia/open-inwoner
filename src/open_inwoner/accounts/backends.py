@@ -23,19 +23,9 @@ class UserModelEmailBackend(ModelBackend):
     """
 
     def authenticate(
-        self,
-        request,
-        login_type=None,
-        username=None,
-        password=None,
-        user=None,
-        token=None,
-        **kwargs
+        self, request, username=None, password=None, user=None, token=None, **kwargs
     ):
         config = SiteConfiguration.get_solo()
-
-        if login_type == "digid":
-            return None
 
         if username and password and not config.login_2fa_sms:
             try:

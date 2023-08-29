@@ -333,23 +333,24 @@ class ContactCreateForm(forms.Form):
                 Q(first_name__iexact=first_name) & Q(last_name__iexact=last_name)
             )
 
+        existing_users = existing_users.filter(is_active=True)
+
         # no active users with the given specs
-        if not (existing_users := existing_users.filter(is_active=True)):
+        if not existing_users:
             raise ValidationError(
                 _("The user cannot be added, their account has been deleted.")
             )
 
-        # multiple users with the given specs
-        if existing_users.count() > 1:
+        # check if there are multiple users with the given specs
+        try:
+            existing_user = existing_users.get()
+        except User.MultipleObjectsReturned:
             raise ValidationError(
                 _(
                     "We're having trouble finding an account with this information."
                     "Please contact us for help."
                 )
             )
-
-        # exactly 1 user
-        existing_user = existing_users.get()
 
         # contact already exists
         if self.user.has_contact(existing_user):

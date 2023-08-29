@@ -40,13 +40,11 @@ class ContactViewTests(WebTest):
 
     def test_contact_list_filled(self):
         response = self.app.get(self.list_url, user=self.user)
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.contact.first_name)
 
     def test_contact_list_only_show_personal_contacts(self):
         other_user = UserFactory()
         response = self.app.get(self.list_url, user=other_user)
-        self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, self.contact.first_name)
 
     def test_list_shows_pending_invitations(self):
@@ -62,14 +60,12 @@ class ContactViewTests(WebTest):
         self.user.user_contacts.add(begeleider)
 
         response = self.app.get(self.list_url, user=self.user)
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.contact.first_name)
         self.assertContains(response, begeleider.first_name)
 
         form = response.forms["contact-filter"]
         form["type"] = ContactTypeChoices.begeleider
         response = form.submit()
-        self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, self.contact.first_name)
         self.assertContains(response, begeleider.first_name)
 
@@ -81,7 +77,6 @@ class ContactViewTests(WebTest):
         form = response.forms["contact-filter"]
         form["type"] = ContactTypeChoices.contact
         response = form.submit()
-        self.assertEqual(response.status_code, 200)
         self.assertContains(
             response,
             _(
@@ -129,7 +124,6 @@ class ContactViewTests(WebTest):
         other_contact.user_contacts.add(self.user)
 
         response = self.app.get(self.list_url, user=self.user)
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, "reverse_contact_user_should_be_found")
 
     def test_contact_create_login_required(self):
@@ -139,7 +133,6 @@ class ContactViewTests(WebTest):
     def test_new_user_contact_not_created_and_invite_sent(self):
         contacts_before = list(self.user.user_contacts.all())
         response = self.app.get(self.create_url, user=self.user)
-        self.assertEqual(response.status_code, 200)
 
         form = response.forms["contact-form"]
         form["first_name"] = "John"
@@ -175,8 +168,6 @@ class ContactViewTests(WebTest):
         form["email"] = existing_user.email
         response = form.submit(user=self.user)
         pending_invitation = self.user.contacts_for_approval.first()
-
-        self.assertEqual(response.status_code, 302)
 
         response = response.follow()
         self.assertContains(response, existing_user.email)
@@ -214,7 +205,6 @@ class ContactViewTests(WebTest):
                 )
             ]
         }
-        self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["form"].errors, expected_errors)
 
     def test_adding_inactive_contact_fails(self):
@@ -232,7 +222,6 @@ class ContactViewTests(WebTest):
 
         response = form.submit()
 
-        self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["form"].errors, expected_errors)
 
     def test_user_cannot_add_themselves(self):
@@ -247,7 +236,6 @@ class ContactViewTests(WebTest):
 
         response = form.submit()
 
-        self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["form"].errors, expected_errors)
 
     def test_adding_contact_with_invalid_first_name_chars_fails(self):
@@ -321,7 +309,6 @@ class ContactViewTests(WebTest):
         response = form.submit(user=self.digid_user)
         pending_invitation = self.digid_user.contacts_for_approval.first()
 
-        self.assertEqual(response.status_code, 302)
         self.assertContains(response.follow(), existing_user.email)
         self.assertEqual(existing_user, pending_invitation)
 
@@ -349,7 +336,6 @@ class ContactViewTests(WebTest):
         response = form.submit(user=self.digid_user)
         pending_invitation = self.digid_user.contacts_for_approval.first()
 
-        self.assertEqual(response.status_code, 302)
         self.assertContains(response.follow(), existing_user.email)
         self.assertEqual(existing_user, pending_invitation)
 
@@ -361,7 +347,6 @@ class ContactViewTests(WebTest):
         form["last_name"] = self.contact.last_name
         response = form.submit(user=self.user)
         expected_errors = {"email": ["Dit veld is vereist."]}
-        self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["form"].errors, expected_errors)
 
     def test_users_contact_is_removed(self):

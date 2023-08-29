@@ -298,7 +298,7 @@ class TestLogging(HaalCentraalMixin, TestCase):
                 "message": _("data was retrieved from haal centraal"),
                 "log_level": logging.INFO,
                 "action_flag": list(LOG_ACTIONS[5]),
-                "content_object_repr": user.email,
+                "content_object_repr": f"{user.first_name} {user.last_name} ({user.email})",
             },
         )
 

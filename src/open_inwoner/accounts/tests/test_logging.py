@@ -67,7 +67,7 @@ class TestProfile(WebTest):
             {
                 "message": _("user was created"),
                 "action_flag": list(LOG_ACTIONS[4]),
-                "content_object_repr": user.email,
+                "content_object_repr": str(user),
             },
         )
 
@@ -79,6 +79,8 @@ class TestProfile(WebTest):
         form.submit()
         log_entry = TimelineLog.objects.last()
 
+        self.user.refresh_from_db()
+
         self.assertEqual(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
@@ -88,7 +90,7 @@ class TestProfile(WebTest):
             {
                 "message": _("profile was modified"),
                 "action_flag": list(LOG_ACTIONS[CHANGE]),
-                "content_object_repr": self.user.email,
+                "content_object_repr": str(self.user),
             },
         )
 
@@ -112,7 +114,7 @@ class TestProfile(WebTest):
             {
                 "message": _("categories were modified"),
                 "action_flag": list(LOG_ACTIONS[CHANGE]),
-                "content_object_repr": self.user.email,
+                "content_object_repr": str(self.user),
             },
         )
 
@@ -134,7 +136,7 @@ class TestProfile(WebTest):
             {
                 "message": _("users notifications were modified"),
                 "action_flag": list(LOG_ACTIONS[CHANGE]),
-                "content_object_repr": self.user.email,
+                "content_object_repr": str(self.user),
             },
         )
 
@@ -151,7 +153,7 @@ class TestProfile(WebTest):
             {
                 "message": _("user was logged in via admin page"),
                 "action_flag": list(LOG_ACTIONS[4]),
-                "content_object_repr": self.user.email,
+                "content_object_repr": str(self.user),
             },
         )
 
@@ -168,7 +170,7 @@ class TestProfile(WebTest):
             {
                 "message": _("user was logged in via frontend using email"),
                 "action_flag": list(LOG_ACTIONS[4]),
-                "content_object_repr": self.user.email,
+                "content_object_repr": str(self.user),
             },
         )
 
@@ -186,7 +188,7 @@ class TestProfile(WebTest):
             {
                 "message": _("user was logged in via frontend using digid"),
                 "action_flag": list(LOG_ACTIONS[4]),
-                "content_object_repr": user.email,
+                "content_object_repr": str(user),
             },
         )
 
@@ -203,7 +205,7 @@ class TestProfile(WebTest):
             {
                 "message": _("user was logged out"),
                 "action_flag": list(LOG_ACTIONS[4]),
-                "content_object_repr": self.user.email,
+                "content_object_repr": str(self.user),
             },
         )
 
@@ -222,7 +224,7 @@ class TestProfile(WebTest):
             {
                 "message": _("user was deleted via frontend"),
                 "action_flag": list(LOG_ACTIONS[4]),
-                "content_object_repr": self.user.email,
+                "content_object_repr": str(self.user),
             },
         )
 
@@ -249,7 +251,7 @@ class TestProfile(WebTest):
             {
                 "message": _("password was changed"),
                 "action_flag": list(LOG_ACTIONS[4]),
-                "content_object_repr": user.email,
+                "content_object_repr": str(user),
             },
         )
 
@@ -298,7 +300,7 @@ class TestProfile(WebTest):
                 "message": _("password reset was completed"),
                 "log_level": logging.INFO,
                 "action_flag": list(LOG_ACTIONS[5]),
-                "content_object_repr": self.user.email,
+                "content_object_repr": str(self.user),
             },
         )
 
@@ -328,7 +330,7 @@ class TestInvites(WebTest):
                 "log_level": logging.INFO,
                 "action_flag": list(LOG_ACTIONS[5]),
                 "content_object_repr": _("For: {invitee} (2021-10-18)").format(
-                    invitee=self.invitee.email
+                    invitee=f"{self.invitee.first_name} {self.invitee.last_name} ({self.invitee.email})"
                 ),
             },
         )
@@ -354,7 +356,7 @@ class TestInvites(WebTest):
                 "log_level": logging.INFO,
                 "action_flag": list(LOG_ACTIONS[5]),
                 "content_object_repr": _("For: {invitee} (2021-09-18)").format(
-                    invitee=self.invitee.email
+                    invitee=f"{self.invitee.first_name} {self.invitee.last_name} ({self.invitee.email})"
                 ),
             },
         )
@@ -640,13 +642,14 @@ class TestMessages(WebTest):
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
         self.assertEqual(log_entry.content_object.id, Message.objects.get().id)
+
         self.assertEqual(
             log_entry.extra_data,
             {
                 "message": _("message was created"),
                 "action_flag": list(LOG_ACTIONS[ADDITION]),
-                "content_object_repr": _("From: {me}, To: {other} (2021-10-18)").format(
-                    me=self.user.email, other=self.other_user.email
+                "content_object_repr": _("From: {}, To: {} (2021-10-18)").format(
+                    str(self.user), str(self.other_user)
                 ),
             },
         )
@@ -665,13 +668,14 @@ class TestMessages(WebTest):
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
         )
         self.assertEqual(log_entry.content_object.id, Message.objects.get().id)
+
         self.assertEqual(
             log_entry.extra_data,
             {
                 "message": _("message was created"),
                 "action_flag": list(LOG_ACTIONS[ADDITION]),
-                "content_object_repr": _("From: {me}, To: {other} (2021-10-18)").format(
-                    me=self.user.email, other=self.other_user.email
+                "content_object_repr": _("From: {}, To: {} (2021-10-18)").format(
+                    str(self.user), str(self.other_user)
                 ),
             },
         )
@@ -722,7 +726,7 @@ class TestExport(WebTest):
             {
                 "message": _("file profile.pdf was exported"),
                 "action_flag": list(LOG_ACTIONS[4]),
-                "content_object_repr": self.user.email,
+                "content_object_repr": str(self.user),
             },
         )
 
@@ -744,7 +748,7 @@ class TestExport(WebTest):
                     action_uuid=self.action1.uuid
                 ),
                 "action_flag": list(LOG_ACTIONS[4]),
-                "content_object_repr": self.user.email,
+                "content_object_repr": str(self.user),
             },
         )
 
@@ -764,6 +768,6 @@ class TestExport(WebTest):
             {
                 "message": _("file actions.pdf was exported"),
                 "action_flag": list(LOG_ACTIONS[4]),
-                "content_object_repr": self.user.email,
+                "content_object_repr": str(self.user),
             },
         )

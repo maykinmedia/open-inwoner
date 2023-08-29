@@ -32,7 +32,7 @@ class TestLogging(ESMixin, WebTest):
                     query="search for something"
                 ),
                 "action_flag": list(LOG_ACTIONS[4]),
-                "content_object_repr": user.email,
+                "content_object_repr": f"{user.first_name} {user.last_name} ({user.email})",
             },
         )
 

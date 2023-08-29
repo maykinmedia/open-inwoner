@@ -224,7 +224,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         self._old_bsn = self.bsn
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name} ({self.email})"
+        return (
+            f"{self.first_name} {self.last_name} ({self.get_contact_email()})".strip()
+        )
 
     def clean(self, *args, **kwargs):
         """Reject non-unique emails, except for users with login_type DigiD"""
@@ -240,7 +242,7 @@ class User(AbstractBaseUser, PermissionsMixin):
             return
 
         # account has been deactivated
-        if any(user.bsn == self.bsn and user.is_not_active for user in existing_users):
+        if any(user.bsn == self.bsn and not user.is_active for user in existing_users):
             raise ValidationError(
                 {"email": ValidationError(_("This account has been deactivated"))}
             )
@@ -253,11 +255,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
         # some account does not have login_type digid
         raise ValidationError(
-            {
-                "email": ValidationError(
-                    _("The user cannot be added. Please contact us for help.")
-                )
-            }
+            {"email": ValidationError(_("This email is already taken."))}
         )
 
     @property
@@ -356,10 +354,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         choice = ContactTypeChoices.get_choice(self.contact_type)
         return choice.label
 
-    @property
-    def is_not_active(self):
-        return not self.is_active
-
     def get_contact_email(self):
         return self.email if "@example.org" not in self.email else ""
 
@@ -376,7 +370,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         """
         :returns: `True` if the subject has `user` as contact, `False` otherwise
         """
-        return user in self.user_contacts.all()
+        return self.user_contacts.filter(id=user.id).exists()
 
     def get_plan_contact_new_count(self):
         return (
