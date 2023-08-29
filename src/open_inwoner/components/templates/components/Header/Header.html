@@ -7,12 +7,14 @@
 <header class="header" aria-label="Navigatie header">
     <div class="header__container">
         <div class="header__menu">
+        {% if request.user.is_authenticated or not config.hide_categories_from_anonymous_users %}
             <button class="header__button" aria-expanded="false">
                 <div class="header__menu-icon">
                     <span class="closed">{% trans "Menu" %}</span>
                     <span class="open">{% trans "Sluiten" %}</span>
                 </div>
             </button>
+        {% endif %}
         {% firstof config.logo.default_alt_text config.name as logo_alt_text %}
         {% logo src=config.logo.file.url alt="Homepage "|add:logo_alt_text svg_height=75 %}
 
