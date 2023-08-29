@@ -296,13 +296,13 @@ class TestProductDetailView(WebTest):
         self.assertEqual(len(links), 4)
 
         self.assertEqual(links[0].text, "First subheading")
-        self.assertEqual(links[0].attrib["href"], "#first-subheading")
+        self.assertEqual(links[0].attrib["href"], "#subheader-first-subheading")
 
         self.assertEqual(links[1].text, "Second subheading")
-        self.assertEqual(links[1].attrib["href"], "#second-subheading")
+        self.assertEqual(links[1].attrib["href"], "#subheader-second-subheading")
 
         self.assertEqual(links[2].text, "First subheading")
-        self.assertEqual(links[2].attrib["href"], "#first-subheading")
+        self.assertEqual(links[2].attrib["href"], "#subheader-first-subheading")
 
         self.assertEqual(links[3].text, "Second subheading")
-        self.assertEqual(links[3].attrib["href"], "#second-subheading")
+        self.assertEqual(links[3].attrib["href"], "#subheader-second-subheading")

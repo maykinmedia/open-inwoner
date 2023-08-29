@@ -6,13 +6,13 @@
         {% button href="#" icon="expand_more" icon_position="after" extra_classes="anchor-menu--mobile__title anchor-menu__toggle" bordered=False text=_("Op deze pagina") %}
         <ul class="anchor-menu__list">
             {% for anchor in anchors %}
-                <li class="anchor-menu__list__item">
+                <li class="anchor-menu__list-item">
                     <a class="link" href="{{ anchor.0 }}">{{ anchor.1 }}</a>
                     <!-- subheadings -->
                     {% if anchor.2 %}
                         <ul class="anchor-menu__sublist anchor-menu__sublist--mobile">
                             {% for subheading in anchor.2 %}
-                                <li class-"anchor-menu__sublist__item">
+                                <li class="anchor-menu__list-item">
                                     <a class="link" href="#{{ subheading.1 }}">{{ subheading.0 }}</a>
                                 </li>
                             {% endfor %}
@@ -28,13 +28,13 @@
 
     <ul class="anchor-menu__list">
         {% for anchor in anchors %}
-            <li class="anchor-menu__list__item">
+            <li class="anchor-menu__list-item">
                 <a class="link" href="{{ anchor.0 }}">{{ anchor.1 }}</a>
                 <!-- subheadings -->
                     {% if anchor.2 %}
                         <ul class="anchor-menu__sublist">
                             {% for subheading in anchor.2 %}
-                                <li>
+                                <li class="anchor-menu__list-item">
                                     <a class="link" href="#{{ subheading.1 }}">{{ subheading.0 }}</a>
                                 </li>
                             {% endfor %}

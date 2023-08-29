@@ -19,7 +19,7 @@ def extract_subheadings(content: str, tag: str) -> list[tuple[str, str]]:
     subs = []
     for tag in soup.find_all("h2"):
         subheading = tag.text
-        slug = slugify(subheading)
+        slug = f"subheader-{slugify(subheading)}"
         subs.append((subheading, slug))
 
     return subs

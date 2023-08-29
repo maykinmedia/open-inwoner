@@ -54,7 +54,7 @@ def get_product_rendered_content(product):
             element.attrs["class"] = class_name
 
             if tag == "h2":
-                element.attrs["id"] = slugify(element.text)
+                element.attrs["id"] = f"subheader-{slugify(element.text)}"
 
             if "[CTABUTTON]" in element.text:
                 # decompose the element when product doesn't have either a link or a form
