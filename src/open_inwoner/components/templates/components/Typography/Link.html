@@ -19,7 +19,7 @@
     {% if hide_text %}
     aria-label="{{ text }}"
     {% endif %}
-    title="{{ title }}"
+    title="{% firstof text title %}"
 >
     {% if src %}
         <img class="logo__image" src="{{src}}" alt="{{ text }}"{{ svg_height_attr }}/>

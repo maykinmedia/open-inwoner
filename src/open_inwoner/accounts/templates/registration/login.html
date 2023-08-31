@@ -74,7 +74,7 @@
                     {% endif %}
                         {% url 'oidc_authentication_init' as href %}
                         {% with href|addnexturl:next as href_with_next %}
-                            {% link text=site_config.openid_connect_login_text href=href_with_next secondary=True icon='arrow_forward' icon_position="after" %}
+                            {% link title=site_config.openid_connect_login_text text=site_config.openid_connect_login_text href=href_with_next secondary=True icon='arrow_forward' icon_position="after" %}
                         {% endwith %}
                     {% endrender_card %}
                 {% endif %}

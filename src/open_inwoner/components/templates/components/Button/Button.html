@@ -5,7 +5,7 @@
         class="{{ classes }}"
         href="{{ href }}"
         title="{{ title }}"
-        {% if hide_text %}aria-label="{% firstof title text %}"{% endif %}
+        {% if hide_text %}aria-label="{% firstof text title %}"{% endif %}
         {% if href|startswith:"http" %}target="_blank"{% endif %}
         {% as_attributes extra_attributes %}
     >
@@ -26,7 +26,7 @@
         name="{{ name }}"
         value="{{ value }}"
         title="{{ title }}"
-        {% if hide_text %}aria-label="{% firstof title text %}"{% endif %}
+        {% if hide_text %}aria-label="{% firstof text title %}"{% endif %}
         {% as_attributes extra_attributes %}
         {% if id %} id="{{ id }}" {% endif %}
         {% if form_id %} form="{{ form_id }}"{% endif %}

@@ -8,7 +8,7 @@
    {% if settings.DIGID_ENABLED and digid_url %}
     {% render_column start=5 span=5 %}
         {% render_card direction='horizontal' tinted=True %}
-            <a href="{{ digid_url }}" class="link digid-logo">
+            <a href="{{ digid_url }}" title="Registreren met DigiD" class="link digid-logo">
                 <img class="digid-logo__image" src="{% static 'accounts/digid_logo.svg' %}" alt="DigiD inlogpagina">
             </a>
             {% link bold=True href=digid_url text=_('Registreren met DigiD') secondary=True icon='arrow_forward' %}
