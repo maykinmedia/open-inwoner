@@ -28,6 +28,7 @@ from open_inwoner.openzaak.catalog import (
     fetch_single_status_type,
 )
 from open_inwoner.openzaak.documents import fetch_single_information_object_url
+from open_inwoner.openzaak.managers import UserCaseInfoObjectNotificationManager
 from open_inwoner.openzaak.models import (
     OpenZaakConfig,
     UserCaseInfoObjectNotification,
@@ -224,7 +225,17 @@ def handle_zaakinformatieobject_update(
         )
         return
 
+    # let's not spam the users
+    period = timedelta(seconds=settings.ZGW_LIMIT_NOTIFICATIONS_FREQUENCY)
+    if note.has_received_similar_notes_within(period):
+        log_system_action(
+            f"blocked over-frequent zaakinformatieobject notification email for user '{user}' zaakinformatieobject {zaak_info_object.url} case {case.url}",
+            log_level=logging.INFO,
+        )
+        return
+
     send_case_update_email(user, case)
+    note.mark_sent()
 
     log_system_action(
         f"send zaakinformatieobject notification email for user '{user}' zaakinformatieobject {zaak_info_object.url} case {case.url}",
@@ -332,13 +343,15 @@ def handle_status_update(user: User, case: Zaak, status: Status):
             f"blocked over-frequent status notification email for user '{user}' status {status.url} case {case.url}",
             log_level=logging.INFO,
         )
-    else:
-        send_case_update_email(user, case)
+        return
 
-        log_system_action(
-            f"send status notification email for user '{user}' status {status.url} case {case.url}",
-            log_level=logging.INFO,
-        )
+    send_case_update_email(user, case)
+    note.mark_sent()
+
+    log_system_action(
+        f"send status notification email for user '{user}' status {status.url} case {case.url}",
+        log_level=logging.INFO,
+    )
 
 
 def send_case_update_email(user: User, case: Zaak):
