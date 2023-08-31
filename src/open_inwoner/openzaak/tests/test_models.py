@@ -1,8 +1,13 @@
+from datetime import timedelta
+from uuid import uuid4
+
 from django.test import TestCase
 
+from freezegun import freeze_time
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.test import generate_oas_component
 
+from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.openzaak.api_models import ZaakType
 from open_inwoner.openzaak.models import (
     ZaakTypeConfig,
@@ -10,6 +15,8 @@ from open_inwoner.openzaak.models import (
 )
 from open_inwoner.openzaak.tests.factories import (
     CatalogusConfigFactory,
+    UserCaseInfoObjectNotificationFactory,
+    UserCaseStatusNotificationFactory,
     ZaakTypeConfigFactory,
     ZaakTypeInformatieObjectTypeConfigFactory,
 )
@@ -150,3 +157,98 @@ class ZaakTypeInformatieObjectTypeConfigFactoryModelTestCase(TestCase):
             ZaakTypeInformatieObjectTypeConfig.objects.filter_case_type(case_type)
         )
         self.assertEqual(actual, [a1])
+
+
+class UserCaseStatusNotificationTests(TestCase):
+    def test_status_has_received_similar_notes_within(self):
+        user = UserFactory()
+        case_uuid = uuid4()
+        other_case_uuid = uuid4()
+
+        with freeze_time("2023-01-01 01:00:00"):
+            # create unrelated sent note for different case
+            UserCaseStatusNotificationFactory(
+                user=user, case_uuid=other_case_uuid, is_sent=True
+            )
+            # create a related note we didn't send
+            UserCaseStatusNotificationFactory(
+                user=user, case_uuid=case_uuid, is_sent=False
+            )
+            # create our note
+            note = UserCaseStatusNotificationFactory(
+                user=user, case_uuid=case_uuid, is_sent=True
+            )
+            # it doesn't see any of the above
+            self.assertFalse(
+                note.has_received_similar_notes_within(timedelta(minutes=10))
+            )
+
+        # advance half hour
+        with freeze_time("2023-01-01 01:30:00"):
+            note = UserCaseStatusNotificationFactory(
+                user=user, case_uuid=case_uuid, is_sent=True
+            )
+            # nothing is past 10 minutes
+            self.assertFalse(
+                note.has_received_similar_notes_within(timedelta(minutes=10))
+            )
+            # looking back an hour we see the earlier note
+            self.assertTrue(
+                note.has_received_similar_notes_within(timedelta(minutes=60))
+            )
+
+    def test_case_info_has_received_similar_notes_within(self):
+        user = UserFactory()
+        case_uuid = uuid4()
+        other_case_uuid = uuid4()
+
+        with freeze_time("2023-01-01 01:00:00"):
+            # create unrelated sent note for different case
+            UserCaseInfoObjectNotificationFactory(
+                user=user, case_uuid=other_case_uuid, is_sent=True
+            )
+            # create a related note we didn't send
+            UserCaseInfoObjectNotificationFactory(
+                user=user, case_uuid=case_uuid, is_sent=False
+            )
+            # create our note
+            note = UserCaseInfoObjectNotificationFactory(
+                user=user, case_uuid=case_uuid, is_sent=True
+            )
+            # it doesn't see any of the above
+            self.assertFalse(
+                note.has_received_similar_notes_within(timedelta(minutes=10))
+            )
+
+        # advance half hour
+        with freeze_time("2023-01-01 01:30:00"):
+            note = UserCaseInfoObjectNotificationFactory(
+                user=user, case_uuid=case_uuid, is_sent=True
+            )
+            # nothing is past 10 minutes
+            self.assertFalse(
+                note.has_received_similar_notes_within(timedelta(minutes=10))
+            )
+            # looking back an hour we see the earlier note
+            self.assertTrue(
+                note.has_received_similar_notes_within(timedelta(minutes=60))
+            )
+
+    def test_mixed_notes_has_received_similar_notes_within(self):
+        user = UserFactory()
+        case_uuid = uuid4()
+
+        with freeze_time("2023-01-01 01:00:00"):
+            note_info = UserCaseInfoObjectNotificationFactory(
+                user=user, case_uuid=case_uuid, is_sent=True
+            )
+            note_status = UserCaseStatusNotificationFactory(
+                user=user, case_uuid=case_uuid, is_sent=True
+            )
+            # check each type also sees the other
+            self.assertTrue(
+                note_info.has_received_similar_notes_within(timedelta(minutes=60))
+            )
+            self.assertTrue(
+                note_status.has_received_similar_notes_within(timedelta(minutes=60))
+            )

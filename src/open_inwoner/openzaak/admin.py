@@ -290,6 +290,10 @@ class UserCaseStatusNotificationAdmin(admin.ModelAdmin):
         "case_uuid",
         "status_uuid",
         "created_on",
+        "is_sent",
+    ]
+    list_filter = [
+        "is_sent",
     ]
 
     def has_change_permission(self, request, obj=None):
@@ -312,6 +316,10 @@ class UserCaseInfoObjectNotificationAdmin(admin.ModelAdmin):
         "case_uuid",
         "zaak_info_object_uuid",
         "created_on",
+        "is_sent",
+    ]
+    list_filter = [
+        "is_sent",
     ]
 
     def has_change_permission(self, request, obj=None):
