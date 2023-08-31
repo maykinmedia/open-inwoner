@@ -763,6 +763,11 @@ ZGW_CONSUMERS_TEST_SCHEMA_DIRS = [
     os.path.join(DJANGO_PROJECT_DIR, "openklant", "tests", "files"),
 ]
 
+# notifications
+ZGW_LIMIT_NOTIFICATIONS_FREQUENCY = config(
+    "ZGW_LIMIT_NOTIFICATIONS_FREQUENCY", default=60 * 15
+)
+
 #
 # Maykin fork of DJANGO-TWO-FACTOR-AUTH
 #

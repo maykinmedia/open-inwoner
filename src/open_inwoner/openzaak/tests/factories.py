@@ -8,9 +8,11 @@ from zgw_consumers.api_models.constants import RolOmschrijving
 from zgw_consumers.models import Service
 from zgw_consumers.test import generate_oas_component
 
+from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.openzaak.api_models import Notification, Rol, ZaakType
 from open_inwoner.openzaak.models import (
     CatalogusConfig,
+    UserCaseStatusNotification,
     ZaakTypeConfig,
     ZaakTypeInformatieObjectTypeConfig,
 )
@@ -105,6 +107,15 @@ class ZaakTypeInformatieObjectTypeConfigFactory(factory.django.DjangoModelFactor
         if extra_kwargs:
             kwargs.update(extra_kwargs)
         return ZaakTypeInformatieObjectTypeConfigFactory(**kwargs)
+
+
+class UserCaseStatusNotificationFactory(factory.django.DjangoModelFactory):
+    user = factory.SubFactory(UserFactory)
+    case_uuid = factory.Faker("uuid4")
+    status_uuid = factory.Faker("uuid4")
+
+    class Meta:
+        model = UserCaseStatusNotification
 
 
 class NotificationFactory(factory.Factory):
