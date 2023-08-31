@@ -22,7 +22,7 @@ from open_inwoner.utils.test import ClearCachesMixin
 from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin, Lookups
 
 from ..api_models import Status, StatusType, Zaak, ZaakType
-from ..models import OpenZaakConfig
+from ..models import OpenZaakConfig, UserCaseStatusNotification
 from .helpers import copy_with_new_uuid
 from .test_notification_data import MockAPIData
 
@@ -411,6 +411,9 @@ class StatusNotificationHandlerTestCase(
 class NotificationHandlerEmailTestCase(AssertTimelineLogMixin, TestCase):
     @patch("open_inwoner.openzaak.notifications.send_case_update_email")
     def test_handle_status_update(self, mock_send: Mock):
+        """
+        note this test matches with a similar test from `test_notification_zaak_infoobject.py`
+        """
         data = MockAPIData()
         user = data.user_initiator
 
@@ -433,9 +436,12 @@ class NotificationHandlerEmailTestCase(AssertTimelineLogMixin, TestCase):
         mock_send.reset_mock()
 
         self.assertTimelineLog(
-            f"send status notification email for user",
+            "send status notification email for user",
             lookup=Lookups.startswith,
             level=logging.INFO,
+        )
+        self.assertEqual(
+            1, UserCaseStatusNotification.objects.filter(is_sent=True).count()
         )
 
         # second call with same case/status
@@ -444,6 +450,11 @@ class NotificationHandlerEmailTestCase(AssertTimelineLogMixin, TestCase):
         # no duplicate mail for this user/case/status
         mock_send.assert_not_called()
 
+        self.assertTimelineLog(
+            "ignored duplicate status notification delivery for user ",
+            lookup=Lookups.startswith,
+            level=logging.INFO,
+        )
         # other user is fine
         other_user = UserFactory.create()
         handle_status_update(other_user, case, status)
@@ -468,7 +479,7 @@ class NotificationHandlerEmailTestCase(AssertTimelineLogMixin, TestCase):
         mock_send.assert_not_called()
 
         self.assertTimelineLog(
-            f"blocked over-frequent status notification email for user",
+            "blocked over-frequent status notification email for user",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -483,9 +494,3 @@ class NotificationHandlerEmailTestCase(AssertTimelineLogMixin, TestCase):
 
             # this one succeeds
             mock_send.assert_called_once()
-
-            self.assertTimelineLog(
-                f"send status notification email for user",
-                lookup=Lookups.startswith,
-                level=logging.INFO,
-            )

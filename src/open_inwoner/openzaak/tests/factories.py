@@ -12,6 +12,7 @@ from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.openzaak.api_models import Notification, Rol, ZaakType
 from open_inwoner.openzaak.models import (
     CatalogusConfig,
+    UserCaseInfoObjectNotification,
     UserCaseStatusNotification,
     ZaakTypeConfig,
     ZaakTypeInformatieObjectTypeConfig,
@@ -116,6 +117,15 @@ class UserCaseStatusNotificationFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = UserCaseStatusNotification
+
+
+class UserCaseInfoObjectNotificationFactory(factory.django.DjangoModelFactory):
+    user = factory.SubFactory(UserFactory)
+    case_uuid = factory.Faker("uuid4")
+    zaak_info_object_uuid = factory.Faker("uuid4")
+
+    class Meta:
+        model = UserCaseInfoObjectNotification
 
 
 class NotificationFactory(factory.Factory):
