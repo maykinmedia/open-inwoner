@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.db import models
 from django.db.models import Q, UniqueConstraint
 from django.utils import timezone
@@ -318,6 +320,17 @@ class UserCaseStatusNotification(models.Model):
                 fields=["user", "case_uuid", "status_uuid"],
             )
         ]
+
+    def has_received_similar_notes_within(self, delta: timedelta) -> bool:
+        return (
+            UserCaseStatusNotification.objects.filter(
+                user=self.user,
+                case_uuid=self.case_uuid,
+                created_on__gte=timezone.now() - delta,
+            )
+            .exclude(id=self.id)
+            .exists()
+        )
 
 
 class UserCaseInfoObjectNotification(models.Model):

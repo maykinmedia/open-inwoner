@@ -1,6 +1,8 @@
 import logging
+from datetime import timedelta
 from typing import List
 
+from django.conf import settings
 from django.urls import reverse
 
 from mail_editor.helpers import find_template
@@ -323,12 +325,20 @@ def handle_status_update(user: User, case: Zaak, status: Status):
         )
         return
 
-    send_case_update_email(user, case)
+    # let's not spam the users
+    period = timedelta(seconds=settings.ZGW_LIMIT_NOTIFICATIONS_FREQUENCY)
+    if note.has_received_similar_notes_within(period):
+        log_system_action(
+            f"blocked over-frequent status notification email for user '{user}' status {status.url} case {case.url}",
+            log_level=logging.INFO,
+        )
+    else:
+        send_case_update_email(user, case)
 
-    log_system_action(
-        f"send status notification email for user '{user}' status {status.url} case {case.url}",
-        log_level=logging.INFO,
-    )
+        log_system_action(
+            f"send status notification email for user '{user}' status {status.url} case {case.url}",
+            log_level=logging.INFO,
+        )
 
 
 def send_case_update_email(user: User, case: Zaak):
