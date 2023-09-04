@@ -80,7 +80,7 @@ $vm: var(--spacing-large);
 
       > .header__actions {
         display: block;
-        position: static;
+        position: initial;
         grid-row: 1;
         grid-column: 6 / span 5;
         margin-left: var(--spacing-large);
@@ -228,10 +228,10 @@ $vm: var(--spacing-large);
     overflow-y: auto;
     padding: 0 var(--spacing-large) var(--spacing-extra-large)
       var(--spacing-large);
-    position: fixed;
+    position: relative;
     right: 0;
     text-align: left;
-    top: calc(2 * var(--row-height));
+    top: 0;
     width: 100%;
     z-index: 2;
 
@@ -432,7 +432,9 @@ $vm: var(--spacing-large);
     }
 
     .header {
-      border-bottom: var(--border-width) dotted var(--color-white);
+      &__container {
+        height: 100vh;
+      }
 
       .primary-navigation
         > .primary-navigation__list
@@ -462,7 +464,6 @@ $vm: var(--spacing-large);
             }
 
             .header__menu-icon .open {
-              //height: var(--row-height);
               width: 100%;
               height: var(--font-size-body);
               background-color: var(--color-white);
@@ -482,7 +483,6 @@ $vm: var(--spacing-large);
       .header {
         &__actions {
           box-sizing: border-box;
-          //width: calc(100% - var(--spacing-extra-large));
           padding: 0;
           margin: 0;
 
@@ -513,7 +513,7 @@ $vm: var(--spacing-large);
 
       .header {
         &__submenu {
-          border-top: 1px solid var(--color-white);
+          border-top: none;
           display: block;
 
           .primary-navigation {
