@@ -41,6 +41,10 @@
     </head>
 
     <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+        {% if warning_banner_enabled %}
+          {% include "components/Header/WarningHeader.html" %}
+        {% endif %}
+
         {% cms_toolbar %}
 
         {# render the cms menu and save for display in both mobile and desktop #}

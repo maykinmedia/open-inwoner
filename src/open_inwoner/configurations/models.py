@@ -59,6 +59,26 @@ class SiteConfiguration(SingletonModel):
         default=ColorTypeChoices.dark,
         help_text=_("The font color for when the background is the accent color"),
     )
+    warning_banner_enabled = models.BooleanField(
+        verbose_name=_("Show warning banner"),
+        default=False,
+        help_text=_("Whether the warning banner should be displayed"),
+    )
+    warning_banner_text = models.TextField(
+        verbose_name=_("Warning banner text"),
+        blank=True,
+        help_text=_("Text will be displayed on the warning banner"),
+    )
+    warning_banner_background_color = ColorField(
+        verbose_name=_("Warning banner background"),
+        default="#FFDBAD",
+        help_text=_("The background color for the warning banner"),
+    )
+    warning_banner_font_color = ColorField(
+        verbose_name=_("Warning banner font"),
+        default="#000000",
+        help_text=_("The font color for the warning banner"),
+    )
     logo = FilerImageField(
         verbose_name=_("Logo"),
         null=True,

@@ -110,6 +110,18 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
             },
         ),
         (
+            _("Warning banner"),
+            {
+                "classes": ("collapse",),
+                "fields": (
+                    "warning_banner_enabled",
+                    "warning_banner_text",
+                    "warning_banner_background_color",
+                    "warning_banner_font_color",
+                ),
+            },
+        ),
+        (
             _("Page texts"),
             {
                 "classes": ("collapse",),
@@ -274,6 +286,13 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
             obj.accent_color,
             _("Accent font color"),
             obj.accent_font_color,
+            ACCESSIBLE_CONTRAST_RATIO,
+        )
+        check_contrast_ratio(
+            _("Warning banner background color"),
+            obj.warning_banner_background_color,
+            _("Warning banner font color"),
+            obj.warning_banner_font_color,
             ACCESSIBLE_CONTRAST_RATIO,
         )
 
