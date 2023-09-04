@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2016 sp1 (http://www.altova.com) by Centric Netherlands B.V. -->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:h="http://www.centric.nl/GWS/Header/v0300" xmlns:f="http://www.centric.nl/GWS/FWI/v0200" xmlns:tns="http://www.centric.nl/GWS/Diensten/JaarOpgaveClient/v0400" xmlns:ns="http://www.centric.nl/GWS/Basisschema/v0400" targetNamespace="http://www.centric.nl/GWS/Diensten/JaarOpgaveClient/v0400">
+	<types>
+		<xs:schema targetNamespace="http://www.centric.nl/GWS/Diensten/JaarOpgaveClient/v0400">
+			<xs:include schemaLocation="BodyAction_resolved.xsd"/>
+			<xs:include schemaLocation="BodyReaction_resolved.xsd"/>
+		</xs:schema>
+		<xs:schema targetNamespace="http://www.centric.nl/GWS/Header/v0300">
+			<xs:include schemaLocation="GWSMLHeader_resolved.xsd"/>
+		</xs:schema>
+		<xs:schema targetNamespace="http://www.centric.nl/GWS/FWI/v0200">
+			<xs:include schemaLocation="FWI_resolved.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="JaarOpgaveInfo">
+		<part name="Request" element="tns:JaarOpgaveInfo"/>
+	</message>
+	<message name="JaarOpgaveInfoResponse">
+		<part name="Reponse" element="tns:JaarOpgaveInfoResponse"/>
+	</message>
+	<message name="Header">
+		<part name="headerPart" element="h:Header"/>
+	</message>
+	<message name="FaultMessage">
+		<part name="faultPart" element="f:FWI"/>
+	</message>
+	<portType name="JaarOpgaveClientPortType">
+		<operation name="SendJaarOpgaveClient">
+			<input message="tns:JaarOpgaveInfo" wsaw:Action="http://www.centric.nl/GWS/Diensten/JaarOpgaveClient-v0400/JaarOpgaveInfo"/>
+			<output message="tns:JaarOpgaveInfoResponse" wsaw:Action="http://www.centric.nl/GWS/Diensten/JaarOpgaveClient-v0400/JaarOpgaveInfoResponse"/>
+			<fault name="Fault" message="tns:FaultMessage" wsaw:Action="http://www.centric.nl/GWS/Diensten/JaarOpgaveClient-v0400/Fout"/>
+		</operation>
+	</portType>
+	<binding name="JaarOpgaveClientBinding" type="tns:JaarOpgaveClientPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsp:PolicyReference URI="#JaarOpgaveClientPolicy"/>
+		<operation name="SendJaarOpgaveClient">
+			<soap:operation soapAction="" name="SendJaarOpgaveClient"/>
+			<input>
+				<soap:header message="tns:Header" part="headerPart" use="literal"/>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:header message="tns:Header" part="headerPart" use="literal"/>
+				<soap:body use="literal"/>
+			</output>
+			<fault name="Fault"/>
+		</operation>
+	</binding>
+	<service name="JaarOpgaveClient">
+		<port name="JaarOpgaveClientPort" binding="tns:JaarOpgaveClientBinding">
+			<soap:address location="No target address"/>
+		</port>
+	</service>
+	<wsp:Policy wsu:Id="JaarOpgaveClientPolicy">
+		<wsp:ExactlyOne>
+			<wsp:All>
+				<wsaw:UsingAddressing/>
+			</wsp:All>
+		</wsp:ExactlyOne>
+	</wsp:Policy>
+</definitions>

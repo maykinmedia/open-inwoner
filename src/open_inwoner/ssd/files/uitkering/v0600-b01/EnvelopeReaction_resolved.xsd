@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:gwsd="http://www.centric.nl/GWS/Diensten/UitkeringsSpecificatieClient/v0600"
+        xmlns:gwsh="http://www.centric.nl/GWS/Header/v0300"
+        xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+        xmlns:wsa="http://www.w3.org/2005/08/addressing"
+        xmlns:fwi="http://www.centric.nl/GWS/FWI/v0200"
+        xmlns:tns="http://www.w3.org/2005/08/addressing"
+        xmlns:gwsb="http://www.centric.nl/GWS/Basisschema/v0400"
+        targetNamespace="http://schemas.xmlsoap.org/soap/envelope/"
+        elementFormDefault="unqualified"
+        attributeFormDefault="unqualified">
+   <import namespace="http://www.w3.org/2005/08/addressing"
+           schemaLocation="ws-addr_resolved.xsd"/>
+   <import namespace="http://www.centric.nl/GWS/FWI/v0200"
+           schemaLocation="FWI_resolved.xsd"/>
+   <import namespace="http://www.centric.nl/GWS/Header/v0300"
+           schemaLocation="GWSMLHeader_resolved.xsd"/>
+   <import namespace="http://www.centric.nl/GWS/Diensten/UitkeringsSpecificatieClient/v0600"
+           schemaLocation="BodyReaction_resolved.xsd"/>
+   <xs:element name="Envelope" type="SOAP-ENV:Envelope"/>
+   <xs:complexType name="Envelope">
+		    <xs:sequence>
+			      <xs:element ref="SOAP-ENV:Header"/>
+			      <xs:element ref="SOAP-ENV:Body"/>
+		    </xs:sequence>
+	  </xs:complexType>
+   <xs:element name="Header" type="SOAP-ENV:Header"/>
+   <xs:complexType name="Header">
+		    <xs:all>
+			<!-- Gegevens webservice adressering. -->
+			<xs:element ref="wsa:MessageID"/>
+			      <xs:element ref="wsa:Action"/>
+			      <xs:element ref="wsa:RelatesTo"/>
+			      <xs:element ref="wsa:To" minOccurs="0"/>
+			      <xs:element ref="wsa:From" minOccurs="0"/>
+			      <xs:element ref="wsa:ReplyTo" minOccurs="0"/>
+			      <!-- Gedefinieerd in het headerschema. -->
+			<xs:element ref="gwsh:Header"/>
+		    </xs:all>
+	  </xs:complexType>
+   <xs:element name="Body" type="SOAP-ENV:Body"/>
+   <xs:complexType name="Body">
+		    <xs:choice>
+			<!-- Gedefinieerd in het berichtspecifieke bodyschema. -->
+			<xs:element ref="gwsd:UitkeringsSpecificatieInfoResponse"/>
+			      <!-- Referentie naar standaard SOAP foutstructuur, niet wijzigen. -->
+			<xs:element ref="SOAP-ENV:Fault"/>
+		    </xs:choice>
+	  </xs:complexType>
+   <xs:element name="Fault" type="SOAP-ENV:Fault"/>
+   <xs:complexType name="Fault" final="extension">
+		    <xs:sequence>
+			      <xs:element name="faultcode" type="xs:QName"/>
+			      <xs:element name="faultstring" type="xs:string"/>
+			      <xs:element name="faultactor" type="xs:anyURI" minOccurs="0"/>
+			      <xs:element name="detail" type="SOAP-ENV:detail" minOccurs="0"/>
+		    </xs:sequence>
+	  </xs:complexType>
+   <xs:complexType name="detail">
+		    <xs:sequence>
+			      <xs:element ref="fwi:Fout" maxOccurs="unbounded"/>
+		    </xs:sequence>
+	  </xs:complexType>
+</schema>
