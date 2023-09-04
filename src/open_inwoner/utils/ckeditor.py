@@ -1,3 +1,4 @@
+from django.utils.text import slugify
 from django.utils.translation import gettext as _
 
 import markdown
@@ -51,6 +52,9 @@ def get_product_rendered_content(product):
                 continue
 
             element.attrs["class"] = class_name
+
+            if tag == "h2":
+                element.attrs["id"] = f"subheader-{slugify(element.text)}"
 
             if "[CTABUTTON]" in element.text:
                 # decompose the element when product doesn't have either a link or a form
