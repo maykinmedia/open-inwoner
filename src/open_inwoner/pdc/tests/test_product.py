@@ -1,3 +1,5 @@
+from html import escape
+
 from django.test import override_settings
 from django.urls import reverse
 
@@ -287,9 +289,9 @@ class TestProductContent(WebTest):
             reverse("products:product_detail", kwargs={"slug": product.slug})
         )
 
-        self.assertNotContains(response, "<b>world</b>")
-        self.assertNotContains(response, "&lt;b&gt;world&lt;/b&gt;")
-        self.assertContains(response, "hello world")
+        self.assertNotContains(response, "hello world")
+        self.assertNotContains(response, escape("<b>world"))
+        self.assertContains(response, "hello <b>world</b>")
         self.assertContains(response, "<strong>test</strong>")
 
 
