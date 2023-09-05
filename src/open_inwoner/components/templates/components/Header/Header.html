@@ -31,16 +31,13 @@
         {# end of mobile header-menu with logo #}
 
         <div class="header__submenu">
-            {% if cms_apps.products %}
-            {% if request.user.is_authenticated or not config.hide_search_from_anonymous_users %}
+            {% if cms_apps.products and request.user.is_authenticated or not config.hide_search_from_anonymous_users %}
                 <nav class="header__actions header__actions--open" aria-label="Zoek navigatie mobiel">
-                {% url 'search:search' as search_url %}
-                {% render_form form=search_form method="GET" form_action=search_url inline=True spaceless=False %}
-                    {% input search_form.query no_label=True %}
-                    {% form_actions primary_icon="search" primary_text=_("Zoeken") hide_primary_text=True %}
-                {% endrender_form %}
+                    <form id="search-form-mobile-open" class="search-form-delegate form form--inline">
+                        {% input search_form.query no_label=True %}
+                        {% form_actions primary_icon="search" primary_text=_("Zoeken") hide_primary_text=True %}
+                    </form>
                 </nav>
-            {% endif %}
             {% endif %}
 
                 <nav class="primary-navigation" aria-label="Hoofd navigatie">
@@ -111,16 +108,13 @@
 
         {% include "components/Header/PrimaryNavigation.html" %}
 
-        {% if cms_apps.products %}
-          {% if request.user.is_authenticated or not config.hide_search_from_anonymous_users %}
-          <nav class="header__actions" aria-label="Zoek navigatie desktop">
-              {% url 'search:search' as search_url %}
-              {% render_form form=search_form method="GET" form_action=search_url id="search-header" inline=True spaceless=True %}
-                  {% input search_form.query no_label=True %}
-                  {% form_actions primary_icon="search" primary_text=_("Zoeken") hide_primary_text=True %}
-              {% endrender_form %}
-          </nav>
-          {% endif %}
+        {% if cms_apps.products and request.user.is_authenticated or not config.hide_search_from_anonymous_users %}
+            <nav class="header__actions" aria-label="Zoek navigatie desktop">
+                <form id="search-form-desktop" class="search-form-delegate form form--spaceless form--inline">
+                    {% input search_form.query no_label=True %}
+                    {% form_actions primary_icon="search" primary_text=_("Zoeken") hide_primary_text=True %}
+                </form>
+            </nav>
         {% endif %}
 
         {% include "components/Header/NavigationAuthenticated.html" %}
@@ -128,16 +122,13 @@
     {# end of header container #}
 </header>
 
-{% if cms_apps.products %}
-    {% if request.user.is_authenticated or not config.hide_search_from_anonymous_users %}
-        <section class="search search__mobile search__mobile--closed">
-            <nav class="search__actions " aria-label="Zoek navigatie mobiel">
-                {% url 'search:search' as search_url %}
-                {% render_form form=search_form method="GET" form_action=search_url id="search-header-mobile" inline=True spaceless=False %}
-                    {% input search_form.query no_label=True %}
-                    {% form_actions primary_icon="search" primary_text=_("Zoeken") hide_primary_text=True %}
-                {% endrender_form %}
-            </nav>
-        </section>
-    {% endif %}
+{% if cms_apps.products and request.user.is_authenticated or not config.hide_search_from_anonymous_users %}
+    <section class="search search__mobile search__mobile--closed">
+        <nav class="search__actions " aria-label="Zoek navigatie mobiel">
+            <form id="search-form-mobile-closed" class="search-form-delegate form form--inline">
+                {% input search_form.query no_label=True %}
+                {% form_actions primary_icon="search" primary_text=_("Zoeken") hide_primary_text=True %}
+            </form>
+        </nav>
+    </section>
 {% endif %}

@@ -8,7 +8,7 @@
         </legend>
         <div class="filter__list">
             {% for option in field.field.choices %}
-                {% choice_checkbox choice=option name=field.name data=field.data index=forloop.counter %}
+                {% choice_checkbox choice=option name=field.name data=field.data index=forloop.counter form_id=form_id %}
             {% endfor %}
         </div>
     </fieldset>

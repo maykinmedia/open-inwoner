@@ -53,6 +53,11 @@
         {% endcapture %}
         {% include "components/Header/Header.html" %}
 
+        {# javascript and the form-attribute are used to connect various forms and controls to this invisible form #}
+        <form id="search-form" class="form--hidden" method="GET" action="{% url 'search:search' %}" novalidate="">
+            <input name="query" type="hidden" value="{% firstof search_form.query.value "" %}">
+        </form>
+
         {% if anchors and not custom_anchors %}
             {% anchor_menu anchors=anchors desktop=False %}
                 {% block extra_mobile_anchor %}{% endblock extra_mobile_anchor %}
