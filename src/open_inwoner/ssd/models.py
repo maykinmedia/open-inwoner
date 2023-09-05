@@ -58,7 +58,9 @@ class SSDConfig(SingletonModel):
     mijn_uitkeringen_text = models.TextField(
         _("Overview text"),
         blank=True,
-        help_text=_("The text displayed as overview of the 'Mijn Uikeringen' section."),
+        help_text=_(
+            "The text displayed as overview of the 'Mijn Uitkeringen' section."
+        ),
     )
     # report options (jaaropgave)
     jaaropgave_enabled = models.BooleanField(
