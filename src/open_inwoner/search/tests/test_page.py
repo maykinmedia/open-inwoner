@@ -57,7 +57,7 @@ class SearchPageTests(ESMixin, WebTest):
 
         self.assertEqual(response.status_code, 200)
 
-        form = response.forms["search-form"]
+        form = response.forms["search-header"]
         form["query"] = "content"
         response = form.submit()
 

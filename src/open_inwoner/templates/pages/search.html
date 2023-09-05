@@ -8,10 +8,6 @@
             <div class="grid__sidebar"></div>
             <div class="grid__main">
                 <h1 class="h1">{% trans "Zoeken naar " %} "{{ form.query.value }}"</h1>
-                <div class="form form--columns-2 form--inline form--align-end form--search">
-                    {% input form.query %}
-                    {% form_actions primary_text="Zoeken" primary_icon="arrow_forward" %}
-                </div>
             </div>
         </div>
 
@@ -22,13 +18,13 @@
                 {% if search_filter_categories or search_filter_tags or search_filter_organizations %}
                     <h2 class="h2">{% trans "Zoekfilters" %}</h2>
                         {% if search_filter_categories %}
-                                {% filter field=form.categories %}
+                            {% filter field=form.categories %}
                         {% endif %}
                         {% if search_filter_tags %}
-                                {% filter field=form.tags %}
+                            {% filter field=form.tags %}
                         {% endif %}
                         {% if search_filter_organizations %}
-                                {% filter field=form.organizations %}
+                            {% filter field=form.organizations %}
                         {% endif %}
                 {%  endif %}
                 {#  end search filters #}
