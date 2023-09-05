@@ -1,0 +1,24 @@
+.warning-header {
+  display: flex;
+  box-sizing: border-box;
+  padding: var(--spacing-large);
+
+  .warning-header__container {
+    display: flex;
+    align-items: center;
+    padding: 0;
+    margin: 0 auto;
+
+    @media (min-width: 768px) {
+      max-width: 90%;
+    }
+
+    .warning-header__icon,
+    .warning-header__text {
+      padding: var(--spacing-small);
+    }
+    .warning-header__icon {
+      width: 20px;
+    }
+  }
+}

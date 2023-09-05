@@ -80,12 +80,18 @@ def settings(request):
         "cookie_info_text": config.cookie_info_text,
         "cookie_link_text": config.cookie_link_text,
         "cookie_link_url": config.cookie_link_url,
+        "extra_css": config.extra_css,
         "menu_categories": Category.get_root_nodes().published(),
         "search_form": SearchForm(auto_id=False),
         "has_general_faq_questions": Question.objects.general().exists(),
         "settings": dict(
             [(k, getattr(django_settings, k, None)) for k in public_settings]
         ),
+        "hide_categories_from_anonymous_users": config.hide_categories_from_anonymous_users,
+        "warning_banner_enabled": config.warning_banner_enabled,
+        "warning_banner_text": config.warning_banner_text,
+        "warning_banner_background_color": config.warning_banner_background_color,
+        "warning_banner_font_color": config.warning_banner_font_color,
     }
 
     if hasattr(django_settings, "SENTRY_CONFIG"):

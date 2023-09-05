@@ -22,6 +22,18 @@ class SSDConfig(SingletonModel):
         null=True,
         blank=True,
     )
+    maandspecificatie_endpoint = models.CharField(
+        _("Maandspecificatie endpoint"),
+        max_length=256,
+        default=("UitkeringsSpecificatieClient-v0600"),
+        help_text=_("Endpoint for the maandspecificatie request"),
+    )
+    jaaropgave_endpoint = models.CharField(
+        _("Jaaropgave endpoint"),
+        max_length=256,
+        default=("JaarOpgaveClient-v0400"),
+        help_text=_("Endpoint for the jaaropgave request"),
+    )
     applicatie_naam = models.CharField(
         _("Application name"),
         max_length=32,
@@ -45,9 +57,10 @@ class SSDConfig(SingletonModel):
     )
     mijn_uitkeringen_text = models.TextField(
         _("Overview text"),
-        max_length=704,
         blank=True,
-        help_text=_("The text displayed as overview of the 'Mijn Uikeringen' section."),
+        help_text=_(
+            "The text displayed as overview of the 'Mijn Uitkeringen' section."
+        ),
     )
     # report options (jaaropgave)
     jaaropgave_enabled = models.BooleanField(
@@ -68,7 +81,6 @@ class SSDConfig(SingletonModel):
     )
     jaaropgave_display_text = models.TextField(
         _("Display text"),
-        max_length=704,
         blank=True,
         help_text=_("The text displayed as overview of the 'Jaaropgave' tab"),
     )
@@ -95,7 +107,6 @@ class SSDConfig(SingletonModel):
     )
     maandspecificatie_display_text = models.TextField(
         _("Display text"),
-        max_length=704,
         blank=True,
         help_text=_("The text displayed as overview of the 'Maandspecificatie' tab"),
     )

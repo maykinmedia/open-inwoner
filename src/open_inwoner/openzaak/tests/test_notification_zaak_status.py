@@ -1,9 +1,10 @@
 import logging
 from unittest.mock import Mock, patch
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 import requests_mock
+from freezegun import freeze_time
 from notifications_api_common.models import NotificationsConfig
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
@@ -21,7 +22,8 @@ from open_inwoner.utils.test import ClearCachesMixin
 from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin, Lookups
 
 from ..api_models import Status, StatusType, Zaak, ZaakType
-from ..models import OpenZaakConfig
+from ..models import OpenZaakConfig, UserCaseStatusNotification
+from .helpers import copy_with_new_uuid
 from .test_notification_data import MockAPIData
 
 
@@ -404,9 +406,14 @@ class StatusNotificationHandlerTestCase(
         )
 
 
-class NotificationHandlerEmailTestCase(TestCase):
+@override_settings(ZGW_LIMIT_NOTIFICATIONS_FREQUENCY=3600)
+@freeze_time("2023-01-01 01:00:00")
+class NotificationHandlerEmailTestCase(AssertTimelineLogMixin, TestCase):
     @patch("open_inwoner.openzaak.notifications.send_case_update_email")
     def test_handle_status_update(self, mock_send: Mock):
+        """
+        note this test matches with a similar test from `test_notification_zaak_infoobject.py`
+        """
         data = MockAPIData()
         user = data.user_initiator
 
@@ -428,12 +435,26 @@ class NotificationHandlerEmailTestCase(TestCase):
 
         mock_send.reset_mock()
 
+        self.assertTimelineLog(
+            "send status notification email for user",
+            lookup=Lookups.startswith,
+            level=logging.INFO,
+        )
+        self.assertEqual(
+            1, UserCaseStatusNotification.objects.filter(is_sent=True).count()
+        )
+
         # second call with same case/status
         handle_status_update(user, case, status)
 
         # no duplicate mail for this user/case/status
         mock_send.assert_not_called()
 
+        self.assertTimelineLog(
+            "ignored duplicate status notification delivery for user ",
+            lookup=Lookups.startswith,
+            level=logging.INFO,
+        )
         # other user is fine
         other_user = UserFactory.create()
         handle_status_update(other_user, case, status)
@@ -442,3 +463,34 @@ class NotificationHandlerEmailTestCase(TestCase):
 
         args = mock_send.call_args.args
         self.assertEqual(args[0], other_user)
+
+        # test frequency-limit check
+        mock_send.reset_mock()
+        self.resetTimelineLogs()
+
+        # create new status
+        status = factory(Status, copy_with_new_uuid(data.status_final))
+        status.statustype = factory(
+            StatusType, copy_with_new_uuid(data.status_type_final)
+        )
+        handle_status_update(user, case, status)
+
+        # not sent because we already send to this user within the frequency
+        mock_send.assert_not_called()
+
+        self.assertTimelineLog(
+            "blocked over-frequent status notification email for user",
+            lookup=Lookups.startswith,
+            level=logging.INFO,
+        )
+
+        # advance time
+        with freeze_time("2023-01-01 03:00:00"):
+            status = factory(Status, copy_with_new_uuid(data.status_final))
+            status.statustype = factory(
+                StatusType, copy_with_new_uuid(data.status_type_final)
+            )
+            handle_status_update(user, case, status)
+
+            # this one succeeds
+            mock_send.assert_called_once()

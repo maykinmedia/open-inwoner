@@ -9,13 +9,14 @@ from view_breadcrumbs import BaseBreadcrumbMixin, ListBreadcrumbMixin
 
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.pdc.models.product import ProductCondition
-from open_inwoner.plans.models import Plan
 from open_inwoner.questionnaire.models import QuestionnaireStep
+from open_inwoner.utils.views import LoginMaybeRequiredMixin
 
 from ..utils.views import CommonPageMixin
 from .choices import YesNo
 from .forms import ProductFinderForm
 from .models import Category, Product, ProductLocation, Question
+from .utils import extract_subheadings
 
 
 class CategoryBreadcrumbMixin:
@@ -112,7 +113,9 @@ class FAQView(CommonPageMixin, TemplateView):
         return super().get_context_data(**kwargs)
 
 
-class CategoryListView(CommonPageMixin, ListBreadcrumbMixin, ListView):
+class CategoryListView(
+    LoginMaybeRequiredMixin, CommonPageMixin, ListBreadcrumbMixin, ListView
+):
     template_name = "pages/category/list.html"
     model = Category
 
@@ -124,9 +127,18 @@ class CategoryListView(CommonPageMixin, ListBreadcrumbMixin, ListView):
         config = SiteConfiguration.get_solo()
         return [(config.theme_title, reverse("products:category_list"))]
 
+    @property
+    def display_restricted(self):
+        config = SiteConfiguration.get_solo()
+        return config.hide_categories_from_anonymous_users is True
+
 
 class CategoryDetailView(
-    CommonPageMixin, BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView
+    LoginMaybeRequiredMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    CategoryBreadcrumbMixin,
+    DetailView,
 ):
     template_name = "pages/category/detail.html"
     model = Category
@@ -166,6 +178,11 @@ class CategoryDetailView(
     def get_breadcrumb_name(self):
         return self.object.name
 
+    @property
+    def display_restricted(self):
+        config = SiteConfiguration.get_solo()
+        return config.hide_categories_from_anonymous_users is True
+
 
 class ProductDetailView(
     CommonPageMixin, BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView
@@ -185,8 +202,10 @@ class ProductDetailView(
         product = self.get_object()
         context = super().get_context_data(**kwargs)
 
+        subheadings = extract_subheadings(product.content, tag="h2")
+
         anchors = [
-            ("#title", product.name),
+            ("#title", product.name, subheadings),
         ]
         if product.question_set.exists():
             anchors.append(("#faq", _("Veelgestelde vragen")))
@@ -194,13 +213,8 @@ class ProductDetailView(
             anchors.append(("#files", _("Bestanden")))
         if product.locations.exists():
             anchors.append(("#locations", _("Locaties")))
-        if product.links.exists():
-            anchors.append(("#links", _("Links")))
         if product.contacts.exists():
             anchors.append(("#contact", _("Contact")))
-        if product.related_products.published().exists():
-            anchors.append(("#see", _("Zie ook")))
-        # anchors.append(("#share", _("Delen")))  disabled for #822
 
         context["anchors"] = anchors
         context["related_products_start"] = 6 if product.links.exists() else 1

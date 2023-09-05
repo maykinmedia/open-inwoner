@@ -228,6 +228,28 @@ class TestProductContent(WebTest):
 
         self.assertFalse(cta_button)
 
+    def test_button_text_change(self):
+        """
+        Assert that button text can be modified + aria-labels are changed accordingly
+        """
+        product = ProductFactory(
+            content="Some content [CTABUTTON]",
+            link="http://www.example.com",
+            button_text="click me!",
+        )
+
+        response = self.app.get(
+            reverse("products:product_detail", kwargs={"slug": product.slug})
+        )
+
+        cta_button = response.pyquery(".grid__main")[0].find_class("cta-button")[0]
+        cta_button_span = cta_button.getchildren()[0]
+
+        self.assertEqual(cta_button.tag, "a")
+        self.assertEqual(cta_button.attrib["title"], "click me!")
+        self.assertEqual(cta_button.attrib["aria-label"], "click me!")
+        self.assertEqual(cta_button_span.attrib["aria-label"], "click me!")
+
     def test_sidemenu_button_is_not_rendered_when_cta_inside_product_content(self):
         product = ProductFactory(
             content="Some content \[CTABUTTON\]", link="http://www.example.com"
@@ -254,3 +276,33 @@ class TestProductContent(WebTest):
 
         self.assertTrue(sidemenu_cta_button)
         self.assertIn(product.link, sidemenu_cta_button[0].values())
+
+
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+class TestProductDetailView(WebTest):
+    def test_subheadings_in_sidebar(self):
+        product = ProductFactory(
+            content="##First subheading\rlorem ipsum...\r##Second subheading",
+            link="http://www.example.com",
+        )
+
+        response = self.app.get(
+            reverse("products:product_detail", kwargs={"slug": product.slug})
+        )
+
+        links = response.pyquery(".anchor-menu__sublist a")
+
+        # 2 x 2 links (mobile + desktop)
+        self.assertEqual(len(links), 4)
+
+        self.assertEqual(links[0].text, "First subheading")
+        self.assertEqual(links[0].attrib["href"], "#subheader-first-subheading")
+
+        self.assertEqual(links[1].text, "Second subheading")
+        self.assertEqual(links[1].attrib["href"], "#subheader-second-subheading")
+
+        self.assertEqual(links[2].text, "First subheading")
+        self.assertEqual(links[2].attrib["href"], "#subheader-first-subheading")
+
+        self.assertEqual(links[3].text, "Second subheading")
+        self.assertEqual(links[3].attrib["href"], "#subheader-second-subheading")

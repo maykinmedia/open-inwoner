@@ -1,0 +1,15 @@
+{% load i18n icon_tags link_tags static %}
+
+<style nonce="{{ request.csp_nonce }}"> 
+	.warning-header {
+		background-color: {{ warning_banner_background_color }};
+    color: {{ warning_banner_font_color }};
+	}
+</style>
+
+<div class="warning-header">
+	<div class="warning-header__container">
+    <span class="warning-header__icon">{% icon icon="error_outlined" icon_position="after" outlined=True %}</span>
+		<span class="warning-header__text">{{ warning_banner_text }}</span>
+	</div>
+</div>

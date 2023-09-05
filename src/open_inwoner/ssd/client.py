@@ -6,6 +6,7 @@ from typing import Optional
 from uuid import uuid4
 
 from django.template import loader
+from django.template.defaultfilters import date as django_date
 from django.utils import timezone
 
 import requests
@@ -26,6 +27,7 @@ class SSDBaseClient(ABC):
     html_template: Path
     request_template: Path
     soap_action: str
+    endpoint: property  # str
 
     def __init__(self):
         self.config = SSDConfig.get_solo()
@@ -72,7 +74,7 @@ class SSDBaseClient(ABC):
 
         try:
             response = requests.post(
-                url=self.config.service.url,
+                url=self.config.service.url + self.endpoint,
                 data=body.encode("utf-8"),
                 headers=headers,
                 **auth_kwargs,
@@ -108,6 +110,10 @@ class SSDBaseClient(ABC):
         the client's SOAP service is successful, `None` otherwise
         """
 
+    @property
+    def endpoint(self) -> str:
+        return ""
+
 
 class JaaropgaveClient(SSDBaseClient):
     """
@@ -128,7 +134,7 @@ class JaaropgaveClient(SSDBaseClient):
         return f"Jaaropgave {dt.strftime('%Y')}"
 
     def get_report(
-        self, bsn: str, report_date_iso: str, base_url: str
+        self, bsn: str, report_date_iso: str, request_base_url: str
     ) -> Optional[bytes]:
         response = self.templated_request(
             bsn=bsn, dienstjaar=self.format_report_date(report_date_iso)
@@ -139,12 +145,9 @@ class JaaropgaveClient(SSDBaseClient):
 
         jaaropgave = response.text
 
-        # TODO: remove when done testing
-        # xml_response = "src/open_inwoner/ssd/tests/files/jaaropgave_response.xml"
-        # with open(xml_response, "r") as file:
-        #     jaaropgave = file.read()
+        if (data := get_jaaropgave_dict(jaaropgave)) is None:
+            return None
 
-        data = get_jaaropgave_dict(jaaropgave)
         data.update(
             {
                 "logo": self.config.logo,
@@ -154,10 +157,14 @@ class JaaropgaveClient(SSDBaseClient):
         pdf_content = render_pdf(
             self.html_template,
             context={**data},
-            base_url=base_url,
+            base_url=request_base_url,
         )
 
         return pdf_content
+
+    @property
+    def endpoint(self) -> str:
+        return self.config.jaaropgave_endpoint
 
 
 class UitkeringClient(SSDBaseClient):
@@ -174,10 +181,10 @@ class UitkeringClient(SSDBaseClient):
 
     def format_file_name(self, report_date_iso: str) -> str:
         dt = datetime.strptime(report_date_iso, "%Y-%m-%d")
-        return f"Maandspecificatie {dt.strftime('%B %Y')}"
+        return f"Maandspecificatie {django_date(dt, 'M Y')}"
 
     def get_report(
-        self, bsn: str, report_date_iso: str, base_url: str
+        self, bsn: str, report_date_iso: str, request_base_url: str
     ) -> Optional[bytes]:
         response = self.templated_request(
             bsn=bsn, period=self.format_report_date(report_date_iso)
@@ -188,12 +195,9 @@ class UitkeringClient(SSDBaseClient):
 
         maandspecificatie = response.text
 
-        # TODO: remove when done testing
-        # xml_response = "src/open_inwoner/ssd/tests/files/uitkering_response.xml"
-        # with open(xml_response, "r") as file:
-        #     maandspecificatie = file.read()
+        if (data := get_uitkering_dict(maandspecificatie)) is None:
+            return None
 
-        data = get_uitkering_dict(maandspecificatie)
         data.update(
             {
                 "logo": self.config.logo,
@@ -202,7 +206,11 @@ class UitkeringClient(SSDBaseClient):
         pdf_content = render_pdf(
             self.html_template,
             context={**data},
-            base_url=base_url,
+            base_url=request_base_url,
         )
 
         return pdf_content
+
+    @property
+    def endpoint(self) -> str:
+        return self.config.maandspecificatie_endpoint

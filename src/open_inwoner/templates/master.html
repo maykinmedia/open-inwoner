@@ -28,7 +28,11 @@
         {% render_block "css" %}
         {% block extra_css %}{% endblock %}
         {% block extra_head %}{% endblock %}
-
+        {% if extra_css %}
+            <style id="extra-css" nonce="{{ request.csp_nonce }}">
+                {{ extra_css }}
+            </style>
+        {% endif %}
 	{% if request|cookies_accepted %}
 	  {% include "analytics/google.html" %}
 	  {% include "analytics/matomo.html" %}
@@ -37,8 +41,17 @@
     </head>
 
     <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+        {% if warning_banner_enabled %}
+          {% include "components/Header/WarningHeader.html" %}
+        {% endif %}
+
         {% cms_toolbar %}
-        {% header categories=menu_categories request=request breadcrumbs=breadcrumbs search_form=search_form has_general_faq_questions=has_general_faq_questions cms_apps=cms_apps %}
+
+        {# render the cms menu and save for display in both mobile and desktop #}
+        {% capture as rendered_cms_menu__home %}
+            {% show_menu_below_id "home" 0 100 100 100 "cms/menu/primary.html" %}
+        {% endcapture %}
+        {% include "components/Header/Header.html" %}
 
         {% if anchors and not custom_anchors %}
             {% anchor_menu anchors=anchors desktop=False %}

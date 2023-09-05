@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.db import models
 from django.db.models import Q, UniqueConstraint
 from django.utils import timezone
@@ -292,7 +294,7 @@ class ZaakTypeInformatieObjectTypeConfig(models.Model):
         return self.omschrijving
 
 
-class UserCaseStatusNotification(models.Model):
+class UserCaseStatusNotificationBase(models.Model):
     user = models.ForeignKey(
         "accounts.User",
         on_delete=models.CASCADE,
@@ -300,13 +302,23 @@ class UserCaseStatusNotification(models.Model):
     case_uuid = models.UUIDField(
         verbose_name=_("Zaak UUID"),
     )
-    status_uuid = models.UUIDField(
-        verbose_name=_("Status UUID"),
-    )
     created_on = models.DateTimeField(
         verbose_name=_("Created on"), default=timezone.now
     )
+    is_sent = models.BooleanField(_("Is sent"), default=False)
 
+    def mark_sent(self):
+        self.is_sent = True
+        self.save(update_fields=["is_sent"])
+
+    class Meta:
+        abstract = True
+
+
+class UserCaseStatusNotification(UserCaseStatusNotificationBase):
+    status_uuid = models.UUIDField(
+        verbose_name=_("Status UUID"),
+    )
     objects = UserCaseStatusNotificationManager()
 
     class Meta:
@@ -319,22 +331,18 @@ class UserCaseStatusNotification(models.Model):
             )
         ]
 
+    def has_received_similar_notes_within(self, period: timedelta) -> bool:
+        return UserCaseStatusNotification.objects.has_received_similar_notes_within(
+            self.user, self.case_uuid, period, not_record_id=self.id
+        ) or UserCaseInfoObjectNotification.objects.has_received_similar_notes_within(
+            self.user, self.case_uuid, period
+        )
 
-class UserCaseInfoObjectNotification(models.Model):
-    user = models.ForeignKey(
-        "accounts.User",
-        on_delete=models.CASCADE,
-    )
-    case_uuid = models.UUIDField(
-        verbose_name=_("Zaak UUID"),
-    )
+
+class UserCaseInfoObjectNotification(UserCaseStatusNotificationBase):
     zaak_info_object_uuid = models.UUIDField(
         verbose_name=_("InformatieObject UUID"),
     )
-    created_on = models.DateTimeField(
-        verbose_name=_("Created on"), default=timezone.now
-    )
-
     objects = UserCaseInfoObjectNotificationManager()
 
     class Meta:
@@ -346,3 +354,10 @@ class UserCaseInfoObjectNotification(models.Model):
                 fields=["user", "case_uuid", "zaak_info_object_uuid"],
             )
         ]
+
+    def has_received_similar_notes_within(self, period: timedelta) -> bool:
+        return UserCaseInfoObjectNotification.objects.has_received_similar_notes_within(
+            self.user, self.case_uuid, period, not_record_id=self.id
+        ) or UserCaseStatusNotification.objects.has_received_similar_notes_within(
+            self.user, self.case_uuid, period
+        )

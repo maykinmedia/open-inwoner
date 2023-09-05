@@ -41,12 +41,11 @@ def log_user_login(sender, user, request, *args, **kwargs):
 
     # update brp fields when login with digid and brp is configured
     brp_config = HaalCentraalConfig.get_solo()
-
     oc_config = OpenKlantConfig.get_solo()
 
     if user.login_type == LoginTypeChoices.digid:
         if brp_config.service:
-            update_brp_data_in_db(user, settings.BRP_VERSION, initial=False)
+            update_brp_data_in_db(user, initial=False)
 
         if oc_config.klanten_service:
             update_user_from_klant(user)

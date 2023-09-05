@@ -345,6 +345,14 @@
                 "zaaktypeinformatieobjecttypeconfig"
             ],
             [
+                "soap",
+                "soapservice"
+            ],
+            [
+                "ssd",
+                "ssdconfig"
+            ],
+            [
                 "zgw_consumers",
                 "certificate"
             ],

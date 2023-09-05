@@ -10,10 +10,12 @@ from .models import SSDConfig
 class SSDConfigAdmin(SingletonModelAdmin):
     fieldsets = (
         (
-            _("SSD client"),
+            _("SSD clients"),
             {
                 "fields": (
                     "service",
+                    "maandspecificatie_endpoint",
+                    "jaaropgave_endpoint",
                     "bedrijfs_naam",
                     "applicatie_naam",
                     "gemeentecode",

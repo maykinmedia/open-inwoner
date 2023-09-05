@@ -52,7 +52,7 @@ class TestMonthlyBenefitsFormView(TestCase):
 
     @patch(
         "open_inwoner.ssd.client.UitkeringClient.get_report",
-        return_value=mock_report(str(FILES_DIR / "uitkering_response.xml")),
+        return_value=mock_report(str(FILES_DIR / "uitkering_response_basic.xml")),
     )
     @freeze_time("1985-12-25")
     def test_post_success(self, mock_report):
@@ -119,9 +119,9 @@ class TestYearlyBenefitsFormView(TestCase):
         self.user.save()
 
     def test_get(self):
-        url = reverse("ssd:yearly_benefits_index")
 
         # request with anonymous user
+        url = reverse("ssd:yearly_benefits_index")
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, HTTPStatus.FOUND)

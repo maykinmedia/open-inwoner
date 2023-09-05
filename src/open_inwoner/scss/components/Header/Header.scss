@@ -5,14 +5,13 @@ $hm: max(calc((100vw - var(--container-width)) / 2), var(--spacing-large));
 $vm: var(--spacing-large);
 
 .header {
-  position: static;
+  position: relative;
   min-height: 81px;
   background-color: var(--color-white);
   width: 100%;
   z-index: 1003;
 
   @media (min-width: 768px) {
-    position: relative;
     display: flex;
     align-items: center;
     min-height: 90px;
@@ -22,9 +21,10 @@ $vm: var(--spacing-large);
   .indicator {
     display: inline-block;
     position: relative;
-    margin-left: var(--spacing-large);
     overflow: visible;
     text-align: center;
+    right: 15px;
+    top: -5px;
 
     .link,
     &__link {
@@ -93,7 +93,7 @@ $vm: var(--spacing-large);
     }
 
     // Tablet search bar
-    @media screen and (min-width: 768px) and (max-width: 910px) {
+    @media (min-width: 768px) and (max-width: 910px) {
       > .header__actions {
         grid-column: 1 / span 12;
         grid-row: 2;
@@ -127,7 +127,7 @@ $vm: var(--spacing-large);
         grid-row: 1;
       }
 
-      @media screen and (min-width: 768px) and (max-width: 910px) {
+      @media (min-width: 768px) and (max-width: 910px) {
         grid-column: 10 / span 3;
       }
     }
@@ -141,18 +141,19 @@ $vm: var(--spacing-large);
     box-sizing: border-box;
     width: fit-content;
 
-    @media screen and (max-width: 360px) {
+    @media (max-width: 360px) {
       margin-left: var(--spacing-tiny);
+      padding: 8px;
+      margin-right: auto;
     }
     @media (min-width: 768px) {
       height: auto;
       grid-column: 1 / span 6;
       margin: 0;
     }
-    @media screen and (min-width: 361px) and (max-width: 767px) {
-      padding: 8px;
-      margin-right: auto;
+    @media (min-width: 361px) and (max-width: 767px) {
       margin-left: var(--spacing-large);
+      margin-right: auto;
     }
 
     img {
@@ -238,6 +239,7 @@ $vm: var(--spacing-large);
       display: none;
     }
   }
+
   &__submenu::backdrop {
     display: none;
   }
@@ -266,11 +268,11 @@ $vm: var(--spacing-large);
       left: 0;
       bottom: 0;
       padding: 0;
-      min-width: 150px;
 
       &__main {
         grid-row: 1;
         grid-column: 4 / span 2;
+        width: 170px;
       }
 
       &__authenticated {
@@ -280,7 +282,7 @@ $vm: var(--spacing-large);
         grid-column: 11 / span 2;
 
         // Tablet menu
-        @media screen and (min-width: 768px) and (max-width: 910px) {
+        @media (min-width: 768px) and (max-width: 910px) {
           grid-column: 10 / span 3;
         }
 
@@ -288,6 +290,16 @@ $vm: var(--spacing-large);
           overflow-x: visible;
           justify-content: flex-end;
           position: relative;
+
+          .primary-navigation__list-item
+            .subpage-list
+            .primary-navigation__list-item {
+            .indicator {
+              margin-left: var(--spacing-large);
+              right: 0;
+              top: 0;
+            }
+          }
         }
       }
     }
@@ -553,6 +565,14 @@ $vm: var(--spacing-large);
               transform: rotate(0deg);
               top: 8px;
               right: var(--spacing-large);
+            }
+          }
+
+          .primary-navigation__list .primary-navigation__list-item {
+            .indicator {
+              margin-left: var(--spacing-large);
+              right: 0;
+              top: 0;
             }
           }
         }

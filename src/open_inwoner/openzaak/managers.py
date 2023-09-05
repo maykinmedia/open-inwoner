@@ -1,7 +1,9 @@
+from datetime import timedelta
 from typing import TYPE_CHECKING, Optional
 from uuid import UUID
 
 from django.db import IntegrityError, models, transaction
+from django.utils import timezone
 
 from open_inwoner.accounts.models import User
 from open_inwoner.openzaak.api_models import Zaak, ZaakType
@@ -13,7 +15,29 @@ if TYPE_CHECKING:
     )
 
 
-class UserCaseStatusNotificationManager(models.Manager):
+class UserCaseNotificationBaseManager(models.Manager):
+    def has_received_similar_notes_within(
+        self, user: User, case_uuid, delta: timedelta, not_record_id: int = None
+    ) -> bool:
+        qs = self.filter(
+            user=user,
+            case_uuid=case_uuid,
+            created_on__gte=timezone.now() - delta,
+            is_sent=True,
+        )
+        if not_record_id:
+            qs = qs.exclude(id=not_record_id)
+        return qs.exists()
+
+    def attempt_create(self, **kwargs):
+        try:
+            with transaction.atomic():
+                return self.create(**kwargs)
+        except IntegrityError:
+            return None
+
+
+class UserCaseStatusNotificationManager(UserCaseNotificationBaseManager):
     def record_if_unique_notification(
         self,
         user: User,
@@ -28,15 +52,10 @@ class UserCaseStatusNotificationManager(models.Manager):
             "case_uuid": case_uuid,
             "status_uuid": status_uuid,
         }
-        try:
-            with transaction.atomic():
-                note = self.create(**kwargs)
-                return note
-        except IntegrityError:
-            return None
+        return self.attempt_create(**kwargs)
 
 
-class UserCaseInfoObjectNotificationManager(models.Manager):
+class UserCaseInfoObjectNotificationManager(UserCaseNotificationBaseManager):
     def record_if_unique_notification(
         self,
         user: User,
@@ -51,12 +70,7 @@ class UserCaseInfoObjectNotificationManager(models.Manager):
             "case_uuid": case_uuid,
             "zaak_info_object_uuid": zaak_info_object_uuid,
         }
-        try:
-            with transaction.atomic():
-                note = self.create(**kwargs)
-                return note
-        except IntegrityError:
-            return None
+        return self.attempt_create(**kwargs)
 
 
 class ZaakTypeInformatieObjectTypeConfigQueryset(models.QuerySet):

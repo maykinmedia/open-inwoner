@@ -1,4 +1,5 @@
 from django import http
+from django.contrib.auth.mixins import AccessMixin
 from django.template import TemplateDoesNotExist, loader
 from django.views.decorators.csrf import requires_csrf_token
 from django.views.defaults import ERROR_500_TEMPLATE_NAME
@@ -47,6 +48,21 @@ class CustomDetailBreadcrumbMixin(DetailBreadcrumbMixin):
                 self.detail_view_url,
             ),
         ]
+
+
+class LoginMaybeRequiredMixin(AccessMixin):
+    """
+    Conditional access control on a per-view basis
+
+    Access to the view is restricted to authenticated users if
+    `self.display_restricted` is `True`, which must be defined on
+    the view inheriting from this Mixin.
+    """
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated and self.display_restricted:
+            return self.handle_no_permission()
+        return super().dispatch(request, *args, **kwargs)
 
 
 @requires_csrf_token

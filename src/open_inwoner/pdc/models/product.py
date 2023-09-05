@@ -79,6 +79,13 @@ class Product(models.Model):
         default="",
         help_text=_("Action link to request the product."),
     )
+    button_text = models.CharField(
+        verbose_name=_("CTA Button text"),
+        max_length=64,
+        blank=True,
+        default=_("Aanvraag starten"),
+        help_text=_("The text displayed on the button."),
+    )
     form = OpenFormsSlugField(
         _("Request form"),
         blank=True,

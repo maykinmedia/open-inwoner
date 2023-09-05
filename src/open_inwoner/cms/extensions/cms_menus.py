@@ -38,6 +38,8 @@ class MenuModifier(Modifier):
                 # optimise and only retrieve id and related object
                 .only("id").select_related("commonextension")
             )
+            num_indicators = 0
+
             for page in pages:
                 node = page_nodes[page.id]
                 try:
@@ -65,6 +67,11 @@ class MenuModifier(Modifier):
                     node.indicator = indicator_lookup(request, namespace)
                 else:
                     node.indicator = 0
+
+                num_indicators += node.indicator
+
+            # store total on something we can access from outside the template tags
+            request.user.num_indicators = num_indicators
 
         return nodes
 

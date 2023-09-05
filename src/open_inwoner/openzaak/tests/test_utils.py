@@ -16,6 +16,7 @@ from open_inwoner.openzaak.utils import (
 )
 
 from ...utils.test import ClearCachesMixin
+from .helpers import copy_with_new_uuid
 from .shared import CATALOGI_ROOT, ZAKEN_ROOT
 
 
@@ -288,3 +289,29 @@ class TestUtils(ClearCachesMixin, TestCase):
             with self.subTest(value=value, expected=expected):
                 actual = reformat_esuite_zaak_identificatie(value)
                 self.assertEqual(actual, expected)
+
+
+class TestHelpers(TestCase):
+    def test_copy_with_new_uuid(self):
+        data = {
+            "url": "http://api/zaaktype/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            "data": [1, 2, 3],
+        }
+        res = copy_with_new_uuid(data)
+        # its a deepcopy
+        self.assertIsNot(data, res)
+        self.assertIsNot(data["data"], res["data"])
+        self.assertEqual(data["data"], res["data"])
+
+        # uuid in url updated
+        self.assertNotEqual(data["url"], res["url"])
+
+        data = {
+            "uuid": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            "url": "http://api/zaaktype/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+        }
+        res = copy_with_new_uuid(data)
+        self.assertIsNot(data, res)
+        # uuid AND url updated
+        self.assertNotEqual(data["uuid"], res["uuid"])
+        self.assertIn(data["uuid"], data["url"])

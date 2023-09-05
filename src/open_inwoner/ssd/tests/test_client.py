@@ -7,23 +7,17 @@ from django.test import TestCase
 import requests_mock
 from lxml import etree
 
-from ..client import JaaropgaveClient, SSDBaseClient, UitkeringClient
-from .factories import SSDConfigFactory
+from ..client import JaaropgaveClient, UitkeringClient
+from .factories import ConcreteSSDClient, SSDConfigFactory
 
 FILES_DIR = Path(__file__).parent.resolve() / "files"
 
 
 @patch("open_inwoner.ssd.client.SSDBaseClient._make_request_body", return_value="")
 class SSDClientRequestInterfaceTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        # enable testing of the request interface through abstract SSDBaseClient
-        SSDBaseClient.__abstractmethods__ = []
-        super().setUpTestData()
-
     @requests_mock.Mocker()
     def test_tsl_with_server_cert(self, mock_request_body, mock_request):
-        client = SSDBaseClient()
+        client = ConcreteSSDClient()
         client.config = SSDConfigFactory.build(
             service__url="https://example.com/soap-service",
             service__with_server_cert=True,
@@ -41,7 +35,7 @@ class SSDClientRequestInterfaceTest(TestCase):
 
     @requests_mock.Mocker()
     def test_tsl_without_server_cert(self, mock_request_body, mock_request):
-        client = SSDBaseClient()
+        client = ConcreteSSDClient()
         client.config = SSDConfigFactory.build(
             service__url="https://example.com/soap-service",
             service__with_client_cert=True,
@@ -57,7 +51,7 @@ class SSDClientRequestInterfaceTest(TestCase):
 
     @requests_mock.Mocker()
     def test_tls_no_client_cert(self, mock_request_body, mock_request):
-        client = SSDBaseClient()
+        client = ConcreteSSDClient()
         client.config = SSDConfigFactory.build(
             service__url="https://example.com/soap-service",
             service__with_client_cert=False,
@@ -73,7 +67,7 @@ class SSDClientRequestInterfaceTest(TestCase):
 
     @requests_mock.Mocker()
     def test_tsl_client_public_cert_missing(self, mock_request_body, mock_request):
-        client = SSDBaseClient()
+        client = ConcreteSSDClient()
         client.config = SSDConfigFactory.build(
             service__url="https://example.com/soap-service",
             service__with_client_cert=True,
@@ -90,7 +84,7 @@ class SSDClientRequestInterfaceTest(TestCase):
 
     @requests_mock.Mocker()
     def test_tsl_client_public_cert_only(self, mock_request_body, mock_request):
-        client = SSDBaseClient()
+        client = ConcreteSSDClient()
         client.config = SSDConfigFactory.build(
             service__url="https://example.com/soap-service",
             service__with_client_cert=True,
@@ -110,7 +104,7 @@ class SSDClientRequestInterfaceTest(TestCase):
 
     @requests_mock.Mocker()
     def test_tsl_client_cert_and_private_key(self, mock_request_body, mock_request):
-        client = SSDBaseClient()
+        client = ConcreteSSDClient()
         client.config = SSDConfigFactory.build(
             service__url="https://example.com/soap-service",
             service__with_client_cert=True,
@@ -137,19 +131,19 @@ class UitkeringClientTest(TestCase):
     def test_request_status_not_ok(self, mock_request):
         client = UitkeringClient()
         client.config = SSDConfigFactory.build(
-            service__url="https://example.com/soap-service",
+            service__url="https://example.com/soap-service/",
         )
 
         for code in [300, 400, 500]:
             with self.subTest(code=code):
                 mock_request.post(
-                    "https://example.com/soap-service",
+                    "https://example.com/soap-service/maandspecificatie/",
                     status_code=code,
                 )
                 res = client.get_report(
                     bsn="12345",
                     report_date_iso="1985-07-25",
-                    base_url="https://dummy.com",
+                    request_base_url="https://dummy.com",
                 )
                 self.assertIsNone(res)
 
@@ -158,13 +152,15 @@ class UitkeringClientTest(TestCase):
     def test_request_body(self, mock_datetime, mock_request):
         client = UitkeringClient()
         client.config = SSDConfigFactory.build(
-            service__url="https://example.com/soap-service",
+            service__url="https://example.com/soap-service/",
         )
 
-        mock_request.post("https://example.com/soap-service")
+        mock_request.post("https://example.com/soap-service/maandspecificatie/")
 
         client.get_report(
-            bsn="12345", report_date_iso="1985-07-25", base_url="https://dummy.com"
+            bsn="12345",
+            report_date_iso="1985-07-25",
+            request_base_url="https://dummy.com",
         )
 
         # get request body and parse XML
@@ -192,19 +188,19 @@ class JaaropgaveClientTest(TestCase):
     def test_request_status_not_ok(self, mock_request):
         client = JaaropgaveClient()
         client.config = SSDConfigFactory.build(
-            service__url="https://example.com/soap-service",
+            service__url="https://example.com/soap-service/",
         )
 
         for code in [300, 400, 500]:
             with self.subTest(code=code):
                 mock_request.post(
-                    "https://example.com/soap-service",
+                    "https://example.com/soap-service/jaaropgave/",
                     status_code=code,
                 )
                 res = client.get_report(
                     bsn="12345",
                     report_date_iso="1985-12-24",
-                    base_url="https://dummy.com",
+                    request_base_url="https://dummy.com",
                 )
                 self.assertIsNone(res)
 
@@ -213,15 +209,15 @@ class JaaropgaveClientTest(TestCase):
     def test_request_body(self, mock_datetime, mock_request):
         client = JaaropgaveClient()
         client.config = SSDConfigFactory.build(
-            service__url="https://example.com/soap-service",
+            service__url="https://example.com/soap-service/",
         )
 
-        mock_request.post("https://example.com/soap-service")
+        mock_request.post("https://example.com/soap-service/jaaropgave/")
 
         client.get_report(
             bsn="12345",
             report_date_iso="1985-12-12",
-            base_url="https://dummy.com",
+            request_base_url="https://dummy.com",
         )
 
         # get request body and parse XML

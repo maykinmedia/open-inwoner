@@ -8,6 +8,7 @@ from django.core.validators import URLValidator
 from django.forms import ValidationError
 from django.urls import resolve
 from django.urls.exceptions import Resolver404
+from django.utils.html import format_html, format_html_join
 from django.utils.translation import ugettext_lazy as _
 
 from ordered_model.admin import OrderedInlineModelAdminMixin, OrderedTabularInline
@@ -16,6 +17,9 @@ from solo.admin import SingletonModelAdmin
 from open_inwoner.ckeditor5.widgets import CKEditorWidget
 
 from ..utils.colors import ACCESSIBLE_CONTRAST_RATIO, get_contrast_ratio
+from ..utils.css import ALLOWED_PROPERTIES
+from ..utils.fields import CSSEditorWidget
+from ..utils.iteration import split
 from .models import SiteConfiguration, SiteConfigurationPage
 
 
@@ -39,6 +43,9 @@ class SiteConfigurarionAdminForm(forms.ModelForm):
     class Meta:
         model = SiteConfiguration
         fields = "__all__"
+        widgets = {
+            "extra_css": CSSEditorWidget,
+        }
 
     def clean_redirect_to(self):
         redirect_to = self.cleaned_data["redirect_to"]
@@ -100,6 +107,18 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                     "hero_image_login",
                     "favicon",
                 )
+            },
+        ),
+        (
+            _("Warning banner"),
+            {
+                "classes": ("collapse",),
+                "fields": (
+                    "warning_banner_enabled",
+                    "warning_banner_text",
+                    "warning_banner_background_color",
+                    "warning_banner_font_color",
+                ),
             },
         ),
         (
@@ -189,9 +208,50 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                 ),
             },
         ),
+        (
+            _("Display options for anonymous users"),
+            {
+                "fields": (
+                    "hide_categories_from_anonymous_users",
+                    "hide_search_from_anonymous_users",
+                )
+            },
+        ),
+        (
+            _("Advanced display options"),
+            {
+                "classes": ["collapse"],
+                "fields": (
+                    "extra_css",
+                    "extra_css_allowed",
+                ),
+            },
+        ),
     )
     inlines = [SiteConfigurationPageInline]
     form = SiteConfigurarionAdminForm
+
+    readonly_fields = [
+        "extra_css_allowed",
+    ]
+
+    @admin.display(
+        description=_("Allowed CSS properties"),
+    )
+    def extra_css_allowed(self, obj):
+        columns = split(ALLOWED_PROPERTIES, 4)
+
+        def _get_column(props):
+            return format_html_join("", "{}<br>", ((p,) for p in props))
+
+        return format_html(
+            '<div class="css-properties-table">\n{}\n</div>',
+            format_html_join(
+                "\n",
+                '<div class="css-properties-table__column">{}</div>',
+                ((_get_column(c),) for c in columns),
+            ),
+        )
 
     def report_contrast_ratio(self, request, obj):
         def check_contrast_ratio(label1, color1, label2, color2, expected_ratio):
@@ -226,6 +286,13 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
             obj.accent_color,
             _("Accent font color"),
             obj.accent_font_color,
+            ACCESSIBLE_CONTRAST_RATIO,
+        )
+        check_contrast_ratio(
+            _("Warning banner background color"),
+            obj.warning_banner_background_color,
+            _("Warning banner font color"),
+            obj.warning_banner_font_color,
             ACCESSIBLE_CONTRAST_RATIO,
         )
 

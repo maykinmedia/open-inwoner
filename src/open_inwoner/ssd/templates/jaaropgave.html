@@ -53,15 +53,14 @@
                 <tr class="yearly-report__tr">
                     <th class="yearly-report__th">{{ jaaropgave.fiscaalloon.key }}</th>
                     <th class="yearly-report__th">{{ jaaropgave.loonheffing.key }}</th>
-                    <th class="yearly-report__th">{{ jaaropgave.arbeidskorting.key }}</th>
+                    <th class="yearly-report__th">Verrekende arbeidskorting</th>
                     <th class="yearly-report__th">{{ jaaropgave.loon_heffings_korting.key }}</th>
                     <th class="yearly-report__th">{{ jaaropgave.loon_heffings_korting.code_label }}</th>
                 </tr>
                 <tr class="yearly-report__tr">
                     <td class="yearly-report__td">{{ jaaropgave.fiscaalloon.sign }} {{ jaaropgave.fiscaalloon.value }}</td>
                     <td class="yearly-report__td">{{ jaaropgave.loonheffing.sign }} {{ jaaropgave.loonheffing.value }}</td>
-                    <!-- TODO: check if this needs to be changed; hard-coded for now. -->
-                    <td class="yearly-report__td">0</td>
+                    <th class="yearly-report__th">0</th>
                     <!-- Display first date -->
                     <td class="yearly-report__td">{{ jaaropgave.loon_heffings_korting.dates.0.ingangsdatum }}</td>
                     <td class="yearly-report__td">{{ jaaropgave.loon_heffings_korting.dates.0.code }}</td>
@@ -90,14 +89,13 @@
                 <tr class="yearly-report__tr">
                     <th class="yearly-report__th">{{ client.bsn_label }}</th>
                     <th class="yearly-report__th">{{ jaaropgave.loon_zorgverzekeringswet.key }}</th>
-                    <th class="yearly-report__th">{{ jaaropgave.ingehouden_bijdrage.key }}</th>
+                    <th class="yearly-report__th">Ingehouden bijdrage Zorgverzekeringswet</th>
                     <th class="yearly-report__th">{{ jaaropgave.periode.key }}</th>
                 </tr>
                 <tr class="yearly-report__tr">
                     <td class="yearly-report__td">{{ client.bsn }}</td>
-                    <!-- `loon_zvw` is calculated based on `fiscaalloon` - `vergoeding_premie` -->
                     <td class="yearly-report__td">{{ jaaropgave.loon_zorgverzekeringswet.value }}</td>
-                    <td class="yearly-report__td">{{ jaaropgave.ingehouden_bijdrage.sign }} {{ jaaropgave.ingehouden_bijdrage.value }}</td>
+                    <td class="yearly-report__td">0</td>
                     <td class="yearly-report__td">{{ jaaropgave.periode.van }} t/m {{ jaaropgave.periode.tot }}</td>
                 </tr>
             </table>
@@ -119,8 +117,6 @@
                     <th class="yearly-report__th">{{ jaaropgave.code_loonbelastingtabel.key }}</th>
                 </tr>
                 <tr class="yearly-report__tr">
-                    <!-- Hard-coded to 0 for now as different values don't make sense for the current purpose -->
-                    <!-- Cf. the Response2018.xslt template provided in the Taiga files -->
                     <td class="yearly-report__td">0</td>
                     <td class="yearly-report__td">0</td>
                     <td class="yearly-report__td">{{ jaaropgave.werkgevers_heffing_premie.value }}</td>
@@ -132,11 +128,8 @@
     <br/>
     <!-- TOELICHTING -->
     <section class="section section__toelichting extra-margin">
-        <div class="heading">
-            <h3 class="h3">Toelichting</h3>
-        </div>
         <div class="subsection extra-margin">
-            <p class="yearly-report__p">{{ jaaropgave_comments|markdown|safe }}</p>
+            <p class="yearly-report__p yearly-report__comments" >{{ jaaropgave_comments|markdown|safe }}</p>
         </div>
     </section>
 </div>

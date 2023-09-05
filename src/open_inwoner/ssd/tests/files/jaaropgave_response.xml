@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:gwsd="http://www.centric.nl/GWS/Diensten/JaarOpgaveClient/v0400" xmlns:ns3="http://www.centric.nl/GWS/Header/v0201" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:wsa="http://www.w3.org/2005/08/addressing" xsi:schemaLocation="http://www.centric.nl/GWS/Diensten/JaarOpgaveClient/v0400 Diensten\JaarOpgaveClient\v0400-b01\BodyReaction_resolved.xsd">
  <SOAP-ENV:Header>
-  <wsa:MessageID>832D9371-8F47-4EDA-8A3F-A5D29EDEB98F</wsa:MessageID>
+  <wsa:MessageID>739ABF07-3828-4477-9D2A-584045771D24</wsa:MessageID>
   <wsa:Action>http://www.centric.nl/GWS/Diensten/JaarOpgaveClient-v0400/JaarOpgaveInfoResponse</wsa:Action>
-  <wsa:RelatesTo>urn:uuid:709f2981-9d6b-4f29-8288-b90eb6729aa0</wsa:RelatesTo>
+  <wsa:RelatesTo>urn:uuid:6be8d30a-7590-43de-9731-7c8dcbde91ad</wsa:RelatesTo>
   <wsa:From>
    <wsa:Address>https://rfor-2securet1.rfor.local:8443/ENSC/Intern/SSD/JaarOpgaveClient-v0400</wsa:Address>
   </wsa:From>
@@ -15,13 +15,13 @@
     </Bron>
     <Bestemming>
      <Gemeentecode>0153</Gemeentecode>
-     <ApplicatieNaam>e-Suite</ApplicatieNaam>
+     <ApplicatieNaam>Open Inwoner</ApplicatieNaam>
     </Bestemming>
    </RouteInformatie>
    <BerichtIdentificatie>
-    <DatTijdAanmaakRequest>2023-03-09T10:39:36.979+01:00</DatTijdAanmaakRequest>
-    <DatTijdOntvangstRequest>2023-05-26T11:29:16+02:00</DatTijdOntvangstRequest>
-    <DatTijdAanmaakResponse>2023-05-26T11:29:17+02:00</DatTijdAanmaakResponse>
+    <DatTijdAanmaakRequest>2023-08-17T09:09:26+0200</DatTijdAanmaakRequest>
+    <DatTijdOntvangstRequest>2023-08-17T09:09:26+02:00</DatTijdOntvangstRequest>
+    <DatTijdAanmaakResponse>2023-08-17T09:09:28+02:00</DatTijdAanmaakResponse>
    </BerichtIdentificatie>
   </ns3:Header>
  </SOAP-ENV:Header>
@@ -29,17 +29,17 @@
   <gwsd:JaarOpgaveInfoResponse>
    <JaarOpgaveClient>
     <Client>
-     <BurgerServiceNr>123456789</BurgerServiceNr>
-     <Voornamen>Fabiënne Maria Charlotte</Voornamen>
-     <Voorletters>F.M.C.</Voorletters>
-     <Voorvoegsel>van den</Voorvoegsel>
-     <Achternaam>Berg</Achternaam>
+     <BurgerServiceNr>900038937</BurgerServiceNr>
+     <Voornamen>Fabiënne Maria Charlotte Elsbeth</Voornamen>
+     <Voorletters>F.M.C.E</Voorletters>
+     <Voorvoegsel>van der</Voorvoegsel>
+     <Achternaam>Achterhuüskamp</Achternaam>
      <AanduidingNaamgebruik>3</AanduidingNaamgebruik>
      <Adres>
-      <Straatnaam>Dummystraat</Straatnaam>
-      <Huisnummer>42</Huisnummer>
+      <Straatnaam>Robinson Crusoëstraat</Straatnaam>
+      <Huisnummer>21</Huisnummer>
       <Huisletter>a</Huisletter>
-      <Postcode>88888</Postcode>
+      <Postcode>7541AA</Postcode>
       <Woonplaatsnaam>Enschede</Woonplaatsnaam>
       <Gemeentenaam>Enschede</Gemeentenaam>
      </Adres>
@@ -48,15 +48,15 @@
      <Inhoudingsplichtige>
       <Gemeentecode>0153</Gemeentecode>
       <Gemeentenaam>Enschede</Gemeentenaam>
-      <Bezoekadres>Fantasiestraat 42</Bezoekadres>
-      <Postcode>1234AD</Postcode>
+      <Bezoekadres>Hengelosestraat 51</Bezoekadres>
+      <Postcode>7514AD</Postcode>
       <Woonplaatsnaam>Enschede</Woonplaatsnaam>
      </Inhoudingsplichtige>
      <SpecificatieJaarOpgave>
       <Regeling>Participatiewet</Regeling>
-      <Dienstjaar>1985</Dienstjaar>
-      <AangiftePeriodeVan>19850101</AangiftePeriodeVan>
-      <AangiftePeriodeTot>19851231</AangiftePeriodeTot>
+      <Dienstjaar>2022</Dienstjaar>
+      <AangiftePeriodeVan>20220101</AangiftePeriodeVan>
+      <AangiftePeriodeTot>20221231</AangiftePeriodeTot>
       <Fiscaalloon>
        <CdPositiefNegatief>+</CdPositiefNegatief>
        <WaardeBedrag>7305</WaardeBedrag>
@@ -100,12 +100,8 @@
        <WaardeBedrag>26</WaardeBedrag>
       </OntvangstenWerkgeversheffingPremieZVW>
       <Loonheffingskorting>
-       <Ingangsdatum>19840101</Ingangsdatum>
+       <Ingangsdatum>20220101</Ingangsdatum>
        <CdLoonheffingskorting>1</CdLoonheffingskorting>
-      </Loonheffingskorting>
-      <Loonheffingskorting>
-       <Ingangsdatum>19850101</Ingangsdatum>
-       <CdLoonheffingskorting>2</CdLoonheffingskorting>
       </Loonheffingskorting>
       <BelasteAlimentatie>
        <CdPositiefNegatief>+</CdPositiefNegatief>

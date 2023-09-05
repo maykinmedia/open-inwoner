@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Union
+from typing import Type, Union
 
 from django import forms
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -14,12 +14,12 @@ from .forms import MonthlyReportsForm, YearlyReportsForm
 class BenefitsFormView(LoginRequiredMixin, FormView):
     template_name: str
     form_class: forms.Form
-    ssd_client: Union[JaaropgaveClient, UitkeringClient]
+    ssd_client_type: Union[Type[JaaropgaveClient], Type[UitkeringClient]]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        client = self.ssd_client()
+        client = self.ssd_client_type()
 
         context["client"] = client
 
@@ -37,9 +37,9 @@ class BenefitsFormView(LoginRequiredMixin, FormView):
 
             bsn = request.user.bsn
             report_date_iso = form.data["report_date"]
-            base_url = request.build_absolute_uri()
+            request_base_url = request.build_absolute_uri()
 
-            pdf_content = client.get_report(bsn, report_date_iso, base_url)
+            pdf_content = client.get_report(bsn, report_date_iso, request_base_url)
 
             if pdf_content is None:
                 return redirect(
@@ -56,10 +56,10 @@ class BenefitsFormView(LoginRequiredMixin, FormView):
 class MonthlyBenefitsFormView(BenefitsFormView):
     template_name = "pages/ssd/monthly_reports_list.html"
     form_class = MonthlyReportsForm
-    ssd_client = UitkeringClient
+    ssd_client_type = UitkeringClient
 
 
 class YearlyBenefitsFormView(BenefitsFormView):
     template_name = "pages/ssd/yearly_reports_list.html"
     form_class = YearlyReportsForm
-    ssd_client = JaaropgaveClient
+    ssd_client_type = JaaropgaveClient

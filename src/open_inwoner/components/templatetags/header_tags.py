@@ -1,7 +1,6 @@
 from django import template
 
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.questionnaire.models import QuestionnaireStep
 
 register = template.Library()
 
@@ -23,69 +22,3 @@ def accessibility_header(request, **kwargs):
     config = SiteConfiguration.get_solo()
     kwargs["help_text"] = config.get_help_text(request)
     return {**kwargs, "request": request}
-
-
-@register.inclusion_tag("components/Header/Header.html")
-def header(categories, request, **kwargs):
-    """
-    Displaying the header.
-
-    Usage:
-        {% header categories=Category.objects.all request=request %}
-
-    Variables:
-        + categories: Category[] | The categories that should be displayed in the theme dropdown.
-        + request: Request | the django request object.
-        - has_general_faq_questions: boolean | If the FAQ menu item should be shown.
-    """
-    return {
-        **kwargs,
-        "categories": categories,
-        "request": request,
-    }
-
-
-@register.inclusion_tag("components/Header/PrimaryNavigation.html")
-def primary_navigation(categories, request, **kwargs):
-    """
-    Displaying the primary navigation
-
-    Usage:
-        {% primary_navigation categories=Category.objects.all request=request %}
-
-    Variables:
-        + categories: Category[] | The categories that should be displayed in the theme dropdown.
-        + request: Request | The django request object.
-        + questionnaire: QuestionnaireStep | The default QuestionnaireStep, if any.
-        - has_general_faq_questions: boolean | If the FAQ menu item should be shown.
-        - show_plans: boolean | If the Plan item should be shown.
-    """
-
-    return {
-        **kwargs,
-        "categories": categories,
-        "request": request,
-    }
-
-
-@register.inclusion_tag("components/Header/NavigationAuthenticated.html")
-def navigation_authenticated(categories, request, **kwargs):
-    """
-    Displaying the desktop navigation when user is authenticated
-
-    Usage:
-        {% navigation_authenticated categories=Category.objects.all request=request %}
-
-    Variables:
-        + categories: Category[] | The categories that should be displayed in the theme dropdown.
-        + request: Request | The django request object.
-        + questionnaire: QuestionnaireStep | The default QuestionnaireStep, if any.
-        - has_general_faq_questions: boolean | If the FAQ menu item should be shown.
-        - show_plans: boolean | If the Plan item should be shown.
-    """
-
-    return {
-        **kwargs,
-        "categories": categories,
-        "request": request,
-    }

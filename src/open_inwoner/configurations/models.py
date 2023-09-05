@@ -12,6 +12,8 @@ from solo.models import SingletonModel
 from open_inwoner.utils.validators import DutchPhoneNumberValidator
 
 from ..utils.colors import hex_to_hsl
+from ..utils.css import clean_stylesheet
+from ..utils.fields import CSSField
 from ..utils.validators import FilerExactImageSizeValidator
 from .choices import ColorTypeChoices, OpenIDDisplayChoices
 from .validators import validate_oidc_config
@@ -56,6 +58,26 @@ class SiteConfiguration(SingletonModel):
         choices=ColorTypeChoices.choices,
         default=ColorTypeChoices.dark,
         help_text=_("The font color for when the background is the accent color"),
+    )
+    warning_banner_enabled = models.BooleanField(
+        verbose_name=_("Show warning banner"),
+        default=False,
+        help_text=_("Whether the warning banner should be displayed"),
+    )
+    warning_banner_text = models.TextField(
+        verbose_name=_("Warning banner text"),
+        blank=True,
+        help_text=_("Text will be displayed on the warning banner"),
+    )
+    warning_banner_background_color = ColorField(
+        verbose_name=_("Warning banner background"),
+        default="#FFDBAD",
+        help_text=_("The background color for the warning banner"),
+    )
+    warning_banner_font_color = ColorField(
+        verbose_name=_("Warning banner font"),
+        default="#000000",
+        help_text=_("The font color for the warning banner"),
     )
     logo = FilerImageField(
         verbose_name=_("Logo"),
@@ -445,12 +467,39 @@ class SiteConfiguration(SingletonModel):
         default=True,
         help_text=_("Whether file sharing via the messages is allowed or not"),
     )
+    hide_categories_from_anonymous_users = models.BooleanField(
+        verbose_name=_("Hide categories from anonymous users"),
+        default=False,
+        help_text=_(
+            "If checked, categories will be hidden from users who are not logged in."
+        ),
+    )
+    hide_search_from_anonymous_users = models.BooleanField(
+        verbose_name=_("Hide search from anonymous users"),
+        default=False,
+        help_text=_(
+            "If checked, only authenticated users will be able to search the page."
+        ),
+    )
+
+    extra_css = CSSField(
+        blank=True,
+        verbose_name=_("Extra CSS"),
+        help_text=_(
+            "Additional CSS added to the page. Note only a (safe) subset of CSS properties is supported."
+        ),
+    )
 
     class Meta:
         verbose_name = _("Site Configuration")
 
     def __str__(self):
         return str(_("Site Configuration"))
+
+    def save(self, *args, **kwargs):
+        if self.extra_css:
+            self.extra_css = clean_stylesheet(self.extra_css)
+        super().save(*args, **kwargs)
 
     @property
     def get_primary_color(self):

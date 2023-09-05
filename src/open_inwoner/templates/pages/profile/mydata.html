@@ -33,15 +33,15 @@
                 </div>
                 <div class="tabled__row">
                     <div class="tabled__item tabled__item--bold">{% trans "Voorvoegsel" %}</div>
-                    <div class="tabled__item">{{my_data.prefix|default:"-"}}</div>
+                    <div class="tabled__item">{{my_data.infix|default:"-"}}</div>
                 </div>
                 <div class="tabled__row">
                     <div class="tabled__item tabled__item--bold">{% trans "Geboortedatum" %}</div>
-                    <div class="tabled__item">{{my_data.birthday|default:"-"}}</div>
+                    <div class="tabled__item">{{my_data.birthday|date:"d-m-Y"|default:"-"}}</div>
                 </div>
                 <div class="tabled__row">
                     <div class="tabled__item tabled__item--bold">{% trans "Geboorteplaats" %}</div>
-                    <div class="tabled__item">{{my_data.birthday_place|default:"-"}}</div>
+                    <div class="tabled__item">{{my_data.birth_place|default:"-"}}</div>
                 </div>
                 <div class="tabled__row">
                     <div class="tabled__item tabled__item--bold">{% trans "Burgerservicenummer (BSN)" %}</div>
@@ -63,7 +63,7 @@
                 </div>
                 <div class="tabled__row">
                     <div class="tabled__item tabled__item--bold">{% trans "Huisnummer" %}</div>
-                    <div class="tabled__item">{{my_data.house_number|default:"-"}}</div>
+                    <div class="tabled__item">{{my_data.housenumber|default:"-"}}</div>
                 </div>
                 <div class="tabled__row">
                     <div class="tabled__item tabled__item--bold">{% trans "Postcode" %}</div>
@@ -71,11 +71,11 @@
                 </div>
                 <div class="tabled__row">
                     <div class="tabled__item tabled__item--bold">{% trans "Plaats" %}</div>
-                    <div class="tabled__item">{{my_data.place|default:"-"}}</div>
+                    <div class="tabled__item">{{my_data.city|default:"-"}}</div>
                 </div>
                 <div class="tabled__row">
                     <div class="tabled__item tabled__item--bold">{% trans "Land" %}</div>
-                    <div class="tabled__item">{{my_data.land|default:"-"}}</div>
+                    <div class="tabled__item">{{my_data.country|default:"-"}}</div>
                 </div>
             </div>
 

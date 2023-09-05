@@ -1,6 +1,8 @@
 import logging
+from datetime import timedelta
 from typing import List
 
+from django.conf import settings
 from django.urls import reverse
 
 from mail_editor.helpers import find_template
@@ -26,6 +28,7 @@ from open_inwoner.openzaak.catalog import (
     fetch_single_status_type,
 )
 from open_inwoner.openzaak.documents import fetch_single_information_object_url
+from open_inwoner.openzaak.managers import UserCaseInfoObjectNotificationManager
 from open_inwoner.openzaak.models import (
     OpenZaakConfig,
     UserCaseInfoObjectNotification,
@@ -222,7 +225,17 @@ def handle_zaakinformatieobject_update(
         )
         return
 
+    # let's not spam the users
+    period = timedelta(seconds=settings.ZGW_LIMIT_NOTIFICATIONS_FREQUENCY)
+    if note.has_received_similar_notes_within(period):
+        log_system_action(
+            f"blocked over-frequent zaakinformatieobject notification email for user '{user}' zaakinformatieobject {zaak_info_object.url} case {case.url}",
+            log_level=logging.INFO,
+        )
+        return
+
     send_case_update_email(user, case)
+    note.mark_sent()
 
     log_system_action(
         f"send zaakinformatieobject notification email for user '{user}' zaakinformatieobject {zaak_info_object.url} case {case.url}",
@@ -323,7 +336,17 @@ def handle_status_update(user: User, case: Zaak, status: Status):
         )
         return
 
+    # let's not spam the users
+    period = timedelta(seconds=settings.ZGW_LIMIT_NOTIFICATIONS_FREQUENCY)
+    if note.has_received_similar_notes_within(period):
+        log_system_action(
+            f"blocked over-frequent status notification email for user '{user}' status {status.url} case {case.url}",
+            log_level=logging.INFO,
+        )
+        return
+
     send_case_update_email(user, case)
+    note.mark_sent()
 
     log_system_action(
         f"send status notification email for user '{user}' status {status.url} case {case.url}",
@@ -336,7 +359,7 @@ def send_case_update_email(user: User, case: Zaak):
     send the actual mail
     """
     case_detail_url = build_absolute_url(
-        reverse("cases:case_detail_content", kwargs={"object_id": str(case.uuid)})
+        reverse("cases:case_detail", kwargs={"object_id": str(case.uuid)})
     )
 
     template = find_template("case_notification")
