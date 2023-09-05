@@ -1545,8 +1545,6 @@ msgstr "Secundaire paginanavigatie"
 #: cms/cases/views/cases.py:113 cms/cases/views/submissions.py:25
 #: cms/cases/views/submissions.py:29 cms/cases/views/submissions.py:55
 #: cms/cases/views/submissions.py:63
-#, fuzzy
-#| msgid "Open aanvragen"
 msgid "Openstaande aanvragen"
 msgstr "Open aanvragen"
 
@@ -2420,7 +2418,7 @@ msgstr "De link naar je zaakdetail pagina"
 
 #: conf/parts/maileditor.py:354
 msgid "Contact form registration notification"
-msgstr "Registratie via contactformulier"
+msgstr "Contactformulier inzending"
 
 #: conf/parts/maileditor.py:355
 msgid "This email is used to register a contact form submission"
@@ -2460,8 +2458,6 @@ msgid "Images"
 msgstr "Afbeeldingen"
 
 #: configurations/admin.py:113
-#, fuzzy
-#| msgid "Login Banner"
 msgid "Warning banner"
 msgstr "Waarschuwingsbanner"
 
@@ -2494,10 +2490,8 @@ msgid "Cookie consent"
 msgstr "Toestemming voor cookies"
 
 #: configurations/admin.py:212
-#, fuzzy
-#| msgid "System - anonymous user"
 msgid "Display options for anonymous users"
-msgstr "System - anonieme gebruiker"
+msgstr "Weergave opties voor anonieme gebruikers"
 
 #: configurations/admin.py:221
 msgid "Advanced display options"
@@ -2539,8 +2533,6 @@ msgid "Warning banner background color"
 msgstr "De achtergrondkleur van de waarschuwingsbanner"
 
 #: configurations/admin.py:294
-#, fuzzy
-#| msgid "Primary font color"
 msgid "Warning banner font color"
 msgstr "Waarschuwingsbanner tekstkleur"
 
@@ -2593,14 +2585,10 @@ msgid "Show warning banner"
 msgstr "Toon waarschuwingsbanner"
 
 #: configurations/models.py:65
-#, fuzzy
-#| msgid "Whether the category should be published or not."
 msgid "Whether the warning banner should be displayed"
 msgstr "Of de waarschuwingsbanner zichtbaar moet zijn of niet."
 
 #: configurations/models.py:68
-#, fuzzy
-#| msgid "Banner Text"
 msgid "Warning banner text"
 msgstr "Tekstinhoud waarschuwingsbanner"
 
@@ -2621,8 +2609,6 @@ msgid "Warning banner font"
 msgstr "Waarschuwingsbanner tekst"
 
 #: configurations/models.py:80
-#, fuzzy
-#| msgid "The font color for when the background is the accent color"
 msgid "The font color for the warning banner"
 msgstr "De tekstkleur voor de waarschuwingsbanner"
 
@@ -3166,14 +3152,10 @@ msgid "The text that is displayed as the link to the cookie policy."
 msgstr "De tekst die wordt gebruikt als link naar de privacypagina."
 
 #: configurations/models.py:427
-#, fuzzy
-#| msgid "Print pagina"
 msgid "Privacy page link"
 msgstr "URL van de privacypagina"
 
 #: configurations/models.py:428
-#, fuzzy
-#| msgid "The link to the plan."
 msgid "The link to the cookie policy page."
 msgstr "De link naar de pagina met het privacybeleid."
 
@@ -3233,8 +3215,6 @@ msgstr ""
 "uitgeschakeld dan kunnen alleen tekstberichten worden verzonden"
 
 #: configurations/models.py:471
-#, fuzzy
-#| msgid "Redirect anonymous user to"
 msgid "Hide categories from anonymous users"
 msgstr "Verberg het Onderwerpen-menu voor niet-ingelogde gebruikers"
 
@@ -3243,8 +3223,6 @@ msgid "If checked, categories will be hidden from users who are not logged in."
 msgstr "Indien geselecteerd: alleen ingelogde gebruikers zien het Onderwerpen-menu."
 
 #: configurations/models.py:478
-#, fuzzy
-#| msgid "System - anonymous user"
 msgid "Hide search from anonymous users"
 msgstr "Verberg zoekbalk voor anonieme gebruiker"
 
@@ -4003,8 +3981,6 @@ msgid "CTA Button text"
 msgstr "Tekst van CTA knop"
 
 #: pdc/models/product.py:87
-#, fuzzy
-#| msgid "The title of the text block"
 msgid "The text displayed on the button."
 msgstr "De tekst die zichtbaar is in de CTA knop"
 
@@ -4848,10 +4824,8 @@ msgid "Invalid page (%(page_number)s): %(message)s"
 msgstr "Ongelidge pagina (%(page_number)s): %(message)s"
 
 #: soap/admin.py:28
-#, fuzzy
-#| msgid "Requires authentication"
 msgid "Authentication"
-msgstr "Inloggen is verplicht"
+msgstr "Authenticatie"
 
 #: soap/models.py:11
 msgid "label"
@@ -4876,10 +4850,8 @@ msgid ""
 msgstr "Het SSL-certificaatbestand dat wordt gebruikt voor clientidentificatie. Indien leeg gelaten, is wederzijdse TLS uitgeschakeld."
 
 #: soap/models.py:35
-#, fuzzy
-#| msgid "The identification of the case"
 msgid "The SSL/TLS certificate of the server"
-msgstr "De zaakidentificatie"
+msgstr "Het SSL/TLS certificaat van de server"
 
 #: soap/models.py:41 ssd/models.py:19
 msgid "SOAP service"
@@ -4890,44 +4862,30 @@ msgid "SOAP services"
 msgstr "SOAP services"
 
 #: ssd/admin.py:13
-#, fuzzy
-#| msgid "Documents"
 msgid "SSD clients"
 msgstr "SSD clients"
 
 #: ssd/admin.py:25
-#, fuzzy
-#| msgid "Mijn uitkeringen"
 msgid "Mijn Uitkeringen"
 msgstr "Mijn uitkeringen"
 
 #: ssd/admin.py:27
-#, fuzzy
-#| msgid "Maandspecificaties"
 msgid "Maandspecificatie"
 msgstr "Maandspecificatie"
 
 #: ssd/admin.py:38
-#, fuzzy
-#| msgid "Jaaropgaven"
 msgid "Jaaropgave"
 msgstr "Jaaropgave"
 
 #: ssd/admin.py:52
-#, fuzzy
-#| msgid "Site Configuration"
 msgid "SSD configuration"
 msgstr "SSD configuratie"
 
 #: ssd/cms_apps.py:10
-#, fuzzy
-#| msgid "Mijn uitkeringen"
 msgid "Mijn Uitkeringen app"
 msgstr "Mijn uitkeringen app"
 
 #: ssd/models.py:26
-#, fuzzy
-#| msgid "Maandspecificaties"
 msgid "Maandspecificatie endpoint"
 msgstr "Maandspecificaties endpoint"
 
@@ -4936,8 +4894,6 @@ msgid "Endpoint for the maandspecificatie request"
 msgstr "Endpoint voor het maandspecificatie request"
 
 #: ssd/models.py:32
-#, fuzzy
-#| msgid "Jaaropgaven"
 msgid "Jaaropgave endpoint"
 msgstr "Jaaropgave endpoint"
 
@@ -4946,26 +4902,18 @@ msgid "Endpoint for the jaaropgave request"
 msgstr "Endpoint voor het jaaropgave request"
 
 #: ssd/models.py:38
-#, fuzzy
-#| msgid "Location name"
 msgid "Application name"
 msgstr "Applicatie naam"
 
 #: ssd/models.py:40
-#, fuzzy
-#| msgid "Name of the organization"
 msgid "Name of the application"
 msgstr "Naam van de organisatie"
 
 #: ssd/models.py:45
-#, fuzzy
-#| msgid "Display name"
 msgid "Company name"
 msgstr "Bedrijfsnaam"
 
 #: ssd/models.py:47
-#, fuzzy
-#| msgid "Name of the site"
 msgid "Name of the supplier"
 msgstr "Naam van de leverancier"
 
@@ -4978,8 +4926,6 @@ msgid "Municipality code to register zaken"
 msgstr "Gemeente code voor zaakregistratie"
 
 #: ssd/models.py:59
-#, fuzzy
-#| msgid "Negative text"
 msgid "Overview text"
 msgstr "Tekst voor overzicht"
 
@@ -4988,8 +4934,6 @@ msgid "The text displayed as overview of the 'Mijn Uitkeringen' section."
 msgstr "De introductietekst voor de 'Mijn Uitkeringen' sectie."
 
 #: ssd/models.py:65 ssd/models.py:92
-#, fuzzy
-#| msgid "Enable document upload"
 msgid "Enable download"
 msgstr "Activeer documentuploads"
 
@@ -5008,8 +4952,6 @@ msgid ""
 msgstr "Dag en maand vanaf wanneer de jaaroverzichten beschikbaar zijn "
 
 #: ssd/models.py:81 ssd/models.py:107
-#, fuzzy
-#| msgid "Display name"
 msgid "Display text"
 msgstr "Tabblad tekst"
 
@@ -5018,14 +4960,10 @@ msgid "The text displayed as overview of the 'Jaaropgave' tab"
 msgstr "De introductietekst van het jaaroverzicht-tabblad"
 
 #: ssd/models.py:86
-#, fuzzy
-#| msgid "Help texts"
 msgid "PDF help text"
 msgstr "PDF Helpteksten"
 
 #: ssd/models.py:88
-#, fuzzy
-#| msgid "The help text for the home page."
 msgid "Help text for the columns in the Jaaropgave PDF"
 msgstr "Helptekst voor de kolommen in de Jaaropgave PDF"
 
@@ -5153,10 +5091,8 @@ msgid "Terug naar boven"
 msgstr "Terug naar boven"
 
 #: templates/master.html:120
-#, fuzzy
-#| msgid "Alle onderwerpen"
 msgid "Alles weigeren"
-msgstr "Alle onderwerpen"
+msgstr "Alles weigeren"
 
 #: templates/master.html:121
 msgid "Alles toestaan"
@@ -5190,8 +5126,6 @@ msgstr "Bekijk aanvraag"
 
 #: templates/pages/cases/list_outer.html:15
 #: templates/pages/cases/status_outer.html:22
-#, fuzzy
-#| msgid "Gegevens"
 msgid "Gegevens laden..."
 msgstr "Gegevens laden..."
 
