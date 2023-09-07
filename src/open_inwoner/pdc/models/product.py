@@ -1,3 +1,4 @@
+import html
 import json
 from typing import Union
 from uuid import uuid4
@@ -5,6 +6,7 @@ from uuid import uuid4
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.urls import reverse
+from django.utils.html import strip_tags
 from django.utils.translation import ugettext_lazy as _
 
 from filer.fields.file import FilerFileField
