@@ -29,7 +29,7 @@
                 <div class="grid__main">
                     <div class="search-results">
                         <h2 class="h2 search-results__title">
-                            Zoekresultaten
+                            {% trans "Zoekresultaten" %}
                             <span class="search-results__title-small">{{paginator.count}} zoekresultaten</span>
 
                         </h2>
@@ -46,6 +46,25 @@
                     </div>
 
                     {% pagination page_obj=page_obj paginator=paginator request=request %}
+                </div>
+            </div>
+        {% else %}
+            <div class="grid">
+                {% spaceless %}
+                <div class="grid__sidebar">&nbsp;</div>
+                {% endspaceless %}
+                <div class="grid__main">
+                    <div class="search-results search-results--none">
+                        <h2 class="h2 search-results__title">
+                            {% trans "Geen zoekresultaten" %}
+                        </h2>
+                        <p class="p">{% trans "Helaas, wij vonden geen resultaten voor jouw zoekopdracht." %}</p>
+                    </div>
+                    <ul class="ul">
+                       <li class="li">{% trans "Controleer de spelling van je zoekopdracht." %}</li>
+                       <li class="li">{% trans "Probeer een andere zoekopdracht." %}</li>
+                       <li class="li">{% trans "Vragen? Neem contact met ons op." %}</li>
+                    </ul>
                 </div>
             </div>
         {% endif %}
