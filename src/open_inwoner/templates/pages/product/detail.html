@@ -129,7 +129,7 @@
 
             {% render_column span=9 %}
                 {% if object.contacts.exists %}
-                    {% render_notification type='success' icon=False %}
+                    <div class="contact-block">
                         <h3 class="h3" id="contact">{% trans 'Contact' %}</h3>
 
                         {% for contact in object.contacts.all %}
@@ -144,7 +144,7 @@
                                     {% endrender_column %}
 
                                     {% render_column start=7 span=6 %}
-                                        {% link href='tel:'|add:contact.phonenumber text=contact.phonenumber primary=True %}
+                                        {% link href='tel:'|add:contact.phonenumber text=contact.phonenumber secondary=True %}
                                     {% endrender_column %}
                                 {% endif %}
 
@@ -154,12 +154,12 @@
                                     {% endrender_column %}
 
                                     {% render_column start=7 span=6 %}
-                                        {% link href='mailto:'|add:contact.email text=contact.email primary=True %}
+                                        {% link href='mailto:'|add:contact.email text=contact.email secondary=True %}
                                     {% endrender_column %}
                                 {% endif %}
                             {% endrender_grid %}
                         {% endfor %}
-                    {% endrender_notification %}
+                    </div>
                 {% endif %}
             {% endrender_column %}
         {% endrender_grid %}

@@ -93,7 +93,7 @@
                             <ul class="header__list">
                                 <li class="header__list-item">
                                     {% trans "Logout" as logout %}
-                                    {% link text=logout href=request.user.get_logout_url icon="arrow_forward" icon_position="before" primary=True %}
+                                    {% link text=logout href=request.user.get_logout_url icon="arrow_forward" icon_position="before" secondary=True %}
                                 </li>
                             </ul>
                         {% elif config.login_show %}
