@@ -1,0 +1,15 @@
+{% load solo_tags link_tags %}
+<nav class="footer__links" aria-label="Footer navigatie">
+    <ul class="footer__list">
+        {% if has_form_configuration %}
+            <li class="footer__list-item">
+                {% link text=_("Contact formulier") secondary=True href="contactform" %}
+            </li>
+        {% endif %}
+        {% for flatpage in flatpages %}
+            <li class="footer__list-item">
+                {% link text=flatpage.title secondary=True href=flatpage.get_absolute_url %}
+            </li>
+        {% endfor %}
+    </ul>
+</nav>

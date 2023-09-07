@@ -162,19 +162,6 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                 ),
             },
         ),
-        (
-            _("Footer addresses"),
-            {
-                "fields": (
-                    "footer_visiting_title",
-                    "footer_visiting_intro",
-                    "footer_visiting_phonenumber",
-                    "footer_visiting_map",
-                    "footer_mailing_title",
-                    "footer_mailing_intro",
-                )
-            },
-        ),
         (_("Emails"), {"fields": ("email_new_message",)}),
         (
             _("Openid Connect"),

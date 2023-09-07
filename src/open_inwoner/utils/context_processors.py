@@ -52,15 +52,12 @@ def settings(request):
                 "select_questionnaire_title": config.select_questionnaire_title,
                 "select_questionnaire_intro": config.select_questionnaire_intro,
             },
-            "footer": {
-                "footer_visiting_title": config.footer_visiting_title,
-                "footer_visiting_intro": config.footer_visiting_intro,
-                "footer_visiting_phonenumber": config.footer_visiting_phonenumber,
-                "footer_visiting_map": config.footer_visiting_map,
-                "footer_mailing_title": config.footer_mailing_title,
-                "footer_mailing_intro": config.footer_mailing_intro,
-                "flatpages": config.get_ordered_flatpages,
-            },
+        },
+        "footer": {
+            "logo": config.footer_logo,
+            "logo_alt": config.name,
+            "logo_url": config.footer_logo_url,
+            "logo_title": config.footer_logo_title,
         },
         "hero_image_login": (
             config.hero_image_login.file.url if config.hero_image_login else ""

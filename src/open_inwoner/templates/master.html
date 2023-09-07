@@ -1,4 +1,4 @@
-{% load static i18n header_tags card_tags footer_tags button_tags link_tags notification_tags anchor_menu_tags view_breadcrumbs utils session_tags django_htmx cms_tags menu_tags sekizai_tags %}<!DOCTYPE html>
+{% load static i18n header_tags card_tags button_tags link_tags notification_tags anchor_menu_tags logo_tags view_breadcrumbs utils session_tags django_htmx cms_tags menu_tags sekizai_tags %}<!DOCTYPE html>
 <html lang="nl" class="view {% block view_class %}view--{{ request.resolver_match.namespaces|join:'-' }}-{{ request.resolver_match.url_name }}{% endblock %}">
     <head>
         <meta charset="utf-8">
@@ -93,7 +93,28 @@
             </main>
         {% endblock main_outer %}
 
-        {% footer footer_texts=configurable_text.footer %}
+        {% if footer %}
+        <footer class="footer">
+            {% if footer.logo_title or footer.logo %}
+            <div class="footer__header">
+                {% if footer.logo_title %}
+                    <div class="footer__logo-text">
+                        <p class="p">{{ footer.logo_title|linebreaksbr }}</p>
+                    </div>
+                {% endif %}
+                {% if footer.logo %}
+                    <div class="footer__logo">
+                        {% logo src=footer.logo.url alt=footer.logo_alt href=footer.logo_url svg_height=60 %}
+                    </div>
+                {% endif %}
+            </div>
+            {% endif %}
+            <div class="footer__left">{% static_placeholder "footer_left" %}</div>
+            <div class="footer__center">{% static_placeholder "footer_center" %}</div>
+            <div class="footer__right">{% static_placeholder "footer_right" %}</div>
+        </footer>
+        {% endif %}
+
         {% session_timeout %}
 
         <dialog class="modal" id="modal" aria-labelledby="modal__title" aria-describedby="modal__text">

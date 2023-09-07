@@ -214,6 +214,7 @@ INSTALLED_APPS = [
     "open_inwoner.cms.collaborate",
     "open_inwoner.cms.banner",
     "open_inwoner.cms.extensions",
+    "open_inwoner.cms.footer",
 ]
 
 MIDDLEWARE = [
@@ -549,9 +550,34 @@ CMS_PLACEHOLDER_CONF = {
     "banner_image": {"plugins": ["BannerImagePlugin"], "name": _("Banner Image")},
     "banner_text": {"plugins": ["BannerTextPlugin"], "name": _("Banner Text")},
     "login_banner": {"plugins": ["BannerImagePlugin"], "name": _("Login Banner")},
+    "footer_left": {
+        "name": _("Footer, Left"),
+        "plugins": ["TextPlugin", "LinkPlugin", "FooterPagesPlugin"],
+        "child_classes": {
+            "TextPlugin": ["LinkPlugin"],
+        },
+    },
+    "footer_center": {
+        "name": _("Footer, Center"),
+        "plugins": ["TextPlugin", "LinkPlugin", "FooterPagesPlugin"],
+        "child_classes": {
+            "TextPlugin": ["LinkPlugin"],
+        },
+    },
+    "footer_right": {
+        "name": _("Footer, Right"),
+        "plugins": ["TextPlugin", "LinkPlugin", "FooterPagesPlugin"],
+        "child_classes": {
+            "TextPlugin": ["LinkPlugin"],
+        },
+    },
 }
 
 CMS_TOOLBAR_ANONYMOUS_ON = False
+
+DJANGOCMS_LINK_TEMPLATES = [
+    ("arrow", _("Arrow")),
+]
 
 #
 # Django-Admin-Index
