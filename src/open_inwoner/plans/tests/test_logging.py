@@ -244,6 +244,6 @@ class TestPlans(WebTest):
                     plan_uuid=self.plan.uuid
                 ),
                 "action_flag": list(LOG_ACTIONS[4]),
-                "content_object_repr": self.user.email,
+                "content_object_repr": str(self.user),
             },
         )

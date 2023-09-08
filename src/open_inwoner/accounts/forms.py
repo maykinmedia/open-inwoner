@@ -1,9 +1,12 @@
+from typing import Optional
+
 from django import forms
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth.forms import PasswordResetForm
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
+from django.db.models import Q
 from django.template import loader
 from django.utils.translation import ugettext_lazy as _
 
@@ -120,18 +123,6 @@ class CustomRegistrationForm(RegistrationForm):
         else:
             self.fields["phonenumber"].required = True
 
-    def clean_email(self):
-        email = self.cleaned_data["email"]
-
-        existing_user = User.objects.filter(email__iexact=email).first()
-        if not existing_user:
-            return email
-
-        if existing_user.is_active:
-            raise ValidationError(_("The user with this email already exists"))
-
-        raise ValidationError(_("This user has been deactivated"))
-
 
 class BaseUserForm(forms.ModelForm):
     class Meta:
@@ -153,6 +144,10 @@ class BaseUserForm(forms.ModelForm):
 
 
 class UserForm(BaseUserForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = kwargs.pop("user")
+
     class Meta:
         model = User
         fields = (
@@ -214,17 +209,13 @@ class NecessaryUserForm(forms.ModelForm):
             if not user.infix:
                 del self.fields["infix"]
 
-    def clean_email(self):
-        email = self.cleaned_data["email"]
-
-        is_existing_user = User.objects.filter(email__iexact=email).exists()
-        if is_existing_user:
-            raise ValidationError(_("The user with this email already exists"))
-
-        return email
-
 
 class CustomPasswordResetForm(PasswordResetForm):
+    def get_users(self, email):
+        users = super().get_users(email)
+        # filter regular email login users
+        return [u for u in users if u.login_type == LoginTypeChoices.default]
+
     def send_mail(
         self,
         subject_template_name,
@@ -236,28 +227,26 @@ class CustomPasswordResetForm(PasswordResetForm):
     ):
         """
         Send a django.core.mail.EmailMultiAlternatives to `to_email`.
+
+        Note: the context has the user specific information / tokens etc
         """
-        email = self.cleaned_data.get("email")
-        user = User.objects.get(email=email)
+        subject = loader.render_to_string(subject_template_name, context)
+        # Email subject *must not* contain newlines
+        subject = "".join(subject.splitlines())
+        body = loader.render_to_string(email_template_name, context)
 
-        if user.login_type == LoginTypeChoices.default:
-            subject = loader.render_to_string(subject_template_name, context)
-            # Email subject *must not* contain newlines
-            subject = "".join(subject.splitlines())
-            body = loader.render_to_string(email_template_name, context)
+        email_message = EmailMultiAlternatives(
+            subject,
+            body,
+            from_email,
+            [to_email],
+            headers={"X-Mail-Queue-Priority": "now"},
+        )
+        if html_email_template_name is not None:
+            html_email = loader.render_to_string(html_email_template_name, context)
+            email_message.attach_alternative(html_email, "text/html")
 
-            email_message = EmailMultiAlternatives(
-                subject,
-                body,
-                from_email,
-                [to_email],
-                headers={"X-Mail-Queue-Priority": "now"},
-            )
-            if html_email_template_name is not None:
-                html_email = loader.render_to_string(html_email_template_name, context)
-                email_message.attach_alternative(html_email, "text/html")
-
-            email_message.send()
+        email_message.send()
 
 
 class CategoriesForm(forms.ModelForm):
@@ -316,24 +305,60 @@ class ContactCreateForm(forms.Form):
         super().__init__(*args, **kwargs)
 
     def clean(self):
+        """
+        Note cleaning and lookup is a bit convoluted as we have to deal with non-unique emails:
+         - adding multiple contacts at same time
+         - users adding their own email, to add their other account as contact
+
+        But we still want to provide some error feedback
+        """
         cleaned_data = super().clean()
         email = cleaned_data.get("email")
+        if not email:
+            return
 
-        if email:
-            if email == self.user.email:
-                raise ValidationError(
-                    _("Please enter a valid email address of a contact.")
-                )
+        # use sets for simplicity, and use .only("id")
+        existing_users = set(User.objects.filter(email__iexact=email))
+        user_contacts = set(self.user.user_contacts.all().only("id"))
+        contacts_for_approval = set(self.user.contacts_for_approval.all().only("id"))
 
-            if self.user.is_email_of_contact(email):
+        # check if this was our own email and if we just found ourselves
+        if self.user in existing_users:
+            existing_users.remove(self.user)
+            if not existing_users:
+                raise ValidationError(_("You cannot add yourself as a contact."))
+
+        if not existing_users:
+            # no users found, pass and let the view send an Invite to the email
+            return
+
+        # best effort, we're going to return successful if we find at least one good contact
+        #   or only report the worst error (to not confuse the end-user)
+        not_active = False
+        has_contact = False
+        added_contacts = set()
+
+        # check if these users are valid and not already added
+        for contact_user in existing_users:
+            if not contact_user.is_active:
+                not_active = True
+            elif contact_user in user_contacts or contact_user in contacts_for_approval:
+                has_contact = True
+            else:
+                added_contacts.add(contact_user)
+
+        # remember the contacts and let the view add records, logs and the emails
+        if added_contacts:
+            cleaned_data["added_contacts"] = added_contacts
+        else:
+            # produce some feedback, check most interesting first
+            if has_contact:
                 raise ValidationError(
                     _(
                         "Het ingevoerde e-mailadres komt al voor in uw contactpersonen. Pas de gegevens aan en probeer het opnieuw."
                     )
                 )
-
-            existing_user = User.objects.filter(email__iexact=email)
-            if existing_user and existing_user.get().is_not_active():
+            elif not_active:
                 raise ValidationError(
                     _("The user cannot be added, their account has been deleted.")
                 )

@@ -5,7 +5,9 @@ from uuid import uuid4
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.contrib.contenttypes.fields import GenericRelation
+from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import CheckConstraint, Q, UniqueConstraint
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.crypto import get_random_string
@@ -72,7 +74,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         default="",
         validators=[CharFieldValidator()],
     )
-    email = models.EmailField(verbose_name=_("Email address"), unique=True)
+    email = models.EmailField(
+        verbose_name=_("Email address"),
+    )
     phonenumber = models.CharField(
         verbose_name=_("Phonenumber"),
         blank=True,
@@ -111,6 +115,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(
         verbose_name=_("Date joined"), default=timezone.now
     )
+    # TODO shouldn't rsin & bsn be unique? (possibly fixed in model constraints)
+    # TODO fix rsin & bsn to not be both null AND blank (!)
     rsin = models.CharField(verbose_name=_("Rsin"), max_length=9, null=True, blank=True)
     bsn = NLBSNField(verbose_name=_("Bsn"), null=True, blank=True)
     login_type = models.CharField(
@@ -216,6 +222,87 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name = _("User")
         verbose_name_plural = _("Users")
 
+        constraints = [
+            UniqueConstraint(
+                fields=["email"],
+                condition=~Q(login_type=LoginTypeChoices.digid),
+                name="unique_email_when_not_digid",
+            ),
+            # UniqueConstraint(
+            #     fields=["bsn"],
+            #     condition=Q(login_type=LoginTypeChoices.digid)
+            #     # not quite sure if we want this (bsn shouldn't be null AND blank)
+            #     & ~(Q(bsn="") | Q(bsn__isnull=True)),
+            #     name="unique_bsn_when_digid",
+            # ),
+            # UniqueConstraint(
+            #     fields=["rsin"],
+            #     condition=Q(login_type=LoginTypeChoices.eherkenning)
+            #     # not quite sure if we want this (rsin shouldn't be null AND blank)
+            #     & ~(Q(rsin="") | Q(rsin__isnull=True)),
+            #     name="unique_rsin_when_eherkenning",
+            # ),
+            # UniqueConstraint(
+            #     fields=["oidc_id"],
+            #     condition=Q(login_type=LoginTypeChoices.oidc),
+            #     name="unique_bsn_when_digid",
+            # ),
+            # CheckConstraint(
+            #     # maybe this is not correct?
+            #     check=(Q(bsn="") | Q(bsn__isnull=True))
+            #     | ~Q(login_type=LoginTypeChoices.digid),
+            #     name="check_digid_bsn_required_when_digid",
+            # ),
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._old_bsn = self.bsn
+
+    def __str__(self):
+        name = self.get_full_name()
+        email = self.get_contact_email()
+        if name and email:
+            return f"{name} ({email})"
+        else:
+            return name or email or str(self.uuid)[:8]
+
+    def clean(self, *args, **kwargs):
+        """Reject non-unique emails, except for users with login_type DigiD"""
+
+        existing_users = User.objects.filter(email__iexact=self.email)
+        if self.pk:
+            existing_users = existing_users.exclude(pk=self.pk)
+
+        # no duplicates
+        if not existing_users:
+            return
+
+        # account has been deactivated
+        for user in existing_users:
+            if (
+                user.login_type == LoginTypeChoices.digid
+                and user.bsn == self.bsn
+                and not user.is_active
+            ):
+                raise ValidationError(
+                    {"email": ValidationError(_("This account has been deactivated"))}
+                )
+
+        # all accounts with duplicate emails have login_type digid
+        if self.login_type == LoginTypeChoices.digid:
+            for user in existing_users:
+                if user.login_type != LoginTypeChoices.digid:
+                    # some account does not have login_type digid
+                    raise ValidationError(
+                        {"email": ValidationError(_("This email is already taken."))}
+                    )
+        else:
+            # non-digid must be unique
+            raise ValidationError(
+                {"email": ValidationError(_("This email is already taken."))}
+            )
+
     @property
     def seed(self):
         if not hasattr(self, "_seed"):
@@ -225,16 +312,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 
         return self._seed
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._old_bsn = self.bsn
-
     def get_full_name(self):
         parts = (self.first_name, self.infix, self.last_name)
         return " ".join(p for p in parts if p)
 
     def get_short_name(self):
-        "Returns the short name for the user."
         return self.first_name
 
     def get_age(self):
@@ -316,9 +398,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         choice = ContactTypeChoices.get_choice(self.contact_type)
         return choice.label
 
-    def is_not_active(self):
-        return not self.is_active
-
     def get_contact_email(self):
         return self.email if "@example.org" not in self.email else ""
 
@@ -331,11 +410,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_pending_invitations(self):
         return Invite.objects.get_pending_invitations_for_user(self)
 
-    def is_email_of_contact(self, email):
-        return (
-            self.user_contacts.filter(email=email).exists()
-            or self.contacts_for_approval.filter(email=email).exists()
-        )
+    def has_contact(self, user):
+        return self.user_contacts.filter(id=user.id).exists()
 
     def get_plan_contact_new_count(self):
         return (

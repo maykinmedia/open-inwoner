@@ -22,6 +22,6 @@ class MessageTest(TestCase):
         message = MessageFactory(sender=self.sender, receiver=self.receiver)
         self.assertEqual(
             str(message),
-            "From: person-a@example.com, To: person-b@example.com (2021-12-21)",
+            f"From: {self.sender}, To: {self.receiver} (2021-12-21)",
         )
         message.delete()
