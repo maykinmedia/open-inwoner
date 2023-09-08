@@ -24,6 +24,7 @@ from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.cms.cases.views.status import SimpleFile
 from open_inwoner.openzaak.tests.factories import (
+    StatusTranslationFactory,
     ZaakTypeConfigFactory,
     ZaakTypeInformatieObjectTypeConfigFactory,
 )
@@ -350,6 +351,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         )
 
     def test_status_is_retrieved_when_user_logged_in_via_digid(self, m):
+        self.maxDiff = None
+
         self._setUpMocks(m)
         status_new_obj, status_finish_obj = factory(
             Status, [self.status_new, self.status_finish]
@@ -370,7 +373,16 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 "end_date_legal": datetime.date(2022, 1, 5),
                 "description": "Coffee zaaktype",
                 "current_status": "Finish",
-                "statuses": [status_new_obj, status_finish_obj],
+                "statuses": [
+                    {
+                        "date": datetime.datetime(2021, 1, 12),
+                        "label": "Initial request",
+                    },
+                    {
+                        "date": datetime.datetime(2021, 3, 12),
+                        "label": "Finish",
+                    },
+                ],
                 # only one visible information object
                 "documents": [self.informatie_object_file],
                 "initiator": "Foo Bar van der Bazz",
@@ -406,6 +418,24 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             self.app.get(self.case_detail_url, user=self.user)
 
         spy_format.assert_called_once()
+
+    def test_page_translates_statuses(self, m):
+        st1 = StatusTranslationFactory(
+            status=self.status_type_new["omschrijving"],
+            translation="Translated First Status Type",
+        )
+        st2 = StatusTranslationFactory(
+            status=self.status_type_finish["omschrijving"],
+            translation="Translated Second Status Type",
+        )
+        self._setUpMocks(m)
+        response = self.app.get(
+            self.case_detail_url, user=self.user, headers={"HX-Request": "true"}
+        )
+        self.assertNotContains(response, st1.status)
+        self.assertNotContains(response, st2.status)
+        self.assertContains(response, st1.translation)
+        self.assertContains(response, st2.translation)
 
     def test_when_accessing_case_detail_a_timelinelog_is_created(self, m):
         self._setUpMocks(m)
