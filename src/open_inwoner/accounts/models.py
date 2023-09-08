@@ -115,7 +115,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(
         verbose_name=_("Date joined"), default=timezone.now
     )
-    # TODO shouldn't rsin & bsn be unique?
+    # TODO shouldn't rsin & bsn be unique? (possibly fixed in model constraints)
+    # TODO fix rsin & bsn to not be both null AND blank (!)
     rsin = models.CharField(verbose_name=_("Rsin"), max_length=9, null=True, blank=True)
     bsn = NLBSNField(verbose_name=_("Bsn"), null=True, blank=True)
     login_type = models.CharField(
@@ -221,25 +222,37 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name = _("User")
         verbose_name_plural = _("Users")
 
-        # TODO enforce email/is_active/login_type unique constraints on database?
         constraints = [
             UniqueConstraint(
                 fields=["email"],
                 condition=~Q(login_type=LoginTypeChoices.digid),
                 name="unique_email_when_not_digid",
             ),
+            # UniqueConstraint(
+            #     fields=["bsn"],
+            #     condition=Q(login_type=LoginTypeChoices.digid)
+            #     # not quite sure if we want this (bsn shouldn't be null AND blank)
+            #     & ~(Q(bsn="") | Q(bsn__isnull=True)),
+            #     name="unique_bsn_when_digid",
+            # ),
+            # UniqueConstraint(
+            #     fields=["rsin"],
+            #     condition=Q(login_type=LoginTypeChoices.eherkenning)
+            #     # not quite sure if we want this (rsin shouldn't be null AND blank)
+            #     & ~(Q(rsin="") | Q(rsin__isnull=True)),
+            #     name="unique_rsin_when_eherkenning",
+            # ),
+            # UniqueConstraint(
+            #     fields=["oidc_id"],
+            #     condition=Q(login_type=LoginTypeChoices.oidc),
+            #     name="unique_bsn_when_digid",
+            # ),
             # CheckConstraint(
             #     # maybe this is not correct?
             #     check=(Q(bsn="") | Q(bsn__isnull=True))
-            #     & ~Q(login_type=LoginTypeChoices.digid),
+            #     | ~Q(login_type=LoginTypeChoices.digid),
             #     name="check_digid_bsn_required_when_digid",
             # ),
-            # UniqueConstraint(
-            #     fields=["bsn"],
-            #     condition=Q(login_type=LoginTypeChoices.digid),
-            #     name="unique_bsn_when_digid",
-            # ),
-            # ideally we'd have a lot more here
         ]
 
     def __init__(self, *args, **kwargs):

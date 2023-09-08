@@ -729,15 +729,6 @@ class DuplicateEmailRegistrationTest(WebTest):
             last_name="",
             is_prepopulated=True,
         )
-        c = copy.deepcopy(inactive_user.__dict__)
-        inactive_user = User.objects.create(
-            # inactive_user2 = User.objects.create(
-            login_type=LoginTypeChoices.digid,
-            email="test@example.com",
-            bsn="123456789",
-            is_active=False,
-        )
-        # self.assertEqual(inactive_user.__dict__, inactive_user2.__dict__)
 
         url = reverse("digid-mock:password")
         params = {
