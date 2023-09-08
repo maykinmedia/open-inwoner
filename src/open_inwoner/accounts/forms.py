@@ -305,76 +305,63 @@ class ContactCreateForm(forms.Form):
         super().__init__(*args, **kwargs)
 
     def clean(self):
+        """
+        Note cleaning and lookup is a bit convoluted as we have to deal with non-unique emails:
+         - adding multiple contacts at same time
+         - users adding their own email, to add their other account as contact
+
+        But we still want to provide some error feedback
+        """
         cleaned_data = super().clean()
-        first_name = cleaned_data.get("first_name")
-        last_name = cleaned_data.get("last_name")
         email = cleaned_data.get("email")
-
-        try:
-            contact_user = self.find_user(email)
-        except (ValidationError, User.MultipleObjectsReturned):
-            contact_user = self.find_user(email, first_name, last_name)
-
-        cleaned_data["contact_user"] = contact_user
-
-    def find_user(
-        self,
-        email: str,
-        first_name: Optional[str] = None,
-        last_name: Optional[str] = None,
-    ):
-        """Try to find a user by email alone, or email + first_name + last_name"""
-
-        raise NotImplemented("this feels weird")
-        # TODO fix contact create form
-
-        existing_users = User.objects.filter(email__iexact=email)
-
-        # no user found: return, then send invitation (no ValidationError raised)
-        if not existing_users:
+        if not email:
             return
 
-        if first_name and last_name:
-            existing_users = User.objects.filter(
-                Q(first_name__iexact=first_name) & Q(last_name__iexact=last_name)
-            )
+        # use sets for simplicity, and use .only("id")
+        existing_users = set(User.objects.filter(email__iexact=email))
+        user_contacts = set(self.user.user_contacts.all().only("id"))
+        contacts_for_approval = set(self.user.contacts_for_approval.all().only("id"))
 
-        existing_users = existing_users.filter(is_active=True)
+        # check if this was our own email and if we just found ourselves
+        if self.user in existing_users:
+            existing_users.remove(self.user)
+            if not existing_users:
+                raise ValidationError(_("You cannot add yourself as a contact."))
 
-        # no active users with the given specs
         if not existing_users:
-            raise ValidationError(
-                _("The user cannot be added, their account has been deleted.")
-            )
+            # no users found, pass and let the view send an Invite to the email
+            return
 
-        # check if there are multiple users with the given specs
-        try:
-            existing_user = existing_users.get()
-        except User.MultipleObjectsReturned:
-            raise ValidationError(
-                _(
-                    "We're having trouble finding an account with this information."
-                    "Please contact us for help."
+        # best effort, we're going to return successful if we find at least one good contact
+        #   or only report the worst error (to not confuse the end-user)
+        not_active = False
+        has_contact = False
+        added_contacts = set()
+
+        # check if these users are valid and not already added
+        for contact_user in existing_users:
+            if not contact_user.is_active:
+                not_active = True
+            elif contact_user in user_contacts or contact_user in contacts_for_approval:
+                has_contact = True
+            else:
+                added_contacts.add(contact_user)
+
+        # remember the contacts and let the view add records, logs and the emails
+        if added_contacts:
+            cleaned_data["added_contacts"] = added_contacts
+        else:
+            # produce some feedback, check most interesting first
+            if has_contact:
+                raise ValidationError(
+                    _(
+                        "Het ingevoerde e-mailadres komt al voor in uw contactpersonen. Pas de gegevens aan en probeer het opnieuw."
+                    )
                 )
-            )
-
-        # contact already exists
-        if self.user.has_contact(existing_user):
-            raise ValidationError(
-                _(
-                    "Het ingevoerde contact komt al voor in uw contactpersonen. "
-                    "Pas de gegevens aan en probeer het opnieuw."
+            elif not_active:
+                raise ValidationError(
+                    _("The user cannot be added, their account has been deleted.")
                 )
-            )
-
-        # user attempts to add themselves as contact
-        if (
-            self.user.first_name == existing_user.first_name
-            and self.user.last_name == existing_user.last_name
-        ):
-            raise ValidationError(_("You cannot add yourself as a contact."))
-
-        return existing_user
 
 
 class UserField(forms.ModelChoiceField):

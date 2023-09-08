@@ -304,7 +304,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         return " ".join(p for p in parts if p)
 
     def get_short_name(self):
-        "Returns the short name for the user."
         return self.first_name
 
     def get_age(self):
@@ -399,9 +398,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         return Invite.objects.get_pending_invitations_for_user(self)
 
     def has_contact(self, user):
-        """
-        :returns: `True` if the subject has `user` as contact, `False` otherwise
-        """
         return self.user_contacts.filter(id=user.id).exists()
 
     def get_plan_contact_new_count(self):
