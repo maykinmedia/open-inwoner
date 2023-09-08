@@ -656,7 +656,7 @@ class MyDataTests(HaalCentraalMixin, WebTest):
             {
                 "message": _("user requests for brp data"),
                 "action_flag": list(LOG_ACTIONS[4]),
-                "content_object_repr": f"{self.user.first_name} {self.user.last_name} ({self.user.email})",
+                "content_object_repr": str(self.user),
             },
         )
 
@@ -677,7 +677,7 @@ class MyDataTests(HaalCentraalMixin, WebTest):
             {
                 "message": _("user requests for brp data"),
                 "action_flag": list(LOG_ACTIONS[4]),
-                "content_object_repr": f"{self.user.first_name} {self.user.last_name} ({self.user.email})",
+                "content_object_repr": str(self.user),
             },
         )
 
@@ -710,7 +710,7 @@ class MyDataTests(HaalCentraalMixin, WebTest):
             {
                 "message": _("user requests for brp data"),
                 "action_flag": list(LOG_ACTIONS[4]),
-                "content_object_repr": f"({self.user.email})",
+                "content_object_repr": self.user.email,
             },
         )
 

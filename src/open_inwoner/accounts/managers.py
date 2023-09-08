@@ -33,6 +33,8 @@ class eHerkenningManager(BaseeHerkenningManager):
         return self.get_queryset().get(rsin=rsin)
 
     def eherkenning_create(self, rsin, **kwargs):
+        raise NotImplementedError("old code, please verify before use")
+        # TODO what is this @rsin.com email hostname? @example.org is bad enough but this actually exists
         return super().create(
             email="user-{}@rsin.com".format(rsin),
             login_type=LoginTypeChoices.eherkenning,

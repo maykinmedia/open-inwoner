@@ -211,6 +211,11 @@ class NecessaryUserForm(forms.ModelForm):
 
 
 class CustomPasswordResetForm(PasswordResetForm):
+    def get_users(self, email):
+        users = super().get_users(email)
+        # filter regular email login users
+        return [u for u in users if u.login_type == LoginTypeChoices.default]
+
     def send_mail(
         self,
         subject_template_name,
@@ -222,28 +227,26 @@ class CustomPasswordResetForm(PasswordResetForm):
     ):
         """
         Send a django.core.mail.EmailMultiAlternatives to `to_email`.
+
+        Note: the context has the user specific information / tokens etc
         """
-        email = self.cleaned_data.get("email")
-        user = User.objects.get(email=email)
+        subject = loader.render_to_string(subject_template_name, context)
+        # Email subject *must not* contain newlines
+        subject = "".join(subject.splitlines())
+        body = loader.render_to_string(email_template_name, context)
 
-        if user.login_type == LoginTypeChoices.default:
-            subject = loader.render_to_string(subject_template_name, context)
-            # Email subject *must not* contain newlines
-            subject = "".join(subject.splitlines())
-            body = loader.render_to_string(email_template_name, context)
+        email_message = EmailMultiAlternatives(
+            subject,
+            body,
+            from_email,
+            [to_email],
+            headers={"X-Mail-Queue-Priority": "now"},
+        )
+        if html_email_template_name is not None:
+            html_email = loader.render_to_string(html_email_template_name, context)
+            email_message.attach_alternative(html_email, "text/html")
 
-            email_message = EmailMultiAlternatives(
-                subject,
-                body,
-                from_email,
-                [to_email],
-                headers={"X-Mail-Queue-Priority": "now"},
-            )
-            if html_email_template_name is not None:
-                html_email = loader.render_to_string(html_email_template_name, context)
-                email_message.attach_alternative(html_email, "text/html")
-
-            email_message.send()
+        email_message.send()
 
 
 class CategoriesForm(forms.ModelForm):
@@ -321,6 +324,9 @@ class ContactCreateForm(forms.Form):
         last_name: Optional[str] = None,
     ):
         """Try to find a user by email alone, or email + first_name + last_name"""
+
+        raise NotImplemented("this feels weird")
+        # TODO fix contact create form
 
         existing_users = User.objects.filter(email__iexact=email)
 
