@@ -635,6 +635,7 @@ class MyDataTests(HaalCentraalMixin, WebTest):
         self.user = UserFactory(
             bsn="999993847",
             first_name="Merel",
+            infix="de",
             last_name="Kooyman",
             login_type=LoginTypeChoices.digid,
         )
