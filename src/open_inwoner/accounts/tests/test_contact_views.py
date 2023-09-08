@@ -201,7 +201,7 @@ class ContactViewTests(WebTest):
         expected_errors = {
             "__all__": [
                 _(
-                    "Het ingevoerde contact komt al voor in uw contactpersonen. Pas de gegevens aan en probeer het opnieuw."
+                    "Het ingevoerde e-mailadres komt al voor in uw contactpersonen. Pas de gegevens aan en probeer het opnieuw."
                 )
             ]
         }

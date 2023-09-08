@@ -330,7 +330,7 @@ class TestInvites(WebTest):
                 "log_level": logging.INFO,
                 "action_flag": list(LOG_ACTIONS[5]),
                 "content_object_repr": _("For: {invitee} (2021-10-18)").format(
-                    invitee=f"{self.invitee.first_name} {self.invitee.last_name} ({self.invitee.email})"
+                    invitee=str(self.invitee)
                 ),
             },
         )
@@ -356,7 +356,7 @@ class TestInvites(WebTest):
                 "log_level": logging.INFO,
                 "action_flag": list(LOG_ACTIONS[5]),
                 "content_object_repr": _("For: {invitee} (2021-09-18)").format(
-                    invitee=f"{self.invitee.first_name} {self.invitee.last_name} ({self.invitee.email})"
+                    invitee=str(self.invitee)
                 ),
             },
         )

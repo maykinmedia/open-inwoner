@@ -1,6 +1,5 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Q
 from django.http.response import HttpResponseBadRequest, HttpResponseRedirect
 from django.urls.base import reverse, reverse_lazy
 from django.utils.functional import cached_property
@@ -76,22 +75,24 @@ class ContactCreateView(
         return {**super().get_form_kwargs(), "user": self.request.user}
 
     def form_valid(self, form):
-        cleaned_data = form.cleaned_data
+        user: User = self.request.user
+        email = form.cleaned_data["email"]
 
-        user = self.request.user
-
-        # Add existing user as contact
-        if contact_user := cleaned_data["contact_user"]:
-            user.contacts_for_approval.add(contact_user)
-            self.send_email_to_existing_user(contact_user, user, self.request)
-            self.log_addition(contact_user, _("contact was added, pending approval"))
-        # Send invitation to new user
+        added_contacts = form.cleaned_data.get("added_contacts")
+        if added_contacts:
+            for contact_user in added_contacts:
+                user.contacts_for_approval.add(contact_user)
+                self.send_email_to_existing_user(contact_user, user, self.request)
+                self.log_addition(
+                    contact_user, _("contact was added, pending approval")
+                )
         else:
+            # send invitation to new users
             invite = Invite.objects.create(
-                inviter=self.request.user,
-                invitee_email=cleaned_data["email"],
-                invitee_first_name=cleaned_data["first_name"],
-                invitee_last_name=cleaned_data["last_name"],
+                inviter=user,
+                invitee_email=email,
+                invitee_first_name=form.cleaned_data["first_name"],
+                invitee_last_name=form.cleaned_data["last_name"],
             )
             invite.send(self.request)
             self.log_addition(
@@ -99,14 +100,11 @@ class ContactCreateView(
                 _("invite was created"),
             )
 
+        # if we reach here if we did not raise an error
         messages.add_message(
             self.request,
             messages.SUCCESS,
-            _(
-                "{contact} is toegevoegd aan uw contactpersonen.".format(
-                    contact=cleaned_data["email"]
-                )
-            ),
+            _("{contact} is toegevoegd aan uw contactpersonen.".format(contact=email)),
         )
         return HttpResponseRedirect(self.get_success_url())
 
