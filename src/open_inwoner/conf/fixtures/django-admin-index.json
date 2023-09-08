@@ -330,6 +330,10 @@
             ],
             [
                 "openzaak",
+                "statustranslation"
+            ],
+            [
+                "openzaak",
                 "usercaseinfoobjectnotification"
             ],
             [
