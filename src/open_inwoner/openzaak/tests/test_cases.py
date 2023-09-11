@@ -21,7 +21,7 @@ from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 from ...utils.tests.helpers import AssertRedirectsMixin
 from ..models import OpenZaakConfig
 from ..utils import format_zaak_identificatie
-from .factories import ServiceFactory
+from .factories import ServiceFactory, StatusTranslationFactory
 from .shared import CATALOGI_ROOT, ZAKEN_ROOT
 
 
@@ -381,6 +381,18 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
         spy_format.assert_called()
         self.assertEqual(spy_format.call_count, 2)
 
+    def test_list_open_cases_translates_status(self, m):
+        st1 = StatusTranslationFactory(
+            status=self.status_type1["omschrijving"],
+            translation="Translated Status Type",
+        )
+        self._setUpMocks(m)
+        response = self.app.get(
+            self.inner_url_open, user=self.user, headers={"HX-Request": "true"}
+        )
+        self.assertNotContains(response, st1.status)
+        self.assertContains(response, st1.translation)
+
     def test_list_open_cases_logs_displayed_case_ids(self, m):
         self._setUpMocks(m)
 
@@ -466,6 +478,18 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
 
         spy_format.assert_called()
         self.assertEqual(spy_format.call_count, 1)
+
+    def test_list_closed_cases_translates_status(self, m):
+        st1 = StatusTranslationFactory(
+            status=self.status_type2["omschrijving"],
+            translation="Translated Status Type",
+        )
+        self._setUpMocks(m)
+        response = self.app.get(
+            self.inner_url_closed, user=self.user, headers={"HX-Request": "true"}
+        )
+        self.assertNotContains(response, st1.status)
+        self.assertContains(response, st1.translation)
 
     def test_list_closed_cases_logs_displayed_case_ids(self, m):
         self._setUpMocks(m)

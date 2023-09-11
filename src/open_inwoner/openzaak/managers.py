@@ -6,7 +6,8 @@ from django.db import IntegrityError, models, transaction
 from django.utils import timezone
 
 from open_inwoner.accounts.models import User
-from open_inwoner.openzaak.api_models import Zaak, ZaakType
+from open_inwoner.openzaak.api_models import ZaakType
+from open_inwoner.utils.translate import TranslationLookup
 
 if TYPE_CHECKING:
     from open_inwoner.openzaak.models import (
@@ -162,3 +163,8 @@ class ZaakTypeConfigQueryset(models.QuerySet):
             return self.none()
 
         return self.filter_case_type(case_type).filter(questions_enabled=True)
+
+
+class StatusTranslationQuerySet(models.QuerySet):
+    def get_lookup(self):
+        return TranslationLookup(self.values_list("status", "translation"))

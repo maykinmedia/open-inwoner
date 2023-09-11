@@ -267,10 +267,11 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
     def test_name_validation(self):
         invalid_characters = '<>#/"\\,.:;'
 
+        response = self.app.get(self.url, user=self.user, status=200)
+        form = response.forms["profile-edit"]
+
         for char in invalid_characters:
             with self.subTest(char=char):
-                response = self.app.get(self.url, user=self.user, status=200)
-                form = response.forms["profile-edit"]
                 form["first_name"] = "test" + char
                 form["infix"] = char + "test"
                 form["last_name"] = "te" + char + "st"
@@ -633,8 +634,9 @@ class MyDataTests(HaalCentraalMixin, WebTest):
     def setUp(self):
         self.user = UserFactory(
             bsn="999993847",
-            first_name="",
-            last_name="",
+            first_name="Merel",
+            infix="de",
+            last_name="Kooyman",
             login_type=LoginTypeChoices.digid,
         )
         self.url = reverse("profile:data")
@@ -655,7 +657,7 @@ class MyDataTests(HaalCentraalMixin, WebTest):
             {
                 "message": _("user requests for brp data"),
                 "action_flag": list(LOG_ACTIONS[4]),
-                "content_object_repr": self.user.email,
+                "content_object_repr": str(self.user),
             },
         )
 
@@ -676,7 +678,7 @@ class MyDataTests(HaalCentraalMixin, WebTest):
             {
                 "message": _("user requests for brp data"),
                 "action_flag": list(LOG_ACTIONS[4]),
-                "content_object_repr": self.user.email,
+                "content_object_repr": str(self.user),
             },
         )
 

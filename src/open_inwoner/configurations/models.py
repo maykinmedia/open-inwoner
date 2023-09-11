@@ -225,47 +225,7 @@ class SiteConfiguration(SingletonModel):
         verbose_name=_("Edit goal message"),
         help_text=_("The message when a user edits a goal."),
     )
-    footer_visiting_title = models.CharField(
-        max_length=255,
-        default="",
-        blank=True,
-        verbose_name=_("Footer visiting title"),
-        help_text=_("Visiting title on the footer section."),
-    )
-    footer_visiting_intro = models.TextField(
-        verbose_name=_("Visiting details"),
-        default="",
-        blank=True,
-        help_text=_("Visiting intro text on the footer section."),
-    )
-    footer_visiting_phonenumber = models.CharField(
-        max_length=15,
-        default="",
-        blank=True,
-        validators=[DutchPhoneNumberValidator()],
-        verbose_name=_("Footer visiting phonenumber"),
-        help_text=_("Visiting phonenumber on the footer section."),
-    )
-    footer_visiting_map = models.CharField(
-        max_length=255,
-        verbose_name=_("Footer visiting map"),
-        default="",
-        blank=True,
-        help_text=_("Visiting address in google maps on the footer section."),
-    )
-    footer_mailing_title = models.CharField(
-        max_length=255,
-        default="",
-        blank=True,
-        verbose_name=_("Footer mailing title"),
-        help_text=_("Mailing title on the footer section."),
-    )
-    footer_mailing_intro = models.TextField(
-        verbose_name=_("Mailing details"),
-        default="",
-        blank=True,
-        help_text=_("Mailing intro text on the footer section."),
-    )
+
     footer_logo = FilerImageField(
         verbose_name=_("Footer logo"),
         null=True,

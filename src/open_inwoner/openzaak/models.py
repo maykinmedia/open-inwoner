@@ -12,6 +12,7 @@ from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 from zgw_consumers.constants import APITypes
 
 from open_inwoner.openzaak.managers import (
+    StatusTranslationQuerySet,
     UserCaseInfoObjectNotificationManager,
     UserCaseStatusNotificationManager,
     ZaakTypeConfigQueryset,
@@ -361,3 +362,21 @@ class UserCaseInfoObjectNotification(UserCaseStatusNotificationBase):
         ) or UserCaseStatusNotification.objects.has_received_similar_notes_within(
             self.user, self.case_uuid, period
         )
+
+
+class StatusTranslation(models.Model):
+    status = models.CharField(
+        verbose_name=_("Status tekst"),
+        max_length=255,
+        unique=True,
+    )
+    translation = models.CharField(
+        verbose_name=_("Vertaling"),
+        max_length=255,
+    )
+
+    objects = StatusTranslationQuerySet.as_manager()
+
+    class Meta:
+        verbose_name = _("Status vertaling")
+        verbose_name_plural = _("Status vertalingen")

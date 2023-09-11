@@ -1,83 +1,67 @@
 ///
 /// Footer.
 ///
-
 .footer {
   $hm: max(calc((100vw - var(--container-width)) / 2), var(--spacing-large));
   $vm: var(--row-height);
   background-color: var(--color-gray-lightest);
   box-sizing: border-box;
+
   display: grid;
   gap: var(--spacing-medium);
+
   grid-template-areas:
-    'lg-tx lg-tx lg-tx lg-tx'
-    'lg   lg   lg   lg'
-    'vstr vstr vstr vstr'
-    'ml   ml   ml   ml'
-    'scl  scl  scl  scl'
-    'nws  nws  nws  nws'
-    'lnks lnks lnks lnks';
-  grid-template-columns: repeat(4, 1fr);
+    'head'
+    'left'
+    'center'
+    'right';
+  grid-template-columns: 1fr;
   padding: $vm $hm;
 
   @media (min-width: 768px) {
     gap: var(--gutter-width);
     grid-template-areas:
-      'lg-tx lg-tx lg-tx lg-tx . . . . . . . . '
-      'lg   lg   lg   lg   lg  lg  lg  lg  lg   lg   lg lg'
-      'vstr vstr vstr vstr scl scl scl scl scl lnks lnks lnks'
-      'ml   ml   ml   ml   nws nws nws nws nws lnks lnks lnks';
-    grid-template-columns: repeat(12, 1fr);
+      'head head head'
+      'left center right';
+    grid-template-columns: repeat(3, 1fr);
   }
 
-  /// Layout.
+  &__header {
+    grid-area: head;
+  }
+  &__left {
+    grid-area: left;
+  }
+  &__center {
+    grid-area: center;
+  }
+  &__right {
+    grid-area: right;
+  }
 
+  &__left,
+  &__center,
+  &__right {
+    :first-child {
+      padding-top: 0;
+    }
+  }
   &__logo {
-    display: flex;
-    grid-area: lg;
-
     img {
       width: auto;
       max-height: 60px;
     }
   }
-
   &__logo-text {
-    grid-area: lg-tx;
   }
-
-  &__visitor {
-    grid-area: vstr;
-
-    &-phonenumber a {
-      display: block;
-      color: var(--color-secondary);
-      text-decoration: none;
-    }
-  }
-
-  &__mail {
-    grid-area: ml;
-  }
-
-  .social {
-    grid-area: scl;
-  }
-
-  &__newsletter {
-    grid-area: nws;
-  }
-
-  &__links {
-    grid-area: lnks;
-  }
-
-  /// List.
 
   &__list {
     list-style: none;
     margin: 0;
     padding: 0;
+    :first-child {
+      margin-top: 0;
+    }
   }
 
   &__list-item {

@@ -1,3 +1,5 @@
+from html import escape
+
 from django.test import override_settings
 from django.urls import reverse
 
@@ -276,6 +278,21 @@ class TestProductContent(WebTest):
 
         self.assertTrue(sidemenu_cta_button)
         self.assertIn(product.link, sidemenu_cta_button[0].values())
+
+    def test_content_html_escape(self):
+        product = ProductFactory()
+
+        product.content = "hello \\<b>world\\</b> **test**"
+        product.save()
+
+        response = self.app.get(
+            reverse("products:product_detail", kwargs={"slug": product.slug})
+        )
+
+        self.assertNotContains(response, "hello world")
+        self.assertNotContains(response, escape("<b>world"))
+        self.assertContains(response, "hello <b>world</b>")
+        self.assertContains(response, "<strong>test</strong>")
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")

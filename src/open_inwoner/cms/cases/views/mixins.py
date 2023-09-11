@@ -19,7 +19,7 @@ from open_inwoner.openzaak.catalog import (
     fetch_single_case_type,
     fetch_single_status_type,
 )
-from open_inwoner.openzaak.models import OpenZaakConfig
+from open_inwoner.openzaak.models import OpenZaakConfig, StatusTranslation
 from open_inwoner.openzaak.utils import format_zaak_identificatie, is_zaak_visible
 from open_inwoner.utils.mixins import PaginationMixin
 from open_inwoner.utils.views import LogMixin
@@ -141,6 +141,7 @@ class CaseListMixin(CaseLogMixin, PaginationMixin):
     def process_cases(self, cases: List[Zaak]) -> List[dict]:
         # Prepare data for frontend
         config = OpenZaakConfig.get_solo()
+        status_translate = StatusTranslation.objects.get_lookup()
 
         updated_cases = []
         for case in cases:
@@ -150,7 +151,7 @@ class CaseListMixin(CaseLogMixin, PaginationMixin):
                 "start_date": case.startdatum,
                 "end_date": getattr(case, "einddatum", None),
                 "description": case.zaaktype.omschrijving,
-                "current_status": glom(
+                "current_status": status_translate.from_glom(
                     case, "status.statustype.omschrijving", default=""
                 ),
             }

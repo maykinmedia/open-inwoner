@@ -19,8 +19,10 @@ class UserFactory(factory.django.DjangoModelFactory):
     infix = factory.fuzzy.FuzzyChoice(["de", "van", "van de"])
     last_name = factory.Faker("last_name")
     # Note that 'example.org' addresses are always redirected to the registration_necessary view
+    # use `first_name.lower()` to prevent tests from accidentally passing
     email = factory.LazyAttribute(
-        lambda o: "%s%d@example.com" % (o.first_name, random.randint(0, 10000000))
+        lambda o: "%s%d@example.com"
+        % (o.first_name.lower(), random.randint(0, 10000000))
     )
     password = factory.PostGenerationMethodCall("set_password", "secret")
     phonenumber = factory.Faker("numerify", text="061#######")

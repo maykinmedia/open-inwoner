@@ -131,7 +131,7 @@ class TestSMSVerificationLogin(WebTest):
                     "Het versturen van een SMS-bericht aan {phonenumber} is mislukt. Inloggen afgebroken."
                 ).format(phonenumber=self.user.phonenumber),
                 "action_flag": list(LOG_ACTIONS[4]),
-                "content_object_repr": self.user.email,
+                "content_object_repr": str(self.user),
             },
         )
 

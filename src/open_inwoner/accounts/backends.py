@@ -26,14 +26,28 @@ class UserModelEmailBackend(ModelBackend):
         self, request, username=None, password=None, user=None, token=None, **kwargs
     ):
         config = SiteConfiguration.get_solo()
-
+        User = get_user_model()
         if username and password and not config.login_2fa_sms:
             try:
-                user = get_user_model().objects.get(email__iexact=username)
-                if check_password(password, user.password):
+                user = User.objects.get(
+                    email__iexact=username,
+                    login_type=LoginTypeChoices.default,
+                )
+                if check_password(
+                    password, user.password
+                ) and self.user_can_authenticate(user):
                     return user
-            except get_user_model().DoesNotExist:
+            except User.MultipleObjectsReturned:
+                # Found multiple users with this email (shouldn't happen if we added checks)
+                # Run the default password hasher once to reduce the timing
+                # difference between an existing and a nonexistent user (#20760).
+                User().set_password(password)
+                return None
+            except User.DoesNotExist:
                 # No user was found, return None - triggers default login failed
+                # Run the default password hasher once to reduce the timing
+                # difference between an existing and a nonexistent user (#20760).
+                User().set_password(password)
                 return None
 
         # 2FA with sms verification
@@ -57,18 +71,29 @@ class CustomAxesBackend(AxesBackend):
 
 class CustomOIDCBackend(OIDCAuthenticationBackend):
     def create_user(self, claims):
-        """Return object for a newly created user account."""
+        """
+        Return object for a newly created user account.
+
+        before we got here we already checked for existing users based on the overriden queryset from the .filter_users_by_claims()
+        """
         unique_id = self.retrieve_identifier_claim(claims)
 
-        email = generate_email_from_string(unique_id)
         if "email" in claims:
             email = claims["email"]
+        else:
+            email = generate_email_from_string(unique_id)
 
-        existing_user = self.UserModel.objects.filter(email__iexact=email).first()
+        existing_user = self.UserModel.objects.filter(
+            email__iexact=email,
+            login_type=LoginTypeChoices.default,
+            is_active=True,
+        ).first()
         if existing_user:
             logger.debug("Updating OIDC user: %s with email %s", unique_id, email)
             existing_user.oidc_id = unique_id
             existing_user.login_type = LoginTypeChoices.oidc
+            # TODO verify we want unusable_password
+            existing_user.set_unusable_password()
             existing_user.save()
             return existing_user
         else:
@@ -79,9 +104,10 @@ class CustomOIDCBackend(OIDCAuthenticationBackend):
                 "email": email,
                 "login_type": LoginTypeChoices.oidc,
             }
-
             user = self.UserModel.objects.create_user(**kwargs)
             self.update_user(user, claims)
+            # TODO verify we want unusable_password
+            user.set_unusable_password()
 
             return user
 

@@ -27,18 +27,19 @@
                 {% button text="" title="Inloggen" href=login_url icon="person" icon_position="before" primary=True icon_outlined=True transparent=True %}
             </span>
         {% endif %}
+        </div>
+        {# end of mobile header-menu with logo #}
 
-            <div class="header__submenu">
-
+        <div class="header__submenu">
             {% if cms_apps.products %}
             {% if request.user.is_authenticated or not config.hide_search_from_anonymous_users %}
-              <nav class="header__actions" aria-label="Zoek navigatie mobiel">
-                  {% url 'search:search' as search_url %}
-                  {% render_form form=search_form method="GET" form_action=search_url inline=True spaceless=False %}
-                      {% input search_form.query no_label=True %}
-                      {% form_actions primary_icon="search" primary_text=_("Zoeken") hide_primary_text=True %}
-                  {% endrender_form %}
-              </nav>
+                <nav class="header__actions header__actions--open" aria-label="Zoek navigatie mobiel">
+                {% url 'search:search' as search_url %}
+                {% render_form form=search_form method="GET" form_action=search_url inline=True spaceless=False %}
+                    {% input search_form.query no_label=True %}
+                    {% form_actions primary_icon="search" primary_text=_("Zoeken") hide_primary_text=True %}
+                {% endrender_form %}
+                </nav>
             {% endif %}
             {% endif %}
 
@@ -93,7 +94,7 @@
                             <ul class="header__list">
                                 <li class="header__list-item">
                                     {% trans "Logout" as logout %}
-                                    {% link text=logout href=request.user.get_logout_url icon="arrow_forward" icon_position="before" primary=True %}
+                                    {% link text=logout href=request.user.get_logout_url icon="arrow_forward" icon_position="before" secondary=True %}
                                 </li>
                             </ul>
                         {% elif config.login_show %}
@@ -102,10 +103,8 @@
                     </div>
                 </section>
 
-
             </div>
-        </div>
-{#end of mobile menu#}
+            {# end of submenu items #}
 
     {% firstof config.logo.default_alt_text config.name as logo_alt_text %}
         <div class="logo__desktop">{% logo src=config.logo.file.url alt="Homepage "|add:logo_alt_text svg_height=75 %}</div>
@@ -126,11 +125,12 @@
 
         {% include "components/Header/NavigationAuthenticated.html" %}
     </div>
+    {# end of header container #}
 </header>
 
 {% if cms_apps.products %}
     {% if request.user.is_authenticated or not config.hide_search_from_anonymous_users %}
-        <section class="search search__mobile">
+        <section class="search search__mobile search__mobile--closed">
             <nav class="search__actions " aria-label="Zoek navigatie mobiel">
                 {% url 'search:search' as search_url %}
                 {% render_form form=search_form method="GET" form_action=search_url inline=True spaceless=False %}
