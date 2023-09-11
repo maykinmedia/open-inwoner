@@ -6,6 +6,10 @@
     margin: var(--spacing-large) 0;
   }
 
+  &--tiny {
+    margin: var(--spacing-medium) 0;
+  }
+
   @media (min-width: 768px) {
     margin: var(--spacing-giant) 0;
   }

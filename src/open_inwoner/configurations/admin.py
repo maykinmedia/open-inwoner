@@ -162,6 +162,16 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                 ),
             },
         ),
+        (
+            _("Search filter options"),
+            {
+                "fields": (
+                    "search_filter_categories",
+                    "search_filter_tags",
+                    "search_filter_organizations",
+                )
+            },
+        ),
         (_("Emails"), {"fields": ("email_new_message",)}),
         (
             _("Openid Connect"),
