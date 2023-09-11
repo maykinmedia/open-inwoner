@@ -1,3 +1,4 @@
+from django.test import tag
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
@@ -11,6 +12,7 @@ from open_inwoner.utils.logentry import LOG_ACTIONS
 from .utils import ESMixin
 
 
+@tag("elastic")
 @freeze_time("2021-10-18 13:00:00")
 class TestLogging(ESMixin, WebTest):
     def test_search_query_of_logged_in_user_is_logged(self):

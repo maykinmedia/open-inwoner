@@ -17,7 +17,6 @@ from timeline_logger.models import TimelineLog
 
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.utils.logentry import LOG_ACTIONS
-from open_inwoner.utils.validators import format_phone_number
 
 from ..gateways import GatewayError
 from .factories import UserFactory

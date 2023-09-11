@@ -675,6 +675,7 @@ class PlanViewTests(WebTest):
         self.assertEqual(response.status_code, 404)
 
 
+@tag("e2e")
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class PlanBegeleiderListViewTests(WebTest):
     def setUp(self):

@@ -1,6 +1,7 @@
 import urllib
 
 from django.contrib import messages
+from django.test import tag
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
@@ -15,6 +16,7 @@ from .factories import FeedbackFactory
 from .utils import ESMixin
 
 
+@tag("elastic")
 class TestFeedbackFunctionality(ESMixin, WebTest):
     def setUp(self):
         self.user = UserFactory()
