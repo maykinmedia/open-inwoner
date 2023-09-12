@@ -187,6 +187,7 @@ class ContactViewTests(WebTest):
         self.assertEqual(response.status_code, 302)
 
         pending_invitation = self.user.contacts_for_approval.get()
+        # set expiration time here?
 
         self.assertEqual(existing_user, pending_invitation)
 
