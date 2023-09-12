@@ -35,7 +35,8 @@
     left: 0;
     max-height: 80vh;
     padding: var(--spacing-giant);
-    position: absolute;
+    position: fixed;
+    z-index: 1101;
 
     @media (min-width: 768px) {
       margin: 0;
