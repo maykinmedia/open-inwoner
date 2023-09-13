@@ -103,6 +103,14 @@
        <IndicatieKolom>1</IndicatieKolom>
       </Componenthistorie>
       <Componenthistorie>
+       <Omschrijving>KD norm tot AOW</Omschrijving>
+       <Bedrag>
+        <CdPositiefNegatief>+</CdPositiefNegatief>
+        <WaardeBedrag>2308</WaardeBedrag>
+       </Bedrag>
+       <IndicatieKolom>1</IndicatieKolom>
+      </Componenthistorie>
+      <Componenthistorie>
        <Omschrijving>Ink pensioen/VUT (65-)geen vt</Omschrijving>
        <Bedrag>
         <CdPositiefNegatief>+</CdPositiefNegatief>

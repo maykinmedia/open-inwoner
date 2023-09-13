@@ -1,3 +1,5 @@
+"""Deprecated. Remove when done refactoring"""
+
 from datetime import datetime
 from typing import Optional
 from xml.parsers.expat import ExpatError

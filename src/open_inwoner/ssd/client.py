@@ -14,7 +14,9 @@ from requests import Response
 
 from ..utils.export import render_pdf
 from .models import SSDConfig
-from .xml import get_jaaropgave_dict, get_uitkering_dict
+from .xml.jaaropgave import get_jaaropgave
+from .xml.uitkering import get_uitkeringen
+from .xml_old import get_jaaropgave_dict, get_uitkering_dict
 
 logger = logging.getLogger(__name__)
 
@@ -97,18 +99,18 @@ class SSDBaseClient(ABC):
         :returns: formatted string for PDF name
         """
 
-    @abstractmethod
-    def get_report(
-        self, bsn: str, report_date_iso: str, base_url: str
-    ) -> Optional[bytes]:
-        """
-        :param bsn: the BSN number of the client making the request
-        :param report_date_iso: the date of the requested report in ISO 8601 format
-        :param base_url: the absolute URI of the request, allows the use of
-        relative URLs in templates used to generate PDFs
-        :returns: a yearly/monthly benefits report PDF (bytes) if the request to
-        the client's SOAP service is successful, `None` otherwise
-        """
+    # @abstractmethod
+    # def get_report(
+    #     self, bsn: str, report_date_iso: str, base_url: str
+    # ) -> Optional[bytes]:
+    #     """
+    #     :param bsn: the BSN number of the client making the request
+    #     :param report_date_iso: the date of the requested report in ISO 8601 format
+    #     :param base_url: the absolute URI of the request, allows the use of
+    #     relative URLs in templates used to generate PDFs
+    #     :returns: a yearly/monthly benefits report PDF (bytes) if the request to
+    #     the client's SOAP service is successful, `None` otherwise
+    #     """
 
     @property
     def endpoint(self) -> str:
@@ -136,17 +138,26 @@ class JaaropgaveClient(SSDBaseClient):
     def get_report(
         self, bsn: str, report_date_iso: str, request_base_url: str
     ) -> Optional[bytes]:
-        response = self.templated_request(
-            bsn=bsn, dienstjaar=self.format_report_date(report_date_iso)
-        )
+        # response = self.templated_request(
+        #     bsn=bsn, dienstjaar=self.format_report_date(report_date_iso)
+        # )
 
-        if response.status_code >= 300:
-            return None
+        # if response.status_code >= 300:
+        #     return None
 
-        jaaropgave = response.text
+        # jaaropgave = response.text
 
-        if (data := get_jaaropgave_dict(jaaropgave)) is None:
-            return None
+        # if (data := get_jaaropgave_dict(jaaropgave)) is None:
+        #     return None
+
+        with open(
+            "src/open_inwoner/ssd/tests/files/jaaropgave_response.xml", "r"
+        ) as file:
+            content = file.read()
+
+        data = get_jaaropgave(None)
+        # data = get_jaaropgave_dict(content)
+        # import pdb;pdb.set_trace()
 
         data.update(
             {
@@ -183,33 +194,42 @@ class UitkeringClient(SSDBaseClient):
         dt = datetime.strptime(report_date_iso, "%Y-%m-%d")
         return f"Maandspecificatie {django_date(dt, 'M Y')}"
 
-    def get_report(
+    def get_reports(
         self, bsn: str, report_date_iso: str, request_base_url: str
     ) -> Optional[bytes]:
-        response = self.templated_request(
-            bsn=bsn, period=self.format_report_date(report_date_iso)
-        )
+        # response = self.templated_request(
+        #     bsn=bsn, period=self.format_report_date(report_date_iso)
+        # )
 
-        if response.status_code >= 300:
+        # if response.status_code >= 300:
+        #     return None
+
+        # maandspecificatie = response.text
+
+        # if (data := get_uitkering_dict(maandspecificatie)) is None:
+        #     return None
+
+        uitkeringen = get_uitkeringen(None)
+
+        if not uitkeringen:
             return None
 
-        maandspecificatie = response.text
+        # import pdb;pdb.set_trace()
+        pdf_contents = []
+        for report_data in uitkeringen:
+            report_data.update(
+                {
+                    "logo": self.config.logo,
+                }
+            )
+            pdf = render_pdf(
+                self.html_template,
+                context={**report_data},
+                base_url=request_base_url,
+            )
+            pdf_contents.append(pdf)
 
-        if (data := get_uitkering_dict(maandspecificatie)) is None:
-            return None
-
-        data.update(
-            {
-                "logo": self.config.logo,
-            }
-        )
-        pdf_content = render_pdf(
-            self.html_template,
-            context={**data},
-            base_url=request_base_url,
-        )
-
-        return pdf_content
+        return pdf_contents
 
     @property
     def endpoint(self) -> str:

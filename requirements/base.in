@@ -52,6 +52,7 @@ django-yubin
 django-image-cropping
 django-log-outgoing-requests
 xmltodict
+xsdata
 
 # django cms
 django-cms

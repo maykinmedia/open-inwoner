@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:gwsb="http://www.centric.nl/GWS/Basisschema/v0400"
+        targetNamespace="http://www.centric.nl/GWS/Basisschema/v0400"
+        elementFormDefault="unqualified"
+        attributeFormDefault="unqualified">
+   <xs:complexType name="Actor">
+		    <xs:sequence>
+			      <xs:choice>
+				        <xs:element name="Bedrijfsnaam" type="gwsb:Bedrijfsnaam"/>
+				        <xs:element name="Gemeentecode" type="gwsb:Gemeentecode"/>
+			      </xs:choice>
+			      <xs:element name="ApplicatieNaam" type="gwsb:ApplicatieNaam" minOccurs="0"/>
+		    </xs:sequence>
+	  </xs:complexType>
+   <xs:simpleType name="IndicatieKolom">
+		    <xs:restriction base="xs:string">
+			      <xs:enumeration value="0">
+				        <xs:annotation>
+					          <xs:documentation>Niet afdrukken</xs:documentation>
+				        </xs:annotation>
+			      </xs:enumeration>
+			      <xs:enumeration value="1">
+				        <xs:annotation>
+					          <xs:documentation>Pluskolom</xs:documentation>
+				        </xs:annotation>
+			      </xs:enumeration>
+			      <xs:enumeration value="2">
+				        <xs:annotation>
+					          <xs:documentation>Minkolom</xs:documentation>
+				        </xs:annotation>
+			      </xs:enumeration>
+			      <xs:enumeration value="3">
+				        <xs:annotation>
+					          <xs:documentation>Basiskolom</xs:documentation>
+				        </xs:annotation>
+			      </xs:enumeration>
+		    </xs:restriction>
+	  </xs:simpleType>
+   <xs:simpleType name="TypePeriode">
+		    <xs:restriction base="xs:string">
+			      <xs:enumeration value="0">
+				        <xs:annotation>
+					          <xs:documentation>Periode betrekking</xs:documentation>
+				        </xs:annotation>
+			      </xs:enumeration>
+			      <xs:enumeration value="1">
+				        <xs:annotation>
+					          <xs:documentation>Periode verwerking</xs:documentation>
+				        </xs:annotation>
+			      </xs:enumeration>
+		    </xs:restriction>
+	  </xs:simpleType>
+   <xs:complexType name="Adres">
+		    <xs:sequence>
+			      <xs:element name="Locatie" type="gwsb:Locatie" minOccurs="0"/>
+			      <xs:element name="Straatnaam" type="gwsb:NaamAdresNederlandAN24" minOccurs="0"/>
+			      <xs:element name="Huisnummer" type="gwsb:NummerAdresNederlandN5" minOccurs="0"/>
+			      <xs:element name="Huisletter" type="gwsb:Huisletter" minOccurs="0"/>
+			      <xs:element name="HuisnrToevoeging"
+                     type="gwsb:NummerAdresNederlandAN6"
+                     minOccurs="0"/>
+			      <xs:element name="Postcode" type="gwsb:Postcode" minOccurs="0"/>
+			      <xs:element name="Woonplaatsnaam"
+                     type="gwsb:NaamAdresNederlandAN80"
+                     minOccurs="0"/>
+			      <xs:element name="Gemeentenaam"
+                     type="gwsb:NaamAdresNederlandAN40"
+                     minOccurs="0"/>
+		    </xs:sequence>
+	  </xs:complexType>
+   <xs:complexType name="Persoon">
+		    <xs:sequence>
+			      <xs:element name="BurgerServiceNr" type="gwsb:BSN"/>
+			      <xs:element name="Voornamen" type="gwsb:NaamPersoonA200" minOccurs="0"/>
+			      <xs:element name="Voorletters" type="gwsb:Voorletters" minOccurs="0"/>
+			      <xs:element name="Voorvoegsel" type="gwsb:Voorvoegsel" minOccurs="0"/>
+			      <xs:element name="Achternaam" type="gwsb:NaamPersoonA200"/>
+			      <xs:element name="AanduidingNaamgebruik"
+                     type="gwsb:AanduidingNaamgebruik"
+                     minOccurs="0"/>
+			      <xs:element name="VoorvoegselEchtgenoot" type="gwsb:Voorvoegsel" minOccurs="0"/>
+			      <xs:element name="AchternaamEchtgenoot"
+                     type="gwsb:NaamPersoonA200"
+                     minOccurs="0"/>
+		    </xs:sequence>
+	  </xs:complexType>
+   <xs:complexType name="StandaardBedrag">
+		    <xs:sequence>
+			      <xs:element name="CdPositiefNegatief" type="gwsb:CdPositiefNegatief"/>
+			      <xs:element name="WaardeBedrag" type="gwsb:WaardeBedrag"/>
+		    </xs:sequence>
+	  </xs:complexType>
+   <xs:simpleType name="BankIdentifierCode">
+		    <xs:restriction base="xs:string">
+			      <xs:pattern value="[A-Z]{6,6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3,3}){0,1}"/>
+		    </xs:restriction>
+	  </xs:simpleType>
+   <xs:simpleType name="CodeN10">
+		    <xs:restriction base="xs:string">
+			      <xs:maxLength value="10"/>
+			      <xs:pattern value="\d*"/>
+		    </xs:restriction>
+	  </xs:simpleType>
+   <xs:simpleType name="Datum">
+		    <xs:restriction base="xs:string">
+			      <xs:length value="8"/>
+			      <xs:pattern value="[1-2][0-9]{3}(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])"/>
+		    </xs:restriction>
+	  </xs:simpleType>
+   <xs:simpleType name="Dossiernummer">
+		    <xs:restriction base="xs:string">
+			      <xs:maxLength value="8"/>
+			      <xs:pattern value="\d*"/>
+		    </xs:restriction>
+	  </xs:simpleType>
+   <xs:simpleType name="Gemeentecode">
+		    <xs:restriction base="xs:string">
+			      <xs:length value="4"/>
+			      <xs:pattern value="\d*"/>
+		    </xs:restriction>
+	  </xs:simpleType>
+   <xs:simpleType name="IntBankAccountNumber">
+		    <xs:restriction base="xs:string">
+			      <xs:pattern value="[A-Z]{2,2}[0-9]{2,2}[a-zA-Z0-9]{1,30}"/>
+		    </xs:restriction>
+	  </xs:simpleType>
+   <xs:simpleType name="OmschrijvingAN30">
+		    <xs:restriction base="xs:string">
+			      <xs:maxLength value="30"/>
+		    </xs:restriction>
+	  </xs:simpleType>
+   <xs:simpleType name="OmschrijvingAN40">
+		    <xs:restriction base="xs:string">
+			      <xs:maxLength value="40"/>
+		    </xs:restriction>
+	  </xs:simpleType>
+   <xs:simpleType name="OmschrijvingAN200">
+		    <xs:restriction base="xs:string">
+			      <xs:maxLength value="200"/>
+		    </xs:restriction>
+	  </xs:simpleType>
+   <xs:simpleType name="Periodenummer">
+		    <xs:restriction base="xs:string">
+			      <xs:length value="6"/>
+			      <xs:pattern value="[1-2][0-9]{3}(0[1-9]|1[0-2])"/>
+		    </xs:restriction>
+	  </xs:simpleType>
+   <xs:simpleType name="ApplicatieNaam">
+		    <xs:restriction base="xs:string">
+			      <xs:maxLength value="100"/>
+		    </xs:restriction>
+	  </xs:simpleType>
+   <xs:simpleType name="Bedrijfsnaam">
+		    <xs:restriction base="xs:string">
+			      <xs:maxLength value="100"/>
+		    </xs:restriction>
+	  </xs:simpleType>
+   <xs:simpleType name="Huisletter">
+		    <xs:restriction base="xs:string">
+			      <xs:pattern value="([A-Z]{1}|[a-z]{1})"/>
+		    </xs:restriction>
+	  </xs:simpleType>
+   <xs:simpleType name="Locatie">
+		    <xs:restriction base="xs:string">
+			      <xs:maxLength value="35"/>
+		    </xs:restriction>
+	  </xs:simpleType>
+   <xs:simpleType name="NaamAdresNederlandAN24">
+		    <xs:restriction base="xs:string">
+			      <xs:maxLength value="24"/>
+		    </xs:restriction>
+	  </xs:simpleType>
+   <xs:simpleType name="NaamAdresNederlandAN40">
+		    <xs:restriction base="xs:string">
+			      <xs:maxLength value="40"/>
+		    </xs:restriction>
+	  </xs:simpleType>
+   <xs:simpleType name="NaamAdresNederlandAN80">
+		    <xs:restriction base="xs:string">
+			      <xs:maxLength value="80"/>
+		    </xs:restriction>
+	  </xs:simpleType>
+   <xs:simpleType name="NummerAdresNederlandAN6">
+		    <xs:restriction base="xs:string">
+			      <xs:maxLength value="6"/>
+		    </xs:restriction>
+	  </xs:simpleType>
+   <xs:simpleType name="NummerAdresNederlandN5">
+		    <xs:restriction base="xs:nonNegativeInteger">
+			      <xs:totalDigits value="5"/>
+		    </xs:restriction>
+	  </xs:simpleType>
+   <xs:simpleType name="Postcode">
+		    <xs:restriction base="xs:string">
+			      <xs:length value="6"/>
+			      <xs:pattern value="[1-9][0-9]{3}[A-Z]{2}"/>
+		    </xs:restriction>
+	  </xs:simpleType>
+   <xs:simpleType name="AanduidingNaamgebruik">
+		    <xs:restriction base="xs:string">
+			      <xs:enumeration value="0">
+				        <xs:annotation>
+					          <xs:documentation>Onbekend</xs:documentation>
+				        </xs:annotation>
+			      </xs:enumeration>
+			      <xs:enumeration value="1">
+				        <xs:annotation>
+					          <xs:documentation>Eigen naam</xs:documentation>
+				        </xs:annotation>
+			      </xs:enumeration>
+			      <xs:enumeration value="2">
+				        <xs:annotation>
+					          <xs:documentation>Naam echtgeno(o)te of geregistreerd partner</xs:documentation>
+				        </xs:annotation>
+			      </xs:enumeration>
+			      <xs:enumeration value="3">
+				        <xs:annotation>
+					          <xs:documentation>Naam echtgeno(o)te of geregistreerd partner gevolgd door eigen naam</xs:documentation>
+				        </xs:annotation>
+			      </xs:enumeration>
+			      <xs:enumeration value="4">
+				        <xs:annotation>
+					          <xs:documentation>Eigen naam gevolgd door naam echtgeno(o)te of geregistreerd partner</xs:documentation>
+				        </xs:annotation>
+			      </xs:enumeration>
+			      <xs:enumeration value="5">
+				        <xs:annotation>
+					          <xs:documentation>Pseudoniem</xs:documentation>
+				        </xs:annotation>
+			      </xs:enumeration>
+		    </xs:restriction>
+	  </xs:simpleType>
+   <xs:simpleType name="BSN">
+		    <xs:restriction base="xs:string">
+			      <xs:length value="9"/>
+			      <xs:pattern value="\d*"/>
+		    </xs:restriction>
+	  </xs:simpleType>
+   <xs:simpleType name="NaamPersoonA200">
+		    <xs:restriction base="xs:string">
+			      <xs:maxLength value="200"/>
+			      <xs:pattern value="\D*"/>
+		    </xs:restriction>
+	  </xs:simpleType>
+   <xs:simpleType name="Voorletters">
+		    <xs:restriction base="xs:string">
+			      <xs:maxLength value="12"/>
+			      <xs:pattern value="\D*"/>
+		    </xs:restriction>
+	  </xs:simpleType>
+   <xs:simpleType name="Voorvoegsel">
+		    <xs:restriction base="xs:string">
+			      <xs:maxLength value="10"/>
+			      <xs:pattern value="\D*"/>
+		    </xs:restriction>
+	  </xs:simpleType>
+   <xs:simpleType name="CdPositiefNegatief">
+		    <xs:restriction base="xs:string">
+			      <xs:enumeration value="+">
+				        <xs:annotation>
+					          <xs:documentation>Positief</xs:documentation>
+				        </xs:annotation>
+			      </xs:enumeration>
+			      <xs:enumeration value="-">
+				        <xs:annotation>
+					          <xs:documentation>Negatief</xs:documentation>
+				        </xs:annotation>
+			      </xs:enumeration>
+		    </xs:restriction>
+	  </xs:simpleType>
+   <xs:simpleType name="WaardeBedrag">
+		    <xs:restriction base="xs:nonNegativeInteger">
+			      <xs:totalDigits value="18"/>
+		    </xs:restriction>
+	  </xs:simpleType>
+</schema>

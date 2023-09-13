@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2016 sp1 (http://www.altova.com) by Centric Netherlands B.V. -->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:h="http://www.centric.nl/GWS/Header/v0300" xmlns:f="http://www.centric.nl/GWS/FWI/v0200" xmlns:tns="http://www.centric.nl/GWS/Diensten/UitkeringsSpecificatieClient/v0600" xmlns:ns="http://www.centric.nl/GWS/Basisschema/v0400" targetNamespace="http://www.centric.nl/GWS/Diensten/UitkeringsSpecificatieClient/v0600">
+	<types>
+		<xs:schema targetNamespace="http://www.centric.nl/GWS/Diensten/UitkeringsSpecificatieClient/v0600">
+			<xs:include schemaLocation="BodyAction_resolved.xsd"/>
+			<xs:include schemaLocation="BodyReaction_resolved.xsd"/>
+		</xs:schema>
+		<xs:schema targetNamespace="http://www.centric.nl/GWS/Header/v0300">
+			<xs:include schemaLocation="GWSMLHeader_resolved.xsd"/>
+		</xs:schema>
+		<xs:schema targetNamespace="http://www.centric.nl/GWS/FWI/v0200">
+			<xs:include schemaLocation="FWI_resolved.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="UitkeringsSpecificatieInfo">
+		<part name="Request" element="tns:UitkeringsSpecificatieInfo"/>
+	</message>
+	<message name="UitkeringsSpecificatieInfoResponse">
+		<part name="Response" element="tns:UitkeringsSpecificatieInfoResponse"/>
+	</message>
+	<message name="Header">
+		<part name="headerPart" element="h:Header"/>
+	</message>
+	<message name="FaultMessage">
+		<part name="FaultPart" element="f:FWI"/>
+	</message>
+	<portType name="UitkeringsSpecificatieClientPortType">
+		<operation name="SendUitkeringsSpecificatieClient">
+			<input message="tns:UitkeringsSpecificatieInfo" wsaw:Action="http://www.centric.nl/GWS/Diensten/UitkeringsSpecificatieClient-v0600/UitkeringsSpecificatieInfo"/>
+			<output message="tns:UitkeringsSpecificatieInfoResponse" wsaw:Action="http://www.centric.nl/GWS/Diensten/UitkeringsSpecificatieClient-v0600/UitkeringsSpecificatieInfoResponse"/>
+			<fault name="Fault" message="tns:FaultMessage" wsaw:Action="http://www.centric.nl/GWS/Diensten/UitkeringsSpecificatieClient-v0600/Fout"/>
+		</operation>
+	</portType>
+	<binding name="UitkeringsSpecificatieClientBinding" type="tns:UitkeringsSpecificatieClientPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsp:PolicyReference URI="#UitkeringsSpecificatieClientPolicy"/>
+		<operation name="SendUitkeringsSpecificatieClient">
+			<soap:operation soapAction="" name="SendUitkeringsSpecificatie"/>
+			<input>
+				<soap:header message="tns:Header" part="headerPart" use="literal"/>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:header message="tns:Header" part="headerPart" use="literal"/>
+				<soap:body use="literal"/>
+			</output>
+			<fault name="Fault"/>
+		</operation>
+	</binding>
+	<service name="UitkeringsSpecificatieClient">
+		<port name="UitkeringsSpecificatieClientPort" binding="tns:UitkeringsSpecificatieClientBinding">
+			<soap:address location="No target address"/>
+		</port>
+	</service>
+	<wsp:Policy wsu:Id="UitkeringsSpecificatieClientPolicy">
+		<wsp:ExactlyOne>
+			<wsp:All>
+				<wsaw:UsingAddressing/>
+			</wsp:All>
+		</wsp:ExactlyOne>
+	</wsp:Policy>
+</definitions>

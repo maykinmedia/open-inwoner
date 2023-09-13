@@ -33,12 +33,18 @@
                                 {% endrender_form %}
 
                                 <div>
-                                    {% if report_date %}
-                                        {% blocktrans with time_period=report_date|date:"M Y" %}
+                                    {% if date_report_not_found %}
+                                        {% blocktrans with time_period=date_report_not_found|date:"M Y" %}
                                             Geen uitkeringsspecificatie gevonden voor {{ time_period }}.
                                         {% endblocktrans %}
                                     {% endif %}
                                 </div>
+
+																<div>
+																	{% if multiple_reports is True %}
+																	<p>test...</p>
+																	{% endif %}
+																</div>
                             </div>
                         </div>
                     {% else %}

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:gwsb="http://www.centric.nl/GWS/Basisschema/v0400"
+        xmlns:fwi="http://www.centric.nl/GWS/FWI/v0200"
+        xmlns:gwsd="http://www.centric.nl/GWS/Diensten/UitkeringsSpecificatieClient/v0600"
+        targetNamespace="http://www.centric.nl/GWS/Diensten/UitkeringsSpecificatieClient/v0600"
+        elementFormDefault="unqualified"
+        attributeFormDefault="unqualified">
+   <import namespace="http://www.centric.nl/GWS/FWI/v0200"
+           schemaLocation="FWI_resolved.xsd"/>
+   <import namespace="http://www.centric.nl/GWS/Basisschema/v0400"
+           schemaLocation="FWI-Include_resolved.xsd"/>
+   <xs:element name="UitkeringsSpecificatieInfoResponse" type="gwsd:Response"/>
+   <xs:complexType name="Response">
+		    <xs:choice>
+			      <xs:sequence>
+				        <xs:element name="UitkeringsSpecificatieClient"
+                        type="gwsd:UitkeringsSpecificatieClient"
+                        minOccurs="0"/>
+				        <xs:element ref="fwi:FWI" minOccurs="0"/>
+			      </xs:sequence>
+			      <xs:element ref="fwi:NietsGevonden"/>
+		    </xs:choice>
+	  </xs:complexType>
+   <xs:complexType name="UitkeringsSpecificatieClient">
+		    <xs:sequence>
+			      <xs:element name="Client" type="gwsd:ClientType" minOccurs="0"/>
+			      <xs:element name="TypePeriode" type="gwsb:TypePeriode"/>
+			      <xs:element name="Uitkeringsspecificatie"
+                     type="gwsd:Uitkeringsspecificatie"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+		    </xs:sequence>
+	  </xs:complexType>
+   <xs:complexType name="ClientType">
+		    <xs:complexContent>
+			      <xs:extension base="gwsd:Client">
+				        <xs:sequence>
+					          <xs:element name="Adres" type="gwsb:Adres" minOccurs="0"/>
+				        </xs:sequence>
+			      </xs:extension>
+		    </xs:complexContent>
+	  </xs:complexType>
+   <xs:complexType name="Uitkeringsspecificatie">
+		    <xs:sequence>
+			      <xs:element name="Uitkeringsinstantie" type="gwsd:Uitkeringsinstantie"/>
+			      <xs:element name="Dossierhistorie"
+                     type="gwsd:Dossierhistorie"
+                     minOccurs="1"
+                     maxOccurs="unbounded"/>
+		    </xs:sequence>
+	  </xs:complexType>
+   <xs:complexType name="Uitkeringsinstantie">
+		    <xs:sequence>
+			      <xs:element name="Gemeentecode" type="gwsb:Gemeentecode"/>
+			      <xs:element name="Gemeentenaam"
+                     type="gwsb:NaamAdresNederlandAN40"
+                     minOccurs="0"/>
+			      <xs:element name="Bezoekadres" type="gwsb:OmschrijvingAN30" minOccurs="0"/>
+			      <xs:element name="Postcode" type="gwsb:Postcode" minOccurs="0"/>
+			      <xs:element name="Woonplaatsnaam"
+                     type="gwsb:NaamAdresNederlandAN80"
+                     minOccurs="0"/>
+		    </xs:sequence>
+	  </xs:complexType>
+   <xs:complexType name="Dossierhistorie">
+		    <xs:sequence>
+			      <xs:element name="Regeling" type="gwsb:OmschrijvingAN30"/>
+			      <xs:element name="Dossiernummer" type="gwsb:Dossiernummer"/>
+			      <xs:element name="Periodenummer" type="gwsb:Periodenummer"/>
+			      <xs:element name="Betrekkingsperiode" type="gwsb:Periodenummer"/>
+			      <xs:element name="UitbetaaldBedragClient"
+                     type="gwsb:StandaardBedrag"
+                     minOccurs="0"/>
+			      <xs:element name="Iban" type="gwsb:IntBankAccountNumber" minOccurs="0"/>
+			      <xs:element name="Bic" type="gwsb:BankIdentifierCode" minOccurs="0"/>
+			      <xs:element name="OverigeBijstandspartij"
+                     type="gwsd:OverigeBijstandspartij"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+			      <xs:element name="OpgegevenInkomsten" type="gwsb:StandaardBedrag" minOccurs="0"/>
+			      <xs:element name="TeVerrekenenInkomsten"
+                     type="gwsb:StandaardBedrag"
+                     minOccurs="0"/>
+			      <xs:element name="InkomstenVrijlating"
+                     type="gwsb:StandaardBedrag"
+                     minOccurs="0"/>
+			      <xs:element name="InkomstenNaVrijlating"
+                     type="gwsb:StandaardBedrag"
+                     minOccurs="0"/>
+			      <xs:element name="VakantiegeldOverInkomsten"
+                     type="gwsb:StandaardBedrag"
+                     minOccurs="0"/>
+			      <xs:element name="GekorteInkomsten" type="gwsb:StandaardBedrag" minOccurs="0"/>
+			      <xs:element name="UitbetaaldBedragDossier"
+                     type="gwsb:StandaardBedrag"
+                     minOccurs="0"/>
+			      <xs:element name="DatumBetaald" type="gwsb:Datum" minOccurs="0"/>
+			      <xs:element name="Componenthistorie"
+                     type="gwsd:Componenthistorie"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+		    </xs:sequence>
+	  </xs:complexType>
+   <xs:complexType name="OverigeBijstandspartij">
+		    <xs:complexContent>
+			      <xs:extension base="gwsd:Client">
+				        <xs:sequence>
+					          <xs:element name="UitbetaaldBedrag" type="gwsb:StandaardBedrag" minOccurs="0"/>
+					          <xs:element name="Iban" type="gwsb:IntBankAccountNumber" minOccurs="0"/>
+					          <xs:element name="Bic" type="gwsb:BankIdentifierCode" minOccurs="0"/>
+				        </xs:sequence>
+			      </xs:extension>
+		    </xs:complexContent>
+	  </xs:complexType>
+   <xs:complexType name="Client">
+		    <xs:complexContent>
+			      <xs:extension base="gwsb:Persoon">
+				        <xs:sequence>
+					          <xs:element name="Clientnummer" type="gwsb:CodeN10" minOccurs="0"/>
+				        </xs:sequence>
+			      </xs:extension>
+		    </xs:complexContent>
+	  </xs:complexType>
+   <xs:complexType name="Componenthistorie">
+		    <xs:sequence>
+			      <xs:element name="Omschrijving" type="xs:string"/>
+			      <xs:element name="Bedrag" type="gwsb:StandaardBedrag"/>
+			      <xs:element name="IndicatieKolom" type="gwsb:IndicatieKolom"/>
+			      <xs:element name="Toelichting" type="gwsb:OmschrijvingAN40" minOccurs="0"/>
+			      <xs:element name="Crediteur" type="gwsb:OmschrijvingAN200" minOccurs="0"/>
+		    </xs:sequence>
+	  </xs:complexType>
+</schema>

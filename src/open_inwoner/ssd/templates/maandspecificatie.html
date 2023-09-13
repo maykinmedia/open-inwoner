@@ -3,14 +3,14 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-    <title>Maandspecificatie {{ uitkeringsspecificatie.periode.value }}</title>
+    <title>Maandspecificatie {{ uitkeringsspecificatie.periode }}</title>
 </head>
 <body>
 <div class="monthly-report">
     <!-- HEADER -->
     <header class="header flex-container">
         <div class="flex-box heading left">
-            <h1 class="h1">Maandspecificatie {{ uitkeringsspecificatie.periode.value }}</h1>
+            <h1 class="h1">Maandspecificatie {{ uitkeringsspecificatie.periode }}</h1>
         </div>
         <div class="flex-box heading__logo right">
             <img class="monthly-report__logo" src="{{ logo.url }}" alt="">
@@ -20,10 +20,10 @@
     <h2 class="h2 section-title">Uitkeringsinstantie</h2>
     <section class="section section__uitkeringsinstantie">
         <table class="monthly-report__table">
-            {% for key, detail in uitkeringsinstantie.items %}
+            {% for key, value in uitkeringsinstantie.items %}
                 <tr class="monthly-report__tr">
-                    <td class="monthly-report__td">{{ detail.key }}</td>
-                    <td class="monthly-report__td">{{ detail.value }}</td>
+                    <td class="monthly-report__td">{{ key }}</td>
+                    <td class="monthly-report__td">{{ value }}</td>
                 </tr>
             {% endfor %}
         </table>
@@ -32,10 +32,10 @@
     <h2 class="h2 section-title">Client</h2>
     <section class="section section__client">
         <table class="monthly-report__table">
-            {% for key, detail in client.items %}
+            {% for key, value in client.items %}
                 <tr class="monthly-report__tr">
-                    <td class="monthly-report__td">{{ detail.key }}</td>
-                    <td class="monthly-report__td">{{ detail.value }}</td>
+                    <td class="monthly-report__td">{{ key }}</td>
+                    <td class="monthly-report__td">{{ value }}</td>
                 </tr>
             {% endfor %}
         </table>
@@ -44,10 +44,10 @@
     <h2 class="h2 section-title">Uitkeringsspecificatie</h2>
     <section class="section section__uitkeringsspecificatie">
         <table class="monthly-report__table">
-            {% for key, detail in uitkeringsspecificatie.items %}
+            {% for key, value in uitkeringsspecificatie.items %}
                 <tr class="monthly-report__tr">
-                    <td class="monthly-report__td">{{ detail.key }}</td>
-                    <td class="monthly-report__td">{{ detail.value }}</td>
+                    <td class="monthly-report__td">{{ key }}</td>
+                    <td class="monthly-report__td">{{ value }}</td>
                 </tr>
             {% endfor %}
         </table>
@@ -68,9 +68,9 @@
                 <td class="monthly-report__td">Plus (&euro;)</td>
                 <td class="monthly-report__td">Min (&euro;)</td>
             </tr>
-            {% for key, detail in details.items %}
+            {% for detail in details %}
                 <tr class="monthly-report__tr">
-                    <td class="monthly-report__td">{{ detail.key }}</td>
+                    <td class="monthly-report__td">{{ detail.omschrijving }}</td>
                     <td class="monthly-report__td">{% get_detail_value_for_column detail "base" %}</td>
                     <td class="monthly-report__td">{% get_detail_value_for_column detail "plus" %}</td>
                     <td class="monthly-report__td">{% get_detail_value_for_column detail "minus" %}</td>
@@ -89,7 +89,7 @@
                 <tr class="monthly-report__tr">
                     <td class="monthly-report__td">{{ detail.key }}</td>
                     <td class="monthly-report__td">&euro;</td>
-                    <td class="monthly-report__td">{{ detail.value }}</td>
+                    <td class="monthly-report__td">{% format_float_repr detail.value %}</td>
                     <td class="monthly-report__td">{{ detail.sign }}</td>
                 </tr>
                 {% if forloop.counter|divisibleby:2 %}

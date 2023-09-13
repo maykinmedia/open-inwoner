@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.w3.org/2005/08/addressing" targetNamespace="http://www.w3.org/2005/08/addressing" elementFormDefault="qualified" attributeFormDefault="unqualified" blockDefault="#all">
+	<!-- Constructs from the WS-Addressing Core -->
+	<xs:element name="EndpointReference" type="tns:EndpointReferenceType"/>
+	<xs:complexType name="EndpointReferenceType" mixed="false">
+		<xs:sequence>
+			<xs:element name="Address" type="tns:AttributedURIType"/>
+			<xs:element ref="tns:ReferenceParameters" minOccurs="0"/>
+			<xs:element ref="tns:Metadata" minOccurs="0"/>
+			<xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:anyAttribute namespace="##other" processContents="lax"/>
+	</xs:complexType>
+	<xs:element name="ReferenceParameters" type="tns:ReferenceParametersType"/>
+	<xs:complexType name="ReferenceParametersType" mixed="false">
+		<xs:sequence>
+			<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:anyAttribute namespace="##other" processContents="lax"/>
+	</xs:complexType>
+	<xs:element name="Metadata" type="tns:MetadataType"/>
+	<xs:complexType name="MetadataType" mixed="false">
+		<xs:sequence>
+			<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:anyAttribute namespace="##other" processContents="lax"/>
+	</xs:complexType>
+		<xs:element name="MessageID" type="tns:AttributedURIType"/>
+	<xs:element name="RelatesTo" type="tns:RelatesToType"/>
+	<xs:complexType name="RelatesToType" mixed="false">
+		<xs:simpleContent>
+			<xs:extension base="xs:anyURI">
+				<xs:attribute name="RelationshipType" type="tns:RelationshipTypeOpenEnum" use="optional" default="http://www.w3.org/2005/08/addressing/reply"/>
+				<xs:anyAttribute namespace="##other" processContents="lax"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:simpleType name="RelationshipTypeOpenEnum">
+		<xs:union memberTypes="tns:RelationshipType xs:anyURI"/>
+	</xs:simpleType>
+	<xs:simpleType name="RelationshipType">
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="http://www.w3.org/2005/08/addressing/reply"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:element name="ReplyTo" type="tns:EndpointReferenceType"/>
+	<xs:element name="From" type="tns:EndpointReferenceType"/>
+	<xs:element name="FaultTo" type="tns:EndpointReferenceType"/>
+	<xs:element name="To" type="tns:AttributedURIType"/>
+	<xs:element name="Action" type="tns:AttributedURIType"/>
+	<xs:complexType name="AttributedURIType" mixed="false">
+		<xs:simpleContent>
+			<xs:extension base="xs:anyURI">
+				<xs:anyAttribute namespace="##other" processContents="lax"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+</xs:schema>
