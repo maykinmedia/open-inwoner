@@ -30,6 +30,7 @@
         aria-label="{% firstof title text %}"
         {% as_attributes extra_attributes %}
         {% if id %} id="{{ id }}" {% endif %}
+        {% if form_id %} form="{{ form_id }}"{% endif %}
         {% if ariaExpanded %} aria-expanded="{{ ariaExpanded }}" {% endif %}
     >
         {% if icon %}{% icon icon=icon outlined=icon_outlined %}{% endif %}
