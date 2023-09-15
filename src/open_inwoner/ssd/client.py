@@ -14,9 +14,8 @@ from requests import Response
 
 from ..utils.export import render_pdf
 from .models import SSDConfig
-from .xml.jaaropgave import get_jaaropgave
+from .xml.jaaropgave import get_jaaropgaven
 from .xml.uitkering import get_uitkeringen
-from .xml_old import get_jaaropgave_dict, get_uitkering_dict
 
 logger = logging.getLogger(__name__)
 
@@ -135,7 +134,7 @@ class JaaropgaveClient(SSDBaseClient):
         dt = datetime.strptime(report_date_iso, "%Y-%m-%d")
         return f"Jaaropgave {dt.strftime('%Y')}"
 
-    def get_report(
+    def get_reports(
         self, bsn: str, report_date_iso: str, request_base_url: str
     ) -> Optional[bytes]:
         # response = self.templated_request(
@@ -150,28 +149,25 @@ class JaaropgaveClient(SSDBaseClient):
         # if (data := get_jaaropgave_dict(jaaropgave)) is None:
         #     return None
 
-        with open(
-            "src/open_inwoner/ssd/tests/files/jaaropgave_response.xml", "r"
-        ) as file:
-            content = file.read()
-
-        data = get_jaaropgave(None)
+        jaaropgaven = get_jaaropgaven(None)
         # data = get_jaaropgave_dict(content)
-        # import pdb;pdb.set_trace()
 
-        data.update(
-            {
-                "logo": self.config.logo,
-                "jaaropgave_comments": self.config.jaaropgave_comments,
-            }
-        )
-        pdf_content = render_pdf(
+        if not jaaropgaven:
+            return None
+
+        for report_data in jaaropgaven:
+            report_data.update(
+                {
+                    "logo": self.config.logo,
+                    "jaaropgave_comments": self.config.jaaropgave_comments,
+                }
+            )
+        pdf = render_pdf(
             self.html_template,
-            context={**data},
+            context={"reports": jaaropgaven},
             base_url=request_base_url,
         )
-
-        return pdf_content
+        return pdf
 
     @property
     def endpoint(self) -> str:
@@ -214,22 +210,18 @@ class UitkeringClient(SSDBaseClient):
         if not uitkeringen:
             return None
 
-        # import pdb;pdb.set_trace()
-        pdf_contents = []
         for report_data in uitkeringen:
             report_data.update(
                 {
                     "logo": self.config.logo,
                 }
             )
-            pdf = render_pdf(
-                self.html_template,
-                context={**report_data},
-                base_url=request_base_url,
-            )
-            pdf_contents.append(pdf)
-
-        return pdf_contents
+        pdf = render_pdf(
+            self.html_template,
+            context={"reports": uitkeringen},
+            base_url=request_base_url,
+        )
+        return pdf
 
     @property
     def endpoint(self) -> str:

@@ -1,13 +1,15 @@
 from datetime import datetime
+from io import BytesIO
 from typing import Type, Union
+from zipfile import ZipFile
 
 from django import forms
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.shortcuts import redirect
-from django.urls import reverse
 from django.views.generic.edit import FormView
 
+from ..utils.export import render_pdf
 from .client import JaaropgaveClient, UitkeringClient
 from .forms import MonthlyReportsForm, YearlyReportsForm
 
@@ -26,14 +28,11 @@ class BenefitsFormView(LoginRequiredMixin, FormView):
 
         if "not_found" in self.request.GET:
             dt = datetime.strptime(self.request.GET["report"], "%Y-%m-%d")
-            context["date_report_not_found"] = dt
+            context["report_not_found"] = dt
 
         return context
 
     def post(self, request, *args, **kwargs):
-        if "multiple_reports" in request.session:
-            del request.session["multiple_reports"]
-
         form = self.get_form()
 
         if form.is_valid():
@@ -43,41 +42,18 @@ class BenefitsFormView(LoginRequiredMixin, FormView):
             report_date_iso = form.data["report_date"]
             request_base_url = request.build_absolute_uri()
 
-            pdf_contents = client.get_reports(bsn, report_date_iso, request_base_url)
-            # pdf_content = client.get_reports(bsn, report_date_iso, request_base_url)
+            pdf_content = client.get_reports(bsn, report_date_iso, request_base_url)
 
-            # no content
-            if pdf_contents is None:
+            if pdf_content is None:
                 return redirect(
                     self.request.get_full_path()
                     + f"?report={report_date_iso}&not_found"
                 )
-            # single report (default)
-            elif len(pdf_contents) == 1:
-                pdf_name = client.format_file_name(report_date_iso)
 
-                response = HttpResponse(pdf_contents[0], content_type="application/pdf")
-                response["Content-Disposition"] = f"attachment; filename={pdf_name}.pdf"
-                return response
-            # multiple reports (vakantiegeld)
-            else:
-                import zipfile
-                from io import BytesIO
-                from zipfile import ZipFile
-
-                archive = BytesIO()
-                with ZipFile(archive, "w") as zip_obj:
-                    for index, pdf in enumerate(pdf_contents):
-                        pdf_name = (
-                            f"{client.format_file_name(report_date_iso)} ({index})"
-                        )
-                        zip_obj.writestr(pdf_name, pdf)
-
-                response = HttpResponse(
-                    archive.getvalue(), content_type="application/zip"
-                )
-                response["Content-Disposition"] = "attachment; filename=uitkeringen.zip"
-                return response
+            pdf_name = client.format_file_name(report_date_iso)
+            response = HttpResponse(pdf_content, content_type="application/pdf")
+            response["Content-Disposition"] = f"attachment; filename={pdf_name}.pdf"
+            return response
 
 
 class MonthlyBenefitsFormView(BenefitsFormView):
