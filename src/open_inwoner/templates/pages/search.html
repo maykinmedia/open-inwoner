@@ -9,7 +9,7 @@
                 &nbsp;
             </div>{% endspaceless %}
             <div class="grid__main">
-                <h1 class="h1">Zoeken</h1>
+                <h1 class="h1">{% trans "Zoeken naar " %} "{{ form.query.value }}"</h1>
                 <div class="form form--columns-2 form--inline form--align-end form--search">
                     {% input form.query %}
                     {% form_actions primary_text="Zoeken" primary_icon="arrow_forward" %}
