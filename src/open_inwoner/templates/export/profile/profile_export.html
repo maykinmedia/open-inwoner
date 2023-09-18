@@ -36,22 +36,29 @@
         </tr>
         <tr>
             <th class="table__header">{% trans "Communicatievoorkeuren" %}</th>
-            <td class="table__item">{{ request.user.get_active_notifications }}</td>
+            <td class="table__item">{{ object.get_active_notifications }}</td>
         </tr>
     </table>
 
-
-    <h2 class="h2 h2--extra">{% trans "Netwerkcontacten" %}</h2>
-    {% include "export/include/contacts.html" %}
-
-
-    <h2 class="h2 h2--extra">{% trans "Acties" %}</h2>
-    {% include "export/include/actions.html" with actions=object.actions.visible %}
-
-
-    <h2 class="h2 h2--extra">{% trans "Bestanden" %}</h2>
-    {% if object.get_all_files %}
-        {% file_table files=object.get_all_files download_view="profile:documents_download" %}
+    {% with pending_invitations=object.get_pending_invitations contacts_for_approval=object.get_contacts_for_approval active_contacts=object.get_active_contacts %}
+    {% if pending_invitations or contacts_for_approval or active_contacts %}
+        <h2 class="h2 h2--extra">{% trans "Netwerkcontacten" %}</h2>
+        {% include "export/include/contacts.html" %}
     {% endif %}
+    {% endwith %}
+
+    {% with object.actions.visible as actions %}
+    {% if files %}
+        <h2 class="h2 h2--extra">{% trans "Acties" %}</h2>
+        {% include "export/include/actions.html" with actions=actions %}
+    {% endif %}
+    {% endwith %}
+
+    {% with object.get_all_files as files %}
+    {% if files %}
+        <h2 class="h2 h2--extra">{% trans "Bestanden" %}</h2>
+        {% file_table files=files download_view="profile:documents_download" %}
+    {% endif %}
+    {% endwith %}
 
 {% endblock %}
