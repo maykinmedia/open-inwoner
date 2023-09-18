@@ -69,7 +69,6 @@ class SearchView(
         paginator_dict = self.paginate_with_context(results.results)
 
         context.update(paginator_dict)
-        context.update({"results": results})
 
         return self.render_to_response(context)
 
@@ -142,4 +141,4 @@ class SearchView(
     @property
     def display_restricted(self):
         config = SiteConfiguration.get_solo()
-        return config.hide_categories_from_anonymous_users is True
+        return config.hide_categories_from_anonymous_users

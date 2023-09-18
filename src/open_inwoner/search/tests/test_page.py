@@ -49,7 +49,7 @@ class SearchPageTests(ESMixin, WebTest):
             # check that facet fields are not shown
             self.assertNotIn(facet, search_form.fields)
 
-        results_div = response.html.find("div", {"class": "search-results"})
+        results_div = response.html.find("div", {"class": "search-results__list"})
         self.assertIsNone(results_div)  # check that results are not shown
 
     def test_show_results_and_filter_with_search(self):
@@ -75,7 +75,7 @@ class SearchPageTests(ESMixin, WebTest):
         results_div = response.html.find("div", {"class": "search-results"})
         self.assertIsNotNone(results_div)  # check that results are shown
 
-        results = response.context["results"].results
+        results = response.context["paginator"].object_list
         self.assertEqual(len(results), 2)
 
     def test_search_with_filter(self):
@@ -105,7 +105,7 @@ class SearchPageTests(ESMixin, WebTest):
         results_div = response.html.find("div", {"class": "search-results"})
         self.assertIsNotNone(results_div)  # check that results are shown
 
-        results = response.context["results"].results
+        results = response.context["paginator"].object_list
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].slug, self.product1.slug)
 
@@ -118,7 +118,7 @@ class SearchPageTests(ESMixin, WebTest):
 
         self.assertEqual(response.status_code, 200)
 
-        results = response.context["results"].results
+        results = response.context["paginator"].object_list
         self.assertEqual(len(results), 21)
 
         pagination_div = response.html.find("div", {"class": "pagination"})
