@@ -51,7 +51,7 @@ class TestMonthlyBenefitsFormView(TestCase):
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
     @patch(
-        "open_inwoner.ssd.client.UitkeringClient.get_report",
+        "open_inwoner.ssd.client.UitkeringClient.get_reports",
         return_value=mock_report(str(FILES_DIR / "uitkering_response_basic.xml")),
     )
     @freeze_time("1985-12-25")
@@ -65,7 +65,7 @@ class TestMonthlyBenefitsFormView(TestCase):
         self.assertEqual(response.headers["content-type"], "application/pdf")
 
     @patch(
-        "open_inwoner.ssd.client.UitkeringClient.get_report",
+        "open_inwoner.ssd.client.UitkeringClient.get_reports",
         return_value=None,
     )
     @freeze_time("1985-12-25")
@@ -86,7 +86,7 @@ class TestMonthlyBenefitsFormView(TestCase):
         )
 
     @patch(
-        "open_inwoner.ssd.client.UitkeringClient.get_report",
+        "open_inwoner.ssd.client.UitkeringClient.get_reports",
         return_value=None,
     )
     @freeze_time("1985-12-25")
@@ -98,7 +98,7 @@ class TestMonthlyBenefitsFormView(TestCase):
             self.client.post(url, data={"report_date": "bad-user-input"})
 
     @patch("open_inwoner.ssd.models.SSDConfig.get_solo")
-    def test_get_report_not_enabled(self, mock_solo):
+    def test_get_reports_not_enabled(self, mock_solo):
         mock_solo.return_value.maandspecificatie_enabled = False
 
         url = reverse("ssd:monthly_benefits_index")
@@ -137,7 +137,7 @@ class TestYearlyBenefitsFormView(TestCase):
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
     @patch(
-        "open_inwoner.ssd.client.JaaropgaveClient.get_report",
+        "open_inwoner.ssd.client.JaaropgaveClient.get_reports",
         return_value=mock_report(str(FILES_DIR / "jaaropgave_response.xml")),
     )
     @freeze_time("1985-12-25")
@@ -151,7 +151,7 @@ class TestYearlyBenefitsFormView(TestCase):
         self.assertEqual(response.headers["content-type"], "application/pdf")
 
     @patch(
-        "open_inwoner.ssd.client.JaaropgaveClient.get_report",
+        "open_inwoner.ssd.client.JaaropgaveClient.get_reports",
         return_value=None,
     )
     @freeze_time("1985-12-25")
@@ -170,7 +170,7 @@ class TestYearlyBenefitsFormView(TestCase):
         self.assertContains(response, "Geen uitkeringsspecificatie gevonden voor 1984")
 
     @patch("open_inwoner.ssd.forms.SSDConfig.get_solo")
-    def test_get_report_not_enabled(self, mock_solo):
+    def test_get_reports_not_enabled(self, mock_solo):
         mock_solo.return_value.jaaropgave_enabled = False
 
         url = reverse("ssd:yearly_benefits_index")

@@ -50,11 +50,11 @@
 						</tr>
 						<tr class="monthly-report__tr">
 							<td class="monthly-report__td">Naam</td>
-							<td class="monthly-report__td">{% format_name client %}</td>
+							<td class="monthly-report__td">{% format_string client.voorletters client.voorvoegsel client.achternaam %}</td>
 						</tr>
 						<tr class="monthly-report__tr">
 							<td class="monthly-report__td">Adres</td>
-							<td class="monthly-report__td">{% format_street client %}</td>
+							<td class="monthly-report__td">{% format_string client.adres.straatnaam client.adres.huisnummer client.adress.huisletter %}</td>
 						</tr>
 						<tr class="monthly-report__tr">
 							<td class="monthly-report__td">Postcode</td>

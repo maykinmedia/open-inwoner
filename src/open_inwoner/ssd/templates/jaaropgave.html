@@ -25,8 +25,8 @@
 			<!-- Addresses -->
 			<div class="flex-container__address address">
 					<div class="flex-box heading personalia">
-							<p class="yearly-report__p">{% format_name client %}</p>
-							<p class="yearly-report__p">{% format_street client %}</p>
+							<p class="yearly-report__p">{% format_string client.voorletters client.voorvoegsel client.achternaam %}</p>
+							<p class="yearly-report__p">{% format_string client.adres.straatnaam client.adres.huisnummer client.adress.huisletter %}</p>
 							<p class="yearly-report__p">{{ client.adres.postcode }} {{ client.adres.woonplaatsnaam }}</p>
 					</div>
 					<div class="flex-box heading address">

@@ -1,7 +1,5 @@
 from datetime import datetime
-from io import BytesIO
 from typing import Type, Union
-from zipfile import ZipFile
 
 from django import forms
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -9,7 +7,6 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.views.generic.edit import FormView
 
-from ..utils.export import render_pdf
 from .client import JaaropgaveClient, UitkeringClient
 from .forms import MonthlyReportsForm, YearlyReportsForm
 

@@ -140,7 +140,7 @@ class UitkeringClientTest(TestCase):
                     "https://example.com/soap-service/maandspecificatie/",
                     status_code=code,
                 )
-                res = client.get_report(
+                res = client.get_reports(
                     bsn="12345",
                     report_date_iso="1985-07-25",
                     request_base_url="https://dummy.com",
@@ -157,7 +157,7 @@ class UitkeringClientTest(TestCase):
 
         mock_request.post("https://example.com/soap-service/maandspecificatie/")
 
-        client.get_report(
+        client.get_reports(
             bsn="12345",
             report_date_iso="1985-07-25",
             request_base_url="https://dummy.com",
@@ -197,7 +197,7 @@ class JaaropgaveClientTest(TestCase):
                     "https://example.com/soap-service/jaaropgave/",
                     status_code=code,
                 )
-                res = client.get_report(
+                res = client.get_reports(
                     bsn="12345",
                     report_date_iso="1985-12-24",
                     request_base_url="https://dummy.com",
@@ -214,7 +214,7 @@ class JaaropgaveClientTest(TestCase):
 
         mock_request.post("https://example.com/soap-service/jaaropgave/")
 
-        client.get_report(
+        client.get_reports(
             bsn="12345",
             report_date_iso="1985-12-12",
             request_base_url="https://dummy.com",

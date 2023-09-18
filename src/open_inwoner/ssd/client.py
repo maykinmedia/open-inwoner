@@ -14,8 +14,7 @@ from requests import Response
 
 from ..utils.export import render_pdf
 from .models import SSDConfig
-from .xml.jaaropgave import get_jaaropgaven
-from .xml.uitkering import get_uitkeringen
+from .xml import get_jaaropgaven, get_uitkeringen
 
 logger = logging.getLogger(__name__)
 
@@ -98,18 +97,18 @@ class SSDBaseClient(ABC):
         :returns: formatted string for PDF name
         """
 
-    # @abstractmethod
-    # def get_report(
-    #     self, bsn: str, report_date_iso: str, base_url: str
-    # ) -> Optional[bytes]:
-    #     """
-    #     :param bsn: the BSN number of the client making the request
-    #     :param report_date_iso: the date of the requested report in ISO 8601 format
-    #     :param base_url: the absolute URI of the request, allows the use of
-    #     relative URLs in templates used to generate PDFs
-    #     :returns: a yearly/monthly benefits report PDF (bytes) if the request to
-    #     the client's SOAP service is successful, `None` otherwise
-    #     """
+    @abstractmethod
+    def get_reports(
+        self, bsn: str, report_date_iso: str, base_url: str
+    ) -> Optional[bytes]:
+        """
+        :param bsn: the BSN number of the client making the request
+        :param report_date_iso: the date of the requested report in ISO 8601 format
+        :param base_url: the absolute URI of the request, allows the use of
+        relative URLs in templates used to generate PDFs
+        :returns: a yearly/monthly benefits report PDF (bytes) if the request to
+        the client's SOAP service is successful, `None` otherwise
+        """
 
     @property
     def endpoint(self) -> str:
@@ -137,20 +136,14 @@ class JaaropgaveClient(SSDBaseClient):
     def get_reports(
         self, bsn: str, report_date_iso: str, request_base_url: str
     ) -> Optional[bytes]:
-        # response = self.templated_request(
-        #     bsn=bsn, dienstjaar=self.format_report_date(report_date_iso)
-        # )
+        response = self.templated_request(
+            bsn=bsn, dienstjaar=self.format_report_date(report_date_iso)
+        )
 
-        # if response.status_code >= 300:
-        #     return None
+        if response.status_code != 200:
+            return None
 
-        # jaaropgave = response.text
-
-        # if (data := get_jaaropgave_dict(jaaropgave)) is None:
-        #     return None
-
-        jaaropgaven = get_jaaropgaven(None)
-        # data = get_jaaropgave_dict(content)
+        jaaropgaven = get_jaaropgaven(response)
 
         if not jaaropgaven:
             return None
@@ -193,19 +186,14 @@ class UitkeringClient(SSDBaseClient):
     def get_reports(
         self, bsn: str, report_date_iso: str, request_base_url: str
     ) -> Optional[bytes]:
-        # response = self.templated_request(
-        #     bsn=bsn, period=self.format_report_date(report_date_iso)
-        # )
+        response = self.templated_request(
+            bsn=bsn, period=self.format_report_date(report_date_iso)
+        )
 
-        # if response.status_code >= 300:
-        #     return None
+        if response.status_code != 200:
+            return None
 
-        # maandspecificatie = response.text
-
-        # if (data := get_uitkering_dict(maandspecificatie)) is None:
-        #     return None
-
-        uitkeringen = get_uitkeringen(None)
+        uitkeringen = get_uitkeringen(response)
 
         if not uitkeringen:
             return None

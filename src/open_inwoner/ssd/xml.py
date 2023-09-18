@@ -12,10 +12,14 @@ from .service.uitkering import (
     UitkeringsSpecificatieInfoResponse as UitkeringInfoResponse,
 )
 
-JAAROPGAVE_INFO_RESPONSE_NODE = "//{http://www.centric.nl/GWS/Diensten/JaarOpgaveClient/v0400}" "JaarOpgaveInfoResponse"
+JAAROPGAVE_INFO_RESPONSE_NODE = (
+    "//{http://www.centric.nl/GWS/Diensten/JaarOpgaveClient/v0400}"
+    "JaarOpgaveInfoResponse"
+)
 
 UITKERING_INFO_RESPONSE_NODE = (
-    "//{http://www.centric.nl/GWS/Diensten/UitkeringsSpecificatieClient/v0600}" "UitkeringsSpecificatieInfoResponse"
+    "//{http://www.centric.nl/GWS/Diensten/UitkeringsSpecificatieClient/v0600}"
+    "UitkeringsSpecificatieInfoResponse"
 )
 
 
@@ -28,6 +32,9 @@ def _get_report_info(
     :returns: the `info_type` (e.g. JaarOpgaveInfoResponse) from
         the request response, or `None` if a parsing error occurs
     """
+    if not response.content:
+        return None
+
     tree = etree.fromstring(response.content)
     node = tree.find(info_response_node)
     parser = XmlParser(context=XmlContext(), handler=LxmlEventHandler)
@@ -40,15 +47,24 @@ def _get_report_info(
 
 
 def get_jaaropgaven(response: requests.Response) -> Optional[list[dict]]:
-    jaaropgave_info = _get_report_info(response, JAAROPGAVE_INFO_RESPONSE_NODE, JaarOpgaveInfoResponse)
+    """
+    Wrapper function: guard against `AttributeError` while fetching Jaaropgave data
+    """
+    jaaropgave_info = _get_report_info(
+        response, JAAROPGAVE_INFO_RESPONSE_NODE, JaarOpgaveInfoResponse
+    )
 
     if not jaaropgave_info or not isinstance(jaaropgave_info, JaarOpgaveInfoResponse):
         return None
 
     try:
         client = jaaropgave_info.jaar_opgave_client.client
-        inhoudingsplichtige = jaaropgave_info.jaar_opgave_client.jaar_opgave[0].inhoudingsplichtige
-        specificatien = jaaropgave_info.jaar_opgave_client.jaar_opgave[0].specificatie_jaar_opgave
+        inhoudingsplichtige = jaaropgave_info.jaar_opgave_client.jaar_opgave[
+            0
+        ].inhoudingsplichtige
+        specificatien = jaaropgave_info.jaar_opgave_client.jaar_opgave[
+            0
+        ].specificatie_jaar_opgave
     except AttributeError:
         return None
 
@@ -65,7 +81,12 @@ def get_jaaropgaven(response: requests.Response) -> Optional[list[dict]]:
 
 
 def get_uitkeringen(response: requests.Response) -> Optional[list[dict]]:
-    uitkeringen_info = _get_report_info(response, UITKERING_INFO_RESPONSE_NODE, UitkeringInfoResponse)
+    """
+    Wrapper function: guard against `AttributeError` while fetching uitkering data
+    """
+    uitkeringen_info = _get_report_info(
+        response, UITKERING_INFO_RESPONSE_NODE, UitkeringInfoResponse
+    )
 
     if not uitkeringen_info or not isinstance(uitkeringen_info, UitkeringInfoResponse):
         return None
@@ -76,7 +97,9 @@ def get_uitkeringen(response: requests.Response) -> Optional[list[dict]]:
                                               .uitkeringsspecificatie[0]\
                                               .uitkeringsinstantie
         client = uitkeringen_info.uitkerings_specificatie_client.client
-        dossierhistorien = uitkeringen_info.uitkerings_specificatie_client.uitkeringsspecificatie[0].dossierhistorie
+        dossierhistorien = uitkeringen_info.uitkerings_specificatie_client\
+                                           .uitkeringsspecificatie[0]\
+                                           .dossierhistorie
     except AttributeError:
         return None
 

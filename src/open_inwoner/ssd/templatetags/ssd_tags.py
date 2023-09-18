@@ -6,26 +6,21 @@ from django.template.defaultfilters import date as django_date, stringfilter
 
 import markdown as md
 
-from ..service.jaaropgave import Client as JaaropgaveClient
 from ..service.jaaropgave.fwi_include_resolved import CdPositiefNegatief
-from ..service.uitkering import Client as UitkeringClient
 
 register = template.Library()
 
 
-def format_string(*args: Optional[Union[str, int]]) -> str:
-    """
-    Return a formatted string, filtering out `None` elements from `args`,
-    normalizing datatypes by casting `int` to `str`, and cleaning up whitespace
-    """
-    filtered = filter(None, args)
-    cleaned = [str(item).strip() for item in filtered]
-    return " ".join(cleaned)
-
-
 @register.simple_tag
 def calculate_loon_zvw(specificatie) -> int:
-    return specificatie.fiscaalloon.waarde_bedrag - specificatie.vergoeding_premie_zvw.waarde_bedrag
+    if not specificatie:
+        return ""
+
+    fiscaalloon = specificatie.fiscaalloon.waarde_bedrag
+
+    if vergoeding := specificatie.vergoeding_premie_zvw:
+        return fiscaalloon - vergoeding.waarde_bedrag
+    return fiscaalloon
 
 
 @register.simple_tag
@@ -53,17 +48,7 @@ def format_float(value: str) -> str:
     try:
         return "{:.2f}".format(float(value) / 100).replace(".", ",")
     except ValueError:
-        # import pdb;pdb.set_trace()
         return ""
-
-
-@register.simple_tag
-def format_name(client: Union[JaaropgaveClient, UitkeringClient]) -> str:
-    return format_string(
-        client.voorletters,
-        client.voorvoegsel,
-        client.achternaam,
-    )
 
 
 @register.simple_tag
@@ -77,22 +62,28 @@ def format_period(date_str: Optional[str]) -> str:
 
 
 @register.simple_tag
-def format_street(client: Union[JaaropgaveClient, UitkeringClient]) -> str:
-    return format_string(
-        client.adres.straatnaam,
-        client.adres.huisnummer,
-        client.adres.huisletter,
-    )
-
-
-@register.simple_tag
 def format_sign_value(item) -> str:
-    sign = get_sign(item.cd_positief_negatief)
+    if not item:
+        return ""
+
+    sign = get_sign(item.cd_positief_negatief.value)
     value = str(item.waarde_bedrag)
 
     if sign:
-        return f"{sign} {value}"
+        return f"{sign}{value}"
     return value
+
+
+@register.simple_tag
+def format_string(*args: Optional[Union[str, int]]) -> str:
+    """
+    Return a formatted string, filtering out `None` elements from `args`,
+    normalizing datatypes by casting `int` to `str`, and cleaning up whitespace
+    """
+    filtered = filter(None, args)
+    normalized = [str(item) for item in filtered]
+    cleaned = [item.strip() for item in normalized if not item.isspace()]
+    return " ".join(cleaned)
 
 
 @register.simple_tag
