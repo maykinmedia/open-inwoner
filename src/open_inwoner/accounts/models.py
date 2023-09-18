@@ -313,7 +313,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self._seed
 
     def get_full_name(self):
-        parts = (self.first_name, self.infix, self.last_name)
+        first_name = self.display_name or self.first_name
+        parts = (first_name, self.infix, self.last_name)
         return " ".join(p for p in parts if p)
 
     def get_short_name(self):
