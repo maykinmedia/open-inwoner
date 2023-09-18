@@ -127,6 +127,7 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                 "classes": ("collapse",),
                 "fields": (
                     "login_text",
+                    "registration_text",
                     "home_welcome_title",
                     "home_welcome_intro",
                     "home_theme_title",
