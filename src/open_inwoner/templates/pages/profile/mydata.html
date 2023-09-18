@@ -73,10 +73,12 @@
                     <div class="tabled__item tabled__item--bold">{% trans "Plaats" %}</div>
                     <div class="tabled__item">{{my_data.city|default:"-"}}</div>
                 </div>
+                {% if my_data.country %}
                 <div class="tabled__row">
                     <div class="tabled__item tabled__item--bold">{% trans "Land" %}</div>
                     <div class="tabled__item">{{my_data.country|default:"-"}}</div>
                 </div>
+                {% endif %}
             </div>
 
             <!-- BRP contact data -->
