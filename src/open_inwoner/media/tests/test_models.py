@@ -6,7 +6,7 @@ from .factories import VideoFactory
 class VideoTests(TestCase):
     def test_str(self):
         video = VideoFactory.build(link_id="123", title="Anne")
-        self.assertEqual(str(video), "Anne (123, nl)")
+        self.assertEqual(str(video), "Anne (vimeo: 123, nl)")
 
     def test_str_no_title(self):
         video = VideoFactory.build(link_id="123", title="")

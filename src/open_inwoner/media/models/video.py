@@ -6,10 +6,6 @@ from open_inwoner.media.choices import VideoPlayerChoices
 from open_inwoner.utils.text import middle_truncate
 
 
-class VideoManager(models.Manager):
-    pass
-
-
 class Video(models.Model):
     link_id = models.CharField(
         _("video ID"),
@@ -36,8 +32,6 @@ class Video(models.Model):
         choices=settings.LANGUAGES,
         default=settings.LANGUAGE_CODE,
     )
-
-    objects = VideoManager()
 
     class Meta:
         verbose_name = _("Video")
