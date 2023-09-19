@@ -101,6 +101,15 @@ class Product(models.Model):
             "Product content with build-in WYSIWYG editor. By adding '[CTABUTTON]' you can embed a cta-button for linking to the defined form or link"
         ),
     )
+    video = models.ForeignKey(
+        "media.Video",
+        blank=True,
+        null=True,
+        verbose_name=_("Video"),
+        on_delete=models.PROTECT,
+        related_name="products",
+        help_text=_("Video to show after the intro"),
+    )
     categories = models.ManyToManyField(
         "pdc.Category",
         verbose_name=_("Categories"),

@@ -8,6 +8,7 @@ from django_webtest import WebTest
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.questionnaire.tests.factories import QuestionnaireStepFactory
 
+from ...media.tests.factories import VideoFactory
 from ..models import CategoryProduct
 from .factories import CategoryFactory, ProductFactory, QuestionFactory
 
@@ -293,6 +294,24 @@ class TestProductContent(WebTest):
         self.assertNotContains(response, escape("<b>world"))
         self.assertContains(response, "hello <b>world</b>")
         self.assertContains(response, "<strong>test</strong>")
+
+
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+class TestProductVideo(WebTest):
+    def test_product_video_is_rendered(self):
+        video = VideoFactory()
+        product = ProductFactory(
+            content="Some content",
+            link="http://www.example.com",
+            video=video,
+        )
+        response = self.app.get(
+            reverse("products:product_detail", kwargs={"slug": product.slug})
+        )
+        video_frames = response.pyquery(".video iframe")
+        self.assertEqual(len(video_frames), 1)
+        iframe = video_frames[0]
+        self.assertEqual(iframe.attrib["src"], video.player_url)
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
