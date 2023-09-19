@@ -207,6 +207,7 @@ INSTALLED_APPS = [
     "open_inwoner.questionnaire",
     "open_inwoner.extended_sessions",
     "open_inwoner.custom_csp",
+    "open_inwoner.media",
     "open_inwoner.cms.profile",
     "open_inwoner.cms.cases",
     "open_inwoner.cms.inbox",
@@ -215,6 +216,7 @@ INSTALLED_APPS = [
     "open_inwoner.cms.banner",
     "open_inwoner.cms.extensions",
     "open_inwoner.cms.footer",
+    "open_inwoner.cms.plugins",
 ]
 
 MIDDLEWARE = [
@@ -531,6 +533,7 @@ CMS_PLACEHOLDER_CONF = {
         "plugins": [
             # "TextPlugin",
             "PicturePlugin",
+            "VideoPlayerPlugin",
             "CategoriesPlugin",
             "ActivePlansPlugin",
             "QuestionnairePlugin",
