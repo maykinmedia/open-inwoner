@@ -9,7 +9,7 @@ def mock_get_report_info(path, info_response_node, info_type):  # pragma: no cov
     Mock SOAP response content by retrieving XML data from files
     """
     with open(path, "rb") as f:
-        tree = etree.parse(f)
+        tree = etree.parse(f)  # nosec
         node = tree.find(info_response_node)
         parser = XmlParser(context=XmlContext(), handler=LxmlEventHandler)
         res = parser.parse(node, info_type)

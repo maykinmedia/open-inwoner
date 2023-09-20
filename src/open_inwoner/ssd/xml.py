@@ -3,7 +3,7 @@
 from typing import Any, Optional, Union
 
 import requests
-from lxml import etree
+from lxml import etree  # nosec
 from xsdata.exceptions import ParserError
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.parsers import XmlParser
@@ -31,13 +31,17 @@ def _get_report_info(
     info_type: Any,
 ) -> Optional[Union[JaarOpgaveInfoResponse, UitkeringInfoResponse]]:
     """
-    :returns: the `info_type` (e.g. JaarOpgaveInfoResponse) from
-        the request response, or `None` if a parsing error occurs
+    Return the `info_type` (e.g. JaarOpgaveInfoResponse) from the request
+    response, or `None` if a parsing error occurs
+
+    Note: bandit identifies the use of `lxml.etree.fromstring` as a security issue
+    because the parser is vulnerable to certain XML attacks. We count the origin of the
+    `response` as a trusted source, hence the warning is considered a false positive
     """
     if not response.content:
         return None
 
-    tree = etree.fromstring(response.content)
+    tree = etree.fromstring(response.content) 
     node = tree.find(info_response_node)
     parser = XmlParser(context=XmlContext(), handler=LxmlEventHandler)
 
