@@ -1,3 +1,5 @@
+# fmt: off
+
 from typing import Any, Optional, Union
 
 import requests
@@ -91,7 +93,6 @@ def get_uitkeringen(response: requests.Response) -> Optional[list[dict]]:
     if not uitkeringen_info or not isinstance(uitkeringen_info, UitkeringInfoResponse):
         return None
 
-    # fmt: off
     try:
         uitkeringsinstantie = uitkeringen_info.uitkerings_specificatie_client\
                                               .uitkeringsspecificatie[0]\

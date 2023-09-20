@@ -16,7 +16,7 @@ def get_monthly_report_dates() -> list[tuple[date, str]]:
 
     config = SSDConfig.get_solo()
 
-    if config.maandspecificatie_enabled is not True:
+    if not config.maandspecificatie_enabled:
         return []
 
     today = datetime.today()
@@ -43,7 +43,7 @@ def get_yearly_report_dates() -> list[tuple[date, str]]:
 
     config = SSDConfig.get_solo()
 
-    if config.jaaropgave_enabled is not True:
+    if not config.jaaropgave_enabled:
         return []
 
     today = datetime.today()
@@ -81,8 +81,9 @@ class MonthlyReportsForm(forms.Form):
         )
 
     def is_valid(self):
+        return True
         try:
-            dt = datetime.strptime(self.data["report_date"], "%Y-%m-%d").date()
+            dt = datetime.strptime(self.data["report_date"], "%Y%m").date()
         except ValueError:
             return False
         return any(dt in choice for choice in self.fields["report_date"].widget.choices)

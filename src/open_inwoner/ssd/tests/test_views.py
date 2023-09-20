@@ -18,6 +18,7 @@ from freezegun import freeze_time
 
 from open_inwoner.accounts.tests.factories import UserFactory
 
+from ..client import UitkeringClient
 from .mocks import mock_report
 
 FILES_DIR = Path(__file__).parent.resolve() / "files"
@@ -25,6 +26,10 @@ FILES_DIR = Path(__file__).parent.resolve() / "files"
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestMonthlyBenefitsFormView(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.ssd_client = UitkeringClient()
+
     def setUp(self):
         self.user = UserFactory()
         self.user.set_password("12345")

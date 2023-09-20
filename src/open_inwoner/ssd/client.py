@@ -86,24 +86,22 @@ class SSDBaseClient(ABC):
         return response
 
     @abstractmethod
-    def format_report_date(self, report_date_iso: str) -> str:
+    def format_report_date(self, report_date: str) -> str:
         """
         :returns: formatted date string for SOAP request
         """
 
     @abstractmethod
-    def format_file_name(self, report_date_iso: str) -> str:
+    def format_file_name(self, report_date: str) -> str:
         """
         :returns: formatted string for PDF name
         """
 
     @abstractmethod
-    def get_reports(
-        self, bsn: str, report_date_iso: str, base_url: str
-    ) -> Optional[bytes]:
+    def get_reports(self, bsn: str, report_date: str, base_url: str) -> Optional[bytes]:
         """
         :param bsn: the BSN number of the client making the request
-        :param report_date_iso: the date of the requested report in ISO 8601 format
+        :param report_date: the date of the requested report
         :param base_url: the absolute URI of the request, allows the use of
         relative URLs in templates used to generate PDFs
         :returns: a yearly/monthly benefits report PDF (bytes) if the request to
@@ -126,19 +124,23 @@ class JaaropgaveClient(SSDBaseClient):
         "http://www.centric.nl/GWS/Diensten/JaarOpgaveClient-v0400/JaarOpgaveInfo"
     )
 
-    def format_report_date(self, report_date_iso: str) -> str:
-        return datetime.strptime(report_date_iso, "%Y-%m-%d").strftime("%Y")
+    def format_report_date(self, report_date: str) -> str:
+        """
+        1995-12-24 -> 1985
+        """
+        return datetime.strptime(report_date, "%Y-%m-%d").strftime("%Y")
 
-    def format_file_name(self, report_date_iso: str) -> str:
-        dt = datetime.strptime(report_date_iso, "%Y-%m-%d")
-        return f"Jaaropgave {dt.strftime('%Y')}"
+    def format_file_name(self, report_date: str) -> str:
+        """
+        1985 -> Jaaropgave 1985
+        """
+        return f"Jaaropgave {report_date}"
 
     def get_reports(
-        self, bsn: str, report_date_iso: str, request_base_url: str
+        self, bsn: str, report_date: str, request_base_url: str
     ) -> Optional[bytes]:
-        response = self.templated_request(
-            bsn=bsn, dienstjaar=self.format_report_date(report_date_iso)
-        )
+
+        response = self.templated_request(bsn=bsn, dienstjaar=report_date)
 
         if response.status_code != 200:
             return None
@@ -176,19 +178,25 @@ class UitkeringClient(SSDBaseClient):
     request_template = BASE_DIR / "soap/templates/ssd/maandspecificatie.xml"
     soap_action = "http://www.centric.nl/GWS/Diensten/UitkeringsSpecificatieClient-v0600/UitkeringsSpecificatieInfo"
 
-    def format_report_date(self, report_date_iso: str) -> str:
-        return datetime.strptime(report_date_iso, "%Y-%m-%d").strftime("%Y%m")
+    def format_report_date(self, report_date: str) -> str:
+        """
+        1985-12-24 -> 198512
+        """
+        return datetime.strptime(report_date, "%Y-%m-%d").strftime("%Y%m")
 
-    def format_file_name(self, report_date_iso: str) -> str:
-        dt = datetime.strptime(report_date_iso, "%Y-%m-%d")
-        return f"Maandspecificatie {django_date(dt, 'M Y')}"
+    def format_file_name(self, report_date: str) -> str:
+        """
+        198505 -> Maandspecificatie mei 1985
+        """
+        dt = datetime.strptime(report_date, "%Y%m")
+        dt_formatted = django_date(dt, "M Y").lower()
+        return f"Maandspecificatie {dt_formatted}"
 
     def get_reports(
-        self, bsn: str, report_date_iso: str, request_base_url: str
+        self, bsn: str, report_date: str, request_base_url: str
     ) -> Optional[bytes]:
-        response = self.templated_request(
-            bsn=bsn, period=self.format_report_date(report_date_iso)
-        )
+
+        response = self.templated_request(bsn=bsn, period=report_date)
 
         if response.status_code != 200:
             return None
