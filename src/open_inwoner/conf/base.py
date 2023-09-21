@@ -44,6 +44,8 @@ LANGUAGES = [
     ("nl", _("Dutch")),
 ]
 
+# Default (connection timeout, read timeout) for the requests library (in seconds)
+DEFAULT_TIMEOUT_REQUESTS = (10, 60)
 
 TIME_ZONE = "Europe/Amsterdam"  # note: this *may* affect the output of DRF datetimes
 

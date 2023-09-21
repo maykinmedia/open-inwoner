@@ -12,7 +12,6 @@ from django.views import View
 from django.views.generic import FormView, TemplateView
 
 from django_htmx.http import HttpResponseClientRedirect
-from glom import glom
 from mail_editor.helpers import find_template
 from view_breadcrumbs import BaseBreadcrumbMixin
 from zgw_consumers.api_models.constants import RolOmschrijving
