@@ -9,7 +9,6 @@ export class FilterMobile {
 
   toggleOpen(event) {
     event.preventDefault()
-    console.log('this is mobile')
     const filterParent = this.node.parentElement
     if (filterParent) {
       filterParent.classList.toggle('filter--open')
