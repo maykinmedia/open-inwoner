@@ -1,9 +1,10 @@
-{% load i18n filter_tags icon_tags form_tags %}
+{% load i18n filter_tags icon_tags button_tags form_tags %}
 
 <div>
-    <fieldset class="filter filter--open" aria-label="{% trans "Filter" %}">
+    <fieldset class="filter" aria-label="{% trans "Filter" %}">
+        {% button href="#" icon="expand_more" icon_position="after" extra_classes="filter__mobile filter--toggle" bordered=False text=field.label %}
         <legend class="filter__title">
-            {{ field.label }}
+            <span class="filter__legend-label">{{ field.label }}</span>
         </legend>
         <div class="filter__list">
             {% for option in field.field.choices %}
@@ -11,5 +12,5 @@
             {% endfor %}
         </div>
     </fieldset>
-    <hr class="divider divider--small">
+    <hr class="divider divider--tiny">
 </div>

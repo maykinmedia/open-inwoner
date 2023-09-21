@@ -80,6 +80,9 @@ def settings(request):
         "extra_css": config.extra_css,
         "menu_categories": Category.get_root_nodes().published(),
         "search_form": SearchForm(auto_id=False),
+        "search_filter_categories": config.search_filter_categories,
+        "search_filter_tags": config.search_filter_tags,
+        "search_filter_organizations": config.search_filter_organizations,
         "has_general_faq_questions": Question.objects.general().exists(),
         "settings": dict(
             [(k, getattr(django_settings, k, None)) for k in public_settings]

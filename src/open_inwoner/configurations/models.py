@@ -316,6 +316,31 @@ class SiteConfiguration(SingletonModel):
         verbose_name=_("Plan help"),
         help_text=_("The help text for the plan page."),
     )
+
+    # search filters
+    search_filter_categories = models.BooleanField(
+        verbose_name=_("Add category filter for search results"),
+        default=True,
+        help_text=_(
+            "Whether to show category-checkboxes in order to filter the search result."
+        ),
+    )
+    search_filter_tags = models.BooleanField(
+        verbose_name=_("Add tag filter for search results"),
+        default=True,
+        help_text=_(
+            "Whether to show tag-checkboxes in order to filter the search result."
+        ),
+    )
+    search_filter_organizations = models.BooleanField(
+        verbose_name=_("Add organization filter for search results"),
+        default=True,
+        help_text=_(
+            "Whether to show organization-checkboxes in order to filter the search result."
+        ),
+    )
+
+    # email notifications
     email_new_message = models.BooleanField(
         verbose_name=_("Send email about a new message"),
         default=True,

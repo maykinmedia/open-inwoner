@@ -18,10 +18,20 @@
         {#  facets and results section #}
         {% if paginator.count %}
             <div class="grid">
-                <aside class="grid__sidebar" aria-label="{% trans "Zoekfilters" %}">
-                    {% filter field=form.categories %}
-                    {% filter field=form.tags %}
-                    {% filter field=form.organizations %}
+                <aside class="grid__sidebar grid__filters" aria-label="{% trans "Zoekfilters" %}">
+                {% if search_filter_categories or search_filter_tags or search_filter_organizations %}
+                    <h2 class="h2">{% trans "Zoekfilters" %}</h2>
+                        {% if search_filter_categories %}
+                                {% filter field=form.categories %}
+                        {% endif %}
+                        {% if search_filter_tags %}
+                                {% filter field=form.tags %}
+                        {% endif %}
+                        {% if search_filter_organizations %}
+                                {% filter field=form.organizations %}
+                        {% endif %}
+                {%  endif %}
+                {#  end search filters #}
                 </aside>
 
                 <div class="grid__main">
