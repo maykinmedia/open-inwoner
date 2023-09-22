@@ -63,7 +63,7 @@ class SearchView(
         # update form fields with choices
         for facet in results.facets:
             if facet.name in form.fields:
-                form.fields[facet.name].choices = facet.choices()
+                form.fields[facet.name].choices = facet.total_choices()
 
         # paginate
         paginator_dict = self.paginate_with_context(results.results)
