@@ -22,7 +22,7 @@ from .utils import ESMixin
 
 @tag("elastic")
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class SearchPageTests(ESMixin, WebTest):
+class SearchPageTests(ClearCachesMixin, ESMixin, WebTest):
     url = reverse_lazy("search:search")
 
     def setUp(self):
@@ -129,6 +129,46 @@ class SearchPageTests(ESMixin, WebTest):
             self.assertEqual(
                 link["href"], f"?query=content&tags={self.tag.slug}&page=2"
             )
+
+    def test_search_filter_configuration(self):
+        config = SiteConfiguration.get_solo()
+
+        def _assert_facet_checkbox_count(response, facet, count):
+            controls = response.pyquery(f"input[form='search-form'][name='{facet}']")
+            self.assertEqual(len(controls), count)
+
+        with self.subTest("tags"):
+            config.search_filter_tags = False
+            config.search_filter_categories = True
+            config.search_filter_organizations = True
+            config.save()
+            response = self.app.get(self.url, {"query": "content"})
+
+            _assert_facet_checkbox_count(response, "tags", 0)
+            _assert_facet_checkbox_count(response, "categories", 1)
+            _assert_facet_checkbox_count(response, "organizations", 1)
+
+        with self.subTest("categories"):
+            config.search_filter_tags = True
+            config.search_filter_categories = False
+            config.search_filter_organizations = True
+            config.save()
+            response = self.app.get(self.url, {"query": "content"})
+
+            _assert_facet_checkbox_count(response, "tags", 1)
+            _assert_facet_checkbox_count(response, "categories", 0)
+            _assert_facet_checkbox_count(response, "organizations", 1)
+
+        with self.subTest("organizations"):
+            config.search_filter_tags = True
+            config.search_filter_categories = True
+            config.search_filter_organizations = False
+            config.save()
+            response = self.app.get(self.url, {"query": "content"})
+
+            _assert_facet_checkbox_count(response, "tags", 1)
+            _assert_facet_checkbox_count(response, "categories", 1)
+            _assert_facet_checkbox_count(response, "organizations", 0)
 
 
 @tag("e2e")
