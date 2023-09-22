@@ -98,7 +98,15 @@
        <Omschrijving>KD norm tot AOW</Omschrijving>
        <Bedrag>
         <CdPositiefNegatief>+</CdPositiefNegatief>
-        <WaardeBedrag>74017</WaardeBedrag>
+        <WaardeBedrag>34541</WaardeBedrag>
+       </Bedrag>
+       <IndicatieKolom>1</IndicatieKolom>
+      </Componenthistorie>
+      <Componenthistorie>
+       <Omschrijving>KD norm tot AOW</Omschrijving>
+       <Bedrag>
+        <CdPositiefNegatief>+</CdPositiefNegatief>
+        <WaardeBedrag>34617</WaardeBedrag>
        </Bedrag>
        <IndicatieKolom>1</IndicatieKolom>
       </Componenthistorie>
@@ -114,7 +122,7 @@
        <Omschrijving>TOTAAL GEKORTE INKOMSTEN</Omschrijving>
        <Bedrag>
         <CdPositiefNegatief>+</CdPositiefNegatief>
-        <WaardeBedrag>3644</WaardeBedrag>
+        <WaardeBedrag>9044</WaardeBedrag>
        </Bedrag>
        <IndicatieKolom>2</IndicatieKolom>
       </Componenthistorie>
@@ -122,15 +130,23 @@
        <Omschrijving>RESERVERING VAKANTIEGELD</Omschrijving>
        <Bedrag>
         <CdPositiefNegatief>+</CdPositiefNegatief>
-        <WaardeBedrag>3701</WaardeBedrag>
+        <WaardeBedrag>3188</WaardeBedrag>
        </Bedrag>
        <IndicatieKolom>2</IndicatieKolom>
+      </Componenthistorie>
+      <Componenthistorie>
+       <Omschrijving>Uitbetaling vakantiegeld</Omschrijving>
+       <Bedrag>
+        <CdPositiefNegatief>+</CdPositiefNegatief>
+        <WaardeBedrag>350</WaardeBedrag>
+       </Bedrag>
+       <IndicatieKolom>1</IndicatieKolom>
       </Componenthistorie>
       <Componenthistorie>
        <Omschrijving>TOTAAL NETTO BIJSTAND</Omschrijving>
        <Bedrag>
         <CdPositiefNegatief>+</CdPositiefNegatief>
-        <WaardeBedrag>66672</WaardeBedrag>
+        <WaardeBedrag>57276</WaardeBedrag>
        </Bedrag>
        <IndicatieKolom>1</IndicatieKolom>
       </Componenthistorie>
@@ -138,7 +154,15 @@
        <Omschrijving>Aflossing vordering</Omschrijving>
        <Bedrag>
         <CdPositiefNegatief>+</CdPositiefNegatief>
-        <WaardeBedrag>3329</WaardeBedrag>
+        <WaardeBedrag>3458</WaardeBedrag>
+       </Bedrag>
+       <IndicatieKolom>2</IndicatieKolom>
+      </Componenthistorie>
+      <Componenthistorie>
+       <Omschrijving>Overige reserveringen</Omschrijving>
+       <Bedrag>
+        <CdPositiefNegatief>+</CdPositiefNegatief>
+        <WaardeBedrag>500</WaardeBedrag>
        </Bedrag>
        <IndicatieKolom>2</IndicatieKolom>
       </Componenthistorie>
@@ -146,7 +170,7 @@
        <Omschrijving>UIT TE BETALEN BEDRAG</Omschrijving>
        <Bedrag>
         <CdPositiefNegatief>+</CdPositiefNegatief>
-        <WaardeBedrag>63343</WaardeBedrag>
+        <WaardeBedrag>53318</WaardeBedrag>
        </Bedrag>
        <IndicatieKolom>1</IndicatieKolom>
       </Componenthistorie>

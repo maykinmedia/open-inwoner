@@ -315,8 +315,14 @@ class SSDTagTest(TestCase):
         uitkering = get_uitkeringen(None)[0]
         componenthistorie = uitkering["dossierhistorie"].componenthistorie
 
-        kd_norm = componenthistorie[0]
-        gekorte_inkomsten = componenthistorie[3]
+        kd_norm = next(
+            item for item in componenthistorie if item.omschrijving == "KD norm tot AOW"
+        )
+        gekorte_inkomsten = next(
+            item
+            for item in componenthistorie
+            if item.omschrijving == "TOTAAL GEKORTE INKOMSTEN"
+        )
 
         tests = [
             (kd_norm, "plus", "740,17"),
