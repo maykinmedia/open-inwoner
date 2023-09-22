@@ -295,7 +295,7 @@ class SearchPagePlaywrightTests(
                 expect(checkbox).to_be_enabled()
                 expect(checkbox).not_to_be_checked()
 
-        def _click_checkbox_for_name(name):
+        def _click_checkbox_for_name(page, name):
             # our checkbox widget hides the <input> element and styles the <label> and a pseudo-element
             # this a problem for playwright accessibility, so we find the label for the checkbox and click on the label like a user would
             page.locator(".checkbox").filter(
@@ -304,8 +304,7 @@ class SearchPagePlaywrightTests(
 
         def _test_search(checkbox_name, expected_text):
             page.goto(self.live_reverse("search:search", params={"query": "summary"}))
-            _click_checkbox_for_name(checkbox_name)
-            page.wait_for_timeout(250)  # wait for debounce JS
+            _click_checkbox_for_name(page, checkbox_name)
             page.wait_for_url(self.live_reverse("search:search", star=True))
             # is our box checked in response
             expect(page.get_by_role("checkbox", name=checkbox_name)).to_be_checked()
