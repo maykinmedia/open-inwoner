@@ -142,7 +142,12 @@ def user_action(request, object, message):
 
 
 def system_action(
-    message, *, content_object=None, user=None, log_level=logging.INFO, exc_info=None
+    message,
+    content_object=None,
+    user=None,
+    log_level=logging.INFO,
+    exc_info=None,
+    **kwargs,
 ):
     """
     Log a generic action done by business logic.
@@ -163,5 +168,6 @@ def system_action(
             "action_flag": LOG_ACTIONS[5],
             "message": message,
             "log_level": log_level,
+            **kwargs,
         },
     )

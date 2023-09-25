@@ -807,5 +807,5 @@ class Invite(models.Model):
         return reverse("profile:invite_accept", kwargs={"key": self.key})
 
     def expired(self) -> bool:
-        expiration_date = self.created_on + timedelta(days=settings.INVITE_EXPIRY)
+        expiration_date = self.created_on + timedelta(days=settings.INVITE_EXPIRY_DAYS)
         return expiration_date <= timezone.now()

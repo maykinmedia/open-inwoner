@@ -784,9 +784,8 @@ CKEDITOR_CONFIGS = {
     }
 }
 
-
 # invite expires in X days after sending
-INVITE_EXPIRY = 14
+INVITE_EXPIRY_DAYS = config("INVITE_EXPIRY_DAYS", default=30)
 
 # zgw-consumers
 ZGW_CONSUMERS_TEST_SCHEMA_DIRS = [
