@@ -30,6 +30,19 @@ class UserTests(TestCase):
         user = User(first_name="Foo", display_name="Flexi", infix="de", last_name="Bar")
         self.assertEqual(user.get_full_name(), "Flexi de Bar")
 
+        # spaces everywhere
+        user = User(first_name="Foo", display_name="    ", infix="de", last_name="Bar")
+        self.assertEqual(user.get_full_name(), "Foo de Bar")
+
+        user = User(
+            first_name="  ",
+            display_name="  ",
+            infix="  ",
+            last_name="  ",
+            email="foo@bar.nl",
+        )
+        self.assertEqual(user.get_full_name(), "")
+
     @freeze_time("2021-07-07 12:00:00")
     def test_get_age_same_day(self):
         with freeze_time("1990-07-07"):
