@@ -1,8 +1,8 @@
 {% load l10n i18n %}
 
-<aside aria-hidden="true" class="{{ classes }}"{% if id %} id="{{ id }}"{% endif %} aria-label="{% trans "Locatie kaart" %}">
+<aside aria-hidden="true" class="{{ classes }}" aria-label="{% trans "Locatie kaart" %}">
     {% if title %}
-        <h3 class="h3">{{ title }}</h3>
+        <h3 {% if id %} id="{{ id }}"{% endif %} class="h3">{{ title }}</h3>
     {% endif %}
 
     <div class="map__leaflet" data-lat="{{ lat|unlocalize }}" data-lng="{{ lng|unlocalize }}" data-zoom="{{ zoom }}"{% if geojson_feature_collection %} data-geojson-feature-collection="{{ geojson_feature_collection|force_escape }}"{% endif %}></div>

@@ -204,9 +204,7 @@ class ProductDetailView(
 
         subheadings = extract_subheadings(product.content, tag="h2")
 
-        anchors = [
-            ("#title", product.name, subheadings),
-        ]
+        anchors = subheadings
         if product.question_set.exists():
             anchors.append(("#faq", _("Veelgestelde vragen")))
         if product.files.exists():

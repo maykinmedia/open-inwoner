@@ -326,19 +326,19 @@ class TestProductDetailView(WebTest):
             reverse("products:product_detail", kwargs={"slug": product.slug})
         )
 
-        links = response.pyquery(".anchor-menu__sublist a")
+        links = response.pyquery(".anchor-menu__list .link")
 
         # 2 x 2 links (mobile + desktop)
         self.assertEqual(len(links), 4)
 
         self.assertEqual(links[0].text, "First subheading")
-        self.assertEqual(links[0].attrib["href"], "#subheader-first-subheading")
+        self.assertEqual(links[0].attrib["href"], "#subheading-first-subheading")
 
         self.assertEqual(links[1].text, "Second subheading")
-        self.assertEqual(links[1].attrib["href"], "#subheader-second-subheading")
+        self.assertEqual(links[1].attrib["href"], "#subheading-second-subheading")
 
         self.assertEqual(links[2].text, "First subheading")
-        self.assertEqual(links[2].attrib["href"], "#subheader-first-subheading")
+        self.assertEqual(links[2].attrib["href"], "#subheading-first-subheading")
 
         self.assertEqual(links[3].text, "Second subheading")
-        self.assertEqual(links[3].attrib["href"], "#subheader-second-subheading")
+        self.assertEqual(links[3].attrib["href"], "#subheading-second-subheading")
