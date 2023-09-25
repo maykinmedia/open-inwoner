@@ -2,9 +2,6 @@
   margin: var(--spacing-large) 0;
   max-width: var(--mobile-s-width);
 
-  &__container {
-  }
-
   &__player {
     position: relative;
     overflow: hidden;
@@ -20,8 +17,5 @@
     right: 0;
     width: 100%;
     height: 100%;
-  }
-
-  &--full-width {
   }
 }
