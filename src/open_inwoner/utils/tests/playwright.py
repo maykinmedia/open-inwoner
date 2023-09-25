@@ -9,12 +9,19 @@ from playwright.sync_api import Browser, Playwright, sync_playwright
 
 from open_inwoner.accounts.models import User
 
+HEADLESS = "NO_E2E_HEADLESS" not in os.environ
+
+LAUNCH_KWARGS = {
+    "headless": HEADLESS,
+}
+
+
 BROWSER_DRIVERS = {
     # keys for the E2E_DRIVER environment variable (likely from test matrix)
-    "chromium": lambda p: p.chromium.launch(),
-    "firefox": lambda p: p.firefox.launch(),
-    "webkit": lambda p: p.webkit.launch(),
-    "msedge": lambda p: p.chromium.launch(channel="msedge"),
+    "chromium": lambda p: p.chromium.launch(**LAUNCH_KWARGS),
+    "firefox": lambda p: p.firefox.launch(**LAUNCH_KWARGS),
+    "webkit": lambda p: p.webkit.launch(**LAUNCH_KWARGS),
+    "msedge": lambda p: p.chromium.launch(channel="msedge", **LAUNCH_KWARGS),
     # MORE here, with interesting launch options
 }
 BROWSER_DEFAULT = "chromium"
