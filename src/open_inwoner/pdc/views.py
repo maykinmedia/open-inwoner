@@ -216,6 +216,7 @@ class ProductDetailView(
         if product.contacts.exists():
             anchors.append(("#contact", _("Contact")))
 
+        context["meta_description"] = product.summary
         context["anchors"] = anchors
         context["related_products_start"] = 6 if product.links.exists() else 1
         context["product_links"] = product.links.order_by("pk")
