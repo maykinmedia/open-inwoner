@@ -1252,7 +1252,7 @@ class TestPasswordResetFunctionality(WebTest):
 
     def test_password_reset_form_custom_template_is_rendered(self):
         response = self.app.get(reverse("password_reset"))
-        self.assertContains(response, _("Wachtwoord opnieuw instellen"))
+        self.assertContains(response, _("Reset password"))
 
     def test_password_reset_email_contains_proper_data(self):
         current_site = Site.objects.get_current()
@@ -1262,19 +1262,17 @@ class TestPasswordResetFunctionality(WebTest):
         sent_mail = mail.outbox[0]
         body = sent_mail.body
         self.assertEqual(
-            _("Wachtwoordherinitialisatie voor {domain}").format(
-                domain=current_site.domain
-            ),
+            _("Password reset for {domain}").format(domain=current_site.domain),
             sent_mail.subject,
         )
         self.assertIn(
             _(
-                "U ontvangt deze e-mail, omdat u een aanvraag voor opnieuw instellen van het wachtwoord voor uw account op {domain} hebt gedaan."
+                "You're receiving this email because for your user account at example.com you requested a password reset."
             ).format(domain=current_site.domain),
             body,
         )
         self.assertIn(
-            _("Uw gebruikersnaam, mocht u deze vergeten zijn: {user_email}").format(
+            _("Your username, in case you’ve forgotten: {user_email}").format(
                 user_email=self.user.email
             ),
             body,
@@ -1308,11 +1306,11 @@ class TestPasswordChange(WebTest):
 
     def test_password_change_form_custom_template_is_rendered(self):
         response = self.app.get(reverse("password_change"), user=self.user)
-        self.assertContains(response, _("Wachtwoordwijziging"))
+        self.assertContains(response, _("Password reset"))
 
     def test_password_change_form_done_custom_template_is_rendered(self):
         response = self.app.get(reverse("password_change_done"), user=self.user)
-        self.assertContains(response, _("Uw wachtwoord is gewijzigd."))
+        self.assertContains(response, _("Your password has been changed."))
 
     def test_password_change_button_is_rendered_with_default_login_type(self):
         response = self.app.get(reverse("profile:detail"), user=self.user)
