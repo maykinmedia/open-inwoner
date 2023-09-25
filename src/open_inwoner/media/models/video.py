@@ -1,4 +1,7 @@
+import re
+
 from django.conf import settings
+from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -13,6 +16,7 @@ class Video(models.Model):
         help_text=_(
             "https://vimeo.com/[Video ID] | https://www.youtube.com/watch?v=[Video ID]"
         ),
+        validators=[RegexValidator(r"[a-z0-9_-]", flags=re.IGNORECASE)],
     )
     player_type = models.CharField(
         _("Player type"),
@@ -41,36 +45,22 @@ class Video(models.Model):
         if not self.title:
             return self.link_id
 
-        return "{} ({}: {}, {})".format(
-            middle_truncate(self.title, 50),
-            self.player_type,
-            self.link_id,
-            self.language,
-        )
+        return f"{middle_truncate(self.title, 50)} ({self.player_type}: {self.link_id}, {self.language})"
 
     @property
     def external_url(self):
         if self.player_type == VideoPlayerChoices.youtube:
-            url = "https://www.youtube.com/watch?v={link_id}&enablejsapi=1"
+            return f"https://www.youtube.com/watch?v={self.link_id}&enablejsapi=1"
         elif self.player_type == VideoPlayerChoices.vimeo:
-            url = "https://vimeo.com/{link_id}"
+            return f"https://vimeo.com/{self.link_id}"
         else:
             raise Exception("unsupported player_type")
-        return url.format(link_id=self.link_id)
 
     @property
     def player_url(self):
         if self.player_type == VideoPlayerChoices.youtube:
-            separator = "?"
-            if "?" in self.link_id:
-                separator = "&"
-            url = (
-                "https://www.youtube.com/embed/{link_id}"
-                + separator
-                + "enablejsapi=1&modestbranding=1"
-            )
+            return f"https://www.youtube.com/embed/{self.link_id}?enablejsapi=1&modestbranding=1"
         elif self.player_type == VideoPlayerChoices.vimeo:
-            url = "https://player.vimeo.com/video/{link_id}"
+            return f"https://player.vimeo.com/video/{self.link_id}"
         else:
             raise Exception("unsupported player_type")
-        return url.format(link_id=self.link_id)

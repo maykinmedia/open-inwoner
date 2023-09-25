@@ -19,15 +19,6 @@ class VideoTests(TestCase):
             "https://www.youtube.com/embed/123?enablejsapi=1&modestbranding=1",
         )
 
-    def test_youtube_link_id_hack(self):
-        video = VideoFactory.build(
-            link_id="123?foo=bar", title="", player_type="youtube"
-        )
-        self.assertEqual(
-            video.player_url,
-            "https://www.youtube.com/embed/123?foo=bar&enablejsapi=1&modestbranding=1",
-        )
-
     def test_external_url(self):
         video = VideoFactory.build()
         self.assertEqual(video.external_url, "https://vimeo.com/" + video.link_id)
