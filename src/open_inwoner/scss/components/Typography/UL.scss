@@ -1,0 +1,24 @@
+ul {
+  //list-style: none;
+  margin: 0 0 0 1em;
+  padding: 0;
+
+  li {
+    overflow: visible;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-bottom: var(--spacing-small);
+  }
+}
+
+ol {
+  margin: 0 0 0 1em;
+  padding: 0;
+
+  li {
+    overflow: visible;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-bottom: var(--spacing-small);
+  }
+}

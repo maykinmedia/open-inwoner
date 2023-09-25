@@ -1,0 +1,10 @@
+/// additional default styles for HTML tags, other tag styles are in their respective stylesheets
+H4,
+H5,
+H6 {
+  margin: 0;
+}
+
+blockquote {
+  margin-left: var(--row-height);
+}
