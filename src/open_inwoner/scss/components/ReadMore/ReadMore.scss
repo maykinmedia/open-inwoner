@@ -1,0 +1,45 @@
+.readmore {
+  &__toggle {
+    font-weight: bold;
+    margin-top: calc(-1 * (var(--row-height)));
+    padding: 0 var(--spacing-large) 0 0;
+
+    .readmore__button-text {
+      display: inline;
+      &--hidden {
+        display: none;
+      }
+    }
+  }
+
+  &__content {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: 0.5s;
+    overflow: hidden;
+
+    &--hidden {
+      // hide content if toggle-button is active
+      // always show for screenreaders
+      min-height: 0;
+    }
+  }
+
+  &--open {
+    .readmore__toggle {
+      [class*='icon'] {
+        transform: rotate(180deg);
+        transition: all 0.3s;
+      }
+      .readmore__button-text {
+        display: none;
+        &--hidden {
+          display: inline;
+        }
+      }
+    }
+    .readmore__content {
+      grid-template-rows: 1fr;
+    }
+  }
+}

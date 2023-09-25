@@ -34,6 +34,10 @@
   margin-top: var(--gutter-width);
 }
 
+.p + .h4 {
+  margin-top: var(--row-height-small);
+}
+
 .p + .p {
   margin-top: var(--font-line-height-body);
 }

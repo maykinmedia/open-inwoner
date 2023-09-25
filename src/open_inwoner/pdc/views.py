@@ -209,6 +209,8 @@ class ProductDetailView(
         subheadings = extract_subheadings(product.content, tag="h2")
 
         anchors = subheadings
+        if product.content_is_collapsable:
+            anchors = []
         if product.question_set.exists():
             anchors.append(("#faq", _("Veelgestelde vragen")))
         if product.files.exists():
