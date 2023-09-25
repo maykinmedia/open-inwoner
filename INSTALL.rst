@@ -126,6 +126,22 @@ using ``npm run watch``.
 .. _Sass: https://sass-lang.com/
 
 
+ElasticSearch
+-------------
+
+1. To start ElasticSearch, run the following command:
+
+   .. code-block:: bash
+
+        $ bin/start_elasticsearch.sh
+
+2. Then build the indices:
+
+   .. code-block:: bash
+
+        $ src/manage.py search_index --rebuild
+
+
 Update installation
 -------------------
 
@@ -154,6 +170,12 @@ When updating an existing installation:
 
        $ python src/manage.py collectstatic --link
        $ python src/manage.py migrate
+
+4. Update the ElasticSearch indices:
+
+   .. code-block:: bash
+
+       $ src/manage.py search_index --rebuild
 
 
 Testsuite
