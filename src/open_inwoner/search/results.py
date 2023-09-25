@@ -22,10 +22,7 @@ class FacetBucket:
 
     @property
     def label(self) -> str:
-        if self.count > 0:
-            return f"{self.name} ({self.count})"
-        else:
-            return self.name
+        return f"{self.name} ({self.count})"
 
 
 @dataclass(init=False)
