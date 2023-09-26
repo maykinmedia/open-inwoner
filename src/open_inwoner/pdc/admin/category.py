@@ -9,6 +9,7 @@ from ordered_model.admin import OrderedInlineModelAdminMixin, OrderedTabularInli
 from treebeard.admin import TreeAdmin
 from treebeard.forms import movenodeform_factory
 
+from open_inwoner.ckeditor5.widgets import CKEditorWidget
 from open_inwoner.utils.logentry import system_action
 
 from ..models import Category, CategoryProduct
@@ -31,6 +32,7 @@ class CategoryAdminForm(movenodeform_factory(Category)):
     class Meta:
         model = Category
         fields = "__all__"
+        widgets = {"description": CKEditorWidget}
 
     def clean(self, *args, **kwargs):
         cleaned_data = super().clean(*args, **kwargs)

@@ -8,7 +8,7 @@ from .factories import CategoryFactory
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class TestCategoryListView(TestCase):
+class CategoryListViewTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = UserFactory()
@@ -16,7 +16,7 @@ class TestCategoryListView(TestCase):
         cls.user.email = "test@email.com"
         cls.user.save()
 
-    def test_access_restricted(self):
+    def test_category_list_view_access_restricted(self):
         config = SiteConfiguration.get_solo()
         config.hide_categories_from_anonymous_users = True
         config.save()
@@ -36,7 +36,7 @@ class TestCategoryListView(TestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_access_not_restricted(self):
+    def test_category_list_view_access_not_restricted(self):
         config = SiteConfiguration.get_solo()
         config.hide_categories_from_anonymous_users = False
         config.save()
@@ -50,7 +50,7 @@ class TestCategoryListView(TestCase):
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class TestCategoryDetailView(TestCase):
+class CategoryDetailViewTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = UserFactory()
@@ -58,9 +58,12 @@ class TestCategoryDetailView(TestCase):
         cls.user.email = "test@email.com"
         cls.user.save()
 
-        cls.category = CategoryFactory.create(name="test cat")
+        cls.category = CategoryFactory.create(
+            name="test cat",
+            description="A <em>descriptive</em> description",
+        )
 
-    def test_access_restricted(self):
+    def test_category_detail_view_access_restricted(self):
         config = SiteConfiguration.get_solo()
         config.hide_categories_from_anonymous_users = True
         config.save()
@@ -80,7 +83,7 @@ class TestCategoryDetailView(TestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_access_not_restricted(self):
+    def test_category_detail_view_access_not_restricted(self):
         config = SiteConfiguration.get_solo()
         config.hide_categories_from_anonymous_users = False
         config.save()
@@ -91,3 +94,17 @@ class TestCategoryDetailView(TestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
+
+    def test_category_detail_description_rendered(self):
+        url = reverse("products:category_detail", kwargs={"slug": self.category.slug})
+
+        response = self.client.get(url)
+
+        self.assertIn(
+            '<p class="p">A <em>descriptive</em> description</p>',
+            response.rendered_content,
+        )
+        self.assertNotIn(
+            '[<p class="p">A <em>descriptive</em> description</p>, <em>descriptive</em>]',
+            response.rendered_content,
+        )

@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n button_tags card_tags faq_tags grid_tags questionnaire_tags string_tags %}
+{% load i18n button_tags card_tags faq_tags grid_tags questionnaire_tags string_tags category_tags %}
 
 {% block header_image %}
 {% if object.image %}
@@ -17,7 +17,7 @@
                 {% button icon="edit" text=_("Open in admin") hide_text=True href="admin:pdc_category_change" object_id=object.pk %}
             {% endif %}
         </h1>
-        <p class="p">{{ object.description|linebreaksbr }}</p>
+				{{ object.description|category_ckeditor_content|safe }}
 
         {% if subcategories %}
             {% card_container subcategories=subcategories parent_category=object %}
