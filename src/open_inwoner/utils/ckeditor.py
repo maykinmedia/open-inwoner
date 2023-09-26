@@ -21,7 +21,7 @@ CLASS_ADDERS = [
 ]
 
 
-def get_rendered_content(content):
+def get_rendered_content(content: str) -> str:
     """
     Takes object's content as an input and returns the rendered one.
     """
@@ -37,7 +37,7 @@ def get_rendered_content(content):
             if element.name == "a" and element.attrs.get("href", "").startswith("http"):
                 element.attrs["target"] = "_blank"
 
-    return soup
+    return str(soup)
 
 
 def get_product_rendered_content(product):
