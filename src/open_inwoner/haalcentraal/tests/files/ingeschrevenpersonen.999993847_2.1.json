@@ -14,6 +14,7 @@
                 "voornamen": "Merel",
                 "geslachtsnaam": "Kooyman",
                 "voorletters": "M.",
+                "voorvoegsel": "de",
                 "volledigeNaam": "Merel Kooyman"
             },
             "geboorte": {
@@ -34,10 +35,10 @@
             "verblijfplaats": {
                 "type": "Adres",
                 "verblijfadres": {
-                    "officieleStraatnaam": "Hector Berliozplantsoen",
-                    "korteStraatnaam": "Hector Berliozplantsoen",
-                    "huisnummer": 31,
-                    "postcode": "2551XS",
+                    "officieleStraatnaam": "King Olivereiland",
+                    "korteStraatnaam": "King Olivereiland",
+                    "huisnummer": 64,
+                    "postcode": "2551JV",
                     "woonplaats": "'s-Gravenhage",
                     "inOnderzoek": {
                         "aanduidingBijHuisnummer": true,

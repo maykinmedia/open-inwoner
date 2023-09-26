@@ -19,12 +19,12 @@ class HaalCentraalMixin:
         m.get(
             "https://personen/api/schema/openapi.yaml?v=3",
             status_code=200,
-            content=self.load_binary_mock("personen_2.0.yaml"),
+            content=self.load_binary_mock("personen_2.1.yaml"),
         )
         m.post(
             "https://personen/api/brp/personen",
             status_code=200,
-            json=self.load_json_mock("ingeschrevenpersonen.999993847_2.0.json"),
+            json=self.load_json_mock("ingeschrevenpersonen.999993847_2.1.json"),
         )
 
     def _setUpMocks_v_1_3(self, m):
