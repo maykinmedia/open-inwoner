@@ -60,6 +60,7 @@ class ContactMomentCreateData(TypedDict):
     tekst: str
     onderwerp: str
     type: str
+    kanaal: str
     medewerkerIdentificatie: MedewerkerIdentificatie
 
 

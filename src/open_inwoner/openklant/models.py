@@ -94,6 +94,11 @@ class ContactFormSubject(OrderedModel):
         verbose_name=_("Onderwerp"),
         max_length=255,
     )
+    subject_code = models.CharField(
+        verbose_name=_("e-Suite 'onderwerp' code"),
+        max_length=255,
+        blank=True,
+    )
     # FK for easy inline admins
     config = models.ForeignKey(
         OpenKlantConfig,
