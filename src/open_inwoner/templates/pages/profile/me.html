@@ -49,12 +49,11 @@
     </div>
 </div>
 
-<h1 class="h1" id="overview">{% trans "Persoonlijk overzicht" %}</h1>
-
 <div class="tabled tabled--flexible personal-overview">
+    <h2 class="h2" id="overview">{% trans "Overzicht" %}</h2>
     {% if request.user.is_digid_and_brp and view.config.my_data %}
         <div class="tabled__row">
-            <div class="tabled__item tabled__item--bold">{% trans "Mijn gegevens" %}</div>
+            <div class="tabled__item tabled__item--bold">{% link href="profile:categories" text=_('My details') %}</div>
             <div class="tabled__item">{{request.user.get_full_name}}{% if request.user.get_address %}, {{ request.user.get_address }}{% endif %}</div>
             <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="profile:data" text="Bekijken" icon="arrow_forward" icon_position="after" primary=True %}</div>
         </div>
@@ -62,7 +61,7 @@
 
     {% if view.config.selected_categories %}
         <div class="tabled__row">
-            <div class="tabled__item tabled__item--bold">{% trans "Interessegebieden" %}</div>
+            <div class="tabled__item tabled__item--bold">{% link href="profile:categories" text=_('My categories') %}</div>
             <div class="tabled__item">{{ category_text }}</div>
             <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="profile:categories" text="Aanpassen" icon="arrow_forward" icon_position="after" secondary=True %}</div>
         </div>
@@ -70,7 +69,14 @@
 
     {% if view.config.mentors %}
         <div class="tabled__row">
-            <div class="tabled__item tabled__item--bold">{% trans "Begeleider(s)" %}</div>
+            <div class="tabled__item tabled__item--bold">
+                {% if mentor_contacts %}
+                    {% url 'profile:contact_list' as mentor_url %}
+                    {% link href=mentor_url|add:"?type=begeleider" text=_('My mentor(s)') %}
+                {% else %}
+                    {% trans "Begeleider(s)" %}
+                {% endif %}
+            </div>
             {% if mentor_contacts %}
                 <div class="tabled__item">{{ mentor_contacts|join:", " }}</div>
                 {% url 'profile:contact_list' as mentor_url %}
@@ -86,7 +92,7 @@
 
     {% if view.config.my_contacts %}
         <div class="tabled__row">
-            <div class="tabled__item tabled__item--bold">{% trans "Mijn netwerkcontacten" %}</div>
+            <div class="tabled__item tabled__item--bold">{% link href="profile:contact_list" text=_('My contacts') %}</div>
             <div class="tabled__item">{{ contact_text }}</div>
             <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="profile:contact_list" text=_("Beheer contacten") icon="arrow_forward" icon_position="after" secondary=True %}</div>
         </div>
@@ -94,7 +100,7 @@
 
     {% if questionnaire_exists and view.config.selfdiagnose %}
         <div class="tabled__row">
-            <div class="tabled__item tabled__item--bold">{% trans "Zelfdiagnose" %}</div>
+            <div class="tabled__item tabled__item--bold">{% link href="products:questionnaire_list" text=_('Zelftest') %}</div>
             <div class="tabled__item"></div>
             <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href='products:questionnaire_list' text=_('Start zelfdiagnose') icon="arrow_forward" icon_position="after" secondary=True %}</div>
         </div>
@@ -102,7 +108,7 @@
 
     {% if view.config.actions %}
         <div class="personal-overview__actions tabled__row">
-            <div class="tabled__item tabled__item--bold">{% trans "Acties" %}</div>
+            <div class="tabled__item tabled__item--bold">{% link href="profile:action_list" text=_('Actions') %}</div>
             <div class="tabled__item">{{ action_text }}</div>
             <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="profile:action_list" text="Aanpassen" icon="arrow_forward" icon_position="after" secondary=True %}</div>
         </div>
@@ -110,21 +116,21 @@
 
     {% if view.config.notifications %}
         <div class="tabled__row">
-            <div class="tabled__item tabled__item--bold">{% trans "Communicatievoorkeuren" %}</div>
+            <div class="tabled__item tabled__item--bold">{% link href="profile:notifications" text=_('Receive notifications for') %}</div>
             <div class="tabled__item">{{ request.user.get_active_notifications }}</div>
             <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="profile:notifications" text="Aanpassen" icon="arrow_forward" icon_position="after" secondary=True %}</div>
         </div>
     {% endif %}
     {% if view.config.questions %}
         <div class="tabled__row">
-            <div class="tabled__item tabled__item--bold">{% trans "Mijn vragen" %}</div>
+            <div class="tabled__item tabled__item--bold">{% link href="cases:contactmoment_list" text=_('My questions') %}</div>
             <div class="tabled__item"></div>
             <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="cases:contactmoment_list" text=_('Bekijken') icon="arrow_forward" icon_position="after" secondary=True %}</div>
         </div>
     {% endif %}
     {% if view.config.ssd %}
         <div class="tabled__row">
-            <div class="tabled__item tabled__item--bold">{% trans "Mijn uitkeringen" %}</div>
+            <div class="tabled__item tabled__item--bold">{% link href="profile:monthly_benefits_index" text=_('My benefits') %}</div>
             <div class="tabled__item">Jaaropgaven, Maandspecificaties</div>
             <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="ssd:monthly_benefits_index" text=_("Bekijken") icon="arrow_forward" icon_position="after" secondary=True %}</div>
         </div>
@@ -145,9 +151,5 @@
        </button>
     </div>
 {% endrender_form %}
-
-{% if files %}
-{% file_list h1=True files=files allow_delete=True title=_("Bestanden") download_view="profile:documents_download" %}
-{% endif %}
 
 {% endblock content %}
