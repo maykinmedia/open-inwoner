@@ -199,6 +199,11 @@ class ZaakTypeConfig(models.Model):
         verbose_name=_("Enable sending questions via OpenKlant API"),
         default=False,
     )
+    contact_subject_code = models.CharField(
+        verbose_name=_("e-Suite 'onderwerp' code"),
+        max_length=255,
+        blank=True,
+    )
 
     objects = ZaakTypeConfigQueryset.as_manager()
 
