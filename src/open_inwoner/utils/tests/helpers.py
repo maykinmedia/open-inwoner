@@ -1,4 +1,5 @@
 import io
+import json
 import logging
 
 from django.conf import settings
@@ -38,13 +39,24 @@ class AssertTimelineLogMixin:
         *,
         level=None,
         lookup=Lookups.exact,
+        content_object_repr=None,
+        action_flag=None,
     ) -> TimelineLog:
 
         kwargs = {
             f"extra_data__message__{lookup}": force_str(message),
         }
+        extra = {}
         if level is not None:
-            kwargs["extra_data__log_level"] = level
+            extra["log_level"] = level
+        if content_object_repr is not None:
+            extra["content_object_repr"] = content_object_repr
+        if action_flag is not None:
+            extra["action_flag"] = action_flag
+
+        # compile query
+        for k, v in extra.items():
+            kwargs[f"extra_data__{k}"] = v
 
         logs = list(TimelineLog.objects.filter(**kwargs))
         count = len(logs)
@@ -69,20 +81,30 @@ class AssertTimelineLogMixin:
             ret.append(f"total {c} timelinelogs")
 
         for log in qs:
-            message = log.extra_data.get("message")
+            message = json.dumps(log.extra_data.get("message", ""))
             log_level = log.extra_data.get("log_level")
             if log_level:
                 log_level = logging.getLevelName(log_level)
             else:
                 log_level = "NO_LEVEL"
             msg = f"  {log_level}: {message}"
+
+            parts = []
+            for k in sorted(log.extra_data.keys()):
+                if k in ("message", "log_level"):
+                    continue
+                v = json.dumps(log.extra_data[k])
+                parts.append(f"{k}={v}")
+            if parts:
+                msg = f"{msg} {', '.join(parts)}"
             ret.append(msg)
+
         return "\n".join(ret)
 
     def dumpTimelineLog(self):
         print(self.getTimelineLogDump())
 
-    def resetTimelineLogs(self):
+    def clearTimelineLogs(self):
         TimelineLog.objects.all().delete()
 
 

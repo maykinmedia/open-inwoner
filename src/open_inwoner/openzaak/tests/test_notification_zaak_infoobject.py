@@ -361,7 +361,7 @@ class NotificationHandlerEmailTestCase(AssertTimelineLogMixin, TestCase):
 
         # test frequency-limit check
         mock_send.reset_mock()
-        self.resetTimelineLogs()
+        self.clearTimelineLogs()
 
         # create new ZaakInformatieObject
         zio = factory(

@@ -405,7 +405,7 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
 
         # reset noise from signals
         m.reset_mock()
-        self.resetTimelineLogs()
+        self.clearTimelineLogs()
 
         form = response.forms["profile-edit"]
         form["email"] = "new@example.com"
@@ -437,7 +437,7 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
 
         # reset noise from signals
         m.reset_mock()
-        self.resetTimelineLogs()
+        self.clearTimelineLogs()
 
         form = response.forms["profile-edit"]
         form.submit()
@@ -456,7 +456,7 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
 
         # reset noise from signals
         m.reset_mock()
-        self.resetTimelineLogs()
+        self.clearTimelineLogs()
 
         form = response.forms["profile-edit"]
         form["phonenumber"] = "0612345678"
@@ -486,7 +486,7 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
 
         # reset noise from signals
         m.reset_mock()
-        self.resetTimelineLogs()
+        self.clearTimelineLogs()
 
         form = response.forms["profile-edit"]
         form["email"] = "new@example.com"
@@ -596,7 +596,7 @@ class ProfileDeleteTest(WebTest):
 
 @requests_mock.Mocker()
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class MyDataTests(HaalCentraalMixin, WebTest):
+class MyDataTests(AssertTimelineLogMixin, HaalCentraalMixin, WebTest):
     maxDiff = None
 
     expected_response = BRPData(
@@ -621,27 +621,58 @@ class MyDataTests(HaalCentraalMixin, WebTest):
             infix="de",
             last_name="Kooyman",
             login_type=LoginTypeChoices.digid,
+            display_name="Meertje",
         )
         self.url = reverse("profile:data")
+
+        self.expected_strings = [
+            self.expected_response.first_name,
+            self.expected_response.infix,
+            self.expected_response.last_name,
+            self.expected_response.birthday.strftime("%d-%m-%Y"),
+            self.expected_response.birth_place,
+            self.expected_response.gender,
+            self.expected_response.street,
+            self.expected_response.get_housenumber(),
+            self.expected_response.postal_code,
+            self.expected_response.city,
+            # self.expected_response.country,
+            self.user.bsn,
+            self.user.display_name,
+            self.user.email,
+            self.user.phonenumber,
+        ]
+        self.clearTimelineLogs()
+
+    def assertDataDisplays(self, response):
+        texts = set()
+        for elem in response.pyquery(".tabled__item:not(.tabled__item--bold)"):
+            s = elem.text.strip()
+            texts.add(s)
+
+        missing = list()
+        for s in self.expected_strings:
+            if s not in texts:
+                missing.append(s)
+
+        if missing:
+            f = ", ".join(f"'{s}'" for s in missing)
+            self.fail(f"missing display of values: {f}")
 
     def test_expected_response_is_returned_brp_v_2(self, m):
         self._setUpMocks_v_2(m)
         self._setUpService()
 
         response = self.app.get(self.url, user=self.user)
-        log_entry = TimelineLog.objects.last()
-
         self.assertEqual(
             asdict(response.context["my_data"]),
             asdict(self.expected_response),
         )
-        self.assertEqual(
-            log_entry.extra_data,
-            {
-                "message": _("user requests for brp data"),
-                "action_flag": list(LOG_ACTIONS[4]),
-                "content_object_repr": str(self.user),
-            },
+        self.assertDataDisplays(response)
+        self.assertTimelineLog(
+            _("user requests for brp data"),
+            content_object_repr=str(self.user),
+            action_flag=list(LOG_ACTIONS[4]),
         )
 
     @override_settings(BRP_VERSION="1.3")
@@ -650,19 +681,15 @@ class MyDataTests(HaalCentraalMixin, WebTest):
         self._setUpService()
 
         response = self.app.get(self.url, user=self.user)
-        log_entry = TimelineLog.objects.last()
-
         self.assertEqual(
             asdict(response.context["my_data"]),
             asdict(self.expected_response),
         )
-        self.assertEqual(
-            log_entry.extra_data,
-            {
-                "message": _("user requests for brp data"),
-                "action_flag": list(LOG_ACTIONS[4]),
-                "content_object_repr": str(self.user),
-            },
+        self.assertDataDisplays(response)
+        self.assertTimelineLog(
+            _("user requests for brp data"),
+            content_object_repr=str(self.user),
+            action_flag=list(LOG_ACTIONS[4]),
         )
 
     @override_settings(BRP_VERSION="1.3")
@@ -686,16 +713,12 @@ class MyDataTests(HaalCentraalMixin, WebTest):
             },
         )
         response = self.app.get(self.url, user=self.user)
-        log_entry = TimelineLog.objects.last()
 
         self.assertIsNone(response.context["my_data"].birthday)
-        self.assertEqual(
-            log_entry.extra_data,
-            {
-                "message": _("user requests for brp data"),
-                "action_flag": list(LOG_ACTIONS[4]),
-                "content_object_repr": self.user.email,
-            },
+        self.assertTimelineLog(
+            _("user requests for brp data"),
+            content_object_repr=self.user.email,
+            action_flag=list(LOG_ACTIONS[4]),
         )
 
 
