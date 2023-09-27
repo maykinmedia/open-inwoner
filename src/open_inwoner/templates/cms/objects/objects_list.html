@@ -1,0 +1,17 @@
+{% load i18n sekizai_tags %}
+
+{% load i18n button_tags card_tags utils icon_tags %}
+<h2 class="h2">
+  {{ instance.title }}
+</h2>
+<div class="plans-cards card-container card-container--columns-4">
+    {% for object in instance.get_objects %}
+        {% render_card image_object_fit="cover" %}
+            <div class="card__content">
+              <h3 class="h3 object-list">{{ object.record.index }}</h3>
+	      {{ object.uuid }}
+            </div>
+        {% endrender_card %}
+    {% endfor %}
+</div>
+

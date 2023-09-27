@@ -189,6 +189,7 @@ INSTALLED_APPS = [
     "mozilla_django_oidc_db",
     "sessionprofile",
     "openformsclient",
+    "objectsapiclient",
     "django_htmx",
     "django_yubin",
     "log_outgoing_requests",
@@ -220,6 +221,7 @@ INSTALLED_APPS = [
     "open_inwoner.cms.footer",
     "open_inwoner.cms.plugins",
     "open_inwoner.cms.benefits",
+    "open_inwoner.cms.objects",
 ]
 
 MIDDLEWARE = [
@@ -542,6 +544,7 @@ CMS_PLACEHOLDER_CONF = {
             "QuestionnairePlugin",
             "ProductFinderPlugin",
             "ProductLocationPlugin",
+            "ObjectsListPlugin",
         ],
         "text_only_plugins": ["LinkPlugin"],
         "name": _("Content"),
