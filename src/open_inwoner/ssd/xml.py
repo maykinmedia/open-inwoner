@@ -41,7 +41,7 @@ def _get_report_info(
     if not response.content:
         return None
 
-    tree = etree.fromstring(response.content) 
+    tree = etree.fromstring(response.content)
     node = tree.find(info_response_node)
     parser = XmlParser(context=XmlContext(), handler=LxmlEventHandler)
 

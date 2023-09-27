@@ -38,7 +38,7 @@ def format_date_month_name(date_str: str) -> str:
 
 
 @register.simple_tag
-def format_float(value: str) -> str:
+def format_currency(value: str) -> str:
     """
     74017 -> 740,17
     """
@@ -81,9 +81,8 @@ def format_string(*args: Optional[Union[str, int]]) -> str:
     normalizing datatypes by casting `int` to `str`, and cleaning up whitespace
     """
     filtered = filter(None, args)
-    normalized = [str(item) for item in filtered]
-    cleaned = [item.strip() for item in normalized if not item.isspace()]
-    return " ".join(cleaned)
+    cleaned = (str(item).strip() for item in filtered)
+    return " ".join(s for s in cleaned if s)
 
 
 @register.simple_tag
@@ -103,7 +102,7 @@ def get_detail_value_for_column(detail, column: str) -> str:
         detail_column = "base"
 
     if detail_column == column:
-        return format_float(detail.bedrag.waarde_bedrag)
+        return format_currency(detail.bedrag.waarde_bedrag)
     return ""
 
 

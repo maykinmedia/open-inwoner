@@ -81,9 +81,8 @@ class MonthlyReportsForm(forms.Form):
         )
 
     def is_valid(self):
-        return True
         try:
-            dt = datetime.strptime(self.data["report_date"], "%Y%m").date()
+            dt = datetime.strptime(self.data["report_date"], "%Y-%m-%d").date()
         except ValueError:
             return False
         return any(dt in choice for choice in self.fields["report_date"].widget.choices)

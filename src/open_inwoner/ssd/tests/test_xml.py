@@ -9,8 +9,8 @@ from ..service.uitkering import (
 )
 from ..templatetags.ssd_tags import (
     calculate_loon_zvw,
+    format_currency,
     format_date_month_name,
-    format_float,
     format_period,
     format_sign_value,
     format_string,
@@ -74,9 +74,11 @@ class JaaropgaveDataTest(TestCase):
             self.assertEqual(spec.dienstjaar, 2022)
             self.assertEqual(spec.fiscaalloon.waarde_bedrag, 7305)
             self.assertEqual(spec.loonheffing.waarde_bedrag, 0)
-            self.assertEqual(len(spec.loonheffingskorting), 1)
+            self.assertEqual(len(spec.loonheffingskorting), 2)
             self.assertEqual(spec.loonheffingskorting[0].ingangsdatum, "20220101")
             self.assertEqual(spec.loonheffingskorting[0].cd_loonheffingskorting, "1")
+            self.assertEqual(spec.loonheffingskorting[1].ingangsdatum, "20230101")
+            self.assertEqual(spec.loonheffingskorting[1].cd_loonheffingskorting, "1")
             self.assertEqual(spec.aangifte_periode_van, "20220101")
             self.assertEqual(spec.aangifte_periode_tot, "20221231")
             self.assertEqual(spec.werkgeversheffing_premie_zvw.waarde_bedrag, 494)
@@ -251,7 +253,7 @@ class SSDTagTest(TestCase):
         ]
         for i, (input, expected) in enumerate(tests):
             with self.subTest(i=i):
-                res = format_float(input)
+                res = format_currency(input)
                 self.assertEqual(res, expected)
 
     def test_format_period(self):
@@ -271,7 +273,7 @@ class SSDTagTest(TestCase):
             ("J.M.S.", "de la", "Mancha", "J.M.S. de la Mancha"),
             ("  J.M.S.", "de la  ", " Mancha ", "J.M.S. de la Mancha"),
             ("J.", "", "Silentio", "J. Silentio"),
-            ("J.", "  ", "Silentio", "J. Silentio"),
+            ("J.", "   ", "Silentio", "J. Silentio"),
             ("J.", "Silentio", 1, "J. Silentio 1"),
         ]
         for i, (voorletters, voorvoegsel, achternaam, expected) in enumerate(tests):
