@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n static form_tags card_tags grid_tags %}
+{% load i18n static form_tags card_tags grid_tags solo_tags %}
 
 {% block content %}
 
@@ -7,7 +7,9 @@
 {% render_grid %}
     {% render_column span=9 %}
         {% render_card tinted=True  %}
+            {% get_solo 'configurations.SiteConfiguration' as config %}
             <h1 class="h1">{% trans "Registratie voltooien" %}</h1><br>
+            {% if config.registration_text %}<p class="p">{{ config.registration_text|urlize|linebreaksbr }}</p><br>{% endif %}
             {% form form_object=form method="POST" id="necessary-form" %}
         {% endrender_card %}
     {% endrender_column %}

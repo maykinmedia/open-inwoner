@@ -1,4 +1,3 @@
-import copy
 from datetime import date
 from urllib.parse import urlencode
 
@@ -16,6 +15,7 @@ from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 
 from ...cms.tests import cms_tools
+from ...utils.test import ClearCachesMixin
 from ...utils.tests.helpers import AssertRedirectsMixin
 from ..choices import LoginTypeChoices
 from ..models import User
@@ -964,12 +964,26 @@ class DuplicateEmailRegistrationTest(WebTest):
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class TestRegistrationNecessary(WebTest):
+class TestRegistrationNecessary(ClearCachesMixin, WebTest):
     url = reverse_lazy("profile:registration_necessary")
 
     @classmethod
     def setUpTestData(cls):
         cms_tools.create_homepage()
+
+    def test_page_show_config_text(self):
+        config = SiteConfiguration.get_solo()
+        config.registration_text = "Hello registration text http://foo.bar/"
+        config.save()
+
+        user = UserFactory(
+            first_name="",
+            last_name="",
+            login_type=LoginTypeChoices.digid,
+        )
+        response = self.app.get(self.url, user=user)
+        self.assertContains(response, "Hello registration text")
+        self.assertContains(response, ' href="http://foo.bar/" ')
 
     def test_any_page_for_digid_user_redirect_to_necessary_fields(self):
         user = UserFactory(

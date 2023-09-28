@@ -9,8 +9,6 @@ from filer.fields.image import FilerImageField
 from ordered_model.models import OrderedModel, OrderedModelManager
 from solo.models import SingletonModel
 
-from open_inwoner.utils.validators import DutchPhoneNumberValidator
-
 from ..utils.colors import hex_to_hsl
 from ..utils.css import clean_stylesheet
 from ..utils.fields import CSSField
@@ -120,6 +118,11 @@ class SiteConfiguration(SingletonModel):
         blank=True,
         verbose_name=_("Login tekst"),
         help_text=_("Deze tekst wordt getoond op de login pagina."),
+    )
+    registration_text = models.TextField(
+        blank=True,
+        verbose_name=_("Registratie tekst"),
+        help_text=_("Deze tekst wordt getoond op de registratie pagina."),
     )
     home_welcome_title = models.CharField(
         max_length=255,
