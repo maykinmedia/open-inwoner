@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from dataclasses import dataclass
+from operator import attrgetter
 from typing import List, Type
 
 from django.db import models
@@ -21,7 +22,6 @@ class FacetBucket:
 
     @property
     def label(self) -> str:
-        """display in the label"""
         return f"{self.name} ({self.count})"
 
 
@@ -80,6 +80,12 @@ class Facet:
 
     def choices(self) -> list:
         return [(b.slug, b.label) for b in self.buckets]
+
+    def total_choices(self) -> list:
+        return [
+            (b.slug, b.label)
+            for b in sorted(self.total_buckets, key=attrgetter("slug"))
+        ]
 
 
 @dataclass()

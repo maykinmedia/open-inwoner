@@ -17,6 +17,10 @@
     gap: 0;
   }
 
+  &--hidden {
+    display: none;
+  }
+
   &--horizontal {
     .form__control > .label {
       flex-direction: row;

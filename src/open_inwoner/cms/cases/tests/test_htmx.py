@@ -450,7 +450,7 @@ class CasesPlaywrightTests(
         contact_form = page.locator("#contact-form")
         expect(contact_form).to_be_visible()
 
-        question_text_area = page.get_by_label(_("Vraag"))
+        question_text_area = page.get_by_role("textbox", name=_("Vraag"))
         expect(question_text_area).to_be_visible()
 
         question_text_area.fill("a question")

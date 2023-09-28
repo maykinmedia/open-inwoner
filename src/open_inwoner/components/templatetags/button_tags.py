@@ -43,6 +43,7 @@ def button(text, **kwargs):
     Variables:
         + text: string | this will be the button text.
         - class: str | Additional classes.
+        - form_id: str | ID of parent form, sets 'form' attribute.
         - hide_text: bool | whether to hide the text and use aria attribute instead.
         - href: url or string | where the link links to (can be url name).
         - uuid: string | if href is an url name, pk for reverse can be passed.

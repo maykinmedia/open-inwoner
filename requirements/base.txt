@@ -320,7 +320,7 @@ glom==20.11.0
     # via
     #   -r requirements/base.in
     #   mozilla-django-oidc-db
-greenlet==2.0.1
+greenlet==2.0.2
     # via playwright
 html5lib==1.1
     # via
@@ -391,7 +391,7 @@ pillow==9.0.1
     #   easy-thumbnails
     #   reportlab
     #   weasyprint
-playwright==1.28.0
+playwright==1.38.0
     # via -r requirements/base.in
 polib==1.1.1
     # via django-rosetta

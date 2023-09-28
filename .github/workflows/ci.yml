@@ -16,7 +16,7 @@ env:
 jobs:
   #
   # Unit and integration tests
-  # 
+  #
   tests:
     name: Run the Django test suite
     runs-on: ubuntu-latest
@@ -29,7 +29,7 @@ jobs:
         ports:
           - 5432:5432
         # needed because the postgres container does not provide a healthcheck
-        options: 
+        options:
           --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
           --name postgres
 
@@ -64,7 +64,7 @@ jobs:
             --parallel \
             --exclude-tag=e2e \
             --exclude-tag=elastic
-          coverage run src/manage.py test src --tag=elastic
+          coverage run src/manage.py test src --tag=elastic --exclude-tag=e2e
           coverage combine
 
         env:
@@ -104,6 +104,16 @@ jobs:
         options:
           --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
           --name postgres
+
+      elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.9.2
+        env:
+          discovery.type: single-node
+          ES_JAVA_OPTS: '-Xms512m -Xmx512m'
+        ports:
+          - 9200:9200
+          - 9300:9300
+
     steps:
       - uses: actions/checkout@v3
       - name: Set up backend environment
