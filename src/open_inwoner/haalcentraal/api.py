@@ -38,13 +38,13 @@ class BRPAPI(ABC):
     def fetch_brp(self, user_bsn: str) -> Optional[BRPData]:
         if not self._is_ready:
             return None
-        else:
-            data = self.fetch_data(user_bsn)
-            if not data:
-                logger.warning("no data retrieved from Haal Centraal")
-                return None
-            obj = self.parse_data(data)
-            return obj
+
+        data = self.fetch_data(user_bsn)
+        if not data:
+            logger.warning("no data retrieved from Haal Centraal")
+            return None
+        obj = self.parse_data(data)
+        return obj
 
     def glom_date(self, data, path, default=None):
         try:
@@ -62,15 +62,15 @@ class BRP_1_3(BRPAPI):
 
     def fetch_data(self, user_bsn: str) -> Optional[dict]:
         url = urljoin(self.client.base_url, f"ingeschrevenpersonen/{user_bsn}")
-        try:
-            headers = {
-                "Accept": "application/hal+json",
-            }
-            if self.config.api_origin_oin:  # See Taiga #755
-                headers["x-origin-oin"] = self.config.api_origin_oin
-            if self.config.api_doelbinding:  # See Taiga #755
-                headers["x-doelbinding"] = self.config.api_doelbinding
+        headers = {
+            "Accept": "application/hal+json",
+        }
+        if self.config.api_origin_oin:  # See Taiga #755
+            headers["x-origin-oin"] = self.config.api_origin_oin
+        if self.config.api_doelbinding:  # See Taiga #755
+            headers["x-doelbinding"] = self.config.api_doelbinding
 
+        try:
             data = self.client.retrieve(
                 "ingeschrevenpersonen",
                 url=url,
