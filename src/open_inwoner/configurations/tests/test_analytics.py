@@ -4,6 +4,8 @@ from django.utils.translation import gettext as _
 
 from playwright.sync_api import expect
 
+from open_inwoner.utils.test import ClearCachesMixin
+
 from ...cms.tests import cms_tools
 from ...utils.tests.playwright import PlaywrightSyncLiveServerTestCase
 from ..models import SiteConfiguration
@@ -119,7 +121,7 @@ class TestCookieBannerDisabled(TestCase):
 
 @tag("e2e")
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class CookieBannerPlaywrightTests(PlaywrightSyncLiveServerTestCase):
+class CookieBannerPlaywrightTests(ClearCachesMixin, PlaywrightSyncLiveServerTestCase):
     def setUp(self):
         from open_inwoner.accounts.tests.factories import DigidUserFactory
 
@@ -136,9 +138,12 @@ class CookieBannerPlaywrightTests(PlaywrightSyncLiveServerTestCase):
         page = context.new_page()
         page.goto(self.live_reverse("profile:action_list"))
 
-        expect(page.get_by_text(config.cookie_info_text)).to_be_visible()
+        cookie_banner = page.locator("#cookie-banner")
 
-        accept_button = page.get_by_text(_("Alles toestaan"))
+        expect(cookie_banner).to_be_visible()
+        expect(cookie_banner.get_by_text(config.cookie_info_text)).to_be_visible()
+
+        accept_button = cookie_banner.get_by_text(_("Alles toestaan"))
         accept_button.click()
 
         cookie_banner_accepted = None
@@ -147,7 +152,7 @@ class CookieBannerPlaywrightTests(PlaywrightSyncLiveServerTestCase):
                 cookie_banner_accepted = True
 
         self.assertTrue(cookie_banner_accepted)
-        expect(page.get_by_text(config.cookie_info_text)).to_be_hidden()
+        expect(page.locator("#cookie-banner")).to_be_hidden()
 
     def test_cookie_reject(self):
         config = SiteConfiguration.get_solo()
@@ -157,9 +162,12 @@ class CookieBannerPlaywrightTests(PlaywrightSyncLiveServerTestCase):
         page = context.new_page()
         page.goto(self.live_reverse("profile:action_list"))
 
-        expect(page.get_by_text(config.cookie_info_text)).to_be_visible()
+        cookie_banner = page.locator("#cookie-banner")
 
-        reject_button = page.get_by_text(_("Alles weigeren"))
+        expect(cookie_banner).to_be_visible()
+        expect(cookie_banner.get_by_text(config.cookie_info_text)).to_be_visible()
+
+        reject_button = cookie_banner.get_by_text(_("Alles weigeren"))
         reject_button.click()
 
         cookie_banner_accepted = None
@@ -168,4 +176,4 @@ class CookieBannerPlaywrightTests(PlaywrightSyncLiveServerTestCase):
                 cookie_banner_accepted = False
 
         self.assertFalse(cookie_banner_accepted)
-        expect(page.get_by_text(config.cookie_info_text)).to_be_hidden()
+        expect(page.locator("#cookie-banner")).to_be_hidden()
