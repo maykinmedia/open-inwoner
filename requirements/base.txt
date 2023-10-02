@@ -195,7 +195,7 @@ django-js-asset==1.2.2
     #   django-mptt
 django-localflavor==3.1
     # via -r requirements/base.in
-django-log-outgoing-requests==0.5.0
+django-log-outgoing-requests==0.5.2
     # via -r requirements/base.in
 django-mptt==0.13.4
     # via django-filer
