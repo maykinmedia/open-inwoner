@@ -5,7 +5,7 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import include, path, re_path
-from django.views.generic import RedirectView
+from django.views.generic import RedirectView, TemplateView
 
 from mozilla_django_oidc_db.views import AdminLoginFailure
 
@@ -167,6 +167,11 @@ elif settings.EHERKENNING_MOCK:
 
 if settings.DEBUG:
     urlpatterns = [
+        # provide default styling template
+        path(
+            "style-demo/",
+            TemplateView.as_view(template_name="components/Typography/StyleDemo.html"),
+        ),
         # fix annoying favicon http error
         path("favicon.ico", RedirectView.as_view(url="/static/ico/favicon.png")),
     ] + urlpatterns
