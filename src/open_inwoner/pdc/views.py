@@ -201,6 +201,7 @@ class ProductDetailView(
     def get_context_data(self, **kwargs):
         product = self.get_object()
         context = super().get_context_data(**kwargs)
+        request = context["view"].request
 
         subheadings = extract_subheadings(product.content, tag="h2")
 
@@ -217,6 +218,9 @@ class ProductDetailView(
             anchors.append(("#contact", _("Contact")))
 
         context["meta_description"] = product.summary
+        if product.icon:
+            context["meta_image_url"] = request.build_absolute_uri(product.icon.url)
+        context["meta_page_url"] = request.build_absolute_uri(request.path)
         context["anchors"] = anchors
         context["related_products_start"] = 6 if product.links.exists() else 1
         context["product_links"] = product.links.order_by("pk")
