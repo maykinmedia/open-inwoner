@@ -2,9 +2,9 @@
 {% load i18n form_tags utils icon_tags filter_tags pagination_tags %}
 
 {% block main_inner %}
-    {#  zoek button section #}
+    {#  search term section #}
     <div class="grid">
-        <div class="grid__sidebar"></div>
+        <div class="grid__sidebar">&nbsp;</div>
         <div class="grid__main">
             <h1 class="h1">{% trans "Zoeken naar " %} "{% firstof search_form.query.value "" %}"</h1>
         </div>
@@ -46,29 +46,11 @@
                         {% endfor %}
                     </div>
                 </div>
-                {% pagination page_obj=page_obj paginator=paginator request=request %}
-            {% else %}
-                <div class="search-results search-results--none">
-                    <h2 class="h2 search-results__title">
-                        {% trans "Geen zoekresultaten" %}
-                    </h2>
-                    <p class="p">{% trans "Helaas, wij vonden geen resultaten voor jouw zoekopdracht." %}</p>
-                </div>
-                <ul class="ul">
-                   <li class="li">{% trans "Controleer de spelling van je zoekopdracht." %}</li>
-                   <li class="li">{% trans "Probeer een andere zoekopdracht." %}</li>
-                   <li class="li">{% trans "Vragen? Neem contact met ons op." %}</li>
-                </ul>
-            {% endif %}
-        </div>
-    </div>
 
-    {% if paginator.count and not messages %}
-        <div class="grid">
-            <div class="grid__sidebar"></div>
-            <div class="grid__main">
-                <div class="grid">
-                    <aside class="feedback" aria-label="{% trans "Pagina feedback" %}">
+                {% pagination page_obj=page_obj paginator=paginator request=request %}
+
+                {% if paginator.count and not messages %}
+                    <section class="feedback" aria-label="{% trans "Pagina feedback" %}">
                         <h4 class="h4">{% trans "Feedback" %}</h4>
                         <p class="p">{% trans "Heeft u gevonden wat u zocht?" %}</p>
                         {% render_form form=feedback_form method="POST" form_action=request.get_full_path id="feedback_form" show_notifications=True %}
@@ -93,9 +75,23 @@
                                 {% form_actions primary_text="Feedback versturen" %}
                             </div>
                         {% endrender_form %}
-                    </aside>
+                    </section>
+                {% endif %}
+
+            {% else %}
+                <div class="search-results search-results--none">
+                    <h2 class="h2 search-results__title">
+                        {% trans "Geen zoekresultaten" %}
+                    </h2>
+                    <p class="p">{% trans "Helaas, wij vonden geen resultaten voor jouw zoekopdracht." %}</p>
                 </div>
-            </div>
+                <ul class="ul">
+                   <li class="li">{% trans "Controleer de spelling van je zoekopdracht." %}</li>
+                   <li class="li">{% trans "Probeer een andere zoekopdracht." %}</li>
+                   <li class="li">{% trans "Vragen? Neem contact met ons op." %}</li>
+                </ul>
+            {% endif %}
         </div>
-    {% endif %}
+    </div>
+
 {% endblock main_inner %}
