@@ -1,7 +1,13 @@
-from django.test import TestCase
+from django.test import TestCase, override_settings, tag
 from django.urls import reverse
+from django.utils.translation import gettext as _
+
+from playwright.sync_api import expect
+
+from open_inwoner.utils.test import ClearCachesMixin
 
 from ...cms.tests import cms_tools
+from ...utils.tests.playwright import PlaywrightSyncLiveServerTestCase
 from ..models import SiteConfiguration
 
 
@@ -111,3 +117,63 @@ class TestCookieBannerDisabled(TestCase):
 
         self.assertTemplateNotUsed(response, "analytics/siteimprove.html")
         self.assertNotContains(response, "<!-- SiteImprove -->")
+
+
+@tag("e2e")
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+class CookieBannerPlaywrightTests(ClearCachesMixin, PlaywrightSyncLiveServerTestCase):
+    def setUp(self):
+        from open_inwoner.accounts.tests.factories import DigidUserFactory
+
+        super().setUp()
+
+        self.user = DigidUserFactory.create()
+        self.user_login_state = self.get_user_bsn_login_state(self.user)
+
+    def test_cookie_accept(self):
+        config = SiteConfiguration.get_solo()
+
+        context = self.browser.new_context(storage_state=self.user_login_state)
+
+        page = context.new_page()
+        page.goto(self.live_reverse("profile:action_list"))
+
+        cookie_banner = page.locator("#cookie-banner")
+
+        expect(cookie_banner).to_be_visible()
+        expect(cookie_banner.get_by_text(config.cookie_info_text)).to_be_visible()
+
+        accept_button = cookie_banner.get_by_text(_("Alles toestaan"))
+        accept_button.click()
+
+        cookie_banner_accepted = None
+        for cookie in page.context.cookies():
+            if cookie["name"] == "cookieBannerAccepted" and cookie["value"] == "true":
+                cookie_banner_accepted = True
+
+        self.assertTrue(cookie_banner_accepted)
+        expect(page.locator("#cookie-banner")).to_be_hidden()
+
+    def test_cookie_reject(self):
+        config = SiteConfiguration.get_solo()
+
+        context = self.browser.new_context(storage_state=self.user_login_state)
+
+        page = context.new_page()
+        page.goto(self.live_reverse("profile:action_list"))
+
+        cookie_banner = page.locator("#cookie-banner")
+
+        expect(cookie_banner).to_be_visible()
+        expect(cookie_banner.get_by_text(config.cookie_info_text)).to_be_visible()
+
+        reject_button = cookie_banner.get_by_text(_("Alles weigeren"))
+        reject_button.click()
+
+        cookie_banner_accepted = None
+        for cookie in page.context.cookies():
+            if cookie["name"] == "cookieBannerAccepted" and cookie["value"] == "false":
+                cookie_banner_accepted = False
+
+        self.assertFalse(cookie_banner_accepted)
+        expect(page.locator("#cookie-banner")).to_be_hidden()
