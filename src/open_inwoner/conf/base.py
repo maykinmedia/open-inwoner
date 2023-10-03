@@ -443,8 +443,8 @@ LOGGING = {
 LOG_OUTGOING_REQUESTS_DB_SAVE = config("LOG_OUTGOING_REQUESTS_DB_SAVE", default=True)
 LOG_OUTGOING_REQUESTS_RESET_DB_SAVE_AFTER = None  # reset config after $ minutes
 LOG_OUTGOING_REQUESTS_MAX_AGE = config(
-    "LOG_OUTGOING_REQUESTS_MAX_AGE", default=1
-)  # clean logs after 1 day
+    "LOG_OUTGOING_REQUESTS_MAX_AGE", default=30
+)  # clean logs after 30 days
 
 #
 # AUTH settings - user accounts, passwords, backends...
