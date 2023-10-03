@@ -8,16 +8,6 @@
             {% for anchor in anchors %}
                 <li class="anchor-menu__list-item">
                     <a class="link" href="{{ anchor.0 }}">{{ anchor.1 }}</a>
-                    <!-- subheadings -->
-                    {% if anchor.2 %}
-                        <ul class="anchor-menu__sublist anchor-menu__sublist--mobile">
-                            {% for subheading in anchor.2 %}
-                                <li class="anchor-menu__list-item">
-                                    <a class="link" href="#{{ subheading.1 }}">{{ subheading.0 }}</a>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
                 </li>
             {% endfor %}
             {{ contents }}
@@ -27,19 +17,10 @@
     {% else %}
 
     <ul class="anchor-menu__list">
+    {# desktop anchors #}
         {% for anchor in anchors %}
             <li class="anchor-menu__list-item">
                 <a class="link" href="{{ anchor.0 }}">{{ anchor.1 }}</a>
-                <!-- subheadings -->
-                    {% if anchor.2 %}
-                        <ul class="anchor-menu__sublist">
-                            {% for subheading in anchor.2 %}
-                                <li class="anchor-menu__list-item">
-                                    <a class="link" href="#{{ subheading.1 }}">{{ subheading.0 }}</a>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
             </li>
         {% endfor %}
         {{ contents }}
