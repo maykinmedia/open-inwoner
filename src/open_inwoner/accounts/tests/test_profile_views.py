@@ -69,7 +69,7 @@ class ProfileViewTests(WebTest):
         response = self.app.get(self.url, user=self.user)
 
         self.assertEquals(response.status_code, 200)
-        self.assertContains(response, _("U heeft geen interessegebieden aangegeven."))
+        self.assertContains(response, _("U heeft geen interesses gekozen."))
         self.assertContains(response, _("U heeft nog geen contacten."))
         self.assertContains(response, "0 acties staan open.")
         self.assertNotContains(response, reverse("products:questionnaire_list"))
@@ -99,23 +99,6 @@ class ProfileViewTests(WebTest):
         self.assertEquals(response.status_code, 200)
         self.assertContains(response, "0 acties staan open.")
 
-    def test_get_documents_sorted(self):
-        """
-        check that the new document is shown first
-        """
-        doc_old = DocumentFactory.create(name="some-old", owner=self.user)
-        doc_new = DocumentFactory.create(name="some-new", owner=self.user)
-
-        response = self.app.get(self.url, user=self.user)
-        self.assertEquals(response.status_code, 200)
-
-        file_tags = response.html.find(class_="file-list").find_all(
-            class_="file-list__list-item"
-        )
-        self.assertEquals(len(file_tags), 2)
-        self.assertTrue(doc_new.name in file_tags[0].prettify())
-        self.assertTrue(doc_old.name in file_tags[1].prettify())
-
     def test_mydata_shown_with_digid_and_brp(self):
         user = UserFactory(
             bsn="999993847",
@@ -125,7 +108,7 @@ class ProfileViewTests(WebTest):
             login_type=LoginTypeChoices.digid,
         )
         response = self.app.get(self.url, user=user)
-        self.assertContains(response, _("Mijn gegevens"))
+        self.assertContains(response, _("My details"))
 
     def test_mydata_not_shown_with_digid_and_no_brp(self):
         user = UserFactory(
@@ -136,11 +119,11 @@ class ProfileViewTests(WebTest):
             login_type=LoginTypeChoices.digid,
         )
         response = self.app.get(self.url, user=user)
-        self.assertNotContains(response, _("Mijn gegevens"))
+        self.assertNotContains(response, _("My details"))
 
     def test_mydata_not_shown_without_digid(self):
         response = self.app.get(self.url, user=self.user)
-        self.assertNotContains(response, _("Mijn gegevens"))
+        self.assertNotContains(response, _("My details"))
 
     def test_active_user_notifications_are_shown(self):
         response = self.app.get(self.url, user=self.user)

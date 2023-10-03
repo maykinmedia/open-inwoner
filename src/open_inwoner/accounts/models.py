@@ -346,7 +346,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_interests(self) -> str:
         if not self.selected_categories.exists():
-            return _("U heeft geen interessegebieden aangegeven.")
+            return _("U heeft geen interesses gekozen.")
 
         return ", ".join(list(self.selected_categories.values_list("name", flat=True)))
 

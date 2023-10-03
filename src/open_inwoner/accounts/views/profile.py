@@ -59,8 +59,6 @@ class MyProfileView(
         ]
 
         user_files = user.get_all_files()
-        if user_files:
-            context["anchors"].append(("#files", _("Bestanden")))
 
         # List of names of 'mentor' users that are a contact of me
         mentor_contacts = [
@@ -256,7 +254,7 @@ class MyNotificationsView(
     def crumbs(self):
         return [
             (_("Mijn profiel"), reverse("profile:detail")),
-            (_("Communicatievoorkeuren"), reverse("profile:notifications")),
+            (_("Ontvang berichten over"), reverse("profile:notifications")),
         ]
 
     def get_object(self):
