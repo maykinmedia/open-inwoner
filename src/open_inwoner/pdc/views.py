@@ -12,6 +12,7 @@ from open_inwoner.pdc.models.product import ProductCondition
 from open_inwoner.questionnaire.models import QuestionnaireStep
 from open_inwoner.utils.views import LoginMaybeRequiredMixin
 
+from ..utils.ckeditor import get_rendered_content
 from ..utils.views import CommonPageMixin
 from .choices import YesNo
 from .forms import ProductFinderForm
@@ -172,6 +173,9 @@ class CategoryDetailView(
         context["products"] = self.object.products.published().order_in_category()
         context["questionnaire_roots"] = QuestionnaireStep.get_root_nodes().filter(
             category=self.object
+        )
+        context["category_rendered_description"] = get_rendered_content(
+            self.object.description
         )
         return context
 
