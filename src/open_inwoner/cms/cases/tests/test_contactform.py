@@ -1,3 +1,4 @@
+from django.core import mail
 from django.test import override_settings
 from django.urls import reverse
 from django.utils.translation import gettext as _
@@ -28,11 +29,12 @@ from open_inwoner.openzaak.tests.shared import (
     ZAKEN_ROOT,
 )
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
+from open_inwoner.utils.tests.helpers import AssertMockMatchersMixin
 
 
 @requests_mock.Mocker()
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class CasesContactFormTestCase(ClearCachesMixin, WebTest):
+class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTest):
     def setUp(self):
         super().setUp()
 
@@ -155,6 +157,7 @@ class CasesContactFormTestCase(ClearCachesMixin, WebTest):
             catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             identificatie=self.zaaktype["identificatie"],
             contact_form_enabled=True,
+            contact_subject_code="afdeling-x",
         )
 
         self.case_detail_url = reverse(
@@ -215,16 +218,20 @@ class CasesContactFormTestCase(ClearCachesMixin, WebTest):
             klant=self.klant["url"],
             contactmoment=self.contactmoment["url"],
         )
-        m.post(
+        self.matcher_create_contactmoment = m.post(
             f"{CONTACTMOMENTEN_ROOT}contactmomenten",
             json=self.contactmoment,
             status_code=201,
-        ),
-        m.post(
+        )
+        self.matcher_create_klantcontactmoment = m.post(
             f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten",
             json=self.klant_contactmoment,
             status_code=201,
-        ),
+        )
+        self.extra_matchers = [
+            self.matcher_create_contactmoment,
+            self.matcher_create_klantcontactmoment,
+        ]
 
     def test_form_is_shown_if_open_klant_api_configured(self, m):
         self._setUpMocks(m)
@@ -293,8 +300,7 @@ class CasesContactFormTestCase(ClearCachesMixin, WebTest):
 
         CatalogusConfig.objects.all().delete()
         self.zaak_type_config.delete()
-
-        ZaakTypeConfigFactory(
+        self.zaak_type_config = ZaakTypeConfigFactory(
             catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             identificatie=self.zaaktype["identificatie"],
             contact_form_enabled=False,
@@ -327,6 +333,20 @@ class CasesContactFormTestCase(ClearCachesMixin, WebTest):
         redirect_messages = list(redirect.context["messages"])
 
         self.assertEqual(redirect_messages[0].message, _("Vraag verstuurd!"))
+        self.assertMockMatchersCalled(self.extra_matchers)
+
+        payload = self.matcher_create_contactmoment.request_history[0].json()
+        self.assertEqual(
+            payload,
+            {
+                "bronorganisatie": "123456788",
+                "kanaal": "Internet",
+                "medewerkerIdentificatie": {"identificatie": "FooVonBar"},
+                "onderwerp": "afdeling-x",
+                "tekst": "Sample text",
+                "type": "Melding",
+            },
+        )
 
     def test_form_success_with_email(self, m):
         self._setUpMocks(m)
@@ -354,6 +374,13 @@ class CasesContactFormTestCase(ClearCachesMixin, WebTest):
 
         self.assertEqual(redirect_messages[0].message, _("Vraag verstuurd!"))
 
+        self.assertEqual(len(mail.outbox), 1)
+        message = mail.outbox[0]
+        self.assertEqual(
+            message.subject,
+            _("Contact formulier inzending vanaf Open Inwoner Platform"),
+        )
+
     def test_form_success_with_both_email_and_api(self, m):
         self._setUpMocks(m)
         self._setUpExtraMocks(m)
@@ -378,3 +405,5 @@ class CasesContactFormTestCase(ClearCachesMixin, WebTest):
         redirect_messages = list(redirect.context["messages"])
 
         self.assertEqual(redirect_messages[0].message, _("Vraag verstuurd!"))
+        self.assertMockMatchersCalled(self.extra_matchers)
+        self.assertEqual(len(mail.outbox), 1)

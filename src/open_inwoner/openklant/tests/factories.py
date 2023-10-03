@@ -6,3 +6,4 @@ class ContactFormSubjectFactory(factory.django.DjangoModelFactory):
         model = "openklant.ContactFormSubject"
 
     subject = factory.Faker("sentence")
+    subject_code = factory.Faker("word")
