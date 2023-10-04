@@ -4,6 +4,24 @@
         <meta charset="utf-8">
         <title>{% block title %}{% if page_title %}{{ page_title }} - {% endif %}{{ site_name }}{% endblock %}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <meta property="og:title" content="{% if page_title %}{{ page_title }} - {% endif %}{{ site_name }}">
+        <meta name="twitter:title" content="{% if page_title %}{{ page_title }} - {% endif %}{{ site_name }}">
+        {% if meta_description %}
+            <meta property="og:description" content="{{ meta_description }}">
+            <meta name="twitter:description" content="{{ meta_description }}">
+            <meta name="description" content="{{ meta_description }}"/>
+        {% endif %}
+        {% if meta_image_url %}
+            <meta property="og:image" content="{{ meta_image_url }}">
+            <meta name="twitter:image" content="{{ meta_image_url  }}">
+        {% endif %}
+        {% if meta_page_url %}
+            <meta property="og:url" content="{{ meta_page_url }}">
+        {% endif %}
+        <meta property="og:type" content="article">
+
+
         {% if favicon %}<link rel="icon" href="{{ favicon }}" />
         <link rel="apple-touch-icon" href="{{ favicon }}">{% endif %}
 
