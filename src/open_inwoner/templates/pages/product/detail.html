@@ -184,5 +184,17 @@
             {% endrender_column %}
         {% endrender_grid %}
 
+        {% if display_social %}
+            <nav class="sharing-list" aria-label="{% trans "Deel dit artikel" %}">
+                <h3 class="h3" id="sharing">{% trans "Deel dit artikel" %}</h3>
+                {% with request.build_absolute_uri as page_url %}
+                    {% include "components/ShareButton/ShareButton.html" with platform="facebook" platform_verbose="Facebook" text_to_share=page_url %}
+                    {% include "components/ShareButton/ShareButton.html" with platform="x-twitter" platform_verbose="X" text_to_share=page_url %}
+                    {% include "components/ShareButton/ShareButton.html" with platform="whatsapp" platform_verbose="WhatsApp" text_to_share=page_url %}
+                    {% include "components/ShareButton/ShareButton.html" with platform="linkedin" platform_verbose="LinkedIn" text_to_share=page_url %}
+                {% endwith %}
+            </nav>
+        {% endif %}
+
     </div>
 {% endblock content %}

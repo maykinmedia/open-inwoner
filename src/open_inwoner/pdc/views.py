@@ -203,6 +203,7 @@ class ProductDetailView(
         return base_list + [(self.get_object().name, self.request.path)]
 
     def get_context_data(self, **kwargs):
+        config = SiteConfiguration.get_solo()
         product = self.get_object()
         context = super().get_context_data(**kwargs)
 
@@ -223,6 +224,7 @@ class ProductDetailView(
         context["anchors"] = anchors
         context["related_products_start"] = 6 if product.links.exists() else 1
         context["product_links"] = product.links.order_by("pk")
+        context["display_social"] = config.display_social
         return context
 
 

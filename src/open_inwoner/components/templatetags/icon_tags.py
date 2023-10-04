@@ -22,5 +22,5 @@ def icon(icon, **kwargs):
         - social: bool | if the icon is from Fontawesome brands.
     """
 
-    social = icon in ["facebook", "twitter", "whatsapp", "linkedin"]
+    social = icon in ["facebook", "twitter", "whatsapp", "linkedin", "x-twitter"]
     return {**kwargs, "icon": icon, "social": social}

@@ -1,0 +1,18 @@
+{% load i18n icon_tags %}
+<a
+    class="button {{platform}}-share-button"
+    aria-label="{% trans "Delen op" %} {{platform_verbose}}"
+    title="{% trans "Delen op" %} {{platform_verbose}}"
+    {% if platform == "facebook" %}
+        href="{{"https://www.facebook.com/share.php?u="|add:text_to_share}}"
+    {% elif platform == "x-twitter" %}
+        href="{{"https://twitter.com/intent/tweet?url="|add:text_to_share}}"
+    {% elif platform == "whatsapp" %}
+        href="{{"https://api.whatsapp.com/send?text="|add:text_to_share}}"
+    {% elif platform == "linkedin" %}
+        href="{{"https://www.linkedin.com/shareArticle?mini=true&url="|add:text_to_share}}"
+    {% endif %}
+    target="_blank"
+>
+    {% icon platform %}
+</a>
