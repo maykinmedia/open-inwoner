@@ -705,11 +705,16 @@ class MyDataTests(AssertTimelineLogMixin, HaalCentraalMixin, WebTest):
             "https://personen/api/brp/ingeschrevenpersonen/999993847?fields=geslachtsaanduiding,naam,geboorte,verblijfplaats",
             status_code=200,
             json={
+                "naam": {
+                    "voornamen": "Merel",
+                    "voorvoegsel": "de",
+                    "geslachtsnaam": "Kooyman",
+                },
                 "geboorte": {
                     "datum": {
                         "datum": "1982-04",
                     },
-                }
+                },
             },
         )
         response = self.app.get(self.url, user=self.user)
@@ -717,7 +722,7 @@ class MyDataTests(AssertTimelineLogMixin, HaalCentraalMixin, WebTest):
         self.assertIsNone(response.context["my_data"].birthday)
         self.assertTimelineLog(
             _("user requests for brp data"),
-            content_object_repr=self.user.email,
+            content_object_repr=str(self.user),
             action_flag=list(LOG_ACTIONS[4]),
         )
 
