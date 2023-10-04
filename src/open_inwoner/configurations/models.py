@@ -469,6 +469,13 @@ class SiteConfiguration(SingletonModel):
             "If checked, only authenticated users will be able to search the page."
         ),
     )
+    display_social = models.BooleanField(
+        verbose_name=_("Display social media buttons"),
+        default=True,
+        help_text=_(
+            "Enable sharing of products on social media (Facebook, LinkedIn...)",
+        ),
+    )
 
     extra_css = CSSField(
         blank=True,
