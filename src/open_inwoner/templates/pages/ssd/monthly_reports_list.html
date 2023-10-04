@@ -31,10 +31,9 @@
                                     {% input form.report_date icon="expand_more" icon_position="after" icon_outlined=True %}
                                     {% form_actions primary_text=_("Download") primary_icon="file_download" icon_position="before" extra_classes="ssd" %}
                                 {% endrender_form %}
-
                                 <div>
-                                    {% if report_date %}
-                                        {% blocktrans with time_period=report_date|date:"M Y" %}
+                                    {% if report_not_found %}
+                                        {% blocktrans with time_period=report_not_found|date:"M Y" %}
                                             Geen uitkeringsspecificatie gevonden voor {{ time_period }}.
                                         {% endblocktrans %}
                                     {% endif %}

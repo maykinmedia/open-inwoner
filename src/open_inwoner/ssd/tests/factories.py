@@ -25,5 +25,5 @@ class ConcreteSSDClient(SSDBaseClient):
     def format_file_name(self, report_date_iso):
         return ""
 
-    def get_report(self, bsn, report_date_iso, base_url):
+    def get_reports(self, bsn, report_date_iso, base_url):
         return ""

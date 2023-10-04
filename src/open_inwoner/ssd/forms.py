@@ -16,7 +16,7 @@ def get_monthly_report_dates() -> list[tuple[date, str]]:
 
     config = SSDConfig.get_solo()
 
-    if config.maandspecificatie_enabled is not True:
+    if not config.maandspecificatie_enabled:
         return []
 
     today = datetime.today()
@@ -43,7 +43,7 @@ def get_yearly_report_dates() -> list[tuple[date, str]]:
 
     config = SSDConfig.get_solo()
 
-    if config.jaaropgave_enabled is not True:
+    if not config.jaaropgave_enabled:
         return []
 
     today = datetime.today()

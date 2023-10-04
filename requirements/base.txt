@@ -502,7 +502,9 @@ tinycss2==1.1.1
     #   svglib
     #   weasyprint
 typing-extensions==4.4.0
-    # via pyee
+    # via
+    #   pyee
+    #   xsdata
 unidecode==1.1.2
     # via django-filer
 uritemplate==4.1.1
@@ -535,7 +537,7 @@ xlwt==1.3.0
     # via tablib
 xmlsec==1.3.12
     # via maykin-python3-saml
-xmltodict==0.13.0
+xsdata==23.8
     # via -r requirements/base.in
 zgw-consumers==0.25.0
     # via

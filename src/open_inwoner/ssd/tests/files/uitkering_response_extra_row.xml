@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:gwsd="http://www.centric.nl/GWS/Diensten/UitkeringsSpecificatieClient/v0600" xmlns:ns3="http://www.centric.nl/GWS/Header/v0201" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:wsa="http://www.w3.org/2005/08/addressing" xsi:schemaLocation="http://www.centric.nl/GWS/Diensten/UitkeringsSpecificatieClient/v0600 Diensten\UitkeringsSpecificatieClient\v0600-b01\BodyReaction_resolved.xsd">
+ <SOAP-ENV:Header>
+  <wsa:MessageID>85630FB6-94E1-4D7F-A19E-6C0E0B62B947</wsa:MessageID>
+  <wsa:Action>http://www.centric.nl/GWS/Diensten/UitkeringsSpecificatieClient-v0600/UitkeringsSpecificatieInfoResponse</wsa:Action>
+  <wsa:RelatesTo>urn:uuid:1d82df77-2072-4505-9069-c56687fc4858</wsa:RelatesTo>
+  <wsa:From>
+   <wsa:Address>https://rfor-2securet1.rfor.local:8443/ENSC/Intern/SSD/UitkeringsSpecificatieClient-v0600</wsa:Address>
+  </wsa:From>
+  <ns3:Header>
+   <RouteInformatie>
+    <Bron>
+     <Gemeentecode>0153</Gemeentecode>
+     <ApplicatieNaam>GWS4all</ApplicatieNaam>
+    </Bron>
+    <Bestemming>
+     <Gemeentecode>0153</Gemeentecode>
+     <ApplicatieNaam>Open Inwoner</ApplicatieNaam>
+    </Bestemming>
+   </RouteInformatie>
+   <BerichtIdentificatie>
+    <DatTijdAanmaakRequest>2023-08-16T16:36:36+0200</DatTijdAanmaakRequest>
+    <DatTijdOntvangstRequest>2023-08-16T16:36:36+02:00</DatTijdOntvangstRequest>
+    <DatTijdAanmaakResponse>2023-08-16T16:36:38+02:00</DatTijdAanmaakResponse>
+   </BerichtIdentificatie>
+  </ns3:Header>
+ </SOAP-ENV:Header>
+ <SOAP-ENV:Body>
+  <gwsd:UitkeringsSpecificatieInfoResponse>
+   <UitkeringsSpecificatieClient>
+    <Client>
+     <BurgerServiceNr>900038937</BurgerServiceNr>
+     <Voornamen>Fabiënne Maria Charlotte Elsbeth</Voornamen>
+     <Voorletters>F.M.C.E</Voorletters>
+     <Voorvoegsel>van der</Voorvoegsel>
+     <Achternaam>Achterhuüskamp</Achternaam>
+     <AanduidingNaamgebruik>3</AanduidingNaamgebruik>
+     <Clientnummer>30000825</Clientnummer>
+     <Adres>
+      <Straatnaam>Robinson Crusoëstraat</Straatnaam>
+      <Huisnummer>21</Huisnummer>
+      <Huisletter>a</Huisletter>
+      <Postcode>7541AA</Postcode>
+      <Woonplaatsnaam>Enschede</Woonplaatsnaam>
+      <Gemeentenaam>Enschede</Gemeentenaam>
+     </Adres>
+    </Client>
+    <TypePeriode>0</TypePeriode>
+    <Uitkeringsspecificatie>
+     <Uitkeringsinstantie>
+      <Gemeentecode>0153</Gemeentecode>
+      <Gemeentenaam>Enschede</Gemeentenaam>
+      <Bezoekadres>Hengelosestraat 51</Bezoekadres>
+      <Postcode>7514AD</Postcode>
+      <Woonplaatsnaam>Enschede</Woonplaatsnaam>
+     </Uitkeringsinstantie>
+     <Dossierhistorie>
+      <Regeling>Participatiewet</Regeling>
+      <Dossiernummer>61913</Dossiernummer>
+      <Periodenummer>202301</Periodenummer>
+      <Betrekkingsperiode>202301</Betrekkingsperiode>
+      <UitbetaaldBedragClient>
+       <CdPositiefNegatief>+</CdPositiefNegatief>
+       <WaardeBedrag>63343</WaardeBedrag>
+      </UitbetaaldBedragClient>
+      <Iban>NL23INGB0665265182</Iban>
+      <Bic>INGBNL2A</Bic>
+      <OpgegevenInkomsten>
+       <CdPositiefNegatief>+</CdPositiefNegatief>
+       <WaardeBedrag>3644</WaardeBedrag>
+      </OpgegevenInkomsten>
+      <TeVerrekenenInkomsten>
+       <CdPositiefNegatief>+</CdPositiefNegatief>
+       <WaardeBedrag>3644</WaardeBedrag>
+      </TeVerrekenenInkomsten>
+      <InkomstenVrijlating>
+       <CdPositiefNegatief>+</CdPositiefNegatief>
+       <WaardeBedrag>0</WaardeBedrag>
+      </InkomstenVrijlating>
+      <InkomstenNaVrijlating>
+       <CdPositiefNegatief>+</CdPositiefNegatief>
+       <WaardeBedrag>3644</WaardeBedrag>
+      </InkomstenNaVrijlating>
+      <VakantiegeldOverInkomsten>
+       <CdPositiefNegatief>+</CdPositiefNegatief>
+       <WaardeBedrag>0</WaardeBedrag>
+      </VakantiegeldOverInkomsten>
+      <GekorteInkomsten>
+       <CdPositiefNegatief>+</CdPositiefNegatief>
+       <WaardeBedrag>3644</WaardeBedrag>
+      </GekorteInkomsten>
+      <UitbetaaldBedragDossier>
+       <CdPositiefNegatief>+</CdPositiefNegatief>
+       <WaardeBedrag>63343</WaardeBedrag>
+      </UitbetaaldBedragDossier>
+      <DatumBetaald>20230123</DatumBetaald>
+      <Componenthistorie>
+       <Omschrijving>KD norm tot AOW</Omschrijving>
+       <Bedrag>
+        <CdPositiefNegatief>+</CdPositiefNegatief>
+        <WaardeBedrag>34541</WaardeBedrag>
+       </Bedrag>
+       <IndicatieKolom>1</IndicatieKolom>
+      </Componenthistorie>
+      <Componenthistorie>
+       <Omschrijving>KD norm tot AOW</Omschrijving>
+       <Bedrag>
+        <CdPositiefNegatief>+</CdPositiefNegatief>
+        <WaardeBedrag>34617</WaardeBedrag>
+       </Bedrag>
+       <IndicatieKolom>1</IndicatieKolom>
+      </Componenthistorie>
+      <Componenthistorie>
+       <Omschrijving>Ink pensioen/VUT (65-)geen vt</Omschrijving>
+       <Bedrag>
+        <CdPositiefNegatief>+</CdPositiefNegatief>
+        <WaardeBedrag>3644</WaardeBedrag>
+       </Bedrag>
+       <IndicatieKolom>3</IndicatieKolom>
+      </Componenthistorie>
+      <Componenthistorie>
+       <Omschrijving>TOTAAL GEKORTE INKOMSTEN</Omschrijving>
+       <Bedrag>
+        <CdPositiefNegatief>+</CdPositiefNegatief>
+        <WaardeBedrag>9044</WaardeBedrag>
+       </Bedrag>
+       <IndicatieKolom>2</IndicatieKolom>
+      </Componenthistorie>
+      <Componenthistorie>
+       <Omschrijving>RESERVERING VAKANTIEGELD</Omschrijving>
+       <Bedrag>
+        <CdPositiefNegatief>+</CdPositiefNegatief>
+        <WaardeBedrag>3188</WaardeBedrag>
+       </Bedrag>
+       <IndicatieKolom>2</IndicatieKolom>
+      </Componenthistorie>
+      <Componenthistorie>
+       <Omschrijving>Uitbetaling vakantiegeld</Omschrijving>
+       <Bedrag>
+        <CdPositiefNegatief>+</CdPositiefNegatief>
+        <WaardeBedrag>350</WaardeBedrag>
+       </Bedrag>
+       <IndicatieKolom>1</IndicatieKolom>
+      </Componenthistorie>
+      <Componenthistorie>
+       <Omschrijving>TOTAAL NETTO BIJSTAND</Omschrijving>
+       <Bedrag>
+        <CdPositiefNegatief>+</CdPositiefNegatief>
+        <WaardeBedrag>57276</WaardeBedrag>
+       </Bedrag>
+       <IndicatieKolom>1</IndicatieKolom>
+      </Componenthistorie>
+      <Componenthistorie>
+       <Omschrijving>Aflossing vordering</Omschrijving>
+       <Bedrag>
+        <CdPositiefNegatief>+</CdPositiefNegatief>
+        <WaardeBedrag>3458</WaardeBedrag>
+       </Bedrag>
+       <IndicatieKolom>2</IndicatieKolom>
+      </Componenthistorie>
+      <Componenthistorie>
+       <Omschrijving>Overige reserveringen</Omschrijving>
+       <Bedrag>
+        <CdPositiefNegatief>+</CdPositiefNegatief>
+        <WaardeBedrag>500</WaardeBedrag>
+       </Bedrag>
+       <IndicatieKolom>2</IndicatieKolom>
+      </Componenthistorie>
+      <Componenthistorie>
+       <Omschrijving>UIT TE BETALEN BEDRAG</Omschrijving>
+       <Bedrag>
+        <CdPositiefNegatief>+</CdPositiefNegatief>
+        <WaardeBedrag>53318</WaardeBedrag>
+       </Bedrag>
+       <IndicatieKolom>1</IndicatieKolom>
+      </Componenthistorie>
+     </Dossierhistorie>
+    </Uitkeringsspecificatie>
+   </UitkeringsSpecificatieClient>
+  </gwsd:UitkeringsSpecificatieInfoResponse>
+ </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:gwsb="http://www.centric.nl/GWS/Basisschema/v0400"
+        xmlns:fwi="http://www.centric.nl/GWS/FWI/v0200"
+        xmlns:gwsd="http://www.centric.nl/GWS/Diensten/JaarOpgaveClient/v0400"
+        targetNamespace="http://www.centric.nl/GWS/Diensten/JaarOpgaveClient/v0400"
+        elementFormDefault="unqualified"
+        attributeFormDefault="unqualified">
+   <import namespace="http://www.centric.nl/GWS/FWI/v0200"
+           schemaLocation="FWI_resolved.xsd"/>
+   <import namespace="http://www.centric.nl/GWS/Basisschema/v0400"
+           schemaLocation="FWI-Include_resolved.xsd"/>
+   <xs:element name="JaarOpgaveInfoResponse" type="gwsd:Response"/>
+   <xs:complexType name="Response">
+		    <xs:choice>
+			      <xs:sequence>
+				        <xs:element name="JaarOpgaveClient" type="gwsd:JaarOpgaveClient" minOccurs="0"/>
+				        <xs:element ref="fwi:FWI" minOccurs="0"/>
+			      </xs:sequence>
+			      <xs:element ref="fwi:NietsGevonden"/>
+		    </xs:choice>
+	  </xs:complexType>
+   <xs:complexType name="JaarOpgaveClient">
+		    <xs:sequence>
+			      <xs:element name="Client" type="gwsd:Client" minOccurs="0"/>
+			      <xs:element name="JaarOpgave"
+                     type="gwsd:JaarOpgave"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+		    </xs:sequence>
+	  </xs:complexType>
+   <xs:complexType name="Client">
+		    <xs:complexContent>
+			      <xs:extension base="gwsb:Persoon">
+				        <xs:sequence>
+					          <xs:element name="Adres" type="gwsb:Adres" minOccurs="0"/>
+				        </xs:sequence>
+			      </xs:extension>
+		    </xs:complexContent>
+	  </xs:complexType>
+   <xs:complexType name="JaarOpgave">
+		    <xs:sequence>
+			      <xs:element name="Inhoudingsplichtige" type="gwsd:Inhoudingsplichtige"/>
+			      <xs:element name="SpecificatieJaarOpgave"
+                     type="gwsd:SpecificatieJaarOpgave"
+                     minOccurs="1"
+                     maxOccurs="unbounded"/>
+		    </xs:sequence>
+	  </xs:complexType>
+   <xs:complexType name="Inhoudingsplichtige">
+		    <xs:sequence>
+			      <xs:element name="Gemeentecode" type="gwsb:Gemeentecode"/>
+			      <xs:element name="Gemeentenaam"
+                     type="gwsb:NaamAdresNederlandAN40"
+                     minOccurs="0"/>
+			      <xs:element name="Bezoekadres" type="gwsb:OmschrijvingAN30" minOccurs="0"/>
+			      <xs:element name="Postcode" type="gwsb:Postcode" minOccurs="0"/>
+			      <xs:element name="Woonplaatsnaam"
+                     type="gwsb:NaamAdresNederlandAN80"
+                     minOccurs="0"/>
+		    </xs:sequence>
+	  </xs:complexType>
+   <xs:complexType name="SpecificatieJaarOpgave">
+		    <xs:sequence>
+			      <xs:element name="Regeling" type="gwsb:OmschrijvingAN30"/>
+			      <xs:element name="Dienstjaar" type="gwsb:Jaar"/>
+			      <xs:element name="AangiftePeriodeVan" type="gwsb:Datum"/>
+			      <xs:element name="AangiftePeriodeTot" type="gwsb:Datum"/>
+			      <xs:element name="Fiscaalloon" type="gwsb:StandaardBedrag"/>
+			      <xs:element name="Loonheffing" type="gwsb:StandaardBedrag" minOccurs="0"/>
+			      <xs:element name="CdPremieVolksverzekering"/>
+			      <xs:element name="IndicatieZVW" type="gwsb:StdIndJN"/>
+			      <xs:element name="IngehoudenPremieZVW"
+                     type="gwsb:StandaardBedrag"
+                     minOccurs="0"/>
+			      <xs:element name="VergoedingPremieZVW"
+                     type="gwsb:StandaardBedrag"
+                     minOccurs="0"/>
+			      <xs:element name="OntvangstenFiscaalloon"
+                     type="gwsb:StandaardBedrag"
+                     minOccurs="0"/>
+			      <xs:element name="OntvangstenIngehoudenPremieZVW"
+                     type="gwsb:StandaardBedrag"
+                     minOccurs="0"/>
+			      <xs:element name="OntvangstenVergoedingPremieZVW"
+                     type="gwsb:StandaardBedrag"
+                     minOccurs="0"/>
+			      <xs:element name="OntvangstenPremieloon"
+                     type="gwsb:StandaardBedrag"
+                     minOccurs="0"/>
+			      <xs:element name="WerkgeversheffingPremieZVW"
+                     type="gwsb:StandaardBedrag"
+                     minOccurs="0"/>
+			      <xs:element name="OntvangstenWerkgeversheffingPremieZVW"
+                     type="gwsb:StandaardBedrag"
+                     minOccurs="0"/>
+			      <xs:element name="Loonheffingskorting"
+                     type="gwsd:Loonheffingskorting"
+                     minOccurs="0"
+                     maxOccurs="3"/>
+			      <xs:element name="BelasteAlimentatie" type="gwsb:StandaardBedrag" minOccurs="0"/>
+		    </xs:sequence>
+	  </xs:complexType>
+   <xs:complexType name="Loonheffingskorting">
+		    <xs:sequence>
+			      <xs:element name="Ingangsdatum" type="gwsb:Datum"/>
+			      <xs:element name="CdLoonheffingskorting"/>
+		    </xs:sequence>
+	  </xs:complexType>
+</schema>

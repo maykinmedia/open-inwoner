@@ -64,6 +64,13 @@
     table-layout: fixed;
   }
 
+  .table-fixed .yearly-report__td:not(:first-child):not(:last-child) {
+    width: 23%;
+  }
+  .table-fixed .yearly-report__td:last-child {
+    width: 31%;
+  }
+
   .yearly-report__th {
     padding: 0.3em;
     font-weight: normal;
