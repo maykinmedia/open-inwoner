@@ -375,7 +375,7 @@ class ContactFormTestCase(
         response = self.app.get(self.url, user=data.user)
 
         # reset interference from signals
-        self.resetTimelineLogs()
+        self.clearTimelineLogs()
         m.reset_mock()
 
         form = response.forms["contactmoment-form"]
@@ -447,7 +447,7 @@ class ContactFormTestCase(
         response = self.app.get(self.url, user=data.user)
 
         # reset interference from signals
-        self.resetTimelineLogs()
+        self.clearTimelineLogs()
         m.reset_mock()
 
         form = response.forms["contactmoment-form"]

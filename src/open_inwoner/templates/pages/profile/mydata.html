@@ -63,11 +63,11 @@
                 </div>
                 <div class="tabled__row">
                     <div class="tabled__item tabled__item--bold">{% trans "Huisnummer" %}</div>
-                    <div class="tabled__item">{{my_data.housenumber|default:"-"}}</div>
+                    <div class="tabled__item">{{my_data.get_housenumber|default:"-"}}</div>
                 </div>
                 <div class="tabled__row">
                     <div class="tabled__item tabled__item--bold">{% trans "Postcode" %}</div>
-                    <div class="tabled__item">{{my_data.postcode|default:"-"}}</div>
+                    <div class="tabled__item">{{my_data.postal_code|default:"-"}}</div>
                 </div>
                 <div class="tabled__row">
                     <div class="tabled__item tabled__item--bold">{% trans "Plaats" %}</div>

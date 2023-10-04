@@ -466,7 +466,7 @@ class NotificationHandlerEmailTestCase(AssertTimelineLogMixin, TestCase):
 
         # test frequency-limit check
         mock_send.reset_mock()
-        self.resetTimelineLogs()
+        self.clearTimelineLogs()
 
         # create new status
         status = factory(Status, copy_with_new_uuid(data.status_final))
