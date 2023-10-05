@@ -1281,12 +1281,12 @@ class TestPasswordResetFunctionality(WebTest):
         )
         self.assertIn(
             _(
-                "You're receiving this email because for your user account at example.com you requested a password reset."
+                "U ontvangt deze e-mail, omdat u een aanvraag voor opnieuw instellen van het wachtwoord voor uw account op example.comhebt gedaan."
             ).format(domain=current_site.domain),
             body,
         )
         self.assertIn(
-            _("Your username, in case you’ve forgotten: {user_email}").format(
+            _("Uw gebruikersnaam, mocht u deze vergeten zijn: {user_email}").format(
                 user_email=self.user.email
             ),
             body,
@@ -1299,7 +1299,7 @@ class TestPasswordResetFunctionality(WebTest):
         confirm_response = self.app.get(
             reverse("password_reset_confirm", kwargs={"token": token, "uidb64": uid})
         ).follow()
-        self.assertContains(confirm_response, _("Mijn wachtwoord wijzigen"))
+        self.assertContains(confirm_response, _("Change my password"))
 
     def test_custom_password_reset_form_sends_email_when_user_is_default(self):
         self.app.post(reverse("password_reset"), {"email": self.user.email})
