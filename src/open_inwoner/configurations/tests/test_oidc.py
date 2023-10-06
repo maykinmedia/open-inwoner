@@ -32,7 +32,7 @@ class OIDCConfigTest(ClearCachesMixin, WebTest):
         # regular site
         response = self.app.get(reverse("login"))
 
-        self.assertNotContains(response, _("Login with Azure AD"))
+        self.assertNotContains(response, _("Inloggen met Azure AD"))
 
         # admin login
         response = self.app.get(reverse("admin:login"))
@@ -51,10 +51,10 @@ class OIDCConfigTest(ClearCachesMixin, WebTest):
         # regular site
         response = self.app.get(reverse("login"))
 
-        link = response.pyquery.find("[title='Login with Azure AD']")
+        link = response.pyquery.find("[title='Inloggen met Azure AD']")
         link_text = link.find(".link__text").text()
 
-        self.assertEqual(link_text, _("Login with Azure AD"))
+        self.assertEqual(link_text, _(""))
 
         # admin login
         response = self.client.get(reverse("admin:login"))

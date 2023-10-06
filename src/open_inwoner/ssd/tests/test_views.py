@@ -112,7 +112,9 @@ class TestMonthlyBenefitsFormView(TestCase):
 
         response = self.client.get(url)
 
-        self.assertContains(response, "Download of monthly reports not supported.")
+        self.assertContains(
+            response, "Downloaden van maandoverzichten wordt niet ondersteund."
+        )
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
@@ -184,4 +186,6 @@ class TestYearlyBenefitsFormView(TestCase):
 
         response = self.client.get(url)
 
-        self.assertContains(response, "Download of yearly reports not supported.")
+        self.assertContains(
+            response, "Downloaden van jaaroverzichten wordt niet ondersteund."
+        )
