@@ -94,6 +94,8 @@ class Map {
       address_line_2,
       phonenumber,
       email,
+      date,
+      link,
       ...properties
     } = feature.properties
 
@@ -103,6 +105,8 @@ class Map {
     const displayAddress2 = escapeVariableText(address_line_2)
     const displayPhonenumber = escapeVariableText(phonenumber)
     const displayEmail = escapeVariableText(email)
+    const displayDate = escapeVariableText(date)
+    const buttonLink = escapeVariableText(link)
     let title = ''
 
     if (locationDetailView) {
@@ -115,23 +119,39 @@ class Map {
       title = displayName
     }
 
-    return `
+    const phonenumberElement = `
+      <a href="tel:${displayPhonenumber}" class="link link--secondary" aria-label=${displayPhonenumber} title=${displayPhonenumber}>
+        <span class="link__text">${displayPhonenumber}</span>
+      </a>
+    `
+    const emailElement = `
+      <a href="mailto:${displayEmail}" class="link link--secondary" aria-label=${displayEmail} title=${displayEmail}>
+        <span class="link__text">${displayEmail}</span>
+      </a>
+    `
+    const buttonLinkElement = `
+    <a href="${buttonLink}" class="button button--bordered button--primary" aria-label=${buttonLink} title=${buttonLink}">
+      <span class="button__text">Action</span>
+    </a>
+    `
+
+    return (
+      `
       <div class="leaflet-content-name">
         <h4 class="h4">
           ${title}
         </h4>
       </div>
-      <div class="leaflet-content-details p--no-margin">
-        <p class="p">${displayAddress1}</p>
-        <p class="p">${displayAddress2}</p>
-        <a href="tel:${displayPhonenumber}" class="link link--secondary" aria-label=${displayPhonenumber} title=${displayPhonenumber}>
-          <span class="link__text">${displayPhonenumber}</span>
-        </a>
-        <a href="mailto:${displayEmail}" class="link link--secondary" aria-label=${displayEmail} title=${displayEmail}>
-          <span class="link__text">${displayEmail}</span>
-        </a>
-      </div>
-    `
+    ` +
+      '<div class="leaflet-content-details p--no-margin">' +
+      (displayAddress1 ? `<p class="p">${displayAddress1}</p>` : '') +
+      (displayAddress2 ? `<p class="p">${displayAddress2}</p>` : '') +
+      (displayDate ? `<p class="p">${displayDate}</p>` : '') +
+      (displayPhonenumber ? phonenumberElement : '') +
+      (displayEmail ? emailElement : '') +
+      (buttonLink ? buttonLinkElement : '') +
+      '</div>'
+    )
   }
 }
 

@@ -1,0 +1,13 @@
+{% load i18n sekizai_tags utils map_tags %}
+
+<h2 class="h2">
+  {{ instance.title }}
+</h2>
+<div>
+    {% if objects %}
+        {% map instance.map_lat instance.map_long zoom=instance.map_zoom_level geojson_feature_collection=objects %}
+    {% else %}
+      <p>{{ instance.no_results_message }}</p>
+    {% endif %}
+</div>
+

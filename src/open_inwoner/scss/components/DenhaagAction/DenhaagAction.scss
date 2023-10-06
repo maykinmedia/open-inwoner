@@ -1,0 +1,113 @@
+.denhaag-action {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  gap: 0.5rem;
+  color: hsla(0, 0%, 18%, 1);
+  background-color: hsl(0 0% 100%);
+  padding-inline-start: 1rem;
+  padding-inline-end: 1rem;
+  padding-block-start: 1rem;
+  padding-block-end: 1rem;
+  border-style: solid;
+  border-width: 1px;
+  border-color: hsl(0 0% 82%);
+
+  @media (width >= 768px) {
+    flex-direction: row;
+    align-items: center;
+    gap: 1.5rem;
+    padding-block-start: 0.8rem;
+    padding-block-end: 0.8rem;
+  }
+
+  &__details {
+    display: flex;
+    flex-shrink: 0;
+    flex-direction: column;
+    gap: 1rem;
+
+    @media (width >= 768px) {
+      flex-direction: row;
+      align-items: center;
+      gap: 1.5rem;
+    }
+  }
+
+  &__content {
+    font-weight: 600;
+  }
+
+  &__date {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    color: hsl(0 0% 29%);
+    font-weight: 500 &--warning {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: hsl(23 100% 27%);
+      font-weight: 600;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    & > a {
+      width: 100%;
+
+      @media (width >= 768px) {
+        width: auto;
+      }
+    }
+  }
+
+  &__link-icon {
+    flex-shrink: 0;
+    width: 20px;
+    color: hsl(207 80% 35%);
+  }
+
+  &__warning-icon {
+    flex-shrink: 0;
+    width: 20px;
+    color: hsl(23 99% 44%);
+  }
+
+  &--single {
+    padding-inline-start: 1rem;
+    padding-inline-end: 1rem;
+    padding-block-start: 1rem;
+    padding-block-end: 1rem;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    text-decoration: none;
+
+    &:hover,
+    &.denhaag-action--hover {
+      background-color: hsl(0 0% 95%);
+    }
+
+    &:focus,
+    &.denhaag-action--focus {
+      outline-color: hsl(47 100% 25%);
+      outline-width: 2px;
+      outline-style: dashed;
+    }
+
+    .denhaag-action__details {
+      flex-direction: row;
+      justify-content: space-between;
+      gap: 0.5rem;
+
+      @media (width >= 768px) {
+        gap: 0.8rem;
+      }
+    }
+  }
+}
