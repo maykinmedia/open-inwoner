@@ -16,7 +16,6 @@ tinycss2
 Django>=3.2.11<4.0
 django-admin-index
 django-axes
-django-choices
 django-filer
 django-hijack
 django-ordered-model

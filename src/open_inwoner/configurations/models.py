@@ -434,7 +434,7 @@ class SiteConfiguration(SingletonModel):
     openid_display = models.CharField(
         verbose_name=_("Show option to login via OpenId"),
         max_length=24,
-        choices=OpenIDDisplayChoices,
+        choices=OpenIDDisplayChoices.choices,
         default=OpenIDDisplayChoices.admin,
         validators=[validate_oidc_config],
         help_text=_("Only selected groups will see the option to login via OpenId."),

@@ -220,6 +220,7 @@ INSTALLED_APPS = [
     "open_inwoner.cms.footer",
     "open_inwoner.cms.plugins",
     "open_inwoner.cms.benefits",
+    "djchoices",
 ]
 
 MIDDLEWARE = [

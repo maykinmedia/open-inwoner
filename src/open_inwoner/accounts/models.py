@@ -397,7 +397,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         return f"{url}#messages-last"
 
     def get_contact_type_display(self) -> str:
-        choice = ContactTypeChoices.get_choice(self.contact_type)
+        choice = getattr(ContactTypeChoices, self.contact_type)
         return choice.label
 
     def get_contact_email(self):
