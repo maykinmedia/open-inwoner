@@ -16,6 +16,7 @@ from .models import (
     UserCaseStatusNotification,
     ZaakTypeConfig,
     ZaakTypeInformatieObjectTypeConfig,
+    ZaakTypeStatusTypeConfig,
 )
 from .resources.import_resource import StatusTranslationImportResource
 
@@ -157,10 +158,39 @@ class ZaakTypeInformatieObjectTypeConfigInline(admin.TabularInline):
         return request.user.is_superuser
 
 
+class ZaakTypeStatusTypeConfigInline(admin.TabularInline):
+    model = ZaakTypeStatusTypeConfig
+    fields = [
+        "statustekst",
+        "omschrijving",
+        "statustype_url",
+        "zaaktype_uuids",
+        "status_indicator",
+        "status_indicator_text",
+    ]
+    readonly_fields = [
+        "statustekst",
+        "omschrijving",
+        "statustype_url",
+        "zaaktype_uuids",
+    ]
+    ordering = (
+        "zaaktype_uuids",
+        "omschrijving",
+    )
+
+    def has_add_permission(self, request, obj):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+
 @admin.register(ZaakTypeConfig)
 class ZaakTypeConfigAdmin(admin.ModelAdmin):
     inlines = [
         ZaakTypeInformatieObjectTypeConfigInline,
+        ZaakTypeStatusTypeConfigInline,
     ]
     actions = [
         "mark_as_notify_status_changes",
