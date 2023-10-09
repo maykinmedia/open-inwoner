@@ -16,29 +16,31 @@ from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.cms.cases.views.mixins import CaseListMixin
+from open_inwoner.openzaak.tests.shared import FORMS_ROOT
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 
 from ...utils.tests.helpers import AssertRedirectsMixin
 from ..constants import StatusIndicators
-from ..models import OpenZaakConfig, ZaakTypeStatusTypeConfig
+from ..models import OpenZaakConfig
 from ..utils import format_zaak_identificatie
 from .factories import (
     ServiceFactory,
     StatusTranslationFactory,
     ZaakTypeStatusTypeConfigFactory,
 )
+from .mocks import ESuiteData
 from .shared import CATALOGI_ROOT, ZAKEN_ROOT
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class CaseListAccessTests(AssertRedirectsMixin, ClearCachesMixin, WebTest):
     outer_urls = [
-        reverse_lazy("cases:open_cases"),
-        reverse_lazy("cases:closed_cases"),
+        reverse_lazy("cases:index"),
+        # reverse_lazy("cases:closed_cases"),
     ]
     inner_urls = [
-        reverse_lazy("cases:open_cases_content"),
-        reverse_lazy("cases:closed_cases_content"),
+        reverse_lazy("cases:cases_content"),
+        # reverse_lazy("cases:closed_cases_content"),
     ]
 
     @classmethod
@@ -138,8 +140,7 @@ class CaseListAccessTests(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 @requests_mock.Mocker()
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class CaseListViewTests(ClearCachesMixin, WebTest):
-    inner_url_open = reverse_lazy("cases:open_cases_content")
-    inner_url_closed = reverse_lazy("cases:closed_cases_content")
+    inner_url = reverse_lazy("cases:cases_content")
 
     @classmethod
     def setUpTestData(cls):
@@ -296,6 +297,14 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
             datumStatusGezet="2021-01-12",
             statustoelichting="",
         )
+        cls.submission = generate_oas_component(
+            "zrc",
+            "schemas/Zaak",
+            url=f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4ee0bf67d",
+            uuid="c8yudeb7-490f-2cw9-h8wa-44h9830bf67d",
+            naam="mysub",
+            datum_laatste_wijziging="2023-10-10",
+        )
 
     def _setUpMocks(self, m):
         mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
@@ -326,11 +335,11 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
         ]:
             m.get(resource["url"], json=resource)
 
-    def test_list_open_cases(self, m):
+    def test_list_cases(self, m):
         self._setUpMocks(m)
 
         response = self.app.get(
-            self.inner_url_open, user=self.user, headers={"HX-Request": "true"}
+            self.inner_url, user=self.user, headers={"HX-Request": "true"}
         )
 
         self.assertListEqual(
@@ -354,103 +363,6 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
                     "current_status": self.status_type1["omschrijving"],
                     "statustype_config": self.zt_statustype_config1,
                 },
-            ],
-        )
-        # don't show closed cases
-        self.assertNotContains(response, self.zaak3["identificatie"])
-        self.assertNotContains(response, self.zaak3["omschrijving"])
-        self.assertNotContains(response, self.zaak_intern["identificatie"])
-        self.assertNotContains(response, self.zaak_intern["omschrijving"])
-
-        zaken_cards = response.html.find_all("div", {"class": "card"})
-
-        self.assertEqual(len(zaken_cards), 2)
-        self.assertTrue("U moet documenten toevoegen" in zaken_cards[0].text)
-        self.assertTrue("U moet documenten toevoegen" in zaken_cards[1].text)
-
-        # check zaken request query parameters
-        list_zaken_req = [
-            req
-            for req in m.request_history
-            if req.hostname == "zaken.nl" and req.path == "/api/v1/zaken"
-        ][0]
-        self.assertEqual(len(list_zaken_req.qs), 2)
-        self.assertEqual(
-            list_zaken_req.qs,
-            {
-                "rol__betrokkeneidentificatie__natuurlijkpersoon__inpbsn": [
-                    self.user.bsn
-                ],
-                "maximalevertrouwelijkheidaanduiding": [
-                    VertrouwelijkheidsAanduidingen.beperkt_openbaar
-                ],
-            },
-        )
-
-    def test_list_open_cases_reformats_zaak_identificatie(self, m):
-        self._setUpMocks(m)
-
-        with patch(
-            "open_inwoner.cms.cases.views.mixins.format_zaak_identificatie",
-            wraps=format_zaak_identificatie,
-        ) as spy_format:
-            self.app.get(
-                self.inner_url_open, user=self.user, headers={"HX-Request": "true"}
-            )
-
-        spy_format.assert_called()
-        self.assertEqual(spy_format.call_count, 2)
-
-    def test_list_open_cases_translates_status(self, m):
-        st1 = StatusTranslationFactory(
-            status=self.status_type1["omschrijving"],
-            translation="Translated Status Type",
-        )
-        self._setUpMocks(m)
-        response = self.app.get(
-            self.inner_url_open, user=self.user, headers={"HX-Request": "true"}
-        )
-        self.assertNotContains(response, st1.status)
-        self.assertContains(response, st1.translation)
-
-    def test_list_open_cases_logs_displayed_case_ids(self, m):
-        self._setUpMocks(m)
-
-        self.app.get(
-            self.inner_url_open, user=self.user, headers={"HX-Request": "true"}
-        )
-
-        # check access logs for displayed cases
-        logs = list(TimelineLog.objects.all())
-
-        case_log = [
-            l for l in logs if self.zaak1["identificatie"] in l.extra_data["message"]
-        ]
-        self.assertEqual(len(case_log), 1)
-        self.assertEqual(self.user, case_log[0].user)
-        self.assertEqual(self.user, case_log[0].content_object)
-
-        case_log = [
-            l for l in logs if self.zaak2["identificatie"] in l.extra_data["message"]
-        ]
-        self.assertEqual(len(case_log), 1)
-        self.assertEqual(self.user, case_log[0].user)
-        self.assertEqual(self.user, case_log[0].content_object)
-
-        # no logs for non-displayed cases
-        for log in logs:
-            self.assertNotIn(self.zaak3["identificatie"], log.extra_data["message"])
-
-    def test_list_closed_cases(self, m):
-        self._setUpMocks(m)
-
-        response = self.app.get(
-            self.inner_url_closed, user=self.user, headers={"HX-Request": "true"}
-        )
-
-        self.assertListEqual(
-            response.context.get("cases"),
-            [
                 {
                     "uuid": self.zaak3["uuid"],
                     "start_date": datetime.date.fromisoformat(self.zaak3["startdatum"]),
@@ -462,10 +374,9 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
                 },
             ],
         )
-        # don't show closed cases
-        for open_zaak in [self.zaak1, self.zaak2]:
-            self.assertNotContains(response, open_zaak["identificatie"])
-            self.assertNotContains(response, open_zaak["omschrijving"])
+        # don't show internal cases
+        self.assertNotContains(response, self.zaak_intern["omschrijving"])
+        self.assertNotContains(response, self.zaak_intern["identificatie"])
 
         # check zaken request query parameters
         list_zaken_req = [
@@ -486,53 +397,61 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
             },
         )
 
-    def test_list_closed_cases_reformats_zaak_identificatie(self, m):
+    def test_list_cases_reformats_zaak_identificatie(self, m):
         self._setUpMocks(m)
 
         with patch(
             "open_inwoner.cms.cases.views.mixins.format_zaak_identificatie",
             wraps=format_zaak_identificatie,
         ) as spy_format:
-            self.app.get(
-                self.inner_url_closed, user=self.user, headers={"HX-Request": "true"}
-            )
+            self.app.get(self.inner_url, user=self.user, headers={"HX-Request": "true"})
 
         spy_format.assert_called()
-        self.assertEqual(spy_format.call_count, 1)
+        self.assertEqual(spy_format.call_count, 3)
 
-    def test_list_closed_cases_translates_status(self, m):
+    def test_list_cases_translates_status(self, m):
         st1 = StatusTranslationFactory(
-            status=self.status_type2["omschrijving"],
+            status=self.status_type1["omschrijving"],
             translation="Translated Status Type",
         )
         self._setUpMocks(m)
         response = self.app.get(
-            self.inner_url_closed, user=self.user, headers={"HX-Request": "true"}
+            self.inner_url, user=self.user, headers={"HX-Request": "true"}
         )
         self.assertNotContains(response, st1.status)
         self.assertContains(response, st1.translation)
 
-    def test_list_closed_cases_logs_displayed_case_ids(self, m):
+    def test_list_cases_logs_displayed_case_ids(self, m):
         self._setUpMocks(m)
 
-        self.app.get(
-            self.inner_url_closed, user=self.user, headers={"HX-Request": "true"}
-        )
+        self.app.get(self.inner_url, user=self.user, headers={"HX-Request": "true"})
 
         # check access logs for displayed cases
         logs = list(TimelineLog.objects.all())
 
         case_log = [
-            l for l in logs if self.zaak3["identificatie"] in l.extra_data["message"]
+            log
+            for log in logs
+            if self.zaak1["identificatie"] in log.extra_data["message"]
         ]
         self.assertEqual(len(case_log), 1)
         self.assertEqual(self.user, case_log[0].user)
         self.assertEqual(self.user, case_log[0].content_object)
 
-        # no logs for non-displayed cases
+        case_log = [
+            log
+            for log in logs
+            if self.zaak2["identificatie"] in log.extra_data["message"]
+        ]
+        self.assertEqual(len(case_log), 1)
+        self.assertEqual(self.user, case_log[0].user)
+        self.assertEqual(self.user, case_log[0].content_object)
+
+        # no logs for internal, hence non-displayed cases
         for log in logs:
-            self.assertNotIn(self.zaak1["identificatie"], log.extra_data["message"])
-            self.assertNotIn(self.zaak2["identificatie"], log.extra_data["message"])
+            self.assertNotIn(
+                self.zaak_intern["identificatie"], log.extra_data["message"]
+            )
 
     @patch.object(CaseListMixin, "paginate_by", 1)
     def test_list_cases_paginated(self, m):
@@ -543,7 +462,7 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
 
         # 1. test first page
         response_1 = self.app.get(
-            self.inner_url_open, user=self.user, headers={"HX-Request": "true"}
+            self.inner_url, user=self.user, headers={"HX-Request": "true"}
         )
 
         self.assertListEqual(
@@ -564,7 +483,7 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
         self.assertContains(response_1, "?page=2")
 
         # 2. test next page
-        next_page = f"{self.inner_url_open}?page=2"
+        next_page = f"{self.inner_url}?page=2"
         response_2 = self.app.get(
             next_page, user=self.user, headers={"HX-Request": "true"}
         )
@@ -590,45 +509,93 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
     def test_list_cases_paginated_logs_displayed_case_ids(self, m):
         self._setUpMocks(m)
 
-        # 1. test first page
-        response = self.app.get(
-            self.inner_url_open, user=self.user, headers={"HX-Request": "true"}
-        )
-        self.assertEqual(response.context.get("cases")[0]["uuid"], self.zaak2["uuid"])
+        with self.subTest("first page"):
+            response = self.app.get(
+                self.inner_url, user=self.user, headers={"HX-Request": "true"}
+            )
+            self.assertEqual(
+                response.context.get("cases")[0]["uuid"], self.zaak2["uuid"]
+            )
 
-        # check access logs for displayed cases
-        logs = list(TimelineLog.objects.all())
+            # check access logs for displayed cases
+            logs = list(TimelineLog.objects.all())
 
-        case_log = [
-            l for l in logs if self.zaak2["identificatie"] in l.extra_data["message"]
-        ]
-        self.assertEqual(len(case_log), 1)
-        self.assertEqual(self.user, case_log[0].user)
-        self.assertEqual(self.user, case_log[0].content_object)
+            case_log = [
+                log
+                for log in logs
+                if self.zaak2["identificatie"] in log.extra_data["message"]
+            ]
+            self.assertEqual(len(case_log), 1)
+            self.assertEqual(self.user, case_log[0].user)
+            self.assertEqual(self.user, case_log[0].content_object)
 
-        # no logs for non-displayed cases
-        for log in logs:
-            self.assertNotIn(self.zaak1["identificatie"], log.extra_data["message"])
-            self.assertNotIn(self.zaak3["identificatie"], log.extra_data["message"])
+            # no logs for non-displayed cases
+            for log in logs:
+                self.assertNotIn(self.zaak1["identificatie"], log.extra_data["message"])
+                self.assertNotIn(self.zaak3["identificatie"], log.extra_data["message"])
 
-        # clear logs for testing
         TimelineLog.objects.all().delete()
 
-        # 2. test next page
-        next_page = f"{self.inner_url_open}?page=2"
-        response = self.app.get(
-            next_page, user=self.user, headers={"HX-Request": "true"}
+        with self.subTest("next page"):
+            next_page = f"{self.inner_url}?page=2"
+            response = self.app.get(
+                next_page, user=self.user, headers={"HX-Request": "true"}
+            )
+            self.assertEqual(
+                response.context.get("cases")[0]["uuid"], self.zaak1["uuid"]
+            )
+
+            # check access logs for displayed cases
+            logs = list(TimelineLog.objects.all())
+            case_log = [
+                log
+                for log in logs
+                if self.zaak1["identificatie"] in log.extra_data["message"]
+            ]
+            self.assertEqual(len(case_log), 1)
+
+            # no logs for non-displayed cases (after we cleared just above)
+            for log in logs:
+                self.assertNotIn(self.zaak2["identificatie"], log.extra_data["message"])
+                self.assertNotIn(self.zaak3["identificatie"], log.extra_data["message"])
+
+
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+class CaseSubmissionTest(WebTest):
+    inner_url = reverse_lazy("cases:cases_content")
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+
+        cls.config = OpenZaakConfig.get_solo()
+        cls.config.form_service = ServiceFactory(
+            api_root=FORMS_ROOT, api_type=APITypes.orc
         )
-        self.assertEqual(response.context.get("cases")[0]["uuid"], self.zaak1["uuid"])
+        cls.config.save()
 
-        # check access logs for displayed cases
-        logs = list(TimelineLog.objects.all())
-        case_log = [
-            l for l in logs if self.zaak1["identificatie"] in l.extra_data["message"]
-        ]
-        self.assertEqual(len(case_log), 1)
+    @requests_mock.Mocker()
+    def test_case_submission(self, m):
+        user = UserFactory(
+            login_type=LoginTypeChoices.digid, bsn="900222086", email="john@smith.nl"
+        )
 
-        # no logs for non-displayed cases (after we cleared just above)
-        for log in logs:
-            self.assertNotIn(self.zaak2["identificatie"], log.extra_data["message"])
-            self.assertNotIn(self.zaak3["identificatie"], log.extra_data["message"])
+        data = ESuiteData().install_mocks(m)
+
+        response = self.app.get(
+            self.inner_url, user=user, headers={"HX-Request": "true"}
+        )
+
+        cases = response.context["cases"]
+
+        self.assertEqual(len(cases), 2)
+
+        # submission cases are sorted in reverse by `last modified`
+        self.assertEqual(cases[0]["url"], data.submission_2["url"])
+        self.assertEqual(cases[0]["uuid"], data.submission_2["uuid"])
+        self.assertEqual(cases[0]["naam"], data.submission_2["naam"])
+        self.assertEqual(cases[0]["vervolg_link"], data.submission_2["vervolgLink"])
+        self.assertEqual(
+            cases[0]["datum_laatste_wijziging"].strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
+            data.submission_2["datumLaatsteWijziging"],
+        )

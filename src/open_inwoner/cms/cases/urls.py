@@ -11,30 +11,14 @@ from .views import (
     CaseDocumentDownloadView,
     CaseDocumentUploadFormView,
     InnerCaseDetailView,
-    InnerClosedCaseListView,
-    InnerOpenCaseListView,
-    InnerOpenSubmissionListView,
+    InnerCaseListView,
     OuterCaseDetailView,
-    OuterClosedCaseListView,
-    OuterOpenCaseListView,
-    OuterOpenSubmissionListView,
+    OuterCaseListView,
 )
 
 app_name = "cases"
 
 urlpatterns = [
-    path(
-        "closed/content/",
-        InnerClosedCaseListView.as_view(),
-        name="closed_cases_content",
-    ),
-    path("closed/", OuterClosedCaseListView.as_view(), name="closed_cases"),
-    path("forms/", OuterOpenSubmissionListView.as_view(), name="open_submissions"),
-    path(
-        "forms/content/",
-        InnerOpenSubmissionListView.as_view(),
-        name="open_submissions_content",
-    ),
     path(
         "contactmomenten/",
         KlantContactMomentListView.as_view(),
@@ -70,7 +54,7 @@ urlpatterns = [
         CaseDocumentUploadFormView.as_view(),
         name="case_detail_document_form",
     ),
-    path("open/", RedirectView.as_view(pattern_name="cases:open_cases"), name="index"),
-    path("content/", InnerOpenCaseListView.as_view(), name="open_cases_content"),
-    path("", OuterOpenCaseListView.as_view(), name="open_cases"),
+    path("open/", RedirectView.as_view(), name="redirect"),
+    path("content/", InnerCaseListView.as_view(), name="cases_content"),
+    path("", OuterCaseListView.as_view(), name="index"),
 ]

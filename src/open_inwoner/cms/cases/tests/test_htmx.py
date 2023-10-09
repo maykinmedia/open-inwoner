@@ -358,22 +358,7 @@ class CasesPlaywrightTests(
         context = self.browser.new_context(storage_state=self.user_login_state)
 
         page = context.new_page()
-        page.goto(self.live_reverse("cases:open_cases"))
-
-        # expected anchors
-        menu_items = page.get_by_role(
-            "complementary", name=_("Secundaire paginanavigatie")
-        ).get_by_role("listitem")
-
-        expect(
-            menu_items.get_by_role("link", name=_("Openstaande aanvragen"))
-        ).to_be_visible()
-        expect(
-            menu_items.get_by_role("link", name=_("Lopende aanvragen"))
-        ).to_be_visible()
-        expect(
-            menu_items.get_by_role("link", name=_("Afgeronde aanvragen"))
-        ).to_be_visible()
+        page.goto(self.live_reverse("cases:index"))
 
         # case title
         case_title = page.get_by_role("link", name=self.zaaktype["omschrijving"])

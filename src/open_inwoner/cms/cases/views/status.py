@@ -71,7 +71,7 @@ class OuterCaseDetailView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn aanvragen"), reverse("cases:open_cases")),
+            (_("Mijn aanvragen"), reverse("cases:index")),
             (
                 _("Status"),
                 reverse("cases:case_detail", kwargs=self.kwargs),
@@ -95,7 +95,7 @@ class InnerCaseDetailView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn aanvragen"), reverse("cases:open_cases")),
+            (_("Mijn aanvragen"), reverse("cases:index")),
             (
                 _("Status"),
                 reverse("cases:case_detail", kwargs=self.kwargs),

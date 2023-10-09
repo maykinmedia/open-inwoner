@@ -1,8 +1,4 @@
-{% load i18n anchor_menu_tags grid_tags icon_tags list_tags pagination_tags utils %}
-
-<div id="cases-list-anchors-oob-desktop" hx-swap-oob="true">
-    {% anchor_menu anchors desktop=True %}
-</div>
+{% load link_tags button_tags i18n grid_tags icon_tags list_tags pagination_tags utils %}
 
 <h2 class="h2" id="cases">{% trans "Mijn aanvragen" %}</h2>
 {% render_grid %}
@@ -15,23 +11,43 @@
     <div class="card card--compact card--stretch">
             {% include "components/StatusIndicator/StatusIndicator.html" with status_indicator=case.statustype_config.status_indicator status_indicator_text=case.statustype_config.status_indicator_text %}
             <div class="card__body">
-                <a href="{% url 'cases:case_detail' object_id=case.uuid %}" class="cases__link">
-                    <p class="h4">
-                        <span class="link link__text">{{ case.description }}</span>
-                    </p>
+                <!-- submission cases -->
+                {% if case.datum_laatste_wijziging %}
+                    <a href="{% url 'cases:case_detail' object_id=case.uuid %}" class="cases__link">
+                    <p class="h4"><span class="link link__text">{{ case.naam }}</span></p>
                     {% render_list %}
-                        <span class="case-list">
-                        {% list_item case.current_status caption=_("Status") compact=True strong=False %}
-                        {% list_item case.start_date caption=_("Ontvangstdatum") compact=True strong=False %}
-                        {% list_item case.identificatie caption=_("Zaaknummer") compact=True strong=False %}
-                        </span>
+                    <span class="case-list">
+                        {% list_item text="Openstaand aanvraag" caption=_("Status") compact=True strong=False %}
+                        {% list_item text=case.datum_laatste_wijziging caption=_("Laatste wijziging") compact=True strong=False %}
+                        {% list_item text=case.eind_datum_geldigheid caption=_("Einddatum geldigheid") compact=True strong=False%}
+                    </span>
                     {% endrender_list %}
-
                     <span class="link link--icon link--secondary" aria-label="{% trans "Bekijk aanvraag" %}" title="{% trans "Bekijk aanvraag" %}">
                         <span class="link__text">{% trans "Bekijk aanvraag" %}</span>
                         {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
                     </span>
-                </a>
+                    </a>
+                <!-- other cases -->
+                {% else %}
+                    <a href="{% url 'cases:case_detail' object_id=case.uuid %}" class="cases__link">
+                    <p class="h4"><span class="link link__text">{{ case.description }}</span></p>
+                    {% render_list %}
+                        <span class="case-list">
+                        {% if case.current_status %}
+                            {% list_item case.current_status caption=_("Status") compact=True strong=False %}
+                        {% else %}
+                            {% list_item "No status" caption=_("Status") compact=True strong=False %}
+                        {% endif%}
+                        {% list_item case.start_date caption=_("Ontvangstdatum") compact=True strong=False %}
+                        {% list_item case.identificatie caption=_("Zaaknummer") compact=True strong=False %}
+                        </span>
+                    {% endrender_list %}
+                    <span class="link link--icon link--secondary" aria-label="{% trans "Bekijk aanvraag" %}" title="{% trans "Bekijk aanvraag" %}">
+                        <span class="link__text">{% trans "Bekijk aanvraag" %}</span>
+                        {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
+                    </span>
+                    </a>
+                {% endif %}
             </div>
         </div>
         {% endrender_column %}
