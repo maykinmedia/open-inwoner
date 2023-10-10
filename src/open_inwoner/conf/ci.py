@@ -70,3 +70,7 @@ warnings.filterwarnings(
 )
 
 PLAYWRIGHT_MULTI_ONLY_DEFAULT = False
+
+PASSWORD_HASHERS = [
+    "django.contrib.auth.hashers.MD5PasswordHasher",
+]

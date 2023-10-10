@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:gwsb="http://www.centric.nl/GWS/Basisschema/v0400"
+        xmlns:gwsd="http://www.centric.nl/GWS/Diensten/UitkeringsSpecificatieClient/v0600"
+        targetNamespace="http://www.centric.nl/GWS/Diensten/UitkeringsSpecificatieClient/v0600"
+        elementFormDefault="unqualified"
+        attributeFormDefault="unqualified">
+   <import namespace="http://www.centric.nl/GWS/Basisschema/v0400"
+           schemaLocation="FWI-Include_resolved.xsd"/>
+   <xs:element name="UitkeringsSpecificatieInfo" type="gwsd:Request"/>
+   <xs:complexType name="Request">
+		    <xs:sequence>
+			      <xs:element name="BurgerServiceNr" type="gwsb:BSN"/>
+			      <xs:element name="Periodenummer" type="gwsb:Periodenummer"/>
+			      <xs:element name="TypePeriode"
+                     type="gwsb:TypePeriode"
+                     default="0"
+                     minOccurs="0"/>
+		    </xs:sequence>
+	  </xs:complexType>
+</schema>

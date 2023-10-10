@@ -1,4 +1,3 @@
-import copy
 from datetime import date
 from urllib.parse import urlencode
 
@@ -16,6 +15,7 @@ from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 
 from ...cms.tests import cms_tools
+from ...utils.test import ClearCachesMixin
 from ...utils.tests.helpers import AssertRedirectsMixin
 from ..choices import LoginTypeChoices
 from ..models import User
@@ -964,12 +964,26 @@ class DuplicateEmailRegistrationTest(WebTest):
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class TestRegistrationNecessary(WebTest):
+class TestRegistrationNecessary(ClearCachesMixin, WebTest):
     url = reverse_lazy("profile:registration_necessary")
 
     @classmethod
     def setUpTestData(cls):
         cms_tools.create_homepage()
+
+    def test_page_show_config_text(self):
+        config = SiteConfiguration.get_solo()
+        config.registration_text = "Hello registration text http://foo.bar/"
+        config.save()
+
+        user = UserFactory(
+            first_name="",
+            last_name="",
+            login_type=LoginTypeChoices.digid,
+        )
+        response = self.app.get(self.url, user=user)
+        self.assertContains(response, "Hello registration text")
+        self.assertContains(response, ' href="http://foo.bar/" ')
 
     def test_any_page_for_digid_user_redirect_to_necessary_fields(self):
         user = UserFactory(
@@ -1252,7 +1266,7 @@ class TestPasswordResetFunctionality(WebTest):
 
     def test_password_reset_form_custom_template_is_rendered(self):
         response = self.app.get(reverse("password_reset"))
-        self.assertContains(response, _("Wachtwoord opnieuw instellen"))
+        self.assertContains(response, _("Reset password"))
 
     def test_password_reset_email_contains_proper_data(self):
         current_site = Site.objects.get_current()
@@ -1262,14 +1276,12 @@ class TestPasswordResetFunctionality(WebTest):
         sent_mail = mail.outbox[0]
         body = sent_mail.body
         self.assertEqual(
-            _("Wachtwoordherinitialisatie voor {domain}").format(
-                domain=current_site.domain
-            ),
+            _("Password reset for {domain}").format(domain=current_site.domain),
             sent_mail.subject,
         )
         self.assertIn(
             _(
-                "U ontvangt deze e-mail, omdat u een aanvraag voor opnieuw instellen van het wachtwoord voor uw account op {domain} hebt gedaan."
+                "U ontvangt deze e-mail, omdat u een aanvraag voor opnieuw instellen van het wachtwoord voor uw account op example.comhebt gedaan."
             ).format(domain=current_site.domain),
             body,
         )
@@ -1287,7 +1299,7 @@ class TestPasswordResetFunctionality(WebTest):
         confirm_response = self.app.get(
             reverse("password_reset_confirm", kwargs={"token": token, "uidb64": uid})
         ).follow()
-        self.assertContains(confirm_response, _("Mijn wachtwoord wijzigen"))
+        self.assertContains(confirm_response, _("Change my password"))
 
     def test_custom_password_reset_form_sends_email_when_user_is_default(self):
         self.app.post(reverse("password_reset"), {"email": self.user.email})
@@ -1308,11 +1320,11 @@ class TestPasswordChange(WebTest):
 
     def test_password_change_form_custom_template_is_rendered(self):
         response = self.app.get(reverse("password_change"), user=self.user)
-        self.assertContains(response, _("Wachtwoordwijziging"))
+        self.assertContains(response, _("Password reset"))
 
     def test_password_change_form_done_custom_template_is_rendered(self):
         response = self.app.get(reverse("password_change_done"), user=self.user)
-        self.assertContains(response, _("Uw wachtwoord is gewijzigd."))
+        self.assertContains(response, _("Your password has been changed."))
 
     def test_password_change_button_is_rendered_with_default_login_type(self):
         response = self.app.get(reverse("profile:detail"), user=self.user)

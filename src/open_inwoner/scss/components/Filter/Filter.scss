@@ -1,10 +1,34 @@
 .filter {
   border: 0 solid transparent;
+  margin: 0;
+  padding: 0;
 
-  &--open {
-    .filter__list {
+  @media (min-width: 768px) {
+    padding: 0 var(--spacing-large) var(--spacing-large) var(--spacing-large);
+  }
+
+  &__list {
+    padding-top: 0;
+    padding-bottom: var(--spacing-large);
+    display: none;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-large);
+
+    @media (min-width: 768px) {
       display: grid;
+      padding-top: var(--spacing-large);
+      padding-bottom: 0;
     }
+
+    .checkbox .checkbox__label {
+      cursor: pointer;
+    }
+  }
+
+  .button {
+    color: var(--font-color-body);
+    font-weight: bold;
+    padding: 0;
   }
 
   &__title {
@@ -14,14 +38,69 @@
     font-weight: bold;
     letter-spacing: 0;
     line-height: 21px;
-    cursor: pointer;
     display: flex;
   }
 
-  &__list {
-    padding-top: var(--spacing-large);
-    display: none;
-    grid-template-columns: 1fr;
-    gap: var(--spacing-large);
+  &__legend {
+    &-label {
+      display: none;
+      @media (min-width: 768px) {
+        display: inline;
+      }
+    }
+  }
+
+  .divider {
+    background-color: yellow;
+    border: red solid 5px !important;
+    &--small {
+      display: none;
+      @media (min-width: 768px) {
+        display: block;
+      }
+    }
+    &--tiny {
+      display: block;
+      @media (min-width: 768px) {
+        display: none;
+      }
+    }
+  }
+
+  &__mobile {
+    @media (min-width: 768px) {
+      display: none;
+    }
+  }
+
+  //toggling dropdows
+  &.filter--open {
+    .button {
+      color: var(--color-secondary);
+      padding: 0;
+    }
+
+    .button--textless [class*='icon'] {
+      display: inline-block;
+      right: var(--spacing-large);
+      top: 0;
+      transform: rotate(180deg);
+      transition: all 0.3s;
+    }
+
+    .filter__list {
+      display: grid;
+    }
+  }
+}
+
+.grid__filters {
+  .h2 {
+    border-bottom: 2px solid var(--color-gray-light);
+    display: block;
+    padding-bottom: var(--spacing-large);
+    @media (min-width: 768px) {
+      display: none;
+    }
   }
 }

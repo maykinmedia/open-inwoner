@@ -161,6 +161,7 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
 
         # create contact moment
         subject = form.cleaned_data["subject"].subject
+        subject_code = form.cleaned_data["subject"].subject_code
         question = form.cleaned_data["question"]
         text = f"{subject}\n\n{question}"
 
@@ -186,6 +187,7 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
             "tekst": text,
             "type": config.register_type,
             "kanaal": "Internet",
+            "onderwerp": subject_code or subject,
             "medewerkerIdentificatie": {
                 "identificatie": config.register_employee_id,
             },

@@ -13,7 +13,7 @@ class ProfileConfig(AppHookConfig):
         ),
     )
     selected_categories = models.BooleanField(
-        verbose_name=_("Interessegebieden"),
+        verbose_name=_("Gekozen onderwerpen"),
         default=True,
         help_text=_(
             "Designates whether 'selected categories' section is rendered or not."
@@ -43,7 +43,7 @@ class ProfileConfig(AppHookConfig):
         ),
     )
     notifications = models.BooleanField(
-        verbose_name=_("Communicatievoorkeuren"),
+        verbose_name=_("Mijn meldingen"),
         default=True,
         help_text=_("Designates whether 'notifications' section is rendered or not."),
     )

@@ -12,7 +12,6 @@ from django.views import View
 from django.views.generic import FormView, TemplateView
 
 from django_htmx.http import HttpResponseClientRedirect
-from glom import glom
 from mail_editor.helpers import find_template
 from view_breadcrumbs import BaseBreadcrumbMixin
 from zgw_consumers.api_models.constants import RolOmschrijving
@@ -481,14 +480,8 @@ class CaseContactFormView(CaseAccessMixin, CaseLogMixin, FormView):
             "email": self.request.user.email,
             "phonenumber": self.request.user.phonenumber,
             "question": form.cleaned_data["question"],
+            "name": self.request.user.get_full_name(),
         }
-
-        parts = [
-            self.request.user.first_name,
-            self.request.user.infix if self.request.user.infix else "",
-            self.request.user.last_name,
-        ]
-        context["name"] = " ".join(p for p in parts)
 
         success = template.send_email([recipient_email], context)
 
@@ -506,6 +499,11 @@ class CaseContactFormView(CaseAccessMixin, CaseLogMixin, FormView):
 
     def register_by_api(self, form, config: OpenKlantConfig):
         assert config.has_api_configuration()
+
+        try:
+            ztc = ZaakTypeConfig.objects.filter_case_type(self.case.zaaktype).get()
+        except ObjectDoesNotExist:
+            ztc = None
 
         klant = fetch_klant_for_bsn(self.request.user.bsn)
         if klant:
@@ -547,6 +545,8 @@ class CaseContactFormView(CaseAccessMixin, CaseLogMixin, FormView):
                 "identificatie": config.register_employee_id,
             },
         }
+        if ztc and ztc.contact_subject_code:
+            data["onderwerp"] = ztc.contact_subject_code
 
         contactmoment = create_contactmoment(data, klant=klant)
 

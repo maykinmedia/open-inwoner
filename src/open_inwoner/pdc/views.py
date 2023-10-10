@@ -12,6 +12,7 @@ from open_inwoner.pdc.models.product import ProductCondition
 from open_inwoner.questionnaire.models import QuestionnaireStep
 from open_inwoner.utils.views import LoginMaybeRequiredMixin
 
+from ..utils.ckeditor import get_rendered_content
 from ..utils.views import CommonPageMixin
 from .choices import YesNo
 from .forms import ProductFinderForm
@@ -173,6 +174,9 @@ class CategoryDetailView(
         context["questionnaire_roots"] = QuestionnaireStep.get_root_nodes().filter(
             category=self.object
         )
+        context["category_rendered_description"] = get_rendered_content(
+            self.object.description
+        )
         return context
 
     def get_breadcrumb_name(self):
@@ -199,14 +203,16 @@ class ProductDetailView(
         return base_list + [(self.get_object().name, self.request.path)]
 
     def get_context_data(self, **kwargs):
+        config = SiteConfiguration.get_solo()
         product = self.get_object()
         context = super().get_context_data(**kwargs)
+        request = context["view"].request
 
         subheadings = extract_subheadings(product.content, tag="h2")
 
-        anchors = [
-            ("#title", product.name, subheadings),
-        ]
+        anchors = subheadings
+        if product.content_is_collapsable:
+            anchors = []
         if product.question_set.exists():
             anchors.append(("#faq", _("Veelgestelde vragen")))
         if product.files.exists():
@@ -216,9 +222,14 @@ class ProductDetailView(
         if product.contacts.exists():
             anchors.append(("#contact", _("Contact")))
 
+        context["meta_description"] = product.summary
+        if product.icon:
+            context["meta_image_url"] = request.build_absolute_uri(product.icon.url)
+        context["meta_page_url"] = request.build_absolute_uri(request.path)
         context["anchors"] = anchors
         context["related_products_start"] = 6 if product.links.exists() else 1
         context["product_links"] = product.links.order_by("pk")
+        context["display_social"] = config.display_social
         return context
 
 

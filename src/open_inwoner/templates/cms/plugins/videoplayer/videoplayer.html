@@ -1,0 +1,7 @@
+<section class="video{% if instance.full_width %} video--full-width{% endif %} video--{{ instance.video.player_type }}">
+    <div class="video__container">
+        <div class="video__player">
+            <iframe class="video__iframe video__iframe--{{ instance.video.player_type }}" id="video-{{ instance.pk }}-{{ instance.video.pk }}" src="{{ instance.video.player_url }}" width="640" height="360" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen allow="autoplay; fullscreen"></iframe>
+        </div>
+    </div>
+</section>

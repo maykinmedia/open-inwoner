@@ -44,6 +44,8 @@ LANGUAGES = [
     ("nl", _("Dutch")),
 ]
 
+# Default (connection timeout, read timeout) for the requests library (in seconds)
+DEFAULT_TIMEOUT_REQUESTS = (10, 60)
 
 TIME_ZONE = "Europe/Amsterdam"  # note: this *may* affect the output of DRF datetimes
 
@@ -207,6 +209,7 @@ INSTALLED_APPS = [
     "open_inwoner.questionnaire",
     "open_inwoner.extended_sessions",
     "open_inwoner.custom_csp",
+    "open_inwoner.media",
     "open_inwoner.cms.profile",
     "open_inwoner.cms.cases",
     "open_inwoner.cms.inbox",
@@ -215,6 +218,8 @@ INSTALLED_APPS = [
     "open_inwoner.cms.banner",
     "open_inwoner.cms.extensions",
     "open_inwoner.cms.footer",
+    "open_inwoner.cms.plugins",
+    "open_inwoner.cms.benefits",
 ]
 
 MIDDLEWARE = [
@@ -531,6 +536,7 @@ CMS_PLACEHOLDER_CONF = {
         "plugins": [
             # "TextPlugin",
             "PicturePlugin",
+            "VideoPlayerPlugin",
             "CategoriesPlugin",
             "ActivePlansPlugin",
             "QuestionnairePlugin",
@@ -779,9 +785,8 @@ CKEDITOR_CONFIGS = {
     }
 }
 
-
 # invite expires in X days after sending
-INVITE_EXPIRY = 14
+INVITE_EXPIRY_DAYS = config("INVITE_EXPIRY_DAYS", default=30)
 
 # zgw-consumers
 ZGW_CONSUMERS_TEST_SCHEMA_DIRS = [
@@ -883,4 +888,4 @@ ACCOUNTS_SMS_GATEWAY = {
 
 from .app.csp import *  # noqa
 
-SECURE_REFERRER_POLICY = "origin-when-cross-origin"
+SECURE_REFERRER_POLICY = "same-origin"

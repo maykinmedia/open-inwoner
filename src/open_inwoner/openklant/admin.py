@@ -10,7 +10,7 @@ from .models import ContactFormSubject, OpenKlantConfig
 
 class ContactFormSubjectInlineAdmin(OrderedTabularInline):
     model = ContactFormSubject
-    fields = ("subject", "order", "move_up_down_links")
+    fields = ("subject", "subject_code", "order", "move_up_down_links")
     readonly_fields = ("order", "move_up_down_links")
     ordering = ("order",)
     extra = 0

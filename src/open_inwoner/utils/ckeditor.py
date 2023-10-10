@@ -21,7 +21,7 @@ CLASS_ADDERS = [
 ]
 
 
-def get_rendered_content(content):
+def get_rendered_content(content: str) -> str:
     """
     Takes object's content as an input and returns the rendered one.
     """
@@ -37,7 +37,7 @@ def get_rendered_content(content):
             if element.name == "a" and element.attrs.get("href", "").startswith("http"):
                 element.attrs["target"] = "_blank"
 
-    return soup
+    return str(soup)
 
 
 def get_product_rendered_content(product):
@@ -58,7 +58,7 @@ def get_product_rendered_content(product):
             element.attrs["class"] = class_name
 
             if tag == "h2":
-                element.attrs["id"] = f"subheader-{slugify(element.text)}"
+                element.attrs["id"] = f"subheading-{slugify(element.text)}"
 
             if "[CTABUTTON]" in element.text:
                 # decompose the element when product doesn't have either a link or a form

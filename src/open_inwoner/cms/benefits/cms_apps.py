@@ -10,4 +10,4 @@ class SSDApphook(CMSApp):
     name = _("Mijn Uitkeringen app")
 
     def get_urls(self, page=None, language=None, **kwargs):
-        return ["open_inwoner.ssd.urls"]
+        return ["open_inwoner.cms.benefits.urls"]

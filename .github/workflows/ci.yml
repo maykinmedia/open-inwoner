@@ -14,6 +14,9 @@ env:
   IMAGE_NAME: maykinmedia/open-inwoner
 
 jobs:
+  #
+  # Unit and integration tests
+  #
   tests:
     name: Run the Django test suite
     runs-on: ubuntu-latest
@@ -26,7 +29,9 @@ jobs:
         ports:
           - 5432:5432
         # needed because the postgres container does not provide a healthcheck
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+        options:
+          --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+          --name postgres
 
       elasticsearch:
         image: docker.elastic.co/elasticsearch/elasticsearch:7.9.2
@@ -38,39 +43,30 @@ jobs:
           - 9300:9300
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - uses: actions/checkout@v3
+      - name: Set up backend environment
+        uses: maykinmedia/setup-django-backend@v1
         with:
+          apt-packages: 'libxml2-dev libxmlsec1-dev libxmlsec1-openssl gettext postgresql-client libgdal-dev gdal-bin'
           python-version: '3.9'
-      - uses: actions/setup-node@v2-beta
-        with:
-          node-version: '12'
-
-      - name: Install system packages
-        run: |
-          sudo apt-get update \
-          && sudo apt-get install -y --no-install-recommends \
-            libgdal-dev \
-            gdal-bin
-
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libxml2-dev libxmlsec1-dev libxmlsec1-openssl
-          pip install -r requirements/dev.txt
-          playwright install
-          playwright install msedge
-          playwright install-deps
-
-      - name: Build frontend
-        run: |
-          npm ci
-          npm run build
+          optimize-postgres: 'yes'
+          pg-service: 'postgres'
+          setup-node: 'yes'
+          npm-ci-flags: '--legacy-peer-deps'
 
       - name: Run tests
         run: |
           python src/manage.py collectstatic --noinput --link
-          coverage run src/manage.py test src
+          coverage run \
+            --concurrency=multiprocessing \
+            --parallel-mode \
+            src/manage.py test src \
+            --parallel \
+            --exclude-tag=e2e \
+            --exclude-tag=elastic
+          coverage run src/manage.py test src --tag=elastic --exclude-tag=e2e
+          coverage combine
+
         env:
           DJANGO_SETTINGS_MODULE: open_inwoner.conf.ci
           SECRET_KEY: dummy
@@ -78,10 +74,84 @@ jobs:
           DB_PASSWORD: ''
 
       - name: Publish coverage report
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
+  #
+  # End-to-end tests
+  #
+  e2etests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        browser:
+          - chromium
+          - firefox
+          - webkit
+          - msedge
+
+    name: End-to-end tests, ${{ matrix.browser }}
+
+    services:
+      postgres:
+        image: postgis/postgis:10-2.5
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        # Needed because the postgres container does not provide a healthcheck
+        options:
+          --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+          --name postgres
+
+      elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.9.2
+        env:
+          discovery.type: single-node
+          ES_JAVA_OPTS: '-Xms512m -Xmx512m'
+        ports:
+          - 9200:9200
+          - 9300:9300
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up backend environment
+        uses: maykinmedia/setup-django-backend@v1
+        with:
+          apt-packages: 'libxml2-dev libxmlsec1-dev libxmlsec1-openssl gettext postgresql-client libgdal-dev gdal-bin'
+          python-version: '3.9'
+          optimize-postgres: 'yes'
+          pg-service: 'postgres'
+          setup-node: 'yes'
+          npm-ci-flags: '--legacy-peer-deps'
+
+      # See https://playwright.dev/python/docs/ci#caching-browsers
+      - name: Cache Playwright browser
+        id: cache-browser
+        uses: actions/cache@v3
+        with:
+          path: /home/runner/.cache/ms-playwright
+          key:
+            ${{ runner.os }}-${{ matrix.browser }}-playwright-${{ hashFiles('requirements/ci.txt') }}
+
+      - name: Install playwright deps
+        run: playwright install --with-deps ${{ matrix.browser }}
+
+      - name: Run testsuite
+        run: |
+          python src/manage.py collectstatic --noinput --link
+          src/manage.py test src --tag=e2e
+        env:
+          DJANGO_SETTINGS_MODULE: open_inwoner.conf.ci
+          SECRET_KEY: dummy
+          DB_USER: postgres
+          DB_PASSWORD: ''
+          E2E_DRIVER: ${{ matrix.browser }}
+
+  #
+  # Docker
+  #
   docker:
     needs: tests
 

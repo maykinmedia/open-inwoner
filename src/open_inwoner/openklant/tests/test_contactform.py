@@ -217,7 +217,11 @@ class ContactFormTestCase(
         data = MockAPICreateData()
         data.install_mocks_anon_with_klant(m)
 
-        subject = ContactFormSubjectFactory(config=config, subject="Aanvraag document")
+        subject = ContactFormSubjectFactory(
+            config=config,
+            subject="Aanvraag document",
+            subject_code="afdeling-xyz",
+        )
 
         response = self.app.get(self.url)
         form = response.forms["contactmoment-form"]
@@ -262,6 +266,7 @@ class ContactFormTestCase(
                 "tekst": f"Aanvraag document\n\nhey!\n\nwaddup?",
                 "type": "Melding",
                 "kanaal": "Internet",
+                "onderwerp": "afdeling-xyz",
             },
         )
         kcm_create_data = data.matchers[2].request_history[0].json()
@@ -288,7 +293,11 @@ class ContactFormTestCase(
         data = MockAPICreateData()
         data.install_mocks_anon_without_klant(m)
 
-        subject = ContactFormSubjectFactory(config=config, subject="Aanvraag document")
+        subject = ContactFormSubjectFactory(
+            config=config,
+            subject="Aanvraag document",
+            subject_code="afdeling-xyz",
+        )
 
         response = self.app.get(self.url)
         form = response.forms["contactmoment-form"]
@@ -336,6 +345,7 @@ class ContactFormTestCase(
                 "tekst": text,
                 "type": "Melding",
                 "kanaal": "Internet",
+                "onderwerp": "afdeling-xyz",
             },
         )
         self.assertTimelineLog(
@@ -356,12 +366,16 @@ class ContactFormTestCase(
         data = MockAPICreateData()
         data.install_mocks_digid(m)
 
-        subject = ContactFormSubjectFactory(config=config, subject="Aanvraag document")
+        subject = ContactFormSubjectFactory(
+            config=config,
+            subject="Aanvraag document",
+            subject_code="afdeling-xyz",
+        )
 
         response = self.app.get(self.url, user=data.user)
 
         # reset interference from signals
-        self.resetTimelineLogs()
+        self.clearTimelineLogs()
         m.reset_mock()
 
         form = response.forms["contactmoment-form"]
@@ -396,6 +410,7 @@ class ContactFormTestCase(
                 "tekst": f"Aanvraag document\n\nhey!\n\nwaddup?",
                 "type": "Melding",
                 "kanaal": "Internet",
+                "onderwerp": "afdeling-xyz",
             },
         )
         kcm_create_data = data.matchers[2].request_history[0].json()
@@ -423,12 +438,16 @@ class ContactFormTestCase(
         data = MockAPICreateData()
         data.install_mocks_digid_missing_contact_info(m)
 
-        subject = ContactFormSubjectFactory(config=config, subject="Aanvraag document")
+        subject = ContactFormSubjectFactory(
+            config=config,
+            subject="Aanvraag document",
+            subject_code="afdeling-xyz",
+        )
 
         response = self.app.get(self.url, user=data.user)
 
         # reset interference from signals
-        self.resetTimelineLogs()
+        self.clearTimelineLogs()
         m.reset_mock()
 
         form = response.forms["contactmoment-form"]
@@ -466,6 +485,7 @@ class ContactFormTestCase(
                 "tekst": f"Aanvraag document\n\nhey!\n\nwaddup?",
                 "type": "Melding",
                 "kanaal": "Internet",
+                "onderwerp": "afdeling-xyz",
             },
         )
         kcm_create_data = data.matchers[3].request_history[0].json()

@@ -7,7 +7,7 @@
   scroll-margin-top: 122px;
 
   @media (min-width: 768px) {
-    scroll-margin-top: 16px;
+    scroll-margin-top: var(--font-size-body);
   }
 }
 
@@ -86,25 +86,6 @@
 
     @media (min-width: 768px) {
       border-left-color: var(--color-primary);
-    }
-  }
-
-  // nested list
-  &__sublist {
-    list-style-type: none;
-    padding: 0;
-    line-height: var(--spacing-large);
-
-    li .link {
-      padding: var(--spacing-small) 0 var(--spacing-small)
-        var(--spacing-extra-large);
-      font-size: var(--font-size-body-small);
-    }
-
-    &--mobile {
-      li > a {
-        font-size: var(--font-size-heading-4) !important;
-      }
     }
   }
 

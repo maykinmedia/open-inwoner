@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import TestCase, tag
 
 from open_inwoner.pdc.tests.factories import (
     CategoryFactory,
@@ -13,6 +13,7 @@ from ..searches import search_products
 from .utils import ESMixin
 
 
+@tag("elastic")
 class SearchQueryTests(ESMixin, TestCase):
     def setUp(self):
         super().setUp()
@@ -83,6 +84,7 @@ class SearchQueryTests(ESMixin, TestCase):
         self.assertEqual(int(results[0].meta.id), self.product1.id)
 
 
+@tag("elastic")
 class SearchFacetTests(ESMixin, TestCase):
     def setUp(self):
         super().setUp()

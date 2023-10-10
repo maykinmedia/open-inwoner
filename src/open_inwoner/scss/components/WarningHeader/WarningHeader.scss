@@ -5,20 +5,21 @@
 
   .warning-header__container {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     padding: 0;
     margin: 0 auto;
 
     @media (min-width: 768px) {
-      max-width: 90%;
+      max-width: var(--container-width);
     }
 
-    .warning-header__icon,
     .warning-header__text {
       padding: var(--spacing-small);
     }
-    .warning-header__icon {
-      width: 20px;
+
+    *[class*='icon'],
+    *[class*='Icon'] {
+      max-width: var(--spacing-giant);
     }
   }
 }

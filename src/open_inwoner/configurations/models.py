@@ -9,8 +9,6 @@ from filer.fields.image import FilerImageField
 from ordered_model.models import OrderedModel, OrderedModelManager
 from solo.models import SingletonModel
 
-from open_inwoner.utils.validators import DutchPhoneNumberValidator
-
 from ..utils.colors import hex_to_hsl
 from ..utils.css import clean_stylesheet
 from ..utils.fields import CSSField
@@ -120,6 +118,11 @@ class SiteConfiguration(SingletonModel):
         blank=True,
         verbose_name=_("Login tekst"),
         help_text=_("Deze tekst wordt getoond op de login pagina."),
+    )
+    registration_text = models.TextField(
+        blank=True,
+        verbose_name=_("Registratie tekst"),
+        help_text=_("Deze tekst wordt getoond op de registratie pagina."),
     )
     home_welcome_title = models.CharField(
         max_length=255,
@@ -316,6 +319,31 @@ class SiteConfiguration(SingletonModel):
         verbose_name=_("Plan help"),
         help_text=_("The help text for the plan page."),
     )
+
+    # search filters
+    search_filter_categories = models.BooleanField(
+        verbose_name=_("Add category filter for search results"),
+        default=True,
+        help_text=_(
+            "Whether to show category-checkboxes in order to filter the search result."
+        ),
+    )
+    search_filter_tags = models.BooleanField(
+        verbose_name=_("Add tag filter for search results"),
+        default=True,
+        help_text=_(
+            "Whether to show tag-checkboxes in order to filter the search result."
+        ),
+    )
+    search_filter_organizations = models.BooleanField(
+        verbose_name=_("Add organization filter for search results"),
+        default=True,
+        help_text=_(
+            "Whether to show organization-checkboxes in order to filter the search result."
+        ),
+    )
+
+    # email notifications
     email_new_message = models.BooleanField(
         verbose_name=_("Send email about a new message"),
         default=True,
@@ -439,6 +467,13 @@ class SiteConfiguration(SingletonModel):
         default=False,
         help_text=_(
             "If checked, only authenticated users will be able to search the page."
+        ),
+    )
+    display_social = models.BooleanField(
+        verbose_name=_("Display social media buttons"),
+        default=True,
+        help_text=_(
+            "Enable sharing of products on social media (Facebook, LinkedIn...)",
         ),
     )
 

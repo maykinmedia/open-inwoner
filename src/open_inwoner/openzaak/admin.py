@@ -171,6 +171,7 @@ class ZaakTypeConfigAdmin(admin.ModelAdmin):
         "identificatie",
         "omschrijving",
         "contact_form_enabled",
+        "contact_subject_code",
         "notify_status_changes",
         "document_upload_enabled",
         "external_document_upload_url",
@@ -188,6 +189,8 @@ class ZaakTypeConfigAdmin(admin.ModelAdmin):
         "catalogus",
         "notify_status_changes",
         "has_doc_notify",
+        "contact_form_enabled",
+        "contact_subject_code",
         "document_upload_enabled",
         "num_infotypes",
     ]
@@ -205,6 +208,7 @@ class ZaakTypeConfigAdmin(admin.ModelAdmin):
         "omschrijving",
         "catalogus__domein",
         "catalogus__rsin",
+        "contact_subject_code",
     ]
     ordering = ("identificatie", "catalogus__domein")
 

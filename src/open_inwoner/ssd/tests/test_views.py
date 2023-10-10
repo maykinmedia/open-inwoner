@@ -18,6 +18,7 @@ from freezegun import freeze_time
 
 from open_inwoner.accounts.tests.factories import UserFactory
 
+from ..client import UitkeringClient
 from .mocks import mock_report
 
 FILES_DIR = Path(__file__).parent.resolve() / "files"
@@ -25,13 +26,17 @@ FILES_DIR = Path(__file__).parent.resolve() / "files"
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestMonthlyBenefitsFormView(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.ssd_client = UitkeringClient()
+
     def setUp(self):
         self.user = UserFactory()
         self.user.set_password("12345")
         self.user.email = "test@email.com"
         self.user.save()
 
-    def test_get(self):
+    def test_uitkering_get(self):
         url = reverse("ssd:monthly_benefits_index")
 
         # request with anonymous user
@@ -51,11 +56,11 @@ class TestMonthlyBenefitsFormView(TestCase):
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
     @patch(
-        "open_inwoner.ssd.client.UitkeringClient.get_report",
+        "open_inwoner.ssd.client.UitkeringClient.get_reports",
         return_value=mock_report(str(FILES_DIR / "uitkering_response_basic.xml")),
     )
     @freeze_time("1985-12-25")
-    def test_post_success(self, mock_report):
+    def test_uitkering_post_success(self, mock_report):
         url = reverse("ssd:monthly_benefits_index")
         self.client.login(email=self.user.email, password="12345")
 
@@ -65,11 +70,11 @@ class TestMonthlyBenefitsFormView(TestCase):
         self.assertEqual(response.headers["content-type"], "application/pdf")
 
     @patch(
-        "open_inwoner.ssd.client.UitkeringClient.get_report",
+        "open_inwoner.ssd.client.UitkeringClient.get_reports",
         return_value=None,
     )
     @freeze_time("1985-12-25")
-    def test_post_fail(self, mock_report):
+    def test_uitkering_post_fail(self, mock_report):
         url = reverse("ssd:monthly_benefits_index")
         self.client.login(email=self.user.email, password="12345")
 
@@ -86,11 +91,11 @@ class TestMonthlyBenefitsFormView(TestCase):
         )
 
     @patch(
-        "open_inwoner.ssd.client.UitkeringClient.get_report",
+        "open_inwoner.ssd.client.UitkeringClient.get_reports",
         return_value=None,
     )
     @freeze_time("1985-12-25")
-    def test_post_bad_input(self, mock_report):
+    def test_uitkering_post_bad_input(self, mock_report):
         url = reverse("ssd:monthly_benefits_index")
         self.client.login(email=self.user.email, password="12345")
 
@@ -98,7 +103,7 @@ class TestMonthlyBenefitsFormView(TestCase):
             self.client.post(url, data={"report_date": "bad-user-input"})
 
     @patch("open_inwoner.ssd.models.SSDConfig.get_solo")
-    def test_get_report_not_enabled(self, mock_solo):
+    def test_uitkering_get_reports_not_enabled(self, mock_solo):
         mock_solo.return_value.maandspecificatie_enabled = False
 
         url = reverse("ssd:monthly_benefits_index")
@@ -107,7 +112,9 @@ class TestMonthlyBenefitsFormView(TestCase):
 
         response = self.client.get(url)
 
-        self.assertContains(response, "Download of monthly reports not supported.")
+        self.assertContains(
+            response, "Downloaden van maandoverzichten wordt niet ondersteund."
+        )
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
@@ -118,7 +125,7 @@ class TestYearlyBenefitsFormView(TestCase):
         self.user.email = "test@email.com"
         self.user.save()
 
-    def test_get(self):
+    def test_jaaropgave_get(self):
 
         # request with anonymous user
         url = reverse("ssd:yearly_benefits_index")
@@ -137,11 +144,11 @@ class TestYearlyBenefitsFormView(TestCase):
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
     @patch(
-        "open_inwoner.ssd.client.JaaropgaveClient.get_report",
+        "open_inwoner.ssd.client.JaaropgaveClient.get_reports",
         return_value=mock_report(str(FILES_DIR / "jaaropgave_response.xml")),
     )
     @freeze_time("1985-12-25")
-    def test_post_success(self, mock_report):
+    def test_jaaropgave_post_success(self, mock_report):
         url = reverse("ssd:yearly_benefits_index")
         self.client.login(email=self.user.email, password="12345")
 
@@ -151,11 +158,11 @@ class TestYearlyBenefitsFormView(TestCase):
         self.assertEqual(response.headers["content-type"], "application/pdf")
 
     @patch(
-        "open_inwoner.ssd.client.JaaropgaveClient.get_report",
+        "open_inwoner.ssd.client.JaaropgaveClient.get_reports",
         return_value=None,
     )
     @freeze_time("1985-12-25")
-    def test_post_fail(self, mock_report):
+    def test_jaaropgave_post_fail(self, mock_report):
         url = reverse("ssd:yearly_benefits_index")
         self.client.login(email=self.user.email, password="12345")
 
@@ -170,7 +177,7 @@ class TestYearlyBenefitsFormView(TestCase):
         self.assertContains(response, "Geen uitkeringsspecificatie gevonden voor 1984")
 
     @patch("open_inwoner.ssd.forms.SSDConfig.get_solo")
-    def test_get_report_not_enabled(self, mock_solo):
+    def test_jaaropgave_get_reports_not_enabled(self, mock_solo):
         mock_solo.return_value.jaaropgave_enabled = False
 
         url = reverse("ssd:yearly_benefits_index")
@@ -179,4 +186,6 @@ class TestYearlyBenefitsFormView(TestCase):
 
         response = self.client.get(url)
 
-        self.assertContains(response, "Download of yearly reports not supported.")
+        self.assertContains(
+            response, "Downloaden van jaaroverzichten wordt niet ondersteund."
+        )

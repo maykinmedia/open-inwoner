@@ -104,7 +104,7 @@ class YearlyChoicesTest(TestCase):
         self.assertEqual(date_repr, "1983")
 
     @patch("open_inwoner.ssd.forms.SSDConfig.get_solo")
-    def test_monthly_reports_not_enabled(self, mock_solo):
+    def test_yearly_reports_not_enabled(self, mock_solo):
         mock_solo.return_value = SSDConfigFactory.build(
             jaaropgave_enabled=False,
         )

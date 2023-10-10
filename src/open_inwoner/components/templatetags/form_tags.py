@@ -356,7 +356,9 @@ def hidden(field, **kwargs):
 
 
 @register.inclusion_tag("components/Form/FormActions.html")
-def form_actions(primary_text="", primary_icon=None, secondary=True, **kwargs):
+def form_actions(
+    primary_text="", primary_icon=None, secondary=True, form_id=None, **kwargs
+):
     """
     Rendering the form actions. This may contain a primary and or secondary button.
 
@@ -393,6 +395,7 @@ def form_actions(primary_text="", primary_icon=None, secondary=True, **kwargs):
         "primary_icon": primary_icon,
         "primary": primary,
         "secondary": secondary,
+        "form_id": form_id,
     }
 
 
@@ -409,6 +412,19 @@ def addclass(field, class_string):
         + class_string: string | The class that needs to be added.
     """
     return field.as_widget(attrs={"class": class_string})
+
+
+@register.simple_tag()
+def field_as_widget(field, class_string, form_id):
+    """
+    Clone of addclass-filter but with more atributes
+    """
+    attrs = {}
+    if class_string:
+        attrs["class"] = class_string
+    if form_id:
+        attrs["form"] = form_id
+    return field.as_widget(attrs=attrs)
 
 
 @register.simple_tag(takes_context=True)

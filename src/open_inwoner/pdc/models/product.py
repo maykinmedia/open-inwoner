@@ -59,6 +59,11 @@ class Product(models.Model):
         max_length=300,
         help_text=_("Short description of the product, limited to 300 characters."),
     )
+    content_is_collapsable = models.BooleanField(
+        verbose_name=_("Make product content collapsable"),
+        default=False,
+        help_text=_("Whether the user can expand and collapse the product content."),
+    )
     icon = FilerImageField(
         verbose_name=_("Icon"),
         null=True,
@@ -100,6 +105,15 @@ class Product(models.Model):
         help_text=_(
             "Product content with build-in WYSIWYG editor. By adding '[CTABUTTON]' you can embed a cta-button for linking to the defined form or link"
         ),
+    )
+    video = models.ForeignKey(
+        "media.Video",
+        blank=True,
+        null=True,
+        verbose_name=_("Video"),
+        on_delete=models.PROTECT,
+        related_name="products",
+        help_text=_("Video to show after the intro"),
     )
     categories = models.ManyToManyField(
         "pdc.Category",

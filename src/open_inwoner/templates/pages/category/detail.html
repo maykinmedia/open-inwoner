@@ -17,7 +17,7 @@
                 {% button icon="edit" text=_("Open in admin") hide_text=True href="admin:pdc_category_change" object_id=object.pk %}
             {% endif %}
         </h1>
-        <p class="p">{{ object.description|linebreaksbr }}</p>
+            {{ category_rendered_description|safe }}
 
         {% if subcategories %}
             {% card_container subcategories=subcategories parent_category=object %}

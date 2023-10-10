@@ -28,6 +28,7 @@ class SearchView(
         return _("Zoeken")
 
     def get(self, request, *args, **kwargs):
+        # SearchForm
         form = self.get_form()
         if form.is_valid():
             return self.search(form)
@@ -36,7 +37,7 @@ class SearchView(
             return self.render_to_response(context)
 
     def get_form_kwargs(self):
-        """Return the keyword arguments for instantiating the form."""
+        # SearchForm
         kwargs = {
             "initial": self.get_initial(),
             "prefix": self.get_prefix(),
@@ -48,14 +49,13 @@ class SearchView(
         data = form.cleaned_data.copy()
         query = data.pop("query")
         context = self.get_context_data(form=form)
-        user = self.request.user
-
         if not query:
             return self.render_to_response(context)
 
         # log search query of authenticated users
+        user = self.request.user
         if user.is_authenticated:
-            self.log_user_action(user, (_("search query: {query}")).format(query=query))
+            self.log_user_action(user, _("search query: {query}").format(query=query))
 
         # perform search
         results = search_products(query, filters=data)
@@ -63,13 +63,12 @@ class SearchView(
         # update form fields with choices
         for facet in results.facets:
             if facet.name in form.fields:
-                form.fields[facet.name].choices = facet.choices()
+                form.fields[facet.name].choices = facet.total_choices()
 
         # paginate
         paginator_dict = self.paginate_with_context(results.results)
 
         context.update(paginator_dict)
-        context.update({"results": results})
 
         return self.render_to_response(context)
 
@@ -98,6 +97,8 @@ class SearchView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        # alias our bound "form" as "search_form" to overwrite global blank default
+        context["search_form"] = context.get("form")
         context["feedback_form"] = self.get_feedback_form()
         return context
 
@@ -109,6 +110,7 @@ class SearchView(
         return form
 
     def post(self, request, *args, **kwargs):
+        # Feedback form
         form = self.get_feedback_form()
         if form.is_valid():
             return self.form_valid(form)
@@ -116,9 +118,11 @@ class SearchView(
             return self.form_invalid(form)
 
     def form_invalid(self, form):
+        # Feedback form
         return self.render_to_response(self.get_context_data(feedback_form=form))
 
     def form_valid(self, form):
+        # Feedback form
         if self.request.user.is_authenticated:
             form.instance.searched_by = self.request.user
         http_referer = self.request.get_full_path()
@@ -142,4 +146,4 @@ class SearchView(
     @property
     def display_restricted(self):
         config = SiteConfiguration.get_solo()
-        return config.hide_categories_from_anonymous_users is True
+        return config.hide_categories_from_anonymous_users

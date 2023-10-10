@@ -8,6 +8,7 @@ from django_webtest import WebTest
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.questionnaire.tests.factories import QuestionnaireStepFactory
 
+from ...media.tests.factories import VideoFactory
 from ..models import CategoryProduct
 from .factories import CategoryFactory, ProductFactory, QuestionFactory
 
@@ -296,6 +297,24 @@ class TestProductContent(WebTest):
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+class TestProductVideo(WebTest):
+    def test_product_video_is_rendered(self):
+        video = VideoFactory()
+        product = ProductFactory(
+            content="Some content",
+            link="http://www.example.com",
+            video=video,
+        )
+        response = self.app.get(
+            reverse("products:product_detail", kwargs={"slug": product.slug})
+        )
+        video_frames = response.pyquery(".video iframe")
+        self.assertEqual(len(video_frames), 1)
+        iframe = video_frames[0]
+        self.assertEqual(iframe.attrib["src"], video.player_url)
+
+
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestProductDetailView(WebTest):
     def test_subheadings_in_sidebar(self):
         product = ProductFactory(
@@ -307,19 +326,19 @@ class TestProductDetailView(WebTest):
             reverse("products:product_detail", kwargs={"slug": product.slug})
         )
 
-        links = response.pyquery(".anchor-menu__sublist a")
+        links = response.pyquery(".anchor-menu__list .link")
 
         # 2 x 2 links (mobile + desktop)
         self.assertEqual(len(links), 4)
 
         self.assertEqual(links[0].text, "First subheading")
-        self.assertEqual(links[0].attrib["href"], "#subheader-first-subheading")
+        self.assertEqual(links[0].attrib["href"], "#subheading-first-subheading")
 
         self.assertEqual(links[1].text, "Second subheading")
-        self.assertEqual(links[1].attrib["href"], "#subheader-second-subheading")
+        self.assertEqual(links[1].attrib["href"], "#subheading-second-subheading")
 
         self.assertEqual(links[2].text, "First subheading")
-        self.assertEqual(links[2].attrib["href"], "#subheader-first-subheading")
+        self.assertEqual(links[2].attrib["href"], "#subheading-first-subheading")
 
         self.assertEqual(links[3].text, "Second subheading")
-        self.assertEqual(links[3].attrib["href"], "#subheader-second-subheading")
+        self.assertEqual(links[3].attrib["href"], "#subheading-second-subheading")

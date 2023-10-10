@@ -103,6 +103,10 @@
        <Ingangsdatum>20220101</Ingangsdatum>
        <CdLoonheffingskorting>1</CdLoonheffingskorting>
       </Loonheffingskorting>
+      <Loonheffingskorting>
+       <Ingangsdatum>20230101</Ingangsdatum>
+       <CdLoonheffingskorting>1</CdLoonheffingskorting>
+      </Loonheffingskorting>
       <BelasteAlimentatie>
        <CdPositiefNegatief>+</CdPositiefNegatief>
        <WaardeBedrag>0</WaardeBedrag>

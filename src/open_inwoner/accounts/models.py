@@ -313,7 +313,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self._seed
 
     def get_full_name(self):
-        parts = (self.first_name, self.infix, self.last_name)
+        # validator allowed spaces as values
+        first_name = self.display_name.strip() or self.first_name.strip()
+        parts = (first_name, self.infix.strip(), self.last_name.strip())
         return " ".join(p for p in parts if p)
 
     def get_short_name(self):
@@ -344,7 +346,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_interests(self) -> str:
         if not self.selected_categories.exists():
-            return _("U heeft geen interessegebieden aangegeven.")
+            return _("U heeft geen interesses gekozen.")
 
         return ", ".join(list(self.selected_categories.values_list("name", flat=True)))
 
@@ -805,5 +807,5 @@ class Invite(models.Model):
         return reverse("profile:invite_accept", kwargs={"key": self.key})
 
     def expired(self) -> bool:
-        expiration_date = self.created_on + timedelta(days=settings.INVITE_EXPIRY)
+        expiration_date = self.created_on + timedelta(days=settings.INVITE_EXPIRY_DAYS)
         return expiration_date <= timezone.now()

@@ -4,6 +4,24 @@
         <meta charset="utf-8">
         <title>{% block title %}{% if page_title %}{{ page_title }} - {% endif %}{{ site_name }}{% endblock %}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <meta property="og:title" content="{% if page_title %}{{ page_title }} - {% endif %}{{ site_name }}">
+        <meta name="twitter:title" content="{% if page_title %}{{ page_title }} - {% endif %}{{ site_name }}">
+        {% if meta_description %}
+            <meta property="og:description" content="{{ meta_description }}">
+            <meta name="twitter:description" content="{{ meta_description }}">
+            <meta name="description" content="{{ meta_description }}"/>
+        {% endif %}
+        {% if meta_image_url %}
+            <meta property="og:image" content="{{ meta_image_url }}">
+            <meta name="twitter:image" content="{{ meta_image_url  }}">
+        {% endif %}
+        {% if meta_page_url %}
+            <meta property="og:url" content="{{ meta_page_url }}">
+        {% endif %}
+        <meta property="og:type" content="article">
+
+
         {% if favicon %}<link rel="icon" href="{{ favicon }}" />
         <link rel="apple-touch-icon" href="{{ favicon }}">{% endif %}
 
@@ -52,6 +70,11 @@
             {% show_menu_below_id "home" 0 100 100 100 "cms/menu/primary.html" %}
         {% endcapture %}
         {% include "components/Header/Header.html" %}
+
+        {# javascript and the form-attribute are used to connect various forms and controls to this invisible form #}
+        <form id="search-form" class="form--hidden" method="GET" action="{% url 'search:search' %}" novalidate="">
+            <input name="query" type="hidden" value="{% firstof search_form.query.value "" %}">
+        </form>
 
         {% if anchors and not custom_anchors %}
             {% anchor_menu anchors=anchors desktop=False %}

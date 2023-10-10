@@ -17,8 +17,8 @@ FILES_DIR = Path(__file__).parent.resolve() / "files"
 class SSDClientRequestInterfaceTest(TestCase):
     @requests_mock.Mocker()
     def test_tsl_with_server_cert(self, mock_request_body, mock_request):
-        client = ConcreteSSDClient()
-        client.config = SSDConfigFactory.build(
+        ssd_client = ConcreteSSDClient()
+        ssd_client.config = SSDConfigFactory.build(
             service__url="https://example.com/soap-service",
             service__with_server_cert=True,
         )
@@ -26,17 +26,17 @@ class SSDClientRequestInterfaceTest(TestCase):
         mock_request.post("https://example.com/soap-service")
 
         context = {"bsn": "dummy", "period": "dummy"}
-        client.templated_request(**context)
+        ssd_client.templated_request(**context)
 
         self.assertEqual(
             mock_request.last_request.verify,
-            client.config.service.server_certificate.public_certificate.path,
+            ssd_client.config.service.server_certificate.public_certificate.path,
         )
 
     @requests_mock.Mocker()
     def test_tsl_without_server_cert(self, mock_request_body, mock_request):
-        client = ConcreteSSDClient()
-        client.config = SSDConfigFactory.build(
+        ssd_client = ConcreteSSDClient()
+        ssd_client.config = SSDConfigFactory.build(
             service__url="https://example.com/soap-service",
             service__with_client_cert=True,
             service__with_server_cert=False,
@@ -45,14 +45,14 @@ class SSDClientRequestInterfaceTest(TestCase):
         mock_request.post("https://example.com/soap-service")
 
         context = {"bsn": "dummy", "period": "dummy"}
-        client.templated_request(**context)
+        ssd_client.templated_request(**context)
 
         self.assertEqual(mock_request.last_request.verify, True)
 
     @requests_mock.Mocker()
     def test_tls_no_client_cert(self, mock_request_body, mock_request):
-        client = ConcreteSSDClient()
-        client.config = SSDConfigFactory.build(
+        ssd_client = ConcreteSSDClient()
+        ssd_client.config = SSDConfigFactory.build(
             service__url="https://example.com/soap-service",
             service__with_client_cert=False,
             service__with_server_cert=False,
@@ -61,14 +61,14 @@ class SSDClientRequestInterfaceTest(TestCase):
         mock_request.post("https://example.com/soap-service")
 
         context = {"bsn": "dummy", "period": "dummy"}
-        client.templated_request(**context)
+        ssd_client.templated_request(**context)
 
         self.assertIsNone(mock_request.last_request.cert)
 
     @requests_mock.Mocker()
     def test_tsl_client_public_cert_missing(self, mock_request_body, mock_request):
-        client = ConcreteSSDClient()
-        client.config = SSDConfigFactory.build(
+        ssd_client = ConcreteSSDClient()
+        ssd_client.config = SSDConfigFactory.build(
             service__url="https://example.com/soap-service",
             service__with_client_cert=True,
             service__client_certificate__public_certificate="",
@@ -78,14 +78,14 @@ class SSDClientRequestInterfaceTest(TestCase):
         mock_request.post("https://example.com/soap-service")
 
         context = {"bsn": "dummy", "period": "dummy"}
-        client.templated_request(**context)
+        ssd_client.templated_request(**context)
 
         self.assertIsNone(mock_request.last_request.cert)
 
     @requests_mock.Mocker()
     def test_tsl_client_public_cert_only(self, mock_request_body, mock_request):
-        client = ConcreteSSDClient()
-        client.config = SSDConfigFactory.build(
+        ssd_client = ConcreteSSDClient()
+        ssd_client.config = SSDConfigFactory.build(
             service__url="https://example.com/soap-service",
             service__with_client_cert=True,
             service__client_certificate__with_private_key=False,
@@ -95,17 +95,17 @@ class SSDClientRequestInterfaceTest(TestCase):
         mock_request.post("https://example.com/soap-service")
 
         context = {"bsn": "dummy", "period": "dummy"}
-        client.templated_request(**context)
+        ssd_client.templated_request(**context)
 
         self.assertEqual(
             mock_request.last_request.cert,
-            client.config.service.client_certificate.public_certificate.path,
+            ssd_client.config.service.client_certificate.public_certificate.path,
         )
 
     @requests_mock.Mocker()
     def test_tsl_client_cert_and_private_key(self, mock_request_body, mock_request):
-        client = ConcreteSSDClient()
-        client.config = SSDConfigFactory.build(
+        ssd_client = ConcreteSSDClient()
+        ssd_client.config = SSDConfigFactory.build(
             service__url="https://example.com/soap-service",
             service__with_client_cert=True,
             service__client_certificate__with_private_key=True,
@@ -115,13 +115,13 @@ class SSDClientRequestInterfaceTest(TestCase):
         mock_request.post("https://example.com/soap-service")
 
         context = {"bsn": "dummy", "period": "dummy"}
-        client.templated_request(**context)
+        ssd_client.templated_request(**context)
 
         self.assertEqual(
             mock_request.last_request.cert,
             (
-                client.config.service.client_certificate.public_certificate.path,
-                client.config.service.client_certificate.private_key.path,
+                ssd_client.config.service.client_certificate.public_certificate.path,
+                ssd_client.config.service.client_certificate.private_key.path,
             ),
         )
 
@@ -129,8 +129,8 @@ class SSDClientRequestInterfaceTest(TestCase):
 class UitkeringClientTest(TestCase):
     @requests_mock.Mocker()
     def test_request_status_not_ok(self, mock_request):
-        client = UitkeringClient()
-        client.config = SSDConfigFactory.build(
+        ssd_client = UitkeringClient()
+        ssd_client.config = SSDConfigFactory.build(
             service__url="https://example.com/soap-service/",
         )
 
@@ -140,9 +140,9 @@ class UitkeringClientTest(TestCase):
                     "https://example.com/soap-service/maandspecificatie/",
                     status_code=code,
                 )
-                res = client.get_report(
+                res = ssd_client.get_reports(
                     bsn="12345",
-                    report_date_iso="1985-07-25",
+                    report_date="198507",
                     request_base_url="https://dummy.com",
                 )
                 self.assertIsNone(res)
@@ -150,16 +150,16 @@ class UitkeringClientTest(TestCase):
     @patch("django.utils.timezone.localtime", return_value=datetime(2023, 7, 12, 11, 0))
     @requests_mock.Mocker()
     def test_request_body(self, mock_datetime, mock_request):
-        client = UitkeringClient()
-        client.config = SSDConfigFactory.build(
+        ssd_client = UitkeringClient()
+        ssd_client.config = SSDConfigFactory.build(
             service__url="https://example.com/soap-service/",
         )
 
         mock_request.post("https://example.com/soap-service/maandspecificatie/")
 
-        client.get_report(
+        ssd_client.get_reports(
             bsn="12345",
-            report_date_iso="1985-07-25",
+            report_date="198507",
             request_base_url="https://dummy.com",
         )
 
@@ -186,8 +186,8 @@ class UitkeringClientTest(TestCase):
 class JaaropgaveClientTest(TestCase):
     @requests_mock.Mocker()
     def test_request_status_not_ok(self, mock_request):
-        client = JaaropgaveClient()
-        client.config = SSDConfigFactory.build(
+        ssd_client = JaaropgaveClient()
+        ssd_client.config = SSDConfigFactory.build(
             service__url="https://example.com/soap-service/",
         )
 
@@ -197,9 +197,9 @@ class JaaropgaveClientTest(TestCase):
                     "https://example.com/soap-service/jaaropgave/",
                     status_code=code,
                 )
-                res = client.get_report(
+                res = ssd_client.get_reports(
                     bsn="12345",
-                    report_date_iso="1985-12-24",
+                    report_date="1985-12-24",
                     request_base_url="https://dummy.com",
                 )
                 self.assertIsNone(res)
@@ -207,16 +207,16 @@ class JaaropgaveClientTest(TestCase):
     @patch("django.utils.timezone.localtime", return_value=datetime(2023, 7, 12, 11, 0))
     @requests_mock.Mocker()
     def test_request_body(self, mock_datetime, mock_request):
-        client = JaaropgaveClient()
-        client.config = SSDConfigFactory.build(
+        ssd_client = JaaropgaveClient()
+        ssd_client.config = SSDConfigFactory.build(
             service__url="https://example.com/soap-service/",
         )
 
         mock_request.post("https://example.com/soap-service/jaaropgave/")
 
-        client.get_report(
+        ssd_client.get_reports(
             bsn="12345",
-            report_date_iso="1985-12-12",
+            report_date="1985",
             request_base_url="https://dummy.com",
         )
 

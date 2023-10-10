@@ -7,7 +7,7 @@
             {{ field.label }}
             {% if field.field.required %}<span class="label__label--required"> * </span>{% endif %}
         </span>
-        {{ field|addclass:"input" }}
+        {% field_as_widget field "input" form_id %}
         {% if field.help_text and not no_help %}
             <p class="p">{{ field.help_text }}</p>
         {% endif %}

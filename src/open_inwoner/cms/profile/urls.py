@@ -25,7 +25,6 @@ from open_inwoner.accounts.views import (
     NecessaryFieldsUserView,
 )
 from open_inwoner.accounts.views.actions import ActionDeleteView
-from open_inwoner.ssd.views import MonthlyBenefitsFormView, YearlyBenefitsFormView
 
 app_name = "profile"
 
@@ -61,17 +60,6 @@ action_patterns = [
     path("", ActionListView.as_view(), name="action_list"),
 ]
 
-benefits_patterns = [
-    path(
-        "maandspecificaties/",
-        MonthlyBenefitsFormView.as_view(),
-        name="monthly_benefits_index",
-    ),
-    path(
-        "jaaropgaven/", YearlyBenefitsFormView.as_view(), name="yearly_benefits_index"
-    ),
-]
-
 contact_patterns = [
     path("create/", ContactCreateView.as_view(), name="contact_create"),
     path(
@@ -103,7 +91,6 @@ documents_patterns = [
 urlpatterns = [
     path("actions/", include(action_patterns)),
     path("contacts/", include(contact_patterns)),
-    path("uitkeringen/", include(benefits_patterns)),
     path("documenten/", include(documents_patterns)),
     path("onderwerpen/", MyCategoriesView.as_view(), name="categories"),
     path("notificaties/", MyNotificationsView.as_view(), name="notifications"),

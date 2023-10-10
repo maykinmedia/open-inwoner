@@ -127,6 +127,7 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                 "classes": ("collapse",),
                 "fields": (
                     "login_text",
+                    "registration_text",
                     "home_welcome_title",
                     "home_welcome_intro",
                     "home_theme_title",
@@ -160,6 +161,16 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                     "questionnaire_help_text",
                     "plan_help_text",
                 ),
+            },
+        ),
+        (
+            _("Search filter options"),
+            {
+                "fields": (
+                    "search_filter_categories",
+                    "search_filter_tags",
+                    "search_filter_organizations",
+                )
             },
         ),
         (_("Emails"), {"fields": ("email_new_message",)}),
@@ -214,6 +225,7 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                 ),
             },
         ),
+        (_("Social media"), {"fields": ("display_social",)}),
     )
     inlines = [SiteConfigurationPageInline]
     form = SiteConfigurarionAdminForm

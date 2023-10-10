@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import TestCase, tag
 
 from open_inwoner.pdc.tests.factories import ProductFactory
 
@@ -6,6 +6,7 @@ from ..searches import search_autocomplete
 from .utils import ESMixin
 
 
+@tag("elastic")
 class AutocompleteTests(ESMixin, TestCase):
     def test_autocomplete_on_name(self):
         ProductFactory.create(name="Name", keywords=["Keyword"])
