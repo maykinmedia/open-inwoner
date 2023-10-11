@@ -131,6 +131,16 @@ class OpenZaakConfig(SingletonModel):
         default=False,
     )
 
+    title_text = models.TextField(
+        verbose_name=_("Title text"),
+        help_text=_(
+            "The title/introductory text shown on the list view of 'Mijn aanvragen'."
+        ),
+        default=_(
+            "Hier vindt u een overzicht van al uw lopende an afgeronde aanvragen."
+        ),
+    )
+
     class Meta:
         verbose_name = _("Open Zaak configuration")
 

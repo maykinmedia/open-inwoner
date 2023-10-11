@@ -1,6 +1,9 @@
 {% load link_tags button_tags i18n grid_tags icon_tags list_tags pagination_tags utils %}
 
 <h2 class="h2" id="cases">{% trans "Mijn aanvragen" %}</h2>
+<h2 class="h2" id="cases">{{ page_title }} ({{ paginator.count }})</h2>
+<p class="cases__title_text">{{ title_text }}</p>
+
 {% render_grid %}
     {% if not cases %}
         <b>{% trans "U heeft op dit moment nog geen lopende aanvragen." %}</b>

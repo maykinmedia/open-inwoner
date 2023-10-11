@@ -7,6 +7,7 @@ from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.htmx.mixins import RequiresHtmxMixin
 from open_inwoner.openzaak.formapi import fetch_open_submissions
+from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.utils.views import CommonPageMixin
 
 from .mixins import CaseAccessMixin, CaseListMixin, OuterCaseAccessMixin
@@ -55,6 +56,8 @@ class InnerCaseListView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        config = OpenZaakConfig.get_solo()
 
         context["hxget"] = reverse("cases:cases_content")
+        context["title_text"] = config.title_text
         return context
