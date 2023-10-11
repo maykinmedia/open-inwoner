@@ -535,6 +535,7 @@ CMS_PLACEHOLDER_CONF = {
     "content": {
         "plugins": [
             # "TextPlugin",
+            "CasesPlugin",
             "PicturePlugin",
             "VideoPlayerPlugin",
             "CategoriesPlugin",

@@ -1,0 +1,31 @@
+{% load i18n anchor_menu_tags grid_tags icon_tags list_tags pagination_tags utils %}
+
+<div id="cases-list-anchors-oob-desktop" hx-swap-oob="true">
+    {% anchor_menu anchors desktop=True %}
+</div>
+
+<h2 class="h2" id="cases">{{ page_title }} ({{ paginator.count }})</h2>
+{% render_grid %}
+    
+    {% for case in cases %}
+        <div class="card__body">
+            <div class="card__content">
+            <h2 class="h2"><span class="link link__text">{{ title }}</span></h2>
+            <p class="p">{{ description }}</p>
+
+            <div class="card__tabled">
+                <div>{% trans "Einddatum" %}:</div>
+                <div>{{ case }}</div>
+                <div>{% trans "Created by" %}:</div>
+                <div>{{ object }}</div>
+            </div>
+
+            <span class="spacer"></span>
+            <span class="button button--icon-before button--transparent button--secondary">
+            {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
+            </span>
+
+        </div>
+
+    {% endfor %}
+{% endrender_grid %}

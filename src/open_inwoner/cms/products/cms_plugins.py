@@ -3,6 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 
+from open_inwoner.openzaak.cases import fetch_cases
 from open_inwoner.pdc.forms import ProductFinderForm
 from open_inwoner.pdc.models import Category, ProductCondition, ProductLocation
 from open_inwoner.questionnaire.models import QuestionnaireStep
@@ -14,7 +15,8 @@ from ..utils.plugin_mixins import CMSActiveAppMixin
 class CategoriesPlugin(CMSActiveAppMixin, CMSPluginBase):
     module = _("PDC")
     name = _("Categories Plugin")
-    render_template = "cms/products/categories_plugin.html"
+    # render_template = "cms/products/categories_plugin.html"
+    render_template = "cms/cases/cases_plugin.html"
     app_hook = "ProductsApphook"
     cache = False
 
@@ -39,6 +41,10 @@ class CategoriesPlugin(CMSActiveAppMixin, CMSPluginBase):
             categories = Category.objects.published().order_by("path")[: self.limit]
 
         context["categories"] = categories
+
+        # from cms.models import Page
+        # pages = Page.objects.published().all()
+        # import pdb;pdb.set_trace()
 
         return context
 
