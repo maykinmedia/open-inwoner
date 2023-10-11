@@ -16,13 +16,15 @@
             <div class="card__body">
                 <!-- submission cases -->
                 {% if case.datum_laatste_wijziging %}
-                    <a href="{% url 'cases:case_detail' object_id=case.uuid %}" class="cases__link">
+                    <a href="{{ case.url }}"  class="cases__link">
                     <p class="h4"><span class="link link__text">{{ case.naam }}</span></p>
                     {% render_list %}
                     <span class="case-list">
                         {% list_item text="Openstaand aanvraag" caption=_("Status") compact=True strong=False %}
                         {% list_item text=case.datum_laatste_wijziging caption=_("Laatste wijziging") compact=True strong=False %}
-                        {% list_item text=case.eind_datum_geldigheid caption=_("Einddatum geldigheid") compact=True strong=False%}
+                        {% with end_date=case.eind_datum_geldigheid|default:"Geen" %}
+                            {% list_item text=end_date caption=_("Einddatum geldigheid") compact=True strong=False%}
+                        {% endwith %}
                     </span>
                     {% endrender_list %}
                     <span class="link link--icon link--secondary" aria-label="{% trans "Bekijk aanvraag" %}" title="{% trans "Bekijk aanvraag" %}">

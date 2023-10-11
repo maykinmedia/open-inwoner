@@ -49,10 +49,6 @@
     width: 24px;
   }
 
-  &__content {
-    width: 100%;
-  }
-
   &__close {
     position: absolute;
     top: var(--spacing-small);
@@ -77,5 +73,23 @@
 
   @media (min-width: 768px) {
     margin: var(--spacing-tiny) 0;
+  }
+
+  // Overrides based on context
+  &--cases {
+    padding: var(--spacing-small);
+    margin-bottom: var(--spacing-medium);
+    align-items: center;
+
+    .notification__icon {
+      display: flex;
+      padding-left: var(--spacing-medium);
+      align-items: center;
+    }
+
+    .notification__close {
+      top: 0;
+      position: inherit;
+    }
   }
 }

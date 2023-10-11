@@ -36,11 +36,9 @@ from .shared import CATALOGI_ROOT, ZAKEN_ROOT
 class CaseListAccessTests(AssertRedirectsMixin, ClearCachesMixin, WebTest):
     outer_urls = [
         reverse_lazy("cases:index"),
-        # reverse_lazy("cases:closed_cases"),
     ]
     inner_urls = [
         reverse_lazy("cases:cases_content"),
-        # reverse_lazy("cases:closed_cases_content"),
     ]
 
     @classmethod
