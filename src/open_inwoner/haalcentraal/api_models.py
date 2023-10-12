@@ -46,10 +46,10 @@ class BRPData:
     def get_housenumber(self):
         parts = []
         if self.housenumber:
-            parts.append(self.housenumber)
+            parts.append(str(self.housenumber))
         if self.houseletter:
-            parts.append(self.houseletter)
+            parts.append(str(self.houseletter))
         if self.housenumbersuffix:
             parts.append(" ")
-            parts.append(self.housenumbersuffix)
+            parts.append(str(self.housenumbersuffix))
         return "".join(parts)
