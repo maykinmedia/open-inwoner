@@ -331,6 +331,7 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
                     "identificatie": self.zaak2["identificatie"],
                     "description": self.zaaktype["omschrijving"],
                     "current_status": self.status_type1["omschrijving"],
+                    "statustype_config": None,
                 },
                 {
                     "uuid": self.zaak1["uuid"],
@@ -339,6 +340,7 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
                     "identificatie": self.zaak1["identificatie"],
                     "description": self.zaaktype["omschrijving"],
                     "current_status": self.status_type1["omschrijving"],
+                    "statustype_config": None,
                 },
             ],
         )
@@ -438,6 +440,7 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
                     "identificatie": self.zaak3["identificatie"],
                     "description": self.zaaktype["omschrijving"],
                     "current_status": self.status_type2["omschrijving"],
+                    "statustype_config": None,
                 },
             ],
         )
@@ -535,6 +538,7 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
                     "identificatie": self.zaak2["identificatie"],
                     "description": self.zaaktype["omschrijving"],
                     "current_status": self.status_type1["omschrijving"],
+                    "statustype_config": self.zt_statustype_config1,
                 },
             ],
         )
@@ -557,6 +561,7 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
                     "identificatie": self.zaak1["identificatie"],
                     "description": self.zaaktype["omschrijving"],
                     "current_status": self.status_type1["omschrijving"],
+                    "statustype_config": self.zt_statustype_config1,
                 },
             ],
         )
