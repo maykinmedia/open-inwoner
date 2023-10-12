@@ -26,3 +26,47 @@
 #cases-contact-form-content > h2 {
   margin-top: var(--spacing-large);
 }
+
+.card__header.success {
+  display: flex;
+  background-color: $color-success;
+  color: $color-success-dark;
+  padding: 0.4em;
+
+  & .icon--success {
+    margin-right: 0.2em;
+  }
+}
+
+.card__header.info {
+  display: flex;
+  background-color: $color-info;
+  color: $color-info-dark;
+  padding: 0.4em;
+
+  & .icon--info {
+    margin-right: 0.2em;
+  }
+}
+
+.card__header.warning {
+  display: flex;
+  background-color: $color-warning;
+  color: $color-warning-dark;
+  padding: 0.4em;
+
+  & .icon--warning {
+    margin-right: 0.2em;
+  }
+}
+
+.card__header.failure {
+  display: flex;
+  background-color: $color-danger;
+  color: $color-danger-dark;
+  padding: 0.4em;
+
+  & .icon--failure {
+    margin-right: 0.2em;
+  }
+}

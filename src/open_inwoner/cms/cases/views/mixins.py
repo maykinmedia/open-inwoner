@@ -19,7 +19,11 @@ from open_inwoner.openzaak.catalog import (
     fetch_single_case_type,
     fetch_single_status_type,
 )
-from open_inwoner.openzaak.models import OpenZaakConfig, StatusTranslation
+from open_inwoner.openzaak.models import (
+    OpenZaakConfig,
+    StatusTranslation,
+    ZaakTypeStatusTypeConfig,
+)
 from open_inwoner.openzaak.utils import format_zaak_identificatie, is_zaak_visible
 from open_inwoner.utils.mixins import PaginationMixin
 from open_inwoner.utils.views import LogMixin
@@ -110,6 +114,11 @@ class CaseListMixin(CaseLogMixin, PaginationMixin):
         case_types = {}
         case_types_set = {case.zaaktype for case in cases}
 
+        mapping = {
+            zaaktype_statustype.statustype_url: zaaktype_statustype
+            for zaaktype_statustype in ZaakTypeStatusTypeConfig.objects.all()
+        }
+
         # fetch unique case types
         for case_type_url in case_types_set:
             # todo parallel
@@ -129,6 +138,8 @@ class CaseListMixin(CaseLogMixin, PaginationMixin):
                 # todo parallel
                 case.status = fetch_single_status(case.status)
                 status_types[case.status.statustype].append(case)
+
+                case.statustype_config = mapping.get(case.status.statustype)
 
         for status_type_url, _cases in status_types.items():
             # todo parallel
@@ -154,6 +165,7 @@ class CaseListMixin(CaseLogMixin, PaginationMixin):
                 "current_status": status_translate.from_glom(
                     case, "status.statustype.omschrijving", default=""
                 ),
+                "statustype_config": getattr(case, "statustype_config"),
             }
             updated_cases.append(case_dict)
         return updated_cases
