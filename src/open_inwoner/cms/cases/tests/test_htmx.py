@@ -376,11 +376,13 @@ class CasesPlaywrightTests(
         ).to_be_visible()
 
         # case title
-        case_title = page.get_by_role("link", name=self.zaaktype["omschrijving"])
+        case_title = page.get_by_role("heading", name=self.zaaktype["omschrijving"])
         expect(case_title).to_be_visible()
 
         # go to case-detail page
-        case_title.click()
+        goto_case_link = page.get_by_text(_("Bekijk aanvraag"))
+        expect(goto_case_link).to_be_visible()
+        goto_case_link.click()
         page.wait_for_url(
             self.live_reverse(
                 "cases:case_detail", kwargs={"object_id": self.zaak["uuid"]}, star=True
