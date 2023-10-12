@@ -19,9 +19,14 @@ from open_inwoner.cms.cases.views.mixins import CaseListMixin
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 
 from ...utils.tests.helpers import AssertRedirectsMixin
-from ..models import OpenZaakConfig
+from ..constants import StatusIndicators
+from ..models import OpenZaakConfig, ZaakTypeStatusTypeConfig
 from ..utils import format_zaak_identificatie
-from .factories import ServiceFactory, StatusTranslationFactory
+from .factories import (
+    ServiceFactory,
+    StatusTranslationFactory,
+    ZaakTypeStatusTypeConfigFactory,
+)
 from .shared import CATALOGI_ROOT, ZAKEN_ROOT
 
 
@@ -193,6 +198,13 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
             volgnummer=2,
             isEindstatus=True,
         )
+
+        cls.zt_statustype_config1 = ZaakTypeStatusTypeConfigFactory.create(
+            zaaktype_config__identificatie="ZAAK-2022-0000000001",
+            statustype_url=cls.status_type1["url"],
+            status_indicator=StatusIndicators.warning,
+            status_indicator_text="U moet documenten toevoegen",
+        )
         # open
         cls.zaak1 = generate_oas_component(
             "zrc",
@@ -331,7 +343,7 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
                     "identificatie": self.zaak2["identificatie"],
                     "description": self.zaaktype["omschrijving"],
                     "current_status": self.status_type1["omschrijving"],
-                    "statustype_config": None,
+                    "statustype_config": self.zt_statustype_config1,
                 },
                 {
                     "uuid": self.zaak1["uuid"],
@@ -340,7 +352,7 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
                     "identificatie": self.zaak1["identificatie"],
                     "description": self.zaaktype["omschrijving"],
                     "current_status": self.status_type1["omschrijving"],
-                    "statustype_config": None,
+                    "statustype_config": self.zt_statustype_config1,
                 },
             ],
         )
@@ -349,6 +361,12 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
         self.assertNotContains(response, self.zaak3["omschrijving"])
         self.assertNotContains(response, self.zaak_intern["identificatie"])
         self.assertNotContains(response, self.zaak_intern["omschrijving"])
+
+        zaken_cards = response.html.find_all("div", {"class": "card"})
+
+        self.assertEqual(len(zaken_cards), 2)
+        self.assertTrue("U moet documenten toevoegen" in zaken_cards[0].text)
+        self.assertTrue("U moet documenten toevoegen" in zaken_cards[1].text)
 
         # check zaken request query parameters
         list_zaken_req = [
