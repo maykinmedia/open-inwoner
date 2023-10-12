@@ -33,7 +33,8 @@ from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 from ...utils.tests.helpers import AssertRedirectsMixin
 from ..api_models import Status, StatusType
 from ..models import OpenZaakConfig
-from ..utils import format_zaak_identificatie
+
+# from ..utils import format_zaak_identificatie
 from .factories import CatalogusConfigFactory, ServiceFactory
 from .shared import CATALOGI_ROOT, DOCUMENTEN_ROOT, ZAKEN_ROOT
 
@@ -366,7 +367,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             response.context.get("case"),
             {
                 "id": self.zaak["uuid"],
-                "identification": "ZAAK-2022-0000000024",
+                "identification": "0014ESUITE66392022",
                 "start_date": datetime.date(2022, 1, 2),
                 "end_date": None,
                 "end_date_planned": datetime.date(2022, 1, 4),
@@ -412,8 +413,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self._setUpMocks(m)
 
         with patch(
-            "open_inwoner.cms.cases.views.status.format_zaak_identificatie",
-            wraps=format_zaak_identificatie,
+            "open_inwoner.openzaak.api_models.Zaak.format_zaak_identificatie",
         ) as spy_format:
             self.app.get(self.case_detail_url, user=self.user)
 

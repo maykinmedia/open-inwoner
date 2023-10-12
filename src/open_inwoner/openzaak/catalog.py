@@ -1,19 +1,34 @@
 import logging
-from typing import List, Optional
+from typing import List, Optional, Union
+from uuid import UUID
 
 from django.conf import settings
 
 from requests import RequestException
-from zds_client import ClientError
+from zds_client import ClientError, get_operation_url
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.catalogi import Catalogus
 from zgw_consumers.service import get_paginated_results
 
+from ..utils.decorators import cache as cache_result
 from .api_models import InformatieObjectType, ResultaatType, StatusType, ZaakType
 from .clients import build_client
-from .utils import cache as cache_result, get_retrieve_resource_by_uuid_url
 
 logger = logging.getLogger(__name__)
+
+
+def get_retrieve_resource_by_uuid_url(
+    client, resource: str, uuid: Union[str, UUID]
+) -> str:
+    op_suffix = client.operation_suffix_mapping["retrieve"]
+    operation_id = f"{resource}{op_suffix}"
+    path_kwargs = {
+        "uuid": uuid,
+    }
+    url = get_operation_url(
+        client.schema, operation_id, base_url=client.base_url, **path_kwargs
+    )
+    return url
 
 
 # not cached because only used by tools,

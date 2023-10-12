@@ -35,7 +35,6 @@ from open_inwoner.openzaak.models import (
     UserCaseStatusNotification,
 )
 from open_inwoner.openzaak.utils import (
-    format_zaak_identificatie,
     get_zaak_type_config,
     get_zaak_type_info_object_type_config,
     is_info_object_visible,
@@ -358,13 +357,15 @@ def send_case_update_email(user: User, case: Zaak):
     """
     send the actual mail
     """
+    config = OpenZaakConfig.get_solo()
+
     case_detail_url = build_absolute_url(
         reverse("cases:case_detail", kwargs={"object_id": str(case.uuid)})
     )
 
     template = find_template("case_notification")
     context = {
-        "identification": format_zaak_identificatie(case.identificatie),
+        "identification": case.format_zaak_identificatie(case.identificatie, config),
         "type_description": case.zaaktype.omschrijving,
         "start_date": case.startdatum,
         "case_link": case_detail_url,

@@ -19,17 +19,12 @@ from open_inwoner.openzaak.notifications import (
 from open_inwoner.openzaak.tests.factories import generate_rol
 
 from ..api_models import Zaak, ZaakType
-from ..utils import format_zaak_identificatie
 from .test_notification_data import MockAPIData
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class NotificationHandlerUtilsTestCase(TestCase):
-    @patch(
-        "open_inwoner.openzaak.notifications.format_zaak_identificatie",
-        wraps=format_zaak_identificatie,
-    )
-    def test_send_case_update_email(self, spy_format):
+    def test_send_case_update_email(self):
         config = SiteConfiguration.get_solo()
         data = MockAPIData()
 
@@ -41,8 +36,6 @@ class NotificationHandlerUtilsTestCase(TestCase):
         case_url = reverse("cases:case_detail", kwargs={"object_id": str(case.uuid)})
 
         send_case_update_email(user, case)
-
-        spy_format.assert_called_once()
 
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]

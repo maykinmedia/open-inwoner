@@ -6,11 +6,13 @@ from django.views.generic import TemplateView
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.htmx.mixins import RequiresHtmxMixin
+from open_inwoner.openzaak.cases import fetch_cases, preprocess_data
 from open_inwoner.openzaak.formapi import fetch_open_submissions
 from open_inwoner.openzaak.models import OpenZaakConfig
+from open_inwoner.utils.mixins import PaginationMixin
 from open_inwoner.utils.views import CommonPageMixin
 
-from .mixins import CaseAccessMixin, CaseListMixin, OuterCaseAccessMixin
+from .mixins import CaseAccessMixin, CaseLogMixin, OuterCaseAccessMixin
 
 
 class OuterCaseListView(
@@ -35,29 +37,51 @@ class OuterCaseListView(
 
 
 class InnerCaseListView(
-    RequiresHtmxMixin, CommonPageMixin, CaseAccessMixin, CaseListMixin, TemplateView
+    RequiresHtmxMixin,
+    CommonPageMixin,
+    CaseAccessMixin,
+    CaseLogMixin,
+    PaginationMixin,
+    TemplateView,
 ):
     """View on case list"""
 
     template_name = "pages/cases/list_inner.html"
+    paginate_by = 9
 
     def page_title(self):
         return _("Mijn aanvragen")
 
     def get_cases(self):
-        cases = super().get_cases()
+        raw_cases = fetch_cases(self.request.user.bsn)
+        preprocessed_cases = preprocess_data(raw_cases)
+        preprocessed_cases.sort(key=lambda case: case.startdatum, reverse=True)
+        return preprocessed_cases
+
+    def get_submissions(self):
         subs = fetch_open_submissions(self.request.user.bsn)
-
-        cases.sort(key=lambda case: case.startdatum, reverse=True)
         subs.sort(key=lambda sub: sub.datum_laatste_wijziging, reverse=True)
-
-        all_cases = subs + cases
-        return all_cases
+        return subs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         config = OpenZaakConfig.get_solo()
 
+        # update ctx with cases + submissions
+        preprocessed_cases = self.get_cases()
+        open_submissions = self.get_submissions()
+        paginator_dict = self.paginate_with_context(
+            open_submissions + preprocessed_cases
+        )
+        case_dicts = [case.process_data() for case in paginator_dict["object_list"]]
+
+        context["cases"] = case_dicts
+        context.update(paginator_dict)
+
+        for case in case_dicts:
+            self.log_case_access(case)
+
+        # other data
         context["hxget"] = reverse("cases:cases_content")
         context["title_text"] = config.title_text
         return context

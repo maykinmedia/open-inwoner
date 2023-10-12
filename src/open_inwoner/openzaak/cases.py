@@ -9,10 +9,10 @@ from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 from zgw_consumers.service import get_paginated_results
 
+from ..utils.decorators import cache as cache_result
 from .api_models import Resultaat, Rol, Status, Zaak, ZaakInformatieObject
 from .clients import build_client
 from .models import OpenZaakConfig
-from .utils import cache as cache_result
 
 logger = logging.getLogger(__name__)
 
@@ -288,3 +288,73 @@ def connect_case_with_document(case_url: str, document_url: str) -> Optional[dic
         return
 
     return response
+
+
+import copy
+from collections import defaultdict
+
+from open_inwoner.openzaak.cases import fetch_single_status
+from open_inwoner.openzaak.catalog import (
+    fetch_single_case_type,
+    fetch_single_status_type,
+)
+
+from .utils import is_zaak_visible
+
+
+def resolve_zaak_type(cases: list[Zaak]) -> None:
+    """
+    Resolve zaaktype for each case
+
+    Mutates input
+    """
+    case_types = {}
+    case_types_set = {case.zaaktype for case in cases}
+
+    # fetch unique case types
+    for case_type_url in case_types_set:
+        # todo parallel
+        case_types[case_type_url] = fetch_single_case_type(case_type_url)
+
+    # set resolved case types
+    for case in cases:
+        case.zaaktype = case_types[case.zaaktype]
+
+
+def filter_visible(cases: list[Zaak]) -> list[Zaak]:
+    return [case for case in cases if is_zaak_visible(case)]
+
+
+def resolve_status_type(cases: list[Zaak]) -> None:
+    """
+    Fetch status resource and attach to each case
+
+    Mutates input
+    """
+    # fetch case status resources and attach resolved to case
+    status_types = defaultdict(list)
+    for case in cases:
+        if case.status:
+            # todo parallel
+            case.status = fetch_single_status(case.status)
+            status_types[case.status.statustype].append(case)
+
+    for status_type_url, _cases in status_types.items():
+        # todo parallel
+        status_type = fetch_single_status_type(status_type_url)
+        for case in _cases:
+            case.status.statustype = status_type
+
+
+def preprocess_data(cases: list[Zaak]) -> list[Zaak]:
+    """
+    Resolve zaaktype and statustype, filter for visibility
+
+    Input is copied since it is mutated and returned
+    """
+    _cases = copy.copy(cases)
+
+    resolve_zaak_type(_cases)
+    resolve_status_type(_cases)
+
+    return filter_visible(_cases)

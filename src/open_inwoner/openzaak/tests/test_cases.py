@@ -15,31 +15,27 @@ from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
-from open_inwoner.cms.cases.views.mixins import CaseListMixin
+from open_inwoner.cms.cases.views.cases import InnerCaseListView
 from open_inwoner.openzaak.tests.shared import FORMS_ROOT
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 
 from ...utils.tests.helpers import AssertRedirectsMixin
 from ..constants import StatusIndicators
 from ..models import OpenZaakConfig
-from ..utils import format_zaak_identificatie
 from .factories import (
     ServiceFactory,
     StatusTranslationFactory,
     ZaakTypeStatusTypeConfigFactory,
 )
+from ..api_models import Zaak
 from .mocks import ESuiteData
 from .shared import CATALOGI_ROOT, ZAKEN_ROOT
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class CaseListAccessTests(AssertRedirectsMixin, ClearCachesMixin, WebTest):
-    outer_urls = [
-        reverse_lazy("cases:index"),
-    ]
-    inner_urls = [
-        reverse_lazy("cases:cases_content"),
-    ]
+    outer_url = reverse_lazy("cases:index")
+    inner_url = reverse_lazy("cases:cases_content")
 
     @classmethod
     def setUpTestData(cls):
@@ -63,18 +59,14 @@ class CaseListAccessTests(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             last_name="",
             login_type=LoginTypeChoices.default,
         )
-        for url in self.outer_urls:
-            with self.subTest(url):
-                self.app.get(url, user=user, status=403)
+        self.app.get(self.outer_url, user=user, status=403)
 
     def test_anonymous_user_has_no_access_to_cases_page(self):
         user = AnonymousUser()
 
-        for url in self.outer_urls:
-            with self.subTest(url):
-                response = self.app.get(url, user=user)
+        response = self.app.get(self.outer_url, user=user)
 
-                self.assertRedirectsLogin(response, next=url)
+        self.assertRedirectsLogin(response, next=self.outer_url)
 
     def test_bad_request_when_no_htmx_in_inner_urls(self):
         user = UserFactory(
@@ -83,9 +75,7 @@ class CaseListAccessTests(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             login_type=LoginTypeChoices.default,
         )
 
-        for url in self.inner_urls:
-            with self.subTest(url):
-                self.app.get(url, user=user, status=400)
+        self.app.get(self.inner_url, user=user, status=400)
 
     def test_missing_zaak_client_returns_empty_list(self):
         user = UserFactory(
@@ -94,11 +84,11 @@ class CaseListAccessTests(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.config.zaak_service = None
         self.config.save()
 
-        for url in self.inner_urls:
-            with self.subTest(url):
-                response = self.app.get(url, user=user, headers={"HX-Request": "true"})
+        response = self.app.get(
+            self.inner_url, user=user, headers={"HX-Request": "true"}
+        )
 
-                self.assertListEqual(response.context.get("cases"), [])
+        self.assertListEqual(response.context.get("cases"), [])
 
     @requests_mock.Mocker()
     def test_no_cases_are_retrieved_when_http_404(self, m):
@@ -111,11 +101,11 @@ class CaseListAccessTests(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             status_code=404,
         )
 
-        for url in self.inner_urls:
-            with self.subTest(url):
-                response = self.app.get(url, user=user, headers={"HX-Request": "true"})
+        response = self.app.get(
+            self.inner_url, user=user, headers={"HX-Request": "true"}
+        )
 
-                self.assertListEqual(response.context.get("cases"), [])
+        self.assertListEqual(response.context.get("cases"), [])
 
     @requests_mock.Mocker()
     def test_no_cases_are_retrieved_when_http_500(self, m):
@@ -128,11 +118,11 @@ class CaseListAccessTests(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             status_code=500,
         )
 
-        for url in self.inner_urls:
-            with self.subTest(url):
-                response = self.app.get(url, user=user, headers={"HX-Request": "true"})
+        response = self.app.get(
+            self.inner_url, user=user, headers={"HX-Request": "true"}
+        )
 
-                self.assertListEqual(response.context.get("cases"), [])
+        self.assertListEqual(response.context.get("cases"), [])
 
 
 @requests_mock.Mocker()
@@ -233,7 +223,8 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
             url=f"{ZAKEN_ROOT}zaken/e4d469b9-6666-4bdd-bf42-b53445298102",
             uuid="e4d469b9-6666-4bdd-bf42-b53445298102",
             zaaktype=cls.zaaktype["url"],
-            identificatie="ZAAK-2022-0008800002",
+            # identificatie="ZAAK-2022-0008800002",
+            identificatie="0014ESUITE66392022",
             omschrijving="Coffee zaak 2",
             startdatum="2022-01-12",
             einddatum=None,
@@ -395,17 +386,59 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
             },
         )
 
-    def test_list_cases_reformats_zaak_identificatie(self, m):
+    def test_format_zaak_identificatie(self, m):
+        config = OpenZaakConfig.get_solo()
         self._setUpMocks(m)
 
-        with patch(
-            "open_inwoner.cms.cases.views.mixins.format_zaak_identificatie",
-            wraps=format_zaak_identificatie,
-        ) as spy_format:
-            self.app.get(self.inner_url, user=self.user, headers={"HX-Request": "true"})
+        with self.subTest("formatting enabled"):
+            config.reformat_esuite_zaak_identificatie = True
+            config.save()
 
-        spy_format.assert_called()
-        self.assertEqual(spy_format.call_count, 3)
+            response = self.app.get(
+                self.inner_url, user=self.user, headers={"HX-Request": "true"}
+            )
+
+            e_suite_case = next(
+                (
+                    case
+                    for case in response.context["cases"]
+                    if case["uuid"] == self.zaak2["uuid"]
+                )
+            )
+
+            self.assertEqual(e_suite_case["identificatie"], "6639-2022")
+
+        with self.subTest("formatting disabled"):
+            config.reformat_esuite_zaak_identificatie = False
+            config.save()
+
+            response = self.app.get(
+                self.inner_url, user=self.user, headers={"HX-Request": "true"}
+            )
+
+            e_suite_case = next(
+                (
+                    case
+                    for case in response.context["cases"]
+                    if case["uuid"] == self.zaak2["uuid"]
+                )
+            )
+
+            self.assertEqual(e_suite_case["identificatie"], "0014ESUITE66392022")
+
+    def test_reformat_esuite_zaak_identificatie(self, m):
+        tests = [
+            ("0014ESUITE66392022", "6639-2022"),
+            ("4321ESUITE00011991", "0001-1991"),
+            ("4321ESUITE123456781991", "12345678-1991"),
+            ("12345678", "12345678"),
+            ("aaaaaa1234", "aaaaaa1234"),
+        ]
+
+        for value, expected in tests:
+            with self.subTest(value=value, expected=expected):
+                actual = Zaak._reformat_esuite_zaak_identificatie(value)
+                self.assertEqual(actual, expected)
 
     def test_list_cases_translates_status(self, m):
         st1 = StatusTranslationFactory(
@@ -418,6 +451,9 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
         )
         self.assertNotContains(response, st1.status)
         self.assertContains(response, st1.translation)
+
+    def test_zaak_proecess_data(self, m):
+        pass
 
     def test_list_cases_logs_displayed_case_ids(self, m):
         self._setUpMocks(m)
@@ -451,7 +487,7 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
                 self.zaak_intern["identificatie"], log.extra_data["message"]
             )
 
-    @patch.object(CaseListMixin, "paginate_by", 1)
+    @patch.object(InnerCaseListView, "paginate_by", 1)
     def test_list_cases_paginated(self, m):
         """
         show only one case and url to the next page
@@ -503,7 +539,7 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
         self.assertNotContains(response_2, self.zaak2["identificatie"])
         self.assertContains(response_2, "?page=1")
 
-    @patch.object(CaseListMixin, "paginate_by", 1)
+    @patch.object(InnerCaseListView, "paginate_by", 1)
     def test_list_cases_paginated_logs_displayed_case_ids(self, m):
         self._setUpMocks(m)
 

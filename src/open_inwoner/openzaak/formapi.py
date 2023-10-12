@@ -22,6 +22,16 @@ class OpenSubmission(Model):
     vervolg_link: Optional[str] = None
     eind_datum_geldigheid: Optional[datetime] = None
 
+    def process_data(self):
+        return {
+            "url": self.url,
+            "uuid": self.uuid,
+            "naam": self.naam,
+            "vervolg_link": self.vervolg_link,
+            "datum_laatste_wijziging": self.datum_laatste_wijziging,
+            "eind_datum_geldigheid": self.eind_datum_geldigheid or "Geen",
+        }
+
 
 def fetch_open_submissions(bsn: str) -> List[OpenSubmission]:
     if not bsn:

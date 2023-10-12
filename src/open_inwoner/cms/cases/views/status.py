@@ -44,11 +44,7 @@ from open_inwoner.openzaak.models import (
     ZaakTypeConfig,
     ZaakTypeInformatieObjectTypeConfig,
 )
-from open_inwoner.openzaak.utils import (
-    format_zaak_identificatie,
-    get_role_name_display,
-    is_info_object_visible,
-)
+from open_inwoner.openzaak.utils import get_role_name_display, is_info_object_visible
 from open_inwoner.utils.translate import TranslationLookup
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
@@ -109,7 +105,7 @@ class InnerCaseDetailView(
         context = super().get_context_data(**kwargs)
 
         if self.case:
-            self.log_case_access(self.case.identificatie)
+            self.log_case_access(self.case.process_data())
             config = OpenZaakConfig.get_solo()
             status_translate = StatusTranslation.objects.get_lookup()
 
@@ -137,7 +133,7 @@ class InnerCaseDetailView(
 
             context["case"] = {
                 "id": str(self.case.uuid),
-                "identification": format_zaak_identificatie(
+                "identification": self.case.format_zaak_identificatie(
                     self.case.identificatie, config
                 ),
                 "initiator": self.get_initiator_display(self.case),
@@ -341,7 +337,7 @@ class CaseDocumentDownloadView(LogMixin, CaseAccessMixin, View):
         raise PermissionDenied()
 
 
-class CaseDocumentUploadFormView(CaseAccessMixin, CaseLogMixin, FormView):
+class CaseDocumentUploadFormView(CaseAccessMixin, LogMixin, FormView):
     template_name = "pages/cases/document_form.html"
     form_class = CaseUploadForm
 
@@ -424,7 +420,8 @@ class CaseDocumentUploadFormView(CaseAccessMixin, CaseLogMixin, FormView):
         return context
 
 
-class CaseContactFormView(CaseAccessMixin, CaseLogMixin, FormView):
+# TODO why does does use CaseLogMixin?
+class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
     template_name = "pages/cases/contact_form.html"
     form_class = CaseContactForm
 
