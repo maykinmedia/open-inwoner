@@ -888,4 +888,5 @@ ACCOUNTS_SMS_GATEWAY = {
 
 from .app.csp import *  # noqa
 
-SECURE_REFERRER_POLICY = "same-origin"
+SECURE_REFERRER_POLICY = "origin-when-cross-origin"
+# SECURE_REFERRER_POLICY = "same-origin"
