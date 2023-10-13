@@ -29,7 +29,7 @@ class MonthlyChoicesTest(TestCase):
         self.assertEqual(date.month, 1)
 
         date_repr = choices[0][1]
-        self.assertEqual(date_repr, "Jan 1985")
+        self.assertEqual(date_repr, "januari 1985")
 
     @freeze_time("1985-01-25")
     @patch("open_inwoner.ssd.forms.SSDConfig.get_solo")
@@ -50,7 +50,7 @@ class MonthlyChoicesTest(TestCase):
         self.assertEqual(date.month, 12)
 
         date_repr = choices[0][1]
-        self.assertEqual(date_repr, "Dec 1984")
+        self.assertEqual(date_repr, "december 1984")
 
     @patch("open_inwoner.ssd.forms.SSDConfig.get_solo")
     def test_monthly_reports_not_enabled(self, mock_solo):
