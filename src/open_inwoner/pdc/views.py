@@ -1,5 +1,6 @@
 from django.db.models import Q
 from django.http import Http404, HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
@@ -32,7 +33,7 @@ class CategoryBreadcrumbMixin:
                     {
                         "slug": sl,
                         "build_slug": f"{older_slugs}/{sl}" if older_slugs else sl,
-                        "category": Category.objects.get(slug=sl),
+                        "category": get_object_or_404(Category, slug=sl),
                     }
                 )
                 if older_slugs:
