@@ -32,7 +32,7 @@ def get_monthly_report_dates() -> list[tuple[date, str]]:
 
     choices = []
     for report_date in dates:
-        formatted = django_date(report_date, "M Y")
+        formatted = django_date(report_date, "F Y")
         choices.append((report_date.date(), formatted))
 
     return choices
