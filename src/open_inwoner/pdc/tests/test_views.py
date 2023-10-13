@@ -108,3 +108,10 @@ class CategoryDetailViewTest(TestCase):
             '[<p class="p">A <em>descriptive</em> description</p>, <em>descriptive</em>]',
             response.rendered_content,
         )
+
+    def test_category_breadcrumbs_404(self):
+        url = reverse(
+            "products:category_detail", kwargs={"slug": f"none/{self.category.slug}"}
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
