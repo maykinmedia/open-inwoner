@@ -1,4 +1,4 @@
-{% load i18n anchor_menu_tags card_tags dashboard_tags file_tags grid_tags table_tags solo_tags button_tags icon_tags notification_tags %}
+{% load i18n ssd_tags anchor_menu_tags card_tags dashboard_tags file_tags grid_tags table_tags solo_tags button_tags icon_tags notification_tags %}
 
 {# Anchor menu-mobile #}
 <div id="cases-status-anchors-oob-mobile" hx-swap-oob="true">
@@ -52,6 +52,15 @@
 
             {% if case.internal_upload_enabled %}
                 <h2 class="h2" id=>{% trans "Document uploaden" %}</h2>
+
+                <div class="card card--compact card--info">
+                    <div class="card__body document-upload-description">
+                        <p>{% icon icon="info" icon_position="after" extra_classes="icon--info" %}</p>
+
+                        <div>{{ case.case_type_document_upload_description|markdown|safe }}</div>
+                    </div>
+                </div>
+
                 {% if case.case_type_config_description %}
                     <p class="p">{{ case.case_type_config_description }}</p>
                 {% else %}

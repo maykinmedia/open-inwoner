@@ -19,6 +19,11 @@
     display: inline-flex;
   }
 
+  &--info {
+    background-color: $color-info;
+    color: $color-info-dark;
+  }
+
   &--stretch {
     height: 100%;
   }
