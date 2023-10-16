@@ -8,7 +8,6 @@ export class ReadMore {
   }
 
   toggleReadMore(event) {
-    event.preventDefault()
     setTimeout(() => {
       this.node.classList.toggle('readmore--open')
       this.button.setAttribute(
