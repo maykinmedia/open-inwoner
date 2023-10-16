@@ -1,12 +1,15 @@
 from django.contrib import admin, messages
 from django.core.exceptions import ValidationError
 from django.db.models import BooleanField, Count, ExpressionWrapper, Q
+from django.forms import ModelForm
 from django.forms.models import BaseInlineFormSet
 from django.utils.translation import gettext_lazy as _, ngettext
 
 from import_export.admin import ImportExportMixin
 from import_export.formats import base_formats
 from solo.admin import SingletonModelAdmin
+
+from open_inwoner.ckeditor5.widgets import CKEditorWidget
 
 from .models import (
     CatalogusConfig,
@@ -158,6 +161,13 @@ class ZaakTypeInformatieObjectTypeConfigInline(admin.TabularInline):
         return request.user.is_superuser
 
 
+class ZaakTypeStatusTypeConfigInlineAdminForm(ModelForm):
+    class Meta:
+        model = ZaakTypeStatusTypeConfig
+        fields = "__all__"
+        widgets = {"document_upload_description": CKEditorWidget}
+
+
 class ZaakTypeStatusTypeConfigInline(admin.TabularInline):
     model = ZaakTypeStatusTypeConfig
     fields = [
@@ -167,6 +177,7 @@ class ZaakTypeStatusTypeConfigInline(admin.TabularInline):
         "zaaktype_uuids",
         "status_indicator",
         "status_indicator_text",
+        "document_upload_description",
     ]
     readonly_fields = [
         "statustekst",
@@ -178,6 +189,7 @@ class ZaakTypeStatusTypeConfigInline(admin.TabularInline):
         "zaaktype_uuids",
         "omschrijving",
     )
+    form = ZaakTypeStatusTypeConfigInlineAdminForm
 
     def has_add_permission(self, request, obj):
         return False
