@@ -34,6 +34,7 @@ from ...utils.tests.helpers import AssertRedirectsMixin
 from ..api_models import Status, StatusType
 from ..models import OpenZaakConfig
 
+# TODO delete
 # from ..utils import format_zaak_identificatie
 from .factories import CatalogusConfigFactory, ServiceFactory
 from .shared import CATALOGI_ROOT, DOCUMENTEN_ROOT, ZAKEN_ROOT
@@ -367,7 +368,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             response.context.get("case"),
             {
                 "id": self.zaak["uuid"],
-                "identification": "0014ESUITE66392022",
+                "identification": "ZAAK-2022-0000000024",
                 "start_date": datetime.date(2022, 1, 2),
                 "end_date": None,
                 "end_date_planned": datetime.date(2022, 1, 4),

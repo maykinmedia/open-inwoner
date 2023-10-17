@@ -71,15 +71,14 @@ class InnerCaseListView(
         preprocessed_cases = self.get_cases()
         open_submissions = self.get_submissions()
         paginator_dict = self.paginate_with_context(
-            open_submissions + preprocessed_cases
+            [*open_submissions, *preprocessed_cases]
         )
         case_dicts = [case.process_data() for case in paginator_dict["object_list"]]
 
         context["cases"] = case_dicts
         context.update(paginator_dict)
 
-        for case in case_dicts:
-            self.log_case_access(case)
+        self.log_access_cases(case_dicts)
 
         # other data
         context["hxget"] = reverse("cases:cases_content")

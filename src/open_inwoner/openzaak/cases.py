@@ -1,4 +1,6 @@
+import copy
 import logging
+from collections import defaultdict
 from typing import List, Optional
 
 from django.conf import settings
@@ -11,8 +13,10 @@ from zgw_consumers.service import get_paginated_results
 
 from ..utils.decorators import cache as cache_result
 from .api_models import Resultaat, Rol, Status, Zaak, ZaakInformatieObject
+from .catalog import fetch_single_case_type, fetch_single_status_type
 from .clients import build_client
 from .models import OpenZaakConfig
+from .utils import is_zaak_visible
 
 logger = logging.getLogger(__name__)
 
@@ -290,18 +294,6 @@ def connect_case_with_document(case_url: str, document_url: str) -> Optional[dic
     return response
 
 
-import copy
-from collections import defaultdict
-
-from open_inwoner.openzaak.cases import fetch_single_status
-from open_inwoner.openzaak.catalog import (
-    fetch_single_case_type,
-    fetch_single_status_type,
-)
-
-from .utils import is_zaak_visible
-
-
 def resolve_zaak_type(cases: list[Zaak]) -> None:
     """
     Resolve zaaktype for each case
@@ -352,7 +344,7 @@ def preprocess_data(cases: list[Zaak]) -> list[Zaak]:
 
     Input is copied since it is mutated and returned
     """
-    _cases = copy.copy(cases)
+    _cases = copy.deepcopy(cases)
 
     resolve_zaak_type(_cases)
     resolve_status_type(_cases)

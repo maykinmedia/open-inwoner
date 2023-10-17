@@ -223,7 +223,6 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
             url=f"{ZAKEN_ROOT}zaken/e4d469b9-6666-4bdd-bf42-b53445298102",
             uuid="e4d469b9-6666-4bdd-bf42-b53445298102",
             zaaktype=cls.zaaktype["url"],
-            # identificatie="ZAAK-2022-0008800002",
             identificatie="0014ESUITE66392022",
             omschrijving="Coffee zaak 2",
             startdatum="2022-01-12",

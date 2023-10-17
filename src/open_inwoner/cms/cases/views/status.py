@@ -87,6 +87,7 @@ class InnerCaseDetailView(
     template_name = "pages/cases/status_inner.html"
     form_class = CaseUploadForm
     contact_form_class = CaseContactForm
+    case: Zaak = None
 
     @cached_property
     def crumbs(self):
@@ -104,8 +105,10 @@ class InnerCaseDetailView(
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        # case is retrieved via CaseAccessMixin
         if self.case:
-            self.log_case_access(self.case.process_data())
+            self.log_access_case_detail(self.case)
+
             config = OpenZaakConfig.get_solo()
             status_translate = StatusTranslation.objects.get_lookup()
 

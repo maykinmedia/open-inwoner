@@ -22,11 +22,16 @@ class OpenSubmission(Model):
     vervolg_link: Optional[str] = None
     eind_datum_geldigheid: Optional[datetime] = None
 
+    @property
+    def identificatie(self):
+        return f"{self.naam}: {self.uuid}"
+
     def process_data(self):
         return {
             "url": self.url,
             "uuid": self.uuid,
             "naam": self.naam,
+            "identificatie": self.identificatie,
             "vervolg_link": self.vervolg_link,
             "datum_laatste_wijziging": self.datum_laatste_wijziging,
             "eind_datum_geldigheid": self.eind_datum_geldigheid or "Geen",
