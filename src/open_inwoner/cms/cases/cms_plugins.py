@@ -7,6 +7,7 @@ from cms.plugin_pool import plugin_pool
 from open_inwoner.openzaak.cases import fetch_cases
 from open_inwoner.openzaak.formapi import fetch_open_submissions
 
+from ..utils.auth import check_user_access_rights, check_user_auth
 from ..utils.plugin_mixins import CMSActiveAppMixin
 
 
@@ -23,10 +24,18 @@ class CasesPlugin(CMSActiveAppMixin, CMSPluginBase):
 
     def render(self, context, instance, placeholder):
         request = context["request"]
+        user = request.user
 
-        raw_cases = [
-            case for case in fetch_cases(request.user.bsn) if not case.einddatum
-        ]
+        if not check_user_auth(user, digid_required=True):
+            context["cases"] = None
+            return context
+
+        raw_cases = [case for case in fetch_cases(user.bsn) if not case.einddatum]
+
+        if not all(check_user_access_rights(user, case.url) for case in raw_cases):
+            context["cases"] = None
+            return context
+
         # TODO
         # preprocessed_cases = preprocess_data(raw_cases)
 
