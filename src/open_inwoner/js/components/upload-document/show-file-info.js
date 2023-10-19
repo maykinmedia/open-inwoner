@@ -37,7 +37,7 @@ export class ShowInfo {
     })
 
     this.fileUploadInput.addEventListener('change', function (e) {
-      const files = e.target.files
+      const files = Array.from(e.target.files)
 
       if ((files.length === 0) | (files === null) | (files === undefined)) {
         submit_upload.disabled = true
@@ -46,12 +46,8 @@ export class ShowInfo {
         iconDrive.forEach((elem) => {
           elem.classList.add('error')
         })
-
-        // Hide the size element if user doesn't choose any file
-        formControlInfo.forEach((elem) => {
-          elem.style.display = 'none'
-        })
       } else {
+        console.log('array in target-files object:', files)
         submit_upload.disabled = false
         validationInfo.classList.remove('error')
         closeButton.classList.remove('error')
@@ -59,9 +55,45 @@ export class ShowInfo {
           elem.classList.remove('error')
         })
 
-        // Display info
-        sizeInfo.textContent = formatFileSize(files[0].size)
-        nameInfo.textContent = `${files[0].name}`
+        // Display info old
+        // sizeInfo.textContent = formatFileSize(files[0].size)
+        // nameInfo.textContent = `${files[0].name}`
+
+        // Display sizes for all selected files
+        const fileSizes = []
+        files.forEach((file) => {
+          fileSizes.push(formatFileSize(file.size))
+        })
+
+        // Join the file sizes into a single string with commas and spaces for separation
+        const sizes = fileSizes.join(', \n')
+
+        // Set the sizes in the DOM
+        // sizeInfo.textContent = sizes
+
+        // Display info for all selected files, for testing
+        let names = ''
+
+        files.forEach((file, index) => {
+          const fileNameDiv = document.createElement('div')
+          const fileSizeDiv = document.createElement('div')
+          fileNameDiv.textContent = file.name
+          fileSizeDiv.textContent = file.size
+          nameInfo.appendChild(fileNameDiv)
+          sizeInfo.appendChild(fileSizeDiv)
+
+          // what
+          names += `${nameInfo.textContent} `
+
+          // If not the last file, add a comma and space for separation
+          if (index < files.length - 1) {
+            names += ', \n'
+          }
+        })
+
+        // Set the names in the DOM
+        nameInfo.textContent = names
+
         // Display in DOM
         formControlInfo.forEach((elem) => {
           elem.classList.remove('form__control__info')
@@ -91,7 +123,8 @@ export class ShowInfo {
       .querySelectorAll('.file-type__select')
       .forEach(function (selectType) {
         if (selectType.querySelector('input[type="hidden"]')) {
-          selectType.style.display = 'none'
+          //for testing
+          selectType.style.backgroundColor = 'orange'
         }
       })
 

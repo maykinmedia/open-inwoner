@@ -11,6 +11,24 @@ from open_inwoner.openzaak.models import (
 from open_inwoner.utils.validators import CharFieldValidator
 
 
+class MultipleFileInput(forms.ClearableFileInput):
+    allow_multiple_selected = True
+
+
+class MultipleFileField(forms.FileField):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("widget", MultipleFileInput())
+        super().__init__(*args, **kwargs)
+
+    def clean(self, data, initial=None):
+        single_file_clean = super().clean
+        if isinstance(data, (list, tuple)):
+            result = [single_file_clean(d, initial) for d in data]
+        else:
+            result = single_file_clean(data, initial)
+        return result
+
+
 class CaseUploadForm(forms.Form):
     title = forms.CharField(
         label=_("Titel bestand"), max_length=255, validators=[CharFieldValidator()]
@@ -20,7 +38,7 @@ class CaseUploadForm(forms.Form):
         empty_label=None,
         label=_("Bestand type"),
     )
-    file = forms.FileField(label=_("Bestand"))
+    file = MultipleFileField(label=_("Bestand"))
 
     def __init__(self, case, **kwargs):
         super().__init__(**kwargs)
