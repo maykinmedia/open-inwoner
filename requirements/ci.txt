@@ -501,7 +501,7 @@ faker==9.9.0
     #   -r requirements/base.txt
     #   factory-boy
     #   zgw-consumers
-fontawesomefree==6.1.1
+fontawesomefree==6.4.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
