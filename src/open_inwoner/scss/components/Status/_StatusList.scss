@@ -9,26 +9,68 @@
     position: relative;
   }
 
-  &__list:before {
-    content: '';
-    background-color: var(--color-success);
-    display: block;
-    height: calc(100% - 1.5em);
-    left: 11px;
-    position: absolute;
-    top: 0.75em;
-    width: 2px;
-    z-index: -1;
-  }
-
   &__list-item {
     display: flex;
     gap: var(--spacing-large);
+
+    h3 {
+      display: inline-block;
+      width: calc(100% - 2em);
+    }
+
+    .material-icons,
+    .material-icons-outlined {
+      box-sizing: border-box;
+      color: var(--color-success);
+      position: relative;
+      width: var(--spacing-extra-large);
+      z-index: 3;
+
+      &::before {
+        content: '';
+        background-color: white;
+        border-radius: 50%;
+        top: 2px;
+        left: 2px;
+        height: 20px;
+        width: 20px;
+        position: absolute;
+        z-index: -1;
+      }
+    }
+
+    &--info {
+      background-color: var(--color-info-lighter);
+
+      .material-icons,
+      .material-icons-outlined {
+        color: var(--color-info-darker);
+
+        &::before {
+          background-color: transparent;
+        }
+      }
+    }
   }
 
-  [class*='icon'] {
-    color: var(--color-success);
-    background-color: var(--color-white);
+  &__notification {
+    padding: var(--spacing-extra-large);
+    &-content {
+      margin-left: 2em;
+
+      &::before {
+        content: '';
+        background-color: var(--color-success);
+        display: block;
+        height: calc(100% - 4.3em);
+        left: 11px;
+        margin-left: var(--spacing-extra-large);
+        position: absolute;
+        top: 1.3em;
+        width: 2px;
+        z-index: 1;
+      }
+    }
   }
 }
 

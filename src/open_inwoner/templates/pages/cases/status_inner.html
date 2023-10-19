@@ -10,21 +10,16 @@
     {% notifications messages %}
 </div>
 
-{# Anchor menu-desktop #}
-<div id="cases-status-anchors-oob" hx-swap-oob="true">
-    {% anchor_menu anchors desktop=True %}
-</div>
-
 {% get_solo 'openzaak.OpenZaakConfig' as openzaak_config %}
 
 {% if case %}
     {% render_grid %}
-        {% render_column span=9 %}
-
+        {% render_column span=12 %}
             {# Title/dashboard. #}
             <h1 class="h1" id="title">{{ case.description }}</h1>
             {% case_dashboard case %}
-            {% case_table case %}
+        {% endrender_column %}
+        {% render_column start=4 span=6 %}
 
             {#  Status history. #}
             {% if case.statuses %}
@@ -33,13 +28,31 @@
                 <aside class="status-list" aria-label="{% trans "Status lijst" %}">
                     <ul class="status-list__list">
                         {% for status in case.statuses %}
-                        <li class="status-list__list-item">
-                            {% icon icon="task_alt" %}
-                            <p class="p p--compact">{{ status.date|date }}</p>
-                            <p class="p p--compact">{{ status.label }}</p>
+                        <li class="status-list__list-item status-list__list-item--info">
+                            <div class="status-list__notification status-list__notification--info">
+{#                                {{ case.statustype_config }}#}
+                                <h3><a href="#" class="link toggle link--bold link--icon link--secondary">{{ status.label }}</a>{% icon icon="expand_more" icon_position="after" outlined=True %}</h3>
+                                <div class="status-list__notification-content">
+                                    <p class="p p--compact">Uw aanvraag kan pas verder in behandeling worden genomen nadat u de benodigde documenten hebt geüpload. Voeg de gegevens toe voor <strong>30 september 2020</strong>.</p>
+                                    <p class="p p--compact">{{ status.date|date }}</p>
+                                </div>
+                            </div>
                         </li>
                         {% endfor %}
+                        {# {% if ... end-status %}#}
+                        <li class="status-list__list-item">
+                            <div class="status-list__notification">
+                                {% icon icon="circle_outlined" icon_position="before" outlined=True %}
+                                <h3><a href="#" class="link toggle link--bold link--icon link--secondary">Aanvraag afgerond</a>{% icon icon="expand_more" icon_position="after" outlined=True %}</h3>
+                                <div class="status-list__notification-content">
+                                    <p class="p p--compact">Aanvraag afgerond.</p>
+                                </div>
+                            </div>
+                        </li>
+                        {# {% endif %}#}
                     </ul>
+
+
                 </aside>
 
             {% endif %}
@@ -51,6 +64,7 @@
             {% endif %}
 
             {% if case.internal_upload_enabled %}
+                <h2 class="h2" id="documents">{% trans "Document uploaden" %}</h2>
                 <h2 class="h2" id=>{% trans "Document uploaden" %}</h2>
 
                 {% if case.case_type_document_upload_description %}

@@ -12,6 +12,10 @@
     cursor: pointer;
   }
 
+  &__detail {
+    box-sizing: border-box;
+  }
+
   &__title_text {
     padding-top: var(--spacing-medium);
     padding-bottom: var(--spacing-extra-large);
@@ -58,7 +62,6 @@
   background-color: $color-danger;
   color: $color-danger-dark;
   padding: 0.4em;
-}
 
 .icon--success {
   margin-right: 0.2em;
