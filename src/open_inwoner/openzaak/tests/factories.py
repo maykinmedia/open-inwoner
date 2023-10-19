@@ -17,6 +17,7 @@ from open_inwoner.openzaak.models import (
     UserCaseStatusNotification,
     ZaakTypeConfig,
     ZaakTypeInformatieObjectTypeConfig,
+    ZaakTypeStatusTypeConfig,
 )
 
 
@@ -109,6 +110,15 @@ class ZaakTypeInformatieObjectTypeConfigFactory(factory.django.DjangoModelFactor
         if extra_kwargs:
             kwargs.update(extra_kwargs)
         return ZaakTypeInformatieObjectTypeConfigFactory(**kwargs)
+
+
+class ZaakTypeStatusTypeConfigFactory(factory.django.DjangoModelFactory):
+    zaaktype_config = factory.SubFactory(ZaakTypeConfigFactory)
+    statustype_url = factory.Faker("url")
+    omschrijving = factory.Faker("pystr", max_chars=80)
+
+    class Meta:
+        model = ZaakTypeStatusTypeConfig
 
 
 class UserCaseStatusNotificationFactory(factory.django.DjangoModelFactory):

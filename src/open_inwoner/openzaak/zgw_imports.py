@@ -3,19 +3,21 @@ from typing import List, Tuple
 
 from django.db import transaction
 
-from zgw_consumers.api_models.catalogi import InformatieObjectType
+from zgw_consumers.api_models.catalogi import InformatieObjectType, StatusType
 
 from open_inwoner.openzaak.api_models import ZaakType
 from open_inwoner.openzaak.catalog import (
     fetch_case_types_by_identification_no_cache,
     fetch_catalogs_no_cache,
     fetch_single_information_object_type,
+    fetch_single_status_type,
     fetch_zaaktypes_no_cache,
 )
 from open_inwoner.openzaak.models import (
     CatalogusConfig,
     ZaakTypeConfig,
     ZaakTypeInformatieObjectTypeConfig,
+    ZaakTypeStatusTypeConfig,
 )
 
 
@@ -134,6 +136,18 @@ def import_zaaktype_informatieobjecttype_configs() -> List[
     return created
 
 
+def import_zaaktype_statustype_configs() -> List[Tuple[ZaakTypeConfig, StatusType]]:
+    """
+    generate ZaakTypeStatusTypeConfigs for all ZaakTypeConfig
+    """
+    created = []
+    for ztc in ZaakTypeConfig.objects.all():
+        imported = import_statustype_configs_for_type(ztc)
+        if imported:
+            created.append((ztc, imported))
+    return created
+
+
 def import_zaaktype_informatieobjecttype_configs_for_type(
     ztc: ZaakTypeConfig,
 ) -> List[ZaakTypeInformatieObjectTypeConfig]:
@@ -198,5 +212,73 @@ def import_zaaktype_informatieobjecttype_configs_for_type(
             ZaakTypeInformatieObjectTypeConfig.objects.bulk_update(
                 update, ["zaaktype_uuids"]
             )
+
+    return create
+
+
+def import_statustype_configs_for_type(
+    ztc: ZaakTypeConfig,
+) -> List[ZaakTypeStatusTypeConfig]:
+    """
+    generate ZaakTypeStatusTypeConfigs for all StatusTypes used by each ZaakTypeConfigs source ZaakTypes
+
+    this is a bit complicated because one ZaakTypeConfig can represent multiple ZaakTypes
+    """
+
+    # grab actual ZaakTypes for this identificatie
+    zaak_types: List[ZaakType] = get_configurable_zaaktypes_by_identification(
+        ztc.identificatie, ztc.catalogus_url
+    )
+    if not zaak_types:
+        return []
+
+    create = []
+    update = []
+
+    with transaction.atomic():
+        # map existing config records by url
+
+        info_map = {
+            zaaktype_statustype.statustype_url: zaaktype_statustype
+            for zaaktype_statustype in ztc.zaaktypestatustypeconfig_set.all()
+        }
+
+        # collect and implicitly de-duplicate informatieobjecttype url's and track which zaaktype used it
+        info_queue = defaultdict(list)
+        for zaak_type in zaak_types:
+            for url in zaak_type.statustypen:
+                info_queue[url].append(zaak_type)
+
+        if info_queue:
+            # load urls and update/create records
+            for statustype_url, using_zaak_types in info_queue.items():
+                status_type = fetch_single_status_type(statustype_url)
+
+                zaaktype_statustype = info_map.get(status_type.url)
+                if zaaktype_statustype:
+                    # we got a record for this, see if we got data to update
+                    for using in using_zaak_types:
+                        # track which zaaktype UUID's are interested in this statustype
+                        if using.uuid not in zaaktype_statustype.zaaktype_uuids:
+                            zaaktype_statustype.zaaktype_uuids.append(using.uuid)
+                            if zaaktype_statustype not in create:
+                                update.append(zaaktype_statustype)
+                else:
+                    # new record
+                    zaaktype_statustype = ZaakTypeStatusTypeConfig(
+                        zaaktype_config=ztc,
+                        statustype_url=status_type.url,
+                        omschrijving=status_type.omschrijving,
+                        statustekst=status_type.statustekst,
+                        zaaktype_uuids=[zt.uuid for zt in using_zaak_types],
+                    )
+                    create.append(zaaktype_statustype)
+                    # not strictly necessary but let's be accurate
+                    info_map[status_type.uuid] = zaaktype_statustype
+
+        if create:
+            ZaakTypeStatusTypeConfig.objects.bulk_create(create)
+        if update:
+            ZaakTypeStatusTypeConfig.objects.bulk_update(update, ["zaaktype_uuids"])
 
     return create

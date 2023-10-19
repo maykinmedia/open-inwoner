@@ -1,0 +1,10 @@
+{% load icon_tags %}
+<div class="card__header {{ status_indicator }}">
+    {% if status_indicator == "success" %}
+        {% icon icon="check_circle" icon_position="after" extra_classes="icon--"|add:status_indicator %} {{status_indicator_text}}
+    {% elif status_indicator == "failure" %}
+        {% icon icon="cancel" icon_position="after" extra_classes="icon--"|add:status_indicator %} {{status_indicator_text}}
+    {% else %}
+        {% icon icon=status_indicator icon_position="after" extra_classes="icon--"|add:status_indicator %} {{status_indicator_text}}
+    {% endif %}
+</div>

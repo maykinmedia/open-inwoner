@@ -19,6 +19,8 @@ from open_inwoner.openzaak.managers import (
     ZaakTypeInformatieObjectTypeConfigQueryset,
 )
 
+from .constants import StatusIndicators
+
 
 def generate_default_file_extensions():
     return sorted(
@@ -298,6 +300,63 @@ class ZaakTypeInformatieObjectTypeConfig(models.Model):
 
     def __str__(self):
         return self.omschrijving
+
+
+class ZaakTypeStatusTypeConfig(models.Model):
+    zaaktype_config = models.ForeignKey(
+        "openzaak.ZaakTypeConfig",
+        on_delete=models.CASCADE,
+    )
+    statustype_url = models.URLField(
+        verbose_name=_("Statustype URL"),
+        max_length=1000,
+    )
+    omschrijving = models.CharField(
+        verbose_name=_("Omschrijving"),
+        max_length=80,
+    )
+    statustekst = models.CharField(
+        verbose_name=_("Statustekst"),
+        max_length=1000,
+    )
+    zaaktype_uuids = ArrayField(
+        models.UUIDField(
+            verbose_name=_("Zaaktype UUID"),
+        ),
+        default=list,
+    )
+
+    # configuration
+    status_indicator = models.CharField(
+        blank=True,
+        max_length=32,
+        choices=StatusIndicators.choices,
+        verbose_name=_("Statustype indicator"),
+        help_text=_(
+            "Determines what will be shown to the user if a case is set to this status"
+        ),
+    )
+    status_indicator_text = models.TextField(
+        blank=True,
+        default="",
+        verbose_name=_("Statustype indicator"),
+        help_text=_(
+            "Determines the text that will be shown to the user if a case is set to this status"
+        ),
+    )
+
+    class Meta:
+        verbose_name = _("Zaaktype Statustype Configuration")
+
+        constraints = [
+            UniqueConstraint(
+                name="unique_zaaktype_config_statustype_url",
+                fields=["zaaktype_config", "statustype_url"],
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.zaaktype_config.identificatie} - {self.omschrijving}"
 
 
 class UserCaseStatusNotificationBase(models.Model):
