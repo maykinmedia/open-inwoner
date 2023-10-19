@@ -20,8 +20,13 @@ from .utils import is_zaak_visible
 logger = logging.getLogger(__name__)
 
 
-@cache_result("cases:{user_bsn}:{max_cases}", timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT)
-def fetch_cases(user_bsn: str, max_cases: Optional[int] = 100) -> List[Zaak]:
+@cache_result(
+    "cases:{user_bsn}:{max_cases}:{identificatie}",
+    timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
+)
+def fetch_cases(
+    user_bsn: str, max_cases: Optional[int] = 100, identificatie: Optional[str] = None
+) -> List[Zaak]:
     """
     retrieve cases for particular user with allowed confidentiality level
 
@@ -35,16 +40,20 @@ def fetch_cases(user_bsn: str, max_cases: Optional[int] = 100) -> List[Zaak]:
 
     config = OpenZaakConfig.get_solo()
 
+    params = {
+        "rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn": user_bsn,
+        "maximaleVertrouwelijkheidaanduiding": config.zaak_max_confidentiality,
+    }
+    if identificatie:
+        params.update({"identificatie": identificatie})
+
     try:
         response = get_paginated_results(
             client,
             "zaak",
             minimum=max_cases,
             request_kwargs={
-                "params": {
-                    "rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn": user_bsn,
-                    "maximaleVertrouwelijkheidaanduiding": config.zaak_max_confidentiality,
-                },
+                "params": params,
             },
         )
     except (RequestException, ClientError) as e:
