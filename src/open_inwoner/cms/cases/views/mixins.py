@@ -165,7 +165,7 @@ class CaseListMixin(CaseLogMixin, PaginationMixin):
                 "current_status": status_translate.from_glom(
                     case, "status.statustype.omschrijving", default=""
                 ),
-                "statustype_config": getattr(case, "statustype_config"),
+                "statustype_config": getattr(case, "statustype_config", None),
             }
             updated_cases.append(case_dict)
         return updated_cases
