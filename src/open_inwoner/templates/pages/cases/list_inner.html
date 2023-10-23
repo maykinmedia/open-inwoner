@@ -4,8 +4,12 @@
     {% anchor_menu anchors desktop=True %}
 </div>
 
-<h2 class="h2" id="cases">{{ page_title }} ({{ paginator.count }})</h2>
+<h2 class="h2" id="cases">{% trans "Mijn aanvragen" %}</h2>
 {% render_grid %}
+    {% if not cases %}
+        <b>{% trans "U heeft op dit moment nog geen lopende aanvragen." %}</b>
+    {% endif %}
+
     {% for case in cases %}
         {% render_column start=forloop.counter_0|multiply:4 span=4 %}
     <div class="card card--compact card--stretch">
@@ -34,5 +38,6 @@
     {% endfor %}
 {% endrender_grid %}
 
-{% pagination page_obj=page_obj paginator=paginator request=request hxget=hxget hxtarget='#cases-content' %}
-
+{% if cases %}
+    {% pagination page_obj=page_obj paginator=paginator request=request hxget=hxget hxtarget='#cases-content' %}
+{% endif %}
