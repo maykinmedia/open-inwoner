@@ -28,6 +28,7 @@
                 <aside class="status-list" aria-label="{% trans "Status lijst" %}">
                     <ul class="status-list__list">
                         {% for status in case.statuses %}
+                        {% comment %} {{status.status_indicator}} {{status.status_indicator_text}} {% endcomment %}
                         <li class="status-list__list-item status-list__list-item--info">
                             <div class="status-list__notification status-list__notification--info">
 {#                                {{ case.statustype_config }}#}

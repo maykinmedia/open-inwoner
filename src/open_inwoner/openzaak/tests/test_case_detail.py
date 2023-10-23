@@ -23,6 +23,7 @@ from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.cms.cases.views.status import SimpleFile
+from open_inwoner.openzaak.constants import StatusIndicators
 from open_inwoner.openzaak.tests.factories import (
     StatusTranslationFactory,
     ZaakTypeConfigFactory,
@@ -353,6 +354,17 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
     def test_status_is_retrieved_when_user_logged_in_via_digid(self, m):
         self.maxDiff = None
 
+        ZaakTypeStatusTypeConfigFactory.create(
+            statustype_url=self.status_type_new["url"],
+            status_indicator=StatusIndicators.warning,
+            status_indicator_text="foo",
+        )
+        ZaakTypeStatusTypeConfigFactory.create(
+            statustype_url=self.status_type_finish["url"],
+            status_indicator=StatusIndicators.success,
+            status_indicator_text="bar",
+        )
+
         self._setUpMocks(m)
         status_new_obj, status_finish_obj = factory(
             Status, [self.status_new, self.status_finish]
@@ -372,15 +384,18 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 "end_date_planned": datetime.date(2022, 1, 4),
                 "end_date_legal": datetime.date(2022, 1, 5),
                 "description": "Coffee zaaktype",
-                "current_status": "Finish",
                 "statuses": [
                     {
                         "date": datetime.datetime(2021, 1, 12),
                         "label": "Initial request",
+                        "status_indicator": StatusIndicators.warning,
+                        "status_indicator_text": "foo",
                     },
                     {
                         "date": datetime.datetime(2021, 3, 12),
                         "label": "Finish",
+                        "status_indicator": StatusIndicators.success,
+                        "status_indicator_text": "bar",
                     },
                 ],
                 # only one visible information object
@@ -404,7 +419,6 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
         self.assertContains(response, "ZAAK-2022-0000000024")
         self.assertContains(response, "Coffee zaaktype")
-        self.assertContains(response, "Finish")
         self.assertContains(response, "uploaded_document_title")
         self.assertContains(response, "Foo Bar van der Bazz")
         self.assertContains(response, "resultaat toelichting")
@@ -448,13 +462,6 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.assertIn(self.zaak["identificatie"], log.extra_data["message"])
         self.assertEqual(self.user, log.user)
         self.assertEqual(self.user, log.content_object)
-
-    def test_current_status_in_context_is_the_most_recent_one(self, m):
-        self._setUpMocks(m)
-
-        response = self.app.get(self.case_detail_url, user=self.user)
-        current_status = response.context.get("case", {}).get("current_status")
-        self.assertEquals(current_status, "Finish")
 
     def test_case_io_objects_are_retrieved_when_user_logged_in_via_digid(self, m):
         self._setUpMocks(m)
