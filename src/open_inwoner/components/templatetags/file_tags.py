@@ -1,10 +1,13 @@
+import datetime
 import pathlib
 
 from django import template
+from django.conf import settings
 
 from filer.models.filemodels import File
 
-from open_inwoner.openzaak.api_models import ZaakInformatieObject
+from open_inwoner.cms.cases.views.status import SimpleFile
+from open_inwoner.utils.time import is_new
 
 register = template.Library()
 
@@ -46,7 +49,7 @@ def file_list(files, **kwargs):
 
 
 @register.inclusion_tag("components/File/FileList.html")
-def case_document_list(documents: list[ZaakInformatieObject], **kwargs) -> dict:
+def case_document_list(documents: list[SimpleFile], **kwargs) -> dict:
     """
     Shows multiple case documents in a file_list.
 
@@ -140,6 +143,12 @@ def file(file, **kwargs):
 
     if kwargs.get("download_url"):
         kwargs["url"] = kwargs["download_url"]
+
+    created = getattr(file, "created", None)
+    kwargs["created"] = created
+
+    if is_new(file, "created", datetime.timedelta(days=settings.DOCUMENT_RECENT_DAYS)):
+        kwargs["recently_added"] = True
 
     if "show_download" not in kwargs:
         kwargs["show_download"] = True

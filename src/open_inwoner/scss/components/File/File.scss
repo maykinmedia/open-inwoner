@@ -1,4 +1,10 @@
 .file {
+  &__container {
+    &--recent {
+      border-left: var(--border-width-thin) solid var(--color-red);
+    }
+  }
+
   &__file {
     align-items: center;
     border: var(--border-width-thin) solid var(--color-gray);
@@ -7,11 +13,25 @@
     display: flex;
   }
 
-  &__file > *[class*='icon']:first-child,
-  &__file > *[class*='Icon']:first-child {
-    background-color: var(--color-gray-light);
-    padding: var(--spacing-large);
+  &__symbol {
+    display: flex;
+    align-items: center;
+    background-color: var(--color-gray-lightest);
+    padding: var(--spacing-large) 0;
+    margin: 0;
     box-sizing: content-box;
+
+    align-self: stretch;
+
+    *[class*='icon'],
+    *[class*='Icon'] {
+      padding: var(--spacing-large);
+    }
+  }
+
+  &__data {
+    display: flex;
+    flex-direction: column;
   }
 
   &__file .link,
@@ -25,6 +45,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    line-height: var(--spacing-extra-large);
   }
 
   &__file .link__text {
@@ -45,5 +66,15 @@
 
   &__file + .p {
     margin-top: var(--spacing-small);
+  }
+
+  &__file--recent {
+    color: var(--color-red);
+    font-size: var(--font-size-body-extra-small);
+    vertical-align: middle;
+  }
+
+  &__date {
+    font-size: var(--font-size-body-extra-small);
   }
 }

@@ -8,6 +8,7 @@ from django.utils.translation import gettext_lazy as _
 
 import requests_mock
 from django_webtest import WebTest
+from freezegun import freeze_time
 from timeline_logger.models import TimelineLog
 from webtest import Upload
 from webtest.forms import Hidden
@@ -312,6 +313,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                     "info_id": cls.informatie_object["uuid"],
                 },
             ),
+            created=datetime.datetime(2021, 1, 12, 0, 0, 0),
         )
 
     def _setUpOASMocks(self, m):
@@ -384,7 +386,6 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812/download",
             text="document content",
         )
-        # TODO
         m.get(
             f"{CATALOGI_ROOT}statustypen?zaaktype={self.zaaktype['url']}",
             json=paginated_response(
@@ -461,6 +462,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 "external_upload_url": "",
                 "allowed_file_extensions": sorted(self.config.allowed_file_extensions),
                 "contact_form_enabled": False,
+                "new_docs": False,
             },
         )
 
@@ -541,8 +543,17 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 "external_upload_url": "",
                 "allowed_file_extensions": sorted(self.config.allowed_file_extensions),
                 "contact_form_enabled": False,
+                "new_docs": False,
             },
         )
+
+    @freeze_time("2021-01-12 17:00:00")
+    def test_new_docs(self, m):
+        self._setUpMocks(m)
+
+        response = self.app.get(self.case_detail_url, user=self.user)
+
+        self.assertEqual(response.context.get("case")["new_docs"], True)
 
     def test_page_displays_expected_data(self, m):
         self._setUpMocks(m)
