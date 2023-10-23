@@ -1,6 +1,20 @@
 .cases {
   margin-top: var(--spacing-giant);
 
+  &__grid .grid {
+    grid-row-gap: var(--spacing-medium);
+    grid-column-gap: var(--spacing-extra-large);
+    @media (max-width: 900px) {
+      grid-template-columns: 1fr;
+    }
+
+    .column--start-4 {
+      @media (max-width: 900px) {
+        grid-column-start: 1;
+      }
+    }
+  }
+
   /// cards on cases page
   .card {
     .cases__link {

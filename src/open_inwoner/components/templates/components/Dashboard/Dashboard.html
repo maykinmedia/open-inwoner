@@ -4,9 +4,7 @@
     <ul class="dashboard__list">
         {% for metric in config.metrics %}
             <li class="dashboard__list-item">
-                {% icon metric.icon outlined=True %}
-                <h4 class="h4">{{ metric.label }}</h4>
-                <p class="p p--compact">{{ metric.value|default:'-' }}</p>
+                <p class="p p--compact"><span class="dashboard__item-label">{{ metric.label }}</span> {{ metric.value|default:'-' }}</p>
             </li>
         {% endfor %}
     </ul>

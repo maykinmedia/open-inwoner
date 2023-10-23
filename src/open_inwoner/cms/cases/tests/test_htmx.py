@@ -375,15 +375,6 @@ class CasesPlaywrightTests(
         # check case is visible
         expect(page.get_by_text(self.zaak["identificatie"])).to_be_visible()
 
-        # out-of-band anchor menu
-        menu_items = page.get_by_role(
-            "complementary", name=_("Secundaire paginanavigatie")
-        ).get_by_role("listitem")
-
-        expect(menu_items.get_by_role("link", name=_("Gegevens"))).to_be_visible()
-        expect(menu_items.get_by_role("link", name=_("Status"))).to_be_visible()
-        expect(menu_items.get_by_role("link", name=_("Documenten"))).to_be_visible()
-
         # check documents show
         documents = page.locator(".file-list").get_by_role("listitem")
 

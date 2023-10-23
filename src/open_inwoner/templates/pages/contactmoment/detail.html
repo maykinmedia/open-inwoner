@@ -1,18 +1,19 @@
 {% extends 'master.html' %}
 {% load i18n anchor_menu_tags card_tags dashboard_tags file_tags grid_tags table_tags solo_tags form_tags button_tags %}
 
-{% block sidebar_content %}
-    {% if contactmoment %}
-        {% anchor_menu anchors desktop=True %}
-    {% endif %}
-{% endblock sidebar_content %}
-
 {% block content %}
     {% if contactmoment %}
         {% render_grid %}
-            {% render_column span=9 %}
+            {% render_column span=12 %}
+                {# Contactmoment/dashboard. #}
+                <h1 class="h1" id="title">{{ page_title }}</h1>
                 {% contactmoment_dashboard contactmoment %}
+            {% endrender_column %}
+            {% render_column start=4 span=6 %}
+
+                <div class="contactmoment__details">
                 {% contactmoment_table contactmoment %}
+                </div>
             {% endrender_column %}
         {% endrender_grid %}
     {% else %}
