@@ -31,7 +31,10 @@ from open_inwoner.openzaak.cases import (
     fetch_single_result,
     fetch_status_history,
 )
-from open_inwoner.openzaak.catalog import fetch_single_status_type
+from open_inwoner.openzaak.catalog import (
+    fetch_single_status_type,
+    fetch_status_types_no_cache,
+)
 from open_inwoner.openzaak.documents import (
     download_document,
     fetch_single_information_object_url,
@@ -122,6 +125,18 @@ class InnerCaseDetailView(
                 for zaaktype_statustype in ZaakTypeStatusTypeConfig.objects.all()
             }
 
+            # NOTE maybe this should be cached?
+            statustypen = fetch_status_types_no_cache(self.case.zaaktype.url)
+            end_statustype = next(
+                (
+                    status_type
+                    for status_type in statustypen
+                    if status_type.is_eindstatus
+                ),
+                None,
+            )
+            end_statustype_data = None
+
             # NOTE we cannot sort on the Status.datum_status_gezet (datetime) because eSuite returns zeros as the time component of the datetime,
             # so we're going with the observation that on both OpenZaak and eSuite the returned list is ordered 'oldest-last'
             # here we want it 'oldest-first' so we reverse() it instead of sort()-ing
@@ -140,6 +155,25 @@ class InnerCaseDetailView(
                 for status in _statuses:
                     status.statustype = status_type
 
+            # The end status data is not passed if the end status has been reached,
+            # because in that case the end status data is already included in `statuses`
+            if not status_types.get(end_statustype.url):
+                end_statustype_data = {
+                    "label": status_translate(
+                        end_statustype.omschrijving, default=_("No data available")
+                    ),
+                    "status_indicator": getattr(
+                        statustype_config_mapping.get(end_statustype.url),
+                        "status_indicator",
+                        None,
+                    ),
+                    "status_indicator_text": getattr(
+                        statustype_config_mapping.get(end_statustype.url),
+                        "status_indicator_text",
+                        None,
+                    ),
+                }
+
             context["case"] = {
                 "id": str(self.case.uuid),
                 "identification": self.case.identification,
@@ -155,6 +189,7 @@ class InnerCaseDetailView(
                 "statuses": self.get_statuses_data(
                     statuses, status_translate, statustype_config_mapping
                 ),
+                "end_statustype_data": end_statustype_data,
                 "documents": documents,
                 "allowed_file_extensions": sorted(config.allowed_file_extensions),
             }
