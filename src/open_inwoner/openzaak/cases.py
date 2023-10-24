@@ -1,6 +1,5 @@
 import copy
 import logging
-from collections import defaultdict
 from typing import List, Optional
 
 from django.conf import settings
@@ -15,7 +14,7 @@ from ..utils.decorators import cache as cache_result
 from .api_models import Resultaat, Rol, Status, Zaak, ZaakInformatieObject
 from .catalog import fetch_single_case_type, fetch_single_status_type
 from .clients import build_client
-from .models import OpenZaakConfig
+from .models import OpenZaakConfig, ZaakTypeStatusTypeConfig
 from .utils import is_zaak_visible
 
 logger = logging.getLogger(__name__)
@@ -297,8 +296,6 @@ def connect_case_with_document(case_url: str, document_url: str) -> Optional[dic
 def resolve_zaak_type(cases: list[Zaak]) -> None:
     """
     Resolve zaaktype for each case
-
-    Mutates input
     """
     case_types = {}
     case_types_set = {case.zaaktype for case in cases}
@@ -313,40 +310,51 @@ def resolve_zaak_type(cases: list[Zaak]) -> None:
         case.zaaktype = case_types[case.zaaktype]
 
 
+def resolve_status(case: Zaak) -> None:
+    """
+    Resolve `case.status` (`str`) to a `Status(ZGWModel)` object
+    """
+    case.status = fetch_single_status(case.status)
+
+
+def add_status_type_config(case: Zaak):
+    """
+    Add `ZaakTypeStatusTypeConfig` corresponding to the status type url of the case
+
+    Note: must be called before the call to `resolve_status_type`, since we need
+          the unresolved status type url here
+    """
+    case_statustype_url = case.status.statustype
+
+    try:
+        case.statustype_config = ZaakTypeStatusTypeConfig.objects.get(
+            statustype_url=case_statustype_url
+        )
+    except ZaakTypeStatusTypeConfig.DoesNotExist:
+        pass
+
+
+def resolve_status_type(case: Zaak) -> None:
+    """
+    Resolve `case.statustype` (`str`) to a `StatusType(ZGWModel)` object
+    """
+    statustype_url = case.status.statustype
+    case.status.statustype = fetch_single_status_type(statustype_url)
+
+
 def filter_visible(cases: list[Zaak]) -> list[Zaak]:
     return [case for case in cases if is_zaak_visible(case)]
 
 
-def resolve_status_type(cases: list[Zaak]) -> None:
-    """
-    Fetch status resource and attach to each case
-
-    Mutates input
-    """
-    # fetch case status resources and attach resolved to case
-    status_types = defaultdict(list)
-    for case in cases:
-        if case.status:
-            # todo parallel
-            case.status = fetch_single_status(case.status)
-            status_types[case.status.statustype].append(case)
-
-    for status_type_url, _cases in status_types.items():
-        # todo parallel
-        status_type = fetch_single_status_type(status_type_url)
-        for case in _cases:
-            case.status.statustype = status_type
-
-
 def preprocess_data(cases: list[Zaak]) -> list[Zaak]:
     """
-    Resolve zaaktype and statustype, filter for visibility
-
-    Input is copied since it is mutated and returned
+    Resolve zaaktype and statustype, add status type config, filter for visibility
     """
-    _cases = copy.deepcopy(cases)
+    resolve_zaak_type(cases)
 
-    resolve_zaak_type(_cases)
-    resolve_status_type(_cases)
+    for case in filter(lambda case: case.status, cases):
+        resolve_status(case)
+        add_status_type_config(case)
+        resolve_status_type(case)
 
-    return filter_visible(_cases)
+    return filter_visible(cases)

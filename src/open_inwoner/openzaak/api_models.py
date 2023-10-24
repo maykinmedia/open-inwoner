@@ -81,6 +81,7 @@ class Zaak(ZGWModel):
             "current_status": status_translate.from_glom(
                 self, "status.statustype.omschrijving", default=""
             ),
+            "statustype_config": getattr(self, "statustype_config", None),
         }
 
 
