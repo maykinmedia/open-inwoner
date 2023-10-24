@@ -12,13 +12,55 @@
     cursor: pointer;
   }
 
+  &__title_text {
+    padding-top: var(--spacing-medium);
+    padding-bottom: var(--spacing-extra-large);
+  }
+
   &__detail {
     box-sizing: border-box;
   }
 
-  &__title_text {
-    padding-top: var(--spacing-medium);
-    padding-bottom: var(--spacing-extra-large);
+  /// cards with statuses
+
+  .card__header {
+    display: flex;
+    background-color: var(--color-info-lighter);
+    border-top-left-radius: var(--border-radius);
+    border-top-right-radius: var(--border-radius);
+    color: var(--color-info-darker);
+
+    .card__status_indicator_text {
+      padding: var(--spacing-medium);
+    }
+
+    [class*='icons'] {
+      margin: var(--spacing-small) var(--spacing-medium) 0 var(--spacing-medium);
+    }
+
+    &.success {
+      display: flex;
+      background-color: var(--color-success-lighter);
+      color: var(--color-success);
+    }
+
+    &.info {
+      display: flex;
+      background-color: var(--color-info-lighter);
+      color: var(--color-info-darker);
+    }
+
+    &.warning {
+      display: flex;
+      background-color: var(--color-danger-lightest);
+      color: var(--color-danger-darker);
+    }
+
+    &.failure {
+      display: flex;
+      background-color: var(--color-error-lighter);
+      color: var(--color-error-darker);
+    }
   }
 }
 
@@ -32,53 +74,10 @@
   }
 }
 
+//.document-upload-description {
+//  display: flex;
+//}
+
 #cases-contact-form-content > h2 {
   margin-top: var(--spacing-large);
-}
-
-.card__header.success {
-  display: flex;
-  background-color: $color-success;
-  color: $color-success-dark;
-  padding: 0.4em;
-}
-
-.card__header.info {
-  display: flex;
-  background-color: $color-info;
-  color: $color-info-dark;
-  padding: 0.4em;
-}
-
-.card__header.warning {
-  display: flex;
-  background-color: $color-warning;
-  color: $color-warning-dark;
-  padding: 0.4em;
-}
-
-.card__header.failure {
-  display: flex;
-  background-color: $color-danger;
-  color: $color-danger-dark;
-  padding: 0.4em;
-
-.icon--success {
-  margin-right: 0.2em;
-}
-
-.icon--info {
-  margin-right: 0.2em;
-}
-
-.icon--warning {
-  margin-right: 0.2em;
-}
-
-.icon--failure {
-  margin-right: 0.2em;
-}
-
-.document-upload-description {
-  display: flex;
 }

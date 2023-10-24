@@ -404,13 +404,13 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                     {
                         "date": datetime.datetime(2021, 1, 12),
                         "label": "Initial request",
-                        "status_indicator": StatusIndicators.warning,
+                        "status_indicator": "warning",
                         "status_indicator_text": "foo",
                     },
                     {
                         "date": datetime.datetime(2021, 3, 12),
                         "label": "Finish",
-                        "status_indicator": StatusIndicators.success,
+                        "status_indicator": "success",
                         "status_indicator_text": "bar",
                     },
                 ],
@@ -462,7 +462,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 "end_date_legal": datetime.date(2022, 1, 5),
                 "end_statustype_data": {
                     "label": "Finish",
-                    "status_indicator": StatusIndicators.success,
+                    "status_indicator": "success",
                     "status_indicator_text": "bar",
                 },
                 "description": "Coffee zaaktype",
@@ -470,7 +470,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                     {
                         "date": datetime.datetime(2021, 1, 12),
                         "label": "Initial request",
-                        "status_indicator": StatusIndicators.warning,
+                        "status_indicator": "warning",
                         "status_indicator_text": "foo",
                     },
                 ],
@@ -479,6 +479,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 "initiator": "Foo Bar van der Bazz",
                 "result": "resultaat toelichting",
                 "case_type_config_description": "",
+                "case_type_document_upload_description": "",
                 "internal_upload_enabled": False,
                 "external_upload_enabled": False,
                 "external_upload_url": "",

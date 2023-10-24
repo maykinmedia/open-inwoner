@@ -137,7 +137,7 @@ class OpenZaakConfig(SingletonModel):
             "The title/introductory text shown on the list view of 'Mijn aanvragen'."
         ),
         default=_(
-            "Hier vindt u een overzicht van al uw lopende an afgeronde aanvragen."
+            "Hier vindt u een overzicht van al uw lopende en afgeronde aanvragen."
         ),
     )
 
@@ -343,13 +343,13 @@ class ZaakTypeStatusTypeConfig(models.Model):
         choices=StatusIndicators.choices,
         verbose_name=_("Statustype indicator"),
         help_text=_(
-            "Determines what will be shown to the user if a case is set to this status"
+            "Determines what color will be shown to the user if a case is set to this status"
         ),
     )
     status_indicator_text = models.TextField(
         blank=True,
         default="",
-        verbose_name=_("Statustype indicator"),
+        verbose_name=_("Statustype indicator text"),
         help_text=_(
             "Determines the text that will be shown to the user if a case is set to this status"
         ),

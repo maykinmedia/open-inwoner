@@ -12,14 +12,45 @@
   &__list-item {
     display: flex;
     gap: var(--spacing-large);
+    padding: 8px 16px 0 16px;
 
-    h3 {
-      display: inline-block;
-      width: calc(100% - 2em);
+    &:not(:last-child)::before {
+      content: '';
+      background-color: var(--color-success);
+      display: block;
+      height: calc(100% - 6.3em);
+      left: 3px;
+      margin-left: var(--spacing-extra-large);
+      position: absolute;
+      top: 1.3em;
+      width: 2px;
+      z-index: 1;
     }
 
-    .material-icons,
-    .material-icons-outlined {
+    .status-list__notification-h3 {
+      color: var(--color-success);
+      cursor: pointer;
+      display: flex;
+      font-weight: normal;
+      justify-content: space-between;
+      margin: var(--spacing-small) 0 var(--spacing-large) 0;
+      width: 100%;
+    }
+
+    .p-date {
+      color: var(--color-gray-dark);
+      font-size: var(--font-size-body-small);
+    }
+
+    .button *[class*='icons'] {
+      color: white;
+    }
+    .button *[class*='icons']::before {
+      content: '';
+      background-color: transparent;
+    }
+
+    > [class*='icons'] {
       box-sizing: border-box;
       color: var(--color-success);
       position: relative;
@@ -28,7 +59,7 @@
 
       &::before {
         content: '';
-        background-color: white;
+        background-color: var(--color-white);
         border-radius: 50%;
         top: 2px;
         left: 2px;
@@ -42,34 +73,117 @@
     &--info {
       background-color: var(--color-info-lighter);
 
-      .material-icons,
-      .material-icons-outlined {
+      [class*='icons'] {
         color: var(--color-info-darker);
+      }
 
-        &::before {
-          background-color: transparent;
+      &.item--completed {
+        background-color: var(--color-info-lighter);
+        [class*='icons'] {
+          color: var(--color-info-darker) !important;
         }
       }
+    }
+
+    &--warning {
+      background-color: var(--color-danger-lightest);
+
+      [class*='icons'] {
+        color: var(--color-danger-darker);
+      }
+
+      &.item--completed {
+        background-color: var(--color-info-lighter);
+        [class*='icons'] {
+          color: var(--color-info-darker) !important;
+        }
+      }
+    }
+
+    &--success {
+      background-color: var(--color-success-lighter);
+
+      h3 {
+        [class*='icons'] {
+          color: var(--color-success);
+        }
+      }
+
+      &.item--completed {
+        background-color: var(--color-info-lighter);
+        [class*='icons'] {
+          color: var(--color-info-darker) !important;
+        }
+      }
+    }
+
+    &--failure {
+      background-color: var(--color-error-lightest);
+
+      [class*='icons'] {
+        color: var(--color-error-darker);
+      }
+
+      &.item--completed {
+        background-color: var(--color-info-lighter);
+        [class*='icons'] {
+          color: var(--color-info-darker) !important;
+        }
+      }
+    }
+
+    &--future {
+      [class*='icons'] {
+        color: var(--color-body);
+      }
+    }
+
+    // Current status open by default
+    &.status--current.status--open
+      .status-list__notification
+      .status-list__notification-content {
+      padding-bottom: 50px;
     }
   }
 
   &__notification {
-    padding: var(--spacing-extra-large);
-    &-content {
-      margin-left: 2em;
+    padding: 0 0 var(--spacing-extra-large) 0;
+    width: 100%;
 
-      &::before {
-        content: '';
-        background-color: var(--color-success);
-        display: block;
-        height: calc(100% - 4.3em);
-        left: 11px;
-        margin-left: var(--spacing-extra-large);
-        position: absolute;
-        top: 1.3em;
-        width: 2px;
-        z-index: 1;
-      }
+    &-content {
+      display: none;
+      margin-left: 0;
+    }
+
+    &-content.status-content--open {
+      display: block;
+    }
+  }
+
+  // Active completed status should NOT have a line on the left
+  .status-list__list-item.item--completed:last-child {
+    &::before {
+      background-color: var(--color-info-lighter);
+      bottom: 10px;
+      content: '';
+      display: block;
+      height: 150px;
+      left: 10px;
+      margin-left: 1em;
+      position: absolute;
+      width: 5px;
+      z-index: 2;
+    }
+  }
+
+  /// Toggle styles
+  .status--open &__notification {
+    h3 [class*='icons'] {
+      display: inline-block;
+      transition: all 0.3s;
+      transform: rotate(180deg);
+      top: 0;
+      right: var(--spacing-large);
     }
   }
 }
