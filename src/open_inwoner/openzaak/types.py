@@ -3,12 +3,22 @@ from typing import Protocol
 
 class UniformCase(Protocol):
     """
-    Zaaken and open submissions are classified as "cases" if they have an
-    `identificatie` attribute and a method `process_data` to prepare data
+    Zaken and open submissions are classified as "cases" if they have an
+    `identification` property and a method `process_data` to prepare data
     for the template
     """
 
-    identificatie: str
+    @property
+    def identification(self) -> str:
+        ...
 
     def process_data(self) -> dict:
+        """
+        Prepare data for template
+
+        Should include (at least) the following:
+            - identification (str)
+            - uuid (str)
+            - case_type (str)
+        """
         ...

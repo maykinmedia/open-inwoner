@@ -1,6 +1,8 @@
 import logging
-from typing import Optional
+from typing import Optional, Union
+from uuid import UUID
 
+from zds_client import get_operation_url
 from zgw_consumers.api_models.constants import RolTypes, VertrouwelijkheidsAanduidingen
 
 from open_inwoner.openzaak.api_models import InformatieObject, Rol, Zaak, ZaakType
@@ -124,3 +126,17 @@ def get_zaak_type_info_object_type_config(
         )
     except ZaakTypeInformatieObjectTypeConfig.DoesNotExist:
         return None
+
+
+def get_retrieve_resource_by_uuid_url(
+    client, resource: str, uuid: Union[str, UUID]
+) -> str:
+    op_suffix = client.operation_suffix_mapping["retrieve"]
+    operation_id = f"{resource}{op_suffix}"
+    path_kwargs = {
+        "uuid": uuid,
+    }
+    url = get_operation_url(
+        client.schema, operation_id, base_url=client.base_url, **path_kwargs
+    )
+    return url

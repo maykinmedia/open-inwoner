@@ -18,8 +18,10 @@ from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.cms.cases.views.cases import InnerCaseListView
 from open_inwoner.openzaak.tests.shared import FORMS_ROOT
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
+from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin, Lookups
 
 from ...utils.tests.helpers import AssertRedirectsMixin
+from ..api_models import Zaak
 from ..constants import StatusIndicators
 from ..models import OpenZaakConfig
 from .factories import (
@@ -27,7 +29,6 @@ from .factories import (
     StatusTranslationFactory,
     ZaakTypeStatusTypeConfigFactory,
 )
-from ..api_models import Zaak
 from .mocks import ESuiteData
 from .shared import CATALOGI_ROOT, ZAKEN_ROOT
 
@@ -127,7 +128,7 @@ class CaseListAccessTests(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
 @requests_mock.Mocker()
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class CaseListViewTests(ClearCachesMixin, WebTest):
+class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
     inner_url = reverse_lazy("cases:cases_content")
 
     @classmethod
@@ -337,28 +338,31 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
                     "uuid": self.zaak2["uuid"],
                     "start_date": datetime.date.fromisoformat(self.zaak2["startdatum"]),
                     "end_date": None,
-                    "identificatie": self.zaak2["identificatie"],
+                    "identification": self.zaak2["identificatie"],
                     "description": self.zaaktype["omschrijving"],
                     "current_status": self.status_type1["omschrijving"],
                     "statustype_config": self.zt_statustype_config1,
+                    "case_type": "Zaak",
                 },
                 {
                     "uuid": self.zaak1["uuid"],
                     "start_date": datetime.date.fromisoformat(self.zaak1["startdatum"]),
                     "end_date": None,
-                    "identificatie": self.zaak1["identificatie"],
+                    "identification": self.zaak1["identificatie"],
                     "description": self.zaaktype["omschrijving"],
                     "current_status": self.status_type1["omschrijving"],
                     "statustype_config": self.zt_statustype_config1,
+                    "case_type": "Zaak",
                 },
                 {
                     "uuid": self.zaak3["uuid"],
                     "start_date": datetime.date.fromisoformat(self.zaak3["startdatum"]),
                     "end_date": datetime.date.fromisoformat(self.zaak3["einddatum"]),
-                    "identificatie": self.zaak3["identificatie"],
+                    "identification": self.zaak3["identificatie"],
                     "description": self.zaaktype["omschrijving"],
                     "current_status": self.status_type2["omschrijving"],
                     "statustype_config": None,
+                    "case_type": "Zaak",
                 },
             ],
         )
@@ -405,7 +409,7 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
                 )
             )
 
-            self.assertEqual(e_suite_case["identificatie"], "6639-2022")
+            self.assertEqual(e_suite_case["identification"], "6639-2022")
 
         with self.subTest("formatting disabled"):
             config.reformat_esuite_zaak_identificatie = False
@@ -423,7 +427,7 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
                 )
             )
 
-            self.assertEqual(e_suite_case["identificatie"], "0014ESUITE66392022")
+            self.assertEqual(e_suite_case["identification"], "0014ESUITE66392022")
 
     def test_reformat_esuite_zaak_identificatie(self, m):
         tests = [
@@ -451,9 +455,6 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
         self.assertNotContains(response, st1.status)
         self.assertContains(response, st1.translation)
 
-    def test_zaak_proecess_data(self, m):
-        pass
-
     def test_list_cases_logs_displayed_case_ids(self, m):
         self._setUpMocks(m)
 
@@ -463,18 +464,14 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
         logs = list(TimelineLog.objects.all())
 
         case_log = [
-            log
-            for log in logs
-            if self.zaak1["identificatie"] in log.extra_data["message"]
+            l for l in logs if self.zaak1["identificatie"] in l.extra_data["message"]
         ]
         self.assertEqual(len(case_log), 1)
         self.assertEqual(self.user, case_log[0].user)
         self.assertEqual(self.user, case_log[0].content_object)
 
         case_log = [
-            log
-            for log in logs
-            if self.zaak2["identificatie"] in log.extra_data["message"]
+            l for l in logs if self.zaak2["identificatie"] in l.extra_data["message"]
         ]
         self.assertEqual(len(case_log), 1)
         self.assertEqual(self.user, case_log[0].user)
@@ -505,10 +502,11 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
                     "uuid": self.zaak2["uuid"],
                     "start_date": datetime.date.fromisoformat(self.zaak2["startdatum"]),
                     "end_date": None,
-                    "identificatie": self.zaak2["identificatie"],
+                    "identification": self.zaak2["identificatie"],
                     "description": self.zaaktype["omschrijving"],
                     "current_status": self.status_type1["omschrijving"],
                     "statustype_config": self.zt_statustype_config1,
+                    "case_type": "Zaak",
                 },
             ],
         )
@@ -528,10 +526,11 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
                     "uuid": self.zaak1["uuid"],
                     "start_date": datetime.date.fromisoformat(self.zaak1["startdatum"]),
                     "end_date": None,
-                    "identificatie": self.zaak1["identificatie"],
+                    "identification": self.zaak1["identificatie"],
                     "description": self.zaaktype["omschrijving"],
                     "current_status": self.status_type1["omschrijving"],
                     "statustype_config": self.zt_statustype_config1,
+                    "case_type": "Zaak",
                 },
             ],
         )
@@ -550,22 +549,15 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
                 response.context.get("cases")[0]["uuid"], self.zaak2["uuid"]
             )
 
-            # check access logs for displayed cases
-            logs = list(TimelineLog.objects.all())
+            self.assertTimelineLog(f"Zaken bekeken: {self.zaak2['identificatie']}")
 
-            case_log = [
-                log
-                for log in logs
-                if self.zaak2["identificatie"] in log.extra_data["message"]
-            ]
-            self.assertEqual(len(case_log), 1)
-            self.assertEqual(self.user, case_log[0].user)
-            self.assertEqual(self.user, case_log[0].content_object)
-
-            # no logs for non-displayed cases
-            for log in logs:
-                self.assertNotIn(self.zaak1["identificatie"], log.extra_data["message"])
-                self.assertNotIn(self.zaak3["identificatie"], log.extra_data["message"])
+            with self.assertRaises(AssertionError):
+                self.assertTimelineLog(
+                    self.zaak1["identificatie"], lookup=Lookups.icontains
+                )
+                self.assertTimelineLog(
+                    self.zaak3["identificatie"], lookup=Lookups.icontains
+                )
 
         TimelineLog.objects.all().delete()
 
@@ -578,19 +570,15 @@ class CaseListViewTests(ClearCachesMixin, WebTest):
                 response.context.get("cases")[0]["uuid"], self.zaak1["uuid"]
             )
 
-            # check access logs for displayed cases
-            logs = list(TimelineLog.objects.all())
-            case_log = [
-                log
-                for log in logs
-                if self.zaak1["identificatie"] in log.extra_data["message"]
-            ]
-            self.assertEqual(len(case_log), 1)
+            self.assertTimelineLog(f"Zaken bekeken: {self.zaak1['identificatie']}")
 
-            # no logs for non-displayed cases (after we cleared just above)
-            for log in logs:
-                self.assertNotIn(self.zaak2["identificatie"], log.extra_data["message"])
-                self.assertNotIn(self.zaak3["identificatie"], log.extra_data["message"])
+            with self.assertRaises(AssertionError):
+                self.assertTimelineLog(
+                    self.zaak2["identificatie"], lookup=Lookups.icontains
+                )
+                self.assertTimelineLog(
+                    self.zaak3["identificatie"], lookup=Lookups.icontains
+                )
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")

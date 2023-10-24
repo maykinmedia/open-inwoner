@@ -1,4 +1,4 @@
-from unittest.mock import patch
+from unittest import mock
 
 from django.core import mail
 from django.test import TestCase
@@ -35,7 +35,16 @@ class NotificationHandlerUtilsTestCase(TestCase):
 
         case_url = reverse("cases:case_detail", kwargs={"object_id": str(case.uuid)})
 
-        send_case_update_email(user, case)
+        # mock `_format_zaak_identificatie`, but then continue with result of actual call
+        # (test redirect for invalid BSN that passes pattern validation)
+        ret_val = case._format_zaak_identificatie()
+        with mock.patch.object(
+            Zaak, "_format_zaak_identificatie"
+        ) as format_identificatie:
+            format_identificatie.return_value = ret_val
+            send_case_update_email(user, case)
+
+        format_identificatie.assert_called_once()
 
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]

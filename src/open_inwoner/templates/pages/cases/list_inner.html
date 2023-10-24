@@ -15,12 +15,12 @@
             {% include "components/StatusIndicator/StatusIndicator.html" with status_indicator=case.statustype_config.status_indicator status_indicator_text=case.statustype_config.status_indicator_text %}
             <div class="card__body">
                 <!-- submission cases -->
-                {% if case.datum_laatste_wijziging %}
+                {% if case.case_type == "OpenSubmission" %}
                     <a href="{{ case.url }}"  class="cases__link">
                     <p class="h4"><span class="link link__text">{{ case.naam }}</span></p>
                     {% render_list %}
                     <span class="case-list">
-                        {% list_item text="Openstaand aanvraag" caption=_("Status") compact=True strong=False %}
+                        {% list_item text="Openstaande aanvraag" caption=_("Status") compact=True strong=False %}
                         {% list_item text=case.datum_laatste_wijziging caption=_("Laatste wijziging") compact=True strong=False %}
                         {% with end_date=case.eind_datum_geldigheid|default:"Geen" %}
                             {% list_item text=end_date caption=_("Einddatum geldigheid") compact=True strong=False%}

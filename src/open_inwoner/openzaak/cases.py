@@ -293,21 +293,16 @@ def connect_case_with_document(case_url: str, document_url: str) -> Optional[dic
     return response
 
 
-def resolve_zaak_type(cases: list[Zaak]) -> None:
+def resolve_zaak_type(case: Zaak) -> None:
     """
-    Resolve zaaktype for each case
+    Resolve `case.zaaktype` (`str`) to a `ZaakType(ZGWModel)` object
+
+    Note: the result of `fetch_single_case_type` is cached, hence a request
+          is only made for new case type urls
     """
-    case_types = {}
-    case_types_set = {case.zaaktype for case in cases}
-
-    # fetch unique case types
-    for case_type_url in case_types_set:
-        # todo parallel
-        case_types[case_type_url] = fetch_single_case_type(case_type_url)
-
-    # set resolved case types
-    for case in cases:
-        case.zaaktype = case_types[case.zaaktype]
+    case_type_url = case.zaaktype
+    case_type = fetch_single_case_type(case_type_url)
+    case.zaaktype = case_type
 
 
 def resolve_status(case: Zaak) -> None:
@@ -315,23 +310,6 @@ def resolve_status(case: Zaak) -> None:
     Resolve `case.status` (`str`) to a `Status(ZGWModel)` object
     """
     case.status = fetch_single_status(case.status)
-
-
-def add_status_type_config(case: Zaak):
-    """
-    Add `ZaakTypeStatusTypeConfig` corresponding to the status type url of the case
-
-    Note: must be called before the call to `resolve_status_type`, since we need
-          the unresolved status type url here
-    """
-    case_statustype_url = case.status.statustype
-
-    try:
-        case.statustype_config = ZaakTypeStatusTypeConfig.objects.get(
-            statustype_url=case_statustype_url
-        )
-    except ZaakTypeStatusTypeConfig.DoesNotExist:
-        pass
 
 
 def resolve_status_type(case: Zaak) -> None:
@@ -342,6 +320,21 @@ def resolve_status_type(case: Zaak) -> None:
     case.status.statustype = fetch_single_status_type(statustype_url)
 
 
+def add_status_type_config(case: Zaak) -> None:
+    """
+    Add `ZaakTypeStatusTypeConfig` corresponding to the status type url of the case
+
+    Note: must be called after `resolve_status_type` since we're getting the
+          status type url from `case.status.statustype`
+    """
+    try:
+        case.statustype_config = ZaakTypeStatusTypeConfig.objects.get(
+            statustype_url=case.status.statustype.url
+        )
+    except ZaakTypeStatusTypeConfig.DoesNotExist:
+        pass
+
+
 def filter_visible(cases: list[Zaak]) -> list[Zaak]:
     return [case for case in cases if is_zaak_visible(case)]
 
@@ -350,11 +343,12 @@ def preprocess_data(cases: list[Zaak]) -> list[Zaak]:
     """
     Resolve zaaktype and statustype, add status type config, filter for visibility
     """
-    resolve_zaak_type(cases)
+    for case in cases:
+        resolve_zaak_type(case)
 
-    for case in filter(lambda case: case.status, cases):
-        resolve_status(case)
-        add_status_type_config(case)
-        resolve_status_type(case)
+        if case.status:
+            resolve_status(case)
+            resolve_status_type(case)
+            add_status_type_config(case)
 
     return filter_visible(cases)

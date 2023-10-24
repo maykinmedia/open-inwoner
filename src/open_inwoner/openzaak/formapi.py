@@ -23,18 +23,22 @@ class OpenSubmission(Model):
     eind_datum_geldigheid: Optional[datetime] = None
 
     @property
-    def identificatie(self):
+    def identification(self) -> str:
         return f"{self.naam}: {self.uuid}"
 
-    def process_data(self):
+    def process_data(self) -> dict:
+        """
+        Prepare data for template
+        """
         return {
+            "identification": self.identification,
             "url": self.url,
             "uuid": self.uuid,
             "naam": self.naam,
-            "identificatie": self.identificatie,
             "vervolg_link": self.vervolg_link,
             "datum_laatste_wijziging": self.datum_laatste_wijziging,
             "eind_datum_geldigheid": self.eind_datum_geldigheid or "Geen",
+            "case_type": "OpenSubmission",
         }
 
 

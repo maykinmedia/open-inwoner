@@ -357,15 +357,13 @@ def send_case_update_email(user: User, case: Zaak):
     """
     send the actual mail
     """
-    config = OpenZaakConfig.get_solo()
-
     case_detail_url = build_absolute_url(
         reverse("cases:case_detail", kwargs={"object_id": str(case.uuid)})
     )
 
     template = find_template("case_notification")
     context = {
-        "identification": case.format_zaak_identificatie(case.identificatie, config),
+        "identification": case.identification,
         "type_description": case.zaaktype.omschrijving,
         "start_date": case.startdatum,
         "case_link": case_detail_url,

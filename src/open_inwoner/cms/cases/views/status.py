@@ -136,9 +136,7 @@ class InnerCaseDetailView(
 
             context["case"] = {
                 "id": str(self.case.uuid),
-                "identification": self.case.format_zaak_identificatie(
-                    self.case.identificatie, config
-                ),
+                "identification": self.case.identification,
                 "initiator": self.get_initiator_display(self.case),
                 "result": self.get_result_display(self.case),
                 "start_date": self.case.startdatum,
@@ -423,7 +421,6 @@ class CaseDocumentUploadFormView(CaseAccessMixin, LogMixin, FormView):
         return context
 
 
-# TODO why does does use CaseLogMixin?
 class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
     template_name = "pages/cases/contact_form.html"
     form_class = CaseContactForm

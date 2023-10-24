@@ -18,22 +18,21 @@ logger = logging.getLogger(__name__)
 class CaseLogMixin(LogMixin):
     def log_access_cases(self, cases: list[dict]):
         """
-        Log access to cases on the list view (create single log for all cases)
+        Log access to cases on the list view
+
+        Creates a single log for all cases
         """
-        case_ids = (case["identificatie"] for case in cases)
+        case_ids = (case["identification"] for case in cases)
 
         self.log_user_action(
             self.request.user,
-            _("Zaaken bekeken: {cases}").format(cases=", ".join(case_ids)),
+            _("Zaken bekeken: {cases}").format(cases=", ".join(case_ids)),
         )
 
     def log_access_case_detail(self, case: UniformCase):
-        """
-        Log access to a particular case
-        """
         self.log_user_action(
             self.request.user,
-            _("Zaak bekeken: {case}").format(case=case.identificatie),
+            _("Zaak bekeken: {case}").format(case=case.identification),
         )
 
 

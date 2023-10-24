@@ -1,33 +1,25 @@
 from django.urls import reverse
-from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
-
-from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.htmx.mixins import RequiresHtmxMixin
 from open_inwoner.openzaak.cases import fetch_cases, preprocess_data
 from open_inwoner.openzaak.formapi import fetch_open_submissions
 from open_inwoner.openzaak.models import OpenZaakConfig
+from open_inwoner.openzaak.types import UniformCase
 from open_inwoner.utils.mixins import PaginationMixin
 from open_inwoner.utils.views import CommonPageMixin
 
 from .mixins import CaseAccessMixin, CaseLogMixin, OuterCaseAccessMixin
 
 
-class OuterCaseListView(
-    OuterCaseAccessMixin, CommonPageMixin, BaseBreadcrumbMixin, TemplateView
-):
-    """View on case list while being loaded"""
+class OuterCaseListView(OuterCaseAccessMixin, CommonPageMixin, TemplateView):
+    """View on the case list while content is loaded via htmx"""
 
     template_name = "pages/cases/list_outer.html"
 
     def page_title(self):
         return _("Mijn aanvragen")
-
-    @cached_property
-    def crumbs(self):
-        return [(_("Mijn aanvragen"), reverse("cases:redirect"))]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -44,8 +36,6 @@ class InnerCaseListView(
     PaginationMixin,
     TemplateView,
 ):
-    """View on case list"""
-
     template_name = "pages/cases/list_inner.html"
     paginate_by = 9
 
@@ -67,9 +57,9 @@ class InnerCaseListView(
         context = super().get_context_data(**kwargs)
         config = OpenZaakConfig.get_solo()
 
-        # update ctx with cases + submissions
-        preprocessed_cases = self.get_cases()
-        open_submissions = self.get_submissions()
+        # update ctx with submissions + cases
+        open_submissions: list[UniformCase] = self.get_submissions()
+        preprocessed_cases: list[UniformCase] = self.get_cases()
         paginator_dict = self.paginate_with_context(
             [*open_submissions, *preprocessed_cases]
         )
