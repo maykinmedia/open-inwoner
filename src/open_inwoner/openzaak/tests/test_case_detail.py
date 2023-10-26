@@ -27,6 +27,7 @@ from open_inwoner.openzaak.tests.factories import (
     StatusTranslationFactory,
     ZaakTypeConfigFactory,
     ZaakTypeInformatieObjectTypeConfigFactory,
+    ZaakTypeStatusTypeConfigFactory,
 )
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 
@@ -388,6 +389,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 "initiator": "Foo Bar van der Bazz",
                 "result": "resultaat toelichting",
                 "case_type_config_description": "",
+                "case_type_document_upload_description": "",
                 "internal_upload_enabled": False,
                 "external_upload_enabled": False,
                 "external_upload_url": "",
@@ -592,6 +594,12 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             zaaktype_uuids=[self.zaaktype["uuid"]],
             document_upload_enabled=True,
         )
+        zt_statustype_config = ZaakTypeStatusTypeConfigFactory(
+            zaaktype_config=zaak_type_config,
+            statustype_url=self.status_type_finish["url"],
+            zaaktype_uuids=[self.zaaktype["uuid"]],
+            document_upload_description="- Foo\n- bar",
+        )
 
         response = self.app.get(
             reverse(
@@ -606,6 +614,11 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
         self.assertEqual(type(type_field), Hidden)
         self.assertEqual(type_field.value, str(expected_choice))
+
+        info_card = response.html.find("div", {"class": "card--info"})
+
+        self.assertIsNotNone(info_card)
+        self.assertEqual(info_card.text.strip(), "info\n\nFoo\nbar")
 
     def test_expected_information_object_types_are_available_in_upload_form(self, m):
         self._setUpMocks(m)

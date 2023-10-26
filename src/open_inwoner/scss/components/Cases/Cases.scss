@@ -32,10 +32,6 @@
   background-color: $color-success;
   color: $color-success-dark;
   padding: 0.4em;
-
-  & .icon--success {
-    margin-right: 0.2em;
-  }
 }
 
 .card__header.info {
@@ -43,10 +39,6 @@
   background-color: $color-info;
   color: $color-info-dark;
   padding: 0.4em;
-
-  & .icon--info {
-    margin-right: 0.2em;
-  }
 }
 
 .card__header.warning {
@@ -54,10 +46,6 @@
   background-color: $color-warning;
   color: $color-warning-dark;
   padding: 0.4em;
-
-  & .icon--warning {
-    margin-right: 0.2em;
-  }
 }
 
 .card__header.failure {
@@ -65,8 +53,24 @@
   background-color: $color-danger;
   color: $color-danger-dark;
   padding: 0.4em;
+}
 
-  & .icon--failure {
-    margin-right: 0.2em;
-  }
+.icon--success {
+  margin-right: 0.2em;
+}
+
+.icon--info {
+  margin-right: 0.2em;
+}
+
+.icon--warning {
+  margin-right: 0.2em;
+}
+
+.icon--failure {
+  margin-right: 0.2em;
+}
+
+.document-upload-description {
+  display: flex;
 }

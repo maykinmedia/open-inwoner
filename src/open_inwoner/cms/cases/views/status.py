@@ -184,6 +184,7 @@ class InnerCaseDetailView(
         )
 
         case_type_config_description = ""
+        case_type_document_upload_description = ""
         external_upload_enabled = False
         external_upload_url = ""
         contact_form_enabled = False
@@ -198,8 +199,20 @@ class InnerCaseDetailView(
             if ztc.document_upload_enabled and ztc.external_document_upload_url != "":
                 external_upload_url = ztc.external_document_upload_url
                 external_upload_enabled = True
+
+            try:
+                zt_statustype_config = ztc.zaaktypestatustypeconfig_set.get(
+                    statustype_url=case.status.statustype.url
+                )
+                case_type_document_upload_description = (
+                    zt_statustype_config.document_upload_description
+                )
+            except ObjectDoesNotExist:
+                pass
+
         return {
             "case_type_config_description": case_type_config_description,
+            "case_type_document_upload_description": case_type_document_upload_description,
             "internal_upload_enabled": internal_upload_enabled
             and not getattr(self.case, "einddatum", None),
             "external_upload_enabled": external_upload_enabled
