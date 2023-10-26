@@ -31,7 +31,7 @@ def notification(type, message, **kwargs):
     Add a notification to the screen. These will be places inline.
 
     Usage:
-        {% notification type="success" message="this is the message" closable=True %}
+        {% notification type="success" message="this is the message" closable=True ctx="cases" %}
         {% notification type="warning" title="title" message="this is the message" action="#" action_text="Verzoek opsturen" %}
 
     Variables:
@@ -43,6 +43,8 @@ def notification(type, message, **kwargs):
         - action_text: string | The text of the button.
         - closable: bool | If a close button should be shown.
         - compact: boolean | Whether to use compact styling or not.
+        - ctx: string | The context in which the tag is rendered; used to add
+            classes to HTML element and override CSS
     """
     message_types = {
         "debug": "bug_report",

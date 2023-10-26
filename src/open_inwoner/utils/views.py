@@ -88,8 +88,7 @@ def server_error(request, template_name=ERROR_500_TEMPLATE_NAME):
 
 class LogMixin(object):
     """
-    Class based views mixin that adds simple wrappers to
-    the functions above.
+    CBV mixin that adds simple wrappers to logging functions
     """
 
     def log_addition(self, instance, message=""):

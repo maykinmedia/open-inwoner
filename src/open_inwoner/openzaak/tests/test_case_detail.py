@@ -34,7 +34,6 @@ from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 from ...utils.tests.helpers import AssertRedirectsMixin
 from ..api_models import Status, StatusType
 from ..models import OpenZaakConfig
-from ..utils import format_zaak_identificatie
 from .factories import CatalogusConfigFactory, ServiceFactory
 from .shared import CATALOGI_ROOT, DOCUMENTEN_ROOT, ZAKEN_ROOT
 
@@ -414,12 +413,13 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self._setUpMocks(m)
 
         with patch(
-            "open_inwoner.cms.cases.views.status.format_zaak_identificatie",
-            wraps=format_zaak_identificatie,
+            "open_inwoner.openzaak.api_models.Zaak._format_zaak_identificatie",
         ) as spy_format:
             self.app.get(self.case_detail_url, user=self.user)
 
-        spy_format.assert_called_once()
+        # _format_zaak_identificatie is called twice on requesting DetailVew:
+        # once for the log, once for adding case to context
+        spy_format.assert_called
 
     def test_page_translates_statuses(self, m):
         st1 = StatusTranslationFactory(

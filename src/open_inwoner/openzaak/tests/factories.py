@@ -3,13 +3,12 @@ from notifications_api_common.models import Subscription
 from simple_certmanager.constants import CertificateTypes
 from simple_certmanager.models import Certificate
 from zgw_consumers.api_models.base import factory as zwg_factory
-from zgw_consumers.api_models.catalogi import InformatieObjectType
 from zgw_consumers.api_models.constants import RolOmschrijving
 from zgw_consumers.models import Service
 from zgw_consumers.test import generate_oas_component
 
 from open_inwoner.accounts.tests.factories import UserFactory
-from open_inwoner.openzaak.api_models import Notification, Rol, ZaakType
+from open_inwoner.openzaak.api_models import Notification, Rol
 from open_inwoner.openzaak.models import (
     CatalogusConfig,
     StatusTranslation,

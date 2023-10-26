@@ -1,9 +1,4 @@
-from .cases import (
-    InnerClosedCaseListView,
-    InnerOpenCaseListView,
-    OuterClosedCaseListView,
-    OuterOpenCaseListView,
-)
+from .cases import InnerCaseListView, OuterCaseListView
 from .status import (
     CaseContactFormView,
     CaseDocumentDownloadView,
@@ -11,4 +6,3 @@ from .status import (
     InnerCaseDetailView,
     OuterCaseDetailView,
 )
-from .submissions import InnerOpenSubmissionListView, OuterOpenSubmissionListView

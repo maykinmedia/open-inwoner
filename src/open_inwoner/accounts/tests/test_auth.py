@@ -955,7 +955,7 @@ class DuplicateEmailRegistrationTest(WebTest):
         form = edit_page.forms["profile-edit"]
         form["first_name"] = "changed_first"
         form["last_name"] = "changed_last"
-        response = form.submit()
+        form.submit()
 
         user = User.objects.get(id=test_user.id)
 
@@ -994,7 +994,7 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
         urls = [
             reverse("pages-root"),
             reverse("products:category_list"),
-            reverse("cases:open_cases"),
+            reverse("cases:index"),
             reverse("profile:detail"),
             reverse("profile:data"),
             reverse("collaborate:plan_list"),

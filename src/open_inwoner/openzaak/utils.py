@@ -1,11 +1,6 @@
-import inspect
 import logging
-import re
-from functools import wraps
-from typing import Callable, Optional, TypeVar, Union
+from typing import Optional, Union
 from uuid import UUID
-
-from django.core.cache import caches
 
 from zds_client import get_operation_url
 from zgw_consumers.api_models.constants import RolTypes, VertrouwelijkheidsAanduidingen
@@ -113,82 +108,6 @@ def get_role_name_display(rol: Rol) -> str:
         return display
 
 
-RT = TypeVar("RT")
-
-
-def cache(key: str, alias: str = "default", **set_options):
-    """
-    Function-decorator for updating the django low-level cache.
-
-    It determines if the key exists in cache and skips it by calling the decorated function
-    or creates it if doesn't exist.
-
-    We can pass a keyword argument for the time we want the cache the data in
-    seconds (timeout=60).
-    """
-
-    def decorator(func: Callable[..., RT]) -> Callable[..., RT]:
-        argspec = inspect.getfullargspec(func)
-
-        if argspec.defaults:
-            positional_count = len(argspec.args) - len(argspec.defaults)
-            defaults = dict(zip(argspec.args[positional_count:], argspec.defaults))
-        else:
-            defaults = {}
-
-        @wraps(func)
-        def wrapped(*args, **kwargs) -> RT:
-            skip_cache = kwargs.pop("skip_cache", False)
-            if skip_cache:
-                return func(*args, **kwargs)
-
-            key_kwargs = defaults.copy()
-            named_args = dict(zip(argspec.args, args), **kwargs)
-            key_kwargs.update(**named_args)
-
-            if argspec.varkw:
-                var_kwargs = {
-                    key: value
-                    for key, value in named_args.items()
-                    if key not in argspec.args
-                }
-                key_kwargs[argspec.varkw] = var_kwargs
-
-            cache_key = key.format(**key_kwargs)
-
-            _cache = caches[alias]
-            result = _cache.get(cache_key)
-
-            # The key exists in cache so we return the already cached data
-            if result is not None:
-                logger.debug("Cache key '%s' hit", cache_key)
-                return result
-
-            # The key does not exist so we call the decorated function and set the cache
-            result = func(*args, **kwargs)
-            _cache.set(cache_key, result, **set_options)
-
-            return result
-
-        return wrapped
-
-    return decorator
-
-
-def get_retrieve_resource_by_uuid_url(
-    client, resource: str, uuid: Union[str, UUID]
-) -> str:
-    op_suffix = client.operation_suffix_mapping["retrieve"]
-    operation_id = f"{resource}{op_suffix}"
-    path_kwargs = {
-        "uuid": uuid,
-    }
-    url = get_operation_url(
-        client.schema, operation_id, base_url=client.base_url, **path_kwargs
-    )
-    return url
-
-
 def get_zaak_type_config(case_type: ZaakType) -> Optional[ZaakTypeConfig]:
     try:
         return ZaakTypeConfig.objects.filter_case_type(case_type).get()
@@ -209,24 +128,15 @@ def get_zaak_type_info_object_type_config(
         return None
 
 
-def format_zaak_identificatie(
-    identificatie: str, config: Optional[OpenZaakConfig] = None
-):
-    config = config or OpenZaakConfig.get_solo()
-    if config.reformat_esuite_zaak_identificatie:
-        return reformat_esuite_zaak_identificatie(identificatie)
-    else:
-        return identificatie
-
-
-def reformat_esuite_zaak_identificatie(identificatie: str):
-    """
-    0014ESUITE66392022 -> 6639-2022
-    """
-    exp = r"^\d+ESUITE(?P<num>\d+?)(?P<year>\d{4})$"
-    m = re.match(exp, identificatie)
-    if not m:
-        return identificatie
-    num = m.group("num")
-    year = m.group("year")
-    return f"{num}-{year}"
+def get_retrieve_resource_by_uuid_url(
+    client, resource: str, uuid: Union[str, UUID]
+) -> str:
+    op_suffix = client.operation_suffix_mapping["retrieve"]
+    operation_id = f"{resource}{op_suffix}"
+    path_kwargs = {
+        "uuid": uuid,
+    }
+    url = get_operation_url(
+        client.schema, operation_id, base_url=client.base_url, **path_kwargs
+    )
+    return url

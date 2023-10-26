@@ -8,11 +8,9 @@ from open_inwoner.openzaak.api_models import InformatieObject, Zaak, ZaakType
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.tests.factories import generate_rol
 from open_inwoner.openzaak.utils import (
-    format_zaak_identificatie,
     get_role_name_display,
     is_info_object_visible,
     is_zaak_visible,
-    reformat_esuite_zaak_identificatie,
 )
 
 from ...utils.test import ClearCachesMixin
@@ -258,37 +256,6 @@ class TestUtils(ClearCachesMixin, TestCase):
             )
             expected = "Bazz, Foo van der"
             self.assertEqual(expected, get_role_name_display(role))
-
-    def test_format_zaak_identificatie(self):
-        config = OpenZaakConfig.get_solo()
-        value = "0014ESUITE66392022"
-
-        with self.subTest("enabled"):
-            config.reformat_esuite_zaak_identificatie = True
-            config.save()
-            actual = format_zaak_identificatie(value, config)
-            self.assertEqual(actual, "6639-2022")
-
-        with self.subTest("disabled"):
-            config.reformat_esuite_zaak_identificatie = False
-            config.save()
-            actual = format_zaak_identificatie(value, config)
-            # no change
-            self.assertEqual(actual, value)
-
-    def test_reformat_esuite_zaak_identificatie(self):
-        tests = [
-            ("0014ESUITE66392022", "6639-2022"),
-            ("4321ESUITE00011991", "0001-1991"),
-            ("4321ESUITE123456781991", "12345678-1991"),
-            ("12345678", "12345678"),
-            ("aaaaaa1234", "aaaaaa1234"),
-        ]
-
-        for value, expected in tests:
-            with self.subTest(value=value, expected=expected):
-                actual = reformat_esuite_zaak_identificatie(value)
-                self.assertEqual(actual, expected)
 
 
 class TestHelpers(TestCase):

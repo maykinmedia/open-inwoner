@@ -44,11 +44,7 @@ from open_inwoner.openzaak.models import (
     ZaakTypeConfig,
     ZaakTypeInformatieObjectTypeConfig,
 )
-from open_inwoner.openzaak.utils import (
-    format_zaak_identificatie,
-    get_role_name_display,
-    is_info_object_visible,
-)
+from open_inwoner.openzaak.utils import get_role_name_display, is_info_object_visible
 from open_inwoner.utils.translate import TranslationLookup
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
@@ -71,7 +67,7 @@ class OuterCaseDetailView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn aanvragen"), reverse("cases:open_cases")),
+            (_("Mijn aanvragen"), reverse("cases:index")),
             (
                 _("Status"),
                 reverse("cases:case_detail", kwargs=self.kwargs),
@@ -91,11 +87,12 @@ class InnerCaseDetailView(
     template_name = "pages/cases/status_inner.html"
     form_class = CaseUploadForm
     contact_form_class = CaseContactForm
+    case: Zaak = None
 
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn aanvragen"), reverse("cases:open_cases")),
+            (_("Mijn aanvragen"), reverse("cases:index")),
             (
                 _("Status"),
                 reverse("cases:case_detail", kwargs=self.kwargs),
@@ -108,8 +105,10 @@ class InnerCaseDetailView(
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        # case is retrieved via CaseAccessMixin
         if self.case:
-            self.log_case_access(self.case.identificatie)
+            self.log_access_case_detail(self.case)
+
             config = OpenZaakConfig.get_solo()
             status_translate = StatusTranslation.objects.get_lookup()
 
@@ -137,9 +136,7 @@ class InnerCaseDetailView(
 
             context["case"] = {
                 "id": str(self.case.uuid),
-                "identification": format_zaak_identificatie(
-                    self.case.identificatie, config
-                ),
+                "identification": self.case.identification,
                 "initiator": self.get_initiator_display(self.case),
                 "result": self.get_result_display(self.case),
                 "start_date": self.case.startdatum,
@@ -354,7 +351,7 @@ class CaseDocumentDownloadView(LogMixin, CaseAccessMixin, View):
         raise PermissionDenied()
 
 
-class CaseDocumentUploadFormView(CaseAccessMixin, CaseLogMixin, FormView):
+class CaseDocumentUploadFormView(CaseAccessMixin, LogMixin, FormView):
     template_name = "pages/cases/document_form.html"
     form_class = CaseUploadForm
 
@@ -437,7 +434,7 @@ class CaseDocumentUploadFormView(CaseAccessMixin, CaseLogMixin, FormView):
         return context
 
 
-class CaseContactFormView(CaseAccessMixin, CaseLogMixin, FormView):
+class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
     template_name = "pages/cases/contact_form.html"
     form_class = CaseContactForm
 

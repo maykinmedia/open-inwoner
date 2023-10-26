@@ -1,121 +1,76 @@
 from django.urls import reverse
-from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
-from view_breadcrumbs import BaseBreadcrumbMixin
-
 from open_inwoner.htmx.mixins import RequiresHtmxMixin
+from open_inwoner.openzaak.cases import fetch_cases, preprocess_data
+from open_inwoner.openzaak.formapi import fetch_open_submissions
+from open_inwoner.openzaak.models import OpenZaakConfig
+from open_inwoner.openzaak.types import UniformCase
+from open_inwoner.utils.mixins import PaginationMixin
 from open_inwoner.utils.views import CommonPageMixin
 
-from .mixins import CaseAccessMixin, CaseListMixin, OuterCaseAccessMixin
+from .mixins import CaseAccessMixin, CaseLogMixin, OuterCaseAccessMixin
 
 
-class OuterOpenCaseListView(
-    OuterCaseAccessMixin, CommonPageMixin, BaseBreadcrumbMixin, TemplateView
-):
+class OuterCaseListView(OuterCaseAccessMixin, CommonPageMixin, TemplateView):
+    """View on the case list while content is loaded via htmx"""
+
     template_name = "pages/cases/list_outer.html"
 
-    @cached_property
-    def crumbs(self):
-        return [(_("Mijn aanvragen"), reverse("cases:open_cases"))]
-
     def page_title(self):
-        return _("Lopende aanvragen")
-
-    def get_anchors(self) -> list:
-        return [
-            (reverse("cases:open_submissions"), _("Openstaande aanvragen")),
-            ("#cases", _("Lopende aanvragen")),
-            (reverse("cases:closed_cases"), _("Afgeronde aanvragen")),
-        ]
+        return _("Mijn aanvragen")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # anchors are needed here as well for rendering the mobile ones
-        context["anchors"] = self.get_anchors()
-        context["hxget"] = reverse("cases:open_cases_content")
+        context["hxget"] = reverse("cases:cases_content")
         return context
 
 
-class InnerOpenCaseListView(
-    RequiresHtmxMixin, CommonPageMixin, CaseAccessMixin, CaseListMixin, TemplateView
+class InnerCaseListView(
+    RequiresHtmxMixin,
+    CommonPageMixin,
+    CaseAccessMixin,
+    CaseLogMixin,
+    PaginationMixin,
+    TemplateView,
 ):
     template_name = "pages/cases/list_inner.html"
+    paginate_by = 9
 
     def page_title(self):
-        return _("Lopende aanvragen")
+        return _("Mijn aanvragen")
 
     def get_cases(self):
-        all_cases = super().get_cases()
+        raw_cases = fetch_cases(self.request.user.bsn)
+        preprocessed_cases = preprocess_data(raw_cases)
+        preprocessed_cases.sort(key=lambda case: case.startdatum, reverse=True)
+        return preprocessed_cases
 
-        cases = [case for case in all_cases if not case.einddatum]
-        cases.sort(key=lambda case: case.startdatum, reverse=True)
-        return cases
-
-    def get_anchors(self) -> list:
-        return [
-            (reverse("cases:open_submissions"), _("Openstaande aanvragen")),
-            ("#cases", _("Lopende aanvragen")),
-            (reverse("cases:closed_cases"), _("Afgeronde aanvragen")),
-        ]
+    def get_submissions(self):
+        subs = fetch_open_submissions(self.request.user.bsn)
+        subs.sort(key=lambda sub: sub.datum_laatste_wijziging, reverse=True)
+        return subs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["hxget"] = reverse("cases:open_cases_content")
-        return context
+        config = OpenZaakConfig.get_solo()
 
+        # update ctx with submissions + cases
+        open_submissions: list[UniformCase] = self.get_submissions()
+        preprocessed_cases: list[UniformCase] = self.get_cases()
+        paginator_dict = self.paginate_with_context(
+            [*open_submissions, *preprocessed_cases]
+        )
+        case_dicts = [case.process_data() for case in paginator_dict["object_list"]]
 
-class OuterClosedCaseListView(
-    OuterCaseAccessMixin, CommonPageMixin, BaseBreadcrumbMixin, TemplateView
-):
-    template_name = "pages/cases/list_outer.html"
+        context["cases"] = case_dicts
+        context.update(paginator_dict)
 
-    @cached_property
-    def crumbs(self):
-        return [(_("Mijn aanvragen"), reverse("cases:closed_cases"))]
+        self.log_access_cases(case_dicts)
 
-    def page_title(self):
-        return _("Afgeronde aanvragen")
-
-    def get_anchors(self) -> list:
-        return [
-            (reverse("cases:open_submissions"), _("Openstaande aanvragen")),
-            (reverse("cases:open_cases"), _("Lopende aanvragen")),
-            ("#cases", _("Afgeronde aanvragen")),
-        ]
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["hxget"] = reverse("cases:closed_cases_content")
-        context["anchors"] = self.get_anchors()
-        return context
-
-
-class InnerClosedCaseListView(
-    RequiresHtmxMixin, CommonPageMixin, CaseAccessMixin, CaseListMixin, TemplateView
-):
-    template_name = "pages/cases/list_inner.html"
-
-    def page_title(self):
-        return _("Afgeronde aanvragen")
-
-    def get_cases(self):
-        all_cases = super().get_cases()
-
-        cases = [case for case in all_cases if case.einddatum]
-        cases.sort(key=lambda case: case.einddatum, reverse=True)
-        return cases
-
-    def get_anchors(self) -> list:
-        return [
-            (reverse("cases:open_submissions"), _("Openstaande aanvragen")),
-            (reverse("cases:open_cases"), _("Lopende aanvragen")),
-            ("#cases", _("Afgeronde aanvragen")),
-        ]
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["hxget"] = reverse("cases:closed_cases_content")
+        # other data
+        context["hxget"] = reverse("cases:cases_content")
+        context["title_text"] = config.title_text
         return context

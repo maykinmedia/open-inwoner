@@ -47,6 +47,7 @@ class OpenZaakConfigAdmin(SingletonModelAdmin):
                     "document_max_confidentiality",
                     "max_upload_size",
                     "allowed_file_extensions",
+                    "title_text",
                 ],
             },
         ),

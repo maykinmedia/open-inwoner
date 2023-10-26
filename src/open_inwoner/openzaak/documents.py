@@ -16,7 +16,7 @@ from open_inwoner.openzaak.api_models import InformatieObject
 from open_inwoner.openzaak.clients import build_client
 from open_inwoner.openzaak.models import OpenZaakConfig
 
-from .utils import cache as cache_result
+from ..utils.decorators import cache as cache_result
 
 logger = logging.getLogger(__name__)
 

@@ -9,9 +9,10 @@ from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.catalogi import Catalogus
 from zgw_consumers.service import get_paginated_results
 
+from ..utils.decorators import cache as cache_result
 from .api_models import InformatieObjectType, ResultaatType, StatusType, ZaakType
 from .clients import build_client
-from .utils import cache as cache_result, get_retrieve_resource_by_uuid_url
+from .utils import get_retrieve_resource_by_uuid_url
 
 logger = logging.getLogger(__name__)
 
