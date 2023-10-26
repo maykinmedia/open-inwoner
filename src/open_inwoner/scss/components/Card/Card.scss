@@ -20,8 +20,17 @@
   }
 
   &--info {
-    background-color: $color-info;
-    color: $color-info-dark;
+    background-color: var(--color-info-lighter);
+    color: var(--color-info-darker);
+    border: 0;
+
+    & .document-upload-description__text {
+      margin-top: 0.15em;
+
+      & * {
+        margin: 0;
+      }
+    }
   }
 
   &--stretch {

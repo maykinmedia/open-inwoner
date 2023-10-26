@@ -618,7 +618,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         info_card = response.html.find("div", {"class": "card--info"})
 
         self.assertIsNotNone(info_card)
-        self.assertEqual(info_card.text, "\n\n\ninfo\n\n\nFoo\nbar\n\n\n")
+        self.assertEqual(info_card.text.strip(), "info\n\nFoo\nbar")
 
     def test_expected_information_object_types_are_available_in_upload_form(self, m):
         self._setUpMocks(m)

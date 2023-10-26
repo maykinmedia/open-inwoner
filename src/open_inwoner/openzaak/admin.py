@@ -1,7 +1,7 @@
 from django.contrib import admin, messages
 from django.core.exceptions import ValidationError
 from django.db.models import BooleanField, Count, ExpressionWrapper, Q
-from django.forms import ModelForm
+from django.forms import ModelForm, Textarea
 from django.forms.models import BaseInlineFormSet
 from django.utils.translation import gettext_lazy as _, ngettext
 
@@ -165,7 +165,10 @@ class ZaakTypeStatusTypeConfigInlineAdminForm(ModelForm):
     class Meta:
         model = ZaakTypeStatusTypeConfig
         fields = "__all__"
-        widgets = {"document_upload_description": CKEditorWidget}
+        widgets = {
+            "document_upload_description": CKEditorWidget,
+            "status_indicator_text": Textarea(attrs={"cols": 40, "rows": 10}),
+        }
 
 
 class ZaakTypeStatusTypeConfigInline(admin.TabularInline):
