@@ -335,20 +335,23 @@ def add_status_type_config(case: Zaak) -> None:
         pass
 
 
-def filter_visible(cases: list[Zaak]) -> list[Zaak]:
-    return [case for case in cases if is_zaak_visible(case)]
-
-
 def preprocess_data(cases: list[Zaak]) -> list[Zaak]:
     """
     Resolve zaaktype and statustype, add status type config, filter for visibility
+
+    Note: we need to iterate twice over `cases` because the `zaak_type` must be
+          resolved to a `ZaakType` object before we can filter by visibility
     """
     for case in cases:
         resolve_zaak_type(case)
 
-        if case.status:
-            resolve_status(case)
-            resolve_status_type(case)
-            add_status_type_config(case)
+    cases = [case for case in cases if case.status and is_zaak_visible(case)]
 
-    return filter_visible(cases)
+    for case in cases:
+        resolve_status(case)
+        resolve_status_type(case)
+        add_status_type_config(case)
+
+    cases.sort(key=lambda case: case.startdatum, reverse=True)
+
+    return cases

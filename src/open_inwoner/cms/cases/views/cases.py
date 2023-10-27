@@ -45,7 +45,6 @@ class InnerCaseListView(
     def get_cases(self):
         raw_cases = fetch_cases(self.request.user.bsn)
         preprocessed_cases = preprocess_data(raw_cases)
-        preprocessed_cases.sort(key=lambda case: case.startdatum, reverse=True)
         return preprocessed_cases
 
     def get_submissions(self):
