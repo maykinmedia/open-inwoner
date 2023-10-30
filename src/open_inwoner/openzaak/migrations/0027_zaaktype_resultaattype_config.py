@@ -8,7 +8,7 @@ import django_better_admin_arrayfield.models.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("openzaak", "0025_auto_20231016_0957"),
+        ("openzaak", "0026_zaaktypestatustypeconfig_document_upload_description"),
     ]
 
     operations = [
