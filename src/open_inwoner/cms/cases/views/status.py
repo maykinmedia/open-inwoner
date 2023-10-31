@@ -171,6 +171,16 @@ class InnerCaseDetailView(
                         "status_indicator_text",
                         None,
                     ),
+                    "call_to_action_url": getattr(
+                        statustype_config_mapping.get(end_statustype.url),
+                        "call_to_action_url",
+                        None,
+                    ),
+                    "call_to_action_text": getattr(
+                        statustype_config_mapping.get(end_statustype.url),
+                        "call_to_action_text",
+                        None,
+                    ),
                 }
 
             context["case"] = {
@@ -203,6 +213,7 @@ class InnerCaseDetailView(
             )
         else:
             context["case"] = None
+
         return context
 
     def add_second_status_preview(self, statuses: list, statustypen: list) -> None:
@@ -295,21 +306,23 @@ class InnerCaseDetailView(
             ),
         }
 
-    def get_result_display(self, case: Zaak) -> str:
+    @staticmethod
+    def get_result_display(case: Zaak) -> str:
         if case.resultaat:
             result = fetch_single_result(case.resultaat)
             if result:
                 return result.toelichting
         return None
 
-    def get_initiator_display(self, case: Zaak) -> str:
+    @staticmethod
+    def get_initiator_display(case: Zaak) -> str:
         roles = fetch_case_roles(case.url, RolOmschrijving.initiator)
         if not roles:
             return ""
         return ", ".join([get_role_name_display(r) for r in roles])
 
+    @staticmethod
     def get_statuses_data(
-        self,
         statuses: List[Status],
         lookup: TranslationLookup,
         statustype_config_mapping: Optional[dict] = None,
@@ -330,11 +343,22 @@ class InnerCaseDetailView(
                     "status_indicator_text",
                     None,
                 ),
+                "call_to_action_url": getattr(
+                    statustype_config_mapping.get(s.statustype.url),
+                    "call_to_action_url",
+                    None,
+                ),
+                "call_to_action_text": getattr(
+                    statustype_config_mapping.get(s.statustype.url),
+                    "call_to_action_text",
+                    None,
+                ),
             }
             for s in statuses
         ]
 
-    def get_case_document_files(self, case: Zaak) -> List[SimpleFile]:
+    @staticmethod
+    def get_case_document_files(case: Zaak) -> List[SimpleFile]:
         case_info_objects = fetch_case_information_objects(case.url)
 
         # get the information objects for the case objects

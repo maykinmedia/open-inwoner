@@ -383,6 +383,26 @@ class ZaakTypeStatusTypeConfig(models.Model):
             "Whether the user should be notfied if a case is set to this type of status"
         ),
     )
+    show_document_uploads = models.BooleanField(
+        default=True,
+        verbose_name=_("Show document uploads"),
+        help_text=_("Whether document uploads are to be shown"),
+    )
+    call_to_action_url = models.URLField(
+        blank=True,
+        default="",
+        verbose_name=_("Call to action url"),
+        help_text=_(
+            "The url the user will be sent to by clicking on the call-to-action button"
+        ),
+    )
+    call_to_action_text = models.CharField(
+        max_length=48,
+        blank=True,
+        default="",
+        verbose_name=_("Call to action text"),
+        help_text=_("The text displayed on the call-to-action button"),
+    )
 
     class Meta:
         verbose_name = _("Zaaktype Statustype Configuration")
