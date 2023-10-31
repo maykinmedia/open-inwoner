@@ -1,3 +1,6 @@
+from django.core.exceptions import BadRequest
+from django.shortcuts import render
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from cms.plugin_base import CMSPluginBase
@@ -25,15 +28,23 @@ class CasesPlugin(CMSActiveAppMixin, CMSPluginBase):
     def render(self, context, instance, placeholder):
         request = context["request"]
         user = request.user
+        if check_user_auth(user, digid_required=True):
+            context["hxget"] = reverse("cases:cases_plugin_content")
+        return context
+
+    @classmethod
+    def render_htmx_content(cls, request):
+        user = request.user
+        context = dict()
+        context["page_title"] = "Page title"
+        context["title_text"] = "Title text"
 
         if not check_user_auth(user, digid_required=True):
-            context["cases"] = None
             return context
 
         raw_cases = [case for case in fetch_cases(user.bsn) if not case.einddatum]
 
         if not all(check_user_access_rights(user, case.url) for case in raw_cases):
-            context["cases"] = None
             return context
 
         # TODO
@@ -41,11 +52,22 @@ class CasesPlugin(CMSActiveAppMixin, CMSPluginBase):
 
         subs = fetch_open_submissions(request.user.bsn)
 
-        # replce raw_cases with preprocessed_cases
+        # replace raw_cases with preprocessed_cases
         all_cases = raw_cases + subs
 
         # processed_cases = [case.preprocess_data() for case in all_cases]
 
-        context["cases"] = all_cases[: self.limit]
+        context["cases"] = all_cases[: cls.limit]
 
         return context
+
+    @classmethod
+    def as_htmx_view(cls):
+        # this could be generalized to a mixin
+        def _view(request):
+            if not request.htmx:
+                raise BadRequest("requires htmx")
+            context = cls.render_htmx_content(request)
+            return render(request, cls.render_template, context)
+
+        return _view

@@ -10,6 +10,7 @@ from cms.api import add_plugin
 from cms.app_base import CMSApp
 from cms.models import Placeholder
 from cms.plugin_rendering import ContentRenderer
+from django_htmx.middleware import HtmxDetails
 
 from open_inwoner.cms.extensions.models import CommonExtension
 
@@ -43,12 +44,19 @@ def _init_plugin(plugin_class, plugin_data=None) -> Tuple[dict, str]:
     return model_instance
 
 
-def get_request(*, user=None):
-    request = RequestFactory()
+def get_request(*, user=None, htmx=False):
+    headers = {}
+    if htmx:
+        headers["HX-Request"] = "true"
+    request = RequestFactory().get("/", headers=headers)
     if user:
         request.user = user
     else:
         request.user = AnonymousUser()
+    if htmx:
+        request.htmx = HtmxDetails(request)
+    else:
+        request.htmx = None
     return request
 
 
@@ -62,6 +70,9 @@ def render_plugin(plugin_class, plugin_data=None, *, user=None) -> Tuple[str, di
     #   and once to get the returned context (to test returned context content)
     renderer = ContentRenderer(request=request)
     html = renderer.render_plugin(model_instance, context)
+
+    # clean up newlines from template that decides to render nothing
+    html = html.strip()
 
     # let's check for output
     if html:

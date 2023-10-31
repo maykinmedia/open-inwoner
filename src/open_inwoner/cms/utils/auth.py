@@ -17,6 +17,6 @@ def check_user_auth(user, digid_required: bool = False) -> bool:
 
 def check_user_access_rights(user, case_url) -> bool:
     if not fetch_roles_for_case_and_bsn(case_url, user.bsn):
-        f"Permission denied: no role for the case {case_url}"
+        logger.debug(f"Permission denied: no role for the case {case_url}")
         return False
     return True

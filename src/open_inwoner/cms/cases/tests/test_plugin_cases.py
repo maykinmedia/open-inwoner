@@ -1,8 +1,9 @@
 from unittest.mock import patch
 
+from django.template.loader import render_to_string
 from django.test import TestCase, override_settings
+from django.urls import reverse
 
-import lxml
 import requests_mock
 from pyquery import PyQuery as pq
 
@@ -12,8 +13,18 @@ from open_inwoner.openzaak.tests.mixins import ZakenTestMixin
 from open_inwoner.utils.test import ClearCachesMixin
 
 from ...tests import cms_tools
+from ...tests.cms_tools import get_request
 from ..cms_apps import CasesApphook
 from ..cms_plugins import CasesPlugin
+
+
+def render_htmx_plugin(plugin_class, *, user=None) -> tuple[str, dict]:
+    # this could be moved to cmstools when re-used
+    request = get_request(user=user, htmx=True)
+    context = plugin_class.render_content(request)
+    html = render_to_string(plugin_class.render_template, context, request=request)
+    html = html.strip()
+    return html, context
 
 
 @requests_mock.Mocker()
@@ -31,13 +42,8 @@ class CasesPluginTest(ZakenTestMixin, ClearCachesMixin, TestCase):
         # anonymous user
         html, context = cms_tools.render_plugin(CasesPlugin)
 
-        self.assertIsNone(context["cases"])
-
-        # check that html empty
-        with self.assertRaises(lxml.etree.ParserError) as ctx:
-            pq(html)
-
-        self.assertEqual(str(ctx.exception), "Document is empty")
+        self.assertIsNone(context)
+        self.assertEqual(html, "")
 
     def test_cms_plugin_cases_not_rendered_for_non_digid_user(self, m):
         self.setUpMocks(m)
@@ -48,20 +54,25 @@ class CasesPluginTest(ZakenTestMixin, ClearCachesMixin, TestCase):
 
         html, context = cms_tools.render_plugin(CasesPlugin, user=user)
 
-        self.assertIsNone(context["cases"])
+        self.assertIsNone(context)
+        self.assertEqual(html, "")
 
-        # check that html empty
-        with self.assertRaises(lxml.etree.ParserError) as ctx:
-            pq(html)
-
-        self.assertEqual(str(ctx.exception), "Document is empty")
-
-    def test_cms_plugin_cases_rendered(self, m):
+    def test_cms_plugin_renders_htmx_trigger(self, m):
         self.setUpMocks(m)
-        self.setUpMocksExtra(m)  # create additional zaken
-
-        # the ZakenTestMixin user is a digid user
         html, context = cms_tools.render_plugin(CasesPlugin, user=self.user)
+
+        self.assertEqual(context["hxget"], reverse("cases:cases_plugin_content"))
+
+        doc = pq(html)
+        trigger = doc.find("#spinner")
+        self.assertEqual(trigger.attr["hx-get"], reverse("cases:cases_plugin_content"))
+        self.assertEqual(trigger.attr["hx-trigger"], "load")
+
+    def test_cms_plugin_view_renders_cases(self, m):
+        self.setUpMocks(m)
+        self.setUpMocksExtra(m)
+
+        html, context = render_htmx_plugin(CasesPlugin, user=self.user)
 
         cases = context["cases"]
 
@@ -83,4 +94,33 @@ class CasesPluginTest(ZakenTestMixin, ClearCachesMixin, TestCase):
         html_case_links = doc.find("a")
 
         for html_link, path in zip(html_case_links, case_link_paths):
-            self.assertEqual(html_link.attrib["href"], f"/cases/{path}/status/")
+            # TODO reverse
+            self.assertEqual(html_link.attrib["href"], rf"/cases/{path}/status/")
+
+    def test_cms_plugin_view_requires_digid_and_htmx(self, m):
+        self.setUpMocks(m)
+        self.setUpMocksExtra(m)
+
+        url = reverse("cases:cases_plugin_content")
+
+        with self.subTest("anonymous"):
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 400)
+
+        with self.subTest("not bsn"):
+            user = UserFactory()
+            user.login_type = LoginTypeChoices.default
+            user.save()
+            self.client.force_login(user)
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 400)
+
+        with self.subTest("digid"):
+            self.client.force_login(self.user)
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 400)
+
+        with self.subTest("digid and htmx"):
+            self.client.force_login(self.user)
+            response = self.client.get(url, HTTP_HX_REQUEST="true")
+            self.assertEqual(response.status_code, 200)

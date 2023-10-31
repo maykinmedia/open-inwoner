@@ -1,10 +1,13 @@
 {% load i18n grid_tags icon_tags list_tags pagination_tags utils %}
-
-{% if cases %}
+{% if hxget %}
+    <div class="spinner" id="spinner-id" hx-get="{{ hxget }}" hx-trigger="load">
+        {% icon icon="rotate_right" extra_classes="spinner-icon rotate" %}
+        <div class="spinner__content">{% trans "Gegevens laden..." %}</div>
+    </div>
+{% elif cases %}
   <h2 class="h2" id="cases">{{ page_title }} ({{ paginator.count }})</h2>
   <p class="cases__title_text">{{ title_text }}</p>
   {% render_grid %}
-      
       {% for case in cases %}
           {% render_column start=forloop.counter_0|multiply:4 span=4 %}
           <div class="card card--compact card--stretch">
