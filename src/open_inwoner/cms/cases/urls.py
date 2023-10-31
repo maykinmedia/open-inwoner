@@ -6,6 +6,7 @@ from open_inwoner.accounts.views.contactmoments import (
     KlantContactMomentListView,
 )
 
+from .cms_plugins import CasesPlugin
 from .views import (
     CaseContactFormView,
     CaseDocumentDownloadView,
@@ -23,6 +24,11 @@ from .views import (
 app_name = "cases"
 
 urlpatterns = [
+    path(
+        "plugins/cases/",
+        CasesPlugin.as_htmx_view(),
+        name="cases_plugin_content",
+    ),
     path(
         "closed/content/",
         InnerClosedCaseListView.as_view(),
