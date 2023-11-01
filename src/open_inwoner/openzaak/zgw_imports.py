@@ -3,13 +3,18 @@ from typing import List, Tuple
 
 from django.db import transaction
 
-from zgw_consumers.api_models.catalogi import InformatieObjectType, StatusType
+from zgw_consumers.api_models.catalogi import (
+    InformatieObjectType,
+    ResultaatType,
+    StatusType,
+)
 
 from open_inwoner.openzaak.api_models import ZaakType
 from open_inwoner.openzaak.catalog import (
     fetch_case_types_by_identification_no_cache,
     fetch_catalogs_no_cache,
     fetch_single_information_object_type,
+    fetch_single_resultaat_type,
     fetch_single_status_type,
     fetch_zaaktypes_no_cache,
 )
@@ -17,6 +22,7 @@ from open_inwoner.openzaak.models import (
     CatalogusConfig,
     ZaakTypeConfig,
     ZaakTypeInformatieObjectTypeConfig,
+    ZaakTypeResultaatTypeConfig,
     ZaakTypeStatusTypeConfig,
 )
 
@@ -148,6 +154,20 @@ def import_zaaktype_statustype_configs() -> List[Tuple[ZaakTypeConfig, StatusTyp
     return created
 
 
+def import_zaaktype_resultaattype_configs() -> List[
+    Tuple[ZaakTypeConfig, ResultaatType]
+]:
+    """
+    generate ZaakTypeResultaatTypeConfigs for all ZaakTypeConfig
+    """
+    created = []
+    for ztc in ZaakTypeConfig.objects.all():
+        imported = import_resultaattype_configs_for_type(ztc)
+        if imported:
+            created.append((ztc, imported))
+    return created
+
+
 def import_zaaktype_informatieobjecttype_configs_for_type(
     ztc: ZaakTypeConfig,
 ) -> List[ZaakTypeInformatieObjectTypeConfig]:
@@ -243,7 +263,7 @@ def import_statustype_configs_for_type(
             for zaaktype_statustype in ztc.zaaktypestatustypeconfig_set.all()
         }
 
-        # collect and implicitly de-duplicate informatieobjecttype url's and track which zaaktype used it
+        # collect and implicitly de-duplicate statustype url's and track which zaaktype used it
         info_queue = defaultdict(list)
         for zaak_type in zaak_types:
             for url in zaak_type.statustypen:
@@ -280,5 +300,72 @@ def import_statustype_configs_for_type(
             ZaakTypeStatusTypeConfig.objects.bulk_create(create)
         if update:
             ZaakTypeStatusTypeConfig.objects.bulk_update(update, ["zaaktype_uuids"])
+
+    return create
+
+
+def import_resultaattype_configs_for_type(
+    ztc: ZaakTypeConfig,
+) -> List[ZaakTypeResultaatTypeConfig]:
+    """
+    generate ZaakTypeResultaatTypeConfigs for all ResultaatTypes used by each ZaakTypeConfigs source ZaakTypes
+
+    this is a bit complicated because one ZaakTypeConfig can represent multiple ZaakTypes
+    """
+
+    # grab actual ZaakTypes for this identificatie
+    zaak_types: List[ZaakType] = get_configurable_zaaktypes_by_identification(
+        ztc.identificatie, ztc.catalogus_url
+    )
+    if not zaak_types:
+        return []
+
+    create = []
+    update = []
+
+    with transaction.atomic():
+        # map existing config records by url
+
+        info_map = {
+            zaaktype_resultaattype.resultaattype_url: zaaktype_resultaattype
+            for zaaktype_resultaattype in ztc.zaaktyperesultaattypeconfig_set.all()
+        }
+
+        # collect and implicitly de-duplicate resultaattype url's and track which zaaktype used it
+        info_queue = defaultdict(list)
+        for zaak_type in zaak_types:
+            for url in zaak_type.resultaattypen:
+                info_queue[url].append(zaak_type)
+
+        if info_queue:
+            # load urls and update/create records
+            for resultaattype_url, using_zaak_types in info_queue.items():
+                resultaat_type = fetch_single_resultaat_type(resultaattype_url)
+
+                zaaktype_resultaattype = info_map.get(resultaat_type.url)
+                if zaaktype_resultaattype:
+                    # we got a record for this, see if we got data to update
+                    for using in using_zaak_types:
+                        # track which zaaktype UUID's are interested in this resultaattype
+                        if using.uuid not in zaaktype_resultaattype.zaaktype_uuids:
+                            zaaktype_resultaattype.zaaktype_uuids.append(using.uuid)
+                            if zaaktype_resultaattype not in create:
+                                update.append(zaaktype_resultaattype)
+                else:
+                    # new record
+                    zaaktype_resultaattype = ZaakTypeResultaatTypeConfig(
+                        zaaktype_config=ztc,
+                        resultaattype_url=resultaat_type.url,
+                        omschrijving=resultaat_type.omschrijving,
+                        zaaktype_uuids=[zt.uuid for zt in using_zaak_types],
+                    )
+                    create.append(zaaktype_resultaattype)
+                    # not strictly necessary but let's be accurate
+                    info_map[resultaat_type.uuid] = zaaktype_resultaattype
+
+        if create:
+            ZaakTypeResultaatTypeConfig.objects.bulk_create(create)
+        if update:
+            ZaakTypeResultaatTypeConfig.objects.bulk_update(update, ["zaaktype_uuids"])
 
     return create
