@@ -1,31 +1,22 @@
 {% load i18n ssd_tags anchor_menu_tags card_tags dashboard_tags file_tags grid_tags table_tags solo_tags button_tags icon_tags notification_tags %}
 
-{# Anchor menu-mobile #}
-<div id="cases-status-anchors-oob-mobile" hx-swap-oob="true">
-    {% anchor_menu anchors=anchors desktop=False %}
-</div>
-
 {# Messages #}
 <div class="container container--no-margin" id="cases-status-messages-oob" hx-swap-oob="true">
     {% notifications messages %}
 </div>
 
-{# Anchor menu-desktop #}
-<div id="cases-status-anchors-oob" hx-swap-oob="true">
-    {% anchor_menu anchors desktop=True %}
-</div>
-
 {% get_solo 'openzaak.OpenZaakConfig' as openzaak_config %}
 
+<div class="cases__grid">
 {% if case %}
     {% render_grid %}
-        {% render_column span=9 %}
-
+        {% render_column span=12 %}
             {# Title/dashboard. #}
             <h1 class="h1" id="title">{{ case.description }}</h1>
             {% case_dashboard case %}
-            {% case_table case %}
+        {% endrender_column %}
 
+        {% render_column start=4 span=6 %}
             {#  Status history. #}
             {% if case.statuses %}
                 <h2 class="h2" id="statuses">{% trans 'Status' %}</h2>
@@ -104,3 +95,4 @@
 {% else %}
     <h2 class="h2">{% trans 'There is no available data at the moment.' %}</h2>
 {% endif %}
+</div>
