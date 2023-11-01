@@ -83,6 +83,26 @@ def fetch_single_status_type(status_type_url: str) -> Optional[StatusType]:
     return status_type
 
 
+@cache_result(
+    "resultaat_type:{resultaat_type_url}", timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT
+)
+def fetch_single_resultaat_type(resultaat_type_url: str) -> Optional[ResultaatType]:
+    client = build_client("catalogi")
+
+    if client is None:
+        return
+
+    try:
+        response = client.retrieve("resultaattype", url=resultaat_type_url)
+    except (RequestException, ClientError) as e:
+        logger.exception("exception while making request", exc_info=e)
+        return
+
+    resultaat_type = factory(ResultaatType, response)
+
+    return resultaat_type
+
+
 # not cached because only used by tools,
 # and because caching (stale) listings can break lookups
 def fetch_zaaktypes_no_cache() -> List[ZaakType]:

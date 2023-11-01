@@ -88,6 +88,18 @@ class InformationObjectTypeMockData:
             statustypen=[
                 self.statustype_aaa_1["url"],
             ],
+            resultaattypen=[
+                f"{CATALOGI_ROOT}resultaatypen/b1a268dd-4322-47bb-a930-b83066b4a32c"
+            ],
+        )
+        self.resultaat_type_1 = generate_oas_component(
+            "ztc",
+            "schemas/ResultaatType",
+            url=f"{CATALOGI_ROOT}resultaatypen/b1a268dd-4322-47bb-a930-b83066b4a32c",
+            zaaktype=self.zaaktype_aaa_1,
+            omschrijving="test",
+            resultaattypeomschrijving="test1",
+            selectielijstklasse="ABC",
         )
         self.zaaktype_bbb = generate_oas_component(
             "ztc",
@@ -103,6 +115,9 @@ class InformationObjectTypeMockData:
                 self.info_type_bbb["url"],
             ],
             statustypen=[],
+            resultaattypen=[
+                f"{CATALOGI_ROOT}resultaatypen/b1a268dd-4322-47bb-a930-b83066b4a32c"
+            ],
         )
         self.zaaktype_aaa_2 = generate_oas_component(
             "ztc",
@@ -121,6 +136,9 @@ class InformationObjectTypeMockData:
             statustypen=[
                 self.statustype_aaa_2["url"],
             ],
+            resultaattypen=[
+                f"{CATALOGI_ROOT}resultaatypen/b1a268dd-4322-47bb-a930-b83066b4a32c",
+            ],
         )
         self.zaaktype_aaa_intern = generate_oas_component(
             "ztc",
@@ -137,6 +155,7 @@ class InformationObjectTypeMockData:
                 self.info_type_aaa_1["url"],
             ],
             statustypen=[],
+            resultaattypen=[],
         )
         self.extra_zaaktype_aaa = generate_oas_component(
             "ztc",
@@ -155,6 +174,9 @@ class InformationObjectTypeMockData:
                 self.extra_info_type_aaa_3["url"],
             ],
             statustypen=[],
+            resultaattypen=[
+                self.resultaat_type_1["url"],
+            ],
         )
 
         self.all_io_types = [
@@ -174,6 +196,9 @@ class InformationObjectTypeMockData:
             self.statustype_aaa_1,
             self.statustype_aaa_2,
         ]
+        self.all_resultaat_types = [
+            self.resultaat_type_1,
+        ]
 
     def setUpOASMocks(self, m):
         mock_service_oas_get(m, CATALOGI_ROOT, "ztc")
@@ -188,6 +213,7 @@ class InformationObjectTypeMockData:
             self.extra_info_type_aaa_3,
             self.statustype_aaa_1,
             self.statustype_aaa_2,
+            self.resultaat_type_1,
         ]:
             m.get(resource["url"], json=resource)
 
@@ -199,6 +225,14 @@ class InformationObjectTypeMockData:
                     self.zaaktype_bbb,
                     self.zaaktype_aaa_2,
                     self.zaaktype_aaa_intern,
+                ]
+            ),
+        )
+        m.get(
+            f"{CATALOGI_ROOT}resultaattypen",
+            json=paginated_response(
+                [
+                    self.resultaat_type_1,
                 ]
             ),
         )

@@ -1,4 +1,5 @@
 from datetime import date
+from unittest.mock import patch
 from urllib.parse import urlencode
 
 from django.contrib.sites.models import Site
@@ -68,7 +69,11 @@ class DigiDRegistrationTest(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
             furl(reverse("digid:login")).add({"next": necessary_url}).url,
         )
 
-    def test_digid_fail_without_invite_redirects_to_login_page(self):
+    @patch("digid_eherkenning.validators.Proef11ValidatorBase.__call__")
+    def test_digid_fail_without_invite_redirects_to_login_page(self, m):
+        # disable mock form validation to check redirect
+        m.return_value = True
+
         self.assertNotIn("invite_url", self.client.session.keys())
 
         url = reverse("digid-mock:password")
@@ -87,7 +92,11 @@ class DigiDRegistrationTest(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
 
         self.assertRedirectsLogin(response, with_host=True)
 
-    def test_digid_fail_without_invite_and_next_url_redirects_to_login_page(self):
+    @patch("digid_eherkenning.validators.Proef11ValidatorBase.__call__")
+    def test_digid_fail_without_invite_and_next_url_redirects_to_login_page(self, m):
+        # disable mock form validation to check redirect
+        m.return_value = True
+
         self.assertNotIn("invite_url", self.client.session.keys())
 
         url = reverse("digid-mock:password")
@@ -106,7 +115,10 @@ class DigiDRegistrationTest(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
 
         self.assertRedirectsLogin(response, with_host=True)
 
-    def test_digid_fail_with_invite_redirects_to_register_page(self):
+    @patch("digid_eherkenning.validators.Proef11ValidatorBase.__call__")
+    def test_digid_fail_with_invite_redirects_to_register_page(self, m):
+        # disable mock form validation to check redirect
+        m.return_value = True
         invite = InviteFactory()
         session = self.client.session
         session[
@@ -149,7 +161,7 @@ class DigiDRegistrationTest(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
         url = f"{url}?{urlencode(params)}"
 
         data = {
-            "auth_name": "123456789",
+            "auth_name": "533458225",
             "auth_pass": "bar",
         }
 
@@ -175,7 +187,7 @@ class DigiDRegistrationTest(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
             "next": reverse("profile:registration_necessary"),
         }
         data = {
-            "auth_name": "123456789",
+            "auth_name": "533458225",
             "auth_pass": "bar",
         }
         url = f"{url}?{urlencode(params)}"
@@ -223,7 +235,7 @@ class DigiDRegistrationTest(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
             "next": reverse("profile:registration_necessary"),
         }
         data = {
-            "auth_name": "123456789",
+            "auth_name": "533458225",
             "auth_pass": "bar",
         }
         url = f"{url}?{urlencode(params)}"
@@ -260,7 +272,7 @@ class DigiDRegistrationTest(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
         url = f"{url}?{urlencode(params)}"
 
         data = {
-            "auth_name": "123456782",
+            "auth_name": "533458225",
             "auth_pass": "bar",
         }
         # post our password to the IDP
@@ -691,7 +703,7 @@ class DuplicateEmailRegistrationTest(WebTest):
         """Assert that digid users can register with duplicate emails"""
         test_user = DigidUserFactory.create(
             email="test@example.com",
-            bsn="123456789",
+            bsn="648197724",
         )
 
         url = reverse("digid-mock:password")
@@ -703,7 +715,7 @@ class DuplicateEmailRegistrationTest(WebTest):
 
         data = {
             # different BSN
-            "auth_name": "112083948",
+            "auth_name": "533458225",
             "auth_pass": "bar",
         }
         # post our password to the IDP
@@ -780,7 +792,7 @@ class DuplicateEmailRegistrationTest(WebTest):
         url = f"{url}?{urlencode(params)}"
 
         data = {
-            "auth_name": "123456789",
+            "auth_name": "533458225",
             "auth_pass": "bar",
         }
         # post our password to the IDP
@@ -816,7 +828,7 @@ class DuplicateEmailRegistrationTest(WebTest):
         url = f"{url}?{urlencode(params)}"
 
         data = {
-            "auth_name": "123456782",
+            "auth_name": "533458225",
             "auth_pass": "bar",
         }
         # post our password to the IDP

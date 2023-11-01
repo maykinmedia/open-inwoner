@@ -496,8 +496,6 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.assertContains(response, "ZAAK-2022-0000000024")
         self.assertContains(response, "Coffee zaaktype")
         self.assertContains(response, "uploaded_document_title")
-        self.assertContains(response, "Foo Bar van der Bazz")
-        self.assertContains(response, "resultaat toelichting")
 
     def test_page_reformats_zaak_identificatie(self, m):
         self._setUpMocks(m)

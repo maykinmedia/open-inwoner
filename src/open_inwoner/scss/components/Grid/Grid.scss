@@ -18,7 +18,8 @@
     display: grid;
     grid-template-columns: repeat(12, 1fr);
     grid-template-rows: 1fr;
-    gap: var(--gutter-width);
+    grid-row-gap: var(--spacing-extra-large);
+    grid-column-gap: var(--gutter-width);
   }
 
   /// Layout.

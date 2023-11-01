@@ -377,6 +377,50 @@ class ZaakTypeStatusTypeConfig(models.Model):
         return f"{self.zaaktype_config.identificatie} - {self.omschrijving}"
 
 
+class ZaakTypeResultaatTypeConfig(models.Model):
+    zaaktype_config = models.ForeignKey(
+        "openzaak.ZaakTypeConfig",
+        on_delete=models.CASCADE,
+    )
+    resultaattype_url = models.URLField(
+        verbose_name=_("Resultaattype URL"),
+        max_length=1000,
+    )
+    omschrijving = models.CharField(
+        verbose_name=_("Omschrijving"),
+        max_length=20,
+    )
+    zaaktype_uuids = ArrayField(
+        models.UUIDField(
+            verbose_name=_("Zaaktype UUID"),
+        ),
+        default=list,
+    )
+
+    # configuration
+    description = models.TextField(
+        blank=True,
+        default="",
+        verbose_name=_("Frontend description"),
+        help_text=_(
+            "Determines the text that will be shown to the user if a case is set to this result"
+        ),
+    )
+
+    class Meta:
+        verbose_name = _("Zaaktype Resultaattype Configuration")
+
+        constraints = [
+            UniqueConstraint(
+                name="unique_zaaktype_config_resultaattype_url",
+                fields=["zaaktype_config", "resultaattype_url"],
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.zaaktype_config.identificatie} - {self.omschrijving}"
+
+
 class UserCaseStatusNotificationBase(models.Model):
     user = models.ForeignKey(
         "accounts.User",

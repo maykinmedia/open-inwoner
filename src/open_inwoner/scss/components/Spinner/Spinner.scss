@@ -20,6 +20,11 @@
     align-items: flex-start;
     height: 70vh;
     margin: 100px 0 0 200px;
+
+    &.case__spinner-container {
+      justify-content: center;
+      margin: 100px 0 0 0;
+    }
   }
 
   .spinner {

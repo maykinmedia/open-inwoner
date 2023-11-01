@@ -14,7 +14,9 @@
   }
 
   @media (min-width: 768px) {
-    $hm: max(calc((100vw - var(--container-width)) / 2), var(--spacing-large));
+    // $hm has a minimum of var(--spacing-large), and a maximum of $hlargest
+    $hlargest: calc(((100vw - var(--container-width)) / 2) - 7px);
+    $hm: max($hlargest, var(--spacing-large));
     margin: var(--spacing-extra-large) $hm calc(var(--row-height) * 2);
 
     &--no-margin {
