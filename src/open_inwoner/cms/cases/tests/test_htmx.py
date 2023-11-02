@@ -308,6 +308,15 @@ class CasesPlaywrightTests(
             self.zaak,
             self.result,
             self.zaaktype,
+            self.status_type_new,
+            self.status_type_finish,
+        ]:
+            m.get(resource["url"], json=resource)
+
+        for resource in [
+            self.zaak,
+            self.result,
+            self.zaaktype,
             self.informatie_object,
             self.uploaded_informatie_object,
             self.status_finish,

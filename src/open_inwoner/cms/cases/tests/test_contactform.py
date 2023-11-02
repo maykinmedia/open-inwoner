@@ -121,7 +121,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             "schemas/Status",
             url=f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-beu760sle929",
             zaak=self.zaak["url"],
-            statustype=f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-777yu878km09",
+            statustype=f"{CATALOGI_ROOT}statustypen/t302de91-68b5-4bb2-9f65-fdd3083bace9",
             datumStatusGezet="2021-01-12",
             statustoelichting="",
         )
@@ -147,6 +147,19 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             omschrijvingGeneriek="Nieuw",
             statustekst="",
             volgnummer=1,
+            isEindstatus=False,
+        )
+        # no associated status (for testing `add_second_status_preview`)
+        self.status_type_in_behandeling = generate_oas_component(
+            "ztc",
+            "schemas/StatusType",
+            url=f"{CATALOGI_ROOT}statustypen/167cb935-ac8a-428e-8cca-5abda0da47c7",
+            zaaktype=self.zaaktype["url"],
+            catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            omschrijving="In behandeling",
+            omschrijvingGeneriek="some content",
+            statustekst="",
+            volgnummer=3,
             isEindstatus=False,
         )
         self.status_type_finish = generate_oas_component(
@@ -210,6 +223,16 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             self.status_type_finish,
         ]:
             self.matchers.append(m.get(resource["url"], json=resource))
+
+        for resource in [
+            self.zaak,
+            self.result,
+            self.zaaktype,
+            self.status_type_new,
+            self.status_type_in_behandeling,
+            self.status_type_finish,
+        ]:
+            m.get(resource["url"], json=resource)
 
         # mock `fetch_status_types_no_cache`
         m.get(
