@@ -51,6 +51,14 @@ class SearchView(
         query = data.pop("query")
         context = self.get_context_data(form=form)
 
+        if not query:
+            return self.render_to_response(context)
+
+        # log search query of authenticated users
+        user = self.request.user
+        if user.is_authenticated:
+            self.log_user_action(user, _("search query: {query}").format(query=query))
+
         # Check if the query exactly matches with a case that belongs to the user
         if hasattr(self.request.user, "bsn"):
             cases = fetch_cases(self.request.user.bsn, identificatie=query)
@@ -60,14 +68,6 @@ class SearchView(
                         "cases:case_detail", kwargs={"object_id": str(cases[0].uuid)}
                     )
                 )
-
-        if not query:
-            return self.render_to_response(context)
-
-        # log search query of authenticated users
-        user = self.request.user
-        if user.is_authenticated:
-            self.log_user_action(user, _("search query: {query}").format(query=query))
 
         # perform search
         results = search_products(query, filters=data)

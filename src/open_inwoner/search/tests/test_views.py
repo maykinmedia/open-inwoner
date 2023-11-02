@@ -284,3 +284,13 @@ class TestSearchView(ESMixin, TestCase):
 
         # Show regular search results page
         self.assertEqual(response.status_code, 200)
+
+    def test_search_case_empty_query(self, m):
+        self._setUpMocks(m)
+
+        self.client.force_login(self.user)
+        params = urlencode({"query": ""}, doseq=True)
+        response = self.client.get(f'{reverse("search:search")}?{params}')
+
+        # Show regular search results page
+        self.assertEqual(response.status_code, 200)
