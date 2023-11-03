@@ -1,6 +1,9 @@
 from django.urls import reverse
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
+
+from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.htmx.mixins import RequiresHtmxMixin
 from open_inwoner.openzaak.cases import fetch_cases, preprocess_data
@@ -13,10 +16,18 @@ from open_inwoner.utils.views import CommonPageMixin
 from .mixins import CaseAccessMixin, CaseLogMixin, OuterCaseAccessMixin
 
 
-class OuterCaseListView(OuterCaseAccessMixin, CommonPageMixin, TemplateView):
+class OuterCaseListView(
+    OuterCaseAccessMixin, CommonPageMixin, BaseBreadcrumbMixin, TemplateView
+):
     """View on the case list while content is loaded via htmx"""
 
     template_name = "pages/cases/list_outer.html"
+
+    @cached_property
+    def crumbs(self):
+        return [
+            (_("Mijn aanvragen"), reverse("cases:index")),
+        ]
 
     def page_title(self):
         return _("Mijn aanvragen")
