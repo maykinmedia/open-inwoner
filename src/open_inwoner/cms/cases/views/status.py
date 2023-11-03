@@ -239,11 +239,13 @@ class InnerCaseDetailView(
                 zt_statustype_config = ztc.zaaktypestatustypeconfig_set.get(
                     statustype_url=case.status.statustype.url
                 )
+            # case has no status, or status type not found
+            except (AttributeError, ObjectDoesNotExist):
+                pass
+            else:
                 case_type_document_upload_description = (
                     zt_statustype_config.document_upload_description
                 )
-            except ObjectDoesNotExist:
-                pass
 
         return {
             "case_type_config_description": case_type_config_description,
