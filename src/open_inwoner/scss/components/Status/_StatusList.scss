@@ -1,7 +1,8 @@
 .status-list {
+  margin-bottom: var(--spacing-mega);
+
   &__list {
     display: flex;
-    gap: var(--spacing-medium);
     flex-direction: column;
     list-style: none;
     margin: 0;
@@ -12,14 +13,17 @@
   &__list-item {
     display: flex;
     gap: var(--spacing-large);
-    padding: 8px 16px 0 16px;
+    padding: var(--spacing-medium) var(--spacing-giant) var(--spacing-large)
+      var(--spacing-giant);
+    position: relative;
 
+    // Continuous line
     &:not(:last-child)::before {
       content: '';
       background-color: var(--color-success);
       display: block;
-      height: calc(100% - 6.3em);
-      left: 3px;
+      height: 100%;
+      left: 19px;
       margin-left: var(--spacing-extra-large);
       position: absolute;
       top: 1.3em;
@@ -27,27 +31,32 @@
       z-index: 1;
     }
 
-    .status-list__notification-h3 {
+    .status-list__button {
       color: var(--color-success);
       cursor: pointer;
       display: flex;
       font-weight: normal;
       justify-content: space-between;
+      padding: 0;
       margin: var(--spacing-small) 0 var(--spacing-large) 0;
       width: 100%;
     }
 
+    .status-list__button .link {
+      color: var(--color-success);
+    }
+
+    .link-future {
+      color: var(--color-gray-90);
+    }
+
     .p-date {
-      color: var(--color-gray-dark);
       font-size: var(--font-size-body-small);
     }
 
-    .button *[class*='icons'] {
-      color: white;
-    }
-    .button *[class*='icons']::before {
-      content: '';
-      background-color: transparent;
+    [class*='icons'] {
+      transform-origin: center;
+      transition: all 0.3s;
     }
 
     > [class*='icons'] {
@@ -70,65 +79,10 @@
       }
     }
 
-    &--info {
-      background-color: var(--color-info-lighter);
-
-      [class*='icons'] {
-        color: var(--color-info-darker);
-      }
-
-      &.item--completed {
-        background-color: var(--color-info-lighter);
-        [class*='icons'] {
-          color: var(--color-info-darker) !important;
-        }
-      }
-    }
-
-    &--warning {
-      background-color: var(--color-danger-lightest);
-
-      [class*='icons'] {
-        color: var(--color-danger-darker);
-      }
-
-      &.item--completed {
-        background-color: var(--color-info-lighter);
-        [class*='icons'] {
-          color: var(--color-info-darker) !important;
-        }
-      }
-    }
-
-    &--success {
-      background-color: var(--color-success-lighter);
-
-      h3 {
-        [class*='icons'] {
-          color: var(--color-success);
-        }
-      }
-
-      &.item--completed {
-        background-color: var(--color-info-lighter);
-        [class*='icons'] {
-          color: var(--color-info-darker) !important;
-        }
-      }
-    }
-
     &--failure {
       background-color: var(--color-error-lightest);
-
-      [class*='icons'] {
+      .status-step[class*='icons'] {
         color: var(--color-error-darker);
-      }
-
-      &.item--completed {
-        background-color: var(--color-info-lighter);
-        [class*='icons'] {
-          color: var(--color-info-darker) !important;
-        }
       }
     }
 
@@ -138,16 +92,42 @@
       }
     }
 
+    &--info {
+      background-color: var(--color-info-lighter);
+      .status-step[class*='icons'] {
+        color: var(--color-info-darker);
+      }
+    }
+
+    &--warning {
+      background-color: var(--color-danger-lightest);
+      .status-step[class*='icons'] {
+        color: var(--color-danger-darker);
+      }
+    }
+
+    &--success {
+      background-color: var(--color-success-lighter);
+    }
+
     // Current status open by default
-    &.status--current.status--open
-      .status-list__notification
-      .status-list__notification-content {
-      padding-bottom: 50px;
+    &.status--current {
+      .button--borderless .link {
+        color: var(--color-black);
+      }
+      .status-list__button [class*='icons'] {
+        color: var(--color-black);
+      }
+      &.status--open
+        .status-list__notification
+        .status-list__notification-content {
+        padding-bottom: var(--spacing-tiny);
+      }
     }
   }
 
   &__notification {
-    padding: 0 0 var(--spacing-extra-large) 0;
+    padding: 0 0 var(--spacing-tiny) 0;
     width: 100%;
 
     &-content {
@@ -157,28 +137,70 @@
 
     &-content.status-content--open {
       display: block;
+      color: var(--color-gray-dark);
     }
   }
 
-  // Active completed status should NOT have a line on the left
-  .status-list__list-item.item--completed:last-child {
+  // Active current status should NOT have a line on the left
+  .status-list__list-item.status--current,
+  .status-list__list-item.status--future {
     &::before {
-      background-color: var(--color-info-lighter);
-      bottom: 10px;
+      top: 0;
       content: '';
       display: block;
-      height: 150px;
-      left: 10px;
+      height: 100%;
+      left: 27px;
       margin-left: 1em;
       position: absolute;
-      width: 5px;
+      width: 2px;
       z-index: 2;
+    }
+
+    //Continuous line-color depending on status
+    &.status-list__list-item--failure::before {
+      background-color: var(--color-error-darker);
+    }
+    &.status-list__list-item--info::before {
+      background-color: var(--color-info-darker);
+    }
+    &.status-list__list-item--success::before {
+      background-color: var(--color-success);
+    }
+    &.status-list__list-item--warning::before {
+      background-color: var(--color-danger-darker);
+    }
+    &.status-list__list-item--future::before {
+      background-color: var(--color-gray-dark);
+      height: 16px;
+    }
+  }
+
+  // Final active status should NOT have a line on the left
+  .status-list__list-item.status--final {
+    &::before {
+      background-color: var(--color-info-darker);
+      top: 0;
+      content: '';
+      display: block;
+      height: 16px;
+      left: 27px;
+      margin-left: 1em;
+      position: absolute;
+      width: 2px;
+      z-index: 2;
+    }
+
+    .button--borderless {
+      cursor: default;
+      .link {
+        color: var(--color-black);
+      }
     }
   }
 
   /// Toggle styles
   .status--open &__notification {
-    h3 [class*='icons'] {
+    .status-list__button [class*='icons'] {
       display: inline-block;
       transition: all 0.3s;
       transform: rotate(180deg);

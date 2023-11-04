@@ -3,7 +3,7 @@ export class StatusAccordion {
 
   constructor(node) {
     this.node = node
-    this.buttons = node.querySelectorAll('.status-list__notification-h3')
+    this.buttons = node.querySelectorAll('.status-list__button')
     this.buttons.forEach((button) => {
       button.addEventListener(
         'click',

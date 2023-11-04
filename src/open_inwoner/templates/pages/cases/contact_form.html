@@ -1,6 +1,6 @@
 {% load i18n form_tags button_tags icon_tags %}
 
-<h2 class="h2" id="contact">{% trans 'Contact' %}</h2>
+<h2 class="h2" id="contact">{% trans 'Stel een vraag' %}</h2>
 <p class="p">
     {% blocktrans trimmed %}
     Door middel van dit formulier kunt u een vraag stellen over deze zaak.
@@ -9,12 +9,12 @@
     {% endblocktrans %}
 </p>
 
-{% render_form form=contact_form method="POST" id="contact-form" hxpost=hxpost_contact_action hxtarget="#cases-contact-form" extra_classes="case-detail-form" %}
+{% render_form form=contact_form method="POST" id="contact-form" hxpost=hxpost_contact_action hxtarget="#cases-contact-form" extra_classes="case-contact-form" %}
     {% csrf_token %}
     {% textarea contact_form.question %}
     <div class="form__submit">
         {% button_row %}
-            {% button text=_("Vraag versturen") id="submit_contact" type="submit" primary=True name="contact_form_submit" %}
+            {% button text=_("Vraag versturen") id="submit_contact" type="submit" disabled=True primary=True name="contact_form_submit" %}
         {% endbutton_row %}
     </div>
 {% endrender_form %}
