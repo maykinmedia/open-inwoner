@@ -915,7 +915,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         form.action = reverse(
             "cases:case_detail_document_form", kwargs={"object_id": self.zaak["uuid"]}
         )
-        form["title"] = "uploaded file"
+        # form["title"] = "uploaded file"
         form["type"] = zaak_type_iotc.id
         form["file"] = Upload("upload.txt", b"data", "text/plain")
         form_response = form.submit()

@@ -282,7 +282,7 @@ def file_input(file, text, **kwargs):
     Displaying a file upload interface.
 
     Usage:
-        {% file_input form.field text=_('Document selecteren') %}
+        {% file_input form.field text=_('Selecteer bestanden') %}
 
     Variables:
         + field: Field | The field that needs to be rendered.

@@ -13,7 +13,10 @@ from open_inwoner.utils.validators import CharFieldValidator
 
 class CaseUploadForm(forms.Form):
     title = forms.CharField(
-        label=_("Titel bestand"), max_length=255, validators=[CharFieldValidator()]
+        label=_("Titel bestand"),
+        max_length=255,
+        # empty_value=_("Titel bestand"),#TypeError: Object of type __proxy__ is not JSON serializable
+        required=False,
     )
     type = forms.ModelChoiceField(
         ZaakTypeInformatieObjectTypeConfig.objects.none(),

@@ -102,6 +102,11 @@
                 </div>
                 {% endif %}
 
+                {#  Upload document form. #}
+                <section id="form_upload" class="form__open-upload">
+                    {% include 'pages/cases/document_form.html' %}
+                </section>
+
                 {% if case.case_type_config_description %}
                     <p class="p">{{ case.case_type_config_description }}</p>
                 {% else %}
@@ -111,11 +116,6 @@
                         {% endblocktranslate %}
                     </p>
                 {% endif %}
-
-                {#  Upload document form. #}
-                <section id="form_upload" class="form__open-upload">
-                    {% include 'pages/cases/document_form.html' %}
-                </section>
 
             {% elif case.external_upload_enabled %}
                 <h2 class="h2" id="documents-upload">{% trans "Document toevoegen" %}</h2>
