@@ -432,7 +432,7 @@ class CasesPlaywrightTests(
         upload_form = page.locator("#document-upload")
         expect(upload_form).to_be_visible()
 
-        upload_form.get_by_label(_("Document selecteren")).set_input_files(
+        upload_form.get_by_label(_("Selecteer bestanden")).set_input_files(
             files=[
                 {
                     "name": "uploaded_test_file.txt",
@@ -441,12 +441,8 @@ class CasesPlaywrightTests(
                 }
             ],
         )
-        submit_button = upload_form.get_by_role("button", name=_("Document uploaden"))
+        submit_button = upload_form.get_by_role("button", name=_("Upload documenten"))
         expect(submit_button).to_be_visible()
-
-        title_input = upload_form.get_by_label(_("Titel bestand"))
-        expect(title_input).to_be_visible()
-        title_input.fill("uploaded document")
 
         submit_button.click()
 

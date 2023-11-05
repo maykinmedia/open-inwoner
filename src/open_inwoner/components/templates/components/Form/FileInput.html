@@ -4,13 +4,15 @@
     <div class="inputfile-group">
         <label class="label">
             <span class="input-file">
-            {{ field|addclass:"inputfile" }}
+                <p>{% icon icon="upload" icon_position="before" outlined=True %}</p>
 
-                <span class="label__label" for="{{ field.auto_id }}">
-                {% icon icon="cloud_upload" icon_position="before" outlined=True %}
+                {{ field|addclass:"inputfile" }}
+                {#  appended HTML #}
+    {#            <input type="file" name="file" class="inputfile" required="" id="id_file" data-max-size="13000">#}
+
+                    <span class="label__label cloud" for="{{ field.auto_id }}">
                     {{ text }}
-
-                </span>{% if field.field.required %}<span class="label__label--required"> * </span>{% endif %}
+                </span>
             </span>
 
             {% if field.errors %}

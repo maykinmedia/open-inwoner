@@ -6,6 +6,11 @@ export class ShowInfo {
     this.showData()
   }
 
+  getFileExtension(fileName) {
+    const parts = fileName.split('.')
+    return parts[parts.length - 1]
+  }
+
   showData() {
     // get the closest parent element (the form section element)
     const documentUpload = this.fileUploadInput.closest('#form_upload')
@@ -21,6 +26,13 @@ export class ShowInfo {
     const formControlInfo = documentUpload.querySelectorAll(
       '.form__control__info'
     )
+    const fileInput = document.getElementById('id_file')
+    const fileList = document.getElementById('fileList')
+    const fileDivsContainer =
+      documentUpload.querySelectorAll('.fieldset--files')
+    let selectedFiles = []
+    // read maximum size from backend
+    const maxBytes = Number(fileInput.dataset.maxSize)
 
     // Convert the file size to a readable format
     const formatFileSize = function (bytes) {
@@ -36,8 +48,8 @@ export class ShowInfo {
       elem.classList.add('error')
     })
 
-    this.fileUploadInput.addEventListener('change', function (e) {
-      const files = e.target.files
+    this.fileUploadInput.addEventListener('change', (e) => {
+      const files = Array.from(e.target.files)
 
       if ((files.length === 0) | (files === null) | (files === undefined)) {
         submit_upload.disabled = true
@@ -52,12 +64,53 @@ export class ShowInfo {
           elem.style.display = 'none'
         })
       } else {
+        //When files are selected
+        console.log('More than 1 file is selected.', files)
+        console.log('This is the data attribute size: ', maxBytes)
         submit_upload.disabled = false
         validationInfo.classList.remove('error')
         closeButton.classList.remove('error')
         iconDrive.forEach((elem) => {
           elem.classList.remove('error')
         })
+
+        fileDivsContainer.forEach((file) => {
+          //add template for selected files
+          const fileName = files[0].name
+          const fileExtension = this.getFileExtension(fileName)
+          const fileDivBig = document.createElement('div')
+          fileDivBig.classList.add('file-item')
+
+          const fileHTML = `
+      <div class="file__file symbol"><span class="file-material-icon">
+        <span aria-hidden="true" class="material-icons-outlined ">insert_drive_file</span>
+      </span></div>
+      <span class="file-name">name: ${files[0].name}</span>
+      <span class="file-extension"><span class="file--uppercase">(${fileExtension}</span>, ${formatFileSize(
+            files[0].size
+          )})</span>
+      <button class="button button--textless button--icon button--icon-after button--transparent button-file-remove" type="button" title="Toegevoegd bestand verwijderen" aria-label="Toegevoegd bestand verwijderen">
+        <span aria-hidden="true" class="material-icons-outlined ">delete</span>
+      </button>
+    `
+
+          fileDivBig.innerHTML = fileHTML
+
+          if (files[0].size > maxBytes) {
+            console.log('Dit bestand is te groot')
+            fileDivBig.classList.add('error-message')
+            const fileSizeError = document.createElement('div')
+            fileSizeError.textContent = 'Dit bestand is te groot'
+            fileSizeError.classList.add('error-message')
+            fileDivBig
+              .querySelector('.file-material-icon')
+              .appendChild(fileSizeError)
+          }
+
+          fileList.appendChild(fileDivBig)
+          selectedFiles.push(file)
+        })
+        //end template
 
         // Display info
         sizeInfo.textContent = formatFileSize(files[0].size)
