@@ -107,6 +107,10 @@
                 "outgoingrequestslog"
             ],
             [
+                "log_outgoing_requests",
+                "outgoingrequestslogconfig"
+            ],
+            [
                 "otp_totp",
                 "totpdevice"
             ],
