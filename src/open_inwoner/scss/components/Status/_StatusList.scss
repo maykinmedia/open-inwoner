@@ -38,12 +38,16 @@
       font-weight: normal;
       justify-content: space-between;
       padding: 0;
-      margin: var(--spacing-small) 0 var(--spacing-large) 0;
+      margin: var(--spacing-small) 0 0 0;
       width: 100%;
     }
 
     .status-list__button .link {
       color: var(--color-success);
+    }
+
+    .link--bold {
+      margin: var(--spacing-small) 0 0 0;
     }
 
     .link-future {
@@ -52,6 +56,14 @@
 
     .p-date {
       font-size: var(--font-size-body-small);
+    }
+
+    .p__upload {
+      display: none;
+      &.p__upload--enabled {
+        //hide when final status is reached
+        display: block;
+      }
     }
 
     [class*='icons'] {
@@ -133,6 +145,7 @@
     &-content {
       display: none;
       margin-left: 0;
+      margin-top: var(--spacing-large);
     }
 
     &-content.status-content--open {
