@@ -22,7 +22,7 @@
                         {% list_item text="Openstaande aanvraag" caption=_("Status") compact=True strong=False %}
                         {% list_item text=case.datum_laatste_wijziging caption=_("Laatste wijziging") compact=True strong=False %}
                         {% with end_date=case.eind_datum_geldigheid|default:"Geen" %}
-                            {% list_item text=end_date caption=_("Einddatum geldigheid") compact=True strong=False%}
+                            {% list_item text=end_date caption=_("Verloopt op") compact=True strong=False%}
                         {% endwith %}
                     </span>
                     {% endrender_list %}
