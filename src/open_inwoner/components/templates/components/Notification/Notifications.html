@@ -1,7 +1,9 @@
-{% load notification_tags %}
+{% load notification_tags string_tags %}
 
 <div class="notifications">
     {% for message in messages %}
-        {% notification icon=message.icon type=message.level_tag message=message.message closable=True compact=compact %}
+        {% with as_markdown=message.extra_tags|is_substring:"as_markdown" %}
+            {% notification icon=message.icon type=message.level_tag message=message.message as_markdown=as_markdown closable=True compact=compact %}
+        {% endwith %}
     {% endfor %}
 </div>

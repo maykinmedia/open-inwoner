@@ -1,4 +1,4 @@
-{% load i18n button_tags icon_tags button_tags icon_tags %}
+{% load i18n ssd_tags button_tags icon_tags button_tags icon_tags %}
 <div class="notification{% if contents %} notification--contents{% endif %}{% if type %} notification--{{ type }}{% endif %}{% if compact %} notification--compact{% endif %} {% if ctx %}notification--{{ ctx }}{% endif %}">
     {% if not icon == False %}
         <div class="notification__icon">
@@ -13,7 +13,11 @@
         {% if contents %}
             {{ contents }}
         {% else %}
-            <p class="p p--compact">{{ message }}</p>
+            {% if as_markdown %}
+                {{ message|markdown|safe }}
+            {% else %}
+                <p class="p p--compact">{{ message }}</p>
+            {% endif %}
         {% endif %}
     </div>
 

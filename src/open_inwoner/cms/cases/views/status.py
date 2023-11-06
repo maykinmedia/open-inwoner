@@ -477,12 +477,22 @@ class CaseDocumentUploadFormView(CaseAccessMixin, LogMixin, FormView):
                         filename=file.name,
                     ),
                 )
+
+                # TODO implement `created_documents` properly when uploading of multiple
+                # docs is implemented
+                created_documents = [created_document]
+                success_message = (
+                    _(
+                        "Wij hebben **{num_uploaded} bestand(en)** succesvol geüpload:"
+                    ).format(num_uploaded=len(created_documents))
+                    + "\n\n"
+                    + "\n".join(f"- {doc['titel']}" for doc in created_documents)
+                )
                 messages.add_message(
                     request,
                     messages.SUCCESS,
-                    _("{filename} has been successfully uploaded").format(
-                        filename=file.name
-                    ),
+                    success_message,
+                    extra_tags="as_markdown",
                 )
 
                 return HttpResponseClientRedirect(
