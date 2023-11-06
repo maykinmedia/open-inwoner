@@ -24,7 +24,7 @@ export class ShowInfo {
     const iconDrive = documentUpload.querySelectorAll('.drive')
     // show info
     const formControlInfo = documentUpload.querySelectorAll(
-      '.form__control__info'
+      '.form__content__info'
     )
     const fileInput = document.getElementById('id_file')
     const fileList = document.getElementById('fileList')
@@ -117,8 +117,8 @@ export class ShowInfo {
         nameInfo.textContent = `${files[0].name}`
         // Display in DOM
         formControlInfo.forEach((elem) => {
-          elem.classList.remove('form__control__info')
-          elem.classList.add('form__control__info--active')
+          elem.classList.remove('form__content__info')
+          elem.classList.add('form__content__info--active')
         })
       }
     })
@@ -133,8 +133,8 @@ export class ShowInfo {
         })
 
         formControlInfo.forEach((elem) => {
-          elem.classList.remove('form__control__info--active')
-          elem.classList.add('form__control__info')
+          elem.classList.remove('form__content__info--active')
+          elem.classList.add('form__content__info')
         })
       })
     }

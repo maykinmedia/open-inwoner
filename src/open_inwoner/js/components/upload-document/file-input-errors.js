@@ -13,7 +13,7 @@ export class FileInputError {
     if (documentUpload) {
       // get info
       const getFormInfo = documentUpload.querySelectorAll(
-        '.form__control__info'
+        '.form__content__info'
       )
 
       // if errors are present, scroll and trigger opened state
@@ -23,8 +23,8 @@ export class FileInputError {
       })
 
       getFormInfo.forEach((elem) => {
-        elem.classList.remove('form__control__info')
-        elem.classList.add('form__control__info--active')
+        elem.classList.remove('form__content__info')
+        elem.classList.add('form__content__info--active')
       })
     }
   }
