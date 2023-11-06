@@ -3,6 +3,8 @@ from django.contrib import admin
 from django.forms import BaseModelFormSet
 from django.utils.translation import gettext as _
 
+from django_better_admin_arrayfield.admin.mixins import DynamicArrayMixin
+from django_better_admin_arrayfield.forms.widgets import DynamicArrayWidget
 from import_export.admin import ImportExportMixin
 from import_export.formats import base_formats
 from ordered_model.admin import OrderedInlineModelAdminMixin, OrderedTabularInline
@@ -32,7 +34,7 @@ class CategoryAdminForm(movenodeform_factory(Category)):
     class Meta:
         model = Category
         fields = "__all__"
-        widgets = {"description": CKEditorWidget}
+        widgets = {"description": CKEditorWidget, "zaaktypen": DynamicArrayWidget}
 
     def clean(self, *args, **kwargs):
         cleaned_data = super().clean(*args, **kwargs)
@@ -71,7 +73,9 @@ class CategoryAdminFormSet(BaseModelFormSet):
 
 
 @admin.register(Category)
-class CategoryAdmin(OrderedInlineModelAdminMixin, ImportExportMixin, TreeAdmin):
+class CategoryAdmin(
+    DynamicArrayMixin, OrderedInlineModelAdminMixin, ImportExportMixin, TreeAdmin
+):
     change_list_template = "admin/category_change_list.html"
     form = CategoryAdminForm
     inlines = (
@@ -81,8 +85,23 @@ class CategoryAdmin(OrderedInlineModelAdminMixin, ImportExportMixin, TreeAdmin):
     prepopulated_fields = {"slug": ("name",)}
     search_fields = ("name",)
     ordering = ("path",)
-    list_display = ("name", "highlighted", "published")
-    list_editable = ("highlighted", "published")
+    list_display = (
+        "name",
+        "highlighted",
+        "published",
+        "visible_for_anonymous",
+        "visible_for_authenticated",
+        "visible_for_companies",
+        "visible_for_citizens",
+    )
+    list_editable = (
+        "highlighted",
+        "published",
+        "visible_for_anonymous",
+        "visible_for_authenticated",
+        "visible_for_companies",
+        "visible_for_citizens",
+    )
     exclude = ("path", "depth", "numchild")
 
     # import-export
