@@ -186,10 +186,10 @@ class UitkeringClient(SSDBaseClient):
 
     def format_file_name(self, report_date: str) -> str:
         """
-        198505 -> Maandspecificatie mei 1985
+        198506 -> Maandspecificatie juni 1985
         """
         dt = datetime.strptime(report_date, "%Y%m")
-        dt_formatted = django_date(dt, "M Y").lower()
+        dt_formatted = django_date(dt, "F Y").lower()
         return f"Maandspecificatie {dt_formatted}"
 
     def get_reports(
