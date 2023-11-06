@@ -122,7 +122,7 @@ class CategoryListView(
     model = Category
 
     def get_queryset(self):
-        return Category.get_root_nodes().published()
+        return Category.get_root_nodes().published().visible_for_user(self.request.user)
 
     @cached_property
     def crumbs(self):
