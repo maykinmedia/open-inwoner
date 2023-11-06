@@ -2,11 +2,12 @@ from django.contrib import messages
 from django.core.paginator import InvalidPage, Paginator
 from django.http import Http404
 from django.http.response import HttpResponseRedirect
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
 from django.views.generic import FormView
 
 from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.openzaak.cases import fetch_cases
 from open_inwoner.utils.mixins import PaginationMixin
 from open_inwoner.utils.views import CommonPageMixin, LoginMaybeRequiredMixin, LogMixin
 
@@ -49,6 +50,7 @@ class SearchView(
         data = form.cleaned_data.copy()
         query = data.pop("query")
         context = self.get_context_data(form=form)
+
         if not query:
             return self.render_to_response(context)
 
@@ -56,6 +58,16 @@ class SearchView(
         user = self.request.user
         if user.is_authenticated:
             self.log_user_action(user, _("search query: {query}").format(query=query))
+
+        # Check if the query exactly matches with a case that belongs to the user
+        if hasattr(self.request.user, "bsn"):
+            cases = fetch_cases(self.request.user.bsn, identificatie=query)
+            if cases and len(cases) == 1:
+                return HttpResponseRedirect(
+                    reverse(
+                        "cases:case_detail", kwargs={"object_id": str(cases[0].uuid)}
+                    )
+                )
 
         # perform search
         results = search_products(query, filters=data)
