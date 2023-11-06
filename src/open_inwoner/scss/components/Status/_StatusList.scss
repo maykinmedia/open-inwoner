@@ -145,7 +145,7 @@
   .status-list__list-item.status--current,
   .status-list__list-item.status--future {
     &::before {
-      top: 0;
+      top: 10px;
       content: '';
       display: block;
       height: 100%;
@@ -177,19 +177,6 @@
 
   // Final active status should NOT have a line on the left
   .status-list__list-item.status--final {
-    &::before {
-      background-color: var(--color-info-darker);
-      top: 0;
-      content: '';
-      display: block;
-      height: 16px;
-      left: 27px;
-      margin-left: 1em;
-      position: absolute;
-      width: 2px;
-      z-index: 2;
-    }
-
     .button--borderless {
       cursor: default;
       .link {
