@@ -23,14 +23,35 @@ class TestHighlightedCategories(WebTest):
 
     def test_only_highlighted_categories_exist_in_context_when_they_exist(self):
         CategoryFactory(name="Should be first")
-        highlighted_category = CategoryFactory(
-            name="This should be second", highlighted=True
+        highlighted_category1 = CategoryFactory(
+            name="This should be second",
+            highlighted=True,
+            visible_for_anonymous=True,
+            visible_for_authenticated=True,
+        )
+        highlighted_category2 = CategoryFactory(
+            path="0002",
+            highlighted=True,
+            visible_for_anonymous=True,
+            visible_for_authenticated=False,
+        )
+        highlighted_category3 = CategoryFactory(
+            path="0003",
+            highlighted=True,
+            visible_for_anonymous=False,
+            visible_for_authenticated=True,
+        )
+        highlighted_category4 = CategoryFactory(
+            path="0004",
+            highlighted=True,
+            visible_for_anonymous=False,
+            visible_for_authenticated=False,
         )
 
         html, context = cms_tools.render_plugin(CategoriesPlugin)
         self.assertEqual(
             list(context["categories"]),
-            [highlighted_category],
+            [highlighted_category1, highlighted_category2],
         )
 
     def test_highlighted_categories_are_ordered_by_alphabetically(self):
@@ -49,15 +70,36 @@ class TestHighlightedCategories(WebTest):
     def test_only_highlighted_categories_are_shown_when_they_exist(self):
         user = UserFactory()
         category = CategoryFactory(name="Should be first")
-        highlighted_category = CategoryFactory(
-            name="This should be second", highlighted=True
+        highlighted_category1 = CategoryFactory(
+            name="This should be second",
+            highlighted=True,
+            visible_for_anonymous=True,
+            visible_for_authenticated=True,
+        )
+        highlighted_category2 = CategoryFactory(
+            path="0002",
+            highlighted=True,
+            visible_for_anonymous=True,
+            visible_for_authenticated=False,
+        )
+        highlighted_category3 = CategoryFactory(
+            path="0003",
+            highlighted=True,
+            visible_for_anonymous=False,
+            visible_for_authenticated=True,
+        )
+        highlighted_category4 = CategoryFactory(
+            path="0004",
+            highlighted=True,
+            visible_for_anonymous=False,
+            visible_for_authenticated=False,
         )
 
         html, context = cms_tools.render_plugin(CategoriesPlugin, user=user)
 
         self.assertEqual(
             list(context["categories"]),
-            [highlighted_category],
+            [highlighted_category1, highlighted_category3],
         )
 
     def test_category_selected(self):

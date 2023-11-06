@@ -23,10 +23,32 @@ class HeaderTest(TestCase):
         # PrimaryNavigation.html requires apphook + categories
         create_apphook_page(ProductsApphook)
         cls.published1 = CategoryFactory(
-            path="0001", name="First one", slug="first-one"
+            path="0001",
+            name="First one",
+            slug="first-one",
+            visible_for_anonymous=True,
+            visible_for_authenticated=True,
         )
         cls.published2 = CategoryFactory(
-            path="0002", name="Second one", slug="second-one"
+            path="0002",
+            name="Second one",
+            slug="second-one",
+            visible_for_anonymous=True,
+            visible_for_authenticated=False,
+        )
+        cls.published3 = CategoryFactory(
+            path="0003",
+            name="Third one",
+            slug="third-one",
+            visible_for_anonymous=False,
+            visible_for_authenticated=True,
+        )
+        cls.published4 = CategoryFactory(
+            path="0004",
+            name="Fourth one",
+            slug="fourth-one",
+            visible_for_anonymous=False,
+            visible_for_authenticated=False,
         )
 
     def test_categories_hidden_from_anonymous_users(self):
@@ -54,6 +76,37 @@ class HeaderTest(TestCase):
         self.assertEqual(len(categories), 2)
         self.assertEqual(categories[0].tag, "a")
         self.assertEqual(categories[1].tag, "button")
+
+        links = [x for x in doc.find("[title='Onderwerpen'] + ul li a").items()]
+        self.assertEqual(len(links), 4)
+        self.assertEqual(links[0].attr("href"), self.published1.get_absolute_url())
+        self.assertEqual(links[1].attr("href"), self.published2.get_absolute_url())
+        self.assertEqual(links[2].attr("href"), self.published1.get_absolute_url())
+        self.assertEqual(links[3].attr("href"), self.published2.get_absolute_url())
+
+    def test_categories_visibility_for_authenticated_users(self):
+        config = SiteConfiguration.get_solo()
+        config.hide_categories_from_anonymous_users = False
+        config.save()
+
+        self.client.force_login(self.user)
+
+        response = self.client.get("/", user=self.user)
+
+        doc = PyQuery(response.content)
+
+        categories = doc.find("[title='Onderwerpen']")
+
+        self.assertEqual(len(categories), 2)
+        self.assertEqual(categories[0].tag, "a")
+        self.assertEqual(categories[1].tag, "button")
+
+        links = [x for x in doc.find("[title='Onderwerpen'] + ul li a").items()]
+        self.assertEqual(len(links), 4)
+        self.assertEqual(links[0].attr("href"), self.published1.get_absolute_url())
+        self.assertEqual(links[1].attr("href"), self.published3.get_absolute_url())
+        self.assertEqual(links[2].attr("href"), self.published1.get_absolute_url())
+        self.assertEqual(links[3].attr("href"), self.published3.get_absolute_url())
 
     def test_search_bar_hidden_from_anonymous_users(self):
         config = SiteConfiguration.get_solo()

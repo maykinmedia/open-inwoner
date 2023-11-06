@@ -61,6 +61,8 @@ class CategoryDetailViewTest(TestCase):
         cls.category = CategoryFactory.create(
             name="test cat",
             description="A <em>descriptive</em> description",
+            visible_for_anonymous=False,
+            visible_for_authenticated=False,
         )
 
     def test_category_detail_view_access_restricted(self):
@@ -84,6 +86,18 @@ class CategoryDetailViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_category_detail_view_access_not_restricted(self):
+        config = SiteConfiguration.get_solo()
+        config.hide_categories_from_anonymous_users = False
+        config.save()
+
+        url = reverse("products:category_detail", kwargs={"slug": self.category.slug})
+
+        # request with anonymous user
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_category_detail_view_access_not_restricted_if_invisible(self):
         config = SiteConfiguration.get_solo()
         config.hide_categories_from_anonymous_users = False
         config.save()
