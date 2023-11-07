@@ -23,6 +23,7 @@ from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.cms.cases.views.status import SimpleFile
+from open_inwoner.openzaak.constants import StatusIndicators
 from open_inwoner.openzaak.tests.factories import (
     StatusTranslationFactory,
     ZaakTypeConfigFactory,
@@ -163,7 +164,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             omschrijvingGeneriek="some content",
             statustekst="",
             volgnummer=2,
-            isEindstatus=False,
+            isEindstatus=True,
         )
         cls.user_role = generate_oas_component(
             "zrc",
@@ -296,7 +297,12 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         mock_service_oas_get(m, CATALOGI_ROOT, "ztc")
         mock_service_oas_get(m, DOCUMENTEN_ROOT, "drc")
 
-    def _setUpMocks(self, m):
+    def _setUpMocks(self, m, use_eindstatus=True):
+        if use_eindstatus:
+            self.zaak["status"] = self.status_finish["url"]
+        else:
+            self.zaak["status"] = self.status_new["url"]
+
         self._setUpOASMocks(m)
 
         for resource in [
@@ -321,11 +327,17 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             f"{ZAKEN_ROOT}zaakinformatieobjecten?zaak={self.zaak['url']}",
             json=[self.zaak_informatie_object, self.zaak_informatie_object_invisible],
         )
-        m.get(
-            f"{ZAKEN_ROOT}statussen?zaak={self.zaak['url']}",
-            # Taiga #972 these have to be oldest-last (newest-first) and cannot be resorted on
-            json=paginated_response([self.status_finish, self.status_new]),
-        )
+        if use_eindstatus:
+            m.get(
+                f"{ZAKEN_ROOT}statussen?zaak={self.zaak['url']}",
+                # Taiga #972 these have to be oldest-last (newest-first) and cannot be resorted on
+                json=paginated_response([self.status_finish, self.status_new]),
+            )
+        else:
+            m.get(
+                f"{ZAKEN_ROOT}statussen?zaak={self.zaak['url']}",
+                json=paginated_response([self.status_new]),
+            )
         m.get(
             f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}",
             json=paginated_response([self.user_role, self.not_initiator_role]),
@@ -349,9 +361,24 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812/download",
             text="document content",
         )
+        m.get(
+            f"{CATALOGI_ROOT}statustypen?zaaktype={self.zaaktype['url']}",
+            json=paginated_response([self.status_type_new, self.status_type_finish]),
+        )
 
     def test_status_is_retrieved_when_user_logged_in_via_digid(self, m):
         self.maxDiff = None
+
+        ZaakTypeStatusTypeConfigFactory.create(
+            statustype_url=self.status_type_new["url"],
+            status_indicator=StatusIndicators.warning,
+            status_indicator_text="foo",
+        )
+        ZaakTypeStatusTypeConfigFactory.create(
+            statustype_url=self.status_type_finish["url"],
+            status_indicator=StatusIndicators.success,
+            status_indicator_text="bar",
+        )
 
         self._setUpMocks(m)
         status_new_obj, status_finish_obj = factory(
@@ -371,16 +398,80 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 "end_date": None,
                 "end_date_planned": datetime.date(2022, 1, 4),
                 "end_date_legal": datetime.date(2022, 1, 5),
+                "end_statustype_data": None,
                 "description": "Coffee zaaktype",
-                "current_status": "Finish",
                 "statuses": [
                     {
                         "date": datetime.datetime(2021, 1, 12),
                         "label": "Initial request",
+                        "status_indicator": "warning",
+                        "status_indicator_text": "foo",
                     },
                     {
                         "date": datetime.datetime(2021, 3, 12),
                         "label": "Finish",
+                        "status_indicator": "success",
+                        "status_indicator_text": "bar",
+                    },
+                ],
+                # only one visible information object
+                "documents": [self.informatie_object_file],
+                "initiator": "Foo Bar van der Bazz",
+                "result": "resultaat toelichting",
+                "case_type_config_description": "",
+                "case_type_document_upload_description": "",
+                "internal_upload_enabled": False,
+                "external_upload_enabled": False,
+                "external_upload_url": "",
+                "allowed_file_extensions": sorted(self.config.allowed_file_extensions),
+                "contact_form_enabled": False,
+            },
+        )
+
+    def test_pass_endstatus_type_data_if_endstatus_not_reached(self, m):
+        self.maxDiff = None
+
+        ZaakTypeStatusTypeConfigFactory.create(
+            statustype_url=self.status_type_new["url"],
+            status_indicator=StatusIndicators.warning,
+            status_indicator_text="foo",
+        )
+        ZaakTypeStatusTypeConfigFactory.create(
+            statustype_url=self.status_type_finish["url"],
+            status_indicator=StatusIndicators.success,
+            status_indicator_text="bar",
+        )
+
+        self._setUpMocks(m, use_eindstatus=False)
+        status_new_obj, status_finish_obj = factory(
+            Status, [self.status_new, self.status_finish]
+        )
+        status_new_obj.statustype = factory(StatusType, self.status_type_new)
+        status_finish_obj.statustype = factory(StatusType, self.status_type_finish)
+
+        response = self.app.get(self.case_detail_url, user=self.user)
+
+        self.assertEqual(
+            response.context.get("case"),
+            {
+                "id": self.zaak["uuid"],
+                "identification": "ZAAK-2022-0000000024",
+                "start_date": datetime.date(2022, 1, 2),
+                "end_date": None,
+                "end_date_planned": datetime.date(2022, 1, 4),
+                "end_date_legal": datetime.date(2022, 1, 5),
+                "end_statustype_data": {
+                    "label": "Finish",
+                    "status_indicator": "success",
+                    "status_indicator_text": "bar",
+                },
+                "description": "Coffee zaaktype",
+                "statuses": [
+                    {
+                        "date": datetime.datetime(2021, 1, 12),
+                        "label": "Initial request",
+                        "status_indicator": "warning",
+                        "status_indicator_text": "foo",
                     },
                 ],
                 # only one visible information object
@@ -404,7 +495,6 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
         self.assertContains(response, "ZAAK-2022-0000000024")
         self.assertContains(response, "Coffee zaaktype")
-        self.assertContains(response, "Finish")
         self.assertContains(response, "uploaded_document_title")
 
     def test_page_reformats_zaak_identificatie(self, m):
@@ -446,13 +536,6 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.assertIn(self.zaak["identificatie"], log.extra_data["message"])
         self.assertEqual(self.user, log.user)
         self.assertEqual(self.user, log.content_object)
-
-    def test_current_status_in_context_is_the_most_recent_one(self, m):
-        self._setUpMocks(m)
-
-        response = self.app.get(self.case_detail_url, user=self.user)
-        current_status = response.context.get("case", {}).get("current_status")
-        self.assertEquals(current_status, "Finish")
 
     def test_case_io_objects_are_retrieved_when_user_logged_in_via_digid(self, m):
         self._setUpMocks(m)

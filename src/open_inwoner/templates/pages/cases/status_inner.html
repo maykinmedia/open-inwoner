@@ -1,4 +1,4 @@
-{% load i18n ssd_tags anchor_menu_tags card_tags dashboard_tags file_tags grid_tags table_tags solo_tags button_tags icon_tags notification_tags %}
+{% load i18n ssd_tags anchor_menu_tags card_tags dashboard_tags file_tags grid_tags table_tags solo_tags link_tags button_tags icon_tags notification_tags %}
 
 {# Messages #}
 <div class="container container--no-margin" id="cases-status-messages-oob" hx-swap-oob="true">
@@ -18,22 +18,9 @@
 
         {% render_column start=4 span=6 %}
             {#  Status history. #}
-            {% if case.statuses %}
-                <h2 class="h2" id="statuses">{% trans 'Status' %}</h2>
-
-                <aside class="status-list" aria-label="{% trans "Status lijst" %}">
-                    <ul class="status-list__list">
-                        {% for status in case.statuses %}
-                        <li class="status-list__list-item">
-                            {% icon icon="task_alt" %}
-                            <p class="p p--compact">{{ status.date|date }}</p>
-                            <p class="p p--compact">{{ status.label }}</p>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                </aside>
-
-            {% endif %}
+            <section id="statuses_component" class="statuses__section">
+                {% include 'pages/cases/statuses.html' %}
+            </section>
 
             {#  Documents. #}
             {% if case.documents %}
@@ -42,7 +29,7 @@
             {% endif %}
 
             {% if case.internal_upload_enabled %}
-                <h2 class="h2" id=>{% trans "Document uploaden" %}</h2>
+                <h2 class="h2" id="documents-upload">{% trans "Document uploaden" %}</h2>
 
                 {% if case.case_type_document_upload_description %}
                 <div class="card card--compact card--info">
@@ -70,7 +57,7 @@
                 </section>
 
             {% elif case.external_upload_enabled %}
-                <h2 class="h2">{% trans "Document toevoegen" %}</h2>
+                <h2 class="h2" id="documents-upload">{% trans "Document toevoegen" %}</h2>
                 {% if case.case_type_config_description %}
                     <p class="p">{{ case.case_type_config_description }}</p>
                 {% else %}

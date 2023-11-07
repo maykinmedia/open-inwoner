@@ -1,6 +1,6 @@
 import dataclasses
 from collections import defaultdict
-from typing import List
+from typing import List, Optional
 
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
@@ -31,7 +31,10 @@ from open_inwoner.openzaak.cases import (
     fetch_single_result,
     fetch_status_history,
 )
-from open_inwoner.openzaak.catalog import fetch_single_status_type
+from open_inwoner.openzaak.catalog import (
+    fetch_single_status_type,
+    fetch_status_types_no_cache,
+)
 from open_inwoner.openzaak.documents import (
     download_document,
     fetch_single_information_object_url,
@@ -43,6 +46,7 @@ from open_inwoner.openzaak.models import (
     StatusTranslation,
     ZaakTypeConfig,
     ZaakTypeInformatieObjectTypeConfig,
+    ZaakTypeStatusTypeConfig,
 )
 from open_inwoner.openzaak.utils import get_role_name_display, is_info_object_visible
 from open_inwoner.utils.translate import TranslationLookup
@@ -116,6 +120,23 @@ class InnerCaseDetailView(
 
             statuses = fetch_status_history(self.case.url)
 
+            statustype_config_mapping = {
+                zaaktype_statustype.statustype_url: zaaktype_statustype
+                for zaaktype_statustype in ZaakTypeStatusTypeConfig.objects.all()
+            }
+
+            # NOTE maybe this should be cached?
+            statustypen = fetch_status_types_no_cache(self.case.zaaktype.url)
+            end_statustype = next(
+                (
+                    status_type
+                    for status_type in statustypen
+                    if status_type.is_eindstatus
+                ),
+                None,
+            )
+            end_statustype_data = None
+
             # NOTE we cannot sort on the Status.datum_status_gezet (datetime) because eSuite returns zeros as the time component of the datetime,
             # so we're going with the observation that on both OpenZaak and eSuite the returned list is ordered 'oldest-last'
             # here we want it 'oldest-first' so we reverse() it instead of sort()-ing
@@ -134,6 +155,25 @@ class InnerCaseDetailView(
                 for status in _statuses:
                     status.statustype = status_type
 
+            # The end status data is not passed if the end status has been reached,
+            # because in that case the end status data is already included in `statuses`
+            if not status_types.get(end_statustype.url):
+                end_statustype_data = {
+                    "label": status_translate(
+                        end_statustype.omschrijving, default=_("No data available")
+                    ),
+                    "status_indicator": getattr(
+                        statustype_config_mapping.get(end_statustype.url),
+                        "status_indicator",
+                        None,
+                    ),
+                    "status_indicator_text": getattr(
+                        statustype_config_mapping.get(end_statustype.url),
+                        "status_indicator_text",
+                        None,
+                    ),
+                }
+
             context["case"] = {
                 "id": str(self.case.uuid),
                 "identification": self.case.identification,
@@ -146,12 +186,10 @@ class InnerCaseDetailView(
                     self.case, "uiterlijke_einddatum_afdoening", None
                 ),
                 "description": self.case.zaaktype.omschrijving,
-                "current_status": status_translate.from_glom(
-                    self.case,
-                    "status.statustype.omschrijving",
-                    default=_("No data available"),
+                "statuses": self.get_statuses_data(
+                    statuses, status_translate, statustype_config_mapping
                 ),
-                "statuses": self.get_statuses_data(statuses, status_translate),
+                "end_statustype_data": end_statustype_data,
                 "documents": documents,
                 "allowed_file_extensions": sorted(config.allowed_file_extensions),
             }
@@ -236,13 +274,26 @@ class InnerCaseDetailView(
         return ", ".join([get_role_name_display(r) for r in roles])
 
     def get_statuses_data(
-        self, statuses: List[Status], lookup: TranslationLookup
+        self,
+        statuses: List[Status],
+        lookup: TranslationLookup,
+        statustype_config_mapping: Optional[dict] = None,
     ) -> List[dict]:
         return [
             {
                 "date": s.datum_status_gezet,
                 "label": lookup.from_glom(
                     s, "statustype.omschrijving", default=_("No data available")
+                ),
+                "status_indicator": getattr(
+                    statustype_config_mapping.get(s.statustype.url),
+                    "status_indicator",
+                    None,
+                ),
+                "status_indicator_text": getattr(
+                    statustype_config_mapping.get(s.statustype.url),
+                    "status_indicator_text",
+                    None,
                 ),
             }
             for s in statuses

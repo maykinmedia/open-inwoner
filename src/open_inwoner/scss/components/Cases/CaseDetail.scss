@@ -1,0 +1,37 @@
+.cases__detail {
+  /// cards on case detail
+  .card {
+    margin-bottom: var(--spacing-extra-large);
+    &__body {
+      &.document-upload-description {
+        display: flex;
+        column-gap: var(--spacing-medium);
+      }
+    }
+  }
+
+  #document-upload {
+    /// Make required asterisk visible for this component
+    .label__label--required {
+      color: var(--color-red);
+      padding-left: var(--spacing-tiny);
+      //make asterisks invisible by default, only make them visible if component has the caption
+      display: inline;
+    }
+  }
+
+  #cases-contact-form-content > h2 {
+    margin-top: var(--spacing-large);
+  }
+
+  .case-contact-form {
+    .button[type='submit']:disabled,
+    .button--primary.button--disabled {
+      background-color: var(--color-gray) !important;
+      border-color: var(--color-gray) !important;
+      color: var(--color-white);
+      cursor: default;
+      pointer-events: none;
+    }
+  }
+}

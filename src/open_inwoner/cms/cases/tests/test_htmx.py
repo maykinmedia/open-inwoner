@@ -122,6 +122,18 @@ class CasesPlaywrightTests(
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
             indicatieInternOfExtern="extern",
         )
+        #
+        # statuses
+        #
+        self.status_new = generate_oas_component(
+            "zrc",
+            "schemas/Status",
+            url=f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-beu760sle929",
+            zaak=self.zaak["url"],
+            statustype=f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-777yu878km09",
+            datumStatusGezet="2021-01-12",
+            statustoelichting="",
+        )
         self.status_finish = generate_oas_component(
             "zrc",
             "schemas/Status",
@@ -131,6 +143,21 @@ class CasesPlaywrightTests(
             datumStatusGezet="2021-03-12",
             statustoelichting="",
         )
+        #
+        # status types
+        #
+        self.status_type_new = generate_oas_component(
+            "ztc",
+            "schemas/StatusType",
+            url=self.status_new["statustype"],
+            zaaktype=self.zaaktype["url"],
+            catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            omschrijving="Initial request",
+            omschrijvingGeneriek="Nieuw",
+            statustekst="",
+            volgnummer=1,
+            isEindstatus=False,
+        )
         self.status_type_finish = generate_oas_component(
             "ztc",
             "schemas/StatusType",
@@ -138,7 +165,10 @@ class CasesPlaywrightTests(
             zaaktype=self.zaaktype["url"],
             catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             omschrijving="Finish",
-            omschrijvingGeneriek="some content",
+            omschrijvingGeneriek="Afgehandeld",
+            statustekst="",
+            volgnummer=1,
+            isEindstatus=True,
         )
         self.user_role = generate_oas_component(
             "zrc",
@@ -284,6 +314,12 @@ class CasesPlaywrightTests(
             self.status_type_finish,
         ]:
             self.matchers.append(m.get(resource["url"], json=resource))
+
+        # mock `fetch_status_types_no_cache`
+        m.get(
+            f"{CATALOGI_ROOT}statustypen?zaaktype={self.zaak['zaaktype']}",
+            json=paginated_response([self.status_type_new, self.status_type_finish]),
+        )
 
         self.matchers += [
             m.get(

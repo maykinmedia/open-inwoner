@@ -17,7 +17,7 @@
     }
   }
 
-  /// cards on cases page
+  /// cards on cases list
   .card {
     .cases__link {
       text-decoration: none;
@@ -32,66 +32,50 @@
     padding-top: var(--spacing-medium);
     padding-bottom: var(--spacing-extra-large);
   }
-}
 
-#document-upload {
-  /// Make required asterisk visible for this component
-  .label__label--required {
-    color: var(--color-red);
-    padding-left: var(--spacing-tiny);
-    //make asterisks invisible by default, only make them visible if component has the caption
-    display: inline;
+  &__detail {
+    box-sizing: border-box;
   }
-}
 
-#cases-contact-form-content > h2 {
-  margin-top: var(--spacing-large);
-}
+  /// cards with statuses
 
-.card__header.success {
-  display: flex;
-  background-color: $color-success;
-  color: $color-success-dark;
-  padding: 0.4em;
-}
+  .card__header {
+    display: flex;
+    background-color: var(--color-info-lighter);
+    border-top-left-radius: var(--border-radius);
+    border-top-right-radius: var(--border-radius);
+    color: var(--color-info-darker);
 
-.card__header.info {
-  display: flex;
-  background-color: $color-info;
-  color: $color-info-dark;
-  padding: 0.4em;
-}
+    .card__status_indicator_text {
+      padding: var(--spacing-medium);
+    }
 
-.card__header.warning {
-  display: flex;
-  background-color: $color-warning;
-  color: $color-warning-dark;
-  padding: 0.4em;
-}
+    [class*='icons'] {
+      margin: var(--spacing-small) var(--spacing-medium) 0 var(--spacing-medium);
+    }
 
-.card__header.failure {
-  display: flex;
-  background-color: $color-danger;
-  color: $color-danger-dark;
-  padding: 0.4em;
-}
+    &.success {
+      display: flex;
+      background-color: var(--color-success-lighter);
+      color: var(--color-success);
+    }
 
-.icon--success {
-  margin-right: 0.2em;
-}
+    &.info {
+      display: flex;
+      background-color: var(--color-info-lighter);
+      color: var(--color-info-darker);
+    }
 
-.icon--info {
-  margin-right: 0.2em;
-}
+    &.warning {
+      display: flex;
+      background-color: var(--color-danger-lightest);
+      color: var(--color-danger-darker);
+    }
 
-.icon--warning {
-  margin-right: 0.2em;
-}
-
-.icon--failure {
-  margin-right: 0.2em;
-}
-
-.document-upload-description {
-  display: flex;
+    &.failure {
+      display: flex;
+      background-color: var(--color-error-lighter);
+      color: var(--color-error-darker);
+    }
+  }
 }

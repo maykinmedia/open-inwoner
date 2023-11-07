@@ -9,6 +9,7 @@ import './autocomplete-search'
 import './autocomplete'
 import './autosumbit'
 import './cases'
+import { DisableCaseContactButton } from './cases/case_contact_form'
 import { DisableSubmitButton } from './cases/document_upload'
 import './confirmation'
 import './contacts'
@@ -28,6 +29,7 @@ import './readmore'
 import './search'
 import './toggle'
 import './upload-document'
+import { StatusAccordion } from './cases/status_accordion'
 import { ShowInfo } from './upload-document/show-file-info'
 import { FileInputError } from './upload-document/file-input-errors'
 import './session'
@@ -47,10 +49,15 @@ const elementWrappers = [
   [Dropdown.selector, (elt) => new Dropdown(elt)],
   [CreateGumshoe.selector, (elt) => new CreateGumshoe(elt)],
   [DisableSubmitButton.selector, (elt) => new DisableSubmitButton(elt)],
+  [
+    DisableCaseContactButton.selector,
+    (elt) => new DisableCaseContactButton(elt),
+  ],
   [ShowInfo.selector, (elt) => new ShowInfo(elt)],
   [FileInputError.selector, (elt) => new FileInputError(elt)],
   [Notification.selector, (elt) => new Notification(elt)],
   [AnchorMobile.selector, (elt) => new AnchorMobile(elt)],
+  [StatusAccordion.selector, (elt) => new StatusAccordion(elt)],
   // add more when needed
 ]
 
