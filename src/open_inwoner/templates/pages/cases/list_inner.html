@@ -3,6 +3,7 @@
 <h2 class="h2" id="cases">{{ page_title }} ({{ paginator.count }})</h2>
 <p class="cases__title_text">{{ title_text }}</p>
 
+<div class="cases__grid">
 {% render_grid %}
     {% if not cases %}
         <b>{% trans "U heeft op dit moment nog geen lopende aanvragen." %}</b>
@@ -57,6 +58,7 @@
         {% endrender_column %}
     {% endfor %}
 {% endrender_grid %}
+</div>
 
 {% if cases %}
     {% pagination page_obj=page_obj paginator=paginator request=request hxget=hxget hxtarget='#cases-content' %}
