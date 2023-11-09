@@ -492,7 +492,7 @@ class CaseDocumentUploadFormView(CaseAccessMixin, LogMixin, FormView):
                     request,
                     messages.SUCCESS,
                     success_message,
-                    extra_tags="as_markdown",
+                    extra_tags="as_markdown local_message",
                 )
 
                 return HttpResponseClientRedirect(

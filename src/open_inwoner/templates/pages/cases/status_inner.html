@@ -31,6 +31,8 @@
             {% if case.internal_upload_enabled %}
                 <h2 class="h2" id="documents-upload">{% trans "Document uploaden" %}</h2>
 
+                {% notifications messages show_local_messages=True %}
+
                 {% if case.case_type_document_upload_description %}
                 <div class="card card--compact card--info">
                     <div class="card__body document-upload-description">
