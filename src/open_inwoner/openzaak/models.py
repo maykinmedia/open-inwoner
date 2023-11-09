@@ -362,6 +362,14 @@ class ZaakTypeStatusTypeConfig(models.Model):
             "Description that will be shown above the document upload widget in a case detail page"
         ),
     )
+    description = models.TextField(
+        blank=True,
+        default="",
+        verbose_name=_("Frontend description"),
+        help_text=_(
+            "The text displayed in the case detail page for the status with this statustype"
+        ),
+    )
 
     class Meta:
         verbose_name = _("Zaaktype Statustype Configuration")
