@@ -29,7 +29,10 @@ class CategoriesPlugin(CMSActiveAppMixin, CMSPluginBase):
 
         # Highlighted categories
         highlighted_categories = (
-            Category.objects.published().filter(highlighted=True).order_by("path")
+            Category.objects.published()
+            .visible_for_user(request.user)
+            .filter(highlighted=True)
+            .order_by("path")
         )
         if request.user.is_authenticated and request.user.selected_categories.exists():
             categories = request.user.selected_categories.order_by("name")[: self.limit]

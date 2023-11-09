@@ -16,16 +16,38 @@ class TestPublishedCategories(WebTest):
     def setUp(self):
         self.user = UserFactory()
         self.published1 = CategoryFactory(
-            path="0001", name="First one", slug="first-one"
+            path="0001",
+            name="First one",
+            slug="first-one",
+            visible_for_anonymous=True,
+            visible_for_authenticated=True,
         )
         self.published2 = CategoryFactory(
-            path="0002", name="Second one", slug="second-one"
+            path="0002",
+            name="Second one",
+            slug="second-one",
+            visible_for_anonymous=True,
+            visible_for_authenticated=False,
+        )
+        self.published3 = CategoryFactory(
+            path="0003",
+            name="Third one",
+            slug="third-one",
+            visible_for_anonymous=False,
+            visible_for_authenticated=True,
+        )
+        self.published4 = CategoryFactory(
+            path="0004",
+            name="Fourth one",
+            slug="fourth-one",
+            visible_for_anonymous=False,
+            visible_for_authenticated=False,
         )
         self.draft1 = CategoryFactory(
-            path="0003", name="Third one", slug="third-one", published=False
+            path="0005", name="Fifth one", slug="fifth-one", published=False
         )
         self.draft2 = CategoryFactory(
-            path="0004", name="Wourth one", slug="wourth-one", published=False
+            path="0006", name="Sixth one", slug="sixth-one", published=False
         )
         cms_tools.create_homepage()
 
@@ -40,7 +62,7 @@ class TestPublishedCategories(WebTest):
         response = self.app.get("/", user=self.user)
         self.assertEqual(
             list(response.context["menu_categories"]),
-            [self.published1, self.published2],
+            [self.published1, self.published3],
         )
 
     def test_only_published_categories_exist_in_list_page_when_anonymous(self):
@@ -52,7 +74,7 @@ class TestPublishedCategories(WebTest):
     def test_only_published_categories_exist_in_list_page_when_logged_in(self):
         response = self.app.get(reverse("products:category_list"), user=self.user)
         self.assertEqual(
-            list(response.context["categories"]), [self.published1, self.published2]
+            list(response.context["categories"]), [self.published1, self.published3]
         )
 
     def test_only_published_subcategories_exist_in_detail_page_when_anonymous(self):
@@ -87,7 +109,7 @@ class TestPublishedCategories(WebTest):
         response = self.app.get(reverse("profile:categories"), user=self.user)
         self.assertEqual(
             list(response.context["form"].fields["selected_categories"].queryset.all()),
-            [self.published1, self.published2],
+            [self.published1, self.published2, self.published3, self.published4],
         )
 
 

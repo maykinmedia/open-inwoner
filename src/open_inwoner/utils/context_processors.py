@@ -78,7 +78,9 @@ def settings(request):
         "cookie_link_text": config.cookie_link_text,
         "cookie_link_url": config.cookie_link_url,
         "extra_css": config.extra_css,
-        "menu_categories": Category.get_root_nodes().published(),
+        "menu_categories": (
+            Category.get_root_nodes().published().visible_for_user(request.user)
+        ),
         # default SearchForm, might be overwritten by actual SearchView
         "search_form": SearchForm(auto_id=False),
         "search_filter_categories": config.search_filter_categories,
