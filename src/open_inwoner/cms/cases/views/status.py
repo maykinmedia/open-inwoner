@@ -1,4 +1,5 @@
 import dataclasses
+import logging
 from collections import defaultdict
 from typing import List, Optional
 
@@ -54,6 +55,8 @@ from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from ..forms import CaseContactForm, CaseUploadForm
 from .mixins import CaseAccessMixin, CaseLogMixin, OuterCaseAccessMixin
+
+logger = logging.getLogger(__name__)
 
 
 @dataclasses.dataclass
@@ -116,31 +119,25 @@ class InnerCaseDetailView(
             config = OpenZaakConfig.get_solo()
             status_translate = StatusTranslation.objects.get_lookup()
 
+            # fetch data associated with `self.case`
             documents = self.get_case_document_files(self.case)
-
             statuses = fetch_status_history(self.case.url)
+            # NOTE maybe this should be cached?
+            statustypen = fetch_status_types_no_cache(self.case.zaaktype.url)
 
             statustype_config_mapping = {
                 zaaktype_statustype.statustype_url: zaaktype_statustype
                 for zaaktype_statustype in ZaakTypeStatusTypeConfig.objects.all()
             }
 
-            # NOTE maybe this should be cached?
-            statustypen = fetch_status_types_no_cache(self.case.zaaktype.url)
-            end_statustype = next(
-                (
-                    status_type
-                    for status_type in statustypen
-                    if status_type.is_eindstatus
-                ),
-                None,
-            )
-            end_statustype_data = None
-
-            # NOTE we cannot sort on the Status.datum_status_gezet (datetime) because eSuite returns zeros as the time component of the datetime,
-            # so we're going with the observation that on both OpenZaak and eSuite the returned list is ordered 'oldest-last'
+            # NOTE we cannot sort on the Status.datum_status_gezet (datetime) because eSuite
+            # returns zeros as the time component of the datetime, so we're going with the
+            # observation that on both OpenZaak and eSuite the returned list is ordered 'oldest-last'
             # here we want it 'oldest-first' so we reverse() it instead of sort()-ing
             statuses.reverse()
+
+            if len(statuses) == 1:
+                self.add_second_status_preview(statuses, statustypen)
 
             status_types = defaultdict(list)
             for status in statuses:
@@ -157,6 +154,8 @@ class InnerCaseDetailView(
 
             # The end status data is not passed if the end status has been reached,
             # because in that case the end status data is already included in `statuses`
+            end_statustype = next((s for s in statustypen if s.is_eindstatus), None)
+            end_statustype_data = None
             if not status_types.get(end_statustype.url):
                 end_statustype_data = {
                     "label": status_translate(
@@ -205,6 +204,42 @@ class InnerCaseDetailView(
         else:
             context["case"] = None
         return context
+
+    def add_second_status_preview(self, statuses: list, statustypen: list) -> None:
+        """
+        Update `statuses` with second (upcoming) status
+
+        As the second status is not yet available, a mock is created, using `self.case`
+        and the second statustype from `statustypen`
+
+        Note: we cannot assume that the "second" statustype has the `volgnummer` 2;
+              hence we get all statustype_numbers, sort in ascending order, and let
+              the "second" statustype be that with `volgnummer == statustype_numbers[1]`
+        """
+        statustype_numbers = [s.volgnummer for s in statustypen]
+
+        # only 1 statustype for `self.case`
+        # (this scenario is blocked by openzaak, but not part of the zgw standard)
+        if len(statustype_numbers) < 2:
+            logger.info("Case {case} has only one statustype".format(case=self.case))
+            return
+
+        statustype_numbers.sort()
+
+        second_status_type = next(
+            filter(
+                lambda s: s.volgnummer == statustype_numbers[1] and not s.is_eindstatus,
+                statustypen,
+            ),
+            None,
+        )
+        if not second_status_type:
+            return
+
+        second_status = Status(
+            url="#", zaak=self.case, statustype=second_status_type.url
+        )
+        statuses.append(second_status)
 
     def get_upload_info_context(self, case: Zaak):
         if not case:

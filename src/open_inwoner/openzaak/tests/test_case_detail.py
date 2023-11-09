@@ -75,7 +75,9 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             kwargs={"object_id": "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d"},
         )
 
-        # openzaak resources
+        #
+        # zaken
+        #
         cls.zaak = generate_oas_component(
             "zrc",
             "schemas/Zaak",
@@ -124,6 +126,9 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             beginGeldigheid="2020-09-25",
             versiedatum="2020-09-25",
         )
+        #
+        # statuses
+        #
         cls.status_new = generate_oas_component(
             "zrc",
             "schemas/Status",
@@ -136,12 +141,15 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         cls.status_finish = generate_oas_component(
             "zrc",
             "schemas/Status",
-            url=f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
+            url=f"{ZAKEN_ROOT}statussen/29ag1264-c4he-249j-bc24-jip862tle833",
             zaak=cls.zaak["url"],
-            statustype=f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-744516671fe4",
+            statustype=f"{CATALOGI_ROOT}statustypen/d4839012-gh35-3a8d-866h-444uy935acv7",
             datumStatusGezet="2021-03-12",
             statustoelichting="",
         )
+        #
+        # status types
+        #
         cls.status_type_new = generate_oas_component(
             "ztc",
             "schemas/StatusType",
@@ -154,6 +162,19 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             volgnummer=1,
             isEindstatus=False,
         )
+        # no associated status (for testing `add_second_status_preview`)
+        cls.status_type_in_behandeling = generate_oas_component(
+            "ztc",
+            "schemas/StatusType",
+            url=f"{CATALOGI_ROOT}statustypen/167cb935-ac8a-428e-8cca-5abda0da47c7",
+            zaaktype=cls.zaaktype["url"],
+            catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            omschrijving="In behandeling",
+            omschrijvingGeneriek="some content",
+            statustekst="",
+            volgnummer=3,
+            isEindstatus=False,
+        )
         cls.status_type_finish = generate_oas_component(
             "ztc",
             "schemas/StatusType",
@@ -163,7 +184,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             omschrijving="Finish",
             omschrijvingGeneriek="some content",
             statustekst="",
-            volgnummer=2,
+            volgnummer=4,
             isEindstatus=True,
         )
         cls.user_role = generate_oas_component(
@@ -314,6 +335,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             self.informatie_object_invisible,
             self.zaaktype_informatie_object_type,
             self.status_type_new,
+            self.status_type_in_behandeling,
             self.status_type_finish,
         ]:
             m.get(resource["url"], json=resource)
@@ -361,9 +383,16 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812/download",
             text="document content",
         )
+        # TODO
         m.get(
             f"{CATALOGI_ROOT}statustypen?zaaktype={self.zaaktype['url']}",
-            json=paginated_response([self.status_type_new, self.status_type_finish]),
+            json=paginated_response(
+                [
+                    self.status_type_new,
+                    self.status_type_in_behandeling,
+                    self.status_type_finish,
+                ]
+            ),
         )
 
     def test_status_is_retrieved_when_user_logged_in_via_digid(self, m):
@@ -437,6 +466,11 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             status_indicator_text="foo",
         )
         ZaakTypeStatusTypeConfigFactory.create(
+            statustype_url=self.status_type_in_behandeling["url"],
+            status_indicator=StatusIndicators.success,
+            status_indicator_text="zap",
+        )
+        ZaakTypeStatusTypeConfigFactory.create(
             statustype_url=self.status_type_finish["url"],
             status_indicator=StatusIndicators.success,
             status_indicator_text="bar",
@@ -472,6 +506,13 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                         "label": "Initial request",
                         "status_indicator": "warning",
                         "status_indicator_text": "foo",
+                    },
+                    # preview of second (upcoming) status
+                    {
+                        "date": None,
+                        "label": "In behandeling",
+                        "status_indicator": "success",
+                        "status_indicator_text": "zap",
                     },
                 ],
                 # only one visible information object
