@@ -275,6 +275,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
             bestandsnaam="upload.txt",
             bestandsomvang=123,
+            titel="uploaded file",
         )
 
         cls.zaak_informatie_object_invisible = generate_oas_component(
@@ -905,8 +906,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
         self.assertEqual(
             redirect_messages[0].message,
-            _(
-                f"{self.uploaded_informatie_object['bestandsnaam']} is succesvol geüpload"
+            _("Wij hebben **1 bestand(en)** succesvol geüpload:\n\n- {title}").format(
+                title="uploaded file"
             ),
         )
 
@@ -942,10 +943,18 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
         redirect = self.app.get(form_response.headers["HX-Redirect"])
         redirect_messages = list(redirect.context["messages"])
+        upload_request = next(
+            request
+            for request in m.request_history
+            if request.url == f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten"
+        )
 
+        self.assertEqual(upload_request.json()["bestandsnaam"], "upload.TXT")
         self.assertEqual(
             redirect_messages[0].message,
-            _("upload.TXT is succesvol geüpload"),
+            _("Wij hebben **1 bestand(en)** succesvol geüpload:\n\n- {title}").format(
+                title="uploaded file"
+            ),
         )
 
     def test_upload_file_flow_fails_with_invalid_file_extension(self, m):

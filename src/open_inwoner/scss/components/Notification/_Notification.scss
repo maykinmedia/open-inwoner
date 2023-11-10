@@ -92,4 +92,12 @@
       position: inherit;
     }
   }
+
+  & &__content {
+    margin-top: 0.15em;
+
+    & * {
+      margin: 0;
+    }
+  }
 }
