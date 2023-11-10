@@ -3236,12 +3236,12 @@ msgstr ""
 
 #: configurations/models.py:459
 msgid "Hide categories from anonymous users"
-msgstr "Verberg het Onderwerpen-menu voor niet-ingelogde gebruikers"
+msgstr "Blokkeer toegang tot Onderwerpen voor niet-ingelogde gebruikers"
 
 #: configurations/models.py:462
 msgid "If checked, categories will be hidden from users who are not logged in."
 msgstr ""
-"Indien geselecteerd: alleen ingelogde gebruikers zien het Onderwerpen-menu."
+"Indien geselecteerd: alleen ingelogde gebruikers hebben toegang tot Onderwerpen."
 
 #: configurations/models.py:466
 msgid "Hide search from anonymous users"
