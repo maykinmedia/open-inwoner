@@ -23,7 +23,7 @@ class CategoriesPlugin(CMSActiveAppMixin, CMSPluginBase):
 
     def render(self, context, instance, placeholder):
         request = context["request"]
-        # Show the categories if the user has selected them, otherwise
+        # Show the categories if the user has cases linked to them, otherwise
         # Show the highlighted published categories if they have been specified, otherwise
         # Show the first X published categories
 
@@ -34,8 +34,17 @@ class CategoriesPlugin(CMSActiveAppMixin, CMSPluginBase):
             .filter(highlighted=True)
             .order_by("path")
         )
-        if request.user.is_authenticated and request.user.selected_categories.exists():
-            categories = request.user.selected_categories.order_by("name")[: self.limit]
+        if request.user.is_authenticated and request.user.bsn:
+            categories = (
+                Category.objects.published()
+                .filter_for_user_with_zaken(request.user)
+                .order_by("name")[: self.limit]
+            )
+
+            # Fallback for if the user has no cases with case types that are linked to
+            # categories
+            if not categories:
+                categories = highlighted_categories[: self.limit]
         elif highlighted_categories.exists():
             categories = highlighted_categories[: self.limit]
         else:
