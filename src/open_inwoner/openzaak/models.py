@@ -186,7 +186,13 @@ class ZaakTypeConfig(models.Model):
     # actual config
 
     # notifications
-    notify_status_changes = models.BooleanField(default=False)
+    notify_status_changes = models.BooleanField(
+        verbose_name=_("Notify of status changes"),
+        default=False,
+        help_text=_(
+            "Whether the user should be notified of status changes for cases with this zaak type"
+        ),
+    )
 
     # documents
     description = models.TextField(
@@ -368,6 +374,13 @@ class ZaakTypeStatusTypeConfig(models.Model):
         verbose_name=_("Frontend description"),
         help_text=_(
             "The text displayed in the case detail page for the status with this statustype"
+        ),
+    )
+    notify_status_change = models.BooleanField(
+        verbose_name=_("Notify of status change"),
+        default=True,
+        help_text=_(
+            "Whether the user should be notfied if a case is set to this type of status"
         ),
     )
 
