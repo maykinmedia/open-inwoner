@@ -208,7 +208,7 @@ class TestCategoryLogging(WebTest):
         self.assertEqual(
             log_entry.extra_data,
             {
-                "message": "Omschrijving and Ten opzichte van gewijzigd.",
+                "message": "Zaaktypen, Omschrijving and Ten opzichte van gewijzigd.",
                 "action_flag": [2, "Change"],
                 "content_object_repr": category.name,
             },
