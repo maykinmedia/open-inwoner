@@ -194,6 +194,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
             statustype_url=cls.status_type1["url"],
             status_indicator=StatusIndicators.warning,
             status_indicator_text="U moet documenten toevoegen",
+            description="Lorem ipsum dolor sit amet",
         )
         # open
         cls.zaak1 = generate_oas_component(

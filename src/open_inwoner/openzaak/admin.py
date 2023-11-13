@@ -170,11 +170,13 @@ class ZaakTypeStatusTypeConfigInlineAdminForm(ModelForm):
         widgets = {
             "document_upload_description": CKEditorWidget,
             "status_indicator_text": Textarea(attrs={"cols": 40, "rows": 10}),
+            "description": CKEditorWidget,
         }
 
 
-class ZaakTypeStatusTypeConfigInline(admin.TabularInline):
+class ZaakTypeStatusTypeConfigInline(admin.StackedInline):
     model = ZaakTypeStatusTypeConfig
+    classes = ["collapse"]
     fields = [
         "statustekst",
         "omschrijving",
@@ -183,6 +185,7 @@ class ZaakTypeStatusTypeConfigInline(admin.TabularInline):
         "status_indicator",
         "status_indicator_text",
         "document_upload_description",
+        "description",
     ]
     readonly_fields = [
         "statustekst",
@@ -203,8 +206,9 @@ class ZaakTypeStatusTypeConfigInline(admin.TabularInline):
         return request.user.is_superuser
 
 
-class ZaakTypeResultaattypeConfigInline(admin.TabularInline):
+class ZaakTypeResultaattypeConfigInline(admin.StackedInline):
     model = ZaakTypeResultaatTypeConfig
+    classes = ["collapse"]
     fields = [
         "omschrijving",
         "resultaattype_url",
