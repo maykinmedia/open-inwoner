@@ -26,6 +26,10 @@ class CategoryPublishedQueryset(MP_NodeQuerySet):
 
     def visible_for_user(self, user: User):
         if user.is_authenticated:
+            if getattr(user, "bsn", None):
+                return self.filter(visible_for_citizens=True)
+            elif getattr(user, "kvk", None):
+                return self.filter(visible_for_companies=True)
             return self.filter(visible_for_authenticated=True)
         return self.filter(visible_for_anonymous=True)
 
