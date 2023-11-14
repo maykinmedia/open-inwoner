@@ -94,30 +94,6 @@ class TestProfile(WebTest):
             },
         )
 
-    def test_categories_modification_is_logged(self):
-        CategoryFactory()
-        CategoryFactory()
-        form = self.app.get(reverse("profile:categories"), user=self.user).forms[
-            "change-categories"
-        ]
-
-        form.get("selected_categories", index=1).checked = True
-        form.submit()
-        log_entry = TimelineLog.objects.last()
-
-        self.assertEqual(
-            log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
-        )
-        self.assertEqual(log_entry.content_object.id, self.user.id)
-        self.assertEqual(
-            log_entry.extra_data,
-            {
-                "message": _("categories were modified"),
-                "action_flag": list(LOG_ACTIONS[CHANGE]),
-                "content_object_repr": str(self.user),
-            },
-        )
-
     @patch("open_inwoner.cms.utils.page_display._is_published", return_value=True)
     def test_user_notifications_update_is_logged(self, mock_cms_page_display):
         form = self.app.get(reverse("profile:notifications"), user=self.user).forms[

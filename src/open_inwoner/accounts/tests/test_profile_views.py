@@ -69,7 +69,6 @@ class ProfileViewTests(WebTest):
         response = self.app.get(self.url, user=self.user)
 
         self.assertEquals(response.status_code, 200)
-        self.assertContains(response, _("U heeft geen interesses gekozen."))
         self.assertContains(response, _("U heeft nog geen contacten."))
         self.assertContains(response, "0 acties staan open.")
         self.assertNotContains(response, reverse("products:questionnaire_list"))
@@ -80,12 +79,10 @@ class ProfileViewTests(WebTest):
         contact = UserFactory()
         self.user.user_contacts.add(contact)
         category = CategoryFactory()
-        self.user.selected_categories.add(category)
         QuestionnaireStepFactory(published=True)
 
         response = self.app.get(self.url, user=self.user)
         self.assertEquals(response.status_code, 200)
-        self.assertContains(response, category.name)
         self.assertContains(
             response,
             f"{contact.first_name} ({contact.get_contact_type_display()})",
@@ -725,29 +722,6 @@ class MyDataTests(AssertTimelineLogMixin, HaalCentraalMixin, WebTest):
             content_object_repr=str(self.user),
             action_flag=list(LOG_ACTIONS[4]),
         )
-
-
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class EditIntrestsTests(WebTest):
-    def setUp(self):
-        self.url = reverse("profile:categories")
-        self.user = UserFactory()
-
-    def test_login_required(self):
-        login_url = reverse("login")
-        response = self.app.get(self.url)
-        self.assertRedirects(response, f"{login_url}?next={self.url}")
-
-    def test_preselected_values(self):
-        category = CategoryFactory(name="a")
-        CategoryFactory(name="b")
-        CategoryFactory(name="c")
-        self.user.selected_categories.add(category)
-        response = self.app.get(self.url, user=self.user)
-        form = response.forms["change-categories"]
-        self.assertTrue(form.get("selected_categories", index=0).checked)
-        self.assertFalse(form.get("selected_categories", index=1).checked)
-        self.assertFalse(form.get("selected_categories", index=2).checked)
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")

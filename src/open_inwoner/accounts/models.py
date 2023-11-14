@@ -161,12 +161,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         default=False,
         help_text=_("Indicates if fields have been prepopulated by Haal Central API."),
     )
-    selected_categories = models.ManyToManyField(
-        "pdc.Category",
-        verbose_name=_("Selected categories"),
-        related_name="selected_by",
-        blank=True,
-    )
     oidc_id = models.CharField(
         verbose_name=_("OpenId Connect id"),
         max_length=250,
@@ -343,12 +337,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_all_files(self):
         return self.documents.order_by("-created_on")
-
-    def get_interests(self) -> str:
-        if not self.selected_categories.exists():
-            return _("U heeft geen interesses gekozen.")
-
-        return ", ".join(list(self.selected_categories.values_list("name", flat=True)))
 
     def get_active_notifications(self) -> str:
         enabled = []

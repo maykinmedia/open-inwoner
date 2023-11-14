@@ -105,13 +105,6 @@ class TestPublishedCategories(WebTest):
         )
         self.assertEqual(list(response.context["subcategories"]), [descendent1])
 
-    def test_only_published_categories_exist_in_my_categories_page(self):
-        response = self.app.get(reverse("profile:categories"), user=self.user)
-        self.assertEqual(
-            list(response.context["form"].fields["selected_categories"].queryset.all()),
-            [self.published1, self.published2, self.published3, self.published4],
-        )
-
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestHighlightedQuestionnaire(WebTest):

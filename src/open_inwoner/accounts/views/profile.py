@@ -29,7 +29,7 @@ from open_inwoner.utils.mixins import ExportMixin
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from ...openklant.wrap import fetch_klant_for_bsn, patch_klant
-from ..forms import BrpUserForm, CategoriesForm, UserForm, UserNotificationsForm
+from ..forms import BrpUserForm, UserForm, UserNotificationsForm
 from ..models import Action, User
 
 
@@ -77,7 +77,6 @@ class MyProfileView(
             .first()
         )
         context["files"] = user_files
-        context["category_text"] = user.get_interests()
         context["action_text"] = _(
             f"{Action.objects.visible().connected(self.request.user).filter(status=StatusChoices.open).count()} acties staan open."
         )
@@ -192,31 +191,6 @@ class EditProfileView(
         kwargs = super().get_form_kwargs()
         kwargs["user"] = self.request.user
         return kwargs
-
-
-class MyCategoriesView(
-    LogMixin, LoginRequiredMixin, CommonPageMixin, BaseBreadcrumbMixin, UpdateView
-):
-    template_name = "pages/profile/categories.html"
-    model = User
-    form_class = CategoriesForm
-    success_url = reverse_lazy("profile:detail")
-
-    @cached_property
-    def crumbs(self):
-        return [
-            (_("Mijn profiel"), reverse("profile:detail")),
-            (_("Mijn onderwerpen"), reverse("profile:categories")),
-        ]
-
-    def get_object(self):
-        return self.request.user
-
-    def form_valid(self, form):
-        form.save()
-        messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
-        self.log_change(self.object, _("categories were modified"))
-        return HttpResponseRedirect(self.get_success_url())
 
 
 class MyDataView(
