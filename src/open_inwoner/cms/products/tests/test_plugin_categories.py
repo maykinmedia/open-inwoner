@@ -123,6 +123,46 @@ class TestHighlightedCategories(WebTest):
             [highlighted_category1, highlighted_category3],
         )
 
+    @patch("open_inwoner.openzaak.models.OpenZaakConfig.get_solo")
+    def test_only_highlighted_categories_are_shown_when_zaaktypen_filter_feature_flag_is_disabled(
+        self, mock_solo
+    ):
+        mock_solo.return_value.enable_categories_filtering_with_zaken = False
+
+        user = DigidUserFactory()
+        category = CategoryFactory(name="Should be first")
+        highlighted_category1 = CategoryFactory(
+            name="This should be second",
+            highlighted=True,
+            visible_for_anonymous=True,
+            visible_for_citizens=True,
+        )
+        highlighted_category2 = CategoryFactory(
+            path="0002",
+            highlighted=True,
+            visible_for_anonymous=True,
+            visible_for_citizens=False,
+        )
+        highlighted_category3 = CategoryFactory(
+            path="0003",
+            highlighted=True,
+            visible_for_anonymous=False,
+            visible_for_citizens=True,
+        )
+        highlighted_category4 = CategoryFactory(
+            path="0004",
+            highlighted=True,
+            visible_for_anonymous=False,
+            visible_for_citizens=False,
+        )
+
+        html, context = cms_tools.render_plugin(CategoriesPlugin, user=user)
+
+        self.assertEqual(
+            list(context["categories"]),
+            [highlighted_category1, highlighted_category3],
+        )
+
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestPublishedCategories(WebTest):
@@ -222,6 +262,7 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
         cls.config.zaak_max_confidentiality = (
             VertrouwelijkheidsAanduidingen.beperkt_openbaar
         )
+        cls.config.enable_categories_filtering_with_zaken = True
         cls.config.save()
 
         #
@@ -379,7 +420,6 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
         In case of failure on fetch_cases, the highlighted categories that are visible
         for the user are shown
         """
-
         html, context = cms_tools.render_plugin(CategoriesPlugin, user=self.user)
 
         self.assertEqual(

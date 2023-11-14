@@ -141,6 +141,17 @@ class OpenZaakConfig(SingletonModel):
         ),
     )
 
+    # feature flags
+    enable_categories_filtering_with_zaken = models.BooleanField(
+        verbose_name=_("Enable category filtering based on zaken"),
+        default=False,
+        help_text=_(
+            "If checked, the highlighted categories list on the homepage will consist "
+            "of categories that are linked to ZaakTypen for which the DigiD authenticated "
+            "user has at least one Zaak."
+        ),
+    )
+
     class Meta:
         verbose_name = _("Open Zaak configuration")
 
