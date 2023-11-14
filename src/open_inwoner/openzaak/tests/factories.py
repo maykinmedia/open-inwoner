@@ -66,6 +66,7 @@ class CatalogusConfigFactory(factory.django.DjangoModelFactory):
 
 
 class ZaakTypeConfigFactory(factory.django.DjangoModelFactory):
+    urls = [factory.Faker("url")]
     catalogus = factory.SubFactory(CatalogusConfigFactory)
     identificatie = factory.Faker("pystr", max_chars=50)
     omschrijving = factory.Faker("pystr", max_chars=80)

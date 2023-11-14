@@ -254,6 +254,7 @@ class ZaakTypeConfigAdmin(admin.ModelAdmin):
         "mark_as_not_notify_status_changes",
     ]
     fields = [
+        "urls",
         "catalogus",
         "identificatie",
         "omschrijving",
@@ -265,6 +266,7 @@ class ZaakTypeConfigAdmin(admin.ModelAdmin):
         "description",
     ]
     readonly_fields = [
+        "urls",
         "catalogus",
         "identificatie",
         "omschrijving",

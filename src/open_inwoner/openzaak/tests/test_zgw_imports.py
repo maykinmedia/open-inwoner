@@ -215,6 +215,12 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
         self.assertEqual(res[0].catalogus, cat_config_aa)
         self.assertEqual(res[1].catalogus, cat_config_bb)
 
+        # URLs of zaaktype versions should be stored
+        self.assertEqual(
+            res[0].urls, [data.zaak_types[0]["url"], data.zaak_types[2]["url"]]
+        )
+        self.assertEqual(res[1].urls, [data.zaak_types[1]["url"]])
+
         # run again with same API response
         res = import_zaaktype_configs()
 

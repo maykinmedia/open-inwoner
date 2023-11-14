@@ -178,6 +178,12 @@ class CatalogusConfig(models.Model):
 
 
 class ZaakTypeConfig(models.Model):
+    urls = ArrayField(
+        models.URLField(
+            verbose_name=_("Zaaktype URL"),
+        ),
+        default=list,
+    )
     catalogus = models.ForeignKey(
         "openzaak.CatalogusConfig",
         on_delete=models.CASCADE,
