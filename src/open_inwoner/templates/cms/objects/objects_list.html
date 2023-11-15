@@ -1,0 +1,16 @@
+{% load i18n sekizai_tags utils denhaag_action_tags %}
+
+<h2 class="h2">
+  {{ instance.title }}
+</h2>
+
+<div>
+  {% if objects %}
+    {% for object in objects %}
+      {% denhaag_action title=object.title date=object.date link=object.link %}
+    {% endfor %}
+  {% else %}
+    <p>{{ instance.no_results_message }}</p>
+  {% endif %}
+</div>
+
