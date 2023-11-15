@@ -305,6 +305,10 @@
                 "haalcentraalconfig"
             ],
             [
+                "kvk",
+                "kvkconfig"
+            ],
+            [
                 "mozilla_django_oidc_db",
                 "openidconnectconfig"
             ],

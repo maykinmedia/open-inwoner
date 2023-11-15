@@ -199,6 +199,7 @@ INSTALLED_APPS = [
     "formtools",
     # Project applications.
     "open_inwoner.components",
+    "open_inwoner.contrib.kvk",
     "open_inwoner.ckeditor5",
     "open_inwoner.pdc",
     "open_inwoner.plans",
