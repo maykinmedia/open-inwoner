@@ -408,6 +408,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             statustype_url=self.status_type_finish["url"],
             status_indicator=StatusIndicators.success,
             status_indicator_text="bar",
+            call_to_action_url="https://www.example.com",
+            call_to_action_text="Click me",
         )
 
         self._setUpMocks(m)
@@ -436,12 +438,16 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                         "label": "Initial request",
                         "status_indicator": "warning",
                         "status_indicator_text": "foo",
+                        "call_to_action_url": "",
+                        "call_to_action_text": "",
                     },
                     {
                         "date": datetime.datetime(2021, 3, 12),
                         "label": "Finish",
                         "status_indicator": "success",
                         "status_indicator_text": "bar",
+                        "call_to_action_url": "https://www.example.com",
+                        "call_to_action_text": "Click me",
                     },
                 ],
                 # only one visible information object
@@ -475,6 +481,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             statustype_url=self.status_type_finish["url"],
             status_indicator=StatusIndicators.success,
             status_indicator_text="bar",
+            call_to_action_url="https://www.example.com",
+            call_to_action_text="Click me",
         )
 
         self._setUpMocks(m, use_eindstatus=False)
@@ -499,6 +507,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                     "label": "Finish",
                     "status_indicator": "success",
                     "status_indicator_text": "bar",
+                    "call_to_action_url": "https://www.example.com",
+                    "call_to_action_text": "Click me",
                 },
                 "description": "Coffee zaaktype",
                 "statuses": [
@@ -507,6 +517,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                         "label": "Initial request",
                         "status_indicator": "warning",
                         "status_indicator_text": "foo",
+                        "call_to_action_url": "",
+                        "call_to_action_text": "",
                     },
                     # preview of second (upcoming) status
                     {
@@ -514,6 +526,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                         "label": "In behandeling",
                         "status_indicator": "success",
                         "status_indicator_text": "zap",
+                        "call_to_action_url": "",
+                        "call_to_action_text": "",
                     },
                 ],
                 # only one visible information object
