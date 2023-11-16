@@ -240,6 +240,15 @@ class ZaakTypeConfig(models.Model):
         blank=True,
     )
 
+    relevante_zaakperiode = models.PositiveIntegerField(
+        verbose_name=_("Relevante zaakperiode"),
+        blank=True,
+        null=True,
+        help_text=_(
+            "Aantal maanden dat teruggekeken moet worden naar Zaken van deze zaaktypes."
+        ),
+    )
+
     objects = ZaakTypeConfigQueryset.as_manager()
 
     class Meta:

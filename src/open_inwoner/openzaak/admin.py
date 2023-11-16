@@ -264,6 +264,7 @@ class ZaakTypeConfigAdmin(admin.ModelAdmin):
         "document_upload_enabled",
         "external_document_upload_url",
         "description",
+        "relevante_zaakperiode",
     ]
     readonly_fields = [
         "urls",

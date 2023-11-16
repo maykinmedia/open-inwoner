@@ -44,6 +44,7 @@ class CategoriesPlugin(CMSActiveAppMixin, CMSPluginBase):
         ):
             categories = (
                 Category.objects.published()
+                .visible_for_user(request.user)
                 .filter_for_user_with_zaken(request.user)
                 .order_by("name")[: self.limit]
             )

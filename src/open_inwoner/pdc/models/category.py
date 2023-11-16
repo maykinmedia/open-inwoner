@@ -72,14 +72,6 @@ class Category(MP_Node):
             "Zaaktypen waarvoor bij aanwezigheid dit onderwerp getoond moet worden."
         ),
     )
-    relevante_zaakperiode = models.PositiveIntegerField(
-        verbose_name=_("Relevante zaakperiode"),
-        blank=True,
-        null=True,
-        help_text=_(
-            "Aantal maanden dat teruggekeken moet worden naar Zaken van deze zaaktypes."
-        ),
-    )
     highlighted = models.BooleanField(
         verbose_name=_("Highlighted"),
         default=False,

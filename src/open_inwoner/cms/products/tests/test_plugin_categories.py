@@ -16,7 +16,7 @@ from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 from open_inwoner.accounts.tests.factories import DigidUserFactory, UserFactory
 from open_inwoner.cms.products.cms_apps import ProductsApphook
 from open_inwoner.openzaak.models import OpenZaakConfig
-from open_inwoner.openzaak.tests.factories import ServiceFactory
+from open_inwoner.openzaak.tests.factories import ServiceFactory, ZaakTypeConfigFactory
 from open_inwoner.openzaak.tests.shared import (
     CATALOGI_ROOT,
     DOCUMENTEN_ROOT,
@@ -209,35 +209,30 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
         cls.category1 = CategoryFactory(
             name="0001",
             zaaktypen=[],
-            relevante_zaakperiode=None,
             visible_for_citizens=True,
         )
         cls.category2 = CategoryFactory(
             name="0002",
             highlighted=True,
             zaaktypen=["ZAAKTYPE-2020-0000000001"],
-            relevante_zaakperiode=None,
             visible_for_citizens=True,
         )
         cls.category3 = CategoryFactory(
             name="0003",
             highlighted=True,
             zaaktypen=["ZAAKTYPE-2020-0000000001"],
-            relevante_zaakperiode=3,
             visible_for_citizens=False,
         )
         cls.category4 = CategoryFactory(
             name="0004",
             highlighted=True,
-            zaaktypen=["ZAAKTYPE-2020-0000000001"],
-            relevante_zaakperiode=1,
+            zaaktypen=["ZAAKTYPE-2020-0000000002"],
             visible_for_citizens=True,
         )
         cls.category5 = CategoryFactory(
             name="0005",
             highlighted=True,
             zaaktypen=["unknown-zaaktype"],
-            relevante_zaakperiode=12,
             visible_for_citizens=True,
         )
 
@@ -370,6 +365,18 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
             beginGeldigheid="2020-09-25",
             versiedatum="2020-09-25",
         )
+        cls.zaaktype_config1 = ZaakTypeConfigFactory(
+            catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            urls=[cls.zaaktype["url"]],
+            identificatie=cls.zaaktype["identificatie"],
+            relevante_zaakperiode=None,
+        )
+        cls.zaaktype_config2 = ZaakTypeConfigFactory(
+            catalogus__url=cls.zaaktype_config1.catalogus,
+            urls=[cls.zaaktype2["url"]],
+            identificatie=cls.zaaktype2["identificatie"],
+            relevante_zaakperiode=1,
+        )
 
     def _setUpOASMocks(self, m):
         mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
@@ -408,7 +415,7 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
 
         self.assertEqual(
             list(context["categories"]),
-            [self.category2, self.category3],
+            [self.category2],
         )
 
     @patch(

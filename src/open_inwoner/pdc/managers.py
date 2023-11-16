@@ -8,6 +8,7 @@ from treebeard.mp_tree import MP_NodeQuerySet
 
 from open_inwoner.accounts.models import User
 from open_inwoner.openzaak.cases import fetch_cases, resolve_zaak_type
+from open_inwoner.openzaak.models import ZaakTypeConfig
 
 
 class ProductQueryset(models.QuerySet):
@@ -44,20 +45,36 @@ class CategoryPublishedQueryset(MP_NodeQuerySet):
         if not getattr(user, "bsn", None):
             return self
 
+        zaaktypen = ZaakTypeConfig.objects.all()
+        url_to_identificatie_mapping = {
+            url: zaaktype.identificatie
+            for zaaktype in zaaktypen
+            for url in zaaktype.urls
+        }
+        zaakperiode_mapping = {
+            zaaktype.identificatie: zaaktype.relevante_zaakperiode
+            for zaaktype in zaaktypen
+        }
+
         cases = fetch_cases(user.bsn)
 
         months_since_last_zaak_per_zaaktype = {}
         for case in cases:
-            resolve_zaak_type(case)
+            # TODO This can occur if the import ZGW data is missing entries or if the
+            # user has Zaken for zaaktypen with indicatie intern
+            if case.zaaktype not in url_to_identificatie_mapping:
+                continue
+
+            zaaktype_identificatie = url_to_identificatie_mapping[case.zaaktype]
 
             duration_since_start = relativedelta(date.today(), case.startdatum)
             if (
-                case.zaaktype.identificatie not in months_since_last_zaak_per_zaaktype
-                or months_since_last_zaak_per_zaaktype[case.zaaktype.identificatie]
+                zaaktype_identificatie not in months_since_last_zaak_per_zaaktype
+                or months_since_last_zaak_per_zaaktype[zaaktype_identificatie]
                 > duration_since_start.months
             ):
                 months_since_last_zaak_per_zaaktype[
-                    case.zaaktype.identificatie
+                    zaaktype_identificatie
                 ] = duration_since_start.months
 
         zaaktype_ids = list(months_since_last_zaak_per_zaaktype.keys())
@@ -66,14 +83,15 @@ class CategoryPublishedQueryset(MP_NodeQuerySet):
 
         pks = []
         for category in qs:
-            if not category.relevante_zaakperiode:
-                pks.append(category.pk)
-                continue
-
             for identificatie in category.zaaktypen:
+                relevante_zaakperiode = zaakperiode_mapping.get(identificatie)
+                if not relevante_zaakperiode:
+                    pks.append(category.pk)
+                    continue
+
                 if (
                     months_since_last_zaak_per_zaaktype[identificatie]
-                    <= category.relevante_zaakperiode
+                    <= relevante_zaakperiode
                 ):
                     pks.append(category.pk)
                     break
