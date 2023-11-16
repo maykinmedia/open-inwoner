@@ -1,46 +1,55 @@
+from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from djchoices import ChoiceItem, DjangoChoices
 
-
-class LoginTypeChoices(DjangoChoices):
-    default = ChoiceItem("default", _("E-mail en Wachtwoord"))
-    digid = ChoiceItem("digid", _("DigiD"))
-    eherkenning = ChoiceItem("eherkenning", _("eHerkenning"))
-    oidc = ChoiceItem("oidc", _("OpenId connect"))
-
-
-# Created because of a filter that needs to happen. This way the form can take the empty choice and the modal is still filled.
-class AllEmptyChoice(DjangoChoices):
-    empty = ChoiceItem("", _("Alle"))
-
-
-class ContactTypeChoices(DjangoChoices):
-    contact = ChoiceItem("contact", _("Contactpersoon"))
-    begeleider = ChoiceItem("begeleider", _("Begeleider"))
-    organization = ChoiceItem("organization", _("Organisatie"))
-
-
-class EmptyContactTypeChoices(AllEmptyChoice, ContactTypeChoices):
-    pass
+class LoginTypeChoices(models.TextChoices):
+    default = "default", _("E-mail en Wachtwoord")
+    digid = "digid", _("DigiD")
+    eherkenning = "eherkenning", _("eHerkenning")
+    oidc = "oidc", _("OpenId connect")
 
 
 # Created because of a filter that needs to happen. This way the form can take the empty choice and the modal is still filled.
-class StatusEmptyChoice(DjangoChoices):
-    empty = ChoiceItem("", _("Status"))
+class AllEmptyChoice(models.TextChoices):
+    empty = "", _("Alle")
 
 
-class StatusChoices(DjangoChoices):
-    open = ChoiceItem("open", _("Open"), icon="format_list_bulleted")
-    approval = ChoiceItem("approval", _("Accordering"), icon="question_mark")
-    closed = ChoiceItem("closed", _("Afgerond"), icon="check")
+class ContactTypeChoices(models.TextChoices):
+    contact = "contact", _("Contactpersoon")
+    begeleider = "begeleider", _("Begeleider")
+    organization = "organization", _("Organisatie")
 
-    # note the icons are names from Material Symbols and Icons - Google Fonts
+
+class EmptyContactTypeChoices(models.TextChoices):
+    empty = "", _("Alle")
+    contact = "contact", _("Contactpersoon")
+    begeleider = "begeleider", _("Begeleider")
+    organization = "organization", _("Organisatie")
+
+
+# Created because of a filter that needs to happen. This way the form can take the empty choice and the modal is still filled.
+class StatusEmptyChoice(models.TextChoices):
+    empty = "", _("Status")
+
+
+class StatusChoices(models.TextChoices):
+    open = "open", _("Open")
+    approval = "approval", _("Accordering")
+    closed = "closed", _("Afgerond")
+
+    @staticmethod
+    def get_icon_mapping():
+        return {
+            "open": "format_list_bulleted",
+            "approval": "question_mark",
+            "closed": "check",
+        }
 
     @classmethod
-    def get_icon(cls, status, default="label"):
+    def get_icon(cls, status: str, default="label"):
         if status in cls.values:
-            return cls.get_choice(status).icon
+            icon_mapping = cls.get_icon_mapping()
+            return icon_mapping[status]
         else:
             return default
 
@@ -49,10 +58,13 @@ class StatusChoices(DjangoChoices):
         return [(value, label, cls.get_icon(value)) for value, label in cls.choices]
 
 
-class EmptyStatusChoices(StatusEmptyChoice, StatusChoices):
-    pass
+class EmptyStatusChoices(models.TextChoices):
+    empty = "", _("Status")
+    open = "open", _("Open")
+    approval = "approval", _("Accordering")
+    closed = "closed", _("Afgerond")
 
 
-class TypeChoices(DjangoChoices):
-    incidental = ChoiceItem("incidental", _("Incidentieel"))
-    recurring = ChoiceItem("recurring", _("Terugkerend"))
+class TypeChoices(models.TextChoices):
+    incidental = "incidental", _("Incidentieel")
+    recurring = "recurring", _("Terugkerend")

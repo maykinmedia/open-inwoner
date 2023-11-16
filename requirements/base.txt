@@ -134,10 +134,8 @@ django-better-admin-arrayfield==1.4.2
     # via
     #   -r requirements/base.in
     #   mozilla-django-oidc-db
-django-choices==1.7.2
-    # via
-    #   -r requirements/base.in
-    #   mail-editor
+django-choices==2.0.0
+    # via mail-editor
 django-ckeditor==6.2.0
     # via mail-editor
 django-classy-tags==4.0.0
@@ -474,7 +472,6 @@ six==1.16.0
     # via
     #   click-repl
     #   django-appdata
-    #   django-choices
     #   django-elasticsearch-dsl
     #   elasticsearch-dsl
     #   furl

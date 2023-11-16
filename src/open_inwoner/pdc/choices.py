@@ -1,8 +1,7 @@
+from django.db import models
 from django.utils.translation import gettext as _
 
-from djchoices import ChoiceItem, DjangoChoices
 
-
-class YesNo(DjangoChoices):
-    yes = ChoiceItem("yes", _("Ja"))
-    no = ChoiceItem("no", _("Nee"))
+class YesNo(models.TextChoices):
+    yes = "yes", _("Ja")
+    no = "no", _("Nee")
