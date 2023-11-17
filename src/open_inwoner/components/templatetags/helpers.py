@@ -63,4 +63,7 @@ def get_product_url(context, product):
 def as_attributes(attribute_dict):
     if not attribute_dict:
         return ""
-    return format_html_join(" ", '{}="{}"', attribute_dict.items())
+    try:
+        return format_html_join(" ", '{}="{}"', attribute_dict.items())
+    except AttributeError:
+        return attribute_dict

@@ -17,6 +17,7 @@ import { CookieBanner } from './cookie-consent'
 import './datepicker'
 import { Dropdown } from './dropdown'
 import './emoji-button'
+import './form'
 import './header'
 import './map'
 import './message-file'
@@ -34,6 +35,7 @@ import { ShowInfo } from './upload-document/show-file-info'
 import { FileInputError } from './upload-document/file-input-errors'
 import './session'
 import './twofactor-sms'
+import { FileInput } from './form/FileInput'
 
 const htmx = (window.htmx = require('htmx.org'))
 
@@ -58,7 +60,7 @@ const elementWrappers = [
   [Notification.selector, (elt) => new Notification(elt)],
   [AnchorMobile.selector, (elt) => new AnchorMobile(elt)],
   [StatusAccordion.selector, (elt) => new StatusAccordion(elt)],
-  // add more when needed
+  [FileInput.selector, (elt) => new FileInput(elt)],
 ]
 
 // harden against multiple events

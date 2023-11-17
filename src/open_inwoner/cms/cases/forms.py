@@ -1,23 +1,17 @@
 import os
 
 from django import forms
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.utils.translation import gettext_lazy as _
 
 from open_inwoner.openzaak.models import (
     OpenZaakConfig,
+    ZaakTypeConfig,
     ZaakTypeInformatieObjectTypeConfig,
 )
-from open_inwoner.utils.validators import CharFieldValidator
 
 
 class CaseUploadForm(forms.Form):
-    title = forms.CharField(
-        label=_("Titel bestand"),
-        max_length=255,
-        # empty_value=_("Titel bestand"),#TypeError: Object of type __proxy__ is not JSON serializable
-        required=False,
-    )
     type = forms.ModelChoiceField(
         ZaakTypeInformatieObjectTypeConfig.objects.none(),
         empty_label=None,
@@ -26,7 +20,18 @@ class CaseUploadForm(forms.Form):
     file = forms.FileField(label=_("Bestand"))
 
     def __init__(self, case, **kwargs):
+        self.oz_config = OpenZaakConfig.get_solo()
         super().__init__(**kwargs)
+
+        help_text = f"Grootte max. { self.oz_config.max_upload_size } MB, toegestane document formaten: { ', '.join(self.oz_config.allowed_file_extensions) }."
+
+        try:
+            ztc = ZaakTypeConfig.objects.filter_case_type(case.zaaktype).get()
+            help_text = ztc.description or help_text
+        except (AttributeError, ObjectDoesNotExist):
+            pass
+
+        self.fields["file"].help_text = help_text
 
         if case:
             self.fields[
@@ -44,14 +49,13 @@ class CaseUploadForm(forms.Form):
     def clean_file(self):
         file = self.cleaned_data["file"]
 
-        config = OpenZaakConfig.get_solo()
-        max_allowed_size = 1024**2 * config.max_upload_size
-        allowed_extensions = sorted(config.allowed_file_extensions)
+        max_allowed_size = 1024**2 * self.oz_config.max_upload_size
+        allowed_extensions = sorted(self.oz_config.allowed_file_extensions)
         filename, file_extension = os.path.splitext(file.name)
 
         if file.size > max_allowed_size:
             raise ValidationError(
-                f"Een aangeleverd bestand dient maximaal {config.max_upload_size} MB te zijn, uw bestand is te groot."
+                f"Een aangeleverd bestand dient maximaal {self.oz_config.max_upload_size} MB te zijn, uw bestand is te groot."
             )
 
         if file_extension.lower().replace(".", "") not in allowed_extensions:

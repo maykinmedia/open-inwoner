@@ -277,7 +277,7 @@ def input(field, **kwargs):
 
 
 @register.inclusion_tag("components/Form/FileInput.html")
-def file_input(file, text, **kwargs):
+def file_input(file, text="", **kwargs):
     """
     Displaying a file upload interface.
 

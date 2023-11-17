@@ -478,7 +478,7 @@ class CaseDocumentUploadFormView(CaseAccessMixin, LogMixin, FormView):
         cleaned_data = form.cleaned_data
 
         file = cleaned_data["file"]
-        title = cleaned_data["title"]
+        title = file.name
         document_type = cleaned_data["type"]
         source_organization = self.case.bronorganisatie
 
