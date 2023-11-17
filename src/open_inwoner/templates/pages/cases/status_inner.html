@@ -107,16 +107,6 @@
                     {% include 'pages/cases/document_form.html' %}
                 </section>
 
-                {% if case.case_type_config_description %}
-                    <p class="p">{{ case.case_type_config_description }}</p>
-                {% else %}
-                    <p class="p">
-                        {% blocktranslate with max_filesize=openzaak_config.max_upload_size allowed_extensions=case.allowed_file_extensions|join:', ' %}
-                            Grootte max. {{ max_filesize }} MB, toegestane document formaten: {{ allowed_extensions }}.
-                        {% endblocktranslate %}
-                    </p>
-                {% endif %}
-
             {% elif case.external_upload_enabled %}
                 <h2 class="h2" id="documents-upload">{% trans "Document toevoegen" %}</h2>
                 {% if case.case_type_config_description %}

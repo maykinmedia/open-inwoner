@@ -96,6 +96,7 @@
   &__img--contain {
     object-fit: contain;
   }
+
   &__body {
     padding: var(--card-spacing);
 
@@ -103,6 +104,13 @@
       display: flex;
       flex-direction: column;
       flex-wrap: wrap;
+    }
+
+    &--direction-vertical {
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
     }
 
     .spacer {

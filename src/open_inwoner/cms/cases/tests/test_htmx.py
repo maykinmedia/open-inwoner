@@ -432,7 +432,8 @@ class CasesPlaywrightTests(
         upload_form = page.locator("#document-upload")
         expect(upload_form).to_be_visible()
 
-        upload_form.get_by_label(_("Selecteer bestanden")).set_input_files(
+        file_input = upload_form.get_by_text(_("Sleep of selecteer bestand"))
+        file_input.set_input_files(
             files=[
                 {
                     "name": "uploaded_test_file.txt",

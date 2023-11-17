@@ -1,0 +1,42 @@
+.file-input {
+  .card:first-child {
+    text-align: center;
+    position: relative;
+  }
+
+  &--drag-active .card:first-child {
+    background-color: var(--color-gray-lightest);
+  }
+
+  .card__body {
+    box-sizing: border-box;
+    padding: var(--row-height);
+  }
+
+  [class*='icon'] {
+    pointer-events: none;
+    position: static !important;
+    transform: none !important;
+  }
+
+  &--drag-active .button {
+    pointer-events: none;
+  }
+
+  &__input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  > .p {
+    margin: calc(0.5 * var(--gutter-width)) 0;
+    display: block;
+    text-align: center;
+  }
+
+  .h4 {
+    margin-top: var(--gutter-width);
+    margin-bottom: calc(0.5 * var(--gutter-width));
+  }
+}

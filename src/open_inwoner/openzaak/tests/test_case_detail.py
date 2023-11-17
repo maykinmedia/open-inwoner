@@ -955,7 +955,6 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         form.action = reverse(
             "cases:case_detail_document_form", kwargs={"object_id": self.zaak["uuid"]}
         )
-        form["title"] = "uploaded file"
         form["type"] = zaak_type_iotc.id
         form["file"] = Upload("upload.TXT", b"data", "text/plain")
         form_response = form.submit()
@@ -1004,7 +1003,6 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             user=self.user,
         )
         form = response.forms["document-upload"]
-        form["title"] = "uploaded file"
         form["type"] = zaak_type_iotc.id
         form["file"] = Upload("upload.xml", b"data", "application/xml")
         form_response = form.submit()
@@ -1045,7 +1043,6 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         )
         form = response.forms["document-upload"]
 
-        form["title"] = "uploaded file"
         form["type"] = zaak_type_iotc.id
         form["file"] = Upload("upload.txt", b"data", "text/plain")
         form_response = form.submit()
@@ -1220,7 +1217,6 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         form.action = reverse(
             "cases:case_detail_document_form", kwargs={"object_id": self.zaak["uuid"]}
         )
-        form["title"] = "uploaded file"
         form["file"] = Upload("upload.txt", b"data", "text/plain")
         form_response = form.submit()
 
@@ -1261,7 +1257,6 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         form.action = reverse(
             "cases:case_detail_document_form", kwargs={"object_id": self.zaak["uuid"]}
         )
-        form["title"] = "A title"
         form["file"] = Upload("upload.txt", b"data", "text/plain")
         form_response = form.submit()
 
