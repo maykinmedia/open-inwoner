@@ -71,6 +71,10 @@ DATABASES = {
     }
 }
 
+# Geospatial libraries
+GEOS_LIBRARY_PATH = config("GEOS_LIBRARY_PATH", None)
+GDAL_LIBRARY_PATH = config("GDAL_LIBRARY_PATH", None)
+
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
