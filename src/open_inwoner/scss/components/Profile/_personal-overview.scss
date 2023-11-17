@@ -1,6 +1,10 @@
-.personal-overview {
+.profile-section {
   h2,
   .h2 {
-    margin: var(--row-height) 0 0 0;
+    margin: calc(var(--row-height) * 1.5) 0 0 0;
   }
+}
+
+#title {
+  padding-bottom: var(--spacing-medium);
 }

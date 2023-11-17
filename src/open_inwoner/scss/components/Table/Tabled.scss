@@ -24,6 +24,12 @@
     margin: var(--row-height) 0 0 0;
   }
 
+  .card {
+    .profile__link {
+      text-decoration: none;
+    }
+  }
+
   .tabled__header {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -41,10 +47,18 @@
     }
   }
 
+  .tabled__section {
+    border-bottom: 1px solid var(--color-gray-light);
+  }
+
   .tabled__row {
     display: grid;
     grid-template-columns: 1fr 1fr;
     border-bottom: 1px solid var(--color-gray-light);
+
+    &--blank {
+      border-bottom-width: 0;
+    }
 
     @media (min-width: 768px) {
       grid-template-columns: 1fr 1fr 125px 125px;
@@ -54,9 +68,13 @@
   .tabled__item {
     font-family: var(--font-family-body);
     padding: var(--spacing-medium);
+    padding-left: 0;
 
     &--bold {
       font-weight: bold;
+    }
+    &--lighter {
+      font-weight: lighter;
     }
 
     &--right {
