@@ -249,17 +249,6 @@ class CustomPasswordResetForm(PasswordResetForm):
         email_message.send()
 
 
-class CategoriesForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = ("selected_categories",)
-        widgets = {"selected_categories": forms.widgets.CheckboxSelectMultiple}
-
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        self.fields["selected_categories"].queryset = Category.objects.published()
-
-
 class UserNotificationsForm(forms.ModelForm):
     class Meta:
         model = User

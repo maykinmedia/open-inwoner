@@ -4,7 +4,6 @@
     "fields": {
       "namespace": "profile-apphook-config",
       "my_data": true,
-      "selected_categories": true,
       "mentors": true,
       "my_contacts": true,
       "selfdiagnose": true,
