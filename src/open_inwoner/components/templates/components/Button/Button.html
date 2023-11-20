@@ -21,7 +21,7 @@
         {% endif %}
     </a>
 {% else %}
-    <{{ tag }}
+    <button
         class="{{ classes }}"
         type="{{type}}"
         name="{{ name }}"
@@ -42,5 +42,5 @@
         {% else %}
             {% if not hide_text %}{{text}}{% endif %}
         {% endif %}
-    </{{ tag }}>
+    </button>
 {% endif %}
