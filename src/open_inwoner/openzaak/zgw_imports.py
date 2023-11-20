@@ -88,7 +88,7 @@ def import_zaaktype_configs() -> List[ZaakTypeConfig]:
     if not zaak_types:
         return []
 
-    create = []
+    create = {}
 
     with transaction.atomic():
         catalog_lookup = {c.url: c for c in CatalogusConfig.objects.all()}
@@ -114,18 +114,19 @@ def import_zaaktype_configs() -> List[ZaakTypeConfig]:
 
             if key not in known_keys:
                 known_keys.add(key)
-                create.append(
-                    ZaakTypeConfig(
-                        catalogus=catalog,
-                        identificatie=zaak_type.identificatie,
-                        omschrijving=zaak_type.omschrijving,
-                    )
+                create[key] = ZaakTypeConfig(
+                    urls=[zaak_type.url],
+                    catalogus=catalog,
+                    identificatie=zaak_type.identificatie,
+                    omschrijving=zaak_type.omschrijving,
                 )
+            elif key in create:
+                create[key].urls = create[key].urls + [zaak_type.url]
 
         if create:
-            ZaakTypeConfig.objects.bulk_create(create)
+            ZaakTypeConfig.objects.bulk_create(list(create.values()))
 
-    return create
+    return list((create or {}).values())
 
 
 def import_zaaktype_informatieobjecttype_configs() -> List[

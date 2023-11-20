@@ -141,6 +141,17 @@ class OpenZaakConfig(SingletonModel):
         ),
     )
 
+    # feature flags
+    enable_categories_filtering_with_zaken = models.BooleanField(
+        verbose_name=_("Enable category filtering based on zaken"),
+        default=False,
+        help_text=_(
+            "If checked, the highlighted categories list on the homepage will consist "
+            "of categories that are linked to ZaakTypen for which the DigiD authenticated "
+            "user has at least one Zaak."
+        ),
+    )
+
     class Meta:
         verbose_name = _("Open Zaak configuration")
 
@@ -167,6 +178,12 @@ class CatalogusConfig(models.Model):
 
 
 class ZaakTypeConfig(models.Model):
+    urls = ArrayField(
+        models.URLField(
+            verbose_name=_("Zaaktype URL"),
+        ),
+        default=list,
+    )
     catalogus = models.ForeignKey(
         "openzaak.CatalogusConfig",
         on_delete=models.CASCADE,
@@ -221,6 +238,15 @@ class ZaakTypeConfig(models.Model):
         verbose_name=_("e-Suite 'onderwerp' code"),
         max_length=255,
         blank=True,
+    )
+
+    relevante_zaakperiode = models.PositiveIntegerField(
+        verbose_name=_("Relevante zaakperiode"),
+        blank=True,
+        null=True,
+        help_text=_(
+            "Aantal maanden dat teruggekeken moet worden naar Zaken van deze zaaktypes."
+        ),
     )
 
     objects = ZaakTypeConfigQueryset.as_manager()

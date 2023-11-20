@@ -1,8 +1,8 @@
-from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
+from django_better_admin_arrayfield.models.fields import ArrayField
 from filer.fields.image import FilerImageField
 from treebeard.exceptions import InvalidMoveToDescendant
 from treebeard.mp_tree import MP_MoveHandler, MP_Node
@@ -70,14 +70,6 @@ class Category(MP_Node):
         blank=True,
         help_text=_(
             "Zaaktypen waarvoor bij aanwezigheid dit onderwerp getoond moet worden."
-        ),
-    )
-    relevante_zaakperiode = models.PositiveIntegerField(
-        verbose_name=_("Relevante zaakperiode"),
-        blank=True,
-        null=True,
-        help_text=_(
-            "Aantal maanden dat teruggekeken moet worden naar Zaken van deze zaaktypes."
         ),
     )
     highlighted = models.BooleanField(

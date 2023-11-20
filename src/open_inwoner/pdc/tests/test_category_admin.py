@@ -1,8 +1,12 @@
+from unittest.mock import patch
+
 from django.urls import reverse
+from django.utils.translation import gettext as _
 
 from django_webtest import WebTest
 
 from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.openzaak.tests.factories import ZaakTypeConfigFactory
 
 from ..models.category import Category
 from .factories import CategoryFactory
@@ -90,3 +94,56 @@ class TestAdminCategoryForm(WebTest):
         form.submit("_save")
         updated_category = Category.objects.get(slug="bar4")
         self.assertFalse(updated_category.published)
+
+    @patch("open_inwoner.openzaak.models.OpenZaakConfig.get_solo")
+    def test_user_can_link_zaaktypen_if_category_filtering_with_zaken_feature_flag_enabled(
+        self, mock_solo
+    ):
+        mock_solo.return_value.enable_categories_filtering_with_zaken = True
+
+        ZaakTypeConfigFactory.create(identificatie="001")
+
+        category = CategoryFactory(path="0006", slug="foo6", published=False)
+        form = self.app.get(
+            reverse("admin:pdc_category_change", kwargs={"object_id": category.pk}),
+            user=self.user,
+        ).form
+
+        form["zaaktypen"] = "001"
+        response = form.submit("_save")
+
+        self.assertEqual(response.status_code, 302)
+
+        category.refresh_from_db()
+
+        self.assertEqual(category.zaaktypen, ["001"])
+
+    @patch("open_inwoner.openzaak.models.OpenZaakConfig.get_solo")
+    def test_user_cannot_link_zaaktypen_if_category_filtering_with_zaken_feature_flag_disabled(
+        self, mock_solo
+    ):
+        mock_solo.return_value.enable_categories_filtering_with_zaken = False
+
+        ZaakTypeConfigFactory.create(identificatie="001")
+
+        category = CategoryFactory(path="0006", slug="foo6", published=False)
+        form = self.app.get(
+            reverse("admin:pdc_category_change", kwargs={"object_id": category.pk}),
+            user=self.user,
+        ).form
+
+        form["zaaktypen"] = "001"
+        response = form.submit()
+
+        self.assertEqual(response.status_code, 200)
+
+        error_msg = _(
+            "The feature flag to enable category visibility based on zaken is currently disabled. "
+            "This should be enabled via the admin interface before this Category can be linked to zaaktypen."
+        )
+
+        self.assertEqual(response.context["errors"], [[error_msg]])
+
+        category.refresh_from_db()
+
+        self.assertFalse(category.zaaktypen, [])

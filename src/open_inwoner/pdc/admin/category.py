@@ -1,5 +1,8 @@
+from collections import defaultdict
+
 from django import forms
 from django.contrib import admin
+from django.core.exceptions import ValidationError
 from django.forms import BaseModelFormSet
 from django.utils.translation import gettext as _
 
@@ -12,11 +15,46 @@ from treebeard.admin import TreeAdmin
 from treebeard.forms import movenodeform_factory
 
 from open_inwoner.ckeditor5.widgets import CKEditorWidget
+from open_inwoner.openzaak.models import OpenZaakConfig, ZaakTypeConfig
 from open_inwoner.utils.logentry import system_action
 
 from ..models import Category, CategoryProduct
 from ..resources import CategoryExportResource, CategoryImportResource
 from .faq import QuestionInline
+
+
+class ZaakTypenSelectWidget(forms.Select):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        zaaktypen = ZaakTypeConfig.objects.order_by("catalogus__domein")
+
+        # Create an optgroup for each Catalogus and its ZaakTypen
+        choices_dict = defaultdict(list)
+        choices_dict[""] = [
+            (
+                "",
+                "-------",
+            )
+        ]
+        for zaaktype in zaaktypen:
+            choices_dict[
+                f"{zaaktype.catalogus.domein} - {zaaktype.catalogus.rsin}"
+            ].append(
+                (
+                    zaaktype.identificatie,
+                    zaaktype.omschrijving,
+                )
+            )
+
+        self.choices = choices_dict.items()
+
+
+class DynamicArraySelectWidget(DynamicArrayWidget):
+    def __init__(self, *args, **kwargs):
+        kwargs["subwidget_form"] = ZaakTypenSelectWidget
+
+        super().__init__(*args, **kwargs)
 
 
 class CategoryProductInline(OrderedTabularInline):
@@ -34,7 +72,7 @@ class CategoryAdminForm(movenodeform_factory(Category)):
     class Meta:
         model = Category
         fields = "__all__"
-        widgets = {"description": CKEditorWidget, "zaaktypen": DynamicArrayWidget}
+        widgets = {"description": CKEditorWidget, "zaaktypen": DynamicArraySelectWidget}
 
     def clean(self, *args, **kwargs):
         cleaned_data = super().clean(*args, **kwargs)
@@ -47,6 +85,19 @@ class CategoryAdminForm(movenodeform_factory(Category)):
                 raise forms.ValidationError(
                     _("Parent nodes have to be published in order to publish a child.")
                 )
+
+    def clean_zaaktypen(self):
+        config = OpenZaakConfig.get_solo()
+        zaaktypen = self.cleaned_data["zaaktypen"]
+
+        if zaaktypen and not config.enable_categories_filtering_with_zaken:
+            raise forms.ValidationError(
+                _(
+                    "The feature flag to enable category visibility based on zaken is currently disabled. "
+                    "This should be enabled via the admin interface before this Category can be linked to zaaktypen."
+                )
+            )
+        return zaaktypen
 
 
 class CategoryAdminFormSet(BaseModelFormSet):
@@ -74,7 +125,7 @@ class CategoryAdminFormSet(BaseModelFormSet):
 
 @admin.register(Category)
 class CategoryAdmin(
-    DynamicArrayMixin, OrderedInlineModelAdminMixin, ImportExportMixin, TreeAdmin
+    OrderedInlineModelAdminMixin, ImportExportMixin, TreeAdmin, DynamicArrayMixin
 ):
     change_list_template = "admin/category_change_list.html"
     form = CategoryAdminForm

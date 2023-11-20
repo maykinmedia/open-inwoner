@@ -53,6 +53,13 @@ class OpenZaakConfigAdmin(SingletonModelAdmin):
             },
         ),
         (
+            "Feature flags",
+            {
+                "classes": ("collapse",),
+                "fields": ("enable_categories_filtering_with_zaken",),
+            },
+        ),
+        (
             _("API behaviour override options"),
             {
                 "fields": [
@@ -247,6 +254,7 @@ class ZaakTypeConfigAdmin(admin.ModelAdmin):
         "mark_as_not_notify_status_changes",
     ]
     fields = [
+        "urls",
         "catalogus",
         "identificatie",
         "omschrijving",
@@ -256,8 +264,10 @@ class ZaakTypeConfigAdmin(admin.ModelAdmin):
         "document_upload_enabled",
         "external_document_upload_url",
         "description",
+        "relevante_zaakperiode",
     ]
     readonly_fields = [
+        "urls",
         "catalogus",
         "identificatie",
         "omschrijving",
