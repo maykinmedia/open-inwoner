@@ -1,7 +1,14 @@
 .file-input {
-  .card:first-child {
-    text-align: center;
-    position: relative;
+  .card {
+    &:first-child {
+      text-align: center;
+      position: relative;
+    }
+
+     .label .input-button > .button {
+       padding-bottom: var(--spacing-medium);
+      position: static;
+    }
   }
 
   &--drag-active .card:first-child {
@@ -24,9 +31,21 @@
   }
 
   &__input {
+    left: 0;
     position: absolute;
     opacity: 0;
     pointer-events: none;
+    width: 100%;
+    height: var(--row-height-giant);
+  }
+
+  .input-button {
+    display: inline-block;
+
+    &--selected {
+      //display: none; TODO: toggle this with JS
+      cursor: pointer;
+    }
   }
 
   > .p {

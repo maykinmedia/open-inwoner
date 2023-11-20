@@ -58,7 +58,6 @@ def button(text, **kwargs):
         - icon: string | the icon that you want to display.
         - icon_position: enum[before, after] | where the icon should be positioned to the text.
         - icon_outlined: bool | if the outlined icons should be used.
-        - tag: string | The tag to use (if not a link, defaults to button)
         - text_icon: string | An additional icon to show before the (current value) text.
         - type: string | the type of button that should be used.
         - title: string | The HTML title attribute if different than the text.
@@ -130,5 +129,4 @@ def button(text, **kwargs):
 
     kwargs["classes"] = get_classes()
     kwargs["text"] = text
-    kwargs["tag"] = kwargs.get("tag", "button")
     return {**kwargs}

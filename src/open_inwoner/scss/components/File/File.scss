@@ -45,7 +45,13 @@
     box-sizing: border-box;
   }
 
+  &__file .link:hover {
+    color: var(--font-color-body);
+    text-decoration: none;
+  }
+
   &__file .p {
+    max-width: var(--mobile-xs-width);
     width: 100%;
     white-space: nowrap;
     overflow: hidden;
