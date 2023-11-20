@@ -20,7 +20,11 @@ from privates.storages import PrivateMediaFileSystemStorage
 from timeline_logger.models import TimelineLog
 
 from open_inwoner.utils.hash import create_sha256_hash
-from open_inwoner.utils.validators import CharFieldValidator, DutchPhoneNumberValidator
+from open_inwoner.utils.validators import (
+    CharFieldValidator,
+    DutchPhoneNumberValidator,
+    validate_kvk,
+)
 
 from ..plans.models import PlanContact
 from .choices import ContactTypeChoices, LoginTypeChoices, StatusChoices, TypeChoices
@@ -119,6 +123,16 @@ class User(AbstractBaseUser, PermissionsMixin):
     # TODO fix rsin & bsn to not be both null AND blank (!)
     rsin = models.CharField(verbose_name=_("Rsin"), max_length=9, null=True, blank=True)
     bsn = NLBSNField(verbose_name=_("Bsn"), null=True, blank=True)
+    kvk = models.CharField(
+        verbose_name=_("KvK number"),
+        max_length=8,
+        null=True,
+        blank=True,
+        validators=[validate_kvk],
+    )
+    company_name = models.CharField(
+        verbose_name=_("Company name"), max_length=250, null=True, blank=True
+    )
     login_type = models.CharField(
         verbose_name=_("Login type"),
         choices=LoginTypeChoices.choices,
