@@ -2,6 +2,7 @@ from collections import defaultdict
 
 from django import forms
 from django.contrib import admin
+from django.core.exceptions import ValidationError
 from django.forms import BaseModelFormSet
 from django.utils.translation import gettext as _
 
@@ -14,7 +15,7 @@ from treebeard.admin import TreeAdmin
 from treebeard.forms import movenodeform_factory
 
 from open_inwoner.ckeditor5.widgets import CKEditorWidget
-from open_inwoner.openzaak.models import ZaakTypeConfig
+from open_inwoner.openzaak.models import OpenZaakConfig, ZaakTypeConfig
 from open_inwoner.utils.logentry import system_action
 
 from ..models import Category, CategoryProduct
@@ -84,6 +85,19 @@ class CategoryAdminForm(movenodeform_factory(Category)):
                 raise forms.ValidationError(
                     _("Parent nodes have to be published in order to publish a child.")
                 )
+
+    def clean_zaaktypen(self):
+        config = OpenZaakConfig.get_solo()
+        zaaktypen = self.cleaned_data["zaaktypen"]
+
+        if zaaktypen and not config.enable_categories_filtering_with_zaken:
+            raise forms.ValidationError(
+                _(
+                    "The feature flag to enable category visibility based on zaken is currently disabled. "
+                    "This should be enabled via the admin interface before this Category can be linked to zaaktypen."
+                )
+            )
+        return zaaktypen
 
 
 class CategoryAdminFormSet(BaseModelFormSet):
