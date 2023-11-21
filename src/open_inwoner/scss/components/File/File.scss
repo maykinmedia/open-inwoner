@@ -34,6 +34,12 @@
     flex-direction: column;
   }
 
+  &__data > * {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
   &__file .link,
   &__file .p {
     padding: var(--spacing-large);

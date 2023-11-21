@@ -15,14 +15,16 @@
                 {% if recently_added %}
                     <span class="file__file--recent">{% icon icon="fiber_manual_record" outlined=False extra_classes="file__file--recent" %}{% trans "Nieuw" %}</span>
                 {% endif %}
-                {{ name }}
-                {% if extension and size %}
-                    ({{extension}}, {{size|readable_size}})
-                {% elif extension %}
-                    ({{extension}})
-                {% elif size %}
-                    ({{size|readable_size}})
-                {% endif %}
+                <span class="files__name">
+                    {{ name }}
+                    {% if extension and size %}
+                        ({{extension}}, {{size|readable_size}})
+                    {% elif extension %}
+                        ({{extension}})
+                    {% elif size %}
+                        ({{size|readable_size}})
+                    {% endif %}
+                </span>
                 <span class="file__date">{{ created|date:'d.m.Y' }}</span>
             </p>
             {% if allow_delete %}
