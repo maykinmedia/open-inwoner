@@ -198,7 +198,7 @@ export class FileInput extends Component {
                 <p class="p file__data">
                   <span class="file__name">${name} (${ext}, ${sizeMB}MB)</span>
                 </p>
-                <a class="link link--secondary" href="#" role="button" aria-label="${labelDelete}">
+                <a class="link link--primary" href="#" role="button" aria-label="${labelDelete}">
                   <span aria-hidden="true" class="material-icons-outlined">delete</span>
                 </a>
             </div>
