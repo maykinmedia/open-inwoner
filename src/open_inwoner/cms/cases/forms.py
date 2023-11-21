@@ -17,7 +17,7 @@ class CaseUploadForm(forms.Form):
         empty_label=None,
         label=_("Bestand type"),
     )
-    file = forms.FileField(label=_("Bestand"))
+    file = forms.FileField(label=_("Bestand"), required=True)
 
     def __init__(self, case, **kwargs):
         self.oz_config = OpenZaakConfig.get_solo()

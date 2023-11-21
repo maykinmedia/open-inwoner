@@ -4,11 +4,6 @@
       text-align: center;
       position: relative;
     }
-
-    .label .input-button > .button {
-      padding-bottom: var(--spacing-medium);
-      position: static;
-    }
   }
 
   &--drag-active .card:first-child {
@@ -21,9 +16,12 @@
   }
 
   [class*='icon'] {
+    color: var(--color-gray-dark);
+    font-size: 30px;
     pointer-events: none;
     position: static !important;
     transform: none !important;
+    height: 30px;
   }
 
   &--drag-active .button {
@@ -37,15 +35,6 @@
     pointer-events: none;
     width: 100%;
     height: var(--row-height-giant);
-  }
-
-  .input-button {
-    display: inline-block;
-
-    &--selected {
-      //display: none; TODO: toggle this with JS
-      cursor: pointer;
-    }
   }
 
   > .p {

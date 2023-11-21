@@ -31,8 +31,6 @@ import './search'
 import './toggle'
 import './upload-document'
 import { StatusAccordion } from './cases/status_accordion'
-import { ShowInfo } from './upload-document/show-file-info'
-import { FileInputError } from './upload-document/file-input-errors'
 import './session'
 import './twofactor-sms'
 import { FileInput } from './form/FileInput'
@@ -55,8 +53,6 @@ const elementWrappers = [
     DisableCaseContactButton.selector,
     (elt) => new DisableCaseContactButton(elt),
   ],
-  [ShowInfo.selector, (elt) => new ShowInfo(elt)],
-  [FileInputError.selector, (elt) => new FileInputError(elt)],
   [Notification.selector, (elt) => new Notification(elt)],
   [AnchorMobile.selector, (elt) => new AnchorMobile(elt)],
   [StatusAccordion.selector, (elt) => new StatusAccordion(elt)],

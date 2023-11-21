@@ -5,16 +5,11 @@
     {% render_card direction="vertical" %}
         {% icon icon="upload" icon_position="before" outlined=True %}
         <div class="inputfile-group">
-            <input class="file-input__input" id="{{ field.auto_id }}" name="file" type="file">
-            <label class="label" for="{{ field.auto_id }}">
-                <span class="input-button input-button--emptied"><span class="button button--primary" href="#document-upload" aria-label="_('Sleep of selecteer bestand')">{% trans 'Sleep of selecteer bestand' %}</span></span>
-                <span class="input-button input-button--selected"><span class="button button--textless button--icon button--transparent" href="#document-upload" aria-label="_('Selecteer bestand')">
-                {% icon icon="control_point" icon_position="before" primary=True outlined=True %}
-                {% trans 'Selecteer bestand' %}
-                </span></span>
+            <input class="file-input__input" id="{{ field.auto_id }}" name="file" type="file"{% if field.field.required %} required{% endif %}>
+            <label class="button button--primary" aria-label="_('Sleep of selecteer bestand')" for="id_file">
+                {% trans 'Sleep of selecteer bestand' %}
             </label>
         </div>
-
     {% endrender_card %}
 
     {% if field.help_text %}<p class="p p--muted p--small">{{ field.help_text }}</p>{% endif %}
