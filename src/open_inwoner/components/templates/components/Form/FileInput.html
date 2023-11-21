@@ -3,7 +3,7 @@
 <div class="form__control file-input">
     {% render_card direction="vertical" %}
         {% icon icon="upload" icon_position="before" outlined=True %}
-        <input multiple class="file-input__input" id="{{ field.auto_id }}" name="file" type="file"{% if field.field.required %} required{% endif %}>
+        <input class="file-input__input" id="{{ field.auto_id }}" name="file" type="file"{% if field.field.required %} required{% endif %}>
         <label class="button button--primary" aria-label="_('Sleep of selecteer bestand')" for="id_file">
             {% trans 'Sleep of selecteer bestand' %}
         </label>
