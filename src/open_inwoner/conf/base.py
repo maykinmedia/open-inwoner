@@ -449,9 +449,7 @@ LOGGING = {
 #
 LOG_OUTGOING_REQUESTS_DB_SAVE = config("LOG_OUTGOING_REQUESTS_DB_SAVE", default=True)
 LOG_OUTGOING_REQUESTS_RESET_DB_SAVE_AFTER = None  # reset config after $ minutes
-LOG_OUTGOING_REQUESTS_MAX_AGE = config(
-    "LOG_OUTGOING_REQUESTS_MAX_AGE", default=30
-)  # clean logs after 30 days
+
 
 #
 # AUTH settings - user accounts, passwords, backends...
@@ -806,6 +804,9 @@ ZGW_CONSUMERS_TEST_SCHEMA_DIRS = [
 ZGW_LIMIT_NOTIFICATIONS_FREQUENCY = config(
     "ZGW_LIMIT_NOTIFICATIONS_FREQUENCY", default=60 * 15
 )
+
+# recent documents: created/added no longer than n days in the past
+DOCUMENT_RECENT_DAYS = config("DOCUMENT_RECENT_DAYS", default=1)
 
 #
 # Maykin fork of DJANGO-TWO-FACTOR-AUTH

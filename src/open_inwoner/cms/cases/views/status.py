@@ -1,8 +1,11 @@
 import dataclasses
+import datetime as dt
 import logging
 from collections import defaultdict
+from datetime import datetime
 from typing import List, Optional
 
+from django.conf import settings
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.http import Http404, StreamingHttpResponse
@@ -50,6 +53,7 @@ from open_inwoner.openzaak.models import (
     ZaakTypeStatusTypeConfig,
 )
 from open_inwoner.openzaak.utils import get_role_name_display, is_info_object_visible
+from open_inwoner.utils.time import has_new_elements
 from open_inwoner.utils.translate import TranslationLookup
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
@@ -64,6 +68,7 @@ class SimpleFile:
     name: str
     size: int
     url: str
+    created: Optional[datetime] = None
 
 
 class OuterCaseDetailView(
@@ -201,6 +206,11 @@ class InnerCaseDetailView(
                 "end_statustype_data": end_statustype_data,
                 "documents": documents,
                 "allowed_file_extensions": sorted(config.allowed_file_extensions),
+                "new_docs": has_new_elements(
+                    documents,
+                    "created",
+                    dt.timedelta(days=settings.DOCUMENT_RECENT_DAYS),
+                ),
             }
             context["case"].update(self.get_upload_info_context(self.case))
             context["anchors"] = self.get_anchors(statuses, documents)
@@ -285,7 +295,7 @@ class InnerCaseDetailView(
                 zt_statustype_config = ztc.zaaktypestatustypeconfig_set.get(
                     statustype_url=case.status.statustype.url
                 )
-            # case has no status, or status type not found
+            # case has no status, or statustype config not found
             except (AttributeError, ObjectDoesNotExist):
                 pass
             else:
@@ -395,8 +405,10 @@ class InnerCaseDetailView(
                             "info_id": info_obj.uuid,
                         },
                     ),
+                    created=case_info_obj.registratiedatum,
                 )
             )
+
         return documents
 
     def get_form_kwargs(self):
