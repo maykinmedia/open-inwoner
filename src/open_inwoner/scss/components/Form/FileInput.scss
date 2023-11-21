@@ -8,6 +8,12 @@
 
   &--drag-active .card:first-child {
     background-color: var(--color-gray-lightest);
+    border-style: dashed;
+  }
+
+  &--drag-active .card__body,
+  .card:first-child [class*='icon'] {
+    pointer-events: none;
   }
 
   .card__body {

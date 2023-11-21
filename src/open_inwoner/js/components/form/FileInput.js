@@ -99,6 +99,9 @@ export class FileInput extends Component {
    * Gets called when dragging ends on the card (drop zone).
    */
   onDragLeave(e) {
+    if(e.target !== this.getCard()) {
+      return;
+    }
     this.node.classList.remove('file-input--drag-active')
   }
 
