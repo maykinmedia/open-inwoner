@@ -45,12 +45,22 @@
     box-sizing: border-box;
   }
 
+  &__file .link:hover {
+    color: var(--font-color-body);
+    text-decoration: none;
+  }
+
   &__file .p {
+    max-width: 200px;
     width: 100%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     line-height: var(--spacing-extra-large);
+
+    @media (min-width: 768px) {
+      max-width: var(--mobile-xs-width);
+    }
   }
 
   &__file .link__text {

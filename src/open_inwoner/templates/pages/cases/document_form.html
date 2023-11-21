@@ -1,37 +1,9 @@
 {% load i18n form_tags button_tags icon_tags %}
 
-<div class="upload-interface">
-    {#  if local upload is enabled #}
-    {% render_form id="document-upload" form=form method="POST" hxencoding="multipart/form-data" hxpost=hxpost_document_action hxtarget="#form_upload" submit_text=_("Bestand uploaden") show_required=True extra_classes="case-detail-form" %}
-        {% csrf_token %}
-        <div id="info_container" class="info-container form__control__info">
-            <div class="upload-interface__info">
-                <fieldset class="fieldset-container">
-                    <div class="drive">{% icon icon="insert_drive_file" outlined=True icon_position="before" %}</div>
-                    <div class="fieldset__content">
-                        <div id="upload_error" class="upload-info upload-info__error">
-                            <span>{% trans "Selecteer uw bestand opnieuw" %} {% icon icon="arrow_downward" outlined=True icon_position="before" %}</span></div>
-                        <div id="upload_name" class="upload-info upload-info__name"></div>
-                        <div id="upload_size" class="upload-info upload-info__size"></div>
-                    </div>
-                    <div class="close">{% button id="close_upload" icon="cancel" type='reset' text='' transparent=True icon_outlined=True icon_position="before" %}</div>
-                </fieldset>
-            </div>
-        </div>
-
-        <div class="form__control__info">{% input form.title no_label=False no_help=True id="id_title" %}</div>
-
-        <div class="form__control__info">{% input form.type no_label=False no_help=True icon="expand_more" icon_position="after" class="label input" id="id_type" extra_classes="file-type__select" %}</div>
-
-        <div class="form__control upload">
-            <div class="upload__container">
-                {% file_input form.file text=_("Document selecteren") no_label=False no_help=True extra_classes="file-upload" %}
-                <div class="form__submit">
-                    {% button_row %}
-                        {% button type="submit" text=_("Document uploaden") id="submit_upload" primary=True %}
-                    {% endbutton_row %}
-                </div>
-            </div>
-        </div>
-    {% endrender_form %}
-</div>
+{#  if local upload is enabled #}
+{% render_form id="document-upload" form=form method="POST" hxencoding="multipart/form-data" hxpost=hxpost_document_action hxtarget="#form_upload" submit_text=_("Bestand uploaden") extra_classes="case-detail-form" %}
+    {% csrf_token %}
+    {% input form.type no_label=True no_help=True class="label input" id="id_type" extra_classes="file-type__select" %}
+    {% file_input form.file %}
+    {% form_actions primary_text=_("Upload documenten") enctype="multipart/form-data" %}
+{% endrender_form %}

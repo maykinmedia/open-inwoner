@@ -20,6 +20,7 @@ export class Component {
 
     this.setState(initialState)
     this.bindEvents()
+    this.setupMutationObserver()
   }
 
   /**
@@ -27,6 +28,28 @@ export class Component {
    * Callbacks should trigger `setState` which in turn triggers `render`.
    */
   bindEvents() {}
+
+  /**
+   * Unbinds events from callbacks.
+   * Callbacks functions should be strict equal between `bindEvents()` and `unbindEvents`.
+   * Use this to call `removeEventListener()` for every `addEventListener`()` called.
+   */
+  unbindEvents() {}
+
+  /**
+   * Sets up the mutation observer managing §this.unbindEvents()`.
+   */
+  setupMutationObserver() {
+    this.mutationObserver = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'childList' && !document.contains(this.node)) {
+          // Element has been removed from the DOM
+          this.unbindEvents()
+          this.mutationObserver.disconnect() // Stop observing once the element is removed
+        }
+      })
+    })
+  }
 
   /**
    * Mutates state, then re-renders.

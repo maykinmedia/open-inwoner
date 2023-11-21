@@ -11,6 +11,35 @@
   }
 
   #document-upload {
+    gap: 0;
+    padding: 0 0 var(--row-height-giant) 0;
+
+    &:invalid [type='submit'] {
+      @extend .button--disabled;
+      background-color: var(--color-gray);
+      border-color: var(--color-gray);
+      color: var(--color-gray-90);
+      cursor: default;
+      font-weight: bold;
+      justify-content: center;
+      pointer-events: none;
+      width: 100%;
+
+      @media (min-width: 768px) {
+        width: initial;
+      }
+    }
+
+    .file-list,
+    .form__actions {
+      display: block;
+      margin: 0;
+
+      @media (min-width: 768px) {
+        display: grid;
+      }
+    }
+
     /// Make required asterisk visible for this component
     .label__label--required {
       color: var(--color-red);

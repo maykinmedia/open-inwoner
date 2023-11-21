@@ -1,21 +1,19 @@
-{% load i18n form_tags icon_tags %}
+{% load i18n button_tags card_tags form_tags icon_tags %}
 
-<div class="form__control {{ extra_classes|default:"upload" }}">
-    <div class="inputfile-group">
-        <label class="label">
-            <span class="input-file">
-            {{ field|addclass:"inputfile" }}
-
-                <span class="label__label" for="{{ field.auto_id }}">
-                {% icon icon="cloud_upload" icon_position="before" outlined=True %}
-                    {{ text }}
-
-                </span>{% if field.field.required %}<span class="label__label--required"> * </span>{% endif %}
-            </span>
-
-            {% if field.errors %}
-                {% errors errors=field.errors %}
-            {% endif %}
+<div class="form__control file-input">
+    {% render_card direction="vertical" %}
+        {% icon icon="upload" icon_position="before" outlined=True %}
+        <input class="file-input__input" id="{{ field.auto_id }}" name="file" type="file"{% if field.field.required %} required{% endif %}>
+        <label class="button button--primary" aria-label="_('Sleep of selecteer bestand')" for="id_file">
+            {% trans 'Sleep of selecteer bestand' %}
         </label>
+    {% endrender_card %}
+
+    {% if field.help_text %}<p class="p p--muted p--small">{{ field.help_text }}</p>{% endif %}
+    {% if field.errors %}{% errors errors=field.errors %}{% endif %}
+
+    <div class="file-list" aria-live="polite">
+        <h4 class="h4">{% trans 'Geselecteerd bestand'%}</h4>
+        <ul class="file-list__list" aria-live="polite" data-label-delete="{% trans 'Verwijderen' %}"></ul>
     </div>
 </div>
