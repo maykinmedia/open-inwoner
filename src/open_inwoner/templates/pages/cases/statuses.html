@@ -21,7 +21,11 @@
                             {% if case.end_statustype_data %}{% icon icon="expand_more" icon_position="after" outlined=True %}{% endif %} </button>
                         <div class="status-list__notification-content {% if case.end_statustype_data %}status-content--open{% endif %} {% if not case.end_statustype_data %}status-content--open{% endif %}" id="{{ content_id }}">
                             <p class="p p-text p--compact">
-                                {{ case_type_result_type_config.description|default:"" }}</p>
+                                {# Configurable texts #}
+                                <span>{{ status.status_indicator_text|default:"" }}</span>
+                                <span>{{ status.description|default:"" }}</span>
+                                {% if not case.end_statustype_data %}<span class="status--result">{{ status.case_type_result_type_config.description|default:"" }}/{{ status.case_type_config_description.description|default:"" }}</span>{% endif %}
+                            </p>
                             <p class="p p-date p--compact">{{ status.date|date }}</p>
                             <p class="p p__upload {% if case.end_statustype_data %}p__upload--enabled{% endif %}">
                             {% if case.internal_upload_enabled or case.external_upload_enabled %}
@@ -42,7 +46,9 @@
                         <button class="status-list__button button--borderless" aria-controls="{{ completed_id }}" aria-expanded="false" id="{{ id }}"><a href="#" class="link link-success">{{ status.label }}</a>{% icon icon="expand_more" icon_position="after" outlined=True %}</button>
                         <div class="status-list__notification-content" id="{{ completed_id }}">
                             <p class="p p-text p--compact">
-                                {{ case_type_result_type_config.description|default:"" }}
+                                {# Configurable texts #}
+                                <span>{{ status.status_indicator_text|default:"" }}</span>
+                                <span>{{ status.description|default:"" }}</span>
                             </p>
                             <p class="p p-date p--compact">{{ status.date|date }}</p>
                             <p class="p p__upload {% if case.end_statustype_data %}p__upload--enabled{% endif %}">

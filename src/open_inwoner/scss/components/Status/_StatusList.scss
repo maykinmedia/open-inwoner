@@ -58,6 +58,11 @@
       font-size: var(--font-size-body-small);
     }
 
+    .p-text {
+      display: flex;
+      flex-direction: column;
+    }
+
     .p__upload {
       display: none;
       &.p__upload--enabled {

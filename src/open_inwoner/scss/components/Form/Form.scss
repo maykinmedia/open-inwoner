@@ -248,11 +248,11 @@
   &.select-grid > .form__control > .form__grid-box {
     grid-template-columns: 1fr;
 
-    @media screen and (min-width: 500px) and (max-width: 768px) {
+    @media screen and (min-width: 500px) and (max-width: 767px) {
       grid-template-columns: 1fr 1fr;
     }
 
-    @media screen and (min-width: 769px) and (max-width: 904px) {
+    @media screen and (min-width: 768px) and (max-width: 904px) {
       grid-template-columns: 1fr 1fr 1fr;
     }
 
@@ -268,7 +268,7 @@
 .header__submenu {
   .form {
     // tablet sizes
-    @media screen and (min-width: 360px) and (max-width: 768px) {
+    @media screen and (min-width: 360px) and (max-width: 767px) {
       &__control > .label .input {
         max-width: 100%;
       }

@@ -363,6 +363,9 @@ class InnerCaseDetailView(
                     "call_to_action_text",
                     None,
                 ),
+                "description": getattr(
+                    statustype_config_mapping.get(s.statustype.url), "description", None
+                ),
             }
             for s in statuses
         ]
