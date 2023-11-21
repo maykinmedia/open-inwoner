@@ -27,10 +27,9 @@ class CaseUploadForm(forms.Form):
 
         try:
             ztc = ZaakTypeConfig.objects.filter_case_type(case.zaaktype).get()
-        except ObjectDoesNotExist:
-            pass
-        else:
             help_text = ztc.description or help_text
+        except (AttributeError, ObjectDoesNotExist):
+            pass
 
         self.fields["file"].help_text = help_text
 
