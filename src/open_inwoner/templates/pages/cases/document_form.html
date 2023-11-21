@@ -5,5 +5,5 @@
     {% csrf_token %}
     {% input form.type no_label=True no_help=True class="label input" id="id_type" extra_classes="file-type__select" %}
     {% file_input form.file %}
-    {% form_actions primary_text=_("Upload documenten")             enctype="multipart/form-data" %}
+    {% form_actions primary_text=_("Upload documenten") enctype="multipart/form-data" %}
 {% endrender_form %}
