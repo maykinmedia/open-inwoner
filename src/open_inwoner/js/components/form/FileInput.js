@@ -185,14 +185,20 @@ export class FileInput extends Component {
     return `
       <li class="file-list__list-item">
         <aside class="file">
-          <div class="file__file">
-              <span aria-hidden="true" class="material-icons-outlined">${
-                type.match('image') ? 'image' : 'description'
-              }</span>
-              <p class="p">${name} (${ext}, ${sizeMB}MB)</p>
-              <a class="link link--primary" href="#" role="button" aria-label="${labelDelete}">
-                <span aria-hidden="true" class="material-icons-outlined">delete</span>
-              </a>
+        <div class="file__container">
+            <div class="file__file">
+                <p class="file__symbol">
+                <span aria-hidden="true" class="material-icons-outlined">${
+                  type.match('image') ? 'image' : 'description'
+                }</span>
+                </p>
+                <p class="p file__data">
+                  <span class="file__name">${name} (${ext}, ${sizeMB}MB)</span>
+                </p>
+                <a class="link link--secondary" href="#" role="button" aria-label="${labelDelete}">
+                  <span aria-hidden="true" class="material-icons-outlined">delete</span>
+                </a>
+            </div>
           </div>
         </aside>
       </li>
