@@ -166,6 +166,7 @@ INSTALLED_APPS = [
     "axes",
     "sniplates",
     "digid_eherkenning",
+    "eherkenning",
     # "hijack.contrib.admin", # This should be imported but it causes an error. So now there are
     # "hijack",
     "localflavor",
@@ -472,6 +473,7 @@ AUTHENTICATION_BACKENDS = [
     "open_inwoner.accounts.backends.UserModelEmailBackend",
     "django.contrib.auth.backends.ModelBackend",
     "digid_eherkenning.backends.DigiDBackend",
+    "digid_eherkenning.backends.eHerkenningBackend",
     "open_inwoner.accounts.backends.CustomOIDCBackend",
 ]
 
@@ -859,6 +861,9 @@ DIGID = {
     # (False).
     "want_assertions_signed": DIGID_WANT_ASSERTIONS_SIGNED,
 }
+
+EHERKENNING_ENABLED = config("EHERKENNING", default=True)
+EHERKENNING_MOCK = config("EHERKENNING_MOCK", default=True)
 
 THUMBNAIL_ALIASES = {
     "": {

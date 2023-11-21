@@ -1,0 +1,43 @@
+{% extends "eherkenning/mock/eherkenning_base.html" %}
+
+{% block service_menu %}
+    <nav class='service-menu'>
+        <ul class='service-menu-items'>
+            <li>
+                <a class="language-menu-item digidmock-anchor-placeholder" data-locale="en">EN</a>
+            </li>
+            <li>
+                <a class="language-menu-item active digidmock-anchor-placeholder" data-locale="nl">NL</a>
+            </li>
+        </ul>
+    </nav>
+{% endblock %}
+
+
+{% block body %}
+    <h2 class='orange_heading' id='authentication_heading'>Hoe wilt u inloggen?</h2>
+
+    <div class='authentications'>
+        <a class='authentication login_tile' href='{{ password_login_url }}'
+            id='authentication_type_account_basis'>
+            <h2>
+                <i class="icon-basis" aria-hidden='true' aria-label="basis icoon"></i>
+                <span>Met gebruikersnaam en wachtwoord</span>
+                <p class='description'></p>
+            </h2>
+            <i class="icon-3941-delta-links-24px" style="float: right" aria-hidden='true'
+                aria-label="3941-delta-links- icoon"></i>
+        </a>
+    </div>
+    <div class='actions'>
+        <form class="button_to" method="get" action="{{ cancel_url }}">
+            <button arrow="true" class="actions__left--button arrow" type="submit">Annuleren</button>
+        </form>
+    </div>
+    <ul class='list-with-arrows' style='margin-bottom: 48px;'>
+        <li id='request-new-digid'>
+            <a class="digidmock-anchor-placeholder">Nog geen eHerkenning? Vraag uw eHerkenning aan</a>
+        </li>
+    </ul>
+
+{% endblock %}

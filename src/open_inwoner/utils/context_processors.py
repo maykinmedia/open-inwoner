@@ -12,6 +12,7 @@ def settings(request):
         "SHOW_ALERT",
         "PROJECT_NAME",
         "DIGID_ENABLED",
+        "EHERKENNING_ENABLED",
     )
 
     config = SiteConfiguration.get_solo()

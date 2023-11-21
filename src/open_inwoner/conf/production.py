@@ -29,6 +29,12 @@ elif DIGID_MOCK:
 else:
     DIGID_ENABLED = False
 
+EHERKENNING_MOCK = config("EHERKENNING_MOCK", default=False)
+if not DEBUG:
+    AUTHENTICATION_BACKENDS += ["digid_eherkenning.backends.eHerkenningBackend"]
+elif EHERKENNING_MOCK:
+    AUTHENTICATION_BACKENDS += ["eherkenning.mock.backends.eHerkenningBackend"]
+
 # Database performance
 # for db_config in DATABASES.values():
 #    db_config["CONN_MAX_AGE"] = 60  # Lifetime of a database connection for performance.

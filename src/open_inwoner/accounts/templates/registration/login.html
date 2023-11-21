@@ -27,6 +27,18 @@
                     {% endrender_card %}
 		{% endif %}
 
+        {% if settings.EHERKENNING_ENABLED %}
+                    {% render_card direction='horizontal' tinted=True %}
+                        <a href="{% url 'eherkenning:login' %}" class="link eherkenning-logo">
+                            <img class="eherkenning-logo__image" src="{% static 'accounts/eherkenning.png' %}" height=40 alt="eHerkenning inlogpagina">
+                        </a>
+                        {% url 'eherkenning:login' as href %}
+                        {% with href|addnexturl:next as href_with_next %}
+                            {% link href=href_with_next text=_('Inloggen met eHerkenning') secondary=True icon='arrow_forward' extra_classes="link--eherkenning" %}
+                        {% endwith %}
+                    {% endrender_card %}
+		{% endif %}
+
                 {% get_solo 'mozilla_django_oidc_db.OpenIDConnectConfig' as oidc_config %}
                 {% get_solo 'configurations.SiteConfiguration' as site_config %}
                 {% if oidc_config.enabled and site_config.openid_enabled_for_regular_users %}
