@@ -9,6 +9,7 @@ from open_inwoner.openzaak.models import (
     ZaakTypeConfig,
     ZaakTypeInformatieObjectTypeConfig,
 )
+from open_inwoner.utils.forms import MultipleFileField
 
 
 class CaseUploadForm(forms.Form):
@@ -17,7 +18,7 @@ class CaseUploadForm(forms.Form):
         empty_label=None,
         label=_("Bestand type"),
     )
-    file = forms.FileField(label=_("Bestand"), required=True)
+    files = MultipleFileField(label=_("Bestand"))
 
     def __init__(self, case, **kwargs):
         self.oz_config = OpenZaakConfig.get_solo()
@@ -31,7 +32,7 @@ class CaseUploadForm(forms.Form):
         except (AttributeError, ObjectDoesNotExist):
             pass
 
-        self.fields["file"].help_text = help_text
+        self.fields["files"].help_text = help_text
 
         if case:
             self.fields[
@@ -46,24 +47,29 @@ class CaseUploadForm(forms.Form):
             self.fields["type"].initial = list(choices)[0][0].value
             self.fields["type"].widget = forms.HiddenInput()
 
-    def clean_file(self):
-        file = self.cleaned_data["file"]
+    def clean_files(self):
+        files = self.files.getlist("file")
 
         max_allowed_size = 1024**2 * self.oz_config.max_upload_size
         allowed_extensions = sorted(self.oz_config.allowed_file_extensions)
-        filename, file_extension = os.path.splitext(file.name)
 
-        if file.size > max_allowed_size:
-            raise ValidationError(
-                f"Een aangeleverd bestand dient maximaal {self.oz_config.max_upload_size} MB te zijn, uw bestand is te groot."
-            )
+        cleaned_files = []
+        for file in files:
+            filename, file_extension = os.path.splitext(file.name)
 
-        if file_extension.lower().replace(".", "") not in allowed_extensions:
-            raise ValidationError(
-                f"Het type bestand dat u hebt geüpload is ongeldig. Geldige bestandstypen zijn: {', '.join(allowed_extensions)}"
-            )
+            if file.size > max_allowed_size:
+                raise ValidationError(
+                    f"Een aangeleverd bestand dient maximaal {self.oz_config.max_upload_size} MB te zijn, uw bestand is te groot."
+                )
 
-        return file
+            if file_extension.lower().replace(".", "") not in allowed_extensions:
+                raise ValidationError(
+                    f"Het type bestand dat u hebt geüpload is ongeldig. Geldige bestandstypen zijn: {', '.join(allowed_extensions)}"
+                )
+
+            cleaned_files.append(file)
+
+        return cleaned_files
 
 
 class CaseContactForm(forms.Form):
