@@ -263,7 +263,7 @@ class ContactFormTestCase(
             {
                 "medewerkerIdentificatie": {"identificatie": "FooVonBar"},
                 "bronorganisatie": "123456789",
-                "tekst": f"Aanvraag document\n\nhey!\n\nwaddup?",
+                "tekst": f"Onderwerp: Aanvraag document\n\nhey!\n\nwaddup?",
                 "type": "Melding",
                 "kanaal": "Internet",
                 "onderwerp": "afdeling-xyz",
@@ -325,7 +325,7 @@ class ContactFormTestCase(
 
         text = inspect.cleandoc(
             """
-        Aanvraag document
+        Onderwerp: Aanvraag document
 
         hey!
 
@@ -407,7 +407,7 @@ class ContactFormTestCase(
             {
                 "medewerkerIdentificatie": {"identificatie": "FooVonBar"},
                 "bronorganisatie": "123456789",
-                "tekst": f"Aanvraag document\n\nhey!\n\nwaddup?",
+                "tekst": f"Onderwerp: Aanvraag document\n\nhey!\n\nwaddup?",
                 "type": "Melding",
                 "kanaal": "Internet",
                 "onderwerp": "afdeling-xyz",
@@ -482,7 +482,7 @@ class ContactFormTestCase(
             {
                 "medewerkerIdentificatie": {"identificatie": "FooVonBar"},
                 "bronorganisatie": "123456789",
-                "tekst": f"Aanvraag document\n\nhey!\n\nwaddup?",
+                "tekst": f"Onderwerp: Aanvraag document\n\nhey!\n\nwaddup?",
                 "type": "Melding",
                 "kanaal": "Internet",
                 "onderwerp": "afdeling-xyz",
