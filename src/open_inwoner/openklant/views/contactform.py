@@ -163,7 +163,7 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
         subject = form.cleaned_data["subject"].subject
         subject_code = form.cleaned_data["subject"].subject_code
         question = form.cleaned_data["question"]
-        text = f"{subject}\n\n{question}"
+        text = f"Onderwerp: {subject}\n\n{question}"
 
         if not klant:
             # if we don't have a BSN and can't create a Klant we'll add contact info to the tekst
