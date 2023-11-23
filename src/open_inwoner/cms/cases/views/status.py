@@ -487,6 +487,19 @@ class CaseDocumentUploadFormView(CaseAccessMixin, LogMixin, FormView):
             return self.handle_document_upload(request, form)
         return self.form_invalid(form)
 
+    def handle_document_error(self, request, file):
+        messages.add_message(
+            request,
+            messages.ERROR,
+            _("An error occured while uploading file {filename}").format(
+                filename=file.name
+            ),
+        )
+
+        return HttpResponseClientRedirect(
+            reverse("cases:case_detail", kwargs={"object_id": str(self.case.uuid)})
+        )
+
     def handle_document_upload(self, request, form):
         cleaned_data = form.cleaned_data
         files = cleaned_data["files"]
@@ -505,38 +518,23 @@ class CaseDocumentUploadFormView(CaseAccessMixin, LogMixin, FormView):
                 document_type.informatieobjecttype_url,
                 source_organization,
             )
+            if not created_document:
+                return self.handle_document_error(request, file)
 
-            try:
-                created_relationship = connect_case_with_document(
-                    self.case.url, created_document.get("url")
-                )
-            except AttributeError:
-                pass
+            created_relationship = connect_case_with_document(
+                self.case.url, created_document.get("url")
+            )
+            if not created_relationship:
+                return self.handle_document_error(request, file)
 
-            # failed uploading the document or connecting it to the zaak
-            if not created_document or not created_relationship:
-                messages.add_message(
-                    request,
-                    messages.ERROR,
-                    _("An error occured while uploading file {filename}").format(
-                        filename=file.name
-                    ),
-                )
-
-                return HttpResponseClientRedirect(
-                    reverse(
-                        "cases:case_detail", kwargs={"object_id": str(self.case.uuid)}
-                    )
-                )
-            else:
-                self.log_user_action(
-                    request.user,
-                    _("Document was uploaded for {case}: {filename}").format(
-                        case=self.case.identificatie,
-                        filename=file.name,
-                    ),
-                )
-                created_documents.append(created_document)
+            self.log_user_action(
+                request.user,
+                _("Document was uploaded for {case}: {filename}").format(
+                    case=self.case.identificatie,
+                    filename=file.name,
+                ),
+            )
+            created_documents.append(created_document)
 
         success_message = (
             _("Wij hebben **{num_uploaded} bestand(en)** succesvol geüpload:").format(
