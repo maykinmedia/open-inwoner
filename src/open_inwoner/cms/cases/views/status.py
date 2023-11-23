@@ -505,9 +505,14 @@ class CaseDocumentUploadFormView(CaseAccessMixin, LogMixin, FormView):
                 document_type.informatieobjecttype_url,
                 source_organization,
             )
-            created_relationship = connect_case_with_document(
-                self.case.url, getattr(created_document, "url", None)
-            )
+
+            try:
+                created_relationship = connect_case_with_document(
+                    self.case.url, created_document.get("url")
+                )
+            except AttributeError:
+                pass
+
             # failed uploading the document or connecting it to the zaak
             if not created_document or not created_relationship:
                 messages.add_message(
