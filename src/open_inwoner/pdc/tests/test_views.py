@@ -3,7 +3,11 @@ from unittest import skip
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
-from open_inwoner.accounts.tests.factories import DigidUserFactory, UserFactory
+from open_inwoner.accounts.tests.factories import (
+    DigidUserFactory,
+    UserFactory,
+    eHerkenningUserFactory,
+)
 from open_inwoner.configurations.models import SiteConfiguration
 
 from .factories import CategoryFactory
@@ -121,12 +125,10 @@ class CategoryListViewTest(TestCase):
             list(response.context["object_list"]), [self.category2, self.category3]
         )
 
-    @skip("eHerkenning is not implemented yet")
     def test_category_list_view_visibility_for_eherkenning_user(self):
         url = reverse("products:category_list")
 
-        # TODO should be eHerkenningUserFactory
-        user = DigidUserFactory()
+        user = eHerkenningUserFactory()
         self.client.force_login(user)
 
         # request with eHerkenning user
