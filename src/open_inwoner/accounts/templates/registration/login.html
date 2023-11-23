@@ -27,7 +27,7 @@
                     {% endrender_card %}
 		{% endif %}
 
-        {% if settings.EHERKENNING_ENABLED %}
+        {% if eherkenning_enabled %}
                     {% render_card direction='horizontal' tinted=True %}
                         <a href="{% url 'eherkenning:login' %}" class="link eherkenning-logo">
                             <img class="eherkenning-logo__image" src="{% static 'accounts/eherkenning.png' %}" height=40 alt="eHerkenning inlogpagina">

@@ -862,7 +862,6 @@ DIGID = {
     "want_assertions_signed": DIGID_WANT_ASSERTIONS_SIGNED,
 }
 
-EHERKENNING_ENABLED = config("EHERKENNING", default=True)
 EHERKENNING_MOCK = config("EHERKENNING_MOCK", default=True)
 
 THUMBNAIL_ALIASES = {
