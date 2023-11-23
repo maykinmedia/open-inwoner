@@ -42,7 +42,7 @@ def case_dashboard(case: dict, **kwargs) -> dict:
                 "value": case.get("start_date"),
             },
             {
-                "label": _("Laatste datum beslissing:"),
+                "label": _("Beslissing op zijn laatst:"),
                 "value": case.get("end_date_legal"),
             },
         ]
