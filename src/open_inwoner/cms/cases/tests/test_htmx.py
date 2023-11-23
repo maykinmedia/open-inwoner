@@ -433,7 +433,7 @@ class CasesPlaywrightTests(
         expect(upload_form).to_be_visible()
 
         file_input = upload_form.get_by_label(
-            _("Sleep of selecteer bestand"), exact=True
+            _("Sleep of selecteer bestanden"), exact=True
         )
         file_input.set_input_files(
             files=[
