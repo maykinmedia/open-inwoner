@@ -15,6 +15,7 @@
   }
 
   #document-upload {
+    color: var(--color-gray-dark);
     gap: 0;
     padding: 0 0 var(--row-height-giant) 0;
 
@@ -41,6 +42,20 @@
 
       @media (min-width: 768px) {
         display: grid;
+      }
+    }
+
+    .p--upload-info {
+      text-align: center;
+
+      &.p--upload-help {
+        display: none;
+
+        &.error {
+          color: var(--color-gray-dark);
+          display: block;
+          margin-top: var(--spacing-medium);
+        }
       }
     }
 

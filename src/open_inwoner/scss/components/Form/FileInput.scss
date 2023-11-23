@@ -49,6 +49,19 @@
     text-align: center;
   }
 
+  .p--upload-error {
+    color: var(--color-red-notification);
+    display: flex;
+    align-items: normal;
+    gap: var(--spacing-small);
+    justify-content: flex-start;
+
+    [class*='icon'] {
+      color: var(--color-red-notification);
+      font-size: var(--font-size-body-large);
+    }
+  }
+
   .h4 {
     margin-top: var(--spacing-large);
     margin-bottom: calc(0.5 * var(--spacing-large));
@@ -56,5 +69,22 @@
 
   & .file-list {
     margin-bottom: var(--spacing-large) !important;
+
+    // upload-error styles
+    .file__file.error {
+      border-color: var(--color-red-notification);
+
+      .p {
+        color: var(--color-gray-90);
+      }
+
+      [class*='icon'] {
+        color: var(--color-gray-light);
+      }
+
+      .link [class*='icon'] {
+        color: var(--color-red-notification);
+      }
+    }
   }
 }

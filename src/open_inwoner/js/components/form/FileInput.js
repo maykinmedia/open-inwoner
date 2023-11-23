@@ -8,6 +8,14 @@ export class FileInput extends Component {
   static selector = '.file-input'
 
   /**
+   * Get configured maximum filesize from 'data-max-size' and use in node.
+   * @returns {string} Maximum file size.
+   */
+  getLimit() {
+    return this.getInput().dataset.maxSize
+  }
+
+  /**
    * Returns the card (drop zone) associated with the file input.
    * @return {HTMLDivElement}
    */
@@ -17,7 +25,7 @@ export class FileInput extends Component {
 
   /**
    * Return the input associated with the file input.
-   * @return HTMLInputElement
+   * @return {HTMLInputElement}
    */
   getInput() {
     return this.node.querySelector(`${FileInput.selector}__input`)
@@ -33,10 +41,18 @@ export class FileInput extends Component {
 
   /**
    * Return the element associated with the file list.
-   * @return {HTMLUListElement}
+   * @return {HTMLUListElement} File list element.
    */
   getFilesList() {
     return this.node.querySelector(`${FileInput.selector} .file-list__list`)
+  }
+
+  /**
+   * Returns the element associated with the help section.
+   * @return {HTMLDivElement} Help section element.
+   */
+  getUploadHelpElement() {
+    return document.querySelector('.p--upload-help')
   }
 
   /**
@@ -76,7 +92,7 @@ export class FileInput extends Component {
 
   /**
    * Gets called when files are dropped on the card (drop zone).
-   * @param {DragEvent} e
+   * @param {DragEvent} e - The drag event.
    */
   onDrop(e) {
     e.preventDefault()
@@ -91,12 +107,13 @@ export class FileInput extends Component {
   /**
    * Gets called when dragging starts on the card (drop zone).
    */
-  onDragEnter(e) {
+  onDragEnter() {
     this.node.classList.add('file-input--drag-active')
   }
 
   /**
    * Gets called when dragging ends on the card (drop zone).
+   * @param {Event} e - The drag leave event.
    */
   onDragLeave(e) {
     if (e.target !== this.getCard()) {
@@ -106,9 +123,8 @@ export class FileInput extends Component {
   }
 
   /**
-   * Gets called when click event is received on the files list, it originates from a delete button, handle the deletion
-   * accordingly.
-   * @param {PointerEvent} e
+   * Gets called when click event is received on the files list, it originates from a delete button, handle the deletion accordingly.
+   * @param {PointerEvent} e - The click event.
    */
   onClick(e) {
     e.preventDefault()
@@ -137,7 +153,7 @@ export class FileInput extends Component {
 
   /**
    * Generic no op (no operation) event handler. Calls `preventDefault()` on given event.
-   * @param {Event} e
+   * @param {Event} e - The event.
    */
   noop(e) {
     e.preventDefault()
@@ -145,14 +161,14 @@ export class FileInput extends Component {
 
   /**
    * Adds files in dataTransfer to input, only the first item is added if not `[multiple]`.
-   * @param {File[]} files
+   * @param {File[]} files - Array of files to add.
    */
   addFiles(files) {
     const input = this.getInput()
     const dataTransfer = new DataTransfer()
     const _files = input.multiple ? [...files] : [files[0]]
 
-    _files.filter((v) => v).forEach((file) => dataTransfer.items.add(file))
+    _files.filter(Boolean).forEach((file) => dataTransfer.items.add(file))
     input.files = dataTransfer.files
   }
 
@@ -166,8 +182,7 @@ export class FileInput extends Component {
     const filesSection = this.getFilesSection()
 
     // Only show files section when files are selected.
-    filesSection.setAttribute('hidden', true)
-    files.length && filesSection.removeAttribute('hidden')
+    filesSection.toggleAttribute('hidden', !files.length)
 
     // Populate the file list.
     const html = [...files].map((file) => this.renderFileHTML(file)).join('')
@@ -176,8 +191,8 @@ export class FileInput extends Component {
 
   /**
    * Returns the HTML to be used for a file.
-   * @param {File} file
-   * @return {string}
+   * @param {File} file - The file to render HTML for.
+   * @return {string} HTML for the file.
    */
   renderFileHTML(file) {
     const { name, size, type } = file
@@ -185,26 +200,49 @@ export class FileInput extends Component {
     const sizeMB = (size / (1024 * 1024)).toFixed(2)
     const labelDelete = this.getFilesList().dataset.labelDelete || 'Delete'
 
-    return `
+    // Only show errors notification if data-max-file-size is exceeded + add error class to file-list
+    const maxMegabytes = this.getLimit()
+
+    const htmlStart = `
       <li class="file-list__list-item">
         <aside class="file">
-        <div class="file__container">
-            <div class="file__file">
-                <p class="file__symbol">
+          <div class="file__container">
+            ${
+              sizeMB > maxMegabytes
+                ? '<div class="file__file error">'
+                : '<div class="file__file">'
+            }
+              <p class="file__symbol">
                 <span aria-hidden="true" class="material-icons-outlined">${
                   type.match('image') ? 'image' : 'description'
                 }</span>
-                </p>
-                <p class="p file__data">
-                  <span class="file__name">${name} (${ext}, ${sizeMB}MB)</span>
-                </p>
-                <a class="link link--primary" href="#" role="button" aria-label="${labelDelete}">
-                  <span aria-hidden="true" class="material-icons-outlined">delete</span>
-                </a>
+              </p>
+              <p class="p file__data">
+                <span class="file__name">${name} (${ext}, ${sizeMB}MB)</span>
+              </p>
+              <a class="link link--primary" href="#" role="button" aria-label="${labelDelete}">
+                <span aria-hidden="true" class="material-icons-outlined">delete</span>
+              </a>
             </div>
           </div>
         </aside>
-      </li>
-    `
+      </li>`
+
+    if (sizeMB > maxMegabytes) {
+      const uploadHelpElement = this.getUploadHelpElement()
+      if (uploadHelpElement) {
+        uploadHelpElement.classList.add('error')
+      }
+
+      return (
+        htmlStart +
+        `<p class="p p--upload-error error">
+          <span aria-hidden="true" class="material-icons-outlined">warning_amber</span>
+          Dit bestand is te groot
+        </p>`
+      )
+    }
+
+    return htmlStart
   }
 }
