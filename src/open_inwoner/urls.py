@@ -144,7 +144,7 @@ elif settings.DIGID_MOCK:
         path("digid/idp/", include("digid_eherkenning.mock.idp.digid_urls")),
     ] + urlpatterns
 
-if "digid_eherkenning.backends.eHerkenningBackend" in settings.AUTHENTICATION_BACKENDS:
+if "eherkenning.backends.eHerkenningBackend" in settings.AUTHENTICATION_BACKENDS:
     urlpatterns = [
         path(
             "eherkenning/acs/",

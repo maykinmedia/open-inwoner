@@ -473,7 +473,7 @@ AUTHENTICATION_BACKENDS = [
     "open_inwoner.accounts.backends.UserModelEmailBackend",
     "django.contrib.auth.backends.ModelBackend",
     "digid_eherkenning.backends.DigiDBackend",
-    "digid_eherkenning.backends.eHerkenningBackend",
+    "eherkenning.backends.eHerkenningBackend",
     "open_inwoner.accounts.backends.CustomOIDCBackend",
 ]
 

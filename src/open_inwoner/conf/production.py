@@ -31,7 +31,7 @@ else:
 
 EHERKENNING_MOCK = config("EHERKENNING_MOCK", default=False)
 if not DEBUG:
-    AUTHENTICATION_BACKENDS += ["digid_eherkenning.backends.eHerkenningBackend"]
+    AUTHENTICATION_BACKENDS += ["eherkenning.backends.eHerkenningBackend"]
 elif EHERKENNING_MOCK:
     AUTHENTICATION_BACKENDS += ["eherkenning.mock.backends.eHerkenningBackend"]
 
