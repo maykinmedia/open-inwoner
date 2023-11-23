@@ -1,3 +1,6 @@
+import json
+from uuid import UUID
+
 from django.test import override_settings, tag
 from django.utils.translation import gettext as _
 
@@ -487,3 +490,112 @@ class CasesPlaywrightTests(
 
         # finally check if our mock matchers are accurate
         self.assertMockMatchersCalled(self.matchers)
+
+    def test_multiple_file_upload(self, m):
+        self._setUpMocks(m)
+
+        # Keep track of uploaded files (schemas/EnkelvoudigInformatieObject array)
+        # This list is updated by mocks after uploading the files.
+        uploads = []
+
+        # Document list mock.
+        def mock_list(request, context):
+            """
+            Mock GET "zaakinformatieobjecten" endpoint (schemas/ZaakInformatieObject array).
+            Creates schemas/ZaakInformatieObject dict for each item in uploads.
+            """
+            items = [generate_oas_component(
+                "zrc",
+                "schemas/ZaakInformatieObject",
+                url=f"{ZAKEN_ROOT}zaakinformatieobjecten/e55153aa-ad2c-4a07-ae75-15add57d6",
+                informatieobject=upload["url"],
+                zaak=self.zaak["url"],
+            ) for upload in uploads]
+            return json.dumps(items)
+
+        m.get(
+            f"{ZAKEN_ROOT}zaakinformatieobjecten?zaak={self.zaak['url']}", text=mock_list
+        ),
+
+        # Upload mock.
+        def mock_upload(request, context):
+            """
+            Mock POST "enkelvoudiginformatieobjecten" endpoint (schemas/EnkelvoudigInformatieObject).
+            Creates schemas/EnkelvoudigInformatieObject dict and mock for its url.
+            appends created item to `uploads`.
+            """
+            request_body = json.loads(request.body)
+            file_name = request_body["titel"]
+
+            # Create a UUID based on a seed derived from the file name.
+            # This makes sure the two test cases have unique entries.
+            seed = file_name.ljust(16, '0').encode("utf-8")
+            uuid = UUID(bytes=seed)
+
+            uploaded_informatie_object = generate_oas_component(
+                "drc",
+                "schemas/EnkelvoudigInformatieObject",
+                uuid=str(uuid),
+                url=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/{uuid}",
+                inhoud=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/85079ba3-554a-450f-b963-2ce20b176c90/download",
+                informatieobjecttype=self.informatie_object_type["url"],
+                status="definitief",
+                vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+                bestandsnaam=file_name,
+                titel=file_name,
+                bestandsomvang=request_body["bestandsomvang"],
+            )
+            m.get(uploaded_informatie_object["url"], json=uploaded_informatie_object)
+            uploads.append(uploaded_informatie_object)
+            return json.dumps(uploaded_informatie_object)
+
+        m.post(
+            f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten",
+            status_code=201,
+            text=mock_upload
+        ),
+
+        # Setup.
+        context = self.browser.new_context(storage_state=self.user_login_state)
+        page = context.new_page()
+        page.goto(self.live_reverse("cases:case_detail", kwargs={"object_id": self.zaak["uuid"]}))
+
+        upload_form = page.locator("#document-upload")
+        file_input = upload_form.get_by_label('Sleep of selecteer bestanden')
+        submit_button = upload_form.get_by_role("button", name=_("Upload documenten"))
+        notification_list = page.get_by_role('alert').get_by_role("list")
+        notification_list_items = notification_list.get_by_role("listitem")
+        file_list = page.get_by_role("list").last
+        file_list_items = file_list.get_by_role("listitem")
+
+        # Check that the initial state does not have any uploaded documents.
+        expect(notification_list_items).to_have_count(0)
+        expect(file_list_items).to_have_count(0)
+
+        # Upload some files.
+        file_input.set_input_files(
+            files=[
+                {
+                    "name": "document_1.txt",
+                    "mimeType": "text/plain",
+                    "buffer": "test12345".encode("utf8")
+                },
+                {
+                    "name": "document_two.pdf",
+                    "mimeType": "application/pdf",
+                    "buffer": "test67890".encode("utf8")
+                }
+            ],
+        )
+        submit_button.click()
+        page.wait_for_url(self.live_reverse("cases:case_detail", kwargs={"object_id": self.zaak["uuid"]}))
+
+        # Check that the case does now have two uploaded documents.
+        expect(notification_list_items).to_have_count(2)
+        expect(notification_list_items.first).to_contain_text('document_1.txt')
+        expect(notification_list_items.last).to_contain_text('document_two.pdf')
+        expect(file_list_items).to_have_count(2)
+        expect(file_list_items.first).to_contain_text('document_1')
+        expect(file_list_items.first).to_contain_text('(txt, 9 bytes)')
+        expect(file_list_items.last).to_contain_text('document_two')
+        expect(file_list_items.last).to_contain_text('(pdf, 9 bytes)')
