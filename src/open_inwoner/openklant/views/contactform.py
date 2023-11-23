@@ -131,7 +131,9 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
                 if update_data:
                     patch_klant(klant, update_data)
                     self.log_system_action(
-                        f"patched klant from user with missing fields: {', '.join(sorted(update_data.keys()))}",
+                        "patched klant from user with missing fields: {patched}".format(
+                            patched=", ".join(sorted(update_data.keys()))
+                        ),
                         user=self.request.user,
                     )
             else:
@@ -148,7 +150,8 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
                 "emailadres": form.cleaned_data["email"],
                 "telefoonnummer": form.cleaned_data["phonenumber"],
             }
-            # registering klanten won't work in e-Suite as it always pulls from BRP (but try anyway and fallback to appending details to tekst if fails)
+            # registering klanten won't work in e-Suite as it always pulls from BRP
+            # (but try anyway and fallback to appending details to tekst if fails)
             klant = create_klant(data)
             if klant:
                 if self.request.user.is_authenticated:
@@ -163,19 +166,27 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
         subject = form.cleaned_data["subject"].subject
         subject_code = form.cleaned_data["subject"].subject_code
         question = form.cleaned_data["question"]
-        text = f"{subject}\n\n{question}"
+        text = _("Onderwerp: {subject}\n\n{question}").format(
+            subject=subject, question=question
+        )
 
         if not klant:
             # if we don't have a BSN and can't create a Klant we'll add contact info to the tekst
             parts = [form.cleaned_data[k] for k in ("first_name", "infix", "last_name")]
             full_name = " ".join(p for p in parts if p)
-            text = f"{text}\n\nNaam: {full_name}"
+            text = _("{text}\n\nNaam: {full_name}").format(
+                text=text, full_name=full_name
+            )
 
             if form.cleaned_data["email"]:
-                text = f"{text}\nEmail: {form.cleaned_data['email']}"
+                text = _("{text}\nEmail: {email}").format(
+                    text=text, email=form.cleaned_data["email"]
+                )
 
             if form.cleaned_data["phonenumber"]:
-                text = f"{text}\nTelefoonnummer: {form.cleaned_data['phonenumber']}"
+                text = _("{text}\nTelefoonnummer: {phone}").format(
+                    text=text, phone=form.cleaned_data["phonenumber"]
+                )
 
             self.log_system_action(
                 "could not retrieve or create klant for user, appended info to message",
