@@ -368,7 +368,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     def require_necessary_fields(self) -> bool:
         """returns whether user needs to fill in necessary fields"""
         if (
-            self.is_digid_and_brp()
+            self.is_digid_user_with_brp
             and self.email
             and not self.email.endswith("@example.org")
         ):
@@ -427,12 +427,17 @@ class User(AbstractBaseUser, PermissionsMixin):
     def clear_plan_contact_new_count(self):
         PlanContact.objects.filter(user=self).update(notify_new=False)
 
-    def is_digid_and_brp(self) -> bool:
+    @property
+    def is_digid_user(self) -> bool:
+        return self.login_type == LoginTypeChoices.digid
+
+    @property
+    def is_digid_user_with_brp(self) -> bool:
         """
         Returns whether user is logged in with digid and data has
         been requested from haal centraal
         """
-        return self.login_type == LoginTypeChoices.digid and self.is_prepopulated
+        return self.is_digid_user and self.is_prepopulated
 
 
 class Document(models.Model):

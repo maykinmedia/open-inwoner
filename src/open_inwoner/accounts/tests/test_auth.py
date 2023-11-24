@@ -11,6 +11,7 @@ from django.utils.translation import gettext as _
 import requests_mock
 from django_webtest import WebTest
 from furl import furl
+from pyquery import PyQuery as PQ
 
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
@@ -1340,14 +1341,20 @@ class TestPasswordChange(WebTest):
 
     def test_password_change_button_is_rendered_with_default_login_type(self):
         response = self.app.get(reverse("profile:detail"), user=self.user)
-        self.assertContains(response, _("Wijzig wachtwoord"))
+
+        doc = PQ(response.content)
+        link = doc.find("[aria-label='Wachtwoord']")[0]
+        self.assertTrue(doc(link).is_("a"))
 
     def test_password_change_button_is_not_rendered_with_digid_login_type(self):
         digid_user = UserFactory(
             login_type=LoginTypeChoices.digid, email="john@smith.nl"
         )
         response = self.app.get(reverse("profile:detail"), user=digid_user)
-        self.assertNotContains(response, _("Wijzig wachtwoord"))
+
+        doc = PQ(response.content)
+        links = doc.find("[aria-label='Wachtwoord']")
+        self.assertEqual(len(links), 0)
 
     def test_anonymous_user_is_redirected_to_login_page_if_password_change_is_accessed(
         self,
