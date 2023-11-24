@@ -480,70 +480,74 @@ class CaseDocumentUploadFormView(CaseAccessMixin, LogMixin, FormView):
     form_class = CaseUploadForm
 
     def post(self, request, *args, **kwargs):
-        form = self.get_form()
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
 
         if form.is_valid() and not getattr(self.case, "einddatum", None):
             return self.handle_document_upload(request, form)
         return self.form_invalid(form)
 
-    def handle_document_upload(self, request, form):
-        cleaned_data = form.cleaned_data
-
-        file = cleaned_data["file"]
-        title = file.name
-        document_type = cleaned_data["type"]
-        source_organization = self.case.bronorganisatie
-
-        created_document = upload_document(
-            request.user,
-            file,
-            title,
-            document_type.informatieobjecttype_url,
-            source_organization,
-        )
-        if created_document:
-            created_relationship = connect_case_with_document(
-                self.case.url, created_document["url"]
-            )
-            if created_relationship:
-                self.log_user_action(
-                    request.user,
-                    _("Document was uploaded for {case}: {filename}").format(
-                        case=self.case.identificatie,
-                        filename=file.name,
-                    ),
-                )
-
-                # TODO implement `created_documents` properly when uploading of multiple
-                # docs is implemented
-                created_documents = [created_document]
-                success_message = (
-                    _(
-                        "Wij hebben **{num_uploaded} bestand(en)** succesvol geüpload:"
-                    ).format(num_uploaded=len(created_documents))
-                    + "\n\n"
-                    + "\n".join(f"- {doc['titel']}" for doc in created_documents)
-                )
-                messages.add_message(
-                    request,
-                    messages.SUCCESS,
-                    success_message,
-                    extra_tags="as_markdown local_message",
-                )
-
-                return HttpResponseClientRedirect(
-                    reverse(
-                        "cases:case_detail", kwargs={"object_id": str(self.case.uuid)}
-                    )
-                )
-
-        # fail uploading the document or connecting it to the zaak
+    def handle_document_error(self, request, file):
         messages.add_message(
             request,
             messages.ERROR,
             _("An error occured while uploading file {filename}").format(
                 filename=file.name
             ),
+        )
+
+        return HttpResponseClientRedirect(
+            reverse("cases:case_detail", kwargs={"object_id": str(self.case.uuid)})
+        )
+
+    def handle_document_upload(self, request, form):
+        cleaned_data = form.cleaned_data
+        files = cleaned_data["files"]
+
+        created_documents = []
+
+        for file in files:
+            title = file.name
+            document_type = cleaned_data["type"]
+            source_organization = self.case.bronorganisatie
+
+            created_document = upload_document(
+                request.user,
+                file,
+                title,
+                document_type.informatieobjecttype_url,
+                source_organization,
+            )
+            if not created_document:
+                return self.handle_document_error(request, file)
+
+            created_relationship = connect_case_with_document(
+                self.case.url, created_document.get("url")
+            )
+            if not created_relationship:
+                return self.handle_document_error(request, file)
+
+            self.log_user_action(
+                request.user,
+                _("Document was uploaded for {case}: {filename}").format(
+                    case=self.case.identificatie,
+                    filename=file.name,
+                ),
+            )
+            created_documents.append(created_document)
+
+        success_message = (
+            _("Wij hebben **{num_uploaded} bestand(en)** succesvol geüpload:").format(
+                num_uploaded=len(created_documents)
+            )
+            + "\n\n"
+            + "\n".join(f"- {doc['titel']}" for doc in created_documents)
+        )
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            success_message,
+            extra_tags="as_markdown local_message",
         )
 
         return HttpResponseClientRedirect(

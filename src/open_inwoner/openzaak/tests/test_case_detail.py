@@ -1010,7 +1010,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.assertEqual(
             form_response.context["form"].errors,
             {
-                "file": [
+                "files": [
                     f"Het type bestand dat u hebt geüpload is ongeldig. Geldige bestandstypen zijn: {', '.join(sorted(self.config.allowed_file_extensions))}"
                 ]
             },
@@ -1052,7 +1052,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.assertEqual(
             form_response.context["form"].errors,
             {
-                "file": [
+                "files": [
                     f"Een aangeleverd bestand dient maximaal {self.config.max_upload_size} MB te zijn, uw bestand is te groot."
                 ]
             },

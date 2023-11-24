@@ -1,5 +1,5 @@
 {% load i18n ssd_tags button_tags icon_tags button_tags icon_tags %}
-<div class="notification{% if contents %} notification--contents{% endif %}{% if type %} notification--{{ type }}{% endif %}{% if compact %} notification--compact{% endif %} {% if ctx %}notification--{{ ctx }}{% endif %}">
+<div class="notification{% if contents %} notification--contents{% endif %}{% if type %} notification--{{ type }}{% endif %}{% if compact %} notification--compact{% endif %} {% if ctx %}notification--{{ ctx }}{% endif %}" role="alert">
     {% if not icon == False %}
         <div class="notification__icon">
             {% icon icon %}

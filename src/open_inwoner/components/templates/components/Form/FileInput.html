@@ -3,9 +3,9 @@
 <div class="form__control file-input">
     {% render_card direction="vertical" %}
         {% icon icon="upload" icon_position="before" outlined=True %}
-        <input class="file-input__input" id="{{ field.auto_id }}" name="file" type="file"{% if field.field.required %} required{% endif %}>
-        <label class="button button--primary" aria-label="_('Sleep of selecteer bestand')" for="id_file">
-            {% trans 'Sleep of selecteer bestand' %}
+        <input class="file-input__input" id="{{ field.auto_id }}" name="file" type="file"{% if field.field.required %} required{% endif %}{% if multiple %} multiple{% endif %}>
+        <label class="button button--primary" for="{{ field.auto_id }}">
+            {% if multiple %}{% trans 'Sleep of selecteer bestanden' %}{% else %}{% trans 'Sleep of selecteer bestand' %}{% endif %}
         </label>
     {% endrender_card %}
 
@@ -13,7 +13,7 @@
     {% if field.errors %}{% errors errors=field.errors %}{% endif %}
 
     <div class="file-list" aria-live="polite">
-        <h4 class="h4">{% trans 'Geselecteerd bestand'%}</h4>
+        <h4 class="h4">{% if multiple %}{% trans 'Geselecteerde bestanden' %}{% else %}{% trans 'Geselecteerd bestand' %}{% endif %}</h4>
         <ul class="file-list__list" aria-live="polite" data-label-delete="{% trans 'Verwijderen' %}"></ul>
     </div>
 </div>
