@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from typing import Generator, Union
 
 from django.conf import settings
 from django.contrib import messages
@@ -48,6 +49,23 @@ class MyProfileView(
     def crumbs(self):
         return [(_("Mijn profiel"), reverse("profile:detail"))]
 
+    @staticmethod
+    def stringify(
+        items: list, string_func: callable, lump: bool = False
+    ) -> Union[Generator, str]:
+        """
+        Create string representation(s) of `items` for display
+
+        :param string_func: the function used to stringify elements in `items`
+        :param lump: if `True`, `string_func` is applied to `items` collectively
+        :returns: a `Generator` of strings representing elements in `items`, or a
+            `str` representing `items` as a whole, depending on whether `lump` is
+            `True`
+        """
+        if lump:
+            return string_func(items)
+        return (string_func(item) for item in items)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
@@ -60,15 +78,35 @@ class MyProfileView(
 
         user_files = user.get_all_files()
 
-        # List of names of 'mentor' users that are a contact of me
-        mentor_contacts = [
-            c.get_full_name()
-            for c in user.user_contacts.filter(
-                contact_type=ContactTypeChoices.begeleider
-            )
-        ]
-
+        # Mentor contacts + names for display
+        mentor_contacts = user.user_contacts.filter(
+            contact_type=ContactTypeChoices.begeleider
+        )
         context["mentor_contacts"] = mentor_contacts
+        context["mentor_contact_names"] = self.stringify(
+            mentor_contacts,
+            string_func=lambda m: m.get_full_name,
+        )
+
+        # Regular contacts + names for display
+        contacts = user.get_active_contacts()
+        context["contact_names"] = self.stringify(
+            contacts,
+            string_func=lambda c: f"{c.first_name} ({c.get_contact_type_display()})",
+        )
+
+        # Actions
+        actions = (
+            Action.objects.visible()
+            .connected(self.request.user)
+            .filter(status=StatusChoices.open)
+        )
+        context["action_text"] = self.stringify(
+            actions,
+            string_func=lambda actions: f"{actions.count()} acties staan open",
+            lump=True,
+        )
+
         context["next_action"] = (
             Action.objects.visible()
             .connected(self.request.user)
@@ -76,23 +114,8 @@ class MyProfileView(
             .order_by("end_date")
             .first()
         )
-        context["files"] = user_files
-        context["action_text"] = _(
-            f"{Action.objects.visible().connected(self.request.user).filter(status=StatusChoices.open).count()} acties staan open."
-        )
-        contacts = user.get_active_contacts()
-        # Invited contacts
-        contact_names = [
-            f"{contact.first_name} ({contact.get_contact_type_display()})"
-            for contact in contacts[:3]
-        ]
 
-        if contacts.count() > 0:
-            context[
-                "contact_text"
-            ] = f"{', '.join(contact_names)}{'...' if contacts.count() > 3 else ''}"
-        else:
-            context["contact_text"] = _("U heeft nog geen contacten.")
+        context["files"] = user_files
 
         context["questionnaire_exists"] = QuestionnaireStep.objects.filter(
             published=True
@@ -183,7 +206,7 @@ class EditProfileView(
 
     def get_form_class(self):
         user = self.request.user
-        if user.is_digid_and_brp():
+        if user.is_digid_user_with_brp:
             return BrpUserForm
         return super().get_form_class()
 
