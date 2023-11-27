@@ -1146,7 +1146,7 @@
         "public_extension": 2,
         "extended_object": 4,
         "requires_auth": true,
-        "requires_auth_bsn": false,
+        "requires_auth_bsn_or_kvk": false,
         "menu_indicator": "",
         "menu_icon": "apps"
     }
@@ -1158,7 +1158,7 @@
         "public_extension": null,
         "extended_object": 9,
         "requires_auth": true,
-        "requires_auth_bsn": false,
+        "requires_auth_bsn_or_kvk": false,
         "menu_indicator": "",
         "menu_icon": "apps"
     }
@@ -1170,7 +1170,7 @@
         "public_extension": 4,
         "extended_object": 7,
         "requires_auth": true,
-        "requires_auth_bsn": false,
+        "requires_auth_bsn_or_kvk": false,
         "menu_indicator": "plan_new_contacts",
         "menu_icon": "people"
     }
@@ -1182,7 +1182,7 @@
         "public_extension": null,
         "extended_object": 12,
         "requires_auth": true,
-        "requires_auth_bsn": false,
+        "requires_auth_bsn_or_kvk": false,
         "menu_indicator": "plan_new_contacts",
         "menu_icon": "people"
     }
@@ -1194,7 +1194,7 @@
         "public_extension": 6,
         "extended_object": 6,
         "requires_auth": true,
-        "requires_auth_bsn": false,
+        "requires_auth_bsn_or_kvk": false,
         "menu_indicator": "inbox_new_messages",
         "menu_icon": "inbox"
     }
@@ -1206,7 +1206,7 @@
         "public_extension": null,
         "extended_object": 11,
         "requires_auth": true,
-        "requires_auth_bsn": false,
+        "requires_auth_bsn_or_kvk": false,
         "menu_indicator": "inbox_new_messages",
         "menu_icon": "inbox"
     }
@@ -1218,7 +1218,7 @@
         "public_extension": 8,
         "extended_object": 5,
         "requires_auth": true,
-        "requires_auth_bsn": true,
+        "requires_auth_bsn_or_kvk": true,
         "menu_indicator": "",
         "menu_icon": "inventory_2"
     }
@@ -1230,7 +1230,7 @@
         "public_extension": null,
         "extended_object": 10,
         "requires_auth": true,
-        "requires_auth_bsn": true,
+        "requires_auth_bsn_or_kvk": true,
         "menu_indicator": "",
         "menu_icon": "inventory_2"
     }

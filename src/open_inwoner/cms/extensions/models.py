@@ -13,10 +13,12 @@ class CommonExtension(PageExtension):
         default=False,
         help_text=_("Deze pagina vereist een account"),
     )
-    requires_auth_bsn = models.BooleanField(
-        _("Requires BSN authentication"),
+    requires_auth_bsn_or_kvk = models.BooleanField(
+        _("Requires DigiD/eHerkenning authentication"),
         default=False,
-        help_text=_("Deze pagina vereist een account met een Digid BSN"),
+        help_text=_(
+            "Deze pagina vereist een account met een Digid BSN of eHerkenning KvK"
+        ),
     )
     menu_indicator = models.CharField(
         _("Indicator"),
@@ -37,7 +39,7 @@ class CommonExtension(PageExtension):
         return str(self.get_page())
 
     def save(self, *args, **kwargs):
-        if self.requires_auth_bsn:
+        if self.requires_auth_bsn_or_kvk:
             self.requires_auth = True
         super().save(*args, **kwargs)
 
