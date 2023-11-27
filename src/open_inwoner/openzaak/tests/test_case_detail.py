@@ -441,6 +441,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                         "status_indicator_text": "foo",
                         "call_to_action_url": "",
                         "call_to_action_text": "",
+                        "description": "",
                     },
                     {
                         "date": datetime.datetime(2021, 3, 12),
@@ -449,12 +450,14 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                         "status_indicator_text": "bar",
                         "call_to_action_url": "https://www.example.com",
                         "call_to_action_text": "Click me",
+                        "description": "",
                     },
                 ],
                 # only one visible information object
                 "documents": [self.informatie_object_file],
                 "initiator": "Foo Bar van der Bazz",
                 "result": "resultaat toelichting",
+                "result_description": "",
                 "case_type_config_description": "",
                 "case_type_document_upload_description": "",
                 "internal_upload_enabled": False,
@@ -521,6 +524,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                         "status_indicator_text": "foo",
                         "call_to_action_url": "",
                         "call_to_action_text": "",
+                        "description": "",
                     },
                     # preview of second (upcoming) status
                     {
@@ -530,12 +534,14 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                         "status_indicator_text": "zap",
                         "call_to_action_url": "",
                         "call_to_action_text": "",
+                        "description": "",
                     },
                 ],
                 # only one visible information object
                 "documents": [self.informatie_object_file],
                 "initiator": "Foo Bar van der Bazz",
                 "result": "resultaat toelichting",
+                "result_description": "",
                 "case_type_config_description": "",
                 "case_type_document_upload_description": "",
                 "internal_upload_enabled": False,
