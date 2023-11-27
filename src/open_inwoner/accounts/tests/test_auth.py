@@ -419,7 +419,11 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
     def setUpTestData(cls):
         cms_tools.create_homepage()
 
-    def test_registration_page_eherkenning(self):
+    @patch("open_inwoner.configurations.models.SiteConfiguration.get_solo")
+    def test_registration_page_eherkenning(self, mock_solo):
+        mock_solo.return_value.eherkenning_enabled = True
+        mock_solo.return_value.login_allow_registration = False
+
         response = self.app.get(self.url)
 
         self.assertEqual(response.status_code, 200)
@@ -434,7 +438,11 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
             .url,
         )
 
-    def test_registration_page_eherkenning_with_invite(self):
+    @patch("open_inwoner.configurations.models.SiteConfiguration.get_solo")
+    def test_registration_page_eherkenning_with_invite(self, mock_solo):
+        mock_solo.return_value.eherkenning_enabled = True
+        mock_solo.return_value.login_allow_registration = False
+
         invite = InviteFactory.create()
 
         response = self.app.get(f"{self.url}?invite={invite.key}")

@@ -5,7 +5,7 @@
 
 <div class="registration-grid">
   {% render_grid %}
-   {% if digit_url %}
+   {% if settings.DIGID_ENABLED and digit_url %}
     {% render_column start=5 span=5 %}
         {% render_card direction='horizontal' tinted=True %}
             <a href="{{ digit_url }}" class="link digid-logo">
@@ -16,7 +16,7 @@
     {% endrender_column %}
   {% endif %}
 
-  {% if eherkenning_url %}
+  {% if eherkenning_enabled and eherkenning_url %}
     {% render_column start=5 span=5 %}
         {% render_card direction='horizontal' tinted=True %}
             <a href="{{ eherkenning_url }}" class="link eherkenning-logo">
