@@ -20,7 +20,12 @@ from ...utils.test import ClearCachesMixin
 from ...utils.tests.helpers import AssertRedirectsMixin
 from ..choices import LoginTypeChoices
 from ..models import User
-from .factories import DigidUserFactory, InviteFactory, UserFactory
+from .factories import (
+    DigidUserFactory,
+    InviteFactory,
+    UserFactory,
+    eHerkenningUserFactory,
+)
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
@@ -404,6 +409,173 @@ class DigiDRegistrationTest(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
+    """Tests concerning the registration of eHerkenning users"""
+
+    csrf_checks = False
+    url = reverse_lazy("django_registration_register")
+
+    @classmethod
+    def setUpTestData(cls):
+        cms_tools.create_homepage()
+
+    def test_registration_page_eherkenning(self):
+        response = self.app.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNone(response.html.find(id="registration-form"))
+
+        eherkenning_tag = response.html.find("a", title="Registreren met eHerkenning")
+        self.assertIsNotNone(eherkenning_tag)
+        self.assertEqual(
+            eherkenning_tag.attrs["href"],
+            furl(reverse("eherkenning:login"))
+            .add({"next": reverse("profile:registration_necessary")})
+            .url,
+        )
+
+    def test_registration_page_eherkenning_with_invite(self):
+        invite = InviteFactory.create()
+
+        response = self.app.get(f"{self.url}?invite={invite.key}")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNone(response.html.find(id="registration-form"))
+
+        eherkenning_tag = response.html.find("a", title="Registreren met eHerkenning")
+        self.assertIsNotNone(eherkenning_tag)
+        necessary_url = (
+            furl(reverse("profile:registration_necessary"))
+            .add({"invite": invite.key})
+            .url
+        )
+        self.assertEqual(
+            eherkenning_tag.attrs["href"],
+            furl(reverse("eherkenning:login")).add({"next": necessary_url}).url,
+        )
+
+    @patch("eherkenning.validators.KVKValidator.__call__")
+    def test_eherkenning_fail_without_invite_redirects_to_login_page(self, m):
+        # disable mock form validation to check redirect
+        m.return_value = True
+
+        self.assertNotIn("invite_url", self.client.session.keys())
+
+        url = reverse("eherkenning-mock:password")
+        params = {
+            "acs": reverse("eherkenning-acs"),
+            "next": reverse("pages-root"),
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": "w",
+            "auth_pass": "bar",
+        }
+        # post our password to the IDP
+        response = self.app.post(url, data).follow()
+
+        self.assertRedirectsLogin(response, with_host=True)
+
+    @patch("eherkenning.validators.KVKValidator.__call__")
+    def test_eherkenning_fail_without_invite_and_next_url_redirects_to_login_page(
+        self, m
+    ):
+        # disable mock form validation to check redirect
+        m.return_value = True
+
+        self.assertNotIn("invite_url", self.client.session.keys())
+
+        url = reverse("eherkenning-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": None,
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": "w",
+            "auth_pass": "bar",
+        }
+        # post our password to the IDP
+        response = self.app.post(url, data).follow()
+
+        self.assertRedirectsLogin(response, with_host=True)
+
+    @patch("eherkenning.validators.KVKValidator.__call__")
+    def test_eherkenning_fail_with_invite_redirects_to_register_page(self, m):
+        # disable mock form validation to check redirect
+        m.return_value = True
+        invite = InviteFactory()
+        session = self.client.session
+        session[
+            "invite_url"
+        ] = f"{reverse('django_registration_register')}?invite={invite.key}"
+        session.save()
+
+        url = reverse("eherkenning-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": f"{reverse('profile:registration_necessary')}?invite={invite.key}",
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": "w",
+            "auth_pass": "bar",
+        }
+        # post our password to the IDP
+        response = self.client.post(url, data, follow=True)
+
+        self.assertRedirects(
+            response,
+            f"http://testserver{reverse('django_registration_register')}?invite={invite.key}",
+        )
+
+    def test_invite_url_not_in_session_after_successful_login(self):
+        invite = InviteFactory()
+        session = self.client.session
+        session[
+            "invite_url"
+        ] = f"{reverse('django_registration_register')}?invite={invite.key}"
+        session.save()
+
+        url = reverse("eherkenning-mock:password")
+        params = {
+            "acs": reverse("eherkenning:acs"),
+            "next": f"{reverse('profile:registration_necessary')}?invite={invite.key}",
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": "12345678",
+            "auth_pass": "bar",
+        }
+
+        self.assertIn("invite_url", self.client.session.keys())
+
+        # post our password to the IDP
+        response = self.client.post(url, data, follow=True)
+
+        self.assertRedirects(
+            response,
+            f"{reverse('profile:registration_necessary')}?invite={invite.key}",
+        )
+        self.assertNotIn("invite_url", self.client.session.keys())
+
+    def test_eherkenning_user_is_redirected_to_necessary_registration(self):
+        """
+        eHerkenning users that do not have their email filled in should be redirected to
+        the registration form
+        """
+        user = eHerkenningUserFactory(kvk="12345678", email="user-12345678@localhost")
+
+        response = self.app.get(reverse("pages-root"), user=user)
+
+        self.assertRedirects(response, reverse("profile:registration_necessary"))
+
+
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class EmailPasswordRegistrationTest(WebTest):
     """
     Tests concerning the registration of non-digid users (email + password)
@@ -681,7 +853,7 @@ class EmailPasswordRegistrationTest(WebTest):
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class DuplicateEmailRegistrationTest(WebTest):
     """
-    DigiD users should be able to register with email addresses that are already in use.
+    DigiD/eHerkenning users should be able to register with email addresses that are already in use.
     Other users should not be able to register with duplicate emails.
     """
 
@@ -693,8 +865,6 @@ class DuplicateEmailRegistrationTest(WebTest):
     def setUpTestData(cls):
         cls.msg_dupes = _("This email is already taken.")
         cls.msg_inactive = _("This account has been deactivated")
-
-    # TODO use factories and valid Users (eg: bsn AND LoginTypeChoices.digid)
 
     #
     # digid users
@@ -731,8 +901,46 @@ class DuplicateEmailRegistrationTest(WebTest):
         users = User.objects.filter(email__iexact=test_user.email)
 
         self.assertEqual(users.count(), 2)
+        self.assertEqual(users.first().email, "test@example.com")
+        self.assertEqual(users.last().email, "test@example.com")
 
-        # TODO
+    def test_eherkenning_user_success(self):
+        """Assert that eHerkenning users can register with duplicate emails"""
+        test_user = eHerkenningUserFactory.create(
+            email="test@localhost",
+            kvk="64819772",
+        )
+
+        url = reverse("eherkenning-mock:password")
+        params = {
+            "acs": reverse("eherkenning:acs"),
+            "next": reverse("profile:registration_necessary"),
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            # different KvK
+            "auth_name": "12345678",
+            "auth_pass": "bar",
+        }
+        # post our password to the IDP
+        response = self.app.post(url, data).follow().follow()
+
+        form = response.forms["necessary-form"]
+
+        self.assertEqual(form["email"].value, "")
+        self.assertNotIn("first_name", form.fields)
+        self.assertNotIn("last_name", form.fields)
+
+        # same email
+        form["email"] = "test@localhost"
+        form.submit().follow()
+
+        users = User.objects.filter(email__iexact=test_user.email)
+
+        self.assertEqual(users.count(), 2)
+        self.assertEqual(users.first().email, "test@localhost")
+        self.assertEqual(users.last().email, "test@localhost")
 
     # def test_digid_user_cannot_reregister_inactive_duplicate_email(self):
     #     inactive_user = DigidUserFactory.create(
