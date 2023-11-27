@@ -15,8 +15,9 @@ class eHerkenningBackend(_eHerkenningBackend):
     def get_or_create_user(self, request, saml_response, saml_attributes):
         kvk = self.get_kvk_number(saml_attributes)
         if kvk == "":
-            error_message = "Login failed due to no KvK being returned by eHerkenning."
-            raise eHerkenningError(error_message)
+            raise eHerkenningError(
+                "Login failed due to no KvK being returned by eHerkenning."
+            )
 
         created = False
         try:

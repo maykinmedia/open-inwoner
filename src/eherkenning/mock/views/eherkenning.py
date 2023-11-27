@@ -61,7 +61,7 @@ class eHerkenningAssertionConsumerServiceMockView(View):
     mock replacement for eherkenning:acs
     """
 
-    def get_login_url(self):
+    def get_failure_url(self):
         """
         where to go after unsuccessful login
         """
@@ -95,8 +95,8 @@ class eHerkenningAssertionConsumerServiceMockView(View):
                 "check the website https://www.eherkenning.nl for the latest information."
             )
             messages.error(request, message)
-            login_url = self.get_login_url()
-            return HttpResponseRedirect(login_url)
+            failure_url = self.get_failure_url()
+            return HttpResponseRedirect(failure_url)
 
         auth.login(request, user)
 

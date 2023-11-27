@@ -30,10 +30,10 @@ else:
     DIGID_ENABLED = False
 
 EHERKENNING_MOCK = config("EHERKENNING_MOCK", default=False)
-if not DEBUG:
-    AUTHENTICATION_BACKENDS += ["eherkenning.backends.eHerkenningBackend"]
-elif EHERKENNING_MOCK:
+if EHERKENNING_MOCK:
     AUTHENTICATION_BACKENDS += ["eherkenning.mock.backends.eHerkenningBackend"]
+else:
+    AUTHENTICATION_BACKENDS += ["eherkenning.backends.eHerkenningBackend"]
 
 # Database performance
 # for db_config in DATABASES.values():

@@ -66,21 +66,14 @@ class CustomDigiDAssertionConsumerServiceMockView(
         invite_url = self.request.session.get("invite_url")
         next_url = self.request.GET.get("next")
 
-        if (
-            invite_url
-            and next_url
-            and reverse("profile:registration_necessary") in next_url
-        ):
-            # If user logs in via the invitation flow redirect to the invitation
-            # accept view if login fails
-            absolute_invite_url = self.request.build_absolute_uri(invite_url)
-            return absolute_invite_url
-        elif (
-            invite_url
-            and next_url
-            and not reverse("profile:registration_necessary") in next_url
-        ):
-            del self.request.session["invite_url"]
+        if invite_url and next_url:
+            if reverse("profile:registration_necessary") in next_url:
+                # If user logs in via the invitation flow redirect to the invitation
+                # accept view if login fails
+                absolute_invite_url = self.request.build_absolute_uri(invite_url)
+                return absolute_invite_url
+            else:
+                del self.request.session["invite_url"]
 
         url = self.request.build_absolute_uri(digid_conf.get_cancel_url())
         url = get_redirect_url(
@@ -112,21 +105,15 @@ class CustomDigiDAssertionConsumerServiceView(DigiDAssertionConsumerServiceView)
         invite_url = self.request.session.get("invite_url")
         next_url = self.request.GET.get("RelayState")
 
-        if (
-            invite_url
-            and next_url
-            and reverse("profile:registration_necessary") in next_url
-        ):
-            # If user logs in via the invitation flow redirect to the invitation
-            # accept view if login fails
-            absolute_invite_url = self.request.build_absolute_uri(invite_url)
-            return absolute_invite_url
-        elif (
-            invite_url
-            and next_url
-            and not reverse("profile:registration_necessary") in next_url
-        ):
-            del self.request.session["invite_url"]
+        if invite_url and next_url:
+            if reverse("profile:registration_necessary") in next_url:
+                # If user logs in via the invitation flow redirect to the invitation
+                # accept view if login fails
+                absolute_invite_url = self.request.build_absolute_uri(invite_url)
+                return absolute_invite_url
+            else:
+                del self.request.session["invite_url"]
+
         url = self.get_redirect_url()
         if url:
             return url
@@ -156,21 +143,14 @@ class CustomeHerkenningAssertionConsumerServiceMockView(
         invite_url = self.request.session.get("invite_url")
         next_url = self.request.GET.get("next")
 
-        if (
-            invite_url
-            and next_url
-            and reverse("profile:registration_necessary") in next_url
-        ):
-            # If user logs in via the invitation flow redirect to the invitation
-            # accept view if login fails
-            absolute_invite_url = self.request.build_absolute_uri(invite_url)
-            return absolute_invite_url
-        elif (
-            invite_url
-            and next_url
-            and not reverse("profile:registration_necessary") in next_url
-        ):
-            del self.request.session["invite_url"]
+        if invite_url and next_url:
+            if reverse("profile:registration_necessary") in next_url:
+                # If user logs in via the invitation flow redirect to the invitation
+                # accept view if login fails
+                absolute_invite_url = self.request.build_absolute_uri(invite_url)
+                return absolute_invite_url
+            else:
+                del self.request.session["invite_url"]
 
         url = self.request.build_absolute_uri(eherkenning_conf.get_cancel_url())
         url = get_redirect_url(
@@ -199,21 +179,15 @@ class CustomeHerkenningAssertionConsumerServiceView(
         invite_url = self.request.session.get("invite_url")
         next_url = self.request.GET.get("RelayState")
 
-        if (
-            invite_url
-            and next_url
-            and reverse("profile:registration_necessary") in next_url
-        ):
-            # If user logs in via the invitation flow redirect to the invitation
-            # accept view if login fails
-            absolute_invite_url = self.request.build_absolute_uri(invite_url)
-            return absolute_invite_url
-        elif (
-            invite_url
-            and next_url
-            and not reverse("profile:registration_necessary") in next_url
-        ):
-            del self.request.session["invite_url"]
+        if invite_url and next_url:
+            if reverse("profile:registration_necessary") in next_url:
+                # If user logs in via the invitation flow redirect to the invitation
+                # accept view if login fails
+                absolute_invite_url = self.request.build_absolute_uri(invite_url)
+                return absolute_invite_url
+            else:
+                del self.request.session["invite_url"]
+
         url = self.get_redirect_url()
         if url:
             return url

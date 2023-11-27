@@ -97,7 +97,10 @@ class MyProfileView(
         context["questionnaire_exists"] = QuestionnaireStep.objects.filter(
             published=True
         ).exists()
-        context["can_change_password"] = user.login_type != LoginTypeChoices.digid
+        context["can_change_password"] = user.login_type not in (
+            LoginTypeChoices.digid,
+            LoginTypeChoices.eherkenning,
+        )
         context["inbox_page_is_published"] = inbox_page_is_published()
 
         return context

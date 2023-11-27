@@ -22,7 +22,6 @@ OVERRIDE_SETTINGS = dict(
     EHERKENNING_MOCK_APP_TITLE="FooBarBazz-MockApp",
     EHERKENNING_MOCK_RETURN_URL=RETURN_URL,  # url to redirect to after success
     EHERKENNING_MOCK_CANCEL_URL=CANCEL_URL,  # url to navigate to when users clicks 'cancel/annuleren'
-    # ROOT_URLCONF="tests.project.mock_urls",
 )
 
 MODIFY_SETTINGS = dict(

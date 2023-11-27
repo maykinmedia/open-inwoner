@@ -2,7 +2,6 @@ import logging
 import re
 
 from django.contrib.auth import get_user_model
-from django.utils.translation import gettext_lazy as _
 
 from digid_eherkenning.backends import BaseBackend
 from digid_eherkenning.utils import get_client_ip
@@ -17,13 +16,9 @@ class eHerkenningBackend(BaseBackend):
     error_messages = dict(
         BaseBackend.error_messages,
         **{
-            "eherkenning_no_kvk": _(
-                "Login failed due to no KvK being returned by eHerkenning."
-            ),
-            "eherkenning_len_kvk": _(
-                "Login failed due to no KvK having more then 8 digits."
-            ),
-            "eherkenning_num_kvk": _("Login failed due to no KvK not being numerical."),
+            "eherkenning_no_kvk": "Login failed due to no KvK being returned by eHerkenning.",
+            "eherkenning_len_kvk": "Login failed due to no KvK having more then 8 digits.",
+            "eherkenning_num_kvk": "Login failed due to no KvK not being numerical.",
         }
     )
 
@@ -54,11 +49,11 @@ class eHerkenningBackend(BaseBackend):
             self.log_error(request, self.error_messages["eherkenning_no_kvk"])
             return
 
-        elif not re.match(r"^[0-9]+$", kvk):
+        if not re.match(r"^[0-9]+$", kvk):
             self.log_error(request, self.error_messages["eherkenning_len_kvk"])
             return
 
-        elif len(kvk) > 8:
+        if len(kvk) > 8:
             self.log_error(request, self.error_messages["eherkenning_num_kvk"])
             return
 

@@ -33,7 +33,6 @@ class eHerkenningManager(BaseeHerkenningManager):
         return self.get_queryset().get(kvk=kvk)
 
     def eherkenning_create(self, kvk, **kwargs):
-        # TODO what is this @rsin.com email hostname? @example.org is bad enough but this actually exists
         return super().create(
             email="user-{}@localhost".format(kvk),
             login_type=LoginTypeChoices.eherkenning,
