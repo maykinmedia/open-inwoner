@@ -10,6 +10,10 @@
     }
   }
 
+  .case__grid .grid {
+    gap: 0;
+  }
+
   #document-upload {
     gap: 0;
     padding: 0 0 var(--row-height-giant) 0;

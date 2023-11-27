@@ -23,8 +23,8 @@
                             <p class="p p-text p--compact">
                                 {# Configurable texts #}
                                 <span>{{ status.status_indicator_text|default:"" }}</span>
-                                <span>{{ status.description|default:"" }}</span>
-                                {% if not case.end_statustype_data %}<span class="status--result">{{ case.result_description|default:"" }}/{{ status.case_type_config_description.description|default:"" }}</span>{% endif %}
+                                {% if case.end_statustype_data %}<span>{{ status.description|default:"" }}</span>{% endif %}
+                                {% if not case.end_statustype_data %}<span class="status--result">{{ case.result_description|default:"" }}</span>{% endif %}
                             </p>
                             <p class="p p-date p--compact">{{ status.date|date }}</p>
                             <p class="p p__upload {% if case.end_statustype_data %}p__upload--enabled{% endif %}">
