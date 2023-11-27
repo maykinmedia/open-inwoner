@@ -150,6 +150,7 @@ class NecessaryFieldsUserView(LogMixin, LoginRequiredMixin, InviteMixin, UpdateV
         if not invite and (
             (user.bsn and user.email == generate_email_from_string(user.bsn))
             or (user.oidc_id and user.email == generate_email_from_string(user.oidc_id))
+            or (user.kvk and user.email == f"user-{user.kvk}@localhost")
         ):
             initial["email"] = ""
 

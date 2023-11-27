@@ -208,6 +208,9 @@ class NecessaryUserForm(forms.ModelForm):
                 del self.fields["last_name"]
             if not user.infix:
                 del self.fields["infix"]
+        elif user.login_type == LoginTypeChoices.eherkenning:
+            for field_name in ["first_name", "infix", "last_name"]:
+                del self.fields[field_name]
 
 
 class CustomPasswordResetForm(PasswordResetForm):
