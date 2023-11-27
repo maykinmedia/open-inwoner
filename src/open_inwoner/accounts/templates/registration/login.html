@@ -30,7 +30,7 @@
         {% if eherkenning_enabled %}
             {% render_card direction='horizontal' tinted=True %}
                 <a href="{% url 'eherkenning:login' %}" class="link eherkenning-logo">
-                    <img class="eherkenning-logo__image" src="{% static 'accounts/eherkenning.png' %}" height=40 alt="eHerkenning inlogpagina">
+                    <img class="eherkenning-logo__image" src="{% static 'accounts/eherkenning.png' %}" height=30 alt="eHerkenning inlogpagina">
                 </a>
                 {% url 'eherkenning:login' as href %}
                 {% with href|addnexturl:next as href_with_next %}

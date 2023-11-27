@@ -101,6 +101,15 @@ class CustomRegistrationView(LogMixin, InviteMixin, RegistrationView):
             )
         except:
             context["digit_url"] = ""
+
+        try:
+            context["eherkenning_url"] = (
+                furl(reverse("eherkenning:login"))
+                .add({"next": necessary_fields_url})
+                .url
+            )
+        except:
+            context["eherkenning_url"] = ""
         return context
 
     def get(self, request, *args, **kwargs):
