@@ -1,4 +1,5 @@
 import logging
+from typing import Optional
 from urllib.parse import urlencode, urljoin
 
 import requests
@@ -15,7 +16,10 @@ class KvKClient:
         self.search_endpoint = urljoin(self.config.api_root, "zoeken")
 
     @staticmethod
-    def _build_url(endpoint: str, params: dict = {}) -> str:
+    def _build_url(endpoint: str, params: Optional[dict] = None) -> str:
+        if not params:
+            return endpoint
+
         encoded_params = urlencode(params, doseq=True)
         return f"{endpoint}?{encoded_params}"
 
@@ -38,22 +42,44 @@ class KvKClient:
             response = requests.get(url, **request_kwargs)
         except requests.RequestException as ex:
             logger.exception("Unable to retrieve information from the KVK API: %s", ex)
-            return []
+            return {}
 
         try:
             data = response.json()
         except (AttributeError, JSONDecodeError, requests.RequestException) as ex:
             logger.exception("Unable to parse information from the KVK API: %s", ex)
-            return []
+            return {}
 
-        return data.get("resultaten", [])
+        return data
 
     def search(self, kvk: str, **kwargs) -> dict:
         params = {"kvkNummer": kvk, **kwargs}
 
-        companies = self._request(self.search_endpoint, params=params)
+        companies = self._request(self.search_endpoint, params=params).get(
+            "resultaten", []
+        )
 
         if not companies:
             return {}
 
         return companies[0]
+
+    def retrieve_rsin_with_kvk(self, kvk, **kwargs) -> Optional[str]:
+        company_data = self.search(kvk)
+
+        if not company_data:
+            return None
+
+        basisprofiel_link = None
+        for link in company_data["links"]:
+            if link["rel"] == "basisprofiel":
+                basisprofiel_link = link["href"]
+                break
+
+        basisprofiel = self._request(basisprofiel_link, {})
+        try:
+            rsin = basisprofiel["_embedded"]["eigenaar"]["rsin"]
+        except KeyError:
+            rsin = None
+
+        return rsin
