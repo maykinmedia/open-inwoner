@@ -387,8 +387,15 @@ class User(AbstractBaseUser, PermissionsMixin):
                 or not self.email
                 or self.email.endswith("@example.org")
             )
-        elif self.login_type == LoginTypeChoices.oidc:
-            return not self.email or self.email.endswith("@example.org")
+        elif self.login_type in (
+            LoginTypeChoices.oidc,
+            LoginTypeChoices.eherkenning,
+        ):
+            return (
+                not self.email
+                or self.email.endswith("@example.org")
+                or self.email.endswith("localhost")
+            )
         return False
 
     def get_logout_url(self) -> str:
