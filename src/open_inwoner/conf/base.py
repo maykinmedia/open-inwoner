@@ -482,10 +482,10 @@ ADMIN_SESSION_COOKIE_AGE = config(
     "ADMIN_SESSION_COOKIE_AGE", 3600
 )  # Default 1 hour max session duration for admins
 SESSION_WARN_DELTA = 60  # Warn 1 minute before end of session.
-SESSION_COOKIE_AGE = 900  # Set to 15 minutes
+SESSION_COOKIE_AGE = 900  # Set to 15 minutes or less for testing
 
 LOGIN_REDIRECT_URL = "/"
-LOGOUT_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/accounts/login/"
 
 #
 # SECURITY settings

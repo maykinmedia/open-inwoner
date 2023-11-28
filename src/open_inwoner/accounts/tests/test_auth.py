@@ -1265,7 +1265,7 @@ class TestLoginLogoutFunctionality(AssertRedirectsMixin, WebTest):
         """Test that a user is able to log out and page redirects to root endpoint."""
         # Log out user and redirection
         logout_response = self.app.get(reverse("logout"), user=self.user)
-        self.assertRedirects(logout_response, reverse("pages-root"))
+        self.assertRedirects(logout_response, reverse("login"))
         self.assertFalse(logout_response.follow().context["user"].is_authenticated)
 
 

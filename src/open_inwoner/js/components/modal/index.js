@@ -30,14 +30,8 @@ export default class Modal {
   }
 
   setListeners() {
-    this.node.addEventListener('click', (event) => {
-      event.preventDefault()
-      this.hide()
-    })
-
     this.close.addEventListener('click', (event) => {
       event.preventDefault()
-
       this.hide()
     })
 
