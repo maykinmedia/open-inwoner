@@ -13,6 +13,8 @@ from django_webtest import WebTest
 from furl import furl
 
 from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.contrib.kvk.models import KvKConfig
+from open_inwoner.contrib.kvk.tests.factories import CertificateFactory
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 
 from ...cms.tests import cms_tools
@@ -540,7 +542,14 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
             f"http://testserver{reverse('django_registration_register')}?invite={invite.key}",
         )
 
-    def test_invite_url_not_in_session_after_successful_login(self):
+    @patch(
+        "open_inwoner.contrib.kvk.models.KvKConfig.get_solo",
+    )
+    def test_invite_url_not_in_session_after_successful_login(self, mock_solo):
+        mock_solo.return_value.api_root = "http://foo.bar/api/v1/"
+        mock_solo.return_value.client_certificate = CertificateFactory()
+        mock_solo.return_value.server_certificate = CertificateFactory()
+
         invite = InviteFactory()
         session = self.client.session
         session[

@@ -38,22 +38,14 @@ class KvKAPITest(TestCase):
         self.assertEqual(
             company,
             {
-                "kvkNummer": "69599084",
-                "vestigingsnummer": "000038509504",
-                "handelsnaam": "Test EMZ Dagobert",
-                "adresType": "bezoekadres",
-                "straatnaam": "Abebe Bikilalaan",
-                "plaats": "Amsterdam",
-                "type": "hoofdvestiging",
+                "kvkNummer": "68750110",
+                "handelsnaam": "Test BV Donald",
+                "type": "rechtspersoon",
                 "links": [
                     {
                         "rel": "basisprofiel",
-                        "href": "https://api.kvk.nl/test/api/v1/basisprofielen/69599084",
-                    },
-                    {
-                        "rel": "vestigingsprofiel",
-                        "href": "https://api.kvk.nl/test/api/v1/vestigingsprofielen/000038509504",
-                    },
+                        "href": "https://api.kvk.nl/test/api/v1/basisprofielen/68750110",
+                    }
                 ],
             },
         )
@@ -86,26 +78,18 @@ class KvKAPITest(TestCase):
     def test_search_by_kvk_extra_params(self):
         self.mocked_requests.return_value.json.return_value = mocks.simple
 
-        company = self.kvk_client.search(kvk="69599084", type="Hoofdvestiging")
+        company = self.kvk_client.search(kvk="68750110", type="Rechtspersoon")
         self.assertEqual(
             company,
             {
-                "kvkNummer": "69599084",
-                "vestigingsnummer": "000038509504",
-                "handelsnaam": "Test EMZ Dagobert",
-                "adresType": "bezoekadres",
-                "straatnaam": "Abebe Bikilalaan",
-                "plaats": "Amsterdam",
-                "type": "hoofdvestiging",
+                "kvkNummer": "68750110",
+                "handelsnaam": "Test BV Donald",
+                "type": "rechtspersoon",
                 "links": [
                     {
                         "rel": "basisprofiel",
-                        "href": "https://api.kvk.nl/test/api/v1/basisprofielen/69599084",
-                    },
-                    {
-                        "rel": "vestigingsprofiel",
-                        "href": "https://api.kvk.nl/test/api/v1/vestigingsprofielen/000038509504",
-                    },
+                        "href": "https://api.kvk.nl/test/api/v1/basisprofielen/68750110",
+                    }
                 ],
             },
         )
