@@ -17,7 +17,7 @@
       overflow-x: auto;
       table-layout: fixed;
       width: 100%;
-      @media (min-width: 767px) {
+      @media (min-width: 768px) {
         width: var(--mobile-ms-width);
       }
     }

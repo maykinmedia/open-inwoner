@@ -13,7 +13,7 @@
     }
 
     // tablet sizes
-    @media screen and (min-width: 360px) and (max-width: 768px) {
+    @media screen and (min-width: 360px) and (max-width: 767px) {
       &__control > .label .input {
         max-width: 100%;
       }

@@ -468,7 +468,7 @@ class ZaakTypeResultaatTypeConfig(models.Model):
     description = models.TextField(
         blank=True,
         default="",
-        verbose_name=_("Frontend description"),
+        verbose_name=_("Result description"),
         help_text=_(
             "Determines the text that will be shown to the user if a case is set to this result"
         ),

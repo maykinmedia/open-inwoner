@@ -1,5 +1,5 @@
 .status-list {
-  margin-bottom: var(--spacing-mega);
+  margin-bottom: var(--row-height);
 
   &__list {
     display: flex;
@@ -56,6 +56,11 @@
 
     .p-date {
       font-size: var(--font-size-body-small);
+    }
+
+    .p-text {
+      display: flex;
+      flex-direction: column;
     }
 
     .p__upload {

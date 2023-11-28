@@ -7,7 +7,7 @@
 
 {% get_solo 'openzaak.OpenZaakConfig' as openzaak_config %}
 
-<div class="cases__grid">
+<div class="case__grid">
 {% if case %}
     {% render_grid %}
         {% render_column span=12 %}
@@ -21,65 +21,6 @@
             <section id="statuses_component" class="statuses__section">
                 {% include 'pages/cases/statuses.html' %}
             </section>
-            {% if case.statuses %}
-                <h2 class="h2" id="statuses">{% trans 'Status' %}</h2>
-
-                <aside class="status-list" aria-label="{% trans "Status lijst" %}">
-                    <ul class="status-list__list">
-                        {% for status in case.statuses %}
-
-                            {% if forloop.last %}
-                                {# Current active status, including final status #}
-                                <li class="{% if case.end_statustype_data %}status--current{% endif %} status-list__list-item status-list__list-item--{{ status.status_indicator }} {% if not case.end_statustype_data %}item--completed status-list__list-item--info{% endif %}">
-                                    {% icon icon="circle" %}
-                                    <div class="status-list__notification status-list__notification--{{ status.status_indicator }}">
-                                        <h3 class="status-list__notification-h3"><a href="#" class="link link-toggle link--bold">{{ status.label }}</a>{% icon icon="expand_more" icon_position="after" outlined=True %}</h3>
-                                        <div class="status-list__notification-content">
-                                            <p class="p p-text p--compact">{{ status.status_indicator_text }}</p>
-                                            <p class="p p-date p--compact">{{ status.date|date }}</p>
-                                            <p>
-                                            {% if case.internal_upload_enabled or case.external_upload_enabled %}
-                                                {% button href="#form_upload" text=_("Scroll naar document uploaden") title=_("Ga direct naar document upload sectie.") primary=True icon="arrow_downward" icon_position="after" %}
-                                            {% endif %}
-                                            {# IF there is a CTA button in the final status, show this #}
-                                            {% with button_url=status.call_to_action_url %}
-                                                {% if button_url %}
-                                                    {% translate status.call_to_action_text as button_text %}
-                                                        {% button href=button_url text=button_text title=_("Open de bijlage") primary=True icon="arrow_forward" icon_position="after" %}
-                                                {% endif %}
-                                            {% endwith %}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </li>
-                            {% else %}
-                                {# Completed past statuses #}
-                                <li class="status--completed status-list__list-item">
-                                    {% icon icon="task_alt" %}
-                                    <div class="status-list__notification">
-                                        <h3 class="status-list__notification-h3"><a href="#" class="link link-toggle link-success">{{ status.label }}</a>{% icon icon="expand_more" icon_position="after" outlined=True %}</h3>
-                                        <div class="status-list__notification-content">
-                                            <p class="p p-text p--compact">{{ status.status_indicator_text }}</p>
-                                            <p class="p p-date p--compact">{{ status.date|date }}</p>
-                                        </div>
-                                    </div>
-                                </li>
-
-                            {% endif %}
-                        {% endfor %}
-                        {% if case.end_statustype_data %}
-                            {# Future end status #}
-                            <li class="status--future status-list__list-item status-list__list-item--future">
-                                {% icon icon="circle_outlined" outlined=True %}
-                                <div class="status-list__notification status-list__notification--future">
-                                    <h3 class="status-list__notification-h3"><span class="link">{{ case.end_statustype_data.label }}</span></h3>
-                                </div>
-                            </li>
-
-                        {% endif %}
-                    </ul>
-                </aside>
-            {% endif %}
 
             {% if case.internal_upload_enabled %}
                 <h2 class="h2" id="documents-upload">{% trans "Document uploaden" %}</h2>

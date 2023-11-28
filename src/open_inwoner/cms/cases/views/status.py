@@ -50,6 +50,7 @@ from open_inwoner.openzaak.models import (
     StatusTranslation,
     ZaakTypeConfig,
     ZaakTypeInformatieObjectTypeConfig,
+    ZaakTypeResultaatTypeConfig,
     ZaakTypeStatusTypeConfig,
 )
 from open_inwoner.openzaak.utils import get_role_name_display, is_info_object_visible
@@ -130,6 +131,10 @@ class InnerCaseDetailView(
             # NOTE maybe this should be cached?
             statustypen = fetch_status_types_no_cache(self.case.zaaktype.url)
 
+            resulttype_config_mapping = {
+                zt_resulttype.resultaattype_url: zt_resulttype
+                for zt_resulttype in ZaakTypeResultaatTypeConfig.objects.all()
+            }
             statustype_config_mapping = {
                 zaaktype_statustype.statustype_url: zaaktype_statustype
                 for zaaktype_statustype in ZaakTypeStatusTypeConfig.objects.all()
@@ -188,11 +193,14 @@ class InnerCaseDetailView(
                     ),
                 }
 
+            result_data = self.get_result_data(self.case, resulttype_config_mapping)
+
             context["case"] = {
                 "id": str(self.case.uuid),
                 "identification": self.case.identification,
                 "initiator": self.get_initiator_display(self.case),
-                "result": self.get_result_display(self.case),
+                "result": result_data.get("display", ""),
+                "result_description": result_data.get("description", ""),
                 "start_date": self.case.startdatum,
                 "end_date": getattr(self.case, "einddatum", None),
                 "end_date_planned": getattr(self.case, "einddatum_gepland", None),
@@ -317,12 +325,21 @@ class InnerCaseDetailView(
         }
 
     @staticmethod
-    def get_result_display(case: Zaak) -> str:
-        if case.resultaat:
-            result = fetch_single_result(case.resultaat)
-            if result:
-                return result.toelichting
-        return None
+    def get_result_data(case: Zaak, result_type_config_mapping: dict) -> dict:
+        if not case.resultaat:
+            return {}
+
+        result = fetch_single_result(case.resultaat)
+
+        display = result.toelichting
+        description = getattr(
+            result_type_config_mapping.get(result.resultaattype), "description", ""
+        )
+
+        return {
+            "display": display,
+            "description": description,
+        }
 
     @staticmethod
     def get_initiator_display(case: Zaak) -> str:
@@ -362,6 +379,9 @@ class InnerCaseDetailView(
                     statustype_config_mapping.get(s.statustype.url),
                     "call_to_action_text",
                     None,
+                ),
+                "description": getattr(
+                    statustype_config_mapping.get(s.statustype.url), "description", None
                 ),
             }
             for s in statuses
