@@ -10,49 +10,70 @@
 {% with user=request.user %}
 
 <div class="tabled tabled--flexible">
-    <h1 class="h1" id="title">{% trans "Welkom" %}, {{ user.first_name }}</h1>
+    <h1 class="h1" id="title">{% trans "Welkom" %}{% if not user.is_digid_user %}, {{ user.first_name }}{% endif %}</h1>
     <span class="tabled__item title-info">{%trans "voor het laatst ingelogd op" %}: {{ user.last_login|date:"d-m-Y" }} om {{ user.last_login|date:"H:i" }} uur</span>
 </div>
 
-<!-- Personal information -->
-<div class="tabled tabled--flexible profile-section">
-    <div>
-        <h2 class="h2 tabled__section" id="personal-overview">{% trans "Persoonlijke gegevens" %}
-            <div class="tabled__item--force-right tabled__item--mobile-big">
-                {% button href="profile:edit" text=_("Bewerken") icon="edit" transparent=True %}
-                {% if user.is_digid_user_with_brp and view.config.my_data %}
-                    {% button href="profile:data" text=_("My details") icon="info" transparent=True icon_outlined=True %}
-                {% elif not user.is_digid_user %}
-                    {% button href="password_change" text=_("Password") icon="key" transparent=True %}
-                {% endif %}
-            </div>
-        </h2>
+{% if user.kvk %}
+    <!-- Business information -->
+    <div class="tabled tabled--flexible profile-section">
+        <div>
+            <h2 class="h2 tabled__section" id="business-overview">{% trans "Bedrijfsgegevens" %}</h2>
+        </div>
+        <div class="tabled__row tabled__row--blank">
+            <div class="tabled__item tabled__item--lighter">{% trans "Handelsnaam" %}</div>
+            <div class="tabled__item">{{ user.company_name }}</div>
+        </div>
+        <div class="tabled__row tabled__row--blank">
+            <div class="tabled__item tabled__item--lighter">{% trans "KvK nummer" %}</div>
+            <div class="tabled__item">{{ user.kvk }}</div>
+        </div>
+        <div class="tabled__row tabled__row--blank">
+            <div class="tabled__item tabled__item--lighter">{% trans "Zakelijk adres" %}</div>
+            <div class="tabled__item">{{ user.street }} {{ user.housenumber }}<br>{{user.postcode}} {{ user.city }}</div>
+        </div>
     </div>
-    <div class="tabled__row tabled__row--blank">
-        <div class="tabled__item tabled__item--lighter">{% trans "Voornaam" %}</div>
-        <div class="tabled__item">{{ user.infix}} {{ user.first_name }}</div>
+{% else %}
+    <!-- Personal information -->
+    <div class="tabled tabled--flexible profile-section">
+        <div>
+            <h2 class="h2 tabled__section" id="personal-overview">{% trans "Persoonlijke gegevens" %}
+                <div class="tabled__item--force-right tabled__item--mobile-big">
+                    {% button href="profile:edit" text=_("Bewerken") icon="edit" transparent=True %}
+                    {% if user.is_digid_user_with_brp and view.config.my_data %}
+                        {% button href="profile:data" text=_("My details") icon="info" transparent=True icon_outlined=True %}
+                    {% elif not user.is_digid_user %}
+                        {% button href="password_change" text=_("Password") icon="key" transparent=True %}
+                    {% endif %}
+                </div>
+            </h2>
+        </div>
+        <div class="tabled__row tabled__row--blank">
+            <div class="tabled__item tabled__item--lighter">{% trans "Voornaam" %}</div>
+            <div class="tabled__item">{{ user.infix}} {{ user.first_name }}</div>
+        </div>
+        <div class="tabled__row tabled__row--blank">
+            <div class="tabled__item tabled__item--lighter">{% trans "Achternaam" %}</div>
+            <div class="tabled__item">{{ user.last_name }}</div>
+        </div>
+        <div class="tabled__row tabled__row--blank">
+            <div class="tabled__item tabled__item--lighter">{% trans "Geboortedatum" %}</div>
+            <div class="tabled__item">{{ user.birthday|date:"d.m.Y" }}</div>
+        </div>
+        <div class="tabled__row tabled__row--blank">
+            <div class="tabled__item tabled__item--lighter">{% trans "Adres" %}</div>
+            <div class="tabled__item">{{ user.street }} {{ user.housenumber }}<br>{{user.postcode}} {{ user.city }}</div>
+        </div>
+        <div class="tabled__row tabled__row--blank">
+            <div class="tabled__item tabled__item--lighter">{% trans "E-mail adres" %}</div>
+            <div class="tabled__item">{{ user.get_contact_email }}</div>
+        </div>
+        <div class="tabled__row">
+            <div class="tabled__item tabled__item--lighter">{% trans "Telefoonnummer" %}</div>
+            <div class="tabled__item">{{ user.phonenumber }}</div>
+        </div>
     </div>
-    <div class="tabled__row tabled__row--blank">
-        <div class="tabled__item tabled__item--lighter">{% trans "Achternaam" %}</div>
-        <div class="tabled__item">{{ user.last_name }}</div>
-    </div>
-    <div class="tabled__row tabled__row--blank">
-        <div class="tabled__item tabled__item--lighter">{% trans "Geboortedatum" %}</div>
-        <div class="tabled__item">{{ user.birthday|date:"d.m.Y" }}</div>
-    </div>
-    <div class="tabled__row tabled__row--blank">
-        <div class="tabled__item tabled__item--lighter">{% trans "Adres" %}</div>
-        <div class="tabled__item">{{ user.street }} {{ user.housenumber }}<br>{{user.postcode}} {{ user.city }}</div>
-    </div>
-    <div class="tabled__row tabled__row--blank">
-        <div class="tabled__item tabled__item--lighter">{% trans "E-mail adres" %}</div>
-        <div class="tabled__item">{{ user.get_contact_email }}</div>
-    </div>
-    <div class="tabled__row">
-        <div class="tabled__item tabled__item--lighter">{% trans "Telefoonnummer" %}</div>
-        <div class="tabled__item">{{ user.phonenumber }}</div>
-    </div>
-</div>
+{% endif %}
 
 <!-- Notifications -->
 <div class="tabled tabled--flexible profile-section">

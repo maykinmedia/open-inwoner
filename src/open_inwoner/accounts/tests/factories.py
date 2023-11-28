@@ -34,6 +34,11 @@ class DigidUserFactory(UserFactory):
     is_prepopulated = True
 
 
+class KvKUserFactory(UserFactory):
+    login_type = LoginTypeChoices.eherkenning
+    kvk = "12345678"
+
+
 class TokenFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "authtoken.Token"
