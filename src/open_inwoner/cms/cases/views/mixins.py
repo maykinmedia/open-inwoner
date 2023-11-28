@@ -6,8 +6,13 @@ from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
 
 from open_inwoner.openzaak.api_models import Zaak
-from open_inwoner.openzaak.cases import fetch_roles_for_case_and_bsn, fetch_single_case
+from open_inwoner.openzaak.cases import (
+    fetch_roles_for_case_and_bsn,
+    fetch_roles_for_case_and_kvk,
+    fetch_single_case,
+)
 from open_inwoner.openzaak.catalog import fetch_single_case_type
+from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.types import UniformCase
 from open_inwoner.openzaak.utils import is_zaak_visible
 from open_inwoner.utils.views import LogMixin
@@ -54,20 +59,31 @@ class CaseAccessMixin(AccessMixin):
             logger.debug("CaseAccessMixin - permission denied: user not authenticated")
             return self.handle_no_permission()
 
-        if not request.user.bsn:
+        if not request.user.bsn and not request.user.kvk:
             logger.debug(
-                "CaseAccessMixin - permission denied: user doesn't have a bsn "
+                "CaseAccessMixin - permission denied: user doesn't have a bsn or kvk number"
             )
             return self.handle_no_permission()
 
         self.case = self.get_case(kwargs)
         if self.case:
             # check if we have a role in this case
-            if not fetch_roles_for_case_and_bsn(self.case.url, request.user.bsn):
-                logger.debug(
-                    f"CaseAccessMixin - permission denied: no role for the case {self.case.url}"
-                )
-                return self.handle_no_permission()
+            if request.user.bsn:
+                if not fetch_roles_for_case_and_bsn(self.case.url, request.user.bsn):
+                    logger.debug(
+                        f"CaseAccessMixin - permission denied: no role for the case {self.case.url}"
+                    )
+                    return self.handle_no_permission()
+            elif request.user.kvk:
+                identifier = self.request.user.kvk
+                config = OpenZaakConfig.get_solo()
+                if config.fetch_eherkenning_zaken_with_rsin:
+                    identifier = self.request.user.rsin
+                if not fetch_roles_for_case_and_kvk(self.case.url, identifier):
+                    logger.debug(
+                        f"CaseAccessMixin - permission denied: no role for the case {self.case.url}"
+                    )
+                    return self.handle_no_permission()
 
             # resolve case-type
             self.case.zaaktype = fetch_single_case_type(self.case.zaaktype)
@@ -102,6 +118,13 @@ class CaseAccessMixin(AccessMixin):
 
 class OuterCaseAccessMixin(LoginRequiredMixin):
     def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated and not request.user.bsn:
+        if (
+            request.user.is_authenticated
+            and not request.user.bsn
+            and not request.user.kvk
+        ):
+            logger.debug(
+                "OuterCaseAccessMixin - permission denied: user doesn't have a bsn or kvk number"
+            )
             return self.handle_no_permission()
         return super().dispatch(request, *args, **kwargs)
