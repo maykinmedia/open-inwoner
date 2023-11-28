@@ -5,7 +5,11 @@
         {% with as_markdown=message.extra_tags|is_substring:"as_markdown" %}
             {% with local_message=message.extra_tags|is_substring:"local_message" %}
                 {% if show_local_messages and local_message or not show_local_messages and not local_message %}
-                    {% notification icon=message.icon type=message.level_tag message=message.message as_markdown=as_markdown closable=True compact=compact %}
+                    {% if closable %}
+                        {% notification icon=message.icon type=message.level_tag message=message.message as_markdown=as_markdown closable=True compact=compact %}
+                    {% else %}
+                        {% notification icon=message.icon type=message.level_tag message=message.message as_markdown=as_markdown closable=False compact=compact %}
+                    {% endif %}
                 {% endif %}
             {% endwith %}
         {% endwith %}

@@ -11,10 +11,11 @@ def notifications(messages, **kwargs):
     display multiple notifications. They will now always be positioned absolute.
 
     Usage:
-        {% notifications messages=request.messages %}
+        {% notifications messages=request.messages closable=False %}
 
     Variables:
         + messages: list | A list of messages that need to be displayed.
+        - closable: bool | If a close button should be shown.
         - compact: boolean | Whether to use compact styling or not.
         - icon: string | The icon, can be false.
     """
