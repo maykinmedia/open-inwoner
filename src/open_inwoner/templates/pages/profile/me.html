@@ -10,49 +10,78 @@
 {% with user=request.user %}
 
 <div class="tabled tabled--flexible">
-    <h1 class="h1 tabled__title">{% trans "Welkom" %}, {{ user.first_name }}</h1>
-    <span class="tabled__key">{%trans "voor het laatst ingelogd op" %}: <span class="tabled__value">{{ user.last_login|date:"j F Y" }} om {{ user.last_login|date:"H:i" }} uur</span></span>
+    <h1 class="h1" id="title">{% trans "Welkom" %}{% if not user.is_eherkenning_user %}, {{ user.first_name }}{% endif %}</h1>
+    <p class="tabled__key">
+    {%trans "voor het laatst ingelogd op" %}: <span class="tabled__value">{{ user.last_login|date:"j F Y" }} om {{ user.last_login|date:"G:i" }} uur</span>
+    </p>
 </div>
 
-{# Personal information #}
-<div class="tabled tabled--flexible profile-section" id="personal-info">
-    <div class="tabled__section">
-        <h2 class="h2 title" id="personal-overview">{% trans "Persoonlijke gegevens" %}
-            <div class="tabled__item--force-right tabled__item--mobile-big">
-                {% button href="profile:edit" text=_("Bewerken") icon="edit" transparent=True %}
-                {% if user.is_digid_user_with_brp and view.config.my_data %}
-                    {% button href="profile:data" text=_("My details") icon="info" transparent=True icon_outlined=True %}
-                {% elif not user.is_digid_user %}
-                    {% button href="password_change" text=_("Password") icon="key" transparent=True %}
-                {% endif %}
+{% if user.kvk %}
+    {# Business information #}
+    <div class="tabled tabled--flexible profile-section">
+        <div>
+            <h2 class="h2 tabled__section" id="business-overview">{% trans "Bedrijfsgegevens" %}</h2>
+        </div>
+        <div class="tabled__row tabled__row--blank">
+            <div class="tabled__item tabled__item--lighter">{% trans "Handelsnaam" %}</div>
+            <div class="tabled__item">{{ user.company_name }}</div>
+        </div>
+        <div class="tabled__row tabled__row--blank">
+            <div class="tabled__item tabled__item--lighter">{% trans "KvK nummer" %}</div>
+            <div class="tabled__item">{{ user.kvk }}</div>
+        </div>
+        <div class="tabled__row tabled__row--blank">
+            <div class="tabled__item tabled__item--lighter">{% trans "Zakelijk adres" %}</div>
+            <div class="tabled__item">
+                <div>{{ user.street }} {{ user.housenumber }}</div>
+                <div>{{user.postcode}} {{ user.city }}</div>
             </div>
-        </h2>
+        </div>
     </div>
-    <div class="tabled__row tabled__row--blank">
-        <div class="tabled__item tabled__key">{% trans "Voornaam" %}</div>
-        <div class="tabled__item tabled__value">{{ user.infix}} {{ user.first_name }}</div>
+{% else %}
+    {# Personal information #}
+    <div class="tabled tabled--flexible profile-section" id="personal-info">
+        <div class="tabled__section">
+            <h2 class="h2 title" id="personal-overview">{% trans "Persoonlijke gegevens" %}
+                <div class="tabled__item--force-right tabled__item--mobile-big">
+                    {% button href="profile:edit" text=_("Bewerken") icon="edit" transparent=True %}
+                    {% if user.is_digid_user_with_brp and view.config.my_data %}
+                        {% button href="profile:data" text=_("My details") icon="info" transparent=True icon_outlined=True %}
+                    {% elif not user.is_digid_user %}
+                        {% button href="password_change" text=_("Password") icon="key" transparent=True %}
+                    {% endif %}
+                </div>
+            </h2>
+        </div>
+        <div class="tabled__row tabled__row--blank">
+            <div class="tabled__item tabled__key">{% trans "Voornaam" %}</div>
+            <div class="tabled__item tabled__value">{{ user.infix}} {{ user.first_name }}</div>
+        </div>
+        <div class="tabled__row tabled__row--blank">
+            <div class="tabled__item tabled__key">{% trans "Achternaam" %}</div>
+            <div class="tabled__item tabled__value">{{ user.last_name }}</div>
+        </div>
+        <div class="tabled__row tabled__row--blank">
+            <div class="tabled__item tabled__key">{% trans "Geboortedatum" %}</div>
+            <div class="tabled__item tabled__value">{{ user.birthday|date:"j F Y" }}</div>
+        </div>
+        <div class="tabled__row tabled__row--blank">
+            <div class="tabled__item tabled__key">{% trans "Adres" %}</div>
+            <div class="tabled__item tabled__value">
+                <div>{{ user.street }} {{ user.housenumber }}</div>
+                <div>{{ user.postcode}} {{ user.city }}</div>
+            </div>
+        </div>
+        <div class="tabled__row tabled__row--blank">
+            <div class="tabled__item tabled__key">{% trans "E-mail adres" %}</div>
+            <div class="tabled__item tabled__value">{{ user.get_contact_email }}</div>
+        </div>
+        <div class="tabled__row">
+            <div class="tabled__item tabled__key">{% trans "Telefoonnummer" %}</div>
+            <div class="tabled__item tabled__value">{{ user.phonenumber }}</div>
+        </div>
     </div>
-    <div class="tabled__row tabled__row--blank">
-        <div class="tabled__item tabled__key">{% trans "Achternaam" %}</div>
-        <div class="tabled__item tabled__value">{{ user.last_name }}</div>
-    </div>
-    <div class="tabled__row tabled__row--blank">
-        <div class="tabled__item tabled__key">{% trans "Geboortedatum" %}</div>
-        <div class="tabled__item tabled__value">{{ user.birthday|date:"j F Y" }}</div>
-    </div>
-    <div class="tabled__row tabled__row--blank">
-        <div class="tabled__item tabled__key">{% trans "Adres" %}</div>
-        <div class="tabled__item tabled__value">{{ user.street }} {{ user.housenumber }}<br>{{user.postcode}} {{ user.city }}</div>
-    </div>
-    <div class="tabled__row tabled__row--blank">
-        <div class="tabled__item tabled__key">{% trans "E-mail adres" %}</div>
-        <div class="tabled__item tabled__value">{{ user.get_contact_email }}</div>
-    </div>
-    <div class="tabled__row">
-        <div class="tabled__item tabled__key">{% trans "Telefoonnummer" %}</div>
-        <div class="tabled__item tabled__value">{{ user.phonenumber }}</div>
-    </div>
-</div>
+{% endif %}
 
 {# Notifications #}
 <div class="tabled tabled--flexible profile-section" id="notifications">
@@ -93,7 +122,7 @@
                         {% render_list %}
                         <span class="profile-list">
                             {% for name in mentor_contact_names %}
-                                {% list_item text=name compact=True %}
+                                {% list_item text=name compact=True strong=False %}
                             {% empty %}
                                 {% list_item text=_("U heeft nog geen begeleider.") compact=True strong=False %}
                             {% endfor %}
@@ -227,7 +256,7 @@
     {% csrf_token %}
     <div class="form__actions ">
        <button class="button button--textless button--icon button--icon-after button--transparent view--profile-detail" type="submit" title="Profiel verwijderen" aria-label="Profiel verwijderen">
-       {% icon icon="close" %}
+       {% icon icon="delete" text=_("Profiel verwijderen") icon_position="before" icon_outlined=True  %}
        {% trans "Profiel verwijderen" %}
        </button>
     </div>

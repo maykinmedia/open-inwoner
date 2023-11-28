@@ -3,4 +3,10 @@
   .h2 {
     margin: calc(var(--row-height) * 1.5) 0 0 0;
   }
+
+  .profile-list {
+    .list-item--compact {
+      padding: var(--spacing-small) 0;
+    }
+  }
 }
