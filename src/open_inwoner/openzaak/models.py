@@ -131,6 +131,17 @@ class OpenZaakConfig(SingletonModel):
         default=False,
     )
 
+    fetch_eherkenning_zaken_with_rsin = models.BooleanField(
+        verbose_name=_(
+            "Fetch Zaken for users authenticated with eHerkenning using RSIN"
+        ),
+        help_text=_(
+            "If enabled, Zaken for eHerkenning users are fetched using the company RSIN (Open Zaak). "
+            "If not enabled, Zaken are fetched using the KvK number (eSuite)."
+        ),
+        default=True,
+    )
+
     title_text = models.TextField(
         verbose_name=_("Title text"),
         help_text=_(
