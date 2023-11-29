@@ -1,6 +1,5 @@
 {% load i18n form_tags button_tags icon_tags %}
 
-{#  if local upload is enabled #}
 {% render_form id="document-upload" form=form method="POST" hxencoding="multipart/form-data" hxpost=hxpost_document_action hxtarget="#form_upload" submit_text=_("Bestand uploaden") extra_classes="case-detail-form" %}
     {% csrf_token %}
     {% input form.type no_label=True no_help=True class="label input" id="id_type" extra_classes="file-type__select" %}

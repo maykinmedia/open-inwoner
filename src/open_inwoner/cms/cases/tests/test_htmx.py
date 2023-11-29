@@ -29,6 +29,7 @@ from open_inwoner.openzaak.tests.factories import (
     ServiceFactory,
     ZaakTypeConfigFactory,
     ZaakTypeInformatieObjectTypeConfigFactory,
+    ZaakTypeStatusTypeConfigFactory,
 )
 from open_inwoner.openzaak.tests.shared import (
     CATALOGI_ROOT,
@@ -296,6 +297,17 @@ class CasesPlaywrightTests(
             zaaktype_config=zaak_type_config,
             informatieobjecttype_url=self.informatie_object["url"],
             zaaktype_uuids=[self.zaaktype["uuid"]],
+            document_upload_enabled=True,
+        )
+        # enable upload for new and last status
+        ZaakTypeStatusTypeConfigFactory(
+            zaaktype_config=zaak_type_config,
+            statustype_url=self.status_type_new["url"],
+            document_upload_enabled=True,
+        )
+        ZaakTypeStatusTypeConfigFactory(
+            zaaktype_config=zaak_type_config,
+            statustype_url=self.status_type_finish["url"],
             document_upload_enabled=True,
         )
 

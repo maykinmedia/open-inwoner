@@ -200,6 +200,19 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             volgnummer=3,
             isEindstatus=False,
         )
+        # we need to use a `StatusType` object, not the oas_component (a `dict`)
+        cls.second_status_preview = StatusType(
+            url=cls.status_type_in_behandeling["url"],
+            zaaktype=cls.status_type_in_behandeling["zaaktype"],
+            omschrijving=cls.status_type_in_behandeling["omschrijving"],
+            volgnummer=cls.status_type_in_behandeling["volgnummer"],
+            omschrijving_generiek=cls.status_type_in_behandeling[
+                "omschrijvingGeneriek"
+            ],
+            statustekst=cls.status_type_in_behandeling["statustekst"],
+            is_eindstatus=cls.status_type_in_behandeling["isEindstatus"],
+            informeren=cls.status_type_in_behandeling["informeren"],
+        )
         cls.status_type_finish = generate_oas_component(
             "ztc",
             "schemas/StatusType",
@@ -496,8 +509,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 "end_date": None,
                 "end_date_planned": datetime.date(2022, 1, 4),
                 "end_date_legal": datetime.date(2022, 1, 5),
-                "end_statustype_data": None,
                 "description": "Coffee zaaktype",
+                # statuses, 2nd status preview, end status data
                 "statuses": [
                     {
                         "date": datetime.datetime(2021, 1, 12),
@@ -518,6 +531,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                         "description": "",
                     },
                 ],
+                "second_status_preview": None,
+                "end_statustype_data": None,
                 # only one visible information object
                 "documents": [self.informatie_object_file],
                 "initiator": "Foo Bar van der Bazz",
@@ -572,15 +587,9 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 "start_date": datetime.date(2022, 1, 2),
                 "end_date": None,
                 "end_date_planned": datetime.date(2022, 1, 4),
-                "end_date_legal": datetime.date(2022, 1, 5),
-                "end_statustype_data": {
-                    "label": "Finish",
-                    "status_indicator": "success",
-                    "status_indicator_text": "bar",
-                    "call_to_action_url": "https://www.example.com",
-                    "call_to_action_text": "Click me",
-                },
                 "description": "Coffee zaaktype",
+                "end_date_legal": datetime.date(2022, 1, 5),
+                # statuses, 2nd status preview, end status
                 "statuses": [
                     {
                         "date": datetime.datetime(2021, 1, 12),
@@ -591,17 +600,15 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                         "call_to_action_text": "",
                         "description": "",
                     },
-                    # preview of second (upcoming) status
-                    {
-                        "date": None,
-                        "label": "In behandeling",
-                        "status_indicator": "success",
-                        "status_indicator_text": "zap",
-                        "call_to_action_url": "",
-                        "call_to_action_text": "",
-                        "description": "",
-                    },
                 ],
+                "second_status_preview": self.second_status_preview,
+                "end_statustype_data": {
+                    "label": "Finish",
+                    "status_indicator": "success",
+                    "status_indicator_text": "bar",
+                    "call_to_action_url": "https://www.example.com",
+                    "call_to_action_text": "Click me",
+                },
                 # only one visible information object
                 "documents": [self.informatie_object_file],
                 "initiator": "Foo Bar van der Bazz",
@@ -939,8 +946,14 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.assertIsNotNone(info_card)
         self.assertEqual(info_card.text.strip(), "info\n\nFoo\nbar")
 
-    def test_expected_information_object_types_are_available_in_upload_form(self, m):
+    @patch(
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype"
+    )
+    def test_expected_information_object_types_are_available_in_upload_form(
+        self, m, upload
+    ):
         self._setUpMocks(m)
+        upload.return_value = True
 
         zaak_type_config = ZaakTypeConfigFactory(
             catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
@@ -975,26 +988,24 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
         self.assertEqual(sorted(type_field.options), sorted(expected_choices))
 
-    def test_case_type_config_description_is_rendered_when_internal_upload(self, m):
+    @patch(
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_internal_file_upload_enabled"
+    )
+    def test_case_type_config_description_is_rendered_when_internal_upload(
+        self, m, upload
+    ):
         self._setUpMocks(m)
+        upload.return_value = True
 
         catalogus = CatalogusConfigFactory(
             url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
         )
-        zaak_type_config = ZaakTypeConfigFactory(
+        ZaakTypeConfigFactory(
             catalogus=catalogus,
             identificatie=self.zaaktype["identificatie"],
             document_upload_enabled=False,
             description="some description content",
         )
-
-        zaak_type_iot_config = ZaakTypeInformatieObjectTypeConfigFactory(
-            zaaktype_config=zaak_type_config,
-            informatieobjecttype_url=self.informatie_object_type["url"],
-            document_upload_enabled=True,
-            zaaktype_uuids=[self.zaaktype["uuid"]],
-        )
-
         response = self.app.get(
             reverse(
                 "cases:case_detail_content",
@@ -1005,8 +1016,14 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
         self.assertContains(response, _("some description content"))
 
-    def test_fixed_text_is_rendered_when_no_description_in_internal_upload(self, m):
+    @patch(
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_internal_file_upload_enabled"
+    )
+    def test_fixed_text_is_rendered_when_no_description_in_internal_upload(
+        self, m, upload
+    ):
         self._setUpMocks(m)
+        upload.return_value = True
 
         catalogus = CatalogusConfigFactory(
             url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
@@ -1018,12 +1035,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             description="",
         )
 
-        zaak_type_iot_config = ZaakTypeInformatieObjectTypeConfigFactory(
-            zaaktype_config=zaak_type_config,
-            informatieobjecttype_url=self.informatie_object_type["url"],
-            document_upload_enabled=True,
-            zaaktype_uuids=[self.zaaktype["uuid"]],
+        status_new_obj, status_finish_obj = factory(
+            Status, [self.status_new, self.status_finish]
         )
+        status_new_obj.statustype = factory(StatusType, self.status_type_new)
 
         response = self.app.get(
             reverse(
@@ -1067,8 +1082,12 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
         self.assertNotIn("document-upload", response.forms)
 
-    def test_successful_document_upload_flow(self, m):
+    @patch(
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype"
+    )
+    def test_successful_document_upload_flow(self, m, upload):
         self._setUpMocks(m)
+        upload.return_value = True
 
         zaak_type_config = ZaakTypeConfigFactory(
             catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
@@ -1107,8 +1126,12 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             ),
         )
 
-    def test_successful_document_upload_flow_with_uppercase_extension(self, m):
+    @patch(
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype"
+    )
+    def test_successful_document_upload_flow_with_uppercase_extension(self, m, upload):
         self._setUpMocks(m)
+        upload.return_value = True
 
         zaak_type_config = ZaakTypeConfigFactory(
             catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
@@ -1152,8 +1175,12 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             ),
         )
 
-    def test_upload_file_flow_fails_with_invalid_file_extension(self, m):
+    @patch(
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype"
+    )
+    def test_upload_file_flow_fails_with_invalid_file_extension(self, m, upload):
         self._setUpMocks(m)
+        upload.return_value = True
 
         zaak_type_config = ZaakTypeConfigFactory(
             catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
@@ -1187,8 +1214,12 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             },
         )
 
-    def test_upload_with_larger_file_size_fails(self, m):
+    @patch(
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype"
+    )
+    def test_upload_with_larger_file_size_fails(self, m, upload):
         self._setUpMocks(m)
+        upload.return_value = True
 
         zaak_type_config = ZaakTypeConfigFactory(
             catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
@@ -1367,8 +1398,12 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             response, _("By clicking the button below you can upload a document.")
         )
 
-    def test_request_error_in_uploading_document_shows_proper_message(self, m):
+    @patch(
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype"
+    )
+    def test_request_error_in_uploading_document_shows_proper_message(self, m, upload):
         self._setUpMocks(m)
+        upload.return_value = True
 
         zaak_type_config = ZaakTypeConfigFactory(
             catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
@@ -1407,8 +1442,14 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             ),
         )
 
-    def test_request_error_in_connecting_doc_with_zaak_shows_proper_message(self, m):
+    @patch(
+        "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype"
+    )
+    def test_request_error_in_connecting_doc_with_zaak_shows_proper_message(
+        self, m, upload
+    ):
         self._setUpMocks(m)
+        upload.return_value = True
 
         zaak_type_config = ZaakTypeConfigFactory(
             catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
