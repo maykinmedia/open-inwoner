@@ -25,10 +25,26 @@ export class FileInput extends Component {
 
   /**
    * Return the input associated with the file input.
-   * @return {HTMLInputElement}
+   * @return HTMLInputElement
    */
   getInput() {
     return this.node.querySelector(`${FileInput.selector}__input`)
+  }
+
+  /**
+   * Return the label when zero files are selected.
+   * @return {HTMLInputElement}
+   */
+  getLabelEmpty() {
+    return this.node.querySelector(`${FileInput.selector}__empty`)
+  }
+
+  /**
+   * Return the label if more than 0 files are selected.
+   * @return {HTMLInputElement}
+   */
+  getLabelSelected() {
+    return this.node.querySelector(`${FileInput.selector}__selected`)
   }
 
   /**
@@ -41,7 +57,7 @@ export class FileInput extends Component {
 
   /**
    * Return the element associated with the file list.
-   * @return {HTMLUListElement} File list element.
+   * @return {HTMLUListElement}
    */
   getFilesList() {
     return this.node.querySelector(`${FileInput.selector} .file-list__list`)
@@ -49,7 +65,7 @@ export class FileInput extends Component {
 
   /**
    * Returns the element associated with the help section.
-   * @return {HTMLDivElement} Help section element.
+   * @return {HTMLDivElement}
    */
   getUploadHelpElement() {
     return document.querySelector('.p--upload-help')
@@ -92,7 +108,7 @@ export class FileInput extends Component {
 
   /**
    * Gets called when files are dropped on the card (drop zone).
-   * @param {DragEvent} e - The drag event.
+   * @param {DragEvent} e
    */
   onDrop(e) {
     e.preventDefault()
@@ -124,7 +140,7 @@ export class FileInput extends Component {
 
   /**
    * Gets called when click event is received on the files list, it originates from a delete button, handle the deletion accordingly.
-   * @param {PointerEvent} e - The click event.
+   * @param {PointerEvent} e
    */
   onClick(e) {
     e.preventDefault()
@@ -153,7 +169,7 @@ export class FileInput extends Component {
 
   /**
    * Generic no op (no operation) event handler. Calls `preventDefault()` on given event.
-   * @param {Event} e - The event.
+   * @param {Event} e
    */
   noop(e) {
     e.preventDefault()
@@ -161,7 +177,7 @@ export class FileInput extends Component {
 
   /**
    * Adds files in dataTransfer to input, only the first item is added if not `[multiple]`.
-   * @param {File[]} files - Array of files to add.
+   * @param {File[]} files
    */
   addFiles(files) {
     const input = this.getInput()
@@ -180,9 +196,14 @@ export class FileInput extends Component {
   render() {
     const { files } = this.getInput()
     const filesSection = this.getFilesSection()
+    const additionalLabel = this.getLabelSelected()
+    const emptyLabel = this.getLabelEmpty()
 
-    // Only show files section when files are selected.
+    // Only show these sections when files are selected.
     filesSection.toggleAttribute('hidden', !files.length)
+    additionalLabel.toggleAttribute('hidden', !files.length)
+    // Hide label when no files are selected
+    emptyLabel.toggleAttribute('hidden', files.length > 0)
 
     // Populate the file list.
     const html = [...files].map((file) => this.renderFileHTML(file)).join('')
@@ -191,8 +212,8 @@ export class FileInput extends Component {
 
   /**
    * Returns the HTML to be used for a file.
-   * @param {File} file - The file to render HTML for.
-   * @return {string} HTML for the file.
+   * @param {File} file
+   * @return {string}
    */
   renderFileHTML(file) {
     const { name, size, type } = file

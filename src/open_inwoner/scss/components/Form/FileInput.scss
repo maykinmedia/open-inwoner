@@ -19,6 +19,21 @@
   .card__body {
     box-sizing: border-box;
     padding: var(--row-height);
+
+    .button--borderless {
+      display: flex;
+      gap: var(--spacing-medium);
+      color: var(--color-primary);
+      font-weight: bold;
+
+      [class*='icon'] {
+        color: var(--color-primary);
+        font-size: var(--font-size-body);
+        position: static !important;
+        transform: none !important;
+        height: var(--font-size-body);
+      }
+    }
   }
 
   [class*='icon'] {

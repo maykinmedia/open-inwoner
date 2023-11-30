@@ -5,6 +5,6 @@
     {% csrf_token %}
     {% input form.type no_label=True no_help=True class="label input" id="id_type" extra_classes="file-type__select" %}
     {% file_input form.files %}
-    {% form_actions primary_text=_("Upload documenten") primary_icon="arrow_forward" enctype="multipart/form-data" %}
+    {% form_actions primary_text=_("Upload documenten") enctype="multipart/form-data" %}
     <p class="p--upload-error p--small p--upload-info p--upload-help">{% trans "Verwijder eerst bestanden die niet voldoen aan de voorwaarden" %}</p>
 {% endrender_form %}

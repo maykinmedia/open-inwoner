@@ -3,5 +3,5 @@
     {% if secondary_text %}{% button href=secondary_href secondary=secondary text=secondary_text icon=secondary_icon icon_position=secondary_icon_position form_id=form_id %}{% endif %}
     {% if secondary_name %}{% button name=secondary_name type="submit" secondary=secondary text=secondary_text icon=secondary_icon icon_position=secondary_icon_position form_id=form_id %}{% endif %}
     {% if secondary_value %}{% button name=secondary_name value=secondary_value type="submit" secondary=secondary text=secondary_text icon=secondary_icon icon_position=secondary_icon_position form_id=form_id %}{% endif %}
-    {% button text=primary_text icon=primary_icon primary=primary type="submit" icon_position="after" hide_text=hide_primary_text transparent=transparent form_id=form_id %}
+    {% button text=primary_text icon=primary_icon primary=primary type="submit" icon_position="after" hide_text=hide_primary_text transparent=transparent form_id=form_id extra_classes="button--fullwidth" %}
 </div>

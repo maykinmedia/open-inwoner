@@ -15,7 +15,7 @@ input[type='file'] {
   @media (min-width: 768px) {
     display: flex;
     flex-direction: column;
-    min-width: var(--form-width);
+    min-width: var(--mobile-xs-width);
   }
 }
 
