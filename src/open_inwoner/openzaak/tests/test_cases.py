@@ -14,7 +14,7 @@ from zgw_consumers.constants import APITypes
 from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 
 from open_inwoner.accounts.choices import LoginTypeChoices
-from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.accounts.tests.factories import UserFactory, eHerkenningUserFactory
 from open_inwoner.cms.cases.views.cases import InnerCaseListView
 from open_inwoner.openzaak.tests.shared import FORMS_ROOT
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
@@ -130,6 +130,7 @@ class CaseListAccessTests(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
     inner_url = reverse_lazy("cases:cases_content")
+    maxDiff = None
 
     @classmethod
     def setUpTestData(cls):
@@ -137,6 +138,11 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
 
         cls.user = UserFactory(
             login_type=LoginTypeChoices.digid, bsn="900222086", email="johm@smith.nl"
+        )
+        cls.eherkenning_user = eHerkenningUserFactory.create(
+            kvk="12345678",
+            rsin="123456789",
+            login_type=LoginTypeChoices.eherkenning,
         )
         # services
         cls.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
@@ -243,6 +249,32 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
             datumStatusGezet="2021-03-12",
             statustoelichting="",
         )
+        cls.zaak_eherkenning1 = generate_oas_component(
+            "zrc",
+            "schemas/Zaak",
+            url=f"{ZAKEN_ROOT}zaken/bf558d78-280d-4723-b8e8-2b6179cd74e3",
+            uuid="bf558d78-280d-4723-b8e8-2b6179cd74e3",
+            zaaktype=cls.zaaktype["url"],
+            identificatie="ZAAK-2022-0000000003",
+            omschrijving="Coffee zaak 3",
+            startdatum="2022-01-02",
+            einddatum=None,
+            status=f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+        )
+        cls.zaak_eherkenning2 = generate_oas_component(
+            "zrc",
+            "schemas/Zaak",
+            url=f"{ZAKEN_ROOT}zaken/ff5026c8-5d1f-4bd2-a069-58d4bf75ec8c",
+            uuid="ff5026c8-5d1f-4bd2-a069-58d4bf75ec8c",
+            zaaktype=cls.zaaktype["url"],
+            identificatie="ZAAK-2022-0000000004",
+            omschrijving="Coffee zaak 4",
+            startdatum="2022-02-02",
+            einddatum=None,
+            status=f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+        )
         # closed
         cls.zaak3 = generate_oas_component(
             "zrc",
@@ -314,6 +346,20 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
                 [self.zaak1, self.zaak2, self.zaak3, self.zaak_intern]
             ),
         )
+        for identifier in [self.eherkenning_user.kvk, self.eherkenning_user.rsin]:
+            m.get(
+                furl(f"{ZAKEN_ROOT}zaken")
+                .add(
+                    {
+                        "rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__innNnpId": identifier,
+                        "maximaleVertrouwelijkheidaanduiding": VertrouwelijkheidsAanduidingen.beperkt_openbaar,
+                    }
+                )
+                .url,
+                json=paginated_response(
+                    [self.zaak_eherkenning1, self.zaak_eherkenning2]
+                ),
+            )
         for resource in [
             self.zaaktype,
             self.status_type1,
@@ -391,6 +437,83 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
                 ],
             },
         )
+
+    def test_list_cases_for_eherkenning_user(self, m):
+        self._setUpMocks(m)
+
+        for fetch_eherkenning_zaken_with_rsin in [True, False]:
+            with self.subTest(
+                fetch_eherkenning_zaken_with_rsin=fetch_eherkenning_zaken_with_rsin
+            ):
+                self.config.fetch_eherkenning_zaken_with_rsin = (
+                    fetch_eherkenning_zaken_with_rsin
+                )
+                self.config.save()
+
+                m.reset_mock()
+
+                response = self.app.get(
+                    self.inner_url,
+                    user=self.eherkenning_user,
+                    headers={"HX-Request": "true"},
+                )
+
+                self.assertListEqual(
+                    response.context["cases"],
+                    [
+                        {
+                            "uuid": self.zaak_eherkenning2["uuid"],
+                            "start_date": datetime.date.fromisoformat(
+                                self.zaak_eherkenning2["startdatum"]
+                            ),
+                            "end_date": None,
+                            "identification": self.zaak_eherkenning2["identificatie"],
+                            "description": self.zaaktype["omschrijving"],
+                            "current_status": self.status_type1["omschrijving"],
+                            "statustype_config": self.zt_statustype_config1,
+                            "case_type": "Zaak",
+                        },
+                        {
+                            "uuid": self.zaak_eherkenning1["uuid"],
+                            "start_date": datetime.date.fromisoformat(
+                                self.zaak_eherkenning1["startdatum"]
+                            ),
+                            "end_date": None,
+                            "identification": self.zaak_eherkenning1["identificatie"],
+                            "description": self.zaaktype["omschrijving"],
+                            "current_status": self.status_type1["omschrijving"],
+                            "statustype_config": self.zt_statustype_config1,
+                            "case_type": "Zaak",
+                        },
+                    ],
+                )
+                # don't show internal cases
+                self.assertNotContains(response, self.zaak_intern["omschrijving"])
+                self.assertNotContains(response, self.zaak_intern["identificatie"])
+
+                # check zaken request query parameters
+                list_zaken_req = [
+                    req
+                    for req in m.request_history
+                    if req.hostname == "zaken.nl" and req.path == "/api/v1/zaken"
+                ][0]
+                identifier = (
+                    self.eherkenning_user.rsin
+                    if fetch_eherkenning_zaken_with_rsin
+                    else self.eherkenning_user.kvk
+                )
+                self.assertEqual(len(list_zaken_req.qs), 2)
+                self.assertEqual(
+                    list_zaken_req.qs,
+                    {
+                        "rol__betrokkeneidentificatie__nietnatuurlijkpersoon__innnnpid": [
+                            identifier
+                        ],
+                        "maximalevertrouwelijkheidaanduiding": [
+                            VertrouwelijkheidsAanduidingen.beperkt_openbaar
+                        ],
+                    },
+                )
 
     def test_format_zaak_identificatie(self, m):
         config = OpenZaakConfig.get_solo()

@@ -22,7 +22,7 @@ from zgw_consumers.constants import APITypes
 from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 
 from open_inwoner.accounts.choices import LoginTypeChoices
-from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.accounts.tests.factories import UserFactory, eHerkenningUserFactory
 from open_inwoner.cms.cases.views.status import SimpleFile
 from open_inwoner.openzaak.constants import StatusIndicators
 from open_inwoner.openzaak.tests.factories import (
@@ -50,6 +50,11 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         cls.user = UserFactory(
             login_type=LoginTypeChoices.digid, bsn="900222086", email="johm@smith.nl"
         )
+        cls.eherkenning_user = eHerkenningUserFactory.create(
+            kvk="12345678",
+            rsin="123456789",
+            login_type=LoginTypeChoices.eherkenning,
+        )
         # services
         cls.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
         cls.catalogi_service = ServiceFactory(
@@ -75,6 +80,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             "cases:case_detail_content",
             kwargs={"object_id": "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d"},
         )
+        cls.eherkenning_case_detail_url = reverse(
+            "cases:case_detail_content",
+            kwargs={"object_id": "3b751e7e-cf17-4200-9ee4-4a42d801ea21"},
+        )
 
         #
         # zaken
@@ -86,6 +95,21 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             url=f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
             zaaktype=f"{CATALOGI_ROOT}zaaktypen/0caa29cb-0167-426f-8dc1-88bebd7c8804",
             identificatie="ZAAK-2022-0000000024",
+            omschrijving="Zaak naar aanleiding van ingezonden formulier",
+            startdatum="2022-01-02",
+            einddatumGepland="2022-01-04",
+            uiterlijkeEinddatumAfdoening="2022-01-05",
+            status=f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
+            resultaat=f"{ZAKEN_ROOT}resultaten/a44153aa-ad2c-6a07-be75-15add5113",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+        )
+        cls.zaak_eherkenning = generate_oas_component(
+            "zrc",
+            "schemas/Zaak",
+            uuid="3b751e7e-cf17-4200-9ee4-4a42d801ea21",
+            url=f"{ZAKEN_ROOT}zaken/3b751e7e-cf17-4200-9ee4-4a42d801ea21",
+            zaaktype=f"{CATALOGI_ROOT}zaaktypen/0caa29cb-0167-426f-8dc1-88bebd7c8804",
+            identificatie="ZAAK-2022-0000000025",
             omschrijving="Zaak naar aanleiding van ingezonden formulier",
             startdatum="2022-01-02",
             einddatumGepland="2022-01-04",
@@ -196,6 +220,32 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             betrokkeneType=RolTypes.natuurlijk_persoon,
             betrokkeneIdentificatie={
                 "inpBsn": "900222086",
+                "voornamen": "Foo Bar",
+                "voorvoegselGeslachtsnaam": "van der",
+                "geslachtsnaam": "Bazz",
+            },
+        )
+        cls.eherkenning_user_role_rsin = generate_oas_component(
+            "zrc",
+            "schemas/Rol",
+            url=f"{ZAKEN_ROOT}rollen/ff4a3ae8-bf31-40cd-9db1-7ca9a0c8aea9",
+            omschrijvingGeneriek=RolOmschrijving.initiator,
+            betrokkeneType=RolTypes.niet_natuurlijk_persoon,
+            betrokkeneIdentificatie={
+                "innNnpId": "123456789",
+                "voornamen": "Foo Bar",
+                "voorvoegselGeslachtsnaam": "van der",
+                "geslachtsnaam": "Bazz",
+            },
+        )
+        cls.eherkenning_user_role_kvk = generate_oas_component(
+            "zrc",
+            "schemas/Rol",
+            url=f"{ZAKEN_ROOT}rollen/ff4a3ae8-bf31-40cd-9db1-7ca9a0c8aea9",
+            omschrijvingGeneriek=RolOmschrijving.initiator,
+            betrokkeneType=RolTypes.niet_natuurlijk_persoon,
+            betrokkeneIdentificatie={
+                "innNnpId": "12345678",
                 "voornamen": "Foo Bar",
                 "voorvoegselGeslachtsnaam": "van der",
                 "geslachtsnaam": "Bazz",
@@ -331,6 +381,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
         for resource in [
             self.zaak,
+            self.zaak_eherkenning,
             self.result,
             self.zaaktype,
             self.informatie_object_type,
@@ -352,6 +403,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             f"{ZAKEN_ROOT}zaakinformatieobjecten?zaak={self.zaak['url']}",
             json=[self.zaak_informatie_object, self.zaak_informatie_object_invisible],
         )
+        m.get(
+            f"{ZAKEN_ROOT}zaakinformatieobjecten?zaak={self.zaak_eherkenning['url']}",
+            json=[],
+        )
         if use_eindstatus:
             m.get(
                 f"{ZAKEN_ROOT}statussen?zaak={self.zaak['url']}",
@@ -364,6 +419,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 json=paginated_response([self.status_new]),
             )
         m.get(
+            f"{ZAKEN_ROOT}statussen?zaak={self.zaak_eherkenning['url']}",
+            json=paginated_response([]),
+        )
+        m.get(
             f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}",
             json=paginated_response([self.user_role, self.not_initiator_role]),
         )
@@ -372,6 +431,12 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             # Taiga #961 this is not an accurate OpenZaak response as it has a 'behandelaar' even when we filter on 'initiator'
             # but eSuite doesn't filter the response in the API, so we use filtering in Python to remove the not-initiator
             json=paginated_response([self.user_role, self.not_initiator_role]),
+        )
+        m.get(
+            f"{ZAKEN_ROOT}rollen?zaak={self.zaak_eherkenning['url']}",
+            json=paginated_response(
+                [self.eherkenning_user_role_kvk, self.eherkenning_user_role_rsin]
+            ),
         )
         m.post(
             f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten",
@@ -570,6 +635,25 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.assertContains(response, "Coffee zaaktype")
         self.assertContains(response, "uploaded_document_title")
 
+    def test_page_displays_expected_data_for_eherkenning_user(self, m):
+        self._setUpMocks(m)
+
+        for fetch_eherkenning_zaken_with_rsin in [True, False]:
+            with self.subTest(
+                fetch_eherkenning_zaken_with_rsin=fetch_eherkenning_zaken_with_rsin
+            ):
+                self.config.fetch_eherkenning_zaken_with_rsin = (
+                    fetch_eherkenning_zaken_with_rsin
+                )
+                self.config.save()
+
+                response = self.app.get(
+                    self.eherkenning_case_detail_url, user=self.eherkenning_user
+                )
+
+                self.assertContains(response, "ZAAK-2022-0000000025")
+                self.assertContains(response, "Coffee zaaktype")
+
     def test_page_reformats_zaak_identificatie(self, m):
         self._setUpMocks(m)
 
@@ -666,6 +750,87 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         #     json=paginated_response([self.status_finish, self.status_new]),
         # )
         response = self.app.get(self.case_detail_url, user=self.user)
+
+        self.assertTemplateUsed("pages/cases/403.html")
+        self.assertContains(
+            response, _("Sorry, you don't have access to this page (403)")
+        )
+
+    def test_no_access_when_no_roles_are_found_for_user_kvk_or_rsin(self, m):
+        self._setUpOASMocks(m)
+
+        not_initiator_role = generate_oas_component(
+            "zrc",
+            "schemas/Rol",
+            url=f"{ZAKEN_ROOT}rollen/aa353aa-ad2c-4a07-ae75-15add5822",
+            omschrijvingGeneriek=RolOmschrijving.behandelaar,
+            betrokkeneType=RolTypes.niet_natuurlijk_persoon,
+            betrokkeneIdentificatie={
+                "innNnpId": "987654321",
+                "voornamen": "Somebody",
+                "geslachtsnaam": "Else",
+            },
+        )
+
+        m.get(self.zaak["url"], json=self.zaak)
+        m.get(self.zaaktype["url"], json=self.zaaktype)
+        m.get(
+            f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}",
+            # no roles for our user found
+            json=paginated_response([not_initiator_role]),
+        )
+
+        for fetch_eherkenning_zaken_with_rsin in [True, False]:
+            with self.subTest(
+                fetch_eherkenning_zaken_with_rsin=fetch_eherkenning_zaken_with_rsin
+            ):
+                self.config.fetch_eherkenning_zaken_with_rsin = (
+                    fetch_eherkenning_zaken_with_rsin
+                )
+                self.config.save()
+
+                response = self.app.get(
+                    self.case_detail_url, user=self.eherkenning_user
+                )
+
+                self.assertTemplateUsed("pages/cases/403.html")
+                self.assertContains(
+                    response, _("Sorry, you don't have access to this page (403)")
+                )
+
+    def test_no_access_if_fetch_eherkenning_zaken_with_rsin_and_user_has_no_rsin(
+        self, m
+    ):
+        self._setUpOASMocks(m)
+
+        not_initiator_role = generate_oas_component(
+            "zrc",
+            "schemas/Rol",
+            url=f"{ZAKEN_ROOT}rollen/aa353aa-ad2c-4a07-ae75-15add5822",
+            omschrijvingGeneriek=RolOmschrijving.behandelaar,
+            betrokkeneType=RolTypes.niet_natuurlijk_persoon,
+            betrokkeneIdentificatie={
+                "innNnpId": "987654321",
+                "voornamen": "Somebody",
+                "geslachtsnaam": "Else",
+            },
+        )
+
+        m.get(self.zaak["url"], json=self.zaak)
+        m.get(self.zaaktype["url"], json=self.zaaktype)
+        m.get(
+            f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}",
+            # no roles for our user found
+            json=paginated_response([not_initiator_role]),
+        )
+
+        self.config.fetch_eherkenning_zaken_with_rsin = True
+        self.config.save()
+
+        self.eherkenning_user.rsin = None
+        self.eherkenning_user.save()
+
+        response = self.app.get(self.case_detail_url, user=self.eherkenning_user)
 
         self.assertTemplateUsed("pages/cases/403.html")
         self.assertContains(
