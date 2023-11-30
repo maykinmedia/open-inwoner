@@ -6,7 +6,7 @@
     {% render_card direction="vertical" %}
         {% icon icon="upload" icon_position="before" outlined=True %}
         <input class="file-input__input" id="{{ field.auto_id }}" name="file" type="file"{% if field.field.required %} required{% endif %}{% if multiple %} multiple{% endif %} data-max-size="{{ openzaak_config.max_upload_size }}">
-        <label class="button button--primary file-input__empty" for="{{ field.auto_id }}">
+        <label class="button button--primary file-input__label-empty" for="{{ field.auto_id }}">
             {% if multiple %}{% trans 'Sleep of selecteer bestanden' %}{% else %}{% trans 'Sleep of selecteer bestand' %}{% endif %}
         </label>
         <div class="file-input__selected">
@@ -17,7 +17,7 @@
         </div>
     {% endrender_card %}
 
-    {% if field.help_text %}<p class="p p--small p--upload-info">{{ field.help_text }}</p>{% endif %}
+    {% if field.help_text %}<p class="p p--small p--centered">{{ field.help_text }}</p>{% endif %}
     {% if field.errors %}{% errors errors=field.errors %}{% endif %}
 
     <div class="file-list" aria-live="polite">

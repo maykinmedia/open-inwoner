@@ -9,10 +9,10 @@ export class FileInput extends Component {
 
   /**
    * Get configured maximum filesize from 'data-max-size' and use in node.
-   * @returns {string} Maximum file size.
+   * @returns {number} Maximum file size.
    */
   getLimit() {
-    return this.getInput().dataset.maxSize
+    return parseInt(this.getInput().dataset.maxSize)
   }
 
   /**
@@ -33,15 +33,15 @@ export class FileInput extends Component {
 
   /**
    * Return the label when zero files are selected.
-   * @return {HTMLInputElement}
+   * @return HTMLInputElement
    */
   getLabelEmpty() {
-    return this.node.querySelector(`${FileInput.selector}__empty`)
+    return this.node.querySelector(`${FileInput.selector}__label-empty`)
   }
 
   /**
    * Return the label if more than 0 files are selected.
-   * @return {HTMLInputElement}
+   * @return HTMLInputElement
    */
   getLabelSelected() {
     return this.node.querySelector(`${FileInput.selector}__selected`)
@@ -64,11 +64,11 @@ export class FileInput extends Component {
   }
 
   /**
-   * Returns the element associated with the help section.
+   * Returns the element associated with the error section that informs to delete files that exceed the limit.
    * @return {HTMLDivElement}
    */
-  getUploadHelpElement() {
-    return document.querySelector('.p--upload-help')
+  getFormNonFieldError() {
+    return document.querySelector('.form__non-field-error')
   }
 
   /**
@@ -220,6 +220,7 @@ export class FileInput extends Component {
     const ext = name.split('.').pop().toUpperCase()
     const sizeMB = (size / (1024 * 1024)).toFixed(2)
     const labelDelete = this.getFilesList().dataset.labelDelete || 'Delete'
+    const getFormNonFieldError = this.getFormNonFieldError()
 
     // Only show errors notification if data-max-file-size is exceeded + add error class to file-list
     const maxMegabytes = this.getLimit()
@@ -250,18 +251,17 @@ export class FileInput extends Component {
       </li>`
 
     if (sizeMB > maxMegabytes) {
-      const uploadHelpElement = this.getUploadHelpElement()
-      if (uploadHelpElement) {
-        uploadHelpElement.classList.add('error')
-      }
+      getFormNonFieldError.removeAttribute('hidden')
 
       return (
         htmlStart +
-        `<p class="p p--upload-error error">
+        `<p class="p p--small p--centered error">
           <span aria-hidden="true" class="material-icons-outlined">warning_amber</span>
           Dit bestand is te groot
         </p>`
       )
+    } else {
+      getFormNonFieldError.setAttribute('hidden', 'hidden')
     }
 
     return htmlStart

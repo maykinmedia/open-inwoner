@@ -37,20 +37,6 @@
       margin: 0;
     }
 
-    .p--upload-info {
-      text-align: center;
-
-      &.p--upload-help {
-        display: none;
-
-        &.error {
-          color: var(--color-gray-dark);
-          display: block;
-          margin-top: var(--spacing-medium);
-        }
-      }
-    }
-
     /// Make required asterisk visible for this component
     .label__label--required {
       color: var(--color-red);
