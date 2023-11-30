@@ -95,6 +95,7 @@ def settings(request):
         "warning_banner_text": config.warning_banner_text,
         "warning_banner_background_color": config.warning_banner_background_color,
         "warning_banner_font_color": config.warning_banner_font_color,
+        "eherkenning_enabled": config.eherkenning_enabled,
     }
 
     if hasattr(django_settings, "SENTRY_CONFIG"):

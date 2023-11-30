@@ -233,8 +233,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         constraints = [
             UniqueConstraint(
                 fields=["email"],
-                condition=~Q(login_type=LoginTypeChoices.digid),
-                name="unique_email_when_not_digid",
+                condition=~Q(login_type=LoginTypeChoices.digid)
+                & ~Q(login_type=LoginTypeChoices.eherkenning),
+                name="unique_email_when_not_digid_or_eherkenning",
             ),
             # UniqueConstraint(
             #     fields=["bsn"],
@@ -297,11 +298,17 @@ class User(AbstractBaseUser, PermissionsMixin):
                     {"email": ValidationError(_("This account has been deactivated"))}
                 )
 
-        # all accounts with duplicate emails have login_type digid
-        if self.login_type == LoginTypeChoices.digid:
+        # all accounts with duplicate emails have login_type digid or eHerkenning
+        if self.login_type in (
+            LoginTypeChoices.digid,
+            LoginTypeChoices.eherkenning,
+        ):
             for user in existing_users:
-                if user.login_type != LoginTypeChoices.digid:
-                    # some account does not have login_type digid
+                if user.login_type not in (
+                    LoginTypeChoices.digid,
+                    LoginTypeChoices.eherkenning,
+                ):
+                    # some account does not have login_type digid or eHerkenning
                     raise ValidationError(
                         {"email": ValidationError(_("This email is already taken."))}
                     )
@@ -380,8 +387,15 @@ class User(AbstractBaseUser, PermissionsMixin):
                 or not self.email
                 or self.email.endswith("@example.org")
             )
-        elif self.login_type == LoginTypeChoices.oidc:
-            return not self.email or self.email.endswith("@example.org")
+        elif self.login_type in (
+            LoginTypeChoices.oidc,
+            LoginTypeChoices.eherkenning,
+        ):
+            return (
+                not self.email
+                or self.email.endswith("@example.org")
+                or self.email.endswith("localhost")
+            )
         return False
 
     def get_logout_url(self) -> str:

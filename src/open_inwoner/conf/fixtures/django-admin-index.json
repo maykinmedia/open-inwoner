@@ -301,6 +301,10 @@
                 "digidconfiguration"
             ],
             [
+                "digid_eherkenning",
+                "eherkenningconfiguration"
+            ],
+            [
                 "haalcentraal",
                 "haalcentraalconfig"
             ],

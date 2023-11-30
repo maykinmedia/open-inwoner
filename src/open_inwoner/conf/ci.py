@@ -35,6 +35,7 @@ AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
     # mock login like dev.py
     "digid_eherkenning.mock.backends.DigiDBackend",
+    "eherkenning.mock.backends.eHerkenningBackend",
     "open_inwoner.accounts.backends.CustomOIDCBackend",
 ]
 

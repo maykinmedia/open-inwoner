@@ -11,6 +11,8 @@ from .actions import (
 from .auth import (
     CustomDigiDAssertionConsumerServiceMockView,
     CustomDigiDAssertionConsumerServiceView,
+    CustomeHerkenningAssertionConsumerServiceMockView,
+    CustomeHerkenningAssertionConsumerServiceView,
     LogPasswordChangeView,
     LogPasswordResetConfirmView,
     LogPasswordResetView,

@@ -228,6 +228,10 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
             },
         ),
         (
+            _("Authentication"),
+            {"fields": ("eherkenning_enabled",)},
+        ),
+        (
             _("Analytics"),
             {
                 "fields": (

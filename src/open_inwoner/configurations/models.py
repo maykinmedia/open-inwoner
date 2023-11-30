@@ -485,6 +485,13 @@ class SiteConfiguration(SingletonModel):
         ),
     )
 
+    # authentication options
+    eherkenning_enabled = models.BooleanField(
+        verbose_name=_("eHerkenning authentication enabled"),
+        default=False,
+        help_text=_("Whether users can log in with eHerkenning or not."),
+    )
+
     class Meta:
         verbose_name = _("Site Configuration")
 
