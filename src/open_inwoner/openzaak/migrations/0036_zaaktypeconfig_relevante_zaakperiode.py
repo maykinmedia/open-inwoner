@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("openzaak", "0035_populate_zaaktypeconfig_urls"),
+        ("openzaak", "0034_zaaktypeconfig_urls"),
     ]
 
     operations = [

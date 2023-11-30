@@ -38,7 +38,7 @@ def populate_zaaktype_config_urls(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("openzaak", "0034_zaaktypeconfig_urls"),
+        ("openzaak", "0037_openzaakconfig_fetch_eherkenning_zaken_with_rsin"),
     ]
 
     operations = [

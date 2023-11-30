@@ -6,7 +6,11 @@ from django.views.generic import TemplateView
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.htmx.mixins import RequiresHtmxMixin
-from open_inwoner.openzaak.cases import fetch_cases, preprocess_data
+from open_inwoner.openzaak.cases import (
+    fetch_cases,
+    fetch_cases_by_kvk_or_rsin,
+    preprocess_data,
+)
 from open_inwoner.openzaak.formapi import fetch_open_submissions
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.types import UniformCase
@@ -54,7 +58,14 @@ class InnerCaseListView(
         return _("Mijn aanvragen")
 
     def get_cases(self):
-        raw_cases = fetch_cases(self.request.user.bsn)
+        if self.request.user.kvk:
+            identifier = self.request.user.kvk
+            config = OpenZaakConfig.get_solo()
+            if config.fetch_eherkenning_zaken_with_rsin:
+                identifier = self.request.user.rsin
+            raw_cases = fetch_cases_by_kvk_or_rsin(identifier)
+        else:
+            raw_cases = fetch_cases(self.request.user.bsn)
         preprocessed_cases = preprocess_data(raw_cases)
         return preprocessed_cases
 
