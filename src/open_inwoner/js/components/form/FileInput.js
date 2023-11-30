@@ -44,7 +44,7 @@ export class FileInput extends Component {
    * @return HTMLInputElement
    */
   getLabelSelected() {
-    return this.node.querySelector(`${FileInput.selector}__selected`)
+    return this.node.querySelector(`${FileInput.selector}__label-selected`)
   }
 
   /**
@@ -64,7 +64,7 @@ export class FileInput extends Component {
   }
 
   /**
-   * Returns the element associated with the error section that informs to delete files that exceed the limit.
+   * Returns the element outside of this component, which prompts the user to delete file-items that exceed the limit.
    * @return {HTMLDivElement}
    */
   getFormNonFieldError() {
@@ -122,6 +122,7 @@ export class FileInput extends Component {
 
   /**
    * Gets called when dragging starts on the card (drop zone).
+   * @param {Event} e
    */
   onDragEnter() {
     this.node.classList.add('file-input--drag-active')
@@ -129,7 +130,7 @@ export class FileInput extends Component {
 
   /**
    * Gets called when dragging ends on the card (drop zone).
-   * @param {Event} e - The drag leave event.
+   * @param {Event} e
    */
   onDragLeave(e) {
     if (e.target !== this.getCard()) {
@@ -184,7 +185,7 @@ export class FileInput extends Component {
     const dataTransfer = new DataTransfer()
     const _files = input.multiple ? [...files] : [files[0]]
 
-    _files.filter(Boolean).forEach((file) => dataTransfer.items.add(file))
+    _files.filter((v) => v).forEach((file) => dataTransfer.items.add(file))
     input.files = dataTransfer.files
   }
 

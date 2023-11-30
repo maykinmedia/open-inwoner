@@ -9,12 +9,10 @@
         <label class="button button--primary file-input__label-empty" for="{{ field.auto_id }}">
             {% if multiple %}{% trans 'Sleep of selecteer bestanden' %}{% else %}{% trans 'Sleep of selecteer bestand' %}{% endif %}
         </label>
-        <div class="file-input__selected">
-            <label class="button button--borderless" for="{{ field.auto_id }}">
-            {% icon icon="add_circle_outlined" icon_position="before" outlined=True %}
-                {% if multiple %}{% trans 'Selecteer meer bestanden' %}{% else %}{% trans 'Selecteer ander bestand' %}{% endif %}
-            </label>
-        </div>
+        <label class="button button--borderless file-input__label-selected" for="{{ field.auto_id }}">
+        {% icon icon="add_circle_outlined" icon_position="before" outlined=True %}
+            {% if multiple %}{% trans 'Selecteer meer bestanden' %}{% else %}{% trans 'Selecteer ander bestand' %}{% endif %}
+        </label>
     {% endrender_card %}
 
     {% if field.help_text %}<p class="p p--small p--centered">{{ field.help_text }}</p>{% endif %}

@@ -33,6 +33,10 @@
         transform: none !important;
         height: var(--font-size-body);
       }
+
+      &[hidden] {
+        display: none;
+      }
     }
   }
 
