@@ -8,6 +8,14 @@ export class FileInput extends Component {
   static selector = '.file-input'
 
   /**
+   * Get configured maximum filesize from 'data-max-size' and use in node.
+   * @returns {number} Maximum file size.
+   */
+  getLimit() {
+    return parseInt(this.getInput().dataset.maxSize)
+  }
+
+  /**
    * Returns the card (drop zone) associated with the file input.
    * @return {HTMLDivElement}
    */
@@ -24,6 +32,22 @@ export class FileInput extends Component {
   }
 
   /**
+   * Return the label when zero files are selected.
+   * @return HTMLInputElement
+   */
+  getLabelEmpty() {
+    return this.node.querySelector(`${FileInput.selector}__label-empty`)
+  }
+
+  /**
+   * Return the label if more than 0 files are selected.
+   * @return HTMLInputElement
+   */
+  getLabelSelected() {
+    return this.node.querySelector(`${FileInput.selector}__label-selected`)
+  }
+
+  /**
    * Return the element associated with the files section.
    * @return {HTMLDivElement}
    */
@@ -37,6 +61,14 @@ export class FileInput extends Component {
    */
   getFilesList() {
     return this.node.querySelector(`${FileInput.selector} .file-list__list`)
+  }
+
+  /**
+   * Returns the element outside of this component, which prompts the user to delete file-items that exceed the limit.
+   * @return {HTMLDivElement}
+   */
+  getFormNonFieldError() {
+    return document.querySelector('.form__non-field-error')
   }
 
   /**
@@ -90,13 +122,15 @@ export class FileInput extends Component {
 
   /**
    * Gets called when dragging starts on the card (drop zone).
+   * @param {Event} e
    */
-  onDragEnter(e) {
+  onDragEnter() {
     this.node.classList.add('file-input--drag-active')
   }
 
   /**
    * Gets called when dragging ends on the card (drop zone).
+   * @param {Event} e
    */
   onDragLeave(e) {
     if (e.target !== this.getCard()) {
@@ -106,8 +140,7 @@ export class FileInput extends Component {
   }
 
   /**
-   * Gets called when click event is received on the files list, it originates from a delete button, handle the deletion
-   * accordingly.
+   * Gets called when click event is received on the files list, it originates from a delete button, handle the deletion accordingly.
    * @param {PointerEvent} e
    */
   onClick(e) {
@@ -164,10 +197,14 @@ export class FileInput extends Component {
   render() {
     const { files } = this.getInput()
     const filesSection = this.getFilesSection()
+    const additionalLabel = this.getLabelSelected()
+    const emptyLabel = this.getLabelEmpty()
 
-    // Only show files section when files are selected.
-    filesSection.setAttribute('hidden', true)
-    files.length && filesSection.removeAttribute('hidden')
+    // Only show these sections when files are selected.
+    filesSection.toggleAttribute('hidden', !files.length)
+    additionalLabel.toggleAttribute('hidden', !files.length)
+    // Hide label when no files are selected
+    emptyLabel.toggleAttribute('hidden', files.length > 0)
 
     // Populate the file list.
     const html = [...files].map((file) => this.renderFileHTML(file)).join('')
@@ -184,27 +221,50 @@ export class FileInput extends Component {
     const ext = name.split('.').pop().toUpperCase()
     const sizeMB = (size / (1024 * 1024)).toFixed(2)
     const labelDelete = this.getFilesList().dataset.labelDelete || 'Delete'
+    const getFormNonFieldError = this.getFormNonFieldError()
 
-    return `
+    // Only show errors notification if data-max-file-size is exceeded + add error class to file-list
+    const maxMegabytes = this.getLimit()
+
+    const htmlStart = `
       <li class="file-list__list-item">
         <aside class="file">
-        <div class="file__container">
-            <div class="file__file">
-                <p class="file__symbol">
+          <div class="file__container">
+            ${
+              sizeMB > maxMegabytes
+                ? '<div class="file__file error">'
+                : '<div class="file__file">'
+            }
+              <p class="file__symbol">
                 <span aria-hidden="true" class="material-icons-outlined">${
                   type.match('image') ? 'image' : 'description'
                 }</span>
-                </p>
-                <p class="p file__data">
-                  <span class="file__name">${name} (${ext}, ${sizeMB}MB)</span>
-                </p>
-                <a class="link link--primary" href="#" role="button" aria-label="${labelDelete}">
-                  <span aria-hidden="true" class="material-icons-outlined">delete</span>
-                </a>
+              </p>
+              <p class="p file__data">
+                <span class="file__name">${name} (${ext}, ${sizeMB}MB)</span>
+              </p>
+              <a class="link link--primary" href="#" role="button" aria-label="${labelDelete}">
+                <span aria-hidden="true" class="material-icons-outlined">delete</span>
+              </a>
             </div>
           </div>
         </aside>
-      </li>
-    `
+      </li>`
+
+    if (sizeMB > maxMegabytes) {
+      getFormNonFieldError.removeAttribute('hidden')
+
+      return (
+        htmlStart +
+        `<p class="p p--small p--centered error">
+          <span aria-hidden="true" class="material-icons-outlined">warning_amber</span>
+          Dit bestand is te groot
+        </p>`
+      )
+    } else {
+      getFormNonFieldError.setAttribute('hidden', 'hidden')
+    }
+
+    return htmlStart
   }
 }

@@ -15,8 +15,9 @@
   }
 
   #document-upload {
+    color: var(--color-gray-dark);
     gap: 0;
-    padding: 0 0 var(--row-height-giant) 0;
+    padding: 0 0 var(--row-height) 0;
 
     &:invalid [type='submit'] {
       @extend .button--disabled;
@@ -28,20 +29,12 @@
       justify-content: center;
       pointer-events: none;
       width: 100%;
-
-      @media (min-width: 768px) {
-        width: initial;
-      }
     }
 
     .file-list,
     .form__actions {
       display: block;
       margin: 0;
-
-      @media (min-width: 768px) {
-        display: grid;
-      }
     }
 
     /// Make required asterisk visible for this component
