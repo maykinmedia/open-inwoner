@@ -52,7 +52,7 @@ class TestAdminSite(WebTest):
         doc = PyQuery(response.content)
 
         warning_msg = doc.find(".warning").text()
-        self.assertEqual(warning_msg, "You cannot delete the last site.")
+        self.assertEqual(warning_msg, _("You cannot delete the last site."))
 
     def test_bulk_delete_success(self):
         site2 = Site.objects.create(id=2, domain="example2.com", name="example2")
@@ -98,7 +98,7 @@ class TestAdminSite(WebTest):
         warning_msg = doc.find(".warning").text()
         self.assertEqual(
             warning_msg,
-            "You cannot delete all websites; at least one site must remain.",
+            _("You cannot delete all websites; at least one site must remain."),
         )
 
 
