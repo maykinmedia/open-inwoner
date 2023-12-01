@@ -33,8 +33,8 @@ class TestShowActions(WebTest):
     def test_when_enabled_and_user_is_logged_in(self):
         response = self.app.get(self.profile_url, user=self.user)
 
-        links = response.pyquery(".personal-overview")
-        self.assertNotEqual(links.find(".personal-overview__actions"), [])
+        links = response.pyquery(".profile-section")
+        self.assertNotEqual(links.find("#profile-section-actions"), [])
         self.assertNotEqual(links.find(f'a[href="{self.actions_list_url}"]'), [])
 
     def test_when_disabled_and_user_is_logged_in(self):
@@ -42,8 +42,8 @@ class TestShowActions(WebTest):
         self.profile_config.save()
         response = self.app.get(self.profile_url, user=self.user)
 
-        links = response.pyquery(".personal-overview")
-        self.assertEqual(links.find(".personal-overview__actions"), [])
+        links = response.pyquery(".profile-section")
+        self.assertEqual(links.find("#profile-section-actions"), [])
         self.assertEqual(links.find(f'a[href="{self.actions_list_url}"]'), [])
 
     def test_action_pages_show_404_when_disabled(self):
