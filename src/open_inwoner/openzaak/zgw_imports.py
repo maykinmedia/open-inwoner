@@ -67,7 +67,7 @@ def import_catalog_configs() -> List[CatalogusConfig]:
             create.append(
                 CatalogusConfig(
                     url=catalog.url,
-                    rsin=catalog.rsin,
+                    rsin=catalog.rsin or "",
                     domein=catalog.domein,
                 )
             )
