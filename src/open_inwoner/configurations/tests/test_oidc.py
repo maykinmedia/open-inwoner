@@ -54,7 +54,7 @@ class OIDCConfigTest(ClearCachesMixin, WebTest):
         link = response.pyquery.find("[title='Inloggen met Azure AD']")
         link_text = link.find(".link__text").text()
 
-        self.assertEqual(link_text, _(""))
+        self.assertEqual(link_text, "")
 
         # admin login
         response = self.client.get(reverse("admin:login"))
