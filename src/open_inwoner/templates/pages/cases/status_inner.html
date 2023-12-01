@@ -56,7 +56,7 @@
 
             {#  Documents. #}
             {% if case.documents %}
-                <h2 class="h2" id="documents">{% trans 'Documenten' %}</h2>
+                <h2 class="h2" id="documents">{% trans 'Documenten' %}{% if case.new_docs %}{% icon icon="fiber_manual_record" outlined=False extra_classes="file__file--recent" %}{% endif %}</h2>
                 {% case_document_list case.documents %}
             {% endif %}
 

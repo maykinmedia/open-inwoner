@@ -196,7 +196,7 @@ class NecessaryUserForm(forms.ModelForm):
         self.fields["infix"].required = False
         self.fields["last_name"].required = True
 
-        if user.is_digid_and_brp():
+        if user.is_digid_user_with_brp:
             self.fields["first_name"].disabled = True
             self.fields["infix"].disabled = True
             self.fields["last_name"].disabled = True

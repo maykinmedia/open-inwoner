@@ -160,8 +160,7 @@
   }
 
   // Active current status should NOT have a line on the left
-  .status-list__list-item.status--current,
-  .status-list__list-item.status--future {
+  .status-list__list-item.status--current {
     &::before {
       top: 10px;
       content: '';

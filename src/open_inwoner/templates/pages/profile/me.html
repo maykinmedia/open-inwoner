@@ -1,145 +1,234 @@
 {% extends 'master.html' %}
-{% load i18n l10n link_tags file_tags button_tags utils icon_tags form_tags anchor_menu_tags dropdown_tags %}
+{% load i18n l10n link_tags file_tags grid_tags list_tags button_tags utils icon_tags form_tags anchor_menu_tags dropdown_tags %}
 
 {% block sidebar_content %}
-{% anchor_menu anchors desktop=True %}
+    {% anchor_menu anchors desktop=True %}
 {% endblock sidebar_content %}
 
 {% block content %}
-<h1 class="h1" id="title">
-    {% trans "Persoonlijke gegevens" %}
 
-    {% button_row align="right" %}
-        {% dropdown icon="settings" secondary=True %}
-            <div class="dropdown__item">
-                {% button href="profile:edit" text=_("Bewerken") icon="edit" transparent=True %}
-            </div>
-            {% if can_change_password %}
-                <div class="dropdown__item">
-                    {% button href="password_change" text=_("Wijzig wachtwoord") icon="key" transparent=True %}
-                </div>
-            {% endif %}
-        {% enddropdown %}
-        {% button href="profile:export" icon="file-pdf" text=_("Exporteer naar PDF") hide_text=True icon_outlined=True transparent=True secondary=True %}
-    {% endbutton_row %}
-</h1>
+{% with user=request.user %}
 
-<div class="personal-information">
-    <div class="personal-information__block personal-information__block--bold">
-        {% icon icon="person_outline" %}<br>
-        {{ request.user.get_full_name }}<br>
-	    {{ request.user.email }}<br>
-	    {% if request.user.phonenumber %}{{ request.user.phonenumber }}<br>{% endif %}
-        {% if request.user.get_address %}{{ request.user.get_address }}{% else %}-{% endif %}
-    </div>
-    <div class="personal-information__block">
-        {% icon icon="calendar_today" %}<br>
-        {% trans "Geboortedatum" %}:<br>
-        {% if request.user.birthday %}{{ request.user.birthday|date:"d-m-Y" }}{% else %}-{% endif %}
-    </div>
-    <div class="personal-information__block">
-        {% icon icon="desktop_windows" %}<br>
-        {% trans "Actief sinds" %}:<br>
-        {{ request.user.date_joined|date:"d-m-Y" }}
-    </div>
-    <div class="personal-information__block">
-        {% icon icon="content_paste" %}<br>
-        {% trans "Volgende actie" %}:<br>
-        {{ next_action.end_date|date:"d-m-Y" }}
-    </div>
+<div class="tabled tabled--flexible">
+    <h1 class="h1 tabled__title">{% trans "Welkom" %}, {{ user.first_name }}</h1>
+    <span class="tabled__key">{%trans "voor het laatst ingelogd op" %}: <span class="tabled__value">{{ user.last_login|date:"d-m-Y" }} om {{ user.last_login|date:"H:i" }} uur</span></span>
 </div>
 
-<div class="tabled tabled--flexible personal-overview">
-    <h2 class="h2" id="overview">{% trans "Overzicht" %}</h2>
-    {% if request.user.is_digid_and_brp and view.config.my_data %}
-        <div class="tabled__row">
-            <div class="tabled__item tabled__item--bold">{% link href="profile:categories" text=_('My details') %}</div>
-            <div class="tabled__item">{{request.user.get_full_name}}{% if request.user.get_address %}, {{ request.user.get_address }}{% endif %}</div>
-            <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="profile:data" text="Bekijken" icon="arrow_forward" icon_position="after" primary=True %}</div>
-        </div>
-    {% endif %}
-
-    {% if view.config.mentors %}
-        <div class="tabled__row">
-            <div class="tabled__item tabled__item--bold">
-                {% if mentor_contacts %}
-                    {% url 'profile:contact_list' as mentor_url %}
-                    {% link href=mentor_url|add:"?type=begeleider" text=_('My mentor(s)') %}
-                {% else %}
-                    {% trans "Begeleider(s)" %}
+{# Personal information #}
+<div class="tabled tabled--flexible profile-section" id="personal-info">
+    <div class="tabled__section">
+        <h2 class="h2 title" id="personal-overview">{% trans "Persoonlijke gegevens" %}
+            <div class="tabled__item--force-right tabled__item--mobile-big">
+                {% button href="profile:edit" text=_("Bewerken") icon="edit" transparent=True %}
+                {% if user.is_digid_user_with_brp and view.config.my_data %}
+                    {% button href="profile:data" text=_("My details") icon="info" transparent=True icon_outlined=True %}
+                {% elif not user.is_digid_user %}
+                    {% button href="password_change" text=_("Password") icon="key" transparent=True %}
                 {% endif %}
             </div>
-            {% if mentor_contacts %}
-                <div class="tabled__item">{{ mentor_contacts|join:", " }}</div>
-                {% url 'profile:contact_list' as mentor_url %}
-		{% if inbox_page_is_published %}
-		    <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href=mentor_url|add:"?type=begeleider" text="Stuur een bericht" icon="arrow_forward" icon_position="after" secondary=True %}</div>
-		{% endif %}
-            {% else %}
-                <div class="tabled__item">{% trans "U heeft (nog) geen gemeentelijke begeleider." %}</div>
-                <div class="tabled__item tabled__item--force-right tabled__item--mobile-big"></div>
-            {% endif %}
-        </div>
-    {% endif %}
-
-    {% if view.config.my_contacts %}
-        <div class="tabled__row">
-            <div class="tabled__item tabled__item--bold">{% link href="profile:contact_list" text=_('My contacts') %}</div>
-            <div class="tabled__item">{{ contact_text }}</div>
-            <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="profile:contact_list" text=_("Beheer contacten") icon="arrow_forward" icon_position="after" secondary=True %}</div>
-        </div>
-    {% endif %}
-
-    {% if questionnaire_exists and view.config.selfdiagnose %}
-        <div class="tabled__row">
-            <div class="tabled__item tabled__item--bold">{% link href="products:questionnaire_list" text=_('Zelftest') %}</div>
-            <div class="tabled__item"></div>
-            <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href='products:questionnaire_list' text=_('Start zelfdiagnose') icon="arrow_forward" icon_position="after" secondary=True %}</div>
-        </div>
-    {% endif %}
-
-    {% if view.config.actions %}
-        <div class="personal-overview__actions tabled__row">
-            <div class="tabled__item tabled__item--bold">{% link href="profile:action_list" text=_('Actions') %}</div>
-            <div class="tabled__item">{{ action_text }}</div>
-            <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="profile:action_list" text="Aanpassen" icon="arrow_forward" icon_position="after" secondary=True %}</div>
-        </div>
-    {% endif %}
-
-    {% if view.config.notifications %}
-        <div class="tabled__row">
-            <div class="tabled__item tabled__item--bold">{% link href="profile:notifications" text=_('Receive notifications for') %}</div>
-            <div class="tabled__item">{{ request.user.get_active_notifications }}</div>
-            <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="profile:notifications" text="Aanpassen" icon="arrow_forward" icon_position="after" secondary=True %}</div>
-        </div>
-    {% endif %}
-    {% if view.config.questions %}
-        <div class="tabled__row">
-            <div class="tabled__item tabled__item--bold">{% link href="cases:contactmoment_list" text=_('My questions') %}</div>
-            <div class="tabled__item"></div>
-            <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="cases:contactmoment_list" text=_('Bekijken') icon="arrow_forward" icon_position="after" secondary=True %}</div>
-        </div>
-    {% endif %}
-    {% if view.config.ssd %}
-        <div class="tabled__row">
-            <div class="tabled__item tabled__item--bold">{% link href="profile:monthly_benefits_index" text=_('My benefits') %}</div>
-            <div class="tabled__item">Jaaropgaven, Maandspecificaties</div>
-            <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="ssd:monthly_benefits_index" text=_("Bekijken") icon="arrow_forward" icon_position="after" secondary=True %}</div>
-        </div>
-    {% endif %}
-    {% comment %} <div class="tabled__row">
-        <div class="tabled__item tabled__item--bold">{% trans "Afspraken" %}</div>
-        <div class="tabled__item">4 afspraken, eerstvolgende voor 6 september</div>
-        <div class="tabled__item tabled__item--force-right tabled__item--mobile-big">{% link href="#" text="Aanpassen" icon="arrow_forward" icon_position="after" primary=True %}</div>
-    </div> {% endcomment %}
+        </h2>
+    </div>
+    <div class="tabled__row tabled__row--blank">
+        <div class="tabled__item tabled__key">{% trans "Voornaam" %}</div>
+        <div class="tabled__item tabled__value">{{ user.infix}} {{ user.first_name }}</div>
+    </div>
+    <div class="tabled__row tabled__row--blank">
+        <div class="tabled__item tabled__key">{% trans "Achternaam" %}</div>
+        <div class="tabled__item tabled__value">{{ user.last_name }}</div>
+    </div>
+    <div class="tabled__row tabled__row--blank">
+        <div class="tabled__item tabled__key">{% trans "Geboortedatum" %}</div>
+        <div class="tabled__item tabled__value">{{ user.birthday|date:"d.m.Y" }}</div>
+    </div>
+    <div class="tabled__row tabled__row--blank">
+        <div class="tabled__item tabled__key">{% trans "Adres" %}</div>
+        <div class="tabled__item tabled__value">{{ user.street }} {{ user.housenumber }}<br>{{user.postcode}} {{ user.city }}</div>
+    </div>
+    <div class="tabled__row tabled__row--blank">
+        <div class="tabled__item tabled__key">{% trans "E-mail adres" %}</div>
+        <div class="tabled__item tabled__value">{{ user.get_contact_email }}</div>
+    </div>
+    <div class="tabled__row">
+        <div class="tabled__item tabled__key">{% trans "Telefoonnummer" %}</div>
+        <div class="tabled__item tabled__value">{{ user.phonenumber }}</div>
+    </div>
 </div>
+
+{# Notifications #}
+<div class="tabled tabled--flexible profile-section" id="notifications">
+    <div class="tabled__section">
+        <h2 class="h2 title" id="overview">{% trans "Voorkeuren voor meldingen" %}
+            <div class="tabled__item--force-right tabled__item--mobile-big">{% button href="profile:notifications" text=_("Bewerken") icon="edit" transparent=True %}</div>
+        </h2>
+    </div>
+    <div class="tabled__row tabled__row--blank">
+        <div class="tabled__item tabled__key">{% trans "Communicatiekanaal" %}</div>
+        <div class="tabled__item tabled__value">E-mail</div>
+    </div>
+    <div class="tabled__row tabled__row--blank">
+        <div class="tabled__item tabled__key">{% trans "Ontvang notificaties over" %}</div>
+        <div class="tabled__item tabled__value">
+            <div class="item__option">{{ user.get_active_notifications }}</div>
+        </div>
+    </div>
+</div>
+
+{# Overview #}
+<div class="tabled tabled__section tabled--flexible profile-section">
+    <h2 class="h2 title title--extra-padding" id="overview">{% trans "Overzicht" %}</h2>
+    {% render_grid %}
+        {# Mentors #}
+        {% if view.config.mentors %}
+            {% render_column start=forloop.counter_0|multiply:4 span=4 %}
+                <div class="card card--compact card--stretch" id="profile-section-mentors">
+                    <div class="card__body">
+                        {% if mentor_contacts %}
+                            {% url "profile:contact_list" as mentor_url %}
+                            <a href="{{ mentor_url }}?type=begeleider" class="profile__link">
+                        {% else %}
+                            <a href="#" class="profile__link">
+                        {% endif %}
+                            <p class="h4"><span class="link link__text">{% trans "Mijn begeleider" %}</span></p>
+
+                        {% render_list %}
+                        <span class="profile-list">
+                            {% for name in mentor_contact_names %}
+                                {% list_item text=name compact=True %}
+                            {% empty %}
+                                {% list_item text=_("U heeft nog geen begeleider.") compact=True strong=False %}
+                            {% endfor %}
+                        </span>
+                        {% endrender_list %}
+
+                        {% if inbox_page_is_published %}
+                        <span class="link link--icon link--secondary" aria-label="{% trans "Stuur een bericht" %}" title="{% trans "Stuur een bericht" %}">
+                            <span class="link__text">{% trans "Stuur een bericht" %}</span>
+                            {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
+                        </span>
+                        {% endif %}
+
+                        </a>
+                    </div>
+                </div>
+            {% endrender_column %}
+        {% endif %}
+        {# Contacts #}
+        {% if view.config.my_contacts %}
+            {% render_column start=forloop.counter_0|multiply:4 span=4 %}
+                <div class="card card--compact card--stretch" id="profile-section-contacts">
+                    <div class="card__body">
+                        <a href="{% url 'profile:contact_list' %}"  class="profile__link">
+                            <p class="h4"><span class="link link__text">{% trans "Mijn contacten" %}</span></p>
+                        {% render_list %}
+                        <span class="profile-list">
+                            {% for name in contact_names %}
+                                {% list_item text=name compact=True strong=False %}
+                            {% empty %}
+                                {% list_item text=_("U heeft nog geen contacten") compact=True strong=False %}
+                            {% endfor %}
+                        </span>
+                        {% endrender_list %}
+
+                        <span class="link link--icon link--secondary" aria-label="{% trans "Beheer contacten" %}" title="{% trans "Beheer contacten" %}">
+                            <span class="link__text">{% trans "Beheer contacten" %}</span>
+                            {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
+                        </span>
+
+                        </a>
+                    </div>
+                </div>
+            {% endrender_column %}
+        {% endif %}
+        {# Overview #}
+        {% if view.config.actions %}
+            {% render_column start=forloop.counter_0|multiply:4 span=4 %}
+                <div class="card card--compact card--stretch" id="profile-section-actions">
+                    <div class="card__body">
+                        <a href="{% url 'profile:action_list' %}"  class="profile__link">
+                            <p class="h4"><span class="link link__text">{% trans "Acties" %}</span></p>
+                        {% render_list %}
+                        <span class="profile-list">
+                            {% list_item text=action_text compact=True strong=False %}
+                        </span>
+                        {% endrender_list %}
+
+                        <span class="link link--icon link--secondary" aria-label="{% trans "Beheer acties" %}" title="{% trans "Beheer acties" %}">
+                            <span class="link__text">{% trans "Beheer acties" %}</span>
+                            {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
+                        </span>
+
+                        </a>
+                    </div>
+                </div>
+            {% endrender_column %}
+        {% endif %}
+        {# Benefits #}
+        {% if view.config.ssd %}
+            {% render_column start=forloop.counter_0|multiply:4 span=4 %}
+                <div class="card card--compact card--stretch"id="profile-section-ssd">
+                    <div class="card__body">
+                        <a href="{% url 'ssd:uitkeringen' %}"  class="profile__link">
+                            <p class="h4"><span class="link link__text">{% trans "Mijn uitkeringen" %}</span></p>
+                        {% render_list %}
+                        <span class="profile-list">
+                            {% list_item text="Jaaropgaven" compact=True strong=False active=False %}
+                            {% list_item text="Maandspecificaties" compact=True strong=False %}
+                        </span>
+                        {% endrender_list %}
+
+                        <span class="link link--icon link--secondary" aria-label="{% trans "Bekijk uitkeringen" %}" title="{% trans "Bekijk uitkeringen" %}">
+                            <span class="link__text">{% trans "Bekijk uitkeringen" %}</span>
+                            {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
+                        </span>
+                        </a>
+                    </div>
+                </div>
+            {% endrender_column %}
+        {% endif %}
+        {# Questions #}
+        {% if view.config.questions %}
+            {% render_column start=forloop.counter_0|multiply:4 span=4 %}
+                <div class="card card--compact card--stretch id="profile-section-questions"">
+                    <div class="card__body">
+                        <a href="{% url 'cases:contactmoment_list' %}"  class="profile__link">
+                            <p class="h4"><span class="link link__text">{% trans "Mijn vragen" %}</span></p>
+
+                        <span class="link link--icon link--secondary" aria-label="{% trans "Bekijken" %}" title="{% trans "Bekijken" %}">
+                            <span class="link__text">{% trans "Bekijken" %}</span>
+                            {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
+                        </span>
+                        </a>
+                    </div>
+                </div>
+            {% endrender_column %}
+        {% endif %}
+        {# Questionnaire #}
+        {% if questionnaire_exists and view.config.selfdiagnose %}
+            {% render_column start=forloop.counter_0|multiply:4 span=4 %}
+                <div class="card card--compact card--stretch id="profile-section-questions"">
+                    <div class="card__body">
+                        <a href="{% url 'products:questionnaire_list' %}"  class="profile__link">
+                            <p class="h4"><span class="link link__text">{% trans "Zelftest" %}</span></p>
+
+                        <span class="link link--icon link--secondary" aria-label="{% trans "Start zelfdiagnose" %}" title="{% trans "Start zelfdiagnose" %}">
+                            <span class="link__text">{% trans "Start zelfdiagnose" %}</span>
+                            {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
+                        </span>
+                        </a>
+                    </div>
+                </div>
+            {% endrender_column %}
+        {% endif %}
+    {% endrender_grid %}
+</div>
+{% endwith %}
 
 {% render_form form=form method="POST" id="delete-form" extra_classes="confirm" spaceless=True data_confirm_title=_("Weet u zeker dat u uw account wilt verwijderen?") data_confirm_text=_("Hiermee worden alleen uw persoonlijke voorkeuren verwijderd. U krijgt dan bijvoorbeeld geen e-mail meer van ons over wijzigingen van uw lopende zaken. Uw persoonsgegevens en uw lopende zaken zelf worden hiermee niet verwijderd.") data_confirm_cancel=_("Nee") data_confirm_default=_("Ja") %}
     {% csrf_token %}
     <div class="form__actions ">
        <button class="button button--textless button--icon button--icon-after button--transparent view--profile-detail" type="submit" title="Profiel verwijderen" aria-label="Profiel verwijderen">
        {% icon icon="close" %}
-       Profiel verwijderen
+       {% trans "Profiel verwijderen" %}
        </button>
     </div>
 {% endrender_form %}

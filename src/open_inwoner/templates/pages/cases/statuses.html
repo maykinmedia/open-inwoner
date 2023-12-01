@@ -59,12 +59,21 @@
                         </div>
                     </div>
                 </li>
-
             {% endif %}
         {% endfor %}
 
+        {# Preview of upcoming second status #}
+        {% if case.second_status_preview %}
+            <li class="status--future status-list__list-item status-list__list-item--future">
+                {% icon icon="circle_outlined" outlined=True %}
+                <div class="status-list__notification status-list__notification">
+                    <div class="status-list__open"><span class="link link-future">{{ case.second_status_preview.omschrijving }}</span></div>
+                </div>
+            </li>
+        {% endif %}
+
+        {# Future end status #}
         {% if case.end_statustype_data %}
-            {# Future end status #}
             <li class="status--future status-list__list-item status-list__list-item--future">
                 {% icon icon="circle_outlined" outlined=True %}
                 <div class="status-list__notification status-list__notification--future">

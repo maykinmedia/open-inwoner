@@ -26,7 +26,7 @@ from open_inwoner.openklant.wrap import (
     create_klant,
     fetch_klant_for_bsn,
 )
-from open_inwoner.openzaak.api_models import Status, Zaak
+from open_inwoner.openzaak.api_models import Status, StatusType, Zaak
 from open_inwoner.openzaak.cases import (
     connect_case_with_document,
     fetch_case_information_objects,
@@ -102,6 +102,16 @@ class InnerCaseDetailView(
     contact_form_class = CaseContactForm
     case: Zaak = None
 
+    def __init__(self):
+        self.statustype_config_mapping = {
+            zaaktype_statustype.statustype_url: zaaktype_statustype
+            for zaaktype_statustype in ZaakTypeStatusTypeConfig.objects.all()
+        }
+        self.resulttype_config_mapping = {
+            zt_resulttype.resultaattype_url: zt_resulttype
+            for zt_resulttype in ZaakTypeResultaatTypeConfig.objects.all()
+        }
+
     @cached_property
     def crumbs(self):
         return [
@@ -131,23 +141,17 @@ class InnerCaseDetailView(
             # NOTE maybe this should be cached?
             statustypen = fetch_status_types_no_cache(self.case.zaaktype.url)
 
-            resulttype_config_mapping = {
-                zt_resulttype.resultaattype_url: zt_resulttype
-                for zt_resulttype in ZaakTypeResultaatTypeConfig.objects.all()
-            }
-            statustype_config_mapping = {
-                zaaktype_statustype.statustype_url: zaaktype_statustype
-                for zaaktype_statustype in ZaakTypeStatusTypeConfig.objects.all()
-            }
-
             # NOTE we cannot sort on the Status.datum_status_gezet (datetime) because eSuite
             # returns zeros as the time component of the datetime, so we're going with the
             # observation that on both OpenZaak and eSuite the returned list is ordered 'oldest-last'
             # here we want it 'oldest-first' so we reverse() it instead of sort()-ing
             statuses.reverse()
 
+            # get preview of second status
             if len(statuses) == 1:
-                self.add_second_status_preview(statuses, statustypen)
+                second_status_preview = self.get_second_status_preview(statustypen)
+            else:
+                second_status_preview = None
 
             status_types = defaultdict(list)
             for status in statuses:
@@ -172,28 +176,30 @@ class InnerCaseDetailView(
                         end_statustype.omschrijving, default=_("No data available")
                     ),
                     "status_indicator": getattr(
-                        statustype_config_mapping.get(end_statustype.url),
+                        self.statustype_config_mapping.get(end_statustype.url),
                         "status_indicator",
                         None,
                     ),
                     "status_indicator_text": getattr(
-                        statustype_config_mapping.get(end_statustype.url),
+                        self.statustype_config_mapping.get(end_statustype.url),
                         "status_indicator_text",
                         None,
                     ),
                     "call_to_action_url": getattr(
-                        statustype_config_mapping.get(end_statustype.url),
+                        self.statustype_config_mapping.get(end_statustype.url),
                         "call_to_action_url",
                         None,
                     ),
                     "call_to_action_text": getattr(
-                        statustype_config_mapping.get(end_statustype.url),
+                        self.statustype_config_mapping.get(end_statustype.url),
                         "call_to_action_text",
                         None,
                     ),
                 }
 
-            result_data = self.get_result_data(self.case, resulttype_config_mapping)
+            result_data = self.get_result_data(
+                self.case, self.resulttype_config_mapping
+            )
 
             context["case"] = {
                 "id": str(self.case.uuid),
@@ -209,9 +215,10 @@ class InnerCaseDetailView(
                 ),
                 "description": self.case.zaaktype.omschrijving,
                 "statuses": self.get_statuses_data(
-                    statuses, status_translate, statustype_config_mapping
+                    statuses, status_translate, self.statustype_config_mapping
                 ),
                 "end_statustype_data": end_statustype_data,
+                "second_status_preview": second_status_preview,
                 "documents": documents,
                 "allowed_file_extensions": sorted(config.allowed_file_extensions),
                 "new_docs": has_new_elements(
@@ -234,12 +241,9 @@ class InnerCaseDetailView(
 
         return context
 
-    def add_second_status_preview(self, statuses: list, statustypen: list) -> None:
+    def get_second_status_preview(self, statustypen: list) -> Optional[StatusType]:
         """
-        Update `statuses` with second (upcoming) status
-
-        As the second status is not yet available, a mock is created, using `self.case`
-        and the second statustype from `statustypen`
+        Get the relevant status type to display preview of second case status
 
         Note: we cannot assume that the "second" statustype has the `volgnummer` 2;
               hence we get all statustype_numbers, sort in ascending order, and let
@@ -255,32 +259,47 @@ class InnerCaseDetailView(
 
         statustype_numbers.sort()
 
-        second_status_type = next(
+        return next(
             filter(
                 lambda s: s.volgnummer == statustype_numbers[1] and not s.is_eindstatus,
                 statustypen,
             ),
             None,
         )
-        if not second_status_type:
-            return
 
-        second_status = Status(
-            url="#", zaak=self.case, statustype=second_status_type.url
+    @property
+    def is_file_upload_enabled_for_case_type(self) -> bool:
+        return ZaakTypeInformatieObjectTypeConfig.objects.filter_enabled_for_case_type(
+            self.case.zaaktype
+        ).exists()
+
+    @property
+    def is_file_upload_enabled_for_statustype(self) -> bool:
+        try:
+            enabled_for_status_type = self.statustype_config_mapping[
+                self.case.status.statustype.url
+            ].document_upload_enabled
+        except KeyError:
+            logger.info(
+                "Could not retrieve status type config for url {url}".format(
+                    url=self.case.status.statustype.url
+                )
+            )
+            return False
+        return enabled_for_status_type
+
+    @property
+    def is_internal_file_upload_enabled(self) -> bool:
+        return (
+            self.is_file_upload_enabled_for_case_type
+            and self.is_file_upload_enabled_for_statustype
         )
-        statuses.append(second_status)
 
     def get_upload_info_context(self, case: Zaak):
         if not case:
             return {}
 
         open_klant_config = OpenKlantConfig.get_solo()
-
-        internal_upload_enabled = (
-            ZaakTypeInformatieObjectTypeConfig.objects.filter_enabled_for_case_type(
-                case.zaaktype
-            ).exists()
-        )
 
         case_type_config_description = ""
         case_type_document_upload_description = ""
@@ -314,7 +333,7 @@ class InnerCaseDetailView(
         return {
             "case_type_config_description": case_type_config_description,
             "case_type_document_upload_description": case_type_document_upload_description,
-            "internal_upload_enabled": internal_upload_enabled
+            "internal_upload_enabled": self.is_internal_file_upload_enabled
             and not getattr(self.case, "einddatum", None),
             "external_upload_enabled": external_upload_enabled
             and not getattr(self.case, "einddatum", None),
@@ -586,6 +605,7 @@ class CaseDocumentUploadFormView(CaseAccessMixin, LogMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
         context["hxpost_document_action"] = reverse(
             "cases:case_detail_document_form", kwargs=self.kwargs
         )
