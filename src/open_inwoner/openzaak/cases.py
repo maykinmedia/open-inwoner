@@ -67,21 +67,24 @@ def fetch_cases(
 
 
 @cache_result(
-    "cases:{kvk_or_rsin}:{max_cases}:{identificatie}",
+    "cases:{kvk_or_rsin}:{max_cases}:{zaak_identificatie}",
     timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
 )
 def fetch_cases_by_kvk_or_rsin(
-    kvk_or_rsin: str,
+    kvk_or_rsin: Optional[str],
     max_cases: Optional[int] = 100,
-    identificatie: Optional[str] = None,
+    zaak_identificatie: Optional[str] = None,
 ) -> List[Zaak]:
     """
     retrieve cases for particular company with allowed confidentiality level
 
-    :param:max_cases - used to limit the number of requests to list_zaken resource. The default
+    :param max_cases: - used to limit the number of requests to list_zaken resource. The default
     value = 100, which means only one 1 request
-    :param:identificatie - used to filter the cases by a specific identification
+    :param zaak_identificatie: - used to filter the cases by a unique Zaak identification number
     """
+    if not kvk_or_rsin:
+        return []
+
     client = build_client("zaak")
 
     if client is None:
@@ -93,8 +96,8 @@ def fetch_cases_by_kvk_or_rsin(
         "rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__innNnpId": kvk_or_rsin,
         "maximaleVertrouwelijkheidaanduiding": config.zaak_max_confidentiality,
     }
-    if identificatie:
-        params.update({"identificatie": identificatie})
+    if zaak_identificatie:
+        params.update({"identificatie": zaak_identificatie})
 
     try:
         response = get_paginated_results(
