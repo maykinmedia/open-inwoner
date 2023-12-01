@@ -2,7 +2,7 @@
 
 {# Messages #}
 <div class="container container--no-margin" id="cases-status-messages-oob" hx-swap-oob="true">
-    {% notifications messages %}
+    {% notifications messages closable=True %}
 </div>
 
 {% get_solo 'openzaak.OpenZaakConfig' as openzaak_config %}
@@ -25,7 +25,7 @@
             {% if case.internal_upload_enabled %}
                 <h2 class="h2" id="documents-upload">{% trans "Document uploaden" %}</h2>
 
-                {% notifications messages show_local_messages=True %}
+                {% notifications messages show_local_messages=True closable=False %}
 
                 {% if case.case_type_document_upload_description %}
                 <div class="card card--compact card--info">

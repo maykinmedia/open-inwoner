@@ -49,6 +49,14 @@
     height: 30px;
   }
 
+  .notifications {
+    .notification--warning {
+      [class*='icon'] {
+        color: var(--notification-color-text);
+      }
+    }
+  }
+
   .link--primary [class*='icon'] {
     color: var(--color-primary);
   }
