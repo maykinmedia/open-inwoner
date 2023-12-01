@@ -59,11 +59,11 @@ class InnerCaseListView(
 
     def get_cases(self):
         if self.request.user.kvk:
-            identifier = self.request.user.kvk
+            kvk_or_rsin = self.request.user.kvk
             config = OpenZaakConfig.get_solo()
             if config.fetch_eherkenning_zaken_with_rsin:
-                identifier = self.request.user.rsin
-            raw_cases = fetch_cases_by_kvk_or_rsin(identifier)
+                kvk_or_rsin = self.request.user.rsin
+            raw_cases = fetch_cases_by_kvk_or_rsin(kvk_or_rsin=kvk_or_rsin)
         else:
             raw_cases = fetch_cases(self.request.user.bsn)
         preprocessed_cases = preprocess_data(raw_cases)
