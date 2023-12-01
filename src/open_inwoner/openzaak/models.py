@@ -420,10 +420,12 @@ class ZaakTypeStatusTypeConfig(models.Model):
             "Whether the user should be notfied if a case is set to this type of status"
         ),
     )
-    show_document_uploads = models.BooleanField(
+    document_upload_enabled = models.BooleanField(
         default=True,
-        verbose_name=_("Show document uploads"),
-        help_text=_("Whether document uploads are to be shown"),
+        verbose_name=_("Document uploads"),
+        help_text=_(
+            "Enable document uploads for this statustype (override setting for case type)"
+        ),
     )
     call_to_action_url = models.URLField(
         blank=True,
