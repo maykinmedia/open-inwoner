@@ -11,7 +11,6 @@ class KvKConfig(SingletonModel):
     api_root = models.URLField(
         verbose_name=_("API root"),
         max_length=128,
-        blank=True,
         help_text=_("The root of the API (e.g. https://api.kvk.nl/api/v1)"),
     )
     api_key = models.CharField(
