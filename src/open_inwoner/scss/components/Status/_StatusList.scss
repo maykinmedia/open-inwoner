@@ -1,7 +1,8 @@
 .status-list {
+  margin-bottom: var(--row-height);
+
   &__list {
     display: flex;
-    gap: var(--spacing-medium);
     flex-direction: column;
     list-style: none;
     margin: 0;
@@ -9,26 +10,207 @@
     position: relative;
   }
 
-  &__list:before {
-    content: '';
-    background-color: var(--color-success);
-    display: block;
-    height: calc(100% - 1.5em);
-    left: 11px;
-    position: absolute;
-    top: 0.75em;
-    width: 2px;
-    z-index: -1;
-  }
-
   &__list-item {
     display: flex;
     gap: var(--spacing-large);
+    padding: var(--spacing-medium) var(--spacing-giant) var(--spacing-large)
+      var(--spacing-giant);
+    position: relative;
+
+    // Continuous line
+    &:not(:last-child)::before {
+      content: '';
+      background-color: var(--color-success);
+      display: block;
+      height: 100%;
+      left: 19px;
+      margin-left: var(--spacing-extra-large);
+      position: absolute;
+      top: 1.3em;
+      width: 2px;
+      z-index: 1;
+    }
+
+    .status-list__button {
+      color: var(--color-success);
+      cursor: pointer;
+      display: flex;
+      font-weight: normal;
+      justify-content: space-between;
+      padding: 0;
+      margin: var(--spacing-small) 0 0 0;
+      width: 100%;
+    }
+
+    .status-list__button .link {
+      color: var(--color-success);
+    }
+
+    .link--bold {
+      margin: var(--spacing-small) 0 0 0;
+    }
+
+    .link-future {
+      color: var(--color-gray-90);
+    }
+
+    .p-date {
+      font-size: var(--font-size-body-small);
+    }
+
+    .p-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .p__upload {
+      display: none;
+      &.p__upload--enabled {
+        //hide when final status is reached
+        display: block;
+      }
+    }
+
+    [class*='icons'] {
+      transform-origin: center;
+      transition: all 0.3s;
+    }
+
+    > [class*='icons'] {
+      box-sizing: border-box;
+      color: var(--color-success);
+      position: relative;
+      width: var(--spacing-extra-large);
+      z-index: 3;
+
+      &::before {
+        content: '';
+        background-color: var(--color-white);
+        border-radius: 50%;
+        top: 2px;
+        left: 2px;
+        height: 20px;
+        width: 20px;
+        position: absolute;
+        z-index: -1;
+      }
+    }
+
+    &--failure {
+      background-color: var(--color-error-lightest);
+      .status-step[class*='icons'] {
+        color: var(--color-error-darker);
+      }
+    }
+
+    &--future {
+      [class*='icons'] {
+        color: var(--color-body);
+      }
+    }
+
+    &--info {
+      background-color: var(--color-info-lighter);
+      .status-step[class*='icons'] {
+        color: var(--color-info-darker);
+      }
+    }
+
+    &--warning {
+      background-color: var(--color-danger-lightest);
+      .status-step[class*='icons'] {
+        color: var(--color-danger-darker);
+      }
+    }
+
+    &--success {
+      background-color: var(--color-success-lighter);
+    }
+
+    // Current status open by default
+    &.status--current {
+      .button--borderless .link {
+        color: var(--color-black);
+      }
+      .status-list__button [class*='icons'] {
+        color: var(--color-black);
+      }
+      &.status--open
+        .status-list__notification
+        .status-list__notification-content {
+        padding-bottom: var(--spacing-tiny);
+      }
+    }
   }
 
-  [class*='icon'] {
-    color: var(--color-success);
-    background-color: var(--color-white);
+  &__notification {
+    padding: 0 0 var(--spacing-tiny) 0;
+    width: 100%;
+
+    &-content {
+      display: none;
+      margin-left: 0;
+      margin-top: var(--spacing-large);
+    }
+
+    &-content.status-content--open {
+      display: block;
+      color: var(--color-gray-dark);
+    }
+  }
+
+  // Active current status should NOT have a line on the left
+  .status-list__list-item.status--current {
+    &::before {
+      top: 10px;
+      content: '';
+      display: block;
+      height: 100%;
+      left: 27px;
+      margin-left: 1em;
+      position: absolute;
+      width: 2px;
+      z-index: 2;
+    }
+
+    //Continuous line-color depending on status
+    &.status-list__list-item--failure::before {
+      background-color: var(--color-error-darker);
+    }
+    &.status-list__list-item--info::before {
+      background-color: var(--color-info-darker);
+    }
+    &.status-list__list-item--success::before {
+      background-color: var(--color-success);
+    }
+    &.status-list__list-item--warning::before {
+      background-color: var(--color-danger-darker);
+    }
+    &.status-list__list-item--future::before {
+      background-color: var(--color-gray-dark);
+      height: 16px;
+    }
+  }
+
+  // Final active status should NOT have a line on the left
+  .status-list__list-item.status--final {
+    .button--borderless {
+      cursor: default;
+      .link {
+        color: var(--color-black);
+      }
+    }
+  }
+
+  /// Toggle styles
+  .status--open &__notification {
+    .status-list__button [class*='icons'] {
+      display: inline-block;
+      transition: all 0.3s;
+      transform: rotate(180deg);
+      top: 0;
+      right: var(--spacing-large);
+    }
   }
 }
 

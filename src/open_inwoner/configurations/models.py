@@ -434,7 +434,7 @@ class SiteConfiguration(SingletonModel):
     openid_display = models.CharField(
         verbose_name=_("Show option to login via OpenId"),
         max_length=24,
-        choices=OpenIDDisplayChoices,
+        choices=OpenIDDisplayChoices.choices,
         default=OpenIDDisplayChoices.admin,
         validators=[validate_oidc_config],
         help_text=_("Only selected groups will see the option to login via OpenId."),
@@ -483,6 +483,13 @@ class SiteConfiguration(SingletonModel):
         help_text=_(
             "Additional CSS added to the page. Note only a (safe) subset of CSS properties is supported."
         ),
+    )
+
+    # authentication options
+    eherkenning_enabled = models.BooleanField(
+        verbose_name=_("eHerkenning authentication enabled"),
+        default=False,
+        help_text=_("Whether users can log in with eHerkenning or not."),
     )
 
     class Meta:

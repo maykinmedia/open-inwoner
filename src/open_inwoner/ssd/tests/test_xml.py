@@ -236,7 +236,7 @@ class SSDTagTest(TestCase):
     def test_format_date_month_name(self):
         tests = [
             ("202305", "mei 2023"),
-            ("202306", "jun 2023"),
+            ("202306", "juni 2023"),
             (None, ""),
             ("", ""),
         ]

@@ -39,7 +39,7 @@ def case_table(case: dict, **kwargs) -> dict:
         {% case_table case %}
 
     Variables:
-        + case: dict | The case to be able to build the dashboard, fetching the documents and statusses of the case.
+        + case: dict | The case to be able to build the dashboard, fetching the documents and statuses of the case.
 
     Extra context:
         + table: TableConfig | The configuration of the table.

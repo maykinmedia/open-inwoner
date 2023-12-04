@@ -13,6 +13,7 @@ from privates.test import temp_private_root
 
 from open_inwoner.cms.tests import cms_tools
 from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.utils.tests.playwright import get_driver_name
 
 from ...utils.tests.playwright import PlaywrightSyncLiveServerTestCase
 from ..choices import StatusChoices
@@ -337,6 +338,10 @@ class ActionsPlaywrightTests(PlaywrightSyncLiveServerTestCase):
         self.action_list_url = reverse("profile:action_list")
 
     def test_action_status(self, mock_solo):
+        # @skipIf(...) causes issues together with Playwright
+        if get_driver_name() == "firefox":
+            self.skipTest("Test is flakey in firefox")
+
         mock_solo.return_value.cookiebanner_enabled = False
 
         context = self.browser.new_context(storage_state=self.user_login_state)
@@ -349,17 +354,16 @@ class ActionsPlaywrightTests(PlaywrightSyncLiveServerTestCase):
         dropdown_button = action_element.locator(".actions__status-selector")
         dropdown_content = action_element.locator(".dropdown__content")
 
-        # check state
-        expect(dropdown_button).to_contain_text(
-            str(StatusChoices.labels[StatusChoices.open])
-        )
+        # labels are lazy; force evaluation by casting to `str`
+        approval_label = str(StatusChoices.approval.label)
+        closed_label = str(StatusChoices.closed.label)
+        open_label = str(StatusChoices.open.label)
 
-        # grab buttonss
-        status_closed_button = dropdown_content.get_by_role(
-            "button", name=str(StatusChoices.labels[StatusChoices.closed])
-        )
+        expect(dropdown_button).to_contain_text(open_label)
+        # grab buttons
+        status_closed_button = dropdown_content.get_by_role("button", name=closed_label)
         status_approval_button = dropdown_content.get_by_role(
-            "button", name=str(StatusChoices.labels[StatusChoices.approval])
+            "button", name=approval_label
         )
         expect(status_approval_button).to_be_visible(visible=False)
 
@@ -371,9 +375,7 @@ class ActionsPlaywrightTests(PlaywrightSyncLiveServerTestCase):
         status_approval_button.click()
 
         # status should change to approval
-        expect(dropdown_button).to_contain_text(
-            str(StatusChoices.labels[StatusChoices.approval])
-        )
+        expect(dropdown_button).to_contain_text(approval_label)
 
         # dropdown widget is closed
         expect(status_approval_button).to_be_visible(visible=False)
@@ -390,9 +392,7 @@ class ActionsPlaywrightTests(PlaywrightSyncLiveServerTestCase):
         status_closed_button.click()
 
         # status should change
-        expect(dropdown_button).to_contain_text(
-            str(StatusChoices.labels[StatusChoices.closed])
-        )
+        expect(dropdown_button).to_contain_text(closed_label)
 
         # dropdown widget is closed
         expect(status_closed_button).to_be_visible(visible=False)

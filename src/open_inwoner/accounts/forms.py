@@ -196,7 +196,7 @@ class NecessaryUserForm(forms.ModelForm):
         self.fields["infix"].required = False
         self.fields["last_name"].required = True
 
-        if user.is_digid_and_brp():
+        if user.is_digid_user_with_brp:
             self.fields["first_name"].disabled = True
             self.fields["infix"].disabled = True
             self.fields["last_name"].disabled = True
@@ -208,6 +208,9 @@ class NecessaryUserForm(forms.ModelForm):
                 del self.fields["last_name"]
             if not user.infix:
                 del self.fields["infix"]
+        elif user.login_type == LoginTypeChoices.eherkenning:
+            for field_name in ["first_name", "infix", "last_name"]:
+                del self.fields[field_name]
 
 
 class CustomPasswordResetForm(PasswordResetForm):
@@ -247,17 +250,6 @@ class CustomPasswordResetForm(PasswordResetForm):
             email_message.attach_alternative(html_email, "text/html")
 
         email_message.send()
-
-
-class CategoriesForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = ("selected_categories",)
-        widgets = {"selected_categories": forms.widgets.CheckboxSelectMultiple}
-
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        self.fields["selected_categories"].queryset = Category.objects.published()
 
 
 class UserNotificationsForm(forms.ModelForm):

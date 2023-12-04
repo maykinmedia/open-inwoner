@@ -20,6 +20,10 @@ BROWSER_DRIVERS = {
 BROWSER_DEFAULT = "chromium"
 
 
+def get_driver_name() -> str:
+    return os.environ.get("E2E_DRIVER", BROWSER_DEFAULT)
+
+
 class PlaywrightSyncLiveServerTestCase(StaticLiveServerTestCase):
     """
     base class for convenient synchronous Playwright in Django
@@ -73,7 +77,7 @@ class PlaywrightSyncLiveServerTestCase(StaticLiveServerTestCase):
 
     @classmethod
     def get_browser_launcher(cls) -> Callable[[Playwright], Browser]:
-        name = os.environ.get("E2E_DRIVER", BROWSER_DEFAULT)
+        name = get_driver_name()
         if name in BROWSER_DRIVERS:
             return BROWSER_DRIVERS[name]
         else:

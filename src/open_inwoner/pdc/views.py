@@ -1,5 +1,6 @@
 from django.db.models import Q
 from django.http import Http404, HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
@@ -32,7 +33,7 @@ class CategoryBreadcrumbMixin:
                     {
                         "slug": sl,
                         "build_slug": f"{older_slugs}/{sl}" if older_slugs else sl,
-                        "category": Category.objects.get(slug=sl),
+                        "category": get_object_or_404(Category, slug=sl),
                     }
                 )
                 if older_slugs:
@@ -54,55 +55,6 @@ class CategoryBreadcrumbMixin:
         ]
 
 
-class HomeView(CommonPageMixin, TemplateView):
-    template_name = "pages/home.html"
-
-    def page_title(self):
-        return _("Home")
-
-    def get_context_data(self, **kwargs):
-        config = SiteConfiguration.get_solo()
-
-        limit = 4
-        kwargs.update(categories=Category.objects.published().order_by("name")[:limit])
-        kwargs.update(product_locations=ProductLocation.objects.all()[:1000])
-        kwargs.update(
-            questionnaire_roots=QuestionnaireStep.get_root_nodes().filter(
-                highlighted=True, published=True
-            )
-        )
-
-        # Show the categories if the user has selected them, otherwise
-        # Show the highlighted published categories if they have been specified, otherwise
-        # Show the first X published categories
-
-        # Highlighted categories
-        highlighted_categories = (
-            Category.objects.published()
-            .filter(highlighted=True)
-            .order_by("name")[:limit]
-        )
-        if (
-            self.request.user.is_authenticated
-            and self.request.user.selected_categories.exists()
-        ):
-            kwargs.update(
-                categories=self.request.user.selected_categories.order_by("name")[
-                    :limit
-                ]
-            )
-        elif highlighted_categories:
-            kwargs.update(categories=highlighted_categories)
-
-        return super().get_context_data(**kwargs)
-
-    def get_template_names(self):
-        if self.request.user.is_authenticated:
-            return ["pages/user-home.html"]
-        else:
-            return [self.template_name]
-
-
 class FAQView(CommonPageMixin, TemplateView):
     template_name = "pages/faq.html"
 
@@ -121,7 +73,7 @@ class CategoryListView(
     model = Category
 
     def get_queryset(self):
-        return Category.get_root_nodes().published()
+        return Category.get_root_nodes().published().visible_for_user(self.request.user)
 
     @cached_property
     def crumbs(self):

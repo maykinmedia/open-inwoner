@@ -31,10 +31,6 @@
         {% endif %}
 
         <tr>
-            <th class="table__header">{% trans "Mijn onderwerpen" %}</th>
-            <td class="table__item">{{ object.get_interests }}</td>
-        </tr>
-        <tr>
             <th class="table__header">{% trans "Ontvang berichten over" %}</th>
             <td class="table__item">{{ object.get_active_notifications }}</td>
         </tr>

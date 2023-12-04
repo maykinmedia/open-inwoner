@@ -134,10 +134,8 @@ django-better-admin-arrayfield==1.4.2
     # via
     #   -r requirements/base.in
     #   mozilla-django-oidc-db
-django-choices==1.7.2
-    # via
-    #   -r requirements/base.in
-    #   mail-editor
+django-choices==2.0.0
+    # via mail-editor
 django-ckeditor==6.2.0
     # via mail-editor
 django-classy-tags==4.0.0
@@ -161,7 +159,7 @@ django-csp==3.7
     # via -r requirements/base.in
 django-csp-reports==1.8.1
     # via -r requirements/base.in
-django-digid-eherkenning==0.7.0
+django-digid-eherkenning==0.9.0
     # via -r requirements/base.in
 django-elasticsearch-dsl==7.2.1
     # via -r requirements/base.in
@@ -195,7 +193,7 @@ django-js-asset==1.2.2
     #   django-mptt
 django-localflavor==3.1
     # via -r requirements/base.in
-django-log-outgoing-requests==0.5.0
+django-log-outgoing-requests==0.5.2
     # via -r requirements/base.in
 django-mptt==0.13.4
     # via django-filer
@@ -300,7 +298,7 @@ face==20.1.1
     # via glom
 faker==9.9.0
     # via zgw-consumers
-fontawesomefree==6.1.1
+fontawesomefree==6.4.2
     # via -r requirements/base.in
 fonttools[woff]==4.29.1
     # via weasyprint
@@ -474,7 +472,6 @@ six==1.16.0
     # via
     #   click-repl
     #   django-appdata
-    #   django-choices
     #   django-elasticsearch-dsl
     #   elasticsearch-dsl
     #   furl

@@ -56,6 +56,23 @@ class InformationObjectTypeMockData:
             omschrijving="info-bbb",
         )
 
+        self.statustype_aaa_1 = generate_oas_component(
+            "ztc",
+            "schemas/StatusType",
+            url=f"{CATALOGI_ROOT}statustypen/aaaaaaaa-aaaa-aaaa-aaaa-111111111111",
+            catalogus=f"{CATALOGI_ROOT}catalogussen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            # zaaktype=self.zaaktype_aaa_1,
+            omschrijving="status-aaa-1",
+        )
+        self.statustype_aaa_2 = generate_oas_component(
+            "ztc",
+            "schemas/StatusType",
+            url=f"{CATALOGI_ROOT}statustypen/aaaaaaaa-aaaa-aaaa-aaaa-222222222222",
+            catalogus=f"{CATALOGI_ROOT}catalogussen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            # zaaktype=self.zaaktype_aaa_2,
+            omschrijving="status-aaa-2",
+        )
+
         self.zaaktype_aaa_1 = generate_oas_component(
             "ztc",
             "schemas/ZaakType",
@@ -68,6 +85,21 @@ class InformationObjectTypeMockData:
             informatieobjecttypen=[
                 self.info_type_aaa_1["url"],
             ],
+            statustypen=[
+                self.statustype_aaa_1["url"],
+            ],
+            resultaattypen=[
+                f"{CATALOGI_ROOT}resultaatypen/b1a268dd-4322-47bb-a930-b83066b4a32c"
+            ],
+        )
+        self.resultaat_type_1 = generate_oas_component(
+            "ztc",
+            "schemas/ResultaatType",
+            url=f"{CATALOGI_ROOT}resultaatypen/b1a268dd-4322-47bb-a930-b83066b4a32c",
+            zaaktype=self.zaaktype_aaa_1,
+            omschrijving="test",
+            resultaattypeomschrijving="test1",
+            selectielijstklasse="ABC",
         )
         self.zaaktype_bbb = generate_oas_component(
             "ztc",
@@ -81,6 +113,10 @@ class InformationObjectTypeMockData:
             indicatieInternOfExtern="extern",
             informatieobjecttypen=[
                 self.info_type_bbb["url"],
+            ],
+            statustypen=[],
+            resultaattypen=[
+                f"{CATALOGI_ROOT}resultaatypen/b1a268dd-4322-47bb-a930-b83066b4a32c"
             ],
         )
         self.zaaktype_aaa_2 = generate_oas_component(
@@ -97,6 +133,12 @@ class InformationObjectTypeMockData:
                 self.info_type_aaa_1["url"],
                 self.info_type_aaa_2["url"],
             ],
+            statustypen=[
+                self.statustype_aaa_2["url"],
+            ],
+            resultaattypen=[
+                f"{CATALOGI_ROOT}resultaatypen/b1a268dd-4322-47bb-a930-b83066b4a32c",
+            ],
         )
         self.zaaktype_aaa_intern = generate_oas_component(
             "ztc",
@@ -112,6 +154,8 @@ class InformationObjectTypeMockData:
             informatieobjecttypen=[
                 self.info_type_aaa_1["url"],
             ],
+            statustypen=[],
+            resultaattypen=[],
         )
         self.extra_zaaktype_aaa = generate_oas_component(
             "ztc",
@@ -129,7 +173,12 @@ class InformationObjectTypeMockData:
                 # add extra_info_type
                 self.extra_info_type_aaa_3["url"],
             ],
+            statustypen=[],
+            resultaattypen=[
+                self.resultaat_type_1["url"],
+            ],
         )
+
         self.all_io_types = [
             self.info_type_aaa_1,
             self.info_type_bbb,
@@ -143,6 +192,13 @@ class InformationObjectTypeMockData:
             self.zaaktype_aaa_intern,
             self.extra_zaaktype_aaa,
         ]
+        self.all_status_types = [
+            self.statustype_aaa_1,
+            self.statustype_aaa_2,
+        ]
+        self.all_resultaat_types = [
+            self.resultaat_type_1,
+        ]
 
     def setUpOASMocks(self, m):
         mock_service_oas_get(m, CATALOGI_ROOT, "ztc")
@@ -155,6 +211,9 @@ class InformationObjectTypeMockData:
             self.info_type_bbb,
             self.info_type_aaa_2,
             self.extra_info_type_aaa_3,
+            self.statustype_aaa_1,
+            self.statustype_aaa_2,
+            self.resultaat_type_1,
         ]:
             m.get(resource["url"], json=resource)
 
@@ -169,6 +228,14 @@ class InformationObjectTypeMockData:
                 ]
             ),
         )
+        m.get(
+            f"{CATALOGI_ROOT}resultaattypen",
+            json=paginated_response(
+                [
+                    self.resultaat_type_1,
+                ]
+            ),
+        )
 
         if with_catalog:
             cat_a = f"&catalogus={CATALOGI_ROOT}catalogussen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
@@ -177,7 +244,11 @@ class InformationObjectTypeMockData:
         else:
             cat_a, cat_b = "", ""
 
-            for zt in (*self.all_io_types, *self.all_zaak_types):
+            for zt in (
+                *self.all_io_types,
+                *self.all_zaak_types,
+                *self.all_status_types,
+            ):
                 zt["catalogus"] = None
 
         m.get(

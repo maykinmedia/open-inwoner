@@ -14,15 +14,16 @@ from open_inwoner.openzaak.notifications import (
     handle_status_update,
     handle_zaken_notification,
 )
-from open_inwoner.openzaak.tests.factories import (
-    NotificationFactory,
-    ZaakTypeConfigFactory,
-)
 from open_inwoner.utils.test import ClearCachesMixin
 from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin, Lookups
 
 from ..api_models import Status, StatusType, Zaak, ZaakType
 from ..models import OpenZaakConfig, UserCaseStatusNotification
+from .factories import (
+    NotificationFactory,
+    ZaakTypeConfigFactory,
+    ZaakTypeStatusTypeConfigFactory,
+)
 from .helpers import copy_with_new_uuid
 from .test_notification_data import MockAPIData
 
@@ -317,6 +318,38 @@ class StatusNotificationHandlerTestCase(
 
         self.assertTimelineLog(
             "accepted status notification: attempt informing users ",
+            lookup=Lookups.startswith,
+            level=logging.INFO,
+        )
+
+    def test_status_handle_notification_status_type_config_notify_false(
+        self, m, mock_handle: Mock
+    ):
+        oz_config = OpenZaakConfig.get_solo()
+        oz_config.skip_notification_statustype_informeren = True
+        oz_config.save()
+
+        data = MockAPIData().install_mocks(m)
+
+        zaaktype_config = ZaakTypeConfigFactory.create(
+            catalogus__url=data.zaak_type["catalogus"],
+            identificatie=data.zaak_type["identificatie"],
+            # set this to notify
+            notify_status_changes=True,
+        )
+
+        ZaakTypeStatusTypeConfigFactory.create(
+            zaaktype_config=zaaktype_config,
+            statustype_url=data.status_type_final["url"],
+            notify_status_change=False,
+        )
+
+        handle_zaken_notification(data.status_notification)
+
+        mock_handle.assert_not_called()
+
+        self.assertTimelineLog(
+            "ignored status notification: 'notify_status_change' is False",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )

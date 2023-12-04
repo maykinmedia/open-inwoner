@@ -20,6 +20,10 @@
     color: var(--color-mute);
   }
 
+  &--centered {
+    text-align: center;
+  }
+
   &:empty {
     margin: 0 !important;
   }

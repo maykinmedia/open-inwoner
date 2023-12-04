@@ -19,6 +19,8 @@ from open_inwoner.openzaak.managers import (
     ZaakTypeInformatieObjectTypeConfigQueryset,
 )
 
+from .constants import StatusIndicators
+
 
 def generate_default_file_extensions():
     return sorted(
@@ -129,6 +131,38 @@ class OpenZaakConfig(SingletonModel):
         default=False,
     )
 
+    fetch_eherkenning_zaken_with_rsin = models.BooleanField(
+        verbose_name=_(
+            "Fetch Zaken for users authenticated with eHerkenning using RSIN"
+        ),
+        help_text=_(
+            "If enabled, Zaken for eHerkenning users are fetched using the company RSIN (Open Zaak). "
+            "If not enabled, Zaken are fetched using the KvK number (eSuite)."
+        ),
+        default=True,
+    )
+
+    title_text = models.TextField(
+        verbose_name=_("Title text"),
+        help_text=_(
+            "The title/introductory text shown on the list view of 'Mijn aanvragen'."
+        ),
+        default=_(
+            "Hier vindt u een overzicht van al uw lopende en afgeronde aanvragen."
+        ),
+    )
+
+    # feature flags
+    enable_categories_filtering_with_zaken = models.BooleanField(
+        verbose_name=_("Enable category filtering based on zaken"),
+        default=False,
+        help_text=_(
+            "If checked, the highlighted categories list on the homepage will consist "
+            "of categories that are linked to ZaakTypen for which the DigiD authenticated "
+            "user has at least one Zaak."
+        ),
+    )
+
     class Meta:
         verbose_name = _("Open Zaak configuration")
 
@@ -155,6 +189,12 @@ class CatalogusConfig(models.Model):
 
 
 class ZaakTypeConfig(models.Model):
+    urls = ArrayField(
+        models.URLField(
+            verbose_name=_("Zaaktype URL"),
+        ),
+        default=list,
+    )
     catalogus = models.ForeignKey(
         "openzaak.CatalogusConfig",
         on_delete=models.CASCADE,
@@ -174,7 +214,13 @@ class ZaakTypeConfig(models.Model):
     # actual config
 
     # notifications
-    notify_status_changes = models.BooleanField(default=False)
+    notify_status_changes = models.BooleanField(
+        verbose_name=_("Notify of status changes"),
+        default=False,
+        help_text=_(
+            "Whether the user should be notified of status changes for cases with this zaak type"
+        ),
+    )
 
     # documents
     description = models.TextField(
@@ -203,6 +249,15 @@ class ZaakTypeConfig(models.Model):
         verbose_name=_("e-Suite 'onderwerp' code"),
         max_length=255,
         blank=True,
+    )
+
+    relevante_zaakperiode = models.PositiveIntegerField(
+        verbose_name=_("Relevante zaakperiode"),
+        blank=True,
+        null=True,
+        help_text=_(
+            "Aantal maanden dat teruggekeken moet worden naar Zaken van deze zaaktypes."
+        ),
     )
 
     objects = ZaakTypeConfigQueryset.as_manager()
@@ -298,6 +353,152 @@ class ZaakTypeInformatieObjectTypeConfig(models.Model):
 
     def __str__(self):
         return self.omschrijving
+
+
+class ZaakTypeStatusTypeConfig(models.Model):
+    zaaktype_config = models.ForeignKey(
+        "openzaak.ZaakTypeConfig",
+        on_delete=models.CASCADE,
+    )
+    statustype_url = models.URLField(
+        verbose_name=_("Statustype URL"),
+        max_length=1000,
+    )
+    omschrijving = models.CharField(
+        verbose_name=_("Omschrijving"),
+        max_length=80,
+    )
+    statustekst = models.CharField(
+        verbose_name=_("Statustekst"),
+        max_length=1000,
+    )
+    zaaktype_uuids = ArrayField(
+        models.UUIDField(
+            verbose_name=_("Zaaktype UUID"),
+        ),
+        default=list,
+    )
+
+    # configuration
+    status_indicator = models.CharField(
+        blank=True,
+        max_length=32,
+        choices=StatusIndicators.choices,
+        verbose_name=_("Statustype indicator"),
+        help_text=_(
+            "Determines what color will be shown to the user if a case is set to this status"
+        ),
+    )
+    status_indicator_text = models.TextField(
+        blank=True,
+        default="",
+        verbose_name=_("Statustype indicator text"),
+        help_text=_(
+            "Determines the text that will be shown to the user if a case is set to this status"
+        ),
+    )
+    document_upload_description = models.TextField(
+        blank=True,
+        default="",
+        verbose_name=_("Document upload description"),
+        help_text=_(
+            "Description that will be shown above the document upload widget in a case detail page"
+        ),
+    )
+    description = models.TextField(
+        blank=True,
+        default="",
+        verbose_name=_("Frontend description"),
+        help_text=_(
+            "The text displayed in the case detail page for the status with this statustype"
+        ),
+    )
+    notify_status_change = models.BooleanField(
+        verbose_name=_("Notify of status change"),
+        default=True,
+        help_text=_(
+            "Whether the user should be notfied if a case is set to this type of status"
+        ),
+    )
+    document_upload_enabled = models.BooleanField(
+        default=True,
+        verbose_name=_("Document uploads"),
+        help_text=_(
+            "Enable document uploads for this statustype (override setting for case type)"
+        ),
+    )
+    call_to_action_url = models.URLField(
+        blank=True,
+        default="",
+        verbose_name=_("Call to action url"),
+        help_text=_(
+            "The url the user will be sent to by clicking on the call-to-action button"
+        ),
+    )
+    call_to_action_text = models.CharField(
+        max_length=48,
+        blank=True,
+        default="",
+        verbose_name=_("Call to action text"),
+        help_text=_("The text displayed on the call-to-action button"),
+    )
+
+    class Meta:
+        verbose_name = _("Zaaktype Statustype Configuration")
+
+        constraints = [
+            UniqueConstraint(
+                name="unique_zaaktype_config_statustype_url",
+                fields=["zaaktype_config", "statustype_url"],
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.zaaktype_config.identificatie} - {self.omschrijving}"
+
+
+class ZaakTypeResultaatTypeConfig(models.Model):
+    zaaktype_config = models.ForeignKey(
+        "openzaak.ZaakTypeConfig",
+        on_delete=models.CASCADE,
+    )
+    resultaattype_url = models.URLField(
+        verbose_name=_("Resultaattype URL"),
+        max_length=1000,
+    )
+    omschrijving = models.CharField(
+        verbose_name=_("Omschrijving"),
+        max_length=20,
+    )
+    zaaktype_uuids = ArrayField(
+        models.UUIDField(
+            verbose_name=_("Zaaktype UUID"),
+        ),
+        default=list,
+    )
+
+    # configuration
+    description = models.TextField(
+        blank=True,
+        default="",
+        verbose_name=_("Result description"),
+        help_text=_(
+            "Determines the text that will be shown to the user if a case is set to this result"
+        ),
+    )
+
+    class Meta:
+        verbose_name = _("Zaaktype Resultaattype Configuration")
+
+        constraints = [
+            UniqueConstraint(
+                name="unique_zaaktype_config_resultaattype_url",
+                fields=["zaaktype_config", "resultaattype_url"],
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.zaaktype_config.identificatie} - {self.omschrijving}"
 
 
 class UserCaseStatusNotificationBase(models.Model):

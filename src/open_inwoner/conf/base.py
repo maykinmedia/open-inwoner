@@ -71,6 +71,10 @@ DATABASES = {
     }
 }
 
+# Geospatial libraries
+GEOS_LIBRARY_PATH = config("GEOS_LIBRARY_PATH", None)
+GDAL_LIBRARY_PATH = config("GDAL_LIBRARY_PATH", None)
+
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
@@ -162,6 +166,7 @@ INSTALLED_APPS = [
     "axes",
     "sniplates",
     "digid_eherkenning",
+    "eherkenning",
     # "hijack.contrib.admin", # This should be imported but it causes an error. So now there are
     # "hijack",
     "localflavor",
@@ -195,6 +200,7 @@ INSTALLED_APPS = [
     "formtools",
     # Project applications.
     "open_inwoner.components",
+    "open_inwoner.contrib.kvk",
     "open_inwoner.ckeditor5",
     "open_inwoner.pdc",
     "open_inwoner.plans",
@@ -220,6 +226,7 @@ INSTALLED_APPS = [
     "open_inwoner.cms.footer",
     "open_inwoner.cms.plugins",
     "open_inwoner.cms.benefits",
+    "djchoices",
 ]
 
 MIDDLEWARE = [
@@ -466,6 +473,7 @@ AUTHENTICATION_BACKENDS = [
     "open_inwoner.accounts.backends.UserModelEmailBackend",
     "django.contrib.auth.backends.ModelBackend",
     "digid_eherkenning.backends.DigiDBackend",
+    "eherkenning.backends.eHerkenningBackend",
     "open_inwoner.accounts.backends.CustomOIDCBackend",
 ]
 
@@ -476,10 +484,10 @@ ADMIN_SESSION_COOKIE_AGE = config(
     "ADMIN_SESSION_COOKIE_AGE", 3600
 )  # Default 1 hour max session duration for admins
 SESSION_WARN_DELTA = 60  # Warn 1 minute before end of session.
-SESSION_COOKIE_AGE = 900  # Set to 15 minutes
+SESSION_COOKIE_AGE = 900  # Set to 15 minutes or less for testing
 
 LOGIN_REDIRECT_URL = "/"
-LOGOUT_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/accounts/login/"
 
 #
 # SECURITY settings
@@ -644,7 +652,7 @@ HIJACK_ALLOW_GET_REQUESTS = True
 # SENTRY - error monitoring
 #
 SENTRY_DSN = config("SENTRY_DSN", None)
-RELEASE = "v1.11"  # get_current_version()
+RELEASE = "v1.12"  # get_current_version()
 
 PRIVATE_MEDIA_ROOT = os.path.join(BASE_DIR, "private_media")
 FILER_ROOT = os.path.join(BASE_DIR, "media", "filer")
@@ -799,6 +807,9 @@ ZGW_LIMIT_NOTIFICATIONS_FREQUENCY = config(
     "ZGW_LIMIT_NOTIFICATIONS_FREQUENCY", default=60 * 15
 )
 
+# recent documents: created/added no longer than n days in the past
+DOCUMENT_RECENT_DAYS = config("DOCUMENT_RECENT_DAYS", default=1)
+
 #
 # Maykin fork of DJANGO-TWO-FACTOR-AUTH
 #
@@ -851,6 +862,8 @@ DIGID = {
     "want_assertions_signed": DIGID_WANT_ASSERTIONS_SIGNED,
 }
 
+EHERKENNING_MOCK = config("EHERKENNING_MOCK", default=True)
+
 THUMBNAIL_ALIASES = {
     "": {
         "logo": {
@@ -888,4 +901,5 @@ ACCOUNTS_SMS_GATEWAY = {
 
 from .app.csp import *  # noqa
 
-SECURE_REFERRER_POLICY = "same-origin"
+SECURE_REFERRER_POLICY = "origin-when-cross-origin"
+# SECURE_REFERRER_POLICY = "same-origin"

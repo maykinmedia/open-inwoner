@@ -7,6 +7,7 @@
 @import './Card/LocationCardList.scss';
 @import './CardContainer/CardContainer.scss';
 @import './Cases/Cases.scss';
+@import './Cases/CaseDetail';
 @import './Condition/Condition.scss';
 @import './ContactForm/ContactForm.scss';
 @import './Contactmomenten/Contactmomenten.scss';
@@ -27,14 +28,16 @@
 @import './Form/Checkbox.scss';
 @import './Form/ContactForm.scss';
 @import './Form/Date.scss';
-@import './Form/DocumentUpload.scss';
 @import './Form/Error.scss';
 @import './Form/Fieldset.scss';
+@import './Form/FileInput.scss';
+@import './Form/FileInputDefault.scss';
 @import './Form/Form.scss';
 @import './Form/GroupInput';
 @import './Form/Input.scss';
 @import './Form/Label.scss';
 @import './Form/MultiCheckbox.scss';
+@import './Form/NonFieldError.scss';
 @import './Form/Radio.scss';
 @import './Form/Search.scss';
 @import './Form/Select.scss';
@@ -79,6 +82,7 @@
 @import './Social/Social.scss';
 @import './Spinner/Spinner.scss';
 @import './Status/StatusList.scss';
+@import './Status/Status.scss';
 @import './Step/StepIndicator.scss';
 @import './Sticky/Sticky.scss';
 @import './Table/Table.scss';

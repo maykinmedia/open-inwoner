@@ -24,10 +24,14 @@ $color-primary: $color-blue !default;
 $color-secondary: $color-gray !default;
 $color-background: $color-white !default;
 $color-border: $color-gray !default;
-$color-danger: $color-red !default;
-$color-info: $color-blue !default;
-$color-success: $color-green !default;
-$color-warning: $color-orange !default;
+$color-danger: #ffbaba !default;
+$color-danger-dark: #680000 !default;
+$color-info: #cee9f7 !default;
+$color-info-dark: #0a5982 !default;
+$color-success: #dbf9e1 !default;
+$color-success-dark: #02791b !default;
+$color-warning: #fdce79 !default;
+$color-warning-dark: #593a00 !default;
 
 $grid-columns-mobile: 4 !default;
 $grid-columns-tablet: 9 !default;

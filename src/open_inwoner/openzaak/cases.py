@@ -1,3 +1,4 @@
+import copy
 import logging
 from typing import List, Optional
 
@@ -9,21 +10,29 @@ from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 from zgw_consumers.service import get_paginated_results
 
+from ..utils.decorators import cache as cache_result
 from .api_models import Resultaat, Rol, Status, Zaak, ZaakInformatieObject
+from .catalog import fetch_single_case_type, fetch_single_status_type
 from .clients import build_client
-from .models import OpenZaakConfig
-from .utils import cache as cache_result
+from .models import OpenZaakConfig, ZaakTypeStatusTypeConfig
+from .utils import is_zaak_visible
 
 logger = logging.getLogger(__name__)
 
 
-@cache_result("cases:{user_bsn}:{max_cases}", timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT)
-def fetch_cases(user_bsn: str, max_cases: Optional[int] = 100) -> List[Zaak]:
+@cache_result(
+    "cases:{user_bsn}:{max_cases}:{identificatie}",
+    timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
+)
+def fetch_cases(
+    user_bsn: str, max_cases: Optional[int] = 100, identificatie: Optional[str] = None
+) -> List[Zaak]:
     """
     retrieve cases for particular user with allowed confidentiality level
 
     :param:max_cases - used to limit the number of requests to list_zaken resource. The default
     value = 100, which means only one 1 request
+    :param:identificatie - used to filter the cases by a specific identification
     """
     client = build_client("zaak")
 
@@ -32,16 +41,71 @@ def fetch_cases(user_bsn: str, max_cases: Optional[int] = 100) -> List[Zaak]:
 
     config = OpenZaakConfig.get_solo()
 
+    params = {
+        "rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn": user_bsn,
+        "maximaleVertrouwelijkheidaanduiding": config.zaak_max_confidentiality,
+    }
+    if identificatie:
+        params.update({"identificatie": identificatie})
+
     try:
         response = get_paginated_results(
             client,
             "zaak",
             minimum=max_cases,
             request_kwargs={
-                "params": {
-                    "rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn": user_bsn,
-                    "maximaleVertrouwelijkheidaanduiding": config.zaak_max_confidentiality,
-                },
+                "params": params,
+            },
+        )
+    except (RequestException, ClientError) as e:
+        logger.exception("exception while making request", exc_info=e)
+        return []
+
+    cases = factory(Zaak, response)
+
+    return cases
+
+
+@cache_result(
+    "cases:{kvk_or_rsin}:{max_cases}:{zaak_identificatie}",
+    timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
+)
+def fetch_cases_by_kvk_or_rsin(
+    kvk_or_rsin: Optional[str],
+    max_cases: Optional[int] = 100,
+    zaak_identificatie: Optional[str] = None,
+) -> List[Zaak]:
+    """
+    retrieve cases for particular company with allowed confidentiality level
+
+    :param max_cases: - used to limit the number of requests to list_zaken resource. The default
+    value = 100, which means only one 1 request
+    :param zaak_identificatie: - used to filter the cases by a unique Zaak identification number
+    """
+    if not kvk_or_rsin:
+        return []
+
+    client = build_client("zaak")
+
+    if client is None:
+        return []
+
+    config = OpenZaakConfig.get_solo()
+
+    params = {
+        "rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__innNnpId": kvk_or_rsin,
+        "maximaleVertrouwelijkheidaanduiding": config.zaak_max_confidentiality,
+    }
+    if zaak_identificatie:
+        params.update({"identificatie": zaak_identificatie})
+
+    try:
+        response = get_paginated_results(
+            client,
+            "zaak",
+            minimum=max_cases,
+            request_kwargs={
+                "params": params,
             },
         )
     except (RequestException, ClientError) as e:
@@ -227,6 +291,28 @@ def fetch_roles_for_case_and_bsn(case_url: str, bsn: str) -> List[Rol]:
     return bsn_roles
 
 
+# implicitly cached because it uses fetch_case_roles()
+def fetch_roles_for_case_and_kvk(case_url: str, kvk_or_rsin: str) -> List[Rol]:
+    """
+    note we do a query on all case_roles and then manually filter our roles from the result,
+    because e-Suite doesn't support querying on both "zaak" AND "betrokkeneIdentificatie__nietNatuurlijkPersoon__inn_nnp_id"
+
+    see Taiga #948
+    """
+    case_roles = fetch_case_roles(case_url)
+    if not case_roles:
+        return []
+
+    roles = []
+    for role in case_roles:
+        if role.betrokkene_type == RolTypes.niet_natuurlijk_persoon:
+            nnp_id = role.betrokkene_identificatie.get("inn_nnp_id")
+            if nnp_id and nnp_id == kvk_or_rsin:
+                roles.append(role)
+
+    return roles
+
+
 # not cached because currently only used in info-object download view
 def fetch_case_information_objects_for_case_and_info(
     case_url: str, info_object_url: str
@@ -288,3 +374,67 @@ def connect_case_with_document(case_url: str, document_url: str) -> Optional[dic
         return
 
     return response
+
+
+def resolve_zaak_type(case: Zaak) -> None:
+    """
+    Resolve `case.zaaktype` (`str`) to a `ZaakType(ZGWModel)` object
+
+    Note: the result of `fetch_single_case_type` is cached, hence a request
+          is only made for new case type urls
+    """
+    case_type_url = case.zaaktype
+    case_type = fetch_single_case_type(case_type_url)
+    case.zaaktype = case_type
+
+
+def resolve_status(case: Zaak) -> None:
+    """
+    Resolve `case.status` (`str`) to a `Status(ZGWModel)` object
+    """
+    case.status = fetch_single_status(case.status)
+
+
+def resolve_status_type(case: Zaak) -> None:
+    """
+    Resolve `case.statustype` (`str`) to a `StatusType(ZGWModel)` object
+    """
+    statustype_url = case.status.statustype
+    case.status.statustype = fetch_single_status_type(statustype_url)
+
+
+def add_status_type_config(case: Zaak) -> None:
+    """
+    Add `ZaakTypeStatusTypeConfig` corresponding to the status type url of the case
+
+    Note: must be called after `resolve_status_type` since we're getting the
+          status type url from `case.status.statustype`
+    """
+    try:
+        case.statustype_config = ZaakTypeStatusTypeConfig.objects.get(
+            statustype_url=case.status.statustype.url
+        )
+    except ZaakTypeStatusTypeConfig.DoesNotExist:
+        pass
+
+
+def preprocess_data(cases: list[Zaak]) -> list[Zaak]:
+    """
+    Resolve zaaktype and statustype, add status type config, filter for visibility
+
+    Note: we need to iterate twice over `cases` because the `zaak_type` must be
+          resolved to a `ZaakType` object before we can filter by visibility
+    """
+    for case in cases:
+        resolve_zaak_type(case)
+
+    cases = [case for case in cases if case.status and is_zaak_visible(case)]
+
+    for case in cases:
+        resolve_status(case)
+        resolve_status_type(case)
+        add_status_type_config(case)
+
+    cases.sort(key=lambda case: case.startdatum, reverse=True)
+
+    return cases

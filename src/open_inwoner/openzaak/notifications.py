@@ -22,6 +22,7 @@ from open_inwoner.openzaak.cases import (
     fetch_single_case_information_object,
     fetch_single_status,
     fetch_status_history_no_cache,
+    resolve_status,
 )
 from open_inwoner.openzaak.catalog import (
     fetch_single_case_type,
@@ -35,7 +36,6 @@ from open_inwoner.openzaak.models import (
     UserCaseStatusNotification,
 )
 from open_inwoner.openzaak.utils import (
-    format_zaak_identificatie,
     get_zaak_type_config,
     get_zaak_type_info_object_type_config,
     is_info_object_visible,
@@ -43,6 +43,8 @@ from open_inwoner.openzaak.utils import (
 )
 from open_inwoner.utils.logentry import system_action as log_system_action
 from open_inwoner.utils.url import build_absolute_url
+
+from .models import ZaakTypeStatusTypeConfig
 
 logger = logging.getLogger(__name__)
 
@@ -313,13 +315,31 @@ def _handle_status_notification(notification: Notification, case: Zaak, inform_u
             )
             return
 
+    # check status notification setting on `ZaakTypeStatusTypeConfig`
+    resolve_status(case)
+    statustype_url = case.status.statustype
+
+    try:
+        statustype_config = ZaakTypeStatusTypeConfig.objects.get(
+            statustype_url=statustype_url
+        )
+    except ZaakTypeStatusTypeConfig.DoesNotExist:
+        pass
+    else:
+        if not statustype_config.notify_status_change:
+            log_system_action(
+                f"ignored {r} notification: 'notify_status_change' is False for the status "
+                f"type configuration of the status of this case ({case.url})",
+                log_level=logging.INFO,
+            )
+            return
+
     # reaching here means we're going to inform users
     log_system_action(
         f"accepted {r} notification: attempt informing users {wrap_join(inform_users)} for case {case.url}",
         log_level=logging.INFO,
     )
     for user in inform_users:
-        # TODO run in try/except so it can't bail?
         handle_status_update(user, case, status)
 
 
@@ -364,7 +384,7 @@ def send_case_update_email(user: User, case: Zaak):
 
     template = find_template("case_notification")
     context = {
-        "identification": format_zaak_identificatie(case.identificatie),
+        "identification": case.identification,
         "type_description": case.zaaktype.omschrijving,
         "start_date": case.startdatum,
         "case_link": case_detail_url,

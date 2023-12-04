@@ -3,6 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 
+from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.pdc.forms import ProductFinderForm
 from open_inwoner.pdc.models import Category, ProductCondition, ProductLocation
 from open_inwoner.questionnaire.models import QuestionnaireStep
@@ -22,21 +23,39 @@ class CategoriesPlugin(CMSActiveAppMixin, CMSPluginBase):
     limit = 4
 
     def render(self, context, instance, placeholder):
+        config = OpenZaakConfig.get_solo()
         request = context["request"]
-        # Show the categories if the user has selected them, otherwise
+        # Show the categories if the user has cases linked to them, otherwise
         # Show the highlighted published categories if they have been specified, otherwise
         # Show the first X published categories
 
         # Highlighted categories
         highlighted_categories = (
-            Category.objects.published().filter(highlighted=True).order_by("path")
+            Category.objects.published()
+            .visible_for_user(request.user)
+            .filter(highlighted=True)
+            .order_by("path")
         )
-        if request.user.is_authenticated and request.user.selected_categories.exists():
-            categories = request.user.selected_categories.order_by("name")[: self.limit]
-        elif highlighted_categories.exists():
-            categories = highlighted_categories[: self.limit]
-        else:
-            categories = Category.objects.published().order_by("path")[: self.limit]
+        categories = None
+        if (
+            config.enable_categories_filtering_with_zaken
+            and request.user.is_authenticated
+            and request.user.bsn
+        ):
+            categories = (
+                Category.objects.published()
+                .visible_for_user(request.user)
+                .filter_for_user_with_zaken(request.user)
+                .order_by("name")[: self.limit]
+            )
+
+        # Fallback for if the user has no cases with case types that are linked to
+        # categories
+        if not categories:
+            if highlighted_categories.exists():
+                categories = highlighted_categories[: self.limit]
+            else:
+                categories = Category.objects.published().order_by("path")[: self.limit]
 
         context["categories"] = categories
 

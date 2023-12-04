@@ -1,4 +1,5 @@
 from datetime import date
+from unittest.mock import patch
 from urllib.parse import urlencode
 
 from django.contrib.sites.models import Site
@@ -10,8 +11,11 @@ from django.utils.translation import gettext as _
 import requests_mock
 from django_webtest import WebTest
 from furl import furl
+from pyquery import PyQuery as PQ
 
 from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.contrib.kvk.models import KvKConfig
+from open_inwoner.contrib.kvk.tests.factories import CertificateFactory
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 
 from ...cms.tests import cms_tools
@@ -19,7 +23,12 @@ from ...utils.test import ClearCachesMixin
 from ...utils.tests.helpers import AssertRedirectsMixin
 from ..choices import LoginTypeChoices
 from ..models import User
-from .factories import DigidUserFactory, InviteFactory, UserFactory
+from .factories import (
+    DigidUserFactory,
+    InviteFactory,
+    UserFactory,
+    eHerkenningUserFactory,
+)
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
@@ -68,7 +77,11 @@ class DigiDRegistrationTest(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
             furl(reverse("digid:login")).add({"next": necessary_url}).url,
         )
 
-    def test_digid_fail_without_invite_redirects_to_login_page(self):
+    @patch("digid_eherkenning.validators.Proef11ValidatorBase.__call__")
+    def test_digid_fail_without_invite_redirects_to_login_page(self, m):
+        # disable mock form validation to check redirect
+        m.return_value = True
+
         self.assertNotIn("invite_url", self.client.session.keys())
 
         url = reverse("digid-mock:password")
@@ -87,7 +100,11 @@ class DigiDRegistrationTest(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
 
         self.assertRedirectsLogin(response, with_host=True)
 
-    def test_digid_fail_without_invite_and_next_url_redirects_to_login_page(self):
+    @patch("digid_eherkenning.validators.Proef11ValidatorBase.__call__")
+    def test_digid_fail_without_invite_and_next_url_redirects_to_login_page(self, m):
+        # disable mock form validation to check redirect
+        m.return_value = True
+
         self.assertNotIn("invite_url", self.client.session.keys())
 
         url = reverse("digid-mock:password")
@@ -106,7 +123,10 @@ class DigiDRegistrationTest(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
 
         self.assertRedirectsLogin(response, with_host=True)
 
-    def test_digid_fail_with_invite_redirects_to_register_page(self):
+    @patch("digid_eherkenning.validators.Proef11ValidatorBase.__call__")
+    def test_digid_fail_with_invite_redirects_to_register_page(self, m):
+        # disable mock form validation to check redirect
+        m.return_value = True
         invite = InviteFactory()
         session = self.client.session
         session[
@@ -149,7 +169,7 @@ class DigiDRegistrationTest(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
         url = f"{url}?{urlencode(params)}"
 
         data = {
-            "auth_name": "123456789",
+            "auth_name": "533458225",
             "auth_pass": "bar",
         }
 
@@ -175,7 +195,7 @@ class DigiDRegistrationTest(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
             "next": reverse("profile:registration_necessary"),
         }
         data = {
-            "auth_name": "123456789",
+            "auth_name": "533458225",
             "auth_pass": "bar",
         }
         url = f"{url}?{urlencode(params)}"
@@ -223,7 +243,7 @@ class DigiDRegistrationTest(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
             "next": reverse("profile:registration_necessary"),
         }
         data = {
-            "auth_name": "123456789",
+            "auth_name": "533458225",
             "auth_pass": "bar",
         }
         url = f"{url}?{urlencode(params)}"
@@ -260,7 +280,7 @@ class DigiDRegistrationTest(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
         url = f"{url}?{urlencode(params)}"
 
         data = {
-            "auth_name": "123456782",
+            "auth_name": "533458225",
             "auth_pass": "bar",
         }
         # post our password to the IDP
@@ -389,6 +409,188 @@ class DigiDRegistrationTest(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
         user.refresh_from_db()
 
         self.assertNotEqual(user.first_name, "UpdatedName")
+
+
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
+    """Tests concerning the registration of eHerkenning users"""
+
+    csrf_checks = False
+    url = reverse_lazy("django_registration_register")
+
+    @classmethod
+    def setUpTestData(cls):
+        cms_tools.create_homepage()
+
+    @patch("open_inwoner.configurations.models.SiteConfiguration.get_solo")
+    def test_registration_page_eherkenning(self, mock_solo):
+        mock_solo.return_value.eherkenning_enabled = True
+        mock_solo.return_value.login_allow_registration = False
+
+        response = self.app.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNone(response.html.find(id="registration-form"))
+
+        eherkenning_tag = response.html.find("a", title="Registreren met eHerkenning")
+        self.assertIsNotNone(eherkenning_tag)
+        self.assertEqual(
+            eherkenning_tag.attrs["href"],
+            furl(reverse("eherkenning:login"))
+            .add({"next": reverse("profile:registration_necessary")})
+            .url,
+        )
+
+    @patch("open_inwoner.configurations.models.SiteConfiguration.get_solo")
+    def test_registration_page_eherkenning_with_invite(self, mock_solo):
+        mock_solo.return_value.eherkenning_enabled = True
+        mock_solo.return_value.login_allow_registration = False
+
+        invite = InviteFactory.create()
+
+        response = self.app.get(f"{self.url}?invite={invite.key}")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNone(response.html.find(id="registration-form"))
+
+        eherkenning_tag = response.html.find("a", title="Registreren met eHerkenning")
+        self.assertIsNotNone(eherkenning_tag)
+        necessary_url = (
+            furl(reverse("profile:registration_necessary"))
+            .add({"invite": invite.key})
+            .url
+        )
+        self.assertEqual(
+            eherkenning_tag.attrs["href"],
+            furl(reverse("eherkenning:login")).add({"next": necessary_url}).url,
+        )
+
+    @patch("eherkenning.validators.KVKValidator.__call__")
+    def test_eherkenning_fail_without_invite_redirects_to_login_page(self, m):
+        # disable mock form validation to check redirect
+        m.return_value = True
+
+        self.assertNotIn("invite_url", self.client.session.keys())
+
+        url = reverse("eherkenning-mock:password")
+        params = {
+            "acs": reverse("eherkenning-acs"),
+            "next": reverse("pages-root"),
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": "w",
+            "auth_pass": "bar",
+        }
+        # post our password to the IDP
+        response = self.app.post(url, data).follow()
+
+        self.assertRedirectsLogin(response, with_host=True)
+
+    @patch("eherkenning.validators.KVKValidator.__call__")
+    def test_eherkenning_fail_without_invite_and_next_url_redirects_to_login_page(
+        self, m
+    ):
+        # disable mock form validation to check redirect
+        m.return_value = True
+
+        self.assertNotIn("invite_url", self.client.session.keys())
+
+        url = reverse("eherkenning-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": None,
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": "w",
+            "auth_pass": "bar",
+        }
+        # post our password to the IDP
+        response = self.app.post(url, data).follow()
+
+        self.assertRedirectsLogin(response, with_host=True)
+
+    @patch("eherkenning.validators.KVKValidator.__call__")
+    def test_eherkenning_fail_with_invite_redirects_to_register_page(self, m):
+        # disable mock form validation to check redirect
+        m.return_value = True
+        invite = InviteFactory()
+        session = self.client.session
+        session[
+            "invite_url"
+        ] = f"{reverse('django_registration_register')}?invite={invite.key}"
+        session.save()
+
+        url = reverse("eherkenning-mock:password")
+        params = {
+            "acs": reverse("acs"),
+            "next": f"{reverse('profile:registration_necessary')}?invite={invite.key}",
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": "w",
+            "auth_pass": "bar",
+        }
+        # post our password to the IDP
+        response = self.client.post(url, data, follow=True)
+
+        self.assertRedirects(
+            response,
+            f"http://testserver{reverse('django_registration_register')}?invite={invite.key}",
+        )
+
+    @patch(
+        "open_inwoner.contrib.kvk.models.KvKConfig.get_solo",
+    )
+    def test_invite_url_not_in_session_after_successful_login(self, mock_solo):
+        mock_solo.return_value.api_root = "http://foo.bar/api/v1/"
+        mock_solo.return_value.client_certificate = CertificateFactory()
+        mock_solo.return_value.server_certificate = CertificateFactory()
+
+        invite = InviteFactory()
+        session = self.client.session
+        session[
+            "invite_url"
+        ] = f"{reverse('django_registration_register')}?invite={invite.key}"
+        session.save()
+
+        url = reverse("eherkenning-mock:password")
+        params = {
+            "acs": reverse("eherkenning:acs"),
+            "next": f"{reverse('profile:registration_necessary')}?invite={invite.key}",
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": "12345678",
+            "auth_pass": "bar",
+        }
+
+        self.assertIn("invite_url", self.client.session.keys())
+
+        # post our password to the IDP
+        response = self.client.post(url, data, follow=True)
+
+        self.assertRedirects(
+            response,
+            f"{reverse('profile:registration_necessary')}?invite={invite.key}",
+        )
+        self.assertNotIn("invite_url", self.client.session.keys())
+
+    def test_eherkenning_user_is_redirected_to_necessary_registration(self):
+        """
+        eHerkenning users that do not have their email filled in should be redirected to
+        the registration form
+        """
+        user = eHerkenningUserFactory(kvk="12345678", email="user-12345678@localhost")
+
+        response = self.app.get(reverse("pages-root"), user=user)
+
+        self.assertRedirects(response, reverse("profile:registration_necessary"))
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
@@ -669,7 +871,7 @@ class EmailPasswordRegistrationTest(WebTest):
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class DuplicateEmailRegistrationTest(WebTest):
     """
-    DigiD users should be able to register with email addresses that are already in use.
+    DigiD/eHerkenning users should be able to register with email addresses that are already in use.
     Other users should not be able to register with duplicate emails.
     """
 
@@ -682,8 +884,6 @@ class DuplicateEmailRegistrationTest(WebTest):
         cls.msg_dupes = _("This email is already taken.")
         cls.msg_inactive = _("This account has been deactivated")
 
-    # TODO use factories and valid Users (eg: bsn AND LoginTypeChoices.digid)
-
     #
     # digid users
     #
@@ -691,7 +891,7 @@ class DuplicateEmailRegistrationTest(WebTest):
         """Assert that digid users can register with duplicate emails"""
         test_user = DigidUserFactory.create(
             email="test@example.com",
-            bsn="123456789",
+            bsn="648197724",
         )
 
         url = reverse("digid-mock:password")
@@ -703,7 +903,7 @@ class DuplicateEmailRegistrationTest(WebTest):
 
         data = {
             # different BSN
-            "auth_name": "112083948",
+            "auth_name": "533458225",
             "auth_pass": "bar",
         }
         # post our password to the IDP
@@ -719,8 +919,46 @@ class DuplicateEmailRegistrationTest(WebTest):
         users = User.objects.filter(email__iexact=test_user.email)
 
         self.assertEqual(users.count(), 2)
+        self.assertEqual(users.first().email, "test@example.com")
+        self.assertEqual(users.last().email, "test@example.com")
 
-        # TODO
+    def test_eherkenning_user_success(self):
+        """Assert that eHerkenning users can register with duplicate emails"""
+        test_user = eHerkenningUserFactory.create(
+            email="test@localhost",
+            kvk="64819772",
+        )
+
+        url = reverse("eherkenning-mock:password")
+        params = {
+            "acs": reverse("eherkenning:acs"),
+            "next": reverse("profile:registration_necessary"),
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            # different KvK
+            "auth_name": "12345678",
+            "auth_pass": "bar",
+        }
+        # post our password to the IDP
+        response = self.app.post(url, data).follow().follow()
+
+        form = response.forms["necessary-form"]
+
+        self.assertEqual(form["email"].value, "")
+        self.assertNotIn("first_name", form.fields)
+        self.assertNotIn("last_name", form.fields)
+
+        # same email
+        form["email"] = "test@localhost"
+        form.submit().follow()
+
+        users = User.objects.filter(email__iexact=test_user.email)
+
+        self.assertEqual(users.count(), 2)
+        self.assertEqual(users.first().email, "test@localhost")
+        self.assertEqual(users.last().email, "test@localhost")
 
     # def test_digid_user_cannot_reregister_inactive_duplicate_email(self):
     #     inactive_user = DigidUserFactory.create(
@@ -780,7 +1018,7 @@ class DuplicateEmailRegistrationTest(WebTest):
         url = f"{url}?{urlencode(params)}"
 
         data = {
-            "auth_name": "123456789",
+            "auth_name": "533458225",
             "auth_pass": "bar",
         }
         # post our password to the IDP
@@ -816,7 +1054,7 @@ class DuplicateEmailRegistrationTest(WebTest):
         url = f"{url}?{urlencode(params)}"
 
         data = {
-            "auth_name": "123456782",
+            "auth_name": "533458225",
             "auth_pass": "bar",
         }
         # post our password to the IDP
@@ -955,7 +1193,7 @@ class DuplicateEmailRegistrationTest(WebTest):
         form = edit_page.forms["profile-edit"]
         form["first_name"] = "changed_first"
         form["last_name"] = "changed_last"
-        response = form.submit()
+        form.submit()
 
         user = User.objects.get(id=test_user.id)
 
@@ -994,7 +1232,7 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
         urls = [
             reverse("pages-root"),
             reverse("products:category_list"),
-            reverse("cases:open_cases"),
+            reverse("cases:index"),
             reverse("profile:detail"),
             reverse("profile:data"),
             reverse("collaborate:plan_list"),
@@ -1253,7 +1491,7 @@ class TestLoginLogoutFunctionality(AssertRedirectsMixin, WebTest):
         """Test that a user is able to log out and page redirects to root endpoint."""
         # Log out user and redirection
         logout_response = self.app.get(reverse("logout"), user=self.user)
-        self.assertRedirects(logout_response, reverse("pages-root"))
+        self.assertRedirects(logout_response, reverse("login"))
         self.assertFalse(logout_response.follow().context["user"].is_authenticated)
 
 
@@ -1328,14 +1566,20 @@ class TestPasswordChange(WebTest):
 
     def test_password_change_button_is_rendered_with_default_login_type(self):
         response = self.app.get(reverse("profile:detail"), user=self.user)
-        self.assertContains(response, _("Wijzig wachtwoord"))
+
+        doc = PQ(response.content)
+        link = doc.find("[aria-label='Wachtwoord']")[0]
+        self.assertTrue(doc(link).is_("a"))
 
     def test_password_change_button_is_not_rendered_with_digid_login_type(self):
         digid_user = UserFactory(
             login_type=LoginTypeChoices.digid, email="john@smith.nl"
         )
         response = self.app.get(reverse("profile:detail"), user=digid_user)
-        self.assertNotContains(response, _("Wijzig wachtwoord"))
+
+        doc = PQ(response.content)
+        links = doc.find("[aria-label='Wachtwoord']")
+        self.assertEqual(len(links), 0)
 
     def test_anonymous_user_is_redirected_to_login_page_if_password_change_is_accessed(
         self,

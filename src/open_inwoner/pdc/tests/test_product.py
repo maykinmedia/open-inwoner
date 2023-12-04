@@ -1,12 +1,16 @@
 from html import escape
+from unittest.mock import patch
 
-from django.test import override_settings
+from django.test import override_settings, tag
 from django.urls import reverse
 
 from django_webtest import WebTest
+from playwright.sync_api import expect
 
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.questionnaire.tests.factories import QuestionnaireStepFactory
+from open_inwoner.utils.test import ClearCachesMixin
+from open_inwoner.utils.tests.playwright import PlaywrightSyncLiveServerTestCase
 
 from ...media.tests.factories import VideoFactory
 from ..models import CategoryProduct
@@ -342,3 +346,31 @@ class TestProductDetailView(WebTest):
 
         self.assertEqual(links[3].text, "Second subheading")
         self.assertEqual(links[3].attrib["href"], "#subheading-second-subheading")
+
+
+@tag("e2e")
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@patch("open_inwoner.configurations.models.SiteConfiguration.get_solo")
+class ProductPagePlaywrightTests(ClearCachesMixin, PlaywrightSyncLiveServerTestCase):
+    def test_click_cta_button(self, mock_solo):
+        mock_solo.return_value.cookiebanner_enabled = False
+
+        product = ProductFactory(
+            content="Some content [CTABUTTON]", link="http://www.example.com"
+        )
+
+        context = self.browser.new_context()
+        page = context.new_page()
+
+        page.goto(
+            self.live_reverse("products:product_detail", kwargs={"slug": product.slug})
+        )
+
+        cta_button = page.locator(".grid__main .cta-button")
+
+        expect(cta_button).to_be_visible()
+
+        cta_button.click()
+        new_page = context.wait_for_event("page")
+
+        self.assertEqual(new_page.url, "http://www.example.com/")

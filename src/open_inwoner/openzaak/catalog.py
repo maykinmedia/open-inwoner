@@ -9,9 +9,10 @@ from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.catalogi import Catalogus
 from zgw_consumers.service import get_paginated_results
 
+from ..utils.decorators import cache as cache_result
 from .api_models import InformatieObjectType, ResultaatType, StatusType, ZaakType
 from .clients import build_client
-from .utils import cache as cache_result, get_retrieve_resource_by_uuid_url
+from .utils import get_retrieve_resource_by_uuid_url
 
 logger = logging.getLogger(__name__)
 
@@ -80,6 +81,26 @@ def fetch_single_status_type(status_type_url: str) -> Optional[StatusType]:
     status_type = factory(StatusType, response)
 
     return status_type
+
+
+@cache_result(
+    "resultaat_type:{resultaat_type_url}", timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT
+)
+def fetch_single_resultaat_type(resultaat_type_url: str) -> Optional[ResultaatType]:
+    client = build_client("catalogi")
+
+    if client is None:
+        return
+
+    try:
+        response = client.retrieve("resultaattype", url=resultaat_type_url)
+    except (RequestException, ClientError) as e:
+        logger.exception("exception while making request", exc_info=e)
+        return
+
+    resultaat_type = factory(ResultaatType, response)
+
+    return resultaat_type
 
 
 # not cached because only used by tools,

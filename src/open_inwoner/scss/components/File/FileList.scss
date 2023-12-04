@@ -1,4 +1,6 @@
 .file-list {
+  margin-bottom: var(--row-height);
+
   .h4 {
     margin-bottom: var(--spacing-large);
   }
@@ -10,7 +12,7 @@
   }
 
   &__list-item {
-    margin-bottom: var(--spacing-large);
+    margin-bottom: var(--spacing-medium);
 
     &:last-child {
       margin-bottom: 0;

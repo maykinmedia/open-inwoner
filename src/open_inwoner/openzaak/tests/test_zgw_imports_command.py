@@ -12,6 +12,8 @@ from open_inwoner.openzaak.models import (
     OpenZaakConfig,
     ZaakTypeConfig,
     ZaakTypeInformatieObjectTypeConfig,
+    ZaakTypeResultaatTypeConfig,
+    ZaakTypeStatusTypeConfig,
 )
 from open_inwoner.openzaak.tests.factories import ServiceFactory
 from open_inwoner.openzaak.tests.shared import CATALOGI_ROOT
@@ -47,6 +49,8 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
         self.assertEqual(CatalogusConfig.objects.count(), 2)
         self.assertEqual(ZaakTypeConfig.objects.count(), 2)
         self.assertEqual(ZaakTypeInformatieObjectTypeConfig.objects.count(), 3)
+        self.assertEqual(ZaakTypeStatusTypeConfig.objects.count(), 2)
+        self.assertEqual(ZaakTypeResultaatTypeConfig.objects.count(), 2)
 
         stdout = out.getvalue().strip()
 
@@ -66,6 +70,17 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
           info-aaa-2
         BBB - zaaktype-bbb
           info-bbb
+
+        imported 2 new zaaktype-statustype configs
+        AAA - zaaktype-aaa
+          AAA - status-aaa-1
+          AAA - status-aaa-2
+
+        imported 2 new zaaktype-resultaattype configs
+        AAA - zaaktype-aaa
+          AAA - test
+        BBB - zaaktype-bbb
+          BBB - test
         """
         ).strip()
 
@@ -79,6 +94,8 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
         self.assertEqual(CatalogusConfig.objects.count(), 2)
         self.assertEqual(ZaakTypeConfig.objects.count(), 2)
         self.assertEqual(ZaakTypeInformatieObjectTypeConfig.objects.count(), 3)
+        self.assertEqual(ZaakTypeStatusTypeConfig.objects.count(), 2)
+        self.assertEqual(ZaakTypeResultaatTypeConfig.objects.count(), 2)
 
         stdout = out.getvalue().strip()
 
@@ -89,6 +106,10 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
         imported 0 new zaaktype configs
 
         imported 0 new zaaktype-informatiebjecttype configs
+
+        imported 0 new zaaktype-statustype configs
+
+        imported 0 new zaaktype-resultaattype configs
         """
         ).strip()
 
@@ -101,13 +122,15 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
         )
         InformationObjectTypeMockData().install_mocks(m, with_catalog=False)
 
-        # run it to import our data
+        # # run it to import our data
         out = StringIO()
         call_command("zgw_import_data", stdout=out)
 
         self.assertEqual(CatalogusConfig.objects.count(), 0)
         self.assertEqual(ZaakTypeConfig.objects.count(), 2)
         self.assertEqual(ZaakTypeInformatieObjectTypeConfig.objects.count(), 3)
+        self.assertEqual(ZaakTypeStatusTypeConfig.objects.count(), 2)
+        self.assertEqual(ZaakTypeResultaatTypeConfig.objects.count(), 2)
 
         stdout = out.getvalue().strip()
 
@@ -125,6 +148,17 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
           info-aaa-2
         BBB - zaaktype-bbb
           info-bbb
+
+        imported 2 new zaaktype-statustype configs
+        AAA - zaaktype-aaa
+          AAA - status-aaa-1
+          AAA - status-aaa-2
+
+        imported 2 new zaaktype-resultaattype configs
+        AAA - zaaktype-aaa
+          AAA - test
+        BBB - zaaktype-bbb
+          BBB - test
         """
         ).strip()
 
@@ -138,6 +172,8 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
         self.assertEqual(CatalogusConfig.objects.count(), 0)
         self.assertEqual(ZaakTypeConfig.objects.count(), 2)
         self.assertEqual(ZaakTypeInformatieObjectTypeConfig.objects.count(), 3)
+        self.assertEqual(ZaakTypeStatusTypeConfig.objects.count(), 2)
+        self.assertEqual(ZaakTypeResultaatTypeConfig.objects.count(), 2)
 
         stdout = out.getvalue().strip()
 
@@ -148,6 +184,10 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
         imported 0 new zaaktype configs
 
         imported 0 new zaaktype-informatiebjecttype configs
+
+        imported 0 new zaaktype-statustype configs
+
+        imported 0 new zaaktype-resultaattype configs
         """
         ).strip()
 

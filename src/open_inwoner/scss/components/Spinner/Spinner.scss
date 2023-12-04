@@ -16,10 +16,10 @@
   text-align: center;
 
   @media (min-width: 500px) {
-    justify-content: flex-start;
+    justify-content: center;
     align-items: flex-start;
     height: 70vh;
-    margin: 100px 0 0 200px;
+    margin: 100px 0 0 0;
   }
 
   .spinner {

@@ -1,7 +1,28 @@
 .cases {
   margin-top: var(--spacing-giant);
 
-  /// cards on cases page
+  &__grid .grid {
+    grid-row-gap: var(--spacing-medium);
+    grid-column-gap: var(--spacing-extra-large);
+
+    // Tablets
+    @media (min-width: 500px) and (max-width: 767px) {
+      flex-direction: row;
+      flex-wrap: wrap;
+
+      .column {
+        flex-basis: calc(50% - var(--spacing-large));
+      }
+    }
+
+    .column--start-4 {
+      @media (min-width: 768px) and (max-width: 900px) {
+        grid-column-start: 1;
+      }
+    }
+  }
+
+  /// cards on cases list
   .card {
     .cases__link {
       text-decoration: none;
@@ -11,18 +32,55 @@
   a:hover {
     cursor: pointer;
   }
-}
 
-#document-upload {
-  /// Make required asterisk visible for this component
-  .label__label--required {
-    color: var(--color-red);
-    padding-left: var(--spacing-tiny);
-    //make asterisks invisible by default, only make them visible if component has the caption
-    display: inline;
+  &__title_text {
+    padding-top: var(--spacing-medium);
+    padding-bottom: var(--spacing-extra-large);
   }
-}
 
-#cases-contact-form-content > h2 {
-  margin-top: var(--spacing-large);
+  &__detail {
+    box-sizing: border-box;
+  }
+
+  /// cards with statuses
+
+  .card__header {
+    display: flex;
+    background-color: var(--color-info-lighter);
+    border-top-left-radius: var(--border-radius);
+    border-top-right-radius: var(--border-radius);
+    color: var(--color-info-darker);
+
+    .card__status_indicator_text {
+      padding: var(--spacing-medium);
+    }
+
+    [class*='icons'] {
+      margin: var(--spacing-small) var(--spacing-medium) 0 var(--spacing-medium);
+    }
+
+    &.success {
+      display: flex;
+      background-color: var(--color-success-lighter);
+      color: var(--color-success);
+    }
+
+    &.info {
+      display: flex;
+      background-color: var(--color-info-lighter);
+      color: var(--color-info-darker);
+    }
+
+    &.warning {
+      display: flex;
+      background-color: var(--color-danger-lightest);
+      color: var(--color-danger-darker);
+    }
+
+    &.failure {
+      display: flex;
+      background-color: var(--color-error-lighter);
+      color: var(--color-error-darker);
+    }
+  }
 }

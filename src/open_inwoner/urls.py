@@ -14,6 +14,8 @@ from open_inwoner.accounts.views import (
     AddPhoneNumberWizardView,
     CustomDigiDAssertionConsumerServiceMockView,
     CustomDigiDAssertionConsumerServiceView,
+    CustomeHerkenningAssertionConsumerServiceMockView,
+    CustomeHerkenningAssertionConsumerServiceView,
     CustomLoginView,
     CustomRegistrationView,
     LogPasswordChangeView,
@@ -110,7 +112,6 @@ urlpatterns = [
     path("apimock/", include("open_inwoner.apimock.urls")),
     # TODO move search to products cms app?
     path("", include("open_inwoner.search.urls", namespace="search")),
-    # path("uitkeringen/", include("open_inwoner.cms.ssd.urls", namespace="ssd")),
     re_path(r"^", include("cms.urls")),
 ]
 
@@ -120,6 +121,9 @@ urlpatterns += staticfiles_urlpatterns() + static(
     settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
 )
 
+urlpatterns = [
+    path("metadata/", include("digid_eherkenning.metadata_urls"))
+] + urlpatterns
 if "digid_eherkenning.backends.DigiDBackend" in settings.AUTHENTICATION_BACKENDS:
     urlpatterns = [
         path(
@@ -128,7 +132,6 @@ if "digid_eherkenning.backends.DigiDBackend" in settings.AUTHENTICATION_BACKENDS
             name="acs",
         ),
         path("digid/", include("digid_eherkenning.digid_urls")),
-        path("metadata/", include("digid_eherkenning.metadata_urls")),
     ] + urlpatterns
 elif settings.DIGID_MOCK:
     urlpatterns = [
@@ -139,7 +142,26 @@ elif settings.DIGID_MOCK:
         ),
         path("digid/", include("digid_eherkenning.mock.digid_urls")),
         path("digid/idp/", include("digid_eherkenning.mock.idp.digid_urls")),
-        path("metadata/", include("digid_eherkenning.metadata_urls")),
+    ] + urlpatterns
+
+if "eherkenning.backends.eHerkenningBackend" in settings.AUTHENTICATION_BACKENDS:
+    urlpatterns = [
+        path(
+            "eherkenning/acs/",
+            CustomeHerkenningAssertionConsumerServiceView.as_view(),
+            name="eherkenning-acs",
+        ),
+        path("eherkenning/", include("digid_eherkenning.eherkenning_urls")),
+    ] + urlpatterns
+elif settings.EHERKENNING_MOCK:
+    urlpatterns = [
+        path(
+            "eherkenning/acs/",
+            CustomeHerkenningAssertionConsumerServiceMockView.as_view(),
+            name="eherkenning-acs",
+        ),
+        path("eherkenning/", include("eherkenning.mock.eherkenning_urls")),
+        path("eherkenning/idp/", include("eherkenning.mock.idp.eherkenning_urls")),
     ] + urlpatterns
 
 

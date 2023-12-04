@@ -19,6 +19,20 @@
     display: inline-flex;
   }
 
+  &--info {
+    background-color: var(--color-info-lighter);
+    color: var(--color-info-darker);
+    border: 0;
+
+    & .document-upload-description__text {
+      margin-top: 0.15em;
+
+      & * {
+        margin: 0;
+      }
+    }
+  }
+
   &--stretch {
     height: 100%;
   }
@@ -82,6 +96,7 @@
   &__img--contain {
     object-fit: contain;
   }
+
   &__body {
     padding: var(--card-spacing);
 
@@ -89,6 +104,13 @@
       display: flex;
       flex-direction: column;
       flex-wrap: wrap;
+    }
+
+    &--direction-vertical {
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
     }
 
     .spacer {

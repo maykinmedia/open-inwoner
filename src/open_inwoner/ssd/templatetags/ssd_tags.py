@@ -34,7 +34,7 @@ def format_date_month_name(date_str: str) -> str:
     patched = date_str + "01"
     dt = datetime.strptime(patched, "%Y%m%d")
 
-    return django_date(dt, "M Y").lower()
+    return django_date(dt, "F Y").lower()
 
 
 @register.simple_tag

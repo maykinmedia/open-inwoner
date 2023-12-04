@@ -47,7 +47,7 @@ COPY ./build /app/build/
 COPY ./*.json ./*.js ./.babelrc /app/
 
 # install WITH dev tooling
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 
 # copy source code
 COPY ./src /app/src
@@ -110,6 +110,7 @@ ARG COMMIT_HASH
 ENV GIT_SHA=${COMMIT_HASH}
 ENV DJANGO_SETTINGS_MODULE=open_inwoner.conf.docker
 ENV DIGID_MOCK=True
+ENV EHERKENNING_MOCK=True
 
 ARG SECRET_KEY=dummy
 

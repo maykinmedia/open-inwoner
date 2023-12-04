@@ -182,3 +182,12 @@ class DiversityValidator:
             "Your password must contain at least 1 upper-case letter, "
             "1 lower-case letter, 1 digit."
         )
+
+
+def validate_kvk(value):
+    if len(value) != 8:
+        raise ValidationError(
+            _("Het KVK nummer moet uit 8 cijfers bestaan."), code="invalid"
+        )
+    if not value.isdigit():
+        raise ValidationError(_("Het KVK nummer moet numeriek zijn."), code="invalid")

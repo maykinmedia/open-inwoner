@@ -33,21 +33,17 @@ class SessionTimeout {
       this.warnTime * 1000
     )
     this.expiredTimeout = setTimeout(
-      this.showExpiredModal,
+      this.showExpiredModal.bind(this),
       (this.expiryAge + 1) * 1000
     )
   }
 
   setDataset() {
-    console.log('setDataset')
     this.expiryAge = parseInt(this.element.dataset.expiryAge)
     this.warnTime = parseInt(this.element.dataset.warnTime)
-    console.log('this.expiryAge', this.expiryAge)
-    console.log('this.warnTime', this.warnTime)
   }
 
   showWarningModal() {
-    console.log('showWarningModal')
     if (this.userActive) {
       this.restartSession()
       return
@@ -113,6 +109,7 @@ class SessionTimeout {
       this.restartNoActivity.bind(this),
       30 * 1000
     )
+    // SESSION_COOKIE_AGE in seconds - (minus) 30 = warnTime
   }
 
   restartNoActivity() {

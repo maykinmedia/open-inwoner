@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from typing import Generator, Union
 
 from django.conf import settings
 from django.contrib import messages
@@ -29,7 +30,7 @@ from open_inwoner.utils.mixins import ExportMixin
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from ...openklant.wrap import fetch_klant_for_bsn, patch_klant
-from ..forms import BrpUserForm, CategoriesForm, UserForm, UserNotificationsForm
+from ..forms import BrpUserForm, UserForm, UserNotificationsForm
 from ..models import Action, User
 
 
@@ -48,27 +49,65 @@ class MyProfileView(
     def crumbs(self):
         return [(_("Mijn profiel"), reverse("profile:detail"))]
 
+    @staticmethod
+    def stringify(
+        items: list, string_func: callable, lump: bool = False
+    ) -> Union[Generator, str]:
+        """
+        Create string representation(s) of `items` for display
+
+        :param string_func: the function used to stringify elements in `items`
+        :param lump: if `True`, `string_func` is applied to `items` collectively
+        :returns: a `Generator` of strings representing elements in `items`, or a
+            `str` representing `items` as a whole, depending on whether `lump` is
+            `True`
+        """
+        if lump:
+            return string_func(items)
+        return (string_func(item) for item in items)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
         today = date.today()
 
         context["anchors"] = [
-            ("#title", _("Persoonlijke gegevens")),
-            ("#overview", _("Persoonlijk overzicht")),
+            ("#personal-info", _("Persoonlijke gegevens")),
+            ("#notifications", _("Voorkeuren voor meldingen")),
+            ("#overview", _("Overzicht")),
         ]
 
         user_files = user.get_all_files()
 
-        # List of names of 'mentor' users that are a contact of me
-        mentor_contacts = [
-            c.get_full_name()
-            for c in user.user_contacts.filter(
-                contact_type=ContactTypeChoices.begeleider
-            )
-        ]
-
+        # Mentor contacts + names for display
+        mentor_contacts = user.user_contacts.filter(
+            contact_type=ContactTypeChoices.begeleider
+        )
         context["mentor_contacts"] = mentor_contacts
+        context["mentor_contact_names"] = self.stringify(
+            mentor_contacts,
+            string_func=lambda m: m.get_full_name,
+        )
+
+        # Regular contacts + names for display
+        contacts = user.get_active_contacts()
+        context["contact_names"] = self.stringify(
+            contacts,
+            string_func=lambda c: f"{c.first_name} ({c.get_contact_type_display()})",
+        )
+
+        # Actions
+        actions = (
+            Action.objects.visible()
+            .connected(self.request.user)
+            .filter(status=StatusChoices.open)
+        )
+        context["action_text"] = self.stringify(
+            actions,
+            string_func=lambda actions: f"{actions.count()} acties staan open",
+            lump=True,
+        )
+
         context["next_action"] = (
             Action.objects.visible()
             .connected(self.request.user)
@@ -76,29 +115,16 @@ class MyProfileView(
             .order_by("end_date")
             .first()
         )
-        context["files"] = user_files
-        context["category_text"] = user.get_interests()
-        context["action_text"] = _(
-            f"{Action.objects.visible().connected(self.request.user).filter(status=StatusChoices.open).count()} acties staan open."
-        )
-        contacts = user.get_active_contacts()
-        # Invited contacts
-        contact_names = [
-            f"{contact.first_name} ({contact.get_contact_type_display()})"
-            for contact in contacts[:3]
-        ]
 
-        if contacts.count() > 0:
-            context[
-                "contact_text"
-            ] = f"{', '.join(contact_names)}{'...' if contacts.count() > 3 else ''}"
-        else:
-            context["contact_text"] = _("U heeft nog geen contacten.")
+        context["files"] = user_files
 
         context["questionnaire_exists"] = QuestionnaireStep.objects.filter(
             published=True
         ).exists()
-        context["can_change_password"] = user.login_type != LoginTypeChoices.digid
+        context["can_change_password"] = user.login_type not in (
+            LoginTypeChoices.digid,
+            LoginTypeChoices.eherkenning,
+        )
         context["inbox_page_is_published"] = inbox_page_is_published()
 
         return context
@@ -184,7 +210,7 @@ class EditProfileView(
 
     def get_form_class(self):
         user = self.request.user
-        if user.is_digid_and_brp():
+        if user.is_digid_user_with_brp:
             return BrpUserForm
         return super().get_form_class()
 
@@ -192,31 +218,6 @@ class EditProfileView(
         kwargs = super().get_form_kwargs()
         kwargs["user"] = self.request.user
         return kwargs
-
-
-class MyCategoriesView(
-    LogMixin, LoginRequiredMixin, CommonPageMixin, BaseBreadcrumbMixin, UpdateView
-):
-    template_name = "pages/profile/categories.html"
-    model = User
-    form_class = CategoriesForm
-    success_url = reverse_lazy("profile:detail")
-
-    @cached_property
-    def crumbs(self):
-        return [
-            (_("Mijn profiel"), reverse("profile:detail")),
-            (_("Mijn onderwerpen"), reverse("profile:categories")),
-        ]
-
-    def get_object(self):
-        return self.request.user
-
-    def form_valid(self, form):
-        form.save()
-        messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
-        self.log_change(self.object, _("categories were modified"))
-        return HttpResponseRedirect(self.get_success_url())
 
 
 class MyDataView(

@@ -29,3 +29,12 @@ def optional_paragraph(optional_text: str) -> str:
             optional_text=linebreaksbr(optional_text)
         )
     )
+
+
+@register.filter
+def is_substring(arg1, arg2):
+    """check if arg2 is a substring of arg1"""
+    if not arg1:
+        return False
+
+    return arg2 in arg1

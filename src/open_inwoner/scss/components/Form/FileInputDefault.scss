@@ -1,0 +1,43 @@
+/// Vanilla input for type=file globally
+input[type='file'] {
+  background-color: var(--color-white);
+  color: var(--color-primary);
+  border: 1px solid var(--color-mute);
+  border-radius: var(--border-radius);
+  display: inline-block;
+  filter: saturate(70%);
+  min-width: 100%;
+  max-width: var(--form-width);
+  padding: 0;
+  overflow: hidden;
+  cursor: pointer;
+
+  @media (min-width: 768px) {
+    display: flex;
+    flex-direction: column;
+    min-width: var(--mobile-xs-width);
+  }
+}
+
+input[type='file']::file-selector-button {
+  color: var(--color-white);
+  background-color: var(--color-primary);
+  text-transform: uppercase;
+  border: 1px;
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-body);
+  line-height: var(--font-line-height-body);
+  height: var(--row-height);
+  font-weight: normal;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  white-space: nowrap;
+  padding: 0 12px 0 12px;
+  margin: 0 12px 0 0;
+  width: 150px;
+
+  @media (min-width: 768px) {
+    width: 200px;
+  }
+}

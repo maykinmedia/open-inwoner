@@ -1,7 +1,17 @@
-{% load notification_tags %}
+{% load notification_tags string_tags %}
 
 <div class="notifications">
     {% for message in messages %}
-        {% notification icon=message.icon type=message.level_tag message=message.message closable=True compact=compact %}
+        {% with as_markdown=message.extra_tags|is_substring:"as_markdown" %}
+            {% with local_message=message.extra_tags|is_substring:"local_message" %}
+                {% if show_local_messages and local_message or not show_local_messages and not local_message %}
+                    {% if closable %}
+                        {% notification icon=message.icon type=message.level_tag message=message.message as_markdown=as_markdown closable=True compact=compact %}
+                    {% else %}
+                        {% notification icon=message.icon type=message.level_tag message=message.message as_markdown=as_markdown closable=False compact=compact %}
+                    {% endif %}
+                {% endif %}
+            {% endwith %}
+        {% endwith %}
     {% endfor %}
 </div>

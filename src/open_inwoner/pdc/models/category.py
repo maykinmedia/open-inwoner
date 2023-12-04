@@ -2,6 +2,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
+from django_better_admin_arrayfield.models.fields import ArrayField
 from filer.fields.image import FilerImageField
 from treebeard.exceptions import InvalidMoveToDescendant
 from treebeard.mp_tree import MP_MoveHandler, MP_Node
@@ -33,6 +34,43 @@ class Category(MP_Node):
         verbose_name=_("Published"),
         default=False,
         help_text=_("Whether the category should be published or not."),
+    )
+    visible_for_anonymous = models.BooleanField(
+        verbose_name=_("Anonieme deel"),
+        default=True,
+        help_text=_(
+            "Of het onderwerp zichtbaar moet zijn op het anonieme deel (zonder inloggen)."
+        ),
+    )
+    visible_for_authenticated = models.BooleanField(
+        verbose_name=_("Beveiligde deel"),
+        default=True,
+        help_text=_(
+            "Of het onderwerp zichtbaar moet zijn op het beveiligde deel (achter inloggen)."
+        ),
+    )
+    visible_for_companies = models.BooleanField(
+        verbose_name=_("Bedrijven content"),
+        default=True,
+        help_text=_(
+            "Of het onderwerp zichtbaar moet zijn wanneer iemand aangeeft een bedrijf te zijn (of is ingelogd met KvK)."
+        ),
+    )
+    visible_for_citizens = models.BooleanField(
+        verbose_name=_("Inwoner content"),
+        default=True,
+        help_text=_(
+            "Of het onderwerp zichtbaar moet zijn wanneer iemand aangeeft een inwoner te zijn (of is ingelogd met BSN)."
+        ),
+    )
+    zaaktypen = ArrayField(
+        models.CharField(max_length=1000, blank=True),
+        verbose_name=_("Zaaktypen"),
+        default=list,
+        blank=True,
+        help_text=_(
+            "Zaaktypen waarvoor bij aanwezigheid dit onderwerp getoond moet worden."
+        ),
     )
     highlighted = models.BooleanField(
         verbose_name=_("Highlighted"),

@@ -24,7 +24,7 @@ from .shared import CATALOGI_ROOT, ZAKEN_ROOT
 @requests_mock.Mocker()
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
-    inner_url = reverse_lazy("cases:open_cases_content")
+    inner_url = reverse_lazy("cases:cases_content")
 
     @classmethod
     def setUpTestData(cls):
@@ -301,18 +301,3 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
             self.assertIsNotNone(cache.get(f"status:{self.new_status['url']}"))
             self.assertIsNotNone(cache.get(f"status:{self.status1['url']}"))
             self.assertIsNotNone(cache.get(f"status:{self.status2['url']}"))
-
-
-class ClosedCaseListCacheTests(OpenCaseListCacheTests):
-    """
-    run the same tests as for open cases
-    """
-
-    inner_url = reverse_lazy("cases:closed_cases_content")
-
-    @classmethod
-    def setUpTestData(cls):
-        super().setUpTestData()
-
-        for zaak in [cls.zaak1, cls.zaak2, cls.new_zaak]:
-            zaak["einddatum"] = "2022-01-16"

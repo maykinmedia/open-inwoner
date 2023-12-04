@@ -1,9 +1,8 @@
+from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from djchoices import ChoiceItem, DjangoChoices
 
-
-class PlanStatusChoices(DjangoChoices):
-    empty = ChoiceItem("", _("Status"))
-    open = ChoiceItem("open", _("Open"))
-    closed = ChoiceItem("closed", _("Afgerond"))
+class PlanStatusChoices(models.TextChoices):
+    empty = "", _("Status")
+    open = "open", _("Open")
+    closed = "closed", _("Afgerond")

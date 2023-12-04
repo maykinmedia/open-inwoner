@@ -1,3 +1,5 @@
+import logging
+import re
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from typing import Dict, Optional, Union
@@ -5,6 +7,9 @@ from typing import Dict, Optional, Union
 from dateutil.relativedelta import relativedelta
 from zgw_consumers.api_models.base import Model, ZGWModel
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
+
+logger = logging.getLogger(__name__)
+
 
 """
 Modified ZGWModel's to work with both OpenZaak and e-Suite implementations,
@@ -31,6 +36,55 @@ class Zaak(ZGWModel):
     resultaat: Optional[str] = None
     #    relevante_andere_zaken: list
     #    zaakgeometrie: dict
+
+    @staticmethod
+    def _reformat_esuite_zaak_identificatie(identificatie: str) -> str:
+        """
+        0014ESUITE66392022 -> 6639-2022
+
+        Static utility function; only used in connection with `Zaak` instances
+        """
+        exp = r"^\d+ESUITE(?P<num>\d+?)(?P<year>\d{4})$"
+        m = re.match(exp, identificatie)
+        if not m:
+            return identificatie
+        num = m.group("num")
+        year = m.group("year")
+        return f"{num}-{year}"
+
+    def _format_zaak_identificatie(self) -> str:
+        from open_inwoner.openzaak.models import OpenZaakConfig
+
+        zaak_config = OpenZaakConfig.get_solo()
+
+        if zaak_config.reformat_esuite_zaak_identificatie:
+            return self._reformat_esuite_zaak_identificatie(self.identificatie)
+        return self.identificatie
+
+    @property
+    def identification(self) -> str:
+        return self._format_zaak_identificatie()
+
+    def process_data(self) -> dict:
+        """
+        Prepare data for template
+        """
+        from open_inwoner.openzaak.models import StatusTranslation
+
+        status_translate = StatusTranslation.objects.get_lookup()
+
+        return {
+            "identification": self.identification,
+            "uuid": str(self.uuid),
+            "start_date": self.startdatum,
+            "end_date": getattr(self, "einddatum", None),
+            "description": self.zaaktype.omschrijving,
+            "current_status": status_translate.from_glom(
+                self, "status.statustype.omschrijving", default=""
+            ),
+            "statustype_config": getattr(self, "statustype_config", None),
+            "case_type": "Zaak",
+        }
 
 
 @dataclass

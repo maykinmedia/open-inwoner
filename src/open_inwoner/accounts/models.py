@@ -20,7 +20,11 @@ from privates.storages import PrivateMediaFileSystemStorage
 from timeline_logger.models import TimelineLog
 
 from open_inwoner.utils.hash import create_sha256_hash
-from open_inwoner.utils.validators import CharFieldValidator, DutchPhoneNumberValidator
+from open_inwoner.utils.validators import (
+    CharFieldValidator,
+    DutchPhoneNumberValidator,
+    validate_kvk,
+)
 
 from ..plans.models import PlanContact
 from .choices import ContactTypeChoices, LoginTypeChoices, StatusChoices, TypeChoices
@@ -119,6 +123,16 @@ class User(AbstractBaseUser, PermissionsMixin):
     # TODO fix rsin & bsn to not be both null AND blank (!)
     rsin = models.CharField(verbose_name=_("Rsin"), max_length=9, null=True, blank=True)
     bsn = NLBSNField(verbose_name=_("Bsn"), null=True, blank=True)
+    kvk = models.CharField(
+        verbose_name=_("KvK number"),
+        max_length=8,
+        null=True,
+        blank=True,
+        validators=[validate_kvk],
+    )
+    company_name = models.CharField(
+        verbose_name=_("Company name"), max_length=250, null=True, blank=True
+    )
     login_type = models.CharField(
         verbose_name=_("Login type"),
         choices=LoginTypeChoices.choices,
@@ -160,12 +174,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name=_("Prepopulated"),
         default=False,
         help_text=_("Indicates if fields have been prepopulated by Haal Central API."),
-    )
-    selected_categories = models.ManyToManyField(
-        "pdc.Category",
-        verbose_name=_("Selected categories"),
-        related_name="selected_by",
-        blank=True,
     )
     oidc_id = models.CharField(
         verbose_name=_("OpenId Connect id"),
@@ -225,8 +233,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         constraints = [
             UniqueConstraint(
                 fields=["email"],
-                condition=~Q(login_type=LoginTypeChoices.digid),
-                name="unique_email_when_not_digid",
+                condition=~Q(login_type=LoginTypeChoices.digid)
+                & ~Q(login_type=LoginTypeChoices.eherkenning),
+                name="unique_email_when_not_digid_or_eherkenning",
             ),
             # UniqueConstraint(
             #     fields=["bsn"],
@@ -289,11 +298,17 @@ class User(AbstractBaseUser, PermissionsMixin):
                     {"email": ValidationError(_("This account has been deactivated"))}
                 )
 
-        # all accounts with duplicate emails have login_type digid
-        if self.login_type == LoginTypeChoices.digid:
+        # all accounts with duplicate emails have login_type digid or eHerkenning
+        if self.login_type in (
+            LoginTypeChoices.digid,
+            LoginTypeChoices.eherkenning,
+        ):
             for user in existing_users:
-                if user.login_type != LoginTypeChoices.digid:
-                    # some account does not have login_type digid
+                if user.login_type not in (
+                    LoginTypeChoices.digid,
+                    LoginTypeChoices.eherkenning,
+                ):
+                    # some account does not have login_type digid or eHerkenning
                     raise ValidationError(
                         {"email": ValidationError(_("This email is already taken."))}
                     )
@@ -344,12 +359,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_all_files(self):
         return self.documents.order_by("-created_on")
 
-    def get_interests(self) -> str:
-        if not self.selected_categories.exists():
-            return _("U heeft geen interesses gekozen.")
-
-        return ", ".join(list(self.selected_categories.values_list("name", flat=True)))
-
     def get_active_notifications(self) -> str:
         enabled = []
         if self.cases_notifications and self.login_type == LoginTypeChoices.digid:
@@ -366,7 +375,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     def require_necessary_fields(self) -> bool:
         """returns whether user needs to fill in necessary fields"""
         if (
-            self.is_digid_and_brp()
+            self.is_digid_user_with_brp
             and self.email
             and not self.email.endswith("@example.org")
         ):
@@ -378,8 +387,15 @@ class User(AbstractBaseUser, PermissionsMixin):
                 or not self.email
                 or self.email.endswith("@example.org")
             )
-        elif self.login_type == LoginTypeChoices.oidc:
-            return not self.email or self.email.endswith("@example.org")
+        elif self.login_type in (
+            LoginTypeChoices.oidc,
+            LoginTypeChoices.eherkenning,
+        ):
+            return (
+                not self.email
+                or self.email.endswith("@example.org")
+                or self.email.endswith("localhost")
+            )
         return False
 
     def get_logout_url(self) -> str:
@@ -397,7 +413,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         return f"{url}#messages-last"
 
     def get_contact_type_display(self) -> str:
-        choice = ContactTypeChoices.get_choice(self.contact_type)
+        choice = getattr(ContactTypeChoices, self.contact_type)
         return choice.label
 
     def get_contact_email(self):
@@ -425,12 +441,17 @@ class User(AbstractBaseUser, PermissionsMixin):
     def clear_plan_contact_new_count(self):
         PlanContact.objects.filter(user=self).update(notify_new=False)
 
-    def is_digid_and_brp(self) -> bool:
+    @property
+    def is_digid_user(self) -> bool:
+        return self.login_type == LoginTypeChoices.digid
+
+    @property
+    def is_digid_user_with_brp(self) -> bool:
         """
         Returns whether user is logged in with digid and data has
         been requested from haal centraal
         """
-        return self.login_type == LoginTypeChoices.digid and self.is_prepopulated
+        return self.is_digid_user and self.is_prepopulated
 
 
 class Document(models.Model):

@@ -277,18 +277,19 @@ def input(field, **kwargs):
 
 
 @register.inclusion_tag("components/Form/FileInput.html")
-def file_input(file, text, **kwargs):
+def file_input(files, text="", **kwargs):
     """
     Displaying a file upload interface.
 
     Usage:
-        {% file_input form.field text=_('Document selecteren') %}
+        {% file_input form.field text=_('Selecteer bestanden') %}
 
     Variables:
         + field: Field | The field that needs to be rendered.
         - extra_classes: string| classes which should be added to the top-level container
     """
-    return {**kwargs, "field": file, "text": text}
+    multiple = files.field.widget.attrs.get("multiple", False)
+    return {**kwargs, "field": files, "text": text, "multiple": multiple}
 
 
 @register.inclusion_tag("components/Form/DateField.html")

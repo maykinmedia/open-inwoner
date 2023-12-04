@@ -1,7 +1,11 @@
 import dataclasses
+import datetime as dt
+import logging
 from collections import defaultdict
-from typing import List
+from datetime import datetime
+from typing import List, Optional
 
+from django.conf import settings
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.http import Http404, StreamingHttpResponse
@@ -22,7 +26,7 @@ from open_inwoner.openklant.wrap import (
     create_klant,
     fetch_klant_for_bsn,
 )
-from open_inwoner.openzaak.api_models import Status, Zaak
+from open_inwoner.openzaak.api_models import Status, StatusType, Zaak
 from open_inwoner.openzaak.cases import (
     connect_case_with_document,
     fetch_case_information_objects,
@@ -31,7 +35,10 @@ from open_inwoner.openzaak.cases import (
     fetch_single_result,
     fetch_status_history,
 )
-from open_inwoner.openzaak.catalog import fetch_single_status_type
+from open_inwoner.openzaak.catalog import (
+    fetch_single_status_type,
+    fetch_status_types_no_cache,
+)
 from open_inwoner.openzaak.documents import (
     download_document,
     fetch_single_information_object_url,
@@ -43,17 +50,18 @@ from open_inwoner.openzaak.models import (
     StatusTranslation,
     ZaakTypeConfig,
     ZaakTypeInformatieObjectTypeConfig,
+    ZaakTypeResultaatTypeConfig,
+    ZaakTypeStatusTypeConfig,
 )
-from open_inwoner.openzaak.utils import (
-    format_zaak_identificatie,
-    get_role_name_display,
-    is_info_object_visible,
-)
+from open_inwoner.openzaak.utils import get_role_name_display, is_info_object_visible
+from open_inwoner.utils.time import has_new_elements
 from open_inwoner.utils.translate import TranslationLookup
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 from ..forms import CaseContactForm, CaseUploadForm
 from .mixins import CaseAccessMixin, CaseLogMixin, OuterCaseAccessMixin
+
+logger = logging.getLogger(__name__)
 
 
 @dataclasses.dataclass
@@ -61,6 +69,7 @@ class SimpleFile:
     name: str
     size: int
     url: str
+    created: Optional[datetime] = None
 
 
 class OuterCaseDetailView(
@@ -71,7 +80,7 @@ class OuterCaseDetailView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn aanvragen"), reverse("cases:open_cases")),
+            (_("Mijn aanvragen"), reverse("cases:index")),
             (
                 _("Status"),
                 reverse("cases:case_detail", kwargs=self.kwargs),
@@ -91,11 +100,22 @@ class InnerCaseDetailView(
     template_name = "pages/cases/status_inner.html"
     form_class = CaseUploadForm
     contact_form_class = CaseContactForm
+    case: Zaak = None
+
+    def __init__(self):
+        self.statustype_config_mapping = {
+            zaaktype_statustype.statustype_url: zaaktype_statustype
+            for zaaktype_statustype in ZaakTypeStatusTypeConfig.objects.all()
+        }
+        self.resulttype_config_mapping = {
+            zt_resulttype.resultaattype_url: zt_resulttype
+            for zt_resulttype in ZaakTypeResultaatTypeConfig.objects.all()
+        }
 
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn aanvragen"), reverse("cases:open_cases")),
+            (_("Mijn aanvragen"), reverse("cases:index")),
             (
                 _("Status"),
                 reverse("cases:case_detail", kwargs=self.kwargs),
@@ -108,19 +128,30 @@ class InnerCaseDetailView(
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        # case is retrieved via CaseAccessMixin
         if self.case:
-            self.log_case_access(self.case.identificatie)
+            self.log_access_case_detail(self.case)
+
             config = OpenZaakConfig.get_solo()
             status_translate = StatusTranslation.objects.get_lookup()
 
+            # fetch data associated with `self.case`
             documents = self.get_case_document_files(self.case)
-
             statuses = fetch_status_history(self.case.url)
+            # NOTE maybe this should be cached?
+            statustypen = fetch_status_types_no_cache(self.case.zaaktype.url)
 
-            # NOTE we cannot sort on the Status.datum_status_gezet (datetime) because eSuite returns zeros as the time component of the datetime,
-            # so we're going with the observation that on both OpenZaak and eSuite the returned list is ordered 'oldest-last'
+            # NOTE we cannot sort on the Status.datum_status_gezet (datetime) because eSuite
+            # returns zeros as the time component of the datetime, so we're going with the
+            # observation that on both OpenZaak and eSuite the returned list is ordered 'oldest-last'
             # here we want it 'oldest-first' so we reverse() it instead of sort()-ing
             statuses.reverse()
+
+            # get preview of second status
+            if len(statuses) == 1:
+                second_status_preview = self.get_second_status_preview(statustypen)
+            else:
+                second_status_preview = None
 
             status_types = defaultdict(list)
             for status in statuses:
@@ -135,13 +166,47 @@ class InnerCaseDetailView(
                 for status in _statuses:
                     status.statustype = status_type
 
+            # The end status data is not passed if the end status has been reached,
+            # because in that case the end status data is already included in `statuses`
+            end_statustype = next((s for s in statustypen if s.is_eindstatus), None)
+            end_statustype_data = None
+            if not status_types.get(end_statustype.url):
+                end_statustype_data = {
+                    "label": status_translate(
+                        end_statustype.omschrijving, default=_("No data available")
+                    ),
+                    "status_indicator": getattr(
+                        self.statustype_config_mapping.get(end_statustype.url),
+                        "status_indicator",
+                        None,
+                    ),
+                    "status_indicator_text": getattr(
+                        self.statustype_config_mapping.get(end_statustype.url),
+                        "status_indicator_text",
+                        None,
+                    ),
+                    "call_to_action_url": getattr(
+                        self.statustype_config_mapping.get(end_statustype.url),
+                        "call_to_action_url",
+                        None,
+                    ),
+                    "call_to_action_text": getattr(
+                        self.statustype_config_mapping.get(end_statustype.url),
+                        "call_to_action_text",
+                        None,
+                    ),
+                }
+
+            result_data = self.get_result_data(
+                self.case, self.resulttype_config_mapping
+            )
+
             context["case"] = {
                 "id": str(self.case.uuid),
-                "identification": format_zaak_identificatie(
-                    self.case.identificatie, config
-                ),
+                "identification": self.case.identification,
                 "initiator": self.get_initiator_display(self.case),
-                "result": self.get_result_display(self.case),
+                "result": result_data.get("display", ""),
+                "result_description": result_data.get("description", ""),
                 "start_date": self.case.startdatum,
                 "end_date": getattr(self.case, "einddatum", None),
                 "end_date_planned": getattr(self.case, "einddatum_gepland", None),
@@ -149,14 +214,18 @@ class InnerCaseDetailView(
                     self.case, "uiterlijke_einddatum_afdoening", None
                 ),
                 "description": self.case.zaaktype.omschrijving,
-                "current_status": status_translate.from_glom(
-                    self.case,
-                    "status.statustype.omschrijving",
-                    default=_("No data available"),
+                "statuses": self.get_statuses_data(
+                    statuses, status_translate, self.statustype_config_mapping
                 ),
-                "statuses": self.get_statuses_data(statuses, status_translate),
+                "end_statustype_data": end_statustype_data,
+                "second_status_preview": second_status_preview,
                 "documents": documents,
                 "allowed_file_extensions": sorted(config.allowed_file_extensions),
+                "new_docs": has_new_elements(
+                    documents,
+                    "created",
+                    dt.timedelta(days=settings.DOCUMENT_RECENT_DAYS),
+                ),
             }
             context["case"].update(self.get_upload_info_context(self.case))
             context["anchors"] = self.get_anchors(statuses, documents)
@@ -169,7 +238,62 @@ class InnerCaseDetailView(
             )
         else:
             context["case"] = None
+
         return context
+
+    def get_second_status_preview(self, statustypen: list) -> Optional[StatusType]:
+        """
+        Get the relevant status type to display preview of second case status
+
+        Note: we cannot assume that the "second" statustype has the `volgnummer` 2;
+              hence we get all statustype_numbers, sort in ascending order, and let
+              the "second" statustype be that with `volgnummer == statustype_numbers[1]`
+        """
+        statustype_numbers = [s.volgnummer for s in statustypen]
+
+        # only 1 statustype for `self.case`
+        # (this scenario is blocked by openzaak, but not part of the zgw standard)
+        if len(statustype_numbers) < 2:
+            logger.info("Case {case} has only one statustype".format(case=self.case))
+            return
+
+        statustype_numbers.sort()
+
+        return next(
+            filter(
+                lambda s: s.volgnummer == statustype_numbers[1] and not s.is_eindstatus,
+                statustypen,
+            ),
+            None,
+        )
+
+    @property
+    def is_file_upload_enabled_for_case_type(self) -> bool:
+        return ZaakTypeInformatieObjectTypeConfig.objects.filter_enabled_for_case_type(
+            self.case.zaaktype
+        ).exists()
+
+    @property
+    def is_file_upload_enabled_for_statustype(self) -> bool:
+        try:
+            enabled_for_status_type = self.statustype_config_mapping[
+                self.case.status.statustype.url
+            ].document_upload_enabled
+        except KeyError:
+            logger.info(
+                "Could not retrieve status type config for url {url}".format(
+                    url=self.case.status.statustype.url
+                )
+            )
+            return False
+        return enabled_for_status_type
+
+    @property
+    def is_internal_file_upload_enabled(self) -> bool:
+        return (
+            self.is_file_upload_enabled_for_case_type
+            and self.is_file_upload_enabled_for_statustype
+        )
 
     def get_upload_info_context(self, case: Zaak):
         if not case:
@@ -177,13 +301,8 @@ class InnerCaseDetailView(
 
         open_klant_config = OpenKlantConfig.get_solo()
 
-        internal_upload_enabled = (
-            ZaakTypeInformatieObjectTypeConfig.objects.filter_enabled_for_case_type(
-                case.zaaktype
-            ).exists()
-        )
-
         case_type_config_description = ""
+        case_type_document_upload_description = ""
         external_upload_enabled = False
         external_upload_url = ""
         contact_form_enabled = False
@@ -198,9 +317,23 @@ class InnerCaseDetailView(
             if ztc.document_upload_enabled and ztc.external_document_upload_url != "":
                 external_upload_url = ztc.external_document_upload_url
                 external_upload_enabled = True
+
+            try:
+                zt_statustype_config = ztc.zaaktypestatustypeconfig_set.get(
+                    statustype_url=case.status.statustype.url
+                )
+            # case has no status, or statustype config not found
+            except (AttributeError, ObjectDoesNotExist):
+                pass
+            else:
+                case_type_document_upload_description = (
+                    zt_statustype_config.document_upload_description
+                )
+
         return {
             "case_type_config_description": case_type_config_description,
-            "internal_upload_enabled": internal_upload_enabled
+            "case_type_document_upload_description": case_type_document_upload_description,
+            "internal_upload_enabled": self.is_internal_file_upload_enabled
             and not getattr(self.case, "einddatum", None),
             "external_upload_enabled": external_upload_enabled
             and not getattr(self.case, "einddatum", None),
@@ -210,21 +343,35 @@ class InnerCaseDetailView(
             ),
         }
 
-    def get_result_display(self, case: Zaak) -> str:
-        if case.resultaat:
-            result = fetch_single_result(case.resultaat)
-            if result:
-                return result.toelichting
-        return None
+    @staticmethod
+    def get_result_data(case: Zaak, result_type_config_mapping: dict) -> dict:
+        if not case.resultaat:
+            return {}
 
-    def get_initiator_display(self, case: Zaak) -> str:
+        result = fetch_single_result(case.resultaat)
+
+        display = result.toelichting
+        description = getattr(
+            result_type_config_mapping.get(result.resultaattype), "description", ""
+        )
+
+        return {
+            "display": display,
+            "description": description,
+        }
+
+    @staticmethod
+    def get_initiator_display(case: Zaak) -> str:
         roles = fetch_case_roles(case.url, RolOmschrijving.initiator)
         if not roles:
             return ""
         return ", ".join([get_role_name_display(r) for r in roles])
 
+    @staticmethod
     def get_statuses_data(
-        self, statuses: List[Status], lookup: TranslationLookup
+        statuses: List[Status],
+        lookup: TranslationLookup,
+        statustype_config_mapping: Optional[dict] = None,
     ) -> List[dict]:
         return [
             {
@@ -232,11 +379,35 @@ class InnerCaseDetailView(
                 "label": lookup.from_glom(
                     s, "statustype.omschrijving", default=_("No data available")
                 ),
+                "status_indicator": getattr(
+                    statustype_config_mapping.get(s.statustype.url),
+                    "status_indicator",
+                    None,
+                ),
+                "status_indicator_text": getattr(
+                    statustype_config_mapping.get(s.statustype.url),
+                    "status_indicator_text",
+                    None,
+                ),
+                "call_to_action_url": getattr(
+                    statustype_config_mapping.get(s.statustype.url),
+                    "call_to_action_url",
+                    None,
+                ),
+                "call_to_action_text": getattr(
+                    statustype_config_mapping.get(s.statustype.url),
+                    "call_to_action_text",
+                    None,
+                ),
+                "description": getattr(
+                    statustype_config_mapping.get(s.statustype.url), "description", None
+                ),
             }
             for s in statuses
         ]
 
-    def get_case_document_files(self, case: Zaak) -> List[SimpleFile]:
+    @staticmethod
+    def get_case_document_files(case: Zaak) -> List[SimpleFile]:
         case_info_objects = fetch_case_information_objects(case.url)
 
         # get the information objects for the case objects
@@ -273,8 +444,10 @@ class InnerCaseDetailView(
                             "info_id": info_obj.uuid,
                         },
                     ),
+                    created=case_info_obj.registratiedatum,
                 )
             )
+
         return documents
 
     def get_form_kwargs(self):
@@ -341,65 +514,79 @@ class CaseDocumentDownloadView(LogMixin, CaseAccessMixin, View):
         raise PermissionDenied()
 
 
-class CaseDocumentUploadFormView(CaseAccessMixin, CaseLogMixin, FormView):
+class CaseDocumentUploadFormView(CaseAccessMixin, LogMixin, FormView):
     template_name = "pages/cases/document_form.html"
     form_class = CaseUploadForm
 
     def post(self, request, *args, **kwargs):
-        form = self.get_form()
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
 
         if form.is_valid() and not getattr(self.case, "einddatum", None):
             return self.handle_document_upload(request, form)
         return self.form_invalid(form)
 
-    def handle_document_upload(self, request, form):
-        cleaned_data = form.cleaned_data
-
-        file = cleaned_data["file"]
-        title = cleaned_data["title"]
-        document_type = cleaned_data["type"]
-        source_organization = self.case.bronorganisatie
-
-        created_document = upload_document(
-            request.user,
-            file,
-            title,
-            document_type.informatieobjecttype_url,
-            source_organization,
-        )
-        if created_document:
-            created_relationship = connect_case_with_document(
-                self.case.url, created_document["url"]
-            )
-            if created_relationship:
-                self.log_user_action(
-                    request.user,
-                    _("Document was uploaded for {case}: {filename}").format(
-                        case=self.case.identificatie,
-                        filename=file.name,
-                    ),
-                )
-                messages.add_message(
-                    request,
-                    messages.SUCCESS,
-                    _("{filename} has been successfully uploaded").format(
-                        filename=file.name
-                    ),
-                )
-
-                return HttpResponseClientRedirect(
-                    reverse(
-                        "cases:case_detail", kwargs={"object_id": str(self.case.uuid)}
-                    )
-                )
-
-        # fail uploading the document or connecting it to the zaak
+    def handle_document_error(self, request, file):
         messages.add_message(
             request,
             messages.ERROR,
             _("An error occured while uploading file {filename}").format(
                 filename=file.name
             ),
+        )
+
+        return HttpResponseClientRedirect(
+            reverse("cases:case_detail", kwargs={"object_id": str(self.case.uuid)})
+        )
+
+    def handle_document_upload(self, request, form):
+        cleaned_data = form.cleaned_data
+        files = cleaned_data["files"]
+
+        created_documents = []
+
+        for file in files:
+            title = file.name
+            document_type = cleaned_data["type"]
+            source_organization = self.case.bronorganisatie
+
+            created_document = upload_document(
+                request.user,
+                file,
+                title,
+                document_type.informatieobjecttype_url,
+                source_organization,
+            )
+            if not created_document:
+                return self.handle_document_error(request, file)
+
+            created_relationship = connect_case_with_document(
+                self.case.url, created_document.get("url")
+            )
+            if not created_relationship:
+                return self.handle_document_error(request, file)
+
+            self.log_user_action(
+                request.user,
+                _("Document was uploaded for {case}: {filename}").format(
+                    case=self.case.identificatie,
+                    filename=file.name,
+                ),
+            )
+            created_documents.append(created_document)
+
+        success_message = (
+            _("Wij hebben **{num_uploaded} bestand(en)** succesvol geüpload:").format(
+                num_uploaded=len(created_documents)
+            )
+            + "\n\n"
+            + "\n".join(f"- {doc['titel']}" for doc in created_documents)
+        )
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            success_message,
+            extra_tags="as_markdown local_message",
         )
 
         return HttpResponseClientRedirect(
@@ -418,13 +605,14 @@ class CaseDocumentUploadFormView(CaseAccessMixin, CaseLogMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
         context["hxpost_document_action"] = reverse(
             "cases:case_detail_document_form", kwargs=self.kwargs
         )
         return context
 
 
-class CaseContactFormView(CaseAccessMixin, CaseLogMixin, FormView):
+class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
     template_name = "pages/cases/contact_form.html"
     form_class = CaseContactForm
 

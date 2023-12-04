@@ -1,21 +1,25 @@
-{% load i18n form_tags icon_tags %}
+{% load i18n solo_tags button_tags card_tags form_tags icon_tags %}
 
-<div class="form__control {{ extra_classes|default:"upload" }}">
-    <div class="inputfile-group">
-        <label class="label">
-            <span class="input-file">
-            {{ field|addclass:"inputfile" }}
+{% get_solo 'openzaak.OpenZaakConfig' as openzaak_config %}
 
-                <span class="label__label" for="{{ field.auto_id }}">
-                {% icon icon="cloud_upload" icon_position="before" outlined=True %}
-                    {{ text }}
-
-                </span>{% if field.field.required %}<span class="label__label--required"> * </span>{% endif %}
-            </span>
-
-            {% if field.errors %}
-                {% errors errors=field.errors %}
-            {% endif %}
+<div class="form__control file-input" aria-live="polite">
+    {% render_card direction="vertical" %}
+        {% icon icon="upload" icon_position="before" outlined=True %}
+        <input class="file-input__input" id="{{ field.auto_id }}" name="file" type="file"{% if field.field.required %} required{% endif %}{% if multiple %} multiple{% endif %} data-max-size="{{ openzaak_config.max_upload_size }}">
+        <label class="button button--primary file-input__label-empty" for="{{ field.auto_id }}">
+            {% if multiple %}{% trans 'Sleep of selecteer bestanden' %}{% else %}{% trans 'Sleep of selecteer bestand' %}{% endif %}
         </label>
+        <label class="button button--borderless file-input__label-selected" for="{{ field.auto_id }}">
+        {% icon icon="add_circle_outlined" icon_position="before" outlined=True %}
+            {% if multiple %}{% trans 'Selecteer meer bestanden' %}{% else %}{% trans 'Selecteer ander bestand' %}{% endif %}
+        </label>
+    {% endrender_card %}
+
+    {% if field.help_text %}<p class="p p--small p--centered">{{ field.help_text }}</p>{% endif %}
+    {% if field.errors %}{% errors errors=field.errors %}{% endif %}
+
+    <div class="file-list" aria-live="polite">
+        <h4 class="h4">{% if multiple %}{% trans 'Geselecteerde bestanden' %}{% else %}{% trans 'Geselecteerd bestand' %}{% endif %}</h4>
+        <ul class="file-list__list" aria-live="polite" data-label-delete="{% trans 'Verwijderen' %}"></ul>
     </div>
 </div>

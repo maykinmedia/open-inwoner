@@ -12,13 +12,6 @@ class ProfileConfig(AppHookConfig):
             "Designates whether 'My data' section is rendered or not (Only for digid users)."
         ),
     )
-    selected_categories = models.BooleanField(
-        verbose_name=_("Gekozen onderwerpen"),
-        default=True,
-        help_text=_(
-            "Designates whether 'selected categories' section is rendered or not."
-        ),
-    )
     mentors = models.BooleanField(
         verbose_name=_("Begeleiders"),
         default=True,

@@ -1,26 +1,55 @@
 .dashboard {
+  margin-bottom: var(--row-height);
+
   &__list {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--spacing-large) var(--spacing-medium);
-    justify-content: space-between;
+    display: block;
     list-style: none;
     margin: 0;
     padding: 0;
+    border-bottom: var(--border-width-thin) solid var(--color-gray);
 
-    @media (min-width: 768px) {
+    @media (min-width: 900px) {
       display: flex;
-      gap: var(--spacing-medium);
+      gap: 0;
+      border-top: var(--border-width-thin) solid var(--color-gray);
     }
   }
 
   &__list-item {
+    padding: var(--spacing-large) 0;
+    color: var(--color-gray-dark);
     white-space: nowrap;
-    text-align: center;
+    border-top: var(--border-width-thin) solid var(--color-gray);
+    @media (min-width: 900px) {
+      border-top: none;
+      margin-left: var(--spacing-extra-large);
+    }
 
-    @media (min-width: 768px) {
+    &:first-child {
+      margin-left: 0;
+    }
+
+    p::after {
+      color: var(--color-gray);
+      @media (min-width: 900px) {
+        content: '|';
+        margin-left: var(--spacing-extra-large);
+      }
+    }
+
+    &:last-child p::after {
+      @media (min-width: 900px) {
+        content: none;
+      }
+    }
+
+    @media (min-width: 900px) {
       text-align: start;
     }
+  }
+
+  &__item-label {
+    color: var(--color-gray-90);
   }
 
   .h4 {

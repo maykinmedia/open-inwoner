@@ -8,3 +8,28 @@
     }
   }
 }
+
+.contactmoment {
+  &__details {
+    // Set table width for word-break
+    table {
+      margin-top: 0;
+      overflow-x: auto;
+      table-layout: fixed;
+      width: 100%;
+      @media (min-width: 768px) {
+        width: var(--mobile-ms-width);
+      }
+    }
+    table th {
+      width: 100px;
+      white-space: nowrap;
+    }
+    table td {
+      width: 300px;
+      overflow: hidden;
+      word-break: break-word;
+      white-space: normal;
+    }
+  }
+}

@@ -63,6 +63,11 @@
     }
   }
 
+  &--fullwidth {
+    display: block;
+    width: 100%;
+  }
+
   &#{&}--primary {
     background-color: var(--color-primary);
     border: 1px solid var(--color-primary);
@@ -155,12 +160,23 @@
     color: var(--color-danger-lighter);
   }
 
+  &--borderless {
+    background-color: rgba(0, 0, 0, 0);
+    border: none;
+    color: var(--color-gray-dark);
+    padding: 0;
+  }
+
   &__text-wrapper {
     display: flex;
   }
 
   > .link__text {
     width: 100%;
+  }
+
+  &[hidden] {
+    display: none;
   }
 }
 

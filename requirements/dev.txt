@@ -232,7 +232,7 @@ django-better-admin-arrayfield==1.4.2
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   mozilla-django-oidc-db
-django-choices==1.7.2
+django-choices==2.0.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -276,7 +276,7 @@ django-csp-reports==1.8.1
     #   -r requirements/ci.txt
 django-debug-toolbar==3.2.2
     # via -r requirements/dev.in
-django-digid-eherkenning==0.7.0
+django-digid-eherkenning==0.9.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -338,7 +338,7 @@ django-localflavor==3.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-django-log-outgoing-requests==0.5.0
+django-log-outgoing-requests==0.5.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -540,7 +540,7 @@ faker==9.9.0
     #   zgw-consumers
 flake8==3.9.2
     # via -r requirements/dev.in
-fontawesomefree==6.1.1
+fontawesomefree==6.4.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -936,7 +936,6 @@ six==1.16.0
     #   -r requirements/ci.txt
     #   click-repl
     #   django-appdata
-    #   django-choices
     #   django-elasticsearch-dsl
     #   elasticsearch-dsl
     #   furl

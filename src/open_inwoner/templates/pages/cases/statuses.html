@@ -1,0 +1,88 @@
+{% load i18n button_tags icon_tags %}
+
+{# WILL BE UPDATED WHEN status_inner IS FINISHED #}
+
+{% if case.statuses %}
+<h2 class="h3 h2-statuses" id="statuses">{% trans 'Status' %}</h2>
+
+<aside class="status-list" aria-label="{% trans "Status lijst" %}">
+    <ul class="status-list__list">
+        {% for status in case.statuses %}
+
+            {% if forloop.last %}
+                {# Current active status class #}
+                <li class="status-list__list-item {% if case.end_statustype_data %}status--current status-list__list-item--{{ status.status_indicator }} status--open{% endif %} {# Final status class #}{% if not case.end_statustype_data %}status--final status-list__list-item--info status--open{% endif %}">
+                {% firstof case.id|slugify as id %}
+                {% firstof 'content-'|add:id|add:'-id' as content_id %}
+                    {% icon icon="circle" extra_classes="status-step" %}
+                    <div class="status-list__notification status-list__notification--{{ status.status_indicator }}">
+                        <button class="button--borderless {% if case.end_statustype_data %}status-list__button{% endif %} {# Final status class #}{% if not case.end_statustype_data %}status-list__open-button{% endif %}" aria-controls="{{ content_id }}" aria-expanded="true" id="{{ id }}">
+                            <span class="link link--bold">{{ status.label }}</span>
+                            {% if case.end_statustype_data %}{% icon icon="expand_more" icon_position="after" outlined=True %}{% endif %} </button>
+                        <div class="status-list__notification-content {% if case.end_statustype_data %}status-content--open{% endif %} {% if not case.end_statustype_data %}status-content--open{% endif %}" id="{{ content_id }}">
+                            <p class="p p-text p--compact">
+                                {# Configurable texts #}
+                                <span>{{ status.status_indicator_text|default:"" }}</span>
+                                {% if case.end_statustype_data %}<span>{{ status.description|default:"" }}</span>{% endif %}
+                                {% if not case.end_statustype_data %}<span class="status--result">{{ case.result_description|default:"" }}</span>{% endif %}
+                            </p>
+                            <p class="p p-date p--compact">{{ status.date|date }}</p>
+                            <p class="p p__upload {% if case.end_statustype_data %}p__upload--enabled{% endif %}">
+                            {% if case.internal_upload_enabled or case.external_upload_enabled %}
+                                {% button href="#documents-upload" text=_("Scroll omlaag") title=_("Ga direct naar document upload sectie.") primary=True icon="arrow_downward" icon_position="after" %}
+                            {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </li>
+
+            {% else %}
+                {# Completed past statuses #}
+                <li class="status--completed status-list__list-item">
+                {% firstof case.id|slugify as id %}
+                {% firstof 'completed-'|add:id|add:'-id' as completed_id %}
+                    {% icon icon="task_alt" %}
+                    <div class="status-list__notification">
+                        <button class="status-list__button button--borderless" aria-controls="{{ completed_id }}" aria-expanded="false" id="{{ id }}"><a href="#" class="link link-success">{{ status.label }}</a>{% icon icon="expand_more" icon_position="after" outlined=True %}</button>
+                        <div class="status-list__notification-content" id="{{ completed_id }}">
+                            <p class="p p-text p--compact">
+                                {# Configurable texts #}
+                                <span>{{ status.status_indicator_text|default:"" }}</span>
+                                <span>{{ status.description|default:"" }}</span>
+                            </p>
+                            <p class="p p-date p--compact">{{ status.date|date }}</p>
+                            <p class="p p__upload {% if case.end_statustype_data %}p__upload--enabled{% endif %}">
+                            {% if case.internal_upload_enabled or case.external_upload_enabled %}
+                                {% button href="#documents-upload" text=_("Scroll omlaag") title=_("Ga direct naar document upload sectie.") primary=True icon="arrow_downward" icon_position="after" %}
+                            {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </li>
+            {% endif %}
+        {% endfor %}
+
+        {# Preview of upcoming second status #}
+        {% if case.second_status_preview %}
+            <li class="status--future status-list__list-item status-list__list-item--future">
+                {% icon icon="circle_outlined" outlined=True %}
+                <div class="status-list__notification status-list__notification">
+                    <div class="status-list__open"><span class="link link-future">{{ case.second_status_preview.omschrijving }}</span></div>
+                </div>
+            </li>
+        {% endif %}
+
+        {# Future end status #}
+        {% if case.end_statustype_data %}
+            <li class="status--future status-list__list-item status-list__list-item--future">
+                {% icon icon="circle_outlined" outlined=True %}
+                <div class="status-list__notification status-list__notification--future">
+                    <div class="status-list__open"><span class="link link-future">{{ case.end_statustype_data.label }}</span></div>
+                </div>
+            </li>
+        {% endif %}
+
+    </ul>
+</aside>
+
+{% endif %}

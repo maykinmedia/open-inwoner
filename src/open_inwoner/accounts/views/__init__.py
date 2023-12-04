@@ -11,6 +11,8 @@ from .actions import (
 from .auth import (
     CustomDigiDAssertionConsumerServiceMockView,
     CustomDigiDAssertionConsumerServiceView,
+    CustomeHerkenningAssertionConsumerServiceMockView,
+    CustomeHerkenningAssertionConsumerServiceView,
     LogPasswordChangeView,
     LogPasswordResetConfirmView,
     LogPasswordResetView,
@@ -34,7 +36,6 @@ from .login import (
 from .password_reset import PasswordResetView
 from .profile import (
     EditProfileView,
-    MyCategoriesView,
     MyDataView,
     MyNotificationsView,
     MyProfileExportView,

@@ -9,7 +9,6 @@ register = template.Library()
 
 
 class Metric(TypedDict):
-    icon: str
     label: str
     value: Optional[str]
 
@@ -27,7 +26,7 @@ def case_dashboard(case: dict, **kwargs) -> dict:
         {% case_dashboard case %}
 
     Variables:
-        + case: dict | The case to be able to build the dashboard, fetching the documents and statusses of the case.
+        + case: dict | The case to be able to build the dashboard, fetching the documents and statuses of the case.
 
     Extra context:
         + config: DashboardConfig | The configuration of the dashboard.
@@ -35,24 +34,16 @@ def case_dashboard(case: dict, **kwargs) -> dict:
     config: DashboardConfig = {
         "metrics": [
             {
-                "icon": "inventory_2",
-                "label": _("Aanvraag"),
+                "label": _("Zaaknummer:"),
                 "value": case.get("identification"),
             },
             {
-                "icon": "calendar_today",
-                "label": _("Datum"),
+                "label": _("Aanvraag ingediend op:"),
                 "value": case.get("start_date"),
             },
             {
-                "icon": "task_alt",
-                "label": _("Status"),
-                "value": case.get("current_status"),
-            },
-            {
-                "icon": "description",
-                "label": _("Documenten"),
-                "value": len(case.get("documents")),
+                "label": _("Beslissing op zijn laatst:"),
+                "value": case.get("end_date_legal"),
             },
         ]
     }
@@ -80,18 +71,15 @@ def contactmoment_dashboard(kcm: KCMDict, **kwargs) -> dict:
     config: DashboardConfig = {
         "metrics": [
             {
-                "icon": "calendar_today",
-                "label": _("Ontvangstdatum"),
+                "label": _("Ontvangstdatum: "),
                 "value": kcm.get("registered_date"),
             },
             {
-                "icon": "inventory_2",
-                "label": _("Contactwijze"),
+                "label": _("Contactwijze: "),
                 "value": kcm.get("channel"),
             },
             {
-                "icon": "task_alt",
-                "label": _("Status"),
+                "label": _("Status: "),
                 "value": kcm.get("status"),
             },
         ]

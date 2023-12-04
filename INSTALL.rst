@@ -196,6 +196,7 @@ file or as part of the ``(post)activate`` of your virtualenv.
 
 * ``SECRET_KEY``: the secret key to use. A default is set in ``dev.py``
 * ``DIGID_MOCK``: determines if a mock-DigiD interface is to be shown on the frontend, if configured in the admin this has to be set to ``True`` to avoid switching to the mock-authentication by accident.
+* ``EHERKENNING_MOCK``: determines if a mock-eHerkenning interface is to be shown on the frontend, if configured in the admin this has to be set to ``True`` to avoid switching to the mock-authentication by accident.
 
 * ``DB_NAME``: name of the database for the project. Defaults to ``open_inwoner``.
 * ``DB_USER``: username to connect to the database with. Defaults to ``open_inwoner``.

@@ -1,12 +1,15 @@
 from django.contrib import admin, messages
 from django.core.exceptions import ValidationError
 from django.db.models import BooleanField, Count, ExpressionWrapper, Q
+from django.forms import ModelForm, Textarea
 from django.forms.models import BaseInlineFormSet
 from django.utils.translation import gettext_lazy as _, ngettext
 
 from import_export.admin import ImportExportMixin
 from import_export.formats import base_formats
 from solo.admin import SingletonModelAdmin
+
+from open_inwoner.ckeditor5.widgets import CKEditorWidget
 
 from .models import (
     CatalogusConfig,
@@ -16,6 +19,8 @@ from .models import (
     UserCaseStatusNotification,
     ZaakTypeConfig,
     ZaakTypeInformatieObjectTypeConfig,
+    ZaakTypeResultaatTypeConfig,
+    ZaakTypeStatusTypeConfig,
 )
 from .resources.import_resource import StatusTranslationImportResource
 
@@ -43,7 +48,15 @@ class OpenZaakConfigAdmin(SingletonModelAdmin):
                     "document_max_confidentiality",
                     "max_upload_size",
                     "allowed_file_extensions",
+                    "title_text",
                 ],
+            },
+        ),
+        (
+            "Feature flags",
+            {
+                "classes": ("collapse",),
+                "fields": ("enable_categories_filtering_with_zaken",),
             },
         ),
         (
@@ -52,6 +65,7 @@ class OpenZaakConfigAdmin(SingletonModelAdmin):
                 "fields": [
                     "skip_notification_statustype_informeren",
                     "reformat_esuite_zaak_identificatie",
+                    "fetch_eherkenning_zaken_with_rsin",
                 ],
             },
         ),
@@ -157,16 +171,91 @@ class ZaakTypeInformatieObjectTypeConfigInline(admin.TabularInline):
         return request.user.is_superuser
 
 
+class ZaakTypeStatusTypeConfigInlineAdminForm(ModelForm):
+    class Meta:
+        model = ZaakTypeStatusTypeConfig
+        fields = "__all__"
+        widgets = {
+            "document_upload_description": CKEditorWidget,
+            "status_indicator_text": Textarea(attrs={"cols": 40, "rows": 10}),
+            "description": CKEditorWidget,
+        }
+
+
+class ZaakTypeStatusTypeConfigInline(admin.StackedInline):
+    model = ZaakTypeStatusTypeConfig
+    classes = ["collapse"]
+    fields = [
+        "statustekst",
+        "omschrijving",
+        "statustype_url",
+        "zaaktype_uuids",
+        "status_indicator",
+        "status_indicator_text",
+        "document_upload_enabled",
+        "document_upload_description",
+        "description",
+        "call_to_action_url",
+        "call_to_action_text",
+    ]
+    readonly_fields = [
+        "statustekst",
+        "omschrijving",
+        "statustype_url",
+        "zaaktype_uuids",
+    ]
+    ordering = (
+        "zaaktype_uuids",
+        "omschrijving",
+    )
+    form = ZaakTypeStatusTypeConfigInlineAdminForm
+
+    def has_add_permission(self, request, obj):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+
+class ZaakTypeResultaattypeConfigInline(admin.StackedInline):
+    model = ZaakTypeResultaatTypeConfig
+    classes = ["collapse"]
+    fields = [
+        "omschrijving",
+        "resultaattype_url",
+        "zaaktype_uuids",
+        "description",
+    ]
+    readonly_fields = [
+        "omschrijving",
+        "resultaattype_url",
+        "zaaktype_uuids",
+    ]
+    ordering = (
+        "zaaktype_uuids",
+        "omschrijving",
+    )
+
+    def has_add_permission(self, request, obj):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+
 @admin.register(ZaakTypeConfig)
 class ZaakTypeConfigAdmin(admin.ModelAdmin):
     inlines = [
         ZaakTypeInformatieObjectTypeConfigInline,
+        ZaakTypeStatusTypeConfigInline,
+        ZaakTypeResultaattypeConfigInline,
     ]
     actions = [
         "mark_as_notify_status_changes",
         "mark_as_not_notify_status_changes",
     ]
     fields = [
+        "urls",
         "catalogus",
         "identificatie",
         "omschrijving",
@@ -176,8 +265,10 @@ class ZaakTypeConfigAdmin(admin.ModelAdmin):
         "document_upload_enabled",
         "external_document_upload_url",
         "description",
+        "relevante_zaakperiode",
     ]
     readonly_fields = [
+        "urls",
         "catalogus",
         "identificatie",
         "omschrijving",

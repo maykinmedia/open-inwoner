@@ -1,65 +1,40 @@
-{% load i18n anchor_menu_tags card_tags dashboard_tags file_tags grid_tags table_tags solo_tags button_tags icon_tags notification_tags %}
-
-{# Anchor menu-mobile #}
-<div id="cases-status-anchors-oob-mobile" hx-swap-oob="true">
-    {% anchor_menu anchors=anchors desktop=False %}
-</div>
+{% load i18n ssd_tags anchor_menu_tags card_tags dashboard_tags file_tags grid_tags table_tags solo_tags link_tags button_tags icon_tags notification_tags %}
 
 {# Messages #}
 <div class="container container--no-margin" id="cases-status-messages-oob" hx-swap-oob="true">
-    {% notifications messages %}
-</div>
-
-{# Anchor menu-desktop #}
-<div id="cases-status-anchors-oob" hx-swap-oob="true">
-    {% anchor_menu anchors desktop=True %}
+    {% notifications messages closable=True %}
 </div>
 
 {% get_solo 'openzaak.OpenZaakConfig' as openzaak_config %}
 
+<div class="case__grid">
 {% if case %}
     {% render_grid %}
-        {% render_column span=9 %}
-
+        {% render_column span=12 %}
             {# Title/dashboard. #}
             <h1 class="h1" id="title">{{ case.description }}</h1>
             {% case_dashboard case %}
-            {% case_table case %}
+        {% endrender_column %}
 
+        {% render_column start=4 span=6 %}
             {#  Status history. #}
-            {% if case.statuses %}
-                <h2 class="h2" id="statuses">{% trans 'Status' %}</h2>
-
-                <aside class="status-list" aria-label="{% trans "Status lijst" %}">
-                    <ul class="status-list__list">
-                        {% for status in case.statuses %}
-                        <li class="status-list__list-item">
-                            {% icon icon="task_alt" %}
-                            <p class="p p--compact">{{ status.date|date }}</p>
-                            <p class="p p--compact">{{ status.label }}</p>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                </aside>
-
-            {% endif %}
-
-            {#  Documents. #}
-            {% if case.documents %}
-                <h2 class="h2" id="documents">{% trans 'Documenten' %}</h2>
-                {% case_document_list case.documents %}
-            {% endif %}
+            <section id="statuses_component" class="statuses__section">
+                {% include 'pages/cases/statuses.html' %}
+            </section>
 
             {% if case.internal_upload_enabled %}
-                <h2 class="h2" id=>{% trans "Document uploaden" %}</h2>
-                {% if case.case_type_config_description %}
-                    <p class="p">{{ case.case_type_config_description }}</p>
-                {% else %}
-                    <p class="p">
-                        {% blocktranslate with max_filesize=openzaak_config.max_upload_size allowed_extensions=case.allowed_file_extensions|join:', ' %}
-                            Grootte max. {{ max_filesize }} MB, toegestane document formaten: {{ allowed_extensions }}.
-                        {% endblocktranslate %}
-                    </p>
+                <h2 class="h2" id="documents-upload">{% trans "Document uploaden" %}</h2>
+
+                {% notifications messages show_local_messages=True closable=False %}
+
+                {% if case.case_type_document_upload_description %}
+                <div class="card card--compact card--info">
+                    <div class="card__body document-upload-description">
+                        {% icon icon="info" icon_position="after" extra_classes="icon--info" outlined=True %}
+
+                        <div class="document-upload-description__text">{{ case.case_type_document_upload_description|markdown|safe }}</div>
+                    </div>
+                </div>
                 {% endif %}
 
                 {#  Upload document form. #}
@@ -68,7 +43,7 @@
                 </section>
 
             {% elif case.external_upload_enabled %}
-                <h2 class="h2">{% trans "Document toevoegen" %}</h2>
+                <h2 class="h2" id="documents-upload">{% trans "Document toevoegen" %}</h2>
                 {% if case.case_type_config_description %}
                     <p class="p">{{ case.case_type_config_description }}</p>
                 {% else %}
@@ -77,6 +52,12 @@
                 {% button_row %}
                     {% button href=case.external_upload_url text=_("Document uploaden") title=_("Opens new window") primary=True icon="open_in_new" icon_position="after" %}
                 {% endbutton_row %}
+            {% endif %}
+
+            {#  Documents. #}
+            {% if case.documents %}
+                <h2 class="h2" id="documents">{% trans 'Documenten' %}{% if case.new_docs %}{% icon icon="fiber_manual_record" outlined=False extra_classes="file__file--recent" %}{% endif %}</h2>
+                {% case_document_list case.documents %}
             {% endif %}
 
             {#  Contact moment form #}
@@ -93,3 +74,4 @@
 {% else %}
     <h2 class="h2">{% trans 'There is no available data at the moment.' %}</h2>
 {% endif %}
+</div>

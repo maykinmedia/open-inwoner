@@ -1,3 +1,6 @@
+import json
+from uuid import UUID
+
 from django.test import override_settings, tag
 from django.utils.translation import gettext as _
 
@@ -26,6 +29,7 @@ from open_inwoner.openzaak.tests.factories import (
     ServiceFactory,
     ZaakTypeConfigFactory,
     ZaakTypeInformatieObjectTypeConfigFactory,
+    ZaakTypeStatusTypeConfigFactory,
 )
 from open_inwoner.openzaak.tests.shared import (
     CATALOGI_ROOT,
@@ -122,6 +126,18 @@ class CasesPlaywrightTests(
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
             indicatieInternOfExtern="extern",
         )
+        #
+        # statuses
+        #
+        self.status_new = generate_oas_component(
+            "zrc",
+            "schemas/Status",
+            url=f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-beu760sle929",
+            zaak=self.zaak["url"],
+            statustype=f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-777yu878km09",
+            datumStatusGezet="2021-01-12",
+            statustoelichting="",
+        )
         self.status_finish = generate_oas_component(
             "zrc",
             "schemas/Status",
@@ -131,6 +147,21 @@ class CasesPlaywrightTests(
             datumStatusGezet="2021-03-12",
             statustoelichting="",
         )
+        #
+        # status types
+        #
+        self.status_type_new = generate_oas_component(
+            "ztc",
+            "schemas/StatusType",
+            url=self.status_new["statustype"],
+            zaaktype=self.zaaktype["url"],
+            catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            omschrijving="Initial request",
+            omschrijvingGeneriek="Nieuw",
+            statustekst="",
+            volgnummer=1,
+            isEindstatus=False,
+        )
         self.status_type_finish = generate_oas_component(
             "ztc",
             "schemas/StatusType",
@@ -138,7 +169,10 @@ class CasesPlaywrightTests(
             zaaktype=self.zaaktype["url"],
             catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             omschrijving="Finish",
-            omschrijvingGeneriek="some content",
+            omschrijvingGeneriek="Afgehandeld",
+            statustekst="",
+            volgnummer=1,
+            isEindstatus=True,
         )
         self.user_role = generate_oas_component(
             "zrc",
@@ -265,6 +299,17 @@ class CasesPlaywrightTests(
             zaaktype_uuids=[self.zaaktype["uuid"]],
             document_upload_enabled=True,
         )
+        # enable upload for new and last status
+        ZaakTypeStatusTypeConfigFactory(
+            zaaktype_config=zaak_type_config,
+            statustype_url=self.status_type_new["url"],
+            document_upload_enabled=True,
+        )
+        ZaakTypeStatusTypeConfigFactory(
+            zaaktype_config=zaak_type_config,
+            statustype_url=self.status_type_finish["url"],
+            document_upload_enabled=True,
+        )
 
     def _setUpMocks(self, m):
         mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
@@ -278,12 +323,27 @@ class CasesPlaywrightTests(
             self.zaak,
             self.result,
             self.zaaktype,
+            self.status_type_new,
+            self.status_type_finish,
+        ]:
+            m.get(resource["url"], json=resource)
+
+        for resource in [
+            self.zaak,
+            self.result,
+            self.zaaktype,
             self.informatie_object,
             self.uploaded_informatie_object,
             self.status_finish,
             self.status_type_finish,
         ]:
             self.matchers.append(m.get(resource["url"], json=resource))
+
+        # mock `fetch_status_types_no_cache`
+        m.get(
+            f"{CATALOGI_ROOT}statustypen?zaaktype={self.zaak['zaaktype']}",
+            json=paginated_response([self.status_type_new, self.status_type_finish]),
+        )
 
         self.matchers += [
             m.get(
@@ -358,22 +418,7 @@ class CasesPlaywrightTests(
         context = self.browser.new_context(storage_state=self.user_login_state)
 
         page = context.new_page()
-        page.goto(self.live_reverse("cases:open_cases"))
-
-        # expected anchors
-        menu_items = page.get_by_role(
-            "complementary", name=_("Secundaire paginanavigatie")
-        ).get_by_role("listitem")
-
-        expect(
-            menu_items.get_by_role("link", name=_("Openstaande aanvragen"))
-        ).to_be_visible()
-        expect(
-            menu_items.get_by_role("link", name=_("Lopende aanvragen"))
-        ).to_be_visible()
-        expect(
-            menu_items.get_by_role("link", name=_("Afgeronde aanvragen"))
-        ).to_be_visible()
+        page.goto(self.live_reverse("cases:index"))
 
         # case title
         case_title = page.get_by_role("link", name=self.zaaktype["omschrijving"])
@@ -390,15 +435,6 @@ class CasesPlaywrightTests(
         # check case is visible
         expect(page.get_by_text(self.zaak["identificatie"])).to_be_visible()
 
-        # out-of-band anchor menu
-        menu_items = page.get_by_role(
-            "complementary", name=_("Secundaire paginanavigatie")
-        ).get_by_role("listitem")
-
-        expect(menu_items.get_by_role("link", name=_("Gegevens"))).to_be_visible()
-        expect(menu_items.get_by_role("link", name=_("Status"))).to_be_visible()
-        expect(menu_items.get_by_role("link", name=_("Documenten"))).to_be_visible()
-
         # check documents show
         documents = page.locator(".file-list").get_by_role("listitem")
 
@@ -411,7 +447,10 @@ class CasesPlaywrightTests(
         upload_form = page.locator("#document-upload")
         expect(upload_form).to_be_visible()
 
-        upload_form.get_by_label(_("Document selecteren")).set_input_files(
+        file_input = upload_form.get_by_label(
+            _("Sleep of selecteer bestanden"), exact=True
+        )
+        file_input.set_input_files(
             files=[
                 {
                     "name": "uploaded_test_file.txt",
@@ -420,12 +459,8 @@ class CasesPlaywrightTests(
                 }
             ],
         )
-        submit_button = upload_form.get_by_role("button", name=_("Document uploaden"))
+        submit_button = upload_form.get_by_role("button", name=_("Upload documenten"))
         expect(submit_button).to_be_visible()
-
-        title_input = upload_form.get_by_label(_("Titel bestand"))
-        expect(title_input).to_be_visible()
-        title_input.fill("uploaded document")
 
         submit_button.click()
 
@@ -467,3 +502,124 @@ class CasesPlaywrightTests(
 
         # finally check if our mock matchers are accurate
         self.assertMockMatchersCalled(self.matchers)
+
+    def test_multiple_file_upload(self, m):
+        self._setUpMocks(m)
+
+        # Keep track of uploaded files (schemas/EnkelvoudigInformatieObject array)
+        # This list is updated by mocks after uploading the files.
+        uploads = []
+
+        # Document list mock.
+        def mock_list(request, context):
+            """
+            Mock GET "zaakinformatieobjecten" endpoint (schemas/ZaakInformatieObject array).
+            Creates schemas/ZaakInformatieObject dict for each item in uploads.
+            """
+            items = [
+                generate_oas_component(
+                    "zrc",
+                    "schemas/ZaakInformatieObject",
+                    url=f"{ZAKEN_ROOT}zaakinformatieobjecten/e55153aa-ad2c-4a07-ae75-15add57d6",
+                    informatieobject=upload["url"],
+                    zaak=self.zaak["url"],
+                )
+                for upload in uploads
+            ]
+            return json.dumps(items)
+
+        m.get(
+            f"{ZAKEN_ROOT}zaakinformatieobjecten?zaak={self.zaak['url']}",
+            text=mock_list,
+        ),
+
+        # Upload mock.
+        def mock_upload(request, context):
+            """
+            Mock POST "enkelvoudiginformatieobjecten" endpoint (schemas/EnkelvoudigInformatieObject).
+            Creates schemas/EnkelvoudigInformatieObject dict and mock for its url.
+            appends created item to `uploads`.
+            """
+            request_body = json.loads(request.body)
+            file_name = request_body["titel"]
+
+            # Create a UUID based on a seed derived from the file name.
+            # This makes sure the two test cases have unique entries.
+            seed = file_name.ljust(16, "0").encode("utf-8")
+            uuid = UUID(bytes=seed)
+
+            uploaded_informatie_object = generate_oas_component(
+                "drc",
+                "schemas/EnkelvoudigInformatieObject",
+                uuid=str(uuid),
+                url=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/{uuid}",
+                inhoud=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/85079ba3-554a-450f-b963-2ce20b176c90/download",
+                informatieobjecttype=self.informatie_object_type["url"],
+                status="definitief",
+                vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+                bestandsnaam=file_name,
+                titel=file_name,
+                bestandsomvang=request_body["bestandsomvang"],
+            )
+            m.get(uploaded_informatie_object["url"], json=uploaded_informatie_object)
+            uploads.append(uploaded_informatie_object)
+            return json.dumps(uploaded_informatie_object)
+
+        m.post(
+            f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten",
+            status_code=201,
+            text=mock_upload,
+        ),
+
+        # Setup.
+        context = self.browser.new_context(storage_state=self.user_login_state)
+        page = context.new_page()
+        page.goto(
+            self.live_reverse(
+                "cases:case_detail", kwargs={"object_id": self.zaak["uuid"]}
+            )
+        )
+
+        upload_form = page.locator("#document-upload")
+        file_input = upload_form.get_by_label("Sleep of selecteer bestanden")
+        submit_button = upload_form.get_by_role("button", name=_("Upload documenten"))
+        notification_list = page.get_by_role("alert").get_by_role("list")
+        notification_list_items = notification_list.get_by_role("listitem")
+        file_list = page.get_by_role("list").last
+        file_list_items = file_list.get_by_role("listitem")
+
+        # Check that the initial state does not have any uploaded documents.
+        expect(notification_list_items).to_have_count(0)
+        expect(file_list_items).to_have_count(0)
+
+        # Upload some files.
+        file_input.set_input_files(
+            files=[
+                {
+                    "name": "document_1.txt",
+                    "mimeType": "text/plain",
+                    "buffer": "test12345".encode("utf8"),
+                },
+                {
+                    "name": "document_two.pdf",
+                    "mimeType": "application/pdf",
+                    "buffer": "test67890".encode("utf8"),
+                },
+            ],
+        )
+        submit_button.click()
+        page.wait_for_url(
+            self.live_reverse(
+                "cases:case_detail", kwargs={"object_id": self.zaak["uuid"]}
+            )
+        )
+
+        # Check that the case does now have two uploaded documents.
+        expect(notification_list_items).to_have_count(2)
+        expect(notification_list_items.first).to_contain_text("document_1.txt")
+        expect(notification_list_items.last).to_contain_text("document_two.pdf")
+        expect(file_list_items).to_have_count(2)
+        expect(file_list_items.first).to_contain_text("document_1")
+        expect(file_list_items.first).to_contain_text("(txt, 9 bytes)")
+        expect(file_list_items.last).to_contain_text("document_two")
+        expect(file_list_items.last).to_contain_text("(pdf, 9 bytes)")

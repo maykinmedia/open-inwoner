@@ -60,44 +60,43 @@ class ProfileViewTests(WebTest):
     def test_user_information_profile_page(self):
         response = self.app.get(self.url, user=self.user)
 
-        self.assertContains(response, self.user.get_full_name())
+        self.assertContains(response, self.user.first_name)
+        self.assertContains(response, self.user.last_name)
+        self.assertContains(response, self.user.infix)
         self.assertContains(response, self.user.email)
         self.assertContains(response, self.user.phonenumber)
-        self.assertContains(response, self.user.get_address())
+        self.assertContains(response, self.user.street)
+        self.assertContains(response, self.user.housenumber)
+        self.assertContains(response, self.user.city)
 
     def test_get_empty_profile_page(self):
         response = self.app.get(self.url, user=self.user)
 
         self.assertEquals(response.status_code, 200)
-        self.assertContains(response, _("U heeft geen interesses gekozen."))
-        self.assertContains(response, _("U heeft nog geen contacten."))
-        self.assertContains(response, "0 acties staan open.")
+        self.assertContains(response, _("U heeft nog geen contacten"))
+        self.assertContains(response, "0 acties staan open")
         self.assertNotContains(response, reverse("products:questionnaire_list"))
-        self.assertContains(response, _("messages, plans"))
 
     def test_get_filled_profile_page(self):
         ActionFactory(created_by=self.user)
         contact = UserFactory()
         self.user.user_contacts.add(contact)
-        category = CategoryFactory()
-        self.user.selected_categories.add(category)
+        CategoryFactory()
         QuestionnaireStepFactory(published=True)
 
         response = self.app.get(self.url, user=self.user)
         self.assertEquals(response.status_code, 200)
-        self.assertContains(response, category.name)
         self.assertContains(
             response,
             f"{contact.first_name} ({contact.get_contact_type_display()})",
         )
-        self.assertContains(response, "1 acties staan open.")
+        self.assertContains(response, "1 acties staan open")
         self.assertContains(response, reverse("products:questionnaire_list"))
 
     def test_only_open_actions(self):
-        action = ActionFactory(created_by=self.user, status=StatusChoices.closed)
+        ActionFactory(created_by=self.user, status=StatusChoices.closed)
         response = self.app.get(self.url, user=self.user)
-        self.assertEquals(response.status_code, 200)
-        self.assertContains(response, "0 acties staan open.")
+        self.assertIn("0 acties staan open", response)
 
     def test_mydata_shown_with_digid_and_brp(self):
         user = UserFactory(
@@ -126,8 +125,18 @@ class ProfileViewTests(WebTest):
         self.assertNotContains(response, _("My details"))
 
     def test_active_user_notifications_are_shown(self):
-        response = self.app.get(self.url, user=self.user)
-        self.assertContains(response, _("messages, plans"))
+        user = UserFactory(
+            bsn="999993847",
+            first_name="name",
+            last_name="surname",
+            is_prepopulated=False,
+            login_type=LoginTypeChoices.digid,
+            messages_notifications=True,
+            plans_notifications=True,
+            cases_notifications=False,
+        )
+        response = self.app.get(self.url, user=user)
+        self.assertContains(response, _("Mijn Berichten, Samenwerken"))
 
     def test_expected_message_is_shown_when_all_notifications_disabled(self):
         self.user.cases_notifications = False
@@ -529,7 +538,7 @@ class ProfileDeleteTest(WebTest):
         # check redirect
         self.assertRedirects(
             self.app.get(response.url),
-            reverse("pages-root"),
+            reverse("login"),
             status_code=302,
             target_status_code=200,
             fetch_redirect_response=True,
@@ -548,7 +557,7 @@ class ProfileDeleteTest(WebTest):
         # check redirect
         self.assertRedirects(
             self.app.get(response.url),
-            reverse("pages-root"),
+            reverse("login"),
             status_code=302,
             target_status_code=200,
             fetch_redirect_response=True,
@@ -725,29 +734,6 @@ class MyDataTests(AssertTimelineLogMixin, HaalCentraalMixin, WebTest):
             content_object_repr=str(self.user),
             action_flag=list(LOG_ACTIONS[4]),
         )
-
-
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class EditIntrestsTests(WebTest):
-    def setUp(self):
-        self.url = reverse("profile:categories")
-        self.user = UserFactory()
-
-    def test_login_required(self):
-        login_url = reverse("login")
-        response = self.app.get(self.url)
-        self.assertRedirects(response, f"{login_url}?next={self.url}")
-
-    def test_preselected_values(self):
-        category = CategoryFactory(name="a")
-        CategoryFactory(name="b")
-        CategoryFactory(name="c")
-        self.user.selected_categories.add(category)
-        response = self.app.get(self.url, user=self.user)
-        form = response.forms["change-categories"]
-        self.assertTrue(form.get("selected_categories", index=0).checked)
-        self.assertFalse(form.get("selected_categories", index=1).checked)
-        self.assertFalse(form.get("selected_categories", index=2).checked)
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
