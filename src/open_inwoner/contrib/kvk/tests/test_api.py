@@ -94,6 +94,29 @@ class KvKAPITest(TestCase):
             },
         )
 
+    def test_no_search_without_config(self):
+        config = None
+        kvk_client = KvKClient(config)
+
+        company = kvk_client.search(kvk="69599084")
+
+        self.assertEqual(company, {})
+
+    def test_no_search_with_empty_api_root(self):
+        """Sentry 343407"""
+
+        config = KvKConfig(
+            api_root="",
+            api_key="12345",
+            client_certificate=CLIENT_CERT,
+            server_certificate=SERVER_CERT,
+        )
+        kvk_client = KvKClient(config)
+
+        company = kvk_client.search(kvk="69599084")
+
+        self.assertEqual(company, {})
+
     #
     # requests interface
     #
