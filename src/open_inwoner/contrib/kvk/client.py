@@ -34,7 +34,10 @@ class KvKClient:
 
         return request_kwargs
 
-    def _request(self, endpoint: str, params: dict) -> list:
+    def _request(self, endpoint: str, params: dict) -> dict:
+        if not self.config or not self.config.api_root:
+            return {}
+
         url = self._build_url(endpoint, params=params)
         request_kwargs = self._build_request_kwargs()
 
