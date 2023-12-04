@@ -14,7 +14,7 @@ from ..utils.decorators import cache as cache_result
 from .api_models import Resultaat, Rol, Status, Zaak, ZaakInformatieObject
 from .catalog import fetch_single_case_type, fetch_single_status_type
 from .clients import build_client
-from .models import OpenZaakConfig, ZaakTypeStatusTypeConfig
+from .models import OpenZaakConfig, ZaakTypeConfig, ZaakTypeStatusTypeConfig
 from .utils import is_zaak_visible
 
 logger = logging.getLogger(__name__)
@@ -403,6 +403,21 @@ def resolve_status_type(case: Zaak) -> None:
     case.status.statustype = fetch_single_status_type(statustype_url)
 
 
+def add_zaak_type_config(case: Zaak) -> None:
+    """
+    Add `ZaakTypeConfig` corresponding to the zaaktype type url of the case
+
+    Note: must be called after `resolve_zaak_type` since we're using the `uuid` and
+        `identificatie` from `case.zaaktype`
+    """
+    try:
+        case.zaaktype_config = ZaakTypeConfig.objects.filter_case_type(
+            case.zaaktype
+        ).get()
+    except ZaakTypeConfig.DoesNotExist:
+        pass
+
+
 def add_status_type_config(case: Zaak) -> None:
     """
     Add `ZaakTypeStatusTypeConfig` corresponding to the status type url of the case
@@ -412,9 +427,10 @@ def add_status_type_config(case: Zaak) -> None:
     """
     try:
         case.statustype_config = ZaakTypeStatusTypeConfig.objects.get(
-            statustype_url=case.status.statustype.url
+            zaaktype_config=case.zaaktype_config,
+            statustype_url=case.status.statustype.url,
         )
-    except ZaakTypeStatusTypeConfig.DoesNotExist:
+    except (AttributeError, ZaakTypeStatusTypeConfig.DoesNotExist):
         pass
 
 
@@ -433,6 +449,7 @@ def preprocess_data(cases: list[Zaak]) -> list[Zaak]:
     for case in cases:
         resolve_status(case)
         resolve_status_type(case)
+        add_zaak_type_config(case)
         add_status_type_config(case)
 
     cases.sort(key=lambda case: case.startdatum, reverse=True)
