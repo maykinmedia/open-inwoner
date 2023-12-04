@@ -515,6 +515,36 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
                     },
                 )
 
+    def test_list_cases_for_eherkenning_user_missing_rsin(self, m):
+        self._setUpMocks(m)
+
+        self.eherkenning_user.rsin = ""
+        self.eherkenning_user.save()
+
+        self.config.fetch_eherkenning_zaken_with_rsin = True
+        self.config.save()
+
+        m.reset_mock()
+
+        response = self.app.get(
+            self.inner_url,
+            user=self.eherkenning_user,
+            headers={"HX-Request": "true"},
+        )
+
+        self.assertListEqual(response.context["cases"], [])
+        # don't show internal cases
+        self.assertNotContains(response, self.zaak_intern["omschrijving"])
+        self.assertNotContains(response, self.zaak_intern["identificatie"])
+
+        # check zaken request query parameters
+        list_zaken_req = [
+            req
+            for req in m.request_history
+            if req.hostname == "zaken.nl" and req.path == "/api/v1/zaken"
+        ]
+        self.assertEqual(len(list_zaken_req), 0)
+
     def test_format_zaak_identificatie(self, m):
         config = OpenZaakConfig.get_solo()
         self._setUpMocks(m)
