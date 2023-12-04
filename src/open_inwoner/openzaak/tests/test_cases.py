@@ -25,8 +25,10 @@ from ..api_models import Zaak
 from ..constants import StatusIndicators
 from ..models import OpenZaakConfig
 from .factories import (
+    CatalogusConfigFactory,
     ServiceFactory,
     StatusTranslationFactory,
+    ZaakTypeConfigFactory,
     ZaakTypeStatusTypeConfigFactory,
 )
 from .mocks import ESuiteData
@@ -163,6 +165,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
             "schemas/ZaakType",
             url=f"{CATALOGI_ROOT}zaaktypen/53340e34-7581-4b04-884f",
             omschrijving="Coffee zaaktype",
+            identificatie="ZAAK-2022-0000000001",
             catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
             indicatieInternOfExtern="extern",
@@ -195,8 +198,16 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
             isEindstatus=True,
         )
 
+        cls.catalogus_config = CatalogusConfigFactory.create(
+            url=cls.zaaktype["catalogus"]
+        )
+        cls.zaaktype_config1 = ZaakTypeConfigFactory.create(
+            urls=[cls.zaaktype["url"]],
+            identificatie=cls.zaaktype["identificatie"],
+            catalogus=cls.catalogus_config,
+        )
         cls.zt_statustype_config1 = ZaakTypeStatusTypeConfigFactory.create(
-            zaaktype_config__identificatie="ZAAK-2022-0000000001",
+            zaaktype_config=cls.zaaktype_config1,
             statustype_url=cls.status_type1["url"],
             status_indicator=StatusIndicators.warning,
             status_indicator_text="U moet documenten toevoegen",
@@ -376,6 +387,19 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
     def test_list_cases(self, m):
         self._setUpMocks(m)
 
+        # Added for https://taiga.maykinmedia.nl/project/open-inwoner/task/1904
+        # In eSuite it is possible to reuse a StatusType for multiple ZaakTypen, which
+        # led to errors when retrieving the ZaakTypeStatusTypeConfig. This duplicate
+        # config is added to verify that that issue was solved
+        ZaakTypeStatusTypeConfigFactory.create(
+            statustype_url=self.status_type1["url"],
+            status_indicator=StatusIndicators.warning,
+            status_indicator_text="U moet documenten toevoegen",
+            description="Lorem ipsum dolor sit amet",
+            call_to_action_url="https://example.com",
+            call_to_action_text="duplicate",
+        )
+
         response = self.app.get(
             self.inner_url, user=self.user, headers={"HX-Request": "true"}
         )
@@ -390,6 +414,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
                     "identification": self.zaak2["identificatie"],
                     "description": self.zaaktype["omschrijving"],
                     "current_status": self.status_type1["omschrijving"],
+                    "zaaktype_config": self.zaaktype_config1,
                     "statustype_config": self.zt_statustype_config1,
                     "case_type": "Zaak",
                 },
@@ -400,6 +425,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
                     "identification": self.zaak1["identificatie"],
                     "description": self.zaaktype["omschrijving"],
                     "current_status": self.status_type1["omschrijving"],
+                    "zaaktype_config": self.zaaktype_config1,
                     "statustype_config": self.zt_statustype_config1,
                     "case_type": "Zaak",
                 },
@@ -410,6 +436,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
                     "identification": self.zaak3["identificatie"],
                     "description": self.zaaktype["omschrijving"],
                     "current_status": self.status_type2["omschrijving"],
+                    "zaaktype_config": self.zaaktype_config1,
                     "statustype_config": None,
                     "case_type": "Zaak",
                 },
@@ -470,6 +497,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
                             "identification": self.zaak_eherkenning2["identificatie"],
                             "description": self.zaaktype["omschrijving"],
                             "current_status": self.status_type1["omschrijving"],
+                            "zaaktype_config": self.zaaktype_config1,
                             "statustype_config": self.zt_statustype_config1,
                             "case_type": "Zaak",
                         },
@@ -482,6 +510,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
                             "identification": self.zaak_eherkenning1["identificatie"],
                             "description": self.zaaktype["omschrijving"],
                             "current_status": self.status_type1["omschrijving"],
+                            "zaaktype_config": self.zaaktype_config1,
                             "statustype_config": self.zt_statustype_config1,
                             "case_type": "Zaak",
                         },
@@ -631,6 +660,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
                     "identification": self.zaak2["identificatie"],
                     "description": self.zaaktype["omschrijving"],
                     "current_status": self.status_type1["omschrijving"],
+                    "zaaktype_config": self.zaaktype_config1,
                     "statustype_config": self.zt_statustype_config1,
                     "case_type": "Zaak",
                 },
@@ -655,6 +685,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
                     "identification": self.zaak1["identificatie"],
                     "description": self.zaaktype["omschrijving"],
                     "current_status": self.status_type1["omschrijving"],
+                    "zaaktype_config": self.zaaktype_config1,
                     "statustype_config": self.zt_statustype_config1,
                     "case_type": "Zaak",
                 },
