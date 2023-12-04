@@ -1,6 +1,4 @@
-.form {
-  &__non-field-error {
-    color: var(--color-gray-dark);
-    margin-top: var(--spacing-medium);
-  }
+.non-field-error {
+  color: var(--color-gray-dark);
+  margin-top: var(--spacing-medium);
 }

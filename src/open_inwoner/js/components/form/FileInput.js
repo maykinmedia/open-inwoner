@@ -33,7 +33,7 @@ export class FileInput extends Component {
 
   /**
    * Return the label when zero files are selected.
-   * @return HTMLInputElement
+   * @return {HTMLLabelElement}
    */
   getLabelEmpty() {
     return this.node.querySelector(`${FileInput.selector}__label-empty`)
@@ -41,7 +41,7 @@ export class FileInput extends Component {
 
   /**
    * Return the label if more than 0 files are selected.
-   * @return HTMLInputElement
+   * @return {HTMLLabelElement}
    */
   getLabelSelected() {
     return this.node.querySelector(`${FileInput.selector}__label-selected`)
@@ -68,7 +68,7 @@ export class FileInput extends Component {
    * @return {HTMLDivElement}
    */
   getFormNonFieldError() {
-    return document.querySelector('.form__non-field-error')
+    return document.querySelector('.non-field-error')
   }
 
   /**
