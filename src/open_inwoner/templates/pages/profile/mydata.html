@@ -37,7 +37,7 @@
                 </div>
                 <div class="tabled__row">
                     <div class="tabled__item tabled__item--bold">{% trans "Geboortedatum" %}</div>
-                    <div class="tabled__item">{{my_data.birthday|date:"d-m-Y"|default:"-"}}</div>
+                    <div class="tabled__item">{{my_data.birthday|date:"d F Y"|default:"-"}}</div>
                 </div>
                 <div class="tabled__row">
                     <div class="tabled__item tabled__item--bold">{% trans "Geboorteplaats" %}</div>

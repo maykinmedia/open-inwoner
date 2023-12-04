@@ -11,7 +11,7 @@
 
 <div class="tabled tabled--flexible">
     <h1 class="h1 tabled__title">{% trans "Welkom" %}, {{ user.first_name }}</h1>
-    <span class="tabled__key">{%trans "voor het laatst ingelogd op" %}: <span class="tabled__value">{{ user.last_login|date:"d F Y" }} om {{ user.last_login|date:"H:i" }} uur</span></span>
+    <span class="tabled__key">{%trans "voor het laatst ingelogd op" %}: <span class="tabled__value">{{ user.last_login|date:"j F Y" }} om {{ user.last_login|date:"H:i" }} uur</span></span>
 </div>
 
 {# Personal information #}
@@ -38,7 +38,7 @@
     </div>
     <div class="tabled__row tabled__row--blank">
         <div class="tabled__item tabled__key">{% trans "Geboortedatum" %}</div>
-        <div class="tabled__item tabled__value">{{ user.birthday|date:"d F Y" }}</div>
+        <div class="tabled__item tabled__value">{{ user.birthday|date:"j F Y" }}</div>
     </div>
     <div class="tabled__row tabled__row--blank">
         <div class="tabled__item tabled__key">{% trans "Adres" %}</div>

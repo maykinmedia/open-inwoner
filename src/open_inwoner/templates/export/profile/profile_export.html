@@ -20,7 +20,7 @@
         </tr>
         <tr>
             <th class="table__header">{% trans "Actief sinds" %}</th>
-            <td class="table__item">{{ object.date_joined}}</td>
+            <td class="table__item">{{ object.date_joined|date:"j F Y"}}</td>
         </tr>
 
         {% if object.bsn %}
