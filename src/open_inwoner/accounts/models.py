@@ -151,7 +151,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name=_("House number"), default="", blank=True, max_length=250
     )
     postcode = NLZipCodeField(
-        verbose_name=_("Postcode"), null=True, blank=True, max_length=250
+        verbose_name=_("Postcode"), blank=True, default="", max_length=250
     )
     city = models.CharField(
         verbose_name=_("City"),
@@ -350,7 +350,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_address(self):
         if self.street:
-            return f"{self.street} {self.housenumber}, {self.city}"
+            return f"{self.street} {self.housenumber}, {self.postcode} {self.city}"
         return ""
 
     def get_new_messages_total(self) -> int:
