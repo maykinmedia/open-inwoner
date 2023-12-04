@@ -27,14 +27,46 @@ class KvKAPITest(TestCase):
         self.mocked_requests = patched_requests.start()
         self.addCleanup(patch.stopall)
 
-    #
-    # search
-    #
-    def test_search_by_kvk(self):
+    def test_search_endpoint(self):
+        self.kvk_client.config.api_root = "https://api.kvk.nl/test/api/v1"
+        endpoint1 = self.kvk_client.search_endpoint
+
+        self.kvk_client.config.api_root = "https://api.kvk.nl/test/api/v1/"
+        endpoint2 = self.kvk_client.search_endpoint
+
+        self.assertEqual(endpoint1, endpoint2)
+
+    def test_generic_search_by_kvk(self):
         self.mocked_requests.return_value.json.return_value = mocks.simple
 
         company = self.kvk_client.search(kvk="69599084")
 
+        self.assertEqual(
+            company,
+            {
+                "pagina": 1,
+                "aantal": 1,
+                "totaal": 1,
+                "resultaten": [
+                    {
+                        "kvkNummer": "68750110",
+                        "handelsnaam": "Test BV Donald",
+                        "type": "rechtspersoon",
+                        "links": [
+                            {
+                                "rel": "basisprofiel",
+                                "href": "https://api.kvk.nl/test/api/v1/basisprofielen/68750110",
+                            }
+                        ],
+                    }
+                ],
+            },
+        )
+
+    def test_search_headquarters(self):
+        self.mocked_requests.return_value.json.return_value = mocks.simple
+
+        company = self.kvk_client.get_company_headquarters(kvk="68750110")
         self.assertEqual(
             company,
             {
@@ -50,29 +82,52 @@ class KvKAPITest(TestCase):
             },
         )
 
-    def test_search_by_kvk_multiple_results(self):
-        """
-        Test that the first result is used when multiple matches are found for the given KVK
-        """
-        self.mocked_requests.return_value.json.return_value = mocks.multiple
+    def test_search_all_branches(self):
+        self.mocked_requests.return_value.json.return_value = mocks.multiple_branches
 
-        company = self.kvk_client.search(kvk="69599084")
+        branches = self.kvk_client.get_all_company_branches(kvk="69599084")
         self.assertEqual(
-            company,
-            {
-                "kvkNummer": "69599084",
-                "handelsnaam": "Test Stichting Bolderbast",
-                "adresType": "bezoekadres",
-                "straatnaam": "Oosterwal",
-                "plaats": "Lochem",
-                "type": "hoofdvestiging",
-                "links": [
-                    {
-                        "rel": "basisprofiel",
-                        "href": "https://api.kvk.nl/test/api/v1/basisprofielen/69599068",
-                    }
-                ],
-            },
+            branches,
+            [
+                {
+                    "kvkNummer": "69599084",
+                    "vestigingsnummer": "028435810622",
+                    "handelsnaam": "Test Stichting Bolderbast",
+                    "adresType": "bezoekadres",
+                    "straatnaam": "Oosterwal",
+                    "plaats": "Lochem",
+                    "type": "hoofdvestiging",
+                    "links": [
+                        {
+                            "rel": "basisprofiel",
+                            "href": "https://api.kvk.nl/test/api/v1/basisprofielen/69599068",
+                        },
+                        {
+                            "rel": "vestigingsprofiel",
+                            "href": "https://api.kvk.nl/test/api/v1/vestigingsprofielen/028435810622",
+                        },
+                    ],
+                },
+                {
+                    "kvkNummer": "69599084",
+                    "vestigingsnummer": "000038509504",
+                    "handelsnaam": "Test Stichting Bolderbast",
+                    "adresType": "bezoekadres",
+                    "straatnaam": "Abebe Bikilalaan",
+                    "plaats": "Amsterdam",
+                    "type": "hoofdvestiging",
+                    "links": [
+                        {
+                            "rel": "basisprofiel",
+                            "href": "https://api.kvk.nl/test/api/v1/basisprofielen/69599084",
+                        },
+                        {
+                            "rel": "vestigingsprofiel",
+                            "href": "https://api.kvk.nl/test/api/v1/vestigingsprofielen/000038509504",
+                        },
+                    ],
+                },
+            ],
         )
 
     def test_search_by_kvk_extra_params(self):
@@ -82,13 +137,20 @@ class KvKAPITest(TestCase):
         self.assertEqual(
             company,
             {
-                "kvkNummer": "68750110",
-                "handelsnaam": "Test BV Donald",
-                "type": "rechtspersoon",
-                "links": [
+                "pagina": 1,
+                "aantal": 1,
+                "totaal": 1,
+                "resultaten": [
                     {
-                        "rel": "basisprofiel",
-                        "href": "https://api.kvk.nl/test/api/v1/basisprofielen/68750110",
+                        "kvkNummer": "68750110",
+                        "handelsnaam": "Test BV Donald",
+                        "type": "rechtspersoon",
+                        "links": [
+                            {
+                                "rel": "basisprofiel",
+                                "href": "https://api.kvk.nl/test/api/v1/basisprofielen/68750110",
+                            }
+                        ],
                     }
                 ],
             },
@@ -117,14 +179,28 @@ class KvKAPITest(TestCase):
 
         self.assertEqual(company, {})
 
-    #
-    # requests interface
-    #
+
+class KvKRequestsInterfaceTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        config = KvKConfig(
+            api_root="https://api.kvk.nl/test/api/v1",
+            api_key="12345",
+            client_certificate=CLIENT_CERT,
+            server_certificate=SERVER_CERT,
+        )
+        cls.kvk_client = KvKClient(config)
+
+    def setUp(self):
+        patched_requests = patch("open_inwoner.contrib.kvk.client.requests.get")
+        self.mocked_requests = patched_requests.start()
+        self.addCleanup(patch.stopall)
+
     def test_kvk_client_with_certs(self):
-        self.kvk_client.search(kvk="69599084")
+        self.kvk_client.get_company_headquarters(kvk="69599084")
 
         self.mocked_requests.assert_called_with(
-            f"{self.kvk_client.search_endpoint}?kvkNummer=69599084",
+            f"{self.kvk_client.search_endpoint}?kvkNummer=69599084&type=hoofdvestiging",
             headers={"apikey": self.kvk_client.config.api_key},
             cert=self.kvk_client.config.client_certificate.public_certificate.path,
             verify=self.kvk_client.config.server_certificate.public_certificate.path,
@@ -139,10 +215,10 @@ class KvKAPITest(TestCase):
         )
         self.kvk_client.config = config
 
-        self.kvk_client.search(kvk="69599084")
+        self.kvk_client.get_company_headquarters(kvk="69599084")
 
         self.mocked_requests.assert_called_with(
-            f"{self.kvk_client.search_endpoint}?kvkNummer=69599084",
+            f"{self.kvk_client.search_endpoint}?kvkNummer=69599084&type=hoofdvestiging",
             headers={"apikey": self.kvk_client.config.api_key},
             cert=(
                 self.kvk_client.config.client_certificate.public_certificate.path,
@@ -158,12 +234,11 @@ class KvKAPITest(TestCase):
         )
         kvk_client = KvKClient(config)
 
-        kvk_client.search(kvk="69599084")
+        kvk_client.search(kvkNummer="69599084")
 
         self.mocked_requests.assert_called_with(
             f"{kvk_client.search_endpoint}?kvkNummer=69599084",
             headers={"apikey": kvk_client.config.api_key},
-            cert=None,
             verify=True,
         )
 
@@ -178,26 +253,26 @@ class KvKAPITest(TestCase):
                     status_code=code,
                 )
 
-                company = self.kvk_client.search(kvk="69599084")
+                company = self.kvk_client.search(kvkNummer="69599084")
                 self.assertEqual(company, {})
 
     def test_kvk_api_error(self):
         self.mocked_requests.side_effect = SSLError
 
-        company = self.kvk_client.search(kvk="69599084")
+        company = self.kvk_client.search(kvkNummer="69599084")
 
         self.assertEqual(company, {})
 
     def test_kvk_invalid_json(self):
         self.mocked_requests.return_value.json.side_effect = InvalidJSONError
 
-        company = self.kvk_client.search(kvk="69599084")
+        company = self.kvk_client.search(kvkNummer="69599084")
 
         self.assertEqual(company, {})
 
     def test_kvk_no_response(self):
         self.mocked_requests.return_value = None
 
-        company = self.kvk_client.search(kvk="69599084")
+        company = self.kvk_client.search(kvkNummer="69599084")
 
         self.assertEqual(company, {})
