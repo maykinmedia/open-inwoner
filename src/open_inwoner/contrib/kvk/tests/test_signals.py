@@ -59,7 +59,7 @@ class TestPreSaveSignal(ClearCachesMixin, TestCase):
 
         user.refresh_from_db()
 
-        self.assertEqual(user.rsin, None)
+        self.assertEqual(user.rsin, "")
         self.assertFalse(user.is_prepopulated)
 
     def test_empty_response_from_kvk(self, m):
@@ -74,7 +74,7 @@ class TestPreSaveSignal(ClearCachesMixin, TestCase):
 
         user.refresh_from_db()
 
-        self.assertEqual(user.rsin, None)
+        self.assertEqual(user.rsin, "")
         self.assertFalse(user.is_prepopulated)
 
     def test_user_is_not_updated_when_http_404(self, m):
@@ -88,7 +88,7 @@ class TestPreSaveSignal(ClearCachesMixin, TestCase):
         user = UserModel.eherkenning_objects.eherkenning_create("69599084")
         user.refresh_from_db()
 
-        self.assertEqual(user.rsin, None)
+        self.assertEqual(user.rsin, "")
         self.assertFalse(user.is_prepopulated)
 
     def test_user_is_not_updated_when_http_500(self, m):
@@ -102,7 +102,7 @@ class TestPreSaveSignal(ClearCachesMixin, TestCase):
         user = UserModel.eherkenning_objects.eherkenning_create("69599084")
         user.refresh_from_db()
 
-        self.assertEqual(user.rsin, None)
+        self.assertEqual(user.rsin, "")
         self.assertFalse(user.is_prepopulated)
 
 
