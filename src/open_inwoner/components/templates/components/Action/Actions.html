@@ -71,11 +71,11 @@
                 </div>
                 <div class="actions__label">
                     <div class="table__explain">{% trans "Toegevoegd op" %}</div>
-                    {{ action.created_on|date:"d-m-Y" }}
+                    {{ action.created_on|date:"j F Y" }}
                 </div>
                 <div class="actions__label">
                     <div class="table__explain">{% trans "Uitvoeren voor" %}</div>
-                    {{ action.end_date|date:"d-m-Y"|default:"-" }}
+                    {{ action.end_date|date:"j F Y"|default:"-" }}
                 </div>
                 <div class="actions__label">
                     <div class="table__explain">

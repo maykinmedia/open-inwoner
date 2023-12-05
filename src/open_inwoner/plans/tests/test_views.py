@@ -721,7 +721,7 @@ class PlanBegeleiderListViewTests(WebTest):
 
         self.assertIn(self.begeleider_plan.title, rendered_plan_title)
         self.assertEqual(rendered_contact, self.contact.get_full_name())
-        self.assertEqual(rendered_end_date, "20-01-2022")
+        self.assertEqual(rendered_end_date, "20 januari 2022")
         self.assertEqual(rendered_plan_status, _("Open"))
         self.assertEqual(rendered_actions_num, "1")
         self.assertEqual(rendered_action_required, _("Actie vereist"))
@@ -736,7 +736,7 @@ class PlanBegeleiderListViewTests(WebTest):
         rendered_end_date = items[1].text
         rendered_plan_status = items[2].text
 
-        self.assertEqual(rendered_end_date, "01-01-2022")
+        self.assertEqual(rendered_end_date, "01 januari 2022")
         self.assertEqual(rendered_plan_status, _("Afgerond"))
 
     @freeze_time("2022-01-01")
