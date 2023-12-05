@@ -305,6 +305,14 @@
                 "eherkenningconfiguration"
             ],
             [
+                "digid_eherkenning_oidc_generics",
+                "openidconnecteherkenningconfig"
+            ],
+            [
+                "digid_eherkenning_oidc_generics",
+                "openidconnectdigidconfig"
+            ],
+            [
                 "haalcentraal",
                 "haalcentraalconfig"
             ],

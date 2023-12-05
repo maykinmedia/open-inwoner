@@ -107,6 +107,18 @@ urlpatterns = [
     ),
     path("contactformulier/", ContactFormView.as_view(), name="contactform"),
     path("oidc/", include("mozilla_django_oidc.urls")),
+    path(
+        "digid-oidc/",
+        include(
+            "digid_eherkenning_oidc_generics.digid_urls",
+        ),
+    ),
+    path(
+        "eherkenning-oidc/",
+        include(
+            "digid_eherkenning_oidc_generics.eherkenning_urls",
+        ),
+    ),
     path("faq/", FAQView.as_view(), name="general_faq"),
     path("yubin/", include("django_yubin.urls")),
     path("apimock/", include("open_inwoner.apimock.urls")),
