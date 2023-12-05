@@ -2,11 +2,12 @@ import logging
 
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import SuspiciousOperation
+from django.urls import reverse_lazy
 
 from mozilla_django_oidc_db.backends import (
     OIDCAuthenticationBackend as _OIDCAuthenticationBackend,
 )
-from requests.exceptions import RequestException
+from requests.exceptions import HTTPError, RequestException
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 
@@ -18,6 +19,15 @@ logger = logging.getLogger(__name__)
 
 class OIDCAuthenticationBackend(_OIDCAuthenticationBackend):
     config_identifier_field = "identifier_claim_name"
+    callback_path = None
+
+    def authenticate(self, request, *args, **kwargs):
+        # Avoid attempting OIDC for a specific variant if we know that that is not the
+        # correct variant being attempted
+        if request and request.path != self.callback_path:
+            return
+
+        return super().authenticate(request, *args, **kwargs)
 
     def filter_users_by_claims(self, claims):
         """Return all users matching the specified subject."""
@@ -58,6 +68,7 @@ class OIDCAuthenticationDigiDBackend(SoloConfigDigiDMixin, OIDCAuthenticationBac
     """
 
     login_type = LoginTypeChoices.digid
+    callback_path = reverse_lazy("digid_oidc:callback")
 
 
 class OIDCAuthenticationEHerkenningBackend(
@@ -68,3 +79,4 @@ class OIDCAuthenticationEHerkenningBackend(
     """
 
     login_type = LoginTypeChoices.eherkenning
+    callback_path = reverse_lazy("eherkenning_oidc:callback")
