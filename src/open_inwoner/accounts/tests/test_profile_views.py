@@ -28,7 +28,12 @@ from ...questionnaire.tests.factories import QuestionnaireStepFactory
 from ..choices import ContactTypeChoices, LoginTypeChoices
 from ..forms import BrpUserForm, UserForm
 from ..models import User
-from .factories import ActionFactory, DigidUserFactory, DocumentFactory, UserFactory
+from .factories import (
+    ActionFactory,
+    DigidUserFactory,
+    UserFactory,
+    eHerkenningUserFactory,
+)
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
@@ -37,6 +42,8 @@ class ProfileViewTests(WebTest):
         self.url = reverse("profile:detail")
         self.return_url = reverse("logout")
         self.user = UserFactory(street="MyStreet")
+        self.digid_user = DigidUserFactory()
+        self.eherkenning_user = eHerkenningUserFactory()
 
         self.action_deleted = ActionFactory(
             name="deleted action, should not show up",
@@ -56,6 +63,54 @@ class ProfileViewTests(WebTest):
         login_url = reverse("login")
         response = self.app.get(self.url)
         self.assertRedirects(response, f"{login_url}?next={self.url}")
+
+    def test_show_correct_logout_button_for_login_type_default(self):
+        response = self.app.get(self.url, user=self.user)
+
+        logout_title = _("Logout")
+        logout_link = response.pyquery.find(f"[title='{logout_title}']")
+
+        self.assertEqual(logout_link.attr("href"), reverse("logout"))
+
+    @patch("digid_eherkenning_oidc_generics.models.OpenIDConnectDigiDConfig.get_solo")
+    def test_show_correct_logout_button_for_login_type_digid(self, mock_solo):
+        for oidc_enabled in [True, False]:
+            with self.subTest(oidc_enabled=oidc_enabled):
+                mock_solo.return_value.enabled = oidc_enabled
+
+                logout_url = (
+                    reverse("digid_oidc:logout")
+                    if oidc_enabled
+                    else reverse("digid:logout")
+                )
+
+                response = self.app.get(self.url, user=self.digid_user)
+
+                logout_title = _("Logout")
+                logout_link = response.pyquery.find(f"[title='{logout_title}']")
+
+                self.assertEqual(logout_link.attr("href"), logout_url)
+
+    @patch(
+        "digid_eherkenning_oidc_generics.models.OpenIDConnectEHerkenningConfig.get_solo"
+    )
+    def test_show_correct_logout_button_for_login_type_eherkenning(self, mock_solo):
+        for oidc_enabled in [True, False]:
+            with self.subTest(oidc_enabled=oidc_enabled):
+                mock_solo.return_value.enabled = oidc_enabled
+
+                logout_url = (
+                    reverse("eherkenning_oidc:logout")
+                    if oidc_enabled
+                    else reverse("eherkenning:logout")
+                )
+
+                response = self.app.get(self.url, user=self.eherkenning_user)
+
+                logout_title = _("Logout")
+                logout_link = response.pyquery.find(f"[title='{logout_title}']")
+
+                self.assertEqual(logout_link.attr("href"), logout_url)
 
     def test_user_information_profile_page(self):
         response = self.app.get(self.url, user=self.user)
