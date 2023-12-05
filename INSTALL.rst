@@ -353,3 +353,11 @@ There are no specific commands for the project. See
 ``python src/manage.py --help``.
 
 .. _Django framework commands: https://docs.djangoproject.com/en/dev/ref/django-admin/#available-commands
+
+
+NLDS DesignTokens
+=================
+
+Generate a CSS file from JSON designtokens
+
+    $ python src/manage.py shell < src/open_inwoner/generate_css.py

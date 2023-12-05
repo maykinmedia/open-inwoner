@@ -1,4 +1,6 @@
-<h1 class="h1">{{ instance.title }} {{ request.user.get_full_name }}</h1>
+<utrecht-html-content class="utrecht-theme">
+    <h1>{{ instance.title }} {{ request.user.get_full_name }}</h1>
+</utrecht-html-content>
 
 {% if instance.description %}
     <p class="p">{{ instance.description|linebreaksbr }}</p>

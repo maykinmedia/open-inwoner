@@ -312,6 +312,36 @@
       format('opentype');
 }
 
+//test
+
+@font-face {
+  font-family: 'Roboto';
+  src: local('TheSans C5'),
+    url('/static/fonts/Roboto/Roboto-Regular-webfont.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-weight: bold;
+  src: local('TheSans C5'),
+    url('/static/fonts/Roboto/Roboto-Bold-webfont.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: italic;
+  src: local('TheSans C5'),
+    url('/static/fonts/Roboto/Roboto-Italic-webfont.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-weight: bold;
+  font-style: italic;
+  src: local('TheSans C5'),
+    url('/static/fonts/Roboto/Roboto-BoldItalic-webfont.woff') format('woff');
+}
+
 html {
   scroll-behavior: smooth;
 }
