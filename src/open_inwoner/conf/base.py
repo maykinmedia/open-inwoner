@@ -885,6 +885,8 @@ THUMBNAIL_QUALITY = 100
 OIDC_AUTHENTICATE_CLASS = "mozilla_django_oidc_db.views.OIDCAuthenticationRequestView"
 OIDC_CALLBACK_CLASS = "mozilla_django_oidc_db.views.OIDCCallbackView"
 OIDC_AUTHENTICATION_CALLBACK_URL = "oidc_authentication_callback"
+# ID token is required to enable OIDC logout
+OIDC_STORE_ID_TOKEN = True
 MOZILLA_DJANGO_OIDC_DB_CACHE = "oidc"
 MOZILLA_DJANGO_OIDC_DB_CACHE_TIMEOUT = 1
 

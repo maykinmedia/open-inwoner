@@ -1,8 +1,14 @@
 import logging
 
+from django.conf import settings
 from django.contrib import auth
 from django.core.exceptions import SuspiciousOperation
+from django.http import HttpResponseRedirect
+from django.shortcuts import resolve_url
+from django.views import View
 
+import requests
+from furl import furl
 from mozilla_django_oidc.views import (
     OIDCAuthenticationCallbackView as _OIDCAuthenticationCallbackView,
     OIDCAuthenticationRequestView as _OIDCAuthenticationRequestView,
@@ -86,6 +92,31 @@ class OIDCAuthenticationCallbackView(_OIDCAuthenticationCallbackView):
         return self.login_failure()
 
 
+class OIDCLogoutView(View):
+    def get_success_url(self):
+        return resolve_url(settings.LOGOUT_REDIRECT_URL)
+
+    def get(self, request):
+        if "oidc_id_token" in request.session:
+            logout_endpoint = self.config_class.get_solo().oidc_op_logout_endpoint
+            if logout_endpoint:
+                logout_url = furl(logout_endpoint).set(
+                    {
+                        "id_token_hint": request.session["oidc_id_token"],
+                    }
+                )
+                requests.get(str(logout_url))
+
+            del request.session["oidc_id_token"]
+
+        if "oidc_login_next" in request.session:
+            del request.session["oidc_login_next"]
+
+        auth.logout(request)
+
+        return HttpResponseRedirect(self.get_success_url())
+
+
 class DigiDOIDCAuthenticationRequestView(
     SoloConfigDigiDMixin, OIDCAuthenticationRequestView
 ):
@@ -98,6 +129,10 @@ class DigiDOIDCAuthenticationCallbackView(
     auth_backend_class = OIDCAuthenticationDigiDBackend
 
 
+class DigiDOIDCLogoutView(SoloConfigDigiDMixin, OIDCLogoutView):
+    pass
+
+
 class eHerkenningOIDCAuthenticationRequestView(
     SoloConfigEHerkenningMixin, OIDCAuthenticationRequestView
 ):
@@ -108,3 +143,7 @@ class eHerkenningOIDCAuthenticationCallbackView(
     SoloConfigEHerkenningMixin, OIDCAuthenticationCallbackView
 ):
     auth_backend_class = OIDCAuthenticationEHerkenningBackend
+
+
+class eHerkenningOIDCLogoutView(SoloConfigEHerkenningMixin, OIDCLogoutView):
+    pass

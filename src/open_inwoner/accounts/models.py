@@ -19,6 +19,10 @@ from mail_editor.helpers import find_template
 from privates.storages import PrivateMediaFileSystemStorage
 from timeline_logger.models import TimelineLog
 
+from digid_eherkenning_oidc_generics.models import (
+    OpenIDConnectDigiDConfig,
+    OpenIDConnectEHerkenningConfig,
+)
 from open_inwoner.utils.hash import create_sha256_hash
 from open_inwoner.utils.validators import (
     CharFieldValidator,
@@ -399,11 +403,22 @@ class User(AbstractBaseUser, PermissionsMixin):
         return False
 
     def get_logout_url(self) -> str:
-        return (
-            reverse("digid:logout")
-            if self.login_type == LoginTypeChoices.digid
-            else reverse("logout")
-        )
+        # Exit early, because for some reason reverse("logout") fails after checking
+        # the singletonmodels
+        if self.login_type not in [
+            LoginTypeChoices.digid,
+            LoginTypeChoices.eherkenning,
+        ]:
+            return reverse("logout")
+
+        if self.login_type == LoginTypeChoices.digid:
+            if OpenIDConnectDigiDConfig.get_solo().enabled:
+                return reverse("digid_oidc:logout")
+            return reverse("digid:logout")
+        elif self.login_type == LoginTypeChoices.eherkenning:
+            if OpenIDConnectEHerkenningConfig.get_solo().enabled:
+                return reverse("eherkenning_oidc:logout")
+            return reverse("eherkenning:logout")
 
     def get_contact_update_url(self):
         return reverse("profile:contact_edit", kwargs={"uuid": self.uuid})

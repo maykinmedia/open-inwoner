@@ -5,6 +5,7 @@ from mozilla_django_oidc.urls import urlpatterns
 from .views import (
     eHerkenningOIDCAuthenticationCallbackView,
     eHerkenningOIDCAuthenticationRequestView,
+    eHerkenningOIDCLogoutView,
 )
 
 app_name = "eherkenning_oidc"
@@ -20,5 +21,10 @@ urlpatterns = [
         "authenticate/",
         eHerkenningOIDCAuthenticationRequestView.as_view(),
         name="init",
+    ),
+    path(
+        "logout/",
+        eHerkenningOIDCLogoutView.as_view(),
+        name="logout",
     ),
 ] + urlpatterns
