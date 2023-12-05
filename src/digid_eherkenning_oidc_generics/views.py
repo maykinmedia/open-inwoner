@@ -4,13 +4,17 @@ from django.conf import settings
 from django.contrib import auth
 from django.http import HttpResponseRedirect
 from django.shortcuts import resolve_url
+from django.urls import reverse_lazy
 from django.views import View
 
 import requests
 from furl import furl
 from mozilla_django_oidc.views import (
-    OIDCAuthenticationCallbackView,
     OIDCAuthenticationRequestView as _OIDCAuthenticationRequestView,
+)
+from mozilla_django_oidc_db.views import (
+    AdminLoginFailure,
+    OIDCCallbackView as _OIDCCallbackView,
 )
 
 from digid_eherkenning_oidc_generics.mixins import (
@@ -27,6 +31,14 @@ class OIDCAuthenticationRequestView(_OIDCAuthenticationRequestView):
         if kc_idp_hint:
             return {"kc_idp_hint": kc_idp_hint}
         return {}
+
+
+class OIDCFailureView(AdminLoginFailure):
+    template_name = "digid_eherkenning_oidc_login_failure.html"
+
+
+class OIDCCallbackView(_OIDCCallbackView):
+    failure_url = reverse_lazy("oidc-error")
 
 
 class OIDCLogoutView(View):
@@ -60,9 +72,7 @@ class DigiDOIDCAuthenticationRequestView(
     pass
 
 
-class DigiDOIDCAuthenticationCallbackView(
-    SoloConfigDigiDMixin, OIDCAuthenticationCallbackView
-):
+class DigiDOIDCAuthenticationCallbackView(SoloConfigDigiDMixin, OIDCCallbackView):
     pass
 
 
@@ -77,7 +87,7 @@ class eHerkenningOIDCAuthenticationRequestView(
 
 
 class eHerkenningOIDCAuthenticationCallbackView(
-    SoloConfigEHerkenningMixin, OIDCAuthenticationCallbackView
+    SoloConfigEHerkenningMixin, OIDCCallbackView
 ):
     pass
 
