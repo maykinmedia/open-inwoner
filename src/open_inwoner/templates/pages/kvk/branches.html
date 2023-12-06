@@ -1,0 +1,30 @@
+{% extends "master.html" %}
+{% load i18n static card_tags button_tags %}
+
+{% block content %}
+<p> {% trans "Selecteer de vestiging waarmee u wilt inloggen" %}:</p>
+<form method="POST" id="eherkenning-branch-form">
+    {% csrf_token %}
+    {% for branch in company_branches %}
+    <div class="card card--compact card--spaced">
+        <div class="card__body">
+            {% with company_id=branch.vestigingsnummer|default:branch.kvkNummer %}
+                <label class="left" for="branch-{{ company_id }}">
+                    <p>{{ branch.handelsnaam }}</p>
+                    {% if branch.straatnaam and branch.plaats %}
+                        <p>{{ branch.straatnaam }}, {{ branch.plaats}}</p>
+                    {% endif %}
+                    {% if branch.vestigingsnummer %}
+                        <p>{% trans "Vestiging" %}: {{ company_id }}</p>
+                    {% endif %}
+                </label>
+                <input type="radio" class="radio right" id="branch-{{ company_id }}"
+                    name="branch_number" value="{{ company_id }}">
+            {% endwith %}
+        </div>
+    </div>
+    {% endfor %}
+    <input type="submit" class="button button--primary" name="submit" value="Log in"/>
+    <a class="button button--danger" href="/accounts/logout/">Cancel</a>
+</form>
+{% endblock content %}

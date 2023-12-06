@@ -1,5 +1,6 @@
 from unittest import skip
 
+from django.conf import settings
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
@@ -11,6 +12,13 @@ from open_inwoner.accounts.tests.factories import (
 from open_inwoner.configurations.models import SiteConfiguration
 
 from .factories import CategoryFactory
+
+# Avoid redirects through `KvKLoginMiddleware`
+PATCHED_MIDDLEWARE = [
+    m
+    for m in settings.MIDDLEWARE
+    if m != "open_inwoner.contrib.kvk.middleware.KvKLoginMiddleware"
+]
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
@@ -108,13 +116,13 @@ class CategoryListViewTest(TestCase):
             list(response.context["object_list"]), [self.category2, self.category3]
         )
 
+    @override_settings(MIDDLEWARE=PATCHED_MIDDLEWARE)
     def test_category_list_view_visibility_for_eherkenning_user(self):
         url = reverse("products:category_list")
 
         user = eHerkenningUserFactory()
         self.client.force_login(user)
 
-        # request with eHerkenning user
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)

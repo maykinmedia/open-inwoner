@@ -19,6 +19,7 @@ class eHerkenningMockTestCase(TestCase):
 
 
 OVERRIDE_SETTINGS = dict(
+    ROOT_URLCONF="open_inwoner.cms.tests.urls",
     EHERKENNING_MOCK_APP_TITLE="FooBarBazz-MockApp",
     EHERKENNING_MOCK_RETURN_URL=RETURN_URL,  # url to redirect to after success
     EHERKENNING_MOCK_CANCEL_URL=CANCEL_URL,  # url to navigate to when users clicks 'cancel/annuleren'
@@ -106,7 +107,13 @@ class PasswordLoginViewTests(eHerkenningMockTestCase):
         self.assertContains(response, reverse("eherkenning-mock:login"))
         self.assertNoEHerkenningURLS(response)
 
-    def test_post_redirects_and_authenticates(self):
+    @patch("open_inwoner.contrib.kvk.client.KvKClient.get_all_company_branches")
+    def test_post_redirects_and_authenticates(self, mock_kvk):
+        mock_kvk.return_value = [
+            {"kvkNummer": "29664887", "vestigingsnummer": "1234"},
+            {"kvkNummer": "29664887", "vestigingsnummer": "5678"},
+        ]
+
         url = reverse("eherkenning-mock:password")
         params = {
             "acs": reverse("eherkenning:acs"),
@@ -117,8 +124,9 @@ class PasswordLoginViewTests(eHerkenningMockTestCase):
 
         data = {
             "auth_name": "29664887",
-            "auth_pass": "bar",
+            "auth_pass": "company@localhost",
         }
+
         # post our password to the IDP
         response = self.client.post(url, data, follow=False)
 
@@ -129,15 +137,98 @@ class PasswordLoginViewTests(eHerkenningMockTestCase):
         # follow the ACS redirect and get/create the user
         response = self.client.get(response["Location"], follow=False)
 
+        # redirect to kvk/branches
+        response = self.client.get(response["Location"])
+        self.assertIn(reverse("kvk:branches"), response["Location"])
+
+        # post branch_number, follow redirect back to register/necessary
+        response = self.client.post(
+            response["Location"], {"branch_number": "1234"}, follow=True
+        )
+        self.assertRedirects(response, reverse("profile:registration_necessary"))
+
+        # check user kvk
         User = get_user_model()
-        user = User.eherkenning_objects.get(kvk="29664887")
+        self.assertEqual(
+            response.context["user"].kvk, User.eherkenning_objects.get().kvk
+        )
 
-        # follow redirect to 'next'
-        self.assertRedirects(response, RETURN_URL)
+        # check company branch number in session
+        self.assertEqual(self.client.session["KVK_BRANCH_NUMBER"], "1234")
 
-        response = self.client.get(response["Location"], follow=False)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["user"].kvk, "29664887")
+    @patch("open_inwoner.contrib.kvk.client.KvKClient.get_all_company_branches")
+    def test_redirect_flow_with_single_company(self, mock_kvk):
+        """
+        Assert that if the KvK API returns only a single company:
+            1. the redirect flow passes automatically through `KvKLoginMiddleware`
+            2. the company vestigingsnummer is stored in the session
+        """
+        mock_kvk.return_value = [
+            {"kvkNummer": "29664887", "vestigingsnummer": "1234"},
+        ]
+
+        url = reverse("eherkenning-mock:password")
+        params = {
+            "acs": reverse("eherkenning:acs"),
+            "next": RETURN_URL,
+            "cancel": CANCEL_URL,
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": "29664887",
+            "auth_pass": "company@localhost",
+        }
+
+        # post our password to the IDP
+        response = self.client.post(url, data, follow=False)
+
+        # it will redirect to our ACS
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("eherkenning:acs"), response["Location"])
+
+        # follow the ACS redirect and get/create the user
+        response = self.client.get(response["Location"], follow=True)
+
+        # check company branch number in session
+        self.assertEqual(self.client.session["KVK_BRANCH_NUMBER"], "1234")
+
+    @patch("open_inwoner.contrib.kvk.client.KvKClient.get_all_company_branches")
+    def test_redirect_flow_with_no_vestigingsnummer(self, mock_kvk):
+        """
+        Assert that if the KvK API returns only a single company without vestigingsnummer:
+            1. the redirect flow passes automatically through `KvKLoginMiddleware`
+            2. the company KvKNummer is stored in the session
+        """
+        mock_kvk.return_value = [
+            {"kvkNummer": "29664887"},
+        ]
+
+        url = reverse("eherkenning-mock:password")
+        params = {
+            "acs": reverse("eherkenning:acs"),
+            "next": RETURN_URL,
+            "cancel": CANCEL_URL,
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": "29664887",
+            "auth_pass": "company@localhost",
+        }
+
+        # post our password to the IDP
+        response = self.client.post(url, data, follow=False)
+
+        # it will redirect to our ACS
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("eherkenning:acs"), response["Location"])
+
+        # follow the ACS redirect and get/create the user
+        response = self.client.get(response["Location"], follow=True)
+
+        # check company branch number in session
+        self.assertEqual(self.client.session["KVK_BRANCH_NUMBER"], "29664887")
 
     def test_post_redirect_retains_acs_querystring_params(self):
         url = reverse("eherkenning-mock:password")

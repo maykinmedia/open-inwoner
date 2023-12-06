@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 class KvKClient:
-    def __init__(self, config: KvKConfig = None):
+    def __init__(self, config: Optional[KvKConfig] = None):
         self.config = config or KvKConfig.get_solo()
 
     #
@@ -74,7 +74,7 @@ class KvKClient:
     def search_endpoint(self):
         return self._urljoin(self.config.api_root, "zoeken")
 
-    def search(self, **kwargs):
+    def search(self, **kwargs) -> dict:
         """
         Generic call to the 'Zoeken' endpoint of the KvK API
 

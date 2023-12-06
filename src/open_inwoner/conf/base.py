@@ -258,6 +258,7 @@ MIDDLEWARE = [
     "django.contrib.flatpages.middleware.FlatpageFallbackMiddleware",
     "open_inwoner.extended_sessions.middleware.SessionTimeoutMiddleware",
     "open_inwoner.accounts.middleware.NecessaryFieldsMiddleware",
+    "open_inwoner.contrib.kvk.middleware.KvKLoginMiddleware",
     "open_inwoner.cms.utils.middleware.AnonymousHomePageRedirectMiddleware",
     "mozilla_django_oidc_db.middleware.SessionRefresh",
 ]

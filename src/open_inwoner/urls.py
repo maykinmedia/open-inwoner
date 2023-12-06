@@ -124,6 +124,7 @@ urlpatterns = [
     path("faq/", FAQView.as_view(), name="general_faq"),
     path("yubin/", include("django_yubin.urls")),
     path("apimock/", include("open_inwoner.apimock.urls")),
+    path("kvk/", include("open_inwoner.contrib.kvk.urls")),
     # TODO move search to products cms app?
     path("", include("open_inwoner.search.urls", namespace="search")),
     re_path(r"^", include("cms.urls")),

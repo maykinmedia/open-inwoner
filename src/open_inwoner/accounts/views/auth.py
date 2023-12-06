@@ -201,16 +201,3 @@ class CustomeHerkenningAssertionConsumerServiceView(
             del session["invite_url"]
 
         return super().get_success_url()
-
-    def get(self, request):
-        import pdbr
-
-        pdbr.set_trace()
-        return super().get(request)
-
-    # override get
-    # if there are branches:
-    # redirect: intermediate page, display branches
-    # select branch
-    # requestion.session["company_branch_number"] = branch_number
-    # redirect: get_success_url

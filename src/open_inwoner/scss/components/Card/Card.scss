@@ -16,6 +16,33 @@
   position: relative;
   text-decoration: none;
 
+  &--flex {
+    display: flex;
+  }
+
+  &--spaced {
+    margin-bottom: var(--spacing-large);
+  }
+
+  @media (min-width: 768px) {
+    &--compact {
+      width: 50%;
+    }
+  }
+
+  .left {
+    float: left;
+  }
+  .right {
+    float: right;
+  }
+  .radio {
+    position: absolute;
+    top: 10%;
+    bottom: 10%;
+    right: 10%;
+  }
+
   &--inline {
     display: inline-flex;
   }
@@ -72,6 +99,10 @@
   &--type-info .h5,
   &--type-info .p {
     color: var(--color-info-darker);
+  }
+
+  &--spaced {
+    margin-bottom: var(--spacing-large);
   }
 
   &--tinted {

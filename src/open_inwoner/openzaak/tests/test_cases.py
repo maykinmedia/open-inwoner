@@ -1,6 +1,7 @@
 import datetime
 from unittest.mock import patch
 
+from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.test.utils import override_settings
 from django.urls import reverse_lazy
@@ -33,6 +34,13 @@ from .factories import (
 )
 from .mocks import ESuiteData
 from .shared import CATALOGI_ROOT, ZAKEN_ROOT
+
+# Avoid redirects through `KvKLoginMiddleware`
+PATCHED_MIDDLEWARE = [
+    m
+    for m in settings.MIDDLEWARE
+    if m != "open_inwoner.contrib.kvk.middleware.KvKLoginMiddleware"
+]
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
@@ -129,7 +137,9 @@ class CaseListAccessTests(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
 
 @requests_mock.Mocker()
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(
+    ROOT_URLCONF="open_inwoner.cms.tests.urls", MIDDLEWARE=PATCHED_MIDDLEWARE
+)
 class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
     inner_url = reverse_lazy("cases:cases_content")
     maxDiff = None
@@ -383,6 +393,9 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
             self.zaak_type_intern,
         ]:
             m.get(resource["url"], json=resource)
+
+        # TODO
+        # m.get(reverse("kvk:branches"))
 
     def test_list_cases(self, m):
         self._setUpMocks(m)

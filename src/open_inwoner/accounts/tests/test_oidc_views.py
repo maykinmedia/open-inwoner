@@ -2,7 +2,7 @@ from hashlib import md5
 from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.test import TestCase, modify_settings, override_settings
 from django.urls import reverse
 
 import requests_mock
@@ -423,7 +423,9 @@ class DigiDOIDCFlowTests(TestCase):
                 self.assertEqual(response.status_code, 403)
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class eHerkenningOIDCFlowTests(TestCase):
+    @patch("open_inwoner.contrib.kvk.client.KvKClient.get_all_company_branches")
     @patch("open_inwoner.contrib.kvk.signals.KvKClient.retrieve_rsin_with_kvk")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
@@ -441,7 +443,12 @@ class eHerkenningOIDCFlowTests(TestCase):
         mock_store_tokens,
         mock_get_userinfo,
         mock_retrieve_rsin_with_kvk,
+        mock_kvk,
     ):
+        mock_kvk.return_value = [
+            {"vestigingsnummer": "1234"},
+        ]
+
         mock_retrieve_rsin_with_kvk.return_value = "123456789"
         # set up a user with a colliding email address
         # sub is the oidc_id field in our db
@@ -548,6 +555,7 @@ class eHerkenningOIDCFlowTests(TestCase):
         session = self.client.session
         session["oidc_states"] = {"mock": {"nonce": "nonce"}}
         session["oidc_id_token"] = "foo"
+        session["KVK_BRANCH_NUMBER"] = "1234"
         session.save()
         logout_url = reverse("eherkenning_oidc:logout")
 
@@ -563,7 +571,7 @@ class eHerkenningOIDCFlowTests(TestCase):
                 )
             )
             m.get(logout_endpoint_url)
-            logout_response = self.client.get(logout_url)
+            logout_response = self.client.get(logout_url, follow=False)
 
             self.assertEqual(len(m.request_history), 1)
             self.assertEqual(m.request_history[0].url, logout_endpoint_url)
@@ -575,6 +583,12 @@ class eHerkenningOIDCFlowTests(TestCase):
         self.assertNotIn("oidc_states", self.client.session)
         self.assertNotIn("oidc_id_token", self.client.session)
 
+    @modify_settings(
+        MIDDLEWARE={
+            "remove": ["open_inwoner.contrib.kvk.middleware.KvKLoginMiddleware"]
+        }
+    )
+    @patch("open_inwoner.contrib.kvk.client.KvKClient.get_all_company_branches")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
@@ -590,11 +604,14 @@ class eHerkenningOIDCFlowTests(TestCase):
         mock_verify_token,
         mock_store_tokens,
         mock_get_userinfo,
+        mock_kvk,
     ):
         mock_get_userinfo.return_value = {
             "sub": "some_username",
             "kvk": "12345678",
         }
+        mock_kvk.return_value = [{"vestigingsnummber": "1234"}]
+
         session = self.client.session
         session["oidc-error"] = "some error"
         session.save()
