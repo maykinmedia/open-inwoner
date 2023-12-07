@@ -8,7 +8,6 @@
   },
   "scripts": {
     "build": "npm run collect && npm run bundle",
-    "build-styledictionary": "style-dictionary build",
     "bundle": "webpack",
     "collect": "cp -r node_modules/leaflet/dist/images src/open_inwoner/static/bundles && cp -r node_modules/material-icons/iconfont/*.woff src/open_inwoner/static/bundles && cp -r node_modules/material-icons/iconfont/*.woff2 src/open_inwoner/static/bundles && cp -r node_modules/@fortawesome/fontawesome-free/webfonts src/open_inwoner/static/",
     "test": "karma start",
