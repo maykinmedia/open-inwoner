@@ -1,3 +1,4 @@
+from hashlib import md5
 from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
@@ -316,7 +317,11 @@ class DigiDOIDCFlowTests(TestCase):
         new_user = User.objects.get(bsn="000000000")
 
         mock_brp.assert_called_with(new_user)
-        self.assertEqual(new_user.email, "user-000000000@localhost")
+        salt = "generate_email_from_bsn"
+        hashed_bsn = md5(
+            (salt + "000000000").encode(), usedforsecurity=False
+        ).hexdigest()
+        self.assertEqual(new_user.email, f"{hashed_bsn}@localhost")
         self.assertEqual(new_user.login_type, LoginTypeChoices.digid)
 
     @patch(
@@ -520,7 +525,11 @@ class eHerkenningOIDCFlowTests(TestCase):
         new_user = User.objects.get(kvk="00000000")
 
         mock_retrieve_rsin_with_kvk.assert_called_with("00000000")
-        self.assertEqual(new_user.email, "user-00000000@localhost")
+        salt = "generate_email_from_bsn"
+        hashed_bsn = md5(
+            (salt + "00000000").encode(), usedforsecurity=False
+        ).hexdigest()
+        self.assertEqual(new_user.email, f"{hashed_bsn}@localhost")
         self.assertEqual(new_user.rsin, "123456789")
         self.assertEqual(new_user.login_type, LoginTypeChoices.eherkenning)
 

@@ -1,17 +1,14 @@
 import logging
 
-from django.contrib.auth.models import AnonymousUser
-from django.core.exceptions import SuspiciousOperation
 from django.urls import reverse_lazy
 
 from mozilla_django_oidc_db.backends import (
     OIDCAuthenticationBackend as _OIDCAuthenticationBackend,
 )
-from requests.exceptions import HTTPError, RequestException
 
 from open_inwoner.accounts.choices import LoginTypeChoices
+from open_inwoner.utils.hash import generate_email_from_string
 
-from .constants import DIGID_OIDC_AUTH_SESSION_KEY, EHERKENNING_OIDC_AUTH_SESSION_KEY
 from .mixins import SoloConfigDigiDMixin, SoloConfigEHerkenningMixin
 
 logger = logging.getLogger(__name__)
@@ -49,7 +46,9 @@ class OIDCAuthenticationBackend(_OIDCAuthenticationBackend):
 
         user = self.UserModel.objects.create_user(
             **{
-                self.UserModel.USERNAME_FIELD: "user-{}@localhost".format(unique_id),
+                self.UserModel.USERNAME_FIELD: generate_email_from_string(
+                    unique_id, domain="localhost"
+                ),
                 identifier_claim_name: unique_id,
                 "login_type": self.login_type,
             }
