@@ -2,7 +2,7 @@
 import json
 
 design_tokens_path = "conf/fixtures/design-tokens.json"
-css_output_path = "../../static/css/oip_-styles.css"
+css_output_path = "static/bundles/oip_styles.css"
 
 with open(design_tokens_path, "r") as file:
     design_tokens = json.load(file)

@@ -192,7 +192,7 @@
   /// Font.
 
   --font-color-heading: var(--color-black);
-  --font-family-heading: 'TheMix C5';
+  --font-family-heading: 'Roboto';
   --font-weight-heading: bold;
 
   --font-color-heading-1: var(--font-color-heading);
@@ -221,7 +221,7 @@
 
   --font-size-heading-card: 18px;
 
-  --font-family-body: 'TheSans C5';
+  --font-family-body: 'Roboto';
   --font-color-body: var(--color-gray-dark);
   --font-size-body: 16px;
   --font-line-height-body: 21px;
@@ -315,9 +315,15 @@
 //test
 
 @font-face {
+  font-family: 'Cowboys';
+  src: local('TheSans C5'),
+    url('/static/fonts/Cowboys/WesternCowboys-rgVrK.otf') format('opentype');
+}
+
+@font-face {
   font-family: 'Roboto';
   src: local('TheSans C5'),
-    url('/static/fonts/Roboto/Roboto-Regular-webfont.woff') format('woff');
+    url('/static/fonts/Roboto/Roboto-Regular.ttf') format('truetype');
 }
 
 @font-face {
