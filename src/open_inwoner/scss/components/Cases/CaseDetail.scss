@@ -1,4 +1,8 @@
 .cases__detail {
+  .documents-upload__h3 {
+    margin: var(--spacing-extra-large) 0;
+  }
+
   /// cards on case detail
   .card {
     margin-bottom: var(--spacing-extra-large);
@@ -16,8 +20,13 @@
 
   #document-upload {
     color: var(--color-gray-dark);
-    gap: 0;
+    display: block;
     padding: 0 0 var(--row-height) 0;
+
+    .button--primary[type='submit'] {
+      justify-content: center;
+      width: 100%;
+    }
 
     &:invalid [type='submit'] {
       @extend .button--disabled;
