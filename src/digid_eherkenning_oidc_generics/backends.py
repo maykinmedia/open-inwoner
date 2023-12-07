@@ -75,7 +75,7 @@ class OIDCAuthenticationEHerkenningBackend(
     SoloConfigEHerkenningMixin, OIDCAuthenticationBackend
 ):
     """
-    Allows logging in via OIDC with DigiD
+    Allows logging in via OIDC with eHerkenning
     """
 
     login_type = LoginTypeChoices.eherkenning

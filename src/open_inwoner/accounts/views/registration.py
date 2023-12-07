@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
-from django.urls import reverse, reverse_lazy
+from django.urls import NoReverseMatch, reverse
 from django.utils.translation import gettext as _
 from django.views.generic import UpdateView
 
@@ -99,17 +99,18 @@ class CustomRegistrationView(LogMixin, InviteMixin, RegistrationView):
             if invite_key
             else reverse("profile:registration_necessary")
         )
+
         try:
             config = OpenIDConnectDigiDConfig.get_solo()
             if config.enabled:
                 digid_url = reverse("digid_oidc:init")
             else:
                 digid_url = reverse("digid:login")
-            context["digit_url"] = (
+            context["digid_url"] = (
                 furl(digid_url).add({"next": necessary_fields_url}).url
             )
-        except:
-            context["digit_url"] = ""
+        except NoReverseMatch:
+            context["digid_url"] = ""
 
         try:
             config = OpenIDConnectEHerkenningConfig.get_solo()
@@ -120,7 +121,7 @@ class CustomRegistrationView(LogMixin, InviteMixin, RegistrationView):
             context["eherkenning_url"] = (
                 furl(eherkenning_url).add({"next": necessary_fields_url}).url
             )
-        except:
+        except NoReverseMatch:
             context["eherkenning_url"] = ""
         return context
 

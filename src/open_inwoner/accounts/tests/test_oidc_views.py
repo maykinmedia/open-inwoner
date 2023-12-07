@@ -435,9 +435,9 @@ class eHerkenningOIDCFlowTests(TestCase):
         mock_verify_token,
         mock_store_tokens,
         mock_get_userinfo,
-        mock_kvk,
+        mock_retrieve_rsin_with_kvk,
     ):
-        mock_kvk.return_value = "123456789"
+        mock_retrieve_rsin_with_kvk.return_value = "123456789"
         # set up a user with a colliding email address
         # sub is the oidc_id field in our db
         mock_get_userinfo.return_value = {
@@ -445,7 +445,7 @@ class eHerkenningOIDCFlowTests(TestCase):
             "sub": "some_username",
             "kvk": "12345678",
         }
-        user = DigidUserFactory.create(
+        user = eHerkenningUserFactory.create(
             first_name="John",
             last_name="Doe",
             kvk="12345678",
@@ -473,10 +473,10 @@ class eHerkenningOIDCFlowTests(TestCase):
         db_user = User.objects.get()
 
         # User data was prepopulated, so this should not be called
-        mock_kvk.assert_not_called()
+        mock_retrieve_rsin_with_kvk.assert_not_called()
         self.assertEqual(db_user.id, user.id)
         self.assertEqual(db_user.kvk, "12345678")
-        self.assertEqual(db_user.login_type, LoginTypeChoices.digid)
+        self.assertEqual(db_user.login_type, LoginTypeChoices.eherkenning)
         self.assertEqual(db_user.first_name, "John")
         self.assertEqual(db_user.last_name, "Doe")
 
@@ -496,9 +496,9 @@ class eHerkenningOIDCFlowTests(TestCase):
         mock_verify_token,
         mock_store_tokens,
         mock_get_userinfo,
-        mock_kvk,
+        mock_retrieve_rsin_with_kvk,
     ):
-        mock_kvk.return_value = "123456789"
+        mock_retrieve_rsin_with_kvk.return_value = "123456789"
         # set up a user with a non existing email address
         mock_get_userinfo.return_value = {"sub": "some_username", "kvk": "00000000"}
         eHerkenningUserFactory.create(kvk="12345678", email="existing_user@example.com")
@@ -519,7 +519,7 @@ class eHerkenningOIDCFlowTests(TestCase):
         )
         new_user = User.objects.get(kvk="00000000")
 
-        mock_kvk.assert_called_with("00000000")
+        mock_retrieve_rsin_with_kvk.assert_called_with("00000000")
         self.assertEqual(new_user.email, "user-00000000@localhost")
         self.assertEqual(new_user.rsin, "123456789")
         self.assertEqual(new_user.login_type, LoginTypeChoices.eherkenning)

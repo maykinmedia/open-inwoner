@@ -5,13 +5,13 @@
 
 <div class="registration-grid">
   {% render_grid %}
-   {% if settings.DIGID_ENABLED and digit_url %}
+   {% if settings.DIGID_ENABLED and digid_url %}
     {% render_column start=5 span=5 %}
         {% render_card direction='horizontal' tinted=True %}
-            <a href="{{ digit_url }}" class="link digid-logo">
+            <a href="{{ digid_url }}" class="link digid-logo">
                 <img class="digid-logo__image" src="{% static 'accounts/digid_logo.svg' %}" alt="DigiD inlogpagina">
             </a>
-            {% link bold=True href=digit_url text=_('Registreren met DigiD') secondary=True icon='arrow_forward' %}
+            {% link bold=True href=digid_url text=_('Registreren met DigiD') secondary=True icon='arrow_forward' %}
         {% endrender_card %}
     {% endrender_column %}
   {% endif %}

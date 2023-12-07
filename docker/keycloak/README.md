@@ -44,4 +44,4 @@ To test the login flow, navigate to `http://127.0.0.1:8000/digid-oidc/`
 (not `localhost`, because this domain is not on the allowlist in the Keycloak config).
 
 Click `Inloggen met DigiD` and fill in `testuser` for both username and password
-in the Keycloak login screen. If everything succeeded, you are now redirected back to the form.
+in the Keycloak login screen. If everything succeeded, you are now logged in and redirected to the Open Inwoner home page.
