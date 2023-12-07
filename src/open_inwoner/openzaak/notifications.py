@@ -300,8 +300,8 @@ def _handle_status_notification(notification: Notification, case: Zaak, inform_u
     status.statustype = status_type
 
     # check the ZaakTypeConfig
+    ztc = get_zaak_type_config(case.zaaktype)
     if oz_config.skip_notification_statustype_informeren:
-        ztc = get_zaak_type_config(case.zaaktype)
         if not ztc:
             log_system_action(
                 f"ignored {r} notification: 'skip_notification_statustype_informeren' is True but cannot retrieve case_type configuration '{case.zaaktype.identificatie}' for case {case.url}",
@@ -321,7 +321,7 @@ def _handle_status_notification(notification: Notification, case: Zaak, inform_u
 
     try:
         statustype_config = ZaakTypeStatusTypeConfig.objects.get(
-            statustype_url=statustype_url
+            zaaktype_config=ztc, statustype_url=statustype_url
         )
     except ZaakTypeStatusTypeConfig.DoesNotExist:
         pass

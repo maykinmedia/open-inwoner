@@ -48,6 +48,24 @@ class StatusNotificationHandlerTestCase(
         """
         data = MockAPIData().install_mocks(m)
 
+        # Added for https://taiga.maykinmedia.nl/project/open-inwoner/task/1904
+        # In eSuite it is possible to reuse a StatusType for multiple ZaakTypen, which
+        # led to errors when retrieving the ZaakTypeStatusTypeConfig. This duplicate
+        # config is added to verify that that issue was solved
+        ztc = ZaakTypeConfigFactory.create(
+            catalogus__url=data.zaak_type["catalogus"],
+            identificatie=data.zaak_type["identificatie"],
+        )
+        ZaakTypeStatusTypeConfigFactory.create(
+            omschrijving=data.status_type_final["omschrijving"],
+            statustype_url=data.status_type_final["url"],
+        )
+        ZaakTypeStatusTypeConfigFactory.create(
+            zaaktype_config=ztc,
+            omschrijving=data.status_type_final["omschrijving"],
+            statustype_url=data.status_type_final["url"],
+        )
+
         handle_zaken_notification(data.status_notification)
 
         mock_handle.assert_called_once()
@@ -299,11 +317,24 @@ class StatusNotificationHandlerTestCase(
 
         data = MockAPIData().install_mocks(m)
 
-        ZaakTypeConfigFactory.create(
+        ztc = ZaakTypeConfigFactory.create(
             catalogus__url=data.zaak_type["catalogus"],
             identificatie=data.zaak_type["identificatie"],
             # set this to notify
             notify_status_changes=True,
+        )
+        # Added for https://taiga.maykinmedia.nl/project/open-inwoner/task/1904
+        # In eSuite it is possible to reuse a StatusType for multiple ZaakTypen, which
+        # led to errors when retrieving the ZaakTypeStatusTypeConfig. This duplicate
+        # config is added to verify that that issue was solved
+        ZaakTypeStatusTypeConfigFactory.create(
+            omschrijving=data.status_type_final["omschrijving"],
+            statustype_url=data.status_type_final["url"],
+        )
+        ZaakTypeStatusTypeConfigFactory.create(
+            zaaktype_config=ztc,
+            omschrijving=data.status_type_final["omschrijving"],
+            statustype_url=data.status_type_final["url"],
         )
 
         handle_zaken_notification(data.status_notification)
