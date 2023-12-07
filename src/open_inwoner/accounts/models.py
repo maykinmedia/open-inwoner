@@ -121,17 +121,19 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
     # TODO shouldn't rsin & bsn be unique? (possibly fixed in model constraints)
     # TODO fix rsin & bsn to not be both null AND blank (!)
-    rsin = models.CharField(verbose_name=_("Rsin"), max_length=9, null=True, blank=True)
-    bsn = NLBSNField(verbose_name=_("Bsn"), null=True, blank=True)
+    rsin = models.CharField(
+        verbose_name=_("Rsin"), max_length=9, blank=True, default=""
+    )
+    bsn = NLBSNField(verbose_name=_("Bsn"), blank=True, default="")
     kvk = models.CharField(
         verbose_name=_("KvK number"),
         max_length=8,
-        null=True,
         blank=True,
+        default="",
         validators=[validate_kvk],
     )
     company_name = models.CharField(
-        verbose_name=_("Company name"), max_length=250, null=True, blank=True
+        verbose_name=_("Company name"), max_length=250, blank=True, default=""
     )
     login_type = models.CharField(
         verbose_name=_("Login type"),

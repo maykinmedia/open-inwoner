@@ -834,7 +834,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.config.fetch_eherkenning_zaken_with_rsin = True
         self.config.save()
 
-        self.eherkenning_user.rsin = None
+        self.eherkenning_user.rsin = ""
         self.eherkenning_user.save()
 
         response = self.app.get(self.case_detail_url, user=self.eherkenning_user)
