@@ -188,7 +188,8 @@ class ActionAdmin(UUIDAdminFirstInOrder, PrivateMediaMixin, admin.ModelAdmin):
 
 @admin.register(Document)
 class DocumentAdmin(UUIDAdminFirstInOrder, PrivateMediaMixin, admin.ModelAdmin):
-    readonly_fields = ("uuid",)
+    fields = ["uuid", "name", "file", "created_on", "plan", "owner"]
+    readonly_fields = ("uuid", "name", "file", "plan", "preview", "created_on", "owner")
     list_display = ("name", "preview", "created_on", "owner")
     list_filter = ("owner",)
     private_media_fields = ("file",)
@@ -201,6 +202,9 @@ class DocumentAdmin(UUIDAdminFirstInOrder, PrivateMediaMixin, admin.ModelAdmin):
         )
 
     preview.short_description = "Preview file"
+
+    def has_add_permission(self, request):
+        return False
 
 
 @admin.register(Appointment)
