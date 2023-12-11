@@ -251,6 +251,10 @@ class InnerCaseDetailView(
         """
         statustype_numbers = [s.volgnummer for s in statustypen]
 
+        # status_types retrieved via eSuite don't always have a volgnummer
+        if not all(statustype_numbers):
+            return
+
         # only 1 statustype for `self.case`
         # (this scenario is blocked by openzaak, but not part of the zgw standard)
         if len(statustype_numbers) < 2:
