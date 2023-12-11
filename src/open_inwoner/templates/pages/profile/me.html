@@ -93,7 +93,7 @@
                         {% render_list %}
                         <span class="profile-list">
                             {% for name in mentor_contact_names %}
-                                {% list_item text=name compact=True %}
+                                {% list_item text=name compact=True strong=False %}
                             {% empty %}
                                 {% list_item text=_("U heeft nog geen begeleider.") compact=True strong=False %}
                             {% endfor %}
@@ -144,7 +144,7 @@
             {% render_column start=forloop.counter_0|multiply:4 span=4 %}
                 <div class="card card--compact card--stretch" id="profile-section-actions">
                     <div class="card__body">
-                        <a href="{% url 'profile:action_list' %}"  class="profile__link">
+                        <a href="{% url 'profile:action_list' %}" class="profile__link">
                             <p class="h4"><span class="link link__text">{% trans "Acties" %}</span></p>
                         {% render_list %}
                         <span class="profile-list">
@@ -165,7 +165,7 @@
         {# Benefits #}
         {% if view.config.ssd %}
             {% render_column start=forloop.counter_0|multiply:4 span=4 %}
-                <div class="card card--compact card--stretch"id="profile-section-ssd">
+                <div class="card card--compact card--stretch" id="profile-section-ssd">
                     <div class="card__body">
                         <a href="{% url 'ssd:uitkeringen' %}"  class="profile__link">
                             <p class="h4"><span class="link link__text">{% trans "Mijn uitkeringen" %}</span></p>
@@ -188,7 +188,7 @@
         {# Questions #}
         {% if view.config.questions %}
             {% render_column start=forloop.counter_0|multiply:4 span=4 %}
-                <div class="card card--compact card--stretch id="profile-section-questions"">
+                <div class="card card--compact card--stretch" id="profile-section-questions">
                     <div class="card__body">
                         <a href="{% url 'cases:contactmoment_list' %}"  class="profile__link">
                             <p class="h4"><span class="link link__text">{% trans "Mijn vragen" %}</span></p>
@@ -205,7 +205,7 @@
         {# Questionnaire #}
         {% if questionnaire_exists and view.config.selfdiagnose %}
             {% render_column start=forloop.counter_0|multiply:4 span=4 %}
-                <div class="card card--compact card--stretch id="profile-section-questions"">
+                <div class="card card--compact card--stretch" id="profile-section-questions">
                     <div class="card__body">
                         <a href="{% url 'products:questionnaire_list' %}"  class="profile__link">
                             <p class="h4"><span class="link link__text">{% trans "Zelftest" %}</span></p>
