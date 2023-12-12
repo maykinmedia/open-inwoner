@@ -447,7 +447,7 @@ qrcode==6.1
     # via maykin-django-two-factor-auth
 redis==3.5.3
     # via django-redis
-reportlab==3.6.12
+reportlab==3.6.13
     # via
     #   easy-thumbnails
     #   svglib

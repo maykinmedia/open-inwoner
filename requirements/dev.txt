@@ -894,7 +894,7 @@ redis==3.5.3
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-redis
-reportlab==3.6.12
+reportlab==3.6.13
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt

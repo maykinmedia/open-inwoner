@@ -803,7 +803,7 @@ redis==3.5.3
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-redis
-reportlab==3.6.12
+reportlab==3.6.13
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
