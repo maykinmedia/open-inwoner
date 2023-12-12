@@ -29,3 +29,8 @@
 h1 + .card-container {
   margin-top: var(--gutter-width);
 }
+
+.utrecht-heading-1 {
+  font-size: var(--utrecht-heading-1-font-size);
+  font-weight: var(--utrecht-heading-1-font-weight);
+}
