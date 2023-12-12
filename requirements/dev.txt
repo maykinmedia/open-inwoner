@@ -65,7 +65,7 @@ celery==5.2.7
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   notifications-api-common
-certifi==2022.9.24
+certifi==2023.11.17
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -119,7 +119,7 @@ coverage==4.5.4
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-cryptography==38.0.4
+cryptography==41.0.7
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -810,7 +810,7 @@ pyflakes==2.3.1
     # via flake8
 pygments==2.12.0
     # via sphinx
-pyjwt==2.3.0
+pyjwt==2.8.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -820,7 +820,7 @@ pylint==2.11.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-pyopenssl==22.1.0
+pyopenssl==23.3.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -1044,7 +1044,7 @@ urllib3==1.26.7
     #   elasticsearch
     #   requests
     #   sentry-sdk
-uwsgi==2.0.19.1
+uwsgi==2.0.23
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
