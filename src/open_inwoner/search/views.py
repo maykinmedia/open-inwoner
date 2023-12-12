@@ -6,6 +6,8 @@ from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
 from django.views.generic import FormView
 
+from furl import furl
+
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openzaak.cases import fetch_cases
 from open_inwoner.utils.mixins import PaginationMixin
@@ -153,7 +155,9 @@ class SearchView(
                 "Thank you for your feedback. It will help us to improve our search engine"
             ),
         )
-        return HttpResponseRedirect(http_referer)
+        redirect = furl(reverse("search:search"))
+        redirect.args.update(self.request.GET)
+        return HttpResponseRedirect(redirect.url)
 
     @property
     def display_restricted(self):
