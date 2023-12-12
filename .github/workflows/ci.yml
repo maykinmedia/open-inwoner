@@ -20,6 +20,13 @@ jobs:
   tests:
     name: Run the Django test suite
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python:
+          - '3.9'
+          - '3.10'
+          - '3.11'
+#          - '3.12'
 
     services:
       postgres:
@@ -48,7 +55,7 @@ jobs:
         uses: maykinmedia/setup-django-backend@v1
         with:
           apt-packages: 'libxml2-dev libxmlsec1-dev libxmlsec1-openssl gettext postgresql-client libgdal-dev gdal-bin'
-          python-version: '3.9'
+          python-version: ${{ matrix.python }}
           optimize-postgres: 'yes'
           pg-service: 'postgres'
           setup-node: 'yes'
