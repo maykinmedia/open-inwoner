@@ -451,7 +451,7 @@ reportlab==3.6.12
     # via
     #   easy-thumbnails
     #   svglib
-requests==2.26.0
+requests==2.31.0
     # via
     #   django-log-outgoing-requests
     #   django-open-forms-client
@@ -506,7 +506,7 @@ unidecode==1.1.2
     # via django-filer
 uritemplate==4.1.1
     # via drf-spectacular
-urllib3==1.26.7
+urllib3==1.26.18
     # via
     #   elastic-apm
     #   elasticsearch

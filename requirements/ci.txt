@@ -809,7 +809,7 @@ reportlab==3.6.12
     #   -r requirements/base.txt
     #   easy-thumbnails
     #   svglib
-requests==2.26.0
+requests==2.31.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -907,7 +907,7 @@ uritemplate==4.1.1
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   drf-spectacular
-urllib3==1.26.7
+urllib3==1.26.18
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
