@@ -48,7 +48,7 @@ class ContactViewTests(WebTest):
         self.assertNotContains(response, self.contact.first_name)
 
     def test_list_shows_pending_invitations(self):
-        existing_user = UserFactory()
+        existing_user = UserFactory(first_name="UniqueName")
         self.user.contacts_for_approval.add(existing_user)
         response = self.app.get(self.list_url, user=self.user)
 
