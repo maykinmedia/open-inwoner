@@ -1086,7 +1086,7 @@ webtest==3.0.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-webtest
-wheel==0.37.0
+wheel==0.42.0
     # via pip-tools
 wrapt==1.12.1
     # via
