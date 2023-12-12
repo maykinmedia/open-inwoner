@@ -152,7 +152,7 @@ diff-match-patch==20200713
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-import-export
-django==3.2.20
+django==3.2.23
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -967,7 +967,7 @@ sphinxcontrib-qthelp==1.0.3
     # via sphinx
 sphinxcontrib-serializinghtml==1.1.5
     # via sphinx
-sqlparse==0.4.2
+sqlparse==0.4.4
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
