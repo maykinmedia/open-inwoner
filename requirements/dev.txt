@@ -921,7 +921,7 @@ requests-mock==1.9.3
     #   -r requirements/ci.txt
     #   ddt-api-calls
     #   zgw-consumers
-sentry-sdk==1.4.3
+sentry-sdk==1.38.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -1036,7 +1036,7 @@ uritemplate==4.1.1
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   drf-spectacular
-urllib3==1.26.7
+urllib3==1.26.18
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt

@@ -828,7 +828,7 @@ requests-mock==1.9.3
     #   -r requirements/base.txt
     #   -r requirements/test-tools.in
     #   zgw-consumers
-sentry-sdk==1.4.3
+sentry-sdk==1.38.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -907,7 +907,7 @@ uritemplate==4.1.1
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   drf-spectacular
-urllib3==1.26.7
+urllib3==1.26.18
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt

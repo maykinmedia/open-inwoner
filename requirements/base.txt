@@ -464,7 +464,7 @@ requests==2.26.0
     #   zgw-consumers
 requests-mock==1.9.3
     # via zgw-consumers
-sentry-sdk==1.4.3
+sentry-sdk==1.38.0
     # via -r requirements/base.in
 simplejson==3.18.0
     # via mail-parser
@@ -506,7 +506,7 @@ unidecode==1.1.2
     # via django-filer
 uritemplate==4.1.1
     # via drf-spectacular
-urllib3==1.26.7
+urllib3==1.26.18
     # via
     #   elastic-apm
     #   elasticsearch
