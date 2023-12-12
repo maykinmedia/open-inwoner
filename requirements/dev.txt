@@ -749,7 +749,7 @@ phonenumbers==8.12.33
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-pillow==9.0.1
+pillow==10.1.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt

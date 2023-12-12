@@ -378,7 +378,7 @@ packaging==23.0
     # via djangocms-text-ckeditor
 phonenumbers==8.12.33
     # via -r requirements/base.in
-pillow==9.0.1
+pillow==10.1.0
     # via
     #   -r requirements/base.in
     #   djangocms-text-ckeditor

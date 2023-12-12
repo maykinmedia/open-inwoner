@@ -675,7 +675,7 @@ phonenumbers==8.12.33
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-pillow==9.0.1
+pillow==10.1.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
