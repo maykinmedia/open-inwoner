@@ -290,7 +290,7 @@ django-extra-fields==3.0.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-django-filer==2.2.4
+django-filer==3.1.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -333,7 +333,6 @@ django-js-asset==1.2.2
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-ckeditor
-    #   django-mptt
 django-localflavor==3.1
     # via
     #   -c requirements/ci.txt
@@ -342,11 +341,6 @@ django-log-outgoing-requests==0.5.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-django-mptt==0.13.4
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-    #   django-filer
 django-open-forms-client==0.2.3
     # via
     #   -c requirements/ci.txt
@@ -1026,11 +1020,6 @@ typing-extensions==4.4.0
     #   pyee
     #   pylint
     #   xsdata
-unidecode==1.1.2
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-    #   django-filer
 uritemplate==4.1.1
     # via
     #   -c requirements/ci.txt

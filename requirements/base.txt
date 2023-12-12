@@ -165,7 +165,7 @@ django-elasticsearch-dsl==7.2.1
     # via -r requirements/base.in
 django-extra-fields==3.0.2
     # via -r requirements/base.in
-django-filer==2.2.4
+django-filer==3.1.1
     # via
     #   -r requirements/base.in
     #   djangocms-file
@@ -188,15 +188,11 @@ django-import-export==2.6.1
 django-ipware==4.0.0
     # via django-axes
 django-js-asset==1.2.2
-    # via
-    #   django-ckeditor
-    #   django-mptt
+    # via django-ckeditor
 django-localflavor==3.1
     # via -r requirements/base.in
 django-log-outgoing-requests==0.5.2
     # via -r requirements/base.in
-django-mptt==0.13.4
-    # via django-filer
 django-open-forms-client==0.2.3
     # via -r requirements/base.in
 django-ordered-model==3.4.3
@@ -502,8 +498,6 @@ typing-extensions==4.4.0
     # via
     #   pyee
     #   xsdata
-unidecode==1.1.2
-    # via django-filer
 uritemplate==4.1.1
     # via drf-spectacular
 urllib3==1.26.18
