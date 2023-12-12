@@ -447,7 +447,7 @@ qrcode==6.1
     # via maykin-django-two-factor-auth
 redis==3.5.3
     # via django-redis
-reportlab==3.6.12
+reportlab==3.6.13
     # via
     #   easy-thumbnails
     #   svglib
@@ -464,7 +464,7 @@ requests==2.31.0
     #   zgw-consumers
 requests-mock==1.9.3
     # via zgw-consumers
-sentry-sdk==1.4.3
+sentry-sdk==1.38.0
     # via -r requirements/base.in
 simplejson==3.18.0
     # via mail-parser

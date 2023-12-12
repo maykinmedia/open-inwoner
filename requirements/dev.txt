@@ -894,7 +894,7 @@ redis==3.5.3
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-redis
-reportlab==3.6.12
+reportlab==3.6.13
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -921,7 +921,7 @@ requests-mock==1.9.3
     #   -r requirements/ci.txt
     #   ddt-api-calls
     #   zgw-consumers
-sentry-sdk==1.4.3
+sentry-sdk==1.38.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -1086,7 +1086,7 @@ webtest==3.0.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-webtest
-wheel==0.37.0
+wheel==0.42.0
     # via pip-tools
 wrapt==1.12.1
     # via
