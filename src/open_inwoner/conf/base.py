@@ -173,7 +173,6 @@ INSTALLED_APPS = [
     "easy_thumbnails",  # used by filer
     "image_cropping",
     "filer",
-    "mptt",
     "django_elasticsearch_dsl",
     "import_export",
     "solo",
