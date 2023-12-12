@@ -13,6 +13,10 @@ from django_webtest import WebTest
 from furl import furl
 from pyquery import PyQuery as PQ
 
+from digid_eherkenning_oidc_generics.models import (
+    OpenIDConnectDigiDConfig,
+    OpenIDConnectEHerkenningConfig,
+)
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.contrib.kvk.models import KvKConfig
 from open_inwoner.contrib.kvk.tests.factories import CertificateFactory
@@ -42,20 +46,31 @@ class DigiDRegistrationTest(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
     def setUpTestData(cls):
         cms_tools.create_homepage()
 
-    def test_registration_page_only_digid(self):
-        response = self.app.get(self.url)
+    @patch("digid_eherkenning_oidc_generics.models.OpenIDConnectDigiDConfig.get_solo")
+    def test_registration_page_only_digid(self, mock_solo):
+        for oidc_enabled in [True, False]:
+            with self.subTest(oidc_enabled=oidc_enabled):
+                mock_solo.return_value.enabled = oidc_enabled
 
-        self.assertEqual(response.status_code, 200)
-        self.assertIsNone(response.html.find(id="registration-form"))
+                digid_url = (
+                    reverse("digid_oidc:init")
+                    if oidc_enabled
+                    else reverse("digid:login")
+                )
 
-        digid_tag = response.html.find("a", title="Registreren met DigiD")
-        self.assertIsNotNone(digid_tag)
-        self.assertEqual(
-            digid_tag.attrs["href"],
-            furl(reverse("digid:login"))
-            .add({"next": reverse("profile:registration_necessary")})
-            .url,
-        )
+                response = self.app.get(self.url)
+
+                self.assertEqual(response.status_code, 200)
+                self.assertIsNone(response.html.find(id="registration-form"))
+
+                digid_tag = response.html.find("a", title="Registreren met DigiD")
+                self.assertIsNotNone(digid_tag)
+                self.assertEqual(
+                    digid_tag.attrs["href"],
+                    furl(digid_url)
+                    .add({"next": reverse("profile:registration_necessary")})
+                    .url,
+                )
 
     def test_registration_page_only_digid_with_invite(self):
         invite = InviteFactory.create()
@@ -422,24 +437,39 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
     def setUpTestData(cls):
         cms_tools.create_homepage()
 
+    @patch(
+        "digid_eherkenning_oidc_generics.models.OpenIDConnectEHerkenningConfig.get_solo"
+    )
     @patch("open_inwoner.configurations.models.SiteConfiguration.get_solo")
-    def test_registration_page_eherkenning(self, mock_solo):
+    def test_registration_page_eherkenning(self, mock_solo, mock_eherkenning_config):
         mock_solo.return_value.eherkenning_enabled = True
         mock_solo.return_value.login_allow_registration = False
 
-        response = self.app.get(self.url)
+        for oidc_enabled in [True, False]:
+            with self.subTest(oidc_enabled=oidc_enabled):
+                mock_eherkenning_config.return_value.enabled = oidc_enabled
 
-        self.assertEqual(response.status_code, 200)
-        self.assertIsNone(response.html.find(id="registration-form"))
+                eherkenning_url = (
+                    reverse("eherkenning_oidc:init")
+                    if oidc_enabled
+                    else reverse("eherkenning:login")
+                )
 
-        eherkenning_tag = response.html.find("a", title="Registreren met eHerkenning")
-        self.assertIsNotNone(eherkenning_tag)
-        self.assertEqual(
-            eherkenning_tag.attrs["href"],
-            furl(reverse("eherkenning:login"))
-            .add({"next": reverse("profile:registration_necessary")})
-            .url,
-        )
+                response = self.app.get(self.url)
+
+                self.assertEqual(response.status_code, 200)
+                self.assertIsNone(response.html.find(id="registration-form"))
+
+                eherkenning_tag = response.html.find(
+                    "a", title="Registreren met eHerkenning"
+                )
+                self.assertIsNotNone(eherkenning_tag)
+                self.assertEqual(
+                    eherkenning_tag.attrs["href"],
+                    furl(eherkenning_url)
+                    .add({"next": reverse("profile:registration_necessary")})
+                    .url,
+                )
 
     @patch("open_inwoner.configurations.models.SiteConfiguration.get_solo")
     def test_registration_page_eherkenning_with_invite(self, mock_solo):
@@ -1452,6 +1482,54 @@ class TestLoginLogoutFunctionality(AssertRedirectsMixin, WebTest):
         form.submit().follow()
         # Verify that the user has been authenticated
         self.assertIn("_auth_user_id", self.app.session)
+
+    def test_login_page_shows_correct_digid_login_url(self):
+        config = OpenIDConnectDigiDConfig.get_solo()
+
+        for oidc_enabled in [True, False]:
+            with self.subTest(oidc_enabled=oidc_enabled):
+                config.enabled = oidc_enabled
+                config.save()
+
+                login_url = (
+                    reverse("digid_oidc:init")
+                    if oidc_enabled
+                    else f"{reverse('digid:login')}?next="
+                )
+
+                response = self.app.get(reverse("login"))
+
+                digid_login_title = _("Inloggen met DigiD")
+                digid_login_link = response.pyquery(f"[title='{digid_login_title}']")
+
+                self.assertEqual(digid_login_link.attr("href"), login_url)
+
+    def test_login_page_shows_correct_eherkenning_login_url(self):
+        site_config = SiteConfiguration.get_solo()
+        site_config.eherkenning_enabled = True
+        site_config.save()
+
+        config = OpenIDConnectEHerkenningConfig.get_solo()
+
+        for oidc_enabled in [True, False]:
+            with self.subTest(oidc_enabled=oidc_enabled):
+                config.enabled = oidc_enabled
+                config.save()
+
+                login_url = (
+                    reverse("eherkenning_oidc:init")
+                    if oidc_enabled
+                    else f"{reverse('eherkenning:login')}?next="
+                )
+
+                response = self.app.get(reverse("login"))
+
+                eherkenning_login_title = _("Inloggen met eHerkenning")
+                eherkenning_login_link = response.pyquery(
+                    f"[title='{eherkenning_login_title}']"
+                )
+
+                self.assertEqual(eherkenning_login_link.attr("href"), login_url)
 
     def test_login_for_inactive_user_shows_appropriate_message(self):
         # Change user to inactive

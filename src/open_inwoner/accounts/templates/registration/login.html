@@ -16,27 +16,49 @@
                 {% if login_text %}<p class="p">{{ login_text|linebreaksbr }}</p>{% endif %}
                 <br>
 		{% if settings.DIGID_ENABLED %}
-                    {% render_card direction='horizontal' tinted=True %}
-                        <a href="{% url 'digid:login' %}" class="link digid-logo">
-                            <img class="digid-logo__image" src="{% static 'accounts/digid_logo.svg' %}" alt="DigiD inlogpagina">
-                        </a>
-                        {% url 'digid:login' as href %}
-                        {% with href|addnexturl:next as href_with_next %}
-                            {% link href=href_with_next text=_('Inloggen met DigiD') secondary=True icon='arrow_forward' extra_classes="link--digid" %}
-                        {% endwith %}
-                    {% endrender_card %}
+            {% get_solo 'digid_eherkenning_oidc_generics.OpenIDConnectDigiDConfig' as digid_oidc_config %}
+            {% if digid_oidc_config.enabled %}
+                {% render_card direction='horizontal' tinted=True %}
+                    <a href="{% url 'digid_oidc:init' %}" class="link digid-logo">
+                        <img class="digid-logo__image" src="{% static 'accounts/digid_logo.svg' %}" alt="DigiD inlogpagina">
+                    </a>
+                    {% url 'digid_oidc:init' as href %}
+                    {% link href=href text=_('Inloggen met DigiD') secondary=True icon='arrow_forward' extra_classes="link--digid" %}
+                {% endrender_card %}
+            {% else %}
+                {% render_card direction='horizontal' tinted=True %}
+                    <a href="{% url 'digid:login' %}" class="link digid-logo">
+                        <img class="digid-logo__image" src="{% static 'accounts/digid_logo.svg' %}" alt="DigiD inlogpagina">
+                    </a>
+                    {% url 'digid:login' as href %}
+                    {% with href|addnexturl:next as href_with_next %}
+                        {% link href=href_with_next text=_('Inloggen met DigiD') secondary=True icon='arrow_forward' extra_classes="link--digid" %}
+                    {% endwith %}
+                {% endrender_card %}
+            {% endif %}
 		{% endif %}
 
         {% if eherkenning_enabled %}
-            {% render_card direction='horizontal' tinted=True %}
-                <a href="{% url 'eherkenning:login' %}" class="link eherkenning-logo">
-                    <img class="eherkenning-logo__image" src="{% static 'accounts/eherkenning.png' %}" height=30 alt="eHerkenning inlogpagina">
-                </a>
-                {% url 'eherkenning:login' as href %}
-                {% with href|addnexturl:next as href_with_next %}
-                    {% link href=href_with_next text=_('Inloggen met eHerkenning') secondary=True icon='arrow_forward' extra_classes="link--eherkenning" %}
-                {% endwith %}
-            {% endrender_card %}
+            {% get_solo 'digid_eherkenning_oidc_generics.OpenIDConnectEHerkenningConfig' as eherkenning_oidc_config %}
+            {% if eherkenning_oidc_config.enabled %}
+                {% render_card direction='horizontal' tinted=True %}
+                    <a href="{% url 'eherkenning_oidc:init' %}" class="link eherkenning-logo">
+                        <img class="eherkenning-logo__image" src="{% static 'accounts/eherkenning.png' %}" height=30 alt="eHerkenning inlogpagina">
+                    </a>
+                    {% url 'eherkenning_oidc:init' as href %}
+                    {% link href=href text=_('Inloggen met eHerkenning') secondary=True icon='arrow_forward' extra_classes="link--eherkenning" %}
+                {% endrender_card %}
+            {% else %}
+                {% render_card direction='horizontal' tinted=True %}
+                    <a href="{% url 'eherkenning:login' %}" class="link eherkenning-logo">
+                        <img class="eherkenning-logo__image" src="{% static 'accounts/eherkenning.png' %}" height=30 alt="eHerkenning inlogpagina">
+                    </a>
+                    {% url 'eherkenning:login' as href %}
+                    {% with href|addnexturl:next as href_with_next %}
+                        {% link href=href_with_next text=_('Inloggen met eHerkenning') secondary=True icon='arrow_forward' extra_classes="link--eherkenning" %}
+                    {% endwith %}
+                {% endrender_card %}
+            {% endif %}
 		{% endif %}
 
                 {% get_solo 'mozilla_django_oidc_db.OpenIDConnectConfig' as oidc_config %}

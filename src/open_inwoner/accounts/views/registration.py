@@ -5,13 +5,17 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
-from django.urls import reverse, reverse_lazy
+from django.urls import NoReverseMatch, reverse
 from django.utils.translation import gettext as _
 from django.views.generic import UpdateView
 
 from django_registration.backends.one_step.views import RegistrationView
 from furl import furl
 
+from digid_eherkenning_oidc_generics.models import (
+    OpenIDConnectDigiDConfig,
+    OpenIDConnectEHerkenningConfig,
+)
 from open_inwoner.utils.hash import generate_email_from_string
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
@@ -95,20 +99,29 @@ class CustomRegistrationView(LogMixin, InviteMixin, RegistrationView):
             if invite_key
             else reverse("profile:registration_necessary")
         )
-        try:
-            context["digit_url"] = (
-                furl(reverse("digid:login")).add({"next": necessary_fields_url}).url
-            )
-        except:
-            context["digit_url"] = ""
 
         try:
-            context["eherkenning_url"] = (
-                furl(reverse("eherkenning:login"))
-                .add({"next": necessary_fields_url})
-                .url
+            config = OpenIDConnectDigiDConfig.get_solo()
+            if config.enabled:
+                digid_url = reverse("digid_oidc:init")
+            else:
+                digid_url = reverse("digid:login")
+            context["digid_url"] = (
+                furl(digid_url).add({"next": necessary_fields_url}).url
             )
-        except:
+        except NoReverseMatch:
+            context["digid_url"] = ""
+
+        try:
+            config = OpenIDConnectEHerkenningConfig.get_solo()
+            if config.enabled:
+                eherkenning_url = reverse("eherkenning_oidc:init")
+            else:
+                eherkenning_url = reverse("eherkenning:login")
+            context["eherkenning_url"] = (
+                furl(eherkenning_url).add({"next": necessary_fields_url}).url
+            )
+        except NoReverseMatch:
             context["eherkenning_url"] = ""
         return context
 

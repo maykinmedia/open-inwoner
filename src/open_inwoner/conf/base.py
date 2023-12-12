@@ -192,6 +192,7 @@ INSTALLED_APPS = [
     "cspreports",
     "mozilla_django_oidc",
     "mozilla_django_oidc_db",
+    "digid_eherkenning_oidc_generics",
     "sessionprofile",
     "openformsclient",
     "django_htmx",
@@ -474,6 +475,8 @@ AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
     "digid_eherkenning.backends.DigiDBackend",
     "eherkenning.backends.eHerkenningBackend",
+    "digid_eherkenning_oidc_generics.backends.OIDCAuthenticationDigiDBackend",
+    "digid_eherkenning_oidc_generics.backends.OIDCAuthenticationEHerkenningBackend",
     "open_inwoner.accounts.backends.CustomOIDCBackend",
 ]
 
@@ -882,6 +885,8 @@ THUMBNAIL_QUALITY = 100
 OIDC_AUTHENTICATE_CLASS = "mozilla_django_oidc_db.views.OIDCAuthenticationRequestView"
 OIDC_CALLBACK_CLASS = "mozilla_django_oidc_db.views.OIDCCallbackView"
 OIDC_AUTHENTICATION_CALLBACK_URL = "oidc_authentication_callback"
+# ID token is required to enable OIDC logout
+OIDC_STORE_ID_TOKEN = True
 MOZILLA_DJANGO_OIDC_DB_CACHE = "oidc"
 MOZILLA_DJANGO_OIDC_DB_CACHE_TIMEOUT = 1
 

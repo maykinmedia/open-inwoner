@@ -366,7 +366,7 @@ messagebird==2.1.0
     # via -r requirements/base.in
 mozilla-django-oidc==2.0.0
     # via mozilla-django-oidc-db
-mozilla-django-oidc-db==0.10.0
+mozilla-django-oidc-db==0.12.0
     # via -r requirements/base.in
 notifications-api-common==0.2.0
     # via -r requirements/base.in

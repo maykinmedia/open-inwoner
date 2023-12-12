@@ -489,7 +489,11 @@ class SiteConfiguration(SingletonModel):
     eherkenning_enabled = models.BooleanField(
         verbose_name=_("eHerkenning authentication enabled"),
         default=False,
-        help_text=_("Whether users can log in with eHerkenning or not."),
+        help_text=_(
+            "Whether users can log in with eHerkenning or not. "
+            "By default, the SAML integration will be used for this, in order to use "
+            "the OpenID Connect integration, navigate to `OpenID Connect configuration for eHerkenning` and enable it."
+        ),
     )
 
     class Meta:
