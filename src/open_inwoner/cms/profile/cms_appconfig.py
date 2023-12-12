@@ -47,5 +47,10 @@ class ProfileConfig(AppHookConfig):
     )
     ssd = models.BooleanField(
         verbose_name=_("Mijn uitkeringen"),
-        default=True,
+        default=False,
+        help_text=_(
+            "Designates whether the 'Mijn uitkeringen' section is rendered or not. "
+            "Should only be enabled if a CMS app has been created and the corresponding "
+            "CMS page has been published."
+        ),
     )
