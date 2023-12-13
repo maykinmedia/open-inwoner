@@ -3,6 +3,7 @@
 
 from cms.models import Page
 
+from open_inwoner.cms.benefits.cms_apps import SSDApphook
 from open_inwoner.cms.cases.cms_apps import CasesApphook
 from open_inwoner.cms.collaborate.cms_apps import CollaborateApphook
 from open_inwoner.cms.inbox.cms_apps import InboxApphook
@@ -11,6 +12,7 @@ cms_apps = {
     "inbox": InboxApphook,
     "collaborate": CollaborateApphook,
     "cases": CasesApphook,
+    "ssd": SSDApphook,
 }
 
 
@@ -43,3 +45,10 @@ def collaborate_page_is_published() -> bool:
     :returns: True if the collaborate page published, False otherwise
     """
     return _is_published("collaborate")
+
+
+def benefits_page_is_published() -> bool:
+    """
+    :returns: True if the social benefits page published, False otherwise
+    """
+    return _is_published("ssd")

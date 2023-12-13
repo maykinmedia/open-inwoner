@@ -22,7 +22,10 @@ from open_inwoner.accounts.choices import (
     LoginTypeChoices,
     StatusChoices,
 )
-from open_inwoner.cms.utils.page_display import inbox_page_is_published
+from open_inwoner.cms.utils.page_display import (
+    benefits_page_is_published,
+    inbox_page_is_published,
+)
 from open_inwoner.haalcentraal.utils import fetch_brp
 from open_inwoner.plans.models import Plan
 from open_inwoner.questionnaire.models import QuestionnaireStep
@@ -126,6 +129,7 @@ class MyProfileView(
             LoginTypeChoices.eherkenning,
         )
         context["inbox_page_is_published"] = inbox_page_is_published()
+        context["benefits_page_is_published"] = benefits_page_is_published()
 
         return context
 
