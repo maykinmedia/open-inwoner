@@ -420,7 +420,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         elif self.login_type == LoginTypeChoices.eherkenning:
             if OpenIDConnectEHerkenningConfig.get_solo().enabled:
                 return reverse("eherkenning_oidc:logout")
-            return reverse("eherkenning:logout")
+            return reverse("logout")
 
     def get_contact_update_url(self):
         return reverse("profile:contact_edit", kwargs={"uuid": self.uuid})
