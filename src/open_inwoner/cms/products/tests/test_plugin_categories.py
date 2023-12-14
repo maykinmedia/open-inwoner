@@ -214,7 +214,7 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
         cls.category2 = CategoryFactory(
             name="0002",
             highlighted=True,
-            zaaktypen=["ZAAKTYPE-2020-0000000001"],
+            zaaktypen=["ZAAKTYPE-2020-0000000001", "ZAAKTYPE-2020-0000000003"],
             visible_for_citizens=True,
         )
         cls.category3 = CategoryFactory(
@@ -365,6 +365,31 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
             beginGeldigheid="2020-09-25",
             versiedatum="2020-09-25",
         )
+        # For https://taiga.maykinmedia.nl/project/open-inwoner/issue/1932
+        # This zaaktype is linked to a Category, but the user does not have a Zaak with
+        # this Zaaktype and filtering should not fail because of this
+        cls.zaaktype3 = generate_oas_component(
+            "ztc",
+            "schemas/ZaakType",
+            uuid="bd0fab67-c7b8-429d-973d-7bece55be710",
+            url="http://testserver/zaaktype/bd0fab67-c7b8-429d-973d-7bece55be710",
+            identificatie="ZAAKTYPE-2020-0000000003",
+            omschrijving="foo zaaktype",
+            catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+            doel="Ask for coffee",
+            aanleiding="Coffee is essential",
+            indicatieInternOfExtern="extern",
+            handelingInitiator="Request",
+            onderwerp="Coffee",
+            handelingBehandelaar="Behandelen",
+            opschortingEnAanhoudingMogelijk=False,
+            verlengingMogelijk=False,
+            publicatieIndicatie=False,
+            besluittypen=[],
+            beginGeldigheid="2020-09-25",
+            versiedatum="2020-09-25",
+        )
         cls.zaaktype_config1 = ZaakTypeConfigFactory(
             catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             urls=[cls.zaaktype["url"]],
@@ -376,6 +401,12 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
             urls=[cls.zaaktype2["url"]],
             identificatie=cls.zaaktype2["identificatie"],
             relevante_zaakperiode=1,
+        )
+        cls.zaaktype_config3 = ZaakTypeConfigFactory(
+            catalogus=cls.zaaktype_config1.catalogus,
+            urls=[cls.zaaktype3["url"]],
+            identificatie=cls.zaaktype3["identificatie"],
+            relevante_zaakperiode=2,
         )
 
     def _setUpOASMocks(self, m):
@@ -392,6 +423,7 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
             self.zaak3,
             self.zaaktype,
             self.zaaktype2,
+            self.zaaktype3,
         ]:
             m.get(resource["url"], json=resource)
 
