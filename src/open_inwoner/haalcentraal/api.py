@@ -77,7 +77,12 @@ class BRP_1_3(BRPAPI):
                 request_kwargs=dict(
                     headers=headers,
                     params={
-                        "fields": "geslachtsaanduiding,naam,geboorte,verblijfplaats"
+                        "fields": "geslachtsaanduiding,"
+                        "naam.voornamen,naam.geslachtsnaam,naam.voorletters,naam.voorvoegsel,"
+                        "verblijfplaats.straat,verblijfplaats.huisletter,"
+                        "verblijfplaats.huisnummertoevoeging,verblijfplaats.woonplaats,"
+                        "verblijfplaats.postcode,verblijfplaats.land.omschrijving,"
+                        "geboorte.datum.datum,geboorte.plaats.omschrijving"
                     },
                     verify=False,
                 ),
@@ -91,6 +96,7 @@ class BRP_1_3(BRPAPI):
         brp = BRPData(
             first_name=glom(data, "naam.voornamen", default=""),
             infix=glom(data, "naam.voorvoegsel", default=""),
+            initials=glom(data, "naam.voorletters", default=""),
             last_name=glom(data, "naam.geslachtsnaam", default=""),
             street=glom(data, "verblijfplaats.straat", default=""),
             housenumber=str(glom(data, "verblijfplaats.huisnummer", default="")),
@@ -99,13 +105,12 @@ class BRP_1_3(BRPAPI):
                 data, "verblijfplaats.huisnummertoevoeging", default=""
             ),
             city=glom(data, "verblijfplaats.woonplaats", default=""),
-            birthday=self.glom_date(data, "geboorte.datum.datum", default=None),
-            # extra fields
-            initials=glom(data, "naam.voorletters", default=""),
-            birth_place=glom(data, "geboorte.plaats.omschrijving", default=""),
-            gender=glom(data, "geslachtsaanduiding", default=""),
             postal_code=glom(data, "verblijfplaats.postcode", default=""),
             country=glom(data, "verblijfplaats.land.omschrijving", default=""),
+            birthday=self.glom_date(data, "geboorte.datum.datum", default=None),
+            # extra fields
+            birth_place=glom(data, "geboorte.plaats.omschrijving", default=""),
+            gender=glom(data, "geslachtsaanduiding", default=""),
         )
         return brp
 
@@ -120,7 +125,21 @@ class BRP_2_1(BRPAPI):
                 operation_id="GetPersonen",
                 url=url,
                 data={
-                    "fields": ["geslacht", "naam", "geboorte", "verblijfplaats"],
+                    "fields": [
+                        "naam.geslachtsnaam",
+                        "naam.voorletters",
+                        "naam.voornamen",
+                        "naam.voorvoegsel",
+                        "geslacht.omschrijving",
+                        "geboorte.plaats.omschrijving",
+                        "geboorte.datum.datum",
+                        "verblijfplaats.verblijfadres.officieleStraatnaam",
+                        "verblijfplaats.verblijfadres.huisnummer",
+                        "verblijfplaats.verblijfadres.huisletter",
+                        "verblijfplaats.verblijfadres.huisnummertoevoeging",
+                        "verblijfplaats.verblijfadres.postcode",
+                        "verblijfplaats.verblijfadres.woonplaats",
+                    ],
                     "type": "RaadpleegMetBurgerservicenummer",
                     "burgerservicenummer": [user_bsn],
                 },
@@ -143,6 +162,7 @@ class BRP_2_1(BRPAPI):
             first_name=glom(data, "naam.voornamen", default=""),
             infix=glom(data, "naam.voorvoegsel", default=""),
             last_name=glom(data, "naam.geslachtsnaam", default=""),
+            initials=glom(data, "naam.voorletters", default=""),
             street=glom(
                 data, "verblijfplaats.verblijfadres.officieleStraatnaam", default=""
             ),
@@ -156,12 +176,10 @@ class BRP_2_1(BRPAPI):
                 data, "verblijfplaats.verblijfadres.huisnummertoevoeging", default=""
             ),
             city=glom(data, "verblijfplaats.verblijfadres.woonplaats", default=""),
+            postal_code=glom(data, "verblijfplaats.verblijfadres.postcode", default=""),
             birthday=self.glom_date(data, "geboorte.datum.datum", default=None),
-            # extra fields
-            initials=glom(data, "naam.voorletters", default=""),
             birth_place=glom(data, "geboorte.plaats.omschrijving", default=""),
             gender=glom(data, "geslacht.omschrijving", default=""),
-            postal_code=glom(data, "verblijfplaats.verblijfadres.postcode", default=""),
             # we don't have country in 2.x (address defaults to Nederland)
             # country=glom(data, "verblijfplaats.land.omschrijving", default=""),
         )

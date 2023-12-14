@@ -699,6 +699,7 @@ class MyDataTests(AssertTimelineLogMixin, HaalCentraalMixin, WebTest):
             self.expected_response.gender,
             self.expected_response.street,
             self.expected_response.get_housenumber(),
+            # self.expected_response.housenumbersuffix,
             self.expected_response.postal_code,
             self.expected_response.city,
             # self.expected_response.country,
@@ -767,7 +768,7 @@ class MyDataTests(AssertTimelineLogMixin, HaalCentraalMixin, WebTest):
             content=self.load_binary_mock("personen_1.3.yaml"),
         )
         m.get(
-            "https://personen/api/brp/ingeschrevenpersonen/999993847?fields=geslachtsaanduiding,naam,geboorte,verblijfplaats",
+            "https://personen/api/brp/ingeschrevenpersonen/999993847?fields=geslachtsaanduiding,naam.voornamen,naam.geslachtsnaam,naam.voorletters,naam.voorvoegsel,verblijfplaats.straat,verblijfplaats.huisletter,verblijfplaats.huisnummertoevoeging,verblijfplaats.woonplaats,verblijfplaats.postcode,verblijfplaats.land.omschrijving,geboorte.datum.datum,geboorte.plaats.omschrijving",
             status_code=200,
             json={
                 "naam": {

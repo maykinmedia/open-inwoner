@@ -19,7 +19,6 @@
     <div class="tabled__section">
         <h2 class="h2 title" id="personal-overview">{% trans "Persoonlijke gegevens" %}
             <div class="tabled__item--force-right tabled__item--mobile-big">
-                {% button href="profile:edit" text=_("Bewerken") icon="edit" transparent=True %}
                 {% if user.is_digid_user_with_brp and view.config.my_data %}
                     {% button href="profile:data" text=_("My details") icon="info" transparent=True icon_outlined=True %}
                 {% elif not user.is_digid_user %}

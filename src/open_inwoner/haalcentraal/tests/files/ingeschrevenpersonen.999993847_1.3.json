@@ -6,52 +6,19 @@
   },
   "geslachtsaanduiding": "vrouw",
   "naam": {
-    "aanhef": "Geachte mevrouw Kooyman",
-    "aanschrijfwijze": "M. de Kooyman",
-    "gebruikInLopendeTekst": "mevrouw de Kooyman",
-    "aanduidingNaamgebruik": "eigen",
     "voornamen": "Merel",
     "voorletters": "M.",
     "voorvoegsel": "de",
     "geslachtsnaam": "Kooyman"
   },
   "verblijfplaats": {
-    "functieAdres": "woonadres",
-    "adresseerbaarObjectIdentificatie": "0518010000631274",
-    "nummeraanduidingIdentificatie": "0518200000631273",
-    "korteNaam": "King Olivereiland",
-    "datumIngangGeldigheid": {
-      "datum": "2011-11-01",
-      "jaar": 2011,
-      "maand": 11,
-      "dag": 1
-    },
-    "gemeenteVanInschrijving": {
-      "code": "0518",
-      "omschrijving": "'s-Gravenhage"
-    },
-    "datumAanvangAdreshouding": {
-      "datum": "2001-02-15",
-      "jaar": 2001,
-      "maand": 2,
-      "dag": 15
-    },
-    "datumInschrijvingInGemeente": {
-      "datum": "2001-02-15",
-      "jaar": 2001,
-      "maand": 2,
-      "dag": 15
-    },
-    "adresregel1": "King Olivereiland 64",
-    "adresregel2": "2551JV 's-Gravenhage",
     "straat": "King Olivereiland",
     "huisnummer": 64,
     "postcode": "2551JV",
     "woonplaats": "'s-Gravenhage"
   },
   "geboorte": {
-    "plaats": { "code": "0545", "omschrijving": "Leerdam" },
-    "land": { "code": "6030", "omschrijving": "Nederland" },
-    "datum": { "datum": "1982-04-10", "jaar": 1982, "maand": 4, "dag": 10 }
+    "plaats": { "omschrijving": "Leerdam" },
+    "datum": { "datum": "1982-04-10" }
   }
 }
