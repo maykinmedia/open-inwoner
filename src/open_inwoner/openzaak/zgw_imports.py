@@ -274,6 +274,8 @@ def import_statustype_configs_for_type(
             # load urls and update/create records
             for statustype_url, using_zaak_types in info_queue.items():
                 status_type = fetch_single_status_type(statustype_url)
+                if not status_type:  # Statustype isn't available anymore?
+                    continue
 
                 zaaktype_statustype = info_map.get(status_type.url)
                 if zaaktype_statustype:
