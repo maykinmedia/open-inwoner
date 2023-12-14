@@ -36,6 +36,26 @@ def fetch_klantcontactmomenten_for_bsn(user_bsn: str) -> List[KlantContactMoment
     return ret
 
 
+def fetch_klantcontactmomenten_for_kvk_or_rsin(
+    user_kvk_or_rsin: str,
+) -> List[KlantContactMoment]:
+    klanten = _fetch_klanten_for_kvk_or_rsin(user_kvk_or_rsin)
+    if klanten is None:
+        return []
+
+    client = build_client("contactmomenten")
+
+    ret = list()
+    for klant in klanten:
+        moments = _fetch_klantcontactmomenten_for_klant(klant, client=client)
+        ret.extend(moments)
+
+    # combine sorting for moments of all klanten for a kvk
+    ret.sort(key=lambda kcm: kcm.contactmoment.registratiedatum)
+
+    return ret
+
+
 def fetch_klantcontactmoment_for_bsn(
     kcm_uuid: str, user_bsn: str
 ) -> Optional[KlantContactMoment]:
@@ -48,6 +68,29 @@ def fetch_klantcontactmoment_for_bsn(
     # use the list query because eSuite doesn't have all proper resources
     # see git history before this change for the original single resource version
     kcms = fetch_klantcontactmomenten_for_bsn(user_bsn)
+
+    kcm = None
+    # try to grab the specific KCM
+    for k in kcms:
+        if kcm_uuid == str(k.uuid):
+            kcm = k
+            break
+
+    return kcm
+
+
+def fetch_klantcontactmoment_for_kvk_or_rsin(
+    kcm_uuid: str, user_kvk_or_rsin: str
+) -> Optional[KlantContactMoment]:
+
+    cm_client = build_client("contactmomenten")
+    k_client = build_client("klanten")
+    if cm_client is None or k_client is None:
+        return
+
+    # use the list query because eSuite doesn't have all proper resources
+    # see git history before this change for the original single resource version
+    kcms = fetch_klantcontactmomenten_for_kvk_or_rsin(user_kvk_or_rsin)
 
     kcm = None
     # try to grab the specific KCM
@@ -79,9 +122,43 @@ def _fetch_klanten_for_bsn(user_bsn: str, *, client=None) -> List[Klant]:
     return klanten
 
 
+def _fetch_klanten_for_kvk_or_rsin(
+    user_kvk_or_rsin: str, *, client=None
+) -> List[Klant]:
+    client = client or build_client("klanten")
+    if client is None:
+        return []
+
+    try:
+        response = get_paginated_results(
+            client,
+            "klant",
+            request_kwargs={
+                "params": {"subjectNietNatuurlijkPersoon__innNnpId": user_kvk_or_rsin}
+            },
+        )
+    except (RequestException, ClientError) as e:
+        logger.exception("exception while making request", exc_info=e)
+        return []
+
+    klanten = factory(Klant, response)
+
+    return klanten
+
+
 def fetch_klant_for_bsn(user_bsn: str) -> Optional[Klant]:
     # this is technically a search operation and could return multiple records
     klanten = _fetch_klanten_for_bsn(user_bsn)
+    if klanten:
+        # let's use the first one
+        return klanten[0]
+    else:
+        return
+
+
+def fetch_klant_for_kvk_or_rsin(user_kvk_or_rsin: str) -> Optional[Klant]:
+    # this is technically a search operation and could return multiple records
+    klanten = _fetch_klanten_for_kvk_or_rsin(user_kvk_or_rsin)
     if klanten:
         # let's use the first one
         return klanten[0]
