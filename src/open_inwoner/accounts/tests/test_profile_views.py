@@ -103,7 +103,7 @@ class ProfileViewTests(WebTest):
                 logout_url = (
                     reverse("eherkenning_oidc:logout")
                     if oidc_enabled
-                    else reverse("eherkenning:logout")
+                    else reverse("logout")
                 )
 
                 response = self.app.get(self.url, user=self.eherkenning_user)

@@ -3,7 +3,7 @@ from urllib.parse import urlencode
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase, modify_settings, override_settings
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 
 from furl import furl
 
@@ -166,18 +166,3 @@ class PasswordLoginViewTests(eHerkenningMockTestCase):
         self.assertRedirects(
             response, str(expected_redirect), fetch_redirect_response=False
         )
-
-
-@override_settings(**OVERRIDE_SETTINGS)
-@modify_settings(**MODIFY_SETTINGS)
-class LogoutViewTests(TestCase):
-    def test_logout(self):
-        User = get_user_model()
-        user = User.objects.create_user(email="testuser@localhost", password="test")
-        self.client.force_login(user)
-
-        url = reverse("eherkenning:logout")
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 302)
-        self.assertFalse("_auth_user_id" in self.client.session)
