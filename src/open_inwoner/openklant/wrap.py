@@ -247,7 +247,10 @@ def patch_klant(klant: Klant, update_data) -> Optional[Klant]:
 
 
 def create_contactmoment(
-    data: ContactMomentCreateData, *, klant: Optional[Klant] = None
+    data: ContactMomentCreateData,
+    *,
+    klant: Optional[Klant] = None,
+    rol: Optional[str] = "belanghebbende"
 ) -> Optional[ContactMoment]:
     client = build_client("contactmomenten")
     if client is None:
@@ -269,6 +272,7 @@ def create_contactmoment(
                 data={
                     "klant": klant.url,
                     "contactmoment": contactmoment.url,
+                    "rol": rol,
                 },
             )
         except (RequestException, ClientError) as e:

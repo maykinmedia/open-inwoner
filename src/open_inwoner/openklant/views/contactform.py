@@ -12,8 +12,10 @@ from open_inwoner.openklant.wrap import (
     create_contactmoment,
     create_klant,
     fetch_klant_for_bsn,
+    fetch_klant_for_kvk_or_rsin,
     patch_klant,
 )
+from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 
@@ -115,11 +117,21 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
         assert config.has_api_configuration()
 
         # fetch/update/create klant
-        if self.request.user.is_authenticated and self.request.user.bsn:
-            klant = fetch_klant_for_bsn(self.request.user.bsn)
+        if self.request.user.is_authenticated and (
+            self.request.user.bsn or self.request.user.kvk
+        ):
+            if self.request.user.bsn:
+                klant = fetch_klant_for_bsn(self.request.user.bsn)
+            else:
+                kvk_or_rsin = self.request.user.kvk
+                oz_config = OpenZaakConfig.get_solo()
+                if oz_config.fetch_eherkenning_zaken_with_rsin:
+                    kvk_or_rsin = self.request.user.rsin
+                klant = fetch_klant_for_kvk_or_rsin(kvk_or_rsin)
+
             if klant:
                 self.log_system_action(
-                    "retrieved klant for BSN-user", user=self.request.user
+                    "retrieved klant for BSN or KVK user", user=self.request.user
                 )
 
                 # check if we have some data missing from the Klant
@@ -138,7 +150,8 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
                     )
             else:
                 self.log_system_action(
-                    "could not retrieve klant for BSN-user", user=self.request.user
+                    "could not retrieve klant for BSN or KVK user",
+                    user=self.request.user,
                 )
 
         else:
