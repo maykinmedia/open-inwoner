@@ -51,7 +51,7 @@ def is_zaak_visible(zaak: Zaak) -> bool:
     if isinstance(zaak.zaaktype, str):
         raise ValueError("expected zaak.zaaktype to be resolved from url to model")
 
-    if zaak.zaaktype.indicatie_intern_of_extern != "extern":
+    if not zaak.zaaktype or zaak.zaaktype.indicatie_intern_of_extern != "extern":
         return False
 
     return is_object_visible(zaak, config.zaak_max_confidentiality)
