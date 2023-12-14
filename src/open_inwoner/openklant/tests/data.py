@@ -185,6 +185,10 @@ class MockAPICreateData(MockAPIData):
         self.user = DigidUserFactory(
             bsn="100000001",
         )
+        self.eherkenning_user = eHerkenningUserFactory(
+            kvk="12345678",
+            rsin="000000000",
+        )
         self.klant = generate_oas_component(
             "kc",
             "schemas/Klant",
@@ -289,6 +293,71 @@ class MockAPICreateData(MockAPIData):
                 f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn={self.user.bsn}",
                 json=paginated_response([self.klant_no_contact_info]),
             ),
+            m.patch(
+                f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+                json=self.klant,
+                status_code=200,
+            ),
+            m.post(
+                f"{CONTACTMOMENTEN_ROOT}contactmomenten",
+                json=self.contactmoment,
+                status_code=201,
+            ),
+            m.post(
+                f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten",
+                json=self.klant_contactmoment,
+                status_code=201,
+            ),
+        ]
+        return self
+
+    def install_mocks_eherkenning(self, m, use_rsin=True) -> "MockAPICreateData":
+        self.setUpOASMocks(m)
+
+        if use_rsin:
+            first_matcher = m.get(
+                f"{KLANTEN_ROOT}klanten?subjectNietNatuurlijkPersoon__innNnpId={self.eherkenning_user.rsin}",
+                json=paginated_response([self.klant]),
+            )
+        else:
+            first_matcher = m.get(
+                f"{KLANTEN_ROOT}klanten?subjectNietNatuurlijkPersoon__innNnpId={self.eherkenning_user.kvk}",
+                json=paginated_response([self.klant]),
+            )
+
+        self.matchers = [
+            first_matcher,
+            m.post(
+                f"{CONTACTMOMENTEN_ROOT}contactmomenten",
+                json=self.contactmoment,
+                status_code=201,
+            ),
+            m.post(
+                f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten",
+                json=self.klant_contactmoment,
+                status_code=201,
+            ),
+        ]
+        return self
+
+    def install_mocks_eherkenning_missing_contact_info(
+        self, m, use_rsin=True
+    ) -> "MockAPICreateData":
+        self.setUpOASMocks(m)
+
+        if use_rsin:
+            first_matcher = m.get(
+                f"{KLANTEN_ROOT}klanten?subjectNietNatuurlijkPersoon__innNnpId={self.eherkenning_user.rsin}",
+                json=paginated_response([self.klant_no_contact_info]),
+            )
+        else:
+            first_matcher = m.get(
+                f"{KLANTEN_ROOT}klanten?subjectNietNatuurlijkPersoon__innNnpId={self.eherkenning_user.kvk}",
+                json=paginated_response([self.klant_no_contact_info]),
+            )
+
+        self.matchers = [
+            first_matcher,
             m.patch(
                 f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
                 json=self.klant,

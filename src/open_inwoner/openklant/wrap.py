@@ -11,6 +11,7 @@ from open_inwoner.openklant.api_models import (
     ContactMomentCreateData,
     Klant,
     KlantContactMoment,
+    KlantContactRol,
     KlantCreateData,
 )
 from open_inwoner.openklant.clients import build_client
@@ -250,7 +251,7 @@ def create_contactmoment(
     data: ContactMomentCreateData,
     *,
     klant: Optional[Klant] = None,
-    rol: Optional[str] = "belanghebbende"
+    rol: Optional[str] = KlantContactRol.BELANGHEBBENDE
 ) -> Optional[ContactMoment]:
     client = build_client("contactmomenten")
     if client is None:
