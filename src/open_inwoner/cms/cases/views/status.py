@@ -100,7 +100,7 @@ class InnerCaseDetailView(
     template_name = "pages/cases/status_inner.html"
     form_class = CaseUploadForm
     contact_form_class = CaseContactForm
-    case: Zaak = None
+    case: Optional[Zaak] = None
 
     def __init__(self):
         self.statustype_config_mapping = {
@@ -283,6 +283,13 @@ class InnerCaseDetailView(
             enabled_for_status_type = self.statustype_config_mapping[
                 self.case.status.statustype.url
             ].document_upload_enabled
+        except AttributeError:
+            logger.info(
+                "Could not retrieve status type for case {case}; "
+                "the status has not been resolved to a ZGW model object.".format(
+                    case=self.case
+                )
+            )
         except KeyError:
             logger.info(
                 "Could not retrieve status type config for url {url}".format(
