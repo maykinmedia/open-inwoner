@@ -15,10 +15,9 @@ from open_inwoner.openklant.api_models import KlantContactMoment
 from open_inwoner.openklant.constants import Status
 from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.openklant.wrap import (
-    fetch_klantcontactmoment_for_bsn,
-    fetch_klantcontactmoment_for_kvk_or_rsin,
-    fetch_klantcontactmomenten_for_bsn,
-    fetch_klantcontactmomenten_for_kvk_or_rsin,
+    fetch_klantcontactmoment,
+    fetch_klantcontactmomenten,
+    get_fetch_parameters,
 )
 from open_inwoner.utils.views import CommonPageMixin
 
@@ -107,14 +106,7 @@ class KlantContactMomentListView(KlantContactMomentBaseView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        if self.request.user.bsn:
-            kcms = fetch_klantcontactmomenten_for_bsn(self.request.user.bsn)
-        elif self.request.user.kvk:
-            kvk_or_rsin = self.request.user.kvk
-            config = OpenKlantConfig.get_solo()
-            if config.use_rsin_for_innNnpId_query_parameter:
-                kvk_or_rsin = self.request.user.rsin
-            kcms = fetch_klantcontactmomenten_for_kvk_or_rsin(kvk_or_rsin)
+        kcms = fetch_klantcontactmomenten(**get_fetch_parameters(self.request.user))
         ctx["contactmomenten"] = [self.get_kcm_data(kcm) for kcm in kcms]
         return ctx
 
@@ -138,18 +130,10 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
 
-        if self.request.user.bsn:
-            kcm = fetch_klantcontactmoment_for_bsn(
-                kwargs["kcm_uuid"], self.request.user.bsn
-            )
-        elif self.request.user.kvk:
-            kvk_or_rsin = self.request.user.kvk
-            config = OpenKlantConfig.get_solo()
-            if config.use_rsin_for_innNnpId_query_parameter:
-                kvk_or_rsin = self.request.user.rsin
-            kcm = fetch_klantcontactmoment_for_kvk_or_rsin(
-                kwargs["kcm_uuid"], kvk_or_rsin
-            )
+        kcm = fetch_klantcontactmoment(
+            kwargs["kcm_uuid"],
+            **get_fetch_parameters(self.request.user),
+        )
 
         if not kcm:
             raise Http404()

@@ -5,10 +5,8 @@ import requests_mock
 from open_inwoner.openklant.api_models import KlantContactMoment
 from open_inwoner.openklant.tests.data import MockAPIReadData
 from open_inwoner.openklant.wrap import (
-    fetch_klantcontactmoment_for_bsn,
-    fetch_klantcontactmoment_for_kvk_or_rsin,
-    fetch_klantcontactmomenten_for_bsn,
-    fetch_klantcontactmomenten_for_kvk_or_rsin,
+    fetch_klantcontactmoment,
+    fetch_klantcontactmomenten,
 )
 from open_inwoner.utils.test import ClearCachesMixin, DisableRequestLogMixin
 
@@ -23,7 +21,7 @@ class FetchKlantDataTestCase(ClearCachesMixin, DisableRequestLogMixin, TestCase)
     def test_fetch_klantcontactmomenten_for_bsn(self, m):
         data = MockAPIReadData().install_mocks(m)
 
-        res = fetch_klantcontactmomenten_for_bsn(data.user.bsn)
+        res = fetch_klantcontactmomenten(user_bsn=data.user.bsn)
 
         self.assertNotEquals(res, list())
         self.assertIsInstance(res[0], KlantContactMoment)
@@ -32,8 +30,8 @@ class FetchKlantDataTestCase(ClearCachesMixin, DisableRequestLogMixin, TestCase)
     def test_fetch_klantcontactmoment_for_bsn(self, m):
         data = MockAPIReadData().install_mocks(m)
 
-        kcm = fetch_klantcontactmoment_for_bsn(
-            data.klant_contactmoment["uuid"], data.user.bsn
+        kcm = fetch_klantcontactmoment(
+            data.klant_contactmoment["uuid"], user_bsn=data.user.bsn
         )
 
         self.assertIsNotNone(kcm)
@@ -43,7 +41,7 @@ class FetchKlantDataTestCase(ClearCachesMixin, DisableRequestLogMixin, TestCase)
     def test_fetch_klantcontactmomenten_for_kvk(self, m):
         data = MockAPIReadData().install_mocks(m)
 
-        res = fetch_klantcontactmomenten_for_kvk_or_rsin(data.eherkenning_user.kvk)
+        res = fetch_klantcontactmomenten(user_kvk_or_rsin=data.eherkenning_user.kvk)
 
         self.assertNotEquals(res, list())
         self.assertIsInstance(res[0], KlantContactMoment)
@@ -52,8 +50,9 @@ class FetchKlantDataTestCase(ClearCachesMixin, DisableRequestLogMixin, TestCase)
     def test_fetch_klantcontactmoment_for_kvk(self, m):
         data = MockAPIReadData().install_mocks(m)
 
-        kcm = fetch_klantcontactmoment_for_kvk_or_rsin(
-            data.klant_contactmoment2["uuid"], data.eherkenning_user.kvk
+        kcm = fetch_klantcontactmoment(
+            data.klant_contactmoment2["uuid"],
+            user_kvk_or_rsin=data.eherkenning_user.kvk,
         )
 
         self.assertIsNotNone(kcm)

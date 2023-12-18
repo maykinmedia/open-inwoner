@@ -11,8 +11,8 @@ from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.openklant.wrap import (
     create_contactmoment,
     create_klant,
-    fetch_klant_for_bsn,
-    fetch_klant_for_kvk_or_rsin,
+    fetch_klant,
+    get_fetch_parameters,
     patch_klant,
 )
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
@@ -119,13 +119,7 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
         if self.request.user.is_authenticated and (
             self.request.user.bsn or self.request.user.kvk
         ):
-            if self.request.user.bsn:
-                klant = fetch_klant_for_bsn(self.request.user.bsn)
-            else:
-                kvk_or_rsin = self.request.user.kvk
-                if config.use_rsin_for_innNnpId_query_parameter:
-                    kvk_or_rsin = self.request.user.rsin
-                klant = fetch_klant_for_kvk_or_rsin(kvk_or_rsin)
+            klant = fetch_klant(**get_fetch_parameters(self.request.user))
 
             if klant:
                 self.log_system_action(

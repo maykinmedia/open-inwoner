@@ -6,6 +6,7 @@ from zds_client import ClientError
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.service import get_paginated_results
 
+from open_inwoner.accounts.models import User
 from open_inwoner.openklant.api_models import (
     ContactMoment,
     ContactMomentCreateData,
@@ -15,12 +16,22 @@ from open_inwoner.openklant.api_models import (
     KlantCreateData,
 )
 from open_inwoner.openklant.clients import build_client
+from open_inwoner.openklant.models import OpenKlantConfig
 
 logger = logging.getLogger(__name__)
 
 
-def fetch_klantcontactmomenten_for_bsn(user_bsn: str) -> List[KlantContactMoment]:
-    klanten = _fetch_klanten_for_bsn(user_bsn)
+def fetch_klantcontactmomenten(
+    user_bsn: Optional[str] = None, user_kvk_or_rsin: Optional[str] = None
+) -> List[KlantContactMoment]:
+    if not user_bsn and not user_kvk_or_rsin:
+        return []
+
+    if user_bsn:
+        klanten = _fetch_klanten_for_bsn(user_bsn)
+    elif user_kvk_or_rsin:
+        klanten = _fetch_klanten_for_kvk_or_rsin(user_kvk_or_rsin)
+
     if klanten is None:
         return []
 
@@ -37,28 +48,10 @@ def fetch_klantcontactmomenten_for_bsn(user_bsn: str) -> List[KlantContactMoment
     return ret
 
 
-def fetch_klantcontactmomenten_for_kvk_or_rsin(
-    user_kvk_or_rsin: str,
-) -> List[KlantContactMoment]:
-    klanten = _fetch_klanten_for_kvk_or_rsin(user_kvk_or_rsin)
-    if klanten is None:
-        return []
-
-    client = build_client("contactmomenten")
-
-    ret = list()
-    for klant in klanten:
-        moments = _fetch_klantcontactmomenten_for_klant(klant, client=client)
-        ret.extend(moments)
-
-    # combine sorting for moments of all klanten for a kvk
-    ret.sort(key=lambda kcm: kcm.contactmoment.registratiedatum)
-
-    return ret
-
-
-def fetch_klantcontactmoment_for_bsn(
-    kcm_uuid: str, user_bsn: str
+def fetch_klantcontactmoment(
+    kcm_uuid: str,
+    user_bsn: Optional[str] = None,
+    user_kvk_or_rsin: Optional[str] = None,
 ) -> Optional[KlantContactMoment]:
 
     cm_client = build_client("contactmomenten")
@@ -66,32 +59,15 @@ def fetch_klantcontactmoment_for_bsn(
     if cm_client is None or k_client is None:
         return
 
-    # use the list query because eSuite doesn't have all proper resources
-    # see git history before this change for the original single resource version
-    kcms = fetch_klantcontactmomenten_for_bsn(user_bsn)
-
-    kcm = None
-    # try to grab the specific KCM
-    for k in kcms:
-        if kcm_uuid == str(k.uuid):
-            kcm = k
-            break
-
-    return kcm
-
-
-def fetch_klantcontactmoment_for_kvk_or_rsin(
-    kcm_uuid: str, user_kvk_or_rsin: str
-) -> Optional[KlantContactMoment]:
-
-    cm_client = build_client("contactmomenten")
-    k_client = build_client("klanten")
-    if cm_client is None or k_client is None:
+    if not user_bsn and not user_kvk_or_rsin:
         return
 
     # use the list query because eSuite doesn't have all proper resources
     # see git history before this change for the original single resource version
-    kcms = fetch_klantcontactmomenten_for_kvk_or_rsin(user_kvk_or_rsin)
+    if user_bsn:
+        kcms = fetch_klantcontactmomenten(user_bsn=user_bsn)
+    elif user_kvk_or_rsin:
+        kcms = fetch_klantcontactmomenten(user_kvk_or_rsin=user_kvk_or_rsin)
 
     kcm = None
     # try to grab the specific KCM
@@ -147,19 +123,18 @@ def _fetch_klanten_for_kvk_or_rsin(
     return klanten
 
 
-def fetch_klant_for_bsn(user_bsn: str) -> Optional[Klant]:
-    # this is technically a search operation and could return multiple records
-    klanten = _fetch_klanten_for_bsn(user_bsn)
-    if klanten:
-        # let's use the first one
-        return klanten[0]
-    else:
+def fetch_klant(
+    user_bsn: Optional[str] = None, user_kvk_or_rsin: Optional[str] = None
+) -> Optional[Klant]:
+    if not user_bsn and not user_kvk_or_rsin:
         return
 
-
-def fetch_klant_for_kvk_or_rsin(user_kvk_or_rsin: str) -> Optional[Klant]:
     # this is technically a search operation and could return multiple records
-    klanten = _fetch_klanten_for_kvk_or_rsin(user_kvk_or_rsin)
+    if user_bsn:
+        klanten = _fetch_klanten_for_bsn(user_bsn)
+    elif user_kvk_or_rsin:
+        klanten = _fetch_klanten_for_kvk_or_rsin(user_kvk_or_rsin)
+
     if klanten:
         # let's use the first one
         return klanten[0]
@@ -289,3 +264,18 @@ def create_contactmoment(
     #     contactmoment.klantcontactmomenten = []
 
     return contactmoment
+
+
+def get_fetch_parameters(user: User) -> dict:
+    """
+    Determine the parameters used to perform Klanten/Contactmomenten fetches
+    """
+    if user.bsn:
+        return {"user_bsn": user.bsn}
+    elif user.kvk:
+        kvk_or_rsin = user.kvk
+        config = OpenKlantConfig.get_solo()
+        if config.use_rsin_for_innNnpId_query_parameter:
+            kvk_or_rsin = user.rsin
+        return {"user_kvk_or_rsin": kvk_or_rsin}
+    return {}
