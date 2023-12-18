@@ -27,7 +27,7 @@ class ZaakTypenSelectWidget(forms.Select):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        zaaktypen = ZaakTypeConfig.objects.order_by("catalogus__domein")
+        zaaktypen = ZaakTypeConfig.objects.order_by("catalogus__domein", "omschrijving")
 
         # Create an optgroup for each Catalogus and its ZaakTypen
         choices_dict = defaultdict(list)
