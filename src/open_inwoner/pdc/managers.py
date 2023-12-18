@@ -35,7 +35,6 @@ class CategoryPublishedQueryset(MP_NodeQuerySet):
                 return self.filter(visible_for_citizens=True)
             elif user.kvk:
                 return self.filter(visible_for_companies=True)
-            return self.filter(visible_for_authenticated=True)
         return self.filter(visible_for_anonymous=True)
 
     def filter_for_user_with_zaken(self, user: User):

@@ -13,7 +13,11 @@ from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 from zgw_consumers.constants import APITypes
 from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 
-from open_inwoner.accounts.tests.factories import DigidUserFactory, UserFactory
+from open_inwoner.accounts.tests.factories import (
+    DigidUserFactory,
+    UserFactory,
+    eHerkenningUserFactory,
+)
 from open_inwoner.cms.products.cms_apps import ProductsApphook
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.tests.factories import ServiceFactory, ZaakTypeConfigFactory
@@ -48,25 +52,21 @@ class TestHighlightedCategories(WebTest):
             name="This should be second",
             highlighted=True,
             visible_for_anonymous=True,
-            visible_for_authenticated=True,
         )
         highlighted_category2 = CategoryFactory(
             path="0002",
             highlighted=True,
             visible_for_anonymous=True,
-            visible_for_authenticated=False,
         )
         highlighted_category3 = CategoryFactory(
             path="0003",
             highlighted=True,
             visible_for_anonymous=False,
-            visible_for_authenticated=True,
         )
         highlighted_category4 = CategoryFactory(
             path="0004",
             highlighted=True,
             visible_for_anonymous=False,
-            visible_for_authenticated=False,
         )
 
         html, context = cms_tools.render_plugin(CategoriesPlugin)
@@ -88,39 +88,84 @@ class TestHighlightedCategories(WebTest):
             [highlighted_category1, highlighted_category2],
         )
 
-    def test_only_highlighted_categories_are_shown_when_they_exist(self):
-        user = UserFactory()
+    def test_only_highlighted_categories_are_shown_when_they_exist_digid_user(self):
+        user = DigidUserFactory()
         category = CategoryFactory(name="Should be first")
         highlighted_category1 = CategoryFactory(
             name="This should be second",
             highlighted=True,
             visible_for_anonymous=True,
-            visible_for_authenticated=True,
+            visible_for_citizens=False,
+            visible_for_companies=False,
         )
         highlighted_category2 = CategoryFactory(
             path="0002",
             highlighted=True,
             visible_for_anonymous=True,
-            visible_for_authenticated=False,
+            visible_for_citizens=True,
+            visible_for_companies=False,
         )
         highlighted_category3 = CategoryFactory(
             path="0003",
             highlighted=True,
             visible_for_anonymous=False,
-            visible_for_authenticated=True,
+            visible_for_citizens=False,
+            visible_for_companies=True,
         )
         highlighted_category4 = CategoryFactory(
             path="0004",
             highlighted=True,
             visible_for_anonymous=False,
-            visible_for_authenticated=False,
+            visible_for_citizens=True,
+            visible_for_companies=True,
         )
 
         html, context = cms_tools.render_plugin(CategoriesPlugin, user=user)
 
         self.assertEqual(
             list(context["categories"]),
-            [highlighted_category1, highlighted_category3],
+            [highlighted_category2, highlighted_category4],
+        )
+
+    def test_only_highlighted_categories_are_shown_when_they_exist_eherkenning_user(
+        self,
+    ):
+        user = eHerkenningUserFactory()
+        category = CategoryFactory(name="Should be first")
+        highlighted_category1 = CategoryFactory(
+            name="This should be second",
+            highlighted=True,
+            visible_for_anonymous=True,
+            visible_for_citizens=False,
+            visible_for_companies=False,
+        )
+        highlighted_category2 = CategoryFactory(
+            path="0002",
+            highlighted=True,
+            visible_for_anonymous=True,
+            visible_for_citizens=True,
+            visible_for_companies=False,
+        )
+        highlighted_category3 = CategoryFactory(
+            path="0003",
+            highlighted=True,
+            visible_for_anonymous=False,
+            visible_for_citizens=False,
+            visible_for_companies=True,
+        )
+        highlighted_category4 = CategoryFactory(
+            path="0004",
+            highlighted=True,
+            visible_for_anonymous=False,
+            visible_for_citizens=True,
+            visible_for_companies=True,
+        )
+
+        html, context = cms_tools.render_plugin(CategoriesPlugin, user=user)
+
+        self.assertEqual(
+            list(context["categories"]),
+            [highlighted_category3, highlighted_category4],
         )
 
     @patch("open_inwoner.openzaak.models.OpenZaakConfig.get_solo")

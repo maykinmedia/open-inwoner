@@ -141,7 +141,6 @@ class CategoryAdmin(
         "highlighted",
         "published",
         "visible_for_anonymous",
-        "visible_for_authenticated",
         "visible_for_companies",
         "visible_for_citizens",
     )
@@ -149,7 +148,6 @@ class CategoryAdmin(
         "highlighted",
         "published",
         "visible_for_anonymous",
-        "visible_for_authenticated",
         "visible_for_companies",
         "visible_for_citizens",
     )

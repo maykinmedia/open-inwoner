@@ -25,28 +25,24 @@ class CategoryListViewTest(TestCase):
         cls.category1 = CategoryFactory(
             name="0001",
             visible_for_anonymous=True,
-            visible_for_authenticated=True,
             visible_for_citizens=False,
             visible_for_companies=False,
         )
         cls.category2 = CategoryFactory(
             name="0002",
             visible_for_anonymous=True,
-            visible_for_authenticated=False,
             visible_for_citizens=True,
             visible_for_companies=True,
         )
         cls.category3 = CategoryFactory(
             name="0003",
             visible_for_anonymous=False,
-            visible_for_authenticated=True,
             visible_for_citizens=True,
             visible_for_companies=False,
         )
         cls.category4 = CategoryFactory(
             name="0004",
             visible_for_anonymous=False,
-            visible_for_authenticated=False,
             visible_for_citizens=False,
             visible_for_companies=True,
         )
@@ -98,19 +94,6 @@ class CategoryListViewTest(TestCase):
             list(response.context["object_list"]), [self.category1, self.category2]
         )
 
-    def test_category_list_view_visibility_for_authenticated_user(self):
-        url = reverse("products:category_list")
-
-        self.client.force_login(self.user)
-
-        # request with authenticated user
-        response = self.client.get(url, user=self.user)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            list(response.context["object_list"]), [self.category1, self.category3]
-        )
-
     def test_category_list_view_visibility_for_digid_user(self):
         url = reverse("products:category_list")
 
@@ -153,7 +136,6 @@ class CategoryDetailViewTest(TestCase):
             name="test cat",
             description="A <em>descriptive</em> description",
             visible_for_anonymous=False,
-            visible_for_authenticated=False,
         )
 
     def test_category_detail_view_access_restricted(self):
