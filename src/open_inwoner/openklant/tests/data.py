@@ -157,7 +157,7 @@ class MockAPIReadData(MockAPIData):
         )
 
         # Mock both RSIN and KvK fetch variations, can be toggled with feature flag
-        # `fetch_eherkenning_zaken_with_rsin`
+        # `use_rsin_for_innNnpId_query_parameter`
         m.get(
             f"{KLANTEN_ROOT}klanten?subjectNietNatuurlijkPersoon__innNnpId={self.eherkenning_user.kvk}",
             json=paginated_response([self.klant2]),

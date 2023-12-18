@@ -9,8 +9,8 @@ import requests_mock
 from django_webtest import WebTest
 
 from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.openklant.tests.data import MockAPIReadData
-from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.utils.test import ClearCachesMixin, DisableRequestLogMixin
 
 
@@ -55,13 +55,13 @@ class FetchKlantDataTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
         )
 
     def test_list_for_kvk_or_rsin(self, m):
-        for fetch_eherkenning_zaken_with_rsin in [True, False]:
+        for use_rsin_for_innNnpId_query_parameter in [True, False]:
             with self.subTest(
-                fetch_eherkenning_zaken_with_rsin=fetch_eherkenning_zaken_with_rsin
+                use_rsin_for_innNnpId_query_parameter=use_rsin_for_innNnpId_query_parameter
             ):
-                config = OpenZaakConfig.get_solo()
-                config.fetch_eherkenning_zaken_with_rsin = (
-                    fetch_eherkenning_zaken_with_rsin
+                config = OpenKlantConfig.get_solo()
+                config.use_rsin_for_innNnpId_query_parameter = (
+                    use_rsin_for_innNnpId_query_parameter
                 )
                 config.save()
 
@@ -122,13 +122,13 @@ class FetchKlantDataTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
         )
 
     def test_show_detail_for_kvk_or_rsin(self, m):
-        for fetch_eherkenning_zaken_with_rsin in [True, False]:
+        for use_rsin_for_innNnpId_query_parameter in [True, False]:
             with self.subTest(
-                fetch_eherkenning_zaken_with_rsin=fetch_eherkenning_zaken_with_rsin
+                use_rsin_for_innNnpId_query_parameter=use_rsin_for_innNnpId_query_parameter
             ):
-                config = OpenZaakConfig.get_solo()
-                config.fetch_eherkenning_zaken_with_rsin = (
-                    fetch_eherkenning_zaken_with_rsin
+                config = OpenKlantConfig.get_solo()
+                config.use_rsin_for_innNnpId_query_parameter = (
+                    use_rsin_for_innNnpId_query_parameter
                 )
                 config.save()
 

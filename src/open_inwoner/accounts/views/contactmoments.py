@@ -13,13 +13,13 @@ from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.openklant.api_models import KlantContactMoment
 from open_inwoner.openklant.constants import Status
+from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.openklant.wrap import (
     fetch_klantcontactmoment_for_bsn,
     fetch_klantcontactmoment_for_kvk_or_rsin,
     fetch_klantcontactmomenten_for_bsn,
     fetch_klantcontactmomenten_for_kvk_or_rsin,
 )
-from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.utils.views import CommonPageMixin
 
 
@@ -111,8 +111,8 @@ class KlantContactMomentListView(KlantContactMomentBaseView):
             kcms = fetch_klantcontactmomenten_for_bsn(self.request.user.bsn)
         elif self.request.user.kvk:
             kvk_or_rsin = self.request.user.kvk
-            config = OpenZaakConfig.get_solo()
-            if config.fetch_eherkenning_zaken_with_rsin:
+            config = OpenKlantConfig.get_solo()
+            if config.use_rsin_for_innNnpId_query_parameter:
                 kvk_or_rsin = self.request.user.rsin
             kcms = fetch_klantcontactmomenten_for_kvk_or_rsin(kvk_or_rsin)
         ctx["contactmomenten"] = [self.get_kcm_data(kcm) for kcm in kcms]
@@ -144,8 +144,8 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
             )
         elif self.request.user.kvk:
             kvk_or_rsin = self.request.user.kvk
-            config = OpenZaakConfig.get_solo()
-            if config.fetch_eherkenning_zaken_with_rsin:
+            config = OpenKlantConfig.get_solo()
+            if config.use_rsin_for_innNnpId_query_parameter:
                 kvk_or_rsin = self.request.user.rsin
             kcm = fetch_klantcontactmoment_for_kvk_or_rsin(
                 kwargs["kcm_uuid"], kvk_or_rsin

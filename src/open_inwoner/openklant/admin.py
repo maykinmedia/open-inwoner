@@ -56,6 +56,7 @@ class OpenKlantConfigAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                     "register_bronorganisatie_rsin",
                     "register_type",
                     "register_employee_id",
+                    "use_rsin_for_innNnpId_query_parameter",
                 ],
             },
         ),

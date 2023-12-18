@@ -15,7 +15,6 @@ from open_inwoner.openklant.wrap import (
     fetch_klant_for_kvk_or_rsin,
     patch_klant,
 )
-from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 
@@ -124,8 +123,7 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
                 klant = fetch_klant_for_bsn(self.request.user.bsn)
             else:
                 kvk_or_rsin = self.request.user.kvk
-                oz_config = OpenZaakConfig.get_solo()
-                if oz_config.fetch_eherkenning_zaken_with_rsin:
+                if config.use_rsin_for_innNnpId_query_parameter:
                     kvk_or_rsin = self.request.user.rsin
                 klant = fetch_klant_for_kvk_or_rsin(kvk_or_rsin)
 

@@ -13,7 +13,6 @@ from open_inwoner.openklant.api_models import KlantContactRol
 from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.openklant.tests.data import MockAPICreateData
 from open_inwoner.openklant.tests.factories import ContactFormSubjectFactory
-from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.tests.factories import ServiceFactory
 from open_inwoner.utils.test import ClearCachesMixin, DisableRequestLogMixin
 from open_inwoner.utils.tests.helpers import AssertFormMixin, AssertTimelineLogMixin
@@ -439,23 +438,22 @@ class ContactFormTestCase(
         config.register_employee_id = "FooVonBar"
         config.save()
 
-        for fetch_eherkenning_zaken_with_rsin in [True, False]:
+        for use_rsin_for_innNnpId_query_parameter in [True, False]:
             with self.subTest(
-                fetch_eherkenning_zaken_with_rsin=fetch_eherkenning_zaken_with_rsin
+                use_rsin_for_innNnpId_query_parameter=use_rsin_for_innNnpId_query_parameter
             ):
                 # NOTE Explicitly creating a new Mocker object here, because for some reason
                 # `m` is overridden somewhere, which causes issues when `MockAPIData.setUpOASMocks`
                 # is run for the second time
                 with requests_mock.Mocker() as m:
-                    oz_config = OpenZaakConfig.get_solo()
-                    oz_config.fetch_eherkenning_zaken_with_rsin = (
-                        fetch_eherkenning_zaken_with_rsin
+                    config.use_rsin_for_innNnpId_query_parameter = (
+                        use_rsin_for_innNnpId_query_parameter
                     )
-                    oz_config.save()
+                    config.save()
 
                     data = MockAPICreateData()
                     data.install_mocks_eherkenning(
-                        m, use_rsin=fetch_eherkenning_zaken_with_rsin
+                        m, use_rsin=use_rsin_for_innNnpId_query_parameter
                     )
 
                     subject = ContactFormSubjectFactory(
@@ -609,23 +607,22 @@ class ContactFormTestCase(
         config.register_employee_id = "FooVonBar"
         config.save()
 
-        for fetch_eherkenning_zaken_with_rsin in [True, False]:
+        for use_rsin_for_innNnpId_query_parameter in [True, False]:
             with self.subTest(
-                fetch_eherkenning_zaken_with_rsin=fetch_eherkenning_zaken_with_rsin
+                use_rsin_for_innNnpId_query_parameter=use_rsin_for_innNnpId_query_parameter
             ):
                 # NOTE Explicitly creating a new Mocker object here, because for some reason
                 # `m` is overridden somewhere, which causes issues when `MockAPIData.setUpOASMocks`
                 # is run for the second time
                 with requests_mock.Mocker() as m:
-                    oz_config = OpenZaakConfig.get_solo()
-                    oz_config.fetch_eherkenning_zaken_with_rsin = (
-                        fetch_eherkenning_zaken_with_rsin
+                    config.use_rsin_for_innNnpId_query_parameter = (
+                        use_rsin_for_innNnpId_query_parameter
                     )
-                    oz_config.save()
+                    config.save()
 
                     data = MockAPICreateData()
                     data.install_mocks_eherkenning_missing_contact_info(
-                        m, use_rsin=fetch_eherkenning_zaken_with_rsin
+                        m, use_rsin=use_rsin_for_innNnpId_query_parameter
                     )
 
                     subject = ContactFormSubjectFactory(
