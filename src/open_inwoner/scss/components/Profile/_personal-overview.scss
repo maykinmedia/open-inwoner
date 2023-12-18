@@ -6,8 +6,14 @@
 
   h2,
   .h2 {
-    height: var(--row-height);
+    display: block;
+    height: initial;
     margin: calc(var(--row-height)) 0 0 0;
+
+    @media (min-width: 768px) {
+      display: flex;
+      height: var(--row-height);
+    }
   }
 
   .h2 + .grid {

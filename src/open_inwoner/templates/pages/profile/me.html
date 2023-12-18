@@ -88,8 +88,9 @@
     <section class="tabled tabled--flexible profile-section profile-section--bordered" id="profile-notifications">
         <div class="tabled__section">
             <h2 class="h2 title" id="overview">{% trans "Voorkeuren voor meldingen" %}
-                <div
-                    class="tabled__item--force-right tabled__item--mobile-big">{% button href="profile:notifications" text=_("Bewerk") icon="edit" transparent=True icon_outlined=True %}</div>
+                <div class="tabled__item--force-right tabled__item--mobile-big">
+                    {% button href="profile:notifications" text=_("Bewerk") icon="edit" transparent=True icon_outlined=True %}
+                </div>
             </h2>
         </div>
         <div class="tabled__row tabled__row--blank">
@@ -105,40 +106,36 @@
     </section>
 
     {# Overview #}
-    <section class="profile-section">
+    <section class="profile-section profile-section__overview">
         <h2 class="h2 title" id="profile-overview">{% trans "Overzicht" %}</h2>
         <div class="profile-cards card-container card-container--columns-3">
 
             {# Mentors #}
             {% if view.config.mentors %}
-                    <a href="{% url 'profile:action_list' %}" class="card card--compact card--stretch" id="profile-section-mentors">
+                {% if mentor_contacts %}
+                    <a href="{% url 'profile:contact_list' %}?type=begeleider" class="card card--compact card--stretch" id="profile-section-mentors">
+                {% else %}
+                    <a href="#" class="card card--compact card--stretch" id="profile-section-mentors">
+                {% endif %}
                         <div class="card__body">
-                            {% if mentor_contacts %}
-                                {% url "profile:contact_list" as mentor_url %}
-                                <span href="{{ mentor_url }}?type=begeleider" class="profile__link">
-                            {% else %}
-                                <span href="#" class="profile__link">
-                            {% endif %}
                             <p class="h4"><span class="link link__text">{% trans "Mijn begeleider" %}</span></p>
-
                             {% render_list %}
-                                <span class="profile-list">
+                                <span class="profile-list ellipsis">
                                     {% for name in mentor_contact_names %}
                                         {% list_item text=name compact=True strong=False %}
                                     {% empty %}
-                                        {% list_item text=_("U heeft nog geen begeleider.") compact=True strong=False %}
+                                        <p class="p list_paragraph">{% trans "U heeft geen gemeentelijke begeleider." %}</p>
                                     {% endfor %}
                                 </span>
                             {% endrender_list %}
 
                             {% if inbox_page_is_published %}
-                                <span class="link link--icon link--primary" aria-label="{% trans "Stuur een bericht" %}" title="{% trans "Stuur een bericht" %}">
+                                <span class="link link--icon link--secondary" aria-label="{% trans "Stuur een bericht" %}" title="{% trans "Stuur een bericht" %}">
                                     <span class="link__text">{% trans "Stuur een bericht" %}</span>
                                     {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
                                 </span>
                             {% endif %}
 
-                            </span>
                         </div>
                     </a>
             {% endif %}
@@ -149,16 +146,16 @@
                             <div class="profile__link">
                                 <p class="h4"><span class="link link__text">{% trans "Mijn contacten" %}</span></p>
                                 {% render_list %}
-                                    <span class="profile-list">
+                                    <span class="profile-list ellipsis">
                                     {% for name in contact_names %}
                                         {% list_item text=name compact=True strong=False %}
                                     {% empty %}
-                                        {% list_item text=_("U heeft nog geen contacten") compact=True strong=False %}
+                                        <p class="p list_paragraph">{% trans "U heeft nog geen contacten" %}</p>
                                     {% endfor %}
                                 </span>
                                 {% endrender_list %}
 
-                                <span class="link link--icon link--primary"
+                                <span class="link link--icon link--secondary"
                                       aria-label="{% trans "Beheer contacten" %}"
                                       title="{% trans "Beheer contacten" %}">
                                 <span class="link__text">{% trans "Beheer contacten" %}</span>
@@ -181,7 +178,7 @@
                                         {% list_item text=action_text compact=True strong=False %}
                                     </span>
                                 {% endrender_list %}
-                                <span class="link link--icon link--primary" aria-label="{% trans "Beheer acties" %}" title="{% trans "Beheer acties" %}">
+                                <span class="link link--icon link--secondary" aria-label="{% trans "Beheer acties" %}" title="{% trans "Beheer acties" %}">
                                     <span class="link__text">{% trans "Beheer acties" %}</span>
                                     {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
                                 </span>
@@ -202,7 +199,7 @@
                                 {% list_item text="Maandspecificaties" compact=True strong=False %}
                             </span>
                         {% endrender_list %}
-                        <span class="link link--icon link--primary"
+                        <span class="link link--icon link--secondary"
                               aria-label="{% trans "Bekijk uitkeringen" %}"
                               title="{% trans "Bekijk uitkeringen" %}">
                             <span class="link__text">{% trans "Bekijk uitkeringen" %}</span>
@@ -216,7 +213,7 @@
                 <a href="{% url 'cases:contactmoment_list' %}" class="card card--compact card--stretch" id="profile-section-questions">
                     <div class="card__body">
                     <p class="h4"><span class="link link__text">{% trans "Mijn vragen" %}</span></p>
-                    <span class="link link--icon link--primary profile-card__button" aria-label="{% trans "Bekijken" %}" title="{% trans "Bekijken" %}">
+                    <span class="link link--icon link--secondary profile-card__button" aria-label="{% trans "Bekijken" %}" title="{% trans "Bekijken" %}">
                         <span class="link__text">{% trans "Bekijken" %}</span>
                         {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
                     </span>
@@ -228,7 +225,7 @@
                 <a href="{% url 'products:questionnaire_list' %}" class="card card--compact card--stretch" id="profile-section-questions">
                     <div class="card__body">
                         <p class="h4"><span class="link link__text">{% trans "Zelftest" %}</span></p>
-                        <span class="link link--icon link--primary profile-card__button" aria-label="{% trans "Start zelfdiagnose" %}" title="{% trans "Start zelfdiagnose" %}">
+                        <span class="link link--icon link--secondary profile-card__button" aria-label="{% trans "Start zelfdiagnose" %}" title="{% trans "Start zelfdiagnose" %}">
                             <span class="link__text">{% trans "Start zelfdiagnose" %}</span>
                             {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
                         </span>

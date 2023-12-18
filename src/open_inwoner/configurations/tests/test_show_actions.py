@@ -33,7 +33,7 @@ class TestShowActions(WebTest):
     def test_when_enabled_and_user_is_logged_in(self):
         response = self.app.get(self.profile_url, user=self.user)
 
-        links = response.pyquery(".profile-section")
+        links = response.pyquery(".profile-section__overview")
         self.assertNotEqual(links.find("#profile-section-actions"), [])
         self.assertNotEqual(links.find(f'a[href="{self.actions_list_url}"]'), [])
 
@@ -42,7 +42,7 @@ class TestShowActions(WebTest):
         self.profile_config.save()
         response = self.app.get(self.profile_url, user=self.user)
 
-        links = response.pyquery(".profile-section")
+        links = response.pyquery(".profile-section__overview")
         self.assertEqual(links.find("#profile-section-actions"), [])
         self.assertEqual(links.find(f'a[href="{self.actions_list_url}"]'), [])
 
