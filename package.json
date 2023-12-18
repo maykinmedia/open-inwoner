@@ -7,7 +7,9 @@
     "doc": "doc"
   },
   "scripts": {
-    "build": "npm run collect && npm run bundle",
+    "build": "npm run collect && npm run bundle && npm --prefix design-tokens/open-inwoner-design-tokens run build",
+    "build-design-tokens": "npm --prefix design-tokens/open-inwoner-design-tokens run build",
+    "watch-design-tokens": "npm --prefix design-tokens/open-inwoner-design-tokens run start",
     "bundle": "webpack",
     "collect": "cp -r node_modules/leaflet/dist/images src/open_inwoner/static/bundles && cp -r node_modules/material-icons/iconfont/*.woff src/open_inwoner/static/bundles && cp -r node_modules/material-icons/iconfont/*.woff2 src/open_inwoner/static/bundles && cp -r node_modules/@fortawesome/fontawesome-free/webfonts src/open_inwoner/static/",
     "test": "karma start",
@@ -62,6 +64,8 @@
     "@babel/polyfill": "latest",
     "@babel/preset-env": "latest",
     "@types/leaflet": "^1.7.6",
+    "@utrecht/component-library-css": "3.0.1-alpha.0",
+    "@utrecht/components": "3.0.1-alpha.0",
     "autoprefixer": "^9.0.0",
     "babel-loader": "^8.2.5",
     "chai": "latest",

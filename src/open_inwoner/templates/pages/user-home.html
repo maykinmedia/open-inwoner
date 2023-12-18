@@ -4,7 +4,7 @@
 {% block header_image %}{% endblock header_image %}
 
 {% block user_content %}
-    <h1 class="h1">{{ configurable_text.home_page.home_welcome_title }} {{ request.user.get_full_name }}</h1>
+    <h1 class="utrecht-heading-1">{{ configurable_text.home_page.home_welcome_title }} {{ request.user.get_full_name }}</h1>
     <p class="p">{{ configurable_text.home_page.home_welcome_intro|linebreaksbr }}</p>
 
     {% if show_plans %}

@@ -1,4 +1,15 @@
+@import '@utrecht/components/dist/heading-1/css/index.css';
 @import '~microscope-sass/lib/responsive';
+
+.utrecht-heading-1 {
+  color: var(--font-color-heading-1);
+  font-family: var(--font-family-heading-1);
+  font-size: var(--font-size-heading-1);
+  font-weight: var(--font-weight-heading-1);
+  line-height: var(--font-line-height-heading-1);
+  display: flex;
+  justify-content: space-between;
+}
 
 .h1 {
   color: var(--font-color-heading-1);
