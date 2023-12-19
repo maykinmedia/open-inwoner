@@ -10,6 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 import requests_mock
 from cms import api
 from django_webtest import WebTest
+from pyquery import PyQuery as PQ
 from timeline_logger.models import TimelineLog
 from webtest import Upload
 
@@ -32,6 +33,7 @@ from ..models import User
 from .factories import (
     ActionFactory,
     DigidUserFactory,
+    DocumentFactory,
     UserFactory,
     eHerkenningUserFactory,
 )
@@ -125,6 +127,9 @@ class ProfileViewTests(WebTest):
         self.assertContains(response, self.user.housenumber)
         self.assertContains(response, self.user.city)
 
+        # check business profile section not displayed
+        self.assertNotContains(response, "Bedrijfsgegevens")
+
     def test_get_empty_profile_page(self):
         response = self.app.get(self.url, user=self.user)
 
@@ -165,6 +170,9 @@ class ProfileViewTests(WebTest):
         response = self.app.get(self.url, user=user)
         self.assertContains(response, _("My details"))
 
+        # check business profile section not displayed
+        self.assertNotContains(response, "Bedrijfsgegevens")
+
     def test_mydata_not_shown_with_digid_and_no_brp(self):
         user = UserFactory(
             bsn="999993847",
@@ -179,6 +187,29 @@ class ProfileViewTests(WebTest):
     def test_mydata_not_shown_without_digid(self):
         response = self.app.get(self.url, user=self.user)
         self.assertNotContains(response, _("My details"))
+
+    def test_info_eherkenning_user(self):
+        user = eHerkenningUserFactory(
+            company_name="Makers and Shakers",
+            street="Fantasiestraat",
+            housenumber="42",
+            postcode="1234 XY",
+            city="The good place",
+        )
+        response = self.app.get(self.url, user=user)
+
+        self.assertContains(response, "Makers and Shakers")
+        self.assertContains(response, "Fantasiestraat 42")
+        self.assertContains(response, "1234 XY The good place")
+
+        doc = PQ(response.content)
+
+        business_section = doc.find("#business-overview")[0]
+        self.assertEqual(business_section.text, "Bedrijfsgegevens")
+
+        # check personal overview section not displayed
+        personal_section = doc.find("#personal-overview")
+        self.assertEqual(personal_section, [])
 
     def test_active_user_notifications_are_shown(self):
         user = UserFactory(

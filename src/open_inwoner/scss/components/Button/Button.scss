@@ -68,6 +68,10 @@
     width: 100%;
   }
 
+  &--spaceless {
+    padding: 0;
+  }
+
   &#{&}--primary {
     background-color: var(--color-primary);
     border: 1px solid var(--color-primary);
@@ -158,6 +162,10 @@
 
   &--danger-borderless {
     color: var(--color-danger-lighter);
+  }
+
+  &--error {
+    color: var(--color-error-darker);
   }
 
   &--borderless {
