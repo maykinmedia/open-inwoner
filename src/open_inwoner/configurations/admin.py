@@ -136,7 +136,6 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                     "primary_font_color",
                     "secondary_font_color",
                     "accent_font_color",
-                    "theme_stylesheet",
                 )
             },
         ),
@@ -268,6 +267,7 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
             {
                 "classes": ["collapse"],
                 "fields": (
+                    "theme_stylesheet",
                     "extra_css",
                     "extra_css_allowed",
                 ),
