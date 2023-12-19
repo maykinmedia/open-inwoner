@@ -136,6 +136,10 @@ class CategoryDetailView(
 
     @property
     def display_restricted(self):
+        obj = self.get_object()
+        if not obj.visible_for_anonymous and not self.request.user.is_authenticated:
+            return True
+
         config = SiteConfiguration.get_solo()
         return config.hide_categories_from_anonymous_users is True
 

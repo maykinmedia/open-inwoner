@@ -127,7 +127,7 @@ class CategoryListViewTest(TestCase):
 class CategoryDetailViewTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.user = UserFactory()
+        cls.user = DigidUserFactory()
         cls.user.set_password("12345")
         cls.user.email = "test@email.com"
         cls.user.save()
@@ -158,7 +158,7 @@ class CategoryDetailViewTest(TestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_category_detail_view_access_not_restricted(self):
+    def test_category_detail_view_access_restricted_if_invisible(self):
         config = SiteConfiguration.get_solo()
         config.hide_categories_from_anonymous_users = False
         config.save()
@@ -168,24 +168,14 @@ class CategoryDetailViewTest(TestCase):
         # request with anonymous user
         response = self.client.get(url)
 
-        self.assertEqual(response.status_code, 200)
-
-    def test_category_detail_view_access_not_restricted_if_invisible(self):
-        config = SiteConfiguration.get_solo()
-        config.hide_categories_from_anonymous_users = False
-        config.save()
-
-        url = reverse("products:category_detail", kwargs={"slug": self.category.slug})
-
-        # request with anonymous user
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
 
     def test_category_detail_description_rendered(self):
         url = reverse("products:category_detail", kwargs={"slug": self.category.slug})
 
-        response = self.client.get(url)
+        self.client.force_login(self.user)
+
+        response = self.client.get(url, user=self.user)
 
         self.assertIn(
             '<p class="p">A <em>descriptive</em> description</p>',
@@ -200,5 +190,8 @@ class CategoryDetailViewTest(TestCase):
         url = reverse(
             "products:category_detail", kwargs={"slug": f"none/{self.category.slug}"}
         )
-        response = self.client.get(url)
+        self.client.force_login(self.user)
+
+        response = self.client.get(url, user=self.user)
+
         self.assertEqual(response.status_code, 404)
