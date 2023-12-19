@@ -152,6 +152,42 @@ class CategoryAdmin(
         "visible_for_citizens",
     )
     exclude = ("path", "depth", "numchild")
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": (
+                    "name",
+                    "slug",
+                    "description",
+                    "icon",
+                    "image",
+                    "_position",
+                    "_ref_node_id",
+                ),
+            },
+        ),
+        (
+            _("Category permissions"),
+            {
+                "fields": (
+                    "published",
+                    "visible_for_anonymous",
+                    "visible_for_companies",
+                    "visible_for_citizens",
+                ),
+            },
+        ),
+        (
+            _("Category visibility for plugin on homepage"),
+            {
+                "fields": (
+                    "zaaktypen",
+                    "highlighted",
+                ),
+            },
+        ),
+    )
 
     # import-export
     import_template_name = "admin/category_import.html"
