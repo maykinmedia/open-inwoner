@@ -23,6 +23,24 @@
   &.cms-plugin {
     margin-top: var(--gutter-width);
   }
+
+  &.indicator {
+    display: inline-block;
+    overflow: visible;
+    position: relative;
+
+    &:after {
+      content: '';
+      background-color: var(--color-red-notification);
+      border-radius: 100px;
+      display: inline-block;
+      height: 8px;
+      position: absolute;
+      right: -12px;
+      top: 6px;
+      width: 8px;
+    }
+  }
 }
 
 ///
