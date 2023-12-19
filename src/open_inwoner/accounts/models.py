@@ -150,9 +150,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     housenumber = models.CharField(
         verbose_name=_("House number"), default="", blank=True, max_length=250
     )
-    postcode = NLZipCodeField(
-        verbose_name=_("Postcode"), blank=True, default="", max_length=250
-    )
+    postcode = NLZipCodeField(verbose_name=_("Postcode"), blank=True, default="")
     city = models.CharField(
         verbose_name=_("City"),
         default="",
@@ -269,12 +267,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         self._old_bsn = self.bsn
 
     def __str__(self):
-        name = self.get_full_name()
+        identifier = self.company_name if self.kvk else self.get_full_name()
         email = self.get_contact_email()
-        if name and email:
-            return f"{name} ({email})"
+        if identifier and email:
+            return f"{identifier} ({email})"
         else:
-            return name or email or str(self.uuid)[:8]
+            return identifier or email or str(self.uuid)[:8]
 
     def clean(self, *args, **kwargs):
         """Reject non-unique emails, except for users with login_type DigiD"""
@@ -462,6 +460,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         been requested from haal centraal
         """
         return self.is_digid_user and self.is_prepopulated
+
+    @property
+    def is_eherkenning_user(self) -> bool:
+        return self.login_type == LoginTypeChoices.eherkenning
 
 
 class Document(models.Model):

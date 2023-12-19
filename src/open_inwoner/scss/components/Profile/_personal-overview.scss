@@ -1,7 +1,29 @@
 .profile-section {
+  &--bordered {
+    border-bottom: 1px solid var(--color-gray-light);
+    padding-bottom: var(--spacing-large);
+  }
+
   h2,
   .h2 {
-    margin: calc(var(--row-height) * 1.5) 0 0 0;
+    display: block;
+    height: initial;
+    margin: calc(var(--row-height)) 0 0 0;
+
+    @media (min-width: 768px) {
+      display: flex;
+      height: var(--row-height);
+    }
+  }
+
+  .h2 + .grid {
+    margin-top: 0;
+  }
+
+  .profile-list {
+    .list-item--compact {
+      padding: var(--spacing-small) 0;
+    }
   }
 
   .profile-list {
