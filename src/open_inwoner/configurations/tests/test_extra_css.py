@@ -1,3 +1,5 @@
+from django.core.files.base import ContentFile
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import override_settings
 from django.urls import reverse
 from django.utils.html import escape
@@ -5,8 +7,23 @@ from django.utils.html import escape
 from django_webtest import WebTest
 
 from ...cms.tests import cms_tools
-from ...utils.test import ClearCachesMixin
+from ...utils.test import ClearCachesMixin, temp_media_root
 from ..models import SiteConfiguration
+
+
+@temp_media_root()
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+class ThemestylesheetTest(ClearCachesMixin, WebTest):
+    def test_theme_stylesheet_renders_tag(self):
+        cms_tools.create_homepage()
+
+        self.config = SiteConfiguration.get_solo()
+        self.config.theme_stylesheet = ContentFile("text", "my_custom_theme.css")
+        self.config.save()
+
+        response = self.app.get(reverse("pages-root"))
+        response.showbrowser()
+        self.assertContains(response, self.config.theme_stylesheet.url)
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")

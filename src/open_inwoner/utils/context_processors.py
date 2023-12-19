@@ -78,6 +78,9 @@ def settings(request):
         "cookie_link_text": config.cookie_link_text,
         "cookie_link_url": config.cookie_link_url,
         "extra_css": config.extra_css,
+        "theme_stylesheet": (
+            config.theme_stylesheet.url if config.theme_stylesheet else None
+        ),
         "menu_categories": (
             Category.get_root_nodes().published().visible_for_user(request.user)
         ),
