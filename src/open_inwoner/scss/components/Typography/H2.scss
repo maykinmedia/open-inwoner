@@ -1,4 +1,15 @@
+@import '~@utrecht/components/dist/heading-2/css/index.css';
 @import '~microscope-sass/lib/responsive';
+
+.utrecht-heading-2 {
+  display: flex;
+  justify-content: space-between;
+
+  // when CMS is in edit mode
+  &.cms-plugin {
+    margin-top: var(--gutter-width);
+  }
+}
 
 .h2 {
   color: var(--font-color-heading-2);

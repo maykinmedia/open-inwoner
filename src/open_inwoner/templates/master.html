@@ -43,7 +43,7 @@
                 --color-font-accent: {{theming.accent_font_color}};
             }
         </style>
-        {% render_block "css" %}    
+        {% render_block "css" %}
         {% if theme_stylesheet %}
             <link id="theme-css" nonce="{{ request.csp_nonce }}" media="all" rel="stylesheet" href="{{ theme_stylesheet }}" />
         {% endif %}

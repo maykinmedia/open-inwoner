@@ -44,6 +44,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          submodules: 'true'
       - name: Set up backend environment
         uses: maykinmedia/setup-django-backend@v1
         with:
@@ -111,6 +113,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          submodules: 'true'
       - name: Set up backend environment
         uses: maykinmedia/setup-django-backend@v1
         with:
@@ -155,6 +159,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: 'true'
 
       - name: Set tag
         id: vars

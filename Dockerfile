@@ -46,6 +46,9 @@ WORKDIR /app
 COPY ./build /app/build/
 COPY ./*.json ./*.js ./.babelrc /app/
 
+# Clone design token submodule (normally done using git submodule update --init)
+RUN git clone https://github.com/maykinmedia/open-inwoner-design-tokens.git
+
 # install WITH dev tooling
 RUN npm ci --legacy-peer-deps
 

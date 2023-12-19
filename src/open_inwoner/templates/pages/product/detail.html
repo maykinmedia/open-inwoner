@@ -26,8 +26,8 @@
 {% endblock sidebar_content %}
 
 {% block content %}
-    <h1 class="h1" id="title">
-        {{ object.name }}
+    <h1 class="utrecht-heading-1" id="title">
+    {{ object.name }}
         {% if request.user.is_staff %}
             {% button icon="edit" text=_("Bewerken in de Admin") hide_text=True href="admin:pdc_product_change" object_id=object.pk %}
         {% endif %}
