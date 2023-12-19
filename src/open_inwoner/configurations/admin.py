@@ -136,6 +136,7 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                     "primary_font_color",
                     "secondary_font_color",
                     "accent_font_color",
+                    "theme_stylesheet",
                 )
             },
         ),
