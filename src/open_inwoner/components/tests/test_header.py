@@ -61,6 +61,14 @@ class HeaderTest(TestCase):
             visible_for_citizens=True,
             visible_for_companies=True,
         )
+        cls.subcategory = CategoryFactory.build(
+            name="foo",
+            visible_for_anonymous=True,
+            visible_for_citizens=True,
+            visible_for_companies=True,
+        )
+        # Subcategories should not show up
+        cls.published1.add_child(instance=cls.subcategory)
 
     def test_categories_hidden_from_anonymous_users(self):
         config = SiteConfiguration.get_solo()

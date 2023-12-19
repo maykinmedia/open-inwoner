@@ -59,6 +59,14 @@ class TestPublishedCategories(WebTest):
         self.draft2 = CategoryFactory(
             path="0006", name="Sixth one", slug="sixth-one", published=False
         )
+        self.subcategory = CategoryFactory.build(
+            name="foo",
+            visible_for_anonymous=True,
+            visible_for_citizens=True,
+            visible_for_companies=True,
+        )
+        # Subcategories should not show up
+        self.published2.add_child(instance=self.subcategory)
         cms_tools.create_homepage()
 
     def test_only_published_categories_exist_in_breadcrumbs_when_anonymous(self):

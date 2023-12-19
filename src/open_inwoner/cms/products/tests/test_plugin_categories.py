@@ -370,12 +370,14 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
             zaaktypen=[],
             visible_for_citizens=True,
         )
-        cls.category6 = CategoryFactory(
+        cls.category6 = CategoryFactory.build(
             name="foo",
             highlighted=True,
             zaaktypen=["ZAAKTYPE-2020-0000000002"],
             visible_for_citizens=True,
         )
+        # Highlighted subcategories should show up as well
+        cls.category1.add_child(instance=cls.category6)
 
         # Ensure categories are ordered by path
         cls.category6.path = "0009"
