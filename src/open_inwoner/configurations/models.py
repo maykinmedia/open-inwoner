@@ -1,10 +1,12 @@
 from typing import Optional
 
 from django.contrib.flatpages.models import FlatPage
+from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from colorfield.fields import ColorField
+from filer.fields.file import FilerFileField
 from filer.fields.image import FilerImageField
 from ordered_model.models import OrderedModel, OrderedModelManager
 from solo.models import SingletonModel
@@ -476,7 +478,14 @@ class SiteConfiguration(SingletonModel):
             "Enable sharing of products on social media (Facebook, LinkedIn...)",
         ),
     )
-
+    theme_stylesheet = models.FileField(
+        upload_to="themes/",
+        verbose_name=_("Theme stylesheet"),
+        help_text=_("Additional CSS file added to the page."),
+        validators=[FileExtensionValidator(["css"])],
+        blank=True,
+        null=True,
+    )
     extra_css = CSSField(
         blank=True,
         verbose_name=_("Extra CSS"),
@@ -484,7 +493,6 @@ class SiteConfiguration(SingletonModel):
             "Additional CSS added to the page. Note only a (safe) subset of CSS properties is supported."
         ),
     )
-
     # authentication options
     eherkenning_enabled = models.BooleanField(
         verbose_name=_("eHerkenning authentication enabled"),

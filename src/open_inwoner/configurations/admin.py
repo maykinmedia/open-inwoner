@@ -267,6 +267,7 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
             {
                 "classes": ["collapse"],
                 "fields": (
+                    "theme_stylesheet",
                     "extra_css",
                     "extra_css_allowed",
                 ),

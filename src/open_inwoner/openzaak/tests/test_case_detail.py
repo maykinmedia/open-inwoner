@@ -2,6 +2,7 @@ import datetime
 from unittest.mock import patch
 
 from django.contrib.auth.models import AnonymousUser
+from django.test import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -23,7 +24,7 @@ from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory, eHerkenningUserFactory
-from open_inwoner.cms.cases.views.status import SimpleFile
+from open_inwoner.cms.cases.views.status import InnerCaseDetailView, SimpleFile
 from open_inwoner.openzaak.constants import StatusIndicators
 from open_inwoner.openzaak.tests.factories import (
     StatusTranslationFactory,
@@ -204,12 +205,12 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         cls.second_status_preview = StatusType(
             url=cls.status_type_in_behandeling["url"],
             zaaktype=cls.status_type_in_behandeling["zaaktype"],
-            omschrijving=cls.status_type_in_behandeling["omschrijving"],
-            volgnummer=cls.status_type_in_behandeling["volgnummer"],
+            omschrijving="In behandeling",
             omschrijving_generiek=cls.status_type_in_behandeling[
                 "omschrijvingGeneriek"
             ],
             statustekst=cls.status_type_in_behandeling["statustekst"],
+            volgnummer=3,
             is_eindstatus=cls.status_type_in_behandeling["isEindstatus"],
             informeren=cls.status_type_in_behandeling["informeren"],
         )
@@ -624,6 +625,60 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 "new_docs": False,
             },
         )
+
+    def test_second_status_preview(self, m):
+        """Unit test for `InnerCaseDetailView.get_second_status_preview`"""
+
+        request = RequestFactory().get("/")
+        detail_view = InnerCaseDetailView()
+        detail_view.setup(request)
+        detail_view.case = self.zaak
+
+        st1 = StatusType(
+            url="http://statustype_2.com",
+            zaaktype=self.status_type_in_behandeling["zaaktype"],
+            omschrijving=self.status_type_in_behandeling["omschrijving"],
+            volgnummer=2,
+            omschrijving_generiek=self.status_type_in_behandeling[
+                "omschrijvingGeneriek"
+            ],
+            statustekst=self.status_type_in_behandeling["statustekst"],
+            is_eindstatus=self.status_type_in_behandeling["isEindstatus"],
+            informeren=self.status_type_in_behandeling["informeren"],
+        )
+        st2 = StatusType(
+            url="http://statustype_1.com",
+            zaaktype=self.status_type_new["zaaktype"],
+            omschrijving=self.status_type_new["omschrijving"],
+            volgnummer=1,
+            omschrijving_generiek=self.status_type_new["omschrijvingGeneriek"],
+            statustekst=self.status_type_new["statustekst"],
+            is_eindstatus=self.status_type_new["isEindstatus"],
+            informeren=self.status_type_new["informeren"],
+        )
+        st3 = StatusType(
+            url=self.status_type_in_behandeling["url"],
+            zaaktype=self.status_type_in_behandeling["zaaktype"],
+            omschrijving=self.status_type_in_behandeling["omschrijving"],
+            volgnummer=None,
+            omschrijving_generiek=self.status_type_in_behandeling[
+                "omschrijvingGeneriek"
+            ],
+            statustekst=self.status_type_in_behandeling["statustekst"],
+            is_eindstatus=self.status_type_in_behandeling["isEindstatus"],
+            informeren=self.status_type_in_behandeling["informeren"],
+        )
+
+        test_cases = [
+            ([st1, st2], st1),  # OK
+            ([st1, st2, st3], None),  # status_type with volgnummer=None
+            ([st1], None),  # no second status_type
+            ([], None),  # no status_type
+        ]
+        for i, (status_types, result) in enumerate(test_cases):
+            with self.subTest(i=i):
+                res = detail_view.get_second_status_preview(status_types)
+                self.assertEqual(res, result)
 
     @freeze_time("2021-01-12 17:00:00")
     def test_new_docs(self, m):

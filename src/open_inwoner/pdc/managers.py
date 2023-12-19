@@ -84,6 +84,8 @@ class CategoryPublishedQueryset(MP_NodeQuerySet):
         pks = []
         for category in qs:
             for identificatie in category.zaaktypen:
+                if not identificatie in months_since_last_zaak_per_zaaktype:
+                    continue
                 relevante_zaakperiode = zaakperiode_mapping.get(identificatie)
                 if not relevante_zaakperiode:
                     pks.append(category.pk)

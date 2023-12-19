@@ -21,11 +21,7 @@ from view_breadcrumbs import BaseBreadcrumbMixin
 from zgw_consumers.api_models.constants import RolOmschrijving
 
 from open_inwoner.openklant.models import OpenKlantConfig
-from open_inwoner.openklant.wrap import (
-    create_contactmoment,
-    create_klant,
-    fetch_klant_for_bsn,
-)
+from open_inwoner.openklant.wrap import create_contactmoment, create_klant, fetch_klant
 from open_inwoner.openzaak.api_models import Status, StatusType, Zaak
 from open_inwoner.openzaak.cases import (
     connect_case_with_document,
@@ -100,7 +96,7 @@ class InnerCaseDetailView(
     template_name = "pages/cases/status_inner.html"
     form_class = CaseUploadForm
     contact_form_class = CaseContactForm
-    case: Zaak = None
+    case: Optional[Zaak] = None
 
     def __init__(self):
         self.statustype_config_mapping = {
@@ -251,6 +247,10 @@ class InnerCaseDetailView(
         """
         statustype_numbers = [s.volgnummer for s in statustypen]
 
+        # status_types retrieved via eSuite don't always have a volgnummer
+        if not all(statustype_numbers):
+            return
+
         # only 1 statustype for `self.case`
         # (this scenario is blocked by openzaak, but not part of the zgw standard)
         if len(statustype_numbers) < 2:
@@ -279,6 +279,13 @@ class InnerCaseDetailView(
             enabled_for_status_type = self.statustype_config_mapping[
                 self.case.status.statustype.url
             ].document_upload_enabled
+        except AttributeError:
+            logger.info(
+                "Could not retrieve status type for case {case}; "
+                "the status has not been resolved to a ZGW model object.".format(
+                    case=self.case
+                )
+            )
         except KeyError:
             logger.info(
                 "Could not retrieve status type config for url {url}".format(
@@ -693,7 +700,7 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
         except ObjectDoesNotExist:
             ztc = None
 
-        klant = fetch_klant_for_bsn(self.request.user.bsn)
+        klant = fetch_klant(user_bsn=self.request.user.bsn)
         if klant:
             self.log_system_action(
                 "retrieved klant for BSN-user", user=self.request.user

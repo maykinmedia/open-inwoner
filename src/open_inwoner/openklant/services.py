@@ -1,10 +1,10 @@
 from open_inwoner.accounts.models import User
-from open_inwoner.openklant.wrap import fetch_klant_for_bsn
+from open_inwoner.openklant.wrap import fetch_klant
 from open_inwoner.utils.logentry import system_action
 
 
 def update_user_from_klant(user: User):
-    klant = fetch_klant_for_bsn(user.bsn)
+    klant = fetch_klant(user_bsn=user.bsn)
     if not klant:
         return
 

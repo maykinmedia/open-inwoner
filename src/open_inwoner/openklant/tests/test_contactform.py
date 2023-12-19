@@ -9,6 +9,7 @@ import requests_mock
 from django_webtest import WebTest
 
 from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.openklant.api_models import KlantContactRol
 from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.openklant.tests.data import MockAPICreateData
 from open_inwoner.openklant.tests.factories import ContactFormSubjectFactory
@@ -275,6 +276,7 @@ class ContactFormTestCase(
             {
                 "contactmoment": "https://contactmomenten.nl/api/v1/contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
                 "klant": "https://klanten.nl/api/v1/klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+                "rol": KlantContactRol.BELANGHEBBENDE,
             },
         )
         self.assertTimelineLog("created klant for anonymous user")
@@ -419,11 +421,102 @@ class ContactFormTestCase(
             {
                 "contactmoment": "https://contactmomenten.nl/api/v1/contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
                 "klant": "https://klanten.nl/api/v1/klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+                "rol": KlantContactRol.BELANGHEBBENDE,
             },
         )
 
-        self.assertTimelineLog("retrieved klant for BSN-user")
+        self.assertTimelineLog("retrieved klant for BSN or KVK user")
         self.assertTimelineLog("registered contactmoment by API")
+
+    def test_submit_and_register_kvk_or_rsin_user_via_api(self, _m):
+        MockAPICreateData.setUpServices()
+
+        config = OpenKlantConfig.get_solo()
+        config.register_contact_moment = True
+        config.register_bronorganisatie_rsin = "123456789"
+        config.register_type = "Melding"
+        config.register_employee_id = "FooVonBar"
+        config.save()
+
+        for use_rsin_for_innNnpId_query_parameter in [True, False]:
+            with self.subTest(
+                use_rsin_for_innNnpId_query_parameter=use_rsin_for_innNnpId_query_parameter
+            ):
+                # NOTE Explicitly creating a new Mocker object here, because for some reason
+                # `m` is overridden somewhere, which causes issues when `MockAPIData.setUpOASMocks`
+                # is run for the second time
+                with requests_mock.Mocker() as m:
+                    config.use_rsin_for_innNnpId_query_parameter = (
+                        use_rsin_for_innNnpId_query_parameter
+                    )
+                    config.save()
+
+                    data = MockAPICreateData()
+                    data.install_mocks_eherkenning(
+                        m, use_rsin=use_rsin_for_innNnpId_query_parameter
+                    )
+
+                    subject = ContactFormSubjectFactory(
+                        config=config,
+                        subject="Aanvraag document",
+                        subject_code="afdeling-xyz",
+                    )
+
+                    response = self.app.get(self.url, user=data.eherkenning_user)
+
+                    # reset interference from signals
+                    self.clearTimelineLogs()
+                    m.reset_mock()
+
+                    form = response.forms["contactmoment-form"]
+                    self.assertFormExactFields(
+                        form,
+                        (
+                            "subject",
+                            "question",
+                        ),
+                    )
+                    form["subject"].select(text=subject.subject)
+                    form["question"] = "hey!\n\nwaddup?"
+
+                    response = form.submit().follow()
+
+                    msgs = list(response.context["messages"])
+                    self.assertEqual(len(msgs), 1)
+                    self.assertEqual(str(msgs[0]), _("Vraag verstuurd!"))
+                    self.assertEqual(msgs[0].level, messages.SUCCESS)
+
+                    self.assertEqual(len(mail.outbox), 0)
+
+                    for m in data.matchers:
+                        self.assertTrue(m.called_once, str(m._url))
+
+                    contactmoment_create_data = (
+                        data.matchers[1].request_history[0].json()
+                    )
+                    self.assertEqual(
+                        contactmoment_create_data,
+                        {
+                            "medewerkerIdentificatie": {"identificatie": "FooVonBar"},
+                            "bronorganisatie": "123456789",
+                            "tekst": f"Onderwerp: Aanvraag document\n\nhey!\n\nwaddup?",
+                            "type": "Melding",
+                            "kanaal": "Internet",
+                            "onderwerp": "afdeling-xyz",
+                        },
+                    )
+                    kcm_create_data = data.matchers[2].request_history[0].json()
+                    self.assertEqual(
+                        kcm_create_data,
+                        {
+                            "contactmoment": "https://contactmomenten.nl/api/v1/contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
+                            "klant": "https://klanten.nl/api/v1/klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+                            "rol": KlantContactRol.BELANGHEBBENDE,
+                        },
+                    )
+
+                    self.assertTimelineLog("retrieved klant for BSN or KVK user")
+                    self.assertTimelineLog("registered contactmoment by API")
 
     def test_submit_and_register_bsn_user_via_api_and_update_klant(self, m):
         MockAPICreateData.setUpServices()
@@ -494,11 +587,108 @@ class ContactFormTestCase(
             {
                 "contactmoment": "https://contactmomenten.nl/api/v1/contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
                 "klant": "https://klanten.nl/api/v1/klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+                "rol": KlantContactRol.BELANGHEBBENDE,
             },
         )
 
-        self.assertTimelineLog("retrieved klant for BSN-user")
+        self.assertTimelineLog("retrieved klant for BSN or KVK user")
         self.assertTimelineLog(
             "patched klant from user with missing fields: emailadres, telefoonnummer"
         )
         self.assertTimelineLog("registered contactmoment by API")
+
+    def test_submit_and_register_kvk_or_rsin_user_via_api_and_update_klant(self, _m):
+        MockAPICreateData.setUpServices()
+
+        config = OpenKlantConfig.get_solo()
+        config.register_contact_moment = True
+        config.register_bronorganisatie_rsin = "123456789"
+        config.register_type = "Melding"
+        config.register_employee_id = "FooVonBar"
+        config.save()
+
+        for use_rsin_for_innNnpId_query_parameter in [True, False]:
+            with self.subTest(
+                use_rsin_for_innNnpId_query_parameter=use_rsin_for_innNnpId_query_parameter
+            ):
+                # NOTE Explicitly creating a new Mocker object here, because for some reason
+                # `m` is overridden somewhere, which causes issues when `MockAPIData.setUpOASMocks`
+                # is run for the second time
+                with requests_mock.Mocker() as m:
+                    config.use_rsin_for_innNnpId_query_parameter = (
+                        use_rsin_for_innNnpId_query_parameter
+                    )
+                    config.save()
+
+                    data = MockAPICreateData()
+                    data.install_mocks_eherkenning_missing_contact_info(
+                        m, use_rsin=use_rsin_for_innNnpId_query_parameter
+                    )
+
+                    subject = ContactFormSubjectFactory(
+                        config=config,
+                        subject="Aanvraag document",
+                        subject_code="afdeling-xyz",
+                    )
+
+                    response = self.app.get(self.url, user=data.eherkenning_user)
+
+                    # reset interference from signals
+                    self.clearTimelineLogs()
+                    m.reset_mock()
+
+                    form = response.forms["contactmoment-form"]
+                    self.assertFormExactFields(
+                        form,
+                        (
+                            "subject",
+                            "question",
+                        ),
+                    )
+                    form["subject"].select(text=subject.subject)
+                    form["question"] = "hey!\n\nwaddup?"
+
+                    form.submit().follow()
+                    # response tested in other cases
+
+                    for m in data.matchers:
+                        self.assertTrue(m.called_once, str(m._url))
+
+                    klant_patch_data = data.matchers[1].request_history[0].json()
+                    self.assertEqual(
+                        klant_patch_data,
+                        {
+                            "emailadres": data.eherkenning_user.email,
+                            "telefoonnummer": data.eherkenning_user.phonenumber,
+                        },
+                    )
+
+                    contactmoment_create_data = (
+                        data.matchers[2].request_history[0].json()
+                    )
+                    self.assertEqual(
+                        contactmoment_create_data,
+                        {
+                            "medewerkerIdentificatie": {"identificatie": "FooVonBar"},
+                            "bronorganisatie": "123456789",
+                            "tekst": f"Onderwerp: Aanvraag document\n\nhey!\n\nwaddup?",
+                            "type": "Melding",
+                            "kanaal": "Internet",
+                            "onderwerp": "afdeling-xyz",
+                        },
+                    )
+                    kcm_create_data = data.matchers[3].request_history[0].json()
+                    self.assertEqual(
+                        kcm_create_data,
+                        {
+                            "contactmoment": "https://contactmomenten.nl/api/v1/contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
+                            "klant": "https://klanten.nl/api/v1/klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+                            "rol": KlantContactRol.BELANGHEBBENDE,
+                        },
+                    )
+
+                    self.assertTimelineLog("retrieved klant for BSN or KVK user")
+                    self.assertTimelineLog(
+                        "patched klant from user with missing fields: emailadres, telefoonnummer"
+                    )
+                    self.assertTimelineLog("registered contactmoment by API")

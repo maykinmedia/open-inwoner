@@ -229,7 +229,7 @@ class StatusType(ZGWModel):
     url: str  # bug: not required according to OAS
     zaaktype: str
     omschrijving: str
-    volgnummer: int
+    volgnummer: Optional[int]  # not in eSuite
     omschrijving_generiek: str = ""
     statustekst: str = ""
     is_eindstatus: bool = False

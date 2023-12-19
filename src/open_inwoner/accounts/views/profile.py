@@ -32,7 +32,7 @@ from open_inwoner.questionnaire.models import QuestionnaireStep
 from open_inwoner.utils.mixins import ExportMixin
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
-from ...openklant.wrap import fetch_klant_for_bsn, patch_klant
+from ...openklant.wrap import fetch_klant, patch_klant
 from ..forms import BrpUserForm, UserForm, UserNotificationsForm
 from ..models import Action, User
 
@@ -200,7 +200,7 @@ class EditProfileView(
             if user_form_data.get(local_name)
         }
         if update_data:
-            klant = fetch_klant_for_bsn(user.bsn)
+            klant = fetch_klant(user_bsn=user.bsn)
             if klant:
                 self.log_system_action(
                     "retrieved klant for BSN-user", user=self.request.user
