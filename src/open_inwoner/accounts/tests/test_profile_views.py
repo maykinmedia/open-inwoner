@@ -34,7 +34,6 @@ from .factories import (
     ActionFactory,
     DigidUserFactory,
     DocumentFactory,
-    KvKUserFactory,
     UserFactory,
     eHerkenningUserFactory,
 )
@@ -189,8 +188,8 @@ class ProfileViewTests(WebTest):
         response = self.app.get(self.url, user=self.user)
         self.assertNotContains(response, _("My details"))
 
-    def test_info_kvk_user(self):
-        user = KvKUserFactory(
+    def test_info_eherkenning_user(self):
+        user = eHerkenningUserFactory(
             company_name="Makers and Shakers",
             street="Fantasiestraat",
             housenumber="42",
