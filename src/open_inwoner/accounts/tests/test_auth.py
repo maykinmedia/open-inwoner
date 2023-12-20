@@ -19,9 +19,9 @@ from digid_eherkenning_oidc_generics.models import (
     OpenIDConnectEHerkenningConfig,
 )
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.contrib.kvk.models import KvKConfig
-from open_inwoner.contrib.kvk.tests.factories import CertificateFactory
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
+from open_inwoner.kvk.models import KvKConfig
+from open_inwoner.kvk.tests.factories import CertificateFactory
 
 from ...cms.tests import cms_tools
 from ...utils.test import ClearCachesMixin
@@ -574,9 +574,9 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
             f"http://testserver{reverse('django_registration_register')}?invite={invite.key}",
         )
 
-    @patch("open_inwoner.contrib.kvk.client.KvKClient.get_all_company_branches")
+    @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
     @patch(
-        "open_inwoner.contrib.kvk.models.KvKConfig.get_solo",
+        "open_inwoner.kvk.models.KvKConfig.get_solo",
     )
     def test_invite_url_not_in_session_after_successful_login(
         self, mock_solo, mock_kvk
@@ -627,9 +627,9 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
         # check company branch number in session
         self.assertEqual(self.client.session["KVK_BRANCH_NUMBER"], "1234")
 
-    @patch("open_inwoner.contrib.kvk.client.KvKClient.get_all_company_branches")
+    @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
     @patch(
-        "open_inwoner.contrib.kvk.models.KvKConfig.get_solo",
+        "open_inwoner.kvk.models.KvKConfig.get_solo",
     )
     def test_redirect_flow_with_two_company_branches(self, mock_solo, mock_kvk):
         """
@@ -687,9 +687,9 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
         # check company branch number in session
         self.assertEqual(self.client.session["KVK_BRANCH_NUMBER"], "1234")
 
-    @patch("open_inwoner.contrib.kvk.client.KvKClient.get_all_company_branches")
+    @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
     @patch(
-        "open_inwoner.contrib.kvk.models.KvKConfig.get_solo",
+        "open_inwoner.kvk.models.KvKConfig.get_solo",
     )
     def test_redirect_flow_with_no_vestigingsnummer(self, mock_solo, mock_kvk):
         """
@@ -1077,7 +1077,7 @@ class DuplicateEmailRegistrationTest(WebTest):
         self.assertEqual(users.first().email, "test@example.com")
         self.assertEqual(users.last().email, "test@example.com")
 
-    @patch("open_inwoner.contrib.kvk.client.KvKClient.get_all_company_branches")
+    @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
     def test_eherkenning_user_success(self, mock_kvk):
         """Assert that eHerkenning users can register with duplicate emails"""
 

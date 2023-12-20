@@ -17,7 +17,7 @@ from open_inwoner.utils.test import ClearCachesMixin, DisableRequestLogMixin
 @requests_mock.Mocker()
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 @modify_settings(
-    MIDDLEWARE={"remove": ["open_inwoner.contrib.kvk.middleware.KvKLoginMiddleware"]}
+    MIDDLEWARE={"remove": ["open_inwoner.kvk.middleware.KvKLoginMiddleware"]}
 )
 class FetchKlantDataTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
     maxDiff = None

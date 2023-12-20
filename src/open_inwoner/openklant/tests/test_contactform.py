@@ -21,7 +21,7 @@ from open_inwoner.utils.tests.helpers import AssertFormMixin, AssertTimelineLogM
 
 @requests_mock.Mocker()
 @modify_settings(
-    MIDDLEWARE={"remove": ["open_inwoner.contrib.kvk.middleware.KvKLoginMiddleware"]}
+    MIDDLEWARE={"remove": ["open_inwoner.kvk.middleware.KvKLoginMiddleware"]}
 )
 class ContactFormTestCase(
     ClearCachesMixin,

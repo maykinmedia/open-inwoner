@@ -425,8 +425,8 @@ class DigiDOIDCFlowTests(TestCase):
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class eHerkenningOIDCFlowTests(TestCase):
-    @patch("open_inwoner.contrib.kvk.client.KvKClient.get_all_company_branches")
-    @patch("open_inwoner.contrib.kvk.signals.KvKClient.retrieve_rsin_with_kvk")
+    @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
+    @patch("open_inwoner.kvk.signals.KvKClient.retrieve_rsin_with_kvk")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
@@ -492,7 +492,7 @@ class eHerkenningOIDCFlowTests(TestCase):
         self.assertEqual(db_user.first_name, "John")
         self.assertEqual(db_user.last_name, "Doe")
 
-    @patch("open_inwoner.contrib.kvk.signals.KvKClient.retrieve_rsin_with_kvk")
+    @patch("open_inwoner.kvk.signals.KvKClient.retrieve_rsin_with_kvk")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
@@ -584,11 +584,9 @@ class eHerkenningOIDCFlowTests(TestCase):
         self.assertNotIn("oidc_id_token", self.client.session)
 
     @modify_settings(
-        MIDDLEWARE={
-            "remove": ["open_inwoner.contrib.kvk.middleware.KvKLoginMiddleware"]
-        }
+        MIDDLEWARE={"remove": ["open_inwoner.kvk.middleware.KvKLoginMiddleware"]}
     )
-    @patch("open_inwoner.contrib.kvk.client.KvKClient.get_all_company_branches")
+    @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")

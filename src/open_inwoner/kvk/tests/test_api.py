@@ -23,7 +23,7 @@ class KvKAPITest(TestCase):
         cls.kvk_client = KvKClient(config)
 
     def setUp(self):
-        patched_requests = patch("open_inwoner.contrib.kvk.client.requests.get")
+        patched_requests = patch("open_inwoner.kvk.client.requests.get")
         self.mocked_requests = patched_requests.start()
         self.addCleanup(patch.stopall)
 
@@ -192,7 +192,7 @@ class KvKRequestsInterfaceTest(TestCase):
         cls.kvk_client = KvKClient(config)
 
     def setUp(self):
-        patched_requests = patch("open_inwoner.contrib.kvk.client.requests.get")
+        patched_requests = patch("open_inwoner.kvk.client.requests.get")
         self.mocked_requests = patched_requests.start()
         self.addCleanup(patch.stopall)
 

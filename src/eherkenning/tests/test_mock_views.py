@@ -107,7 +107,7 @@ class PasswordLoginViewTests(eHerkenningMockTestCase):
         self.assertContains(response, reverse("eherkenning-mock:login"))
         self.assertNoEHerkenningURLS(response)
 
-    @patch("open_inwoner.contrib.kvk.client.KvKClient.get_all_company_branches")
+    @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
     def test_post_redirects_and_authenticates(self, mock_kvk):
         mock_kvk.return_value = [
             {"kvkNummer": "29664887", "vestigingsnummer": "1234"},
@@ -156,7 +156,7 @@ class PasswordLoginViewTests(eHerkenningMockTestCase):
         # check company branch number in session
         self.assertEqual(self.client.session["KVK_BRANCH_NUMBER"], "1234")
 
-    @patch("open_inwoner.contrib.kvk.client.KvKClient.get_all_company_branches")
+    @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
     def test_redirect_flow_with_single_company(self, mock_kvk):
         """
         Assert that if the KvK API returns only a single company:
@@ -193,7 +193,7 @@ class PasswordLoginViewTests(eHerkenningMockTestCase):
         # check company branch number in session
         self.assertEqual(self.client.session["KVK_BRANCH_NUMBER"], "1234")
 
-    @patch("open_inwoner.contrib.kvk.client.KvKClient.get_all_company_branches")
+    @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
     def test_redirect_flow_with_no_vestigingsnummer(self, mock_kvk):
         """
         Assert that if the KvK API returns only a single company without vestigingsnummer:

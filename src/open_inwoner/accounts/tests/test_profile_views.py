@@ -43,7 +43,7 @@ from .factories import (
 PATCHED_MIDDLEWARE = [
     m
     for m in settings.MIDDLEWARE
-    if m != "open_inwoner.contrib.kvk.middleware.KvKLoginMiddleware"
+    if m != "open_inwoner.kvk.middleware.KvKLoginMiddleware"
 ]
 
 
