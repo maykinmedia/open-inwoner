@@ -4,7 +4,7 @@ from typing import Any, Optional, Union
 
 import requests
 from lxml import etree  # nosec
-from lxml.etree import LxmlError  # nosec
+from lxml.etree import LxmlError, XMLSyntaxError  # nosec
 from xsdata.exceptions import ParserError
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.parsers import XmlParser
@@ -45,7 +45,7 @@ def _get_report_info(
     try:
         tree = etree.fromstring(response.content).getroottree()
         node = tree.find(info_response_node)
-    except LxmlError:
+    except (LxmlError, XMLSyntaxError):
         return None
 
     parser = XmlParser(context=XmlContext(), handler=LxmlEventHandler)

@@ -6,6 +6,7 @@ from django.test import TestCase
 
 import requests_mock
 from lxml import etree
+from requests.exceptions import ConnectionError
 
 from ..client import JaaropgaveClient, UitkeringClient
 from .factories import ConcreteSSDClient, SSDConfigFactory
@@ -124,6 +125,18 @@ class SSDClientRequestInterfaceTest(TestCase):
                 ssd_client.config.service.client_certificate.private_key.path,
             ),
         )
+
+    @patch("open_inwoner.ssd.client.requests.post", side_effect=ConnectionError)
+    def test_requests_exception(self, mock_request_body, mock_request_post):
+        ssd_client = ConcreteSSDClient()
+        ssd_client.config = SSDConfigFactory.build(
+            service__url="https://example.com/soap-service",
+        )
+
+        context = {"bsn": "dummy", "period": "dummy"}
+        response = ssd_client.templated_request(**context)
+
+        self.assertIsNone(response)
 
 
 class UitkeringClientTest(TestCase):
