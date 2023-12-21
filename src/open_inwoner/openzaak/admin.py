@@ -192,6 +192,7 @@ class ZaakTypeStatusTypeConfigInline(admin.StackedInline):
         "zaaktype_uuids",
         "status_indicator",
         "status_indicator_text",
+        "notify_status_change",
         "document_upload_enabled",
         "document_upload_description",
         "description",
