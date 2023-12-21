@@ -83,7 +83,10 @@ class CategoryListView(
     @property
     def display_restricted(self):
         config = SiteConfiguration.get_solo()
-        return config.hide_categories_from_anonymous_users is True
+        return (
+            not self.request.user.is_authenticated
+            and config.hide_categories_from_anonymous_users is True
+        )
 
 
 class CategoryDetailView(
@@ -137,11 +140,25 @@ class CategoryDetailView(
     @property
     def display_restricted(self):
         obj = self.get_object()
-        if not obj.visible_for_anonymous and not self.request.user.is_authenticated:
+
+        if self.request.user.is_authenticated:
+            if self.request.user.bsn:
+                if obj.visible_for_citizens:
+                    return False
+                return True
+            elif self.request.user.kvk:
+                if obj.visible_for_companies:
+                    return False
+                return True
+
+        if not obj.visible_for_anonymous:
             return True
 
         config = SiteConfiguration.get_solo()
-        return config.hide_categories_from_anonymous_users is True
+        return (
+            not self.request.user.is_authenticated
+            and config.hide_categories_from_anonymous_users
+        )
 
 
 class ProductDetailView(

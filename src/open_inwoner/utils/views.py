@@ -54,13 +54,12 @@ class LoginMaybeRequiredMixin(AccessMixin):
     """
     Conditional access control on a per-view basis
 
-    Access to the view is restricted to authenticated users if
-    `self.display_restricted` is `True`, which must be defined on
-    the view inheriting from this Mixin.
+    Access to the view is restricted to users if `self.display_restricted` is `True`,
+    which must be defined on the view inheriting from this Mixin.
     """
 
     def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_authenticated and self.display_restricted:
+        if self.display_restricted:
             return self.handle_no_permission()
         return super().dispatch(request, *args, **kwargs)
 

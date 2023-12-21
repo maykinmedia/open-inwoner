@@ -169,13 +169,51 @@ class CategoryDetailViewTest(TestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, "/accounts/login/?next=/products/test-cat/")
+
+    def test_category_detail_view_access_restricted_for_digid_user(self):
+        category = CategoryFactory.create(
+            name="test cat2",
+            description="A <em>descriptive</em> description",
+            visible_for_citizens=False,
+        )
+        user = DigidUserFactory()
+        self.client.force_login(user)
+
+        url = reverse("products:category_detail", kwargs={"slug": category.slug})
+
+        # request with digid user
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_category_detail_view_access_restricted_for_eherkenning_user(self):
+        category = CategoryFactory.create(
+            name="test cat2",
+            description="A <em>descriptive</em> description",
+            visible_for_companies=False,
+        )
+        user = eHerkenningUserFactory()
+        self.client.force_login(user)
+
+        url = reverse("products:category_detail", kwargs={"slug": category.slug})
+
+        # request with eherkenning user
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 403)
 
     def test_category_detail_description_rendered(self):
+        config = SiteConfiguration.get_solo()
+        config.hide_categories_from_anonymous_users = False
+        config.save()
+
+        self.category.visible_for_anonymous = True
+        self.category.save()
+
         url = reverse("products:category_detail", kwargs={"slug": self.category.slug})
 
-        self.client.force_login(self.user)
-
-        response = self.client.get(url, user=self.user)
+        response = self.client.get(url)
 
         self.assertIn(
             '<p class="p">A <em>descriptive</em> description</p>',
@@ -187,11 +225,17 @@ class CategoryDetailViewTest(TestCase):
         )
 
     def test_category_breadcrumbs_404(self):
+        config = SiteConfiguration.get_solo()
+        config.hide_categories_from_anonymous_users = False
+        config.save()
+
+        self.category.visible_for_anonymous = True
+        self.category.save()
+
         url = reverse(
             "products:category_detail", kwargs={"slug": f"none/{self.category.slug}"}
         )
-        self.client.force_login(self.user)
 
-        response = self.client.get(url, user=self.user)
+        response = self.client.get(url)
 
         self.assertEqual(response.status_code, 404)

@@ -162,4 +162,7 @@ class SearchView(
     @property
     def display_restricted(self):
         config = SiteConfiguration.get_solo()
-        return config.hide_categories_from_anonymous_users
+        return (
+            not self.request.user.is_authenticated
+            and config.hide_categories_from_anonymous_users
+        )
