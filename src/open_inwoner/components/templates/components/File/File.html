@@ -15,7 +15,7 @@
                 {% if recently_added %}
                     <span class="file__file--recent">{% icon icon="fiber_manual_record" outlined=False extra_classes="file__file--recent" %}{% trans "Nieuw" %}</span>
                 {% endif %}
-                <span class="files__name">
+                <span class="file__name">
                     {{ name }}
                     {% if extension and size %}
                         ({{extension}}, {{size|readable_size}})

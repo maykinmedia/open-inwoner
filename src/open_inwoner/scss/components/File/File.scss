@@ -7,6 +7,7 @@
 
   &__file {
     align-items: center;
+    justify-content: space-between;
     border: var(--border-width-thin) solid var(--color-gray);
     border-radius: var(--border-radius);
     box-sizing: border-box;
@@ -19,7 +20,6 @@
     background-color: var(--color-gray-lightest);
     margin: 0;
     box-sizing: content-box;
-
     align-self: stretch;
 
     *[class*='icon'],
@@ -31,12 +31,12 @@
   &__data {
     display: flex;
     flex-direction: column;
-  }
 
-  &__data > * {
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
+    > * {
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
   }
 
   &__file .link,
@@ -50,17 +50,12 @@
     text-decoration: none;
   }
 
-  &__file .p {
-    max-width: 200px;
+  &__file .file__data {
     width: 100%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     line-height: var(--spacing-extra-large);
-
-    @media (min-width: 768px) {
-      max-width: var(--mobile-xs-width);
-    }
   }
 
   &__file .link__text {
@@ -79,7 +74,7 @@
     }
   }
 
-  &__file + .p {
+  &__file + .file__data {
     margin-top: var(--spacing-small);
   }
 
