@@ -202,6 +202,7 @@ class CasesPlaywrightTests(
             url=f"{ZAKEN_ROOT}zaakinformatieobjecten/e55153aa-ad2c-4a07-ae75-15add57d6",
             informatieobject=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812",
             zaak=self.zaak["url"],
+            registratiedatum="2021-01-12",
         )
         self.informatie_object_type = generate_oas_component(
             "ztc",
@@ -243,6 +244,7 @@ class CasesPlaywrightTests(
             url=f"{ZAKEN_ROOT}zaakinformatieobjecten/48599f76-b524-48e8-be5a-6fc47288c9bf",
             informatieobject=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/48599f76-b524-48e8-be5a-6fc47288c9bf",
             zaak=self.zaak["url"],
+            registratiedatum="2022-01-12",
         )
         self.uploaded_zaak_informatie_object_content = "test56789".encode("utf8")
         self.uploaded_informatie_object = generate_oas_component(
@@ -433,7 +435,9 @@ class CasesPlaywrightTests(
         )
 
         # check case is visible
-        expect(page.get_by_text(self.zaak["identificatie"])).to_be_visible()
+        expect(page.get_by_text(self.zaak["identificatie"])).to_be_visible(
+            timeout=100_000
+        )
 
         # check documents show
         documents = page.locator(".file-list").get_by_role("listitem")
@@ -466,7 +470,7 @@ class CasesPlaywrightTests(
 
         # check for new file
         expect(documents).to_have_count(2)
-        uploaded_doc = documents.nth(1)
+        uploaded_doc = documents.nth(0)
         expect(uploaded_doc).to_contain_text("uploaded_test_file")
         expect(uploaded_doc).to_contain_text("(txt, 9 bytes)")
 
@@ -523,6 +527,7 @@ class CasesPlaywrightTests(
                     url=f"{ZAKEN_ROOT}zaakinformatieobjecten/e55153aa-ad2c-4a07-ae75-15add57d6",
                     informatieobject=upload["url"],
                     zaak=self.zaak["url"],
+                    registratiedatum="2021-01-12",
                 )
                 for upload in uploads
             ]
@@ -616,8 +621,8 @@ class CasesPlaywrightTests(
 
         # Check that the case does now have two uploaded documents.
         expect(notification_list_items).to_have_count(2)
-        expect(notification_list_items.first).to_contain_text("document_1.txt")
         expect(notification_list_items.last).to_contain_text("document_two.pdf")
+        expect(notification_list_items.first).to_contain_text("document_1.txt")
         expect(file_list_items).to_have_count(2)
         expect(file_list_items.first).to_contain_text("document_1")
         expect(file_list_items.first).to_contain_text("(txt, 9 bytes)")

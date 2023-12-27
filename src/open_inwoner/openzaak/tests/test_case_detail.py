@@ -293,9 +293,31 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             informatieobject=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812",
             zaak=cls.zaak["url"],
             aardRelatieWeergave="some content",
-            titel="",
+            titel="info object 1",
             beschrijving="",
             registratiedatum="2021-01-12",
+        )
+        cls.zaak_informatie_object_2 = generate_oas_component(
+            "zrc",
+            "schemas/ZaakInformatieObject",
+            url=f"{ZAKEN_ROOT}zaakinformatieobjecten/e55153aa-ad2c-4a07-ae75-15add57d7",
+            informatieobject=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/015c38fe-b010-4412-881c-3000032fb812",
+            zaak=cls.zaak["url"],
+            aardRelatieWeergave="some content",
+            titel="info object 2",
+            beschrijving="",
+            registratiedatum="2021-02-12",
+        )
+        # informatie_object without registratiedatum
+        cls.zaak_informatie_object_no_date = generate_oas_component(
+            "zrc",
+            "schemas/ZaakInformatieObject",
+            url=f"{ZAKEN_ROOT}zaakinformatieobjecten/e55153aa-ad2c-4a07-ae75-15add57d7",
+            informatieobject=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/016c38fe-b010-4412-881c-3000032fb812",
+            zaak=cls.zaak["url"],
+            aardRelatieWeergave="some content",
+            titel="info object 3",
+            beschrijving="",
         )
         cls.informatie_object_type = generate_oas_component(
             "ztc",
@@ -327,6 +349,32 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
             bestandsnaam="uploaded_document.txt",
             titel="uploaded_document_title.txt",
+            bestandsomvang=123,
+        )
+        cls.informatie_object_2 = generate_oas_component(
+            "drc",
+            "schemas/EnkelvoudigInformatieObject",
+            uuid="015c38fe-b010-4412-881c-3000032fb812",
+            url=cls.zaak_informatie_object_2["informatieobject"],
+            inhoud=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/015c38fe-b010-4412-881c-3000032fb812/download",
+            informatieobjecttype=cls.informatie_object_type["url"],
+            status="definitief",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+            bestandsnaam="uploaded_document.txt",
+            titel="another_document_title.txt",
+            bestandsomvang=123,
+        )
+        cls.informatie_object_no_date = generate_oas_component(
+            "drc",
+            "schemas/EnkelvoudigInformatieObject",
+            uuid="015c38fe-b010-4412-881c-3000032fb812",
+            url=cls.zaak_informatie_object_no_date["informatieobject"],
+            inhoud=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/016c38fe-b010-4412-881c-3000032fb812/download",
+            informatieobjecttype=cls.informatie_object_type["url"],
+            status="definitief",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+            bestandsnaam="uploaded_document.txt",
+            titel="yet_another_document_title.txt",
             bestandsomvang=123,
         )
         cls.uploaded_informatie_object = generate_oas_component(
@@ -379,6 +427,29 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             ),
             created=datetime.datetime(2021, 1, 12, 0, 0, 0),
         )
+        cls.informatie_object_file_2 = SimpleFile(
+            name="another_document_title.txt",
+            size=123,
+            url=reverse(
+                "cases:document_download",
+                kwargs={
+                    "object_id": cls.zaak["uuid"],
+                    "info_id": cls.informatie_object_2["uuid"],
+                },
+            ),
+            created=datetime.datetime(2021, 2, 12, 0, 0, 0),
+        )
+        cls.informatie_object_file_no_date = SimpleFile(
+            name="yet_another_document_title.txt",
+            size=123,
+            url=reverse(
+                "cases:document_download",
+                kwargs={
+                    "object_id": cls.zaak["uuid"],
+                    "info_id": cls.informatie_object_no_date["uuid"],
+                },
+            ),
+        )
 
     def _setUpOASMocks(self, m):
         mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
@@ -400,6 +471,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             self.zaaktype,
             self.informatie_object_type,
             self.informatie_object,
+            self.informatie_object_2,
             self.informatie_object_invisible,
             self.zaaktype_informatie_object_type,
             self.status_type_new,
@@ -411,11 +483,18 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         m.post(
             f"{ZAKEN_ROOT}zaakinformatieobjecten",
             status_code=201,
-            json=self.zaak_informatie_object,
+            json=[
+                self.zaak_informatie_object,
+                self.zaak_informatie_object_2,
+            ],
         )
         m.get(
             f"{ZAKEN_ROOT}zaakinformatieobjecten?zaak={self.zaak['url']}",
-            json=[self.zaak_informatie_object, self.zaak_informatie_object_invisible],
+            json=[
+                self.zaak_informatie_object,
+                self.zaak_informatie_object_2,
+                self.zaak_informatie_object_invisible,
+            ],
         )
         m.get(
             f"{ZAKEN_ROOT}zaakinformatieobjecten?zaak={self.zaak_eherkenning['url']}",
@@ -534,8 +613,11 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 ],
                 "second_status_preview": None,
                 "end_statustype_data": None,
-                # only one visible information object
-                "documents": [self.informatie_object_file],
+                # only two visible information objects
+                "documents": [
+                    self.informatie_object_file_2,
+                    self.informatie_object_file,
+                ],
                 "initiator": "Foo Bar van der Bazz",
                 "result": "resultaat toelichting",
                 "result_description": "",
@@ -611,7 +693,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                     "call_to_action_text": "Click me",
                 },
                 # only one visible information object
-                "documents": [self.informatie_object_file],
+                "documents": [
+                    self.informatie_object_file_2,
+                    self.informatie_object_file,
+                ],
                 "initiator": "Foo Bar van der Bazz",
                 "result": "resultaat toelichting",
                 "result_description": "",
@@ -679,6 +764,66 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             with self.subTest(i=i):
                 res = detail_view.get_second_status_preview(status_types)
                 self.assertEqual(res, result)
+
+    def test_document_ordering_by_name(self, m):
+        """
+        Assert that case documents are sorted by name/title if sorting by date does not work
+        """
+        self.maxDiff = None
+        self._setUpMocks(m)
+
+        ZaakTypeStatusTypeConfigFactory.create(
+            statustype_url=self.status_type_new["url"],
+            status_indicator=StatusIndicators.warning,
+            status_indicator_text="foo",
+        )
+        ZaakTypeStatusTypeConfigFactory.create(
+            statustype_url=self.status_type_finish["url"],
+            status_indicator=StatusIndicators.success,
+            status_indicator_text="bar",
+            call_to_action_url="https://www.example.com",
+            call_to_action_text="Click me",
+        )
+
+        # install mocks with additional case documents
+        m.get(self.informatie_object["url"], json=self.informatie_object)
+        m.get(self.informatie_object_2["url"], json=self.informatie_object_2)
+        m.get(
+            self.informatie_object_no_date["url"], json=self.informatie_object_no_date
+        )
+
+        m.post(
+            f"{ZAKEN_ROOT}zaakinformatieobjecten",
+            status_code=201,
+            json=[
+                self.zaak_informatie_object,
+                self.zaak_informatie_object_2,
+                self.zaak_informatie_object_no_date,
+            ],
+        )
+        m.get(
+            f"{ZAKEN_ROOT}zaakinformatieobjecten?zaak={self.zaak['url']}",
+            json=[
+                self.zaak_informatie_object,
+                self.zaak_informatie_object_2,
+                self.zaak_informatie_object_no_date,
+                self.zaak_informatie_object_invisible,
+            ],
+        )
+
+        status_new_obj, status_finish_obj = factory(
+            Status, [self.status_new, self.status_finish]
+        )
+        status_new_obj.statustype = factory(StatusType, self.status_type_new)
+        status_finish_obj.statustype = factory(StatusType, self.status_type_finish)
+
+        response = self.app.get(self.case_detail_url, user=self.user)
+
+        documents = response.context.get("case")["documents"]
+
+        self.assertEqual(documents[0].name, "another_document_title.txt")
+        self.assertEqual(documents[1].name, "uploaded_document_title.txt")
+        self.assertEqual(documents[2].name, "yet_another_document_title.txt")
 
     @freeze_time("2021-01-12 17:00:00")
     def test_new_docs(self, m):
@@ -761,11 +906,11 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
         response = self.app.get(self.case_detail_url, user=self.user)
         documents = response.context.get("case", {}).get("documents")
-        self.assertEquals(len(documents), 1)
+        self.assertEquals(len(documents), 2)
         self.assertEquals(
             documents,
-            # only one visible information object
-            [self.informatie_object_file],
+            # only two visible information objects, newest first
+            [self.informatie_object_file_2, self.informatie_object_file],
         )
 
     def test_user_is_redirected_to_root_when_not_logged_in_via_digid(self, m):

@@ -442,7 +442,7 @@ class InnerCaseDetailView(
             # restructure into something understood by the FileList template tag
             documents.append(
                 SimpleFile(
-                    name=info_obj.titel,
+                    name=getattr(info_obj, "titel", None),
                     size=info_obj.bestandsomvang,
                     url=reverse(
                         "cases:document_download",
@@ -451,11 +451,20 @@ class InnerCaseDetailView(
                             "info_id": info_obj.uuid,
                         },
                     ),
-                    created=case_info_obj.registratiedatum,
+                    created=getattr(case_info_obj, "registratiedatum", None),
                 )
             )
 
-        return documents
+        # `registratiedatum` and `titel` should be present, but not guaranteed by schema
+        try:
+            return sorted(documents, key=lambda doc: doc.created, reverse=True)
+        except TypeError:
+            try:
+                return sorted(
+                    documents, key=lambda doc: doc.name
+                )  # order ascending b/c alphabetical
+            except TypeError:
+                return documents
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
