@@ -42,13 +42,6 @@ class Category(MP_Node):
             "Of het onderwerp zichtbaar moet zijn op het anonieme deel (zonder inloggen)."
         ),
     )
-    visible_for_authenticated = models.BooleanField(
-        verbose_name=_("Beveiligde deel"),
-        default=True,
-        help_text=_(
-            "Of het onderwerp zichtbaar moet zijn op het beveiligde deel (achter inloggen)."
-        ),
-    )
     visible_for_companies = models.BooleanField(
         verbose_name=_("Bedrijven content"),
         default=True,

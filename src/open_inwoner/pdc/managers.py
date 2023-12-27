@@ -7,6 +7,7 @@ from ordered_model.models import OrderedModelQuerySet
 from treebeard.mp_tree import MP_NodeQuerySet
 
 from open_inwoner.accounts.models import User
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openzaak.cases import fetch_cases, resolve_zaak_type
 from open_inwoner.openzaak.models import ZaakTypeConfig
 
@@ -35,7 +36,10 @@ class CategoryPublishedQueryset(MP_NodeQuerySet):
                 return self.filter(visible_for_citizens=True)
             elif user.kvk:
                 return self.filter(visible_for_companies=True)
-            return self.filter(visible_for_authenticated=True)
+
+        config = SiteConfiguration.get_solo()
+        if config.hide_categories_from_anonymous_users:
+            return self.none()
         return self.filter(visible_for_anonymous=True)
 
     def filter_for_user_with_zaken(self, user: User):
