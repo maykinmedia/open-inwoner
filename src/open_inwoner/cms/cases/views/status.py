@@ -269,9 +269,17 @@ class InnerCaseDetailView(
 
     @property
     def is_file_upload_enabled_for_case_type(self) -> bool:
-        return ZaakTypeInformatieObjectTypeConfig.objects.filter_enabled_for_case_type(
-            self.case.zaaktype
-        ).exists()
+        case_upload_enabled = (
+            ZaakTypeInformatieObjectTypeConfig.objects.filter_enabled_for_case_type(
+                self.case.zaaktype
+            ).exists()
+        )
+        logger.info(
+            "Case {url} has case type file upload: {case_upload_enabled}".format(
+                url=self.case.url, case_upload_enabled=case_upload_enabled
+            )
+        )
+        return case_upload_enabled
 
     @property
     def is_file_upload_enabled_for_statustype(self) -> bool:
@@ -286,6 +294,7 @@ class InnerCaseDetailView(
                     case=self.case
                 )
             )
+            return False
         except KeyError:
             logger.info(
                 "Could not retrieve status type config for url {url}".format(
@@ -293,6 +302,13 @@ class InnerCaseDetailView(
                 )
             )
             return False
+        logger.info(
+            "Case {url} status type {status_type} has status type file upload: {enabled_for_status_type}".format(
+                url=self.case.url,
+                status_type=self.case.status.statustype,
+                enabled_for_status_type=enabled_for_status_type,
+            )
+        )
         return enabled_for_status_type
 
     @property
