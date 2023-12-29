@@ -98,7 +98,7 @@ class InnerCaseDetailView(
     contact_form_class = CaseContactForm
     case: Optional[Zaak] = None
 
-    def __init__(self):
+    def dispatch(self, request, *args, **kwargs):
         self.statustype_config_mapping = {
             zaaktype_statustype.statustype_url: zaaktype_statustype
             for zaaktype_statustype in ZaakTypeStatusTypeConfig.objects.all()
@@ -107,6 +107,7 @@ class InnerCaseDetailView(
             zt_resulttype.resultaattype_url: zt_resulttype
             for zt_resulttype in ZaakTypeResultaatTypeConfig.objects.all()
         }
+        return super(InnerCaseDetailView, self).dispatch(request, *args, **kwargs)
 
     @cached_property
     def crumbs(self):
