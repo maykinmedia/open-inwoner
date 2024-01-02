@@ -15,7 +15,6 @@ class NecessaryFieldsMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        return self.get_response(request)
         try:
             necessary_fields_url = reverse("profile:registration_necessary")
         except NoReverseMatch:

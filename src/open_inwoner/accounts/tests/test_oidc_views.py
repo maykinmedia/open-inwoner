@@ -584,7 +584,12 @@ class eHerkenningOIDCFlowTests(TestCase):
         self.assertNotIn("oidc_id_token", self.client.session)
 
     @modify_settings(
-        MIDDLEWARE={"remove": ["open_inwoner.kvk.middleware.KvKLoginMiddleware"]}
+        MIDDLEWARE={
+            "remove": [
+                "open_inwoner.accounts.middleware.NecessaryFieldsMiddleware",
+                "open_inwoner.kvk.middleware.KvKLoginMiddleware",
+            ]
+        }
     )
     @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")

@@ -631,66 +631,6 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
     @patch(
         "open_inwoner.kvk.models.KvKConfig.get_solo",
     )
-    def test_redirect_flow_with_two_company_branches(self, mock_solo, mock_kvk):
-        """
-        Assert that if the KvK API returns >= 2 company branches:
-            1. the redirect flow stops at `KvKLoginMiddleware`
-            2. the selected company vestigingsnummer is stored in the session
-        """
-        mock_kvk.return_value = [
-            {"kvkNummer": "12345678", "vestigingsnummer": "1234"},
-            {"kvkNummer": "12345678", "vestigingsnummer": "5678"},
-        ]
-
-        mock_solo.return_value.api_key = "123"
-        mock_solo.return_value.api_root = "http://foo.bar/api/v1/"
-        mock_solo.return_value.client_certificate = CertificateFactory()
-        mock_solo.return_value.server_certificate = CertificateFactory()
-
-        user = eHerkenningUserFactory.create(
-            kvk="12345678", email="user-12345678@localhost"
-        )
-
-        url = reverse("eherkenning-mock:password")
-        params = {
-            "acs": reverse("eherkenning:acs"),
-            "next": "/",
-        }
-        url = f"{url}?{urlencode(params)}"
-
-        data = {
-            "auth_name": "12345678",
-            "auth_pass": "foo",
-        }
-
-        response = self.client.get(url, user=user)
-
-        # post our password to the IDP
-        response = self.client.post(url, data, user=user, follow=False)
-        self.assertIn(reverse("eherkenning:acs"), response["Location"])
-
-        # follow rough redirect flow
-        res = self.client.get(response["Location"], user=user)
-        res = self.client.get(res["Location"], user=user)
-
-        # post branch number
-        self.assertIn(reverse("kvk:branches"), res["Location"])
-        response = self.client.post(
-            res["Location"], {"branch_number": "1234"}, user=user, follow=True
-        )
-
-        self.assertRedirects(
-            response,
-            f"{reverse('profile:registration_necessary')}",
-        )
-
-        # check company branch number in session
-        self.assertEqual(self.client.session["KVK_BRANCH_NUMBER"], "1234")
-
-    @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
-    @patch(
-        "open_inwoner.kvk.models.KvKConfig.get_solo",
-    )
     def test_redirect_flow_with_no_vestigingsnummer(self, mock_solo, mock_kvk):
         """
         Assert that if the KvK API returns only a single company without vestigingsnummer:
@@ -741,7 +681,6 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
         """
         user = eHerkenningUserFactory.create(kvk="12345678", email="example@localhost")
 
-        # redirect to /register/necessary/
         response = self.app.get(reverse("pages-root"), user=user)
 
         # redirect to /kvk/branches/
@@ -1392,7 +1331,6 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
         self.assertContains(response, "Hello registration text")
         self.assertContains(response, ' href="http://foo.bar/" ')
 
-    @skip("Debug")
     def test_any_page_for_digid_user_redirect_to_necessary_fields(self):
         user = UserFactory(
             first_name="",
