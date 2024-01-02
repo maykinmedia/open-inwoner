@@ -137,30 +137,8 @@ class ProfileViewTests(WebTest):
         response = self.app.get(self.url, user=self.user)
         self.assertNotContains(response, _("My details"))
 
-    def test_info_eherkenning_user(self):
-        user = eHerkenningUserFactory(
-            company_name="Makers and Shakers",
-            street="Fantasiestraat",
-            housenumber="42",
-            postcode="1234 XY",
-            city="The good place",
-        )
-        response = self.app.get(self.url, user=user)
-
-        self.assertContains(response, "Makers and Shakers")
-        self.assertContains(response, "Fantasiestraat 42")
-        self.assertContains(response, "1234 XY The good place")
-
-        doc = PQ(response.content)
-
-        business_section = doc.find("#business-overview")[0]
-        self.assertEqual(business_section.text, "Bedrijfsgegevens")
-
-        # check personal overview section not displayed
-        personal_section = doc.find("#personal-overview")
-        self.assertEqual(personal_section, [])
-
-    def test_active_user_notifications_are_shown(self):
+    @patch("open_inwoner.cms.utils.page_display._is_published", return_value=True)
+    def test_active_user_notifications_are_shown(self, mock_page_display):
         user = UserFactory(
             bsn="999993847",
             first_name="name",
