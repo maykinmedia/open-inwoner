@@ -22,16 +22,19 @@
                         <div class="status-list__notification-content {% if case.end_statustype_data %}status-content--open{% endif %} {% if not case.end_statustype_data %}status-content--open{% endif %}" id="{{ content_id }}">
                             <p class="p p-text p--compact">
                                 {# Configurable texts #}
-                                <span>{{ status.status_indicator_text|default:"" }}</span>
                                 {% if case.end_statustype_data %}<span>{{ status.description|default:"" }}</span>{% endif %}
                                 {% if not case.end_statustype_data %}<span class="status--result">{{ case.result_description|default:"" }}</span>{% endif %}
                             </p>
                             <p class="p p-date p--compact">{{ status.date|date }}</p>
+			    {% if status.call_to_action_url %}
+			    {% button href=status.call_to_action_url text=status.call_to_action_text title=status.call_to_action_text primary=True icon="arrow_forward" icon_position="after" %}
+			    {% else %}
                             <p class="p p__upload {% if case.end_statustype_data %}p__upload--enabled{% endif %}">
                             {% if case.internal_upload_enabled or case.external_upload_enabled %}
                                 {% button href="#documents-upload" text=_("Scroll omlaag") title=_("Ga direct naar document upload sectie.") primary=True icon="arrow_downward" icon_position="after" %}
                             {% endif %}
-                            </p>
+                            </p>			    
+			    {% endif %}
                         </div>
                     </div>
                 </li>
@@ -47,15 +50,9 @@
                         <div class="status-list__notification-content" id="{{ completed_id }}">
                             <p class="p p-text p--compact">
                                 {# Configurable texts #}
-                                <span>{{ status.status_indicator_text|default:"" }}</span>
                                 <span>{{ status.description|default:"" }}</span>
                             </p>
                             <p class="p p-date p--compact">{{ status.date|date }}</p>
-                            <p class="p p__upload {% if case.end_statustype_data %}p__upload--enabled{% endif %}">
-                            {% if case.internal_upload_enabled or case.external_upload_enabled %}
-                                {% button href="#documents-upload" text=_("Scroll omlaag") title=_("Ga direct naar document upload sectie.") primary=True icon="arrow_downward" icon_position="after" %}
-                            {% endif %}
-                            </p>
                         </div>
                     </div>
                 </li>

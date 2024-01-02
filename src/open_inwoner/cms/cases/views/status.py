@@ -176,6 +176,9 @@ class InnerCaseDetailView(
             # The end status data is not passed if the end status has been reached,
             # because in that case the end status data is already included in `statuses`
             end_statustype = next((s for s in statustypen if s.is_eindstatus), None)
+            # eSuite-specific workaround to deal with multiple statustypes per zaaktype having isEindstatus: true
+            if statuses and statuses[-1].statustype and statuses[-1].statustype.is_eindstatus:
+                end_statustype = statuses[-1].statustype
             end_statustype_data = None
             if not status_types.get(end_statustype.url):
                 end_statustype_data = {
