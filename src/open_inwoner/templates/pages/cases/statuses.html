@@ -22,7 +22,6 @@
                         <div class="status-list__notification-content {% if case.end_statustype_data %}status-content--open{% endif %} {% if not case.end_statustype_data %}status-content--open{% endif %}" id="{{ content_id }}">
                             <p class="p p-text p--compact">
                                 {# Configurable texts #}
-                                <span>{{ status.status_indicator_text|default:"" }}</span>
                                 {% if case.end_statustype_data %}<span>{{ status.description|default:"" }}</span>{% endif %}
                                 {% if not case.end_statustype_data %}<span class="status--result">{{ case.result_description|default:"" }}</span>{% endif %}
                             </p>
@@ -47,7 +46,6 @@
                         <div class="status-list__notification-content" id="{{ completed_id }}">
                             <p class="p p-text p--compact">
                                 {# Configurable texts #}
-                                <span>{{ status.status_indicator_text|default:"" }}</span>
                                 <span>{{ status.description|default:"" }}</span>
                             </p>
                             <p class="p p-date p--compact">{{ status.date|date }}</p>
