@@ -1,7 +1,7 @@
 .file {
   &__container {
     &--recent {
-      border-left: var(--border-width-thin) solid var(--color-red);
+      border-left: var(--border-width-thin) solid var(--color-red-notification);
     }
   }
 
@@ -79,7 +79,7 @@
   }
 
   &__file--recent {
-    color: var(--color-red);
+    color: var(--color-red-notification);
     font-size: var(--font-size-body-extra-small);
     vertical-align: middle;
   }
