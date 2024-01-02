@@ -394,9 +394,6 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
         ]:
             m.get(resource["url"], json=resource)
 
-        # TODO
-        # m.get(reverse("kvk:branches"))
-
     def test_list_cases(self, m):
         self._setUpMocks(m)
 
