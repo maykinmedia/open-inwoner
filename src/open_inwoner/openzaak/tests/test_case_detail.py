@@ -152,6 +152,9 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             beginGeldigheid="2020-09-25",
             versiedatum="2020-09-25",
         )
+        cls.zaaktype_config = ZaakTypeConfigFactory.create(
+            identificatie=cls.zaaktype["identificatie"],
+        )
         #
         # statuses
         #
@@ -559,11 +562,13 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.maxDiff = None
 
         ZaakTypeStatusTypeConfigFactory.create(
+            zaaktype_config=self.zaaktype_config,
             statustype_url=self.status_type_new["url"],
             status_indicator=StatusIndicators.warning,
             status_indicator_text="foo",
         )
         ZaakTypeStatusTypeConfigFactory.create(
+            zaaktype_config=self.zaaktype_config,
             statustype_url=self.status_type_finish["url"],
             status_indicator=StatusIndicators.success,
             status_indicator_text="bar",
@@ -636,16 +641,19 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.maxDiff = None
 
         ZaakTypeStatusTypeConfigFactory.create(
+            zaaktype_config=self.zaaktype_config,
             statustype_url=self.status_type_new["url"],
             status_indicator=StatusIndicators.warning,
             status_indicator_text="foo",
         )
         ZaakTypeStatusTypeConfigFactory.create(
+            zaaktype_config=self.zaaktype_config,
             statustype_url=self.status_type_in_behandeling["url"],
             status_indicator=StatusIndicators.success,
             status_indicator_text="zap",
         )
         ZaakTypeStatusTypeConfigFactory.create(
+            zaaktype_config=self.zaaktype_config,
             statustype_url=self.status_type_finish["url"],
             status_indicator=StatusIndicators.success,
             status_indicator_text="bar",

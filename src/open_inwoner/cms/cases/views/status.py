@@ -98,14 +98,20 @@ class InnerCaseDetailView(
     contact_form_class = CaseContactForm
     case: Optional[Zaak] = None
 
-    def __init__(self):
+    def store_statustype_resulttype_mapping(self, zaaktype_identificatie):
+        # Filter on ZaakType identificatie to avoid eSuite situation where one statustype
+        # is linked to multiple zaaktypes
         self.statustype_config_mapping = {
             zaaktype_statustype.statustype_url: zaaktype_statustype
-            for zaaktype_statustype in ZaakTypeStatusTypeConfig.objects.all()
+            for zaaktype_statustype in ZaakTypeStatusTypeConfig.objects.filter(
+                zaaktype_config__identificatie=zaaktype_identificatie
+            )
         }
         self.resulttype_config_mapping = {
             zt_resulttype.resultaattype_url: zt_resulttype
-            for zt_resulttype in ZaakTypeResultaatTypeConfig.objects.all()
+            for zt_resulttype in ZaakTypeResultaatTypeConfig.objects.filter(
+                zaaktype_config__identificatie=zaaktype_identificatie
+            )
         }
 
     @cached_property
@@ -134,6 +140,7 @@ class InnerCaseDetailView(
             # fetch data associated with `self.case`
             documents = self.get_case_document_files(self.case)
             statuses = fetch_status_history(self.case.url)
+            self.store_statustype_resulttype_mapping(self.case.zaaktype.identificatie)
             # NOTE maybe this should be cached?
             statustypen = fetch_status_types_no_cache(self.case.zaaktype.url)
 
