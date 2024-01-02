@@ -160,6 +160,13 @@ class CategoryDetailView(
             and config.hide_categories_from_anonymous_users
         )
 
+    def get_permission_denied_message(self):
+        if self.request.user.is_authenticated:
+            if self.request.user.bsn:
+                return _("This page cannot be accessed by citizens")
+            elif self.request.user.kvk:
+                return _("This page cannot be accessed by companies")
+
 
 class ProductDetailView(
     CommonPageMixin, BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView
