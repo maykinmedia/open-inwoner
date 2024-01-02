@@ -74,6 +74,9 @@ class CompanyBranchChoiceView(FormView):
         )
 
     def post(self, request):
+        if not getattr(request.user, "kvk", None):
+            return HttpResponse(_("Unauthorized"), status=401)
+
         form = self.get_form()
 
         if form.is_valid():
