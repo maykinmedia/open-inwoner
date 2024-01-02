@@ -360,12 +360,22 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.documents.order_by("-created_on")
 
     def get_active_notifications(self) -> str:
+        from open_inwoner.cms.utils.page_display import (
+            case_page_is_published,
+            collaborate_page_is_published,
+            inbox_page_is_published,
+        )
+
         enabled = []
-        if self.cases_notifications and self.login_type == LoginTypeChoices.digid:
+        if (
+            self.cases_notifications
+            and self.login_type == LoginTypeChoices.digid
+            and case_page_is_published()
+        ):
             enabled.append(_("cases"))
-        if self.messages_notifications:
+        if self.messages_notifications and inbox_page_is_published():
             enabled.append(_("messages"))
-        if self.plans_notifications:
+        if self.plans_notifications and collaborate_page_is_published():
             enabled.append(_("plans"))
         if not enabled:
             return _("You do not have any notifications enabled.")
