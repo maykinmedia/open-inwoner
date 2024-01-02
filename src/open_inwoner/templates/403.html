@@ -3,8 +3,9 @@
 {% block menu %}{% endblock %}
 
 {% block content %}
-
-  <h1>Sorry, you don't have access to this page (403)</h1>
-
-
+  {% if exception %}
+    <h1>{{ exception }}</h1>
+  {% else %}
+    <h1>Sorry, you don't have access to this page (403)</h1>
+  {% endif %}
 {% endblock content %}
