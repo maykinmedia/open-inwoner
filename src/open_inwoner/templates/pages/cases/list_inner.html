@@ -16,7 +16,7 @@
             <div class="card__body">
                 <!-- submission cases -->
                 {% if case.case_type == "OpenSubmission" %}
-                    <a href="{{ case.url }}"  class="cases__link">
+                    <a href="{{ case.vervolg_link }}"  class="cases__link">
                     <p class="h4"><span class="link link__text">{{ case.naam }}</span></p>
                     {% render_list %}
                     <span class="case-list">
