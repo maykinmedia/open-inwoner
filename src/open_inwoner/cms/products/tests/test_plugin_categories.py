@@ -386,6 +386,7 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
         cls.category7.save()
 
         cls.user = DigidUserFactory()
+        cls.eherkenning_user = eHerkenningUserFactory(kvk="12345678", rsin="123456789")
 
         # services
         cls.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
@@ -436,7 +437,7 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
             "schemas/Zaak",
             uuid="cc490c2e-210f-49a0-b7c9-546f7ba7a1f6",
             url=f"{ZAKEN_ROOT}zaken/cc490c2e-210f-49a0-b7c9-546f7ba7a1f6",
-            zaaktype=f"{CATALOGI_ROOT}zaaktypen/0caa29cb-0167-426f-8dc1-88bebd7c8804",
+            zaaktype=f"{CATALOGI_ROOT}zaaktypen/b36f3461-0a24-45b1-9702-c4fc84a9810c",
             identificatie="ZAAK-2022-0000000025",
             omschrijving="Zaak naar aanleiding van ingezonden formulier",
             startdatum=(TODAY - relativedelta(months=3, days=10)).strftime("%Y-%m-%d"),
@@ -495,8 +496,8 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
         cls.zaaktype2 = generate_oas_component(
             "ztc",
             "schemas/ZaakType",
-            uuid="0caa29cb-0167-426f-8dc1-88bebd7c8804",
-            url=cls.zaak3["zaaktype"],
+            uuid="b36f3461-0a24-45b1-9702-c4fc84a9810c",
+            url=cls.zaak2["zaaktype"],
             identificatie="ZAAKTYPE-2020-0000000002",
             omschrijving="Tea zaaktype",
             catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
@@ -520,8 +521,8 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
         cls.zaaktype3 = generate_oas_component(
             "ztc",
             "schemas/ZaakType",
-            uuid="bd0fab67-c7b8-429d-973d-7bece55be710",
-            url="http://testserver/zaaktype/bd0fab67-c7b8-429d-973d-7bece55be710",
+            uuid="5465853f-f1e2-45fa-a811-4bbf23648b4f",
+            url=cls.zaak3["zaaktype"],
             identificatie="ZAAKTYPE-2020-0000000003",
             omschrijving="foo zaaktype",
             catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
@@ -598,6 +599,83 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
         self.assertEqual(context["categories"].first(), self.category2)
         self.assertEqual(context["categories"][1], self.category6)
         self.assertEqual(context["categories"].last(), self.category7)
+
+    @requests_mock.Mocker()
+    def test_categories_based_on_cases_for_eherkenning_user(self, m):
+        self._setUpMocks(m)
+
+        for identifier in [self.eherkenning_user.kvk, self.eherkenning_user.rsin]:
+            m.get(
+                furl(f"{ZAKEN_ROOT}zaken")
+                .add(
+                    {
+                        "rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__innNnpId": identifier,
+                        "maximaleVertrouwelijkheidaanduiding": VertrouwelijkheidsAanduidingen.beperkt_openbaar,
+                    }
+                )
+                .url,
+                json=paginated_response([self.zaak, self.zaak3]),
+            )
+
+        for fetch_eherkenning_zaken_with_rsin in [True, False]:
+            with self.subTest(
+                fetch_eherkenning_zaken_with_rsin=fetch_eherkenning_zaken_with_rsin
+            ):
+                self.config.fetch_eherkenning_zaken_with_rsin = (
+                    fetch_eherkenning_zaken_with_rsin
+                )
+                self.config.save()
+
+                html, context = cms_tools.render_plugin(
+                    CategoriesPlugin, user=self.eherkenning_user
+                )
+
+                self.assertEqual(context["categories"].count(), 4)
+                self.assertEqual(context["categories"][0], self.category2)
+                self.assertEqual(context["categories"][1], self.category3)
+                self.assertEqual(context["categories"][2], self.category6)
+                self.assertEqual(context["categories"][3], self.category7)
+
+    @requests_mock.Mocker()
+    def test_categories_based_on_cases_for_eherkenning_user_with_vestigingsnummer(
+        self, m
+    ):
+        self._setUpMocks(m)
+
+        for identifier in [self.eherkenning_user.kvk, self.eherkenning_user.rsin]:
+            m.get(
+                furl(f"{ZAKEN_ROOT}zaken")
+                .add(
+                    {
+                        "rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__innNnpId": identifier,
+                        "maximaleVertrouwelijkheidaanduiding": VertrouwelijkheidsAanduidingen.beperkt_openbaar,
+                        "rol__betrokkeneIdentificatie__vestiging__vestigingsNummer": "1234",
+                    }
+                )
+                .url,
+                json=paginated_response([self.zaak, self.zaak3]),
+            )
+
+        for fetch_eherkenning_zaken_with_rsin in [True, False]:
+            with self.subTest(
+                fetch_eherkenning_zaken_with_rsin=fetch_eherkenning_zaken_with_rsin
+            ):
+                self.config.fetch_eherkenning_zaken_with_rsin = (
+                    fetch_eherkenning_zaken_with_rsin
+                )
+                self.config.save()
+
+                html, context = cms_tools.render_plugin(
+                    CategoriesPlugin,
+                    user=self.eherkenning_user,
+                    session_vars={"KVK_BRANCH_NUMBER": "1234"},
+                )
+
+                self.assertEqual(context["categories"].count(), 4)
+                self.assertEqual(context["categories"][0], self.category2)
+                self.assertEqual(context["categories"][1], self.category3)
+                self.assertEqual(context["categories"][2], self.category6)
+                self.assertEqual(context["categories"][3], self.category7)
 
     @patch(
         "open_inwoner.openzaak.cases.get_paginated_results",

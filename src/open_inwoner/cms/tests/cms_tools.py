@@ -2,6 +2,7 @@ from typing import Tuple
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
+from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import RequestFactory
 from django.utils.module_loading import import_string
 
@@ -43,18 +44,25 @@ def _init_plugin(plugin_class, plugin_data=None) -> Tuple[dict, str]:
     return model_instance
 
 
-def get_request(*, user=None):
-    request = RequestFactory()
+def get_request(*, user=None, session_vars=None):
+    request = RequestFactory().get("/")
     if user:
         request.user = user
     else:
         request.user = AnonymousUser()
+    middleware = SessionMiddleware()
+    middleware.process_request(request)
+    if session_vars:
+        request.session.update(session_vars)
+    request.session.save()
     return request
 
 
-def render_plugin(plugin_class, plugin_data=None, *, user=None) -> Tuple[str, dict]:
+def render_plugin(
+    plugin_class, plugin_data=None, *, user=None, session_vars=None
+) -> Tuple[str, dict]:
     model_instance = _init_plugin(plugin_class, plugin_data)
-    request = get_request(user=user)
+    request = get_request(user=user, session_vars=session_vars)
 
     context = apply_context_processors(request)
 
