@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import TestCase, modify_settings
 
 from pyquery import PyQuery
 
@@ -12,6 +12,7 @@ from open_inwoner.cms.tests import cms_tools
 from open_inwoner.cms.tests.cms_tools import create_apphook_page
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.pdc.tests.factories import CategoryFactory
+from open_inwoner.utils.test import set_kvk_branch_number_in_session
 
 
 class HeaderTest(TestCase):
@@ -128,6 +129,7 @@ class HeaderTest(TestCase):
         self.assertEqual(links[2].attr("href"), self.published2.get_absolute_url())
         self.assertEqual(links[3].attr("href"), self.published4.get_absolute_url())
 
+    @set_kvk_branch_number_in_session()
     def test_categories_visibility_for_eherkenning_users(self):
         config = SiteConfiguration.get_solo()
         config.hide_categories_from_anonymous_users = False

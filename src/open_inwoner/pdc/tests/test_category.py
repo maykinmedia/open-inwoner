@@ -1,7 +1,7 @@
+from django.conf import settings
 from django.test import override_settings
 from django.urls import reverse
 
-from cms import api
 from django_webtest import WebTest
 
 from open_inwoner.accounts.tests.factories import (
@@ -14,8 +14,16 @@ from open_inwoner.questionnaire.tests.factories import QuestionnaireStepFactory
 from ...cms.tests import cms_tools
 from .factories import CategoryFactory
 
+PATCHED_MIDDLEWARE = [
+    m
+    for m in settings.MIDDLEWARE
+    if m != "open_inwoner.kvk.middleware.KvKLoginMiddleware"
+]
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+
+@override_settings(
+    ROOT_URLCONF="open_inwoner.cms.tests.urls", MIDDLEWARE=PATCHED_MIDDLEWARE
+)
 class TestPublishedCategories(WebTest):
     def setUp(self):
         self.user = UserFactory()

@@ -1,11 +1,10 @@
 from datetime import date
-from unittest import skip
 from unittest.mock import patch
 from urllib.parse import urlencode
 
 from django.contrib.sites.models import Site
 from django.core import mail
-from django.test import override_settings
+from django.test import modify_settings, override_settings
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
 
@@ -674,11 +673,26 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
         # check company branch number in session
         self.assertEqual(self.client.session["KVK_BRANCH_NUMBER"], "12345678")
 
-    def test_eherkenning_user_is_redirected_to_necessary_registration(self):
+    @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
+    @patch(
+        "open_inwoner.kvk.models.KvKConfig.get_solo",
+    )
+    def test_eherkenning_user_is_redirected_to_necessary_registration(
+        self, mock_solo, mock_kvk
+    ):
         """
         eHerkenning users that do not have their email filled in should be redirected to
         the registration form
         """
+        mock_kvk.return_value = [
+            {"kvkNummer": "12345678", "vestigingsnummer": "1234"},
+        ]
+
+        mock_solo.return_value.api_key = "123"
+        mock_solo.return_value.api_root = "http://foo.bar/api/v1/"
+        mock_solo.return_value.client_certificate = CertificateFactory()
+        mock_solo.return_value.server_certificate = CertificateFactory()
+
         user = eHerkenningUserFactory.create(kvk="12345678", email="example@localhost")
 
         response = self.app.get(reverse("pages-root"), user=user)
