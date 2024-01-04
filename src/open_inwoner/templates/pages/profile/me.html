@@ -105,6 +105,7 @@
         </div>
     </section>
 
+    {% if view.config.mentors or view.config.my_contacts or view.config.actions or view.config.ssd or view.config.selfdiagnose %}
     {# Overview #}
     <section class="profile-section profile-section__overview">
         <h2 class="h2 title" id="profile-overview">{% trans "Overzicht" %}</h2>
@@ -235,6 +236,7 @@
 
         </div> {# End of cards container #}
     </section>
+    {% endif %}
 
     <section class="tabled profile-section profile-section--bordered">
         <div class="tabled__section">

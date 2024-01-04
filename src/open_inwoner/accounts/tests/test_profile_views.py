@@ -211,7 +211,8 @@ class ProfileViewTests(WebTest):
         personal_section = doc.find("#personal-overview")
         self.assertEqual(personal_section, [])
 
-    def test_active_user_notifications_are_shown(self):
+    @patch("open_inwoner.cms.utils.page_display._is_published", return_value=True)
+    def test_active_user_notifications_are_shown(self, mock_page_display):
         user = UserFactory(
             bsn="999993847",
             first_name="name",
