@@ -33,7 +33,11 @@ from open_inwoner.openzaak.tests.factories import (
     ZaakTypeInformatieObjectTypeConfigFactory,
     ZaakTypeStatusTypeConfigFactory,
 )
-from open_inwoner.utils.test import ClearCachesMixin, paginated_response
+from open_inwoner.utils.test import (
+    ClearCachesMixin,
+    paginated_response,
+    set_kvk_branch_number_in_session,
+)
 
 from ...utils.tests.helpers import AssertRedirectsMixin
 from ..api_models import Status, StatusType
@@ -276,6 +280,19 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 "voornamen": "Foo Bar",
                 "voorvoegselGeslachtsnaam": "van der",
                 "geslachtsnaam": "Bazz",
+            },
+        )
+        cls.eherkenning_user_role_kvk_vestiging = generate_oas_component(
+            "zrc",
+            "schemas/Rol",
+            url=f"{ZAKEN_ROOT}rollen/58ff6286-893f-45cb-a074-9c9c97ec876e",
+            omschrijvingGeneriek=RolOmschrijving.initiator,
+            betrokkeneType=RolTypes.vestiging,
+            betrokkeneIdentificatie={
+                "vestigingsNummer": "1234",
+                "handelsnaam": "Foo Bar",
+                "verblijfsadres" "subVerblijfBuitenland": "van der",
+                "kvkNummer": "Bazz",
             },
         )
         cls.not_initiator_role = generate_oas_component(
@@ -880,6 +897,44 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 self.assertContains(response, "ZAAK-2022-0000000025")
                 self.assertContains(response, "Coffee zaaktype")
 
+    @set_kvk_branch_number_in_session("1234")
+    def test_page_displays_expected_data_for_eherkenning_user_with_vestigingsnummer(
+        self, m
+    ):
+        """
+        In order to have access to a case detail page when logged in as a specific
+        vestiging, that case should have a role with a vestigingsnummer that matches
+        with that branch and also have a role with a KvK/RSIN that matches to the
+        KvK/RSIN of the main branch
+        """
+        self._setUpMocks(m)
+        self.client.force_login(user=self.eherkenning_user)
+
+        m.get(
+            f"{ZAKEN_ROOT}rollen?zaak={self.zaak_eherkenning['url']}",
+            json=paginated_response(
+                [
+                    self.eherkenning_user_role_kvk,
+                    self.eherkenning_user_role_rsin,
+                    self.eherkenning_user_role_kvk_vestiging,
+                ]
+            ),
+        )
+
+        for fetch_eherkenning_zaken_with_rsin in [True, False]:
+            with self.subTest(
+                fetch_eherkenning_zaken_with_rsin=fetch_eherkenning_zaken_with_rsin
+            ):
+                self.config.fetch_eherkenning_zaken_with_rsin = (
+                    fetch_eherkenning_zaken_with_rsin
+                )
+                self.config.save()
+
+                response = self.client.get(self.eherkenning_case_detail_url)
+
+                self.assertContains(response, "ZAAK-2022-0000000025")
+                self.assertContains(response, "Coffee zaaktype")
+
     def test_page_reformats_zaak_identificatie(self, m):
         self._setUpMocks(m)
 
@@ -1018,6 +1073,78 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 response = self.app.get(
                     self.case_detail_url, user=self.eherkenning_user
                 )
+
+                self.assertTemplateUsed("pages/cases/403.html")
+                self.assertContains(
+                    response, _("Sorry, you don't have access to this page (403)")
+                )
+
+    @set_kvk_branch_number_in_session("1234")
+    def test_no_access_as_vestiging_when_no_roles_are_found_for_user_kvk_or_rsin(
+        self, m
+    ):
+        """
+        Just having a role with betrokkeneType vestiging that matches for a case
+        is not sufficient to have access
+        """
+        self._setUpOASMocks(m)
+        self.client.force_login(user=self.eherkenning_user)
+
+        m.get(self.zaak["url"], json=self.zaak)
+        m.get(self.zaaktype["url"], json=self.zaaktype)
+        m.get(
+            f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}",
+            # no main branch roles for our user found
+            json=paginated_response([self.eherkenning_user_role_kvk_vestiging]),
+        )
+
+        for fetch_eherkenning_zaken_with_rsin in [True, False]:
+            with self.subTest(
+                fetch_eherkenning_zaken_with_rsin=fetch_eherkenning_zaken_with_rsin
+            ):
+                self.config.fetch_eherkenning_zaken_with_rsin = (
+                    fetch_eherkenning_zaken_with_rsin
+                )
+                self.config.save()
+
+                response = self.client.get(self.case_detail_url)
+
+                self.assertTemplateUsed("pages/cases/403.html")
+                self.assertContains(
+                    response, _("Sorry, you don't have access to this page (403)")
+                )
+
+    @set_kvk_branch_number_in_session("1234")
+    def test_no_access_as_vestiging_when_no_roles_are_found_for_vestigingsnummer(
+        self, m
+    ):
+        """
+        In order to have access to a case when logged in as a vestiging, that case
+        should have a role with betrokkeneType vestiging and a matching vestigingsnummer
+        """
+        self._setUpOASMocks(m)
+        self.client.force_login(user=self.eherkenning_user)
+
+        m.get(self.zaak["url"], json=self.zaak)
+        m.get(self.zaaktype["url"], json=self.zaaktype)
+        m.get(
+            f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}",
+            # no main branch roles for our user found
+            json=paginated_response(
+                [self.eherkenning_user_role_kvk, self.eherkenning_user_role_rsin]
+            ),
+        )
+
+        for fetch_eherkenning_zaken_with_rsin in [True, False]:
+            with self.subTest(
+                fetch_eherkenning_zaken_with_rsin=fetch_eherkenning_zaken_with_rsin
+            ):
+                self.config.fetch_eherkenning_zaken_with_rsin = (
+                    fetch_eherkenning_zaken_with_rsin
+                )
+                self.config.save()
+
+                response = self.client.get(self.case_detail_url)
 
                 self.assertTemplateUsed("pages/cases/403.html")
                 self.assertContains(
