@@ -86,6 +86,19 @@ class CompanyBranchChoiceView(FormView):
             cleaned = form.cleaned_data
             branch_number = cleaned["branch_number"]
 
+            if not any(
+                branch["kvkNummer"] == branch_number
+                or branch.get("vestigingsnummer") == branch_number
+                for branch in context["company_branches"]
+            ):
+                form.add_error(
+                    "branch_number",
+                    _("Invalid branch number for the current KvK number"),
+                )
+                context["form"] = form
+                # Directly calling `super().form_invalid(form)` would override the error
+                return self.render_to_response(context)
+
             request.session["KVK_BRANCH_NUMBER"] = branch_number
 
             return HttpResponseRedirect(redirect.url)
