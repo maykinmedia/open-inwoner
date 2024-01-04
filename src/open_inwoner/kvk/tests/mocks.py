@@ -24,13 +24,14 @@ simple = {
     ],
 }
 
-multiple = {
+multiple_branches = {
     "pagina": 1,
     "aantal": 2,
     "totaal": 2,
     "resultaten": [
         {
             "kvkNummer": "69599084",
+            "vestigingsnummer": "028435810622",
             "handelsnaam": "Test Stichting Bolderbast",
             "adresType": "bezoekadres",
             "straatnaam": "Oosterwal",
@@ -40,13 +41,17 @@ multiple = {
                 {
                     "rel": "basisprofiel",
                     "href": "https://api.kvk.nl/test/api/v1/basisprofielen/69599068",
-                }
+                },
+                {
+                    "rel": "vestigingsprofiel",
+                    "href": "https://api.kvk.nl/test/api/v1/vestigingsprofielen/028435810622",
+                },
             ],
         },
         {
             "kvkNummer": "69599084",
             "vestigingsnummer": "000038509504",
-            "handelsnaam": "Test EMZ Dagobert",
+            "handelsnaam": "Test Stichting Bolderbast",
             "adresType": "bezoekadres",
             "straatnaam": "Abebe Bikilalaan",
             "plaats": "Amsterdam",

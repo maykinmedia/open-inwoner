@@ -2,6 +2,7 @@ from dataclasses import asdict
 from datetime import date
 from unittest.mock import patch
 
+from django.conf import settings
 from django.template.defaultfilters import date as django_date
 from django.test import override_settings
 from django.urls import reverse
@@ -38,8 +39,17 @@ from .factories import (
     eHerkenningUserFactory,
 )
 
+# Avoid redirects through `KvKLoginMiddleware`
+PATCHED_MIDDLEWARE = [
+    m
+    for m in settings.MIDDLEWARE
+    if m != "open_inwoner.kvk.middleware.KvKLoginMiddleware"
+]
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+
+@override_settings(
+    ROOT_URLCONF="open_inwoner.cms.tests.urls", MIDDLEWARE=PATCHED_MIDDLEWARE
+)
 class ProfileViewTests(WebTest):
     def setUp(self):
         self.url = reverse("profile:detail")

@@ -97,6 +97,9 @@ def button(text, **kwargs):
         if kwargs.get("primary"):
             classnames += " button--primary"
 
+        if kwargs.get("danger"):
+            classnames += " button--danger"
+
         if kwargs.get("secondary"):
             classnames += " button--secondary"
 

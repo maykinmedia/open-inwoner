@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import uuid4
 
-from django.test import override_settings
+from django.test import modify_settings, override_settings
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -16,6 +16,9 @@ from open_inwoner.utils.test import ClearCachesMixin, DisableRequestLogMixin
 
 @requests_mock.Mocker()
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@modify_settings(
+    MIDDLEWARE={"remove": ["open_inwoner.kvk.middleware.KvKLoginMiddleware"]}
+)
 class FetchKlantDataTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
     maxDiff = None
 

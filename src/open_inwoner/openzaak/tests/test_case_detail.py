@@ -1,6 +1,7 @@
 import datetime
 from unittest.mock import patch
 
+from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.test import RequestFactory
 from django.test.utils import override_settings
@@ -40,9 +41,18 @@ from ..models import OpenZaakConfig
 from .factories import CatalogusConfigFactory, ServiceFactory
 from .shared import CATALOGI_ROOT, DOCUMENTEN_ROOT, ZAKEN_ROOT
 
+PATCHED_MIDDLEWARE = [
+    m
+    for m in settings.MIDDLEWARE
+    if m != "open_inwoner.kvk.middleware.KvKLoginMiddleware"
+]
+
 
 @requests_mock.Mocker()
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(
+    ROOT_URLCONF="open_inwoner.cms.tests.urls",
+    MIDDLEWARE=PATCHED_MIDDLEWARE,
+)
 class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
     @classmethod
     def setUpTestData(cls):
@@ -863,7 +873,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 self.config.save()
 
                 response = self.app.get(
-                    self.eherkenning_case_detail_url, user=self.eherkenning_user
+                    self.eherkenning_case_detail_url,
+                    user=self.eherkenning_user,
                 )
 
                 self.assertContains(response, "ZAAK-2022-0000000025")

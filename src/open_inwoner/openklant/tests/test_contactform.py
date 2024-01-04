@@ -2,6 +2,7 @@ import inspect
 
 from django.contrib import messages
 from django.core import mail
+from django.test import modify_settings
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
@@ -19,6 +20,9 @@ from open_inwoner.utils.tests.helpers import AssertFormMixin, AssertTimelineLogM
 
 
 @requests_mock.Mocker()
+@modify_settings(
+    MIDDLEWARE={"remove": ["open_inwoner.kvk.middleware.KvKLoginMiddleware"]}
+)
 class ContactFormTestCase(
     ClearCachesMixin,
     AssertTimelineLogMixin,
