@@ -47,10 +47,10 @@ class CaseAccessMixin(AccessMixin):
 
     Base checks:
     - user is authenticated
-    - user has a BSN
+    - user has a BSN or KvK number
 
     When retrieving a case :
-    - users BSN has a role for this case
+    - users BSN/KVK has a role for this case
     - case confidentiality is not higher than globally configured
     """
 

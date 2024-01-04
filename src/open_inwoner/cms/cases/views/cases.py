@@ -63,7 +63,13 @@ class InnerCaseListView(
             config = OpenZaakConfig.get_solo()
             if config.fetch_eherkenning_zaken_with_rsin:
                 kvk_or_rsin = self.request.user.rsin
-            raw_cases = fetch_cases_by_kvk_or_rsin(kvk_or_rsin=kvk_or_rsin)
+            vestigingsnummer = self.request.session.get("KVK_BRANCH_NUMBER")
+            if vestigingsnummer and vestigingsnummer != self.request.user.kvk:
+                raw_cases = fetch_cases_by_kvk_or_rsin(
+                    kvk_or_rsin=kvk_or_rsin, vestigingsnummer=vestigingsnummer
+                )
+            else:
+                raw_cases = fetch_cases_by_kvk_or_rsin(kvk_or_rsin=kvk_or_rsin)
         else:
             raw_cases = fetch_cases(self.request.user.bsn)
         preprocessed_cases = preprocess_data(raw_cases)
