@@ -43,7 +43,7 @@ def log_user_login(sender, user, request, *args, **kwargs):
     brp_config = HaalCentraalConfig.get_solo()
     oc_config = OpenKlantConfig.get_solo()
 
-    if user.login_type == LoginTypeChoices.digid:
+    if user.login_type in [LoginTypeChoices.digid, LoginTypeChoices.eherkenning]:
         if brp_config.service:
             update_brp_data_in_db(user, initial=False)
 

@@ -21,7 +21,12 @@ from view_breadcrumbs import BaseBreadcrumbMixin
 from zgw_consumers.api_models.constants import RolOmschrijving
 
 from open_inwoner.openklant.models import OpenKlantConfig
-from open_inwoner.openklant.wrap import create_contactmoment, create_klant, fetch_klant
+from open_inwoner.openklant.wrap import (
+    create_contactmoment,
+    create_klant,
+    fetch_klant,
+    get_fetch_parameters,
+)
 from open_inwoner.openzaak.api_models import Status, StatusType, Zaak
 from open_inwoner.openzaak.cases import (
     connect_case_with_document,
@@ -741,7 +746,7 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
         except ObjectDoesNotExist:
             ztc = None
 
-        klant = fetch_klant(user_bsn=self.request.user.bsn)
+        klant = fetch_klant(**get_fetch_parameters(self.request.user))
         if klant:
             self.log_system_action(
                 "retrieved klant for BSN-user", user=self.request.user

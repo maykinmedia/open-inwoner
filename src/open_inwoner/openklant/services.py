@@ -2,13 +2,15 @@ from open_inwoner.accounts.models import User
 from open_inwoner.openklant.wrap import fetch_klant
 from open_inwoner.utils.logentry import system_action
 
+from .wrap import get_fetch_parameters
+
 
 def update_user_from_klant(user: User):
-    klant = fetch_klant(user_bsn=user.bsn)
+    klant = fetch_klant(**get_fetch_parameters(user))
     if not klant:
         return
 
-    system_action("retrieved klant for BSN-user", content_object=user)
+    system_action("retrieved klant for user", content_object=user)
 
     update_data = {}
 
