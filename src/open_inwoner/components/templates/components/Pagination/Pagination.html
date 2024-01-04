@@ -5,6 +5,7 @@
         {% button href=href text=text icon="arrow_backward" %}
     {% endif %}
 
+    {% if page_obj.has_other_pages %}
     <div class="pagination__pages">
         {% if page_obj.has_previous %}
             <a class="pagination__link"
@@ -83,4 +84,5 @@
             <span class="pagination__item">{% icon icon="chevron_right" %}</span>
         {% endif %}
     </div>
+    {% endif %}
 </div>
