@@ -302,7 +302,7 @@ def fetch_roles_for_case_and_bsn(case_url: str, bsn: str) -> List[Rol]:
 
 
 # implicitly cached because it uses fetch_case_roles()
-def fetch_roles_for_case_and_kvk(case_url: str, kvk_or_rsin: str) -> List[Rol]:
+def fetch_roles_for_case_and_kvk_or_rsin(case_url: str, kvk_or_rsin: str) -> List[Rol]:
     """
     note we do a query on all case_roles and then manually filter our roles from the result,
     because e-Suite doesn't support querying on both "zaak" AND "betrokkeneIdentificatie__nietNatuurlijkPersoon__inn_nnp_id"
@@ -318,6 +318,29 @@ def fetch_roles_for_case_and_kvk(case_url: str, kvk_or_rsin: str) -> List[Rol]:
         if role.betrokkene_type == RolTypes.niet_natuurlijk_persoon:
             nnp_id = role.betrokkene_identificatie.get("inn_nnp_id")
             if nnp_id and nnp_id == kvk_or_rsin:
+                roles.append(role)
+
+    return roles
+
+
+def fetch_roles_for_case_and_vestigingsnummer(
+    case_url: str, vestigingsnummer: str
+) -> List[Rol]:
+    """
+    note we do a query on all case_roles and then manually filter our roles from the result,
+    because e-Suite doesn't support querying on both "zaak" AND "rol__betrokkeneIdentificatie__vestiging__vestigingsNummer"
+
+    see Taiga #948
+    """
+    case_roles = fetch_case_roles(case_url)
+    if not case_roles:
+        return []
+
+    roles = []
+    for role in case_roles:
+        if role.betrokkene_type == RolTypes.vestiging:
+            identifier = role.betrokkene_identificatie.get("vestigings_nummer")
+            if identifier and identifier == vestigingsnummer:
                 roles.append(role)
 
     return roles
