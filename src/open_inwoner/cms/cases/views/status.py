@@ -748,12 +748,10 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
 
         klant = fetch_klant(**get_fetch_parameters(self.request.user))
         if klant:
-            self.log_system_action(
-                "retrieved klant for BSN-user", user=self.request.user
-            )
+            self.log_system_action("retrieved klant for user", user=self.request.user)
         else:
             self.log_system_action(
-                "could not retrieve klant for BSN-user", user=self.request.user
+                "could not retrieve klant for user", user=self.request.user
             )
             data = {
                 "bronorganisatie": config.register_bronorganisatie_rsin,
@@ -772,7 +770,7 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
                 )
             else:
                 self.log_system_action(
-                    "could not create klant for BSN-user", user=self.request.user
+                    "could not create klant for user", user=self.request.user
                 )
 
         # create contact moment

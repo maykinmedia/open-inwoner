@@ -38,6 +38,11 @@ class MockAPIReadPatchData(MockAPIData):
             email="old@example.com",
             phonenumber="0100000000",
         )
+        self.eherkenning_user = eHerkenningUserFactory(
+            email="old2@example.com",
+            kvk="12345678",
+            rsin="000000000",
+        )
 
         self.klant_old = generate_oas_component(
             "kc",
@@ -63,6 +68,28 @@ class MockAPIReadPatchData(MockAPIData):
                 f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn={self.user.bsn}",
                 json=paginated_response([self.klant_old]),
             ),
+            m.patch(
+                f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+                json=self.klant_updated,
+                status_code=200,
+            ),
+        ]
+        return self
+
+    def install_mocks_eherkenning(self, m, use_rsin=True) -> "MockAPIReadPatchData":
+        self.setUpOASMocks(m)
+        if use_rsin:
+            first_eherkenning_matcher = m.get(
+                f"{KLANTEN_ROOT}klanten?subjectNietNatuurlijkPersoon__innNnpId={self.eherkenning_user.rsin}",
+                json=paginated_response([self.klant_old]),
+            )
+        else:
+            first_eherkenning_matcher = m.get(
+                f"{KLANTEN_ROOT}klanten?subjectNietNatuurlijkPersoon__innNnpId={self.eherkenning_user.kvk}",
+                json=paginated_response([self.klant_old]),
+            )
+        self.matchers = [
+            first_eherkenning_matcher,
             m.patch(
                 f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
                 json=self.klant_updated,
