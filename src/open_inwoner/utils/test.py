@@ -5,6 +5,8 @@ from typing import Any, Dict, List
 from django.core.cache import caches
 from django.test import override_settings
 
+from open_inwoner.kvk.branches import KVK_BRANCH_SESSION_VARIABLE
+
 
 def temp_media_root():
     # Convenience decorator/context manager to use a temporary directory as
@@ -63,7 +65,7 @@ def set_kvk_branch_number_in_session(value="1234"):
     def decorator(test_func):
         def wrapper(self, *args, **kwargs):
             session = self.client.session
-            session["KVK_BRANCH_NUMBER"] = value
+            session[KVK_BRANCH_SESSION_VARIABLE] = value
             session.save()
             test_func(self, *args, **kwargs)
 
