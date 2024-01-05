@@ -9,6 +9,7 @@ from treebeard.mp_tree import MP_NodeQuerySet
 
 from open_inwoner.accounts.models import User
 from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.kvk.branches import get_kvk_branch_number
 from open_inwoner.openzaak.api_models import Zaak
 from open_inwoner.openzaak.cases import fetch_cases, fetch_cases_by_kvk_or_rsin
 from open_inwoner.openzaak.models import OpenZaakConfig, ZaakTypeConfig
@@ -58,7 +59,7 @@ class CategoryPublishedQueryset(MP_NodeQuerySet):
             config = OpenZaakConfig.get_solo()
             if config.fetch_eherkenning_zaken_with_rsin:
                 kvk_or_rsin = request.user.rsin
-            vestigingsnummer = request.session.get("KVK_BRANCH_NUMBER")
+            vestigingsnummer = get_kvk_branch_number(request.session)
             if vestigingsnummer and vestigingsnummer != request.user.kvk:
                 cases = fetch_cases_by_kvk_or_rsin(
                     kvk_or_rsin=kvk_or_rsin, vestigingsnummer=vestigingsnummer

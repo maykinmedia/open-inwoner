@@ -20,6 +20,7 @@ from open_inwoner.accounts.tests.factories import (
 )
 from open_inwoner.cms.products.cms_apps import ProductsApphook
 from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.kvk.branches import KVK_BRANCH_SESSION_VARIABLE
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.tests.factories import ServiceFactory, ZaakTypeConfigFactory
 from open_inwoner.openzaak.tests.shared import (
@@ -668,7 +669,7 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
                 html, context = cms_tools.render_plugin(
                     CategoriesPlugin,
                     user=self.eherkenning_user,
-                    session_vars={"KVK_BRANCH_NUMBER": "1234"},
+                    session_vars={KVK_BRANCH_SESSION_VARIABLE: "1234"},
                 )
 
                 self.assertEqual(context["categories"].count(), 4)
