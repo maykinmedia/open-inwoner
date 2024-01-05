@@ -226,7 +226,9 @@ class DigiDOIDCFlowTests(TestCase):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
         "digid_eherkenning_oidc_generics.models.OpenIDConnectDigiDConfig.get_solo",
-        return_value=OpenIDConnectDigiDConfig(id=1, enabled=True),
+        return_value=OpenIDConnectDigiDConfig(
+            id=1, enabled=True, identifier_claim_name="sub"
+        ),
     )
     def test_existing_bsn_creates_no_new_user(
         self,
@@ -241,8 +243,7 @@ class DigiDOIDCFlowTests(TestCase):
         # sub is the oidc_id field in our db
         mock_get_userinfo.return_value = {
             "email": "existing_user@example.com",
-            "sub": "some_username",
-            "bsn": "123456782",
+            "sub": "123456782",
         }
         user = DigidUserFactory.create(
             first_name="John",
@@ -286,7 +287,9 @@ class DigiDOIDCFlowTests(TestCase):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
         "digid_eherkenning_oidc_generics.models.OpenIDConnectDigiDConfig.get_solo",
-        return_value=OpenIDConnectDigiDConfig(id=1, enabled=True),
+        return_value=OpenIDConnectDigiDConfig(
+            id=1, enabled=True, identifier_claim_name="sub"
+        ),
     )
     def test_new_user_is_created_when_new_bsn(
         self,
@@ -298,7 +301,7 @@ class DigiDOIDCFlowTests(TestCase):
         mock_brp,
     ):
         # set up a user with a non existing email address
-        mock_get_userinfo.return_value = {"sub": "some_username", "bsn": "000000000"}
+        mock_get_userinfo.return_value = {"sub": "000000000"}
         DigidUserFactory.create(bsn="123456782", email="existing_user@example.com")
         session = self.client.session
         session["oidc_states"] = {"mock": {"nonce": "nonce"}}
@@ -434,7 +437,9 @@ class eHerkenningOIDCFlowTests(TestCase):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
         "digid_eherkenning_oidc_generics.models.OpenIDConnectEHerkenningConfig.get_solo",
-        return_value=OpenIDConnectEHerkenningConfig(id=1, enabled=True),
+        return_value=OpenIDConnectEHerkenningConfig(
+            id=1, enabled=True, identifier_claim_name="sub"
+        ),
     )
     def test_existing_kvk_creates_no_new_user(
         self,
@@ -455,8 +460,7 @@ class eHerkenningOIDCFlowTests(TestCase):
         # sub is the oidc_id field in our db
         mock_get_userinfo.return_value = {
             "email": "existing_user@example.com",
-            "sub": "some_username",
-            "kvk": "12345678",
+            "sub": "12345678",
         }
         user = eHerkenningUserFactory.create(
             first_name="John",
@@ -500,7 +504,9 @@ class eHerkenningOIDCFlowTests(TestCase):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
         "digid_eherkenning_oidc_generics.models.OpenIDConnectEHerkenningConfig.get_solo",
-        return_value=OpenIDConnectEHerkenningConfig(id=1, enabled=True),
+        return_value=OpenIDConnectEHerkenningConfig(
+            id=1, enabled=True, identifier_claim_name="sub"
+        ),
     )
     def test_new_user_is_created_when_new_kvk(
         self,
@@ -513,7 +519,7 @@ class eHerkenningOIDCFlowTests(TestCase):
     ):
         mock_retrieve_rsin_with_kvk.return_value = "123456789"
         # set up a user with a non existing email address
-        mock_get_userinfo.return_value = {"sub": "some_username", "kvk": "00000000"}
+        mock_get_userinfo.return_value = {"sub": "00000000"}
         eHerkenningUserFactory.create(kvk="12345678", email="existing_user@example.com")
         session = self.client.session
         session["oidc_states"] = {"mock": {"nonce": "nonce"}}
