@@ -19,9 +19,6 @@ class CategoriesPlugin(CMSActiveAppMixin, CMSPluginBase):
     app_hook = "ProductsApphook"
     cache = False
 
-    # own variables
-    limit = 4
-
     def render(self, context, instance, placeholder):
         config = OpenZaakConfig.get_solo()
         request = context["request"]
@@ -33,9 +30,9 @@ class CategoriesPlugin(CMSActiveAppMixin, CMSPluginBase):
         if (
             config.enable_categories_filtering_with_zaken
             and request.user.is_authenticated
-            and request.user.bsn
+            and (request.user.bsn or request.user.kvk)
         ):
-            categories |= visible_categories.filter_for_user_with_zaken(request.user)
+            categories |= visible_categories.filter_by_zaken_for_request(request)
 
         context["categories"] = categories.order_by("path")
 

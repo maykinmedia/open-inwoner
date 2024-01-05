@@ -1,4 +1,5 @@
 from datetime import date
+from typing import List
 
 from django.db import models
 
@@ -8,8 +9,10 @@ from treebeard.mp_tree import MP_NodeQuerySet
 
 from open_inwoner.accounts.models import User
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.openzaak.cases import fetch_cases, resolve_zaak_type
-from open_inwoner.openzaak.models import ZaakTypeConfig
+from open_inwoner.kvk.branches import get_kvk_branch_number
+from open_inwoner.openzaak.api_models import Zaak
+from open_inwoner.openzaak.cases import fetch_cases, fetch_cases_by_kvk_or_rsin
+from open_inwoner.openzaak.models import OpenZaakConfig, ZaakTypeConfig
 
 
 class ProductQueryset(models.QuerySet):
@@ -42,13 +45,34 @@ class CategoryPublishedQueryset(MP_NodeQuerySet):
             return self.none()
         return self.filter(visible_for_anonymous=True)
 
-    def filter_for_user_with_zaken(self, user: User):
+    def filter_by_zaken_for_request(self, request):
         """
-        Returns the categories linked to ZaakTypen for which the user has Zaken.
+        Returns the categories linked to ZaakTypen for which the request's user has Zaken.
         """
-        if not getattr(user, "bsn", None):
+        if not request.user.bsn and not request.user.kvk:
             return self
 
+        if request.user.bsn:
+            cases = fetch_cases(request.user.bsn)
+        elif request.user.kvk:
+            kvk_or_rsin = request.user.kvk
+            config = OpenZaakConfig.get_solo()
+            if config.fetch_eherkenning_zaken_with_rsin:
+                kvk_or_rsin = request.user.rsin
+            vestigingsnummer = get_kvk_branch_number(request.session)
+            if vestigingsnummer and vestigingsnummer != request.user.kvk:
+                cases = fetch_cases_by_kvk_or_rsin(
+                    kvk_or_rsin=kvk_or_rsin, vestigingsnummer=vestigingsnummer
+                )
+            else:
+                cases = fetch_cases_by_kvk_or_rsin(kvk_or_rsin=kvk_or_rsin)
+
+        return self.filter_by_zaken(cases)
+
+    def filter_by_zaken(self, cases: List[Zaak]):
+        """
+        Returns the categories linked to ZaakTypen matching with the specified Zaken.
+        """
         zaaktypen = ZaakTypeConfig.objects.all()
         url_to_identificatie_mapping = {
             url: zaaktype.identificatie
@@ -59,8 +83,6 @@ class CategoryPublishedQueryset(MP_NodeQuerySet):
             zaaktype.identificatie: zaaktype.relevante_zaakperiode
             for zaaktype in zaaktypen
         }
-
-        cases = fetch_cases(user.bsn)
 
         months_since_last_zaak_per_zaaktype = {}
         for case in cases:
