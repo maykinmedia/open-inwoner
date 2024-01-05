@@ -47,6 +47,7 @@ def log_user_login(sender, user, request, *args, **kwargs):
         if brp_config.service:
             update_brp_data_in_db(user, initial=False)
 
+    if user.login_type in [LoginTypeChoices.digid, LoginTypeChoices.eherkenning]:
         if oc_config.klanten_service:
             update_user_from_klant(user)
 

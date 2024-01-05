@@ -18,6 +18,7 @@ from webtest import Upload
 from open_inwoner.accounts.choices import StatusChoices
 from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
+from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.pdc.tests.factories import CategoryFactory
 from open_inwoner.plans.tests.factories import PlanFactory
 from open_inwoner.utils.logentry import LOG_ACTIONS
@@ -281,7 +282,9 @@ class ProfileViewTests(WebTest):
         self.assertEqual(link_text(), _("Stuur een bericht"))
 
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(
+    ROOT_URLCONF="open_inwoner.cms.tests.urls", MIDDLEWARE=PATCHED_MIDDLEWARE
+)
 class EditProfileTests(AssertTimelineLogMixin, WebTest):
     def setUp(self):
         self.url = reverse("profile:edit")
@@ -530,10 +533,58 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
                 "telefoonnummer": "0612345678",
             },
         )
-        self.assertTimelineLog("retrieved klant for BSN-user")
+        self.assertTimelineLog("retrieved klant for user")
         self.assertTimelineLog(
             "patched klant from user profile edit with fields: emailadres, telefoonnummer"
         )
+
+    @requests_mock.Mocker()
+    def test_eherkenning_user_updates_klant_api(self, m):
+        MockAPIReadPatchData.setUpServices()
+
+        for use_rsin_for_innNnpId_query_parameter in [True, False]:
+            with self.subTest(
+                use_rsin_for_innNnpId_query_parameter=use_rsin_for_innNnpId_query_parameter
+            ):
+                # NOTE Explicitly creating a new Mocker object here, because for some reason
+                # `m` is overridden somewhere, which causes issues when `MockAPIReadPatchData.install_mocks`
+                # is run for the second time
+                with requests_mock.Mocker() as m:
+                    data = MockAPIReadPatchData().install_mocks_eherkenning(
+                        m, use_rsin=use_rsin_for_innNnpId_query_parameter
+                    )
+
+                    config = OpenKlantConfig.get_solo()
+                    config.use_rsin_for_innNnpId_query_parameter = (
+                        use_rsin_for_innNnpId_query_parameter
+                    )
+                    config.save()
+
+                    response = self.app.get(self.url, user=data.eherkenning_user)
+
+                    # reset noise from signals
+                    m.reset_mock()
+                    self.clearTimelineLogs()
+
+                    form = response.forms["profile-edit"]
+                    form["email"] = "new@example.com"
+                    form["phonenumber"] = "0612345678"
+                    form.submit()
+
+                    # user data tested in other cases
+                    self.assertTrue(data.matchers[0].called)
+                    klant_patch_data = data.matchers[1].request_history[0].json()
+                    self.assertEqual(
+                        klant_patch_data,
+                        {
+                            "emailadres": "new@example.com",
+                            "telefoonnummer": "0612345678",
+                        },
+                    )
+                    self.assertTimelineLog("retrieved klant for user")
+                    self.assertTimelineLog(
+                        "patched klant from user profile edit with fields: emailadres, telefoonnummer"
+                    )
 
     @requests_mock.Mocker()
     def test_modify_phone_updates_klant_api_but_skips_unchanged(self, m):
@@ -579,7 +630,7 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
                 "telefoonnummer": "0612345678",
             },
         )
-        self.assertTimelineLog("retrieved klant for BSN-user")
+        self.assertTimelineLog("retrieved klant for user")
         self.assertTimelineLog(
             "patched klant from user profile edit with fields: telefoonnummer"
         )
@@ -609,7 +660,7 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
                 "emailadres": "new@example.com",
             },
         )
-        self.assertTimelineLog("retrieved klant for BSN-user")
+        self.assertTimelineLog("retrieved klant for user")
         self.assertTimelineLog(
             "patched klant from user profile edit with fields: emailadres"
         )
