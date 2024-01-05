@@ -5,6 +5,7 @@ from django.contrib.auth.mixins import AccessMixin, LoginRequiredMixin
 from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
 
+from open_inwoner.kvk.branches import get_kvk_branch_number
 from open_inwoner.openzaak.api_models import Zaak
 from open_inwoner.openzaak.cases import (
     fetch_roles_for_case_and_bsn,
@@ -81,7 +82,7 @@ class CaseAccessMixin(AccessMixin):
                 if config.fetch_eherkenning_zaken_with_rsin:
                     identifier = self.request.user.rsin
 
-                vestigingsnummer = self.request.session.get("KVK_BRANCH_NUMBER")
+                vestigingsnummer = get_kvk_branch_number(self.request.session)
                 if (
                     vestigingsnummer
                     and vestigingsnummer != self.request.user.kvk

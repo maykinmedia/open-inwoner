@@ -4,6 +4,7 @@ from django.test import TestCase
 from django.urls import reverse_lazy
 
 from open_inwoner.accounts.tests.factories import eHerkenningUserFactory
+from open_inwoner.kvk.branches import KVK_BRANCH_SESSION_VARIABLE, get_kvk_branch_number
 from open_inwoner.kvk.tests.factories import CertificateFactory
 
 
@@ -51,7 +52,7 @@ class KvKViewsTestCase(TestCase):
         response = self.client.post(self.url, data={"branch_number": "1234"})
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(self.client.session["KVK_BRANCH_NUMBER"], "1234")
+        self.assertEqual(get_kvk_branch_number(self.client.session), "1234")
 
     @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
     @patch(
@@ -75,4 +76,4 @@ class KvKViewsTestCase(TestCase):
         response = self.client.post(self.url, data={"branch_number": "4321"})
 
         self.assertEqual(response.status_code, 200)
-        self.assertNotIn("KVK_BRANCH_NUMBER", self.client.session)
+        self.assertNotIn(KVK_BRANCH_SESSION_VARIABLE, self.client.session)

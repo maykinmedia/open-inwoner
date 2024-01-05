@@ -13,6 +13,7 @@ from digid_eherkenning_oidc_generics.models import (
     OpenIDConnectDigiDConfig,
     OpenIDConnectEHerkenningConfig,
 )
+from open_inwoner.kvk.branches import KVK_BRANCH_SESSION_VARIABLE
 
 from ..choices import LoginTypeChoices
 from .factories import DigidUserFactory, UserFactory, eHerkenningUserFactory
@@ -555,7 +556,7 @@ class eHerkenningOIDCFlowTests(TestCase):
         session = self.client.session
         session["oidc_states"] = {"mock": {"nonce": "nonce"}}
         session["oidc_id_token"] = "foo"
-        session["KVK_BRANCH_NUMBER"] = "1234"
+        session[KVK_BRANCH_SESSION_VARIABLE] = "1234"
         session.save()
         logout_url = reverse("eherkenning_oidc:logout")
 

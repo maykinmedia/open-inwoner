@@ -6,6 +6,7 @@ from django.views.generic import TemplateView
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.htmx.mixins import RequiresHtmxMixin
+from open_inwoner.kvk.branches import get_kvk_branch_number
 from open_inwoner.openzaak.cases import (
     fetch_cases,
     fetch_cases_by_kvk_or_rsin,
@@ -63,7 +64,7 @@ class InnerCaseListView(
             config = OpenZaakConfig.get_solo()
             if config.fetch_eherkenning_zaken_with_rsin:
                 kvk_or_rsin = self.request.user.rsin
-            vestigingsnummer = self.request.session.get("KVK_BRANCH_NUMBER")
+            vestigingsnummer = get_kvk_branch_number(self.request.session)
             if vestigingsnummer and vestigingsnummer != self.request.user.kvk:
                 raw_cases = fetch_cases_by_kvk_or_rsin(
                     kvk_or_rsin=kvk_or_rsin, vestigingsnummer=vestigingsnummer

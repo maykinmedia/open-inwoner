@@ -6,6 +6,8 @@ from django.views.generic import FormView
 
 from furl import furl
 
+from open_inwoner.kvk.branches import KVK_BRANCH_SESSION_VARIABLE
+
 from .client import KvKClient
 from .forms import CompanyBranchChoiceForm
 
@@ -56,7 +58,7 @@ class CompanyBranchChoiceView(FormView):
             return HttpResponseRedirect(redirect.url)
 
         if len(company_branches) == 1:
-            request.session["KVK_BRANCH_NUMBER"] = (
+            request.session[KVK_BRANCH_SESSION_VARIABLE] = (
                 company_branches[0].get("vestigingsnummer") or request.user.kvk
             )
             request.session.save()
@@ -99,7 +101,7 @@ class CompanyBranchChoiceView(FormView):
                 # Directly calling `super().form_invalid(form)` would override the error
                 return self.render_to_response(context)
 
-            request.session["KVK_BRANCH_NUMBER"] = branch_number
+            request.session[KVK_BRANCH_SESSION_VARIABLE] = branch_number
 
             return HttpResponseRedirect(redirect.url)
 
