@@ -183,7 +183,10 @@ export class FileInput extends Component {
   addFiles(files) {
     const input = this.getInput()
     const dataTransfer = new DataTransfer()
-    const _files = input.multiple ? [...files] : [files[0]]
+    // Ensure the previously selected files are added as well
+    const _files = input.multiple
+      ? [...input.files, ...files]
+      : [...input.files, files[0]]
 
     _files.filter((v) => v).forEach((file) => dataTransfer.items.add(file))
     input.files = dataTransfer.files
