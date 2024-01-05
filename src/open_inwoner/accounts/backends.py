@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.hashers import check_password
+from django.urls import reverse_lazy
 
 from axes.backends import AxesBackend
 from mozilla_django_oidc_db.backends import OIDCAuthenticationBackend
@@ -70,6 +71,16 @@ class CustomAxesBackend(AxesBackend):
 
 
 class CustomOIDCBackend(OIDCAuthenticationBackend):
+    callback_path = reverse_lazy("oidc_authentication_callback")
+
+    def authenticate(self, request, *args, **kwargs):
+        # Avoid attempting OIDC for a specific variant if we know that that is not the
+        # correct variant being attempted
+        if request and request.path != self.callback_path:
+            return
+
+        return super().authenticate(request, *args, **kwargs)
+
     def create_user(self, claims):
         """
         Return object for a newly created user account.
