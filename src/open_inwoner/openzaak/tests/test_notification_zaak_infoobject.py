@@ -71,6 +71,48 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
             level=logging.INFO,
         )
 
+    def test_zio_handle_zaken_notification_niet_natuurlijk_persoon_initiator(
+        self, m, mock_handle: Mock
+    ):
+        """
+        happy-flow from valid data calls the (mocked) handle_zaakinformatieobject() for
+        niet natuurlijk persoon initiator
+        """
+        data = MockAPIData().install_mocks(m)
+
+        ZaakTypeInformatieObjectTypeConfigFactory.from_case_type_info_object_dicts(
+            data.zaak_type, data.informatie_object, document_notification_enabled=True
+        )
+
+        config = OpenZaakConfig.get_solo()
+        for fetch_eherkenning_zaken_with_rsin in [True, False]:
+            with self.subTest(
+                fetch_eherkenning_zaken_with_rsin=fetch_eherkenning_zaken_with_rsin
+            ):
+                mock_handle.reset_mock()
+                self.clearTimelineLogs()
+
+                config.fetch_eherkenning_zaken_with_rsin = (
+                    fetch_eherkenning_zaken_with_rsin
+                )
+                config.save()
+
+                handle_zaken_notification(data.zio_notification2)
+
+                mock_handle.assert_called_once()
+
+                # check call arguments
+                args = mock_handle.call_args.args
+                self.assertEqual(args[0], data.eherkenning_user_initiator)
+                self.assertEqual(args[1].url, data.zaak2["url"])
+                self.assertEqual(args[2].url, data.zaak_informatie_object2["url"])
+
+                self.assertTimelineLog(
+                    "accepted zaakinformatieobject notification: attempt informing users ",
+                    lookup=Lookups.startswith,
+                    level=logging.INFO,
+                )
+
     # start of generic checks
 
     def test_zio_bails_when_bad_notification_channel(self, m, mock_handle: Mock):

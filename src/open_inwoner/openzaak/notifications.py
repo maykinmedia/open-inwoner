@@ -419,16 +419,55 @@ def get_np_initiator_bsns_from_roles(roles: List[Rol]) -> List[str]:
     return list(ret)
 
 
+def get_nnp_initiator_nnp_id_from_roles(roles: List[Rol]) -> List[str]:
+    """
+    iterate over Rollen and for all non-natural-person initiators return their nnpId
+    """
+    ret = set()
+
+    for role in roles:
+        if role.omschrijving_generiek not in (
+            RolOmschrijving.initiator,
+            RolOmschrijving.medeinitiator,
+        ):
+            continue
+        if role.betrokkene_type != RolTypes.niet_natuurlijk_persoon:
+            continue
+        if not role.betrokkene_identificatie:
+            continue
+        nnp_id = role.betrokkene_identificatie.get("inn_nnp_id")
+        if not nnp_id:
+            continue
+        ret.add(nnp_id)
+
+    return list(ret)
+
+
 def get_emailable_initiator_users_from_roles(roles: List[Rol]) -> List[User]:
     """
     iterate over Rollen and return User objects for all natural-person initiators we can notify
     """
+    users = []
+
     bsn_list = get_np_initiator_bsns_from_roles(roles)
-    if not bsn_list:
-        return []
-    users = list(
-        User.objects.filter(
-            bsn__in=bsn_list, is_active=True, cases_notifications=True
-        ).having_usable_email()
-    )
+    if bsn_list:
+        users += list(
+            User.objects.filter(
+                bsn__in=bsn_list, is_active=True, cases_notifications=True
+            ).having_usable_email()
+        )
+
+    nnp_id_list = get_nnp_initiator_nnp_id_from_roles(roles)
+    if nnp_id_list:
+        config = OpenZaakConfig.get_solo()
+        if config.fetch_eherkenning_zaken_with_rsin:
+            id_filter = {"rsin__in": nnp_id_list}
+        else:
+            id_filter = {"kvk__in": nnp_id_list}
+        users += list(
+            User.objects.filter(
+                is_active=True, cases_notifications=True, **id_filter
+            ).having_usable_email()
+        )
+
     return users
