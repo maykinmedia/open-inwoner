@@ -162,7 +162,7 @@ export class FileInput extends Component {
 
     const files = [...input.files].filter((_, i) => i !== index)
 
-    this.addFiles(files)
+    this.addFiles(files, true)
 
     // We need to render manually since we're not making state changes.
     this.render()
@@ -179,11 +179,21 @@ export class FileInput extends Component {
   /**
    * Adds files in dataTransfer to input, only the first item is added if not `[multiple]`.
    * @param {File[]} files
+   * @param {boolean} removeCurrent=false
    */
-  addFiles(files) {
+  addFiles(files, removeCurrent = false) {
     const input = this.getInput()
     const dataTransfer = new DataTransfer()
-    const _files = input.multiple ? [...files] : [files[0]]
+    // Ensure the previously selected files are added as well
+
+    let _files
+    if (removeCurrent) {
+      _files = input.multiple ? [...files] : [files[0]]
+    } else {
+      _files = input.multiple
+        ? [...input.files, ...files]
+        : [...input.files, files[0]]
+    }
 
     _files.filter((v) => v).forEach((file) => dataTransfer.items.add(file))
     input.files = dataTransfer.files
