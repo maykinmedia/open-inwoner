@@ -162,7 +162,8 @@ export class FileInput extends Component {
 
     const files = [...input.files].filter((_, i) => i !== index)
 
-    this.addFiles(files)
+    this.addFiles(files, true)
+    this.files = files
 
     // We need to render manually since we're not making state changes.
     this.render()
@@ -179,17 +180,25 @@ export class FileInput extends Component {
   /**
    * Adds files in dataTransfer to input, only the first item is added if not `[multiple]`.
    * @param {File[]} files
+   * @param {boolean} removeCurrent=false
    */
-  addFiles(files) {
+  addFiles(files, removeCurrent = false) {
     const input = this.getInput()
     const dataTransfer = new DataTransfer()
     // Ensure the previously selected files are added as well
-    const _files = input.multiple
-      ? [...input.files, ...files]
-      : [...input.files, files[0]]
+
+    let _files
+    if (removeCurrent) {
+      _files = input.multiple ? [...files] : [files[0]]
+    } else {
+      _files = input.multiple
+        ? [...input.files, ...files]
+        : [...input.files, files[0]]
+    }
 
     _files.filter((v) => v).forEach((file) => dataTransfer.items.add(file))
     input.files = dataTransfer.files
+    this.files = _files
   }
 
   /**
@@ -197,8 +206,18 @@ export class FileInput extends Component {
    * NOTE: We inspect the actual input here to obtain the `FileList` state.
    * NOTE: CHANGE EVENT MAY BE BYPASSED WHEN USING HTMX.
    */
-  render() {
-    const { files } = this.getInput()
+  render(e) {
+    let { files } = this.getInput()
+
+    // Bugfix for https://taiga.maykinmedia.nl/project/open-inwoner/task/1975
+    // Selecting files using the select window triggers a change event and would normally
+    // overwrite the previously selected files, so the previously selected files need to
+    // be stored and joined with the newly uploaded files, to avoid the selection from being overwritten
+    if (e && e.type === 'change') {
+      files = [...(this.files || []), ...files]
+      this.addFiles(files, true)
+    }
+
     const filesSection = this.getFilesSection()
     const additionalLabel = this.getLabelSelected()
     const emptyLabel = this.getLabelEmpty()
