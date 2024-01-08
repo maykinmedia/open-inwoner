@@ -35,6 +35,17 @@ class OpenIDConnectBaseConfig(CachingMixin, OpenIDConnectConfigBase):
         blank=True,
     )
 
+    error_message_mapping = models.JSONField(
+        _("Error message mapping"),
+        max_length=1000,
+        help_text=_(
+            "Mapping that maps error messages returned by the identity provider "
+            "to human readable error messages that are shown to the user"
+        ),
+        default=dict,
+        blank=True,
+    )
+
     # Keycloak specific config
     oidc_keycloak_idp_hint = models.CharField(
         _("Keycloak Identity Provider hint"),

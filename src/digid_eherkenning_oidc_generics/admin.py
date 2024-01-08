@@ -25,6 +25,7 @@ class OpenIDConnectConfigBaseAdmin(DynamicArrayMixin, SingletonModelAdmin):
                     "oidc_rp_sign_algo",
                     "oidc_rp_idp_sign_key",
                     "userinfo_claims_source",
+                    "error_message_mapping",
                 )
             },
         ),
