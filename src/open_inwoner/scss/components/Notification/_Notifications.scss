@@ -1,4 +1,5 @@
 .notifications {
+  position: sticky;
   top: var(--spacing-extra-large);
   display: flex;
   flex-direction: column;

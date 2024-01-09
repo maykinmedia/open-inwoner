@@ -3,6 +3,14 @@
     margin: var(--spacing-extra-large) 0;
   }
 
+  .document-upload {
+    &-notification {
+      .notifications {
+        position: static;
+      }
+    }
+  }
+
   /// cards on case detail
   .card {
     margin-bottom: var(--spacing-extra-large);
