@@ -2,8 +2,8 @@
 @import '~microscope-sass/lib/responsive';
 
 .utrecht-heading-2 {
-  display: flex;
-  justify-content: space-between;
+  display: var(--oip-typography-heading-display);
+  justify-content: var(--oip-typography-heading-justify-content);
 
   // when CMS is in edit mode
   &.cms-plugin {
