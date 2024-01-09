@@ -19,7 +19,7 @@
     {% if field.errors %}{% errors errors=field.errors %}{% endif %}
 
     <div class="file-list" aria-live="polite">
-        <h4 class="h4">{% if multiple %}{% trans 'Geselecteerde bestanden' %}{% else %}{% trans 'Geselecteerd bestand' %}{% endif %}</h4>
+        <div class="file-list-selection" hidden><h4 class="file-list-selection__h4">{% if multiple %}{% trans 'Geselecteerde bestanden' %}{% else %}{% trans 'Geselecteerd bestand' %}{% endif %}</h4></div>
         <ul class="file-list__list" aria-live="polite" data-label-delete="{% trans 'Verwijderen' %}"></ul>
     </div>
 </div>

@@ -34,6 +34,18 @@
     .button--primary[type='submit'] {
       justify-content: center;
       width: 100%;
+
+      &:disabled {
+        @extend .button--disabled;
+        background-color: var(--color-gray);
+        border-color: var(--color-gray);
+        color: var(--color-gray-90);
+        cursor: default;
+        font-weight: bold;
+        justify-content: center;
+        pointer-events: none;
+        width: 100%;
+      }
     }
 
     &:invalid [type='submit'] {
@@ -52,6 +64,14 @@
     .form__actions {
       display: block;
       margin: 0;
+
+      &-selection__h4 {
+        color: var(--font-color-heading-4);
+        font-family: var(--font-family-heading-4);
+        font-size: var(--font-size-heading-4);
+        font-weight: var(--font-weight-heading-4);
+        line-height: var(--font-line-height-heading-4);
+      }
     }
 
     /// Make required asterisk visible for this component
