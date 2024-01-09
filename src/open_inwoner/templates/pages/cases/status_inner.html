@@ -26,7 +26,10 @@
                 <h2 class="h2" id="documents-upload">{% trans "Documenten" %}</h2>
                 <h3 class="h3 documents-upload__h3">{% trans "Voeg documenten toe" %}</h3>
 
+                <div class="document-upload-notification">
                 {% notifications messages show_local_messages=True closable=False %}
+                </div>
+
 
                 {% if case.case_type_document_upload_description %}
                 <div class="card card--compact card--info">
