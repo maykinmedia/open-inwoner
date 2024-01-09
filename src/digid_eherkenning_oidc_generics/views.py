@@ -2,6 +2,8 @@ import logging
 
 from django.conf import settings
 from django.contrib import auth, messages
+from django.core.exceptions import ValidationError
+from django.db import IntegrityError, transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import resolve_url
 from django.urls import reverse, reverse_lazy
@@ -17,6 +19,7 @@ from mozilla_django_oidc.views import (
 from mozilla_django_oidc_db.views import (
     OIDC_ERROR_SESSION_KEY,
     OIDCCallbackView as _OIDCCallbackView,
+    get_exception_message,
 )
 
 from digid_eherkenning_oidc_generics.mixins import (
@@ -25,6 +28,19 @@ from digid_eherkenning_oidc_generics.mixins import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+GENERIC_DIGID_ERROR_MSG = _(
+    "Inloggen bij deze organisatie is niet gelukt. Probeert u het later "
+    "nog een keer. Lukt het nog steeds niet? Log in bij Mijn DigiD. "
+    "Zo controleert u of uw DigiD goed werkt. Mogelijk is er een "
+    "storing bij de organisatie waar u inlogt."
+)
+GENERIC_EHERKENNING_ERROR_MSG = _(
+    "Inloggen bij deze organisatie is niet gelukt. Probeert u het later nog een keer. "
+    "Lukt het nog steeds niet? Neem dan contact op met uw eHerkenning leverancier of "
+    "kijk op https://www.eherkenning.nl"
+)
 
 
 class OIDCAuthenticationRequestView(_OIDCAuthenticationRequestView):
@@ -51,15 +67,19 @@ class OIDCFailureView(View):
 
 class OIDCCallbackView(_OIDCCallbackView):
     failure_url = reverse_lazy("oidc-error")
+    generic_error_msg = ""
 
     def get(self, request):
         response = super().get(request)
 
-        if request.GET.get("error") == "access_denied":
-            error = request.GET.get("error_description")
-            request.session[
-                OIDC_ERROR_SESSION_KEY
-            ] = self.config.error_message_mapping.get(error, error)
+        error = request.GET.get("error_description")
+        error_label = self.config.error_message_mapping.get(
+            error, str(self.generic_error_msg)
+        )
+        if error and error_label:
+            request.session[OIDC_ERROR_SESSION_KEY] = error_label
+        elif OIDC_ERROR_SESSION_KEY in request.session and error_label:
+            request.session[OIDC_ERROR_SESSION_KEY] = error_label
 
         return response
 
@@ -96,7 +116,7 @@ class DigiDOIDCAuthenticationRequestView(
 
 
 class DigiDOIDCAuthenticationCallbackView(SoloConfigDigiDMixin, OIDCCallbackView):
-    pass
+    generic_error_msg = GENERIC_DIGID_ERROR_MSG
 
 
 class DigiDOIDCLogoutView(SoloConfigDigiDMixin, OIDCLogoutView):
@@ -112,7 +132,7 @@ class eHerkenningOIDCAuthenticationRequestView(
 class eHerkenningOIDCAuthenticationCallbackView(
     SoloConfigEHerkenningMixin, OIDCCallbackView
 ):
-    pass
+    generic_error_msg = GENERIC_EHERKENNING_ERROR_MSG
 
 
 class eHerkenningOIDCLogoutView(SoloConfigEHerkenningMixin, OIDCLogoutView):
