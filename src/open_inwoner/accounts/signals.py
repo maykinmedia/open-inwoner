@@ -49,7 +49,7 @@ def log_user_login(sender, user, request, *args, **kwargs):
 
     if user.login_type in [LoginTypeChoices.digid, LoginTypeChoices.eherkenning]:
         if oc_config.klanten_service:
-            update_user_from_klant(user)
+            update_user_from_klant(request)
 
 
 @receiver(user_logged_out)

@@ -5,8 +5,13 @@ from open_inwoner.utils.logentry import system_action
 from .wrap import get_fetch_parameters
 
 
-def update_user_from_klant(user: User):
-    klant = fetch_klant(**get_fetch_parameters(user))
+def update_user_from_klant(request):
+    if not hasattr(request, "user"):
+        return
+
+    user: User = request.user
+
+    klant = fetch_klant(**get_fetch_parameters(request))
     if not klant:
         return
 
