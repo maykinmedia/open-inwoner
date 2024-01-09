@@ -85,7 +85,7 @@ pyopenssl
 django-sessionprofile
 
 # Common Ground integration
-zgw-consumers
+zgw-consumers==0.27.0
 notifications-api-common
 
 # 2FA SMS verification
