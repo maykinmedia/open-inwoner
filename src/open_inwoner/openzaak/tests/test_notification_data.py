@@ -8,7 +8,10 @@ from zgw_consumers.api_models.constants import (
 from zgw_consumers.constants import APITypes
 from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 
-from open_inwoner.accounts.tests.factories import DigidUserFactory
+from open_inwoner.accounts.tests.factories import (
+    DigidUserFactory,
+    eHerkenningUserFactory,
+)
 from open_inwoner.openzaak.tests.factories import (
     NotificationFactory,
     ServiceFactory,
@@ -54,6 +57,11 @@ class MockAPIData:
             bsn="100000001",
             email="initiator@example.com",
         )
+        self.eherkenning_user_initiator = eHerkenningUserFactory(
+            kvk="12345678",
+            rsin="000000000",
+            email="initiator_kvk@example.com",
+        )
         self.zaak_type = generate_oas_component(
             "ztc",
             "schemas/ZaakType",
@@ -93,6 +101,15 @@ class MockAPIData:
             resultaat=f"{ZAKEN_ROOT}resultaten/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
         )
+        self.zaak2 = generate_oas_component(
+            "zrc",
+            "schemas/Zaak",
+            url=f"{ZAKEN_ROOT}zaken/bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+            zaaktype=self.zaak_type["url"],
+            status=f"{ZAKEN_ROOT}statussen/aaaaaaaa-aaaa-aaaa-aaaa-222222222222",
+            resultaat=f"{ZAKEN_ROOT}resultaten/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+        )
         self.status_initial = generate_oas_component(
             "zrc",
             "schemas/Status",
@@ -123,6 +140,13 @@ class MockAPIData:
             informatieobject=self.informatie_object["url"],
             zaak=self.zaak["url"],
         )
+        self.zaak_informatie_object2 = generate_oas_component(
+            "zrc",
+            "schemas/ZaakInformatieObject",
+            url=f"{ZAKEN_ROOT}zaakinformatieobjecten/aaaaaaaa-0002-aaaa-aaaa-aaaaaaaaaaaa",
+            informatieobject=self.informatie_object["url"],
+            zaak=self.zaak2["url"],
+        )
 
         self.role_initiator = generate_oas_component(
             "zrc",
@@ -134,8 +158,32 @@ class MockAPIData:
                 "inpBsn": self.user_initiator.bsn,
             },
         )
+        self.eherkenning_role_initiator = generate_oas_component(
+            "zrc",
+            "schemas/Rol",
+            url=f"{ZAKEN_ROOT}rollen/aaaaaaaa-0002-aaaa-aaaa-aaaaaaaaaaaa",
+            omschrijvingGeneriek=RolOmschrijving.initiator,
+            betrokkeneType=RolTypes.niet_natuurlijk_persoon,
+            betrokkeneIdentificatie={
+                "innNnpId": self.eherkenning_user_initiator.kvk,
+            },
+        )
+        self.eherkenning_role_initiator2 = generate_oas_component(
+            "zrc",
+            "schemas/Rol",
+            url=f"{ZAKEN_ROOT}rollen/aaaaaaaa-0003-aaaa-aaaa-aaaaaaaaaaaa",
+            omschrijvingGeneriek=RolOmschrijving.initiator,
+            betrokkeneType=RolTypes.niet_natuurlijk_persoon,
+            betrokkeneIdentificatie={
+                "innNnpId": self.eherkenning_user_initiator.rsin,
+            },
+        )
 
         self.case_roles = [self.role_initiator]
+        self.eherkenning_case_roles = [
+            self.eherkenning_role_initiator,
+            self.eherkenning_role_initiator2,
+        ]
         self.status_history = [self.status_initial, self.status_final]
 
         self.status_notification = NotificationFactory(
@@ -149,6 +197,12 @@ class MockAPIData:
             actie="create",
             resource_url=self.zaak_informatie_object["url"],
             hoofd_object=self.zaak["url"],
+        )
+        self.zio_notification2 = NotificationFactory(
+            resource="zaakinformatieobject",
+            actie="create",
+            resource_url=self.zaak_informatie_object2["url"],
+            hoofd_object=self.zaak2["url"],
         )
 
     def setUpOASMocks(self, m):
@@ -171,6 +225,10 @@ class MockAPIData:
                 f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}",
                 json=paginated_response(self.case_roles),
             )
+            m.get(
+                f"{ZAKEN_ROOT}rollen?zaak={self.zaak2['url']}",
+                json=paginated_response(self.eherkenning_case_roles),
+            )
 
         if "status_history" in res404:
             m.get(f"{ZAKEN_ROOT}statussen?zaak={self.zaak['url']}", status_code=404)
@@ -182,6 +240,7 @@ class MockAPIData:
 
         for resource_attr in [
             "zaak",
+            "zaak2",
             "zaak_type",
             "status_initial",
             "status_final",
@@ -190,6 +249,7 @@ class MockAPIData:
             "status_type_final",
             "informatie_object",
             "zaak_informatie_object",
+            "zaak_informatie_object2",
         ]:
             resource = getattr(self, resource_attr)
             if resource_attr in res404:
