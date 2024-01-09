@@ -343,9 +343,14 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
 
 @override_settings(ZGW_LIMIT_NOTIFICATIONS_FREQUENCY=3600)
 @freeze_time("2023-01-01 01:00:00")
-class NotificationHandlerEmailTestCase(AssertTimelineLogMixin, TestCase):
+class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
+    @patch(
+        "open_inwoner.openzaak.notifications.case_document_added_notification_received"
+    )
     @patch("open_inwoner.openzaak.notifications.send_case_update_email")
-    def test_handle_zaak_info_object_update(self, mock_send: Mock):
+    def test_handle_zaak_info_object_update(
+        self, mock_send: Mock, mock_feed_hook: Mock
+    ):
         """
         note this test matches with a similar test from `test_notification_zaak_status.py`
         """
@@ -362,6 +367,9 @@ class NotificationHandlerEmailTestCase(AssertTimelineLogMixin, TestCase):
         handle_zaakinformatieobject_update(user, case, zio)
 
         mock_send.assert_called_once()
+
+        # check if userfeed hook was called
+        mock_feed_hook.assert_called_once()
 
         # check call arguments
         args = mock_send.call_args.args

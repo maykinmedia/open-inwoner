@@ -44,6 +44,8 @@ from open_inwoner.openzaak.utils import (
 from open_inwoner.utils.logentry import system_action as log_system_action
 from open_inwoner.utils.url import build_absolute_url
 
+from ..userfeed.hooks.case_document import case_document_added_notification_received
+from ..userfeed.hooks.case_status import case_status_notification_received
 from .models import ZaakTypeStatusTypeConfig
 
 logger = logging.getLogger(__name__)
@@ -215,6 +217,9 @@ def _handle_zaakinformatieobject_notification(
 def handle_zaakinformatieobject_update(
     user: User, case: Zaak, zaak_info_object: ZaakInformatieObject
 ):
+    # hook into userfeed
+    case_document_added_notification_received(user, case, zaak_info_object)
+
     note = UserCaseInfoObjectNotification.objects.record_if_unique_notification(
         user,
         case.uuid,
@@ -344,6 +349,10 @@ def _handle_status_notification(notification: Notification, case: Zaak, inform_u
 
 
 def handle_status_update(user: User, case: Zaak, status: Status):
+    # hook into userfeed
+    case_status_notification_received(user, case, status)
+
+    # email notification
     note = UserCaseStatusNotification.objects.record_if_unique_notification(
         user,
         case.uuid,
