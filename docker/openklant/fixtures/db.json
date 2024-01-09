@@ -87,6 +87,27 @@
 		}
 	},
 	{
+		"model": "klanten.klant",
+		"pk": 2,
+		"fields": {
+			"uuid": "f21f35fc-d8f0-4a8f-979b-8d725f713817",
+			"bronorganisatie": "000000000",
+			"klantnummer": "54321",
+			"bedrijfsnaam": "",
+			"website_url": "",
+			"voornaam": "",
+			"voorvoegsel_achternaam": "",
+			"achternaam": "",
+			"functie": "",
+			"telefoonnummer": "",
+			"emailadres": "",
+			"subject": "",
+			"subject_type": "vestiging",
+			"aanmaakkanaal": "",
+			"geverifieerd": true
+		}
+	},
+	{
 		"model": "klanten.nietnatuurlijkpersoon",
 		"pk": 1,
 		"fields": {
@@ -99,13 +120,39 @@
 		}
 	},
 	{
+		"model": "klanten.vestiging",
+		"pk": 1,
+		"fields": {
+			"klant": 2,
+			"vestigings_nummer": "000037178598",
+			"handelsnaam": ["Test Value"]
+		}
+	},
+	{
+		"model": "contactmomenten.contactmoment",
+		"pk": 1,
+		"fields": {
+			"uuid": "9047c5be-885d-47ef-94ca-1c61c7a6480c",
+			"bronorganisatie": "000000000",
+			"registratiedatum": "2023-12-14T11:59:55Z",
+			"tekst": "Alleen zichtbaar voor hoofdvestiging",
+			"voorkeurskanaal": "",
+			"voorkeurstaal": "",
+			"kanaal": "email",
+			"initiatiefnemer": "",
+			"medewerker": "",
+			"onderwerp_links": "[]",
+			"vorig_contactmoment": null
+		}
+	},
+	{
 		"model": "contactmomenten.contactmoment",
 		"pk": 2,
 		"fields": {
 			"uuid": "2032bf57-216a-4438-bd4a-529c1b2c1191",
 			"bronorganisatie": "000000000",
 			"registratiedatum": "2023-12-14T11:59:55Z",
-			"tekst": "foo",
+			"tekst": "Zichtbaar voor vestiging en hoofdvestiging",
 			"voorkeurskanaal": "",
 			"voorkeurstaal": "",
 			"kanaal": "email",
@@ -121,6 +168,28 @@
 		"fields": {
 			"uuid": "8dd23721-a7ab-4d04-a73b-572235ff43cd",
 			"contactmoment": 2,
+			"klant": "http://openklant.local:8001/klanten/api/v1/klanten/00e82ffb-e98a-4967-b8c1-232bf3c8c3a9",
+			"rol": "belanghebbende",
+			"gelezen": false
+		}
+	},
+	{
+		"model": "contactmomenten.klantcontactmoment",
+		"pk": 2,
+		"fields": {
+			"uuid": "8045f566-75a8-49ae-b4ab-e8f090a08ce5",
+			"contactmoment": 2,
+			"klant": "http://openklant.local:8001/klanten/api/v1/klanten/f21f35fc-d8f0-4a8f-979b-8d725f713817",
+			"rol": "belanghebbende",
+			"gelezen": false
+		}
+	},
+	{
+		"model": "contactmomenten.klantcontactmoment",
+		"pk": 3,
+		"fields": {
+			"uuid": "88a39300-2a4f-49e9-bc90-525aa654d8a5",
+			"contactmoment": 1,
 			"klant": "http://openklant.local:8001/klanten/api/v1/klanten/00e82ffb-e98a-4967-b8c1-232bf3c8c3a9",
 			"rol": "belanghebbende",
 			"gelezen": false
