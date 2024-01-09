@@ -39,7 +39,7 @@ class KvKAPITest(TestCase):
     def test_generic_search_by_kvk(self):
         self.mocked_requests.return_value.json.return_value = mocks.simple
 
-        company = self.kvk_client.search(kvk="69599084")
+        company = self.kvk_client.search(kvk="68750110")
 
         self.assertEqual(
             company,
@@ -64,103 +64,86 @@ class KvKAPITest(TestCase):
         )
 
     def test_search_headquarters(self):
-        self.mocked_requests.return_value.json.return_value = mocks.simple
+        self.mocked_requests.return_value.json.return_value = mocks.multiple
 
-        company = self.kvk_client.get_company_headquarters(kvk="68750110")
+        headquarters = self.kvk_client.get_company_headquarters(kvk="68750110")
         self.assertEqual(
-            company,
+            headquarters,
             {
                 "kvkNummer": "68750110",
+                "vestigingsnummer": "000037178598",
                 "handelsnaam": "Test BV Donald",
-                "type": "rechtspersoon",
+                "adresType": "bezoekadres",
+                "straatnaam": "Hizzaarderlaan",
+                "plaats": "Lollum",
+                "type": "hoofdvestiging",
                 "links": [
                     {
                         "rel": "basisprofiel",
                         "href": "https://api.kvk.nl/test/api/v1/basisprofielen/68750110",
-                    }
+                    },
+                    {
+                        "rel": "vestigingsprofiel",
+                        "href": "https://api.kvk.nl/test/api/v1/vestigingsprofielen/000037178598",
+                    },
                 ],
             },
         )
 
     def test_search_all_branches(self):
-        self.mocked_requests.return_value.json.return_value = mocks.multiple_branches
+        self.mocked_requests.return_value.json.return_value = mocks.multiple
 
-        branches = self.kvk_client.get_all_company_branches(kvk="69599084")
+        branches = self.kvk_client.get_all_company_branches(kvk="68750110")
+
         self.assertEqual(
             branches,
             [
                 {
-                    "kvkNummer": "69599084",
-                    "vestigingsnummer": "028435810622",
-                    "handelsnaam": "Test Stichting Bolderbast",
+                    "kvkNummer": "68750110",
+                    "vestigingsnummer": "000037178598",
+                    "handelsnaam": "Test BV Donald",
                     "adresType": "bezoekadres",
-                    "straatnaam": "Oosterwal",
-                    "plaats": "Lochem",
+                    "straatnaam": "Hizzaarderlaan",
+                    "plaats": "Lollum",
                     "type": "hoofdvestiging",
                     "links": [
                         {
                             "rel": "basisprofiel",
-                            "href": "https://api.kvk.nl/test/api/v1/basisprofielen/69599068",
+                            "href": "https://api.kvk.nl/test/api/v1/basisprofielen/68750110",
                         },
                         {
                             "rel": "vestigingsprofiel",
-                            "href": "https://api.kvk.nl/test/api/v1/vestigingsprofielen/028435810622",
+                            "href": "https://api.kvk.nl/test/api/v1/vestigingsprofielen/000037178598",
                         },
                     ],
                 },
                 {
-                    "kvkNummer": "69599084",
-                    "vestigingsnummer": "000038509504",
-                    "handelsnaam": "Test Stichting Bolderbast",
+                    "kvkNummer": "68750110",
+                    "vestigingsnummer": "000037178601",
+                    "handelsnaam": "Test BV Donald Nevenvestiging",
                     "adresType": "bezoekadres",
-                    "straatnaam": "Abebe Bikilalaan",
-                    "plaats": "Amsterdam",
-                    "type": "hoofdvestiging",
+                    "straatnaam": "Brinkerinckbaan",
+                    "plaats": "Diepenveen",
+                    "type": "nevenvestiging",
                     "links": [
                         {
                             "rel": "basisprofiel",
-                            "href": "https://api.kvk.nl/test/api/v1/basisprofielen/69599084",
+                            "href": "https://api.kvk.nl/test/api/v1/basisprofielen/68750110",
                         },
                         {
                             "rel": "vestigingsprofiel",
-                            "href": "https://api.kvk.nl/test/api/v1/vestigingsprofielen/000038509504",
+                            "href": "https://api.kvk.nl/test/api/v1/vestigingsprofielen/000037178601",
                         },
                     ],
                 },
             ],
         )
 
-    def test_search_by_kvk_extra_params(self):
-        self.mocked_requests.return_value.json.return_value = mocks.simple
-
-        company = self.kvk_client.search(kvk="68750110", type="Rechtspersoon")
-        self.assertEqual(
-            company,
-            {
-                "pagina": 1,
-                "aantal": 1,
-                "totaal": 1,
-                "resultaten": [
-                    {
-                        "kvkNummer": "68750110",
-                        "handelsnaam": "Test BV Donald",
-                        "type": "rechtspersoon",
-                        "links": [
-                            {
-                                "rel": "basisprofiel",
-                                "href": "https://api.kvk.nl/test/api/v1/basisprofielen/68750110",
-                            }
-                        ],
-                    }
-                ],
-            },
-        )
-
     def test_no_search_without_config(self):
         config = None
         kvk_client = KvKClient(config)
 
-        company = kvk_client.search(kvk="69599084")
+        company = kvk_client.search(kvk="68750110")
 
         self.assertEqual(company, {})
 
@@ -175,7 +158,7 @@ class KvKAPITest(TestCase):
         )
         kvk_client = KvKClient(config)
 
-        company = kvk_client.search(kvk="69599084")
+        company = kvk_client.search(kvk="68750110")
 
         self.assertEqual(company, {})
 

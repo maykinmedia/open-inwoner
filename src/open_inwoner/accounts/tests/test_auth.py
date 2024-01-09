@@ -1036,8 +1036,16 @@ class DuplicateEmailRegistrationTest(WebTest):
         """Assert that eHerkenning users can register with duplicate emails"""
 
         mock_kvk.return_value = [
-            {"kvkNummer": "12345678", "vestigingsnummer": "1234"},
-            {"kvkNummer": "12345678", "vestigingsnummer": "5678"},
+            {
+                "kvkNummer": "12345678",
+                "vestigingsnummer": "1234",
+                "handelsnaam": "Mijn bedrijf",
+            },
+            {
+                "kvkNummer": "12345678",
+                "vestigingsnummer": "5678",
+                "handelsnaam": "Mijn bedrijf",
+            },
         ]
 
         test_user = eHerkenningUserFactory.create(

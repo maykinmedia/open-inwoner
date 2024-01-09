@@ -66,6 +66,13 @@ class CompanyBranchChoiceView(FormView):
             request.session.save()
             return HttpResponseRedirect(redirect.url)
 
+        # create pseudo-branch representing the company as a whole
+        master_branch = {
+            "kvkNummer": request.user.kvk,
+            "handelsnaam": company_branches[0].get("handelsnaam", ""),
+        }
+        company_branches.insert(0, master_branch)
+
         form = context["form"]
 
         return render(
