@@ -2,16 +2,23 @@ from hashlib import md5
 from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.test import TestCase, modify_settings, override_settings
 from django.urls import reverse
+from django.utils.translation import gettext as _
 
 import requests_mock
 from furl import furl
 from mozilla_django_oidc_db.models import OpenIDConnectConfig
+from pyquery import PyQuery as PQ
 
 from digid_eherkenning_oidc_generics.models import (
     OpenIDConnectDigiDConfig,
     OpenIDConnectEHerkenningConfig,
+)
+from digid_eherkenning_oidc_generics.views import (
+    GENERIC_DIGID_ERROR_MSG,
+    GENERIC_EHERKENNING_ERROR_MSG,
 )
 from open_inwoner.kvk.branches import KVK_BRANCH_SESSION_VARIABLE
 
@@ -370,12 +377,12 @@ class DigiDOIDCFlowTests(TestCase):
         self.assertNotIn("oidc_states", self.client.session)
         self.assertNotIn("oidc_id_token", self.client.session)
 
-    def test_error_page_direct_access_forbidden(self):
+    def test_error_page_direct_access(self):
         error_url = reverse("oidc-error")
 
         response = self.client.get(error_url)
 
-        self.assertEqual(response.status_code, 403)
+        self.assertRedirects(response, reverse("login"), fetch_redirect_response=False)
 
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
@@ -425,6 +432,162 @@ class DigiDOIDCFlowTests(TestCase):
                 response = self.client.get(error_url)
 
                 self.assertEqual(response.status_code, 403)
+
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
+    @patch(
+        "digid_eherkenning_oidc_generics.models.OpenIDConnectDigiDConfig.get_solo",
+        return_value=OpenIDConnectDigiDConfig(
+            id=1,
+            enabled=True,
+            error_message_mapping={"some mapped message": "Some Error"},
+        ),
+    )
+    def test_login_error_message_mapped_in_config(
+        self,
+        mock_get_solo,
+        mock_get_token,
+        mock_verify_token,
+        mock_store_tokens,
+        mock_get_userinfo,
+    ):
+        mock_get_userinfo.return_value = {
+            "sub": "some_username",
+            "bsn": "123456782",
+        }
+
+        session = self.client.session
+        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session.save()
+        callback_url = reverse("digid_oidc:callback")
+
+        # enter the login flow
+        callback_response = self.client.get(
+            callback_url,
+            {
+                "error": "access_denied",
+                "error_description": "some mapped message",
+                "state": "mock",
+            },
+        )
+
+        self.assertRedirects(
+            callback_response, reverse("oidc-error"), fetch_redirect_response=False
+        )
+
+        error_response = self.client.get(callback_response.url)
+
+        self.assertRedirects(
+            error_response, reverse("login"), fetch_redirect_response=False
+        )
+
+        login_response = self.client.get(error_response.url)
+        doc = PQ(login_response.content)
+        error_msg = doc.find(".notification__content").text()
+
+        self.assertEqual(error_msg, "Some Error")
+
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
+    @patch(
+        "digid_eherkenning_oidc_generics.models.OpenIDConnectDigiDConfig.get_solo",
+        return_value=OpenIDConnectDigiDConfig(id=1, enabled=True),
+    )
+    def test_login_error_message_not_mapped_in_config(
+        self,
+        mock_get_solo,
+        mock_get_token,
+        mock_verify_token,
+        mock_store_tokens,
+        mock_get_userinfo,
+    ):
+        mock_get_userinfo.return_value = {
+            "sub": "some_username",
+            "bsn": "123456782",
+        }
+
+        session = self.client.session
+        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session.save()
+        callback_url = reverse("digid_oidc:callback")
+
+        # enter the login flow
+        callback_response = self.client.get(
+            callback_url,
+            {
+                "error": "access_denied",
+                "error_description": "some unmapped message",
+                "state": "mock",
+            },
+        )
+
+        self.assertRedirects(
+            callback_response, reverse("oidc-error"), fetch_redirect_response=False
+        )
+
+        error_response = self.client.get(callback_response.url)
+
+        self.assertRedirects(
+            error_response, reverse("login"), fetch_redirect_response=False
+        )
+
+        login_response = self.client.get(error_response.url)
+        doc = PQ(login_response.content)
+        error_msg = doc.find(".notification__content").text()
+
+        self.assertEqual(error_msg, str(GENERIC_DIGID_ERROR_MSG))
+
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
+    @patch(
+        "digid_eherkenning_oidc_generics.models.OpenIDConnectDigiDConfig.get_solo",
+        return_value=OpenIDConnectDigiDConfig(id=1, enabled=True),
+    )
+    def test_login_validation_error(
+        self,
+        mock_get_solo,
+        mock_get_token,
+        mock_verify_token,
+        mock_store_tokens,
+        mock_get_userinfo,
+    ):
+        mock_verify_token.side_effect = ValidationError("Something went wrong")
+        mock_get_userinfo.return_value = {
+            "sub": "some_username",
+            "bsn": "123456782",
+        }
+
+        session = self.client.session
+        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session.save()
+        callback_url = reverse("digid_oidc:callback")
+
+        # enter the login flow
+        callback_response = self.client.get(
+            callback_url, {"code": "mock", "state": "mock"}
+        )
+
+        self.assertRedirects(
+            callback_response, reverse("oidc-error"), fetch_redirect_response=False
+        )
+
+        error_response = self.client.get(callback_response.url)
+
+        self.assertRedirects(
+            error_response, reverse("login"), fetch_redirect_response=False
+        )
+
+        login_response = self.client.get(error_response.url)
+        doc = PQ(login_response.content)
+        error_msg = doc.find(".notification__content").text()
+
+        self.assertEqual(error_msg, str(GENERIC_DIGID_ERROR_MSG))
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
@@ -650,3 +813,159 @@ class eHerkenningOIDCFlowTests(TestCase):
                 response = self.client.get(error_url)
 
                 self.assertEqual(response.status_code, 403)
+
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
+    @patch(
+        "digid_eherkenning_oidc_generics.models.OpenIDConnectEHerkenningConfig.get_solo",
+        return_value=OpenIDConnectEHerkenningConfig(
+            id=1,
+            enabled=True,
+            error_message_mapping={"some mapped message": "Some Error"},
+        ),
+    )
+    def test_login_error_message_mapped_in_config(
+        self,
+        mock_get_solo,
+        mock_get_token,
+        mock_verify_token,
+        mock_store_tokens,
+        mock_get_userinfo,
+    ):
+        mock_get_userinfo.return_value = {
+            "sub": "some_username",
+            "bsn": "123456782",
+        }
+
+        session = self.client.session
+        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session.save()
+        callback_url = reverse("eherkenning_oidc:callback")
+
+        # enter the login flow
+        callback_response = self.client.get(
+            callback_url,
+            {
+                "error": "access_denied",
+                "error_description": "some mapped message",
+                "state": "mock",
+            },
+        )
+
+        self.assertRedirects(
+            callback_response, reverse("oidc-error"), fetch_redirect_response=False
+        )
+
+        error_response = self.client.get(callback_response.url)
+
+        self.assertRedirects(
+            error_response, reverse("login"), fetch_redirect_response=False
+        )
+
+        login_response = self.client.get(error_response.url)
+        doc = PQ(login_response.content)
+        error_msg = doc.find(".notification__content").text()
+
+        self.assertEqual(error_msg, "Some Error")
+
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
+    @patch(
+        "digid_eherkenning_oidc_generics.models.OpenIDConnectEHerkenningConfig.get_solo",
+        return_value=OpenIDConnectEHerkenningConfig(id=1, enabled=True),
+    )
+    def test_login_error_message_not_mapped_in_config(
+        self,
+        mock_get_solo,
+        mock_get_token,
+        mock_verify_token,
+        mock_store_tokens,
+        mock_get_userinfo,
+    ):
+        mock_get_userinfo.return_value = {
+            "sub": "some_username",
+            "bsn": "123456782",
+        }
+
+        session = self.client.session
+        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session.save()
+        callback_url = reverse("eherkenning_oidc:callback")
+
+        # enter the login flow
+        callback_response = self.client.get(
+            callback_url,
+            {
+                "error": "access_denied",
+                "error_description": "some unmapped message",
+                "state": "mock",
+            },
+        )
+
+        self.assertRedirects(
+            callback_response, reverse("oidc-error"), fetch_redirect_response=False
+        )
+
+        error_response = self.client.get(callback_response.url)
+
+        self.assertRedirects(
+            error_response, reverse("login"), fetch_redirect_response=False
+        )
+
+        login_response = self.client.get(error_response.url)
+        doc = PQ(login_response.content)
+        error_msg = doc.find(".notification__content").text()
+
+        self.assertEqual(error_msg, str(GENERIC_EHERKENNING_ERROR_MSG))
+
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
+    @patch(
+        "digid_eherkenning_oidc_generics.models.OpenIDConnectEHerkenningConfig.get_solo",
+        return_value=OpenIDConnectEHerkenningConfig(id=1, enabled=True),
+    )
+    def test_login_validation_error(
+        self,
+        mock_get_solo,
+        mock_get_token,
+        mock_verify_token,
+        mock_store_tokens,
+        mock_get_userinfo,
+    ):
+        mock_verify_token.side_effect = ValidationError("Something went wrong")
+        mock_get_userinfo.return_value = {
+            "sub": "some_username",
+            "bsn": "123456782",
+        }
+
+        session = self.client.session
+        session["oidc_states"] = {"mock": {"nonce": "nonce"}}
+        session.save()
+        callback_url = reverse("eherkenning_oidc:callback")
+
+        # enter the login flow
+        callback_response = self.client.get(
+            callback_url, {"code": "mock", "state": "mock"}
+        )
+
+        self.assertRedirects(
+            callback_response, reverse("oidc-error"), fetch_redirect_response=False
+        )
+
+        error_response = self.client.get(callback_response.url)
+
+        self.assertRedirects(
+            error_response, reverse("login"), fetch_redirect_response=False
+        )
+
+        login_response = self.client.get(error_response.url)
+        doc = PQ(login_response.content)
+        error_msg = doc.find(".notification__content").text()
+
+        self.assertEqual(error_msg, str(GENERIC_EHERKENNING_ERROR_MSG))
