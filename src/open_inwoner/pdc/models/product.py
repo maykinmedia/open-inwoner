@@ -86,6 +86,14 @@ class Product(models.Model):
         default="",
         help_text=_("Action link to request the product."),
     )
+    auto_redirect_to_link = models.BooleanField(
+        verbose_name=_("Automatically redirect to link"),
+        default=False,
+        help_text=_(
+            "Whether the user should be automatically redirect to the product link when "
+            "the user visits the product page."
+        ),
+    )
     button_text = models.CharField(
         verbose_name=_("CTA Button text"),
         max_length=64,
