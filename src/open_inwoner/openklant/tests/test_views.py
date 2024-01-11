@@ -9,7 +9,7 @@ import requests_mock
 from django_webtest import WebTest
 
 from open_inwoner.accounts.tests.factories import UserFactory
-from open_inwoner.openklant.models import OpenKlantConfig
+from open_inwoner.openklant.models import ContactFormSubject, OpenKlantConfig
 from open_inwoner.openklant.tests.data import MockAPIReadData
 from open_inwoner.utils.test import (
     ClearCachesMixin,
@@ -30,6 +30,13 @@ class FetchKlantDataTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
     def setUpTestData(cls):
         super().setUpTestData()
         MockAPIReadData.setUpServices()
+
+        # for testing replacement of e-suite "onderwerp" code with OIP configured subject
+        cls.contactformsubject = ContactFormSubject.objects.create(
+            subject="oip_subject",
+            subject_code="e_suite_subject_code",
+            config=OpenKlantConfig.get_solo(),
+        )
 
     def test_list_for_bsn(self, m):
         data = MockAPIReadData().install_mocks(m)
@@ -52,7 +59,7 @@ class FetchKlantDataTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
                 ),
                 "channel": data.contactmoment["kanaal"].title(),
                 "text": data.contactmoment["tekst"],
-                "onderwerp": data.contactmoment["onderwerp"],
+                "onderwerp": self.contactformsubject.subject,
                 "antwoord": data.contactmoment["antwoord"],
                 "identificatie": data.contactmoment["identificatie"],
                 "type": data.contactmoment["type"],
@@ -92,7 +99,7 @@ class FetchKlantDataTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
                         ),
                         "channel": data.contactmoment2["kanaal"].title(),
                         "text": data.contactmoment2["tekst"],
-                        "onderwerp": data.contactmoment2["onderwerp"],
+                        "onderwerp": self.contactformsubject.subject,
                         "antwoord": data.contactmoment2["antwoord"],
                         "identificatie": data.contactmoment2["identificatie"],
                         "type": data.contactmoment2["type"],
@@ -162,7 +169,7 @@ class FetchKlantDataTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
                 ),
                 "channel": data.contactmoment["kanaal"].title(),
                 "text": data.contactmoment["tekst"],
-                "onderwerp": data.contactmoment["onderwerp"],
+                "onderwerp": self.contactformsubject.subject,
                 "antwoord": data.contactmoment["antwoord"],
                 "identificatie": data.contactmoment["identificatie"],
                 "type": data.contactmoment["type"],
@@ -199,7 +206,7 @@ class FetchKlantDataTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
                         ),
                         "channel": data.contactmoment2["kanaal"].title(),
                         "text": data.contactmoment2["tekst"],
-                        "onderwerp": data.contactmoment2["onderwerp"],
+                        "onderwerp": self.contactformsubject.subject,
                         "antwoord": data.contactmoment2["antwoord"],
                         "identificatie": data.contactmoment2["identificatie"],
                         "type": data.contactmoment2["type"],

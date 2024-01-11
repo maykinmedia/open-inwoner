@@ -143,6 +143,7 @@ class MockAPIReadData(MockAPIData):
             kanaal="MAIL",
             status=Status.afgehandeld,
             antwoord="",
+            onderwerp="e_suite_subject_code",
         )
         self.contactmoment2 = generate_oas_component(
             "cmc",
@@ -154,6 +155,7 @@ class MockAPIReadData(MockAPIData):
             kanaal="MAIL",
             status=Status.afgehandeld,
             antwoord="",
+            onderwerp="e_suite_subject_code",
         )
         self.contactmoment_vestiging = generate_oas_component(
             "cmc",
