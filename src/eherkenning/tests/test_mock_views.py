@@ -22,7 +22,6 @@ class eHerkenningMockTestCase(TestCase):
 
 OVERRIDE_SETTINGS = dict(
     ROOT_URLCONF="open_inwoner.cms.tests.urls",
-    EHERKENNING_MOCK_APP_TITLE="FooBarBazz-MockApp",
     EHERKENNING_MOCK_RETURN_URL=RETURN_URL,  # url to redirect to after success
     EHERKENNING_MOCK_CANCEL_URL=CANCEL_URL,  # url to navigate to when users clicks 'cancel/annuleren'
 )
@@ -81,7 +80,7 @@ class LoginViewTests(eHerkenningMockTestCase):
         response = self.client.get(url, data=data)
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "FooBarBazz-MockApp")
+        self.assertContains(response, "Dit is een mockup van de eHerkenning login flow")
         self.assertContains(response, reverse("eherkenning-mock:password"))
         self.assertNoEHerkenningURLS(response)
 
@@ -105,8 +104,8 @@ class PasswordLoginViewTests(eHerkenningMockTestCase):
         response = self.client.get(url, data=data)
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "FooBarBazz-MockApp")
-        self.assertContains(response, reverse("eherkenning-mock:login"))
+        self.assertContains(response, "Dit is een mockup van de eHerkenning")
+        self.assertContains(response, reverse("login"))
         self.assertNoEHerkenningURLS(response)
 
     @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
