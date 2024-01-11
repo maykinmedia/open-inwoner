@@ -2,7 +2,7 @@ from unittest.mock import Mock, patch
 
 from django.test import TestCase, override_settings
 from django.urls import reverse
-from django.utils.html import strip_tags
+from django.utils.html import escape, strip_tags
 from django.utils.translation import ugettext as _
 
 from zgw_consumers.api_models.base import factory
@@ -43,7 +43,10 @@ class FeedHookTest(TestCase):
         self.assertEqual(item.type, FeedItemType.case_status_changed)
         self.assertEqual(item.action_required, False)
         self.assertEqual(item.is_completed, False)
-        self.assertEqual(item.message, _("Case status has been changed to 'initial'"))
+        self.assertEqual(
+            strip_tags(item.message),
+            escape(_("Case status has been changed to 'initial'")),
+        )
         self.assertEqual(item.title, case.omschrijving)
         self.assertEqual(
             item.action_url,
@@ -83,9 +86,11 @@ class FeedHookTest(TestCase):
         # check item changed
         item = feed.items[0]
         self.assertEqual(
-            item.message,
-            _("Case status has been changed to '{status}'").format(
-                status="translated status"
+            strip_tags(item.message),
+            escape(
+                _("Case status has been changed to '{status}'").format(
+                    status="translated status"
+                )
             ),
         )
         self.assertEqual(item.title, case.omschrijving)

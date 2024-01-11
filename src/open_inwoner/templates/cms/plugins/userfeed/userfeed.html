@@ -1,6 +1,6 @@
 {% load i18n icon_tags %}
 
-
+{% if userfeed %}
 <section class="userfeed">
     <h2 class="h2 {% if userfeed.action_required %}indicator{% endif %}">
         {% trans "Aanvragen updates" %}
@@ -44,3 +44,4 @@
 {#        </a>#}
     </div>
 </section>
+{% endif %}
