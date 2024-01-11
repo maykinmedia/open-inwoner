@@ -58,8 +58,14 @@ development machine.
 
    .. code-block:: bash
 
-       $ git clone git@github.com:maykinmedia/open-inwoner.git
-       $ cd open-inwoner
+       git clone git@github.com:maykinmedia/open-inwoner.git
+       cd open-inwoner
+       # initialize submodules
+       git submodule update --init --recursive
+
+This will include the `Open-Inwoner-Design-Tokens`_ subdirectory. When all is built and run this is where the OIP design tokens CSS will be generated. When this repository gets updated, it needs to be pulled again.
+
+.. _Open-Inwoner-Design-Tokens: https://github.com/maykinmedia/open-inwoner-design-tokens
 
 3. Install all required (backend) libraries.
    **Tip:** You can use the ``bootstrap.py`` script to install the requirements
@@ -68,9 +74,9 @@ development machine.
 
    .. code-block:: bash
 
-       $ virtualenv env
-       $ source env/bin/activate
-       $ pip install -r requirements/dev.txt
+       virtualenv env
+       source env/bin/activate
+       pip install -r requirements/dev.txt
 
 4. Run third-party install commands:
 
@@ -78,7 +84,7 @@ development machine.
 
    .. code-block:: bash
 
-       $ playwright install
+       playwright install
 
 .. _Playwright: https://playwright.dev/python/
 
@@ -86,34 +92,41 @@ development machine.
 
    .. code-block:: bash
 
-       $ npm install
-       or as an alternative: npm ci --legacy-peer-deps
-       $ npm run build
+       npm install
+       npm run build
+
+   - Or as an alternative:
+
+   .. code-block:: bash
+
+       npm ci --legacy-peer-deps
+       npm run build
 
 6. Create the statics and database:
 
    .. code-block:: bash
 
-       $ python src/manage.py collectstatic --link
-       $ python src/manage.py migrate
+       python src/manage.py collectstatic --link
+       python src/manage.py migrate
 
 7. Create a superuser to access the management interface:
 
    .. code-block:: bash
 
-       $ python src/manage.py createsuperuser
+       python src/manage.py createsuperuser
 
 8. You can now run your installation and point your browser to the address
    given by this command:
 
    .. code-block:: bash
 
-       $ python src/manage.py runserver
+       python src/manage.py runserver
 
 9. Create a .env file with database settings. See dotenv.example for an example.
 
-        $ cp dotenv.example .env
+   .. code-block:: bash
 
+       cp dotenv.example .env
 
 **Note:** If you are making local, machine specific, changes, add them to
 ``src/open_inwoner/conf/local.py``. You can base this file on the
@@ -133,13 +146,13 @@ ElasticSearch
 
    .. code-block:: bash
 
-        $ bin/start_elasticsearch.sh
+        bin/start_elasticsearch.sh
 
 2. Then build the indices:
 
    .. code-block:: bash
 
-        $ src/manage.py search_index --rebuild
+        src/manage.py search_index --rebuild
 
 
 Update installation
@@ -151,31 +164,31 @@ When updating an existing installation:
 
    .. code-block:: bash
 
-       $ cd open-inwoner
-       $ source env/bin/activate
+       cd open-inwoner
+       source env/bin/activate
 
 2. Update the code and libraries:
 
    .. code-block:: bash
 
-       $ git pull
-       $ pip install -r requirements/dev.txt
-       $ npm install
+       git pull
+       pip install -r requirements/dev.txt
+       npm install
        or as an alternative: npm ci --legacy-peer-deps
-       $ npm run build
+       npm run build
 
 3. Update the statics and database:
 
    .. code-block:: bash
 
-       $ python src/manage.py collectstatic --link
-       $ python src/manage.py migrate
+       python src/manage.py collectstatic --link
+       python src/manage.py migrate
 
 4. Update the ElasticSearch indices:
 
    .. code-block:: bash
 
-       $ src/manage.py search_index --rebuild
+       src/manage.py search_index --rebuild
 
 
 Testsuite
@@ -185,7 +198,7 @@ To run the test suite:
 
 .. code-block:: bash
 
-    $ python src/manage.py test open_inwoner
+    python src/manage.py test open_inwoner
 
 Configuration via environment variables
 ---------------------------------------
@@ -223,17 +236,17 @@ The easiest way to get the project started is by using `Docker Compose`_.
 
    .. code-block:: bash
 
-       $ git clone git@bitbucket.org:maykinmedia/open-inwoner.git
+       git clone git@bitbucket.org:maykinmedia/open-inwoner.git
        Cloning into 'open-inwoner'...
        ...
 
-       $ cd open-inwoner
+       cd open-inwoner
 
 2. Start the database and web services:
 
    .. code-block:: bash
 
-       $ docker-compose up -d
+       docker-compose up -d
        Starting open-inwoner_db_1 ... done
        Starting open-inwoner_web_1 ... done
 
@@ -243,14 +256,14 @@ The easiest way to get the project started is by using `Docker Compose`_.
 
    .. code-block:: bash
 
-       $ docker logs -f open-inwoner_web_1
+       docker logs -f open-inwoner_web_1
 
 3. Create an admin user. If different container names are shown above, use
    the container name ending with ``_web_1``:
 
    .. code-block:: bash
 
-       $ docker exec -it open-inwoner_web_1 /app/src/manage.py createsuperuser
+       docker exec -it open-inwoner_web_1 /app/src/manage.py createsuperuser
        E-mail address: admin@admin.com
        ...
        Superuser created successfully.
@@ -266,7 +279,7 @@ The easiest way to get the project started is by using `Docker Compose`_.
 
    .. code-block:: bash
 
-       $ docker-machine ls
+       docker-machine ls
        NAME      ACTIVE   DRIVER       STATE     URL
        default   *        virtualbox   Running   tcp://<ip>:<port>
 
@@ -287,8 +300,8 @@ all settings.
 
 .. code-block:: bash
 
-    $ docker build -t open_inwoner
-    $ docker run \
+    docker build -t open_inwoner
+    docker run \
         -p 8000:8000 \
         -e DATABASE_USERNAME=... \
         -e DATABASE_PASSWORD=... \
@@ -296,7 +309,7 @@ all settings.
         --name open_inwoner \
         open_inwoner
 
-    $ docker exec -it open_inwoner /app/src/manage.py createsuperuser
+    docker exec -it open_inwoner /app/src/manage.py createsuperuser
 
 Staging and production
 ======================
@@ -309,21 +322,21 @@ the target machine has a clean `Debian`_ installation.
 
    .. code-block:: bash
 
-       $ pip install ansible
+       pip install ansible
 
 2. Navigate to the project directory, and install the Maykin deployment
    submodule if you haven't already:
 
    .. code-block:: bash
 
-       $ git submodule update --init
+       git submodule update --init
 
 3. Run the Ansible playbook to provision a clean Debian machine:
 
    .. code-block:: bash
 
-       $ cd deployment
-       $ ansible-playbook <test/staging/production>.yml
+       cd deployment
+       ansible-playbook <test/staging/production>.yml
 
 For more information, see the ``README`` file in the deployment directory.
 
@@ -346,7 +359,7 @@ Commands can be executed using:
 
 .. code-block:: bash
 
-    $ python src/manage.py <command>
+    python src/manage.py <command>
 
 There are no specific commands for the project. See
 `Django framework commands`_ for all default commands, or type
