@@ -202,7 +202,7 @@ class EditProfileView(
             if user_form_data.get(local_name)
         }
         if update_data:
-            klant = fetch_klant(**get_fetch_parameters(user))
+            klant = fetch_klant(**get_fetch_parameters(self.request))
 
             if klant:
                 self.log_system_action(

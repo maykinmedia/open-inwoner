@@ -125,6 +125,14 @@ class MockAPIReadData(MockAPIData):
             emailadres="foo@bar.com",
             telefoonnummer="0687654321",
         )
+        self.klant_vestiging = generate_oas_component(
+            "kc",
+            "schemas/Klant",
+            uuid="bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+            url=f"{KLANTEN_ROOT}klant/bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+            emailadres="foo@bar.com",
+            telefoonnummer="0612345678",
+        )
         self.contactmoment = generate_oas_component(
             "cmc",
             "schemas/ContactMoment",
@@ -147,6 +155,17 @@ class MockAPIReadData(MockAPIData):
             status=Status.afgehandeld,
             antwoord="",
         )
+        self.contactmoment_vestiging = generate_oas_component(
+            "cmc",
+            "schemas/ContactMoment",
+            uuid="aaaaaaaa-aaaa-aaaa-aaaa-eeeeeeeeeeee",
+            url=f"{CONTACTMOMENTEN_ROOT}contactmoment/aaaaaaaa-aaaa-aaaa-aaaa-eeeeeeeeeeee",
+            identificatie="AB123",
+            type="SomeType",
+            kanaal="MAIL",
+            status=Status.afgehandeld,
+            antwoord="",
+        )
         self.klant_contactmoment = generate_oas_component(
             "cmc",
             "schemas/KlantContactMoment",
@@ -163,6 +182,22 @@ class MockAPIReadData(MockAPIData):
             klant=self.klant2["url"],
             contactmoment=self.contactmoment2["url"],
         )
+        self.klant_contactmoment3 = generate_oas_component(
+            "cmc",
+            "schemas/KlantContactMoment",
+            uuid="aaaaaaaa-aaaa-aaaa-aaaa-dddddddddddd",
+            url=f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten/aaaaaaaa-aaaa-aaaa-aaaa-dddddddddddd",
+            klant=self.klant["url"],
+            contactmoment=self.contactmoment_vestiging["url"],
+        )
+        self.klant_contactmoment4 = generate_oas_component(
+            "cmc",
+            "schemas/KlantContactMoment",
+            uuid="aaaaaaaa-aaaa-aaaa-aaaa-ffffffffffff",
+            url=f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten/aaaaaaaa-aaaa-aaaa-aaaa-ffffffffffff",
+            klant=self.klant_vestiging["url"],
+            contactmoment=self.contactmoment_vestiging["url"],
+        )
 
     def install_mocks(self, m) -> "MockAPIReadData":
         self.setUpOASMocks(m)
@@ -170,10 +205,14 @@ class MockAPIReadData(MockAPIData):
         for resource_attr in [
             "klant",
             "klant2",
+            "klant_vestiging",
             "contactmoment",
             "contactmoment2",
+            "contactmoment_vestiging",
             "klant_contactmoment",
             "klant_contactmoment2",
+            "klant_contactmoment3",
+            "klant_contactmoment4",
         ]:
             resource = getattr(self, resource_attr)
             m.get(resource["url"], json=resource)
@@ -193,15 +232,22 @@ class MockAPIReadData(MockAPIData):
             f"{KLANTEN_ROOT}klanten?subjectNietNatuurlijkPersoon__innNnpId={self.eherkenning_user.rsin}",
             json=paginated_response([self.klant2]),
         )
+        m.get(
+            f"{KLANTEN_ROOT}klanten?subjectVestiging__vestigingsNummer=1234",
+            json=paginated_response([self.klant_vestiging]),
+        )
 
         m.get(
             f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten?klant={self.klant['url']}",
             json=paginated_response([self.klant_contactmoment]),
         )
-
         m.get(
             f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten?klant={self.klant2['url']}",
             json=paginated_response([self.klant_contactmoment2]),
+        )
+        m.get(
+            f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten?klant={self.klant_vestiging['url']}",
+            json=paginated_response([self.klant_contactmoment4]),
         )
 
         return self

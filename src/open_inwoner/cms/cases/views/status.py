@@ -746,7 +746,7 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
         except ObjectDoesNotExist:
             ztc = None
 
-        klant = fetch_klant(**get_fetch_parameters(self.request.user))
+        klant = fetch_klant(**get_fetch_parameters(self.request))
         if klant:
             self.log_system_action("retrieved klant for user", user=self.request.user)
         else:

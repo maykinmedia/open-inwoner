@@ -11,6 +11,7 @@ from django.views.generic import TemplateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin
 
+from open_inwoner.kvk.branches import get_kvk_branch_number
 from open_inwoner.openklant.api_models import KlantContactMoment
 from open_inwoner.openklant.constants import Status
 from open_inwoner.openklant.models import OpenKlantConfig
@@ -106,7 +107,9 @@ class KlantContactMomentListView(KlantContactMomentBaseView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        kcms = fetch_klantcontactmomenten(**get_fetch_parameters(self.request.user))
+        kcms = fetch_klantcontactmomenten(
+            **get_fetch_parameters(self.request, use_vestigingsnummer=True)
+        )
         ctx["contactmomenten"] = [self.get_kcm_data(kcm) for kcm in kcms]
         return ctx
 
@@ -132,7 +135,7 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
 
         kcm = fetch_klantcontactmoment(
             kwargs["kcm_uuid"],
-            **get_fetch_parameters(self.request.user),
+            **get_fetch_parameters(self.request, use_vestigingsnummer=True),
         )
 
         if not kcm:

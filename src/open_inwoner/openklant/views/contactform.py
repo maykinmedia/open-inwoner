@@ -119,7 +119,7 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
         if self.request.user.is_authenticated and (
             self.request.user.bsn or self.request.user.kvk
         ):
-            klant = fetch_klant(**get_fetch_parameters(self.request.user))
+            klant = fetch_klant(**get_fetch_parameters(self.request))
 
             if klant:
                 self.log_system_action(
