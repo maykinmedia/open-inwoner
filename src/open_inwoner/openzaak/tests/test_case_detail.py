@@ -585,8 +585,8 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             ),
         )
 
-    @patch("open_inwoner.cms.cases.views.status.case_status_seen")
-    @patch("open_inwoner.cms.cases.views.status.case_documents_seen")
+    @patch("open_inwoner.userfeed.hooks.case_status_seen")
+    @patch("open_inwoner.userfeed.hooks.case_documents_seen")
     def test_status_is_retrieved_when_user_logged_in_via_digid(
         self, m, mock_hook_status: Mock, mock_hook_documents: Mock
     ):

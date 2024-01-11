@@ -473,7 +473,7 @@ class StatusNotificationHandlerTestCase(
 @override_settings(ZGW_LIMIT_NOTIFICATIONS_FREQUENCY=3600)
 @freeze_time("2023-01-01 01:00:00")
 class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
-    @patch("open_inwoner.openzaak.notifications.case_status_notification_received")
+    @patch("open_inwoner.userfeed.hooks.case_status_notification_received")
     @patch("open_inwoner.openzaak.notifications.send_case_update_email")
     def test_handle_status_update(self, mock_send: Mock, mock_feed_hook: Mock):
         """

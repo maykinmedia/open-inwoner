@@ -1,4 +1,5 @@
 from open_inwoner.userfeed.adapter import FeedItem
+from open_inwoner.userfeed.choices import FeedItemType
 
 
 def get_item_adapter_class(type: str) -> type[FeedItem]:
@@ -9,7 +10,7 @@ feed_adapter_default = FeedItem
 feed_adapter_map = dict()
 
 
-def register_item_adapter(adapter_class: type[FeedItem], feed_type: str):
+def register_item_adapter(adapter_class: type[FeedItem], feed_type: FeedItemType):
     # NOTE this function could be upgraded to work as class decorator
 
     if feed_type in feed_adapter_map and adapter_class != feed_adapter_map[feed_type]:

@@ -148,7 +148,7 @@ class PlanViewTests(WebTest):
         self.assertContains(response, self.contact.get_full_name())
         self.assertNotContains(response, new_contact.get_full_name())
 
-    @patch("open_inwoner.plans.views.plan_completed")
+    @patch("open_inwoner.userfeed.hooks.plan_completed")
     def test_plan_detail_userfeed_hook(self, mock_plan_completed: Mock):
         self.plan.end_date = date.today()
         self.plan.save()

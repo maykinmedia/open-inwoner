@@ -33,7 +33,7 @@ class Command(BaseCommand):
         try:
             user = User.objects.get(pk=options["user"])
         except User.DoesNotExist:
-            self.stdout.write("user_id not found, use one off:")
+            self.stdout.write("user_id not found, use one of:")
             for user in User.objects.filter(is_active=True, is_staff=True).order_by(
                 "id"
             ):

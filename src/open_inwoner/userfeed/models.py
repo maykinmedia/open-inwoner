@@ -1,4 +1,5 @@
-from typing import Optional
+from typing import Optional, Union
+from uuid import UUID
 
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -17,10 +18,10 @@ class FeedItemManager(models.Manager):
     def mark_uuid_completed(
         self,
         user: User,
-        type: str,
-        ref_uuid,
+        type: FeedItemType,
+        ref_uuid: Union[str, UUID],
         ref_key: Optional[str] = None,
-        force=False,
+        force: bool = False,
     ):
         qs = self.filter(
             user=user,
@@ -34,10 +35,10 @@ class FeedItemManager(models.Manager):
     def mark_object_completed(
         self,
         user: User,
-        type: str,
-        ref_object,
+        type: FeedItemType,
+        ref_object: models.Model,
         ref_key: Optional[str] = None,
-        force=False,
+        force: bool = False,
     ):
         qs = self.filter(
             user=user,
@@ -61,7 +62,9 @@ class FeedItemQueryset(models.QuerySet):
             completed_at=timezone.now(),
         )
 
-    def filter_ref_object(self, ref_object):
+    def filter_ref_object(
+        self, ref_object: models.Model
+    ) -> models.QuerySet["FeedItemData"]:
         return self.filter(
             ref_object_id=ref_object.id,
             ref_object_type=ContentType.objects.get_for_model(ref_object),
@@ -84,7 +87,7 @@ class FeedItemData(models.Model):
     )
 
     @property
-    def is_completed(self):
+    def is_completed(self) -> bool:
         return self.completed_at is not None
 
     auto_expire_at = models.DateTimeField(
@@ -124,7 +127,7 @@ class FeedItemData(models.Model):
     ref_object_id = models.PositiveIntegerField(blank=True, null=True)
 
     @cached_property
-    def ref_object(self):
+    def ref_object(self) -> Optional[models.Model]:
         # don't raise but return None
         if self.ref_object_type_id and self.ref_object_id:
             return self.ref_object_field

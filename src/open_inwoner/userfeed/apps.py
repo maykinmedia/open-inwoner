@@ -11,19 +11,11 @@ class UserFeedConfig(AppConfig):
     verbose_name = "User Feed"
 
     def ready(self):
-        auto_import_hooks()
+        auto_import_adapters()
 
 
-def auto_import_hooks():
+def auto_import_adapters():
     """
-    import files from hooks directory
-
-    this expects things calling their register_xyz() function at module level
+    import files from hooks directory to register adapters
     """
-
-    hooks_dir = Path(__file__).parent / "hooks"
-    for f in os.listdir(hooks_dir):
-        name, ext = os.path.splitext(f)
-        if ext == ".py" and name != "__init__":
-            path = f"open_inwoner.userfeed.hooks.{name}"
-            import_module(path)
+    import open_inwoner.userfeed.hooks  # noqa

@@ -24,7 +24,7 @@ class Feed:
     items: list[FeedItem] = dataclasses.field(default_factory=list)
     summary: list[str] = dataclasses.field(default_factory=list)
 
-    def has_display(self) -> int:
+    def has_display(self) -> bool:
         return self.total_items > 0
 
     def action_required(self) -> int:

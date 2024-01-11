@@ -55,8 +55,7 @@ from open_inwoner.openzaak.models import (
     ZaakTypeStatusTypeConfig,
 )
 from open_inwoner.openzaak.utils import get_role_name_display, is_info_object_visible
-from open_inwoner.userfeed.hooks.case_document import case_documents_seen
-from open_inwoner.userfeed.hooks.case_status import case_status_seen
+from open_inwoner.userfeed import hooks
 from open_inwoner.utils.time import has_new_elements
 from open_inwoner.utils.translate import TranslationLookup
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
@@ -220,9 +219,8 @@ class InnerCaseDetailView(
                 self.case, self.resulttype_config_mapping
             )
 
-            # flag case seen in user feed
-            case_status_seen(self.request.user, self.case)
-            case_documents_seen(self.request.user, self.case)
+            hooks.case_status_seen(self.request.user, self.case)
+            hooks.case_documents_seen(self.request.user, self.case)
 
             context["case"] = {
                 "id": str(self.case.uuid),
