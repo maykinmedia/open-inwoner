@@ -74,6 +74,10 @@ class KvKClient:
     def search_endpoint(self):
         return self._urljoin(self.config.api_root, "zoeken")
 
+    @cached_property
+    def basisprofielen_endpoint(self):
+        return self._urljoin(self.config.api_root, "basisprofielen")
+
     def search(self, **kwargs) -> dict:
         """
         Generic call to the 'Zoeken' endpoint of the KvK API
@@ -107,18 +111,13 @@ class KvKClient:
         return self.search(**kwargs).get("resultaten", [])
 
     def retrieve_rsin_with_kvk(self, kvk, **kwargs) -> Optional[str]:
-        company_data = self.get_company_headquarters(kvk, **kwargs)
+        basisprofiel = self._request(
+            f"{self.basisprofielen_endpoint}/{kvk}", params=kwargs
+        )
 
-        if not company_data:
+        if not basisprofiel:
             return None
 
-        basisprofiel_link = None
-        for link in company_data["links"]:
-            if link["rel"] == "basisprofiel":
-                basisprofiel_link = link["href"]
-                break
-
-        basisprofiel = self._request(basisprofiel_link, {})
         try:
             rsin = basisprofiel["_embedded"]["eigenaar"]["rsin"]
         except KeyError:

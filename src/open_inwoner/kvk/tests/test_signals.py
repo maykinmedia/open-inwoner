@@ -34,16 +34,14 @@ class TestPreSaveSignal(ClearCachesMixin, TestCase):
     def test_signal_updates_users_data_when_logged_in_via_eherkenning(self, m):
         m.get(
             self.kvk_client._build_url(
-                self.kvk_client.search_endpoint, {"kvkNummer": "69599084"}
+                f"{self.kvk_client.basisprofielen_endpoint}/69599084",
             ),
-            json=mocks.simple,
-        )
-        m.get(
-            mocks.simple["resultaten"][0]["links"][0]["href"],
             json=mocks.basisprofiel_detail,
         )
 
         user = UserModel.eherkenning_objects.eherkenning_create("69599084")
+
+        self.client.force_login(user=user)
 
         user.refresh_from_db()
 
@@ -65,7 +63,7 @@ class TestPreSaveSignal(ClearCachesMixin, TestCase):
     def test_empty_response_from_kvk(self, m):
         m.get(
             self.kvk_client._build_url(
-                self.kvk_client.search_endpoint, {"kvkNummer": "69599084"}
+                f"{self.kvk_client.basisprofielen_endpoint}/69599084",
             ),
             json=mocks.empty,
         )
@@ -80,7 +78,7 @@ class TestPreSaveSignal(ClearCachesMixin, TestCase):
     def test_user_is_not_updated_when_http_404(self, m):
         m.get(
             self.kvk_client._build_url(
-                self.kvk_client.search_endpoint, {"kvkNummer": "69599084"}
+                f"{self.kvk_client.basisprofielen_endpoint}/69599084",
             ),
             status_code=404,
         )
@@ -94,7 +92,7 @@ class TestPreSaveSignal(ClearCachesMixin, TestCase):
     def test_user_is_not_updated_when_http_500(self, m):
         m.get(
             self.kvk_client._build_url(
-                self.kvk_client.search_endpoint, {"kvkNummer": "69599084"}
+                f"{self.kvk_client.basisprofielen_endpoint}/69599084",
             ),
             status_code=500,
         )
@@ -121,12 +119,8 @@ class TestLogging(TestCase):
     def test_signal_updates_logging(self, m):
         m.get(
             self.kvk_client._build_url(
-                self.kvk_client.search_endpoint, {"kvkNummer": "69599084"}
+                f"{self.kvk_client.basisprofielen_endpoint}/69599084",
             ),
-            json=mocks.simple,
-        )
-        m.get(
-            mocks.simple["resultaten"][0]["links"][0]["href"],
             json=mocks.basisprofiel_detail,
         )
 
@@ -136,7 +130,9 @@ class TestLogging(TestCase):
         user.kvk = "69599084"
         user.save()
 
-        log_entry = TimelineLog.objects.filter(object_id=user.id)[1]
+        self.client.force_login(user=user)
+
+        log_entry = TimelineLog.objects.filter(object_id=user.id)[2]
 
         self.assertEquals(
             log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
@@ -156,11 +152,10 @@ class TestLogging(TestCase):
     def test_single_entry_is_logged_when_there_is_an_error(self, m):
         m.get(
             self.kvk_client._build_url(
-                self.kvk_client.search_endpoint, {"kvkNummer": "69599084"}
+                f"{self.kvk_client.basisprofielen_endpoint}/69599084",
             ),
-            json=mocks.simple,
+            status_code=500,
         )
-        m.get(mocks.simple["resultaten"][0]["links"][0]["href"], status_code=500)
 
         user = UserFactory(
             first_name="", last_name="", login_type=LoginTypeChoices.eherkenning
@@ -168,6 +163,9 @@ class TestLogging(TestCase):
         user.kvk = "69599084"
         user.save()
 
+        self.client.force_login(user=user)
+
         log_entries = TimelineLog.objects.count()
 
-        self.assertEqual(log_entries, 1)
+        # Login message + message to attempt KvK data retrieval
+        self.assertEqual(log_entries, 2)
