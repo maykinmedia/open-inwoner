@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import messages
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -15,6 +16,7 @@ from open_inwoner.openklant.wrap import (
     get_fetch_parameters,
     patch_klant,
 )
+from open_inwoner.utils.hash import create_sha256_hash
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 
@@ -115,11 +117,13 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
     def register_by_api(self, form, config: OpenKlantConfig):
         assert config.has_api_configuration()
 
+        klant = None
         # fetch/update/create klant
         if self.request.user.is_authenticated and (
             self.request.user.bsn or self.request.user.kvk
         ):
-            klant = fetch_klant(**get_fetch_parameters(self.request))
+            params = get_fetch_parameters(self.request, use_vestigingsnummer=True)
+            klant = fetch_klant(**params)
 
             if klant:
                 self.log_system_action(
@@ -146,25 +150,45 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
                     user=self.request.user,
                 )
 
-            data = {
-                "bronorganisatie": config.register_bronorganisatie_rsin,
-                "voornaam": form.cleaned_data["first_name"],
-                "voorvoegselAchternaam": form.cleaned_data["infix"],
-                "achternaam": form.cleaned_data["last_name"],
-                "emailadres": form.cleaned_data["email"],
-                "telefoonnummer": form.cleaned_data["phonenumber"],
-            }
-            # registering klanten won't work in e-Suite as it always pulls from BRP
-            # (but try anyway and fallback to appending details to tekst if fails)
-            klant = create_klant(data)
-            if klant:
-                if self.request.user.is_authenticated:
-                    self.log_system_action(
-                        "created klant for basic authenticated user",
-                        user=self.request.user,
-                    )
+                if self.request.user.bsn:
+                    unique_id = self.request.user.bsn
+                    subject_type = "natuurlijk_persoon"
+                    subject_identificatie = {"inp_bsn": unique_id}
                 else:
-                    self.log_system_action("created klant for anonymous user")
+                    if "vestigingsnummer" in params:
+                        unique_id = params["vestigingsnummer"]
+                        subject_type = "vestiging"
+                        subject_identificatie = {"vestigings_nummer": unique_id}
+                    else:
+                        unique_id = params["user_kvk_or_rsin"]
+                        subject_type = "niet_natuurlijk_persoon"
+                        subject_identificatie = {"inn_nnp_id": unique_id}
+
+                data = {
+                    "klantnummer": create_sha256_hash(
+                        unique_id, salt=settings.SECRET_KEY
+                    )[:8],
+                    "bronorganisatie": config.register_bronorganisatie_rsin,
+                    "voornaam": form.cleaned_data["first_name"],
+                    "voorvoegselAchternaam": form.cleaned_data["infix"],
+                    "achternaam": form.cleaned_data["last_name"],
+                    "emailadres": form.cleaned_data["email"],
+                    "telefoonnummer": form.cleaned_data["phonenumber"],
+                    "subject_type": subject_type,
+                    "subject_identificatie": subject_identificatie,
+                }
+                # registering klanten won't work in e-Suite as it always pulls from BRP
+                # (but try anyway and fallback to appending details to tekst if fails)
+
+                klant = create_klant(data)
+                if klant:
+                    if self.request.user.is_authenticated:
+                        self.log_system_action(
+                            "created klant for basic authenticated user",
+                            user=self.request.user,
+                        )
+                    else:
+                        self.log_system_action("created klant for anonymous user")
 
         # create contact moment
         subject = form.cleaned_data["subject"].subject

@@ -137,7 +137,9 @@ def _fetch_klanten_for_kvk_or_rsin(
 
 
 def fetch_klant(
-    user_bsn: Optional[str] = None, user_kvk_or_rsin: Optional[str] = None
+    user_bsn: Optional[str] = None,
+    user_kvk_or_rsin: Optional[str] = None,
+    vestigingsnummer: Optional[str] = None,
 ) -> Optional[Klant]:
     if not user_bsn and not user_kvk_or_rsin:
         return
@@ -146,7 +148,9 @@ def fetch_klant(
     if user_bsn:
         klanten = _fetch_klanten_for_bsn(user_bsn)
     elif user_kvk_or_rsin:
-        klanten = _fetch_klanten_for_kvk_or_rsin(user_kvk_or_rsin)
+        klanten = _fetch_klanten_for_kvk_or_rsin(
+            user_kvk_or_rsin, vestigingsnummer=vestigingsnummer
+        )
 
     if klanten:
         # let's use the first one

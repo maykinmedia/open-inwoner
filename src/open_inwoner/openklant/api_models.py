@@ -3,10 +3,11 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import List, Optional, TypedDict, Union
 
-from zgw_consumers.api_models.base import ZGWModel
+from zgw_consumers.api_models.base import Model, ZGWModel
 
 
 class KlantCreateData(TypedDict):
+    klantnummer: str
     bronorganisatie: str
     voornaam: str
     voorvoegselAchternaam: str

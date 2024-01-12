@@ -55,6 +55,7 @@ from open_inwoner.openzaak.models import (
     ZaakTypeStatusTypeConfig,
 )
 from open_inwoner.openzaak.utils import get_role_name_display, is_info_object_visible
+from open_inwoner.utils.hash import create_sha256_hash
 from open_inwoner.utils.time import has_new_elements
 from open_inwoner.utils.translate import TranslationLookup
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
@@ -746,20 +747,41 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
         except ObjectDoesNotExist:
             ztc = None
 
-        klant = fetch_klant(**get_fetch_parameters(self.request))
+        params = get_fetch_parameters(self.request)
+        klant = fetch_klant(**params)
         if klant:
             self.log_system_action("retrieved klant for user", user=self.request.user)
         else:
             self.log_system_action(
                 "could not retrieve klant for user", user=self.request.user
             )
+
+            if self.request.user.bsn:
+                unique_id = self.request.user.bsn
+                subject_type = "natuurlijk_persoon"
+                subject_identificatie = {"inp_bsn": unique_id}
+            else:
+                if "vestigingsnummer" in params:
+                    unique_id = params["vestigingsnummer"]
+                    subject_type = "vestiging"
+                    subject_identificatie = {"vestigings_nummer": unique_id}
+                else:
+                    unique_id = params["user_kvk_or_rsin"]
+                    subject_type = "niet_natuurlijk_persoon"
+                    subject_identificatie = {"inn_nnp_id": unique_id}
+
             data = {
+                "klantnummer": create_sha256_hash(unique_id, salt=settings.SECRET_KEY)[
+                    :9
+                ],
                 "bronorganisatie": config.register_bronorganisatie_rsin,
                 "voornaam": self.request.user.first_name,
                 "voorvoegselAchternaam": self.request.user.infix,
                 "achternaam": self.request.user.last_name,
                 "emailadres": self.request.user.email,
                 "telefoonnummer": self.request.user.phonenumber,
+                "subject_type": subject_type,
+                "subject_identificatie": subject_identificatie,
             }
             # registering klanten won't work in e-Suite as it always pulls from BRP (but try anyway and fallback to appending details to tekst if fails)
             klant = create_klant(data)
