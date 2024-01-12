@@ -162,6 +162,7 @@ class CategoryAdmin(
                     "description",
                     "icon",
                     "image",
+                    "auto_redirect_to_link",
                     "_position",
                     "_ref_node_id",
                 ),
