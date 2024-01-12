@@ -22,10 +22,12 @@ class ContactViewTests(WebTest):
     csrf_checks = False
 
     def setUp(self) -> None:
-        self.user = UserFactory()
-        self.digid_user = DigidUserFactory()
+        self.user = UserFactory(first_name="Joe", infix="van de", last_name="Doe")
+        self.digid_user = DigidUserFactory(
+            first_name="Jane", infix="van de", last_name="Roe"
+        )
 
-        self.contact = UserFactory()
+        self.contact = UserFactory(first_name="Harry", infix="van de", last_name="Moe")
         self.user.user_contacts.add(self.contact)
         self.login_url = reverse("login")
         self.list_url = reverse("profile:contact_list")
@@ -43,7 +45,7 @@ class ContactViewTests(WebTest):
         self.assertContains(response, self.contact.first_name)
 
     def test_contact_list_only_show_personal_contacts(self):
-        other_user = UserFactory()
+        other_user = UserFactory(first_name="Luke")
         response = self.app.get(self.list_url, user=other_user)
         self.assertNotContains(response, self.contact.first_name)
 
@@ -56,7 +58,9 @@ class ContactViewTests(WebTest):
         self.assertContains(response, existing_user.email)
 
     def test_contact_filter(self):
-        begeleider = UserFactory(contact_type=ContactTypeChoices.begeleider)
+        begeleider = UserFactory(
+            first_name="Luke", contact_type=ContactTypeChoices.begeleider
+        )
         self.user.user_contacts.add(begeleider)
 
         response = self.app.get(self.list_url, user=self.user)
@@ -159,7 +163,7 @@ class ContactViewTests(WebTest):
         self.assertIn(invite_url, body)
 
     def test_existing_user_contact(self):
-        existing_user = UserFactory()
+        existing_user = UserFactory(first_name="Luke")
         response = self.app.get(self.create_url, user=self.user)
         form = response.forms["contact-form"]
 
@@ -372,7 +376,9 @@ class ContactViewTests(WebTest):
         self.app.post(self.delete_url, user=other_user, status=404)
 
     def test_approve_with_existing_user(self):
-        existing_user = UserFactory(email="ex@example.com")
+        existing_user = UserFactory(
+            first_name="Luke", last_name="Skywalker", email="ex@example.com"
+        )
 
         # Create contact from existing user
         create_form = self.app.get(self.create_url, user=self.user).forms[
@@ -395,7 +401,9 @@ class ContactViewTests(WebTest):
         self.assertIn(self.user, existing_user.user_contacts.all())
 
     def test_reject_with_existing_user(self):
-        existing_user = UserFactory(email="ex@example.com")
+        existing_user = UserFactory(
+            first_name="Luke", last_name="Skywalker", email="ex@example.com"
+        )
 
         # Create a contact which addresses an existing user
         create_form = self.app.get(self.create_url, user=self.user).forms[
@@ -418,7 +426,9 @@ class ContactViewTests(WebTest):
         self.assertNotIn(self.user, existing_user.user_contacts.all())
 
     def test_approve_action_redirects_to_contact_list_page(self):
-        existing_user = UserFactory(email="ex@example.com")
+        existing_user = UserFactory(
+            first_name="Luke", last_name="Skywalker", email="ex@example.com"
+        )
         self.user.contacts_for_approval.add(existing_user)
 
         response = self.app.get(self.list_url, user=existing_user)
@@ -434,7 +444,12 @@ class ContactViewTests(WebTest):
         response = self.app.post(url, user=other_user, status=404)
 
     def test_pending_approval_shows_only_email_in_creator_page(self):
-        existing_user = UserFactory(email="uu@example.com", phonenumber="06988989898")
+        existing_user = UserFactory(
+            first_name="Luke",
+            last_name="Skywalker",
+            email="ex@example.com",
+            phonenumber="06988989898",
+        )
         self.user.contacts_for_approval.add(existing_user)
 
         response = self.app.get(self.list_url, user=self.user)
@@ -445,7 +460,9 @@ class ContactViewTests(WebTest):
         self.assertNotContains(response, existing_user.phonenumber)
 
     def test_accepted_contact_appears_in_both_contact_lists(self):
-        existing_user = UserFactory(email="ex@example.com")
+        existing_user = UserFactory(
+            first_name="Luke", last_name="Skywalker", email="ex@example.com"
+        )
         self.user.contacts_for_approval.add(existing_user)
 
         # Receiver contact list page
@@ -475,7 +492,9 @@ class ContactViewTests(WebTest):
 
     # TODO: fix
     def test_notification_email_for_approval_is_sent(self):
-        existing_user = UserFactory(email="ex@example.com")
+        existing_user = UserFactory(
+            first_name="Luke", last_name="Skywalker", email="ex@example.com"
+        )
 
         # Create a contact which addresses an existing user
         create_form = self.app.get(self.create_url, user=self.user).forms[
