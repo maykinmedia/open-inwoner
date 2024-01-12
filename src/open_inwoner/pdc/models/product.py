@@ -86,6 +86,16 @@ class Product(models.Model):
         default="",
         help_text=_("Action link to request the product."),
     )
+    auto_redirect_to_link = models.URLField(
+        verbose_name=_("Automatically redirect to link"),
+        max_length=1000,
+        blank=True,
+        default="",
+        help_text=_(
+            "If configured, the user will be automatically redirected to this link "
+            "when accessing the product detail page."
+        ),
+    )
     button_text = models.CharField(
         verbose_name=_("CTA Button text"),
         max_length=64,
