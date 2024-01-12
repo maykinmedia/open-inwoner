@@ -18,8 +18,6 @@ export class StatusAccordion {
       '.status-list__notification-content'
     )
     setTimeout(() => {
-      console.log('status is clicked')
-
       // Toggle any status list-element (current, completed, final, future)
       node.classList.toggle(
         'status--open',
