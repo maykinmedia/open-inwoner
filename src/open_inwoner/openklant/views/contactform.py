@@ -146,7 +146,6 @@ class ContactFormView(CommonPageMixin, LogMixin, BaseBreadcrumbMixin, FormView):
                     user=self.request.user,
                 )
 
-        else:
             data = {
                 "bronorganisatie": config.register_bronorganisatie_rsin,
                 "voornaam": form.cleaned_data["first_name"],
