@@ -347,6 +347,19 @@ class TestProductDetailView(WebTest):
         self.assertEqual(links[3].text, "Second subheading")
         self.assertEqual(links[3].attrib["href"], "#subheading-second-subheading")
 
+    def test_auto_redirect_to_link(self):
+        product = ProductFactory(
+            content="##First subheading\rlorem ipsum...\r##Second subheading",
+            auto_redirect_to_link="http://www.example.com",
+        )
+
+        response = self.app.get(
+            reverse("products:product_detail", kwargs={"slug": product.slug})
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, "http://www.example.com")
+
 
 @tag("e2e")
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")

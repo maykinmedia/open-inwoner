@@ -174,6 +174,21 @@ class TestPublishedCategories(WebTest):
         )
         self.assertEqual(list(response.context["subcategories"]), [descendent1])
 
+    def test_auto_redirect_to_link(self):
+        category = CategoryFactory(
+            path="1234",
+            name="redirect",
+            slug="redirect",
+            auto_redirect_to_link="http://www.example.com",
+        )
+
+        response = self.app.get(
+            reverse("products:category_detail", kwargs={"slug": category.slug})
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, "http://www.example.com")
+
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestHighlightedQuestionnaire(WebTest):
