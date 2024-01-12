@@ -174,6 +174,37 @@ class TestPublishedCategories(WebTest):
         )
         self.assertEqual(list(response.context["subcategories"]), [descendent1])
 
+    def test_auto_redirect_to_link(self):
+        category = CategoryFactory(
+            path="1234",
+            name="redirect",
+            slug="redirect",
+            link="http://www.example.com",
+            auto_redirect_to_link=True,
+        )
+
+        response = self.app.get(
+            reverse("products:category_detail", kwargs={"slug": category.slug})
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, "http://www.example.com")
+
+    def test_no_auto_redirect_to_link_if_no_link_configured(self):
+        category = CategoryFactory(
+            path="1234",
+            name="redirect",
+            slug="redirect",
+            link="http://www.example.com",
+            auto_redirect_to_link=False,
+        )
+
+        response = self.app.get(
+            reverse("products:category_detail", kwargs={"slug": category.slug})
+        )
+
+        self.assertEqual(response.status_code, 200)
+
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestHighlightedQuestionnaire(WebTest):
