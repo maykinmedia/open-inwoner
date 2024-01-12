@@ -55,6 +55,14 @@ class CategoryBreadcrumbMixin:
         ]
 
 
+class RedirectToLinkMixin:
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if obj.auto_redirect_to_link and obj.link:
+            return HttpResponseRedirect(obj.link)
+        return super().dispatch(request, *args, **kwargs)
+
+
 class FAQView(CommonPageMixin, TemplateView):
     template_name = "pages/faq.html"
 
@@ -94,6 +102,7 @@ class CategoryDetailView(
     CommonPageMixin,
     BaseBreadcrumbMixin,
     CategoryBreadcrumbMixin,
+    RedirectToLinkMixin,
     DetailView,
 ):
     template_name = "pages/category/detail.html"
@@ -169,18 +178,16 @@ class CategoryDetailView(
 
 
 class ProductDetailView(
-    CommonPageMixin, BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    CategoryBreadcrumbMixin,
+    RedirectToLinkMixin,
+    DetailView,
 ):
     template_name = "pages/product/detail.html"
     model = Product
     breadcrumb_use_pk = False
     no_list = True
-
-    def dispatch(self, request, *args, **kwargs):
-        obj = self.get_object()
-        if obj.auto_redirect_to_link and obj.link:
-            return HttpResponseRedirect(obj.link)
-        return super().dispatch(request, *args, **kwargs)
 
     @cached_property
     def crumbs(self):

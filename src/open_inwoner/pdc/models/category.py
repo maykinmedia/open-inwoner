@@ -93,6 +93,22 @@ class Category(MP_Node):
         help_text=_("Image of the category"),
     )
 
+    link = models.URLField(
+        verbose_name=_("Redirect to link"),
+        max_length=1000,
+        blank=True,
+        default="",
+        help_text=_("The link to which the user will be redirected"),
+    )
+    auto_redirect_to_link = models.BooleanField(
+        verbose_name=_("Automatically redirect to link"),
+        default=False,
+        help_text=_(
+            "Whether the user should be automatically redirect to the category link "
+            "when the user visits the product page."
+        ),
+    )
+
     objects = CategoryPublishedQueryset.as_manager()
 
     class Meta:
