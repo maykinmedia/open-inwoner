@@ -38,13 +38,13 @@
     {# Collapsable content #}
     <div class="readmore">
         {% if object.content_is_collapsable %}
-            <a class="readmore__toggle button button--textless button--icon button--icon-after button--secondary button--transparent" href="#" title="{% trans 'Click here in order to show extra content' %}" aria-label="{% trans 'Click here for more information' %}" aria-expanded="false">
+            <a class="readmore__toggle button button--textless button--icon button--icon-after button--secondary button--transparent" href="#readmore__content" title="{% trans 'Click here in order to show extra content' %}" aria-label="{% trans 'Click here for more information' %}" aria-expanded="false">
                 {% icon icon="expand_more" icon_position="after" icon_outlined=True %}
                 <span class="readmore__button-text">{% trans "Click here for more information" %}</span>
                 <span class="readmore__button-text--hidden">{% trans "Show less information" %}</span>
             </a>
         {% endif %}
-        <div class="readmore__content" data-toggle-readmore="{{ readmore|lower }}">
+        <div class="readmore__content" id="readmore__content" data-toggle-readmore="{{ readmore|lower }}">
             <div class="readmore__inner-content {% if object.content_is_collapsable %}readmore__content--hidden{% endif %}">
                 {{ object|product_ckeditor_content|safe }}
             </div>

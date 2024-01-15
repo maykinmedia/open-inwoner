@@ -3,13 +3,15 @@ export class ReadMore {
 
   constructor(node) {
     this.node = node
-    this.button = node.querySelector('.button')
-    this.button.addEventListener('click', this.toggleReadMore.bind(this))
+    this.button = node.querySelector('.readmore .button')
+    // Execute if selector exists
+    this.button?.addEventListener('click', this.toggleReadMore.bind(this))
   }
 
-  toggleReadMore(event) {
+  toggleReadMore() {
     setTimeout(() => {
       this.node.classList.toggle('readmore--open')
+
       this.button.setAttribute(
         'aria-expanded',
         this.button.getAttribute('aria-expanded') === 'true' ? 'false' : 'true'
