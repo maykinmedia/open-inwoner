@@ -52,7 +52,7 @@
     "htmx.org": "^1.8.4",
     "inline-css": "^3.0.0",
     "leaflet": "^1.7.1",
-    "material-icons": "^1.10.11",
+    "material-icons": "^1.13.12",
     "microscope-sass": "latest",
     "proj4leaflet": "^1.0.2",
     "style-loader": "^2.0.0"
