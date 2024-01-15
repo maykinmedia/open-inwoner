@@ -147,6 +147,19 @@ TWO_FACTOR_PATCH_ADMIN = False
 # playwright multi browser
 PLAYWRIGHT_MULTI_ONLY_DEFAULT = True
 
+if config("PROFILE", default=False):
+    INSTALLED_APPS += ["silk"]
+    MIDDLEWARE = ["silk.middleware.SilkyMiddleware"] + MIDDLEWARE
+    SILKY_PYTHON_PROFILER = True
+    SILKY_PYTHON_PROFILER_BINARY = True
+    SILKY_DYNAMIC_PROFILING = [
+        {
+            "module": "open_inwoner.cms.cases.views.status",
+            "function": "InnerCaseDetailView.dispatch",
+            "name": "InnerCaseDetailView",
+        }
+    ]
+
 # Override settings with local settings.
 try:
     from .local import *  # noqa

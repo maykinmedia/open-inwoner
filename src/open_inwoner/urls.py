@@ -192,3 +192,6 @@ if settings.DEBUG:
         urlpatterns = [
             path("__debug__/", include(debug_toolbar.urls)),
         ] + urlpatterns
+
+if apps.is_installed("silk"):
+    urlpatterns.insert(0, path(r"silk/", include("silk.urls", namespace="silk")))
