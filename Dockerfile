@@ -64,7 +64,7 @@ FROM python:3.9-slim-buster
 # Note: mime-support becomes media-types in Debian Bullseye (required for correctly serving mime-types for images)
 # Also install the dependencies for GeoDjango
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
         procps \
         vim \
         postgresql-client \
