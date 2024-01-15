@@ -645,7 +645,7 @@ mozilla-django-oidc-db==0.12.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-notifications-api-common==0.2.0
+notifications-api-common==0.2.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
