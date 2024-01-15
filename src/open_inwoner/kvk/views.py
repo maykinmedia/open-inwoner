@@ -55,6 +55,8 @@ class CompanyBranchChoiceView(FormView):
         company_branches = context["company_branches"]
 
         if not company_branches:
+            request.session[KVK_BRANCH_SESSION_VARIABLE] = request.user.kvk
+            request.session.save()
             return HttpResponseRedirect(redirect.url)
 
         if len(company_branches) == 1:
