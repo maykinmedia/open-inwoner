@@ -168,6 +168,7 @@ export class FileInput extends Component {
       !target.classList.contains('link') &&
       !target.parentElement.classList.contains('link')
     ) {
+      console.log(!target.classList)
       return
     }
 
@@ -175,6 +176,9 @@ export class FileInput extends Component {
     const listItem = target.closest('.file-list__list-item')
     const index = [...this.getFilesList().children].indexOf(listItem)
     const input = this.getInput()
+    console.log(listItem,'listItem')
+    console.log('index',index)
+    console.log('input', input)
 
     const files = [...input.files].filter((_, i) => i !== index)
 
@@ -253,6 +257,7 @@ export class FileInput extends Component {
     // Populate the file list.
     const html = [...files].map((file) => this.renderFileHTML(file)).join('')
     this.getFilesList().innerHTML = html
+    console.log('html er na.', html)
   }
 
   /**
@@ -268,9 +273,12 @@ export class FileInput extends Component {
     const labelDelete = this.getFilesList().dataset.labelDelete || 'Delete'
     const getFormNonFieldError = this.getFormNonFieldError()
     const formSubmitButton = this.getFormSubmitButton()
+    console.log('labelDelete', labelDelete)
+    console.log('getFormNonFieldError', getFormNonFieldError)
 
     // Only show errors notification if data-max-file-size is exceeded + add error class to file-list
     const maxMegabytes = this.getLimit()
+    console.log('maxMegabytes', maxMegabytes)
 
     const htmlStart = `
       <li class="file-list__list-item">
