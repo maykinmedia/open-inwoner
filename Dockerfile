@@ -46,8 +46,8 @@ WORKDIR /app
 COPY ./build /app/build/
 COPY ./*.json ./*.js ./.babelrc /app/
 
-# Clone design token submodule with specific Tag version (cloning normally done using git submodule update --init)
-RUN git clone --depth 1 --branch 0.0.2 https://github.com/maykinmedia/open-inwoner-design-tokens.git
+# Clone design token submodule (normally done using git submodule update --init)
+RUN git clone https://github.com/maykinmedia/open-inwoner-design-tokens.git
 
 # install WITH dev tooling
 RUN npm ci --legacy-peer-deps
