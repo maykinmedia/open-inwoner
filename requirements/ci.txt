@@ -349,7 +349,7 @@ django-registration==3.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-django-relativedelta==1.1.2
+django-relativedelta==2.0.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -958,7 +958,7 @@ xsdata==23.8
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-zgw-consumers==0.25.0
+zgw-consumers==0.27.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
