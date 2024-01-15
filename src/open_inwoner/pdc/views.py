@@ -234,6 +234,11 @@ class ProductFormView(
     breadcrumb_use_pk = False
     no_list = True
 
+    def dispatch(self, request, *args, **kwargs):
+        response = super().dispatch(request, *args, **kwargs)
+        response.headers["Referrer-Policy"] = "origin-when-cross-origin"
+        return response
+
     def page_title(self):
         return f"{self.object.name} {_('Formulier')}"
 
