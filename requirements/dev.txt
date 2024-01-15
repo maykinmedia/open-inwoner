@@ -739,7 +739,7 @@ msgpack==1.0.7
     # via locust
 mypy-extensions==0.4.3
     # via black
-notifications-api-common==0.2.0
+notifications-api-common==0.2.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
