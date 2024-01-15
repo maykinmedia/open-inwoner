@@ -176,8 +176,8 @@ export class FileInput extends Component {
     const listItem = target.closest('.file-list__list-item')
     const index = [...this.getFilesList().children].indexOf(listItem)
     const input = this.getInput()
-    console.log(listItem,'listItem')
-    console.log('index',index)
+    console.log(listItem, 'listItem')
+    console.log('index', index)
     console.log('input', input)
 
     const files = [...input.files].filter((_, i) => i !== index)
