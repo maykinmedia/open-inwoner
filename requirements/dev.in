@@ -20,3 +20,4 @@ sphinx_rtd_theme
 
 # performance testing
 locust
+django-silk
