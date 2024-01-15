@@ -1,4 +1,10 @@
+@import '~@utrecht/components/dist/heading-3/css/index.css';
 @import '~microscope-sass/lib/responsive';
+
+.utrecht-heading-3 {
+  display: var(--oip-typography-heading-display);
+  justify-content: var(--oip-typography-heading-justify-content);
+}
 
 .h3 {
   color: var(--font-color-heading-3);
@@ -14,6 +20,7 @@
   }
 }
 
+.p + .utrecht-heading-3,
 .p + .h3 {
   margin-top: var(--spacing-large);
 }
