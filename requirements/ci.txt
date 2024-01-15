@@ -18,7 +18,7 @@ asgiref==3.4.1
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django
-astroid==2.8.0
+astroid==2.15.8
     # via pylint
 attrs==21.2.0
     # via
@@ -130,6 +130,8 @@ diff-match-patch==20200713
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-import-export
+dill==0.3.7
+    # via pylint
 django==3.2.23
     # via
     #   -c requirements/base.txt
@@ -626,8 +628,10 @@ maykin-python3-saml==1.14.0.post0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-digid-eherkenning
-mccabe==0.6.1
-    # via pylint
+mccabe==0.7.0
+    # via
+    #   -r requirements/test-tools.in
+    #   pylint
 messagebird==2.1.0
     # via
     #   -c requirements/base.txt
@@ -724,7 +728,7 @@ pyjwt==2.8.0
     #   -r requirements/base.txt
     #   gemma-zds-client
     #   messagebird
-pylint==2.11.1
+pylint==2.17.7
     # via -r requirements/test-tools.in
 pyopenssl==23.3.0
     # via
@@ -881,7 +885,9 @@ tinycss2==1.1.1
     #   cssselect2
     #   svglib
     #   weasyprint
-toml==0.10.2
+tomli==2.0.1
+    # via pylint
+tomlkit==0.12.3
     # via pylint
 typing-extensions==4.4.0
     # via

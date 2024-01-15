@@ -5,6 +5,7 @@ coverage < 5.0
 django-webtest
 factory-boy
 freezegun
+mccabe<0.8.0,>=0.7.0
 pep8
 pylint
 pyquery  # integrates with webtest
