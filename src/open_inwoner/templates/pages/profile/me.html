@@ -2,7 +2,7 @@
 {% load i18n l10n link_tags file_tags card_tags grid_tags list_tags button_tags utils icon_tags form_tags anchor_menu_tags dropdown_tags %}
 
 {% block sidebar_content %}
-    {% anchor_menu anchors desktop=True %}
+    {% anchor_menu anchors=anchors desktop=True %}
 {% endblock sidebar_content %}
 
 {% block content %}
@@ -83,7 +83,7 @@
     {# Notifications #}
     <section class="tabled tabled--flexible profile-section profile-section--bordered" id="profile-notifications">
         <div class="tabled__section">
-            <h2 class="h2 title" id="overview">{% trans "Voorkeuren voor meldingen" %}
+            <h2 class="h2 title" id="notifications">{% trans "Voorkeuren voor meldingen" %}
                 <div class="tabled__item--force-right tabled__item--mobile-big">
                     {% button href="profile:notifications" text=_("Bewerk") icon="edit" transparent=True icon_outlined=True %}
                 </div>

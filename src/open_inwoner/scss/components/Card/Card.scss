@@ -4,6 +4,8 @@
   --card-size-border: var(--border-width-thin);
   --card-size-dog-ear: var(--gutter-width);
   --card-spacing: var(--spacing-large);
+  --card-spacing-vertical: var(--spacing-giant);
+  --card-spacing-horizontal: var(--spacing-extra-large);
 
   background-color: var(--card-color-background);
   border: var(--card-size-border) solid var(--card-color-border);
@@ -98,8 +100,26 @@
     object-fit: contain;
   }
 
+  &__caption {
+    color: var(--color-gray-dark-900);
+    margin: 0;
+  }
+
+  &__text--small {
+    font-size: var(--font-size-body-small);
+  }
+
+  &__text--dark {
+    color: var(--font-color-body);
+    padding-left: var(--spacing-medium);
+  }
+
   &__body {
-    padding: var(--card-spacing);
+    padding: var(--card-spacing-vertical) var(--card-spacing-horizontal);
+
+    &--compact {
+      padding: var(--card-spacing);
+    }
 
     &--tabled {
       display: flex;
@@ -223,6 +243,14 @@
     font-size: var(--font-size-heading-card);
   }
 
+  &__heading {
+    color: var(--color-black);
+    font-family: var(--font-family-heading);
+    font-size: var(--font-size-heading-card);
+    line-height: var(--font-line-height-body);
+    margin: 0;
+  }
+
   &--product {
     padding: 20px;
     align-items: end;
@@ -255,7 +283,7 @@
   span.button:last-child {
     bottom: 0;
     right: 0;
-    padding-bottom: var(--card-spacing);
+    padding-bottom: var(--card-spacing-vertical);
     position: absolute;
   }
 
@@ -283,7 +311,7 @@
 
   &--stretch .list + .link:first-of-type:last-of-type,
   &--stretch .profile-card__button {
-    bottom: var(--card-spacing);
+    bottom: var(--card-spacing-vertical);
     position: static;
 
     @media (min-width: 768px) {

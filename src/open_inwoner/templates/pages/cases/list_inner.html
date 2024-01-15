@@ -16,38 +16,42 @@
             <div class="card__body">
                 <!-- submission cases -->
                 {% if case.case_type == "OpenSubmission" %}
-                    <a href="{{ case.vervolg_link }}"  class="cases__link">
-                    <p class="h4"><span class="link link__text">{{ case.naam }}</span></p>
+                    <a href="{{ case.vervolg_link }}" class="cases__link">
+                    <h2 class="card__heading">{{ case.naam }}</h2>
                     {% render_list %}
                     <span class="case-list">
+                        <li class="list-item list-item--compact">
+                            {% with end_date=case.eind_datum_geldigheid|default:"Geen" %}
+                            <p class="card__caption card__text--small"><span>{% trans "Aanvraag verloopt op:" %}</span><span class="card__text--dark">{{ end_date|date }}</span></p>
+                            {% endwith %}
+                        </li>
                         {% list_item text="Openstaande aanvraag" caption=_("Status") compact=True strong=False %}
-                        {% list_item text=case.datum_laatste_wijziging caption=_("Laatste wijziging") compact=True strong=False %}
-                        {% with end_date=case.eind_datum_geldigheid|default:"Geen" %}
-                            {% list_item text=end_date caption=_("Verloopt op") compact=True strong=False%}
-                        {% endwith %}
                     </span>
                     {% endrender_list %}
-                    <span class="link link--icon link--secondary" aria-label="{% trans "Bekijk aanvraag" %}" title="{% trans "Ga naar aanvraag" %}">
-                        <span class="link__text">{% trans "Bekijk aanvraag" %}</span>
+                    <span class="link link--icon link--secondary">
+                        <span class="link__text">{% trans "Aanvraag afronden" %}</span>
                         {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
                     </span>
                     </a>
                 <!-- other cases -->
                 {% else %}
                     <a href="{% url 'cases:case_detail' object_id=case.uuid %}" class="cases__link">
-                    <p class="h4"><span class="link link__text">{{ case.description }}</span></p>
+                    <h2 class="card__heading">{{ case.description }}</h2>
                     {% render_list %}
                         <span class="case-list">
+                        <li class="list-item list-item--compact">
+                            <p class="card__caption card__text--small"><span>{% trans "Aanvraag ingediend op:" %}</span><span class="card__text--dark">{{ case.start_date }}</span></p>
+                        </li>
                         {% if case.current_status %}
                             {% list_item case.current_status caption=_("Status") compact=True strong=False %}
                         {% else %}
                             {% list_item "No status" caption=_("Status") compact=True strong=False %}
                         {% endif%}
-                        {% list_item case.start_date caption=_("Ontvangstdatum") compact=True strong=False %}
                         {% list_item case.identification caption=_("Zaaknummer") compact=True strong=False %}
                         </span>
                     {% endrender_list %}
-                    <span class="link link--icon link--secondary" aria-label="{% trans "Bekijk aanvraag" %}" title="{% trans "Bekijk aanvraag" %}">
+
+                    <span class="link link--icon link--secondary">
                         <span class="link__text">{{ case.statustype_config.case_link_text|default:"Bekijk aanvraag" }}</span>
                         {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
                     </span>
