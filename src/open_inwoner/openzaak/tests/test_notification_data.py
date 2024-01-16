@@ -159,7 +159,7 @@ class MockAPIData:
         self.zaak_informatie_object_extra = generate_oas_component(
             "zrc",
             "schemas/ZaakInformatieObject",
-            url=f"{ZAKEN_ROOT}zaakinformatieobjecten/aaaaaaaa-0002-aaaa-aaaa-aaaaaaaaaaaa",
+            url=f"{ZAKEN_ROOT}zaakinformatieobjecten/aaaaaaaa-0003-aaaa-aaaa-aaaaaaaaaaaa",
             informatieobject=self.informatie_object_extra["url"],
             zaak=self.zaak["url"],
         )
