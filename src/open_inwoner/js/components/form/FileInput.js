@@ -156,37 +156,39 @@ export class FileInput extends Component {
   }
 
   /**
-   * Gets called when click event is received on the files list, it originates from a delete button, handle the deletion accordingly.
+   * Gets called when click event is received on the files list, it originates from a delete button, to handle the deletion accordingly.
    * @param {PointerEvent} e
    */
   onClick(e) {
     e.preventDefault()
     const { target } = e
 
-    // Do nothing if the click does not originate from a delete button.
-    if (
-      !target.classList.contains('link') &&
-      !target.parentElement.classList.contains('link')
-    ) {
-      console.log(!target.classList)
-      return
+    // Check if the click originates from a delete button
+    const isDeleteButton =
+      // Filter the file list.
+      target.classList.contains('link') ||
+      target.parentElement.classList.contains('link')
+
+    if (isDeleteButton) {
+      const listItem = target.closest('.file-list__list-item')
+
+      // Ensure the list item is found
+      if (listItem) {
+        const index = Array.from(listItem.parentElement.children).indexOf(
+          listItem
+        )
+        const input = this.getInput()
+
+        // Use filter, not splice
+        const files = Array.from(input.files).filter((_, i) => i !== index)
+
+        this.addFiles(files, true)
+        this.files = files
+
+        // We need to render manually since we're not making state changes.
+        this.render()
+      }
     }
-
-    // Filter the file list.
-    const listItem = target.closest('.file-list__list-item')
-    const index = [...this.getFilesList().children].indexOf(listItem)
-    const input = this.getInput()
-    console.log(listItem, 'listItem')
-    console.log('index', index)
-    console.log('input', input)
-
-    const files = [...input.files].filter((_, i) => i !== index)
-
-    this.addFiles(files, true)
-    this.files = files
-
-    // We need to render manually since we're not making state changes.
-    this.render()
   }
 
   /**
@@ -257,7 +259,6 @@ export class FileInput extends Component {
     // Populate the file list.
     const html = [...files].map((file) => this.renderFileHTML(file)).join('')
     this.getFilesList().innerHTML = html
-    console.log('html er na.', html)
   }
 
   /**
@@ -273,39 +274,34 @@ export class FileInput extends Component {
     const labelDelete = this.getFilesList().dataset.labelDelete || 'Delete'
     const getFormNonFieldError = this.getFormNonFieldError()
     const formSubmitButton = this.getFormSubmitButton()
-    console.log('labelDelete', labelDelete)
-    console.log('getFormNonFieldError', getFormNonFieldError)
 
     // Only show errors notification if data-max-file-size is exceeded + add error class to file-list
     const maxMegabytes = this.getLimit()
-    console.log('maxMegabytes', maxMegabytes)
+
+    const isError = sizeMB > maxMegabytes
 
     const htmlStart = `
-      <li class="file-list__list-item">
-        <aside class="file">
-          <div class="file__container">
-            ${
-              sizeMB > maxMegabytes
-                ? '<div class="file__file error">'
-                : '<div class="file__file">'
-            }
-              <p class="file__symbol">
-                <span aria-hidden="true" class="material-icons-outlined">${
-                  type.match('image') ? 'image' : 'description'
-                }</span>
-              </p>
-              <p class="p file__data">
-                <span class="file__name">${name} (${ext}, ${sizeMB}MB)</span>
-              </p>
-              <a class="link link--primary" href="#" role="button" aria-label="${labelDelete}">
-                <span aria-hidden="true" class="material-icons-outlined">delete</span>
-              </a>
-            </div>
+    <li class="file-list__list-item">
+      <aside class="file">
+        <div class="file__container">
+          <div class="file__file ${isError ? 'error' : ''}">
+            <p class="file__symbol">
+              <span aria-hidden="true" class="material-icons-outlined">${
+                type.match('image') ? 'image' : 'description'
+              }</span>
+            </p>
+            <p class="p file__data">
+              <span class="file__name">${name} (${ext}, ${sizeMB}MB)</span>
+            </p>
+            <a class="link link--primary" href="#document-upload" role="button" aria-label="${labelDelete}">
+              <span aria-hidden="true" class="material-icons-outlined">delete</span>
+            </a>
           </div>
-        </aside>
-      </li>`
+        </div>
+      </aside>
+    </li>`
 
-    if (sizeMB > maxMegabytes) {
+    if (isError) {
       getFormNonFieldError.removeAttribute('hidden')
       formSubmitButton.setAttribute('disabled', 'true')
 
