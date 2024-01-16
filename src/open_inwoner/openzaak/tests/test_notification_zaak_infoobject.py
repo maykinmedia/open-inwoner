@@ -160,22 +160,7 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            "ignored zaakinformatieobject notification: no users with bsn, valid email or with enabled notifications as (mede)initiators in case https://",
-            lookup=Lookups.startswith,
-            level=logging.INFO,
-        )
-
-    def test_zio_bails_when_user_notifications_disabled(self, m, mock_handle: Mock):
-        data = MockAPIData()
-        data.user_initiator.cases_notifications = False
-        data.user_initiator.save()
-        data.install_mocks(m)
-
-        handle_zaken_notification(data.zio_notification)
-
-        mock_handle.assert_not_called()
-        self.assertTimelineLog(
-            "ignored zaakinformatieobject notification: no users with bsn, valid email or with enabled notifications as (mede)initiators in case https://",
+            "ignored zaakinformatieobject notification: no users with bsn/nnp_id as (mede)initiators in case https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
@@ -343,12 +328,76 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
 
 @override_settings(ZGW_LIMIT_NOTIFICATIONS_FREQUENCY=3600)
 @freeze_time("2023-01-01 01:00:00")
-class NotificationHandlerEmailTestCase(AssertTimelineLogMixin, TestCase):
+class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
+    """
+    note these tests match with a similar test from `test_notification_zaak_status.py`
+    """
+
+    @patch("open_inwoner.userfeed.hooks.case_document_added_notification_received")
     @patch("open_inwoner.openzaak.notifications.send_case_update_email")
-    def test_handle_zaak_info_object_update(self, mock_send: Mock):
-        """
-        note this test matches with a similar test from `test_notification_zaak_status.py`
-        """
+    def test_handle_zaak_info_object_update_filters_disabled_notifications(
+        self, mock_send: Mock, mock_feed_hook: Mock
+    ):
+        data = MockAPIData()
+        user = data.user_initiator
+        user.cases_notifications = False  # opt-out
+        user.save()
+
+        case = factory(Zaak, data.zaak)
+        case.zaaktype = factory(ZaakType, data.zaak_type)
+
+        zio = factory(ZaakInformatieObject, data.zaak_informatie_object)
+        zio.informatieobject = factory(InformatieObject, data.informatie_object)
+
+        handle_zaakinformatieobject_update(user, case, zio)
+
+        # not called because disabled notifications
+        mock_send.assert_not_called()
+
+        # check if userfeed hook was called
+        mock_feed_hook.assert_called_once()
+
+        self.assertTimelineLog(
+            "ignored user-disabled notification delivery for user ",
+            lookup=Lookups.startswith,
+            level=logging.INFO,
+        )
+
+    @patch("open_inwoner.userfeed.hooks.case_document_added_notification_received")
+    @patch("open_inwoner.openzaak.notifications.send_case_update_email")
+    def test_handle_zaak_info_object_update_filters_bad_email(
+        self, mock_send: Mock, mock_feed_hook: Mock
+    ):
+        data = MockAPIData()
+        user = data.user_initiator
+        user.email = "user@example.org"
+        user.save()
+
+        case = factory(Zaak, data.zaak)
+        case.zaaktype = factory(ZaakType, data.zaak_type)
+
+        zio = factory(ZaakInformatieObject, data.zaak_informatie_object)
+        zio.informatieobject = factory(InformatieObject, data.informatie_object)
+
+        handle_zaakinformatieobject_update(user, case, zio)
+
+        # not called because bad email
+        mock_send.assert_not_called()
+
+        # check if userfeed hook was called
+        mock_feed_hook.assert_called_once()
+
+        self.assertTimelineLog(
+            "ignored user-disabled notification delivery for user ",
+            lookup=Lookups.startswith,
+            level=logging.INFO,
+        )
+
+    @patch("open_inwoner.userfeed.hooks.case_document_added_notification_received")
+    @patch("open_inwoner.openzaak.notifications.send_case_update_email")
+    def test_handle_zaak_info_object_update(
+        self, mock_send: Mock, mock_feed_hook: Mock
+    ):
         data = MockAPIData()
         user = data.user_initiator
 
@@ -362,6 +411,9 @@ class NotificationHandlerEmailTestCase(AssertTimelineLogMixin, TestCase):
         handle_zaakinformatieobject_update(user, case, zio)
 
         mock_send.assert_called_once()
+
+        # check if userfeed hook was called
+        mock_feed_hook.assert_called_once()
 
         # check call arguments
         args = mock_send.call_args.args

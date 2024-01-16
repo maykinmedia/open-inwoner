@@ -1,0 +1,47 @@
+{% load i18n icon_tags %}
+
+{% if userfeed %}
+<section class="userfeed">
+    <h2 class="h2 {% if userfeed.action_required %}indicator{% endif %}">
+        {% trans "Aanvragen updates" %}
+    </h2>
+    <div class="userfeed__summary">
+        <ul class="userfeed__list">
+            {% for line in userfeed.summary %}
+            <li class="userfeed__list-item">
+                <p class="userfeed__list-paragraph">{{ line }}</p>
+            </li>            
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="card-container card-container--columns-2">
+        {% for item in userfeed.items %}
+        <a href="{{ item.action_url }}" class="card {% if item.action_required %}card--status{% endif %} {% if item.is_completed %}card--completed{% endif %}">
+            <div class="card__body card__body--tabled">
+                <p class="p tabled__value">{{ item.title }}</p>
+                <h2 class="userfeed__heading">
+                    <span class="">{{ item.message }}</span>
+{#                    Status gewijzigd naar &lsquo;<span class="status">Documenten nodig</span>&rsquo;</span>#}
+                </h2>
+                <span class="button button--icon-before button--transparent button--secondary">
+                {% icon icon="east" icon_position="after" primary=True outlined=True %}
+                </span>
+            </div>
+        </a>
+        {% endfor %}
+        
+        {# Example of card without action status #}
+{#        <a href="{{ userfeedbackend }}" class="card">#}
+{#            <div class="card__body card__body--tabled">#}
+{#                <p class="p tabled__value">Bijzondere bijstand aanvragen</p>#}
+{#                <h2 class="userfeed__heading">#}
+{#                    <span class="">Status gewijzigd naar &lsquo;<span class="status">in behandeling</span>&rsquo;</span>#}
+{#                </h2>#}
+{#                <span class="button button--icon-before button--transparent button--secondary">#}
+{#                {% icon icon="east" icon_position="after" primary=True outlined=True %}#}
+{#                </span>#}
+{#            </div>#}
+{#        </a>#}
+    </div>
+</section>
+{% endif %}

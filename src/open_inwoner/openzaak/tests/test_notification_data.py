@@ -148,6 +148,22 @@ class MockAPIData:
             zaak=self.zaak2["url"],
         )
 
+        self.informatie_object_extra = generate_oas_component(
+            "drc",
+            "schemas/EnkelvoudigInformatieObject",
+            url=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/aaaaaaaa-0002-bbbb-aaaa-aaaaaaaaaaaa",
+            informatieobjecttype=f"{CATALOGI_ROOT}informatieobjecttypen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            status="definitief",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+        )
+        self.zaak_informatie_object_extra = generate_oas_component(
+            "zrc",
+            "schemas/ZaakInformatieObject",
+            url=f"{ZAKEN_ROOT}zaakinformatieobjecten/aaaaaaaa-0003-aaaa-aaaa-aaaaaaaaaaaa",
+            informatieobject=self.informatie_object_extra["url"],
+            zaak=self.zaak["url"],
+        )
+
         self.role_initiator = generate_oas_component(
             "zrc",
             "schemas/Rol",
@@ -250,6 +266,8 @@ class MockAPIData:
             "informatie_object",
             "zaak_informatie_object",
             "zaak_informatie_object2",
+            "informatie_object_extra",
+            "zaak_informatie_object_extra",
         ]:
             resource = getattr(self, resource_attr)
             if resource_attr in res404:

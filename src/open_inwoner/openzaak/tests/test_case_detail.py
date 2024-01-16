@@ -1,5 +1,5 @@
 import datetime
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
@@ -585,7 +585,11 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             ),
         )
 
-    def test_status_is_retrieved_when_user_logged_in_via_digid(self, m):
+    @patch("open_inwoner.userfeed.hooks.case_status_seen")
+    @patch("open_inwoner.userfeed.hooks.case_documents_seen")
+    def test_status_is_retrieved_when_user_logged_in_via_digid(
+        self, m, mock_hook_status: Mock, mock_hook_documents: Mock
+    ):
         self.maxDiff = None
 
         ZaakTypeStatusTypeConfigFactory.create(
@@ -663,6 +667,9 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 "new_docs": False,
             },
         )
+        # check userfeed hooks
+        mock_hook_status.assert_called_once()
+        mock_hook_documents.assert_called_once()
 
     def test_pass_endstatus_type_data_if_endstatus_not_reached(self, m):
         self.maxDiff = None

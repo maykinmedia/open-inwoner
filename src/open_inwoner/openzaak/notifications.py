@@ -41,6 +41,7 @@ from open_inwoner.openzaak.utils import (
     is_info_object_visible,
     is_zaak_visible,
 )
+from open_inwoner.userfeed import hooks
 from open_inwoner.utils.logentry import system_action as log_system_action
 from open_inwoner.utils.url import build_absolute_url
 
@@ -93,10 +94,10 @@ def handle_zaken_notification(notification: Notification):
         )
         return
 
-    inform_users = get_emailable_initiator_users_from_roles(roles)
+    inform_users = get_initiator_users_from_roles(roles)
     if not inform_users:
         log_system_action(
-            f"ignored {r} notification: no users with bsn, valid email or with enabled notifications as (mede)initiators in case {case_url}",
+            f"ignored {r} notification: no users with bsn/nnp_id as (mede)initiators in case {case_url}",
             log_level=logging.INFO,
         )
         return
@@ -215,6 +216,16 @@ def _handle_zaakinformatieobject_notification(
 def handle_zaakinformatieobject_update(
     user: User, case: Zaak, zaak_info_object: ZaakInformatieObject
 ):
+    # hook into userfeed
+    hooks.case_document_added_notification_received(user, case, zaak_info_object)
+
+    if not user.cases_notifications or not user.get_contact_email():
+        log_system_action(
+            f"ignored user-disabled notification delivery for user '{user}' zaakinformatieobject {zaak_info_object.url} case {case.url}",
+            log_level=logging.INFO,
+        )
+        return
+
     note = UserCaseInfoObjectNotification.objects.record_if_unique_notification(
         user,
         case.uuid,
@@ -344,6 +355,17 @@ def _handle_status_notification(notification: Notification, case: Zaak, inform_u
 
 
 def handle_status_update(user: User, case: Zaak, status: Status):
+    # hook into userfeed
+    hooks.case_status_notification_received(user, case, status)
+
+    if not user.cases_notifications or not user.get_contact_email():
+        log_system_action(
+            f"ignored user-disabled notification delivery for user '{user}' status {status.url} case {case.url}",
+            log_level=logging.INFO,
+        )
+        return
+
+    # email notification
     note = UserCaseStatusNotification.objects.record_if_unique_notification(
         user,
         case.uuid,
@@ -443,19 +465,15 @@ def get_nnp_initiator_nnp_id_from_roles(roles: List[Rol]) -> List[str]:
     return list(ret)
 
 
-def get_emailable_initiator_users_from_roles(roles: List[Rol]) -> List[User]:
+def get_initiator_users_from_roles(roles: List[Rol]) -> List[User]:
     """
-    iterate over Rollen and return User objects for all natural-person initiators we can notify
+    iterate over Rollen and return User objects for initiators
     """
     users = []
 
     bsn_list = get_np_initiator_bsns_from_roles(roles)
     if bsn_list:
-        users += list(
-            User.objects.filter(
-                bsn__in=bsn_list, is_active=True, cases_notifications=True
-            ).having_usable_email()
-        )
+        users += list(User.objects.filter(bsn__in=bsn_list, is_active=True))
 
     nnp_id_list = get_nnp_initiator_nnp_id_from_roles(roles)
     if nnp_id_list:
@@ -464,10 +482,6 @@ def get_emailable_initiator_users_from_roles(roles: List[Rol]) -> List[User]:
             id_filter = {"rsin__in": nnp_id_list}
         else:
             id_filter = {"kvk__in": nnp_id_list}
-        users += list(
-            User.objects.filter(
-                is_active=True, cases_notifications=True, **id_filter
-            ).having_usable_email()
-        )
+        users += list(User.objects.filter(is_active=True, **id_filter))
 
     return users

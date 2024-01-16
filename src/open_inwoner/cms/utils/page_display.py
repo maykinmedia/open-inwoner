@@ -1,6 +1,8 @@
 """Utilities for determining whether CMS pages are published"""
 
 
+from django.db.models import Q
+
 from cms.models import Page
 
 from open_inwoner.cms.benefits.cms_apps import SSDApphook
@@ -52,3 +54,15 @@ def benefits_page_is_published() -> bool:
     :returns: True if the social benefits page published, False otherwise
     """
     return _is_published("ssd")
+
+
+def get_active_app_names() -> list[str]:
+    return list(
+        Page.objects.published()
+        .exclude(
+            Q(application_urls="")
+            | Q(application_urls__isnull=True)
+            | Q(application_namespace="")
+        )
+        .values_list("application_namespace", flat=True)
+    )
