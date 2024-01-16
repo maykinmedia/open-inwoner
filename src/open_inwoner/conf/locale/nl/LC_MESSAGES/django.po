@@ -3279,11 +3279,11 @@ msgstr ""
 
 #: configurations/models.py:483
 msgid "Theme stylesheet"
-msgstr ""
+msgstr "Design/thema stylesheet"
 
 #: configurations/models.py:484
 msgid "Additional CSS file added to the page."
-msgstr ""
+msgstr "Additioneel CSS bestand wat op alle pagina's wordt ingeladen."
 
 #: configurations/models.py:491
 msgid "Extra CSS"
