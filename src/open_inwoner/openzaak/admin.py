@@ -198,6 +198,7 @@ class ZaakTypeStatusTypeConfigInline(admin.StackedInline):
         "description",
         "call_to_action_url",
         "call_to_action_text",
+        "case_link_text",
     ]
     readonly_fields = [
         "statustekst",

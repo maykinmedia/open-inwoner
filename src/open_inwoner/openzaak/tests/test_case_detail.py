@@ -597,6 +597,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             statustype_url=self.status_type_new["url"],
             status_indicator=StatusIndicators.warning,
             status_indicator_text="foo",
+            case_link_text="Bekijk aanvraag",
         )
         ZaakTypeStatusTypeConfigFactory.create(
             zaaktype_config=self.zaaktype_config,
@@ -605,6 +606,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             status_indicator_text="bar",
             call_to_action_url="https://www.example.com",
             call_to_action_text="Click me",
+            case_link_text="Bekijk aanvraag",
         )
 
         self._setUpMocks(m)
@@ -636,6 +638,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                         "call_to_action_url": "",
                         "call_to_action_text": "",
                         "description": "",
+                        "case_link_text": "Bekijk aanvraag",
                     },
                     {
                         "date": datetime.datetime(2021, 3, 12),
@@ -645,6 +648,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                         "call_to_action_url": "https://www.example.com",
                         "call_to_action_text": "Click me",
                         "description": "",
+                        "case_link_text": "Bekijk aanvraag",
                     },
                 ],
                 "second_status_preview": None,
@@ -679,12 +683,14 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             statustype_url=self.status_type_new["url"],
             status_indicator=StatusIndicators.warning,
             status_indicator_text="foo",
+            case_link_text="Document toevoegen",
         )
         ZaakTypeStatusTypeConfigFactory.create(
             zaaktype_config=self.zaaktype_config,
             statustype_url=self.status_type_in_behandeling["url"],
             status_indicator=StatusIndicators.success,
             status_indicator_text="zap",
+            case_link_text="Document toevoegen",
         )
         ZaakTypeStatusTypeConfigFactory.create(
             zaaktype_config=self.zaaktype_config,
@@ -693,6 +699,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             status_indicator_text="bar",
             call_to_action_url="https://www.example.com",
             call_to_action_text="Click me",
+            case_link_text="Document toevoegen",
         )
 
         self._setUpMocks(m, use_eindstatus=False)
@@ -724,6 +731,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                         "call_to_action_url": "",
                         "call_to_action_text": "",
                         "description": "",
+                        "case_link_text": "Document toevoegen",
                     },
                 ],
                 "second_status_preview": self.second_status_preview,
@@ -733,6 +741,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                     "status_indicator_text": "bar",
                     "call_to_action_url": "https://www.example.com",
                     "call_to_action_text": "Click me",
+                    "case_link_text": "Document toevoegen",
                 },
                 # only one visible information object
                 "documents": [
