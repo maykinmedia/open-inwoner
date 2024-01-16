@@ -383,6 +383,11 @@ class InnerCaseDetailView(
                     zt_statustype_config.document_upload_description
                 )
 
+        # disable document upload message
+        if self.request.session.get("uploads", ""):
+            case_type_document_upload_description = ""
+            del self.request.session["uploads"]
+
         return {
             "case_type_config_description": case_type_config_description,
             "case_type_document_upload_description": case_type_document_upload_description,
@@ -655,6 +660,8 @@ class CaseDocumentUploadFormView(CaseAccessMixin, LogMixin, FormView):
             success_message,
             extra_tags="as_markdown local_message",
         )
+
+        self.request.session["uploads"] = True
 
         return HttpResponseClientRedirect(
             reverse("cases:case_detail", kwargs={"object_id": str(self.case.uuid)})
