@@ -1698,7 +1698,7 @@ class TestPasswordResetFunctionality(WebTest):
         )
         self.assertIn(
             _(
-                "U ontvangt deze e-mail, omdat u een aanvraag voor opnieuw instellen van het wachtwoord voor uw account op example.comhebt gedaan."
+                "U ontvangt deze e-mail, omdat u een aanvraag voor opnieuw instellen van het wachtwoord voor uw account op example.com hebt gedaan."
             ).format(domain=current_site.domain),
             body,
         )
