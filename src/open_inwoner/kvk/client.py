@@ -105,10 +105,23 @@ class KvKClient:
 
     def get_all_company_branches(self, kvk: str, **kwargs) -> list[Optional[dict]]:
         """
-        Get data about all branches ("hoofdvestiging" + "nevenvestigingen") of a company
+        Get data about all branches ("hoofdvestiging" + "nevenvestigingen") of a company.
+
+        Filter response from KvK API (remove elements which are not specific branches) and
+        sort the results (move the main branch ("hoofdvestiging") to the front of the list)
         """
         kwargs.update({"kvkNummer": kvk})
-        return self.search(**kwargs).get("resultaten", [])
+        branches = self.search(**kwargs).get("resultaten", [])
+
+        for branch in branches.copy():
+            if not (
+                branch["type"] == "hoofdvestiging" or branch["type"] == "nevenvestiging"
+            ):
+                branches.remove(branch)
+            elif branch["type"] == "hoofdvestiging":
+                branches.insert(0, branches.pop(branches.index(branch)))
+
+        return branches
 
     def retrieve_rsin_with_kvk(self, kvk, **kwargs) -> Optional[str]:
         basisprofiel = self._request(

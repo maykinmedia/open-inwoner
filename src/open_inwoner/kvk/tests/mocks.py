@@ -24,46 +24,57 @@ simple = {
     ],
 }
 
-multiple_branches = {
+multiple = {
     "pagina": 1,
-    "aantal": 2,
-    "totaal": 2,
+    "aantal": 10,
+    "totaal": 3,
     "resultaten": [
         {
-            "kvkNummer": "69599084",
-            "vestigingsnummer": "028435810622",
-            "handelsnaam": "Test Stichting Bolderbast",
-            "adresType": "bezoekadres",
-            "straatnaam": "Oosterwal",
-            "plaats": "Lochem",
-            "type": "hoofdvestiging",
+            "kvkNummer": "68750110",
+            "handelsnaam": "Test BV Donald",
+            "type": "rechtspersoon",
             "links": [
                 {
                     "rel": "basisprofiel",
-                    "href": "https://api.kvk.nl/test/api/v1/basisprofielen/69599068",
+                    "href": "https://api.kvk.nl/test/api/v1/basisprofielen/68750110",
+                }
+            ],
+        },
+        {
+            "kvkNummer": "68750110",
+            "vestigingsnummer": "000037178601",
+            "handelsnaam": "Test BV Donald Nevenvestiging",
+            "adresType": "bezoekadres",
+            "straatnaam": "Brinkerinckbaan",
+            "plaats": "Diepenveen",
+            "type": "nevenvestiging",
+            "links": [
+                {
+                    "rel": "basisprofiel",
+                    "href": "https://api.kvk.nl/test/api/v1/basisprofielen/68750110",
                 },
                 {
                     "rel": "vestigingsprofiel",
-                    "href": "https://api.kvk.nl/test/api/v1/vestigingsprofielen/028435810622",
+                    "href": "https://api.kvk.nl/test/api/v1/vestigingsprofielen/000037178601",
                 },
             ],
         },
         {
-            "kvkNummer": "69599084",
-            "vestigingsnummer": "000038509504",
-            "handelsnaam": "Test Stichting Bolderbast",
+            "kvkNummer": "68750110",
+            "vestigingsnummer": "000037178598",
+            "handelsnaam": "Test BV Donald",
             "adresType": "bezoekadres",
-            "straatnaam": "Abebe Bikilalaan",
-            "plaats": "Amsterdam",
+            "straatnaam": "Hizzaarderlaan",
+            "plaats": "Lollum",
             "type": "hoofdvestiging",
             "links": [
                 {
                     "rel": "basisprofiel",
-                    "href": "https://api.kvk.nl/test/api/v1/basisprofielen/69599084",
+                    "href": "https://api.kvk.nl/test/api/v1/basisprofielen/68750110",
                 },
                 {
                     "rel": "vestigingsprofiel",
-                    "href": "https://api.kvk.nl/test/api/v1/vestigingsprofielen/000038509504",
+                    "href": "https://api.kvk.nl/test/api/v1/vestigingsprofielen/000037178598",
                 },
             ],
         },
