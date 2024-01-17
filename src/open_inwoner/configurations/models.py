@@ -1,13 +1,16 @@
+import os
 from typing import Optional
 
+from django.conf import settings
 from django.contrib.flatpages.models import FlatPage
 from django.core.validators import FileExtensionValidator
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
 
 from colorfield.fields import ColorField
 from django_better_admin_arrayfield.models.fields import ArrayField
-from filer.fields.file import FilerFileField
 from filer.fields.image import FilerImageField
 from ordered_model.models import OrderedModel, OrderedModelManager
 from solo.models import SingletonModel
@@ -15,8 +18,9 @@ from solo.models import SingletonModel
 from ..utils.colors import hex_to_hsl
 from ..utils.css import clean_stylesheet
 from ..utils.fields import CSSField
+from ..utils.files import OverwriteStorage
 from ..utils.validators import FilerExactImageSizeValidator
-from .choices import ColorTypeChoices, OpenIDDisplayChoices
+from .choices import ColorTypeChoices, CustomFontName, OpenIDDisplayChoices
 from .validators import validate_oidc_config
 
 
@@ -592,6 +596,77 @@ class SiteConfiguration(SingletonModel):
             return self.home_help_text
         else:
             return ""
+
+
+class CustomFontField(models.FileField):
+    def __init__(self, file_name: str = "", **kwargs):
+        self.file_name = file_name
+        super().__init__(**kwargs)
+
+
+class CustomFontSet(models.Model):
+    def update_filename(self, filename: str, new_name: str, path: str) -> str:
+        ext = filename.split(".")[1]
+        filename = f"{new_name}.{ext}"
+        return "{path}/{filename}".format(path=path, filename=filename)
+
+    def update_filename_body(self, filename: str) -> str:
+        return CustomFontSet.update_filename(
+            self,
+            filename,
+            new_name=CustomFontName.body,
+            path="custom_fonts/",
+        )
+
+    def update_filename_heading(self, filename: str) -> str:
+        return CustomFontSet.update_filename(
+            self,
+            filename,
+            new_name=CustomFontName.heading,
+            path="custom_fonts/",
+        )
+
+    site_configuration = models.OneToOneField(
+        SiteConfiguration,
+        verbose_name=_("Configuration"),
+        related_name="custom_fonts",
+        on_delete=models.CASCADE,
+    )
+    text_body_font = CustomFontField(
+        verbose_name=_("Text body font"),
+        upload_to=update_filename_body,
+        file_name=CustomFontName.body,
+        storage=OverwriteStorage(),
+        validators=[FileExtensionValidator(["ttf"])],
+        blank=True,
+        null=True,
+        help_text=_("Upload text body font. TTF font types only."),
+    )
+    heading_font = CustomFontField(
+        verbose_name=_("Heading font"),
+        upload_to=update_filename_heading,
+        file_name=CustomFontName.heading,
+        storage=OverwriteStorage(),
+        validators=[FileExtensionValidator(["ttf"])],
+        blank=True,
+        null=True,
+        help_text=_("Upload heading font. TTF font types only."),
+    )
+
+
+@receiver(post_save, sender=CustomFontSet)
+def remove_orphan_files(sender, instance, *args, **kwargs):
+    """
+    Remove font files corresponding to `CustomFont` fields that have been cleared
+    """
+    custom_fonts_dir = os.path.join(settings.MEDIA_ROOT, "custom_fonts")
+    font_names = os.listdir(custom_fonts_dir)
+
+    for field in sender._meta.concrete_fields:
+        if isinstance(field, models.FileField) and not getattr(instance, field.name):
+            for font_name in font_names:
+                if font_name.startswith(field.file_name):
+                    os.remove(os.path.join(custom_fonts_dir, font_name))
 
 
 class SiteConfigurationPage(OrderedModel):

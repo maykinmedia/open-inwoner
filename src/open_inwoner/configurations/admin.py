@@ -25,7 +25,7 @@ from ..utils.colors import ACCESSIBLE_CONTRAST_RATIO, get_contrast_ratio
 from ..utils.css import ALLOWED_PROPERTIES
 from ..utils.fields import CSSEditorWidget
 from ..utils.iteration import split
-from .models import SiteConfiguration, SiteConfigurationPage
+from .models import CustomFontSet, SiteConfiguration, SiteConfigurationPage
 
 
 @admin.action(description=_("Delete selected websites"))
@@ -60,6 +60,9 @@ class CustomSiteAdmin(SiteAdmin):
         else:
             super().delete_model(request, obj)
 
+    class Media:
+        css = {"all": ("css/admin/admin_overrides.css",)}
+
 
 # re-register `Site` with our CustomSiteAdmin
 admin.site.unregister(Site)
@@ -80,6 +83,13 @@ class SiteConfigurationPageInline(OrderedTabularInline):
     extra = 1
     ordering = ("order",)
     autocomplete_fields = ("flatpage",)
+
+
+class FontConfigurationInline(admin.StackedInline):
+    model = CustomFontSet
+    verbose_name = "Fonts"
+    min_num = 1
+    can_delete = False
 
 
 class SiteConfigurationAdminForm(forms.ModelForm):
@@ -284,7 +294,7 @@ class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
         ),
         (_("Social media"), {"fields": ("display_social",)}),
     )
-    inlines = [SiteConfigurationPageInline]
+    inlines = [SiteConfigurationPageInline, FontConfigurationInline]
     form = SiteConfigurationAdminForm
 
     readonly_fields = [

@@ -10,3 +10,8 @@ class ColorTypeChoices(models.TextChoices):
 class OpenIDDisplayChoices(models.TextChoices):
     admin = "admin", _("Admin")
     regular = "regular", _("Regular user")
+
+
+class CustomFontName(models.TextChoices):
+    body = _("text_body_font"), _("Text body font")
+    heading = _("heading_font"), _("Heading font")
