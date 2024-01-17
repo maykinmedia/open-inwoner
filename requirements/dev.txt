@@ -344,7 +344,7 @@ django-localflavor==3.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-django-log-outgoing-requests==0.5.2
+django-log-outgoing-requests==0.6.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
