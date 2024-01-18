@@ -142,7 +142,36 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
 
 @admin.register(Action)
 class ActionAdmin(UUIDAdminFirstInOrder, PrivateMediaMixin, admin.ModelAdmin):
-    readonly_fields = ("uuid",)
+    fields = [
+        "uuid",
+        "name",
+        "description",
+        "status",
+        "type",
+        "end_date",
+        "file",
+        "is_for",
+        "created_on",
+        "updated_on",
+        "created_by",
+        "plan",
+        "is_deleted",
+    ]
+    readonly_fields = (
+        "uuid",
+        "name",
+        "description",
+        "status",
+        "type",
+        "end_date",
+        "file",
+        "is_for",
+        "created_on",
+        "updated_on",
+        "created_by",
+        "plan",
+        "is_deleted",
+    )
     list_display = ("name", "status", "plan", "created_on", "created_by", "is_deleted")
     list_filter = (
         "is_deleted",
@@ -156,6 +185,9 @@ class ActionAdmin(UUIDAdminFirstInOrder, PrivateMediaMixin, admin.ModelAdmin):
     raw_id_fields = [
         "plan",
     ]
+
+    def has_add_permission(self, request):
+        return False
 
     @admin.action(description=_("Mark selected actions as soft-deleted by user."))
     def mark_deleted(self, request, queryset):
@@ -216,10 +248,32 @@ class AppointmentAdmin(UUIDAdminFirstInOrder, admin.ModelAdmin):
 
 @admin.register(Message)
 class MessageAdmin(PrivateMediaMixin, admin.ModelAdmin):
-    readonly_fields = ("uuid",)
+    fields = (
+        "uuid",
+        "sender",
+        "receiver",
+        "created_on",
+        "content",
+        "seen",
+        "sent",
+        "file",
+    )
+    readonly_fields = (
+        "uuid",
+        "sender",
+        "receiver",
+        "created_on",
+        "content",
+        "seen",
+        "sent",
+        "file",
+    )
     list_display = ("sender", "receiver", "created_on", "seen", "sent")
     list_filter = ("sender", "receiver")
     private_media_fields = ("file",)
+
+    def has_add_permission(self, request):
+        return False
 
 
 @admin.register(Invite)
