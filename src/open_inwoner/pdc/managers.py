@@ -60,7 +60,7 @@ class CategoryPublishedQueryset(MP_NodeQuerySet):
             if config.fetch_eherkenning_zaken_with_rsin:
                 kvk_or_rsin = request.user.rsin
             vestigingsnummer = get_kvk_branch_number(request.session)
-            if vestigingsnummer and vestigingsnummer != request.user.kvk:
+            if vestigingsnummer:
                 cases = fetch_cases_by_kvk_or_rsin(
                     kvk_or_rsin=kvk_or_rsin, vestigingsnummer=vestigingsnummer
                 )

@@ -12,7 +12,7 @@
             {% endif %}
             {% for branch in company_branches %}
                 {% render_card direction='horizontal' %}
-                    {% with company_id=branch.vestigingsnummer|default:branch.kvkNummer %}
+                    {% with company_id=branch.vestigingsnummer %}
                         <label class="left" for="branch-{{ company_id }}">
                             <p>{{ branch.handelsnaam }}</p>
                             {% if branch.straatnaam and branch.plaats %}

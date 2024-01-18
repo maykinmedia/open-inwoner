@@ -296,7 +296,7 @@ def get_fetch_parameters(request, use_vestigingsnummer: bool = False) -> dict:
         parameters = {"user_kvk_or_rsin": kvk_or_rsin}
         if use_vestigingsnummer:
             vestigingsnummer = get_kvk_branch_number(request.session)
-            if vestigingsnummer and vestigingsnummer != user.kvk:
+            if vestigingsnummer:
                 parameters.update({"vestigingsnummer": vestigingsnummer})
         return parameters
     return {}
