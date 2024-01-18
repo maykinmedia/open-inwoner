@@ -2,6 +2,7 @@ from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from django.forms import ValidationError
+from django.http.request import HttpRequest
 from django.urls import reverse, reverse_lazy
 from django.utils.html import format_html
 from django.utils.translation import ngettext, ugettext_lazy as _
@@ -19,6 +20,12 @@ class ReadOnlyFileMixin:
     """
     By default, private media fields do not display the correct URL when readonly
     """
+
+    def get_fields(self, request, obj=None):
+        fields = super().get_fields(request, obj=obj)
+        if "display_file_url" not in fields and "file" in fields:
+            fields[fields.index("file")] = "display_file_url"
+        return fields
 
     def display_file_url(self, obj):
         view_name = "%(app_label)s_%(model_name)s_%(field)s" % {
@@ -164,36 +171,6 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
 class ActionAdmin(
     ReadOnlyFileMixin, UUIDAdminFirstInOrder, PrivateMediaMixin, admin.ModelAdmin
 ):
-    fields = [
-        "uuid",
-        "name",
-        "description",
-        "status",
-        "type",
-        "end_date",
-        "display_file_url",
-        "is_for",
-        "created_on",
-        "updated_on",
-        "created_by",
-        "plan",
-        "is_deleted",
-    ]
-    readonly_fields = (
-        "uuid",
-        "name",
-        "description",
-        "status",
-        "type",
-        "end_date",
-        "display_file_url",
-        "is_for",
-        "created_on",
-        "updated_on",
-        "created_by",
-        "plan",
-        "is_deleted",
-    )
     list_display = ("name", "status", "plan", "created_on", "created_by", "is_deleted")
     list_filter = (
         "is_deleted",
@@ -209,6 +186,9 @@ class ActionAdmin(
     ]
 
     def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
         return False
 
     @admin.action(description=_("Mark selected actions as soft-deleted by user."))
@@ -244,20 +224,14 @@ class ActionAdmin(
 class DocumentAdmin(
     ReadOnlyFileMixin, UUIDAdminFirstInOrder, PrivateMediaMixin, admin.ModelAdmin
 ):
-    fields = ["uuid", "name", "display_file_url", "created_on", "plan", "owner"]
-    readonly_fields = (
-        "uuid",
-        "name",
-        "display_file_url",
-        "plan",
-        "created_on",
-        "owner",
-    )
     list_display = ("name", "display_file_url", "created_on", "owner")
     list_filter = ("owner",)
     private_media_fields = ("file",)
 
     def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
         return False
 
 
@@ -270,31 +244,14 @@ class AppointmentAdmin(UUIDAdminFirstInOrder, admin.ModelAdmin):
 
 @admin.register(Message)
 class MessageAdmin(ReadOnlyFileMixin, PrivateMediaMixin, admin.ModelAdmin):
-    fields = (
-        "uuid",
-        "sender",
-        "receiver",
-        "created_on",
-        "content",
-        "seen",
-        "sent",
-        "display_file_url",
-    )
-    readonly_fields = (
-        "uuid",
-        "sender",
-        "receiver",
-        "created_on",
-        "content",
-        "seen",
-        "sent",
-        "display_file_url",
-    )
     list_display = ("sender", "receiver", "created_on", "seen", "sent")
     list_filter = ("sender", "receiver")
     private_media_fields = ("file",)
 
     def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
         return False
 
 
