@@ -37,6 +37,15 @@ class CompanyBranchChoiceView(FormView):
         else:
             redirect = furl(reverse("pages-root"))
 
+        # create pseudo-branch representing the company as a whole
+        master_branch = {
+            "vestigingsnummer": "",
+            "handelsnaam": company_branches[0].get("handelsnaam", "")
+            if company_branches
+            else "",
+        }
+        company_branches.insert(0, master_branch)
+
         context.update(
             company_branches=company_branches,
             form=form,
@@ -52,7 +61,9 @@ class CompanyBranchChoiceView(FormView):
         context = self.get_context_data()
 
         redirect = context["redirect"]
-        company_branches = context["company_branches"]
+        company_branches_with_master = context["company_branches"]
+        # Exclude the "master" branch from these checks, since we always insert this
+        company_branches = company_branches_with_master[1:]
 
         if not company_branches:
             request.session[KVK_BRANCH_SESSION_VARIABLE] = None
@@ -64,20 +75,13 @@ class CompanyBranchChoiceView(FormView):
             request.session.save()
             return HttpResponseRedirect(redirect.url)
 
-        # create pseudo-branch representing the company as a whole
-        master_branch = {
-            "vestigingsnummer": "",
-            "handelsnaam": company_branches[0].get("handelsnaam", ""),
-        }
-        company_branches.insert(0, master_branch)
-
         form = context["form"]
 
         return render(
             request,
             self.template_name,
             {
-                "company_branches": company_branches,
+                "company_branches": company_branches_with_master,
                 "form": form,
             },
         )

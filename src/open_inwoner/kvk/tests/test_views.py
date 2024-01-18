@@ -65,6 +65,29 @@ class KvKViewsTestCase(TestCase):
     @patch(
         "open_inwoner.kvk.models.KvKConfig.get_solo",
     )
+    def test_post_branches_page_with_empty_vestigingsnummer(self, mock_solo, mock_kvk):
+        mock_kvk.return_value = [
+            {"kvkNummer": "12345678"},
+            {"kvkNummer": "12345678", "vestigingsnummer": "1234"},
+        ]
+
+        mock_solo.return_value.api_key = "123"
+        mock_solo.return_value.api_root = "http://foo.bar/api/v1/"
+        mock_solo.return_value.client_certificate = CertificateFactory()
+        mock_solo.return_value.server_certificate = CertificateFactory()
+
+        self.client.force_login(user=self.user)
+
+        response = self.client.post(self.url, data={"branch_number": ""})
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(kvk_branch_selected_done(self.client.session), True)
+        self.assertEqual(get_kvk_branch_number(self.client.session), "")
+
+    @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
+    @patch(
+        "open_inwoner.kvk.models.KvKConfig.get_solo",
+    )
     def test_post_branches_page_with_incorrect_vestigingsnummer(
         self, mock_solo, mock_kvk
     ):
@@ -85,6 +108,12 @@ class KvKViewsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(kvk_branch_selected_done(self.client.session), False)
         self.assertNotIn(KVK_BRANCH_SESSION_VARIABLE, self.client.session)
+
+        doc = PyQuery(response.content)
+        branch_inputs = doc.find("[name='branch_number']")
+
+        # check that pseudo-branch representing company as a whole has been added
+        self.assertEqual(len(branch_inputs), 3)
 
     @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
     @patch(
@@ -189,6 +218,6 @@ class KvKViewsTestCase(TestCase):
         # check that pseudo-branch representing company as a whole has been added
         self.assertEqual(len(branch_inputs), 3)
 
-        self.assertEqual(branch_inputs[0], doc.find("[id='branch-12345678']")[0])
+        self.assertEqual(branch_inputs[0], doc.find("[id='branch-']")[0])
         self.assertEqual(branch_inputs[1], doc.find("[id='branch-1234']")[0])
         self.assertEqual(branch_inputs[2], doc.find("[id='branch-5678']")[0])
