@@ -15,6 +15,26 @@ from .choices import ContactTypeChoices
 from .models import Action, Appointment, Document, Invite, Message, User
 
 
+class ReadOnlyFileMixin:
+    """
+    By default, private media fields do not display the correct URL when readonly
+    """
+
+    def display_file_url(self, obj):
+        view_name = "%(app_label)s_%(model_name)s_%(field)s" % {
+            "app_label": self.opts.app_label,
+            "model_name": self.opts.model_name,
+            "field": "file",
+        }
+        return format_html(
+            _("<a href='{url}'>{text}</a>"),
+            url=reverse(f"admin:{view_name}", kwargs={"pk": obj.pk}),
+            text=obj.file.name,
+        )
+
+    display_file_url.short_description = _("File")
+
+
 class ActionInlineAdmin(UUIDAdminFirstInOrder, admin.StackedInline):
     model = Action
     extra = 1
@@ -141,7 +161,9 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
 
 
 @admin.register(Action)
-class ActionAdmin(UUIDAdminFirstInOrder, PrivateMediaMixin, admin.ModelAdmin):
+class ActionAdmin(
+    ReadOnlyFileMixin, UUIDAdminFirstInOrder, PrivateMediaMixin, admin.ModelAdmin
+):
     fields = [
         "uuid",
         "name",
@@ -149,7 +171,7 @@ class ActionAdmin(UUIDAdminFirstInOrder, PrivateMediaMixin, admin.ModelAdmin):
         "status",
         "type",
         "end_date",
-        "file",
+        "display_file_url",
         "is_for",
         "created_on",
         "updated_on",
@@ -164,7 +186,7 @@ class ActionAdmin(UUIDAdminFirstInOrder, PrivateMediaMixin, admin.ModelAdmin):
         "status",
         "type",
         "end_date",
-        "file",
+        "display_file_url",
         "is_for",
         "created_on",
         "updated_on",
@@ -219,21 +241,21 @@ class ActionAdmin(UUIDAdminFirstInOrder, PrivateMediaMixin, admin.ModelAdmin):
 
 
 @admin.register(Document)
-class DocumentAdmin(UUIDAdminFirstInOrder, PrivateMediaMixin, admin.ModelAdmin):
-    fields = ["uuid", "name", "file", "created_on", "plan", "owner"]
-    readonly_fields = ("uuid", "name", "file", "plan", "preview", "created_on", "owner")
-    list_display = ("name", "preview", "created_on", "owner")
+class DocumentAdmin(
+    ReadOnlyFileMixin, UUIDAdminFirstInOrder, PrivateMediaMixin, admin.ModelAdmin
+):
+    fields = ["uuid", "name", "display_file_url", "created_on", "plan", "owner"]
+    readonly_fields = (
+        "uuid",
+        "name",
+        "display_file_url",
+        "plan",
+        "created_on",
+        "owner",
+    )
+    list_display = ("name", "display_file_url", "created_on", "owner")
     list_filter = ("owner",)
     private_media_fields = ("file",)
-
-    def preview(self, obj):
-        return format_html(
-            _("<a href='{url}'>{text}</a>"),
-            url=reverse("admin:accounts_document_file", kwargs={"pk": obj.pk}),
-            text=obj.file.name,
-        )
-
-    preview.short_description = "Preview file"
 
     def has_add_permission(self, request):
         return False
@@ -247,7 +269,7 @@ class AppointmentAdmin(UUIDAdminFirstInOrder, admin.ModelAdmin):
 
 
 @admin.register(Message)
-class MessageAdmin(PrivateMediaMixin, admin.ModelAdmin):
+class MessageAdmin(ReadOnlyFileMixin, PrivateMediaMixin, admin.ModelAdmin):
     fields = (
         "uuid",
         "sender",
@@ -256,7 +278,7 @@ class MessageAdmin(PrivateMediaMixin, admin.ModelAdmin):
         "content",
         "seen",
         "sent",
-        "file",
+        "display_file_url",
     )
     readonly_fields = (
         "uuid",
@@ -266,7 +288,7 @@ class MessageAdmin(PrivateMediaMixin, admin.ModelAdmin):
         "content",
         "seen",
         "sent",
-        "file",
+        "display_file_url",
     )
     list_display = ("sender", "receiver", "created_on", "seen", "sent")
     list_filter = ("sender", "receiver")
