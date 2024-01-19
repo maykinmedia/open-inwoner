@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-19 11:38+0100\n"
+"POT-Creation-Date: 2024-01-19 14:21+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -115,7 +115,7 @@ msgstr "Organisatie"
 
 #: accounts/choices.py:32 accounts/choices.py:62 accounts/models.py:601
 #: cms/cases/views/status.py:87 cms/cases/views/status.py:128
-#: cms/cases/views/status.py:134 cms/cases/views/status.py:519
+#: cms/cases/views/status.py:134 cms/cases/views/status.py:529
 #: components/templates/components/Action/Actions.html:82 plans/choices.py:6
 #: plans/forms.py:141 templates/export/include/actions.html:7
 #: templates/export/profile/action_export.html:20
@@ -478,7 +478,7 @@ msgid "The name of the document"
 msgstr "De naam van het document"
 
 #: accounts/models.py:504 accounts/models.py:556 accounts/models.py:639
-#: accounts/models.py:734 accounts/models.py:811 openzaak/models.py:513
+#: accounts/models.py:734 accounts/models.py:811 openzaak/models.py:522
 #: pdc/models/product.py:156 search/models.py:61
 #: templates/export/plans/plan_export.html:34
 #: templates/export/profile/action_export.html:40
@@ -1526,7 +1526,7 @@ msgstr "Bestand"
 #: cms/cases/tests/test_contactform.py:495
 #: cms/cases/tests/test_contactform.py:535
 #: cms/cases/tests/test_contactform.py:567 cms/cases/tests/test_htmx.py:505
-#: cms/cases/views/status.py:709 openklant/tests/test_contactform.py:195
+#: cms/cases/views/status.py:719 openklant/tests/test_contactform.py:195
 #: openklant/tests/test_contactform.py:245
 #: openklant/tests/test_contactform.py:322
 #: openklant/tests/test_contactform.py:402
@@ -1568,43 +1568,50 @@ msgstr "Zaken bekeken: {cases}"
 msgid "Zaak bekeken: {case}"
 msgstr "Zaak bekeken: {case}"
 
-#: cms/cases/views/status.py:194 cms/cases/views/status.py:428
+#: cms/cases/views/status.py:194 cms/cases/views/status.py:433
 msgid "No data available"
 msgstr "Geen data beschikbaar"
 
-#: cms/cases/views/status.py:516
+#: cms/cases/views/status.py:219 cms/cases/views/status.py:461
+#: templates/pages/cases/list_inner.html:30
+#: templates/pages/cases/list_inner.html:31
+#: templates/pages/cases/list_inner.html:50
+msgid "Bekijk aanvraag"
+msgstr "Bekijk aanvraag"
+
+#: cms/cases/views/status.py:526
 msgid "Gegevens"
 msgstr "Gegevens"
 
-#: cms/cases/views/status.py:522 templates/pages/cases/status_inner.html:26
+#: cms/cases/views/status.py:532 templates/pages/cases/status_inner.html:26
 msgid "Documenten"
 msgstr "Documenten"
 
-#: cms/cases/views/status.py:555 openzaak/tests/test_documents.py:243
+#: cms/cases/views/status.py:565 openzaak/tests/test_documents.py:243
 #, python-brace-format
 msgid "Document van zaak gedownload {case}: {filename}"
 msgstr "Document van zaak gedownload {case}: {filename}"
 
-#: cms/cases/views/status.py:590
+#: cms/cases/views/status.py:600
 #, python-brace-format
 msgid "An error occured while uploading file {filename}"
 msgstr "Een fout is opgetreden bij het uploaden van {filename}"
 
-#: cms/cases/views/status.py:628
+#: cms/cases/views/status.py:638
 #, python-brace-format
 msgid "Document was uploaded for {case}: {filename}"
 msgstr "Document {filename} is geüpload voor {case}"
 
-#: cms/cases/views/status.py:636
+#: cms/cases/views/status.py:646
 #, python-brace-format
 msgid "Wij hebben **{num_uploaded} bestand(en)** succesvol geüpload:"
 msgstr "Wij hebben **{num_uploaded} bestand(en)** succesvol geüpload:"
 
-#: cms/cases/views/status.py:715 openklant/views/contactform.py:69
+#: cms/cases/views/status.py:725 openklant/views/contactform.py:69
 msgid "Probleem bij versturen van de vraag."
 msgstr "Probleem bij versturen van de vraag."
 
-#: cms/cases/views/status.py:722
+#: cms/cases/views/status.py:732
 #, python-brace-format
 msgid "Case: {case_identification}"
 msgstr "Zaak: {case_identification}"
@@ -1710,7 +1717,6 @@ msgid "General"
 msgstr "Algemeen"
 
 #: cms/plugins/cms_plugins/userfeed.py:14
-#| msgid "User"
 msgid "User Feed"
 msgstr "Openstaande acties"
 
@@ -1736,6 +1742,7 @@ msgstr "De video uit de bibliotheek."
 
 #: cms/plugins/tests/test_userfeed.py:37 userfeed/summarize.py:49
 #: userfeed/tests/test_feed.py:46
+#, python-brace-format
 msgid "There is {count} message"
 msgid_plural "There are {count} messages"
 msgstr[0] "Er is {count} openstaande actie"
@@ -3476,11 +3483,11 @@ msgstr "Gegevens ophalen uit KVK API op basis van KVK-nummer"
 msgid "data was retrieved from KvK API"
 msgstr "data is opgehaald via KVK API"
 
-#: kvk/views.py:50 kvk/views.py:89
+#: kvk/views.py:59 kvk/views.py:91
 msgid "Unauthorized"
 msgstr "Ongeautoriseerd"
 
-#: kvk/views.py:107
+#: kvk/views.py:108
 msgid "Invalid branch number for the current KvK number"
 msgstr "Ongeldig vestigingsnummer voor dit KVK-nummer"
 
@@ -3699,7 +3706,7 @@ msgstr ""
 "Het gebruiken van een link en een informatieobject tegelijkertijd wordt niet "
 "toegestaan. Gebruik of de link, of een informatieobject maar niet beiden."
 
-#: openzaak/admin.py:354
+#: openzaak/admin.py:355
 #, python-format
 msgid "%d zaaktype was successfully set to notify on status changes."
 msgid_plural "%d zaaktypes were successfully set to notify on status changes."
@@ -3710,7 +3717,7 @@ msgstr[1] ""
 "%d zaaktypen zijn succesvol ingesteld om bij statusveranderingen een "
 "notificatie te sturen."
 
-#: openzaak/admin.py:368
+#: openzaak/admin.py:369
 #, python-format
 msgid "%d zaaktype was successfully set to not notify on status changes."
 msgid_plural ""
@@ -3940,11 +3947,11 @@ msgstr "Zaaktype Configuratie"
 msgid "Information object URL"
 msgstr "Informatieobject URL"
 
-#: openzaak/models.py:305 openzaak/models.py:368 openzaak/models.py:470
+#: openzaak/models.py:305 openzaak/models.py:368 openzaak/models.py:479
 msgid "Omschrijving"
 msgstr "Omschrijving"
 
-#: openzaak/models.py:310 openzaak/models.py:377 openzaak/models.py:475
+#: openzaak/models.py:310 openzaak/models.py:377 openzaak/models.py:484
 msgid "Zaaktype UUID"
 msgstr "Zaaktype UUID"
 
@@ -4068,19 +4075,29 @@ msgstr ""
 "Bepaalt de knoplabel tekst van de getoonde knop bij het openklappen van deze "
 "status"
 
-#: openzaak/models.py:447
+#: openzaak/models.py:449
+msgid "Case link text"
+msgstr "Linknaam naar detailweergave"
+
+#: openzaak/models.py:451
+msgid ""
+"The text that will be shown in the button that links to a case's detail page"
+msgstr ""
+"De naam van de link op de lijstweergave om naar de detailweergave te navigeren. Standaard staat dit op 'Bekijk aanvraag'"
+
+#: openzaak/models.py:456
 msgid "Zaaktype Statustype Configuration"
 msgstr "Zaaktype Statustype Configuratie"
 
-#: openzaak/models.py:466
+#: openzaak/models.py:475
 msgid "Resultaattype URL"
 msgstr "Resultaattype URL"
 
-#: openzaak/models.py:484
+#: openzaak/models.py:493
 msgid "Result description"
 msgstr "Resultaatomschrijving"
 
-#: openzaak/models.py:486
+#: openzaak/models.py:495
 msgid ""
 "Determines the text that will be shown to the user if a case is set to this "
 "result"
@@ -4088,47 +4105,47 @@ msgstr ""
 "Bepaalt de getoonde tekst op de detailpagina van 'Mijn aanvragen' wanneer "
 "een zaak dit resultaat heeft bereikt"
 
-#: openzaak/models.py:491
+#: openzaak/models.py:500
 msgid "Zaaktype Resultaattype Configuration"
 msgstr "Zaaktype Resultaattype Configuratie"
 
-#: openzaak/models.py:510
+#: openzaak/models.py:519
 msgid "Zaak UUID"
 msgstr "Zaak UUID"
 
-#: openzaak/models.py:515
+#: openzaak/models.py:524
 msgid "Is sent"
 msgstr "Is verzonden"
 
-#: openzaak/models.py:527
+#: openzaak/models.py:536
 msgid "Status UUID"
 msgstr "Status UUID"
 
-#: openzaak/models.py:532
+#: openzaak/models.py:541
 msgid "Open Zaak status notification record"
 msgstr "Open Zaak statusnotificatie record"
 
-#: openzaak/models.py:551
+#: openzaak/models.py:560
 msgid "InformatieObject UUID"
 msgstr "Informatieobject UUID"
 
-#: openzaak/models.py:556
+#: openzaak/models.py:565
 msgid "Open Zaak info object notification record"
 msgstr "Open Zaak informatieobject notificatie record"
 
-#: openzaak/models.py:575
+#: openzaak/models.py:584
 msgid "Status tekst"
 msgstr "Status tekst"
 
-#: openzaak/models.py:580
+#: openzaak/models.py:589
 msgid "Vertaling"
 msgstr "Vertaling"
 
-#: openzaak/models.py:587
+#: openzaak/models.py:596
 msgid "Status vertaling"
 msgstr "Status vertaling"
 
-#: openzaak/models.py:588
+#: openzaak/models.py:597
 msgid "Status vertalingen"
 msgstr "Status vertalingen"
 
@@ -4137,35 +4154,35 @@ msgstr "Status vertalingen"
 msgid "Missing required headers: {missing_headers}"
 msgstr "Ontbrekende verplichte headers: {missing_headers}"
 
-#: openzaak/tests/test_case_detail.py:1009
-#: openzaak/tests/test_case_detail.py:1044
-#: openzaak/tests/test_case_detail.py:1086
-#: openzaak/tests/test_case_detail.py:1121
-#: openzaak/tests/test_case_detail.py:1158
-#: openzaak/tests/test_case_detail.py:1197
-#: openzaak/tests/test_case_detail.py:1258 templates/pages/cases/403.html:3
+#: openzaak/tests/test_case_detail.py:1018
+#: openzaak/tests/test_case_detail.py:1053
+#: openzaak/tests/test_case_detail.py:1095
+#: openzaak/tests/test_case_detail.py:1130
+#: openzaak/tests/test_case_detail.py:1167
+#: openzaak/tests/test_case_detail.py:1206
+#: openzaak/tests/test_case_detail.py:1267 templates/pages/cases/403.html:3
 msgid "Sorry, you don't have access to this page (403)"
 msgstr "Sorry, u heeft geen toegang tot deze pagina (403)"
 
-#: openzaak/tests/test_case_detail.py:1226
-#: openzaak/tests/test_case_detail.py:1236
-#: openzaak/tests/test_case_detail.py:1421
+#: openzaak/tests/test_case_detail.py:1235
+#: openzaak/tests/test_case_detail.py:1245
+#: openzaak/tests/test_case_detail.py:1430
 #: templates/pages/cases/status_inner.html:79
 #: templates/pages/contactmoment/detail.html:20
 msgid "There is no available data at the moment."
 msgstr "Op dit moment zijn er geen aanvragen beschikbaar."
 
-#: openzaak/tests/test_case_detail.py:1370
-#: openzaak/tests/test_case_detail.py:1659
+#: openzaak/tests/test_case_detail.py:1379
+#: openzaak/tests/test_case_detail.py:1668
 msgid "some description content"
 msgstr "some description content"
 
-#: openzaak/tests/test_case_detail.py:1405
+#: openzaak/tests/test_case_detail.py:1414
 msgid "Grootte max. 50 MB, toegestane document formaten:"
 msgstr "Grootte max. 50 MB, toegestane document formaten:"
 
-#: openzaak/tests/test_case_detail.py:1477
-#: openzaak/tests/test_case_detail.py:1526
+#: openzaak/tests/test_case_detail.py:1486
+#: openzaak/tests/test_case_detail.py:1535
 #, python-brace-format
 msgid ""
 "Wij hebben **1 bestand(en)** succesvol geüpload:\n"
@@ -4173,14 +4190,14 @@ msgid ""
 "- {title}"
 msgstr ""
 
-#: openzaak/tests/test_case_detail.py:1636
-#: openzaak/tests/test_case_detail.py:1705
-#: openzaak/tests/test_case_detail.py:1728
-#: openzaak/tests/test_case_detail.py:1751
+#: openzaak/tests/test_case_detail.py:1645
+#: openzaak/tests/test_case_detail.py:1714
+#: openzaak/tests/test_case_detail.py:1737
+#: openzaak/tests/test_case_detail.py:1760
 msgid "By clicking the button below you can upload a document."
 msgstr "Via onderstaande knop kunt u een bestand toevoegen."
 
-#: openzaak/tests/test_case_detail.py:1683
+#: openzaak/tests/test_case_detail.py:1692
 #: templates/pages/cases/status_inner.html:54
 msgid ""
 "By clicking the button below you can upload a document. This is an external "
@@ -4189,8 +4206,8 @@ msgstr ""
 "Via onderstaande knop kunt u een bestand toevoegen. U wordt doorgestuurd "
 "naar een ander systeem."
 
-#: openzaak/tests/test_case_detail.py:1794
-#: openzaak/tests/test_case_detail.py:1834
+#: openzaak/tests/test_case_detail.py:1803
+#: openzaak/tests/test_case_detail.py:1843
 msgid ""
 "Een fout is opgetreden bij het uploaden van {self."
 "uploaded_informatie_object['bestandsnaam']}"
@@ -5691,11 +5708,8 @@ msgid "Verloopt op"
 msgstr "Verloopt op"
 
 #: templates/pages/cases/list_inner.html:30
-#: templates/pages/cases/list_inner.html:31
-#: templates/pages/cases/list_inner.html:50
-#: templates/pages/cases/list_inner.html:51
-msgid "Bekijk aanvraag"
-msgstr "Bekijk aanvraag"
+msgid "Ga naar aanvraag"
+msgstr "Ga naar aanvraag"
 
 #: templates/pages/cases/list_inner.html:46
 #: templates/pages/contactmoment/list.html:21
@@ -6422,6 +6436,7 @@ msgid "Case status update"
 msgstr "Aanvraagstatus gewijzigd"
 
 #: userfeed/hooks/case_status.py:58 userfeed/tests/hooks/test_case_status.py:95
+#, python-brace-format
 msgid "Case status has been changed to '{status}'"
 msgstr "Aanvraagstatus is veranderd naar '{status}'"
 
