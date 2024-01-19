@@ -65,7 +65,7 @@ class InnerCaseListView(
             if config.fetch_eherkenning_zaken_with_rsin:
                 kvk_or_rsin = self.request.user.rsin
             vestigingsnummer = get_kvk_branch_number(self.request.session)
-            if vestigingsnummer and vestigingsnummer != self.request.user.kvk:
+            if vestigingsnummer:
                 raw_cases = fetch_cases_by_kvk_or_rsin(
                     kvk_or_rsin=kvk_or_rsin, vestigingsnummer=vestigingsnummer
                 )

@@ -725,7 +725,7 @@ class eHerkenningOIDCFlowTests(TestCase):
         session = self.client.session
         session["oidc_states"] = {"mock": {"nonce": "nonce"}}
         session["oidc_id_token"] = "foo"
-        session[KVK_BRANCH_SESSION_VARIABLE] = "1234"
+        session[KVK_BRANCH_SESSION_VARIABLE] = None
         session.save()
         logout_url = reverse("eherkenning_oidc:logout")
 

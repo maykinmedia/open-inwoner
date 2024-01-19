@@ -83,12 +83,8 @@ class CaseAccessMixin(AccessMixin):
                     identifier = self.request.user.rsin
 
                 vestigingsnummer = get_kvk_branch_number(self.request.session)
-                if (
-                    vestigingsnummer
-                    and vestigingsnummer != self.request.user.kvk
-                    and not fetch_roles_for_case_and_vestigingsnummer(
-                        self.case.url, vestigingsnummer
-                    )
+                if vestigingsnummer and not fetch_roles_for_case_and_vestigingsnummer(
+                    self.case.url, vestigingsnummer
                 ):
                     logger.debug(
                         f"CaseAccessMixin - permission denied: no role for the case {self.case.url}"

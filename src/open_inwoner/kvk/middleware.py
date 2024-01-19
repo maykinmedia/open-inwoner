@@ -5,7 +5,7 @@ from django.urls import NoReverseMatch, reverse
 
 from furl import furl
 
-from open_inwoner.kvk.branches import get_kvk_branch_number
+from open_inwoner.kvk.branches import kvk_branch_selected_done
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +23,7 @@ class KvKLoginMiddleware:
         if (
             not user.is_authenticated
             or not user.is_eherkenning_user
-            or get_kvk_branch_number(request.session)
+            or kvk_branch_selected_done(request.session)
         ):
             return self.get_response(request)
 

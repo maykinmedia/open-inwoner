@@ -37,6 +37,15 @@ class CompanyBranchChoiceView(FormView):
         else:
             redirect = furl(reverse("pages-root"))
 
+        # create pseudo-branch representing the company as a whole
+        master_branch = {
+            "vestigingsnummer": "",
+            "handelsnaam": company_branches[0].get("handelsnaam", "")
+            if company_branches
+            else "",
+        }
+        company_branches.insert(0, master_branch)
+
         context.update(
             company_branches=company_branches,
             form=form,
@@ -52,26 +61,19 @@ class CompanyBranchChoiceView(FormView):
         context = self.get_context_data()
 
         redirect = context["redirect"]
-        company_branches = context["company_branches"]
+        company_branches_with_master = context["company_branches"]
+        # Exclude the "master" branch from these checks, since we always insert this
+        company_branches = company_branches_with_master[1:]
 
         if not company_branches:
-            request.session[KVK_BRANCH_SESSION_VARIABLE] = request.user.kvk
+            request.session[KVK_BRANCH_SESSION_VARIABLE] = None
             request.session.save()
             return HttpResponseRedirect(redirect.url)
 
         if len(company_branches) == 1:
-            request.session[KVK_BRANCH_SESSION_VARIABLE] = (
-                company_branches[0].get("vestigingsnummer") or request.user.kvk
-            )
+            request.session[KVK_BRANCH_SESSION_VARIABLE] = None
             request.session.save()
             return HttpResponseRedirect(redirect.url)
-
-        # create pseudo-branch representing the company as a whole
-        master_branch = {
-            "kvkNummer": request.user.kvk,
-            "handelsnaam": company_branches[0].get("handelsnaam", ""),
-        }
-        company_branches.insert(0, master_branch)
 
         form = context["form"]
 
@@ -79,7 +81,7 @@ class CompanyBranchChoiceView(FormView):
             request,
             self.template_name,
             {
-                "company_branches": company_branches,
+                "company_branches": company_branches_with_master,
                 "form": form,
             },
         )
@@ -97,9 +99,8 @@ class CompanyBranchChoiceView(FormView):
             cleaned = form.cleaned_data
             branch_number = cleaned["branch_number"]
 
-            if not any(
-                branch["kvkNummer"] == branch_number
-                or branch.get("vestigingsnummer") == branch_number
+            if branch_number and not any(
+                branch.get("vestigingsnummer") == branch_number
                 for branch in context["company_branches"]
             ):
                 form.add_error(
