@@ -21,6 +21,7 @@ from open_inwoner.openzaak.tests.factories import (
 from open_inwoner.utils.test import paginated_response
 
 from ..models import OpenZaakConfig
+from .helpers import generate_oas_component_cached
 from .shared import CATALOGI_ROOT, DOCUMENTEN_ROOT, ZAKEN_ROOT
 
 
@@ -62,7 +63,7 @@ class MockAPIData:
             rsin="000000000",
             email="initiator_kvk@example.com",
         )
-        self.zaak_type = generate_oas_component(
+        self.zaak_type = generate_oas_component_cached(
             "ztc",
             "schemas/ZaakType",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
@@ -72,7 +73,7 @@ class MockAPIData:
             indicatieInternOfExtern="extern",
             omschrijving="My Zaaktype omschrijving",
         )
-        self.status_type_initial = generate_oas_component(
+        self.status_type_initial = generate_oas_component_cached(
             "ztc",
             "schemas/StatusType",
             url=f"{CATALOGI_ROOT}statustypen/aaaaaaaa-aaaa-aaaa-aaaa-111111111111",
@@ -82,7 +83,7 @@ class MockAPIData:
             omschrijving="initial",
             isEindStatus=False,
         )
-        self.status_type_final = generate_oas_component(
+        self.status_type_final = generate_oas_component_cached(
             "ztc",
             "schemas/StatusType",
             url=f"{CATALOGI_ROOT}statustypen/aaaaaaaa-aaaa-aaaa-aaaa-222222222222",
@@ -92,7 +93,7 @@ class MockAPIData:
             omschrijving="final",
             isEindStatus=True,
         )
-        self.zaak = generate_oas_component(
+        self.zaak = generate_oas_component_cached(
             "zrc",
             "schemas/Zaak",
             url=f"{ZAKEN_ROOT}zaken/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
@@ -101,7 +102,7 @@ class MockAPIData:
             resultaat=f"{ZAKEN_ROOT}resultaten/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
         )
-        self.zaak2 = generate_oas_component(
+        self.zaak2 = generate_oas_component_cached(
             "zrc",
             "schemas/Zaak",
             url=f"{ZAKEN_ROOT}zaken/bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
@@ -110,14 +111,14 @@ class MockAPIData:
             resultaat=f"{ZAKEN_ROOT}resultaten/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
         )
-        self.status_initial = generate_oas_component(
+        self.status_initial = generate_oas_component_cached(
             "zrc",
             "schemas/Status",
             url=f"{ZAKEN_ROOT}statussen/aaaaaaaa-aaaa-aaaa-aaaa-111111111111",
             zaak=self.zaak["url"],
             statustype=self.status_type_initial["url"],
         )
-        self.status_final = generate_oas_component(
+        self.status_final = generate_oas_component_cached(
             "zrc",
             "schemas/Status",
             url=f"{ZAKEN_ROOT}statussen/aaaaaaaa-aaaa-aaaa-aaaa-222222222222",
@@ -125,7 +126,7 @@ class MockAPIData:
             statustype=self.status_type_final["url"],
         )
 
-        self.informatie_object = generate_oas_component(
+        self.informatie_object = generate_oas_component_cached(
             "drc",
             "schemas/EnkelvoudigInformatieObject",
             url=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/aaaaaaaa-0001-bbbb-aaaa-aaaaaaaaaaaa",
@@ -133,14 +134,14 @@ class MockAPIData:
             status="definitief",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
         )
-        self.zaak_informatie_object = generate_oas_component(
+        self.zaak_informatie_object = generate_oas_component_cached(
             "zrc",
             "schemas/ZaakInformatieObject",
             url=f"{ZAKEN_ROOT}zaakinformatieobjecten/aaaaaaaa-0001-aaaa-aaaa-aaaaaaaaaaaa",
             informatieobject=self.informatie_object["url"],
             zaak=self.zaak["url"],
         )
-        self.zaak_informatie_object2 = generate_oas_component(
+        self.zaak_informatie_object2 = generate_oas_component_cached(
             "zrc",
             "schemas/ZaakInformatieObject",
             url=f"{ZAKEN_ROOT}zaakinformatieobjecten/aaaaaaaa-0002-aaaa-aaaa-aaaaaaaaaaaa",
@@ -148,7 +149,7 @@ class MockAPIData:
             zaak=self.zaak2["url"],
         )
 
-        self.informatie_object_extra = generate_oas_component(
+        self.informatie_object_extra = generate_oas_component_cached(
             "drc",
             "schemas/EnkelvoudigInformatieObject",
             url=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/aaaaaaaa-0002-bbbb-aaaa-aaaaaaaaaaaa",
@@ -156,7 +157,7 @@ class MockAPIData:
             status="definitief",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
         )
-        self.zaak_informatie_object_extra = generate_oas_component(
+        self.zaak_informatie_object_extra = generate_oas_component_cached(
             "zrc",
             "schemas/ZaakInformatieObject",
             url=f"{ZAKEN_ROOT}zaakinformatieobjecten/aaaaaaaa-0003-aaaa-aaaa-aaaaaaaaaaaa",
@@ -164,7 +165,7 @@ class MockAPIData:
             zaak=self.zaak["url"],
         )
 
-        self.role_initiator = generate_oas_component(
+        self.role_initiator = generate_oas_component_cached(
             "zrc",
             "schemas/Rol",
             url=f"{ZAKEN_ROOT}rollen/aaaaaaaa-0001-aaaa-aaaa-aaaaaaaaaaaa",
@@ -174,7 +175,7 @@ class MockAPIData:
                 "inpBsn": self.user_initiator.bsn,
             },
         )
-        self.eherkenning_role_initiator = generate_oas_component(
+        self.eherkenning_role_initiator = generate_oas_component_cached(
             "zrc",
             "schemas/Rol",
             url=f"{ZAKEN_ROOT}rollen/aaaaaaaa-0002-aaaa-aaaa-aaaaaaaaaaaa",
@@ -184,7 +185,7 @@ class MockAPIData:
                 "innNnpId": self.eherkenning_user_initiator.kvk,
             },
         )
-        self.eherkenning_role_initiator2 = generate_oas_component(
+        self.eherkenning_role_initiator2 = generate_oas_component_cached(
             "zrc",
             "schemas/Rol",
             url=f"{ZAKEN_ROOT}rollen/aaaaaaaa-0003-aaaa-aaaa-aaaaaaaaaaaa",

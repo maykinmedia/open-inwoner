@@ -26,3 +26,36 @@ def create_sha256_hash(val, salt=None):
     h = sha256(val)
     h.update(salt.encode("utf-8"))
     return h.hexdigest()
+
+
+def pyhash_value(value) -> int:
+    """
+    Best effort to create a python hash() of common types, even for lists, tuples and dictionaries.
+
+    Use with care as source is still mutable.
+
+    Example use-case is generating a cache-key from arguments to store (API) result in a dict.
+    """
+    try:
+        # every normal hashable
+        return hash(value)
+
+    except TypeError as e:
+        if isinstance(value, dict):
+            # convert dict to hashable tuple of key-value tuples
+            elems = list()
+            for k in sorted(value.keys()):
+                elems.append((k, pyhash_value(value[k])))
+            return hash(tuple(elems))
+
+        elif isinstance(value, (list, tuple)):
+            # convert list to hashable tuple
+            return hash(tuple(map(pyhash_value, value)))
+        elif isinstance(value, set):
+            # convert set to sorted hashable tuple
+            return hash(tuple(sorted(map(pyhash_value, value))))
+        else:
+            # we could add more support (dataclasses), but for now lets reraise
+            raise TypeError(
+                f"unhashable type '{type(value)}' for value '{value}'"
+            ) from e
