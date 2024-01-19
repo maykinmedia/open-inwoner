@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-16 14:22+0100\n"
+"POT-Creation-Date: 2024-01-19 11:38+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,61 +17,68 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: accounts/admin.py:32 accounts/tests/test_admin.py:134
+#: accounts/admin.py:37
+#, python-brace-format
+msgid "<a href='{url}'>{text}</a>"
+msgstr "<a href='{url}'>{text}</a>"
+
+#: accounts/admin.py:42 accounts/models.py:500 accounts/models.py:621
+#: accounts/models.py:756 pdc/models/product.py:247 plans/models.py:26
+#: templates/export/include/actions.html:11
+#: templates/export/profile/action_export.html:36
+msgid "File"
+msgstr "Bestand"
+
+#: accounts/admin.py:59 accounts/tests/test_admin.py:134
 msgid "Only a 'begeleider' user can add an image."
 msgstr "Alleen een begeleider mag een afbeelding toevoegen."
 
-#: accounts/admin.py:40 accounts/admin.py:52 accounts/tests/test_admin.py:69
+#: accounts/admin.py:67 accounts/admin.py:79 accounts/tests/test_admin.py:69
 #: accounts/tests/test_admin.py:83
 msgid "The user with this email already exists."
 msgstr "Een gebruiker met dit e-mailadres bestaat al"
 
-#: accounts/admin.py:67
+#: accounts/admin.py:94
 msgid "Personal info"
 msgstr "Persoonlijke informatie"
 
-#: accounts/admin.py:82
+#: accounts/admin.py:109
 msgid "Permissions"
 msgstr "Permissies"
 
-#: accounts/admin.py:97
+#: accounts/admin.py:124
 msgid "Notifications"
 msgstr "Notificaties"
 
-#: accounts/admin.py:108
+#: accounts/admin.py:135
 msgid "Contacts - invites"
 msgstr "Contacten - uitnodigingen"
 
-#: accounts/admin.py:111
+#: accounts/admin.py:138
 msgid "Important dates"
 msgstr "Belangrijke datums"
 
-#: accounts/admin.py:160
+#: accounts/admin.py:194
 msgid "Mark selected actions as soft-deleted by user."
 msgstr "Markeer geselecteerde acties als soft-deleted."
 
-#: accounts/admin.py:166
+#: accounts/admin.py:200
 #, python-format
 msgid "%d actions was successfully marked as deleted."
 msgid_plural "%d stories were successfully marked as deleted."
 msgstr[0] ""
 msgstr[1] ""
 
-#: accounts/admin.py:174
+#: accounts/admin.py:208
 msgid "Restore selected soft-deleted actions"
 msgstr "Herstel geselecteerde soft-deleted acties"
 
-#: accounts/admin.py:180
+#: accounts/admin.py:214
 #, python-format
 msgid "%d actions was successfully restored."
 msgid_plural "%d stories were successfully restored."
 msgstr[0] "%d actie is hersteld"
 msgstr[1] "%d acties zijn hersteld"
-
-#: accounts/admin.py:198
-#, python-brace-format
-msgid "<a href='{url}'>{text}</a>"
-msgstr "<a href='{url}'>{text}</a>"
 
 #: accounts/choices.py:6
 msgid "E-mail en Wachtwoord"
@@ -107,8 +114,8 @@ msgid "Organisatie"
 msgstr "Organisatie"
 
 #: accounts/choices.py:32 accounts/choices.py:62 accounts/models.py:601
-#: cms/cases/views/status.py:86 cms/cases/views/status.py:127
-#: cms/cases/views/status.py:133 cms/cases/views/status.py:515
+#: cms/cases/views/status.py:87 cms/cases/views/status.py:128
+#: cms/cases/views/status.py:134 cms/cases/views/status.py:519
 #: components/templates/components/Action/Actions.html:82 plans/choices.py:6
 #: plans/forms.py:141 templates/export/include/actions.html:7
 #: templates/export/profile/action_export.html:20
@@ -120,7 +127,7 @@ msgid "Status"
 msgstr "Status"
 
 #: accounts/choices.py:36 accounts/choices.py:63 plans/choices.py:7
-#: plans/models.py:179 plans/tests/test_views.py:725
+#: plans/models.py:179 plans/tests/test_views.py:740
 msgid "Open"
 msgstr "Open"
 
@@ -129,7 +136,7 @@ msgid "Accordering"
 msgstr "Accordering"
 
 #: accounts/choices.py:38 accounts/choices.py:65 plans/choices.py:8
-#: plans/models.py:181 plans/tests/test_views.py:740
+#: plans/models.py:181 plans/tests/test_views.py:755
 msgid "Afgerond"
 msgstr "Afgerond"
 
@@ -470,13 +477,6 @@ msgstr "Naam"
 msgid "The name of the document"
 msgstr "De naam van het document"
 
-#: accounts/models.py:500 accounts/models.py:621 accounts/models.py:756
-#: pdc/models/product.py:247 plans/models.py:26
-#: templates/export/include/actions.html:11
-#: templates/export/profile/action_export.html:36
-msgid "File"
-msgstr "Bestand"
-
 #: accounts/models.py:504 accounts/models.py:556 accounts/models.py:639
 #: accounts/models.py:734 accounts/models.py:811 openzaak/models.py:513
 #: pdc/models/product.py:156 search/models.py:61
@@ -598,7 +598,7 @@ msgstr "Huidige status van de actie"
 #: accounts/models.py:608 components/templatetags/table_tags.py:102
 #: pdc/models/organization.py:31 pdc/models/tag.py:29 plans/models.py:79
 #: templates/export/include/actions.html:8
-#: templates/export/include/contacts.html:7
+#: templates/export/include/contacts.html:7 userfeed/models.py:105
 msgid "Type"
 msgstr "Type"
 
@@ -687,7 +687,7 @@ msgstr "De ontvanger van het bericht"
 msgid "This is the date the message was created"
 msgstr "Datum dat het bericht is aangemaakt"
 
-#: accounts/models.py:739 conf/base.py:558 pdc/models/product.py:114
+#: accounts/models.py:739 conf/base.py:560 pdc/models/product.py:114
 msgid "Content"
 msgstr "Content"
 
@@ -930,13 +930,13 @@ msgstr "Welkom"
 
 #: accounts/templates/registration/login.html:26
 #: accounts/templates/registration/login.html:35
-#: accounts/tests/test_auth.py:1595
+#: accounts/tests/test_auth.py:1603
 msgid "Inloggen met DigiD"
 msgstr "Log in met DigiD"
 
 #: accounts/templates/registration/login.html:49
 #: accounts/templates/registration/login.html:58
-#: accounts/tests/test_auth.py:1620
+#: accounts/tests/test_auth.py:1628
 msgid "Inloggen met eHerkenning"
 msgstr "Inloggen met eHerkenning"
 
@@ -977,7 +977,7 @@ msgid "Verstuur nieuwe SMS"
 msgstr "Verstuur nieuwe SMS"
 
 #: accounts/tests/test_action_views.py:169 accounts/views/actions.py:220
-#: plans/tests/test_views.py:585 plans/views.py:552
+#: plans/tests/test_views.py:600 plans/views.py:557
 #, python-brace-format
 msgid "Actie '{action}' is verwijdered."
 msgstr "Actie '{action}' is verwijdered."
@@ -1005,7 +1005,7 @@ msgid "Voer een geldig e-mailadres in."
 msgstr "Voer een geldig e-mailadres in."
 
 #: accounts/tests/test_auth.py:779 accounts/tests/test_auth.py:802
-#: accounts/tests/test_auth.py:1512 accounts/tests/test_auth.py:1540
+#: accounts/tests/test_auth.py:1520 accounts/tests/test_auth.py:1548
 #: accounts/tests/test_contact_views.py:260
 #: accounts/tests/test_contact_views.py:282
 #: accounts/tests/test_profile_views.py:378 utils/validators.py:81
@@ -1033,7 +1033,7 @@ msgstr ""
 msgid "Dit veld is vereist."
 msgstr "Dit veld is vereist."
 
-#: accounts/tests/test_auth.py:1641 accounts/tests/test_auth.py:1656
+#: accounts/tests/test_auth.py:1649 accounts/tests/test_auth.py:1664
 msgid ""
 "Voer een juiste E-mailadres en wachtwoord in. Let op dat beide velden "
 "hoofdlettergevoelig zijn."
@@ -1041,18 +1041,18 @@ msgstr ""
 "Voer een juiste E-mailadres en wachtwoord in. Let op dat beide velden "
 "hoofdlettergevoelig zijn."
 
-#: accounts/tests/test_auth.py:1678
+#: accounts/tests/test_auth.py:1686
 #: templates/registration/password_reset_form.html:5
 #: templates/registration/password_reset_form.html:12
 msgid "Reset password"
 msgstr "Wijzig wachtwoord"
 
-#: accounts/tests/test_auth.py:1688
+#: accounts/tests/test_auth.py:1696
 #, python-brace-format
 msgid "Password reset for {domain}"
 msgstr "Wachtwoordwijziging voor {domain}"
 
-#: accounts/tests/test_auth.py:1693
+#: accounts/tests/test_auth.py:1701
 msgid ""
 "U ontvangt deze e-mail, omdat u een aanvraag voor opnieuw instellen van het "
 "wachtwoord voor uw account op example.com hebt gedaan."
@@ -1060,23 +1060,23 @@ msgstr ""
 "U ontvangt deze e-mail, omdat u een aanvraag voor opnieuw instellen van het "
 "wachtwoord voor uw account op {domain} hebt gedaan."
 
-#: accounts/tests/test_auth.py:1698
+#: accounts/tests/test_auth.py:1706
 #, python-brace-format
 msgid "Uw gebruikersnaam, mocht u deze vergeten zijn: {user_email}"
 msgstr "Uw gebruikersnaam, mocht u deze vergeten zijn: {user_email}"
 
-#: accounts/tests/test_auth.py:1711
+#: accounts/tests/test_auth.py:1719
 #: templates/registration/password_change_form.html:13
 #: templates/registration/password_reset_confirm.html:8
 msgid "Change my password"
 msgstr "Mijn wachtwoord wijzigen"
 
-#: accounts/tests/test_auth.py:1732
+#: accounts/tests/test_auth.py:1740
 #: templates/registration/password_change_form.html:5
 msgid "Password reset"
 msgstr "Wachtwoordwijziging"
 
-#: accounts/tests/test_auth.py:1736
+#: accounts/tests/test_auth.py:1744
 #: templates/registration/password_change_done.html:6
 msgid "Your password has been changed."
 msgstr "Uw wachtwoord is gewijzigd."
@@ -1305,7 +1305,7 @@ msgstr "Stuur een bericht"
 msgid "user requests for brp data"
 msgstr "gebruiker vraagt BRP data op"
 
-#: accounts/views/actions.py:128 plans/views.py:466
+#: accounts/views/actions.py:128 plans/views.py:471
 msgid "Bewerk {}"
 msgstr "Bewerk {}"
 
@@ -1314,11 +1314,11 @@ msgstr "Bewerk {}"
 msgid "action soft-deleted by user {user}"
 msgstr "actie gemarkeerd als verwijderd door gebruiker {user}"
 
-#: accounts/views/actions.py:243 plans/views.py:415
+#: accounts/views/actions.py:243 plans/views.py:420
 msgid "Maak actie aan"
 msgstr "Maak actie aan"
 
-#: accounts/views/actions.py:334 plans/views.py:570
+#: accounts/views/actions.py:334 plans/views.py:575
 msgid "History of {}"
 msgstr "Geschiedenis van {}"
 
@@ -1493,7 +1493,7 @@ msgstr ""
 "De aangepaste hoogte van de afbeelding in pixels. Voorbeeld: \"220\". Laat "
 "dit veld leeg om de standaardhoogte van de afbeelding te gebruiken."
 
-#: cms/banner/models.py:33 plans/models.py:106
+#: cms/banner/models.py:33 cms/plugins/models/userfeed.py:9 plans/models.py:106
 #: templates/export/plans/plan_export.html:10
 msgid "Title"
 msgstr "Titel"
@@ -1526,7 +1526,7 @@ msgstr "Bestand"
 #: cms/cases/tests/test_contactform.py:495
 #: cms/cases/tests/test_contactform.py:535
 #: cms/cases/tests/test_contactform.py:567 cms/cases/tests/test_htmx.py:505
-#: cms/cases/views/status.py:705 openklant/tests/test_contactform.py:195
+#: cms/cases/views/status.py:709 openklant/tests/test_contactform.py:195
 #: openklant/tests/test_contactform.py:245
 #: openklant/tests/test_contactform.py:322
 #: openklant/tests/test_contactform.py:402
@@ -1553,8 +1553,8 @@ msgid "Vraag versturen"
 msgstr "Vraag versturen"
 
 #: cms/cases/views/cases.py:34 cms/cases/views/cases.py:38
-#: cms/cases/views/cases.py:59 cms/cases/views/status.py:84
-#: cms/cases/views/status.py:125
+#: cms/cases/views/cases.py:59 cms/cases/views/status.py:85
+#: cms/cases/views/status.py:126
 msgid "Mijn aanvragen"
 msgstr "Mijn aanvragen"
 
@@ -1568,43 +1568,43 @@ msgstr "Zaken bekeken: {cases}"
 msgid "Zaak bekeken: {case}"
 msgstr "Zaak bekeken: {case}"
 
-#: cms/cases/views/status.py:193 cms/cases/views/status.py:424
+#: cms/cases/views/status.py:194 cms/cases/views/status.py:428
 msgid "No data available"
 msgstr "Geen data beschikbaar"
 
-#: cms/cases/views/status.py:512
+#: cms/cases/views/status.py:516
 msgid "Gegevens"
 msgstr "Gegevens"
 
-#: cms/cases/views/status.py:518 templates/pages/cases/status_inner.html:26
+#: cms/cases/views/status.py:522 templates/pages/cases/status_inner.html:26
 msgid "Documenten"
 msgstr "Documenten"
 
-#: cms/cases/views/status.py:551 openzaak/tests/test_documents.py:243
+#: cms/cases/views/status.py:555 openzaak/tests/test_documents.py:243
 #, python-brace-format
 msgid "Document van zaak gedownload {case}: {filename}"
 msgstr "Document van zaak gedownload {case}: {filename}"
 
-#: cms/cases/views/status.py:586
+#: cms/cases/views/status.py:590
 #, python-brace-format
 msgid "An error occured while uploading file {filename}"
 msgstr "Een fout is opgetreden bij het uploaden van {filename}"
 
-#: cms/cases/views/status.py:624
+#: cms/cases/views/status.py:628
 #, python-brace-format
 msgid "Document was uploaded for {case}: {filename}"
 msgstr "Document {filename} is geüpload voor {case}"
 
-#: cms/cases/views/status.py:632
+#: cms/cases/views/status.py:636
 #, python-brace-format
 msgid "Wij hebben **{num_uploaded} bestand(en)** succesvol geüpload:"
 msgstr "Wij hebben **{num_uploaded} bestand(en)** succesvol geüpload:"
 
-#: cms/cases/views/status.py:711 openklant/views/contactform.py:69
+#: cms/cases/views/status.py:715 openklant/views/contactform.py:69
 msgid "Probleem bij versturen van de vraag."
 msgstr "Probleem bij versturen van de vraag."
 
-#: cms/cases/views/status.py:718
+#: cms/cases/views/status.py:722
 #, python-brace-format
 msgid "Case: {case_identification}"
 msgstr "Zaak: {case_identification}"
@@ -1705,6 +1705,15 @@ msgstr "Contactformulier"
 msgid "Inbox Application"
 msgstr "Berichten app"
 
+#: cms/plugins/cms_plugins/userfeed.py:13
+msgid "General"
+msgstr "Algemeen"
+
+#: cms/plugins/cms_plugins/userfeed.py:14
+#| msgid "User"
+msgid "User Feed"
+msgstr "Openstaande acties"
+
 #: cms/plugins/cms_plugins/videoplayer.py:12
 msgid "Media"
 msgstr "Media"
@@ -1713,9 +1722,24 @@ msgstr "Media"
 msgid "Video Player"
 msgstr "Videospeler"
 
+#: cms/plugins/models/userfeed.py:11
+msgid "The title of the plugin block"
+msgstr "De titel van de plugin blok"
+
+#: cms/plugins/models/userfeed.py:12 templates/pages/plans/list.html:41
+msgid "Openstaande acties"
+msgstr "Openstaande acties"
+
 #: cms/plugins/models/videoplayer.py:12
 msgid "The video from the catalog."
 msgstr "De video uit de bibliotheek."
+
+#: cms/plugins/tests/test_userfeed.py:37 userfeed/summarize.py:49
+#: userfeed/tests/test_feed.py:46
+msgid "There is {count} message"
+msgid_plural "There are {count} messages"
+msgstr[0] "Er is {count} openstaande actie"
+msgstr[1] "Er zijn {count} openstaande acties"
 
 #: cms/products/cms_apps.py:10
 msgid "Products Application"
@@ -1776,7 +1800,7 @@ msgstr "Zelftest"
 msgid "Designates whether 'self diagnose' section is rendered or not."
 msgstr "Bepaalt of de 'zelftest' sectie getoond wordt."
 
-#: cms/profile/cms_appconfig.py:31 plans/views.py:220
+#: cms/profile/cms_appconfig.py:31 plans/views.py:221
 #: templates/export/plans/plan_export.html:49
 #: templates/export/profile/profile_export.html:48
 #: templates/pages/plans/detail.html:79 templates/pages/profile/me.html:176
@@ -1844,7 +1868,7 @@ msgstr "Filter op:"
 msgid "Export to PDF"
 msgstr "Opslaan als PDF"
 
-#: components/templates/components/Action/Actions.html:26 plans/views.py:288
+#: components/templates/components/Action/Actions.html:26 plans/views.py:293
 #: templates/pages/plans/detail.html:17 templates/pages/profile/mydata.html:91
 msgid "Bewerken"
 msgstr "Bewerken"
@@ -2158,10 +2182,6 @@ msgstr "Tag lijst"
 msgid "Yes"
 msgstr "Ja"
 
-#: components/templates/components/UserFeed/UserFeed.html:6
-msgid "Aanvragen updates"
-msgstr "Aanvragen updates"
-
 #: components/templatetags/dashboard_tags.py:37
 msgid "Zaaknummer:"
 msgstr "Zaaknummer:"
@@ -2220,7 +2240,7 @@ msgid "Identificatie"
 msgstr "Identificatie"
 
 #: components/templatetags/table_tags.py:103 conf/parts/maileditor.py:397
-#: openklant/forms.py:12 openklant/models.py:106
+#: openklant/forms.py:12 openklant/models.py:105
 #: templates/pages/contactmoment/list.html:24
 msgid "Onderwerp"
 msgstr "Onderwerp"
@@ -2233,35 +2253,35 @@ msgstr "Antwoord"
 msgid "Dutch"
 msgstr "Nederlands"
 
-#: conf/base.py:567
+#: conf/base.py:569
 msgid "Banner Image"
 msgstr "Bannerafbeelding"
 
-#: conf/base.py:568
+#: conf/base.py:570
 msgid "Banner Text"
 msgstr "Banner tekst"
 
-#: conf/base.py:569
+#: conf/base.py:571
 msgid "Login Banner"
 msgstr "Login Banner"
 
-#: conf/base.py:571
+#: conf/base.py:573
 msgid "Footer, Left"
 msgstr "Footer linkerzijde"
 
-#: conf/base.py:578
+#: conf/base.py:580
 msgid "Footer, Center"
 msgstr "Footer midden"
 
-#: conf/base.py:585
+#: conf/base.py:587
 msgid "Footer, Right"
 msgstr "Footer rechterzijde"
 
-#: conf/base.py:596
+#: conf/base.py:598
 msgid "Arrow"
 msgstr "Pijl"
 
-#: conf/base.py:898
+#: conf/base.py:900
 #, python-brace-format
 msgid "Inlogcode: {token} (deze code is geldig voor 5 minuten)"
 msgstr "Inlogcode: {token} (deze code is geldig voor 5 minuten)"
@@ -3456,11 +3476,11 @@ msgstr "Gegevens ophalen uit KVK API op basis van KVK-nummer"
 msgid "data was retrieved from KvK API"
 msgstr "data is opgehaald via KVK API"
 
-#: kvk/views.py:50 kvk/views.py:82
+#: kvk/views.py:50 kvk/views.py:89
 msgid "Unauthorized"
 msgstr "Ongeautoriseerd"
 
-#: kvk/views.py:100
+#: kvk/views.py:107
 msgid "Invalid branch number for the current KvK number"
 msgstr "Ongeldig vestigingsnummer voor dit KVK-nummer"
 
@@ -3607,19 +3627,19 @@ msgstr ""
 "voor eHerkenning-gebruikers opgehaald via RSIN (Open Klant). Indien niet "
 "ingeschakeld, worden deze bronnen via het KVK-nummer."
 
-#: openklant/models.py:92
+#: openklant/models.py:91
 msgid "Open Klant configuration"
 msgstr "Configuratie 'Open Klant'"
 
-#: openklant/models.py:110 openzaak/models.py:249
+#: openklant/models.py:109 openzaak/models.py:249
 msgid "e-Suite 'onderwerp' code"
 msgstr "e-Suite 'onderwerp' code"
 
-#: openklant/models.py:125
+#: openklant/models.py:124
 msgid "Contact formulier onderwerp"
 msgstr "Contact formulier onderwerp"
 
-#: openklant/models.py:126
+#: openklant/models.py:125
 msgid "Contact formulier onderwerpen"
 msgstr "Contact formulier onderwerpen"
 
@@ -4117,35 +4137,35 @@ msgstr "Status vertalingen"
 msgid "Missing required headers: {missing_headers}"
 msgstr "Ontbrekende verplichte headers: {missing_headers}"
 
-#: openzaak/tests/test_case_detail.py:1002
-#: openzaak/tests/test_case_detail.py:1037
-#: openzaak/tests/test_case_detail.py:1079
-#: openzaak/tests/test_case_detail.py:1114
-#: openzaak/tests/test_case_detail.py:1151
-#: openzaak/tests/test_case_detail.py:1190
-#: openzaak/tests/test_case_detail.py:1251 templates/pages/cases/403.html:3
+#: openzaak/tests/test_case_detail.py:1009
+#: openzaak/tests/test_case_detail.py:1044
+#: openzaak/tests/test_case_detail.py:1086
+#: openzaak/tests/test_case_detail.py:1121
+#: openzaak/tests/test_case_detail.py:1158
+#: openzaak/tests/test_case_detail.py:1197
+#: openzaak/tests/test_case_detail.py:1258 templates/pages/cases/403.html:3
 msgid "Sorry, you don't have access to this page (403)"
 msgstr "Sorry, u heeft geen toegang tot deze pagina (403)"
 
-#: openzaak/tests/test_case_detail.py:1219
-#: openzaak/tests/test_case_detail.py:1229
-#: openzaak/tests/test_case_detail.py:1414
+#: openzaak/tests/test_case_detail.py:1226
+#: openzaak/tests/test_case_detail.py:1236
+#: openzaak/tests/test_case_detail.py:1421
 #: templates/pages/cases/status_inner.html:79
 #: templates/pages/contactmoment/detail.html:20
 msgid "There is no available data at the moment."
 msgstr "Op dit moment zijn er geen aanvragen beschikbaar."
 
-#: openzaak/tests/test_case_detail.py:1363
-#: openzaak/tests/test_case_detail.py:1652
+#: openzaak/tests/test_case_detail.py:1370
+#: openzaak/tests/test_case_detail.py:1659
 msgid "some description content"
 msgstr "some description content"
 
-#: openzaak/tests/test_case_detail.py:1398
+#: openzaak/tests/test_case_detail.py:1405
 msgid "Grootte max. 50 MB, toegestane document formaten:"
 msgstr "Grootte max. 50 MB, toegestane document formaten:"
 
-#: openzaak/tests/test_case_detail.py:1470
-#: openzaak/tests/test_case_detail.py:1519
+#: openzaak/tests/test_case_detail.py:1477
+#: openzaak/tests/test_case_detail.py:1526
 #, python-brace-format
 msgid ""
 "Wij hebben **1 bestand(en)** succesvol geüpload:\n"
@@ -4153,14 +4173,14 @@ msgid ""
 "- {title}"
 msgstr ""
 
-#: openzaak/tests/test_case_detail.py:1629
-#: openzaak/tests/test_case_detail.py:1698
-#: openzaak/tests/test_case_detail.py:1721
-#: openzaak/tests/test_case_detail.py:1744
+#: openzaak/tests/test_case_detail.py:1636
+#: openzaak/tests/test_case_detail.py:1705
+#: openzaak/tests/test_case_detail.py:1728
+#: openzaak/tests/test_case_detail.py:1751
 msgid "By clicking the button below you can upload a document."
 msgstr "Via onderstaande knop kunt u een bestand toevoegen."
 
-#: openzaak/tests/test_case_detail.py:1676
+#: openzaak/tests/test_case_detail.py:1683
 #: templates/pages/cases/status_inner.html:54
 msgid ""
 "By clicking the button below you can upload a document. This is an external "
@@ -4169,8 +4189,8 @@ msgstr ""
 "Via onderstaande knop kunt u een bestand toevoegen. U wordt doorgestuurd "
 "naar een ander systeem."
 
-#: openzaak/tests/test_case_detail.py:1787
-#: openzaak/tests/test_case_detail.py:1827
+#: openzaak/tests/test_case_detail.py:1794
+#: openzaak/tests/test_case_detail.py:1834
 msgid ""
 "Een fout is opgetreden bij het uploaden van {self."
 "uploaded_informatie_object['bestandsnaam']}"
@@ -4821,7 +4841,7 @@ msgstr "Deze pagina is niet toegankelijk voor burgers"
 msgid "This page cannot be accessed by companies"
 msgstr "Deze pagina is niet toegankelijk voor bedrijven"
 
-#: pdc/views.py:212 plans/views.py:219
+#: pdc/views.py:212 plans/views.py:220
 #: templates/export/plans/plan_export.html:44
 #: templates/export/profile/profile_export.html:55
 #: templates/pages/plans/detail.html:68 templates/pages/product/detail.html:69
@@ -4845,8 +4865,8 @@ msgstr "Producten"
 msgid "No template"
 msgstr "Geen sjabloon"
 
-#: plans/forms.py:67 plans/tests/test_views.py:317
-#: plans/tests/test_views.py:333
+#: plans/forms.py:67 plans/tests/test_views.py:332
+#: plans/tests/test_views.py:348
 msgid "At least one collaborator is required for a plan."
 msgstr "U dient in ieder geval 1 contactpersoon toe te voegen voor een plan."
 
@@ -4995,23 +5015,23 @@ msgstr "Over"
 msgid "dagen"
 msgstr "dagen"
 
-#: plans/tests/test_logging.py:57 plans/views.py:259
+#: plans/tests/test_logging.py:57 plans/views.py:264
 msgid "plan was created"
 msgstr "plan is aangemaakt"
 
-#: plans/tests/test_logging.py:80 plans/views.py:306
+#: plans/tests/test_logging.py:80 plans/views.py:311
 msgid "plan was modified"
 msgstr "plan is gewijzigd"
 
-#: plans/tests/test_logging.py:104 plans/views.py:348
+#: plans/tests/test_logging.py:104 plans/views.py:353
 msgid "plan goal was modified"
 msgstr "plan doel is gewijzigd"
 
-#: plans/tests/test_logging.py:130 plans/views.py:396
+#: plans/tests/test_logging.py:130 plans/views.py:401
 msgid "file was uploaded"
 msgstr "bestand is geüpload"
 
-#: plans/tests/test_logging.py:179 plans/views.py:446
+#: plans/tests/test_logging.py:179 plans/views.py:451
 msgid "action was created via plan"
 msgstr "actie is aangemaakt voor plan"
 
@@ -5024,52 +5044,52 @@ msgstr "Gewijzigd: Naam."
 msgid "file plan_{plan_uuid}.pdf was exported"
 msgstr ""
 
-#: plans/tests/test_views.py:315 plans/tests/test_views.py:316
-#: plans/tests/test_views.py:495
+#: plans/tests/test_views.py:330 plans/tests/test_views.py:331
+#: plans/tests/test_views.py:510
 msgid "This field is required."
 msgstr "Dit veld is vereist."
 
-#: plans/tests/test_views.py:559 plans/views.py:562
+#: plans/tests/test_views.py:574 plans/views.py:567
 #: templates/pages/plans/list.html:37
 msgid "Samenwerking"
 msgstr "Samenwerking"
 
-#: plans/tests/test_views.py:727 plans/tests/test_views.py:754
+#: plans/tests/test_views.py:742 plans/tests/test_views.py:769
 #: templates/pages/plans/list.html:55
 msgid "Actie vereist"
 msgstr "Actie vereist"
 
-#: plans/tests/test_views.py:834 templates/pages/plans/list.html:62
+#: plans/tests/test_views.py:849 templates/pages/plans/list.html:62
 msgid "There are no plans with these filters."
 msgstr "Er zijn nog geen plannen met deze filters."
 
-#: plans/tests/test_views.py:1087 plans/tests/test_views.py:1109
-#: plans/tests/test_views.py:1130 plans/views.py:102 plans/views.py:196
-#: plans/views.py:244 templates/cms/collaborate/active_plans_plugin.html:4
+#: plans/tests/test_views.py:1102 plans/tests/test_views.py:1124
+#: plans/tests/test_views.py:1145 plans/views.py:103 plans/views.py:197
+#: plans/views.py:249 templates/cms/collaborate/active_plans_plugin.html:4
 #: templates/pages/plans/edit.html:5 templates/pages/plans/file.html:5
 #: templates/pages/plans/list.html:10
 msgid "Samenwerken"
 msgstr "Samenwerken"
 
-#: plans/views.py:218
+#: plans/views.py:219
 msgid "Doelen"
 msgstr "Doelen"
 
-#: plans/views.py:245 templates/pages/plans/create.html:6
+#: plans/views.py:250 templates/pages/plans/create.html:6
 #: templates/pages/plans/list.html:11
 msgid "Start nieuwe samenwerking"
 msgstr "Start nieuwe samenwerking"
 
-#: plans/views.py:283 plans/views.py:331 plans/views.py:372 plans/views.py:409
-#: plans/views.py:458
+#: plans/views.py:288 plans/views.py:336 plans/views.py:377 plans/views.py:414
+#: plans/views.py:463
 msgid "Samenwerkingsplannen"
 msgstr "Samenwerkingsplannen"
 
-#: plans/views.py:337
+#: plans/views.py:342
 msgid "Doel bewerken"
 msgstr "Doel bewerken"
 
-#: plans/views.py:378
+#: plans/views.py:383
 msgid "Nieuw bestand uploaden"
 msgstr "Nieuw bestand uploaden"
 
@@ -5810,10 +5830,6 @@ msgstr "Doel en omschrijving aanpassen"
 msgid "Reset filters"
 msgstr "Reset filters"
 
-#: templates/pages/plans/list.html:41
-msgid "Openstaande acties"
-msgstr "Openstaande acties"
-
 #: templates/pages/product/detail.html:32 templates/pages/product/form.html:19
 msgid "Bewerken in de Admin"
 msgstr "Bewerken in de beheeromgeving"
@@ -6375,6 +6391,95 @@ msgstr "Let op: dit werkt alleen als je geen DigiD gebruikt om in te loggen."
 msgid "Password reset for %(site_name)s"
 msgstr "Wachtwoordwijziging voor %(site_name)s"
 
+#: userfeed/choices.py:6
+msgid "Simple text message"
+msgstr "Eenvoudig tekstbericht"
+
+#: userfeed/choices.py:7
+msgid "Case status changed"
+msgstr "Aanvraagstatus is gewijzigd"
+
+#: userfeed/choices.py:8 userfeed/hooks/case_document.py:59
+msgid "Case document added"
+msgstr "Document is toegevoegd"
+
+#: userfeed/choices.py:9
+msgid "Plan nears deadline"
+msgstr "Samenwerkingsplan loopt af"
+
+#: userfeed/hooks/case_document.py:60
+#: userfeed/tests/hooks/test_case_document.py:51
+#, python-brace-format
+msgid "Case document '{title}' has been added"
+msgstr "Document '{title}' is toegevoegd"
+
+#: userfeed/hooks/case_document.py:73 userfeed/hooks/case_status.py:70
+msgid "onbekend"
+msgstr "onbekend"
+
+#: userfeed/hooks/case_status.py:57
+msgid "Case status update"
+msgstr "Aanvraagstatus gewijzigd"
+
+#: userfeed/hooks/case_status.py:58 userfeed/tests/hooks/test_case_status.py:95
+msgid "Case status has been changed to '{status}'"
+msgstr "Aanvraagstatus is veranderd naar '{status}'"
+
+#: userfeed/hooks/plan.py:53
+msgid "Plan expiring"
+msgstr "Plan verloopt"
+
+#: userfeed/hooks/plan.py:54 userfeed/tests/hooks/test_plan.py:38
+#, python-brace-format
+msgid "Plan deadline expires at {expire}"
+msgstr "Plan verloopt op {expire}"
+
+#: userfeed/models.py:80
+msgid "Feed time"
+msgstr "Actie aangemaakt op"
+
+#: userfeed/models.py:84
+msgid "Information seen or action completed"
+msgstr "Informatie bekeken of actie voltooid"
+
+#: userfeed/models.py:94
+msgid "Automatically mark as completed after"
+msgstr "Automatisch als voltooid zien na"
+
+#: userfeed/models.py:100
+msgid "Action required"
+msgstr "Actie benodigd"
+
+#: userfeed/models.py:110
+msgid "Data for type"
+msgstr "Data voor type"
+
+#: userfeed/models.py:117
+msgid "External object UUID"
+msgstr "Extern object UUID"
+
+#: userfeed/models.py:119
+msgid "External object de-duplication"
+msgstr "Extern objectondubbeling"
+
+#: userfeed/summarize.py:23 userfeed/tests/hooks/test_case_status.py:58
+#, python-brace-format
+msgid "In {count} case the status has changed"
+msgid_plural "In {count} cases the status has changed"
+msgstr[0] "In {count} aanvraag is de status gewijzgd"
+msgstr[1] "In {count} aanvragen is de status gewijzigd"
+
+#: userfeed/summarize.py:36
+#, python-brace-format
+msgid "In {count} case your action is required"
+msgid_plural "In {count} cases your action is required"
+msgstr[0] "Bij {count} aanvraag is actie benodigd "
+msgstr[1] "Bij {count} aanvragen is actie benodigd "
+
+#: userfeed/tests/hooks/test_case_status.py:48
+msgid "Case status has been changed to 'initial'"
+msgstr "Aanvraagstatus is veranderd naar 'initial'"
+
 #: utils/admin.py:37
 msgid "content type"
 msgstr "Inhouds type"
@@ -6487,3 +6592,6 @@ msgstr "Het KVK nummer moet uit 8 cijfers bestaan."
 #: utils/validators.py:193
 msgid "Het KVK nummer moet numeriek zijn."
 msgstr "Het KVK nummer moet numeriek zijn."
+
+#~ msgid "Aanvragen updates"
+#~ msgstr "Aanvragen updates"
