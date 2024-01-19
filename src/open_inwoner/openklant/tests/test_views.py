@@ -161,6 +161,8 @@ class FetchKlantDataTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
         response = self.app.get(detail_url, user=data.user)
 
         kcm = response.context["contactmoment"]
+
+        self.assertEqual(response.context["zaak"], None)
         self.assertEqual(
             kcm,
             {
@@ -176,6 +178,48 @@ class FetchKlantDataTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
                 "status": _("Afgehandeld"),
                 "url": detail_url,
             },
+        )
+
+    def test_show_detail_for_bsn_with_zaak(self, m):
+        data = MockAPIReadData().install_mocks(m, link_objectcontactmomenten=True)
+
+        detail_url = reverse(
+            "cases:contactmoment_detail",
+            kwargs={"kcm_uuid": data.klant_contactmoment["uuid"]},
+        )
+        response = self.app.get(detail_url, user=data.user)
+
+        kcm = response.context["contactmoment"]
+
+        self.assertIsNotNone(response.context["zaak"])
+        self.assertEqual(response.context["zaak"].url, data.zaak["url"])
+        self.assertEqual(response.context["zaak"].identificatie, "Test Zaak")
+        self.assertEqual(
+            kcm,
+            {
+                "registered_date": datetime.fromisoformat(
+                    data.contactmoment["registratiedatum"]
+                ),
+                "channel": data.contactmoment["kanaal"].title(),
+                "text": data.contactmoment["tekst"],
+                "onderwerp": self.contactformsubject.subject,
+                "antwoord": data.contactmoment["antwoord"],
+                "identificatie": data.contactmoment["identificatie"],
+                "type": data.contactmoment["type"],
+                "status": _("Afgehandeld"),
+                "url": detail_url,
+            },
+        )
+
+        zaak_link = response.pyquery(".zaak-hyperlink")
+
+        self.assertEqual(zaak_link.text(), _("Ga naar zaak"))
+        self.assertEqual(
+            zaak_link.attr("href"),
+            reverse(
+                "cases:case_detail",
+                kwargs={"object_id": "410bb717-ff3d-4fd8-8357-801e5daf9775"},
+            ),
         )
 
     def test_show_detail_for_kvk_or_rsin(self, m):

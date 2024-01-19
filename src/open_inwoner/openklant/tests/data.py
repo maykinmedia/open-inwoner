@@ -1,3 +1,4 @@
+from requests.exceptions import RequestException
 from zgw_consumers.constants import APITypes
 from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 
@@ -7,11 +8,13 @@ from open_inwoner.accounts.tests.factories import (
 )
 from open_inwoner.openklant.constants import Status
 from open_inwoner.openklant.models import OpenKlantConfig
+from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.tests.factories import ServiceFactory
 from open_inwoner.utils.test import paginated_response
 
 KLANTEN_ROOT = "https://klanten.nl/api/v1/"
 CONTACTMOMENTEN_ROOT = "https://contactmomenten.nl/api/v1/"
+ZAKEN_ROOT = "https://zaken.nl/api/v1/"
 
 
 class MockAPIData:
@@ -26,10 +29,17 @@ class MockAPIData:
         )
         config.save()
 
+        oz_config = OpenZaakConfig.get_solo()
+        oz_config.zaak_service = ServiceFactory(
+            api_root=ZAKEN_ROOT, api_type=APITypes.zrc
+        )
+        oz_config.save()
+
     @classmethod
     def setUpOASMocks(self, m):
         mock_service_oas_get(m, KLANTEN_ROOT, "kc")
         mock_service_oas_get(m, CONTACTMOMENTEN_ROOT, "cmc")
+        mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
 
 
 class MockAPIReadPatchData(MockAPIData):
@@ -201,8 +211,34 @@ class MockAPIReadData(MockAPIData):
             klant=self.klant_vestiging["url"],
             contactmoment=self.contactmoment_vestiging["url"],
         )
+        self.objectcontactmoment_other = generate_oas_component(
+            "cmc",
+            "schemas/ObjectContactMoment",
+            uuid="bb51784c-fa2c-4f65-b24e-7179b615efac",
+            url=f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten/bb51784c-fa2c-4f65-b24e-7179b615efac",
+            object="http://documenten.nl/api/v1/1",
+            contactmoment=self.contactmoment["url"],
+        )
+        # Force objectType other than zaak, to verify that filtering works
+        self.objectcontactmoment_other["object_type"] = "document"
+        self.objectcontactmoment_zaak = generate_oas_component(
+            "cmc",
+            "schemas/ObjectContactMoment",
+            uuid="77880671-b88a-44ed-ba24-dc2ae688c2ec",
+            url=f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten/77880671-b88a-44ed-ba24-dc2ae688c2ec",
+            object=f"{ZAKEN_ROOT}zaken/410bb717-ff3d-4fd8-8357-801e5daf9775",
+            object_type="zaak",
+            contactmoment=self.contactmoment["url"],
+        )
+        self.zaak = generate_oas_component(
+            "zrc",
+            "schemas/Zaak",
+            uuid="410bb717-ff3d-4fd8-8357-801e5daf9775",
+            url=f"{ZAKEN_ROOT}zaken/410bb717-ff3d-4fd8-8357-801e5daf9775",
+            identificatie="Test Zaak",
+        )
 
-    def install_mocks(self, m) -> "MockAPIReadData":
+    def install_mocks(self, m, link_objectcontactmomenten=False) -> "MockAPIReadData":
         self.setUpOASMocks(m)
 
         for resource_attr in [
@@ -216,6 +252,7 @@ class MockAPIReadData(MockAPIData):
             "klant_contactmoment2",
             "klant_contactmoment3",
             "klant_contactmoment4",
+            "zaak",
         ]:
             resource = getattr(self, resource_attr)
             m.get(resource["url"], json=resource)
@@ -251,6 +288,25 @@ class MockAPIReadData(MockAPIData):
         m.get(
             f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten?klant={self.klant_vestiging['url']}",
             json=paginated_response([self.klant_contactmoment4]),
+        )
+
+        m.get(
+            f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten?contactmoment={self.contactmoment['url']}",
+            json=paginated_response(
+                [self.objectcontactmoment_other, self.objectcontactmoment_zaak]
+                if link_objectcontactmomenten
+                else []
+            ),
+        )
+        # If exceptions occur while fetching objectcontactmomenten, the contactmoment
+        # should still show
+        m.get(
+            f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten?contactmoment={self.contactmoment2['url']}",
+            exc=RequestException,
+        )
+        m.get(
+            f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten?contactmoment={self.contactmoment_vestiging['url']}",
+            exc=RequestException,
         )
 
         return self
