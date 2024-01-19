@@ -83,7 +83,6 @@ class OpenKlantConfig(SingletonModel):
         "klanten_service",
         "register_bronorganisatie_rsin",
         "register_type",
-        "register_employee_id",
     )
 
     objects = OpenKlantConfigManager()
