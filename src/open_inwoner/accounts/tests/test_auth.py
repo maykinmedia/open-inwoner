@@ -1,4 +1,5 @@
 from datetime import date
+from hashlib import md5
 from unittest.mock import patch
 from urllib.parse import urlencode
 
@@ -1067,6 +1068,13 @@ class DuplicateEmailRegistrationTest(WebTest):
         }
         # post our password to the IDP
         response = self.app.post(url, data).follow().follow()
+
+        user = User.objects.get(kvk="12345678")
+        salt = "generate_email_from_bsn"
+        hashed_kvk = md5(
+            (salt + "12345678").encode(), usedforsecurity=False
+        ).hexdigest()
+        self.assertEqual(user.email, f"{hashed_kvk}@localhost")
 
         # select company branch
         response = self.app.get(response["Location"])

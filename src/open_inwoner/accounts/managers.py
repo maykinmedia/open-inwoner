@@ -33,8 +33,9 @@ class eHerkenningManager(BaseeHerkenningManager):
         return self.get_queryset().get(kvk=kvk)
 
     def eherkenning_create(self, kvk, **kwargs):
+        email = generate_email_from_string(kvk, domain="localhost")
         return super().create(
-            email="user-{}@localhost".format(kvk),
+            email=email,
             login_type=LoginTypeChoices.eherkenning,
             kvk=kvk,
         )

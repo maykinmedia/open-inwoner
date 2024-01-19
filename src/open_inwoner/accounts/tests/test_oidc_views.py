@@ -703,10 +703,10 @@ class eHerkenningOIDCFlowTests(TestCase):
 
         mock_retrieve_rsin_with_kvk.assert_called_with("00000000")
         salt = "generate_email_from_bsn"
-        hashed_bsn = md5(
+        hashed_kvk = md5(
             (salt + "00000000").encode(), usedforsecurity=False
         ).hexdigest()
-        self.assertEqual(new_user.email, f"{hashed_bsn}@localhost")
+        self.assertEqual(new_user.email, f"{hashed_kvk}@localhost")
         self.assertEqual(new_user.rsin, "123456789")
         self.assertEqual(new_user.login_type, LoginTypeChoices.eherkenning)
 

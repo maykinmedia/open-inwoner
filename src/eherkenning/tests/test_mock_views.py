@@ -1,3 +1,4 @@
+from hashlib import md5
 from unittest.mock import patch
 from urllib.parse import urlencode
 
@@ -11,6 +12,8 @@ from open_inwoner.kvk.branches import get_kvk_branch_number
 
 RETURN_URL = "/"
 CANCEL_URL = reverse("login")
+
+User = get_user_model()
 
 
 class eHerkenningMockTestCase(TestCase):
@@ -149,7 +152,6 @@ class PasswordLoginViewTests(eHerkenningMockTestCase):
         self.assertRedirects(response, reverse("profile:registration_necessary"))
 
         # check user kvk
-        User = get_user_model()
         self.assertEqual(
             response.context["user"].kvk, User.eherkenning_objects.get().kvk
         )
@@ -190,6 +192,13 @@ class PasswordLoginViewTests(eHerkenningMockTestCase):
 
         # follow the ACS redirect and get/create the user
         response = self.client.get(response["Location"], follow=True)
+
+        user = User.objects.get(kvk="29664887")
+        salt = "generate_email_from_bsn"
+        hashed_kvk = md5(
+            (salt + "29664887").encode(), usedforsecurity=False
+        ).hexdigest()
+        self.assertEqual(user.email, f"{hashed_kvk}@localhost")
 
         # check company branch number in session
         self.assertEqual(get_kvk_branch_number(self.client.session), "1234")
