@@ -29,6 +29,10 @@
             [
                 "accounts",
                 "user"
+            ],
+            [
+                "userfeed",
+                "feeditemdata"
             ]
         ]
     }
@@ -124,7 +128,7 @@
 {
     "model": "admin_index.appgroup",
     "fields": {
-        "order": 10,
+        "order": 11,
         "name": "Overige / Diverse",
         "slug": "overige-diverse",
         "models": [
@@ -166,7 +170,7 @@
 {
     "model": "admin_index.appgroup",
     "fields": {
-        "order": 8,
+        "order": 9,
         "name": "Configuratie",
         "slug": "configuratie",
         "models": [
@@ -266,7 +270,7 @@
 {
     "model": "admin_index.appgroup",
     "fields": {
-        "order": 9,
+        "order": 10,
         "name": "Emails",
         "slug": "emails",
         "models": [
@@ -293,37 +297,9 @@
     "model": "admin_index.appgroup",
     "fields": {
         "order": 6,
-        "name": "Koppelingen",
+        "name": "Data koppelingen",
         "slug": "koppelingen",
         "models": [
-            [
-                "digid_eherkenning",
-                "digidconfiguration"
-            ],
-            [
-                "digid_eherkenning",
-                "eherkenningconfiguration"
-            ],
-            [
-                "digid_eherkenning_oidc_generics",
-                "openidconnecteherkenningconfig"
-            ],
-            [
-                "digid_eherkenning_oidc_generics",
-                "openidconnectdigidconfig"
-            ],
-            [
-                "haalcentraal",
-                "haalcentraalconfig"
-            ],
-            [
-                "kvk",
-                "kvkconfig"
-            ],
-            [
-                "mozilla_django_oidc_db",
-                "openidconnectconfig"
-            ],
             [
                 "notifications_api_common",
                 "notificationsconfig"
@@ -394,7 +370,7 @@
 {
     "model": "admin_index.appgroup",
     "fields": {
-        "order": 7,
+        "order": 8,
         "name": "CMS",
         "slug": "cms",
         "models": [
@@ -437,6 +413,40 @@
             [
                 "cms",
                 "placeholderreference"
+            ]
+        ]
+    }
+},
+{
+    "model": "admin_index.appgroup",
+    "fields": {
+        "order": 7,
+        "name": "Inlog koppelingen",
+        "slug": "auth-koppelingen",
+        "models": [
+            [
+                "digid_eherkenning",
+                "digidconfiguration"
+            ],
+            [
+                "digid_eherkenning",
+                "eherkenningconfiguration"
+            ],
+            [
+                "digid_eherkenning_oidc_generics",
+                "openidconnectdigidconfig"
+            ],
+            [
+                "digid_eherkenning_oidc_generics",
+                "openidconnecteherkenningconfig"
+            ],
+            [
+                "haalcentraal",
+                "haalcentraalconfig"
+            ],
+            [
+                "kvk",
+                "kvkconfig"
             ]
         ]
     }
