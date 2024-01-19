@@ -1,6 +1,7 @@
 from typing import List, TypedDict
 
 from django import template
+from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from open_inwoner.accounts.views.contactmoments import KCMDict
@@ -72,7 +73,7 @@ def case_table(case: dict, **kwargs) -> dict:
 
 
 @register.inclusion_tag("components/table/table.html")
-def contactmoment_table(kcm: KCMDict, **kwargs) -> dict:
+def contactmoment_table(kcm: KCMDict, zaak=None, **kwargs) -> dict:
     """
     Renders a table below the dashboard for additional values related to a Zaak (case).
 
@@ -97,6 +98,23 @@ def contactmoment_table(kcm: KCMDict, **kwargs) -> dict:
         row = {"headers": [{"text": label}], "cells": [{"text": value}]}
 
         rows.append(row)
+
+    if zaak:
+        rows.append(
+            {
+                "headers": [{"text": _("Zaakidentificatie")}],
+                "cells": [
+                    {
+                        "text": zaak.identificatie,
+                        "url": reverse(
+                            "cases:case_detail", kwargs={"object_id": str(zaak.uuid)}
+                        ),
+                        "hyperlink_text": _("Ga naar zaak"),
+                        "class": "zaak-hyperlink",
+                    }
+                ],
+            }
+        )
 
     add_row_if_not_empty("identificatie", _("Identificatie"))
     add_row_if_not_empty("type", _("Type"))

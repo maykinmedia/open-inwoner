@@ -1,5 +1,6 @@
 import logging
 from typing import List, Optional
+from urllib.parse import urlparse
 
 from requests import RequestException
 from zds_client import ClientError
@@ -15,9 +16,11 @@ from open_inwoner.openklant.api_models import (
     KlantContactMoment,
     KlantContactRol,
     KlantCreateData,
+    ObjectContactMoment,
 )
 from open_inwoner.openklant.clients import build_client
 from open_inwoner.openklant.models import OpenKlantConfig
+from open_inwoner.openzaak.cases import fetch_single_case
 
 logger = logging.getLogger(__name__)
 
@@ -85,6 +88,59 @@ def fetch_klantcontactmoment(
             break
 
     return kcm
+
+
+def _fetch_objectcontactmomenten_for_contactmoment(
+    contactmoment: ContactMoment, *, client=None
+) -> List[ContactMoment]:
+    client = client or build_client("contactmomenten")
+    if client is None:
+        return []
+
+    try:
+        response = get_paginated_results(
+            client,
+            "objectcontactmoment",
+            request_kwargs={"params": {"contactmoment": contactmoment.url}},
+        )
+    except (RequestException, ClientError) as e:
+        logger.exception("exception while making request", exc_info=e)
+        return []
+
+    object_contact_momenten = factory(ObjectContactMoment, response)
+
+    # resolve linked resources
+    for ocm in object_contact_momenten:
+        assert ocm.contactmoment == contactmoment.url
+        ocm.contactmoment = contactmoment
+        if ocm.object_type == "zaak":
+            object_path = urlparse(ocm.object).path
+            ocm.object = fetch_single_case(object_path.split("/")[-1])
+
+    return object_contact_momenten
+
+
+def fetch_objectcontactmomenten_for_object_type(
+    contactmoment: ContactMoment, object_type: str
+) -> List[ObjectContactMoment]:
+    client = build_client("contactmomenten")
+
+    moments = _fetch_objectcontactmomenten_for_contactmoment(
+        contactmoment, client=client
+    )
+
+    # eSuite doesn't implement a `object_type` query parameter
+    ret = [moment for moment in moments if moment.object_type == object_type]
+
+    return ret or []
+
+
+def fetch_objectcontactmoment(
+    contactmoment: ContactMoment, object_type: str
+) -> Optional[ObjectContactMoment]:
+    ocms = fetch_objectcontactmomenten_for_object_type(contactmoment, object_type)
+    ocms = ocms or [None]
+    return ocms[0]
 
 
 def _fetch_klanten_for_bsn(user_bsn: str, *, client=None) -> List[Klant]:

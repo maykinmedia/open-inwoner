@@ -1,24 +1,24 @@
 import logging
 from datetime import datetime
-from typing import List, TypedDict
+from typing import TypedDict
 
 from django.contrib.auth.mixins import AccessMixin
 from django.http import Http404
 from django.shortcuts import redirect
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin
 
-from open_inwoner.kvk.branches import get_kvk_branch_number
 from open_inwoner.openklant.api_models import KlantContactMoment
 from open_inwoner.openklant.constants import Status
-from open_inwoner.openklant.models import ContactFormSubject, OpenKlantConfig
+from open_inwoner.openklant.models import ContactFormSubject
 from open_inwoner.openklant.wrap import (
     fetch_klantcontactmoment,
     fetch_klantcontactmomenten,
+    fetch_objectcontactmoment,
     get_fetch_parameters,
 )
 from open_inwoner.utils.views import CommonPageMixin
@@ -166,6 +166,9 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
 
         if not kcm:
             raise Http404()
+
+        ocm = fetch_objectcontactmoment(kcm.contactmoment, "zaak")
+        ctx["zaak"] = getattr(ocm, "object", None)
 
         ctx["contactmoment"] = self.get_kcm_data(kcm)
         return ctx

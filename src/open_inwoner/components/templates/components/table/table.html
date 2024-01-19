@@ -9,7 +9,7 @@
                     <th class="table__header table__header--status">{{ header.text }}</th>
                 {% endfor %}
                 {% for cell in row.cells %}
-                    <td class="table__item table__item--status">{{ cell.text|linebreaksbr }}</td>
+                    <td class="table__item table__item--status">{{ cell.text|linebreaksbr }} {% if cell.url %}<a href="{{ cell.url }}" class="{{ cell.class }}">{{ cell.hyperlink_text }}</a>{% endif %}</td>
                 {% endfor %}
             </tr>
         {% endfor %}

@@ -194,5 +194,25 @@
 			"rol": "belanghebbende",
 			"gelezen": false
 		}
+	},
+	{
+		"model": "contactmomenten.objectcontactmoment",
+		"pk": 1,
+		"fields": {
+			"uuid": "63b894b5-6a7e-49d0-a77f-84c4f3039b6a",
+			"contactmoment": 1,
+			"object": "https://test.openzaak.nl/zaken/api/v1/zaken/7fcf77fc-08a1-4a27-9e0e-28c91e4a3034",
+			"object_type": "zaak"
+		}
+	},
+	{
+		"model": "contactmomenten.objectcontactmoment",
+		"pk": 2,
+		"fields": {
+			"uuid": "2869d347-cc92-4e87-b4da-8f5eb34e7e4e",
+			"contactmoment": 2,
+			"object": "https://test.openzaak.nl/zaken/api/v1/zaken/6f9fb6a2-6d4b-4a58-8df5-407ffa9550a7",
+			"object_type": "zaak"
+		}
 	}
 ]
