@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.utils import timezone
 from django.utils.html import strip_tags
-from django.utils.translation import ugettext as _
+from django.utils.translation import ngettext, ugettext as _
 
 from freezegun import freeze_time
 
@@ -42,7 +42,11 @@ class FeedTests(TestCase):
 
         # check summary
         summary = feed.summary[0]
-        expected = _("There is {count} message").format(count=1)
+        expected = ngettext(
+            "There is {count} message",
+            "There are {count} messages",
+            1,
+        ).format(count=1)
         self.assertEqual(strip_tags(summary), expected)
 
         # forward in time past range

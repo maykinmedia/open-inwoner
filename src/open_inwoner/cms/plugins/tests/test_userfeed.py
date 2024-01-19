@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.utils.html import strip_tags
-from django.utils.translation import ugettext as _
+from django.utils.translation import ngettext, ugettext as _
 
 from pyquery import PyQuery as PQ
 
@@ -33,7 +33,11 @@ class TestUserFeedPlugin(TestCase):
         self.assertEqual(len(summaries), 1)
 
         summary = summaries.text()
-        expected = _("There is {count} message").format(count=1)
+        expected = ngettext(
+            "There is {count} message",
+            "There are {count} messages",
+            1,
+        ).format(count=1)
         self.assertEqual(strip_tags(summary), expected)
 
         # test item

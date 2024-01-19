@@ -3,7 +3,7 @@ from unittest.mock import Mock, patch
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils.html import escape, strip_tags
-from django.utils.translation import ugettext as _
+from django.utils.translation import ngettext, ugettext as _
 
 from zgw_consumers.api_models.base import factory
 
@@ -54,7 +54,11 @@ class FeedHookTest(TestCase):
         )
 
         summary = feed.summary[0]
-        expected = _("In {count} case the status has changed").format(count=1)
+        expected = ngettext(
+            "In {count} case the status has changed",
+            "In {count} cases the status has changed",
+            1,
+        ).format(count=1)
         self.assertEqual(strip_tags(summary), expected)
 
         # send duplicate notification
