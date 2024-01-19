@@ -6478,7 +6478,7 @@ msgstr[1] "Bij {count} aanvragen is actie benodigd "
 
 #: userfeed/tests/hooks/test_case_status.py:48
 msgid "Case status has been changed to 'initial'"
-msgstr ""
+msgstr "Aanvraagstatus is veranderd naar 'initial'"
 
 #: utils/admin.py:37
 msgid "content type"
