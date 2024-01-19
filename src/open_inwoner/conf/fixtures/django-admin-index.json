@@ -74,11 +74,23 @@
             ],
             [
                 "pdc",
+                "question"
+            ],
+            [
+                "pdc",
                 "tag"
             ],
             [
                 "pdc",
                 "tagtype"
+            ],
+            [
+                "questionnaire",
+                "questionnairestep"
+            ],
+            [
+                "questionnaire",
+                "questionnairestepfile"
             ]
         ]
     }
@@ -86,7 +98,7 @@
 {
     "model": "admin_index.appgroup",
     "fields": {
-        "order": 5,
+        "order": 4,
         "name": "Permissies, 2FA en logging",
         "slug": "permissies-2fa-en-logging",
         "models": [
@@ -128,7 +140,7 @@
 {
     "model": "admin_index.appgroup",
     "fields": {
-        "order": 11,
+        "order": 10,
         "name": "Overige / Diverse",
         "slug": "overige-diverse",
         "models": [
@@ -170,7 +182,7 @@
 {
     "model": "admin_index.appgroup",
     "fields": {
-        "order": 9,
+        "order": 8,
         "name": "Configuratie",
         "slug": "configuratie",
         "models": [
@@ -205,28 +217,6 @@
     "model": "admin_index.appgroup",
     "fields": {
         "order": 3,
-        "name": "Vragen en antwoorden",
-        "slug": "vraag-antwoord",
-        "models": [
-            [
-                "pdc",
-                "question"
-            ],
-            [
-                "questionnaire",
-                "questionnairestep"
-            ],
-            [
-                "questionnaire",
-                "questionnairestepfile"
-            ]
-        ]
-    }
-},
-{
-    "model": "admin_index.appgroup",
-    "fields": {
-        "order": 4,
         "name": "Zoeken",
         "slug": "zoeken",
         "models": [
@@ -270,7 +260,7 @@
 {
     "model": "admin_index.appgroup",
     "fields": {
-        "order": 10,
+        "order": 9,
         "name": "Emails",
         "slug": "emails",
         "models": [
@@ -296,7 +286,7 @@
 {
     "model": "admin_index.appgroup",
     "fields": {
-        "order": 6,
+        "order": 5,
         "name": "Data koppelingen",
         "slug": "koppelingen",
         "models": [
@@ -370,7 +360,7 @@
 {
     "model": "admin_index.appgroup",
     "fields": {
-        "order": 8,
+        "order": 7,
         "name": "CMS",
         "slug": "cms",
         "models": [
@@ -420,7 +410,7 @@
 {
     "model": "admin_index.appgroup",
     "fields": {
-        "order": 7,
+        "order": 6,
         "name": "Inlog koppelingen",
         "slug": "auth-koppelingen",
         "models": [
