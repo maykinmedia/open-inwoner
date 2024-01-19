@@ -348,10 +348,6 @@
             ],
             [
                 "zgw_consumers",
-                "nlxconfig"
-            ],
-            [
-                "zgw_consumers",
                 "service"
             ]
         ]
