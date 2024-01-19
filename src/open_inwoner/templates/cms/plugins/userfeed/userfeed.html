@@ -3,7 +3,7 @@
 {% if userfeed %}
 <section class="userfeed">
     <h2 class="h2 {% if userfeed.action_required %}indicator{% endif %}">
-        {% trans "Aanvragen updates" %}
+        {{ instance.title }}
     </h2>
     <div class="userfeed__summary">
         <ul class="userfeed__list">
