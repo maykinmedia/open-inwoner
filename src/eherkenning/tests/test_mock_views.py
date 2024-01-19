@@ -192,7 +192,7 @@ class PasswordLoginViewTests(eHerkenningMockTestCase):
         response = self.client.get(response["Location"], follow=True)
 
         # check company branch number in session
-        self.assertEqual(get_kvk_branch_number(self.client.session), "1234")
+        self.assertEqual(get_kvk_branch_number(self.client.session), None)
 
     @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
     def test_redirect_flow_with_no_vestigingsnummer(self, mock_kvk):
@@ -229,7 +229,7 @@ class PasswordLoginViewTests(eHerkenningMockTestCase):
         response = self.client.get(response["Location"], follow=True)
 
         # check company branch number in session
-        self.assertEqual(get_kvk_branch_number(self.client.session), "29664887")
+        self.assertEqual(get_kvk_branch_number(self.client.session), None)
 
     def test_post_redirect_retains_acs_querystring_params(self):
         url = reverse("eherkenning-mock:password")

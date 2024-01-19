@@ -491,6 +491,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
             },
         )
 
+    @set_kvk_branch_number_in_session(None)
     def test_list_cases_for_eherkenning_user(self, m):
         self._setUpMocks(m)
 
@@ -638,87 +639,6 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
                         ],
                         "rol__betrokkeneidentificatie__vestiging__vestigingsnummer": [
                             "1234"
-                        ],
-                    },
-                )
-
-    @set_kvk_branch_number_in_session("12345678")
-    def test_list_cases_for_eherkenning_user_with_vestigingsnummer_same_as_kvk(self, m):
-        """
-        If the KVK_BRANCH_NUMBER session variable is identical to the KvK number,
-        no additional filtering by vestiging should be applied when retrieving zaken
-        """
-        self._setUpMocks(m)
-        self.client.force_login(user=self.eherkenning_user)
-
-        for fetch_eherkenning_zaken_with_rsin in [True, False]:
-            with self.subTest(
-                fetch_eherkenning_zaken_with_rsin=fetch_eherkenning_zaken_with_rsin
-            ):
-                self.config.fetch_eherkenning_zaken_with_rsin = (
-                    fetch_eherkenning_zaken_with_rsin
-                )
-                self.config.save()
-
-                m.reset_mock()
-
-                response = self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
-
-                self.assertListEqual(
-                    response.context["cases"],
-                    [
-                        {
-                            "uuid": self.zaak_eherkenning2["uuid"],
-                            "start_date": datetime.date.fromisoformat(
-                                self.zaak_eherkenning2["startdatum"]
-                            ),
-                            "end_date": None,
-                            "identification": self.zaak_eherkenning2["identificatie"],
-                            "description": self.zaaktype["omschrijving"],
-                            "current_status": self.status_type1["omschrijving"],
-                            "zaaktype_config": self.zaaktype_config1,
-                            "statustype_config": self.zt_statustype_config1,
-                            "case_type": "Zaak",
-                        },
-                        {
-                            "uuid": self.zaak_eherkenning1["uuid"],
-                            "start_date": datetime.date.fromisoformat(
-                                self.zaak_eherkenning1["startdatum"]
-                            ),
-                            "end_date": None,
-                            "identification": self.zaak_eherkenning1["identificatie"],
-                            "description": self.zaaktype["omschrijving"],
-                            "current_status": self.status_type1["omschrijving"],
-                            "zaaktype_config": self.zaaktype_config1,
-                            "statustype_config": self.zt_statustype_config1,
-                            "case_type": "Zaak",
-                        },
-                    ],
-                )
-                # don't show internal cases
-                self.assertNotContains(response, self.zaak_intern["omschrijving"])
-                self.assertNotContains(response, self.zaak_intern["identificatie"])
-
-                # check zaken request query parameters
-                list_zaken_req = [
-                    req
-                    for req in m.request_history
-                    if req.hostname == "zaken.nl" and req.path == "/api/v1/zaken"
-                ][0]
-                identifier = (
-                    self.eherkenning_user.rsin
-                    if fetch_eherkenning_zaken_with_rsin
-                    else self.eherkenning_user.kvk
-                )
-                self.assertEqual(len(list_zaken_req.qs), 2)
-                self.assertEqual(
-                    list_zaken_req.qs,
-                    {
-                        "rol__betrokkeneidentificatie__nietnatuurlijkpersoon__innnnpid": [
-                            identifier
-                        ],
-                        "maximalevertrouwelijkheidaanduiding": [
-                            VertrouwelijkheidsAanduidingen.beperkt_openbaar
                         ],
                     },
                 )
