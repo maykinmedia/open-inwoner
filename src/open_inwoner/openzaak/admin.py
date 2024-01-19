@@ -192,11 +192,13 @@ class ZaakTypeStatusTypeConfigInline(admin.StackedInline):
         "zaaktype_uuids",
         "status_indicator",
         "status_indicator_text",
+        "notify_status_change",
         "document_upload_enabled",
         "document_upload_description",
         "description",
         "call_to_action_url",
         "call_to_action_text",
+        "case_link_text",
     ]
     readonly_fields = [
         "statustekst",

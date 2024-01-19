@@ -39,6 +39,7 @@
       }
     }
     .readmore__content {
+      scroll-margin-top: var(--spacing-giant);
       grid-template-rows: 1fr;
     }
   }

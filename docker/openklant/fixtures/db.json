@@ -1,0 +1,198 @@
+[
+	{
+		"model": "accounts.user",
+		"pk": 1,
+		"fields": {
+			"password": "pbkdf2_sha256$260000$Pebw2i9eDUNBPOaJQ0UAZL$iouKg/mE5u9im6u1WW3CziS7eYOFqLX8jaO2jHYvhqg=",
+			"last_login": "2023-12-14T13:47:22.165Z",
+			"is_superuser": true,
+			"username": "admin",
+			"first_name": "",
+			"last_name": "",
+			"email": "",
+			"is_staff": true,
+			"is_active": true,
+			"date_joined": "2023-12-14T13:47:20.049Z",
+			"groups": [],
+			"user_permissions": []
+		}
+	},
+	{
+		"model": "vng_api_common.jwtsecret",
+		"pk": 1,
+		"fields": {
+			"identifier": "open_inwoner",
+			"secret": "open_inwoner_secret"
+		}
+	},
+	{
+		"model": "vng_api_common.jwtsecret",
+		"pk": 2,
+		"fields": {
+			"identifier": "openklant",
+			"secret": "openklant_secret"
+		}
+	},
+	{
+		"model": "vng_api_common.apicredential",
+		"pk": 1,
+		"fields": {
+			"api_root": "http://openklant.local:8001/klanten/api/v1/",
+			"label": "Klanten [self]",
+			"client_id": "openklant",
+			"secret": "openklant_secret",
+			"user_id": "Open Klant",
+			"user_representation": "Open Klant"
+		}
+	},
+	{
+		"model": "authorizations.applicatie",
+		"pk": 1,
+		"fields": {
+			"uuid": "eea9b6bc-cc33-4ea7-bcbc-37ac589f1acc",
+			"client_ids": "[\"open_inwoner\"]",
+			"label": "Open Inwoner",
+			"heeft_alle_autorisaties": true
+		}
+	},
+	{
+		"model": "authorizations.applicatie",
+		"pk": 2,
+		"fields": {
+			"uuid": "abecbe3d-3a8e-494f-9560-0e3ac93654a2",
+			"client_ids": "[\"openklant\"]",
+			"label": "Open Klant [self]",
+			"heeft_alle_autorisaties": true
+		}
+	},
+	{
+		"model": "klanten.klant",
+		"pk": 1,
+		"fields": {
+			"uuid": "00e82ffb-e98a-4967-b8c1-232bf3c8c3a9",
+			"bronorganisatie": "000000000",
+			"klantnummer": "12345",
+			"bedrijfsnaam": "",
+			"website_url": "",
+			"voornaam": "",
+			"voorvoegsel_achternaam": "",
+			"achternaam": "",
+			"functie": "",
+			"telefoonnummer": "",
+			"emailadres": "",
+			"subject": "",
+			"subject_type": "niet_natuurlijk_persoon",
+			"aanmaakkanaal": "",
+			"geverifieerd": true
+		}
+	},
+	{
+		"model": "klanten.klant",
+		"pk": 2,
+		"fields": {
+			"uuid": "f21f35fc-d8f0-4a8f-979b-8d725f713817",
+			"bronorganisatie": "000000000",
+			"klantnummer": "54321",
+			"bedrijfsnaam": "",
+			"website_url": "",
+			"voornaam": "",
+			"voorvoegsel_achternaam": "",
+			"achternaam": "",
+			"functie": "",
+			"telefoonnummer": "",
+			"emailadres": "",
+			"subject": "",
+			"subject_type": "vestiging",
+			"aanmaakkanaal": "",
+			"geverifieerd": true
+		}
+	},
+	{
+		"model": "klanten.nietnatuurlijkpersoon",
+		"pk": 1,
+		"fields": {
+			"klant": 1,
+			"inn_nnp_id": "857587973",
+			"ann_identificatie": "",
+			"statutaire_naam": "",
+			"inn_rechtsvorm": "",
+			"bezoekadres": ""
+		}
+	},
+	{
+		"model": "klanten.vestiging",
+		"pk": 1,
+		"fields": {
+			"klant": 2,
+			"vestigings_nummer": "000037178598",
+			"handelsnaam": ["Test Value"]
+		}
+	},
+	{
+		"model": "contactmomenten.contactmoment",
+		"pk": 1,
+		"fields": {
+			"uuid": "9047c5be-885d-47ef-94ca-1c61c7a6480c",
+			"bronorganisatie": "000000000",
+			"registratiedatum": "2023-12-14T11:59:55Z",
+			"tekst": "Alleen zichtbaar voor hoofdvestiging",
+			"voorkeurskanaal": "",
+			"voorkeurstaal": "",
+			"kanaal": "email",
+			"initiatiefnemer": "",
+			"medewerker": "",
+			"onderwerp_links": "[]",
+			"vorig_contactmoment": null
+		}
+	},
+	{
+		"model": "contactmomenten.contactmoment",
+		"pk": 2,
+		"fields": {
+			"uuid": "2032bf57-216a-4438-bd4a-529c1b2c1191",
+			"bronorganisatie": "000000000",
+			"registratiedatum": "2023-12-14T11:59:55Z",
+			"tekst": "Zichtbaar voor vestiging en hoofdvestiging",
+			"voorkeurskanaal": "",
+			"voorkeurstaal": "",
+			"kanaal": "email",
+			"initiatiefnemer": "",
+			"medewerker": "",
+			"onderwerp_links": "[]",
+			"vorig_contactmoment": null
+		}
+	},
+	{
+		"model": "contactmomenten.klantcontactmoment",
+		"pk": 1,
+		"fields": {
+			"uuid": "8dd23721-a7ab-4d04-a73b-572235ff43cd",
+			"contactmoment": 2,
+			"klant": "http://openklant.local:8001/klanten/api/v1/klanten/00e82ffb-e98a-4967-b8c1-232bf3c8c3a9",
+			"rol": "belanghebbende",
+			"gelezen": false
+		}
+	},
+	{
+		"model": "contactmomenten.klantcontactmoment",
+		"pk": 2,
+		"fields": {
+			"uuid": "8045f566-75a8-49ae-b4ab-e8f090a08ce5",
+			"contactmoment": 2,
+			"klant": "http://openklant.local:8001/klanten/api/v1/klanten/f21f35fc-d8f0-4a8f-979b-8d725f713817",
+			"rol": "belanghebbende",
+			"gelezen": false
+		}
+	},
+	{
+		"model": "contactmomenten.klantcontactmoment",
+		"pk": 3,
+		"fields": {
+			"uuid": "88a39300-2a4f-49e9-bc90-525aa654d8a5",
+			"contactmoment": 1,
+			"klant": "http://openklant.local:8001/klanten/api/v1/klanten/00e82ffb-e98a-4967-b8c1-232bf3c8c3a9",
+			"rol": "belanghebbende",
+			"gelezen": false
+		}
+	}
+]

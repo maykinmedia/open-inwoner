@@ -29,6 +29,10 @@
             [
                 "accounts",
                 "user"
+            ],
+            [
+                "userfeed",
+                "feeditemdata"
             ]
         ]
     }
@@ -70,11 +74,23 @@
             ],
             [
                 "pdc",
+                "question"
+            ],
+            [
+                "pdc",
                 "tag"
             ],
             [
                 "pdc",
                 "tagtype"
+            ],
+            [
+                "questionnaire",
+                "questionnairestep"
+            ],
+            [
+                "questionnaire",
+                "questionnairestepfile"
             ]
         ]
     }
@@ -82,7 +98,7 @@
 {
     "model": "admin_index.appgroup",
     "fields": {
-        "order": 5,
+        "order": 4,
         "name": "Permissies, 2FA en logging",
         "slug": "permissies-2fa-en-logging",
         "models": [
@@ -201,28 +217,6 @@
     "model": "admin_index.appgroup",
     "fields": {
         "order": 3,
-        "name": "Vragen en antwoorden",
-        "slug": "vraag-antwoord",
-        "models": [
-            [
-                "pdc",
-                "question"
-            ],
-            [
-                "questionnaire",
-                "questionnairestep"
-            ],
-            [
-                "questionnaire",
-                "questionnairestepfile"
-            ]
-        ]
-    }
-},
-{
-    "model": "admin_index.appgroup",
-    "fields": {
-        "order": 4,
         "name": "Zoeken",
         "slug": "zoeken",
         "models": [
@@ -292,30 +286,10 @@
 {
     "model": "admin_index.appgroup",
     "fields": {
-        "order": 6,
-        "name": "Koppelingen",
+        "order": 5,
+        "name": "Data koppelingen",
         "slug": "koppelingen",
         "models": [
-            [
-                "digid_eherkenning",
-                "digidconfiguration"
-            ],
-            [
-                "digid_eherkenning",
-                "eherkenningconfiguration"
-            ],
-            [
-                "haalcentraal",
-                "haalcentraalconfig"
-            ],
-            [
-                "kvk",
-                "kvkconfig"
-            ],
-            [
-                "mozilla_django_oidc_db",
-                "openidconnectconfig"
-            ],
             [
                 "notifications_api_common",
                 "notificationsconfig"
@@ -374,10 +348,6 @@
             ],
             [
                 "zgw_consumers",
-                "nlxconfig"
-            ],
-            [
-                "zgw_consumers",
                 "service"
             ]
         ]
@@ -429,6 +399,40 @@
             [
                 "cms",
                 "placeholderreference"
+            ]
+        ]
+    }
+},
+{
+    "model": "admin_index.appgroup",
+    "fields": {
+        "order": 6,
+        "name": "Inlog koppelingen",
+        "slug": "auth-koppelingen",
+        "models": [
+            [
+                "digid_eherkenning",
+                "digidconfiguration"
+            ],
+            [
+                "digid_eherkenning",
+                "eherkenningconfiguration"
+            ],
+            [
+                "digid_eherkenning_oidc_generics",
+                "openidconnectdigidconfig"
+            ],
+            [
+                "digid_eherkenning_oidc_generics",
+                "openidconnecteherkenningconfig"
+            ],
+            [
+                "haalcentraal",
+                "haalcentraalconfig"
+            ],
+            [
+                "kvk",
+                "kvkconfig"
             ]
         ]
     }

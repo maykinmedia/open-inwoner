@@ -47,7 +47,7 @@
                     <tr>
                         <th class="table__header">{% link href=plan.get_absolute_url text=plan.title %}</th>
                         <td class="table__item">{{plan_participants|truncatechars:30}}</td>
-                        <td class="table__item table__item--no-lb">{{plan.end_date|date:"d-m-Y"}}</td>
+                        <td class="table__item table__item--no-lb">{{plan.end_date|date:"d F Y"}}</td>
                         <td class="table__item">{{plan.get_status}}</td>
                         <td class="table__item">{{plan.open_actions.count}}</td>
                         <td class="table__item">

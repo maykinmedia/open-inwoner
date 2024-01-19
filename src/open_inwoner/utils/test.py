@@ -1,10 +1,11 @@
 import logging
-import operator
 import tempfile
 from typing import Any, Dict, List
 
 from django.core.cache import caches
 from django.test import override_settings
+
+from open_inwoner.kvk.branches import KVK_BRANCH_SESSION_VARIABLE
 
 
 def temp_media_root():
@@ -50,3 +51,24 @@ class DisableRequestLogMixin:
             self.addCleanup(_reset_requests_logger)
 
         super().setUp()
+
+
+def set_kvk_branch_number_in_session(value="1234"):
+    """
+    Injects a value for the `KVK_BRANCH_NUMBER` variable into the session, to prevent
+    the `KvKLoginMiddleware` from triggering
+
+    NOTE: DOES NOT WORK FOR DJANGO-WEBTEST
+    see: https://github.com/django-webtest/django-webtest/issues/68#issuecomment-285131384
+    """
+
+    def decorator(test_func):
+        def wrapper(self, *args, **kwargs):
+            session = self.client.session
+            session[KVK_BRANCH_SESSION_VARIABLE] = value
+            session.save()
+            test_func(self, *args, **kwargs)
+
+        return wrapper
+
+    return decorator

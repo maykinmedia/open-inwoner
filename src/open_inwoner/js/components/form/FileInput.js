@@ -33,7 +33,7 @@ export class FileInput extends Component {
 
   /**
    * Return the label when zero files are selected.
-   * @return HTMLInputElement
+   * @return {HTMLLabelElement}
    */
   getLabelEmpty() {
     return this.node.querySelector(`${FileInput.selector}__label-empty`)
@@ -41,7 +41,7 @@ export class FileInput extends Component {
 
   /**
    * Return the label if more than 0 files are selected.
-   * @return HTMLInputElement
+   * @return {HTMLLabelElement}
    */
   getLabelSelected() {
     return this.node.querySelector(`${FileInput.selector}__label-selected`)
@@ -53,6 +53,14 @@ export class FileInput extends Component {
    */
   getFilesSection() {
     return this.node.querySelector(`${FileInput.selector} .file-list`)
+  }
+
+  /**
+   * Return the element associated with indicating whether 1 or more files are selected.
+   * @return {HTMLDivElement}
+   */
+  getSelectionIndicator() {
+    return this.node.querySelector(`${FileInput.selector} .file-list-selection`)
   }
 
   /**
@@ -68,7 +76,15 @@ export class FileInput extends Component {
    * @return {HTMLDivElement}
    */
   getFormNonFieldError() {
-    return document.querySelector('.form__non-field-error')
+    return document.querySelector('.non-field-error')
+  }
+
+  /**
+   * Returns the submit button of the form
+   * @return {HTMLDivElement}
+   */
+  getFormSubmitButton() {
+    return document.querySelector('#document-upload .button[type="submit"]')
   }
 
   /**
@@ -162,7 +178,8 @@ export class FileInput extends Component {
 
     const files = [...input.files].filter((_, i) => i !== index)
 
-    this.addFiles(files)
+    this.addFiles(files, true)
+    this.files = files
 
     // We need to render manually since we're not making state changes.
     this.render()
@@ -179,14 +196,25 @@ export class FileInput extends Component {
   /**
    * Adds files in dataTransfer to input, only the first item is added if not `[multiple]`.
    * @param {File[]} files
+   * @param {boolean} removeCurrent=false
    */
-  addFiles(files) {
+  addFiles(files, removeCurrent = false) {
     const input = this.getInput()
     const dataTransfer = new DataTransfer()
-    const _files = input.multiple ? [...files] : [files[0]]
+    // Ensure the previously selected files are added as well
+
+    let _files
+    if (removeCurrent) {
+      _files = input.multiple ? [...files] : [files[0]]
+    } else {
+      _files = input.multiple
+        ? [...input.files, ...files]
+        : [...input.files, files[0]]
+    }
 
     _files.filter((v) => v).forEach((file) => dataTransfer.items.add(file))
     input.files = dataTransfer.files
+    this.files = _files
   }
 
   /**
@@ -194,15 +222,31 @@ export class FileInput extends Component {
    * NOTE: We inspect the actual input here to obtain the `FileList` state.
    * NOTE: CHANGE EVENT MAY BE BYPASSED WHEN USING HTMX.
    */
-  render() {
-    const { files } = this.getInput()
+  render(e) {
+    let { files } = this.getInput()
+
+    // Bugfix for https://taiga.maykinmedia.nl/project/open-inwoner/task/1975
+    // Selecting files using the select window triggers a change event and would normally
+    // overwrite the previously selected files, so the previously selected files need to
+    // be stored and joined with the newly uploaded files, to avoid the selection from being overwritten
+    if (e && e.type === 'change') {
+      files = [...(this.files || []), ...files]
+      this.addFiles(files, true)
+    }
+
+    const filesExist = files.length > 0
     const filesSection = this.getFilesSection()
+    const selectionIndicator = this.getSelectionIndicator()
     const additionalLabel = this.getLabelSelected()
     const emptyLabel = this.getLabelEmpty()
+    const formSubmitButton = this.getFormSubmitButton()
 
     // Only show these sections when files are selected.
-    filesSection.toggleAttribute('hidden', !files.length)
-    additionalLabel.toggleAttribute('hidden', !files.length)
+    filesSection.hidden = !filesExist
+    selectionIndicator.hidden = !filesExist
+    additionalLabel.hidden = !filesExist
+    formSubmitButton.hidden = !filesExist
+
     // Hide label when no files are selected
     emptyLabel.toggleAttribute('hidden', files.length > 0)
 
@@ -217,11 +261,13 @@ export class FileInput extends Component {
    * @return {string}
    */
   renderFileHTML(file) {
+    // renderFileHTML is a separate function, where the context of 'this' changes when it is called
     const { name, size, type } = file
     const ext = name.split('.').pop().toUpperCase()
     const sizeMB = (size / (1024 * 1024)).toFixed(2)
     const labelDelete = this.getFilesList().dataset.labelDelete || 'Delete'
     const getFormNonFieldError = this.getFormNonFieldError()
+    const formSubmitButton = this.getFormSubmitButton()
 
     // Only show errors notification if data-max-file-size is exceeded + add error class to file-list
     const maxMegabytes = this.getLimit()
@@ -253,6 +299,7 @@ export class FileInput extends Component {
 
     if (sizeMB > maxMegabytes) {
       getFormNonFieldError.removeAttribute('hidden')
+      formSubmitButton.setAttribute('disabled', 'true')
 
       return (
         htmlStart +
@@ -263,6 +310,7 @@ export class FileInput extends Component {
       )
     } else {
       getFormNonFieldError.setAttribute('hidden', 'hidden')
+      formSubmitButton.removeAttribute('disabled')
     }
 
     return htmlStart

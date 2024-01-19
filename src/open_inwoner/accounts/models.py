@@ -19,6 +19,10 @@ from mail_editor.helpers import find_template
 from privates.storages import PrivateMediaFileSystemStorage
 from timeline_logger.models import TimelineLog
 
+from digid_eherkenning_oidc_generics.models import (
+    OpenIDConnectDigiDConfig,
+    OpenIDConnectEHerkenningConfig,
+)
 from open_inwoner.utils.hash import create_sha256_hash
 from open_inwoner.utils.validators import (
     CharFieldValidator,
@@ -121,17 +125,19 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
     # TODO shouldn't rsin & bsn be unique? (possibly fixed in model constraints)
     # TODO fix rsin & bsn to not be both null AND blank (!)
-    rsin = models.CharField(verbose_name=_("Rsin"), max_length=9, null=True, blank=True)
-    bsn = NLBSNField(verbose_name=_("Bsn"), null=True, blank=True)
+    rsin = models.CharField(
+        verbose_name=_("Rsin"), max_length=9, blank=True, default=""
+    )
+    bsn = NLBSNField(verbose_name=_("Bsn"), blank=True, default="")
     kvk = models.CharField(
         verbose_name=_("KvK number"),
         max_length=8,
-        null=True,
         blank=True,
+        default="",
         validators=[validate_kvk],
     )
     company_name = models.CharField(
-        verbose_name=_("Company name"), max_length=250, null=True, blank=True
+        verbose_name=_("Company name"), max_length=250, blank=True, default=""
     )
     login_type = models.CharField(
         verbose_name=_("Login type"),
@@ -150,9 +156,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     housenumber = models.CharField(
         verbose_name=_("House number"), default="", blank=True, max_length=250
     )
-    postcode = NLZipCodeField(
-        verbose_name=_("Postcode"), null=True, blank=True, max_length=250
-    )
+    postcode = NLZipCodeField(verbose_name=_("Postcode"), blank=True, default="")
     city = models.CharField(
         verbose_name=_("City"),
         default="",
@@ -269,12 +273,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         self._old_bsn = self.bsn
 
     def __str__(self):
-        name = self.get_full_name()
+        identifier = self.company_name if self.kvk else self.get_full_name()
         email = self.get_contact_email()
-        if name and email:
-            return f"{name} ({email})"
+        if identifier and email:
+            return f"{identifier} ({email})"
         else:
-            return name or email or str(self.uuid)[:8]
+            return identifier or email or str(self.uuid)[:8]
 
     def clean(self, *args, **kwargs):
         """Reject non-unique emails, except for users with login_type DigiD"""
@@ -350,7 +354,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_address(self):
         if self.street:
-            return f"{self.street} {self.housenumber}, {self.city}"
+            return f"{self.street} {self.housenumber}, {self.postcode} {self.city}"
         return ""
 
     def get_new_messages_total(self) -> int:
@@ -360,12 +364,22 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.documents.order_by("-created_on")
 
     def get_active_notifications(self) -> str:
+        from open_inwoner.cms.utils.page_display import (
+            case_page_is_published,
+            collaborate_page_is_published,
+            inbox_page_is_published,
+        )
+
         enabled = []
-        if self.cases_notifications and self.login_type == LoginTypeChoices.digid:
+        if (
+            self.cases_notifications
+            and self.login_type == LoginTypeChoices.digid
+            and case_page_is_published()
+        ):
             enabled.append(_("cases"))
-        if self.messages_notifications:
+        if self.messages_notifications and inbox_page_is_published():
             enabled.append(_("messages"))
-        if self.plans_notifications:
+        if self.plans_notifications and collaborate_page_is_published():
             enabled.append(_("plans"))
         if not enabled:
             return _("You do not have any notifications enabled.")
@@ -399,11 +413,22 @@ class User(AbstractBaseUser, PermissionsMixin):
         return False
 
     def get_logout_url(self) -> str:
-        return (
-            reverse("digid:logout")
-            if self.login_type == LoginTypeChoices.digid
-            else reverse("logout")
-        )
+        # Exit early, because for some reason reverse("logout") fails after checking
+        # the singletonmodels
+        if self.login_type not in [
+            LoginTypeChoices.digid,
+            LoginTypeChoices.eherkenning,
+        ]:
+            return reverse("logout")
+
+        if self.login_type == LoginTypeChoices.digid:
+            if OpenIDConnectDigiDConfig.get_solo().enabled:
+                return reverse("digid_oidc:logout")
+            return reverse("digid:logout")
+        elif self.login_type == LoginTypeChoices.eherkenning:
+            if OpenIDConnectEHerkenningConfig.get_solo().enabled:
+                return reverse("eherkenning_oidc:logout")
+            return reverse("logout")
 
     def get_contact_update_url(self):
         return reverse("profile:contact_edit", kwargs={"uuid": self.uuid})
@@ -452,6 +477,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         been requested from haal centraal
         """
         return self.is_digid_user and self.is_prepopulated
+
+    @property
+    def is_eherkenning_user(self) -> bool:
+        return self.login_type == LoginTypeChoices.eherkenning
 
 
 class Document(models.Model):

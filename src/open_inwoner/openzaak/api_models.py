@@ -82,6 +82,7 @@ class Zaak(ZGWModel):
             "current_status": status_translate.from_glom(
                 self, "status.statustype.omschrijving", default=""
             ),
+            "zaaktype_config": getattr(self, "zaaktype_config", None),
             "statustype_config": getattr(self, "statustype_config", None),
             "case_type": "Zaak",
         }
@@ -228,7 +229,7 @@ class StatusType(ZGWModel):
     url: str  # bug: not required according to OAS
     zaaktype: str
     omschrijving: str
-    volgnummer: int
+    volgnummer: Optional[int]  # not in eSuite
     omschrijving_generiek: str = ""
     statustekst: str = ""
     is_eindstatus: bool = False

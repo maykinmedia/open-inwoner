@@ -2,6 +2,7 @@ from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from django.forms import ValidationError
+from django.http.request import HttpRequest
 from django.urls import reverse, reverse_lazy
 from django.utils.html import format_html
 from django.utils.translation import ngettext, ugettext_lazy as _
@@ -13,6 +14,32 @@ from open_inwoner.utils.mixins import UUIDAdminFirstInOrder
 
 from .choices import ContactTypeChoices
 from .models import Action, Appointment, Document, Invite, Message, User
+
+
+class ReadOnlyFileMixin:
+    """
+    By default, private media fields do not display the correct URL when readonly
+    """
+
+    def get_fields(self, request, obj=None):
+        fields = super().get_fields(request, obj=obj)
+        if "display_file_url" not in fields and "file" in fields:
+            fields[fields.index("file")] = "display_file_url"
+        return fields
+
+    def display_file_url(self, obj):
+        view_name = "%(app_label)s_%(model_name)s_%(field)s" % {
+            "app_label": self.opts.app_label,
+            "model_name": self.opts.model_name,
+            "field": "file",
+        }
+        return format_html(
+            _("<a href='{url}'>{text}</a>"),
+            url=reverse(f"admin:{view_name}", kwargs={"pk": obj.pk}),
+            text=obj.file.name,
+        )
+
+    display_file_url.short_description = _("File")
 
 
 class ActionInlineAdmin(UUIDAdminFirstInOrder, admin.StackedInline):
@@ -141,8 +168,9 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
 
 
 @admin.register(Action)
-class ActionAdmin(UUIDAdminFirstInOrder, PrivateMediaMixin, admin.ModelAdmin):
-    readonly_fields = ("uuid",)
+class ActionAdmin(
+    ReadOnlyFileMixin, UUIDAdminFirstInOrder, PrivateMediaMixin, admin.ModelAdmin
+):
     list_display = ("name", "status", "plan", "created_on", "created_by", "is_deleted")
     list_filter = (
         "is_deleted",
@@ -156,6 +184,12 @@ class ActionAdmin(UUIDAdminFirstInOrder, PrivateMediaMixin, admin.ModelAdmin):
     raw_id_fields = [
         "plan",
     ]
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
 
     @admin.action(description=_("Mark selected actions as soft-deleted by user."))
     def mark_deleted(self, request, queryset):
@@ -187,20 +221,18 @@ class ActionAdmin(UUIDAdminFirstInOrder, PrivateMediaMixin, admin.ModelAdmin):
 
 
 @admin.register(Document)
-class DocumentAdmin(UUIDAdminFirstInOrder, PrivateMediaMixin, admin.ModelAdmin):
-    readonly_fields = ("uuid",)
-    list_display = ("name", "preview", "created_on", "owner")
+class DocumentAdmin(
+    ReadOnlyFileMixin, UUIDAdminFirstInOrder, PrivateMediaMixin, admin.ModelAdmin
+):
+    list_display = ("name", "display_file_url", "created_on", "owner")
     list_filter = ("owner",)
     private_media_fields = ("file",)
 
-    def preview(self, obj):
-        return format_html(
-            _("<a href='{url}'>{text}</a>"),
-            url=reverse("admin:accounts_document_file", kwargs={"pk": obj.pk}),
-            text=obj.file.name,
-        )
+    def has_add_permission(self, request):
+        return False
 
-    preview.short_description = "Preview file"
+    def has_change_permission(self, request, obj=None):
+        return False
 
 
 @admin.register(Appointment)
@@ -211,11 +243,16 @@ class AppointmentAdmin(UUIDAdminFirstInOrder, admin.ModelAdmin):
 
 
 @admin.register(Message)
-class MessageAdmin(PrivateMediaMixin, admin.ModelAdmin):
-    readonly_fields = ("uuid",)
+class MessageAdmin(ReadOnlyFileMixin, PrivateMediaMixin, admin.ModelAdmin):
     list_display = ("sender", "receiver", "created_on", "seen", "sent")
     list_filter = ("sender", "receiver")
     private_media_fields = ("file",)
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
 
 
 @admin.register(Invite)

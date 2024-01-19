@@ -1,6 +1,6 @@
 {% load link_tags button_tags i18n grid_tags icon_tags list_tags pagination_tags utils %}
 
-<h2 class="h2" id="cases">{{ page_title }} ({{ paginator.count }})</h2>
+<h1 class="utrecht-heading-1" id="cases">{{ page_title }} ({{ paginator.count }})</h1>
 <p class="cases__title_text">{{ title_text }}</p>
 
 <div class="cases__grid">
@@ -16,7 +16,7 @@
             <div class="card__body">
                 <!-- submission cases -->
                 {% if case.case_type == "OpenSubmission" %}
-                    <a href="{{ case.url }}"  class="cases__link">
+                    <a href="{{ case.vervolg_link }}"  class="cases__link">
                     <p class="h4"><span class="link link__text">{{ case.naam }}</span></p>
                     {% render_list %}
                     <span class="case-list">
@@ -27,7 +27,7 @@
                         {% endwith %}
                     </span>
                     {% endrender_list %}
-                    <span class="link link--icon link--secondary" aria-label="{% trans "Bekijk aanvraag" %}" title="{% trans "Bekijk aanvraag" %}">
+                    <span class="link link--icon link--secondary" aria-label="{% trans "Bekijk aanvraag" %}" title="{% trans "Ga naar aanvraag" %}">
                         <span class="link__text">{% trans "Bekijk aanvraag" %}</span>
                         {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
                     </span>
@@ -48,7 +48,7 @@
                         </span>
                     {% endrender_list %}
                     <span class="link link--icon link--secondary" aria-label="{% trans "Bekijk aanvraag" %}" title="{% trans "Bekijk aanvraag" %}">
-                        <span class="link__text">{% trans "Bekijk aanvraag" %}</span>
+                        <span class="link__text">{{ case.statustype_config.case_link_text|default:"Bekijk aanvraag" }}</span>
                         {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
                     </span>
                     </a>

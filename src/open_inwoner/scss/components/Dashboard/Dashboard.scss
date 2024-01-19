@@ -59,7 +59,8 @@
   }
 }
 
-.h1 + .dashboard {
+.h1 + .dashboard,
+.utrecht-heading-1 + .dashboard {
   margin-top: var(--spacing-large);
 
   @media (min-width: 768px) {

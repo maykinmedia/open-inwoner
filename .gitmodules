@@ -1,3 +1,4 @@
-[submodule "deployment/maykin-deployment"]
-	path = deployment/maykin-deployment
-	url = git@bitbucket.org:maykinmedia/maykin-deployment.git
+[submodule "open-inwoner-design-tokens"]
+	path = open-inwoner-design-tokens
+	url = git@github.com:maykinmedia/open-inwoner-design-tokens.git
+	branch = main

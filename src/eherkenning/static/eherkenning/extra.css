@@ -1,0 +1,94 @@
+html {
+    background-image: repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8) 5px, rgba(255, 255, 255, 0.5) 5px, rgba(255, 255, 255, 0.5) 10px ), url(backdrop.jpg)
+}
+
+.eherkenningmock-notification {
+    /* copied from the error message */
+    margin-bottom: 15px;
+    margin-top: 15px;
+
+    background-image: url(error.svg);
+    background-color: #f9dfdd;
+    background-position: 10px 10px;
+    background-repeat: no-repeat;
+    background-size: 21px 21px;
+    min-height: 20px;
+    padding-left: 38px;
+    padding-right: 5px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    width: auto;
+    border-radius: 4px;
+    position: relative;
+}
+
+/* Taken from DigiD mock styles */
+.code_box, .form__item__field, .form__item__field--extra-small, .form__item__field--medium, .form__item__field--small {
+    border-color: #282828;
+    border-radius: 4px;
+    border-style: solid;
+    border-width: 1px;
+    font-family: "RO Sans", Verdana, Arial, sans-serif;
+    font-size: 110%;
+    margin-right: 6px;
+    padding: 8px 3%;
+    height: 30px;
+    display: inline !important;
+}
+
+/* Taken from DigiD mock styles */
+.form__item__label {
+    font-size: 112%;
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px
+}
+
+fieldset {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font: inherit;
+    font-size: 100%;
+    vertical-align: baseline
+}
+
+.form-button {
+    display: inline;
+    text-align: center;
+    background-color: #1c2f70;
+    color: #fff;
+    font-size: 1.3em;
+    font-weight: 700;
+    width: auto;
+    border: 0;
+    padding: 10px 20px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    background-position: right 5px center;
+    text-decoration: none;
+}
+
+.submit-wrapper {
+    margin-top: 1.5em;
+}
+
+h2 {
+    text-align: center;
+    background: #f3f3f3;
+    font-size: 1em;
+    padding: 25px 0;
+}
+
+.remember_login {
+    display: flex;
+    justify-content: center;
+}
+
+.form__item__field {
+    max-width: 100% !important;
+}
+
+#section-header {
+    padding-bottom: 0px;
+}

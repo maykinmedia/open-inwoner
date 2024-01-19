@@ -24,6 +24,7 @@ from open_inwoner.accounts.views.actions import (
     ActionUpdateView,
     BaseActionFilter,
 )
+from open_inwoner.userfeed import hooks
 from open_inwoner.utils.logentry import get_change_message
 from open_inwoner.utils.mixins import ExportMixin
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
@@ -223,6 +224,10 @@ class PlanDetailView(
             data=self.request.GET, users=actions.values_list("is_for_id", flat=True)
         )
         context["actions"] = self.get_actions(actions)
+
+        if obj.end_date < date.today():
+            hooks.plan_completed(self.request.user, obj)
+
         return context
 
 

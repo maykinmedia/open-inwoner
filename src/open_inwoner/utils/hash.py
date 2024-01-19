@@ -1,12 +1,14 @@
 from hashlib import md5, sha256
+from typing import Optional
 
 
-def generate_email_from_string(value: str) -> str:
+def generate_email_from_string(
+    value: str, domain: Optional[str] = "example.org"
+) -> str:
     """generate email address based on string"""
     salt = "generate_email_from_bsn"
     hashed_bsn = md5((salt + value).encode(), usedforsecurity=False).hexdigest()
-
-    return f"{hashed_bsn}@example.org"
+    return f"{hashed_bsn}@{domain}"
 
 
 def create_sha256_hash(val, salt=None):

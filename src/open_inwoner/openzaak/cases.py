@@ -14,7 +14,7 @@ from ..utils.decorators import cache as cache_result
 from .api_models import Resultaat, Rol, Status, Zaak, ZaakInformatieObject
 from .catalog import fetch_single_case_type, fetch_single_status_type
 from .clients import build_client
-from .models import OpenZaakConfig, ZaakTypeStatusTypeConfig
+from .models import OpenZaakConfig, ZaakTypeConfig, ZaakTypeStatusTypeConfig
 from .utils import is_zaak_visible
 
 logger = logging.getLogger(__name__)
@@ -67,13 +67,14 @@ def fetch_cases(
 
 
 @cache_result(
-    "cases:{kvk_or_rsin}:{max_cases}:{zaak_identificatie}",
+    "cases:{kvk_or_rsin}:{vestigingsnummer}:{max_cases}:{zaak_identificatie}",
     timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
 )
 def fetch_cases_by_kvk_or_rsin(
     kvk_or_rsin: Optional[str],
     max_cases: Optional[int] = 100,
     zaak_identificatie: Optional[str] = None,
+    vestigingsnummer: Optional[str] = None,
 ) -> List[Zaak]:
     """
     retrieve cases for particular company with allowed confidentiality level
@@ -81,6 +82,7 @@ def fetch_cases_by_kvk_or_rsin(
     :param max_cases: - used to limit the number of requests to list_zaken resource. The default
     value = 100, which means only one 1 request
     :param zaak_identificatie: - used to filter the cases by a unique Zaak identification number
+    :param vestigingsnummer: - used to filter the cases by a vestigingsnummer
     """
     if not kvk_or_rsin:
         return []
@@ -96,6 +98,14 @@ def fetch_cases_by_kvk_or_rsin(
         "rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__innNnpId": kvk_or_rsin,
         "maximaleVertrouwelijkheidaanduiding": config.zaak_max_confidentiality,
     }
+
+    if vestigingsnummer:
+        params.update(
+            {
+                "rol__betrokkeneIdentificatie__vestiging__vestigingsNummer": vestigingsnummer,
+            }
+        )
+
     if zaak_identificatie:
         params.update({"identificatie": zaak_identificatie})
 
@@ -292,7 +302,7 @@ def fetch_roles_for_case_and_bsn(case_url: str, bsn: str) -> List[Rol]:
 
 
 # implicitly cached because it uses fetch_case_roles()
-def fetch_roles_for_case_and_kvk(case_url: str, kvk_or_rsin: str) -> List[Rol]:
+def fetch_roles_for_case_and_kvk_or_rsin(case_url: str, kvk_or_rsin: str) -> List[Rol]:
     """
     note we do a query on all case_roles and then manually filter our roles from the result,
     because e-Suite doesn't support querying on both "zaak" AND "betrokkeneIdentificatie__nietNatuurlijkPersoon__inn_nnp_id"
@@ -308,6 +318,29 @@ def fetch_roles_for_case_and_kvk(case_url: str, kvk_or_rsin: str) -> List[Rol]:
         if role.betrokkene_type == RolTypes.niet_natuurlijk_persoon:
             nnp_id = role.betrokkene_identificatie.get("inn_nnp_id")
             if nnp_id and nnp_id == kvk_or_rsin:
+                roles.append(role)
+
+    return roles
+
+
+def fetch_roles_for_case_and_vestigingsnummer(
+    case_url: str, vestigingsnummer: str
+) -> List[Rol]:
+    """
+    note we do a query on all case_roles and then manually filter our roles from the result,
+    because e-Suite doesn't support querying on both "zaak" AND "rol__betrokkeneIdentificatie__vestiging__vestigingsNummer"
+
+    see Taiga #948
+    """
+    case_roles = fetch_case_roles(case_url)
+    if not case_roles:
+        return []
+
+    roles = []
+    for role in case_roles:
+        if role.betrokkene_type == RolTypes.vestiging:
+            identifier = role.betrokkene_identificatie.get("vestigings_nummer")
+            if identifier and identifier == vestigingsnummer:
                 roles.append(role)
 
     return roles
@@ -403,6 +436,21 @@ def resolve_status_type(case: Zaak) -> None:
     case.status.statustype = fetch_single_status_type(statustype_url)
 
 
+def add_zaak_type_config(case: Zaak) -> None:
+    """
+    Add `ZaakTypeConfig` corresponding to the zaaktype type url of the case
+
+    Note: must be called after `resolve_zaak_type` since we're using the `uuid` and
+        `identificatie` from `case.zaaktype`
+    """
+    try:
+        case.zaaktype_config = ZaakTypeConfig.objects.filter_case_type(
+            case.zaaktype
+        ).get()
+    except ZaakTypeConfig.DoesNotExist:
+        pass
+
+
 def add_status_type_config(case: Zaak) -> None:
     """
     Add `ZaakTypeStatusTypeConfig` corresponding to the status type url of the case
@@ -412,9 +460,10 @@ def add_status_type_config(case: Zaak) -> None:
     """
     try:
         case.statustype_config = ZaakTypeStatusTypeConfig.objects.get(
-            statustype_url=case.status.statustype.url
+            zaaktype_config=case.zaaktype_config,
+            statustype_url=case.status.statustype.url,
         )
-    except ZaakTypeStatusTypeConfig.DoesNotExist:
+    except (AttributeError, ZaakTypeStatusTypeConfig.DoesNotExist):
         pass
 
 
@@ -433,6 +482,7 @@ def preprocess_data(cases: list[Zaak]) -> list[Zaak]:
     for case in cases:
         resolve_status(case)
         resolve_status_type(case)
+        add_zaak_type_config(case)
         add_status_type_config(case)
 
     cases.sort(key=lambda case: case.startdatum, reverse=True)

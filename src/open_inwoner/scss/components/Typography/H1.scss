@@ -1,4 +1,10 @@
+@import '~@utrecht/components/dist/heading-1/css/index.css';
 @import '~microscope-sass/lib/responsive';
+
+.utrecht-heading-1 {
+  display: var(--oip-typography-heading-display);
+  justify-content: var(--oip-typography-heading-justify-content);
+}
 
 .h1 {
   color: var(--font-color-heading-1);
@@ -26,6 +32,7 @@
   }
 }
 
+.utrecht-heading-1 + .card-container,
 h1 + .card-container {
   margin-top: var(--gutter-width);
 }

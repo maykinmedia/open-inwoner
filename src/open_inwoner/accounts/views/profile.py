@@ -22,14 +22,18 @@ from open_inwoner.accounts.choices import (
     LoginTypeChoices,
     StatusChoices,
 )
-from open_inwoner.cms.utils.page_display import inbox_page_is_published
+from open_inwoner.cms.utils.page_display import (
+    benefits_page_is_published,
+    inbox_page_is_published,
+)
 from open_inwoner.haalcentraal.utils import fetch_brp
+from open_inwoner.openklant.wrap import get_fetch_parameters
 from open_inwoner.plans.models import Plan
 from open_inwoner.questionnaire.models import QuestionnaireStep
 from open_inwoner.utils.mixins import ExportMixin
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
-from ...openklant.wrap import fetch_klant_for_bsn, patch_klant
+from ...openklant.wrap import fetch_klant, patch_klant
 from ..forms import BrpUserForm, UserForm, UserNotificationsForm
 from ..models import Action, User
 
@@ -126,6 +130,7 @@ class MyProfileView(
             LoginTypeChoices.eherkenning,
         )
         context["inbox_page_is_published"] = inbox_page_is_published()
+        context["benefits_page_is_published"] = benefits_page_is_published()
 
         return context
 
@@ -184,8 +189,9 @@ class EditProfileView(
 
     def update_klant_api(self, user_form_data: dict):
         user: User = self.request.user
-        if not user.bsn or user.login_type != LoginTypeChoices.digid:
+        if not user.bsn and not user.kvk:
             return
+
         field_mapping = {
             "emailadres": "email",
             "telefoonnummer": "phonenumber",
@@ -196,10 +202,11 @@ class EditProfileView(
             if user_form_data.get(local_name)
         }
         if update_data:
-            klant = fetch_klant_for_bsn(user.bsn)
+            klant = fetch_klant(**get_fetch_parameters(self.request))
+
             if klant:
                 self.log_system_action(
-                    "retrieved klant for BSN-user", user=self.request.user
+                    "retrieved klant for user", user=self.request.user
                 )
                 klant = patch_klant(klant, update_data)
                 if klant:

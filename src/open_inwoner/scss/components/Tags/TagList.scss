@@ -1,4 +1,6 @@
 .tag-list {
+  margin-top: var(--spacing-large);
+
   &__list {
     display: flex;
     flex-wrap: wrap;
@@ -7,8 +9,4 @@
     margin: 0;
     padding: 0;
   }
-}
-
-*[class^='h'] + .tag-list {
-  margin-top: var(--spacing-large);
 }

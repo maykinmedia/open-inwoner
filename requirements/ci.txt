@@ -52,7 +52,7 @@ celery==5.2.7
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   notifications-api-common
-certifi==2022.9.24
+certifi==2023.11.17
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -102,7 +102,7 @@ confusable-homoglyphs==3.2.0
     #   django-registration
 coverage==4.5.4
     # via -r requirements/test-tools.in
-cryptography==38.0.4
+cryptography==41.0.7
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -130,7 +130,7 @@ diff-match-patch==20200713
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-import-export
-django==3.2.20
+django==3.2.23
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -261,7 +261,7 @@ django-extra-fields==3.0.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-django-filer==2.2.4
+django-filer==3.1.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -304,20 +304,14 @@ django-js-asset==1.2.2
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-ckeditor
-    #   django-mptt
 django-localflavor==3.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-django-log-outgoing-requests==0.5.2
+django-log-outgoing-requests==0.6.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-django-mptt==0.13.4
-    # via
-    #   -c requirements/base.txt
-    #   -r requirements/base.txt
-    #   django-filer
 django-open-forms-client==0.2.3
     # via
     #   -c requirements/base.txt
@@ -643,7 +637,7 @@ mozilla-django-oidc==2.0.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   mozilla-django-oidc-db
-mozilla-django-oidc-db==0.10.0
+mozilla-django-oidc-db==0.12.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -681,7 +675,7 @@ phonenumbers==8.12.33
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-pillow==9.0.1
+pillow==10.1.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -724,7 +718,7 @@ pyee==9.0.4
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   playwright
-pyjwt==2.3.0
+pyjwt==2.8.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -732,7 +726,7 @@ pyjwt==2.3.0
     #   messagebird
 pylint==2.11.1
     # via -r requirements/test-tools.in
-pyopenssl==22.1.0
+pyopenssl==23.3.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -803,13 +797,13 @@ redis==3.5.3
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-redis
-reportlab==3.6.12
+reportlab==3.6.13
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   easy-thumbnails
     #   svglib
-requests==2.26.0
+requests==2.31.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -828,7 +822,7 @@ requests-mock==1.9.3
     #   -r requirements/base.txt
     #   -r requirements/test-tools.in
     #   zgw-consumers
-sentry-sdk==1.4.3
+sentry-sdk==1.38.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -858,7 +852,7 @@ soupsieve==2.3.1
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   beautifulsoup4
-sqlparse==0.4.2
+sqlparse==0.4.4
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -897,17 +891,12 @@ typing-extensions==4.4.0
     #   pyee
     #   pylint
     #   xsdata
-unidecode==1.1.2
-    # via
-    #   -c requirements/base.txt
-    #   -r requirements/base.txt
-    #   django-filer
 uritemplate==4.1.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   drf-spectacular
-urllib3==1.26.7
+urllib3==1.26.18
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -915,7 +904,7 @@ urllib3==1.26.7
     #   elasticsearch
     #   requests
     #   sentry-sdk
-uwsgi==2.0.19.1
+uwsgi==2.0.23
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt

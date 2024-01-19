@@ -1,0 +1,635 @@
+/*! normalize.css v3.0.0 | MIT License | git.io/normalize */
+/*! normalize.css v3.0.0 | HTML5 Display Definitions | MIT License | git.io/normalize */
+
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+main,
+nav,
+section,
+summary {
+  display: block;
+}
+audio,
+canvas,
+progress,
+video {
+  display: inline-block;
+  vertical-align: baseline;
+}
+audio:not([controls]) {
+  display: none;
+  height: 0;
+}
+[hidden],
+template {
+  display: none;
+}
+/*! normalize.css v3.0.0 | Base | MIT License | git.io/normalize */
+
+html {
+  font-family: sans-serif;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+}
+body {
+  margin: 0;
+}
+/*! normalize.css v3.0.0 | Links | MIT License | git.io/normalize */
+
+a {
+  background: transparent;
+}
+a:active,
+a:hover {
+  outline: 0;
+}
+/*! normalize.css v3.0.0 | Typography | MIT License | git.io/normalize */
+
+abbr[title] {
+  border-bottom: 1px dotted;
+}
+b,
+strong {
+  font-weight: bold;
+}
+dfn {
+  font-style: italic;
+}
+h1 {
+  font-size: 2em;
+  margin: 0.67em 0;
+}
+mark {
+  background: #ff0;
+  color: #000;
+}
+small {
+  font-size: 80%;
+}
+sub,
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+sup {
+  top: -0.5em;
+}
+sub {
+  bottom: -0.25em;
+}
+/*! normalize.css v3.0.0 | Embedded Content | MIT License | git.io/normalize */
+
+img {
+  border: 0;
+}
+svg:not(:root) {
+  overflow: hidden;
+}
+/*! normalize.css v3.0.0 | Figures | MIT License | git.io/normalize */
+
+figure {
+  margin: 1em 40px;
+}
+hr {
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  height: 0;
+}
+pre {
+  overflow: auto;
+}
+code,
+kbd,
+pre,
+samp {
+  font-family: monospace, monospace;
+  font-size: 1em;
+}
+/*! normalize.css v3.0.0 | Forms | MIT License | git.io/normalize */
+
+button,
+input,
+optgroup,
+select,
+textarea {
+  color: inherit;
+  font: inherit;
+  margin: 0;
+}
+button {
+  overflow: visible;
+}
+button,
+select {
+  text-transform: none;
+}
+button,
+html input[type="button"],
+input[type="reset"],
+input[type="submit"] {
+  -webkit-appearance: button;
+  cursor: pointer;
+}
+button[disabled],
+html input[disabled] {
+  cursor: default;
+}
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+input {
+  line-height: normal;
+}
+input[type="checkbox"],
+input[type="radio"] {
+  box-sizing: border-box;
+  padding: 0;
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  height: auto;
+}
+input[type="search"] {
+  -webkit-appearance: textfield;
+  -moz-box-sizing: content-box;
+  -webkit-box-sizing: content-box;
+  box-sizing: content-box;
+}
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+fieldset {
+  border: 1px solid #c0c0c0;
+  margin: 0 2px;
+  padding: 0.35em 0.625em 0.75em;
+}
+legend {
+  border: 0;
+  padding: 0;
+}
+textarea {
+  overflow: auto;
+}
+optgroup {
+  font-weight: bold;
+}
+/*! normalize.css v3.0.0 | Tables | MIT License | git.io/normalize */
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+td,
+th {
+  padding: 0;
+}
+html {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+embed,
+img,
+object,
+video {
+  max-width: 100%;
+  height: auto;
+}
+.login {
+  position: relative;
+  margin: 0 auto;
+  max-width: 580px;
+  background: #fff;
+  margin-top: 2%;
+}
+.login p {
+  margin-bottom: 20px;
+  margin-bottom: 30px;
+}
+.login a.annuleren {
+  font-size: 0.9em;
+}
+.login a.language {
+  position: absolute;
+  text-decoration: none;
+  /*color: #8999b7;*/
+  color: #1c2f70;
+}
+.login a.language:hover {
+  text-decoration: underline;
+}
+.login label.leverancier {
+  display: none;
+}
+input[type="submit"] {
+  -moz-border-radius: 0;
+  -webkit-border-radius: 0;
+  border-radius: 0;
+}
+.message {
+  background-color: #fef1bc;
+  color: #000000;
+  padding: 0 5px;
+  padding: 0;
+}
+.message.error {
+  background-color: #fab2bd;
+}
+.message.error .inner:before {
+  content: "!";
+  background: #e71e27;
+  color: #ffffff;
+}
+.message.error .close a:after {
+  background: #e71e27;
+  color: #ffffff;
+}
+.message .inner {
+  padding: 10px 0;
+  margin: 0 auto;
+  max-width: 580px;
+}
+.message .inner:before {
+  line-height: 20px;
+  margin-right: 5px;
+  float: left;
+  width: 20px;
+  height: 20px;
+  text-align: center;
+  content: "i";
+  background: #fbd326;
+}
+.message .inner p {
+  margin-left: 35px;
+  margin-bottom: 1em;
+}
+.message .close {
+  text-align: right;
+}
+.message .close a {
+  text-decoration: none;
+  color: #000000;
+}
+.message .close a:after {
+  line-height: 20px;
+  margin-left: 10px;
+  width: 20px;
+  height: 20px;
+  text-align: center;
+  content: "x";
+  background: #fbd326;
+  display: block;
+  float: right;
+}
+html {
+  background-color: #f3f3f3;
+  background-image: repeating-linear-gradient(
+      -45deg,
+      rgba(255, 255, 255, 0.8),
+      rgba(255, 255, 255, 0.8) 5px,
+      rgba(255, 255, 255, 0.5) 5px,
+      rgba(255, 255, 255, 0.5) 10px
+    ),
+    url("../images/eherkenning/backdrop.jpg");
+  background-size: auto, cover;
+  background-repeat: repeat, no-repeat;
+  background-position: center;
+  height: 100%;
+}
+body {
+  font-family: "PT Sans", sans-serif;
+  font-size: 16px;
+  line-height: 1.46;
+  color: #1c2f70;
+}
+#section-header {
+  margin: 20px 0;
+  text-align: center;
+}
+@media (min-width: 40.063em) {
+  #section-header {
+    padding: 50px 0;
+  }
+}
+a {
+  color: #1c2f70;
+}
+h1 {
+  text-align: center;
+  background: #f3f3f3;
+  font-size: 1.7em;
+  padding: 25px 0;
+}
+@media (min-width: 40.063em) {
+  h1 {
+    font-size: 1.85em;
+  }
+}
+p {
+  text-align: center;
+  max-width: 68%;
+  margin: 0 auto;
+}
+.login {
+  -moz-border-radius: 5px / 5px;
+  -webkit-border-radius: 5px 5px;
+  border-radius: 5px / 5px;
+  padding: 10px;
+  margin-bottom: 2%;
+}
+.login .niveau {
+  margin: 10px 0 20px 0;
+  text-align: center;
+}
+.login .checkbox-wrapper {
+  max-width: 68%;
+  display: block;
+  margin: 0 auto;
+}
+.login .submit-wrapper {
+  text-align: center;
+}
+.login a.language {
+  top: 5px;
+  right: 10px;
+}
+@media (min-width: 40.063em) {
+  .login a.language {
+    top: 20px;
+    right: 20px;
+  }
+}
+.login form label {
+  font-size: 0.9em;
+}
+.login form input,
+.login form select {
+  margin: 0 auto;
+  display: block;
+  width: 100%;
+  max-width: 68%;
+  color: #000;
+  font-size: 0.9em;
+  margin-bottom: 20px;
+}
+.login form input[type="checkbox"],
+.login form select[type="checkbox"] {
+  width: auto;
+  display: inline;
+}
+@media (min-width: 40.063em) {
+  .login form input[type="checkbox"],
+  .login form select[type="checkbox"] {
+    margin-top: 0;
+  }
+}
+.login form input[type="checkbox"]:after,
+.login form select[type="checkbox"]:after {
+  content: " ";
+  display: block;
+}
+.login form input[type="submit"],
+.login form select[type="submit"] {
+  display: inline;
+  text-align: center;
+  background-color: #1c2f70;
+  color: #fff;
+  font-size: 1.3em;
+  font-weight: 700;
+  width: auto;
+  border: 0;
+  padding: 10px 20px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  background-position: right 5px center;
+}
+@media (min-width: 40.063em) {
+  .login form input[type="submit"],
+  .login form select[type="submit"] {
+    margin-top: 15px;
+  }
+}
+.message .inner p {
+  margin-left: 35px;
+  margin-bottom: 1em;
+  max-width: none;
+  text-align: left;
+}
+#aanbieder {
+  font-size: 0.75em;
+  font-style: italic;
+  margin-top: 1em;
+  margin-bottom: 0;
+}
+#aanbieder a:hover {
+  text-decoration: none;
+}
+footer {
+  margin-top: 1em;
+}
+a.info {
+  position: relative;
+  z-index: 24;
+}
+a.info:hover,
+a.info:focus,
+a.info:active {
+  z-index: 25;
+}
+a.info span {
+  position: absolute;
+  left: -9000px;
+  width: 0;
+  overflow: hidden;
+}
+a.info:hover span,
+a.info:focus span,
+a.info:active span {
+  display: block;
+  position: absolute;
+  top: 1em;
+  left: 1em;
+  width: 12em;
+  text-align: center;
+  background-color: #fef1bc;
+}
+
+.uservoice {
+  font-weight: bold;
+  background: #f3f3f3;
+  text-align: right;
+  -moz-transform: skewX(-25deg);
+  -ms-transform: skewX(-25deg);
+  -webkit-transform: skewX(-25deg);
+  transform: skewX(-25deg);
+  min-height: 55px;
+  margin: 0.67em;
+  border: 2px solid #1c2f70;
+  padding: 10px;
+  line-height: 1.2em;
+}
+@media (min-width: 325px) {
+  .uservoice {
+    max-width: 53%;
+    min-width: 325px;
+    margin: 20px auto 40px auto;
+  }
+}
+@media (min-width: 1000px) {
+  .uservoice {
+    background: #1c2f70;
+    color: #fff;
+    position: fixed;
+    right: -26px;
+    top: 295px;
+    width: 190px;
+    min-width: auto;
+    max-width: none;
+    text-align: left;
+  }
+}
+@media (min-width: 1440px) {
+  .uservoice {
+    width: 315px;
+    top: 320px;
+    text-align: right;
+  }
+}
+.uservoice .inner {
+  -moz-transform: skewX(25deg);
+  -ms-transform: skewX(25deg);
+  -webkit-transform: skewX(25deg);
+  transform: skewX(25deg);
+  padding-right: 20%;
+}
+@media (min-width: 1000px) {
+  .uservoice .inner {
+    padding-left: 61px;
+    padding-right: 5px;
+  }
+}
+@media (min-width: 1440px) {
+  .uservoice .inner {
+    padding-left: 61px;
+    padding-right: 80px;
+  }
+}
+.uservoice .inner:before {
+  content: "";
+  width: 53px;
+  height: 40px;
+  background: url("../images/eherkenning/duimpje.svg") no-repeat;
+  display: block;
+  position: absolute;
+  left: -3px;
+  top: -4px;
+}
+.uservoice .inner:after {
+  content: "";
+  width: 30px;
+  height: 30px;
+  background: url("../images/eherkenning/pijltje-donker.svg") no-repeat;
+  display: block;
+  position: absolute;
+  right: 5px;
+  top: 15%;
+}
+@media (min-width: 1000px) {
+  .uservoice .inner:after {
+    background: none;
+  }
+}
+@media (min-width: 1440px) {
+  .uservoice .inner:after {
+    background: url("../images/eherkenning/pijltje.svg") no-repeat;
+    right: 30px;
+  }
+}
+
+.uservoice a {
+  text-decoration: none;
+  display: block;
+  width: 100%;
+}
+@media (min-width: 1000px) {
+  .uservoice a {
+    color: #fff;
+    display: inline;
+  }
+  .uservoice a:after {
+    content: "";
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    background: url("../images/eherkenning/pijltje.svg") no-repeat;
+    background-size: contain;
+    position: absolute;
+    margin-left: 5px;
+  }
+}
+@media (min-width: 1440px) {
+  .uservoice a:after {
+    display: none;
+  }
+}
+.uservoice a span.info {
+  position: relative;
+  z-index: 24;
+}
+.uservoice a:hover,
+.uservoice a:focus,
+.uservoice a:active {
+  z-index: 25;
+}
+.uservoice a span.info {
+  position: absolute;
+  left: -9000px;
+  width: 0;
+  overflow: hidden;
+}
+.uservoice a:hover span.info,
+.uservoice a:focus span.info,
+.uservoice a:active span.info {
+  display: block;
+  position: absolute;
+  top: 3em;
+  left: 1em;
+  width: 12em;
+  text-align: center;
+  background-color: #fef1bc;
+  color: #1c2f70;
+}
+
+.uservoice .second-line {
+  display: block;
+}
+@media (min-width: 1000px) {
+  .uservoice .second-line {
+    display: none;
+  }
+}
+@media (min-width: 1440px) {
+  .uservoice .second-line {
+    display: block;
+  }
+}
+
+#section-content .message .inner {
+  padding: 10px;
+}

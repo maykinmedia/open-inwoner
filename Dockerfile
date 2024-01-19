@@ -46,6 +46,9 @@ WORKDIR /app
 COPY ./build /app/build/
 COPY ./*.json ./*.js ./.babelrc /app/
 
+# Clone design token submodule (normally done using git submodule update --init)
+RUN git clone https://github.com/maykinmedia/open-inwoner-design-tokens.git
+
 # install WITH dev tooling
 RUN npm ci --legacy-peer-deps
 
@@ -64,7 +67,7 @@ FROM python:3.9-slim-buster
 # Note: mime-support becomes media-types in Debian Bullseye (required for correctly serving mime-types for images)
 # Also install the dependencies for GeoDjango
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
         procps \
         vim \
         postgresql-client \

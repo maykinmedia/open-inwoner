@@ -19,6 +19,15 @@ from .factories import CategoryFactory, ProductFactory, QuestionFactory
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestPublishedProducts(WebTest):
+    def test_product_referrer_policy_header(self):
+        product = ProductFactory()
+
+        response = self.client.get(
+            reverse("products:product_detail", kwargs={"slug": product.slug})
+        )
+
+        self.assertEqual(response.headers["Referrer-Policy"], "same-origin")
+
     def test_only_published_products_exist_on_categories_page_when_anonymous(self):
         category = CategoryFactory(path="0001", name="First one", slug="first-one")
         product1 = ProductFactory(categories=(category,))
@@ -346,6 +355,19 @@ class TestProductDetailView(WebTest):
 
         self.assertEqual(links[3].text, "Second subheading")
         self.assertEqual(links[3].attrib["href"], "#subheading-second-subheading")
+
+    def test_auto_redirect_to_link(self):
+        product = ProductFactory(
+            content="##First subheading\rlorem ipsum...\r##Second subheading",
+            auto_redirect_to_link="http://www.example.com",
+        )
+
+        response = self.app.get(
+            reverse("products:product_detail", kwargs={"slug": product.slug})
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, "http://www.example.com")
 
 
 @tag("e2e")

@@ -7,7 +7,12 @@ from zgw_consumers.api_models.constants import RolTypes, VertrouwelijkheidsAandu
 
 from open_inwoner.openzaak.api_models import InformatieObject, Rol, Zaak, ZaakType
 
-from .models import OpenZaakConfig, ZaakTypeConfig, ZaakTypeInformatieObjectTypeConfig
+from .models import (
+    OpenZaakConfig,
+    StatusTranslation,
+    ZaakTypeConfig,
+    ZaakTypeInformatieObjectTypeConfig,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +56,7 @@ def is_zaak_visible(zaak: Zaak) -> bool:
     if isinstance(zaak.zaaktype, str):
         raise ValueError("expected zaak.zaaktype to be resolved from url to model")
 
-    if zaak.zaaktype.indicatie_intern_of_extern != "extern":
+    if not zaak.zaaktype or zaak.zaaktype.indicatie_intern_of_extern != "extern":
         return False
 
     return is_object_visible(zaak, config.zaak_max_confidentiality)
@@ -140,3 +145,16 @@ def get_retrieve_resource_by_uuid_url(
         client.schema, operation_id, base_url=client.base_url, **path_kwargs
     )
     return url
+
+
+def translate_single_status(status_text: str) -> str:
+    if not status_text:
+        return ""
+
+    # in most cases try to cache with StatusTranslation.objects.get_lookup()
+    try:
+        return StatusTranslation.objects.values_list("translation", flat=True).get(
+            status=status_text
+        )
+    except StatusTranslation.DoesNotExist:
+        return ""

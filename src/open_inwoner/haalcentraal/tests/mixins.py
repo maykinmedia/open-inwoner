@@ -34,7 +34,7 @@ class HaalCentraalMixin:
             content=self.load_binary_mock("personen_1.3.yaml"),
         )
         m.get(
-            "https://personen/api/brp/ingeschrevenpersonen/999993847?fields=geslachtsaanduiding,naam,geboorte,verblijfplaats",
+            "https://personen/api/brp/ingeschrevenpersonen/999993847?fields=geslachtsaanduiding,naam.voornamen,naam.geslachtsnaam,naam.voorletters,naam.voorvoegsel,verblijfplaats.straat,verblijfplaats.huisletter,verblijfplaats.huisnummertoevoeging,verblijfplaats.woonplaats,verblijfplaats.postcode,verblijfplaats.land.omschrijving,geboorte.datum.datum,geboorte.plaats.omschrijving",
             status_code=200,
             json=self.load_json_mock("ingeschrevenpersonen.999993847_1.3.json"),
         )

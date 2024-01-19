@@ -1,4 +1,5 @@
 from datetime import date
+from unittest.mock import Mock, patch
 
 from django.contrib.messages import get_messages
 from django.core import mail
@@ -146,6 +147,20 @@ class PlanViewTests(WebTest):
         response = self.app.get(self.detail_url, user=self.user)
         self.assertContains(response, self.contact.get_full_name())
         self.assertNotContains(response, new_contact.get_full_name())
+
+    @patch("open_inwoner.userfeed.hooks.plan_completed")
+    def test_plan_detail_userfeed_hook(self, mock_plan_completed: Mock):
+        self.plan.end_date = date.today()
+        self.plan.save()
+
+        self.app.get(self.detail_url, user=self.user)
+        mock_plan_completed.assert_not_called()
+
+        self.plan.end_date = date(2000, 1, 1)
+        self.plan.save()
+
+        self.app.get(self.detail_url, user=self.user)
+        mock_plan_completed.assert_called_once()
 
     def test_plan_contact_can_access(self):
         response = self.app.get(self.list_url, user=self.contact)
@@ -721,7 +736,7 @@ class PlanBegeleiderListViewTests(WebTest):
 
         self.assertIn(self.begeleider_plan.title, rendered_plan_title)
         self.assertEqual(rendered_contact, self.contact.get_full_name())
-        self.assertEqual(rendered_end_date, "20-01-2022")
+        self.assertEqual(rendered_end_date, "20 januari 2022")
         self.assertEqual(rendered_plan_status, _("Open"))
         self.assertEqual(rendered_actions_num, "1")
         self.assertEqual(rendered_action_required, _("Actie vereist"))
@@ -736,7 +751,7 @@ class PlanBegeleiderListViewTests(WebTest):
         rendered_end_date = items[1].text
         rendered_plan_status = items[2].text
 
-        self.assertEqual(rendered_end_date, "01-01-2022")
+        self.assertEqual(rendered_end_date, "01 januari 2022")
         self.assertEqual(rendered_plan_status, _("Afgerond"))
 
     @freeze_time("2022-01-01")

@@ -42,13 +42,6 @@ class Category(MP_Node):
             "Of het onderwerp zichtbaar moet zijn op het anonieme deel (zonder inloggen)."
         ),
     )
-    visible_for_authenticated = models.BooleanField(
-        verbose_name=_("Beveiligde deel"),
-        default=True,
-        help_text=_(
-            "Of het onderwerp zichtbaar moet zijn op het beveiligde deel (achter inloggen)."
-        ),
-    )
     visible_for_companies = models.BooleanField(
         verbose_name=_("Bedrijven content"),
         default=True,
@@ -98,6 +91,17 @@ class Category(MP_Node):
         on_delete=models.SET_NULL,
         related_name="category_images",
         help_text=_("Image of the category"),
+    )
+
+    auto_redirect_to_link = models.URLField(
+        verbose_name=_("Automatically redirect to link"),
+        max_length=1000,
+        blank=True,
+        default="",
+        help_text=_(
+            "If configured, the user will be automatically redirected to this link "
+            "when accessing the category detail page."
+        ),
     )
 
     objects = CategoryPublishedQueryset.as_manager()

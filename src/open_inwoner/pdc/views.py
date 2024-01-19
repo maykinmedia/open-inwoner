@@ -55,6 +55,14 @@ class CategoryBreadcrumbMixin:
         ]
 
 
+class RedirectToLinkMixin:
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if obj.auto_redirect_to_link:
+            return HttpResponseRedirect(obj.auto_redirect_to_link)
+        return super().dispatch(request, *args, **kwargs)
+
+
 class FAQView(CommonPageMixin, TemplateView):
     template_name = "pages/faq.html"
 
@@ -83,7 +91,10 @@ class CategoryListView(
     @property
     def display_restricted(self):
         config = SiteConfiguration.get_solo()
-        return config.hide_categories_from_anonymous_users is True
+        return (
+            not self.request.user.is_authenticated
+            and config.hide_categories_from_anonymous_users is True
+        )
 
 
 class CategoryDetailView(
@@ -91,6 +102,7 @@ class CategoryDetailView(
     CommonPageMixin,
     BaseBreadcrumbMixin,
     CategoryBreadcrumbMixin,
+    RedirectToLinkMixin,
     DetailView,
 ):
     template_name = "pages/category/detail.html"
@@ -136,12 +148,41 @@ class CategoryDetailView(
 
     @property
     def display_restricted(self):
+        obj = self.get_object()
+
+        if self.request.user.is_authenticated:
+            if self.request.user.bsn:
+                if obj.visible_for_citizens:
+                    return False
+                return True
+            elif self.request.user.kvk:
+                if obj.visible_for_companies:
+                    return False
+                return True
+
+        if not obj.visible_for_anonymous:
+            return True
+
         config = SiteConfiguration.get_solo()
-        return config.hide_categories_from_anonymous_users is True
+        return (
+            not self.request.user.is_authenticated
+            and config.hide_categories_from_anonymous_users
+        )
+
+    def get_permission_denied_message(self):
+        if self.request.user.is_authenticated:
+            if self.request.user.bsn:
+                return _("This page cannot be accessed by citizens")
+            elif self.request.user.kvk:
+                return _("This page cannot be accessed by companies")
 
 
 class ProductDetailView(
-    CommonPageMixin, BaseBreadcrumbMixin, CategoryBreadcrumbMixin, DetailView
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    CategoryBreadcrumbMixin,
+    RedirectToLinkMixin,
+    DetailView,
 ):
     template_name = "pages/product/detail.html"
     model = Product
@@ -192,6 +233,11 @@ class ProductFormView(
     model = Product
     breadcrumb_use_pk = False
     no_list = True
+
+    def dispatch(self, request, *args, **kwargs):
+        response = super().dispatch(request, *args, **kwargs)
+        response.headers["Referrer-Policy"] = "origin-when-cross-origin"
+        return response
 
     def page_title(self):
         return f"{self.object.name} {_('Formulier')}"

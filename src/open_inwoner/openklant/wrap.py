@@ -6,20 +6,37 @@ from zds_client import ClientError
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.service import get_paginated_results
 
+from open_inwoner.accounts.models import User
+from open_inwoner.kvk.branches import get_kvk_branch_number
 from open_inwoner.openklant.api_models import (
     ContactMoment,
     ContactMomentCreateData,
     Klant,
     KlantContactMoment,
+    KlantContactRol,
     KlantCreateData,
 )
 from open_inwoner.openklant.clients import build_client
+from open_inwoner.openklant.models import OpenKlantConfig
 
 logger = logging.getLogger(__name__)
 
 
-def fetch_klantcontactmomenten_for_bsn(user_bsn: str) -> List[KlantContactMoment]:
-    klanten = _fetch_klanten_for_bsn(user_bsn)
+def fetch_klantcontactmomenten(
+    user_bsn: Optional[str] = None,
+    user_kvk_or_rsin: Optional[str] = None,
+    vestigingsnummer: Optional[str] = None,
+) -> List[KlantContactMoment]:
+    if not user_bsn and not user_kvk_or_rsin:
+        return []
+
+    if user_bsn:
+        klanten = _fetch_klanten_for_bsn(user_bsn)
+    elif user_kvk_or_rsin:
+        klanten = _fetch_klanten_for_kvk_or_rsin(
+            user_kvk_or_rsin, vestigingsnummer=vestigingsnummer
+        )
+
     if klanten is None:
         return []
 
@@ -36,8 +53,11 @@ def fetch_klantcontactmomenten_for_bsn(user_bsn: str) -> List[KlantContactMoment
     return ret
 
 
-def fetch_klantcontactmoment_for_bsn(
-    kcm_uuid: str, user_bsn: str
+def fetch_klantcontactmoment(
+    kcm_uuid: str,
+    user_bsn: Optional[str] = None,
+    user_kvk_or_rsin: Optional[str] = None,
+    vestigingsnummer: Optional[str] = None,
 ) -> Optional[KlantContactMoment]:
 
     cm_client = build_client("contactmomenten")
@@ -45,9 +65,17 @@ def fetch_klantcontactmoment_for_bsn(
     if cm_client is None or k_client is None:
         return
 
+    if not user_bsn and not user_kvk_or_rsin:
+        return
+
     # use the list query because eSuite doesn't have all proper resources
     # see git history before this change for the original single resource version
-    kcms = fetch_klantcontactmomenten_for_bsn(user_bsn)
+    if user_bsn:
+        kcms = fetch_klantcontactmomenten(user_bsn=user_bsn)
+    elif user_kvk_or_rsin:
+        kcms = fetch_klantcontactmomenten(
+            user_kvk_or_rsin=user_kvk_or_rsin, vestigingsnummer=vestigingsnummer
+        )
 
     kcm = None
     # try to grab the specific KCM
@@ -79,9 +107,47 @@ def _fetch_klanten_for_bsn(user_bsn: str, *, client=None) -> List[Klant]:
     return klanten
 
 
-def fetch_klant_for_bsn(user_bsn: str) -> Optional[Klant]:
+def _fetch_klanten_for_kvk_or_rsin(
+    user_kvk_or_rsin: str, *, vestigingsnummer=None, client=None
+) -> List[Klant]:
+    client = client or build_client("klanten")
+    if client is None:
+        return []
+
+    params = {"subjectNietNatuurlijkPersoon__innNnpId": user_kvk_or_rsin}
+
+    if vestigingsnummer:
+        params = {
+            "subjectVestiging__vestigingsNummer": vestigingsnummer,
+        }
+
+    try:
+        response = get_paginated_results(
+            client,
+            "klant",
+            request_kwargs={"params": params},
+        )
+    except (RequestException, ClientError) as e:
+        logger.exception("exception while making request", exc_info=e)
+        return []
+
+    klanten = factory(Klant, response)
+
+    return klanten
+
+
+def fetch_klant(
+    user_bsn: Optional[str] = None, user_kvk_or_rsin: Optional[str] = None
+) -> Optional[Klant]:
+    if not user_bsn and not user_kvk_or_rsin:
+        return
+
     # this is technically a search operation and could return multiple records
-    klanten = _fetch_klanten_for_bsn(user_bsn)
+    if user_bsn:
+        klanten = _fetch_klanten_for_bsn(user_bsn)
+    elif user_kvk_or_rsin:
+        klanten = _fetch_klanten_for_kvk_or_rsin(user_kvk_or_rsin)
+
     if klanten:
         # let's use the first one
         return klanten[0]
@@ -170,7 +236,10 @@ def patch_klant(klant: Klant, update_data) -> Optional[Klant]:
 
 
 def create_contactmoment(
-    data: ContactMomentCreateData, *, klant: Optional[Klant] = None
+    data: ContactMomentCreateData,
+    *,
+    klant: Optional[Klant] = None,
+    rol: Optional[str] = KlantContactRol.BELANGHEBBENDE
 ) -> Optional[ContactMoment]:
     client = build_client("contactmomenten")
     if client is None:
@@ -192,6 +261,7 @@ def create_contactmoment(
                 data={
                     "klant": klant.url,
                     "contactmoment": contactmoment.url,
+                    "rol": rol,
                 },
             )
         except (RequestException, ClientError) as e:
@@ -207,3 +277,26 @@ def create_contactmoment(
     #     contactmoment.klantcontactmomenten = []
 
     return contactmoment
+
+
+def get_fetch_parameters(request, use_vestigingsnummer: bool = False) -> dict:
+    """
+    Determine the parameters used to perform Klanten/Contactmomenten fetches
+    """
+    user = request.user
+
+    if user.bsn:
+        return {"user_bsn": user.bsn}
+    elif user.kvk:
+        kvk_or_rsin = user.kvk
+        config = OpenKlantConfig.get_solo()
+        if config.use_rsin_for_innNnpId_query_parameter:
+            kvk_or_rsin = user.rsin
+
+        parameters = {"user_kvk_or_rsin": kvk_or_rsin}
+        if use_vestigingsnummer:
+            vestigingsnummer = get_kvk_branch_number(request.session)
+            if vestigingsnummer:
+                parameters.update({"vestigingsnummer": vestigingsnummer})
+        return parameters
+    return {}

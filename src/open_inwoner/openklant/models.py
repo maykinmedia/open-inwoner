@@ -65,13 +65,24 @@ class OpenKlantConfig(SingletonModel):
         help_text=_("Gebruikersnaam van actieve medewerker uit e-Suite"),
     )
 
+    use_rsin_for_innNnpId_query_parameter = models.BooleanField(
+        verbose_name=_(
+            "Fetch resources from Klanten and Contactmomenten APIs for users authenticated with eHerkenning using RSIN"
+        ),
+        help_text=_(
+            "If enabled, resources from the Klanten and Contactmomenten APIs for eHerkenning "
+            "users are fetched using the company RSIN (Open Klant). "
+            "If not enabled, these resources are fetched using the KvK number."
+        ),
+        default=True,
+    )
+
     register_api_required_fields = (
         "register_contact_moment",
         "contactmomenten_service",
         "klanten_service",
         "register_bronorganisatie_rsin",
         "register_type",
-        "register_employee_id",
     )
 
     objects = OpenKlantConfigManager()

@@ -24,7 +24,8 @@ from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.openklant.wrap import (
     create_contactmoment,
     create_klant,
-    fetch_klant_for_bsn,
+    fetch_klant,
+    get_fetch_parameters,
 )
 from open_inwoner.openzaak.api_models import Status, StatusType, Zaak
 from open_inwoner.openzaak.cases import (
@@ -54,6 +55,7 @@ from open_inwoner.openzaak.models import (
     ZaakTypeStatusTypeConfig,
 )
 from open_inwoner.openzaak.utils import get_role_name_display, is_info_object_visible
+from open_inwoner.userfeed import hooks
 from open_inwoner.utils.time import has_new_elements
 from open_inwoner.utils.translate import TranslationLookup
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
@@ -100,16 +102,22 @@ class InnerCaseDetailView(
     template_name = "pages/cases/status_inner.html"
     form_class = CaseUploadForm
     contact_form_class = CaseContactForm
-    case: Zaak = None
+    case: Optional[Zaak] = None
 
-    def __init__(self):
+    def store_statustype_resulttype_mapping(self, zaaktype_identificatie):
+        # Filter on ZaakType identificatie to avoid eSuite situation where one statustype
+        # is linked to multiple zaaktypes
         self.statustype_config_mapping = {
             zaaktype_statustype.statustype_url: zaaktype_statustype
-            for zaaktype_statustype in ZaakTypeStatusTypeConfig.objects.all()
+            for zaaktype_statustype in ZaakTypeStatusTypeConfig.objects.filter(
+                zaaktype_config__identificatie=zaaktype_identificatie
+            )
         }
         self.resulttype_config_mapping = {
             zt_resulttype.resultaattype_url: zt_resulttype
-            for zt_resulttype in ZaakTypeResultaatTypeConfig.objects.all()
+            for zt_resulttype in ZaakTypeResultaatTypeConfig.objects.filter(
+                zaaktype_config__identificatie=zaaktype_identificatie
+            )
         }
 
     @cached_property
@@ -138,6 +146,7 @@ class InnerCaseDetailView(
             # fetch data associated with `self.case`
             documents = self.get_case_document_files(self.case)
             statuses = fetch_status_history(self.case.url)
+            self.store_statustype_resulttype_mapping(self.case.zaaktype.identificatie)
             # NOTE maybe this should be cached?
             statustypen = fetch_status_types_no_cache(self.case.zaaktype.url)
 
@@ -169,6 +178,15 @@ class InnerCaseDetailView(
             # The end status data is not passed if the end status has been reached,
             # because in that case the end status data is already included in `statuses`
             end_statustype = next((s for s in statustypen if s.is_eindstatus), None)
+            # The following check is a eSuite-specific workaround to deal with multiple statustypes per zaaktype having isEindstatus: true
+            # In the case when we have reached a statustype with isEindstatus set we assume this is our eindstatus
+            if (
+                statuses
+                and statuses[-1].statustype
+                and statuses[-1].statustype.is_eindstatus
+            ):
+                end_statustype = statuses[-1].statustype
+
             end_statustype_data = None
             if not status_types.get(end_statustype.url):
                 end_statustype_data = {
@@ -195,11 +213,19 @@ class InnerCaseDetailView(
                         "call_to_action_text",
                         None,
                     ),
+                    "case_link_text": getattr(
+                        self.statustype_config_mapping.get(end_statustype.url),
+                        "case_link_text",
+                        _("Bekijk aanvraag"),
+                    ),
                 }
 
             result_data = self.get_result_data(
                 self.case, self.resulttype_config_mapping
             )
+
+            hooks.case_status_seen(self.request.user, self.case)
+            hooks.case_documents_seen(self.request.user, self.case)
 
             context["case"] = {
                 "id": str(self.case.uuid),
@@ -251,6 +277,10 @@ class InnerCaseDetailView(
         """
         statustype_numbers = [s.volgnummer for s in statustypen]
 
+        # status_types retrieved via eSuite don't always have a volgnummer
+        if not all(statustype_numbers):
+            return
+
         # only 1 statustype for `self.case`
         # (this scenario is blocked by openzaak, but not part of the zgw standard)
         if len(statustype_numbers) < 2:
@@ -269,9 +299,17 @@ class InnerCaseDetailView(
 
     @property
     def is_file_upload_enabled_for_case_type(self) -> bool:
-        return ZaakTypeInformatieObjectTypeConfig.objects.filter_enabled_for_case_type(
-            self.case.zaaktype
-        ).exists()
+        case_upload_enabled = (
+            ZaakTypeInformatieObjectTypeConfig.objects.filter_enabled_for_case_type(
+                self.case.zaaktype
+            ).exists()
+        )
+        logger.info(
+            "Case {url} has case type file upload: {case_upload_enabled}".format(
+                url=self.case.url, case_upload_enabled=case_upload_enabled
+            )
+        )
+        return case_upload_enabled
 
     @property
     def is_file_upload_enabled_for_statustype(self) -> bool:
@@ -279,6 +317,14 @@ class InnerCaseDetailView(
             enabled_for_status_type = self.statustype_config_mapping[
                 self.case.status.statustype.url
             ].document_upload_enabled
+        except AttributeError:
+            logger.info(
+                "Could not retrieve status type for case {case}; "
+                "the status has not been resolved to a ZGW model object.".format(
+                    case=self.case
+                )
+            )
+            return False
         except KeyError:
             logger.info(
                 "Could not retrieve status type config for url {url}".format(
@@ -286,6 +332,13 @@ class InnerCaseDetailView(
                 )
             )
             return False
+        logger.info(
+            "Case {url} status type {status_type} has status type file upload: {enabled_for_status_type}".format(
+                url=self.case.url,
+                status_type=self.case.status.statustype,
+                enabled_for_status_type=enabled_for_status_type,
+            )
+        )
         return enabled_for_status_type
 
     @property
@@ -402,6 +455,11 @@ class InnerCaseDetailView(
                 "description": getattr(
                     statustype_config_mapping.get(s.statustype.url), "description", None
                 ),
+                "case_link_text": getattr(
+                    statustype_config_mapping.get(s.statustype.url),
+                    "case_link_text",
+                    _("Bekijk aanvraag"),
+                ),
             }
             for s in statuses
         ]
@@ -435,7 +493,7 @@ class InnerCaseDetailView(
             # restructure into something understood by the FileList template tag
             documents.append(
                 SimpleFile(
-                    name=info_obj.titel,
+                    name=getattr(info_obj, "titel", None),
                     size=info_obj.bestandsomvang,
                     url=reverse(
                         "cases:document_download",
@@ -444,11 +502,20 @@ class InnerCaseDetailView(
                             "info_id": info_obj.uuid,
                         },
                     ),
-                    created=case_info_obj.registratiedatum,
+                    created=getattr(case_info_obj, "registratiedatum", None),
                 )
             )
 
-        return documents
+        # `registratiedatum` and `titel` should be present, but not guaranteed by schema
+        try:
+            return sorted(documents, key=lambda doc: doc.created, reverse=True)
+        except TypeError:
+            try:
+                return sorted(
+                    documents, key=lambda doc: doc.name
+                )  # order ascending b/c alphabetical
+            except TypeError:
+                return documents
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -693,14 +760,12 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
         except ObjectDoesNotExist:
             ztc = None
 
-        klant = fetch_klant_for_bsn(self.request.user.bsn)
+        klant = fetch_klant(**get_fetch_parameters(self.request))
         if klant:
-            self.log_system_action(
-                "retrieved klant for BSN-user", user=self.request.user
-            )
+            self.log_system_action("retrieved klant for user", user=self.request.user)
         else:
             self.log_system_action(
-                "could not retrieve klant for BSN-user", user=self.request.user
+                "could not retrieve klant for user", user=self.request.user
             )
             data = {
                 "bronorganisatie": config.register_bronorganisatie_rsin,
@@ -719,7 +784,7 @@ class CaseContactFormView(CaseAccessMixin, LogMixin, FormView):
                 )
             else:
                 self.log_system_action(
-                    "could not create klant for BSN-user", user=self.request.user
+                    "could not create klant for user", user=self.request.user
                 )
 
         # create contact moment

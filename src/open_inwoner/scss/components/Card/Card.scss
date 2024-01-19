@@ -12,6 +12,7 @@
   display: flex;
   flex-direction: column;
   min-height: 70px;
+  min-width: var(--header-height);
   position: relative;
   text-decoration: none;
 
@@ -122,6 +123,12 @@
     /// clickable plans on home page after authenticated
     .plan-list {
       text-decoration: none;
+    }
+
+    .ellipsis .list-item p {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
   }
 
@@ -262,17 +269,26 @@
   }
 
   /// On a stretched card, the one and only link after a list should be placed on above the bottom border.
-  &--stretch &__body {
-    padding-bottom: 0;
+  &-- stretch &__body {
+    padding-bottom: var(--card-spacing);
+
+    @media (min-width: 768px) {
+      padding-bottom: 0;
+    }
   }
 
   &--stretch &__body .list:last-of-type {
     padding-bottom: calc(var(--font-size-body) + var(--card-spacing) + 1em);
   }
 
-  &--stretch .list + .link:first-of-type:last-of-type {
+  &--stretch .list + .link:first-of-type:last-of-type,
+  &--stretch .profile-card__button {
     bottom: var(--card-spacing);
-    position: absolute;
+    position: static;
+
+    @media (min-width: 768px) {
+      position: absolute;
+    }
   }
 }
 

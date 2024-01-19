@@ -110,7 +110,7 @@ SOLO_CACHE_TIMEOUT = 5  # 5 seconds
 SOLO_CACHE = "local"  # Avoid Redis overhead
 
 # ZGW API caches
-CACHE_ZGW_CATALOGI_TIMEOUT = config("CACHE_ZGW_CATALOGI_TIMEOUT", default=60 * 15)
+CACHE_ZGW_CATALOGI_TIMEOUT = config("CACHE_ZGW_CATALOGI_TIMEOUT", default=60 * 60 * 24)
 CACHE_ZGW_ZAKEN_TIMEOUT = config("CACHE_ZGW_ZAKEN_TIMEOUT", default=60 * 1)
 
 #
@@ -173,7 +173,6 @@ INSTALLED_APPS = [
     "easy_thumbnails",  # used by filer
     "image_cropping",
     "filer",
-    "mptt",
     "django_elasticsearch_dsl",
     "import_export",
     "solo",
@@ -192,6 +191,7 @@ INSTALLED_APPS = [
     "cspreports",
     "mozilla_django_oidc",
     "mozilla_django_oidc_db",
+    "digid_eherkenning_oidc_generics",
     "sessionprofile",
     "openformsclient",
     "django_htmx",
@@ -200,7 +200,7 @@ INSTALLED_APPS = [
     "formtools",
     # Project applications.
     "open_inwoner.components",
-    "open_inwoner.contrib.kvk",
+    "open_inwoner.kvk",
     "open_inwoner.ckeditor5",
     "open_inwoner.pdc",
     "open_inwoner.plans",
@@ -216,6 +216,7 @@ INSTALLED_APPS = [
     "open_inwoner.extended_sessions",
     "open_inwoner.custom_csp",
     "open_inwoner.media",
+    "open_inwoner.userfeed",
     "open_inwoner.cms.profile",
     "open_inwoner.cms.cases",
     "open_inwoner.cms.inbox",
@@ -257,6 +258,7 @@ MIDDLEWARE = [
     "open_inwoner.cms.utils.middleware.DropToolbarMiddleware",
     "django.contrib.flatpages.middleware.FlatpageFallbackMiddleware",
     "open_inwoner.extended_sessions.middleware.SessionTimeoutMiddleware",
+    "open_inwoner.kvk.middleware.KvKLoginMiddleware",
     "open_inwoner.accounts.middleware.NecessaryFieldsMiddleware",
     "open_inwoner.cms.utils.middleware.AnonymousHomePageRedirectMiddleware",
     "mozilla_django_oidc_db.middleware.SessionRefresh",
@@ -474,6 +476,8 @@ AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
     "digid_eherkenning.backends.DigiDBackend",
     "eherkenning.backends.eHerkenningBackend",
+    "digid_eherkenning_oidc_generics.backends.OIDCAuthenticationDigiDBackend",
+    "digid_eherkenning_oidc_generics.backends.OIDCAuthenticationEHerkenningBackend",
     "open_inwoner.accounts.backends.CustomOIDCBackend",
 ]
 
@@ -499,7 +503,7 @@ CSRF_COOKIE_SECURE = IS_HTTPS
 CSRF_FAILURE_VIEW = "open_inwoner.accounts.views.csrf_failure"
 
 if IS_HTTPS:
-    SECURE_HSTS_SECONDS = 63072000
+    SECURE_HSTS_SECONDS = 31536000
 
 # X_FRAME_OPTIONS = "DENY"
 X_FRAME_OPTIONS = "SAMEORIGIN"
@@ -550,6 +554,7 @@ CMS_PLACEHOLDER_CONF = {
             "QuestionnairePlugin",
             "ProductFinderPlugin",
             "ProductLocationPlugin",
+            "UserFeedPlugin",
         ],
         "text_only_plugins": ["LinkPlugin"],
         "name": _("Content"),
@@ -652,7 +657,7 @@ HIJACK_ALLOW_GET_REQUESTS = True
 # SENTRY - error monitoring
 #
 SENTRY_DSN = config("SENTRY_DSN", None)
-RELEASE = "v1.12"  # get_current_version()
+RELEASE = "v1.13"  # get_current_version()
 
 PRIVATE_MEDIA_ROOT = os.path.join(BASE_DIR, "private_media")
 FILER_ROOT = os.path.join(BASE_DIR, "media", "filer")
@@ -882,6 +887,8 @@ THUMBNAIL_QUALITY = 100
 OIDC_AUTHENTICATE_CLASS = "mozilla_django_oidc_db.views.OIDCAuthenticationRequestView"
 OIDC_CALLBACK_CLASS = "mozilla_django_oidc_db.views.OIDCCallbackView"
 OIDC_AUTHENTICATION_CALLBACK_URL = "oidc_authentication_callback"
+# ID token is required to enable OIDC logout
+OIDC_STORE_ID_TOKEN = True
 MOZILLA_DJANGO_OIDC_DB_CACHE = "oidc"
 MOZILLA_DJANGO_OIDC_DB_CACHE_TIMEOUT = 1
 
@@ -901,5 +908,4 @@ ACCOUNTS_SMS_GATEWAY = {
 
 from .app.csp import *  # noqa
 
-SECURE_REFERRER_POLICY = "origin-when-cross-origin"
-# SECURE_REFERRER_POLICY = "same-origin"
+SECURE_REFERRER_POLICY = "same-origin"

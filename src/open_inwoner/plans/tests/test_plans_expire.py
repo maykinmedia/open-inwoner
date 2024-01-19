@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+from unittest.mock import Mock, patch
 
 from django.core import mail
 from django.core.management import call_command
@@ -31,6 +32,15 @@ class NotifyComandTests(TestCase):
         self.assertIn(plan.goal, html_body)
         self.assertIn(reverse("collaborate:plan_list"), html_body)
 
+    @patch("open_inwoner.userfeed.hooks.plan_expiring")
+    def test_notify_about_expiring_plan_userfeed_hook(self, mock_plan_expiring: Mock):
+        user = UserFactory()
+        plan = PlanFactory(end_date=date.today(), created_by=user)
+
+        call_command("plans_expire")
+
+        mock_plan_expiring.assert_called_once()
+
     def test_no_notification_about_expiring_plan_when_disabled(self):
         user = UserFactory(plans_notifications=False)
         plan = PlanFactory(end_date=date.today(), created_by=user)
@@ -55,7 +65,7 @@ class NotifyComandTests(TestCase):
         call_command("plans_expire")
         self.assertEqual(len(mail.outbox), 0)
 
-    def test_notify_about_expiring_plan(self):
+    def test_notify_about_expiring_plan_email_contact(self):
         user = UserFactory()
         contact = UserFactory()
         plan = PlanFactory(end_date=date.today(), created_by=user)

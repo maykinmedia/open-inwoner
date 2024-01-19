@@ -4,7 +4,7 @@ from urllib.parse import urlencode
 
 from django.contrib.sites.models import Site
 from django.core import mail
-from django.test import override_settings
+from django.test import modify_settings, override_settings
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
 
@@ -13,10 +13,15 @@ from django_webtest import WebTest
 from furl import furl
 from pyquery import PyQuery as PQ
 
+from digid_eherkenning_oidc_generics.models import (
+    OpenIDConnectDigiDConfig,
+    OpenIDConnectEHerkenningConfig,
+)
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.contrib.kvk.models import KvKConfig
-from open_inwoner.contrib.kvk.tests.factories import CertificateFactory
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
+from open_inwoner.kvk.branches import get_kvk_branch_number
+from open_inwoner.kvk.models import KvKConfig
+from open_inwoner.kvk.tests.factories import CertificateFactory
 
 from ...cms.tests import cms_tools
 from ...utils.test import ClearCachesMixin
@@ -42,20 +47,31 @@ class DigiDRegistrationTest(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
     def setUpTestData(cls):
         cms_tools.create_homepage()
 
-    def test_registration_page_only_digid(self):
-        response = self.app.get(self.url)
+    @patch("digid_eherkenning_oidc_generics.models.OpenIDConnectDigiDConfig.get_solo")
+    def test_registration_page_only_digid(self, mock_solo):
+        for oidc_enabled in [True, False]:
+            with self.subTest(oidc_enabled=oidc_enabled):
+                mock_solo.return_value.enabled = oidc_enabled
 
-        self.assertEqual(response.status_code, 200)
-        self.assertIsNone(response.html.find(id="registration-form"))
+                digid_url = (
+                    reverse("digid_oidc:init")
+                    if oidc_enabled
+                    else reverse("digid:login")
+                )
 
-        digid_tag = response.html.find("a", title="Registreren met DigiD")
-        self.assertIsNotNone(digid_tag)
-        self.assertEqual(
-            digid_tag.attrs["href"],
-            furl(reverse("digid:login"))
-            .add({"next": reverse("profile:registration_necessary")})
-            .url,
-        )
+                response = self.app.get(self.url)
+
+                self.assertEqual(response.status_code, 200)
+                self.assertIsNone(response.html.find(id="registration-form"))
+
+                digid_tag = response.html.find("a", title="Registreren met DigiD")
+                self.assertIsNotNone(digid_tag)
+                self.assertEqual(
+                    digid_tag.attrs["href"],
+                    furl(digid_url)
+                    .add({"next": reverse("profile:registration_necessary")})
+                    .url,
+                )
 
     def test_registration_page_only_digid_with_invite(self):
         invite = InviteFactory.create()
@@ -422,24 +438,39 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
     def setUpTestData(cls):
         cms_tools.create_homepage()
 
+    @patch(
+        "digid_eherkenning_oidc_generics.models.OpenIDConnectEHerkenningConfig.get_solo"
+    )
     @patch("open_inwoner.configurations.models.SiteConfiguration.get_solo")
-    def test_registration_page_eherkenning(self, mock_solo):
+    def test_registration_page_eherkenning(self, mock_solo, mock_eherkenning_config):
         mock_solo.return_value.eherkenning_enabled = True
         mock_solo.return_value.login_allow_registration = False
 
-        response = self.app.get(self.url)
+        for oidc_enabled in [True, False]:
+            with self.subTest(oidc_enabled=oidc_enabled):
+                mock_eherkenning_config.return_value.enabled = oidc_enabled
 
-        self.assertEqual(response.status_code, 200)
-        self.assertIsNone(response.html.find(id="registration-form"))
+                eherkenning_url = (
+                    reverse("eherkenning_oidc:init")
+                    if oidc_enabled
+                    else reverse("eherkenning:login")
+                )
 
-        eherkenning_tag = response.html.find("a", title="Registreren met eHerkenning")
-        self.assertIsNotNone(eherkenning_tag)
-        self.assertEqual(
-            eherkenning_tag.attrs["href"],
-            furl(reverse("eherkenning:login"))
-            .add({"next": reverse("profile:registration_necessary")})
-            .url,
-        )
+                response = self.app.get(self.url)
+
+                self.assertEqual(response.status_code, 200)
+                self.assertIsNone(response.html.find(id="registration-form"))
+
+                eherkenning_tag = response.html.find(
+                    "a", title="Registreren met eHerkenning"
+                )
+                self.assertIsNotNone(eherkenning_tag)
+                self.assertEqual(
+                    eherkenning_tag.attrs["href"],
+                    furl(eherkenning_url)
+                    .add({"next": reverse("profile:registration_necessary")})
+                    .url,
+                )
 
     @patch("open_inwoner.configurations.models.SiteConfiguration.get_solo")
     def test_registration_page_eherkenning_with_invite(self, mock_solo):
@@ -543,10 +574,18 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
             f"http://testserver{reverse('django_registration_register')}?invite={invite.key}",
         )
 
+    @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
     @patch(
-        "open_inwoner.contrib.kvk.models.KvKConfig.get_solo",
+        "open_inwoner.kvk.models.KvKConfig.get_solo",
     )
-    def test_invite_url_not_in_session_after_successful_login(self, mock_solo):
+    def test_invite_url_not_in_session_after_successful_login(
+        self, mock_solo, mock_kvk
+    ):
+        mock_kvk.return_value = [
+            {"kvkNummer": "12345678", "vestigingsnummer": "1234"},
+        ]
+
+        mock_solo.return_value.api_key = "123"
         mock_solo.return_value.api_root = "http://foo.bar/api/v1/"
         mock_solo.return_value.client_certificate = CertificateFactory()
         mock_solo.return_value.server_certificate = CertificateFactory()
@@ -573,24 +612,97 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
         self.assertIn("invite_url", self.client.session.keys())
 
         # post our password to the IDP
-        response = self.client.post(url, data, follow=True)
+        response = self.client.post(url, data, follow=False)
+
+        # follow redirect flow
+        res = self.client.get(response["Location"])
+        res = self.client.get(res["Location"])
+        res = self.client.get(res["Location"])
 
         self.assertRedirects(
-            response,
-            f"{reverse('profile:registration_necessary')}?invite={invite.key}",
+            res, f"{reverse('profile:registration_necessary')}?invite={invite.key}"
         )
         self.assertNotIn("invite_url", self.client.session.keys())
 
-    def test_eherkenning_user_is_redirected_to_necessary_registration(self):
+        # check company branch number in session
+        self.assertEqual(get_kvk_branch_number(self.client.session), None)
+
+    @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
+    @patch(
+        "open_inwoner.kvk.models.KvKConfig.get_solo",
+    )
+    def test_redirect_flow_with_no_vestigingsnummer(self, mock_solo, mock_kvk):
+        """
+        Assert that if the KvK API returns only a single company without vestigingsnummer:
+            1. the redirect flow passes automatically through `KvKLoginMiddleware`
+            2. the company KvKNummer is stored in the session
+        """
+        mock_kvk.return_value = [
+            {"kvkNummer": "12345678"},
+        ]
+
+        mock_solo.return_value.api_key = "123"
+        mock_solo.return_value.api_root = "http://foo.bar/api/v1/"
+        mock_solo.return_value.client_certificate = CertificateFactory()
+        mock_solo.return_value.server_certificate = CertificateFactory()
+
+        user = eHerkenningUserFactory.create(
+            kvk="12345678", email="user-12345678@localhost"
+        )
+
+        url = reverse("eherkenning-mock:password")
+        params = {
+            "acs": reverse("eherkenning:acs"),
+            "next": "/",
+        }
+        url = f"{url}?{urlencode(params)}"
+
+        data = {
+            "auth_name": "12345678",
+            "auth_pass": "foo",
+        }
+
+        response = self.client.get(url, user=user)
+
+        # post our password to the IDP
+        response = self.client.post(url, data, user=user, follow=True)
+        self.assertRedirects(
+            response,
+            f"{reverse('profile:registration_necessary')}",
+        )
+
+        # check company branch number in session
+        self.assertEqual(get_kvk_branch_number(self.client.session), None)
+
+    @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
+    @patch(
+        "open_inwoner.kvk.models.KvKConfig.get_solo",
+    )
+    def test_eherkenning_user_is_redirected_to_necessary_registration(
+        self, mock_solo, mock_kvk
+    ):
         """
         eHerkenning users that do not have their email filled in should be redirected to
         the registration form
         """
-        user = eHerkenningUserFactory(kvk="12345678", email="user-12345678@localhost")
+        mock_kvk.return_value = [
+            {"kvkNummer": "12345678", "vestigingsnummer": "1234"},
+        ]
+
+        mock_solo.return_value.api_key = "123"
+        mock_solo.return_value.api_root = "http://foo.bar/api/v1/"
+        mock_solo.return_value.client_certificate = CertificateFactory()
+        mock_solo.return_value.server_certificate = CertificateFactory()
+
+        user = eHerkenningUserFactory.create(kvk="12345678", email="example@localhost")
 
         response = self.app.get(reverse("pages-root"), user=user)
 
-        self.assertRedirects(response, reverse("profile:registration_necessary"))
+        # redirect to /kvk/branches/
+        res = self.app.post(response["Location"], {"branch_number": "1234"})
+
+        # redirect to /register/necessary/
+        self.assertRedirects(res, reverse("profile:registration_necessary"))
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
@@ -884,9 +996,6 @@ class DuplicateEmailRegistrationTest(WebTest):
         cls.msg_dupes = _("This email is already taken.")
         cls.msg_inactive = _("This account has been deactivated")
 
-    #
-    # digid users
-    #
     def test_digid_user_success(self):
         """Assert that digid users can register with duplicate emails"""
         test_user = DigidUserFactory.create(
@@ -922,8 +1031,23 @@ class DuplicateEmailRegistrationTest(WebTest):
         self.assertEqual(users.first().email, "test@example.com")
         self.assertEqual(users.last().email, "test@example.com")
 
-    def test_eherkenning_user_success(self):
+    @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
+    def test_eherkenning_user_success(self, mock_kvk):
         """Assert that eHerkenning users can register with duplicate emails"""
+
+        mock_kvk.return_value = [
+            {
+                "kvkNummer": "12345678",
+                "vestigingsnummer": "1234",
+                "handelsnaam": "Mijn bedrijf",
+            },
+            {
+                "kvkNummer": "12345678",
+                "vestigingsnummer": "5678",
+                "handelsnaam": "Mijn bedrijf",
+            },
+        ]
+
         test_user = eHerkenningUserFactory.create(
             email="test@localhost",
             kvk="64819772",
@@ -944,6 +1068,13 @@ class DuplicateEmailRegistrationTest(WebTest):
         # post our password to the IDP
         response = self.app.post(url, data).follow().follow()
 
+        # select company branch
+        response = self.app.get(response["Location"])
+        form = response.forms["eherkenning-branch-form"]
+        form["branch_number"] = "5678"
+        response = form.submit().follow()
+
+        # fill in necessary fields form
         form = response.forms["necessary-form"]
 
         self.assertEqual(form["email"].value, "")
@@ -1453,6 +1584,54 @@ class TestLoginLogoutFunctionality(AssertRedirectsMixin, WebTest):
         # Verify that the user has been authenticated
         self.assertIn("_auth_user_id", self.app.session)
 
+    def test_login_page_shows_correct_digid_login_url(self):
+        config = OpenIDConnectDigiDConfig.get_solo()
+
+        for oidc_enabled in [True, False]:
+            with self.subTest(oidc_enabled=oidc_enabled):
+                config.enabled = oidc_enabled
+                config.save()
+
+                login_url = (
+                    reverse("digid_oidc:init")
+                    if oidc_enabled
+                    else f"{reverse('digid:login')}?next="
+                )
+
+                response = self.app.get(reverse("login"))
+
+                digid_login_title = _("Inloggen met DigiD")
+                digid_login_link = response.pyquery(f"[title='{digid_login_title}']")
+
+                self.assertEqual(digid_login_link.attr("href"), login_url)
+
+    def test_login_page_shows_correct_eherkenning_login_url(self):
+        site_config = SiteConfiguration.get_solo()
+        site_config.eherkenning_enabled = True
+        site_config.save()
+
+        config = OpenIDConnectEHerkenningConfig.get_solo()
+
+        for oidc_enabled in [True, False]:
+            with self.subTest(oidc_enabled=oidc_enabled):
+                config.enabled = oidc_enabled
+                config.save()
+
+                login_url = (
+                    reverse("eherkenning_oidc:init")
+                    if oidc_enabled
+                    else f"{reverse('eherkenning:login')}?next="
+                )
+
+                response = self.app.get(reverse("login"))
+
+                eherkenning_login_title = _("Inloggen met eHerkenning")
+                eherkenning_login_link = response.pyquery(
+                    f"[title='{eherkenning_login_title}']"
+                )
+
+                self.assertEqual(eherkenning_login_link.attr("href"), login_url)
+
     def test_login_for_inactive_user_shows_appropriate_message(self):
         # Change user to inactive
         self.user.is_active = False
@@ -1519,7 +1698,7 @@ class TestPasswordResetFunctionality(WebTest):
         )
         self.assertIn(
             _(
-                "U ontvangt deze e-mail, omdat u een aanvraag voor opnieuw instellen van het wachtwoord voor uw account op example.comhebt gedaan."
+                "U ontvangt deze e-mail, omdat u een aanvraag voor opnieuw instellen van het wachtwoord voor uw account op example.com hebt gedaan."
             ).format(domain=current_site.domain),
             body,
         )

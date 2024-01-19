@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core import mail
 from django.test import override_settings
 from django.urls import reverse
@@ -13,7 +14,10 @@ from zgw_consumers.api_models.constants import (
 from zgw_consumers.constants import APITypes
 from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 
-from open_inwoner.accounts.tests.factories import DigidUserFactory
+from open_inwoner.accounts.tests.factories import (
+    DigidUserFactory,
+    eHerkenningUserFactory,
+)
 from open_inwoner.openklant.constants import Status
 from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.openklant.tests.data import (
@@ -31,9 +35,17 @@ from open_inwoner.openzaak.tests.shared import (
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 from open_inwoner.utils.tests.helpers import AssertMockMatchersMixin
 
+PATCHED_MIDDLEWARE = [
+    m
+    for m in settings.MIDDLEWARE
+    if m != "open_inwoner.kvk.middleware.KvKLoginMiddleware"
+]
+
 
 @requests_mock.Mocker()
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(
+    ROOT_URLCONF="open_inwoner.cms.tests.urls", MIDDLEWARE=PATCHED_MIDDLEWARE
+)
 class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTest):
     def setUp(self):
         super().setUp()
@@ -97,6 +109,32 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             betrokkeneType=RolTypes.natuurlijk_persoon,
             betrokkeneIdentificatie={
                 "inpBsn": "900222086",
+                "voornamen": "Foo Bar",
+                "voorvoegselGeslachtsnaam": "van der",
+                "geslachtsnaam": "Bazz",
+            },
+        )
+        self.eherkenning_user_role = generate_oas_component(
+            "zrc",
+            "schemas/Rol",
+            url=f"{ZAKEN_ROOT}rollen/3ff7686f-db35-4181-8e48-57521220f887",
+            omschrijvingGeneriek=RolOmschrijving.initiator,
+            betrokkeneType=RolTypes.niet_natuurlijk_persoon,
+            betrokkeneIdentificatie={
+                "innNnpId": "000000000",
+                "voornamen": "Foo Bar",
+                "voorvoegselGeslachtsnaam": "van der",
+                "geslachtsnaam": "Bazz",
+            },
+        )
+        self.eherkenning_user_role_kvk = generate_oas_component(
+            "zrc",
+            "schemas/Rol",
+            url=f"{ZAKEN_ROOT}rollen/5885531e-9b7f-46af-947e-f2278a2e72a8",
+            omschrijvingGeneriek=RolOmschrijving.initiator,
+            betrokkeneType=RolTypes.niet_natuurlijk_persoon,
+            betrokkeneIdentificatie={
+                "innNnpId": "12345678",
                 "voornamen": "Foo Bar",
                 "voorvoegselGeslachtsnaam": "van der",
                 "geslachtsnaam": "Bazz",
@@ -221,18 +259,10 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
             self.zaaktype,
             self.status_finish,
             self.status_type_finish,
-        ]:
-            self.matchers.append(m.get(resource["url"], json=resource))
-
-        for resource in [
-            self.zaak,
-            self.result,
-            self.zaaktype,
             self.status_type_new,
             self.status_type_in_behandeling,
-            self.status_type_finish,
         ]:
-            m.get(resource["url"], json=resource)
+            self.matchers.append(m.get(resource["url"], json=resource))
 
         # mock `fetch_status_types_no_cache`
         m.get(
@@ -243,7 +273,13 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         self.matchers += [
             m.get(
                 f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}",
-                json=paginated_response([self.user_role]),
+                json=paginated_response(
+                    [
+                        self.user_role,
+                        self.eherkenning_user_role,
+                        self.eherkenning_user_role_kvk,
+                    ]
+                ),
             ),
             m.get(
                 f"{ZAKEN_ROOT}zaakinformatieobjecten?zaak={self.zaak['url']}",
@@ -406,6 +442,71 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
                 "type": "Melding",
             },
         )
+
+    def test_form_success_with_api_eherkenning_user(self, m):
+        self._setUpMocks(m)
+        self._setUpExtraMocks(m)
+
+        for use_rsin_for_innNnpId_query_parameter in [True, False]:
+            with self.subTest(
+                use_rsin_for_innNnpId_query_parameter=use_rsin_for_innNnpId_query_parameter
+            ):
+                eherkenning_user = eHerkenningUserFactory(
+                    kvk="12345678", rsin="000000000"
+                )
+
+                config = OpenKlantConfig.get_solo()
+                config.use_rsin_for_innNnpId_query_parameter = (
+                    use_rsin_for_innNnpId_query_parameter
+                )
+                config.save()
+
+                identifier = (
+                    eherkenning_user.rsin
+                    if use_rsin_for_innNnpId_query_parameter
+                    else eherkenning_user.kvk
+                )
+                m.get(
+                    f"{KLANTEN_ROOT}klanten?subjectNietNatuurlijkPersoon__innNnpId={identifier}",
+                    json=paginated_response([self.klant]),
+                ),
+
+                response = self.app.get(self.case_detail_url, user=eherkenning_user)
+
+                form = response.forms["contact-form"]
+                form.action = reverse(
+                    "cases:case_detail_contact_form",
+                    kwargs={"object_id": self.zaak["uuid"]},
+                )
+                form["question"] = "Sample text"
+                response = form.submit()
+
+                self.assertEqual(
+                    response.headers["HX-Redirect"],
+                    reverse(
+                        "cases:case_detail",
+                        kwargs={"object_id": str(self.zaak["uuid"])},
+                    ),
+                )
+
+                redirect = self.app.get(response.headers["HX-Redirect"])
+                redirect_messages = list(redirect.context["messages"])
+
+                self.assertEqual(redirect_messages[0].message, _("Vraag verstuurd!"))
+                self.assertMockMatchersCalled(self.extra_matchers)
+
+                payload = self.matcher_create_contactmoment.request_history[0].json()
+                self.assertEqual(
+                    payload,
+                    {
+                        "bronorganisatie": "123456788",
+                        "kanaal": "Internet",
+                        "medewerkerIdentificatie": {"identificatie": "FooVonBar"},
+                        "onderwerp": "afdeling-x",
+                        "tekst": "Sample text",
+                        "type": "Melding",
+                    },
+                )
 
     def test_form_success_with_email(self, m):
         self._setUpMocks(m)

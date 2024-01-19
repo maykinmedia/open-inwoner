@@ -1,4 +1,15 @@
+@import '~@utrecht/components/dist/heading-2/css/index.css';
 @import '~microscope-sass/lib/responsive';
+
+.utrecht-heading-2 {
+  display: var(--oip-typography-heading-display);
+  justify-content: var(--oip-typography-heading-justify-content);
+
+  // when CMS is in edit mode
+  &.cms-plugin {
+    margin-top: var(--gutter-width);
+  }
+}
 
 .h2 {
   color: var(--font-color-heading-2);
@@ -22,6 +33,24 @@
   // when CMS is in edit mode
   &.cms-plugin {
     margin-top: var(--gutter-width);
+  }
+
+  &.indicator {
+    display: inline-block;
+    overflow: visible;
+    position: relative;
+
+    &:after {
+      content: '';
+      background-color: var(--color-red-notification);
+      border-radius: 100px;
+      display: inline-block;
+      height: 8px;
+      position: absolute;
+      right: -12px;
+      top: 6px;
+      width: 8px;
+    }
   }
 }
 

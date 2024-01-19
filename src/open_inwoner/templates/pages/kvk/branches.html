@@ -1,0 +1,37 @@
+{% extends "master.html" %}
+{% load i18n static form_tags grid_tags button_tags card_tags button_tags %}
+
+{% block content %}
+<p> {% trans "Selecteer de vestiging waarmee u wilt inloggen" %}:</p>
+{% render_grid %}
+    {% render_column start=0 span=6 %}
+        <form method="POST" id="eherkenning-branch-form">
+            {% csrf_token %}
+            {% if form.branch_number.errors %}
+                {% errors errors=form.branch_number.errors %}
+            {% endif %}
+            {% for branch in company_branches %}
+                {% render_card direction='horizontal' %}
+                    {% with company_id=branch.vestigingsnummer %}
+                        <label class="left" for="branch-{{ company_id }}">
+                            <p>{{ branch.handelsnaam }}</p>
+                            {% if branch.straatnaam and branch.plaats %}
+                                <p>{{ branch.straatnaam }}, {{ branch.plaats}}</p>
+                            {% endif %}
+                            {% if branch.vestigingsnummer %}
+                                <p>{% trans "Vestiging" %}: {{ company_id }}</p>
+                            {% endif %}
+                        </label>
+                        <input type="radio" id="branch-{{ company_id }}" name="branch_number" value="{{ company_id }}">
+                    {% endwith %}
+                {% endrender_card %}
+            {% endfor %}
+            {% button_row %}
+                {% button primary=True name="submit" text=_('Log in') %}
+                {% url 'logout' as logout_url %}
+                {% button danger=True href=logout_url text=_('Cancel') %}
+            {% endbutton_row %}
+        </form>
+    {% endrender_column %}
+{% endrender_grid %}
+{% endblock content %}

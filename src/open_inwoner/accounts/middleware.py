@@ -43,6 +43,7 @@ class NecessaryFieldsMiddleware:
                         reverse("logout"),
                         digid_logout,
                         digid_slo_redirect,
+                        reverse("kvk:branches"),
                     )
                 )
                 and request.user.require_necessary_fields()

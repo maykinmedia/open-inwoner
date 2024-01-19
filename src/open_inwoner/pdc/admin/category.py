@@ -27,7 +27,7 @@ class ZaakTypenSelectWidget(forms.Select):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        zaaktypen = ZaakTypeConfig.objects.order_by("catalogus__domein")
+        zaaktypen = ZaakTypeConfig.objects.order_by("catalogus__domein", "omschrijving")
 
         # Create an optgroup for each Catalogus and its ZaakTypen
         choices_dict = defaultdict(list)
@@ -141,7 +141,6 @@ class CategoryAdmin(
         "highlighted",
         "published",
         "visible_for_anonymous",
-        "visible_for_authenticated",
         "visible_for_companies",
         "visible_for_citizens",
     )
@@ -149,11 +148,47 @@ class CategoryAdmin(
         "highlighted",
         "published",
         "visible_for_anonymous",
-        "visible_for_authenticated",
         "visible_for_companies",
         "visible_for_citizens",
     )
     exclude = ("path", "depth", "numchild")
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": (
+                    "name",
+                    "slug",
+                    "description",
+                    "icon",
+                    "image",
+                    "auto_redirect_to_link",
+                    "_position",
+                    "_ref_node_id",
+                ),
+            },
+        ),
+        (
+            _("Category permissions"),
+            {
+                "fields": (
+                    "published",
+                    "visible_for_anonymous",
+                    "visible_for_companies",
+                    "visible_for_citizens",
+                ),
+            },
+        ),
+        (
+            _("Category visibility for plugin on homepage"),
+            {
+                "fields": (
+                    "zaaktypen",
+                    "highlighted",
+                ),
+            },
+        ),
+    )
 
     # import-export
     import_template_name = "admin/category_import.html"

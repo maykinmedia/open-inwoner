@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
             model_name="openzaakconfig",
             name="title_text",
             field=models.TextField(
-                default="Hier vindt u een overzicht van al uw lopende an afgeronde aanvragen.",
+                default="Hier vindt u een overzicht van al uw lopende en afgeronde aanvragen.",
                 help_text="The title/introductory text shown on the list view of 'Mijn aanvragen'.",
                 verbose_name="Title text",
             ),

@@ -2,12 +2,6 @@
   display: flex;
   flex-direction: column;
 
-  .h2 {
-    &.title--extra-padding {
-      padding-bottom: var(--spacing-large);
-    }
-  }
-
   &__key {
     color: var(--color-gray-90);
   }
@@ -41,24 +35,6 @@
     margin: var(--row-height) 0 0 0;
   }
 
-  .card {
-    .h4 .link {
-      color: var(--color-black);
-    }
-
-    .profile__link {
-      text-decoration: none;
-    }
-
-    .list-item {
-      p {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-    }
-  }
-
   .tabled__header {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -72,7 +48,7 @@
       color: var(--color-gray-lighter);
       font-size: 16px;
       letter-spacing: 0;
-      line-height: 24px;
+      line-height: var(--font-line-height-body-medium);
     }
   }
 
@@ -96,6 +72,11 @@
     @media (min-width: 768px) {
       grid-template-columns: 1fr 1fr 125px 125px;
     }
+  }
+
+  .tabled__paragraph {
+    margin: 0;
+    line-height: var(--font-line-height-body-medium);
   }
 
   .tabled__item {

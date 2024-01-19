@@ -64,6 +64,8 @@
 @import './Notification/Notification.scss';
 @import './Notification/Notifications.scss';
 @import './Pagination/Pagination.scss';
+@import './Profile/personal-information';
+@import './Profile/personal-overview';
 @import './Plan/PlanContact.scss';
 @import './Plan/PlanCreate.scss';
 @import './Plan/PlanEdit.scss';
@@ -82,7 +84,6 @@
 @import './Social/Social.scss';
 @import './Spinner/Spinner.scss';
 @import './Status/StatusList.scss';
-@import './Status/Status.scss';
 @import './Step/StepIndicator.scss';
 @import './Sticky/Sticky.scss';
 @import './Table/Table.scss';
@@ -98,10 +99,9 @@
 @import './Typography/Link.scss';
 @import './Typography/LinkList.scss';
 @import './Typography/P.scss';
+@import './UserFeed/UserFeed.scss';
 @import './Video/Video.scss';
 @import './modal/modal';
 @import './Emoji/Emoji.scss';
-@import './Profile/personal-information';
-@import './Profile/personal-overview';
 @import './Profile/edit.scss';
 @import './WarningHeader/WarningHeader.scss';

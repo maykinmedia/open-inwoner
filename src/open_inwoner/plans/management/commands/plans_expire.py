@@ -10,6 +10,7 @@ from mail_editor.helpers import find_template
 
 from open_inwoner.accounts.models import User
 from open_inwoner.plans.models import Plan
+from open_inwoner.userfeed import hooks
 from open_inwoner.utils.url import build_absolute_url
 
 logger = logging.getLogger(__name__)
@@ -47,6 +48,9 @@ class Command(BaseCommand):
             logger.info(
                 f"The email was sent to the user {receiver} about {plans.count()} expiring plans"
             )
+
+            for p in plans:
+                hooks.plan_expiring(receiver, p)
 
     def send_email(self, receiver: User, plans: List[Plan]):
         plan_list_link = build_absolute_url(reverse("collaborate:plan_list"))

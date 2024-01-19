@@ -19,45 +19,22 @@ class CategoriesPlugin(CMSActiveAppMixin, CMSPluginBase):
     app_hook = "ProductsApphook"
     cache = False
 
-    # own variables
-    limit = 4
-
     def render(self, context, instance, placeholder):
         config = OpenZaakConfig.get_solo()
         request = context["request"]
-        # Show the categories if the user has cases linked to them, otherwise
-        # Show the highlighted published categories if they have been specified, otherwise
-        # Show the first X published categories
-
-        # Highlighted categories
-        highlighted_categories = (
-            Category.objects.published()
-            .visible_for_user(request.user)
-            .filter(highlighted=True)
-            .order_by("path")
-        )
-        categories = None
+        # Show the all the highlighted categories the user has access to, as well as
+        # categories that are linked to ZaakTypen for which the user has Zaken within
+        # the specified period
+        visible_categories = Category.objects.published().visible_for_user(request.user)
+        categories = visible_categories.filter(highlighted=True)
         if (
             config.enable_categories_filtering_with_zaken
             and request.user.is_authenticated
-            and request.user.bsn
+            and (request.user.bsn or request.user.kvk)
         ):
-            categories = (
-                Category.objects.published()
-                .visible_for_user(request.user)
-                .filter_for_user_with_zaken(request.user)
-                .order_by("name")[: self.limit]
-            )
+            categories |= visible_categories.filter_by_zaken_for_request(request)
 
-        # Fallback for if the user has no cases with case types that are linked to
-        # categories
-        if not categories:
-            if highlighted_categories.exists():
-                categories = highlighted_categories[: self.limit]
-            else:
-                categories = Category.objects.published().order_by("path")[: self.limit]
-
-        context["categories"] = categories
+        context["categories"] = categories.order_by("path")
 
         return context
 

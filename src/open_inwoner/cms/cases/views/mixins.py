@@ -5,10 +5,12 @@ from django.contrib.auth.mixins import AccessMixin, LoginRequiredMixin
 from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
 
+from open_inwoner.kvk.branches import get_kvk_branch_number
 from open_inwoner.openzaak.api_models import Zaak
 from open_inwoner.openzaak.cases import (
     fetch_roles_for_case_and_bsn,
-    fetch_roles_for_case_and_kvk,
+    fetch_roles_for_case_and_kvk_or_rsin,
+    fetch_roles_for_case_and_vestigingsnummer,
     fetch_single_case,
 )
 from open_inwoner.openzaak.catalog import fetch_single_case_type
@@ -47,10 +49,10 @@ class CaseAccessMixin(AccessMixin):
 
     Base checks:
     - user is authenticated
-    - user has a BSN
+    - user has a BSN or KvK number
 
     When retrieving a case :
-    - users BSN has a role for this case
+    - users BSN/KVK has a role for this case
     - case confidentiality is not higher than globally configured
     """
 
@@ -79,7 +81,17 @@ class CaseAccessMixin(AccessMixin):
                 config = OpenZaakConfig.get_solo()
                 if config.fetch_eherkenning_zaken_with_rsin:
                     identifier = self.request.user.rsin
-                if not fetch_roles_for_case_and_kvk(self.case.url, identifier):
+
+                vestigingsnummer = get_kvk_branch_number(self.request.session)
+                if vestigingsnummer and not fetch_roles_for_case_and_vestigingsnummer(
+                    self.case.url, vestigingsnummer
+                ):
+                    logger.debug(
+                        f"CaseAccessMixin - permission denied: no role for the case {self.case.url}"
+                    )
+                    return self.handle_no_permission()
+
+                if not fetch_roles_for_case_and_kvk_or_rsin(self.case.url, identifier):
                     logger.debug(
                         f"CaseAccessMixin - permission denied: no role for the case {self.case.url}"
                     )

@@ -149,7 +149,7 @@ MAIL_EDITOR_CONF = {
             {% for action in actions %}
                 <tr>
                     <td>{{ action.name }}</td>
-                    <td>{{ action.end_date|date:"d-m-Y" }}</td>
+                    <td>{{ action.end_date|date:"j F Y" }}</td>
                 </tr>
             {% endfor %}
             </table>
@@ -201,7 +201,7 @@ MAIL_EDITOR_CONF = {
                 <tr>
                     <td>{{ plan.title }}</td>
                     <td>{{ plan.goal }}</td>
-                    <td>{{ plan.end_date|date:"d-m-Y" }}</td>
+                    <td>{{ plan.end_date|date:"j F Y" }}</td>
                 </tr>
             {% endfor %}
             </table>

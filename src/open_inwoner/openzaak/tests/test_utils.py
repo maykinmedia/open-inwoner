@@ -154,6 +154,10 @@ class TestUtils(ClearCachesMixin, TestCase):
             zaak.vertrouwelijkheidaanduiding = VertrouwelijkheidsAanduidingen.geheim
             self.assertFalse(is_zaak_visible(zaak))
 
+        with self.subTest("invisible when zaaktype not properly resolved"):
+            zaak.zaaktype = None
+            self.assertFalse(is_zaak_visible(zaak))
+
     def test_get_role_name_display(self):
         with self.subTest("natuurlijk_persoon > all fields"):
             role = generate_rol(

@@ -13,8 +13,14 @@ from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 from zgw_consumers.constants import APITypes
 from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 
-from open_inwoner.accounts.tests.factories import DigidUserFactory, UserFactory
+from open_inwoner.accounts.tests.factories import (
+    DigidUserFactory,
+    UserFactory,
+    eHerkenningUserFactory,
+)
 from open_inwoner.cms.products.cms_apps import ProductsApphook
+from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.kvk.branches import KVK_BRANCH_SESSION_VARIABLE
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.tests.factories import ServiceFactory, ZaakTypeConfigFactory
 from open_inwoner.openzaak.tests.shared import (
@@ -22,6 +28,7 @@ from open_inwoner.openzaak.tests.shared import (
     DOCUMENTEN_ROOT,
     ZAKEN_ROOT,
 )
+from open_inwoner.pdc.models import Category
 from open_inwoner.pdc.tests.factories import CategoryFactory
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 
@@ -48,25 +55,21 @@ class TestHighlightedCategories(WebTest):
             name="This should be second",
             highlighted=True,
             visible_for_anonymous=True,
-            visible_for_authenticated=True,
         )
         highlighted_category2 = CategoryFactory(
             path="0002",
             highlighted=True,
             visible_for_anonymous=True,
-            visible_for_authenticated=False,
         )
         highlighted_category3 = CategoryFactory(
             path="0003",
             highlighted=True,
             visible_for_anonymous=False,
-            visible_for_authenticated=True,
         )
         highlighted_category4 = CategoryFactory(
             path="0004",
             highlighted=True,
             visible_for_anonymous=False,
-            visible_for_authenticated=False,
         )
 
         html, context = cms_tools.render_plugin(CategoriesPlugin)
@@ -88,39 +91,84 @@ class TestHighlightedCategories(WebTest):
             [highlighted_category1, highlighted_category2],
         )
 
-    def test_only_highlighted_categories_are_shown_when_they_exist(self):
-        user = UserFactory()
+    def test_only_highlighted_categories_are_shown_when_they_exist_digid_user(self):
+        user = DigidUserFactory()
         category = CategoryFactory(name="Should be first")
         highlighted_category1 = CategoryFactory(
             name="This should be second",
             highlighted=True,
             visible_for_anonymous=True,
-            visible_for_authenticated=True,
+            visible_for_citizens=False,
+            visible_for_companies=False,
         )
         highlighted_category2 = CategoryFactory(
             path="0002",
             highlighted=True,
             visible_for_anonymous=True,
-            visible_for_authenticated=False,
+            visible_for_citizens=True,
+            visible_for_companies=False,
         )
         highlighted_category3 = CategoryFactory(
             path="0003",
             highlighted=True,
             visible_for_anonymous=False,
-            visible_for_authenticated=True,
+            visible_for_citizens=False,
+            visible_for_companies=True,
         )
         highlighted_category4 = CategoryFactory(
             path="0004",
             highlighted=True,
             visible_for_anonymous=False,
-            visible_for_authenticated=False,
+            visible_for_citizens=True,
+            visible_for_companies=True,
         )
 
         html, context = cms_tools.render_plugin(CategoriesPlugin, user=user)
 
         self.assertEqual(
             list(context["categories"]),
-            [highlighted_category1, highlighted_category3],
+            [highlighted_category2, highlighted_category4],
+        )
+
+    def test_only_highlighted_categories_are_shown_when_they_exist_eherkenning_user(
+        self,
+    ):
+        user = eHerkenningUserFactory()
+        category = CategoryFactory(name="Should be first")
+        highlighted_category1 = CategoryFactory(
+            name="This should be second",
+            highlighted=True,
+            visible_for_anonymous=True,
+            visible_for_citizens=False,
+            visible_for_companies=False,
+        )
+        highlighted_category2 = CategoryFactory(
+            path="0002",
+            highlighted=True,
+            visible_for_anonymous=True,
+            visible_for_citizens=True,
+            visible_for_companies=False,
+        )
+        highlighted_category3 = CategoryFactory(
+            path="0003",
+            highlighted=True,
+            visible_for_anonymous=False,
+            visible_for_citizens=False,
+            visible_for_companies=True,
+        )
+        highlighted_category4 = CategoryFactory(
+            path="0004",
+            highlighted=True,
+            visible_for_anonymous=False,
+            visible_for_citizens=True,
+            visible_for_companies=True,
+        )
+
+        html, context = cms_tools.render_plugin(CategoriesPlugin, user=user)
+
+        self.assertEqual(
+            list(context["categories"]),
+            [highlighted_category3, highlighted_category4],
         )
 
     @patch("open_inwoner.openzaak.models.OpenZaakConfig.get_solo")
@@ -167,32 +215,108 @@ class TestHighlightedCategories(WebTest):
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestPublishedCategories(WebTest):
     def setUp(self):
-        self.user = UserFactory()
+        self.digid_user = DigidUserFactory()
+        self.eherkenning_user = eHerkenningUserFactory()
         self.published1 = CategoryFactory(
-            path="0001", name="First one", slug="first-one"
+            path="0001",
+            name="First one",
+            slug="first-one",
+            highlighted=True,
+            visible_for_citizens=True,
+            visible_for_companies=False,
         )
         self.published2 = CategoryFactory(
-            path="0002", name="Second one", slug="second-one"
+            path="0002",
+            name="Second one",
+            slug="second-one",
+            highlighted=True,
+            visible_for_citizens=False,
+            visible_for_companies=True,
+        )
+        self.published3 = CategoryFactory(
+            path="0003",
+            name="Third one",
+            slug="third-one",
+            highlighted=True,
+            visible_for_citizens=False,
+            visible_for_companies=False,
+        )
+        self.published4 = CategoryFactory(
+            path="0004",
+            name="Fourth one",
+            slug="foruth-one",
+            highlighted=True,
+            visible_for_citizens=False,
+            visible_for_companies=False,
+        )
+        self.published5 = CategoryFactory(
+            path="0005",
+            name="Fifth one",
+            slug="fifth-one",
+            highlighted=True,
+            visible_for_citizens=False,
+            visible_for_companies=False,
         )
         self.draft1 = CategoryFactory(
-            path="0003", name="Third one", slug="third-one", published=False
+            path="0003",
+            name="sixth one",
+            slug="sixth-one",
+            published=False,
         )
         self.draft2 = CategoryFactory(
-            path="0004", name="Wourth one", slug="wourth-one", published=False
+            path="0004",
+            name="Seventh one",
+            slug="seventh-one",
+            published=False,
         )
         cms_tools.create_apphook_page(ProductsApphook)
 
+    def test_no_categories_exist_in_home_page_when_anonymous(self):
+        config = SiteConfiguration.get_solo()
+        config.hide_categories_from_anonymous_users = True
+        config.save()
+
+        html, context = cms_tools.render_plugin(CategoriesPlugin)
+        self.assertFalse(context["categories"].exists())
+
     def test_only_published_categories_exist_in_home_page_when_anonymous(self):
+        config = SiteConfiguration.get_solo()
+        config.hide_categories_from_anonymous_users = False
+        config.save()
+
         html, context = cms_tools.render_plugin(CategoriesPlugin)
         self.assertEqual(
-            list(context["categories"]), [self.published1, self.published2]
+            list(context["categories"]),
+            [
+                self.published1,
+                self.published2,
+                self.published3,
+                self.published4,
+                self.published5,
+            ],
         )
 
-    def test_only_published_categories_exist_in_home_page_when_logged_in(self):
-        html, context = cms_tools.render_plugin(CategoriesPlugin, user=self.user)
-        self.assertEqual(
-            list(context["categories"]), [self.published1, self.published2]
+    def test_only_published_categories_exist_in_home_page_when_logged_in_with_digid(
+        self,
+    ):
+        config = SiteConfiguration.get_solo()
+        config.hide_categories_from_anonymous_users = False
+        config.save()
+
+        html, context = cms_tools.render_plugin(CategoriesPlugin, user=self.digid_user)
+        self.assertEqual(list(context["categories"]), [self.published1])
+
+    def test_only_published_categories_exist_in_home_page_when_logged_in_with_eherkenning(
+        self,
+    ):
+        config = SiteConfiguration.get_solo()
+        config.hide_categories_from_anonymous_users = False
+        config.save()
+
+        html, context = cms_tools.render_plugin(
+            CategoriesPlugin, user=self.eherkenning_user
         )
+        self.assertEqual(list(context["categories"]), [self.published2])
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
@@ -208,35 +332,62 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
 
         cls.category1 = CategoryFactory(
             name="0001",
+            path="0001",
+            highlighted=False,
             zaaktypen=[],
             visible_for_citizens=True,
         )
         cls.category2 = CategoryFactory(
             name="0002",
-            highlighted=True,
-            zaaktypen=["ZAAKTYPE-2020-0000000001"],
+            path="0002",
+            highlighted=False,
+            zaaktypen=["ZAAKTYPE-2020-0000000001", "ZAAKTYPE-2020-0000000003"],
             visible_for_citizens=True,
         )
         cls.category3 = CategoryFactory(
             name="0003",
-            highlighted=True,
+            path="0003",
+            highlighted=False,
             zaaktypen=["ZAAKTYPE-2020-0000000001"],
             visible_for_citizens=False,
         )
         cls.category4 = CategoryFactory(
             name="0004",
-            highlighted=True,
+            path="0004",
+            highlighted=False,
             zaaktypen=["ZAAKTYPE-2020-0000000002"],
             visible_for_citizens=True,
         )
         cls.category5 = CategoryFactory(
             name="0005",
-            highlighted=True,
+            path="0005",
+            highlighted=False,
             zaaktypen=["unknown-zaaktype"],
             visible_for_citizens=True,
         )
+        cls.category7 = CategoryFactory(
+            name="bar",
+            highlighted=True,
+            zaaktypen=[],
+            visible_for_citizens=True,
+        )
+        cls.category6 = CategoryFactory.build(
+            name="foo",
+            highlighted=True,
+            zaaktypen=["ZAAKTYPE-2020-0000000002"],
+            visible_for_citizens=True,
+        )
+        # Highlighted subcategories should show up as well
+        cls.category1.add_child(instance=cls.category6)
+
+        # Ensure categories are ordered by path
+        cls.category6.path = "0009"
+        cls.category7.path = "0010"
+        cls.category6.save()
+        cls.category7.save()
 
         cls.user = DigidUserFactory()
+        cls.eherkenning_user = eHerkenningUserFactory(kvk="12345678", rsin="123456789")
 
         # services
         cls.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
@@ -287,7 +438,7 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
             "schemas/Zaak",
             uuid="cc490c2e-210f-49a0-b7c9-546f7ba7a1f6",
             url=f"{ZAKEN_ROOT}zaken/cc490c2e-210f-49a0-b7c9-546f7ba7a1f6",
-            zaaktype=f"{CATALOGI_ROOT}zaaktypen/0caa29cb-0167-426f-8dc1-88bebd7c8804",
+            zaaktype=f"{CATALOGI_ROOT}zaaktypen/b36f3461-0a24-45b1-9702-c4fc84a9810c",
             identificatie="ZAAK-2022-0000000025",
             omschrijving="Zaak naar aanleiding van ingezonden formulier",
             startdatum=(TODAY - relativedelta(months=3, days=10)).strftime("%Y-%m-%d"),
@@ -346,10 +497,35 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
         cls.zaaktype2 = generate_oas_component(
             "ztc",
             "schemas/ZaakType",
-            uuid="0caa29cb-0167-426f-8dc1-88bebd7c8804",
-            url=cls.zaak3["zaaktype"],
+            uuid="b36f3461-0a24-45b1-9702-c4fc84a9810c",
+            url=cls.zaak2["zaaktype"],
             identificatie="ZAAKTYPE-2020-0000000002",
             omschrijving="Tea zaaktype",
+            catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+            doel="Ask for coffee",
+            aanleiding="Coffee is essential",
+            indicatieInternOfExtern="extern",
+            handelingInitiator="Request",
+            onderwerp="Coffee",
+            handelingBehandelaar="Behandelen",
+            opschortingEnAanhoudingMogelijk=False,
+            verlengingMogelijk=False,
+            publicatieIndicatie=False,
+            besluittypen=[],
+            beginGeldigheid="2020-09-25",
+            versiedatum="2020-09-25",
+        )
+        # For https://taiga.maykinmedia.nl/project/open-inwoner/issue/1932
+        # This zaaktype is linked to a Category, but the user does not have a Zaak with
+        # this Zaaktype and filtering should not fail because of this
+        cls.zaaktype3 = generate_oas_component(
+            "ztc",
+            "schemas/ZaakType",
+            uuid="5465853f-f1e2-45fa-a811-4bbf23648b4f",
+            url=cls.zaak3["zaaktype"],
+            identificatie="ZAAKTYPE-2020-0000000003",
+            omschrijving="foo zaaktype",
             catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
             doel="Ask for coffee",
@@ -377,6 +553,12 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
             identificatie=cls.zaaktype2["identificatie"],
             relevante_zaakperiode=1,
         )
+        cls.zaaktype_config3 = ZaakTypeConfigFactory(
+            catalogus=cls.zaaktype_config1.catalogus,
+            urls=[cls.zaaktype3["url"]],
+            identificatie=cls.zaaktype3["identificatie"],
+            relevante_zaakperiode=2,
+        )
 
     def _setUpOASMocks(self, m):
         mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
@@ -392,6 +574,7 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
             self.zaak3,
             self.zaaktype,
             self.zaaktype2,
+            self.zaaktype3,
         ]:
             m.get(resource["url"], json=resource)
 
@@ -413,10 +596,87 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
 
         html, context = cms_tools.render_plugin(CategoriesPlugin, user=self.user)
 
-        self.assertEqual(
-            list(context["categories"]),
-            [self.category2],
-        )
+        self.assertEqual(context["categories"].count(), 3)
+        self.assertEqual(context["categories"].first(), self.category2)
+        self.assertEqual(context["categories"][1], self.category6)
+        self.assertEqual(context["categories"].last(), self.category7)
+
+    @requests_mock.Mocker()
+    def test_categories_based_on_cases_for_eherkenning_user(self, m):
+        self._setUpMocks(m)
+
+        for identifier in [self.eherkenning_user.kvk, self.eherkenning_user.rsin]:
+            m.get(
+                furl(f"{ZAKEN_ROOT}zaken")
+                .add(
+                    {
+                        "rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__innNnpId": identifier,
+                        "maximaleVertrouwelijkheidaanduiding": VertrouwelijkheidsAanduidingen.beperkt_openbaar,
+                    }
+                )
+                .url,
+                json=paginated_response([self.zaak, self.zaak3]),
+            )
+
+        for fetch_eherkenning_zaken_with_rsin in [True, False]:
+            with self.subTest(
+                fetch_eherkenning_zaken_with_rsin=fetch_eherkenning_zaken_with_rsin
+            ):
+                self.config.fetch_eherkenning_zaken_with_rsin = (
+                    fetch_eherkenning_zaken_with_rsin
+                )
+                self.config.save()
+
+                html, context = cms_tools.render_plugin(
+                    CategoriesPlugin, user=self.eherkenning_user
+                )
+
+                self.assertEqual(context["categories"].count(), 4)
+                self.assertEqual(context["categories"][0], self.category2)
+                self.assertEqual(context["categories"][1], self.category3)
+                self.assertEqual(context["categories"][2], self.category6)
+                self.assertEqual(context["categories"][3], self.category7)
+
+    @requests_mock.Mocker()
+    def test_categories_based_on_cases_for_eherkenning_user_with_vestigingsnummer(
+        self, m
+    ):
+        self._setUpMocks(m)
+
+        for identifier in [self.eherkenning_user.kvk, self.eherkenning_user.rsin]:
+            m.get(
+                furl(f"{ZAKEN_ROOT}zaken")
+                .add(
+                    {
+                        "rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__innNnpId": identifier,
+                        "maximaleVertrouwelijkheidaanduiding": VertrouwelijkheidsAanduidingen.beperkt_openbaar,
+                        "rol__betrokkeneIdentificatie__vestiging__vestigingsNummer": "1234",
+                    }
+                )
+                .url,
+                json=paginated_response([self.zaak, self.zaak3]),
+            )
+
+        for fetch_eherkenning_zaken_with_rsin in [True, False]:
+            with self.subTest(
+                fetch_eherkenning_zaken_with_rsin=fetch_eherkenning_zaken_with_rsin
+            ):
+                self.config.fetch_eherkenning_zaken_with_rsin = (
+                    fetch_eherkenning_zaken_with_rsin
+                )
+                self.config.save()
+
+                html, context = cms_tools.render_plugin(
+                    CategoriesPlugin,
+                    user=self.eherkenning_user,
+                    session_vars={KVK_BRANCH_SESSION_VARIABLE: "1234"},
+                )
+
+                self.assertEqual(context["categories"].count(), 4)
+                self.assertEqual(context["categories"][0], self.category2)
+                self.assertEqual(context["categories"][1], self.category3)
+                self.assertEqual(context["categories"][2], self.category6)
+                self.assertEqual(context["categories"][3], self.category7)
 
     @patch(
         "open_inwoner.openzaak.cases.get_paginated_results",
@@ -424,12 +684,11 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
     )
     def test_categories_fail_to_fetch_cases(self, m):
         """
-        In case of failure on fetch_cases, the highlighted categories that are visible
-        for the user are shown
+        In case of failure on fetch_cases, only highlighted categories are shown
         """
+
         html, context = cms_tools.render_plugin(CategoriesPlugin, user=self.user)
 
-        self.assertEqual(
-            list(context["categories"]),
-            [self.category2, self.category4, self.category5],
-        )
+        self.assertEqual(context["categories"].count(), 2)
+        self.assertEqual(context["categories"].first(), self.category6)
+        self.assertEqual(context["categories"].last(), self.category7)

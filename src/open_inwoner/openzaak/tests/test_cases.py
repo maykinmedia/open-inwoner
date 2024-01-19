@@ -1,6 +1,7 @@
 import datetime
 from unittest.mock import patch
 
+from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.test.utils import override_settings
 from django.urls import reverse_lazy
@@ -17,7 +18,11 @@ from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory, eHerkenningUserFactory
 from open_inwoner.cms.cases.views.cases import InnerCaseListView
 from open_inwoner.openzaak.tests.shared import FORMS_ROOT
-from open_inwoner.utils.test import ClearCachesMixin, paginated_response
+from open_inwoner.utils.test import (
+    ClearCachesMixin,
+    paginated_response,
+    set_kvk_branch_number_in_session,
+)
 from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin, Lookups
 
 from ...utils.tests.helpers import AssertRedirectsMixin
@@ -25,12 +30,21 @@ from ..api_models import Zaak
 from ..constants import StatusIndicators
 from ..models import OpenZaakConfig
 from .factories import (
+    CatalogusConfigFactory,
     ServiceFactory,
     StatusTranslationFactory,
+    ZaakTypeConfigFactory,
     ZaakTypeStatusTypeConfigFactory,
 )
 from .mocks import ESuiteData
 from .shared import CATALOGI_ROOT, ZAKEN_ROOT
+
+# Avoid redirects through `KvKLoginMiddleware`
+PATCHED_MIDDLEWARE = [
+    m
+    for m in settings.MIDDLEWARE
+    if m != "open_inwoner.kvk.middleware.KvKLoginMiddleware"
+]
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
@@ -127,7 +141,9 @@ class CaseListAccessTests(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
 
 @requests_mock.Mocker()
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(
+    ROOT_URLCONF="open_inwoner.cms.tests.urls", MIDDLEWARE=PATCHED_MIDDLEWARE
+)
 class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
     inner_url = reverse_lazy("cases:cases_content")
     maxDiff = None
@@ -163,6 +179,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
             "schemas/ZaakType",
             url=f"{CATALOGI_ROOT}zaaktypen/53340e34-7581-4b04-884f",
             omschrijving="Coffee zaaktype",
+            identificatie="ZAAK-2022-0000000001",
             catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
             indicatieInternOfExtern="extern",
@@ -195,8 +212,16 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
             isEindstatus=True,
         )
 
+        cls.catalogus_config = CatalogusConfigFactory.create(
+            url=cls.zaaktype["catalogus"]
+        )
+        cls.zaaktype_config1 = ZaakTypeConfigFactory.create(
+            urls=[cls.zaaktype["url"]],
+            identificatie=cls.zaaktype["identificatie"],
+            catalogus=cls.catalogus_config,
+        )
         cls.zt_statustype_config1 = ZaakTypeStatusTypeConfigFactory.create(
-            zaaktype_config__identificatie="ZAAK-2022-0000000001",
+            zaaktype_config=cls.zaaktype_config1,
             statustype_url=cls.status_type1["url"],
             status_indicator=StatusIndicators.warning,
             status_indicator_text="U moet documenten toevoegen",
@@ -360,6 +385,18 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
                     [self.zaak_eherkenning1, self.zaak_eherkenning2]
                 ),
             )
+            m.get(
+                furl(f"{ZAKEN_ROOT}zaken")
+                .add(
+                    {
+                        "rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__innNnpId": identifier,
+                        "maximaleVertrouwelijkheidaanduiding": VertrouwelijkheidsAanduidingen.beperkt_openbaar,
+                        "rol__betrokkeneIdentificatie__vestiging__vestigingsNummer": "1234",
+                    }
+                )
+                .url,
+                json=paginated_response([self.zaak_eherkenning1]),
+            )
         for resource in [
             self.zaaktype,
             self.status_type1,
@@ -376,6 +413,19 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
     def test_list_cases(self, m):
         self._setUpMocks(m)
 
+        # Added for https://taiga.maykinmedia.nl/project/open-inwoner/task/1904
+        # In eSuite it is possible to reuse a StatusType for multiple ZaakTypen, which
+        # led to errors when retrieving the ZaakTypeStatusTypeConfig. This duplicate
+        # config is added to verify that that issue was solved
+        ZaakTypeStatusTypeConfigFactory.create(
+            statustype_url=self.status_type1["url"],
+            status_indicator=StatusIndicators.warning,
+            status_indicator_text="U moet documenten toevoegen",
+            description="Lorem ipsum dolor sit amet",
+            call_to_action_url="https://example.com",
+            call_to_action_text="duplicate",
+        )
+
         response = self.app.get(
             self.inner_url, user=self.user, headers={"HX-Request": "true"}
         )
@@ -390,6 +440,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
                     "identification": self.zaak2["identificatie"],
                     "description": self.zaaktype["omschrijving"],
                     "current_status": self.status_type1["omschrijving"],
+                    "zaaktype_config": self.zaaktype_config1,
                     "statustype_config": self.zt_statustype_config1,
                     "case_type": "Zaak",
                 },
@@ -400,6 +451,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
                     "identification": self.zaak1["identificatie"],
                     "description": self.zaaktype["omschrijving"],
                     "current_status": self.status_type1["omschrijving"],
+                    "zaaktype_config": self.zaaktype_config1,
                     "statustype_config": self.zt_statustype_config1,
                     "case_type": "Zaak",
                 },
@@ -410,6 +462,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
                     "identification": self.zaak3["identificatie"],
                     "description": self.zaaktype["omschrijving"],
                     "current_status": self.status_type2["omschrijving"],
+                    "zaaktype_config": self.zaaktype_config1,
                     "statustype_config": None,
                     "case_type": "Zaak",
                 },
@@ -438,6 +491,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
             },
         )
 
+    @set_kvk_branch_number_in_session(None)
     def test_list_cases_for_eherkenning_user(self, m):
         self._setUpMocks(m)
 
@@ -470,6 +524,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
                             "identification": self.zaak_eherkenning2["identificatie"],
                             "description": self.zaaktype["omschrijving"],
                             "current_status": self.status_type1["omschrijving"],
+                            "zaaktype_config": self.zaaktype_config1,
                             "statustype_config": self.zt_statustype_config1,
                             "case_type": "Zaak",
                         },
@@ -482,6 +537,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
                             "identification": self.zaak_eherkenning1["identificatie"],
                             "description": self.zaaktype["omschrijving"],
                             "current_status": self.status_type1["omschrijving"],
+                            "zaaktype_config": self.zaaktype_config1,
                             "statustype_config": self.zt_statustype_config1,
                             "case_type": "Zaak",
                         },
@@ -511,6 +567,78 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
                         ],
                         "maximalevertrouwelijkheidaanduiding": [
                             VertrouwelijkheidsAanduidingen.beperkt_openbaar
+                        ],
+                    },
+                )
+
+    @set_kvk_branch_number_in_session("1234")
+    def test_list_cases_for_eherkenning_user_with_vestigingsnummer(self, m):
+        """
+        If a KVK_BRANCH_NUMBER that is different from the KVK number is specified,
+        additional filtering by vestiging should be applied when retrieving zaken
+        """
+        self._setUpMocks(m)
+        self.client.force_login(user=self.eherkenning_user)
+
+        for fetch_eherkenning_zaken_with_rsin in [True, False]:
+            with self.subTest(
+                fetch_eherkenning_zaken_with_rsin=fetch_eherkenning_zaken_with_rsin
+            ):
+                self.config.fetch_eherkenning_zaken_with_rsin = (
+                    fetch_eherkenning_zaken_with_rsin
+                )
+                self.config.save()
+
+                m.reset_mock()
+
+                response = self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
+
+                self.assertListEqual(
+                    response.context["cases"],
+                    [
+                        {
+                            "uuid": self.zaak_eherkenning1["uuid"],
+                            "start_date": datetime.date.fromisoformat(
+                                self.zaak_eherkenning1["startdatum"]
+                            ),
+                            "end_date": None,
+                            "identification": self.zaak_eherkenning1["identificatie"],
+                            "description": self.zaaktype["omschrijving"],
+                            "current_status": self.status_type1["omschrijving"],
+                            "zaaktype_config": self.zaaktype_config1,
+                            "statustype_config": self.zt_statustype_config1,
+                            "case_type": "Zaak",
+                        },
+                    ],
+                )
+                # don't show internal cases
+                self.assertNotContains(response, self.zaak_intern["omschrijving"])
+                self.assertNotContains(response, self.zaak_intern["identificatie"])
+
+                # check zaken request query parameters
+                list_zaken_req = [
+                    req
+                    for req in m.request_history
+                    if req.hostname == "zaken.nl" and req.path == "/api/v1/zaken"
+                ][0]
+                identifier = (
+                    self.eherkenning_user.rsin
+                    if fetch_eherkenning_zaken_with_rsin
+                    else self.eherkenning_user.kvk
+                )
+
+                self.assertEqual(len(list_zaken_req.qs), 3)
+                self.assertEqual(
+                    list_zaken_req.qs,
+                    {
+                        "rol__betrokkeneidentificatie__nietnatuurlijkpersoon__innnnpid": [
+                            identifier
+                        ],
+                        "maximalevertrouwelijkheidaanduiding": [
+                            VertrouwelijkheidsAanduidingen.beperkt_openbaar
+                        ],
+                        "rol__betrokkeneidentificatie__vestiging__vestigingsnummer": [
+                            "1234"
                         ],
                     },
                 )
@@ -661,6 +789,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
                     "identification": self.zaak2["identificatie"],
                     "description": self.zaaktype["omschrijving"],
                     "current_status": self.status_type1["omschrijving"],
+                    "zaaktype_config": self.zaaktype_config1,
                     "statustype_config": self.zt_statustype_config1,
                     "case_type": "Zaak",
                 },
@@ -685,6 +814,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
                     "identification": self.zaak1["identificatie"],
                     "description": self.zaaktype["omschrijving"],
                     "current_status": self.status_type1["omschrijving"],
+                    "zaaktype_config": self.zaaktype_config1,
                     "statustype_config": self.zt_statustype_config1,
                     "case_type": "Zaak",
                 },

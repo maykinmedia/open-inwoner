@@ -20,7 +20,7 @@
         {% for log in logs %}
             {% with log.extra_data.message as log_message %}
             <tr>
-                <td class="table__item table__item--top">{{ log.timestamp|date:"d-m-Y" }}</td>
+                <td class="table__item table__item--top">{{ log.timestamp|date:"d F Y" }}</td>
                 <td class="table__item table__item--top">{{ log.user.get_full_name }}</td>
                 <td class="table__item">
                     {% if not log_message|is_list_instance %}

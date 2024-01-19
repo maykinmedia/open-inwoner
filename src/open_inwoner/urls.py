@@ -9,6 +9,7 @@ from django.views.generic import RedirectView
 
 from mozilla_django_oidc_db.views import AdminLoginFailure
 
+from digid_eherkenning_oidc_generics.views import OIDCFailureView
 from open_inwoner.accounts.forms import CustomRegistrationForm
 from open_inwoner.accounts.views import (
     AddPhoneNumberWizardView,
@@ -107,9 +108,23 @@ urlpatterns = [
     ),
     path("contactformulier/", ContactFormView.as_view(), name="contactform"),
     path("oidc/", include("mozilla_django_oidc.urls")),
+    path(
+        "digid-oidc/",
+        include(
+            "digid_eherkenning_oidc_generics.digid_urls",
+        ),
+    ),
+    path(
+        "eherkenning-oidc/",
+        include(
+            "digid_eherkenning_oidc_generics.eherkenning_urls",
+        ),
+    ),
+    path("login/failure/", OIDCFailureView.as_view(), name="oidc-error"),
     path("faq/", FAQView.as_view(), name="general_faq"),
     path("yubin/", include("django_yubin.urls")),
     path("apimock/", include("open_inwoner.apimock.urls")),
+    path("kvk/", include("open_inwoner.kvk.urls")),
     # TODO move search to products cms app?
     path("", include("open_inwoner.search.urls", namespace="search")),
     re_path(r"^", include("cms.urls")),

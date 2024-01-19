@@ -44,6 +44,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          submodules: 'true'
       - name: Set up backend environment
         uses: maykinmedia/setup-django-backend@v1
         with:
@@ -54,18 +56,13 @@ jobs:
           setup-node: 'yes'
           npm-ci-flags: '--legacy-peer-deps'
 
+      # We temporarily disable parallel test runs due to a Django bug:
+      # https://code.djangoproject.com/ticket/32114
+      # https://github.com/django/django/pull/17650
       - name: Run tests
         run: |
           python src/manage.py collectstatic --noinput --link
-          coverage run \
-            --concurrency=multiprocessing \
-            --parallel-mode \
-            src/manage.py test src \
-            --parallel \
-            --exclude-tag=e2e \
-            --exclude-tag=elastic
-          coverage run src/manage.py test src --tag=elastic --exclude-tag=e2e
-          coverage combine
+          coverage run src/manage.py test src --exclude-tag=e2e
 
         env:
           DJANGO_SETTINGS_MODULE: open_inwoner.conf.ci
@@ -116,6 +113,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          submodules: 'true'
       - name: Set up backend environment
         uses: maykinmedia/setup-django-backend@v1
         with:
@@ -160,6 +159,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: 'true'
 
       - name: Set tag
         id: vars

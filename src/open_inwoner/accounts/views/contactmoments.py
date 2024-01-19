@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from typing import List, TypedDict
 
@@ -11,13 +12,18 @@ from django.views.generic import TemplateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin
 
+from open_inwoner.kvk.branches import get_kvk_branch_number
 from open_inwoner.openklant.api_models import KlantContactMoment
 from open_inwoner.openklant.constants import Status
+from open_inwoner.openklant.models import ContactFormSubject, OpenKlantConfig
 from open_inwoner.openklant.wrap import (
-    fetch_klantcontactmoment_for_bsn,
-    fetch_klantcontactmomenten_for_bsn,
+    fetch_klantcontactmoment,
+    fetch_klantcontactmomenten,
+    get_fetch_parameters,
 )
 from open_inwoner.utils.views import CommonPageMixin
+
+logger = logging.getLogger(__name__)
 
 
 class KlantContactMomentAccessMixin(AccessMixin):
@@ -37,7 +43,7 @@ class KlantContactMomentAccessMixin(AccessMixin):
         if not request.user.is_authenticated:
             return self.handle_no_permission()
 
-        if not request.user.bsn:
+        if not request.user.bsn and not request.user.kvk:
             return self.handle_no_permission()
 
         # TODO more here?
@@ -75,10 +81,33 @@ class KlantContactMomentBaseView(
             # eSuite extra
             "identificatie": kcm.contactmoment.identificatie,
             "type": kcm.contactmoment.type,
-            "onderwerp": kcm.contactmoment.onderwerp,
             "status": Status.safe_label(kcm.contactmoment.status, _("Onbekend")),
             "antwoord": kcm.contactmoment.antwoord,
         }
+
+        # replace e_suite_subject_code with OIP configured subject, if applicable
+        e_suite_subject_code = getattr(kcm.contactmoment, "onderwerp", None)
+
+        if not e_suite_subject_code:
+            data["onderwerp"] = None
+        else:
+            try:
+                subject = ContactFormSubject.objects.get(
+                    subject_code=e_suite_subject_code
+                )
+            except (
+                ContactFormSubject.DoesNotExist,
+                ContactFormSubject.MultipleObjectsReturned,
+            ) as e:
+                logger.warning(
+                    "Could not determine subject ('onderwerp') for contactmoment %s (%s)",
+                    kcm.contactmoment.url,
+                    e,
+                )
+                data["onderwerp"] = None
+            else:
+                data["onderwerp"] = subject.subject
+
         return data
 
     def get_context_data(self, **kwargs):
@@ -104,7 +133,9 @@ class KlantContactMomentListView(KlantContactMomentBaseView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        kcms = fetch_klantcontactmomenten_for_bsn(self.request.user.bsn)
+        kcms = fetch_klantcontactmomenten(
+            **get_fetch_parameters(self.request, use_vestigingsnummer=True)
+        )
         ctx["contactmomenten"] = [self.get_kcm_data(kcm) for kcm in kcms]
         return ctx
 
@@ -127,9 +158,12 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        kcm = fetch_klantcontactmoment_for_bsn(
-            kwargs["kcm_uuid"], self.request.user.bsn
+
+        kcm = fetch_klantcontactmoment(
+            kwargs["kcm_uuid"],
+            **get_fetch_parameters(self.request, use_vestigingsnummer=True),
         )
+
         if not kcm:
             raise Http404()
 

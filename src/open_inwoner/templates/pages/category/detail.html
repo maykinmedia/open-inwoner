@@ -11,7 +11,7 @@
 
 {% block content %}
     <div class="categories__content">
-        <h1 class="h1">
+        <h1 class="utrecht-heading-1">
             {{ object.name }}
             {% if request.user.is_staff %}
                 {% button icon="edit" text=_("Open in admin") hide_text=True href="admin:pdc_category_change" object_id=object.pk %}
