@@ -27,7 +27,7 @@
                         {% endwith %}
                     </span>
                     {% endrender_list %}
-                    <span class="link link--icon link--secondary" aria-label="{% trans "Bekijk aanvraag" %}" title="{% trans "Bekijk aanvraag" %}">
+                    <span class="link link--icon link--secondary" aria-label="{% trans "Bekijk aanvraag" %}" title="{% trans "Ga naar aanvraag" %}">
                         <span class="link__text">{% trans "Bekijk aanvraag" %}</span>
                         {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
                     </span>
@@ -48,7 +48,7 @@
                         </span>
                     {% endrender_list %}
                     <span class="link link--icon link--secondary" aria-label="{% trans "Bekijk aanvraag" %}" title="{% trans "Bekijk aanvraag" %}">
-                        <span class="link__text">{% trans "Bekijk aanvraag" %}</span>
+                        <span class="link__text">{{ case.statustype_config.case_link_text }}</span>
                         {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
                     </span>
                     </a>

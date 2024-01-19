@@ -442,6 +442,15 @@ class ZaakTypeStatusTypeConfig(models.Model):
         verbose_name=_("Call to action text"),
         help_text=_("The text displayed on the call-to-action button"),
     )
+    case_link_text = models.CharField(
+        max_length=40,
+        blank=True,
+        default="",
+        verbose_name=_("Case link text"),
+        help_text=_(
+            "The text that will be shown in the button that links to a case's detail page"
+        ),
+    )
 
     class Meta:
         verbose_name = _("Zaaktype Statustype Configuration")

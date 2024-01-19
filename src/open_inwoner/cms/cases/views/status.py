@@ -213,6 +213,11 @@ class InnerCaseDetailView(
                         "call_to_action_text",
                         None,
                     ),
+                    "case_link_text": getattr(
+                        self.statustype_config_mapping.get(end_statustype.url),
+                        "case_link_text",
+                        _("Bekijk aanvraag"),
+                    ),
                 }
 
             result_data = self.get_result_data(
@@ -449,6 +454,11 @@ class InnerCaseDetailView(
                 ),
                 "description": getattr(
                     statustype_config_mapping.get(s.statustype.url), "description", None
+                ),
+                "case_link_text": getattr(
+                    statustype_config_mapping.get(s.statustype.url),
+                    "case_link_text",
+                    _("Bekijk aanvraag"),
                 ),
             }
             for s in statuses
