@@ -314,7 +314,7 @@ glom==20.11.0
     # via
     #   -r requirements/base.in
     #   mozilla-django-oidc-db
-greenlet==2.0.2
+greenlet==3.0.3
     # via playwright
 html5lib==1.1
     # via
@@ -385,19 +385,19 @@ pillow==10.1.0
     #   easy-thumbnails
     #   reportlab
     #   weasyprint
-playwright==1.38.0
+playwright==1.41.0
     # via -r requirements/base.in
 polib==1.1.1
     # via django-rosetta
 prompt-toolkit==3.0.36
     # via click-repl
-psycopg2==2.9.1
+psycopg2==2.9.5
     # via -r requirements/base.in
 pycparser==2.20
     # via cffi
 pydyf==0.1.2
     # via weasyprint
-pyee==9.0.4
+pyee==11.0.1
     # via playwright
 pyjwt==2.8.0
     # via
