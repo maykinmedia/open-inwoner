@@ -290,33 +290,93 @@ MAIL_EDITOR_CONF = {
             },
         ],
     },
-    "case_notification": {
-        "name": _("Case update notification"),
+    "case_status_notification": {
+        "name": _("Case status update notification"),
         "description": _(
-            "This email is used to notify people an update happened to their case"
+            "This email is used to notify people about a new status being set on their case"
         ),
-        "subject_default": "Update to your case at {{ site_name }}",
+        "subject_default": "Uw zaak is bijgewerkt op {{ site_name }}",
         "body_default": """
             <p>Beste</p>
 
-            <p>You are receiving this email because one of your cases received a new status update or document attachment.</p>
+            <p>U ontvangt deze email, omdat de status van een van uw zaken is bijgewerkt.</p>
 
             <table>
                 <tr>
-                    <th>Case identification</th>
+                    <th>Zaakidentificatie</th>
                     <td>{{ identification }}</td>
                 </tr>
                 <tr>
-                    <th>Case type</th>
+                    <th>Zaaktype</th>
                     <td>{{ type_description }}</td>
                 </tr>
                 <tr>
-                    <th>Start date</th>
+                    <th>Startdatum</th>
                     <td>{{ start_date }}</td>
                 </tr>
             </table>
 
-            <p><a href="{{ case_link }}">Go to your case</a> </p>
+            <p><a href="{{ case_link }}">Ga naar uw zaak</a> </p>
+
+            <p>Met vriendelijke groet,
+            {{ site_name }} </p>
+       """,
+        "subject": [
+            {
+                "name": "site_name",
+                "description": _("Name of the site."),
+            },
+        ],
+        "body": [
+            {
+                "name": "identification",
+                "description": _("The identification of the case"),
+            },
+            {
+                "name": "type_description",
+                "description": _("The description of the type of the case"),
+            },
+            {
+                "name": "start_date",
+                "description": _("The start date of the case"),
+            },
+            {
+                "name": "case_link",
+                "description": _("The link to the case details."),
+            },
+            {
+                "name": "site_name",
+                "description": _("Name of the site"),
+            },
+        ],
+    },
+    "case_document_notification": {
+        "name": _("Case document update notification"),
+        "description": _(
+            "This email is used to notify people that a new document was added to their case"
+        ),
+        "subject_default": "Uw zaak is bijgewerkt op {{ site_name }}",
+        "body_default": """
+            <p>Beste</p>
+
+            <p>U ontvangt deze email, omdat er bij een van uw zaken een document als bijlage is toegevoegd.</p>
+
+            <table>
+                <tr>
+                    <th>Zaakidentificatie</th>
+                    <td>{{ identification }}</td>
+                </tr>
+                <tr>
+                    <th>Zaaktype</th>
+                    <td>{{ type_description }}</td>
+                </tr>
+                <tr>
+                    <th>Startdatum</th>
+                    <td>{{ start_date }}</td>
+                </tr>
+            </table>
+
+            <p><a href="{{ case_link }}">Ga naar uw zaak</a> </p>
 
             <p>Met vriendelijke groet,
             {{ site_name }} </p>
