@@ -13,6 +13,8 @@ class PyHashTest(TestCase):
         self.assertEqual(pyhash_value("123"), pyhash_value("123"))
         self.assertEqual(pyhash_value(True), pyhash_value(True))
 
+        self.assertNotEqual(pyhash_value(123), pyhash_value(456))
+
         self.assertEqual(
             # list
             pyhash_value([1, 2, 3]),
@@ -46,6 +48,11 @@ class PyHashTest(TestCase):
             pyhash_value({"a": (1, 2, 3), "b": "xyz"}),
             pyhash_value({"b": "xyz", "a": (1, 2, 3)}),
         )
+        self.assertEqual(
+            # mixed key types
+            pyhash_value({"a": 1, 44: 55}),
+            pyhash_value({44: 55, "a": 1}),
+        )
         uuid = str(uuid4())
         self.assertEqual(
             # any hashable
@@ -56,6 +63,11 @@ class PyHashTest(TestCase):
             # nested kitchensink
             pyhash_value({"a": {"b": (1, date(2022, 1, 1), UUID(uuid))}}),
             pyhash_value({"a": {"b": (1, date(2022, 1, 1), UUID(uuid))}}),
+        )
+        self.assertNotEqual(
+            # nested kitchensink
+            pyhash_value({"a": {"b": (1, date(2022, 1, 1), UUID(uuid))}}),
+            pyhash_value({"a": {"b": (2, date(2022, 1, 1), UUID(uuid))}}),
         )
         with self.assertRaises(TypeError):
             # try an unsupported un-hashable

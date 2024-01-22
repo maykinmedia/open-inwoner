@@ -43,16 +43,17 @@ def pyhash_value(value) -> int:
     except TypeError as e:
         if isinstance(value, dict):
             # convert dict to hashable tuple of key-value tuples
-            elems = list()
-            for k in sorted(value.keys()):
-                elems.append((k, pyhash_value(value[k])))
+            # sort the *hashed* keys to support mixed key types
+            elems = sorted(
+                ((pyhash_value(k), pyhash_value(v)) for k, v in value.items())
+            )
             return hash(tuple(elems))
-
         elif isinstance(value, (list, tuple)):
             # convert list to hashable tuple
             return hash(tuple(map(pyhash_value, value)))
         elif isinstance(value, set):
             # convert set to sorted hashable tuple
+            # sort *hashes* to support mixed value types
             return hash(tuple(sorted(map(pyhash_value, value))))
         else:
             # we could add more support (dataclasses), but for now lets reraise
