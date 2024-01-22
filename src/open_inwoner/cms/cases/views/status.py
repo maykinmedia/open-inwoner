@@ -34,6 +34,7 @@ from open_inwoner.openzaak.cases import (
     fetch_case_information_objects_for_case_and_info,
     fetch_case_roles,
     fetch_single_result,
+    fetch_single_status,
     fetch_status_history,
 )
 from open_inwoner.openzaak.catalog import (
@@ -167,7 +168,12 @@ class InnerCaseDetailView(
                 status_types[status.statustype].append(status)
                 if self.case.status == status.url:
                     self.case.status = status
-
+            
+            if type(self.case.status) == str:
+                logger.info("Issue #2037 -- Retrieving status individually to deal with the situation where eSuite doesnt return current status as part of statuslist retrieval")
+                self.case.status = fetch_single_status(self.case.status)
+                status_types[self.case.status.statustype].append(self.case.status)
+                    
             for status_type_url, _statuses in list(status_types.items()):
                 # todo parallel
                 status_type = fetch_single_status_type(status_type_url)
@@ -317,21 +323,23 @@ class InnerCaseDetailView(
             enabled_for_status_type = self.statustype_config_mapping[
                 self.case.status.statustype.url
             ].document_upload_enabled
-        except AttributeError:
+        except AttributeError as e:
+            logger.exception(e)
             logger.info(
                 "Could not retrieve status type for case {case}; "
                 "the status has not been resolved to a ZGW model object.".format(
                     case=self.case
                 )
             )
-            return False
-        except KeyError:
+            return True
+        except KeyError as e:
+            logger.exception(e)
             logger.info(
                 "Could not retrieve status type config for url {url}".format(
                     url=self.case.status.statustype.url
                 )
             )
-            return False
+            return True
         logger.info(
             "Case {url} status type {status_type} has status type file upload: {enabled_for_status_type}".format(
                 url=self.case.url,
