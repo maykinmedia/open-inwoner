@@ -6,9 +6,9 @@ from typing import List, Optional
 from requests import RequestException
 from zds_client import ClientError
 from zgw_consumers.api_models.base import Model, factory
-from zgw_consumers.service import get_paginated_results
 
 from open_inwoner.openzaak.clients import build_client
+from open_inwoner.utils.api import get_paginated_results
 
 logger = logging.getLogger(__name__)
 
@@ -54,8 +54,8 @@ def fetch_open_submissions(bsn: str) -> List[OpenSubmission]:
     try:
         response = get_paginated_results(
             client,
-            "opensubmission",
-            request_kwargs={"params": {"bsn": bsn}},
+            "openstaande-inzendingen",
+            params={"bsn": bsn},
         )
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)

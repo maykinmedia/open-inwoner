@@ -8,6 +8,7 @@ from urllib.parse import urljoin
 from glom import GlomError, glom
 from requests import RequestException
 from zds_client import ClientError
+from zgw_consumers.client import build_client
 
 from open_inwoner.haalcentraal.api_models import BRPData
 from open_inwoner.haalcentraal.models import HaalCentraalConfig
@@ -24,7 +25,7 @@ class BRPAPI(ABC):
         if not self.config.service:
             logger.warning("no service defined for Haal Centraal")
         else:
-            self.client = self.config.service.build_client()
+            self.client = build_client(self.config.service)
             self._is_ready = True
 
     @abc.abstractmethod
@@ -71,23 +72,20 @@ class BRP_1_3(BRPAPI):
             headers["x-doelbinding"] = self.config.api_doelbinding
 
         try:
-            data = self.client.retrieve(
-                "ingeschrevenpersonen",
+            data = self.client.get(
                 url=url,
-                request_kwargs=dict(
-                    headers=headers,
-                    params={
-                        "fields": "geslachtsaanduiding,"
-                        "naam.voornamen,naam.geslachtsnaam,naam.voorletters,naam.voorvoegsel,"
-                        "verblijfplaats.straat,verblijfplaats.huisletter,"
-                        "verblijfplaats.huisnummertoevoeging,verblijfplaats.woonplaats,"
-                        "verblijfplaats.postcode,verblijfplaats.land.omschrijving,"
-                        "geboorte.datum.datum,geboorte.plaats.omschrijving"
-                    },
-                    verify=False,
-                ),
+                headers=headers,
+                params={
+                    "fields": "geslachtsaanduiding,"
+                    "naam.voornamen,naam.geslachtsnaam,naam.voorletters,naam.voorvoegsel,"
+                    "verblijfplaats.straat,verblijfplaats.huisletter,"
+                    "verblijfplaats.huisnummertoevoeging,verblijfplaats.woonplaats,"
+                    "verblijfplaats.postcode,verblijfplaats.land.omschrijving,"
+                    "geboorte.datum.datum,geboorte.plaats.omschrijving"
+                },
+                verify=False,
             )
-            return data
+            return data.json()
         except (RequestException, ClientError) as e:
             logger.exception("exception while making request", exc_info=e)
             return None
@@ -121,8 +119,7 @@ class BRP_2_1(BRPAPI):
     def fetch_data(self, user_bsn: str) -> Optional[dict]:
         url = urljoin(self.client.base_url, "personen")
         try:
-            data = self.client.operation(
-                operation_id="GetPersonen",
+            data = self.client.post(
                 url=url,
                 data={
                     "fields": [
@@ -143,11 +140,10 @@ class BRP_2_1(BRPAPI):
                     "type": "RaadpleegMetBurgerservicenummer",
                     "burgerservicenummer": [user_bsn],
                 },
-                request_kwargs=dict(
-                    headers={"Accept": "application/json"}, verify=False
-                ),
+                headers={"Accept": "application/json"},
+                verify=False,
             )
-            return data
+            return data.json()
         except (RequestException, ClientError) as e:
             logger.exception("exception while making request", exc_info=e)
             return None

@@ -7,12 +7,12 @@ from requests import RequestException
 from zds_client import ClientError
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.catalogi import Catalogus
-from zgw_consumers.service import get_paginated_results
+
+from open_inwoner.utils.api import get_paginated_results
 
 from ..utils.decorators import cache as cache_result
 from .api_models import InformatieObjectType, ResultaatType, StatusType, ZaakType
 from .clients import build_client
-from .utils import get_retrieve_resource_by_uuid_url
 
 logger = logging.getLogger(__name__)
 
@@ -28,8 +28,8 @@ def fetch_status_types_no_cache(case_type_url: str) -> List[StatusType]:
     try:
         response = get_paginated_results(
             client,
-            "statustype",
-            request_kwargs={"params": {"zaaktype": case_type_url}},
+            "statustypen",
+            params={"zaaktype": case_type_url},
         )
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
@@ -51,8 +51,8 @@ def fetch_result_types_no_cache(case_type_url: str) -> List[ResultaatType]:
     try:
         response = get_paginated_results(
             client,
-            "resultaattype",
-            request_kwargs={"params": {"zaaktype": case_type_url}},
+            "resultaattypen",
+            params={"zaaktype": case_type_url},
         )
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
@@ -73,7 +73,7 @@ def fetch_single_status_type(status_type_url: str) -> Optional[StatusType]:
         return
 
     try:
-        response = client.retrieve("statustype", url=status_type_url)
+        response = client.get(url=status_type_url).json()
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
@@ -93,7 +93,7 @@ def fetch_single_resultaat_type(resultaat_type_url: str) -> Optional[ResultaatTy
         return
 
     try:
-        response = client.retrieve("resultaattype", url=resultaat_type_url)
+        response = client.get(url=resultaat_type_url).json()
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
@@ -115,7 +115,7 @@ def fetch_zaaktypes_no_cache() -> List[ZaakType]:
         return []
 
     try:
-        response = get_paginated_results(client, "zaaktype")
+        response = get_paginated_results(client, "zaaktypen")
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return []
@@ -144,8 +144,8 @@ def fetch_case_types_by_identification_no_cache(
 
         response = get_paginated_results(
             client,
-            "zaaktype",
-            request_kwargs={"params": params},
+            "zaaktypen",
+            params=params,
         )
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
@@ -167,8 +167,7 @@ def fetch_single_case_type_uuid(uuid: str) -> Optional[ZaakType]:
         return None
 
     # make url to use same cache
-    url = get_retrieve_resource_by_uuid_url(client, "zaaktype", uuid)
-    return fetch_single_case_type(url)
+    return fetch_single_case_type(f"zaaktypen/{uuid}")
 
 
 @cache_result("case_type:{case_type_url}", timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT)
@@ -179,7 +178,7 @@ def fetch_single_case_type(case_type_url: str) -> Optional[ZaakType]:
         return
 
     try:
-        response = client.retrieve("zaaktype", url=case_type_url)
+        response = client.get(url=case_type_url).json()
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
@@ -201,7 +200,7 @@ def fetch_catalogs_no_cache() -> List[Catalogus]:
     try:
         response = get_paginated_results(
             client,
-            "catalogus",
+            "catalogussen",
         )
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
@@ -225,9 +224,7 @@ def fetch_single_information_object_type(
         return
 
     try:
-        response = client.retrieve(
-            "informatieobjecttype", url=information_object_type_url
-        )
+        response = client.get(url=information_object_type_url).json()
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return

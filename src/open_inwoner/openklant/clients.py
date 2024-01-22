@@ -1,14 +1,15 @@
 import logging
 from typing import Optional
 
-from zgw_consumers.client import ZGWClient
+from ape_pie.client import APIClient
+from zgw_consumers.client import build_client as _build_client
 
 from .models import OpenKlantConfig
 
 logger = logging.getLogger(__name__)
 
 
-def build_client(type_) -> Optional[ZGWClient]:
+def build_client(type_) -> Optional[APIClient]:
     config = OpenKlantConfig.get_solo()
     services = {
         "klanten",
@@ -17,7 +18,7 @@ def build_client(type_) -> Optional[ZGWClient]:
     if type_ in services:
         service = getattr(config, f"{type_}_service")
         if service:
-            client = service.build_client()
+            client = _build_client(service)
             return client
 
     logger.warning(f"no service defined for {type_}")

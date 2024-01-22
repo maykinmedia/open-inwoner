@@ -11,6 +11,7 @@ import requests
 from requests import HTTPError, RequestException, Response
 from zds_client import ClientError
 from zgw_consumers.api_models.base import factory
+from zgw_consumers.client import build_client
 
 from open_inwoner.openzaak.api_models import InformatieObject
 from open_inwoner.openzaak.clients import build_client
@@ -44,9 +45,9 @@ def _fetch_single_information_object(
 
     try:
         if url:
-            response = client.retrieve("enkelvoudiginformatieobject", url=url)
+            response = client.get(url=url).json()
         else:
-            response = client.retrieve("enkelvoudiginformatieobject", uuid=uuid)
+            response = client.get(f"enkelvoudiginformatieobjecten/{uuid}").json()
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
@@ -57,18 +58,18 @@ def _fetch_single_information_object(
 
 
 def download_document(url: str) -> Optional[Response]:
-    config = OpenZaakConfig.get_solo()
-    client = config.document_service.build_client()
+    client = build_client("document")
     if client is None:
         return
 
+    config = OpenZaakConfig.get_solo()
     service = config.document_service
 
     req_args = {}
 
     # copy/emulate auth and certs from ZGW Consumers / ZDS Client
     if client.auth:
-        req_args["headers"] = client.auth.credentials()
+        req_args["headers"] = client.auth.auth.credentials()
 
     if service.server_certificate:
         req_args["verify"] = service.server_certificate.public_certificate.path
@@ -118,7 +119,9 @@ def upload_document(
     }
 
     try:
-        response = client.create("enkelvoudiginformatieobject", document_body)
+        response = client.post(
+            "enkelvoudiginformatieobjecten", json=document_body
+        ).json()
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return

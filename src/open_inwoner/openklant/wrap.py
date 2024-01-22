@@ -4,7 +4,6 @@ from typing import List, Optional
 from requests import RequestException
 from zds_client import ClientError
 from zgw_consumers.api_models.base import factory
-from zgw_consumers.service import get_paginated_results
 
 from open_inwoner.accounts.models import User
 from open_inwoner.kvk.branches import get_kvk_branch_number
@@ -20,6 +19,7 @@ from open_inwoner.openklant.api_models import (
 from open_inwoner.openklant.clients import build_client
 from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.openzaak.cases import fetch_case_by_url_no_cache
+from open_inwoner.utils.api import get_paginated_results
 
 logger = logging.getLogger(__name__)
 
@@ -156,8 +156,8 @@ def _fetch_klanten_for_bsn(user_bsn: str, *, client=None) -> List[Klant]:
     try:
         response = get_paginated_results(
             client,
-            "klant",
-            request_kwargs={"params": {"subjectNatuurlijkPersoon__inpBsn": user_bsn}},
+            "klanten",
+            params={"subjectNatuurlijkPersoon__inpBsn": user_bsn},
         )
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
@@ -185,8 +185,8 @@ def _fetch_klanten_for_kvk_or_rsin(
     try:
         response = get_paginated_results(
             client,
-            "klant",
-            request_kwargs={"params": params},
+            "klanten",
+            params=params,
         )
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
@@ -226,8 +226,8 @@ def _fetch_klantcontactmomenten_for_klant(
     try:
         response = get_paginated_results(
             client,
-            "klantcontactmoment",
-            request_kwargs={"params": {"klant": klant.url}},
+            "klantcontactmomenten",
+            params={"klant": klant.url},
         )
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
@@ -250,7 +250,7 @@ def _fetch_contactmoment(url, *, client=None) -> Optional[ContactMoment]:
         return
 
     try:
-        response = client.retrieve("contactmoment", url=url)
+        response = client.get(url).json()
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
@@ -266,7 +266,7 @@ def create_klant(data: KlantCreateData) -> Optional[Klant]:
         return
 
     try:
-        response = client.create("klant", data=data)
+        response = client.post("klanten", json=data).json()
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
@@ -286,7 +286,7 @@ def patch_klant(klant: Klant, update_data) -> Optional[Klant]:
         return
 
     try:
-        response = client.partial_update("klant", url=klant.url, data=update_data)
+        response = client.patch(url=klant.url, json=update_data).json()
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
@@ -307,7 +307,7 @@ def create_contactmoment(
         return
 
     try:
-        response = client.create("contactmoment", data=data)
+        response = client.post("contactmomenten", json=data).json()
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
@@ -317,14 +317,14 @@ def create_contactmoment(
     if klant:
         # relate contact to klant though a klantcontactmoment
         try:
-            response = client.create(
-                "klantcontactmoment",
-                data={
+            response = client.post(
+                "klantcontactmomenten",
+                json={
                     "klant": klant.url,
                     "contactmoment": contactmoment.url,
                     "rol": rol,
                 },
-            )
+            ).json()
         except (RequestException, ClientError) as e:
             logger.exception("exception while making request", exc_info=e)
             return

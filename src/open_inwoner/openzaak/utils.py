@@ -133,20 +133,6 @@ def get_zaak_type_info_object_type_config(
         return None
 
 
-def get_retrieve_resource_by_uuid_url(
-    client, resource: str, uuid: Union[str, UUID]
-) -> str:
-    op_suffix = client.operation_suffix_mapping["retrieve"]
-    operation_id = f"{resource}{op_suffix}"
-    path_kwargs = {
-        "uuid": uuid,
-    }
-    url = get_operation_url(
-        client.schema, operation_id, base_url=client.base_url, **path_kwargs
-    )
-    return url
-
-
 def translate_single_status(status_text: str) -> str:
     if not status_text:
         return ""

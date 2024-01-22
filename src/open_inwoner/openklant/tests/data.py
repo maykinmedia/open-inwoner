@@ -389,7 +389,7 @@ class MockAPICreateData(MockAPIData):
         self.setUpOASMocks(m)
 
         self.matchers = [
-            m.post(f"{KLANTEN_ROOT}klanten", json=self.klant, status_code=500),
+            m.post(f"{KLANTEN_ROOT}klanten", status_code=500),
             m.post(
                 f"{CONTACTMOMENTEN_ROOT}contactmomenten",
                 json=self.contactmoment,
