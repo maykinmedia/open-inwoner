@@ -100,7 +100,7 @@
       }
     }
 
-    .p--centered.error {
+    .error {
       color: var(--color-red-notification);
       display: flex;
       align-items: normal;
@@ -109,7 +109,6 @@
 
       [class*='icon'] {
         color: var(--color-red-notification);
-        font-size: var(--font-size-body-large);
       }
     }
   }
