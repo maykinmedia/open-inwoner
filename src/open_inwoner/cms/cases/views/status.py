@@ -168,12 +168,14 @@ class InnerCaseDetailView(
                 status_types[status.statustype].append(status)
                 if self.case.status == status.url:
                     self.case.status = status
-            
+
             if type(self.case.status) == str:
-                logger.info("Issue #2037 -- Retrieving status individually to deal with the situation where eSuite doesnt return current status as part of statuslist retrieval")
+                logger.info(
+                    "Issue #2037 -- Retrieving status individually to deal with the situation where eSuite doesnt return current status as part of statuslist retrieval"
+                )
                 self.case.status = fetch_single_status(self.case.status)
                 status_types[self.case.status.statustype].append(self.case.status)
-                    
+
             for status_type_url, _statuses in list(status_types.items()):
                 # todo parallel
                 status_type = fetch_single_status_type(status_type_url)
