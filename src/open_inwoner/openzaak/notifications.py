@@ -247,7 +247,7 @@ def handle_zaakinformatieobject_update(
         )
         return
 
-    send_case_update_email(user, case)
+    send_case_update_email(user, case, "case_document_notification")
     note.mark_sent()
 
     log_system_action(
@@ -387,7 +387,7 @@ def handle_status_update(user: User, case: Zaak, status: Status):
         )
         return
 
-    send_case_update_email(user, case)
+    send_case_update_email(user, case, "case_status_notification")
     note.mark_sent()
 
     log_system_action(
@@ -396,7 +396,9 @@ def handle_status_update(user: User, case: Zaak, status: Status):
     )
 
 
-def send_case_update_email(user: User, case: Zaak):
+def send_case_update_email(
+    user: User, case: Zaak, template_name: str, extra_context: dict = None
+):
     """
     send the actual mail
     """
@@ -404,13 +406,15 @@ def send_case_update_email(user: User, case: Zaak):
         reverse("cases:case_detail", kwargs={"object_id": str(case.uuid)})
     )
 
-    template = find_template("case_notification")
+    template = find_template(template_name)
     context = {
         "identification": case.identification,
         "type_description": case.zaaktype.omschrijving,
         "start_date": case.startdatum,
         "case_link": case_detail_url,
     }
+    if extra_context:
+        context.update(extra_context)
     template.send_email([user.email], context)
 
 
