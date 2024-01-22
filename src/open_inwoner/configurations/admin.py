@@ -216,7 +216,15 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                 )
             },
         ),
-        (_("Emails"), {"fields": ("email_new_message",)}),
+        (
+            _("Emails"),
+            {
+                "fields": (
+                    "email_new_message",
+                    "recipients_email_digest",
+                )
+            },
+        ),
         (
             _("Openid Connect"),
             {
