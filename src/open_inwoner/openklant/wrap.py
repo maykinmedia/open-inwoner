@@ -99,8 +99,8 @@ def _fetch_objectcontactmomenten_for_contactmoment(
     try:
         response = get_paginated_results(
             client,
-            "objectcontactmoment",
-            request_kwargs={"params": {"contactmoment": contactmoment.url}},
+            "objectcontactmomenten",
+            params={"contactmoment": contactmoment.url},
         )
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)

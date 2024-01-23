@@ -10,7 +10,6 @@ from freezegun import freeze_time
 from furl import furl
 from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 from zgw_consumers.constants import APITypes
-from zgw_consumers.test import mock_service_oas_get
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
@@ -159,8 +158,6 @@ class OpenCaseListCacheTests(ClearCachesMixin, WebTest):
         )
 
     def _setUpMocks(self, m):
-        mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
-        mock_service_oas_get(m, CATALOGI_ROOT, "ztc")
         m.get(
             furl(f"{ZAKEN_ROOT}zaken")
             .add(

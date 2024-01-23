@@ -12,7 +12,6 @@ from zgw_consumers.api_models.constants import (
     VertrouwelijkheidsAanduidingen,
 )
 from zgw_consumers.constants import APITypes
-from zgw_consumers.test import mock_service_oas_get
 
 from open_inwoner.accounts.tests.factories import DigidUserFactory
 from open_inwoner.cms.tests import cms_tools
@@ -315,11 +314,6 @@ class CasesPlaywrightTests(
         )
 
     def _setUpMocks(self, m):
-        mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
-        mock_service_oas_get(m, CATALOGI_ROOT, "ztc")
-        mock_service_oas_get(m, DOCUMENTEN_ROOT, "drc")
-        MockAPIData.setUpOASMocks(m)
-
         self.matchers = []
 
         for resource in [

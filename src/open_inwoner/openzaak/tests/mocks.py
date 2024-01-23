@@ -1,5 +1,3 @@
-from zgw_consumers.test import mock_service_oas_get
-
 from open_inwoner.openzaak.tests.shared import FORMS_ROOT
 
 
@@ -30,11 +28,7 @@ class ESuiteData:
             ],
         }
 
-    def setUpOASMocks(self, m):
-        mock_service_oas_get(m, FORMS_ROOT, "submissions-esuite")
-
     def install_mocks(self, m):
-        self.setUpOASMocks(m)
         m.get(
             f"{FORMS_ROOT}openstaande-inzendingen",
             json=self.response,

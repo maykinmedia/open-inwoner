@@ -12,7 +12,6 @@ from furl import furl
 from timeline_logger.models import TimelineLog
 from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 from zgw_consumers.constants import APITypes
-from zgw_consumers.test import mock_service_oas_get
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory, eHerkenningUserFactory
@@ -110,7 +109,6 @@ class CaseListAccessTests(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         user = UserFactory(
             login_type=LoginTypeChoices.digid, bsn="900222086", email="john@smith.nl"
         )
-        mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
         m.get(
             f"{ZAKEN_ROOT}zaken?rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn=900222086",
             status_code=404,
@@ -127,7 +125,6 @@ class CaseListAccessTests(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         user = UserFactory(
             login_type=LoginTypeChoices.digid, bsn="900222086", email="john@smith.nl"
         )
-        mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
         m.get(
             f"{ZAKEN_ROOT}zaken?rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn=900222086",
             status_code=500,
@@ -355,8 +352,6 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
         )
 
     def _setUpMocks(self, m):
-        mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
-        mock_service_oas_get(m, CATALOGI_ROOT, "ztc")
         m.get(
             furl(f"{ZAKEN_ROOT}zaken")
             .add(

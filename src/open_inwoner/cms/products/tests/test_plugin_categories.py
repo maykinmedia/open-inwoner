@@ -11,7 +11,6 @@ from furl import furl
 from requests import RequestException
 from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 from zgw_consumers.constants import APITypes
-from zgw_consumers.test import mock_service_oas_get
 
 from open_inwoner.accounts.tests.factories import (
     DigidUserFactory,
@@ -555,14 +554,7 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
             relevante_zaakperiode=2,
         )
 
-    def _setUpOASMocks(self, m):
-        mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
-        mock_service_oas_get(m, CATALOGI_ROOT, "ztc")
-        mock_service_oas_get(m, DOCUMENTEN_ROOT, "drc")
-
     def _setUpMocks(self, m):
-        self._setUpOASMocks(m)
-
         for resource in [
             self.zaak,
             self.zaak2,

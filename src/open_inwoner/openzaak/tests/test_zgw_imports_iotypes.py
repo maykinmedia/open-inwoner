@@ -4,7 +4,6 @@ from django.test import TestCase
 
 import requests_mock
 from zgw_consumers.constants import APITypes
-from zgw_consumers.test import mock_service_oas_get
 
 from open_inwoner.openzaak.models import (
     OpenZaakConfig,
@@ -201,12 +200,7 @@ class InformationObjectTypeMockData:
             self.resultaat_type_1,
         ]
 
-    def setUpOASMocks(self, m):
-        mock_service_oas_get(m, CATALOGI_ROOT, "ztc")
-
     def install_mocks(self, m, *, with_catalog=True) -> "InformationObjectTypeMockData":
-        self.setUpOASMocks(m)
-
         for resource in [
             self.info_type_aaa_1,
             self.info_type_bbb,

@@ -17,7 +17,6 @@ from zgw_consumers.api_models.constants import (
     VertrouwelijkheidsAanduidingen,
 )
 from zgw_consumers.constants import APITypes, AuthTypes
-from zgw_consumers.test import mock_service_oas_get
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
@@ -167,14 +166,8 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
             ),
         )
 
-    def _setUpOASMocks(self, m):
-        mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
-        mock_service_oas_get(m, CATALOGI_ROOT, "ztc")
-        mock_service_oas_get(m, DOCUMENTEN_ROOT, "drc")
-
     def _setUpAccessMocks(self, m):
         # the minimal mocks needed to be able to access the information object
-        self._setUpOASMocks(m)
         m.get(self.zaak["url"], json=self.zaak)
         m.get(
             f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}",
@@ -307,13 +300,11 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
         self.app.get(self.informatie_object_file.url, user=user, status=403)
 
     def test_no_data_is_retrieved_when_case_object_http_404(self, m):
-        self._setUpOASMocks(m)
         m.get(self.zaak["url"], status_code=404)
 
         self.app.get(self.informatie_object_file.url, user=self.user, status=404)
 
     def test_no_data_is_retrieved_when_no_related_roles_are_found_for_user_bsn(self, m):
-        self._setUpOASMocks(m)
         m.get(self.zaak["url"], json=self.zaak)
         m.get(
             f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}",
@@ -323,7 +314,6 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
         self.app.get(self.informatie_object_file.url, user=self.user, status=403)
 
     def test_no_data_is_retrieved_when_zaaktype_is_internal(self, m):
-        self._setUpOASMocks(m)
         m.get(self.zaak["url"], json=self.zaak)
         m.get(
             f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}",
@@ -340,7 +330,6 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
         self.app.get(self.informatie_object_file.url, user=self.user, status=403)
 
     def test_no_data_is_retrieved_when_no_matching_case_info_object_is_found(self, m):
-        self._setUpOASMocks(m)
         m.get(self.zaak["url"], json=self.zaak)
         m.get(
             f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}",

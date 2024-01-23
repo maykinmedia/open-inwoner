@@ -2,7 +2,7 @@ from django.test import TestCase
 
 import requests_mock
 from zgw_consumers.constants import APITypes
-from zgw_consumers.test import generate_oas_component, mock_service_oas_get
+from zgw_consumers.test import generate_oas_component
 
 from open_inwoner.openzaak.models import CatalogusConfig, OpenZaakConfig, ZaakTypeConfig
 from open_inwoner.openzaak.tests.factories import CatalogusConfigFactory, ServiceFactory
@@ -41,11 +41,7 @@ class CatalogMockData:
             rsin="123456789",
         )
 
-    def setUpOASMocks(self, m):
-        mock_service_oas_get(m, CATALOGI_ROOT, "ztc")
-
     def install_mocks(self, m) -> "CatalogMockData":
-        self.setUpOASMocks(m)
         m.get(
             f"{CATALOGI_ROOT}catalogussen",
             json=paginated_response(self.catalogs),
@@ -123,12 +119,7 @@ class ZaakTypeMockData:
             self.extra_zaaktype,
         ]
 
-    def setUpOASMocks(self, m):
-        mock_service_oas_get(m, CATALOGI_ROOT, "ztc")
-
     def install_mocks(self, m, *, with_catalog=True) -> "ZaakTypeMockData":
-        self.setUpOASMocks(m)
-
         if not with_catalog:
             for zt in self.all_zaak_types:
                 zt["catalogus"] = None

@@ -3,7 +3,6 @@ from django.test import RequestFactory, override_settings
 
 import requests_mock
 from django_webtest import WebTest
-from zgw_consumers.test import generate_oas_component
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.models import User
@@ -41,8 +40,6 @@ class UpdateUserFromLoginSignalAPITestCase(
         )
 
     def test_update_user_after_login(self, m):
-        MockAPIReadData.setUpOASMocks(m)
-
         m.get(
             f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn=999993847",
             json=paginated_response([self.klant]),
@@ -70,8 +67,6 @@ class UpdateUserFromLoginSignalAPITestCase(
         )
 
     def test_update_eherkenning_user_after_login(self, m):
-        MockAPIReadData.setUpOASMocks(m)
-
         user = eHerkenningUserFactory(
             phonenumber="0123456789",
             email="old@example.com",
@@ -117,8 +112,6 @@ class UpdateUserFromLoginSignalAPITestCase(
                 )
 
     def test_update_user_after_login_skips_existing_email(self, m):
-        MockAPIReadData.setUpOASMocks(m)
-
         m.get(
             f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn=999993847",
             json=paginated_response([self.klant]),
