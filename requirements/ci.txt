@@ -23,7 +23,7 @@ asgiref==3.4.1
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django
-astroid==2.8.0
+astroid==2.15.8
     # via pylint
 attrs==21.2.0
     # via
@@ -135,6 +135,8 @@ diff-match-patch==20200713
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-import-export
+dill==0.3.7
+    # via pylint
 django==3.2.23
     # via
     #   -c requirements/base.txt
@@ -469,7 +471,12 @@ easy-thumbnails[svg]==2.8.5
     #   django-filer
     #   djangocms-picture
     #   easy-thumbnails
-elastic-apm==6.4.0
+ecs-logging==2.1.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   elastic-apm
+elastic-apm==6.20.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -723,7 +730,7 @@ pyjwt==2.8.0
     #   -r requirements/base.txt
     #   gemma-zds-client
     #   messagebird
-pylint==2.11.1
+pylint==2.17.7
     # via -r requirements/test-tools.in
 pyopenssl==23.3.0
     # via
@@ -875,7 +882,7 @@ tinycss2==1.1.1
     #   cssselect2
     #   svglib
     #   weasyprint
-toml==0.10.2
+tomlkit==0.12.3
     # via pylint
 typing-extensions==4.4.0
     # via
@@ -929,8 +936,12 @@ webob==1.8.7
     # via webtest
 webtest==3.0.0
     # via django-webtest
-wrapt==1.12.1
-    # via astroid
+wrapt==1.14.1
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   astroid
+    #   elastic-apm
 xlrd==2.0.1
     # via
     #   -c requirements/base.txt

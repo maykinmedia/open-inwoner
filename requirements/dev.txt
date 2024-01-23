@@ -25,7 +25,7 @@ asgiref==3.4.1
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django
-astroid==2.8.0
+astroid==2.15.8
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -164,6 +164,11 @@ diff-match-patch==20200713
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-import-export
+dill==0.3.7
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   pylint
 django==3.2.23
     # via
     #   -c requirements/ci.txt
@@ -511,7 +516,12 @@ easy-thumbnails[svg]==2.8.5
     #   django-filer
     #   djangocms-picture
     #   easy-thumbnails
-elastic-apm==6.4.0
+ecs-logging==2.1.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   elastic-apm
+elastic-apm==6.20.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -847,7 +857,7 @@ pyjwt==2.8.0
     #   -r requirements/ci.txt
     #   gemma-zds-client
     #   messagebird
-pylint==2.11.1
+pylint==2.17.7
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -1045,13 +1055,13 @@ tinycss2==1.1.1
     #   cssselect2
     #   svglib
     #   weasyprint
-toml==0.10.2
+tomli==1.2.1
+    # via pep517
+tomlkit==0.12.3
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   pylint
-tomli==1.2.1
-    # via pep517
 typing-extensions==4.4.0
     # via
     #   -c requirements/ci.txt
@@ -1119,11 +1129,12 @@ werkzeug==3.0.1
     #   locust
 wheel==0.42.0
     # via pip-tools
-wrapt==1.12.1
+wrapt==1.14.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   astroid
+    #   elastic-apm
 xlrd==2.0.1
     # via
     #   -c requirements/ci.txt
