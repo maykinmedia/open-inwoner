@@ -20,36 +20,36 @@
         {% with request.user as user %}
             <div class="tabled tabled--flexible">
                 <div class="tabled__row">
-                    <div class="tabled__item tabled__item--bold">{% trans "Voornamen" %}</div>
-                    <div class="tabled__item">{{my_data.first_name|default:"-"}}</div>
+                    <div class="tabled__item tabled__key">{% trans "Voornamen" %}</div>
+                    <div class="tabled__item tabled__value">{{my_data.first_name|default:"-"}}</div>
                 </div>
                 <div class="tabled__row">
-                    <div class="tabled__item tabled__item--bold">{% trans "Voorletters" %}</div>
-                    <div class="tabled__item">{{my_data.initials|default:"-"}}</div>
+                    <div class="tabled__item tabled__key">{% trans "Voorletters" %}</div>
+                    <div class="tabled__item tabled__value">{{my_data.initials|default:"-"}}</div>
                 </div>
                 <div class="tabled__row">
-                    <div class="tabled__item tabled__item--bold">{% trans "Achternaam" %}</div>
-                    <div class="tabled__item">{{my_data.last_name|default:"-"}}</div>
+                    <div class="tabled__item tabled__key">{% trans "Achternaam" %}</div>
+                    <div class="tabled__item tabled__value">{{my_data.last_name|default:"-"}}</div>
                 </div>
                 <div class="tabled__row">
-                    <div class="tabled__item tabled__item--bold">{% trans "Voorvoegsel" %}</div>
-                    <div class="tabled__item">{{my_data.infix|default:"-"}}</div>
+                    <div class="tabled__item tabled__key">{% trans "Voorvoegsel" %}</div>
+                    <div class="tabled__item tabled__value">{{my_data.infix|default:"-"}}</div>
                 </div>
                 <div class="tabled__row">
-                    <div class="tabled__item tabled__item--bold">{% trans "Geboortedatum" %}</div>
-                    <div class="tabled__item">{{my_data.birthday|date:"d F Y"|default:"-"}}</div>
+                    <div class="tabled__item tabled__key">{% trans "Geboortedatum" %}</div>
+                    <div class="tabled__item tabled__value">{{my_data.birthday|date:"d F Y"|default:"-"}}</div>
                 </div>
                 <div class="tabled__row">
-                    <div class="tabled__item tabled__item--bold">{% trans "Geboorteplaats" %}</div>
-                    <div class="tabled__item">{{my_data.birth_place|default:"-"}}</div>
+                    <div class="tabled__item tabled__key">{% trans "Geboorteplaats" %}</div>
+                    <div class="tabled__item tabled__value">{{my_data.birth_place|default:"-"}}</div>
                 </div>
                 <div class="tabled__row">
-                    <div class="tabled__item tabled__item--bold">{% trans "Burgerservicenummer (BSN)" %}</div>
-                    <div class="tabled__item">{{user.bsn|default:"-"}}</div>
+                    <div class="tabled__item tabled__key">{% trans "Burgerservicenummer (BSN)" %}</div>
+                    <div class="tabled__item tabled__value">{{user.bsn|default:"-"}}</div>
                 </div>
                 <div class="tabled__row">
-                    <div class="tabled__item tabled__item--bold">{% trans "Geslacht" %}</div>
-                    <div class="tabled__item">{{my_data.gender|default:"-"}}</div>
+                    <div class="tabled__item tabled__key">{% trans "Geslacht" %}</div>
+                    <div class="tabled__item tabled__value">{{my_data.gender|default:"-"}}</div>
                 </div>
             </div>
 
@@ -58,25 +58,25 @@
 
             <div class="tabled tabled--flexible">
                 <div class="tabled__row">
-                    <div class="tabled__item tabled__item--bold">{% trans "Straat" %}</div>
-                    <div class="tabled__item">{{my_data.street|default:"-"}}</div>
+                    <div class="tabled__item tabled__key">{% trans "Straat" %}</div>
+                    <div class="tabled__item tabled__value">{{my_data.street|default:"-"}}</div>
                 </div>
                 <div class="tabled__row">
-                    <div class="tabled__item tabled__item--bold">{% trans "Huisnummer" %}</div>
-                    <div class="tabled__item">{{my_data.get_housenumber|default:"-"}}</div>
+                    <div class="tabled__item tabled__key">{% trans "Huisnummer" %}</div>
+                    <div class="tabled__item tabled__value">{{my_data.get_housenumber|default:"-"}}</div>
                 </div>
                 <div class="tabled__row">
-                    <div class="tabled__item tabled__item--bold">{% trans "Postcode" %}</div>
-                    <div class="tabled__item">{{my_data.postal_code|default:"-"}}</div>
+                    <div class="tabled__item tabled__key">{% trans "Postcode" %}</div>
+                    <div class="tabled__item tabled__value">{{my_data.postal_code|default:"-"}}</div>
                 </div>
                 <div class="tabled__row">
-                    <div class="tabled__item tabled__item--bold">{% trans "Plaats" %}</div>
-                    <div class="tabled__item">{{my_data.city|default:"-"}}</div>
+                    <div class="tabled__item tabled__key">{% trans "Plaats" %}</div>
+                    <div class="tabled__item tabled__value">{{my_data.city|default:"-"}}</div>
                 </div>
                 {% if my_data.country %}
                 <div class="tabled__row">
-                    <div class="tabled__item tabled__item--bold">{% trans "Land" %}</div>
-                    <div class="tabled__item">{{my_data.country|default:"-"}}</div>
+                    <div class="tabled__item tabled__key">{% trans "Land" %}</div>
+                    <div class="tabled__item tabled__value">{{my_data.country|default:"-"}}</div>
                 </div>
                 {% endif %}
             </div>
@@ -96,16 +96,16 @@
 
             <div class="tabled tabled--flexible">
                 <div class="tabled__row">
-                    <div class="tabled__item tabled__item--bold">{% trans "Roepnaam" %}</div>
-                    <div class="tabled__item">{{user.display_name|default:"-"}}</div>
+                    <div class="tabled__item tabled__key">{% trans "Roepnaam" %}</div>
+                    <div class="tabled__item tabled__value">{{user.display_name|default:"-"}}</div>
                 </div>
                 <div class="tabled__row">
-                    <div class="tabled__item tabled__item--bold">{% trans "Telefoonnummer" %}</div>
-                    <div class="tabled__item">{{user.phonenumber|default:"-"}}</div>
+                    <div class="tabled__item tabled__key">{% trans "Telefoonnummer" %}</div>
+                    <div class="tabled__item tabled__value">{{user.phonenumber|default:"-"}}</div>
                 </div>
                 <div class="tabled__row">
-                    <div class="tabled__item tabled__item--bold">{% trans "E-mailadres" %}</div>
-                    <div class="tabled__item">{{user.email|default:"-"}}</div>
+                    <div class="tabled__item tabled__key">{% trans "E-mailadres" %}</div>
+                    <div class="tabled__item tabled__value tabled__break">{{user.email|default:"-"}}</div>
                 </div>
             </div>
         {% endwith %}
