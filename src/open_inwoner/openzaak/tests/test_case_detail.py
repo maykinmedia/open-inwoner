@@ -175,7 +175,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         cls.status_new = generate_oas_component(
             "zrc",
             "schemas/Status",
-            url=f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-beu760sle929",
+            url=f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
             zaak=cls.zaak["url"],
             statustype=f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-777yu878km09",
             datumStatusGezet="2021-01-12",
@@ -507,6 +507,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             self.status_type_new,
             self.status_type_in_behandeling,
             self.status_type_finish,
+            self.status_new,
         ]:
             m.get(resource["url"], json=resource)
 
