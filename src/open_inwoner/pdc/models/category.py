@@ -104,6 +104,16 @@ class Category(MP_Node):
         ),
     )
 
+    access_groups = models.ManyToManyField(
+        "auth.Group",
+        verbose_name=_("Restrict to admin groups"),
+        blank=True,
+        help_text=_(
+            "If set only users belonging to this group can edit this category and it's products"
+        ),
+        related_name="managed_categories",
+    )
+
     objects = CategoryPublishedQueryset.as_manager()
 
     class Meta:

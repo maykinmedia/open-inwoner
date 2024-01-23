@@ -1,11 +1,12 @@
 from unittest.mock import patch
 
+from django.contrib.auth.models import Permission
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from django_webtest import WebTest
 
-from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.accounts.tests.factories import GroupFactory, UserFactory
 from open_inwoner.openzaak.tests.factories import ZaakTypeConfigFactory
 
 from ..models.category import Category
@@ -94,6 +95,52 @@ class TestAdminCategoryForm(WebTest):
         form.submit("_save")
         updated_category = Category.objects.get(slug="bar4")
         self.assertFalse(updated_category.published)
+
+    def test_access_limited_to_linked_auth_groups(self):
+        super_user = UserFactory(is_superuser=True, is_staff=True)
+
+        group = GroupFactory()
+        group_user = UserFactory(is_staff=True)
+        group_user.user_permissions.add(
+            Permission.objects.get(codename="view_category"),
+        )
+        group_user.groups.add(group)
+
+        category_general = CategoryFactory(
+            path="everyone", name="everyone", published=True
+        )
+        category_grouped = CategoryFactory(
+            path="grouped", name="grouped", published=True
+        )
+        category_grouped.access_groups.add(group)
+
+        with self.subTest("superuser sees all in list"):
+            response = self.app.get(
+                reverse("admin:pdc_category_changelist"), user=super_user
+            )
+            categories = list(response.context["cl"].queryset.all())
+            # list shows all categories
+            self.assertEqual(categories, [category_general, category_grouped])
+
+        with self.subTest("user list is limited by group"):
+            response = self.app.get(
+                reverse("admin:pdc_category_changelist"), user=group_user
+            )
+            categories = list(response.context["cl"].queryset.all())
+            # list shows only categories linked to group
+            self.assertEqual(categories, [category_grouped])
+
+        with self.subTest("user cannot access not-linked category"):
+            response = self.app.get(
+                reverse(
+                    "admin:pdc_category_change",
+                    kwargs={"object_id": category_general.id},
+                ),
+                user=group_user,
+            )
+            # status code is 302 when object is not found and redirects to admin index
+            self.assertEqual(response.status_code, 302)
+            self.assertEqual(response.follow().request.path, "/admin/")
 
     @patch("open_inwoner.openzaak.models.OpenZaakConfig.get_solo")
     def test_user_can_link_zaaktypen_if_category_filtering_with_zaken_feature_flag_enabled(

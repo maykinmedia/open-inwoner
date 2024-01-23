@@ -1,12 +1,11 @@
-from typing import Optional
-
 from django import forms
 from django.conf import settings
+from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.contrib.auth import authenticate
 from django.contrib.auth.forms import PasswordResetForm
+from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
-from django.db.models import Q
 from django.template import loader
 from django.utils.translation import ugettext_lazy as _
 
@@ -210,6 +209,35 @@ class NecessaryUserForm(forms.ModelForm):
         elif user.login_type == LoginTypeChoices.eherkenning:
             for field_name in ["first_name", "infix", "last_name"]:
                 del self.fields[field_name]
+
+
+class GroupAdminForm(forms.ModelForm):
+    """
+    Add the ability to add/remove 'managed_categories' to the GroupAdmin.
+    """
+
+    managed_categories = forms.ModelMultipleChoiceField(
+        label=_("Restricted PDC categories"),
+        queryset=Category.objects.all(),
+        required=False,
+        widget=FilteredSelectMultiple(verbose_name=_("Category"), is_stacked=False),
+    )
+
+    class Meta:
+        model = Group
+        fields = ("name", "permissions")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if self.instance and self.instance.pk:
+            self.fields[
+                "managed_categories"
+            ].initial = self.instance.managed_categories.all()
+
+    def _save_m2m(self):
+        super()._save_m2m()
+        self.instance.managed_categories.set(self.cleaned_data["managed_categories"])
 
 
 class CustomPasswordResetForm(PasswordResetForm):
