@@ -1,6 +1,5 @@
 import logging
 from typing import List, Optional
-from urllib.parse import urlparse
 
 from requests import RequestException
 from zds_client import ClientError
@@ -20,7 +19,7 @@ from open_inwoner.openklant.api_models import (
 )
 from open_inwoner.openklant.clients import build_client
 from open_inwoner.openklant.models import OpenKlantConfig
-from open_inwoner.openzaak.cases import fetch_single_case
+from open_inwoner.openzaak.cases import fetch_case_by_url_no_cache
 
 logger = logging.getLogger(__name__)
 
@@ -110,12 +109,18 @@ def _fetch_objectcontactmomenten_for_contactmoment(
     object_contact_momenten = factory(ObjectContactMoment, response)
 
     # resolve linked resources
+    object_mapping = {}
     for ocm in object_contact_momenten:
         assert ocm.contactmoment == contactmoment.url
         ocm.contactmoment = contactmoment
         if ocm.object_type == "zaak":
-            object_path = urlparse(ocm.object).path
-            ocm.object = fetch_single_case(object_path.split("/")[-1])
+            object_url = ocm.object
+            # Avoid fetching the same object, if multiple relations wit the same object exist
+            if ocm.object in object_mapping:
+                ocm.object = object_mapping[object_url]
+            else:
+                ocm.object = fetch_case_by_url_no_cache(ocm.object)
+                object_mapping[object_url] = ocm.object
 
     return object_contact_momenten
 
@@ -132,15 +137,15 @@ def fetch_objectcontactmomenten_for_object_type(
     # eSuite doesn't implement a `object_type` query parameter
     ret = [moment for moment in moments if moment.object_type == object_type]
 
-    return ret or []
+    return ret
 
 
 def fetch_objectcontactmoment(
     contactmoment: ContactMoment, object_type: str
 ) -> Optional[ObjectContactMoment]:
     ocms = fetch_objectcontactmomenten_for_object_type(contactmoment, object_type)
-    ocms = ocms or [None]
-    return ocms[0]
+    if ocms:
+        return ocms[0]
 
 
 def _fetch_klanten_for_bsn(user_bsn: str, *, client=None) -> List[Klant]:

@@ -1,10 +1,11 @@
-from typing import List, TypedDict
+from typing import List, Optional, TypedDict
 
 from django import template
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from open_inwoner.accounts.views.contactmoments import KCMDict
+from open_inwoner.openzaak.api_models import Zaak
 
 register = template.Library()
 
@@ -73,7 +74,7 @@ def case_table(case: dict, **kwargs) -> dict:
 
 
 @register.inclusion_tag("components/table/table.html")
-def contactmoment_table(kcm: KCMDict, zaak=None, **kwargs) -> dict:
+def contactmoment_table(kcm: KCMDict, zaak: Optional[Zaak] = None, **kwargs) -> dict:
     """
     Renders a table below the dashboard for additional values related to a Zaak (case).
 
@@ -110,7 +111,7 @@ def contactmoment_table(kcm: KCMDict, zaak=None, **kwargs) -> dict:
                             "cases:case_detail", kwargs={"object_id": str(zaak.uuid)}
                         ),
                         "hyperlink_text": _("Ga naar zaak"),
-                        "class": "zaak-hyperlink",
+                        "class": "case-detail__link",
                     }
                 ],
             }

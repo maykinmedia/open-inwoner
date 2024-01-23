@@ -31,8 +31,15 @@
       word-break: break-word;
       white-space: normal;
 
-      .zaak-hyperlink {
-        float: right;
+      &.table__item--status {
+        .table__item--wrapper {
+          display: flex;
+          justify-content: space-between;
+        }
+      }
+
+      .case-detail__link {
+        color: var(--color-primary);
         text-decoration: none;
 
         &::after {
