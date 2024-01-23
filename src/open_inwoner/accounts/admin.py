@@ -13,7 +13,7 @@ from privates.admin import PrivateMediaMixin
 from open_inwoner.utils.mixins import UUIDAdminFirstInOrder
 
 from .choices import ContactTypeChoices
-from .models import Action, Appointment, Document, Invite, Message, User
+from .models import Action, Document, Invite, Message, User
 
 
 class ReadOnlyFileMixin:
@@ -233,13 +233,6 @@ class DocumentAdmin(
 
     def has_change_permission(self, request, obj=None):
         return False
-
-
-@admin.register(Appointment)
-class AppointmentAdmin(UUIDAdminFirstInOrder, admin.ModelAdmin):
-    readonly_fields = ("uuid",)
-    list_display = ("name", "datetime", "created_on", "created_by")
-    list_filter = ("created_by",)
 
 
 @admin.register(Message)
