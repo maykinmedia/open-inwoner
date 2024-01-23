@@ -1,5 +1,4 @@
 from django.core.files.base import ContentFile
-from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import override_settings
 from django.urls import reverse
 from django.utils.html import escape
@@ -22,7 +21,6 @@ class ThemestylesheetTest(ClearCachesMixin, WebTest):
         self.config.save()
 
         response = self.app.get(reverse("pages-root"))
-        response.showbrowser()
         self.assertContains(response, self.config.theme_stylesheet.url)
 
 

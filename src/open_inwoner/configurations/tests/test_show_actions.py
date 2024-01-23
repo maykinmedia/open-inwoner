@@ -50,10 +50,8 @@ class TestShowActions(WebTest):
         urls = [
             reverse("profile:action_list"),
             reverse("profile:action_create"),
-            reverse("profile:action_list_export"),
             reverse("profile:action_edit", kwargs={"uuid": self.action.uuid}),
             reverse("profile:action_delete", kwargs={"uuid": self.action.uuid}),
-            reverse("profile:action_export", kwargs={"uuid": self.action.uuid}),
             reverse("profile:action_download", kwargs={"uuid": self.action.uuid}),
             reverse("profile:action_history", kwargs={"uuid": self.action.uuid}),
         ]

@@ -1,10 +1,7 @@
-import io
-
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from django_webtest import WebTest
-from PIL import Image
 from webtest import Upload
 
 from open_inwoner.utils.tests.helpers import create_image_bytes
