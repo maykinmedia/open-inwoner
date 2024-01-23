@@ -4,7 +4,7 @@ from django.test import TestCase
 
 import requests_mock
 from zgw_consumers.constants import APITypes
-from zgw_consumers.test import generate_oas_component, mock_service_oas_get
+from zgw_consumers.test import mock_service_oas_get
 
 from open_inwoner.openzaak.models import (
     OpenZaakConfig,
@@ -15,6 +15,7 @@ from open_inwoner.openzaak.tests.factories import (
     ServiceFactory,
     ZaakTypeConfigFactory,
 )
+from open_inwoner.openzaak.tests.helpers import generate_oas_component_cached
 from open_inwoner.openzaak.tests.shared import CATALOGI_ROOT
 from open_inwoner.openzaak.zgw_imports import (
     import_zaaktype_informatieobjecttype_configs,
@@ -25,21 +26,21 @@ from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 class InformationObjectTypeMockData:
     def __init__(self):
 
-        self.info_type_aaa_1 = generate_oas_component(
+        self.info_type_aaa_1 = generate_oas_component_cached(
             "ztc",
             "schemas/InformatieObjectType",
             url=f"{CATALOGI_ROOT}informatieobjecttypen/aaaaaaaa-aaaa-aaaa-aaaa-111111111111",
             catalogus=f"{CATALOGI_ROOT}catalogussen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             omschrijving="info-aaa-1",
         )
-        self.info_type_aaa_2 = generate_oas_component(
+        self.info_type_aaa_2 = generate_oas_component_cached(
             "ztc",
             "schemas/InformatieObjectType",
             url=f"{CATALOGI_ROOT}informatieobjecttypen/aaaaaaaa-aaaa-aaaa-aaaa-222222222222",
             catalogus=f"{CATALOGI_ROOT}catalogussen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
             omschrijving="info-aaa-2",
         )
-        self.extra_info_type_aaa_3 = generate_oas_component(
+        self.extra_info_type_aaa_3 = generate_oas_component_cached(
             "ztc",
             "schemas/InformatieObjectType",
             url=f"{CATALOGI_ROOT}informatieobjecttypen/aaaaaaaa-aaaa-aaaa-aaaa-333333333333",
@@ -47,7 +48,7 @@ class InformationObjectTypeMockData:
             omschrijving="info-aaa-3",
         )
 
-        self.info_type_bbb = generate_oas_component(
+        self.info_type_bbb = generate_oas_component_cached(
             "ztc",
             "schemas/InformatieObjectType",
             url=f"{CATALOGI_ROOT}informatieobjecttypen/bbbbbbbb-bbbb-bbbb-bbbb-111111111111",
@@ -56,7 +57,7 @@ class InformationObjectTypeMockData:
             omschrijving="info-bbb",
         )
 
-        self.statustype_aaa_1 = generate_oas_component(
+        self.statustype_aaa_1 = generate_oas_component_cached(
             "ztc",
             "schemas/StatusType",
             url=f"{CATALOGI_ROOT}statustypen/aaaaaaaa-aaaa-aaaa-aaaa-111111111111",
@@ -64,7 +65,7 @@ class InformationObjectTypeMockData:
             # zaaktype=self.zaaktype_aaa_1,
             omschrijving="status-aaa-1",
         )
-        self.statustype_aaa_2 = generate_oas_component(
+        self.statustype_aaa_2 = generate_oas_component_cached(
             "ztc",
             "schemas/StatusType",
             url=f"{CATALOGI_ROOT}statustypen/aaaaaaaa-aaaa-aaaa-aaaa-222222222222",
@@ -73,7 +74,7 @@ class InformationObjectTypeMockData:
             omschrijving="status-aaa-2",
         )
 
-        self.zaaktype_aaa_1 = generate_oas_component(
+        self.zaaktype_aaa_1 = generate_oas_component_cached(
             "ztc",
             "schemas/ZaakType",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-111111111111",
@@ -92,7 +93,7 @@ class InformationObjectTypeMockData:
                 f"{CATALOGI_ROOT}resultaatypen/b1a268dd-4322-47bb-a930-b83066b4a32c"
             ],
         )
-        self.resultaat_type_1 = generate_oas_component(
+        self.resultaat_type_1 = generate_oas_component_cached(
             "ztc",
             "schemas/ResultaatType",
             url=f"{CATALOGI_ROOT}resultaatypen/b1a268dd-4322-47bb-a930-b83066b4a32c",
@@ -101,7 +102,7 @@ class InformationObjectTypeMockData:
             resultaattypeomschrijving="test1",
             selectielijstklasse="ABC",
         )
-        self.zaaktype_bbb = generate_oas_component(
+        self.zaaktype_bbb = generate_oas_component_cached(
             "ztc",
             "schemas/ZaakType",
             uuid="bbbbbbbb-bbbb-bbbb-bbbb-111111111111",
@@ -119,7 +120,7 @@ class InformationObjectTypeMockData:
                 f"{CATALOGI_ROOT}resultaatypen/b1a268dd-4322-47bb-a930-b83066b4a32c"
             ],
         )
-        self.zaaktype_aaa_2 = generate_oas_component(
+        self.zaaktype_aaa_2 = generate_oas_component_cached(
             "ztc",
             "schemas/ZaakType",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-222222222222",
@@ -140,7 +141,7 @@ class InformationObjectTypeMockData:
                 f"{CATALOGI_ROOT}resultaatypen/b1a268dd-4322-47bb-a930-b83066b4a32c",
             ],
         )
-        self.zaaktype_aaa_intern = generate_oas_component(
+        self.zaaktype_aaa_intern = generate_oas_component_cached(
             "ztc",
             "schemas/ZaakType",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-444444444444",
@@ -157,7 +158,7 @@ class InformationObjectTypeMockData:
             statustypen=[],
             resultaattypen=[],
         )
-        self.extra_zaaktype_aaa = generate_oas_component(
+        self.extra_zaaktype_aaa = generate_oas_component_cached(
             "ztc",
             "schemas/ZaakType",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-555555555555",

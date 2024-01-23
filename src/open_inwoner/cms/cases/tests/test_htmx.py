@@ -12,7 +12,7 @@ from zgw_consumers.api_models.constants import (
     VertrouwelijkheidsAanduidingen,
 )
 from zgw_consumers.constants import APITypes
-from zgw_consumers.test import generate_oas_component, mock_service_oas_get
+from zgw_consumers.test import mock_service_oas_get
 
 from open_inwoner.accounts.tests.factories import DigidUserFactory
 from open_inwoner.cms.tests import cms_tools
@@ -31,6 +31,7 @@ from open_inwoner.openzaak.tests.factories import (
     ZaakTypeInformatieObjectTypeConfigFactory,
     ZaakTypeStatusTypeConfigFactory,
 )
+from open_inwoner.openzaak.tests.helpers import generate_oas_component_cached
 from open_inwoner.openzaak.tests.shared import (
     CATALOGI_ROOT,
     DOCUMENTEN_ROOT,
@@ -101,7 +102,7 @@ class CasesPlaywrightTests(
         )
         self.ok_config.save()
 
-        self.zaak = generate_oas_component(
+        self.zaak = generate_oas_component_cached(
             "zrc",
             "schemas/Zaak",
             uuid="d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
@@ -115,7 +116,7 @@ class CasesPlaywrightTests(
             resultaat=f"{ZAKEN_ROOT}resultaten/a44153aa-ad2c-6a07-be75-15add5113",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
         )
-        self.zaaktype = generate_oas_component(
+        self.zaaktype = generate_oas_component_cached(
             "ztc",
             "schemas/ZaakType",
             uuid="0caa29cb-0167-426f-8dc1-88bebd7c8804",
@@ -129,7 +130,7 @@ class CasesPlaywrightTests(
         #
         # statuses
         #
-        self.status_new = generate_oas_component(
+        self.status_new = generate_oas_component_cached(
             "zrc",
             "schemas/Status",
             url=f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-beu760sle929",
@@ -138,7 +139,7 @@ class CasesPlaywrightTests(
             datumStatusGezet="2021-01-12",
             statustoelichting="",
         )
-        self.status_finish = generate_oas_component(
+        self.status_finish = generate_oas_component_cached(
             "zrc",
             "schemas/Status",
             url=f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
@@ -150,7 +151,7 @@ class CasesPlaywrightTests(
         #
         # status types
         #
-        self.status_type_new = generate_oas_component(
+        self.status_type_new = generate_oas_component_cached(
             "ztc",
             "schemas/StatusType",
             url=self.status_new["statustype"],
@@ -162,7 +163,7 @@ class CasesPlaywrightTests(
             volgnummer=1,
             isEindstatus=False,
         )
-        self.status_type_finish = generate_oas_component(
+        self.status_type_finish = generate_oas_component_cached(
             "ztc",
             "schemas/StatusType",
             url=self.status_finish["statustype"],
@@ -174,7 +175,7 @@ class CasesPlaywrightTests(
             volgnummer=1,
             isEindstatus=True,
         )
-        self.user_role = generate_oas_component(
+        self.user_role = generate_oas_component_cached(
             "zrc",
             "schemas/Rol",
             url=f"{ZAKEN_ROOT}rollen/f33153aa-ad2c-4a07-ae75-15add5891",
@@ -187,7 +188,7 @@ class CasesPlaywrightTests(
                 "geslachtsnaam": "Bazz",
             },
         )
-        self.result = generate_oas_component(
+        self.result = generate_oas_component_cached(
             "zrc",
             "schemas/Resultaat",
             uuid="a44153aa-ad2c-6a07-be75-15add5113",
@@ -196,7 +197,7 @@ class CasesPlaywrightTests(
             zaak=self.zaak["url"],
             toelichting="resultaat toelichting",
         )
-        self.zaak_informatie_object = generate_oas_component(
+        self.zaak_informatie_object = generate_oas_component_cached(
             "zrc",
             "schemas/ZaakInformatieObject",
             url=f"{ZAKEN_ROOT}zaakinformatieobjecten/e55153aa-ad2c-4a07-ae75-15add57d6",
@@ -204,14 +205,14 @@ class CasesPlaywrightTests(
             zaak=self.zaak["url"],
             registratiedatum="2021-01-12",
         )
-        self.informatie_object_type = generate_oas_component(
+        self.informatie_object_type = generate_oas_component_cached(
             "ztc",
             "schemas/InformatieObjectType",
             url=f"{CATALOGI_ROOT}informatieobjecttype/014c38fe-b010-4412-881c-3000032fb321",
             catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             omschrijving="Some content",
         )
-        self.zaaktype_informatie_object_type = generate_oas_component(
+        self.zaaktype_informatie_object_type = generate_oas_component_cached(
             "ztc",
             "schemas/ZaakTypeInformatieObjectType",
             uuid="3fb03882-f6f9-4e0d-ad92-f810e24b9abb",
@@ -223,7 +224,7 @@ class CasesPlaywrightTests(
             richting="inkomend",
             statustype=self.status_type_finish,
         )
-        self.informatie_object = generate_oas_component(
+        self.informatie_object = generate_oas_component_cached(
             "drc",
             "schemas/EnkelvoudigInformatieObject",
             uuid="014c38fe-b010-4412-881c-3000032fb812",
@@ -238,7 +239,7 @@ class CasesPlaywrightTests(
         )
 
         # for upload testing
-        self.uploaded_zaak_informatie_object = generate_oas_component(
+        self.uploaded_zaak_informatie_object = generate_oas_component_cached(
             "zrc",
             "schemas/ZaakInformatieObject",
             url=f"{ZAKEN_ROOT}zaakinformatieobjecten/48599f76-b524-48e8-be5a-6fc47288c9bf",
@@ -247,7 +248,7 @@ class CasesPlaywrightTests(
             registratiedatum="2022-01-12",
         )
         self.uploaded_zaak_informatie_object_content = "test56789".encode("utf8")
-        self.uploaded_informatie_object = generate_oas_component(
+        self.uploaded_informatie_object = generate_oas_component_cached(
             "drc",
             "schemas/EnkelvoudigInformatieObject",
             uuid="48599f76-b524-48e8-be5a-6fc47288c9bf",
@@ -260,7 +261,7 @@ class CasesPlaywrightTests(
             titel="uploaded_test_file.txt",
             bestandsomvang=len(self.uploaded_zaak_informatie_object_content),
         )
-        self.klant = generate_oas_component(
+        self.klant = generate_oas_component_cached(
             "kc",
             "schemas/Klant",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
@@ -271,7 +272,7 @@ class CasesPlaywrightTests(
             emailadres="foo@example.com",
             telefoonnummer="0612345678",
         )
-        self.contactmoment = generate_oas_component(
+        self.contactmoment = generate_oas_component_cached(
             "cmc",
             "schemas/ContactMoment",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
@@ -280,7 +281,7 @@ class CasesPlaywrightTests(
             antwoord="",
             text="hey!\n\nwaddup?",
         )
-        self.klant_contactmoment = generate_oas_component(
+        self.klant_contactmoment = generate_oas_component_cached(
             "cmc",
             "schemas/KlantContactMoment",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
@@ -521,7 +522,7 @@ class CasesPlaywrightTests(
             Creates schemas/ZaakInformatieObject dict for each item in uploads.
             """
             items = [
-                generate_oas_component(
+                generate_oas_component_cached(
                     "zrc",
                     "schemas/ZaakInformatieObject",
                     url=f"{ZAKEN_ROOT}zaakinformatieobjecten/e55153aa-ad2c-4a07-ae75-15add57d6",
@@ -553,7 +554,7 @@ class CasesPlaywrightTests(
             seed = file_name.ljust(16, "0").encode("utf-8")
             uuid = UUID(bytes=seed)
 
-            uploaded_informatie_object = generate_oas_component(
+            uploaded_informatie_object = generate_oas_component_cached(
                 "drc",
                 "schemas/EnkelvoudigInformatieObject",
                 uuid=str(uuid),
