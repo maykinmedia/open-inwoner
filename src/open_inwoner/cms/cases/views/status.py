@@ -148,7 +148,6 @@ class InnerCaseDetailView(
             documents = self.get_case_document_files(self.case)
             statuses = fetch_status_history(self.case.url)
             self.store_statustype_resulttype_mapping(self.case.zaaktype.identificatie)
-            # NOTE maybe this should be cached?
             statustypen = fetch_status_types_no_cache(self.case.zaaktype.url)
 
             # NOTE we cannot sort on the Status.datum_status_gezet (datetime) because eSuite
@@ -163,18 +162,22 @@ class InnerCaseDetailView(
             else:
                 second_status_preview = None
 
+            # transform current status of `self.case` to ZGW model object
             status_types = defaultdict(list)
             for status in statuses:
                 status_types[status.statustype].append(status)
                 if self.case.status == status.url:
                     self.case.status = status
 
-            if type(self.case.status) == str:
+            # e-suite compatibility
+            if isinstance(self.case.status, str):
                 logger.info(
-                    "Issue #2037 -- Retrieving status individually to deal with the situation where eSuite doesnt return current status as part of statuslist retrieval"
+                    "Issue #2037 -- Retrieving status individually to deal with the situation"
+                    "where eSuite doesnt return current status as part of statuslist retrieval"
                 )
                 self.case.status = fetch_single_status(self.case.status)
                 status_types[self.case.status.statustype].append(self.case.status)
+                statuses.append(self.case.status)
 
             for status_type_url, _statuses in list(status_types.items()):
                 # todo parallel
