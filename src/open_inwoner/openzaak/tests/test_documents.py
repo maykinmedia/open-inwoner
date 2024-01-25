@@ -17,7 +17,7 @@ from zgw_consumers.api_models.constants import (
     VertrouwelijkheidsAanduidingen,
 )
 from zgw_consumers.constants import APITypes, AuthTypes
-from zgw_consumers.test import generate_oas_component, mock_service_oas_get
+from zgw_consumers.test import mock_service_oas_get
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
@@ -33,6 +33,7 @@ from .factories import (
     ZaakTypeConfigFactory,
     ZaakTypeInformatieObjectTypeConfigFactory,
 )
+from .helpers import generate_oas_component_cached
 from .shared import CATALOGI_ROOT, DOCUMENTEN_ROOT, ZAKEN_ROOT
 
 
@@ -49,33 +50,32 @@ def get_temporary_text_file():
 @requests_mock.Mocker()
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
-    @classmethod
-    def setUpTestData(cls):
-        super().setUpTestData()
+    def setUp(self):
+        super().setUp()
 
-        cls.user = UserFactory(
+        self.user = UserFactory(
             login_type=LoginTypeChoices.digid, bsn="900222086", email="johm@smith.nl"
         )
-        cls.config = OpenZaakConfig.get_solo()
-        cls.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
-        cls.config.zaak_service = cls.zaak_service
-        cls.catalogi_service = ServiceFactory(
+        self.config = OpenZaakConfig.get_solo()
+        self.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
+        self.config.zaak_service = self.zaak_service
+        self.catalogi_service = ServiceFactory(
             api_root=CATALOGI_ROOT, api_type=APITypes.ztc
         )
-        cls.config.catalogi_service = cls.catalogi_service
-        cls.document_service = ServiceFactory(
+        self.config.catalogi_service = self.catalogi_service
+        self.document_service = ServiceFactory(
             api_root=DOCUMENTEN_ROOT, api_type=APITypes.drc
         )
-        cls.config.document_service = cls.document_service
-        cls.config.document_max_confidentiality = (
+        self.config.document_service = self.document_service
+        self.config.document_max_confidentiality = (
             VertrouwelijkheidsAanduidingen.beperkt_openbaar
         )
-        cls.config.zaak_max_confidentiality = (
+        self.config.zaak_max_confidentiality = (
             VertrouwelijkheidsAanduidingen.beperkt_openbaar
         )
-        cls.config.save()
+        self.config.save()
 
-        cls.zaak = generate_oas_component(
+        self.zaak = generate_oas_component_cached(
             "zrc",
             "schemas/Zaak",
             uuid="d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
@@ -89,10 +89,10 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
             bronorganisatie="123456782",
         )
-        cls.zaaktype = generate_oas_component(
+        self.zaaktype = generate_oas_component_cached(
             "ztc",
             "schemas/ZaakType",
-            url=cls.zaak["zaaktype"],
+            url=self.zaak["zaaktype"],
             uuid="0caa29cb-0167-426f-8dc1-88bebd7c8804",
             omschrijving="Coffee zaaktype",
             catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
@@ -100,18 +100,18 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
             indicatieInternOfExtern="extern",
         )
-        cls.zaak_informatie_object = generate_oas_component(
+        self.zaak_informatie_object = generate_oas_component_cached(
             "zrc",
             "schemas/ZaakInformatieObject",
             url=f"{ZAKEN_ROOT}zaakinformatieobjecten/e55153aa-ad2c-4a07-ae75-15add57d6",
             informatieobject=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812",
-            zaak=cls.zaak["url"],
+            zaak=self.zaak["url"],
             aardRelatieWeergave="some content",
             titel="",
             beschrijving="",
             registratiedatum="2021-01-12",
         )
-        cls.user_role = generate_oas_component(
+        self.user_role = generate_oas_component_cached(
             "zrc",
             "schemas/Rol",
             url=f"{ZAKEN_ROOT}rollen/f33153aa-ad2c-4a07-ae75-15add5891",
@@ -124,7 +124,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
                 "geslachtsnaam": "Bazz",
             },
         )
-        cls.not_our_user_role = generate_oas_component(
+        self.not_our_user_role = generate_oas_component_cached(
             "zrc",
             "schemas/Rol",
             url=f"{ZAKEN_ROOT}rollen/aa353aa-ad2c-4a07-ae75-15add5822",
@@ -136,12 +136,12 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
                 "geslachtsnaam": "Else",
             },
         )
-        cls.informatie_object_content = "my document content".encode("utf8")
-        cls.informatie_object = generate_oas_component(
+        self.informatie_object_content = "my document content".encode("utf8")
+        self.informatie_object = generate_oas_component_cached(
             "drc",
             "schemas/EnkelvoudigInformatieObject",
             uuid="014c38fe-b010-4412-881c-3000032fb812",
-            url=cls.zaak_informatie_object["informatieobject"],
+            url=self.zaak_informatie_object["informatieobject"],
             inhoud=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812/download",
             informatieobjecttype=f"{CATALOGI_ROOT}informatieobjecttype/014c38fe-b010-4412-881c-3000032fb321",
             status="definitief",
@@ -149,20 +149,20 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
             formaat="text/plain",
             bestandsnaam="my_document.txt",
-            bestandsomvang=len(cls.informatie_object_content),
+            bestandsomvang=len(self.informatie_object_content),
             bronorganisatie="1233456782",
             creatiedatum=date.today().strftime("%Y-%m-%d"),
             titel="",
             auteur="Open Inwoner Platform",
         )
-        cls.informatie_object_file = SimpleFile(
+        self.informatie_object_file = SimpleFile(
             name="my_document.txt",
-            size=len(cls.informatie_object_content),
+            size=len(self.informatie_object_content),
             url=reverse(
                 "cases:document_download",
                 kwargs={
-                    "object_id": cls.zaak["uuid"],
-                    "info_id": cls.informatie_object["uuid"],
+                    "object_id": self.zaak["uuid"],
+                    "info_id": self.informatie_object["uuid"],
                 },
             ),
         )
@@ -249,7 +249,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
     def test_document_content_with_bad_status_is_http_403(self, m):
         self._setUpAccessMocks(m)
 
-        info_object = generate_oas_component(
+        info_object = generate_oas_component_cached(
             "drc",
             "schemas/EnkelvoudigInformatieObject",
             uuid="014c38fe-b010-4412-881c-3000032fb812",
@@ -272,7 +272,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
     def test_document_content_with_bad_confidentiality_is_http_403(self, m):
         self._setUpAccessMocks(m)
 
-        info_object = generate_oas_component(
+        info_object = generate_oas_component_cached(
             "drc",
             "schemas/EnkelvoudigInformatieObject",
             uuid="014c38fe-b010-4412-881c-3000032fb812",
@@ -330,7 +330,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, WebTest):
             # no roles for our user found
             json=paginated_response([self.user_role]),
         )
-        zaaktype_intern = generate_oas_component(
+        zaaktype_intern = generate_oas_component_cached(
             "ztc",
             "schemas/ZaakType",
             url=self.zaak["zaaktype"],
