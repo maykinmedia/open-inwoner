@@ -1660,7 +1660,7 @@ class TestLoginLogoutFunctionality(AssertRedirectsMixin, WebTest):
 
     def test_login(self):
         """Test that a user is successfully logged in."""
-        form = self.app.get(reverse("login")).forms["login-form"]
+        form = self.app.get(reverse("login_email")).forms["login-form"]
         form["username"] = self.user.email
         form["password"] = "test"
         form.submit().follow()
@@ -1706,7 +1706,7 @@ class TestLoginLogoutFunctionality(AssertRedirectsMixin, WebTest):
                     else f"{reverse('eherkenning:login')}?next="
                 )
 
-                response = self.app.get(reverse("login"))
+                response = self.app.get(reverse("login_business"))
 
                 eherkenning_login_title = _("Inloggen met eHerkenning")
                 eherkenning_login_link = response.pyquery(
@@ -1720,7 +1720,7 @@ class TestLoginLogoutFunctionality(AssertRedirectsMixin, WebTest):
         self.user.is_active = False
         self.user.save()
 
-        form = self.app.get(reverse("login")).forms["login-form"]
+        form = self.app.get(reverse("login_email")).forms["login-form"]
         form["username"] = self.user.email
         form["password"] = "test"
         response = form.submit()
@@ -1735,7 +1735,7 @@ class TestLoginLogoutFunctionality(AssertRedirectsMixin, WebTest):
         )
 
     def test_login_with_wrong_credentials_shows_appropriate_message(self):
-        form = self.app.get(reverse("login")).forms["login-form"]
+        form = self.app.get(reverse("login_email")).forms["login-form"]
         form["username"] = self.user.email
         form["password"] = "wrong_password"
         response = form.submit()

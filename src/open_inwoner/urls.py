@@ -15,6 +15,7 @@ from digid_eherkenning_oidc_generics.views import OIDCFailureView
 from open_inwoner.accounts.forms import CustomRegistrationForm
 from open_inwoner.accounts.views import (
     AddPhoneNumberWizardView,
+    CustomBusinessLoginView,
     CustomDigiDAssertionConsumerServiceMockView,
     CustomDigiDAssertionConsumerServiceView,
     CustomeHerkenningAssertionConsumerServiceMockView,
@@ -28,6 +29,7 @@ from open_inwoner.accounts.views import (
     ResendTokenView,
     VerifyTokenView,
 )
+from open_inwoner.accounts.views.login import CustomEmailLoginView
 from open_inwoner.openklant.views.contactform import ContactFormView
 from open_inwoner.pdc.views import FAQView
 
@@ -88,6 +90,16 @@ urlpatterns = [
         name="password_reset_confirm",
     ),
     path("accounts/login/", CustomLoginView.as_view(), name="login"),
+    path(
+        "accounts/login-email/",
+        CustomEmailLoginView.as_view(),
+        name="login_email",
+    ),
+    path(
+        "accounts/login-business/",
+        CustomBusinessLoginView.as_view(),
+        name="login_business",
+    ),
     path("accounts/verify/", VerifyTokenView.as_view(), name="verify_token"),
     path("accounts/resend-token/", ResendTokenView.as_view(), name="resend_token"),
     path(
@@ -181,7 +193,6 @@ elif settings.EHERKENNING_MOCK:
         path("eherkenning/", include("eherkenning.mock.eherkenning_urls")),
         path("eherkenning/idp/", include("eherkenning.mock.idp.eherkenning_urls")),
     ] + urlpatterns
-
 
 if settings.DEBUG:
     urlpatterns = [
