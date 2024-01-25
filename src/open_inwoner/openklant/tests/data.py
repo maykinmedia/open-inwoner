@@ -1,5 +1,5 @@
 from zgw_consumers.constants import APITypes
-from zgw_consumers.test import generate_oas_component, mock_service_oas_get
+from zgw_consumers.test import mock_service_oas_get
 
 from open_inwoner.accounts.tests.factories import (
     DigidUserFactory,
@@ -8,6 +8,7 @@ from open_inwoner.accounts.tests.factories import (
 from open_inwoner.openklant.constants import Status
 from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.openzaak.tests.factories import ServiceFactory
+from open_inwoner.openzaak.tests.helpers import generate_oas_component_cached
 from open_inwoner.utils.test import paginated_response
 
 KLANTEN_ROOT = "https://klanten.nl/api/v1/"
@@ -44,7 +45,7 @@ class MockAPIReadPatchData(MockAPIData):
             rsin="000000000",
         )
 
-        self.klant_old = generate_oas_component(
+        self.klant_old = generate_oas_component_cached(
             "kc",
             "schemas/Klant",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
@@ -52,7 +53,7 @@ class MockAPIReadPatchData(MockAPIData):
             emailadres="bad@example.com",
             telefoonnummer="",
         )
-        self.klant_updated = generate_oas_component(
+        self.klant_updated = generate_oas_component_cached(
             "kc",
             "schemas/Klant",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
@@ -109,7 +110,7 @@ class MockAPIReadData(MockAPIData):
             rsin="000000000",
         )
 
-        self.klant = generate_oas_component(
+        self.klant = generate_oas_component_cached(
             "kc",
             "schemas/Klant",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
@@ -117,7 +118,7 @@ class MockAPIReadData(MockAPIData):
             emailadres="foo@example.com",
             telefoonnummer="0612345678",
         )
-        self.klant2 = generate_oas_component(
+        self.klant2 = generate_oas_component_cached(
             "kc",
             "schemas/Klant",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-ffffffffffff",
@@ -125,7 +126,7 @@ class MockAPIReadData(MockAPIData):
             emailadres="foo@bar.com",
             telefoonnummer="0687654321",
         )
-        self.klant_vestiging = generate_oas_component(
+        self.klant_vestiging = generate_oas_component_cached(
             "kc",
             "schemas/Klant",
             uuid="bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
@@ -133,7 +134,7 @@ class MockAPIReadData(MockAPIData):
             emailadres="foo@bar.com",
             telefoonnummer="0612345678",
         )
-        self.contactmoment = generate_oas_component(
+        self.contactmoment = generate_oas_component_cached(
             "cmc",
             "schemas/ContactMoment",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
@@ -145,7 +146,7 @@ class MockAPIReadData(MockAPIData):
             antwoord="",
             onderwerp="e_suite_subject_code",
         )
-        self.contactmoment2 = generate_oas_component(
+        self.contactmoment2 = generate_oas_component_cached(
             "cmc",
             "schemas/ContactMoment",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-dddddddddddd",
@@ -157,7 +158,7 @@ class MockAPIReadData(MockAPIData):
             antwoord="",
             onderwerp="e_suite_subject_code",
         )
-        self.contactmoment_vestiging = generate_oas_component(
+        self.contactmoment_vestiging = generate_oas_component_cached(
             "cmc",
             "schemas/ContactMoment",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-eeeeeeeeeeee",
@@ -169,7 +170,7 @@ class MockAPIReadData(MockAPIData):
             antwoord="",
             onderwerp="e_suite_subject_code",
         )
-        self.klant_contactmoment = generate_oas_component(
+        self.klant_contactmoment = generate_oas_component_cached(
             "cmc",
             "schemas/KlantContactMoment",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
@@ -177,7 +178,7 @@ class MockAPIReadData(MockAPIData):
             klant=self.klant["url"],
             contactmoment=self.contactmoment["url"],
         )
-        self.klant_contactmoment2 = generate_oas_component(
+        self.klant_contactmoment2 = generate_oas_component_cached(
             "cmc",
             "schemas/KlantContactMoment",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-eeeeeeeeeeee",
@@ -185,7 +186,7 @@ class MockAPIReadData(MockAPIData):
             klant=self.klant2["url"],
             contactmoment=self.contactmoment2["url"],
         )
-        self.klant_contactmoment3 = generate_oas_component(
+        self.klant_contactmoment3 = generate_oas_component_cached(
             "cmc",
             "schemas/KlantContactMoment",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-dddddddddddd",
@@ -193,7 +194,7 @@ class MockAPIReadData(MockAPIData):
             klant=self.klant["url"],
             contactmoment=self.contactmoment_vestiging["url"],
         )
-        self.klant_contactmoment4 = generate_oas_component(
+        self.klant_contactmoment4 = generate_oas_component_cached(
             "cmc",
             "schemas/KlantContactMoment",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-ffffffffffff",
@@ -265,7 +266,7 @@ class MockAPICreateData(MockAPIData):
             kvk="12345678",
             rsin="000000000",
         )
-        self.klant = generate_oas_component(
+        self.klant = generate_oas_component_cached(
             "kc",
             "schemas/Klant",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
@@ -276,7 +277,7 @@ class MockAPICreateData(MockAPIData):
             emailadres="foo@example.com",
             telefoonnummer="0612345678",
         )
-        self.klant_no_contact_info = generate_oas_component(
+        self.klant_no_contact_info = generate_oas_component_cached(
             "kc",
             "schemas/Klant",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
@@ -287,7 +288,7 @@ class MockAPICreateData(MockAPIData):
             emailadres="",
             telefoonnummer="",
         )
-        self.contactmoment = generate_oas_component(
+        self.contactmoment = generate_oas_component_cached(
             "cmc",
             "schemas/ContactMoment",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-bbbbbbbbbbbb",
@@ -299,7 +300,7 @@ class MockAPICreateData(MockAPIData):
             antwoord="",
             text="hey!\n\nwaddup?",
         )
-        self.klant_contactmoment = generate_oas_component(
+        self.klant_contactmoment = generate_oas_component_cached(
             "cmc",
             "schemas/KlantContactMoment",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc",
