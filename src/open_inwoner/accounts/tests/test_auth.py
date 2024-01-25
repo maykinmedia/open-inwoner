@@ -1642,7 +1642,7 @@ class TestLoginLogoutFunctionality(AssertRedirectsMixin, WebTest):
                     else f"{reverse('eherkenning:login')}?next="
                 )
 
-                response = self.app.get(reverse("login"))
+                response = self.app.get(reverse("login_business"))
 
                 eherkenning_login_title = _("Inloggen met eHerkenning")
                 eherkenning_login_link = response.pyquery(

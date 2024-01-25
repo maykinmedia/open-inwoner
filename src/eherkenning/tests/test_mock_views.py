@@ -45,7 +45,7 @@ class TestAppIndexTests(TestCase):
     def test_eherkenning_enabled(self, mock_solo):
         mock_solo.return_value.eherkenning_enabled = True
 
-        url = reverse("login")
+        url = reverse("login_business")
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
@@ -54,7 +54,7 @@ class TestAppIndexTests(TestCase):
     def test_eherkenning_disabled(self, mock_solo):
         mock_solo.return_value.eherkenning_enabled = False
 
-        url = reverse("login")
+        url = reverse("login_business")
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
