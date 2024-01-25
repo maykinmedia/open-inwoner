@@ -11,6 +11,7 @@ from django.utils.translation import gettext_lazy as _
 import requests_mock
 from django_webtest import WebTest
 from freezegun import freeze_time
+from pyquery import PyQuery
 from timeline_logger.models import TimelineLog
 from webtest import Upload
 from webtest.forms import Hidden
@@ -876,6 +877,102 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.assertEqual(documents[0].name, "another_document_title.txt")
         self.assertEqual(documents[1].name, "uploaded_document_title.txt")
         self.assertEqual(documents[2].name, "yet_another_document_title.txt")
+
+    @patch("open_inwoner.cms.cases.views.status.fetch_status_history")
+    def test_e_suite_missing_current_status_fetch_status(
+        self, m, mock_fetch_status_history
+    ):
+        """
+        Regression test for #2037
+
+        eSuite can fail to return the status of the current case as part of status
+        history, which causes the upload button to be hidden. Check that the status
+        is fetched if it's missing from the eSuite response.
+        """
+        self.maxDiff = None
+        self._setUpMocks(m)
+
+        # e-suite returns nothing, hence status history list is empty
+        mock_fetch_status_history.return_value = []
+        m.get(
+            f"{ZAKEN_ROOT}statussen/29ag1264-c4he-249j-bc24-jip862tle833",
+            json=self.status_finish,
+        )
+
+        status_new_obj, status_finish_obj = factory(
+            Status, [self.status_new, self.status_finish]
+        )
+        status_new_obj.statustype = factory(StatusType, self.status_type_new)
+        status_finish_obj.statustype = factory(StatusType, self.status_type_finish)
+
+        response = self.app.get(self.case_detail_url, user=self.user)
+
+        self.assertEqual(
+            response.context.get("case")["statuses"],
+            [
+                {
+                    "date": datetime.datetime(2021, 3, 12, 0, 0),
+                    "label": "Finish",
+                    "status_indicator": None,
+                    "status_indicator_text": None,
+                    "call_to_action_url": None,
+                    "call_to_action_text": None,
+                    "description": None,
+                    "case_link_text": "Bekijk aanvraag",
+                }
+            ],
+        )
+
+    @patch("open_inwoner.cms.cases.views.status.fetch_status_history")
+    def test_e_suite_missing_current_status_upload_button_displayed(
+        self, m, mock_fetch_status_history
+    ):
+        """
+        Regression test for #2037
+
+        eSuite can fail to return the status of the current case as part of status
+        history, which causes the upload button to be hidden. Check that the upload
+        button is displayed.
+        """
+        self.maxDiff = None
+        self._setUpMocks(m)
+
+        # e-suite returns nothing, hence status history list is empty
+        mock_fetch_status_history.return_value = []
+        m.get(
+            f"{ZAKEN_ROOT}statussen/29ag1264-c4he-249j-bc24-jip862tle833",
+            json=self.status_finish,
+        )
+
+        zaak_type_config = ZaakTypeConfigFactory(
+            catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            identificatie=self.zaaktype["identificatie"],
+        )
+        zaak_type_iotc = ZaakTypeInformatieObjectTypeConfigFactory(
+            zaaktype_config=zaak_type_config,
+            informatieobjecttype_url=self.informatie_object["url"],
+            zaaktype_uuids=[self.zaaktype["uuid"]],
+            document_upload_enabled=True,
+        )
+        zt_statustype_config = ZaakTypeStatusTypeConfigFactory(
+            zaaktype_config=zaak_type_config,
+            statustype_url=self.status_type_finish["url"],
+            zaaktype_uuids=[self.zaaktype["uuid"]],
+            document_upload_description="- Foo\n- bar",
+        )
+        response = self.app.get(
+            reverse(
+                "cases:case_detail_content",
+                kwargs={"object_id": self.zaak["uuid"]},
+            ),
+            user=self.user,
+        )
+
+        doc = PyQuery(response.content)
+
+        upload_button = doc.find("#document-upload").find("button")
+
+        self.assertEqual(upload_button.text(), "Upload documenten")
 
     @freeze_time("2021-01-12 17:00:00")
     def test_new_docs(self, m):
