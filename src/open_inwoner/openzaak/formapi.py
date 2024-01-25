@@ -4,11 +4,10 @@ from datetime import datetime
 from typing import List, Optional
 
 from requests import RequestException
-from zds_client import ClientError
 from zgw_consumers.api_models.base import Model, factory
 
 from open_inwoner.openzaak.clients import build_client
-from open_inwoner.utils.api import get_paginated_results
+from open_inwoner.utils.api import ClientError, get_paginated_results
 
 logger = logging.getLogger(__name__)
 

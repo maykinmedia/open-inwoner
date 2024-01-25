@@ -4,11 +4,10 @@ from typing import List, Optional
 from django.conf import settings
 
 from requests import RequestException
-from zds_client import ClientError
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.catalogi import Catalogus
 
-from open_inwoner.utils.api import get_paginated_results
+from open_inwoner.utils.api import ClientError, get_paginated_results
 
 from ..utils.decorators import cache as cache_result
 from .api_models import InformatieObjectType, ResultaatType, StatusType, ZaakType
@@ -73,7 +72,7 @@ def fetch_single_status_type(status_type_url: str) -> Optional[StatusType]:
         return
 
     try:
-        response = client.get(url=status_type_url).json()
+        response = client.get(url=status_type_url)
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
@@ -93,7 +92,7 @@ def fetch_single_resultaat_type(resultaat_type_url: str) -> Optional[ResultaatTy
         return
 
     try:
-        response = client.get(url=resultaat_type_url).json()
+        response = client.get(url=resultaat_type_url)
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
@@ -178,7 +177,7 @@ def fetch_single_case_type(case_type_url: str) -> Optional[ZaakType]:
         return
 
     try:
-        response = client.get(url=case_type_url).json()
+        response = client.get(url=case_type_url)
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
@@ -224,7 +223,7 @@ def fetch_single_information_object_type(
         return
 
     try:
-        response = client.get(url=information_object_type_url).json()
+        response = client.get(url=information_object_type_url)
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return

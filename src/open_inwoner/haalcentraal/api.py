@@ -7,11 +7,11 @@ from urllib.parse import urljoin
 
 from glom import GlomError, glom
 from requests import RequestException
-from zds_client import ClientError
 from zgw_consumers.client import build_client
 
 from open_inwoner.haalcentraal.api_models import BRPData
 from open_inwoner.haalcentraal.models import HaalCentraalConfig
+from open_inwoner.utils.api import ClientError, JSONParserClient
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +25,9 @@ class BRPAPI(ABC):
         if not self.config.service:
             logger.warning("no service defined for Haal Centraal")
         else:
-            self.client = build_client(self.config.service)
+            self.client = build_client(
+                self.config.service, client_factory=JSONParserClient
+            )
             self._is_ready = True
 
     @abc.abstractmethod
@@ -85,7 +87,7 @@ class BRP_1_3(BRPAPI):
                 },
                 verify=False,
             )
-            return data.json()
+            return data
         except (RequestException, ClientError) as e:
             logger.exception("exception while making request", exc_info=e)
             return None
@@ -143,7 +145,7 @@ class BRP_2_1(BRPAPI):
                 headers={"Accept": "application/json"},
                 verify=False,
             )
-            return data.json()
+            return data
         except (RequestException, ClientError) as e:
             logger.exception("exception while making request", exc_info=e)
             return None

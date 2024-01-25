@@ -2,7 +2,6 @@ import logging
 from typing import List, Optional
 
 from requests import RequestException
-from zds_client import ClientError
 from zgw_consumers.api_models.base import factory
 
 from open_inwoner.accounts.models import User
@@ -19,7 +18,7 @@ from open_inwoner.openklant.api_models import (
 from open_inwoner.openklant.clients import build_client
 from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.openzaak.cases import fetch_case_by_url_no_cache
-from open_inwoner.utils.api import get_paginated_results
+from open_inwoner.utils.api import ClientError, get_paginated_results
 
 logger = logging.getLogger(__name__)
 
@@ -250,7 +249,7 @@ def _fetch_contactmoment(url, *, client=None) -> Optional[ContactMoment]:
         return
 
     try:
-        response = client.get(url).json()
+        response = client.get(url)
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
@@ -266,7 +265,7 @@ def create_klant(data: KlantCreateData) -> Optional[Klant]:
         return
 
     try:
-        response = client.post("klanten", json=data).json()
+        response = client.post("klanten", json=data)
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
@@ -286,7 +285,7 @@ def patch_klant(klant: Klant, update_data) -> Optional[Klant]:
         return
 
     try:
-        response = client.patch(url=klant.url, json=update_data).json()
+        response = client.patch(url=klant.url, json=update_data)
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
@@ -307,7 +306,7 @@ def create_contactmoment(
         return
 
     try:
-        response = client.post("contactmomenten", json=data).json()
+        response = client.post("contactmomenten", json=data)
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
@@ -324,7 +323,7 @@ def create_contactmoment(
                     "contactmoment": contactmoment.url,
                     "rol": rol,
                 },
-            ).json()
+            )
         except (RequestException, ClientError) as e:
             logger.exception("exception while making request", exc_info=e)
             return

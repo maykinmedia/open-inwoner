@@ -5,11 +5,10 @@ from typing import List, Optional
 from django.conf import settings
 
 from requests import RequestException
-from zds_client import ClientError
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 
-from open_inwoner.utils.api import get_paginated_results
+from open_inwoner.utils.api import ClientError, get_paginated_results
 
 from ..utils.decorators import cache as cache_result
 from .api_models import Resultaat, Rol, Status, Zaak, ZaakInformatieObject
@@ -135,7 +134,7 @@ def fetch_single_case(case_uuid: str) -> Optional[Zaak]:
         return
 
     try:
-        response = client.get(f"zaken/{case_uuid}", headers=CRS_HEADERS).json()
+        response = client.get(f"zaken/{case_uuid}", headers=CRS_HEADERS)
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
@@ -155,7 +154,7 @@ def fetch_single_case_information_object(url: str) -> Optional[ZaakInformatieObj
         return
 
     try:
-        response = client.get(url=url).json()
+        response = client.get(url=url)
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
@@ -168,7 +167,7 @@ def fetch_single_case_information_object(url: str) -> Optional[ZaakInformatieObj
 def fetch_case_by_url_no_cache(case_url: str) -> Optional[Zaak]:
     client = build_client("zaak")
     try:
-        response = client.get(url=case_url, headers=CRS_HEADERS).json()
+        response = client.get(url=case_url, headers=CRS_HEADERS)
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
@@ -189,7 +188,7 @@ def fetch_case_information_objects(case_url: str) -> List[ZaakInformatieObject]:
         response = client.get(
             "zaakinformatieobjecten",
             params={"zaak": case_url},
-        ).json()
+        )
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return []
@@ -211,7 +210,7 @@ def fetch_status_history_no_cache(case_url: str) -> List[Status]:
         return []
 
     try:
-        response = client.get("statussen", params={"zaak": case_url}).json()
+        response = client.get("statussen", params={"zaak": case_url})
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return []
@@ -229,7 +228,7 @@ def fetch_single_status(status_url: str) -> Optional[Status]:
         return
 
     try:
-        response = client.get(url=status_url).json()
+        response = client.get(url=status_url)
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
@@ -360,7 +359,7 @@ def fetch_case_information_objects_for_case_and_info(
                 "zaak": case_url,
                 "informatieobject": info_object_url,
             },
-        ).json()
+        )
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return []
@@ -378,7 +377,7 @@ def fetch_single_result(result_url: str) -> Optional[Resultaat]:
         return
 
     try:
-        response = client.get(url=result_url).json()
+        response = client.get(url=result_url)
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
@@ -398,7 +397,7 @@ def connect_case_with_document(case_url: str, document_url: str) -> Optional[dic
         response = client.post(
             "zaakinformatieobjecten",
             json={"zaak": case_url, "informatieobject": document_url},
-        ).json()
+        )
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return

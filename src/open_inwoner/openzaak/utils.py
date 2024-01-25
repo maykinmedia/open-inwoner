@@ -2,7 +2,6 @@ import logging
 from typing import Optional, Union
 from uuid import UUID
 
-from zds_client import get_operation_url
 from zgw_consumers.api_models.constants import RolTypes, VertrouwelijkheidsAanduidingen
 
 from open_inwoner.openzaak.api_models import InformatieObject, Rol, Zaak, ZaakType

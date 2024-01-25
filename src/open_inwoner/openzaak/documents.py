@@ -9,13 +9,13 @@ from django.utils.functional import SimpleLazyObject
 
 import requests
 from requests import HTTPError, RequestException, Response
-from zds_client import ClientError
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.client import build_client
 
 from open_inwoner.openzaak.api_models import InformatieObject
 from open_inwoner.openzaak.clients import build_client
 from open_inwoner.openzaak.models import OpenZaakConfig
+from open_inwoner.utils.api import ClientError
 
 from ..utils.decorators import cache as cache_result
 
@@ -45,9 +45,9 @@ def _fetch_single_information_object(
 
     try:
         if url:
-            response = client.get(url=url).json()
+            response = client.get(url=url)
         else:
-            response = client.get(f"enkelvoudiginformatieobjecten/{uuid}").json()
+            response = client.get(f"enkelvoudiginformatieobjecten/{uuid}")
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
@@ -119,9 +119,7 @@ def upload_document(
     }
 
     try:
-        response = client.post(
-            "enkelvoudiginformatieobjecten", json=document_body
-        ).json()
+        response = client.post("enkelvoudiginformatieobjecten", json=document_body)
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
