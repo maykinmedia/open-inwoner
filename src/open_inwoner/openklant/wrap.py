@@ -48,7 +48,7 @@ def fetch_klantcontactmomenten(
         ret.extend(moments)
 
     # combine sorting for moments of all klanten for a bsn
-    ret.sort(key=lambda kcm: kcm.contactmoment.registratiedatum)
+    ret.sort(key=lambda kcm: kcm.contactmoment.registratiedatum, reverse=True)
 
     return ret
 

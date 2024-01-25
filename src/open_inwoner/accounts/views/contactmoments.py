@@ -21,6 +21,7 @@ from open_inwoner.openklant.wrap import (
     fetch_klantcontactmomenten,
     get_fetch_parameters,
 )
+from open_inwoner.utils.mixins import PaginationMixin
 from open_inwoner.utils.views import CommonPageMixin
 
 logger = logging.getLogger(__name__)
@@ -116,8 +117,9 @@ class KlantContactMomentBaseView(
         return ctx
 
 
-class KlantContactMomentListView(KlantContactMomentBaseView):
+class KlantContactMomentListView(PaginationMixin, KlantContactMomentBaseView):
     template_name = "pages/contactmoment/list.html"
+    paginate_by = 9
 
     @cached_property
     def crumbs(self):
@@ -137,6 +139,8 @@ class KlantContactMomentListView(KlantContactMomentBaseView):
             **get_fetch_parameters(self.request, use_vestigingsnummer=True)
         )
         ctx["contactmomenten"] = [self.get_kcm_data(kcm) for kcm in kcms]
+        paginator_dict = self.paginate_with_context(ctx["contactmomenten"])
+        ctx.update(paginator_dict)
         return ctx
 
 
