@@ -109,7 +109,7 @@ class Category(MP_Node):
         verbose_name=_("Restrict to admin groups"),
         blank=True,
         help_text=_(
-            "If set only users belonging to this group can edit this category and it's products"
+            "If set, only users belonging to this group can edit this category and its products"
         ),
         related_name="managed_categories",
     )

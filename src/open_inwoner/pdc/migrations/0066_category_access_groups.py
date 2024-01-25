@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             name="access_groups",
             field=models.ManyToManyField(
                 blank=True,
-                help_text="If set only users belonging to this group can edit this category and it's products",
+                help_text="If set, only users belonging to this group can edit this category and its products",
                 related_name="managed_categories",
                 to="auth.Group",
                 verbose_name="Restrict to admin groups",

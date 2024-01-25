@@ -85,7 +85,6 @@ class ProductAdmin(ImportExportMixin, admin.ModelAdmin):
     list_editable = ("published",)
     date_hierarchy = "created_on"
     autocomplete_fields = (
-        # "categories",
         "related_products",
         "tags",
         "organizations",
