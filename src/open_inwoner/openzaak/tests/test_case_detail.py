@@ -585,6 +585,12 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             ),
         )
 
+        # extra mock for fetching single status (#2037)
+        m.get(
+            f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
+            json=self.status_new,
+        )
+
     @patch("open_inwoner.userfeed.hooks.case_status_seen")
     @patch("open_inwoner.userfeed.hooks.case_documents_seen")
     def test_status_is_retrieved_when_user_logged_in_via_digid(
