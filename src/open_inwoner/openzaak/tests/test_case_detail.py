@@ -325,7 +325,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             aardRelatieWeergave="some content",
             titel="info object 1",
             beschrijving="",
-            registratiedatum="2021-01-12",
+            registratiedatum="2021-01-12T00:00:00+01:00",
         )
         self.zaak_informatie_object_2 = generate_oas_component_cached(
             "zrc",
@@ -336,7 +336,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             aardRelatieWeergave="some content",
             titel="info object 2",
             beschrijving="",
-            registratiedatum="2021-02-12",
+            registratiedatum="2024-01-12T00:00:00+01:00",
         )
         # informatie_object without registratiedatum
         self.zaak_informatie_object_no_date = generate_oas_component_cached(
@@ -431,6 +431,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             titel="",
             beschrijving="",
             registratiedatum="2021-01-12",
+            # registratiedatum="2021-01-12T00:00:00+01:00",
         )
         self.informatie_object_invisible = generate_oas_component_cached(
             "drc",
@@ -456,6 +457,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 },
             ),
             created=datetime.datetime(2021, 1, 12, 0, 0, 0),
+            # corresponds to self.zaak_informatie_object
+            # created=datetime.datetime.strptime(
+            #     self.zaak_informatie_object["registratiedatum"], "%Y-%m-%dT%H:%M:%S%z"
+            # )
         )
         self.informatie_object_file_2 = SimpleFile(
             name="another_document_title.txt",
@@ -467,7 +472,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                     "info_id": self.informatie_object_2["uuid"],
                 },
             ),
-            created=datetime.datetime(2021, 2, 12, 0, 0, 0),
+            created=datetime.datetime(2024, 1, 12, 0, 0, 0),
         )
         self.informatie_object_file_no_date = SimpleFile(
             name="yet_another_document_title.txt",
@@ -904,6 +909,58 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
         self.assertEqual(result, end_status_type)
 
+    def test_document_ordering_by_date(self, m):
+        """
+        Assert that case documents are sorted by date
+        """
+        self.maxDiff = None
+        self._setUpMocks(m)
+
+        ZaakTypeStatusTypeConfigFactory.create(
+            statustype_url=self.status_type_new["url"],
+            status_indicator=StatusIndicators.warning,
+            status_indicator_text="foo",
+        )
+        ZaakTypeStatusTypeConfigFactory.create(
+            statustype_url=self.status_type_finish["url"],
+            status_indicator=StatusIndicators.success,
+            status_indicator_text="bar",
+        )
+
+        # install mocks with additional case documents
+        m.get(self.informatie_object["url"], json=self.informatie_object)
+        m.get(self.informatie_object_2["url"], json=self.informatie_object_2)
+
+        m.post(
+            f"{ZAKEN_ROOT}zaakinformatieobjecten",
+            status_code=201,
+            json=[
+                self.zaak_informatie_object,
+                self.zaak_informatie_object_2,
+            ],
+        )
+        m.get(
+            f"{ZAKEN_ROOT}zaakinformatieobjecten?zaak={self.zaak['url']}",
+            json=[
+                self.zaak_informatie_object,
+                self.zaak_informatie_object_2,
+            ],
+        )
+
+        status_new_obj, status_finish_obj = factory(
+            Status, [self.status_new, self.status_finish]
+        )
+        status_new_obj.statustype = factory(StatusType, self.status_type_new)
+        status_finish_obj.statustype = factory(StatusType, self.status_type_finish)
+
+        response = self.app.get(self.case_detail_url, user=self.user)
+
+        documents = response.context.get("case")["documents"]
+
+        # order should be reverse of list order from response
+        self.assertEqual(documents[0].name, self.informatie_object_2["titel"])
+        self.assertEqual(documents[1].name, self.informatie_object["titel"])
+
     def test_document_ordering_by_name(self, m):
         """
         Assert that case documents are sorted by name/title if sorting by date does not work
@@ -946,7 +1003,6 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 self.zaak_informatie_object,
                 self.zaak_informatie_object_2,
                 self.zaak_informatie_object_no_date,
-                self.zaak_informatie_object_invisible,
             ],
         )
 
@@ -960,9 +1016,10 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
         documents = response.context.get("case")["documents"]
 
-        self.assertEqual(documents[0].name, "another_document_title.txt")
-        self.assertEqual(documents[1].name, "uploaded_document_title.txt")
-        self.assertEqual(documents[2].name, "yet_another_document_title.txt")
+        # order of #1 and #2 should be reversed
+        self.assertEqual(documents[0].name, self.informatie_object_2["titel"])
+        self.assertEqual(documents[1].name, self.informatie_object["titel"])
+        self.assertEqual(documents[2].name, self.informatie_object_no_date["titel"])
 
     @patch("open_inwoner.cms.cases.views.status.fetch_status_history")
     def test_e_suite_missing_current_status_fetch_status(
