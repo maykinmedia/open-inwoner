@@ -167,75 +167,13 @@ class InnerCaseDetailView(
             else:
                 second_status_preview = None
 
-            # transform current status of `self.case` to ZGW model object
-            status_types = defaultdict(list)
-            for status in statuses:
-                status_types[status.statustype].append(status)
-                if self.case.status == status.url:
-                    self.case.status = status
-
-            # e-suite compatibility
-            if isinstance(self.case.status, str):
-                logger.info(
-                    "Issue #2037 -- Retrieving status individually to deal with the situation"
-                    "where eSuite doesnt return current status as part of statuslist retrieval"
-                )
-                self.case.status = fetch_single_status(self.case.status)
-                status_types[self.case.status.statustype].append(self.case.status)
-                statuses.append(self.case.status)
-
-            for status_type_url, _statuses in list(status_types.items()):
-                # todo parallel
-                status_type = fetch_single_status_type(status_type_url)
-                status_types[status_type_url] = status_type
-                for status in _statuses:
-                    status.statustype = status_type
-
-            # The end status data is not passed if the end status has been reached,
-            # because in that case the end status data is already included in `statuses`
-            end_statustype = next((s for s in statustypen if s.is_eindstatus), None)
-            # The following check is a eSuite-specific workaround to deal with multiple statustypes per zaaktype having isEindstatus: true
-            # In the case when we have reached a statustype with isEindstatus set we assume this is our eindstatus
-            if (
-                statuses
-                and statuses[-1].statustype
-                and statuses[-1].statustype.is_eindstatus
-            ):
-                end_statustype = statuses[-1].statustype
-
-            end_statustype_data = None
-            if not status_types.get(end_statustype.url):
-                end_statustype_data = {
-                    "label": status_translate(
-                        end_statustype.omschrijving, default=_("No data available")
-                    ),
-                    "status_indicator": getattr(
-                        self.statustype_config_mapping.get(end_statustype.url),
-                        "status_indicator",
-                        None,
-                    ),
-                    "status_indicator_text": getattr(
-                        self.statustype_config_mapping.get(end_statustype.url),
-                        "status_indicator_text",
-                        None,
-                    ),
-                    "call_to_action_url": getattr(
-                        self.statustype_config_mapping.get(end_statustype.url),
-                        "call_to_action_url",
-                        None,
-                    ),
-                    "call_to_action_text": getattr(
-                        self.statustype_config_mapping.get(end_statustype.url),
-                        "call_to_action_text",
-                        None,
-                    ),
-                    "case_link_text": getattr(
-                        self.statustype_config_mapping.get(end_statustype.url),
-                        "case_link_text",
-                        _("Bekijk aanvraag"),
-                    ),
-                }
-
+            # handle/transform data associated with `self.case`
+            status_types_mapping = self.sync_statuses_with_status_types(statuses)
+            end_statustype_data = self.handle_end_statustype_data(
+                status_types_mapping=status_types_mapping,
+                end_statustype=self.handle_end_statustype(statuses, statustypen),
+                status_translate=status_translate,
+            )
             result_data = self.get_result_data(
                 self.case, self.resulttype_config_mapping
             )
@@ -259,6 +197,7 @@ class InnerCaseDetailView(
                 "statuses": self.get_statuses_data(
                     statuses, status_translate, self.statustype_config_mapping
                 ),
+                # "end_statustype_data": end_statustype_data,
                 "end_statustype_data": end_statustype_data,
                 "second_status_preview": second_status_preview,
                 "documents": documents,
@@ -312,6 +251,118 @@ class InnerCaseDetailView(
             ),
             None,
         )
+
+    def sync_statuses_with_status_types(
+        self, statuses: list[Status]
+    ) -> dict[str, StatusType]:
+        """
+        Update `statuses` (including the status on this view) and sync with `status_types`:
+            - resolve `self.case.status` (a url/str) to a `Status` object
+            - resolve `status_type` url for each element in `statuses` to the corresponding
+              `StatusType` object (this also mutates `self.case.status`)
+            - create mapping `{status_type_url: StatusType}`
+
+        We create a preliminary mapping {status_type url: Status}, then loop over this mapping
+        replacing `Status` with the `StatusType` corresponding to the url, and resolving the
+        `status_type` url on each `Status` instance to the corresponding `StatusType` object.
+        Note that this works by mutating `statuses`.
+
+        Requires eSuite compatibility check for cases where the current status of our case is
+        not returned as part of the statuslist retrieval.
+        """
+        status_types_mapping = defaultdict(list)
+
+        # preliminary mapping {status_type url: status}
+        for status in statuses:
+            status_types_mapping[status.statustype].append(status)
+            if self.case.status == status.url:
+                self.case.status = status
+
+        # eSuite compatibility
+        if isinstance(self.case.status, str):
+            logger.info(
+                "Issue #2037 -- Retrieving status individually because of eSuite"
+            )
+            self.case.status = fetch_single_status(self.case.status)
+            status_types_mapping[self.case.status.statustype].append(self.case.status)
+            statuses.append(self.case.status)
+
+        # final mapping {status_type url: status_type}
+        for status_type_url, _statuses in list(status_types_mapping.items()):
+            status_type = fetch_single_status_type(status_type_url)
+            status_types_mapping[status_type_url] = status_type
+            # resolve statustype url to `StatusType`
+            for status in _statuses:
+                status.statustype = status_type
+
+        return status_types_mapping
+
+    def handle_end_statustype(
+        self, statuses: list[Status], statustypen: list[StatusType]
+    ):
+        """
+        Determine the statustype of the endstatus in `statustypen` (if there is one)
+
+        Requires eSuite compatibility check for cases containing multiple statustypes
+        per zaaktype with `isEindstatus: true`. When reaching a `statustype` with
+        `isEindstatus: true`, we assume this is our end status.
+        """
+        # The end status data is not passed if the end status has been reached,
+        # because in that case the end status data is already included in `statuses`
+        end_statustype = next((s for s in statustypen if s.is_eindstatus), None)
+
+        # eSuite compatibility
+        if (
+            statuses
+            and statuses[-1].statustype
+            and statuses[-1].statustype.is_eindstatus
+        ):
+            end_statustype = statuses[-1].statustype
+
+        return end_statustype
+
+    def handle_end_statustype_data(
+        self,
+        status_types_mapping: dict[str, StatusType],
+        end_statustype: StatusType,
+        status_translate: StatusTranslation,
+    ):
+        """
+        Prepare data about end statustype for use in context/template
+        """
+        end_statustype_data = None
+        if not status_types_mapping.get(end_statustype.url):
+            end_statustype_data = {
+                "label": status_translate(
+                    end_statustype.omschrijving, default=_("No data available")
+                ),
+                "status_indicator": getattr(
+                    self.statustype_config_mapping.get(end_statustype.url),
+                    "status_indicator",
+                    None,
+                ),
+                "status_indicator_text": getattr(
+                    self.statustype_config_mapping.get(end_statustype.url),
+                    "status_indicator_text",
+                    None,
+                ),
+                "call_to_action_url": getattr(
+                    self.statustype_config_mapping.get(end_statustype.url),
+                    "call_to_action_url",
+                    None,
+                ),
+                "call_to_action_text": getattr(
+                    self.statustype_config_mapping.get(end_statustype.url),
+                    "call_to_action_text",
+                    None,
+                ),
+                "case_link_text": getattr(
+                    self.statustype_config_mapping.get(end_statustype.url),
+                    "case_link_text",
+                    _("Bekijk aanvraag"),
+                ),
+            }
+        return end_statustype_data
 
     @property
     def is_file_upload_enabled_for_case_type(self) -> bool:

@@ -858,6 +858,52 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
 
         self.assertEqual(first_status["status_indicator_text"], "foo")
 
+    def test_e_suite_multiple_end_statustypes(self, m):
+        """
+        Regression test for #1971
+        eSuite can return multiple statustypes with `isEindstatus=True`
+        """
+        self.maxDiff = None
+
+        request = RequestFactory().get("/")
+        detail_view = InnerCaseDetailView()
+        detail_view.setup(request)
+
+        end_status_type = StatusType(
+            url="http://statustype_1.com",
+            zaaktype=self.status_type_finish["zaaktype"],
+            omschrijving="End status",
+            volgnummer=3,
+            omschrijving_generiek="End status",
+            statustekst=self.status_type_finish["statustekst"],
+            is_eindstatus=True,
+            informeren=self.status_type_finish["informeren"],
+        )
+        end_status_type_extra = StatusType(
+            url="http://statustype_2.com",
+            zaaktype=self.status_type_finish["zaaktype"],
+            omschrijving="Bogus end status",
+            volgnummer=2,
+            omschrijving_generiek="Bogus end status",
+            statustekst=self.status_type_finish["statustekst"],
+            is_eindstatus=True,
+            informeren=self.status_type_finish["informeren"],
+        )
+        statustypen = [end_status_type_extra, end_status_type]
+        statuses = [
+            Status(
+                url=self.status_finish["url"],
+                zaak="https://zaken.nl/api/v1/zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
+                statustype=end_status_type,
+                datum_status_gezet=datetime.datetime(2021, 1, 12, 0, 0),
+                statustoelichting="",
+            )
+        ]
+
+        result = detail_view.handle_end_statustype(statuses, statustypen)
+
+        self.assertEqual(result, end_status_type)
+
     def test_document_ordering_by_name(self, m):
         """
         Assert that case documents are sorted by name/title if sorting by date does not work
