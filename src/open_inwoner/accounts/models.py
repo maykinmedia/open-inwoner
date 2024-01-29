@@ -145,7 +145,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         default=LoginTypeChoices.default,
         max_length=250,
     )
-    birthday = models.DateField(verbose_name=_("Birthday"), null=True, blank=True)
     street = models.CharField(
         verbose_name=_("Street"),
         default="",
@@ -339,18 +338,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_short_name(self):
         return self.first_name
-
-    def get_age(self):
-        if self.birthday:
-            today = date.today()
-            age = (
-                today.year
-                - self.birthday.year
-                - ((today.month, today.day) < (self.birthday.month, self.birthday.day))
-            )
-
-            return age
-        return None
 
     def get_address(self):
         if self.street:

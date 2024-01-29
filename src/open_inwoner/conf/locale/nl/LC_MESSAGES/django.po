@@ -549,11 +549,6 @@ msgstr "Bedrijfsnaam"
 msgid "Login type"
 msgstr "Logintype"
 
-#: src/open_inwoner/accounts/models.py:148
-#: src/open_inwoner/templates/export/profile/profile_export.html:14
-msgid "Birthday"
-msgstr "Geboortedatum"
-
 #: src/open_inwoner/accounts/models.py:150
 msgid "Street"
 msgstr "Straat"

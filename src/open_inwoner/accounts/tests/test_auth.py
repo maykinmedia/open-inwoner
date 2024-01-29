@@ -306,7 +306,6 @@ class DigiDRegistrationTest(AssertRedirectsMixin, HaalCentraalMixin, WebTest):
 
         self.assertEqual(user.first_name, "Merel")
         self.assertEqual(user.last_name, "Kooyman")
-        self.assertEqual(user.birthday, date(1982, 4, 10))
         self.assertEqual(user.street, "King Olivereiland")
         self.assertEqual(user.housenumber, "64")
         self.assertEqual(user.city, "'s-Gravenhage")

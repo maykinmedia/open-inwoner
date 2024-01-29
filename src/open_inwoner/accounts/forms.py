@@ -157,7 +157,6 @@ class UserForm(BaseUserForm):
             "display_name",
             "email",
             "phonenumber",
-            "birthday",
             "street",
             "housenumber",
             "postcode",

@@ -320,7 +320,6 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         form["display_name"] = ""
         form["email"] = ""
         form["phonenumber"] = ""
-        form["birthday"] = ""
         form["street"] = ""
         form["housenumber"] = ""
         form["postcode"] = ""
@@ -337,7 +336,6 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         form["display_name"] = "a nickname"
         form["email"] = "user@example.com"
         form["phonenumber"] = "0612345678"
-        form["birthday"] = "21-01-1992"
         form["street"] = "Keizersgracht"
         form["housenumber"] = "17 d"
         form["postcode"] = "1013 RM"
@@ -351,7 +349,6 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         self.assertEquals(self.user.last_name, "Last name")
         self.assertEquals(self.user.display_name, "a nickname")
         self.assertEquals(self.user.email, "user@example.com")
-        self.assertEquals(self.user.birthday.strftime("%d-%m-%Y"), "21-01-1992")
         self.assertEquals(self.user.street, "Keizersgracht")
         self.assertEquals(self.user.housenumber, "17 d")
         self.assertEquals(self.user.postcode, "1013 RM")
