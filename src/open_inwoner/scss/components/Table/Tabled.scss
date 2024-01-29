@@ -4,9 +4,20 @@
 
   &__key {
     color: var(--color-gray-90);
+    @media (max-width: 500px) {
+      min-width: 150px;
+    }
   }
   &__value {
     color: var(--color-gray-dark);
+    overflow-wrap: break-word;
+    word-break: normal;
+  }
+
+  &__break {
+    color: var(--color-gray-dark);
+    overflow-wrap: break-word;
+    word-break: break-all;
   }
 
   &__title {
@@ -25,9 +36,7 @@
   &.tabled--flexible {
     .tabled__header,
     .tabled__row {
-      @media (min-width: 768px) {
-        grid-template-columns: 1fr 1fr 1fr;
-      }
+      grid-template-columns: 1fr 2fr;
     }
   }
 
