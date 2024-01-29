@@ -12,7 +12,7 @@ from furl import furl
 from timeline_logger.models import TimelineLog
 from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 from zgw_consumers.constants import APITypes
-from zgw_consumers.test import generate_oas_component, mock_service_oas_get
+from zgw_consumers.test import mock_service_oas_get
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory, eHerkenningUserFactory
@@ -36,6 +36,7 @@ from .factories import (
     ZaakTypeConfigFactory,
     ZaakTypeStatusTypeConfigFactory,
 )
+from .helpers import generate_oas_component_cached
 from .mocks import ESuiteData
 from .shared import CATALOGI_ROOT, ZAKEN_ROOT
 
@@ -52,20 +53,19 @@ class CaseListAccessTests(AssertRedirectsMixin, ClearCachesMixin, WebTest):
     outer_url = reverse_lazy("cases:index")
     inner_url = reverse_lazy("cases:cases_content")
 
-    @classmethod
-    def setUpTestData(cls):
-        super().setUpTestData()
+    def setUp(self):
+        super().setUp()
 
         # services
-        cls.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
-        cls.catalogi_service = ServiceFactory(
+        self.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
+        self.catalogi_service = ServiceFactory(
             api_root=CATALOGI_ROOT, api_type=APITypes.ztc
         )
         # openzaak config
-        cls.config = OpenZaakConfig.get_solo()
-        cls.config.zaak_service = cls.zaak_service
-        cls.config.catalogi_service = cls.catalogi_service
-        cls.config.save()
+        self.config = OpenZaakConfig.get_solo()
+        self.config.zaak_service = self.zaak_service
+        self.config.catalogi_service = self.catalogi_service
+        self.config.save()
 
     def test_user_access_is_forbidden_when_not_logged_in_via_digid(self):
         # User's bsn is None when logged in by email (default method)
@@ -148,33 +148,32 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
     inner_url = reverse_lazy("cases:cases_content")
     maxDiff = None
 
-    @classmethod
-    def setUpTestData(cls):
-        super().setUpTestData()
+    def setUp(self):
+        super().setUp()
 
-        cls.user = UserFactory(
+        self.user = UserFactory(
             login_type=LoginTypeChoices.digid, bsn="900222086", email="johm@smith.nl"
         )
-        cls.eherkenning_user = eHerkenningUserFactory.create(
+        self.eherkenning_user = eHerkenningUserFactory.create(
             kvk="12345678",
             rsin="123456789",
             login_type=LoginTypeChoices.eherkenning,
         )
         # services
-        cls.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
-        cls.catalogi_service = ServiceFactory(
+        self.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
+        self.catalogi_service = ServiceFactory(
             api_root=CATALOGI_ROOT, api_type=APITypes.ztc
         )
         # openzaak config
-        cls.config = OpenZaakConfig.get_solo()
-        cls.config.zaak_service = cls.zaak_service
-        cls.config.catalogi_service = cls.catalogi_service
-        cls.config.zaak_max_confidentiality = (
+        self.config = OpenZaakConfig.get_solo()
+        self.config.zaak_service = self.zaak_service
+        self.config.catalogi_service = self.catalogi_service
+        self.config.zaak_max_confidentiality = (
             VertrouwelijkheidsAanduidingen.beperkt_openbaar
         )
-        cls.config.save()
+        self.config.save()
 
-        cls.zaaktype = generate_oas_component(
+        self.zaaktype = generate_oas_component_cached(
             "ztc",
             "schemas/ZaakType",
             url=f"{CATALOGI_ROOT}zaaktypen/53340e34-7581-4b04-884f",
@@ -184,7 +183,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
             indicatieInternOfExtern="extern",
         )
-        cls.zaak_type_intern = generate_oas_component(
+        self.zaak_type_intern = generate_oas_component_cached(
             "ztc",
             "schemas/ZaakType",
             url=f"{CATALOGI_ROOT}zaaktypen/53340e34-75a1-4b04-1234",
@@ -193,36 +192,36 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
             indicatieInternOfExtern="intern",
         )
-        cls.status_type1 = generate_oas_component(
+        self.status_type1 = generate_oas_component_cached(
             "ztc",
             "schemas/StatusType",
             url=f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-777yu878km09",
-            zaaktype=cls.zaaktype["url"],
+            zaaktype=self.zaaktype["url"],
             omschrijving="Initial request",
             volgnummer=1,
             isEindstatus=False,
         )
-        cls.status_type2 = generate_oas_component(
+        self.status_type2 = generate_oas_component_cached(
             "ztc",
             "schemas/StatusType",
             url=f"{CATALOGI_ROOT}statustypen/e3798107-ab27-4c3c-977d-744516671fe4",
-            zaaktype=cls.zaaktype["url"],
+            zaaktype=self.zaaktype["url"],
             omschrijving="Finish",
             volgnummer=2,
             isEindstatus=True,
         )
 
-        cls.catalogus_config = CatalogusConfigFactory.create(
-            url=cls.zaaktype["catalogus"]
+        self.catalogus_config = CatalogusConfigFactory.create(
+            url=self.zaaktype["catalogus"]
         )
-        cls.zaaktype_config1 = ZaakTypeConfigFactory.create(
-            urls=[cls.zaaktype["url"]],
-            identificatie=cls.zaaktype["identificatie"],
-            catalogus=cls.catalogus_config,
+        self.zaaktype_config1 = ZaakTypeConfigFactory.create(
+            urls=[self.zaaktype["url"]],
+            identificatie=self.zaaktype["identificatie"],
+            catalogus=self.catalogus_config,
         )
-        cls.zt_statustype_config1 = ZaakTypeStatusTypeConfigFactory.create(
-            zaaktype_config=cls.zaaktype_config1,
-            statustype_url=cls.status_type1["url"],
+        self.zt_statustype_config1 = ZaakTypeStatusTypeConfigFactory.create(
+            zaaktype_config=self.zaaktype_config1,
+            statustype_url=self.status_type1["url"],
             status_indicator=StatusIndicators.warning,
             status_indicator_text="U moet documenten toevoegen",
             description="Lorem ipsum dolor sit amet",
@@ -230,12 +229,12 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
             call_to_action_text="Click me",
         )
         # open
-        cls.zaak1 = generate_oas_component(
+        self.zaak1 = generate_oas_component_cached(
             "zrc",
             "schemas/Zaak",
             url=f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
             uuid="d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
-            zaaktype=cls.zaaktype["url"],
+            zaaktype=self.zaaktype["url"],
             identificatie="ZAAK-2022-0000000001",
             omschrijving="Coffee zaak 1",
             startdatum="2022-01-02",
@@ -243,21 +242,21 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
             status=f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
         )
-        cls.status1 = generate_oas_component(
+        self.status1 = generate_oas_component_cached(
             "zrc",
             "schemas/Status",
-            url=cls.zaak1["status"],
-            zaak=cls.zaak1["url"],
-            statustype=cls.status_type1["url"],
+            url=self.zaak1["status"],
+            zaak=self.zaak1["url"],
+            statustype=self.status_type1["url"],
             datumStatusGezet="2021-01-12",
             statustoelichting="",
         )
-        cls.zaak2 = generate_oas_component(
+        self.zaak2 = generate_oas_component_cached(
             "zrc",
             "schemas/Zaak",
             url=f"{ZAKEN_ROOT}zaken/e4d469b9-6666-4bdd-bf42-b53445298102",
             uuid="e4d469b9-6666-4bdd-bf42-b53445298102",
-            zaaktype=cls.zaaktype["url"],
+            zaaktype=self.zaaktype["url"],
             identificatie="0014ESUITE66392022",
             omschrijving="Coffee zaak 2",
             startdatum="2022-01-12",
@@ -265,21 +264,21 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
             status=f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-beu760sle929",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
         )
-        cls.status2 = generate_oas_component(
+        self.status2 = generate_oas_component_cached(
             "zrc",
             "schemas/Status",
-            url=cls.zaak2["status"],
-            zaak=cls.zaak2["url"],
-            statustype=cls.status_type1["url"],
+            url=self.zaak2["status"],
+            zaak=self.zaak2["url"],
+            statustype=self.status_type1["url"],
             datumStatusGezet="2021-03-12",
             statustoelichting="",
         )
-        cls.zaak_eherkenning1 = generate_oas_component(
+        self.zaak_eherkenning1 = generate_oas_component_cached(
             "zrc",
             "schemas/Zaak",
             url=f"{ZAKEN_ROOT}zaken/bf558d78-280d-4723-b8e8-2b6179cd74e3",
             uuid="bf558d78-280d-4723-b8e8-2b6179cd74e3",
-            zaaktype=cls.zaaktype["url"],
+            zaaktype=self.zaaktype["url"],
             identificatie="ZAAK-2022-0000000003",
             omschrijving="Coffee zaak 3",
             startdatum="2022-01-02",
@@ -287,12 +286,12 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
             status=f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
         )
-        cls.zaak_eherkenning2 = generate_oas_component(
+        self.zaak_eherkenning2 = generate_oas_component_cached(
             "zrc",
             "schemas/Zaak",
             url=f"{ZAKEN_ROOT}zaken/ff5026c8-5d1f-4bd2-a069-58d4bf75ec8c",
             uuid="ff5026c8-5d1f-4bd2-a069-58d4bf75ec8c",
-            zaaktype=cls.zaaktype["url"],
+            zaaktype=self.zaaktype["url"],
             identificatie="ZAAK-2022-0000000004",
             omschrijving="Coffee zaak 4",
             startdatum="2022-02-02",
@@ -301,12 +300,12 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
         )
         # closed
-        cls.zaak3 = generate_oas_component(
+        self.zaak3 = generate_oas_component_cached(
             "zrc",
             "schemas/Zaak",
             url=f"{ZAKEN_ROOT}zaken/6f8de38f-85ea-42d3-978c-845a033335a7",
             uuid="6f8de38f-85ea-42d3-978c-845a033335a7",
-            zaaktype=cls.zaaktype["url"],
+            zaaktype=self.zaaktype["url"],
             identificatie="ZAAK-2022-0001000003",
             omschrijving="Coffee zaak closed",
             startdatum="2021-07-26",
@@ -314,22 +313,22 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
             status=f"{ZAKEN_ROOT}statussen/98659876-bbb3-476a-ad13-n3nvcght758js",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
         )
-        cls.status3 = generate_oas_component(
+        self.status3 = generate_oas_component_cached(
             "zrc",
             "schemas/Status",
-            url=cls.zaak3["status"],
-            zaak=cls.zaak3["url"],
-            statustype=cls.status_type2["url"],
+            url=self.zaak3["status"],
+            zaak=self.zaak3["url"],
+            statustype=self.status_type2["url"],
             datumStatusGezet="2021-03-15",
             statustoelichting="",
         )
         # not visible
-        cls.zaak_intern = generate_oas_component(
+        self.zaak_intern = generate_oas_component_cached(
             "zrc",
             "schemas/Zaak",
             url=f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4ee0bf67d",
             uuid="d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
-            zaaktype=cls.zaak_type_intern["url"],
+            zaaktype=self.zaak_type_intern["url"],
             identificatie="ZAAK-2022-0000000009",
             omschrijving="Intern zaak",
             startdatum="2022-01-02",
@@ -337,16 +336,16 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, WebTest):
             status=f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c90234500333",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
         )
-        cls.status_intern = generate_oas_component(
+        self.status_intern = generate_oas_component_cached(
             "zrc",
             "schemas/Status",
-            url=cls.zaak_intern["status"],
-            zaak=cls.zaak_intern["url"],
-            statustype=cls.status_type1["url"],
+            url=self.zaak_intern["status"],
+            zaak=self.zaak_intern["url"],
+            statustype=self.status_type1["url"],
             datumStatusGezet="2021-01-12",
             statustoelichting="",
         )
-        cls.submission = generate_oas_component(
+        self.submission = generate_oas_component_cached(
             "zrc",
             "schemas/Zaak",
             url=f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4ee0bf67d",

@@ -1,7 +1,7 @@
 from datetime import date
 from unittest.mock import patch
 
-from django.test import TestCase, override_settings
+from django.test import TestCase
 from django.test.utils import override_settings
 
 import requests_mock
@@ -11,11 +11,10 @@ from furl import furl
 from requests import RequestException
 from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 from zgw_consumers.constants import APITypes
-from zgw_consumers.test import generate_oas_component, mock_service_oas_get
+from zgw_consumers.test import mock_service_oas_get
 
 from open_inwoner.accounts.tests.factories import (
     DigidUserFactory,
-    UserFactory,
     eHerkenningUserFactory,
 )
 from open_inwoner.cms.products.cms_apps import ProductsApphook
@@ -23,12 +22,12 @@ from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.kvk.branches import KVK_BRANCH_SESSION_VARIABLE
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.tests.factories import ServiceFactory, ZaakTypeConfigFactory
+from open_inwoner.openzaak.tests.helpers import generate_oas_component_cached
 from open_inwoner.openzaak.tests.shared import (
     CATALOGI_ROOT,
     DOCUMENTEN_ROOT,
     ZAKEN_ROOT,
 )
-from open_inwoner.pdc.models import Category
 from open_inwoner.pdc.tests.factories import CategoryFactory
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 
@@ -326,95 +325,91 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
 
         cms_tools.create_apphook_page(ProductsApphook)
 
-    @classmethod
-    def setUpTestData(cls):
-        super().setUpTestData()
-
-        cls.category1 = CategoryFactory(
+        self.category1 = CategoryFactory(
             name="0001",
             path="0001",
             highlighted=False,
             zaaktypen=[],
             visible_for_citizens=True,
         )
-        cls.category2 = CategoryFactory(
+        self.category2 = CategoryFactory(
             name="0002",
             path="0002",
             highlighted=False,
             zaaktypen=["ZAAKTYPE-2020-0000000001", "ZAAKTYPE-2020-0000000003"],
             visible_for_citizens=True,
         )
-        cls.category3 = CategoryFactory(
+        self.category3 = CategoryFactory(
             name="0003",
             path="0003",
             highlighted=False,
             zaaktypen=["ZAAKTYPE-2020-0000000001"],
             visible_for_citizens=False,
         )
-        cls.category4 = CategoryFactory(
+        self.category4 = CategoryFactory(
             name="0004",
             path="0004",
             highlighted=False,
             zaaktypen=["ZAAKTYPE-2020-0000000002"],
             visible_for_citizens=True,
         )
-        cls.category5 = CategoryFactory(
+        self.category5 = CategoryFactory(
             name="0005",
             path="0005",
             highlighted=False,
             zaaktypen=["unknown-zaaktype"],
             visible_for_citizens=True,
         )
-        cls.category7 = CategoryFactory(
+        self.category7 = CategoryFactory(
             name="bar",
             highlighted=True,
             zaaktypen=[],
             visible_for_citizens=True,
         )
-        cls.category6 = CategoryFactory.build(
+        self.category6 = CategoryFactory.build(
             name="foo",
             highlighted=True,
             zaaktypen=["ZAAKTYPE-2020-0000000002"],
             visible_for_citizens=True,
         )
         # Highlighted subcategories should show up as well
-        cls.category1.add_child(instance=cls.category6)
+        self.category1.add_child(instance=self.category6)
 
         # Ensure categories are ordered by path
-        cls.category6.path = "0009"
-        cls.category7.path = "0010"
-        cls.category6.save()
-        cls.category7.save()
+        self.category6.path = "0009"
+        self.category7.path = "0010"
+        self.category6.save()
+        self.category7.save()
 
-        cls.user = DigidUserFactory()
-        cls.eherkenning_user = eHerkenningUserFactory(kvk="12345678", rsin="123456789")
+        self.user = DigidUserFactory()
+        self.eherkenning_user = eHerkenningUserFactory(kvk="12345678", rsin="123456789")
 
         # services
-        cls.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
-        cls.catalogi_service = ServiceFactory(
+        self.zaak_service = ServiceFactory(api_root=ZAKEN_ROOT, api_type=APITypes.zrc)
+        self.catalogi_service = ServiceFactory(
             api_root=CATALOGI_ROOT, api_type=APITypes.ztc
         )
-        cls.document_service = ServiceFactory(
+        self.document_service = ServiceFactory(
             api_root=DOCUMENTEN_ROOT, api_type=APITypes.drc
         )
         # openzaak config
-        cls.config = OpenZaakConfig.get_solo()
-        cls.config.zaak_service = cls.zaak_service
-        cls.config.catalogi_service = cls.catalogi_service
-        cls.config.document_service = cls.document_service
-        cls.config.document_max_confidentiality = (
+        self.config = OpenZaakConfig.get_solo()
+        self.config.zaak_service = self.zaak_service
+        self.config.catalogi_service = self.catalogi_service
+        self.config.document_service = self.document_service
+        self.config.document_max_confidentiality = (
             VertrouwelijkheidsAanduidingen.beperkt_openbaar
         )
-        cls.config.zaak_max_confidentiality = (
+        self.config.zaak_max_confidentiality = (
             VertrouwelijkheidsAanduidingen.beperkt_openbaar
         )
-        cls.config.enable_categories_filtering_with_zaken = True
-        cls.config.save()
+        self.config.enable_categories_filtering_with_zaken = True
+        self.config.save()
 
         #
         # zaken
         #
-        cls.zaak = generate_oas_component(
+        self.zaak = generate_oas_component_cached(
             "zrc",
             "schemas/Zaak",
             uuid="d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
@@ -433,7 +428,7 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
             resultaat=f"{ZAKEN_ROOT}resultaten/a44153aa-ad2c-6a07-be75-15add5113",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
         )
-        cls.zaak2 = generate_oas_component(
+        self.zaak2 = generate_oas_component_cached(
             "zrc",
             "schemas/Zaak",
             uuid="cc490c2e-210f-49a0-b7c9-546f7ba7a1f6",
@@ -452,7 +447,7 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
             resultaat=f"{ZAKEN_ROOT}resultaten/a44153aa-ad2c-6a07-be75-15add5113",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
         )
-        cls.zaak3 = generate_oas_component(
+        self.zaak3 = generate_oas_component_cached(
             "zrc",
             "schemas/Zaak",
             uuid="09428099-a239-43a8-acc8-18569348f627",
@@ -472,11 +467,11 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
         )
 
-        cls.zaaktype = generate_oas_component(
+        self.zaaktype = generate_oas_component_cached(
             "ztc",
             "schemas/ZaakType",
             uuid="0caa29cb-0167-426f-8dc1-88bebd7c8804",
-            url=cls.zaak["zaaktype"],
+            url=self.zaak["zaaktype"],
             identificatie="ZAAKTYPE-2020-0000000001",
             omschrijving="Coffee zaaktype",
             catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
@@ -494,11 +489,11 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
             beginGeldigheid="2020-09-25",
             versiedatum="2020-09-25",
         )
-        cls.zaaktype2 = generate_oas_component(
+        self.zaaktype2 = generate_oas_component_cached(
             "ztc",
             "schemas/ZaakType",
             uuid="b36f3461-0a24-45b1-9702-c4fc84a9810c",
-            url=cls.zaak2["zaaktype"],
+            url=self.zaak2["zaaktype"],
             identificatie="ZAAKTYPE-2020-0000000002",
             omschrijving="Tea zaaktype",
             catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
@@ -519,11 +514,11 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
         # For https://taiga.maykinmedia.nl/project/open-inwoner/issue/1932
         # This zaaktype is linked to a Category, but the user does not have a Zaak with
         # this Zaaktype and filtering should not fail because of this
-        cls.zaaktype3 = generate_oas_component(
+        self.zaaktype3 = generate_oas_component_cached(
             "ztc",
             "schemas/ZaakType",
             uuid="5465853f-f1e2-45fa-a811-4bbf23648b4f",
-            url=cls.zaak3["zaaktype"],
+            url=self.zaak3["zaaktype"],
             identificatie="ZAAKTYPE-2020-0000000003",
             omschrijving="foo zaaktype",
             catalogus=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
@@ -541,22 +536,22 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, WebTest):
             beginGeldigheid="2020-09-25",
             versiedatum="2020-09-25",
         )
-        cls.zaaktype_config1 = ZaakTypeConfigFactory(
+        self.zaaktype_config1 = ZaakTypeConfigFactory(
             catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
-            urls=[cls.zaaktype["url"]],
-            identificatie=cls.zaaktype["identificatie"],
+            urls=[self.zaaktype["url"]],
+            identificatie=self.zaaktype["identificatie"],
             relevante_zaakperiode=None,
         )
-        cls.zaaktype_config2 = ZaakTypeConfigFactory(
-            catalogus__url=cls.zaaktype_config1.catalogus,
-            urls=[cls.zaaktype2["url"]],
-            identificatie=cls.zaaktype2["identificatie"],
+        self.zaaktype_config2 = ZaakTypeConfigFactory(
+            catalogus__url=self.zaaktype_config1.catalogus,
+            urls=[self.zaaktype2["url"]],
+            identificatie=self.zaaktype2["identificatie"],
             relevante_zaakperiode=1,
         )
-        cls.zaaktype_config3 = ZaakTypeConfigFactory(
-            catalogus=cls.zaaktype_config1.catalogus,
-            urls=[cls.zaaktype3["url"]],
-            identificatie=cls.zaaktype3["identificatie"],
+        self.zaaktype_config3 = ZaakTypeConfigFactory(
+            catalogus=self.zaaktype_config1.catalogus,
+            urls=[self.zaaktype3["url"]],
+            identificatie=self.zaaktype3["identificatie"],
             relevante_zaakperiode=2,
         )
 

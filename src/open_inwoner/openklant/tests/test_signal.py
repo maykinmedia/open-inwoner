@@ -10,6 +10,7 @@ from open_inwoner.accounts.models import User
 from open_inwoner.accounts.tests.factories import UserFactory, eHerkenningUserFactory
 from open_inwoner.openklant.models import OpenKlantConfig
 from open_inwoner.openklant.tests.data import KLANTEN_ROOT, MockAPIReadData
+from open_inwoner.openzaak.tests.helpers import generate_oas_component_cached
 from open_inwoner.utils.test import (
     ClearCachesMixin,
     DisableRequestLogMixin,
@@ -27,10 +28,10 @@ class UpdateUserFromLoginSignalAPITestCase(
         super().setUpTestData()
         MockAPIReadData.setUpServices()
 
-    def test_update_user_after_login(self, m):
-        MockAPIReadData.setUpOASMocks(m)
+    def setUp(self) -> None:
+        super().setUp()
 
-        self.klant = generate_oas_component(
+        self.klant = generate_oas_component_cached(
             "kc",
             "schemas/Klant",
             uuid="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
@@ -38,6 +39,10 @@ class UpdateUserFromLoginSignalAPITestCase(
             emailadres="new@example.com",
             telefoonnummer="0612345678",
         )
+
+    def test_update_user_after_login(self, m):
+        MockAPIReadData.setUpOASMocks(m)
+
         m.get(
             f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn=999993847",
             json=paginated_response([self.klant]),
@@ -67,14 +72,6 @@ class UpdateUserFromLoginSignalAPITestCase(
     def test_update_eherkenning_user_after_login(self, m):
         MockAPIReadData.setUpOASMocks(m)
 
-        self.klant = generate_oas_component(
-            "kc",
-            "schemas/Klant",
-            uuid="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
-            url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
-            emailadres="new@example.com",
-            telefoonnummer="0612345678",
-        )
         user = eHerkenningUserFactory(
             phonenumber="0123456789",
             email="old@example.com",
@@ -122,14 +119,6 @@ class UpdateUserFromLoginSignalAPITestCase(
     def test_update_user_after_login_skips_existing_email(self, m):
         MockAPIReadData.setUpOASMocks(m)
 
-        self.klant = generate_oas_component(
-            "kc",
-            "schemas/Klant",
-            uuid="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
-            url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
-            emailadres="foo@example.com",
-            telefoonnummer="0612345678",
-        )
         m.get(
             f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn=999993847",
             json=paginated_response([self.klant]),
@@ -144,7 +133,7 @@ class UpdateUserFromLoginSignalAPITestCase(
         other_user = UserFactory(
             phonenumber="0101010101",
             # uses same email as klant resource
-            email="foo@example.com",
+            email="new@example.com",
         )
 
         request = RequestFactory().get("/dummy")
