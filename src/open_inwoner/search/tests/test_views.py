@@ -7,7 +7,6 @@ import requests_mock
 from furl import furl
 from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 from zgw_consumers.constants import APITypes
-from zgw_consumers.test import mock_service_oas_get
 
 from open_inwoner.accounts.tests.factories import DigidUserFactory
 from open_inwoner.configurations.models import SiteConfiguration
@@ -155,8 +154,6 @@ class TestSearchView(ESMixin, TestCase):
         )
 
     def _setUpMocks(self, m):
-        mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
-        mock_service_oas_get(m, CATALOGI_ROOT, "ztc")
         m.get(
             furl(f"{ZAKEN_ROOT}zaken")
             .add(

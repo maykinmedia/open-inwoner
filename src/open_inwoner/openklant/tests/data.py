@@ -1,6 +1,5 @@
 from requests.exceptions import RequestException
 from zgw_consumers.constants import APITypes
-from zgw_consumers.test import mock_service_oas_get
 
 from open_inwoner.accounts.tests.factories import (
     DigidUserFactory,
@@ -36,12 +35,6 @@ class MockAPIData:
         )
         oz_config.save()
 
-    @classmethod
-    def setUpOASMocks(self, m):
-        mock_service_oas_get(m, KLANTEN_ROOT, "kc")
-        mock_service_oas_get(m, CONTACTMOMENTEN_ROOT, "cmc")
-        mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
-
 
 class MockAPIReadPatchData(MockAPIData):
     def __init__(self):
@@ -73,7 +66,6 @@ class MockAPIReadPatchData(MockAPIData):
         )
 
     def install_mocks(self, m) -> "MockAPIReadPatchData":
-        self.setUpOASMocks(m)
         self.matchers = [
             m.get(
                 f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn={self.user.bsn}",
@@ -88,7 +80,6 @@ class MockAPIReadPatchData(MockAPIData):
         return self
 
     def install_mocks_eherkenning(self, m, use_rsin=True) -> "MockAPIReadPatchData":
-        self.setUpOASMocks(m)
         if use_rsin:
             first_eherkenning_matcher = m.get(
                 f"{KLANTEN_ROOT}klanten?subjectNietNatuurlijkPersoon__innNnpId={self.eherkenning_user.rsin}",
@@ -240,8 +231,6 @@ class MockAPIReadData(MockAPIData):
         )
 
     def install_mocks(self, m, link_objectcontactmomenten=False) -> "MockAPIReadData":
-        self.setUpOASMocks(m)
-
         for resource_attr in [
             "klant",
             "klant2",
@@ -368,8 +357,6 @@ class MockAPICreateData(MockAPIData):
         self.matchers = []
 
     def install_mocks_anon_with_klant(self, m) -> "MockAPICreateData":
-        self.setUpOASMocks(m)
-
         self.matchers = [
             m.post(f"{KLANTEN_ROOT}klanten", json=self.klant, status_code=201),
             m.post(
@@ -386,10 +373,8 @@ class MockAPICreateData(MockAPIData):
         return self
 
     def install_mocks_anon_without_klant(self, m) -> "MockAPICreateData":
-        self.setUpOASMocks(m)
-
         self.matchers = [
-            m.post(f"{KLANTEN_ROOT}klanten", json=self.klant, status_code=500),
+            m.post(f"{KLANTEN_ROOT}klanten", status_code=500),
             m.post(
                 f"{CONTACTMOMENTEN_ROOT}contactmomenten",
                 json=self.contactmoment,
@@ -399,8 +384,6 @@ class MockAPICreateData(MockAPIData):
         return self
 
     def install_mocks_digid(self, m) -> "MockAPICreateData":
-        self.setUpOASMocks(m)
-
         self.matchers = [
             m.get(
                 f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn={self.user.bsn}",
@@ -420,7 +403,6 @@ class MockAPICreateData(MockAPIData):
         return self
 
     def install_mocks_digid_missing_contact_info(self, m) -> "MockAPICreateData":
-        self.setUpOASMocks(m)
         self.matchers = [
             m.get(
                 f"{KLANTEN_ROOT}klanten?subjectNatuurlijkPersoon__inpBsn={self.user.bsn}",
@@ -445,8 +427,6 @@ class MockAPICreateData(MockAPIData):
         return self
 
     def install_mocks_eherkenning(self, m, use_rsin=True) -> "MockAPICreateData":
-        self.setUpOASMocks(m)
-
         if use_rsin:
             first_matcher = m.get(
                 f"{KLANTEN_ROOT}klanten?subjectNietNatuurlijkPersoon__innNnpId={self.eherkenning_user.rsin}",
@@ -476,8 +456,6 @@ class MockAPICreateData(MockAPIData):
     def install_mocks_eherkenning_missing_contact_info(
         self, m, use_rsin=True
     ) -> "MockAPICreateData":
-        self.setUpOASMocks(m)
-
         if use_rsin:
             first_matcher = m.get(
                 f"{KLANTEN_ROOT}klanten?subjectNietNatuurlijkPersoon__innNnpId={self.eherkenning_user.rsin}",

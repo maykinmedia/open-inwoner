@@ -6,7 +6,6 @@ from zgw_consumers.api_models.constants import (
     VertrouwelijkheidsAanduidingen,
 )
 from zgw_consumers.constants import APITypes
-from zgw_consumers.test import generate_oas_component, mock_service_oas_get
 
 from open_inwoner.accounts.tests.factories import (
     DigidUserFactory,
@@ -222,13 +221,7 @@ class MockAPIData:
             hoofd_object=self.zaak2["url"],
         )
 
-    def setUpOASMocks(self, m):
-        mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
-        mock_service_oas_get(m, CATALOGI_ROOT, "ztc")
-        mock_service_oas_get(m, DOCUMENTEN_ROOT, "drc")
-
     def install_mocks(self, m, *, res404: Optional[List[str]] = None) -> "MockAPIData":
-        self.setUpOASMocks(m)
         if res404 is None:
             res404 = []
         for attr in res404:

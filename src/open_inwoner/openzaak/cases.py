@@ -5,10 +5,10 @@ from typing import List, Optional
 from django.conf import settings
 
 from requests import RequestException
-from zds_client import ClientError
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
-from zgw_consumers.service import get_paginated_results
+
+from open_inwoner.utils.api import ClientError, get_paginated_results
 
 from ..utils.decorators import cache as cache_result
 from .api_models import Resultaat, Rol, Status, Zaak, ZaakInformatieObject
@@ -18,6 +18,7 @@ from .models import OpenZaakConfig, ZaakTypeConfig, ZaakTypeStatusTypeConfig
 from .utils import is_zaak_visible
 
 logger = logging.getLogger(__name__)
+CRS_HEADERS = {"Content-Crs": "EPSG:4326", "Accept-Crs": "EPSG:4326"}
 
 
 @cache_result(
@@ -51,11 +52,10 @@ def fetch_cases(
     try:
         response = get_paginated_results(
             client,
-            "zaak",
+            "zaken",
             minimum=max_cases,
-            request_kwargs={
-                "params": params,
-            },
+            params=params,
+            headers=CRS_HEADERS,
         )
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
@@ -112,11 +112,10 @@ def fetch_cases_by_kvk_or_rsin(
     try:
         response = get_paginated_results(
             client,
-            "zaak",
+            "zaken",
             minimum=max_cases,
-            request_kwargs={
-                "params": params,
-            },
+            params=params,
+            headers=CRS_HEADERS,
         )
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
@@ -135,7 +134,7 @@ def fetch_single_case(case_uuid: str) -> Optional[Zaak]:
         return
 
     try:
-        response = client.retrieve("zaak", uuid=case_uuid)
+        response = client.get(f"zaken/{case_uuid}", headers=CRS_HEADERS)
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
@@ -155,7 +154,7 @@ def fetch_single_case_information_object(url: str) -> Optional[ZaakInformatieObj
         return
 
     try:
-        response = client.retrieve("zaakinformatieobject", url=url)
+        response = client.get(url=url)
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
@@ -168,7 +167,7 @@ def fetch_single_case_information_object(url: str) -> Optional[ZaakInformatieObj
 def fetch_case_by_url_no_cache(case_url: str) -> Optional[Zaak]:
     client = build_client("zaak")
     try:
-        response = client.retrieve("zaak", url=case_url)
+        response = client.get(url=case_url, headers=CRS_HEADERS)
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
@@ -186,11 +185,9 @@ def fetch_case_information_objects(case_url: str) -> List[ZaakInformatieObject]:
         return []
 
     try:
-        response = client.list(
-            "zaakinformatieobject",
-            request_kwargs={
-                "params": {"zaak": case_url},
-            },
+        response = client.get(
+            "zaakinformatieobjecten",
+            params={"zaak": case_url},
         )
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
@@ -213,7 +210,7 @@ def fetch_status_history_no_cache(case_url: str) -> List[Status]:
         return []
 
     try:
-        response = client.list("status", request_kwargs={"params": {"zaak": case_url}})
+        response = client.get("statussen", params={"zaak": case_url})
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return []
@@ -231,7 +228,7 @@ def fetch_single_status(status_url: str) -> Optional[Status]:
         return
 
     try:
-        response = client.retrieve("status", url=status_url)
+        response = client.get(url=status_url)
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
@@ -263,8 +260,8 @@ def fetch_case_roles(
     try:
         response = get_paginated_results(
             client,
-            "rol",
-            request_kwargs={"params": params},
+            "rollen",
+            params=params,
         )
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
@@ -356,13 +353,11 @@ def fetch_case_information_objects_for_case_and_info(
         return []
 
     try:
-        response = client.list(
-            "zaakinformatieobject",
-            request_kwargs={
-                "params": {
-                    "zaak": case_url,
-                    "informatieobject": info_object_url,
-                },
+        response = client.get(
+            "zaakinformatieobjecten",
+            params={
+                "zaak": case_url,
+                "informatieobject": info_object_url,
             },
         )
     except (RequestException, ClientError) as e:
@@ -382,7 +377,7 @@ def fetch_single_result(result_url: str) -> Optional[Resultaat]:
         return
 
     try:
-        response = client.retrieve("result", url=result_url)
+        response = client.get(url=result_url)
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)
         return
@@ -399,8 +394,9 @@ def connect_case_with_document(case_url: str, document_url: str) -> Optional[dic
         return
 
     try:
-        response = client.create(
-            "zaakinformatieobject", {"zaak": case_url, "informatieobject": document_url}
+        response = client.post(
+            "zaakinformatieobjecten",
+            json={"zaak": case_url, "informatieobject": document_url},
         )
     except (RequestException, ClientError) as e:
         logger.exception("exception while making request", exc_info=e)

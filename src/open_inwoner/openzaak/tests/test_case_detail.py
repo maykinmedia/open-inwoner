@@ -22,7 +22,6 @@ from zgw_consumers.api_models.constants import (
     VertrouwelijkheidsAanduidingen,
 )
 from zgw_consumers.constants import APITypes
-from zgw_consumers.test import mock_service_oas_get
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory, eHerkenningUserFactory
@@ -482,18 +481,11 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             ),
         )
 
-    def _setUpOASMocks(self, m):
-        mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
-        mock_service_oas_get(m, CATALOGI_ROOT, "ztc")
-        mock_service_oas_get(m, DOCUMENTEN_ROOT, "drc")
-
     def _setUpMocks(self, m, use_eindstatus=True):
         if use_eindstatus:
             self.zaak["status"] = self.status_finish["url"]
         else:
             self.zaak["status"] = self.status_new["url"]
-
-        self._setUpOASMocks(m)
 
         for resource in [
             self.zaak,
@@ -1132,8 +1124,6 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         )
 
     def test_no_access_when_no_roles_are_found_for_user_bsn(self, m):
-        self._setUpOASMocks(m)
-
         m.get(self.zaak["url"], json=self.zaak)
         m.get(self.zaaktype["url"], json=self.zaaktype)
         m.get(
@@ -1157,8 +1147,6 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         )
 
     def test_no_access_when_no_roles_are_found_for_user_kvk_or_rsin(self, m):
-        self._setUpOASMocks(m)
-
         not_initiator_role = generate_oas_component_cached(
             "zrc",
             "schemas/Rol",
@@ -1206,7 +1194,6 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         Just having a role with betrokkeneType vestiging that matches for a case
         is not sufficient to have access
         """
-        self._setUpOASMocks(m)
         self.client.force_login(user=self.eherkenning_user)
 
         m.get(self.zaak["url"], json=self.zaak)
@@ -1241,7 +1228,6 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         In order to have access to a case when logged in as a vestiging, that case
         should have a role with betrokkeneType vestiging and a matching vestigingsnummer
         """
-        self._setUpOASMocks(m)
         self.client.force_login(user=self.eherkenning_user)
 
         m.get(self.zaak["url"], json=self.zaak)
@@ -1273,8 +1259,6 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
     def test_no_access_if_fetch_eherkenning_zaken_with_rsin_and_user_has_no_rsin(
         self, m
     ):
-        self._setUpOASMocks(m)
-
         not_initiator_role = generate_oas_component_cached(
             "zrc",
             "schemas/Rol",
@@ -1310,8 +1294,6 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         )
 
     def test_no_data_is_retrieved_when_zaaktype_is_internal(self, m):
-        self._setUpOASMocks(m)
-
         m.get(self.zaak["url"], json=self.zaak)
         m.get(
             f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}",
@@ -1328,8 +1310,6 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.app.get(self.informatie_object_file.url, user=self.user, status=403)
 
     def test_no_data_is_retrieved_when_http_404(self, m):
-        self._setUpOASMocks(m)
-
         m.get(self.zaak["url"], status_code=404)
 
         response = self.app.get(self.case_detail_url, user=self.user)
@@ -1338,8 +1318,6 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.assertContains(response, _("There is no available data at the moment."))
 
     def test_no_data_is_retrieved_when_http_500(self, m):
-        self._setUpOASMocks(m)
-
         m.get(self.zaak["url"], status_code=500)
 
         response = self.app.get(self.case_detail_url, user=self.user)
@@ -1348,8 +1326,6 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         self.assertContains(response, _("There is no available data at the moment."))
 
     def test_no_access_when_case_is_confidential(self, m):
-        self._setUpOASMocks(m)
-
         m.get(self.zaak_invisible["url"], json=self.zaak_invisible)
         m.get(self.zaaktype["url"], json=self.zaaktype)
         m.get(

@@ -2,7 +2,6 @@ from django.test import TestCase
 
 import requests_mock
 from zgw_consumers.constants import APITypes
-from zgw_consumers.test import mock_service_oas_get
 
 from open_inwoner.openzaak.cases import fetch_single_case
 
@@ -34,7 +33,6 @@ class TestFetchSpecificCase(ClearCachesMixin, TestCase):
         )
 
     def test_case_is_retrieved(self, m):
-        mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
         m.get(self.zaak["url"], json=self.zaak)
 
         case = fetch_single_case("d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d")
@@ -45,7 +43,6 @@ class TestFetchSpecificCase(ClearCachesMixin, TestCase):
         )
 
     def test_no_case_is_retrieved_when_http_404(self, m):
-        mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
         m.get(self.zaak["url"], status_code=404)
 
         case = fetch_single_case("d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d")
@@ -53,7 +50,6 @@ class TestFetchSpecificCase(ClearCachesMixin, TestCase):
         self.assertIsNone(case)
 
     def test_no_case_is_retrieved_when_http_500(self, m):
-        mock_service_oas_get(m, ZAKEN_ROOT, "zrc")
         m.get(
             self.zaak["url"],
             status_code=500,
