@@ -824,7 +824,7 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
         """
         self.maxDiff = None
 
-        bogus_zaaktype = generate_oas_component(
+        bogus_zaaktype = generate_oas_component_cached(
             "ztc",
             "schemas/ZaakType",
             identificatie="Bogus zaaktype",
