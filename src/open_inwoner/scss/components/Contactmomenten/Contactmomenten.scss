@@ -30,6 +30,25 @@
       overflow: hidden;
       word-break: break-word;
       white-space: normal;
+
+      &.table__item--status {
+        .table__item--wrapper {
+          display: flex;
+          justify-content: space-between;
+        }
+      }
+
+      .case-detail__link {
+        color: var(--color-primary);
+        text-decoration: none;
+
+        &::after {
+          font-family: 'Material Icons';
+          content: 'arrow_forward';
+          font-size: 1em;
+          vertical-align: middle;
+        }
+      }
     }
   }
 }

@@ -49,20 +49,19 @@ class FetchKlantDataTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
         response = self.app.get(list_url, user=data.user)
 
         kcms = response.context["contactmomenten"]
+        cm_data = data.contactmoment
         self.assertEqual(len(kcms), 1)
 
         self.assertEqual(
             kcms[0],
             {
-                "registered_date": datetime.fromisoformat(
-                    data.contactmoment["registratiedatum"]
-                ),
-                "channel": data.contactmoment["kanaal"].title(),
-                "text": data.contactmoment["tekst"],
+                "registered_date": datetime.fromisoformat(cm_data["registratiedatum"]),
+                "channel": cm_data["kanaal"].title(),
+                "text": cm_data["tekst"],
                 "onderwerp": self.contactformsubject.subject,
-                "antwoord": data.contactmoment["antwoord"],
-                "identificatie": data.contactmoment["identificatie"],
-                "type": data.contactmoment["type"],
+                "antwoord": cm_data["antwoord"],
+                "identificatie": cm_data["identificatie"],
+                "type": cm_data["type"],
                 "status": _("Afgehandeld"),
                 "url": detail_url,
             },
@@ -89,20 +88,20 @@ class FetchKlantDataTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
                 response = self.app.get(list_url, user=data.eherkenning_user)
 
                 kcms = response.context["contactmomenten"]
+                cm_data = data.contactmoment2
+                registratiedatum = datetime.fromisoformat(cm_data["registratiedatum"])
                 self.assertEqual(len(kcms), 1)
 
                 self.assertEqual(
                     kcms[0],
                     {
-                        "registered_date": datetime.fromisoformat(
-                            data.contactmoment2["registratiedatum"]
-                        ),
-                        "channel": data.contactmoment2["kanaal"].title(),
-                        "text": data.contactmoment2["tekst"],
+                        "registered_date": registratiedatum,
+                        "channel": cm_data["kanaal"].title(),
+                        "text": cm_data["tekst"],
                         "onderwerp": self.contactformsubject.subject,
-                        "antwoord": data.contactmoment2["antwoord"],
-                        "identificatie": data.contactmoment2["identificatie"],
-                        "type": data.contactmoment2["type"],
+                        "antwoord": cm_data["antwoord"],
+                        "identificatie": cm_data["identificatie"],
+                        "type": cm_data["type"],
                         "status": _("Afgehandeld"),
                         "url": detail_url,
                     },
@@ -132,20 +131,20 @@ class FetchKlantDataTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
                 response = self.client.get(list_url)
 
                 kcms = response.context["contactmomenten"]
+                cm_data = data.contactmoment_vestiging
+                registratiedatum = datetime.fromisoformat(cm_data["registratiedatum"])
                 self.assertEqual(len(kcms), 1)
 
                 self.assertEqual(
                     kcms[0],
                     {
-                        "registered_date": datetime.fromisoformat(
-                            data.contactmoment_vestiging["registratiedatum"]
-                        ),
-                        "channel": data.contactmoment_vestiging["kanaal"].title(),
-                        "text": data.contactmoment_vestiging["tekst"],
+                        "registered_date": registratiedatum,
+                        "channel": cm_data["kanaal"].title(),
+                        "text": cm_data["tekst"],
                         "onderwerp": self.contactformsubject.subject,
-                        "antwoord": data.contactmoment_vestiging["antwoord"],
-                        "identificatie": data.contactmoment_vestiging["identificatie"],
-                        "type": data.contactmoment_vestiging["type"],
+                        "antwoord": cm_data["antwoord"],
+                        "identificatie": cm_data["identificatie"],
+                        "type": cm_data["type"],
                         "status": _("Afgehandeld"),
                         "url": detail_url,
                     },
@@ -161,21 +160,63 @@ class FetchKlantDataTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
         response = self.app.get(detail_url, user=data.user)
 
         kcm = response.context["contactmoment"]
+        cm_data = data.contactmoment
+
+        self.assertEqual(response.context["zaak"], None)
         self.assertEqual(
             kcm,
             {
-                "registered_date": datetime.fromisoformat(
-                    data.contactmoment["registratiedatum"]
-                ),
-                "channel": data.contactmoment["kanaal"].title(),
-                "text": data.contactmoment["tekst"],
+                "registered_date": datetime.fromisoformat(cm_data["registratiedatum"]),
+                "channel": cm_data["kanaal"].title(),
+                "text": cm_data["tekst"],
                 "onderwerp": self.contactformsubject.subject,
-                "antwoord": data.contactmoment["antwoord"],
-                "identificatie": data.contactmoment["identificatie"],
-                "type": data.contactmoment["type"],
+                "antwoord": cm_data["antwoord"],
+                "identificatie": cm_data["identificatie"],
+                "type": cm_data["type"],
                 "status": _("Afgehandeld"),
                 "url": detail_url,
             },
+        )
+
+    def test_show_detail_for_bsn_with_zaak(self, m):
+        data = MockAPIReadData().install_mocks(m, link_objectcontactmomenten=True)
+
+        detail_url = reverse(
+            "cases:contactmoment_detail",
+            kwargs={"kcm_uuid": data.klant_contactmoment["uuid"]},
+        )
+        response = self.app.get(detail_url, user=data.user)
+
+        kcm = response.context["contactmoment"]
+        cm_data = data.contactmoment
+
+        self.assertIsNotNone(response.context["zaak"])
+        self.assertEqual(response.context["zaak"].url, data.zaak["url"])
+        self.assertEqual(response.context["zaak"].identificatie, "Test Zaak")
+        self.assertEqual(
+            kcm,
+            {
+                "registered_date": datetime.fromisoformat(cm_data["registratiedatum"]),
+                "channel": cm_data["kanaal"].title(),
+                "text": cm_data["tekst"],
+                "onderwerp": self.contactformsubject.subject,
+                "antwoord": cm_data["antwoord"],
+                "identificatie": cm_data["identificatie"],
+                "type": cm_data["type"],
+                "status": _("Afgehandeld"),
+                "url": detail_url,
+            },
+        )
+
+        zaak_link = response.pyquery(".case-detail__link")
+
+        self.assertEqual(zaak_link.text(), _("Ga naar zaak"))
+        self.assertEqual(
+            zaak_link.attr("href"),
+            reverse(
+                "cases:case_detail",
+                kwargs={"object_id": "410bb717-ff3d-4fd8-8357-801e5daf9775"},
+            ),
         )
 
     def test_show_detail_for_kvk_or_rsin(self, m):
@@ -198,18 +239,18 @@ class FetchKlantDataTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
                 response = self.app.get(detail_url, user=data.eherkenning_user)
 
                 kcm = response.context["contactmoment"]
+                cm_data = data.contactmoment2
+                registratiedatum = datetime.fromisoformat(cm_data["registratiedatum"])
                 self.assertEqual(
                     kcm,
                     {
-                        "registered_date": datetime.fromisoformat(
-                            data.contactmoment2["registratiedatum"]
-                        ),
-                        "channel": data.contactmoment2["kanaal"].title(),
-                        "text": data.contactmoment2["tekst"],
+                        "registered_date": registratiedatum,
+                        "channel": cm_data["kanaal"].title(),
+                        "text": cm_data["tekst"],
                         "onderwerp": self.contactformsubject.subject,
-                        "antwoord": data.contactmoment2["antwoord"],
-                        "identificatie": data.contactmoment2["identificatie"],
-                        "type": data.contactmoment2["type"],
+                        "antwoord": cm_data["antwoord"],
+                        "identificatie": cm_data["identificatie"],
+                        "type": cm_data["type"],
                         "status": _("Afgehandeld"),
                         "url": detail_url,
                     },
@@ -237,18 +278,18 @@ class FetchKlantDataTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
                 response = self.client.get(detail_url)
 
                 kcm = response.context["contactmoment"]
+                cm_data = data.contactmoment_vestiging
+                registratie_datum = datetime.fromisoformat(cm_data["registratiedatum"])
                 self.assertEqual(
                     kcm,
                     {
-                        "registered_date": datetime.fromisoformat(
-                            data.contactmoment_vestiging["registratiedatum"]
-                        ),
-                        "channel": data.contactmoment_vestiging["kanaal"].title(),
-                        "text": data.contactmoment_vestiging["tekst"],
+                        "registered_date": registratie_datum,
+                        "channel": cm_data["kanaal"].title(),
+                        "text": cm_data["tekst"],
                         "onderwerp": self.contactformsubject.subject,
-                        "antwoord": data.contactmoment_vestiging["antwoord"],
-                        "identificatie": data.contactmoment_vestiging["identificatie"],
-                        "type": data.contactmoment_vestiging["type"],
+                        "antwoord": cm_data["antwoord"],
+                        "identificatie": cm_data["identificatie"],
+                        "type": cm_data["type"],
                         "status": _("Afgehandeld"),
                         "url": detail_url,
                     },
