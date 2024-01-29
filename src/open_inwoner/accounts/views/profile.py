@@ -278,14 +278,3 @@ class MyNotificationsView(
         messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
         self.log_change(self.object, _("users notifications were modified"))
         return HttpResponseRedirect(self.get_success_url())
-
-
-class MyProfileExportView(LogMixin, LoginRequiredMixin, ExportMixin, DetailView):
-    template_name = "export/profile/profile_export.html"
-    model = User
-
-    def get_object(self):
-        return self.request.user
-
-    def get_filename(self):
-        return "profile.pdf"

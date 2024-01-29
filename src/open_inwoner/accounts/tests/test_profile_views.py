@@ -1027,24 +1027,3 @@ class NotificationsDisplayTests(WebTest):
         form = response.forms["change-notifications"]
 
         self.assertIn("plans_notifications", form.fields)
-
-
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class ExportProfileTests(WebTest):
-    def setUp(self):
-        self.url = reverse("profile:export")
-        self.user = UserFactory()
-
-    def test_login_required(self):
-        login_url = reverse("login")
-        response = self.app.get(self.url)
-        self.assertRedirects(response, f"{login_url}?next={self.url}")
-
-    def test_export_profile(self):
-        response = self.app.get(self.url, user=self.user)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content_type, "application/pdf")
-        self.assertEqual(
-            response["Content-Disposition"],
-            f'attachment; filename="profile.pdf"',
-        )

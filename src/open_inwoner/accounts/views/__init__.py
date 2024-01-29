@@ -34,11 +34,5 @@ from .login import (
     VerifyTokenView,
 )
 from .password_reset import PasswordResetView
-from .profile import (
-    EditProfileView,
-    MyDataView,
-    MyNotificationsView,
-    MyProfileExportView,
-    MyProfileView,
-)
+from .profile import EditProfileView, MyDataView, MyNotificationsView, MyProfileView
 from .registration import CustomRegistrationView, NecessaryFieldsUserView

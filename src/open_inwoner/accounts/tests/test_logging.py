@@ -13,16 +13,14 @@ from django_webtest import WebTest
 from freezegun import freeze_time
 from privates.test import temp_private_root
 from timeline_logger.models import TimelineLog
-from webtest import Upload
 
 from open_inwoner.accounts.models import Invite
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.pdc.tests.factories import CategoryFactory
 from open_inwoner.utils.logentry import LOG_ACTIONS
 
 from ..choices import LoginTypeChoices, StatusChoices
 from ..forms import ActionForm
-from ..models import Action, Document, Message, User
+from ..models import Action, Message, User
 from .factories import (
     ActionFactory,
     DocumentFactory,
@@ -677,73 +675,5 @@ class TestMessages(WebTest):
                 "content_object_repr": _(
                     "From: {sender}, To: {receiver} (2021-10-18)"
                 ).format(sender=message.sender, receiver=message.receiver),
-            },
-        )
-
-
-@freeze_time("2021-10-18 13:00:00")
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class TestExport(WebTest):
-    def setUp(self):
-        self.user = UserFactory()
-        self.action1 = ActionFactory(created_by=self.user)
-        self.action2 = ActionFactory(created_by=self.user)
-
-    def test_profile_export_is_logged(self):
-        self.app.get(reverse("profile:export"), user=self.user)
-        log_entry = TimelineLog.objects.last()
-
-        self.assertEqual(
-            log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
-        )
-        self.assertEqual(log_entry.content_object.id, self.user.id)
-        self.assertEqual(
-            log_entry.extra_data,
-            {
-                "message": _("file profile.pdf was exported"),
-                "action_flag": list(LOG_ACTIONS[4]),
-                "content_object_repr": str(self.user),
-            },
-        )
-
-    def test_action_export_is_logged(self):
-        self.app.get(
-            reverse("profile:action_export", kwargs={"uuid": self.action1.uuid}),
-            user=self.user,
-        )
-        log_entry = TimelineLog.objects.last()
-
-        self.assertEqual(
-            log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
-        )
-        self.assertEqual(log_entry.content_object.id, self.user.id)
-        self.assertEqual(
-            log_entry.extra_data,
-            {
-                "message": _("file action_{action_uuid}.pdf was exported").format(
-                    action_uuid=self.action1.uuid
-                ),
-                "action_flag": list(LOG_ACTIONS[4]),
-                "content_object_repr": str(self.user),
-            },
-        )
-
-    def test_action_list_export_is_logged(self):
-        self.app.get(
-            reverse("profile:action_list_export"),
-            user=self.user,
-        )
-        log_entry = TimelineLog.objects.last()
-
-        self.assertEqual(
-            log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
-        )
-        self.assertEqual(log_entry.content_object.id, self.user.id)
-        self.assertEqual(
-            log_entry.extra_data,
-            {
-                "message": _("file actions.pdf was exported"),
-                "action_flag": list(LOG_ACTIONS[4]),
-                "content_object_repr": str(self.user),
             },
         )
