@@ -474,5 +474,56 @@ MAIL_EDITOR_CONF = {
             },
         ],
     },
+    "daily_email_digest": {
+        "name": _("Inform admin about failed emails"),
+        "description": _(
+            "This email is used to periodically inform an admin about failed emails"
+        ),
+        "subject_default": "Gefaalde emails voor {{ site_name }} ({{ date }})",
+        "body_default": """
+            <p>Beste</p>
+
+            Het is niet gelukt om de onderstaande emails af te leveren op {{ date }}
+            <table>
+                {% for failed_email in failed_emails %}
+                    <tr>
+                        <th>Onderwerp</th>
+                        <td>{{ failed_email.subject }}</td>
+                    </tr>
+                    <tr>
+                        <th>Ontvanger</th>
+                        <td>{{ failed_email.recipient }}</td>
+                    </tr>
+                    <tr>
+                        <th>Datum</th>
+                        <td>{{ failed_email.date }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+
+            <p>Met vriendelijke groet,
+            {{ site_name }} </p>
+       """,
+        "subject": [
+            {
+                "name": "site_name",
+                "description": _("Name of the site."),
+            },
+            {
+                "name": "date",
+                "description": _("The date for which failed emails are reported"),
+            },
+        ],
+        "body": [
+            {
+                "name": "date",
+                "description": _("The date for which failed emails are reported"),
+            },
+            {
+                "name": "failed_emails",
+                "description": _("List of failed emails"),
+            },
+        ],
+    },
 }
 MAIL_EDITOR_BASE_CONTEXT = {"site_name": "Open Inwoner Platform"}

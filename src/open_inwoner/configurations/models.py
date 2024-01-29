@@ -6,6 +6,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from colorfield.fields import ColorField
+from django_better_admin_arrayfield.models.fields import ArrayField
 from filer.fields.file import FilerFileField
 from filer.fields.image import FilerImageField
 from ordered_model.models import OrderedModel, OrderedModelManager
@@ -350,6 +351,15 @@ class SiteConfiguration(SingletonModel):
         verbose_name=_("Send email about a new message"),
         default=True,
         help_text=_("Whether to send email about each new message the user receives"),
+    )
+    recipients_email_digest = ArrayField(
+        models.EmailField(),
+        verbose_name=_("recipients email digest"),
+        help_text=_(
+            "The email addresses that should receive a daily report of items requiring attention."
+        ),
+        blank=True,
+        default=list,
     )
 
     # analytics
