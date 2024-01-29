@@ -535,49 +535,6 @@ class Document(models.Model):
         return self.name
 
 
-class Appointment(models.Model):
-    uuid = models.UUIDField(
-        verbose_name=_("UUID"),
-        unique=True,
-        default=uuid4,
-        help_text=_("Used as a reference in the appointments api."),
-    )
-    name = models.CharField(
-        verbose_name=_("Name"),
-        default="",
-        max_length=250,
-        help_text=_("The name of the appointment."),
-    )
-    datetime = models.DateTimeField(
-        verbose_name=_("Appointment time"),
-        help_text=_("This is the time that the appointment is at."),
-    )
-    created_on = models.DateTimeField(
-        verbose_name=_("Created on"),
-        auto_now_add=True,
-        help_text=_("This is the date the appointment was created"),
-    )
-    updated_on = models.DateTimeField(
-        verbose_name=_("Updated on"),
-        auto_now=True,
-        help_text=_("This is the date when the appointment was last changed"),
-    )
-    created_by = models.ForeignKey(
-        "accounts.User",
-        verbose_name=_("Created by"),
-        on_delete=models.CASCADE,
-        related_name="appointments",
-        help_text=_("The person that created the appointment."),
-    )
-
-    class Meta:
-        verbose_name = _("Appointment")
-        verbose_name_plural = _("Appointments")
-
-    def __str__(self):
-        return self.name
-
-
 class Action(models.Model):
     uuid = models.UUIDField(
         verbose_name=_("UUID"),
