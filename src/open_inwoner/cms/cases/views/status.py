@@ -105,7 +105,7 @@ class InnerCaseDetailView(
     contact_form_class = CaseContactForm
     case: Optional[Zaak] = None
 
-    def store_statustype_resulttype_mapping(self, zaaktype_identificatie):
+    def store_statustype_mapping(self, zaaktype_identificatie):
         # Filter on ZaakType identificatie to avoid eSuite situation where one statustype
         # is linked to multiple zaaktypes
         self.statustype_config_mapping = {
@@ -114,6 +114,10 @@ class InnerCaseDetailView(
                 zaaktype_config__identificatie=zaaktype_identificatie
             )
         }
+
+    def store_resulttype_mapping(self, zaaktype_identificatie):
+        # Filter on ZaakType identificatie to avoid eSuite situation where one resulttype
+        # is linked to multiple zaaktypes
         self.resulttype_config_mapping = {
             zt_resulttype.resultaattype_url: zt_resulttype
             for zt_resulttype in ZaakTypeResultaatTypeConfig.objects.filter(
@@ -147,7 +151,8 @@ class InnerCaseDetailView(
             # fetch data associated with `self.case`
             documents = self.get_case_document_files(self.case)
             statuses = fetch_status_history(self.case.url)
-            self.store_statustype_resulttype_mapping(self.case.zaaktype.identificatie)
+            self.store_statustype_mapping(self.case.zaaktype.identificatie)
+            self.store_resulttype_mapping(self.case.zaaktype.identificatie)
             statustypen = fetch_status_types_no_cache(self.case.zaaktype.url)
 
             # NOTE we cannot sort on the Status.datum_status_gezet (datetime) because eSuite

@@ -815,6 +815,49 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                 res = detail_view.get_second_status_preview(status_types)
                 self.assertEqual(res, result)
 
+    def test_e_suite_statustype_zaaktype_mapping(self, m):
+        """
+        Regression test for #1991
+
+        eSuite has one statustype for multiple zaaktypes, hence it could happen that
+        the wrong statustypeconfig (corresponding to different zaaktype) was used
+        """
+        self.maxDiff = None
+
+        bogus_zaaktype = generate_oas_component(
+            "ztc",
+            "schemas/ZaakType",
+            identificatie="Bogus zaaktype",
+        )
+        bogus_zt_config = ZaakTypeConfigFactory(
+            identificatie=bogus_zaaktype["identificatie"],
+        )
+
+        ZaakTypeStatusTypeConfigFactory(
+            zaaktype_config=self.zaaktype_config,
+            statustype_url=self.status_type_new["url"],
+            status_indicator_text="foo",
+        )
+        ZaakTypeStatusTypeConfigFactory(
+            zaaktype_config=bogus_zt_config,
+            statustype_url=self.status_type_new["url"],
+            status_indicator_text="bogus",
+        )
+        ZaakTypeStatusTypeConfigFactory(
+            zaaktype_config=self.zaaktype_config,
+            statustype_url=self.status_type_finish["url"],
+            status_indicator_text="bar",
+        )
+
+        self._setUpMocks(m)
+
+        response = self.app.get(self.case_detail_url, user=self.user)
+
+        case = response.context.get("case")
+        first_status = case["statuses"][0]
+
+        self.assertEqual(first_status["status_indicator_text"], "foo")
+
     def test_document_ordering_by_name(self, m):
         """
         Assert that case documents are sorted by name/title if sorting by date does not work
