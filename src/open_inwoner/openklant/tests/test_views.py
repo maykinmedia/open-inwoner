@@ -67,6 +67,10 @@ class FetchKlantDataTestCase(ClearCachesMixin, DisableRequestLogMixin, WebTest):
             },
         )
 
+        status_item = response.pyquery.find(f"p:contains('{_('Status')}')").parent()
+
+        self.assertEqual(status_item.text(), f"{_('Status')}\n{_('Afgehandeld')}")
+
     def test_list_for_kvk_or_rsin(self, m):
         for use_rsin_for_innNnpId_query_parameter in [True, False]:
             with self.subTest(

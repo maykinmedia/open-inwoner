@@ -1,6 +1,27 @@
 .contactmomenten {
   margin-top: var(--spacing-giant);
 
+  & .grid {
+    grid-row-gap: var(--spacing-medium);
+    grid-column-gap: var(--spacing-extra-large);
+
+    // Tablets
+    @media (min-width: 500px) and (max-width: 767px) {
+      flex-direction: row;
+      flex-wrap: wrap;
+
+      .column {
+        flex-basis: calc(50% - var(--spacing-large));
+      }
+    }
+
+    .column--start-4 {
+      @media (min-width: 768px) and (max-width: 900px) {
+        grid-column-start: 1;
+      }
+    }
+  }
+
   /// cards on cases page
   .card {
     .contactmomenten__link {
