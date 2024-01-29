@@ -88,6 +88,7 @@ class SiteConfigurarionAdminForm(forms.ModelForm):
         fields = "__all__"
         widgets = {
             "extra_css": CSSEditorWidget,
+            "login_text": CKEditorWidget,
         }
 
     def clean_redirect_to(self):

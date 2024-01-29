@@ -1,11 +1,11 @@
 from django import template
 from django.conf import settings
 from django.http import HttpRequest
+from django.template.defaultfilters import stringfilter
 from django.utils.html import format_html
 
+import markdown as md
 from humanfriendly import format_size
-
-from open_inwoner.configurations.models import SiteConfiguration
 
 register = template.Library()
 
@@ -100,3 +100,9 @@ def readable_size(value):
 @register.filter
 def cookies_accepted(request: HttpRequest) -> bool:
     return request.COOKIES.get("cookieBannerAccepted") == "true"
+
+
+@register.filter()
+@stringfilter
+def markdown(value):
+    return md.markdown(value, extensions=["markdown.extensions.fenced_code"])

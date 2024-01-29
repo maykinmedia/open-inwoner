@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n static logo_tags grid_tags card_tags form_tags link_tags button_tags solo_tags cms_tags %}
+{% load i18n static utils logo_tags grid_tags card_tags form_tags link_tags button_tags solo_tags cms_tags %}
 
 
 {% block header_image %}
@@ -13,7 +13,7 @@
         {% render_column start=5 span=5 %}
             {% render_card %}
                 <h1 class="h1">{% trans 'Welkom' %}</h1>
-                {% if login_text %}<p class="p">{{ login_text|linebreaksbr }}</p>{% endif %}
+                {% if login_text %}<div class="wysiwyg">{{ login_text|markdown|safe }}</div>{% endif %}
                 <br>
 		{% if settings.DIGID_ENABLED %}
             {% get_solo 'digid_eherkenning_oidc_generics.OpenIDConnectDigiDConfig' as digid_oidc_config %}
