@@ -793,6 +793,9 @@ from .parts.maileditor import MAIL_EDITOR_BASE_CONTEXT, MAIL_EDITOR_CONF  # noqa
 CKEDITOR_CONFIGS = {
     "mail_editor": {
         "allowedContent": True,
+        "contentsCss": [
+            "/static/mailcss/email.css"
+        ],  # Enter the css file used to style the email.
         "height": 600,  # This is optional
         "entities": False,  # This is added because CKEDITOR escapes the ' when you do an if statement
     }
