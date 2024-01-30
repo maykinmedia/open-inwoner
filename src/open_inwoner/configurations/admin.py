@@ -82,7 +82,7 @@ class SiteConfigurationPageInline(OrderedTabularInline):
     autocomplete_fields = ("flatpage",)
 
 
-class SiteConfigurarionAdminForm(forms.ModelForm):
+class SiteConfigurationAdminForm(forms.ModelForm):
     class Meta:
         model = SiteConfiguration
         fields = "__all__"
@@ -110,7 +110,7 @@ class SiteConfigurarionAdminForm(forms.ModelForm):
 
 
 @admin.register(SiteConfiguration)
-class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
+class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
     save_on_top = True
     fieldsets = (
         (
@@ -284,7 +284,7 @@ class SiteConfigurarionAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
         (_("Social media"), {"fields": ("display_social",)}),
     )
     inlines = [SiteConfigurationPageInline]
-    form = SiteConfigurarionAdminForm
+    form = SiteConfigurationAdminForm
 
     readonly_fields = [
         "extra_css_allowed",
