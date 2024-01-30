@@ -420,6 +420,13 @@ class ZaakTypeStatusTypeConfig(models.Model):
             "Whether the user should be notfied if a case is set to this type of status"
         ),
     )
+    action_required = models.BooleanField(
+        verbose_name=_("Action required"),
+        default=False,
+        help_text=_(
+            "Whether the status change notification should indicate that an action is required"
+        ),
+    )
     document_upload_enabled = models.BooleanField(
         default=True,
         verbose_name=_("Document uploads"),

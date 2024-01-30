@@ -320,7 +320,7 @@ def check_status_type(
     oz_config: OpenZaakConfig,
 ) -> ZaakType | None:
     """
-    Check if a status_type exists for `case` and if notifications are enabled
+    Check if a status_type exists for `status` and if notifications are enabled
     """
     status_type = fetch_single_status_type(status.statustype)
     resource = notification.resource
@@ -418,10 +418,16 @@ def check_user_status_notitifactions(
     user: User,
     case: Zaak,
     status: Status,
+    status_type_config: ZaakTypeStatusTypeConfig,
 ) -> bool:
     """
-    Check if user has an email and status notifications enabled
+    Check if user has an email and status notifications are enabled
+
+    The user cannot opt out of action-required-notifications
     """
+    if status_type_config.action_required:
+        return True
+
     if not user.cases_notifications or not user.get_contact_email():
         log_system_action(
             f"ignored user-disabled notification delivery for user '{user}' status "
@@ -429,6 +435,7 @@ def check_user_status_notitifactions(
             log_level=logging.INFO,
         )
         return False
+
     return True
 
 
@@ -461,7 +468,7 @@ def handle_status_notification(
     status.statustype = status_type
 
     for user in inform_users:
-        if not check_user_status_notitifactions(user, case, status):
+        if not check_user_status_notitifactions(user, case, status, status_type_config):
             return
 
         # all checks have passed
@@ -477,6 +484,7 @@ def handle_status_update(
     user: User,
     case: Zaak,
     status: Status,
+    status_type_config: ZaakTypeStatusTypeConfig,
 ):
     # hook into userfeed
     hooks.case_status_notification_received(user, case, status)
@@ -505,7 +513,13 @@ def handle_status_update(
         )
         return
 
-    send_case_update_email(user, case, "case_status_notification")
+    # choose template
+    if status_type_config.action_required:
+        template_name = "case_status_notification_action_required"
+    else:
+        template_name = "case_status_notification"
+
+    send_case_update_email(user, case, template_name)
     note.mark_sent()
 
     log_system_action(

@@ -490,6 +490,38 @@ class StatusNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
 
+    def test_action_required_notifications_cannot_be_disabled(
+        self, m, mock_handle: Mock
+    ):
+        oz_config = OpenZaakConfig.get_solo()
+        oz_config.skip_notification_statustype_informeren = True
+        oz_config.save()
+
+        data = MockAPIData()
+        data.zaak_type["catalogus"] = None
+        data.install_mocks(m)
+
+        user = data.user_initiator
+        user.cases_notifications = False  # opt-out
+        user.save()
+
+        ztc = ZaakTypeConfigFactory.create(
+            catalogus=None,
+            identificatie=data.zaak_type["identificatie"],
+            notify_status_changes=True,
+        )
+        ZaakTypeStatusTypeConfigFactory.create(
+            zaaktype_config=ztc,
+            omschrijving=data.status_type_final["omschrijving"],
+            statustype_url=data.status_type_final["url"],
+            notify_status_change=True,
+            action_required=True,  # these cannot be disabled by the user
+        )
+
+        handle_zaken_notification(data.status_notification)
+
+        mock_handle.assert_called_once()
+
     def test_user_bad_email(self, m, mock_handle: Mock):
         oz_config = OpenZaakConfig.get_solo()
         oz_config.skip_notification_statustype_informeren = True
@@ -540,8 +572,21 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         status = factory(Status, data.status_final)
         status.statustype = factory(StatusType, data.status_type_final)
 
+        ztc = ZaakTypeConfigFactory.create(
+            catalogus=None,
+            identificatie=data.zaak_type["identificatie"],
+            # set this to notify
+            notify_status_changes=True,
+        )
+        status_type_config = ZaakTypeStatusTypeConfigFactory.create(
+            zaaktype_config=ztc,
+            omschrijving=data.status_type_final["omschrijving"],
+            statustype_url=data.status_type_final["url"],
+            notify_status_change=True,
+        )
+
         # first call
-        handle_status_update(user, case, status)
+        handle_status_update(user, case, status, status_type_config)
 
         mock_send.assert_called_once()
 
@@ -566,7 +611,7 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         )
 
         # second call with same case/status
-        handle_status_update(user, case, status)
+        handle_status_update(user, case, status, status_type_config)
 
         # no duplicate mail for this user/case/status
         mock_send.assert_not_called()
@@ -578,7 +623,7 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         )
         # other user is fine
         other_user = UserFactory.create()
-        handle_status_update(other_user, case, status)
+        handle_status_update(other_user, case, status, status_type_config)
 
         mock_send.assert_called_once()
 
@@ -594,7 +639,7 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         status.statustype = factory(
             StatusType, copy_with_new_uuid(data.status_type_final)
         )
-        handle_status_update(user, case, status)
+        handle_status_update(user, case, status, status_type_config)
 
         # not sent because we already send to this user within the frequency
         mock_send.assert_not_called()
@@ -611,7 +656,42 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
             status.statustype = factory(
                 StatusType, copy_with_new_uuid(data.status_type_final)
             )
-            handle_status_update(user, case, status)
+            handle_status_update(user, case, status, status_type_config)
 
             # this one succeeds
             mock_send.assert_called_once()
+
+    @patch("open_inwoner.userfeed.hooks.case_status_notification_received")
+    @patch("open_inwoner.openzaak.notifications.send_case_update_email")
+    def test_action_required_template(self, mock_send: Mock, mock_feed_hook: Mock):
+        data = MockAPIData()
+        user = data.user_initiator
+
+        case = factory(Zaak, data.zaak)
+        case.zaaktype = factory(ZaakType, data.zaak_type)
+
+        status = factory(Status, data.status_final)
+        status.statustype = factory(StatusType, data.status_type_final)
+
+        ztc = ZaakTypeConfigFactory.create(
+            catalogus=None,
+            identificatie=data.zaak_type["identificatie"],
+            # set this to notify
+            notify_status_changes=True,
+        )
+        status_type_config = ZaakTypeStatusTypeConfigFactory.create(
+            zaaktype_config=ztc,
+            omschrijving=data.status_type_final["omschrijving"],
+            statustype_url=data.status_type_final["url"],
+            notify_status_change=True,
+            action_required=True,
+        )
+
+        handle_status_update(user, case, status, status_type_config)
+
+        mock_send.assert_called_once()
+        # check call arguments
+        args = mock_send.call_args.args
+        self.assertEqual(args[0], user)
+        self.assertEqual(args[1].url, case.url)
+        self.assertEqual(args[2], "case_status_notification_action_required")
