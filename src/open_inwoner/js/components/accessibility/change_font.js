@@ -14,8 +14,8 @@ class ChangeFont {
     let root = document.documentElement
     const varName = '--font-family-body'
 
-    if (root.style.getPropertyValue(varName) == 'Open Dyslexic') {
-      root.style.setProperty(varName, 'TheSans C5')
+    if (root.style.getPropertyValue(varName) === 'Open Dyslexic') {
+      root.style.setProperty(varName, 'Body')
       this.text.innerText = this.node.dataset.text
     } else {
       root.style.setProperty(varName, 'Open Dyslexic')

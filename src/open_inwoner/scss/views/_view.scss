@@ -10,4 +10,21 @@
       margin-top: 0;
     }
   }
+
+  &--style-demo {
+    line-height: 24px;
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-family: var(--font-family-heading);
+    }
+
+    a {
+      color: var(--color-primary);
+    }
+  }
 }
