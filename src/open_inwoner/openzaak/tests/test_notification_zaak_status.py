@@ -381,11 +381,17 @@ class StatusNotificationHandlerTestCase(
         data.zaak_type["catalogus"] = None
         data.install_mocks(m)
 
-        ZaakTypeConfigFactory.create(
+        ztc = ZaakTypeConfigFactory.create(
             catalogus=None,
             identificatie=data.zaak_type["identificatie"],
             # set this to notify
             notify_status_changes=True,
+        )
+        ZaakTypeStatusTypeConfigFactory.create(
+            zaaktype_config=ztc,
+            omschrijving=data.status_type_final["omschrijving"],
+            statustype_url=data.status_type_final["url"],
+            notify_status_change=True,
         )
 
         handle_zaken_notification(data.status_notification)
@@ -454,6 +460,66 @@ class StatusNotificationHandlerTestCase(
             level=logging.INFO,
         )
 
+    def test_user_status_notifications_disabled(self, m, mock_handle: Mock):
+        oz_config = OpenZaakConfig.get_solo()
+        oz_config.skip_notification_statustype_informeren = True
+        oz_config.save()
+
+        data = MockAPIData()
+        data.zaak_type["catalogus"] = None
+        data.install_mocks(m)
+
+        user = data.user_initiator
+        user.cases_notifications = False  # opt-out
+        user.save()
+
+        ztc = ZaakTypeConfigFactory.create(
+            catalogus=None,
+            identificatie=data.zaak_type["identificatie"],
+            # set this to notify
+            notify_status_changes=True,
+        )
+        ZaakTypeStatusTypeConfigFactory.create(
+            zaaktype_config=ztc,
+            omschrijving=data.status_type_final["omschrijving"],
+            statustype_url=data.status_type_final["url"],
+            notify_status_change=True,
+        )
+
+        handle_zaken_notification(data.status_notification)
+
+        mock_handle.assert_not_called()
+
+    def test_user_bad_email(self, m, mock_handle: Mock):
+        oz_config = OpenZaakConfig.get_solo()
+        oz_config.skip_notification_statustype_informeren = True
+        oz_config.save()
+
+        data = MockAPIData()
+        data.zaak_type["catalogus"] = None
+        data.install_mocks(m)
+
+        user = data.user_initiator
+        user.email = "user@example.org"
+        user.save()
+
+        ztc = ZaakTypeConfigFactory.create(
+            catalogus=None,
+            identificatie=data.zaak_type["identificatie"],
+            # set this to notify
+            notify_status_changes=True,
+        )
+        ZaakTypeStatusTypeConfigFactory.create(
+            zaaktype_config=ztc,
+            omschrijving=data.status_type_final["omschrijving"],
+            statustype_url=data.status_type_final["url"],
+            notify_status_change=True,
+        )
+
+        handle_zaken_notification(data.status_notification)
+
+        mock_handle.assert_not_called()
+
 
 @override_settings(ZGW_LIMIT_NOTIFICATIONS_FREQUENCY=3600)
 @freeze_time("2023-01-01 01:00:00")
@@ -461,52 +527,6 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
     """
     note these tests match with a similar test from `test_notification_zaak_infoobject.py`
     """
-
-    @patch("open_inwoner.userfeed.hooks.case_status_notification_received")
-    @patch("open_inwoner.openzaak.notifications.send_case_update_email")
-    def test_handle_status_update_filters_disabled_notifications(
-        self, mock_send: Mock, mock_feed_hook: Mock
-    ):
-        data = MockAPIData()
-        user = data.user_initiator
-        user.cases_notifications = False  # opt-out
-        user.save()
-
-        case = factory(Zaak, data.zaak)
-        case.zaaktype = factory(ZaakType, data.zaak_type)
-
-        status = factory(Status, data.status_final)
-        status.statustype = factory(StatusType, data.status_type_final)
-
-        handle_status_update(user, case, status)
-
-        mock_send.assert_not_called()
-
-        # check if userfeed hook was called
-        mock_feed_hook.assert_called_once()
-
-    @patch("open_inwoner.userfeed.hooks.case_status_notification_received")
-    @patch("open_inwoner.openzaak.notifications.send_case_update_email")
-    def test_handle_status_update_filters_bad_email(
-        self, mock_send: Mock, mock_feed_hook: Mock
-    ):
-        data = MockAPIData()
-        user = data.user_initiator
-        user.email = "user@example.org"
-        user.save()
-
-        case = factory(Zaak, data.zaak)
-        case.zaaktype = factory(ZaakType, data.zaak_type)
-
-        status = factory(Status, data.status_final)
-        status.statustype = factory(StatusType, data.status_type_final)
-
-        handle_status_update(user, case, status)
-
-        mock_send.assert_not_called()
-
-        # check if userfeed hook was called
-        mock_feed_hook.assert_called_once()
 
     @patch("open_inwoner.userfeed.hooks.case_status_notification_received")
     @patch("open_inwoner.openzaak.notifications.send_case_update_email")

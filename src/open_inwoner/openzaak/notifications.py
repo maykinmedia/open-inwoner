@@ -15,6 +15,7 @@ from open_inwoner.openzaak.api_models import (
     Status,
     Zaak,
     ZaakInformatieObject,
+    ZaakType,
 )
 from open_inwoner.openzaak.cases import (
     fetch_case_by_url_no_cache,
@@ -34,6 +35,7 @@ from open_inwoner.openzaak.models import (
     OpenZaakConfig,
     UserCaseInfoObjectNotification,
     UserCaseStatusNotification,
+    ZaakTypeConfig,
 )
 from open_inwoner.openzaak.utils import (
     get_zaak_type_config,
@@ -129,7 +131,7 @@ def handle_zaken_notification(notification: Notification):
         return
 
     if notification.resource == "status":
-        _handle_status_notification(notification, case, inform_users)
+        handle_status_notification(notification, case, inform_users)
     elif notification.resource == "zaakinformatieobject":
         _handle_zaakinformatieobject_notification(notification, case, inform_users)
     else:
@@ -256,27 +258,43 @@ def handle_zaakinformatieobject_update(
     )
 
 
-def _handle_status_notification(notification: Notification, case: Zaak, inform_users):
-    oz_config = OpenZaakConfig.get_solo()
-    r = notification.resource  # short alias for logging
-
-    # check if this is a status we want to inform on
-    status_url = notification.resource_url
-
+#
+# Helper functions for handling status update notifications
+#
+def check_status_history(notification: Notification, case: Zaak) -> List[Status] | None:
+    """
+    Check if more than one status exists for `case` (else notifications are skipped)
+    """
+    resource = notification.resource
     status_history = fetch_status_history_no_cache(case.url)
+
     if not status_history:
         log_system_action(
-            f"ignored {r} notification: cannot retrieve status_history for case {case.url}",
+            f"ignored {resource} notification: cannot retrieve status_history for case {case.url}",
             log_level=logging.ERROR,
         )
-        return
+        return None
 
     if len(status_history) == 1:
         log_system_action(
-            f"ignored {r} notification: skip initial status notification for case {case.url}",
+            f"ignored {resource} notification: skip initial status notification for case {case.url}",
             log_level=logging.INFO,
         )
-        return
+        return None
+
+    return status_history
+
+
+def check_status(
+    notification: Notification,
+    case: Zaak,
+    status_history: List[Status],
+) -> Status | None:
+    """
+    Check if this is a status we want to inform on
+    """
+    resource = notification.resource
+    status_url = notification.resource_url
 
     for s in status_history:
         if s.url == status_url:
@@ -287,47 +305,89 @@ def _handle_status_notification(notification: Notification, case: Zaak, inform_u
 
     if not status:
         log_system_action(
-            f"ignored {r} notification: cannot retrieve status {status_url} for case {case.url}",
+            f"ignored {resource} notification: cannot retrieve status {status_url} for case {case.url}",
             log_level=logging.ERROR,
         )
-        return
+        return None
 
+    return status
+
+
+def check_status_type(
+    notification: Notification,
+    case: Zaak,
+    status: Status,
+    oz_config: OpenZaakConfig,
+) -> ZaakType | None:
+    """
+    Check if a status_type exists for `case` and if notifications are enabled
+    """
     status_type = fetch_single_status_type(status.statustype)
+    resource = notification.resource
+
     if not status_type:
         log_system_action(
-            f"ignored {r} notification: cannot retrieve status_type {status.statustype} for case {case.url}",
+            f"ignored {resource} notification: cannot retrieve status_type "
+            f"{status.statustype} for case {case.url}",
             log_level=logging.ERROR,
         )
-        return
+        return None
 
-    if not oz_config.skip_notification_statustype_informeren:
-        if not status_type.informeren:
-            log_system_action(
-                f"ignored {r} notification: status_type.informeren is false for status {status.url} and case {case.url}",
-                log_level=logging.INFO,
-            )
-            return
+    if (
+        not oz_config.skip_notification_statustype_informeren
+        and not status_type.informeren
+    ):
+        log_system_action(
+            f"ignored {resource} notification: status_type.informeren is false for "
+            f"status {status.url} and case {case.url}",
+            log_level=logging.INFO,
+        )
+        return None
 
-    status.statustype = status_type
+    return status_type
 
-    # check the ZaakTypeConfig
+
+def check_zaaktype_config(
+    notification: Notification,
+    case: Zaak,
+    oz_config: OpenZaakConfig,
+) -> ZaakTypeConfig | None:
+    """
+    Check if zaaktype_config exists and notifications are enabled
+    """
+    resource = notification.resource
     ztc = get_zaak_type_config(case.zaaktype)
+
     if oz_config.skip_notification_statustype_informeren:
         if not ztc:
             log_system_action(
-                f"ignored {r} notification: 'skip_notification_statustype_informeren' is True but cannot retrieve case_type configuration '{case.zaaktype.identificatie}' for case {case.url}",
+                f"ignored {resource} notification: 'skip_notification_statustype_informeren' "
+                f"is True but cannot retrieve case_type configuration '{case.zaaktype.identificatie}' "
+                f"for case {case.url}",
                 log_level=logging.INFO,
             )
-            return
+            return None
         elif not ztc.notify_status_changes:
             log_system_action(
-                f"ignored {r} notification: case_type configuration '{case.zaaktype.identificatie}' found but 'notify_status_changes' is False for case {case.url}",
+                f"ignored {resource} notification: case_type configuration "
+                f"'{case.zaaktype.identificatie}' found but 'notify_status_changes' is False "
+                f"for case {case.url}",
                 log_level=logging.INFO,
             )
-            return
+            return None
 
-    # check status notification setting on `ZaakTypeStatusTypeConfig`
-    resolve_status(case)
+    return ztc
+
+
+def check_statustype_config(
+    notification: Notification,
+    case: Zaak,
+    ztc: ZaakTypeConfig,
+) -> ZaakTypeStatusTypeConfig | None:
+    """
+    Check if statustype_config exists and notifications are enabled
+    """
+    resource = notification.resource
     statustype_url = case.status.statustype
 
     try:
@@ -335,35 +395,91 @@ def _handle_status_notification(notification: Notification, case: Zaak, inform_u
             zaaktype_config=ztc, statustype_url=statustype_url
         )
     except ZaakTypeStatusTypeConfig.DoesNotExist:
-        pass
-    else:
-        if not statustype_config.notify_status_change:
-            log_system_action(
-                f"ignored {r} notification: 'notify_status_change' is False for the status "
-                f"type configuration of the status of this case ({case.url})",
-                log_level=logging.INFO,
-            )
-            return
-
-    # reaching here means we're going to inform users
-    log_system_action(
-        f"accepted {r} notification: attempt informing users {wrap_join(inform_users)} for case {case.url}",
-        log_level=logging.INFO,
-    )
-    for user in inform_users:
-        handle_status_update(user, case, status)
-
-
-def handle_status_update(user: User, case: Zaak, status: Status):
-    # hook into userfeed
-    hooks.case_status_notification_received(user, case, status)
-
-    if not user.cases_notifications or not user.get_contact_email():
         log_system_action(
-            f"ignored user-disabled notification delivery for user '{user}' status {status.url} case {case.url}",
+            "ignored {resource} notification: ZaakTypeStatusTypeConfig could not be found for statustype {url}",
+            resource=resource,
+            url=statustype_url,
             log_level=logging.INFO,
         )
+        return None
+
+    if not statustype_config.notify_status_change:
+        log_system_action(
+            f"ignored {resource} notification: 'notify_status_change' is False for "
+            f"the status type configuration of the status of this case ({case.url})",
+            log_level=logging.INFO,
+        )
+        return None
+
+    return statustype_config
+
+
+def check_user_status_notitifactions(
+    user: User,
+    case: Zaak,
+    status: Status,
+) -> bool:
+    """
+    Check if user has an email and status notifications enabled
+    """
+    if not user.cases_notifications or not user.get_contact_email():
+        log_system_action(
+            f"ignored user-disabled notification delivery for user '{user}' status "
+            f"{status.url} case {case.url}",
+            log_level=logging.INFO,
+        )
+        return False
+    return True
+
+
+def handle_status_notification(
+    notification: Notification,
+    case: Zaak,
+    inform_users: list[User],
+):
+    """
+    Check status notification settings of user and case-related objects/configs
+    """
+    oz_config = OpenZaakConfig.get_solo()
+
+    if not (status_history := check_status_history(notification, case)):
         return
+
+    if not (status := check_status(notification, case, status_history)):
+        return
+
+    if not (status_type := check_status_type(notification, case, status, oz_config)):
+        return
+
+    if not (ztc := check_zaaktype_config(notification, case, oz_config)):
+        return
+
+    resolve_status(case)
+    if not (status_type_config := check_statustype_config(notification, case, ztc)):
+        return
+
+    status.statustype = status_type
+
+    for user in inform_users:
+        if not check_user_status_notitifactions(user, case, status):
+            return
+
+        # all checks have passed
+        log_system_action(
+            f"accepted {notification.resource} notification: attempt informing users "
+            f"{wrap_join(inform_users)} for case {case.url}",
+            log_level=logging.INFO,
+        )
+        handle_status_update(user, case, status, status_type_config)
+
+
+def handle_status_update(
+    user: User,
+    case: Zaak,
+    status: Status,
+):
+    # hook into userfeed
+    hooks.case_status_notification_received(user, case, status)
 
     # email notification
     note = UserCaseStatusNotification.objects.record_if_unique_notification(
@@ -373,7 +489,8 @@ def handle_status_update(user: User, case: Zaak, status: Status):
     )
     if not note:
         log_system_action(
-            f"ignored duplicate status notification delivery for user '{user}' status {status.url} case {case.url}",
+            f"ignored duplicate status notification delivery for user '{user}' status "
+            f"{status.url} case {case.url}",
             log_level=logging.INFO,
         )
         return
@@ -382,7 +499,8 @@ def handle_status_update(user: User, case: Zaak, status: Status):
     period = timedelta(seconds=settings.ZGW_LIMIT_NOTIFICATIONS_FREQUENCY)
     if note.has_received_similar_notes_within(period):
         log_system_action(
-            f"blocked over-frequent status notification email for user '{user}' status {status.url} case {case.url}",
+            f"blocked over-frequent status notification email for user '{user}' status "
+            f"{status.url} case {case.url}",
             log_level=logging.INFO,
         )
         return
