@@ -33,7 +33,7 @@
             color: #059EC2;
         }
 
-        @media (max-width: 580px) {
+        @media (max-width: 600px) {
             h1, h2, h3, h4, h5, h6,
             a, p,
             img {
@@ -63,7 +63,18 @@
 ">
 
 <center>
-{{ content }}
+    <table border="0" cellspacing="0" width="100%" class="table-mail">
+        <tbody>
+        <tr>
+            <!-- Do not remove empty TD's !!! -->
+            <td></td>
+            <td width="600">
+                {{ content }}
+            </td>
+            <td></td>
+        </tr>
+        </tbody>
+    </table>
 </center>
 </body>
 </html>

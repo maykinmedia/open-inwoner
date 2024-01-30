@@ -1,0 +1,84 @@
+<table border="0" cellspacing="0" width="100%" class="table-mail">
+    <tbody>
+    <tr>
+        <td class="td-mail--accent td-mail__bg-accent" colspan="6" style="background-color: {{ theming.primary }};">&nbsp;</td>
+    </tr>
+    <tr>
+        <td class="td-mail logo-mail td__padding-top" colspan="6"><img src="{{ footer.logo_url }}" class="logo-mail"></td>
+    </tr>
+    <tr>
+        <td class="td-mail td__padding-all" colspan="6">
+            <p>Beste inwoner,</p>
+            <p>Er is een update over &eacute;&eacute;n van uw aanvragen beschikbaar:</p>
+        </td>
+    </tr>
+    <tr>
+        <td class="td-mail td-mail__bg-info td__padding-all" colspan="6">
+        <!--[if mso]>
+            <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="{{ case_link }}" style="height:36px;v-text-anchor:middle;width:150px;" arcsize="5%" strokecolor="#ffffff" fillcolor="#ffffff">
+                <w:anchorlock/>
+                <span style="color:#704000;font-family:'Lato','Helvetica',Arial,sans-serif;font-size:16px;">Upload documenten</span>
+            </v:roundrect>
+        <![endif]-->
+            <div style="mso-hide:all;" class="td-mail__bg-white">
+                <p>
+                <table border="0" cellspacing="0" width="100%">
+                    <tr>
+                        <td width="35" class="td-mail td__padding-left td__padding-top align-top">
+                            <p><img src="/static/img/mail/info_info-blue.jpg" alt=""></p>
+                        </td>
+                        <td class="td__padding-top td__padding-right td__padding-bottom"><strong>
+                            <p>De status is gewijzigd naar <span class="status_current"><strong>{{ case.status_title }}</strong></span>.</p>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td class="td-mail td-mail__bg-info td__padding-all" colspan="6">
+            <p>U hoeft niets te doen. Zodra er weer een update beschikbaar is ontvangt u hier een melding over. U kunt wel inloggen om uw aanvraag te bekijken.</p>
+            <p><strong><a href="#" class="color--primary">Log in &rarr;</a></strong></p>
+        </td>
+    </tr>
+    <tr>
+        <td class="td-mail td__padding-all" colspan="6">
+            <p>Met vriendelijke groet,</p>
+            <p>&nbsp;</p>
+            <p>{{ site_name }}</p>
+            <p>&nbsp;</p>
+            <p>&nbsp;</p>
+        </td>
+    </tr>
+    <tr class="tr-mail border-top">
+        <td class="td-mail border-top td__padding-zero" colspan="6">
+            <!-- <hr> is not supported in some clients -->
+        </td>
+    </tr>
+    <tr>
+        <td class="td-mail td__padding-top td__padding-right td__padding-left" colspan="6">
+            <p>Dit bericht is automatisch verzonden. U kunt <strong>niet reageren</strong> op deze e-mail. </p>
+            <p>&nbsp;</p>
+            <p><strong>Contact opnemen</strong></p>
+            <p>
+                Wilt u contact opnemen met ons?
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td class="td-mail td__padding-right td__padding-bottom td__padding-left" colspan="3"><a href="/contactformulier/" class="color--secondary">Bekijk onze contactpagina</a>
+        </td>
+        <td class="td-mail td__padding-right td__padding-bottom td__padding-left" colspan="3"><a href="/contactformulier/" class="color--secondary">Bel naar 14050</a></td>
+    </tr>
+    <tr class="tr-mail border-top">
+        <td class="td-mail border-top td__padding-zero" colspan="6">
+            <!-- <hr> is not supported in some clients -->
+        </td>
+    </tr>
+    <tr>
+        <td class="td-mail td__padding-all" colspan="6">
+            <p>Pas hier uw <a href="https://example.com/mijn-profiel/notificaties/" class="color--secondary">voorkeuren</a> aan voor de notificaties. </p>
+        </td>
+    </tr>
+    </tbody>
+</table>

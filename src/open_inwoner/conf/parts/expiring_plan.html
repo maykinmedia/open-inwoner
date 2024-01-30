@@ -1,0 +1,21 @@
+<p>Dear</p>
+<p>You are receiving this email because you have some plans that are expiring.</p>
+
+<table>
+    <tr>
+        <td>Plan name</td>
+        <td>Goal</td>
+        <td>End date</td>
+    </tr>
+    {% for plan in plans %}
+        <tr>
+            <td>{{ plan.title }}</td>
+            <td>{{ plan.goal }}</td>
+            <td>{{ plan.end_date|date:"j F Y" }}</td>
+        </tr>
+    {% endfor %}
+</table>
+
+<p><a href="{{ plan_list_link }}">Go to your plans</a></p>
+<p>Met vriendelijke groet,
+    {{ site_name }} </p>

@@ -54,7 +54,6 @@ class NotificationHandlerUtilsTestCase(TestCase):
         body_html = email.alternatives[0][0]
         self.assertIn(case.identificatie, body_html)
         self.assertIn(case.zaaktype.omschrijving, body_html)
-        self.assertIn(date_format(case.startdatum), body_html)
         self.assertIn(case_url, body_html)
         self.assertIn(config.name, body_html)
 

@@ -577,6 +577,7 @@ def send_case_update_email(
         "identification": case.identification,
         "type_description": case.zaaktype.omschrijving,
         "start_date": case.startdatum,
+        "end_date": case.einddatum_gepland,
         "case_link": case_detail_url,
     }
     if extra_context:
