@@ -802,7 +802,7 @@ pillow==10.1.0
     #   easy-thumbnails
     #   reportlab
     #   weasyprint
-pip-tools==6.8.0
+pip-tools==7.3.0
     # via -r requirements/dev.in
 platformdirs==2.4.0
     # via
@@ -826,7 +826,7 @@ prompt-toolkit==3.0.36
     #   click-repl
 psutil==5.9.7
     # via locust
-psycopg2==2.9.5
+psycopg2==2.9.9
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
