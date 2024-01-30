@@ -1,0 +1,22 @@
+<p>Beste</p>
+<p>Het is niet gelukt om de onderstaande emails af te leveren op {{ date }}</p>
+
+<table>
+    {% for failed_email in failed_emails %}
+        <tr>
+            <th>Onderwerp</th>
+            <td>{{ failed_email.subject }}</td>
+        </tr>
+        <tr>
+            <th>Ontvanger</th>
+            <td>{{ failed_email.recipient }}</td>
+        </tr>
+        <tr>
+            <th>Datum</th>
+            <td>{{ failed_email.date }}</td>
+        </tr>
+    {% endfor %}
+</table>
+
+<p>Met vriendelijke groet,
+    {{ site_name }} </p>
