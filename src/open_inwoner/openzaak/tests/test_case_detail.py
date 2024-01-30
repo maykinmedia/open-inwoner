@@ -431,7 +431,6 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
             titel="",
             beschrijving="",
             registratiedatum="2021-01-12",
-            # registratiedatum="2021-01-12T00:00:00+01:00",
         )
         self.informatie_object_invisible = generate_oas_component_cached(
             "drc",
@@ -456,11 +455,9 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                     "info_id": self.informatie_object["uuid"],
                 },
             ),
-            created=datetime.datetime(2021, 1, 12, 0, 0, 0),
-            # corresponds to self.zaak_informatie_object
-            # created=datetime.datetime.strptime(
-            #     self.zaak_informatie_object["registratiedatum"], "%Y-%m-%dT%H:%M:%S%z"
-            # )
+            created=datetime.datetime.fromisoformat(
+                self.zaak_informatie_object["registratiedatum"]
+            ),
         )
         self.informatie_object_file_2 = SimpleFile(
             name="another_document_title.txt",
@@ -472,7 +469,9 @@ class TestCaseDetailView(AssertRedirectsMixin, ClearCachesMixin, WebTest):
                     "info_id": self.informatie_object_2["uuid"],
                 },
             ),
-            created=datetime.datetime(2024, 1, 12, 0, 0, 0),
+            created=datetime.datetime.fromisoformat(
+                self.zaak_informatie_object_2["registratiedatum"]
+            ),
         )
         self.informatie_object_file_no_date = SimpleFile(
             name="yet_another_document_title.txt",
