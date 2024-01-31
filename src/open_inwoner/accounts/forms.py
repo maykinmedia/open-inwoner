@@ -198,7 +198,7 @@ class NecessaryUserForm(forms.ModelForm):
         self.fields["last_name"].required = True
 
         # notifications
-        if not (user.login_type == LoginTypeChoices.digid or case_page_is_published()):
+        if not (user.login_type == LoginTypeChoices.digid and case_page_is_published()):
             del self.fields["cases_notifications"]
         if not inbox_page_is_published():
             del self.fields["messages_notifications"]

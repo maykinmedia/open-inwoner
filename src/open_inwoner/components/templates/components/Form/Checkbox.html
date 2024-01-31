@@ -5,7 +5,7 @@
         {{ field|addclass:"checkbox__input" }}
         {% if not no_label %}<label class="checkbox__label" for="id_{{ field.name }}">{{ field.label }}</label>{% endif %}
         {% if field.help_text %}
-            <p class="p">{{ field.help_text }}</p>
+            <p class="p{{ help_extra_cls }}">{{ field.help_text }}</p>
         {% endif %}
 
         {% if field.errors %}
