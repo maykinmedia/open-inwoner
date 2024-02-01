@@ -1,38 +1,28 @@
-import copy
 import logging
 from typing import List, Optional
 
 from django.conf import settings
 
-from requests import RequestException
-from zgw_consumers.api_models.base import factory
-from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
-
-from open_inwoner.utils.api import ClientError, get_paginated_results
+from zgw_consumers.api_models.constants import RolTypes
 
 from ..utils.decorators import cache as cache_result
 from .api_models import Resultaat, Rol, Status, Zaak, ZaakInformatieObject
 from .catalog import fetch_single_case_type, fetch_single_status_type
 from .clients import build_client
-from .models import OpenZaakConfig, ZaakTypeConfig, ZaakTypeStatusTypeConfig
+from .models import ZaakTypeConfig, ZaakTypeStatusTypeConfig
 from .utils import is_zaak_visible
 
 logger = logging.getLogger(__name__)
 CRS_HEADERS = {"Content-Crs": "EPSG:4326", "Accept-Crs": "EPSG:4326"}
 
 
-@cache_result(
-    "cases:{user_bsn}:{max_cases}:{identificatie}",
-    timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
-)
 def fetch_cases(
-    user_bsn: str, max_cases: Optional[int] = 100, identificatie: Optional[str] = None
+    user_bsn: str, max_requests: Optional[int] = 1, identificatie: Optional[str] = None
 ) -> List[Zaak]:
     """
     retrieve cases for particular user with allowed confidentiality level
 
-    :param:max_cases - used to limit the number of requests to list_zaken resource. The default
-    value = 100, which means only one 1 request
+    :param:max_requests - used to limit the number of requests to list_zaken resource.
     :param:identificatie - used to filter the cases by a specific identification
     """
     client = build_client("zaak")
@@ -40,141 +30,58 @@ def fetch_cases(
     if client is None:
         return []
 
-    config = OpenZaakConfig.get_solo()
-
-    params = {
-        "rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn": user_bsn,
-        "maximaleVertrouwelijkheidaanduiding": config.zaak_max_confidentiality,
-    }
-    if identificatie:
-        params.update({"identificatie": identificatie})
-
-    try:
-        response = get_paginated_results(
-            client,
-            "zaken",
-            minimum=max_cases,
-            params=params,
-            headers=CRS_HEADERS,
-        )
-    except (RequestException, ClientError) as e:
-        logger.exception("exception while making request", exc_info=e)
-        return []
-
-    cases = factory(Zaak, response)
-
-    return cases
+    return client.fetch_cases(
+        user_bsn=user_bsn, max_requests=max_requests, identificatie=identificatie
+    )
 
 
-@cache_result(
-    "cases:{kvk_or_rsin}:{vestigingsnummer}:{max_cases}:{zaak_identificatie}",
-    timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
-)
 def fetch_cases_by_kvk_or_rsin(
     kvk_or_rsin: Optional[str],
-    max_cases: Optional[int] = 100,
+    max_requests: Optional[int] = 1,
     zaak_identificatie: Optional[str] = None,
     vestigingsnummer: Optional[str] = None,
 ) -> List[Zaak]:
     """
     retrieve cases for particular company with allowed confidentiality level
 
-    :param max_cases: - used to limit the number of requests to list_zaken resource. The default
-    value = 100, which means only one 1 request
+    :param max_requests: - used to limit the number of requests to list_zaken resource.
     :param zaak_identificatie: - used to filter the cases by a unique Zaak identification number
     :param vestigingsnummer: - used to filter the cases by a vestigingsnummer
     """
-    if not kvk_or_rsin:
-        return []
-
     client = build_client("zaak")
 
     if client is None:
         return []
 
-    config = OpenZaakConfig.get_solo()
-
-    params = {
-        "rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__innNnpId": kvk_or_rsin,
-        "maximaleVertrouwelijkheidaanduiding": config.zaak_max_confidentiality,
-    }
-
-    if vestigingsnummer:
-        params.update(
-            {
-                "rol__betrokkeneIdentificatie__vestiging__vestigingsNummer": vestigingsnummer,
-            }
-        )
-
-    if zaak_identificatie:
-        params.update({"identificatie": zaak_identificatie})
-
-    try:
-        response = get_paginated_results(
-            client,
-            "zaken",
-            minimum=max_cases,
-            params=params,
-            headers=CRS_HEADERS,
-        )
-    except (RequestException, ClientError) as e:
-        logger.exception("exception while making request", exc_info=e)
-        return []
-
-    cases = factory(Zaak, response)
-
-    return cases
+    return client.fetch_cases_by_kvk_or_rsin(
+        kvk_or_rsin=kvk_or_rsin,
+        max_requests=max_requests,
+        zaak_identificatie=zaak_identificatie,
+        vestigingsnummer=vestigingsnummer,
+    )
 
 
-@cache_result("single_case:{case_uuid}", timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT)
 def fetch_single_case(case_uuid: str) -> Optional[Zaak]:
     client = build_client("zaak")
 
     if client is None:
         return
 
-    try:
-        response = client.get(f"zaken/{case_uuid}", headers=CRS_HEADERS)
-    except (RequestException, ClientError) as e:
-        logger.exception("exception while making request", exc_info=e)
-        return
-
-    case = factory(Zaak, response)
-
-    return case
+    return client.fetch_single_case(case_uuid)
 
 
-@cache_result(
-    "single_case_information_object:{url}", timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT
-)
 def fetch_single_case_information_object(url: str) -> Optional[ZaakInformatieObject]:
     client = build_client("zaak")
 
     if client is None:
         return
 
-    try:
-        response = client.get(url=url)
-    except (RequestException, ClientError) as e:
-        logger.exception("exception while making request", exc_info=e)
-        return
-
-    case = factory(ZaakInformatieObject, response)
-
-    return case
+    return client.fetch_single_case_information_object(url)
 
 
 def fetch_case_by_url_no_cache(case_url: str) -> Optional[Zaak]:
     client = build_client("zaak")
-    try:
-        response = client.get(url=case_url, headers=CRS_HEADERS)
-    except (RequestException, ClientError) as e:
-        logger.exception("exception while making request", exc_info=e)
-        return
-
-    case = factory(Zaak, response)
-
-    return case
+    return client.fetch_case_by_url_no_cache(case_url)
 
 
 # not cached for quicker uploaded document visibility
@@ -184,18 +91,7 @@ def fetch_case_information_objects(case_url: str) -> List[ZaakInformatieObject]:
     if client is None:
         return []
 
-    try:
-        response = client.get(
-            "zaakinformatieobjecten",
-            params={"zaak": case_url},
-        )
-    except (RequestException, ClientError) as e:
-        logger.exception("exception while making request", exc_info=e)
-        return []
-
-    case_info_objects = factory(ZaakInformatieObject, response)
-
-    return case_info_objects
+    return client.fetch_case_information_objects(case_url)
 
 
 @cache_result("status_history:{case_url}", timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT)
@@ -209,39 +105,18 @@ def fetch_status_history_no_cache(case_url: str) -> List[Status]:
     if client is None:
         return []
 
-    try:
-        response = client.get("statussen", params={"zaak": case_url})
-    except (RequestException, ClientError) as e:
-        logger.exception("exception while making request", exc_info=e)
-        return []
-
-    statuses = factory(Status, response["results"])
-
-    return statuses
+    return client.fetch_status_history_no_cache(case_url)
 
 
-@cache_result("status:{status_url}", timeout=60 * 60)
 def fetch_single_status(status_url: str) -> Optional[Status]:
     client = build_client("zaak")
 
     if client is None:
         return
 
-    try:
-        response = client.get(url=status_url)
-    except (RequestException, ClientError) as e:
-        logger.exception("exception while making request", exc_info=e)
-        return
-
-    status = factory(Status, response)
-
-    return status
+    return client.fetch_single_status(status_url)
 
 
-@cache_result(
-    "case_roles:{case_url}:{role_desc_generic}",
-    timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
-)
 def fetch_case_roles(
     case_url: str, role_desc_generic: Optional[str] = None
 ) -> List[Rol]:
@@ -250,30 +125,7 @@ def fetch_case_roles(
     if client is None:
         return []
 
-    params = {
-        "zaak": case_url,
-    }
-    if role_desc_generic:
-        assert role_desc_generic in RolOmschrijving.values
-        params["omschrijvingGeneriek"] = role_desc_generic
-
-    try:
-        response = get_paginated_results(
-            client,
-            "rollen",
-            params=params,
-        )
-    except (RequestException, ClientError) as e:
-        logger.exception("exception while making request", exc_info=e)
-        return []
-
-    roles = factory(Rol, response)
-
-    # Taiga #961 process eSuite response to apply ignored filter query
-    if role_desc_generic:
-        roles = [r for r in roles if r.omschrijving_generiek == role_desc_generic]
-
-    return roles
+    return client.fetch_case_roles(case_url, role_desc_generic=role_desc_generic)
 
 
 # implicitly cached because it uses fetch_case_roles()
@@ -352,39 +204,18 @@ def fetch_case_information_objects_for_case_and_info(
     if client is None:
         return []
 
-    try:
-        response = client.get(
-            "zaakinformatieobjecten",
-            params={
-                "zaak": case_url,
-                "informatieobject": info_object_url,
-            },
-        )
-    except (RequestException, ClientError) as e:
-        logger.exception("exception while making request", exc_info=e)
-        return []
-
-    case_info_objects = factory(ZaakInformatieObject, response)
-
-    return case_info_objects
+    return client.fetch_case_information_objects_for_case_and_info(
+        case_url, info_object_url
+    )
 
 
-@cache_result("single_result:{result_url}", timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT)
 def fetch_single_result(result_url: str) -> Optional[Resultaat]:
     client = build_client("zaak")
 
     if client is None:
         return
 
-    try:
-        response = client.get(url=result_url)
-    except (RequestException, ClientError) as e:
-        logger.exception("exception while making request", exc_info=e)
-        return
-
-    result = factory(Resultaat, response)
-
-    return result
+    return client.fetch_single_result(result_url)
 
 
 def connect_case_with_document(case_url: str, document_url: str) -> Optional[dict]:
@@ -393,16 +224,7 @@ def connect_case_with_document(case_url: str, document_url: str) -> Optional[dic
     if client is None:
         return
 
-    try:
-        response = client.post(
-            "zaakinformatieobjecten",
-            json={"zaak": case_url, "informatieobject": document_url},
-        )
-    except (RequestException, ClientError) as e:
-        logger.exception("exception while making request", exc_info=e)
-        return
-
-    return response
+    return client.connect_case_with_document(case_url, document_url)
 
 
 def resolve_zaak_type(case: Zaak) -> None:

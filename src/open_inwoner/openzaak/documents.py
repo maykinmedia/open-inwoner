@@ -1,21 +1,15 @@
-import base64
 import logging
-from datetime import date
 from typing import Optional
 
 from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.utils.functional import SimpleLazyObject
 
-import requests
-from requests import HTTPError, RequestException, Response
-from zgw_consumers.api_models.base import factory
+from requests import Response
 from zgw_consumers.client import build_client
 
 from open_inwoner.openzaak.api_models import InformatieObject
 from open_inwoner.openzaak.clients import build_client
-from open_inwoner.openzaak.models import OpenZaakConfig
-from open_inwoner.utils.api import ClientError
 
 from ..utils.decorators import cache as cache_result
 
@@ -35,26 +29,12 @@ def fetch_single_information_object_uuid(uuid: str) -> Optional[InformatieObject
 def _fetch_single_information_object(
     *, url: Optional[str] = None, uuid: Optional[str] = None
 ) -> Optional[InformatieObject]:
-    if (url and uuid) or (not url and not uuid):
-        raise ValueError("supply either 'url' or 'uuid' argument")
-
     client = build_client("document")
 
     if client is None:
         return
 
-    try:
-        if url:
-            response = client.get(url=url)
-        else:
-            response = client.get(f"enkelvoudiginformatieobjecten/{uuid}")
-    except (RequestException, ClientError) as e:
-        logger.exception("exception while making request", exc_info=e)
-        return
-
-    info_object = factory(InformatieObject, response)
-
-    return info_object
+    return client._fetch_single_information_object(url=url, uuid=uuid)
 
 
 def download_document(url: str) -> Optional[Response]:
@@ -62,34 +42,7 @@ def download_document(url: str) -> Optional[Response]:
     if client is None:
         return
 
-    config = OpenZaakConfig.get_solo()
-    service = config.document_service
-
-    req_args = {}
-
-    # copy/emulate auth and certs from ZGW Consumers / ZDS Client
-    if client.auth:
-        req_args["headers"] = client.auth.auth.credentials()
-
-    if service.server_certificate:
-        req_args["verify"] = service.server_certificate.public_certificate.path
-
-    if service.client_certificate:
-        if service.client_certificate.private_key:
-            req_args["cert"] = (
-                service.client_certificate.public_certificate.path,
-                service.client_certificate.private_key.path,
-            )
-        else:
-            req_args["cert"] = service.client_certificate.public_certificate.path
-
-    try:
-        res = requests.get(url, **req_args)
-        res.raise_for_status()
-    except HTTPError as e:
-        logger.exception("exception while making request", exc_info=e)
-    else:
-        return res
+    return client.download_document(url)
 
 
 def upload_document(
@@ -104,24 +57,6 @@ def upload_document(
     if client is None:
         return
 
-    document_body = {
-        "bronorganisatie": source_organization,
-        "creatiedatum": date.today().strftime("%Y-%m-%d"),
-        "titel": title,
-        "auteur": user.get_full_name(),
-        "inhoud": base64.b64encode(file.read()).decode("utf-8"),
-        "bestandsomvang": file.size,
-        "bestandsnaam": file.name,
-        "status": "definitief",
-        "indicatieGebruiksrecht": False,
-        "taal": "dut",
-        "informatieobjecttype": informatieobjecttype_url,
-    }
-
-    try:
-        response = client.post("enkelvoudiginformatieobjecten", json=document_body)
-    except (RequestException, ClientError) as e:
-        logger.exception("exception while making request", exc_info=e)
-        return
-
-    return response
+    return client.upload_document(
+        user, file, title, informatieobjecttype_url, source_organization
+    )
