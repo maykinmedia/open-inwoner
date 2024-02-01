@@ -150,6 +150,8 @@ INSTALLED_APPS = [
     "django_otp.plugins.otp_static",
     "django_otp.plugins.otp_totp",
     "two_factor",
+    "two_factor.plugins.webauthn",
+    "maykin_2fa",
     # Optional applications.
     "ordered_model",
     "django_admin_index",
@@ -245,7 +247,12 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "axes.middleware.AxesMiddleware",
+<<<<<<< HEAD
     "django_otp.middleware.OTPMiddleware",
+=======
+    "hijack.middleware.HijackUserMiddleware",
+    "maykin_2fa.middleware.OTPMiddleware",
+>>>>>>> 02e70ca5 ([WIP] First attempt to replace 2FA with maykin-2fa)
     "django.middleware.locale.LocaleMiddleware",
     "cms.middleware.utils.ApphookReloadMiddleware",
     "cms.middleware.user.CurrentUserMiddleware",
@@ -477,6 +484,12 @@ AUTHENTICATION_BACKENDS = [
     "digid_eherkenning_oidc_generics.backends.OIDCAuthenticationEHerkenningBackend",
     "open_inwoner.accounts.backends.CustomOIDCBackend",
 ]
+
+# Allowing OIDC admins to bypass 2FA
+MAYKIN_2FA_ALLOW_MFA_BYPASS_BACKENDS = [
+    "open_inwoner.accounts.backends.CustomOIDCBackend",
+]
+
 
 SESSION_COOKIE_NAME = "open_inwoner_sessionid"
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
@@ -791,13 +804,11 @@ ZGW_LIMIT_NOTIFICATIONS_FREQUENCY = config(
 DOCUMENT_RECENT_DAYS = config("DOCUMENT_RECENT_DAYS", default=1)
 
 #
-# Maykin fork of DJANGO-TWO-FACTOR-AUTH
+# Maykin 2FA
 #
-TWO_FACTOR_FORCE_OTP_ADMIN = config("TWO_FACTOR_FORCE_OTP_ADMIN", default=not DEBUG)
-TWO_FACTOR_PATCH_ADMIN = config("TWO_FACTOR_PATCH_ADMIN", default=True)
-ADMIN_INDEX_DISPLAY_DROP_DOWN_MENU_CONDITION_FUNCTION = (
-    "open_inwoner.utils.django_two_factor_auth.should_display_dropdown_menu"
-)
+TWO_FACTOR_PATCH_ADMIN = False
+TWO_FACTOR_WEBAUTHN_RP_NAME = f"OpenInwoner {ENVIRONMENT}"
+TWO_FACTOR_WEBAUTHN_AUTHENTICATOR_ATTACHMENT = "cross-platform"
 
 # file upload limits
 MIN_UPLOAD_SIZE = 1  # in bytes

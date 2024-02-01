@@ -53,9 +53,7 @@ class DropToolbarMiddleware:
         return response
 
     def force_disable_toolbar(self, request):
-        if settings.TWO_FACTOR_FORCE_OTP_ADMIN and (
-            not request.user.is_staff or not request.user.is_verified()
-        ):
+        if not request.user.is_staff or not request.user.is_verified():
             return True
         else:
             return False

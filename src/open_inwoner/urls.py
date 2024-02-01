@@ -7,6 +7,8 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import include, path, re_path
 from django.views.generic import RedirectView, TemplateView
 
+from maykin_2fa import monkeypatch_admin
+from maykin_2fa.urls import urlpatterns, webauthn_urlpatterns
 from mozilla_django_oidc_db.views import AdminLoginFailure
 
 from digid_eherkenning_oidc_generics.views import OIDCFailureView
@@ -35,6 +37,7 @@ admin.site.site_header = "Open Inwoner beheeromgeving"
 admin.site.site_title = "Open Inwoner beheeromgeving"
 admin.site.index_title = "Welkom op de OpenInwoner beheeromgeving"
 
+monkeypatch_admin()
 
 urlpatterns = [
     path(
@@ -57,6 +60,12 @@ urlpatterns = [
         auth_views.PasswordResetCompleteView.as_view(),
         name="password_reset_complete",
     ),
+<<<<<<< HEAD
+=======
+    path("admin/", include((urlpatterns, "maykin_2fa"))),
+    path("admin/", include((webauthn_urlpatterns, "two_factor"))),
+    path("admin/hijack/", include("hijack.urls")),
+>>>>>>> 02e70ca5 ([WIP] First attempt to replace 2FA with maykin-2fa)
     path("admin/login/failure/", AdminLoginFailure.as_view(), name="admin-oidc-error"),
     path("admin/", admin.site.urls),
     path("csp/", include("cspreports.urls")),
