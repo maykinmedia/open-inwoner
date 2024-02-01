@@ -31,6 +31,7 @@ class TestProductLogging(WebTest):
         form["slug"] = self.product.slug
         form["content"] = self.product.content
         form["summary"] = self.product.summary
+        form["categories"] = [self.category.id]
         form["costs"] = 0.0
         form.submit()
         product = Product.objects.filter(slug=self.product.slug).first()
