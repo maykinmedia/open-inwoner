@@ -191,7 +191,7 @@ class CategoryAdmin(
             },
         ),
     )
-    filter_horizontal = [
+    readonly_fields = [
         "access_groups",
     ]
 
@@ -207,15 +207,6 @@ class CategoryAdmin(
     import_template_name = "admin/category_import.html"
     resource_class = CategoryImportResource
     formats = [base_formats.XLSX, base_formats.CSV]
-
-    def get_fields(self, request, obj=None):
-        fields = list(super().get_fields(request, obj=obj))
-        if not request.user.has_perm("auth.change_group"):
-            try:
-                fields.remove("access_groups")
-            except ValueError:
-                pass
-        return fields
 
     def get_inlines(self, request, obj):
         inlines = list(super().get_inlines(request, obj))

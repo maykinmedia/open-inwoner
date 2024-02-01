@@ -1,5 +1,6 @@
 from django.contrib.auth.models import Permission
 from django.urls import reverse
+from django.utils.translation import ugettext as _
 
 from django_webtest import WebTest
 
@@ -135,9 +136,18 @@ class TestAdminProductForm(WebTest):
             )
             # select different category
             response.form["categories"].select_multiple(value=[str(category_extra.id)])
-            response.form.submit()
+            response.form.submit().follow()
 
             # swapped different category but the non-group category is still there
             self.assertEqual(
                 set(product.categories.all()), {category_general, category_extra}
+            )
+
+            # requires at least one category
+            response.form["categories"].select_multiple(value=[])
+            response = response.form.submit()
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(
+                response.context["errors"][0][0],
+                _("At least one category is required"),
             )

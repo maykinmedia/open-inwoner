@@ -14,8 +14,8 @@ from privates.admin import PrivateMediaMixin
 from open_inwoner.utils.mixins import UUIDAdminFirstInOrder
 
 from .choices import ContactTypeChoices
-from .models import Action, Document, Invite, Message, User
 from .forms import GroupAdminForm
+from .models import Action, Document, Invite, Message, User
 
 
 class ReadOnlyFileMixin:

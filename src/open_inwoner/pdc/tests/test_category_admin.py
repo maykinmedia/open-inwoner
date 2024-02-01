@@ -142,6 +142,26 @@ class TestAdminCategoryForm(WebTest):
             self.assertEqual(response.status_code, 302)
             self.assertEqual(response.follow().request.path, "/admin/")
 
+    def test_access_categories_cannot_be_edited_by_restricted(self):
+        group = GroupFactory()
+        group_user = UserFactory(is_staff=True)
+        group_user.user_permissions.add(
+            Permission.objects.get(codename="change_category"),
+        )
+        group_user.groups.add(group)
+
+        category = CategoryFactory(path="grouped", name="grouped", published=True)
+        category.access_groups.add(group)
+        response = self.app.get(
+            reverse(
+                "admin:pdc_category_change",
+                kwargs={"object_id": category.id},
+            ),
+            user=group_user,
+        )
+        self.assertIn("name", response.form.fields)
+        self.assertNotIn("access_groups", response.form.fields)
+
     @patch("open_inwoner.openzaak.models.OpenZaakConfig.get_solo")
     def test_user_can_link_zaaktypen_if_category_filtering_with_zaken_feature_flag_enabled(
         self, mock_solo
