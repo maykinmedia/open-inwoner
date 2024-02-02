@@ -10,6 +10,13 @@ import factory.fuzzy
 from open_inwoner.accounts.choices import LoginTypeChoices
 
 
+class GroupFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = "auth.Group"
+
+    name = factory.Faker("word")
+
+
 @factory.django.mute_signals(pre_save, post_save)
 class UserFactory(factory.django.DjangoModelFactory):
     class Meta:

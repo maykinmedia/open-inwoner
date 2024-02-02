@@ -3,11 +3,11 @@ from datetime import date, timedelta
 from uuid import uuid4
 
 from django.conf import settings
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, Group, PermissionsMixin
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import CheckConstraint, Q, UniqueConstraint
+from django.db.models import Q, UniqueConstraint
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.crypto import get_random_string
@@ -468,6 +468,16 @@ class User(AbstractBaseUser, PermissionsMixin):
     @property
     def is_eherkenning_user(self) -> bool:
         return self.login_type == LoginTypeChoices.eherkenning
+
+    def has_group_managed_categories(self) -> bool:
+        from ..pdc.models import Category
+
+        return Category.objects.filter(access_groups__user=self).exists()
+
+    def get_group_managed_categories(self):
+        from ..pdc.models import Category
+
+        return Category.objects.filter(access_groups__user=self)
 
 
 class Document(models.Model):

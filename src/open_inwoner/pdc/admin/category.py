@@ -143,6 +143,7 @@ class CategoryAdmin(
         "visible_for_anonymous",
         "visible_for_companies",
         "visible_for_citizens",
+        "get_access_groups_label",
     )
     list_editable = (
         "highlighted",
@@ -176,6 +177,7 @@ class CategoryAdmin(
                     "visible_for_anonymous",
                     "visible_for_companies",
                     "visible_for_citizens",
+                    "access_groups",
                 ),
             },
         ),
@@ -189,11 +191,46 @@ class CategoryAdmin(
             },
         ),
     )
+    readonly_fields = [
+        "access_groups",
+    ]
+
+    list_filter = [
+        "published",
+        "visible_for_anonymous",
+        "visible_for_companies",
+        "visible_for_citizens",
+        "access_groups",
+    ]
 
     # import-export
     import_template_name = "admin/category_import.html"
     resource_class = CategoryImportResource
     formats = [base_formats.XLSX, base_formats.CSV]
+
+    def get_inlines(self, request, obj):
+        inlines = list(super().get_inlines(request, obj))
+
+        # disable product management if we have restrictions
+        if request.user.has_group_managed_categories():
+            try:
+                inlines.remove(CategoryProductInline)
+            except ValueError:
+                pass
+
+        return inlines
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        categories = request.user.get_group_managed_categories()
+        if categories:
+            qs = qs.filter(id__in=categories)
+        return qs
+
+    def get_access_groups_label(self, obj):
+        return ", ".join(g.name for g in obj.access_groups.all())
+
+    get_access_groups_label.short_description = _("Allowed admin groups")
 
     def get_export_resource_class(self):
         return CategoryExportResource
