@@ -24,7 +24,7 @@ class OIDCConfigTest(ClearCachesMixin, WebTest):
         openid_config.enabled = True
         openid_config.save()
 
-    def test_admin_only_enabled(self):
+    def test_admin_only_enlabled(self):
         """Assert that the OIDC login option is only displayed for login via admin"""
 
         config = SiteConfiguration.get_solo()
@@ -64,7 +64,7 @@ class OIDCConfigTest(ClearCachesMixin, WebTest):
         # admin login
         response = self.client.get(reverse("admin:login"))
 
-        self.assertNotContains(response, _("Login with organization account"))
+        self.assertNotContains(response, _("Log in met een organisatieaccount"))
 
     def test_oidc_config_validation(self):
         """
