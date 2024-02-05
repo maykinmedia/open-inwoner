@@ -60,12 +60,8 @@ urlpatterns = [
         auth_views.PasswordResetCompleteView.as_view(),
         name="password_reset_complete",
     ),
-<<<<<<< HEAD
-=======
     path("admin/", include((urlpatterns, "maykin_2fa"))),
     path("admin/", include((webauthn_urlpatterns, "two_factor"))),
-    path("admin/hijack/", include("hijack.urls")),
->>>>>>> 02e70ca5 ([WIP] First attempt to replace 2FA with maykin-2fa)
     path("admin/login/failure/", AdminLoginFailure.as_view(), name="admin-oidc-error"),
     path("admin/", admin.site.urls),
     path("csp/", include("cspreports.urls")),

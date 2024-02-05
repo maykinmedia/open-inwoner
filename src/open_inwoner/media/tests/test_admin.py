@@ -2,12 +2,14 @@ from django.urls import reverse
 
 from cms.utils.permissions import set_current_user
 from django_webtest import WebTest
+from maykin_2fa.test import disable_admin_mfa
 
 from open_inwoner.accounts.tests.factories import UserFactory
 
 from .factories import VideoFactory
 
 
+@disable_admin_mfa()
 class VideoAdminTests(WebTest):
     def setUp(self):
         set_current_user(

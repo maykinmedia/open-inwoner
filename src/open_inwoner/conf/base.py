@@ -247,12 +247,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "axes.middleware.AxesMiddleware",
-<<<<<<< HEAD
-    "django_otp.middleware.OTPMiddleware",
-=======
-    "hijack.middleware.HijackUserMiddleware",
     "maykin_2fa.middleware.OTPMiddleware",
->>>>>>> 02e70ca5 ([WIP] First attempt to replace 2FA with maykin-2fa)
     "django.middleware.locale.LocaleMiddleware",
     "cms.middleware.utils.ApphookReloadMiddleware",
     "cms.middleware.user.CurrentUserMiddleware",

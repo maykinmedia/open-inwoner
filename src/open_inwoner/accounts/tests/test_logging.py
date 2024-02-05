@@ -11,6 +11,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from django_webtest import WebTest
 from freezegun import freeze_time
+from maykin_2fa.test import disable_admin_mfa
 from privates.test import temp_private_root
 from timeline_logger.models import TimelineLog
 
@@ -30,6 +31,7 @@ from .factories import (
 )
 
 
+@disable_admin_mfa()
 @freeze_time("2021-10-18 13:00:00")
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestProfile(WebTest):
@@ -115,7 +117,11 @@ class TestProfile(WebTest):
         )
 
     def test_login_via_admin_is_logged(self):
-        self.app.post(reverse("admin:login"), user=self.user)
+        login_page = self.app.get(reverse("admin:login"))
+        login_page.form["auth-username"] = self.user.email
+        login_page.form["auth-password"] = "secret"
+        login_page.form.submit()
+
         log_entry = TimelineLog.objects.get()
 
         self.assertEqual(
