@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.utils.translation import gettext_lazy as _
 
 # mail-editor
@@ -331,18 +333,22 @@ MAIL_EDITOR_CONF = {
             {
                 "name": "identification",
                 "description": _("The identification of the case"),
+                "example": "ZAAK-1234",
             },
             {
                 "name": "type_description",
                 "description": _("The description of the type of the case"),
+                "example": "Aanvraag rijbewijs",
             },
             {
                 "name": "start_date",
                 "description": _("The start date of the case"),
+                "example": date(2000, 1, 1),
             },
             {
                 "name": "case_link",
                 "description": _("The link to the case details."),
+                "example": "/",
             },
             {
                 "name": "site_name",
