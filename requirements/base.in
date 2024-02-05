@@ -17,7 +17,6 @@ Django>=3.2.11<4.0
 django-admin-index
 django-axes
 django-filer
-django-hijack
 django-ordered-model
 django-redis
 django-rosetta

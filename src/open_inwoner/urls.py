@@ -56,7 +56,6 @@ urlpatterns = [
         auth_views.PasswordResetCompleteView.as_view(),
         name="password_reset_complete",
     ),
-    path("admin/hijack/", include("hijack.urls")),
     path("admin/login/failure/", AdminLoginFailure.as_view(), name="admin-oidc-error"),
     path("admin/", admin.site.urls),
     path("csp/", include("cspreports.urls")),
