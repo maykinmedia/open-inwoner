@@ -410,6 +410,67 @@ MAIL_EDITOR_CONF = {
             },
         ],
     },
+    "case_status_notification_action_required": {
+        "name": _("Case status update notification (action required)"),
+        "description": _(
+            "This email is used to notify people about a new status being set on their case "
+            "that requires action on their part."
+        ),
+        "subject_default": "Uw zaak is bijgewerkt op {{ site_name }} (actie vereist)",
+        "body_default": """
+            <p>Beste</p>
+
+            <p>U ontvangt deze email, omdat de status van een van uw zaken is bijgewerkt.</p>
+
+            <table>
+                <tr>
+                    <th>Zaakidentificatie</th>
+                    <td>{{ identification }}</td>
+                </tr>
+                <tr>
+                    <th>Zaaktype</th>
+                    <td>{{ type_description }}</td>
+                </tr>
+                <tr>
+                    <th>Startdatum</th>
+                    <td>{{ start_date }}</td>
+                </tr>
+            </table>
+
+            <p><a href="{{ case_link }}">Ga naar uw zaak</a> </p>
+
+            <p>Met vriendelijke groet,
+            {{ site_name }} </p>
+       """,
+        "subject": [
+            {
+                "name": "site_name",
+                "description": _("Name of the site."),
+            },
+        ],
+        "body": [
+            {
+                "name": "identification",
+                "description": _("The identification of the case"),
+            },
+            {
+                "name": "type_description",
+                "description": _("The description of the type of the case"),
+            },
+            {
+                "name": "start_date",
+                "description": _("The start date of the case"),
+            },
+            {
+                "name": "case_link",
+                "description": _("The link to the case details."),
+            },
+            {
+                "name": "site_name",
+                "description": _("Name of the site"),
+            },
+        ],
+    },
     "contactform_registration": {
         "name": _("Contact form registration notification"),
         "description": _("This email is used to register a contact form submission"),
