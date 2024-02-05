@@ -487,7 +487,9 @@ sqlparse==0.4.4
 svglib==1.5.1
     # via easy-thumbnails
 tablib[html,ods,xls,xlsx,yaml]==3.1.0
-    # via django-import-export
+    # via
+    #   django-import-export
+    #   tablib
 tinycss2==1.1.1
     # via
     #   -r requirements/base.in
