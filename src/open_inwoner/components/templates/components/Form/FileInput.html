@@ -1,11 +1,9 @@
-{% load i18n solo_tags button_tags card_tags form_tags icon_tags %}
-
-{% get_solo 'openzaak.OpenZaakConfig' as openzaak_config %}
+{% load i18n button_tags card_tags form_tags icon_tags %}
 
 <div class="form__control file-input" aria-live="polite">
     {% render_card direction="vertical" %}
         {% icon icon="upload" icon_position="before" outlined=True %}
-        <input class="file-input__input" id="{{ field.auto_id }}" name="file" type="file"{% if field.field.required %} required{% endif %}{% if multiple %} multiple{% endif %} data-max-size="{{ openzaak_config.max_upload_size }}" data-file-types="{{ openzaak_config.allowed_file_extensions }}">
+        <input class="file-input__input" id="{{ field.auto_id }}" name="file" type="file"{% if field.field.required %} required{% endif %}{% if multiple %} multiple{% endif %} data-max-size="{{ max_upload_size }}" data-file-types="{{ allowed_file_extensions }}">
         <label class="button button--primary file-input__label-empty" for="{{ field.auto_id }}">
             {% if multiple %}{% trans 'Sleep of selecteer bestanden' %}{% else %}{% trans 'Sleep of selecteer bestand' %}{% endif %}
         </label>

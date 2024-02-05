@@ -4,29 +4,29 @@
         {% for category in categories %}
             {% url 'products:category_detail' slug=category.slug as category_url %}
             {% if category.icon %}
-                {% card src=category.icon.file.url alt=category.icon.name title=category.name href=category_url image_object_fit=image_object_fit %}
+                {% card src=category.icon.file.url alt=category.icon.name title=category.name href=category_url compact=True image_object_fit=image_object_fit %}
             {% else %}
-                {% card src=category.image.file.url alt=category.image.name title=category.name href=category_url image_object_fit=image_object_fit %}
+                {% card src=category.image.file.url alt=category.image.name title=category.name href=category_url compact=True image_object_fit=image_object_fit %}
             {% endif %}
         {% endfor %}
     {% endif %}
 
     {% if subcategories %}
         {% for subcategory in subcategories %}
-            {% category_card category=subcategory parent_category=parent_category image_object_fit=image_object_fit %}
+            {% category_card category=subcategory parent_category=parent_category compact=True image_object_fit=image_object_fit %}
         {% endfor %}
     {% endif %}
 
     {% if products %}
         {% for product in products %}
             {% get_product_url product as product_url %}
-            {% product_card title=product.name description=product.summary url=product_url image=product.icon image_object_fit=image_object_fit %}
+            {% product_card title=product.name description=product.summary url=product_url image=product.icon compact=True image_object_fit=image_object_fit %}
         {% endfor %}
     {% endif %}
 
     {% if plans %}
         {% for plan in plans %}
-            {% description_card title=plan.title description=plan.goal|truncatechars:51 url=plan.get_absolute_url elypsis=True object=plan image_object_fit=image_object_fit %}
+            {% description_card title=plan.title description=plan.goal|truncatechars:51 url=plan.get_absolute_url elypsis=True object=plan compact=True image_object_fit=image_object_fit %}
         {% endfor %}
     {% endif %}
 

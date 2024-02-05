@@ -1,9 +1,11 @@
-{% load i18n form_tags button_tags icon_tags %}
+{% load i18n solo_tags form_tags button_tags icon_tags %}
+
+{% get_solo 'openzaak.OpenZaakConfig' as openzaak_config %}
 
 {% render_form id="document-upload" form=form method="POST" hxencoding="multipart/form-data" hxpost=hxpost_document_action hxtarget="#form_upload" submit_text=_("Bestand uploaden") extra_classes="case-detail-form" %}
     {% csrf_token %}
     {% input form.type no_label=True no_help=True class="label input" id="id_type" extra_classes="file-type__select" %}
-    {% file_input form.files %}
+    {% file_input form.files max_upload_size=openzaak_config.max_upload_size allowed_file_extensions=openzaak_config.allowed_file_extensions %}
     {% form_actions primary_text=_("Upload documenten") enctype="multipart/form-data" %}
     <div class="non-field-error" hidden>
         <p class="p p--small p--centered">{% trans "Verwijder eerst bestanden die niet voldoen aan de voorwaarden" %}</p>

@@ -20,7 +20,7 @@ export class FileInput extends Component {
    * @returns {string} of file extensions.
    */
   getUploadTypes() {
-    return this.getInput().dataset.fileTypes.replace(/["|'\[\]]/g, '')
+    return this.getInput().dataset.fileTypes.replace(/["'\[\]]/g, '')
   }
 
   /**
@@ -275,7 +275,6 @@ export class FileInput extends Component {
    * @return {string}
    */
   renderFileHTML(file) {
-    // renderFileHTML is a separate function, where the context of 'this' changes when it is called
     const { name, size, type } = file
     const ext = name.split('.').pop().toUpperCase()
     const sizeMB = (size / (1024 * 1024)).toFixed(2)
@@ -283,21 +282,17 @@ export class FileInput extends Component {
     const getFormNonFieldError = this.getFormNonFieldError()
     const formSubmitButton = this.getFormSubmitButton()
 
-    // Only show errors notification if data-max-file-size is exceeded + add error class to file-list
     const maxMegabytes = this.getLimit()
     const uploadFileTypes = this.getUploadTypes().toUpperCase()
 
     const sizeError = sizeMB > maxMegabytes
-    // Show fil-type error if allowed types DO contain the extension and returns true
-    const typeError = !uploadFileTypes.includes(ext)
+    const typeError = !uploadFileTypes.split(', ').includes(ext)
 
     const htmlStart = `
     <li class="file-list__list-item">
       <aside class="file">
         <div class="file__container">
-          <div class="file__file ${sizeError ? 'error' : ''} ${
-      typeError ? 'error' : ''
-    }">
+          <div class="file__file ${typeError || sizeError ? 'error' : ''}">
             <p class="file__symbol">
               <span aria-hidden="true" class="material-icons-outlined">${
                 type.match('image') ? 'image' : 'description'
@@ -309,35 +304,38 @@ export class FileInput extends Component {
             <a class="link link--primary" href="#document-upload" role="button" aria-label="${labelDelete}">
               <span aria-hidden="true" class="material-icons-outlined">delete</span>
             </a>
-          </div>
+        </div>
+          ${
+            typeError && sizeError
+              ? `
+              <p class="p p--small error">
+                <span aria-hidden="true" class="material-icons-outlined">warning_amber</span>
+                <span class="file-error__content">Dit bestand is te groot - en van een ongeldig type ("${ext}"). <br />Toegestaan zijn: ${uploadFileTypes}.</span>
+              </p>`
+              : typeError || sizeError
+              ? `
+              <p class="p p--small error">
+                <span aria-hidden="true" class="material-icons-outlined">warning_amber</span>
+                ${
+                  typeError
+                    ? `<span class="file-error__content">Dit type bestand ("${ext}") is ongeldig. Geldige bestandstypen zijn: ${uploadFileTypes}.</span>`
+                    : ''
+                }
+                ${
+                  sizeError
+                    ? '<span class="file-error__content">Dit bestand is te groot.</span>'
+                    : ''
+                }
+              </p>`
+              : ''
+          }
         </div>
       </aside>
     </li>`
 
-    // If uploaded field does NOT contain allowed extension
-    if (typeError) {
+    if (typeError || sizeError) {
       getFormNonFieldError.removeAttribute('hidden')
       formSubmitButton.setAttribute('disabled', 'true')
-
-      return (
-        htmlStart +
-        `<p class="p p--small error">
-          <span aria-hidden="true" class="material-icons-outlined">warning_amber</span>
-          Dit type bestand (${ext}) is ongeldig. Geldige bestandstypen zijn: ${uploadFileTypes}.
-        </p>`
-      )
-    }
-    if (sizeError) {
-      getFormNonFieldError.removeAttribute('hidden')
-      formSubmitButton.setAttribute('disabled', 'true')
-
-      return (
-        htmlStart +
-        `<p class="p p--small error">
-          <span aria-hidden="true" class="material-icons-outlined">warning_amber</span>
-          Dit bestand is te groot
-        </p>`
-      )
     } else {
       getFormNonFieldError.setAttribute('hidden', 'hidden')
       formSubmitButton.removeAttribute('disabled')
