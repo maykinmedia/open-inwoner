@@ -190,7 +190,6 @@ django==3.2.23
     #   django-filer
     #   django-filter
     #   django-formtools
-    #   django-hijack
     #   django-htmx
     #   django-import-export
     #   django-localflavor
@@ -324,10 +323,6 @@ django-formtools==2.3
     #   -r requirements/ci.txt
     #   django-cms
     #   maykin-django-two-factor-auth
-django-hijack==3.0.4
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
 django-htmx==1.13.0
     # via
     #   -c requirements/ci.txt

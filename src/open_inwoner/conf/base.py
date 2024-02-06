@@ -167,8 +167,6 @@ INSTALLED_APPS = [
     "sniplates",
     "digid_eherkenning",
     "eherkenning",
-    # "hijack.contrib.admin", # This should be imported but it causes an error. So now there are
-    # "hijack",
     "localflavor",
     "easy_thumbnails",  # used by filer
     "image_cropping",
@@ -247,7 +245,6 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "axes.middleware.AxesMiddleware",
-    "hijack.middleware.HijackUserMiddleware",
     "django_otp.middleware.OTPMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "cms.middleware.utils.ApphookReloadMiddleware",
@@ -642,16 +639,6 @@ IPWARE_META_PRECEDENCE_ORDER = (
 )
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
-
-#
-# DJANGO-HIJACK
-#
-HIJACK_LOGIN_REDIRECT_URL = "/"
-HIJACK_LOGOUT_REDIRECT_URL = reverse_lazy("admin:accounts_user_changelist")
-HIJACK_REGISTER_ADMIN = False
-# This is a CSRF-security risk.
-# See: http://django-hijack.readthedocs.io/en/latest/configuration/#allowing-get-method-for-hijack-views
-HIJACK_ALLOW_GET_REQUESTS = True
 
 #
 # SENTRY - error monitoring
