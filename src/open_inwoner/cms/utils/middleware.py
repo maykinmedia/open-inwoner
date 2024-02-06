@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.http import HttpResponseRedirect
 
 from cms.toolbar.utils import get_toolbar_from_request

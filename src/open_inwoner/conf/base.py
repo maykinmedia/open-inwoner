@@ -480,11 +480,6 @@ AUTHENTICATION_BACKENDS = [
     "open_inwoner.accounts.backends.CustomOIDCBackend",
 ]
 
-# Allowing OIDC admins to bypass 2FA
-MAYKIN_2FA_ALLOW_MFA_BYPASS_BACKENDS = [
-    "open_inwoner.accounts.backends.CustomOIDCBackend",
-]
-
 
 SESSION_COOKIE_NAME = "open_inwoner_sessionid"
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
@@ -609,6 +604,11 @@ DJANGOCMS_LINK_TEMPLATES = [
 ADMIN_INDEX_SHOW_REMAINING_APPS = False
 ADMIN_INDEX_AUTO_CREATE_APP_GROUP = False
 ADMIN_INDEX_SHOW_REMAINING_APPS_TO_SUPERUSERS = False
+ADMIN_INDEX_SHOW_MENU = True
+ADMIN_INDEX_DISPLAY_DROP_DOWN_MENU_CONDITION_FUNCTION = (
+    "open_inwoner.utils.django_two_factor_auth.should_display_dropdown_menu"
+)
+
 
 #
 # DJANGO-AXES (4.0+)
@@ -804,6 +804,10 @@ DOCUMENT_RECENT_DAYS = config("DOCUMENT_RECENT_DAYS", default=1)
 TWO_FACTOR_PATCH_ADMIN = False
 TWO_FACTOR_WEBAUTHN_RP_NAME = f"OpenInwoner {ENVIRONMENT}"
 TWO_FACTOR_WEBAUTHN_AUTHENTICATOR_ATTACHMENT = "cross-platform"
+# Allow OIDC admins to bypass 2FA
+MAYKIN_2FA_ALLOW_MFA_BYPASS_BACKENDS = [
+    "open_inwoner.accounts.backends.CustomOIDCBackend",
+]
 
 # file upload limits
 MIN_UPLOAD_SIZE = 1  # in bytes
