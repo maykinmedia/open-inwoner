@@ -11,7 +11,7 @@ from ape_pie.client import APIClient
 from requests import HTTPError, RequestException, Response
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.catalogi import Catalogus
-from zgw_consumers.api_models.constants import RolOmschrijving
+from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 from zgw_consumers.client import build_client as _build_client
 from zgw_consumers.service import pagination_helper
 
@@ -47,7 +47,7 @@ class ZakenClient(APIClient):
     def fetch_cases(
         self,
         user_bsn: str,
-        max_requests: Optional[int] = 1,
+        max_requests: Optional[int] = 4,
         identificatie: Optional[str] = None,
     ) -> List[Zaak]:
         """
@@ -72,22 +72,19 @@ class ZakenClient(APIClient):
                 headers=CRS_HEADERS,
             )
             data = get_json_response(response)
-            # FIXME the previous implementation that used `get_paginated_results`
-            # never actually retrieved any of the extra pages, because it was limited
-            # to stop when it reached 100 cases (which is the page size for the Zaken endpoint)
-            # all_data = list(
-            #     pagination_helper(
-            #         self,
-            #         data,
-            #         max_requests=max_requests,
-            #         headers=CRS_HEADERS,
-            #     )
-            # )
+            all_data = list(
+                pagination_helper(
+                    self,
+                    data,
+                    max_requests=max_requests,
+                    headers=CRS_HEADERS,
+                )
+            )
         except (RequestException, ClientError) as e:
             logger.exception("exception while making request", exc_info=e)
             return []
 
-        cases = factory(Zaak, data["results"])
+        cases = factory(Zaak, all_data)
 
         return cases
 
@@ -98,7 +95,7 @@ class ZakenClient(APIClient):
     def fetch_cases_by_kvk_or_rsin(
         self,
         kvk_or_rsin: Optional[str],
-        max_requests: Optional[int] = 1,
+        max_requests: Optional[int] = 4,
         zaak_identificatie: Optional[str] = None,
         vestigingsnummer: Optional[str] = None,
     ) -> List[Zaak]:
@@ -136,7 +133,14 @@ class ZakenClient(APIClient):
                 headers=CRS_HEADERS,
             )
             data = get_json_response(response)
-            all_data = list(pagination_helper(self, data, max_requests=max_requests))
+            all_data = list(
+                pagination_helper(
+                    self,
+                    data,
+                    max_requests=max_requests,
+                    headers=CRS_HEADERS,
+                )
+            )
         except (RequestException, ClientError) as e:
             logger.exception("exception while making request", exc_info=e)
             return []
@@ -217,6 +221,10 @@ class ZakenClient(APIClient):
 
         return statuses
 
+    @cache_result("status_history:{case_url}", timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT)
+    def fetch_status_history(self, case_url: str) -> List[Status]:
+        return self.fetch_status_history_no_cache(case_url)
+
     @cache_result("status:{status_url}", timeout=60 * 60)
     def fetch_single_status(self, status_url: str) -> Optional[Status]:
         try:
@@ -263,6 +271,74 @@ class ZakenClient(APIClient):
 
         return roles
 
+    # implicitly cached because it uses fetch_case_roles()
+    def fetch_roles_for_case_and_bsn(self, case_url: str, bsn: str) -> List[Rol]:
+        """
+        note we do a query on all case_roles and then manually filter our roles from the result,
+        because e-Suite doesn't support querying on both "zaak" AND "betrokkeneIdentificatie__natuurlijkPersoon__inpBsn"
+
+        see Taiga #948
+        """
+        case_roles = self.fetch_case_roles(case_url)
+        if not case_roles:
+            return []
+
+        bsn_roles = []
+        for role in case_roles:
+            if role.betrokkene_type == RolTypes.natuurlijk_persoon:
+                inp_bsn = role.betrokkene_identificatie.get("inp_bsn")
+                if inp_bsn and inp_bsn == bsn:
+                    bsn_roles.append(role)
+
+        return bsn_roles
+
+    # implicitly cached because it uses fetch_case_roles()
+    def fetch_roles_for_case_and_kvk_or_rsin(
+        self, case_url: str, kvk_or_rsin: str
+    ) -> List[Rol]:
+        """
+        note we do a query on all case_roles and then manually filter our roles from the result,
+        because e-Suite doesn't support querying on both "zaak" AND "betrokkeneIdentificatie__nietNatuurlijkPersoon__inn_nnp_id"
+
+        see Taiga #948
+        """
+        case_roles = self.fetch_case_roles(case_url)
+        if not case_roles:
+            return []
+
+        roles = []
+        for role in case_roles:
+            if role.betrokkene_type == RolTypes.niet_natuurlijk_persoon:
+                nnp_id = role.betrokkene_identificatie.get("inn_nnp_id")
+                if nnp_id and nnp_id == kvk_or_rsin:
+                    roles.append(role)
+
+        return roles
+
+    # implicitly cached because it uses fetch_case_roles()
+    def fetch_roles_for_case_and_vestigingsnummer(
+        self, case_url: str, vestigingsnummer: str
+    ) -> List[Rol]:
+        """
+        note we do a query on all case_roles and then manually filter our roles from the result,
+        because e-Suite doesn't support querying on both "zaak" AND "rol__betrokkeneIdentificatie__vestiging__vestigingsNummer"
+
+        see Taiga #948
+        """
+        case_roles = self.fetch_case_roles(case_url)
+        if not case_roles:
+            return []
+
+        roles = []
+        for role in case_roles:
+            if role.betrokkene_type == RolTypes.vestiging:
+                identifier = role.betrokkene_identificatie.get("vestigings_nummer")
+                if identifier and identifier == vestigingsnummer:
+                    roles.append(role)
+
+        return roles
+
+    # not cached because currently only used in info-object download view
     def fetch_case_information_objects_for_case_and_info(
         self, case_url: str, info_object_url: str
     ) -> List[ZaakInformatieObject]:
@@ -315,6 +391,8 @@ class ZakenClient(APIClient):
 
 
 class CatalogiClient(APIClient):
+    # not cached because only used by tools,
+    # and because caching (stale) listings can break lookups
     def fetch_status_types_no_cache(self, case_type_url: str) -> List[StatusType]:
         try:
             response = self.get(
@@ -331,6 +409,8 @@ class CatalogiClient(APIClient):
 
         return status_types
 
+    # not cached because only used by tools,
+    # and because caching (stale) listings can break lookups
     def fetch_result_types_no_cache(self, case_type_url: str) -> List[ResultaatType]:
         try:
             response = self.get(
@@ -393,6 +473,8 @@ class CatalogiClient(APIClient):
 
         return zaak_types
 
+    # not cached because only used by cronjob
+    # and because caching (stale) listings can break lookups
     def fetch_case_types_by_identification_no_cache(
         self, case_type_identification: str, catalog_url: Optional[str] = None
     ) -> List[ZaakType]:
@@ -561,6 +643,6 @@ def build_client(type_) -> Optional[APIClient]:
         if service:
             client = _build_client(service, client_factory=client_class)
             return client
-        else:
-            logger.warning(f"no service defined for {type_}")
+
+    logger.warning("no service defined for %s", type_)
     return None

@@ -11,7 +11,7 @@ from open_inwoner.accounts.models import User
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.kvk.branches import get_kvk_branch_number
 from open_inwoner.openzaak.api_models import Zaak
-from open_inwoner.openzaak.cases import fetch_cases, fetch_cases_by_kvk_or_rsin
+from open_inwoner.openzaak.clients import build_client
 from open_inwoner.openzaak.models import OpenZaakConfig, ZaakTypeConfig
 
 
@@ -52,8 +52,12 @@ class CategoryPublishedQueryset(MP_NodeQuerySet):
         if not request.user.bsn and not request.user.kvk:
             return self
 
+        client = build_client("zaak")
+        if client is None:
+            return self.none()
+
         if request.user.bsn:
-            cases = fetch_cases(request.user.bsn)
+            cases = client.fetch_cases(request.user.bsn)
         elif request.user.kvk:
             kvk_or_rsin = request.user.kvk
             config = OpenZaakConfig.get_solo()
@@ -61,11 +65,11 @@ class CategoryPublishedQueryset(MP_NodeQuerySet):
                 kvk_or_rsin = request.user.rsin
             vestigingsnummer = get_kvk_branch_number(request.session)
             if vestigingsnummer:
-                cases = fetch_cases_by_kvk_or_rsin(
+                cases = client.fetch_cases_by_kvk_or_rsin(
                     kvk_or_rsin=kvk_or_rsin, vestigingsnummer=vestigingsnummer
                 )
             else:
-                cases = fetch_cases_by_kvk_or_rsin(kvk_or_rsin=kvk_or_rsin)
+                cases = client.fetch_cases_by_kvk_or_rsin(kvk_or_rsin=kvk_or_rsin)
 
         return self.filter_by_zaken(cases)
 

@@ -7,11 +7,8 @@ from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.htmx.mixins import RequiresHtmxMixin
 from open_inwoner.kvk.branches import get_kvk_branch_number
-from open_inwoner.openzaak.cases import (
-    fetch_cases,
-    fetch_cases_by_kvk_or_rsin,
-    preprocess_data,
-)
+from open_inwoner.openzaak.cases import preprocess_data
+from open_inwoner.openzaak.clients import build_client
 from open_inwoner.openzaak.formapi import fetch_open_submissions
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.types import UniformCase
@@ -59,6 +56,11 @@ class InnerCaseListView(
         return _("Mijn aanvragen")
 
     def get_cases(self):
+        client = build_client("zaak")
+
+        if client is None:
+            return []
+
         if self.request.user.kvk:
             kvk_or_rsin = self.request.user.kvk
             config = OpenZaakConfig.get_solo()
@@ -66,13 +68,13 @@ class InnerCaseListView(
                 kvk_or_rsin = self.request.user.rsin
             vestigingsnummer = get_kvk_branch_number(self.request.session)
             if vestigingsnummer:
-                raw_cases = fetch_cases_by_kvk_or_rsin(
+                raw_cases = client.fetch_cases_by_kvk_or_rsin(
                     kvk_or_rsin=kvk_or_rsin, vestigingsnummer=vestigingsnummer
                 )
             else:
-                raw_cases = fetch_cases_by_kvk_or_rsin(kvk_or_rsin=kvk_or_rsin)
+                raw_cases = client.fetch_cases_by_kvk_or_rsin(kvk_or_rsin=kvk_or_rsin)
         else:
-            raw_cases = fetch_cases(self.request.user.bsn)
+            raw_cases = client.fetch_cases(self.request.user.bsn)
         preprocessed_cases = preprocess_data(raw_cases)
         return preprocessed_cases
 

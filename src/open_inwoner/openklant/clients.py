@@ -7,7 +7,6 @@ from zgw_consumers.api_models.base import factory
 from zgw_consumers.client import build_client as _build_client
 from zgw_consumers.utils import pagination_helper
 
-from open_inwoner.openzaak.cases import fetch_case_by_url_no_cache
 from open_inwoner.utils.api import ClientError, get_json_response
 
 from .api_models import (
@@ -129,7 +128,7 @@ class ContactmomentenClient(APIClient):
         if klant:
             # relate contact to klant though a klantcontactmoment
             try:
-                response = self.post(
+                self.post(
                     "klantcontactmomenten",
                     json={
                         "klant": klant.url,
@@ -156,7 +155,7 @@ class ContactmomentenClient(APIClient):
         return contact_moment
 
     def retrieve_objectcontactmomenten_for_contactmoment(
-        self, contactmoment: ContactMoment
+        self, contactmoment: ContactMoment, zaken_client
     ) -> List[ObjectContactMoment]:
         try:
             response = self.get(
@@ -171,18 +170,19 @@ class ContactmomentenClient(APIClient):
         object_contact_momenten = factory(ObjectContactMoment, all_data)
 
         # resolve linked resources
-        object_mapping = {}
-        for ocm in object_contact_momenten:
-            assert ocm.contactmoment == contactmoment.url
-            ocm.contactmoment = contactmoment
-            if ocm.object_type == "zaak":
-                object_url = ocm.object
-                # Avoid fetching the same object, if multiple relations wit the same object exist
-                if ocm.object in object_mapping:
-                    ocm.object = object_mapping[object_url]
-                else:
-                    ocm.object = fetch_case_by_url_no_cache(ocm.object)
-                    object_mapping[object_url] = ocm.object
+        if zaken_client:
+            object_mapping = {}
+            for ocm in object_contact_momenten:
+                assert ocm.contactmoment == contactmoment.url
+                ocm.contactmoment = contactmoment
+                if ocm.object_type == "zaak":
+                    object_url = ocm.object
+                    # Avoid fetching the same object, if multiple relations with the same object exist
+                    if ocm.object in object_mapping:
+                        ocm.object = object_mapping[object_url]
+                    else:
+                        ocm.object = zaken_client.fetch_case_by_url_no_cache(ocm.object)
+                        object_mapping[object_url] = ocm.object
 
         return object_contact_momenten
 
@@ -211,10 +211,12 @@ class ContactmomentenClient(APIClient):
         return klanten_contact_moments
 
     def retrieve_objectcontactmomenten_for_object_type(
-        self, contactmoment: ContactMoment, object_type: str
+        self, contactmoment: ContactMoment, object_type: str, zaken_client
     ) -> List[ObjectContactMoment]:
 
-        moments = self.retrieve_objectcontactmomenten_for_contactmoment(contactmoment)
+        moments = self.retrieve_objectcontactmomenten_for_contactmoment(
+            contactmoment, zaken_client
+        )
 
         # eSuite doesn't implement a `object_type` query parameter
         ret = [moment for moment in moments if moment.object_type == object_type]
@@ -222,10 +224,10 @@ class ContactmomentenClient(APIClient):
         return ret
 
     def retrieve_objectcontactmoment(
-        self, contactmoment: ContactMoment, object_type: str
+        self, contactmoment: ContactMoment, object_type: str, zaken_client
     ) -> Optional[ObjectContactMoment]:
         ocms = self.retrieve_objectcontactmomenten_for_object_type(
-            contactmoment, object_type
+            contactmoment, object_type, zaken_client
         )
         if ocms:
             return ocms[0]
@@ -243,5 +245,5 @@ def build_client(type_) -> Optional[APIClient]:
             client = _build_client(service, client_factory=client_class)
             return client
 
-    logger.warning(f"no service defined for {type_}")
+    logger.warning("no service defined for %s", type_)
     return None

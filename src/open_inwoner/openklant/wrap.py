@@ -2,15 +2,7 @@ import logging
 from typing import List, Optional
 
 from open_inwoner.kvk.branches import get_kvk_branch_number
-from open_inwoner.openklant.api_models import (
-    ContactMoment,
-    ContactMomentCreateData,
-    Klant,
-    KlantContactMoment,
-    KlantContactRol,
-    KlantCreateData,
-    ObjectContactMoment,
-)
+from open_inwoner.openklant.api_models import KlantContactMoment
 from open_inwoner.openklant.clients import build_client
 from open_inwoner.openklant.models import OpenKlantConfig
 
@@ -80,57 +72,6 @@ def fetch_klantcontactmoment(
             break
 
     return kcm
-
-
-def fetch_objectcontactmoment(
-    contactmoment: ContactMoment, object_type: str
-) -> Optional[ObjectContactMoment]:
-    client = build_client("contactmomenten")
-    if client is None:
-        return
-
-    return client.retrieve_objectcontactmoment(contactmoment, object_type)
-
-
-def fetch_klant(
-    user_bsn: Optional[str] = None,
-    user_kvk_or_rsin: Optional[str] = None,
-    client=None,
-) -> Optional[Klant]:
-    client = client or build_client("klanten")
-    if client is None:
-        return
-
-    return client.retrieve_klant(user_bsn=user_bsn, user_kvk_or_rsin=user_kvk_or_rsin)
-
-
-def create_klant(data: KlantCreateData) -> Optional[Klant]:
-    client = build_client("klanten")
-    if client is None:
-        return
-
-    return client.create_klant(data)
-
-
-def patch_klant(klant: Klant, update_data) -> Optional[Klant]:
-    client = build_client("klanten")
-    if client is None:
-        return
-
-    return client.partial_update_klant(klant, update_data)
-
-
-def create_contactmoment(
-    data: ContactMomentCreateData,
-    *,
-    klant: Optional[Klant] = None,
-    rol: Optional[str] = KlantContactRol.BELANGHEBBENDE
-) -> Optional[ContactMoment]:
-    client = build_client("contactmomenten")
-    if client is None:
-        return
-
-    return client.create_contactmoment(data, klant=klant, rol=rol)
 
 
 def get_fetch_parameters(request, use_vestigingsnummer: bool = False) -> dict:

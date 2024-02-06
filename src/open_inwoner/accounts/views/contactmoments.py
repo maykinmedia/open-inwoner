@@ -13,14 +13,15 @@ from django.views.generic import TemplateView
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.openklant.api_models import KlantContactMoment
+from open_inwoner.openklant.clients import build_client
 from open_inwoner.openklant.constants import Status
 from open_inwoner.openklant.models import ContactFormSubject
 from open_inwoner.openklant.wrap import (
     fetch_klantcontactmoment,
     fetch_klantcontactmomenten,
-    fetch_objectcontactmoment,
     get_fetch_parameters,
 )
+from open_inwoner.openzaak.clients import build_client as build_client_openzaak
 from open_inwoner.utils.mixins import PaginationMixin
 from open_inwoner.utils.views import CommonPageMixin
 
@@ -171,8 +172,12 @@ class KlantContactMomentDetailView(KlantContactMomentBaseView):
         if not kcm:
             raise Http404()
 
-        ocm = fetch_objectcontactmoment(kcm.contactmoment, "zaak")
-        ctx["zaak"] = getattr(ocm, "object", None)
+        if client := build_client("contactmomenten"):
+            zaken_client = build_client_openzaak("zaak")
+            ocm = client.retrieve_objectcontactmoment(
+                kcm.contactmoment, "zaak", zaken_client
+            )
+            ctx["zaak"] = getattr(ocm, "object", None)
 
         ctx["contactmoment"] = self.get_kcm_data(kcm)
         return ctx

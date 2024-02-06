@@ -27,13 +27,13 @@ from open_inwoner.cms.utils.page_display import (
     inbox_page_is_published,
 )
 from open_inwoner.haalcentraal.utils import fetch_brp
+from open_inwoner.openklant.clients import build_client
 from open_inwoner.openklant.wrap import get_fetch_parameters
 from open_inwoner.plans.models import Plan
 from open_inwoner.questionnaire.models import QuestionnaireStep
 from open_inwoner.utils.mixins import ExportMixin
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
-from ...openklant.wrap import fetch_klant, patch_klant
 from ..forms import BrpUserForm, UserForm, UserNotificationsForm
 from ..models import Action, User
 
@@ -202,18 +202,19 @@ class EditProfileView(
             if user_form_data.get(local_name)
         }
         if update_data:
-            klant = fetch_klant(**get_fetch_parameters(self.request))
+            if client := build_client("klanten"):
+                klant = client.retrieve_klant(**get_fetch_parameters(self.request))
 
-            if klant:
-                self.log_system_action(
-                    "retrieved klant for user", user=self.request.user
-                )
-                klant = patch_klant(klant, update_data)
                 if klant:
                     self.log_system_action(
-                        f"patched klant from user profile edit with fields: {', '.join(sorted(update_data.keys()))}",
-                        user=self.request.user,
+                        "retrieved klant for user", user=self.request.user
                     )
+                    client.partial_update_klant(klant, update_data)
+                    if klant:
+                        self.log_system_action(
+                            f"patched klant from user profile edit with fields: {', '.join(sorted(update_data.keys()))}",
+                            user=self.request.user,
+                        )
 
     def get_form_class(self):
         user = self.request.user
