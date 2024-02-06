@@ -379,7 +379,7 @@ MAIL_EDITOR_CONF = {
             "This email is used to periodically inform an admin about failed emails"
         ),
         "subject_default": "Gefaalde emails voor {{ site_name }} ({{ date }})",
-        "body_default": _readfile("invite.html"),
+        "body_default": _readfile("daily_email_digest.html"),
         "subject": [
             {
                 "name": "site_name",
