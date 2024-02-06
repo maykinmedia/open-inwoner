@@ -1,4 +1,3 @@
-/* test: @import '../../scss/views/App.scss';*/
 /* Prettier ignores the static folder, so format manually */
 
 /* cyrillic-ext */
@@ -83,17 +82,18 @@
 
 /* Tags styles for all templates */
 
+h2 {
+    font-size: 16px;
+}
+
 p {
     padding: 0;
     margin: 0;
 }
 
-h2 {
-    font-size: 16px;
-}
-
 a {
-    color: var(--color-font-secondary);
+    /* color: var(--color-font-secondary); */
+    color: teal;
 }
 
 .heading-font, h1 {
@@ -104,26 +104,17 @@ a {
     margin: 0;
 }
 
-.body-font, table {
+table, .table-mail {
     /* --color-gray-dark */
-    color: #4B4B4B;
-    font-family: "Lato", "Helvetica", sans-serif;
-}
-
-.logo-mail {
-    text-align: center;
-    width: auto;
-    max-height: 53px;
-}
-
-.table-mail {
     background-color: #ffffff;
     border-spacing: 0;
     border-collapse: collapse;
+    color: #4B4B4B;
+    font-family: "Lato", "Helvetica", sans-serif;
     line-height: 24px;
 }
 
-.td-mail, td {
+td, .td-mail  {
     /* --color-gray-dark */
     color: #4B4B4B;
     font-family: "Lato", "Helvetica", Arial, sans-serif;
@@ -132,8 +123,18 @@ a {
 
 /* Class styles for differing elements */
 
+.logo-mail {
+    text-align: center;
+    width: auto;
+    max-height: 53px;
+}
+
 .td-mail.align-top {
     vertical-align: top;
+}
+
+.td-mail.align-center {
+    vertical-align: center;
 }
 
 .tr-mail.border-top .td-mail {
@@ -145,11 +146,11 @@ a {
 }
 
 .td-mail__bg-info {
-    background-color: #D5E6F6;
+    background-color: #B3D9EB;
 }
 
 .td-mail__bg-danger {
-    background-color: #FFDCAD;
+    background-color: #FFEDDF;
 }
 
 .td-mail__bg-white {
@@ -210,20 +211,22 @@ a {
     font-size: 14px;
 }
 
-/* CSS variables may all need to be put in HTML */
+/* CSS variables may all need to be put in HTML instead */
 
 .color--primary {
-    color: var(--color-primary);
+    /* color: var(--color-primary); */
+    color: #0065BD;
 }
 
 .color--secondary {
-    color: var(--color-secondary);
+    /* color: var(--color-secondary); */
+    color: teal;
 }
 
 .color--accent {
-    color: var(--color-accent);
+    /* color: var(--color-accent); */
+    color: maroon;
 }
-
 
 .button--primary {
     background-color: #0065BD;
@@ -241,5 +244,6 @@ a {
 }
 
 .td-mail__bg-accent {
-    background-color: var(--color-accent);
+    /* background-color: var(--color-accent); */
+    background-color: maroon;
 }
