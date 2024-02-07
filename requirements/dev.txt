@@ -139,6 +139,10 @@ cryptography==41.0.7
     #   josepy
     #   mozilla-django-oidc
     #   pyopenssl
+css-inline==0.13.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 cssselect==1.1.0
     # via
     #   -c requirements/ci.txt
@@ -515,7 +519,6 @@ easy-thumbnails[svg]==2.8.5
     #   -r requirements/ci.txt
     #   django-filer
     #   djangocms-picture
-    #   easy-thumbnails
 ecs-logging==2.1.0
     # via
     #   -c requirements/ci.txt
@@ -573,7 +576,6 @@ fonttools[woff]==4.29.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-    #   fonttools
     #   weasyprint
 freezegun==1.1.0
     # via
@@ -696,7 +698,7 @@ lxml==4.9.1
     #   pyquery
     #   svglib
     #   xmlsec
-mail-editor @ git+https://github.com/maykinmedia/mail-editor.git@255bb498b1a0ddee12be4913ed90e7ccdc79e7a0
+mail-editor @ git+https://github.com/maykinmedia/mail-editor.git@336c788815d0b511c5f9251b7bd25387cc1bb2b4
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -1038,7 +1040,6 @@ tablib[html,ods,xls,xlsx,yaml]==3.1.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-import-export
-    #   tablib
 tblib==1.7.0
     # via
     #   -c requirements/ci.txt
