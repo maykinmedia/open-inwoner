@@ -75,6 +75,7 @@ class MyProfileView(
             ("#personal-info", _("Persoonlijke gegevens")),
             ("#notifications", _("Voorkeuren voor meldingen")),
             ("#overview", _("Overzicht")),
+            ("#profile-remove", _("Profiel verwijderen")),
         ]
 
         user_files = user.get_all_files()

@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n l10n link_tags file_tags card_tags grid_tags list_tags button_tags utils icon_tags form_tags anchor_menu_tags dropdown_tags %}
+{% load i18n l10n link_tags file_tags card_tags list_tags button_tags utils icon_tags form_tags anchor_menu_tags dropdown_tags %}
 
 {% block sidebar_content %}
     {% anchor_menu anchors=anchors desktop=True %}
@@ -47,7 +47,7 @@
                 <div class="tabled__item--force-right tabled__item--mobile-big">
                     {% button href="profile:edit" text=_("Bewerk") icon="edit" transparent=True icon_outlined=True %}
                     {% if user.is_digid_user_with_brp and view.config.my_data %}
-                        {% button href="profile:data" text=_("My details") icon="info" transparent=True icon_outlined=True %}
+                        {% button href="profile:data" text=_("Bekijk alle gegevens") icon="east" transparent=True icon_position="after" icon_outlined=True %}
                     {% elif not user.is_digid_user %}
                         {% button href="password_change" text=_("Password") icon="vpn_key" transparent=True icon_outlined=True %}
                     {% endif %}
@@ -104,7 +104,7 @@
     {% if view.config.mentors or view.config.my_contacts or view.config.actions or view.config.ssd or view.config.selfdiagnose %}
     {# Overview #}
     <section class="profile-section profile-section__overview">
-        <h2 class="h2 title" id="profile-overview">{% trans "Overzicht" %}</h2>
+        <h2 class="h2 title" id="overview">{% trans "Overzicht" %}</h2>
         <div class="profile-cards card-container card-container--columns-3">
 
             {# Mentors #}
@@ -236,7 +236,7 @@
 
     <section class="tabled profile-section profile-section--bordered">
         <div class="tabled__section">
-            <h2 class="h2 title" id="overview">{% trans "Profiel verwijderen" %}</h2></div>
+            <h2 class="h2 title" id="profile-remove">{% trans "Profiel verwijderen" %}</h2></div>
             <div class="tabled">
                 <p class="p">
                     {% trans "Hiermee worden alleen uw persoonlijke voorkeuren verwijderd. U krijgt dan bijvoorbeeld geen e-mail meer van ons over wijzigingen van uw lopende zaken. Uw persoonsgegevens en uw lopende zaken zelf worden hiermee niet verwijderd." %}

@@ -1,0 +1,26 @@
+.profile-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-medium);
+
+  &__content {
+    margin: 0;
+  }
+
+  &__link {
+    color: var(--color-secondary);
+  }
+
+  .button {
+    padding: 0;
+    &:hover {
+      transform: none;
+    }
+  }
+
+  *[class*='icon'],
+  *[class*='Icon'] {
+    font-size: 20px;
+    max-width: 20px;
+  }
+}

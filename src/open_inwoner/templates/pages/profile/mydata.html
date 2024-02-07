@@ -1,115 +1,119 @@
 {% extends 'master.html' %}
-{% load i18n l10n link_tags grid_tags dropdown_tags button_tags %}
+{% load i18n l10n link_tags dropdown_tags icon_tags button_tags %}
+
+{% block sidebar_content %}
+    <div class="profile-nav">
+        {% icon icon="west" icon_position="before" outlined=True %}
+        <p class="profile-nav__content">Terug naar {% button href="profile:detail" text=_("mijn gegevens") transparent=True %}</p>
+    </div>
+{% endblock sidebar_content %}
 
 {% block content %}
-<h1 class="h1" id="title">
-    {% trans "Mijn gegevens" %}
-</h1>
 
+    <div class="profile__grid">
+        <h1 class="h1" id="title">
+            {% trans "Persoonlijke gegevens" %}
+        </h1>
 
-{% render_grid %}
-    {% render_column span=7 %}
         <p class="p">
             {% trans "Hier ziet u een beperkte set van gegevens die van u zijn opgeslagen in de Basisregistratie Personen (BRP). Al uw persoonlijke gegevens kunt u vinden op " %}
             {% link href="https://mijn.overheid.nl" text="mijn.overheid.nl" primary=True %}
         </p>
 
         <!-- BRP personal data -->
-        <h2 class="h2">{% trans "Mijn BRP gegevens" %}</h2>
-
         {% with request.user as user %}
-            <div class="tabled tabled--flexible">
-                <div class="tabled__row">
+            <section class="tabled tabled--flexible profile-section" id="profile-notifications">
+                <div class="tabled__section">
+                    <h2 class="h2 title" id="notifications">{% trans "Mijn BRP gegevens" %}</h2>
+                </div>
+                <div class="tabled__row tabled__row--blank">
                     <div class="tabled__item tabled__key">{% trans "Voornamen" %}</div>
-                    <div class="tabled__item tabled__value">{{my_data.first_name|default:"-"}}</div>
+                    <div class="tabled__item tabled__value">{{ my_data.first_name|default:"-" }}</div>
                 </div>
-                <div class="tabled__row">
+                <div class="tabled__row tabled__row--blank">
                     <div class="tabled__item tabled__key">{% trans "Voorletters" %}</div>
-                    <div class="tabled__item tabled__value">{{my_data.initials|default:"-"}}</div>
+                    <div class="tabled__item tabled__value">{{ my_data.initials|default:"-" }}</div>
                 </div>
-                <div class="tabled__row">
+                <div class="tabled__row tabled__row--blank">
                     <div class="tabled__item tabled__key">{% trans "Achternaam" %}</div>
-                    <div class="tabled__item tabled__value">{{my_data.last_name|default:"-"}}</div>
+                    <div class="tabled__item tabled__value">{{ my_data.last_name|default:"-" }}</div>
                 </div>
-                <div class="tabled__row">
+                <div class="tabled__row tabled__row--blank">
                     <div class="tabled__item tabled__key">{% trans "Voorvoegsel" %}</div>
-                    <div class="tabled__item tabled__value">{{my_data.infix|default:"-"}}</div>
+                    <div class="tabled__item tabled__value">{{ my_data.infix|default:"-" }}</div>
                 </div>
-                <div class="tabled__row">
+                <div class="tabled__row tabled__row--blank">
                     <div class="tabled__item tabled__key">{% trans "Geboortedatum" %}</div>
-                    <div class="tabled__item tabled__value">{{my_data.birthday|date:"d F Y"|default:"-"}}</div>
+                    <div class="tabled__item tabled__value">{{ my_data.birthday|date:"d F Y"|default:"-" }}</div>
                 </div>
-                <div class="tabled__row">
+                <div class="tabled__row tabled__row--blank">
                     <div class="tabled__item tabled__key">{% trans "Geboorteplaats" %}</div>
-                    <div class="tabled__item tabled__value">{{my_data.birth_place|default:"-"}}</div>
+                    <div class="tabled__item tabled__value">{{ my_data.birth_place|default:"-" }}</div>
                 </div>
-                <div class="tabled__row">
+                <div class="tabled__row tabled__row--blank">
                     <div class="tabled__item tabled__key">{% trans "Burgerservicenummer (BSN)" %}</div>
-                    <div class="tabled__item tabled__value">{{user.bsn|default:"-"}}</div>
+                    <div class="tabled__item tabled__value">{{ user.bsn|default:"-" }}</div>
                 </div>
-                <div class="tabled__row">
+                <div class="tabled__row tabled__row--blank">
                     <div class="tabled__item tabled__key">{% trans "Geslacht" %}</div>
-                    <div class="tabled__item tabled__value">{{my_data.gender|default:"-"}}</div>
+                    <div class="tabled__item tabled__value">{{ my_data.gender|default:"-" }}</div>
                 </div>
-            </div>
+            </section>
 
             <!-- BRP registration data -->
-            <h2 class="h2">{% trans "Inschrijfadres" %}</h2>
-
-            <div class="tabled tabled--flexible">
-                <div class="tabled__row">
+            <section class="tabled tabled--flexible profile-section" id="profile-notifications">
+                <div class="tabled__section">
+                    <h2 class="h2 title" id="notifications">{% trans "Inschrijfadres" %}</h2>
+                </div>
+                <div class="tabled__row tabled__row--blank">
                     <div class="tabled__item tabled__key">{% trans "Straat" %}</div>
-                    <div class="tabled__item tabled__value">{{my_data.street|default:"-"}}</div>
+                    <div class="tabled__item tabled__value">{{ my_data.street|default:"-" }}</div>
                 </div>
-                <div class="tabled__row">
+                <div class="tabled__row tabled__row--blank">
                     <div class="tabled__item tabled__key">{% trans "Huisnummer" %}</div>
-                    <div class="tabled__item tabled__value">{{my_data.get_housenumber|default:"-"}}</div>
+                    <div class="tabled__item tabled__value">{{ my_data.get_housenumber|default:"-" }}</div>
                 </div>
-                <div class="tabled__row">
+                <div class="tabled__row tabled__row--blank">
                     <div class="tabled__item tabled__key">{% trans "Postcode" %}</div>
-                    <div class="tabled__item tabled__value">{{my_data.postal_code|default:"-"}}</div>
+                    <div class="tabled__item tabled__value">{{ my_data.postal_code|default:"-" }}</div>
                 </div>
-                <div class="tabled__row">
+                <div class="tabled__row tabled__row--blank">
                     <div class="tabled__item tabled__key">{% trans "Plaats" %}</div>
-                    <div class="tabled__item tabled__value">{{my_data.city|default:"-"}}</div>
+                    <div class="tabled__item tabled__value">{{ my_data.city|default:"-" }}</div>
                 </div>
                 {% if my_data.country %}
-                <div class="tabled__row">
-                    <div class="tabled__item tabled__key">{% trans "Land" %}</div>
-                    <div class="tabled__item tabled__value">{{my_data.country|default:"-"}}</div>
-                </div>
+                    <div class="tabled__row tabled__row--blank">
+                        <div class="tabled__item tabled__key">{% trans "Land" %}</div>
+                        <div class="tabled__item tabled__value">{{ my_data.country|default:"-" }}</div>
+                    </div>
                 {% endif %}
-            </div>
+            </section>
 
             <!-- BRP contact data -->
-            <h2 class="h2">
-                {% trans "Contactgegevens" %}
-
-                {% button_row align="right" %}
-                    {% dropdown icon="settings" secondary=True %}
-                        <div class="dropdown__item">
-                            {% button href="profile:edit" text=_("Bewerken") icon="edit" transparent=True %}
+            <section class="tabled tabled--flexible profile-section" id="profile-notifications">
+                <div class="tabled__section">
+                    <h2 class="h2 title" id="notifications">{% trans "Contactgegevens" %}
+                        <div class="tabled__item--force-right tabled__item--mobile-big">
+                            {% button href="profile:edit" text=_("Bewerk") icon="edit" transparent=True icon_outlined=True %}
                         </div>
-                    {% enddropdown %}
-                {% endbutton_row %}
-            </h2>
-
-            <div class="tabled tabled--flexible">
-                <div class="tabled__row">
+                    </h2>
+                </div>
+                <div class="tabled__row tabled__row--blank">
                     <div class="tabled__item tabled__key">{% trans "Roepnaam" %}</div>
-                    <div class="tabled__item tabled__value">{{user.display_name|default:"-"}}</div>
+                    <div class="tabled__item tabled__value">{{ user.display_name|default:"-" }}</div>
                 </div>
-                <div class="tabled__row">
+                <div class="tabled__row tabled__row--blank">
                     <div class="tabled__item tabled__key">{% trans "Telefoonnummer" %}</div>
-                    <div class="tabled__item tabled__value">{{user.phonenumber|default:"-"}}</div>
+                    <div class="tabled__item tabled__value">{{ user.phonenumber|default:"-" }}</div>
                 </div>
-                <div class="tabled__row">
+                <div class="tabled__row tabled__row--blank">
                     <div class="tabled__item tabled__key">{% trans "E-mailadres" %}</div>
-                    <div class="tabled__item tabled__value tabled__break">{{user.email|default:"-"}}</div>
+                    <div class="tabled__item tabled__value tabled__break">{{ user.email|default:"-" }}</div>
                 </div>
-            </div>
+            </section>
+
         {% endwith %}
-    {% endrender_column %}
-{% endrender_grid %}
+
+    </div>
 
 {% endblock content %}

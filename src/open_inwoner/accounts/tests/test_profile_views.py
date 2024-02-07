@@ -177,7 +177,7 @@ class ProfileViewTests(WebTest):
             login_type=LoginTypeChoices.digid,
         )
         response = self.app.get(self.url, user=user)
-        self.assertContains(response, _("My details"))
+        self.assertContains(response, _("Bekijk alle gegevens"))
 
         # check business profile section not displayed
         self.assertNotContains(response, "Bedrijfsgegevens")
