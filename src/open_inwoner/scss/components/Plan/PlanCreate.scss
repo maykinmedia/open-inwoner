@@ -12,5 +12,24 @@
 
   .modal--open {
     background: rgba(0, 0, 0, 0.25);
+
+    .modal__container {
+      padding: var(--spacing-giant);
+
+      [class*='icon'] {
+        font-size: var(--font-size-body-large);
+      }
+
+      .button-icon--primary {
+        color: var(--color-white);
+        font-size: var(--font-size-body);
+      }
+
+      .modal__title .modal__button {
+        height: var(--font-size-body);
+        min-width: initial;
+        padding: 0;
+      }
+    }
   }
 }

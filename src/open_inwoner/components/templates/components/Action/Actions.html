@@ -35,7 +35,7 @@
                             </div>
                             <div class="dropdown__item">
                                 {% get_action_delete_url action=action plan=plan as action_url %}
-                                {% render_form form=form method="POST" form_action=action_url extra_classes="confirm" spaceless=True data_confirm_title=_("Weet je het zeker dat je deze actie wilt verwijderen?") data_confirm_cancel=_("Nee") data_confirm_default=_("Ja") %}
+                                {% render_form form=form method="POST" form_action=action_url extra_classes="confirm" spaceless=True data_confirm_title=_("Weet je het zeker dat je deze actie wilt verwijderen?") data_confirm_cancel=_("Nee, annuleren") data_confirm_default=_("Ja, verwijderen") %}
                                     {% csrf_token %}
                                     {% button icon="delete" text=_("Verwijderen") icon_outlined=True transparent=True %}
                                 {% endrender_form %}
