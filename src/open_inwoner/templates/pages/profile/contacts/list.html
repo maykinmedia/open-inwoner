@@ -141,9 +141,9 @@
                             {% dropdown icon="settings" disabled=contact.is_not_active %}
                                 <div class="dropdown__item">
                                     {% url 'profile:contact_delete' uuid=contact.uuid as delete_url %}
-                                    {% render_form form=None form_action=delete_url method="POST" spaceless=True id="delete-contact-form" extra_classes="confirm" data_confirm_title=_("Are you sure you want to delete this contact?") data_confirm_cancel=_("Nee") data_confirm_default=_("Ja") %}
+                                    {% render_form form=None form_action=delete_url method="POST" spaceless=True id="delete-contact-form" extra_classes="confirm" data_confirm_title=_("Are you sure you want to delete this contact?") data_confirm_cancel=_("Nee, annuleren") data_confirm_default=_("Ja, verwijderen") %}
                                         {% csrf_token %}
-                                        {% button icon="delete" text=_("Verwijderen") transparent=True %}
+                                        {% button icon="delete" icon_outlined=True text=_("Verwijderen") transparent=True %}
                                     {% endrender_form %}
                                 </div>
                             {% enddropdown %}
