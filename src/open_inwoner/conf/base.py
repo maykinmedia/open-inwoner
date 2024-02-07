@@ -788,7 +788,11 @@ ES_SUGGEST_SIZE = 5
 IMPORT_EXPORT_USE_TRANSACTIONS = True
 
 # mail-editor
-from .parts.maileditor import MAIL_EDITOR_BASE_CONTEXT, MAIL_EDITOR_CONF  # noqa
+from .parts.maileditor import (  # noqa
+    MAIL_EDITOR_BASE_CONTEXT,
+    MAIL_EDITOR_CONF,
+    MAIL_EDITOR_DYNAMIC_CONTEXT,
+)
 
 CKEDITOR_CONFIGS = {
     "mail_editor": {
