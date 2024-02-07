@@ -403,3 +403,4 @@ MAIL_EDITOR_CONF = {
     },
 }
 MAIL_EDITOR_BASE_CONTEXT = {"site_name": "Open Inwoner Platform"}
+MAIL_EDITOR_DYNAMIC_CONTEXT = "open_inwoner.mail.context.mail_context"
