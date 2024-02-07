@@ -10,7 +10,7 @@ furl # processing urls
 weasyprint # export to pdf
 pywatchman
 tinycss2
-
+css_inline
 
 # Framework libraries
 Django>=3.2.11<4.0
@@ -37,7 +37,7 @@ django-view-breadcrumbs
 markdown
 django_better_admin_arrayfield
 humanfriendly
-git+https://github.com/maykinmedia/mail-editor.git@255bb498b1a0ddee12be4913ed90e7ccdc79e7a0#egg=mail-editor
+git+https://github.com/maykinmedia/mail-editor.git@336c788815d0b511c5f9251b7bd25387cc1bb2b4#egg=mail-editor
 fontawesomefree
 django-timeline-logger
 django-csp
