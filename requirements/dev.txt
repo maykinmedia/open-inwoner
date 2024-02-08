@@ -36,6 +36,8 @@ attrs==21.2.0
     #   -r requirements/ci.txt
     #   glom
     #   jsonschema
+autopep8==1.5.7
+    # via django-silk
 babel==2.9.1
     # via sphinx
 bandit==1.7.4
@@ -205,6 +207,7 @@ django==3.2.23
     #   django-rosetta
     #   django-sekizai
     #   django-sendfile2
+    #   django-silk
     #   django-simple-certmanager
     #   django-sniplates
     #   django-timeline-logger
@@ -414,6 +417,8 @@ django-sessionprofile==1.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-digid-eherkenning
+django-silk==5.1.0
+    # via -r requirements/dev.in
 django-simple-certmanager==1.4.1
     # via
     #   -c requirements/ci.txt
@@ -610,6 +615,8 @@ glom==20.11.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   mozilla-django-oidc-db
+gprof2dot==2022.7.29
+    # via django-silk
 greenlet==3.0.3
     # via
     #   -c requirements/ci.txt
@@ -826,7 +833,9 @@ psycopg2==2.9.9
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
 pycodestyle==2.7.0
-    # via flake8
+    # via
+    #   autopep8
+    #   flake8
 pycparser==2.20
     # via
     #   -c requirements/ci.txt
@@ -1021,6 +1030,7 @@ sqlparse==0.4.4
     #   -r requirements/ci.txt
     #   django
     #   django-debug-toolbar
+    #   django-silk
 stevedore==3.5.0
     # via bandit
 svglib==1.5.1
@@ -1050,6 +1060,8 @@ tinycss2==1.1.1
     #   cssselect2
     #   svglib
     #   weasyprint
+toml==0.10.2
+    # via autopep8
 tomli==1.2.1
     # via pep517
 tomlkit==0.12.3
