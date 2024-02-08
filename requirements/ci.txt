@@ -122,6 +122,7 @@ css-inline==0.13.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   mail-editor
 cssselect==1.1.0
     # via pyquery
 cssselect2==0.4.1
@@ -148,6 +149,7 @@ django==3.2.23
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   django-admin-index
     #   django-appconf
     #   django-appdata
     #   django-axes
@@ -191,7 +193,7 @@ django==3.2.23
     #   mozilla-django-oidc-db
     #   notifications-api-common
     #   zgw-consumers
-django-admin-index==1.5.0
+django-admin-index==3.1.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -472,6 +474,7 @@ easy-thumbnails[svg]==2.8.5
     #   -r requirements/base.txt
     #   django-filer
     #   djangocms-picture
+    #   easy-thumbnails
 ecs-logging==2.1.0
     # via
     #   -c requirements/base.txt
@@ -515,6 +518,7 @@ fonttools[woff]==4.29.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   fonttools
     #   weasyprint
 freezegun==1.1.0
     # via -r requirements/test-tools.in
@@ -605,6 +609,7 @@ lxml==4.9.1
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-digid-eherkenning
+    #   mail-editor
     #   maykin-python3-saml
     #   pyquery
     #   svglib
@@ -834,6 +839,7 @@ requests==2.31.0
     #   django-open-forms-client
     #   django-rosetta
     #   gemma-zds-client
+    #   mail-editor
     #   maykin-python3-saml
     #   messagebird
     #   mozilla-django-oidc
@@ -886,6 +892,7 @@ tablib[html,ods,xls,xlsx,yaml]==3.1.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-import-export
+    #   tablib
 tblib==1.7.0
     # via -r requirements/test-tools.in
 text-unidecode==1.3

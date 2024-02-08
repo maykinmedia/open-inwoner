@@ -30,6 +30,7 @@ from open_inwoner.openklant.views.contactform import ContactFormView
 from open_inwoner.pdc.views import FAQView
 
 handler500 = "open_inwoner.utils.views.server_error"
+admin.site.enable_nav_sidebar = False
 admin.site.site_header = "Open Inwoner beheeromgeving"
 admin.site.site_title = "Open Inwoner beheeromgeving"
 admin.site.index_title = "Welkom op de OpenInwoner beheeromgeving"

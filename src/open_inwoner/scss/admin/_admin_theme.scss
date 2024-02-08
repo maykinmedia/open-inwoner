@@ -69,7 +69,6 @@ div.breadcrumbs {
   color: $color_primary;
   position: sticky;
   top: 60px;
-  z-index: 100000;
 
   a {
     color: $color_dark;
@@ -101,9 +100,13 @@ div.breadcrumbs {
 #content {
   /* adjusting for django-cms page */
   #changelist:not([class~='cms-pagetree-root']) {
-    display: grid;
-    grid-template-columns: 1fr 360px;
+    display: block;
+    grid-template-columns: 1fr 260px;
     gap: 16px;
+
+    @media (min-width: 768px) {
+      display: grid;
+    }
   }
 
   #toolbar,
