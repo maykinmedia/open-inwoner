@@ -290,6 +290,18 @@ class CustomPasswordResetForm(PasswordResetForm):
         email_message.send()
 
 
+class CategoriesForm(forms.ModelForm):
+    selected_categories = forms.ModelMultipleChoiceField(
+        queryset=Category.objects.published(),
+        widget=forms.widgets.CheckboxSelectMultiple,
+        required=False,
+    )
+
+    class Meta:
+        model = User
+        fields = ("selected_categories",)
+
+
 class UserNotificationsForm(forms.ModelForm):
     class Meta:
         model = User

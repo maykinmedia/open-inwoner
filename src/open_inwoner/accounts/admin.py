@@ -103,6 +103,7 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
                     "image",
                     "cropping",
                     "phonenumber",
+                    "selected_categories",
                 )
             },
         ),

@@ -17,6 +17,7 @@ from timeline_logger.models import TimelineLog
 
 from open_inwoner.accounts.models import Invite
 from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.pdc.tests.factories import CategoryFactory
 from open_inwoner.utils.logentry import LOG_ACTIONS
 
 from ..choices import LoginTypeChoices, StatusChoices
@@ -89,6 +90,30 @@ class TestProfile(WebTest):
             log_entry.extra_data,
             {
                 "message": _("profile was modified"),
+                "action_flag": list(LOG_ACTIONS[CHANGE]),
+                "content_object_repr": str(self.user),
+            },
+        )
+
+    def test_categories_modification_is_logged(self):
+        CategoryFactory()
+        CategoryFactory()
+        form = self.app.get(reverse("profile:categories"), user=self.user).forms[
+            "change-categories"
+        ]
+
+        form.get("selected_categories", index=1).checked = True
+        form.submit()
+        log_entry = TimelineLog.objects.last()
+
+        self.assertEqual(
+            log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
+        )
+        self.assertEqual(log_entry.content_object.id, self.user.id)
+        self.assertEqual(
+            log_entry.extra_data,
+            {
+                "message": _("categories were modified"),
                 "action_flag": list(LOG_ACTIONS[CHANGE]),
                 "content_object_repr": str(self.user),
             },
