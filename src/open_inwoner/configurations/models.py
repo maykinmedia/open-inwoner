@@ -618,6 +618,30 @@ class CustomFontSet(models.Model):
             path="custom_fonts/",
         )
 
+    def update_filename_body_italic(self, filename: str) -> str:
+        return CustomFontSet.update_filename(
+            self,
+            filename,
+            new_name=CustomFontName.body_italic,
+            path="custom_fonts/",
+        )
+
+    def update_filename_body_bold(self, filename: str) -> str:
+        return CustomFontSet.update_filename(
+            self,
+            filename,
+            new_name=CustomFontName.body_bold,
+            path="custom_fonts/",
+        )
+
+    def update_filename_body_bold_italic(self, filename: str) -> str:
+        return CustomFontSet.update_filename(
+            self,
+            filename,
+            new_name=CustomFontName.body_bold_italic,
+            path="custom_fonts/",
+        )
+
     def update_filename_heading(self, filename: str) -> str:
         return CustomFontSet.update_filename(
             self,
@@ -626,22 +650,6 @@ class CustomFontSet(models.Model):
             path="custom_fonts/",
         )
 
-    site_configuration = models.OneToOneField(
-        SiteConfiguration,
-        verbose_name=_("Configuration"),
-        related_name="custom_fonts",
-        on_delete=models.CASCADE,
-    )
-    text_body_font = CustomFontField(
-        verbose_name=_("Text body font"),
-        upload_to=update_filename_body,
-        file_name=CustomFontName.body,
-        storage=OverwriteStorage(),
-        validators=[FileExtensionValidator(["ttf"])],
-        blank=True,
-        null=True,
-        help_text=_("Upload text body font. TTF font types only."),
-    )
     heading_font = CustomFontField(
         verbose_name=_("Heading font"),
         upload_to=update_filename_heading,
@@ -651,6 +659,52 @@ class CustomFontSet(models.Model):
         blank=True,
         null=True,
         help_text=_("Upload heading font. TTF font types only."),
+    )
+    site_configuration = models.OneToOneField(
+        SiteConfiguration,
+        verbose_name=_("Configuration"),
+        related_name="custom_fonts",
+        on_delete=models.CASCADE,
+    )
+    body_font_regular = CustomFontField(
+        verbose_name=_("Body font regular"),
+        upload_to=update_filename_body,
+        file_name=CustomFontName.body,
+        storage=OverwriteStorage(),
+        validators=[FileExtensionValidator(["ttf"])],
+        blank=True,
+        null=True,
+        help_text=_("Upload regular text body font. TTF font types only."),
+    )
+    body_font_italic = CustomFontField(
+        verbose_name=_("Body font italic"),
+        upload_to=update_filename_body_italic,
+        file_name=CustomFontName.body_italic,
+        storage=OverwriteStorage(),
+        validators=[FileExtensionValidator(["ttf"])],
+        blank=True,
+        null=True,
+        help_text=_("Upload italic text body font. TTF font types only."),
+    )
+    body_font_bold = CustomFontField(
+        verbose_name=_("Body font bold"),
+        upload_to=update_filename_body_bold,
+        file_name=CustomFontName.body_bold,
+        storage=OverwriteStorage(),
+        validators=[FileExtensionValidator(["ttf"])],
+        blank=True,
+        null=True,
+        help_text=_("Upload bold text body font. TTF font types only."),
+    )
+    body_font_bold_italic = CustomFontField(
+        verbose_name=_("Body font bold italic"),
+        upload_to=update_filename_body_bold_italic,
+        file_name=CustomFontName.body_bold_italic,
+        storage=OverwriteStorage(),
+        validators=[FileExtensionValidator(["ttf"])],
+        blank=True,
+        null=True,
+        help_text=_("Upload bold italic text body font. TTF font types only."),
     )
 
 

@@ -13,5 +13,8 @@ class OpenIDDisplayChoices(models.TextChoices):
 
 
 class CustomFontName(models.TextChoices):
-    body = _("text_body_font"), _("Text body font")
+    body = _("body_font_regular"), _("Text body font")
+    body_italic = _("body_font_italic"), _("Text body font italic")
+    body_bold = _("body_font_bold"), _("Text body font bold")
+    body_bold_italic = _("body_font_bold_italic"), _("Text body font bold italic")
     heading = _("heading_font"), _("Heading font")
