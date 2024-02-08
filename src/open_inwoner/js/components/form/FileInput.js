@@ -16,6 +16,14 @@ export class FileInput extends Component {
   }
 
   /**
+   * Get configured limited file-types from 'data-file-types', return as clean string, and use in node.
+   * @returns {string} of file extensions.
+   */
+  getUploadTypes() {
+    return this.getInput().dataset.fileTypes.replace(/["'\[\]]/g, '')
+  }
+
+  /**
    * Returns the card (drop zone) associated with the file input.
    * @return {HTMLDivElement}
    */
@@ -156,33 +164,39 @@ export class FileInput extends Component {
   }
 
   /**
-   * Gets called when click event is received on the files list, it originates from a delete button, handle the deletion accordingly.
+   * Gets called when click event is received on the files list, it originates from a delete button, to handle the deletion accordingly.
    * @param {PointerEvent} e
    */
   onClick(e) {
     e.preventDefault()
     const { target } = e
 
-    // Do nothing if the click does not originate from a delete button.
-    if (
-      !target.classList.contains('link') &&
-      !target.parentElement.classList.contains('link')
-    ) {
-      return
+    // Check if the click originates from a delete button
+    const isDeleteButton =
+      // Filter the file list.
+      target.classList.contains('link') ||
+      target.parentElement.classList.contains('link')
+
+    if (isDeleteButton) {
+      const listItem = target.closest('.file-list__list-item')
+
+      // Ensure the list item is found
+      if (listItem) {
+        const index = Array.from(listItem.parentElement.children).indexOf(
+          listItem
+        )
+        const input = this.getInput()
+
+        // Use filter, not splice
+        const files = Array.from(input.files).filter((_, i) => i !== index)
+
+        this.addFiles(files, true)
+        this.files = files
+
+        // We need to render manually since we're not making state changes.
+        this.render()
+      }
     }
-
-    // Filter the file list.
-    const listItem = target.closest('.file-list__list-item')
-    const index = [...this.getFilesList().children].indexOf(listItem)
-    const input = this.getInput()
-
-    const files = [...input.files].filter((_, i) => i !== index)
-
-    this.addFiles(files, true)
-    this.files = files
-
-    // We need to render manually since we're not making state changes.
-    this.render()
   }
 
   /**
@@ -261,7 +275,6 @@ export class FileInput extends Component {
    * @return {string}
    */
   renderFileHTML(file) {
-    // renderFileHTML is a separate function, where the context of 'this' changes when it is called
     const { name, size, type } = file
     const ext = name.split('.').pop().toUpperCase()
     const sizeMB = (size / (1024 * 1024)).toFixed(2)
@@ -269,45 +282,60 @@ export class FileInput extends Component {
     const getFormNonFieldError = this.getFormNonFieldError()
     const formSubmitButton = this.getFormSubmitButton()
 
-    // Only show errors notification if data-max-file-size is exceeded + add error class to file-list
     const maxMegabytes = this.getLimit()
+    const uploadFileTypes = this.getUploadTypes().toUpperCase()
+
+    const sizeError = sizeMB > maxMegabytes
+    const typeError = !uploadFileTypes.split(', ').includes(ext)
 
     const htmlStart = `
-      <li class="file-list__list-item">
-        <aside class="file">
-          <div class="file__container">
-            ${
-              sizeMB > maxMegabytes
-                ? '<div class="file__file error">'
-                : '<div class="file__file">'
-            }
-              <p class="file__symbol">
-                <span aria-hidden="true" class="material-icons-outlined">${
-                  type.match('image') ? 'image' : 'description'
-                }</span>
-              </p>
-              <p class="p file__data">
-                <span class="file__name">${name} (${ext}, ${sizeMB}MB)</span>
-              </p>
-              <a class="link link--primary" href="#" role="button" aria-label="${labelDelete}">
-                <span aria-hidden="true" class="material-icons-outlined">delete</span>
-              </a>
-            </div>
-          </div>
-        </aside>
-      </li>`
+    <li class="file-list__list-item">
+      <aside class="file">
+        <div class="file__container">
+          <div class="file__file ${typeError || sizeError ? 'error' : ''}">
+            <p class="file__symbol">
+              <span aria-hidden="true" class="material-icons-outlined">${
+                type.match('image') ? 'image' : 'description'
+              }</span>
+            </p>
+            <p class="p file__data">
+              <span class="file__name">${name} (${ext}, ${sizeMB}MB)</span>
+            </p>
+            <a class="link link--primary" href="#document-upload" role="button" aria-label="${labelDelete}">
+              <span aria-hidden="true" class="material-icons-outlined">delete</span>
+            </a>
+        </div>
+          ${
+            typeError && sizeError
+              ? `
+              <p class="p p--small error">
+                <span aria-hidden="true" class="material-icons-outlined">warning_amber</span>
+                <span class="file-error__content">Dit bestand is te groot - en van een ongeldig type ("${ext}"). <br />Toegestaan zijn: ${uploadFileTypes}.</span>
+              </p>`
+              : typeError || sizeError
+              ? `
+              <p class="p p--small error">
+                <span aria-hidden="true" class="material-icons-outlined">warning_amber</span>
+                ${
+                  typeError
+                    ? `<span class="file-error__content">Dit type bestand ("${ext}") is ongeldig. Geldige bestandstypen zijn: ${uploadFileTypes}.</span>`
+                    : ''
+                }
+                ${
+                  sizeError
+                    ? '<span class="file-error__content">Dit bestand is te groot.</span>'
+                    : ''
+                }
+              </p>`
+              : ''
+          }
+        </div>
+      </aside>
+    </li>`
 
-    if (sizeMB > maxMegabytes) {
+    if (typeError || sizeError) {
       getFormNonFieldError.removeAttribute('hidden')
       formSubmitButton.setAttribute('disabled', 'true')
-
-      return (
-        htmlStart +
-        `<p class="p p--small p--centered error">
-          <span aria-hidden="true" class="material-icons-outlined">warning_amber</span>
-          Dit bestand is te groot
-        </p>`
-      )
     } else {
       getFormNonFieldError.setAttribute('hidden', 'hidden')
       formSubmitButton.removeAttribute('disabled')
