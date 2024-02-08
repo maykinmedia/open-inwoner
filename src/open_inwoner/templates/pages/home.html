@@ -25,9 +25,9 @@
     <p class="p">{{configurable_text.home_page.home_theme_intro|linebreaksbr}}</p>
 
     {% if request.user.is_authenticated %}
-        {% card_container categories=categories columns=4 image_object_fit="cover" %}
+        {% include "components/Card/CardContainer.html" with categories=categories columns=4 image_object_fit="cover" %}
     {% else %}
-        {% card_container categories=categories image_object_fit="cover" %}
+        {% include "components/Card/CardContainer.html" with categories=categories image_object_fit="cover" %}
     {% endif %}
 
     {% if questionnaire_roots.exists %}

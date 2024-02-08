@@ -1,0 +1,16 @@
+{% load link_tags string_tags %}
+<div class="card card__body">
+    {% if location_name %}
+        {% link href=location.get_absolute_url primary=True text=location_name extra_classes="h3" %}
+    {% endif %}
+    <div class="card__body--flex p--no-margin">
+        <p class="p">{{ address_line_1 }}</p>
+        <p class="p">{{ address_line_2 }}</p>
+        {% if phonenumber %}
+            {% link href='tel:'|addstr:phonenumber secondary=True text=phonenumber %}
+        {% endif %}
+        {% if email %}
+            {% link href='mailto:'|addstr:email secondary=True text=email %}
+        {% endif %}
+    </div>
+</div>
