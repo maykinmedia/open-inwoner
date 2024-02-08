@@ -748,7 +748,7 @@ class SiteConfigurationPage(OrderedModel):
 
     objects = OrderedModelManager()
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         verbose_name = _("Flatpage in the footer")
         verbose_name_plural = _("Flatpages in the footer")
 

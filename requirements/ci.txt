@@ -325,7 +325,7 @@ django-open-forms-client==0.2.3
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-django-ordered-model==3.4.3
+django-ordered-model==3.7.4
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt

@@ -27,7 +27,7 @@ class CategoryProduct(OrderedModel):
     product = models.ForeignKey("pdc.Product", on_delete=models.CASCADE)
     order_with_respect_to = "category"
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         ordering = ("category", "product")
 
     def get_product_name(self):
