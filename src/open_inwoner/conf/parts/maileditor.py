@@ -220,6 +220,10 @@ MAIL_EDITOR_CONF = {
                 "name": "case_link",
                 "description": _("The link to the case details."),
             },
+            # {
+            #     "name": "start_date",
+            #     "description": _("The start date of the case"),
+            # },
             {
                 "name": "end_date",
                 "description": _("The planned final date of the case"),
@@ -235,22 +239,6 @@ MAIL_EDITOR_CONF = {
             {
                 "name": "site_name",
                 "description": _("Name of the site"),
-            },
-            {
-                "name": "footer.logo_url",
-                "description": _("URL of the site logo."),
-            },
-            {
-                "name": "theming.accent",
-                "description": _("Configured accent background color"),
-            },
-            {
-                "name": "theming.primary",
-                "description": _("Configured primary background color"),
-            },
-            {
-                "name": "theming.secondary",
-                "description": _("Configured secondary background color"),
             },
         ],
     },
