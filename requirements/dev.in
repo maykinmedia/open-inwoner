@@ -18,5 +18,6 @@ django-extensions
 sphinx
 sphinx_rtd_theme
 
-# performance testing
+# performance testing / profiling
 locust
+django-silk
