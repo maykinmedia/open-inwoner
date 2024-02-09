@@ -896,3 +896,9 @@ ACCOUNTS_SMS_GATEWAY = {
 from .app.csp import *  # noqa
 
 SECURE_REFERRER_POLICY = "same-origin"
+
+
+#
+# Project specific settings
+#
+CASE_LIST_NUM_THREADS = 6
