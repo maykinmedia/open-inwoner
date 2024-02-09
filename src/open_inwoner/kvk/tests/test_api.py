@@ -14,13 +14,13 @@ from .factories import CLIENT_CERT, CLIENT_CERT_PAIR, SERVER_CERT
 class KvKAPITest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        config = KvKConfig(
-            api_root="https://api.kvk.nl/test/api/v1",
+        cls.config = KvKConfig(
+            api_root="https://api.kvk.nl/test/api/",
             api_key="12345",
             client_certificate=CLIENT_CERT,
             server_certificate=SERVER_CERT,
         )
-        cls.kvk_client = KvKClient(config)
+        cls.kvk_client = KvKClient(cls.config)
 
     def setUp(self):
         patched_requests = patch("open_inwoner.kvk.client.requests.get")
@@ -28,12 +28,39 @@ class KvKAPITest(TestCase):
         self.addCleanup(patch.stopall)
 
     def test_search_endpoint(self):
-        self.kvk_client.config.api_root = "https://api.kvk.nl/test/api/v1"
+        """
+        Assert that the "Zoeken" API url is constructed properly from the API root:
+            - trailing slashes are ignored
+            - correct API version number is inserted
+            - endpoint is appended
+        """
         endpoint1 = self.kvk_client.search_endpoint
 
-        self.kvk_client.config.api_root = "https://api.kvk.nl/test/api/v1/"
-        endpoint2 = self.kvk_client.search_endpoint
+        # second client for contrast: same root but without '/'
+        kvk_client2 = KvKClient(self.config)
+        kvk_client2.config.api_root = "https://api.kvk.nl/test/api"
 
+        endpoint2 = kvk_client2.search_endpoint
+
+        self.assertEqual(endpoint1, "https://api.kvk.nl/test/api/v2/zoeken")
+        self.assertEqual(endpoint1, endpoint2)
+
+    def test_basisprofielen_endpoint(self):
+        """
+        Assert that the "Basisprofielen" API url is constructed properly from the API root:
+            - trailing slashes are ignored
+            - correct API version number is inserted
+            - endpoint is appended
+        """
+        endpoint1 = self.kvk_client.basisprofielen_endpoint
+
+        # second client for contrast: same root but without '/'
+        kvk_client2 = KvKClient(self.config)
+        kvk_client2.config.api_root = "https://api.kvk.nl/test/api"
+
+        endpoint2 = kvk_client2.basisprofielen_endpoint
+
+        self.assertEqual(endpoint1, "https://api.kvk.nl/test/api/v1/basisprofielen")
         self.assertEqual(endpoint1, endpoint2)
 
     def test_generic_search_by_kvk(self):
